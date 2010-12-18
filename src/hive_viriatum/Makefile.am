@@ -25,8 +25,10 @@
 
 include $(top_srcdir)/Common.am
 
-libmariachi_a_CFLAGS = $(AM_CFLAGS)
-libmariachi_a_CXXFLAGS = $(AM_CXXFLAGS)
+bin_PROGRAMS = viriatum
+
+viriatum_CFLAGS = $(AM_CFLAGS)
+viriatum_CXXFLAGS = $(AM_CXXFLAGS)
 
 viriatum_SOURCES = stdafx.c \
 viriatum.c 
