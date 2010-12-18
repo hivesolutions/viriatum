@@ -36,10 +36,10 @@
 #include "global/targetver.h"
 #include "global/resource.h"
 
-// excludes rarely-used stuff from windows headers
+/* excludes rarely-used stuff from windows headers */
 #define WIN32_LEAN_AND_MEAN
 
-// includes the extra math definitions
+/* includes the extra math definitions */
 #define _USE_MATH_DEFINES
 #endif
 

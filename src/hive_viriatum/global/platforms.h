@@ -37,7 +37,7 @@
 #define VIRIATUM_PLATFORM_WIN32 true
 #endif
 
-#ifdef linux
+#ifdef __linux__
 #define VIRIATUM_PLATFORM_LINUX true
 #endif
 
