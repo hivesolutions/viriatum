@@ -25,35 +25,22 @@
 
 #pragma once
 
-#ifdef __MACH__
-#define unix true
-#include <TargetConditionals.h>
-#endif
-
-#ifdef _WIN32
-#include "global/targetver.h"
-#include "global/resource.h"
-
-// excludes rarely-used stuff from windows headers
-#define WIN32_LEAN_AND_MEAN
-
-// includes the extra math definitions
-#define _USE_MATH_DEFINES
-#endif
-
-#include "global/definitions.h"
-
 #ifdef VIRIATUM_PLATFORM_WIN32
-#include <Windows.h>
+#define PID_TYPE DWORD
+#define LOCAL_TIME(localTimeValue, timeValue) tm localTimeValueValue; localTimeValue = &localTimeValueValue; localtime_s(localTimeValue, timeValue)
+#define SLEEP(miliseconds) Sleep(miliseconds)
+#define GET_PID() GetCurrentProcessId()
+#define SPRINTF(buffer, size, format, ...) sprintf_s(buffer, size, format, __VA_ARGS__)
+#define GET_ENV(buffer, bufferSize, variableName) _dupenv_s(&buffer, &bufferSize, variableName)
+#define FILE_EXISTS(filePath) GetFileAttributes(filePath) != 0xffffffff
+#elif VIRIATUM_PLATFORM_UNIX
+#define PID_TYPE pid_t
+#define LOCAL_TIME(localTimeValue, timeValue) localTimeValue = localtime(timeValue)
+#define SLEEP(miliseconds) usleep((useconds_t) miliseconds * 1000)
+#define GET_PID() getpid()
+#define SPRINTF(buffer, size, format, ...) sprintf(buffer, format, __VA_ARGS__)
+#define GET_ENV(buffer, bufferSize, variableName) buffer = getenv(variableName)
+#define FILE_EXISTS(filePath) access(filePath, F_OK) == 0
 #endif
 
-#ifdef VIRIATUM_PLATFORM_UNIX
-#include <unistd.h>
-#include <pthread.h>
-#endif
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
-#include <math.h>
+#define CLOCK() clock()
