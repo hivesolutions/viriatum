@@ -46,7 +46,7 @@ int main(int argc, char *argv[]) {
     SOCKET_ADDRESS clientSocketAddress;
 
     /* allocates the client socket address size */
-    int clientSocketAddressSize;
+    unsigned int clientSocketAddressSize;
 
     SOCKET_ERROR_CODE result;
 
@@ -60,7 +60,7 @@ int main(int argc, char *argv[]) {
     /* creates the socket for the given types */
     socketHandle = SOCKET_CREATE(SOCKET_INTERNET_TYPE, SOCKET_PACKET_TYPE, SOCKET_PROTOCOL_TCP);
 
-    // tests the socket for errors
+    /* tests the socket for errors */
     if(SOCKET_TEST_SOCKET(socketHandle)) {
         /* retrieves the socket error code */
         SOCKET_ERROR_CODE socketErrorCode = SOCKET_GET_ERROR_CODE(socketHandle);
