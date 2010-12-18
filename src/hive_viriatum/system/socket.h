@@ -67,8 +67,8 @@
 #include <arpa/inet.h>
 #define SOCKET_HANDLE int
 #define SOCKET_DATA void *
-#define SOCKET_ADDRESS sockaddr
-#define SOCKET_ADDRESS_INPUT sockaddr_in
+#define SOCKET_ADDRESS struct sockaddr
+#define SOCKET_ADDRESS_INPUT struct sockaddr_in
 #define SOCKET_ERROR_CODE int
 #define SOCKET_INTERNET_TYPE AF_INET
 #define SOCKET_INTERNET6_TYPE AF_INET6
