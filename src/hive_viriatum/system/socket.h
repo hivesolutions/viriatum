@@ -56,7 +56,6 @@
 #define SOCKET_TEST_ERROR(result) result == SOCKET_ERROR
 #define SOCKET_GET_ERROR_CODE(result) WSAGetLastError()
 #endif
-
 #ifdef VIRIATUM_PLATFORM_UNIX
 #include <sys/socket.h>
 #include <arpa/inet.h>
