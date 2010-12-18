@@ -33,8 +33,16 @@ int main(int argc, char *argv[]) {
 	/* creates the new socket handle */
 	SOCKET_HANDLE socketHandle = SOCKET_CREATE(SOCKET_INTERNET_TYPE, SOCKET_PACKET_TYPE, SOCKET_PROTOCOL_TCP);
 
+    /* allocates the socket address structure */
+    SOCKET_ADDRESS socketAddress;
+
+	/* sets the socket address attributes */
+	socketAddress.sin_family = SOCKET_INTERNET_TYPE;
+	socketAddress.sin_addr.s_addr = inet_addr("0.0.0.0");
+	socketAddress.sin_port = htons(8080);
+
 	/* binds the socket */
-	SOCKET_BIND(socketHandle, "0.0.0.0");
+	SOCKET_BIND(socketHandle, socketAddress);
 
 	/* iterates continuously */
 	while(1) {
