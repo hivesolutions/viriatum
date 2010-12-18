@@ -104,7 +104,7 @@ int main(int argc, char *argv[]) {
 
     /* sets the socket address attributes */
     socketAddress.sin_family = SOCKET_INTERNET_TYPE;
-    socketAddress.sin_addr.s_addr = inet_addr("127.0.0.1");
+    socketAddress.sin_addr.s_addr = inet_addr("0.0.0.0");
     socketAddress.sin_port = htons(8080);
 
     /* binds the socket */
@@ -145,6 +145,7 @@ int main(int argc, char *argv[]) {
         if (clientSocketHandle < 0)
             printf("ERROR on accept");
 
+        /* sends the data */
         n = SOCKET_SEND(clientSocketHandle, response, strlen(response), 0);
         n = SOCKET_SEND(clientSocketHandle, buffer2, fileSize, 0);
 
