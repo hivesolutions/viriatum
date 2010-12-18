@@ -70,6 +70,9 @@ int main(int argc, char *argv[]) {
 
         /* runs the socket finish */
         SOCKET_FINISH();
+
+        /* returns immediately */
+        return 0;
     }
 
     /* sets the socket address attributes */
@@ -95,7 +98,7 @@ int main(int argc, char *argv[]) {
         SOCKET_FINISH();
 
         /* returns immediately */
-        return;
+        return 0;
     }
 
     /* listens for a socket change */
@@ -118,6 +121,9 @@ int main(int argc, char *argv[]) {
 
         n = SOCKET_SEND(clientSocketHandle, "tobias e fixe", strlen("tobias e fixe"), 0);
     }
+
+	/* runs the socket finish */
+    SOCKET_FINISH();
 
     /* returns zero (valid) */
     return 0;
