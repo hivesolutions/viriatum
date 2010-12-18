@@ -42,9 +42,6 @@ AC_PROG_MAKE_SET
 
 case "$host_os" in
 *linux*)
-    AC_CHECK_LIB([GL], [main], [], [AC_MSG_ERROR(can't build without OpenGL (libGL) libraries)])
-    AC_CHECK_LIB([X11], [main], [], [AC_MSG_ERROR(can't build without X11 (libX11) libraries)])
-    AC_CHECK_LIB([glut], [main], [], [AC_MSG_WARN(building without GLUT (libglut) libraries support)])
     ;;    
 *darwin*)
     ;;

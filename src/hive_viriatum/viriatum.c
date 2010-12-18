@@ -31,6 +31,7 @@ int main(int argc, char *argv[]) {
 	/* creates the new socket handle */
 	SOCKET_HANDLE socketHandle = SOCKET_CREATE(SOCKET_INTERNET_TYPE, SOCKET_PACKET_TYPE, SOCKET_PROTOCOL_TCP);
 
+	/* binds the socket */
 	SOCKET_BIND(socketHandle, "0.0.0.0");
 
 	/* iterates continuously */
