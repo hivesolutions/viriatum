@@ -33,6 +33,7 @@
 #define SOCKET_DATA WSADATA
 #define SOCKET_HANDLE SOCKET
 #define SOCKET_ADDRESS SOCKADDR_IN
+#define SOCKET_ADDRESS_SIMPLE SOCKADDR
 #define SOCKET_ERROR_CODE int
 #define SOCKET_INTERNET_TYPE AF_INET
 #define SOCKET_INTERNET6_TYPE AF_INET6
@@ -40,12 +41,13 @@
 #define SOCKET_DATAGRAM_TYPE SOCK_DGRAM
 #define SOCKET_PROTOCOL_TCP IPPROTO_TCP
 #define SOCKET_PROTOCOL_UDP IPPROTO_UDP
-#define SOCKET_INITIALIZE(socketData) if(WSAStartup(MAKEWORD(2, 0), socketData) != 0) { throw Exception("Socket Initialization Error"); }
+#define SOCKET_INITIALIZE(socketData) WSAStartup(MAKEWORD(2, 0), socketData)
 #define SOCKET_FINISH() WSACleanup()
 #define SOCKET_CREATE(type, streamType, protocolType) socket(type, streamType, protocolType)
 #define SOCKET_BIND(socketHandle, socketAddress) bind(socketHandle, (LPSOCKADDR) &socketAddress, sizeof(SOCKET_ADDRESS))
 #define SOCKET_LISTEN(socketHandle) listen(socketHandle, SOMAXCONN)
-#define SOCKET_CONNECT(socketHandle, socketAddress) connect(socketHandle, (LPSOCKADDR) &socketAddress, sizeof(SOCKET_ADDRESS));
+#define SOCKET_CONNECT(socketHandle, socketAddress) connect(socketHandle, (LPSOCKADDR) &socketAddress, sizeof(SOCKET_ADDRESS))
+#define SOCKET_ACCEPT(socketHandle, socketAddress, socketAddressSize) accept(socketHandle, socketAddress, &socketAddressSize)
 #define SOCKET_CLOSE(socketHandle) closesocket(socketHandle)
 #define SOCKET_ADDRESS_CREATE(socketAddress, type, address, port) memset(&socketAddress, 0, sizeof(SOCKET_ADDRESS));\
     socketAddress.sin_family = type;\
@@ -55,7 +57,10 @@
 #define SOCKET_TEST_SOCKET(socketHandle) socketHandle == INVALID_SOCKET
 #define SOCKET_TEST_ERROR(result) result == SOCKET_ERROR
 #define SOCKET_GET_ERROR_CODE(result) WSAGetLastError()
+#define SOCKET_SEND(socketHandle, buffer, length, flags) send(socketHandle, buffer, length, flags)
+#define SOCKET_RECEIVE(socketHandle, buffer, length, flags) recv(socketHandle, buffer, length, flags)
 #endif
+
 #ifdef VIRIATUM_PLATFORM_UNIX
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -76,6 +81,7 @@
 #define SOCKET_BIND(socketHandle, socketAddress) bind(socketHandle, (struct sockaddr *) &socketAddress, sizeof(SOCKET_ADDRESS))
 #define SOCKET_LISTEN(socketHandle) listen(socketHandle, SOMAXCONN)
 #define SOCKET_CONNECT(socketHandle, socketAddress) connect(socketHandle, (struct sockaddr *) &socketAddress, sizeof(SOCKET_ADDRESS))
+#define SOCKET_ACCEPT(socketHandle, socketAddress) accept(socketHandle, (struct sockaddr *) &socketAddress, sizeof(SOCKET_ADDRESS))
 #define SOCKET_CLOSE(socketHandle) close(socketHandle)
 #define SOCKET_ADDRESS_CREATE(socketAddress, type, address, port) memset(&socketAddress, 0, sizeof(SOCKET_ADDRESS));\
     socketAddress.sin_family = type;\
@@ -85,4 +91,6 @@
 #define SOCKET_TEST_SOCKET(socketHandle) socketHandle < 0
 #define SOCKET_TEST_ERROR(result) result < 0
 #define SOCKET_GET_ERROR_CODE(result) result
+#define SOCKET_SEND(socketHandle, buffer, length, flags) write(socketHandle, buffer, length)
+#define SOCKET_RECEIVE(socketHandle, buffer, length, flags) read(socketHandle, buffer, length)
 #endif
