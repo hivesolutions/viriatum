@@ -48,13 +48,38 @@ int main(int argc, char *argv[]) {
     /* allocates the client socket address size */
     unsigned int clientSocketAddressSize;
 
-	/* allocates the result */
+    /* allocates the result */
     SOCKET_ERROR_CODE result;
 
-	/* allocates the "simple" buffer */
-    char buffer[256];
+    /* allocates the "simple" buffer */
+    char buffer[10240];
+
+    char response[1000];
+
+    char *buffer2 = malloc(1000000);
+    size_t fileSize;
 
     unsigned int n;
+
+    char *fileName;
+
+    FILE *file;
+
+    if(argc > 1) {
+        fileName = argv[1];
+    } else {
+        fileName = "C:\\Desert.jpg";
+    }
+
+    file = fopen(fileName, "rb");
+
+    fseek (file , 0 , SEEK_END);
+    fileSize = ftell (file);
+    rewind (file);
+
+    fread(buffer2, 1, fileSize, file);
+
+    sprintf(response, "HTTP/1.1 200 OK\r\nServer: Viriatum Web Server\r\nContent-Length: %d\r\n\r\n", fileSize);
 
     /* initializes the socket infrastructure */
     SOCKET_INITIALIZE(&socketData);
@@ -114,17 +139,20 @@ int main(int argc, char *argv[]) {
         /* accepts the socket */
         clientSocketHandle = SOCKET_ACCEPT(socketHandle, &clientSocketAddress, clientSocketAddressSize);
 
-        n = SOCKET_RECEIVE(clientSocketHandle, buffer, 255, 0);
-
-        printf("Received %s", buffer);
+        /* reveives from the client socket */
+        n = SOCKET_RECEIVE(clientSocketHandle, buffer, 10240, 0);
 
         if (clientSocketHandle < 0)
             printf("ERROR on accept");
 
-        n = SOCKET_SEND(clientSocketHandle, "tobias e fixe", strlen("tobias e fixe"), 0);
+        n = SOCKET_SEND(clientSocketHandle, response, strlen(response), 0);
+        n = SOCKET_SEND(clientSocketHandle, buffer2, fileSize, 0);
+
+        /* closes the client socket */
+        SOCKET_CLOSE(clientSocketHandle);
     }
 
-	/* runs the socket finish */
+    /* runs the socket finish */
     SOCKET_FINISH();
 
     /* returns zero (valid) */
