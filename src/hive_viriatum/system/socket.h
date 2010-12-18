@@ -82,7 +82,7 @@
 #define SOCKET_BIND(socketHandle, socketAddress) bind(socketHandle, (struct sockaddr *) &socketAddress, sizeof(SOCKET_ADDRESS))
 #define SOCKET_LISTEN(socketHandle) listen(socketHandle, SOMAXCONN)
 #define SOCKET_CONNECT(socketHandle, socketAddress) connect(socketHandle, (struct sockaddr *) &socketAddress, sizeof(SOCKET_ADDRESS))
-#define SOCKET_ACCEPT(socketHandle, socketAddress) accept(socketHandle, (struct sockaddr *) &socketAddress, sizeof(SOCKET_ADDRESS))
+#define SOCKET_ACCEPT(socketHandle, socketAddress, socketAddressSize) accept(socketHandle, socketAddress, &socketAddressSize)
 #define SOCKET_CLOSE(socketHandle) close(socketHandle)
 #define SOCKET_ADDRESS_CREATE(socketAddress, type, address, port) memset(&socketAddress, 0, sizeof(SOCKET_ADDRESS));\
     socketAddress.sin_family = type;\
