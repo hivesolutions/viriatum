@@ -25,6 +25,20 @@
 
 #include "stdafx.h"
 
-int main(int argc, char* argv[]) {
+#include "system/system.h"
+
+int main(int argc, char *argv[]) {
+	/* creates the new socket handle */
+	SOCKET_HANDLE socketHandle = SOCKET_CREATE(SOCKET_INTERNET_TYPE, SOCKET_PACKET_TYPE, SOCKET_PROTOCOL_TCP);
+
+	SOCKET_BIND(socketHandle, "0.0.0.0");
+
+	/* iterates continuously */
+	while(1) {
+		/* listens for a socket change */
+		SOCKET_LISTEN(socketHandle);
+	}
+
+	/* returns zero (valid) */
 	return 0;
 }

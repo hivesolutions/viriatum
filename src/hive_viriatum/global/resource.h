@@ -23,37 +23,16 @@
 // __copyright__ = Copyright (c) 2008 Hive Solutions Lda.
 // __license__   = GNU General Public License (GPL), Version 3
 
-#pragma once
+#define IDS_APP_TITLE 101
+#define IDI_SMALL 102
+#define IDC_STATIC -1
 
-#ifdef __MACH__
-#define unix true
-#include <TargetConditionals.h>
+#ifdef APSTUDIO_INVOKED
+#ifndef APSTUDIO_READONLY_SYMBOLS
+#define _APS_NO_MFC 1
+#define _APS_NEXT_RESOURCE_VALUE 129
+#define _APS_NEXT_COMMAND_VALUE 32772
+#define _APS_NEXT_CONTROL_VALUE 1000
+#define _APS_NEXT_SYMED_VALUE 110
 #endif
-
-#ifdef _WIN32
-#include "global/targetver.h"
-#include "global/resource.h"
-
-// excludes rarely-used stuff from windows headers
-#define WIN32_LEAN_AND_MEAN
-
-// includes the extra math definitions
-#define _USE_MATH_DEFINES
 #endif
-
-#include "global/definitions.h"
-
-#ifdef VIRIATUM_PLATFORM_WIN32
-#include <Windows.h>
-#endif
-
-#ifdef VIRIATUM_PLATFORM_UNIX
-#include <unistd.h>
-#include <pthread.h>
-#endif
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
-#include <math.h>

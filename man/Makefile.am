@@ -22,7 +22,3 @@
 // __date__      = $LastChangedDate$
 // __copyright__ = Copyright (c) 2008 Hive Solutions Lda.
 // __license__   = GNU General Public License (GPL), Version 3
-
-include $(top_srcdir)/Common.am
-
-SUBDIRS = hive_viriatum

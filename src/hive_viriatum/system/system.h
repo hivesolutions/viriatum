@@ -25,35 +25,6 @@
 
 #pragma once
 
-#ifdef __MACH__
-#define unix true
-#include <TargetConditionals.h>
-#endif
-
-#ifdef _WIN32
-#include "global/targetver.h"
-#include "global/resource.h"
-
-// excludes rarely-used stuff from windows headers
-#define WIN32_LEAN_AND_MEAN
-
-// includes the extra math definitions
-#define _USE_MATH_DEFINES
-#endif
-
-#include "global/definitions.h"
-
-#ifdef VIRIATUM_PLATFORM_WIN32
-#include <Windows.h>
-#endif
-
-#ifdef VIRIATUM_PLATFORM_UNIX
-#include <unistd.h>
-#include <pthread.h>
-#endif
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
-#include <math.h>
+#include "socket.h"
+#include "system_util.h"
+#include "thread.h"

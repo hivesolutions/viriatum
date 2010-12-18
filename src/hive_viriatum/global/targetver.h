@@ -25,35 +25,17 @@
 
 #pragma once
 
-#ifdef __MACH__
-#define unix true
-#include <TargetConditionals.h>
+// sets windows version to windows xp and 2003 or above
+#ifndef WINVER
+#define WINVER 0x0501
 #endif
 
-#ifdef _WIN32
-#include "global/targetver.h"
-#include "global/resource.h"
-
-// excludes rarely-used stuff from windows headers
-#define WIN32_LEAN_AND_MEAN
-
-// includes the extra math definitions
-#define _USE_MATH_DEFINES
+// sets windows nt version to windows xp and 2003 or above
+#ifndef _WIN32_WINNT
+#define _WIN32_WINNT 0x0501
 #endif
 
-#include "global/definitions.h"
-
-#ifdef VIRIATUM_PLATFORM_WIN32
-#include <Windows.h>
+// sets windows 32 version to windows 98 or above
+#ifndef _WIN32_WINDOWS
+#define _WIN32_WINDOWS 0x0410
 #endif
-
-#ifdef VIRIATUM_PLATFORM_UNIX
-#include <unistd.h>
-#include <pthread.h>
-#endif
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
-#include <math.h>

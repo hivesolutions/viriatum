@@ -25,4 +25,8 @@
 
 include $(top_srcdir)/Common.am
 
-SUBDIRS = hive_viriatum
+libmariachi_a_CFLAGS = $(AM_CFLAGS)
+libmariachi_a_CXXFLAGS = $(AM_CXXFLAGS)
+
+viriatum_SOURCES = stdafx.c \
+viriatum.c 

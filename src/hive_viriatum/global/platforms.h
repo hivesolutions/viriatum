@@ -25,35 +25,46 @@
 
 #pragma once
 
-#ifdef __MACH__
-#define unix true
-#include <TargetConditionals.h>
+#if defined(__sparc__) || defined(__hppa__) || defined(__ppc__) || defined(__mips__) || (defined(__MWERKS__) && !defined(__INTEL__))
+#define VIRIATUM_BIG_ENDIAN true
+#else
+#define VIRIATUM_LITTLE_ENDIAN true
 #endif
 
 #ifdef _WIN32
-#include "global/targetver.h"
-#include "global/resource.h"
-
-// excludes rarely-used stuff from windows headers
-#define WIN32_LEAN_AND_MEAN
-
-// includes the extra math definitions
-#define _USE_MATH_DEFINES
+#define VIRIATUM_PLATFORM_WIN32 true
 #endif
 
-#include "global/definitions.h"
-
-#ifdef VIRIATUM_PLATFORM_WIN32
-#include <Windows.h>
+#ifdef linux
+#define VIRIATUM_PLATFORM_LINUX true
 #endif
 
-#ifdef VIRIATUM_PLATFORM_UNIX
-#include <unistd.h>
-#include <pthread.h>
+#ifdef __MACH__
+#if TARGET_OS_IPHONE
+#define VIRIATUM_PLATFORM_IPHONE true
+#else
+#define VIRIATUM_PLATFORM_MACOSX true
+#endif
 #endif
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
-#include <math.h>
+#ifdef unix
+#define VIRIATUM_PLATFORM_UNIX true
+#endif
+
+#if defined(VIRIATUM_PLATFORM_WIN32)
+#define VIRIATUM_PLATFORM_DIRECT3D true
+#endif
+
+#if defined(VIRIATUM_PLATFORM_WIN32) || defined(VIRIATUM_PLATFORM_LINUX) || defined(VIRIATUM_PLATFORM_MACOSX)
+#define VIRIATUM_PLATFORM_OPENGL true
+#endif
+
+#if defined(VIRIATUM_PLATFORM_IPHONE)
+#define VIRIATUM_PLATFORM_OPENGLES true
+#endif
+
+#if defined(VIRIATUM_PLATFORM_IPHONE)
+#define VIRIATUM_SYNC_PARALLEL_PROCESSING true
+#else
+#define VIRIATUM_SYNC_PARALLEL_PROCESSING true
+#endif

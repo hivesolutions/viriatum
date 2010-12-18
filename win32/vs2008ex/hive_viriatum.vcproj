@@ -196,6 +196,14 @@
 				RelativePath="..\..\src\hive_viriatum\viriatum.c"
 				>
 			</File>
+			<Filter
+				Name="system"
+				>
+			</Filter>
+			<Filter
+				Name="global"
+				>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -206,10 +214,46 @@
 				RelativePath="..\..\src\hive_viriatum\stdafx.h"
 				>
 			</File>
-			<File
-				RelativePath="..\..\src\hive_viriatum\targetver.h"
+			<Filter
+				Name="system"
 				>
-			</File>
+				<File
+					RelativePath="..\..\src\hive_viriatum\system\socket.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\hive_viriatum\system\system.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\hive_viriatum\system\system_util.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\hive_viriatum\system\thread.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="global"
+				>
+				<File
+					RelativePath="..\..\src\hive_viriatum\global\definitions.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\hive_viriatum\global\platforms.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\hive_viriatum\global\resource.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\hive_viriatum\global\targetver.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Resource Files"
