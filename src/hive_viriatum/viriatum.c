@@ -30,35 +30,35 @@
 #include "system/system.h"
 
 int main(int argc, char *argv[]) {
-	/* allocates the socket data */
-	SOCKET_DATA socketData;
+    /* allocates the socket data */
+    SOCKET_DATA socketData;
 
-	/* allocates the socket handle */
-	SOCKET_HANDLE socketHandle;
+    /* allocates the socket handle */
+    SOCKET_HANDLE socketHandle;
 
     /* allocates the socket address structure */
-    SOCKET_ADDRESS socketAddress;
+    SOCKET_ADDRESS_INPUT socketAddress;
 
-	/* allocates the client socket handle */
-	SOCKET_HANDLE clientSocketHandle;
+    /* allocates the client socket handle */
+    SOCKET_HANDLE clientSocketHandle;
 
-	/* allocates the client socket address structure */
-	SOCKET_ADDRESS_SIMPLE clientSocketAddress;
+    /* allocates the client socket address structure */
+    SOCKET_ADDRESS clientSocketAddress;
 
-	/* allocates the client socket address size */
-	int clientSocketAddressSize;
+    /* allocates the client socket address size */
+    int clientSocketAddressSize;
 
-	SOCKET_ERROR_CODE result;
+    SOCKET_ERROR_CODE result;
 
-	char buffer[256];
+    char buffer[256];
 
-	unsigned int n;
+    unsigned int n;
 
-	/* initializes the socket infrastructure */
-	SOCKET_INITIALIZE(&socketData);
+    /* initializes the socket infrastructure */
+    SOCKET_INITIALIZE(&socketData);
 
-	/* creates the socket for the given types */
-	socketHandle = SOCKET_CREATE(SOCKET_INTERNET_TYPE, SOCKET_PACKET_TYPE, SOCKET_PROTOCOL_TCP);
+    /* creates the socket for the given types */
+    socketHandle = SOCKET_CREATE(SOCKET_INTERNET_TYPE, SOCKET_PACKET_TYPE, SOCKET_PROTOCOL_TCP);
 
     // tests the socket for errors
     if(SOCKET_TEST_SOCKET(socketHandle)) {
@@ -68,19 +68,19 @@ int main(int argc, char *argv[]) {
         /* prints the error */
         printf("Problem creating socket: %d", socketErrorCode);
 
-		/* runs the socket finish */
-		SOCKET_FINISH();
+        /* runs the socket finish */
+        SOCKET_FINISH();
     }
 
-	/* sets the socket address attributes */
-	socketAddress.sin_family = SOCKET_INTERNET_TYPE;
-	socketAddress.sin_addr.s_addr = inet_addr("127.0.0.1");
-	socketAddress.sin_port = htons(8080);
+    /* sets the socket address attributes */
+    socketAddress.sin_family = SOCKET_INTERNET_TYPE;
+    socketAddress.sin_addr.s_addr = inet_addr("127.0.0.1");
+    socketAddress.sin_port = htons(8080);
 
-	/* binds the socket */
-	result = SOCKET_BIND(socketHandle, socketAddress);
+    /* binds the socket */
+    result = SOCKET_BIND(socketHandle, socketAddress);
 
-	/* in case there was an error binding the socket */
+    /* in case there was an error binding the socket */
     if(SOCKET_TEST_ERROR(result)) {
         /* retrieves the binding error code */
         SOCKET_ERROR_CODE bindingErrorCode = SOCKET_GET_ERROR_CODE(bindResult);
@@ -88,37 +88,37 @@ int main(int argc, char *argv[]) {
         /* prints the error */
         printf("Problem binding socket: %d", bindingErrorCode);
 
-		/* closes the socket */
-		SOCKET_CLOSE(socketHandle);
+        /* closes the socket */
+        SOCKET_CLOSE(socketHandle);
 
-		/* runs the socket finish */
-		SOCKET_FINISH();
+        /* runs the socket finish */
+        SOCKET_FINISH();
 
-		/* returns immediately */
-		return;
+        /* returns immediately */
+        return;
     }
 
-	/* listens for a socket change */
-	SOCKET_LISTEN(socketHandle);
+    /* listens for a socket change */
+    SOCKET_LISTEN(socketHandle);
 
-	/* iterates continuously */
-	while(1) {
-		/* calculates the size of the socket address */
-		clientSocketAddressSize = sizeof(socketAddress);
-		
-		/* accepts the socket */
-		clientSocketHandle = SOCKET_ACCEPT(socketHandle, &clientSocketAddress, clientSocketAddressSize);
+    /* iterates continuously */
+    while(1) {
+        /* calculates the size of the socket address */
+        clientSocketAddressSize = sizeof(socketAddress);
 
-		SOCKET_RECEIVE(clientSocketHandle, buffer, 255, 0);
+        /* accepts the socket */
+        clientSocketHandle = SOCKET_ACCEPT(socketHandle, &clientSocketAddress, clientSocketAddressSize);
 
-		printf("Received %s", buffer);
+        SOCKET_RECEIVE(clientSocketHandle, buffer, 255, 0);
 
-		if (clientSocketHandle < 0) 
-			printf("ERROR on accept");
+        printf("Received %s", buffer);
 
-	    n = SOCKET_SEND(clientSocketHandle, "tobias e fixe", strlen("tobias e fixe"), 0);
-	}
+        if (clientSocketHandle < 0)
+            printf("ERROR on accept");
 
-	/* returns zero (valid) */
-	return 0;
+        n = SOCKET_SEND(clientSocketHandle, "tobias e fixe", strlen("tobias e fixe"), 0);
+    }
+
+    /* returns zero (valid) */
+    return 0;
 }
