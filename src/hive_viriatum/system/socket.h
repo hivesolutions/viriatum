@@ -73,9 +73,9 @@
 #define SOCKET_INITIALIZE(socketData)
 #define SOCKET_FINISH()
 #define SOCKET_CREATE(type, streamType, protocolType) socket(type, streamType, protocolType)
-#define SOCKET_BIND(socketHandle, socketAddress) bind(socketHandle, (sockaddr *) &socketAddress, sizeof(SOCKET_ADDRESS))
+#define SOCKET_BIND(socketHandle, socketAddress) bind(socketHandle, (struct sockaddr *) &socketAddress, sizeof(SOCKET_ADDRESS))
 #define SOCKET_LISTEN(socketHandle) listen(socketHandle, SOMAXCONN)
-#define SOCKET_CONNECT(socketHandle, socketAddress) connect(socketHandle, (sockaddr *) &socketAddress, sizeof(SOCKET_ADDRESS))
+#define SOCKET_CONNECT(socketHandle, socketAddress) connect(socketHandle, (struct sockaddr *) &socketAddress, sizeof(SOCKET_ADDRESS))
 #define SOCKET_CLOSE(socketHandle) close(socketHandle)
 #define SOCKET_ADDRESS_CREATE(socketAddress, type, address, port) memset(&socketAddress, 0, sizeof(SOCKET_ADDRESS));\
     socketAddress.sin_family = type;\
