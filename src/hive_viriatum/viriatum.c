@@ -83,7 +83,7 @@ int main(int argc, char *argv[]) {
     /* in case there was an error binding the socket */
     if(SOCKET_TEST_ERROR(result)) {
         /* retrieves the binding error code */
-        SOCKET_ERROR_CODE bindingErrorCode = SOCKET_GET_ERROR_CODE(bindResult);
+        SOCKET_ERROR_CODE bindingErrorCode = SOCKET_GET_ERROR_CODE(result);
 
         /* prints the error */
         printf("Problem binding socket: %d", bindingErrorCode);
