@@ -61,7 +61,9 @@
 #define CONDITION_WAIT(conditionHandle, criticalSectionHandle) SleepConditionVariableCS(&conditionHandle, &criticalSectionHandle, INFINITE)
 #define CONDITION_SIGNAL(conditionHandle) WakeConditionVariable(&conditionHandle)
 #define CONDITION_CLOSE(conditionHandle)
-#elif VIRIATUM_PLATFORM_UNIX
+#endif
+
+#ifdef VIRIATUM_PLATFORM_UNIX
 typedef struct EventHandle_t {
     pthread_cond_t event;
     pthread_mutex_t mutex;
