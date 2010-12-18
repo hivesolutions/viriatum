@@ -58,6 +58,7 @@
 #endif
 #ifdef VIRIATUM_PLATFORM_UNIX
 #include <sys/socket.h>
+#include <netinet/in.h>
 #include <arpa/inet.h>
 #define SOCKET_HANDLE int
 #define SOCKET_DATA void *
