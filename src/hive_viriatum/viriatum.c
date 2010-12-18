@@ -48,8 +48,10 @@ int main(int argc, char *argv[]) {
     /* allocates the client socket address size */
     unsigned int clientSocketAddressSize;
 
+	/* allocates the result */
     SOCKET_ERROR_CODE result;
 
+	/* allocates the "simple" buffer */
     char buffer[256];
 
     unsigned int n;
@@ -112,7 +114,7 @@ int main(int argc, char *argv[]) {
         /* accepts the socket */
         clientSocketHandle = SOCKET_ACCEPT(socketHandle, &clientSocketAddress, clientSocketAddressSize);
 
-        SOCKET_RECEIVE(clientSocketHandle, buffer, 255, 0);
+        n = SOCKET_RECEIVE(clientSocketHandle, buffer, 255, 0);
 
         printf("Received %s", buffer);
 
