@@ -63,7 +63,7 @@ int main(int argc, char *argv[]) {
     // tests the socket for errors
     if(SOCKET_TEST_SOCKET(socketHandle)) {
         /* retrieves the socket error code */
-        SOCKET_ERROR_CODE socketErrorCode = SOCKET_GET_ERROR_CODE(this->socketHandle);
+        SOCKET_ERROR_CODE socketErrorCode = SOCKET_GET_ERROR_CODE(socketHandle);
 
         /* prints the error */
         printf("Problem creating socket: %d", socketErrorCode);
