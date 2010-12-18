@@ -55,7 +55,7 @@
 #define SOCKET_TEST_SOCKET(socketHandle) socketHandle == INVALID_SOCKET
 #define SOCKET_TEST_ERROR(result) result == SOCKET_ERROR
 #define SOCKET_GET_ERROR_CODE(result) WSAGetLastError()
-#elif VIRIATUM_PLATFORM_UNIX
+#elif linux
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #define SOCKET_HANDLE int
