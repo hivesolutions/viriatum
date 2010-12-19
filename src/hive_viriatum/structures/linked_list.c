@@ -32,59 +32,59 @@
 #include "linked_list.h"
 
 void createLinkedList(struct LinkedList_t **linkedListPointer) {
-	/* retrieves the linked list size */
-	size_t linkedListSize = sizeof(struct LinkedList_t);
+    /* retrieves the linked list size */
+    size_t linkedListSize = sizeof(struct LinkedList_t);
 
-	/* allocates space for the linked list */
-	struct LinkedList_t *linkedList = (struct LinkedList_t *) malloc(linkedListSize);
+    /* allocates space for the linked list */
+    struct LinkedList_t *linkedList = (struct LinkedList_t *) malloc(linkedListSize);
 
-	/* initializes the linked list size */
-	linkedList->size = 0;
+    /* initializes the linked list size */
+    linkedList->size = 0;
 
-	/* sets the first and last elements of the linked list to null */
-	linkedList->first = NULL;
-	linkedList->last = NULL;
+    /* sets the first and last elements of the linked list to null */
+    linkedList->first = NULL;
+    linkedList->last = NULL;
 
-	/* sets the linked list in the linked list pointer */
-	*linkedListPointer = linkedList;
+    /* sets the linked list in the linked list pointer */
+    *linkedListPointer = linkedList;
 }
 
 void deleteLinkedList(struct LinkedList_t *linkedList) {
-	/* releases the linked list */
-	free(linkedList);
+    /* releases the linked list */
+    free(linkedList);
 }
 
 void createLinkedListNode(struct LinkedListNode_t **linkedListNodePointer) {
-	/* retrieves the linked list node size */
-	size_t linkedListNodeSize = sizeof(struct LinkedListNode_t);
+    /* retrieves the linked list node size */
+    size_t linkedListNodeSize = sizeof(struct LinkedListNode_t);
 
-	/* allocates space for the linked list node */
-	struct LinkedListNode_t *linkedListNode = (struct LinkedListNode_t *) malloc(linkedListNodeSize);
+    /* allocates space for the linked list node */
+    struct LinkedListNode_t *linkedListNode = (struct LinkedListNode_t *) malloc(linkedListNodeSize);
 
-	/* initializes the linked list node value */ 
-	linkedListNode->value = NULL;
+    /* initializes the linked list node value */
+    linkedListNode->value = NULL;
 
-	/* sets the next and previous elements of the linked list node to null */
-	linkedListNode->next = NULL;
-	linkedListNode->previous = NULL;
+    /* sets the next and previous elements of the linked list node to null */
+    linkedListNode->next = NULL;
+    linkedListNode->previous = NULL;
 
-	/* sets the linked list node in the linked list node pointer */
-	*linkedListNodePointer = linkedListNode;
+    /* sets the linked list node in the linked list node pointer */
+    *linkedListNodePointer = linkedListNode;
 }
 
 void appendLinkedList(struct LinkedList_t *linkedList, void *value) {
-	/* allocates space for the linked list node */
-	struct LinkedListNode_t *linkedListNode;
+    /* allocates space for the linked list node */
+    struct LinkedListNode_t *linkedListNode;
 
-	/* creates the linked list node */
-	createLinkedListNode(&linkedListNode);
+    /* creates the linked list node */
+    createLinkedListNode(&linkedListNode);
 
-	/* sets the value in the linked list node */
-	linkedListNode->value = value;
+    /* sets the value in the linked list node */
+    linkedListNode->value = value;
 
-	/* in case the linked list is empty */
-	if(linkedList->size == 0) {
-		linkedList->first = linkedListNode;
-		linkedList->last = linkedListNode;
-	}
+    /* in case the linked list is empty */
+    if(linkedList->size == 0) {
+        linkedList->first = linkedListNode;
+        linkedList->last = linkedListNode;
+    }
 }

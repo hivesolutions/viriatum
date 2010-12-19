@@ -31,4 +31,6 @@ viriatum_CFLAGS = $(AM_CFLAGS)
 viriatum_CXXFLAGS = $(AM_CXXFLAGS)
 
 viriatum_SOURCES = stdafx.c \
-viriatum.c 
+viriatum.c \
+structures/linked_list.c \
+thread/thread_pool.c 
