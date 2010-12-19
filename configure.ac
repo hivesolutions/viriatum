@@ -39,6 +39,7 @@ AM_PROG_CC_C_O
 AC_PROG_MAKE_SET
 
 # checks for libraries
+AC_CHECK_LIB([pthread], [main], [], [AC_MSG_ERROR(can't build without POSIX threads (libpthread) libraries)])
 
 case "$host_os" in
 *linux*)
