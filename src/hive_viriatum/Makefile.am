@@ -30,6 +30,8 @@ bin_PROGRAMS = viriatum
 viriatum_CFLAGS = $(AM_CFLAGS)
 viriatum_CXXFLAGS = $(AM_CXXFLAGS)
 
+viriatum_LDADD = -lpthread $(INTLLIBS)
+
 viriatum_SOURCES = stdafx.c \
 viriatum.c \
 structures/linked_list.c \
