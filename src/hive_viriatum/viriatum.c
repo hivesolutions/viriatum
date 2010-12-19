@@ -79,7 +79,7 @@ int main(int argc, char *argv[]) {
 
     fread(buffer2, 1, fileSize, file);
 
-    sprintf(response, "HTTP/1.1 200 OK\r\nServer: Viriatum Web Server\r\nContent-Length: %d\r\n\r\n", fileSize);
+    sprintf(response, "HTTP/1.1 200 OK\r\nServer: viriatum/1.0.0\r\nContent-Length: %d\r\n\r\n", fileSize);
 
     /* initializes the socket infrastructure */
     SOCKET_INITIALIZE(&socketData);
@@ -142,8 +142,11 @@ int main(int argc, char *argv[]) {
         /* reveives from the client socket */
         n = SOCKET_RECEIVE(clientSocketHandle, buffer, 10240, 0);
 
-        if (clientSocketHandle < 0)
-            printf("ERROR on accept");
+        /* in case no bytes are sent */
+        if(n < 0) {
+            /* prints an error message */
+            printf("error in receive");
+        }
 
         /* sends the data */
         n = SOCKET_SEND(clientSocketHandle, response, strlen(response), 0);
