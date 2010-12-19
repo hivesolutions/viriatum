@@ -4,17 +4,17 @@ Microsoft Visual Studio Solution File, Format Version 10.00
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hive_viriatum", "hive_viriatum.vcproj", "{39D9BE30-4876-4DAE-94BC-0F0E84AE5BA3}"
 EndProject
 Global
-	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Win32 = Debug|Win32
-		Release|Win32 = Release|Win32
-	EndGlobalSection
-	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{39D9BE30-4876-4DAE-94BC-0F0E84AE5BA3}.Debug|Win32.ActiveCfg = Debug|Win32
-		{39D9BE30-4876-4DAE-94BC-0F0E84AE5BA3}.Debug|Win32.Build.0 = Debug|Win32
-		{39D9BE30-4876-4DAE-94BC-0F0E84AE5BA3}.Release|Win32.ActiveCfg = Release|Win32
-		{39D9BE30-4876-4DAE-94BC-0F0E84AE5BA3}.Release|Win32.Build.0 = Release|Win32
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
-	EndGlobalSection
+    GlobalSection(SolutionConfigurationPlatforms) = preSolution
+        Debug|Win32 = Debug|Win32
+        Release|Win32 = Release|Win32
+    EndGlobalSection
+    GlobalSection(ProjectConfigurationPlatforms) = postSolution
+        {39D9BE30-4876-4DAE-94BC-0F0E84AE5BA3}.Debug|Win32.ActiveCfg = Debug|Win32
+        {39D9BE30-4876-4DAE-94BC-0F0E84AE5BA3}.Debug|Win32.Build.0 = Debug|Win32
+        {39D9BE30-4876-4DAE-94BC-0F0E84AE5BA3}.Release|Win32.ActiveCfg = Release|Win32
+        {39D9BE30-4876-4DAE-94BC-0F0E84AE5BA3}.Release|Win32.Build.0 = Release|Win32
+    EndGlobalSection
+    GlobalSection(SolutionProperties) = preSolution
+        HideSolutionNode = FALSE
+    EndGlobalSection
 EndGlobal
