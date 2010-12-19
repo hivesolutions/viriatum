@@ -204,6 +204,22 @@
 				Name="global"
 				>
 			</Filter>
+			<Filter
+				Name="thread"
+				>
+				<File
+					RelativePath="..\..\src\hive_viriatum\thread\thread_pool.c"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="structures"
+				>
+				<File
+					RelativePath="..\..\src\hive_viriatum\structures\linked_list.c"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -251,6 +267,30 @@
 				</File>
 				<File
 					RelativePath="..\..\src\hive_viriatum\global\targetver.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="thread"
+				>
+				<File
+					RelativePath="..\..\src\hive_viriatum\thread\thread.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\hive_viriatum\thread\thread_pool.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="structures"
+				>
+				<File
+					RelativePath="..\..\src\hive_viriatum\structures\linked_list.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\hive_viriatum\structures\structures.h"
 					>
 				</File>
 			</Filter>
