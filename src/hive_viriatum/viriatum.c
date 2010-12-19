@@ -56,7 +56,7 @@ int main(int argc, char *argv[]) {
 
     char response[1000];
 
-    char *buffer2 = malloc(1000000);
+    char *buffer2 = malloc(10);
     size_t fileSize;
 
     unsigned int n;
