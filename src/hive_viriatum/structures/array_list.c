@@ -29,15 +29,15 @@
 
 #include "array_list.h"
 
-void createArrayList(struct ArrayList_t **arrayListPointer, size_t valueSize, unsigned int initialSize) {
+void createArrayList(struct ArrayList_t **arrayListPointer, size_t valueSize, size_t initialSize) {
     /* retrieves the array list size */
     size_t arrayListSize = sizeof(struct ArrayList_t);
 
     /* allocates space for the array list */
     struct ArrayList_t *arrayList = (struct ArrayList_t *) malloc(arrayListSize);
 
-    /* in case the initial size is not set */
-    if((void *) initialSize == NULL) {
+    /* in case the initial size is not set (zero) */
+    if((void *) initialSize == 0) {
         /* sets the default initial size value */
         initialSize = DEFAULT_ARRAY_LIST_SIZE;
     }

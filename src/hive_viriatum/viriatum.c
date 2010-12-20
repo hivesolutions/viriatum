@@ -79,17 +79,17 @@ int main(int argc, char *argv[]) {
     }
 
     /* creates the array list */
-    createArrayList(&arrayList, sizeof(unsigned int), NULL);
+    createArrayList(&arrayList, sizeof(unsigned int), 0);
 
     /* creates the linked list */
     createLinkedList(&linkedList);
 
     /* adds some element to the linked list */
-    appendLinkedList(linkedList, 12);
-    appendLinkedList(linkedList, 13);
+    appendLinkedList(linkedList, (void *) 12);
+    appendLinkedList(linkedList, (void *) 13);
 
     /* retrieves an element from the linked list */
-    getLinkedList(linkedList, 1, &value);
+    getLinkedList(linkedList, 1, (void **) &value);
 
     file = fopen(fileName, "rb");
 
