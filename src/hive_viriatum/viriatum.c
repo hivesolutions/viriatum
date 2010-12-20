@@ -52,6 +52,8 @@ int main(int argc, char *argv[]) {
     /* allocates the result */
     SOCKET_ERROR_CODE result;
 
+    struct ArrayList_t *arrayList;
+
     struct LinkedList_t *linkedList;
 
     /* allocates the "simple" buffer */
@@ -75,6 +77,9 @@ int main(int argc, char *argv[]) {
     } else {
         fileName = "C:\\Desert.jpg";
     }
+
+    /* creates the array list */
+    createArrayList(&arrayList, sizeof(unsigned int), NULL);
 
     /* creates the linked list */
     createLinkedList(&linkedList);

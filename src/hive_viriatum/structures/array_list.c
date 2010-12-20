@@ -25,5 +25,29 @@
  __license__   = GNU General Public License (GPL), Version 3
 */
 
-#pragma once
+#include "stdafx.h"
 
+#include "array_list.h"
+
+void createArrayList(struct ArrayList_t **arrayListPointer, size_t valueSize, unsigned int initialSize) {
+    /* retrieves the array list size */
+    size_t arrayListSize = sizeof(struct ArrayList_t);
+
+    /* allocates space for the array list */
+    struct ArrayList_t *arrayList = (struct ArrayList_t *) malloc(arrayListSize);
+
+    /* in case the initial size is not set */
+    if((void *) initialSize == NULL) {
+        /* sets the default initial size value */
+        initialSize = DEFAULT_ARRAY_LIST_SIZE;
+    }
+
+    /* initializes the linked list size */
+    arrayList->size = 0;
+
+    /* allocates space for the elements buffer */
+    arrayList->elementsBuffer = (void *) malloc(valueSize * initialSize);
+
+    /* sets the array list in the array list pointer */
+    *arrayListPointer = arrayList;
+}
