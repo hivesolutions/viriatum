@@ -101,9 +101,9 @@ void appendLinkedList(struct LinkedList_t *linkedList, void *value) {
     linkedList->size++;
 }
 
-void getLinkedList(struct LinkedList_t *linkedList, unsigned int index, void **valuePointer) {
+void getLinkedList(struct LinkedList_t *linkedList, size_t index, void **valuePointer) {
     /* allocates space for the index */
-    unsigned int _index;
+    size_t _index;
 
     /* allocates space for the current node */
     struct LinkedListNode_t *currentNode;
