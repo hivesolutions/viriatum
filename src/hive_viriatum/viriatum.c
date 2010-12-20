@@ -28,6 +28,7 @@
 #include "stdafx.h"
 
 #include "system/system.h"
+#include "structures/structures.h"
 
 int main(int argc, char *argv[]) {
     /* allocates the socket data */
@@ -51,6 +52,8 @@ int main(int argc, char *argv[]) {
     /* allocates the result */
     SOCKET_ERROR_CODE result;
 
+    struct LinkedList_t *linkedList;
+
     /* allocates the "simple" buffer */
     char buffer[10240];
 
@@ -65,11 +68,23 @@ int main(int argc, char *argv[]) {
 
     FILE *file;
 
+    unsigned int value;
+
     if(argc > 1) {
         fileName = argv[1];
     } else {
         fileName = "C:\\Desert.jpg";
     }
+
+    /* creates the linked list */
+    createLinkedList(&linkedList);
+
+    /* adds some element to the linked list */
+    appendLinkedList(linkedList, 12);
+    appendLinkedList(linkedList, 13);
+
+    /* retrieves an element from the linked list */
+    getLinkedList(linkedList, 1, &value);
 
     file = fopen(fileName, "rb");
 

@@ -84,7 +84,37 @@ void appendLinkedList(struct LinkedList_t *linkedList, void *value) {
 
     /* in case the linked list is empty */
     if(linkedList->size == 0) {
+        /* sets the linked list node as the first node */
         linkedList->first = linkedListNode;
-        linkedList->last = linkedListNode;
+    } else {
+        /* sets the next element of the last element as
+        the new linked list node */
+        linkedList->last->next = linkedListNode;
+
+        /* sets the previous element of the linked list
+        node as the last one of the linked list */
+        linkedListNode->previous = linkedList->last;
     }
+
+    /* sets the linked list node as the last node */
+    linkedList->last = linkedListNode;
+
+    /* increments the linked list size */
+    linkedList->size++;
+}
+
+void getLinkedList(struct LinkedList_t *linkedList, unsigned int index, void **value) {
+    unsigned int _index;
+
+    struct LinkedListNode_t *currentNode;
+
+    /* sets the initial iteration node */
+    currentNode = linkedList->first;
+
+    for(_index = 0; _index < index; _index++) {
+        currentNode = currentNode->next;
+    }
+
+    /* sets the value as the current node value */
+    *value = currentNode->value;
 }
