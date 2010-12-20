@@ -27,11 +27,15 @@
 
 #pragma once
 
-#define DEFAULT_ARRAY_LIST_SIZE 300
+#define DEFAULT_ARRAY_LIST_SIZE 256
 
 typedef struct ArrayList_t {
     size_t size;
-    void *elementsBuffer;
+    size_t elementSize;
+    void **elementsBuffer;
 } ArrayList;
 
 void createArrayList(struct ArrayList_t **arrayListPointer, size_t valueSize, size_t initialSize);
+void deleteArrayList(struct ArrayList_t *arrayList);
+void setArrayList(struct ArrayList_t *arrayList, size_t index, void *element);
+void getArrayList(struct ArrayList_t *arrayList, size_t index, void **elementPointer);

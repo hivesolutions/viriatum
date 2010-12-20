@@ -29,7 +29,7 @@
 
 #include "array_list.h"
 
-void createArrayList(struct ArrayList_t **arrayListPointer, size_t valueSize, size_t initialSize) {
+void createArrayList(struct ArrayList_t **arrayListPointer, size_t elementSize, size_t initialSize) {
     /* retrieves the array list size */
     size_t arrayListSize = sizeof(struct ArrayList_t);
 
@@ -45,9 +45,43 @@ void createArrayList(struct ArrayList_t **arrayListPointer, size_t valueSize, si
     /* initializes the linked list size */
     arrayList->size = 0;
 
+    /* sets the array list element size */
+    arrayList->elementSize = elementSize;
+
     /* allocates space for the elements buffer */
-    arrayList->elementsBuffer = (void *) malloc(valueSize * initialSize);
+    arrayList->elementsBuffer = (void **) malloc(elementSize * initialSize);
 
     /* sets the array list in the array list pointer */
     *arrayListPointer = arrayList;
+}
+
+void deleteArrayList(struct ArrayList_t *arrayList) {
+    /* releases the array list elements buffer */
+    free(arrayList->elementsBuffer);
+
+    /* releases the array list */
+    free(arrayList);
+}
+
+void setArrayList(struct ArrayList_t *arrayList, size_t index, void *element) {
+    /*  calculates the base index value */
+    size_t baseIndex = arrayList->elementSize * index;
+
+    /* retrieves the base address value */
+    void *baseAddress = &arrayList->elementsBuffer[baseIndex];
+
+    /* copies the element to the array list
+    element buffer, using the element size */
+    memcpy(baseAddress, element, arrayList->elementSize);
+}
+
+void getArrayList(struct ArrayList_t *arrayList, size_t index, void **elementPointer) {
+    /*  calculates the base index value */
+    size_t baseIndex = arrayList->elementSize * index;
+
+    /* retrieves the element from the element buffer */
+    void *element = &arrayList->elementsBuffer[baseIndex];
+
+    /* sets the element in the element pointer */
+    *elementPointer = element;
 }

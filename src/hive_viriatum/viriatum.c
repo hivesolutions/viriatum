@@ -72,6 +72,10 @@ int main(int argc, char *argv[]) {
 
     unsigned int value;
 
+    unsigned int tobias = 123;
+
+    unsigned int *matias;
+
     if(argc > 1) {
         fileName = argv[1];
     } else {
@@ -80,6 +84,8 @@ int main(int argc, char *argv[]) {
 
     /* creates the array list */
     createArrayList(&arrayList, sizeof(unsigned int), 0);
+    setArrayList(arrayList, 0, &tobias);
+    getArrayList(arrayList, 0, &matias);
 
     /* creates the linked list */
     createLinkedList(&linkedList);
