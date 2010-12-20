@@ -26,3 +26,10 @@
 */
 
 #pragma once
+
+#define DEFAULT_ARRAY_LIST_SIZE 300
+
+typedef struct ArrayList_t {
+    unsigned int size;
+    void *elementsBuffer;
+} ArrayList;

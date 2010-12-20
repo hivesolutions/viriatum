@@ -43,4 +43,4 @@ void createLinkedList(struct LinkedList_t **linkedListPointer);
 void deleteLinkedList(struct LinkedList_t *linkedList);
 void createLinkedListNode(struct LinkedListNode_t **linkedListNodePointer);
 void appendLinkedList(struct LinkedList_t *linkedList, void *value);
-void getLinkedList(struct LinkedList_t *linkedList, unsigned int index, void **value);
+void getLinkedList(struct LinkedList_t *linkedList, unsigned int index, void **valuePointer);

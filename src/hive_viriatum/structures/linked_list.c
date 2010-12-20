@@ -25,8 +25,6 @@
  __license__   = GNU General Public License (GPL), Version 3
 */
 
-#pragma once
-
 #include "stdafx.h"
 
 #include "linked_list.h"
@@ -103,18 +101,22 @@ void appendLinkedList(struct LinkedList_t *linkedList, void *value) {
     linkedList->size++;
 }
 
-void getLinkedList(struct LinkedList_t *linkedList, unsigned int index, void **value) {
+void getLinkedList(struct LinkedList_t *linkedList, unsigned int index, void **valuePointer) {
+    /* allocates space for the index */
     unsigned int _index;
 
+    /* allocates space for the current node */
     struct LinkedListNode_t *currentNode;
 
     /* sets the initial iteration node */
     currentNode = linkedList->first;
 
+    /* iterates over the index value */
     for(_index = 0; _index < index; _index++) {
+        /* sets the current node as the next node */
         currentNode = currentNode->next;
     }
 
-    /* sets the value as the current node value */
-    *value = currentNode->value;
+    /* sets the current node value in the value pointer */
+    *valuePointer = currentNode->value;
 }
