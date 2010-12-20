@@ -28,7 +28,7 @@
 #pragma once
 
 typedef struct LinkedList_t {
-    unsigned int size;
+    size_t size;
     struct LinkedListNode_t *first;
     struct LinkedListNode_t *last;
 } LinkedList;

@@ -30,6 +30,8 @@
 #define DEFAULT_ARRAY_LIST_SIZE 300
 
 typedef struct ArrayList_t {
-    unsigned int size;
+    size_t size;
     void *elementsBuffer;
 } ArrayList;
+
+void createArrayList(struct ArrayList_t **arrayListPointer, size_t valueSize, size_t initialSize);
