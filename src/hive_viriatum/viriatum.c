@@ -86,13 +86,13 @@ int main(int argc, char *argv[]) {
 
     /* creates the hash map */
     createHashMap(&hashMap, 0);
-    setHashMap(hashMap, 123123, &tobias);
-    getHashMap(hashMap, 123123, &matias);
+    setHashMap(hashMap, 123123, (void **) &tobias);
+    getHashMap(hashMap, 123123, (void **) &matias);
 
     /* creates the array list */
     createArrayList(&arrayList, sizeof(unsigned int), 0);
-    setArrayList(arrayList, 0, &tobias);
-    getArrayList(arrayList, 0, &matias);
+    setArrayList(arrayList, 0, (void **) &tobias);
+    getArrayList(arrayList, 0, (void **) &matias);
 
     /* creates the linked list */
     createLinkedList(&linkedList);
