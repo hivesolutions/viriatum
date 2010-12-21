@@ -32,6 +32,7 @@
 typedef struct ArrayList_t {
     size_t size;
     size_t elementSize;
+    size_t elementsBufferSize;
     void **elementsBuffer;
 } ArrayList;
 

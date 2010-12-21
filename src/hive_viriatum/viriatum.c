@@ -52,6 +52,8 @@ int main(int argc, char *argv[]) {
     /* allocates the result */
     SOCKET_ERROR_CODE result;
 
+    struct HashMap_t *hashMap;
+
     struct ArrayList_t *arrayList;
 
     struct LinkedList_t *linkedList;
@@ -81,6 +83,11 @@ int main(int argc, char *argv[]) {
     } else {
         fileName = "C:\\Desert.jpg";
     }
+
+    /* creates the hash map */
+    createHashMap(&hashMap, 0);
+    setHashMap(hashMap, 123123, &tobias);
+    getHashMap(hashMap, 123123, &matias);
 
     /* creates the array list */
     createArrayList(&arrayList, sizeof(unsigned int), 0);
