@@ -42,11 +42,14 @@ void createArrayList(struct ArrayList_t **arrayListPointer, size_t elementSize, 
         initialSize = DEFAULT_ARRAY_LIST_SIZE;
     }
 
-    /* initializes the linked list size */
+    /* initializes the array list size */
     arrayList->size = 0;
 
     /* sets the array list element size */
     arrayList->elementSize = elementSize;
+
+    /* sets the elements buffer size */
+    arrayList->elementsBufferSize = initialSize;
 
     /* allocates space for the elements buffer */
     arrayList->elementsBuffer = (void **) malloc(elementSize * initialSize);
@@ -71,7 +74,7 @@ void setArrayList(struct ArrayList_t *arrayList, size_t index, void *element) {
     void *baseAddress = &arrayList->elementsBuffer[baseIndex];
 
     /* copies the element to the array list
-    element buffer, using the element size */
+    elements buffer, using the element size */
     memcpy(baseAddress, element, arrayList->elementSize);
 }
 

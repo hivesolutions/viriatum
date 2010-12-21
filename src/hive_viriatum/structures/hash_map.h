@@ -27,6 +27,23 @@
 
 #pragma once
 
-#include "array_list.h"
-#include "hash_map.h"
-#include "linked_list.h"
+#define DEFAULT_HASH_MAP_SIZE 1024
+#define DEFAULT_MAXIMUM_LOAD_FACTOR 0.75
+
+typedef struct HashMap_t {
+    size_t size;
+    size_t maximumSize;
+    size_t elementSize;
+    size_t elementsBufferSize;
+    struct HashMapElement_t *elementsBuffer;
+} HashMap;
+
+typedef struct HashMapElement_t {
+    void *value;
+    unsigned int used;
+    size_t key;
+} HashMapElement;
+
+void createHashMap(struct HashMap_t **hashMapPointer, size_t initialSize);
+void setHashMap(struct HashMap_t *hashMap, size_t key, void *value);
+void getHashMap(struct HashMap_t *hashMap, size_t key, void **valuePointer);

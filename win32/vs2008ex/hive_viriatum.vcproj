@@ -220,6 +220,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\src\hive_viriatum\structures\hash_map.c"
+					>
+				</File>
+				<File
 					RelativePath="..\..\src\hive_viriatum\structures\linked_list.c"
 					>
 				</File>
@@ -291,6 +295,10 @@
 				>
 				<File
 					RelativePath="..\..\src\hive_viriatum\structures\array_list.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\hive_viriatum\structures\hash_map.h"
 					>
 				</File>
 				<File
