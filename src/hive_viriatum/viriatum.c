@@ -78,6 +78,8 @@ int main(int argc, char *argv[]) {
 
     unsigned int *matias;
 
+    unsigned int index;
+
     if(argc > 1) {
         fileName = argv[1];
     } else {
@@ -86,11 +88,15 @@ int main(int argc, char *argv[]) {
 
     /* creates the hash map */
     createHashMap(&hashMap, 0);
+
+    /* sets and retrieves the value in the hash map */
     setHashMap(hashMap, 123123, (void **) &tobias);
     getHashMap(hashMap, 123123, (void **) &matias);
 
     /* creates the array list */
     createArrayList(&arrayList, sizeof(unsigned int), 0);
+
+    /* sets and retrieves the value in the array list */
     setArrayList(arrayList, 0, (void **) &tobias);
     getArrayList(arrayList, 0, (void **) &matias);
 
