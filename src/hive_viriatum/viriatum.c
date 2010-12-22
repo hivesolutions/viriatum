@@ -78,8 +78,6 @@ int main(int argc, char *argv[]) {
 
     unsigned int *matias;
 
-    unsigned int index;
-
     if(argc > 1) {
         fileName = argv[1];
     } else {
