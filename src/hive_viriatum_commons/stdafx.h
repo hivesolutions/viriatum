@@ -48,7 +48,7 @@
 
 #ifdef VIRIATUM_PLATFORM_UNIX
 /* defineds the export prefix */
-#define VIRIATUM_EXPORT_PREFIX
+#define VIRIATUM_EXPORT_PREFIX extern "C"
 #endif
 
 #include "global/definitions.h"
