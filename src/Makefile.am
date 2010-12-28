@@ -25,4 +25,4 @@
 
 include $(top_srcdir)/Common.am
 
-SUBDIRS = hive_viriatum
+SUBDIRS = hive_viriatum hive_viriatum_commons
