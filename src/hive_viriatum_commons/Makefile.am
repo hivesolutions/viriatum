@@ -25,12 +25,23 @@
 
 include $(top_srcdir)/Common.am
 
-lib_LIBRARIES = libviriatum.a
+lib_LIBRARIES = libviriatum.a libviriatum.la
 
 libviriatum_a_CFLAGS = $(AM_CFLAGS)
 libviriatum_a_CXXFLAGS = $(AM_CXXFLAGS)
 
+libviriatum_la_CFLAGS = $(AM_CFLAGS)
+libviriatum_la_CXXFLAGS = $(AM_CXXFLAGS)
+
 libviriatum_a_SOURCES = stdafx.c \
+checksum/crc_32.c \
+encoding/base_64.c \
+structures/array_list.c \
+structures/hash_map.c \
+structures/linked_list.c \
+thread/thread_pool.c 
+
+libviriatum_la_SOURCES = stdafx.c \
 checksum/crc_32.c \
 encoding/base_64.c \
 structures/array_list.c \
