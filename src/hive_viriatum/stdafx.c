@@ -29,3 +29,6 @@
 
 static char name[] = "viriatum";
 static char version[] = "1.0.0";
+
+char *_name() {	return name; }
+char *_version() {	return version; }
