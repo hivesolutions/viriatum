@@ -48,7 +48,7 @@
 
 #ifdef VIRIATUM_PLATFORM_UNIX
 /* defineds the export prefix */
-#define VIRIATUM_EXPORT_PREFIX __attribute__((visibility("default")))
+#define VIRIATUM_EXPORT_PREFIX __attribute__ ((visibility("default")))
 #endif
 
 #include "global/definitions.h"

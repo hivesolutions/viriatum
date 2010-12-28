@@ -86,4 +86,4 @@ static unsigned long crc32_tab[] = {
 };
 
 
-VIRIATUM_EXPORT_PREFIX2 unsigned long crc32(unsigned char *buffer, unsigned int bufferLength);
+VIRIATUM_EXPORT_PREFIX unsigned long crc32(unsigned char *buffer, unsigned int bufferLength);
