@@ -29,24 +29,24 @@
 
 #include "base_64.h"
 
-int encodeBase64(unsigned char *data, size_t dataLength, unsigned char *result, size_t resultLength) {
+int encodeBase64(unsigned char *buffer, size_t bufferLength, unsigned char *result, size_t resultLength) {
     size_t resultIndex = 0;
     size_t x;
     unsigned long n = 0;
-    int padCount = dataLength % 3;
+    int padCount = bufferLength % 3;
     unsigned char n0, n1, n2, n3;
 
     /* increment over the length of the string, three characters at a time */
-    for(x = 0; x < dataLength; x += 3) {
+    for(x = 0; x < bufferLength; x += 3) {
         /* these three 8-bit (ASCII) characters become one 24-bit number */
-        n = data[x] << 16;
+        n = buffer[x] << 16;
 
-        if(x + 1 < dataLength) {
-            n += data[x + 1] << 8;
+        if(x + 1 < bufferLength) {
+            n += buffer[x + 1] << 8;
         }
 
-        if(x + 2 < dataLength) {
-            n += data[x + 2];
+        if(x + 2 < bufferLength) {
+            n += buffer[x + 2];
         }
 
         /* separates the 24 bit number into four 6 bit numbers */
@@ -75,7 +75,7 @@ int encodeBase64(unsigned char *data, size_t dataLength, unsigned char *result, 
          * if we have only two bytes available, then their encoding is
          * spread out over three chars
          */
-        if(x + 1 < dataLength) {
+        if(x + 1 < bufferLength) {
             if(resultIndex >= resultLength) {
                 return 0;   /* indicate failure: buffer too small */
             }
@@ -87,7 +87,7 @@ int encodeBase64(unsigned char *data, size_t dataLength, unsigned char *result, 
          * if we have all three bytes available, then their encoding is spread
          * out over four characters
          */
-        if(x + 2 < dataLength) {
+        if(x + 2 < bufferLength) {
             if(resultIndex >= resultLength) {
                 return 0;   /* indicate failure: buffer too small */
             }
