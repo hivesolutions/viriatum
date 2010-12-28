@@ -51,6 +51,8 @@
 #define VIRIATUM_EXPORT_PREFIX extern "C"
 #endif
 
+#define VIRIATUM_EXPORT_PREFIX extern "C"
+
 #include "global/definitions.h"
 
 #ifdef VIRIATUM_PLATFORM_WIN32
