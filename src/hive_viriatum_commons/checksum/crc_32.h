@@ -28,7 +28,7 @@
 #pragma once
 
 
-#define VIRIATUM_EXPORT_PREFIX2 __attribute__((visibility("default")))
+#define VIRIATUM_EXPORT_PREFIX2 __attribute__ ((visibility("default")))
 
 static unsigned long crc32_tab[] = {
     0x00000000L, 0x77073096L, 0xee0e612cL, 0x990951baL, 0x076dc419L,
@@ -86,4 +86,4 @@ static unsigned long crc32_tab[] = {
 };
 
 
-__attribute__((visibility("default"))) unsigned long crc32(unsigned char *buffer, unsigned int bufferLength);
+__attribute__ ((visibility("default"))) unsigned long crc32(unsigned char *buffer, unsigned int bufferLength);
