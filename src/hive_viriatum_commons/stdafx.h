@@ -48,7 +48,7 @@
 
 #ifdef VIRIATUM_PLATFORM_UNIX
 /* defineds the export prefix */
-#define VIRIATUM_EXPORT_PREFIX __declspec(dllexport)
+#define VIRIATUM_EXPORT_PREFIX
 #endif
 
 #include "global/definitions.h"
