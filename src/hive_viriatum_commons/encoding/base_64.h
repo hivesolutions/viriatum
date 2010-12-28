@@ -29,4 +29,4 @@
 
 VIRIATUM_EXPORT_PREFIX const char base64Characters[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
-VIRIATUM_EXPORT_PREFIX encodeBase64(unsigned char *data, size_t dataLength, unsigned char *result, size_t resultLength);
+VIRIATUM_EXPORT_PREFIX int encodeBase64(unsigned char *data, size_t dataLength, unsigned char *result, size_t resultLength);
