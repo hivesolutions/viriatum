@@ -27,10 +27,10 @@ include $(top_srcdir)/Common.am
 
 lib_LIBRARIES = libviriatum.a
 
-libmariachi_a_CFLAGS = $(AM_CFLAGS)
-libmariachi_a_CXXFLAGS = $(AM_CXXFLAGS)
+libviriatum_a_CFLAGS = $(AM_CFLAGS)
+libviriatum_a_CXXFLAGS = $(AM_CXXFLAGS)
 
-libmariachi_a_SOURCES = stdafx.c \
+libviriatum_a_SOURCES = stdafx.c \
 checksum/crc_32.c \
 encoding/base_64.c \
 structures/array_list.c \
