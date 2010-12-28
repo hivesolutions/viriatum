@@ -94,7 +94,7 @@ unsigned long crc32(unsigned char *buffer, unsigned int bufferLength) {
     /* starts the crc 32 value */
     crc32Value = 0;
 
-    /* iterates over the length of the data */
+    /* iterates over the length of the buffer */
     for(index = 0; index < bufferLength; index++) {
         /* recalculates the new crc 32 value for the "new" byte */
         crc32Value = crc32Table[(crc32Value ^ buffer[index]) & 0xff] ^ (crc32Value >> 8);
