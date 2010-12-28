@@ -48,10 +48,8 @@
 
 #ifdef VIRIATUM_PLATFORM_UNIX
 /* defineds the export prefix */
-#define VIRIATUM_EXPORT_PREFIX extern "C"
+#define VIRIATUM_EXPORT_PREFIX __attribute__((visibility("default")))
 #endif
-
-#define VIRIATUM_EXPORT_PREFIX extern "C"
 
 #include "global/definitions.h"
 
