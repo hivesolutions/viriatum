@@ -26,3 +26,5 @@
 */
 
 #pragma once
+
+const char base64Characters[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
