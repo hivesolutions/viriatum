@@ -40,6 +40,7 @@ AC_PROG_MAKE_SET
 
 # checks for libraries
 AC_CHECK_LIB([pthread], [main], [], [AC_MSG_ERROR(can't build without POSIX threads (libpthread) libraries)])
+AC_CHECK_LIB([viriatum], [main])
 
 case "$host_os" in
 *linux*)
@@ -63,7 +64,7 @@ AC_FUNC_MALLOC
 AC_CHECK_FUNCS([floor memset])
 
 # sets the config files to be used in automake
-AC_CONFIG_FILES([src/hive_viriatum/Makefile])
+AC_CONFIG_FILES([src/hive_viriatum/Makefile src/hive_viriatum_commons/Makefile])
 
 # sets the entry point make files to be used by automake
 AC_OUTPUT([Makefile src/Makefile lib/Makefile doc/Makefile man/Makefile examples/Makefile scripts/Makefile])
