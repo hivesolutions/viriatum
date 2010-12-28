@@ -38,10 +38,13 @@
 #endif
 
 #ifdef linux
+#define VIRIATUM_PLATFORM_UNIX true
 #define VIRIATUM_PLATFORM_LINUX true
 #endif
 
 #ifdef __MACH__
+#define VIRIATUM_PLATFORM_UNIX true
+
 #if TARGET_OS_IPHONE
 #define VIRIATUM_PLATFORM_IPHONE true
 #else
@@ -51,22 +54,4 @@
 
 #ifdef unix
 #define VIRIATUM_PLATFORM_UNIX true
-#endif
-
-#if defined(VIRIATUM_PLATFORM_WIN32)
-#define VIRIATUM_PLATFORM_DIRECT3D true
-#endif
-
-#if defined(VIRIATUM_PLATFORM_WIN32) || defined(VIRIATUM_PLATFORM_LINUX) || defined(VIRIATUM_PLATFORM_MACOSX)
-#define VIRIATUM_PLATFORM_OPENGL true
-#endif
-
-#if defined(VIRIATUM_PLATFORM_IPHONE)
-#define VIRIATUM_PLATFORM_OPENGLES true
-#endif
-
-#if defined(VIRIATUM_PLATFORM_IPHONE)
-#define VIRIATUM_SYNC_PARALLEL_PROCESSING true
-#else
-#define VIRIATUM_SYNC_PARALLEL_PROCESSING true
 #endif
