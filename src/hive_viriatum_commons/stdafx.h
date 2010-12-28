@@ -44,9 +44,15 @@
 
 /* defines the export prefix */
 #define VIRIATUM_EXPORT_PREFIX __declspec(dllexport)
+
+/* defines the no export prefix */
+#define VIRIATUM_NO_EXPORT_PREFIX
 #else
 /* defines the export prefix */
-#define VIRIATUM_EXPORT_PREFIX __attribute__ ((visibility("default")))
+#define VIRIATUM_EXPORT_PREFIX __attribute__((visibility("default")))
+
+/* defines the no export prefix */
+#define VIRIATUM_NO_EXPORT_PREFIX __attribute__((visibility("hidden")))
 #endif
 
 #include "global/definitions.h"
