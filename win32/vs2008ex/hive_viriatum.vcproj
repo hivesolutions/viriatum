@@ -228,6 +228,22 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="checksum"
+				>
+				<File
+					RelativePath="..\..\src\hive_viriatum\checksum\crc_32.c"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="encoding"
+				>
+				<File
+					RelativePath="..\..\src\hive_viriatum\encoding\base_64.c"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -307,6 +323,30 @@
 				</File>
 				<File
 					RelativePath="..\..\src\hive_viriatum\structures\structures.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="checksum"
+				>
+				<File
+					RelativePath="..\..\src\hive_viriatum\checksum\checksum.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\hive_viriatum\checksum\crc_32.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="encoding"
+				>
+				<File
+					RelativePath="..\..\src\hive_viriatum\encoding\base_64.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\hive_viriatum\encoding\encoding.h"
 					>
 				</File>
 			</Filter>
