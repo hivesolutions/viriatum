@@ -34,7 +34,9 @@ viriatum_LDADD = $(INTLLIBS)
 
 viriatum_SOURCES = stdafx.c \
 viriatum.c \
+checksum/crc_32.c \
+encoding/base_64.c \
 structures/array_list.c \
 structures/hash_map.c \
 structures/linked_list.c \
-thread/thread_pool.c
+thread/thread_pool.c 
