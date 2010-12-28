@@ -30,17 +30,18 @@
 #include "crc_32.h"
 
 unsigned long crc32(unsigned char *buffer, unsigned int bufferLength) {
-	/* allocates space for the index */
+    /* allocates space for the index */
     unsigned int index;
 
-	/* allocates space for the crc 32 value */
+    /* allocates space for the crc 32 value */
     unsigned long crc32Value;
-  
+
     /* starts the crc 32 value */
     crc32Value = 0;
 
-	/* iterates over the length of the data */
+    /* iterates over the length of the data */
     for(index = 0; index < bufferLength; index++) {
+        /* recalculates the new crc 32 value for the "new" byte */
         crc32Value = crc32_tab[(crc32Value ^ buffer[index]) & 0xff] ^ (crc32Value >> 8);
     }
 
