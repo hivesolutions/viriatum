@@ -26,3 +26,6 @@
 */
 
 #include "stdafx.h"
+
+static char name[] = "viriatum";
+static char version[] = "1.0.0";
