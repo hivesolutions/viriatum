@@ -96,27 +96,27 @@ int encodeBase64(unsigned char *data, size_t dataLength, unsigned char *result, 
         }
     }
 
-	/*
-	 * create and add padding that is required if we did not have a multiple of 3
+    /*
+     * create and add padding that is required if we did not have a multiple of 3
      * number of characters available
      */
-	if(padCount > 0) {
-		for(; padCount < 3; padCount++) {
-			if(resultIndex >= resultLength) {
-				return 0;   /* indicate failure: buffer too small */
-			}
+    if(padCount > 0) {
+        for(; padCount < 3; padCount++) {
+            if(resultIndex >= resultLength) {
+                return 0;   /* indicate failure: buffer too small */
+            }
 
-			result[resultIndex++] = '=';
-		}
-	}
+            result[resultIndex++] = '=';
+        }
+    }
 
-	if(resultIndex >= resultLength) {
-		return 0;   /* indicate failure: buffer too small */
-	}
+    if(resultIndex >= resultLength) {
+        return 0;   /* indicate failure: buffer too small */
+    }
 
-	/* sets the final result value */
-	result[resultIndex] = 0;
+    /* sets the final result value */
+    result[resultIndex] = 0;
 
-	/* returns one success */
-	return 1;
+    /* returns one success */
+    return 1;
 }
