@@ -25,7 +25,9 @@
 
 include $(top_srcdir)/Common.am
 
-lib_LIBRARIES = libviriatum.a libviriatum.la
+lib_LIBRARIES = libviriatum.a
+
+lib_LTLIBRARIES = libviriatum.la
 
 libviriatum_a_CFLAGS = $(AM_CFLAGS)
 libviriatum_a_CXXFLAGS = $(AM_CXXFLAGS)
