@@ -27,8 +27,7 @@
 
 #include "stdafx.h"
 
-#include "system/system.h"
-#include "structures/structures.h"
+#include "../hive_viriatum_commons/viriatum_commons.h"
 
 int main(int argc, char *argv[]) {
     /* allocates the socket data */

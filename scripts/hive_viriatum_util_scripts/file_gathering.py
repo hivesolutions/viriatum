@@ -41,7 +41,7 @@ import os.path
 import re
 
 SOURCE_FILE_EXTENSIONS = ["cpp", "c", "mm"]
-SOURCE_DIRS = ["src/hive_viriatum"]
+SOURCE_DIRS = ["src/hive_viriatum_commons", "src/hive_viriatum"]
 base_path = "none"
 
 path_names = []
@@ -65,7 +65,7 @@ def visit(arg, dirname, names):
         total = total.replace("\\", "/")
 
         # iterates over all the source directories
-        # to remove the them from the path string
+        # to remove them from the path string
         for value in SOURCE_DIRS:
             # removes the source directory from
             # the source path
