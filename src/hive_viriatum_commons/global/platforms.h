@@ -44,7 +44,6 @@
 
 #ifdef __MACH__
 #define VIRIATUM_PLATFORM_UNIX true
-
 #if TARGET_OS_IPHONE
 #define VIRIATUM_PLATFORM_IPHONE true
 #else

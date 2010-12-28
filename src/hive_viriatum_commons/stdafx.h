@@ -42,12 +42,10 @@
 /* includes the extra math definitions */
 #define _USE_MATH_DEFINES
 
-/* defineds the export prefix */
+/* defines the export prefix */
 #define VIRIATUM_EXPORT_PREFIX __declspec(dllexport)
-#endif
-
-#ifdef VIRIATUM_PLATFORM_UNIX
-/* defineds the export prefix */
+#else
+/* defines the export prefix */
 #define VIRIATUM_EXPORT_PREFIX __attribute__ ((visibility("default")))
 #endif
 
