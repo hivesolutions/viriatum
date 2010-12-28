@@ -26,3 +26,8 @@
 */
 
 #pragma once
+
+#ifdef _WIN32
+#include "global/targetver.h"
+#include "global/resource.h"
+#endif
