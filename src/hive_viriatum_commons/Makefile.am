@@ -32,8 +32,8 @@ lib_LTLIBRARIES = libviriatum-1.0.0.la
 libviriatum_a_CFLAGS = $(AM_CFLAGS)
 libviriatum_a_CXXFLAGS = $(AM_CXXFLAGS)
 
-libviriatum_1_0_0la_CFLAGS = $(AM_CFLAGS)
-libviriatum_1_0_0la_CXXFLAGS = $(AM_CXXFLAGS)
+libviriatum_1_0_0_la_CFLAGS = $(AM_CFLAGS)
+libviriatum_1_0_0_la_CXXFLAGS = $(AM_CXXFLAGS)
 
 libviriatum_a_SOURCES = stdafx.c \
 checksum/crc_32.c \
@@ -43,7 +43,7 @@ structures/hash_map.c \
 structures/linked_list.c \
 thread/thread_pool.c 
 
-libviriatum_1_0_0la_SOURCES = stdafx.c \
+libviriatum_1_0_0_la_SOURCES = stdafx.c \
 checksum/crc_32.c \
 encoding/base_64.c \
 structures/array_list.c \
