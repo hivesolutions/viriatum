@@ -30,7 +30,7 @@ bin_PROGRAMS = viriatum
 viriatum_CFLAGS = $(AM_CFLAGS)
 viriatum_CXXFLAGS = $(AM_CXXFLAGS)
 
-viriatum_LDADD = ../hive_viriatum_commons/libviriatum.la $(INTLLIBS)
+viriatum_LDADD = ../hive_viriatum_commons/libviriatum.a $(INTLLIBS)
 
 viriatum_SOURCES = stdafx.c \
 viriatum.c
