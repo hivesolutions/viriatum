@@ -57,7 +57,7 @@ int main(int argc, char *argv[]) {
 
     struct LinkedList_t *linkedList;
 
-    char rabeton[] = "como vai a vida";
+    unsigned char rabeton[] = "como vai a vida";
 
     /* allocates the "simple" buffer */
     char buffer[10240];
