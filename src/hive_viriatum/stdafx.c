@@ -27,8 +27,8 @@
 
 #include "stdafx.h"
 
-static char name[] = "viriatum";
-static char version[] = "1.0.0";
+static unsigned char name[] = "viriatum";
+static unsigned char version[] = "1.0.0";
 
-char *_name() {    return name; }
-char *_version() {    return version; }
+unsigned char *_name() { return name; }
+unsigned char *_version() { return version; }
