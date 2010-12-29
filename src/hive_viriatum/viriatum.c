@@ -57,7 +57,7 @@ int main(int argc, char *argv[]) {
 
     struct LinkedList_t *linkedList;
 
-    unsigned char rabeton[] = "como vai a vida";
+    char rabeton[] = "como vai a vida";
 
     /* allocates the "simple" buffer */
     char buffer[10240];
@@ -90,7 +90,7 @@ int main(int argc, char *argv[]) {
     }
 
     /* encodes the value into base64 */
-    encodeBase64(rabeton, strlen(rabeton), &receiver, &receiverLength);
+    encodeBase64((unsigned char *) rabeton, strlen(rabeton), &receiver, &receiverLength);
 
     /* creates the hash map */
     createHashMap(&hashMap, 0);
