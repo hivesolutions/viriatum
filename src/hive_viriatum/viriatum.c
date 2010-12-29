@@ -57,6 +57,8 @@ int main(int argc, char *argv[]) {
 
     struct LinkedList_t *linkedList;
 
+    char rabeton[] = "como vai a vida";
+
     /* allocates the "simple" buffer */
     char buffer[10240];
 
@@ -77,11 +79,18 @@ int main(int argc, char *argv[]) {
 
     unsigned int *matias;
 
+    unsigned char *receiver;
+
+    size_t receiverLength;
+
     if(argc > 1) {
         fileName = argv[1];
     } else {
         fileName = "C:\\Desert.jpg";
     }
+
+    /* encodes the value into base64 */
+    encodeBase64(rabeton, strlen(rabeton), &receiver, &receiverLength);
 
     /* creates the hash map */
     createHashMap(&hashMap, 0);
