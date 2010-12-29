@@ -30,5 +30,5 @@
 static char name[] = "viriatum_commons";
 static char version[] = "1.0.0";
 
-char *_name() {	return name; }
-char *_version() {	return version; }
+char *_name() {    return name; }
+char *_version() {    return version; }

@@ -27,6 +27,8 @@
 
 #pragma once
 
-VIRIATUM_EXPORT_PREFIX const char base64Characters[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+VIRIATUM_EXPORT_PREFIX int encodeBase64(unsigned char *buffer, size_t bufferLength, unsigned char **encodedBufferPointer, size_t *encodedBufferLengthPointer);
+VIRIATUM_EXPORT_PREFIX size_t calculateEncodedBufferLengthBase64(size_t bufferLength);
 
-VIRIATUM_EXPORT_PREFIX int encodeBase64(unsigned char *buffer, size_t bufferLength, unsigned char *result, size_t resultLength);
+VIRIATUM_NO_EXPORT_PREFIX int _encodeBase64(unsigned char *buffer, size_t bufferLength, unsigned char *encodedBuffer, size_t encodedBufferLength);
+VIRIATUM_NO_EXPORT_PREFIX int _allocateEncodedBuffer(size_t bufferLength, unsigned char **encodedBufferPointer, size_t *encodedBufferLengthPointer);

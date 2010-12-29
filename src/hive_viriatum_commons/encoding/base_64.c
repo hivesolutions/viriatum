@@ -29,24 +29,50 @@
 
 #include "base_64.h"
 
-int encodeBase64(unsigned char *buffer, size_t bufferLength, unsigned char *result, size_t resultLength) {
-    size_t resultIndex = 0;
-    size_t x;
+const char base64Characters[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+int encodeBase64(unsigned char *buffer, size_t bufferLength, unsigned char **encodedBufferPointer, size_t *encodedBufferLengthPointer) {
+    /* allocates the encoded buffer, and assigns the encoded buffer length */
+    _allocateEncodedBuffer(bufferLength, encodedBufferPointer, encodedBufferLengthPointer);
+
+    /* encodes the buffer into base 64 */
+    _encodeBase64(buffer, bufferLength, *encodedBufferPointer, *encodedBufferLengthPointer);
+
+    /* returns valid */
+    return 0;
+}
+
+size_t calculateEncodedBufferLengthBase64(size_t bufferLength) {
+    /* allocates the encoded buffer length */
+    size_t encodedBufferLength;
+
+    /* calculates the encoded buffer length */
+    encodedBufferLength = (bufferLength + 2 - ((bufferLength + 2) % 3)) / 3 * 4 ;
+
+    /* returns the encoded buffer length */
+    return encodedBufferLength;
+}
+
+int _encodeBase64(unsigned char *buffer, size_t bufferLength, unsigned char *encodedBuffer, size_t encodedBufferLength) {
+    size_t encodedBufferIndex = 0;
+    size_t index;
     unsigned long n = 0;
     int padCount = bufferLength % 3;
     unsigned char n0, n1, n2, n3;
 
     /* increment over the length of the string, three characters at a time */
-    for(x = 0; x < bufferLength; x += 3) {
-        /* these three 8-bit (ASCII) characters become one 24-bit number */
-        n = buffer[x] << 16;
+    for(index = 0; index < bufferLength; index += 3) {
+        /* starts creating the number with the first byte */
+        n = buffer[index] << 16;
 
-        if(x + 1 < bufferLength) {
-            n += buffer[x + 1] << 8;
+        /* in case there are two bytes (at least) available */
+        if(index + 1 < bufferLength) {
+            n += buffer[index + 1] << 8;
         }
 
-        if(x + 2 < bufferLength) {
-            n += buffer[x + 2];
+        /* in case there are three bytes (at least) available */
+        if(index + 2 < bufferLength) {
+            n += buffer[index + 2];
         }
 
         /* separates the 24 bit number into four 6 bit numbers */
@@ -55,68 +81,45 @@ int encodeBase64(unsigned char *buffer, size_t bufferLength, unsigned char *resu
         n2 = (unsigned char) (n >> 6) & 63;
         n3 = (unsigned char) n & 63;
 
-        /*
-         * if we have one byte available, then its encoding is spread
-         * out over two characters
-         */
-        if(resultIndex >= resultLength) {
-            return 0;   /* indicate failure: buffer too small */
+        /* sets the first two characters in the encoded buffer */
+        encodedBuffer[encodedBufferIndex++] = base64Characters[n0];
+        encodedBuffer[encodedBufferIndex++] = base64Characters[n1];
+
+        /* in case there are two bytes (at least) available */
+        if(index + 1 < bufferLength) {
+            /* sets the third character in the encoded buffer */
+            encodedBuffer[encodedBufferIndex++] = base64Characters[n2];
         }
 
-        result[resultIndex++] = base64Characters[n0];
-
-        if(resultIndex >= resultLength) {
-            return 0;   /* indicate failure: buffer too small */
-        }
-
-        result[resultIndex++] = base64Characters[n1];
-
-        /*
-         * if we have only two bytes available, then their encoding is
-         * spread out over three chars
-         */
-        if(x + 1 < bufferLength) {
-            if(resultIndex >= resultLength) {
-                return 0;   /* indicate failure: buffer too small */
-            }
-
-            result[resultIndex++] = base64Characters[n2];
-        }
-
-        /*
-         * if we have all three bytes available, then their encoding is spread
-         * out over four characters
-         */
-        if(x + 2 < bufferLength) {
-            if(resultIndex >= resultLength) {
-                return 0;   /* indicate failure: buffer too small */
-            }
-
-            result[resultIndex++] = base64Characters[n3];
+        /* in case there are three bytes (at least) available */
+        if(index + 2 < bufferLength) {
+            /* sets the fourth character in the encoded buffer */
+            encodedBuffer[encodedBufferIndex++] = base64Characters[n3];
         }
     }
 
-    /*
-     * create and add padding that is required if we did not have a multiple of 3
-     * number of characters available
-     */
+    /* in case the padding count is valid */
     if(padCount > 0) {
         for(; padCount < 3; padCount++) {
-            if(resultIndex >= resultLength) {
-                return 0;   /* indicate failure: buffer too small */
-            }
-
-            result[resultIndex++] = '=';
+            /* sets the padding character in the encoded buffer buffer */
+            encodedBuffer[encodedBufferIndex++] = '=';
         }
     }
 
-    if(resultIndex >= resultLength) {
-        return 0;   /* indicate failure: buffer too small */
-    }
-
-    /* sets the final result value */
-    result[resultIndex] = 0;
+    /* sets the final encoded buffer value */
+    encodedBuffer[encodedBufferIndex] = 0;
 
     /* returns one success */
     return 1;
+}
+
+int _allocateEncodedBuffer(size_t bufferLength, unsigned char **encodedBufferPointer, size_t *encodedBufferLengthPointer) {
+    /* allocates the encoded buffer length */
+    *encodedBufferLengthPointer = calculateEncodedBufferLengthBase64(bufferLength);
+
+    /* allocates the encoded buffer */
+    *encodedBufferPointer = (unsigned char *) malloc(*encodedBufferLengthPointer);
+
+    /* returns valid */
+    return 0;
 }
