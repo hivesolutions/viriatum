@@ -54,47 +54,59 @@ size_t calculateEncodedBufferLengthBase64(size_t bufferLength) {
 }
 
 int _encodeBase64(unsigned char *buffer, size_t bufferLength, unsigned char *encodedBuffer, size_t encodedBufferLength) {
-    size_t encodedBufferIndex = 0;
+    /* allocates space for the the encoded buffer index */
+    size_t encodedBufferIndex;
+
+    /* allocates space for the the index */
     size_t index;
-    unsigned long n = 0;
-    int padCount = bufferLength % 3;
-    unsigned char n0, n1, n2, n3;
+
+    /* allocates space for the long number */
+    unsigned long number = 0;
+
+    /* allocates space for the partial numbers */
+    unsigned char number0, number1, number2, number3;
+
+    /* creates the pad count value */
+    unsigned int padCount = bufferLength % 3;
+
+    /* starts the encoded buffer index */
+    encodedBufferIndex = 0;
 
     /* increment over the length of the string, three characters at a time */
     for(index = 0; index < bufferLength; index += 3) {
         /* starts creating the number with the first byte */
-        n = buffer[index] << 16;
+        number = buffer[index] << 16;
 
         /* in case there are two bytes (at least) available */
         if(index + 1 < bufferLength) {
-            n += buffer[index + 1] << 8;
+            number += buffer[index + 1] << 8;
         }
 
         /* in case there are three bytes (at least) available */
         if(index + 2 < bufferLength) {
-            n += buffer[index + 2];
+            number += buffer[index + 2];
         }
 
         /* separates the 24 bit number into four 6 bit numbers */
-        n0 = (unsigned char) (n >> 18) & 63;
-        n1 = (unsigned char) (n >> 12) & 63;
-        n2 = (unsigned char) (n >> 6) & 63;
-        n3 = (unsigned char) n & 63;
+        number0 = (unsigned char) (number >> 18) & 63;
+        number1 = (unsigned char) (number >> 12) & 63;
+        number2 = (unsigned char) (number >> 6) & 63;
+        number3 = (unsigned char) number & 63;
 
         /* sets the first two characters in the encoded buffer */
-        encodedBuffer[encodedBufferIndex++] = base64Characters[n0];
-        encodedBuffer[encodedBufferIndex++] = base64Characters[n1];
+        encodedBuffer[encodedBufferIndex++] = base64Characters[number0];
+        encodedBuffer[encodedBufferIndex++] = base64Characters[number1];
 
         /* in case there are two bytes (at least) available */
         if(index + 1 < bufferLength) {
             /* sets the third character in the encoded buffer */
-            encodedBuffer[encodedBufferIndex++] = base64Characters[n2];
+            encodedBuffer[encodedBufferIndex++] = base64Characters[number2];
         }
 
         /* in case there are three bytes (at least) available */
         if(index + 2 < bufferLength) {
             /* sets the fourth character in the encoded buffer */
-            encodedBuffer[encodedBufferIndex++] = base64Characters[n3];
+            encodedBuffer[encodedBufferIndex++] = base64Characters[number3];
         }
     }
 
