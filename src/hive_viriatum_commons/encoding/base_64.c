@@ -72,7 +72,7 @@ int _encodeBase64(unsigned char *buffer, size_t bufferLength, unsigned char *enc
     /* starts the encoded buffer index */
     encodedBufferIndex = 0;
 
-    /* increment over the length of the string, three characters at a time */
+    /* increment over the length of the buffer, three characters at a time */
     for(index = 0; index < bufferLength; index += 3) {
         /* starts creating the number with the first byte */
         number = buffer[index] << 16;
@@ -124,6 +124,48 @@ int _encodeBase64(unsigned char *buffer, size_t bufferLength, unsigned char *enc
     /* returns one success */
     return 1;
 }
+
+
+
+int _decodeBase64(unsigned char *encodedBuffer, size_t encodedBufferLength, unsigned char *buffer, size_t bufferLength) {
+    /* allocates space for the the buffer index */
+    size_t bufferIndex;
+
+    /* allocates space for the the index */
+    size_t index;
+
+    /* allocates space for the long number */
+    unsigned long number = 0;
+
+    /* allocates space for the partial numbers */
+    unsigned char number0, number1, number2;
+
+    /* creates the pad count value */
+    unsigned int padCount = bufferLength % 3;
+
+    /* starts the buffer index */
+    bufferIndex = 0;
+
+    /* increment over the length of the encoded buffer, four characters at a time */
+    for(index = 0; index < encodedBufferLength; index += 4) {
+
+		/* TENHO DE FAZER O MAPEAMENTE INVERSO DO MAPARA DE CARACTERES */
+
+		number = (encodedBuffer[index] << 18) + (encodedBuffer[index + 1] << 12) +
+				 (encodedBuffer[index + 2] << 6) + encodedBuffer[index + 3];
+
+		number0 = (unsigned char) (number >> 16) & 255;
+		number1 = (unsigned char) (number >> 8) & 255;
+		number2 = (unsigned char) number & 255;
+	}
+
+    /* returns one success */
+    return 1;
+}
+
+
+
+
 
 int _allocateEncodedBuffer(size_t bufferLength, unsigned char **encodedBufferPointer, size_t *encodedBufferLengthPointer) {
     /* allocates the encoded buffer length */
