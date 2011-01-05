@@ -124,8 +124,8 @@ void readFile(unsigned char *filePath, unsigned char **bufferPointer, size_t *fi
 	/* allocates space for the file buffer */
 	unsigned char *fileBuffer;
 
-	/* allocates space for the read bytes */
-	size_t readBytes;
+	/* allocates space for the number of bytes */
+	size_t numberBytes;
 
 	/* opens the file */
     file = fopen((char *) filePath, "rb");
@@ -143,7 +143,7 @@ void readFile(unsigned char *filePath, unsigned char **bufferPointer, size_t *fi
 	fileBuffer = (unsigned char *) malloc(fileSize);
 
 	/* reads the file contents */
-    readBytes = fread(fileBuffer, 1, fileSize, file);
+    numberBytes = fread(fileBuffer, 1, fileSize, file);
 
 	/* sets the buffer as the buffer pointer */
 	*bufferPointer = fileBuffer;
@@ -234,7 +234,8 @@ int main(int argc, char *argv[]) {
 
     char response[1000];
 
-    unsigned int n;
+	/* allocates space for the number of bytes */
+	size_t numberBytes;
 
 	/* allocates space for the file path */
     unsigned char *filePath;
@@ -252,6 +253,9 @@ int main(int argc, char *argv[]) {
 
 	/* allocates space for the select timeout value */
 	struct timeval selectTimeout;
+
+	/* allocates space for the select count */
+	int selectCount;
 
 	/* in case the number of arguments is bigger than one */
     if(argc > 1) {
@@ -282,6 +286,8 @@ int main(int argc, char *argv[]) {
 
 	/* sets the socket reuse address option in the socket */
 	SOCKET_SET_OPTIONS(socketHandle, SOCKET_OPTIONS_LEVEL_SOCKET, SOCKET_OPTIONS_REUSE_ADDRESS_SOCKET, optionValue);
+
+	//ioctlsocket(socketHandle, FIONBIO, (u_long *) &optionValue);
 
     /* tests the socket for errors */
     if(SOCKET_TEST_SOCKET(socketHandle)) {
@@ -342,26 +348,41 @@ int main(int argc, char *argv[]) {
 		selectTimeout.tv_sec = 1;
 		selectTimeout.tv_usec = 0;
 
-		select(1, &socketsSet, NULL, NULL, &selectTimeout);
+		/* runs the select over the sockets set */
+		selectCount = select(1, &socketsSet, &socketsSet, NULL, &selectTimeout);
 
-        /* accepts the socket */
-        clientSocketHandle = SOCKET_ACCEPT(socketHandle, &clientSocketAddress, clientSocketAddressSize);
+		/* in case there are sockets ready */
+		if(selectCount > 0) {
+			/* in case the master socket is set */
+			if(FD_ISSET(socketHandle, &socketsSet) == 1) {
+				/* accepts the socket */
+				clientSocketHandle = SOCKET_ACCEPT(socketHandle, &clientSocketAddress, clientSocketAddressSize);
 
-        /* reveives from the client socket */
-        n = SOCKET_RECEIVE(clientSocketHandle, buffer, 10240, 0);
+				/* reveives from the client socket */
+				numberBytes = SOCKET_RECEIVE(clientSocketHandle, buffer, 10240, 0);
 
-        /* in case no bytes are sent */
-        if(n < 0) {
-            /* prints an error message */
-            printf("error in receive");
-        }
+				/* in case no bytes are sent */
+				if(numberBytes < 0) {
+					/* prints an error message */
+					printf("error in receive");
+				}
 
-        /* sends the data */
-        n = SOCKET_SEND(clientSocketHandle, response, strlen(response), 0);
-        n = SOCKET_SEND(clientSocketHandle, fileBuffer, fileSize, 0);
+				/* sends the data */
+				numberBytes = SOCKET_SEND(clientSocketHandle, response, strlen(response), 0);
+				numberBytes = SOCKET_SEND(clientSocketHandle, fileBuffer, fileSize, 0);
 
-        /* closes the client socket */
-        SOCKET_CLOSE(clientSocketHandle);
+				/* closes the client socket */
+				SOCKET_CLOSE(clientSocketHandle);
+			} else {
+			}
+		}
+		/*  in case there are no sockets ready */
+		else if(selectCount == 0) {
+		}
+		/* in case there is an error */
+		else {
+			/* error situation */
+		}
     }
 
     /* runs the socket finish */
