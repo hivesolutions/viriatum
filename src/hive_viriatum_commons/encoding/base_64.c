@@ -135,9 +135,6 @@ int _decodeBase64(unsigned char *encodedBuffer, size_t encodedBufferLength, unsi
     /* allocates space for the partial numbers */
     unsigned char number0, number1, number2;
 
-    /* creates the pad count value */
-    unsigned int padCount = bufferLength % 3;
-
     /* starts the buffer index */
     bufferIndex = 0;
 
