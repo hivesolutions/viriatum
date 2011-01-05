@@ -64,7 +64,10 @@
 #ifdef VIRIATUM_PLATFORM_UNIX
 #include <unistd.h>
 #include <pthread.h>
-#include <sys/types.h>
+#endif
+
+#ifdef VIRIATUM_PLATFORM_LINUX
+#include <linux/unistd.h>
 #endif
 
 #include <stdio.h>
