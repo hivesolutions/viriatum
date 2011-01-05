@@ -43,4 +43,6 @@ VIRIATUM_EXPORT_PREFIX void createLinkedList(struct LinkedList_t **linkedListPoi
 VIRIATUM_EXPORT_PREFIX void deleteLinkedList(struct LinkedList_t *linkedList);
 VIRIATUM_EXPORT_PREFIX void createLinkedListNode(struct LinkedListNode_t **linkedListNodePointer);
 VIRIATUM_EXPORT_PREFIX void appendLinkedList(struct LinkedList_t *linkedList, void *value);
+VIRIATUM_EXPORT_PREFIX void removeLinkedList(struct LinkedList_t *linkedList, size_t index);
 VIRIATUM_EXPORT_PREFIX void getLinkedList(struct LinkedList_t *linkedList, size_t index, void **valuePointer);
+VIRIATUM_EXPORT_PREFIX void popLinkedList(struct LinkedList_t *linkedList, void **valuePointer);
