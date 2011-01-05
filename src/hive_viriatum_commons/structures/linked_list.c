@@ -248,10 +248,10 @@ void getLinkedList(struct LinkedList_t *linkedList, size_t index, struct LinkedL
     currentNode = linkedList->first;
 
     /* iterates over the index value */
-    ///for(index2 = 0; index2 < index; index2++) {
+    for(index2 = 0; index2 < index; index2++) {
         /* sets the current node as the next node */
-    //    currentNode = currentNode->next;
-    //}
+        currentNode = currentNode->next;
+    }
 
     /* sets the current node in the linked list node pointer */
     *linkedListNodePointer = currentNode;
