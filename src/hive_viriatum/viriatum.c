@@ -31,7 +31,7 @@
 
 int threadPoolTest(void *arguments) {
 	/* retrieves the current thread identifier */
-	int threadId = (int) GET_TID();
+	THREAD_IDENTIFIER threadId = THREAD_GET_IDENTIFIER();
 
 	/* prints an hello world message */
 	printf("hello world from thread: %d\n", threadId);
