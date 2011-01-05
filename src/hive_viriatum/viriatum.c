@@ -263,6 +263,9 @@ void service(int argc, char *argv[]) {
     /* allocates space for the select count */
     int selectCount;
 
+	/* prints a debug message */
+	printf("Loading file '%s'", filePath);
+
     /* in case the number of arguments is bigger than one */
     if(argc > 1) {
         /* sets the file path as the first argument */
