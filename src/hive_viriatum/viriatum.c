@@ -92,7 +92,7 @@ void testLinkedList() {
     popValueLinkedList(linkedList, (void **) &value);
 
     /* deletes the linked list */
-    //deleteLinkedList(linkedList);
+    deleteLinkedList(linkedList);
 }
 
 void testArrayList() {
