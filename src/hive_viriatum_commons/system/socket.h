@@ -59,6 +59,7 @@
 #define SOCKET_GET_ERROR_CODE(result) WSAGetLastError()
 #define SOCKET_SEND(socketHandle, buffer, length, flags) send(socketHandle, buffer, length, flags)
 #define SOCKET_RECEIVE(socketHandle, buffer, length, flags) recv(socketHandle, buffer, length, flags)
+#define SOCKET_SET_OPTIONS(socketHandle, level, optionName, optionValue) setsockopt(socketHandle, level, optionName, &optionValue, sizeof(optionValue))
 #endif
 
 #ifdef VIRIATUM_PLATFORM_UNIX
@@ -94,4 +95,5 @@
 #define SOCKET_GET_ERROR_CODE(result) result
 #define SOCKET_SEND(socketHandle, buffer, length, flags) write(socketHandle, buffer, length)
 #define SOCKET_RECEIVE(socketHandle, buffer, length, flags) read(socketHandle, buffer, length)
+#define SOCKET_SET_OPTIONS(socketHandle, level, optionName, optionValue) setsockopt(socketHandle, level, optionName, &optionValue, sizeof(optionValue))
 #endif

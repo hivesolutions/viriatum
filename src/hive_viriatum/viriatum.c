@@ -118,6 +118,8 @@ int main(int argc, char *argv[]) {
 
     unsigned char *receiver;
 
+	char optionValue;
+
     size_t receiverLength;
 
     if(argc > 1) {
@@ -171,6 +173,12 @@ int main(int argc, char *argv[]) {
 
     /* creates the socket for the given types */
     socketHandle = SOCKET_CREATE(SOCKET_INTERNET_TYPE, SOCKET_PACKET_TYPE, SOCKET_PROTOCOL_TCP);
+
+	/* sets the option value to one */
+	optionValue = 1,
+
+	/* sets the socket reuse address option in the socket */
+	SOCKET_SET_OPTIONS(socketHandle, SOL_SOCKET, SO_REUSEADDR, optionValue);
 
     /* tests the socket for errors */
     if(SOCKET_TEST_SOCKET(socketHandle)) {
