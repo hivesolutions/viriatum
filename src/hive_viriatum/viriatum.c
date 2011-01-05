@@ -27,53 +27,51 @@
 
 #include "stdafx.h"
 
-#include "../hive_viriatum_commons/viriatum_commons.h"
-
 int threadPoolStartFunctionTest(void *arguments) {
-	/* retrieves the current thread identifier */
-	THREAD_IDENTIFIER threadId = THREAD_GET_IDENTIFIER();
+    /* retrieves the current thread identifier */
+    THREAD_IDENTIFIER threadId = THREAD_GET_IDENTIFIER();
 
-	/* prints an hello world message */
-	printf("hello world from thread: %d\n", (unsigned int) threadId);
+    /* prints an hello world message */
+    printf("hello world from thread: %d\n", (unsigned int) threadId);
 
-	/* sleeps for a while */
-	SLEEP(10);
+    /* sleeps for a while */
+    SLEEP(10);
 
-	/* returns valid */
-	return 0;
+    /* returns valid */
+    return 0;
 }
 
 void testThreadPool() {
-	/* allocates space for the index */
-	unsigned int index;
+    /* allocates space for the index */
+    unsigned int index;
 
-	/* allocates space for the thread pool */
-	struct ThreadPool_t *threadPool;
+    /* allocates space for the thread pool */
+    struct ThreadPool_t *threadPool;
 
-	/* allocates space for the thread pool task */
-	struct ThreadPoolTask_t *threadPoolTask = (struct ThreadPoolTask_t *) malloc(sizeof(struct ThreadPoolTask_t));
+    /* allocates space for the thread pool task */
+    struct ThreadPoolTask_t *threadPoolTask = (struct ThreadPoolTask_t *) malloc(sizeof(struct ThreadPoolTask_t));
 
-	/* sets the start function */
-	threadPoolTask->startFunction = threadPoolStartFunctionTest;
+    /* sets the start function */
+    threadPoolTask->startFunction = threadPoolStartFunctionTest;
 
-	/* creates the thread pool */
-	createThreadPool(&threadPool, 15, 1, 30);
+    /* creates the thread pool */
+    createThreadPool(&threadPool, 15, 1, 30);
 
-	/* iterates over the range of the index */
-	for(index = 0; index < 100; index ++) {
-		/* inserts the task in the thread pool */
-		insertTaskThreadPool(threadPool, threadPoolTask);
-	}
+    /* iterates over the range of the index */
+    for(index = 0; index < 100; index ++) {
+        /* inserts the task in the thread pool */
+        insertTaskThreadPool(threadPool, threadPoolTask);
+    }
 }
 
 void testLinkedList() {
-	/* allocates space for the element */
+    /* allocates space for the element */
     unsigned int element;
 
-	/* allocates space for the linked list */
-	struct LinkedList_t *linkedList;
+    /* allocates space for the linked list */
+    struct LinkedList_t *linkedList;
 
-	/* creates the linked list */
+    /* creates the linked list */
     createLinkedList(&linkedList);
 
     /* adds some element to the linked list */
@@ -83,24 +81,24 @@ void testLinkedList() {
     /* retrieves an element from the linked list */
     getLinkedList(linkedList, 1, (void **) &element);
 
-	/* removes an element from the linked list */
+    /* removes an element from the linked list */
     removeLinkedList(linkedList, 1);
 
-	/* pops an element from the linked list */
-	popLinkedList(linkedList, (void **) &element);
+    /* pops an element from the linked list */
+    popLinkedList(linkedList, (void **) &element);
 
-	/* deletes the linked list */
+    /* deletes the linked list */
     deleteLinkedList(linkedList);
 }
 
 void testArrayList() {
-	/* allocates space for the element */
-	unsigned int element = 1;
+    /* allocates space for the element */
+    unsigned int element = 1;
 
-	/* allocates space for the element pointer */
+    /* allocates space for the element pointer */
     unsigned int *elementPointer;
 
-	/* allocates space for the array list */
+    /* allocates space for the array list */
     struct ArrayList_t *arrayList;
 
     /* creates the array list */
@@ -110,56 +108,56 @@ void testArrayList() {
     setArrayList(arrayList, 0, (void **) &element);
     getArrayList(arrayList, 0, (void **) &elementPointer);
 
-	/* deletes the array list */
-	deleteArrayList(arrayList);
+    /* deletes the array list */
+    deleteArrayList(arrayList);
 }
 
 void readFile(unsigned char *filePath, unsigned char **bufferPointer, size_t *fileSizePointer) {
-	/* allocates space for the file */
+    /* allocates space for the file */
     FILE *file;
-	
-	/* allocates space for the file size */
-	size_t fileSize;
 
-	/* allocates space for the file buffer */
-	unsigned char *fileBuffer;
+    /* allocates space for the file size */
+    size_t fileSize;
 
-	/* allocates space for the number of bytes */
-	size_t numberBytes;
+    /* allocates space for the file buffer */
+    unsigned char *fileBuffer;
 
-	/* opens the file */
+    /* allocates space for the number of bytes */
+    size_t numberBytes;
+
+    /* opens the file */
     file = fopen((char *) filePath, "rb");
 
-	/* seeks the file until the end */
+    /* seeks the file until the end */
     fseek(file, 0, SEEK_END);
 
-	/* retrieves the file size */
+    /* retrieves the file size */
     fileSize = ftell (file);
 
-	/* seeks the file until the beginning */
-	fseek(file, 0, SEEK_SET);
+    /* seeks the file until the beginning */
+    fseek(file, 0, SEEK_SET);
 
-	/* allocates space for the file buffer */
-	fileBuffer = (unsigned char *) malloc(fileSize);
+    /* allocates space for the file buffer */
+    fileBuffer = (unsigned char *) malloc(fileSize);
 
-	/* reads the file contents */
+    /* reads the file contents */
     numberBytes = fread(fileBuffer, 1, fileSize, file);
 
-	/* sets the buffer as the buffer pointer */
-	*bufferPointer = fileBuffer;
+    /* sets the buffer as the buffer pointer */
+    *bufferPointer = fileBuffer;
 
-	/* sets the file size as the file size pointer */
-	*fileSizePointer = fileSize;
+    /* sets the file size as the file size pointer */
+    *fileSizePointer = fileSize;
 }
 
 void testHashMap() {
-	/* allocates space for the first element */
-	unsigned int firstElement = 1;
+    /* allocates space for the first element */
+    unsigned int firstElement = 1;
 
-	/* allocates space for the second element */
-	unsigned int secondElement = 1;
+    /* allocates space for the second element */
+    unsigned int secondElement = 1;
 
-	/* allocates space for the hash map */
+    /* allocates space for the hash map */
     struct HashMap_t *hashMap;
 
     /* creates the hash map */
@@ -169,42 +167,42 @@ void testHashMap() {
     setHashMap(hashMap, 123123, (void **) &firstElement);
     getHashMap(hashMap, 123123, (void **) &secondElement);
 
-	/* deletes the hash map */
-	deleteHashMap(hashMap);
+    /* deletes the hash map */
+    deleteHashMap(hashMap);
 }
 
 void testBase64() {
-	/* allocates space for the buffer */
+    /* allocates space for the buffer */
     char buffer[] = "hello world";
 
-	/* allocates space for the encoded buffer */
+    /* allocates space for the encoded buffer */
     unsigned char *encodedBuffer;
 
-	/* allocates space for the encoded buffer length */
-	size_t encodedBufferLength;
+    /* allocates space for the encoded buffer length */
+    size_t encodedBufferLength;
 
     /* encodes the value into base64 */
     encodeBase64((unsigned char *) buffer, strlen(buffer), &encodedBuffer, &encodedBufferLength);
 
-	/* releases the encoded buffer */
-	free(encodedBuffer);
+    /* releases the encoded buffer */
+    free(encodedBuffer);
 }
 
 void runTests() {
-	/* tests the thread pool */
-	testThreadPool();
+    /* tests the thread pool */
+    testThreadPool();
 
-	/* tests the linked list */
-	testLinkedList();
+    /* tests the linked list */
+    testLinkedList();
 
-	/* tests the array list */
-	testArrayList();
+    /* tests the array list */
+    testArrayList();
 
-	/* tests the hash map */
-	testHashMap();
+    /* tests the hash map */
+    testHashMap();
 
-	/* tests the base 64 encoder */
-	testBase64();
+    /* tests the base 64 encoder */
+    testBase64();
 }
 
 int main(int argc, char *argv[]) {
@@ -232,47 +230,51 @@ int main(int argc, char *argv[]) {
     /* allocates the "simple" buffer */
     char buffer[10240];
 
+    /* allocates the response buffer */
     char response[1000];
 
-	/* allocates space for the number of bytes */
-	size_t numberBytes;
+    /* allocates space for the number of bytes */
+    size_t numberBytes;
 
-	/* allocates space for the file path */
+    /* allocates space for the file path */
     unsigned char *filePath;
 
-	/* allocates space for the file buffer */
-	size_t fileSize;
+    /* allocates space for the file buffer */
+    size_t fileSize;
 
-	/* allocates space for the file buffer */
+    /* allocates space for the file buffer */
     unsigned char *fileBuffer;
 
-	char optionValue;
+    char optionValue;
 
-	/* allocates space for the sockets set */
-	fd_set socketsSet;
+    /* allocates space for the sockets read set */
+    fd_set socketsReadSet;
 
-	/* allocates space for the select timeout value */
-	struct timeval selectTimeout;
+    /* allocates space for the sockets write set */
+    fd_set socketsWriteSet;
 
-	/* allocates space for the select count */
-	int selectCount;
+    /* allocates space for the select timeout value */
+    struct timeval selectTimeout;
 
-	/* in case the number of arguments is bigger than one */
+    /* allocates space for the select count */
+    int selectCount;
+
+    /* in case the number of arguments is bigger than one */
     if(argc > 1) {
-		/* sets the file path as the first argument */
+        /* sets the file path as the first argument */
         filePath = (unsigned char *) argv[1];
     } else {
-		/* sets the file path as a static file */
+        /* sets the file path as a static file */
         filePath = (unsigned char *) "C:\\Desert.jpg";
     }
 
-	/* runs the tests */
-	runTests();
+    /* runs the tests */
+    runTests();
 
-	/* reads the file */
-	readFile(filePath, &fileBuffer, &fileSize);
+    /* reads the file */
+    readFile(filePath, &fileBuffer, &fileSize);
 
-	/* writes the http static headers to the response */
+    /* writes the http static headers to the response */
     sprintf(response, "HTTP/1.1 200 OK\r\nServer: viriatum/1.0.0\r\nContent-Length: %d\r\n\r\n", (unsigned int) fileSize);
 
     /* initializes the socket infrastructure */
@@ -281,13 +283,13 @@ int main(int argc, char *argv[]) {
     /* creates the socket for the given types */
     socketHandle = SOCKET_CREATE(SOCKET_INTERNET_TYPE, SOCKET_PACKET_TYPE, SOCKET_PROTOCOL_TCP);
 
-	/* sets the option value to one */
-	optionValue = 1,
+    /* sets the option value to one */
+    optionValue = 1,
 
-	/* sets the socket reuse address option in the socket */
-	SOCKET_SET_OPTIONS(socketHandle, SOCKET_OPTIONS_LEVEL_SOCKET, SOCKET_OPTIONS_REUSE_ADDRESS_SOCKET, optionValue);
+    /* sets the socket reuse address option in the socket */
+    SOCKET_SET_OPTIONS(socketHandle, SOCKET_OPTIONS_LEVEL_SOCKET, SOCKET_OPTIONS_REUSE_ADDRESS_SOCKET, optionValue);
 
-	//ioctlsocket(socketHandle, FIONBIO, (u_long *) &optionValue);
+    //ioctlsocket(socketHandle, FIONBIO, (u_long *) &optionValue);
 
     /* tests the socket for errors */
     if(SOCKET_TEST_SOCKET(socketHandle)) {
@@ -334,55 +336,66 @@ int main(int argc, char *argv[]) {
     SOCKET_LISTEN(socketHandle);
 
     /* calculates the size of the socket address */
-	clientSocketAddressSize = sizeof(socketAddress);
+    clientSocketAddressSize = sizeof(socketAddress);
 
     /* iterates continuously */
     while(1) {
-		/* zeros the sockets set */
-		FD_ZERO(&socketsSet);
+        /* zeros the sockets write set */
+        FD_ZERO(&socketsWriteSet);
 
-		/* adds the socket handle to the sockets set */
-		FD_SET(socketHandle, &socketsSet);
+        /* adds the socket handle to the sockets write set */
+        FD_SET(socketHandle, &socketsWriteSet);
 
-		/* sets the timeout value */
-		selectTimeout.tv_sec = 1;
-		selectTimeout.tv_usec = 0;
+        /* zeros the sockets read set */
+        FD_ZERO(&socketsReadSet);
 
-		/* runs the select over the sockets set */
-		selectCount = select(1, &socketsSet, &socketsSet, NULL, &selectTimeout);
+        /* adds the socket handle to the sockets read set */
+        FD_SET(socketHandle, &socketsReadSet);
 
-		/* in case there are sockets ready */
-		if(selectCount > 0) {
-			/* in case the master socket is set */
-			if(FD_ISSET(socketHandle, &socketsSet) == 1) {
-				/* accepts the socket */
-				clientSocketHandle = SOCKET_ACCEPT(socketHandle, &clientSocketAddress, clientSocketAddressSize);
+        /* sets the timeout value */
+        selectTimeout.tv_sec = 1;
+        selectTimeout.tv_usec = 0;
 
-				/* reveives from the client socket */
-				numberBytes = SOCKET_RECEIVE(clientSocketHandle, buffer, 10240, 0);
+        /* runs the select over the sockets set */
+        selectCount = select(1, &socketsReadSet, &socketsWriteSet, NULL, &selectTimeout);
 
-				/* in case no bytes are sent */
-				if(numberBytes < 0) {
-					/* prints an error message */
-					printf("error in receive");
-				}
+        /* in case there are sockets ready */
+        if(selectCount > 0) {
+            /* in case the master socket is set in the read set */
+            if(FD_ISSET(socketHandle, &socketsReadSet) == 1) {
+                /* accepts the socket */
+                clientSocketHandle = SOCKET_ACCEPT(socketHandle, &clientSocketAddress, clientSocketAddressSize);
 
-				/* sends the data */
-				numberBytes = SOCKET_SEND(clientSocketHandle, response, strlen(response), 0);
-				numberBytes = SOCKET_SEND(clientSocketHandle, fileBuffer, fileSize, 0);
+                /* reveives from the client socket */
+                numberBytes = SOCKET_RECEIVE(clientSocketHandle, buffer, 10240, 0);
 
-				/* closes the client socket */
-				SOCKET_CLOSE(clientSocketHandle);
-			} else {
-			}
-		}
-		/*  in case there are no sockets ready */
-		else if(selectCount == 0) {
-		}
-		/* in case there is an error */
-		else {
-			/* error situation */
-		}
+                /* in case no bytes are sent */
+                if(numberBytes < 0) {
+                    /* prints an error message */
+                    printf("error in receive");
+                }
+
+                /* sends the data */
+                numberBytes = SOCKET_SEND(clientSocketHandle, response, strlen(response), 0);
+                numberBytes = SOCKET_SEND(clientSocketHandle, fileBuffer, fileSize, 0);
+
+                /* closes the client socket */
+                SOCKET_CLOSE(clientSocketHandle);
+            }
+            /* in case the master socket is set in the write set */
+            else if(FD_ISSET(socketHandle, &socketsWriteSet) == 1) {
+
+            }
+            else {
+            }
+        }
+        /*  in case there are no sockets ready */
+        else if(selectCount == 0) {
+        }
+        /* in case there is an error */
+        else {
+            /* error situation */
+        }
     }
 
     /* runs the socket finish */

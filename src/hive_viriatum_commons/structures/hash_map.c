@@ -68,6 +68,8 @@ void createHashMap(struct HashMap_t **hashMapPointer, size_t initialSize) {
 }
 
 void deleteHashMap(struct HashMap_t *hashMap) {
+    /* releases the hash map */
+    free(hashMap);
 }
 
 void setHashMap(struct HashMap_t *hashMap, size_t key, void *value) {

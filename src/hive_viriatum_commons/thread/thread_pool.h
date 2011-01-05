@@ -31,10 +31,10 @@
 #include "../system/system.h"
 
 typedef struct ThreadPoolTask_t {
-	int (*startFunction)(void *arguments);
-	int (*stopFunction)(void *arguments);
-	int (*pauseFunction)(void *arguments);
-	int (*resumeFunction)(void *arguments);
+    int (*startFunction)(void *arguments);
+    int (*stopFunction)(void *arguments);
+    int (*pauseFunction)(void *arguments);
+    int (*resumeFunction)(void *arguments);
 } ThreadPoolTask;
 
 typedef struct ThreadPoolElement_t {
@@ -46,11 +46,11 @@ typedef struct ThreadPool_t {
     size_t numberThreads;
     size_t schedulingAlgorithm;
     size_t maximumNumberThreads;
-	size_t currentNumberThreads;
-	CONDITION_HANDLE taskCondition;
-	CRITICAL_SECTION_HANDLE taskConditionLock;
+    size_t currentNumberThreads;
+    CONDITION_HANDLE taskCondition;
+    CRITICAL_SECTION_HANDLE taskConditionLock;
     struct LinkedList_t *workerThreadsList;
-	struct LinkedList_t *taskQueue;
+    struct LinkedList_t *taskQueue;
 } ThreadPool;
 
 VIRIATUM_EXPORT_PREFIX void createThreadPool(struct ThreadPool_t **threadPoolPointer, size_t numberThreads, size_t schedulingAlgorithm, size_t maximumNumberThreads);
