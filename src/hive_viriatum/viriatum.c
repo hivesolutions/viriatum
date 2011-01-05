@@ -253,10 +253,10 @@ int main(int argc, char *argv[]) {
 	/* in case the number of arguments is bigger than one */
     if(argc > 1) {
 		/* sets the file path as the first argument */
-        filePath = argv[1];
+        filePath = (unsigned char *) argv[1];
     } else {
 		/* sets the file path as a static file */
-        filePath = "C:\\Desert.jpg";
+        filePath = (unsigned char *) "C:\\Desert.jpg";
     }
 
 	/* runs the tests */
