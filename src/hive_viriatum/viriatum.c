@@ -273,7 +273,7 @@ void service(int argc, char *argv[]) {
     }
 
 	/* prints a debug message */
-	printf("Loading file '%s'", filePath);
+	printf("Loading file '%s'\n", filePath);
 
     /* reads the file */
     readFile(filePath, &fileBuffer, &fileSize);
