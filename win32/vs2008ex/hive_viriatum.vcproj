@@ -328,6 +328,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\hive_viriatum\service_select.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\hive_viriatum\stdafx.c"
 				>
 				<FileConfiguration
@@ -375,6 +379,10 @@
 			>
 			<File
 				RelativePath="..\..\src\hive_viriatum\service.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\hive_viriatum\service_select.h"
 				>
 			</File>
 			<File

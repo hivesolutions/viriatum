@@ -46,5 +46,5 @@ typedef struct HashMapElement_t {
 
 VIRIATUM_EXPORT_PREFIX void createHashMap(struct HashMap_t **hashMapPointer, size_t initialSize);
 VIRIATUM_EXPORT_PREFIX void deleteHashMap(struct HashMap_t *hashMap);
-VIRIATUM_EXPORT_PREFIX void setHashMap(struct HashMap_t *hashMap, size_t key, void *value);
-VIRIATUM_EXPORT_PREFIX void getHashMap(struct HashMap_t *hashMap, size_t key, void **valuePointer);
+VIRIATUM_EXPORT_PREFIX void setValueHashMap(struct HashMap_t *hashMap, size_t key, void *value);
+VIRIATUM_EXPORT_PREFIX void getValueHashMap(struct HashMap_t *hashMap, size_t key, void **valuePointer);

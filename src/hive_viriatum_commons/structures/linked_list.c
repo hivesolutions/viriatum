@@ -70,16 +70,7 @@ void createLinkedListNode(struct LinkedListNode_t **linkedListNodePointer) {
     *linkedListNodePointer = linkedListNode;
 }
 
-void appendLinkedList(struct LinkedList_t *linkedList, void *value) {
-    /* allocates space for the linked list node */
-    struct LinkedListNode_t *linkedListNode;
-
-    /* creates the linked list node */
-    createLinkedListNode(&linkedListNode);
-
-    /* sets the value in the linked list node */
-    linkedListNode->value = value;
-
+void appendLinkedList(struct LinkedList_t *linkedList, struct LinkedListNode_t *linkedListNode) {
     /* in case the linked list is empty */
     if(linkedList->size == 0) {
         /* sets the linked list node as the first node */
@@ -101,33 +92,32 @@ void appendLinkedList(struct LinkedList_t *linkedList, void *value) {
     linkedList->size++;
 }
 
-void removeLinkedList(struct LinkedList_t *linkedList, size_t index) {
-    /* allocates space for the index */
-    size_t _index;
+void appendValueLinkedList(struct LinkedList_t *linkedList, void *value) {
+    /* allocates space for the linked list node */
+    struct LinkedListNode_t *linkedListNode;
 
-    /* allocates space for the current node */
-    struct LinkedListNode_t *currentNode;
+    /* creates the linked list node */
+    createLinkedListNode(&linkedListNode);
 
+    /* sets the value in the linked list node */
+    linkedListNode->value = value;
+
+    /* appends the linked list node to the linked list */
+    appendLinkedList(linkedList, linkedListNode);
+}
+
+void removeLinkedList(struct LinkedList_t *linkedList, struct LinkedListNode_t *linkedListNode) {
     /* allocates space for the previous node */
     struct LinkedListNode_t *previousNode;
 
     /* allocates space for the next node */
     struct LinkedListNode_t *nextNode;
 
-    /* sets the initial iteration node */
-    currentNode = linkedList->first;
-
-    /* iterates over the index value */
-    for(_index = 0; _index < index; _index++) {
-        /* sets the current node as the next node */
-        currentNode = currentNode->next;
-    }
-
     /* retrieves the previous node */
-    previousNode = currentNode->previous;
+    previousNode = linkedListNode->previous;
 
     /* retrieves the next node */
-    nextNode = currentNode->next;
+    nextNode = linkedListNode->next;
 
     /* in case the previous node is valid */
     if(previousNode != NULL) {
@@ -142,19 +132,17 @@ void removeLinkedList(struct LinkedList_t *linkedList, size_t index) {
     }
 
     /* in case the element to be removed is the last */
-    if(index == linkedList->size - 1) {
+    if(nextNode == NULL) {
         /* sets the last node as the previous node */
         linkedList->last = previousNode;
     }
-
     /* in case the element to be removed is the last minus one */
-    if(index == linkedList->size - 2) {
+    else if(nextNode->next == NULL) {
         /* sets the last node as the next node */
         linkedList->last = nextNode;
     }
-
     /* in case the element to be removed is the first */
-    if(index == 0) {
+    else if(previousNode == NULL) {
         /* sets the last node as the previous node */
         linkedList->first = nextNode;
     }
@@ -163,7 +151,27 @@ void removeLinkedList(struct LinkedList_t *linkedList, size_t index) {
     linkedList->size--;
 }
 
-void getLinkedList(struct LinkedList_t *linkedList, size_t index, void **valuePointer) {
+void removeValueLinkedList(struct LinkedList_t *linkedList, void *value) {
+    /* allocates space for the index */
+    size_t index;
+
+    /* allocates space for the target node */
+    struct LinkedListNode_t *targetNode;
+
+    /* allocates space for the current node */
+    struct LinkedListNode_t *currentNode;
+
+    /* sets the initial iteration node */
+    currentNode = linkedList->first;
+
+    /* iterates over the index value */
+    for(index = 0; index < linkedList->size; index++) {
+        /* sets the current node as the next node */
+        currentNode = currentNode->next;
+    }
+}
+
+void removeIndexLinkedList(struct LinkedList_t *linkedList, size_t index) {
     /* allocates space for the index */
     size_t _index;
 
@@ -179,14 +187,62 @@ void getLinkedList(struct LinkedList_t *linkedList, size_t index, void **valuePo
         currentNode = currentNode->next;
     }
 
-    /* sets the current node value in the value pointer */
-    *valuePointer = currentNode->value;
+    /* removes the current node from the linked list */
+    removeLinkedList(linkedList, currentNode);
 }
 
-void popLinkedList(struct LinkedList_t *linkedList, void **valuePointer) {
-    /* retrieves the first element from the linked list */
-    getLinkedList(linkedList, 0, valuePointer);
+void getLinkedList(struct LinkedList_t *linkedList, size_t index, struct LinkedListNode_t **linkedListNodePointer) {
+    /* allocates space for the index */
+    size_t _index;
 
-    /* removes the first element from the linked list */
-    removeLinkedList(linkedList, 0);
+    /* allocates space for the current node */
+    struct LinkedListNode_t *currentNode;
+
+    /* sets the initial iteration node */
+    currentNode = linkedList->first;
+
+    /* iterates over the index value */
+    for(_index = 0; _index < index; _index++) {
+        /* sets the current node as the next node */
+        currentNode = currentNode->next;
+    }
+
+    /* sets the current node in the linked list node pointer */
+    *linkedListNodePointer = currentNode;
+}
+
+void getValueLinkedList(struct LinkedList_t *linkedList, size_t index, void **valuePointer) {
+    /* allocates space for the linked list node */
+    struct LinkedListNode_t *linkedListNode;
+
+    /* retrieves the linked list node for the index */
+    getLinkedList(linkedList, index, &linkedListNode);
+
+    /* sets the linked list node value in the value pointer */
+    *valuePointer = linkedListNode->value;
+}
+
+void popLinkedList(struct LinkedList_t *linkedList, struct LinkedListNode_t **linkedListNodePointer) {
+    /* allocates space for the linked list node */
+    struct LinkedListNode_t *linkedListNode;
+
+    /* retrieves the initial linked list node */
+    getLinkedList(linkedList, 0, &linkedListNode);
+
+    /* removes the first linked list node from the linked list */
+    removeLinkedList(linkedList, linkedListNode);
+
+    /* sets the linked list node in the linked list node pointer */
+    *linkedListNodePointer = linkedListNode;
+}
+
+void popValueLinkedList(struct LinkedList_t *linkedList, void **valuePointer) {
+    /* allocates space for the linked list node */
+    struct LinkedListNode_t *linkedListNode;
+
+    /* pops the linked list node */
+    popLinkedList(linkedList, &linkedListNode);
+
+    /* sets the linked list node value in the value pointer */
+    *valuePointer = linkedListNode->value;
 }
