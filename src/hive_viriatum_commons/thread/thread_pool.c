@@ -127,6 +127,7 @@ void insertTaskThreadPool(struct ThreadPool_t *threadPool, struct ThreadPoolTask
 * @return The thread result.
 */
 THREAD_RETURN poolRunnerThread(THREAD_ARGUMENTS parameters) {
+	/* allocates space for the work thread task */
 	struct ThreadPoolTask_t *workThreadTask;
 
 	/* retrieves the thread pool from the arguments */
