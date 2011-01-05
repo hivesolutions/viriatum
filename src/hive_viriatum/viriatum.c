@@ -68,6 +68,9 @@ void testLinkedList() {
     /* allocates space for the value */
     unsigned int value;
 
+    /* allocates space for the value */
+    unsigned int value2;
+
     /* allocates space for the linked list */
     struct LinkedList_t *linkedList;
 
@@ -89,7 +92,7 @@ void testLinkedList() {
     removeIndexLinkedList(linkedList, 1);
 
     /* pops a value from the linked list */
-    popValueLinkedList(linkedList, (void **) &value);
+    popValueLinkedList(linkedList, (void **) &value2);
 
     /* deletes the linked list */
     deleteLinkedList(linkedList);
