@@ -66,10 +66,6 @@
 #include <pthread.h>
 #endif
 
-#ifdef VIRIATUM_PLATFORM_LINUX
-#include <linux/unistd.h>
-#endif
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

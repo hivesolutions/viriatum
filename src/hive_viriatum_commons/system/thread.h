@@ -82,7 +82,7 @@ typedef struct EventHandle_t {
 #define THREAD_JOIN(threadIdentifier) pthread_join(threadIdentifier, NULL)
 #define THREAD_JOIN_BASE(threadHandle, threadIdentifier) THREAD_JOIN(threadIdentifier)
 #define THREAD_CLOSE(threadHandle)
-#define THREAD_GET_IDENTIFIER() NULL;
+#define THREAD_GET_IDENTIFIER() pthread_self()
 #define MUTEX_HANDLE pthread_mutex_t *
 #define MUTEX_CREATE(mutexHandle) mutexHandle = (MUTEX_HANDLE) malloc(sizeof(pthread_mutex_t));\
     pthread_mutex_init(mutexHandle, NULL)
