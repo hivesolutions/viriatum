@@ -48,6 +48,27 @@ void createLinkedList(struct LinkedList_t **linkedListPointer) {
 }
 
 void deleteLinkedList(struct LinkedList_t *linkedList) {
+	/* allocates space for the index */
+	unsigned int index;
+
+    /* allocates space for the next node */
+    struct LinkedListNode_t *nextNode;
+
+    /* sets the initial iteration node */
+    struct LinkedListNode_t *currentNode = linkedList->first;
+
+    /* iterates over the index value */
+    for(index = 0; index < linkedList->size; index++) {
+        /* retrieves the next node */
+        nextNode = currentNode->next;
+
+		/* deletes the linked list node */
+		deleteLinkedListNode(currentNode);
+
+		/* sets the current node as the next node */
+		currentNode = nextNode;
+    }
+
     /* releases the linked list */
     free(linkedList);
 }
@@ -68,6 +89,11 @@ void createLinkedListNode(struct LinkedListNode_t **linkedListNodePointer) {
 
     /* sets the linked list node in the linked list node pointer */
     *linkedListNodePointer = linkedListNode;
+}
+
+void deleteLinkedListNode(struct LinkedListNode_t *linkedListNode) {
+	/* releases the linked list node */
+	free(linkedListNode);
 }
 
 void appendLinkedList(struct LinkedList_t *linkedList, struct LinkedListNode_t *linkedListNode) {
