@@ -34,7 +34,10 @@ int threadPoolTest(void *arguments) {
 	THREAD_IDENTIFIER threadId = THREAD_GET_IDENTIFIER();
 
 	/* prints an hello world message */
-	printf("hello world from thread: %d", threadId);
+	printf("hello world from thread: %d\n", threadId);
+
+	/* sleeps for a while */
+	SLEEP(100);
 
 	/* returns valid */
 	return 0;
