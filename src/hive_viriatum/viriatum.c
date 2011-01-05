@@ -124,6 +124,9 @@ void readFile(unsigned char *filePath, unsigned char **bufferPointer, size_t *fi
 	/* allocates space for the file buffer */
 	unsigned char *fileBuffer;
 
+	/* allocates space for the read bytes */
+	size_t readBytes;
+
 	/* opens the file */
     file = fopen((char *) filePath, "rb");
 
@@ -140,7 +143,7 @@ void readFile(unsigned char *filePath, unsigned char **bufferPointer, size_t *fi
 	fileBuffer = (unsigned char *) malloc(fileSize);
 
 	/* reads the file contents */
-    fread(fileBuffer, 1, fileSize, file);
+    readBytes = fread(fileBuffer, 1, fileSize, file);
 
 	/* sets the buffer as the buffer pointer */
 	*bufferPointer = fileBuffer;
