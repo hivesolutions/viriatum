@@ -239,7 +239,7 @@ void removeIndexLinkedList(struct LinkedList_t *linkedList, size_t index) {
 
 void getLinkedList(struct LinkedList_t *linkedList, size_t index, struct LinkedListNode_t **linkedListNodePointer) {
     /* allocates space for the index */
-    size_t _index = 0;
+    size_t index2 = 0;
 
     /* allocates space for the current node */
     struct LinkedListNode_t *currentNode;
@@ -248,7 +248,7 @@ void getLinkedList(struct LinkedList_t *linkedList, size_t index, struct LinkedL
     currentNode = linkedList->first;
 
     /* iterates over the index value */
-    for(_index = 0; _index < index; _index++) {
+    for(index2 = 0; index2 < index; index2++) {
         /* sets the current node as the next node */
         currentNode = currentNode->next;
     }
