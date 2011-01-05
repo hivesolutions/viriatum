@@ -239,7 +239,7 @@ void removeIndexLinkedList(struct LinkedList_t *linkedList, size_t index) {
 
 void getLinkedList(struct LinkedList_t *linkedList, size_t index, struct LinkedListNode_t **linkedListNodePointer) {
     /* allocates space for the index */
-    size_t index2 = 0;
+    size_t _index = 0;
 
     /* allocates space for the current node */
     struct LinkedListNode_t *currentNode;
@@ -248,7 +248,7 @@ void getLinkedList(struct LinkedList_t *linkedList, size_t index, struct LinkedL
     currentNode = linkedList->first;
 
     /* iterates over the index value */
-    for(index2 = 0; index2 < index; index2++) {
+    for(_index = 0; _index < index; _index++) {
         /* sets the current node as the next node */
         currentNode = currentNode->next;
     }
@@ -276,10 +276,10 @@ void popLinkedList(struct LinkedList_t *linkedList, struct LinkedListNode_t **li
     getLinkedList(linkedList, 0, &linkedListNode);
 
     /* removes the first linked list node from the linked list */
-    //removeLinkedList(linkedList, linkedListNode);
+    removeLinkedList(linkedList, linkedListNode);
 
     /* sets the linked list node in the linked list node pointer */
-    //*linkedListNodePointer = linkedListNode;
+    *linkedListNodePointer = linkedListNode;
 }
 
 void popValueLinkedList(struct LinkedList_t *linkedList, void **valuePointer) {
@@ -290,5 +290,5 @@ void popValueLinkedList(struct LinkedList_t *linkedList, void **valuePointer) {
     popLinkedList(linkedList, &linkedListNode);
 
     /* sets the linked list node value in the value pointer */
-    //*valuePointer = linkedListNode->value;
+    *valuePointer = linkedListNode->value;
 }
