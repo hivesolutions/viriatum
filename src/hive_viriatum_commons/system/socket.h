@@ -41,6 +41,8 @@
 #define SOCKET_DATAGRAM_TYPE SOCK_DGRAM
 #define SOCKET_PROTOCOL_TCP IPPROTO_TCP
 #define SOCKET_PROTOCOL_UDP IPPROTO_UDP
+#define SOCKET_OPTIONS_LEVEL_SOCKET SOL_SOCKET
+#define SOCKET_OPTIONS_REUSE_ADDRESS_SOCKET SO_REUSEADDR
 #define SOCKET_INITIALIZE(socketData) WSAStartup(MAKEWORD(2, 0), socketData)
 #define SOCKET_FINISH() WSACleanup()
 #define SOCKET_CREATE(type, streamType, protocolType) socket(type, streamType, protocolType)
@@ -59,6 +61,7 @@
 #define SOCKET_GET_ERROR_CODE(result) WSAGetLastError()
 #define SOCKET_SEND(socketHandle, buffer, length, flags) send(socketHandle, buffer, length, flags)
 #define SOCKET_RECEIVE(socketHandle, buffer, length, flags) recv(socketHandle, buffer, length, flags)
+#define SOCKET_SET_OPTIONS(socketHandle, level, optionName, optionValue) setsockopt(socketHandle, level, optionName, &optionValue, sizeof(optionValue))
 #endif
 
 #ifdef VIRIATUM_PLATFORM_UNIX
@@ -76,6 +79,8 @@
 #define SOCKET_DATAGRAM_TYPE SOCK_DGRAM
 #define SOCKET_PROTOCOL_TCP IPPROTO_TCP
 #define SOCKET_PROTOCOL_UDP IPPROTO_UDP
+#define SOCKET_OPTIONS_LEVEL_SOCKET SOL_SOCKET
+#define SOCKET_OPTIONS_REUSE_ADDRESS_SOCKET SO_REUSEADDR
 #define SOCKET_INITIALIZE(socketData)
 #define SOCKET_FINISH()
 #define SOCKET_CREATE(type, streamType, protocolType) socket(type, streamType, protocolType)
@@ -94,4 +99,5 @@
 #define SOCKET_GET_ERROR_CODE(result) result
 #define SOCKET_SEND(socketHandle, buffer, length, flags) write(socketHandle, buffer, length)
 #define SOCKET_RECEIVE(socketHandle, buffer, length, flags) read(socketHandle, buffer, length)
+#define SOCKET_SET_OPTIONS(socketHandle, level, optionName, optionValue) setsockopt(socketHandle, level, optionName, &optionValue, sizeof(optionValue))
 #endif

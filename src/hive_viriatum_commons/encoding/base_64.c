@@ -118,9 +118,6 @@ int _encodeBase64(unsigned char *buffer, size_t bufferLength, unsigned char *enc
         }
     }
 
-    /* sets the final encoded buffer value */
-    encodedBuffer[encodedBufferIndex] = 0;
-
     /* returns one success */
     return 1;
 }

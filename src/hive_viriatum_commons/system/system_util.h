@@ -35,7 +35,9 @@
 #define SPRINTF(buffer, size, format, ...) sprintf_s(buffer, size, format, __VA_ARGS__)
 #define GET_ENV(buffer, bufferSize, variableName) _dupenv_s(&buffer, &bufferSize, variableName)
 #define FILE_EXISTS(filePath) GetFileAttributes(filePath) != 0xffffffff
-#elif VIRIATUM_PLATFORM_UNIX
+#endif
+
+#ifdef VIRIATUM_PLATFORM_UNIX
 #define PID_TYPE pid_t
 #define LOCAL_TIME(localTimeValue, timeValue) localTimeValue = localtime(timeValue)
 #define SLEEP(miliseconds) usleep((useconds_t) miliseconds * 1000)
