@@ -137,7 +137,7 @@ void removeLinkedList(struct LinkedList_t *linkedList, struct LinkedListNode_t *
         linkedList->last = previousNode;
     }
     /* in case the element to be removed is the last minus one */
-    else if(nextNode->next == NULL) {
+    else if(nextNode != NULL && nextNode->next == NULL) {
         /* sets the last node as the next node */
         linkedList->last = nextNode;
     }
@@ -247,10 +247,10 @@ void popLinkedList(struct LinkedList_t *linkedList, struct LinkedListNode_t **li
     struct LinkedListNode_t *linkedListNode;
 
     /* retrieves the initial linked list node */
-    //getLinkedList(linkedList, 0, &linkedListNode);
+    getLinkedList(linkedList, 0, &linkedListNode);
 
     /* removes the first linked list node from the linked list */
-    //removeLinkedList(linkedList, linkedListNode);
+    removeLinkedList(linkedList, linkedListNode);
 
     /* sets the linked list node in the linked list node pointer */
     *linkedListNodePointer = linkedListNode;
