@@ -130,7 +130,7 @@ void readFile(unsigned char *filePath, unsigned char **bufferPointer, size_t *fi
     size_t numberBytes;
 
     /* opens the file */
-    file = fopen((char *) filePath, "rb");
+    file = fopen("service.c", "rb");
 
     /* seeks the file until the end */
     fseek(file, 0, SEEK_END);
