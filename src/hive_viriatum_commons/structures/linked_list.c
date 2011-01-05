@@ -247,7 +247,7 @@ void popLinkedList(struct LinkedList_t *linkedList, struct LinkedListNode_t **li
     struct LinkedListNode_t *linkedListNode;
 
     /* retrieves the initial linked list node */
-    getLinkedList(linkedList, 0, &linkedListNode);
+    //getLinkedList(linkedList, 0, &linkedListNode);
 
     /* removes the first linked list node from the linked list */
     //removeLinkedList(linkedList, linkedListNode);
