@@ -72,7 +72,7 @@ void deleteHashMap(struct HashMap_t *hashMap) {
     free(hashMap);
 }
 
-void setHashMap(struct HashMap_t *hashMap, size_t key, void *value) {
+void setValueHashMap(struct HashMap_t *hashMap, size_t key, void *value) {
     /* calculates the index using the modulus */
     size_t index = key % hashMap->elementsBufferSize;
 
@@ -85,12 +85,23 @@ void setHashMap(struct HashMap_t *hashMap, size_t key, void *value) {
     element->used = 1;
 }
 
-void getHashMap(struct HashMap_t *hashMap, size_t key, void **valuePointer) {
+void getHashMap(struct HashMap_t *hashMap, size_t key, struct HashMapElement_t **elementPointer) {
     /* calculates the index using the modulus */
     size_t index = key % hashMap->elementsBufferSize;
 
     /* retrieves the base address value */
     struct HashMapElement_t *element = &hashMap->elementsBuffer[index];
+
+    /* sets the element in the element pointer */
+    *elementPointer = element;
+}
+
+void getValueHashMap(struct HashMap_t *hashMap, size_t key, void **valuePointer) {
+    /* allocates space for the element */
+    struct HashMapElement_t *element;
+
+    /* retrieves the hash map element for the key */
+    getHashMap(hashMap, key, &element);
 
     /* sets the element value in the value pointer */
     *valuePointer = element->value;

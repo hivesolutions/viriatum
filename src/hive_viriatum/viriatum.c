@@ -65,8 +65,8 @@ void testThreadPool() {
 }
 
 void testLinkedList() {
-    /* allocates space for the element */
-    unsigned int element;
+    /* allocates space for the value */
+    unsigned int value;
 
     /* allocates space for the linked list */
     struct LinkedList_t *linkedList;
@@ -75,17 +75,17 @@ void testLinkedList() {
     createLinkedList(&linkedList);
 
     /* adds some element to the linked list */
-    appendLinkedList(linkedList, (void *) 1);
-    appendLinkedList(linkedList, (void *) 2);
+    appendValueLinkedList(linkedList, (void *) 1);
+    appendValueLinkedList(linkedList, (void *) 2);
 
-    /* retrieves an element from the linked list */
-    getLinkedList(linkedList, 1, (void **) &element);
+    /* retrieves a value from the linked list */
+    getValueLinkedList(linkedList, 1, (void **) &value);
 
     /* removes an element from the linked list */
-    removeLinkedList(linkedList, 1);
+    removeIndexLinkedList(linkedList, 1);
 
-    /* pops an element from the linked list */
-    popLinkedList(linkedList, (void **) &element);
+    /* pops a value from the linked list */
+    popValueLinkedList(linkedList, (void **) &value);
 
     /* deletes the linked list */
     deleteLinkedList(linkedList);
@@ -164,8 +164,8 @@ void testHashMap() {
     createHashMap(&hashMap, 0);
 
     /* sets and retrieves the value in the hash map */
-    setHashMap(hashMap, 123123, (void **) &firstElement);
-    getHashMap(hashMap, 123123, (void **) &secondElement);
+    setValueHashMap(hashMap, 123123, (void **) &firstElement);
+    getValueHashMap(hashMap, 123123, (void **) &secondElement);
 
     /* deletes the hash map */
     deleteHashMap(hashMap);

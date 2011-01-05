@@ -116,7 +116,7 @@ void insertTaskThreadPool(struct ThreadPool_t *threadPool, struct ThreadPoolTask
     CRITICAL_SECTION_ENTER(threadPool->taskConditionLock);
 
     /* adds the the thread pool task to the task queue */
-    appendLinkedList(threadPool->taskQueue, threadPoolTask);
+    appendValueLinkedList(threadPool->taskQueue, threadPoolTask);
 
     /* signals the task condition */
     CONDITION_SIGNAL(threadPool->taskCondition);
@@ -151,7 +151,7 @@ THREAD_RETURN poolRunnerThread(THREAD_ARGUMENTS parameters) {
         }
 
         /* retrieves the work thread task */
-        popLinkedList(threadPool->taskQueue, (void **) &workThreadTask);
+        popValueLinkedList(threadPool->taskQueue, (void **) &workThreadTask);
 
         /* unlock the task condition lock */
         CRITICAL_SECTION_LEAVE(threadPool->taskConditionLock);
