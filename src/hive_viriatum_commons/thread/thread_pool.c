@@ -146,11 +146,11 @@ THREAD_RETURN poolRunnerThread(THREAD_ARGUMENTS parameters) {
 		/* retrieves the work thread task */
 		popLinkedList(threadPool->taskQueue, &workThreadTask);
 
-		/* calls the start function */
-		workThreadTask->startFunction(NULL);
-
 		/* unlock the task condition lock */
 		CRITICAL_SECTION_LEAVE(threadPool->taskConditionLock);
+
+		/* calls the start function */
+		workThreadTask->startFunction(NULL);
 	}
 
     /* returns valid */
