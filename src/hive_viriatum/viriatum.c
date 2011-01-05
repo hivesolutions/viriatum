@@ -116,7 +116,7 @@ void testArrayList() {
     deleteArrayList(arrayList);
 }
 
-void readFile(unsigned char *filePath, unsigned char **bufferPointer, size_t *fileSizePointer) {
+void readFile(char *filePath, unsigned char **bufferPointer, size_t *fileSizePointer) {
     /* allocates space for the file */
     FILE *file;
 
@@ -130,7 +130,7 @@ void readFile(unsigned char *filePath, unsigned char **bufferPointer, size_t *fi
     size_t numberBytes;
 
     /* opens the file */
-    file = fopen("service.c", "rb");
+    file = fopen(filePath, "rb");
 
     /* seeks the file until the end */
     fseek(file, 0, SEEK_END);
@@ -241,7 +241,7 @@ void service(int argc, char *argv[]) {
     size_t numberBytes;
 
     /* allocates space for the file path */
-    unsigned char *filePath;
+    char *filePath;
 
     /* allocates space for the file buffer */
     size_t fileSize;
@@ -266,10 +266,10 @@ void service(int argc, char *argv[]) {
     /* in case the number of arguments is bigger than one */
     if(argc > 1) {
         /* sets the file path as the first argument */
-        filePath = (unsigned char *) argv[1];
+        filePath = argv[1];
     } else {
         /* sets the file path as a static file */
-        filePath = (unsigned char *) "C:\\Desert.jpg";
+        filePath = "C:\\Desert.jpg";
     }
 
     /* reads the file */
