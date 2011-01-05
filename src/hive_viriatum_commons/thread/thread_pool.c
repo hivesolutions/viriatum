@@ -77,6 +77,12 @@ void deleteThreadPool(struct ThreadPool_t *threadPool) {
 	/* closes the task condition */
 	CONDITION_CLOSE(threadPool->taskCondition);
 
+	/* delete the worker threads list */
+	deleteLinkedList(threadPool->workerThreadsList);
+
+	/* deletes the task queue */
+	deleteLinkedList(threadPool->taskQueue);
+
 	/* releases the thread pool */
     free(threadPool);
 }
