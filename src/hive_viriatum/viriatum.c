@@ -234,15 +234,13 @@ int main(int argc, char *argv[]) {
     unsigned int n;
 
 	/* allocates space for the file path */
-    char *filePath;
+    unsigned char *filePath;
 
 	/* allocates space for the file buffer */
 	size_t fileSize;
 
 	/* allocates space for the file buffer */
     unsigned char *fileBuffer;
-
-    unsigned int tobias = 123;
 
 	char optionValue;
 
