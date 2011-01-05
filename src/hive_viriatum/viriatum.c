@@ -125,7 +125,7 @@ void readFile(unsigned char *filePath, unsigned char **bufferPointer, size_t *fi
 	unsigned char *fileBuffer;
 
 	/* opens the file */
-    file = fopen(filePath, "rb");
+    file = fopen((char *) filePath, "rb");
 
 	/* seeks the file until the end */
     fseek(file, 0, SEEK_END);
