@@ -48,8 +48,8 @@ void createLinkedList(struct LinkedList_t **linkedListPointer) {
 }
 
 void deleteLinkedList(struct LinkedList_t *linkedList) {
-	/* allocates space for the index */
-	unsigned int index;
+    /* allocates space for the index */
+    unsigned int index;
 
     /* allocates space for the next node */
     struct LinkedListNode_t *nextNode;
@@ -62,11 +62,11 @@ void deleteLinkedList(struct LinkedList_t *linkedList) {
         /* retrieves the next node */
         nextNode = currentNode->next;
 
-		/* deletes the linked list node */
-		deleteLinkedListNode(currentNode);
+        /* deletes the linked list node */
+        deleteLinkedListNode(currentNode);
 
-		/* sets the current node as the next node */
-		currentNode = nextNode;
+        /* sets the current node as the next node */
+        currentNode = nextNode;
     }
 
     /* releases the linked list */
@@ -92,8 +92,8 @@ void createLinkedListNode(struct LinkedListNode_t **linkedListNodePointer) {
 }
 
 void deleteLinkedListNode(struct LinkedListNode_t *linkedListNode) {
-	/* releases the linked list node */
-	free(linkedListNode);
+    /* releases the linked list node */
+    free(linkedListNode);
 }
 
 void appendLinkedList(struct LinkedList_t *linkedList, struct LinkedListNode_t *linkedListNode) {

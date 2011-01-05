@@ -272,8 +272,8 @@ void service(int argc, char *argv[]) {
         filePath = "C:\\Desert.jpg";
     }
 
-	/* prints a debug message */
-	printf("Loading file '%s'\n", filePath);
+    /* prints a debug message */
+    printf("Loading file '%s'\n", filePath);
 
     /* reads the file */
     readFile(filePath, &fileBuffer, &fileSize);
@@ -410,8 +410,8 @@ int main(int argc, char *argv[]) {
     /* runs the tests */
     runTests();
 
-	/* prints a debug message */
-	printf("Receiving %d arguments\n", argc);
+    /* prints a debug message */
+    printf("Receiving %d arguments\n", argc);
 
     /* runs the service */
     service(argc, argv);
