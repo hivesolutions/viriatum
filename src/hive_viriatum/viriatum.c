@@ -263,6 +263,8 @@ void service(int argc, char *argv[]) {
     /* allocates space for the select count */
     int selectCount;
 
+	printf("O numero de argumentos e %d\n", argc);
+
     /* in case the number of arguments is bigger than one */
     if(argc > 1) {
         /* sets the file path as the first argument */
