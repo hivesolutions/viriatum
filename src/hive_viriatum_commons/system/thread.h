@@ -40,13 +40,14 @@
 #define THREAD_JOIN(threadHandle) WaitForSingleObject(threadHandle, INFINITE)
 #define THREAD_JOIN_BASE(threadHandle, threadIdentifier) THREAD_JOIN(threadHandle)
 #define THREAD_CLOSE(threadHandle) CloseHandle(threadHandle)
+#define THREAD_GET_IDENTIFIER() GetCurrentThreadId()
 #define MUTEX_HANDLE HANDLE
-#define MUTEX_CREATE(mutexHandle) mutexHandle = CreateMutex(NULL, false, NULL)
+#define MUTEX_CREATE(mutexHandle) mutexHandle = CreateMutex(NULL, 0, NULL)
 #define MUTEX_LOCK(mutexHandle) WaitForSingleObject(mutexHandle, INFINITE)
 #define MUTEX_UNLOCK(mutexHandle) ReleaseMutex(mutexHandle)
 #define MUTEX_CLOSE(mutexHandle) CloseHandle(mutexHandle)
 #define EVENT_HANDLE HANDLE
-#define EVENT_CREATE(eventHandle) eventHandle = CreateEvent(NULL, true, false, NULL)
+#define EVENT_CREATE(eventHandle) eventHandle = CreateEvent(NULL, 1, 0, NULL)
 #define EVENT_WAIT(eventHandle) WaitForSingleObject(eventHandle, INFINITE)
 #define EVENT_SIGNAL(eventHandle) SetEvent(eventHandle)
 #define EVENT_RESET(eventHandle) ResetEvent(eventHandle)
@@ -81,6 +82,7 @@ typedef struct EventHandle_t {
 #define THREAD_JOIN(threadIdentifier) pthread_join(threadIdentifier, NULL)
 #define THREAD_JOIN_BASE(threadHandle, threadIdentifier) THREAD_JOIN(threadIdentifier)
 #define THREAD_CLOSE(threadHandle)
+#define THREAD_GET_IDENTIFIER() NULL;
 #define MUTEX_HANDLE pthread_mutex_t *
 #define MUTEX_CREATE(mutexHandle) mutexHandle = (MUTEX_HANDLE) malloc(sizeof(pthread_mutex_t));\
     pthread_mutex_init(mutexHandle, NULL)
@@ -108,7 +110,7 @@ typedef struct EventHandle_t {
 #define CONDITION_HANDLE pthread_cond_t *
 #define CONDITION_CREATE(conditionHandle) conditionHandle = (CONDITION_HANDLE) malloc(sizeof(pthread_cond_t));\
 pthread_cond_init(conditionHandle, NULL)
-#define CONDITION_WAIT(conditionHandle, criticalSectionHandle) pthread_cond_wait(conditionHandle, criticalSectionHandle)
+#define CONDITION_WAIT(conditionHandle, criticalSectionHandle) pthread_cond_wait(conditionHandle, criticalSectionHandle);
 #define CONDITION_SIGNAL(conditionHandle) pthread_cond_signal(conditionHandle)
 #define CONDITION_CLOSE(conditionHandle) pthread_cond_destroy(conditionHandle);\
 free(conditionHandle)

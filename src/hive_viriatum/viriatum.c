@@ -29,6 +29,40 @@
 
 #include "../hive_viriatum_commons/viriatum_commons.h"
 
+int threadPoolTest(void *arguments) {
+	/* retrieves the current thread identifier */
+	THREAD_IDENTIFIER threadId = THREAD_GET_IDENTIFIER();
+
+	/* prints an hello world message */
+	printf("hello world from thread: %d", threadId);
+
+	/* returns valid */
+	return 0;
+}
+
+void testThreadPool() {
+	/* allocates space for the index */
+	unsigned int index;
+
+	/* allocates space for the thread pool */
+	struct ThreadPool_t *threadPool;
+
+	/* allocates space for the thread pool task */
+	struct ThreadPoolTask_t *threadPoolTask = (struct ThreadPoolTask_t *) malloc(sizeof(struct ThreadPoolTask_t));
+
+	/* sets the start function */
+	threadPoolTask->startFunction = threadPoolTest;
+
+	/* creates the thread pool */
+	createThreadPool(&threadPool, 15, 1, 30);
+
+	/* iterates over the range of the index */
+	for(index = 0; index < 100; index ++) {
+		/* inserts the task in the thread pool */
+		insertTaskThreadPool(threadPool, threadPoolTask);
+	}
+}
+
 int main(int argc, char *argv[]) {
     /* allocates the socket data */
     SOCKET_DATA socketData;
@@ -88,6 +122,9 @@ int main(int argc, char *argv[]) {
     } else {
         fileName = "C:\\Desert.jpg";
     }
+
+	/* tests the thread pool */
+	testThreadPool();
 
     /* encodes the value into base64 */
     encodeBase64((unsigned char *) rabeton, strlen(rabeton), &receiver, &receiverLength);
