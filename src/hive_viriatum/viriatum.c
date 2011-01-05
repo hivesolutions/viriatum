@@ -83,7 +83,7 @@ void testLinkedList() {
    // getValueLinkedList(linkedList, 1, (void **) &value);
 
     /* removes a value from the linked list */
-   // removeValueLinkedList(linkedList, (void *) 1);
+    removeValueLinkedList(linkedList, (void *) 1);
 
     /* removes an element from the linked list */
     removeIndexLinkedList(linkedList, 1);
