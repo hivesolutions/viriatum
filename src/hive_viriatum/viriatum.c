@@ -197,7 +197,7 @@ void runTests() {
     testThreadPool();
 
     /* tests the linked list */
-    /*testLinkedList();*/
+    testLinkedList();
 
     /* tests the array list */
     testArrayList();
