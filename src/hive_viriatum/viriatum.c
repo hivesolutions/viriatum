@@ -65,11 +65,11 @@ void testThreadPool() {
 }
 
 void testLinkedList() {
-    /* allocates space for the value */
-    unsigned int value;
+    /* allocates space for the first value */
+    unsigned int firstValue;
 
-    /* allocates space for the value */
-    unsigned int value2;
+    /* allocates space for the second value */
+    unsigned int secondValue;
 
     /* allocates space for the linked list */
     struct LinkedList_t *linkedList;
@@ -83,7 +83,7 @@ void testLinkedList() {
     appendValueLinkedList(linkedList, (void *) 3);
 
     /* retrieves a value from the linked list */
-    getValueLinkedList(linkedList, 1, (void **) &value);
+    getValueLinkedList(linkedList, 1, (void **) &firstValue);
 
     /* removes a value from the linked list */
     removeValueLinkedList(linkedList, (void *) 1);
@@ -92,7 +92,7 @@ void testLinkedList() {
     removeIndexLinkedList(linkedList, 1);
 
     /* pops a value from the linked list */
-    popValueLinkedList(linkedList, (void **) &value2);
+    //popValueLinkedList(linkedList, (void **) &secondValue);
 
     /* deletes the linked list */
     deleteLinkedList(linkedList);
