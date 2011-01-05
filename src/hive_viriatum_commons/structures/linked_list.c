@@ -290,5 +290,5 @@ void popValueLinkedList(struct LinkedList_t *linkedList, void **valuePointer) {
     popLinkedList(linkedList, &linkedListNode);
 
     /* sets the linked list node value in the value pointer */
-    *valuePointer = linkedListNode->value;
+    //*valuePointer = linkedListNode->value;
 }
