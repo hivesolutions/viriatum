@@ -111,53 +111,53 @@ void removeLinkedList(struct LinkedList_t *linkedList, size_t index) {
     /* allocates space for the previous node */
     struct LinkedListNode_t *previousNode;
 
-	/* allocates space for the next node */
+    /* allocates space for the next node */
     struct LinkedListNode_t *nextNode;
 
     /* sets the initial iteration node */
     currentNode = linkedList->first;
 
-	/* iterates over the index value */
+    /* iterates over the index value */
     for(_index = 0; _index < index; _index++) {
         /* sets the current node as the next node */
         currentNode = currentNode->next;
     }
 
-	/* retrieves the previous node */
-	previousNode = currentNode->previous;
+    /* retrieves the previous node */
+    previousNode = currentNode->previous;
 
-	/* retrieves the next node */
-	nextNode = currentNode->next;
+    /* retrieves the next node */
+    nextNode = currentNode->next;
 
-	/* in case the previous node is valid */
-	if(previousNode != NULL) {
-		/* sets the next as the next node */
-		previousNode->next = nextNode;
-	}
+    /* in case the previous node is valid */
+    if(previousNode != NULL) {
+        /* sets the next as the next node */
+        previousNode->next = nextNode;
+    }
 
-	/* in case the next node is valid */
-	if(nextNode != NULL) {
-		/* sets the previous as the previous node */
-		nextNode->previous = previousNode;
-	}
+    /* in case the next node is valid */
+    if(nextNode != NULL) {
+        /* sets the previous as the previous node */
+        nextNode->previous = previousNode;
+    }
 
-	/* in case the element to be removed is the last */
-	if(index == linkedList->size - 1) {
-		/* sets the last node as the previous node */
-		linkedList->last = previousNode;
-	}
+    /* in case the element to be removed is the last */
+    if(index == linkedList->size - 1) {
+        /* sets the last node as the previous node */
+        linkedList->last = previousNode;
+    }
 
-	/* in case the element to be removed is the last minus one */
-	if(index == linkedList->size - 2) {
-		/* sets the last node as the next node */
-		linkedList->last = nextNode;
-	}
+    /* in case the element to be removed is the last minus one */
+    if(index == linkedList->size - 2) {
+        /* sets the last node as the next node */
+        linkedList->last = nextNode;
+    }
 
-	/* in case the element to be removed is the first */
-	if(index == 0) {
-		/* sets the last node as the previous node */
-		linkedList->first = nextNode;
-	}
+    /* in case the element to be removed is the first */
+    if(index == 0) {
+        /* sets the last node as the previous node */
+        linkedList->first = nextNode;
+    }
 
     /* decrements the linked list size */
     linkedList->size--;
@@ -184,9 +184,9 @@ void getLinkedList(struct LinkedList_t *linkedList, size_t index, void **valuePo
 }
 
 void popLinkedList(struct LinkedList_t *linkedList, void **valuePointer) {
-	/* retrieves the first element from the linked list */
-	getLinkedList(linkedList, 0, valuePointer);
+    /* retrieves the first element from the linked list */
+    getLinkedList(linkedList, 0, valuePointer);
 
-	/* removes the first element from the linked list */
-	removeLinkedList(linkedList, 0);
+    /* removes the first element from the linked list */
+    removeLinkedList(linkedList, 0);
 }

@@ -31,3 +31,5 @@
 #include "global/targetver.h"
 #include "global/resource.h"
 #endif
+
+#include "../hive_viriatum_commons/viriatum_commons.h"
