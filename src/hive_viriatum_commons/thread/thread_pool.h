@@ -27,6 +27,35 @@
 
 #pragma once
 
+#include "../structures/structures.h"
 #include "../system/system.h"
+
+typedef struct ThreadPoolTask_t {
+	int (*startFunction)(void *arguments);
+	int (*stopFunction)(void *arguments);
+	int (*pauseFunction)(void *arguments);
+	int (*resumeFunction)(void *arguments);
+} ThreadPoolTask;
+
+typedef struct ThreadPoolElement_t {
+    THREAD_HANDLE threadHandle;
+    THREAD_IDENTIFIER threadId;
+} ThreadPoolElement;
+
+typedef struct ThreadPool_t {
+    size_t numberThreads;
+    size_t schedulingAlgorithm;
+    size_t maximumNumberThreads;
+	size_t currentNumberThreads;
+	CONDITION_HANDLE taskCondition;
+	CRITICAL_SECTION_HANDLE taskConditionLock;
+    struct LinkedList_t *workerThreadsList;
+	struct LinkedList_t *taskQueue;
+} ThreadPool;
+
+VIRIATUM_EXPORT_PREFIX void createThreadPool(struct ThreadPool_t **threadPoolPointer, size_t numberThreads, size_t schedulingAlgorithm, size_t maximumNumberThreads);
+VIRIATUM_EXPORT_PREFIX void deleteThreadPool(struct ThreadPool_t *threadPool);
+VIRIATUM_EXPORT_PREFIX void createThreadPoolElement(struct ThreadPool_t *threadPool);
+VIRIATUM_EXPORT_PREFIX void insertTaskThreadPool(struct ThreadPool_t *threadPool, struct ThreadPoolTask_t *threadPoolTask);
 
 VIRIATUM_EXPORT_PREFIX THREAD_RETURN poolRunnerThread(THREAD_ARGUMENTS parameters);

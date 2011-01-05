@@ -67,6 +67,9 @@ void createHashMap(struct HashMap_t **hashMapPointer, size_t initialSize) {
     *hashMapPointer = hashMap;
 }
 
+void deleteHashMap(struct HashMap_t *hashMap) {
+}
+
 void setHashMap(struct HashMap_t *hashMap, size_t key, void *value) {
     /* calculates the index using the modulus */
     size_t index = key % hashMap->elementsBufferSize;

@@ -29,6 +29,184 @@
 
 #include "../hive_viriatum_commons/viriatum_commons.h"
 
+int threadPoolStartFunctionTest(void *arguments) {
+	/* retrieves the current thread identifier */
+	THREAD_IDENTIFIER threadId = THREAD_GET_IDENTIFIER();
+
+	/* prints an hello world message */
+	printf("hello world from thread: %d\n", (unsigned int) threadId);
+
+	/* sleeps for a while */
+	SLEEP(10);
+
+	/* returns valid */
+	return 0;
+}
+
+void testThreadPool() {
+	/* allocates space for the index */
+	unsigned int index;
+
+	/* allocates space for the thread pool */
+	struct ThreadPool_t *threadPool;
+
+	/* allocates space for the thread pool task */
+	struct ThreadPoolTask_t *threadPoolTask = (struct ThreadPoolTask_t *) malloc(sizeof(struct ThreadPoolTask_t));
+
+	/* sets the start function */
+	threadPoolTask->startFunction = threadPoolStartFunctionTest;
+
+	/* creates the thread pool */
+	createThreadPool(&threadPool, 15, 1, 30);
+
+	/* iterates over the range of the index */
+	for(index = 0; index < 100; index ++) {
+		/* inserts the task in the thread pool */
+		insertTaskThreadPool(threadPool, threadPoolTask);
+	}
+}
+
+void testLinkedList() {
+	/* allocates space for the element */
+    unsigned int element;
+
+	/* allocates space for the linked list */
+	struct LinkedList_t *linkedList;
+
+	/* creates the linked list */
+    createLinkedList(&linkedList);
+
+    /* adds some element to the linked list */
+    appendLinkedList(linkedList, (void *) 1);
+    appendLinkedList(linkedList, (void *) 2);
+
+    /* retrieves an element from the linked list */
+    getLinkedList(linkedList, 1, (void **) &element);
+
+	/* removes an element from the linked list */
+    removeLinkedList(linkedList, 1);
+
+	/* pops an element from the linked list */
+	popLinkedList(linkedList, (void **) &element);
+
+	/* deletes the linked list */
+    deleteLinkedList(linkedList);
+}
+
+void testArrayList() {
+	/* allocates space for the element */
+	unsigned int element = 1;
+
+	/* allocates space for the element pointer */
+    unsigned int *elementPointer;
+
+	/* allocates space for the array list */
+    struct ArrayList_t *arrayList;
+
+    /* creates the array list */
+    createArrayList(&arrayList, sizeof(unsigned int), 0);
+
+    /* sets and retrieves the value in the array list */
+    setArrayList(arrayList, 0, (void **) &element);
+    getArrayList(arrayList, 0, (void **) &elementPointer);
+
+	/* deletes the array list */
+	deleteArrayList(arrayList);
+}
+
+void readFile(unsigned char *filePath, unsigned char **bufferPointer, size_t *fileSizePointer) {
+	/* allocates space for the file */
+    FILE *file;
+	
+	/* allocates space for the file size */
+	size_t fileSize;
+
+	/* allocates space for the file buffer */
+	unsigned char *fileBuffer;
+
+	/* allocates space for the number of bytes */
+	size_t numberBytes;
+
+	/* opens the file */
+    file = fopen((char *) filePath, "rb");
+
+	/* seeks the file until the end */
+    fseek(file, 0, SEEK_END);
+
+	/* retrieves the file size */
+    fileSize = ftell (file);
+
+	/* seeks the file until the beginning */
+	fseek(file, 0, SEEK_SET);
+
+	/* allocates space for the file buffer */
+	fileBuffer = (unsigned char *) malloc(fileSize);
+
+	/* reads the file contents */
+    numberBytes = fread(fileBuffer, 1, fileSize, file);
+
+	/* sets the buffer as the buffer pointer */
+	*bufferPointer = fileBuffer;
+
+	/* sets the file size as the file size pointer */
+	*fileSizePointer = fileSize;
+}
+
+void testHashMap() {
+	/* allocates space for the first element */
+	unsigned int firstElement = 1;
+
+	/* allocates space for the second element */
+	unsigned int secondElement = 1;
+
+	/* allocates space for the hash map */
+    struct HashMap_t *hashMap;
+
+    /* creates the hash map */
+    createHashMap(&hashMap, 0);
+
+    /* sets and retrieves the value in the hash map */
+    setHashMap(hashMap, 123123, (void **) &firstElement);
+    getHashMap(hashMap, 123123, (void **) &secondElement);
+
+	/* deletes the hash map */
+	deleteHashMap(hashMap);
+}
+
+void testBase64() {
+	/* allocates space for the buffer */
+    char buffer[] = "hello world";
+
+	/* allocates space for the encoded buffer */
+    unsigned char *encodedBuffer;
+
+	/* allocates space for the encoded buffer length */
+	size_t encodedBufferLength;
+
+    /* encodes the value into base64 */
+    encodeBase64((unsigned char *) buffer, strlen(buffer), &encodedBuffer, &encodedBufferLength);
+
+	/* releases the encoded buffer */
+	free(encodedBuffer);
+}
+
+void runTests() {
+	/* tests the thread pool */
+	testThreadPool();
+
+	/* tests the linked list */
+	testLinkedList();
+
+	/* tests the array list */
+	testArrayList();
+
+	/* tests the hash map */
+	testHashMap();
+
+	/* tests the base 64 encoder */
+	testBase64();
+}
+
 int main(int argc, char *argv[]) {
     /* allocates the socket data */
     SOCKET_DATA socketData;
@@ -51,86 +229,65 @@ int main(int argc, char *argv[]) {
     /* allocates the result */
     SOCKET_ERROR_CODE result;
 
-    struct HashMap_t *hashMap;
-
-    struct ArrayList_t *arrayList;
-
-    struct LinkedList_t *linkedList;
-
-    char rabeton[] = "como vai a vida";
-
     /* allocates the "simple" buffer */
     char buffer[10240];
 
     char response[1000];
 
-    char *buffer2 = malloc(1000000);
-    size_t fileSize;
+	/* allocates space for the number of bytes */
+	size_t numberBytes;
 
-    unsigned int n;
+	/* allocates space for the file path */
+    unsigned char *filePath;
 
-    char *fileName;
+	/* allocates space for the file buffer */
+	size_t fileSize;
 
-    FILE *file;
+	/* allocates space for the file buffer */
+    unsigned char *fileBuffer;
 
-    unsigned int value;
+	char optionValue;
 
-    unsigned int tobias = 123;
+	/* allocates space for the sockets set */
+	fd_set socketsSet;
 
-    unsigned int *matias;
+	/* allocates space for the select timeout value */
+	struct timeval selectTimeout;
 
-    unsigned char *receiver;
+	/* allocates space for the select count */
+	int selectCount;
 
-    size_t receiverLength;
-
+	/* in case the number of arguments is bigger than one */
     if(argc > 1) {
-        fileName = argv[1];
+		/* sets the file path as the first argument */
+        filePath = (unsigned char *) argv[1];
     } else {
-        fileName = "C:\\Desert.jpg";
+		/* sets the file path as a static file */
+        filePath = (unsigned char *) "C:\\Desert.jpg";
     }
 
-    /* encodes the value into base64 */
-    encodeBase64((unsigned char *) rabeton, strlen(rabeton), &receiver, &receiverLength);
+	/* runs the tests */
+	runTests();
 
-    /* creates the hash map */
-    createHashMap(&hashMap, 0);
+	/* reads the file */
+	readFile(filePath, &fileBuffer, &fileSize);
 
-    /* sets and retrieves the value in the hash map */
-    setHashMap(hashMap, 123123, (void **) &tobias);
-    getHashMap(hashMap, 123123, (void **) &matias);
-
-    /* creates the array list */
-    createArrayList(&arrayList, sizeof(unsigned int), 0);
-
-    /* sets and retrieves the value in the array list */
-    setArrayList(arrayList, 0, (void **) &tobias);
-    getArrayList(arrayList, 0, (void **) &matias);
-
-    /* creates the linked list */
-    createLinkedList(&linkedList);
-
-    /* adds some element to the linked list */
-    appendLinkedList(linkedList, (void *) 12);
-    appendLinkedList(linkedList, (void *) 13);
-
-    /* retrieves an element from the linked list */
-    getLinkedList(linkedList, 1, (void **) &value);
-
-    file = fopen(fileName, "rb");
-
-    fseek (file , 0 , SEEK_END);
-    fileSize = ftell (file);
-    rewind (file);
-
-    fread(buffer2, 1, fileSize, file);
-
-    sprintf(response, "HTTP/1.1 200 OK\r\nServer: viriatum/1.0.0\r\nContent-Length: %d\r\n\r\n", fileSize);
+	/* writes the http static headers to the response */
+    sprintf(response, "HTTP/1.1 200 OK\r\nServer: viriatum/1.0.0\r\nContent-Length: %d\r\n\r\n", (unsigned int) fileSize);
 
     /* initializes the socket infrastructure */
     SOCKET_INITIALIZE(&socketData);
 
     /* creates the socket for the given types */
     socketHandle = SOCKET_CREATE(SOCKET_INTERNET_TYPE, SOCKET_PACKET_TYPE, SOCKET_PROTOCOL_TCP);
+
+	/* sets the option value to one */
+	optionValue = 1,
+
+	/* sets the socket reuse address option in the socket */
+	SOCKET_SET_OPTIONS(socketHandle, SOCKET_OPTIONS_LEVEL_SOCKET, SOCKET_OPTIONS_REUSE_ADDRESS_SOCKET, optionValue);
+
+	//ioctlsocket(socketHandle, FIONBIO, (u_long *) &optionValue);
 
     /* tests the socket for errors */
     if(SOCKET_TEST_SOCKET(socketHandle)) {
@@ -176,29 +333,56 @@ int main(int argc, char *argv[]) {
     /* listens for a socket change */
     SOCKET_LISTEN(socketHandle);
 
+    /* calculates the size of the socket address */
+	clientSocketAddressSize = sizeof(socketAddress);
+
     /* iterates continuously */
     while(1) {
-        /* calculates the size of the socket address */
-        clientSocketAddressSize = sizeof(socketAddress);
+		/* zeros the sockets set */
+		FD_ZERO(&socketsSet);
 
-        /* accepts the socket */
-        clientSocketHandle = SOCKET_ACCEPT(socketHandle, &clientSocketAddress, clientSocketAddressSize);
+		/* adds the socket handle to the sockets set */
+		FD_SET(socketHandle, &socketsSet);
 
-        /* reveives from the client socket */
-        n = SOCKET_RECEIVE(clientSocketHandle, buffer, 10240, 0);
+		/* sets the timeout value */
+		selectTimeout.tv_sec = 1;
+		selectTimeout.tv_usec = 0;
 
-        /* in case no bytes are sent */
-        if(n < 0) {
-            /* prints an error message */
-            printf("error in receive");
-        }
+		/* runs the select over the sockets set */
+		selectCount = select(1, &socketsSet, &socketsSet, NULL, &selectTimeout);
 
-        /* sends the data */
-        n = SOCKET_SEND(clientSocketHandle, response, strlen(response), 0);
-        n = SOCKET_SEND(clientSocketHandle, buffer2, fileSize, 0);
+		/* in case there are sockets ready */
+		if(selectCount > 0) {
+			/* in case the master socket is set */
+			if(FD_ISSET(socketHandle, &socketsSet) == 1) {
+				/* accepts the socket */
+				clientSocketHandle = SOCKET_ACCEPT(socketHandle, &clientSocketAddress, clientSocketAddressSize);
 
-        /* closes the client socket */
-        SOCKET_CLOSE(clientSocketHandle);
+				/* reveives from the client socket */
+				numberBytes = SOCKET_RECEIVE(clientSocketHandle, buffer, 10240, 0);
+
+				/* in case no bytes are sent */
+				if(numberBytes < 0) {
+					/* prints an error message */
+					printf("error in receive");
+				}
+
+				/* sends the data */
+				numberBytes = SOCKET_SEND(clientSocketHandle, response, strlen(response), 0);
+				numberBytes = SOCKET_SEND(clientSocketHandle, fileBuffer, fileSize, 0);
+
+				/* closes the client socket */
+				SOCKET_CLOSE(clientSocketHandle);
+			} else {
+			}
+		}
+		/*  in case there are no sockets ready */
+		else if(selectCount == 0) {
+		}
+		/* in case there is an error */
+		else {
+			/* error situation */
+		}
     }
 
     /* runs the socket finish */
