@@ -194,7 +194,7 @@ void testBase64() {
 
 void runTests() {
     /* tests the thread pool */
-    testThreadPool();
+    //testThreadPool();
 
     /* tests the linked list */
     testLinkedList();
