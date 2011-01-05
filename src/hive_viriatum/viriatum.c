@@ -178,7 +178,7 @@ int main(int argc, char *argv[]) {
 	optionValue = 1,
 
 	/* sets the socket reuse address option in the socket */
-	SOCKET_SET_OPTIONS(socketHandle, SOL_SOCKET, SO_REUSEADDR, optionValue);
+	SOCKET_SET_OPTIONS(socketHandle, SOCKET_OPTIONS_LEVEL_SOCKET, SOCKET_OPTIONS_REUSE_ADDRESS_SOCKET, optionValue);
 
     /* tests the socket for errors */
     if(SOCKET_TEST_SOCKET(socketHandle)) {
