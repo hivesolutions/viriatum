@@ -209,7 +209,7 @@ void runTests() {
     testBase64();
 }
 
-int main(int argc, char *argv[]) {
+void service(int argc, char *argv[]) {
     /* allocates the socket data */
     SOCKET_DATA socketData;
 
@@ -272,9 +272,6 @@ int main(int argc, char *argv[]) {
         filePath = (unsigned char *) "C:\\Desert.jpg";
     }
 
-    /* runs the tests */
-    runTests();
-
     /* reads the file */
     readFile(filePath, &fileBuffer, &fileSize);
 
@@ -293,7 +290,7 @@ int main(int argc, char *argv[]) {
     /* sets the socket reuse address option in the socket */
     SOCKET_SET_OPTIONS(socketHandle, SOCKET_OPTIONS_LEVEL_SOCKET, SOCKET_OPTIONS_REUSE_ADDRESS_SOCKET, optionValue);
 
-    //ioctlsocket(socketHandle, FIONBIO, (u_long *) &optionValue);
+    /*ioctlsocket(socketHandle, FIONBIO, (u_long *) &optionValue);*/
 
     /* tests the socket for errors */
     if(SOCKET_TEST_SOCKET(socketHandle)) {
@@ -307,7 +304,7 @@ int main(int argc, char *argv[]) {
         SOCKET_FINISH();
 
         /* returns immediately */
-        return 0;
+        return;
     }
 
     /* sets the socket address attributes */
@@ -333,7 +330,7 @@ int main(int argc, char *argv[]) {
         SOCKET_FINISH();
 
         /* returns immediately */
-        return 0;
+        return;
     }
 
     /* listens for a socket change */
@@ -404,6 +401,14 @@ int main(int argc, char *argv[]) {
 
     /* runs the socket finish */
     SOCKET_FINISH();
+}
+
+int main(int argc, char *argv[]) {
+    /* runs the tests */
+    runTests();
+
+    /* runs the service */
+    service(argc, argv);
 
     /* returns zero (valid) */
     return 0;
