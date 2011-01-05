@@ -34,7 +34,7 @@ int threadPoolStartFunctionTest(void *arguments) {
 	THREAD_IDENTIFIER threadId = THREAD_GET_IDENTIFIER();
 
 	/* prints an hello world message */
-	printf("hello world from thread: %d\n", threadId);
+	printf("hello world from thread: %d\n", (unsigned int) threadId);
 
 	/* sleeps for a while */
 	SLEEP(10);
@@ -269,7 +269,7 @@ int main(int argc, char *argv[]) {
 	readFile(filePath, &fileBuffer, &fileSize);
 
 	/* writes the http static headers to the response */
-    sprintf(response, "HTTP/1.1 200 OK\r\nServer: viriatum/1.0.0\r\nContent-Length: %d\r\n\r\n", fileSize);
+    sprintf(response, "HTTP/1.1 200 OK\r\nServer: viriatum/1.0.0\r\nContent-Length: %d\r\n\r\n", (unsigned int) fileSize);
 
     /* initializes the socket infrastructure */
     SOCKET_INITIALIZE(&socketData);
