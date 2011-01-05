@@ -408,7 +408,7 @@ int main(int argc, char *argv[]) {
     runTests();
 
     /* runs the service */
-    service(argc, argv);
+    /*service(argc, argv);*/
 
     /* returns zero (valid) */
     return 0;
