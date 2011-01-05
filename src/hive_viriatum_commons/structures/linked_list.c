@@ -141,8 +141,8 @@ void removeLinkedList(struct LinkedList_t *linkedList, struct LinkedListNode_t *
         /* sets the last node as the next node */
         linkedList->last = nextNode;
     }
-    
-	/* in case the element to be removed is the first */
+
+    /* in case the element to be removed is the first */
     if(previousNode == NULL) {
         /* sets the last node as the previous node */
         linkedList->first = nextNode;
@@ -167,28 +167,28 @@ void removeValueLinkedList(struct LinkedList_t *linkedList, void *value) {
 
     /* iterates over the index value */
     for(index = 0; index < linkedList->size; index++) {
-		/* in case the current node value is the same
-		as the target value */
-		if(currentNode->value == value) {
-			/* sets the target node as the current node */
-			targetNode = currentNode;
+        /* in case the current node value is the same
+        as the target value */
+        if(currentNode->value == value) {
+            /* sets the target node as the current node */
+            targetNode = currentNode;
 
-			/* breaks the loop */
-			break;
-		}
+            /* breaks the loop */
+            break;
+        }
 
         /* sets the current node as the next node */
         currentNode = currentNode->next;
     }
 
-	/* in case no node is found for the value */
-	if(targetNode == NULL) {
-		/* returns immediately */
-		return;
-	}
+    /* in case no node is found for the value */
+    if(targetNode == NULL) {
+        /* returns immediately */
+        return;
+    }
 
-	/* removes the target node from the linked list */
-	removeLinkedList(linkedList, targetNode);
+    /* removes the target node from the linked list */
+    removeLinkedList(linkedList, targetNode);
 }
 
 void removeIndexLinkedList(struct LinkedList_t *linkedList, size_t index) {

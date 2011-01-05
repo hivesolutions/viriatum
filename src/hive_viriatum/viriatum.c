@@ -77,15 +77,15 @@ void testLinkedList() {
     /* adds some element to the linked list */
     appendValueLinkedList(linkedList, (void *) 1);
     appendValueLinkedList(linkedList, (void *) 2);
-	appendValueLinkedList(linkedList, (void *) 3);
+    appendValueLinkedList(linkedList, (void *) 3);
 
     /* retrieves a value from the linked list */
     getValueLinkedList(linkedList, 1, (void **) &value);
 
     /* removes a value from the linked list */
-    removeValueLinkedList(linkedList, 1);
+    removeValueLinkedList(linkedList, (void *) 1);
 
-	/* removes an element from the linked list */
+    /* removes an element from the linked list */
     removeIndexLinkedList(linkedList, 1);
 
     /* pops a value from the linked list */
