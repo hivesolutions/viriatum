@@ -26,5 +26,8 @@
 all:
 	autoheader && libtoolize && aclocal && automake --add-missing && autoconf && ./configure
 
+darwin:
+	autoheader && glibtoolize && aclocal && automake --add-missing && autoconf && ./configure
+
 clean:
 	rm -rf m4 autom4te.cache config.h Makefile Makefile.in aclocal.m4 config.sub config.log config.status config.guess depcomp install-sh ltmain.sh missing stamp-h1 libtool configure

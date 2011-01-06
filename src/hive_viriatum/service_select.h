@@ -37,7 +37,7 @@ typedef struct ServiceSelect_t {
     fd_set socketsReadSetTemporary;
     fd_set socketsWriteSetTemporary;
     struct timeval selectTimeout;
-	struct timeval selectTimeoutTemporary;
+    struct timeval selectTimeoutTemporary;
 } ServiceSelect_t;
 
 void createServiceSelect(struct ServiceSelect_t **serviceSelectPointer);

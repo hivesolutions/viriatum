@@ -42,8 +42,8 @@ void createServiceSelect(struct ServiceSelect_t **serviceSelectPointer) {
     /* creates the service */
     createService(&serviceSelect->service);
 
-	/* resets the sockets set highest value */
-	serviceSelect->socketsSetHighest = 0;
+    /* resets the sockets set highest value */
+    serviceSelect->socketsSetHighest = 0;
 
     /* zeros the sockets read set */
     FD_ZERO(&serviceSelect->socketsReadSet);
@@ -325,28 +325,28 @@ void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_
     serviceSelect->socketsReadSetTemporary = serviceSelect->socketsReadSet;
     serviceSelect->socketsWriteSetTemporary = serviceSelect->socketsWriteSet;
 
-	/* copies the select timeout to the select timeout temporary */
-	serviceSelect->selectTimeoutTemporary = serviceSelect->selectTimeout;
+    /* copies the select timeout to the select timeout temporary */
+    serviceSelect->selectTimeoutTemporary = serviceSelect->selectTimeout;
 
     /* creates the iterator for the linked list */
     createIteratorLinkedList(connectionsList, &connectionsListIterator);
 
     /* prints a debug message */
-	debug("Entering select statement\n");
-	debug("Maximum sockets set value: %d\n", serviceSelect->socketsSetHighest);
+    debug("Entering select statement\n");
+    debug("Maximum sockets set value: %d\n", serviceSelect->socketsSetHighest);
 
     /* runs the select over the sockets set */
     selectCount = select(serviceSelect->socketsSetHighest + 1, &serviceSelect->socketsReadSetTemporary, &serviceSelect->socketsWriteSetTemporary, NULL, &serviceSelect->selectTimeoutTemporary);
 
     /* prints a debug message */
-	debug("Exiting select statement with value: %d\n", selectCount);
+    debug("Exiting select statement with value: %d\n", selectCount);
 
     if(FD_ISSET(serviceSelect->service->serviceSocketHandle, &serviceSelect->socketsReadSetTemporary) == 1)  {
         /* sets the service socket ready to one */
         *serviceSocketReady = 1;
 
-		/* decrements the select count */
-		selectCount--;
+        /* decrements the select count */
+        selectCount--;
     } else {
         /* sets the service socket ready to zero */
         *serviceSocketReady = 0;
@@ -354,11 +354,11 @@ void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_
 
     /* iterator continuously */
     while(1) {
-		/* in case the select count is zero */
-		if(selectCount == 0) {
-			/* breaks the loop */
-			break;
-		}
+        /* in case the select count is zero */
+        if(selectCount == 0) {
+            /* breaks the loop */
+            break;
+        }
 
         /* retrieves the next value from the iterator */
         getNextIterator(connectionsListIterator, (void **) &currentConnection);
@@ -378,8 +378,8 @@ void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_
             /* increments the read index */
             readIndex++;
 
-			/* decrements the select count */
-			selectCount--;
+            /* decrements the select count */
+            selectCount--;
         }
 
         /* in case the current connection socket handle is set in
@@ -391,8 +391,8 @@ void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_
             /* increments the write index */
             writeIndex++;
 
-			/* decrements the select count */
-			selectCount--;
+            /* decrements the select count */
+            selectCount--;
         }
     }
 
