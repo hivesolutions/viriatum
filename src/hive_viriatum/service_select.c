@@ -347,6 +347,8 @@ void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_
 		debug("Problem in select statement: %d\n", selectCount);
 	}
 
+	/* in case the service socket handle is set in
+    the sockets read ready set */
     if(FD_ISSET(serviceSelect->service->serviceSocketHandle, &serviceSelect->socketsReadSetTemporary) == 1)  {
         /* sets the service socket ready to one */
         *serviceSocketReady = 1;
@@ -358,7 +360,7 @@ void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_
         *serviceSocketReady = 0;
     }
 
-    /* iterator continuously */
+    /* iterates continuously */
     while(1) {
         /* in case the select count is zero */
         if(selectCount == 0) {
