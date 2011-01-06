@@ -81,7 +81,7 @@ void startService(struct Service_t *service) {
     /* in case there was an error binding the socket */
     if(SOCKET_TEST_ERROR(socketResult)) {
         /* retrieves the binding error code */
-        SOCKET_ERROR_CODE bindingErrorCode = SOCKET_GET_ERROR_CODE(result);
+        SOCKET_ERROR_CODE bindingErrorCode = SOCKET_GET_ERROR_CODE(socketResult);
 
         /* prints the error */
         printf("Problem binding socket: %d", bindingErrorCode);
