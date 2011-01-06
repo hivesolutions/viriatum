@@ -42,6 +42,9 @@ void createServiceSelect(struct ServiceSelect_t **serviceSelectPointer) {
     /* creates the service */
     createService(&serviceSelect->service);
 
+	/* resets the sockets set highest value */
+	serviceSelect->socketsSetHighest = 0;
+
     /* zeros the sockets read set */
     FD_ZERO(&serviceSelect->socketsReadSet);
 
