@@ -34,7 +34,7 @@ int threadPoolStartFunctionTest(void *arguments) {
     THREAD_IDENTIFIER threadId = THREAD_GET_IDENTIFIER();
 
     /* prints an hello world message */
-    debug("hello world from thread: %d\n", (unsigned int) threadId);
+    DEBUG("hello world from thread: %d\n", (unsigned int) threadId);
 
     /* sleeps for a while */
     SLEEP(10);
@@ -233,16 +233,13 @@ void runService() {
 
 int main(int argc, char *argv[]) {
     /* prints a debug message */
-    debug("Receiving %d arguments\n", argc);
+    DEBUG("Receiving %d arguments\n", argc);
 
     /* runs the tests */
     runTests();
 
     /* runs the service */
     runService();
-
-    /* runs the service */
-    //service(argc, argv);
 
     /* returns zero (valid) */
     return 0;

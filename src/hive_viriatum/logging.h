@@ -27,4 +27,13 @@
 
 #pragma once
 
+#ifdef VIRIATUM_DEBUG
+#define DEBUG(format, ...) printf(format, __VA_ARGS__)
+#endif
+
+#ifndef VIRIATUM_DEBUG
+#define DEBUG(format, ...)
+#endif
+
+
 void debug(const char *format, ...);

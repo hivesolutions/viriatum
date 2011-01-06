@@ -92,7 +92,7 @@ void httpReadHandler(struct ServiceSelect_t *serviceSelect, struct Connection_t 
         SOCKET_ERROR_CODE receivingErrorCode = SOCKET_GET_ERROR_CODE(numberBytes);
 
         /* prints the error */
-        debug("Problem receiving from socket: %d\n", receivingErrorCode);
+        DEBUG("Problem receiving from socket: %d\n", receivingErrorCode);
 
         /* removes the connection from the service select */
         removeConnectionServiceSelect(serviceSelect, connection);
@@ -105,7 +105,7 @@ void httpReadHandler(struct ServiceSelect_t *serviceSelect, struct Connection_t 
     buffer[numberBytes] = '\0';
 
     /* prints the received message */
-    debug("%s", buffer);
+    DEBUG("%s", buffer);
 
     responseBuffer = (unsigned char *) malloc(1024);
 
@@ -155,7 +155,7 @@ void httpWriteHandler(struct ServiceSelect_t *serviceSelect, struct Connection_t
             SOCKET_ERROR_CODE receivingErrorCode = SOCKET_GET_ERROR_CODE(numberBytes);
 
             /* prints the error */
-            debug("Problem sending from socket: %d\n", receivingErrorCode);
+            DEBUG("Problem sending from socket: %d\n", receivingErrorCode);
 
             /* removes the connection from the service select */
             removeConnectionServiceSelect(serviceSelect, connection);
@@ -251,7 +251,7 @@ void startServiceSelect(struct ServiceSelect_t *serviceSelect) {
             socketHandle = SOCKET_ACCEPT(serviceSocketHandle, &socketAddress, clientSocketAddressSize);
 
             /* prints a debug message */
-            debug("Accepted connection: %d\n", socketHandle);
+            DEBUG("Accepted connection: %d\n", socketHandle);
 
             /* creates the connection */
             createConnection(&connection, socketHandle);
@@ -332,19 +332,19 @@ void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_
     createIteratorLinkedList(connectionsList, &connectionsListIterator);
 
     /* prints a debug message */
-    debug("Entering select statement\n");
-    debug("Maximum sockets set value: %d\n", serviceSelect->socketsSetHighest);
+    DEBUG("Entering select statement\n");
+    DEBUG("Maximum sockets set value: %d\n", serviceSelect->socketsSetHighest);
 
     /* runs the select over the sockets set */
     selectCount = select(serviceSelect->socketsSetHighest + 1, &serviceSelect->socketsReadSetTemporary, &serviceSelect->socketsWriteSetTemporary, NULL, &serviceSelect->selectTimeoutTemporary);
 
     /* prints a debug message */
-    debug("Exiting select statement with value: %d\n", selectCount);
+    DEBUG("Exiting select statement with value: %d\n", selectCount);
 
     /* in case the select coutn is negative */
     if(selectCount < 0) {
         /* prints a debug message */
-        debug("Problem in select statement: %d\n", selectCount);
+        DEBUG("Problem in select statement: %d\n", selectCount);
     }
 
     /* in case the service socket handle is set in
@@ -378,7 +378,7 @@ void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_
         }
 
         /* prints a debug message */
-        debug("Testing file for select: %d\n", currentConnection->socketHandle);
+        DEBUG("Testing file for select: %d\n", currentConnection->socketHandle);
 
         /* in case the current connection socket handle is set in
         the sockets read ready set */
@@ -410,7 +410,7 @@ void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_
     /* in case the select count is bigger than zero */
     if(selectCount > 0) {
         /* prints a debug message */
-        debug("Extraordinary select file descriptors not found: %d\n", selectCount);
+        DEBUG("Extraordinary select file descriptors not found: %d\n", selectCount);
     }
 
     /* sets the read index in the read connections size */
