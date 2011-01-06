@@ -333,7 +333,15 @@ void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_
 	debug("Maximum sockets set value: %d\n", serviceSelect->socketsSetHighest);
 
     /* runs the select over the sockets set */
-    selectCount = select(serviceSelect->socketsSetHighest + 1, &serviceSelect->socketsReadTemporarySet, &serviceSelect->socketsWriteTemporarySet, NULL, NULL);
+    selectCount = select(serviceSelect->socketsSetHighest + 1, &serviceSelect->socketsReadTemporarySet, &serviceSelect->socketsWriteTemporarySet, NULL, &serviceSelect->selectTimeout);
+
+	if(selectCount == 0) {
+        *serviceSocketReady = 0;
+		*readConnectionsSize = 0;
+		*writeConnectionsSize = 0;
+
+		return;
+	}
 
     /* prints a debug message */
 	debug("Exiting select statement with value: %d\n", selectCount);
