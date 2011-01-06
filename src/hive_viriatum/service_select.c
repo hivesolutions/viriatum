@@ -58,7 +58,7 @@ void createServiceSelect(struct ServiceSelect_t **serviceSelectPointer) {
     FD_ZERO(&serviceSelect->socketsWriteTemporarySet);
 
     /* sets the default timeout */
-    serviceSelect->selectTimeout.tv_sec = 1;
+    serviceSelect->selectTimeout.tv_sec = 10;
     serviceSelect->selectTimeout.tv_usec = 0;
 
     /* sets the service select in the service select pointer */
