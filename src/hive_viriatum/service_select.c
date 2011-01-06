@@ -333,7 +333,7 @@ void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_
 	debug("Maximum sockets set value: %d\n", serviceSelect->socketsSetHighest);
 
     /* runs the select over the sockets set */
-    selectCount = select(serviceSelect->socketsSetHighest + 1, &serviceSelect->socketsReadTemporarySet, &serviceSelect->socketsWriteTemporarySet, NULL, &serviceSelect->selectTimeout);
+    selectCount = select(serviceSelect->socketsSetHighest + 1, &serviceSelect->socketsReadTemporarySet, &serviceSelect->socketsWriteTemporarySet, NULL, NULL);
 
     /* prints a debug message */
 	debug("Exiting select statement with value: %d\n", selectCount);
