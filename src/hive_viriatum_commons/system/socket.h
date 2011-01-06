@@ -32,6 +32,7 @@
 #pragma comment(lib, "Ws2_32.lib")
 #define SOCKET_DATA WSADATA
 #define SOCKET_HANDLE SOCKET
+#define SOCKET_ADDRESS_SIZE int
 #define SOCKET_ADDRESS SOCKADDR
 #define SOCKET_ADDRESS_INPUT SOCKADDR_IN
 #define SOCKET_ERROR_CODE int
@@ -69,6 +70,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #define SOCKET_HANDLE int
+#define SOCKET_ADDRESS_SIZE socklen_t *
 #define SOCKET_DATA void *
 #define SOCKET_ADDRESS struct sockaddr
 #define SOCKET_ADDRESS_INPUT struct sockaddr_in
