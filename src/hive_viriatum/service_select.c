@@ -241,7 +241,7 @@ void startServiceSelect(struct ServiceSelect_t *serviceSelect) {
     addSocketHandleSocketsSetServiceSelect(serviceSelect, serviceSocketHandle, &serviceSelect->socketsReadSet);
 
     /* iterates continuously */
-    while(1) {
+    //while(1) {
         /* polls the service select */
         pollServiceSelect(serviceSelect, readConnections, writeConnections, &readConnectionsSize, &writeConnectionsSize, &serviceSocketReady);
 
@@ -277,7 +277,7 @@ void startServiceSelect(struct ServiceSelect_t *serviceSelect) {
             /* calls the write handler */
             httpWriteHandler(serviceSelect, currentConnection);
         }
-    }
+    //}
 }
 
 void addConnectionServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_t *connection) {
@@ -333,7 +333,7 @@ void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_
 	debug("Maximum sockets set value: %d\n", serviceSelect->socketsSetHighest);
 
     /* runs the select over the sockets set */
-    selectCount = select(FD_SETSIZE, &serviceSelect->socketsReadTemporarySet, &serviceSelect->socketsWriteTemporarySet, NULL, &serviceSelect->selectTimeout);
+    selectCount = select(serviceSelect->socketsSetHighest + 1, &serviceSelect->socketsReadTemporarySet, &serviceSelect->socketsWriteTemporarySet, NULL, &serviceSelect->selectTimeout);
 
     /* prints a debug message */
 	debug("Exiting select statement with value: %d\n", selectCount);
