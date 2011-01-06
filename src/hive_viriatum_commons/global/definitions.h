@@ -53,3 +53,4 @@
 #elif VIRIATUM_PLATFORM_UNIX
 #define HIVE_VIRIATUM_BASE_PATH "/"
 #endif
+

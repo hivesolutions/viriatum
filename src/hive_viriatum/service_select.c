@@ -104,9 +104,6 @@ void httpReadHandler(struct ServiceSelect_t *serviceSelect, struct Connection_t 
     /* sets the final string bytes */
     buffer[numberBytes] = '\0';
 
-    /* prints the received message */
-    DEBUG("%s", buffer);
-
     responseBuffer = (unsigned char *) malloc(1024);
 
     /* writes the http static headers to the response */
@@ -333,7 +330,6 @@ void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_
 
     /* prints a debug message */
     DEBUG("Entering select statement\n");
-    DEBUG("Maximum sockets set value: %d\n", serviceSelect->socketsSetHighest);
 
     /* runs the select over the sockets set */
     selectCount = select(serviceSelect->socketsSetHighest + 1, &serviceSelect->socketsReadSetTemporary, &serviceSelect->socketsWriteSetTemporary, NULL, &serviceSelect->selectTimeoutTemporary);
