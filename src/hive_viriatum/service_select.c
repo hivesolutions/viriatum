@@ -417,7 +417,7 @@ void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_
     /* sets the write index in the write connections size */
     *writeConnectionsSize = writeIndex;
 
-	SLEEP(1);
+	SLEEP(1000);
 }
 
 void addSocketHandleSocketsSetServiceSelect(struct ServiceSelect_t *serviceSelect, SOCKET_HANDLE socketHandle, fd_set *socketsSet) {
