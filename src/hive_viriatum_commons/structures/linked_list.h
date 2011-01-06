@@ -27,6 +27,8 @@
 
 #pragma once
 
+#include "iterator.h"
+
 typedef struct LinkedList_t {
     size_t size;
     struct LinkedListNode_t *first;
@@ -52,3 +54,7 @@ VIRIATUM_EXPORT_PREFIX void getLinkedList(struct LinkedList_t *linkedList, size_
 VIRIATUM_EXPORT_PREFIX void getValueLinkedList(struct LinkedList_t *linkedList, size_t index, void **valuePointer);
 VIRIATUM_EXPORT_PREFIX void popLinkedList(struct LinkedList_t *linkedList, struct LinkedListNode_t **linkedListNodePointer);
 VIRIATUM_EXPORT_PREFIX void popValueLinkedList(struct LinkedList_t *linkedList, void **valuePointer);
+VIRIATUM_EXPORT_PREFIX void createIteratorLinkedList(struct LinkedList_t *linkedList, struct Iterator_t **iteratorPointer);
+VIRIATUM_EXPORT_PREFIX void deleteIteratorLinkedList(struct LinkedList_t *linkedList, struct Iterator_t *iterator);
+VIRIATUM_EXPORT_PREFIX void resetIteratorLinkedList(struct LinkedList_t *linkedList, struct Iterator_t *iterator);
+VIRIATUM_EXPORT_PREFIX void getNextIteratorLinkedList(struct Iterator_t *iterator, void **nextPointer);

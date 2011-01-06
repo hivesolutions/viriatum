@@ -33,9 +33,14 @@ typedef struct ServiceSelect_t {
     struct Service_t *service;
     fd_set socketsReadSet;
     fd_set socketsWriteSet;
+	fd_set socketsReadTemporarySet;
+    fd_set socketsWriteTemporarySet;
+	struct timeval selectTimeout;
 } ServiceSelect_t;
 
 void createServiceSelect(struct ServiceSelect_t **serviceSelectPointer);
 void deleteServiceSelect(struct ServiceSelect_t *serviceSelect);
+void startServiceSelect(struct ServiceSelect_t *serviceSelect);
 void addConnectionServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_t *connection);
 void removeConnectionServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_t *connection);
+void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_t **readConnections, struct Connection_t **writeConnections, unsigned int *readConnectionsSize, unsigned int *writeConnectionsSize, unsigned int *serviceSocketReady);

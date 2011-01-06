@@ -28,12 +28,14 @@
 #pragma once
 
 typedef struct Service_t {
-    unsigned char *serviceName;
+    unsigned char *name;
+	unsigned int status;
     SOCKET_HANDLE serviceSocketHandle;
     struct LinkedList_t *connectionsList;
 } Service;
 
 typedef struct Connection_t {
+	unsigned int writeRegistered;
     SOCKET_HANDLE socketHandle;
     struct LinkedList_t *readQueue;
     struct LinkedList_t *writeQueue;
@@ -41,5 +43,8 @@ typedef struct Connection_t {
 
 void createService(struct Service_t **servicePointer);
 void deleteService(struct Service_t *service);
+void startService(struct Service_t *service);
 void addConnectionService(struct Service_t *service, struct Connection_t *connection);
 void removeConnectionService(struct Service_t *service, struct Connection_t *connection);
+void createConnection(struct Connection_t **connectionPointer, SOCKET_HANDLE socketHandle);
+void deleteConnection(struct Connection_t *connection);

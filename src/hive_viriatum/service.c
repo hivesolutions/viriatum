@@ -36,6 +36,12 @@ void createService(struct Service_t **servicePointer) {
     /* allocates space for the service */
     struct Service_t *service = (struct Service_t *) malloc(serviceSize);
 
+	/* creates the connections list */
+	createLinkedList(&service->connectionsList);
+
+	/* setst the service status as closed */
+	service->status = 1;
+
     /* sets the service in the service pointer */
     *servicePointer = service;
 }
@@ -43,6 +49,55 @@ void createService(struct Service_t **servicePointer) {
 void deleteService(struct Service_t *service) {
     /* releases the service */
     free(service);
+}
+
+void startService(struct Service_t *service) {
+    /* allocates the socket address structure */
+    SOCKET_ADDRESS_INPUT socketAddress;
+
+	/* allocates the socket result */
+    SOCKET_ERROR_CODE socketResult;
+
+	/* allocates the option value */
+    char optionValue;
+
+    /* sets the socket address attributes */
+    socketAddress.sin_family = SOCKET_INTERNET_TYPE;
+    socketAddress.sin_addr.s_addr = inet_addr("0.0.0.0");
+    socketAddress.sin_port = htons(8080);
+
+    /* creates the service socket for the given types */
+    service->serviceSocketHandle = SOCKET_CREATE(SOCKET_INTERNET_TYPE, SOCKET_PACKET_TYPE, SOCKET_PROTOCOL_TCP);
+
+	/* sets the option value to one (valid) */
+	optionValue = 1,
+
+    /* sets the socket reuse address option in the socket */
+    SOCKET_SET_OPTIONS(service->serviceSocketHandle, SOCKET_OPTIONS_LEVEL_SOCKET, SOCKET_OPTIONS_REUSE_ADDRESS_SOCKET, optionValue);
+
+    /* binds the service socket */
+    socketResult = SOCKET_BIND(service->serviceSocketHandle, socketAddress);
+
+    /* in case there was an error binding the socket */
+    if(SOCKET_TEST_ERROR(socketResult)) {
+        /* retrieves the binding error code */
+        SOCKET_ERROR_CODE bindingErrorCode = SOCKET_GET_ERROR_CODE(result);
+
+        /* prints the error */
+        printf("Problem binding socket: %d", bindingErrorCode);
+
+        /* closes the service socket */
+        SOCKET_CLOSE(service->serviceSocketHandle);
+
+        /* returns immediately */
+        return;
+    }
+
+    /* listens for a service socket change */
+    SOCKET_LISTEN(service->serviceSocketHandle);
+
+	/* setst the service status as open */
+	service->status = 2;
 }
 
 void addConnectionService(struct Service_t *service, struct Connection_t *connection) {
@@ -53,4 +108,38 @@ void addConnectionService(struct Service_t *service, struct Connection_t *connec
 void removeConnectionService(struct Service_t *service, struct Connection_t *connection) {
     /* removes the connection from the connections list */
     removeValueLinkedList(service->connectionsList, connection);
+}
+
+void createConnection(struct Connection_t **connectionPointer, SOCKET_HANDLE socketHandle) {
+    /* retrieves the connection size */
+    size_t connectionSize = sizeof(struct Connection_t);
+
+    /* allocates space for the connection */
+    struct Connection_t *connection = (struct Connection_t *) malloc(connectionSize);
+
+	/* sets the socket handle in the connection */
+	connection->socketHandle = socketHandle;
+
+	/* sets teh write registered to false */
+	connection->writeRegistered = 0;
+
+	/* creates the read queue linked list */
+	createLinkedList(&connection->readQueue);
+
+	/* creates the write queue linked list */
+	createLinkedList(&connection->writeQueue);
+
+    /* sets the connection in the connection pointer */
+    *connectionPointer = connection;
+}
+
+void deleteConnection(struct Connection_t *connection) {
+	/* deletes the read queue linked list */
+	deleteLinkedList(connection->readQueue);
+
+	/* deletes the write queue linked list */
+	deleteLinkedList(connection->writeQueue);
+
+	/* releases the connection */
+	free(connection);
 }

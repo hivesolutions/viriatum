@@ -1,21 +1,21 @@
 /*
- Hive Viriatum Web Server
+ Hive Viriatum Commons
  Copyright (C) 2008 Hive Solutions Lda.
 
- This file is part of Hive Viriatum Web Server.
+ This file is part of Hive Viriatum Commons.
 
- Hive Viriatum Web Server is free software: you can redistribute it and/or modify
+ Hive Viriatum Commons is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation, either version 3 of the License, or
  (at your option) any later version.
 
- Hive Viriatum Web Server is distributed in the hope that it will be useful,
+ Hive Viriatum Commons is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  GNU General Public License for more details.
 
  You should have received a copy of the GNU General Public License
- along with Hive Viriatum Web Server. If not, see <http://www.gnu.org/licenses/>.
+ along with Hive Viriatum Commons. If not, see <http://www.gnu.org/licenses/>.
 
  __author__    = João Magalhães <joamag@hive.pt>
  __version__   = 1.0.0
@@ -27,5 +27,12 @@
 
 #pragma once
 
-#include "service.h"
-#include "service_select.h"
+typedef struct Iterator_t {
+	void *structure;
+	void *parameters;
+	void (*getNextFunction) (struct Iterator_t *iterator, void **next);
+} Iterator;
+
+VIRIATUM_EXPORT_PREFIX void createIterator(struct Iterator_t **iteratorPointer);
+VIRIATUM_EXPORT_PREFIX void deleteIterator(struct Iterator_t *iterator);
+VIRIATUM_EXPORT_PREFIX void getNextIterator(struct Iterator_t *iterator, void **nextPointer);
