@@ -360,6 +360,20 @@ void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_
         *serviceSocketReady = 0;
     }
 
+	/* in case the service socket handle is set in
+    the sockets read ready set */
+    if(FD_ISSET(serviceSelect->service->serviceSocketHandle, &serviceSelect->socketsWriteSetTemporary) == 1)  {
+        /* sets the service socket ready to one */
+        *serviceSocketReady = 1;
+
+        /* decrements the select count */
+        selectCount--;
+    } else {
+        /* sets the service socket ready to zero */
+        *serviceSocketReady = 0;
+    }
+
+
     /* iterates continuously */
     while(1) {
         /* in case the select count is zero */
