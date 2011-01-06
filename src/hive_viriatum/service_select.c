@@ -101,7 +101,6 @@ void httpReadHandler(struct ServiceSelect_t *serviceSelect, struct Connection_t 
 	/* sets the final string bytes */
 	buffer[numberBytes] = '\0';
 
-
 	/* prints the received message */
 	//printf("%s", buffer);
 
@@ -332,6 +331,9 @@ void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_
 	if(FD_ISSET(serviceSelect->service->serviceSocketHandle, &serviceSelect->socketsReadTemporarySet) == 1)  {
 		/* sets the service socket ready to one */
 		*serviceSocketReady = 1;
+
+		*readConnectionsSize = 0;
+		*writeConnectionsSize = 0;
 	} else {
 		/* sets the service socket ready to zero */
 		*serviceSocketReady = 0;

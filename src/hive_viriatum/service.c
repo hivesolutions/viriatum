@@ -64,7 +64,7 @@ void startService(struct Service_t *service) {
     /* sets the socket address attributes */
     socketAddress.sin_family = SOCKET_INTERNET_TYPE;
     socketAddress.sin_addr.s_addr = inet_addr("0.0.0.0");
-    socketAddress.sin_port = htons(8080);
+    socketAddress.sin_port = htons(8181);
 
     /* creates the service socket for the given types */
     service->serviceSocketHandle = SOCKET_CREATE(SOCKET_INTERNET_TYPE, SOCKET_PACKET_TYPE, SOCKET_PROTOCOL_TCP);
