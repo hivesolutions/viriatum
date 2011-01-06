@@ -182,7 +182,7 @@ void readFile(char *filePath, unsigned char **bufferPointer, size_t *fileSizePoi
     size_t numberBytes;
 
     /* opens the file */
-    file = fopen(filePath, "rb");
+	SFOPEN(&file, filePath, "rb");
 
     /* seeks the file until the end */
     fseek(file, 0, SEEK_END);
@@ -276,7 +276,7 @@ void service(int argc, char *argv[]) {
     readFile(filePath, &fileBuffer, &fileSize);
 
     /* writes the http static headers to the response */
-    sprintf(response, "HTTP/1.1 200 OK\r\nServer: viriatum/1.0.0\r\nContent-Length: %d\r\n\r\n", (unsigned int) fileSize);
+    SPRINTF(response, 1000, "HTTP/1.1 200 OK\r\nServer: viriatum/1.0.0\r\nContent-Length: %d\r\n\r\n", (unsigned int) fileSize);
 
     /* initializes the socket infrastructure */
     SOCKET_INITIALIZE(&socketData);
