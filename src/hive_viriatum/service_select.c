@@ -341,13 +341,13 @@ void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_
     /* prints a debug message */
     debug("Exiting select statement with value: %d\n", selectCount);
 
-	/* in case the select coutn is negative */
-	if(selectCount < 0) {
-		/* prints a debug message */
-		debug("Problem in select statement: %d\n", selectCount);
-	}
+    /* in case the select coutn is negative */
+    if(selectCount < 0) {
+        /* prints a debug message */
+        debug("Problem in select statement: %d\n", selectCount);
+    }
 
-	/* in case the service socket handle is set in
+    /* in case the service socket handle is set in
     the sockets read ready set */
     if(FD_ISSET(serviceSelect->service->serviceSocketHandle, &serviceSelect->socketsReadSetTemporary) > 0)  {
         /* sets the service socket ready to one */
@@ -377,8 +377,8 @@ void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_
             break;
         }
 
-		/* prints a debug message */
-		debug("Testing file for select: %d\n", currentConnection->socketHandle);
+        /* prints a debug message */
+        debug("Testing file for select: %d\n", currentConnection->socketHandle);
 
         /* in case the current connection socket handle is set in
         the sockets read ready set */
@@ -407,19 +407,17 @@ void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_
         }
     }
 
-	/* in case the select count is bigger than zero */
-	if(selectCount > 0) {
-		/* prints a debug message */
-		debug("Extraordinary select file descriptors not found: %d\n", selectCount);
-	}
+    /* in case the select count is bigger than zero */
+    if(selectCount > 0) {
+        /* prints a debug message */
+        debug("Extraordinary select file descriptors not found: %d\n", selectCount);
+    }
 
     /* sets the read index in the read connections size */
     *readConnectionsSize = readIndex;
 
     /* sets the write index in the write connections size */
     *writeConnectionsSize = writeIndex;
-
-	SLEEP(1000);
 }
 
 void addSocketHandleSocketsSetServiceSelect(struct ServiceSelect_t *serviceSelect, SOCKET_HANDLE socketHandle, fd_set *socketsSet) {
