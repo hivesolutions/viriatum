@@ -55,7 +55,7 @@ void createServiceSelect(struct ServiceSelect_t **serviceSelectPointer) {
     FD_ZERO(&serviceSelect->socketsWriteTemporarySet);
 
     /* sets the default timeout */
-    serviceSelect->selectTimeout.tv_sec = 10;
+    serviceSelect->selectTimeout.tv_sec = 1;
     serviceSelect->selectTimeout.tv_usec = 0;
 
     /* sets the service select in the service select pointer */
@@ -326,13 +326,13 @@ void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_
     createIteratorLinkedList(connectionsList, &connectionsListIterator);
 
 	/* prints a debug message */
-	debug("Entering select statement");
+	debug("Entering select statement\n");
 
     /* runs the select over the sockets set */
     selectCount = select(serviceSelect->socketsSetHighest, &serviceSelect->socketsReadTemporarySet, &serviceSelect->socketsWriteTemporarySet, NULL, &serviceSelect->selectTimeout);
 
 	/* prints a debug message */
-	debug("Exiting select statement with value: %d", selectCount);
+	debug("Exiting select statement with value: %d\n", selectCount);
 
     if(FD_ISSET(serviceSelect->service->serviceSocketHandle, &serviceSelect->socketsReadTemporarySet) == 1)  {
         /* sets the service socket ready to one */
