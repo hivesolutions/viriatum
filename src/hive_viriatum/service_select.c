@@ -186,7 +186,7 @@ void httpWriteHandler(struct ServiceSelect_t *serviceSelect, struct Connection_t
 
 
 	/* closes the socket */
-	closesocket(connection->socketHandle);
+	SOCKET_CLOSE(connection->socketHandle);
 
 	/* removes the connection from the service select */
 	removeConnectionServiceSelect(serviceSelect, connection);
