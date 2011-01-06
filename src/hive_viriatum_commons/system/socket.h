@@ -70,7 +70,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #define SOCKET_HANDLE int
-#define SOCKET_ADDRESS_SIZE socklen_t *
+#define SOCKET_ADDRESS_SIZE socklen_t *restrict
 #define SOCKET_DATA void *
 #define SOCKET_ADDRESS struct sockaddr
 #define SOCKET_ADDRESS_INPUT struct sockaddr_in
