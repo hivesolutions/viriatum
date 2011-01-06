@@ -325,8 +325,14 @@ void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_
     /* creates the iterator for the linked list */
     createIteratorLinkedList(connectionsList, &connectionsListIterator);
 
+	/* prints a debug message */
+	debug("Entering select statement");
+
     /* runs the select over the sockets set */
     selectCount = select(serviceSelect->socketsSetHighest, &serviceSelect->socketsReadTemporarySet, &serviceSelect->socketsWriteTemporarySet, NULL, &serviceSelect->selectTimeout);
+
+	/* prints a debug message */
+	debug("Exiting select statement with value: %d", selectCount);
 
     if(FD_ISSET(serviceSelect->service->serviceSocketHandle, &serviceSelect->socketsReadTemporarySet) == 1)  {
         /* sets the service socket ready to one */
