@@ -341,6 +341,12 @@ void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_
     /* prints a debug message */
     debug("Exiting select statement with value: %d\n", selectCount);
 
+	/* in case the select coutn is negative */
+	if(selectCount < 0) {
+		/* prints a debug message */
+		debug("Problem in select statement: %d\n", selectCount);
+	}
+
     if(FD_ISSET(serviceSelect->service->serviceSocketHandle, &serviceSelect->socketsReadSetTemporary) == 1)  {
         /* sets the service socket ready to one */
         *serviceSocketReady = 1;
