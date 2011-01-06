@@ -42,13 +42,15 @@ checksum/crc_32.c \
 encoding/base_64.c \
 structures/array_list.c \
 structures/hash_map.c \
+structures/iterator.c \
 structures/linked_list.c \
-thread/thread_pool.c 
+thread/thread_pool.c
 
 libviriatum_la_SOURCES = stdafx.c \
 checksum/crc_32.c \
 encoding/base_64.c \
 structures/array_list.c \
 structures/hash_map.c \
+structures/iterator.c \
 structures/linked_list.c \
-thread/thread_pool.c 
+thread/thread_pool.c
