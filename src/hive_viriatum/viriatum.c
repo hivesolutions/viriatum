@@ -134,6 +134,40 @@ void testHashMap() {
     deleteHashMap(hashMap);
 }
 
+void testBase64() {
+    /* allocates space for the buffer */
+    char buffer[] = "hello world";
+
+    /* allocates space for the encoded buffer */
+    unsigned char *encodedBuffer;
+
+    /* allocates space for the encoded buffer length */
+    size_t encodedBufferLength;
+
+    /* encodes the value into base64 */
+    encodeBase64((unsigned char *) buffer, strlen(buffer), &encodedBuffer, &encodedBufferLength);
+
+    /* releases the encoded buffer */
+    free(encodedBuffer);
+}
+
+void runTests() {
+    /* tests the thread pool */
+    testThreadPool();
+
+    /* tests the linked list */
+    testLinkedList();
+
+    /* tests the array list */
+    testArrayList();
+
+    /* tests the hash map */
+    testHashMap();
+
+    /* tests the base 64 encoder */
+    testBase64();
+}
+
 void readFile(char *filePath, unsigned char **bufferPointer, size_t *fileSizePointer) {
     /* allocates space for the file */
     FILE *file;
@@ -170,40 +204,6 @@ void readFile(char *filePath, unsigned char **bufferPointer, size_t *fileSizePoi
 
     /* sets the file size as the file size pointer */
     *fileSizePointer = fileSize;
-}
-
-void testBase64() {
-    /* allocates space for the buffer */
-    char buffer[] = "hello world";
-
-    /* allocates space for the encoded buffer */
-    unsigned char *encodedBuffer;
-
-    /* allocates space for the encoded buffer length */
-    size_t encodedBufferLength;
-
-    /* encodes the value into base64 */
-    encodeBase64((unsigned char *) buffer, strlen(buffer), &encodedBuffer, &encodedBufferLength);
-
-    /* releases the encoded buffer */
-    free(encodedBuffer);
-}
-
-void runTests() {
-    /* tests the thread pool */
-    testThreadPool();
-
-    /* tests the linked list */
-    testLinkedList();
-
-    /* tests the array list */
-    testArrayList();
-
-    /* tests the hash map */
-    testHashMap();
-
-    /* tests the base 64 encoder */
-    testBase64();
 }
 
 void service(int argc, char *argv[]) {
