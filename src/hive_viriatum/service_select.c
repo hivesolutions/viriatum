@@ -340,6 +340,9 @@ void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_
 		*readConnectionsSize = 0;
 		*writeConnectionsSize = 0;
 
+		serviceSelect->selectTimeout.tv_sec = 10;
+		serviceSelect->selectTimeout.tv_usec = 10;
+
 		return;
 	}
 
