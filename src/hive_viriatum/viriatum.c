@@ -27,6 +27,8 @@
 
 #include "stdafx.h"
 
+#include "viriatum.h"
+
 int threadPoolStartFunctionTest(void *arguments) {
     /* retrieves the current thread identifier */
     THREAD_IDENTIFIER threadId = THREAD_GET_IDENTIFIER();
@@ -87,6 +89,9 @@ void testLinkedList() {
 
     /* removes an element from the linked list */
     removeIndexLinkedList(linkedList, 1);
+
+    /* pops a value from the linked list */
+    popValueLinkedList(linkedList, &value);
 
     /* pops a value from the linked list */
     popValueLinkedList(linkedList, &value);
@@ -403,6 +408,26 @@ void service(int argc, char *argv[]) {
     SOCKET_FINISH();
 }
 
+void runService() {
+	/* allocates the service select */
+	struct ServiceSelect_t *serviceSelect;
+
+    /* allocates the socket data */
+    SOCKET_DATA socketData;
+
+    /* initializes the socket infrastructure */
+    SOCKET_INITIALIZE(&socketData);
+
+	/* creates the service select */
+	createServiceSelect(&serviceSelect);
+
+	/* starts the service select */
+	startServiceSelect(serviceSelect);
+    
+	/* runs the socket finish */
+    SOCKET_FINISH();
+}
+
 int main(int argc, char *argv[]) {
     /* prints a debug message */
     printf("Receiving %d arguments\n", argc);
@@ -410,11 +435,11 @@ int main(int argc, char *argv[]) {
     /* runs the tests */
     runTests();
 
-    /* prints a debug message */
-    printf("Starting service with %d arguments\n", argc);
+	/* runs the service */
+	runService();
 
     /* runs the service */
-    service(argc, argv);
+    //service(argc, argv);
 
     /* returns zero (valid) */
     return 0;

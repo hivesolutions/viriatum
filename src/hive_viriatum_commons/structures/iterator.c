@@ -25,9 +25,27 @@
  __license__   = GNU General Public License (GPL), Version 3
 */
 
-#pragma once
+#include "stdafx.h"
 
-#include "array_list.h"
-#include "hash_map.h"
 #include "iterator.h"
-#include "linked_list.h"
+
+void createIterator(struct Iterator_t **iteratorPointer) {
+    /* retrieves the iterator size */
+    size_t iteratorSize = sizeof(struct Iterator_t);
+
+	/* allocates space for the iterator */
+	struct Iterator_t *iterator = (struct Iterator_t *) malloc(iteratorSize);
+
+	/* sets the iterator in the iterator pointer */
+	*iteratorPointer = iterator;
+}
+
+void deleteIterator(struct Iterator_t *iterator) {
+	/* releases the iterator */
+	free(iterator);
+}
+
+void getNextIterator(struct Iterator_t *iterator, void **nextPointer) {
+	/* calls the iterator get next function */
+	iterator->getNextFunction(iterator, nextPointer);
+}
