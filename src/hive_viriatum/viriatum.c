@@ -187,7 +187,7 @@ void readFile(char *filePath, unsigned char **bufferPointer, size_t *fileSizePoi
     size_t numberBytes;
 
     /* opens the file */
-	SFOPEN(&file, filePath, "rb");
+    SFOPEN(&file, filePath, "rb");
 
     /* seeks the file until the end */
     fseek(file, 0, SEEK_END);
@@ -409,8 +409,8 @@ void service(int argc, char *argv[]) {
 }
 
 void runService() {
-	/* allocates the service select */
-	struct ServiceSelect_t *serviceSelect;
+    /* allocates the service select */
+    struct ServiceSelect_t *serviceSelect;
 
     /* allocates the socket data */
     SOCKET_DATA socketData;
@@ -418,13 +418,13 @@ void runService() {
     /* initializes the socket infrastructure */
     SOCKET_INITIALIZE(&socketData);
 
-	/* creates the service select */
-	createServiceSelect(&serviceSelect);
+    /* creates the service select */
+    createServiceSelect(&serviceSelect);
 
-	/* starts the service select */
-	startServiceSelect(serviceSelect);
-    
-	/* runs the socket finish */
+    /* starts the service select */
+    startServiceSelect(serviceSelect);
+
+    /* runs the socket finish */
     SOCKET_FINISH();
 }
 
@@ -435,8 +435,8 @@ int main(int argc, char *argv[]) {
     /* runs the tests */
     runTests();
 
-	/* runs the service */
-	runService();
+    /* runs the service */
+    runService();
 
     /* runs the service */
     //service(argc, argv);

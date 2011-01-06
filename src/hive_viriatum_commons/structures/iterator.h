@@ -28,9 +28,9 @@
 #pragma once
 
 typedef struct Iterator_t {
-	void *structure;
-	void *parameters;
-	void (*getNextFunction) (struct Iterator_t *iterator, void **next);
+    void *structure;
+    void *parameters;
+    void (*getNextFunction) (struct Iterator_t *iterator, void **next);
 } Iterator;
 
 VIRIATUM_EXPORT_PREFIX void createIterator(struct Iterator_t **iteratorPointer);

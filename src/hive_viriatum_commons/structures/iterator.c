@@ -33,19 +33,19 @@ void createIterator(struct Iterator_t **iteratorPointer) {
     /* retrieves the iterator size */
     size_t iteratorSize = sizeof(struct Iterator_t);
 
-	/* allocates space for the iterator */
-	struct Iterator_t *iterator = (struct Iterator_t *) malloc(iteratorSize);
+    /* allocates space for the iterator */
+    struct Iterator_t *iterator = (struct Iterator_t *) malloc(iteratorSize);
 
-	/* sets the iterator in the iterator pointer */
-	*iteratorPointer = iterator;
+    /* sets the iterator in the iterator pointer */
+    *iteratorPointer = iterator;
 }
 
 void deleteIterator(struct Iterator_t *iterator) {
-	/* releases the iterator */
-	free(iterator);
+    /* releases the iterator */
+    free(iterator);
 }
 
 void getNextIterator(struct Iterator_t *iterator, void **nextPointer) {
-	/* calls the iterator get next function */
-	iterator->getNextFunction(iterator, nextPointer);
+    /* calls the iterator get next function */
+    iterator->getNextFunction(iterator, nextPointer);
 }

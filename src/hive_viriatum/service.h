@@ -29,13 +29,13 @@
 
 typedef struct Service_t {
     unsigned char *name;
-	unsigned int status;
+    unsigned int status;
     SOCKET_HANDLE serviceSocketHandle;
     struct LinkedList_t *connectionsList;
 } Service;
 
 typedef struct Connection_t {
-	unsigned int writeRegistered;
+    unsigned int writeRegistered;
     SOCKET_HANDLE socketHandle;
     struct LinkedList_t *readQueue;
     struct LinkedList_t *writeQueue;
