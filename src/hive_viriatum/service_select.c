@@ -33,9 +33,6 @@ void createServiceSelect(struct ServiceSelect_t **serviceSelectPointer) {
     /* retrieves the service select size */
     size_t serviceSelectSize = sizeof(struct ServiceSelect_t);
 
-    /* retrieves the service size */
-    size_t serviceSize = sizeof(struct Service_t);
-
     /* allocates space for the service select */
     struct ServiceSelect_t *serviceSelect = (struct ServiceSelect_t *) malloc(serviceSelectSize);
 
