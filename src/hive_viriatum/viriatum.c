@@ -413,8 +413,11 @@ int main(int argc, char *argv[]) {
     /* prints a debug message */
     printf("Receiving %d arguments\n", argc);
 
-	/* runs the tests */
+    /* runs the tests */
     runTests();
+
+    /* prints a debug message */
+    printf("Starting service with %d arguments\n", argc);
 
     /* runs the service */
     service(argc, argv);
