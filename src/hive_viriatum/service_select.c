@@ -369,14 +369,14 @@ void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_
         /* retrieves the next value from the iterator */
         getNextIterator(connectionsListIterator, (void **) &currentConnection);
 
-		/* prints a debug message */
-		debug("Testing file for select: %d\n", currentConnection->socketHandle);
-
         /* in case the current connection is null (end of iterator) */
         if(currentConnection == NULL) {
             /* breaks the loop */
             break;
         }
+
+		/* prints a debug message */
+		debug("Testing file for select: %d\n", currentConnection->socketHandle);
 
         /* in case the current connection socket handle is set in
         the sockets read ready set */
