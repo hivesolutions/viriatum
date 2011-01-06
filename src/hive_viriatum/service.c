@@ -94,7 +94,22 @@ void startService(struct Service_t *service) {
     }
 
     /* listens for a service socket change */
-    SOCKET_LISTEN(service->serviceSocketHandle);
+    socketResult = SOCKET_LISTEN(service->serviceSocketHandle);
+
+    /* in case there was an error listening the socket */
+    if(SOCKET_TEST_ERROR(socketResult)) {
+        /* retrieves the listening error code */
+        SOCKET_ERROR_CODE bindingErrorCode = SOCKET_GET_ERROR_CODE(socketResult);
+
+        /* prints the error */
+        debug("Problem listening socket: %d", bindingErrorCode);
+
+        /* closes the service socket */
+        SOCKET_CLOSE(service->serviceSocketHandle);
+
+        /* returns immediately */
+        return;
+    }
 
     /* setst the service status as open */
     service->status = 2;
