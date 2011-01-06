@@ -34,7 +34,7 @@ int threadPoolStartFunctionTest(void *arguments) {
     THREAD_IDENTIFIER threadId = THREAD_GET_IDENTIFIER();
 
     /* prints an hello world message */
-    DEBUG_F("hello world from thread: %d\n", (unsigned int) threadId);
+    DEBUG_F("hello world from thread: %d\n", threadId);
 
     /* sleeps for a while */
     SLEEP(10);
