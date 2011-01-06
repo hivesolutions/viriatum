@@ -139,11 +139,11 @@ void removeLinkedList(struct LinkedList_t *linkedList, struct LinkedListNode_t *
     /* allocates space for the next node */
     struct LinkedListNode_t *nextNode;
 
-	/* in case the linked list node is invalid */
-	if(linkedListNode == NULL) {
-		/* returns immediately */
-		return;
-	}
+    /* in case the linked list node is invalid */
+    if(linkedListNode == NULL) {
+        /* returns immediately */
+        return;
+    }
 
     /* retrieves the previous node */
     previousNode = linkedListNode->previous;
@@ -295,77 +295,77 @@ void popValueLinkedList(struct LinkedList_t *linkedList, void **valuePointer) {
     /* pops the linked list node */
     popLinkedList(linkedList, &linkedListNode);
 
-	/* in case the linked list node is invalid */
-	if(linkedListNode == NULL) {
-		/* sets the null valie in the value pointer */
-		*valuePointer = NULL;
-	} else {
-		/* sets the linked list node value in the value pointer */
-		*valuePointer = linkedListNode->value;
-	}
+    /* in case the linked list node is invalid */
+    if(linkedListNode == NULL) {
+        /* sets the null valie in the value pointer */
+        *valuePointer = NULL;
+    } else {
+        /* sets the linked list node value in the value pointer */
+        *valuePointer = linkedListNode->value;
+    }
 }
 
 void createIteratorLinkedList(struct LinkedList_t *linkedList, struct Iterator_t **iteratorPointer) {
-	/* allocates the iterator */
-	struct Iterator_t *iterator;
+    /* allocates the iterator */
+    struct Iterator_t *iterator;
 
-	/* creates the iterator */
-	createIterator(&iterator);
+    /* creates the iterator */
+    createIterator(&iterator);
 
-	/* sets the linked list in the structure */
-	iterator->structure = (void *) linkedList;
+    /* sets the linked list in the structure */
+    iterator->structure = (void *) linkedList;
 
-	/* sets the get next function in the iterator */
-	iterator->getNextFunction = getNextIteratorLinkedList;
+    /* sets the get next function in the iterator */
+    iterator->getNextFunction = getNextIteratorLinkedList;
 
-	/* resets the iterator */
-	resetIteratorLinkedList(linkedList, iterator);
+    /* resets the iterator */
+    resetIteratorLinkedList(linkedList, iterator);
 
-	/* sets the iterator in the iterator pointer */
-	*iteratorPointer = iterator;
+    /* sets the iterator in the iterator pointer */
+    *iteratorPointer = iterator;
 }
 
 void deleteIteratorLinkedList(struct LinkedList_t *linkedList, struct Iterator_t *iterator) {
-	/* deletes the iterator */
-	deleteIterator(iterator);
+    /* deletes the iterator */
+    deleteIterator(iterator);
 }
 
 void resetIteratorLinkedList(struct LinkedList_t *linkedList, struct Iterator_t *iterator) {
-	/* sets the iterator parameters as the first item of the linked list */
-	iterator->parameters = (void *) linkedList->first;
+    /* sets the iterator parameters as the first item of the linked list */
+    iterator->parameters = (void *) linkedList->first;
 }
 
 void getNextIteratorLinkedList(struct Iterator_t *iterator, void **nextPointer) {
-	/* retrieves the linked list from the iterator structure */
-	struct LinkedList_t *linkedList = (struct LinkedList_t *) iterator->structure;
+    /* retrieves the linked list from the iterator structure */
+    struct LinkedList_t *linkedList = (struct LinkedList_t *) iterator->structure;
 
-	/* retrieves the current node from the iterator parameters */
-	struct LinkedListNode_t *currentNode = (struct LinkedListNode_t *) iterator->parameters;
+    /* retrieves the current node from the iterator parameters */
+    struct LinkedListNode_t *currentNode = (struct LinkedListNode_t *) iterator->parameters;
 
-	/* allocates the next node */
-	struct LinkedListNode_t *nextNode;
+    /* allocates the next node */
+    struct LinkedListNode_t *nextNode;
 
-	/* allocates the next */
-	void *next;
+    /* allocates the next */
+    void *next;
 
-	/* in case the current node is null */
-	if(currentNode == NULL) {
-		/* sets the next node as null */
-		nextNode = NULL;
+    /* in case the current node is null */
+    if(currentNode == NULL) {
+        /* sets the next node as null */
+        nextNode = NULL;
 
-		/* sets the next as null */
-		next = NULL;
-	} else {
-		/* retrieves the next node from the current node */
-		nextNode = currentNode->next;
+        /* sets the next as null */
+        next = NULL;
+    } else {
+        /* retrieves the next node from the current node */
+        nextNode = currentNode->next;
 
-		/* sets the next as the current node value */
-		next = currentNode->value;
-	}
+        /* sets the next as the current node value */
+        next = currentNode->value;
+    }
 
-	/* sets the next node in the iterator parameters */
-	iterator->parameters = (void *) nextNode;
+    /* sets the next node in the iterator parameters */
+    iterator->parameters = (void *) nextNode;
 
-	/* sets the next in the next pointer */
-	*nextPointer = next;
+    /* sets the next in the next pointer */
+    *nextPointer = next;
 }
