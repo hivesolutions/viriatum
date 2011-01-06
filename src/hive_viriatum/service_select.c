@@ -89,7 +89,7 @@ void httpReadHandler(struct ServiceSelect_t *serviceSelect, struct Connection_t 
         SOCKET_ERROR_CODE receivingErrorCode = SOCKET_GET_ERROR_CODE(numberBytes);
 
         /* prints the error */
-        //printf("Problem receiving from socket: %d\n", receivingErrorCode);
+        debug("Problem receiving from socket: %d\n", receivingErrorCode);
 
         /* removes the connection from the service select */
         removeConnectionServiceSelect(serviceSelect, connection);
@@ -102,7 +102,7 @@ void httpReadHandler(struct ServiceSelect_t *serviceSelect, struct Connection_t 
     buffer[numberBytes] = '\0';
 
     /* prints the received message */
-    //printf("%s", buffer);
+    debug("%s", buffer);
 
     responseBuffer = (unsigned char *) malloc(1024);
 
@@ -152,7 +152,7 @@ void httpWriteHandler(struct ServiceSelect_t *serviceSelect, struct Connection_t
             SOCKET_ERROR_CODE receivingErrorCode = SOCKET_GET_ERROR_CODE(numberBytes);
 
             /* prints the error */
-            //printf("Problem sending from socket: %d\n", receivingErrorCode);
+            debug("Problem sending from socket: %d\n", receivingErrorCode);
 
             /* removes the connection from the service select */
             removeConnectionServiceSelect(serviceSelect, connection);
@@ -248,7 +248,7 @@ void startServiceSelect(struct ServiceSelect_t *serviceSelect) {
             socketHandle = SOCKET_ACCEPT(serviceSocketHandle, &socketAddress, clientSocketAddressSize);
 
             /* prints a debug message */
-            //printf("Accepted connection: %d\n", socketHandle);
+            debug("Accepted connection: %d\n", socketHandle);
 
             /* creates the connection */
             createConnection(&connection, socketHandle);
@@ -331,9 +331,6 @@ void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_
     if(FD_ISSET(serviceSelect->service->serviceSocketHandle, &serviceSelect->socketsReadTemporarySet) == 1)  {
         /* sets the service socket ready to one */
         *serviceSocketReady = 1;
-
-        *readConnectionsSize = 0;
-        *writeConnectionsSize = 0;
     } else {
         /* sets the service socket ready to zero */
         *serviceSocketReady = 0;
