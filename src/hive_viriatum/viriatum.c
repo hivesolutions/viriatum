@@ -116,6 +116,24 @@ void testArrayList() {
     deleteArrayList(arrayList);
 }
 
+void testHashMap() {
+    /* allocates space for the element */
+    void *element;
+
+    /* allocates space for the hash map */
+    struct HashMap_t *hashMap;
+
+    /* creates the hash map */
+    createHashMap(&hashMap, 0);
+
+    /* sets and retrieves the value in the hash map */
+    setValueHashMap(hashMap, 123123, (void *) 1);
+    getValueHashMap(hashMap, 123123, &element);
+
+    /* deletes the hash map */
+    deleteHashMap(hashMap);
+}
+
 void readFile(char *filePath, unsigned char **bufferPointer, size_t *fileSizePointer) {
     /* allocates space for the file */
     FILE *file;
@@ -152,27 +170,6 @@ void readFile(char *filePath, unsigned char **bufferPointer, size_t *fileSizePoi
 
     /* sets the file size as the file size pointer */
     *fileSizePointer = fileSize;
-}
-
-void testHashMap() {
-    /* allocates space for the first element */
-    unsigned int firstElement = 1;
-
-    /* allocates space for the second element */
-    unsigned int secondElement = 1;
-
-    /* allocates space for the hash map */
-    struct HashMap_t *hashMap;
-
-    /* creates the hash map */
-    createHashMap(&hashMap, 0);
-
-    /* sets and retrieves the value in the hash map */
-    setValueHashMap(hashMap, 123123, (void **) &firstElement);
-    getValueHashMap(hashMap, 123123, (void **) &secondElement);
-
-    /* deletes the hash map */
-    deleteHashMap(hashMap);
 }
 
 void testBase64() {
