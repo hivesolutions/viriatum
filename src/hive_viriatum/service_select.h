@@ -34,9 +34,10 @@ typedef struct ServiceSelect_t {
     SOCKET_HANDLE socketsSetHighest;
     fd_set socketsReadSet;
     fd_set socketsWriteSet;
-    fd_set socketsReadTemporarySet;
-    fd_set socketsWriteTemporarySet;
+    fd_set socketsReadSetTemporary;
+    fd_set socketsWriteSetTemporary;
     struct timeval selectTimeout;
+	struct timeval selectTimeoutTemporary;
 } ServiceSelect_t;
 
 void createServiceSelect(struct ServiceSelect_t **serviceSelectPointer);

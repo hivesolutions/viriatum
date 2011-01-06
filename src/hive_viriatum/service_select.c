@@ -51,11 +51,11 @@ void createServiceSelect(struct ServiceSelect_t **serviceSelectPointer) {
     /* zeros the sockets write set */
     FD_ZERO(&serviceSelect->socketsWriteSet);
 
-    /* zeros the sockets read temporary set */
-    FD_ZERO(&serviceSelect->socketsReadTemporarySet);
+    /* zeros the sockets read set temporary */
+    FD_ZERO(&serviceSelect->socketsReadSetTemporary);
 
-    /* zeros the sockets write temporary set */
-    FD_ZERO(&serviceSelect->socketsWriteTemporarySet);
+    /* zeros the sockets write set temporary */
+    FD_ZERO(&serviceSelect->socketsWriteSetTemporary);
 
     /* sets the default timeout */
     serviceSelect->selectTimeout.tv_sec = 10;
@@ -321,9 +321,12 @@ void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_
     /* initializes the write index */
     unsigned int writeIndex = 0;
 
-    /* copies the socket sets to the socket temporary sets */
-    serviceSelect->socketsReadTemporarySet = serviceSelect->socketsReadSet;
-    serviceSelect->socketsWriteTemporarySet = serviceSelect->socketsWriteSet;
+    /* copies the socket sets to the socket sets temporary */
+    serviceSelect->socketsReadSetTemporary = serviceSelect->socketsReadSet;
+    serviceSelect->socketsWriteSetTemporary = serviceSelect->socketsWriteSet;
+
+	/* copies the select timeout to the select timeout temporary */
+	serviceSelect->selectTimeoutTemporary = serviceSelect->selectTimeout;
 
     /* creates the iterator for the linked list */
     createIteratorLinkedList(connectionsList, &connectionsListIterator);
@@ -333,25 +336,17 @@ void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_
 	debug("Maximum sockets set value: %d\n", serviceSelect->socketsSetHighest);
 
     /* runs the select over the sockets set */
-    selectCount = select(serviceSelect->socketsSetHighest + 1, &serviceSelect->socketsReadTemporarySet, &serviceSelect->socketsWriteTemporarySet, NULL, &serviceSelect->selectTimeout);
-
-	if(selectCount == 0) {
-        *serviceSocketReady = 0;
-		*readConnectionsSize = 0;
-		*writeConnectionsSize = 0;
-
-		serviceSelect->selectTimeout.tv_sec = 10;
-		serviceSelect->selectTimeout.tv_usec = 10;
-
-		return;
-	}
+    selectCount = select(serviceSelect->socketsSetHighest + 1, &serviceSelect->socketsReadSetTemporary, &serviceSelect->socketsWriteSetTemporary, NULL, &serviceSelect->selectTimeoutTemporary);
 
     /* prints a debug message */
 	debug("Exiting select statement with value: %d\n", selectCount);
 
-    if(FD_ISSET(serviceSelect->service->serviceSocketHandle, &serviceSelect->socketsReadTemporarySet) == 1)  {
+    if(FD_ISSET(serviceSelect->service->serviceSocketHandle, &serviceSelect->socketsReadSetTemporary) == 1)  {
         /* sets the service socket ready to one */
         *serviceSocketReady = 1;
+
+		/* decrements the select count */
+		selectCount--;
     } else {
         /* sets the service socket ready to zero */
         *serviceSocketReady = 0;
@@ -359,6 +354,12 @@ void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_
 
     /* iterator continuously */
     while(1) {
+		/* in case the select count is zero */
+		if(selectCount == 0) {
+			/* breaks the loop */
+			break;
+		}
+
         /* retrieves the next value from the iterator */
         getNextIterator(connectionsListIterator, (void **) &currentConnection);
 
@@ -370,22 +371,28 @@ void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_
 
         /* in case the current connection socket handle is set in
         the sockets read ready set */
-        if(FD_ISSET(currentConnection->socketHandle, &serviceSelect->socketsReadTemporarySet) == 1)  {
+        if(FD_ISSET(currentConnection->socketHandle, &serviceSelect->socketsReadSetTemporary) == 1)  {
             /* sets the current connection in the read connections */
             readConnections[readIndex] = currentConnection;
 
             /* increments the read index */
             readIndex++;
+
+			/* decrements the select count */
+			selectCount--;
         }
 
         /* in case the current connection socket handle is set in
         the sockets write ready set */
-        if(FD_ISSET(currentConnection->socketHandle, &serviceSelect->socketsWriteTemporarySet) == 1)  {
+        if(FD_ISSET(currentConnection->socketHandle, &serviceSelect->socketsWriteSetTemporary) == 1)  {
             /* sets the current connection in the write connections */
             writeConnections[writeIndex] = currentConnection;
 
             /* increments the write index */
             writeIndex++;
+
+			/* decrements the select count */
+			selectCount--;
         }
     }
 
