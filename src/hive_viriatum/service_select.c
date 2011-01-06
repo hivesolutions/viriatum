@@ -92,7 +92,7 @@ void httpReadHandler(struct ServiceSelect_t *serviceSelect, struct Connection_t 
         SOCKET_ERROR_CODE receivingErrorCode = SOCKET_GET_ERROR_CODE(numberBytes);
 
         /* prints the error */
-        DEBUG("Problem receiving from socket: %d\n", receivingErrorCode);
+        DEBUG_F("Problem receiving from socket: %d\n", receivingErrorCode);
 
         /* removes the connection from the service select */
         removeConnectionServiceSelect(serviceSelect, connection);
@@ -152,7 +152,7 @@ void httpWriteHandler(struct ServiceSelect_t *serviceSelect, struct Connection_t
             SOCKET_ERROR_CODE receivingErrorCode = SOCKET_GET_ERROR_CODE(numberBytes);
 
             /* prints the error */
-            DEBUG("Problem sending from socket: %d\n", receivingErrorCode);
+            DEBUG_F("Problem sending from socket: %d\n", receivingErrorCode);
 
             /* removes the connection from the service select */
             removeConnectionServiceSelect(serviceSelect, connection);
@@ -248,7 +248,7 @@ void startServiceSelect(struct ServiceSelect_t *serviceSelect) {
             socketHandle = SOCKET_ACCEPT(serviceSocketHandle, &socketAddress, clientSocketAddressSize);
 
             /* prints a debug message */
-            DEBUG("Accepted connection: %d\n", socketHandle);
+            DEBUG_F("Accepted connection: %d\n", socketHandle);
 
             /* creates the connection */
             createConnection(&connection, socketHandle);
@@ -329,18 +329,18 @@ void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_
     createIteratorLinkedList(connectionsList, &connectionsListIterator);
 
     /* prints a debug message */
-    DEBUG("Entering select statement\n", "");
+    DEBUG_F("Entering select statement\n", "");
 
     /* runs the select over the sockets set */
     selectCount = select(serviceSelect->socketsSetHighest + 1, &serviceSelect->socketsReadSetTemporary, &serviceSelect->socketsWriteSetTemporary, NULL, &serviceSelect->selectTimeoutTemporary);
 
     /* prints a debug message */
-    DEBUG("Exiting select statement with value: %d\n", selectCount);
+    DEBUG_F("Exiting select statement with value: %d\n", selectCount);
 
     /* in case the select coutn is negative */
     if(selectCount < 0) {
         /* prints a debug message */
-        DEBUG("Problem in select statement: %d\n", selectCount);
+        DEBUG_F("Problem in select statement: %d\n", selectCount);
     }
 
     /* in case the service socket handle is set in
@@ -374,7 +374,7 @@ void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_
         }
 
         /* prints a debug message */
-        DEBUG("Testing file for select: %d\n", currentConnection->socketHandle);
+        DEBUG_F("Testing file for select: %d\n", currentConnection->socketHandle);
 
         /* in case the current connection socket handle is set in
         the sockets read ready set */
@@ -406,7 +406,7 @@ void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_
     /* in case the select count is bigger than zero */
     if(selectCount > 0) {
         /* prints a debug message */
-        DEBUG("Extraordinary select file descriptors not found: %d\n", selectCount);
+        DEBUG_F("Extraordinary select file descriptors not found: %d\n", selectCount);
     }
 
     /* sets the read index in the read connections size */
