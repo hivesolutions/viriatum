@@ -46,12 +46,12 @@
 #define SOCKET_INITIALIZE(socketData) WSAStartup(MAKEWORD(2, 0), socketData)
 #define SOCKET_FINISH() WSACleanup()
 #define SOCKET_CREATE(type, streamType, protocolType) socket(type, streamType, protocolType)
-#define SOCKET_BIND(socketHandle, socketAddress) bind(socketHandle, (LPSOCKADDR) &socketAddress, sizeof(SOCKET_ADDRESS))
+#define SOCKET_BIND(socketHandle, socketAddress) bind(socketHandle, (LPSOCKADDR) &socketAddress, sizeof(socketAddress))
 #define SOCKET_LISTEN(socketHandle) listen(socketHandle, 100)
-#define SOCKET_CONNECT(socketHandle, socketAddress) connect(socketHandle, (LPSOCKADDR) &socketAddress, sizeof(SOCKET_ADDRESS))
+#define SOCKET_CONNECT(socketHandle, socketAddress) connect(socketHandle, (LPSOCKADDR) &socketAddress, sizeof(socketAddress))
 #define SOCKET_ACCEPT(socketHandle, socketAddress, socketAddressSize) accept(socketHandle, socketAddress, &socketAddressSize)
 #define SOCKET_CLOSE(socketHandle) closesocket(socketHandle)
-#define SOCKET_ADDRESS_CREATE(socketAddress, type, address, port) memset(&socketAddress, 0, sizeof(SOCKET_ADDRESS));\
+#define SOCKET_ADDRESS_CREATE(socketAddress, type, address, port) memset(&socketAddress, 0, sizeof(socketAddress));\
     socketAddress.sin_family = type;\
     socketAddress.sin_port = htons(port);\
     if(address == NULL) { socketAddress.sin_addr.s_addr = INADDR_ANY; } else { socketAddress.sin_addr.s_addr = inet_addr(address); }
@@ -84,12 +84,12 @@
 #define SOCKET_INITIALIZE(socketData)
 #define SOCKET_FINISH()
 #define SOCKET_CREATE(type, streamType, protocolType) socket(type, streamType, protocolType)
-#define SOCKET_BIND(socketHandle, socketAddress) bind(socketHandle, (struct sockaddr *) &socketAddress, sizeof(SOCKET_ADDRESS))
+#define SOCKET_BIND(socketHandle, socketAddress) bind(socketHandle, (struct sockaddr *) &socketAddress, sizeof(socketAddress))
 #define SOCKET_LISTEN(socketHandle) listen(socketHandle, 100)
-#define SOCKET_CONNECT(socketHandle, socketAddress) connect(socketHandle, (struct sockaddr *) &socketAddress, sizeof(SOCKET_ADDRESS))
+#define SOCKET_CONNECT(socketHandle, socketAddress) connect(socketHandle, (struct sockaddr *) &socketAddress, sizeof(socketAddress))
 #define SOCKET_ACCEPT(socketHandle, socketAddress, socketAddressSize) accept(socketHandle, socketAddress, &socketAddressSize)
 #define SOCKET_CLOSE(socketHandle) close(socketHandle)
-#define SOCKET_ADDRESS_CREATE(socketAddress, type, address, port) memset(&socketAddress, 0, sizeof(SOCKET_ADDRESS));\
+#define SOCKET_ADDRESS_CREATE(socketAddress, type, address, port) memset(&socketAddress, 0, sizeof(socketAddress));\
     socketAddress.sin_family = type;\
     socketAddress.sin_port = htons(port);\
     if(address == NULL) { socketAddress.sin_addr.s_addr = INADDR_ANY; } else { socketAddress.sin_addr.s_addr = inet_addr(address); }

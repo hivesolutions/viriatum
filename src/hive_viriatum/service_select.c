@@ -229,7 +229,7 @@ void startServiceSelect(struct ServiceSelect_t *serviceSelect) {
     SOCKET_ADDRESS socketAddress;
 
     /* calculates the size of the socket address */
-    size_t clientSocketAddressSize = sizeof(SOCKET_ADDRESS);
+    size_t clientSocketAddressSize = sizeof(socketAddress);
 
     /* starts the service */
     startService(serviceSelect->service);
