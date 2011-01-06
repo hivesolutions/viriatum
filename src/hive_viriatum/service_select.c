@@ -78,7 +78,7 @@ void httpReadHandler(struct ServiceSelect_t *serviceSelect, struct Connection_t 
     unsigned char buffer[10240];
 
     /* allocates the response buffer */
-    unsigned char *responseBuffer;
+    char *responseBuffer;
 
     /* receives from the socket */
     numberBytes = SOCKET_RECEIVE(connection->socketHandle, buffer, 10240, 0);
@@ -101,7 +101,7 @@ void httpReadHandler(struct ServiceSelect_t *serviceSelect, struct Connection_t 
     /* sets the final string bytes */
     buffer[numberBytes] = '\0';
 
-    responseBuffer = (unsigned char *) malloc(1024);
+    responseBuffer = (char *) malloc(1024);
 
     /* writes the http static headers to the response */
     SPRINTF(responseBuffer, 1024, "HTTP/1.1 200 OK\r\nServer: viriatum/1.0.0\r\nContent-Length: %d\r\n\r\nhello world", strlen("hello world"));
