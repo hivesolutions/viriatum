@@ -349,7 +349,7 @@ void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_
 
 	/* in case the service socket handle is set in
     the sockets read ready set */
-    if(FD_ISSET(serviceSelect->service->serviceSocketHandle, &serviceSelect->socketsReadSetTemporary) == 1)  {
+    if(FD_ISSET(serviceSelect->service->serviceSocketHandle, &serviceSelect->socketsReadSetTemporary) > 0)  {
         /* sets the service socket ready to one */
         *serviceSocketReady = 1;
 
@@ -359,20 +359,6 @@ void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_
         /* sets the service socket ready to zero */
         *serviceSocketReady = 0;
     }
-
-	/* in case the service socket handle is set in
-    the sockets read ready set */
-    if(FD_ISSET(serviceSelect->service->serviceSocketHandle, &serviceSelect->socketsWriteSetTemporary) == 1)  {
-        /* sets the service socket ready to one */
-        *serviceSocketReady = 1;
-
-        /* decrements the select count */
-        selectCount--;
-    } else {
-        /* sets the service socket ready to zero */
-        *serviceSocketReady = 0;
-    }
-
 
     /* iterates continuously */
     while(1) {
@@ -396,7 +382,7 @@ void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_
 
         /* in case the current connection socket handle is set in
         the sockets read ready set */
-        if(FD_ISSET(currentConnection->socketHandle, &serviceSelect->socketsReadSetTemporary) == 1)  {
+        if(FD_ISSET(currentConnection->socketHandle, &serviceSelect->socketsReadSetTemporary) > 0)  {
             /* sets the current connection in the read connections */
             readConnections[readIndex] = currentConnection;
 
@@ -409,7 +395,7 @@ void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_
 
         /* in case the current connection socket handle is set in
         the sockets write ready set */
-        if(FD_ISSET(currentConnection->socketHandle, &serviceSelect->socketsWriteSetTemporary) == 1)  {
+        if(FD_ISSET(currentConnection->socketHandle, &serviceSelect->socketsWriteSetTemporary) > 0)  {
             /* sets the current connection in the write connections */
             writeConnections[writeIndex] = currentConnection;
 
