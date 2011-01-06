@@ -84,7 +84,7 @@ void startService(struct Service_t *service) {
         SOCKET_ERROR_CODE bindingErrorCode = SOCKET_GET_ERROR_CODE(socketResult);
 
         /* prints the error */
-        debug("Problem binding socket: %d", bindingErrorCode);
+        DEBUG("Problem binding socket: %d", bindingErrorCode);
 
         /* closes the service socket */
         SOCKET_CLOSE(service->serviceSocketHandle);
@@ -102,7 +102,7 @@ void startService(struct Service_t *service) {
         SOCKET_ERROR_CODE bindingErrorCode = SOCKET_GET_ERROR_CODE(socketResult);
 
         /* prints the error */
-        debug("Problem listening socket: %d", bindingErrorCode);
+        DEBUG("Problem listening socket: %d", bindingErrorCode);
 
         /* closes the service socket */
         SOCKET_CLOSE(service->serviceSocketHandle);
