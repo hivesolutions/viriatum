@@ -28,11 +28,13 @@
 #pragma once
 
 #ifdef VIRIATUM_DEBUG
-#define DEBUG(format, ...) printf(format, __VA_ARGS__)
+#define DEBUG(format) printf(format)
+#define DEBUG_F(format, ...) printf(format, __VA_ARGS__)
 #endif
 
 #ifndef VIRIATUM_DEBUG
-#define DEBUG(format, ...)
+#define DEBUG(format)
+#define DEBUG_F(format, ...)
 #endif
 
 
