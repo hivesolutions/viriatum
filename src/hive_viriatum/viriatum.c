@@ -34,7 +34,7 @@ int threadPoolStartFunctionTest(void *arguments) {
     THREAD_IDENTIFIER threadId = THREAD_GET_IDENTIFIER();
 
     /* prints an hello world message */
-    printf("hello world from thread: %d\n", (unsigned int) threadId);
+    debug("hello world from thread: %d\n", (unsigned int) threadId);
 
     /* sleeps for a while */
     SLEEP(10);
@@ -275,7 +275,7 @@ void service(int argc, char *argv[]) {
     }
 
     /* prints a debug message */
-    printf("Loading file '%s'\n", filePath);
+    debug("Loading file '%s'\n", filePath);
 
     /* reads the file */
     readFile(filePath, &fileBuffer, &fileSize);
@@ -303,7 +303,7 @@ void service(int argc, char *argv[]) {
         SOCKET_ERROR_CODE socketErrorCode = SOCKET_GET_ERROR_CODE(socketHandle);
 
         /* prints the error */
-        printf("Problem creating socket: %d", socketErrorCode);
+        debug("Problem creating socket: %d", socketErrorCode);
 
         /* runs the socket finish */
         SOCKET_FINISH();
@@ -326,7 +326,7 @@ void service(int argc, char *argv[]) {
         SOCKET_ERROR_CODE bindingErrorCode = SOCKET_GET_ERROR_CODE(result);
 
         /* prints the error */
-        printf("Problem binding socket: %d", bindingErrorCode);
+        debug("Problem binding socket: %d", bindingErrorCode);
 
         /* closes the socket */
         SOCKET_CLOSE(socketHandle);
@@ -378,7 +378,7 @@ void service(int argc, char *argv[]) {
                 /* in case no bytes are sent */
                 if(numberBytes < 0) {
                     /* prints an error message */
-                    printf("error in receive");
+                    debug("error in receive");
                 }
 
                 /* sends the data */
@@ -430,7 +430,7 @@ void runService() {
 
 int main(int argc, char *argv[]) {
     /* prints a debug message */
-    printf("Receiving %d arguments\n", argc);
+    debug("Receiving %d arguments\n", argc);
 
     /* runs the tests */
     runTests();

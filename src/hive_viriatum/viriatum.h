@@ -27,5 +27,6 @@
 
 #pragma once
 
+#include "logging.h"
 #include "service.h"
 #include "service_select.h"
