@@ -396,6 +396,12 @@ void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_
         }
     }
 
+	/* in case the select count is bigger than zero */
+	if(selectCount > 0) {
+		/* prints a debug message */
+		debug("Extraordinary select file descriptors not found: %d\n", selectCount);
+	}
+
     /* sets the read index in the read connections size */
     *readConnectionsSize = readIndex;
 
