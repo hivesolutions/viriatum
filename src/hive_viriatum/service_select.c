@@ -86,7 +86,7 @@ void httpReadHandler(struct ServiceSelect_t *serviceSelect, struct Connection_t 
 	/* in case there was an error receiving from the socket */
 	if(SOCKET_TEST_ERROR(numberBytes)) {
 		/* retrieves the receving error code */
-		SOCKET_ERROR_CODE receivingErrorCode = SOCKET_GET_ERROR_CODE(result);
+		SOCKET_ERROR_CODE receivingErrorCode = SOCKET_GET_ERROR_CODE(numberBytes);
 
 		/* prints the error */
 		//printf("Problem receiving from socket: %d\n", receivingErrorCode);
@@ -150,7 +150,7 @@ void httpWriteHandler(struct ServiceSelect_t *serviceSelect, struct Connection_t
 		/* in case there was an error receiving from the socket */
 		if(SOCKET_TEST_ERROR(numberBytes)) {
 			/* retrieves the receving error code */
-			SOCKET_ERROR_CODE receivingErrorCode = SOCKET_GET_ERROR_CODE(result);
+			SOCKET_ERROR_CODE receivingErrorCode = SOCKET_GET_ERROR_CODE(numberBytes);
 
 			/* prints the error */
 			//printf("Problem sending from socket: %d\n", receivingErrorCode);
