@@ -329,7 +329,8 @@ void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_
     createIteratorLinkedList(connectionsList, &connectionsListIterator);
 
     /* prints a debug message */
-	debug("Maximum sockets set value: %d", serviceSelect->socketsSetHighest);
+	debug("Entering select statement\n");
+	debug("Maximum sockets set value: %d\n", serviceSelect->socketsSetHighest);
 
     /* runs the select over the sockets set */
     selectCount = select(serviceSelect->socketsSetHighest + 1, &serviceSelect->socketsReadTemporarySet, &serviceSelect->socketsWriteTemporarySet, NULL, &serviceSelect->selectTimeout);
