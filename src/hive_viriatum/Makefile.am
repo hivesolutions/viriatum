@@ -32,5 +32,7 @@ viriatum_CXXFLAGS = $(AM_CXXFLAGS)
 
 viriatum_LDADD = ../hive_viriatum_commons/libviriatum.a $(INTLLIBS)
 
-viriatum_SOURCES = stdafx.c \
+viriatum_SOURCES = service.c \
+service_select.c \
+stdafx.c \
 viriatum.c

@@ -389,6 +389,10 @@
 				RelativePath="..\..\src\hive_viriatum\stdafx.h"
 				>
 			</File>
+			<File
+				RelativePath="..\..\src\hive_viriatum\viriatum.h"
+				>
+			</File>
 			<Filter
 				Name="global"
 				>
