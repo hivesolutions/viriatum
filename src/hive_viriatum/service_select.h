@@ -32,10 +32,10 @@
 typedef struct ServiceSelect_t {
     struct Service_t *service;
     SOCKET_HANDLE socketsSetHighest;
-    fd_set socketsReadSet;
-    fd_set socketsWriteSet;
-    fd_set socketsReadSetTemporary;
-    fd_set socketsWriteSetTemporary;
+    SOCKET_SET socketsReadSet;
+    SOCKET_SET socketsWriteSet;
+    SOCKET_SET socketsReadSetTemporary;
+    SOCKET_SET socketsWriteSetTemporary;
     struct timeval selectTimeout;
     struct timeval selectTimeoutTemporary;
 } ServiceSelect_t;
@@ -46,5 +46,5 @@ void startServiceSelect(struct ServiceSelect_t *serviceSelect);
 void addConnectionServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_t *connection);
 void removeConnectionServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_t *connection);
 void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_t **readConnections, struct Connection_t **writeConnections, unsigned int *readConnectionsSize, unsigned int *writeConnectionsSize, unsigned int *serviceSocketReady);
-void addSocketHandleSocketsSetServiceSelect(struct ServiceSelect_t *serviceSelect, SOCKET_HANDLE socketHandle, fd_set *socketsSet);
-void removeSocketHandleSocketsSetServiceSelect(struct ServiceSelect_t *serviceSelect, SOCKET_HANDLE socketHandle, fd_set *socketsSet);
+void addSocketHandleSocketsSetServiceSelect(struct ServiceSelect_t *serviceSelect, SOCKET_HANDLE socketHandle, SOCKET_SET *socketsSet);
+void removeSocketHandleSocketsSetServiceSelect(struct ServiceSelect_t *serviceSelect, SOCKET_HANDLE socketHandle, SOCKET_SET *socketsSet);

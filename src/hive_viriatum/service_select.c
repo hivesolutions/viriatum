@@ -43,16 +43,16 @@ void createServiceSelect(struct ServiceSelect_t **serviceSelectPointer) {
     serviceSelect->socketsSetHighest = 0;
 
     /* zeros the sockets read set */
-    FD_ZERO(&serviceSelect->socketsReadSet);
+    SOCKET_SET_ZERO(&serviceSelect->socketsReadSet);
 
     /* zeros the sockets write set */
-    FD_ZERO(&serviceSelect->socketsWriteSet);
+    SOCKET_SET_ZERO(&serviceSelect->socketsWriteSet);
 
     /* zeros the sockets read set temporary */
-    FD_ZERO(&serviceSelect->socketsReadSetTemporary);
+    SOCKET_SET_ZERO(&serviceSelect->socketsReadSetTemporary);
 
     /* zeros the sockets write set temporary */
-    FD_ZERO(&serviceSelect->socketsWriteSetTemporary);
+    SOCKET_SET_ZERO(&serviceSelect->socketsWriteSetTemporary);
 
     /* sets the default timeout */
     serviceSelect->selectTimeout.tv_sec = 10;
@@ -171,7 +171,7 @@ void httpWriteHandler(struct ServiceSelect_t *serviceSelect, struct Connection_t
     /* in case there is no error */
     if(error == 0) {
         /* VALOR HARDCODAD FAZER ISTO DE UMA MELHOR MANEIRA */
-        FD_CLR(connection->socketHandle, &serviceSelect->socketsWriteSet);
+        SOCKET_SET_CLEAR(connection->socketHandle, &serviceSelect->socketsWriteSet);
         connection->writeRegistered = 0;
     }
     /* otherwise an error occurred */
@@ -329,7 +329,7 @@ void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_
     DEBUG("Entering select statement\n");
 
     /* runs the select over the sockets set */
-    selectCount = select(serviceSelect->socketsSetHighest + 1, &serviceSelect->socketsReadSetTemporary, &serviceSelect->socketsWriteSetTemporary, NULL, &serviceSelect->selectTimeoutTemporary);
+    selectCount = SOCKET_SELECT(serviceSelect->socketsSetHighest + 1, &serviceSelect->socketsReadSetTemporary, &serviceSelect->socketsWriteSetTemporary, NULL, &serviceSelect->selectTimeoutTemporary);
 
     /* prints a debug message */
     DEBUG_F("Exiting select statement with value: %d\n", selectCount);
@@ -342,7 +342,7 @@ void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_
 
     /* in case the service socket handle is set in
     the sockets read ready set */
-    if(FD_ISSET(serviceSelect->service->serviceSocketHandle, &serviceSelect->socketsReadSetTemporary) > 0)  {
+    if(SOCKET_SET_IS_SET(serviceSelect->service->serviceSocketHandle, &serviceSelect->socketsReadSetTemporary) > 0)  {
         /* sets the service socket ready to one */
         *serviceSocketReady = 1;
 
@@ -375,7 +375,7 @@ void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_
 
         /* in case the current connection socket handle is set in
         the sockets read ready set */
-        if(FD_ISSET(currentConnection->socketHandle, &serviceSelect->socketsReadSetTemporary) > 0)  {
+        if(SOCKET_SET_IS_SET(currentConnection->socketHandle, &serviceSelect->socketsReadSetTemporary) > 0)  {
             /* sets the current connection in the read connections */
             readConnections[readIndex] = currentConnection;
 
@@ -388,7 +388,7 @@ void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_
 
         /* in case the current connection socket handle is set in
         the sockets write ready set */
-        if(FD_ISSET(currentConnection->socketHandle, &serviceSelect->socketsWriteSetTemporary) > 0)  {
+        if(SOCKET_SET_IS_SET(currentConnection->socketHandle, &serviceSelect->socketsWriteSetTemporary) > 0)  {
             /* sets the current connection in the write connections */
             writeConnections[writeIndex] = currentConnection;
 
@@ -413,7 +413,7 @@ void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_
     *writeConnectionsSize = writeIndex;
 }
 
-void addSocketHandleSocketsSetServiceSelect(struct ServiceSelect_t *serviceSelect, SOCKET_HANDLE socketHandle, fd_set *socketsSet) {
+void addSocketHandleSocketsSetServiceSelect(struct ServiceSelect_t *serviceSelect, SOCKET_HANDLE socketHandle, SOCKET_SET *socketsSet) {
     /* in case the current socket handle is bigger than the service
     select sockets set highest value */
     if(socketHandle > serviceSelect->socketsSetHighest) {
@@ -422,10 +422,10 @@ void addSocketHandleSocketsSetServiceSelect(struct ServiceSelect_t *serviceSelec
     }
 
     /* adds the socket handle to the sockets set */
-    FD_SET(socketHandle, socketsSet);
+    SOCKET_SET_SET(socketHandle, socketsSet);
 }
 
-void removeSocketHandleSocketsSetServiceSelect(struct ServiceSelect_t *serviceSelect, SOCKET_HANDLE socketHandle, fd_set *socketsSet) {
+void removeSocketHandleSocketsSetServiceSelect(struct ServiceSelect_t *serviceSelect, SOCKET_HANDLE socketHandle, SOCKET_SET *socketsSet) {
     /* removes the socket handle from the sockets set */
-    FD_CLR(socketHandle, socketsSet);
+    SOCKET_SET_CLEAR(socketHandle, socketsSet);
 }
