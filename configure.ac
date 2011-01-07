@@ -68,9 +68,7 @@ m4_include([m4/variables.m4])
 m4_include([m4/poll.m4])
 m4_include([m4/epoll.m4])
 
-m4_include([m4/have_validation.m4])
 m4_include([m4/poll_methods.m4])
+m4_include([m4/have_validation.m4])
+m4_include([m4/output.m4])
 m4_include([m4/message.m4])
-
-# sets the entry point make files to be used by automake
-AC_OUTPUT([Makefile src/Makefile src/hive_viriatum_commons/Makefile src/hive_viriatum/Makefile lib/Makefile m4/Makefile doc/Makefile man/Makefile examples/Makefile scripts/Makefile])
