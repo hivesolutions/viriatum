@@ -26,24 +26,19 @@
 
 AC_PREREQ(2.61)
 
-m4_define([cherokee_major_version], [1])
-m4_define([cherokee_minor_version], [0])
-m4_define([cherokee_micro_version], [16])
-m4_define([cherokee_version], m4_format('%s:%s:%s', cherokee_major_version, cherokee_minor_version, cherokee_micro_version))
+m4_define([viriatum_major_version], [1])
+m4_define([viriatum_minor_version], [0])
+m4_define([viriatum_micro_version], [0])
+m4_define([viriatum_version], m4_format('%s.%s.%s', viriatum_major_version, viriatum_minor_version, viriatum_micro_version))
 
-
-
-AC_INIT(hive_viriatum, 1.0, development@hive.pt)
-AM_INIT_AUTOMAKE(hive_viriatum, 1.0)
+AC_INIT(hive_viriatum, cherokee_version, development@hive.pt)
+AM_INIT_AUTOMAKE(hive_viriatum, cherokee_version)
 AC_CONFIG_SRCDIR([src])
 AC_CONFIG_HEADERS([src/config.h])
 AC_CONFIG_MACRO_DIR([m4])
 LT_INIT
 AC_PROG_LIBTOOL
 AM_PROG_LIBTOOL
-
-# defines the static values
-AC_DEFINE(VIRIATUM_COMMONS_LIBRARY_VERSION, "1:0:0", "Viriatm commons library version")
 
 # checks for programs
 AC_PROG_CC
@@ -115,7 +110,7 @@ AC_CHECK_FUNCS([floor memset])
 AC_CONFIG_FILES([src/hive_viriatum_commons/Makefile src/hive_viriatum/Makefile])
 
 # sets the entry point make files to be used by automake
-AC_OUTPUT([Makefile src/Makefile lib/Makefile doc/Makefile man/Makefile examples/Makefile scripts/Makefile])
+AC_OUTPUT([Makefile src/Makefile src/hive_viriatum_commons/Makefile src/hive_viriatum/Makefile lib/Makefile doc/Makefile man/Makefile examples/Makefile scripts/Makefile])
 
 
 
