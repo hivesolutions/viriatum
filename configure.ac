@@ -23,7 +23,16 @@
 # __copyright__ = Copyright (c) 2008 Hive Solutions Lda.
 # __license__   = GNU General Public License (GPL), Version 3
 
+
 AC_PREREQ(2.61)
+
+m4_define([cherokee_major_version], [1])
+m4_define([cherokee_minor_version], [0])
+m4_define([cherokee_micro_version], [16])
+m4_define([cherokee_version], m4_format('%s.%s.%s', cherokee_major_version, cherokee_minor_version, cherokee_micro_version))
+
+
+
 AC_INIT(hive_viriatum, 1.0, development@hive.pt)
 AM_INIT_AUTOMAKE(hive_viriatum, 1.0)
 AC_CONFIG_SRCDIR([src])
