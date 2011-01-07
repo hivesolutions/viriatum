@@ -33,8 +33,8 @@
 #endif
 
 #ifndef VIRIATUM_DEBUG
-#define DEBUG(format)
-#define DEBUG_F(format, ...)
+#define DEBUG(format) dump(format)
+#define DEBUG_F(format, ...) dumpMultiple(format, __VA_ARGS__)
 #endif
 
 void debug(const char *format, ...);
