@@ -84,10 +84,6 @@ AC_CHECK_FUNCS([floor memset])
 AC_OUTPUT([Makefile src/Makefile src/hive_viriatum_commons/Makefile src/hive_viriatum/Makefile lib/Makefile m4/Makefile doc/Makefile man/Makefile examples/Makefile scripts/Makefile])
 
 
-
-
-
-
 if test "$have_epoll" = yes; then
     AC_DEFINE(HAVE_EPOLL, 1, [Define to 1 if you have the epoll])
 fi
