@@ -117,6 +117,15 @@ if test "$have_win32_select" = yes; then methods="${methods}win32 "; fi
 if test "$have_select" = yes; then methods="${methods}select"; fi
 
 
+if test "$have_epoll" = yes; then
+    AC_DEFINE(HAVE_EPOLL, 1, [Have epoll])
+fi
+
+
+AM_CONDITIONAL(COMPILE_EPOLL, test x"$have_epoll" = "xyes")
+
+
+
 echo
 echo ============================
 echo "Host                  $host_os"
