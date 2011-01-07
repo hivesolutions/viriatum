@@ -26,6 +26,10 @@
 # requires autoconf
 AC_PREREQ(2.61)
 
+# requires libtool
+AC_PROG_LIBTOOL
+AM_PROG_LIBTOOL
+
 m4_include([m4/settings.m4])
 m4_include([m4/initialization.m4])
 m4_include([m4/exports.m4])
