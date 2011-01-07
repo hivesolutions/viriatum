@@ -34,7 +34,7 @@ AC_PROG_LIBTOOL
 AM_PROG_LIBTOOL
 
 # defines the static values
-AC_DEFINE(VIRIATUM_COMMONS_LIBRARY_VERSION, "1:0:0")
+AC_DEFINE(VIRIATUM_COMMONS_LIBRARY_VERSION, "1:0:0", "Viriatm commons library version")
 
 # checks for programs
 AC_PROG_CC
@@ -121,7 +121,7 @@ if test "$have_select" = yes; then methods="${methods}select"; fi
 
 
 if test "$have_epoll" = yes; then
-    AC_DEFINE(HAVE_EPOLL, 1, [Define to 1 if you have the epoll.])
+    AC_DEFINE(HAVE_EPOLL, 1, [Define to 1 if you have the epoll])
 fi
 
 AM_CONDITIONAL(COMPILE_EPOLL, test x"$have_epoll" = "xyes")
