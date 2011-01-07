@@ -67,7 +67,6 @@ m4_include([m4/functions.m4])
 m4_include([m4/variables.m4])
 m4_include([m4/poll.m4])
 m4_include([m4/epoll.m4])
-
 m4_include([m4/poll_methods.m4])
 m4_include([m4/have_validation.m4])
 m4_include([m4/output.m4])
