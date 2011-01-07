@@ -36,7 +36,7 @@ for poll_method in $poll_methods; do
     index=$((index+1))
 done
 echo
-echo "+ ---                                   --- +"
+echo "+ - - - - - - - - - - - - - - - - - - - - - -+"
 echo
 echo "Run 'make install' to install Viriatum."
 echo
