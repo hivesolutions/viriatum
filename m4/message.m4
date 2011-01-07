@@ -24,13 +24,6 @@
 # __license__   = GNU General Public License (GPL), Version 3
 
 echo
-echo "+------------------------------------------------------------------+"
-echo "| License:                                                         |"
-echo "| This software is subject to the GPL License, available in this   |"
-echo "| distribution in the file COPYING. Please, remember that any copy |"
-echo "| distribution or modification of the software is subject to it.   |"
-echo "+------------------------------------------------------------------+"
-echo
 echo +-------------- CONFIGURATION --------------+
 echo
 echo "  Host                  $host_os"
