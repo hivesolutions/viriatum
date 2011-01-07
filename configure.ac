@@ -56,6 +56,7 @@ AC_CHECK_HEADERS([stdlib.h])
 
 # checks for typedefs, structures, and compiler characteristics
 AC_HEADER_STDBOOL
+AC_PROG_CC_C99
 AC_C_INLINE
 AC_TYPE_SIZE_T
 
