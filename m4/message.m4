@@ -23,20 +23,21 @@
 # __copyright__ = Copyright (c) 2008 Hive Solutions Lda.
 # __license__   = GNU General Public License (GPL), Version 3
 
+echo "System Configuration"
+echo "========================"
 echo
-echo +-------------- CONFIGURATION --------------+
-echo
-echo "  Host                  $host_os"
-echo "  Install prefix        $prefix"
-echo "  CFLAGS                $CFLAGS"
-echo "  Python                $have_python"
+echo " + Host                  $host_os"
+echo " + Install prefix        $prefix"
+echo " + CFLAGS                $CFLAGS"
+echo " + Python                $have_python"
 index=1
 for poll_method in $poll_methods; do
-    echo "  Polling method $index      $poll_method"
+    echo " + Polling method $index      $poll_method"
     index=$((index+1))
 done
 echo
-echo +-------------------------------------------+
+echo Instructions
+echo "========================"
 echo
 echo "Run 'make install' to install Viriatum."
 echo "Thank you for using Viriatum."
