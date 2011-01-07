@@ -73,3 +73,21 @@ AC_CONFIG_FILES([src/hive_viriatum_commons/Makefile src/hive_viriatum/Makefile])
 
 # sets the entry point make files to be used by automake
 AC_OUTPUT([Makefile src/Makefile lib/Makefile doc/Makefile man/Makefile examples/Makefile scripts/Makefile])
+
+esac
+echo
+echo ============================
+echo "Host                  $host_os"
+echo "Install prefix        $prefix"
+echo "CFLAGS                $CFLAGS"
+
+cat <<EOF
++------------------------------------------------------------------+
+| License:                                                         |
+| This software is subject to the GPL License, available in this   |
+| distribution in the file COPYING. Please, remember that any copy |
+| distribution or modification of the software is subject to it.   |
++------------------------------------------------------------------+
+
+Thank you for using Viriatum.
+EOF
