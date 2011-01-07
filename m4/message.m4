@@ -25,13 +25,13 @@
 
 echo
 echo +-------------- CONFIGURATION --------------+
-echo " Host                  $host_os"
-echo " Install prefix        $prefix"
-echo " CFLAGS                $CFLAGS"
-echo " Python                $have_python"
+echo "  Host                  $host_os"
+echo "  Install prefix        $prefix"
+echo "  CFLAGS                $CFLAGS"
+echo "  Python                $have_python"
 index=1
 for poll_method in $poll_methods; do
-    echo " Polling method $index      $poll_method"
+    echo "  Polling method $index      $poll_method"
     index=$((index+1))
 done
 echo +-------------------------------------------+
