@@ -57,10 +57,6 @@ AC_PROG_CC_C99
 AC_PROG_MAKE_SET
 
 
-
-
-
-
 # checks for programs
 AC_PATH_PROGS(PYTHON, python python2.7 python2.6 python2.5 python2.4)
 
@@ -85,18 +81,11 @@ AC_FUNC_MALLOC
 AC_CHECK_FUNCS([floor memset])
 
 # sets the entry point make files to be used by automake
-AC_OUTPUT([Makefile src/Makefile src/hive_viriatum_commons/Makefile src/hive_viriatum/Makefile lib/Makefile doc/Makefile man/Makefile examples/Makefile scripts/Makefile])
+AC_OUTPUT([Makefile src/Makefile src/hive_viriatum_commons/Makefile src/hive_viriatum/Makefile lib/Makefile m4/Makefile doc/Makefile man/Makefile examples/Makefile scripts/Makefile])
 
 
 
 
-methods=""
-if test "$have_epoll" = yes; then methods="${methods}epoll "; fi
-if test "$have_kqueue" = yes; then methods="${methods}kqueue "; fi
-if test "$have_poll" = yes; then methods="${methods}poll "; fi
-if test "$have_port" = yes; then methods="${methods}port "; fi
-if test "$have_win32_select" = yes; then methods="${methods}win32 "; fi
-if test "$have_select" = yes; then methods="${methods}select"; fi
 
 
 if test "$have_epoll" = yes; then
@@ -106,28 +95,5 @@ fi
 AM_CONDITIONAL(COMPILE_EPOLL, test x"$have_epoll" = "xyes")
 
 
-
-
-
-echo
-echo ============================
-echo "Host                  $host_os"
-echo "Install prefix        $prefix"
-echo "CFLAGS                $CFLAGS"
-echo "Python                $have_python"
-index=1
-for method in $methods; do
-    echo "Polling method $index      $method"
-    index=$((index+1))
-done
-echo
-cat <<EOF
-+------------------------------------------------------------------+
-| License:                                                         |
-| This software is subject to the GPL License, available in this   |
-| distribution in the file COPYING. Please, remember that any copy |
-| distribution or modification of the software is subject to it.   |
-+------------------------------------------------------------------+
-
-Thank you for using Viriatum.
-EOF
+m4_include([m4/poll_methods.m4])
+m4_include([m4/message.m4])
