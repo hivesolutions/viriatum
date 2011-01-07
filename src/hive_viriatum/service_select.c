@@ -104,7 +104,7 @@ void httpReadHandler(struct ServiceSelect_t *serviceSelect, struct Connection_t 
     responseBuffer = (char *) malloc(1024);
 
     /* writes the http static headers to the response */
-    SPRINTF(responseBuffer, 1024, "HTTP/1.1 200 OK\r\nServer: viriatum/1.0.0\r\nContent-Length: %d\r\n\r\nhello world", strlen("hello world"));
+    SPRINTF(responseBuffer, 1024, "HTTP/1.1 200 OK\r\nServer: viriatum/1.0.0\r\nContent-Length: %ud\r\n\r\nhello world", strlen("hello world"));
 
     /* adds the response buffer to the write queue */
     appendValueLinkedList(connection->writeQueue, (void *) responseBuffer);
