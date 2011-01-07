@@ -22,9 +22,3 @@
 # __date__      = $LastChangedDate: 2009-04-02 08:36:50 +0100 (qui, 02 Abr 2009) $
 # __copyright__ = Copyright (c) 2008 Hive Solutions Lda.
 # __license__   = GNU General Public License (GPL), Version 3
-
-# sets the initialization settings
-AC_CONFIG_SRCDIR([src])
-AC_CONFIG_HEADERS([src/config.h])
-AC_CONFIG_MACRO_DIR([m4])
-LT_INIT
