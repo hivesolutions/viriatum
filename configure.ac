@@ -79,13 +79,29 @@ AC_CONFIG_FILES([src/hive_viriatum_commons/Makefile src/hive_viriatum/Makefile])
 # sets the entry point make files to be used by automake
 AC_OUTPUT([Makefile src/Makefile lib/Makefile doc/Makefile man/Makefile examples/Makefile scripts/Makefile])
 
+
+
+
+methods=""
+if test "$have_epoll" = yes; then methods="${methods}epoll "; fi
+if test "$have_kqueue" = yes; then methods="${methods}kqueue "; fi
+if test "$have_poll" = yes; then methods="${methods}poll "; fi
+if test "$have_port" = yes; then methods="${methods}port "; fi
+if test "$have_win32_select" = yes; then methods="${methods}win32 "; fi
+if test "$have_select" = yes; then methods="${methods}select"; fi
+
+
 echo
 echo ============================
 echo "Host                  $host_os"
 echo "Install prefix        $prefix"
 echo "CFLAGS                $CFLAGS"
 echo "Python                $have_python"
-
+index=1
+for method in $methods; do
+    echo "Polling method $i      $method"
+    index='expr $index + 1'
+done
 echo
 cat <<EOF
 +------------------------------------------------------------------+
