@@ -39,6 +39,11 @@ AM_PROG_CC_C_O
 AC_PROG_CC_C99
 AC_PROG_MAKE_SET
 
+have_python="yes"
+
+# checks for programs
+AC_PATH_PROGS(PYTHON, python python2.7 python2.6 python2.5 python2.4)
+
 # checks for libraries
 AC_CHECK_LIB([pthread], [main], [], [AC_MSG_ERROR(can't build without POSIX threads (libpthread) libraries)])
 AC_CHECK_LIB([viriatum], [main])
@@ -79,7 +84,9 @@ echo ============================
 echo "Host                  $host_os"
 echo "Install prefix        $prefix"
 echo "CFLAGS                $CFLAGS"
+echo "Python                $have_python"
 
+echo
 cat <<EOF
 +------------------------------------------------------------------+
 | License:                                                         |
