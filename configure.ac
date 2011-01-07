@@ -137,9 +137,6 @@ AC_TYPE_SIZE_T
 AC_FUNC_MALLOC
 AC_CHECK_FUNCS([floor memset])
 
-# sets the config files to be used in automake
-AC_CONFIG_FILES([])
-
 # sets the entry point make files to be used by automake
 AC_OUTPUT([Makefile src/Makefile src/hive_viriatum_commons/Makefile src/hive_viriatum/Makefile lib/Makefile doc/Makefile man/Makefile examples/Makefile scripts/Makefile])
 
