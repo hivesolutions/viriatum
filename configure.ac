@@ -56,16 +56,17 @@ AM_PROG_CC_C_O
 AC_PROG_CC_C99
 AC_PROG_MAKE_SET
 
+# checks for typedefs, structures, and compiler characteristics
+AC_HEADER_STDBOOL
+AC_C_INLINE
+AC_TYPE_SIZE_T
+
 m4_include([m4/libraries.m4])
 m4_include([m4/headers.m4])
 m4_include([m4/variables.m4])
 m4_include([m4/poll.m4])
 m4_include([m4/epoll.m4])
 
-# checks for typedefs, structures, and compiler characteristics
-AC_HEADER_STDBOOL
-AC_C_INLINE
-AC_TYPE_SIZE_T
 
 # checks for library functions
 AC_FUNC_MALLOC
