@@ -23,13 +23,17 @@
 # __copyright__ = Copyright (c) 2008 Hive Solutions Lda.
 # __license__   = GNU General Public License (GPL), Version 3
 
+major_version = 1
+minor_version = 0
+micro_version = 0
+
 # requires autoconf
 AC_PREREQ(2.61)
 
 # defines the version values
-m4_define([viriatum_major_version], [1])
-m4_define([viriatum_minor_version], [0])
-m4_define([viriatum_micro_version], [0])
+m4_define([viriatum_major_version], [$major_version])
+m4_define([viriatum_minor_version], [$minor_version])
+m4_define([viriatum_micro_version], [$micro_version])
 m4_define([viriatum_version], m4_format('%s.%s.%s', viriatum_major_version, viriatum_minor_version, viriatum_micro_version))
 
 # defines the general values
@@ -53,9 +57,9 @@ AM_PROG_LIBTOOL
 #AC_SUBST(PACKAGE_MINOR_VERSION)
 #AC_SUBST(PACKAGE_MICRO_VERSION)
 
-VIRIATUM_AGE=$viriatum_major_version
-VIRIATUM_CURRENT=$viriatum_minor_version
-VIRIATUM_REVISION=$viriatum_micro_version
+VIRIATUM_AGE=$major_version
+VIRIATUM_CURRENT=$minor_version
+VIRIATUM_REVISION=$micro_version
 AC_SUBST(VIRIATUM_AGE)
 AC_SUBST(VIRIATUM_CURRENT)
 AC_SUBST(VIRIATUM_REVISION)
