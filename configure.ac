@@ -74,7 +74,6 @@ AC_CONFIG_FILES([src/hive_viriatum_commons/Makefile src/hive_viriatum/Makefile])
 # sets the entry point make files to be used by automake
 AC_OUTPUT([Makefile src/Makefile lib/Makefile doc/Makefile man/Makefile examples/Makefile scripts/Makefile])
 
-esac
 echo
 echo ============================
 echo "Host                  $host_os"
