@@ -33,3 +33,9 @@
 #endif
 
 #include "../hive_viriatum_commons/viriatum_commons.h"
+
+unsigned char *_name();
+unsigned char *_version();
+
+void dump(argument);
+void dumpMultiple(argument, ...);

@@ -72,3 +72,9 @@
 #include <string.h>
 #include <time.h>
 #include <math.h>
+
+unsigned char *_name();
+unsigned char *_version();
+
+void dump(argument);
+void dumpMultiple(argument, ...);
