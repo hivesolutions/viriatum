@@ -27,4 +27,4 @@
 m4_define([viriatum_major_version], [1])
 m4_define([viriatum_minor_version], [0])
 m4_define([viriatum_micro_version], [0])
-m4_define([viriatum_version], m4_format('%s.%s.%s', viriatum_major_version, viriatum_minor_version, viriatum_micro_version))
+m4_define([viriatum_version], m4_format("%s.%s.%s", viriatum_major_version, viriatum_minor_version, viriatum_micro_version))
