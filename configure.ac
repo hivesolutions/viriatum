@@ -87,7 +87,7 @@ AC_CHECK_HEADER(sys/epoll.h, have_epoll_include=yes, have_epoll_include=no)
 AC_ARG_ENABLE(epoll, AC_HELP_STRING([--disable-epoll], [Disable epoll() support]), wants_epoll="$enableval", wants_epoll="yes")
 
 # in case the user wants epoll and the system has epoll
-if test "xhave_epoll_include" = "xyes" && test "$wants_epoll" = "yes"; then
+if test "x$have_epoll_include" = "xyes" && test "x$wants_epoll" = "xyes"; then
 	AC_MSG_CHECKING(for epoll system call)
 	AC_RUN_IFELSE([
                    #include <stdint.h>
@@ -138,7 +138,7 @@ if test "$have_epoll" = yes; then
     AC_DEFINE(HAVE_EPOLL, 1, [Define to 1 if you have the epoll])
 fi
 
-AM_CONDITIONAL(COMPILE_EPOLL, test "$have_epoll" = "yes")
+AM_CONDITIONAL(COMPILE_EPOLL, test x"$have_epoll" = "xyes")
 
 
 
