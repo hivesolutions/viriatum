@@ -27,5 +27,10 @@
 
 #pragma once
 
+#ifndef DUMP_UTIL_H
+#define DUMP_UTIL_H
+
 __inline void dump(void *argument) { }
 __inline void dumpMultiple(void *argument, ...) { }
+
+#endif
