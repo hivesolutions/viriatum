@@ -59,7 +59,7 @@ AC_PROG_MAKE_SET
 
 
 
-have_python="yes"
+
 
 # checks for programs
 AC_PATH_PROGS(PYTHON, python python2.7 python2.6 python2.5 python2.4)
@@ -71,14 +71,8 @@ AC_CHECK_LIB([viriatum], [main])
 # checks for header files
 AC_CHECK_HEADERS([stdlib.h])
 
-
-
-# checks for polling methods
-AC_CHECK_FUNC(poll, have_poll=yes)
-AC_CHECK_FUNC(kqueue, have_kqueue=yes)
-AC_CHECK_FUNC(select, have_select=yes)
-
-
+m4_include([m4/variables.m4])
+m4_include([m4/poll.m4])
 m4_include([m4/epoll.m4])
 
 # checks for typedefs, structures, and compiler characteristics
