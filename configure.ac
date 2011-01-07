@@ -29,9 +29,6 @@ AC_PREREQ(2.61)
 m4_include([m4/settings.m4])
 m4_include([m4/initialization.m4])
 m4_include([m4/exports.m4])
-
-
-
 m4_include([m4/programs.m4])
 m4_include([m4/characteristics.m4])
 m4_include([m4/libraries.m4])
