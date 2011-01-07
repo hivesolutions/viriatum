@@ -36,6 +36,7 @@ AM_PROG_LIBTOOL
 # checks for programs
 AC_PROG_CC
 AM_PROG_CC_C_O
+AC_PROG_CC_C99
 AC_PROG_MAKE_SET
 
 # checks for libraries
@@ -56,7 +57,6 @@ AC_CHECK_HEADERS([stdlib.h])
 
 # checks for typedefs, structures, and compiler characteristics
 AC_HEADER_STDBOOL
-AC_PROG_CC_C99
 AC_C_INLINE
 AC_TYPE_SIZE_T
 
