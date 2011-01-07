@@ -38,7 +38,7 @@ done
 echo
 echo +-------------------------------------------+
 echo
-echo "Run 'make install' to install Viriatum.
+echo "Run 'make install' to install Viriatum."
 echo
 echo +-------------------------------------------+
 echo
