@@ -23,10 +23,11 @@
 # __copyright__ = Copyright (c) 2008 Hive Solutions Lda.
 # __license__   = GNU General Public License (GPL), Version 3
 
+# inclides the settings
+m4_include([m4/settings.m4])
+
 # requires autoconf
 AC_PREREQ(2.61)
-
-m4_include([m4/settings.m4])
 
 # defines the general values
 AC_INIT(hive_viriatum, viriatum_version, development@hive.pt)
@@ -34,12 +35,11 @@ AM_INIT_AUTOMAKE(hive_viriatum, viriatum_version)
 AC_CONFIG_SRCDIR([src])
 AC_CONFIG_HEADERS([src/config.h])
 AC_CONFIG_MACRO_DIR([m4])
-LT_INIT
 
-# requires libtool
+# requires the libtool
+LT_INIT
 AC_PROG_LIBTOOL
 AM_PROG_LIBTOOL
-
 
 m4_include([m4/initialization.m4])
 m4_include([m4/exports.m4])
