@@ -126,7 +126,7 @@ echo "Python                $have_python"
 index=1
 for method in $methods; do
     echo "Polling method $index      $method"
-    index=$index + 1
+    index=`expr $index + 1`
 done
 echo
 cat <<EOF
