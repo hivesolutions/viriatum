@@ -23,7 +23,9 @@
 # __copyright__ = Copyright (c) 2008 Hive Solutions Lda.
 # __license__   = GNU General Public License (GPL), Version 3
 
+echo
 echo ============ CONFIGURATION ============
+echo
 echo "Host                  $host_os"
 echo "Install prefix        $prefix"
 echo "CFLAGS                $CFLAGS"
@@ -33,6 +35,7 @@ for poll_method in $poll_methods; do
     echo "Polling method $index      $poll_method"
     index=$((index+1))
 done
+echo
 echo =======================================
 echo
 cat <<EOS
