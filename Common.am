@@ -25,5 +25,3 @@
 
 AM_CFLAGS = -pedantic -finline-functions -Wall -Wno-long-long -Wno-variadic-macros -g
 AM_CXXFLAGS = -pedantic -finline-functions  -Wall -Wno-long-long -Wno-variadic-macros -g
-
-VIRIATUM_COMMONS_LIBRARY_VERSION = 1:0:0
