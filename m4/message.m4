@@ -24,7 +24,14 @@
 # __license__   = GNU General Public License (GPL), Version 3
 
 echo
-echo "+-------------- CONFIGURATION --------------+"
+echo +------------------------------------------------------------------+
+echo | License:                                                         |
+echo | This software is subject to the GPL License, available in this   |
+echo | distribution in the file COPYING. Please, remember that any copy |
+echo | distribution or modification of the software is subject to it.   |
+echo +------------------------------------------------------------------+
+echo
+echo +-------------- CONFIGURATION --------------+
 echo
 echo "  Host                  $host_os"
 echo "  Install prefix        $prefix"
@@ -36,17 +43,8 @@ for poll_method in $poll_methods; do
     index=$((index+1))
 done
 echo
-echo "+-------------------------------------------+"
+echo +-------------------------------------------+
 echo
 echo "Run 'make install' to install Viriatum."
+echo "Thank you for using Viriatum."
 echo
-cat <<EOS
-+------------------------------------------------------------------+
-| License:                                                         |
-| This software is subject to the GPL License, available in this   |
-| distribution in the file COPYING. Please, remember that any copy |
-| distribution or modification of the software is subject to it.   |
-+------------------------------------------------------------------+
-
-Thank you for using Viriatum.
-EOS
