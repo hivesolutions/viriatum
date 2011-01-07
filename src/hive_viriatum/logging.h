@@ -37,5 +37,4 @@
 #define DEBUG_F(format, ...)
 #endif
 
-
 void debug(const char *format, ...);
