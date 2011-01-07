@@ -43,17 +43,20 @@ AC_PROG_MAKE_SET
 AC_CHECK_LIB([pthread], [main], [], [AC_MSG_ERROR(can't build without POSIX threads (libpthread) libraries)])
 AC_CHECK_LIB([viriatum], [main])
 
-case "$host_os" in
-*linux*)
-    ;;    
-*darwin*)
-    ;;
-*)
-    ;;
-esac
-
 # checks for header files
 AC_CHECK_HEADERS([stdlib.h])
+
+# checks for the epoll
+AC_CHECK_HEADER(sys/epoll.h, have_epoll_include=yes, have_epoll_include=no)
+
+# checks if the user want epoll
+AC_ARG_ENABLE(epoll, AC_HELP_STRING([--disable-epoll],[Disable epoll() support]), wants_epoll="$enableval", wants_epoll="yes")
+
+if test "x$have_epoll_include" = "xyes" && test "x$wants_epoll" = "xyes"; then
+	AC_MSG_CHECKING(for epoll system call)
+	AC_RUN_IFELSE([], have_epoll=yes, have_epoll=no, have_epoll=yes)
+    AC_MSG_RESULT($have_epoll)
+fi
 
 # checks for typedefs, structures, and compiler characteristics
 AC_HEADER_STDBOOL
@@ -69,3 +72,14 @@ AC_CONFIG_FILES([src/hive_viriatum_commons/Makefile src/hive_viriatum/Makefile])
 
 # sets the entry point make files to be used by automake
 AC_OUTPUT([Makefile src/Makefile lib/Makefile doc/Makefile man/Makefile examples/Makefile scripts/Makefile])
+
+
+case "$host_os" in
+*linux*)
+	echo "Building for: 
+    ;;
+*darwin*)
+    ;;
+*)
+    ;;
+esac
