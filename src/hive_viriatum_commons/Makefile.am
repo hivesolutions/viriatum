@@ -35,7 +35,7 @@ libviriatum_a_CXXFLAGS = $(AM_CXXFLAGS)
 libviriatum_la_CFLAGS = $(AM_CFLAGS)
 libviriatum_la_CXXFLAGS = $(AM_CXXFLAGS)
 
-libviriatum_la_LDFLAGS = -version-info $(VIRIATUM_COMMONS_LIBRARY_VERSION)
+libviriatum_la_LDFLAGS = -version-info 1:0:0
 
 libviriatum_a_SOURCES = stdafx.c \
 checksum/crc_32.c \
