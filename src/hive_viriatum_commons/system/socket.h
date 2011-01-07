@@ -83,7 +83,7 @@
 #define SOCKET_PROTOCOL_UDP IPPROTO_UDP
 #define SOCKET_OPTIONS_LEVEL_SOCKET SOL_SOCKET
 #define SOCKET_OPTIONS_REUSE_ADDRESS_SOCKET SO_REUSEADDR
-#define SOCKET_INITIALIZE(socketData) dump(socketData)
+#define SOCKET_INITIALIZE(socketData) dump((void *) &socketData)
 #define SOCKET_FINISH()
 #define SOCKET_CREATE(type, streamType, protocolType) socket(type, streamType, protocolType)
 #define SOCKET_BIND(socketHandle, socketAddress) bind(socketHandle, (struct sockaddr *) &socketAddress, sizeof(SOCKET_ADDRESS))
