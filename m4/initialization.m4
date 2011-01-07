@@ -23,10 +23,3 @@
 # __copyright__ = Copyright (c) 2008 Hive Solutions Lda.
 # __license__   = GNU General Public License (GPL), Version 3
 
-# defines the general values
-AC_INIT(hive_viriatum, viriatum_version, development@hive.pt)
-AM_INIT_AUTOMAKE(hive_viriatum, viriatum_version)
-AC_CONFIG_SRCDIR([src])
-AC_CONFIG_HEADERS([src/config.h])
-AC_CONFIG_MACRO_DIR([m4])
-LT_INIT
