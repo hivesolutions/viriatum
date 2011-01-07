@@ -75,6 +75,3 @@
 
 unsigned char *_name();
 unsigned char *_version();
-
-void dump(void *argument);
-void dumpMultiple(void *argument, ...);

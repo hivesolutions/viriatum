@@ -32,6 +32,3 @@ static unsigned char version[] = "1.0.0";
 
 unsigned char *_name() { return name; }
 unsigned char *_version() { return version; }
-
-void dump(void *argument) { }
-void dumpMultiple(void *argument, ...) { }
