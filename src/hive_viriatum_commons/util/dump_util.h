@@ -30,7 +30,7 @@
 #ifndef DUMP_UTIL_H
 #define DUMP_UTIL_H
 
-inline void dump(void *argument) { }
-inline void dumpMultiple(void *argument, ...) { }
+__inline__ void dump(void *argument) { }
+__inline__ void dumpMultiple(void *argument, ...) { }
 
 #endif
