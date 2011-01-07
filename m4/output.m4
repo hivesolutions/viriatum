@@ -24,4 +24,4 @@
 # __license__   = GNU General Public License (GPL), Version 3
 
 # sets the entry point make files to be used by automake
-AC_OUTPUT([Makefile src/Makefile src/hive_viriatum_commons/Makefile src/hive_viriatum/Makefile lib/Makefile m4/Makefile doc/Makefile man/Makefile examples/Makefile scripts/Makefile])
+AC_OUTPUT([Makefile doc/Makefile examples/Makefile lib/Makefile m4/Makefile man/Makefile scripts/Makefile src/Makefile src/hive_viriatum_commons/Makefile src/hive_viriatum/Makefile])
