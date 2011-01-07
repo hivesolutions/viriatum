@@ -25,4 +25,4 @@
 
 # checks for library functions
 AC_FUNC_MALLOC
-AC_CHECK_FUNCS([printf, floor memset])
+AC_CHECK_FUNCS([floor memset])
