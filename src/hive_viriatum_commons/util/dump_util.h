@@ -27,5 +27,5 @@
 
 #pragma once
 
-__inline__ void dump(void *argument) { }
-__inline__ void dumpMultiple(void *argument, ...) { }
+inline void dump(void *argument) { }
+inline void dumpMultiple(void *argument, ...) { }
