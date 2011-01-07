@@ -25,7 +25,7 @@
 
 AC_PREREQ(2.61)
 AC_INIT(hive_viriatum, 1.0, development@hive.pt)
-AM_INIT_AUTOMAKE(hive_viriatum, 1.0)
+AM_INIT_AUTOMAKE(hive_viriatum, 1.2)
 AC_CONFIG_SRCDIR([src])
 AC_CONFIG_HEADERS([src/config.h])
 AC_CONFIG_MACRO_DIR([m4])
@@ -122,10 +122,6 @@ if test "$have_epoll" = yes; then
 fi
 
 AM_CONDITIONAL(COMPILE_EPOLL, test x"$have_epoll" = "xyes")
-
-
-AM_DEFINE(VIRIATUM_COMMONS_LIBRARY_VERSION, "1:0:0")
-
 
 echo
 echo ============================
