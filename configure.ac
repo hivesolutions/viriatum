@@ -23,14 +23,16 @@
 # __copyright__ = Copyright (c) 2008 Hive Solutions Lda.
 # __license__   = GNU General Public License (GPL), Version 3
 
-
+# requires autoconf
 AC_PREREQ(2.61)
 
+# defines the version values
 m4_define([viriatum_major_version], [1])
 m4_define([viriatum_minor_version], [0])
 m4_define([viriatum_micro_version], [0])
 m4_define([viriatum_version], m4_format('%s.%s.%s', viriatum_major_version, viriatum_minor_version, viriatum_micro_version))
 
+# defines the general values
 AC_INIT(hive_viriatum, cherokee_version, development@hive.pt)
 AM_INIT_AUTOMAKE(hive_viriatum, cherokee_version)
 AC_CONFIG_SRCDIR([src])
@@ -39,6 +41,11 @@ AC_CONFIG_MACRO_DIR([m4])
 LT_INIT
 AC_PROG_LIBTOOL
 AM_PROG_LIBTOOL
+
+# exports the package version
+AC_DEFINE(VIRIATUM_MAJOR_VERSION, viriatum_major_version, [Version string])
+AC_DEFINE(VIRIATUM_MINOR_VERSION, viriatum_minor_version, [Version string])
+AC_DEFINE(VIRIATUM_MICRO_VERSION, viriatum_version, [Version string])
 
 # checks for programs
 AC_PROG_CC
