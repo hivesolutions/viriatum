@@ -33,8 +33,8 @@ m4_define([viriatum_micro_version], [0])
 m4_define([viriatum_version], m4_format('%s.%s.%s', viriatum_major_version, viriatum_minor_version, viriatum_micro_version))
 
 # defines the general values
-AC_INIT(hive_viriatum, cherokee_version, development@hive.pt)
-AM_INIT_AUTOMAKE(hive_viriatum, cherokee_version)
+AC_INIT(hive_viriatum, viriatum_version, development@hive.pt)
+AM_INIT_AUTOMAKE(hive_viriatum, viriatum_version)
 AC_CONFIG_SRCDIR([src])
 AC_CONFIG_HEADERS([src/config.h])
 AC_CONFIG_MACRO_DIR([m4])
@@ -52,6 +52,9 @@ AC_PROG_CC
 AM_PROG_CC_C_O
 AC_PROG_CC_C99
 AC_PROG_MAKE_SET
+
+
+
 
 have_python="yes"
 
