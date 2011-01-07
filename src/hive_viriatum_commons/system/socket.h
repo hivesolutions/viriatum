@@ -44,6 +44,7 @@
 #define SOCKET_PROTOCOL_UDP IPPROTO_UDP
 #define SOCKET_OPTIONS_LEVEL_SOCKET SOL_SOCKET
 #define SOCKET_OPTIONS_REUSE_ADDRESS_SOCKET SO_REUSEADDR
+#define SOCKET_SET fd_set
 #define SOCKET_INITIALIZE(socketData) WSAStartup(MAKEWORD(2, 0), socketData)
 #define SOCKET_FINISH() WSACleanup()
 #define SOCKET_CREATE(type, streamType, protocolType) socket(type, streamType, protocolType)
@@ -63,6 +64,11 @@
 #define SOCKET_SEND(socketHandle, buffer, length, flags) send(socketHandle, buffer, length, flags)
 #define SOCKET_RECEIVE(socketHandle, buffer, length, flags) recv(socketHandle, buffer, length, flags)
 #define SOCKET_SET_OPTIONS(socketHandle, level, optionName, optionValue) setsockopt(socketHandle, level, optionName, &optionValue, sizeof(optionValue))
+#define SOCKET_SELECT(numberSocket, socketsReadSet, socketsWriteSet, socketsExceptionSet, timeout) select(numberSocket, socketsReadSet, socketsWriteSet, socketsExceptionSet, timeout)
+#define SOCKET_SET_ZERO(socketsSet) FD_ZERO(socketsSet)
+#define SOCKET_SET_SET(socketHandle, socketsSet) FD_SET(socketHandle, socketsSet)
+#define SOCKET_SET_CLEAR(socketHandle, socketsSet) FD_CLR(socketHandle, socketsSet)
+#define SOCKET_SET_IS_SET(socketHandle, socketsSet) FD_ISSET(socketHandle, socketsSet)
 #endif
 
 #ifdef VIRIATUM_PLATFORM_UNIX
@@ -83,6 +89,7 @@
 #define SOCKET_PROTOCOL_UDP IPPROTO_UDP
 #define SOCKET_OPTIONS_LEVEL_SOCKET SOL_SOCKET
 #define SOCKET_OPTIONS_REUSE_ADDRESS_SOCKET SO_REUSEADDR
+#define SOCKET_SET fd_set
 #define SOCKET_INITIALIZE(socketData) dump((void *) socketData)
 #define SOCKET_FINISH()
 #define SOCKET_CREATE(type, streamType, protocolType) socket(type, streamType, protocolType)
@@ -102,4 +109,9 @@
 #define SOCKET_SEND(socketHandle, buffer, length, flags) write(socketHandle, buffer, length)
 #define SOCKET_RECEIVE(socketHandle, buffer, length, flags) read(socketHandle, buffer, length)
 #define SOCKET_SET_OPTIONS(socketHandle, level, optionName, optionValue) setsockopt(socketHandle, level, optionName, &optionValue, sizeof(optionValue))
+#define SOCKET_SELECT(numberSocket, socketsReadSet, socketsWriteSet, socketsExceptionSet, timeout) select(numberSocket, socketsReadSet, socketsWriteSet, socketsExceptionSet, timeout)
+#define SOCKET_SET_ZERO(socketsSet) FD_ZERO(socketsSet)
+#define SOCKET_SET_SET(socketHandle, socketsSet) FD_SET(socketHandle, socketsSet)
+#define SOCKET_SET_CLEAR(socketHandle, socketsSet) FD_CLR(socketHandle, socketsSet)
+#define SOCKET_SET_IS_SET(socketHandle, socketsSet) FD_ISSET(socketHandle, socketsSet)
 #endif
