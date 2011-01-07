@@ -42,15 +42,13 @@ LT_INIT
 AC_PROG_LIBTOOL
 AM_PROG_LIBTOOL
 
+# exports the version definitions to automake
 VIRIATUM_MAJOR_VERSION=1
 VIRIATUM_MINOR_VERSION=0
 VIRIATUM_MICRO_VERSION=0
 AC_SUBST(VIRIATUM_MAJOR_VERSION)
 AC_SUBST(VIRIATUM_MINOR_VERSION)
 AC_SUBST(VIRIATUM_MICRO_VERSION)
-
-AC_DEFINE_UNQUOTED(CHEROKEE_CONFIG_ARGS, "$ac_configure_args", [configure arguments])
-
 
 # checks for programs
 AC_PROG_CC
@@ -89,7 +87,7 @@ AC_CHECK_HEADER(sys/epoll.h, have_epoll_include=yes, have_epoll_include=no)
 AC_ARG_ENABLE(epoll, AC_HELP_STRING([--disable-epoll], [Disable epoll() support]), wants_epoll="$enableval", wants_epoll="yes")
 
 # in case the user wants epoll and the system has epoll
-if test "x$have_epoll_include" = "xyes" && test "x$wants_epoll" = "xyes"; then
+if test "xhave_epoll_include" = "xyes" && test "$wants_epoll" = "yes"; then
 	AC_MSG_CHECKING(for epoll system call)
 	AC_RUN_IFELSE([
                    #include <stdint.h>
@@ -140,7 +138,7 @@ if test "$have_epoll" = yes; then
     AC_DEFINE(HAVE_EPOLL, 1, [Define to 1 if you have the epoll])
 fi
 
-AM_CONDITIONAL(COMPILE_EPOLL, test x"$have_epoll" = "xyes")
+AM_CONDITIONAL(COMPILE_EPOLL, test "$have_epoll" = "yes")
 
 
 
