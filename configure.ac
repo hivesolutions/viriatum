@@ -51,6 +51,15 @@ AC_CHECK_LIB([viriatum], [main])
 # checks for header files
 AC_CHECK_HEADERS([stdlib.h])
 
+
+
+# checks for epoll
+AC_CHECK_FUNC(poll, have_poll=yes)
+AC_CHECK_FUNC(kqueue, have_kqueue=yes)
+AC_CHECK_FUNC(select, have_select=yes)
+
+
+
 # checks for the epoll
 AC_CHECK_HEADER(sys/epoll.h, have_epoll_include=yes, have_epoll_include=no)
 
@@ -116,7 +125,7 @@ echo "CFLAGS                $CFLAGS"
 echo "Python                $have_python"
 index=1
 for method in $methods; do
-    echo "Polling method $i      $method"
+    echo "Polling method $index      $method"
     index='expr $index + 1'
 done
 echo
