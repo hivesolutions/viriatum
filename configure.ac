@@ -23,17 +23,13 @@
 # __copyright__ = Copyright (c) 2008 Hive Solutions Lda.
 # __license__   = GNU General Public License (GPL), Version 3
 
-major_version = 1
-minor_version = 0
-micro_version = 0
-
 # requires autoconf
 AC_PREREQ(2.61)
 
 # defines the version values
-m4_define([viriatum_major_version], [$major_version])
-m4_define([viriatum_minor_version], [$minor_version])
-m4_define([viriatum_micro_version], [$micro_version])
+m4_define([viriatum_major_version], [1])
+m4_define([viriatum_minor_version], [0])
+m4_define([viriatum_micro_version], [0])
 m4_define([viriatum_version], m4_format('%s.%s.%s', viriatum_major_version, viriatum_minor_version, viriatum_micro_version))
 
 # defines the general values
@@ -46,25 +42,12 @@ LT_INIT
 AC_PROG_LIBTOOL
 AM_PROG_LIBTOOL
 
-#AC_DEFINE(PACKAGE_MAJOR_VERSION, "viriatum_major_version", [Version string])
-#AC_DEFINE(PACKAGE_MINOR_VERSION, "viriatum_minor_version", [Version string])
-#AC_DEFINE(PACKAGE_MICRO_VERSION, "viriatum_micro_version", [Version string])
-
-#PACKAGE_MAJOR_VERSION="viriatum_major_version"
-#PACKAGE_MINOR_VERSION="viriatum_minor_version"
-#PACKAGE_MICRO_VERSION="viriatum_micro_version"
-#AC_SUBST(PACKAGE_MAJOR_VERSION)
-#AC_SUBST(PACKAGE_MINOR_VERSION)
-#AC_SUBST(PACKAGE_MICRO_VERSION)
-
-VIRIATUM_AGE=$major_version
-VIRIATUM_CURRENT=$minor_version
-VIRIATUM_REVISION=$micro_version
-AC_SUBST(VIRIATUM_AGE)
-AC_SUBST(VIRIATUM_CURRENT)
-AC_SUBST(VIRIATUM_REVISION)
-
-
+VIRIATUM_MAJOR_VERSION=1
+VIRIATUM_MINOR_VERSION=0
+VIRIATUM_MICRO_VERSION=0
+AC_SUBST(VIRIATUM_MAJOR_VERSION)
+AC_SUBST(VIRIATUM_MINOR_VERSION)
+AC_SUBST(VIRIATUM_MICRO_VERSION)
 
 AC_DEFINE_UNQUOTED(CHEROKEE_CONFIG_ARGS, "$ac_configure_args", [configure arguments])
 
