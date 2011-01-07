@@ -42,10 +42,31 @@ LT_INIT
 AC_PROG_LIBTOOL
 AM_PROG_LIBTOOL
 
-# exports the package version
-AC_DEFINE(VIRIATUM_MAJOR_VERSION, viriatum_major_version, [Version string])
-AC_DEFINE(VIRIATUM_MINOR_VERSION, viriatum_minor_version, [Version string])
-AC_DEFINE(VIRIATUM_MICRO_VERSION, viriatum_version, [Version string])
+
+
+
+dnl Define version
+AC_DEFINE(PACKAGE_MAJOR_VERSION, "viriatum_major_version", [Version string])
+AC_DEFINE(PACKAGE_MINOR_VERSION, "viriatum_minor_version", [Version string])
+AC_DEFINE(PACKAGE_MICRO_VERSION, "viriatum_micro_version", [Version string])
+
+PACKAGE_MAJOR_VERSION="viriatum_major_version"
+PACKAGE_MINOR_VERSION="viriatum_minor_version"
+PACKAGE_MICRO_VERSION="viriatum_micro_version"
+AC_SUBST(PACKAGE_MAJOR_VERSION)
+AC_SUBST(PACKAGE_MINOR_VERSION)
+AC_SUBST(PACKAGE_MICRO_VERSION)
+
+dnl Define library soname
+VIRIATUM_AGE=0
+VIRIATUM_CURRENT=0
+VIRIATUM_REVISION=1
+AC_SUBST(VIRIATUM_AGE)
+AC_SUBST(VIRIATUM_CURRENT)
+AC_SUBST(VIRIATUM_REVISION)
+
+AC_DEFINE_UNQUOTED(CHEROKEE_CONFIG_ARGS, "$ac_configure_args", [configure arguments])
+
 
 # checks for programs
 AC_PROG_CC
