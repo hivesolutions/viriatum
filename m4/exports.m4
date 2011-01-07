@@ -23,24 +23,10 @@
 # __copyright__ = Copyright (c) 2008 Hive Solutions Lda.
 # __license__   = GNU General Public License (GPL), Version 3
 
-# requires autoconf
-AC_PREREQ(2.61)
-
-m4_include([m4/settings.m4])
-m4_include([m4/initialization.m4])
-m4_include([m4/exports.m4])
-
-
-
-m4_include([m4/programs.m4])
-m4_include([m4/characteristics.m4])
-m4_include([m4/libraries.m4])
-m4_include([m4/headers.m4])
-m4_include([m4/functions.m4])
-m4_include([m4/variables.m4])
-m4_include([m4/poll.m4])
-m4_include([m4/epoll.m4])
-m4_include([m4/poll_methods.m4])
-m4_include([m4/have_validation.m4])
-m4_include([m4/output.m4])
-m4_include([m4/message.m4])
+# exports the version definitions to automake
+VIRIATUM_MAJOR_VERSION=1
+VIRIATUM_MINOR_VERSION=0
+VIRIATUM_MICRO_VERSION=0
+AC_SUBST(VIRIATUM_MAJOR_VERSION)
+AC_SUBST(VIRIATUM_MINOR_VERSION)
+AC_SUBST(VIRIATUM_MICRO_VERSION)
