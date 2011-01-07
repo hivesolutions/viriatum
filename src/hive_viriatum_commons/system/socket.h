@@ -69,9 +69,9 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#define SOCKET_DATA void *
 #define SOCKET_HANDLE int
 #define SOCKET_ADDRESS_SIZE unsigned int
-#define SOCKET_DATA void *
 #define SOCKET_ADDRESS struct sockaddr
 #define SOCKET_ADDRESS_INPUT struct sockaddr_in
 #define SOCKET_ERROR_CODE int
@@ -83,7 +83,7 @@
 #define SOCKET_PROTOCOL_UDP IPPROTO_UDP
 #define SOCKET_OPTIONS_LEVEL_SOCKET SOL_SOCKET
 #define SOCKET_OPTIONS_REUSE_ADDRESS_SOCKET SO_REUSEADDR
-#define SOCKET_INITIALIZE(socketData)
+#define SOCKET_INITIALIZE(socketData) socketInitialize(socketData)
 #define SOCKET_FINISH()
 #define SOCKET_CREATE(type, streamType, protocolType) socket(type, streamType, protocolType)
 #define SOCKET_BIND(socketHandle, socketAddress) bind(socketHandle, (struct sockaddr *) &socketAddress, sizeof(SOCKET_ADDRESS))
@@ -102,4 +102,5 @@
 #define SOCKET_SEND(socketHandle, buffer, length, flags) write(socketHandle, buffer, length)
 #define SOCKET_RECEIVE(socketHandle, buffer, length, flags) read(socketHandle, buffer, length)
 #define SOCKET_SET_OPTIONS(socketHandle, level, optionName, optionValue) setsockopt(socketHandle, level, optionName, &optionValue, sizeof(optionValue))
+inline void socketInitialize(SOCKET_DATA socketData) { }
 #endif
