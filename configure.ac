@@ -118,12 +118,13 @@ if test "$have_select" = yes; then methods="${methods}select"; fi
 
 
 if test "$have_epoll" = yes; then
-    AC_DEFINE(HAVE_EPOLL, 1, [Have epoll])
+    AC_DEFINE(HAVE_EPOLL, 1, [Define to 1 if you have the epoll.])
 fi
-
 
 AM_CONDITIONAL(COMPILE_EPOLL, test x"$have_epoll" = "xyes")
 
+
+AM_DEFINE(VIRIATUM_COMMONS_LIBRARY_VERSION, "1:0:0")
 
 
 echo
