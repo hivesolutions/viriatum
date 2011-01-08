@@ -187,7 +187,7 @@ void readFile(char *filePath, unsigned char **bufferPointer, size_t *fileSizePoi
     size_t numberBytes;
 
     /* opens the file */
-    SFOPEN(&file, filePath, "rb");
+    FOPEN(&file, filePath, "rb");
 
     /* seeks the file until the end */
     fseek(file, 0, SEEK_END);
