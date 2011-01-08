@@ -25,4 +25,5 @@
 
 # checks for libraries
 AC_CHECK_LIB([pthread], [main], [], [AC_MSG_ERROR(can't build without POSIX threads (libpthread) libraries)])
+AC_CHECK_LIB([ws2_32], [main])
 AC_CHECK_LIB([viriatum], [main])

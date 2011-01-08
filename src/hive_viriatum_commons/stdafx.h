@@ -70,8 +70,11 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
+#include <assert.h>
 #include <time.h>
 #include <math.h>
 
 unsigned char *_name();
 unsigned char *_version();
+
+#define VIRIATUM_DEBUG

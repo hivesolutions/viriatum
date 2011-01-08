@@ -27,10 +27,26 @@
 
 #pragma once
 
+#ifdef VIRIATUM_PLATFORM_WIN32
+
+#include "../structures/linked_list.h"
+
 typedef struct Condition_t {
-    HANDLE waitCriticalSection;
-    HANDLE syncCriticalSection;
+    unsigned int lockCount;
+    CRITICAL_SECTION waitCriticalSection;
+    CRITICAL_SECTION lockCriticalSection;
+    struct LinkedList_t *waitSet;
 } Condition;
 
 VIRIATUM_EXPORT_PREFIX void createCondition(struct Condition_t **conditionPointer);
 VIRIATUM_EXPORT_PREFIX void deleteCondition(struct Condition_t *condition);
+VIRIATUM_EXPORT_PREFIX void lockCondition(struct Condition_t *condition);
+VIRIATUM_EXPORT_PREFIX void unlockCondition(struct Condition_t *condition);
+VIRIATUM_EXPORT_PREFIX void waitCondition(struct Condition_t *condition);
+VIRIATUM_EXPORT_PREFIX void notifyCondition(struct Condition_t *condition);
+
+VIRIATUM_NO_EXPORT_PREFIX void _pushCondition(struct Condition_t *condition, HANDLE *waitEventPointer);
+VIRIATUM_NO_EXPORT_PREFIX void _popCondition(struct Condition_t *condition, HANDLE *waitEventPointer);
+VIRIATUM_NO_EXPORT_PREFIX unsigned char _testLockOwnerCondition(struct Condition_t *condition);
+
+#endif

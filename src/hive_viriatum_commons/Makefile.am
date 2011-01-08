@@ -44,6 +44,7 @@ structures/array_list.c \
 structures/hash_map.c \
 structures/iterator.c \
 structures/linked_list.c \
+system/_thread_win32.c \
 thread/thread_pool.c
 
 libviriatum_la_SOURCES = stdafx.c \
@@ -53,4 +54,5 @@ structures/array_list.c \
 structures/hash_map.c \
 structures/iterator.c \
 structures/linked_list.c \
+system/_thread_win32.c \
 thread/thread_pool.c

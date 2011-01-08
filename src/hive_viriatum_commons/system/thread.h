@@ -57,11 +57,22 @@
 #define CRITICAL_SECTION_ENTER(criticalSectionHandle) EnterCriticalSection(&criticalSectionHandle)
 #define CRITICAL_SECTION_LEAVE(criticalSectionHandle) LeaveCriticalSection(&criticalSectionHandle)
 #define CRITICAL_SECTION_CLOSE(criticalSectionHandle) DeleteCriticalSection(&criticalSectionHandle)
-#define CONDITION_HANDLE CONDITION_VARIABLE
+
+/*#define CONDITION_HANDLE CONDITION_VARIABLE
 #define CONDITION_CREATE(conditionHandle) InitializeConditionVariable(&conditionHandle)
+#define CONDITION_LOCK(conditionHandle, criticalSectionHandle) CRITICAL_SECTION_ENTER(conditionHandle)
+#define CONDITION_UNLOCK(conditionHandle, criticalSectionHandle) CRITICAL_SECTION_LEAVE(conditionHandle)
 #define CONDITION_WAIT(conditionHandle, criticalSectionHandle) SleepConditionVariableCS(&conditionHandle, &criticalSectionHandle, INFINITE)
 #define CONDITION_SIGNAL(conditionHandle) WakeConditionVariable(&conditionHandle)
-#define CONDITION_CLOSE(conditionHandle)
+#define CONDITION_CLOSE(conditionHandle)*/
+
+#define CONDITION_HANDLE struct Condition_t*
+#define CONDITION_CREATE(conditionHandle) createCondition(&conditionHandle)
+#define CONDITION_LOCK(conditionHandle, criticalSectionHandle) lockCondition(conditionHandle)
+#define CONDITION_UNLOCK(conditionHandle, criticalSectionHandle) unlockCondition(conditionHandle)
+#define CONDITION_WAIT(conditionHandle, criticalSectionHandle) waitCondition(conditionHandle)
+#define CONDITION_SIGNAL(conditionHandle) notifyCondition(conditionHandle)
+#define CONDITION_CLOSE(conditionHandle) deleteCondition(conditionHandle)
 #endif
 
 #ifdef VIRIATUM_PLATFORM_UNIX
@@ -110,6 +121,8 @@ typedef struct EventHandle_t {
 #define CONDITION_HANDLE pthread_cond_t *
 #define CONDITION_CREATE(conditionHandle) conditionHandle = (CONDITION_HANDLE) malloc(sizeof(pthread_cond_t));\
 pthread_cond_init(conditionHandle, NULL)
+#define CONDITION_LOCK(conditionHandle, criticalSectionHandle) CRITICAL_SECTION_ENTER(criticalSectionHandle)
+#define CONDITION_UNLOCK(conditionHandle, criticalSectionHandle) CRITICAL_SECTION_LEAVE(criticalSectionHandle)
 #define CONDITION_WAIT(conditionHandle, criticalSectionHandle) pthread_cond_wait(conditionHandle, criticalSectionHandle);
 #define CONDITION_SIGNAL(conditionHandle) pthread_cond_signal(conditionHandle)
 #define CONDITION_CLOSE(conditionHandle) pthread_cond_destroy(conditionHandle);\
