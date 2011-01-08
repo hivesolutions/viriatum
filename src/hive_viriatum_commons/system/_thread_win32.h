@@ -27,7 +27,10 @@
 
 #pragma once
 
-#include "_thread_win32.h"
-#include "socket.h"
-#include "system_util.h"
-#include "thread.h"
+typedef struct Condition_t {
+    HANDLE waitCriticalSection;
+    HANDLE syncCriticalSection;
+} Condition;
+
+VIRIATUM_EXPORT_PREFIX void createCondition(struct Condition_t **conditionPointer);
+VIRIATUM_EXPORT_PREFIX void deleteCondition(struct Condition_t *condition);

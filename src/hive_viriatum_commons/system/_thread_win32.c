@@ -25,9 +25,34 @@
  __license__   = GNU General Public License (GPL), Version 3
 */
 
-#pragma once
+#include "stdafx.h"
 
 #include "_thread_win32.h"
-#include "socket.h"
-#include "system_util.h"
-#include "thread.h"
+
+void createCondition(struct Condition_t **conditionPointer) {
+    /* retrieves the condition size */
+    size_t conditionSize = sizeof(struct Condition_t);
+
+    /* allocates space for the condition */
+    struct Condition_t *condition = (struct Condition_t *) malloc(conditionSize);
+
+    /* initializes the wait critical section */
+    InitializeCriticalSection(condition->waitCriticalSection);
+
+    /* initializes the sync critical section */
+    InitializeCriticalSection(condition->syncCriticalSection);
+
+    /* sets the condition in the condition pointer */
+    *conditionPointer = condition;
+}
+
+void deleteCondition(struct Condition_t *condition) {
+    /* deletes the sync critical section */
+    DeleteCriticalSection(condition->syncCriticalSection);
+
+    /* deletes the wait critical section */
+    DeleteCriticalSection(condition->waitCriticalSection);
+
+    /* releases the condition */
+    free(condition);
+}
