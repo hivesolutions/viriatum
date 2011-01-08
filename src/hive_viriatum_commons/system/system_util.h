@@ -33,7 +33,7 @@
 #define SLEEP(miliseconds) Sleep(miliseconds)
 #define GET_PID() GetCurrentProcessId()
 #define SPRINTF(buffer, size, format, ...) sprintf_s(buffer, size, format, __VA_ARGS__)
-#define SFOPEN(filePointer, fileName, mode) fopen_s(filePointer, fileName, mode)
+#define FOPEN(filePointer, fileName, mode) fopen_s(filePointer, fileName, mode)
 #define GET_ENV(buffer, bufferSize, variableName) _dupenv_s(&buffer, &bufferSize, variableName)
 #define FILE_EXISTS(filePath) GetFileAttributes(filePath) != 0xffffffff
 #endif
@@ -44,7 +44,7 @@
 #define SLEEP(miliseconds) usleep((useconds_t) miliseconds * 1000)
 #define GET_PID() getpid()
 #define SPRINTF(buffer, size, format, ...) sprintf(buffer, format, __VA_ARGS__)
-#define SFOPEN(filePointer, fileName, mode) *filePointer = fopen(fileName, mode)
+#define FOPEN(filePointer, fileName, mode) *filePointer = fopen(fileName, mode)
 #define GET_ENV(buffer, bufferSize, variableName) buffer = getenv(variableName)
 #define FILE_EXISTS(filePath) access(filePath, F_OK) == 0
 #endif
