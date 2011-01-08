@@ -113,7 +113,7 @@ void createThreadPoolElement(struct ThreadPool_t *threadPool) {
 
 void insertTaskThreadPool(struct ThreadPool_t *threadPool, struct ThreadPoolTask_t *threadPoolTask) {
     /* locks the task condition lock */
-    CRITICAL_SECTION_ENTER(threadPool->taskConditionLock);
+    CONDITION_LOCK(threadPool->taskCondition, threadPool->taskConditionLock);
 
     /* adds the the thread pool task to the task queue */
     appendValueLinkedList(threadPool->taskQueue, threadPoolTask);
@@ -122,7 +122,7 @@ void insertTaskThreadPool(struct ThreadPool_t *threadPool, struct ThreadPoolTask
     CONDITION_SIGNAL(threadPool->taskCondition);
 
     /* unlock the task condition lock */
-    CRITICAL_SECTION_LEAVE(threadPool->taskConditionLock);
+    CONDITION_UNLOCK(threadPool->taskCondition, threadPool->taskConditionLock);
 }
 
 /*
@@ -142,7 +142,7 @@ THREAD_RETURN poolRunnerThread(THREAD_ARGUMENTS parameters) {
     /* ierates continuously */
     while(1) {
         /* locks the task condition lock */
-        CRITICAL_SECTION_ENTER(threadPool->taskConditionLock);
+        CONDITION_LOCK(threadPool->taskCondition, threadPool->taskConditionLock);
 
         /* iterates while the task queue is empty */
         while(threadPool->taskQueue->size == 0) {
@@ -154,7 +154,7 @@ THREAD_RETURN poolRunnerThread(THREAD_ARGUMENTS parameters) {
         popValueLinkedList(threadPool->taskQueue, (void **) &workThreadTask);
 
         /* unlock the task condition lock */
-        CRITICAL_SECTION_LEAVE(threadPool->taskConditionLock);
+        CONDITION_UNLOCK(threadPool->taskCondition, threadPool->taskConditionLock);
 
         /* calls the start function */
         workThreadTask->startFunction(NULL);
