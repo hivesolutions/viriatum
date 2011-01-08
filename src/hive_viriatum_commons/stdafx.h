@@ -74,7 +74,7 @@
 #include <time.h>
 #include <math.h>
 
-unsigned char *_name();
-unsigned char *_version();
+unsigned char *_nameViriatumCommons();
+unsigned char *_versionViriatumCommons();
 
 #define VIRIATUM_DEBUG

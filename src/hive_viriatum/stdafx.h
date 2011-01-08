@@ -34,5 +34,5 @@
 
 #include "../hive_viriatum_commons/viriatum_commons.h"
 
-unsigned char *_name();
-unsigned char *_version();
+unsigned char *_nameViriatum();
+unsigned char *_versionViriatum();
