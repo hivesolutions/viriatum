@@ -27,29 +27,33 @@
 
 #pragma once
 
-#if defined(__arm__) || defined(__sparc__) || defined(__hppa__) || defined(__ppc__) || defined(__mips__)
-#define VIRIATUM_BIG_ENDIAN true
-#else
-#define VIRIATUM_LITTLE_ENDIAN true
-#endif
-
-#ifdef _WIN32 
+#if defined(_WIN32) || defined(_WIN64) || defined(__WIN32__) || defined(__TOS_WIN__) || defined(__WINDOWS__)
 #define VIRIATUM_PLATFORM_WIN32 true
-#define VIRIATUM_PLATFORM "win32"
+#define VIRIATUM_PLATFORM_STRING "win32"
 #endif
 
-#ifdef linux
+#if defined(linux) || defined(__linux)
 #define VIRIATUM_PLATFORM_LINUX true
-#define VIRIATUM_PLATFORM "linux"
+#define VIRIATUM_PLATFORM_STRING "linux"
 #endif
 
-#ifdef __MACH__
+#if defined(__APPLE__) && defined(__MACH__)
 #if TARGET_OS_IPHONE
 #define VIRIATUM_PLATFORM_IPHONE true
 #else
 #define VIRIATUM_PLATFORM_MACOSX true
 #endif
-#define VIRIATUM_PLATFORM "mach"
+#define VIRIATUM_PLATFORM_STRING "darwin"
+#endif
+
+#if defined(__minix)
+#define VIRIATUM_PLATFORM_MINIX true
+#define VIRIATUM_PLATFORM_STRING "minix"
+#endif
+
+#if defined(__FreeBSD__)
+#define VIRIATUM_PLATFORM_FREEBSD true
+#define VIRIATUM_PLATFORM_STRING "freebsd"
 #endif
 
 #ifdef unix
@@ -58,72 +62,67 @@
 
 #ifdef __MINGW32__
 #define VIRIATUM_PLATFORM_MINGW true
-#define VIRIATUM_PLATFORM "mingw32"
+#define VIRIATUM_PLATFORM_STRING "mingw32"
 #endif
 
 // CPU
 
-// GCC DETECTION
+// CPU ARCHITECTURE
 
-#ifdef __arm__
+#if defined(__arm__)
 #define VIRIATUM_PLATFORM_CPU "arm"
+#define VIRIATUM_PLATFORM_CPU_ARM true
 #endif
 
-#ifdef __sparc__
+#if defined(__sparc__)
 #define VIRIATUM_PLATFORM_CPU "sparc"
+#define VIRIATUM_PLATFORM_CPU_SPARC true
 #endif
 
-#ifdef __hppa__
+#if defined(__hppa__)
 #define VIRIATUM_PLATFORM_CPU "hp/pa risc"
+#define VIRIATUM_PLATFORM_CPU_HPPA true
 #endif
 
-#ifdef __ppc__
+#if defined(__ppc__) || defined(_M_MPPC) || defined(_M_PPC)
 #define VIRIATUM_PLATFORM_CPU "powerpc"
+#define VIRIATUM_PLATFORM_CPU_POWERPC true
 #endif
 
-#ifdef __mips__
+#if defined(__mips__) || defined(_M_MRX000)
 #define VIRIATUM_PLATFORM_CPU "mips"
+#define VIRIATUM_PLATFORM_CPU_MIPS true
 #endif
 
-#if defined(i386) || defined(__i386__) || defined(__i486__) || defined(__i586__) || defined(__i686__) || defined(_X86_)
+#if defined(i386) || defined(__i386__) || defined(__i486__) || defined(__i586__) || defined(__i686__) || defined(_X86_) || defined(_M_IX86)
 #define VIRIATUM_PLATFORM_CPU "intel x86"
+#define VIRIATUM_PLATFORM_CPU_X86 true
 #endif
 
-#if defined(__amd64__) || defined(__amd64) || defined(__x86_64__) || defined(__x86_64)
+#if defined(__amd64__) || defined(__amd64) || defined(__x86_64__) || defined(__x86_64) || defined(_M_X64)
 #define VIRIATUM_PLATFORM_CPU "intel x64"
+#define VIRIATUM_PLATFORM_CPU_X64 true
 #endif
 
-#if defined(__ia64__) || defined(_IA64) || defined(__IA64__)
+#if defined(__ia64__) || defined(_IA64) || defined(__IA64__) || defined(_M_IA64)
 #define VIRIATUM_PLATFORM_CPU "intel ia64"
-#endif
-
-// MVC detection
-
-#ifdef _M_IX86
-#define VIRIATUM_PLATFORM_CPU "intel x86"
-#endif
-
-#ifdef _M_X64
-#define VIRIATUM_PLATFORM_CPU "intel x64"
-#endif
-
-#ifdef _M_IA64
-#define VIRIATUM_PLATFORM_CPU "intel ia64"
-#endif
-
-#ifdef _M_MPPC
-#define VIRIATUM_PLATFORM_CPU "powerpc"
-#endif
-
-#ifdef _M_PPC
-#define VIRIATUM_PLATFORM_CPU "powerpc"
-#endif
-
-#ifdef _M_MRX000
-#define VIRIATUM_PLATFORM_CPU "mips"
+#define VIRIATUM_PLATFORM_CPU_IA64 true
 #endif
 
 // CPU BITS
+
+#define VIRIATUM_PLATFORM_CPU_BITS sizeof(void *) * 8
+
+// CPU ENDIANESS
+
+#if defined(VIRIATUM_PLATFORM_CPU_ARM) || defined(VIRIATUM_PLATFORM_CPU_SPARC) ||\
+	defined(VIRIATUM_PLATFORM_CPU_HPPA) || defined(VIRIATUM_PLATFORM_CPU_POWERPC) || defined(VIRIATUM_PLATFORM_CPU_MIPS)
+#define VIRIATUM_BIG_ENDIAN true
+#else
+#define VIRIATUM_LITTLE_ENDIAN true
+#endif
+
+// WIN32 API
 
 #ifdef _WIN32
 #define VIRIATUM_PLATFORM_CPU_WIN_API_BITS 32
@@ -133,7 +132,7 @@
 #define VIRIATUM_PLATFORM_CPU_WIN_API_BITS 64
 #endif
 
-#define VIRIATUM_PLATFORM_CPU_BITS sizeof(void *) * 8
+// COMPILER
 
 #ifdef _MSC_VER
 #define VIRIATUM_PLATFORM_MSC true
@@ -149,9 +148,7 @@
 #define VIRIATUM_COMPILER_VERSION_STRING __VERSION__
 #endif
 
-
-
-// COMPILATION TIME
+// COMPILATION
 
 #define VIRIATUM_COMPILATION_DATE __DATE__
 #define VIRIATUM_COMPILATION_TIME __TIME__
