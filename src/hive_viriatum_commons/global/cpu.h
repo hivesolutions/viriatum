@@ -29,27 +29,27 @@
 
 /* cpu architecture */
 
-#if defined(__arm__)
+#if defined(__arm__) || defined(__thumb__) || defined(_ARM)
 #define VIRIATUM_PLATFORM_CPU "arm"
 #define VIRIATUM_PLATFORM_CPU_ARM true
 #endif
 
-#if defined(__sparc__)
+#if defined(__sparc__) || defined(__sparc) || defined(__sparcv8) || defined(__sparcv9)
 #define VIRIATUM_PLATFORM_CPU "sparc"
 #define VIRIATUM_PLATFORM_CPU_SPARC true
 #endif
 
-#if defined(__hppa__)
+#if defined(__hppa__) || defined(__hppa)
 #define VIRIATUM_PLATFORM_CPU "hp/pa risc"
 #define VIRIATUM_PLATFORM_CPU_HPPA true
 #endif
 
-#if defined(__ppc__) || defined(_M_MPPC) || defined(_M_PPC)
+#if defined(__ppc__) || defined(__powerpc) || defined(__powerpc__) || defined(__POWERPC__) || defined(_ARCH_PPC) || defined(_M_MPPC) || defined(_M_PPC)
 #define VIRIATUM_PLATFORM_CPU "powerpc"
 #define VIRIATUM_PLATFORM_CPU_POWERPC true
 #endif
 
-#if defined(__mips__) || defined(_M_MRX000)
+#if defined(__mips__) || defined(mips) || defined(__mips) || defined(__MIPS__) || defined(_M_MRX000)
 #define VIRIATUM_PLATFORM_CPU "mips"
 #define VIRIATUM_PLATFORM_CPU_MIPS true
 #endif
@@ -76,7 +76,7 @@
 /* cpu endianess */
 
 #if defined(VIRIATUM_PLATFORM_CPU_ARM) || defined(VIRIATUM_PLATFORM_CPU_SPARC) ||\
-	defined(VIRIATUM_PLATFORM_CPU_HPPA) || defined(VIRIATUM_PLATFORM_CPU_POWERPC) || defined(VIRIATUM_PLATFORM_CPU_MIPS)
+    defined(VIRIATUM_PLATFORM_CPU_HPPA) || defined(VIRIATUM_PLATFORM_CPU_POWERPC) || defined(VIRIATUM_PLATFORM_CPU_MIPS)
 #define VIRIATUM_BIG_ENDIAN true
 #else
 #define VIRIATUM_LITTLE_ENDIAN true
