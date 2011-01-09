@@ -89,8 +89,12 @@
 #define VIRIATUM_PLATFORM_CPU "intel x86"
 #endif
 
-#if defined(__ia64__) || defined(_IA64) || defined(__IA64__)
+#if defined(__amd64__) || defined(__amd64) || defined(__x86_64__) || defined(__x86_64)
 #define VIRIATUM_PLATFORM_CPU "intel x64"
+#endif
+
+#if defined(__ia64__) || defined(_IA64) || defined(__IA64__)
+#define VIRIATUM_PLATFORM_CPU "intel ia64"
 #endif
 
 // MVC detection
@@ -129,9 +133,13 @@
 #define VIRIATUM_PLATFORM_CPU_BITS 64
 #endif
 
+#if UINT_MAX == 4294967295U
+#define VIRIATUM_PLATFORM_CPU_BITS 32
+#endif
 
-// COMPILERS
-
+#if UINT_MAX == 18446744073709551615U
+define VIRIATUM_PLATFORM_CPU_BITS 64
+#endif
 
 #ifdef _MSC_VER
 #define VIRIATUM_PLATFORM_MSC true
