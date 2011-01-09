@@ -38,6 +38,11 @@
 #define FILE_EXISTS(filePath) GetFileAttributes(filePath) != 0xffffffff
 #endif
 
+#ifdef VIRIATUM_PLATFORM_MINGW
+#define SPRINTF(buffer, size, format, ...) sprintf(buffer, format, __VA_ARGS__)
+#define FOPEN(filePointer, fileName, mode) *filePointer = fopen(fileName, mode)
+#endif
+
 #ifdef VIRIATUM_PLATFORM_UNIX
 #define PID_TYPE pid_t
 #define LOCAL_TIME(localTimeValue, timeValue) localTimeValue = localtime(timeValue)

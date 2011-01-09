@@ -105,7 +105,7 @@ void createThreadPoolElement(struct ThreadPool_t *threadPool) {
     threadPoolElement->threadId = threadId;
 
     /* adds the thread pool element to the thread pool worker threads list */
-    appendLinkedList(threadPool->workerThreadsList, (void *) threadPoolElement);
+    appendValueLinkedList(threadPool->workerThreadsList, (void *) threadPoolElement);
 
     /* increments the current number of threads */
     threadPool->currentNumberThreads++;
