@@ -55,10 +55,10 @@
 #define VIRIATUM_PLATFORM_UNIX true
 #endif
 
-#ifdef mingw32
+#ifdef __MINGW32__
 #define VIRIATUM_PLATFORM_MINGW true
 #endif
 
-#ifdef cygwin
-#define VIRIATUM_PLATFORM_CYGWIN true
+#ifdef _MSC_VER
+#define VIRIATUM_PLATFORM_MSC true
 #endif

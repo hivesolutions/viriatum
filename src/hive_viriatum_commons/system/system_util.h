@@ -32,15 +32,8 @@
 #define LOCAL_TIME(localTimeValue, timeValue) tm localTimeValueValue; localTimeValue = &localTimeValueValue; localtime_s(localTimeValue, timeValue)
 #define SLEEP(miliseconds) Sleep(miliseconds)
 #define GET_PID() GetCurrentProcessId()
-#define SPRINTF(buffer, size, format, ...) sprintf_s(buffer, size, format, __VA_ARGS__)
-#define FOPEN(filePointer, fileName, mode) fopen_s(filePointer, fileName, mode)
 #define GET_ENV(buffer, bufferSize, variableName) _dupenv_s(&buffer, &bufferSize, variableName)
 #define FILE_EXISTS(filePath) GetFileAttributes(filePath) != 0xffffffff
-#endif
-
-#ifdef VIRIATUM_PLATFORM_MINGW
-#define SPRINTF(buffer, size, format, ...) sprintf(buffer, format, __VA_ARGS__)
-#define FOPEN(filePointer, fileName, mode) *filePointer = fopen(fileName, mode)
 #endif
 
 #ifdef VIRIATUM_PLATFORM_UNIX
@@ -52,6 +45,16 @@
 #define FOPEN(filePointer, fileName, mode) *filePointer = fopen(fileName, mode)
 #define GET_ENV(buffer, bufferSize, variableName) buffer = getenv(variableName)
 #define FILE_EXISTS(filePath) access(filePath, F_OK) == 0
+#endif
+
+#ifdef VIRIATUM_PLATFORM_MSC
+#define SPRINTF(buffer, size, format, ...) sprintf_s(buffer, size, format, __VA_ARGS__)
+#define FOPEN(filePointer, fileName, mode) fopen_s(filePointer, fileName, mode)
+#endif
+
+#ifdef VIRIATUM_PLATFORM_MINGW
+#define SPRINTF(buffer, size, format, ...) sprintf(buffer, format, __VA_ARGS__)
+#define FOPEN(filePointer, fileName, mode) *filePointer = fopen(fileName, mode)
 #endif
 
 #define CLOCK() clock()
