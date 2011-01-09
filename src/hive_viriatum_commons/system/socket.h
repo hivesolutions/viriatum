@@ -29,7 +29,6 @@
 
 #ifdef VIRIATUM_PLATFORM_WIN32
 #include <winsock.h>
-#pragma comment(lib, "Ws2_32.lib")
 #define SOCKET_DATA WSADATA
 #define SOCKET_HANDLE SOCKET
 #define SOCKET_ADDRESS_SIZE int
@@ -114,4 +113,8 @@
 #define SOCKET_SET_SET(socketHandle, socketsSet) FD_SET(socketHandle, socketsSet)
 #define SOCKET_SET_CLEAR(socketHandle, socketsSet) FD_CLR(socketHandle, socketsSet)
 #define SOCKET_SET_IS_SET(socketHandle, socketsSet) FD_ISSET(socketHandle, socketsSet)
+#endif
+
+#ifdef VIRIATUM_PLATFORM_MSC
+#pragma comment(lib, "Ws2_32.lib")
 #endif
