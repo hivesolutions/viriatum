@@ -82,3 +82,7 @@
 #ifdef _WIN64
 #define VIRIATUM_PLATFORM_WINDOWS_API_BITS 64
 #endif
+
+#ifndef VIRIATUM_PLATFORM_STRING
+#define VIRIATUM_PLATFORM_STRING "unknown"
+#endif
