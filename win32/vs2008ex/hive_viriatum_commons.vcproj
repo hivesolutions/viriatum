@@ -419,6 +419,18 @@
 				Name="Global"
 				>
 				<File
+					RelativePath="..\..\src\hive_viriatum_commons\global\compilation.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\hive_viriatum_commons\global\compiler.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\hive_viriatum_commons\global\cpu.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\src\hive_viriatum_commons\global\definitions.h"
 					>
 				</File>

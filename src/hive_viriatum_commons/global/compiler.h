@@ -27,32 +27,18 @@
 
 #pragma once
 
-#include "cpu.h"
-#include "platforms.h"
-#include "compiler.h"
-#include "compilation.h"
+/* compiler structure */
 
-/**
-* The name of the environment variable used to build
-* the mariachi path.
-*/
-#define HIVE_VIRIATUM_ENVIRONMENT_PATH "VIRIATUM_PATH"
-
-/**
-* The root path being used.
-*/
-#define HIVE_VIRIATUM_ROOT_PATH "."
-
-#ifdef VIRIATUM_PLATFORM_WIN32
-#define VIRIATUM_ENVIRONMENT_SEPARATOR ";"
-#elif VIRIATUM_PLATFORM_UNIX
-#define VIRIATUM_ENVIRONMENT_SEPARATOR ":"
+#ifdef _MSC_VER
+#define VIRIATUM_PLATFORM_MSC true
+#define VIRIATUM_COMPILER "msvc"
+#define VIRIATUM_COMPILER_VERSION _MSC_VER
+#define VIRIATUM_COMPILER_VERSION_STRING "1.0.0"
 #endif
 
-#ifdef VIRIATUM_PLATFORM_WIN32
-#define HIVE_VIRIATUM_BASE_PATH "/"
-#elif VIRIATUM_PLATFORM_IPHONE
-#define HIVE_VIRIATUM_BASE_PATH getBundleDirectory()
-#elif VIRIATUM_PLATFORM_UNIX
-#define HIVE_VIRIATUM_BASE_PATH "/"
+#ifdef __GNUC__
+#define VIRIATUM_PLATFORM_GCC true
+#define VIRIATUM_COMPILER "gcc"
+#define VIRIATUM_COMPILER_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
+#define VIRIATUM_COMPILER_VERSION_STRING __VERSION__
 #endif
