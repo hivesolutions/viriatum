@@ -87,17 +87,17 @@
 
 #if defined(i386) || defined(__i386__) || defined(__i486__) || defined(__i586__) || defined(__i686__) || defined(_X86_)
 #define VIRIATUM_PLATFORM_CPU "intel x86"
-define VIRIATUM_PLATFORM_CPU_BITS 32
+#define VIRIATUM_PLATFORM_CPU_BITS 32
 #endif
 
 #if defined(__amd64__) || defined(__amd64) || defined(__x86_64__) || defined(__x86_64)
 #define VIRIATUM_PLATFORM_CPU "intel x64"
-define VIRIATUM_PLATFORM_CPU_BITS 64
+#define VIRIATUM_PLATFORM_CPU_BITS 64
 #endif
 
 #if defined(__ia64__) || defined(_IA64) || defined(__IA64__)
 #define VIRIATUM_PLATFORM_CPU "intel ia64"
-define VIRIATUM_PLATFORM_CPU_BITS 64
+#define VIRIATUM_PLATFORM_CPU_BITS 64
 #endif
 
 // MVC detection
