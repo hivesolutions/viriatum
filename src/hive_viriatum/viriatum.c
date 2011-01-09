@@ -239,6 +239,9 @@ void runService() {
 
 int main(int argc, char *argv[]) {
     /* prints a debug message */
+    DEBUG_F("Viriatum 1.0.0 (%s, %s) [%s %s %d bit (%s)] on %s\n", VIRIATUM_COMPILATION_DATE, VIRIATUM_COMPILATION_TIME, VIRIATUM_COMPILER, VIRIATUM_COMPILER_VERSION_STRING, VIRIATUM_PLATFORM_CPU_BITS, VIRIATUM_PLATFORM_CPU, VIRIATUM_PLATFORM);
+
+    /* prints a debug message */
     DEBUG_F("Receiving %d arguments\n", argc);
 
     /* runs the tests */
