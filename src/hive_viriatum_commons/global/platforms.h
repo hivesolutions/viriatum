@@ -58,6 +58,11 @@
 #define VIRIATUM_PLATFORM_STRING "freebsd"
 #endif
 
+#if defined(__CYGWIN__)
+#define VIRIATUM_PLATFORM_CYGWIN true
+#define VIRIATUM_PLATFORM_STRING "cygwin"
+#endif
+
 /* platform api system */
 
 #ifdef unix
