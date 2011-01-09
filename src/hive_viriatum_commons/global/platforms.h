@@ -54,3 +54,11 @@
 #ifdef unix
 #define VIRIATUM_PLATFORM_UNIX true
 #endif
+
+#ifdef mingw32
+#define VIRIATUM_PLATFORM_MINGW true
+#endif
+
+#ifdef cygwin
+#define VIRIATUM_PLATFORM_CYGWIN true
+#endif

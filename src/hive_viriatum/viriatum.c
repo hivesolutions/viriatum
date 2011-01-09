@@ -56,11 +56,17 @@ void testThreadPool() {
     /* sets the start function */
     threadPoolTask->startFunction = threadPoolStartFunctionTest;
 
+    /* prints a debug message */
+    DEBUG("Creating a thread pool\n");
+
     /* creates the thread pool */
     createThreadPool(&threadPool, 15, 1, 30);
 
     /* iterates over the range of the index */
     for(index = 0; index < 100; index ++) {
+        /* prints a debug message */
+        DEBUG("Inserting task in thread pool\n");
+
         /* inserts the task in the thread pool */
         insertTaskThreadPool(threadPool, threadPoolTask);
     }
