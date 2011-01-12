@@ -40,6 +40,6 @@ echo
 echo Instructions
 echo "========================"
 echo
-echo "Run 'make install' to install Viriatum."
+echo "Run 'make && make install' to install Viriatum."
 echo "Thank you for using Viriatum."
 echo
