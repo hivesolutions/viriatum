@@ -336,9 +336,6 @@ void resetIteratorLinkedList(struct LinkedList_t *linkedList, struct Iterator_t 
 }
 
 void getNextIteratorLinkedList(struct Iterator_t *iterator, void **nextPointer) {
-    /* retrieves the linked list from the iterator structure */
-    struct LinkedList_t *linkedList = (struct LinkedList_t *) iterator->structure;
-
     /* retrieves the current node from the iterator parameters */
     struct LinkedListNode_t *currentNode = (struct LinkedListNode_t *) iterator->parameters;
 
