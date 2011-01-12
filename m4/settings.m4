@@ -27,5 +27,5 @@
 m4_define([viriatum_major_version], [1])
 m4_define([viriatum_minor_version], [0])
 m4_define([viriatum_micro_version], [0])
-m4_define([viriatum_version], m4_format("%s.%s.%s", viriatum_major_version, viriatum_minor_version, viriatum_micro_version))
+m4_define([viriatum_version], m4_format(%s.%s.%s, viriatum_major_version, viriatum_minor_version, viriatum_micro_version))
 m4_define([viriatum_makefiles], [Makefile doc/Makefile examples/Makefile lib/Makefile m4/Makefile man/Makefile scripts/Makefile src/Makefile src/hive_viriatum_commons/Makefile src/hive_viriatum/Makefile])
