@@ -251,7 +251,7 @@ int main(int argc, char *argv[]) {
     runService();
 
     /* prints a debug message */
-    DEBUG_F("Receiving %d arguments\n", argc);
+    DEBUG_F("Finishing process");
 
     /* returns zero (valid) */
     return 0;
