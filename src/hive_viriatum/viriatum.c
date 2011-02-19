@@ -250,6 +250,9 @@ int main(int argc, char *argv[]) {
     /* runs the service */
     runService();
 
+    /* prints a debug message */
+    DEBUG_F("Receiving %d arguments\n", argc);
+
     /* returns zero (valid) */
     return 0;
 }
