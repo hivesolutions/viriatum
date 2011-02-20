@@ -1,2 +1,9 @@
-- implement and refactor decode base64 (base64.c)
-- implement and refactor win32 conditions (_thread_win32.c)
+== New features ==
+
+* Support for lua embedding
+* Support for Python embedding
+
+== Refactor / Bug Fixing ==
+
+* implement and refactor decode base64 (base64.c)
+* implement and refactor win32 conditions (_thread_win32.c)
