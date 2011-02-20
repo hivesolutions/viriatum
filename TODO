@@ -1,0 +1,2 @@
+- implement and refactor decode base64 (base64.c)
+- implement and refactor win32 conditions (_thread_win32.c)
