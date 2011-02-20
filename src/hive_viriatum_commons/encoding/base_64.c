@@ -138,7 +138,7 @@ int _decodeBase64(unsigned char *encodedBuffer, size_t encodedBufferLength, unsi
     /* starts the buffer index */
     bufferIndex = 0;
 
-    /* increment over the length of the encoded buffer, four characters at a time */
+    /* increments over the length of the encoded buffer, four characters at a time */
     for(index = 0; index < encodedBufferLength; index += 4) {
 
         /* TENHO DE FAZER O MAPEAMENTE INVERSO DO MAPARA DE CARACTERES */
