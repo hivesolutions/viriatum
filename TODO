@@ -2,8 +2,9 @@
 
 * Support for lua embedding
 * Support for Python embedding
+* Create infra-structure for error handling base on the SetLastError from Microsoft (http://msdn.microsoft.com/en-us/library/ms680627(v=vs.85).aspx)
 
 == Refactor / Bug Fixing ==
 
 * implement and refactor decode base64 (base64.c)
-* implement and refactor win32 conditions (_thread_win32.c)
+* implement and refactor win32 conditions (_thread_win32.c) use this link http://thbecker.net/free_software_utilities/fair_monitor_for_win32/start_page.html

@@ -27,7 +27,7 @@
 
 #include "stdafx.h"
 
-#ifdef VIRIATUM_PLATFORM_WIN32
+//#ifdef VIRIATUM_PLATFORM_WIN32
 
 #include "_thread_win32.h"
 
@@ -77,7 +77,8 @@ void lockCondition(struct Condition_t *condition) {
 }
 
 void unlockCondition(struct Condition_t *condition) {
-    if(!_testLockOwnerCondition(condition)) {
+    /* in case the test lock owner condition fails */
+	if(!_testLockOwnerCondition(condition)) {
         SetLastError(ERROR_INVALID_FUNCTION);
     }
 
@@ -242,4 +243,4 @@ unsigned char _testLockOwnerCondition(struct Condition_t *condition) {
     return 1;
 }
 
-#endif
+//#endif
