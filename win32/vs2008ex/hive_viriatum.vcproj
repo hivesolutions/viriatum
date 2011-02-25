@@ -402,7 +402,7 @@
 				>
 			</File>
 			<Filter
-				Name="global"
+				Name="Global"
 				>
 				<File
 					RelativePath="..\..\src\hive_viriatum\global\resource.h"

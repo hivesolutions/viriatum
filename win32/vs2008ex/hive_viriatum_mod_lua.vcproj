@@ -182,10 +182,14 @@
 					/>
 				</FileConfiguration>
 			</File>
-			<File
-				RelativePath="..\..\src\hive_viriatum_mod_lua\viriatum_mod_lua.c"
+			<Filter
+				Name="Module"
 				>
-			</File>
+				<File
+					RelativePath="..\..\src\hive_viriatum_mod_lua\module\entry.c"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -200,6 +204,18 @@
 				RelativePath="..\..\src\hive_viriatum_mod_lua\viriatum_mod_lua.h"
 				>
 			</File>
+			<Filter
+				Name="Module"
+				>
+				<File
+					RelativePath="..\..\src\hive_viriatum_mod_lua\module\entry.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\hive_viriatum_mod_lua\module\module.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Resource Files"
