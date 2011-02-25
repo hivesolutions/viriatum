@@ -25,14 +25,5 @@
  __license__   = GNU General Public License (GPL), Version 3
 */
 
-#pragma once
-
-#include "../hive_viriatum/viriatum.h"
-
-unsigned char *nameViriatumModLua();
-unsigned char *versionViriatumModLua();
-unsigned char *descriptionViriatumModLua();
-
-#ifdef VIRIATUM_PLATFORM_MSC
-#pragma comment(lib, "lua.lib")
-#endif
+VIRIATUM_EXPORT_PREFIX void startModule();
+VIRIATUM_EXPORT_PREFIX void stopModule();

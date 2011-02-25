@@ -25,34 +25,4 @@
  __license__   = GNU General Public License (GPL), Version 3
 */
 
-#include "stdafx.h"
-
-#include "viriatum_mod_lua.h"
-
-void startModule() {
-    // retrieves the name
-    unsigned char *name = nameViriatumModLua();
-
-    // retrieves the version
-    unsigned char *version = versionViriatumModLua();
-
-    // retrieves the description
-    unsigned char *description = descriptionViriatumModLua();
-
-    // prints a debug message
-    DEBUG_F("Starting the module '%s' (%s) v%s\n", name, description, version);
-}
-
-void stopModule() {
-    // retrieves the name
-    unsigned char *name = nameViriatumModLua();
-
-    // retrieves the version
-    unsigned char *version = versionViriatumModLua();
-
-    // retrieves the description
-    unsigned char *description = descriptionViriatumModLua();
-
-    // prints a debug message
-    DEBUG_F("Stoping the module '%s' (%s) v%s\n", name, description, version);
-}
+#include "entry.h"
