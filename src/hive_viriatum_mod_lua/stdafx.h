@@ -31,3 +31,4 @@
 
 unsigned char *nameViriatumModLua();
 unsigned char *versionViriatumModLua();
+unsigned char *descriptionViriatumModLua();
