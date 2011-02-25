@@ -238,10 +238,10 @@ void runService() {
 }
 
 int main(int argc, char *argv[]) {
-	// the mod library reference
+    // the mod library reference
     HMODULE modLibrary;
 
-	// the start module function reference
+    // the start module function reference
     FARPROC startModuleFunction;
 
     // retrieves the version
@@ -268,7 +268,7 @@ int main(int argc, char *argv[]) {
         DEBUG("Loaded library\n");
     }
 
-	// retrieves the start nodule function reference
+    // retrieves the start nodule function reference
     startModuleFunction = GetProcAddress(modLibrary, "startModule");
 
     // in case the start module function was not found
@@ -280,7 +280,7 @@ int main(int argc, char *argv[]) {
         DEBUG_F("Found symbol %s in library\n", "startModule");
     }
 
-	// calls the start module function
+    // calls the start module function
     startModuleFunction();
 
     /* runs the tests */
