@@ -25,9 +25,10 @@
  __license__   = GNU General Public License (GPL), Version 3
 */
 
-#pragma once
+#include "stdafx.h"
 
-#include "../hive_viriatum/viriatum.h"
+static unsigned char name[] = "viriatum_mod_lua";
+static unsigned char version[] = "1.0.0";
 
-unsigned char *nameViriatumModLua();
-unsigned char *versionViriatumModLua();
+unsigned char *nameViriatumModLua() { return name; }
+unsigned char *versionViriatumModLua() { return version; }
