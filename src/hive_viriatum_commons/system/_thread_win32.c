@@ -78,7 +78,7 @@ void lockCondition(struct Condition_t *condition) {
 
 void unlockCondition(struct Condition_t *condition) {
     /* in case the test lock owner condition fails */
-	if(!_testLockOwnerCondition(condition)) {
+    if(!_testLockOwnerCondition(condition)) {
         SetLastError(ERROR_INVALID_FUNCTION);
     }
 

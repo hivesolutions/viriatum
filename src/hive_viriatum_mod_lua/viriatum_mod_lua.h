@@ -28,3 +28,6 @@
 #pragma once
 
 #include "stdafx.h"
+
+VIRIATUM_EXPORT_PREFIX void startModule();
+VIRIATUM_EXPORT_PREFIX void stopModule();

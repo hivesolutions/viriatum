@@ -238,11 +238,50 @@ void runService() {
 }
 
 int main(int argc, char *argv[]) {
+	// the mod library reference
+    HMODULE modLibrary;
+
+	// the start module function reference
+    FARPROC startModuleFunction;
+
+    // retrieves the version
+    unsigned char *version = versionViriatum();
+
+    // retrieves the description
+    unsigned char *description = descriptionViriatum();
+
     /* prints a debug message */
-    DEBUG_F("Viriatum 1.0.0 (%s, %s) [%s %s %d bit (%s)] on %s\n", VIRIATUM_COMPILATION_DATE, VIRIATUM_COMPILATION_TIME, VIRIATUM_COMPILER, VIRIATUM_COMPILER_VERSION_STRING, VIRIATUM_PLATFORM_CPU_BITS, VIRIATUM_PLATFORM_CPU, VIRIATUM_PLATFORM_STRING);
+    DEBUG_F("%s %s (%s, %s) [%s %s %d bit (%s)] on %s\n", description, version, VIRIATUM_COMPILATION_DATE, VIRIATUM_COMPILATION_TIME, VIRIATUM_COMPILER, VIRIATUM_COMPILER_VERSION_STRING, VIRIATUM_PLATFORM_CPU_BITS, VIRIATUM_PLATFORM_CPU, VIRIATUM_PLATFORM_STRING);
 
     /* prints a debug message */
     DEBUG_F("Receiving %d arguments\n", argc);
+
+    // loads the mod library
+    modLibrary = LoadLibrary("C:/Users/joamag/Desktop/repositories/viriatum/bin/hive_viriatum_mod_lua/i386/win32/Release/hive_viriatum_mod_lua.dll");
+
+    // in case the mod library was not loaded
+    if(modLibrary == NULL) {
+        /* prints a debug message */
+        DEBUG("Problem loading library\n");
+    } else {
+        /* prints a debug message */
+        DEBUG("Loaded library\n");
+    }
+
+	// retrieves the start nodule function reference
+    startModuleFunction = GetProcAddress(modLibrary, "startModule");
+
+    // in case the start module function was not found
+    if(startModuleFunction == NULL) {
+        /* prints a debug message */
+        DEBUG_F("No such symbol %s in library\n", "startModule");
+    } else {
+        /* prints a debug message */
+        DEBUG_F("Found symbol %s in library\n", "startModule");
+    }
+
+	// calls the start module function
+    startModuleFunction();
 
     /* runs the tests */
     runTests();

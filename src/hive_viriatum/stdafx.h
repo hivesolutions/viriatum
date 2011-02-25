@@ -36,3 +36,4 @@
 
 unsigned char *nameViriatum();
 unsigned char *versionViriatum();
+unsigned char *descriptionViriatum();
