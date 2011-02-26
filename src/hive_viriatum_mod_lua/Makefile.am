@@ -23,9 +23,9 @@
 # __copyright__ = Copyright (c) 2008 Hive Solutions Lda.
 # __license__   = GNU General Public License (GPL), Version 3
 
-if LINK_LUA
-	include $(top_srcdir)/Common.am
+include $(top_srcdir)/Common.am
 
+if LINK_LUA
 	lib_LTLIBRARIES = libviriatum_mod_lua.la
 
 	libviriatum_mod_lua_la_CFLAGS = $(AM_CFLAGS)
