@@ -248,7 +248,7 @@ void loadDynamic() {
     viriatumStartModule startModuleFunction;
 
     /* loads the mod library */
-    modLibrary = LOAD_LIBRARY("C:/Users/joamag/Desktop/repositories/viriatum/bin/hive_viriatum_mod_lua/i386/win32/Release/hive_viriatum_mod_lua.dll");
+    modLibrary = LOAD_LIBRARY("/opt/lib/libviriatum_mod_lua.so");
 
     /* in case the mod library was not loaded */
     if(modLibrary == NULL) {

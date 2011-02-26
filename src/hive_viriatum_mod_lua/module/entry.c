@@ -55,7 +55,7 @@ void startModule() {
     luaopen_math(luaState);
 
     /* runs the script */
-    luaL_dofile(luaState, "c:/teste.lua");
+    luaL_dofile(luaState, "/opt/teste.lua");
 
     /* cleanup lua */
     lua_close(luaState);
