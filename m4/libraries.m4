@@ -24,13 +24,13 @@
 # __license__   = GNU General Public License (GPL), Version 3
 
 # checks for libraries
-AC_CHECK_LIB([pthread], [main], [], [AC_MSG_ERROR(can't build without POSIX threads (libpthread) libraries)])
-AC_CHECK_LIB([ws2_32], [main])
-AC_CHECK_LIB([lua], [main])
-AC_CHECK_LIB([viriatum], [main])
+AC_CHECK_LIB([pthread], [main], [have_pthread=yes], [AC_MSG_ERROR(can't build without POSIX threads (libpthread) libraries)])
+AC_CHECK_LIB([ws2_32], [main], [have_ws2_32=yes])
+AC_CHECK_LIB([lua], [main], [have_lua=yes])
+AC_CHECK_LIB([viriatum], [main], [have_viriatum=yes])
 
 # conditional activation of libraries
-AC_ARG_ENABLE([lua], AS_HELP_STRING([--enable-lua], [enable linking with lua @<:@default=no@:>@]), [link_lua=$enableval], [link_lua=yes])
+#AC_ARG_ENABLE([lua], AS_HELP_STRING([--enable-lua], [enable linking with lua @<:@default=no@:>@]), [link_lua=$enableval], [link_lua=yes])
 
 # library variables activation
 AM_CONDITIONAL([LINK_LUA], [test "$link_lua" = "yes"])
