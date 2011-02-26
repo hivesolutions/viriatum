@@ -241,6 +241,9 @@ int main(int argc, char *argv[]) {
     // the mod library reference
     LIBRARY_REFERENCE modLibrary;
 
+    LIBRARY_SYMBOL symbol;
+
+
     // the start module function reference
     viriatumStartModule startModuleFunction;
 
@@ -269,7 +272,7 @@ int main(int argc, char *argv[]) {
     }
 
     // retrieves the start nodule function reference
-    startModuleFunction = *((viriatumStartModule *) (&GET_LIBRARY_SYMBOL(modLibrary, "startModule")));
+    startModuleFunction = *((viriatumStartModule*)(&symbol));
 
     // in case the start module function was not found
     if(startModuleFunction == NULL) {
