@@ -23,9 +23,7 @@
 # __copyright__ = Copyright (c) 2008 Hive Solutions Lda.
 # __license__   = GNU General Public License (GPL), Version 3
 
-@echo entrando no cenas
-
-if LINK_LUA
+if $have_lua
 	include $(top_srcdir)/Common.am
 
 	lib_LTLIBRARIES = libviriatum_mod_lua.la
