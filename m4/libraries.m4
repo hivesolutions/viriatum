@@ -25,13 +25,13 @@
 
 # checks for libraries
 AC_CHECK_LIB([pthread], [main], [have_pthread=yes], [AC_MSG_ERROR(can't build without POSIX threads (libpthread) libraries)])
-AC_CHECK_LIB([ws2_32], [main], [have_ws2_32=yes])
-AC_CHECK_LIB([lua5.1], [main], [have_lua=yes])
-AC_CHECK_LIB([viriatum], [main], [have_viriatum=yes])
+AC_CHECK_LIB([ws2_32], [main], have_ws2_32=yes)
+AC_CHECK_LIB([lua5.1], [main], have_lua=yes)
+AC_CHECK_LIB([viriatum], [main], have_viriatum=yes)
 
 # conditional activation of libraries
 #AC_ARG_ENABLE([lua], AS_HELP_STRING([--enable-lua], [enable linking with lua @<:@default=no@:>@]), [link_lua=$enableval], [link_lua=yes])
 
 # library variables activation
 #AM_CONDITIONAL([LINK_LUA], [test "$have_lua" = "yes"])
-AM_CONDITIONAL([LINK_LUA], [test x"$have_lua" = "xyes"])
+AM_CONDITIONAL(LINK_LUA, test x"$have_lua" = "xyes")
