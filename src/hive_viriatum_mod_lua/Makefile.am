@@ -25,12 +25,12 @@
 
 include $(top_srcdir)/Common.am
 
-lib_LTLIBRARIES = viriatum_mod_lua.la
+lib_LTLIBRARIES = libviriatum_mod_lua.la
 
-viriatum_mod_lua_la_CFLAGS = $(AM_CFLAGS)
-viriatum_mod_lua_la_CXXFLAGS = $(AM_CXXFLAGS)
+libviriatum_mod_lua_la_CFLAGS = $(AM_CFLAGS)
+libviriatum_mod_lua_la_CXXFLAGS = $(AM_CXXFLAGS)
 
-viriatum_mod_lua_la_LDFLAGS = -version-info $(VIRIATUM_MAJOR_VERSION):$(VIRIATUM_MINOR_VERSION):$(VIRIATUM_MICRO_VERSION)
+libviriatum_mod_lua_la_LDFLAGS = -version-info $(VIRIATUM_MAJOR_VERSION):$(VIRIATUM_MINOR_VERSION):$(VIRIATUM_MICRO_VERSION)
 
-viriatum_mod_lua_la_SOURCES = stdafx.c \
+libviriatum_mod_lua_la_SOURCES = stdafx.c \
 module/entry.c 
