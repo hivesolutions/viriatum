@@ -32,3 +32,22 @@
 #include "logging.h"
 #include "service.h"
 #include "service_select.h"
+
+typedef void (*viriatumStartModule)(void);
+typedef void (*viriatumStopModule)(void);
+
+#ifdef VIRIATUM_PLATFORM_WIN32
+#define LIBRARY_REFERENCE HMODULE
+#define LIBRARY_SYMBOL FARPROC
+#define LOAD_LIBRARY(libraryPath) LoadLibrary(libraryPath)
+#define UNLOAD_LIBRARY(libraryReference) FreeLibrary(libraryReference)
+#define GET_LIBRARY_SYMBOL(libraryReference, symbolName) GetProcAddress(libraryReference, symbolName)
+#endif
+
+#ifdef VIRIATUM_PLATFORM_UNIX
+#define LIBRARY_REFERENCE void *
+#define LIBRARY_SYMBOL void *
+#define LOAD_LIBRARY(libraryPath) dlopen(libraryPath, RTLD_LAZY)
+#define UNLOAD_LIBRARY(libraryReference) dlclose(libraryReference)
+#define GET_LIBRARY_SYMBOL(libraryReference, symbolName) dlsym(libraryReference, symbolName)
+#endif
