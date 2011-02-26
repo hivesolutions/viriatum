@@ -36,8 +36,6 @@ libviriatum_mod_lua_a_CXXFLAGS = $(AM_CXXFLAGS)
 libviriatum_mod_lua_la_CFLAGS = $(AM_CFLAGS)
 libviriatum_mod_lua_la_CXXFLAGS = $(AM_CXXFLAGS)
 
-libviriatum_mod_lua_la_LIBADD = liblua5.1.la
-
 libviriatum_mod_lua_la_LDFLAGS = -version-info $(VIRIATUM_MAJOR_VERSION):$(VIRIATUM_MINOR_VERSION):$(VIRIATUM_MICRO_VERSION)
 
 libviriatum_mod_lua_a_SOURCES = stdafx.c \
