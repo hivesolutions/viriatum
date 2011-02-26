@@ -33,6 +33,10 @@ unsigned char *nameViriatumModLua();
 unsigned char *versionViriatumModLua();
 unsigned char *descriptionViriatumModLua();
 
+#include <lua.h>
+#include <lualib.h>
+#include <lauxlib.h>
+
 #ifdef VIRIATUM_PLATFORM_MSC
 #pragma comment(lib, "lua.lib")
 #endif
