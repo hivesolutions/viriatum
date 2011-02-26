@@ -238,19 +238,19 @@ void runService() {
 }
 
 int main(int argc, char *argv[]) {
-    // the mod library reference
+    /* the mod library reference */
     LIBRARY_REFERENCE modLibrary;
 
+	/* the holder of the library symbol */
     LIBRARY_SYMBOL symbol;
 
-
-    // the start module function reference
+    /* the start module function reference */
     viriatumStartModule startModuleFunction;
 
-    // retrieves the version
+    /* retrieves the version */
     unsigned char *version = versionViriatum();
 
-    // retrieves the description
+    /* retrieves the description */
     unsigned char *description = descriptionViriatum();
 
     /* prints a debug message */
@@ -259,10 +259,10 @@ int main(int argc, char *argv[]) {
     /* prints a debug message */
     DEBUG_F("Receiving %d arguments\n", argc);
 
-    // loads the mod library
+    /* loads the mod library */
     modLibrary = LOAD_LIBRARY("C:/Users/joamag/Desktop/repositories/viriatum/bin/hive_viriatum_mod_lua/i386/win32/Release/hive_viriatum_mod_lua.dll");
 
-    // in case the mod library was not loaded
+    /* in case the mod library was not loaded */
     if(modLibrary == NULL) {
         /* prints a debug message */
         DEBUG("Problem loading library\n");
@@ -271,10 +271,13 @@ int main(int argc, char *argv[]) {
         DEBUG("Loaded library\n");
     }
 
-    // retrieves the start nodule function reference
+	/* retrieves the symbol from the mod library */
+	/*symbol = GET_LIBRARY_SYMBOL(modLibrary, "startModule")*/
+
+    /* retrieves the start nodule function reference */
     startModuleFunction = *((viriatumStartModule*)(&symbol));
 
-    // in case the start module function was not found
+    /* in case the start module function was not found */
     if(startModuleFunction == NULL) {
         /* prints a debug message */
         DEBUG_F("No such symbol %s in library\n", "startModule");
@@ -283,7 +286,7 @@ int main(int argc, char *argv[]) {
         DEBUG_F("Found symbol %s in library\n", "startModule");
     }
 
-    // calls the start module function
+    /* calls the start module function */
     startModuleFunction();
 
     /* runs the tests */
@@ -293,7 +296,7 @@ int main(int argc, char *argv[]) {
     runService();
 
 	/* unloads the library */
-	UNLOAD_LIBRARY(modLibrary);
+	/*UNLOAD_LIBRARY(modLibrary);*/
 
     /* prints a debug message */
     DEBUG("Finishing process");
