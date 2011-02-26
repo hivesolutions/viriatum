@@ -28,3 +28,9 @@ AC_CHECK_LIB([pthread], [main], [], [AC_MSG_ERROR(can't build without POSIX thre
 AC_CHECK_LIB([ws2_32], [main])
 AC_CHECK_LIB([lua], [main])
 AC_CHECK_LIB([viriatum], [main])
+
+# conditional activation of libraries
+AC_ARG_ENABLE([lua], AS_HELP_STRING([--enable-lua], [enable linking with lua @<:@default=no@:>@]), [link_lua=$enableval], [link_lua=yes])
+
+# library variables activation
+AM_CONDITIONAL([LINK_LUA], [test "$link_lua" = "yes"])
