@@ -27,7 +27,7 @@
 AC_CHECK_LIB([dl], [main], [], [AC_MSG_ERROR(can't build without dynamic linking (libdl) libraries)])
 AC_CHECK_LIB([pthread], [main], [], [AC_MSG_ERROR(can't build without posix threads (libpthread) libraries)])
 AC_CHECK_LIB([ws2_32], [main], [])
-AC_CHECK_LIB([lua5.1], [main], [])
+AC_CHECK_LIB([lua5.1], [main], [have_lua=yes])
 AC_CHECK_LIB([viriatum], [main], [have_viriatum=yes])
 
 # library variables activation
