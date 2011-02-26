@@ -239,10 +239,10 @@ void runService() {
 
 int main(int argc, char *argv[]) {
     // the mod library reference
-    HMODULE modLibrary;
+    LIBRARY_REFERENCE modLibrary;
 
     // the start module function reference
-    FARPROC startModuleFunction;
+    viriatumStartModule startModuleFunction;
 
     // retrieves the version
     unsigned char *version = versionViriatum();
@@ -257,7 +257,7 @@ int main(int argc, char *argv[]) {
     DEBUG_F("Receiving %d arguments\n", argc);
 
     // loads the mod library
-    modLibrary = LoadLibrary("C:/Users/joamag/Desktop/repositories/viriatum/bin/hive_viriatum_mod_lua/i386/win32/Release/hive_viriatum_mod_lua.dll");
+    modLibrary = LOAD_LIBRARY("C:/Users/joamag/Desktop/repositories/viriatum/bin/hive_viriatum_mod_lua/i386/win32/Release/hive_viriatum_mod_lua.dll");
 
     // in case the mod library was not loaded
     if(modLibrary == NULL) {
@@ -269,7 +269,7 @@ int main(int argc, char *argv[]) {
     }
 
     // retrieves the start nodule function reference
-    startModuleFunction = GetProcAddress(modLibrary, "startModule");
+    startModuleFunction = *((viriatumStartModule *) &GET_LIBRARY_SYMBOL(modLibrary, "startModule"));
 
     // in case the start module function was not found
     if(startModuleFunction == NULL) {
@@ -288,6 +288,9 @@ int main(int argc, char *argv[]) {
 
     /* runs the service */
     runService();
+
+	/* unloads the library */
+	UNLOAD_LIBRARY(modLibrary);
 
     /* prints a debug message */
     DEBUG("Finishing process");
