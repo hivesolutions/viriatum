@@ -62,6 +62,7 @@
 #endif
 
 #ifdef VIRIATUM_PLATFORM_UNIX
+#include <dlfcn.h>
 #include <unistd.h>
 #include <pthread.h>
 #endif
