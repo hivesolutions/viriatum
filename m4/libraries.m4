@@ -29,6 +29,3 @@ AC_CHECK_LIB([pthread], [main], [], [AC_MSG_ERROR(can't build without posix thre
 AC_CHECK_LIB([lua5.1], [main], [], [AC_MSG_ERROR(can't build without posix threads (libpthread) libraries)])
 AC_CHECK_LIB([ws2_32], [main], [], [])
 AC_CHECK_LIB([viriatum], [main], have_viriatum=yes, [])
-
-# library variables activation
-AM_CONDITIONAL(LINK_LUA, [test "$have_lua" = "yes"])
