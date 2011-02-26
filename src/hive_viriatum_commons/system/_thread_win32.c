@@ -219,8 +219,7 @@ unsigned char _testLockOwnerCondition(struct Condition_t *condition) {
         return 0;
     }
 
-    // If we got the lock, but the lock count is zero, then nobody had it.
-    //
+    /* if we got the lock, but the lock count is zero, then nobody had it */
     if(condition->lockCount == 0) {
         /* asserts that the try lock result is valid */
         assert(tryLockResult);
