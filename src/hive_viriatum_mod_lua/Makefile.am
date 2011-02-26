@@ -25,7 +25,6 @@
 
 include $(top_srcdir)/Common.am
 
-if LINK_LUA
 lib_LIBRARIES = libviriatum_mod_lua.a
 
 lib_LTLIBRARIES = libviriatum_mod_lua.la
@@ -43,4 +42,3 @@ module/entry.c
 
 libviriatum_mod_lua_la_SOURCES = stdafx.c \
 module/entry.c
-endif
