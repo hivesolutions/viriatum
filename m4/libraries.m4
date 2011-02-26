@@ -26,7 +26,7 @@
 # checks for libraries
 AC_CHECK_LIB([pthread], [main], [have_pthread=yes], [AC_MSG_ERROR(can't build without POSIX threads (libpthread) libraries)])
 AC_CHECK_LIB([ws2_32], [main], [have_ws2_32=yes])
-AC_CHECK_LIB([lua], [main], [have_lua=yes])
+AC_CHECK_LIB([lua5.1], [main], [have_lua=yes])
 AC_CHECK_LIB([viriatum], [main], [have_viriatum=yes])
 
 # conditional activation of libraries
