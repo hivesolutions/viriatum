@@ -23,7 +23,7 @@
 # __copyright__ = Copyright (c) 2008 Hive Solutions Lda.
 # __license__   = GNU General Public License (GPL), Version 3
 
-echo entrando no cenas
+@echo entrando no cenas
 
 if LINK_LUA
 	include $(top_srcdir)/Common.am
