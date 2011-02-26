@@ -33,6 +33,8 @@
 #include "service.h"
 #include "service_select.h"
 
+#include <dlfcn.h>
+
 typedef void (*viriatumStartModule)(void);
 typedef void (*viriatumStopModule)(void);
 
