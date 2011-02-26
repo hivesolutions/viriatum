@@ -26,13 +26,13 @@
 include $(top_srcdir)/Common.am
 
 if LINK_LUA
-	lib_LTLIBRARIES = libviriatum_mod_lua.la
+lib_LTLIBRARIES = libviriatum_mod_lua.la
 
-	libviriatum_mod_lua_la_CFLAGS = $(AM_CFLAGS)
-	libviriatum_mod_lua_la_CXXFLAGS = $(AM_CXXFLAGS)
+libviriatum_mod_lua_la_CFLAGS = $(AM_CFLAGS)
+libviriatum_mod_lua_la_CXXFLAGS = $(AM_CXXFLAGS)
 
-	libviriatum_mod_lua_la_LDFLAGS = -version-info $(VIRIATUM_MAJOR_VERSION):$(VIRIATUM_MINOR_VERSION):$(VIRIATUM_MICRO_VERSION)
+libviriatum_mod_lua_la_LDFLAGS = -version-info $(VIRIATUM_MAJOR_VERSION):$(VIRIATUM_MINOR_VERSION):$(VIRIATUM_MICRO_VERSION)
 
-	libviriatum_mod_lua_la_SOURCES = stdafx.c \
-	module/entry.c
+libviriatum_mod_lua_la_SOURCES = stdafx.c \
+module/entry.c
 endif
