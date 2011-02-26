@@ -35,3 +35,7 @@ AC_CHECK_LIB([viriatum], [main], have_viriatum=yes)
 # library variables activation
 #AM_CONDITIONAL([LINK_LUA], [test "$have_lua" = "yes"])
 AM_CONDITIONAL(LINK_LUA, test x"$have_lua" = "xyes")
+
+if test "$have_lua" = yes; then
+    echo Building with support for lua
+fi
