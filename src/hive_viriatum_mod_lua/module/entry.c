@@ -30,29 +30,47 @@
 #include "entry.h"
 
 void startModule() {
-    // retrieves the name
+    /* allocates the lua state */
+    lua_State *luaState;
+
+    /* retrieves the name */
     unsigned char *name = nameViriatumModLua();
 
-    // retrieves the version
+    /* retrieves the version */
     unsigned char *version = versionViriatumModLua();
 
-    // retrieves the description
+    /* retrieves the description */
     unsigned char *description = descriptionViriatumModLua();
 
-    // prints a debug message
+    /* prints a debug message */
     DEBUG_F("Starting the module '%s' (%s) v%s\n", name, description, version);
+
+    /* initializes the lua interpreter */
+    luaState = lua_open();
+
+    /* load various lua libraries */
+    luaopen_base(luaState);
+    luaopen_table(luaState);
+    luaopen_string(luaState);
+    luaopen_math(luaState);
+
+    /* runs the script */
+    luaL_dofile(luaState, "c:/teste.lua");
+
+    /* cleanup lua */
+    lua_close(luaState);
 }
 
 void stopModule() {
-    // retrieves the name
+    /* retrieves the name */
     unsigned char *name = nameViriatumModLua();
 
-    // retrieves the version
+    /* retrieves the version */
     unsigned char *version = versionViriatumModLua();
 
-    // retrieves the description
+    /* retrieves the description */
     unsigned char *description = descriptionViriatumModLua();
 
-    // prints a debug message
+    /* prints a debug message */
     DEBUG_F("Stoping the module '%s' (%s) v%s\n", name, description, version);
 }
