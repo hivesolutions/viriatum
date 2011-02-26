@@ -25,7 +25,7 @@
 
 include $(top_srcdir)/Common.am
 
-if HAVE_LIBLUA5_1
+if LINK_LUA
 lib_LIBRARIES = libviriatum_mod_lua.a
 
 lib_LTLIBRARIES = libviriatum_mod_lua.la
