@@ -29,6 +29,8 @@
 
 #include "viriatum.h"
 
+#include <dlfcn.h>
+
 int threadPoolStartFunctionTest(void *arguments) {
     /* retrieves the current thread identifier */
     THREAD_IDENTIFIER threadId = THREAD_GET_IDENTIFIER();
