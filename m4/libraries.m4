@@ -33,4 +33,5 @@ AC_CHECK_LIB([viriatum], [main], [have_viriatum=yes])
 #AC_ARG_ENABLE([lua], AS_HELP_STRING([--enable-lua], [enable linking with lua @<:@default=no@:>@]), [link_lua=$enableval], [link_lua=yes])
 
 # library variables activation
-AM_CONDITIONAL([LINK_LUA], [test "$have_lua" = "yes"])
+#AM_CONDITIONAL([LINK_LUA], [test "$have_lua" = "yes"])
+AM_CONDITIONAL([LINK_LUA], [test x"$have_lua" = "xyes"])
