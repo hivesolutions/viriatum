@@ -32,7 +32,3 @@ AC_CHECK_LIB([viriatum], [main], [have_viriatum=yes], [])
 
 # library variables activation
 AM_CONDITIONAL(LINK_LUA, [test "$have_lua" = "yes"])
-
-if test "$have_lua" = no; then
-    AC_MSG_WARN(building without Lua (liblua) libraries support)
-fi
