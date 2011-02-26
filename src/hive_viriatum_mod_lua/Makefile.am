@@ -32,6 +32,7 @@ lib_LTLIBRARIES = libviriatum_mod_lua.la
 
 libviriatum_mod_lua_a_CFLAGS = $(AM_CFLAGS)
 libviriatum_mod_lua_a_CXXFLAGS = $(AM_CXXFLAGS)
+libviriatum_mod_lua_a_LDFLAGS = $(AM_LDFLAGS) -all-static
 
 libviriatum_mod_lua_la_CFLAGS = $(AM_CFLAGS)
 libviriatum_mod_lua_la_CXXFLAGS = $(AM_CXXFLAGS)
