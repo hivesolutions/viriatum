@@ -36,5 +36,5 @@ AC_CHECK_LIB([viriatum], [main], [have_viriatum=yes])
 AM_CONDITIONAL(LINK_LUA, [test "$have_lua" = "yes"])
 
 if test "$have_lua" = yes; then
-    echo Building with support for lua
+    AC_MSG_WARN(building without Lua (liblua) libraries support)
 fi
