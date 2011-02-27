@@ -49,10 +49,7 @@ void startModule() {
     luaState = lua_open();
 
     /* load various lua libraries */
-    luaopen_base(luaState);
-    luaopen_table(luaState);
-    luaopen_string(luaState);
-    luaopen_math(luaState);
+    luaL_openlibs(luaState);
 
     /* runs the script */
     luaL_dofile(luaState, "/opt/teste.lua");
