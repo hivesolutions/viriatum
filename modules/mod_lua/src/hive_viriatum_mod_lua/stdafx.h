@@ -27,7 +27,7 @@
 
 #pragma once
 
-#include "../hive_viriatum/viriatum.h"
+#include "../../../../src/hive_viriatum/viriatum.h"
 
 unsigned char *nameViriatumModLua();
 unsigned char *versionViriatumModLua();

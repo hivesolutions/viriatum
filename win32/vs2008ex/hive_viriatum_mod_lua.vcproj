@@ -163,7 +163,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\src\hive_viriatum_mod_lua\stdafx.c"
+				RelativePath="..\..\modules\mod_lua\src\hive_viriatum_mod_lua\stdafx.c"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -186,7 +186,7 @@
 				Name="Module"
 				>
 				<File
-					RelativePath="..\..\src\hive_viriatum_mod_lua\module\entry.c"
+					RelativePath="..\..\modules\mod_lua\src\hive_viriatum_mod_lua\module\entry.c"
 					>
 				</File>
 			</Filter>
@@ -197,22 +197,22 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\src\hive_viriatum_mod_lua\stdafx.h"
+				RelativePath="..\..\modules\mod_lua\src\hive_viriatum_mod_lua\stdafx.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\hive_viriatum_mod_lua\viriatum_mod_lua.h"
+				RelativePath="..\..\modules\mod_lua\src\hive_viriatum_mod_lua\viriatum_mod_lua.h"
 				>
 			</File>
 			<Filter
 				Name="Module"
 				>
 				<File
-					RelativePath="..\..\src\hive_viriatum_mod_lua\module\entry.h"
+					RelativePath="..\..\modules\mod_lua\src\hive_viriatum_mod_lua\module\entry.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\hive_viriatum_mod_lua\module\module.h"
+					RelativePath="..\..\modules\mod_lua\src\hive_viriatum_mod_lua\module\module.h"
 					>
 				</File>
 			</Filter>
@@ -224,7 +224,7 @@
 			>
 		</Filter>
 		<File
-			RelativePath="..\..\src\hive_viriatum_mod_lua\ReadMe.txt"
+			RelativePath="..\..\modules\mod_lua\src\hive_viriatum_mod_lua\ReadMe.txt"
 			>
 		</File>
 	</Files>
