@@ -41,4 +41,5 @@ LT_INIT
 AC_PROG_LIBTOOL
 AM_PROG_LIBTOOL
 
+m4_include([m4/programs.m4])
 m4_include([m4/output.m4])
