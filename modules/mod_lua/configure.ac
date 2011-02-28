@@ -32,9 +32,9 @@ AC_PREREQ(2.61)
 # defines the general values
 AC_INIT(hive_viriatum_mod_lua, mod_lua_version, development@hive.pt)
 AM_INIT_AUTOMAKE(hive_viriatum_mod_lua, mod_lua_version)
-AC_CONFIG_SRCDIR([../../src/hive_viriatum_mod_lua])
-AC_CONFIG_HEADERS([../../src/hive_viriatum_mod_lua/config.h])
-AC_CONFIG_MACRO_DIR([mod_lua/m4])
+AC_CONFIG_SRCDIR([src/hive_viriatum_mod_lua])
+AC_CONFIG_HEADERS([src/hive_viriatum_mod_lua/config.h])
+AC_CONFIG_MACRO_DIR([m4])
 
 # requires the libtool
 LT_INIT
