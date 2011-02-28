@@ -23,35 +23,5 @@
 # __copyright__ = Copyright (c) 2008 Hive Solutions Lda.
 # __license__   = GNU General Public License (GPL), Version 3
 
-# inclides the settings
-m4_include([mod_lua/m4/settings.m4])
-
-# requires autoconf
-AC_PREREQ(2.61)
-
-# defines the general values
-AC_INIT(hive_viriatum_mod_lua, mod_lua_version, development@hive.pt)
-AM_INIT_AUTOMAKE(hive_viriatum_mod_lua, mod_lua_version)
-AC_CONFIG_SRCDIR([../src/hive_viriatum_mod_lua])
-AC_CONFIG_HEADERS([../src/hive_viriatum_mod_lua/config.h])
-AC_CONFIG_MACRO_DIR([mod_lua/m4])
-
-# requires the libtool
-LT_INIT
-AC_PROG_LIBTOOL
-AM_PROG_LIBTOOL
-
-m4_include([../m4/initialization.m4])
-m4_include([../m4/exports.m4])
-m4_include([../m4/programs.m4])
-m4_include([../m4/characteristics.m4])
-m4_include([../m4/libraries.m4])
-m4_include([../m4/headers.m4])
-m4_include([../m4/functions.m4])
-m4_include([../m4/variables.m4])
-m4_include([../m4/poll.m4])
-m4_include([../m4/epoll.m4])
-m4_include([../m4/poll_methods.m4])
-m4_include([../m4/have_validation.m4])
-m4_include([../m4/output.m4])
-m4_include([../m4/message.m4])
+# sets the entry point make files to be used by automake
+AC_OUTPUT(mod_lua_makefiles)
