@@ -30,6 +30,16 @@
 #define EXCEPTION_ERROR_CODE 1
 #define RUNTIME_EXCEPTION_ERROR_CODE 2
 
-#define ERROR_CODE int
-#define RAISE_ERROR(errorCode) return errorCode
+#define EMPTY_ERROR_MESSAGE "N/A"
+
+#define ERROR_CODE unsigned int
+#define RAISE_ERROR(errorCode) setLastErrorMessage(NULL); return errorCode
+#define RAISE_ERROR_M(errorCode, errorMessage) setLastErrorMessage(errorMessage); return errorCode
 #define RAISE_NO_ERROR return 0
+#define IS_ERROR_CODE(errorCode) errorCode != 0
+
+unsigned int getLastErrorCode();
+void setLastErrorCode(unsigned int errorCode);
+unsigned char *getLastErrorMessage();
+unsigned char *getLastErrorMessageSafe();
+void setLastErrorMessage(unsigned char *errorMessage);

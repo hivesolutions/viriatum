@@ -28,3 +28,35 @@
 #include "stdafx.h"
 
 #include "error.h"
+
+unsigned int lastErrorCode;
+unsigned char *lastErrorMessage;
+
+unsigned int getLastErrorCode() {
+    return lastErrorCode;
+}
+
+void setLastErrorCode(unsigned int errorCode) {
+    lastErrorCode = errorCode;
+}
+
+unsigned char *getLastErrorMessage() {
+    return lastErrorMessage;
+}
+
+unsigned char *getLastErrorMessageSafe() {
+    /* in case the last error message is not set */
+    if(lastErrorMessage == NULL) {
+        /* returns the empty error message */
+        return EMPTY_ERROR_MESSAGE;
+    }
+    /* otherwise (normal behaviour */
+    else {
+        /* returns the last error message */
+        return lastErrorMessage;
+    }
+}
+
+void setLastErrorMessage(unsigned char *errorMessage) {
+    lastErrorMessage = errorMessage;
+}

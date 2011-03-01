@@ -50,6 +50,9 @@ void runService() {
 }
 
 int main(int argc, char *argv[]) {
+    /* allocates the return value */
+    ERROR_CODE returnValue;
+
     /* retrieves the version */
     unsigned char *version = versionViriatum();
 
@@ -63,7 +66,12 @@ int main(int argc, char *argv[]) {
     DEBUG_F("Receiving %d arguments\n", argc);
 
     /* loads the module */
-    loadModule("/opt/lib/libviriatum_mod_lua.so");
+    returnValue = loadModule("/opt/lib/libviriatum_mod_lua.so");
+
+    /* tests the error code for error */
+    if(IS_ERROR_CODE(returnValue)) {
+        DEBUG_F("%s\n", getLastErrorMessageSafe());
+    }
 
     /* runs the simple tests */
     runSimpleTests();
