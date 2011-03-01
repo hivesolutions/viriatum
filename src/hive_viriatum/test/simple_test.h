@@ -27,10 +27,43 @@
 
 #pragma once
 
+/**
+ * Test thread function to be used in the thread
+ * pool test.
+ *
+ * @param arguments The pointer to the arguments to
+ * the thread.
+ * @return The result of the thread execution.
+ */
 int threadPoolStartFunctionTest(void *arguments);
+
+/**
+ * Tests the thread pool implementation.
+ */
 void testThreadPool();
+
+/**
+ * Tests the linked list structure.
+ */
 void testLinkedList();
+
+/**
+ * Tests the array list structure.
+ */
 void testArrayList();
+
+/**
+ * Tests the hash map structure.
+ */
 void testHashMap();
+
+/**
+ * Teste the base 64 encoding.
+ */
 void testBase64();
+
+/**
+ * Runs the set of simple tests in the current
+ * test case.
+ */
 void runSimpleTests();
