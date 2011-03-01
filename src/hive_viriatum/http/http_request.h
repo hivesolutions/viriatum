@@ -28,7 +28,7 @@
 #pragma once
 
 typedef struct HttpRequest_t {
-	size_t receivedDataSize;
+    size_t receivedDataSize;
     unsigned char startLineLoaded;
     unsigned char headersLoaded;
 } HttpRequest;
