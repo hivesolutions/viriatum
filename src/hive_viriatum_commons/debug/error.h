@@ -38,8 +38,8 @@
 #define RAISE_NO_ERROR return 0
 #define IS_ERROR_CODE(errorCode) errorCode != 0
 
-unsigned int getLastErrorCode();
-void setLastErrorCode(unsigned int errorCode);
-unsigned char *getLastErrorMessage();
-unsigned char *getLastErrorMessageSafe();
-void setLastErrorMessage(unsigned char *errorMessage);
+VIRIATUM_EXPORT_PREFIX unsigned int getLastErrorCode();
+VIRIATUM_EXPORT_PREFIX void setLastErrorCode(unsigned int errorCode);
+VIRIATUM_EXPORT_PREFIX unsigned char *getLastErrorMessage();
+VIRIATUM_EXPORT_PREFIX unsigned char *getLastErrorMessageSafe();
+VIRIATUM_EXPORT_PREFIX void setLastErrorMessage(unsigned char *errorMessage);

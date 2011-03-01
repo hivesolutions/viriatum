@@ -172,6 +172,8 @@ void httpWriteHandler(struct ServiceSelect_t *serviceSelect, struct Connection_t
     /* in case there is no error */
     if(error == 0) {
         /* VALOR HARDCODAD FAZER ISTO DE UMA MELHOR MANEIRA */
+        /* Tenho realmente de remover o ganho de estar a espera para escrita *7
+        /* mas nao neste handler de http (nao e da competencia dele) */
         SOCKET_SET_CLEAR(connection->socketHandle, &serviceSelect->socketsWriteSet);
         connection->writeRegistered = 0;
     }

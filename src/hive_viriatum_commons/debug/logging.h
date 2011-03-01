@@ -37,4 +37,4 @@
 #define DEBUG_F(format, ...) dumpMultiple(format, __VA_ARGS__)
 #endif
 
-void debug(const char *format, ...);
+VIRIATUM_EXPORT_PREFIX void debug(const char *format, ...);
