@@ -39,20 +39,24 @@ libviriatum_la_LDFLAGS = -version-info $(VIRIATUM_MAJOR_VERSION):$(VIRIATUM_MINO
 
 libviriatum_a_SOURCES = stdafx.c \
 checksum/crc_32.c \
+debug/error.c \
+debug/logging.c \
 encoding/base_64.c \
 structures/array_list.c \
 structures/hash_map.c \
 structures/iterator.c \
 structures/linked_list.c \
 system/_thread_win32.c \
-thread/thread_pool.c
+thread/thread_pool.c 
 
 libviriatum_la_SOURCES = stdafx.c \
 checksum/crc_32.c \
+debug/error.c \
+debug/logging.c \
 encoding/base_64.c \
 structures/array_list.c \
 structures/hash_map.c \
 structures/iterator.c \
 structures/linked_list.c \
 system/_thread_win32.c \
-thread/thread_pool.c
+thread/thread_pool.c 
