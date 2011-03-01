@@ -403,6 +403,18 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="Http"
+				>
+				<File
+					RelativePath="..\..\src\hive_viriatum\http\message_parser.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\hive_viriatum\http\request.c"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -478,6 +490,22 @@
 				</File>
 				<File
 					RelativePath="..\..\src\hive_viriatum\module\module.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Http"
+				>
+				<File
+					RelativePath="..\..\src\hive_viriatum\http\http.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\hive_viriatum\http\message_parser.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\hive_viriatum\http\request.h"
 					>
 				</File>
 			</Filter>
