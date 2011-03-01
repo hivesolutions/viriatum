@@ -30,9 +30,19 @@
 #include "http_request.h"
 
 void createHttpRequest(struct HttpRequest_t **httpRequestPointer) {
+    /* retrieves the http request size */
+    size_t httpRequestSize = sizeof(struct HttpRequest_t);
+
+    /* allocates space for the http request */
+    struct HttpRequest_t *httpRequest = (struct HttpRequest_t *) malloc(httpRequestSize);
+
+    /* sets the http request in the http request pointer */
+    *httpRequestPointer = httpRequest;
 }
 
 void deleteHttpRequest(struct HttpRequest_t *httpRequest) {
+    /* releases the http request */
+    free(httpRequest);
 }
 
 void parseDataHttpRequest(struct HttpRequest_t *httpRequest, unsigned char *data) {
