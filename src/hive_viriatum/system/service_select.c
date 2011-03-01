@@ -109,6 +109,7 @@ void httpReadHandler(struct ServiceSelect_t *serviceSelect, struct Connection_t 
     /* adds the response buffer to the write queue */
     appendValueLinkedList(connection->writeQueue, (void *) responseBuffer);
 
+	/* ESTE CONCEIDO DE ADICAO A LISTA DE ESCRITAS AINDA ESTA MUITO BADALHOCO TENHO DE PENSAR MELHOR */
     if(connection->writeRegistered == 0) {
         /* ESTA HARDCODADO TENHO DE ARRANJAR UMA MANEIIRA MAIS SOFT DE FAZER ISTO !!! */
         addSocketHandleSocketsSetServiceSelect(serviceSelect, connection->socketHandle, &serviceSelect->socketsWriteSet);
