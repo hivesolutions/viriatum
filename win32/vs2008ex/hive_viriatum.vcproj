@@ -324,14 +324,6 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\src\hive_viriatum\service.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\hive_viriatum\service_select.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\src\hive_viriatum\stdafx.c"
 				>
 				<FileConfiguration
@@ -371,20 +363,28 @@
 				RelativePath="..\..\src\hive_viriatum\viriatum.c"
 				>
 			</File>
+			<Filter
+				Name="System"
+				>
+				<File
+					RelativePath="..\..\src\hive_viriatum\system\service.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\hive_viriatum\system\service_select.c"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Global"
+				>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
-			<File
-				RelativePath="..\..\src\hive_viriatum\service.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\hive_viriatum\service_select.h"
-				>
-			</File>
 			<File
 				RelativePath="..\..\src\hive_viriatum\stdafx.h"
 				>
@@ -402,6 +402,22 @@
 				</File>
 				<File
 					RelativePath="..\..\src\hive_viriatum\global\targetver.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="System"
+				>
+				<File
+					RelativePath="..\..\src\hive_viriatum\system\service.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\hive_viriatum\system\service_select.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\hive_viriatum\system\system.h"
 					>
 				</File>
 			</Filter>

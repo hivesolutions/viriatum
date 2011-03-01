@@ -29,8 +29,7 @@
 
 #include "stdafx.h"
 
-#include "service.h"
-#include "service_select.h"
+#include "system/system.h"
 
 typedef void (*viriatumStartModule)(void);
 typedef void (*viriatumStopModule)(void);
