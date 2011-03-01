@@ -30,6 +30,7 @@
 #include "stdafx.h"
 
 #include "checksum/checksum.h"
+#include "debug/debug.h"
 #include "encoding/encoding.h"
 #include "util/util.h"
 #include "structures/structures.h"

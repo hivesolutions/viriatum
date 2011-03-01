@@ -27,8 +27,6 @@
 
 #pragma once
 
-#include "logging.h"
-
 typedef struct Service_t {
     unsigned char *name;
     unsigned int status;
