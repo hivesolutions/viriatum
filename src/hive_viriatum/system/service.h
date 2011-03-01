@@ -41,7 +41,18 @@ typedef struct Connection_t {
     struct LinkedList_t *writeQueue;
 } Connection;
 
+/**
+ * Constructor of the service.
+ *
+ * @param servicePointer The pointer to the service to be constructed.
+ */
 void createService(struct Service_t **servicePointer);
+
+/**
+ * Destructor of the service.
+ *
+ * @param service The service to be destroyed.
+ */
 void deleteService(struct Service_t *service);
 void startService(struct Service_t *service);
 void addConnectionService(struct Service_t *service, struct Connection_t *connection);
