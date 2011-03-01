@@ -29,6 +29,7 @@
 
 #include "stdafx.h"
 
+#include "http/http.h"
 #include "io/io.h"
 #include "module/module.h"
 #include "system/system.h"
