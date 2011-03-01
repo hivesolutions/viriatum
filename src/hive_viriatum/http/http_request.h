@@ -28,9 +28,11 @@
 #pragma once
 
 typedef struct HttpRequest_t {
-    size_t size;
+	size_t receivedDataSize;
+    unsigned char startLineLoaded;
+    unsigned char headersLoaded;
 } HttpRequest;
 
 void createHttpRequest(struct HttpRequest_t **httpRequestPointer);
 void deleteHttpRequest(struct HttpRequest_t *httpRequest);
-void parseDataHttpRequest(struct HttpRequest_t *httpRequest, unsigned char *data);
+void parseDataHttpRequest(struct HttpRequest_t *httpRequest, unsigned char *data, size_t dataSize);
