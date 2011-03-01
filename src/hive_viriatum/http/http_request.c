@@ -27,4 +27,13 @@
 
 #include "stdafx.h"
 
-#include "request.h"
+#include "http_request.h"
+
+void createHttpRequest(struct HttpRequest_t **httpRequestPointer) {
+}
+
+void deleteHttpRequest(struct HttpRequest_t *httpRequest) {
+}
+
+void parseDataHttpRequest(struct HttpRequest_t *httpRequest, unsigned char *data) {
+}

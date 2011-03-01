@@ -407,11 +407,7 @@
 				Name="Http"
 				>
 				<File
-					RelativePath="..\..\src\hive_viriatum\http\message_parser.c"
-					>
-				</File>
-				<File
-					RelativePath="..\..\src\hive_viriatum\http\request.c"
+					RelativePath="..\..\src\hive_viriatum\http\http_request.c"
 					>
 				</File>
 			</Filter>
@@ -501,11 +497,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\hive_viriatum\http\message_parser.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\src\hive_viriatum\http\request.h"
+					RelativePath="..\..\src\hive_viriatum\http\http_request.h"
 					>
 				</File>
 			</Filter>
