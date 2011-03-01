@@ -28,6 +28,7 @@
 #pragma once
 
 #include "_thread_win32.h"
+#include "dynamic.h"
 #include "socket.h"
 #include "system_util.h"
 #include "thread.h"
