@@ -25,6 +25,12 @@
  __license__   = GNU General Public License (GPL), Version 3
 */
 
-#include "stdafx.h"
+#pragma once
 
-#include "message_parser.h"
+typedef struct HttpRequest_t {
+    size_t size;
+} HttpRequest;
+
+void createHttpRequest(struct HttpRequest_t **httpRequestPointer);
+void deleteHttpRequest(struct HttpRequest_t *httpRequest);
+void parseDataHttpRequest(struct HttpRequest_t *httpRequest, unsigned char *data);
