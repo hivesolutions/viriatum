@@ -48,7 +48,7 @@ ERROR_CODE loadModule(unsigned char *modulePath) {
         DEBUG("Problem loading library\n");
 
         /* raises an error */
-        RAISE_ERROR(RUNTIME_EXCEPTION_ERROR_CODE);
+        RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, "Problem loading library");
     } else {
         /* prints a debug message */
         DEBUG("Loaded library\n");
@@ -66,7 +66,7 @@ ERROR_CODE loadModule(unsigned char *modulePath) {
         DEBUG_F("No such symbol %s in library\n", "startModule");
 
         /* raises an error */
-        RAISE_ERROR(RUNTIME_EXCEPTION_ERROR_CODE);
+        RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, "Problem finding symbol");
     } else {
         /* prints a debug message */
         DEBUG_F("Found symbol %s in library\n", "startModule");
