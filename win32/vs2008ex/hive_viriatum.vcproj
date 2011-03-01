@@ -379,6 +379,14 @@
 				Name="Global"
 				>
 			</Filter>
+			<Filter
+				Name="Test"
+				>
+				<File
+					RelativePath="..\..\src\hive_viriatum\test\simple_test.c"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -418,6 +426,18 @@
 				</File>
 				<File
 					RelativePath="..\..\src\hive_viriatum\system\system.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Test"
+				>
+				<File
+					RelativePath="..\..\src\hive_viriatum\test\simple_test.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\hive_viriatum\test\test.h"
 					>
 				</File>
 			</Filter>
