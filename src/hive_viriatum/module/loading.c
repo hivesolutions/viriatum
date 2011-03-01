@@ -29,7 +29,7 @@
 
 #include "loading.h"
 
-void loadModule(unsigned char *modulePath) {
+ERROR_CODE loadModule(unsigned char *modulePath) {
     /* the mod library reference */
     LIBRARY_REFERENCE modLibrary;
 
@@ -46,6 +46,9 @@ void loadModule(unsigned char *modulePath) {
     if(modLibrary == NULL) {
         /* prints a debug message */
         DEBUG("Problem loading library\n");
+
+        /* raises an error */
+        RAISE_ERROR(RUNTIME_EXCEPTION_ERROR_CODE);
     } else {
         /* prints a debug message */
         DEBUG("Loaded library\n");
@@ -61,6 +64,9 @@ void loadModule(unsigned char *modulePath) {
     if(startModuleFunction == NULL) {
         /* prints a debug message */
         DEBUG_F("No such symbol %s in library\n", "startModule");
+
+        /* raises an error */
+        RAISE_ERROR(RUNTIME_EXCEPTION_ERROR_CODE);
     } else {
         /* prints a debug message */
         DEBUG_F("Found symbol %s in library\n", "startModule");
@@ -71,4 +77,7 @@ void loadModule(unsigned char *modulePath) {
 
     /* unloads the library */
     UNLOAD_LIBRARY(modLibrary);
+
+    /* raise no error */
+    RAISE_NO_ERROR;
 }

@@ -381,6 +381,10 @@
 				Name="Debug"
 				>
 				<File
+					RelativePath="..\..\src\hive_viriatum_commons\debug\error.c"
+					>
+				</File>
+				<File
 					RelativePath="..\..\src\hive_viriatum_commons\debug\logging.c"
 					>
 				</File>
@@ -536,6 +540,10 @@
 				>
 				<File
 					RelativePath="..\..\src\hive_viriatum_commons\debug\debug.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\hive_viriatum_commons\debug\error.h"
 					>
 				</File>
 				<File
