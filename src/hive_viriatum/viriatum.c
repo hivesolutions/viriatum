@@ -29,44 +29,6 @@
 
 #include "viriatum.h"
 
-void readFile(char *filePath, unsigned char **bufferPointer, size_t *fileSizePointer) {
-    /* allocates space for the file */
-    FILE *file;
-
-    /* allocates space for the file size */
-    size_t fileSize;
-
-    /* allocates space for the file buffer */
-    unsigned char *fileBuffer;
-
-    /* allocates space for the number of bytes */
-    size_t numberBytes;
-
-    /* opens the file */
-    FOPEN(&file, filePath, "rb");
-
-    /* seeks the file until the end */
-    fseek(file, 0, SEEK_END);
-
-    /* retrieves the file size */
-    fileSize = ftell (file);
-
-    /* seeks the file until the beginning */
-    fseek(file, 0, SEEK_SET);
-
-    /* allocates space for the file buffer */
-    fileBuffer = (unsigned char *) malloc(fileSize);
-
-    /* reads the file contents */
-    numberBytes = fread(fileBuffer, 1, fileSize, file);
-
-    /* sets the buffer as the buffer pointer */
-    *bufferPointer = fileBuffer;
-
-    /* sets the file size as the file size pointer */
-    *fileSizePointer = fileSize;
-}
-
 void runService() {
     /* allocates the service select */
     struct ServiceSelect_t *serviceSelect;
@@ -87,50 +49,6 @@ void runService() {
     SOCKET_FINISH();
 }
 
-void loadDynamic() {
-    /* the mod library reference */
-    LIBRARY_REFERENCE modLibrary;
-
-    /* the holder of the library symbol */
-    LIBRARY_SYMBOL symbol;
-
-    /* the start module function reference */
-    viriatumStartModule startModuleFunction;
-
-    /* loads the mod library */
-    modLibrary = LOAD_LIBRARY("/opt/lib/libviriatum_mod_lua.so");
-
-    /* in case the mod library was not loaded */
-    if(modLibrary == NULL) {
-        /* prints a debug message */
-        DEBUG("Problem loading library\n");
-    } else {
-        /* prints a debug message */
-        DEBUG("Loaded library\n");
-    }
-
-    /* retrieves the symbol from the mod library */
-    symbol = GET_LIBRARY_SYMBOL(modLibrary, "startModule");
-
-    /* retrieves the start nodule function reference */
-    startModuleFunction = *((viriatumStartModule*)(&symbol));
-
-    /* in case the start module function was not found */
-    if(startModuleFunction == NULL) {
-        /* prints a debug message */
-        DEBUG_F("No such symbol %s in library\n", "startModule");
-    } else {
-        /* prints a debug message */
-        DEBUG_F("Found symbol %s in library\n", "startModule");
-    }
-
-    /* calls the start module function */
-    startModuleFunction();
-
-    /* unloads the library */
-    UNLOAD_LIBRARY(modLibrary);
-}
-
 int main(int argc, char *argv[]) {
     /* retrieves the version */
     unsigned char *version = versionViriatum();
@@ -144,8 +62,8 @@ int main(int argc, char *argv[]) {
     /* prints a debug message */
     DEBUG_F("Receiving %d arguments\n", argc);
 
-    /* loads the dynamic libraries (modules) */
-    loadDynamic();
+    /* loads the module */
+    loadModule("/opt/lib/libviriatum_mod_lua.so");
 
     /* runs the simple tests */
     runSimpleTests();

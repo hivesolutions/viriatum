@@ -387,6 +387,22 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="Io"
+				>
+				<File
+					RelativePath="..\..\src\hive_viriatum\io\file.c"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Module"
+				>
+				<File
+					RelativePath="..\..\src\hive_viriatum\module\loading.c"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -438,6 +454,30 @@
 				</File>
 				<File
 					RelativePath="..\..\src\hive_viriatum\test\test.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Io"
+				>
+				<File
+					RelativePath="..\..\src\hive_viriatum\io\file.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\hive_viriatum\io\io.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Module"
+				>
+				<File
+					RelativePath="..\..\src\hive_viriatum\module\loading.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\hive_viriatum\module\module.h"
 					>
 				</File>
 			</Filter>
