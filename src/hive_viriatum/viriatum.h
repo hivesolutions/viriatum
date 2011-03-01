@@ -29,8 +29,7 @@
 
 #include "stdafx.h"
 
+#include "io/io.h"
+#include "module/module.h"
 #include "system/system.h"
 #include "test/test.h"
-
-typedef void (*viriatumStartModule)(void);
-typedef void (*viriatumStopModule)(void);
