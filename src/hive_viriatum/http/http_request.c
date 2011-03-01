@@ -36,8 +36,8 @@ void createHttpRequest(struct HttpRequest_t **httpRequestPointer) {
     /* allocates space for the http request */
     struct HttpRequest_t *httpRequest = (struct HttpRequest_t *) malloc(httpRequestSize);
 
-	/* sets the http request received data size */
-	httpRequest->receivedDataSize = 0;
+    /* sets the http request received data size */
+    httpRequest->receivedDataSize = 0;
 
     /* sets the http request start line loaded */
     httpRequest->startLineLoaded = 0;
@@ -56,12 +56,12 @@ void deleteHttpRequest(struct HttpRequest_t *httpRequest) {
 
 void parseDataHttpRequest(struct HttpRequest_t *httpRequest, unsigned char *data, size_t dataSize) {
     /**
-	 * NOTE: durring the parsing the index (and rest of the state) of
+     * NOTE: durring the parsing the index (and rest of the state) of
      *       the find must be saved during the various parsing iterations
      *
      * 1. must find the first \r\n to load the first line of the http message
      * 2. sets the startLineLoaded flag
      * 3. tries to find the \r\n\r\n end to load the headers
      * 4. sets the headersLoaded flag
-	 */
+     */
 }
