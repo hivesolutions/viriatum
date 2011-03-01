@@ -41,7 +41,7 @@ import os.path
 import re
 
 SOURCE_FILE_EXTENSIONS = ["cpp", "c", "mm"]
-SOURCE_DIRS = ["src/hive_viriatum_mod_lua", "src/hive_viriatum_commons", "src/hive_viriatum"]
+SOURCE_DIRS = ["modules/mod_lua/src/hive_viriatum_mod_lua", "src/hive_viriatum_commons", "src/hive_viriatum"]
 base_path = "none"
 
 path_names = []
