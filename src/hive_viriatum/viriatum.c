@@ -66,7 +66,7 @@ int main(int argc, char *argv[]) {
     DEBUG_F("Receiving %d arguments\n", argc);
 
     /* loads the module */
-    returnValue = loadModule("/opt/lib/libviriatum_mod_lua.so");
+    returnValue = loadModule("C:/Users/joamag/Desktop/repositories/viriatum/bin/hive_viriatum_mod_lua/i386/win32/Debug/hive_viriatum_mod_lua.dll");
 
     /* tests the error code for error */
     if(IS_ERROR_CODE(returnValue)) {
