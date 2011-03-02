@@ -367,6 +367,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\src\hive_viriatum_commons\structures\buffer.c"
+					>
+				</File>
+				<File
 					RelativePath="..\..\src\hive_viriatum_commons\structures\hash_map.c"
 					>
 				</File>
@@ -470,6 +474,10 @@
 				>
 				<File
 					RelativePath="..\..\src\hive_viriatum_commons\structures\array_list.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\hive_viriatum_commons\structures\buffer.h"
 					>
 				</File>
 				<File
