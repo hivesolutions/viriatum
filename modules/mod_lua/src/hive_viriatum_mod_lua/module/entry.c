@@ -52,7 +52,7 @@ void startModule() {
     luaL_openlibs(luaState);
 
     /* runs the script */
-    luaL_dofile(luaState, "/opt/teste.lua");
+    luaL_dofile(luaState, "c:/teste.lua");
 
     /* cleanup lua */
     lua_close(luaState);
