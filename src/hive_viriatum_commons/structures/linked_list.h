@@ -41,7 +41,18 @@ typedef struct LinkedListNode_t {
     struct LinkedListNode_t *previous;
 } LinkedListNode;
 
+/**
+ * Constructor of the linked list.
+ *
+ * @param linkedListPointer The pointer to the linked list to be constructed.
+ */
 VIRIATUM_EXPORT_PREFIX void createLinkedList(struct LinkedList_t **linkedListPointer);
+
+/**
+ * Destructor of the linked list.
+ *
+ * @param linkedList The linked list to be destroyed.
+ */
 VIRIATUM_EXPORT_PREFIX void deleteLinkedList(struct LinkedList_t *linkedList);
 VIRIATUM_EXPORT_PREFIX void createLinkedListNode(struct LinkedListNode_t **linkedListNodePointer);
 VIRIATUM_EXPORT_PREFIX void deleteLinkedListNode(struct LinkedListNode_t *linkedListNode);
