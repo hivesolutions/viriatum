@@ -38,7 +38,7 @@ typedef struct MemoryPoolLargeBlock_t {
 } MemoryPoolLargeBlock;
 
 typedef struct MemoryPoolData_t {
-
+    struct MemoryPool_t *next;
 } MemoryPoolData;
 
 typedef struct MemoryPool_t {
