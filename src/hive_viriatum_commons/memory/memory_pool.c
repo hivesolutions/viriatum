@@ -39,9 +39,6 @@ void createMemoryPool(struct MemoryPool_t **memoryPoolPointer) {
     /* sets the memory pool size */
     memoryPool->size = MEMORY_POOL_SIZE;
 
-    /* sets the memory pool next */
-    memoryPool->next = NULL;
-
     /* sets the memory pool current */
     memoryPool->current = memoryPool;
 
@@ -60,4 +57,7 @@ void deleteMemoryPool(struct MemoryPool_t *memoryPool) {
 void *allocMemoryPool(struct MemoryPool_t *memoryPool, size_t size) {
     /* retrieves the current memory pool */
     struct MemoryPool_t *currentMemoryPool = memoryPool->current;
+
+    /* returns invalid */
+    return NULL;
 }

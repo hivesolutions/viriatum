@@ -38,14 +38,40 @@ typedef struct MemoryPoolLargeBlock_t {
 } MemoryPoolLargeBlock;
 
 typedef struct MemoryPoolData_t {
+    void *last;
+    void *end;
     struct MemoryPool_t *next;
 } MemoryPoolData;
 
+/**
+ * Structure defining a memory pool.
+ */
 typedef struct MemoryPool_t {
+    /**
+     * The data associated with the memory pool.
+     * The data of a pool sets its position in the global
+     * memory pool sequence.
+     */
+    struct MemoryPoolData_t data;
+
+    /**
+     * The current size of the memory pool in bytes.
+     */
     size_t size;
+
+    /**
+     * The maximum block size to be used.
+     */
     size_t maximumBlockSize;
-    struct MemoryPool_t *next;
+
+    /**
+     * The current memory pool reference.
+     */
     struct MemoryPool_t *current;
+
+    /**
+     * Reference to the initial large block reference.
+     */
     struct MemoryPoolLargeBlock_t *largeBlock;
 } MemoryPool;
 
