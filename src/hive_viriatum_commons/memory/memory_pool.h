@@ -32,15 +32,38 @@
 
 #define MEMORY_POOL_SIZE 128
 
+/**
+ * Structure defining a large block for memory pool.
+ * The large blocks represent data to be allocated dynamically.
+ */
 typedef struct MemoryPoolLargeBlock_t {
+    /**
+     * The next large memory block in the list.
+     */
     struct MemoryPoolLargeBlock_t *next;
+
+    /**
+     * The pointer to the data in the large
+     * memory block.
+     */
     void *data;
 } MemoryPoolLargeBlock;
 
+/**
+ * Structure defining the positioning of the data inside
+ * the memory pool "item".
+ */
 typedef struct MemoryPoolData_t {
+    /**
+     * Pointer to the last occupied slot index in
+     * the memory pool data.
+     */
     void *last;
+
+    /**
+     * Pointer to the end of the memory pool data.
+     */
     void *end;
-    struct MemoryPool_t *next;
 } MemoryPoolData;
 
 /**
@@ -68,6 +91,11 @@ typedef struct MemoryPool_t {
      * The current memory pool reference.
      */
     struct MemoryPool_t *current;
+
+    /**
+     * The next memory pool reference.
+     */
+    struct MemoryPool_t *next;
 
     /**
      * Reference to the initial large block reference.
