@@ -103,6 +103,18 @@ typedef struct MemoryPool_t {
     struct MemoryPoolLargeBlock_t *largeBlock;
 } MemoryPool;
 
+/**
+ * Creates a new memory pool object.
+ *
+ * @param memoryPoolPointer The pointer to the memory
+ * pool object to be created.
+ */
 void createMemoryPool(struct MemoryPool_t **memoryPoolPointer);
+
+/**
+ * Deletes an existing memory pool object.
+ *
+ * @param memoryPool The memory pool object to be deleted.
+ */
 void deleteMemoryPool(struct MemoryPool_t *memoryPool);
 void *allocMemoryPool(struct MemoryPool_t *memoryPool, size_t size);
