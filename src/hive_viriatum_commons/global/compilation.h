@@ -27,7 +27,12 @@
 
 #pragma once
 
-/* compilation values */
-
+/**
+ * The compilation date.
+ */
 #define VIRIATUM_COMPILATION_DATE __DATE__
+
+/**
+ * The compilation time.
+ */
 #define VIRIATUM_COMPILATION_TIME __TIME__
