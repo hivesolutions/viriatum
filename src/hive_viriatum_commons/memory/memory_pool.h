@@ -117,4 +117,14 @@ void createMemoryPool(struct MemoryPool_t **memoryPoolPointer);
  * @param memoryPool The memory pool object to be deleted.
  */
 void deleteMemoryPool(struct MemoryPool_t *memoryPool);
+
+/**
+ * Allocates a memory buffer the memory pool and
+ * with the given size.
+ *
+ * @param memoryPool The memory pool object to be used.
+ * @param size The size in bytes of the memory buffer to
+ * allocated.
+ * @return The allocated buffer.
+ */
 void *allocMemoryPool(struct MemoryPool_t *memoryPool, size_t size);
