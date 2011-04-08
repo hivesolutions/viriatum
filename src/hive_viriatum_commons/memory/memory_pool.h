@@ -28,8 +28,16 @@
 #pragma once
 
 #define SMALL_BLOCK_SIZE 1024
+
+/**
+ * The minimum size of a block to be
+ * considered a large block.
+ */
 #define LARGE_BLOCK_SIZE 4096
 
+/**
+ * The default size of a memory pool.
+ */
 #define MEMORY_POOL_SIZE 128
 
 /**
