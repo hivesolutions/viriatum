@@ -28,7 +28,38 @@
 #pragma once
 
 VIRIATUM_EXPORT_PREFIX int encodeBase64(unsigned char *buffer, size_t bufferLength, unsigned char **encodedBufferPointer, size_t *encodedBufferLengthPointer);
+VIRIATUM_EXPORT_PREFIX int decodeBase64(unsigned char *encodedBuffer, size_t encodedBufferLength, unsigned char **decodedBufferPointer, size_t *decodedBufferLengthPointer);
+
+/**
+ * Calculates the encoded buffer length from the
+ * given (decoded) buffer length.
+ *
+ * @param bufferLength The length of the (decoded) buffer.
+ * @return The length of the encoded buffer.
+ */
 VIRIATUM_EXPORT_PREFIX size_t calculateEncodedBufferLengthBase64(size_t bufferLength);
 
+/**
+ * Calculates the decoded buffer length from the
+ * given encoded buffer length.
+ *
+ * @param encodedBufferLength The length of the encoded buffer.
+ * @param paddingCount The ammount of padding in the base 64 encoded string.
+ * @return The length of the decoded buffer.
+ */
+VIRIATUM_EXPORT_PREFIX size_t calculateDecodedBufferLenghtBase64(size_t encodedBufferLength, size_t paddingCount);
+
 VIRIATUM_NO_EXPORT_PREFIX int _encodeBase64(unsigned char *buffer, size_t bufferLength, unsigned char *encodedBuffer, size_t encodedBufferLength);
+VIRIATUM_NO_EXPORT_PREFIX int _decodeBase64(unsigned char *encodedBuffer, size_t encodedBufferLength, unsigned char *buffer, size_t bufferLength);
 VIRIATUM_NO_EXPORT_PREFIX int _allocateEncodedBuffer(size_t bufferLength, unsigned char **encodedBufferPointer, size_t *encodedBufferLengthPointer);
+VIRIATUM_NO_EXPORT_PREFIX int _allocateDecodedBuffer(size_t encodedBufferLength, unsigned char **decodedBufferPointer, size_t *decodedBufferLengthPointer, size_t paddingCount);
+
+/**
+ * Retrieves the padding count for the given encoded buffer
+ * and using the given encoded buffer length.
+ *
+ * @param encodedBuffer The encoded buffer to measure the padding.
+ * @param encodedBufferLength The lenght of the encoded buffer.
+ * @return The padding count for the given encoded buffer.
+ */
+VIRIATUM_NO_EXPORT_PREFIX unsigned int _getPaddingCount(unsigned char *encodedBuffer, size_t encodedBufferLength);

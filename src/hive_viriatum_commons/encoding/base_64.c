@@ -42,15 +42,46 @@ int encodeBase64(unsigned char *buffer, size_t bufferLength, unsigned char **enc
     return 0;
 }
 
+int decodeBase64(unsigned char *encodedBuffer, size_t encodedBufferLength, unsigned char **decodedBufferPointer, size_t *decodedBufferLengthPointer) {
+    /* retrieves the padding count from the encoded buffer */
+    unsigned int paddingCount = _getPaddingCount(encodedBuffer, encodedBufferLength);
+
+    /* allocates the decoded buffer, and assigns the decoded buffer length */
+    _allocateDecodedBuffer(encodedBufferLength, decodedBufferPointer, decodedBufferLengthPointer, paddingCount);
+
+    /* decodes the buffer from base 64 */
+    _decodeBase64(encodedBuffer, encodedBufferLength, *decodedBufferPointer, *decodedBufferLengthPointer);
+
+    /* returns valid */
+    return 0;
+}
+
 size_t calculateEncodedBufferLengthBase64(size_t bufferLength) {
     /* allocates the encoded buffer length */
     size_t encodedBufferLength;
 
+    /* allocates the padding count */
+    size_t paddingCount;
+
+    /* calculates the padding count */
+    paddingCount = (bufferLength % 3) ? 3 - (bufferLength % 3) : 0;
+
     /* calculates the encoded buffer length */
-    encodedBufferLength = (bufferLength + 2 - ((bufferLength + 2) % 3)) / 3 * 4 ;
+    encodedBufferLength = ((bufferLength + paddingCount) * 4 / 3);
 
     /* returns the encoded buffer length */
     return encodedBufferLength;
+}
+
+size_t calculateDecodedBufferLenghtBase64(size_t encodedBufferLength, size_t paddingCount) {
+    /* allocates the decoded buffer length */
+    size_t decodedBufferLength;
+
+    /* calculates the decoded buffer length */
+    decodedBufferLength = (encodedBufferLength / 4 * 3) - 1;
+
+    /* returns the decoded buffer length */
+    return decodedBufferLength;
 }
 
 int _encodeBase64(unsigned char *buffer, size_t bufferLength, unsigned char *encodedBuffer, size_t encodedBufferLength) {
@@ -67,7 +98,7 @@ int _encodeBase64(unsigned char *buffer, size_t bufferLength, unsigned char *enc
     unsigned char number0, number1, number2, number3;
 
     /* creates the pad count value */
-    unsigned int padCount = bufferLength % 3;
+    unsigned int padCount = (unsigned int) bufferLength % 3;
 
     /* starts the encoded buffer index */
     encodedBufferIndex = 0;
@@ -79,11 +110,13 @@ int _encodeBase64(unsigned char *buffer, size_t bufferLength, unsigned char *enc
 
         /* in case there are two bytes (at least) available */
         if(index + 1 < bufferLength) {
+            /* increments the number with the value of the second byte */
             number += buffer[index + 1] << 8;
         }
 
         /* in case there are three bytes (at least) available */
         if(index + 2 < bufferLength) {
+            /* increments the number with the value of the third byte */
             number += buffer[index + 2];
         }
 
@@ -112,6 +145,7 @@ int _encodeBase64(unsigned char *buffer, size_t bufferLength, unsigned char *enc
 
     /* in case the padding count is valid */
     if(padCount > 0) {
+        /* iterates over the pad count */
         for(; padCount < 3; padCount++) {
             /* sets the padding character in the encoded buffer buffer */
             encodedBuffer[encodedBufferIndex++] = '=';
@@ -121,6 +155,30 @@ int _encodeBase64(unsigned char *buffer, size_t bufferLength, unsigned char *enc
     /* returns one success */
     return 1;
 }
+
+unsigned char lookup(unsigned char value) {
+    /* allocates space for the index */
+    unsigned char index;
+
+    /* allocates space for the current value */
+    unsigned char currentValue;
+
+    /* iterates over all the base 64 characters */
+    for(index = 0; index < 64; index++) {
+        /* retrieves the current value */
+        currentValue = base64Characters[index];
+
+        /* in case the current value and the value match */
+        if(currentValue == value) {
+            /* returns the index */
+            return index;
+        }
+    }
+
+    /* returns the default value */
+    return 0;
+}
+
 
 int _decodeBase64(unsigned char *encodedBuffer, size_t encodedBufferLength, unsigned char *buffer, size_t bufferLength) {
     /* allocates space for the the buffer index */
@@ -140,15 +198,19 @@ int _decodeBase64(unsigned char *encodedBuffer, size_t encodedBufferLength, unsi
 
     /* increments over the length of the encoded buffer, four characters at a time */
     for(index = 0; index < encodedBufferLength; index += 4) {
+        /* retrieves the number resulting from the concatenation of the 24 bits */
+        number = (lookup(encodedBuffer[index]) << 18) + (lookup(encodedBuffer[index + 1]) << 12) +
+                 (lookup(encodedBuffer[index + 2]) << 6) + lookup(encodedBuffer[index + 3]);
 
-        /* TENHO DE FAZER O MAPEAMENTE INVERSO DO MAPARA DE CARACTERES */
-
-        number = (encodedBuffer[index] << 18) + (encodedBuffer[index + 1] << 12) +
-                 (encodedBuffer[index + 2] << 6) + encodedBuffer[index + 3];
-
+        /* retrieves the various bytes from the retrieved number */
         number0 = (unsigned char) (number >> 16) & 255;
         number1 = (unsigned char) (number >> 8) & 255;
         number2 = (unsigned char) number & 255;
+
+        /* sets the 3 bytes in the buffer */
+        buffer[bufferIndex++] = number0;
+        buffer[bufferIndex++] = number1;
+        buffer[bufferIndex++] = number2;
     }
 
     /* returns one success */
@@ -164,4 +226,44 @@ int _allocateEncodedBuffer(size_t bufferLength, unsigned char **encodedBufferPoi
 
     /* returns valid */
     return 0;
+}
+
+int _allocateDecodedBuffer(size_t encodedBufferLength, unsigned char **decodedBufferPointer, size_t *decodedBufferLengthPointer, size_t paddingCount) {
+    /* allocates the decoded buffer length */
+    *decodedBufferLengthPointer = calculateDecodedBufferLenghtBase64(encodedBufferLength, paddingCount);
+
+    /* allocates the decoded buffer */
+    *decodedBufferPointer = (unsigned char *) malloc(*decodedBufferLengthPointer);
+
+    /* returns valid */
+    return 0;
+}
+
+unsigned int _getPaddingCount(unsigned char *encodedBuffer, size_t encodedBufferLength) {
+    /* allocates the index */
+    unsigned int index;
+
+    /* allocates the current value */
+    unsigned char currentValue;
+
+    /* allocates the padding count */
+    int paddingCount = 0;
+
+    /* iterates over the encoded buffer */
+    for(index = (unsigned int) encodedBufferLength - 1; index > 0 ; index--) {
+        /* retireve the current value */
+        currentValue = encodedBuffer[index];
+
+        /* in case the current value is not a padding character */
+        if(currentValue != '=') {
+            /* breaks the loop */
+            break;
+        }
+
+        /* increments the padding count */
+        paddingCount++;
+    }
+
+    /* returns the padding count */
+    return paddingCount;
 }

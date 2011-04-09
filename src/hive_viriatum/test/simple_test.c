@@ -155,11 +155,23 @@ void testBase64() {
     /* allocates space for the encoded buffer length */
     size_t encodedBufferLength;
 
+    /* allocates space for the decoded buffer */
+    unsigned char *decodedBuffer;
+
+    /* allocates space for the decoded buffer length */
+    size_t decodedBufferLength;
+
     /* encodes the value into base64 */
     encodeBase64((unsigned char *) buffer, strlen(buffer), &encodedBuffer, &encodedBufferLength);
 
+    /* decodes the value from base64 */
+    decodeBase64(encodedBuffer, encodedBufferLength, &decodedBuffer, &decodedBufferLength);
+
     /* releases the encoded buffer */
     free(encodedBuffer);
+
+    /* releases the decoded buffer */
+    free(decodedBuffer);
 }
 
 void runSimpleTests() {
