@@ -78,7 +78,7 @@ size_t calculateDecodedBufferLenghtBase64(size_t encodedBufferLength, size_t pad
     size_t decodedBufferLength;
 
     /* calculates the decoded buffer length */
-    decodedBufferLength = (encodedBufferLength / 4 * 3) - 1;
+    decodedBufferLength = (encodedBufferLength / 4 * 3) - paddingCount;
 
     /* returns the decoded buffer length */
     return decodedBufferLength;
