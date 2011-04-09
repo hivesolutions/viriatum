@@ -7,15 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		C20C2C5A1350B688001E22FB /* http_request.c in Sources */ = {isa = PBXBuildFile; fileRef = C20C2C421350B688001E22FB /* http_request.c */; };
-		C20C2C5B1350B688001E22FB /* file.c in Sources */ = {isa = PBXBuildFile; fileRef = C20C2C451350B688001E22FB /* file.c */; };
-		C20C2C5C1350B688001E22FB /* loading.c in Sources */ = {isa = PBXBuildFile; fileRef = C20C2C491350B688001E22FB /* loading.c */; };
-		C20C2C5D1350B688001E22FB /* stdafx.c in Sources */ = {isa = PBXBuildFile; fileRef = C20C2C4C1350B688001E22FB /* stdafx.c */; };
-		C20C2C5E1350B688001E22FB /* service.c in Sources */ = {isa = PBXBuildFile; fileRef = C20C2C4F1350B688001E22FB /* service.c */; };
-		C20C2C5F1350B688001E22FB /* service_select.c in Sources */ = {isa = PBXBuildFile; fileRef = C20C2C511350B688001E22FB /* service_select.c */; };
-		C20C2C601350B688001E22FB /* simple_test.c in Sources */ = {isa = PBXBuildFile; fileRef = C20C2C551350B688001E22FB /* simple_test.c */; };
-		C20C2C611350B688001E22FB /* viriatum.c in Sources */ = {isa = PBXBuildFile; fileRef = C20C2C581350B688001E22FB /* viriatum.c */; };
 		C20C2CE51350B71E001E22FB /* libhive_viriatum_commons.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C20C2CE41350B71E001E22FB /* libhive_viriatum_commons.a */; };
+		C27406C71350BE2B0050EEAF /* http_request.c in Sources */ = {isa = PBXBuildFile; fileRef = C27406AF1350BE2B0050EEAF /* http_request.c */; };
+		C27406C81350BE2B0050EEAF /* file.c in Sources */ = {isa = PBXBuildFile; fileRef = C27406B21350BE2B0050EEAF /* file.c */; };
+		C27406C91350BE2B0050EEAF /* loading.c in Sources */ = {isa = PBXBuildFile; fileRef = C27406B61350BE2B0050EEAF /* loading.c */; };
+		C27406CA1350BE2B0050EEAF /* stdafx.c in Sources */ = {isa = PBXBuildFile; fileRef = C27406B91350BE2B0050EEAF /* stdafx.c */; };
+		C27406CB1350BE2B0050EEAF /* service.c in Sources */ = {isa = PBXBuildFile; fileRef = C27406BC1350BE2B0050EEAF /* service.c */; };
+		C27406CC1350BE2B0050EEAF /* service_select.c in Sources */ = {isa = PBXBuildFile; fileRef = C27406BE1350BE2B0050EEAF /* service_select.c */; };
+		C27406CD1350BE2B0050EEAF /* simple_test.c in Sources */ = {isa = PBXBuildFile; fileRef = C27406C21350BE2B0050EEAF /* simple_test.c */; };
+		C27406CE1350BE2B0050EEAF /* viriatum.c in Sources */ = {isa = PBXBuildFile; fileRef = C27406C51350BE2B0050EEAF /* viriatum.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -42,31 +42,31 @@
 
 /* Begin PBXFileReference section */
 		C20C2BBF1350B5D7001E22FB /* hive_viriatum */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = hive_viriatum; sourceTree = BUILT_PRODUCTS_DIR; };
-		C20C2C3E1350B688001E22FB /* resource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = resource.h; sourceTree = "<group>"; };
-		C20C2C3F1350B688001E22FB /* targetver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = targetver.h; sourceTree = "<group>"; };
-		C20C2C411350B688001E22FB /* http.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = http.h; sourceTree = "<group>"; };
-		C20C2C421350B688001E22FB /* http_request.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = http_request.c; sourceTree = "<group>"; };
-		C20C2C431350B688001E22FB /* http_request.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = http_request.h; sourceTree = "<group>"; };
-		C20C2C451350B688001E22FB /* file.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = file.c; sourceTree = "<group>"; };
-		C20C2C461350B688001E22FB /* file.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = file.h; sourceTree = "<group>"; };
-		C20C2C471350B688001E22FB /* io.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = io.h; sourceTree = "<group>"; };
-		C20C2C491350B688001E22FB /* loading.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = loading.c; sourceTree = "<group>"; };
-		C20C2C4A1350B688001E22FB /* loading.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = loading.h; sourceTree = "<group>"; };
-		C20C2C4B1350B688001E22FB /* module.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = module.h; sourceTree = "<group>"; };
-		C20C2C4C1350B688001E22FB /* stdafx.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = stdafx.c; path = ../../../../src/hive_viriatum/stdafx.c; sourceTree = "<group>"; };
-		C20C2C4D1350B688001E22FB /* stdafx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = stdafx.h; path = ../../../../src/hive_viriatum/stdafx.h; sourceTree = "<group>"; };
-		C20C2C4F1350B688001E22FB /* service.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = service.c; sourceTree = "<group>"; };
-		C20C2C501350B688001E22FB /* service.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = service.h; sourceTree = "<group>"; };
-		C20C2C511350B688001E22FB /* service_select.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = service_select.c; sourceTree = "<group>"; };
-		C20C2C521350B688001E22FB /* service_select.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = service_select.h; sourceTree = "<group>"; };
-		C20C2C531350B688001E22FB /* system.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = system.h; sourceTree = "<group>"; };
-		C20C2C551350B688001E22FB /* simple_test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = simple_test.c; sourceTree = "<group>"; };
-		C20C2C561350B688001E22FB /* simple_test.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = simple_test.h; sourceTree = "<group>"; };
-		C20C2C571350B688001E22FB /* test.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = test.h; sourceTree = "<group>"; };
-		C20C2C581350B688001E22FB /* viriatum.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = viriatum.c; path = ../../../../src/hive_viriatum/viriatum.c; sourceTree = "<group>"; };
-		C20C2C591350B688001E22FB /* viriatum.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = viriatum.h; path = ../../../../src/hive_viriatum/viriatum.h; sourceTree = "<group>"; };
 		C20C2C741350B6A9001E22FB /* hive_viriatum_commons.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = hive_viriatum_commons.xcodeproj; path = ../hive_viriatum_commons/hive_viriatum_commons.xcodeproj; sourceTree = "<group>"; };
 		C20C2CE41350B71E001E22FB /* libhive_viriatum_commons.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libhive_viriatum_commons.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		C27406AB1350BE2B0050EEAF /* resource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = resource.h; sourceTree = "<group>"; };
+		C27406AC1350BE2B0050EEAF /* targetver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = targetver.h; sourceTree = "<group>"; };
+		C27406AE1350BE2B0050EEAF /* http.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = http.h; sourceTree = "<group>"; };
+		C27406AF1350BE2B0050EEAF /* http_request.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = http_request.c; sourceTree = "<group>"; };
+		C27406B01350BE2B0050EEAF /* http_request.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = http_request.h; sourceTree = "<group>"; };
+		C27406B21350BE2B0050EEAF /* file.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = file.c; sourceTree = "<group>"; };
+		C27406B31350BE2B0050EEAF /* file.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = file.h; sourceTree = "<group>"; };
+		C27406B41350BE2B0050EEAF /* io.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = io.h; sourceTree = "<group>"; };
+		C27406B61350BE2B0050EEAF /* loading.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = loading.c; sourceTree = "<group>"; };
+		C27406B71350BE2B0050EEAF /* loading.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = loading.h; sourceTree = "<group>"; };
+		C27406B81350BE2B0050EEAF /* module.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = module.h; sourceTree = "<group>"; };
+		C27406B91350BE2B0050EEAF /* stdafx.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = stdafx.c; path = ../../../src/hive_viriatum/stdafx.c; sourceTree = "<group>"; };
+		C27406BA1350BE2B0050EEAF /* stdafx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = stdafx.h; path = ../../../src/hive_viriatum/stdafx.h; sourceTree = "<group>"; };
+		C27406BC1350BE2B0050EEAF /* service.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = service.c; sourceTree = "<group>"; };
+		C27406BD1350BE2B0050EEAF /* service.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = service.h; sourceTree = "<group>"; };
+		C27406BE1350BE2B0050EEAF /* service_select.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = service_select.c; sourceTree = "<group>"; };
+		C27406BF1350BE2B0050EEAF /* service_select.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = service_select.h; sourceTree = "<group>"; };
+		C27406C01350BE2B0050EEAF /* system.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = system.h; sourceTree = "<group>"; };
+		C27406C21350BE2B0050EEAF /* simple_test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = simple_test.c; sourceTree = "<group>"; };
+		C27406C31350BE2B0050EEAF /* simple_test.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = simple_test.h; sourceTree = "<group>"; };
+		C27406C41350BE2B0050EEAF /* test.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = test.h; sourceTree = "<group>"; };
+		C27406C51350BE2B0050EEAF /* viriatum.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = viriatum.c; path = ../../../src/hive_viriatum/viriatum.c; sourceTree = "<group>"; };
+		C27406C61350BE2B0050EEAF /* viriatum.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = viriatum.h; path = ../../../src/hive_viriatum/viriatum.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -85,7 +85,7 @@
 			isa = PBXGroup;
 			children = (
 				C20C2C741350B6A9001E22FB /* hive_viriatum_commons.xcodeproj */,
-				C20C2BC21350B5D7001E22FB /* Classes */,
+				C27406A41350BDF10050EEAF /* Classes */,
 				C20C2BC01350B5D7001E22FB /* Products */,
 				C20C2CE41350B71E001E22FB /* libhive_viriatum_commons.a */,
 			);
@@ -99,88 +99,6 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		C20C2BC21350B5D7001E22FB /* Classes */ = {
-			isa = PBXGroup;
-			children = (
-				C2F8700F1350BAEC0003A4A5 /* base */,
-				C20C2C3D1350B688001E22FB /* global */,
-				C20C2C401350B688001E22FB /* http */,
-				C20C2C441350B688001E22FB /* io */,
-				C20C2C481350B688001E22FB /* module */,
-				C20C2C4E1350B688001E22FB /* system */,
-				C20C2C541350B688001E22FB /* test */,
-			);
-			name = Classes;
-			path = hive_viriatum;
-			sourceTree = "<group>";
-		};
-		C20C2C3D1350B688001E22FB /* global */ = {
-			isa = PBXGroup;
-			children = (
-				C20C2C3E1350B688001E22FB /* resource.h */,
-				C20C2C3F1350B688001E22FB /* targetver.h */,
-			);
-			name = global;
-			path = ../../../../src/hive_viriatum/global;
-			sourceTree = "<group>";
-		};
-		C20C2C401350B688001E22FB /* http */ = {
-			isa = PBXGroup;
-			children = (
-				C20C2C411350B688001E22FB /* http.h */,
-				C20C2C421350B688001E22FB /* http_request.c */,
-				C20C2C431350B688001E22FB /* http_request.h */,
-			);
-			name = http;
-			path = ../../../../src/hive_viriatum/http;
-			sourceTree = "<group>";
-		};
-		C20C2C441350B688001E22FB /* io */ = {
-			isa = PBXGroup;
-			children = (
-				C20C2C451350B688001E22FB /* file.c */,
-				C20C2C461350B688001E22FB /* file.h */,
-				C20C2C471350B688001E22FB /* io.h */,
-			);
-			name = io;
-			path = ../../../../src/hive_viriatum/io;
-			sourceTree = "<group>";
-		};
-		C20C2C481350B688001E22FB /* module */ = {
-			isa = PBXGroup;
-			children = (
-				C20C2C491350B688001E22FB /* loading.c */,
-				C20C2C4A1350B688001E22FB /* loading.h */,
-				C20C2C4B1350B688001E22FB /* module.h */,
-			);
-			name = module;
-			path = ../../../../src/hive_viriatum/module;
-			sourceTree = "<group>";
-		};
-		C20C2C4E1350B688001E22FB /* system */ = {
-			isa = PBXGroup;
-			children = (
-				C20C2C4F1350B688001E22FB /* service.c */,
-				C20C2C501350B688001E22FB /* service.h */,
-				C20C2C511350B688001E22FB /* service_select.c */,
-				C20C2C521350B688001E22FB /* service_select.h */,
-				C20C2C531350B688001E22FB /* system.h */,
-			);
-			name = system;
-			path = ../../../../src/hive_viriatum/system;
-			sourceTree = "<group>";
-		};
-		C20C2C541350B688001E22FB /* test */ = {
-			isa = PBXGroup;
-			children = (
-				C20C2C551350B688001E22FB /* simple_test.c */,
-				C20C2C561350B688001E22FB /* simple_test.h */,
-				C20C2C571350B688001E22FB /* test.h */,
-			);
-			name = test;
-			path = ../../../../src/hive_viriatum/test;
-			sourceTree = "<group>";
-		};
 		C20C2C751350B6A9001E22FB /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -189,13 +107,94 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		C2F8700F1350BAEC0003A4A5 /* base */ = {
+		C27406A41350BDF10050EEAF /* Classes */ = {
 			isa = PBXGroup;
 			children = (
-				C20C2C581350B688001E22FB /* viriatum.c */,
-				C20C2C591350B688001E22FB /* viriatum.h */,
-				C20C2C4C1350B688001E22FB /* stdafx.c */,
-				C20C2C4D1350B688001E22FB /* stdafx.h */,
+				C27406CF1350BE350050EEAF /* base */,
+				C27406AA1350BE2B0050EEAF /* global */,
+				C27406AD1350BE2B0050EEAF /* http */,
+				C27406B11350BE2B0050EEAF /* io */,
+				C27406B51350BE2B0050EEAF /* module */,
+				C27406BB1350BE2B0050EEAF /* system */,
+				C27406C11350BE2B0050EEAF /* test */,
+			);
+			name = Classes;
+			sourceTree = "<group>";
+		};
+		C27406AA1350BE2B0050EEAF /* global */ = {
+			isa = PBXGroup;
+			children = (
+				C27406AB1350BE2B0050EEAF /* resource.h */,
+				C27406AC1350BE2B0050EEAF /* targetver.h */,
+			);
+			name = global;
+			path = ../../../src/hive_viriatum/global;
+			sourceTree = "<group>";
+		};
+		C27406AD1350BE2B0050EEAF /* http */ = {
+			isa = PBXGroup;
+			children = (
+				C27406AE1350BE2B0050EEAF /* http.h */,
+				C27406AF1350BE2B0050EEAF /* http_request.c */,
+				C27406B01350BE2B0050EEAF /* http_request.h */,
+			);
+			name = http;
+			path = ../../../src/hive_viriatum/http;
+			sourceTree = "<group>";
+		};
+		C27406B11350BE2B0050EEAF /* io */ = {
+			isa = PBXGroup;
+			children = (
+				C27406B21350BE2B0050EEAF /* file.c */,
+				C27406B31350BE2B0050EEAF /* file.h */,
+				C27406B41350BE2B0050EEAF /* io.h */,
+			);
+			name = io;
+			path = ../../../src/hive_viriatum/io;
+			sourceTree = "<group>";
+		};
+		C27406B51350BE2B0050EEAF /* module */ = {
+			isa = PBXGroup;
+			children = (
+				C27406B61350BE2B0050EEAF /* loading.c */,
+				C27406B71350BE2B0050EEAF /* loading.h */,
+				C27406B81350BE2B0050EEAF /* module.h */,
+			);
+			name = module;
+			path = ../../../src/hive_viriatum/module;
+			sourceTree = "<group>";
+		};
+		C27406BB1350BE2B0050EEAF /* system */ = {
+			isa = PBXGroup;
+			children = (
+				C27406BC1350BE2B0050EEAF /* service.c */,
+				C27406BD1350BE2B0050EEAF /* service.h */,
+				C27406BE1350BE2B0050EEAF /* service_select.c */,
+				C27406BF1350BE2B0050EEAF /* service_select.h */,
+				C27406C01350BE2B0050EEAF /* system.h */,
+			);
+			name = system;
+			path = ../../../src/hive_viriatum/system;
+			sourceTree = "<group>";
+		};
+		C27406C11350BE2B0050EEAF /* test */ = {
+			isa = PBXGroup;
+			children = (
+				C27406C21350BE2B0050EEAF /* simple_test.c */,
+				C27406C31350BE2B0050EEAF /* simple_test.h */,
+				C27406C41350BE2B0050EEAF /* test.h */,
+			);
+			name = test;
+			path = ../../../src/hive_viriatum/test;
+			sourceTree = "<group>";
+		};
+		C27406CF1350BE350050EEAF /* base */ = {
+			isa = PBXGroup;
+			children = (
+				C27406C51350BE2B0050EEAF /* viriatum.c */,
+				C27406C61350BE2B0050EEAF /* viriatum.h */,
+				C27406B91350BE2B0050EEAF /* stdafx.c */,
+				C27406BA1350BE2B0050EEAF /* stdafx.h */,
 			);
 			name = base;
 			sourceTree = "<group>";
@@ -263,14 +262,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C20C2C5A1350B688001E22FB /* http_request.c in Sources */,
-				C20C2C5B1350B688001E22FB /* file.c in Sources */,
-				C20C2C5C1350B688001E22FB /* loading.c in Sources */,
-				C20C2C5D1350B688001E22FB /* stdafx.c in Sources */,
-				C20C2C5E1350B688001E22FB /* service.c in Sources */,
-				C20C2C5F1350B688001E22FB /* service_select.c in Sources */,
-				C20C2C601350B688001E22FB /* simple_test.c in Sources */,
-				C20C2C611350B688001E22FB /* viriatum.c in Sources */,
+				C27406C71350BE2B0050EEAF /* http_request.c in Sources */,
+				C27406C81350BE2B0050EEAF /* file.c in Sources */,
+				C27406C91350BE2B0050EEAF /* loading.c in Sources */,
+				C27406CA1350BE2B0050EEAF /* stdafx.c in Sources */,
+				C27406CB1350BE2B0050EEAF /* service.c in Sources */,
+				C27406CC1350BE2B0050EEAF /* service_select.c in Sources */,
+				C27406CD1350BE2B0050EEAF /* simple_test.c in Sources */,
+				C27406CE1350BE2B0050EEAF /* viriatum.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
