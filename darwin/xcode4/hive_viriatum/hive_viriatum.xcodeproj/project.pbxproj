@@ -87,7 +87,7 @@
 				C20C2C741350B6A9001E22FB /* hive_viriatum_commons.xcodeproj */,
 				C27406A41350BDF10050EEAF /* Classes */,
 				C20C2BC01350B5D7001E22FB /* Products */,
-				C20C2CE41350B71E001E22FB /* libhive_viriatum_commons.a */,
+				C294CBBA1350BED0000B52B4 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -197,6 +197,14 @@
 				C27406BA1350BE2B0050EEAF /* stdafx.h */,
 			);
 			name = base;
+			sourceTree = "<group>";
+		};
+		C294CBBA1350BED0000B52B4 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				C20C2CE41350B71E001E22FB /* libhive_viriatum_commons.a */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
