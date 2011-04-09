@@ -60,17 +60,17 @@ int main(int argc, char *argv[]) {
     unsigned char *description = descriptionViriatum();
 
     /* prints a debug message */
-    DEBUG_F("%s %s (%s, %s) [%s %s %d bit (%s)] on %s\n", description, version, VIRIATUM_COMPILATION_DATE, VIRIATUM_COMPILATION_TIME, VIRIATUM_COMPILER, VIRIATUM_COMPILER_VERSION_STRING, VIRIATUM_PLATFORM_CPU_BITS, VIRIATUM_PLATFORM_CPU, VIRIATUM_PLATFORM_STRING);
+    V_DEBUG_F("%s %s (%s, %s) [%s %s %d bit (%s)] on %s\n", description, version, VIRIATUM_COMPILATION_DATE, VIRIATUM_COMPILATION_TIME, VIRIATUM_COMPILER, VIRIATUM_COMPILER_VERSION_STRING, (int) VIRIATUM_PLATFORM_CPU_BITS, VIRIATUM_PLATFORM_CPU, VIRIATUM_PLATFORM_STRING);
 
     /* prints a debug message */
-    DEBUG_F("Receiving %d arguments\n", argc);
+    V_DEBUG_F("Receiving %d arguments\n", argc);
 
     /* loads the module */
-    returnValue = loadModule("C:/Users/joamag/Desktop/repositories/viriatum/bin/hive_viriatum_mod_lua/i386/win32/Debug/hive_viriatum_mod_lua.dll");
+    returnValue = loadModule((unsigned char *) "C:/Users/joamag/Desktop/repositories/viriatum/bin/hive_viriatum_mod_lua/i386/win32/Debug/hive_viriatum_mod_lua.dll");
 
     /* tests the error code for error */
     if(IS_ERROR_CODE(returnValue)) {
-        DEBUG_F("%s\n", getLastErrorMessageSafe());
+        V_DEBUG_F("%s\n", getLastErrorMessageSafe());
     }
 
     /* runs the simple tests */
@@ -80,7 +80,7 @@ int main(int argc, char *argv[]) {
     runService();
 
     /* prints a debug message */
-    DEBUG("Finishing process");
+    V_DEBUG("Finishing process");
 
     /* returns zero (valid) */
     return 0;

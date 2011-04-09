@@ -48,7 +48,7 @@ unsigned char *getLastErrorMessageSafe() {
     /* in case the last error message is not set */
     if(lastErrorMessage == NULL) {
         /* returns the empty error message */
-        return EMPTY_ERROR_MESSAGE;
+        return (unsigned char *) EMPTY_ERROR_MESSAGE;
     }
     /* otherwise (normal behaviour */
     else {
