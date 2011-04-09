@@ -34,7 +34,7 @@ int threadPoolStartFunctionTest(void *arguments) {
     THREAD_IDENTIFIER threadId = THREAD_GET_IDENTIFIER();
 
     /* prints an hello world message */
-    DEBUG_F("hello world from thread: %lu\n", (unsigned long) threadId);
+    V_DEBUG_F("hello world from thread: %lu\n", (unsigned long) threadId);
 
     /* sleeps for a while */
     SLEEP(10);
@@ -57,7 +57,7 @@ void testThreadPool() {
     threadPoolTask->startFunction = threadPoolStartFunctionTest;
 
     /* prints a debug message */
-    DEBUG("Creating a thread pool\n");
+    V_DEBUG("Creating a thread pool\n");
 
     /* creates the thread pool */
     createThreadPool(&threadPool, 15, 1, 30);
@@ -65,7 +65,7 @@ void testThreadPool() {
     /* iterates over the range of the index */
     for(index = 0; index < 100; index ++) {
         /* prints a debug message */
-        DEBUG("Inserting task in thread pool\n");
+        V_DEBUG("Inserting task in thread pool\n");
 
         /* inserts the task in the thread pool */
         insertTaskThreadPool(threadPool, threadPoolTask);

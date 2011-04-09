@@ -28,13 +28,13 @@
 #pragma once
 
 #ifdef VIRIATUM_DEBUG
-#define DEBUG(format) printf(format)
-#define DEBUG_F(format, ...) printf(format, __VA_ARGS__)
+#define V_DEBUG(format) printf(format)
+#define V_DEBUG_F(format, ...) printf(format, __VA_ARGS__)
 #endif
 
 #ifndef VIRIATUM_DEBUG
-#define DEBUG(format) dump(format)
-#define DEBUG_F(format, ...) dumpMultiple(format, __VA_ARGS__)
+#define V_DEBUG(format) dump(format)
+#define V_DEBUG_F(format, ...) dumpMultiple(format, __VA_ARGS__)
 #endif
 
 VIRIATUM_EXPORT_PREFIX void debug(const char *format, ...);

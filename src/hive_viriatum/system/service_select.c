@@ -89,7 +89,7 @@ void httpReadHandler(struct ServiceSelect_t *serviceSelect, struct Connection_t 
         SOCKET_ERROR_CODE receivingErrorCode = SOCKET_GET_ERROR_CODE(numberBytes);
 
         /* prints the error */
-        DEBUG_F("Problem receiving from socket: %d\n", receivingErrorCode);
+        V_DEBUG_F("Problem receiving from socket: %d\n", receivingErrorCode);
 
         /* removes the connection from the service select */
         removeConnectionServiceSelect(serviceSelect, connection);
@@ -150,7 +150,7 @@ void httpWriteHandler(struct ServiceSelect_t *serviceSelect, struct Connection_t
             SOCKET_ERROR_CODE receivingErrorCode = SOCKET_GET_ERROR_CODE(numberBytes);
 
             /* prints the error */
-            DEBUG_F("Problem sending from socket: %d\n", receivingErrorCode);
+            V_DEBUG_F("Problem sending from socket: %d\n", receivingErrorCode);
 
             /* removes the connection from the service select */
             removeConnectionServiceSelect(serviceSelect, connection);
@@ -172,7 +172,7 @@ void httpWriteHandler(struct ServiceSelect_t *serviceSelect, struct Connection_t
     /* in case there is no error */
     if(error == 0) {
         /* VALOR HARDCODAD FAZER ISTO DE UMA MELHOR MANEIRA */
-        /* Tenho realmente de remover o ganho de estar a espera para escrita *7
+        /* Tenho realmente de remover o ganho de estar a espera para escrita */
         /* mas nao neste handler de http (nao e da competencia dele) */
         SOCKET_SET_CLEAR(connection->socketHandle, &serviceSelect->socketsWriteSet);
         connection->writeRegistered = 0;
@@ -249,7 +249,7 @@ void startServiceSelect(struct ServiceSelect_t *serviceSelect) {
             socketHandle = SOCKET_ACCEPT(serviceSocketHandle, &socketAddress, clientSocketAddressSize);
 
             /* prints a debug message */
-            DEBUG_F("Accepted connection: %d\n", socketHandle);
+            V_DEBUG_F("Accepted connection: %d\n", socketHandle);
 
             /* creates the connection */
             createConnection(&connection, socketHandle);
@@ -330,18 +330,18 @@ void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_
     createIteratorLinkedList(connectionsList, &connectionsListIterator);
 
     /* prints a debug message */
-    DEBUG("Entering select statement\n");
+    V_DEBUG("Entering select statement\n");
 
     /* runs the select over the sockets set */
     selectCount = SOCKET_SELECT(serviceSelect->socketsSetHighest + 1, &serviceSelect->socketsReadSetTemporary, &serviceSelect->socketsWriteSetTemporary, NULL, &serviceSelect->selectTimeoutTemporary);
 
     /* prints a debug message */
-    DEBUG_F("Exiting select statement with value: %d\n", selectCount);
+    V_DEBUG_F("Exiting select statement with value: %d\n", selectCount);
 
     /* in case the select coutn is negative */
     if(selectCount < 0) {
         /* prints a debug message */
-        DEBUG_F("Problem in select statement: %d\n", selectCount);
+        V_DEBUG_F("Problem in select statement: %d\n", selectCount);
     }
 
     /* in case the service socket handle is set in
@@ -375,7 +375,7 @@ void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_
         }
 
         /* prints a debug message */
-        DEBUG_F("Testing file for select: %d\n", currentConnection->socketHandle);
+        V_DEBUG_F("Testing file for select: %d\n", currentConnection->socketHandle);
 
         /* in case the current connection socket handle is set in
         the sockets read ready set */
@@ -407,7 +407,7 @@ void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_
     /* in case the select count is bigger than zero */
     if(selectCount > 0) {
         /* prints a debug message */
-        DEBUG_F("Extraordinary select file descriptors not found: %d\n", selectCount);
+        V_DEBUG_F("Extraordinary select file descriptors not found: %d\n", selectCount);
     }
 
     /* sets the read index in the read connections size */

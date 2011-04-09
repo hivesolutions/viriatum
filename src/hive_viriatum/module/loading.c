@@ -40,18 +40,18 @@ ERROR_CODE loadModule(unsigned char *modulePath) {
     viriatumStartModule startModuleFunction;
 
     /* loads the mod library */
-    modLibrary = LOAD_LIBRARY(modulePath);
+    modLibrary = LOAD_LIBRARY((const char *) modulePath);
 
     /* in case the mod library was not loaded */
     if(modLibrary == NULL) {
         /* prints a debug message */
-        DEBUG("Problem loading library\n");
+        V_DEBUG("Problem loading library\n");
 
         /* raises an error */
-        RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, "Problem loading library");
+        RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem loading library");
     } else {
         /* prints a debug message */
-        DEBUG("Loaded library\n");
+        V_DEBUG("Loaded library\n");
     }
 
     /* retrieves the symbol from the mod library */
@@ -63,13 +63,13 @@ ERROR_CODE loadModule(unsigned char *modulePath) {
     /* in case the start module function was not found */
     if(startModuleFunction == NULL) {
         /* prints a debug message */
-        DEBUG_F("No such symbol %s in library\n", "startModule");
+        V_DEBUG_F("No such symbol %s in library\n", "startModule");
 
         /* raises an error */
-        RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, "Problem finding symbol");
+        RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem finding symbol");
     } else {
         /* prints a debug message */
-        DEBUG_F("Found symbol %s in library\n", "startModule");
+        V_DEBUG_F("Found symbol %s in library\n", "startModule");
     }
 
     /* calls the start module function */
