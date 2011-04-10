@@ -28,6 +28,11 @@
 #pragma once
 
 /**
+ * The padding character for base 64.
+ */
+#define PADDING_BASE_64 '='
+
+/**
  * Encodes into base 64 the buffer with the given length into a new buffer
  * to be created.
  *

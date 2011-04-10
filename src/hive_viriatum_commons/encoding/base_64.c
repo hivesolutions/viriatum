@@ -148,7 +148,7 @@ int _encodeBase64(unsigned char *buffer, size_t bufferLength, unsigned char *enc
         /* iterates over the pad count */
         for(; padCount < 3; padCount++) {
             /* sets the padding character in the encoded buffer buffer */
-            encodedBuffer[encodedBufferIndex++] = '=';
+            encodedBuffer[encodedBufferIndex++] = PADDING_BASE_64;
         }
     }
 
@@ -267,7 +267,7 @@ unsigned int _getPaddingCount(unsigned char *encodedBuffer, size_t encodedBuffer
         currentValue = encodedBuffer[index];
 
         /* in case the current value is not a padding character */
-        if(currentValue != '=') {
+        if(currentValue != PADDING_BASE_64) {
             /* breaks the loop */
             break;
         }
