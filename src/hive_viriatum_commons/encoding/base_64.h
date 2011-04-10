@@ -141,3 +141,14 @@ VIRIATUM_NO_EXPORT_PREFIX unsigned int _getPaddingCount(unsigned char *encodedBu
  * @return The reverse value (result).
  */
 VIRIATUM_NO_EXPORT_PREFIX unsigned char _lookupBase64(unsigned char value);
+
+/**
+ * Looks up the given value in the reverse
+ * base 64 table and returns the value.
+ * This method is much faster than the normal
+ * implementation
+ *
+ * @param value The value to obtain the reverse value.
+ * @return The reverse value (result).
+ */
+VIRIATUM_NO_EXPORT_PREFIX unsigned char _lookupFastBase64(unsigned char value);
