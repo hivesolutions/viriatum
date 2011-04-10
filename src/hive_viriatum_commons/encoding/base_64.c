@@ -50,7 +50,7 @@ int decodeBase64(unsigned char *encodedBuffer, size_t encodedBufferLength, unsig
     _allocateDecodedBuffer(encodedBufferLength, decodedBufferPointer, decodedBufferLengthPointer, paddingCount);
 
     /* decodes the buffer from base 64 */
-    _decodeBase64(encodedBuffer, encodedBufferLength, *decodedBufferPointer, *decodedBufferLengthPointer);
+    _decodeBase64(encodedBuffer, encodedBufferLength, *decodedBufferPointer, *decodedBufferLengthPointer, paddingCount);
 
     /* returns valid */
     return 0;
@@ -179,8 +179,7 @@ unsigned char lookup(unsigned char value) {
     return 0;
 }
 
-
-int _decodeBase64(unsigned char *encodedBuffer, size_t encodedBufferLength, unsigned char *buffer, size_t bufferLength) {
+int _decodeBase64(unsigned char *encodedBuffer, size_t encodedBufferLength, unsigned char *buffer, size_t bufferLength, size_t paddingCount) {
     /* allocates space for the the buffer index */
     size_t bufferIndex;
 
@@ -192,6 +191,9 @@ int _decodeBase64(unsigned char *encodedBuffer, size_t encodedBufferLength, unsi
 
     /* allocates space for the partial numbers */
     unsigned char number0, number1, number2;
+
+    /* calculates the valid buffer length */
+    size_t validBufferLength = bufferLength - paddingCount;
 
     /* starts the buffer index */
     bufferIndex = 0;
@@ -207,10 +209,20 @@ int _decodeBase64(unsigned char *encodedBuffer, size_t encodedBufferLength, unsi
         number1 = (unsigned char) (number >> 8) & 255;
         number2 = (unsigned char) number & 255;
 
-        /* sets the 3 bytes in the buffer */
+        /* writes the first byte in the buffer */
         buffer[bufferIndex++] = number0;
-        buffer[bufferIndex++] = number1;
-        buffer[bufferIndex++] = number2;
+
+        /* in case the buffer index is still valid */
+        if(bufferIndex <= validBufferLength) {
+            /* writes the second byte in the buffer */
+            buffer[bufferIndex++] = number1;
+        }
+
+        /* in case the buffer index is still valid */
+        if(bufferIndex <= validBufferLength) {
+            /* writes the third byte in the buffer */
+            buffer[bufferIndex++] = number2;
+        }
     }
 
     /* returns one success */
