@@ -90,9 +90,10 @@ VIRIATUM_NO_EXPORT_PREFIX int _encodeBase64(unsigned char *buffer, size_t buffer
  * @param encodedBufferLength The length of the encoded buffer to be decoded.
  * @param buffer The target buffer.
  * @param bufferLength The target buffer length.
+ * @param paddingCount The ammount of padding in the base 64 encoded string.
  * @return The execution status.
  */
-VIRIATUM_NO_EXPORT_PREFIX int _decodeBase64(unsigned char *encodedBuffer, size_t encodedBufferLength, unsigned char *buffer, size_t bufferLength);
+VIRIATUM_NO_EXPORT_PREFIX int _decodeBase64(unsigned char *encodedBuffer, size_t encodedBufferLength, unsigned char *buffer, size_t bufferLength, size_t paddingCount);
 
 /**
  * Allocates a new encoded buffer.
