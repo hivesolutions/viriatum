@@ -156,29 +156,6 @@ int _encodeBase64(unsigned char *buffer, size_t bufferLength, unsigned char *enc
     return 1;
 }
 
-unsigned char lookup(unsigned char value) {
-    /* allocates space for the index */
-    unsigned char index;
-
-    /* allocates space for the current value */
-    unsigned char currentValue;
-
-    /* iterates over all the base 64 characters */
-    for(index = 0; index < 64; index++) {
-        /* retrieves the current value */
-        currentValue = base64Characters[index];
-
-        /* in case the current value and the value match */
-        if(currentValue == value) {
-            /* returns the index */
-            return index;
-        }
-    }
-
-    /* returns the default value */
-    return 0;
-}
-
 int _decodeBase64(unsigned char *encodedBuffer, size_t encodedBufferLength, unsigned char *buffer, size_t bufferLength, size_t paddingCount) {
     /* allocates space for the the buffer index */
     size_t bufferIndex;
@@ -201,8 +178,8 @@ int _decodeBase64(unsigned char *encodedBuffer, size_t encodedBufferLength, unsi
     /* increments over the length of the encoded buffer, four characters at a time */
     for(index = 0; index < encodedBufferLength; index += 4) {
         /* retrieves the number resulting from the concatenation of the 24 bits */
-        number = (lookup(encodedBuffer[index]) << 18) + (lookup(encodedBuffer[index + 1]) << 12) +
-                 (lookup(encodedBuffer[index + 2]) << 6) + lookup(encodedBuffer[index + 3]);
+        number = (_lookupBase64(encodedBuffer[index]) << 18) + (_lookupBase64(encodedBuffer[index + 1]) << 12) +
+                 (_lookupBase64(encodedBuffer[index + 2]) << 6) + _lookupBase64(encodedBuffer[index + 3]);
 
         /* retrieves the various bytes from the retrieved number */
         number0 = (unsigned char) (number >> 16) & 255;
@@ -278,4 +255,27 @@ unsigned int _getPaddingCount(unsigned char *encodedBuffer, size_t encodedBuffer
 
     /* returns the padding count */
     return paddingCount;
+}
+
+unsigned char _lookupBase64(unsigned char value) {
+    /* allocates space for the index */
+    unsigned char index;
+
+    /* allocates space for the current value */
+    unsigned char currentValue;
+
+    /* iterates over all the base 64 characters */
+    for(index = 0; index < 64; index++) {
+        /* retrieves the current value */
+        currentValue = base64Characters[index];
+
+        /* in case the current value and the value match */
+        if(currentValue == value) {
+            /* returns the index */
+            return index;
+        }
+    }
+
+    /* returns the default value */
+    return 0;
 }

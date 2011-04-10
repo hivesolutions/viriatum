@@ -132,3 +132,12 @@ VIRIATUM_NO_EXPORT_PREFIX int _allocateDecodedBuffer(size_t encodedBufferLength,
  * @return The padding count for the given encoded buffer.
  */
 VIRIATUM_NO_EXPORT_PREFIX unsigned int _getPaddingCount(unsigned char *encodedBuffer, size_t encodedBufferLength);
+
+/**
+ * Looks up the given value in the reverse
+ * base 64 table and returns the value.
+ *
+ * @param value The value to obtain the reverse value.
+ * @return The reverse value (result).
+ */
+VIRIATUM_NO_EXPORT_PREFIX unsigned char _lookupBase64(unsigned char value);
