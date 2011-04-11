@@ -54,6 +54,69 @@ void deleteHttpRequest(struct HttpRequest_t *httpRequest) {
     free(httpRequest);
 }
 
+#define TESTFUNC_PARAMS_NAMED const uint8_t *needle, size_t nlen, const uint8_t *haystack, size_t hlen, size_t *ccnt
+#define INC_CCNT (*ccnt)++
+#define MISALIGNED_SIZET(X) ((size_t)(X) & (sizeof(size_t) - 1))
+#define ALIGNED_SIZET(X) (!MISALIGNED_SIZET(X))
+
+static inline int32_t internal_str_cmp(const uint8_t *s1, const uint8_t *s2, size_t len, size_t *ccnt) {
+    // Nothing to compare, so let's return directly
+    if (len == 0) {
+        return (0);
+    }
+
+    // If s1 and s2 are aligned, and we need to compare something that is
+    // at least equal or bigger to word size, we can speed up things a bit
+    if((len >= sizeof(size_t)) && (ALIGNED_SIZET(s1)) && (ALIGNED_SIZET(s2))) {
+        // If s1p and s2p are word-aligned, compare them one word at a time
+        const size_t *a1 = (const size_t *)s1;
+        const size_t *a2 = (const size_t *)s2;
+
+        INC_CCNT;
+        while ((len >= sizeof(size_t)) && (*a1 == *a2)) {
+            len -= sizeof(size_t);
+            if (len) {
+                INC_CCNT;
+                a1++;
+                a2++;
+            }
+        }
+
+        // Either difference detected or not enough bytes left, so search byte-wise
+        s1 = (const uint8_t *)a1;
+        s2 = (const uint8_t *)a2;
+    }
+
+    // Normal byte-wise compare
+    INC_CCNT;
+    while((len) && (*s1 == *s2)) {
+        len--;
+        if (len) {
+            INC_CCNT;
+            s1++;
+            s2++;
+        }
+    }
+
+    return (*s1 - *s2);
+}
+
+// Memory usage: 2 * size_t (counters) = 16 b
+// O(hlen * nlen) worstcase, expected around 2 * nlen
+static size_t naive_strstr(TESTFUNC_PARAMS_NAMED) {
+    // Searching
+    for (size_t j = 0, w = hlen - nlen; j <= w; j++) {
+        if (internal_str_cmp(needle, haystack + j, nlen, ccnt) == 0) {
+            return (j);
+        }
+    }
+
+    return (SIZE_MAX);
+}
+
+
+//const uint8_t *needle, size_t nlen, const uint8_t *haystack, size_t hlen, size_t *cc
+
 void parseDataHttpRequest(struct HttpRequest_t *httpRequest, unsigned char *data, size_t dataSize) {
     /**
      * NOTE: durring the parsing the index (and rest of the state) of
@@ -64,10 +127,14 @@ void parseDataHttpRequest(struct HttpRequest_t *httpRequest, unsigned char *data
      * 3. tries to find the \r\n\r\n end to load the headers
      * 4. sets the headersLoaded flag
      */
+    size_t value;
+    size_t position;
 
     /* in case the start line is not yet loaded */
     if(!httpRequest->startLineLoaded) {
+        position = naive_strstr("\r\n", 2, data, dataSize, &value);
 
+        printf("POSITION %d, '%c'", (int) position, data[position]);
     }
 
     printf("ola mundo\n");
