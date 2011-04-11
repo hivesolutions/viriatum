@@ -27,6 +27,11 @@
 
 #pragma once
 
+/**
+ * Structure representing an http request
+ * it contains information about the request
+ * including size contents and control flags.
+ */
 typedef struct HttpRequest_t {
     size_t receivedDataSize;
     unsigned char startLineLoaded;
@@ -35,4 +40,15 @@ typedef struct HttpRequest_t {
 
 void createHttpRequest(struct HttpRequest_t **httpRequestPointer);
 void deleteHttpRequest(struct HttpRequest_t *httpRequest);
+
+/**
+ * Called to parse a new data chunk in the context
+ * of an http request.
+ * This function should be called whenever a new data
+ * chunk is received.
+ *
+ * @param httpRequest The http request object.
+ * @param data The data to be parsed.
+ * @param dataSize The size of the data to be parsed.
+ */
 void parseDataHttpRequest(struct HttpRequest_t *httpRequest, unsigned char *data, size_t dataSize);

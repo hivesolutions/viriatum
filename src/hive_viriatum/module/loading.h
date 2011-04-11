@@ -27,6 +27,13 @@
 
 #pragma once
 
+/**
+ * Loads the module in the given path.
+ *
+ * @param modulePath The path to the file
+ * containing the module.
+ * @return The resulting error code.
+ */
 ERROR_CODE loadModule(unsigned char *modulePath);
 
 typedef void (*viriatumStartModule)(void);
