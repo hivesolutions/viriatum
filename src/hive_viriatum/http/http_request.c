@@ -64,4 +64,11 @@ void parseDataHttpRequest(struct HttpRequest_t *httpRequest, unsigned char *data
      * 3. tries to find the \r\n\r\n end to load the headers
      * 4. sets the headersLoaded flag
      */
+
+    /* in case the start line is not yet loaded */
+    if(!httpRequest->startLineLoaded) {
+
+    }
+
+    printf("ola mundo\n");
 }
