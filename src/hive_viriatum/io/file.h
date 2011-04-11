@@ -27,4 +27,14 @@
 
 #pragma once
 
+/**
+ * Reads the file at the given file path to a generated
+ * buffer and retrieves the size of the file.
+ *
+ * @param filePath The path to the file to be read.
+ * @param bufferPointer The pointer to the generated buffer
+ * containing the file contents.
+ * @param fileSizePointer The pointer to the file size.
+ * @param The size of the read file.
+ */
 size_t readFile(char *filePath, unsigned char **bufferPointer, size_t *fileSizePointer);
