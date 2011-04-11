@@ -29,7 +29,7 @@
 
 #include "file.h"
 
-void readFile(char *filePath, unsigned char **bufferPointer, size_t *fileSizePointer) {
+size_t readFile(char *filePath, unsigned char **bufferPointer, size_t *fileSizePointer) {
     /* allocates space for the file */
     FILE *file;
 
@@ -65,4 +65,7 @@ void readFile(char *filePath, unsigned char **bufferPointer, size_t *fileSizePoi
 
     /* sets the file size as the file size pointer */
     *fileSizePointer = fileSize;
+
+    /* returns the number of (read) bytes */
+    return numberBytes;
 }

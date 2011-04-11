@@ -27,4 +27,4 @@
 
 #pragma once
 
-void readFile(char *filePath, unsigned char **bufferPointer, size_t *fileSizePointer);
+size_t readFile(char *filePath, unsigned char **bufferPointer, size_t *fileSizePointer);
