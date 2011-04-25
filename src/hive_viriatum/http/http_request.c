@@ -59,7 +59,7 @@ void deleteHttpRequest(struct HttpRequest_t *httpRequest) {
 #define MISALIGNED_SIZET(X) ((size_t)(X) & (sizeof(size_t) - 1))
 #define ALIGNED_SIZET(X) (!MISALIGNED_SIZET(X))
 
-static int internal_str_cmp(const unsigned char *s1, const unsigned char*s2, size_t stringLength, size_t *ccnt) {
+static int internal_str_cmp(const unsigned char *s1, const unsigned char *s2, size_t stringLength, size_t *ccnt) {
     /* in case the length is invalid */
     if(stringLength == 0) {
         /* returns immediately (equal) */
