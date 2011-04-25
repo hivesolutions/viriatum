@@ -107,12 +107,14 @@ static int internal_str_cmp(const unsigned char *s1, const unsigned char*s2, siz
 }
 
 static size_t naive_strstr(TESTFUNC_PARAMS_NAMED) {
-    size_t j = 0;
+    /* allocates the index */
+    size_t index;
     size_t w;
 
-    for(j = 0, w = hlen - nlen; j <= w; j++) {
-        if(internal_str_cmp(needle, haystack + j, nlen, ccnt) == 0) {
-            return j;
+    for(index = 0, w = hlen - nlen; index <= w; index++) {
+        if(internal_str_cmp(needle, haystack + index, nlen, ccnt) == 0) {
+            /* returns the current index */
+            return index;
         }
     }
 
