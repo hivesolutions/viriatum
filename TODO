@@ -8,3 +8,11 @@
 == Refactor / Bug Fixing ==
 
 * implement and refactor win32 conditions (_thread_win32.c) use this link http://thbecker.net/free_software_utilities/fair_monitor_for_win32/start_page.html
+
+== Design decisions ==
+
+* Create a structure similiar to the asynchronous model defined in the colony service implementations
+
+== Target performance ==
+
+* ab -n 10000 -c 100 -k  http://srio.hive:8181/eclipse should be able to run at 18K-24K requests per seconds in raw power
