@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: Cp1252 -*-
+# -*- coding: utf-8 -*-
 
 # Hive Viriatum Web Server
 # Copyright (C) 2008 Hive Solutions Lda.
@@ -19,7 +19,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Hive Viriatum Web Server. If not, see <http://www.gnu.org/licenses/>.
 
-__author__ = "Jo„o Magalh„es <joamag@hive.pt>"
+__author__ = "Jo√£o Magalh√£es <joamag@hive.pt>"
 """ The author(s) of the module """
 
 __version__ = "1.0.0"
