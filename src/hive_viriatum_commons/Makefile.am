@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Hive Viriatum Commons. If not, see <http:#www.gnu.org/licenses/>.
 
-# __author__    = Jo„o Magalh„es <joamag@hive.pt>
+# __author__    = Jo√£o Magalh√£es <joamag@hive.pt>
 # __version__   = 1.0.0
 # __revision__  = $LastChangedRevision: 2390 $
 # __date__      = $LastChangedDate: 2009-04-02 08:36:50 +0100 (qui, 02 Abr 2009) $
@@ -47,7 +47,7 @@ structures/hash_map.c \
 structures/iterator.c \
 structures/linked_list.c \
 system/_thread_win32.c \
-thread/thread_pool.c 
+thread/thread_pool.c
 
 libviriatum_la_SOURCES = stdafx.c \
 checksum/crc_32.c \
@@ -59,4 +59,4 @@ structures/hash_map.c \
 structures/iterator.c \
 structures/linked_list.c \
 system/_thread_win32.c \
-thread/thread_pool.c 
+thread/thread_pool.c
