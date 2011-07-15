@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Hive Viriatum Web Server. If not, see <http:#www.gnu.org/licenses/>.
 
-# __author__    = Jo„o Magalh„es <joamag@hive.pt>
+# __author__    = Jo√£o Magalh√£es <joamag@hive.pt>
 # __version__   = 1.0.0
 # __revision__  = $LastChangedRevision: 2390 $
 # __date__      = $LastChangedDate: 2009-04-02 08:36:50 +0100 (qui, 02 Abr 2009) $
@@ -31,8 +31,8 @@ AC_ARG_ENABLE(epoll, AC_HELP_STRING([--disable-epoll], [Disable epoll() support]
 
 # in case the user wants epoll and the system has epoll
 if test "x$have_epoll_include" = "xyes" && test "x$wants_epoll" = "xyes"; then
-	AC_MSG_CHECKING(for epoll system call)
-	AC_RUN_IFELSE([
+    AC_MSG_CHECKING(for epoll system call)
+    AC_RUN_IFELSE([
                    #include <stdint.h>
                    #include <sys/param.h>
                    #include <sys/types.h>
