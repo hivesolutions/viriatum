@@ -27,6 +27,7 @@
 
 #pragma once
 
+#include "../http/http.h"
 #include "service.h"
 
 typedef struct ServiceSelect_t {
