@@ -34,8 +34,9 @@ viriatum_LDADD = ../hive_viriatum_commons/libviriatum.a $(INTLLIBS)
 
 viriatum_SOURCES = stdafx.c \
 viriatum.c \
+http/http_request.c \
 io/file.c \
 module/loading.c \
 system/service.c \
 system/service_select.c \
-test/simple_test.c
+test/simple_test.c 
