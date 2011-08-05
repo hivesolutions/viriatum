@@ -13,6 +13,7 @@
 == Design decisions ==
 
 * Create a structure similiar to the asynchronous model defined in the colony service implementations
+* Separate the concept of service from the handler of the select (select_service does not make sensess)
 
 == Target performance ==
 
