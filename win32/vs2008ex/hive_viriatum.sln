@@ -6,31 +6,31 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hive_viriatum_commons", "hive_viriatum_commons.vcproj", "{E24C2D58-2F86-4C49-BD2E-F017C5FF2E0E}"
 EndProject
 Global
-    GlobalSection(SolutionConfigurationPlatforms) = preSolution
-        Debug (Dynamic)|Win32 = Debug (Dynamic)|Win32
-        Debug|Win32 = Debug|Win32
-        Release (Dynamic)|Win32 = Release (Dynamic)|Win32
-        Release|Win32 = Release|Win32
-    EndGlobalSection
-    GlobalSection(ProjectConfigurationPlatforms) = postSolution
-        {39D9BE30-4876-4DAE-94BC-0F0E84AE5BA3}.Debug (Dynamic)|Win32.ActiveCfg = Debug (Dynamic)|Win32
-        {39D9BE30-4876-4DAE-94BC-0F0E84AE5BA3}.Debug (Dynamic)|Win32.Build.0 = Debug (Dynamic)|Win32
-        {39D9BE30-4876-4DAE-94BC-0F0E84AE5BA3}.Debug|Win32.ActiveCfg = Debug|Win32
-        {39D9BE30-4876-4DAE-94BC-0F0E84AE5BA3}.Debug|Win32.Build.0 = Debug|Win32
-        {39D9BE30-4876-4DAE-94BC-0F0E84AE5BA3}.Release (Dynamic)|Win32.ActiveCfg = Release (Dynamic)|Win32
-        {39D9BE30-4876-4DAE-94BC-0F0E84AE5BA3}.Release (Dynamic)|Win32.Build.0 = Release (Dynamic)|Win32
-        {39D9BE30-4876-4DAE-94BC-0F0E84AE5BA3}.Release|Win32.ActiveCfg = Release|Win32
-        {39D9BE30-4876-4DAE-94BC-0F0E84AE5BA3}.Release|Win32.Build.0 = Release|Win32
-        {E24C2D58-2F86-4C49-BD2E-F017C5FF2E0E}.Debug (Dynamic)|Win32.ActiveCfg = Debug (Dynamic)|Win32
-        {E24C2D58-2F86-4C49-BD2E-F017C5FF2E0E}.Debug (Dynamic)|Win32.Build.0 = Debug (Dynamic)|Win32
-        {E24C2D58-2F86-4C49-BD2E-F017C5FF2E0E}.Debug|Win32.ActiveCfg = Debug|Win32
-        {E24C2D58-2F86-4C49-BD2E-F017C5FF2E0E}.Debug|Win32.Build.0 = Debug|Win32
-        {E24C2D58-2F86-4C49-BD2E-F017C5FF2E0E}.Release (Dynamic)|Win32.ActiveCfg = Release (Dynamic)|Win32
-        {E24C2D58-2F86-4C49-BD2E-F017C5FF2E0E}.Release (Dynamic)|Win32.Build.0 = Release (Dynamic)|Win32
-        {E24C2D58-2F86-4C49-BD2E-F017C5FF2E0E}.Release|Win32.ActiveCfg = Release|Win32
-        {E24C2D58-2F86-4C49-BD2E-F017C5FF2E0E}.Release|Win32.Build.0 = Release|Win32
-    EndGlobalSection
-    GlobalSection(SolutionProperties) = preSolution
-        HideSolutionNode = FALSE
-    EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug (Dynamic)|Win32 = Debug (Dynamic)|Win32
+		Debug|Win32 = Debug|Win32
+		Release (Dynamic)|Win32 = Release (Dynamic)|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{39D9BE30-4876-4DAE-94BC-0F0E84AE5BA3}.Debug (Dynamic)|Win32.ActiveCfg = Debug (Dynamic)|Win32
+		{39D9BE30-4876-4DAE-94BC-0F0E84AE5BA3}.Debug (Dynamic)|Win32.Build.0 = Debug (Dynamic)|Win32
+		{39D9BE30-4876-4DAE-94BC-0F0E84AE5BA3}.Debug|Win32.ActiveCfg = Debug|Win32
+		{39D9BE30-4876-4DAE-94BC-0F0E84AE5BA3}.Debug|Win32.Build.0 = Debug|Win32
+		{39D9BE30-4876-4DAE-94BC-0F0E84AE5BA3}.Release (Dynamic)|Win32.ActiveCfg = Release (Dynamic)|Win32
+		{39D9BE30-4876-4DAE-94BC-0F0E84AE5BA3}.Release (Dynamic)|Win32.Build.0 = Release (Dynamic)|Win32
+		{39D9BE30-4876-4DAE-94BC-0F0E84AE5BA3}.Release|Win32.ActiveCfg = Release|Win32
+		{39D9BE30-4876-4DAE-94BC-0F0E84AE5BA3}.Release|Win32.Build.0 = Release|Win32
+		{E24C2D58-2F86-4C49-BD2E-F017C5FF2E0E}.Debug (Dynamic)|Win32.ActiveCfg = Debug (Dynamic)|Win32
+		{E24C2D58-2F86-4C49-BD2E-F017C5FF2E0E}.Debug (Dynamic)|Win32.Build.0 = Debug (Dynamic)|Win32
+		{E24C2D58-2F86-4C49-BD2E-F017C5FF2E0E}.Debug|Win32.ActiveCfg = Debug|Win32
+		{E24C2D58-2F86-4C49-BD2E-F017C5FF2E0E}.Debug|Win32.Build.0 = Debug|Win32
+		{E24C2D58-2F86-4C49-BD2E-F017C5FF2E0E}.Release (Dynamic)|Win32.ActiveCfg = Release (Dynamic)|Win32
+		{E24C2D58-2F86-4C49-BD2E-F017C5FF2E0E}.Release (Dynamic)|Win32.Build.0 = Release (Dynamic)|Win32
+		{E24C2D58-2F86-4C49-BD2E-F017C5FF2E0E}.Release|Win32.ActiveCfg = Release|Win32
+		{E24C2D58-2F86-4C49-BD2E-F017C5FF2E0E}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
 EndGlobal
