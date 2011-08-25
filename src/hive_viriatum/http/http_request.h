@@ -28,10 +28,29 @@
 #pragma once
 
 /**
+ * The carriage return character.
+ */
+#define CR '\r'
+
+/**
+ * The line feed character.
+ */
+#define LF '\n'
+
+/**
+ * Defines the various types of http request.
+ */
+typedef enum HttpRequestType_e {
+    HTTP_REQUEST = 1,
+    HTTP_RESPONSE,
+    HTTP_BOTH
+} HttpRequestType;
+
+/**
  * Defines the various http request mehtods.
  * The methods are defined in a random order.
  */
-enum HttpMethod {
+typedef enum HttpMethod_e {
     HTTP_DELETE = 1,
     HTTP_GET,
     HTTP_HEAD,
@@ -56,9 +75,9 @@ enum HttpMethod {
     HTTP_SUBSCRIBE,
     HTTP_UNSUBSCRIBE,
     HTTP_PATCH
-};
+} HttpMethod;
 
-enum HttpRequestState {
+typedef enum HttpRequestState_e {
     STATE_DEAD = 1,
     STATE_START_REQ_OR_RES,
 
@@ -121,8 +140,8 @@ enum HttpRequestState {
     STATE_CHUNK_DATA_DONE,
 
     STATE_BODY_IDENTITY,
-    STATE_BODY_EOF
-};
+    STATE_BODY_IDENTITY_EOF
+} HttpRequestState;
 
 /**
  * Structure representing an http request
@@ -130,16 +149,17 @@ enum HttpRequestState {
  * including size contents and control flags.
  */
 typedef struct HttpRequest_t {
-    size_t receivedDataSize;
-    unsigned char startLineLoaded;
-    unsigned char headersLoaded;
+    unsigned char type;
+    unsigned char flags;
+    enum HttpRequestState_e state;
+    size_t contentLength;
 } HttpRequest;
 
 void createHttpRequest(struct HttpRequest_t **httpRequestPointer);
 void deleteHttpRequest(struct HttpRequest_t *httpRequest);
 
 /**
- * Called to parse a new data chunk in the context
+ * Called to process a new data chunk in the context
  * of an http request.
  * This function should be called whenever a new data
  * chunk is received.
@@ -147,5 +167,7 @@ void deleteHttpRequest(struct HttpRequest_t *httpRequest);
  * @param httpRequest The http request object.
  * @param data The data to be parsed.
  * @param dataSize The size of the data to be parsed.
+ * @return The result of the processing the data in the
+ * current request context.
  */
-void parseDataHttpRequest(struct HttpRequest_t *httpRequest, unsigned char *data, size_t dataSize);
+int processDataHttpRequest(struct HttpRequest_t *httpRequest, unsigned char *data, size_t dataSize);

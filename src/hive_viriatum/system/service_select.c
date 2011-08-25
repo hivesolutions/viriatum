@@ -110,8 +110,8 @@ void httpReadHandler(struct ServiceSelect_t *serviceSelect, struct Connection_t 
     /* creates the http request */
     createHttpRequest(&httpRequest);
 
-    /* parses the http request */
-    parseDataHttpRequest(httpRequest, buffer, numberBytes);
+    /* process the http data for the http request */
+    processDataHttpRequest(httpRequest, buffer, numberBytes);
 
     /* writes the http static headers to the response */
     SPRINTF(responseBuffer, 1024, "HTTP/1.1 200 OK\r\nServer: viriatum/1.0.0 (%s)\r\nContent-Length: %lu\r\n\r\nhello world", VIRIATUM_PLATFORM_STRING, strlen("hello world"));

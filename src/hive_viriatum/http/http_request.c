@@ -36,14 +36,17 @@ void createHttpRequest(struct HttpRequest_t **httpRequestPointer) {
     /* allocates space for the http request */
     struct HttpRequest_t *httpRequest = (struct HttpRequest_t *) malloc(httpRequestSize);
 
-    /* sets the http request received data size */
-    httpRequest->receivedDataSize = 0;
+    /* sets the http request type */
+    httpRequest->type = 2;
 
-    /* sets the http request start line loaded */
-    httpRequest->startLineLoaded = 0;
+    /* sets the http request flags */
+    httpRequest->flags = 6;
 
-    /* sets the http request headers loaded */
-    httpRequest->headersLoaded = 0;
+    /* sets the http request state */
+    httpRequest->state = STATE_START_REQ;
+
+    /* sets the http request content length */
+    httpRequest->contentLength = 0;
 
     /* sets the http request in the http request pointer */
     *httpRequestPointer = httpRequest;
@@ -54,6 +57,66 @@ void deleteHttpRequest(struct HttpRequest_t *httpRequest) {
     free(httpRequest);
 }
 
-void parseDataHttpRequest(struct HttpRequest_t *httpRequest, unsigned char *data, size_t dataSize) {
-    /* https://github.com/ry/http-parser/blob/master/http_parser.c */
+int processDataHttpRequest(struct HttpRequest_t *httpRequest, unsigned char *data, size_t dataSize) {
+    /* Inspired from https://github.com/ry/http-parser/blob/master/http_parser.c */
+
+    unsigned char byte;
+    const unsigned char *pointerEnd;
+    const unsigned char *pointer = data;
+    enum HttpRequestState_e state = httpRequest->state;
+
+    /* in case the received data size is empty */
+    if(dataSize == 0) {
+        /* switches over the state */
+        switch(state) {
+            case STATE_BODY_IDENTITY_EOF:
+                /* CALLBACK2(message_complete); */
+
+                /* returns immediately */
+                return 0;
+
+            case STATE_DEAD:
+            case STATE_START_REQ_OR_RES:
+            case STATE_START_RES:
+            case STATE_START_REQ:
+                /* returs immediately (nothing to process) */
+                return 0;
+
+            default:
+                /* SET_ERRNO(HPE_INVALID_EOF_STATE);*/
+
+                /* returns invalid (error) */
+                return 1;
+        }
+    }
+
+    for(pointer = data, pointerEnd = data + dataSize; pointer != pointerEnd; pointer++) {
+        /* retrieves the current iteration byte */
+        byte = *pointer;
+
+        switch(state) {
+            case STATE_START_REQ_OR_RES:
+                {
+                    if(byte == CR || byte == LF) {
+                        break;
+                    }
+
+                    httpRequest->flags = 0;
+                    httpRequest->contentLength = -1;
+
+                    /* CALLBACK2(message_begin); */
+
+                    if(byte == 'H') {
+                        state = STATE_RES_OR_RESP_H;
+                    } else {
+                        httpRequest->type = HTTP_REQUEST;
+                    /*    goto start_req_method_assign; */
+                    }
+
+                    break;
+                }
+        }
+    }
+
+    return 0;
 }
