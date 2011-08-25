@@ -28,6 +28,37 @@
 #pragma once
 
 /**
+ * Defines the various http request mehtods.
+ * The methods are defined in a random order.
+ */
+enum HttpMethod {
+    HTTP_DELETE = 1,
+    HTTP_GET,
+    HTTP_HEAD,
+    HTTP_POST,
+    HTTP_PUT,
+    HTTP_CONNECT,
+    HTTP_OPTIONS,
+    HTTP_TRACE,
+    HTTP_COPY,
+    HTTP_LOCK,
+    HTTP_MKCOL,
+    HTTP_MOVE,
+    HTTP_PROPFIND,
+    HTTP_PROPPATCH,
+    HTTP_UNLOCK,
+    HTTP_REPORT,
+    HTTP_MKACTIVITY,
+    HTTP_CHECKOUT,
+    HTTP_MERGE,
+    HTTP_MSEARCH,
+    HTTP_NOTIFY,
+    HTTP_SUBSCRIBE,
+    HTTP_UNSUBSCRIBE,
+    HTTP_PATCH
+};
+
+/**
  * Structure representing an http request
  * it contains information about the request
  * including size contents and control flags.
