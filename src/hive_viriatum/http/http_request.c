@@ -55,5 +55,5 @@ void deleteHttpRequest(struct HttpRequest_t *httpRequest) {
 }
 
 void parseDataHttpRequest(struct HttpRequest_t *httpRequest, unsigned char *data, size_t dataSize) {
-	/* https://github.com/ry/http-parser/blob/master/http_parser.c */
+    /* https://github.com/ry/http-parser/blob/master/http_parser.c */
 }
