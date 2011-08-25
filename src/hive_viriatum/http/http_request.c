@@ -133,7 +133,7 @@ void parseDataHttpRequest(struct HttpRequest_t *httpRequest, unsigned char *data
      * 4. sets the headersLoaded flag
      */
     size_t value;
-    size_t position;
+    size_t position = HTTP_DELETE * 2;
 
     /* in case the start line is not yet loaded */
     if(!httpRequest->startLineLoaded) {
