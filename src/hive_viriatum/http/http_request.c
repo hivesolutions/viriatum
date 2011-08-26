@@ -94,27 +94,31 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, unsigned char *dat
         /* retrieves the current iteration byte */
         byte = *pointer;
 
+        /* switch over the current state */
         switch(state) {
             case STATE_START_REQ_OR_RES:
-                {
-                    if(byte == CR || byte == LF) {
-                        break;
-                    }
-
-                    httpRequest->flags = 0;
-                    httpRequest->contentLength = -1;
-
-                    /* CALLBACK2(message_begin); */
-
-                    if(byte == 'H') {
-                        state = STATE_RES_OR_RESP_H;
-                    } else {
-                        httpRequest->type = HTTP_REQUEST;
-                    /*    goto start_req_method_assign; */
-                    }
-
+                /* in case the current byte is a
+                newline character */
+                if(byte == CR || byte == LF) {
+                    /* breaks the switch */
                     break;
                 }
+
+                /* sets the initial request values */
+                httpRequest->flags = 0;
+                httpRequest->contentLength = -1;
+
+                /* CALLBACK2(message_begin); */
+
+                if(byte == 'H') {
+                    state = STATE_RES_OR_RESP_H;
+                } else {
+                    httpRequest->type = HTTP_REQUEST;
+                /*    goto start_req_method_assign; */
+                }
+
+                /* breaks the switch */
+                break;
         }
     }
 
