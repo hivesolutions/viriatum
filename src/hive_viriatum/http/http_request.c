@@ -122,5 +122,6 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, unsigned char *dat
         }
     }
 
-    return 0;
+    /* raise no error */
+    RAISE_NO_ERROR;
 }
