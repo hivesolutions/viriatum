@@ -511,7 +511,7 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
                 }
 
                 startReqMethodAssign:
-                    httpRequest->method = (enum http_method) 0;
+                    httpRequest->method = (unsigned char) 0;
                     index = 1;
 
                     switch(byte) {
