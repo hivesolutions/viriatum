@@ -523,9 +523,7 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
                         case 'M': httpRequest->method = HTTP_MKCOL; /* or MOVE, MKACTIVITY, MERGE, M-SEARCH */ break;
                         case 'N': httpRequest->method = HTTP_NOTIFY; break;
                         case 'O': httpRequest->method = HTTP_OPTIONS; break;
-                        case 'P': httpRequest->method = HTTP_POST;
-                        /* or PROPFIND or PROPPATCH or PUT or PATCH */
-                        break;
+                        case 'P': httpRequest->method = HTTP_POST; /* or PROPFIND or PROPPATCH or PUT or PATCH */ break;
                         case 'R': httpRequest->method = HTTP_REPORT; break;
                         case 'S': httpRequest->method = HTTP_SUBSCRIBE; break;
                         case 'T': httpRequest->method = HTTP_TRACE; break;
