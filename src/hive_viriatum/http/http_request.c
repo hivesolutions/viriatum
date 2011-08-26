@@ -238,9 +238,9 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
     unsigned long long index = httpRequest->index;
     enum HttpRequestState_e state = httpRequest->state;
 
-    const char *headerFieldMark = 0;
-    const char *headerValueMark = 0;
-    const char *urlMark = 0;
+    const unsigned char *headerFieldMark = 0;
+    const unsigned char *headerValueMark = 0;
+    const unsigned char *urlMark = 0;
 
     /* in case the received data size is empty */
     if(dataSize == 0) {
