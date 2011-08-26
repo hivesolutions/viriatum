@@ -59,7 +59,6 @@
   (IS_ALPHANUM(byte) || (byte) == '.' || (byte) == '-' || (byte) == '_')
 #endif
 
-
 #if HTTP_PARSER_STRICT
 #define STRICT_CHECK(condition)\
 do {\
@@ -73,7 +72,6 @@ do {\
 #define STRICT_CHECK(condition)
 #define NEW_MESSAGE() START_STATE
 #endif
-
 
 #define MARK(FOR)\
 do {\
