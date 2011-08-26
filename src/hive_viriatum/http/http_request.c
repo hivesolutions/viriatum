@@ -30,7 +30,38 @@
 #include "http_request.h"
 
 
-#define STRICT_CHECK(condition)
+
+
+int http_should_keep_alive(struct HttpRequest_t *httpRequest) {
+    if (httpRequest->httpMajor > 0 && httpRequest->httpMinor > 0) {
+        /* HTTP/1.1 */
+        if (httpRequest->flags & FLAG_CONNECTION_CLOSE) {
+            return 0;
+        } else {
+            return 1;
+        }
+    } else {
+        /* HTTP/1.0 or earlier */
+        if (httpRequest->flags & FLAG_CONNECTION_KEEP_ALIVE) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 void createHttpRequest(struct HttpRequest_t **httpRequestPointer) {
     /* retrieves the http request size */
@@ -48,6 +79,9 @@ void createHttpRequest(struct HttpRequest_t **httpRequestPointer) {
     /* sets the http request state */
     httpRequest->state = STATE_START_REQ;
 
+    /* sets the http request read count */
+    httpRequest->readCount = -1;
+
     /* sets the http request content length */
     httpRequest->contentLength = -1;
 
@@ -62,6 +96,9 @@ void createHttpRequest(struct HttpRequest_t **httpRequestPointer) {
 
     /* sets the http request method */
     httpRequest->method = 0;
+
+    /* sets the http request upgrade */
+    httpRequest->upgrade = 1;
 
     /* sets the http request in the http request pointer */
     *httpRequestPointer = httpRequest;
@@ -94,14 +131,58 @@ int urlPrintCallback(struct HttpRequest_t *httpRequest, const unsigned char *dat
     /* prints the url */
     V_DEBUG_F("url: %s\n", url);
 
-    return 0;
+    /* raise no error */
+    RAISE_NO_ERROR;
+}
+
+int headerFieldPrintCallback(struct HttpRequest_t *httpRequest, const unsigned char *data, size_t dataSize) {
+    /* allocates the required space for the header field */
+    unsigned char *headerField = (unsigned char *) malloc(dataSize + 1);
+
+    /* copies the memory from the data to the header field */
+    memcpy(headerField, data, dataSize);
+
+    /* puts the end of strng in the header field */
+    headerField[dataSize] = '\0';
+
+    /* prints the url */
+    V_DEBUG_F("header field: %s\n", headerField);
+
+    /* raise no error */
+    RAISE_NO_ERROR;
+}
+
+int headerValuePrintCallback(struct HttpRequest_t *httpRequest, const unsigned char *data, size_t dataSize) {
+    /* allocates the required space for the header value */
+    unsigned char *headerValue = (unsigned char *) malloc(dataSize + 1);
+
+    /* copies the memory from the data to the header value */
+    memcpy(headerValue, data, dataSize);
+
+    /* puts the end of strng in the header value */
+    headerValue[dataSize] = '\0';
+
+    /* prints the url */
+    V_DEBUG_F("header value: %s\n", headerValue);
+
+    /* raise no error */
+    RAISE_NO_ERROR;
+}
+
+int headersCompletePrintCallback(struct HttpRequest_t *httpRequest) {
+    /* prints an information */
+    V_DEBUG("HTTP headers parsed\n");
+
+    /* raise no error */
+    RAISE_NO_ERROR;
 }
 
 int messageCompletePrintCallback(struct HttpRequest_t *httpRequest) {
     /* prints an information */
     V_DEBUG("HTTP request parsed\n");
 
-    return 0;
+    /* raise no error */
+    RAISE_NO_ERROR;
 }
 
 
@@ -120,10 +201,10 @@ void createHttpSettings(struct HttpSettings_t **httpSettingsPointer) {
     httpSettings->onurl = urlPrintCallback;
 
     /* sets the http settings on header field callback */
-    httpSettings->onheaderField = 0;
+    httpSettings->onheaderField = headerFieldPrintCallback;
 
     /* sets the http settings on header value callback */
-    httpSettings->onheaderValue = 0;
+    httpSettings->onheaderValue = headerValuePrintCallback;
 
     /* sets the http settings on headers complete callback */
     httpSettings->onheadersComplete = 0;
@@ -150,8 +231,10 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
     unsigned char byteToken;
     const char *matcher;
     enum HttpRequestHeaderState_e headerState;
+    size_t toRead;
     const unsigned char *pointerEnd;
     const unsigned char *pointer = data;
+    unsigned long long readCount = httpRequest->readCount;
     unsigned long long index = httpRequest->index;
     enum HttpRequestState_e state = httpRequest->state;
 
@@ -1039,7 +1122,7 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
                         * the second \n to denote the end of headers*/
                         state = STATE_HEADERS_ALMOST_DONE;
 
-                        goto headers_almost_done;
+                        goto headersAlmostDone;
                     }
 
                     byteToken = TOKEN(byte);
@@ -1092,7 +1175,7 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
             case STATE_HEADER_FIELD:
                 byteToken = TOKEN(byte);
 
-                if(byte) {
+                if(byteToken) {
                     switch(headerState) {
                         case HEADER_STATE_GENERAL:
                             /* breaks the switch */
@@ -1360,13 +1443,13 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
                             break;
                         }
 
-                        if(!IS_NUM(ch)) {
+                        if(!IS_NUM(byte)) {
                             /*SET_ERRNO(HPE_INVALID_CONTENT_LENGTH);
                             goto error;*/
                         }
 
                         httpRequest->contentLength *= 10;
-                        httpRequest->contentLength += ch - '0';
+                        httpRequest->contentLength += byte - '0';
 
                         /* breaks the switch */
                         break;
@@ -1375,23 +1458,23 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
                     case HEADER_STATE_MATCHING_TRANSFER_ENCODING_CHUNKED:
                         index++;
 
-                        if(index > sizeof(CHUNKED) - 1 || byte != CHUNKED[index]) {
-                            header_state = HEADER_STATE_GENERAL;
-                        } else if(index == sizeof(CHUNKED) - 2) {
-                            header_state = HEADER_STATE_TRANSFER_ENCODING_CHUNKED;
+                        if(index > sizeof(HTTP_CHUNKED) - 1 || byte != HTTP_CHUNKED[index]) {
+                            headerState = HEADER_STATE_GENERAL;
+                        } else if(index == sizeof(HTTP_CHUNKED) - 2) {
+                            headerState = HEADER_STATE_TRANSFER_ENCODING_CHUNKED;
                         }
 
                         /* breaks the switch */
                         break;
 
                     /* looking for 'Connection: keep-alive' */
-                    case h_matching_connection_keep_alive:
+                    case HEADER_STATE_MATCHING_CONNECTION_KEEP_ALIVE:
                         index++;
 
-                        if(index > sizeof(KEEP_ALIVE) - 1 || byte != KEEP_ALIVE[index]) {
+                        if(index > sizeof(HTTP_KEEP_ALIVE) - 1 || byte != HTTP_KEEP_ALIVE[index]) {
                             headerState = HEADER_STATE_GENERAL;
-                        } else if(index == sizeof(KEEP_ALIVE) - 2) {
-                            headerState = h_connection_keep_alive;
+                        } else if(index == sizeof(HTTP_KEEP_ALIVE) - 2) {
+                            headerState = HEADER_STATE_CONNECTION_KEEP_ALIVE;
                         }
 
                         /* breaks the switch */
@@ -1401,10 +1484,10 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
                     case HEADER_STATE_MATCHING_CONNECTION_CLOSE:
                         index++;
 
-                        if(index > sizeof(CLOSE) - 1 || byteToken != CLOSE[index]) {
+                        if(index > sizeof(HTTP_CLOSE) - 1 || byteToken != HTTP_CLOSE[index]) {
                             headerState = HEADER_STATE_GENERAL;
-                        } else if(index == sizeof(CLOSE) - 2) {
-                            headerState = h_connection_close;
+                        } else if(index == sizeof(HTTP_CLOSE) - 2) {
+                            headerState = HEADER_STATE_CONNECTION_CLOSE;
                         }
 
                         /* breaks the switch */
@@ -1430,6 +1513,178 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
 
                 /* breaks the switch */
                 break;
+
+
+            case STATE_HEADER_ALMOST_DONE:
+                headerAlmostDone:
+                    STRICT_CHECK(byte != LF);
+
+                    state = STATE_HEADER_VALUE_LWS;
+
+                    switch(headerState) {
+                        case HEADER_STATE_CONNECTION_KEEP_ALIVE:
+                            httpRequest->flags |= FLAG_CONNECTION_KEEP_ALIVE;
+
+                            /* breaks the switch */
+                            break;
+
+                        case HEADER_STATE_CONNECTION_CLOSE:
+                            httpRequest->flags |= FLAG_CONNECTION_CLOSE;
+
+                            /* breaks the switch */
+                            break;
+
+                        case HEADER_STATE_TRANSFER_ENCODING_CHUNKED:
+                            httpRequest->flags |= FLAG_CHUNKED;
+
+                            /* breaks the switch */
+                            break;
+
+                        default:
+                            /* breaks the switch */
+                            break;
+                    }
+
+                    /* breaks the switch */
+                    break;
+
+            case STATE_HEADER_VALUE_LWS:
+                if(byte == ' ' || byte == '\t') {
+                    state = STATE_HEADER_VALUE_START;
+                } else {
+                    state = STATE_HEADER_FIELD_START;
+                    goto headerFieldStart;
+                }
+
+                /* breaks the switch */
+                break;
+
+            case STATE_HEADERS_ALMOST_DONE:
+                headersAlmostDone:
+                    STRICT_CHECK(ch != LF);
+
+                    if(httpRequest->flags & FLAG_TRAILING) {
+                        /* End of a chunked request */
+                        HTTP_CALLBACK2(messageComplete);
+                        state = NEW_MESSAGE();
+                        break;
+                    }
+
+                    readCount = 0;
+
+                    if(httpRequest->flags & FLAG_UPGRADE || httpRequest->method == HTTP_CONNECT) {
+                        httpRequest->upgrade = 1;
+                    }
+
+                    /* Here we call the headers_complete callback. This is somewhat
+                     * different than other callbacks because if the user returns 1, we
+                     * will interpret that as saying that this message has no body. This
+                     * is needed for the annoying case of recieving a response to a HEAD
+                     * request.
+                     */
+                    if(httpSettings->onheadersComplete) {
+                        switch (httpSettings->onheadersComplete(httpRequest)) {
+                            case 0:
+                                break;
+
+                            case 1:
+                                httpRequest->flags |= FLAG_SKIPBODY;
+                                break;
+
+                            default:
+                                httpRequest->state = state;
+                                /*SET_ERRNO(HPE_CB_headers_complete);*/
+                                return pointer - data; /* Error */
+                        }
+                    }
+
+                    /* Exit, the rest of the connect is in a different protocol. */
+                    if(httpRequest->upgrade) {
+                        HTTP_CALLBACK2(messageComplete);
+
+                        return (pointer - data) + 1;
+                    }
+
+                    if(httpRequest->flags & FLAG_SKIPBODY) {
+                        HTTP_CALLBACK2(messageComplete);
+                        state = NEW_MESSAGE();
+                    } else if(httpRequest->flags & FLAG_CHUNKED) {
+                        /* chunked encoding - ignore Content-Length header */
+                        state = STATE_CHUNK_SIZE_START;
+                    } else {
+                        if(httpRequest->contentLength == 0) {
+                            /* Content-Length header given but zero: Content-Length: 0\r\n */
+                            HTTP_CALLBACK2(messageComplete);
+                            state = NEW_MESSAGE();
+                        } else if(httpRequest->contentLength > 0) {
+                            /* Content-Length header given and non-zero */
+                            state = STATE_BODY_IDENTITY;
+                        } else {
+                            if(httpRequest->type == HTTP_REQUEST || http_should_keep_alive(httpRequest)) {
+                                /* Assume content-length 0 - read the next */
+                                HTTP_CALLBACK2(messageComplete);
+                                state = NEW_MESSAGE();
+                            } else {
+                                /* Read body until EOF */
+                                state = STATE_BODY_IDENTITY_EOF;
+                            }
+                        }
+                    }
+
+                    /* breaks the switch */
+                    break;
+
+
+            case STATE_BODY_IDENTITY:
+                toRead = MIN(pointerEnd - pointer, (long long) httpRequest->contentLength);
+
+                if(toRead > 0) {
+                    if(httpSettings->onbody) {
+                        httpSettings->onbody(httpRequest, pointer, toRead);
+                    }
+
+                    pointer += toRead - 1;
+
+                    httpRequest->contentLength -= toRead;
+
+                    if(httpRequest->contentLength == 0) {
+                        HTTP_CALLBACK2(messageComplete);
+                        state = NEW_MESSAGE();
+                    }
+                }
+
+                /* breaks the switch */
+                break;
+
+            /* read until EOF */
+            case STATE_BODY_IDENTITY_EOF:
+                toRead = pointerEnd - pointer;
+
+                if(toRead > 0) {
+                    if(httpSettings->onbody) {
+                        httpSettings->onbody(httpRequest, pointer, toRead);
+                    }
+
+                    pointer += toRead - 1;
+                }
+
+                /* breaks the switch */
+                break;
+
+            /*case SATE_CHUNK_SIZE_START:
+                assert(readCount == 1);
+                assert(httRequest->flags & FLAG_CHUNKED);
+
+                unhex_val = unhex[(unsigned char)ch];
+                if (unhex_val == -1) {
+                  SET_ERRNO(HPE_INVALID_CHUNK_SIZE);
+                  goto error;
+                }
+
+                parser->content_length = unhex_val;
+                state = s_chunk_size;
+                break;
+            */
         }
     }
 

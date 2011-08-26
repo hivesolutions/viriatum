@@ -37,6 +37,12 @@
  */
 #define LF '\n'
 
+#define START_STATE (httpRequest->type == HTTP_REQUEST ? STATE_START_REQ : STATE_START_RES)
+
+#ifndef MIN
+#define MIN(a,b) ((a) < (b) ? (a) : (b))
+#endif
+
 #define LOWER(byte) (unsigned char)(byte | 0x20)
 #define TOKEN(byte) (tokens[(unsigned char) byte])
 #define IS_ALPHA(byte) (LOWER(byte) >= 'a' && LOWER(byte) <= 'z')
@@ -53,10 +59,26 @@
   (IS_ALPHANUM(byte) || (byte) == '.' || (byte) == '-' || (byte) == '_')
 #endif
 
+
+#if HTTP_PARSER_STRICT
+#define STRICT_CHECK(condition)\
+do {\
+    if(condition) {\
+        SET_ERRNO(HPE_STRICT);\
+        goto error;\
+    }\
+} while(0)
+#define NEW_MESSAGE() (http_should_keep_alive(parser) ? START_STATE : STATE_DEAD)
+#else
+#define STRICT_CHECK(condition)
+#define NEW_MESSAGE() START_STATE
+#endif
+
+
 #define MARK(FOR)\
 do {\
   FOR##Mark = pointer;\
-} while (0)
+} while(0)
 
 
 #define HTTP_CALLBACK(FOR)\
@@ -358,11 +380,13 @@ typedef struct HttpRequest_t {
     unsigned char flags;
     enum HttpRequestState_e state;
     unsigned char index;
+    size_t readCount;
     size_t contentLength;
     unsigned short httpMajor;
     unsigned short httpMinor;
     unsigned short statusCode;
     unsigned char method;
+    char upgrade;
 } HttpRequest;
 
 void createHttpRequest(struct HttpRequest_t **httpRequestPointer);
