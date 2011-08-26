@@ -353,21 +353,6 @@ typedef enum HttpFlags_e {
     FLAG_SKIPBODY = 1 << 5
 } HttpFlags;
 
-typedef int (*httpDataCallback) (struct HttpRequest_t *, const unsigned char *, size_t);
-typedef int (*httpCallback) (struct HttpRequest_t *);
-
-
-
-typedef struct HttpSettings_t {
-    httpCallback onmessageBegin;
-    httpDataCallback onurl;
-    httpDataCallback onheaderField;
-    httpDataCallback onheaderValue;
-    httpCallback onheadersComplete;
-    httpDataCallback onbody;
-    httpCallback onmessageComplete;
-} HttpSettings;
-
 /**
  * Structure representing an http request
  * it contains information about the request
@@ -386,6 +371,19 @@ typedef struct HttpRequest_t {
     unsigned char method;
     char upgrade;
 } HttpRequest;
+
+typedef int (*httpDataCallback) (struct HttpRequest_t *, const unsigned char *, size_t);
+typedef int (*httpCallback) (struct HttpRequest_t *);
+
+typedef struct HttpSettings_t {
+    httpCallback onmessageBegin;
+    httpDataCallback onurl;
+    httpDataCallback onheaderField;
+    httpDataCallback onheaderValue;
+    httpCallback onheadersComplete;
+    httpDataCallback onbody;
+    httpCallback onmessageComplete;
+} HttpSettings;
 
 void createHttpRequest(struct HttpRequest_t **httpRequestPointer);
 void deleteHttpRequest(struct HttpRequest_t *httpRequest);
