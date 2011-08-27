@@ -33,16 +33,16 @@
 
 
 int http_should_keep_alive(struct HttpRequest_t *httpRequest) {
-    if (httpRequest->httpMajor > 0 && httpRequest->httpMinor > 0) {
+    if(httpRequest->httpMajor > 0 && httpRequest->httpMinor > 0) {
         /* HTTP/1.1 */
-        if (httpRequest->flags & FLAG_CONNECTION_CLOSE) {
+        if(httpRequest->flags & FLAG_CONNECTION_CLOSE) {
             return 0;
         } else {
             return 1;
         }
     } else {
         /* HTTP/1.0 or earlier */
-        if (httpRequest->flags & FLAG_CONNECTION_KEEP_ALIVE) {
+        if(httpRequest->flags & FLAG_CONNECTION_KEEP_ALIVE) {
             return 1;
         } else {
             return 0;
@@ -80,19 +80,19 @@ void createHttpRequest(struct HttpRequest_t **httpRequestPointer) {
     httpRequest->state = STATE_START_REQ;
 
     /* sets the http request read count */
-    httpRequest->readCount = -1;
+    httpRequest->readCount = 0;
 
     /* sets the http request content length */
-    httpRequest->contentLength = -1;
+    httpRequest->contentLength = 0;
 
     /* sets the http request http major */
-    httpRequest->httpMajor = -1;
+    httpRequest->httpMajor = 0;
 
     /* sets the http request http minor */
-    httpRequest->httpMinor = -1;
+    httpRequest->httpMinor = 0;
 
     /* sets the http request http minor */
-    httpRequest->statusCode = -1;
+    httpRequest->statusCode = 0;
 
     /* sets the http request method */
     httpRequest->method = 0;
