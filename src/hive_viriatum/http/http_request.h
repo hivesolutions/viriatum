@@ -375,6 +375,10 @@ typedef struct HttpRequest_t {
 typedef int (*httpDataCallback) (struct HttpRequest_t *, const unsigned char *, size_t);
 typedef int (*httpCallback) (struct HttpRequest_t *);
 
+/**
+ * Structure representing the various settings
+ * to be used for parsing the http message.
+ */
 typedef struct HttpSettings_t {
     httpCallback onmessageBegin;
     httpDataCallback onurl;
