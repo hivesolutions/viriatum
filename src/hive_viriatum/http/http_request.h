@@ -90,7 +90,7 @@ do {\
         }\
         FOR##Mark = NULL;\
     }\
-} while (0)
+} while(0)
 
 #define HTTP_CALLBACK2(FOR)\
 do {\
@@ -100,7 +100,7 @@ do {\
             /*return (pointer - data);*/\
         }\
     }\
-} while (0)
+} while(0)
 
 
 #define HTTP_PROXY_CONNECTION "proxy-connection"
