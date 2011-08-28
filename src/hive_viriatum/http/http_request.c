@@ -79,6 +79,9 @@ void createHttpRequest(struct HttpRequest_t **httpRequestPointer) {
     /* sets the http request state */
     httpRequest->state = STATE_START_REQ;
 
+    /* sets the http request header state */
+    httpRequest->headerState = 0;
+
     /* sets the http request read count */
     httpRequest->readCount = 0;
 
@@ -145,7 +148,7 @@ int headerFieldPrintCallback(struct HttpRequest_t *httpRequest, const unsigned c
     /* puts the end of strng in the header field */
     headerField[dataSize] = '\0';
 
-    /* prints the url */
+    /* prints the header field */
     V_DEBUG_F("header field: %s\n", headerField);
 
     /* raise no error */
@@ -162,7 +165,7 @@ int headerValuePrintCallback(struct HttpRequest_t *httpRequest, const unsigned c
     /* puts the end of strng in the header value */
     headerValue[dataSize] = '\0';
 
-    /* prints the url */
+    /* prints the header value */
     V_DEBUG_F("header value: %s\n", headerValue);
 
     /* raise no error */
@@ -177,6 +180,23 @@ int headersCompletePrintCallback(struct HttpRequest_t *httpRequest) {
     RAISE_NO_ERROR;
 }
 
+int bodyPrintCallback(struct HttpRequest_t *httpRequest, const unsigned char *data, size_t dataSize) {
+    /* allocates the required space for the body */
+    unsigned char *body = (unsigned char *) malloc(dataSize + 1);
+
+    /* copies the memory from the data to the body */
+    memcpy(body, data, dataSize);
+
+    /* puts the end of strng in the body */
+    body[dataSize] = '\0';
+
+    /* prints the body */
+    V_DEBUG_F("body: %s\n", body);
+
+    /* raise no error */
+    RAISE_NO_ERROR;
+}
+
 int messageCompletePrintCallback(struct HttpRequest_t *httpRequest) {
     /* prints an information */
     V_DEBUG("HTTP request parsed\n");
@@ -184,8 +204,6 @@ int messageCompletePrintCallback(struct HttpRequest_t *httpRequest) {
     /* raise no error */
     RAISE_NO_ERROR;
 }
-
-
 
 void createHttpSettings(struct HttpSettings_t **httpSettingsPointer) {
     /* retrieves the http settings size */
@@ -207,10 +225,10 @@ void createHttpSettings(struct HttpSettings_t **httpSettingsPointer) {
     httpSettings->onheaderValue = headerValuePrintCallback;
 
     /* sets the http settings on headers complete callback */
-    httpSettings->onheadersComplete = 0;
+    httpSettings->onheadersComplete = headersCompletePrintCallback;
 
     /* sets the http settings on body callback */
-    httpSettings->onbody = 0;
+    httpSettings->onbody = bodyPrintCallback;
 
     /* sets the http settings on message complete callback */
     httpSettings->onmessageComplete = messageCompletePrintCallback;
@@ -229,18 +247,21 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
 
     unsigned char byte;
     unsigned char byteToken;
+    char unhexValue;
     const char *matcher;
     enum HttpRequestHeaderState_e headerState;
     size_t toRead;
     const unsigned char *pointerEnd;
     const unsigned char *pointer = data;
-    unsigned long long readCount = httpRequest->readCount;
-    unsigned long long index = httpRequest->index;
+    size_t readCount = httpRequest->readCount;
+    size_t index = httpRequest->index;
     enum HttpRequestState_e state = httpRequest->state;
 
     const unsigned char *headerFieldMark = 0;
     const unsigned char *headerValueMark = 0;
     const unsigned char *urlMark = 0;
+
+    printf("'%s'", data);
 
     /* in case the received data size is empty */
     if(dataSize == 0) {
@@ -1109,7 +1130,7 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
             case STATE_HEADER_FIELD_START:
                 headerFieldStart:
                     if(byte == CR) {
-                        state = STATE_HEADER_ALMOST_DONE;
+                        state = STATE_HEADERS_ALMOST_DONE;
 
                         /* breaks the switch */
                         break;
@@ -1559,7 +1580,7 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
 
             case STATE_HEADERS_ALMOST_DONE:
                 headersAlmostDone:
-                    STRICT_CHECK(ch != LF);
+                    STRICT_CHECK(byte != LF);
 
                     if(httpRequest->flags & FLAG_TRAILING) {
                         /* End of a chunked request */
@@ -1669,23 +1690,137 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
                 /* breaks the switch */
                 break;
 
-            /*case SATE_CHUNK_SIZE_START:
+            case STATE_CHUNK_SIZE_START:
                 assert(readCount == 1);
-                assert(httRequest->flags & FLAG_CHUNKED);
+                assert(httpRequest->flags & FLAG_CHUNKED);
 
-                unhex_val = unhex[(unsigned char)ch];
-                if (unhex_val == -1) {
-                  SET_ERRNO(HPE_INVALID_CHUNK_SIZE);
-                  goto error;
+                unhexValue = unhex[byte];
+
+                if(unhexValue == -1) {
+                    /*SET_ERRNO(HPE_INVALID_CHUNK_SIZE);
+                    goto error;*/
                 }
 
-                parser->content_length = unhex_val;
-                state = s_chunk_size;
+                httpRequest->contentLength = unhexValue;
+                state = STATE_CHUNK_SIZE;
+
+                /* breaks the switch */
                 break;
-            */
+
+            case STATE_CHUNK_SIZE:
+                assert(httpRequest->flags & FLAG_CHUNKED);
+
+                if(byte == CR) {
+                    state = STATE_CHUNK_SIZE_ALMOST_DONE;
+
+                    /* breaks the switch */
+                    break;
+                }
+
+                unhexValue = unhex[byte];
+
+                if(unhexValue == -1) {
+                    if(byte == ';' || byte == ' ') {
+                        state = STATE_CHUNK_PARAMETERS;
+
+                        /* breaks the switch */
+                        break;
+                    }
+
+                    /*SET_ERRNO(HPE_INVALID_CHUNK_SIZE);
+                    goto error;*/
+                }
+
+                httpRequest->contentLength *= 16;
+                httpRequest->contentLength += unhexValue;
+
+                /* breaks the switch */
+                break;
+
+            case STATE_CHUNK_PARAMETERS:
+                assert(httpRequest->flags & FLAG_CHUNKED);
+
+                /* just ignore this shit. TODO check for overflow */
+                if(byte == CR) {
+                    state = STATE_CHUNK_SIZE_ALMOST_DONE;
+
+                    /* breaks the switch */
+                    break;
+                }
+
+                /* breaks the switch */
+                break;
+
+            case STATE_CHUNK_SIZE_ALMOST_DONE:
+                assert(httpRequest->flags & FLAG_CHUNKED);
+                STRICT_CHECK(byte != LF);
+
+                readCount = 0;
+
+                if(httpRequest->contentLength == 0) {
+                    httpRequest->flags |= FLAG_TRAILING;
+                    state = STATE_HEADER_FIELD_START;
+                } else {
+                    state = STATE_CHUNK_DATA;
+                }
+
+                /* breaks the switch */
+                break;
+
+            case STATE_CHUNK_DATA:
+                assert(httpRequest->flags & FLAG_CHUNKED);
+
+                toRead = MIN(pointerEnd - pointer, (long long) (httpRequest->contentLength));
+
+                if(toRead > 0) {
+                    if (httpSettings->onbody) {
+                        httpSettings->onbody(httpRequest, pointer, toRead);
+                    }
+
+                    pointer += toRead - 1;
+                }
+
+                if(toRead == httpRequest->contentLength) {
+                    state = STATE_CHUNK_DATA_ALMOST_DONE;
+                }
+
+                httpRequest->contentLength -= toRead;
+
+                /* breaks the switch */
+                break;
+
+            case STATE_CHUNK_DATA_ALMOST_DONE:
+                assert(httpRequest->flags & FLAG_CHUNKED);
+                STRICT_CHECK(byte != CR);
+                state = STATE_CHUNK_DATA_DONE;
+
+                /* breaks the switch */
+                break;
+
+            case STATE_CHUNK_DATA_DONE:
+                assert(httpRequest->flags & FLAG_CHUNKED);
+                STRICT_CHECK(byte != LF);
+                state = STATE_CHUNK_SIZE_START;
+
+                /* breaks the switch */
+                break;
+
+            default:
+                assert(0 && "unhandled state");
+                /*SET_ERRNO(HPE_INVALID_INTERNAL_STATE);
+                goto error;*/
         }
     }
 
-    /* raise no error */
-    RAISE_NO_ERROR;
+    HTTP_CALLBACK(headerField);
+    HTTP_CALLBACK(headerValue);
+    HTTP_CALLBACK(url);
+
+    httpRequest->state = state;
+    httpRequest->headerState = headerState;
+    httpRequest->index = index;
+    httpRequest->readCount = readCount;
+
+    /* returns the data size (processed data size) */
+    return dataSize;
 }

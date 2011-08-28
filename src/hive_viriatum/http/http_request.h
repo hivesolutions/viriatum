@@ -149,6 +149,16 @@ static const char tokens[256] = {
        'x',     'y',     'z',      0,      '|',     '}',     '~',       0
 };
 
+static const char unhex[256] = {
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+     0,  1,  2,  3,  4,  5,  6,  7,  8,  9, -1, -1, -1, -1, -1, -1,
+    -1, 10, 11, 12, 13, 14, 15, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, 10, 11, 12, 13, 14, 15, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
+};
 
 static const unsigned char normalUrlChar[256] = {
 /*   0 nul    1 soh    2 stx    3 etx    4 eot    5 enq    6 ack    7 bel  */
@@ -302,7 +312,6 @@ typedef enum HttpRequestState_e {
     STATE_HEADER_VALUE_LWS,
     STATE_HEADER_ALMOST_DONE,
 
-
     STATE_CHUNK_SIZE_START,
     STATE_CHUNK_SIZE,
     STATE_CHUNK_PARAMETERS,
@@ -362,6 +371,7 @@ typedef struct HttpRequest_t {
     unsigned char type;
     unsigned char flags;
     enum HttpRequestState_e state;
+    enum HttpRequestHeaderState_e headerState;
     unsigned char index;
     size_t readCount;
     size_t contentLength;
