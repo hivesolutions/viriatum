@@ -645,11 +645,14 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
 
             case STATE_REQ_SCHEMA:
                 if(IS_ALPHA(byte)) {
+					/* breaks the switch */
                     break;
                 }
 
                 if(byte == ':') {
                     state = STATE_REQ_SCHEMA_SLASH;
+
+					/* breaks the switch */
                     break;
                 }
 
@@ -672,6 +675,7 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
 
             case STATE_REQ_HOST:
                 if(IS_HOST_CHAR(byte)) {
+					/* breaks the switch */
                     break;
                 }
 
