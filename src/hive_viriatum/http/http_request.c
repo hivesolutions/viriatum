@@ -692,7 +692,7 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
                         break;
                     case ' ':
                         /* The request line looks like:
-                         *   "GET http://foo.bar.com HTTP/1.1"
+                         * "GET http://foo.bar.com HTTP/1.1"
                          * That is, there is no path.
                          */
                         HTTP_CALLBACK(url);

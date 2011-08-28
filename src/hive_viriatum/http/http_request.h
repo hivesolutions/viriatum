@@ -414,7 +414,6 @@ void deleteHttpSettings(struct HttpSettings_t *httpSettings);
  * @param httpSettings The http settings for the processing.
  * @param data The data to be parsed.
  * @param dataSize The size of the data to be parsed.
- * @return The result of the processing the data in the
- * current request context.
+ * @return The number of bytes used during the processing.
  */
 int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSettings_t *httpSettings, unsigned char *data, size_t dataSize);
