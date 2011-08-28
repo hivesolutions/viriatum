@@ -311,7 +311,7 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
                     state = STATE_RES_OR_RESP_H;
                 } else {
                     httpRequest->type = HTTP_REQUEST;
-                /*    goto start_req_method_assign; */
+                    goto startReqMethodAssign;
                 }
 
                 /* breaks the switch */
