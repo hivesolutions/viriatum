@@ -114,14 +114,14 @@ void deleteHttpRequest(struct HttpRequest_t *httpRequest) {
 
 
 
-int messageBeginPrintCallback(struct HttpRequest_t *httpRequest) {
+ERROR_CODE messageBeginPrintCallback(struct HttpRequest_t *httpRequest) {
     /* prints an information */
     V_DEBUG("HTTP request received\n");
 
     return 0;
 }
 
-int urlPrintCallback(struct HttpRequest_t *httpRequest, const unsigned char *data, size_t dataSize) {
+ERROR_CODE urlPrintCallback(struct HttpRequest_t *httpRequest, const unsigned char *data, size_t dataSize) {
     /* allocates the required space for the url */
     unsigned char *url = (unsigned char *) malloc(dataSize + 1);
 
@@ -138,7 +138,7 @@ int urlPrintCallback(struct HttpRequest_t *httpRequest, const unsigned char *dat
     RAISE_NO_ERROR;
 }
 
-int headerFieldPrintCallback(struct HttpRequest_t *httpRequest, const unsigned char *data, size_t dataSize) {
+ERROR_CODE headerFieldPrintCallback(struct HttpRequest_t *httpRequest, const unsigned char *data, size_t dataSize) {
     /* allocates the required space for the header field */
     unsigned char *headerField = (unsigned char *) malloc(dataSize + 1);
 
@@ -155,7 +155,7 @@ int headerFieldPrintCallback(struct HttpRequest_t *httpRequest, const unsigned c
     RAISE_NO_ERROR;
 }
 
-int headerValuePrintCallback(struct HttpRequest_t *httpRequest, const unsigned char *data, size_t dataSize) {
+ERROR_CODE headerValuePrintCallback(struct HttpRequest_t *httpRequest, const unsigned char *data, size_t dataSize) {
     /* allocates the required space for the header value */
     unsigned char *headerValue = (unsigned char *) malloc(dataSize + 1);
 
@@ -172,7 +172,7 @@ int headerValuePrintCallback(struct HttpRequest_t *httpRequest, const unsigned c
     RAISE_NO_ERROR;
 }
 
-int headersCompletePrintCallback(struct HttpRequest_t *httpRequest) {
+ERROR_CODE headersCompletePrintCallback(struct HttpRequest_t *httpRequest) {
     /* prints an information */
     V_DEBUG("HTTP headers parsed\n");
 
@@ -180,7 +180,7 @@ int headersCompletePrintCallback(struct HttpRequest_t *httpRequest) {
     RAISE_NO_ERROR;
 }
 
-int bodyPrintCallback(struct HttpRequest_t *httpRequest, const unsigned char *data, size_t dataSize) {
+ERROR_CODE bodyPrintCallback(struct HttpRequest_t *httpRequest, const unsigned char *data, size_t dataSize) {
     /* allocates the required space for the body */
     unsigned char *body = (unsigned char *) malloc(dataSize + 1);
 
@@ -197,7 +197,7 @@ int bodyPrintCallback(struct HttpRequest_t *httpRequest, const unsigned char *da
     RAISE_NO_ERROR;
 }
 
-int messageCompletePrintCallback(struct HttpRequest_t *httpRequest) {
+ERROR_CODE messageCompletePrintCallback(struct HttpRequest_t *httpRequest) {
     /* prints an information */
     V_DEBUG("HTTP request parsed\n");
 

@@ -382,8 +382,8 @@ typedef struct HttpRequest_t {
     char upgrade;
 } HttpRequest;
 
-typedef int (*httpDataCallback) (struct HttpRequest_t *, const unsigned char *, size_t);
-typedef int (*httpCallback) (struct HttpRequest_t *);
+typedef ERROR_CODE (*httpDataCallback) (struct HttpRequest_t *, const unsigned char *, size_t);
+typedef ERROR_CODE (*httpCallback) (struct HttpRequest_t *);
 
 /**
  * Structure representing the various settings
