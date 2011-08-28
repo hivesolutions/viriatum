@@ -261,8 +261,6 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
     const unsigned char *headerValueMark = 0;
     const unsigned char *urlMark = 0;
 
-    printf("'%s'", data);
-
     /* in case the received data size is empty */
     if(dataSize == 0) {
         /* switches over the state */
