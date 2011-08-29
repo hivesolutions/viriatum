@@ -139,7 +139,7 @@ void httpWriteHandler(struct ServiceSelect_t *serviceSelect, struct Connection_t
     /* iterates continuously */
     while(1) {
         /* pops a value (data) from the linked list (write queue) */
-        popValueLinkedList(connection->writeQueue, &data);
+        popValueLinkedList(connection->writeQueue, (void **) &data);
 
         /* in case the data is invalid */
         if(data == NULL) {
