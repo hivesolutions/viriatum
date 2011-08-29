@@ -17,7 +17,7 @@
  You should have received a copy of the GNU General Public License
  along with Hive Viriatum Web Server. If not, see <http://www.gnu.org/licenses/>.
 
- __author__    = Jo√£o Magalh√£es <joamag@hive.pt>
+ __author__    = Jo„o Magalh„es <joamag@hive.pt>
  __version__   = 1.0.0
  __revision__  = $LastChangedRevision$
  __date__      = $LastChangedDate$
@@ -27,11 +27,15 @@
 
 #pragma once
 
-#include "stdafx.h"
+#include "../http/http.h"
 
-#include "http/http.h"
-#include "io/io.h"
-#include "module/module.h"
-#include "handlers/handlers.h"
-#include "system/system.h"
-#include "test/test.h"
+void updateHandlerFile(struct HttpParser_t *httpParser, struct HttpSettings_t *httpSettings);
+void updateHttpParserHandlerFile(struct HttpParser_t *httpParser);
+void updateHttpSettingsHandlerFile(struct HttpSettings_t *httpSettings);
+ERROR_CODE messageBeginCallbackHandlerFile(struct HttpParser_t *httpParser);
+ERROR_CODE urlCallbackHandlerFile(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize);
+ERROR_CODE headerFieldCallbackHandlerFile(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize);
+ERROR_CODE headerValueCallbackHandlerFile(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize);
+ERROR_CODE headersCompleteCallbackHandlerFile(struct HttpParser_t *httpParser);
+ERROR_CODE bodyCallbackHandlerFile(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize);
+ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser);

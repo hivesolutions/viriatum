@@ -26,3 +26,21 @@
 */
 
 #pragma once
+
+typedef struct HttpRequest_t {
+    unsigned char type;
+} HttpRequest;
+
+/**
+ * Constructor of the http request.
+ *
+ * @param httpRequestPointer The pointer to the http request to be constructed.
+ */
+void createHttpRequest(struct HttpRequest_t **httpRequestPointer);
+
+/**
+ * Destructor of the http request.
+ *
+ * @param httpRequest The http request to be destroyed.
+ */
+void deleteHttpRequest(struct HttpRequest_t *httpRequest);

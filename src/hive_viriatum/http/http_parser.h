@@ -76,7 +76,6 @@ do {\
   FOR##Mark = pointer;\
 } while(0)
 
-
 #define HTTP_CALLBACK(FOR)\
 do {\
     if(FOR##Mark) {\

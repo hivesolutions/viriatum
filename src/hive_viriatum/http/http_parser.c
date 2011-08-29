@@ -115,100 +115,6 @@ void deleteHttpParser(struct HttpParser_t *httpParser) {
     free(httpParser);
 }
 
-
-
-ERROR_CODE messageBeginPrintCallback(struct HttpParser_t *httpParser) {
-    /* prints an information */
-    V_DEBUG("HTTP request received\n");
-
-    /* raise no error */
-    RAISE_NO_ERROR;
-}
-
-ERROR_CODE urlPrintCallback(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize) {
-    /* allocates the required space for the url */
-    unsigned char *url = (unsigned char *) malloc(dataSize + 1);
-
-    /* copies the memory from the data to the url */
-    memcpy(url, data, dataSize);
-
-    /* puts the end of strng in the url */
-    url[dataSize] = '\0';
-
-    /* prints the url */
-    V_DEBUG_F("url: %s\n", url);
-
-    /* raise no error */
-    RAISE_NO_ERROR;
-}
-
-ERROR_CODE headerFieldPrintCallback(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize) {
-    /* allocates the required space for the header field */
-    unsigned char *headerField = (unsigned char *) malloc(dataSize + 1);
-
-    /* copies the memory from the data to the header field */
-    memcpy(headerField, data, dataSize);
-
-    /* puts the end of strng in the header field */
-    headerField[dataSize] = '\0';
-
-    /* prints the header field */
-    V_DEBUG_F("header field: %s\n", headerField);
-
-    /* raise no error */
-    RAISE_NO_ERROR;
-}
-
-ERROR_CODE headerValuePrintCallback(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize) {
-    /* allocates the required space for the header value */
-    unsigned char *headerValue = (unsigned char *) malloc(dataSize + 1);
-
-    /* copies the memory from the data to the header value */
-    memcpy(headerValue, data, dataSize);
-
-    /* puts the end of strng in the header value */
-    headerValue[dataSize] = '\0';
-
-    /* prints the header value */
-    V_DEBUG_F("header value: %s\n", headerValue);
-
-    /* raise no error */
-    RAISE_NO_ERROR;
-}
-
-ERROR_CODE headersCompletePrintCallback(struct HttpParser_t *httpParser) {
-    /* prints an information */
-    V_DEBUG("HTTP headers parsed\n");
-
-    /* raise no error */
-    RAISE_NO_ERROR;
-}
-
-ERROR_CODE bodyPrintCallback(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize) {
-    /* allocates the required space for the body */
-    unsigned char *body = (unsigned char *) malloc(dataSize + 1);
-
-    /* copies the memory from the data to the body */
-    memcpy(body, data, dataSize);
-
-    /* puts the end of strng in the body */
-    body[dataSize] = '\0';
-
-    /* prints the body */
-    V_DEBUG_F("body: %s\n", body);
-
-    /* raise no error */
-    RAISE_NO_ERROR;
-}
-
-ERROR_CODE messageCompletePrintCallback(struct HttpParser_t *httpParser) {
-    /* prints an information */
-    V_DEBUG("HTTP request parsed\n");
-
-    /* raise no error */
-    RAISE_NO_ERROR;
-}
-
 void createHttpSettings(struct HttpSettings_t **httpSettingsPointer) {
     /* retrieves the http settings size */
     size_t httpSettingsSize = sizeof(struct HttpSettings_t);
@@ -217,25 +123,25 @@ void createHttpSettings(struct HttpSettings_t **httpSettingsPointer) {
     struct HttpSettings_t *httpSettings = (struct HttpSettings_t *) malloc(httpSettingsSize);
 
     /* sets the http settings on message begin callback */
-    httpSettings->onmessageBegin = messageBeginPrintCallback;
+    httpSettings->onmessageBegin = NULL;
 
     /* sets the http settings on url callback */
-    httpSettings->onurl = urlPrintCallback;
+    httpSettings->onurl = NULL;
 
     /* sets the http settings on header field callback */
-    httpSettings->onheaderField = headerFieldPrintCallback;
+    httpSettings->onheaderField = NULL;
 
     /* sets the http settings on header value callback */
-    httpSettings->onheaderValue = headerValuePrintCallback;
+    httpSettings->onheaderValue = NULL;
 
     /* sets the http settings on headers complete callback */
-    httpSettings->onheadersComplete = headersCompletePrintCallback;
+    httpSettings->onheadersComplete = NULL;
 
     /* sets the http settings on body callback */
-    httpSettings->onbody = bodyPrintCallback;
+    httpSettings->onbody = NULL;
 
     /* sets the http settings on message complete callback */
-    httpSettings->onmessageComplete = messageCompletePrintCallback;
+    httpSettings->onmessageComplete = NULL;
 
     /* sets the http settings in the http settings pointer */
     *httpSettingsPointer = httpSettings;
