@@ -78,5 +78,3 @@
 unsigned char *nameViriatumCommons();
 unsigned char *versionViriatumCommons();
 unsigned char *descriptionViriatumCommons();
-
-#define VIRIATUM_DEBUG
