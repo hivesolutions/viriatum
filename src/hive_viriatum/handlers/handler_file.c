@@ -140,7 +140,7 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
     struct Connection_t *connection = (struct Connection_t *) httpParser->parameters;
 
     /* reads (the complete) file contents */
-    ERROR_CODE readFileResult = countFile(handlerFileContext->filePath, &fileSize);
+    ERROR_CODE readFileResult = countFile((char *) handlerFileContext->filePath, &fileSize);
 
     /* tests the error code for error */
     if(IS_ERROR_CODE(readFileResult)) {
