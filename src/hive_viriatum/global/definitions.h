@@ -36,4 +36,6 @@
 
 #define VIRIATUM_NAME "viriatum"
 #define VIRIATUM_VERSION "0.1.0"
-#define VIRIATUM_DESCRIPTION "Viriatum HTTP Server"
+#define VIRIATUM_DESCRIPTION "Viriatum"
+#define VIRIATUM_OBSERVATIONS "Viriatum HTTP Server"
+#define VIRIATUM_COPYRIGHT "Copyright (c) 2010 Hive Solutions Lda. All rights reserved."
