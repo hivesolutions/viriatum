@@ -110,11 +110,14 @@ void httpReadHandler(struct ServiceSelect_t *serviceSelect, struct Connection_t 
     /* sets the connection as the parser parameter(s) */
     httpParser->parameters = connection;
 
-    /* updates the structures for the handler */
-    updateHandlerDefault(httpParser, httpSettings);
+    /* sets the structures for the handler */
+    setHandlerFile(httpParser, httpSettings);
 
     /* process the http data for the http parser */
     processDataHttpParser(httpParser, httpSettings, buffer, numberBytes);
+
+    /* unsets the structures for the handler */
+    unsetHandlerFile(httpParser, httpSettings);
 
     /* deletes the http parser */
     deleteHttpParser(httpParser);

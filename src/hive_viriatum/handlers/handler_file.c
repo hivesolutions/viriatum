@@ -48,15 +48,23 @@ void deleteHandlerFileContext(struct HandlerFileContext_t *handlerFileContext) {
     free(handlerFileContext);
 }
 
-void updateHandlerFile(struct HttpParser_t *httpParser, struct HttpSettings_t *httpSettings) {
-    /* updates the http parser values */
-    updateHttpParserHandlerFile(httpParser);
+void setHandlerFile(struct HttpParser_t *httpParser, struct HttpSettings_t *httpSettings) {
+    /* sets the http parser values */
+    setHttpParserHandlerFile(httpParser);
 
-    /* updates the http settings values */
-    updateHttpSettingsHandlerFile(httpSettings);
+    /* sets the http settings values */
+    setHttpSettingsHandlerFile(httpSettings);
 }
 
-void updateHttpParserHandlerFile(struct HttpParser_t *httpParser) {
+void unsetHandlerFile(struct HttpParser_t *httpParser, struct HttpSettings_t *httpSettings) {
+    /* unsets the http parser values */
+    unsetHttpParserHandlerFile(httpParser);
+
+    /* unsets the http settings values */
+    unsetHttpSettingsHandlerFile(httpSettings);
+}
+
+void setHttpParserHandlerFile(struct HttpParser_t *httpParser) {
     /* allocates space for the handler file context */
     struct HandlerFileContext_t *handlerFileContext;
 
@@ -67,7 +75,10 @@ void updateHttpParserHandlerFile(struct HttpParser_t *httpParser) {
     httpParser->context = handlerFileContext;
 }
 
-void updateHttpSettingsHandlerFile(struct HttpSettings_t *httpSettings) {
+void unsetHttpParserHandlerFile(struct HttpParser_t *httpParser) {
+}
+
+void setHttpSettingsHandlerFile(struct HttpSettings_t *httpSettings) {
     /* sets the http settings on message begin callback */
     httpSettings->onmessageBegin = messageBeginCallbackHandlerFile;
 
@@ -88,6 +99,29 @@ void updateHttpSettingsHandlerFile(struct HttpSettings_t *httpSettings) {
 
     /* sets the http settings on message complete callback */
     httpSettings->onmessageComplete = messageCompleteCallbackHandlerFile;
+}
+
+void unsetHttpSettingsHandlerFile(struct HttpSettings_t *httpSettings) {
+    /* unsets the http settings on message begin callback */
+    httpSettings->onmessageBegin = NULL;
+
+    /* unsets the http settings on url callback */
+    httpSettings->onurl = NULL;
+
+    /* unsets the http settings on header field callback */
+    httpSettings->onheaderField = NULL;
+
+    /* unsets the http settings on header value callback */
+    httpSettings->onheaderValue = NULL;
+
+    /* unsets the http settings on headers complete callback */
+    httpSettings->onheadersComplete = NULL;
+
+    /* unsets the http settings on body callback */
+    httpSettings->onbody = NULL;
+
+    /* unsets the http settings on message complete callback */
+    httpSettings->onmessageComplete = NULL;
 }
 
 ERROR_CODE messageBeginCallbackHandlerFile(struct HttpParser_t *httpParser) {
@@ -201,6 +235,9 @@ ERROR_CODE sendChunkHandlerFile(struct Connection_t *connection, struct Data_t *
             /* raises an error */
             RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem loading file");
         }
+
+        /* sets the file in the handler file context */
+        handlerFileContext->file = file;
     }
 
     /* reads the file contents */
@@ -216,10 +253,10 @@ ERROR_CODE sendChunkHandlerFile(struct Connection_t *connection, struct Data_t *
 
         /* releases the current file buffer */
         free(fileBuffer);
-    }
 
-    /* sets the file in the handler file context */
-    handlerFileContext->file = file;
+        /* deletes the handler file context */
+        deleteHandlerFileContext(handlerFileContext);
+    }
 
     /* raise no error */
     RAISE_NO_ERROR;

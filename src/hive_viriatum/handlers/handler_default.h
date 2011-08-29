@@ -30,9 +30,12 @@
 #include "../http/http.h"
 #include "../system/system.h"
 
-void updateHandlerDefault(struct HttpParser_t *httpParser, struct HttpSettings_t *httpSettings);
-void updateHttpParserHandlerDefault(struct HttpParser_t *httpParser);
-void updateHttpSettingsHandlerDefault(struct HttpSettings_t *httpSettings);
+void setHandlerDefault(struct HttpParser_t *httpParser, struct HttpSettings_t *httpSettings);
+void unsetHandlerDefault(struct HttpParser_t *httpParser, struct HttpSettings_t *httpSettings);
+void setHttpParserHandlerDefault(struct HttpParser_t *httpParser);
+void unsetHttpParserHandlerDefault(struct HttpParser_t *httpParser);
+void setHttpSettingsHandlerDefault(struct HttpSettings_t *httpSettings);
+void unsetHttpSettingsHandlerDefault(struct HttpSettings_t *httpSettings);
 ERROR_CODE messageBeginCallbackHandlerDefault(struct HttpParser_t *httpParser);
 ERROR_CODE urlCallbackHandlerDefault(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize);
 ERROR_CODE headerFieldCallbackHandlerDefault(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize);
