@@ -228,18 +228,6 @@ static const unsigned char normalUrlChar[256] = {
 };
 
 /**
- * Callback function type used for callbacks that require
- * "extra" data to be send as argument.
- */
-typedef ERROR_CODE (*httpDataCallback) (struct HttpParser_t *, const unsigned char *, size_t);
-
-/**
- * The "default" callback function to be used, without
- * any extra arguments.
- */
-typedef ERROR_CODE (*httpCallback) (struct HttpParser_t *);
-
-/**
  * List of strings defining the various http method
  * names.
  */
@@ -429,6 +417,18 @@ typedef struct HttpParser_t {
     unsigned char method;
     char upgrade;
 } HttpParser;
+
+/**
+ * Callback function type used for callbacks that require
+ * "extra" data to be send as argument.
+ */
+typedef ERROR_CODE (*httpDataCallback) (struct HttpParser_t *, const unsigned char *, size_t);
+
+/**
+ * The "default" callback function to be used, without
+ * any extra arguments.
+ */
+typedef ERROR_CODE (*httpCallback) (struct HttpParser_t *);
 
 /**
  * Structure representing the various settings
