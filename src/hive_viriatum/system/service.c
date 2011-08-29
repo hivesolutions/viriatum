@@ -153,7 +153,7 @@ void addConnectionService(struct Service_t *service, struct Connection_t *connec
 
 void removeConnectionService(struct Service_t *service, struct Connection_t *connection) {
     /* removes the connection from the connections list */
-    removeValueLinkedList(service->connectionsList, connection);
+    removeValueLinkedList(service->connectionsList, connection, 1);
 }
 
 void createConnection(struct Connection_t **connectionPointer, SOCKET_HANDLE socketHandle) {

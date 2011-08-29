@@ -58,9 +58,9 @@ VIRIATUM_EXPORT_PREFIX void createLinkedListNode(struct LinkedListNode_t **linke
 VIRIATUM_EXPORT_PREFIX void deleteLinkedListNode(struct LinkedListNode_t *linkedListNode);
 VIRIATUM_EXPORT_PREFIX void appendLinkedList(struct LinkedList_t *linkedList, struct LinkedListNode_t *linkedListNode);
 VIRIATUM_EXPORT_PREFIX void appendValueLinkedList(struct LinkedList_t *linkedList, void *value);
-VIRIATUM_EXPORT_PREFIX void removeLinkedList(struct LinkedList_t *linkedList, struct LinkedListNode_t *linkedListNode);
-VIRIATUM_EXPORT_PREFIX void removeValueLinkedList(struct LinkedList_t *linkedList, void *value);
-VIRIATUM_EXPORT_PREFIX void removeIndexLinkedList(struct LinkedList_t *linkedList, size_t index);
+VIRIATUM_EXPORT_PREFIX void removeLinkedList(struct LinkedList_t *linkedList, struct LinkedListNode_t *linkedListNode, char deleteNode);
+VIRIATUM_EXPORT_PREFIX void removeValueLinkedList(struct LinkedList_t *linkedList, void *value, char deleteNode);
+VIRIATUM_EXPORT_PREFIX void removeIndexLinkedList(struct LinkedList_t *linkedList, size_t index, char deleteNode);
 VIRIATUM_EXPORT_PREFIX void getLinkedList(struct LinkedList_t *linkedList, size_t index, struct LinkedListNode_t **linkedListNodePointer);
 VIRIATUM_EXPORT_PREFIX void getValueLinkedList(struct LinkedList_t *linkedList, size_t index, void **valuePointer);
 VIRIATUM_EXPORT_PREFIX void popLinkedList(struct LinkedList_t *linkedList, struct LinkedListNode_t **linkedListNodePointer);
