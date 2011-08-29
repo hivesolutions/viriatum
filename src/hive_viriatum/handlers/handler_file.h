@@ -32,11 +32,11 @@
 
 #define FILE_BUFFER_SIZE_HANDLER_FILE 4096
 
-#ifdef VIRIATUM_PLATFORM_WIN32
+/*#ifdef VIRIATUM_PLATFORM_WIN32
 #define RESOURCES_PATH "../../src/hive_viriatum/resources"
-#elif VIRIATUM_PLATFORM_UNIX
+#elif VIRIATUM_PLATFORM_UNIX*/
 #define RESOURCES_PATH "resources"
-#endif
+/*#endif*/
 
 /**
  * The context structure to be used allong
