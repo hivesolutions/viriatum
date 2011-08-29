@@ -252,7 +252,7 @@ int processDataHttpParser(struct HttpParser_t *httpParser, struct HttpSettings_t
     unsigned char byteToken;
     char unhexValue;
     const char *matcher;
-    enum HttpRequestHeaderState_e headerState;
+    unsigned char headerState;
     size_t toRead;
     const unsigned char *pointerEnd;
     const unsigned char *pointer = data;
