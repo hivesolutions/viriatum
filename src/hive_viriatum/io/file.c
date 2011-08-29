@@ -66,6 +66,9 @@ ERROR_CODE readFile(char *filePath, unsigned char **bufferPointer, size_t *fileS
     /* reads the file contents */
     numberBytes = fread(fileBuffer, 1, fileSize, file);
 
+	/* closes the file */
+	fclose(file);
+
     /* sets the buffer as the buffer pointer */
     *bufferPointer = fileBuffer;
 

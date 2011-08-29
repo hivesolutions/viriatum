@@ -173,6 +173,9 @@ void httpWriteHandler(struct ServiceSelect_t *serviceSelect, struct Connection_t
             /* breaks the loop */
             break;
         }
+
+		/* calls the callback with the callback parameters */
+		data->callback(connection, data->callbackParameters);
     }
 
     /* in case there is no error */

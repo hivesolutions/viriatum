@@ -44,6 +44,10 @@ void updateHttpParserHandlerFile(struct HttpParser_t *httpParser) {
     /* allocates space for the handler file context */
     struct HandlerFileContext_t *handlerFileContext = (struct HandlerFileContext_t *) malloc(handlerFileContextSize);
 
+	handlerFileContext->file = NULL;
+
+	handlerFileContext->filePath = NULL;
+
     /* sets the handler file context as the context for the http parser */
     httpParser->context = handlerFileContext;
 }
@@ -93,7 +97,7 @@ ERROR_CODE urlCallbackHandlerFile(struct HttpParser_t *httpParser, const unsigne
     url[dataSize] = '\0';
 
     /* creates the file path from using the base viriatum path */
-    SPRINTF(filePath, 1024, "%s%s", "c:/viriatum_docs", url);
+    SPRINTF(filePath, 1024, "%s%s%s", RESOURCES_PATH, "/html/welcome", url);
 
     /* sets the file path in the handler file context */
     handlerFileContext->filePath = filePath;
@@ -149,13 +153,62 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
     /* otherwise there was no error in the file */
     else {
         /* writes the http static headers to the response */
-        SPRINTF(headersBuffer, 1024, "HTTP/1.1 200 OK\r\nServer: viriatum/1.0.0 (%s @ %s)\r\nContent-Length: %lu\r\n\r\n", VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, fileSize);
+		SPRINTF(headersBuffer, 1024, "HTTP/1.1 200 OK\r\nServer: viriatum/1.0.0 (%s - %s)\r\nConnection: Keep-Alive\r\nContent-Length: %lu\r\n\r\n", VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, fileSize);
 
         /* writes both the headers and the file buffer to the connection */
-        writeConnection(connection, headersBuffer, strlen(headersBuffer));
-        writeConnection(connection, fileBuffer, fileSize);
+        writeConnection(connection, headersBuffer, strlen(headersBuffer), sendChunkHandlerFile, handlerFileContext);
     }
 
     /* raise no error */
     RAISE_NO_ERROR;
 }
+
+ERROR_CODE sendChunkHandlerFile(struct Connection_t *connection, void *parameters) {
+	/* allocates the number of bytes */
+	size_t numberBytes;
+
+	/* casts the parameters as handler file context */
+	struct HandlerFileContext_t *handlerFileContext = (struct HandlerFileContext_t *) parameters;
+
+	/* retrieves the file path from the handler file context */
+	unsigned char *filePath = handlerFileContext->filePath;
+
+	/* retrieves the file from the handler file context */
+	FILE *file = handlerFileContext->file;
+
+
+	/* TODO ARRUMAR ESTE HARDCODE !!!! */
+	unsigned char *fileBuffer = malloc(FILE_BUFFER_SIZE_HANDLER_FILE);
+
+
+	/* in case the file is not defined (should be opened) */
+	if(file == NULL) {
+		/* opens the file */
+		FOPEN(&file, filePath, "rb");
+
+		/* in case the file is not found */
+		if(file == NULL) {
+			/* raises an error */
+			RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem loading file");
+		}
+	}
+
+	/* reads the file contents */
+    numberBytes = fread(fileBuffer, 1, FILE_BUFFER_SIZE_HANDLER_FILE, file);
+
+	/* in case the number of read bytes is valid */
+	if(numberBytes > 0) {
+		/* writes both the headers and the file buffer to the connection */
+		writeConnection(connection, fileBuffer, numberBytes, sendChunkHandlerFile, handlerFileContext);
+	} else {
+		/* closes the file */
+		fclose(file);
+	}
+
+	/* sets the file in the handler file context */
+	handlerFileContext->file = file;
+
+    /* raise no error */
+    RAISE_NO_ERROR;
+}
+

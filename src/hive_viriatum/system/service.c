@@ -159,7 +159,7 @@ void deleteConnection(struct Connection_t *connection) {
     free(connection);
 }
 
-void writeConnection(struct Connection_t *connection, unsigned char *data, unsigned int size) {
+void writeConnection(struct Connection_t *connection, unsigned char *data, unsigned int size, serviceCallback callback, void *callbackParameters) {
     /* retrieves the data size */
     size_t dataSize = sizeof(struct Data_t);
 
@@ -169,6 +169,8 @@ void writeConnection(struct Connection_t *connection, unsigned char *data, unsig
     /* sets the data contents */
     _data->data = data;
     _data->size = size;
+	_data->callback = callback;
+	_data->callbackParameters = callbackParameters;
 
     /* adds the file buffer to the write queue */
     appendValueLinkedList(connection->writeQueue, (void *) _data);

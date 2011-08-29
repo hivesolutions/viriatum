@@ -30,6 +30,8 @@
 #include "../http/http.h"
 #include "../system/system.h"
 
+#define FILE_BUFFER_SIZE_HANDLER_FILE 4096
+
 /**
  * The context structure to be used allong
  * the interpretation of the request for
@@ -37,6 +39,7 @@
  */
 typedef struct HandlerFileContext_t {
     unsigned char *filePath;
+	FILE *file;
 } HandlerFileContext;
 
 void updateHandlerFile(struct HttpParser_t *httpParser, struct HttpSettings_t *httpSettings);
@@ -49,3 +52,4 @@ ERROR_CODE headerValueCallbackHandlerFile(struct HttpParser_t *httpParser, const
 ERROR_CODE headersCompleteCallbackHandlerFile(struct HttpParser_t *httpParser);
 ERROR_CODE bodyCallbackHandlerFile(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize);
 ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser);
+ERROR_CODE sendChunkHandlerFile(struct Connection_t *connection, void *parameter);
