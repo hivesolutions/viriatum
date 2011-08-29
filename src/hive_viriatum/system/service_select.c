@@ -347,15 +347,7 @@ void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_
     serviceSelect->selectTimeoutTemporary = serviceSelect->selectTimeout;
 
     /* creates the iterator for the linked list */
-
-
     createIteratorLinkedList(connectionsList, &connectionsListIterator);
-
-
-
-
-
-
 
     /* prints a debug message */
     V_DEBUG("Entering select statement\n");
@@ -432,10 +424,8 @@ void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_
         }
     }
 
-
+    /* deletes the iterator linked list */
     deleteIteratorLinkedList(connectionsList, connectionsListIterator);
-
-
 
     /* in case the select count is bigger than zero */
     if(selectCount > 0) {
