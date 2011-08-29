@@ -97,7 +97,7 @@ ERROR_CODE urlCallbackHandlerFile(struct HttpParser_t *httpParser, const unsigne
     url[dataSize] = '\0';
 
     /* creates the file path from using the base viriatum path */
-    SPRINTF(filePath, 1024, "%s%s%s", RESOURCES_PATH, "/html/welcome", url);
+    SPRINTF((char *) filePath, 1024, "%s%s%s", RESOURCES_PATH, "/html/welcome", url);
 
     /* sets the file path in the handler file context */
     handlerFileContext->filePath = filePath;
@@ -153,7 +153,7 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
     /* otherwise there was no error in the file */
     else {
         /* writes the http static headers to the response */
-		SPRINTF(headersBuffer, 1024, "HTTP/1.1 200 OK\r\nServer: viriatum/1.0.0 (%s - %s)\r\nConnection: Keep-Alive\r\nContent-Length: %lu\r\n\r\n", VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, fileSize);
+		SPRINTF((char *) headersBuffer, 1024, "HTTP/1.1 200 OK\r\nServer: viriatum/1.0.0 (%s - %s)\r\nConnection: Keep-Alive\r\nContent-Length: %lu\r\n\r\n", VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, fileSize);
 
         /* writes both the headers and the file buffer to the connection */
         writeConnection(connection, headersBuffer, strlen(headersBuffer), sendChunkHandlerFile, handlerFileContext);
