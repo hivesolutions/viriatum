@@ -177,7 +177,7 @@ void httpWriteHandler(struct ServiceSelect_t *serviceSelect, struct Connection_t
         /* in case the data callback is set */
         if(data->callback != NULL) {
             /* calls the callback with the callback parameters */
-            data->callback(connection, data->callbackParameters);
+            data->callback(connection, data, data->callbackParameters);
         }
     }
 

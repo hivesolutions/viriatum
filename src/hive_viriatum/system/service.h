@@ -27,6 +27,7 @@
 
 #pragma once
 
+struct Data_t;
 
 typedef struct Service_t {
     unsigned char *name;
@@ -46,7 +47,7 @@ typedef struct Connection_t {
  * The "default" callback function to be used, without
  * any extra arguments.
  */
-typedef ERROR_CODE (*serviceCallback) (struct Connection_t *, void *);
+typedef ERROR_CODE (*serviceCallback) (struct Connection_t *, struct Data_t *, void *);
 
 typedef struct Data_t {
     unsigned char *data;

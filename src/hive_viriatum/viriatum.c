@@ -62,8 +62,8 @@ int main(int argc, char *argv[]) {
     /* prints a message */
     V_PRINT_F("%s %s (%s, %s) [%s %s %d bit (%s)] on %s\n", description, version, VIRIATUM_COMPILATION_DATE, VIRIATUM_COMPILATION_TIME, VIRIATUM_COMPILER, VIRIATUM_COMPILER_VERSION_STRING, (int) VIRIATUM_PLATFORM_CPU_BITS, VIRIATUM_PLATFORM_CPU, VIRIATUM_PLATFORM_STRING);
 
-	/* prints a message */
-	V_PRINT_F("%s\n", VIRIATUM_COPYRIGHT);
+    /* prints a message */
+    V_PRINT_F("%s\n", VIRIATUM_COPYRIGHT);
 
     /* prints a debug message */
     V_DEBUG_F("Receiving %d arguments\n", argc);
