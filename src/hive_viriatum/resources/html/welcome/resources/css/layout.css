@@ -1,0 +1,105 @@
+body {
+	font-family: Georgia, Times;
+	background-color: #e5e5e5;
+}
+
+h1 {
+	margin: 10px 0px 10px 0px;
+	font-size: 10pt;
+	text-align: center;
+	color: #595959;
+	text-transform: uppercase;
+	text-shadow: 1px 1px 1px #ffffff;
+}
+
+p {
+	margin: 10px 0px 10px 0px;
+	font-size: 11pt;
+	text-align: center;
+	line-height: 1.5em;
+	color: #808080;
+	text-shadow: 1px 1px 1px #ffffff;
+}
+
+a {
+	font-size: 8pt;
+	text-decoration: none;
+	color: #9e9400;
+}
+
+a:hover {
+	color: #000000;
+}
+
+.separator-horizontal {
+	height: 10px;
+	width: 260px;
+	margin: 30px auto 6px auto;
+	background: transparent url(../images/separator-horizontal.png) no-repeat center center;
+}
+
+#header-wrapper {
+	width: 100%;
+}
+
+#header-wrapper .header-body {
+	width: 960px;
+	margin: 0px auto 0px auto;
+}
+
+.main-illustration {
+	height: 290px;
+	width: 960px;
+	background: transparent url(../images/main-illustration.png) no-repeat center center;
+}
+
+.branding a{
+	display: block;
+	height: 48px;
+	width: 340px;
+	margin: 10px auto 20px auto;
+	background: transparent url(../images/branding-viriatum_logotype.png) no-repeat center center;
+}
+
+#content-wrapper {
+	width: 100%;
+}
+
+.content-header {
+	width: 340px;
+	margin: 0px auto 0px auto;
+}
+
+.content-body {
+	width: 340px;
+	margin: 0px auto 0px auto;
+}
+
+#footer-wrapper {
+	width: 100%;
+}
+
+.footer-body {
+	width: 260px;
+	margin: 0px auto 0px auto;
+	text-align: center;
+}
+
+.footer-body a{
+	width: 110px;
+	text-transform: uppercase;
+}
+
+.footer-body a.left{
+	float: left;
+	text-align: right;
+}
+
+.footer-body a.right{
+	float: right;
+	text-align: left;
+}
+
+.bold {
+    font-weight: bold;
+}
