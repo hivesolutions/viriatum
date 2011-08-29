@@ -257,7 +257,7 @@ int processDataHttpParser(struct HttpParser_t *httpParser, struct HttpSettings_t
     size_t readCount = httpParser->readCount;
     size_t index = httpParser->index;
     unsigned char state = httpParser->state;
-	unsigned char headerState = 0;
+    unsigned char headerState = 0;
 
     const unsigned char *headerFieldMark = 0;
     const unsigned char *headerValueMark = 0;
