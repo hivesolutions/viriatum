@@ -310,7 +310,7 @@ void popValueLinkedList(struct LinkedList_t *linkedList, void **valuePointer, ch
         *valuePointer = linkedListNode->value;
     }
 
-	/* in case the delete node flag is set */
+    /* in case the delete node flag is set */
     if(deleteNode) {
         /* deletes the linked list node */
         deleteLinkedListNode(linkedListNode);
