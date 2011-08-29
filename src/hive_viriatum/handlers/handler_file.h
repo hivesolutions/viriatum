@@ -45,9 +45,12 @@ typedef struct HandlerFileContext_t {
 
 void createHandlerFileContext(struct HandlerFileContext_t **handlerFileContextPointer);
 void deleteHandlerFileContext(struct HandlerFileContext_t *handlerFileContext);
-void updateHandlerFile(struct HttpParser_t *httpParser, struct HttpSettings_t *httpSettings);
-void updateHttpParserHandlerFile(struct HttpParser_t *httpParser);
-void updateHttpSettingsHandlerFile(struct HttpSettings_t *httpSettings);
+void setHandlerFile(struct HttpParser_t *httpParser, struct HttpSettings_t *httpSettings);
+void unsetHandlerFile(struct HttpParser_t *httpParser, struct HttpSettings_t *httpSettings);
+void setHttpParserHandlerFile(struct HttpParser_t *httpParser);
+void unsetHttpParserHandlerFile(struct HttpParser_t *httpParser);
+void setHttpSettingsHandlerFile(struct HttpSettings_t *httpSettings);
+void unsetHttpSettingsHandlerFile(struct HttpSettings_t *httpSettings);
 ERROR_CODE messageBeginCallbackHandlerFile(struct HttpParser_t *httpParser);
 ERROR_CODE urlCallbackHandlerFile(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize);
 ERROR_CODE headerFieldCallbackHandlerFile(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize);
