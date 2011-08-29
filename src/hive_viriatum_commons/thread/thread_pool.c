@@ -151,7 +151,7 @@ THREAD_RETURN poolRunnerThread(THREAD_ARGUMENTS parameters) {
         }
 
         /* retrieves the work thread task */
-        popValueLinkedList(threadPool->taskQueue, (void **) &workThreadTask);
+        popValueLinkedList(threadPool->taskQueue, (void **) &workThreadTask, 0);
 
         /* unlock the task condition lock */
         CONDITION_UNLOCK(threadPool->taskCondition, threadPool->taskConditionLock);

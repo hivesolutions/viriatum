@@ -288,7 +288,7 @@ void popLinkedList(struct LinkedList_t *linkedList, struct LinkedListNode_t **li
     *linkedListNodePointer = linkedListNode;
 }
 
-void popValueLinkedList(struct LinkedList_t *linkedList, void **valuePointer) {
+void popValueLinkedList(struct LinkedList_t *linkedList, void **valuePointer, char deleteNode) {
     /* allocates space for the linked list node */
     struct LinkedListNode_t *linkedListNode;
 
@@ -302,6 +302,12 @@ void popValueLinkedList(struct LinkedList_t *linkedList, void **valuePointer) {
     } else {
         /* sets the linked list node value in the value pointer */
         *valuePointer = linkedListNode->value;
+    }
+
+    /* in case the delete node flag is set */
+    if(deleteNode) {
+        /* deletes the linked list node */
+        deleteLinkedListNode(linkedListNode);
     }
 }
 

@@ -200,7 +200,7 @@ void _popCondition(struct Condition_t *condition, HANDLE *waitEventPointer) {
     EnterCriticalSection(&condition->waitCriticalSection);
 
     /* pops the wait event from the wait set */
-    popValueLinkedList(condition->waitSet, (void **) &waitEvent);
+    popValueLinkedList(condition->waitSet, (void **) &waitEvent, 0);
 
     /* leaves the wait critical section */
     LeaveCriticalSection(&condition->waitCriticalSection);
