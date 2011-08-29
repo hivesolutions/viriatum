@@ -37,4 +37,4 @@
  * @param fileSizePointer The pointer to the file size.
  * @param The size of the read file.
  */
-size_t readFile(char *filePath, unsigned char **bufferPointer, size_t *fileSizePointer);
+ERROR_CODE readFile(char *filePath, unsigned char **bufferPointer, size_t *fileSizePointer);

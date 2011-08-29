@@ -158,3 +158,18 @@ void deleteConnection(struct Connection_t *connection) {
     /* releases the connection */
     free(connection);
 }
+
+void writeConnection(struct Connection_t *connection, unsigned char *data, unsigned int size) {
+    /* retrieves the data size */
+    size_t dataSize = sizeof(struct Data_t);
+
+    /* allocates space for the data */
+    struct Data_t *_data = (struct Data_t *) malloc(dataSize);
+
+	/* sets the data contents */
+	_data->data = data;
+	_data->size = size;
+
+	/* adds the file buffer to the write queue */
+    appendValueLinkedList(connection->writeQueue, (void *) _data);
+}

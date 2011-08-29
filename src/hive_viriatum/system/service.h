@@ -34,6 +34,11 @@ typedef struct Service_t {
     struct LinkedList_t *connectionsList;
 } Service;
 
+typedef struct Data_t {
+	unsigned char *data;
+	size_t size;
+} Data;
+
 typedef struct Connection_t {
     unsigned int writeRegistered;
     SOCKET_HANDLE socketHandle;
@@ -59,3 +64,4 @@ void addConnectionService(struct Service_t *service, struct Connection_t *connec
 void removeConnectionService(struct Service_t *service, struct Connection_t *connection);
 void createConnection(struct Connection_t **connectionPointer, SOCKET_HANDLE socketHandle);
 void deleteConnection(struct Connection_t *connection);
+void writeConnection(struct Connection_t *connection, unsigned char *data, unsigned int size);
