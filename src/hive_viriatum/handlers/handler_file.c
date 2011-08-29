@@ -133,6 +133,9 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
     /* allocates the headers buffer */
     char headersBuffer[1024];
 
+	char *buffer;
+	char *buffer2 = malloc(1000000);
+
     /* retrieves the handler file context from the http parser */
     struct HandlerFileContext_t *handlerFileContext = (struct HandlerFileContext_t *) httpParser->context;
 
@@ -150,10 +153,21 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
     /* otherwise there was no error in the file */
     else {
         /* writes the http static headers to the response */
-		SPRINTF(headersBuffer, 1024, "HTTP/1.1 200 OK\r\nServer: viriatum/1.0.0 (%s - %s)\r\nConnection: Keep-Alive\r\nContent-Length: %lu\r\n\r\n", VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, fileSize);
+		SPRINTF(headersBuffer, 1024, "HTTP/1.1 200 OK\r\n\
+									 Server: viriatum/1.0.0 (%s - %s)\r\n\
+									 Content-Type: text/html\r\n\
+									 Date: Mon, 29 Aug 2011 17:39:31 GMT\r\n\
+									 Content-Length: %lu\r\n\r\n", VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, fileSize);
 
         /* writes both the headers and the file buffer to the connection */
-        writeConnection(connection, (unsigned char *) headersBuffer, strlen(headersBuffer), sendChunkHandlerFile, handlerFileContext);
+        /*writeConnection(connection, (unsigned char *) headersBuffer, strlen(headersBuffer), sendChunkHandlerFile, handlerFileContext);*/
+
+		readFile(handlerFileContext->filePath, &buffer, &fileSize);
+
+		memcpy(buffer2, headersBuffer, strlen(headersBuffer));
+		memcpy(buffer2 + strlen(headersBuffer), buffer, fileSize);
+
+		writeConnection(connection, buffer2, strlen(headersBuffer) + fileSize, NULL, NULL);
     }
 
     /* raise no error */
