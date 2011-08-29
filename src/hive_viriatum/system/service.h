@@ -51,8 +51,8 @@ typedef ERROR_CODE (*serviceCallback) (struct Connection_t *, void *);
 typedef struct Data_t {
     unsigned char *data;
     size_t size;
-	serviceCallback callback;
-	void *callbackParameters;
+    serviceCallback callback;
+    void *callbackParameters;
 } Data;
 
 /**

@@ -66,8 +66,8 @@ ERROR_CODE readFile(char *filePath, unsigned char **bufferPointer, size_t *fileS
     /* reads the file contents */
     numberBytes = fread(fileBuffer, 1, fileSize, file);
 
-	/* closes the file */
-	fclose(file);
+    /* closes the file */
+    fclose(file);
 
     /* sets the buffer as the buffer pointer */
     *bufferPointer = fileBuffer;
@@ -101,8 +101,8 @@ ERROR_CODE countFile(char *filePath, size_t *fileSizePointer) {
     /* retrieves the file size */
     fileSize = ftell(file);
 
-	/* closes the file */
-	fclose(file);
+    /* closes the file */
+    fclose(file);
 
     /* sets the file size as the file size pointer */
     *fileSizePointer = fileSize;

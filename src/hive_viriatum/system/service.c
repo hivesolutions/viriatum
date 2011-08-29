@@ -169,8 +169,8 @@ void writeConnection(struct Connection_t *connection, unsigned char *data, unsig
     /* sets the data contents */
     _data->data = data;
     _data->size = size;
-	_data->callback = callback;
-	_data->callbackParameters = callbackParameters;
+    _data->callback = callback;
+    _data->callbackParameters = callbackParameters;
 
     /* adds the file buffer to the write queue */
     appendValueLinkedList(connection->writeQueue, (void *) _data);
