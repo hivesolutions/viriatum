@@ -28,6 +28,7 @@
 #pragma once
 
 #include "../http/http.h"
+#include "../system/system.h"
 
 void updateHandlerDefault(struct HttpParser_t *httpParser, struct HttpSettings_t *httpSettings);
 void updateHttpParserHandlerDefault(struct HttpParser_t *httpParser);
@@ -39,3 +40,4 @@ ERROR_CODE headerValueCallbackHandlerDefault(struct HttpParser_t *httpParser, co
 ERROR_CODE headersCompleteCallbackHandlerDefault(struct HttpParser_t *httpParser);
 ERROR_CODE bodyCallbackHandlerDefault(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize);
 ERROR_CODE messageCompleteCallbackHandlerDefault(struct HttpParser_t *httpParser);
+ERROR_CODE _processResponseHandlerDefault(struct HttpParser_t *httpParser);

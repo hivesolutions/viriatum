@@ -106,6 +106,12 @@ void createHttpParser(struct HttpParser_t **httpParserPointer) {
     /* sets the http parser upgrade */
     httpParser->upgrade = 1;
 
+	/* sets the http parser context */
+	httpParser->context = NULL;
+
+	/* sets the http parser parameters */
+	httpParser->parameters = NULL;
+
     /* sets the http parser in the http parser pointer */
     *httpParserPointer = httpParser;
 }

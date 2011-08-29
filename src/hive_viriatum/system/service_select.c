@@ -77,9 +77,6 @@ void httpReadHandler(struct ServiceSelect_t *serviceSelect, struct Connection_t 
     /* allocates the "simple" buffer */
     unsigned char buffer[10240];
 
-    /* allocates the response buffer */
-    char *responseBuffer;
-
     /* allocates the http settings */
     struct HttpSettings_t *httpSettings;
 
@@ -104,24 +101,17 @@ void httpReadHandler(struct ServiceSelect_t *serviceSelect, struct Connection_t 
         return;
     }
 
-    /* sets the final string bytes */
-    buffer[numberBytes] = '\0';
-
-    /* allocates the response buffer */
-    responseBuffer = (char *) malloc(1024);
-
     /* creates the http settings */
     createHttpSettings(&httpSettings);
 
     /* creates the http parser */
     createHttpParser(&httpParser);
 
+	/* sets the connection as the parser parameter(s) */
+	httpParser->parameters = connection;
 
-    /* tenho de configurar aki o parser para o handler ser o de ficheiro */
-
-    updateHandlerDefault(httpParser, httpSettings);
-
-
+	/* updates the structures for the handler */
+    updateHandlerFile(httpParser, httpSettings);
 
     /* process the http data for the http parser */
     processDataHttpParser(httpParser, httpSettings, buffer, numberBytes);
@@ -129,17 +119,7 @@ void httpReadHandler(struct ServiceSelect_t *serviceSelect, struct Connection_t 
 
 
 
-
-
-
-
-    /* writes the http static headers to the response */
-    SPRINTF(responseBuffer, 1024, "HTTP/1.1 200 OK\r\nServer: viriatum/1.0.0 (%s)\r\nContent-Length: %lu\r\n\r\nhello world", VIRIATUM_PLATFORM_STRING, strlen("hello world"));
-
-    /* adds the response buffer to the write queue */
-    appendValueLinkedList(connection->writeQueue, (void *) responseBuffer);
-
-    /* ESTE CONCEIDO DE ADICAO A LISTA DE ESCRITAS AINDA ESTA MUITO BADALHOCO TENHO DE PENSAR MELHOR */
+	/* ESTE CONCEIDO DE ADICAO A LISTA DE ESCRITAS AINDA ESTA MUITO BADALHOCO TENHO DE PENSAR MELHOR */
     if(connection->writeRegistered == 0) {
         /* ESTA HARDCODADO TENHO DE ARRANJAR UMA MANEIIRA MAIS SOFT DE FAZER ISTO !!! */
         addSocketHandleSocketsSetServiceSelect(serviceSelect, connection->socketHandle, &serviceSelect->socketsWriteSet);
@@ -151,28 +131,24 @@ void httpWriteHandler(struct ServiceSelect_t *serviceSelect, struct Connection_t
     /* allocates the number of bytes */
     int numberBytes;
 
-    void *value;
-
-    size_t valueSize;
+	/* allocates the data */
+    struct Data_t *data;
 
     unsigned int error = 0;
 
     /* iterates continuously */
     while(1) {
-        /* pops a value from the linked list (write queue) */
-        popValueLinkedList(connection->writeQueue, &value);
+        /* pops a value (data) from the linked list (write queue) */
+        popValueLinkedList(connection->writeQueue, &data);
 
-        /* in case the value is invalid */
-        if(value == NULL) {
+        /* in case the data is invalid */
+        if(data == NULL) {
             /* breaks the loop */
             break;
         }
 
-        /* retrieves the value size */
-        valueSize = strlen(value);
-
         /* sends the value retrieving the number of bytes sent */
-        numberBytes = SOCKET_SEND(connection->socketHandle, value, valueSize, 0);
+		numberBytes = SOCKET_SEND(connection->socketHandle, data->data, data->size, 0);
 
         /* in case there was an error receiving from the socket */
         if(SOCKET_TEST_ERROR(numberBytes)) {
@@ -190,7 +166,7 @@ void httpWriteHandler(struct ServiceSelect_t *serviceSelect, struct Connection_t
         }
 
         /* in case the number of bytes sent is the same as the value size */
-        if(numberBytes != valueSize) {
+		if(numberBytes != data->size) {
             /* sets the error flag */
             error = 1;
 
@@ -209,11 +185,7 @@ void httpWriteHandler(struct ServiceSelect_t *serviceSelect, struct Connection_t
     }
     /* otherwise an error occurred */
     else {
-
     }
-
-
-
 
     /* closes the socket */
     SOCKET_CLOSE(connection->socketHandle);

@@ -28,6 +28,16 @@
 #pragma once
 
 #include "../http/http.h"
+#include "../system/system.h"
+
+/**
+ * The context structure to be used allong
+ * the interpretation of the request for
+ * the file handler.
+ */
+typedef struct HandlerFileContext_t {
+	unsigned char *filePath;
+} HandlerFileContext;
 
 void updateHandlerFile(struct HttpParser_t *httpParser, struct HttpSettings_t *httpSettings);
 void updateHttpParserHandlerFile(struct HttpParser_t *httpParser);
