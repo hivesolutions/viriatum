@@ -29,7 +29,27 @@
 
 #include "handler_file.h"
 
-const char headersBuffer[1024];
+void createHandlerFileContext(struct HandlerFileContext_t **handlerFileContextPointer) {
+    /* retrieves the handler file context size */
+    size_t handlerFileContextSize = sizeof(struct HandlerFileContext_t);
+
+    /* allocates space for the handler file context */
+    struct HandlerFileContext_t *handlerFileContext = (struct HandlerFileContext_t *) malloc(handlerFileContextSize);
+
+    /* sets the handler file context file */
+    handlerFileContext->file = NULL;
+
+    /* sets the handler file context file path */
+    handlerFileContext->filePath = NULL;
+
+    /* sets the handler file context in the  pointer */
+    *handlerFileContextPointer = handlerFileContext;
+}
+
+void deleteHandlerFileContext(struct HandlerFileContext_t *handlerFileContext) {
+    /* releases the handler file context */
+    free(handlerFileContext);
+}
 
 void updateHandlerFile(struct HttpParser_t *httpParser, struct HttpSettings_t *httpSettings) {
     /* updates the http parser values */
@@ -40,15 +60,11 @@ void updateHandlerFile(struct HttpParser_t *httpParser, struct HttpSettings_t *h
 }
 
 void updateHttpParserHandlerFile(struct HttpParser_t *httpParser) {
-    /* retrieves the handler file context size */
-    size_t handlerFileContextSize = sizeof(struct HandlerFileContext_t);
-
     /* allocates space for the handler file context */
-    struct HandlerFileContext_t *handlerFileContext = (struct HandlerFileContext_t *) malloc(handlerFileContextSize);
+    struct HandlerFileContext_t *handlerFileContext;
 
-    handlerFileContext->file = NULL;
-
-    handlerFileContext->filePath = NULL;
+    /* creates the handler file context */
+    createHandlerFileContext(&handlerFileContext);
 
     /* sets the handler file context as the context for the http parser */
     httpParser->context = handlerFileContext;
@@ -177,9 +193,6 @@ ERROR_CODE sendChunkHandlerFile(struct Connection_t *connection, struct Data_t *
 
     /* allocates the required buffer for the file */
     unsigned char *fileBuffer = malloc(FILE_BUFFER_SIZE_HANDLER_FILE);
-
-    /* releases the previously allocated data (buffer) */
-    free(data->data);
 
     /* in case the file is not defined (should be opened) */
     if(file == NULL) {

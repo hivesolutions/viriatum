@@ -49,6 +49,12 @@ typedef struct Connection_t {
  */
 typedef ERROR_CODE (*serviceCallback) (struct Connection_t *, struct Data_t *, void *);
 
+/**
+ * Structure defining a data element
+ * to be used in the internal queues.
+ * The queues are user normally for reading
+ * and writing.
+ */
 typedef struct Data_t {
     unsigned char *data;
     size_t size;
@@ -69,6 +75,20 @@ void createService(struct Service_t **servicePointer);
  * @param service The service to be destroyed.
  */
 void deleteService(struct Service_t *service);
+
+/**
+ * Constructor of the data.
+ *
+ * @param dataPointer The pointer to the data to be constructed.
+ */
+void createData(struct Data_t **dataPointer);
+
+/**
+ * Destructor of the data.
+ *
+ * @param data The data to be destroyed.
+ */
+void deleteData(struct Data_t *data);
 void startService(struct Service_t *service);
 void addConnectionService(struct Service_t *service, struct Connection_t *connection);
 void removeConnectionService(struct Service_t *service, struct Connection_t *connection);

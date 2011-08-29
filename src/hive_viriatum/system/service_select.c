@@ -179,6 +179,9 @@ void httpWriteHandler(struct ServiceSelect_t *serviceSelect, struct Connection_t
             /* calls the callback with the callback parameters */
             data->callback(connection, data, data->callbackParameters);
         }
+
+        /* deletes the data */
+        deleteData(data);
     }
 
     /* in case there is no error */

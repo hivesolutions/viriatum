@@ -51,6 +51,37 @@ void deleteService(struct Service_t *service) {
     free(service);
 }
 
+void createData(struct Data_t **dataPointer) {
+    /* retrieves the data size */
+    size_t dataSize = sizeof(struct Data_t);
+
+    /* allocates space for the data */
+    struct Data_t *data = (struct Data_t *) malloc(dataSize);
+
+    /* sets the data data */
+    data->data = NULL;
+
+    /* sets the data size */
+    data->size = 0;
+
+    /* sets the data callback */
+    data->callback = NULL;
+
+    /* sets the data callback parameters */
+    data->callbackParameters = NULL;
+
+    /* sets the data in the data pointer */
+    *dataPointer = data;
+}
+
+void deleteData(struct Data_t *data) {
+    /* releases the data */
+    free(data->data);
+
+    /* releases the data */
+    free(data);
+}
+
 void startService(struct Service_t *service) {
     /* allocates the socket address structure */
     SOCKET_ADDRESS_INPUT socketAddress;
@@ -160,11 +191,11 @@ void deleteConnection(struct Connection_t *connection) {
 }
 
 void writeConnection(struct Connection_t *connection, unsigned char *data, unsigned int size, serviceCallback callback, void *callbackParameters) {
-    /* retrieves the data size */
-    size_t dataSize = sizeof(struct Data_t);
+    /* allocates the data */
+    struct Data_t *_data;
 
-    /* allocates space for the data */
-    struct Data_t *_data = (struct Data_t *) malloc(dataSize);
+    /* creates the data */
+    createData(&_data);
 
     /* sets the data contents */
     _data->data = data;
