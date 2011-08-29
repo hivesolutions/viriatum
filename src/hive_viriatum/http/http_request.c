@@ -32,17 +32,17 @@
 
 
 
-int http_should_keep_alive(struct HttpRequest_t *httpRequest) {
-    if(httpRequest->httpMajor > 0 && httpRequest->httpMinor > 0) {
+int http_should_keep_alive(struct HttpParser_t *httpParser) {
+    if(httpParser->httpMajor > 0 && httpParser->httpMinor > 0) {
         /* HTTP/1.1 */
-        if(httpRequest->flags & FLAG_CONNECTION_CLOSE) {
+        if(httpParser->flags & FLAG_CONNECTION_CLOSE) {
             return 0;
         } else {
             return 1;
         }
     } else {
         /* HTTP/1.0 or earlier */
-        if(httpRequest->flags & FLAG_CONNECTION_KEEP_ALIVE) {
+        if(httpParser->flags & FLAG_CONNECTION_KEEP_ALIVE) {
             return 1;
         } else {
             return 0;
@@ -63,65 +63,66 @@ int http_should_keep_alive(struct HttpRequest_t *httpRequest) {
 
 
 
-void createHttpRequest(struct HttpRequest_t **httpRequestPointer) {
-    /* retrieves the http request size */
-    size_t httpRequestSize = sizeof(struct HttpRequest_t);
+void createHttpParser(struct HttpParser_t **httpParserPointer) {
+    /* retrieves the http parser size */
+    size_t httpParserSize = sizeof(struct HttpParser_t);
 
-    /* allocates space for the http request */
-    struct HttpRequest_t *httpRequest = (struct HttpRequest_t *) malloc(httpRequestSize);
+    /* allocates space for the http parser */
+    struct HttpParser_t *httpParser = (struct HttpParser_t *) malloc(httpParserSize);
 
-    /* sets the http request type */
-    httpRequest->type = 2;
+    /* sets the http parser type */
+    httpParser->type = 2;
 
-    /* sets the http request flags */
-    httpRequest->flags = 6;
+    /* sets the http parser flags */
+    httpParser->flags = 6;
 
-    /* sets the http request state */
-    httpRequest->state = STATE_START_REQ;
+    /* sets the http parser state */
+    httpParser->state = STATE_START_REQ;
 
-    /* sets the http request header state */
-    httpRequest->headerState = 0;
+    /* sets the http parser header state */
+    httpParser->headerState = 0;
 
-    /* sets the http request read count */
-    httpRequest->readCount = 0;
+    /* sets the http parser read count */
+    httpParser->readCount = 0;
 
-    /* sets the http request content length */
-    httpRequest->contentLength = 0;
+    /* sets the http parser content length */
+    httpParser->contentLength = 0;
 
-    /* sets the http request http major */
-    httpRequest->httpMajor = 0;
+    /* sets the http parser http major */
+    httpParser->httpMajor = 0;
 
-    /* sets the http request http minor */
-    httpRequest->httpMinor = 0;
+    /* sets the http parser http minor */
+    httpParser->httpMinor = 0;
 
-    /* sets the http request http minor */
-    httpRequest->statusCode = 0;
+    /* sets the http parser http minor */
+    httpParser->statusCode = 0;
 
-    /* sets the http request method */
-    httpRequest->method = 0;
+    /* sets the http parser method */
+    httpParser->method = 0;
 
-    /* sets the http request upgrade */
-    httpRequest->upgrade = 1;
+    /* sets the http parser upgrade */
+    httpParser->upgrade = 1;
 
-    /* sets the http request in the http request pointer */
-    *httpRequestPointer = httpRequest;
+    /* sets the http parser in the http parser pointer */
+    *httpParserPointer = httpParser;
 }
 
-void deleteHttpRequest(struct HttpRequest_t *httpRequest) {
-    /* releases the http request */
-    free(httpRequest);
+void deleteHttpParser(struct HttpParser_t *httpParser) {
+    /* releases the http parser */
+    free(httpParser);
 }
 
 
 
-ERROR_CODE messageBeginPrintCallback(struct HttpRequest_t *httpRequest) {
+ERROR_CODE messageBeginPrintCallback(struct HttpParser_t *httpParser) {
     /* prints an information */
     V_DEBUG("HTTP request received\n");
 
-    return 0;
+    /* raise no error */
+    RAISE_NO_ERROR;
 }
 
-ERROR_CODE urlPrintCallback(struct HttpRequest_t *httpRequest, const unsigned char *data, size_t dataSize) {
+ERROR_CODE urlPrintCallback(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize) {
     /* allocates the required space for the url */
     unsigned char *url = (unsigned char *) malloc(dataSize + 1);
 
@@ -138,7 +139,7 @@ ERROR_CODE urlPrintCallback(struct HttpRequest_t *httpRequest, const unsigned ch
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE headerFieldPrintCallback(struct HttpRequest_t *httpRequest, const unsigned char *data, size_t dataSize) {
+ERROR_CODE headerFieldPrintCallback(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize) {
     /* allocates the required space for the header field */
     unsigned char *headerField = (unsigned char *) malloc(dataSize + 1);
 
@@ -155,7 +156,7 @@ ERROR_CODE headerFieldPrintCallback(struct HttpRequest_t *httpRequest, const uns
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE headerValuePrintCallback(struct HttpRequest_t *httpRequest, const unsigned char *data, size_t dataSize) {
+ERROR_CODE headerValuePrintCallback(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize) {
     /* allocates the required space for the header value */
     unsigned char *headerValue = (unsigned char *) malloc(dataSize + 1);
 
@@ -172,7 +173,7 @@ ERROR_CODE headerValuePrintCallback(struct HttpRequest_t *httpRequest, const uns
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE headersCompletePrintCallback(struct HttpRequest_t *httpRequest) {
+ERROR_CODE headersCompletePrintCallback(struct HttpParser_t *httpParser) {
     /* prints an information */
     V_DEBUG("HTTP headers parsed\n");
 
@@ -180,7 +181,7 @@ ERROR_CODE headersCompletePrintCallback(struct HttpRequest_t *httpRequest) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE bodyPrintCallback(struct HttpRequest_t *httpRequest, const unsigned char *data, size_t dataSize) {
+ERROR_CODE bodyPrintCallback(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize) {
     /* allocates the required space for the body */
     unsigned char *body = (unsigned char *) malloc(dataSize + 1);
 
@@ -197,7 +198,7 @@ ERROR_CODE bodyPrintCallback(struct HttpRequest_t *httpRequest, const unsigned c
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE messageCompletePrintCallback(struct HttpRequest_t *httpRequest) {
+ERROR_CODE messageCompletePrintCallback(struct HttpParser_t *httpParser) {
     /* prints an information */
     V_DEBUG("HTTP request parsed\n");
 
@@ -242,7 +243,7 @@ void deleteHttpSettings(struct HttpSettings_t *httpSettings) {
     free(httpSettings);
 }
 
-int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSettings_t *httpSettings, unsigned char *data, size_t dataSize) {
+int processDataHttpParser(struct HttpParser_t *httpParser, struct HttpSettings_t *httpSettings, unsigned char *data, size_t dataSize) {
     /* Inspired from https://github.com/ry/http-parser/blob/master/http_parser.c */
 
     unsigned char byte;
@@ -253,9 +254,9 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
     size_t toRead;
     const unsigned char *pointerEnd;
     const unsigned char *pointer = data;
-    size_t readCount = httpRequest->readCount;
-    size_t index = httpRequest->index;
-    enum HttpRequestState_e state = httpRequest->state;
+    size_t readCount = httpParser->readCount;
+    size_t index = httpParser->index;
+    enum HttpRequestState_e state = httpParser->state;
 
     const unsigned char *headerFieldMark = 0;
     const unsigned char *headerValueMark = 0;
@@ -301,16 +302,16 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
                     break;
                 }
 
-                /* sets the initial request values */
-                httpRequest->flags = 0;
-                httpRequest->contentLength = -1;
+                /* sets the initial parser values */
+                httpParser->flags = 0;
+                httpParser->contentLength = -1;
 
                 HTTP_CALLBACK2(messageBegin);
 
                 if(byte == 'H') {
                     state = STATE_RES_OR_RESP_H;
                 } else {
-                    httpRequest->type = HTTP_REQUEST;
+                    httpParser->type = HTTP_REQUEST;
                     goto startReqMethodAssign;
                 }
 
@@ -319,7 +320,7 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
 
             case STATE_RES_OR_RESP_H:
                 if (byte == 'T') {
-                    httpRequest->type = HTTP_RESPONSE;
+                    httpParser->type = HTTP_RESPONSE;
                     state = STATE_RES_HT;
                 } else {
                     if (byte != 'E') {
@@ -327,8 +328,8 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
                         /*goto error; */
                     }
 
-                    httpRequest->type = HTTP_REQUEST;
-                    httpRequest->method = HTTP_HEAD;
+                    httpParser->type = HTTP_REQUEST;
+                    httpParser->method = HTTP_HEAD;
                     index = 2;
                     state = STATE_REQ_METHOD;
                 }
@@ -337,8 +338,8 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
                 break;
 
             case STATE_START_RES:
-                httpRequest->flags = 0;
-                httpRequest->contentLength = -1;
+                httpParser->flags = 0;
+                httpParser->contentLength = -1;
 
                 HTTP_CALLBACK2(messageBegin);
 
@@ -395,7 +396,7 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
                     goto error;*/
                 }
 
-                httpRequest->httpMajor = byte - '0';
+                httpParser->httpMajor = byte - '0';
                 state = STATE_RES_HTTP_MAJOR;
 
                 /* breaks the switch */
@@ -407,7 +408,7 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
                     goto error;*/
                 }
 
-                httpRequest->httpMinor = byte - '0';
+                httpParser->httpMinor = byte - '0';
                 state = STATE_RES_HTTP_MINOR;
 
                 /* breaks the switch */
@@ -426,10 +427,10 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
                     goto error;*/
                 }
 
-                httpRequest->httpMinor *= 10;
-                httpRequest->httpMinor += byte - '0';
+                httpParser->httpMinor *= 10;
+                httpParser->httpMinor += byte - '0';
 
-                if(httpRequest->httpMinor > 999) {
+                if(httpParser->httpMinor > 999) {
                     /*SET_ERRNO(HPE_INVALID_VERSION);
                     goto error;*/
                 }
@@ -447,7 +448,7 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
                     goto error;*/
                 }
 
-                httpRequest->statusCode = byte - '0';
+                httpParser->statusCode = byte - '0';
                 state = STATE_RES_STATUS_CODE;
 
                 /* breaks the switch */
@@ -474,10 +475,10 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
                     break;
                 }
 
-                httpRequest->statusCode *= 10;
-                httpRequest->statusCode += byte - '0';
+                httpParser->statusCode *= 10;
+                httpParser->statusCode += byte - '0';
 
-                if(httpRequest->statusCode > 999) {
+                if(httpParser->statusCode > 999) {
                     /*SET_ERRNO(HPE_INVALID_STATUS);
                     goto error;*/
                 }
@@ -517,8 +518,8 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
                     break;
                 }
 
-                httpRequest->flags = 0;
-                httpRequest->contentLength = -1;
+                httpParser->flags = 0;
+                httpParser->contentLength = -1;
 
                 HTTP_CALLBACK2(messageBegin);
 
@@ -530,23 +531,23 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
                 }
 
                 startReqMethodAssign:
-                    httpRequest->method = (unsigned char) 0;
+                    httpParser->method = (unsigned char) 0;
                     index = 1;
 
                     switch(byte) {
-                        case 'C': httpRequest->method = HTTP_CONNECT; /* or COPY, CHECKOUT */ break;
-                        case 'D': httpRequest->method = HTTP_DELETE; break;
-                        case 'G': httpRequest->method = HTTP_GET; break;
-                        case 'H': httpRequest->method = HTTP_HEAD; break;
-                        case 'L': httpRequest->method = HTTP_LOCK; break;
-                        case 'M': httpRequest->method = HTTP_MKCOL; /* or MOVE, MKACTIVITY, MERGE, M-SEARCH */ break;
-                        case 'N': httpRequest->method = HTTP_NOTIFY; break;
-                        case 'O': httpRequest->method = HTTP_OPTIONS; break;
-                        case 'P': httpRequest->method = HTTP_POST; /* or PROPFIND or PROPPATCH or PUT or PATCH */ break;
-                        case 'R': httpRequest->method = HTTP_REPORT; break;
-                        case 'S': httpRequest->method = HTTP_SUBSCRIBE; break;
-                        case 'T': httpRequest->method = HTTP_TRACE; break;
-                        case 'U': httpRequest->method = HTTP_UNLOCK; /* or UNSUBSCRIBE */ break;
+                        case 'C': httpParser->method = HTTP_CONNECT; /* or COPY, CHECKOUT */ break;
+                        case 'D': httpParser->method = HTTP_DELETE; break;
+                        case 'G': httpParser->method = HTTP_GET; break;
+                        case 'H': httpParser->method = HTTP_HEAD; break;
+                        case 'L': httpParser->method = HTTP_LOCK; break;
+                        case 'M': httpParser->method = HTTP_MKCOL; /* or MOVE, MKACTIVITY, MERGE, M-SEARCH */ break;
+                        case 'N': httpParser->method = HTTP_NOTIFY; break;
+                        case 'O': httpParser->method = HTTP_OPTIONS; break;
+                        case 'P': httpParser->method = HTTP_POST; /* or PROPFIND or PROPPATCH or PUT or PATCH */ break;
+                        case 'R': httpParser->method = HTTP_REPORT; break;
+                        case 'S': httpParser->method = HTTP_SUBSCRIBE; break;
+                        case 'T': httpParser->method = HTTP_TRACE; break;
+                        case 'U': httpParser->method = HTTP_UNLOCK; /* or UNSUBSCRIBE */ break;
 
                         /*default:
                         SET_ERRNO(HPE_INVALID_METHOD);
@@ -564,45 +565,45 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
                      goto error;*/
                 }
 
-                matcher = HttpMethodStrings[httpRequest->method - 1];
+                matcher = HttpMethodStrings[httpParser->method - 1];
 
                 if(byte == ' ' && matcher[index] == '\0') {
                     state = STATE_REQ_SPACES_BEFORE_URL;
                 } else if(byte == matcher[index]) {
-                } else if(httpRequest->method == HTTP_CONNECT) {
+                } else if(httpParser->method == HTTP_CONNECT) {
                     if(index == 1 && byte == 'H') {
-                        httpRequest->method = HTTP_CHECKOUT;
+                        httpParser->method = HTTP_CHECKOUT;
                     } else if(index == 2  && byte == 'P') {
-                        httpRequest->method = HTTP_COPY;
+                        httpParser->method = HTTP_COPY;
                     } else {
                         /*goto error;*/
                     }
-                } else if(httpRequest->method == HTTP_MKCOL) {
+                } else if(httpParser->method == HTTP_MKCOL) {
                     if(index == 1 && byte == 'O') {
-                        httpRequest->method = HTTP_MOVE;
+                        httpParser->method = HTTP_MOVE;
                     } else if(index == 1 && byte == 'E') {
-                        httpRequest->method = HTTP_MERGE;
+                        httpParser->method = HTTP_MERGE;
                     } else if(index == 1 && byte == '-') {
-                        httpRequest->method = HTTP_MSEARCH;
+                        httpParser->method = HTTP_MSEARCH;
                     } else if(index == 2 && byte == 'A') {
-                        httpRequest->method = HTTP_MKACTIVITY;
+                        httpParser->method = HTTP_MKACTIVITY;
                     } else {
                         /*goto error;*/
                     }
-                } else if(index == 1 && httpRequest->method == HTTP_POST) {
+                } else if(index == 1 && httpParser->method == HTTP_POST) {
                     if(byte == 'R') {
-                        httpRequest->method = HTTP_PROPFIND; /* or HTTP_PROPPATCH */
+                        httpParser->method = HTTP_PROPFIND; /* or HTTP_PROPPATCH */
                     } else if(byte == 'U') {
-                        httpRequest->method = HTTP_PUT;
+                        httpParser->method = HTTP_PUT;
                     } else if(byte == 'A') {
-                        httpRequest->method = HTTP_PATCH;
+                        httpParser->method = HTTP_PATCH;
                     } else {
                         /*goto error;*/
                     }
-                } else if(index == 2 && httpRequest->method == HTTP_UNLOCK && byte == 'S') {
-                    httpRequest->method = HTTP_UNSUBSCRIBE;
-                } else if(index == 4 && httpRequest->method == HTTP_PROPFIND && byte == 'P') {
-                    httpRequest->method = HTTP_PROPPATCH;
+                } else if(index == 2 && httpParser->method == HTTP_UNLOCK && byte == 'S') {
+                    httpParser->method = HTTP_UNSUBSCRIBE;
+                } else if(index == 4 && httpParser->method == HTTP_PROPFIND && byte == 'P') {
+                    httpParser->method = HTTP_PROPPATCH;
                 } else {
                     /*SET_ERRNO(HPE_INVALID_METHOD);
                     goto error;*/
@@ -632,9 +633,9 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
                  * CONNECT is followed by a hostname, which begins with alphanum.
                  * All other methods are followed by '/' or '*' (handled above).
                  */
-                if(IS_ALPHA(byte) || (httpRequest->method == HTTP_CONNECT && IS_NUM(byte))) {
+                if(IS_ALPHA(byte) || (httpParser->method == HTTP_CONNECT && IS_NUM(byte))) {
                     MARK(url);
-                    state = (httpRequest->method == HTTP_CONNECT) ? STATE_REQ_HOST : STATE_REQ_SCHEMA;
+                    state = (httpParser->method == HTTP_CONNECT) ? STATE_REQ_HOST : STATE_REQ_SCHEMA;
 
                     /* breaks the switch */
                     break;
@@ -645,14 +646,14 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
 
             case STATE_REQ_SCHEMA:
                 if(IS_ALPHA(byte)) {
-					/* breaks the switch */
+                    /* breaks the switch */
                     break;
                 }
 
                 if(byte == ':') {
                     state = STATE_REQ_SCHEMA_SLASH;
 
-					/* breaks the switch */
+                    /* breaks the switch */
                     break;
                 }
 
@@ -675,7 +676,7 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
 
             case STATE_REQ_HOST:
                 if(IS_HOST_CHAR(byte)) {
-					/* breaks the switch */
+                    /* breaks the switch */
                     break;
                 }
 
@@ -758,8 +759,8 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
 
                     case CR:
                         HTTP_CALLBACK(url);
-                        httpRequest->httpMajor = 0;
-                        httpRequest->httpMinor = 9;
+                        httpParser->httpMajor = 0;
+                        httpParser->httpMinor = 9;
                         state = STATE_REQ_LINE_ALMOST_DONE;
 
                         /* breaks the switch */
@@ -767,8 +768,8 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
 
                     case LF:
                         HTTP_CALLBACK(url);
-                        httpRequest->httpMajor = 0;
-                        httpRequest->httpMinor = 9;
+                        httpParser->httpMajor = 0;
+                        httpParser->httpMinor = 9;
                         state = STATE_HEADER_FIELD_START;
 
                         /* breaks the switch */
@@ -814,8 +815,8 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
 
                     case CR:
                         HTTP_CALLBACK(url);
-                        httpRequest->httpMajor = 0;
-                        httpRequest->httpMinor = 9;
+                        httpParser->httpMajor = 0;
+                        httpParser->httpMinor = 9;
                         state = STATE_REQ_LINE_ALMOST_DONE;
 
                         /* breaks the switch */
@@ -823,8 +824,8 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
 
                     case LF:
                         HTTP_CALLBACK(url);
-                        httpRequest->httpMajor = 0;
-                        httpRequest->httpMinor = 9;
+                        httpParser->httpMajor = 0;
+                        httpParser->httpMinor = 9;
                         state = STATE_HEADER_FIELD_START;
 
                         /* breaks the switch */
@@ -865,8 +866,8 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
 
                     case CR:
                         HTTP_CALLBACK(url);
-                        httpRequest->httpMajor = 0;
-                        httpRequest->httpMinor = 9;
+                        httpParser->httpMajor = 0;
+                        httpParser->httpMinor = 9;
                         state = STATE_REQ_LINE_ALMOST_DONE;
 
                         /* breaks the switch */
@@ -874,8 +875,8 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
 
                     case LF:
                         HTTP_CALLBACK(url);
-                        httpRequest->httpMajor = 0;
-                        httpRequest->httpMinor = 9;
+                        httpParser->httpMajor = 0;
+                        httpParser->httpMinor = 9;
                         state = STATE_HEADER_FIELD_START;
 
                         /* breaks the switch */
@@ -913,8 +914,8 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
 
                     case CR:
                         HTTP_CALLBACK(url);
-                        httpRequest->httpMajor = 0;
-                        httpRequest->httpMinor = 9;
+                        httpParser->httpMajor = 0;
+                        httpParser->httpMinor = 9;
                         state = STATE_REQ_LINE_ALMOST_DONE;
 
                         /* breaks the switch */
@@ -922,8 +923,8 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
 
                     case LF:
                         HTTP_CALLBACK(url);
-                        httpRequest->httpMajor = 0;
-                        httpRequest->httpMinor = 9;
+                        httpParser->httpMajor = 0;
+                        httpParser->httpMinor = 9;
                         state = STATE_HEADER_FIELD_START;
 
                         /* breaks the switch */
@@ -962,8 +963,8 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
 
                   case CR:
                         HTTP_CALLBACK(url);
-                        httpRequest->httpMajor = 0;
-                        httpRequest->httpMinor = 9;
+                        httpParser->httpMajor = 0;
+                        httpParser->httpMinor = 9;
                         state = STATE_REQ_LINE_ALMOST_DONE;
 
                         /* breaks the switch */
@@ -971,8 +972,8 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
 
                   case LF:
                         HTTP_CALLBACK(url);
-                        httpRequest->httpMajor = 0;
-                        httpRequest->httpMinor = 9;
+                        httpParser->httpMajor = 0;
+                        httpParser->httpMinor = 9;
                         state = STATE_HEADER_FIELD_START;
 
                         /* breaks the switch */
@@ -1045,7 +1046,7 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
                     goto error;*/
                 }
 
-                httpRequest->httpMajor = byte - '0';
+                httpParser->httpMajor = byte - '0';
                 state = STATE_REQ_HTTP_MAJOR;
 
                 /* breaks the switch */
@@ -1064,10 +1065,10 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
                     goto error;*/
                 }
 
-                httpRequest->httpMajor *= 10;
-                httpRequest->httpMajor += byte - '0';
+                httpParser->httpMajor *= 10;
+                httpParser->httpMajor += byte - '0';
 
-                if(httpRequest->httpMajor > 999) {
+                if(httpParser->httpMajor > 999) {
                     /*SET_ERRNO(HPE_INVALID_VERSION);
                     goto error;*/
                 }
@@ -1081,7 +1082,7 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
                     goto error;*/
                 }
 
-                httpRequest->httpMinor = byte - '0';
+                httpParser->httpMinor = byte - '0';
                 state = STATE_REQ_HTTP_MINOR;
 
                 /* breaks the switch */
@@ -1107,10 +1108,10 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
                     goto error;*/
                 }
 
-                httpRequest->httpMinor *= 10;
-                httpRequest->httpMinor += byte - '0';
+                httpParser->httpMinor *= 10;
+                httpParser->httpMinor += byte - '0';
 
-                if (httpRequest->httpMinor > 999) {
+                if (httpParser->httpMinor > 999) {
                     /*SET_ERRNO(HPE_INVALID_VERSION);
                     goto error;*/
                 }
@@ -1383,7 +1384,7 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
 
                 switch(headerState) {
                     case HEADER_STATE_UPGRADE:
-                        httpRequest->flags |= FLAG_UPGRADE;
+                        httpParser->flags |= FLAG_UPGRADE;
                         headerState = HEADER_STATE_GENERAL;
 
                         /* breaks the switch */
@@ -1405,7 +1406,7 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
                             goto error;*/
                         }
 
-                        httpRequest->contentLength = byte - '0';
+                        httpParser->contentLength = byte - '0';
 
                         /* breaks the switch */
                         break;
@@ -1469,8 +1470,8 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
                             goto error;*/
                         }
 
-                        httpRequest->contentLength *= 10;
-                        httpRequest->contentLength += byte - '0';
+                        httpParser->contentLength *= 10;
+                        httpParser->contentLength += byte - '0';
 
                         /* breaks the switch */
                         break;
@@ -1544,19 +1545,19 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
 
                     switch(headerState) {
                         case HEADER_STATE_CONNECTION_KEEP_ALIVE:
-                            httpRequest->flags |= FLAG_CONNECTION_KEEP_ALIVE;
+                            httpParser->flags |= FLAG_CONNECTION_KEEP_ALIVE;
 
                             /* breaks the switch */
                             break;
 
                         case HEADER_STATE_CONNECTION_CLOSE:
-                            httpRequest->flags |= FLAG_CONNECTION_CLOSE;
+                            httpParser->flags |= FLAG_CONNECTION_CLOSE;
 
                             /* breaks the switch */
                             break;
 
                         case HEADER_STATE_TRANSFER_ENCODING_CHUNKED:
-                            httpRequest->flags |= FLAG_CHUNKED;
+                            httpParser->flags |= FLAG_CHUNKED;
 
                             /* breaks the switch */
                             break;
@@ -1584,7 +1585,7 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
                 headersAlmostDone:
                     STRICT_CHECK(byte != LF);
 
-                    if(httpRequest->flags & FLAG_TRAILING) {
+                    if(httpParser->flags & FLAG_TRAILING) {
                         /* End of a chunked request */
                         HTTP_CALLBACK2(messageComplete);
                         state = NEW_MESSAGE();
@@ -1593,8 +1594,8 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
 
                     readCount = 0;
 
-                    if(httpRequest->flags & FLAG_UPGRADE || httpRequest->method == HTTP_CONNECT) {
-                        httpRequest->upgrade = 1;
+                    if(httpParser->flags & FLAG_UPGRADE || httpParser->method == HTTP_CONNECT) {
+                        httpParser->upgrade = 1;
                     }
 
                     /* Here we call the headers_complete callback. This is somewhat
@@ -1604,44 +1605,44 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
                      * request.
                      */
                     if(httpSettings->onheadersComplete) {
-                        switch (httpSettings->onheadersComplete(httpRequest)) {
+                        switch (httpSettings->onheadersComplete(httpParser)) {
                             case 0:
                                 break;
 
                             case 1:
-                                httpRequest->flags |= FLAG_SKIPBODY;
+                                httpParser->flags |= FLAG_SKIPBODY;
                                 break;
 
                             default:
-                                httpRequest->state = state;
+                                httpParser->state = state;
                                 /*SET_ERRNO(HPE_CB_headers_complete);*/
                                 return pointer - data; /* Error */
                         }
                     }
 
                     /* Exit, the rest of the connect is in a different protocol. */
-                    if(httpRequest->upgrade) {
+                    if(httpParser->upgrade) {
                         HTTP_CALLBACK2(messageComplete);
 
                         return (pointer - data) + 1;
                     }
 
-                    if(httpRequest->flags & FLAG_SKIPBODY) {
+                    if(httpParser->flags & FLAG_SKIPBODY) {
                         HTTP_CALLBACK2(messageComplete);
                         state = NEW_MESSAGE();
-                    } else if(httpRequest->flags & FLAG_CHUNKED) {
+                    } else if(httpParser->flags & FLAG_CHUNKED) {
                         /* chunked encoding - ignore Content-Length header */
                         state = STATE_CHUNK_SIZE_START;
                     } else {
-                        if(httpRequest->contentLength == 0) {
+                        if(httpParser->contentLength == 0) {
                             /* Content-Length header given but zero: Content-Length: 0\r\n */
                             HTTP_CALLBACK2(messageComplete);
                             state = NEW_MESSAGE();
-                        } else if(httpRequest->contentLength > 0) {
+                        } else if(httpParser->contentLength > 0) {
                             /* Content-Length header given and non-zero */
                             state = STATE_BODY_IDENTITY;
                         } else {
-                            if(httpRequest->type == HTTP_REQUEST || http_should_keep_alive(httpRequest)) {
+                            if(httpParser->type == HTTP_REQUEST || http_should_keep_alive(httpParser)) {
                                 /* Assume content-length 0 - read the next */
                                 HTTP_CALLBACK2(messageComplete);
                                 state = NEW_MESSAGE();
@@ -1657,18 +1658,18 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
 
 
             case STATE_BODY_IDENTITY:
-                toRead = MIN(pointerEnd - pointer, (long long) httpRequest->contentLength);
+                toRead = MIN(pointerEnd - pointer, (long long) httpParser->contentLength);
 
                 if(toRead > 0) {
                     if(httpSettings->onbody) {
-                        httpSettings->onbody(httpRequest, pointer, toRead);
+                        httpSettings->onbody(httpParser, pointer, toRead);
                     }
 
                     pointer += toRead - 1;
 
-                    httpRequest->contentLength -= toRead;
+                    httpParser->contentLength -= toRead;
 
-                    if(httpRequest->contentLength == 0) {
+                    if(httpParser->contentLength == 0) {
                         HTTP_CALLBACK2(messageComplete);
                         state = NEW_MESSAGE();
                     }
@@ -1683,7 +1684,7 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
 
                 if(toRead > 0) {
                     if(httpSettings->onbody) {
-                        httpSettings->onbody(httpRequest, pointer, toRead);
+                        httpSettings->onbody(httpParser, pointer, toRead);
                     }
 
                     pointer += toRead - 1;
@@ -1694,7 +1695,7 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
 
             case STATE_CHUNK_SIZE_START:
                 assert(readCount == 1);
-                assert(httpRequest->flags & FLAG_CHUNKED);
+                assert(httpParser->flags & FLAG_CHUNKED);
 
                 unhexValue = unhex[byte];
 
@@ -1703,14 +1704,14 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
                     goto error;*/
                 }
 
-                httpRequest->contentLength = unhexValue;
+                httpParser->contentLength = unhexValue;
                 state = STATE_CHUNK_SIZE;
 
                 /* breaks the switch */
                 break;
 
             case STATE_CHUNK_SIZE:
-                assert(httpRequest->flags & FLAG_CHUNKED);
+                assert(httpParser->flags & FLAG_CHUNKED);
 
                 if(byte == CR) {
                     state = STATE_CHUNK_SIZE_ALMOST_DONE;
@@ -1733,14 +1734,14 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
                     goto error;*/
                 }
 
-                httpRequest->contentLength *= 16;
-                httpRequest->contentLength += unhexValue;
+                httpParser->contentLength *= 16;
+                httpParser->contentLength += unhexValue;
 
                 /* breaks the switch */
                 break;
 
             case STATE_CHUNK_PARAMETERS:
-                assert(httpRequest->flags & FLAG_CHUNKED);
+                assert(httpParser->flags & FLAG_CHUNKED);
 
                 /* just ignore this shit. TODO check for overflow */
                 if(byte == CR) {
@@ -1754,13 +1755,13 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
                 break;
 
             case STATE_CHUNK_SIZE_ALMOST_DONE:
-                assert(httpRequest->flags & FLAG_CHUNKED);
+                assert(httpParser->flags & FLAG_CHUNKED);
                 STRICT_CHECK(byte != LF);
 
                 readCount = 0;
 
-                if(httpRequest->contentLength == 0) {
-                    httpRequest->flags |= FLAG_TRAILING;
+                if(httpParser->contentLength == 0) {
+                    httpParser->flags |= FLAG_TRAILING;
                     state = STATE_HEADER_FIELD_START;
                 } else {
                     state = STATE_CHUNK_DATA;
@@ -1770,29 +1771,29 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
                 break;
 
             case STATE_CHUNK_DATA:
-                assert(httpRequest->flags & FLAG_CHUNKED);
+                assert(httpParser->flags & FLAG_CHUNKED);
 
-                toRead = MIN(pointerEnd - pointer, (long long) (httpRequest->contentLength));
+                toRead = MIN(pointerEnd - pointer, (long long) (httpParser->contentLength));
 
                 if(toRead > 0) {
                     if (httpSettings->onbody) {
-                        httpSettings->onbody(httpRequest, pointer, toRead);
+                        httpSettings->onbody(httpParser, pointer, toRead);
                     }
 
                     pointer += toRead - 1;
                 }
 
-                if(toRead == httpRequest->contentLength) {
+                if(toRead == httpParser->contentLength) {
                     state = STATE_CHUNK_DATA_ALMOST_DONE;
                 }
 
-                httpRequest->contentLength -= toRead;
+                httpParser->contentLength -= toRead;
 
                 /* breaks the switch */
                 break;
 
             case STATE_CHUNK_DATA_ALMOST_DONE:
-                assert(httpRequest->flags & FLAG_CHUNKED);
+                assert(httpParser->flags & FLAG_CHUNKED);
                 STRICT_CHECK(byte != CR);
                 state = STATE_CHUNK_DATA_DONE;
 
@@ -1800,7 +1801,7 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
                 break;
 
             case STATE_CHUNK_DATA_DONE:
-                assert(httpRequest->flags & FLAG_CHUNKED);
+                assert(httpParser->flags & FLAG_CHUNKED);
                 STRICT_CHECK(byte != LF);
                 state = STATE_CHUNK_SIZE_START;
 
@@ -1818,10 +1819,10 @@ int processDataHttpRequest(struct HttpRequest_t *httpRequest, struct HttpSetting
     HTTP_CALLBACK(headerValue);
     HTTP_CALLBACK(url);
 
-    httpRequest->state = state;
-    httpRequest->headerState = headerState;
-    httpRequest->index = index;
-    httpRequest->readCount = readCount;
+    httpParser->state = state;
+    httpParser->headerState = headerState;
+    httpParser->index = index;
+    httpParser->readCount = readCount;
 
     /* returns the data size (processed data size) */
     return dataSize;
