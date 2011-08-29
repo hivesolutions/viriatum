@@ -84,8 +84,8 @@ ERROR_CODE urlCallbackHandlerDefault(struct HttpParser_t *httpParser, const unsi
     /* prints the url */
     V_DEBUG_F("url: %s\n", url);
 
-	/* releases the url */
-	free(url);
+    /* releases the url */
+    free(url);
 
     /* raise no error */
     RAISE_NO_ERROR;
@@ -104,8 +104,8 @@ ERROR_CODE headerFieldCallbackHandlerDefault(struct HttpParser_t *httpParser, co
     /* prints the header field */
     V_DEBUG_F("header field: %s\n", headerField);
 
-	/* releases the header field */
-	free(headerField);
+    /* releases the header field */
+    free(headerField);
 
     /* raise no error */
     RAISE_NO_ERROR;
@@ -124,8 +124,8 @@ ERROR_CODE headerValueCallbackHandlerDefault(struct HttpParser_t *httpParser, co
     /* prints the header value */
     V_DEBUG_F("header value: %s\n", headerValue);
 
-	/* releases the header value */
-	free(headerValue);
+    /* releases the header value */
+    free(headerValue);
 
     /* raise no error */
     RAISE_NO_ERROR;
@@ -152,8 +152,8 @@ ERROR_CODE bodyCallbackHandlerDefault(struct HttpParser_t *httpParser, const uns
     /* prints the body */
     V_DEBUG_F("body: %s\n", body);
 
-	/* releases the body */
-	free(body);
+    /* releases the body */
+    free(body);
 
     /* raise no error */
     RAISE_NO_ERROR;
@@ -180,7 +180,7 @@ ERROR_CODE _processResponseHandlerDefault(struct HttpParser_t *httpParser) {
     /* writes the http static headers to the response */
     SPRINTF(responseBuffer, 1024, "HTTP/1.1 200 OK\r\nServer: %s/%s (%s @ %s)\r\nContent-Length: %lu\r\n\r\nhello world", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, strlen("hello world"));
 
-	/* writes the response to the connection */
+    /* writes the response to the connection */
     writeConnection(connection, (unsigned char *) responseBuffer, strlen(responseBuffer), NULL, NULL);
 
     /* raise no error */

@@ -111,8 +111,8 @@ ERROR_CODE urlCallbackHandlerFile(struct HttpParser_t *httpParser, const unsigne
     /* creates the file path from using the base viriatum path */
     SPRINTF((char *) handlerFileContext->filePath, 1024, "%s%s%s", RESOURCES_PATH, "/html/welcome", url);
 
-	/* releases the url */
-	free(url);
+    /* releases the url */
+    free(url);
 
     /* raise no error */
     RAISE_NO_ERROR;
@@ -159,8 +159,8 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
         /* prints the error */
         V_DEBUG_F("%s\n", getLastErrorMessageSafe());
 
-		/* releases the headers buffer */
-		free(headersBuffer);
+        /* releases the headers buffer */
+        free(headersBuffer);
     }
     /* otherwise there was no error in the file */
     else {
