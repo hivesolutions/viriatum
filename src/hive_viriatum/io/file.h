@@ -46,4 +46,3 @@ ERROR_CODE readFile(char *filePath, unsigned char **bufferPointer, size_t *fileS
  * @param fileSizePointer The pointer to the file size.
  */
 ERROR_CODE countFile(char *filePath, size_t *fileSizePointer);
-

@@ -44,9 +44,9 @@ void updateHttpParserHandlerFile(struct HttpParser_t *httpParser) {
     /* allocates space for the handler file context */
     struct HandlerFileContext_t *handlerFileContext = (struct HandlerFileContext_t *) malloc(handlerFileContextSize);
 
-	handlerFileContext->file = NULL;
+    handlerFileContext->file = NULL;
 
-	handlerFileContext->filePath = NULL;
+    handlerFileContext->filePath = NULL;
 
     /* sets the handler file context as the context for the http parser */
     httpParser->context = handlerFileContext;
@@ -133,8 +133,8 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
     /* allocates the headers buffer */
     char headersBuffer[1024];
 
-	char *buffer;
-	char *buffer2 = malloc(1000000);
+    char *buffer;
+    char *buffer2 = malloc(1000000);
 
     /* retrieves the handler file context from the http parser */
     struct HandlerFileContext_t *handlerFileContext = (struct HandlerFileContext_t *) httpParser->context;
@@ -153,19 +153,22 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
     /* otherwise there was no error in the file */
     else {
         /* writes the http static headers to the response */
-		SPRINTF(headersBuffer, 1024, "HTTP/1.1 200 OK\r\nServer: viriatum/1.0.0 (%s - %s)\r\nContent-Length: %lu\r\n\r\n", VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, fileSize);
+        SPRINTF(headersBuffer, 1024, "HTTP/1.1 200 OK\r\nServer: viriatum/1.0.0 (%s - %s)\r\nContent-Length: %lu\r\n\r\n", VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, fileSize);
 
         /* writes both the headers and the file buffer to the connection */
         /*writeConnection(connection, (unsigned char *) headersBuffer, strlen(headersBuffer), sendChunkHandlerFile, handlerFileContext);*/
 
-		/* TODO: WE NEED THIS HACK IN ORDER TO AVOID THE BROWSER BUG WITH NO LOADING */
-		/* USING NON BLOCKING SOCKET WE'LL PROBABLY BE ABLE TO OVERCOME THIS PROBLEM */
-		readFile(handlerFileContext->filePath, &buffer, &fileSize);
+        /* TODO: WE NEED THIS HACK IN ORDER TO AVOID THE BROWSER BUG WITH NO LOADING */
+        /* USING NON BLOCKING SOCKET WE'LL PROBABLY BE ABLE TO OVERCOME THIS PROBLEM */
+        readFile(handlerFileContext->filePath, &buffer, &fileSize);
 
-		memcpy(buffer2, headersBuffer, strlen(headersBuffer));
-		memcpy(buffer2 + strlen(headersBuffer), buffer, fileSize);
+        memcpy(buffer2, headersBuffer, strlen(headersBuffer));
+        memcpy(buffer2 + strlen(headersBuffer), buffer, fileSize);
 
-		writeConnection(connection, buffer2, strlen(headersBuffer) + fileSize, NULL, NULL);
+        writeConnection(connection, buffer2, strlen(headersBuffer) + fileSize, NULL, NULL);
+
+		/*writeConnection(connection, headersBuffer, strlen(headersBuffer), NULL, NULL);
+		writeConnection(connection, buffer, fileSize, NULL, NULL);*/
     }
 
     /* raise no error */
@@ -173,51 +176,50 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
 }
 
 ERROR_CODE sendChunkHandlerFile(struct Connection_t *connection, void *parameters) {
-	/* allocates the number of bytes */
-	size_t numberBytes;
+    /* allocates the number of bytes */
+    size_t numberBytes;
 
-	/* casts the parameters as handler file context */
-	struct HandlerFileContext_t *handlerFileContext = (struct HandlerFileContext_t *) parameters;
+    /* casts the parameters as handler file context */
+    struct HandlerFileContext_t *handlerFileContext = (struct HandlerFileContext_t *) parameters;
 
-	/* retrieves the file path from the handler file context */
-	unsigned char *filePath = handlerFileContext->filePath;
+    /* retrieves the file path from the handler file context */
+    unsigned char *filePath = handlerFileContext->filePath;
 
-	/* retrieves the file from the handler file context */
-	FILE *file = handlerFileContext->file;
-
-
-	/* TODO ARRUMAR ESTE HARDCODE !!!! */
-	unsigned char *fileBuffer = malloc(FILE_BUFFER_SIZE_HANDLER_FILE);
+    /* retrieves the file from the handler file context */
+    FILE *file = handlerFileContext->file;
 
 
-	/* in case the file is not defined (should be opened) */
-	if(file == NULL) {
-		/* opens the file */
-		FOPEN(&file, (char *) filePath, "rb");
+    /* TODO ARRUMAR ESTE HARDCODE !!!! */
+    unsigned char *fileBuffer = malloc(FILE_BUFFER_SIZE_HANDLER_FILE);
 
-		/* in case the file is not found */
-		if(file == NULL) {
-			/* raises an error */
-			RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem loading file");
-		}
-	}
 
-	/* reads the file contents */
+    /* in case the file is not defined (should be opened) */
+    if(file == NULL) {
+        /* opens the file */
+        FOPEN(&file, (char *) filePath, "rb");
+
+        /* in case the file is not found */
+        if(file == NULL) {
+            /* raises an error */
+            RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem loading file");
+        }
+    }
+
+    /* reads the file contents */
     numberBytes = fread(fileBuffer, 1, FILE_BUFFER_SIZE_HANDLER_FILE, file);
 
-	/* in case the number of read bytes is valid */
-	if(numberBytes > 0) {
-		/* writes both the headers and the file buffer to the connection */
-		writeConnection(connection, fileBuffer, numberBytes, sendChunkHandlerFile, handlerFileContext);
-	} else {
-		/* closes the file */
-		fclose(file);
-	}
+    /* in case the number of read bytes is valid */
+    if(numberBytes > 0) {
+        /* writes both the headers and the file buffer to the connection */
+        writeConnection(connection, fileBuffer, numberBytes, sendChunkHandlerFile, handlerFileContext);
+    } else {
+        /* closes the file */
+        fclose(file);
+    }
 
-	/* sets the file in the handler file context */
-	handlerFileContext->file = file;
+    /* sets the file in the handler file context */
+    handlerFileContext->file = file;
 
     /* raise no error */
     RAISE_NO_ERROR;
 }
-

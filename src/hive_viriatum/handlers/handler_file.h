@@ -40,7 +40,7 @@
  */
 typedef struct HandlerFileContext_t {
     unsigned char *filePath;
-	FILE *file;
+    FILE *file;
 } HandlerFileContext;
 
 void updateHandlerFile(struct HttpParser_t *httpParser, struct HttpSettings_t *httpSettings);
