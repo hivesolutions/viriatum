@@ -27,6 +27,12 @@
 
 #pragma once
 
+/**
+ * The "default" callback function to be used, without
+ * any extra arguments.
+ */
+typedef ERROR_CODE (*serviceCallback) (struct Connection_t *, void *);
+
 typedef struct Service_t {
     unsigned char *name;
     unsigned int status;
@@ -37,6 +43,8 @@ typedef struct Service_t {
 typedef struct Data_t {
     unsigned char *data;
     size_t size;
+	serviceCallback callback;
+	void *callbackParameters;
 } Data;
 
 typedef struct Connection_t {
@@ -64,4 +72,4 @@ void addConnectionService(struct Service_t *service, struct Connection_t *connec
 void removeConnectionService(struct Service_t *service, struct Connection_t *connection);
 void createConnection(struct Connection_t **connectionPointer, SOCKET_HANDLE socketHandle);
 void deleteConnection(struct Connection_t *connection);
-void writeConnection(struct Connection_t *connection, unsigned char *data, unsigned int size);
+void writeConnection(struct Connection_t *connection, unsigned char *data, unsigned int size, serviceCallback callback, void *callbackParameters);
