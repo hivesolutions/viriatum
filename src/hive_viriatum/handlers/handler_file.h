@@ -43,6 +43,8 @@ typedef struct HandlerFileContext_t {
     FILE *file;
 } HandlerFileContext;
 
+void createHandlerFileContext(struct HandlerFileContext_t **handlerFileContextPointer);
+void deleteHandlerFileContext(struct HandlerFileContext_t *handlerFileContext);
 void updateHandlerFile(struct HttpParser_t *httpParser, struct HttpSettings_t *httpSettings);
 void updateHttpParserHandlerFile(struct HttpParser_t *httpParser);
 void updateHttpSettingsHandlerFile(struct HttpSettings_t *httpSettings);
