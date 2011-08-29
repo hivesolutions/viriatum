@@ -44,8 +44,8 @@ void updateHttpParserHandlerFile(struct HttpParser_t *httpParser) {
     /* allocates space for the handler file context */
     struct HandlerFileContext_t *handlerFileContext = (struct HandlerFileContext_t *) malloc(handlerFileContextSize);
 
-	/* sets the handler file context as the context for the http parser */
-	httpParser->context = handlerFileContext;
+    /* sets the handler file context as the context for the http parser */
+    httpParser->context = handlerFileContext;
 }
 
 void updateHttpSettingsHandlerFile(struct HttpSettings_t *httpSettings) {
@@ -77,11 +77,11 @@ ERROR_CODE messageBeginCallbackHandlerFile(struct HttpParser_t *httpParser) {
 }
 
 ERROR_CODE urlCallbackHandlerFile(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize) {
-	/* allocates the file path */
-	unsigned char *filePath = (unsigned char *) malloc(1024);
+    /* allocates the file path */
+    unsigned char *filePath = (unsigned char *) malloc(1024);
 
-	/* retrieves the handler file context from the http parser */
-	struct HandlerFileContext_t *handlerFileContext = (struct HandlerFileContext_t *) httpParser->context;
+    /* retrieves the handler file context from the http parser */
+    struct HandlerFileContext_t *handlerFileContext = (struct HandlerFileContext_t *) httpParser->context;
 
     /* allocates the required space for the url */
     unsigned char *url = (unsigned char *) malloc(dataSize + 1);
@@ -92,11 +92,11 @@ ERROR_CODE urlCallbackHandlerFile(struct HttpParser_t *httpParser, const unsigne
     /* puts the end of strng in the url */
     url[dataSize] = '\0';
 
-	/* creates the file path from using the base viriatum path */
-	SPRINTF(filePath, 1024, "%s%s", "c:/viriatum_docs", url);
+    /* creates the file path from using the base viriatum path */
+    SPRINTF(filePath, 1024, "%s%s", "c:/viriatum_docs", url);
 
-	/* sets the file path in the handler file context */
-	handlerFileContext->filePath = filePath;
+    /* sets the file path in the handler file context */
+    handlerFileContext->filePath = filePath;
 
     /* raise no error */
     RAISE_NO_ERROR;
@@ -123,38 +123,38 @@ ERROR_CODE bodyCallbackHandlerFile(struct HttpParser_t *httpParser, const unsign
 }
 
 ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
-	/* allocates the file size */
-	size_t fileSize;
+    /* allocates the file size */
+    size_t fileSize;
 
-	/* allocates the file buffer */
-	unsigned char *fileBuffer;
+    /* allocates the file buffer */
+    unsigned char *fileBuffer;
 
-	/* allocates the headers buffer */
-	unsigned char headersBuffer[1024];
+    /* allocates the headers buffer */
+    unsigned char headersBuffer[1024];
 
-	/* retrieves the handler file context from the http parser */
-	struct HandlerFileContext_t *handlerFileContext = (struct HandlerFileContext_t *) httpParser->context;
+    /* retrieves the handler file context from the http parser */
+    struct HandlerFileContext_t *handlerFileContext = (struct HandlerFileContext_t *) httpParser->context;
 
-	/* retrieves the connection from the http parser parameters */
-	struct Connection_t *connection = (struct Connection_t *) httpParser->parameters;
+    /* retrieves the connection from the http parser parameters */
+    struct Connection_t *connection = (struct Connection_t *) httpParser->parameters;
 
-	/* reads (the complete) file contents */
-	ERROR_CODE readFileResult = readFile(handlerFileContext->filePath, &fileBuffer, &fileSize);
+    /* reads (the complete) file contents */
+    ERROR_CODE readFileResult = readFile(handlerFileContext->filePath, &fileBuffer, &fileSize);
 
-	/* tests the error code for error */
+    /* tests the error code for error */
     if(IS_ERROR_CODE(readFileResult)) {
-		/* prints the error */
+        /* prints the error */
         V_DEBUG_F("%s\n", getLastErrorMessageSafe());
     }
-	/* otherwise there was no error in the file */
-	else {
-		/* writes the http static headers to the response */
-		SPRINTF(headersBuffer, 1024, "HTTP/1.1 200 OK\r\nServer: viriatum/1.0.0 (%s @ %s)\r\nContent-Length: %lu\r\n\r\n", VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, fileSize);
+    /* otherwise there was no error in the file */
+    else {
+        /* writes the http static headers to the response */
+        SPRINTF(headersBuffer, 1024, "HTTP/1.1 200 OK\r\nServer: viriatum/1.0.0 (%s @ %s)\r\nContent-Length: %lu\r\n\r\n", VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, fileSize);
 
-		/* writes both the headers and the file buffer to the connection */
-		writeConnection(connection, headersBuffer, strlen(headersBuffer));
-		writeConnection(connection, fileBuffer, fileSize);
-	}
+        /* writes both the headers and the file buffer to the connection */
+        writeConnection(connection, headersBuffer, strlen(headersBuffer));
+        writeConnection(connection, fileBuffer, fileSize);
+    }
 
     /* raise no error */
     RAISE_NO_ERROR;

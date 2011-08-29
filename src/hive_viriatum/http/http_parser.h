@@ -415,8 +415,8 @@ typedef struct HttpParser_t {
     unsigned short statusCode;
     unsigned char method;
     char upgrade;
-	void *context;
-	void *parameters;
+    void *context;
+    void *parameters;
 } HttpParser;
 
 /**

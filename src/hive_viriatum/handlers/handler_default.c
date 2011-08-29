@@ -151,19 +151,19 @@ ERROR_CODE messageCompleteCallbackHandlerDefault(struct HttpParser_t *httpParser
     /* prints an information */
     V_DEBUG("HTTP request parsed\n");
 
-	/* processes (creates) the reponse */
-	_processResponseHandlerDefault(httpParser);
+    /* processes (creates) the reponse */
+    _processResponseHandlerDefault(httpParser);
 
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
 ERROR_CODE _processResponseHandlerDefault(struct HttpParser_t *httpParser) {
-	/* allocates the response buffer */
-	unsigned char responseBuffer[1024];
+    /* allocates the response buffer */
+    unsigned char responseBuffer[1024];
 
-	/* retrieves the connection from the http parser parameters */
-	struct Connection_t *connection = (struct Connection_t *) httpParser->parameters;
+    /* retrieves the connection from the http parser parameters */
+    struct Connection_t *connection = (struct Connection_t *) httpParser->parameters;
 
     /* writes the http static headers to the response */
     SPRINTF(responseBuffer, 1024, "HTTP/1.1 200 OK\r\nServer: viriatum/1.0.0 (%s @ %s)\r\nContent-Length: %lu\r\n\r\nhello world", VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, strlen("hello world"));
@@ -171,6 +171,6 @@ ERROR_CODE _processResponseHandlerDefault(struct HttpParser_t *httpParser) {
     /* adds the response buffer to the write queue */
     appendValueLinkedList(connection->writeQueue, (void *) responseBuffer);
 
-	/* raise no error */
+    /* raise no error */
     RAISE_NO_ERROR;
 }

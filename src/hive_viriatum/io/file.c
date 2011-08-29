@@ -45,11 +45,11 @@ ERROR_CODE readFile(char *filePath, unsigned char **bufferPointer, size_t *fileS
     /* opens the file */
     FOPEN(&file, filePath, "rb");
 
-	/* in case the file is not found */
-	if(file == NULL) {
-		/* raises an error */
+    /* in case the file is not found */
+    if(file == NULL) {
+        /* raises an error */
         RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem loading file");
-	}
+    }
 
     /* seeks the file until the end */
     fseek(file, 0, SEEK_END);
@@ -72,6 +72,6 @@ ERROR_CODE readFile(char *filePath, unsigned char **bufferPointer, size_t *fileS
     /* sets the file size as the file size pointer */
     *fileSizePointer = fileSize;
 
-	/* raise no error */
-	RAISE_NO_ERROR;
+    /* raise no error */
+    RAISE_NO_ERROR;
 }
