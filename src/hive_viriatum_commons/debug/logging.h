@@ -37,4 +37,7 @@
 #define V_DEBUG_F(format, ...) dumpMultiple(format, __VA_ARGS__)
 #endif
 
+#define V_PRINT(format) printf(format)
+#define V_PRINT_F(format, ...) printf(format, __VA_ARGS__)
+
 VIRIATUM_EXPORT_PREFIX void debug(const char *format, ...);

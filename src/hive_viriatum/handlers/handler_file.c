@@ -131,7 +131,9 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
     size_t fileSize;
 
     /* allocates the headers buffer */
-    char headersBuffer[1024];
+    char headersBuffer[1024 + FILE_BUFFER_SIZE_HANDLER_FILE];
+
+	size_t headeresBufferLength;
 
     char *buffer;
     char *buffer2 = malloc(1000000);
@@ -154,6 +156,10 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
     else {
         /* writes the http static headers to the response */
         SPRINTF(headersBuffer, 1024, "HTTP/1.1 200 OK\r\nServer: %s/%s (%s - %s)\r\nContent-Length: %lu\r\n\r\n", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, fileSize);
+
+		headeresBufferLength = strlen(headersBuffer);
+
+		
 
         /* writes both the headers and the file buffer to the connection */
         /*writeConnection(connection, (unsigned char *) headersBuffer, strlen(headersBuffer), sendChunkHandlerFile, handlerFileContext);*/
