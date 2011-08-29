@@ -445,6 +445,10 @@
 				Name="Global"
 				>
 				<File
+					RelativePath="..\..\src\hive_viriatum\global\definitions.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\src\hive_viriatum\global\resource.h"
 					>
 				</File>

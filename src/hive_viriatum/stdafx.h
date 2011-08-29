@@ -34,12 +34,7 @@
 
 #include "../hive_viriatum_commons/viriatum_commons.h"
 
-#ifdef VIRIATUM_PLATFORM_WIN32
-#define RESOURCES_PATH "../../src/hive_viriatum/resources"
-#endif
-#ifdef VIRIATUM_PLATFORM_UNIX
-#define RESOURCES_PATH "resources"
-#endif
+#include "global/definitions.h"
 
 unsigned char *nameViriatum();
 unsigned char *versionViriatum();
