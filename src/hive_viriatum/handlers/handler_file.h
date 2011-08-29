@@ -39,7 +39,7 @@
  * the file handler.
  */
 typedef struct HandlerFileContext_t {
-    unsigned char *filePath;
+    unsigned char filePath[1024];
     FILE *file;
 } HandlerFileContext;
 
