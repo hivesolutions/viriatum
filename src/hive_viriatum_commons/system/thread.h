@@ -57,15 +57,6 @@
 #define CRITICAL_SECTION_ENTER(criticalSectionHandle) EnterCriticalSection(&criticalSectionHandle)
 #define CRITICAL_SECTION_LEAVE(criticalSectionHandle) LeaveCriticalSection(&criticalSectionHandle)
 #define CRITICAL_SECTION_CLOSE(criticalSectionHandle) DeleteCriticalSection(&criticalSectionHandle)
-
-/*#define CONDITION_HANDLE CONDITION_VARIABLE
-#define CONDITION_CREATE(conditionHandle) InitializeConditionVariable(&conditionHandle)
-#define CONDITION_LOCK(conditionHandle, criticalSectionHandle) CRITICAL_SECTION_ENTER(conditionHandle)
-#define CONDITION_UNLOCK(conditionHandle, criticalSectionHandle) CRITICAL_SECTION_LEAVE(conditionHandle)
-#define CONDITION_WAIT(conditionHandle, criticalSectionHandle) SleepConditionVariableCS(&conditionHandle, &criticalSectionHandle, INFINITE)
-#define CONDITION_SIGNAL(conditionHandle) WakeConditionVariable(&conditionHandle)
-#define CONDITION_CLOSE(conditionHandle)*/
-
 #define CONDITION_HANDLE struct Condition_t*
 #define CONDITION_CREATE(conditionHandle) createCondition(&conditionHandle)
 #define CONDITION_LOCK(conditionHandle, criticalSectionHandle) lockCondition(conditionHandle)
