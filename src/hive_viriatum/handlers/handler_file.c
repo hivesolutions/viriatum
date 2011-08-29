@@ -39,9 +39,6 @@ void createHandlerFileContext(struct HandlerFileContext_t **handlerFileContextPo
     /* sets the handler file context file */
     handlerFileContext->file = NULL;
 
-    /* sets the handler file context file path */
-    handlerFileContext->filePath = NULL;
-
     /* sets the handler file context in the  pointer */
     *handlerFileContextPointer = handlerFileContext;
 }
@@ -99,9 +96,6 @@ ERROR_CODE messageBeginCallbackHandlerFile(struct HttpParser_t *httpParser) {
 }
 
 ERROR_CODE urlCallbackHandlerFile(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize) {
-    /* allocates the file path */
-    unsigned char *filePath = (unsigned char *) malloc(1024);
-
     /* retrieves the handler file context from the http parser */
     struct HandlerFileContext_t *handlerFileContext = (struct HandlerFileContext_t *) httpParser->context;
 
@@ -111,14 +105,14 @@ ERROR_CODE urlCallbackHandlerFile(struct HttpParser_t *httpParser, const unsigne
     /* copies the memory from the data to the url */
     memcpy(url, data, dataSize);
 
-    /* puts the end of strng in the url */
+    /* puts the end of string in the url */
     url[dataSize] = '\0';
 
     /* creates the file path from using the base viriatum path */
-    SPRINTF((char *) filePath, 1024, "%s%s%s", RESOURCES_PATH, "/html/welcome", url);
+    SPRINTF((char *) handlerFileContext->filePath, 1024, "%s%s%s", RESOURCES_PATH, "/html/welcome", url);
 
-    /* sets the file path in the handler file context */
-    handlerFileContext->filePath = filePath;
+	/* releases the url */
+	free(url);
 
     /* raise no error */
     RAISE_NO_ERROR;
@@ -164,13 +158,16 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
     if(IS_ERROR_CODE(readFileResult)) {
         /* prints the error */
         V_DEBUG_F("%s\n", getLastErrorMessageSafe());
+
+		/* releases the headers buffer */
+		free(headersBuffer);
     }
     /* otherwise there was no error in the file */
     else {
         /* writes the http static headers to the response */
         SPRINTF(headersBuffer, 1024, "HTTP/1.1 200 OK\r\nServer: %s/%s (%s - %s)\r\nContent-Length: %lu\r\n\r\n", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, fileSize);
 
-        /* writes both the headers and the file buffer to the connection */
+        /* writes both the headers to the connection */
         writeConnection(connection, (unsigned char *) headersBuffer, strlen(headersBuffer), sendChunkHandlerFile, handlerFileContext);
     }
 
@@ -211,7 +208,7 @@ ERROR_CODE sendChunkHandlerFile(struct Connection_t *connection, struct Data_t *
 
     /* in case the number of read bytes is valid */
     if(numberBytes > 0) {
-        /* writes both the headers and the file buffer to the connection */
+        /* writes both the file buffer to the connection */
         writeConnection(connection, fileBuffer, numberBytes, sendChunkHandlerFile, handlerFileContext);
     } else {
         /* closes the file */

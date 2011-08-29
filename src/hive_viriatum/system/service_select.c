@@ -111,15 +111,18 @@ void httpReadHandler(struct ServiceSelect_t *serviceSelect, struct Connection_t 
     httpParser->parameters = connection;
 
     /* updates the structures for the handler */
-    updateHandlerFile(httpParser, httpSettings);
+    updateHandlerDefault(httpParser, httpSettings);
 
     /* process the http data for the http parser */
     processDataHttpParser(httpParser, httpSettings, buffer, numberBytes);
 
+	/* deletes the http parser */
+	deleteHttpParser(httpParser);
 
+	/* deletes the http settings */
+	deleteHttpSettings(httpSettings);
 
-
-    /* ESTE CONCEIDO DE ADICAO A LISTA DE ESCRITAS AINDA ESTA MUITO BADALHOCO TENHO DE PENSAR MELHOR */
+	/* ESTE CONCEIDO DE ADICAO A LISTA DE ESCRITAS AINDA ESTA MUITO BADALHOCO TENHO DE PENSAR MELHOR */
     if(connection->writeRegistered == 0) {
         /* ESTA HARDCODADO TENHO DE ARRANJAR UMA MANEIIRA MAIS SOFT DE FAZER ISTO !!! */
         addSocketHandleSocketsSetServiceSelect(serviceSelect, connection->socketHandle, &serviceSelect->socketsWriteSet);
