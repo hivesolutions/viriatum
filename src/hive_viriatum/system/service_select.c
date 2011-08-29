@@ -142,7 +142,7 @@ void httpWriteHandler(struct ServiceSelect_t *serviceSelect, struct Connection_t
     /* iterates continuously */
     while(1) {
         /* pops a value (data) from the linked list (write queue) */
-        popValueLinkedList(connection->writeQueue, (void **) &data);
+        popValueLinkedList(connection->writeQueue, (void **) &data, 1);
 
         /* in case the data is invalid */
         if(data == NULL) {
@@ -344,7 +344,15 @@ void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_
     serviceSelect->selectTimeoutTemporary = serviceSelect->selectTimeout;
 
     /* creates the iterator for the linked list */
+
+
     createIteratorLinkedList(connectionsList, &connectionsListIterator);
+
+
+
+
+
+
 
     /* prints a debug message */
     V_DEBUG("Entering select statement\n");
@@ -420,6 +428,11 @@ void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_
             selectCount--;
         }
     }
+
+
+    deleteIteratorLinkedList(connectionsList, connectionsListIterator);
+
+
 
     /* in case the select count is bigger than zero */
     if(selectCount > 0) {
