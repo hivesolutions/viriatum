@@ -35,6 +35,15 @@
  * @param bufferPointer The pointer to the generated buffer
  * containing the file contents.
  * @param fileSizePointer The pointer to the file size.
- * @param The size of the read file.
  */
 ERROR_CODE readFile(char *filePath, unsigned char **bufferPointer, size_t *fileSizePointer);
+
+/**
+ * Counts the number of bytes in the file in the
+ * given path and returns the resulting count.
+ *
+ * @param filePath The path to the file to be "counted".
+ * @param fileSizePointer The pointer to the file size.
+ */
+ERROR_CODE countFile(char *filePath, size_t *fileSizePointer);
+

@@ -78,3 +78,35 @@ ERROR_CODE readFile(char *filePath, unsigned char **bufferPointer, size_t *fileS
     /* raise no error */
     RAISE_NO_ERROR;
 }
+
+ERROR_CODE countFile(char *filePath, size_t *fileSizePointer) {
+    /* allocates space for the file */
+    FILE *file;
+
+    /* allocates space for the file size */
+    size_t fileSize;
+
+    /* opens the file */
+    FOPEN(&file, filePath, "rb");
+
+    /* in case the file is not found */
+    if(file == NULL) {
+        /* raises an error */
+        RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem loading file");
+    }
+
+    /* seeks the file until the end */
+    fseek(file, 0, SEEK_END);
+
+    /* retrieves the file size */
+    fileSize = ftell(file);
+
+	/* closes the file */
+	fclose(file);
+
+    /* sets the file size as the file size pointer */
+    *fileSizePointer = fileSize;
+
+    /* raise no error */
+    RAISE_NO_ERROR;
+}
