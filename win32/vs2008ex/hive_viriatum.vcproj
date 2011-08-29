@@ -415,6 +415,18 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="Handlers"
+				>
+				<File
+					RelativePath="..\..\src\hive_viriatum\handlers\handler_default.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\hive_viriatum\handlers\handler_file.c"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -506,6 +518,22 @@
 				</File>
 				<File
 					RelativePath="..\..\src\hive_viriatum\http\http_request.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Handlers"
+				>
+				<File
+					RelativePath="..\..\src\hive_viriatum\handlers\handler_default.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\hive_viriatum\handlers\handler_file.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\hive_viriatum\handlers\handlers.h"
 					>
 				</File>
 			</Filter>

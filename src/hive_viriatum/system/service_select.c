@@ -116,8 +116,22 @@ void httpReadHandler(struct ServiceSelect_t *serviceSelect, struct Connection_t 
     /* creates the http parser */
     createHttpParser(&httpParser);
 
+
+    /* tenho de configurar aki o parser para o handler ser o de ficheiro */
+
+    updateHandlerDefault(httpParser, httpSettings);
+
+
+
     /* process the http data for the http parser */
     processDataHttpParser(httpParser, httpSettings, buffer, numberBytes);
+
+
+
+
+
+
+
 
     /* writes the http static headers to the response */
     SPRINTF(responseBuffer, 1024, "HTTP/1.1 200 OK\r\nServer: viriatum/1.0.0 (%s)\r\nContent-Length: %lu\r\n\r\nhello world", VIRIATUM_PLATFORM_STRING, strlen("hello world"));
