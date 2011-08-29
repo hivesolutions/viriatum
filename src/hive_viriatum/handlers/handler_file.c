@@ -153,15 +153,13 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
     /* otherwise there was no error in the file */
     else {
         /* writes the http static headers to the response */
-		SPRINTF(headersBuffer, 1024, "HTTP/1.1 200 OK\r\n\
-									 Server: viriatum/1.0.0 (%s - %s)\r\n\
-									 Content-Type: text/html\r\n\
-									 Date: Mon, 29 Aug 2011 17:39:31 GMT\r\n\
-									 Content-Length: %lu\r\n\r\n", VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, fileSize);
+		SPRINTF(headersBuffer, 1024, "HTTP/1.1 200 OK\r\nServer: viriatum/1.0.0 (%s - %s)\r\nContent-Length: %lu\r\n\r\n", VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, fileSize);
 
         /* writes both the headers and the file buffer to the connection */
         /*writeConnection(connection, (unsigned char *) headersBuffer, strlen(headersBuffer), sendChunkHandlerFile, handlerFileContext);*/
 
+		/* TODO: WE NEED THIS HACK IN ORDER TO AVOID THE BROWSER BUG WITH NO LOADING */
+		/* USING NON BLOCKING SOCKET WE'LL PROBABLY BE ABLE TO OVERCOME THIS PROBLEM */
 		readFile(handlerFileContext->filePath, &buffer, &fileSize);
 
 		memcpy(buffer2, headersBuffer, strlen(headersBuffer));
