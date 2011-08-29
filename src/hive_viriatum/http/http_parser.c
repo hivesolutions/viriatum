@@ -23,6 +23,7 @@
  __date__      = $LastChangedDate$
  __copyright__ = Copyright (c) 2008 Hive Solutions Lda.
  __license__   = GNU General Public License (GPL), Version 3
+ __credits__   = Ryan Dahl <ry@tinyclouds.org>
 */
 
 #include "stdafx.h"
@@ -246,8 +247,6 @@ void deleteHttpSettings(struct HttpSettings_t *httpSettings) {
 }
 
 int processDataHttpParser(struct HttpParser_t *httpParser, struct HttpSettings_t *httpSettings, unsigned char *data, size_t dataSize) {
-    /* Inspired from https://github.com/ry/http-parser/blob/master/http_parser.c */
-
     unsigned char byte;
     unsigned char byteToken;
     char unhexValue;
