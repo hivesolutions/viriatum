@@ -160,7 +160,7 @@ ERROR_CODE messageCompleteCallbackHandlerDefault(struct HttpParser_t *httpParser
 
 ERROR_CODE _processResponseHandlerDefault(struct HttpParser_t *httpParser) {
     /* allocates the response buffer */
-    unsigned char responseBuffer[1024];
+    char responseBuffer[1024];
 
     /* retrieves the connection from the http parser parameters */
     struct Connection_t *connection = (struct Connection_t *) httpParser->parameters;
