@@ -181,7 +181,7 @@ ERROR_CODE sendChunkHandlerFile(struct Connection_t *connection, void *parameter
 	/* in case the file is not defined (should be opened) */
 	if(file == NULL) {
 		/* opens the file */
-		FOPEN(&file, filePath, "rb");
+		FOPEN(&file, (char *) filePath, "rb");
 
 		/* in case the file is not found */
 		if(file == NULL) {
