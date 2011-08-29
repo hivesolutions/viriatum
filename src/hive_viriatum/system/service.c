@@ -70,7 +70,7 @@ void startService(struct Service_t *service) {
     service->serviceSocketHandle = SOCKET_CREATE(SOCKET_INTERNET_TYPE, SOCKET_PACKET_TYPE, SOCKET_PROTOCOL_TCP);
 
     /* sets the option value to one (valid) */
-    optionValue = 1,
+    optionValue = 0,
 
     /* sets the socket reuse address option in the socket */
     SOCKET_SET_OPTIONS(service->serviceSocketHandle, SOCKET_OPTIONS_LEVEL_SOCKET, SOCKET_OPTIONS_REUSE_ADDRESS_SOCKET, optionValue);
