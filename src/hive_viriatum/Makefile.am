@@ -34,6 +34,8 @@ viriatum_LDADD = ../hive_viriatum_commons/libviriatum.a $(INTLLIBS)
 
 viriatum_SOURCES = stdafx.c \
 viriatum.c \
+handlers/handler_default.c \
+handlers/handler_file.c \
 http/http_parser.c \
 http/http_request.c \
 io/file.c \
