@@ -29,6 +29,7 @@
 
 #ifdef VIRIATUM_PLATFORM_WIN32
 #include <winsock.h>
+#define SOCKET_CONNECTIONS 256
 #define SOCKET_DATA WSADATA
 #define SOCKET_HANDLE SOCKET
 #define SOCKET_ADDRESS_SIZE int
@@ -48,7 +49,7 @@
 #define SOCKET_FINISH() WSACleanup()
 #define SOCKET_CREATE(type, streamType, protocolType) socket(type, streamType, protocolType)
 #define SOCKET_BIND(socketHandle, socketAddress) bind(socketHandle, (LPSOCKADDR) &socketAddress, sizeof(SOCKET_ADDRESS))
-#define SOCKET_LISTEN(socketHandle) listen(socketHandle, SOMAXCONN)
+#define SOCKET_LISTEN(socketHandle) listen(socketHandle, SOCKET_CONNECTIONS)
 #define SOCKET_CONNECT(socketHandle, socketAddress) connect(socketHandle, (LPSOCKADDR) &socketAddress, sizeof(SOCKET_ADDRESS))
 #define SOCKET_ACCEPT(socketHandle, socketAddress, socketAddressSize) accept(socketHandle, socketAddress, &socketAddressSize)
 #define SOCKET_CLOSE(socketHandle) closesocket(socketHandle)
@@ -74,6 +75,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#define SOCKET_CONNECTIONS 256
 #define SOCKET_DATA void *
 #define SOCKET_HANDLE int
 #define SOCKET_ADDRESS_SIZE unsigned int
@@ -93,7 +95,7 @@
 #define SOCKET_FINISH()
 #define SOCKET_CREATE(type, streamType, protocolType) socket(type, streamType, protocolType)
 #define SOCKET_BIND(socketHandle, socketAddress) bind(socketHandle, (struct sockaddr *) &socketAddress, sizeof(SOCKET_ADDRESS))
-#define SOCKET_LISTEN(socketHandle) listen(socketHandle, SOMAXCONN)
+#define SOCKET_LISTEN(socketHandle) listen(socketHandle, SOCKET_CONNECTIONS)
 #define SOCKET_CONNECT(socketHandle, socketAddress) connect(socketHandle, (struct sockaddr *) &socketAddress, sizeof(SOCKET_ADDRESS))
 #define SOCKET_ACCEPT(socketHandle, socketAddress, socketAddressSize) accept(socketHandle, socketAddress, &socketAddressSize)
 #define SOCKET_CLOSE(socketHandle) close(socketHandle)
