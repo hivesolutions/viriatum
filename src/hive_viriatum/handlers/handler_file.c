@@ -29,6 +29,8 @@
 
 #include "handler_file.h"
 
+const char headersBuffer[1024];
+
 void updateHandlerFile(struct HttpParser_t *httpParser, struct HttpSettings_t *httpSettings) {
     /* updates the http parser values */
     updateHttpParserHandlerFile(httpParser);
@@ -131,12 +133,7 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
     size_t fileSize;
 
     /* allocates the headers buffer */
-    char headersBuffer[1024 + FILE_BUFFER_SIZE_HANDLER_FILE];
-
-	size_t headeresBufferLength;
-
-    char *buffer;
-    char *buffer2 = malloc(1000000);
+    char *headersBuffer = malloc(1024);
 
     /* retrieves the handler file context from the http parser */
     struct HandlerFileContext_t *handlerFileContext = (struct HandlerFileContext_t *) httpParser->context;
@@ -157,31 +154,15 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
         /* writes the http static headers to the response */
         SPRINTF(headersBuffer, 1024, "HTTP/1.1 200 OK\r\nServer: %s/%s (%s - %s)\r\nContent-Length: %lu\r\n\r\n", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, fileSize);
 
-		headeresBufferLength = strlen(headersBuffer);
-
-		
-
         /* writes both the headers and the file buffer to the connection */
-        /*writeConnection(connection, (unsigned char *) headersBuffer, strlen(headersBuffer), sendChunkHandlerFile, handlerFileContext);*/
-
-        /* TODO: WE NEED THIS HACK IN ORDER TO AVOID THE BROWSER BUG WITH NO LOADING */
-        /* USING NON BLOCKING SOCKET WE'LL PROBABLY BE ABLE TO OVERCOME THIS PROBLEM */
-        readFile(handlerFileContext->filePath, &buffer, &fileSize);
-
-        memcpy(buffer2, headersBuffer, strlen(headersBuffer));
-        memcpy(buffer2 + strlen(headersBuffer), buffer, fileSize);
-
-        writeConnection(connection, buffer2, strlen(headersBuffer) + fileSize, NULL, NULL);
-
-        /*writeConnection(connection, headersBuffer, strlen(headersBuffer), NULL, NULL);
-        writeConnection(connection, buffer, fileSize, NULL, NULL);*/
+        writeConnection(connection, (unsigned char *) headersBuffer, strlen(headersBuffer), sendChunkHandlerFile, handlerFileContext);
     }
 
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE sendChunkHandlerFile(struct Connection_t *connection, void *parameters) {
+ERROR_CODE sendChunkHandlerFile(struct Connection_t *connection, struct Data_t *data, void *parameters) {
     /* allocates the number of bytes */
     size_t numberBytes;
 
@@ -194,10 +175,11 @@ ERROR_CODE sendChunkHandlerFile(struct Connection_t *connection, void *parameter
     /* retrieves the file from the handler file context */
     FILE *file = handlerFileContext->file;
 
-
-    /* TODO ARRUMAR ESTE HARDCODE !!!! */
+    /* allocates the required buffer for the file */
     unsigned char *fileBuffer = malloc(FILE_BUFFER_SIZE_HANDLER_FILE);
 
+    /* releases the previously allocated data (buffer) */
+    free(data->data);
 
     /* in case the file is not defined (should be opened) */
     if(file == NULL) {
@@ -221,6 +203,9 @@ ERROR_CODE sendChunkHandlerFile(struct Connection_t *connection, void *parameter
     } else {
         /* closes the file */
         fclose(file);
+
+        /* releases the current file buffer */
+        free(fileBuffer);
     }
 
     /* sets the file in the handler file context */

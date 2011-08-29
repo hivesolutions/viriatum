@@ -53,4 +53,4 @@ ERROR_CODE headerValueCallbackHandlerFile(struct HttpParser_t *httpParser, const
 ERROR_CODE headersCompleteCallbackHandlerFile(struct HttpParser_t *httpParser);
 ERROR_CODE bodyCallbackHandlerFile(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize);
 ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser);
-ERROR_CODE sendChunkHandlerFile(struct Connection_t *connection, void *parameter);
+ERROR_CODE sendChunkHandlerFile(struct Connection_t *connection, struct Data_t *data, void *parameter);
