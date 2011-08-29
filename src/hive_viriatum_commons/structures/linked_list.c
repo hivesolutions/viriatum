@@ -132,7 +132,7 @@ void appendValueLinkedList(struct LinkedList_t *linkedList, void *value) {
     appendLinkedList(linkedList, linkedListNode);
 }
 
-void removeLinkedList(struct LinkedList_t *linkedList, struct LinkedListNode_t *linkedListNode) {
+void removeLinkedList(struct LinkedList_t *linkedList, struct LinkedListNode_t *linkedListNode, char deleteNode) {
     /* allocates space for the previous node */
     struct LinkedListNode_t *previousNode;
 
@@ -182,9 +182,15 @@ void removeLinkedList(struct LinkedList_t *linkedList, struct LinkedListNode_t *
 
     /* decrements the linked list size */
     linkedList->size--;
+
+    /* in case the delete node flag is set */
+    if(deleteNode) {
+        /* deletes the linked list node */
+        deleteLinkedListNode(linkedListNode);
+    }
 }
 
-void removeValueLinkedList(struct LinkedList_t *linkedList, void *value) {
+void removeValueLinkedList(struct LinkedList_t *linkedList, void *value, char deleteNode) {
     /* allocates space for the index */
     size_t index;
 
@@ -220,10 +226,10 @@ void removeValueLinkedList(struct LinkedList_t *linkedList, void *value) {
     }
 
     /* removes the target node from the linked list */
-    removeLinkedList(linkedList, targetNode);
+    removeLinkedList(linkedList, targetNode, deleteNode);
 }
 
-void removeIndexLinkedList(struct LinkedList_t *linkedList, size_t index) {
+void removeIndexLinkedList(struct LinkedList_t *linkedList, size_t index, char deleteNode) {
     /* allocates space for the index */
     size_t _index;
 
@@ -240,7 +246,7 @@ void removeIndexLinkedList(struct LinkedList_t *linkedList, size_t index) {
     }
 
     /* removes the current node from the linked list */
-    removeLinkedList(linkedList, currentNode);
+    removeLinkedList(linkedList, currentNode, deleteNode);
 }
 
 void getLinkedList(struct LinkedList_t *linkedList, size_t index, struct LinkedListNode_t **linkedListNodePointer) {
@@ -282,7 +288,7 @@ void popLinkedList(struct LinkedList_t *linkedList, struct LinkedListNode_t **li
     getLinkedList(linkedList, 0, &linkedListNode);
 
     /* removes the first linked list node from the linked list */
-    removeLinkedList(linkedList, linkedListNode);
+    removeLinkedList(linkedList, linkedListNode, 0);
 
     /* sets the linked list node in the linked list node pointer */
     *linkedListNodePointer = linkedListNode;
@@ -304,7 +310,7 @@ void popValueLinkedList(struct LinkedList_t *linkedList, void **valuePointer, ch
         *valuePointer = linkedListNode->value;
     }
 
-    /* in case the delete node flag is set */
+	/* in case the delete node flag is set */
     if(deleteNode) {
         /* deletes the linked list node */
         deleteLinkedListNode(linkedListNode);
