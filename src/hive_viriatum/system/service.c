@@ -64,13 +64,13 @@ void startService(struct Service_t *service) {
     /* sets the socket address attributes */
     socketAddress.sin_family = SOCKET_INTERNET_TYPE;
     socketAddress.sin_addr.s_addr = inet_addr("0.0.0.0");
-    socketAddress.sin_port = htons(8181);
+    socketAddress.sin_port = htons(8282);
 
     /* creates the service socket for the given types */
     service->serviceSocketHandle = SOCKET_CREATE(SOCKET_INTERNET_TYPE, SOCKET_PACKET_TYPE, SOCKET_PROTOCOL_TCP);
 
     /* sets the option value to one (valid) */
-    optionValue = 0,
+    optionValue = 1,
 
     /* sets the socket reuse address option in the socket */
     SOCKET_SET_OPTIONS(service->serviceSocketHandle, SOCKET_OPTIONS_LEVEL_SOCKET, SOCKET_OPTIONS_REUSE_ADDRESS_SOCKET, optionValue);
