@@ -166,10 +166,10 @@ void writeConnection(struct Connection_t *connection, unsigned char *data, unsig
     /* allocates space for the data */
     struct Data_t *_data = (struct Data_t *) malloc(dataSize);
 
-	/* sets the data contents */
-	_data->data = data;
-	_data->size = size;
+    /* sets the data contents */
+    _data->data = data;
+    _data->size = size;
 
-	/* adds the file buffer to the write queue */
+    /* adds the file buffer to the write queue */
     appendValueLinkedList(connection->writeQueue, (void *) _data);
 }

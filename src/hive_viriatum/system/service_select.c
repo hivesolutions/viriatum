@@ -107,10 +107,10 @@ void httpReadHandler(struct ServiceSelect_t *serviceSelect, struct Connection_t 
     /* creates the http parser */
     createHttpParser(&httpParser);
 
-	/* sets the connection as the parser parameter(s) */
-	httpParser->parameters = connection;
+    /* sets the connection as the parser parameter(s) */
+    httpParser->parameters = connection;
 
-	/* updates the structures for the handler */
+    /* updates the structures for the handler */
     updateHandlerFile(httpParser, httpSettings);
 
     /* process the http data for the http parser */
@@ -119,7 +119,7 @@ void httpReadHandler(struct ServiceSelect_t *serviceSelect, struct Connection_t 
 
 
 
-	/* ESTE CONCEIDO DE ADICAO A LISTA DE ESCRITAS AINDA ESTA MUITO BADALHOCO TENHO DE PENSAR MELHOR */
+    /* ESTE CONCEIDO DE ADICAO A LISTA DE ESCRITAS AINDA ESTA MUITO BADALHOCO TENHO DE PENSAR MELHOR */
     if(connection->writeRegistered == 0) {
         /* ESTA HARDCODADO TENHO DE ARRANJAR UMA MANEIIRA MAIS SOFT DE FAZER ISTO !!! */
         addSocketHandleSocketsSetServiceSelect(serviceSelect, connection->socketHandle, &serviceSelect->socketsWriteSet);
@@ -131,7 +131,7 @@ void httpWriteHandler(struct ServiceSelect_t *serviceSelect, struct Connection_t
     /* allocates the number of bytes */
     int numberBytes;
 
-	/* allocates the data */
+    /* allocates the data */
     struct Data_t *data;
 
     unsigned int error = 0;
@@ -148,7 +148,7 @@ void httpWriteHandler(struct ServiceSelect_t *serviceSelect, struct Connection_t
         }
 
         /* sends the value retrieving the number of bytes sent */
-		numberBytes = SOCKET_SEND(connection->socketHandle, data->data, data->size, 0);
+        numberBytes = SOCKET_SEND(connection->socketHandle, data->data, data->size, 0);
 
         /* in case there was an error receiving from the socket */
         if(SOCKET_TEST_ERROR(numberBytes)) {
@@ -166,7 +166,7 @@ void httpWriteHandler(struct ServiceSelect_t *serviceSelect, struct Connection_t
         }
 
         /* in case the number of bytes sent is the same as the value size */
-		if(numberBytes != data->size) {
+        if(numberBytes != data->size) {
             /* sets the error flag */
             error = 1;
 

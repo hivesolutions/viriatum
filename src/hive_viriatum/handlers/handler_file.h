@@ -36,7 +36,7 @@
  * the file handler.
  */
 typedef struct HandlerFileContext_t {
-	unsigned char *filePath;
+    unsigned char *filePath;
 } HandlerFileContext;
 
 void updateHandlerFile(struct HttpParser_t *httpParser, struct HttpSettings_t *httpSettings);

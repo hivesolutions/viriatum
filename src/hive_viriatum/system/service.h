@@ -35,8 +35,8 @@ typedef struct Service_t {
 } Service;
 
 typedef struct Data_t {
-	unsigned char *data;
-	size_t size;
+    unsigned char *data;
+    size_t size;
 } Data;
 
 typedef struct Connection_t {
