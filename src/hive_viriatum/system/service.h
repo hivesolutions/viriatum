@@ -27,11 +27,6 @@
 
 #pragma once
 
-/**
- * The "default" callback function to be used, without
- * any extra arguments.
- */
-typedef ERROR_CODE (*serviceCallback) (struct Connection_t *, void *);
 
 typedef struct Service_t {
     unsigned char *name;
@@ -40,19 +35,25 @@ typedef struct Service_t {
     struct LinkedList_t *connectionsList;
 } Service;
 
-typedef struct Data_t {
-    unsigned char *data;
-    size_t size;
-	serviceCallback callback;
-	void *callbackParameters;
-} Data;
-
 typedef struct Connection_t {
     unsigned int writeRegistered;
     SOCKET_HANDLE socketHandle;
     struct LinkedList_t *readQueue;
     struct LinkedList_t *writeQueue;
 } Connection;
+
+/**
+ * The "default" callback function to be used, without
+ * any extra arguments.
+ */
+typedef ERROR_CODE (*serviceCallback) (struct Connection_t *, void *);
+
+typedef struct Data_t {
+    unsigned char *data;
+    size_t size;
+	serviceCallback callback;
+	void *callbackParameters;
+} Data;
 
 /**
  * Constructor of the service.
