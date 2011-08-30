@@ -194,9 +194,6 @@ ERROR_CODE bodyCallbackHandlerDefault(struct HttpParser_t *httpParser, const uns
 }
 
 ERROR_CODE messageCompleteCallbackHandlerDefault(struct HttpParser_t *httpParser) {
-     /* retrieves the connection from the http parser parameters */
-    struct Connection_t *connection = (struct Connection_t *) httpParser->parameters;
-
     /* prints an information */
     V_DEBUG("HTTP request parsed\n");
 
