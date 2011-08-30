@@ -364,8 +364,14 @@ void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_
         }
     }
 
+    /* prints a debug message */
+    V_DEBUG("Finished file testing\n");
+
     /* deletes the iterator linked list */
     deleteIteratorLinkedList(connectionsList, connectionsListIterator);
+
+    /* prints a debug message */
+    V_DEBUG("Deleted iterator linked list\n");
 
     /* in case the select count is bigger than zero */
     if(selectCount > 0) {
