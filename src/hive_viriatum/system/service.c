@@ -42,6 +42,12 @@ void createService(struct Service_t **servicePointer) {
     /* setst the service status as closed */
     service->status = 1;
 
+    /* sets the service register write */
+    service->registerWrite = NULL;
+
+    /* sets the service unregister write */
+    service->unregisterWrite = NULL;
+
     /* sets the service in the service pointer */
     *servicePointer = service;
 }
@@ -166,6 +172,9 @@ void createConnection(struct Connection_t **connectionPointer, SOCKET_HANDLE soc
     /* sets the socket handle in the connection */
     connection->socketHandle = socketHandle;
 
+    /* sets the service as not set */
+    connection->service = NULL;
+
     /* sets the write registered to false */
     connection->writeRegistered = 0;
 
@@ -194,6 +203,9 @@ void writeConnection(struct Connection_t *connection, unsigned char *data, unsig
     /* allocates the data */
     struct Data_t *_data;
 
+    /* retrieves the (connection) service */
+    struct Service_t *service = connection->service;
+
     /* creates the data */
     createData(&_data);
 
@@ -205,4 +217,7 @@ void writeConnection(struct Connection_t *connection, unsigned char *data, unsig
 
     /* adds the file buffer to the write queue */
     appendValueLinkedList(connection->writeQueue, (void *) _data);
+
+    /* registers the connection for write */
+    service->registerWrite(connection->serviceReference, connection);
 }

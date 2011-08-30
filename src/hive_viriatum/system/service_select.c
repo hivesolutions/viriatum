@@ -39,6 +39,12 @@ void createServiceSelect(struct ServiceSelect_t **serviceSelectPointer) {
     /* creates the service */
     createService(&serviceSelect->service);
 
+    /* sets the register write in the service */
+    serviceSelect->service->registerWrite = registerWriteServiceSelect;
+
+    /* sets the unregister write in the service */
+    serviceSelect->service->unregisterWrite = unregisterWriteServiceSelect;
+
     /* resets the sockets set highest value */
     serviceSelect->socketsSetHighest = 0;
 
@@ -124,13 +130,6 @@ void httpReadHandler(struct ServiceSelect_t *serviceSelect, struct Connection_t 
 
     /* deletes the http settings */
     deleteHttpSettings(httpSettings);
-
-    /* ESTE CONCEIDO DE ADICAO A LISTA DE ESCRITAS AINDA ESTA MUITO BADALHOCO TENHO DE PENSAR MELHOR */
-    if(connection->writeRegistered == 0) {
-        /* ESTA HARDCODADO TENHO DE ARRANJAR UMA MANEIIRA MAIS SOFT DE FAZER ISTO !!! */
-        addSocketHandleSocketsSetServiceSelect(serviceSelect, connection->socketHandle, &serviceSelect->socketsWriteSet);
-        connection->writeRegistered = 1;
-    }
 }
 
 void httpWriteHandler(struct ServiceSelect_t *serviceSelect, struct Connection_t *connection) {
@@ -140,12 +139,13 @@ void httpWriteHandler(struct ServiceSelect_t *serviceSelect, struct Connection_t
     /* allocates the data */
     struct Data_t *data;
 
-    unsigned int error = 0;
+    /* flag andvalue controlling the state of the write */
+    unsigned char error = 0;
 
     /* iterates continuously */
     while(1) {
-        /* pops a value (data) from the linked list (write queue) */
-        popValueLinkedList(connection->writeQueue, (void **) &data, 1);
+        /* peeks a value (data) from the linked list (write queue) */
+        peekValueLinkedList(connection->writeQueue, (void **) &data);
 
         /* in case the data is invalid */
         if(data == NULL) {
@@ -161,24 +161,37 @@ void httpWriteHandler(struct ServiceSelect_t *serviceSelect, struct Connection_t
             /* retrieves the receving error code */
             SOCKET_ERROR_CODE receivingErrorCode = SOCKET_GET_ERROR_CODE(numberBytes);
 
-            /* prints the error */
-            V_DEBUG_F("Problem sending from socket: %d\n", receivingErrorCode);
+            if(receivingErrorCode == WSAEWOULDBLOCK) {
+                V_DEBUG_F("RECEIVED EWOULDBLOCK!!!!\n");
 
-            /* removes the connection from the service select */
-            removeConnectionServiceSelect(serviceSelect, connection);
+                /* TODO: tenho de voltar a meter na lista e nao tiro o read do select */
+
+                /* sets the error flag (non fatal) */
+                error = 2;
+            } else {
+                /* prints the error */
+                V_DEBUG_F("Problem sending from socket: %d\n", receivingErrorCode);
+
+                /* sets the error flag */
+                error = 1;
+            }
 
             /* breaks the loop */
             break;
         }
 
-        /* in case the number of bytes sent is the same as the value size */
+        /* in case the number of bytes sent is the same as the value size
+        (not all data has been sent) */
         if(numberBytes != data->size) {
-            /* sets the error flag */
-            error = 1;
+            /* sets the error flag (non fatal) */
+            error = 2;
 
             /* breaks the loop */
             break;
         }
+
+        /* pops a value (data) from the linked list (write queue) */
+        popValueLinkedList(connection->writeQueue, (void **) &data, 1);
 
         /* in case the data callback is set */
         if(data->callback != NULL) {
@@ -190,26 +203,39 @@ void httpWriteHandler(struct ServiceSelect_t *serviceSelect, struct Connection_t
         deleteData(data);
     }
 
-    /* in case there is no error */
-    if(error == 0) {
-        /* VALOR HARDCODAD FAZER ISTO DE UMA MELHOR MANEIRA */
-        /* Tenho realmente de remover o ganho de estar a espera para escrita */
-        /* mas nao neste handler de http (nao e da competencia dele) */
-        SOCKET_SET_CLEAR(connection->socketHandle, &serviceSelect->socketsWriteSet);
-        connection->writeRegistered = 0;
+    /* switches over the error flag/value */
+    switch(error) {
+        /* in case there's no error */
+        case 0:
+            unregisterWriteServiceSelect(serviceSelect, connection);
+
+            /* breaks the switch */
+            break;
+
+        /* in case it's a fatal error */
+        case 1:
+            /* closes the socket */
+            SOCKET_CLOSE(connection->socketHandle);
+
+            /* removes the connection from the service select */
+            removeConnectionServiceSelect(serviceSelect, connection);
+
+            /* deletes the connection */
+            deleteConnection(connection);
+
+            /* breaks the switch */
+            break;
+
+        /* in case it's a non fatal error */
+        case 2:
+            /* breaks the switch */
+            break;
+
+        /* default case */
+        default:
+            /* breaks the switch */
+            break;
     }
-    /* otherwise an error occurred */
-    else {
-    }
-
-    /* closes the socket */
-    SOCKET_CLOSE(connection->socketHandle);
-
-    /* removes the connection from the service select */
-    removeConnectionServiceSelect(serviceSelect, connection);
-
-    /* deletes the connection */
-    deleteConnection(connection);
 }
 
 void startServiceSelect(struct ServiceSelect_t *serviceSelect) {
@@ -249,6 +275,8 @@ void startServiceSelect(struct ServiceSelect_t *serviceSelect) {
     /* calculates the size of the socket address */
     SOCKET_ADDRESS_SIZE clientSocketAddressSize = sizeof(SOCKET_ADDRESS);
 
+    unsigned long iMode = 1;
+
     /* starts the service */
     startService(serviceSelect->service);
 
@@ -268,11 +296,21 @@ void startServiceSelect(struct ServiceSelect_t *serviceSelect) {
             /* accepts the socket, retrieving the socket handle */
             socketHandle = SOCKET_ACCEPT(serviceSocketHandle, &socketAddress, clientSocketAddressSize);
 
+            ioctlsocket(socketHandle, FIONBIO, &iMode);
+
+
+
             /* prints a debug message */
             V_DEBUG_F("Accepted connection: %d\n", socketHandle);
 
             /* creates the connection */
             createConnection(&connection, socketHandle);
+
+            /* sets the service select service as the service in the connection */
+            connection->service = serviceSelect->service;
+
+            /* sets the service select as the service in the connection */
+            connection->serviceReference = serviceSelect;
 
             /* adds the connection to the service select */
             addConnectionServiceSelect(serviceSelect, connection);
@@ -455,4 +493,38 @@ void addSocketHandleSocketsSetServiceSelect(struct ServiceSelect_t *serviceSelec
 void removeSocketHandleSocketsSetServiceSelect(struct ServiceSelect_t *serviceSelect, SOCKET_HANDLE socketHandle, SOCKET_SET *socketsSet) {
     /* removes the socket handle from the sockets set */
     SOCKET_SET_CLEAR(socketHandle, socketsSet);
+}
+
+ERROR_CODE registerWriteServiceSelect(void *service, struct Connection_t *connection) {
+    /* retrieves the service select */
+    struct ServiceSelect_t *serviceSelect = (struct ServiceSelect_t *) service;
+
+    /* in case the connection is not write registered */
+    if(connection->writeRegistered == 0) {
+        /* adds the connection socket handle to the sockets write set */
+        addSocketHandleSocketsSetServiceSelect(serviceSelect, connection->socketHandle, &serviceSelect->socketsWriteSet);
+
+        /* sets the connection as write registered */
+        connection->writeRegistered = 1;
+    }
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE unregisterWriteServiceSelect(void *service, struct Connection_t *connection) {
+    /* retrieves the service select */
+    struct ServiceSelect_t *serviceSelect = (struct ServiceSelect_t *) service;
+
+    /* in case the connection is write registered */
+    if(connection->writeRegistered == 1) {
+        /* removes the connection socket handle from the sockets write set */
+        removeSocketHandleSocketsSetServiceSelect(serviceSelect, connection->socketHandle, &serviceSelect->socketsWriteSet);
+
+        /* unsets the connection as write registered */
+        connection->writeRegistered = 0;
+    }
+
+    /* raises no error */
+    RAISE_NO_ERROR;
 }

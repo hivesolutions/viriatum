@@ -29,16 +29,33 @@
 
 struct Data_t;
 
+/**
+ * The "default" function used to update a state in the connection
+ * for the given service context.
+ */
+typedef ERROR_CODE (*connectionUpdate) (void *, struct Connection_t *);
+
 typedef struct Service_t {
     unsigned char *name;
     unsigned int status;
     SOCKET_HANDLE serviceSocketHandle;
     struct LinkedList_t *connectionsList;
+    connectionUpdate registerWrite;
+    connectionUpdate unregisterWrite;
 } Service;
 
+/**
+ * Structure defining a connection
+ * conceptually, including the read and write
+ * queue.
+ * The references to the socket handle is also
+ * maintained.
+ */
 typedef struct Connection_t {
-    unsigned int writeRegistered;
     SOCKET_HANDLE socketHandle;
+    struct Service_t *service;
+    void *serviceReference;
+    unsigned int writeRegistered;
     struct LinkedList_t *readQueue;
     struct LinkedList_t *writeQueue;
 } Connection;
