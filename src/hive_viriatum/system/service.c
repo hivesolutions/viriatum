@@ -241,7 +241,7 @@ void writeConnection(struct Connection_t *connection, unsigned char *data, unsig
 
     /* sets the data contents */
     _data->data = data;
-	_data->dataBase = data;
+    _data->dataBase = data;
     _data->size = size;
     _data->callback = callback;
     _data->callbackParameters = callbackParameters;

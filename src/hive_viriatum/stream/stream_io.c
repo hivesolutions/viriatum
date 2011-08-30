@@ -57,6 +57,8 @@ ERROR_CODE readHandlerStreamIo(struct Connection_t *connection) {
         /* receives from the socket */
         numberBytes = SOCKET_RECEIVE(connection->socketHandle, bufferPointer, 1024, 0);
 
+		printf("reading %d\n", numberBytes);
+
         /* in case the number of bytes is zero (connection closed) */
         if(numberBytes == 0) {
             /* sets the error flag */
@@ -176,6 +178,8 @@ ERROR_CODE writeHandlerStreamIo(struct Connection_t *connection) {
 
         /* sends the value retrieving the number of bytes sent */
         numberBytes = SOCKET_SEND(connection->socketHandle, data->data, data->size, 0);
+
+		printf("%d\n", numberBytes);
 
         /* in case there was an error receiving from the socket */
         if(SOCKET_TEST_ERROR(numberBytes)) {
