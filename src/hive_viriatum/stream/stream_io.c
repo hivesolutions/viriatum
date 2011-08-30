@@ -215,6 +215,9 @@ ERROR_CODE writeHandlerStreamIo(struct Connection_t *connection) {
         /* in case the number of bytes sent is the same as the value size
         (not all data has been sent) */
         if(numberBytes != data->size) {
+            /* prints a debug message */
+            V_DEBUG_F("Shrinking data [%d bytes] (partial message sent)\n", numberBytes);
+
             /* updates the data internal structure
             to allow the sending of the pending partial data */
             data->data += numberBytes;
@@ -249,8 +252,8 @@ ERROR_CODE writeHandlerStreamIo(struct Connection_t *connection) {
         deleteData(data);
     }
 
-	/* prints a debug message */
-	V_DEBUG_F("Processing error code: %d\n", error);
+    /* prints a debug message */
+    V_DEBUG_F("Processing error code: %d\n", error);
 
     /* switches over the error flag and value */
     switch(error) {
