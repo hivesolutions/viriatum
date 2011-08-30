@@ -70,6 +70,8 @@ ERROR_CODE readHandlerStreamIo(struct Connection_t *connection) {
 
         /* in case there was an error receiving from the socket */
         if(SOCKET_TEST_ERROR(numberBytes)) {
+			printf("Ocorreu erro !!!")
+
             /* retrieves the receving error code */
             SOCKET_ERROR_CODE receivingErrorCode = SOCKET_GET_ERROR_CODE(numberBytes);
 
