@@ -176,10 +176,16 @@ void startServiceSelect(struct ServiceSelect_t *serviceSelect) {
             addConnectionServiceSelect(serviceSelect, connection);
         }
 
+        /* prints a debug message */
+        V_DEBUG("Processing read connections\n");
+
         /* iterates over the read connections */
         for(index = 0; index < readConnectionsSize; index++) {
             /* retrieves the current connection */
             currentConnection = readConnections[index];
+
+			/* prints a debug message */
+			V_DEBUG_F("Processing read connection: %d\n", currentConnection->socketHandle);
 
             /* in case the current connection is open */
             if(currentConnection->status == STATUS_OPEN && currentConnection->onRead != NULL) {
@@ -194,10 +200,16 @@ void startServiceSelect(struct ServiceSelect_t *serviceSelect) {
             }
         }
 
+        /* prints a debug message */
+        V_DEBUG("Processing write connections\n");
+
         /* iterates over the write connections */
         for(index = 0; index < writeConnectionsSize; index++) {
             /* retrieves the current connection */
             currentConnection = writeConnections[index];
+
+			/* prints a debug message */
+			V_DEBUG_F("Processing write connection: %d\n", currentConnection->socketHandle);
 
             /* in case the current connection is open */
             if(currentConnection->status == STATUS_OPEN && currentConnection->onWrite != NULL) {
@@ -378,9 +390,6 @@ void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_
         /* prints a debug message */
         V_DEBUG_F("Extraordinary select file descriptors not found: %d\n", selectCount);
     }
-
-    /* prints a debug message */
-    V_DEBUG("Cenas 2\n");
 
     /* sets the read index in the read connections size */
     *readConnectionsSize = readIndex;
