@@ -121,7 +121,7 @@ void startServiceSelect(struct ServiceSelect_t *serviceSelect) {
 
 
 
-    unsigned long iMode = 1;
+    unsigned long flags = 1;
 
 
 
@@ -150,8 +150,8 @@ void startServiceSelect(struct ServiceSelect_t *serviceSelect) {
 
 
 
-
-            SOCKET_IOCTL(socketHandle, FIONBIO, &iMode);
+			/* sets the socket to non blocking mdoe */
+            SOCKET_SET_NON_BLOCKING(socketHandle, flags);
 
 
 
