@@ -33,6 +33,7 @@
 #define EMPTY_ERROR_MESSAGE "N/A"
 
 #define ERROR_CODE unsigned int
+#define RAISE_AGAIN(errorCode) return errorCode
 #define RAISE_ERROR(errorCode) setLastErrorMessage(NULL); return errorCode
 #define RAISE_ERROR_M(errorCode, errorMessage) setLastErrorMessage(errorMessage); return errorCode
 #define RAISE_NO_ERROR return 0
