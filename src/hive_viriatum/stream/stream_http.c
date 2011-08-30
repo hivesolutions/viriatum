@@ -46,7 +46,7 @@ void dataHandlerStreamHttp(struct Connection_t *connection, unsigned char *buffe
     httpParser->parameters = connection;
 
     /* sets the structures for the handler */
-    setHandlerFile(httpParser, httpSettings);
+    setHandlerDefault(httpParser, httpSettings);
 
 
     // TODO: tenho de testar quantos bytes processei !!!
@@ -58,7 +58,7 @@ void dataHandlerStreamHttp(struct Connection_t *connection, unsigned char *buffe
 
 
     /* unsets the structures for the handler */
-    unsetHandlerFile(httpParser, httpSettings);
+    unsetHandlerDefault(httpParser, httpSettings);
 
     /* deletes the http parser */
     deleteHttpParser(httpParser);
