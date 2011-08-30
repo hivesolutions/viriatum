@@ -317,6 +317,34 @@ void popValueLinkedList(struct LinkedList_t *linkedList, void **valuePointer, ch
     }
 }
 
+void peekLinkedList(struct LinkedList_t *linkedList, struct LinkedListNode_t **linkedListNodePointer) {
+    /* allocates space for the linked list node */
+    struct LinkedListNode_t *linkedListNode;
+
+    /* retrieves the initial linked list node */
+    getLinkedList(linkedList, 0, &linkedListNode);
+
+    /* sets the linked list node in the linked list node pointer */
+    *linkedListNodePointer = linkedListNode;
+}
+
+void peekValueLinkedList(struct LinkedList_t *linkedList, void **valuePointer) {
+    /* allocates space for the linked list node */
+    struct LinkedListNode_t *linkedListNode;
+
+    /* peeks the linked list node */
+    peekLinkedList(linkedList, &linkedListNode);
+
+    /* in case the linked list node is invalid */
+    if(linkedListNode == NULL) {
+        /* sets the null valie in the value pointer */
+        *valuePointer = NULL;
+    } else {
+        /* sets the linked list node value in the value pointer */
+        *valuePointer = linkedListNode->value;
+    }
+}
+
 void createIteratorLinkedList(struct LinkedList_t *linkedList, struct Iterator_t **iteratorPointer) {
     /* allocates the iterator */
     struct Iterator_t *iterator;
