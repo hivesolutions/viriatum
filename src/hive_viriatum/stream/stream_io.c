@@ -71,18 +71,27 @@ ERROR_CODE readHandlerStreamIo(struct Connection_t *connection) {
             /* retrieves the receving error code */
             SOCKET_ERROR_CODE receivingErrorCode = SOCKET_GET_ERROR_CODE(numberBytes);
 
-            if(receivingErrorCode == SOCKET_WOULDBLOCK) {
-                /* prints a debug message */
-                V_DEBUG("Read structures full: WOULDBLOCK\n");
+			/* switches over the receiving error code */
+			switch(receivingErrorCode) {
+				case SOCKET_WOULDBLOCK:
+					/* prints a debug message */
+					V_DEBUG("Read structures full: WOULDBLOCK\n");
+	
+					/* sets the error flag (non fatal) */
+					error = 2;
 
-                /* sets the error flag (non fatal) */
-                error = 2;
-            } else {
-                /* prints the error */
-                V_DEBUG_F("Problem receiving from socket: %d\n", receivingErrorCode);
+					/* breaks the switch */
+					break;
 
-                /* sets the error flag */
-                error = 1;
+				default:
+					/* prints the error */
+					V_DEBUG_F("Problem receiving from socket: %d\n", receivingErrorCode);
+
+					/* sets the error flag */
+					error = 1;
+
+					/* breaks the switch */
+					break;
             }
 
             /* breaks the loop */
@@ -167,19 +176,28 @@ ERROR_CODE writeHandlerStreamIo(struct Connection_t *connection) {
             /* retrieves the receving error code */
             SOCKET_ERROR_CODE receivingErrorCode = SOCKET_GET_ERROR_CODE(numberBytes);
 
-            if(receivingErrorCode == SOCKET_WOULDBLOCK) {
-                /* prints a debug message */
-                V_DEBUG("Write structures full: WOULDBLOCK\n");
+			/* switches over the receiving error code */
+			switch(receivingErrorCode) {
+				case SOCKET_WOULDBLOCK:
+					/* prints a debug message */
+					V_DEBUG("Write structures full: WOULDBLOCK\n");
 
-                /* sets the error flag (non fatal) */
-                error = 2;
-            } else {
-                /* prints the error */
-                V_DEBUG_F("Problem sending from socket: %d\n", receivingErrorCode);
+					/* sets the error flag (non fatal) */
+	                error = 2;
 
-                /* sets the error flag */
-                error = 1;
-            }
+					/* breaks the switch */
+					break;
+
+				default:
+					/* prints the error */
+					V_DEBUG_F("Problem sending from socket: %d\n", receivingErrorCode);
+
+					/* sets the error flag */
+					error = 1;
+
+					/* breaks the switch */
+					break;
+			}
 
             /* breaks the loop */
             break;
