@@ -37,6 +37,7 @@
 #define SOCKET_ADDRESS_INPUT SOCKADDR_IN
 #define SOCKET_ERROR_CODE int
 #define SOCKET_IOCTL ioctlsocket
+#define SOCKET_EAGAIN 65536
 #define SOCKET_WOULDBLOCK WSAEWOULDBLOCK
 #define SOCKET_INTERNET_TYPE AF_INET
 #define SOCKET_INTERNET6_TYPE AF_INET6
@@ -87,6 +88,7 @@
 #define SOCKET_ERROR_CODE int
 #define SOCKET_IOCTL ioctl
 #define SOCKET_FCNTL fcntl
+#define SOCKET_EAGAIN EAGAIN
 #define SOCKET_WOULDBLOCK EWOULDBLOCK
 #define SOCKET_INTERNET_TYPE AF_INET
 #define SOCKET_INTERNET6_TYPE AF_INET6
@@ -122,7 +124,7 @@
 #define SOCKET_SET_CLEAR(socketHandle, socketsSet) FD_CLR(socketHandle, socketsSet)
 #define SOCKET_SET_IS_SET(socketHandle, socketsSet) FD_ISSET(socketHandle, socketsSet)
 #define SOCKET_SET_NON_BLOCKING(socketHandle, flags) if((flags = SOCKET_FCNTL(socketHandle, F_GETFL, 0) == -1)) { flags = 0; }\
-    SOCKET_FCNTL(socketHandle, F_SETFL, flags | O_NONBLOCK);
+    SOCKET_FCNTL(socketHandle, F_SETFL, flags | O_NONBLOCK)
 #endif
 
 #ifdef VIRIATUM_PLATFORM_MSC
