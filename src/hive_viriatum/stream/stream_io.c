@@ -57,8 +57,6 @@ ERROR_CODE readHandlerStreamIo(struct Connection_t *connection) {
         /* receives from the socket */
         numberBytes = SOCKET_RECEIVE(connection->socketHandle, bufferPointer, 1024, 0);
 
-		printf("reading %d\n", numberBytes);
-
         /* in case the number of bytes is zero (connection closed) */
         if(numberBytes == 0) {
             /* sets the error flag */
@@ -73,13 +71,11 @@ ERROR_CODE readHandlerStreamIo(struct Connection_t *connection) {
             /* retrieves the receving error code */
             SOCKET_ERROR_CODE receivingErrorCode = SOCKET_GET_ERROR_CODE(numberBytes);
 
-			printf("Ocorreu erro !!!");
-
             /* switches over the receiving error code */
             switch(receivingErrorCode) {
                 case SOCKET_WOULDBLOCK:
                     /* prints a debug message */
-                    printf("Read structures not ready: WOULDBLOCK\n");
+                    V_DEBUG_F("Read structures not ready: WOULDBLOCK\n");
 
                     /* sets the error flag (non fatal) */
                     error = 2;
@@ -89,7 +85,7 @@ ERROR_CODE readHandlerStreamIo(struct Connection_t *connection) {
 
                 default:
                     /* prints the error */
-                    printf("Problem receiving from socket: %d\n", receivingErrorCode);
+                    V_DEBUG_F("Problem receiving from socket: %d\n", receivingErrorCode);
 
                     /* sets the error flag */
                     error = 1;
@@ -181,8 +177,6 @@ ERROR_CODE writeHandlerStreamIo(struct Connection_t *connection) {
         /* sends the value retrieving the number of bytes sent */
         numberBytes = SOCKET_SEND(connection->socketHandle, data->data, data->size, 0);
 
-		printf("%d\n", numberBytes);
-
         /* in case there was an error receiving from the socket */
         if(SOCKET_TEST_ERROR(numberBytes)) {
             /* retrieves the receving error code */
@@ -192,7 +186,7 @@ ERROR_CODE writeHandlerStreamIo(struct Connection_t *connection) {
             switch(receivingErrorCode) {
                 case SOCKET_WOULDBLOCK:
                     /* prints a debug message */
-                    printf("Write structures not ready: WOULDBLOCK\n");
+                    V_DEBUG_F("Write structures not ready: WOULDBLOCK\n");
 
                     /* sets the error flag (non fatal) */
                     error = 2;
@@ -202,7 +196,7 @@ ERROR_CODE writeHandlerStreamIo(struct Connection_t *connection) {
 
                 default:
                     /* prints the error */
-                    printf("Problem sending from socket: %d\n", receivingErrorCode);
+                    V_DEBUG_F("Problem sending from socket: %d\n", receivingErrorCode);
 
                     /* sets the error flag */
                     error = 1;
