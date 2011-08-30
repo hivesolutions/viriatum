@@ -1393,7 +1393,7 @@ int processDataHttpParser(struct HttpParser_t *httpParser, struct HttpSettings_t
                     case HEADER_STATE_MATCHING_TRANSFER_ENCODING_CHUNKED:
                         index++;
 
-                        if(index > sizeof(HTTP_CHUNKED) - 1 || byte != HTTP_CHUNKED[index]) {
+                        if(index > sizeof(HTTP_CHUNKED) - 1 || byteToken != HTTP_CHUNKED[index]) {
                             headerState = HEADER_STATE_GENERAL;
                         } else if(index == sizeof(HTTP_CHUNKED) - 2) {
                             headerState = HEADER_STATE_TRANSFER_ENCODING_CHUNKED;
@@ -1406,7 +1406,7 @@ int processDataHttpParser(struct HttpParser_t *httpParser, struct HttpSettings_t
                     case HEADER_STATE_MATCHING_CONNECTION_KEEP_ALIVE:
                         index++;
 
-                        if(index > sizeof(HTTP_KEEP_ALIVE) - 1 || byte != HTTP_KEEP_ALIVE[index]) {
+                        if(index > sizeof(HTTP_KEEP_ALIVE) - 1 || byteToken != HTTP_KEEP_ALIVE[index]) {
                             headerState = HEADER_STATE_GENERAL;
                         } else if(index == sizeof(HTTP_KEEP_ALIVE) - 2) {
                             headerState = HEADER_STATE_CONNECTION_KEEP_ALIVE;
