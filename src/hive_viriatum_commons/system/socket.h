@@ -71,8 +71,7 @@
 #define SOCKET_SET_SET(socketHandle, socketsSet) FD_SET(socketHandle, socketsSet)
 #define SOCKET_SET_CLEAR(socketHandle, socketsSet) FD_CLR(socketHandle, socketsSet)
 #define SOCKET_SET_IS_SET(socketHandle, socketsSet) FD_ISSET(socketHandle, socketsSet)
-#define SOCKET_SET_NON_BLOCKING(socketHandle, flags)\
-	SOCKET_IOCTL(socketHandle, FIONBIO, &flags)
+#define SOCKET_SET_NON_BLOCKING(socketHandle, flags) SOCKET_IOCTL(socketHandle, FIONBIO, &flags)
 #endif
 
 #ifdef VIRIATUM_PLATFORM_UNIX
@@ -122,7 +121,8 @@
 #define SOCKET_SET_SET(socketHandle, socketsSet) FD_SET(socketHandle, socketsSet)
 #define SOCKET_SET_CLEAR(socketHandle, socketsSet) FD_CLR(socketHandle, socketsSet)
 #define SOCKET_SET_IS_SET(socketHandle, socketsSet) FD_ISSET(socketHandle, socketsSet)
-#define SOCKET_SET_NON_BLOCKING(socketHandle, flags) SOCKET_FCNTL(socketHandle, F_SETFL, O_NONBLOCK);
+#define SOCKET_SET_NON_BLOCKING(socketHandle, flags)\ if((flags = fcntl(socketHandle, F_GETFL, 0) == -1)) { flags = 0; }
+    SOCKET_FCNTL(socketHandle, F_SETFL, flags | O_NONBLOCK);
 #endif
 
 #ifdef VIRIATUM_PLATFORM_MSC

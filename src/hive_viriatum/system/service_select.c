@@ -150,7 +150,7 @@ void startServiceSelect(struct ServiceSelect_t *serviceSelect) {
 
 
 
-			/* sets the socket to non blocking mdoe */
+            /* sets the socket to non blocking mdoe */
             SOCKET_SET_NON_BLOCKING(socketHandle, flags);
 
 
@@ -170,9 +170,9 @@ void startServiceSelect(struct ServiceSelect_t *serviceSelect) {
             /* sets the service select as the service in the connection */
             connection->serviceReference = serviceSelect;
 
-			/* TODO: This setting is HARDCODED should be configured */
-			connection->onRead = readHandlerStreamIo;
-			connection->onWrite = writeHandlerStreamIo;
+            /* TODO: This setting is HARDCODED should be configured */
+            connection->onRead = readHandlerStreamIo;
+            connection->onWrite = writeHandlerStreamIo;
 
             /* adds the connection to the service select */
             addConnectionServiceSelect(serviceSelect, connection);
