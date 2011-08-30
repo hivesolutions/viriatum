@@ -242,9 +242,15 @@ ERROR_CODE writeHandlerStreamIo(struct Connection_t *connection) {
             V_DEBUG("Finished calling write callback\n");
         }
 
+        /* prints a debug message */
+        V_DEBUG("Deleting data\n");
+
         /* deletes the data */
         deleteData(data);
     }
+
+	/* prints a debug message */
+    V_DEBUG_F("Processing error code\n", error);
 
     /* switches over the error flag and value */
     switch(error) {
