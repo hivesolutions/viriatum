@@ -94,8 +94,8 @@ void startService(struct Service_t *service) {
 
     /* sets the socket address attributes */
     socketAddress.sin_family = SOCKET_INTERNET_TYPE;
-    socketAddress.sin_addr.s_addr = inet_addr("0.0.0.0");
-    socketAddress.sin_port = htons(8282);
+    socketAddress.sin_addr.s_addr = inet_addr(VIRIATUM_DEFAULT_HOST);
+    socketAddress.sin_port = htons(VIRIATUM_DEFAULT_PORT);
 
     /* creates the service socket for the given types */
     service->serviceSocketHandle = SOCKET_CREATE(SOCKET_INTERNET_TYPE, SOCKET_PACKET_TYPE, SOCKET_PROTOCOL_TCP);
@@ -166,7 +166,7 @@ void createConnection(struct Connection_t **connectionPointer, SOCKET_HANDLE soc
     /* sets the socket handle in the connection */
     connection->socketHandle = socketHandle;
 
-    /* sets teh write registered to false */
+    /* sets the write registered to false */
     connection->writeRegistered = 0;
 
     /* creates the read queue linked list */

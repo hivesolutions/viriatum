@@ -39,3 +39,6 @@
 #define VIRIATUM_DESCRIPTION "Viriatum"
 #define VIRIATUM_OBSERVATIONS "Viriatum HTTP Server"
 #define VIRIATUM_COPYRIGHT "Copyright (c) 2010 Hive Solutions Lda. All rights reserved."
+
+#define VIRIATUM_DEFAULT_HOST "0.0.0.0"
+#define VIRIATUM_DEFAULT_PORT 8282

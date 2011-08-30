@@ -32,13 +32,49 @@
 #include "service.h"
 
 typedef struct ServiceSelect_t {
+    /**
+     * The service reference, for top
+     * level reference.
+     */
     struct Service_t *service;
+
+    /**
+     * The value of the highest socket
+     * reference (performance issue).
+     */
     SOCKET_HANDLE socketsSetHighest;
+
+    /**
+     * The socket set for the read sockets.
+     */
     SOCKET_SET socketsReadSet;
+
+    /**
+     * The socket set for the write sockets.
+     */
     SOCKET_SET socketsWriteSet;
+
+    /**
+     * The temporary socket set for the
+     * read sockets.
+     */
     SOCKET_SET socketsReadSetTemporary;
+
+    /**
+     * The temporary socket set for the
+     * write sockets.
+     */
     SOCKET_SET socketsWriteSetTemporary;
+
+    /**
+     * The timeout value used for the
+     * select call.
+     */
     struct timeval selectTimeout;
+
+    /**
+     * The temporary select timeout value.
+     */
     struct timeval selectTimeoutTemporary;
 } ServiceSelect_t;
 
@@ -50,3 +86,8 @@ void removeConnectionServiceSelect(struct ServiceSelect_t *serviceSelect, struct
 void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_t **readConnections, struct Connection_t **writeConnections, unsigned int *readConnectionsSize, unsigned int *writeConnectionsSize, unsigned int *serviceSocketReady);
 void addSocketHandleSocketsSetServiceSelect(struct ServiceSelect_t *serviceSelect, SOCKET_HANDLE socketHandle, SOCKET_SET *socketsSet);
 void removeSocketHandleSocketsSetServiceSelect(struct ServiceSelect_t *serviceSelect, SOCKET_HANDLE socketHandle, SOCKET_SET *socketsSet);
+
+
+
+void registerConnectionServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_t *connection, char operation);
+void unregisterConnectionServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_t *connection, char operation);
