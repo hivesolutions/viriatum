@@ -75,7 +75,7 @@ ERROR_CODE readHandlerStreamIo(struct Connection_t *connection) {
             switch(receivingErrorCode) {
                 case SOCKET_WOULDBLOCK:
                     /* prints a debug message */
-                    V_DEBUG_F("Read structures not ready: WOULDBLOCK\n");
+                    V_DEBUG("Read structures not ready: WOULDBLOCK\n");
 
                     /* sets the error flag (non fatal) */
                     error = 2;
@@ -186,7 +186,7 @@ ERROR_CODE writeHandlerStreamIo(struct Connection_t *connection) {
             switch(receivingErrorCode) {
                 case SOCKET_WOULDBLOCK:
                     /* prints a debug message */
-                    V_DEBUG_F("Write structures not ready: WOULDBLOCK\n");
+                    V_DEBUG("Write structures not ready: WOULDBLOCK\n");
 
                     /* sets the error flag (non fatal) */
                     error = 2;
