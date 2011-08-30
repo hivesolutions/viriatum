@@ -184,16 +184,19 @@ void startServiceSelect(struct ServiceSelect_t *serviceSelect) {
             /* retrieves the current connection */
             currentConnection = readConnections[index];
 
-			/* prints a debug message */
-			V_DEBUG_F("Processing read connection: %d\n", currentConnection->socketHandle);
+            /* prints a debug message */
+            V_DEBUG_F("Processing read connection: %d\n", currentConnection->socketHandle);
 
             /* in case the current connection is open */
             if(currentConnection->status == STATUS_OPEN && currentConnection->onRead != NULL) {
-				/* prints a debug message */
-				V_DEBUG("Calling on read handler\n");
+                /* prints a debug message */
+                V_DEBUG("Calling on read handler\n");
 
                 /* calls the on read handler */
                 currentConnection->onRead(currentConnection);
+
+                /* prints a debug message */
+                V_DEBUG("Finished calling on read handler\n");
             }
 
             /* in case the current connection is closed */
@@ -211,16 +214,19 @@ void startServiceSelect(struct ServiceSelect_t *serviceSelect) {
             /* retrieves the current connection */
             currentConnection = writeConnections[index];
 
-			/* prints a debug message */
-			V_DEBUG_F("Processing write connection: %d\n", currentConnection->socketHandle);
+            /* prints a debug message */
+            V_DEBUG_F("Processing write connection: %d\n", currentConnection->socketHandle);
 
             /* in case the current connection is open */
             if(currentConnection->status == STATUS_OPEN && currentConnection->onWrite != NULL) {
-				/* prints a debug message */
-				V_DEBUG("Calling on write handler\n");
+                /* prints a debug message */
+                V_DEBUG("Calling on write handler\n");
 
                 /* calls the on write handler */
                 currentConnection->onWrite(currentConnection);
+
+                /* prints a debug message */
+                V_DEBUG("Finished calling on write handler\n");
             }
 
             /* in case the current connection is closed */
