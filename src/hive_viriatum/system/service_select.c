@@ -151,7 +151,7 @@ void startServiceSelect(struct ServiceSelect_t *serviceSelect) {
 
 
 
-            ioctlsocket(socketHandle, FIONBIO, &iMode);
+            SOCKET_IOCTL(socketHandle, FIONBIO, &iMode);
 
 
 
