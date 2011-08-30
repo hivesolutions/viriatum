@@ -112,7 +112,7 @@
 #define SOCKET_GET_HOST_BY_NAME(hostname) gethostbyname(hostname)
 #define SOCKET_TEST_SOCKET(socketHandle) socketHandle < 0
 #define SOCKET_TEST_ERROR(result) result < 0
-#define SOCKET_GET_ERROR_CODE(result) (SOCKET_ERROR_CODE) result
+#define SOCKET_GET_ERROR_CODE(result) (SOCKET_ERROR_CODE) socket_errno()
 #define SOCKET_SEND(socketHandle, buffer, length, flags) write(socketHandle, buffer, length)
 #define SOCKET_RECEIVE(socketHandle, buffer, length, flags) read(socketHandle, buffer, length)
 #define SOCKET_SET_OPTIONS(socketHandle, level, optionName, optionValue) setsockopt(socketHandle, level, optionName, &optionValue, sizeof(optionValue))
