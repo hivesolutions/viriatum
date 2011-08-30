@@ -73,11 +73,9 @@ int main(int argc, char *argv[]) {
 
     /* tests the error code for error */
     if(IS_ERROR_CODE(returnValue)) {
-        V_DEBUG_F("%s\n", getLastErrorMessageSafe());
+		/* prints a warning message */
+        V_WARNING_F("%s\n", getLastErrorMessageSafe());
     }
-
-    /* runs the simple tests */
-    runSimpleTests();
 
     /* runs the service */
     runService();

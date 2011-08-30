@@ -44,8 +44,8 @@ ERROR_CODE loadModule(unsigned char *modulePath) {
 
     /* in case the mod library was not loaded */
     if(modLibrary == NULL) {
-        /* prints a debug message */
-        V_DEBUG("Problem loading library\n");
+        /* prints a warning message */
+        V_WARNING("Problem loading library (not found)\n");
 
         /* raises an error */
         RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem loading library");
@@ -62,8 +62,8 @@ ERROR_CODE loadModule(unsigned char *modulePath) {
 
     /* in case the start module function was not found */
     if(startModuleFunction == NULL) {
-        /* prints a debug message */
-        V_DEBUG_F("No such symbol %s in library\n", "startModule");
+        /* prints a warning message */
+        V_WARNING_F("No such symbol %s in library\n", "startModule");
 
         /* raises an error */
         RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem finding symbol");

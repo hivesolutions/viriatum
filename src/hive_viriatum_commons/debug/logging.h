@@ -28,14 +28,20 @@
 #pragma once
 
 #ifdef VIRIATUM_DEBUG
-#define V_DEBUG(format) printf(format)
-#define V_DEBUG_F(format, ...) printf(format, __VA_ARGS__)
+#define V_DEBUG(format) printf("[DEBUG] "); printf(format)
+#define V_DEBUG_F(format, ...) printf("[DEBUG] "); printf(format, __VA_ARGS__)
 #endif
 
 #ifndef VIRIATUM_DEBUG
 #define V_DEBUG(format) dump(format)
 #define V_DEBUG_F(format, ...) dumpMultiple(format, __VA_ARGS__)
 #endif
+
+#define V_WARNING(format) printf("[WARNING] "); printf(format)
+#define V_WARNING_F(format, ...) printf("[WARNING] "); printf(format, __VA_ARGS__)
+
+#define V_ERROR(format) printf("[ERROR] "); printf(format)
+#define V_ERROR_F(format, ...) printf("[ERROR] "); printf(format, __VA_ARGS__)
 
 #define V_PRINT(format) printf(format)
 #define V_PRINT_F(format, ...) printf(format, __VA_ARGS__)
