@@ -26,3 +26,8 @@
 */
 
 #pragma once
+
+#include "../http/http.h"
+#include "../handlers/handlers.h"
+
+void dataHandlerStreamHttp(struct Connection_t *connection, unsigned char *buffer, size_t bufferSize);

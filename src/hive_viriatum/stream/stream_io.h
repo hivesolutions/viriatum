@@ -26,3 +26,8 @@
 */
 
 #pragma once
+
+#include "../system/service.h"
+
+ERROR_CODE readHandlerStreamIo(struct Connection_t *connection);
+ERROR_CODE writeHandlerStreamIo(struct Connection_t *connection);
