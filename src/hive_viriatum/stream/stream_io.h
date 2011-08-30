@@ -31,3 +31,5 @@
 
 ERROR_CODE readHandlerStreamIo(struct Connection_t *connection);
 ERROR_CODE writeHandlerStreamIo(struct Connection_t *connection);
+ERROR_CODE errorHandlerStreamIo(struct Connection_t *connection);
+ERROR_CODE closeHandlerStreamIo(struct Connection_t *connection);

@@ -287,3 +287,13 @@ ERROR_CODE writeHandlerStreamIo(struct Connection_t *connection) {
     /* returns the error code */
     return error;
 }
+
+ERROR_CODE errorHandlerStreamIo(struct Connection_t *connection) {
+	return 0;
+}
+
+ERROR_CODE closeHandlerStreamIo(struct Connection_t *connection) {
+	printf("Connection closed\n");
+
+	return 0;
+}
