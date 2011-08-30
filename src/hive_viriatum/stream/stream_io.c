@@ -94,6 +94,12 @@ ERROR_CODE readHandlerStreamIo(struct Connection_t *connection) {
 
         /* increments the buffer size with the number of bytes */
         bufferSize += numberBytes;
+
+        /* in case the viriatum is set to blocking */
+        if(!VIRIATUM_NON_BLOCKING) {
+            /* breaks the loop */
+            break;
+        }
     }
 
     /* switches over the error flag and value */
