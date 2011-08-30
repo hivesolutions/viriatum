@@ -65,6 +65,7 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <dlfcn.h>
+#include <errno.h>
 #endif
 
 #include <stdio.h>
