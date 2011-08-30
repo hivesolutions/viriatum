@@ -43,4 +43,5 @@ ERROR_CODE headerValueCallbackHandlerDefault(struct HttpParser_t *httpParser, co
 ERROR_CODE headersCompleteCallbackHandlerDefault(struct HttpParser_t *httpParser);
 ERROR_CODE bodyCallbackHandlerDefault(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize);
 ERROR_CODE messageCompleteCallbackHandlerDefault(struct HttpParser_t *httpParser);
-ERROR_CODE _processResponseHandlerDefault(struct HttpParser_t *httpParser);
+ERROR_CODE _sendResponseHandlerDefault(struct HttpParser_t *httpParser);
+ERROR_CODE _sendResponseCallbackHandlerDefault(struct Connection_t *connection, struct Data_t *data, void *parameters);

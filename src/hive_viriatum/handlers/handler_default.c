@@ -194,17 +194,20 @@ ERROR_CODE bodyCallbackHandlerDefault(struct HttpParser_t *httpParser, const uns
 }
 
 ERROR_CODE messageCompleteCallbackHandlerDefault(struct HttpParser_t *httpParser) {
+     /* retrieves the connection from the http parser parameters */
+    struct Connection_t *connection = (struct Connection_t *) httpParser->parameters;
+
     /* prints an information */
     V_DEBUG("HTTP request parsed\n");
 
-    /* processes (creates) the reponse */
-    _processResponseHandlerDefault(httpParser);
+    /* sends (and creates) the reponse */
+    _sendResponseHandlerDefault(httpParser);
 
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _processResponseHandlerDefault(struct HttpParser_t *httpParser) {
+ERROR_CODE _sendResponseHandlerDefault(struct HttpParser_t *httpParser) {
     /* allocates the response buffer */
     char *responseBuffer = malloc(1024);
 
@@ -215,7 +218,21 @@ ERROR_CODE _processResponseHandlerDefault(struct HttpParser_t *httpParser) {
     SPRINTF(responseBuffer, 1024, "HTTP/1.1 200 OK\r\nServer: %s/%s (%s @ %s)\r\nContent-Length: %lu\r\n\r\nhello world", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, strlen("hello world"));
 
     /* writes the response to the connection */
-    writeConnection(connection, (unsigned char *) responseBuffer, strlen(responseBuffer), NULL, NULL);
+    writeConnection(connection, (unsigned char *) responseBuffer, strlen(responseBuffer), _sendResponseCallbackHandlerDefault, (void *) httpParser->flags);
+
+    /* raise no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE _sendResponseCallbackHandlerDefault(struct Connection_t *connection, struct Data_t *data, void *parameters) {
+    /* retrieves the (http) flags */
+    unsigned char flags = (unsigned char) parameters;
+
+    /* in case the connection is not meant to be kept alive */
+    if(!(flags & FLAG_CONNECTION_KEEP_ALIVE)) {
+        /* closes the connection */
+        connection->closeConnection(connection);
+    }
 
     /* raise no error */
     RAISE_NO_ERROR;

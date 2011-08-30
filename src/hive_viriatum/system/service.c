@@ -178,8 +178,14 @@ void createConnection(struct Connection_t **connectionPointer, SOCKET_HANDLE soc
     /* sets the service as not set */
     connection->service = NULL;
 
+    /* sets the service reference as not set */
+    connection->serviceReference = NULL;
+
     /* sets the write registered to false */
     connection->writeRegistered = 0;
+
+    /* sets the close connection to unset */
+    connection->closeConnection = NULL;
 
     /* creates the read queue linked list */
     createLinkedList(&connection->readQueue);
@@ -222,7 +228,7 @@ void writeConnection(struct Connection_t *connection, unsigned char *data, unsig
     appendValueLinkedList(connection->writeQueue, (void *) _data);
 
     /* registers the connection for write */
-    service->registerWrite(connection->serviceReference, connection);
+    service->registerWrite(connection);
 }
 
 void openConection(struct Connection_t *connection) {

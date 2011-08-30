@@ -40,6 +40,8 @@ http/http_parser.c \
 http/http_request.c \
 io/file.c \
 module/loading.c \
+stream/stream_http.c \
+stream/stream_io.c \
 system/service.c \
 system/service_select.c \
 test/simple_test.c 
