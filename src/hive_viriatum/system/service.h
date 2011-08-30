@@ -43,6 +43,11 @@ typedef struct Connection_t {
     struct LinkedList_t *writeQueue;
 } Connection;
 
+typedef enum Operation_e {
+    WRITE_OPERATION = 1,
+    READ_OPERATION
+} Operation;
+
 /**
  * The "default" callback function to be used, without
  * any extra arguments.
@@ -89,6 +94,13 @@ void createData(struct Data_t **dataPointer);
  * @param data The data to be destroyed.
  */
 void deleteData(struct Data_t *data);
+
+/**
+ * Starts the given service, initializing the
+ * internal structures and the main loop.
+ *
+ * @param service The service to be initialized.
+ */
 void startService(struct Service_t *service);
 void addConnectionService(struct Service_t *service, struct Connection_t *connection);
 void removeConnectionService(struct Service_t *service, struct Connection_t *connection);
