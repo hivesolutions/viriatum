@@ -250,7 +250,7 @@ ERROR_CODE writeHandlerStreamIo(struct Connection_t *connection) {
     }
 
 	/* prints a debug message */
-    V_DEBUG_F("Processing error code\n", error);
+	V_DEBUG_F("Processing error code: %d\n", error);
 
     /* switches over the error flag and value */
     switch(error) {
