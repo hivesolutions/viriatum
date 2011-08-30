@@ -36,6 +36,8 @@
 #define SOCKET_ADDRESS SOCKADDR
 #define SOCKET_ADDRESS_INPUT SOCKADDR_IN
 #define SOCKET_ERROR_CODE int
+#define SOCKET_IOCTL ioctlsocket
+#define SOCKET_WOULDBLOCK WSAEWOULDBLOCK
 #define SOCKET_INTERNET_TYPE AF_INET
 #define SOCKET_INTERNET6_TYPE AF_INET6
 #define SOCKET_PACKET_TYPE SOCK_STREAM
@@ -69,8 +71,6 @@
 #define SOCKET_SET_SET(socketHandle, socketsSet) FD_SET(socketHandle, socketsSet)
 #define SOCKET_SET_CLEAR(socketHandle, socketsSet) FD_CLR(socketHandle, socketsSet)
 #define SOCKET_SET_IS_SET(socketHandle, socketsSet) FD_ISSET(socketHandle, socketsSet)
-#define SOCKET_IOCTL ioctlsocket
-#define SOCKET_WOULDBLOCK WSAEWOULDBLOCK
 #define SOCKET_SET_NON_BLOCKING(socketHandle, flags)\
 	SOCKET_IOCTL(socketHandle, FIONBIO, &flags)
 #endif
@@ -86,6 +86,9 @@
 #define SOCKET_ADDRESS struct sockaddr
 #define SOCKET_ADDRESS_INPUT struct sockaddr_in
 #define SOCKET_ERROR_CODE int
+#define SOCKET_IOCTL ioctl
+#define SOCKET_FCNTL fcntl
+#define SOCKET_WOULDBLOCK EWOULDBLOCK
 #define SOCKET_INTERNET_TYPE AF_INET
 #define SOCKET_INTERNET6_TYPE AF_INET6
 #define SOCKET_PACKET_TYPE SOCK_STREAM
@@ -119,9 +122,6 @@
 #define SOCKET_SET_SET(socketHandle, socketsSet) FD_SET(socketHandle, socketsSet)
 #define SOCKET_SET_CLEAR(socketHandle, socketsSet) FD_CLR(socketHandle, socketsSet)
 #define SOCKET_SET_IS_SET(socketHandle, socketsSet) FD_ISSET(socketHandle, socketsSet)
-#define SOCKET_IOCTL ioctl
-#define SOCKET_FCNTL fcntl
-#define SOCKET_WOULDBLOCK EWOULDBLOCK
 #define SOCKET_SET_NON_BLOCKING(socketHandle, flags) SOCKET_FCNTL(socketHandle, F_SETFL, O_NONBLOCK);
 #endif
 
