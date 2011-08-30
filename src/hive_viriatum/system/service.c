@@ -67,6 +67,9 @@ void createData(struct Data_t **dataPointer) {
     /* sets the data data */
     data->data = NULL;
 
+    /* sets the data data base */
+    data->dataBase = NULL;
+
     /* sets the data size */
     data->size = 0;
 
@@ -82,7 +85,7 @@ void createData(struct Data_t **dataPointer) {
 
 void deleteData(struct Data_t *data) {
     /* releases the data */
-    free(data->data);
+    free(data->dataBase);
 
     /* releases the data */
     free(data);
@@ -238,6 +241,7 @@ void writeConnection(struct Connection_t *connection, unsigned char *data, unsig
 
     /* sets the data contents */
     _data->data = data;
+	_data->dataBase = data;
     _data->size = size;
     _data->callback = callback;
     _data->callbackParameters = callbackParameters;
