@@ -73,7 +73,7 @@ ERROR_CODE readHandlerStreamIo(struct Connection_t *connection) {
 
             if(receivingErrorCode == SOCKET_WOULDBLOCK) {
 				/* prints a debug message */
-				V_DEBUG_F("Read structures full: WOULDBLOCK\n");
+				V_DEBUG("Read structures full: WOULDBLOCK\n");
 
                 /* sets the error flag (non fatal) */
                 error = 2;
@@ -163,7 +163,7 @@ ERROR_CODE writeHandlerStreamIo(struct Connection_t *connection) {
 
             if(receivingErrorCode == SOCKET_WOULDBLOCK) {
 				/* prints a debug message */
-				V_DEBUG_F("Write structures full: WOULDBLOCK\n");
+				V_DEBUG("Write structures full: WOULDBLOCK\n");
 
                 /* sets the error flag (non fatal) */
                 error = 2;
