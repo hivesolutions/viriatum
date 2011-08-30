@@ -40,7 +40,7 @@ void createService(struct Service_t **servicePointer) {
     createLinkedList(&service->connectionsList);
 
     /* setst the service status as closed */
-    service->status = 1;
+    service->status = STATUS_CLOSED;
 
     /* sets the service register write */
     service->registerWrite = NULL;
@@ -148,8 +148,8 @@ void startService(struct Service_t *service) {
         return;
     }
 
-    /* setst the service status as open */
-    service->status = 2;
+    /* sets the service status as open */
+    service->status = STATUS_OPEN;
 }
 
 void addConnectionService(struct Service_t *service, struct Connection_t *connection) {
@@ -168,6 +168,9 @@ void createConnection(struct Connection_t **connectionPointer, SOCKET_HANDLE soc
 
     /* allocates space for the connection */
     struct Connection_t *connection = (struct Connection_t *) malloc(connectionSize);
+
+    /* sets the connection status as closed */
+    connection->status = STATUS_CLOSED;
 
     /* sets the socket handle in the connection */
     connection->socketHandle = socketHandle;
@@ -220,4 +223,17 @@ void writeConnection(struct Connection_t *connection, unsigned char *data, unsig
 
     /* registers the connection for write */
     service->registerWrite(connection->serviceReference, connection);
+}
+
+void openConection(struct Connection_t *connection) {
+    /* sets the connection status as open */
+    connection->status = STATUS_OPEN;
+}
+
+void closeConection(struct Connection_t *connection) {
+    /* closes the socket */
+    SOCKET_CLOSE(connection->socketHandle);
+
+    /* sets the connection status as closed */
+    connection->status = STATUS_CLOSED;
 }

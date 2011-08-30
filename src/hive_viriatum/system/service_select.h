@@ -88,3 +88,42 @@ void addSocketHandleSocketsSetServiceSelect(struct ServiceSelect_t *serviceSelec
 void removeSocketHandleSocketsSetServiceSelect(struct ServiceSelect_t *serviceSelect, SOCKET_HANDLE socketHandle, SOCKET_SET *socketsSet);
 ERROR_CODE registerWriteServiceSelect(void *service, struct Connection_t *connection);
 ERROR_CODE unregisterWriteServiceSelect(void *service, struct Connection_t *connection);
+
+/**
+ * Removes a connection from the remove connections array.
+ * This method checks for duplicates and in case they exist, no
+ * connection is added.
+ *
+ * @param removeConnections The list of connection for removal.
+ * @param removeConnectionsSizePointer A pointer to the sisze
+ * of the remove connections array.
+ * @param connection The connection to be removed (deleted).
+ */
+static __inline void removeConnection(struct Connection_t **removeConnections, unsigned int *removeConnectionsSizePointer, struct Connection_t *connection) {
+    /* allocates the index */
+    unsigned int index;
+
+    /* allocates the current connection */
+    struct Connection_t *currentConnection;
+
+    /* retrieves the remove connections size */
+    unsigned int removeConnectionsSize = *removeConnectionsSizePointer;
+
+    /* iterates over the remove connections */
+    for(index = 0; index < removeConnectionsSize; index++) {
+        /* retrieves the current connection */
+        currentConnection = removeConnections[index];
+
+        /* in case the current connection already exists */
+        if(currentConnection == connection) {
+            /* returns immediately */
+            return;
+        }
+    }
+
+    /* adds the connection to the remove connections */
+    removeConnections[removeConnectionsSize] = connection;
+
+    /* increments the remove connections size */
+    (*removeConnectionsSizePointer)++;
+}
