@@ -75,7 +75,7 @@ ERROR_CODE readHandlerStreamIo(struct Connection_t *connection) {
             switch(receivingErrorCode) {
                 case SOCKET_WOULDBLOCK:
                     /* prints a debug message */
-                    V_DEBUG("Read structures not ready: WOULDBLOCK\n");
+                    printf("Read structures not ready: WOULDBLOCK\n");
 
                     /* sets the error flag (non fatal) */
                     error = 2;
@@ -85,7 +85,7 @@ ERROR_CODE readHandlerStreamIo(struct Connection_t *connection) {
 
                 default:
                     /* prints the error */
-                    V_DEBUG_F("Problem receiving from socket: %d\n", receivingErrorCode);
+                    printf("Problem receiving from socket: %d\n", receivingErrorCode);
 
                     /* sets the error flag */
                     error = 1;
@@ -186,7 +186,7 @@ ERROR_CODE writeHandlerStreamIo(struct Connection_t *connection) {
             switch(receivingErrorCode) {
                 case SOCKET_WOULDBLOCK:
                     /* prints a debug message */
-                    V_DEBUG("Write structures not ready: WOULDBLOCK\n");
+                    printf("Write structures not ready: WOULDBLOCK\n");
 
                     /* sets the error flag (non fatal) */
                     error = 2;
@@ -196,7 +196,7 @@ ERROR_CODE writeHandlerStreamIo(struct Connection_t *connection) {
 
                 default:
                     /* prints the error */
-                    V_DEBUG_F("Problem sending from socket: %d\n", receivingErrorCode);
+                    printf("Problem sending from socket: %d\n", receivingErrorCode);
 
                     /* sets the error flag */
                     error = 1;
