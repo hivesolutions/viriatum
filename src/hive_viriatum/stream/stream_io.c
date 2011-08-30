@@ -221,7 +221,7 @@ ERROR_CODE writeHandlerStreamIo(struct Connection_t *connection) {
             /* updates the data internal structure
             to allow the sending of the pending partial data */
             data->data += numberBytes;
-            data->size += data->size - numberBytes;
+            data->size -= numberBytes;
 
             /* sets the error flag (non fatal) */
             error = 2;
