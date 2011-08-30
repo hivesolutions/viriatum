@@ -98,7 +98,7 @@ int main(int argc, char *argv[]) {
 	/* tests the error code for error */
     if(IS_ERROR_CODE(returnValue)) {
         /* prints an error message */
-        V_ERROR_F("%s\n", getLastErrorMessageSafe());
+		V_ERROR_F("Problem running service: %s\n", getLastErrorMessageSafe());
     }
 
     /* prints a debug message */
