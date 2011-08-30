@@ -379,6 +379,9 @@ void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_
         V_DEBUG_F("Extraordinary select file descriptors not found: %d\n", selectCount);
     }
 
+    /* prints a debug message */
+    V_DEBUG("Cenas 2\n");
+
     /* sets the read index in the read connections size */
     *readConnectionsSize = readIndex;
 
