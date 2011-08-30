@@ -147,11 +147,11 @@ void startServiceSelect(struct ServiceSelect_t *serviceSelect) {
             /* accepts the socket, retrieving the socket handle */
             socketHandle = SOCKET_ACCEPT(serviceSocketHandle, &socketAddress, clientSocketAddressSize);
 
-			/* in case viriatum is set to non blocking */
-			if(VIRIATUM_NON_BLOCKING) {
-				/* sets the socket to non blocking mode */
-				SOCKET_SET_NON_BLOCKING(socketHandle, flags);
-			}
+            /* in case viriatum is set to non blocking */
+            if(VIRIATUM_NON_BLOCKING) {
+                /* sets the socket to non blocking mode */
+                SOCKET_SET_NON_BLOCKING(socketHandle, flags);
+            }
 
             /* prints a debug message */
             V_DEBUG_F("Accepted connection: %d\n", socketHandle);
