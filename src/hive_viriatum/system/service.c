@@ -95,8 +95,11 @@ void startService(struct Service_t *service) {
     /* allocates the socket result */
     SOCKET_ERROR_CODE socketResult;
 
-    /* allocates the option value */
-    char optionValue;
+    /* allocates the option value and sets it to one (valid) */
+    char optionValue = 1;
+
+    /* allocates the flags */
+    unsigned long flags = 1;
 
     /* sets the socket address attributes */
     socketAddress.sin_family = SOCKET_INTERNET_TYPE;
@@ -106,8 +109,8 @@ void startService(struct Service_t *service) {
     /* creates the service socket for the given types */
     service->serviceSocketHandle = SOCKET_CREATE(SOCKET_INTERNET_TYPE, SOCKET_PACKET_TYPE, SOCKET_PROTOCOL_TCP);
 
-    /* sets the option value to one (valid) */
-    optionValue = 1,
+    /* sets the socket to non blocking mode */
+    SOCKET_SET_NON_BLOCKING(service->serviceSocketHandle, flags);
 
     /* sets the socket reuse address option in the socket */
     SOCKET_SET_OPTIONS(service->serviceSocketHandle, SOCKET_OPTIONS_LEVEL_SOCKET, SOCKET_OPTIONS_REUSE_ADDRESS_SOCKET, optionValue);
