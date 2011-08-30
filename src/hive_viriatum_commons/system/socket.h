@@ -118,7 +118,7 @@
 #define SOCKET_SET_CLEAR(socketHandle, socketsSet) FD_CLR(socketHandle, socketsSet)
 #define SOCKET_SET_IS_SET(socketHandle, socketsSet) FD_ISSET(socketHandle, socketsSet)
 #define SOCKET_IOCTL ioctl
-#define SOCKET_WOULDBLOCK WOULDBLOCK
+#define SOCKET_WOULDBLOCK EWOULDBLOCK
 #endif
 
 #ifdef VIRIATUM_PLATFORM_MSC
