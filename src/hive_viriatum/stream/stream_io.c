@@ -31,7 +31,7 @@
 
 ERROR_CODE readHandlerStreamIo(struct Connection_t *connection) {
     /* allocates the number of bytes */
-    size_t numberBytes;
+    SOCKET_ERROR_CODE numberBytes;
 
     /* allocates the "simple" buffer */
     unsigned char buffer[10240];
@@ -70,10 +70,10 @@ ERROR_CODE readHandlerStreamIo(struct Connection_t *connection) {
 
         /* in case there was an error receiving from the socket */
         if(SOCKET_TEST_ERROR(numberBytes)) {
-			printf("Ocorreu erro !!!")
-
             /* retrieves the receving error code */
             SOCKET_ERROR_CODE receivingErrorCode = SOCKET_GET_ERROR_CODE(numberBytes);
+
+			printf("Ocorreu erro !!!");
 
             /* switches over the receiving error code */
             switch(receivingErrorCode) {
@@ -153,7 +153,7 @@ ERROR_CODE readHandlerStreamIo(struct Connection_t *connection) {
 
 ERROR_CODE writeHandlerStreamIo(struct Connection_t *connection) {
     /* allocates the number of bytes */
-    int numberBytes;
+    SOCKET_ERROR_CODE numberBytes;
 
     /* allocates the data */
     struct Data_t *data;
