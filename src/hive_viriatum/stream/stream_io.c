@@ -159,7 +159,7 @@ ERROR_CODE writeHandlerStreamIo(struct Connection_t *connection) {
 
     /* iterates continuously */
     while(1) {
-		/* prints a debug message */
+        /* prints a debug message */
         V_DEBUG("Peeking value from write queue\n");
 
         /* peeks a value (data) from the linked list (write queue) */
@@ -171,8 +171,8 @@ ERROR_CODE writeHandlerStreamIo(struct Connection_t *connection) {
             break;
         }
 
-		/* prints a debug message */
-		V_DEBUG_F("Sending %d bytes through socket: %d\n", data->size, connection->socketHandle);
+        /* prints a debug message */
+        V_DEBUG_F("Sending %d bytes through socket: %d\n", data->size, connection->socketHandle);
 
         /* sends the value retrieving the number of bytes sent */
         numberBytes = SOCKET_SEND(connection->socketHandle, data->data, data->size, 0);
@@ -209,8 +209,8 @@ ERROR_CODE writeHandlerStreamIo(struct Connection_t *connection) {
             break;
         }
 
-		/* prints a debug message */
-		V_DEBUG_F("Data [%d bytes] sent without errors\n", numberBytes);
+        /* prints a debug message */
+        V_DEBUG_F("Data [%d bytes] sent without errors\n", numberBytes);
 
         /* in case the number of bytes sent is the same as the value size
         (not all data has been sent) */
@@ -232,8 +232,14 @@ ERROR_CODE writeHandlerStreamIo(struct Connection_t *connection) {
 
         /* in case the data callback is set */
         if(data->callback != NULL) {
+            /* prints a debug message */
+            V_DEBUG("Calling write callback\n");
+
             /* calls the callback with the callback parameters */
             data->callback(connection, data, data->callbackParameters);
+
+            /* prints a debug message */
+            V_DEBUG("Finished calling write callback\n");
         }
 
         /* deletes the data */
