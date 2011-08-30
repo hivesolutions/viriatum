@@ -200,7 +200,7 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
         V_DEBUG_F("%s\n", getLastErrorMessageSafe());
 
         /* writes the http static headers to the response */
-        SPRINTF(headersBuffer, 1024, "HTTP/1.1 404 Not Found\r\nServer: %s/%s (%s - %s)\r\nContent-Length: 15\r\n\r\n404 - Not Found", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU);
+        SPRINTF(headersBuffer, 1024, "HTTP/1.1 404 Not Found\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nContent-Length: 15\r\n\r\n404 - Not Found", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU);
 
         /* writes both the headers to the connection */
         writeConnection(connection, (unsigned char *) headersBuffer, strlen(headersBuffer), _cleanupHandlerFile, handlerFileContext);
@@ -208,7 +208,7 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
     /* otherwise there was no error in the file */
     else {
         /* writes the http static headers to the response */
-        SPRINTF(headersBuffer, 1024, "HTTP/1.1 200 OK\r\nServer: %s/%s (%s - %s)\r\nContent-Length: %lu\r\n\r\n", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, fileSize);
+        SPRINTF(headersBuffer, 1024, "HTTP/1.1 200 OK\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nContent-Length: %lu\r\n\r\n", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, fileSize);
 
         /* writes both the headers to the connection */
         writeConnection(connection, (unsigned char *) headersBuffer, strlen(headersBuffer), _sendChunkHandlerFile, handlerFileContext);
