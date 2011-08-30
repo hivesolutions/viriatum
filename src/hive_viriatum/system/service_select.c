@@ -171,8 +171,8 @@ void startServiceSelect(struct ServiceSelect_t *serviceSelect) {
             /* TODO: This setting is HARDCODED should be configured */
             connection->onRead = readHandlerStreamIo;
             connection->onWrite = writeHandlerStreamIo;
-			connection->onError = errorHandlerStreamIo;
-			connection->onClose = closeHandlerStreamIo;
+            connection->onError = errorHandlerStreamIo;
+            connection->onClose = closeHandlerStreamIo;
 
             /* adds the connection to the service select */
             addConnectionServiceSelect(serviceSelect, connection);
@@ -473,8 +473,8 @@ ERROR_CODE closeConnectionServiceSelect(struct Connection_t *connection) {
         RAISE_NO_ERROR;
     }
 
-	/* prints a debug message */
-	V_DEBUG_F("Closing connection: %d\n", connection->socketHandle);
+    /* prints a debug message */
+    V_DEBUG_F("Closing connection: %d\n", connection->socketHandle);
 
     /* in case the connection is open */
     if(connection->status == STATUS_OPEN && connection->onClose != NULL) {
