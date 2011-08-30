@@ -33,7 +33,9 @@ struct Data_t;
  * The "default" function used to update a state in the connection
  * for the given service context.
  */
-typedef ERROR_CODE (*connectionUpdate) (void *, struct Connection_t *);
+typedef ERROR_CODE (*connectionUpdate) (struct Connection_t *);
+
+typedef ERROR_CODE (*connectionCallback) (struct Connection_t *);
 
 typedef struct Service_t {
     unsigned char *name;
@@ -59,6 +61,11 @@ typedef struct Connection_t {
     unsigned int writeRegistered;
     struct LinkedList_t *readQueue;
     struct LinkedList_t *writeQueue;
+    connectionUpdate closeConnection;
+    connectionCallback onRead;
+    connectionCallback onWrite;
+    connectionCallback onError;
+    connectionCallback onClose;
 } Connection;
 
 typedef enum Operation_e {

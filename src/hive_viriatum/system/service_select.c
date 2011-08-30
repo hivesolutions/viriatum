@@ -76,7 +76,6 @@ void deleteServiceSelect(struct ServiceSelect_t *serviceSelect) {
     free(serviceSelect);
 }
 
-
 void httpDataHandler(struct Connection_t *connection, unsigned char *buffer, size_t bufferSize) {
     /* allocates the http settings */
     struct HttpSettings_t *httpSettings;
@@ -103,6 +102,8 @@ void httpDataHandler(struct Connection_t *connection, unsigned char *buffer, siz
     /* process the http data for the http parser */
     processDataHttpParser(httpParser, httpSettings, buffer, bufferSize);
 
+
+
     /* unsets the structures for the handler */
     unsetHandlerFile(httpParser, httpSettings);
 
@@ -112,9 +113,6 @@ void httpDataHandler(struct Connection_t *connection, unsigned char *buffer, siz
     /* deletes the http settings */
     deleteHttpSettings(httpSettings);
 }
-
-
-
 
 ERROR_CODE httpReadHandler(struct ServiceSelect_t *serviceSelect, struct Connection_t *connection) {
     /* allocates the number of bytes */
@@ -134,7 +132,8 @@ ERROR_CODE httpReadHandler(struct ServiceSelect_t *serviceSelect, struct Connect
 
     /* iterates continuously */
     while(1) {
-        /* TENHO DE TESTAR SE JA NAO FIZ OVERFLOW DO BUFFER */
+        /* in case the buffer size is so big that may
+        overflow the current allocated buffer */
         if(bufferSize + 1024 > 10240) {
             /* breaks the loop */
             break;
@@ -191,14 +190,8 @@ ERROR_CODE httpReadHandler(struct ServiceSelect_t *serviceSelect, struct Connect
 
         /* in case it's a fatal error */
         case 1:
-            /* removes the connection from the service select */
-            removeConnectionServiceSelect(serviceSelect, connection);
-
             /* closes the connection */
-            closeConection(connection);
-
-            /* deletes the connection */
-            //deleteConnection(connection);
+            connection->closeConnection(connection);
 
             /* breaks the switch */
             break;
@@ -299,21 +292,16 @@ ERROR_CODE httpWriteHandler(struct ServiceSelect_t *serviceSelect, struct Connec
     switch(error) {
         /* in case there's no error */
         case 0:
-            unregisterWriteServiceSelect(serviceSelect, connection);
+            /* unregisters the connection for write */
+            connection->service->unregisterWrite(connection);
 
             /* breaks the switch */
             break;
 
         /* in case it's a fatal error */
         case 1:
-            /* removes the connection from the service select */
-            removeConnectionServiceSelect(serviceSelect, connection);
-
             /* closes the connection */
-            closeConection(connection);
-
-            /* deletes the connection */
-            //deleteConnection(connection);
+            connection->closeConnection(connection);
 
             /* breaks the switch */
             break;
@@ -377,8 +365,6 @@ void startServiceSelect(struct ServiceSelect_t *serviceSelect) {
     SOCKET_ADDRESS_SIZE clientSocketAddressSize = sizeof(SOCKET_ADDRESS);
 
 
-    ERROR_CODE error = 0;
-
 
     unsigned long iMode = 1;
 
@@ -438,11 +424,15 @@ void startServiceSelect(struct ServiceSelect_t *serviceSelect) {
             /* retrieves the current connection */
             currentConnection = readConnections[index];
 
-            /* calls the read handler */
-            error = httpReadHandler(serviceSelect, currentConnection);
+            /* in case the current connection is open */
+            if(currentConnection->status == STATUS_OPEN) {
+                /* calls the read handler */
+                httpReadHandler(serviceSelect, currentConnection);
+            }
 
-            /* in case there was a fatal error */
-            if(error == 1) {
+            /* in case the current connection is closed */
+            if(currentConnection->status == STATUS_CLOSED) {
+                /* tries to add the current connection to the remove connections list */
                 removeConnection(removeConnections, &removeConnectionsSize, currentConnection);
             }
         }
@@ -452,11 +442,15 @@ void startServiceSelect(struct ServiceSelect_t *serviceSelect) {
             /* retrieves the current connection */
             currentConnection = writeConnections[index];
 
-            /* calls the write handler */
-            error = httpWriteHandler(serviceSelect, currentConnection);
+            /* in case the current connection is open */
+            if(currentConnection->status == STATUS_OPEN) {
+                /* calls the write handler */
+                httpWriteHandler(serviceSelect, currentConnection);
+            }
 
-            /* in case there was a fatal error */
-            if(error == 1) {
+            /* in case the current connection is closed */
+            if(currentConnection->status == STATUS_CLOSED) {
+                /* tries to add the current connection to the remove connections list */
                 removeConnection(removeConnections, &removeConnectionsSize, currentConnection);
             }
         }
@@ -487,9 +481,15 @@ void addConnectionServiceSelect(struct ServiceSelect_t *serviceSelect, struct Co
 
     /* adds the socket handle to the sockets read set */
     addSocketHandleSocketsSetServiceSelect(serviceSelect, connection->socketHandle, &serviceSelect->socketsReadSet);
+
+    /* sets the close connection fucntion in the connection */
+    connection->closeConnection = closeConnectionServiceSelect;
 }
 
 void removeConnectionServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_t *connection) {
+    /* unsets the close connection fucntion in the connection */
+    connection->closeConnection = NULL;
+
     /* calls the remove connection service (super) */
     removeConnectionService(serviceSelect->service, connection);
 
@@ -640,9 +640,9 @@ void removeSocketHandleSocketsSetServiceSelect(struct ServiceSelect_t *serviceSe
     SOCKET_SET_CLEAR(socketHandle, socketsSet);
 }
 
-ERROR_CODE registerWriteServiceSelect(void *service, struct Connection_t *connection) {
+ERROR_CODE registerWriteServiceSelect(struct Connection_t *connection) {
     /* retrieves the service select */
-    struct ServiceSelect_t *serviceSelect = (struct ServiceSelect_t *) service;
+    struct ServiceSelect_t *serviceSelect = (struct ServiceSelect_t *) connection->serviceReference;
 
     /* in case the connection is not write registered */
     if(connection->writeRegistered == 0) {
@@ -657,9 +657,9 @@ ERROR_CODE registerWriteServiceSelect(void *service, struct Connection_t *connec
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE unregisterWriteServiceSelect(void *service, struct Connection_t *connection) {
+ERROR_CODE unregisterWriteServiceSelect(struct Connection_t *connection) {
     /* retrieves the service select */
-    struct ServiceSelect_t *serviceSelect = (struct ServiceSelect_t *) service;
+    struct ServiceSelect_t *serviceSelect = (struct ServiceSelect_t *) connection->serviceReference;
 
     /* in case the connection is write registered */
     if(connection->writeRegistered == 1) {
@@ -669,6 +669,26 @@ ERROR_CODE unregisterWriteServiceSelect(void *service, struct Connection_t *conn
         /* unsets the connection as write registered */
         connection->writeRegistered = 0;
     }
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE closeConnectionServiceSelect(struct Connection_t *connection) {
+    /* retrieves the service select */
+    struct ServiceSelect_t *serviceSelect = (struct ServiceSelect_t *) connection->serviceReference;
+
+    /* in case the connection is (already) closed */
+    if(connection->status == STATUS_CLOSED) {
+        /* raises no error */
+        RAISE_NO_ERROR;
+    }
+
+    /* removes the connection from the service select */
+    removeConnectionServiceSelect(serviceSelect, connection);
+
+    /* closes the connection */
+    closeConection(connection);
 
     /* raises no error */
     RAISE_NO_ERROR;

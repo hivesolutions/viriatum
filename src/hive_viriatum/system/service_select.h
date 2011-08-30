@@ -86,8 +86,9 @@ void removeConnectionServiceSelect(struct ServiceSelect_t *serviceSelect, struct
 void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_t **readConnections, struct Connection_t **writeConnections, unsigned int *readConnectionsSize, unsigned int *writeConnectionsSize, unsigned int *serviceSocketReady);
 void addSocketHandleSocketsSetServiceSelect(struct ServiceSelect_t *serviceSelect, SOCKET_HANDLE socketHandle, SOCKET_SET *socketsSet);
 void removeSocketHandleSocketsSetServiceSelect(struct ServiceSelect_t *serviceSelect, SOCKET_HANDLE socketHandle, SOCKET_SET *socketsSet);
-ERROR_CODE registerWriteServiceSelect(void *service, struct Connection_t *connection);
-ERROR_CODE unregisterWriteServiceSelect(void *service, struct Connection_t *connection);
+ERROR_CODE registerWriteServiceSelect(struct Connection_t *connection);
+ERROR_CODE unregisterWriteServiceSelect(struct Connection_t *connection);
+ERROR_CODE closeConnectionServiceSelect(struct Connection_t *connection);
 
 /**
  * Removes a connection from the remove connections array.

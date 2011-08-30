@@ -39,6 +39,9 @@ void createHandlerFileContext(struct HandlerFileContext_t **handlerFileContextPo
     /* sets the handler file context file */
     handlerFileContext->file = NULL;
 
+    /* sets the handler file context flags */
+    handlerFileContext->flags = 0;
+
     /* sets the handler file context in the  pointer */
     *handlerFileContextPointer = handlerFileContext;
 }
@@ -188,13 +191,19 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
     /* reads (the complete) file contents */
     ERROR_CODE readFileResult = countFile((char *) handlerFileContext->filePath, &fileSize);
 
+    /* sets the (http) flags in the handler file context */
+    handlerFileContext->flags = httpParser->flags;
+
     /* tests the error code for error */
     if(IS_ERROR_CODE(readFileResult)) {
         /* prints the error */
         V_DEBUG_F("%s\n", getLastErrorMessageSafe());
 
-        /* releases the headers buffer */
-        free(headersBuffer);
+        /* writes the http static headers to the response */
+        SPRINTF(headersBuffer, 1024, "HTTP/1.1 404 Not Found\r\nServer: %s/%s (%s - %s)\r\nContent-Length: 15\r\n\r\n404 - Not Found", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU);
+
+        /* writes both the headers to the connection */
+        writeConnection(connection, (unsigned char *) headersBuffer, strlen(headersBuffer), _cleanupHandlerFile, handlerFileContext);
     }
     /* otherwise there was no error in the file */
     else {
@@ -202,14 +211,31 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
         SPRINTF(headersBuffer, 1024, "HTTP/1.1 200 OK\r\nServer: %s/%s (%s - %s)\r\nContent-Length: %lu\r\n\r\n", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, fileSize);
 
         /* writes both the headers to the connection */
-        writeConnection(connection, (unsigned char *) headersBuffer, strlen(headersBuffer), sendChunkHandlerFile, handlerFileContext);
+        writeConnection(connection, (unsigned char *) headersBuffer, strlen(headersBuffer), _sendChunkHandlerFile, handlerFileContext);
     }
 
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE sendChunkHandlerFile(struct Connection_t *connection, struct Data_t *data, void *parameters) {
+ERROR_CODE _cleanupHandlerFile(struct Connection_t *connection, struct Data_t *data, void *parameters) {
+    /* casts the parameters as handler file context */
+    struct HandlerFileContext_t *handlerFileContext = (struct HandlerFileContext_t *) parameters;
+
+    /* in case the connection is not meant to be kept alive */
+    if(!(handlerFileContext->flags & FLAG_CONNECTION_KEEP_ALIVE)) {
+        /* closes the connection */
+        connection->closeConnection(connection);
+    }
+
+    /* deletes the handler file context */
+    deleteHandlerFileContext(handlerFileContext);
+
+    /* raise no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE _sendChunkHandlerFile(struct Connection_t *connection, struct Data_t *data, void *parameters) {
     /* allocates the number of bytes */
     size_t numberBytes;
 
@@ -246,16 +272,18 @@ ERROR_CODE sendChunkHandlerFile(struct Connection_t *connection, struct Data_t *
     /* in case the number of read bytes is valid */
     if(numberBytes > 0) {
         /* writes both the file buffer to the connection */
-        writeConnection(connection, fileBuffer, numberBytes, sendChunkHandlerFile, handlerFileContext);
-    } else {
+        writeConnection(connection, fileBuffer, numberBytes, _sendChunkHandlerFile, handlerFileContext);
+    }
+    /* otherwise the file "transfer" is complete */
+    else {
+        /* runs the cleanup handler file (releases internal structures) */
+        _cleanupHandlerFile(connection, data, parameters);
+
         /* closes the file */
         fclose(file);
 
         /* releases the current file buffer */
         free(fileBuffer);
-
-        /* deletes the handler file context */
-        deleteHandlerFileContext(handlerFileContext);
     }
 
     /* raise no error */
