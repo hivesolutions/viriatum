@@ -187,6 +187,18 @@ void createConnection(struct Connection_t **connectionPointer, SOCKET_HANDLE soc
     /* sets the close connection to unset */
     connection->closeConnection = NULL;
 
+    /* sets the on read to unset */
+	connection->onRead = NULL;
+
+    /* sets the on write to unset */
+	connection->onWrite = NULL;
+
+    /* sets the on error to unset */
+	connection->onError = NULL;
+	
+	/* sets the on close to unset */
+	connection->onClose = NULL;
+
     /* creates the read queue linked list */
     createLinkedList(&connection->readQueue);
 

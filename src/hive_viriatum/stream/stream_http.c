@@ -28,3 +28,41 @@
 #include "stdafx.h"
 
 #include "stream_http.h"
+
+void dataHandlerStreamHttp(struct Connection_t *connection, unsigned char *buffer, size_t bufferSize) {
+    /* allocates the http settings */
+    struct HttpSettings_t *httpSettings;
+
+    /* allocates the http parser */
+    struct HttpParser_t *httpParser;
+
+    /* creates the http settings */
+    createHttpSettings(&httpSettings);
+
+    /* creates the http parser */
+    createHttpParser(&httpParser);
+
+    /* sets the connection as the parser parameter(s) */
+    httpParser->parameters = connection;
+
+    /* sets the structures for the handler */
+    setHandlerFile(httpParser, httpSettings);
+
+
+    // TODO: tenho de testar quantos bytes processei !!!
+
+
+    /* process the http data for the http parser */
+    processDataHttpParser(httpParser, httpSettings, buffer, bufferSize);
+
+
+
+    /* unsets the structures for the handler */
+    unsetHandlerFile(httpParser, httpSettings);
+
+    /* deletes the http parser */
+    deleteHttpParser(httpParser);
+
+    /* deletes the http settings */
+    deleteHttpSettings(httpSettings);
+}
