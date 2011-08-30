@@ -79,7 +79,7 @@ typedef struct ServiceSelect_t {
 
 void createServiceSelect(struct ServiceSelect_t **serviceSelectPointer);
 void deleteServiceSelect(struct ServiceSelect_t *serviceSelect);
-void startServiceSelect(struct ServiceSelect_t *serviceSelect);
+ERROR_CODE startServiceSelect(struct ServiceSelect_t *serviceSelect);
 void addConnectionServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_t *connection);
 void removeConnectionServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_t *connection);
 void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_t **readConnections, struct Connection_t **writeConnections, unsigned int *readConnectionsSize, unsigned int *writeConnectionsSize, unsigned int *serviceSocketReady);

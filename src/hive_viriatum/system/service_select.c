@@ -76,7 +76,10 @@ void deleteServiceSelect(struct ServiceSelect_t *serviceSelect) {
     free(serviceSelect);
 }
 
-void startServiceSelect(struct ServiceSelect_t *serviceSelect) {
+ERROR_CODE startServiceSelect(struct ServiceSelect_t *serviceSelect) {
+    /* allocates the return value */
+    ERROR_CODE returnValue;
+
     /* allocates the index */
     unsigned int index;
 
@@ -126,7 +129,13 @@ void startServiceSelect(struct ServiceSelect_t *serviceSelect) {
 
 
     /* starts the service */
-    startService(serviceSelect->service);
+    returnValue = startService(serviceSelect->service);
+
+	/* tests the error code for error */
+    if(IS_ERROR_CODE(returnValue)) {
+		/* raises the error again */
+        RAISE_AGAIN(returnValue);
+    }
 
     /* retrieves the service socket handle */
     serviceSocketHandle = serviceSelect->service->serviceSocketHandle;

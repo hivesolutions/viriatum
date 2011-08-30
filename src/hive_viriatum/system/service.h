@@ -132,8 +132,10 @@ void deleteData(struct Data_t *data);
  * internal structures and the main loop.
  *
  * @param service The service to be initialized.
+ * @return The resulting error code.
  */
-void startService(struct Service_t *service);
+ERROR_CODE startService(struct Service_t *service);
+
 void addConnectionService(struct Service_t *service, struct Connection_t *connection);
 void removeConnectionService(struct Service_t *service, struct Connection_t *connection);
 void createConnection(struct Connection_t **connectionPointer, SOCKET_HANDLE socketHandle);

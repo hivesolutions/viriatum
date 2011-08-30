@@ -91,7 +91,7 @@ void deleteData(struct Data_t *data) {
     free(data);
 }
 
-void startService(struct Service_t *service) {
+ERROR_CODE startService(struct Service_t *service) {
     /* allocates the socket address structure */
     SOCKET_ADDRESS_INPUT socketAddress;
 
@@ -135,8 +135,8 @@ void startService(struct Service_t *service) {
         /* closes the service socket */
         SOCKET_CLOSE(service->serviceSocketHandle);
 
-        /* returns immediately */
-        return;
+        /* raises an error */
+        RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem binding socket");
     }
 
     /* listens for a service socket change */
@@ -153,12 +153,15 @@ void startService(struct Service_t *service) {
         /* closes the service socket */
         SOCKET_CLOSE(service->serviceSocketHandle);
 
-        /* returns immediately */
-        return;
-    }
+	    /* raises an error */
+        RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem listening socket");
+	}
 
     /* sets the service status as open */
     service->status = STATUS_OPEN;
+
+	/* raises no error */
+	RAISE_NO_ERROR;
 }
 
 void addConnectionService(struct Service_t *service, struct Connection_t *connection) {

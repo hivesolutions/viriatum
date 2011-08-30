@@ -29,7 +29,10 @@
 
 #include "viriatum.h"
 
-void runService() {
+ERROR_CODE runService() {
+    /* allocates the return value */
+    ERROR_CODE returnValue;
+
     /* allocates the service select */
     struct ServiceSelect_t *serviceSelect;
 
@@ -43,10 +46,22 @@ void runService() {
     createServiceSelect(&serviceSelect);
 
     /* starts the service select */
-    startServiceSelect(serviceSelect);
+    returnValue = startServiceSelect(serviceSelect);
+
+	/* tests the error code for error */
+    if(IS_ERROR_CODE(returnValue)) {
+		 /* runs the socket finish */
+		SOCKET_FINISH();
+
+		/* raises the error again */
+		RAISE_AGAIN(returnValue);
+    }
 
     /* runs the socket finish */
     SOCKET_FINISH();
+
+	/* raises no error */
+	RAISE_NO_ERROR;
 }
 
 int main(int argc, char *argv[]) {
@@ -78,7 +93,13 @@ int main(int argc, char *argv[]) {
     }
 
     /* runs the service */
-    runService();
+    returnValue = runService();
+
+	/* tests the error code for error */
+    if(IS_ERROR_CODE(returnValue)) {
+        /* prints an error message */
+        V_ERROR_F("%s\n", getLastErrorMessageSafe());
+    }
 
     /* prints a debug message */
     V_DEBUG("Finishing process");
