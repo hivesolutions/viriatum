@@ -76,36 +76,13 @@ void deleteServiceSelect(struct ServiceSelect_t *serviceSelect) {
     free(serviceSelect);
 }
 
-void httpReadHandler(struct ServiceSelect_t *serviceSelect, struct Connection_t *connection) {
-    /* allocates the number of bytes */
-    size_t numberBytes;
 
-    /* allocates the "simple" buffer */
-    unsigned char buffer[10240];
-
+void httpDataHandler(struct Connection_t *connection, unsigned char *buffer, size_t bufferSize) {
     /* allocates the http settings */
     struct HttpSettings_t *httpSettings;
 
     /* allocates the http parser */
     struct HttpParser_t *httpParser;
-
-    /* receives from the socket */
-    numberBytes = SOCKET_RECEIVE(connection->socketHandle, buffer, 10240, 0);
-
-    /* in case there was an error receiving from the socket */
-    if(SOCKET_TEST_ERROR(numberBytes)) {
-        /* retrieves the receving error code */
-        SOCKET_ERROR_CODE receivingErrorCode = SOCKET_GET_ERROR_CODE(numberBytes);
-
-        /* prints the error */
-        V_DEBUG_F("Problem receiving from socket: %d\n", receivingErrorCode);
-
-        /* removes the connection from the service select */
-        removeConnectionServiceSelect(serviceSelect, connection);
-
-        /* returns immediately */
-        return;
-    }
 
     /* creates the http settings */
     createHttpSettings(&httpSettings);
@@ -119,8 +96,12 @@ void httpReadHandler(struct ServiceSelect_t *serviceSelect, struct Connection_t 
     /* sets the structures for the handler */
     setHandlerFile(httpParser, httpSettings);
 
+
+    // TODO: tenho de testar quantos bytes processei !!!
+
+
     /* process the http data for the http parser */
-    processDataHttpParser(httpParser, httpSettings, buffer, numberBytes);
+    processDataHttpParser(httpParser, httpSettings, buffer, bufferSize);
 
     /* unsets the structures for the handler */
     unsetHandlerFile(httpParser, httpSettings);
@@ -132,22 +113,130 @@ void httpReadHandler(struct ServiceSelect_t *serviceSelect, struct Connection_t 
     deleteHttpSettings(httpSettings);
 }
 
-void httpWriteHandler(struct ServiceSelect_t *serviceSelect, struct Connection_t *connection) {
+
+
+
+ERROR_CODE httpReadHandler(struct ServiceSelect_t *serviceSelect, struct Connection_t *connection) {
+    /* allocates the number of bytes */
+    size_t numberBytes;
+
+    /* allocates the "simple" buffer */
+    unsigned char buffer[10240];
+
+    /* retrieves the buffer pointer */
+    unsigned char *bufferPointer = (unsigned char *) buffer;
+
+    /* allocates the buffer size */
+    size_t bufferSize = 0;
+
+    /* flag and value controlling the state of the read */
+    ERROR_CODE error = 0;
+
+    /* iterates continuously */
+    while(1) {
+        /* TENHO DE TESTAR SE JA NAO FIZ OVERFLOW DO BUFFER */
+        if(bufferSize + 1024 > 10240) {
+            /* breaks the loop */
+            break;
+        }
+
+        /* receives from the socket */
+        numberBytes = SOCKET_RECEIVE(connection->socketHandle, bufferPointer, 1024, 0);
+
+        /* in case the number of bytes is zero (connection closed) */
+        if(numberBytes == 0) {
+            /* sets the error flag */
+            error = 1;
+
+            /* breaks the loop */
+            break;
+        }
+
+        /* in case there was an error receiving from the socket */
+        if(SOCKET_TEST_ERROR(numberBytes)) {
+            /* retrieves the receving error code */
+            SOCKET_ERROR_CODE receivingErrorCode = SOCKET_GET_ERROR_CODE(numberBytes);
+
+            if(receivingErrorCode == WSAEWOULDBLOCK) {
+                /* sets the error flag (non fatal) */
+                error = 2;
+            } else {
+                /* prints the error */
+                V_DEBUG_F("Problem receiving from socket: %d\n", receivingErrorCode);
+
+                /* sets the error flag */
+                error = 1;
+            }
+
+            /* breaks the loop */
+            break;
+        }
+
+        /* increments the buffer position */
+        bufferPointer += numberBytes;
+
+        /* increments the buffer size with the number of bytes */
+        bufferSize += numberBytes;
+    }
+
+    /* switches over the error flag and value */
+    switch(error) {
+        /* in case there's no error */
+        case 0:
+            /* calls the http data handler */
+            httpDataHandler(connection, buffer, bufferSize);
+
+            /* breaks the switch */
+            break;
+
+        /* in case it's a fatal error */
+        case 1:
+            /* removes the connection from the service select */
+            removeConnectionServiceSelect(serviceSelect, connection);
+
+            /* closes the connection */
+            closeConection(connection);
+
+            /* deletes the connection */
+            //deleteConnection(connection);
+
+            /* breaks the switch */
+            break;
+
+        /* in case it's a non fatal error */
+        case 2:
+            /* calls the http data handler */
+            httpDataHandler(connection, buffer, bufferSize);
+
+            /* breaks the switch */
+            break;
+
+        /* default case */
+        default:
+            /* breaks the switch */
+            break;
+    }
+
+    /* returns the error code */
+    return error;
+}
+
+ERROR_CODE httpWriteHandler(struct ServiceSelect_t *serviceSelect, struct Connection_t *connection) {
     /* allocates the number of bytes */
     int numberBytes;
 
     /* allocates the data */
     struct Data_t *data;
 
-    /* flag andvalue controlling the state of the write */
-    unsigned char error = 0;
+    /* flag and value controlling the state of the write */
+    ERROR_CODE error = 0;
 
     /* iterates continuously */
     while(1) {
         /* peeks a value (data) from the linked list (write queue) */
         peekValueLinkedList(connection->writeQueue, (void **) &data);
 
-        /* in case the data is invalid */
+        /* in case the data is invalid (list is empty) */
         if(data == NULL) {
             /* breaks the loop */
             break;
@@ -163,8 +252,6 @@ void httpWriteHandler(struct ServiceSelect_t *serviceSelect, struct Connection_t
 
             if(receivingErrorCode == WSAEWOULDBLOCK) {
                 V_DEBUG_F("RECEIVED EWOULDBLOCK!!!!\n");
-
-                /* TODO: tenho de voltar a meter na lista e nao tiro o read do select */
 
                 /* sets the error flag (non fatal) */
                 error = 2;
@@ -183,6 +270,11 @@ void httpWriteHandler(struct ServiceSelect_t *serviceSelect, struct Connection_t
         /* in case the number of bytes sent is the same as the value size
         (not all data has been sent) */
         if(numberBytes != data->size) {
+            /* updates the data internal structure
+            to allow the sending of the pending partial data */
+            data->data += numberBytes;
+            data->size += data->size - numberBytes;
+
             /* sets the error flag (non fatal) */
             error = 2;
 
@@ -203,7 +295,7 @@ void httpWriteHandler(struct ServiceSelect_t *serviceSelect, struct Connection_t
         deleteData(data);
     }
 
-    /* switches over the error flag/value */
+    /* switches over the error flag and value */
     switch(error) {
         /* in case there's no error */
         case 0:
@@ -214,14 +306,14 @@ void httpWriteHandler(struct ServiceSelect_t *serviceSelect, struct Connection_t
 
         /* in case it's a fatal error */
         case 1:
-            /* closes the socket */
-            SOCKET_CLOSE(connection->socketHandle);
-
             /* removes the connection from the service select */
             removeConnectionServiceSelect(serviceSelect, connection);
 
+            /* closes the connection */
+            closeConection(connection);
+
             /* deletes the connection */
-            deleteConnection(connection);
+            //deleteConnection(connection);
 
             /* breaks the switch */
             break;
@@ -236,6 +328,9 @@ void httpWriteHandler(struct ServiceSelect_t *serviceSelect, struct Connection_t
             /* breaks the switch */
             break;
     }
+
+    /* returns the error code */
+    return error;
 }
 
 void startServiceSelect(struct ServiceSelect_t *serviceSelect) {
@@ -248,11 +343,17 @@ void startServiceSelect(struct ServiceSelect_t *serviceSelect) {
     /* allocates the write connections */
     struct Connection_t **writeConnections = (struct Connection_t **) malloc(120 * sizeof(struct Connection_t *));
 
+    /* allocates the remove connections */
+    struct Connection_t **removeConnections = (struct Connection_t **) malloc(120 * sizeof(struct Connection_t *));
+
     /* allocates the read connections size */
     unsigned int readConnectionsSize;
 
     /* allocates the write connections size */
     unsigned int writeConnectionsSize;
+
+    /* allocates the remove connections size */
+    unsigned int removeConnectionsSize;
 
     /* allocates the service socket ready */
     unsigned int serviceSocketReady;
@@ -275,7 +376,13 @@ void startServiceSelect(struct ServiceSelect_t *serviceSelect) {
     /* calculates the size of the socket address */
     SOCKET_ADDRESS_SIZE clientSocketAddressSize = sizeof(SOCKET_ADDRESS);
 
+
+    ERROR_CODE error = 0;
+
+
     unsigned long iMode = 1;
+
+
 
     /* starts the service */
     startService(serviceSelect->service);
@@ -288,6 +395,9 @@ void startServiceSelect(struct ServiceSelect_t *serviceSelect) {
 
     /* iterates continuously */
     while(1) {
+        /* resets the remove connections size */
+        removeConnectionsSize = 0;
+
         /* polls the service select */
         pollServiceSelect(serviceSelect, readConnections, writeConnections, &readConnectionsSize, &writeConnectionsSize, &serviceSocketReady);
 
@@ -295,6 +405,10 @@ void startServiceSelect(struct ServiceSelect_t *serviceSelect) {
         if(serviceSocketReady == 1) {
             /* accepts the socket, retrieving the socket handle */
             socketHandle = SOCKET_ACCEPT(serviceSocketHandle, &socketAddress, clientSocketAddressSize);
+
+
+
+
 
             ioctlsocket(socketHandle, FIONBIO, &iMode);
 
@@ -305,6 +419,9 @@ void startServiceSelect(struct ServiceSelect_t *serviceSelect) {
 
             /* creates the connection */
             createConnection(&connection, socketHandle);
+
+            /* opens the connection */
+            openConection(connection);
 
             /* sets the service select service as the service in the connection */
             connection->service = serviceSelect->service;
@@ -322,7 +439,12 @@ void startServiceSelect(struct ServiceSelect_t *serviceSelect) {
             currentConnection = readConnections[index];
 
             /* calls the read handler */
-            httpReadHandler(serviceSelect, currentConnection);
+            error = httpReadHandler(serviceSelect, currentConnection);
+
+            /* in case there was a fatal error */
+            if(error == 1) {
+                removeConnection(removeConnections, &removeConnectionsSize, currentConnection);
+            }
         }
 
         /* iterates over the write connections */
@@ -331,9 +453,32 @@ void startServiceSelect(struct ServiceSelect_t *serviceSelect) {
             currentConnection = writeConnections[index];
 
             /* calls the write handler */
-            httpWriteHandler(serviceSelect, currentConnection);
+            error = httpWriteHandler(serviceSelect, currentConnection);
+
+            /* in case there was a fatal error */
+            if(error == 1) {
+                removeConnection(removeConnections, &removeConnectionsSize, currentConnection);
+            }
+        }
+
+        /* iterates over the remove connections */
+        for(index = 0; index < removeConnectionsSize; index++) {
+            /* retrieves the current connection */
+            currentConnection = removeConnections[index];
+
+            /* deletes the current connection (house keeping) */
+            deleteConnection(currentConnection);
         }
     }
+
+    /* releases the read connections */
+    free(readConnections);
+
+    /* releases the write connections */
+    free(writeConnections);
+
+    /* releases the remove connections */
+    free(removeConnections);
 }
 
 void addConnectionServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_t *connection) {

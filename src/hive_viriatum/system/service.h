@@ -37,7 +37,7 @@ typedef ERROR_CODE (*connectionUpdate) (void *, struct Connection_t *);
 
 typedef struct Service_t {
     unsigned char *name;
-    unsigned int status;
+    unsigned char status;
     SOCKET_HANDLE serviceSocketHandle;
     struct LinkedList_t *connectionsList;
     connectionUpdate registerWrite;
@@ -52,6 +52,7 @@ typedef struct Service_t {
  * maintained.
  */
 typedef struct Connection_t {
+    unsigned char status;
     SOCKET_HANDLE socketHandle;
     struct Service_t *service;
     void *serviceReference;
@@ -61,9 +62,14 @@ typedef struct Connection_t {
 } Connection;
 
 typedef enum Operation_e {
-    WRITE_OPERATION = 1,
-    READ_OPERATION
+    OPERATION_WRITE = 1,
+    OPERATION_READ
 } Operation;
+
+typedef enum Status_e {
+    STATUS_OPEN = 1,
+    STATUS_CLOSED
+} Status;
 
 /**
  * The "default" callback function to be used, without
@@ -124,3 +130,5 @@ void removeConnectionService(struct Service_t *service, struct Connection_t *con
 void createConnection(struct Connection_t **connectionPointer, SOCKET_HANDLE socketHandle);
 void deleteConnection(struct Connection_t *connection);
 void writeConnection(struct Connection_t *connection, unsigned char *data, unsigned int size, serviceCallback callback, void *callbackParameters);
+void openConection(struct Connection_t *connection);
+void closeConection(struct Connection_t *connection);
