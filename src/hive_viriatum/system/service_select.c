@@ -189,6 +189,9 @@ void startServiceSelect(struct ServiceSelect_t *serviceSelect) {
 
             /* in case the current connection is open */
             if(currentConnection->status == STATUS_OPEN && currentConnection->onRead != NULL) {
+				/* prints a debug message */
+				V_DEBUG("Calling on read handler\n");
+
                 /* calls the on read handler */
                 currentConnection->onRead(currentConnection);
             }
@@ -213,6 +216,9 @@ void startServiceSelect(struct ServiceSelect_t *serviceSelect) {
 
             /* in case the current connection is open */
             if(currentConnection->status == STATUS_OPEN && currentConnection->onWrite != NULL) {
+				/* prints a debug message */
+				V_DEBUG("Calling on write handler\n");
+
                 /* calls the on write handler */
                 currentConnection->onWrite(currentConnection);
             }
