@@ -71,7 +71,10 @@ ERROR_CODE readHandlerStreamIo(struct Connection_t *connection) {
             /* retrieves the receving error code */
             SOCKET_ERROR_CODE receivingErrorCode = SOCKET_GET_ERROR_CODE(numberBytes);
 
-            if(receivingErrorCode == WSAEWOULDBLOCK) {
+            if(receivingErrorCode == SOCKET_WOULDBLOCK) {
+				/* prints a debug message */
+				V_DEBUG_F("Read structures full: WOULDBLOCK\n");
+
                 /* sets the error flag (non fatal) */
                 error = 2;
             } else {
@@ -158,8 +161,9 @@ ERROR_CODE writeHandlerStreamIo(struct Connection_t *connection) {
             /* retrieves the receving error code */
             SOCKET_ERROR_CODE receivingErrorCode = SOCKET_GET_ERROR_CODE(numberBytes);
 
-            if(receivingErrorCode == WSAEWOULDBLOCK) {
-                V_DEBUG_F("RECEIVED EWOULDBLOCK!!!!\n");
+            if(receivingErrorCode == SOCKET_WOULDBLOCK) {
+				/* prints a debug message */
+				V_DEBUG_F("Write structures full: WOULDBLOCK\n");
 
                 /* sets the error flag (non fatal) */
                 error = 2;
