@@ -289,11 +289,11 @@ ERROR_CODE writeHandlerStreamIo(struct Connection_t *connection) {
 }
 
 ERROR_CODE errorHandlerStreamIo(struct Connection_t *connection) {
-	return 0;
+    return 0;
 }
 
 ERROR_CODE closeHandlerStreamIo(struct Connection_t *connection) {
-	printf("Connection closed\n");
+    printf("Connection closed\n");
 
-	return 0;
+    return 0;
 }
