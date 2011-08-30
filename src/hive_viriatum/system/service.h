@@ -28,6 +28,7 @@
 #pragma once
 
 struct Data_t;
+struct Connection_t;
 
 /**
  * The "default" function used to update a state in the connection
