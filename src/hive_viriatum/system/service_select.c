@@ -177,7 +177,7 @@ void startServiceSelect(struct ServiceSelect_t *serviceSelect) {
         }
 
         /* prints a debug message */
-        V_DEBUG("Processing read connections\n");
+        V_DEBUG_F("Processing %d read connections\n", readConnectionsSize);
 
         /* iterates over the read connections */
         for(index = 0; index < readConnectionsSize; index++) {
@@ -201,7 +201,7 @@ void startServiceSelect(struct ServiceSelect_t *serviceSelect) {
         }
 
         /* prints a debug message */
-        V_DEBUG("Processing write connections\n");
+        V_DEBUG_F("Processing %d write connections\n", writeConnectionsSize);
 
         /* iterates over the write connections */
         for(index = 0; index < writeConnectionsSize; index++) {
