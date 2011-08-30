@@ -110,10 +110,10 @@ void startService(struct Service_t *service) {
     service->serviceSocketHandle = SOCKET_CREATE(SOCKET_INTERNET_TYPE, SOCKET_PACKET_TYPE, SOCKET_PROTOCOL_TCP);
 
     /* in case viriatum is set to non blocking */
-    if(VIRIATUM_NON_BLOCKING) {
+    /*if(VIRIATUM_NON_BLOCKING) {*/
         /* sets the socket to non blocking mode */
-        SOCKET_SET_NON_BLOCKING(service->serviceSocketHandle, flags);
-    }
+    /*    SOCKET_SET_NON_BLOCKING(service->serviceSocketHandle, flags);
+    }*/
 
     /* sets the socket reuse address option in the socket */
     SOCKET_SET_OPTIONS(service->serviceSocketHandle, SOCKET_OPTIONS_LEVEL_SOCKET, SOCKET_OPTIONS_REUSE_ADDRESS_SOCKET, optionValue);
