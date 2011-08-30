@@ -471,6 +471,9 @@ ERROR_CODE closeConnectionServiceSelect(struct Connection_t *connection) {
         RAISE_NO_ERROR;
     }
 
+	/* prints a debug message */
+	V_DEBUG_F("Closing connection: %d", connection->socketHandle)
+
     /* removes the connection from the service select */
     removeConnectionServiceSelect(serviceSelect, connection);
 
