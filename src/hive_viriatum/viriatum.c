@@ -89,7 +89,7 @@ int main(int argc, char *argv[]) {
     /* tests the error code for error */
     if(IS_ERROR_CODE(returnValue)) {
         /* prints a warning message */
-        V_WARNING_F("%s\n", getLastErrorMessageSafe());
+		V_WARNING_F("Problem loading module: %s\n", getLastErrorMessageSafe());
     }
 
     /* runs the service */
