@@ -48,9 +48,6 @@ void createHttpConnection(struct HttpConnection_t **httpConnectionPointer, struc
     /* sets the connection as the parser parameter(s) */
     httpConnection->httpParser->parameters = ioConnection->connection;
 
-    /* sets the structures for the handler */
-    setHandlerFile(httpConnection->httpParser, httpConnection->httpSettings);
-
     /* sets the http connection in the (upper) io connection substrate */
     ioConnection->lower = httpConnection;
 
@@ -59,9 +56,6 @@ void createHttpConnection(struct HttpConnection_t **httpConnectionPointer, struc
 }
 
 void deleteHttpConnection(struct HttpConnection_t *httpConnection) {
-    /* unsets the structures for the handler */
-    unsetHandlerFile(httpConnection->httpParser, httpConnection->httpSettings);
-
     /* deletes the http parser */
     deleteHttpParser(httpConnection->httpParser);
 
@@ -77,37 +71,18 @@ ERROR_CODE dataHandlerStreamHttp(struct IoConnection_t *ioConnection, unsigned c
     struct HttpConnection_t *httpConnection = (struct HttpConnection_t *) ioConnection->lower;
 
 
-    /* creates the http settings */
-    createHttpSettings(&httpConnection->httpSettings);
-
-    /* creates the http parser */
-    createHttpParser(&httpConnection->httpParser);
-
-    /* sets the connection as the parser parameter(s) */
-    httpConnection->httpParser->parameters = ioConnection->connection;
-
     /* sets the structures for the handler */
     setHandlerFile(httpConnection->httpParser, httpConnection->httpSettings);
 
 
     // TODO: tenho de testar quantos bytes processei !!!
-
-
     /* process the http data for the http parser */
     processDataHttpParser(httpConnection->httpParser, httpConnection->httpSettings, buffer, bufferSize);
 
 
 
-
-
     /* unsets the structures for the handler */
     unsetHandlerFile(httpConnection->httpParser, httpConnection->httpSettings);
-
-    /* deletes the http parser */
-    deleteHttpParser(httpConnection->httpParser);
-
-    /* deletes the http settings */
-    deleteHttpSettings(httpConnection->httpSettings);
 
 
 
