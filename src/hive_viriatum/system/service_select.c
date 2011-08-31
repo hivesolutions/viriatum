@@ -61,7 +61,7 @@ void createServiceSelect(struct ServiceSelect_t **serviceSelectPointer) {
     SOCKET_SET_ZERO(&serviceSelect->socketsWriteSetTemporary);
 
     /* sets the default timeout */
-    serviceSelect->selectTimeout.tv_sec = 10;
+    serviceSelect->selectTimeout.tv_sec = VIRIATUM_SELECT_TIMEOUT;
     serviceSelect->selectTimeout.tv_usec = 0;
 
     /* sets the service select in the service select pointer */
@@ -122,11 +122,8 @@ ERROR_CODE startServiceSelect(struct ServiceSelect_t *serviceSelect) {
     /* calculates the size of the socket address */
     SOCKET_ADDRESS_SIZE clientSocketAddressSize = sizeof(SOCKET_ADDRESS);
 
-
-
-    unsigned long flags = 1;
-
-
+	/* sets the flags to be used in socket */
+    SOCKET_FLAGS flags = 1;
 
     /* starts the service */
     returnValue = startService(serviceSelect->service);
@@ -143,8 +140,8 @@ ERROR_CODE startServiceSelect(struct ServiceSelect_t *serviceSelect) {
     /* adds the service socket handle to the sockets read set */
     addSocketHandleSocketsSetServiceSelect(serviceSelect, serviceSocketHandle, &serviceSelect->socketsReadSet);
 
-    /* iterates continuously */
-    while(1) {
+    /* iterates while the status is open */
+	while(serviceSelect->service->status == STATUS_OPEN) {
         /* resets the remove connections size */
         removeConnectionsSize = 0;
 
@@ -265,6 +262,26 @@ ERROR_CODE startServiceSelect(struct ServiceSelect_t *serviceSelect) {
 
     /* releases the remove connections */
     free(removeConnections);
+
+	/* raises no error */
+	RAISE_NO_ERROR;
+}
+
+ERROR_CODE stopServiceSelect(struct ServiceSelect_t *serviceSelect) {
+    /* allocates the return value */
+    ERROR_CODE returnValue;
+
+    /* stops the service */
+    returnValue = stopService(serviceSelect->service);
+
+	/* tests the error code for error */
+    if(IS_ERROR_CODE(returnValue)) {
+		/* raises the error again */
+        RAISE_AGAIN(returnValue);
+    }
+
+	/* raises no error */
+	RAISE_NO_ERROR;
 }
 
 void addConnectionServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_t *connection) {

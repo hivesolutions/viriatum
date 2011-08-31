@@ -35,6 +35,7 @@
 #define SOCKET_ADDRESS_SIZE int
 #define SOCKET_ADDRESS SOCKADDR
 #define SOCKET_ADDRESS_INPUT SOCKADDR_IN
+#define SOCKET_FLAGS unsigned long
 #define SOCKET_ERROR_CODE int
 #define SOCKET_IOCTL ioctlsocket
 #define SOCKET_WOULDBLOCK WSAEWOULDBLOCK
@@ -84,6 +85,7 @@
 #define SOCKET_ADDRESS_SIZE unsigned int
 #define SOCKET_ADDRESS struct sockaddr
 #define SOCKET_ADDRESS_INPUT struct sockaddr_in
+#define SOCKET_FLAGS unsigned long
 #define SOCKET_ERROR_CODE int
 #define SOCKET_IOCTL ioctl
 #define SOCKET_FCNTL fcntl

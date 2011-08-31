@@ -101,8 +101,8 @@ ERROR_CODE startService(struct Service_t *service) {
     /* allocates the option value and sets it to one (valid) */
     char optionValue = 1;
 
-    /* allocates the flags */
-    unsigned long flags = 1;
+    /* sets the flags to be used in socket */
+    SOCKET_FLAGS flags = 1;
 
     /* sets the socket address attributes */
     socketAddress.sin_family = SOCKET_INTERNET_TYPE;
@@ -159,6 +159,17 @@ ERROR_CODE startService(struct Service_t *service) {
 
     /* sets the service status as open */
     service->status = STATUS_OPEN;
+
+	/* raises no error */
+	RAISE_NO_ERROR;
+}
+
+ERROR_CODE stopService(struct Service_t *service) {
+	/* closes the service socket */
+	SOCKET_CLOSE(service->serviceSocketHandle);
+
+	/* sets the service status as closed */
+	service->status = STATUS_CLOSED;
 
 	/* raises no error */
 	RAISE_NO_ERROR;
