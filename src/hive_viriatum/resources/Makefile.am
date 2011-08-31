@@ -25,7 +25,7 @@
 
 include $(top_srcdir)/Common.am
 
-nobase_dist_resources_DATA = html/welcome/welcome.html \
+nobase_dist_resources_DATA = html/welcome/index.html \
 html/welcome/resources/css/layout.css \
 html/welcome/resources/images/favicon.ico \
 html/welcome/resources/images/main-illustration.png \
