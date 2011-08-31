@@ -145,11 +145,14 @@ ERROR_CODE urlCallbackHandlerFile(struct HttpParser_t *httpParser, const unsigne
     /* puts the end of string in the url */
     url[dataSize] = '\0';
 
-	if(strcmp(url, "/") == 0 || strcmp(url, "/") == 0) {
-		url = (unsigned char *) realloc(url, 10);
-		
-		memcpy(url, "index.html", 10);
-	}
+    /* in case the string refers the base path */
+    if(strcmp(url, "/") == 0 || strcmp(url, "") == 0) {
+        /* reallocates the space for the index reference */
+        url = (unsigned char *) realloc(url, 12);
+
+        /* copies the index reference as the url */
+        memcpy(url, "/index.html", 12);
+    }
 
     /* creates the file path from using the base viriatum path */
     SPRINTF((char *) handlerFileContext->filePath, 1024, "%s%s%s", VIRIATUM_CONTENTS_PATH, VIRIATUM_WELCOME_PATH, url);
