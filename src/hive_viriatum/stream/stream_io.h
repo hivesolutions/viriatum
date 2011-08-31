@@ -28,8 +28,30 @@
 #pragma once
 
 #include "../system/service.h"
+#include "stream_http.h"
 
+struct IoConnection_t;
+
+typedef ERROR_CODE (*dataIoConnectionCallback) (struct IoConnection_t *, unsigned char *, size_t);
+typedef ERROR_CODE (*ioConnectionCallback) (struct IoConnection_t *);
+
+typedef struct IoConnection_t {
+    struct Connection_t *connection;
+    dataIoConnectionCallback onData;
+    ioConnectionCallback onOpen;
+    ioConnectionCallback onClose;
+
+    /**
+     * Reference to the lower level
+     * connection substrate.
+     */
+    void *lower;
+} IoConnection;
+
+void createIoConnection(struct IoConnection_t **ioConnectionPointer, struct Connection_t *connection);
+void deleteIoConnection(struct IoConnection_t *ioConnection);
 ERROR_CODE readHandlerStreamIo(struct Connection_t *connection);
 ERROR_CODE writeHandlerStreamIo(struct Connection_t *connection);
 ERROR_CODE errorHandlerStreamIo(struct Connection_t *connection);
+ERROR_CODE openHandlerStreamIo(struct Connection_t *connection);
 ERROR_CODE closeHandlerStreamIo(struct Connection_t *connection);

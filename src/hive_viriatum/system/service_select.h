@@ -88,6 +88,7 @@ void addSocketHandleSocketsSetServiceSelect(struct ServiceSelect_t *serviceSelec
 void removeSocketHandleSocketsSetServiceSelect(struct ServiceSelect_t *serviceSelect, SOCKET_HANDLE socketHandle, SOCKET_SET *socketsSet);
 ERROR_CODE registerWriteServiceSelect(struct Connection_t *connection);
 ERROR_CODE unregisterWriteServiceSelect(struct Connection_t *connection);
+ERROR_CODE openConnectionServiceSelect(struct Connection_t *connection);
 ERROR_CODE closeConnectionServiceSelect(struct Connection_t *connection);
 
 /**

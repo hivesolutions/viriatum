@@ -29,5 +29,16 @@
 
 #include "../http/http.h"
 #include "../handlers/handlers.h"
+#include "stream_io.h"
 
-void dataHandlerStreamHttp(struct Connection_t *connection, unsigned char *buffer, size_t bufferSize);
+typedef struct HttpConnection_t {
+    struct IoConnection_t *ioConnection;
+    struct HttpSettings_t *httpSettings;
+    struct HttpParser_t *httpParser;
+} HttpConnection;
+
+void createHttpConnection(struct HttpConnection_t **httpConnectionPointer, struct IoConnection_t *ioConnection);
+void deleteHttpConnection(struct HttpConnection_t *httpConnection);
+ERROR_CODE dataHandlerStreamHttp(struct IoConnection_t *ioConnection, unsigned char *buffer, size_t bufferSize);
+ERROR_CODE openHandlerStreamHttp(struct IoConnection_t *ioConnection);
+ERROR_CODE closeHandlerStreamHttp(struct IoConnection_t *ioConnection);
