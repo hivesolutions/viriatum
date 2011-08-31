@@ -139,6 +139,8 @@ do {\
  */
 #define HTTP_CLOSE "close"
 
+struct HttpParser_t;
+
 static const char tokens[256] = {
 /*   0 nul    1 soh    2 stx    3 etx    4 eot    5 enq    6 ack    7 bel  */
         0,       0,       0,       0,       0,       0,       0,       0,
@@ -225,6 +227,18 @@ static const unsigned char normalUrlChar[256] = {
 /* 120  x   121  y   122  z   123  {   124  |   125  }   126  ~   127 del */
         1,       1,       1,       1,       1,       1,       1,       0
 };
+
+/**
+ * Callback function type used for callbacks that require
+ * "extra" data to be send as argument.
+ */
+typedef ERROR_CODE (*httpDataCallback) (struct HttpParser_t *, const unsigned char *, size_t);
+
+/**
+ * The "default" callback function to be used, without
+ * any extra arguments.
+ */
+typedef ERROR_CODE (*httpCallback) (struct HttpParser_t *);
 
 /**
  * List of strings defining the various http method
@@ -418,18 +432,6 @@ typedef struct HttpParser_t {
     void *context;
     void *parameters;
 } HttpParser;
-
-/**
- * Callback function type used for callbacks that require
- * "extra" data to be send as argument.
- */
-typedef ERROR_CODE (*httpDataCallback) (struct HttpParser_t *, const unsigned char *, size_t);
-
-/**
- * The "default" callback function to be used, without
- * any extra arguments.
- */
-typedef ERROR_CODE (*httpCallback) (struct HttpParser_t *);
 
 /**
  * Structure representing the various settings
