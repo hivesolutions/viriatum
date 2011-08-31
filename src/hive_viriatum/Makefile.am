@@ -48,4 +48,4 @@ test/simple_test.c
 
 resourcesdir = /var/viriatum
 
-dist_resources_DATA = resources/*
+dist_resources_DATA = resources/**
