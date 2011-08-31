@@ -44,11 +44,11 @@ stream/stream_http.c \
 stream/stream_io.c \
 system/service.c \
 system/service_select.c \
-test/simple_test.c 
+test/simple_test.c
 
 resourcesdir = /var/viriatum
 
-dist_resources_DATA = resources/html/welcome/welcome.html \
+dist_pkgdata_DATA = resources/html/welcome/welcome.html \
 resources/html/welcome/resources/css/layout.css \
 resources/html/welcome/resources/images/branding-viriatum_logotype.png \
 resources/html/welcome/resources/images/favicon.ico \
