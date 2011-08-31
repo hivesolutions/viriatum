@@ -45,3 +45,11 @@ stream/stream_io.c \
 system/service.c \
 system/service_select.c \
 test/simple_test.c 
+
+resourcesdir = /var/viriatum
+
+resources_DATA = html/welcome/welcome.html\
+html/welcome/resources/css/layout.css\
+html/welcome/resources/images/branding-viriatum_logotype.png\
+html/welcome/resources/images/favicon.ico\
+html/welcome/resources/images/main-illustration.png
