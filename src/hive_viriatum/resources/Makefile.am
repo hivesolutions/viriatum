@@ -27,6 +27,7 @@ include $(top_srcdir)/Common.am
 
 nobase_dist_resources_DATA = html/welcome/welcome.html \
 html/welcome/resources/css/layout.css \
-html/welcome/resources/images/branding-viriatum_logotype.png \
 html/welcome/resources/images/favicon.ico \
 html/welcome/resources/images/main-illustration.png
+html/welcome/resources/images/separator-horizontal.png \
+html/welcome/resources/images/viriatum-logotype.png
