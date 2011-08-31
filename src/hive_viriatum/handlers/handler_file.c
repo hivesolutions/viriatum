@@ -146,7 +146,7 @@ ERROR_CODE urlCallbackHandlerFile(struct HttpParser_t *httpParser, const unsigne
     url[dataSize] = '\0';
 
     /* in case the string refers the base path */
-    if(strcmp(url, "/") == 0 || strcmp(url, "") == 0) {
+    if(strcmp((char *) url, "/") == 0 || strcmp((char *) url, "") == 0) {
         /* reallocates the space for the index reference */
         url = (unsigned char *) realloc(url, 12);
 
