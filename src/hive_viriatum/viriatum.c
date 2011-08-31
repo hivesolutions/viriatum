@@ -150,7 +150,7 @@ int main(int argc, char *argv[]) {
     }
 
     /* prints a debug message */
-    V_DEBUG("Finishing process");
+    V_DEBUG_F("Finishing (%s) process\n", description);
 
     /* returns zero (valid) */
     return 0;
