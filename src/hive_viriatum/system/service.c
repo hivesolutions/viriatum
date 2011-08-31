@@ -39,8 +39,14 @@ void createService(struct Service_t **servicePointer) {
     /* creates the connections list */
     createLinkedList(&service->connectionsList);
 
+    /* setst the service status as invalid */
+    service->name = NULL;
+
     /* setst the service status as closed */
     service->status = STATUS_CLOSED;
+
+    /* setst the service service socket handle as invalid */
+    service->serviceSocketHandle = 0;
 
     /* sets the service register write */
     service->registerWrite = NULL;
@@ -53,6 +59,15 @@ void createService(struct Service_t **servicePointer) {
 }
 
 void deleteService(struct Service_t *service) {
+    /* in case the service socket handle is defined */
+    if(service->serviceSocketHandle) {
+        /* closes the service socket */
+        SOCKET_CLOSE(service->serviceSocketHandle);
+    }
+
+    /* deletes the connections list */
+    deleteLinkedList(service->connectionsList);
+
     /* releases the service */
     free(service);
 }
@@ -153,26 +168,23 @@ ERROR_CODE startService(struct Service_t *service) {
         /* closes the service socket */
         SOCKET_CLOSE(service->serviceSocketHandle);
 
-	    /* raises an error */
+        /* raises an error */
         RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem listening socket");
-	}
+    }
 
     /* sets the service status as open */
     service->status = STATUS_OPEN;
 
-	/* raises no error */
-	RAISE_NO_ERROR;
+    /* raises no error */
+    RAISE_NO_ERROR;
 }
 
 ERROR_CODE stopService(struct Service_t *service) {
-	/* closes the service socket */
-	SOCKET_CLOSE(service->serviceSocketHandle);
+    /* sets the service status as closed */
+    service->status = STATUS_CLOSED;
 
-	/* sets the service status as closed */
-	service->status = STATUS_CLOSED;
-
-	/* raises no error */
-	RAISE_NO_ERROR;
+    /* raises no error */
+    RAISE_NO_ERROR;
 }
 
 void addConnectionService(struct Service_t *service, struct Connection_t *connection) {
