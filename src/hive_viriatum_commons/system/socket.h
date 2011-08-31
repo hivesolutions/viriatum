@@ -87,7 +87,7 @@
 #define SOCKET_ADDRESS struct sockaddr
 #define SOCKET_ADDRESS_INPUT struct sockaddr_in
 #define SOCKET_FLAGS unsigned long
-#define SOCKET_OPTION char
+#define SOCKET_OPTION int
 #define SOCKET_ERROR_CODE int
 #define SOCKET_IOCTL ioctl
 #define SOCKET_FCNTL fcntl
