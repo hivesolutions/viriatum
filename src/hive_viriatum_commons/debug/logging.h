@@ -27,35 +27,7 @@
 
 #pragma once
 
-static __inline unsigned char *baseStringValue(unsigned char *stringValue) {
-	/* allocates the index counter */
-	unsigned int index;
-
-	/* allocates the current character value */
-	unsigned int currentCharacter;
-
-	/* retrieves the string value length */
-	unsigned int stringValueLength = strlen(stringValue);
-
-	/* iterates from back throught the string value */
-	for(index = stringValueLength; index > 0; index--) {
-		/* retrieves the current character */
-		currentCharacter = stringValue[index];
-
-		/* in case the current character is a slash or a back-slash */
-		if(currentCharacter == '\\' || currentCharacter == '/') {
-			/* increments the index in order to set the apropriate
-			pointer value (need to point to the next chracter after the slash) */
-			index += 1;
-
-			/* breaks the loop */
-			break;
-		}
-	}
-
-	/* returns the "new" string value pointer */
-	return stringValue + index;
-}
+#include "../util/string_util.h"
 
 #ifdef VIRIATUM_DEBUG
 #define V_MESSAGE(level) printf("[%s] [%s:%d] ", level, baseStringValue(__FILE__), __LINE__)
