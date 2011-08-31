@@ -48,7 +48,7 @@ test/simple_test.c
 
 resourcesdir = /var/viriatum
 
-resources_DATA = html/welcome/welcome.html\
+dist_resources_DATA = html/welcome/welcome.html\
 html/welcome/resources/css/layout.css\
 html/welcome/resources/images/branding-viriatum_logotype.png\
 html/welcome/resources/images/favicon.ico\
