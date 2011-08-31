@@ -74,6 +74,11 @@ typedef enum Operation_e {
     OPERATION_READ
 } Operation;
 
+/**
+ * Enumeration defining the various
+ * status to be used in a workflow driven
+ * object or structure.
+ */
 typedef enum Status_e {
     STATUS_OPEN = 1,
     STATUS_CLOSED
