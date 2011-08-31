@@ -146,7 +146,7 @@ ERROR_CODE urlCallbackHandlerFile(struct HttpParser_t *httpParser, const unsigne
     url[dataSize] = '\0';
 
     /* creates the file path from using the base viriatum path */
-    SPRINTF((char *) handlerFileContext->filePath, 1024, "%s%s", VIRIATUM_WELCOME_PATH, url);
+    SPRINTF((char *) handlerFileContext->filePath, 1024, "%s%s%s", VIRIATUM_CONTENTS_PATH, VIRIATUM_WELCOME_PATH, url);
 
     /* releases the url */
     free(url);
