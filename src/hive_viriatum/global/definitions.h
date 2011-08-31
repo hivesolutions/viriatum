@@ -35,7 +35,7 @@
 #ifdef VIRIATUM_PLATFORM_UNIX
 #define VIRIATUM_RESOURCES_PATH "resources"
 #define VIRIATUM_WELCOME_PATH "/html/welcome"
-#define VIRIATUM_CONTENTS_PATH "/var/www"
+#define VIRIATUM_CONTENTS_PATH "/var/viriatum"
 #endif
 
 #define VIRIATUM_NAME "viriatum"
