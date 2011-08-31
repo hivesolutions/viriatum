@@ -25,33 +25,8 @@
 
 include $(top_srcdir)/Common.am
 
-SUBDIRS = resources
-
-bin_PROGRAMS = viriatum
-
-viriatum_CFLAGS = $(AM_CFLAGS)
-viriatum_CXXFLAGS = $(AM_CXXFLAGS)
-
-viriatum_LDADD = ../hive_viriatum_commons/libviriatum.a $(INTLLIBS)
-
-viriatum_SOURCES = stdafx.c \
-viriatum.c \
-handlers/handler_default.c \
-handlers/handler_file.c \
-http/http_parser.c \
-http/http_request.c \
-io/file.c \
-module/loading.c \
-stream/stream_http.c \
-stream/stream_io.c \
-system/service.c \
-system/service_select.c \
-test/simple_test.c
-
-resourcesdir = /var/viriatum
-
-nobase_dist_resources_DATA = resources/html/welcome/welcome.html \
-resources/html/welcome/resources/css/layout.css \
-resources/html/welcome/resources/images/branding-viriatum_logotype.png \
-resources/html/welcome/resources/images/favicon.ico \
-resources/html/welcome/resources/images/main-illustration.png
+nobase_dist_resources_DATA = html/welcome/welcome.html \
+html/welcome/resources/css/layout.css \
+html/welcome/resources/images/branding-viriatum_logotype.png \
+html/welcome/resources/images/favicon.ico \
+html/welcome/resources/images/main-illustration.png
