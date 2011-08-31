@@ -30,10 +30,6 @@
 
 #include "http_parser.h"
 
-
-
-
-
 int httpShouldKeepAlive(struct HttpParser_t *httpParser) {
     /* in case the request is of type http 1.1 */
     if(httpParser->httpMajor > 0 && httpParser->httpMinor > 0) {

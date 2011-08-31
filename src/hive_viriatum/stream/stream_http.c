@@ -74,12 +74,9 @@ ERROR_CODE dataHandlerStreamHttp(struct IoConnection_t *ioConnection, unsigned c
     /* sets the structures for the handler */
     setHandlerFile(httpConnection->httpParser, httpConnection->httpSettings);
 
-
     // TODO: tenho de testar quantos bytes processei !!!
     /* process the http data for the http parser */
     processDataHttpParser(httpConnection->httpParser, httpConnection->httpSettings, buffer, bufferSize);
-
-
 
     /* unsets the structures for the handler */
     unsetHandlerFile(httpConnection->httpParser, httpConnection->httpSettings);
