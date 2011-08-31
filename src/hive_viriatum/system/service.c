@@ -114,7 +114,7 @@ ERROR_CODE startService(struct Service_t *service) {
     SOCKET_ERROR_CODE socketResult;
 
     /* allocates the option value and sets it to one (valid) */
-    char optionValue = 1;
+    SOCKET_OPTION optionValue = 1;
 
     /* sets the flags to be used in socket */
     SOCKET_FLAGS flags = 1;
