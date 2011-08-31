@@ -29,6 +29,40 @@
 
 #include "stream_io.h"
 
+void createIoConnection(struct IoConnection_t **ioConnectionPointer, struct Connection_t *connection) {
+    /* retrieves the io connection size */
+    size_t ioConnectionSize = sizeof(struct IoConnection_t);
+
+    /* allocates space for the io connection */
+    struct IoConnection_t *ioConnection = (struct IoConnection_t *) malloc(ioConnectionSize);
+
+    /* sets the io connection connection */
+    ioConnection->connection = connection;
+
+    /* sets the on data to unset */
+    ioConnection->onData = NULL;
+
+    /* sets the on open to unset */
+    ioConnection->onOpen = NULL;
+
+    /* sets the on close to unset */
+    ioConnection->onClose = NULL;
+
+    /* sets the lower to unset */
+    ioConnection->lower = NULL;
+
+    /* sets the io connection in the (upper) connection substrate */
+    connection->lower = ioConnection;
+
+    /* sets the io connection in the io connection pointer */
+    *ioConnectionPointer = ioConnection;
+}
+
+void deleteIoConnection(struct IoConnection_t *ioConnection) {
+    /* releases the io connection */
+    free(ioConnection);
+}
+
 ERROR_CODE readHandlerStreamIo(struct Connection_t *connection) {
     /* allocates the number of bytes */
     SOCKET_ERROR_CODE numberBytes;
@@ -44,6 +78,9 @@ ERROR_CODE readHandlerStreamIo(struct Connection_t *connection) {
 
     /* flag and value controlling the state of the read */
     ERROR_CODE error = 0;
+
+    /* retrieves the io connection */
+    struct IoConnection_t *ioConnection = (struct IoConnection_t *) connection->lower;
 
     /* iterates continuously */
     while(1) {
@@ -115,8 +152,17 @@ ERROR_CODE readHandlerStreamIo(struct Connection_t *connection) {
     switch(error) {
         /* in case there's no error */
         case 0:
-            /* calls the on data handler */
-            dataHandlerStreamHttp(connection, buffer, bufferSize);
+            /* in case the on data handler is defined */
+            if(ioConnection->onData != NULL) {
+                /* prints a debug message */
+                V_DEBUG("Calling on data handler\n");
+
+                /* calls the on data handler */
+                ioConnection->onData(ioConnection, buffer, bufferSize);
+
+                /* prints a debug message */
+                V_DEBUG("Finished calling on data handler\n");
+            }
 
             /* breaks the switch */
             break;
@@ -131,8 +177,17 @@ ERROR_CODE readHandlerStreamIo(struct Connection_t *connection) {
 
         /* in case it's a non fatal error */
         case 2:
-            /* calls the on data handler */
-            dataHandlerStreamHttp(connection, buffer, bufferSize);
+            /* in case the on data handler is defined */
+            if(ioConnection->onData != NULL) {
+                /* prints a debug message */
+                V_DEBUG("Calling on data handler\n");
+
+                /* calls the on data handler */
+                ioConnection->onData(ioConnection, buffer, bufferSize);
+
+                /* prints a debug message */
+                V_DEBUG("Finished calling on data handler\n");
+            }
 
             /* breaks the switch */
             break;
@@ -292,6 +347,52 @@ ERROR_CODE errorHandlerStreamIo(struct Connection_t *connection) {
     return 0;
 }
 
+ERROR_CODE openHandlerStreamIo(struct Connection_t *connection) {
+    /* allocates the io connection */
+    struct IoConnection_t *ioConnection;
+
+    /* creates the io connection */
+    createIoConnection(&ioConnection, connection);
+
+    /* TODO: this values are hardcoded and should be
+    removed (change also header file reference) */
+    ioConnection->onData = dataHandlerStreamHttp;
+    ioConnection->onOpen = openHandlerStreamHttp;
+    ioConnection->onClose = closeHandlerStreamHttp;
+
+    /* in case the on open handler is defined */
+    if(ioConnection->onOpen != NULL) {
+        /* prints a debug message */
+        V_DEBUG("Calling on open handler\n");
+
+        /* calls the on open handler */
+        ioConnection->onOpen(ioConnection);
+
+        /* prints a debug message */
+        V_DEBUG("Finished calling on open handler\n");
+    }
+
+    return 0;
+}
+
 ERROR_CODE closeHandlerStreamIo(struct Connection_t *connection) {
+    /* retrieves the io connection */
+    struct IoConnection_t *ioConnection = (struct IoConnection_t *) connection->lower;
+
+    /* in case the on close handler is defined */
+    if(ioConnection->onOpen != NULL) {
+        /* prints a debug message */
+        V_DEBUG("Calling on close handler\n");
+
+        /* calls the on close handler */
+        ioConnection->onClose(ioConnection);
+
+        /* prints a debug message */
+        V_DEBUG("Finished calling on close handler\n");
+    }
+
+    /* deletes the io connection */
+    deleteIoConnection(ioConnection);
+
     return 0;
 }

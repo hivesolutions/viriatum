@@ -234,6 +234,9 @@ void createConnection(struct Connection_t **connectionPointer, SOCKET_HANDLE soc
     /* sets the write registered to false */
     connection->writeRegistered = 0;
 
+    /* sets the open connection to unset */
+    connection->openConnection = NULL;
+
     /* sets the close connection to unset */
     connection->closeConnection = NULL;
 
@@ -246,8 +249,14 @@ void createConnection(struct Connection_t **connectionPointer, SOCKET_HANDLE soc
     /* sets the on error to unset */
     connection->onError = NULL;
 
+    /* sets the on open to unset */
+    connection->onOpen = NULL;
+
     /* sets the on close to unset */
     connection->onClose = NULL;
+
+    /* sets the lower to unset */
+    connection->lower = NULL;
 
     /* creates the read queue linked list */
     createLinkedList(&connection->readQueue);
@@ -298,6 +307,7 @@ void openConection(struct Connection_t *connection) {
     /* sets the connection status as open */
     connection->status = STATUS_OPEN;
 }
+
 
 void closeConection(struct Connection_t *connection) {
     /* closes the socket */

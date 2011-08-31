@@ -165,23 +165,20 @@ ERROR_CODE startServiceSelect(struct ServiceSelect_t *serviceSelect) {
             /* creates the connection */
             createConnection(&connection, socketHandle);
 
-            /* opens the connection */
-            openConection(connection);
-
             /* sets the service select service as the service in the connection */
             connection->service = serviceSelect->service;
 
             /* sets the service select as the service in the connection */
             connection->serviceReference = serviceSelect;
 
-            /* TODO: This setting is HARDCODED should be configured */
-            connection->onRead = readHandlerStreamIo;
-            connection->onWrite = writeHandlerStreamIo;
-            connection->onError = errorHandlerStreamIo;
-            connection->onClose = closeHandlerStreamIo;
+            /* sets the open connection fucntion in the connection */
+            connection->openConnection = openConnectionServiceSelect;
 
-            /* adds the connection to the service select */
-            addConnectionServiceSelect(serviceSelect, connection);
+            /* sets the close connection fucntion in the connection */
+            connection->closeConnection = closeConnectionServiceSelect;
+
+            /* opens the connection */
+            connection->openConnection(connection);
         }
 
         /* prints a debug message */
@@ -290,15 +287,9 @@ void addConnectionServiceSelect(struct ServiceSelect_t *serviceSelect, struct Co
 
     /* adds the socket handle to the sockets read set */
     addSocketHandleSocketsSetServiceSelect(serviceSelect, connection->socketHandle, &serviceSelect->socketsReadSet);
-
-    /* sets the close connection fucntion in the connection */
-    connection->closeConnection = closeConnectionServiceSelect;
 }
 
 void removeConnectionServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_t *connection) {
-    /* unsets the close connection fucntion in the connection */
-    connection->closeConnection = NULL;
-
     /* calls the remove connection service (super) */
     removeConnectionService(serviceSelect->service, connection);
 
@@ -489,6 +480,45 @@ ERROR_CODE unregisterWriteServiceSelect(struct Connection_t *connection) {
     RAISE_NO_ERROR;
 }
 
+ERROR_CODE openConnectionServiceSelect(struct Connection_t *connection) {
+    /* retrieves the service select */
+    struct ServiceSelect_t *serviceSelect = (struct ServiceSelect_t *) connection->serviceReference;
+
+    /* in case the connection is (already) open */
+    if(connection->status == STATUS_OPEN) {
+        /* raises no error */
+        RAISE_NO_ERROR;
+    }
+
+    /* opens the connection */
+    openConection(connection);
+
+    /* adds the connection to the service select */
+    addConnectionServiceSelect(serviceSelect, connection);
+
+    /* TODO: This setting is HARDCODED should be configured */
+    connection->onRead = readHandlerStreamIo;
+    connection->onWrite = writeHandlerStreamIo;
+    connection->onError = errorHandlerStreamIo;
+    connection->onOpen = openHandlerStreamIo;
+    connection->onClose = closeHandlerStreamIo;
+
+    /* in case the on open handler is defined */
+    if(connection->onOpen != NULL) {
+        /* prints a debug message */
+        V_DEBUG("Calling on open handler\n");
+
+        /* calls the on open handler */
+        connection->onOpen(connection);
+
+        /* prints a debug message */
+        V_DEBUG("Finished calling on open handler\n");
+    }
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
 ERROR_CODE closeConnectionServiceSelect(struct Connection_t *connection) {
     /* retrieves the service select */
     struct ServiceSelect_t *serviceSelect = (struct ServiceSelect_t *) connection->serviceReference;
@@ -502,8 +532,8 @@ ERROR_CODE closeConnectionServiceSelect(struct Connection_t *connection) {
     /* prints a debug message */
     V_DEBUG_F("Closing connection: %d\n", connection->socketHandle);
 
-    /* in case the connection is open */
-    if(connection->status == STATUS_OPEN && connection->onClose != NULL) {
+    /* in case the on close handler is defined */
+    if(connection->onClose != NULL) {
         /* prints a debug message */
         V_DEBUG("Calling on close handler\n");
 
@@ -513,6 +543,12 @@ ERROR_CODE closeConnectionServiceSelect(struct Connection_t *connection) {
         /* prints a debug message */
         V_DEBUG("Finished calling on close handler\n");
     }
+
+    /* unsets the open connection fucntion in the connection */
+    connection->openConnection = NULL;
+
+    /* unsets the close connection fucntion in the connection */
+    connection->closeConnection = NULL;
 
     /* removes the connection from the service select */
     removeConnectionServiceSelect(serviceSelect, connection);

@@ -72,11 +72,19 @@ typedef struct Connection_t {
     unsigned int writeRegistered;
     struct LinkedList_t *readQueue;
     struct LinkedList_t *writeQueue;
+    connectionUpdate openConnection;
     connectionUpdate closeConnection;
     connectionCallback onRead;
     connectionCallback onWrite;
     connectionCallback onError;
+    connectionCallback onOpen;
     connectionCallback onClose;
+
+    /**
+     * Reference to the lower level
+     * connection substrate.
+     */
+    void *lower;
 } Connection;
 
 typedef enum Operation_e {
