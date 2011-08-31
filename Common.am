@@ -25,3 +25,5 @@
 
 AM_CFLAGS = -pedantic -finline-functions -Wall -Wno-long-long -Wno-variadic-macros
 AM_CXXFLAGS = -pedantic -finline-functions  -Wall -Wno-long-long -Wno-variadic-macros
+
+resourcesdir = /var/viriatum
