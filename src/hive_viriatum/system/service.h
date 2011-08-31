@@ -36,7 +36,17 @@ struct Connection_t;
  */
 typedef ERROR_CODE (*connectionUpdate) (struct Connection_t *);
 
+/**
+ * The function to be used for callbacks associated with the
+ * connection status updates.
+ */
 typedef ERROR_CODE (*connectionCallback) (struct Connection_t *);
+
+/**
+ * The "default" callback function to be used, without
+ * any extra arguments.
+ */
+typedef ERROR_CODE (*serviceCallback) (struct Connection_t *, struct Data_t *, void *);
 
 typedef struct Service_t {
     unsigned char *name;
@@ -83,12 +93,6 @@ typedef enum Status_e {
     STATUS_OPEN = 1,
     STATUS_CLOSED
 } Status;
-
-/**
- * The "default" callback function to be used, without
- * any extra arguments.
- */
-typedef ERROR_CODE (*serviceCallback) (struct Connection_t *, struct Data_t *, void *);
 
 /**
  * Structure defining a data element
