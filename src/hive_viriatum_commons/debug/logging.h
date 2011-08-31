@@ -27,9 +27,47 @@
 
 #pragma once
 
+static __inline unsigned char *baseStringValue(unsigned char *stringValue) {
+	/* allocates the index counter */
+	unsigned int index;
+
+	/* allocates the current character value */
+	unsigned int currentCharacter;
+
+	/* retrieves the string value length */
+	unsigned int stringValueLength = strlen(stringValue);
+
+	/* iterates from back throught the string value */
+	for(index = stringValueLength; index > 0; index--) {
+		/* retrieves the current character */
+		currentCharacter = stringValue[index];
+
+		/* in case the current character is a slash or a back-slash */
+		if(currentCharacter == '\\' || currentCharacter == '/') {
+			/* increments the index in order to set the apropriate
+			pointer value (need to point to the next chracter after the slash) */
+			index += 1;
+
+			/* breaks the loop */
+			break;
+		}
+	}
+
+	/* returns the "new" string value pointer */
+	return stringValue + index;
+}
+
 #ifdef VIRIATUM_DEBUG
-#define V_DEBUG(format) printf("[DEBUG] "); printf(format)
-#define V_DEBUG_F(format, ...) printf("[DEBUG] "); printf(format, __VA_ARGS__)
+#define V_MESSAGE(level) printf("[%s] [%s:%d] ", level, baseStringValue(__FILE__), __LINE__)
+#endif
+
+#ifndef VIRIATUM_DEBUG
+#define V_MESSAGE(level) printf("[%s] ", level)
+#endif
+
+#ifdef VIRIATUM_DEBUG
+#define V_DEBUG(format) V_MESSAGE("DEBUG"); printf(format)
+#define V_DEBUG_F(format, ...) V_MESSAGE("DEBUG"); printf(format, __VA_ARGS__)
 #endif
 
 #ifndef VIRIATUM_DEBUG
@@ -37,11 +75,11 @@
 #define V_DEBUG_F(format, ...) dumpMultiple(format, __VA_ARGS__)
 #endif
 
-#define V_WARNING(format) printf("[WARNING] "); printf(format)
-#define V_WARNING_F(format, ...) printf("[WARNING] "); printf(format, __VA_ARGS__)
+#define V_WARNING(format) V_MESSAGE("WARNING"); printf(format)
+#define V_WARNING_F(format, ...) V_MESSAGE("WARNING"); printf(format, __VA_ARGS__)
 
-#define V_ERROR(format) printf("[ERROR] "); printf(format)
-#define V_ERROR_F(format, ...) printf("[ERROR] "); printf(format, __VA_ARGS__)
+#define V_ERROR(format) V_MESSAGE("ERROR"); printf(format)
+#define V_ERROR_F(format, ...) V_MESSAGE("ERROR"); printf(format, __VA_ARGS__)
 
 #define V_PRINT(format) printf(format)
 #define V_PRINT_F(format, ...) printf(format, __VA_ARGS__)

@@ -102,8 +102,8 @@ ERROR_CODE ranService() {
 }
 
 void killHandler(int signalNumber) {
-    /* removes the signal handler (only one handling) */
-    signal(signalNumber, NULL);
+    /* defaults the signal handler (only one handling) */
+    signal(signalNumber, SIG_DFL);
 
     /* runs the "ran" service */
     ranService();
