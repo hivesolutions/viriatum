@@ -74,6 +74,7 @@
 #include <stdarg.h>
 #include <string.h>
 #include <assert.h>
+#include <signal.h>
 #include <time.h>
 #include <math.h>
 

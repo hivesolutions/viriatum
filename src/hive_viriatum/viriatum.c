@@ -29,12 +29,11 @@
 
 #include "viriatum.h"
 
+static struct ServiceSelect_t *serviceSelect;
+
 ERROR_CODE runService() {
     /* allocates the return value */
     ERROR_CODE returnValue;
-
-    /* allocates the service select */
-    struct ServiceSelect_t *serviceSelect;
 
     /* allocates the socket data */
     SOCKET_DATA socketData;
@@ -64,6 +63,49 @@ ERROR_CODE runService() {
 	RAISE_NO_ERROR;
 }
 
+ERROR_CODE ranService() {
+    /* allocates the return value */
+    ERROR_CODE returnValue;
+
+	/* retrieves the service */
+	struct Service_t *service = serviceSelect->service;
+
+    /* in case the service status is open */
+	if(service->status == STATUS_CLOSED) {
+		/* prints a warning message */
+		V_DEBUG("No service to be stopped\n");
+	} else {
+		/* prints a warning message */
+		V_DEBUG("Stopping service\n");
+
+		/* starts the service select */
+		returnValue = stopServiceSelect(serviceSelect);
+
+		/* tests the error code for error */
+		if(IS_ERROR_CODE(returnValue)) {
+			/* runs the socket finish */
+			SOCKET_FINISH();
+
+			/* raises the error again */
+			RAISE_AGAIN(returnValue);
+		}
+
+		/* prints a warning message */
+		V_DEBUG("Finished stopping service\n");
+	}
+
+	/* raises no error */
+	RAISE_NO_ERROR;
+}
+
+void killHandler(int signalNumber) {
+	/* removes the signal handler (only one handling) */
+	signal(signalNumber, NULL);
+
+	/* runs the "ran" service */
+	ranService();
+}
+
 int main(int argc, char *argv[]) {
     /* allocates the return value */
     ERROR_CODE returnValue;
@@ -74,6 +116,9 @@ int main(int argc, char *argv[]) {
     /* retrieves the description */
     unsigned char *description = descriptionViriatum();
 
+	/* registers the kill handler for the int signal */
+	signal(SIGINT, killHandler);
+
     /* prints a message */
     V_PRINT_F("%s %s (%s, %s) [%s %s %d bit (%s)] on %s\n", description, version, VIRIATUM_COMPILATION_DATE, VIRIATUM_COMPILATION_TIME, VIRIATUM_COMPILER, VIRIATUM_COMPILER_VERSION_STRING, (int) VIRIATUM_PLATFORM_CPU_BITS, VIRIATUM_PLATFORM_CPU, VIRIATUM_PLATFORM_STRING);
 
@@ -81,7 +126,7 @@ int main(int argc, char *argv[]) {
     V_PRINT_F("%s\n", VIRIATUM_COPYRIGHT);
 
     /* prints a debug message */
-    V_DEBUG_F("Receiving %d arguments\n", argc);
+    V_DEBUG_F("Receiving %d argument(s)\n", argc);
 
     /* loads the module */
     returnValue = loadModule((unsigned char *) "C:/Users/joamag/Desktop/repositories/viriatum/bin/hive_viriatum_mod_lua/i386/win32/Debug/hive_viriatum_mod_lua.dll");
