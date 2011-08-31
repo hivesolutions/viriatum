@@ -45,10 +45,10 @@ ERROR_CODE loadModule(unsigned char *modulePath) {
     /* in case the mod library was not loaded */
     if(modLibrary == NULL) {
         /* prints a warning message */
-        V_WARNING("Problem loading library (not found)\n");
+        V_WARNING("Error loading library (not found)\n");
 
         /* raises an error */
-        RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem loading library");
+        RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Error loading library");
     } else {
         /* prints a debug message */
         V_DEBUG("Loaded library\n");
