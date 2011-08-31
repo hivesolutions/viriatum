@@ -47,63 +47,66 @@ ERROR_CODE runService() {
     /* starts the service select */
     returnValue = startServiceSelect(serviceSelect);
 
-	/* tests the error code for error */
+    /* tests the error code for error */
     if(IS_ERROR_CODE(returnValue)) {
-		 /* runs the socket finish */
-		SOCKET_FINISH();
+         /* runs the socket finish */
+        SOCKET_FINISH();
 
-		/* raises the error again */
-		RAISE_AGAIN(returnValue);
+        /* raises the error again */
+        RAISE_AGAIN(returnValue);
     }
+
+    /* deletes the service select */
+    deleteServiceSelect(serviceSelect);
 
     /* runs the socket finish */
     SOCKET_FINISH();
 
-	/* raises no error */
-	RAISE_NO_ERROR;
+    /* raises no error */
+    RAISE_NO_ERROR;
 }
 
 ERROR_CODE ranService() {
     /* allocates the return value */
     ERROR_CODE returnValue;
 
-	/* retrieves the service */
-	struct Service_t *service = serviceSelect->service;
+    /* retrieves the service */
+    struct Service_t *service = serviceSelect->service;
 
     /* in case the service status is open */
-	if(service->status == STATUS_CLOSED) {
-		/* prints a warning message */
-		V_DEBUG("No service to be stopped\n");
-	} else {
-		/* prints a warning message */
-		V_DEBUG("Stopping service\n");
+    if(service->status == STATUS_CLOSED) {
+        /* prints a warning message */
+        V_DEBUG("No service to be stopped\n");
+    } else {
+        /* prints a warning message */
+        V_DEBUG("Stopping service\n");
 
-		/* starts the service select */
-		returnValue = stopServiceSelect(serviceSelect);
+        /* starts the service select */
+        returnValue = stopServiceSelect(serviceSelect);
 
-		/* tests the error code for error */
-		if(IS_ERROR_CODE(returnValue)) {
-			/* runs the socket finish */
-			SOCKET_FINISH();
+        /* tests the error code for error */
+        if(IS_ERROR_CODE(returnValue)) {
+            /* runs the socket finish */
+            SOCKET_FINISH();
 
-			/* raises the error again */
-			RAISE_AGAIN(returnValue);
-		}
+            /* raises the error again */
+            RAISE_AGAIN(returnValue);
+        }
 
-		/* prints a warning message */
-		V_DEBUG("Finished stopping service\n");
-	}
+        /* prints a warning message */
+        V_DEBUG("Finished stopping service\n");
+    }
 
-	/* raises no error */
-	RAISE_NO_ERROR;
+    /* raises no error */
+    RAISE_NO_ERROR;
 }
 
 void killHandler(int signalNumber) {
-	/* removes the signal handler (only one handling) */
-	signal(signalNumber, NULL);
+    /* removes the signal handler (only one handling) */
+    signal(signalNumber, NULL);
 
-	/* runs the "ran" service */
-	ranService();
+    /* runs the "ran" service */
+    ranService();
 }
 
 int main(int argc, char *argv[]) {
@@ -116,8 +119,8 @@ int main(int argc, char *argv[]) {
     /* retrieves the description */
     unsigned char *description = descriptionViriatum();
 
-	/* registers the kill handler for the int signal */
-	signal(SIGINT, killHandler);
+    /* registers the kill handler for the int signal */
+    signal(SIGINT, killHandler);
 
     /* prints a message */
     V_PRINT_F("%s %s (%s, %s) [%s %s %d bit (%s)] on %s\n", description, version, VIRIATUM_COMPILATION_DATE, VIRIATUM_COMPILATION_TIME, VIRIATUM_COMPILER, VIRIATUM_COMPILER_VERSION_STRING, (int) VIRIATUM_PLATFORM_CPU_BITS, VIRIATUM_PLATFORM_CPU, VIRIATUM_PLATFORM_STRING);
@@ -134,16 +137,16 @@ int main(int argc, char *argv[]) {
     /* tests the error code for error */
     if(IS_ERROR_CODE(returnValue)) {
         /* prints a warning message */
-		V_WARNING_F("Problem loading module (%s)\n", getLastErrorMessageSafe());
+        V_WARNING_F("Problem loading module (%s)\n", getLastErrorMessageSafe());
     }
 
     /* runs the service */
     returnValue = runService();
 
-	/* tests the error code for error */
+    /* tests the error code for error */
     if(IS_ERROR_CODE(returnValue)) {
         /* prints an error message */
-		V_ERROR_F("Problem running service (%s)\n", getLastErrorMessageSafe());
+        V_ERROR_F("Problem running service (%s)\n", getLastErrorMessageSafe());
     }
 
     /* prints a debug message */

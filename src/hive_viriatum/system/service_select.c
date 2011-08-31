@@ -122,15 +122,15 @@ ERROR_CODE startServiceSelect(struct ServiceSelect_t *serviceSelect) {
     /* calculates the size of the socket address */
     SOCKET_ADDRESS_SIZE clientSocketAddressSize = sizeof(SOCKET_ADDRESS);
 
-	/* sets the flags to be used in socket */
+    /* sets the flags to be used in socket */
     SOCKET_FLAGS flags = 1;
 
     /* starts the service */
     returnValue = startService(serviceSelect->service);
 
-	/* tests the error code for error */
+    /* tests the error code for error */
     if(IS_ERROR_CODE(returnValue)) {
-		/* raises the error again */
+        /* raises the error again */
         RAISE_AGAIN(returnValue);
     }
 
@@ -141,7 +141,7 @@ ERROR_CODE startServiceSelect(struct ServiceSelect_t *serviceSelect) {
     addSocketHandleSocketsSetServiceSelect(serviceSelect, serviceSocketHandle, &serviceSelect->socketsReadSet);
 
     /* iterates while the status is open */
-	while(serviceSelect->service->status == STATUS_OPEN) {
+    while(serviceSelect->service->status == STATUS_OPEN) {
         /* resets the remove connections size */
         removeConnectionsSize = 0;
 
@@ -263,8 +263,8 @@ ERROR_CODE startServiceSelect(struct ServiceSelect_t *serviceSelect) {
     /* releases the remove connections */
     free(removeConnections);
 
-	/* raises no error */
-	RAISE_NO_ERROR;
+    /* raises no error */
+    RAISE_NO_ERROR;
 }
 
 ERROR_CODE stopServiceSelect(struct ServiceSelect_t *serviceSelect) {
@@ -274,14 +274,14 @@ ERROR_CODE stopServiceSelect(struct ServiceSelect_t *serviceSelect) {
     /* stops the service */
     returnValue = stopService(serviceSelect->service);
 
-	/* tests the error code for error */
+    /* tests the error code for error */
     if(IS_ERROR_CODE(returnValue)) {
-		/* raises the error again */
+        /* raises the error again */
         RAISE_AGAIN(returnValue);
     }
 
-	/* raises no error */
-	RAISE_NO_ERROR;
+    /* raises no error */
+    RAISE_NO_ERROR;
 }
 
 void addConnectionServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_t *connection) {
