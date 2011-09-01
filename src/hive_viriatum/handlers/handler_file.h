@@ -31,6 +31,15 @@
 #include "../http/http.h"
 #include "../system/system.h"
 
+/* forward references */
+struct Connection_t;
+
+/**
+ * The size of the file buffer to be used
+ * durring a file transfer.
+ * Increasing this value will allow the transfer
+ * of bigger chunks.
+ */
 #define FILE_BUFFER_SIZE_HANDLER_FILE 4096
 
 /**

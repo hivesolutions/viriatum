@@ -30,6 +30,9 @@
 #include "../http/http.h"
 #include "../system/system.h"
 
+/* forward references */
+struct Connection_t;
+
 void setHandlerDefault(struct HttpParser_t *httpParser, struct HttpSettings_t *httpSettings);
 void unsetHandlerDefault(struct HttpParser_t *httpParser, struct HttpSettings_t *httpSettings);
 void setHttpParserHandlerDefault(struct HttpParser_t *httpParser);
