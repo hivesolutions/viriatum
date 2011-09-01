@@ -28,7 +28,7 @@
 #pragma once
 
 #ifdef VIRIATUM_DEBUG
-size_t allocations;
+extern size_t allocations;
 #define ALLOCATIONS allocations
 #define START_MEMORY size_t allocations = 0
 #define MALLOC(size) mallocDebug(size)
@@ -40,7 +40,7 @@ static __inline void freeDebug(void *pointer) { allocations--; free(pointer); }
 #endif
 
 #ifndef VIRIATUM_DEBUG
-size_t allocations;
+extern size_t allocations;
 #define ALLOCATIONS allocations
 #define START_MEMORY size_t allocations = -1
 #define MALLOC(size) malloc(size)
