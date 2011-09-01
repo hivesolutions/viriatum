@@ -126,7 +126,7 @@ void waitCondition(struct Condition_t *condition) {
   // If the wait failed, store the last error because it will get
   // overwritten when acquiring the lock.
     /* DWORD dwLastError;
-      if( WAIT_FAILED == dwWaitResult )
+     if( WAIT_FAILED == dwWaitResult )
         dwLastError = ::GetLastError();*/
 
     /* iterates over the current lock count */
