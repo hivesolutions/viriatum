@@ -30,6 +30,7 @@
 #include "../stream/stream.h"
 #include "../polling/polling.h"
 
+/* forward references (avoids loop) */
 struct Data_t;
 struct Polling_t;
 struct Connection_t;
@@ -94,10 +95,35 @@ typedef struct Polling_t {
  * current set of active connections.
  */
 typedef struct Service_t {
+	/**
+	 * The descriptive name of the
+	 * service.
+	 * For textual representation.
+	 */
     unsigned char *name;
+
+	/**
+	 * The current status of the service.
+	 * Used for service life-cycle control.
+	 */
     unsigned char status;
+
+	/**
+	 * The socket handle to the service
+	 * connection.
+	 */
     SOCKET_HANDLE serviceSocketHandle;
+
+	/**
+	 * The reference to the polling (provider)
+	 * used by the service.
+	 */
     struct Polling_t *polling;
+
+	/**
+	 * The list of currenly available (active)
+	 * connections in the service.
+	 */
     struct LinkedList_t *connectionsList;
 } Service;
 
