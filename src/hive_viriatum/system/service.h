@@ -27,7 +27,6 @@
 
 #pragma once
 
-#include "../stream/stream.h"
 #include "../polling/polling.h"
 
 struct Data_t;
