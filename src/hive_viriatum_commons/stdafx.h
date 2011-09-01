@@ -85,6 +85,8 @@
 #include <time.h>
 #include <math.h>
 
+#define VIRIATUM_DEBUG
+
 #include "global/memory.h"
 
 unsigned char *nameViriatumCommons();
