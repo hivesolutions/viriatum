@@ -39,12 +39,6 @@ void createServiceSelect(struct ServiceSelect_t **serviceSelectPointer) {
     /* creates the service */
     createService(&serviceSelect->service);
 
-    /* sets the register write in the service */
-    serviceSelect->service->registerWrite = registerWriteServiceSelect;
-
-    /* sets the unregister write in the service */
-    serviceSelect->service->unregisterWrite = unregisterWriteServiceSelect;
-
     /* resets the sockets set highest value */
     serviceSelect->socketsSetHighest = 0;
 
@@ -137,13 +131,6 @@ ERROR_CODE startServiceSelect(struct ServiceSelect_t *serviceSelect) {
     /* sets the flags to be used in socket */
     SOCKET_FLAGS flags = 1;
 
-    PROCESS_TYPE process;
-
-    MEMORY_INFORMATION_TYPE memoryInformation;
-
-    size_t memoryUsage;
-
-
     /* starts the service */
     returnValue = startService(serviceSelect->service);
 
@@ -161,18 +148,6 @@ ERROR_CODE startServiceSelect(struct ServiceSelect_t *serviceSelect) {
 
     /* iterates while the status is open */
     while(serviceSelect->service->status == STATUS_OPEN) {
-
-        process = GET_PROCESS();
-
-        GET_MEMORY_INFORMATION(process, memoryInformation);
-
-        memoryUsage = GET_MEMORY_USAGE(memoryInformation);
-
-        CLOSE_PROCESS(process);
-
-        /* prints a debug message */
-        V_DEBUG_F("Memory status: [%d objects] [%d KBytes]\n", ALLOCATIONS, memoryUsage / 1024);
-
         /* resets the remove connections size */
         removeConnectionsSize = 0;
 
@@ -211,10 +186,10 @@ ERROR_CODE startServiceSelect(struct ServiceSelect_t *serviceSelect) {
                     /* sets the service select as the service in the connection */
                     connection->serviceReference = serviceSelect;
 
-                    /* sets the open connection fucntion in the connection */
+                    /* sets the open connection function in the connection */
                     connection->openConnection = openConnectionServiceSelect;
 
-                    /* sets the close connection fucntion in the connection */
+                    /* sets the close connection function in the connection */
                     connection->closeConnection = closeConnectionServiceSelect;
 
                     /* opens the connection */
@@ -606,7 +581,7 @@ ERROR_CODE openConnectionServiceSelect(struct Connection_t *connection) {
     V_DEBUG_F("Opening connection: %d\n", connection->socketHandle);
 
     /* opens the connection */
-    openConection(connection);
+    openConnection(connection);
 
     /* adds the connection to the service select */
     addConnectionServiceSelect(serviceSelect, connection);
@@ -659,17 +634,17 @@ ERROR_CODE closeConnectionServiceSelect(struct Connection_t *connection) {
         V_DEBUG("Finished calling on close handler\n");
     }
 
-    /* unsets the open connection fucntion in the connection */
+    /* unsets the open connection function in the connection */
     connection->openConnection = NULL;
 
-    /* unsets the close connection fucntion in the connection */
+    /* unsets the close connection function in the connection */
     connection->closeConnection = NULL;
 
     /* removes the connection from the service select */
     removeConnectionServiceSelect(serviceSelect, connection);
 
     /* closes the connection */
-    closeConection(connection);
+    closeConnection(connection);
 
     /* raises no error */
     RAISE_NO_ERROR;

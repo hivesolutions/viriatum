@@ -27,7 +27,11 @@
 
 #pragma once
 
+#include "../stream/stream.h"
+#include "../polling/polling.h"
+
 struct Data_t;
+struct Polling_t;
 struct Connection_t;
 
 /**
@@ -48,13 +52,40 @@ typedef ERROR_CODE (*connectionCallback) (struct Connection_t *);
  */
 typedef ERROR_CODE (*serviceCallback) (struct Connection_t *, struct Data_t *, void *);
 
+
+
+
+typedef ERROR_CODE (*pollingCallback) (struct Polling_t *);
+
+typedef ERROR_CODE (*pollingConnectionCallback) (struct Polling_t *, struct Connection_t *);
+
+
+
+
+typedef struct Polling_t {
+    struct Service_t *service;
+    pollingCallback open;
+    pollingCallback close;
+    pollingConnectionCallback registerConnection;
+    pollingConnectionCallback unregisterConnection;
+    pollingConnectionCallback registerWrite;
+    pollingConnectionCallback unregisterWrite;
+    pollingCallback poll;
+    pollingCallback call;
+
+    /**
+     * Reference to the lower level
+     * connection substrate.
+     */
+    void *lower;
+} Polling;
+
 typedef struct Service_t {
     unsigned char *name;
     unsigned char status;
     SOCKET_HANDLE serviceSocketHandle;
+    struct Polling_t *polling;
     struct LinkedList_t *connectionsList;
-    connectionUpdate registerWrite;
-    connectionUpdate unregisterWrite;
 } Service;
 
 /**
@@ -69,11 +100,13 @@ typedef struct Connection_t {
     SOCKET_HANDLE socketHandle;
     struct Service_t *service;
     void *serviceReference;
-    unsigned int writeRegistered;
+    unsigned char writeRegistered;
     struct LinkedList_t *readQueue;
     struct LinkedList_t *writeQueue;
     connectionUpdate openConnection;
     connectionUpdate closeConnection;
+    connectionUpdate registerWrite;
+    connectionUpdate unregisterWrite;
     connectionCallback onRead;
     connectionCallback onWrite;
     connectionCallback onError;
@@ -145,6 +178,20 @@ void createData(struct Data_t **dataPointer);
 void deleteData(struct Data_t *data);
 
 /**
+ * Constructor of the polling.
+ *
+ * @param dataPointer The pointer to the polling to be constructed.
+ */
+void createPolling(struct Polling_t **pollingPointer);
+
+/**
+ * Destructor of the polling.
+ *
+ * @param polling The polling to be destroyed.
+ */
+void deletePolling(struct Polling_t *polling);
+
+/**
  * Starts the given service, initializing the
  * internal structures and the main loop.
  *
@@ -168,5 +215,7 @@ void removeConnectionService(struct Service_t *service, struct Connection_t *con
 void createConnection(struct Connection_t **connectionPointer, SOCKET_HANDLE socketHandle);
 void deleteConnection(struct Connection_t *connection);
 void writeConnection(struct Connection_t *connection, unsigned char *data, unsigned int size, serviceCallback callback, void *callbackParameters);
-void openConection(struct Connection_t *connection);
-void closeConection(struct Connection_t *connection);
+ERROR_CODE openConnection(struct Connection_t *connection);
+ERROR_CODE closeConnection(struct Connection_t *connection);
+ERROR_CODE registerWriteConnection(struct Connection_t *connection);
+ERROR_CODE unregisterWriteConnection(struct Connection_t *connection);
