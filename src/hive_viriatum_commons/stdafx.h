@@ -104,7 +104,7 @@ static __inline void freeDebug(void *pointer) { allocations--; free(pointer); }
 #ifndef VIRIATUM_DEBUG
 size_t allocations;
 #define ALLOCATIONS allocations
-#define START_MEMORY size_t allocations = -1;
+#define START_MEMORY size_t allocations = -1
 #define MALLOC(size) malloc(size)
 #define CALLOC(count, size) calloc(count, size)
 #define REALLOC(pointer, size) realloc(pointer, size)
