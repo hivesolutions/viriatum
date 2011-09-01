@@ -34,7 +34,7 @@ void createMemoryPool(struct MemoryPool_t **memoryPoolPointer) {
     size_t memoryPoolSize = sizeof(struct MemoryPool_t);
 
     /* allocates space for the memory pool */
-    struct MemoryPool_t *memoryPool = (struct MemoryPool_t *) malloc(memoryPoolSize);
+    struct MemoryPool_t *memoryPool = (struct MemoryPool_t *) MALLOC(memoryPoolSize);
 
     /* sets the memory pool size */
     memoryPool->size = MEMORY_POOL_SIZE;
@@ -51,7 +51,7 @@ void createMemoryPool(struct MemoryPool_t **memoryPoolPointer) {
 
 void deleteMemoryPool(struct MemoryPool_t *memoryPool) {
     /* releases the memory pool */
-    free(memoryPool);
+    FREE(memoryPool);
 }
 
 void *allocMemoryPool(struct MemoryPool_t *memoryPool, size_t size) {

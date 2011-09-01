@@ -34,7 +34,7 @@ void createLinkedList(struct LinkedList_t **linkedListPointer) {
     size_t linkedListSize = sizeof(struct LinkedList_t);
 
     /* allocates space for the linked list */
-    struct LinkedList_t *linkedList = (struct LinkedList_t *) malloc(linkedListSize);
+    struct LinkedList_t *linkedList = (struct LinkedList_t *) MALLOC(linkedListSize);
 
     /* initializes the linked list size */
     linkedList->size = 0;
@@ -70,7 +70,7 @@ void deleteLinkedList(struct LinkedList_t *linkedList) {
     }
 
     /* releases the linked list */
-    free(linkedList);
+    FREE(linkedList);
 }
 
 void createLinkedListNode(struct LinkedListNode_t **linkedListNodePointer) {
@@ -78,7 +78,7 @@ void createLinkedListNode(struct LinkedListNode_t **linkedListNodePointer) {
     size_t linkedListNodeSize = sizeof(struct LinkedListNode_t);
 
     /* allocates space for the linked list node */
-    struct LinkedListNode_t *linkedListNode = (struct LinkedListNode_t *) malloc(linkedListNodeSize);
+    struct LinkedListNode_t *linkedListNode = (struct LinkedListNode_t *) MALLOC(linkedListNodeSize);
 
     /* initializes the linked list node value */
     linkedListNode->value = NULL;
@@ -93,7 +93,7 @@ void createLinkedListNode(struct LinkedListNode_t **linkedListNodePointer) {
 
 void deleteLinkedListNode(struct LinkedListNode_t *linkedListNode) {
     /* releases the linked list node */
-    free(linkedListNode);
+    FREE(linkedListNode);
 }
 
 void appendLinkedList(struct LinkedList_t *linkedList, struct LinkedListNode_t *linkedListNode) {

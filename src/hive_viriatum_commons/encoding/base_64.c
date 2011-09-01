@@ -211,7 +211,7 @@ int _allocateEncodedBuffer(size_t bufferLength, unsigned char **encodedBufferPoi
     *encodedBufferLengthPointer = calculateEncodedBufferLengthBase64(bufferLength);
 
     /* allocates the encoded buffer */
-    *encodedBufferPointer = (unsigned char *) malloc(*encodedBufferLengthPointer);
+    *encodedBufferPointer = (unsigned char *) MALLOC(*encodedBufferLengthPointer);
 
     /* returns valid */
     return 0;
@@ -222,7 +222,7 @@ int _allocateDecodedBuffer(size_t encodedBufferLength, unsigned char **decodedBu
     *decodedBufferLengthPointer = calculateDecodedBufferLenghtBase64(encodedBufferLength, paddingCount);
 
     /* allocates the decoded buffer */
-    *decodedBufferPointer = (unsigned char *) malloc(*decodedBufferLengthPointer);
+    *decodedBufferPointer = (unsigned char *) MALLOC(*decodedBufferLengthPointer);
 
     /* returns valid */
     return 0;

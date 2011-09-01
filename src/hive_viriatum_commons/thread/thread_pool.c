@@ -37,7 +37,7 @@ void createThreadPool(struct ThreadPool_t **threadPoolPointer, size_t numberThre
     size_t threadPoolSize = sizeof(struct ThreadPool_t);
 
     /* allocates space for the thread pool */
-    struct ThreadPool_t *threadPool = (struct ThreadPool_t *) malloc(threadPoolSize);
+    struct ThreadPool_t *threadPool = (struct ThreadPool_t *) MALLOC(threadPoolSize);
 
     /* sets the number of threads */
     threadPool->numberThreads = numberThreads;
@@ -84,7 +84,7 @@ void deleteThreadPool(struct ThreadPool_t *threadPool) {
     deleteLinkedList(threadPool->taskQueue);
 
     /* releases the thread pool */
-    free(threadPool);
+    FREE(threadPool);
 }
 
 void createThreadPoolElement(struct ThreadPool_t *threadPool) {
@@ -95,7 +95,7 @@ void createThreadPoolElement(struct ThreadPool_t *threadPool) {
     size_t threadPoolElementSize = sizeof(struct ThreadPoolElement_t);
 
     /* allocates space for the thread pool element */
-    struct ThreadPoolElement_t *threadPoolElement = (struct ThreadPoolElement_t *) malloc(threadPoolElementSize);
+    struct ThreadPoolElement_t *threadPoolElement = (struct ThreadPoolElement_t *) MALLOC(threadPoolElementSize);
 
     /* creates the engine runnner thread */
     THREAD_HANDLE threadHandle = THREAD_CREATE_BASE(threadId, poolRunnerThread, (THREAD_ARGUMENTS) threadPool);

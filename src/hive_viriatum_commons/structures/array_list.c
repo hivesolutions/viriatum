@@ -34,7 +34,7 @@ void createArrayList(struct ArrayList_t **arrayListPointer, size_t elementSize, 
     size_t arrayListSize = sizeof(struct ArrayList_t);
 
     /* allocates space for the array list */
-    struct ArrayList_t *arrayList = (struct ArrayList_t *) malloc(arrayListSize);
+    struct ArrayList_t *arrayList = (struct ArrayList_t *) MALLOC(arrayListSize);
 
     /* in case the initial size is not set (zero) */
     if((void *) initialSize == 0) {
@@ -52,7 +52,7 @@ void createArrayList(struct ArrayList_t **arrayListPointer, size_t elementSize, 
     arrayList->elementsBufferSize = initialSize;
 
     /* allocates space for the elements buffer */
-    arrayList->elementsBuffer = (void **) malloc(elementSize * initialSize);
+    arrayList->elementsBuffer = (void **) MALLOC(elementSize * initialSize);
 
     /* sets the array list in the array list pointer */
     *arrayListPointer = arrayList;
@@ -60,10 +60,10 @@ void createArrayList(struct ArrayList_t **arrayListPointer, size_t elementSize, 
 
 void deleteArrayList(struct ArrayList_t *arrayList) {
     /* releases the array list elements buffer */
-    free(arrayList->elementsBuffer);
+    FREE(arrayList->elementsBuffer);
 
     /* releases the array list */
-    free(arrayList);
+    FREE(arrayList);
 }
 
 void setArrayList(struct ArrayList_t *arrayList, size_t index, void *element) {

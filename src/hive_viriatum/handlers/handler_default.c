@@ -107,7 +107,7 @@ ERROR_CODE messageBeginCallbackHandlerDefault(struct HttpParser_t *httpParser) {
 
 ERROR_CODE urlCallbackHandlerDefault(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize) {
     /* allocates the required space for the url */
-    unsigned char *url = (unsigned char *) malloc(dataSize + 1);
+    unsigned char *url = (unsigned char *) MALLOC(dataSize + 1);
 
     /* copies the memory from the data to the url */
     memcpy(url, data, dataSize);
@@ -119,7 +119,7 @@ ERROR_CODE urlCallbackHandlerDefault(struct HttpParser_t *httpParser, const unsi
     V_DEBUG_F("url: %s\n", url);
 
     /* releases the url */
-    free(url);
+    FREE(url);
 
     /* raise no error */
     RAISE_NO_ERROR;
@@ -127,7 +127,7 @@ ERROR_CODE urlCallbackHandlerDefault(struct HttpParser_t *httpParser, const unsi
 
 ERROR_CODE headerFieldCallbackHandlerDefault(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize) {
     /* allocates the required space for the header field */
-    unsigned char *headerField = (unsigned char *) malloc(dataSize + 1);
+    unsigned char *headerField = (unsigned char *) MALLOC(dataSize + 1);
 
     /* copies the memory from the data to the header field */
     memcpy(headerField, data, dataSize);
@@ -139,7 +139,7 @@ ERROR_CODE headerFieldCallbackHandlerDefault(struct HttpParser_t *httpParser, co
     V_DEBUG_F("header field: %s\n", headerField);
 
     /* releases the header field */
-    free(headerField);
+    FREE(headerField);
 
     /* raise no error */
     RAISE_NO_ERROR;
@@ -147,7 +147,7 @@ ERROR_CODE headerFieldCallbackHandlerDefault(struct HttpParser_t *httpParser, co
 
 ERROR_CODE headerValueCallbackHandlerDefault(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize) {
     /* allocates the required space for the header value */
-    unsigned char *headerValue = (unsigned char *) malloc(dataSize + 1);
+    unsigned char *headerValue = (unsigned char *) MALLOC(dataSize + 1);
 
     /* copies the memory from the data to the header value */
     memcpy(headerValue, data, dataSize);
@@ -159,7 +159,7 @@ ERROR_CODE headerValueCallbackHandlerDefault(struct HttpParser_t *httpParser, co
     V_DEBUG_F("header value: %s\n", headerValue);
 
     /* releases the header value */
-    free(headerValue);
+    FREE(headerValue);
 
     /* raise no error */
     RAISE_NO_ERROR;
@@ -175,7 +175,7 @@ ERROR_CODE headersCompleteCallbackHandlerDefault(struct HttpParser_t *httpParser
 
 ERROR_CODE bodyCallbackHandlerDefault(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize) {
     /* allocates the required space for the body */
-    unsigned char *body = (unsigned char *) malloc(dataSize + 1);
+    unsigned char *body = (unsigned char *) MALLOC(dataSize + 1);
 
     /* copies the memory from the data to the body */
     memcpy(body, data, dataSize);
@@ -187,7 +187,7 @@ ERROR_CODE bodyCallbackHandlerDefault(struct HttpParser_t *httpParser, const uns
     V_DEBUG_F("body: %s\n", body);
 
     /* releases the body */
-    free(body);
+    FREE(body);
 
     /* raise no error */
     RAISE_NO_ERROR;
@@ -206,7 +206,7 @@ ERROR_CODE messageCompleteCallbackHandlerDefault(struct HttpParser_t *httpParser
 
 ERROR_CODE _sendResponseHandlerDefault(struct HttpParser_t *httpParser) {
     /* allocates the response buffer */
-    char *responseBuffer = malloc(1024);
+    char *responseBuffer = MALLOC(1024);
 
     /* retrieves the connection from the http parser parameters */
     struct Connection_t *connection = (struct Connection_t *) httpParser->parameters;

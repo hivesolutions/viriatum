@@ -34,7 +34,7 @@ void createIterator(struct Iterator_t **iteratorPointer) {
     size_t iteratorSize = sizeof(struct Iterator_t);
 
     /* allocates space for the iterator */
-    struct Iterator_t *iterator = (struct Iterator_t *) malloc(iteratorSize);
+    struct Iterator_t *iterator = (struct Iterator_t *) MALLOC(iteratorSize);
 
     /* sets the iterator in the iterator pointer */
     *iteratorPointer = iterator;
@@ -42,7 +42,7 @@ void createIterator(struct Iterator_t **iteratorPointer) {
 
 void deleteIterator(struct Iterator_t *iterator) {
     /* releases the iterator */
-    free(iterator);
+    FREE(iterator);
 }
 
 void getNextIterator(struct Iterator_t *iterator, void **nextPointer) {
