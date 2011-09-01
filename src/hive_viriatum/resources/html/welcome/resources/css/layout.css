@@ -1,30 +1,30 @@
 body {
-    font-family: Georgia, Times;
     background-color: #e5e5e5;
+    font-family: Georgia, Times;
 }
 
 h1 {
-    margin: 10px 0px 10px 0px;
-    font-size: 10pt;
-    text-align: center;
     color: #595959;
-    text-transform: uppercase;
+    font-size: 10pt;
+    margin: 10px 0px 10px 0px;
+    text-align: center;
     text-shadow: 1px 1px 1px #ffffff;
+    text-transform: uppercase;
 }
 
 p {
-    margin: 10px 0px 10px 0px;
-    font-size: 11pt;
-    text-align: center;
-    line-height: 1.5em;
     color: #666666;
+    font-size: 11pt;
+    line-height: 1.5em;
+    margin: 10px 0px 10px 0px;
+    text-align: center;
     text-shadow: 1px 1px 1px #ffffff;
 }
 
 a {
+    color: #9e9400;
     font-size: 8pt;
     text-decoration: none;
-    color: #9e9400;
 }
 
 a:hover {
@@ -32,10 +32,10 @@ a:hover {
 }
 
 .separator-horizontal {
-    height: 10px;
-    width: 260px;
-    margin: 30px auto 6px auto;
     background: transparent url(../images/separator-horizontal.png) no-repeat center center;
+    height: 10px;
+    margin: 30px auto 6px auto;
+    width: 260px;
 }
 
 #header-wrapper {
@@ -43,22 +43,22 @@ a:hover {
 }
 
 #header-wrapper .header-body {
-    width: 960px;
     margin: 0px auto 0px auto;
+    width: 960px;
 }
 
 .main-illustration {
+    background: transparent url(../images/main-illustration.png) no-repeat center center;
     height: 290px;
     width: 960px;
-    background: transparent url(../images/main-illustration.png) no-repeat center center;
 }
 
 .branding a{
+    background: transparent url(../images/viriatum-logotype.png) no-repeat center center;
     display: block;
     height: 48px;
-    width: 340px;
     margin: 10px auto 20px auto;
-    background: transparent url(../images/viriatum-logotype.png) no-repeat center center;
+    width: 340px;
 }
 
 #content-wrapper {
@@ -66,13 +66,13 @@ a:hover {
 }
 
 .content-header {
-    width: 340px;
     margin: 0px auto 0px auto;
+    width: 340px;
 }
 
 .content-body {
-    width: 340px;
     margin: 0px auto 0px auto;
+    width: 340px;
 }
 
 #footer-wrapper {
@@ -80,14 +80,14 @@ a:hover {
 }
 
 .footer-body {
-    width: 260px;
     margin: 0px auto 0px auto;
     text-align: center;
+    width: 260px;
 }
 
 .footer-body a{
-    width: 110px;
     text-transform: uppercase;
+    width: 110px;
 }
 
 .footer-body a.left{
