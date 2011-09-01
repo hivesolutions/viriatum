@@ -212,9 +212,6 @@ void removeConnectionService(struct Service_t *service, struct Connection_t *con
     removeValueLinkedList(service->connectionsList, connection, 1);
 }
 
-static int openConn = 0;
-static int closeConn = 0;
-
 void createConnection(struct Connection_t **connectionPointer, SOCKET_HANDLE socketHandle) {
     /* retrieves the connection size */
     size_t connectionSize = sizeof(struct Connection_t);
@@ -267,10 +264,6 @@ void createConnection(struct Connection_t **connectionPointer, SOCKET_HANDLE soc
     /* creates the write queue linked list */
     createLinkedList(&connection->writeQueue);
 
-    openConn++;
-
-    printf("OPEN: %d\n", openConn);
-
     /* sets the connection in the connection pointer */
     *connectionPointer = connection;
 }
@@ -278,11 +271,6 @@ void createConnection(struct Connection_t **connectionPointer, SOCKET_HANDLE soc
 void deleteConnection(struct Connection_t *connection) {
     /* allocates the data */
     struct Data_t *data;
-
-
-    closeConn++;
-
-    printf("DELETE: %d\n", closeConn);
 
     /* iterates continuously */
     while(1) {
