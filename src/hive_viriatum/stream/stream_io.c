@@ -63,8 +63,6 @@ void deleteIoConnection(struct IoConnection_t *ioConnection) {
     free(ioConnection);
 }
 
-static int ZERO_SIZE = 0;
-
 ERROR_CODE readHandlerStreamIo(struct Connection_t *connection) {
     /* allocates the number of bytes */
     SOCKET_ERROR_CODE numberBytes;
@@ -98,10 +96,6 @@ ERROR_CODE readHandlerStreamIo(struct Connection_t *connection) {
 
         /* in case the number of bytes is zero (connection closed) */
         if(numberBytes == 0) {
-            ZERO_SIZE++;
-
-            printf("ZERO_SIZE: %d", ZERO_SIZE);
-
             /* sets the error flag */
             error = 1;
 
@@ -129,8 +123,6 @@ ERROR_CODE readHandlerStreamIo(struct Connection_t *connection) {
                 default:
                     /* prints the error */
                     V_DEBUG_F("Problem receiving from socket: %d\n", receivingErrorCode);
-
-                    printf("FEXOU ERRO\n");
 
                     /* sets the error flag */
                     error = 1;

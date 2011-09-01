@@ -58,6 +58,10 @@
 #include "global/definitions.h"
 
 #ifdef VIRIATUM_PLATFORM_WIN32
+#define FD_SETSIZE 10000
+#endif
+
+#ifdef VIRIATUM_PLATFORM_WIN32
 #include <Windows.h>
 #endif
 
