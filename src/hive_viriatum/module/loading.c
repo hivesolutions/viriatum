@@ -39,7 +39,7 @@ ERROR_CODE loadModule(unsigned char *modulePath) {
     /* the start module function reference */
     viriatumStartModule startModuleFunction;
 
-    /* loads the mod library */
+    /* loads the mod library (tries to find the file) */
     modLibrary = LOAD_LIBRARY((const char *) modulePath);
 
     /* in case the mod library was not loaded */

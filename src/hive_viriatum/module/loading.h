@@ -28,13 +28,27 @@
 #pragma once
 
 /**
+ * Function used for starting a module.
+ * During this initialization all the module
+ * internal structures shall be initialized.
+ */
+typedef void (*viriatumStartModule)(void);
+
+/**
+ * Function used for stopping a module.
+ * During this destruction all the module
+ * internal structures shall be closed and
+ * destroyed.
+ */
+typedef void (*viriatumStopModule)(void);
+
+/**
  * Loads the module in the given path.
+ * The loading of the module implies finding
+ * the appropriate file and loading the symbols.
  *
  * @param modulePath The path to the file
  * containing the module.
  * @return The resulting error code.
  */
 ERROR_CODE loadModule(unsigned char *modulePath);
-
-typedef void (*viriatumStartModule)(void);
-typedef void (*viriatumStopModule)(void);
