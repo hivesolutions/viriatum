@@ -154,13 +154,14 @@ ERROR_CODE startServiceSelect(struct ServiceSelect_t *serviceSelect) {
 
     /* iterates while the status is open */
     while(serviceSelect->service->status == STATUS_OPEN) {
+		/* prints a debug message */
+		V_DEBUG_F("Current memory status: [%d objects] [%d bytes]\n", ALLOCATIONS, 12);
+
         /* resets the remove connections size */
         removeConnectionsSize = 0;
 
         /* polls the service select */
         pollServiceSelect(serviceSelect, readConnections, writeConnections, errorConnections, &readConnectionsSize, &writeConnectionsSize, &errorConnectionsSize, &serviceSocketReady);
-
-		printf("%d\n", ALLOCATIONS);
 
         /* in case the service socket is ready (for read) */
         if(serviceSocketReady == 1) {

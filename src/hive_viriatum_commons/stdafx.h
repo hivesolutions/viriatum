@@ -87,33 +87,27 @@ unsigned char *versionViriatumCommons();
 unsigned char *descriptionViriatumCommons();
 
 
-/*#ifdef VIRIATUM_DEBUG*/
+
+
+#ifdef VIRIATUM_DEBUG
 int allocations;
-
-static __inline void *mallocDebug(size_t size) {
-	allocations++;
-	return malloc(size);
-}
-
-static __inline void freeDebug(void *pointer) {
-	allocations--;
-	free(pointer);
-}
-
 #define ALLOCATIONS allocations
-#define START_MEMORY int allocations = 1
+#define START_MEMORY int allocations = 0
 #define MALLOC(size) mallocDebug(size)
 #define CALLOC(count, size) calloc(count, size)
 #define REALLOC(pointer, size) realloc(pointer, size)
 #define FREE(pointer) freeDebug(pointer)
-/*#endif*/
+static __inline void *mallocDebug(size_t size) { allocations++; return malloc(size); }
+static __inline void freeDebug(void *pointer) { allocations--; free(pointer); }
+#endif
 
-/*
 #ifndef VIRIATUM_DEBUG
-#define ALLOCATIONS -1
+unsigned int allocations;
+#define ALLOCATIONS allocations
+#define START_MEMORY int allocations = 0;
 #define MALLOC(size) malloc(size)
 #define CALLOC(count, size) calloc(count, size)
 #define REALLOC(pointer, size) realloc(pointer, size)
 #define FREE(pointer) free(pointer)
 #endif
-*/
+
