@@ -31,7 +31,7 @@
 #include "../http/http.h"
 #include "../system/system.h"
 
-/* forward references (avoid loop) */
+/* forward references (avoids loop) */
 struct Data_t;
 struct Connection_t;
 
