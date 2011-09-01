@@ -34,7 +34,7 @@ void createHttpConnection(struct HttpConnection_t **httpConnectionPointer, struc
     size_t httpConnectionSize = sizeof(struct HttpConnection_t);
 
     /* allocates space for the http connection */
-    struct HttpConnection_t *httpConnection = (struct HttpConnection_t *) malloc(httpConnectionSize);
+    struct HttpConnection_t *httpConnection = (struct HttpConnection_t *) MALLOC(httpConnectionSize);
 
     /* sets the http connection io connection */
     httpConnection->ioConnection = ioConnection;
@@ -69,7 +69,7 @@ void deleteHttpConnection(struct HttpConnection_t *httpConnection) {
     deleteHttpSettings(httpConnection->httpSettings);
 
     /* releases the http connection */
-    free(httpConnection);
+    FREE(httpConnection);
 }
 
 ERROR_CODE dataHandlerStreamHttp(struct IoConnection_t *ioConnection, unsigned char *buffer, size_t bufferSize) {

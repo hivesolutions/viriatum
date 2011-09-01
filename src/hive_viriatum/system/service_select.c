@@ -34,7 +34,7 @@ void createServiceSelect(struct ServiceSelect_t **serviceSelectPointer) {
     size_t serviceSelectSize = sizeof(struct ServiceSelect_t);
 
     /* allocates space for the service select */
-    struct ServiceSelect_t *serviceSelect = (struct ServiceSelect_t *) malloc(serviceSelectSize);
+    struct ServiceSelect_t *serviceSelect = (struct ServiceSelect_t *) MALLOC(serviceSelectSize);
 
     /* creates the service */
     createService(&serviceSelect->service);
@@ -79,7 +79,7 @@ void deleteServiceSelect(struct ServiceSelect_t *serviceSelect) {
     deleteService(serviceSelect->service);
 
     /* releases the service select */
-    free(serviceSelect);
+    FREE(serviceSelect);
 }
 
 ERROR_CODE startServiceSelect(struct ServiceSelect_t *serviceSelect) {
@@ -90,16 +90,16 @@ ERROR_CODE startServiceSelect(struct ServiceSelect_t *serviceSelect) {
     unsigned int index;
 
     /* allocates the read connections */
-    struct Connection_t **readConnections = (struct Connection_t **) malloc(VIRIATUM_MAXIMUM_CONNECTIONS * sizeof(struct Connection_t *));
+    struct Connection_t **readConnections = (struct Connection_t **) MALLOC(VIRIATUM_MAXIMUM_CONNECTIONS * sizeof(struct Connection_t *));
 
     /* allocates the write connections */
-    struct Connection_t **writeConnections = (struct Connection_t **) malloc(VIRIATUM_MAXIMUM_CONNECTIONS * sizeof(struct Connection_t *));
+    struct Connection_t **writeConnections = (struct Connection_t **) MALLOC(VIRIATUM_MAXIMUM_CONNECTIONS * sizeof(struct Connection_t *));
 
     /* allocates the error connections */
-    struct Connection_t **errorConnections = (struct Connection_t **) malloc(VIRIATUM_MAXIMUM_CONNECTIONS * sizeof(struct Connection_t *));
+    struct Connection_t **errorConnections = (struct Connection_t **) MALLOC(VIRIATUM_MAXIMUM_CONNECTIONS * sizeof(struct Connection_t *));
 
     /* allocates the remove connections */
-    struct Connection_t **removeConnections = (struct Connection_t **) malloc(VIRIATUM_MAXIMUM_CONNECTIONS * sizeof(struct Connection_t *));
+    struct Connection_t **removeConnections = (struct Connection_t **) MALLOC(VIRIATUM_MAXIMUM_CONNECTIONS * sizeof(struct Connection_t *));
 
     /* allocates the read connections size */
     unsigned int readConnectionsSize;
@@ -159,6 +159,8 @@ ERROR_CODE startServiceSelect(struct ServiceSelect_t *serviceSelect) {
 
         /* polls the service select */
         pollServiceSelect(serviceSelect, readConnections, writeConnections, errorConnections, &readConnectionsSize, &writeConnectionsSize, &errorConnectionsSize, &serviceSocketReady);
+
+		printf("%d\n", ALLOCATIONS);
 
         /* in case the service socket is ready (for read) */
         if(serviceSocketReady == 1) {
@@ -294,16 +296,16 @@ ERROR_CODE startServiceSelect(struct ServiceSelect_t *serviceSelect) {
     }
 
     /* releases the read connections */
-    free(readConnections);
+    FREE(readConnections);
 
     /* releases the write connections */
-    free(writeConnections);
+    FREE(writeConnections);
 
     /* releases the error connections */
-    free(errorConnections);
+    FREE(errorConnections);
 
     /* releases the remove connections */
-    free(removeConnections);
+    FREE(removeConnections);
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -554,6 +556,9 @@ ERROR_CODE openConnectionServiceSelect(struct Connection_t *connection) {
         RAISE_NO_ERROR;
     }
 
+    /* prints a debug message */
+    V_DEBUG_F("Opening connection: %d\n", connection->socketHandle);
+
     /* opens the connection */
     openConection(connection);
 
@@ -582,6 +587,8 @@ ERROR_CODE openConnectionServiceSelect(struct Connection_t *connection) {
     /* raises no error */
     RAISE_NO_ERROR;
 }
+
+static int CLOSED = 0;
 
 ERROR_CODE closeConnectionServiceSelect(struct Connection_t *connection) {
     /* retrieves the service select */

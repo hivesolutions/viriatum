@@ -51,7 +51,7 @@ void testThreadPool() {
     struct ThreadPool_t *threadPool;
 
     /* allocates space for the thread pool task */
-    struct ThreadPoolTask_t *threadPoolTask = (struct ThreadPoolTask_t *) malloc(sizeof(struct ThreadPoolTask_t));
+    struct ThreadPoolTask_t *threadPoolTask = (struct ThreadPoolTask_t *) MALLOC(sizeof(struct ThreadPoolTask_t));
 
     /* sets the start function */
     threadPoolTask->startFunction = threadPoolStartFunctionTest;
@@ -168,10 +168,10 @@ void testBase64() {
     decodeBase64(encodedBuffer, encodedBufferLength, &decodedBuffer, &decodedBufferLength);
 
     /* releases the encoded buffer */
-    free(encodedBuffer);
+    FREE(encodedBuffer);
 
     /* releases the decoded buffer */
-    free(decodedBuffer);
+    FREE(decodedBuffer);
 }
 
 void runSimpleTests() {

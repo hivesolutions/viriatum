@@ -67,7 +67,7 @@ void createHttpParser(struct HttpParser_t **httpParserPointer) {
     size_t httpParserSize = sizeof(struct HttpParser_t);
 
     /* allocates space for the http parser */
-    struct HttpParser_t *httpParser = (struct HttpParser_t *) malloc(httpParserSize);
+    struct HttpParser_t *httpParser = (struct HttpParser_t *) MALLOC(httpParserSize);
 
     /* sets the http parser type */
     httpParser->type = 2;
@@ -114,7 +114,7 @@ void createHttpParser(struct HttpParser_t **httpParserPointer) {
 
 void deleteHttpParser(struct HttpParser_t *httpParser) {
     /* releases the http parser */
-    free(httpParser);
+    FREE(httpParser);
 }
 
 void createHttpSettings(struct HttpSettings_t **httpSettingsPointer) {
@@ -122,7 +122,7 @@ void createHttpSettings(struct HttpSettings_t **httpSettingsPointer) {
     size_t httpSettingsSize = sizeof(struct HttpSettings_t);
 
     /* allocates space for the http settings */
-    struct HttpSettings_t *httpSettings = (struct HttpSettings_t *) malloc(httpSettingsSize);
+    struct HttpSettings_t *httpSettings = (struct HttpSettings_t *) MALLOC(httpSettingsSize);
 
     /* sets the http settings on message begin callback */
     httpSettings->onmessageBegin = NULL;
@@ -151,7 +151,7 @@ void createHttpSettings(struct HttpSettings_t **httpSettingsPointer) {
 
 void deleteHttpSettings(struct HttpSettings_t *httpSettings) {
     /* releases the http settings */
-    free(httpSettings);
+    FREE(httpSettings);
 }
 
 int processDataHttpParser(struct HttpParser_t *httpParser, struct HttpSettings_t *httpSettings, unsigned char *data, size_t dataSize) {

@@ -34,7 +34,7 @@ void createBuffer(struct Buffer_t **bufferPointer, size_t initialSize) {
     size_t bufferSize = sizeof(struct Buffer_t);
 
     /* allocates space for the buffer */
-    struct Buffer_t *buffer = (struct Buffer_t *) malloc(bufferSize);
+    struct Buffer_t *buffer = (struct Buffer_t *) MALLOC(bufferSize);
 
     /* sets the buffer in the buffer pointer */
     *bufferPointer = buffer;
@@ -42,5 +42,5 @@ void createBuffer(struct Buffer_t **bufferPointer, size_t initialSize) {
 
 void deleteBuffer(struct Buffer_t *buffer) {
     /* releases the buffer */
-    free(buffer);
+    FREE(buffer);
 }

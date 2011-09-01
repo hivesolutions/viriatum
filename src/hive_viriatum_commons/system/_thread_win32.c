@@ -36,7 +36,7 @@ void createCondition(struct Condition_t **conditionPointer) {
     size_t conditionSize = sizeof(struct Condition_t);
 
     /* allocates space for the condition */
-    struct Condition_t *condition = (struct Condition_t *) malloc(conditionSize);
+    struct Condition_t *condition = (struct Condition_t *) MALLOC(conditionSize);
 
     /* starts the lock count */
     condition->lockCount = 0;
@@ -65,7 +65,7 @@ void deleteCondition(struct Condition_t *condition) {
     DeleteCriticalSection(&condition->waitCriticalSection);
 
     /* releases the condition */
-    free(condition);
+    FREE(condition);
 }
 
 void lockCondition(struct Condition_t *condition) {

@@ -37,7 +37,7 @@ void createHashMap(struct HashMap_t **hashMapPointer, size_t initialSize) {
     size_t hashMapElementSize = sizeof(struct HashMapElement_t);
 
     /* allocates space for the hash map */
-    struct HashMap_t *hashMap = (struct HashMap_t *) malloc(hashMapSize);
+    struct HashMap_t *hashMap = (struct HashMap_t *) MALLOC(hashMapSize);
 
     /* in case the initial size is not set (zero) */
     if((void *) initialSize == 0) {
@@ -58,7 +58,7 @@ void createHashMap(struct HashMap_t **hashMapPointer, size_t initialSize) {
     hashMap->elementsBufferSize = initialSize;
 
     /* allocates space for the elements buffer */
-    hashMap->elementsBuffer = (struct HashMapElement_t *) malloc(hashMapElementSize * initialSize);
+    hashMap->elementsBuffer = (struct HashMapElement_t *) MALLOC(hashMapElementSize * initialSize);
 
     /* resets the elements buffer value */
     memset(hashMap->elementsBuffer, 0, hashMapElementSize * initialSize);
@@ -69,7 +69,7 @@ void createHashMap(struct HashMap_t **hashMapPointer, size_t initialSize) {
 
 void deleteHashMap(struct HashMap_t *hashMap) {
     /* releases the hash map */
-    free(hashMap);
+    FREE(hashMap);
 }
 
 void setValueHashMap(struct HashMap_t *hashMap, size_t key, void *value) {

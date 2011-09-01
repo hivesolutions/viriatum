@@ -34,7 +34,7 @@ void createIoConnection(struct IoConnection_t **ioConnectionPointer, struct Conn
     size_t ioConnectionSize = sizeof(struct IoConnection_t);
 
     /* allocates space for the io connection */
-    struct IoConnection_t *ioConnection = (struct IoConnection_t *) malloc(ioConnectionSize);
+    struct IoConnection_t *ioConnection = (struct IoConnection_t *) MALLOC(ioConnectionSize);
 
     /* sets the io connection connection */
     ioConnection->connection = connection;
@@ -60,7 +60,7 @@ void createIoConnection(struct IoConnection_t **ioConnectionPointer, struct Conn
 
 void deleteIoConnection(struct IoConnection_t *ioConnection) {
     /* releases the io connection */
-    free(ioConnection);
+    FREE(ioConnection);
 }
 
 ERROR_CODE readHandlerStreamIo(struct Connection_t *connection) {

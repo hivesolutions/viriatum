@@ -34,7 +34,7 @@ void createHttpRequest(struct HttpRequest_t **httpRequestPointer) {
     size_t httpRequestSize = sizeof(struct HttpRequest_t);
 
     /* allocates space for the http request */
-    struct HttpRequest_t *httpRequest = (struct HttpRequest_t *) malloc(httpRequestSize);
+    struct HttpRequest_t *httpRequest = (struct HttpRequest_t *) MALLOC(httpRequestSize);
 
     /* sets the http request in the http request pointer */
     *httpRequestPointer = httpRequest;
@@ -42,5 +42,5 @@ void createHttpRequest(struct HttpRequest_t **httpRequestPointer) {
 
 void deleteHttpRequest(struct HttpRequest_t *httpRequest) {
     /* releases the http request */
-    free(httpRequest);
+    FREE(httpRequest);
 }

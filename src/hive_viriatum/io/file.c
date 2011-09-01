@@ -61,7 +61,7 @@ ERROR_CODE readFile(char *filePath, unsigned char **bufferPointer, size_t *fileS
     fseek(file, 0, SEEK_SET);
 
     /* allocates space for the file buffer */
-    fileBuffer = (unsigned char *) malloc(fileSize);
+    fileBuffer = (unsigned char *) MALLOC(fileSize);
 
     /* reads the file contents */
     numberBytes = fread(fileBuffer, 1, fileSize, file);

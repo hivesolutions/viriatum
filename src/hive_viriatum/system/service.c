@@ -34,7 +34,7 @@ void createService(struct Service_t **servicePointer) {
     size_t serviceSize = sizeof(struct Service_t);
 
     /* allocates space for the service */
-    struct Service_t *service = (struct Service_t *) malloc(serviceSize);
+    struct Service_t *service = (struct Service_t *) MALLOC(serviceSize);
 
     /* creates the connections list */
     createLinkedList(&service->connectionsList);
@@ -69,7 +69,7 @@ void deleteService(struct Service_t *service) {
     deleteLinkedList(service->connectionsList);
 
     /* releases the service */
-    free(service);
+    FREE(service);
 }
 
 void createData(struct Data_t **dataPointer) {
@@ -77,7 +77,7 @@ void createData(struct Data_t **dataPointer) {
     size_t dataSize = sizeof(struct Data_t);
 
     /* allocates space for the data */
-    struct Data_t *data = (struct Data_t *) malloc(dataSize);
+    struct Data_t *data = (struct Data_t *) MALLOC(dataSize);
 
     /* sets the data data */
     data->data = NULL;
@@ -100,10 +100,10 @@ void createData(struct Data_t **dataPointer) {
 
 void deleteData(struct Data_t *data) {
     /* releases the data */
-    free(data->dataBase);
+    FREE(data->dataBase);
 
     /* releases the data */
-    free(data);
+    FREE(data);
 }
 
 ERROR_CODE startService(struct Service_t *service) {
@@ -217,7 +217,7 @@ void createConnection(struct Connection_t **connectionPointer, SOCKET_HANDLE soc
     size_t connectionSize = sizeof(struct Connection_t);
 
     /* allocates space for the connection */
-    struct Connection_t *connection = (struct Connection_t *) malloc(connectionSize);
+    struct Connection_t *connection = (struct Connection_t *) MALLOC(connectionSize);
 
     /* sets the connection status as closed */
     connection->status = STATUS_CLOSED;
@@ -300,7 +300,7 @@ void deleteConnection(struct Connection_t *connection) {
     deleteLinkedList(connection->writeQueue);
 
     /* releases the connection */
-    free(connection);
+    FREE(connection);
 }
 
 void writeConnection(struct Connection_t *connection, unsigned char *data, unsigned int size, serviceCallback callback, void *callbackParameters) {

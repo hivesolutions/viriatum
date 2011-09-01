@@ -34,7 +34,7 @@ void createHandlerFileContext(struct HandlerFileContext_t **handlerFileContextPo
     size_t handlerFileContextSize = sizeof(struct HandlerFileContext_t);
 
     /* allocates space for the handler file context */
-    struct HandlerFileContext_t *handlerFileContext = (struct HandlerFileContext_t *) malloc(handlerFileContextSize);
+    struct HandlerFileContext_t *handlerFileContext = (struct HandlerFileContext_t *) MALLOC(handlerFileContextSize);
 
     /* sets the handler file context file */
     handlerFileContext->file = NULL;
@@ -55,7 +55,7 @@ void deleteHandlerFileContext(struct HandlerFileContext_t *handlerFileContext) {
     }
 
     /* releases the handler file context */
-    free(handlerFileContext);
+    FREE(handlerFileContext);
 }
 
 void setHandlerFile(struct HttpParser_t *httpParser, struct HttpSettings_t *httpSettings) {
@@ -160,7 +160,7 @@ ERROR_CODE urlCallbackHandlerFile(struct HttpParser_t *httpParser, const unsigne
     struct HandlerFileContext_t *handlerFileContext = (struct HandlerFileContext_t *) httpParser->context;
 
     /* allocates the required space for the url */
-    unsigned char *url = (unsigned char *) malloc(dataSize + 1);
+    unsigned char *url = (unsigned char *) MALLOC(dataSize + 1);
 
     /* copies the memory from the data to the url */
     memcpy(url, data, dataSize);
@@ -171,7 +171,7 @@ ERROR_CODE urlCallbackHandlerFile(struct HttpParser_t *httpParser, const unsigne
     /* in case the string refers the base path */
     if(strcmp((char *) url, "/") == 0 || strcmp((char *) url, "") == 0) {
         /* reallocates the space for the index reference */
-        url = (unsigned char *) realloc(url, 12);
+        url = (unsigned char *) REALLOC(url, 12);
 
         /* copies the index reference as the url */
         memcpy(url, "/index.html", 12);
@@ -181,7 +181,7 @@ ERROR_CODE urlCallbackHandlerFile(struct HttpParser_t *httpParser, const unsigne
     SPRINTF((char *) handlerFileContext->filePath, 1024, "%s%s%s", VIRIATUM_CONTENTS_PATH, VIRIATUM_WELCOME_PATH, url);
 
     /* releases the url */
-    free(url);
+    FREE(url);
 
     /* raise no error */
     RAISE_NO_ERROR;
@@ -212,7 +212,7 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
     size_t fileSize;
 
     /* allocates the headers buffer */
-    char *headersBuffer = malloc(1024);
+    char *headersBuffer = MALLOC(1024);
 
     /* retrieves the handler file context from the http parser */
     struct HandlerFileContext_t *handlerFileContext = (struct HandlerFileContext_t *) httpParser->context;
@@ -278,7 +278,7 @@ ERROR_CODE _sendChunkHandlerFile(struct Connection_t *connection, struct Data_t 
     FILE *file = handlerFileContext->file;
 
     /* allocates the required buffer for the file */
-    unsigned char *fileBuffer = malloc(FILE_BUFFER_SIZE_HANDLER_FILE);
+    unsigned char *fileBuffer = MALLOC(FILE_BUFFER_SIZE_HANDLER_FILE);
 
     /* in case the file is not defined (should be opened) */
     if(file == NULL) {
@@ -315,7 +315,7 @@ ERROR_CODE _sendChunkHandlerFile(struct Connection_t *connection, struct Data_t 
         fclose(file);
 
         /* releases the current file buffer */
-        free(fileBuffer);
+        FREE(fileBuffer);
     }
 
     /* raise no error */
