@@ -30,7 +30,7 @@
 #include "../util/string_util.h"
 
 #ifdef VIRIATUM_DEBUG
-#define V_MESSAGE(level) printf("[%s] [%s:%d] ", level, baseStringValue(__FILE__), __LINE__)
+#define V_MESSAGE(level) printf("[%s] [%s:%d] ", level, baseStringValue((unsigned char *) __FILE__), __LINE__)
 #endif
 
 #ifndef VIRIATUM_DEBUG
