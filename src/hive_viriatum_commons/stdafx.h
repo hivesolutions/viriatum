@@ -82,31 +82,8 @@
 #include <time.h>
 #include <math.h>
 
+#include "global/memory.h"
+
 unsigned char *nameViriatumCommons();
 unsigned char *versionViriatumCommons();
 unsigned char *descriptionViriatumCommons();
-
-
-
-
-#ifdef VIRIATUM_DEBUG
-size_t allocations;
-#define ALLOCATIONS allocations
-#define START_MEMORY size_t allocations = 0
-#define MALLOC(size) mallocDebug(size)
-#define CALLOC(count, size) calloc(count, size)
-#define REALLOC(pointer, size) realloc(pointer, size)
-#define FREE(pointer) freeDebug(pointer)
-static __inline void *mallocDebug(size_t size) { allocations++; return malloc(size); }
-static __inline void freeDebug(void *pointer) { allocations--; free(pointer); }
-#endif
-
-#ifndef VIRIATUM_DEBUG
-size_t allocations;
-#define ALLOCATIONS allocations
-#define START_MEMORY size_t allocations = -1
-#define MALLOC(size) malloc(size)
-#define CALLOC(count, size) calloc(count, size)
-#define REALLOC(pointer, size) realloc(pointer, size)
-#define FREE(pointer) free(pointer)
-#endif
