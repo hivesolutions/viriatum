@@ -29,21 +29,33 @@
 
 #ifdef VIRIATUM_PLATFORM_WIN32
 #define PID_TYPE DWORD
+#define PROCESS_TYPE HANDLE
+#define MEMORY_INFORMATION_TYPE PROCESS_MEMORY_COUNTERS
 #define LOCAL_TIME(localTimeValue, timeValue) tm localTimeValueValue; localTimeValue = &localTimeValueValue; localtime_s(localTimeValue, timeValue)
 #define SLEEP(miliseconds) Sleep(miliseconds)
 #define GET_PID() GetCurrentProcessId()
 #define GET_ENV(buffer, bufferSize, variableName) _dupenv_s(&buffer, &bufferSize, variableName)
+#define GET_PROCESS() OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, 0, GET_PID())
+#define CLOSE_PROCESS(process) CloseHandle(process)
+#define GET_MEMORY_INFORMATION(process, memoryInformation) GetProcessMemoryInfo(process, &memoryInformation, sizeof(memoryInformation))
+#define GET_MEMORY_USAGE(memoryInformation) memoryInformation.PagefileUsage
 #define FILE_EXISTS(filePath) GetFileAttributes(filePath) != 0xffffffff
 #endif
 
 #ifdef VIRIATUM_PLATFORM_UNIX
 #define PID_TYPE pid_t
+#define PROCESS_TYPE int 
+#define MEMORY_INFORMATION_TYPE struct rusage
 #define LOCAL_TIME(localTimeValue, timeValue) localTimeValue = localtime(timeValue)
 #define SLEEP(miliseconds) usleep((useconds_t) miliseconds * 1000)
 #define GET_PID() getpid()
 #define SPRINTF(buffer, size, format, ...) sprintf(buffer, format, __VA_ARGS__)
 #define FOPEN(filePointer, fileName, mode) *filePointer = fopen(fileName, mode)
 #define GET_ENV(buffer, bufferSize, variableName) buffer = getenv(variableName)
+#define GET_PROCESS() RUSAGE_SELF
+#define CLOSE_PROCESS(process)
+#define GET_MEMORY_INFORMATION(process, memoryInformation) getrusage(process, &memoryInformation)
+#define GET_MEMORY_USAGE(memoryInformation) memoryInformation.ru_ixrss
 #define FILE_EXISTS(filePath) access(filePath, F_OK) == 0
 #endif
 

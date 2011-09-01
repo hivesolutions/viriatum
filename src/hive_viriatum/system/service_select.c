@@ -137,11 +137,12 @@ ERROR_CODE startServiceSelect(struct ServiceSelect_t *serviceSelect) {
     /* sets the flags to be used in socket */
     SOCKET_FLAGS flags = 1;
 
-	HANDLE hProcess;
+	PROCESS_TYPE process;
 
-	PROCESS_MEMORY_COUNTERS pmc;
+	MEMORY_INFORMATION_TYPE memoryInformation;
 
-	PID_TYPE processID;
+	size_t memoryUsage;
+
 
     /* starts the service */
     returnValue = startService(serviceSelect->service);
@@ -160,14 +161,17 @@ ERROR_CODE startServiceSelect(struct ServiceSelect_t *serviceSelect) {
 
     /* iterates while the status is open */
     while(serviceSelect->service->status == STATUS_OPEN) {
-		processID = GET_PID();
 
-		hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, 0, processID);
-		GetProcessMemoryInfo(hProcess, &pmc, sizeof(pmc));
-		CloseHandle(hProcess);
+		process = GET_PROCESS();
+
+		GET_MEMORY_INFORMATION(process, memoryInformation);
+
+		memoryUsage = GET_MEMORY_USAGE(memoryInformation);
+
+		CLOSE_PROCESS(process);
 
         /* prints a debug message */
-        V_PRINT_F("Memory status: [%d objects] [%d KBytes]\n", ALLOCATIONS, pmc.PagefileUsage / 1024);
+        V_DEBUG_F("Memory status: [%d objects] [%d KBytes]\n", ALLOCATIONS, memoryUsage / 1024);
 
         /* resets the remove connections size */
         removeConnectionsSize = 0;
@@ -365,8 +369,11 @@ void addConnectionServiceSelect(struct ServiceSelect_t *serviceSelect, struct Co
     /* adds the socket handle to the sockets read set */
     addSocketHandleSocketsSetServiceSelect(serviceSelect, connection->socketHandle, &serviceSelect->socketsReadSet);
 
-    /* adds the socket handle to the sockets error set */
-    addSocketHandleSocketsSetServiceSelect(serviceSelect, connection->socketHandle, &serviceSelect->socketsReadSet);
+	/* in case the socket error are meant to be processed */
+	if(VIRIATUM_SOCKET_ERROR) {
+		/* adds the socket handle to the sockets error set */
+		addSocketHandleSocketsSetServiceSelect(serviceSelect, connection->socketHandle, &serviceSelect->socketsErrorSet);
+	}
 }
 
 void removeConnectionServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_t *connection) {
@@ -376,8 +383,11 @@ void removeConnectionServiceSelect(struct ServiceSelect_t *serviceSelect, struct
     /* removes the socket handle from the sockets read set */
     removeSocketHandleSocketsSetServiceSelect(serviceSelect, connection->socketHandle, &serviceSelect->socketsReadSet);
 
-	/* removes the socket handle from the sockets error set */
-    removeSocketHandleSocketsSetServiceSelect(serviceSelect, connection->socketHandle, &serviceSelect->socketsErrorSet);
+	/* in case the socket error are meant to be processed */
+	if(VIRIATUM_SOCKET_ERROR) {
+		/* removes the socket handle from the sockets error set */
+		removeSocketHandleSocketsSetServiceSelect(serviceSelect, connection->socketHandle, &serviceSelect->socketsErrorSet);
+	}
 
     /* in case the connection write is registered */
     if(connection->writeRegistered == 1) {
