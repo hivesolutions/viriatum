@@ -52,16 +52,22 @@ typedef ERROR_CODE (*connectionCallback) (struct Connection_t *);
  */
 typedef ERROR_CODE (*serviceCallback) (struct Connection_t *, struct Data_t *, void *);
 
-
-
-
+/**
+ * The "default" callback function to be used for
+ * polling purposes, without any extra arguments.
+ */
 typedef ERROR_CODE (*pollingCallback) (struct Polling_t *);
 
+/**
+ * Callback function to be used for situations where
+ * a change should be made in a connection.
+ */
 typedef ERROR_CODE (*pollingConnectionCallback) (struct Polling_t *, struct Connection_t *);
 
-
-
-
+/**
+ * Structure used to describe a polling (provider)
+ * with all the action functions and callbacks.
+ */
 typedef struct Polling_t {
     struct Service_t *service;
     pollingCallback open;
@@ -80,6 +86,13 @@ typedef struct Polling_t {
     void *lower;
 } Polling;
 
+/**
+ * Structure used to describe a service structure.
+ * The main service socket is set and shold be
+ * maintained for house-keeping purposes.
+ * The list of connections should represent the
+ * current set of active connections.
+ */
 typedef struct Service_t {
     unsigned char *name;
     unsigned char status;
