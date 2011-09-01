@@ -44,7 +44,7 @@
 
 #ifdef VIRIATUM_PLATFORM_UNIX
 #define PID_TYPE pid_t
-#define PROCESS_TYPE int 
+#define PROCESS_TYPE int
 #define MEMORY_INFORMATION_TYPE struct rusage
 #define LOCAL_TIME(localTimeValue, timeValue) localTimeValue = localtime(timeValue)
 #define SLEEP(miliseconds) usleep((useconds_t) miliseconds * 1000)

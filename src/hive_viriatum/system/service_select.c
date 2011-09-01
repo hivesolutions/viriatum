@@ -137,11 +137,11 @@ ERROR_CODE startServiceSelect(struct ServiceSelect_t *serviceSelect) {
     /* sets the flags to be used in socket */
     SOCKET_FLAGS flags = 1;
 
-	PROCESS_TYPE process;
+    PROCESS_TYPE process;
 
-	MEMORY_INFORMATION_TYPE memoryInformation;
+    MEMORY_INFORMATION_TYPE memoryInformation;
 
-	size_t memoryUsage;
+    size_t memoryUsage;
 
 
     /* starts the service */
@@ -162,13 +162,13 @@ ERROR_CODE startServiceSelect(struct ServiceSelect_t *serviceSelect) {
     /* iterates while the status is open */
     while(serviceSelect->service->status == STATUS_OPEN) {
 
-		process = GET_PROCESS();
+        process = GET_PROCESS();
 
-		GET_MEMORY_INFORMATION(process, memoryInformation);
+        GET_MEMORY_INFORMATION(process, memoryInformation);
 
-		memoryUsage = GET_MEMORY_USAGE(memoryInformation);
+        memoryUsage = GET_MEMORY_USAGE(memoryInformation);
 
-		CLOSE_PROCESS(process);
+        CLOSE_PROCESS(process);
 
         /* prints a debug message */
         V_DEBUG_F("Memory status: [%d objects] [%d KBytes]\n", ALLOCATIONS, memoryUsage / 1024);
@@ -181,52 +181,52 @@ ERROR_CODE startServiceSelect(struct ServiceSelect_t *serviceSelect) {
 
         /* in case the service socket is ready (for read) */
         if(serviceSocketReady == 1) {
-			/* iterates continuosly */
-			while(1) {
-				/* accepts the socket, retrieving the socket handle */
-				socketHandle = SOCKET_ACCEPT(serviceSocketHandle, &socketAddress, clientSocketAddressSize);
+            /* iterates continuosly */
+            while(1) {
+                /* accepts the socket, retrieving the socket handle */
+                socketHandle = SOCKET_ACCEPT(serviceSocketHandle, &socketAddress, clientSocketAddressSize);
 
-				/* in case there was an error accepting the socket */
-				if(SOCKET_TEST_ERROR(socketHandle)) {
-					/* breaks the loop */
-					break;
-				}
-				/* otherwise the socket was accepted corretly */
-				else {
-					/* in case viriatum is set to non blocking */
-					if(VIRIATUM_NON_BLOCKING) {
-						/* sets the socket to non blocking mode */
-						SOCKET_SET_NON_BLOCKING(socketHandle, flags);
-					}
+                /* in case there was an error accepting the socket */
+                if(SOCKET_TEST_ERROR(socketHandle)) {
+                    /* breaks the loop */
+                    break;
+                }
+                /* otherwise the socket was accepted corretly */
+                else {
+                    /* in case viriatum is set to non blocking */
+                    if(VIRIATUM_NON_BLOCKING) {
+                        /* sets the socket to non blocking mode */
+                        SOCKET_SET_NON_BLOCKING(socketHandle, flags);
+                    }
 
-					/* prints a debug message */
-					V_DEBUG_F("Accepted connection: %d\n", socketHandle);
+                    /* prints a debug message */
+                    V_DEBUG_F("Accepted connection: %d\n", socketHandle);
 
-					/* creates the connection */
-					createConnection(&connection, socketHandle);
+                    /* creates the connection */
+                    createConnection(&connection, socketHandle);
 
-					/* sets the service select service as the service in the connection */
-					connection->service = serviceSelect->service;
+                    /* sets the service select service as the service in the connection */
+                    connection->service = serviceSelect->service;
 
-					/* sets the service select as the service in the connection */
-					connection->serviceReference = serviceSelect;
+                    /* sets the service select as the service in the connection */
+                    connection->serviceReference = serviceSelect;
 
-					/* sets the open connection fucntion in the connection */
-					connection->openConnection = openConnectionServiceSelect;
+                    /* sets the open connection fucntion in the connection */
+                    connection->openConnection = openConnectionServiceSelect;
 
-					/* sets the close connection fucntion in the connection */
-					connection->closeConnection = closeConnectionServiceSelect;
+                    /* sets the close connection fucntion in the connection */
+                    connection->closeConnection = closeConnectionServiceSelect;
 
-					/* opens the connection */
-					connection->openConnection(connection);
-				}
+                    /* opens the connection */
+                    connection->openConnection(connection);
+                }
 
-				/* in case viriatum is set to blocking */
-				if(!VIRIATUM_NON_BLOCKING) {
-					/* breaks the loop (avoid blocking) */
-					break;
-				}
-			}
+                /* in case viriatum is set to blocking */
+                if(!VIRIATUM_NON_BLOCKING) {
+                    /* breaks the loop (avoid blocking) */
+                    break;
+                }
+            }
         }
 
         /* prints a debug message */
@@ -369,11 +369,11 @@ void addConnectionServiceSelect(struct ServiceSelect_t *serviceSelect, struct Co
     /* adds the socket handle to the sockets read set */
     addSocketHandleSocketsSetServiceSelect(serviceSelect, connection->socketHandle, &serviceSelect->socketsReadSet);
 
-	/* in case the socket error are meant to be processed */
-	if(VIRIATUM_SOCKET_ERROR) {
-		/* adds the socket handle to the sockets error set */
-		addSocketHandleSocketsSetServiceSelect(serviceSelect, connection->socketHandle, &serviceSelect->socketsErrorSet);
-	}
+    /* in case the socket error are meant to be processed */
+    if(VIRIATUM_SOCKET_ERROR) {
+        /* adds the socket handle to the sockets error set */
+        addSocketHandleSocketsSetServiceSelect(serviceSelect, connection->socketHandle, &serviceSelect->socketsErrorSet);
+    }
 }
 
 void removeConnectionServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_t *connection) {
@@ -383,11 +383,11 @@ void removeConnectionServiceSelect(struct ServiceSelect_t *serviceSelect, struct
     /* removes the socket handle from the sockets read set */
     removeSocketHandleSocketsSetServiceSelect(serviceSelect, connection->socketHandle, &serviceSelect->socketsReadSet);
 
-	/* in case the socket error are meant to be processed */
-	if(VIRIATUM_SOCKET_ERROR) {
-		/* removes the socket handle from the sockets error set */
-		removeSocketHandleSocketsSetServiceSelect(serviceSelect, connection->socketHandle, &serviceSelect->socketsErrorSet);
-	}
+    /* in case the socket error are meant to be processed */
+    if(VIRIATUM_SOCKET_ERROR) {
+        /* removes the socket handle from the sockets error set */
+        removeSocketHandleSocketsSetServiceSelect(serviceSelect, connection->socketHandle, &serviceSelect->socketsErrorSet);
+    }
 
     /* in case the connection write is registered */
     if(connection->writeRegistered == 1) {
@@ -633,8 +633,6 @@ ERROR_CODE openConnectionServiceSelect(struct Connection_t *connection) {
     /* raises no error */
     RAISE_NO_ERROR;
 }
-
-static int CLOSED = 0;
 
 ERROR_CODE closeConnectionServiceSelect(struct Connection_t *connection) {
     /* retrieves the service select */

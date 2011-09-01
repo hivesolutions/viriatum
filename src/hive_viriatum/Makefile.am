@@ -42,6 +42,9 @@ http/http_parser.c \
 http/http_request.c \
 io/file.c \
 module/loading.c \
+polling/polling_epoll.c\
+polling/polling_kqueue.c\
+polling/polling_select.c\
 stream/stream_http.c \
 stream/stream_io.c \
 system/service.c \
