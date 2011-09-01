@@ -319,7 +319,8 @@ typedef struct Data_t {
 /**
  * Constructor of the service.
  *
- * @param servicePointer The pointer to the service to be constructed.
+ * @param servicePointer The pointer to the service to
+ * be constructed.
  */
 void createService(struct Service_t **servicePointer);
 
@@ -333,7 +334,8 @@ void deleteService(struct Service_t *service);
 /**
  * Constructor of the data.
  *
- * @param dataPointer The pointer to the data to be constructed.
+ * @param dataPointer The pointer to the data to be
+ * constructed.
  */
 void createData(struct Data_t **dataPointer);
 
@@ -377,12 +379,105 @@ ERROR_CODE startService(struct Service_t *service);
  */
 ERROR_CODE stopService(struct Service_t *service);
 
-void addConnectionService(struct Service_t *service, struct Connection_t *connection);
-void removeConnectionService(struct Service_t *service, struct Connection_t *connection);
-void createConnection(struct Connection_t **connectionPointer, SOCKET_HANDLE socketHandle);
-void deleteConnection(struct Connection_t *connection);
-void writeConnection(struct Connection_t *connection, unsigned char *data, unsigned int size, serviceCallback callback, void *callbackParameters);
+/**
+ * Adds a connection to the given service.
+ * Adding a connection implies the changing
+ * of the polling (provider).
+ *
+ * @param service The service to be used.
+ * @param connection The connection to be added.
+ * @return The resulting error code.
+ */
+ERROR_CODE addConnectionService(struct Service_t *service, struct Connection_t *connection);
+
+/**
+ * Removes a connection from the given service.
+ * Removing a connection implies the changing
+ * of the polling (provider).
+ *
+ * @param service The service to be used.
+ * @param connection The connection to be removed.
+ * @return The resulting error code.
+ */
+ERROR_CODE removeConnectionService(struct Service_t *service, struct Connection_t *connection);
+
+/**
+ * Constructor of the connection.
+ *
+ * @param servicePointer The pointer to the connetcion to
+ * be constructed.
+ * @param socketHandle The socket handle to be associated
+ * with the connection.
+ * @return The resulting error code.
+ */
+ERROR_CODE createConnection(struct Connection_t **connectionPointer, SOCKET_HANDLE socketHandle);
+
+/**
+ * Destructor of the connection.
+ *
+ * @param connection The connection to be destroyed.
+ * @return The resulting error code.
+ */
+ERROR_CODE deleteConnection(struct Connection_t *connection);
+
+/**
+ * Writes the given data to the connection.
+ * A callback may be provided and if provided
+ * it will be called after the data has been successfully
+ * sent through the connection
+ *
+ * @param connection The connection to be used to
+ * send the data.
+ * @param data The data to be send throught the connection.
+ * @param size The size of the data to be sent.
+ * @param callback The callback to be called after the
+ * successful write of data.
+ * @parm callbackParameters The parameters to be sent
+ * back to the callback.
+ * @return The resulting error code.
+ */
+ERROR_CODE writeConnection(struct Connection_t *connection, unsigned char *data, unsigned int size, serviceCallback callback, void *callbackParameters);
+
+/**
+ * Opens the given connection, creating (and starting) all
+ * the required structures.
+ * This method should be always called indirectly.
+ *
+ * @param connection The connection to be open.
+ * @return The resulting error code.
+ */
 ERROR_CODE openConnection(struct Connection_t *connection);
+
+/**
+ * Closes the given connection, destroying all of the
+ * created structures.
+ * This method should be always called indirectly.
+ *
+ * @param connection The connection to be closed.
+ * @return The resulting error code.
+ */
 ERROR_CODE closeConnection(struct Connection_t *connection);
+
+/**
+ * Registers the given connection for write events.
+ * This registration is done according to the polling
+ * provider specification.
+ * This method should be always called indirectly.
+ *
+ * @param connection The connection to be registered
+ * for writing "events".
+ * @return The resulting error code.
+ */
 ERROR_CODE registerWriteConnection(struct Connection_t *connection);
+
+/**
+ * Unregisters the given connection for write events.
+ * This unregistration is done according to the polling
+ * provider specification.
+ * This method should be always called indirectly.
+ *
+ * @param connection The connection to be unregistered
+ * for writing "events".
+ * @return The resulting error code.
+ */
 ERROR_CODE unregisterWriteConnection(struct Connection_t *connection);

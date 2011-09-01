@@ -36,20 +36,16 @@ void createService(struct Service_t **servicePointer) {
     /* allocates space for the service */
     struct Service_t *service = (struct Service_t *) MALLOC(serviceSize);
 
+    /* sets the data attribute (default) values */
+    service->name = NULL;
+    service->status = STATUS_CLOSED;
+    service->serviceSocketHandle = 0;
+
     /* creates the polling (provider) */
     createPolling(&service->polling);
 
     /* creates the connections list */
     createLinkedList(&service->connectionsList);
-
-    /* setst the service status as invalid */
-    service->name = NULL;
-
-    /* setst the service status as closed */
-    service->status = STATUS_CLOSED;
-
-    /* setst the service service socket handle as invalid */
-    service->serviceSocketHandle = 0;
 
     /* sets the service in the service pointer */
     *servicePointer = service;
@@ -58,7 +54,7 @@ void createService(struct Service_t **servicePointer) {
 void deleteService(struct Service_t *service) {
     /* in case the service socket handle is defined */
     if(service->serviceSocketHandle) {
-        /* closes the service socket */
+        /* closes the service socket (secure closing) */
         SOCKET_CLOSE(service->serviceSocketHandle);
     }
 
@@ -79,19 +75,11 @@ void createData(struct Data_t **dataPointer) {
     /* allocates space for the data */
     struct Data_t *data = (struct Data_t *) MALLOC(dataSize);
 
-    /* sets the data data */
+    /* sets the data attribute (default) values */
     data->data = NULL;
-
-    /* sets the data data base */
     data->dataBase = NULL;
-
-    /* sets the data size */
     data->size = 0;
-
-    /* sets the data callback */
     data->callback = NULL;
-
-    /* sets the data callback parameters */
     data->callbackParameters = NULL;
 
     /* sets the data in the data pointer */
@@ -113,34 +101,16 @@ void createPolling(struct Polling_t **pollingPointer) {
     /* allocates space for the polling */
     struct Polling_t *polling = (struct Polling_t *) MALLOC(pollingSize);
 
-    /* sets the polling service */
+    /* sets the polling attribute (default) values */
     polling->service = NULL;
-
-    /* sets the polling open */
     polling->open = NULL;
-
-    /* sets the polling close */
     polling->close = NULL;
-
-    /* sets the polling register connection */
     polling->registerConnection = NULL;
-
-    /* sets the polling unregister connection */
     polling->unregisterConnection = NULL;
-
-    /* sets the polling register connection */
     polling->registerWrite = NULL;
-
-    /* sets the polling unregister write connection */
     polling->unregisterWrite = NULL;
-
-    /* sets the polling poll */
     polling->poll = NULL;
-
-    /* sets the polling call */
     polling->call = NULL;
-
-    /* sets the polling lower */
     polling->lower = NULL;
 
     /* sets the data in the polling pointer */
@@ -327,7 +297,7 @@ ERROR_CODE stopService(struct Service_t *service) {
     RAISE_NO_ERROR;
 }
 
-void addConnectionService(struct Service_t *service, struct Connection_t *connection) {
+ERROR_CODE addConnectionService(struct Service_t *service, struct Connection_t *connection) {
     /* retrieves the polling (provider) */
     struct Polling_t *polling = service->polling;
 
@@ -336,9 +306,12 @@ void addConnectionService(struct Service_t *service, struct Connection_t *connec
 
     /* registes the connection in the polling (provider) */
     polling->registerConnection(polling, connection);
+
+    /* raises no error */
+    RAISE_NO_ERROR;
 }
 
-void removeConnectionService(struct Service_t *service, struct Connection_t *connection) {
+ERROR_CODE removeConnectionService(struct Service_t *service, struct Connection_t *connection) {
     /* retrieves the polling (provider) */
     struct Polling_t *polling = service->polling;
 
@@ -347,49 +320,30 @@ void removeConnectionService(struct Service_t *service, struct Connection_t *con
 
     /* removes the connection from the connections list */
     removeValueLinkedList(service->connectionsList, connection, 1);
+
+    /* raises no error */
+    RAISE_NO_ERROR;
 }
 
-void createConnection(struct Connection_t **connectionPointer, SOCKET_HANDLE socketHandle) {
+ERROR_CODE createConnection(struct Connection_t **connectionPointer, SOCKET_HANDLE socketHandle) {
     /* retrieves the connection size */
     size_t connectionSize = sizeof(struct Connection_t);
 
     /* allocates space for the connection */
     struct Connection_t *connection = (struct Connection_t *) MALLOC(connectionSize);
 
-    /* sets the connection status as closed */
+    /* sets the connection attribute (default) values */
     connection->status = STATUS_CLOSED;
-
-    /* sets the socket handle in the connection */
     connection->socketHandle = socketHandle;
-
-    /* sets the service as not set */
     connection->service = NULL;
-
-    /* sets the write registered to false */
     connection->writeRegistered = 0;
-
-    /* sets the open connection to unset */
     connection->openConnection = NULL;
-
-    /* sets the close connection to unset */
     connection->closeConnection = NULL;
-
-    /* sets the on read to unset */
     connection->onRead = NULL;
-
-    /* sets the on write to unset */
     connection->onWrite = NULL;
-
-    /* sets the on error to unset */
     connection->onError = NULL;
-
-    /* sets the on open to unset */
     connection->onOpen = NULL;
-
-    /* sets the on close to unset */
     connection->onClose = NULL;
-
-    /* sets the lower to unset */
     connection->lower = NULL;
 
     /* creates the read queue linked list */
@@ -400,9 +354,12 @@ void createConnection(struct Connection_t **connectionPointer, SOCKET_HANDLE soc
 
     /* sets the connection in the connection pointer */
     *connectionPointer = connection;
+
+    /* raises no error */
+    RAISE_NO_ERROR;
 }
 
-void deleteConnection(struct Connection_t *connection) {
+ERROR_CODE deleteConnection(struct Connection_t *connection) {
     /* allocates the data */
     struct Data_t *data;
 
@@ -432,9 +389,12 @@ void deleteConnection(struct Connection_t *connection) {
 
     /* releases the connection */
     FREE(connection);
+
+    /* raises no error */
+    RAISE_NO_ERROR;
 }
 
-void writeConnection(struct Connection_t *connection, unsigned char *data, unsigned int size, serviceCallback callback, void *callbackParameters) {
+ERROR_CODE writeConnection(struct Connection_t *connection, unsigned char *data, unsigned int size, serviceCallback callback, void *callbackParameters) {
     /* allocates the data */
     struct Data_t *_data;
 
@@ -456,6 +416,9 @@ void writeConnection(struct Connection_t *connection, unsigned char *data, unsig
 
     /* registers the connection for write */
     connection->registerWrite(connection);
+
+    /* raises no error */
+    RAISE_NO_ERROR;
 }
 
 ERROR_CODE openConnection(struct Connection_t *connection) {
