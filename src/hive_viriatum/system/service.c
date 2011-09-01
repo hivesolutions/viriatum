@@ -274,9 +274,6 @@ void deleteConnection(struct Connection_t *connection) {
 
     /* iterates continuously */
     while(1) {
-        /* prints a debug message */
-        V_DEBUG("Peeking value from write queue (for cleanup)\n");
-
         /* pops a value (data) from the linked list (write queue) */
         popValueLinkedList(connection->writeQueue, (void **) &data, 1);
 
