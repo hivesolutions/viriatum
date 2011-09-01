@@ -59,12 +59,12 @@
 
 #if HTTP_PARSER_STRICT
 #define STRICT_CHECK(condition)\
-do {\
-    if(condition) {\
-        SET_ERRNO(HPE_STRICT);\
-        goto error;\
-    }\
-} while(0)
+	do {\
+	    if(condition) {\
+			SET_ERRNO(HPE_STRICT);\
+			goto error;\
+		}\
+	} while(0)
 #define NEW_MESSAGE() (httpShouldKeepAlive(parser) ? START_STATE : STATE_DEAD)
 #else
 #define STRICT_CHECK(condition)
@@ -72,32 +72,32 @@ do {\
 #endif
 
 #define MARK(FOR)\
-do {\
-  FOR##Mark = pointer;\
-} while(0)
+	do {\
+		FOR##Mark = pointer;\
+	} while(0)
 
 #define HTTP_CALLBACK(FOR)\
-do {\
-    if(FOR##Mark) {\
-        if(httpSettings->on##FOR) {\
-            if(0 != httpSettings->on##FOR(httpParser, FOR##Mark, pointer - FOR##Mark)) {\
-            /*    SET_ERRNO(HPE_CB_##FOR);*/\
-                /*return (p - data);*/\
-            }\
-        }\
-        FOR##Mark = NULL;\
-    }\
-} while(0)
+	do {\
+		if(FOR##Mark) {\
+			if(httpSettings->on##FOR) {\
+				if(0 != httpSettings->on##FOR(httpParser, FOR##Mark, pointer - FOR##Mark)) {\
+				/*    SET_ERRNO(HPE_CB_##FOR);*/\
+					/*return (p - data);*/\
+				}\
+			}\
+			FOR##Mark = NULL;\
+		}\
+	} while(0)
 
 #define HTTP_CALLBACK2(FOR)\
-do {\
-    if(httpSettings->on##FOR) {\
-        if(0 != httpSettings->on##FOR(httpParser)) {\
-            /*SET_ERRNO(HPE_CB_##FOR);*/\
-            /*return (pointer - data);*/\
-        }\
-    }\
-} while(0)
+	do {\
+		if(httpSettings->on##FOR) {\
+			if(0 != httpSettings->on##FOR(httpParser)) {\
+				/*SET_ERRNO(HPE_CB_##FOR);*/\
+				/*return (pointer - data);*/\
+			}\
+		}\
+	} while(0)
 
 /**
  * The http proxy connection string value.
