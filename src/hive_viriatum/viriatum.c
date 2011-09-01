@@ -32,7 +32,7 @@
 /* starts the memory structures */
 START_MEMORY;
 
-static struct ServiceSelect_t *serviceSelect;
+static struct Service_t *service;
 
 ERROR_CODE runService() {
     /* allocates the return value */
@@ -44,11 +44,11 @@ ERROR_CODE runService() {
     /* initializes the socket infrastructure */
     SOCKET_INITIALIZE(&socketData);
 
-    /* creates the service select */
-    createServiceSelect(&serviceSelect);
+    /* creates the service */
+    createService(&service);
 
-    /* starts the service select */
-    returnValue = startServiceSelect(serviceSelect);
+    /* starts the service */
+    returnValue = startService(service);
 
     /* tests the error code for error */
     if(IS_ERROR_CODE(returnValue)) {
@@ -59,8 +59,8 @@ ERROR_CODE runService() {
         RAISE_AGAIN(returnValue);
     }
 
-    /* deletes the service select */
-    deleteServiceSelect(serviceSelect);
+    /* deletes the service */
+    deleteService(service);
 
     /* runs the socket finish */
     SOCKET_FINISH();
@@ -73,9 +73,6 @@ ERROR_CODE ranService() {
     /* allocates the return value */
     ERROR_CODE returnValue;
 
-    /* retrieves the service */
-    struct Service_t *service = serviceSelect->service;
-
     /* in case the service status is open */
     if(service->status == STATUS_CLOSED) {
         /* prints a warning message */
@@ -84,8 +81,8 @@ ERROR_CODE ranService() {
         /* prints a warning message */
         V_DEBUG("Stopping service\n");
 
-        /* starts the service select */
-        returnValue = stopServiceSelect(serviceSelect);
+        /* stops the service */
+        returnValue = stopService(service);
 
         /* tests the error code for error */
         if(IS_ERROR_CODE(returnValue)) {

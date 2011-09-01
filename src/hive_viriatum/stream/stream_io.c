@@ -63,6 +63,80 @@ void deleteIoConnection(struct IoConnection_t *ioConnection) {
     FREE(ioConnection);
 }
 
+ERROR_CODE acceptHandlerStreamIo(struct Connection_t *connection) {
+    /* allocates the socket handle */
+    SOCKET_HANDLE socketHandle;
+
+    /* allocates the socket address */
+    SOCKET_ADDRESS socketAddress;
+
+    /* allocates the (client) connection */
+    struct Connection_t *clientConnection;
+
+    /* sets the flags to be used in socket */
+    SOCKET_FLAGS flags = 1;
+
+    /* calculates the size of the socket address */
+    SOCKET_ADDRESS_SIZE clientSocketAddressSize = sizeof(SOCKET_ADDRESS);
+
+    /* retrieves the io connection */
+    struct IoConnection_t *ioConnection = (struct IoConnection_t *) connection->lower;
+
+    /* iterates continuously */
+    while(1) {
+        /* accepts the socket, retrieving the socket handle */
+        socketHandle = SOCKET_ACCEPT(connection->socketHandle, &socketAddress, clientSocketAddressSize);
+
+        /* in case there was an error accepting the socket */
+        if(SOCKET_TEST_ERROR(socketHandle)) {
+            /* breaks the loop */
+            break;
+        }
+        /* otherwise the socket was accepted corretly */
+        else {
+            /* in case viriatum is set to non blocking */
+            if(VIRIATUM_NON_BLOCKING) {
+                /* sets the socket to non blocking mode */
+                SOCKET_SET_NON_BLOCKING(socketHandle, flags);
+            }
+
+            /* prints a debug message */
+            V_DEBUG_F("Accepted connection: %d\n", socketHandle);
+
+            /* creates the (client) connection */
+            createConnection(&clientConnection, socketHandle);
+
+            /* sets the service select service as the service in the (client)  connection */
+            clientConnection->service = connection->service;
+
+            /* sets the base hanlding functions in the client connection */
+            clientConnection->openConnection = openConnection;
+            clientConnection->closeConnection = closeConnection;
+            clientConnection->registerWrite = registerWriteConnection;
+            clientConnection->unregisterWrite = unregisterWriteConnection;
+
+            /* sets the various stream io connection callbacks
+            in the client connection */
+            clientConnection->onRead = readHandlerStreamIo;
+            clientConnection->onWrite = writeHandlerStreamIo;
+            clientConnection->onError = errorHandlerStreamIo;
+            clientConnection->onOpen = openHandlerStreamIo;
+            clientConnection->onClose = closeHandlerStreamIo;
+
+            /* opens the connection */
+            clientConnection->openConnection(clientConnection);
+        }
+
+        /* in case viriatum is set to blocking */
+        if(!VIRIATUM_NON_BLOCKING) {
+            /* breaks the loop (avoid blocking) */
+            break;
+        }
+    }
+
+    return 0;
+}
+
 ERROR_CODE readHandlerStreamIo(struct Connection_t *connection) {
     /* allocates the number of bytes */
     SOCKET_ERROR_CODE numberBytes;
@@ -315,7 +389,7 @@ ERROR_CODE writeHandlerStreamIo(struct Connection_t *connection) {
         /* in case there's no error */
         case 0:
             /* unregisters the connection for write */
-            connection->service->unregisterWrite(connection);
+            connection->unregisterWrite(connection);
 
             /* breaks the switch */
             break;
