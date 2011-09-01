@@ -529,8 +529,6 @@ void addSocketHandleSocketsSetServiceSelect(struct ServiceSelect_t *serviceSelec
     /* in case the current socket handle is bigger than the service
     select sockets set highest value */
     if(socketHandle > serviceSelect->socketsSetHighest) {
-		printf("reoucou para %d", serviceSelect->socketsSetHighest);
-
         /* sets the socket handle as the sockets set highest */
         serviceSelect->socketsSetHighest = socketHandle;
     }
