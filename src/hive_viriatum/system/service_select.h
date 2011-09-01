@@ -30,6 +30,10 @@
 #include "../stream/stream.h"
 #include "service.h"
 
+/* forward references (avoid loop) */
+struct Data_t;
+struct Connection_t;
+
 typedef struct ServiceSelect_t {
     /**
      * The service reference, for top
