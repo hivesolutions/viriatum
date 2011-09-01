@@ -32,6 +32,7 @@
 #include "http/http.h"
 #include "io/io.h"
 #include "module/module.h"
+#include "polling/polling.h"
 #include "handlers/handlers.h"
 #include "system/system.h"
 #include "test/test.h"
