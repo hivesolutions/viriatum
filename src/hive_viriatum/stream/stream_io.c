@@ -304,7 +304,7 @@ ERROR_CODE writeHandlerStreamIo(struct Connection_t *connection) {
         V_DEBUG("Deleting data (cleanup structures)\n");
 
         /* deletes the data */
-        /*deleteData(data);*/
+        deleteData(data);
     }
 
     /* prints a debug message */
