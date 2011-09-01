@@ -90,9 +90,9 @@ unsigned char *descriptionViriatumCommons();
 
 
 #ifdef VIRIATUM_DEBUG
-int allocations;
+size_t allocations;
 #define ALLOCATIONS allocations
-#define START_MEMORY int allocations = 0
+#define START_MEMORY size_t allocations = 0
 #define MALLOC(size) mallocDebug(size)
 #define CALLOC(count, size) calloc(count, size)
 #define REALLOC(pointer, size) realloc(pointer, size)
@@ -110,4 +110,3 @@ unsigned int allocations;
 #define REALLOC(pointer, size) realloc(pointer, size)
 #define FREE(pointer) free(pointer)
 #endif
-
