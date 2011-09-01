@@ -186,7 +186,7 @@ ERROR_CODE startServiceSelect(struct ServiceSelect_t *serviceSelect) {
 	 CloseHandle( hProcess );
 
         /* prints a debug message */
-        V_DEBUG_F("Current memory status: [%d objects] [%d bytes]\n", ALLOCATIONS, pmc.WorkingSetSize);
+        V_DEBUG_F("Current memory status: [%d objects] [%d bytes]\n", ALLOCATIONS, pmc.PagefileUsage);
 
         /* resets the remove connections size */
         removeConnectionsSize = 0;
