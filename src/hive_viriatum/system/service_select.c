@@ -364,6 +364,9 @@ void addConnectionServiceSelect(struct ServiceSelect_t *serviceSelect, struct Co
 
     /* adds the socket handle to the sockets read set */
     addSocketHandleSocketsSetServiceSelect(serviceSelect, connection->socketHandle, &serviceSelect->socketsReadSet);
+
+    /* adds the socket handle to the sockets error set */
+    addSocketHandleSocketsSetServiceSelect(serviceSelect, connection->socketHandle, &serviceSelect->socketsReadSet);
 }
 
 void removeConnectionServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_t *connection) {
@@ -372,6 +375,9 @@ void removeConnectionServiceSelect(struct ServiceSelect_t *serviceSelect, struct
 
     /* removes the socket handle from the sockets read set */
     removeSocketHandleSocketsSetServiceSelect(serviceSelect, connection->socketHandle, &serviceSelect->socketsReadSet);
+
+	/* removes the socket handle from the sockets error set */
+    removeSocketHandleSocketsSetServiceSelect(serviceSelect, connection->socketHandle, &serviceSelect->socketsErrorSet);
 
     /* in case the connection write is registered */
     if(connection->writeRegistered == 1) {
