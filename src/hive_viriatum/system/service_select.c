@@ -391,8 +391,8 @@ void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_
 
     /* in case the select coutn is negative */
     if(selectCount < 0) {
-        /* prints a debug message */
-        V_DEBUG_F("Problem in select statement: %d\n", selectCount);
+        /* prints a warning message */
+        V_WARNING_F("Problem in select statement: %d\n", selectCount);
     }
 
     /* in case the service socket handle is set in
