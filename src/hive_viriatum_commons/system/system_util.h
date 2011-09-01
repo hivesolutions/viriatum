@@ -58,3 +58,7 @@
 #endif
 
 #define CLOCK() clock()
+
+#ifdef VIRIATUM_PLATFORM_MSC
+#pragma comment(lib, "Psapi.lib")
+#endif
