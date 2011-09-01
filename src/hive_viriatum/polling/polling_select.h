@@ -75,18 +75,54 @@ typedef struct PollingSelect_t {
      */
     SOCKET_SET socketsErrorSetTemporary;
 
-
+	/**
+	 * The buffer that holds the connections
+	 * with data available for read.
+	 */
     struct Connection_t **readConnections;
+
+	/**
+	 * The buffer that holds the connections
+	 * with data available for write.
+	 */
     struct Connection_t **writeConnections;
+
+	/**
+	 * The buffer that holds the connections
+	 * that are in an erroneous state
+	 */
     struct Connection_t **errorConnections;
+
+	/**
+	 * The buffer thatn holds the connections
+	 * to be house-jept (removed) at the end
+	 * of the polling cycle.
+	 */
     struct Connection_t **removeConnections;
+
+	/**
+	 * The size of the read connections
+	 * buffer.
+	 */
     unsigned int readConnectionsSize;
+
+	/**
+	 * The size of the write connections
+	 * buffer.
+	 */
     unsigned int writeConnectionsSize;
+
+	/**
+	 * The size of the error connections
+	 * buffer.
+	 */
     unsigned int errorConnectionsSize;
+
+	/**
+	 * The size of the remove connections
+	 * buffer.
+	 */
     unsigned int removeConnectionsSize;
-
-
-
 
     /**
      * The timeout value used for the
