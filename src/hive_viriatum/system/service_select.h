@@ -54,6 +54,11 @@ typedef struct ServiceSelect_t {
     SOCKET_SET socketsWriteSet;
 
     /**
+     * The socket set for the error sockets.
+     */
+    SOCKET_SET socketsErrorSet;
+
+    /**
      * The temporary socket set for the
      * read sockets.
      */
@@ -64,6 +69,12 @@ typedef struct ServiceSelect_t {
      * write sockets.
      */
     SOCKET_SET socketsWriteSetTemporary;
+
+    /**
+     * The temporary socket set for the
+     * error sockets.
+     */
+    SOCKET_SET socketsErrorSetTemporary;
 
     /**
      * The timeout value used for the
@@ -83,7 +94,7 @@ ERROR_CODE startServiceSelect(struct ServiceSelect_t *serviceSelect);
 ERROR_CODE stopServiceSelect(struct ServiceSelect_t *serviceSelect);
 void addConnectionServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_t *connection);
 void removeConnectionServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_t *connection);
-void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_t **readConnections, struct Connection_t **writeConnections, unsigned int *readConnectionsSize, unsigned int *writeConnectionsSize, unsigned int *serviceSocketReady);
+void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_t **readConnections, struct Connection_t **writeConnections, struct Connection_t **errorConnections, unsigned int *readConnectionsSize, unsigned int *writeConnectionsSize, unsigned int *errorConnectionsSize, unsigned int *serviceSocketReady);
 void addSocketHandleSocketsSetServiceSelect(struct ServiceSelect_t *serviceSelect, SOCKET_HANDLE socketHandle, SOCKET_SET *socketsSet);
 void removeSocketHandleSocketsSetServiceSelect(struct ServiceSelect_t *serviceSelect, SOCKET_HANDLE socketHandle, SOCKET_SET *socketsSet);
 ERROR_CODE registerWriteServiceSelect(struct Connection_t *connection);

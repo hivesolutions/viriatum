@@ -51,11 +51,17 @@ void createHttpConnection(struct HttpConnection_t **httpConnectionPointer, struc
     /* sets the http connection in the (upper) io connection substrate */
     ioConnection->lower = httpConnection;
 
+    /* sets the structures for the handler */
+    setHandlerFile(httpConnection->httpParser, httpConnection->httpSettings);
+
     /* sets the http connection in the http connection pointer */
     *httpConnectionPointer = httpConnection;
 }
 
 void deleteHttpConnection(struct HttpConnection_t *httpConnection) {
+    /* unsets the structures for the handler */
+    unsetHandlerFile(httpConnection->httpParser, httpConnection->httpSettings);
+
     /* deletes the http parser */
     deleteHttpParser(httpConnection->httpParser);
 
@@ -71,16 +77,13 @@ ERROR_CODE dataHandlerStreamHttp(struct IoConnection_t *ioConnection, unsigned c
     struct HttpConnection_t *httpConnection = (struct HttpConnection_t *) ioConnection->lower;
 
 
-    /* sets the structures for the handler */
-    setHandlerFile(httpConnection->httpParser, httpConnection->httpSettings);
+    /* TENHO DE POR ESTE METODO como resetHandlerFile() */
+
+    resetHttpParserHandlerFile(httpConnection->httpParser);
 
     // TODO: tenho de testar quantos bytes processei !!!
     /* process the http data for the http parser */
     processDataHttpParser(httpConnection->httpParser, httpConnection->httpSettings, buffer, bufferSize);
-
-    /* unsets the structures for the handler */
-    unsetHandlerFile(httpConnection->httpParser, httpConnection->httpSettings);
-
 
 
     /* raises no error */

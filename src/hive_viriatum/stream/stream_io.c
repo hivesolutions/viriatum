@@ -63,6 +63,8 @@ void deleteIoConnection(struct IoConnection_t *ioConnection) {
     free(ioConnection);
 }
 
+static int ZERO_SIZE = 0;
+
 ERROR_CODE readHandlerStreamIo(struct Connection_t *connection) {
     /* allocates the number of bytes */
     SOCKET_ERROR_CODE numberBytes;
@@ -96,6 +98,10 @@ ERROR_CODE readHandlerStreamIo(struct Connection_t *connection) {
 
         /* in case the number of bytes is zero (connection closed) */
         if(numberBytes == 0) {
+            ZERO_SIZE++;
+
+            printf("ZERO_SIZE: %d", ZERO_SIZE);
+
             /* sets the error flag */
             error = 1;
 
@@ -123,6 +129,8 @@ ERROR_CODE readHandlerStreamIo(struct Connection_t *connection) {
                 default:
                     /* prints the error */
                     V_DEBUG_F("Problem receiving from socket: %d\n", receivingErrorCode);
+
+                    printf("FEXOU ERRO\n");
 
                     /* sets the error flag */
                     error = 1;
@@ -301,7 +309,7 @@ ERROR_CODE writeHandlerStreamIo(struct Connection_t *connection) {
         }
 
         /* prints a debug message */
-        V_DEBUG("Deleting data\n");
+        V_DEBUG("Deleting data (cleanup structures)\n");
 
         /* deletes the data */
         deleteData(data);
@@ -344,6 +352,9 @@ ERROR_CODE writeHandlerStreamIo(struct Connection_t *connection) {
 }
 
 ERROR_CODE errorHandlerStreamIo(struct Connection_t *connection) {
+    /* closes the connection */
+    connection->closeConnection(connection);
+
     return 0;
 }
 
@@ -380,7 +391,7 @@ ERROR_CODE closeHandlerStreamIo(struct Connection_t *connection) {
     struct IoConnection_t *ioConnection = (struct IoConnection_t *) connection->lower;
 
     /* in case the on close handler is defined */
-    if(ioConnection->onOpen != NULL) {
+    if(ioConnection->onClose != NULL) {
         /* prints a debug message */
         V_DEBUG("Calling on close handler\n");
 

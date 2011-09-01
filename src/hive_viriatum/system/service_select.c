@@ -54,11 +54,17 @@ void createServiceSelect(struct ServiceSelect_t **serviceSelectPointer) {
     /* zeros the sockets write set */
     SOCKET_SET_ZERO(&serviceSelect->socketsWriteSet);
 
+    /* zeros the sockets error set */
+    SOCKET_SET_ZERO(&serviceSelect->socketsErrorSet);
+
     /* zeros the sockets read set temporary */
     SOCKET_SET_ZERO(&serviceSelect->socketsReadSetTemporary);
 
     /* zeros the sockets write set temporary */
     SOCKET_SET_ZERO(&serviceSelect->socketsWriteSetTemporary);
+
+    /* zeros the sockets error set temporary */
+    SOCKET_SET_ZERO(&serviceSelect->socketsErrorSetTemporary);
 
     /* sets the default timeout */
     serviceSelect->selectTimeout.tv_sec = VIRIATUM_SELECT_TIMEOUT;
@@ -84,19 +90,25 @@ ERROR_CODE startServiceSelect(struct ServiceSelect_t *serviceSelect) {
     unsigned int index;
 
     /* allocates the read connections */
-    struct Connection_t **readConnections = (struct Connection_t **) malloc(120 * sizeof(struct Connection_t *));
+    struct Connection_t **readConnections = (struct Connection_t **) malloc(VIRIATUM_MAXIMUM_CONNECTIONS * sizeof(struct Connection_t *));
 
     /* allocates the write connections */
-    struct Connection_t **writeConnections = (struct Connection_t **) malloc(120 * sizeof(struct Connection_t *));
+    struct Connection_t **writeConnections = (struct Connection_t **) malloc(VIRIATUM_MAXIMUM_CONNECTIONS * sizeof(struct Connection_t *));
+
+    /* allocates the error connections */
+    struct Connection_t **errorConnections = (struct Connection_t **) malloc(VIRIATUM_MAXIMUM_CONNECTIONS * sizeof(struct Connection_t *));
 
     /* allocates the remove connections */
-    struct Connection_t **removeConnections = (struct Connection_t **) malloc(120 * sizeof(struct Connection_t *));
+    struct Connection_t **removeConnections = (struct Connection_t **) malloc(VIRIATUM_MAXIMUM_CONNECTIONS * sizeof(struct Connection_t *));
 
     /* allocates the read connections size */
     unsigned int readConnectionsSize;
 
     /* allocates the write connections size */
     unsigned int writeConnectionsSize;
+
+    /* allocates the error connections size */
+    unsigned int errorConnectionsSize;
 
     /* allocates the remove connections size */
     unsigned int removeConnectionsSize;
@@ -146,7 +158,7 @@ ERROR_CODE startServiceSelect(struct ServiceSelect_t *serviceSelect) {
         removeConnectionsSize = 0;
 
         /* polls the service select */
-        pollServiceSelect(serviceSelect, readConnections, writeConnections, &readConnectionsSize, &writeConnectionsSize, &serviceSocketReady);
+        pollServiceSelect(serviceSelect, readConnections, writeConnections, errorConnections, &readConnectionsSize, &writeConnectionsSize, &errorConnectionsSize, &serviceSocketReady);
 
         /* in case the service socket is ready (for read) */
         if(serviceSocketReady == 1) {
@@ -241,6 +253,36 @@ ERROR_CODE startServiceSelect(struct ServiceSelect_t *serviceSelect) {
             }
         }
 
+        /* prints a debug message */
+        V_DEBUG_F("Processing %d error connections\n", errorConnectionsSize);
+
+        /* iterates over the error connections */
+        for(index = 0; index < errorConnectionsSize; index++) {
+            /* retrieves the current connection */
+            currentConnection = errorConnections[index];
+
+            /* prints a debug message */
+            V_DEBUG_F("Processing error connection: %d\n", currentConnection->socketHandle);
+
+            /* in case the current connection is open */
+            if(currentConnection->status == STATUS_OPEN && currentConnection->onError != NULL) {
+                /* prints a debug message */
+                V_DEBUG("Calling on error handler\n");
+
+                /* calls the on error handler */
+                currentConnection->onError(currentConnection);
+
+                /* prints a debug message */
+                V_DEBUG("Finished calling on error handler\n");
+            }
+
+            /* in case the current connection is closed */
+            if(currentConnection->status == STATUS_CLOSED) {
+                /* tries to add the current connection to the remove connections list */
+                removeConnection(removeConnections, &removeConnectionsSize, currentConnection);
+            }
+        }
+
         /* iterates over the remove connections */
         for(index = 0; index < removeConnectionsSize; index++) {
             /* retrieves the current connection */
@@ -256,6 +298,9 @@ ERROR_CODE startServiceSelect(struct ServiceSelect_t *serviceSelect) {
 
     /* releases the write connections */
     free(writeConnections);
+
+    /* releases the error connections */
+    free(errorConnections);
 
     /* releases the remove connections */
     free(removeConnections);
@@ -303,7 +348,7 @@ void removeConnectionServiceSelect(struct ServiceSelect_t *serviceSelect, struct
     }
 }
 
-void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_t **readConnections, struct Connection_t **writeConnections, unsigned int *readConnectionsSize, unsigned int *writeConnectionsSize, unsigned int *serviceSocketReady) {
+void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_t **readConnections, struct Connection_t **writeConnections, struct Connection_t **errorConnections, unsigned int *readConnectionsSize, unsigned int *writeConnectionsSize, unsigned int *errorConnectionsSize, unsigned int *serviceSocketReady) {
     /* allocates space for the select count */
     int selectCount;
 
@@ -322,6 +367,9 @@ void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_
     /* initializes the write index */
     unsigned int writeIndex = 0;
 
+    /* initializes the error index */
+    unsigned int errorIndex = 0;
+
     /* copies the socket sets to the socket sets temporary */
     serviceSelect->socketsReadSetTemporary = serviceSelect->socketsReadSet;
     serviceSelect->socketsWriteSetTemporary = serviceSelect->socketsWriteSet;
@@ -336,7 +384,7 @@ void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_
     V_DEBUG("Entering select statement\n");
 
     /* runs the select over the sockets set */
-    selectCount = SOCKET_SELECT(serviceSelect->socketsSetHighest + 1, &serviceSelect->socketsReadSetTemporary, &serviceSelect->socketsWriteSetTemporary, NULL, &serviceSelect->selectTimeoutTemporary);
+    selectCount = SOCKET_SELECT(serviceSelect->socketsSetHighest + 1, &serviceSelect->socketsReadSetTemporary, &serviceSelect->socketsWriteSetTemporary, &serviceSelect->socketsErrorSetTemporary, &serviceSelect->selectTimeoutTemporary);
 
     /* prints a debug message */
     V_DEBUG_F("Exiting select statement with value: %d\n", selectCount);
@@ -405,6 +453,19 @@ void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_
             /* decrements the select count */
             selectCount--;
         }
+
+        /* in case the current connection socket handle is set in
+        the sockets error ready set */
+        if(SOCKET_SET_IS_SET(currentConnection->socketHandle, &serviceSelect->socketsErrorSetTemporary) > 0)  {
+            /* sets the current connection in the error connections */
+            errorConnections[errorIndex] = currentConnection;
+
+            /* increments the error index */
+            errorIndex++;
+
+            /* decrements the select count */
+            selectCount--;
+        }
     }
 
     /* prints a debug message */
@@ -427,6 +488,9 @@ void pollServiceSelect(struct ServiceSelect_t *serviceSelect, struct Connection_
 
     /* sets the write index in the write connections size */
     *writeConnectionsSize = writeIndex;
+
+    /* sets the error index in the error connections size */
+    *errorConnectionsSize = errorIndex;
 }
 
 void addSocketHandleSocketsSetServiceSelect(struct ServiceSelect_t *serviceSelect, SOCKET_HANDLE socketHandle, SOCKET_SET *socketsSet) {
