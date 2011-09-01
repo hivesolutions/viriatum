@@ -47,6 +47,13 @@ void createHandlerFileContext(struct HandlerFileContext_t **handlerFileContextPo
 }
 
 void deleteHandlerFileContext(struct HandlerFileContext_t *handlerFileContext) {
+    /* in case there is a file defined in
+    the handler file context */
+    if(handlerFileContext->file != NULL) {
+        /* closes the file */
+        fclose(handlerFileContext->file);
+    }
+
     /* releases the handler file context */
     free(handlerFileContext);
 }
@@ -79,6 +86,22 @@ void setHttpParserHandlerFile(struct HttpParser_t *httpParser) {
 }
 
 void unsetHttpParserHandlerFile(struct HttpParser_t *httpParser) {
+    /* retrieves the handler file context from the http parser */
+    struct HandlerFileContext_t *handlerFileContext = (struct HandlerFileContext_t *) httpParser->context;
+
+    /* deletes the handler file context */
+    deleteHandlerFileContext(handlerFileContext);
+}
+
+void resetHttpParserHandlerFile(struct HttpParser_t *httpParser) {
+    /* retrieves the handler file context from the http parser */
+    struct HandlerFileContext_t *handlerFileContext = (struct HandlerFileContext_t *) httpParser->context;
+
+    /* unsets the handler file context file */
+    handlerFileContext->file = NULL;
+
+    /* unsets the handler file context flags */
+    handlerFileContext->flags = 0;
 }
 
 void setHttpSettingsHandlerFile(struct HttpSettings_t *httpSettings) {
@@ -237,9 +260,6 @@ ERROR_CODE _cleanupHandlerFile(struct Connection_t *connection, struct Data_t *d
         connection->closeConnection(connection);
     }
 
-    /* deletes the handler file context */
-    deleteHandlerFileContext(handlerFileContext);
-
     /* raise no error */
     RAISE_NO_ERROR;
 }
@@ -285,6 +305,9 @@ ERROR_CODE _sendChunkHandlerFile(struct Connection_t *connection, struct Data_t 
     }
     /* otherwise the file "transfer" is complete */
     else {
+        /* unsets the file from the handler file context */
+        handlerFileContext->file = NULL;
+
         /* runs the cleanup handler file (releases internal structures) */
         _cleanupHandlerFile(connection, data, parameters);
 
