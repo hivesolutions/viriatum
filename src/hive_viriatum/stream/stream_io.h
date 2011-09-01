@@ -43,7 +43,7 @@ typedef struct IoConnection_t {
 
     /**
      * Reference to the lower level
-     * connection substrate.
+     * connection substrate (child).
      */
     void *lower;
 } IoConnection;

@@ -365,9 +365,6 @@ void createConnection(struct Connection_t **connectionPointer, SOCKET_HANDLE soc
     /* sets the service as not set */
     connection->service = NULL;
 
-    /* sets the service reference as not set */
-    connection->serviceReference = NULL;
-
     /* sets the write registered to false */
     connection->writeRegistered = 0;
 

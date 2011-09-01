@@ -54,35 +54,91 @@ typedef ERROR_CODE (*connectionCallback) (struct Connection_t *);
 typedef ERROR_CODE (*serviceCallback) (struct Connection_t *, struct Data_t *, void *);
 
 /**
- * The "default" callback function to be used for
- * polling purposes, without any extra arguments.
+ * The "default" function used to update a state in the polling
+ * for the given service context.
  */
-typedef ERROR_CODE (*pollingCallback) (struct Polling_t *);
+typedef ERROR_CODE (*pollingUpdate) (struct Polling_t *);
 
 /**
- * Callback function to be used for situations where
- * a change should be made in a connection.
+ * The function used to update a state in the polling
+ * using the given connection as reference.
  */
-typedef ERROR_CODE (*pollingConnectionCallback) (struct Polling_t *, struct Connection_t *);
+typedef ERROR_CODE (*pollingConnectionUpdate) (struct Polling_t *, struct Connection_t *);
 
 /**
  * Structure used to describe a polling (provider)
  * with all the action functions and callbacks.
  */
 typedef struct Polling_t {
+    /**
+     * The reference to the "owning" service.
+     * The "owning" service should be the
+     * only using this polling (provider).
+     */
     struct Service_t *service;
-    pollingCallback open;
-    pollingCallback close;
-    pollingConnectionCallback registerConnection;
-    pollingConnectionCallback unregisterConnection;
-    pollingConnectionCallback registerWrite;
-    pollingConnectionCallback unregisterWrite;
-    pollingCallback poll;
-    pollingCallback call;
+
+    /**
+     * Function called for opening the polling
+     * (provider).
+     * This function should initialize all the
+     * polling context structures.
+     */
+    pollingUpdate open;
+
+    /**
+     * Function called for closing the polling
+     * (provider).
+     * This function should destroy all the
+     * polling context structures.
+     */
+    pollingUpdate close;
+
+    /**
+     * Function used to register a connection
+     * into the polling (provider).
+     * The polling system structures should
+     * be updated to allow the connection events
+     * to be detected.
+     */
+    pollingConnectionUpdate registerConnection;
+
+    /**
+     * Function used to unregister a connection
+     * from the polling (provider).
+     */
+    pollingConnectionUpdate unregisterConnection;
+
+    /**
+     * Function used to the start "listening"
+     * to the write events in the connection.
+     */
+    pollingConnectionUpdate registerWrite;
+
+    /**
+     * Function used to the stop "listening"
+     * to the write events in the connection.
+     */
+    pollingConnectionUpdate unregisterWrite;
+
+    /**
+     * Function used to poll the connections
+     * checking if new "events" are available.
+     * This function should not block for a long
+     * time (exiting may be compromised).
+     */
+    pollingUpdate poll;
+
+    /**
+     * Function to be used to process and call
+     * the callbacks associated with the current
+     * events.
+     * This function may be called after a polling.
+     */
+    pollingUpdate call;
 
     /**
      * Reference to the lower level
-     * connection substrate.
+     * connection substrate (child).
      */
     void *lower;
 } Polling;
@@ -95,35 +151,35 @@ typedef struct Polling_t {
  * current set of active connections.
  */
 typedef struct Service_t {
-	/**
-	 * The descriptive name of the
-	 * service.
-	 * For textual representation.
-	 */
+    /**
+     * The descriptive name of the
+     * service.
+     * For textual representation.
+     */
     unsigned char *name;
 
-	/**
-	 * The current status of the service.
-	 * Used for service life-cycle control.
-	 */
+    /**
+     * The current status of the service.
+     * Used for service life-cycle control.
+     */
     unsigned char status;
 
-	/**
-	 * The socket handle to the service
-	 * connection.
-	 */
+    /**
+     * The socket handle to the service
+     * connection.
+     */
     SOCKET_HANDLE serviceSocketHandle;
 
-	/**
-	 * The reference to the polling (provider)
-	 * used by the service.
-	 */
+    /**
+     * The reference to the polling (provider)
+     * used by the service.
+     */
     struct Polling_t *polling;
 
-	/**
-	 * The list of currenly available (active)
-	 * connections in the service.
-	 */
+    /**
+     * The list of currenly available (active)
+     * connections in the service.
+     */
     struct LinkedList_t *connectionsList;
 } Service;
 
@@ -135,34 +191,106 @@ typedef struct Service_t {
  * maintained.
  */
 typedef struct Connection_t {
+    /**
+     * The current status of the connection.
+     * Used for connection control.
+     */
     unsigned char status;
+
+    /**
+     * The socket handle associated with
+     * the connection.
+     * Typically this represent a file
+     * descriptor.
+     */
     SOCKET_HANDLE socketHandle;
+
+    /**
+     * The reference to the service controlling
+     * (managing) this connection (owner).
+     */
     struct Service_t *service;
-    void *serviceReference;
+
+    /**
+     * "Flag" controlling if the write operations
+     * are currently being monitored in the polling
+     * (provider).
+     * This flag shall be used carefully.
+     */
     unsigned char writeRegistered;
+
+    /**
+     * Queue containing the set of connections with
+     * data pending to be read.
+     */
     struct LinkedList_t *readQueue;
+
+    /**
+     * Queue containing the set of connections which
+     * ar ready for reading.
+     */
     struct LinkedList_t *writeQueue;
+
+    /**
+     * Function to be used for opening a
+     * connection.
+     */
     connectionUpdate openConnection;
+
+    /**
+     * Function to be used for closing a
+     * connection.
+     */
     connectionUpdate closeConnection;
+
+    /**
+     * Function to be used for registering
+     * writing detection in the polling (provider).
+     */
     connectionUpdate registerWrite;
+
+    /**
+     * Function to be used for uregistering
+     * writing detection in the polling (provider).
+     */
     connectionUpdate unregisterWrite;
+
+    /**
+     * Callback function reference to be called
+     * when data is available dor reading.
+     */
     connectionCallback onRead;
+
+    /**
+     * Callback function reference to be called
+     * when the connection is ready for writing.
+     */
     connectionCallback onWrite;
+
+    /**
+     * Callback function reference to be called
+     * when the connection is an erroneous state.
+     */
     connectionCallback onError;
+
+    /**
+     * Callback function reference to be called
+     * when the connection has just been opened.
+     */
     connectionCallback onOpen;
+
+    /**
+     * Callback function reference to be called
+     * when the connection is going to be closed.
+     */
     connectionCallback onClose;
 
     /**
      * Reference to the lower level
-     * connection substrate.
+     * connection substrate (child).
      */
     void *lower;
 } Connection;
-
-typedef enum Operation_e {
-    OPERATION_WRITE = 1,
-    OPERATION_READ
-} Operation;
 
 /**
  * Enumeration defining the various
