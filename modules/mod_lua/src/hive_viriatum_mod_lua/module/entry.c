@@ -29,7 +29,7 @@
 
 #include "entry.h"
 
-void startModule() {
+ERROR_CODE startModule() {
     /* allocates the lua state */
     lua_State *luaState;
 
@@ -43,7 +43,7 @@ void startModule() {
     unsigned char *description = descriptionViriatumModLua();
 
     /* prints a debug message */
-    DEBUG_F("Starting the module '%s' (%s) v%s\n", name, description, version);
+    V_DEBUG_F("Starting the module '%s' (%s) v%s\n", name, description, version);
 
     /* initializes the lua interpreter */
     luaState = lua_open();
@@ -56,9 +56,12 @@ void startModule() {
 
     /* cleanup lua */
     lua_close(luaState);
+
+    /* raises no error */
+    RAISE_NO_ERROR;
 }
 
-void stopModule() {
+ERROR_CODE stopModule() {
     /* retrieves the name */
     unsigned char *name = nameViriatumModLua();
 
@@ -69,5 +72,8 @@ void stopModule() {
     unsigned char *description = descriptionViriatumModLua();
 
     /* prints a debug message */
-    DEBUG_F("Stoping the module '%s' (%s) v%s\n", name, description, version);
+    V_DEBUG_F("Stoping the module '%s' (%s) v%s\n", name, description, version);
+
+    /* raises no error */
+    RAISE_NO_ERROR;
 }
