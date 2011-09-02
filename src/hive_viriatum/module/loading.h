@@ -28,11 +28,60 @@
 #pragma once
 
 /**
+ * Enumeration describing the
+ * various possible types of modules.
+ */
+typedef enum ModuleType_e {
+    MODULE_TYPE_HANDLER = 1
+} ModuleType;
+
+/**
+ * Structure describing the module
+ * facade specification.
+ */
+typedef struct Module_t {
+    /**
+     * The name or description of
+     * the module.
+     */
+    unsigned char *name;
+
+    /**
+     * A string representing the
+     * the version of the module
+     */
+    unsigned char *version;
+
+    /**
+     * The type of module.
+     * This value should be according
+     * to the module type enumeration.
+     */
+    unsigned short type;
+} Module;
+
+/**
+ * Function used to retrieve information
+ * about the module.
+ * The module should be able to populate the module
+ * structure accordingly.
+ *
+ * @param module The module structure to be
+ * populated by the module.
+ */
+typedef ERROR_CODE (*viriatumInfoModule)(struct Module_t *module);
+
+/**
  * Function used for starting a module.
  * During this initialization all the module
  * internal structures shall be initialized.
+ * The module should be able to populate the module
+ * structure accordingly.
+ *
+ * @param module The module structure to be
+ * populated by the module.
  */
-typedef ERROR_CODE (*viriatumStartModule)(void);
+typedef ERROR_CODE (*viriatumStartModule)(struct Module_t *module);
 
 /**
  * Function used for stopping a module.
@@ -41,6 +90,23 @@ typedef ERROR_CODE (*viriatumStartModule)(void);
  * destroyed.
  */
 typedef ERROR_CODE (*viriatumStopModule)(void);
+
+/**
+ * Constructor of the module.
+ *
+ * @param servicePointer The pointer to the module to
+ * be constructed.
+ * @return The resulting error code.
+ */
+ERROR_CODE createModule(struct Module_t **modulePointer);
+
+/**
+ * Destructor of the module.
+ *
+ * @param module The module to be destroyed.
+ * @return The resulting error code.
+ */
+ERROR_CODE deleteModule(struct Module_t *module);
 
 /**
  * Loads the module in the given path.

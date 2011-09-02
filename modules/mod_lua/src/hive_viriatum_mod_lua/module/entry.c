@@ -29,7 +29,7 @@
 
 #include "entry.h"
 
-ERROR_CODE startModule() {
+ERROR_CODE startModule(struct Module_t *module) {
     /* allocates the lua state */
     lua_State *luaState;
 
@@ -56,6 +56,10 @@ ERROR_CODE startModule() {
 
     /* cleanup lua */
     lua_close(luaState);
+
+    module->name = name;
+    module->version = version;
+    module->type = MODULE_TYPE_HANDLER;
 
     /* raises no error */
     RAISE_NO_ERROR;

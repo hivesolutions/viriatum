@@ -29,12 +29,37 @@
 
 #include "loading.h"
 
+ERROR_CODE createModule(struct Module_t **modulePointer) {
+    /* retrieves the module size */
+    size_t moduleSize = sizeof(struct Module_t);
+
+    /* allocates space for the module */
+    struct Module_t *module = (struct Module_t *) MALLOC(moduleSize);
+
+    /* sets the module in the module pointer */
+    *modulePointer = module;
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE deleteModule(struct Module_t *module) {
+    /* releases the module */
+    FREE(module);
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
 ERROR_CODE loadModule(unsigned char *modulePath) {
     /* the mod library reference */
     LIBRARY_REFERENCE modLibrary;
 
     /* the holder of the library symbol */
     LIBRARY_SYMBOL symbol;
+
+    /* the module structure reference */
+    struct Module_t *module;
 
     /* the start module function reference */
     viriatumStartModule startModuleFunction;
@@ -58,7 +83,7 @@ ERROR_CODE loadModule(unsigned char *modulePath) {
     symbol = GET_LIBRARY_SYMBOL(modLibrary, "startModule");
 
     /* retrieves the start nodule function reference */
-    startModuleFunction = *((viriatumStartModule*)(&symbol));
+    startModuleFunction = *((viriatumStartModule *)(&symbol));
 
     /* in case the start module function was not found */
     if(startModuleFunction == NULL) {
@@ -72,8 +97,11 @@ ERROR_CODE loadModule(unsigned char *modulePath) {
         V_DEBUG_F("Found symbol '%s' in library\n", "startModule");
     }
 
+    /* creates the module */
+    createModule(&module);
+
     /* calls the start module function */
-    startModuleFunction();
+    startModuleFunction(module);
 
     /* unloads the library */
     UNLOAD_LIBRARY(modLibrary);

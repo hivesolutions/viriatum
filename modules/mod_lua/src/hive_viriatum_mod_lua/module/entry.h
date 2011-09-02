@@ -25,5 +25,5 @@
  __license__   = GNU General Public License (GPL), Version 3
 */
 
-VIRIATUM_EXPORT_PREFIX ERROR_CODE startModule();
+VIRIATUM_EXPORT_PREFIX ERROR_CODE startModule(struct Module_t *module);
 VIRIATUM_EXPORT_PREFIX ERROR_CODE stopModule();
