@@ -28,6 +28,7 @@
 #pragma once
 
 #include "../stream/stream.h"
+#include "../module/module.h"
 #include "../polling/polling.h"
 
 /* forward references (avoids loop) */
@@ -181,6 +182,12 @@ typedef struct Service_t {
      * connections in the service.
      */
     struct LinkedList_t *connectionsList;
+
+
+
+
+    struct LinkedList_t *httpHandlersList;
+
 } Service;
 
 /**
@@ -257,7 +264,7 @@ typedef struct Connection_t {
 
     /**
      * Callback function reference to be called
-     * when data is available dor reading.
+     * when data is available for reading.
      */
     connectionCallback onRead;
 

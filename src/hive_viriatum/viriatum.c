@@ -131,15 +131,6 @@ int main(int argc, char *argv[]) {
     /* prints a debug message */
     V_DEBUG_F("Receiving %d argument(s)\n", argc);
 
-    /* loads the module */
-    returnValue = loadModule((unsigned char *) "C:/Users/joamag/Desktop/repositories/viriatum/bin/hive_viriatum_mod_lua/i386/win32/Debug/hive_viriatum_mod_lua.dll");
-
-    /* tests the error code for error */
-    if(IS_ERROR_CODE(returnValue)) {
-        /* prints a warning message */
-        V_WARNING_F("Problem loading module (%s)\n", GET_ERROR());
-    }
-
     /* runs the service */
     returnValue = runService();
 

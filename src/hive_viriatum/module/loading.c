@@ -85,9 +85,9 @@ ERROR_CODE deleteModule(struct Module_t *module) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE loadModule(unsigned char *modulePath) {
+ERROR_CODE loadModule(struct Service_t *service, unsigned char *modulePath) {
     /* error code to be used for testing */
-    int errorCode;
+    ERROR_CODE errorCode;
 
     /* the mod library reference */
     LIBRARY_REFERENCE modLibrary;
@@ -143,13 +143,16 @@ ERROR_CODE loadModule(unsigned char *modulePath) {
     /* creates the module */
     createModule(&module);
 
+    /* sets the environment attributes */
+    environment->service = service;
+
     /* calls the info module function */
     errorCode = infoModuleFunction(module);
 
     /* tests the error code for error */
     if(IS_ERROR_CODE(errorCode)) {
-        /* prints the error */
-        V_DEBUG_F("%s\n", GET_ERROR_MODULE(module));
+        /* prints a warning message */
+        V_WARNING_F("%s\n", GET_ERROR_MODULE(module));
     }
 
     /* calls the start module function */
@@ -157,27 +160,27 @@ ERROR_CODE loadModule(unsigned char *modulePath) {
 
     /* tests the error code for error */
     if(IS_ERROR_CODE(errorCode)) {
-        /* prints the error */
-        V_DEBUG_F("%s\n", GET_ERROR_MODULE(module));
+        /* prints a warning message */
+        V_WARNING_F("%s\n", GET_ERROR_MODULE(module));
     }
 
     /* calls the stop module function */
-    errorCode = module->stop(environment, module);
+    /*errorCode = module->stop(environment, module);*/
 
     /* tests the error code for error */
-    if(IS_ERROR_CODE(errorCode)) {
-        /* prints the error */
-        V_DEBUG_F("%s\n", GET_ERROR_MODULE(module));
-    }
+    /*if(IS_ERROR_CODE(errorCode)) {*/
+        /* prints a warning message */
+        /*V_WARNING_F("%s\n", GET_ERROR_MODULE(module));*/
+    /*}*/
 
     /* deletes the module */
-    deleteModule(module);
+    /*deleteModule(module);*/
 
     /* deletes the environment */
-    deleteEnvironment(environment);
+    /*deleteEnvironment(environment);*/
 
     /* unloads the library */
-    UNLOAD_LIBRARY(modLibrary);
+    /*UNLOAD_LIBRARY(modLibrary);*/
 
     /* raise no error */
     RAISE_NO_ERROR;

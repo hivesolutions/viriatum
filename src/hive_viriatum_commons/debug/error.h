@@ -55,7 +55,7 @@ static __inline unsigned int getLastErrorCode() {
     return lastErrorCode;
 }
 
-static __inline void setLastErrorCode(unsigned int errorCode) {
+static __inline void setLastErrorCode(ERROR_CODE errorCode) {
     lastErrorCode = errorCode;
 }
 

@@ -81,7 +81,7 @@ typedef ERROR_CODE (*viriatumErrorModule)(unsigned char **messagePointer);
  * various possible types of modules.
  */
 typedef enum ModuleType_e {
-    MODULE_TYPE_HANDLER = 1
+    MODULE_TYPE_HTTP_HANDLER = 1
 } ModuleType;
 
 /**
@@ -97,6 +97,11 @@ typedef struct Environment_t {
      * the environment.
      */
     unsigned char *name;
+
+    /**
+     * The current environment service.
+     */
+    struct Service_t *service;
 } Environment;
 
 /**
@@ -188,11 +193,13 @@ ERROR_CODE deleteModule(struct Module_t *module);
  * The loading of the module implies finding
  * the appropriate file and loading the symbols.
  *
+ * @param service The base service to load the module
+ * into.
  * @param modulePath The path to the file
  * containing the module.
  * @return The resulting error code.
  */
-ERROR_CODE loadModule(unsigned char *modulePath);
+ERROR_CODE loadModule(struct Service_t *service, unsigned char *modulePath);
 
 /**
  * Retrieves the (last) error message for the given module.

@@ -206,13 +206,13 @@ ERROR_CODE messageCompleteCallbackHandlerDefault(struct HttpParser_t *httpParser
 
 ERROR_CODE _sendResponseHandlerDefault(struct HttpParser_t *httpParser) {
     /* allocates the response buffer */
-    char *responseBuffer = MALLOC(1024);
+    char *responseBuffer = MALLOC(256);
 
     /* retrieves the connection from the http parser parameters */
     struct Connection_t *connection = (struct Connection_t *) httpParser->parameters;
 
     /* writes the http static headers to the response */
-    SPRINTF(responseBuffer, 1024, "HTTP/1.1 200 OK\r\nServer: %s/%s (%s @ %s)\r\nConnection: Keep-Alive\r\nContent-Length: %lu\r\n\r\nhello world", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, strlen("hello world"));
+    SPRINTF(responseBuffer, 256, "HTTP/1.1 200 OK\r\nServer: %s/%s (%s @ %s)\r\nConnection: Keep-Alive\r\nContent-Length: 14\r\n\r\nHello Viriatum", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU);
 
     /* writes the response to the connection */
     writeConnection(connection, (unsigned char *) responseBuffer, strlen(responseBuffer), _sendResponseCallbackHandlerDefault, (void *) httpParser->flags);

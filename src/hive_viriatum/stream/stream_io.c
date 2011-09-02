@@ -52,7 +52,7 @@ void createIoConnection(struct IoConnection_t **ioConnectionPointer, struct Conn
     ioConnection->lower = NULL;
 
     /* sets the io connection in the (upper) connection substrate */
-    connection->lower = ioConnection;
+    connection->lower = (void *) ioConnection;
 
     /* sets the io connection in the io connection pointer */
     *ioConnectionPointer = ioConnection;
