@@ -36,11 +36,46 @@
 #define RAISE_AGAIN(errorCode) return errorCode
 #define RAISE_ERROR(errorCode) setLastErrorMessage(NULL); return errorCode
 #define RAISE_ERROR_M(errorCode, errorMessage) setLastErrorMessage(errorMessage); return errorCode
+#define RAISE_ERROR_S(errorCode) return errorCode
 #define RAISE_NO_ERROR return 0
 #define IS_ERROR_CODE(errorCode) errorCode != 0
+#define GET_ERROR() getLastErrorMessageSafe
 
-VIRIATUM_EXPORT_PREFIX unsigned int getLastErrorCode();
-VIRIATUM_EXPORT_PREFIX void setLastErrorCode(unsigned int errorCode);
-VIRIATUM_EXPORT_PREFIX unsigned char *getLastErrorMessage();
-VIRIATUM_EXPORT_PREFIX unsigned char *getLastErrorMessageSafe();
-VIRIATUM_EXPORT_PREFIX void setLastErrorMessage(unsigned char *errorMessage);
+extern unsigned int lastErrorCode;
+extern unsigned char *lastErrorMessage;
+
+/**
+ * Retrieves the last (current) error code available.
+ * This method uses the global variable last error code
+ * to retrieve its value.
+ *
+ * @return The last (current) error code available.
+ */
+static __inline unsigned int getLastErrorCode() {
+    return lastErrorCode;
+}
+
+static __inline void setLastErrorCode(unsigned int errorCode) {
+    lastErrorCode = errorCode;
+}
+
+static __inline unsigned char *getLastErrorMessage() {
+    return lastErrorMessage;
+}
+
+static __inline unsigned char *getLastErrorMessageSafe() {
+    /* in case the last error message is not set */
+    if(lastErrorMessage == NULL) {
+        /* returns the empty error message */
+        return (unsigned char *) EMPTY_ERROR_MESSAGE;
+    }
+    /* otherwise (normal behaviour */
+    else {
+        /* returns the last error message */
+        return lastErrorMessage;
+    }
+}
+
+static __inline void setLastErrorMessage(unsigned char *errorMessage) {
+    lastErrorMessage = errorMessage;
+}

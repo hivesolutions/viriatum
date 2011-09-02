@@ -27,6 +27,55 @@
 
 #pragma once
 
+#define GET_ERROR_MODULE(module) getErrorMessageModule(module)
+
+struct Module_t;
+struct Environment_t;
+
+/**
+ * Function used for starting a module.
+ * During this initialization all the module
+ * internal structures shall be initialized.
+ * The module should be able to populate the module
+ * structure accordingly.
+ *
+ * @param environment Module environment structures used
+ * to help starting the module.
+ * @param module The module structure to be
+ * populated by the module.
+ */
+typedef ERROR_CODE (*viriatumStartModule)(struct Environment_t *environment, struct Module_t *module);
+
+/**
+ * Function used for stopping a module.
+ * During this destruction all the module
+ * internal structures shall be closed and
+ * destroyed.
+ */
+typedef ERROR_CODE (*viriatumStopModule)();
+
+/**
+ * Function used to retrieve information
+ * about the module.
+ * The module should be able to populate the module
+ * structure accordingly.
+ *
+ * @param module The module structure to be
+ * populated by the module.
+ */
+typedef ERROR_CODE (*viriatumInfoModule)(struct Module_t *module);
+
+/**
+ * Function used to retrieve information
+ * about the module's last error.
+ * The module should be able to populate the module
+ * structure accordingly.
+ *
+ * @param messagePointer The pointer to the error message
+ * to be set.
+ */
+typedef ERROR_CODE (*viriatumErrorModule)(unsigned char **messagePointer);
+
 /**
  * Enumeration describing the
  * various possible types of modules.
@@ -34,6 +83,21 @@
 typedef enum ModuleType_e {
     MODULE_TYPE_HANDLER = 1
 } ModuleType;
+
+/**
+ * Structure that describes the current
+ * (service) environment.
+ * This structure is used by the various
+ * modules to identify the current environment
+ * characteristics.
+ */
+typedef struct Environment_t {
+    /**
+     * The name used to describe
+     * the environment.
+     */
+    unsigned char *name;
+} Environment;
 
 /**
  * Structure describing the module
@@ -58,43 +122,54 @@ typedef struct Module_t {
      * to the module type enumeration.
      */
     unsigned short type;
+
+    /**
+     * The function called to start
+     * the module.
+     */
+    viriatumStartModule start;
+
+    /**
+     * The function called to stop
+     * the module.
+     */
+    viriatumStopModule stop;
+
+    /**
+     * The function called to retrieve
+     * information about the module.
+     */
+    viriatumInfoModule info;
+
+    /**
+     * The function called to retrieve
+     * information (message) about the
+     * last occurring error in the module.
+     */
+    viriatumErrorModule error;
 } Module;
 
 /**
- * Function used for starting a module.
- * During this initialization all the module
- * internal structures shall be initialized.
- * The module should be able to populate the module
- * structure accordingly.
+ * Constructor of the environment.
  *
- * @param module The module structure to be
- * populated by the module.
+ * @param environmentPointer The pointer to the environment to
+ * be constructed.
+ * @return The resulting error code.
  */
-typedef ERROR_CODE (*viriatumStartModule)(struct Module_t *module);
+ERROR_CODE createEnvironment(struct Environment_t **environmentPointer);
 
 /**
- * Function used for stopping a module.
- * During this destruction all the module
- * internal structures shall be closed and
- * destroyed.
- */
-typedef ERROR_CODE (*viriatumStopModule)(void);
-
-/**
- * Function used to retrieve information
- * about the module.
- * The module should be able to populate the module
- * structure accordingly.
+ * Destructor of the environment.
  *
- * @param module The module structure to be
- * populated by the module.
+ * @param environment The environment to be destroyed.
+ * @return The resulting error code.
  */
-typedef ERROR_CODE (*viriatumInfoModule)(struct Module_t *module);
+ERROR_CODE deleteEnvironment(struct Environment_t *environment);
 
 /**
  * Constructor of the module.
  *
- * @param servicePointer The pointer to the module to
+ * @param modulePointer The pointer to the module to
  * be constructed.
  * @return The resulting error code.
  */
@@ -118,3 +193,41 @@ ERROR_CODE deleteModule(struct Module_t *module);
  * @return The resulting error code.
  */
 ERROR_CODE loadModule(unsigned char *modulePath);
+
+/**
+ * Retrieves the (last) error message for the given module.
+ * This method forwards the call to the error handler
+ * method that retrieves the error message.
+ *
+ * @param module The module to be used to retrieve the error
+ * message.
+ * @return The retrieved error message.
+ */
+static __inline unsigned char *getErrorMessageModule(struct Module_t *module) {
+    /* allocates the error message */
+    unsigned char *errorMessage;
+
+    /* in case no valid module structure
+    is available */
+    if(module == NULL) {
+        /* sets invalid error message */
+        errorMessage = "No valid module structure";
+    }
+
+    /* in case the module error handler
+    is not defined */
+    if(module->error == NULL) {
+        /* sets invalid error message */
+        errorMessage = "No error handler defined";
+    }
+    /* otherwise there is a valid error
+    handler defined, and the error message
+    can be retrieved */
+    else {
+        /* retrieves the error message from the module */
+        module->error(&errorMessage);
+    }
+
+    /* returns the error message */
+    return errorMessage;
+}
