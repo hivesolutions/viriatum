@@ -35,10 +35,33 @@ struct IoConnection_t;
 typedef ERROR_CODE (*dataIoConnectionCallback) (struct IoConnection_t *, unsigned char *, size_t);
 typedef ERROR_CODE (*ioConnectionCallback) (struct IoConnection_t *);
 
+/**
+ * Structure defining a logical
+ * io connection.
+ */
 typedef struct IoConnection_t {
+    /**
+     * The (upper) connection that owns
+     * manages this connection.
+     */
     struct Connection_t *connection;
+
+    /**
+     * Callback function reference to be called
+     * when data is available for processing.
+     */
     dataIoConnectionCallback onData;
+
+    /**
+     * Callback function reference to be called
+     * when a connection is has been open.
+     */
     ioConnectionCallback onOpen;
+
+    /**
+     * Callback function reference to be called
+     * when a connection is going to be closed.
+     */
     ioConnectionCallback onClose;
 
     /**

@@ -39,4 +39,6 @@ unsigned char *descriptionViriatumModLua();
 
 #ifdef VIRIATUM_PLATFORM_MSC
 #pragma comment(lib, "lua5.1.lib")
+#pragma comment(lib, "hive_viriatum.lib")
+#pragma comment(lib, "hive_viriatum_commons.lib")
 #endif

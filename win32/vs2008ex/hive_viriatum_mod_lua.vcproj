@@ -189,6 +189,10 @@
 					RelativePath="..\..\modules\mod_lua\src\hive_viriatum_mod_lua\module\entry.c"
 					>
 				</File>
+				<File
+					RelativePath="..\..\modules\mod_lua\src\hive_viriatum_mod_lua\module\handler.c"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter
@@ -209,6 +213,10 @@
 				>
 				<File
 					RelativePath="..\..\modules\mod_lua\src\hive_viriatum_mod_lua\module\entry.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\modules\mod_lua\src\hive_viriatum_mod_lua\module\handler.h"
 					>
 				</File>
 				<File

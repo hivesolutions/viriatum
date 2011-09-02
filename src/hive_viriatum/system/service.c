@@ -47,6 +47,15 @@ void createService(struct Service_t **servicePointer) {
     /* creates the connections list */
     createLinkedList(&service->connectionsList);
 
+
+
+
+    /* creates the http handlers list */
+    createLinkedList(&service->httpHandlersList);
+
+
+
+
     /* sets the service in the service pointer */
     *servicePointer = service;
 }
@@ -57,6 +66,13 @@ void deleteService(struct Service_t *service) {
         /* closes the service socket (secure closing) */
         SOCKET_CLOSE(service->serviceSocketHandle);
     }
+
+
+    /* deltes the http handlers list */
+    deleteLinkedList(service->httpHandlersList);
+
+
+
 
     /* deletes the connections list */
     deleteLinkedList(service->connectionsList);
@@ -147,11 +163,23 @@ ERROR_CODE startService(struct Service_t *service) {
     /* allocates the memory ussage */
     size_t memoryUsage;
 
+    /* allocates the error code */
+    ERROR_CODE errorCode;
+
     /* allocates the option value and sets it to one (valid) */
     SOCKET_OPTION optionValue = 1;
 
     /* sets the flags to be used in socket */
     SOCKET_FLAGS flags = 1;
+
+    /* loads the module, retrieving a possible error code */
+    errorCode = loadModule(service, (unsigned char *) "C:/Users/joamag/Desktop/repositories/viriatum/bin/hive_viriatum_mod_lua/i386/win32/Debug/hive_viriatum_mod_lua.dll");
+
+    /* tests the error code for error */
+    if(IS_ERROR_CODE(errorCode)) {
+        /* prints a warning message */
+        V_WARNING_F("Problem loading module (%s)\n", GET_ERROR());
+    }
 
     /* sets the socket address attributes */
     socketAddress.sin_family = SOCKET_INTERNET_TYPE;

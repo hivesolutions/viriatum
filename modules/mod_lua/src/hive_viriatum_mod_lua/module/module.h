@@ -26,3 +26,4 @@
 */
 
 #include "entry.h"
+#include "handler.h"

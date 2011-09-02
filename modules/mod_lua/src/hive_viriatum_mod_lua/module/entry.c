@@ -32,9 +32,6 @@
 unsigned char *lastErrorMessage;
 
 ERROR_CODE startModule(struct Environment_t *environment, struct Module_t *module) {
-    /* allocates the result code */
-    int resultCode;
-
     /* allocates the lua state */
     lua_State *luaState;
 
@@ -46,6 +43,12 @@ ERROR_CODE startModule(struct Environment_t *environment, struct Module_t *modul
 
     /* retrieves the description */
     unsigned char *description = descriptionViriatumModLua();
+
+
+    struct HttpHandler_t *httpHandler;
+
+    struct ModLuaHttpHandler_t *modLuaHttpHandler;
+
 
     /* prints a debug message */
     V_DEBUG_F("Starting the module '%s' (%s) v%s\n", name, description, version);
@@ -59,20 +62,41 @@ ERROR_CODE startModule(struct Environment_t *environment, struct Module_t *modul
     /* load various lua libraries */
     luaL_openlibs(luaState);
 
-    /* runs the script */
-    resultCode = luaL_dofile(luaState, "c:/teste.lua");
 
-    /* in case there was an error in lua */
-    if(LUA_ERROR(resultCode)) {
-        /* prints a warning message */
-        V_WARNING_F("There was a problem executing: %s\n" , "c:/teste.lua");
 
-        /* raises an error */
-        RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem executing script file");
-    }
+
+
+    /* creates the http handler */
+    createHttpHandler(&httpHandler);
+
+    /* creates the mod lua http handler */
+    createModLuaHttpHandler(&modLuaHttpHandler, httpHandler);
+
+
+    httpHandler->set = setHandlerModule;
+    httpHandler->unset = unsetHandlerModule;
+    httpHandler->reset = NULL;
+
+    modLuaHttpHandler->luaState = luaState;
+
+
+
+
+    /* adds the http handler to the list of handlers in the service */
+    appendValueLinkedList(environment->service->httpHandlersList, (void *) httpHandler);
+
+
+
+
+
+
+
+
+
+
 
     /* cleanup lua */
-    lua_close(luaState);
+    /*lua_close(luaState);*/
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -105,7 +129,7 @@ ERROR_CODE infoModule(struct Module_t *module) {
     /* populates the module structure */
     module->name = name;
     module->version = version;
-    module->type = MODULE_TYPE_HANDLER;
+    module->type = MODULE_TYPE_HTTP_HANDLER;
     module->start = startModule;
     module->stop = stopModule;
     module->info = infoModule;

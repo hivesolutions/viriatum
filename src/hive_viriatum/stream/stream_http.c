@@ -29,15 +29,51 @@
 
 #include "stream_http.h"
 
-void createHttpConnection(struct HttpConnection_t **httpConnectionPointer, struct IoConnection_t *ioConnection) {
+ERROR_CODE createHttpHandler(struct HttpHandler_t **httpHandlerPointer) {
+    /* retrieves the http handler size */
+    size_t httpHandlerSize = sizeof(struct HttpHandler_t);
+
+    /* allocates space for the http handler */
+    struct HttpHandler_t *httpHandler = (struct HttpHandler_t *) MALLOC(httpHandlerSize);
+
+    /* sets the http handler attributes (default) values */
+    httpHandler->set = NULL;
+    httpHandler->unset = NULL;
+    httpHandler->reset = NULL;
+
+    /* sets the http handler in the http handler pointer */
+    *httpHandlerPointer = httpHandler;
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE deleteHttpHandler(struct HttpHandler_t *httpHandler) {
+    /* releases the http handler */
+    FREE(httpHandler);
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE createHttpConnection(struct HttpConnection_t **httpConnectionPointer, struct IoConnection_t *ioConnection) {
     /* retrieves the http connection size */
     size_t httpConnectionSize = sizeof(struct HttpConnection_t);
 
     /* allocates space for the http connection */
     struct HttpConnection_t *httpConnection = (struct HttpConnection_t *) MALLOC(httpConnectionSize);
 
-    /* sets the http connection io connection */
+
+
+    struct Service_t *service = ioConnection->connection->service;
+
+    struct HttpHandler_t *httpHandler;
+
+
+
+    /* sets the http handler attributes (default) values */
     httpConnection->ioConnection = ioConnection;
+    httpConnection->httpHandler = NULL;
 
     /* creates the http settings */
     createHttpSettings(&httpConnection->httpSettings);
@@ -51,16 +87,43 @@ void createHttpConnection(struct HttpConnection_t **httpConnectionPointer, struc
     /* sets the http connection in the (upper) io connection substrate */
     ioConnection->lower = httpConnection;
 
+
+
+
+
+    peekValueLinkedList(service->httpHandlersList, (void **) &httpHandler);
+
+
     /* sets the structures for the handler */
-    setHandlerFile(httpConnection->httpParser, httpConnection->httpSettings);
+    httpHandler->set(httpConnection);
+
+
+
 
     /* sets the http connection in the http connection pointer */
     *httpConnectionPointer = httpConnection;
+
+    /* raises no error */
+    RAISE_NO_ERROR;
 }
 
-void deleteHttpConnection(struct HttpConnection_t *httpConnection) {
+ERROR_CODE deleteHttpConnection(struct HttpConnection_t *httpConnection) {
+
+    struct Service_t *service = httpConnection->ioConnection->connection->service;
+
+    struct HttpHandler_t *httpHandler;
+
+
+    peekValueLinkedList(service->httpHandlersList, (void **) &httpHandler);
+
+
+
     /* unsets the structures for the handler */
-    unsetHandlerFile(httpConnection->httpParser, httpConnection->httpSettings);
+    httpHandler->unset(httpConnection);
+
+
+
+
 
     /* deletes the http parser */
     deleteHttpParser(httpConnection->httpParser);
@@ -70,6 +133,9 @@ void deleteHttpConnection(struct HttpConnection_t *httpConnection) {
 
     /* releases the http connection */
     FREE(httpConnection);
+
+    /* raises no error */
+    RAISE_NO_ERROR;
 }
 
 ERROR_CODE dataHandlerStreamHttp(struct IoConnection_t *ioConnection, unsigned char *buffer, size_t bufferSize) {
@@ -77,9 +143,21 @@ ERROR_CODE dataHandlerStreamHttp(struct IoConnection_t *ioConnection, unsigned c
     struct HttpConnection_t *httpConnection = (struct HttpConnection_t *) ioConnection->lower;
 
 
+
+    struct Service_t *service = httpConnection->ioConnection->connection->service;
+
+    struct HttpHandler_t *httpHandler;
+
+
+    peekValueLinkedList(service->httpHandlersList, (void **) &httpHandler);
+
+
+    httpConnection->httpHandler = httpHandler;
+
+
     /* TENHO DE POR ESTE METODO como resetHandlerFile() */
 
-    resetHttpParserHandlerFile(httpConnection->httpParser);
+    //resetHttpParserHandlerFile(httpConnection->httpParser);
 
     // TODO: tenho de testar quantos bytes processei !!!
     /* process the http data for the http parser */

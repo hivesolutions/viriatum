@@ -25,7 +25,7 @@
  __license__   = GNU General Public License (GPL), Version 3
 */
 
-#define LUA_ERROR(error) error == 1
+#include "handler.h"
 
 VIRIATUM_EXPORT_PREFIX ERROR_CODE startModule(struct Environment_t *environment, struct Module_t *module);
 VIRIATUM_EXPORT_PREFIX ERROR_CODE stopModule();
