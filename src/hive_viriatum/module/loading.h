@@ -211,14 +211,14 @@ static __inline unsigned char *getErrorMessageModule(struct Module_t *module) {
     is available */
     if(module == NULL) {
         /* sets invalid error message */
-        errorMessage = "No valid module structure";
+        errorMessage = (unsigned char *) "No valid module structure";
     }
 
     /* in case the module error handler
     is not defined */
     if(module->error == NULL) {
         /* sets invalid error message */
-        errorMessage = "No error handler defined";
+        errorMessage = (unsigned char *) "No error handler defined";
     }
     /* otherwise there is a valid error
     handler defined, and the error message
