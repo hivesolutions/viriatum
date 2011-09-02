@@ -45,6 +45,9 @@ ERROR_CODE startModule(struct Module_t *module) {
     /* prints a debug message */
     V_DEBUG_F("Starting the module '%s' (%s) v%s\n", name, description, version);
 
+	/* populates the module structure */
+	infoModule(module);
+
     /* initializes the lua interpreter */
     luaState = lua_open();
 
@@ -56,10 +59,6 @@ ERROR_CODE startModule(struct Module_t *module) {
 
     /* cleanup lua */
     lua_close(luaState);
-
-    module->name = name;
-    module->version = version;
-    module->type = MODULE_TYPE_HANDLER;
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -77,6 +76,22 @@ ERROR_CODE stopModule() {
 
     /* prints a debug message */
     V_DEBUG_F("Stoping the module '%s' (%s) v%s\n", name, description, version);
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE infoModule(struct Module_t *module) {
+    /* retrieves the name */
+    unsigned char *name = nameViriatumModLua();
+
+    /* retrieves the version */
+    unsigned char *version = versionViriatumModLua();
+
+	/* populates the module structure */
+    module->name = name;
+    module->version = version;
+    module->type = MODULE_TYPE_HANDLER;
 
     /* raises no error */
     RAISE_NO_ERROR;

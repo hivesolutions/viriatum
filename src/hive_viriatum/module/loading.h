@@ -61,17 +61,6 @@ typedef struct Module_t {
 } Module;
 
 /**
- * Function used to retrieve information
- * about the module.
- * The module should be able to populate the module
- * structure accordingly.
- *
- * @param module The module structure to be
- * populated by the module.
- */
-typedef ERROR_CODE (*viriatumInfoModule)(struct Module_t *module);
-
-/**
  * Function used for starting a module.
  * During this initialization all the module
  * internal structures shall be initialized.
@@ -90,6 +79,17 @@ typedef ERROR_CODE (*viriatumStartModule)(struct Module_t *module);
  * destroyed.
  */
 typedef ERROR_CODE (*viriatumStopModule)(void);
+
+/**
+ * Function used to retrieve information
+ * about the module.
+ * The module should be able to populate the module
+ * structure accordingly.
+ *
+ * @param module The module structure to be
+ * populated by the module.
+ */
+typedef ERROR_CODE (*viriatumInfoModule)(struct Module_t *module);
 
 /**
  * Constructor of the module.
