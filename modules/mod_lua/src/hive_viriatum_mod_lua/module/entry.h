@@ -27,3 +27,4 @@
 
 VIRIATUM_EXPORT_PREFIX ERROR_CODE startModule(struct Module_t *module);
 VIRIATUM_EXPORT_PREFIX ERROR_CODE stopModule();
+VIRIATUM_EXPORT_PREFIX ERROR_CODE infoModule(struct Module_t *module);
