@@ -137,7 +137,7 @@ int main(int argc, char *argv[]) {
     /* tests the error code for error */
     if(IS_ERROR_CODE(returnValue)) {
         /* prints a warning message */
-        V_WARNING_F("Problem loading module (%s)\n", getLastErrorMessageSafe());
+        V_WARNING_F("Problem loading module (%s)\n", GET_ERROR());
     }
 
     /* runs the service */
@@ -146,7 +146,7 @@ int main(int argc, char *argv[]) {
     /* tests the error code for error */
     if(IS_ERROR_CODE(returnValue)) {
         /* prints an error message */
-        V_ERROR_F("Problem running service (%s)\n", getLastErrorMessageSafe());
+        V_ERROR_F("Problem running service (%s)\n", GET_ERROR());
     }
 
     /* prints a debug message */

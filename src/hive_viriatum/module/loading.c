@@ -29,12 +29,46 @@
 
 #include "loading.h"
 
+ERROR_CODE createEnvironment(struct Environment_t **environmentPointer) {
+    /* retrieves the environment size */
+    size_t environmentSize = sizeof(struct Environment_t);
+
+    /* allocates space for the environment */
+    struct Environment_t *environment = (struct Environment_t *) MALLOC(environmentSize);
+
+    /* sets the environment attributes (default) values */
+    environment->name = NULL;
+
+    /* sets the environment in the environment pointer */
+    *environmentPointer = environment;
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE deleteEnvironment(struct Environment_t *environment) {
+    /* releases the environment */
+    FREE(environment);
+
+    /* raises no environment */
+    RAISE_NO_ERROR;
+}
+
 ERROR_CODE createModule(struct Module_t **modulePointer) {
     /* retrieves the module size */
     size_t moduleSize = sizeof(struct Module_t);
 
     /* allocates space for the module */
     struct Module_t *module = (struct Module_t *) MALLOC(moduleSize);
+
+     /* sets the module attributes (default) values */
+    module->name = NULL;
+    module->version = NULL;
+    module->type = 0;
+    module->start = NULL;
+    module->stop = NULL;
+    module->info = NULL;
+    module->error = NULL;
 
     /* sets the module in the module pointer */
     *modulePointer = module;
@@ -52,17 +86,23 @@ ERROR_CODE deleteModule(struct Module_t *module) {
 }
 
 ERROR_CODE loadModule(unsigned char *modulePath) {
+    /* error code to be used for testing */
+    int errorCode;
+
     /* the mod library reference */
     LIBRARY_REFERENCE modLibrary;
 
     /* the holder of the library symbol */
     LIBRARY_SYMBOL symbol;
 
+    /* the environment parameters reference */
+    struct Environment_t *environment;
+
     /* the module structure reference */
     struct Module_t *module;
 
-    /* the start module function reference */
-    viriatumStartModule startModuleFunction;
+    /* the info module function reference */
+    viriatumInfoModule infoModuleFunction;
 
     /* loads the mod library (tries to find the file) */
     modLibrary = LOAD_LIBRARY((const char *) modulePath);
@@ -80,28 +120,61 @@ ERROR_CODE loadModule(unsigned char *modulePath) {
     }
 
     /* retrieves the symbol from the mod library */
-    symbol = GET_LIBRARY_SYMBOL(modLibrary, "startModule");
+    symbol = GET_LIBRARY_SYMBOL(modLibrary, "infoModule");
 
-    /* retrieves the start nodule function reference */
-    startModuleFunction = *((viriatumStartModule *)(&symbol));
+    /* retrieves the info module function reference */
+    infoModuleFunction = *((viriatumInfoModule *)(&symbol));
 
     /* in case the start module function was not found */
-    if(startModuleFunction == NULL) {
+    if(infoModuleFunction == NULL) {
         /* prints a warning message */
-        V_WARNING_F("No such symbol '%s' in library\n", "startModule");
+        V_WARNING_F("No such symbol '%s' in library\n", "infoModule");
 
         /* raises an error */
         RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem finding symbol");
     } else {
         /* prints a debug message */
-        V_DEBUG_F("Found symbol '%s' in library\n", "startModule");
+        V_DEBUG_F("Found symbol '%s' in library\n", "infoModule");
     }
+
+    /* creates the environment */
+    createEnvironment(&environment);
 
     /* creates the module */
     createModule(&module);
 
+    /* calls the info module function */
+    errorCode = infoModuleFunction(module);
+
+    /* tests the error code for error */
+    if(IS_ERROR_CODE(errorCode)) {
+        /* prints the error */
+        V_DEBUG_F("%s\n", GET_ERROR_MODULE(module));
+    }
+
     /* calls the start module function */
-    startModuleFunction(module);
+    errorCode = module->start(environment, module);
+
+    /* tests the error code for error */
+    if(IS_ERROR_CODE(errorCode)) {
+        /* prints the error */
+        V_DEBUG_F("%s\n", GET_ERROR_MODULE(module));
+    }
+
+    /* calls the stop module function */
+    errorCode = module->stop(environment, module);
+
+    /* tests the error code for error */
+    if(IS_ERROR_CODE(errorCode)) {
+        /* prints the error */
+        V_DEBUG_F("%s\n", GET_ERROR_MODULE(module));
+    }
+
+    /* deletes the module */
+    deleteModule(module);
+
+    /* deletes the environment */
+    deleteEnvironment(environment);
 
     /* unloads the library */
     UNLOAD_LIBRARY(modLibrary);

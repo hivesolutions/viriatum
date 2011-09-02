@@ -29,7 +29,12 @@
 
 #include "entry.h"
 
-ERROR_CODE startModule(struct Module_t *module) {
+unsigned char *lastErrorMessage;
+
+ERROR_CODE startModule(struct Environment_t *environment, struct Module_t *module) {
+    /* allocates the result code */
+    int resultCode;
+
     /* allocates the lua state */
     lua_State *luaState;
 
@@ -45,8 +50,8 @@ ERROR_CODE startModule(struct Module_t *module) {
     /* prints a debug message */
     V_DEBUG_F("Starting the module '%s' (%s) v%s\n", name, description, version);
 
-	/* populates the module structure */
-	infoModule(module);
+    /* populates the module structure */
+    infoModule(module);
 
     /* initializes the lua interpreter */
     luaState = lua_open();
@@ -55,7 +60,16 @@ ERROR_CODE startModule(struct Module_t *module) {
     luaL_openlibs(luaState);
 
     /* runs the script */
-    luaL_dofile(luaState, "c:/teste.lua");
+    resultCode = luaL_dofile(luaState, "c:/teste.lua");
+
+    /* in case there was an error in lua */
+    if(LUA_ERROR(resultCode)) {
+        /* prints a warning message */
+        V_WARNING_F("There was a problem executing: %s\n" , "c:/teste.lua");
+
+        /* raises an error */
+        RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem executing script file");
+    }
 
     /* cleanup lua */
     lua_close(luaState);
@@ -88,10 +102,22 @@ ERROR_CODE infoModule(struct Module_t *module) {
     /* retrieves the version */
     unsigned char *version = versionViriatumModLua();
 
-	/* populates the module structure */
+    /* populates the module structure */
     module->name = name;
     module->version = version;
     module->type = MODULE_TYPE_HANDLER;
+    module->start = startModule;
+    module->stop = stopModule;
+    module->info = infoModule;
+    module->error = errorModule;
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE errorModule(unsigned char **messagePointer) {
+    /* sets the error message in the (erro) message pointer */
+    *messagePointer = lastErrorMessage;
 
     /* raises no error */
     RAISE_NO_ERROR;

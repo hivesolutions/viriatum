@@ -36,7 +36,7 @@ void createService(struct Service_t **servicePointer) {
     /* allocates space for the service */
     struct Service_t *service = (struct Service_t *) MALLOC(serviceSize);
 
-    /* sets the data attribute (default) values */
+    /* sets the service attributes (default) values */
     service->name = NULL;
     service->status = STATUS_CLOSED;
     service->serviceSocketHandle = 0;
@@ -75,7 +75,7 @@ void createData(struct Data_t **dataPointer) {
     /* allocates space for the data */
     struct Data_t *data = (struct Data_t *) MALLOC(dataSize);
 
-    /* sets the data attribute (default) values */
+    /* sets the data attributes (default) values */
     data->data = NULL;
     data->dataBase = NULL;
     data->size = 0;
@@ -101,7 +101,7 @@ void createPolling(struct Polling_t **pollingPointer) {
     /* allocates space for the polling */
     struct Polling_t *polling = (struct Polling_t *) MALLOC(pollingSize);
 
-    /* sets the polling attribute (default) values */
+    /* sets the polling attributes (default) values */
     polling->service = NULL;
     polling->open = NULL;
     polling->close = NULL;
@@ -332,7 +332,7 @@ ERROR_CODE createConnection(struct Connection_t **connectionPointer, SOCKET_HAND
     /* allocates space for the connection */
     struct Connection_t *connection = (struct Connection_t *) MALLOC(connectionSize);
 
-    /* sets the connection attribute (default) values */
+    /* sets the connection attributes (default) values */
     connection->status = STATUS_CLOSED;
     connection->socketHandle = socketHandle;
     connection->service = NULL;
