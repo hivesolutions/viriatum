@@ -63,13 +63,13 @@ ERROR_CODE loadModule(unsigned char *modulePath) {
     /* in case the start module function was not found */
     if(startModuleFunction == NULL) {
         /* prints a warning message */
-        V_WARNING_F("No such symbol %s in library\n", "startModule");
+        V_WARNING_F("No such symbol '%s' in library\n", "startModule");
 
         /* raises an error */
         RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem finding symbol");
     } else {
         /* prints a debug message */
-        V_DEBUG_F("Found symbol %s in library\n", "startModule");
+        V_DEBUG_F("Found symbol '%s' in library\n", "startModule");
     }
 
     /* calls the start module function */

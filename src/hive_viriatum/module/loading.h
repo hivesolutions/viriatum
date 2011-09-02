@@ -32,7 +32,7 @@
  * During this initialization all the module
  * internal structures shall be initialized.
  */
-typedef void (*viriatumStartModule)(void);
+typedef ERROR_CODE (*viriatumStartModule)(void);
 
 /**
  * Function used for stopping a module.
@@ -40,7 +40,7 @@ typedef void (*viriatumStartModule)(void);
  * internal structures shall be closed and
  * destroyed.
  */
-typedef void (*viriatumStopModule)(void);
+typedef ERROR_CODE (*viriatumStopModule)(void);
 
 /**
  * Loads the module in the given path.
