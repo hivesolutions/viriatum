@@ -29,6 +29,30 @@
 
 #include "service.h"
 
+ERROR_CODE createHttpHandlerService(struct Service_t *service, struct HttpHandler_t **httpHandlerPointer) {
+    /* creates the http handler */
+    createHttpHandler(httpHandlerPointer);
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE addHttpHandlerService(struct Service_t *service, struct HttpHandler_t *httpHandler) {
+    /* adds the http handler to the list of http handlers in the service */
+    appendValueLinkedList(service->httpHandlersList, (void *) httpHandler);
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+
+
+
+
+
+
+
+
 void createService(struct Service_t **servicePointer) {
     /* retrieves the service size */
     size_t serviceSize = sizeof(struct Service_t);
@@ -40,6 +64,8 @@ void createService(struct Service_t **servicePointer) {
     service->name = NULL;
     service->status = STATUS_CLOSED;
     service->serviceSocketHandle = 0;
+    service->createHttpHandler = createHttpHandlerService;
+    service->addHttpHandler = addHttpHandlerService;
 
     /* creates the polling (provider) */
     createPolling(&service->polling);
@@ -281,6 +307,7 @@ ERROR_CODE startService(struct Service_t *service) {
     /* sets the base hanlding functions in the service connection */
     serviceConnection->openConnection = openConnection;
     serviceConnection->closeConnection = closeConnection;
+    serviceConnection->writeConnection = writeConnection;
     serviceConnection->registerWrite = registerWriteConnection;
     serviceConnection->unregisterWrite = unregisterWriteConnection;
 
@@ -367,6 +394,10 @@ ERROR_CODE createConnection(struct Connection_t **connectionPointer, SOCKET_HAND
     connection->writeRegistered = 0;
     connection->openConnection = NULL;
     connection->closeConnection = NULL;
+    connection->writeConnection = NULL;
+    connection->registerWrite = NULL;
+    connection->unregisterWrite = NULL;
+    connection->allocData = allocConnection;
     connection->onRead = NULL;
     connection->onWrite = NULL;
     connection->onError = NULL;
@@ -422,7 +453,7 @@ ERROR_CODE deleteConnection(struct Connection_t *connection) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE writeConnection(struct Connection_t *connection, unsigned char *data, unsigned int size, serviceCallback callback, void *callbackParameters) {
+ERROR_CODE writeConnection(struct Connection_t *connection, unsigned char *data, unsigned int size, connectionDataCallback callback, void *callbackParameters) {
     /* allocates the data */
     struct Data_t *_data;
 
@@ -551,6 +582,14 @@ ERROR_CODE unregisterWriteConnection(struct Connection_t *connection) {
 
     /* sets the connection as not write registered */
     connection->writeRegistered = 0;
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE allocConnection(struct Connection_t *connection, size_t size, void **dataPointer) {
+    /* allocates a data chunk with the required size */
+    *dataPointer = MALLOC(size);
 
     /* raises no error */
     RAISE_NO_ERROR;

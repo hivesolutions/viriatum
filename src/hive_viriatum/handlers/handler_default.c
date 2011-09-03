@@ -36,8 +36,8 @@ ERROR_CODE setHandlerDefault(struct HttpConnection_t *httpConnection) {
     /* sets the http settings values */
     _setHttpSettingsHandlerDefault(httpConnection->httpSettings);
 
-	/* raises no error */
-	RAISE_NO_ERROR;
+    /* raises no error */
+    RAISE_NO_ERROR;
 }
 
 ERROR_CODE unsetHandlerDefault(struct HttpConnection_t *httpConnection) {
@@ -47,8 +47,8 @@ ERROR_CODE unsetHandlerDefault(struct HttpConnection_t *httpConnection) {
     /* unsets the http settings values */
     _unsetHttpSettingsHandlerDefault(httpConnection->httpSettings);
 
-	/* raises no error */
-	RAISE_NO_ERROR;
+    /* raises no error */
+    RAISE_NO_ERROR;
 }
 
 ERROR_CODE messageBeginCallbackHandlerDefault(struct HttpParser_t *httpParser) {
@@ -159,13 +159,13 @@ ERROR_CODE messageCompleteCallbackHandlerDefault(struct HttpParser_t *httpParser
 }
 
 ERROR_CODE _setHttpParserHandlerDefault(struct HttpParser_t *httpParser) {
-	/* raises no error */
-	RAISE_NO_ERROR;
+    /* raises no error */
+    RAISE_NO_ERROR;
 }
 
 ERROR_CODE _unsetHttpParserHandlerDefault(struct HttpParser_t *httpParser) {
-	/* raises no error */
-	RAISE_NO_ERROR;
+    /* raises no error */
+    RAISE_NO_ERROR;
 }
 
 ERROR_CODE _setHttpSettingsHandlerDefault(struct HttpSettings_t *httpSettings) {
@@ -190,8 +190,8 @@ ERROR_CODE _setHttpSettingsHandlerDefault(struct HttpSettings_t *httpSettings) {
     /* sets the http settings on message complete callback */
     httpSettings->onmessageComplete = messageCompleteCallbackHandlerDefault;
 
-	/* raises no error */
-	RAISE_NO_ERROR;
+    /* raises no error */
+    RAISE_NO_ERROR;
 }
 
 ERROR_CODE _unsetHttpSettingsHandlerDefault(struct HttpSettings_t *httpSettings) {
@@ -216,8 +216,8 @@ ERROR_CODE _unsetHttpSettingsHandlerDefault(struct HttpSettings_t *httpSettings)
     /* unsets the http settings on message complete callback */
     httpSettings->onmessageComplete = NULL;
 
-	/* raises no error */
-	RAISE_NO_ERROR;
+    /* raises no error */
+    RAISE_NO_ERROR;
 }
 
 ERROR_CODE _sendResponseHandlerDefault(struct HttpParser_t *httpParser) {

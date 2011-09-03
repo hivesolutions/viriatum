@@ -112,6 +112,7 @@ ERROR_CODE acceptHandlerStreamIo(struct Connection_t *connection) {
             /* sets the base hanlding functions in the client connection */
             clientConnection->openConnection = openConnection;
             clientConnection->closeConnection = closeConnection;
+            clientConnection->writeConnection = writeConnection;
             clientConnection->registerWrite = registerWriteConnection;
             clientConnection->unregisterWrite = unregisterWriteConnection;
 
@@ -359,12 +360,8 @@ ERROR_CODE writeHandlerStreamIo(struct Connection_t *connection) {
             break;
         }
 
-		printf("no passa nada");
-
         /* pops a value (data) from the linked list (write queue) */
         popValueLinkedList(connection->writeQueue, (void **) &data, 1);
-
-		printf("O QUE SE PASSA ???");
 
         /* in case the data callback is set */
         if(data->callback != NULL) {
@@ -383,16 +380,16 @@ ERROR_CODE writeHandlerStreamIo(struct Connection_t *connection) {
 
         /* deletes the data */
         deleteData(data);
-    
-		/* in case the connection has been closed */
-		if(connection->status == STATUS_CLOSED) {
+
+        /* in case the connection has been closed */
+        if(connection->status == STATUS_CLOSED) {
             /* sets the error flag (non fatal) */
             error = 2;
 
-			/* breaks the loop */
-			break;
-		}
-	}
+            /* breaks the loop */
+            break;
+        }
+    }
 
     /* prints a debug message */
     V_DEBUG_F("Processing write error code: %d\n", error);

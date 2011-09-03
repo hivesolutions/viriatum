@@ -17,7 +17,7 @@
  You should have received a copy of the GNU General Public License
  along with Hive Viriatum Modules. If not, see <http://www.gnu.org/licenses/>.
 
- __author__    = Jo„o Magalh„es <joamag@hive.pt>
+ __author__    = Jo√£o Magalh√£es <joamag@hive.pt>
  __version__   = 1.0.0
  __revision__  = $LastChangedRevision$
  __date__      = $LastChangedDate$
@@ -34,10 +34,10 @@
  */
 typedef struct ModLuaHttpHandler_t {
     /**
-	 * The global lua state used over
-	 * all the operations in lua.
-	 */
-	lua_State *luaState;
+     * The global lua state used over
+     * all the operations in lua.
+     */
+    lua_State *luaState;
 } ModLuaHttpHandler;
 
 ERROR_CODE createModLuaHttpHandler(struct ModLuaHttpHandler_t **modLuaHttpHandlerPonter, struct HttpHandler_t *httpHandlerPonter);

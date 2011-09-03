@@ -17,7 +17,7 @@
  You should have received a copy of the GNU General Public License
  along with Hive Viriatum Modules. If not, see <http://www.gnu.org/licenses/>.
 
- __author__    = Jo„o Magalh„es <joamag@hive.pt>
+ __author__    = Jo√£o Magalh√£es <joamag@hive.pt>
  __version__   = 1.0.0
  __revision__  = $LastChangedRevision$
  __date__      = $LastChangedDate$
@@ -28,6 +28,9 @@
 #include "stdafx.h"
 
 #include "handler.h"
+
+/* starts the memory structures */
+START_MEMORY;
 
 ERROR_CODE createModLuaHttpHandler(struct ModLuaHttpHandler_t **modLuaHttpHandlerPointer, struct HttpHandler_t *httpHandler) {
     /* retrieves the mod lua http handler size */
@@ -262,7 +265,7 @@ ERROR_CODE _sendResponseHandlerModule(struct HttpParser_t *httpParser) {
     lua_setglobal(modLuaHttpHandler->luaState, "connection");
 
     /* register the write connection function */
-	lua_register(modLuaHttpHandler->luaState, "write_connection", _luaWriteConnection);
+    lua_register(modLuaHttpHandler->luaState, "write_connection", _luaWriteConnection);
 
     /* runs the script */
     resultCode = luaL_dofile(modLuaHttpHandler->luaState, "c:/teste.lua");
@@ -306,22 +309,23 @@ ERROR_CODE _sendResponseCallbackHandlerModule(struct Connection_t *connection, s
 }
 
 static int _luaWriteConnection(lua_State *luaState) {
-    /* get number of arguments */
-    int n = lua_gettop(luaState);
     const char *data;
-	unsigned int dataSize;
+    unsigned int dataSize;
     struct HttpParser_t *httpParser;
     struct Connection_t *connection;
-	unsigned char *buffer;
+    unsigned char *buffer;
 
-	/* retrieves the number of argument available */
-    n = lua_gettop(luaState);
+    /* retrieves the number of (received) arguments */
+    unsigned int numberArguments = lua_gettop(luaState);
 
-    if(n != 2) {
+    /* in case the number of arguments is invalid */
+    if(numberArguments != 2) {
+        /* prints a warning message */
+        V_WARNING("Invalid number of arguments");
+
+        /* pushes an error message to lua */
         lua_pushstring(luaState, "Invalid number of arguments");
         lua_error(luaState);
-
-        printf("Invalid number of arguments");
     }
 
     if(!lua_isstring(luaState, -1)) {
@@ -342,19 +346,20 @@ static int _luaWriteConnection(lua_State *luaState) {
 
     httpParser = (struct HttpParser_t *) lua_touserdata(luaState, -2);
 
-	/* retrieves the data (string) size */
-	dataSize = strlen(data);
+    /* retrieves the data (string) size */
+    dataSize = strlen(data);
 
-	/* retrieves the connection from the http parser parameters */
+    /* retrieves the connection from the http parser parameters */
     connection = (struct Connection_t *) httpParser->parameters;
 
-	buffer = (unsigned char *) MALLOC(dataSize * sizeof(unsigned char));
+    /* allocates the data buffer (in a safe maner) */
+    connection->allocData(connection, dataSize * sizeof(unsigned char), &buffer);
 
-	/* copies the data (from lua) into a buffer */
-	memcpy(buffer, data, dataSize);
+    /* copies the data (from lua) into a buffer */
+    memcpy(buffer, data, dataSize);
 
     /* writes the response to the connection */
-    writeConnection(connection, (unsigned char *) buffer, dataSize, _sendResponseCallbackHandlerModule, (void *) httpParser->flags);
+    connection->writeConnection(connection, (unsigned char *) buffer, dataSize, _sendResponseCallbackHandlerModule, (void *) httpParser->flags);
 
     /* return the number of results */
     return 0;

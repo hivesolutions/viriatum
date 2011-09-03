@@ -67,24 +67,23 @@ ERROR_CODE startModule(struct Environment_t *environment, struct Module_t *modul
 
 
     /* creates the http handler */
-    createHttpHandler(&httpHandler);
+    environment->service->createHttpHandler(environment->service, &httpHandler);
 
     /* creates the mod lua http handler */
     createModLuaHttpHandler(&modLuaHttpHandler, httpHandler);
 
 
+    /* sets the http handler attributes */
     httpHandler->set = setHandlerModule;
     httpHandler->unset = unsetHandlerModule;
     httpHandler->reset = NULL;
 
+    /* sets the mod lua handler attributes */
     modLuaHttpHandler->luaState = luaState;
 
 
-
-
-    /* adds the http handler to the list of handlers in the service */
-    appendValueLinkedList(environment->service->httpHandlersList, (void *) httpHandler);
-
+    /* adds the http handler to the service */
+    environment->service->addHttpHandler(environment->service, httpHandler);
 
 
 

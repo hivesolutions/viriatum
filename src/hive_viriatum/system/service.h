@@ -36,11 +36,29 @@ struct Data_t;
 struct Polling_t;
 struct Connection_t;
 
+
+typedef ERROR_CODE (*serviceHttpHandlerCreate) (struct Service_t *, struct HttpHandler_t **);
+
+typedef ERROR_CODE (*serviceHttpHandlerUpdate) (struct Service_t *, struct HttpHandler_t *);
+
+
+
 /**
  * The "default" function used to update a state in the connection
  * for the given service context.
  */
 typedef ERROR_CODE (*connectionUpdate) (struct Connection_t *);
+
+
+
+
+
+
+/**
+ * The function used to allocated data in the context
+ * of a connection (for safe usage).
+ */
+typedef ERROR_CODE (*connectionAlloc) (struct Connection_t *, size_t size, void **dataPointer);
 
 /**
  * The function to be used for callbacks associated with the
@@ -49,10 +67,17 @@ typedef ERROR_CODE (*connectionUpdate) (struct Connection_t *);
 typedef ERROR_CODE (*connectionCallback) (struct Connection_t *);
 
 /**
- * The "default" callback function to be used, without
- * any extra arguments.
+ * The function to be used for callbacks associated with the
+ * connection data updates.
  */
-typedef ERROR_CODE (*serviceCallback) (struct Connection_t *, struct Data_t *, void *);
+typedef ERROR_CODE (*connectionDataCallback) (struct Connection_t *, struct Data_t *, void *);
+
+
+
+typedef ERROR_CODE (*connectionWrite) (struct Connection_t *connection, unsigned char *data, unsigned int size, connectionDataCallback callback, void *callbackParameters);
+
+
+
 
 /**
  * The "default" function used to update a state in the polling
@@ -186,8 +211,17 @@ typedef struct Service_t {
 
 
 
+
+
+    /**
+     * The list of http handlers available
+     * for the service.
+     */
     struct LinkedList_t *httpHandlersList;
 
+    serviceHttpHandlerCreate createHttpHandler;
+    serviceHttpHandlerUpdate addHttpHandler;
+    serviceHttpHandlerUpdate removeHttpHandler;
 } Service;
 
 /**
@@ -250,6 +284,10 @@ typedef struct Connection_t {
      */
     connectionUpdate closeConnection;
 
+
+    connectionWrite writeConnection;
+
+
     /**
      * Function to be used for registering
      * writing detection in the polling (provider).
@@ -261,6 +299,13 @@ typedef struct Connection_t {
      * writing detection in the polling (provider).
      */
     connectionUpdate unregisterWrite;
+
+    /**
+     * Function to be used to allocated (in a
+     * safe away) message data that may be
+     * later released safely
+     */
+    connectionAlloc allocData;
 
     /**
      * Callback function reference to be called
@@ -319,7 +364,7 @@ typedef struct Data_t {
     unsigned char *data;
     unsigned char *dataBase;
     size_t size;
-    serviceCallback callback;
+    connectionDataCallback callback;
     void *callbackParameters;
 } Data;
 
@@ -443,7 +488,7 @@ ERROR_CODE deleteConnection(struct Connection_t *connection);
  * back to the callback.
  * @return The resulting error code.
  */
-ERROR_CODE writeConnection(struct Connection_t *connection, unsigned char *data, unsigned int size, serviceCallback callback, void *callbackParameters);
+ERROR_CODE writeConnection(struct Connection_t *connection, unsigned char *data, unsigned int size, connectionDataCallback callback, void *callbackParameters);
 
 /**
  * Opens the given connection, creating (and starting) all
@@ -488,3 +533,17 @@ ERROR_CODE registerWriteConnection(struct Connection_t *connection);
  * @return The resulting error code.
  */
 ERROR_CODE unregisterWriteConnection(struct Connection_t *connection);
+
+/**
+ * Allocates a chunk of memory for the context of the given
+ * connection.
+ * This chunk of memory is safe in the context of multiple
+ * dynamic libraries.
+ *
+ * @param connection The connection context to be used
+ * in the allocation.
+ * @param size The size of the chunk to be allocated.
+ * @return The pointer to the allocated (data) chunk.
+ * @return The resulting error code.
+ */
+ERROR_CODE allocConnection(struct Connection_t *connection, size_t size, void **dataPointer);
