@@ -204,7 +204,7 @@ ERROR_CODE startService(struct Service_t *service) {
     /* tests the error code for error */
     if(IS_ERROR_CODE(errorCode)) {
         /* prints a warning message */
-        V_WARNING_F("Problem loading module (%s)\n", GET_ERROR());
+        V_WARNING_F("Problem loading module (%s)\n", (char *) GET_ERROR());
     }
 
     /* sets the socket address attributes */
