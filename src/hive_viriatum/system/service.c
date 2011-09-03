@@ -198,15 +198,15 @@ ERROR_CODE startService(struct Service_t *service) {
     /* sets the flags to be used in socket */
     SOCKET_FLAGS flags = 1;
 
-	#ifdef VIRIATUM_PLATFORM_WIN32
+    #ifdef VIRIATUM_PLATFORM_WIN32
     /* loads the module, retrieving a possible error code */
     errorCode = loadModule(service, (unsigned char *) "C:/Users/joamag/Desktop/repositories/viriatum/bin/hive_viriatum_mod_lua/i386/win32/Debug/hive_viriatum_mod_lua.dll");
-	#endif
+    #endif
 
-	#ifdef VIRIATUM_PLATFORM_UNIX
+    #ifdef VIRIATUM_PLATFORM_UNIX
     /* loads the module, retrieving a possible error code */
     errorCode = loadModule(service, (unsigned char *) "/usr/local/lib/libviriatum_mod_lua.so");
-	#endif
+    #endif
 
     /* tests the error code for error */
     if(IS_ERROR_CODE(errorCode)) {

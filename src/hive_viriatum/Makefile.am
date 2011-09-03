@@ -47,5 +47,6 @@ polling/polling_kqueue.c\
 polling/polling_select.c\
 stream/stream_http.c \
 stream/stream_io.c \
+system/environment.c \
 system/service.c \
 test/simple_test.c
