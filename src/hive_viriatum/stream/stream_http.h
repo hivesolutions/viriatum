@@ -31,8 +31,8 @@
 #include "../handlers/handlers.h"
 #include "stream_io.h"
 
-
-
+/* forward references (avoids loop) */
+struct HttpConnection_t;
 
 
 typedef ERROR_CODE (*httpConnectionUpdate) (struct HttpConnection_t *httpConnection);
