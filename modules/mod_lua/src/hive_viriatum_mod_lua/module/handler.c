@@ -295,11 +295,11 @@ ERROR_CODE _sendResponseHandlerModule(struct HttpParser_t *httpParser) {
 }
 
 ERROR_CODE _sendResponseCallbackHandlerModule(struct Connection_t *connection, struct Data_t *data, void *parameters) {
-    /* retrieves the (http) flags */
-    unsigned char flags = (unsigned char) parameters;
+	/* retrieves the http parser */
+	struct HttpParser_t *httpParser = (struct HttpParser_t *) parameters;
 
     /* in case the connection is not meant to be kept alive */
-    if(!(flags & FLAG_CONNECTION_KEEP_ALIVE)) {
+    if(!(httpParser->flags & FLAG_CONNECTION_KEEP_ALIVE)) {
         /* closes the connection */
         connection->closeConnection(connection);
     }
@@ -353,13 +353,13 @@ int _luaWriteConnection(lua_State *luaState) {
     connection = (struct Connection_t *) httpParser->parameters;
 
     /* allocates the data buffer (in a safe maner) */
-    connection->allocData(connection, dataSize * sizeof(unsigned char), &buffer);
+    connection->allocData(connection, dataSize * sizeof(unsigned char), (void **) &buffer);
 
     /* copies the data (from lua) into a buffer */
     memcpy(buffer, data, dataSize);
 
     /* writes the response to the connection */
-    connection->writeConnection(connection, (unsigned char *) buffer, dataSize, _sendResponseCallbackHandlerModule, (void *) httpParser->flags);
+    connection->writeConnection(connection, (unsigned char *) buffer, dataSize, _sendResponseCallbackHandlerModule, (void *) httpParser);
 
     /* return the number of results */
     return 0;
