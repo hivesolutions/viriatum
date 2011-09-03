@@ -35,8 +35,8 @@ extern size_t allocations;
 #define CALLOC(count, size) calloc(count, size)
 #define REALLOC(pointer, size) realloc(pointer, size)
 #define FREE(pointer) freeDebug(pointer, __FILE__, __LINE__)
-static __inline void *mallocDebug(size_t size, char *file, int line) { printf("malloc() %s: %d\n",  file, line);  allocations++; return malloc(size); }
-static __inline void freeDebug(void *pointer, char *file, int line) { printf("free() %s: %d\n", file, line); allocations--; free(pointer); }
+static __inline void *mallocDebug(size_t size, char *file, int line) { printf("[ALLOCATIONS] malloc() %s: %d (%d)\n",  file, line, allocations);  allocations++; return malloc(size); }
+static __inline void freeDebug(void *pointer, char *file, int line) { printf("[ALLOCATIONS] free() %s: %d (%d)\n", file, line, allocations); allocations--; free(pointer); }
 #endif
 
 #ifndef VIRIATUM_DEBUG
