@@ -28,12 +28,12 @@
 #pragma once
 
 #include "../http/http.h"
-#include "../stream/stream.h"
 #include "../system/system.h"
 
 /* forward references (avoids loop) */
 struct Data_t;
 struct Connection_t;
+struct HttpConnection_t;
 
 ERROR_CODE setHandlerDefault(struct HttpConnection_t *httpConnection);
 ERROR_CODE unsetHandlerDefault(struct HttpConnection_t *httpConnection);
