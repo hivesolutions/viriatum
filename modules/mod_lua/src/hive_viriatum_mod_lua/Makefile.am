@@ -38,7 +38,9 @@ libviriatum_mod_lua_la_CXXFLAGS = $(AM_CXXFLAGS)
 libviriatum_mod_lua_la_LDFLAGS = -version-info $(MOD_LUA_MAJOR_VERSION):$(MOD_LUA_MINOR_VERSION):$(MOD_LUA_MICRO_VERSION)
 
 libviriatum_mod_lua_a_SOURCES = stdafx.c \
-module/entry.c
+module/entry.c,
+module/handler.c
 
 libviriatum_mod_lua_la_SOURCES = stdafx.c \
-module/entry.c
+module/entry.c,
+module/handler.c
