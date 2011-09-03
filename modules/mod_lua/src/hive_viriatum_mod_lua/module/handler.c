@@ -350,6 +350,7 @@ static int _luaWriteConnection(lua_State *luaState) {
 
 	buffer = (unsigned char *) MALLOC(dataSize * sizeof(unsigned char));
 
+	/* copies the data (from lua) into a buffer */
 	memcpy(buffer, data, dataSize);
 
     /* writes the response to the connection */

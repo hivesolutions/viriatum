@@ -92,8 +92,12 @@ void createLinkedListNode(struct LinkedListNode_t **linkedListNodePointer) {
 }
 
 void deleteLinkedListNode(struct LinkedListNode_t *linkedListNode) {
+	printf("vai fazer free");
+
     /* releases the linked list node */
     FREE(linkedListNode);
+
+	printf("fez free");
 }
 
 void appendLinkedList(struct LinkedList_t *linkedList, struct LinkedListNode_t *linkedListNode) {
@@ -298,8 +302,10 @@ void popValueLinkedList(struct LinkedList_t *linkedList, void **valuePointer, ch
     /* allocates space for the linked list node */
     struct LinkedListNode_t *linkedListNode;
 
+	printf("vai fazer pop");
     /* pops the linked list node */
     popLinkedList(linkedList, &linkedListNode);
+	printf("fez pop");
 
     /* in case the linked list node is invalid */
     if(linkedListNode == NULL) {
@@ -310,12 +316,16 @@ void popValueLinkedList(struct LinkedList_t *linkedList, void **valuePointer, ch
         *valuePointer = linkedListNode->value;
     }
 
+	printf("fez set do value pointer");
+
     /* in case the linked list node is valid
     and the delete node flag is set */
     if(linkedListNode != NULL && deleteNode) {
         /* deletes the linked list node */
         deleteLinkedListNode(linkedListNode);
     }
+
+	printf("fez delete do node");
 }
 
 void peekLinkedList(struct LinkedList_t *linkedList, struct LinkedListNode_t **linkedListNodePointer) {
