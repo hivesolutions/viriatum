@@ -29,72 +29,26 @@
 
 #include "handler_default.h"
 
-void setHandlerDefault(struct HttpParser_t *httpParser, struct HttpSettings_t *httpSettings) {
+ERROR_CODE setHandlerDefault(struct HttpConnection_t *httpConnection) {
     /* sets the http parser values */
-    setHttpParserHandlerDefault(httpParser);
+    _setHttpParserHandlerDefault(httpConnection->httpParser);
 
     /* sets the http settings values */
-    setHttpSettingsHandlerDefault(httpSettings);
+    _setHttpSettingsHandlerDefault(httpConnection->httpSettings);
+
+	/* raises no error */
+	RAISE_NO_ERROR;
 }
 
-void unsetHandlerDefault(struct HttpParser_t *httpParser, struct HttpSettings_t *httpSettings) {
+ERROR_CODE unsetHandlerDefault(struct HttpConnection_t *httpConnection) {
     /* unsets the http parser values */
-    unsetHttpParserHandlerDefault(httpParser);
+    _unsetHttpParserHandlerDefault(httpConnection->httpParser);
 
     /* unsets the http settings values */
-    unsetHttpSettingsHandlerDefault(httpSettings);
-}
+    _unsetHttpSettingsHandlerDefault(httpConnection->httpSettings);
 
-void setHttpParserHandlerDefault(struct HttpParser_t *httpParser) {
-}
-
-void unsetHttpParserHandlerDefault(struct HttpParser_t *httpParser) {
-}
-
-void setHttpSettingsHandlerDefault(struct HttpSettings_t *httpSettings) {
-    /* sets the http settings on message begin callback */
-    httpSettings->onmessageBegin = messageBeginCallbackHandlerDefault;
-
-    /* sets the http settings on url callback */
-    httpSettings->onurl = urlCallbackHandlerDefault;
-
-    /* sets the http settings on header field callback */
-    httpSettings->onheaderField = headerFieldCallbackHandlerDefault;
-
-    /* sets the http settings on header value callback */
-    httpSettings->onheaderValue = headerValueCallbackHandlerDefault;
-
-    /* sets the http settings on headers complete callback */
-    httpSettings->onheadersComplete = headersCompleteCallbackHandlerDefault;
-
-    /* sets the http settings on body callback */
-    httpSettings->onbody = bodyCallbackHandlerDefault;
-
-    /* sets the http settings on message complete callback */
-    httpSettings->onmessageComplete = messageCompleteCallbackHandlerDefault;
-}
-
-void unsetHttpSettingsHandlerDefault(struct HttpSettings_t *httpSettings) {
-    /* unsets the http settings on message begin callback */
-    httpSettings->onmessageBegin = NULL;
-
-    /* unsets the http settings on url callback */
-    httpSettings->onurl = NULL;
-
-    /* unsets the http settings on header field callback */
-    httpSettings->onheaderField = NULL;
-
-    /* unsets the http settings on header value callback */
-    httpSettings->onheaderValue = NULL;
-
-    /* unsets the http settings on headers complete callback */
-    httpSettings->onheadersComplete = NULL;
-
-    /* unsets the http settings on body callback */
-    httpSettings->onbody = NULL;
-
-    /* unsets the http settings on message complete callback */
-    httpSettings->onmessageComplete = NULL;
+	/* raises no error */
+	RAISE_NO_ERROR;
 }
 
 ERROR_CODE messageBeginCallbackHandlerDefault(struct HttpParser_t *httpParser) {
@@ -202,6 +156,68 @@ ERROR_CODE messageCompleteCallbackHandlerDefault(struct HttpParser_t *httpParser
 
     /* raise no error */
     RAISE_NO_ERROR;
+}
+
+ERROR_CODE _setHttpParserHandlerDefault(struct HttpParser_t *httpParser) {
+	/* raises no error */
+	RAISE_NO_ERROR;
+}
+
+ERROR_CODE _unsetHttpParserHandlerDefault(struct HttpParser_t *httpParser) {
+	/* raises no error */
+	RAISE_NO_ERROR;
+}
+
+ERROR_CODE _setHttpSettingsHandlerDefault(struct HttpSettings_t *httpSettings) {
+    /* sets the http settings on message begin callback */
+    httpSettings->onmessageBegin = messageBeginCallbackHandlerDefault;
+
+    /* sets the http settings on url callback */
+    httpSettings->onurl = urlCallbackHandlerDefault;
+
+    /* sets the http settings on header field callback */
+    httpSettings->onheaderField = headerFieldCallbackHandlerDefault;
+
+    /* sets the http settings on header value callback */
+    httpSettings->onheaderValue = headerValueCallbackHandlerDefault;
+
+    /* sets the http settings on headers complete callback */
+    httpSettings->onheadersComplete = headersCompleteCallbackHandlerDefault;
+
+    /* sets the http settings on body callback */
+    httpSettings->onbody = bodyCallbackHandlerDefault;
+
+    /* sets the http settings on message complete callback */
+    httpSettings->onmessageComplete = messageCompleteCallbackHandlerDefault;
+
+	/* raises no error */
+	RAISE_NO_ERROR;
+}
+
+ERROR_CODE _unsetHttpSettingsHandlerDefault(struct HttpSettings_t *httpSettings) {
+    /* unsets the http settings on message begin callback */
+    httpSettings->onmessageBegin = NULL;
+
+    /* unsets the http settings on url callback */
+    httpSettings->onurl = NULL;
+
+    /* unsets the http settings on header field callback */
+    httpSettings->onheaderField = NULL;
+
+    /* unsets the http settings on header value callback */
+    httpSettings->onheaderValue = NULL;
+
+    /* unsets the http settings on headers complete callback */
+    httpSettings->onheadersComplete = NULL;
+
+    /* unsets the http settings on body callback */
+    httpSettings->onbody = NULL;
+
+    /* unsets the http settings on message complete callback */
+    httpSettings->onmessageComplete = NULL;
+
+	/* raises no error */
+	RAISE_NO_ERROR;
 }
 
 ERROR_CODE _sendResponseHandlerDefault(struct HttpParser_t *httpParser) {

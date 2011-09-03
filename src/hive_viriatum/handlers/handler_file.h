@@ -54,14 +54,10 @@ typedef struct HandlerFileContext_t {
     unsigned char flags;
 } HandlerFileContext;
 
-void createHandlerFileContext(struct HandlerFileContext_t **handlerFileContextPointer);
-void deleteHandlerFileContext(struct HandlerFileContext_t *handlerFileContext);
-void setHandlerFile(struct HttpParser_t *httpParser, struct HttpSettings_t *httpSettings);
-void unsetHandlerFile(struct HttpParser_t *httpParser, struct HttpSettings_t *httpSettings);
-void setHttpParserHandlerFile(struct HttpParser_t *httpParser);
-void unsetHttpParserHandlerFile(struct HttpParser_t *httpParser);
-void setHttpSettingsHandlerFile(struct HttpSettings_t *httpSettings);
-void unsetHttpSettingsHandlerFile(struct HttpSettings_t *httpSettings);
+ERROR_CODE createHandlerFileContext(struct HandlerFileContext_t **handlerFileContextPointer);
+ERROR_CODE deleteHandlerFileContext(struct HandlerFileContext_t *handlerFileContext);
+ERROR_CODE setHandlerFile(struct HttpConnection_t *httpConnection);
+ERROR_CODE unsetHandlerFile(struct HttpConnection_t *httpConnection);
 ERROR_CODE messageBeginCallbackHandlerFile(struct HttpParser_t *httpParser);
 ERROR_CODE urlCallbackHandlerFile(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize);
 ERROR_CODE headerFieldCallbackHandlerFile(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize);
@@ -69,5 +65,9 @@ ERROR_CODE headerValueCallbackHandlerFile(struct HttpParser_t *httpParser, const
 ERROR_CODE headersCompleteCallbackHandlerFile(struct HttpParser_t *httpParser);
 ERROR_CODE bodyCallbackHandlerFile(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize);
 ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser);
+ERROR_CODE _setHttpParserHandlerFile(struct HttpParser_t *httpParser);
+ERROR_CODE _unsetHttpParserHandlerFile(struct HttpParser_t *httpParser);
+ERROR_CODE _setHttpSettingsHandlerFile(struct HttpSettings_t *httpSettings);
+ERROR_CODE _unsetHttpSettingsHandlerFile(struct HttpSettings_t *httpSettings);
 ERROR_CODE _cleanupHandlerFile(struct Connection_t *connection, struct Data_t *data, void *parameters);
 ERROR_CODE _sendChunkHandlerFile(struct Connection_t *connection, struct Data_t *data, void *parameter);
