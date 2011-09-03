@@ -457,9 +457,6 @@ ERROR_CODE writeConnection(struct Connection_t *connection, unsigned char *data,
     /* allocates the data */
     struct Data_t *_data;
 
-    /* retrieves the (connection) service */
-    struct Service_t *service = connection->service;
-
     /* creates the data */
     createData(&_data);
 
