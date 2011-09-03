@@ -248,81 +248,21 @@ ERROR_CODE _unsetHttpSettingsHandlerModule(struct HttpSettings_t *httpSettings) 
     RAISE_NO_ERROR;
 }
 
-/* The function we'll call from the lua script */
-static int average(lua_State *L)
-{
-    /* get number of arguments */
-    int n = lua_gettop(L);
-    double sum = 0;
-    int i;
-
-    printf("CHEGOU");
-
-    /* loop through each argument */
-    for (i = 1; i <= n; i++)
-    {
-            if (!lua_isnumber(L, i))
-        {
-              lua_pushstring(L, "Incorrect argument to 'average'");
-              lua_error(L);
-        }
-
-        /* total the arguments */
-        sum += lua_tonumber(L, i);
-    }
-
-    /* push the average */
-    lua_pushnumber(L, sum / n);
-
-    /* push the sum */
-    lua_pushnumber(L, sum);
-
-    /* return the number of results */
-    return 2;
-}
-
-
-
 ERROR_CODE _sendResponseHandlerModule(struct HttpParser_t *httpParser) {
-    /* allocates the response buffer */
-    char *responseBuffer = MALLOC(256);
-
     /* retrieves the connection from the http parser parameters */
     struct Connection_t *connection = (struct Connection_t *) httpParser->parameters;
 
-
     struct HttpConnection_t *httpConnection = (struct HttpConnection_t *) ((struct IoConnection_t *) connection->lower)->lower;
-
-
 
     struct ModLuaHttpHandler_t *modLuaHttpHandler = (struct ModLuaHttpHandler_t *) httpConnection->httpHandler->lower;
 
     ERROR_CODE resultCode;
 
-
-
-
-
-    /*lua_createtable(modLuaHttpHandler->luaState, 0, 0);*/
-
-
-
-    /*lua_pushstring(modLuaHttpHandler->luaState, "connection");*/
-
-    /* ISTO ESTA ERRADO TENHO DE ALTERAR */
     lua_pushlightuserdata(modLuaHttpHandler->luaState, (void *) httpParser);
     lua_setglobal(modLuaHttpHandler->luaState, "connection");
 
-    /*lua_settable(modLuaHttpHandler->luaState, -3);*/
-
-
-
-    /* register our function */
-    lua_register(modLuaHttpHandler->luaState, "write_connection", _luaWriteConnection);
-
-    lua_register(modLuaHttpHandler->luaState, "average", average);
-
-
+    /* register the write connection function */
+	lua_register(modLuaHttpHandler->luaState, "write_connection", _luaWriteConnection);
 
     /* runs the script */
     resultCode = luaL_dofile(modLuaHttpHandler->luaState, "c:/teste.lua");
@@ -414,8 +354,6 @@ static int _luaWriteConnection(lua_State *luaState) {
 
     /* writes the response to the connection */
     writeConnection(connection, (unsigned char *) buffer, dataSize, _sendResponseCallbackHandlerModule, (void *) httpParser->flags);
-
-    printf("VAI SAIR");
 
     /* return the number of results */
     return 0;
