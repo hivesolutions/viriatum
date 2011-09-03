@@ -385,13 +385,13 @@ ERROR_CODE writeHandlerStreamIo(struct Connection_t *connection) {
         deleteData(data);
     
 		/* in case the connection has been closed */
-		/*if(connection->status == STATUS_CLOSED) {*/
+		if(connection->status == STATUS_CLOSED) {
             /* sets the error flag (non fatal) */
-            /*error = 2;*/
+            error = 2;
 
 			/* breaks the loop */
-			/*break;*/
-		/*}*/
+			break;
+		}
 	}
 
     /* prints a debug message */
