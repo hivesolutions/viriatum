@@ -35,6 +35,7 @@
 struct Data_t;
 struct Polling_t;
 struct Connection_t;
+struct HttpHandler_t;
 
 
 typedef ERROR_CODE (*serviceHttpHandlerCreate) (struct Service_t *, struct HttpHandler_t **);
