@@ -49,6 +49,8 @@ ERROR_CODE startModule(struct Environment_t *environment, struct Module_t *modul
 
     struct ModLuaHttpHandler_t *modLuaHttpHandler;
 
+	/* retrieves the (environment) service */
+    struct Service_t *service = environment->service;
 
     /* prints a debug message */
     V_DEBUG_F("Starting the module '%s' (%s) v%s\n", name, description, version);
@@ -83,14 +85,7 @@ ERROR_CODE startModule(struct Environment_t *environment, struct Module_t *modul
 
 
     /* adds the http handler to the service */
-    environment->service->addHttpHandler(environment->service, httpHandler);
-
-
-
-
-
-
-
+    service->addHttpHandler(service, httpHandler);
 
 
 
