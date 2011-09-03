@@ -308,7 +308,7 @@ ERROR_CODE _sendResponseCallbackHandlerModule(struct Connection_t *connection, s
     RAISE_NO_ERROR;
 }
 
-static int _luaWriteConnection(lua_State *luaState) {
+int _luaWriteConnection(lua_State *luaState) {
     const char *data;
     unsigned int dataSize;
     struct HttpParser_t *httpParser;
