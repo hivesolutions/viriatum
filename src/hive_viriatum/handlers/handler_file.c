@@ -45,8 +45,8 @@ ERROR_CODE createHandlerFileContext(struct HandlerFileContext_t **handlerFileCon
     /* sets the handler file context in the  pointer */
     *handlerFileContextPointer = handlerFileContext;
 
-	/* raises no error */
-	RAISE_NO_ERROR;
+    /* raises no error */
+    RAISE_NO_ERROR;
 }
 
 ERROR_CODE deleteHandlerFileContext(struct HandlerFileContext_t *handlerFileContext) {
@@ -60,8 +60,8 @@ ERROR_CODE deleteHandlerFileContext(struct HandlerFileContext_t *handlerFileCont
     /* releases the handler file context */
     FREE(handlerFileContext);
 
-	/* raises no error */
-	RAISE_NO_ERROR;
+    /* raises no error */
+    RAISE_NO_ERROR;
 }
 
 ERROR_CODE setHandlerFile(struct HttpConnection_t *httpConnection) {
@@ -71,8 +71,8 @@ ERROR_CODE setHandlerFile(struct HttpConnection_t *httpConnection) {
     /* sets the http settings values */
     _setHttpSettingsHandlerFile(httpConnection->httpSettings);
 
-	/* raises no error */
-	RAISE_NO_ERROR;
+    /* raises no error */
+    RAISE_NO_ERROR;
 }
 
 ERROR_CODE unsetHandlerFile(struct HttpConnection_t *httpConnection) {
@@ -82,8 +82,8 @@ ERROR_CODE unsetHandlerFile(struct HttpConnection_t *httpConnection) {
     /* unsets the http settings values */
     _unsetHttpSettingsHandlerFile(httpConnection->httpSettings);
 
-	/* raises no error */
-	RAISE_NO_ERROR;
+    /* raises no error */
+    RAISE_NO_ERROR;
 }
 
 ERROR_CODE messageBeginCallbackHandlerFile(struct HttpParser_t *httpParser) {
@@ -196,8 +196,8 @@ ERROR_CODE _setHttpParserHandlerFile(struct HttpParser_t *httpParser) {
     /* sets the handler file context as the context for the http parser */
     httpParser->context = handlerFileContext;
 
-	/* raises no error */
-	RAISE_NO_ERROR;
+    /* raises no error */
+    RAISE_NO_ERROR;
 }
 
 ERROR_CODE _unsetHttpParserHandlerFile(struct HttpParser_t *httpParser) {
@@ -207,8 +207,8 @@ ERROR_CODE _unsetHttpParserHandlerFile(struct HttpParser_t *httpParser) {
     /* deletes the handler file context */
     deleteHandlerFileContext(handlerFileContext);
 
-	/* raises no error */
-	RAISE_NO_ERROR;
+    /* raises no error */
+    RAISE_NO_ERROR;
 }
 
 ERROR_CODE _resetHttpParserHandlerFile(struct HttpParser_t *httpParser) {
@@ -221,8 +221,8 @@ ERROR_CODE _resetHttpParserHandlerFile(struct HttpParser_t *httpParser) {
     /* unsets the handler file context flags */
     handlerFileContext->flags = 0;
 
-	/* raises no error */
-	RAISE_NO_ERROR;
+    /* raises no error */
+    RAISE_NO_ERROR;
 }
 
 ERROR_CODE _setHttpSettingsHandlerFile(struct HttpSettings_t *httpSettings) {
@@ -247,8 +247,8 @@ ERROR_CODE _setHttpSettingsHandlerFile(struct HttpSettings_t *httpSettings) {
     /* sets the http settings on message complete callback */
     httpSettings->onmessageComplete = messageCompleteCallbackHandlerFile;
 
-	/* raises no error */
-	RAISE_NO_ERROR;
+    /* raises no error */
+    RAISE_NO_ERROR;
 }
 
 ERROR_CODE _unsetHttpSettingsHandlerFile(struct HttpSettings_t *httpSettings) {
@@ -273,8 +273,8 @@ ERROR_CODE _unsetHttpSettingsHandlerFile(struct HttpSettings_t *httpSettings) {
     /* unsets the http settings on message complete callback */
     httpSettings->onmessageComplete = NULL;
 
-	/* raises no error */
-	RAISE_NO_ERROR;
+    /* raises no error */
+    RAISE_NO_ERROR;
 }
 
 ERROR_CODE _cleanupHandlerFile(struct Connection_t *connection, struct Data_t *data, void *parameters) {
