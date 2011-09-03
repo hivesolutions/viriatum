@@ -27,8 +27,17 @@
 
 #define LUA_ERROR(error) error == 1
 
+/**
+ * The structure that holds the internal
+ * structure to support the context
+ * of the lua module.s
+ */
 typedef struct ModLuaHttpHandler_t {
-    lua_State *luaState;
+    /**
+	 * The global lua state used over
+	 * all the operations in lua.
+	 */
+	lua_State *luaState;
 } ModLuaHttpHandler;
 
 ERROR_CODE createModLuaHttpHandler(struct ModLuaHttpHandler_t **modLuaHttpHandlerPonter, struct HttpHandler_t *httpHandlerPonter);

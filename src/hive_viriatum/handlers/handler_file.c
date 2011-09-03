@@ -29,7 +29,7 @@
 
 #include "handler_file.h"
 
-void createHandlerFileContext(struct HandlerFileContext_t **handlerFileContextPointer) {
+ERROR_CODE createHandlerFileContext(struct HandlerFileContext_t **handlerFileContextPointer) {
     /* retrieves the handler file context size */
     size_t handlerFileContextSize = sizeof(struct HandlerFileContext_t);
 
@@ -44,9 +44,12 @@ void createHandlerFileContext(struct HandlerFileContext_t **handlerFileContextPo
 
     /* sets the handler file context in the  pointer */
     *handlerFileContextPointer = handlerFileContext;
+
+	/* raises no error */
+	RAISE_NO_ERROR;
 }
 
-void deleteHandlerFileContext(struct HandlerFileContext_t *handlerFileContext) {
+ERROR_CODE deleteHandlerFileContext(struct HandlerFileContext_t *handlerFileContext) {
     /* in case there is a file defined in
     the handler file context */
     if(handlerFileContext->file != NULL) {
@@ -56,98 +59,31 @@ void deleteHandlerFileContext(struct HandlerFileContext_t *handlerFileContext) {
 
     /* releases the handler file context */
     FREE(handlerFileContext);
+
+	/* raises no error */
+	RAISE_NO_ERROR;
 }
 
-void setHandlerFile(struct HttpParser_t *httpParser, struct HttpSettings_t *httpSettings) {
+ERROR_CODE setHandlerFile(struct HttpConnection_t *httpConnection) {
     /* sets the http parser values */
-    setHttpParserHandlerFile(httpParser);
+    _setHttpParserHandlerFile(httpConnection->httpParser);
 
     /* sets the http settings values */
-    setHttpSettingsHandlerFile(httpSettings);
+    _setHttpSettingsHandlerFile(httpConnection->httpSettings);
+
+	/* raises no error */
+	RAISE_NO_ERROR;
 }
 
-void unsetHandlerFile(struct HttpParser_t *httpParser, struct HttpSettings_t *httpSettings) {
+ERROR_CODE unsetHandlerFile(struct HttpConnection_t *httpConnection) {
     /* unsets the http parser values */
-    unsetHttpParserHandlerFile(httpParser);
+    _unsetHttpParserHandlerFile(httpConnection->httpParser);
 
     /* unsets the http settings values */
-    unsetHttpSettingsHandlerFile(httpSettings);
-}
+    _unsetHttpSettingsHandlerFile(httpConnection->httpSettings);
 
-void setHttpParserHandlerFile(struct HttpParser_t *httpParser) {
-    /* allocates space for the handler file context */
-    struct HandlerFileContext_t *handlerFileContext;
-
-    /* creates the handler file context */
-    createHandlerFileContext(&handlerFileContext);
-
-    /* sets the handler file context as the context for the http parser */
-    httpParser->context = handlerFileContext;
-}
-
-void unsetHttpParserHandlerFile(struct HttpParser_t *httpParser) {
-    /* retrieves the handler file context from the http parser */
-    struct HandlerFileContext_t *handlerFileContext = (struct HandlerFileContext_t *) httpParser->context;
-
-    /* deletes the handler file context */
-    deleteHandlerFileContext(handlerFileContext);
-}
-
-void resetHttpParserHandlerFile(struct HttpParser_t *httpParser) {
-    /* retrieves the handler file context from the http parser */
-    struct HandlerFileContext_t *handlerFileContext = (struct HandlerFileContext_t *) httpParser->context;
-
-    /* unsets the handler file context file */
-    handlerFileContext->file = NULL;
-
-    /* unsets the handler file context flags */
-    handlerFileContext->flags = 0;
-}
-
-void setHttpSettingsHandlerFile(struct HttpSettings_t *httpSettings) {
-    /* sets the http settings on message begin callback */
-    httpSettings->onmessageBegin = messageBeginCallbackHandlerFile;
-
-    /* sets the http settings on url callback */
-    httpSettings->onurl = urlCallbackHandlerFile;
-
-    /* sets the http settings on header field callback */
-    httpSettings->onheaderField = headerFieldCallbackHandlerFile;
-
-    /* sets the http settings on header value callback */
-    httpSettings->onheaderValue = headerValueCallbackHandlerFile;
-
-    /* sets the http settings on headers complete callback */
-    httpSettings->onheadersComplete = headersCompleteCallbackHandlerFile;
-
-    /* sets the http settings on body callback */
-    httpSettings->onbody = bodyCallbackHandlerFile;
-
-    /* sets the http settings on message complete callback */
-    httpSettings->onmessageComplete = messageCompleteCallbackHandlerFile;
-}
-
-void unsetHttpSettingsHandlerFile(struct HttpSettings_t *httpSettings) {
-    /* unsets the http settings on message begin callback */
-    httpSettings->onmessageBegin = NULL;
-
-    /* unsets the http settings on url callback */
-    httpSettings->onurl = NULL;
-
-    /* unsets the http settings on header field callback */
-    httpSettings->onheaderField = NULL;
-
-    /* unsets the http settings on header value callback */
-    httpSettings->onheaderValue = NULL;
-
-    /* unsets the http settings on headers complete callback */
-    httpSettings->onheadersComplete = NULL;
-
-    /* unsets the http settings on body callback */
-    httpSettings->onbody = NULL;
-
-    /* unsets the http settings on message complete callback */
-    httpSettings->onmessageComplete = NULL;
+	/* raises no error */
+	RAISE_NO_ERROR;
 }
 
 ERROR_CODE messageBeginCallbackHandlerFile(struct HttpParser_t *httpParser) {
@@ -248,6 +184,97 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
 
     /* raise no error */
     RAISE_NO_ERROR;
+}
+
+ERROR_CODE _setHttpParserHandlerFile(struct HttpParser_t *httpParser) {
+    /* allocates space for the handler file context */
+    struct HandlerFileContext_t *handlerFileContext;
+
+    /* creates the handler file context */
+    createHandlerFileContext(&handlerFileContext);
+
+    /* sets the handler file context as the context for the http parser */
+    httpParser->context = handlerFileContext;
+
+	/* raises no error */
+	RAISE_NO_ERROR;
+}
+
+ERROR_CODE _unsetHttpParserHandlerFile(struct HttpParser_t *httpParser) {
+    /* retrieves the handler file context from the http parser */
+    struct HandlerFileContext_t *handlerFileContext = (struct HandlerFileContext_t *) httpParser->context;
+
+    /* deletes the handler file context */
+    deleteHandlerFileContext(handlerFileContext);
+
+	/* raises no error */
+	RAISE_NO_ERROR;
+}
+
+ERROR_CODE _resetHttpParserHandlerFile(struct HttpParser_t *httpParser) {
+    /* retrieves the handler file context from the http parser */
+    struct HandlerFileContext_t *handlerFileContext = (struct HandlerFileContext_t *) httpParser->context;
+
+    /* unsets the handler file context file */
+    handlerFileContext->file = NULL;
+
+    /* unsets the handler file context flags */
+    handlerFileContext->flags = 0;
+
+	/* raises no error */
+	RAISE_NO_ERROR;
+}
+
+ERROR_CODE _setHttpSettingsHandlerFile(struct HttpSettings_t *httpSettings) {
+    /* sets the http settings on message begin callback */
+    httpSettings->onmessageBegin = messageBeginCallbackHandlerFile;
+
+    /* sets the http settings on url callback */
+    httpSettings->onurl = urlCallbackHandlerFile;
+
+    /* sets the http settings on header field callback */
+    httpSettings->onheaderField = headerFieldCallbackHandlerFile;
+
+    /* sets the http settings on header value callback */
+    httpSettings->onheaderValue = headerValueCallbackHandlerFile;
+
+    /* sets the http settings on headers complete callback */
+    httpSettings->onheadersComplete = headersCompleteCallbackHandlerFile;
+
+    /* sets the http settings on body callback */
+    httpSettings->onbody = bodyCallbackHandlerFile;
+
+    /* sets the http settings on message complete callback */
+    httpSettings->onmessageComplete = messageCompleteCallbackHandlerFile;
+
+	/* raises no error */
+	RAISE_NO_ERROR;
+}
+
+ERROR_CODE _unsetHttpSettingsHandlerFile(struct HttpSettings_t *httpSettings) {
+    /* unsets the http settings on message begin callback */
+    httpSettings->onmessageBegin = NULL;
+
+    /* unsets the http settings on url callback */
+    httpSettings->onurl = NULL;
+
+    /* unsets the http settings on header field callback */
+    httpSettings->onheaderField = NULL;
+
+    /* unsets the http settings on header value callback */
+    httpSettings->onheaderValue = NULL;
+
+    /* unsets the http settings on headers complete callback */
+    httpSettings->onheadersComplete = NULL;
+
+    /* unsets the http settings on body callback */
+    httpSettings->onbody = NULL;
+
+    /* unsets the http settings on message complete callback */
+    httpSettings->onmessageComplete = NULL;
+
+	/* raises no error */
+	RAISE_NO_ERROR;
 }
 
 ERROR_CODE _cleanupHandlerFile(struct Connection_t *connection, struct Data_t *data, void *parameters) {

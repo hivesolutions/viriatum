@@ -342,10 +342,10 @@ ERROR_CODE _sendResponseHandlerModule(struct HttpParser_t *httpParser) {
 
 
     /* writes the http static headers to the response */
-    SPRINTF(responseBuffer, 256, "HTTP/1.1 200 OK\r\nServer: %s/%s (%s @ %s)\r\nConnection: Keep-Alive\r\nContent-Length: 14\r\n\r\nHello Viriatum", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU);
+    /*SPRINTF(responseBuffer, 256, "HTTP/1.1 200 OK\r\nServer: %s/%s (%s @ %s)\r\nConnection: Keep-Alive\r\nContent-Length: 14\r\n\r\nHello Viriatum", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU);*/
 
     /* writes the response to the connection */
-    writeConnection(connection, (unsigned char *) responseBuffer, strlen(responseBuffer), _sendResponseCallbackHandlerModule, (void *) httpParser->flags);
+    /*writeConnection(connection, (unsigned char *) responseBuffer, strlen(responseBuffer), _sendResponseCallbackHandlerModule, (void *) httpParser->flags);*/
 
     /* raise no error */
     RAISE_NO_ERROR;
@@ -369,13 +369,12 @@ static int _luaWriteConnection(lua_State *luaState) {
     /* get number of arguments */
     int n = lua_gettop(luaState);
     const char *data;
+	unsigned int dataSize;
     struct HttpParser_t *httpParser;
     struct Connection_t *connection;
+	unsigned char *buffer;
 
-    printf("CHEGOU AKIO %d!!!!!", n);
-
-    printf("Chegou aki");
-
+	/* retrieves the number of argument available */
     n = lua_gettop(luaState);
 
     if(n != 2) {
@@ -385,14 +384,14 @@ static int _luaWriteConnection(lua_State *luaState) {
         printf("Invalid number of arguments");
     }
 
-    if(!lua_isstring(luaState, 2)) {
+    if(!lua_isstring(luaState, -1)) {
         printf("Incorrect argument 'expected string'");
 
         lua_pushstring(luaState, "Incorrect argument to 'expected string'");
         lua_error(luaState);
     }
 
-    data = lua_tostring(luaState, 2);
+    data = lua_tostring(luaState, -1);
 
     if(!lua_islightuserdata(luaState, 1)) {
         printf("Incorrect argument 'expected lightuserdata'");
@@ -401,22 +400,20 @@ static int _luaWriteConnection(lua_State *luaState) {
         lua_error(luaState);
     }
 
-    httpParser = (struct HttpParser_t *) lua_touserdata(luaState, 1);
+    httpParser = (struct HttpParser_t *) lua_touserdata(luaState, -2);
 
-    printf("Chegou aki 3 %s %d", data, httpParser);
+	/* retrieves the data (string) size */
+	dataSize = strlen(data);
 
-     /* retrieves the connection from the http parser parameters */
+	/* retrieves the connection from the http parser parameters */
     connection = (struct Connection_t *) httpParser->parameters;
 
-    printf("VAI ENVIAR MENSAGEM");
+	buffer = (unsigned char *) MALLOC(dataSize * sizeof(unsigned char));
 
-
-
-    /* TENHO DE ALOCA UM BUFFER PARA A STRING */
-
+	memcpy(buffer, data, dataSize);
 
     /* writes the response to the connection */
-    writeConnection(connection, (unsigned char *) data, strlen(data), _sendResponseCallbackHandlerModule, (void *) httpParser->flags);
+    writeConnection(connection, (unsigned char *) buffer, dataSize, _sendResponseCallbackHandlerModule, (void *) httpParser->flags);
 
     printf("VAI SAIR");
 

@@ -34,12 +34,8 @@
 struct Data_t;
 struct Connection_t;
 
-void setHandlerDefault(struct HttpParser_t *httpParser, struct HttpSettings_t *httpSettings);
-void unsetHandlerDefault(struct HttpParser_t *httpParser, struct HttpSettings_t *httpSettings);
-void setHttpParserHandlerDefault(struct HttpParser_t *httpParser);
-void unsetHttpParserHandlerDefault(struct HttpParser_t *httpParser);
-void setHttpSettingsHandlerDefault(struct HttpSettings_t *httpSettings);
-void unsetHttpSettingsHandlerDefault(struct HttpSettings_t *httpSettings);
+ERROR_CODE setHandlerDefault(struct HttpConnection_t *httpConnection);
+ERROR_CODE unsetHandlerDefault(struct HttpConnection_t *httpConnection);
 ERROR_CODE messageBeginCallbackHandlerDefault(struct HttpParser_t *httpParser);
 ERROR_CODE urlCallbackHandlerDefault(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize);
 ERROR_CODE headerFieldCallbackHandlerDefault(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize);
@@ -47,5 +43,9 @@ ERROR_CODE headerValueCallbackHandlerDefault(struct HttpParser_t *httpParser, co
 ERROR_CODE headersCompleteCallbackHandlerDefault(struct HttpParser_t *httpParser);
 ERROR_CODE bodyCallbackHandlerDefault(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize);
 ERROR_CODE messageCompleteCallbackHandlerDefault(struct HttpParser_t *httpParser);
+ERROR_CODE _setHttpParserHandlerDefault(struct HttpParser_t *httpParser);
+ERROR_CODE _unsetHttpParserHandlerDefault(struct HttpParser_t *httpParser);
+ERROR_CODE _setHttpSettingsHandlerDefault(struct HttpSettings_t *httpSettings);
+ERROR_CODE _unsetHttpSettingsHandlerDefault(struct HttpSettings_t *httpSettings);
 ERROR_CODE _sendResponseHandlerDefault(struct HttpParser_t *httpParser);
 ERROR_CODE _sendResponseCallbackHandlerDefault(struct Connection_t *connection, struct Data_t *data, void *parameters);

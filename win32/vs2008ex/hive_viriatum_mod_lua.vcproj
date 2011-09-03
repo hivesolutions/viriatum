@@ -61,6 +61,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				IgnoreDefaultLibraryNames="msvcrt"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -130,6 +131,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				IgnoreDefaultLibraryNames="msvcrtd"
 			/>
 			<Tool
 				Name="VCALinkTool"

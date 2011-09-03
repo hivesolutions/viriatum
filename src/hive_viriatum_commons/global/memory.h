@@ -31,12 +31,12 @@
 extern size_t allocations;
 #define ALLOCATIONS allocations
 #define START_MEMORY size_t allocations = 0
-#define MALLOC(size) mallocDebug(size)
+#define MALLOC(size) mallocDebug(size, __FILE__, __LINE__)
 #define CALLOC(count, size) calloc(count, size)
 #define REALLOC(pointer, size) realloc(pointer, size)
-#define FREE(pointer) freeDebug(pointer)
-static __inline void *mallocDebug(size_t size) { allocations++; return malloc(size); }
-static __inline void freeDebug(void *pointer) { allocations--; free(pointer); }
+#define FREE(pointer) freeDebug(pointer, __FILE__, __LINE__)
+static __inline void *mallocDebug(size_t size, char *file, int line) { printf("malloc() %s: %d\n",  file, line);  allocations++; return malloc(size); }
+static __inline void freeDebug(void *pointer, char *file, int line) { printf("free() %s: %d\n", file, line); allocations--; free(pointer); }
 #endif
 
 #ifndef VIRIATUM_DEBUG
