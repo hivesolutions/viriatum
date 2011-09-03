@@ -28,6 +28,7 @@
 #pragma once
 
 #include "../http/http.h"
+#include "../stream/stream.h"
 #include "../system/system.h"
 
 /* forward references (avoids loop) */
