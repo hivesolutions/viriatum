@@ -267,8 +267,15 @@ ERROR_CODE _sendResponseHandlerModule(struct HttpParser_t *httpParser) {
     /* register the write connection function */
     lua_register(modLuaHttpHandler->luaState, "write_connection", _luaWriteConnection);
 
+	#ifdef VIRIATUM_PLATFORM_WIN32
     /* runs the script */
     resultCode = luaL_dofile(modLuaHttpHandler->luaState, "c:/teste.lua");
+	#endif
+
+	#ifdef VIRIATUM_PLATFORM_UNIX
+    /* runs the script */
+    resultCode = luaL_dofile(modLuaHttpHandler->luaState, "/teste.lua");
+	#endif
 
     /* in case there was an error in lua */
     if(LUA_ERROR(resultCode)) {
