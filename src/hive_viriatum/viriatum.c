@@ -137,7 +137,7 @@ int main(int argc, char *argv[]) {
     /* tests the error code for error */
     if(IS_ERROR_CODE(returnValue)) {
         /* prints an error message */
-        V_ERROR_F("Problem running service (%s)\n", GET_ERROR());
+        V_ERROR_F("Problem running service (%s)\n", (char *) GET_ERROR());
     }
 
     /* prints a debug message */
