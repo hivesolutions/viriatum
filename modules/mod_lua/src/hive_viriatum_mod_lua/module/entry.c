@@ -49,7 +49,7 @@ ERROR_CODE startModule(struct Environment_t *environment, struct Module_t *modul
 
     struct ModLuaHttpHandler_t *modLuaHttpHandler;
 
-	/* retrieves the (environment) service */
+    /* retrieves the (environment) service */
     struct Service_t *service = environment->service;
 
     /* prints a debug message */

@@ -79,9 +79,6 @@ ERROR_CODE acceptHandlerStreamIo(struct Connection_t *connection) {
     /* calculates the size of the socket address */
     SOCKET_ADDRESS_SIZE clientSocketAddressSize = sizeof(SOCKET_ADDRESS);
 
-    /* retrieves the io connection */
-    struct IoConnection_t *ioConnection = (struct IoConnection_t *) connection->lower;
-
     /* iterates continuously */
     while(1) {
         /* accepts the socket, retrieving the socket handle */

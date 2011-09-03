@@ -259,6 +259,14 @@ ERROR_CODE _sendResponseHandlerModule(struct HttpParser_t *httpParser) {
 
     struct ModLuaHttpHandler_t *modLuaHttpHandler = (struct ModLuaHttpHandler_t *) httpConnection->httpHandler->lower;
 
+    #ifdef VIRIATUM_PLATFORM_WIN32
+    char *filePath = "c:/teste.lua";
+    #endif
+
+    #ifdef VIRIATUM_PLATFORM_UNIX
+    char *filePath = "/teste.lua";
+    #endif
+
     ERROR_CODE resultCode;
 
     lua_pushlightuserdata(modLuaHttpHandler->luaState, (void *) httpParser);
@@ -267,20 +275,13 @@ ERROR_CODE _sendResponseHandlerModule(struct HttpParser_t *httpParser) {
     /* register the write connection function */
     lua_register(modLuaHttpHandler->luaState, "write_connection", _luaWriteConnection);
 
-	#ifdef VIRIATUM_PLATFORM_WIN32
     /* runs the script */
-    resultCode = luaL_dofile(modLuaHttpHandler->luaState, "c:/teste.lua");
-	#endif
-
-	#ifdef VIRIATUM_PLATFORM_UNIX
-    /* runs the script */
-    resultCode = luaL_dofile(modLuaHttpHandler->luaState, "/teste.lua");
-	#endif
+    resultCode = luaL_dofile(modLuaHttpHandler->luaState, filePath);
 
     /* in case there was an error in lua */
     if(LUA_ERROR(resultCode)) {
         /* prints a warning message */
-        V_WARNING_F("There was a problem executing: %s\n" , "c:/teste.lua");
+        V_WARNING_F("There was a problem executing: %s\n" , filePath);
 
         /* cleanup lua */
         lua_close(modLuaHttpHandler->luaState);
@@ -289,21 +290,13 @@ ERROR_CODE _sendResponseHandlerModule(struct HttpParser_t *httpParser) {
         RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem executing script file");
     }
 
-
-
-    /* writes the http static headers to the response */
-    /*SPRINTF(responseBuffer, 256, "HTTP/1.1 200 OK\r\nServer: %s/%s (%s @ %s)\r\nConnection: Keep-Alive\r\nContent-Length: 14\r\n\r\nHello Viriatum", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU);*/
-
-    /* writes the response to the connection */
-    /*writeConnection(connection, (unsigned char *) responseBuffer, strlen(responseBuffer), _sendResponseCallbackHandlerModule, (void *) httpParser->flags);*/
-
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
 ERROR_CODE _sendResponseCallbackHandlerModule(struct Connection_t *connection, struct Data_t *data, void *parameters) {
-	/* retrieves the http parser */
-	struct HttpParser_t *httpParser = (struct HttpParser_t *) parameters;
+    /* retrieves the http parser */
+    struct HttpParser_t *httpParser = (struct HttpParser_t *) parameters;
 
     /* in case the connection is not meant to be kept alive */
     if(!(httpParser->flags & FLAG_CONNECTION_KEEP_ALIVE)) {

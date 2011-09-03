@@ -238,8 +238,8 @@ ERROR_CODE _sendResponseHandlerDefault(struct HttpParser_t *httpParser) {
 }
 
 ERROR_CODE _sendResponseCallbackHandlerDefault(struct Connection_t *connection, struct Data_t *data, void *parameters) {
-	/* retrieves the http parser */
-	struct HttpParser_t *httpParser = (struct HttpParser_t *) parameters;
+    /* retrieves the http parser */
+    struct HttpParser_t *httpParser = (struct HttpParser_t *) parameters;
 
     /* in case the connection is not meant to be kept alive */
     if(!(httpParser->flags & FLAG_CONNECTION_KEEP_ALIVE)) {
