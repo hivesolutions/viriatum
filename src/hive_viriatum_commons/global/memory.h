@@ -30,7 +30,7 @@
 #include "../util/string_util.h"
 
 #ifdef VIRIATUM_DEBUG
-VIRIATUM_EXTERNAL_PREFIX size_t allocations;
+VIRIATUM_EXTERNAL_PREFIX allocations;
 #define ALLOCATIONS allocations
 #define START_MEMORY VIRIATUM_EXTERNAL_PREFIX size_t allocations = 0;
 #define MALLOC(size) mallocDebug(size, baseStringValue((unsigned char *) __FILE__), __LINE__)
@@ -50,7 +50,7 @@ static __inline void freeDebug(void *pointer, char *file, int line) { allocation
 #endif
 
 #ifndef VIRIATUM_DEBUG
-VIRIATUM_EXTERNAL_PREFIX size_t allocations;
+VIRIATUM_EXTERNAL_PREFIX allocations;
 #define ALLOCATIONS allocations
 #define START_MEMORY VIRIATUM_EXTERNAL_PREFIX size_t allocations = -1
 #define MALLOC(size) malloc(size)
