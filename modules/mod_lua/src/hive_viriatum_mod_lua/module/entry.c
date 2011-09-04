@@ -38,6 +38,8 @@ ERROR_CODE createModLuaModule(struct ModLuaModule_t **modLuaModulePointer, struc
 
      /* sets the mod lua module attributes (default) values */
     modLuaModule->luaState = NULL;
+    modLuaModule->httpHandler = NULL;
+    modLuaModule->modLuaHttpHandler = NULL;
 
     /* sets the mod lua module in the (upper) module substrate */
     module->lower = (void *) modLuaModule;
@@ -97,11 +99,8 @@ ERROR_CODE startModule(struct Environment_t *environment, struct Module_t *modul
     /* load various lua libraries */
     luaL_openlibs(luaState);
 
-    /* sets the lua state in the mod lua module */
-    modLuaModule->luaState = luaState;
-
     /* creates the http handler */
-    environment->service->createHttpHandler(environment->service, &httpHandler);
+    service->createHttpHandler(service, &httpHandler);
 
     /* creates the mod lua http handler */
     createModLuaHttpHandler(&modLuaHttpHandler, httpHandler);
@@ -113,6 +112,11 @@ ERROR_CODE startModule(struct Environment_t *environment, struct Module_t *modul
 
     /* sets the mod lua handler attributes */
     modLuaHttpHandler->luaState = luaState;
+
+    /* sets the mod lua module attributes */
+    modLuaModule->luaState = luaState;
+    modLuaModule->httpHandler = httpHandler;
+    modLuaModule->modLuaHttpHandler = modLuaHttpHandler;
 
     /* adds the http handler to the service */
     service->addHttpHandler(service, httpHandler);
@@ -131,14 +135,40 @@ ERROR_CODE stopModule(struct Environment_t *environment, struct Module_t *module
     /* retrieves the description */
     unsigned char *description = descriptionViriatumModLua();
 
+    /* retrieves the (environment) service */
+    struct Service_t *service = environment->service;
+
     /* retrieves the mod lua module (from the module) */
     struct ModLuaModule_t *modLuaModule = (struct  ModLuaModule_t *) module->lower;
 
     /* retrieves the lua state from the mod lua module */
     lua_State *luaState = modLuaModule->luaState;
 
+    /* retrieves the http handler from the mod lua module */
+    struct HttpHandler_t *httpHandler = modLuaModule->httpHandler;
+
+    /* retrieves the mod lua http handler from the mod lua module */
+    struct ModLuaHttpHandler_t *modLuaHttpHandler = modLuaModule->modLuaHttpHandler;
+
     /* prints a debug message */
     V_DEBUG_F("Stoping the module '%s' (%s) v%s\n", name, description, version);
+
+    /* removes the http handler from the service */
+    service->removeHttpHandler(service, httpHandler);
+
+    /* in case the mod lua http handler is valid and
+    initialized (correct state) */
+    if(modLuaHttpHandler != NULL) {
+        /* deletes the mod lua http handler */
+        deleteModLuaHttpHandler(modLuaHttpHandler);
+    }
+
+    /* in case the http handler is valid and
+    initialized (correct state) */
+    if(httpHandler != NULL) {
+        /* deletes the http handler */
+        service->deleteHttpHandler(service, httpHandler);
+    }
 
     /* in case the lua state is valid and
     initialized (correct state) */

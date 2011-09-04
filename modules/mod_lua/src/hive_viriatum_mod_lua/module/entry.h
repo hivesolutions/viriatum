@@ -38,6 +38,14 @@ typedef struct ModLuaModule_t {
      * all the operations in lua.
      */
     lua_State *luaState;
+
+    struct HttpHandler_t *httpHandler;
+
+    /**
+     * The mod lua http handler associated
+     * with the module.
+     */
+    struct ModLuaHttpHandler_t *modLuaHttpHandler;
 } ModLuaModule;
 
 VIRIATUM_EXPORT_PREFIX ERROR_CODE createModLuaModule(struct ModLuaModule_t **modLuaModulePointer, struct Module_t *module);

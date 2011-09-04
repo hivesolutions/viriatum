@@ -225,6 +225,7 @@ typedef struct Service_t {
     struct LinkedList_t *httpHandlersList;
 
     serviceHttpHandlerCreate createHttpHandler;
+    serviceHttpHandlerUpdate deleteHttpHandler;
     serviceHttpHandlerUpdate addHttpHandler;
     serviceHttpHandlerUpdate removeHttpHandler;
 } Service;

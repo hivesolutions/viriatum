@@ -97,7 +97,7 @@ ERROR_CODE createHttpConnection(struct HttpConnection_t **httpConnectionPointer,
     /* sets the structures for the handler */
     httpHandler->set(httpConnection);
 
-	/*setHandlerFile(httpConnection);*/
+    /*setHandlerFile(httpConnection);*/
 
 
 
@@ -123,7 +123,7 @@ ERROR_CODE deleteHttpConnection(struct HttpConnection_t *httpConnection) {
     /* unsets the structures for the handler */
     httpHandler->unset(httpConnection);
 
-	/*unsetHandlerFile(httpConnection);*/
+    /*unsetHandlerFile(httpConnection);*/
 
 
 
