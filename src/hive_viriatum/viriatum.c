@@ -29,6 +29,9 @@
 
 #include "viriatum.h"
 
+/* starts the memory structures */
+START_MEMORY;
+
 static struct Service_t *service;
 
 ERROR_CODE runService() {
