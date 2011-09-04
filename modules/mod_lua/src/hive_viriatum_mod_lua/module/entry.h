@@ -27,7 +27,22 @@
 
 #include "handler.h"
 
+/**
+ * Structure describing the internal
+ * structures and information for the
+ * mod lua module.
+ */
+typedef struct ModLuaModule_t {
+    /**
+     * The global lua state used over
+     * all the operations in lua.
+     */
+    lua_State *luaState;
+} ModLuaModule;
+
+VIRIATUM_EXPORT_PREFIX ERROR_CODE createModLuaModule(struct ModLuaModule_t **modLuaModulePointer, struct Module_t *module);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE deleteModLuaModule(struct ModLuaModule_t *modLuaModule);
 VIRIATUM_EXPORT_PREFIX ERROR_CODE startModule(struct Environment_t *environment, struct Module_t *module);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE stopModule();
+VIRIATUM_EXPORT_PREFIX ERROR_CODE stopModule(struct Environment_t *environment, struct Module_t *module);
 VIRIATUM_EXPORT_PREFIX ERROR_CODE infoModule(struct Module_t *module);
 VIRIATUM_EXPORT_PREFIX ERROR_CODE errorModule(unsigned char **messagePointer);

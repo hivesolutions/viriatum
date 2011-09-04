@@ -30,9 +30,8 @@
 #include "../util/string_util.h"
 
 #ifdef VIRIATUM_DEBUG
-extern size_t allocations;
+VIRIATUM_EXPORT_PREFIX size_t allocations;
 #define ALLOCATIONS allocations
-#define START_MEMORY size_t allocations = 0
 #define MALLOC(size) mallocDebug(size, baseStringValue((unsigned char *) __FILE__), __LINE__)
 #define CALLOC(count, size) callocDebug(count, size, baseStringValue((unsigned char *) __FILE__), __LINE__)
 #define REALLOC(pointer, size) realloc(pointer, size)
@@ -50,9 +49,8 @@ static __inline void freeDebug(void *pointer, char *file, int line) { allocation
 #endif
 
 #ifndef VIRIATUM_DEBUG
-extern size_t allocations;
+VIRIATUM_EXPORT_PREFIX size_t allocations = -1;
 #define ALLOCATIONS allocations
-#define START_MEMORY size_t allocations = -1
 #define MALLOC(size) malloc(size)
 #define CALLOC(count, size) calloc(count, size)
 #define REALLOC(pointer, size) realloc(pointer, size)

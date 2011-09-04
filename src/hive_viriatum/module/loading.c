@@ -69,6 +69,7 @@ ERROR_CODE createModule(struct Module_t **modulePointer) {
     module->stop = NULL;
     module->info = NULL;
     module->error = NULL;
+    module->lower = NULL;
 
     /* sets the module in the module pointer */
     *modulePointer = module;
@@ -143,6 +144,9 @@ ERROR_CODE loadModule(struct Service_t *service, unsigned char *modulePath) {
     /* creates the module */
     createModule(&module);
 
+    /* sets the module attributes */
+    module->environment = environment;
+
     /* sets the environment attributes */
     environment->service = service;
 
@@ -164,6 +168,9 @@ ERROR_CODE loadModule(struct Service_t *service, unsigned char *modulePath) {
         V_WARNING_F("%s\n", GET_ERROR_MODULE(module));
     }
 
+    /* adds the module to the list of modlues handlers in the service */
+    appendValueLinkedList(service->modulesList, (void *) module);
+
     /* calls the stop module function */
     /*errorCode = module->stop(environment, module);*/
 
@@ -178,6 +185,38 @@ ERROR_CODE loadModule(struct Service_t *service, unsigned char *modulePath) {
 
     /* deletes the environment */
     /*deleteEnvironment(environment);*/
+
+    /* unloads the library */
+    /*UNLOAD_LIBRARY(modLibrary);*/
+
+    /* raise no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE unloadModule(struct Service_t *service, struct Module_t *module) {
+    /* allocates the error code */
+    ERROR_CODE errorCode;
+
+    /* retrieves the environment from the module */
+    struct Environment_t *environment = module->environment;
+
+    /* removes the module from the list of modlues handlers in the service */
+    removeValueLinkedList(service->modulesList, (void *) module, 1);
+
+    /* calls the stop module function */
+    errorCode = module->stop(environment, module);
+
+    /* tests the error code for error */
+    if(IS_ERROR_CODE(errorCode)) {
+        /* prints a warning message */
+        V_WARNING_F("%s\n", GET_ERROR_MODULE(module));
+    }
+
+    /* deletes the module */
+    deleteModule(module);
+
+    /* deletes the environment */
+    deleteModule(environment);
 
     /* unloads the library */
     /*UNLOAD_LIBRARY(modLibrary);*/
