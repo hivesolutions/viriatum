@@ -216,7 +216,7 @@ ERROR_CODE unloadModule(struct Service_t *service, struct Module_t *module) {
     deleteModule(module);
 
     /* deletes the environment */
-    deleteModule(environment);
+    deleteEnvironment(environment);
 
     /* unloads the library */
     /*UNLOAD_LIBRARY(modLibrary);*/
