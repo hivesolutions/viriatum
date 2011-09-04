@@ -29,9 +29,6 @@
 
 #include "handler.h"
 
-/* starts the memory structures */
-START_MEMORY;
-
 ERROR_CODE createModLuaHttpHandler(struct ModLuaHttpHandler_t **modLuaHttpHandlerPointer, struct HttpHandler_t *httpHandler) {
     /* retrieves the mod lua http handler size */
     size_t modLuaHttpHandlerSize = sizeof(struct ModLuaHttpHandler_t);
@@ -309,11 +306,20 @@ ERROR_CODE _sendResponseCallbackHandlerModule(struct Connection_t *connection, s
 }
 
 int _luaWriteConnection(lua_State *luaState) {
+    /* allocates the data (original message data) */
     const char *data;
-    unsigned int dataSize;
-    struct HttpParser_t *httpParser;
-    struct Connection_t *connection;
+
+    /* allocates the (final) buffer to send the message */
     unsigned char *buffer;
+
+    /* allocates the data size */
+    unsigned int dataSize;
+
+    /* allocates the http parser */
+    struct HttpParser_t *httpParser;
+
+    /* allocates the connection */
+    struct Connection_t *connection;
 
     /* retrieves the number of (received) arguments */
     unsigned int numberArguments = lua_gettop(luaState);
@@ -329,21 +335,26 @@ int _luaWriteConnection(lua_State *luaState) {
     }
 
     if(!lua_isstring(luaState, -1)) {
-        printf("Incorrect argument 'expected string'");
+        /* prints a warning message */
+        V_WARNING("Incorrect argument 'expected string'");
 
+        /* pushes an error message to lua */
         lua_pushstring(luaState, "Incorrect argument to 'expected string'");
         lua_error(luaState);
     }
 
-    data = lua_tostring(luaState, -1);
-
     if(!lua_islightuserdata(luaState, 1)) {
-        printf("Incorrect argument 'expected lightuserdata'");
+        /* prints a warning message */
+        V_WARNING("Incorrect argument 'expected lightuserdata'");
 
         lua_pushstring(luaState, "Incorrect argument 'expected lightuserdata'");
         lua_error(luaState);
     }
 
+    /* converts the second argument into a string */
+    data = lua_tostring(luaState, -1);
+
+    /* converts the first argument into http parser structure */
     httpParser = (struct HttpParser_t *) lua_touserdata(luaState, -2);
 
     /* retrieves the data (string) size */

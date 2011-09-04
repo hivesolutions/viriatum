@@ -27,8 +27,11 @@
 
 #pragma once
 
+#include "../system/system.h"
+
 #define GET_ERROR_MODULE(module) getErrorMessageModule(module)
 
+/* forward references (avoids loop) */
 struct Module_t;
 struct Environment_t;
 
@@ -44,15 +47,20 @@ struct Environment_t;
  * @param module The module structure to be
  * populated by the module.
  */
-typedef ERROR_CODE (*viriatumStartModule)(struct Environment_t *environment, struct Module_t *module);
+typedef ERROR_CODE (*viriatumStartModule) (struct Environment_t *environment, struct Module_t *module);
 
 /**
  * Function used for stopping a module.
  * During this destruction all the module
  * internal structures shall be closed and
  * destroyed.
+ *
+ * @param environment Module environment structures used
+ * to help stoping the module.
+ * @param The model structure to be used in
+ * the stoping of the module.
  */
-typedef ERROR_CODE (*viriatumStopModule)();
+typedef ERROR_CODE (*viriatumStopModule) (struct Environment_t *environment, struct Module_t *module);
 
 /**
  * Function used to retrieve information
@@ -63,7 +71,7 @@ typedef ERROR_CODE (*viriatumStopModule)();
  * @param module The module structure to be
  * populated by the module.
  */
-typedef ERROR_CODE (*viriatumInfoModule)(struct Module_t *module);
+typedef ERROR_CODE (*viriatumInfoModule) (struct Module_t *module);
 
 /**
  * Function used to retrieve information
@@ -129,6 +137,12 @@ typedef struct Module_t {
     unsigned short type;
 
     /**
+     * The environment used to load
+     * the module.
+     */
+    struct Environment_t *environment;
+
+    /**
      * The function called to start
      * the module.
      */
@@ -152,6 +166,12 @@ typedef struct Module_t {
      * last occurring error in the module.
      */
     viriatumErrorModule error;
+
+    /**
+     * Reference to the lower level
+     * module substrate (child).
+     */
+    void *lower;
 } Module;
 
 /**
@@ -200,6 +220,19 @@ ERROR_CODE deleteModule(struct Module_t *module);
  * @return The resulting error code.
  */
 ERROR_CODE loadModule(struct Service_t *service, unsigned char *modulePath);
+
+/**
+ * Unloads the module in the given module structure.
+ * The loading of the module implies the unregistering
+ * from the service.
+ *
+ * @param service The base service to unload the module
+ * from.
+ * @param module The structure describing the module
+ * to be unloaded.
+ * @return The resulting error code.
+ */
+ERROR_CODE unloadModule(struct Service_t *service, struct Module_t *module);
 
 /**
  * Retrieves the (last) error message for the given module.

@@ -26,3 +26,28 @@
 */
 
 #pragma once
+
+/* forward references (avoids loop) */
+struct Service_t;
+struct HttpHandler_t;
+
+typedef struct Globals_t {
+    unsigned char *lastErrorMessage;
+
+    /**
+     * The current active service in the
+     * global environment.
+     */
+    struct Service_t *service;
+
+    /**
+     * The list of http handlers available
+     * for the global environment.
+     */
+    struct LinkedList_t *httpHandlersList;
+
+
+    /*serviceHttpHandlerCreate createHttpHandler;
+    serviceHttpHandlerUpdate addHttpHandler;
+    serviceHttpHandlerUpdate removeHttpHandler;*/
+} Globals;

@@ -73,6 +73,8 @@ void createService(struct Service_t **servicePointer) {
     /* creates the connections list */
     createLinkedList(&service->connectionsList);
 
+    /* creates the http modules list */
+    createLinkedList(&service->modulesList);
 
 
 
@@ -98,7 +100,8 @@ void deleteService(struct Service_t *service) {
     deleteLinkedList(service->httpHandlersList);
 
 
-
+    /* deletes the http modules list */
+    deleteLinkedList(service->modulesList);
 
     /* deletes the connections list */
     deleteLinkedList(service->connectionsList);
@@ -189,30 +192,14 @@ ERROR_CODE startService(struct Service_t *service) {
     /* allocates the memory ussage */
     size_t memoryUsage;
 
-    /* allocates the error code */
-    ERROR_CODE errorCode;
-
     /* allocates the option value and sets it to one (valid) */
     SOCKET_OPTION optionValue = 1;
 
     /* sets the flags to be used in socket */
     SOCKET_FLAGS flags = 1;
 
-    #ifdef VIRIATUM_PLATFORM_WIN32
-    /* loads the module, retrieving a possible error code */
-    errorCode = loadModule(service, (unsigned char *) "C:/Users/joamag/Desktop/repositories/viriatum/bin/hive_viriatum_mod_lua/i386/win32/Debug/hive_viriatum_mod_lua.dll");
-    #endif
-
-    #ifdef VIRIATUM_PLATFORM_UNIX
-    /* loads the module, retrieving a possible error code */
-    errorCode = loadModule(service, (unsigned char *) "/usr/local/lib/libviriatum_mod_lua.so");
-    #endif
-
-    /* tests the error code for error */
-    if(IS_ERROR_CODE(errorCode)) {
-        /* prints a warning message */
-        V_WARNING_F("Problem loading module (%s)\n", (char *) GET_ERROR());
-    }
+    /* loads (all) the currently available modules */
+    loadModulesService(service);
 
     /* sets the socket address attributes */
     socketAddress.sin_family = SOCKET_INTERNET_TYPE;
@@ -347,6 +334,9 @@ ERROR_CODE startService(struct Service_t *service) {
     /* closes the polling (provider) */
     polling->close(polling);
 
+    /* unloads the modules for the service */
+    unloadModulesService(service);
+
     /* raises no error */
     RAISE_NO_ERROR;
 }
@@ -354,6 +344,65 @@ ERROR_CODE startService(struct Service_t *service) {
 ERROR_CODE stopService(struct Service_t *service) {
     /* sets the service status as closed */
     service->status = STATUS_CLOSED;
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE loadModulesService(struct Service_t *service) {
+    /* allocates the error code */
+    ERROR_CODE errorCode;
+
+    #ifdef VIRIATUM_PLATFORM_WIN32
+    /* loads the module, retrieving a possible error code */
+    errorCode = loadModule(service, (unsigned char *) "C:/Users/joamag/Desktop/repositories/viriatum/bin/hive_viriatum_mod_lua/i386/win32/Debug/hive_viriatum_mod_lua.dll");
+    #endif
+
+    #ifdef VIRIATUM_PLATFORM_UNIX
+    /* loads the module, retrieving a possible error code */
+    errorCode = loadModule(service, (unsigned char *) "/usr/local/lib/libviriatum_mod_lua.so");
+    #endif
+
+    /* tests the error code for error */
+    if(IS_ERROR_CODE(errorCode)) {
+        /* prints a warning message */
+        V_WARNING_F("Problem loading module (%s)\n", (char *) GET_ERROR());
+
+        /* raises again the error */
+        RAISE_AGAIN(errorCode);
+    }
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE unloadModulesService(struct Service_t *service) {
+    /* allocates the current module */
+    struct Module_t *currentModule;
+
+    /* allocates space for the modules list iterator */
+    struct Iterator_t *modulesListIterator;
+
+    /* creates the iterator for the linked list */
+    createIteratorLinkedList(service->modulesList, &modulesListIterator);
+
+    /* iterates continuously */
+    while(1) {
+        /* retrieves the next value from the iterator */
+        getNextIterator(modulesListIterator, (void **) &currentModule);
+
+        /* in case the current module is null (end of iterator) */
+        if(currentModule == NULL) {
+            /* breaks the loop */
+            break;
+        }
+
+        /* unloads the current module */
+        unloadModule(service, currentModule);
+    }
+
+    /* deletes the iterator linked list */
+    deleteIteratorLinkedList(service->modulesList, modulesListIterator);
 
     /* raises no error */
     RAISE_NO_ERROR;

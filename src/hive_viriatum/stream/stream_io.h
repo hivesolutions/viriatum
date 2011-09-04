@@ -66,7 +66,7 @@ typedef struct IoConnection_t {
 
     /**
      * Reference to the lower level
-     * connection substrate (child).
+     * stream substrate (child).
      */
     void *lower;
 } IoConnection;

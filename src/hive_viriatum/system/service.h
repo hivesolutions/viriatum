@@ -38,9 +38,13 @@ struct Connection_t;
 struct HttpHandler_t;
 
 
+
+
 typedef ERROR_CODE (*serviceHttpHandlerCreate) (struct Service_t *, struct HttpHandler_t **);
 
 typedef ERROR_CODE (*serviceHttpHandlerUpdate) (struct Service_t *, struct HttpHandler_t *);
+
+
 
 
 
@@ -50,13 +54,8 @@ typedef ERROR_CODE (*serviceHttpHandlerUpdate) (struct Service_t *, struct HttpH
  */
 typedef ERROR_CODE (*connectionUpdate) (struct Connection_t *);
 
-
-
-
-
-
 /**
- * The function used to allocated data in the context
+ * The function used to allocate data in the context
  * of a connection (for safe usage).
  */
 typedef ERROR_CODE (*connectionAlloc) (struct Connection_t *, size_t size, void **dataPointer);
@@ -73,12 +72,11 @@ typedef ERROR_CODE (*connectionCallback) (struct Connection_t *);
  */
 typedef ERROR_CODE (*connectionDataCallback) (struct Connection_t *, struct Data_t *, void *);
 
-
-
+/**
+ * Function used to write data into a connection, optional
+ * parameters allow a callback uppon the end of writing.
+ */
 typedef ERROR_CODE (*connectionWrite) (struct Connection_t *connection, unsigned char *data, unsigned int size, connectionDataCallback callback, void *callbackParameters);
-
-
-
 
 /**
  * The "default" function used to update a state in the polling
@@ -209,8 +207,14 @@ typedef struct Service_t {
      */
     struct LinkedList_t *connectionsList;
 
-
-
+    /**
+     * The list of modules available for the
+     * service.
+     * This list represents only the loaded
+     * modules any unloaded or failed module
+     * should not be present in this list.
+     */
+    struct LinkedList_t *modulesList;
 
 
 
@@ -431,6 +435,24 @@ ERROR_CODE startService(struct Service_t *service);
  * @return The resulting error code.
  */
 ERROR_CODE stopService(struct Service_t *service);
+
+/**
+ * Loads all the currently avaialble modules
+ * into the given service context.
+ *
+ * @param service The service to load the modules.
+ * @return The resulting error code.
+ */
+ERROR_CODE loadModulesService(struct Service_t *service);
+
+/**
+ * Unloads all the currently avaialble modules
+ * from the given service context.
+ *
+ * @param service The service to unload the modules.
+ * @return The resulting error code.
+ */
+ERROR_CODE unloadModulesService(struct Service_t *service);
 
 /**
  * Adds a connection to the given service.
