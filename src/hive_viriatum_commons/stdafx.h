@@ -48,6 +48,7 @@
 /* defines the no export prefix */
 #define VIRIATUM_NO_EXPORT_PREFIX
 
+/* defines the external prefix (careful usage) */
 #define VIRIATUM_EXTERNAL_PREFIX __declspec(dllexport)
 #else
 /* defines the export prefix */
@@ -56,6 +57,7 @@
 /* defines the no export prefix */
 #define VIRIATUM_NO_EXPORT_PREFIX __attribute__((visibility("hidden")))
 
+/* defines the external prefix (careful usage) */
 #define VIRIATUM_EXTERNAL_PREFIX extern
 #endif
 
