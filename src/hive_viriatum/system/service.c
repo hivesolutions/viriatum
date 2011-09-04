@@ -37,6 +37,14 @@ ERROR_CODE createHttpHandlerService(struct Service_t *service, struct HttpHandle
     RAISE_NO_ERROR;
 }
 
+ERROR_CODE deleteHttpHandlerService(struct Service_t *service, struct HttpHandler_t *httpHandler) {
+    /* deletes the http handler */
+    deleteHttpHandler(httpHandler);
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
 ERROR_CODE addHttpHandlerService(struct Service_t *service, struct HttpHandler_t *httpHandler) {
     /* adds the http handler to the list of http handlers in the service */
     appendValueLinkedList(service->httpHandlersList, (void *) httpHandler);
@@ -44,6 +52,15 @@ ERROR_CODE addHttpHandlerService(struct Service_t *service, struct HttpHandler_t
     /* raises no error */
     RAISE_NO_ERROR;
 }
+
+ERROR_CODE removeHttpHandlerService(struct Service_t *service, struct HttpHandler_t *httpHandler) {
+    /* removes the http handler from the list of http handlers in the service */
+    removeValueLinkedList(service->httpHandlersList, (void *) httpHandler, 1);
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
 
 
 
@@ -65,7 +82,9 @@ void createService(struct Service_t **servicePointer) {
     service->status = STATUS_CLOSED;
     service->serviceSocketHandle = 0;
     service->createHttpHandler = createHttpHandlerService;
+    service->deleteHttpHandler = deleteHttpHandlerService;
     service->addHttpHandler = addHttpHandlerService;
+    service->removeHttpHandler = removeHttpHandlerService;
 
     /* creates the polling (provider) */
     createPolling(&service->polling);
