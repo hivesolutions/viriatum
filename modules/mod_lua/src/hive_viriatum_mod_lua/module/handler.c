@@ -328,7 +328,7 @@ int _luaWriteConnection(lua_State *luaState) {
     /* in case the number of arguments is invalid */
     if(numberArguments != 2) {
         /* prints a warning message */
-        V_WARNING("Invalid number of arguments");
+        V_WARNING("Invalid number of arguments\n");
 
         /* pushes an error message to lua */
         lua_pushstring(luaState, "Invalid number of arguments");
@@ -337,7 +337,7 @@ int _luaWriteConnection(lua_State *luaState) {
 
     if(!lua_isstring(luaState, -1)) {
         /* prints a warning message */
-        V_WARNING("Incorrect argument 'expected string'");
+        V_WARNING("Incorrect argument 'expected string'\n");
 
         /* pushes an error message to lua */
         lua_pushstring(luaState, "Incorrect argument to 'expected string'");
@@ -346,7 +346,7 @@ int _luaWriteConnection(lua_State *luaState) {
 
     if(!lua_islightuserdata(luaState, 1)) {
         /* prints a warning message */
-        V_WARNING("Incorrect argument 'expected lightuserdata'");
+        V_WARNING("Incorrect argument 'expected lightuserdata'\n");
 
         lua_pushstring(luaState, "Incorrect argument 'expected lightuserdata'");
         lua_error(luaState);

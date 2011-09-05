@@ -95,9 +95,9 @@ ERROR_CODE createHttpConnection(struct HttpConnection_t **httpConnectionPointer,
 
 
     /* sets the structures for the handler */
-    /*httpHandler->set(httpConnection);*/
+    httpHandler->set(httpConnection);
 
-    setHandlerFile(httpConnection);
+    /*setHandlerFile(httpConnection);*/
 
 
 
@@ -122,9 +122,9 @@ ERROR_CODE deleteHttpConnection(struct HttpConnection_t *httpConnection) {
     peekValueLinkedList(service->httpHandlersList, (void **) &httpHandler);
 
     /* unsets the structures for the handler */
-    /*httpHandler->unset(httpConnection);*/
+    httpHandler->unset(httpConnection);
 
-    unsetHandlerFile(httpConnection);
+    /*unsetHandlerFile(httpConnection);*/
 
 
     /* deletes the http parser */
@@ -153,11 +153,11 @@ ERROR_CODE dataHandlerStreamHttp(struct IoConnection_t *ioConnection, unsigned c
 
     peekValueLinkedList(service->httpHandlersList, (void **) &httpHandler);
 
-    /*httpConnection->httpHandler = httpHandler;*/
+    httpConnection->httpHandler = httpHandler;
 
     /* TENHO DE POR ESTE METODO como resetHandlerFile() */
 
-    _resetHttpParserHandlerFile(httpConnection->httpParser);
+    /*_resetHttpParserHandlerFile(httpConnection->httpParser);*/
 
     // TODO: tenho de testar quantos bytes processei !!!
     /* process the http data for the http parser */
