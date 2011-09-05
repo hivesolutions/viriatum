@@ -95,9 +95,9 @@ ERROR_CODE createHttpConnection(struct HttpConnection_t **httpConnectionPointer,
 
 
     /* sets the structures for the handler */
-    httpHandler->set(httpConnection);
+    /*httpHandler->set(httpConnection);*/
 
-    /*setHandlerFile(httpConnection);*/
+    setHandlerFile(httpConnection);
 
 
 
@@ -110,7 +110,10 @@ ERROR_CODE createHttpConnection(struct HttpConnection_t **httpConnectionPointer,
 }
 
 ERROR_CODE deleteHttpConnection(struct HttpConnection_t *httpConnection) {
+    /* retrieves the
+    struct Connection_t *httpConnection->ioConnection->connection
 
+    /* retrieves the service from the http connection */
     struct Service_t *service = httpConnection->ioConnection->connection->service;
 
     struct HttpHandler_t *httpHandler;
@@ -118,15 +121,10 @@ ERROR_CODE deleteHttpConnection(struct HttpConnection_t *httpConnection) {
 
     peekValueLinkedList(service->httpHandlersList, (void **) &httpHandler);
 
-
-
     /* unsets the structures for the handler */
-    httpHandler->unset(httpConnection);
+    /*httpHandler->unset(httpConnection);*/
 
-    /*unsetHandlerFile(httpConnection);*/
-
-
-
+    unsetHandlerFile(httpConnection);
 
 
     /* deletes the http parser */
@@ -143,30 +141,27 @@ ERROR_CODE deleteHttpConnection(struct HttpConnection_t *httpConnection) {
 }
 
 ERROR_CODE dataHandlerStreamHttp(struct IoConnection_t *ioConnection, unsigned char *buffer, size_t bufferSize) {
+    /* allocates the http handler */
+    struct HttpHandler_t *httpHandler;
+
     /* retrieves the http connection */
     struct HttpConnection_t *httpConnection = (struct HttpConnection_t *) ioConnection->lower;
 
-
-
+    /* retrieves the service from the http connection */
     struct Service_t *service = httpConnection->ioConnection->connection->service;
-
-    struct HttpHandler_t *httpHandler;
 
 
     peekValueLinkedList(service->httpHandlersList, (void **) &httpHandler);
 
-
-    httpConnection->httpHandler = httpHandler;
-
+    /*httpConnection->httpHandler = httpHandler;*/
 
     /* TENHO DE POR ESTE METODO como resetHandlerFile() */
 
-    //resetHttpParserHandlerFile(httpConnection->httpParser);
+    _resetHttpParserHandlerFile(httpConnection->httpParser);
 
     // TODO: tenho de testar quantos bytes processei !!!
     /* process the http data for the http parser */
     processDataHttpParser(httpConnection->httpParser, httpConnection->httpSettings, buffer, bufferSize);
-
 
     /* raises no error */
     RAISE_NO_ERROR;

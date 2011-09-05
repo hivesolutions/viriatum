@@ -31,6 +31,39 @@ a:hover {
     color: #000000;
 }
 
+.clear {
+    clear: both;
+}
+
+.left {
+    text-align: left;
+}
+
+.right {
+    text-align: right;
+}
+
+.center {
+    text-align: center;
+}
+
+.bold {
+    font-weight: bold;
+}
+
+.label {
+    color: #a1a1a1;
+}
+
+.table a {
+    font-size: 11pt;
+    color: #595959;
+}
+
+.table a:hover {
+    color: #000000;
+}
+
 .separator-horizontal {
     background: transparent url(../images/separator-horizontal.png) no-repeat center center;
     height: 10px;
@@ -53,7 +86,11 @@ a:hover {
     width: 960px;
 }
 
-.branding a{
+.branding.simple {
+    margin-top: 50px;
+}
+
+.branding a {
     background: transparent url(../images/viriatum-logotype.png) no-repeat center center;
     display: block;
     height: 48px;
@@ -62,7 +99,8 @@ a:hover {
 }
 
 #content-wrapper {
-    width: 100%;
+    width: 960px;
+    margin: 0px auto 0px auto;
 }
 
 .content-header {
@@ -76,7 +114,8 @@ a:hover {
 }
 
 #footer-wrapper {
-    width: 100%;
+    width: 960px;
+    margin: 0px auto 0px auto;
 }
 
 .footer-body {
@@ -85,21 +124,128 @@ a:hover {
     width: 260px;
 }
 
-.footer-body a{
+.footer-body a {
     text-transform: uppercase;
     width: 110px;
 }
 
-.footer-body a.left{
+.footer-body a.left {
     float: left;
     text-align: right;
 }
 
-.footer-body a.right{
+.footer-body a.right {
     float: right;
     text-align: left;
 }
 
-.bold {
+.table.file-listing {
+    width: 660px;
+    margin: 80px auto 20px auto;
+    color: #595959;
+}
+
+.table.file-listing th {
+    font-weight: normal;
+    padding: 8px 0px 8px 36px;
+}
+
+.table.file-listing th:last-child {
+    padding: 8px 10px 8px 0px;
+}
+
+.table.file-listing .current-folder td {
+    border-bottom: 1px solid #CCC;
     font-weight: bold;
+}
+
+.table.file-listing td{
+    padding: 8px 0px 8px 0px;
+}
+
+.table.file-listing tbody td:last-child{
+    padding: 8px 10px 8px 0px;
+}
+
+.table.file-listing td.icon{
+    width: 16px;
+    padding: 0px 10px 0px 10px;
+}
+
+.table.file-listing tfoot tr td {
+    height: 60px;
+    padding: 0px 0px 0px 0px;
+    vertical-align: bottom;
+}
+
+.icon.arrow-left a {
+    display: block;
+    height: 16px;
+    width: 100%;
+    cursor: pointer;
+    background: transparent url(../images/arrow-left.png) top center no-repeat;
+}
+
+.icon.arrow-left a:hover {
+    background-position: bottom center;
+}
+
+.icon.folder{
+    background: transparent url(../images/icon-folder.png) center center no-repeat;
+}
+
+.icon.image{
+    background: transparent url(../images/icon-image.png) center center no-repeat;
+}
+
+.icon.text{
+    background: transparent url(../images/icon-text.png) center center no-repeat;
+}
+
+.icon.html{
+    background: transparent url(../images/icon-html.png) center center no-repeat;
+}
+
+.table.status {
+    width: 960px;
+    margin: 80px auto 20px auto;
+    color: #595959;
+}
+
+.table.status td {
+    padding: 8px 20px 8px 20px;
+}
+
+.content-header.error {
+    width: 400px;
+    margin: 80px auto 80px auto;
+}
+
+.error-illustration {
+    float: left;
+    height: 280px;
+    width: 200px;
+    background: transparent url(../images/error-illustration.png) no-repeat center center;
+}
+
+.error-content {
+    float: left;
+    width: 200px;
+    margin-top: 70px;
+}
+
+.error-code {
+    height: 50px;
+    width: 100%;
+    font-family: times;
+    text-shadow: 1px 1px 1px #FFFFFF;
+    color: #444444;
+    font-size: 38pt;
+    text-align: center;
+}
+
+.error-description {
+    font-size: 16pt;
+    font-weight: normal;
+    text-transform: uppercase;
 }

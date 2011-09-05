@@ -99,6 +99,9 @@ ERROR_CODE startModule(struct Environment_t *environment, struct Module_t *modul
     /* load various lua libraries */
     luaL_openlibs(luaState);
 
+    /* starts the lua state */
+    _startLuaState(luaState);
+
     /* creates the http handler */
     service->createHttpHandler(service, &httpHandler);
 
@@ -207,6 +210,31 @@ ERROR_CODE infoModule(struct Module_t *module) {
 ERROR_CODE errorModule(unsigned char **messagePointer) {
     /* sets the error message in the (erro) message pointer */
     *messagePointer = lastErrorMessage;
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE _startLuaState(lua_State *luaState) {
+    /* registers the viriatum name in lua */
+    lua_pushstring(luaState, VIRIATUM_NAME);
+    lua_setglobal(luaState, "VIRIATUM_NAME");
+
+    /* registers the viriatum version in lua */
+    lua_pushstring(luaState, VIRIATUM_VERSION);
+    lua_setglobal(luaState, "VIRIATUM_VERSION");
+
+    /* registers the viriatum description in lua */
+    lua_pushstring(luaState, VIRIATUM_DESCRIPTION);
+    lua_setglobal(luaState, "VIRIATUM_DESCRIPTION");
+
+    /* registers the viriatum observations in lua */
+    lua_pushstring(luaState, VIRIATUM_OBSERVATIONS);
+    lua_setglobal(luaState, "VIRIATUM_OBSERVATIONS");
+
+    /* registers the viriatum copyright in lua */
+    lua_pushstring(luaState, VIRIATUM_COPYRIGHT);
+    lua_setglobal(luaState, "VIRIATUM_COPYRIGHT");
 
     /* raises no error */
     RAISE_NO_ERROR;

@@ -266,10 +266,11 @@ ERROR_CODE _sendResponseHandlerModule(struct HttpParser_t *httpParser) {
 
     ERROR_CODE resultCode;
 
+    /* registers the current connection in lua */
     lua_pushlightuserdata(modLuaHttpHandler->luaState, (void *) httpParser);
     lua_setglobal(modLuaHttpHandler->luaState, "connection");
 
-    /* register the write connection function */
+    /* registers the write connection function in lua */
     lua_register(modLuaHttpHandler->luaState, "write_connection", _luaWriteConnection);
 
     /* runs the script */

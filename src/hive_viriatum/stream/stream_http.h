@@ -34,9 +34,21 @@
 /* forward references (avoids loop) */
 struct HttpConnection_t;
 
-
+/**
+ * Function used to update the given http connection
+ * with new information.
+ *
+ * @param httpConnection The http connection to be
+ * update with new information.
+ */
 typedef ERROR_CODE (*httpConnectionUpdate) (struct HttpConnection_t *httpConnection);
 
+/**
+ * The structure that describes the structure
+ * of an handler capable of interpreting an
+ * http request and construct a response based
+ * on it.
+ */
 typedef struct HttpHandler_t {
     httpConnectionUpdate set;
     httpConnectionUpdate unset;

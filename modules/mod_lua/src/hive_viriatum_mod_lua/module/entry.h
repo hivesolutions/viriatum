@@ -54,3 +54,4 @@ VIRIATUM_EXPORT_PREFIX ERROR_CODE startModule(struct Environment_t *environment,
 VIRIATUM_EXPORT_PREFIX ERROR_CODE stopModule(struct Environment_t *environment, struct Module_t *module);
 VIRIATUM_EXPORT_PREFIX ERROR_CODE infoModule(struct Module_t *module);
 VIRIATUM_EXPORT_PREFIX ERROR_CODE errorModule(unsigned char **messagePointer);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _startLuaState(lua_State *luaState);
