@@ -350,6 +350,12 @@ ERROR_CODE startService(struct Service_t *service) {
         polling->call(polling);
     }
 
+    /* closes the (service) connection */
+    serviceConnection->closeConnection(serviceConnection);
+
+    /* deletes the (service) connection */
+    deleteConnection(serviceConnection);
+
     /* closes the polling (provider) */
     polling->close(polling);
 
