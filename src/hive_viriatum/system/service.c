@@ -350,11 +350,8 @@ ERROR_CODE startService(struct Service_t *service) {
         polling->call(polling);
     }
 
-    /* closes the (service) connection */
-    serviceConnection->closeConnection(serviceConnection);
-
-    /* deletes the (service) connection */
-    deleteConnection(serviceConnection);
+    /* closes (all) the service connections */
+    closeConnectionsService(service);
 
     /* closes the polling (provider) */
     polling->close(polling);
@@ -369,6 +366,41 @@ ERROR_CODE startService(struct Service_t *service) {
 ERROR_CODE stopService(struct Service_t *service) {
     /* sets the service status as closed */
     service->status = STATUS_CLOSED;
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE closeConnectionsService(struct Service_t *service) {
+    /* allocates space for the current connection */
+    struct Connection_t *currentConnection;
+
+    /* retrieves the service connections list */
+    struct LinkedList_t *connectionsList = service->connectionsList;
+
+    /* prints a debug message */
+    V_DEBUG("Closing the service connections\n");
+
+    /* iterates continuously */
+    while(1) {
+        /* pops a value from the connections list (and deletes the node) */
+        popValueLinkedList(connectionsList, (void **) &currentConnection, 1);
+
+        /* in case the current connection is null (connections list is empty) */
+        if(currentConnection == NULL) {
+            /* breaks the loop */
+            break;
+        }
+
+        /* closes the current connection */
+        currentConnection->closeConnection(currentConnection);
+
+        /* deletes the current connection */
+        deleteConnection(currentConnection);
+    }
+
+    /* prints a debug message */
+    V_DEBUG("Finished closing the service connections\n");
 
     /* raises no error */
     RAISE_NO_ERROR;

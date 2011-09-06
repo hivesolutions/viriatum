@@ -438,6 +438,16 @@ ERROR_CODE startService(struct Service_t *service);
 ERROR_CODE stopService(struct Service_t *service);
 
 /**
+ * Closes all the current active connection in the
+ * given service.
+ *
+ * @param service The service to have the connections
+ * stopped.
+ * @return The resulting error code.
+ */
+ERROR_CODE closeConnectionsService(struct Service_t *service);
+
+/**
  * Loads all the currently avaialble modules
  * into the given service context.
  *
