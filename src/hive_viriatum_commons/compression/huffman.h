@@ -27,9 +27,15 @@
 
 #pragma once
 
+/**
+ * The default size for an huffman symbol.
+ */
+#define DEFAULT_HUFFMAN_SYMBOL_SIZE 8
+
 typedef struct Huffman_t {
     size_t size;
 } Huffman;
 
 VIRIATUM_EXPORT_PREFIX void createHuffman(struct Huffman_t **huffmanPointer);
 VIRIATUM_EXPORT_PREFIX void deleteHuffman(struct Huffman_t *huffman);
+VIRIATUM_EXPORT_PREFIX void generateTableHuffman(struct Huffman_t *huffman);
