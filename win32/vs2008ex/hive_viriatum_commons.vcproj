@@ -555,6 +555,14 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="Compression"
+				>
+				<File
+					RelativePath="..\..\src\hive_viriatum_commons\compression\huffman.c"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -738,6 +746,18 @@
 				</File>
 				<File
 					RelativePath="..\..\src\hive_viriatum_commons\memory\memory_pool.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Compression"
+				>
+				<File
+					RelativePath="..\..\src\hive_viriatum_commons\compression\compression.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\hive_viriatum_commons\compression\huffman.h"
 					>
 				</File>
 			</Filter>
