@@ -63,6 +63,11 @@ void testHashMap();
 void testBase64();
 
 /**
+ * Teste the huffman encoding.
+ */
+void testHuffman();
+
+/**
  * Runs the set of simple tests in the current
  * test case.
  */

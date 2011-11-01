@@ -174,6 +174,17 @@ void testBase64() {
     FREE(decodedBuffer);
 }
 
+void testHuffman() {
+    /* allocates space for the huffman */
+	struct Huffman_t *huffman;
+
+	/* creates the huffman (encoder) */
+	createHuffman(&huffman);
+
+	/* deletes the huffman (encoder) */
+	deleteHuffman(huffman);
+}
+
 void runSimpleTests() {
     /* tests the thread pool */
     testThreadPool();
@@ -188,5 +199,8 @@ void runSimpleTests() {
     testHashMap();
 
     /* tests the base 64 encoder */
+    testBase64();
+
+    /* tests the huffman encoder */
     testBase64();
 }

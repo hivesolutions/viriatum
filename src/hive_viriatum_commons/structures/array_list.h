@@ -27,6 +27,10 @@
 
 #pragma once
 
+/**
+ * The default size to be used in a newly
+ * created array list.
+ */
 #define DEFAULT_ARRAY_LIST_SIZE 256
 
 typedef struct ArrayList_t {
