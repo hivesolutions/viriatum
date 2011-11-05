@@ -185,6 +185,19 @@ void testHuffman() {
 	deleteHuffman(huffman);
 }
 
+void testBitStream() {
+    /* allocates space for the bit stream */
+	struct BitStream_t *bitStream;
+
+	/* creates the bit stream */
+	createBitStream(&bitStream);
+
+	writeByteBitStream(bitStream, 23, 1);
+
+	/* deletes the bit stream */
+	deleteBitStream(bitStream);
+}
+
 void runSimpleTests() {
     /* tests the thread pool */
     testThreadPool();
@@ -202,5 +215,8 @@ void runSimpleTests() {
     testBase64();
 
     /* tests the huffman encoder */
-    testBase64();
+    testHuffman();
+
+	/* tests the bit stream */
+    testBitStream();
 }

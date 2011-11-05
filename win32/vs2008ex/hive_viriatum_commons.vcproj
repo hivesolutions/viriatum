@@ -563,6 +563,14 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="Stream"
+				>
+				<File
+					RelativePath="..\..\src\hive_viriatum_commons\stream\bit_stream.c"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -758,6 +766,18 @@
 				</File>
 				<File
 					RelativePath="..\..\src\hive_viriatum_commons\compression\huffman.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Stream"
+				>
+				<File
+					RelativePath="..\..\src\hive_viriatum_commons\stream\bit_stream.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\hive_viriatum_commons\stream\stream.h"
 					>
 				</File>
 			</Filter>
