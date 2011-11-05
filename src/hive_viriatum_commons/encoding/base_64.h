@@ -104,7 +104,7 @@ VIRIATUM_NO_EXPORT_PREFIX int _decodeBase64(unsigned char *encodedBuffer, size_t
  * Allocates a new encoded buffer.
  * This function is for internal use.
  *
- * @param buffer The buffer to be encoded.
+ * @param bufferLength The size of the buffer to be encoded.
  * @param encodedBufferPointer The pointer to the encoded buffer to be created.
  * @param encodedBufferLengthPointer The length of the encoded buffer to be created.
  * @return The execution status.
