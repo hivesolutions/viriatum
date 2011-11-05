@@ -193,7 +193,7 @@ void testBitStream() {
     struct BitStream_t *bitStream;
 
     /* creates the file stream */
-    createFileStream(&fileStream, "c:/bit_stream.txt", "wb");
+    createFileStream(&fileStream, "bit_stream.txt", "wb");
 
     /* creates the bit stream */
     createBitStream(&bitStream, fileStream->stream);
