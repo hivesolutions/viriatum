@@ -176,58 +176,69 @@ void testBase64() {
 
 void testHuffman() {
     /* allocates space for the huffman */
-	struct Huffman_t *huffman;
+    struct Huffman_t *huffman;
 
-	/* creates the huffman (encoder) */
-	createHuffman(&huffman);
+    /* creates the huffman (encoder) */
+    createHuffman(&huffman);
 
-	/* deletes the huffman (encoder) */
-	deleteHuffman(huffman);
+    /* deletes the huffman (encoder) */
+    deleteHuffman(huffman);
 }
 
 void testBitStream() {
+    /* allocates space for the file stream */
+    struct FileStream_t *fileStream;
+
     /* allocates space for the bit stream */
-	struct BitStream_t *bitStream;
+    struct BitStream_t *bitStream;
 
-	/* creates the bit stream */
-	createBitStream(&bitStream);
+    /* creates the file stream */
+    createFileStream(&fileStream, "c:/bit_stream.txt", "wb");
 
-	/* writes the 0100 bit set to the bit stream
-	and then writes the 0001 bit set */
-	writeByteBitStream(bitStream, 0x04, 4);
-	writeByteBitStream(bitStream, 0x01, 4);
+    /* creates the bit stream */
+    createBitStream(&bitStream, fileStream->stream);
 
-	/* checks if the written 8 bits are
-	01000001 (0x41) the correct value */
-	if(bitStream->buffer[0] == 0x41) {
-		printf("TA BEM");
-	} else {
-		printf("TA ERRADO");
-	}
+    /* writes the 0100 bit set to the bit stream
+    and then writes the 0001 bit set */
+    writeByteBitStream(bitStream, 0x04, 4);
+    writeByteBitStream(bitStream, 0x01, 4);
 
-	/* deletes the bit stream */
-	deleteBitStream(bitStream);
+    /* checks if the written 8 bits are
+    01000001 (0x41) the correct value */
+    assert(bitStream->buffer[0] == 0x41);
+
+    /* writes a the 0100 bit set to the bit stream */
+    writeByteBitStream(bitStream, 0x04, 4);
+
+    /* closes the bit stream */
+    closeBitStream(bitStream);
+
+    /* deletes the bit stream */
+    deleteBitStream(bitStream);
+
+    /* deletes the file stream */
+    deleteFileStream(fileStream);
 }
 
 void testFileStream() {
-	/* allocates space for the file stream */
-	struct FileStream_t *fileStream;
+    /* allocates space for the file stream */
+    struct FileStream_t *fileStream;
 
-	/* allocates space for the stream */
-	struct Stream_t *stream;
+    /* allocates space for the stream */
+    struct Stream_t *stream;
 
-	/* creates the file stream */
-	createFileStream(&fileStream, "hello.txt", "wb");
+    /* creates the file stream */
+    createFileStream(&fileStream, "hello.txt", "wb");
 
-	/* retrieves the stream from the file stream, in order
-	to be able to use the "normal" stream functions */
-	stream = fileStream->stream;
+    /* retrieves the stream from the file stream, in order
+    to be able to use the "normal" stream functions */
+    stream = fileStream->stream;
 
-	/* writes some data to the stream */
-	stream->write(stream, "hello world", 11);
+    /* writes some data to the stream */
+    stream->write(stream, "hello world", 11);
 
-	/* deletes the file stream */
-	deleteFileStream(fileStream);
+    /* deletes the file stream */
+    deleteFileStream(fileStream);
 }
 
 void runSimpleTests() {
@@ -249,9 +260,9 @@ void runSimpleTests() {
     /* tests the huffman encoder */
     testHuffman();
 
-	/* tests the bit stream */
+    /* tests the bit stream */
     testBitStream();
 
-	/* tests the file stream */
-	testFileStream();
+    /* tests the file stream */
+    testFileStream();
 }

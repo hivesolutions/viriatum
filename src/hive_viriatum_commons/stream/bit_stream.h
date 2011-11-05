@@ -51,54 +51,54 @@
  * control over a buffer of bytes.
  */
 typedef struct BitStream_t {
-	/**
-	 * The internal stream used as the final
-	 * target for the stream.
-	 * This stream is updated in every flush.
-	 */
-	struct Stream_t *stream;
+    /**
+     * The internal stream used as the final
+     * target for the stream.
+     * This stream is updated in every flush.
+     */
+    struct Stream_t *stream;
 
-	/**
-	 * The buffer containing the bit stream
-	 * contents in a byte oriented fashion.
-	 */
-	unsigned char *buffer;
+    /**
+     * The buffer containing the bit stream
+     * contents in a byte oriented fashion.
+     */
+    unsigned char *buffer;
 
-	/** 
-	 * The size in bits of the current stream.
-	 */
-	size_t size;
+    /**
+     * The size in bits of the current stream.
+     */
+    size_t size;
 
-	/**
-	 * The position (offset) in bits inside the
-	 * current stream.
-	 */
-	size_t position;
+    /**
+     * The position (offset) in bits inside the
+     * current stream.
+     */
+    size_t position;
 
-	/**
-	 * The current byte used in the writting 
-	 * procedure.
-	 */
-	unsigned char currentByteWrite;
+    /**
+     * The current byte used in the writting
+     * procedure.
+     */
+    unsigned char currentByteWrite;
 
-	/**
-	 * The position of the "cursor" in the
-	 * current byte.
-	 * Used for the write mode in the current byte.
-	 */
-	unsigned char currentByteOffsetWrite;
+    /**
+     * The position of the "cursor" in the
+     * current byte.
+     * Used for the write mode in the current byte.
+     */
+    unsigned char currentByteOffsetWrite;
 
-	/**
-	 * The counter (of bits) used for the writting
-	 * procedure in the current bit stream.
-	 */
-	size_t bitCounterWrite;
+    /**
+     * The counter (of bits) used for the writting
+     * procedure in the current bit stream.
+     */
+    size_t bitCounterWrite;
 
-	/**
-	 * The counter (of bytes) used for the writting
-	 * procedure in the current bit stream.
-	 */
-	size_t byteCounterWrite;
+    /**
+     * The counter (of bytes) used for the writting
+     * procedure in the current bit stream.
+     */
+    size_t byteCounterWrite;
 } BitStream;
 
 /**
@@ -109,21 +109,23 @@ typedef struct BitStream_t {
  * stream size.
  */
 typedef struct BitChunk_t {
-	/**
-	 * The byte buffer with the bit contents
-	 * of the chunk.
-	 */
-	unsigned char *buffer;
+    /**
+     * The byte buffer with the bit contents
+     * of the chunk.
+     */
+    unsigned char *buffer;
 
-	/**
-	 * The size of the bit buffer in bits.
-	 */
+    /**
+     * The size of the bit buffer in bits.
+     */
     size_t size;
 } BitChunk;
 
-VIRIATUM_EXPORT_PREFIX void createBitStream(struct BitStream_t **bitStreamPointer);
+VIRIATUM_EXPORT_PREFIX void createBitStream(struct BitStream_t **bitStreamPointer, struct Stream_t *stream);
 VIRIATUM_EXPORT_PREFIX void deleteBitStream(struct BitStream_t *bitStream);
+VIRIATUM_EXPORT_PREFIX void closeBitStream(struct BitStream_t *bitStream);
 VIRIATUM_EXPORT_PREFIX void readBitStream(struct BitStream_t *bitStream, unsigned char *buffer, size_t count, size_t *readCount);
 VIRIATUM_EXPORT_PREFIX void writeBitStream(struct BitStream_t *bitStream, unsigned char *buffer, size_t size);
 VIRIATUM_EXPORT_PREFIX void writeByteBitStream(struct BitStream_t *bitStream, unsigned char byte, unsigned char size);
 VIRIATUM_EXPORT_PREFIX void flushWriteBitStream(struct BitStream_t *bitStream);
+VIRIATUM_EXPORT_PREFIX void flushBitStream(struct BitStream_t *bitStream);

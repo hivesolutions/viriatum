@@ -31,16 +31,16 @@
 #include "io_stream.h"
 
 typedef struct FileStream_t {
-	/**
-	 * The reference to the file object.
-	 */
-	FILE *file;
+    /**
+     * The reference to the file object.
+     */
+    FILE *file;
 
-	/**
-	 * The reference to the upper stream
-	 * structure.
-	 */
-	struct Stream_t *stream;
+    /**
+     * The reference to the upper stream
+     * structure.
+     */
+    struct Stream_t *stream;
 } FileStream;
 
 VIRIATUM_EXPORT_PREFIX void createFileStream(struct FileStream_t **fileStreamPointer, unsigned char *filePath, unsigned char *mode);

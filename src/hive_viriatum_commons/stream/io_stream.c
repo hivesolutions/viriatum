@@ -31,7 +31,7 @@
 
 VIRIATUM_EXPORT_PREFIX void createStream(struct Stream_t **streamPointer) {
     /* retrieves the stream size */
-	size_t streamSize = sizeof(struct Stream_t);
+    size_t streamSize = sizeof(struct Stream_t);
 
     /* allocates space for the stream */
     struct Stream_t *stream = (struct Stream_t *) MALLOC(streamSize);
