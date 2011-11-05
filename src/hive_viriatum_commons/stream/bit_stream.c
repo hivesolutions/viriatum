@@ -62,9 +62,23 @@ VIRIATUM_EXPORT_PREFIX void deleteBitStream(struct BitStream_t *bitStream) {
     FREE(bitStream);
 }
 
+VIRIATUM_EXPORT_PREFIX void openBitStream(struct BitStream_t *bitStream) {
+    /* retrieves the (inner) stream from the bit stream */
+    struct Stream_t *stream = bitStream->stream;
+
+    /* opens the (inner) stream */
+    stream->open(stream);
+}
+
 VIRIATUM_EXPORT_PREFIX void closeBitStream(struct BitStream_t *bitStream) {
+    /* retrieves the (inner) stream from the bit stream */
+    struct Stream_t *stream = bitStream->stream;
+
     /* flushes the bit stream */
     flushBitStream(bitStream);
+
+    /* closes the (inner) stream */
+    stream->close(stream);
 }
 
 VIRIATUM_EXPORT_PREFIX void readBitStream(struct BitStream_t *bitStream, unsigned char *buffer, size_t count, size_t *readCount) {
@@ -145,6 +159,9 @@ VIRIATUM_EXPORT_PREFIX void flushWriteBitStream(struct BitStream_t *bitStream) {
 }
 
 VIRIATUM_EXPORT_PREFIX void flushBitStream(struct BitStream_t *bitStream) {
+    /* retrieves the (inner) stream from the bit stream */
+    struct Stream_t *stream = bitStream->stream;
+
     /* in case there is a (partial) byte waiting to be writen */
     if(bitStream->currentByteOffsetWrite > 0) {
         // sets the write buffer value
@@ -158,7 +175,7 @@ VIRIATUM_EXPORT_PREFIX void flushBitStream(struct BitStream_t *bitStream) {
     }
 
     /* flushes the bit stream in the (internal) stream */
-    bitStream->stream->write(bitStream->stream, bitStream->buffer, bitStream->byteCounterWrite);
+    stream->write(stream, bitStream->buffer, bitStream->byteCounterWrite);
 
     /* resets the byte counter write (the write buffer
     is also reset by interface) */
