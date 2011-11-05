@@ -49,6 +49,7 @@ VIRIATUM_EXPORT_PREFIX void createFileStream(struct FileStream_t **fileStreamPoi
     fileStream->stream->close = closeFileStream;
     fileStream->stream->read = readFileStream;
     fileStream->stream->write = writeFileStream;
+    fileStream->stream->flush = flushFileStream;
 
     /* sets the file stream in the file stream pointer */
     *fileStreamPointer = fileStream;
@@ -68,7 +69,6 @@ VIRIATUM_EXPORT_PREFIX void deleteFileStream(struct FileStream_t *fileStream) {
 VIRIATUM_EXPORT_PREFIX struct Stream_t *getStreamFileStream(struct FileStream_t *fileStream) {
     return fileStream->stream;
 }
-
 
 VIRIATUM_EXPORT_PREFIX void openFileStream(struct Stream_t *stream) {
 }
@@ -95,4 +95,12 @@ VIRIATUM_EXPORT_PREFIX size_t writeFileStream(struct Stream_t *stream, unsigned 
 
     /* writes the given buffer into the file reference */
     return fwrite(buffer, sizeof(unsigned char), size, fileStream->file);
+}
+
+VIRIATUM_EXPORT_PREFIX void flushFileStream(struct Stream_t *stream) {
+    /* retrieves the file stream from the stream (as the lowe substrate) */
+    struct FileStream_t *fileStream = (struct FileStream_t *) stream->lower;
+
+    /* flushes the file reference */
+    fflush(fileStream->file);
 }

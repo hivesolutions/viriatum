@@ -36,6 +36,7 @@ typedef struct Stream_t {
     streamUpdate close;
     streamRead read;
     streamWrite write;
+    streamUpdate flush;
 
     /**
      * Reference to the lower level
