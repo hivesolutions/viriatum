@@ -48,4 +48,5 @@ VIRIATUM_EXPORT_PREFIX void deleteFileStream(struct FileStream_t *fileStream);
 VIRIATUM_EXPORT_PREFIX struct Stream_t *getStreamFileStream(struct FileStream_t *fileStream);
 VIRIATUM_EXPORT_PREFIX void openFileStream(struct Stream_t *stream);
 VIRIATUM_EXPORT_PREFIX void closeFileStream(struct Stream_t *stream);
+VIRIATUM_EXPORT_PREFIX size_t readFileStream(struct Stream_t *stream, unsigned char *buffer, size_t size);
 VIRIATUM_EXPORT_PREFIX size_t writeFileStream(struct Stream_t *stream, unsigned char *buffer, size_t size);

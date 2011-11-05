@@ -28,14 +28,14 @@
 #pragma once
 
 typedef void (*streamUpdate) (struct Stream_t *stream);
+typedef size_t (*streamRead) (struct Stream_t *stream, unsigned char *buffer, size_t size);
 typedef size_t (*streamWrite) (struct Stream_t *stream, unsigned char *buffer, size_t size);
 
 typedef struct Stream_t {
     streamUpdate open;
     streamUpdate close;
+    streamRead read;
     streamWrite write;
-    /*httpConnectionUpdate read;
-    httpConnectionUpdate reset;*/
 
     /**
      * Reference to the lower level
