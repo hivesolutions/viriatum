@@ -570,6 +570,18 @@
 					RelativePath="..\..\src\hive_viriatum_commons\stream\bit_stream.c"
 					>
 				</File>
+				<File
+					RelativePath="..\..\src\hive_viriatum_commons\stream\file_stream.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\hive_viriatum_commons\stream\io_stream.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\hive_viriatum_commons\stream\memory_stream.c"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter
@@ -774,6 +786,18 @@
 				>
 				<File
 					RelativePath="..\..\src\hive_viriatum_commons\stream\bit_stream.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\hive_viriatum_commons\stream\file_stream.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\hive_viriatum_commons\stream\io_stream.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\hive_viriatum_commons\stream\memory_stream.h"
 					>
 				</File>
 				<File
