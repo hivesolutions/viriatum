@@ -230,6 +230,9 @@ void testFileStream() {
     /* allocates space for the stream */
     struct Stream_t *stream;
 
+    /* allocates some space for the test buffer */
+    unsigned char buffer[128];
+
     /* creates the file stream */
     createFileStream(&fileStream, "hello.txt", "wb");
 
@@ -237,8 +240,36 @@ void testFileStream() {
     to be able to use the "normal" stream functions */
     stream = fileStream->stream;
 
+    /* opens the stream */
+    stream->open(stream);
+
     /* writes some data to the stream */
     stream->write(stream, "hello world", 11);
+
+    /* close the stream */
+    stream->close(stream);
+
+    /* creates the file stream */
+    createFileStream(&fileStream, "hello.txt", "rb");
+
+    /* retrieves the stream from the file stream, in order
+    to be able to use the "normal" stream functions */
+    stream = fileStream->stream;
+
+    /* opens the stream */
+    stream->open(stream);
+
+    /* reads some data from the stream */
+    stream->read(stream, buffer, 11);
+
+    /* sets the end of string character in the buffer */
+    buffer[11] = '\0';
+
+    /* close the stream */
+    stream->close(stream);
+
+    /* compares the read string */
+    assert(strcmp("hello world", buffer) == 0);
 
     /* deletes the file stream */
     deleteFileStream(fileStream);
