@@ -47,6 +47,7 @@ VIRIATUM_EXPORT_PREFIX void createFileStream(struct FileStream_t **fileStreamPoi
     /* sets the various functions of the stream */
     fileStream->stream->open = openFileStream;
     fileStream->stream->close = closeFileStream;
+    fileStream->stream->read = readFileStream;
     fileStream->stream->write = writeFileStream;
 
     /* sets the file stream in the file stream pointer */
@@ -78,6 +79,14 @@ VIRIATUM_EXPORT_PREFIX void closeFileStream(struct Stream_t *stream) {
 
     /* closes the file reference */
     fclose(fileStream->file);
+}
+
+VIRIATUM_EXPORT_PREFIX size_t readFileStream(struct Stream_t *stream, unsigned char *buffer, size_t size) {
+    /* retrieves the file stream from the stream (as the lowe substrate) */
+    struct FileStream_t *fileStream = (struct FileStream_t *) stream->lower;
+
+    /* reads the given size of bytes into the buffer */
+    return fread(buffer, sizeof(unsigned char), size, fileStream->file);
 }
 
 VIRIATUM_EXPORT_PREFIX size_t writeFileStream(struct Stream_t *stream, unsigned char *buffer, size_t size) {
