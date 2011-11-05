@@ -27,6 +27,19 @@
 
 #pragma once
 
-#include "bit_stream.h"
-#include "file_stream.h"
-#include "memory_stream.h"
+typedef size_t (*streamWrite) (struct Stream_t *stream, unsigned char *buffer, size_t size);
+
+typedef struct Stream_t {
+    streamWrite write;
+    /*httpConnectionUpdate read;
+    httpConnectionUpdate reset;*/
+
+    /**
+     * Reference to the lower level
+     * handler substrate (child).
+     */
+    void *lower;
+} Stream;
+
+VIRIATUM_EXPORT_PREFIX void createStream(struct Stream_t **streamPointer);
+VIRIATUM_EXPORT_PREFIX void deleteStream(struct Stream_t *stream);

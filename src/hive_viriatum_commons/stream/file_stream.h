@@ -27,6 +27,25 @@
 
 #pragma once
 
-#include "bit_stream.h"
-#include "file_stream.h"
-#include "memory_stream.h"
+#include "../system/system_util.h"
+#include "io_stream.h"
+
+typedef struct FileStream_t {
+	/**
+	 * The reference to the file object.
+	 */
+	FILE *file;
+
+	/**
+	 * The reference to the upper stream
+	 * structure.
+	 */
+	struct Stream_t *stream;
+} FileStream;
+
+VIRIATUM_EXPORT_PREFIX void createFileStream(struct FileStream_t **fileStreamPointer, unsigned char *filePath, unsigned char *mode);
+VIRIATUM_EXPORT_PREFIX void deleteFileStream(struct FileStream_t *fileStream);
+VIRIATUM_EXPORT_PREFIX struct Stream_t *getStreamFileStream(struct FileStream_t *fileStream);
+VIRIATUM_EXPORT_PREFIX size_t writeFileStream(struct Stream_t *stream, unsigned char *buffer, size_t size);
+VIRIATUM_EXPORT_PREFIX void openFileStream(struct Stream_t *stream);
+VIRIATUM_EXPORT_PREFIX void closeFileStream(struct Stream_t *stream);

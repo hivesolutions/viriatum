@@ -192,10 +192,42 @@ void testBitStream() {
 	/* creates the bit stream */
 	createBitStream(&bitStream);
 
-	writeByteBitStream(bitStream, 23, 1);
+	/* writes the 0100 bit set to the bit stream
+	and then writes the 0001 bit set */
+	writeByteBitStream(bitStream, 0x04, 4);
+	writeByteBitStream(bitStream, 0x01, 4);
+
+	/* checks if the written 8 bits are
+	01000001 (0x41) the correct value */
+	if(bitStream->buffer[0] == 0x41) {
+		printf("TA BEM");
+	} else {
+		printf("TA ERRADO");
+	}
 
 	/* deletes the bit stream */
 	deleteBitStream(bitStream);
+}
+
+void testFileStream() {
+	/* allocates space for the file stream */
+	struct FileStream_t *fileStream;
+
+	/* allocates space for the stream */
+	struct Stream_t *stream;
+
+	/* creates the file stream */
+	createFileStream(&fileStream, "hello.txt", "wb");
+
+	/* retrieves the stream from the file stream, in order
+	to be able to use the "normal" stream functions */
+	stream = fileStream->stream;
+
+	/* writes some data to the stream */
+	stream->write(stream, "hello world", 11);
+
+	/* deletes the file stream */
+	deleteFileStream(fileStream);
 }
 
 void runSimpleTests() {
@@ -219,4 +251,7 @@ void runSimpleTests() {
 
 	/* tests the bit stream */
     testBitStream();
+
+	/* tests the file stream */
+	testFileStream();
 }

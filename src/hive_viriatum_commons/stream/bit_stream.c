@@ -73,7 +73,7 @@ VIRIATUM_EXPORT_PREFIX void writeByteBitStream(struct BitStream_t *bitStream, un
 
     /* in case the number of extra bits is set the number
 	of bits to be writen is the same as the available bits */
-	if(extraBitsCount > 0) {
+	if(size > availableBitsCount) {
 		/* sets the size as the available bits count */
 		size = availableBitsCount;
 	}
@@ -97,7 +97,7 @@ VIRIATUM_EXPORT_PREFIX void writeByteBitStream(struct BitStream_t *bitStream, un
     flushWriteBitStream(bitStream);
 
     /* in case there are no extra bits to be written */
-    if(!extraBitsCount > 0) {
+    if(extraBitsCount == 0) {
 		/* returns immediately */
 		return;
 	}
@@ -108,15 +108,12 @@ VIRIATUM_EXPORT_PREFIX void writeByteBitStream(struct BitStream_t *bitStream, un
 
     /* increments the bit counter by the number of extra bits */
     bitStream->bitCounterWrite += extraBitsCount;
-
-    // returns the number of read bits
-  /*  return numberBits;*/
 }
 
 VIRIATUM_EXPORT_PREFIX void flushWriteBitStream(struct BitStream_t *bitStream) {
 	/* in case the bit counter (for write) hasn't reached
 	the limit no flush is required (no complete byte available) */
-    if(!bitStream->bitCounterWrite == BIT_STREAM_ITEM_SIZE) {
+    if(bitStream->bitCounterWrite != BIT_STREAM_ITEM_SIZE) {
 		/* returns immediately */
 		return;
 	}

@@ -25,8 +25,6 @@
  __license__   = GNU General Public License (GPL), Version 3
 */
 
-#pragma once
+#include "stdafx.h"
 
-#include "bit_stream.h"
-#include "file_stream.h"
 #include "memory_stream.h"
