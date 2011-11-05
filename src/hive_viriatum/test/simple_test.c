@@ -198,6 +198,9 @@ void testBitStream() {
     /* creates the bit stream */
     createBitStream(&bitStream, fileStream->stream);
 
+    /* opens the bit stream */
+    openBitStream(bitStream);
+
     /* writes the 0100 bit set to the bit stream
     and then writes the 0001 bit set */
     writeByteBitStream(bitStream, 0x04, 4);
