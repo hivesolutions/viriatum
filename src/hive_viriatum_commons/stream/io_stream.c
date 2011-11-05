@@ -25,8 +25,22 @@
  __license__   = GNU General Public License (GPL), Version 3
 */
 
-#pragma once
+#include "stdafx.h"
 
-#include "bit_stream.h"
-#include "file_stream.h"
-#include "memory_stream.h"
+#include "io_stream.h"
+
+VIRIATUM_EXPORT_PREFIX void createStream(struct Stream_t **streamPointer) {
+    /* retrieves the stream size */
+	size_t streamSize = sizeof(struct Stream_t);
+
+    /* allocates space for the stream */
+    struct Stream_t *stream = (struct Stream_t *) MALLOC(streamSize);
+
+    /* sets the stream in the stream pointer */
+    *streamPointer = stream;
+}
+
+VIRIATUM_EXPORT_PREFIX void deleteStream(struct Stream_t *stream) {
+    /* releases the stream */
+    FREE(stream);
+}

@@ -58,14 +58,24 @@ void testArrayList();
 void testHashMap();
 
 /**
- * Teste the base 64 encoding.
+ * Tests the base 64 encoding.
  */
 void testBase64();
 
 /**
- * Teste the huffman encoding.
+ * Tests the huffman encoding.
  */
 void testHuffman();
+
+/**
+ * Tests the bit stream.
+ */
+void testBitStream();
+
+/**
+ * Tests the file stream.
+ */
+void testFileStream();
 
 /**
  * Runs the set of simple tests in the current

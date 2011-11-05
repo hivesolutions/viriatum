@@ -62,7 +62,7 @@ typedef struct HttpHandler_t {
 } HttpHandler;
 
 /**
- * Structure defining a locgical
+ * Structure defining a logical
  * http connection.
  */
 typedef struct HttpConnection_t {

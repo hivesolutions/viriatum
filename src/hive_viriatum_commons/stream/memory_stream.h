@@ -27,6 +27,4 @@
 
 #pragma once
 
-#include "bit_stream.h"
-#include "file_stream.h"
-#include "memory_stream.h"
+#include "io_stream.h"

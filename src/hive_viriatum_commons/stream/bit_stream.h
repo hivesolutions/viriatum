@@ -27,6 +27,8 @@
 
 #pragma once
 
+#include "io_stream.h"
+
 /**
  * The size in bits of an item of the
  * bit stream.
@@ -42,7 +44,20 @@
  */
 #define BIT_STREAM_BUFFER_SIZE 4096
 
+/**
+ * Structure describing the internal data
+ * of a stream of bits.
+ * This kind of stream allows a bit level
+ * control over a buffer of bytes.
+ */
 typedef struct BitStream_t {
+	/**
+	 * The internal stream used as the final
+	 * target for the stream.
+	 * This stream is updated in every flush.
+	 */
+	struct Stream_t *stream;
+
 	/**
 	 * The buffer containing the bit stream
 	 * contents in a byte oriented fashion.
@@ -94,7 +109,15 @@ typedef struct BitStream_t {
  * stream size.
  */
 typedef struct BitChunk_t {
+	/**
+	 * The byte buffer with the bit contents
+	 * of the chunk.
+	 */
 	unsigned char *buffer;
+
+	/**
+	 * The size of the bit buffer in bits.
+	 */
     size_t size;
 } BitChunk;
 
