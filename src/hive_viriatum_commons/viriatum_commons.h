@@ -34,6 +34,7 @@
 #include "debug/debug.h"
 #include "encoding/encoding.h"
 #include "util/util.h"
+#include "stream/stream.h"
 #include "structures/structures.h"
 #include "system/system.h"
 #include "thread/thread.h"
