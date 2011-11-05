@@ -46,5 +46,5 @@ void deleteHuffman(struct Huffman_t *huffman) {
 }
 
 void generateTableHuffman(struct Huffman_t *huffman) {
-	printf("This should generate the huffman table");
+    printf("This should generate the huffman table");
 }
