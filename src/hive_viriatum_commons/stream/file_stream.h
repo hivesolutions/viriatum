@@ -37,6 +37,18 @@ typedef struct FileStream_t {
     FILE *file;
 
     /**
+     * The path to the file to be used
+     * in the stream.
+     */
+    unsigned char *filePath;
+
+    /**
+     * The mode to be used in the opening
+     * of the file.
+     */
+    unsigned char *mode;
+
+    /**
      * The reference to the upper stream
      * structure.
      */

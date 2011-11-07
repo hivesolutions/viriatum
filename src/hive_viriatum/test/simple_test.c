@@ -182,7 +182,7 @@ void testHuffman() {
     createHuffman(&huffman);
 
     /* generates the huffman table */
-    generateTableHuffman(huffman);
+    generateTableHuffman(huffman, NULL);
 
     /* deletes the huffman (encoder) */
     deleteHuffman(huffman);
