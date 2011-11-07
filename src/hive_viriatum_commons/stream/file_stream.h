@@ -27,7 +27,7 @@
 
 #pragma once
 
-#include "../system/system_util.h"
+#include "../system/system.h"
 #include "io_stream.h"
 
 typedef struct FileStream_t {
