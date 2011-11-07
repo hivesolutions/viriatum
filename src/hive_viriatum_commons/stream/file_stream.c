@@ -41,8 +41,9 @@ VIRIATUM_EXPORT_PREFIX void createFileStream(struct FileStream_t **fileStreamPoi
     createStream(&fileStream->stream);
     fileStream->stream->lower = (void *) fileStream;
 
-    /* opens the file reference using the file path and the mode */
-    FOPEN(&fileStream->file, filePath, mode);
+    /* sets the file parameters in the file stream */
+    fileStream->filePath = filePath;
+    fileStream->mode = mode;
 
     /* sets the various functions of the stream */
     fileStream->stream->open = openFileStream;
@@ -71,6 +72,11 @@ VIRIATUM_EXPORT_PREFIX struct Stream_t *getStreamFileStream(struct FileStream_t 
 }
 
 VIRIATUM_EXPORT_PREFIX void openFileStream(struct Stream_t *stream) {
+    /* retrieves the file stream from the stream (as the lowe substrate) */
+    struct FileStream_t *fileStream = (struct FileStream_t *) stream->lower;
+
+    /* opens the file reference using the file path and the mode */
+    FOPEN(&fileStream->file, fileStream->filePath, fileStream->mode);
 }
 
 VIRIATUM_EXPORT_PREFIX void closeFileStream(struct Stream_t *stream) {
