@@ -181,6 +181,9 @@ void testHuffman() {
     /* creates the huffman (encoder) */
     createHuffman(&huffman);
 
+    /* generates the huffman table */
+    generateTableHuffman(huffman);
+
     /* deletes the huffman (encoder) */
     deleteHuffman(huffman);
 }

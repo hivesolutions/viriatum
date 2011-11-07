@@ -27,15 +27,24 @@
 
 #pragma once
 
+#include "../stream/stream.h"
+
 /**
  * The default size for an huffman symbol.
  */
-#define DEFAULT_HUFFMAN_SYMBOL_SIZE 8
+#define HUFFMAN_SYMBOL_SIZE 8
+
+/**
+ * The size to be used in the huffman interna
+ * buffer storage.
+ */
+#define HUFFMAN_BUFFER_SIZE 4096
 
 typedef struct Huffman_t {
+    struct Stream_t *stream;
     size_t size;
 } Huffman;
 
 VIRIATUM_EXPORT_PREFIX void createHuffman(struct Huffman_t **huffmanPointer);
 VIRIATUM_EXPORT_PREFIX void deleteHuffman(struct Huffman_t *huffman);
-VIRIATUM_EXPORT_PREFIX void generateTableHuffman(struct Huffman_t *huffman);
+VIRIATUM_EXPORT_PREFIX void generateTableHuffman(struct Huffman_t *huffman, struct Stream_t *stream);
