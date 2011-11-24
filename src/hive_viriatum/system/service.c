@@ -115,7 +115,7 @@ void deleteService(struct Service_t *service) {
     }
 
 
-    /* deltes the http handlers list */
+    /* deletes the http handlers list */
     deleteLinkedList(service->httpHandlersList);
 
 

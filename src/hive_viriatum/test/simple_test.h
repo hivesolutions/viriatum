@@ -78,6 +78,11 @@ void testBitStream();
 void testFileStream();
 
 /**
+ * Tests the template engine.
+ */
+void testTemplateEngine();
+
+/**
  * Runs the set of simple tests in the current
  * test case.
  */
