@@ -61,11 +61,14 @@ void processTemplateEngine(struct TemplateEngine_t *templateEngine, unsigned cha
 
     unsigned char *fileBuffer;
 
+    /* allocates the index variable used to locate
+    the part of context changing durring the parsing */
     size_t index = 0;
     size_t tagIndex = 0;
     size_t parameterIndex = 0;
     size_t parameterValueIndex = 0;
 
+    /* allocates and starts the state for the template parsing */
     enum TemplateEngineState_e state = TEMPLATE_ENGINE_NORMAL;
 
     unsigned char buffer[4096];
@@ -80,6 +83,9 @@ void processTemplateEngine(struct TemplateEngine_t *templateEngine, unsigned cha
     fileSize = ftell(file);
     fseek(file, 0, SEEK_SET);
 
+    /* allocates the buffer that will hold the complete
+    template file (this allocation may be giant), this is
+    necessary for the correct execution of the parser */
     fileBuffer = (void *) MALLOC(fileSize);
 
     /* iterates continuously too run the parser
@@ -120,7 +126,7 @@ void processTemplateEngine(struct TemplateEngine_t *templateEngine, unsigned cha
                 if(current == '{') {
                     state = TEMPLATE_ENGINE_OPEN;
 
-                    /* RAISE tag open */
+                    /* RAISE tag open index - 1 */
                     tagIndex = index + 1;
                 } else {
                     state = TEMPLATE_ENGINE_NORMAL;
@@ -250,7 +256,8 @@ void processTemplateEngine(struct TemplateEngine_t *templateEngine, unsigned cha
         index++;
     }
 
-    /* releases the file buffer */
+    /* releases the file buffer and the buffer */
+    free(buffer);
     free(fileBuffer);
 }
 
