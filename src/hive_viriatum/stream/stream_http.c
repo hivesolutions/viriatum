@@ -91,6 +91,8 @@ ERROR_CODE createHttpConnection(struct HttpConnection_t **httpConnectionPointer,
 
 
 
+
+
     /*peekValueLinkedList(service->httpHandlersList, (void **) &httpHandler);*/
 
 
@@ -119,12 +121,17 @@ ERROR_CODE deleteHttpConnection(struct HttpConnection_t *httpConnection) {
     struct HttpHandler_t *httpHandler;
 
 
+
+
     /*peekValueLinkedList(service->httpHandlersList, (void **) &httpHandler);*/
 
     /* unsets the structures for the handler */
     /*httpHandler->unset(httpConnection);*/
 
     unsetHandlerFile(httpConnection);
+
+
+
 
 
     /* deletes the http parser */

@@ -104,7 +104,7 @@ ERROR_CODE urlCallbackHandlerFile(struct HttpParser_t *httpParser, const unsigne
     /* puts the end of string in the url */
     url[dataSize] = '\0';
 
-    /* in case the string refers the base path */
+    /* in case the string refers the base path (default handler must be used) */
     if(strcmp((char *) url, "/") == 0 || strcmp((char *) url, "") == 0) {
         /* reallocates the space for the index reference */
         url = (unsigned char *) REALLOC(url, 12);

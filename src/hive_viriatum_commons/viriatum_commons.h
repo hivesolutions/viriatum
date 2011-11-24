@@ -37,4 +37,5 @@
 #include "stream/stream.h"
 #include "structures/structures.h"
 #include "system/system.h"
+#include "template/template.h"
 #include "thread/thread.h"

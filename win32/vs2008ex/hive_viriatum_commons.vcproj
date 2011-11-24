@@ -583,6 +583,14 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="Template"
+				>
+				<File
+					RelativePath="..\..\src\hive_viriatum_commons\template\engine.c"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -802,6 +810,18 @@
 				</File>
 				<File
 					RelativePath="..\..\src\hive_viriatum_commons\stream\stream.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Template"
+				>
+				<File
+					RelativePath="..\..\src\hive_viriatum_commons\template\engine.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\hive_viriatum_commons\template\template.h"
 					>
 				</File>
 			</Filter>

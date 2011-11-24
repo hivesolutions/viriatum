@@ -278,6 +278,20 @@ void testFileStream() {
     deleteFileStream(fileStream);
 }
 
+void testTemplateEngine() {
+    /* allocates space for the template engine */
+    struct TemplateEngine_t *templateEngine;
+
+    /* creates the template engine */
+    createTemplateEngine(&templateEngine);
+
+    /* processes the file as a template engine */
+    processTemplateEngine(templateEngine, "c:/tobias.tpl");
+
+    /* deletes the template engine */
+    deleteTemplateEngine(templateEngine);
+}
+
 void runSimpleTests() {
     /* tests the thread pool */
     testThreadPool();
@@ -302,4 +316,7 @@ void runSimpleTests() {
 
     /* tests the file stream */
     testFileStream();
+
+    /* tests the template engine */
+    testTemplateEngine();
 }
