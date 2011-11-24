@@ -62,7 +62,18 @@ typedef enum TemplateEngineState_e {
      */
     TEMPLATE_ENGINE_PARAMETER,
 
+    /**
+     * State when the initial part of a value has been
+     * found and the parser is trying to find the end
+     * of the value.
+     */
     TEMPLATE_ENGINE_PARAMETER_VALUE,
+
+    /**
+     * State where the initial part of a string based value
+     * has been found and the end of string is trying to be
+     * found for complete string value assert.
+     */
     TEMPLATE_ENGINE_PARAMETER_VALUE_STRING
 } TemplateEngineState;
 
