@@ -256,8 +256,7 @@ void processTemplateEngine(struct TemplateEngine_t *templateEngine, unsigned cha
         index++;
     }
 
-    /* releases the file buffer and the buffer */
-    free(buffer);
+    /* releases the file buffer */
     free(fileBuffer);
 }
 
