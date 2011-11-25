@@ -71,12 +71,22 @@
 #define NEW_MESSAGE() START_STATE
 #endif
 
-#define MARK(FOR)\
+#define HTTP_MARK(FOR)\
     do {\
         FOR##Mark = pointer;\
     } while(0)
 
 #define HTTP_CALLBACK(FOR)\
+    do {\
+        if(httpSettings->on##FOR) {\
+            if(httpSettings->on##FOR(httpParser) != 0) {\
+                /*SET_ERRNO(HPE_CB_##FOR);*/\
+                /*return (pointer - data);*/\
+            }\
+        }\
+    } while(0)
+
+#define HTTP_CALLBACK_DATA(FOR)\
     do {\
         if(FOR##Mark) {\
             if(httpSettings->on##FOR) {\
@@ -86,16 +96,6 @@
                 }\
             }\
             FOR##Mark = NULL;\
-        }\
-    } while(0)
-
-#define HTTP_CALLBACK2(FOR)\
-    do {\
-        if(httpSettings->on##FOR) {\
-            if(httpSettings->on##FOR(httpParser) != 0) {\
-                /*SET_ERRNO(HPE_CB_##FOR);*/\
-                /*return (pointer - data);*/\
-            }\
         }\
     } while(0)
 
@@ -229,16 +229,16 @@ static const unsigned char normalUrlChar[256] = {
 };
 
 /**
- * Callback function type used for callbacks that require
- * "extra" data to be send as argument.
- */
-typedef ERROR_CODE (*httpDataCallback) (struct HttpParser_t *, const unsigned char *, size_t);
-
-/**
  * The "default" callback function to be used, without
  * any extra arguments.
  */
 typedef ERROR_CODE (*httpCallback) (struct HttpParser_t *);
+
+/**
+ * Callback function type used for callbacks that require
+ * "extra" data to be send as argument.
+ */
+typedef ERROR_CODE (*httpDataCallback) (struct HttpParser_t *, const unsigned char *, size_t);
 
 /**
  * List of strings defining the various http method
