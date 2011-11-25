@@ -209,4 +209,16 @@ VIRIATUM_EXPORT_PREFIX void deleteTemplateEngine(struct TemplateEngine_t *templa
 VIRIATUM_EXPORT_PREFIX void createTemplateSettings(struct TemplateSettings_t **templateSettingsPointer);
 VIRIATUM_EXPORT_PREFIX void deleteTemplateSettings(struct TemplateSettings_t *templateSettings);
 VIRIATUM_EXPORT_PREFIX void processTemplateEngine(struct TemplateEngine_t *templateEngine, struct TemplateSettings_t *templateSettings, unsigned char *filePath);
+
+/**
+ * Retrieves a new character from the file stream
+ * updating the pointer status, and all the associated
+ * structure.
+ *
+ * @param file The file stream to be used for character
+ * retrieveal.
+ * @param pointer The pointer reference to the buffer to
+ * updated with the read chracter.
+ * @return The character read from the file stream.
+ */
 VIRIATUM_EXPORT_PREFIX char _getcTemplateEngine(FILE *file, unsigned char **pointer);

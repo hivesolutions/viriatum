@@ -27,7 +27,16 @@
 
 #pragma once
 
+/**
+ * The default size to be used in a newly
+ * constructed hash map.
+ */
 #define DEFAULT_HASH_MAP_SIZE 1024
+
+/**
+ * The default maximum load factor for which
+ * a re-allocation of the map must be done.
+ */
 #define DEFAULT_MAXIMUM_LOAD_FACTOR 0.75
 
 typedef struct HashMap_t {
