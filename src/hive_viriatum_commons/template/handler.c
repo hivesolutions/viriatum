@@ -36,7 +36,7 @@ void createTemplateHandler(struct TemplateHandler_t **templateHandlerPointer) {
     /* allocates space for the template handler */
     struct TemplateHandler_t *templateHandler = (struct TemplateHandler_t *) MALLOC(templateHandlerSize);
 
-    /* sets the default values */
+    /* sets the default values in the template handler */
     templateHandler->nodeCount = 0;
     templateHandler->currentNode = NULL;
     templateHandler->nodes = NULL;
@@ -57,6 +57,13 @@ void createTemplateNode(struct TemplateNode_t **templateNodePointer) {
     /* allocates space for the template node */
     struct TemplateNode_t *templateNode = (struct TemplateNode_t *) MALLOC(templateNodeSize);
 
+    /* sets the default values in the template node */
+    templateNode->childCount = 0;
+    templateNode->attributeCount = 0;
+    templateNode->name = NULL;
+    templateNode->children = NULL;
+    templateNode->attributes = NULL;
+
     /* sets the template engine in the template node pointer */
     *templateNodePointer = templateNode;
 }
@@ -73,8 +80,13 @@ ERROR_CODE tagBegin(struct TemplateEngine_t *templateEngine) {
     /* retrieves the template handler from the template engine context */
     struct TemplateHandler_t *templateHandler = (struct TemplateHandler_t *) templateEngine->context;
 
+    /* creates a new template node and sets the template
+    node as the current node in the template handler */
     createTemplateNode(&templateNode);
     templateHandler->currentNode = templateNode;
+
+    /* sets the template node type as open */
+    templateNode->type = TEMPLATE_NODE_OPEN;
 
     printf("TAG_BEGIN\n");
 
@@ -82,6 +94,14 @@ ERROR_CODE tagBegin(struct TemplateEngine_t *templateEngine) {
 }
 
 ERROR_CODE tagCloseBegin(struct TemplateEngine_t *templateEngine) {
+    /* retrieves the template handler from the template engine context
+    and retrieves the current node from it */
+    struct TemplateHandler_t *templateHandler = (struct TemplateHandler_t *) templateEngine->context;
+    struct TemplateNode_t *currentNode = templateHandler->currentNode;
+
+    /* sets the current node type as close */
+    currentNode->type = TEMPLATE_NODE_CLOSE;
+
     printf("TAG_CLOSE_BEGIN\n");
 
     RAISE_NO_ERROR;
@@ -99,12 +119,18 @@ ERROR_CODE tagEnd(struct TemplateEngine_t *templateEngine, const unsigned char *
 }
 
 ERROR_CODE tagName(struct TemplateEngine_t *templateEngine, const unsigned char *pointer, size_t size) {
-    char buffer[1024];
+    /* retrieves the template handler from the template engine context
+    and retrieves the current node from it */
+    struct TemplateHandler_t *templateHandler = (struct TemplateHandler_t *) templateEngine->context;
+    struct TemplateNode_t *currentNode = templateHandler->currentNode;
 
-    memcpy(buffer, pointer, size);
-    buffer[size] = '\0';
+    /* allocates the space for the current node name and
+    sets it with a memory copy */
+    currentNode->name = (unsigned char *) malloc(size + 1);
+    memcpy(currentNode->name, pointer, size);
+    currentNode->name[size] = '\0';
 
-    printf("TAG_NAME: '%s'\n", buffer);
+    printf("TAG_NAME: '%s'\n", currentNode->name);
 
     RAISE_NO_ERROR;
 }
