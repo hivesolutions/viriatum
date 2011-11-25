@@ -278,93 +278,18 @@ void testFileStream() {
     deleteFileStream(fileStream);
 }
 
+void testTemplateHandler() {
+    /* allocates space for the template handler */
+    struct TemplateHandler_t *templateHandler;
 
+    /* creates the template handler */
+    createTemplateHandler(&templateHandler);
 
+    /* processes the file as a template handler */
+    processTemplateHandler(templateHandler, "c:/tobias.tpl");
 
-ERROR_CODE tagBegin(struct TemplateEngine_t *templateEngine) {
-    printf("TAG_BEGIN\n");
-
-    RAISE_NO_ERROR;
-}
-
-ERROR_CODE tagCloseBegin(struct TemplateEngine_t *templateEngine) {
-    printf("TAG_CLOSE_BEGIN\n");
-
-    RAISE_NO_ERROR;
-}
-
-ERROR_CODE tagEnd(struct TemplateEngine_t *templateEngine, const unsigned char *pointer, size_t size) {
-    char buffer[1024];
-
-    memcpy(buffer, pointer, size);
-    buffer[size] = '\0';
-
-    printf("TAG_END: '%s'\n", buffer);
-
-    RAISE_NO_ERROR;
-}
-
-ERROR_CODE tagName(struct TemplateEngine_t *templateEngine, const unsigned char *pointer, size_t size) {
-    char buffer[1024];
-
-    memcpy(buffer, pointer, size);
-    buffer[size] = '\0';
-
-    printf("TAG_NAME: '%s'\n", buffer);
-
-    RAISE_NO_ERROR;
-}
-
-ERROR_CODE parameter(struct TemplateEngine_t *templateEngine, const unsigned char *pointer, size_t size) {
-    char buffer[1024];
-
-    memcpy(buffer, pointer, size);
-    buffer[size] = '\0';
-
-    printf("PARAMETER: '%s'\n", buffer);
-
-    RAISE_NO_ERROR;
-}
-
-ERROR_CODE parameterValue(struct TemplateEngine_t *templateEngine, const unsigned char *pointer, size_t size) {
-    char buffer[1024];
-
-    memcpy(buffer, pointer, size);
-    buffer[size] = '\0';
-
-    printf("VALUE: '%s'\n", buffer);
-
-    RAISE_NO_ERROR;
-}
-
-void testTemplateEngine() {
-    /* allocates space for the template engine */
-    struct TemplateEngine_t *templateEngine;
-
-    /* allocates space for the template settings */
-    struct TemplateSettings_t *templateSettings;
-
-    /* creates the template engine */
-    createTemplateEngine(&templateEngine);
-
-    /* creates the template engine */
-    createTemplateSettings(&templateSettings);
-
-    templateSettings->ontagBegin = tagBegin;
-    templateSettings->ontagCloseBegin = tagCloseBegin;
-    templateSettings->ontagEnd = tagEnd;
-    templateSettings->ontagName = tagName;
-    templateSettings->onparameter = parameter;
-    templateSettings->onparameterValue = parameterValue;
-
-    /* processes the file as a template engine */
-    processTemplateEngine(templateEngine, templateSettings, "c:/tobias.tpl");
-
-    /* deletes the template settings */
-    deleteTemplateSettings(templateSettings);
-
-    /* deletes the template engine */
-    deleteTemplateEngine(templateEngine);
+    /* deletes the template handler */
+    deleteTemplateHandler(templateHandler);
 }
 
 void runSimpleTests() {
@@ -392,6 +317,6 @@ void runSimpleTests() {
     /* tests the file stream */
     testFileStream();
 
-    /* tests the template engine */
-    testTemplateEngine();
+    /* tests the template handler */
+    testTemplateHandler();
 }

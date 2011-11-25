@@ -36,6 +36,9 @@ void createTemplateEngine(struct TemplateEngine_t **templateEnginePointer) {
     /* allocates space for the template engine */
     struct TemplateEngine_t *templateEngine = (struct TemplateEngine_t *) MALLOC(templateEngineSize);
 
+    /* sets the default values */
+    templateEngine->context = NULL;
+
     /* sets the template engine in the template engine pointer */
     *templateEnginePointer = templateEngine;
 }

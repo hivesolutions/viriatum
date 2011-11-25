@@ -27,6 +27,8 @@
 
 #pragma once
 
+#include "engine.h"
+
 /**
  * Structure defining the attribute internal
  * attributes and the references to the value.
@@ -66,6 +68,17 @@ typedef struct TemplateAttribute_t {
 typedef struct TemplateNode_t {
     size_t childCount;
     size_t attributeCount;
-    struct TemplateNode_t *children;
-    struct TemplateAttribute_t *attributes;
+    unsigned char *name;
+    struct TemplateNode_t **children;
+    struct TemplateAttribute_t **attributes;
 } TemplateNode;
+
+typedef struct TemplateHandler_t {
+    size_t nodeCount;
+    struct TemplateNode_t *currentNode;
+    struct TemplateNode_t **nodes;
+} TemplateHandler;
+
+VIRIATUM_EXPORT_PREFIX void createTemplateHandler(struct TemplateHandler_t **templateHandlerPointer);
+VIRIATUM_EXPORT_PREFIX void deleteTemplateHandler(struct TemplateHandler_t *templateHandler);
+VIRIATUM_EXPORT_PREFIX void processTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned char *filePath);

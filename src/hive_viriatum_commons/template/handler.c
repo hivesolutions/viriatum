@@ -28,3 +28,139 @@
 #include "stdafx.h"
 
 #include "handler.h"
+
+void createTemplateHandler(struct TemplateHandler_t **templateHandlerPointer) {
+    /* retrieves the template handler size */
+    size_t templateHandlerSize = sizeof(struct TemplateHandler_t);
+
+    /* allocates space for the template handler */
+    struct TemplateHandler_t *templateHandler = (struct TemplateHandler_t *) MALLOC(templateHandlerSize);
+
+    /* sets the default values */
+    templateHandler->nodeCount = 0;
+    templateHandler->currentNode = NULL;
+    templateHandler->nodes = NULL;
+
+    /* sets the template engine in the template handler pointer */
+    *templateHandlerPointer = templateHandler;
+}
+
+void deleteTemplateHandler(struct TemplateHandler_t *templateHandler) {
+    /* releases the template handler */
+    FREE(templateHandler);
+}
+
+void createTemplateNode(struct TemplateNode_t **templateNodePointer) {
+    /* retrieves the template node size */
+    size_t templateNodeSize = sizeof(struct TemplateNode_t);
+
+    /* allocates space for the template node */
+    struct TemplateNode_t *templateNode = (struct TemplateNode_t *) MALLOC(templateNodeSize);
+
+    /* sets the template engine in the template node pointer */
+    *templateNodePointer = templateNode;
+}
+
+void deleteTemplateNode(struct TemplateNode_t *templateNode) {
+    /* releases the template node */
+    FREE(templateNode);
+}
+
+ERROR_CODE tagBegin(struct TemplateEngine_t *templateEngine) {
+    /* allocates space for the template node */
+    struct TemplateNode_t *templateNode;
+
+    /* retrieves the template handler from the template engine context */
+    struct TemplateHandler_t *templateHandler = (struct TemplateHandler_t *) templateEngine->context;
+
+    createTemplateNode(&templateNode);
+    templateHandler->currentNode = templateNode;
+
+    printf("TAG_BEGIN\n");
+
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE tagCloseBegin(struct TemplateEngine_t *templateEngine) {
+    printf("TAG_CLOSE_BEGIN\n");
+
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE tagEnd(struct TemplateEngine_t *templateEngine, const unsigned char *pointer, size_t size) {
+    char buffer[1024];
+
+    memcpy(buffer, pointer, size);
+    buffer[size] = '\0';
+
+    printf("TAG_END: '%s'\n", buffer);
+
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE tagName(struct TemplateEngine_t *templateEngine, const unsigned char *pointer, size_t size) {
+    char buffer[1024];
+
+    memcpy(buffer, pointer, size);
+    buffer[size] = '\0';
+
+    printf("TAG_NAME: '%s'\n", buffer);
+
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE parameter(struct TemplateEngine_t *templateEngine, const unsigned char *pointer, size_t size) {
+    char buffer[1024];
+
+    memcpy(buffer, pointer, size);
+    buffer[size] = '\0';
+
+    printf("PARAMETER: '%s'\n", buffer);
+
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE parameterValue(struct TemplateEngine_t *templateEngine, const unsigned char *pointer, size_t size) {
+    char buffer[1024];
+
+    memcpy(buffer, pointer, size);
+    buffer[size] = '\0';
+
+    printf("VALUE: '%s'\n", buffer);
+
+    RAISE_NO_ERROR;
+}
+
+void processTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned char *filePath) {
+     /* allocates space for the template engine */
+    struct TemplateEngine_t *templateEngine;
+
+    /* allocates space for the template settings */
+    struct TemplateSettings_t *templateSettings;
+
+    /* creates the template engine */
+    createTemplateEngine(&templateEngine);
+
+    /* creates the template engine */
+    createTemplateSettings(&templateSettings);
+
+    /* sets the context (template handler) in the template engine */
+    templateEngine->context = templateHandler;
+
+    /* sets the various callbacks in the template settings */
+    templateSettings->ontagBegin = tagBegin;
+    templateSettings->ontagCloseBegin = tagCloseBegin;
+    templateSettings->ontagEnd = tagEnd;
+    templateSettings->ontagName = tagName;
+    templateSettings->onparameter = parameter;
+    templateSettings->onparameterValue = parameterValue;
+
+    /* processes the file as a template engine */
+    processTemplateEngine(templateEngine, templateSettings, filePath);
+
+    /* deletes the template settings */
+    deleteTemplateSettings(templateSettings);
+
+    /* deletes the template engine */
+    deleteTemplateEngine(templateEngine);
+}
