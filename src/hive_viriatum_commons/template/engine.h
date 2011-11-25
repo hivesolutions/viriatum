@@ -27,7 +27,50 @@
 
 #pragma once
 
+#include "../debug/debug.h"
 #include "../system/system.h"
+
+#define TEMPLATE_MARK(FOR)\
+    do {\
+        FOR##Mark = pointer;\
+    } while(0)
+
+#define TEMPLATE_CALLBACK(FOR)\
+    do {\
+        if(FOR##Mark) {\
+            if(templateSettings->on##FOR) {\
+                if(templateSettings->on##FOR(templateEngine, FOR##Mark, pointer - FOR##Mark) != 0) {\
+                /*    SET_ERRNO(HPE_CB_##FOR);*/\
+                    /*return (p - data);*/\
+                }\
+            }\
+            FOR##Mark = NULL;\
+        }\
+    } while(0)
+
+#define TEMPLATE_CALLBACK2(FOR)\
+    do {\
+        if(templateSettings->on##FOR) {\
+            if(templateSettings->on##FOR(templateEngine) != 0) {\
+                /*SET_ERRNO(HPE_CB_##FOR);*/\
+                /*return (pointer - data);*/\
+            }\
+        }\
+    } while(0)
+
+struct TemplateEngine_t;
+
+/**
+ * Callback function type used for callbacks that require
+ * "extra" data to be send as argument.
+ */
+typedef ERROR_CODE (*templateDataCallback) (struct TemplateEngine_t *, const unsigned char *, size_t);
+
+/**
+ * The "default" callback function to be used, without
+ * any extra arguments.
+ */
+typedef ERROR_CODE (*templateCallback) (struct TemplateEngine_t *);
 
 typedef enum TemplateEngineState_e {
     /**
@@ -77,11 +120,21 @@ typedef enum TemplateEngineState_e {
     TEMPLATE_ENGINE_PARAMETER_VALUE_STRING
 } TemplateEngineState;
 
+/**
+ * Structure representing the various settings
+ * to be used for (and during) parsing the template.
+ */
+typedef struct TemplateSettings_t {
+    templateCallback ontagBegin;
+} TemplateSettings;
+
 typedef struct TemplateEngine_t {
     size_t tokenCount;
 } TemplateEngine;
 
 VIRIATUM_EXPORT_PREFIX void createTemplateEngine(struct TemplateEngine_t **templateEnginePointer);
 VIRIATUM_EXPORT_PREFIX void deleteTemplateEngine(struct TemplateEngine_t *templateEngine);
-VIRIATUM_EXPORT_PREFIX void processTemplateEngine(struct TemplateEngine_t *templateEngine, unsigned char *filePath);
-VIRIATUM_EXPORT_PREFIX char _getcTemplateEngine(FILE *file, unsigned char *fileBuffer, size_t *index);
+VIRIATUM_EXPORT_PREFIX void createTemplateSettings(struct TemplateSettings_t **templateSettingsPointer);
+VIRIATUM_EXPORT_PREFIX void deleteTemplateSettings(struct TemplateSettings_t *templateSettings);
+VIRIATUM_EXPORT_PREFIX void processTemplateEngine(struct TemplateEngine_t *templateEngine, struct TemplateSettings_t *templateSettings, unsigned char *filePath);
+VIRIATUM_EXPORT_PREFIX char _getcTemplateEngine(FILE *file, unsigned char **pointer);
