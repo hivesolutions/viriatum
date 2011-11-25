@@ -56,6 +56,8 @@ void createTemplateSettings(struct TemplateSettings_t **templateSettingsPointer)
     struct TemplateSettings_t *templateSettings = (struct TemplateSettings_t *) MALLOC(templateSettingsSize);
 
     /* sets the template settings callback values */
+    templateSettings->ontextBegin = NULL;
+    templateSettings->ontextEnd = NULL;
     templateSettings->ontagBegin = NULL;
     templateSettings->ontagCloseBegin = NULL;
     templateSettings->ontagEnd = NULL;
@@ -96,6 +98,7 @@ void processTemplateEngine(struct TemplateEngine_t *templateEngine, struct Templ
     /* allocates the mark variable used to locate
     the part of context changing durring the parsing */
     unsigned char *pointer = 0;
+    unsigned char *textEndMark = 0;
     unsigned char *tagEndMark = 0;
     unsigned char *tagNameMark = 0;
     unsigned char *parameterMark = 0;
@@ -120,6 +123,9 @@ void processTemplateEngine(struct TemplateEngine_t *templateEngine, struct Templ
     the file buffer reference as the (initial) pointer value */
     fileBuffer = (void *) MALLOC(fileSize);
     pointer = fileBuffer;
+
+    TEMPLATE_MARK(textEnd);
+    TEMPLATE_CALLBACK(textBegin);
 
     /* iterates continuously too run the parser
     over the complete set of file contents */
@@ -159,9 +165,10 @@ void processTemplateEngine(struct TemplateEngine_t *templateEngine, struct Templ
             case TEMPLATE_ENGINE_DOLAR:
                 if(current == '{') {
                     /* marks the tag element and calls
-                    the tag begin callback */
+                    the text end and tag begin callbacks */
                     TEMPLATE_MARK(tagName);
                     TEMPLATE_MARK_N(tagEnd, 2);
+                    TEMPLATE_CALLBACK_DATA_N(textEnd, 2);
                     TEMPLATE_CALLBACK(tagBegin);
 
                     /* changes the state of the parser
@@ -176,6 +183,7 @@ void processTemplateEngine(struct TemplateEngine_t *templateEngine, struct Templ
                         aheadSet = 0;
                     }
                 } else {
+                    /* resets the state to the "normal" */
                     state = TEMPLATE_ENGINE_NORMAL;
                 }
 
@@ -190,8 +198,11 @@ void processTemplateEngine(struct TemplateEngine_t *templateEngine, struct Templ
                         state = TEMPLATE_ENGINE_NORMAL;
                         aheadSet = 0;
 
-                        /* calls the tag end callback */
-                        TEMPLATE_CALLBACK_DATA_BACK(tagEnd);
+                        TEMPLATE_MARK(textEnd);
+
+                        /* calls the tag end and text begin callbacks */
+                        TEMPLATE_CALLBACK_DATA(tagEnd);
+                        TEMPLATE_CALLBACK(textBegin);
 
                         break;
                     }
@@ -200,8 +211,11 @@ void processTemplateEngine(struct TemplateEngine_t *templateEngine, struct Templ
                 if(current == '}') {
                     state = TEMPLATE_ENGINE_NORMAL;
 
-                    /* calls the tag end callback */
+                    TEMPLATE_MARK(textEnd);
+
+                    /* calls the tag end and text begin callbacks */
                     TEMPLATE_CALLBACK_DATA(tagEnd);
+                    TEMPLATE_CALLBACK(textBegin);
 
                     break;
                 }
@@ -226,8 +240,11 @@ void processTemplateEngine(struct TemplateEngine_t *templateEngine, struct Templ
                         state = TEMPLATE_ENGINE_NORMAL;
                         aheadSet = 0;
 
-                        /* calls the tag end callback */
+                        TEMPLATE_MARK(textEnd);
+
+                        /* calls the tag end and text begin callbacks */
                         TEMPLATE_CALLBACK_DATA(tagEnd);
+                        TEMPLATE_CALLBACK(textBegin);
 
                         break;
                     }
@@ -236,8 +253,11 @@ void processTemplateEngine(struct TemplateEngine_t *templateEngine, struct Templ
                 if(current == '}') {
                     state = TEMPLATE_ENGINE_NORMAL;
 
-                    /* calls the tag end callback */
+                    TEMPLATE_MARK(textEnd);
+
+                    /* calls the tag end and text begin callbacks */
                     TEMPLATE_CALLBACK_DATA(tagEnd);
+                    TEMPLATE_CALLBACK(textBegin);
 
                     break;
                 }
@@ -259,8 +279,11 @@ void processTemplateEngine(struct TemplateEngine_t *templateEngine, struct Templ
                         state = TEMPLATE_ENGINE_NORMAL;
                         aheadSet = 0;
 
-                        /* calls the tag end callback */
-                        TEMPLATE_CALLBACK_DATA_BACK(tagEnd);
+                        TEMPLATE_MARK(textEnd);
+
+                        /* calls the tag end and text begin callbacks */
+                        TEMPLATE_CALLBACK_DATA(tagEnd);
+                        TEMPLATE_CALLBACK(textBegin);
 
                         break;
                     }
@@ -269,8 +292,11 @@ void processTemplateEngine(struct TemplateEngine_t *templateEngine, struct Templ
                 if(current == '}') {
                     state = TEMPLATE_ENGINE_NORMAL;
 
-                    /* calls the tag end callback */
+                    TEMPLATE_MARK(textEnd);
+
+                    /* calls the tag end and text begin callbacks */
                     TEMPLATE_CALLBACK_DATA(tagEnd);
+                    TEMPLATE_CALLBACK(textBegin);
 
                     break;
                 }
@@ -295,8 +321,11 @@ void processTemplateEngine(struct TemplateEngine_t *templateEngine, struct Templ
                         state = TEMPLATE_ENGINE_NORMAL;
                         aheadSet = 0;
 
-                        /* calls the tag end callback */
-                        TEMPLATE_CALLBACK_DATA_BACK(tagEnd);
+                        TEMPLATE_MARK(textEnd);
+
+                        /* calls the tag end and text begin callbacks */
+                        TEMPLATE_CALLBACK_DATA(tagEnd);
+                        TEMPLATE_CALLBACK(textBegin);
 
                         break;
                     }
@@ -305,8 +334,11 @@ void processTemplateEngine(struct TemplateEngine_t *templateEngine, struct Templ
                 if(current == '}') {
                     state = TEMPLATE_ENGINE_NORMAL;
 
-                    /* calls the tag end callback */
+                    TEMPLATE_MARK(textEnd);
+
+                    /* calls the tag end and text begin callbacks */
                     TEMPLATE_CALLBACK_DATA(tagEnd);
+                    TEMPLATE_CALLBACK(textBegin);
 
                     break;
                 }
@@ -332,6 +364,10 @@ void processTemplateEngine(struct TemplateEngine_t *templateEngine, struct Templ
 
                 break;
         }
+    }
+
+    if(state == TEMPLATE_ENGINE_NORMAL) {
+        TEMPLATE_CALLBACK_DATA(textEnd);
     }
 
     /* closes the file */

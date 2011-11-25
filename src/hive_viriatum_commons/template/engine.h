@@ -30,16 +30,8 @@
 #include "../debug/debug.h"
 #include "../system/system.h"
 
-#define TEMPLATE_MARK(FOR)\
-    do {\
-        FOR##Mark = pointer;\
-    } while(0)
-
-#define TEMPLATE_MARK_BACK(FOR)\
-    do {\
-        FOR##Mark = pointer - 1;\
-    } while(0)
-
+#define TEMPLATE_MARK(FOR) TEMPLATE_MARK_N(FOR, 0)
+#define TEMPLATE_MARK_BACK(FOR) TEMPLATE_MARK_N(FOR, 1)
 #define TEMPLATE_MARK_N(FOR, N)\
     do {\
         FOR##Mark = pointer - N;\
@@ -55,24 +47,13 @@
         }\
     } while(0)
 
-#define TEMPLATE_CALLBACK_DATA(FOR)\
+#define TEMPLATE_CALLBACK_DATA(FOR) TEMPLATE_CALLBACK_DATA_N(FOR, 0)
+#define TEMPLATE_CALLBACK_DATA_BACK(FOR) TEMPLATE_CALLBACK_DATA_N(FOR, 1)
+#define TEMPLATE_CALLBACK_DATA_N(FOR, N)\
     do {\
         if(FOR##Mark) {\
             if(templateSettings->on##FOR) {\
-                if(templateSettings->on##FOR(templateEngine, FOR##Mark, pointer - FOR##Mark) != 0) {\
-                /*    SET_ERRNO(HPE_CB_##FOR);*/\
-                    /*return (p - data);*/\
-                }\
-            }\
-            FOR##Mark = NULL;\
-        }\
-    } while(0)
-
-#define TEMPLATE_CALLBACK_DATA_BACK(FOR)\
-    do {\
-        if(FOR##Mark) {\
-            if(templateSettings->on##FOR) {\
-                if(templateSettings->on##FOR(templateEngine, FOR##Mark, pointer - FOR##Mark - 1) != 0) {\
+                if(templateSettings->on##FOR(templateEngine, FOR##Mark, pointer - FOR##Mark - N) != 0) {\
                 /*    SET_ERRNO(HPE_CB_##FOR);*/\
                     /*return (p - data);*/\
                 }\
@@ -152,6 +133,18 @@ typedef enum TemplateEngineState_e {
  * to be used for (and during) parsing the template.
  */
 typedef struct TemplateSettings_t {
+    /**
+     * Callabck function called when a new text
+     * sequence is opened.
+     */
+    templateCallback ontextBegin;
+
+    /**
+     * Callback function called when an existing
+     * text sequence is closed.
+     */
+    templateDataCallback ontextEnd;
+
     /**
      * Callabck function called when a new tag
      * is opened.
