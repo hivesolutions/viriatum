@@ -52,8 +52,13 @@ void createTemplateSettings(struct TemplateSettings_t **templateSettingsPointer)
     /* allocates space for the template settings */
     struct TemplateSettings_t *templateSettings = (struct TemplateSettings_t *) MALLOC(templateSettingsSize);
 
-    /* sets the template settings on  callback */
+    /* sets the template settings callback values */
     templateSettings->ontagBegin = NULL;
+    templateSettings->ontagCloseBegin = NULL;
+    templateSettings->ontagEnd = NULL;
+    templateSettings->ontagName = NULL;
+    templateSettings->onparameter = NULL;
+    templateSettings->onparameterValue = NULL;
 
     /* sets the template settings in the template settings pointer */
     *templateSettingsPointer = templateSettings;
@@ -76,6 +81,8 @@ void processTemplateEngine(struct TemplateEngine_t *templateEngine, struct Templ
     /* allocates the space for the look ahead valid flag */
     unsigned char aheadSet = 0;
 
+    /* allocates the space for the variable that will hold
+    the size of the file to be parsed */
     size_t fileSize;
 
     /* allocates the buffer thath will hold the contents
@@ -86,14 +93,13 @@ void processTemplateEngine(struct TemplateEngine_t *templateEngine, struct Templ
     /* allocates the mark variable used to locate
     the part of context changing durring the parsing */
     unsigned char *pointer = 0;
-    unsigned char *tagMark = 0;
+    unsigned char *tagEndMark = 0;
+    unsigned char *tagNameMark = 0;
     unsigned char *parameterMark = 0;
     unsigned char *parameterValueMark = 0;
 
     /* allocates and starts the state for the template parsing */
     enum TemplateEngineState_e state = TEMPLATE_ENGINE_NORMAL;
-
-    unsigned char buffer[4096];
 
     /* opens the file */
     FOPEN(&file, (char *) filePath, "rb");
@@ -108,7 +114,7 @@ void processTemplateEngine(struct TemplateEngine_t *templateEngine, struct Templ
     /* allocates the buffer that will hold the complete
     template file (this allocation may be giant), this is
     necessary for the correct execution of the parser, uses
-    the buffer initial pointer as the pointer value */
+    the file buffer reference as the (initial) pointer value */
     fileBuffer = (void *) MALLOC(fileSize);
     pointer = fileBuffer;
 
@@ -120,8 +126,9 @@ void processTemplateEngine(struct TemplateEngine_t *templateEngine, struct Templ
         file reading */
         if(aheadSet) {
             /* sets the current read character as the look
-            ahead character */
+            ahead character and unsets the ahead set flag */
             current = ahead;
+            aheadSet = 0;
         }
         /* otherwise it must be a normal reading */
         else {
@@ -148,15 +155,23 @@ void processTemplateEngine(struct TemplateEngine_t *templateEngine, struct Templ
 
             case TEMPLATE_ENGINE_DOLAR:
                 if(current == '{') {
+                    /* marks the tag element and calls
+                    the tag begin callback */
+                    TEMPLATE_MARK(tagName);
+                    TEMPLATE_MARK_N(tagEnd, 2);
+                    TEMPLATE_CALLBACK(tagBegin);
+
+                    /* changes the state of the parser
+                    to open (tag open) */
                     state = TEMPLATE_ENGINE_OPEN;
 
-                    /* calls the tag begin callback */
-                    TEMPLATE_CALLBACK2(tagBegin);
+                    ahead = _getcTemplateEngine(file, &pointer);
+                    aheadSet = 1;
 
-                    /* RAISE tag open index - 1 */
-
-                    /* marks the tag element */
-                    TEMPLATE_MARK(tag);
+                    if(ahead == '/') {
+                        TEMPLATE_CALLBACK(tagCloseBegin);
+                        aheadSet = 0;
+                    }
                 } else {
                     state = TEMPLATE_ENGINE_NORMAL;
                 }
@@ -172,19 +187,28 @@ void processTemplateEngine(struct TemplateEngine_t *templateEngine, struct Templ
                         state = TEMPLATE_ENGINE_NORMAL;
                         aheadSet = 0;
 
-                        printf("\n");
+                        /* calls the tag end callback */
+                        TEMPLATE_CALLBACK_DATA_BACK(tagEnd);
 
                         break;
                     }
                 }
 
+                if(current == '}') {
+                    state = TEMPLATE_ENGINE_NORMAL;
+
+                    /* calls the tag end callback */
+                    TEMPLATE_CALLBACK_DATA(tagEnd);
+
+                    break;
+                }
+
                 if(current == ' ') {
-                    /* RAISE new tag[tagIndex:index]  */
-                    /*memcpy(buffer, fileBuffer + tagIndex, index - tagIndex);
-                    buffer[index - tagIndex] = '\0';
+                    /* calls the tag name callback */
+                    TEMPLATE_CALLBACK_DATA_BACK(tagName);
 
-                    printf("NEW TAG: %s\n", buffer);*/
-
+                    /* changes the state of the template engine
+                    to parametrs (parameters finding) */
                     state = TEMPLATE_ENGINE_PARAMETERS;
                 }
 
@@ -199,14 +223,26 @@ void processTemplateEngine(struct TemplateEngine_t *templateEngine, struct Templ
                         state = TEMPLATE_ENGINE_NORMAL;
                         aheadSet = 0;
 
+                        /* calls the tag end callback */
+                        TEMPLATE_CALLBACK_DATA(tagEnd);
+
                         break;
                     }
                 }
 
-                if(current != ' ') {
-                    state = TEMPLATE_ENGINE_PARAMETER;
+                if(current == '}') {
+                    state = TEMPLATE_ENGINE_NORMAL;
 
-                    TEMPLATE_MARK(parameter);
+                    /* calls the tag end callback */
+                    TEMPLATE_CALLBACK_DATA(tagEnd);
+
+                    break;
+                }
+
+                if(current != ' ') {
+                    TEMPLATE_MARK_BACK(parameter);
+
+                    state = TEMPLATE_ENGINE_PARAMETER;
                 }
 
                 break;
@@ -220,21 +256,29 @@ void processTemplateEngine(struct TemplateEngine_t *templateEngine, struct Templ
                         state = TEMPLATE_ENGINE_NORMAL;
                         aheadSet = 0;
 
+                        /* calls the tag end callback */
+                        TEMPLATE_CALLBACK_DATA_BACK(tagEnd);
+
                         break;
                     }
                 }
 
+                if(current == '}') {
+                    state = TEMPLATE_ENGINE_NORMAL;
+
+                    /* calls the tag end callback */
+                    TEMPLATE_CALLBACK_DATA(tagEnd);
+
+                    break;
+                }
+
                 if(current == '=') {
-                    state = TEMPLATE_ENGINE_PARAMETER_VALUE;
-
-                    /*memcpy(buffer, fileBuffer + parameterIndex, index - parameterIndex);
-                    buffer[index - parameterIndex] = '\0';
-
-                    printf("NEW PARAMETER: %s\n", buffer);*/
-
-                    /* RAISE new parameter[parameterIndex:index] */
-
+                    /* calls the parameter callback and marks
+                    the template engine parameter value */
+                    TEMPLATE_CALLBACK_DATA_BACK(parameter);
                     TEMPLATE_MARK(parameterValue);
+
+                    state = TEMPLATE_ENGINE_PARAMETER_VALUE;
                 }
 
                 break;
@@ -248,19 +292,27 @@ void processTemplateEngine(struct TemplateEngine_t *templateEngine, struct Templ
                         state = TEMPLATE_ENGINE_NORMAL;
                         aheadSet = 0;
 
-                        printf("\n");
+                        /* calls the tag end callback */
+                        TEMPLATE_CALLBACK_DATA_BACK(tagEnd);
 
                         break;
                     }
                 }
 
+                if(current == '}') {
+                    state = TEMPLATE_ENGINE_NORMAL;
+
+                    /* calls the tag end callback */
+                    TEMPLATE_CALLBACK_DATA(tagEnd);
+
+                    break;
+                }
+
                 if(current == '\"') {
                     state = TEMPLATE_ENGINE_PARAMETER_VALUE_STRING;
                 } else if(current == ' ') {
-                    /*memcpy(buffer, fileBuffer + parameterValueIndex, index - parameterValueIndex);
-                    buffer[index - parameterValueIndex] = '\0';
-
-                    printf("NEW PARAMETER VALUE: %s\n", buffer);*/
+                    /* calls the parameter value callback */
+                    TEMPLATE_CALLBACK_DATA_BACK(parameterValue);
 
                     state = TEMPLATE_ENGINE_PARAMETERS;
                 }
@@ -269,10 +321,8 @@ void processTemplateEngine(struct TemplateEngine_t *templateEngine, struct Templ
 
             case TEMPLATE_ENGINE_PARAMETER_VALUE_STRING:
                 if(current == '\"') {
-                  /*  memcpy(buffer, fileBuffer + parameterValueIndex, index - parameterValueIndex + 1);
-                    buffer[index - parameterValueIndex + 1] = '\0';
-
-                    printf("NEW (STRING) PARAMETER VALUE: %s\n", buffer);*/
+                    /* calls the parameter value callback */
+                    TEMPLATE_CALLBACK_DATA(parameterValue);
 
                     state = TEMPLATE_ENGINE_PARAMETERS;
                 }
@@ -280,6 +330,9 @@ void processTemplateEngine(struct TemplateEngine_t *templateEngine, struct Templ
                 break;
         }
     }
+
+    /* closes the file */
+    fclose(file);
 
     /* releases the file buffer */
     free(fileBuffer);
@@ -289,6 +342,8 @@ char _getcTemplateEngine(FILE *file, unsigned char **pointer) {
     /* retrieves the current character
     from the file stream */
     char current = getc(file);
+    unsigned char *tobias;
+
 
     /* in case the current retrieved character
     is an end of file nothing should be updated */
@@ -300,7 +355,9 @@ char _getcTemplateEngine(FILE *file, unsigned char **pointer) {
     /* updates the file buffer (from pointer) with the current
     character and increments the pointer reference */
     **pointer = current;
-    *pointer++;
+    (*pointer)++;
+
+    tobias = *pointer;
 
     /* returns the current character */
     return current;

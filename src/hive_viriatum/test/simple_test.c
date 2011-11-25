@@ -278,8 +278,58 @@ void testFileStream() {
     deleteFileStream(fileStream);
 }
 
-ERROR_CODE tobias(struct TemplateEngine_t *templateEngine) {
-    printf("ola mundo");
+ERROR_CODE tagBegin(struct TemplateEngine_t *templateEngine) {
+    printf("TAG_BEGIN\n");
+
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE tagCloseBegin(struct TemplateEngine_t *templateEngine) {
+    printf("TAG_CLOSE_BEGIN\n");
+
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE tagEnd(struct TemplateEngine_t *templateEngine, const unsigned char *pointer, size_t size) {
+    char buffer[1024];
+
+    memcpy(buffer, pointer, size);
+    buffer[size] = '\0';
+
+    printf("TAG_END: '%s'\n", buffer);
+
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE tagName(struct TemplateEngine_t *templateEngine, const unsigned char *pointer, size_t size) {
+    char buffer[1024];
+
+    memcpy(buffer, pointer, size);
+    buffer[size] = '\0';
+
+    printf("TAG_NAME: '%s'\n", buffer);
+
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE parameter(struct TemplateEngine_t *templateEngine, const unsigned char *pointer, size_t size) {
+    char buffer[1024];
+
+    memcpy(buffer, pointer, size);
+    buffer[size] = '\0';
+
+    printf("PARAMETER: '%s'\n", buffer);
+
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE parameterValue(struct TemplateEngine_t *templateEngine, const unsigned char *pointer, size_t size) {
+    char buffer[1024];
+
+    memcpy(buffer, pointer, size);
+    buffer[size] = '\0';
+
+    printf("VALUE: '%s'\n", buffer);
 
     RAISE_NO_ERROR;
 }
@@ -297,7 +347,12 @@ void testTemplateEngine() {
     /* creates the template engine */
     createTemplateSettings(&templateSettings);
 
-    templateSettings->ontagBegin = tobias;
+    templateSettings->ontagBegin = tagBegin;
+    templateSettings->ontagCloseBegin = tagCloseBegin;
+    templateSettings->ontagEnd = tagEnd;
+    templateSettings->ontagName = tagName;
+    templateSettings->onparameter = parameter;
+    templateSettings->onparameterValue = parameterValue;
 
     /* processes the file as a template engine */
     processTemplateEngine(templateEngine, templateSettings, "c:/tobias.tpl");

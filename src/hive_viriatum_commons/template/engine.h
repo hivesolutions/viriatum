@@ -35,7 +35,27 @@
         FOR##Mark = pointer;\
     } while(0)
 
+#define TEMPLATE_MARK_BACK(FOR)\
+    do {\
+        FOR##Mark = pointer - 1;\
+    } while(0)
+
+#define TEMPLATE_MARK_N(FOR, N)\
+    do {\
+        FOR##Mark = pointer - N;\
+    } while(0)
+
 #define TEMPLATE_CALLBACK(FOR)\
+    do {\
+        if(templateSettings->on##FOR) {\
+            if(templateSettings->on##FOR(templateEngine) != 0) {\
+                /*SET_ERRNO(HPE_CB_##FOR);*/\
+                /*return (pointer - data);*/\
+            }\
+        }\
+    } while(0)
+
+#define TEMPLATE_CALLBACK_DATA(FOR)\
     do {\
         if(FOR##Mark) {\
             if(templateSettings->on##FOR) {\
@@ -48,29 +68,32 @@
         }\
     } while(0)
 
-#define TEMPLATE_CALLBACK2(FOR)\
+#define TEMPLATE_CALLBACK_DATA_BACK(FOR)\
     do {\
-        if(templateSettings->on##FOR) {\
-            if(templateSettings->on##FOR(templateEngine) != 0) {\
-                /*SET_ERRNO(HPE_CB_##FOR);*/\
-                /*return (pointer - data);*/\
+        if(FOR##Mark) {\
+            if(templateSettings->on##FOR) {\
+                if(templateSettings->on##FOR(templateEngine, FOR##Mark, pointer - FOR##Mark - 1) != 0) {\
+                /*    SET_ERRNO(HPE_CB_##FOR);*/\
+                    /*return (p - data);*/\
+                }\
             }\
+            FOR##Mark = NULL;\
         }\
     } while(0)
 
 struct TemplateEngine_t;
 
 /**
- * Callback function type used for callbacks that require
- * "extra" data to be send as argument.
- */
-typedef ERROR_CODE (*templateDataCallback) (struct TemplateEngine_t *, const unsigned char *, size_t);
-
-/**
  * The "default" callback function to be used, without
  * any extra arguments.
  */
 typedef ERROR_CODE (*templateCallback) (struct TemplateEngine_t *);
+
+/**
+ * Callback function type used for callbacks that require
+ * "extra" data to be send as argument.
+ */
+typedef ERROR_CODE (*templateDataCallback) (struct TemplateEngine_t *, const unsigned char *, size_t);
 
 typedef enum TemplateEngineState_e {
     /**
@@ -125,11 +148,56 @@ typedef enum TemplateEngineState_e {
  * to be used for (and during) parsing the template.
  */
 typedef struct TemplateSettings_t {
+    /**
+     * Callabck function called when a new tag
+     * is opened.
+     */
     templateCallback ontagBegin;
+
+    /**
+     * Callback function called when a new close
+     * type tag is opened.
+     */
+    templateCallback ontagCloseBegin;
+
+    /**
+     * Callback function called when an existing
+     * tag is closed.
+     */
+    templateDataCallback ontagEnd;
+
+    /**
+     * Callback function called when a name of a tag
+     * is parsed correctly.
+     */
+    templateDataCallback ontagName;
+
+    /**
+     * Callback function called when a parameter name
+     * is parsed correctly.
+     */
+    templateDataCallback onparameter;
+
+    /**
+     * Callback function called when a parameter value
+     * is parsed correctly.
+     */
+    templateDataCallback onparameterValue;
 } TemplateSettings;
 
+/**
+ * Structure repsenting the template engine (parser)
+ * used to store all the context of the current
+ * parsing.
+ * Additional options may be used to store context
+ * information that can be used in the callbacks.
+ */
 typedef struct TemplateEngine_t {
-    size_t tokenCount;
+    /**
+     * Context information to be used by the parsing
+     * handlers (callbacks) for context.
+     */
+    void *context;
 } TemplateEngine;
 
 VIRIATUM_EXPORT_PREFIX void createTemplateEngine(struct TemplateEngine_t **templateEnginePointer);
