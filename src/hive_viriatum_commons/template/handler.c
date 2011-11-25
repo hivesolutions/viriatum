@@ -39,6 +39,7 @@ void createTemplateHandler(struct TemplateHandler_t **templateHandlerPointer) {
     /* sets the default values in the template handler */
     templateHandler->nodeCount = 0;
     templateHandler->currentNode = NULL;
+    templateHandler->temporaryNode = NULL;
     templateHandler->nodes = NULL;
 
     /* sets the template engine in the template handler pointer */
@@ -50,12 +51,15 @@ void deleteTemplateHandler(struct TemplateHandler_t *templateHandler) {
     FREE(templateHandler);
 }
 
-void createTemplateNode(struct TemplateNode_t **templateNodePointer) {
+void createTemplateNode(struct TemplateNode_t **templateNodePointer, enum TemplateNodeType_t type) {
     /* retrieves the template node size */
     size_t templateNodeSize = sizeof(struct TemplateNode_t);
 
     /* allocates space for the template node */
     struct TemplateNode_t *templateNode = (struct TemplateNode_t *) MALLOC(templateNodeSize);
+
+    /* sets the (node9 type in the template node */
+    templateNode->type = type;
 
     /* sets the default values in the template node */
     templateNode->childCount = 0;
@@ -73,6 +77,23 @@ void deleteTemplateNode(struct TemplateNode_t *templateNode) {
     FREE(templateNode);
 }
 
+ERROR_CODE textBegin(struct TemplateEngine_t *templateEngine) {
+    printf("TEXT_BEGIN\n");
+
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE textEnd(struct TemplateEngine_t *templateEngine, const unsigned char *pointer, size_t size) {
+    char buffer[1024];
+
+    memcpy(buffer, pointer, size);
+    buffer[size] = '\0';
+
+    printf("TEXT_END: '%s'\n", buffer);
+
+    RAISE_NO_ERROR;
+}
+
 ERROR_CODE tagBegin(struct TemplateEngine_t *templateEngine) {
     /* allocates space for the template node */
     struct TemplateNode_t *templateNode;
@@ -81,12 +102,9 @@ ERROR_CODE tagBegin(struct TemplateEngine_t *templateEngine) {
     struct TemplateHandler_t *templateHandler = (struct TemplateHandler_t *) templateEngine->context;
 
     /* creates a new template node and sets the template
-    node as the current node in the template handler */
-    createTemplateNode(&templateNode);
-    templateHandler->currentNode = templateNode;
-
-    /* sets the template node type as open */
-    templateNode->type = TEMPLATE_NODE_OPEN;
+    node as the temporary node in the template handler */
+    createTemplateNode(&templateNode, TEMPLATE_NODE_OPEN);
+    templateHandler->temporaryNode = templateNode;
 
     printf("TAG_BEGIN\n");
 
@@ -95,12 +113,12 @@ ERROR_CODE tagBegin(struct TemplateEngine_t *templateEngine) {
 
 ERROR_CODE tagCloseBegin(struct TemplateEngine_t *templateEngine) {
     /* retrieves the template handler from the template engine context
-    and retrieves the current node from it */
+    and retrieves the temporary node from it */
     struct TemplateHandler_t *templateHandler = (struct TemplateHandler_t *) templateEngine->context;
-    struct TemplateNode_t *currentNode = templateHandler->currentNode;
+    struct TemplateNode_t *temporaryNode = templateHandler->temporaryNode;
 
-    /* sets the current node type as close */
-    currentNode->type = TEMPLATE_NODE_CLOSE;
+    /* sets the temporary node type as close */
+    temporaryNode->type = TEMPLATE_NODE_CLOSE;
 
     printf("TAG_CLOSE_BEGIN\n");
 
@@ -120,17 +138,17 @@ ERROR_CODE tagEnd(struct TemplateEngine_t *templateEngine, const unsigned char *
 
 ERROR_CODE tagName(struct TemplateEngine_t *templateEngine, const unsigned char *pointer, size_t size) {
     /* retrieves the template handler from the template engine context
-    and retrieves the current node from it */
+    and retrieves the temporary node from it */
     struct TemplateHandler_t *templateHandler = (struct TemplateHandler_t *) templateEngine->context;
-    struct TemplateNode_t *currentNode = templateHandler->currentNode;
+    struct TemplateNode_t *temporaryNode = templateHandler->temporaryNode;
 
-    /* allocates the space for the current node name and
+    /* allocates the space for the temporary node name and
     sets it with a memory copy */
-    currentNode->name = (unsigned char *) malloc(size + 1);
-    memcpy(currentNode->name, pointer, size);
-    currentNode->name[size] = '\0';
+    temporaryNode->name = (unsigned char *) malloc(size + 1);
+    memcpy(temporaryNode->name, pointer, size);
+    temporaryNode->name[size] = '\0';
 
-    printf("TAG_NAME: '%s'\n", currentNode->name);
+    printf("TAG_NAME: '%s'\n", temporaryNode->name);
 
     RAISE_NO_ERROR;
 }
@@ -164,16 +182,25 @@ void processTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned 
     /* allocates space for the template settings */
     struct TemplateSettings_t *templateSettings;
 
+    struct TemplateNode_t *rootNode;
+
     /* creates the template engine */
     createTemplateEngine(&templateEngine);
 
     /* creates the template engine */
     createTemplateSettings(&templateSettings);
 
+    /* creates the root node and sets it as the initial
+    current node */
+    createTemplateNode(&rootNode, TEMPLATE_NODE_ROOT);
+    templateHandler->currentNode = rootNode;
+
     /* sets the context (template handler) in the template engine */
     templateEngine->context = templateHandler;
 
     /* sets the various callbacks in the template settings */
+    templateSettings->ontextBegin = textBegin;
+    templateSettings->ontextEnd = textEnd;
     templateSettings->ontagBegin = tagBegin;
     templateSettings->ontagCloseBegin = tagCloseBegin;
     templateSettings->ontagEnd = tagEnd;

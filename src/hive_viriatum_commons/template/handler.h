@@ -37,10 +37,16 @@
  */
 typedef enum TemplateNodeType_t {
     /**
+     * The template node to be used as the root
+     * node os the node structure.
+     */
+    TEMPLATE_NODE_ROOT = 1,
+
+    /**
      * The template node representing a "simple"
      * string context.
      */
-    TEMPLATE_NODE_STRING = 1,
+    TEMPLATE_NODE_STRING,
 
     /**
      * The template node representing a single
@@ -109,9 +115,12 @@ typedef struct TemplateNode_t {
 typedef struct TemplateHandler_t {
     size_t nodeCount;
     struct TemplateNode_t *currentNode;
+    struct TemplateNode_t *temporaryNode;
     struct TemplateNode_t **nodes;
 } TemplateHandler;
 
 VIRIATUM_EXPORT_PREFIX void createTemplateHandler(struct TemplateHandler_t **templateHandlerPointer);
 VIRIATUM_EXPORT_PREFIX void deleteTemplateHandler(struct TemplateHandler_t *templateHandler);
+VIRIATUM_EXPORT_PREFIX void createTemplateNode(struct TemplateNode_t **templateNodePointer, enum TemplateNodeType_t type);
+VIRIATUM_EXPORT_PREFIX void deleteTemplateNode(struct TemplateNode_t *templateNode);
 VIRIATUM_EXPORT_PREFIX void processTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned char *filePath);
