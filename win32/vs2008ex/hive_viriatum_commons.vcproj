@@ -590,6 +590,10 @@
 					RelativePath="..\..\src\hive_viriatum_commons\template\engine.c"
 					>
 				</File>
+				<File
+					RelativePath="..\..\src\hive_viriatum_commons\template\handler.c"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter
@@ -818,6 +822,10 @@
 				>
 				<File
 					RelativePath="..\..\src\hive_viriatum_commons\template\engine.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\hive_viriatum_commons\template\handler.h"
 					>
 				</File>
 				<File

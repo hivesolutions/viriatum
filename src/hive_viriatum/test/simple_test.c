@@ -278,6 +278,9 @@ void testFileStream() {
     deleteFileStream(fileStream);
 }
 
+
+
+
 ERROR_CODE tagBegin(struct TemplateEngine_t *templateEngine) {
     printf("TAG_BEGIN\n");
 
