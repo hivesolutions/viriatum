@@ -95,6 +95,10 @@ typedef ERROR_CODE (*templateCallback) (struct TemplateEngine_t *);
  */
 typedef ERROR_CODE (*templateDataCallback) (struct TemplateEngine_t *, const unsigned char *, size_t);
 
+/**
+ * Enumeration defining all the states occuring
+ * durring the template parsing.
+ */
 typedef enum TemplateEngineState_e {
     /**
      * Normal state for the template engin where
