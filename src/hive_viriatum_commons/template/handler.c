@@ -63,10 +63,10 @@ void createTemplateNode(struct TemplateNode_t **templateNodePointer, enum Templa
 
     /* sets the default values in the template node */
     templateNode->childCount = 0;
-    templateNode->attributeCount = 0;
+    templateNode->parameterCount = 0;
     templateNode->name = NULL;
     templateNode->children = NULL;
-    templateNode->attributes = NULL;
+    templateNode->parameters = NULL;
 
     /* sets the template engine in the template node pointer */
     *templateNodePointer = templateNode;
@@ -154,7 +154,31 @@ ERROR_CODE tagName(struct TemplateEngine_t *templateEngine, const unsigned char 
 }
 
 ERROR_CODE parameter(struct TemplateEngine_t *templateEngine, const unsigned char *pointer, size_t size) {
-    char buffer[1024];
+    /* retrieves the template handler from the template engine context
+    and retrieves the temporary node from it */
+    struct TemplateHandler_t *templateHandler = (struct TemplateHandler_t *) templateEngine->context;
+    struct TemplateNode_t *temporaryNode = templateHandler->temporaryNode;
+
+	/* allocates space for the parameter to be created */
+	struct TemplateParameter_t *templateParameter;
+
+
+	/* TODO REMOVE THIS */
+	char buffer[1024];
+
+
+	/* in case the children are not defined for the
+	temporary node */
+	if(temporaryNode->children == NULL) {
+		/* creates a new linked list for the children (nodes) */
+		createLinkedList(&temporaryNode->children);
+	}
+
+	/* creates the template parameter */
+	/*createTemplateParameter(templateParameter);*/
+
+
+
 
     memcpy(buffer, pointer, size);
     buffer[size] = '\0';

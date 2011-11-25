@@ -68,48 +68,48 @@ typedef enum TemplateNodeType_t {
 } TemplateNodeType;
 
 /**
- * Structure defining the attribute internal
- * attributes and the references to the value.
+ * Structure defining the parameter internal
+ * parameters and the references to the value.
  */
-typedef struct TemplateAttribute_t {
+typedef struct TemplateParameter_t {
     /**
-     * Teh data type of the current attribute.
+     * Teh data type of the current parameter.
      */
     int type;
 
     /**
-     * The name of the current attribute.
+     * The name of the current parameter.
      */
     unsigned char *name;
 
     /**
-     * The value as a string of the attribute.
+     * The value as a string of the parameter.
      */
     unsigned char *stringValue;
 
     /**
-     * The value as a refernce of the attribute.
+     * The value as a refernce of the parameter.
      */
     unsigned char *referenceValue;
 
     /**
-     * The value as an integer of the attribute.
+     * The value as an integer of the parameter.
      */
     int intValue;
 
     /**
-     * The value as a float of the attribute.
+     * The value as a float of the parameter.
      */
     float floatValue;
-} TemplateAttribute;
+} TemplateParameter;
 
 typedef struct TemplateNode_t {
     size_t childCount;
-    size_t attributeCount;
+    size_t parameterCount;
     unsigned char *name;
     enum TemplateNodeType_t type;
-    struct TemplateNode_t **children;
-    struct TemplateAttribute_t **attributes;
+    struct LinkedList_t *children;
+    struct TemplateParameter_t **parameters;
 } TemplateNode;
 
 typedef struct TemplateHandler_t {
