@@ -278,15 +278,32 @@ void testFileStream() {
     deleteFileStream(fileStream);
 }
 
+ERROR_CODE tobias(struct TemplateEngine_t *templateEngine) {
+    printf("ola mundo");
+
+    RAISE_NO_ERROR;
+}
+
 void testTemplateEngine() {
     /* allocates space for the template engine */
     struct TemplateEngine_t *templateEngine;
 
+    /* allocates space for the template settings */
+    struct TemplateSettings_t *templateSettings;
+
     /* creates the template engine */
     createTemplateEngine(&templateEngine);
 
+    /* creates the template engine */
+    createTemplateSettings(&templateSettings);
+
+    templateSettings->ontagBegin = tobias;
+
     /* processes the file as a template engine */
-    processTemplateEngine(templateEngine, "c:/tobias.tpl");
+    processTemplateEngine(templateEngine, templateSettings, "c:/tobias.tpl");
+
+    /* deletes the template settings */
+    deleteTemplateSettings(templateSettings);
 
     /* deletes the template engine */
     deleteTemplateEngine(templateEngine);

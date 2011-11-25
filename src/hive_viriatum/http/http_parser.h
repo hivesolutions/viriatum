@@ -80,7 +80,7 @@
     do {\
         if(FOR##Mark) {\
             if(httpSettings->on##FOR) {\
-                if(0 != httpSettings->on##FOR(httpParser, FOR##Mark, pointer - FOR##Mark)) {\
+                if(httpSettings->on##FOR(httpParser, FOR##Mark, pointer - FOR##Mark) != 0) {\
                 /*    SET_ERRNO(HPE_CB_##FOR);*/\
                     /*return (p - data);*/\
                 }\
@@ -92,7 +92,7 @@
 #define HTTP_CALLBACK2(FOR)\
     do {\
         if(httpSettings->on##FOR) {\
-            if(0 != httpSettings->on##FOR(httpParser)) {\
+            if(httpSettings->on##FOR(httpParser) != 0) {\
                 /*SET_ERRNO(HPE_CB_##FOR);*/\
                 /*return (pointer - data);*/\
             }\

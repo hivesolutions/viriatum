@@ -45,7 +45,26 @@ void deleteTemplateEngine(struct TemplateEngine_t *templateEngine) {
     FREE(templateEngine);
 }
 
-void processTemplateEngine(struct TemplateEngine_t *templateEngine, unsigned char *filePath) {
+void createTemplateSettings(struct TemplateSettings_t **templateSettingsPointer) {
+    /* retrieves the template settings size */
+    size_t templateSettingsSize = sizeof(struct TemplateSettings_t);
+
+    /* allocates space for the template settings */
+    struct TemplateSettings_t *templateSettings = (struct TemplateSettings_t *) MALLOC(templateSettingsSize);
+
+    /* sets the template settings on  callback */
+    templateSettings->ontagBegin = NULL;
+
+    /* sets the template settings in the template settings pointer */
+    *templateSettingsPointer = templateSettings;
+}
+
+void deleteTemplateSettings(struct TemplateSettings_t *templateSettings) {
+    /* releases the template settings */
+    FREE(templateSettings);
+}
+
+void processTemplateEngine(struct TemplateEngine_t *templateEngine, struct TemplateSettings_t *templateSettings, unsigned char *filePath) {
     /* allocates space for the file */
     FILE *file;
 
@@ -59,14 +78,17 @@ void processTemplateEngine(struct TemplateEngine_t *templateEngine, unsigned cha
 
     size_t fileSize;
 
+    /* allocates the buffer thath will hold the contents
+    of the read file, this buffer is realeased uppon the
+    end of the parsing */
     unsigned char *fileBuffer;
 
-    /* allocates the index variable used to locate
+    /* allocates the mark variable used to locate
     the part of context changing durring the parsing */
-    size_t index = 0;
-    size_t tagIndex = 0;
-    size_t parameterIndex = 0;
-    size_t parameterValueIndex = 0;
+    unsigned char *pointer = 0;
+    unsigned char *tagMark = 0;
+    unsigned char *parameterMark = 0;
+    unsigned char *parameterValueMark = 0;
 
     /* allocates and starts the state for the template parsing */
     enum TemplateEngineState_e state = TEMPLATE_ENGINE_NORMAL;
@@ -85,8 +107,10 @@ void processTemplateEngine(struct TemplateEngine_t *templateEngine, unsigned cha
 
     /* allocates the buffer that will hold the complete
     template file (this allocation may be giant), this is
-    necessary for the correct execution of the parser */
+    necessary for the correct execution of the parser, uses
+    the buffer initial pointer as the pointer value */
     fileBuffer = (void *) MALLOC(fileSize);
+    pointer = fileBuffer;
 
     /* iterates continuously too run the parser
     over the complete set of file contents */
@@ -103,7 +127,7 @@ void processTemplateEngine(struct TemplateEngine_t *templateEngine, unsigned cha
         else {
             /* retrieves the current character
             from the file stream */
-            current = _getcTemplateEngine(file, fileBuffer, &index);
+            current = _getcTemplateEngine(file, &pointer);
         }
 
         /* in case the end of file has been found */
@@ -126,8 +150,13 @@ void processTemplateEngine(struct TemplateEngine_t *templateEngine, unsigned cha
                 if(current == '{') {
                     state = TEMPLATE_ENGINE_OPEN;
 
+                    /* calls the tag begin callback */
+                    TEMPLATE_CALLBACK2(tagBegin);
+
                     /* RAISE tag open index - 1 */
-                    tagIndex = index + 1;
+
+                    /* marks the tag element */
+                    TEMPLATE_MARK(tag);
                 } else {
                     state = TEMPLATE_ENGINE_NORMAL;
                 }
@@ -136,7 +165,7 @@ void processTemplateEngine(struct TemplateEngine_t *templateEngine, unsigned cha
 
             case TEMPLATE_ENGINE_OPEN:
                 if(current == '/') {
-                    ahead = _getcTemplateEngine(file, fileBuffer, &index);
+                    ahead = _getcTemplateEngine(file, &pointer);
                     aheadSet = 1;
 
                     if(ahead == '}') {
@@ -151,10 +180,10 @@ void processTemplateEngine(struct TemplateEngine_t *templateEngine, unsigned cha
 
                 if(current == ' ') {
                     /* RAISE new tag[tagIndex:index]  */
-                    memcpy(buffer, fileBuffer + tagIndex, index - tagIndex);
+                    /*memcpy(buffer, fileBuffer + tagIndex, index - tagIndex);
                     buffer[index - tagIndex] = '\0';
 
-                    printf("NEW TAG: %s\n", buffer);
+                    printf("NEW TAG: %s\n", buffer);*/
 
                     state = TEMPLATE_ENGINE_PARAMETERS;
                 }
@@ -163,7 +192,7 @@ void processTemplateEngine(struct TemplateEngine_t *templateEngine, unsigned cha
 
             case TEMPLATE_ENGINE_PARAMETERS:
                 if(current == '/') {
-                    ahead = _getcTemplateEngine(file, fileBuffer, &index);
+                    ahead = _getcTemplateEngine(file, &pointer);
                     aheadSet = 1;
 
                     if(ahead == '}') {
@@ -177,14 +206,14 @@ void processTemplateEngine(struct TemplateEngine_t *templateEngine, unsigned cha
                 if(current != ' ') {
                     state = TEMPLATE_ENGINE_PARAMETER;
 
-                    parameterIndex = index;
+                    TEMPLATE_MARK(parameter);
                 }
 
                 break;
 
             case TEMPLATE_ENGINE_PARAMETER:
                 if(current == '/') {
-                    ahead = _getcTemplateEngine(file, fileBuffer, &index);
+                    ahead = _getcTemplateEngine(file, &pointer);
                     aheadSet = 1;
 
                     if(ahead == '}') {
@@ -198,21 +227,21 @@ void processTemplateEngine(struct TemplateEngine_t *templateEngine, unsigned cha
                 if(current == '=') {
                     state = TEMPLATE_ENGINE_PARAMETER_VALUE;
 
-                    memcpy(buffer, fileBuffer + parameterIndex, index - parameterIndex);
+                    /*memcpy(buffer, fileBuffer + parameterIndex, index - parameterIndex);
                     buffer[index - parameterIndex] = '\0';
 
-                    printf("NEW PARAMETER: %s\n", buffer);
+                    printf("NEW PARAMETER: %s\n", buffer);*/
 
                     /* RAISE new parameter[parameterIndex:index] */
 
-                    parameterValueIndex = index + 1;
+                    TEMPLATE_MARK(parameterValue);
                 }
 
                 break;
 
             case TEMPLATE_ENGINE_PARAMETER_VALUE:
                 if(current == '/') {
-                    ahead = _getcTemplateEngine(file, fileBuffer, &index);
+                    ahead = _getcTemplateEngine(file, &pointer);
                     aheadSet = 1;
 
                     if(ahead == '}') {
@@ -228,10 +257,10 @@ void processTemplateEngine(struct TemplateEngine_t *templateEngine, unsigned cha
                 if(current == '\"') {
                     state = TEMPLATE_ENGINE_PARAMETER_VALUE_STRING;
                 } else if(current == ' ') {
-                    memcpy(buffer, fileBuffer + parameterValueIndex, index - parameterValueIndex);
+                    /*memcpy(buffer, fileBuffer + parameterValueIndex, index - parameterValueIndex);
                     buffer[index - parameterValueIndex] = '\0';
 
-                    printf("NEW PARAMETER VALUE: %s\n", buffer);
+                    printf("NEW PARAMETER VALUE: %s\n", buffer);*/
 
                     state = TEMPLATE_ENGINE_PARAMETERS;
                 }
@@ -240,27 +269,23 @@ void processTemplateEngine(struct TemplateEngine_t *templateEngine, unsigned cha
 
             case TEMPLATE_ENGINE_PARAMETER_VALUE_STRING:
                 if(current == '\"') {
-                    memcpy(buffer, fileBuffer + parameterValueIndex, index - parameterValueIndex + 1);
+                  /*  memcpy(buffer, fileBuffer + parameterValueIndex, index - parameterValueIndex + 1);
                     buffer[index - parameterValueIndex + 1] = '\0';
 
-                    printf("NEW (STRING) PARAMETER VALUE: %s\n", buffer);
+                    printf("NEW (STRING) PARAMETER VALUE: %s\n", buffer);*/
 
                     state = TEMPLATE_ENGINE_PARAMETERS;
                 }
 
                 break;
         }
-
-        /* increments the index value (the counter
-        for the file cursor position) */
-        index++;
     }
 
     /* releases the file buffer */
     free(fileBuffer);
 }
 
-char _getcTemplateEngine(FILE *file, unsigned char *fileBuffer, size_t *index) {
+char _getcTemplateEngine(FILE *file, unsigned char **pointer) {
     /* retrieves the current character
     from the file stream */
     char current = getc(file);
@@ -272,10 +297,10 @@ char _getcTemplateEngine(FILE *file, unsigned char *fileBuffer, size_t *index) {
         return current;
     }
 
-    /* updates the file buffer with the current
-    character and increments the index reference */
-    fileBuffer[*index] = current;
-    *index++;
+    /* updates the file buffer (from pointer) with the current
+    character and increments the pointer reference */
+    **pointer = current;
+    *pointer++;
 
     /* returns the current character */
     return current;
