@@ -27,7 +27,39 @@
 
 #pragma once
 
+#include "../structures/structures.h"
 #include "engine.h"
+
+/**
+ * Enumeration defining the types of
+ * template nodes that may exist in
+ * the template parsing context.
+ */
+typedef enum TemplateNodeType_t {
+    /**
+     * The template node representing a "simple"
+     * string context.
+     */
+    TEMPLATE_NODE_STRING = 1,
+
+    /**
+     * The template node representing a single
+     * open and closing context.
+     */
+    TEMPLATE_NODE_SINGLE,
+
+    /**
+     * The template node representing an
+     * open (tag) context.
+     */
+    TEMPLATE_NODE_OPEN,
+
+    /**
+     * The template node representing an
+     * close (tag) context.
+     */
+    TEMPLATE_NODE_CLOSE
+} TemplateNodeType;
 
 /**
  * Structure defining the attribute internal
@@ -69,6 +101,7 @@ typedef struct TemplateNode_t {
     size_t childCount;
     size_t attributeCount;
     unsigned char *name;
+    enum TemplateNodeType_t type;
     struct TemplateNode_t **children;
     struct TemplateAttribute_t **attributes;
 } TemplateNode;
