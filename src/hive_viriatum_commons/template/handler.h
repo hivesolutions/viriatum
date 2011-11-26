@@ -82,10 +82,10 @@ typedef struct TemplateParameter_t {
      */
     unsigned char *name;
 
-	/**
-	 * The "raw" and unprocessed parameter value.s
-	 */
-	unsigned char *rawValue;
+    /**
+     * The "raw" and unprocessed parameter value.s
+     */
+    unsigned char *rawValue;
 
     /**
      * The value as a string of the parameter.
@@ -115,7 +115,7 @@ typedef struct TemplateNode_t {
     enum TemplateNodeType_t type;
     struct LinkedList_t *children;
     struct LinkedList_t *parameters;
-	struct TemplateParameter_t *temporaryParameter;
+    struct TemplateParameter_t *temporaryParameter;
 } TemplateNode;
 
 typedef struct TemplateHandler_t {
