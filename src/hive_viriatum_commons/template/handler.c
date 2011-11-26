@@ -47,6 +47,8 @@ void createTemplateHandler(struct TemplateHandler_t **templateHandlerPointer) {
 }
 
 void deleteTemplateHandler(struct TemplateHandler_t *templateHandler) {
+	/* @TODO: TENHO DE APAGAR TODOS OS PARAMETROS E OS NOS */
+
     /* releases the template handler */
     FREE(templateHandler);
 }
@@ -58,7 +60,7 @@ void createTemplateNode(struct TemplateNode_t **templateNodePointer, enum Templa
     /* allocates space for the template node */
     struct TemplateNode_t *templateNode = (struct TemplateNode_t *) MALLOC(templateNodeSize);
 
-    /* sets the (node9 type in the template node */
+    /* sets the (node) type in the template node */
     templateNode->type = type;
 
     /* sets the default values in the template node */
@@ -67,14 +69,45 @@ void createTemplateNode(struct TemplateNode_t **templateNodePointer, enum Templa
     templateNode->name = NULL;
     templateNode->children = NULL;
     templateNode->parameters = NULL;
+	templateNode->temporaryParameter = NULL;
 
     /* sets the template engine in the template node pointer */
     *templateNodePointer = templateNode;
 }
 
 void deleteTemplateNode(struct TemplateNode_t *templateNode) {
+	/* @TODO Tenho de apagar todos os parametros e todos os nos */
+
+
     /* releases the template node */
     FREE(templateNode);
+}
+
+void createTemplateParameter(struct TemplateParameter_t **templateParameterPointer) {
+    /* retrieves the template parameter size */
+    size_t templateParameterSize = sizeof(struct TemplateParameter_t);
+
+    /* allocates space for the template parameter */
+    struct TemplateParameter_t *templateParameter = (struct TemplateParameter_t *) MALLOC(templateParameterSize);
+
+	/* sets the default values in the template parameter */
+    templateParameter->type = 0;
+	templateParameter->name = NULL;
+	templateParameter->rawValue = NULL;
+    templateParameter->stringValue = NULL;
+    templateParameter->referenceValue = NULL;
+    templateParameter->intValue = 0;
+    templateParameter->floatValue = 0.0;
+
+    /* sets the template engine in the template parameter pointer */
+    *templateParameterPointer = templateParameter;
+}
+
+void deleteTemplateParameter(struct TemplateParameter_t *templateParameter) {
+    /* @TODO: TENHO DE REMOVER OS PARAMETROS SE EXISTIREM */
+	
+	/* releases the template parameter */
+    FREE(templateParameter);
 }
 
 ERROR_CODE textBegin(struct TemplateEngine_t *templateEngine) {
@@ -144,7 +177,7 @@ ERROR_CODE tagName(struct TemplateEngine_t *templateEngine, const unsigned char 
 
     /* allocates the space for the temporary node name and
     sets it with a memory copy */
-    temporaryNode->name = (unsigned char *) malloc(size + 1);
+    temporaryNode->name = (unsigned char *) MALLOC(size + 1);
     memcpy(temporaryNode->name, pointer, size);
     temporaryNode->name[size] = '\0';
 
@@ -162,39 +195,47 @@ ERROR_CODE parameter(struct TemplateEngine_t *templateEngine, const unsigned cha
 	/* allocates space for the parameter to be created */
 	struct TemplateParameter_t *templateParameter;
 
-
-	/* TODO REMOVE THIS */
-	char buffer[1024];
-
-
-	/* in case the children are not defined for the
+	/* in case the parameters (list) are not defined for the
 	temporary node */
-	if(temporaryNode->children == NULL) {
-		/* creates a new linked list for the children (nodes) */
-		createLinkedList(&temporaryNode->children);
+	if(temporaryNode->parameters == NULL) {
+		/* creates a new linked list for the parameters */
+		createLinkedList(&temporaryNode->parameters);
 	}
 
-	/* creates the template parameter */
-	/*createTemplateParameter(templateParameter);*/
+	/* creates the template parameter, sets it as the temporary parameter
+	in the temporary node and adds it to the list of parameters */
+	createTemplateParameter(&templateParameter);
+	temporaryNode->temporaryParameter = templateParameter;
+	appendValueLinkedList(temporaryNode->parameters, templateParameter);
 
+    /* allocates the space for the template parameter name and
+    sets it with a memory copy */
+	templateParameter->name = (unsigned char *) MALLOC(size + 1);
+    memcpy(templateParameter->name, pointer, size);
+    templateParameter->name[size] = '\0';
 
-
-
-    memcpy(buffer, pointer, size);
-    buffer[size] = '\0';
-
-    printf("PARAMETER: '%s'\n", buffer);
+	printf("PARAMETER: '%s'\n", templateParameter->name);
 
     RAISE_NO_ERROR;
 }
 
 ERROR_CODE parameterValue(struct TemplateEngine_t *templateEngine, const unsigned char *pointer, size_t size) {
-    char buffer[1024];
+    /* retrieves the template handler from the template engine context
+    and retrieves the temporary node from it and then uses it to retrieve
+	the temporary parameter */
+    struct TemplateHandler_t *templateHandler = (struct TemplateHandler_t *) templateEngine->context;
+    struct TemplateNode_t *temporaryNode = templateHandler->temporaryNode;
+	struct TemplateParameter_t *temporaryParameter = temporaryNode->temporaryParameter;
 
-    memcpy(buffer, pointer, size);
-    buffer[size] = '\0';
+    /* allocates the space for the temporary parameter raw value and
+    sets it with a memory copy */
+	temporaryParameter->rawValue = (unsigned char *) MALLOC(size + 1);
+    memcpy(temporaryParameter->rawValue, pointer, size);
+    temporaryParameter->rawValue[size] = '\0';
 
-    printf("VALUE: '%s'\n", buffer);
+	/* @TODO: Tenho de processar o valor como deve de ser */
+
+    printf("VALUE: '%s'\n", temporaryParameter->stringValue);
 
     RAISE_NO_ERROR;
 }
@@ -206,6 +247,7 @@ void processTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned 
     /* allocates space for the template settings */
     struct TemplateSettings_t *templateSettings;
 
+	/* allocates space for the root node */
     struct TemplateNode_t *rootNode;
 
     /* creates the template engine */

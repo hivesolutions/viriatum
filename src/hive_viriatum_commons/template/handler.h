@@ -73,7 +73,7 @@ typedef enum TemplateNodeType_t {
  */
 typedef struct TemplateParameter_t {
     /**
-     * Teh data type of the current parameter.
+     * The data type of the current parameter.
      */
     int type;
 
@@ -81,6 +81,11 @@ typedef struct TemplateParameter_t {
      * The name of the current parameter.
      */
     unsigned char *name;
+
+	/**
+	 * The "raw" and unprocessed parameter value.s
+	 */
+	unsigned char *rawValue;
 
     /**
      * The value as a string of the parameter.
@@ -109,7 +114,8 @@ typedef struct TemplateNode_t {
     unsigned char *name;
     enum TemplateNodeType_t type;
     struct LinkedList_t *children;
-    struct TemplateParameter_t **parameters;
+    struct LinkedList_t *parameters;
+	struct TemplateParameter_t *temporaryParameter;
 } TemplateNode;
 
 typedef struct TemplateHandler_t {
@@ -123,4 +129,6 @@ VIRIATUM_EXPORT_PREFIX void createTemplateHandler(struct TemplateHandler_t **tem
 VIRIATUM_EXPORT_PREFIX void deleteTemplateHandler(struct TemplateHandler_t *templateHandler);
 VIRIATUM_EXPORT_PREFIX void createTemplateNode(struct TemplateNode_t **templateNodePointer, enum TemplateNodeType_t type);
 VIRIATUM_EXPORT_PREFIX void deleteTemplateNode(struct TemplateNode_t *templateNode);
+VIRIATUM_EXPORT_PREFIX void createTemplateParameter(struct TemplateParameter_t **templateParameterPointer);
+VIRIATUM_EXPORT_PREFIX void deleteTemplateParameter(struct TemplateParameter_t *templateParameter);
 VIRIATUM_EXPORT_PREFIX void processTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned char *filePath);

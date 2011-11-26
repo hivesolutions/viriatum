@@ -374,7 +374,7 @@ void processTemplateEngine(struct TemplateEngine_t *templateEngine, struct Templ
     fclose(file);
 
     /* releases the file buffer */
-    free(fileBuffer);
+    FREE(fileBuffer);
 }
 
 char _getcTemplateEngine(FILE *file, unsigned char **pointer) {
