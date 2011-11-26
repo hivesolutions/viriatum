@@ -381,8 +381,6 @@ char _getcTemplateEngine(FILE *file, unsigned char **pointer) {
     /* retrieves the current character
     from the file stream */
     char current = getc(file);
-    unsigned char *tobias;
-
 
     /* in case the current retrieved character
     is an end of file nothing should be updated */
@@ -395,8 +393,6 @@ char _getcTemplateEngine(FILE *file, unsigned char **pointer) {
     character and increments the pointer reference */
     **pointer = current;
     (*pointer)++;
-
-    tobias = *pointer;
 
     /* returns the current character */
     return current;
