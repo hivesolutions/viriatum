@@ -180,6 +180,9 @@ ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries) {
         appendValueLinkedList(entries, entryName);
     } while(FindNextFile(handlerFind, &findData) != 0);
 
+	/* closes the handler to find */
+	FindClose(handlerFind);
+
     /* releases the list path reference */
     FREE(listPath);
 
@@ -232,6 +235,9 @@ ERROR_CODE isDirectoryFile(char *filePath, unsigned int *isDirectory) {
         /* sets the is directory flag */
         *isDirectory = 1;
     }
+
+    /* closes the directory reference */
+    closedir(directory);
 
     /* raise no error */
     RAISE_NO_ERROR;
