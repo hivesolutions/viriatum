@@ -66,6 +66,13 @@ ERROR_CODE readFile(char *filePath, unsigned char **bufferPointer, size_t *fileS
     /* reads the file contents */
     numberBytes = fread(fileBuffer, 1, fileSize, file);
 
+	/* in case the number of read bytes is not the
+	same as the total bytes in file (error) */
+	if(numberBytes != fileSize) {
+		/* raises an error */
+        RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem reading from file");
+	}
+
     /* closes the file */
     fclose(file);
 
