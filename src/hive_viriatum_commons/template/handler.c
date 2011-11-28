@@ -37,6 +37,7 @@ void createTemplateHandler(struct TemplateHandler_t **templateHandlerPointer) {
     struct TemplateHandler_t *templateHandler = (struct TemplateHandler_t *) MALLOC(templateHandlerSize);
 
     /* sets the default values in the template handler */
+    templateHandler->stringValue = NULL;
     templateHandler->nodeCount = 0;
     templateHandler->currentNode = NULL;
     templateHandler->temporaryNode = NULL;
@@ -46,12 +47,25 @@ void createTemplateHandler(struct TemplateHandler_t **templateHandlerPointer) {
     /* creates a new hash map for the names */
     createHashMap(&templateHandler->names, 0);
 
+    /* creates a new string buffer for buffering
+    the result of the template processing */
+    createStringBuffer(&templateHandler->stringBuffer);
+
     /* sets the template engine in the template handler pointer */
     *templateHandlerPointer = templateHandler;
 }
 
 void deleteTemplateHandler(struct TemplateHandler_t *templateHandler) {
     /* @TODO: TENHO DE APAGAR TODOS OS PARAMETROS E OS NOS */
+
+    /* in case the string value is set */
+    if(templateHandler->stringValue) {
+        /* releases the string value from the template handler */
+        FREE(templateHandler->stringValue);
+    }
+
+    /* deletes the string buffer */
+    deleteStringBuffer(templateHandler->stringBuffer);
 
     /* deletes the names hash map */
     deleteHashMap(templateHandler->names);
@@ -437,14 +451,14 @@ void traverseOutPrint(struct TemplateHandler_t *templateHandler, struct Template
 
     switch(valueParameter->type) {
         case TEMPLATE_PARAMETER_STRING:
-            printf("%s", valueParameter->stringValue);
+            appendStringBuffer(templateHandler->stringBuffer, valueParameter->stringValue);
 
             break;
 
         case TEMPLATE_PARAMETER_REFERENCE:
             getValueStringHashMap(templateHandler->names, valueParameter->referenceValue, &value);
 
-            printf("%s", value);
+            appendStringBuffer(templateHandler->stringBuffer, value);
 
             break;
 
@@ -535,7 +549,7 @@ void traverseNodePrint(struct TemplateHandler_t *templateHandler, struct Templat
             break;
 
         case TEMPLATE_NODE_TEXT:
-            printf(node->name);
+            appendStringBuffer(templateHandler->stringBuffer, node->name);
 
             break;
 
@@ -603,6 +617,11 @@ void processTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned 
     assignTemplateHandler(templateHandler, "tobias", "TOBIAS");
     assignTemplateHandler(templateHandler, "nomes", list);
     traverseNodePrint(templateHandler, templateHandler->currentNode);
+
+
+    /* "joins" the template handler string buffer into the string
+    value, retrieving the final template result */
+    joinStringBuffer(templateHandler->stringBuffer, &templateHandler->stringValue);
 
 
 
