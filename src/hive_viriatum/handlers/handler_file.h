@@ -81,6 +81,10 @@ typedef struct HandlerFileContext_t {
      */
     struct TemplateHandler_t *templateHandler;
 
+	/**
+	 * The flag taht controlls the flushing of the
+	 * internal structures of the file handler.
+	 */
     unsigned int flushed;
 } HandlerFileContext;
 
