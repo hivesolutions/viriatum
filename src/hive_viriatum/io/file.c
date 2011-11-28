@@ -225,7 +225,7 @@ ERROR_CODE isDirectoryFile(char *filePath, unsigned int *isDirectory) {
 	/* in case the directory reference is not valid (null) */
     if(directory == NULL) {
         /* unsets the is directory flag */
-        *isDirectory = 1;
+        *isDirectory = 0;
     }
     /* otherwise the directory reference is valid */
     else {
