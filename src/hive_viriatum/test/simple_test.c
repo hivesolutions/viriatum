@@ -143,8 +143,8 @@ void testHashMap() {
 
     /* sets and retrieves the value (using a string)
     in the hash map */
-    setValueStringHashMap(hashMap, "test", (void *) 2);
-    getValueStringHashMap(hashMap, "test", (void **) &element);
+    setValueStringHashMap(hashMap, (unsigned char *) "test", (void *) 2);
+    getValueStringHashMap(hashMap, (unsigned char *) "test", (void **) &element);
 
     /* deletes the hash map */
     deleteHashMap(hashMap);
@@ -162,9 +162,9 @@ void testStringBuffer() {
     createStringBuffer(&stringBuffer);
 
     /* adds a set of string to the string buffer */
-    appendStringBuffer(stringBuffer, "hello");
-    appendStringBuffer(stringBuffer, " ");
-    appendStringBuffer(stringBuffer, "world");
+    appendStringBuffer(stringBuffer, (unsigned char *) "hello");
+    appendStringBuffer(stringBuffer, (unsigned char *) " ");
+    appendStringBuffer(stringBuffer, (unsigned char *) "world");
 
     /* "joins" the string buffer values into a single
     value (from the internal string list) */
@@ -228,7 +228,7 @@ void testBitStream() {
     struct BitStream_t *bitStream;
 
     /* creates the file stream */
-    createFileStream(&fileStream, "bit_stream.txt", "wb");
+    createFileStream(&fileStream, (unsigned char *) "bit_stream.txt", (unsigned char *) "wb");
 
     /* creates the bit stream */
     createBitStream(&bitStream, fileStream->stream);
@@ -269,7 +269,7 @@ void testFileStream() {
     unsigned char buffer[128];
 
     /* creates the file stream */
-    createFileStream(&fileStream, "hello.txt", "wb");
+    createFileStream(&fileStream, (unsigned char *) "hello.txt", (unsigned char *) "wb");
 
     /* retrieves the stream from the file stream, in order
     to be able to use the "normal" stream functions */
@@ -279,13 +279,13 @@ void testFileStream() {
     stream->open(stream);
 
     /* writes some data to the stream */
-    stream->write(stream, "hello world", 11);
+    stream->write(stream, (unsigned char *) "hello world", 11);
 
     /* close the stream */
     stream->close(stream);
 
     /* creates the file stream */
-    createFileStream(&fileStream, "hello.txt", "rb");
+    createFileStream(&fileStream, (unsigned char *) "hello.txt", (unsigned char *) "rb");
 
     /* retrieves the stream from the file stream, in order
     to be able to use the "normal" stream functions */
@@ -304,7 +304,7 @@ void testFileStream() {
     stream->close(stream);
 
     /* compares the read string */
-    assert(strcmp("hello world", buffer) == 0);
+    assert(strcmp((char *) "hello world", buffer) == 0);
 
     /* deletes the file stream */
     deleteFileStream(fileStream);
