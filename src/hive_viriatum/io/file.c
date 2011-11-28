@@ -244,28 +244,37 @@ ERROR_CODE isDirectoryFile(char *filePath, unsigned int *isDirectory) {
 }
 
 ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries) {
-    /* allocates space for the directory reference */
+    /* allocates space for the directory reference and
+	for the entry reference */
     DIR *directory;
-    struct dirent *ent;
+    struct dirent *entry;
+
+    /* allocates space for both the entry name and the
+    length of the entry name */
+    char *entryName;
+    size_t entryNameLength;
 
     /* opens the directory for the file path */
     directory = opendir(filePath);
 
-	printf("abriu directorio\n");
-
 	/* in case the directory reference is not valid */
     if(directory == NULL) {
-		printf("vai sair cenas\n");
-
         /* raises an error */
         RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem listing directory");
     }
 
-	printf("continuou directorio\n");
-
     /* print all the files and directories within directory */
     while((ent = readdir(directory)) != NULL) {
-        printf("%s\n", ent->d_name);
+        /* calculates the length of the entry name and uses
+        it to create the memory space for the entry name and then
+        copies the contents into it */
+        entryNameLength = strlen(ent->d_name);
+        entryName = (char *) MALLOC(entryNameLength + 1);
+        memcpy(entryName, ent->d_name, entryNameLength + 1);
+
+        /* adds the entrys name to the list of entries for
+        the current directory (path) */
+        appendValueLinkedList(entries, entryName);
     }
 
     /* closes the directory reference */
