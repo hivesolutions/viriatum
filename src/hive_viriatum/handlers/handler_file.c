@@ -158,9 +158,15 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
     unsigned int isDirectory = 0;
     unsigned int isRedirect = 0;
 
+    float startTime = 0.0;
+    float endTime = 0.0;
+    float timeElapsed = 0.0;
+
     /* allocates space for the new location value for
-    redirect request cases */
+    redirect request cases and for the path to the
+    template (for directory listing) */
     unsigned char location[1024];
+    unsigned char templatePath[1024];
 
     /* allocates the space for the "read" result
     error code (valid by default) */
@@ -191,6 +197,9 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
             /* sets the is redirect flag (forces temporary redirect) */
             isRedirect = 1;
         } else {
+            /* creates the complete path to the template file */
+            SPRINTF(templatePath, 1024, "%s%s", VIRIATUM_CONTENTS_PATH, VIRIATUM_LISTING_PATH);
+
             /* creates the directory entries (linked list) */
             createLinkedList(&directoryEntries);
 
@@ -205,7 +214,7 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
             assignTemplateHandler(templateHandler, "entries", directoryEntries);
 
             /* processes the file as a template handler */
-            processTemplateHandler(templateHandler, "C:\\repo_extra\\viriatum\\src\\hive_viriatum\\resources\\html\\welcome\\listing.html");
+            processTemplateHandler(templateHandler, templatePath);
 
             /* sets the template handler in the handler file context and unsets
             the flushed flag */

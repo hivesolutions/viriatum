@@ -196,8 +196,7 @@ void deleteTemplateParameter(struct TemplateParameter_t *templateParameter) {
 }
 
 ERROR_CODE textBegin(struct TemplateEngine_t *templateEngine) {
-    printf("TEXT_BEGIN\n");
-
+    /* raises no error */
     RAISE_NO_ERROR;
 }
 
@@ -237,8 +236,7 @@ ERROR_CODE textEnd(struct TemplateEngine_t *templateEngine, const unsigned char 
     appendValueLinkedList(templateHandler->nodes, templateNode);
     appendValueLinkedList(currentNode->children, templateNode);
 
-    printf("TEXT_END: '%s'\n", templateNode->name);
-
+    /* raises no error */
     RAISE_NO_ERROR;
 }
 
@@ -254,8 +252,7 @@ ERROR_CODE tagBegin(struct TemplateEngine_t *templateEngine) {
     createTemplateNode(&templateNode, TEMPLATE_NODE_OPEN);
     templateHandler->temporaryNode = templateNode;
 
-    printf("TAG_BEGIN\n");
-
+    /* raises no error */
     RAISE_NO_ERROR;
 }
 
@@ -268,6 +265,7 @@ ERROR_CODE tagCloseBegin(struct TemplateEngine_t *templateEngine) {
     /* sets the temporary node type as close */
     temporaryNode->type = TEMPLATE_NODE_CLOSE;
 
+    /* raises no error */
     RAISE_NO_ERROR;
 }
 
@@ -284,12 +282,14 @@ ERROR_CODE _openContextTemplateHandler(struct TemplateHandler_t *templateHandler
 
     templateHandler->currentNode = temporaryNode;
 
+    /* raises no error */
     RAISE_NO_ERROR;
 }
 
 ERROR_CODE _closeContextTemplateHandler(struct TemplateHandler_t *templateHandler) {
     popValueLinkedList(templateHandler->contexts, &templateHandler->currentNode, 1);
 
+    /* raises no error */
     RAISE_NO_ERROR;
 }
 
@@ -360,8 +360,6 @@ ERROR_CODE tagName(struct TemplateEngine_t *templateEngine, const unsigned char 
     memcpy(temporaryNode->name, pointer, size);
     temporaryNode->name[size] = '\0';
 
-    printf("TAG_NAME: '%s'\n", temporaryNode->name);
-
     /* raise no error */
     RAISE_NO_ERROR;
 }
@@ -401,8 +399,6 @@ ERROR_CODE parameter(struct TemplateEngine_t *templateEngine, const unsigned cha
 
     /* sets the parameter reference in the parameters map */
     setValueStringHashMap(temporaryNode->parametersMap, templateParameter->name, templateParameter);
-
-    printf("PARAMETER: '%s'\n", templateParameter->name);
 
     /* raise no error */
     RAISE_NO_ERROR;
