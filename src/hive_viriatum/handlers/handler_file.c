@@ -452,13 +452,13 @@ ERROR_CODE _sendDataHandlerFile(struct Connection_t *connection, struct Data_t *
     /* in case the handler file context is already flushed
     time to clenaup pending structures */
     if(handlerFileContext->flushed) {
-        /* runs the cleanup handler file (releases internal structures) */
-        /*_cleanupHandlerFile(connection, data, parameters); */
-
         /* deletes the template handler (releases memory) and
 		unsets the reference in the handler file context */
         deleteTemplateHandler(templateHandler);
 		handlerFileContext->templateHandler = NULL;
+
+        /* runs the cleanup handler file (releases internal structures) */
+        _cleanupHandlerFile(connection, data, parameters);
     } else {
         /* writes the (file) data to the connection and sets the handler
         file context as flushed */
