@@ -170,6 +170,9 @@ void testStringBuffer() {
     value (from the internal string list) */
     joinStringBuffer(stringBuffer, &stringValue);
 
+    /* releases the string value (string) */
+    free(stringValue);
+
     /* deletes the string buffer */
     deleteStringBuffer(stringBuffer);
 }
