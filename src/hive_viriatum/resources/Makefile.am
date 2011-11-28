@@ -30,7 +30,15 @@ html/welcome/index.html \
 html/welcome/listing.html \
 html/welcome/status.html \
 html/welcome/resources/css/layout.css \
+html/welcome/resources/images/arrow-left.png \
 html/welcome/resources/images/favicon.ico \
-html/welcome/resources/images/main-illustration.png \
 html/welcome/resources/images/separator-horizontal.png \
-html/welcome/resources/images/viriatum-logotype.png
+html/welcome/resources/images/error/error-code-404.png \
+html/welcome/resources/images/illustration/error-illustration.png \
+html/welcome/resources/images/illustration/main-illustration.png \
+html/welcome/resources/images/logo/viriatum-logo.png \
+html/welcome/resources/images/logo/viriatum-background-logo.png \
+html/welcome/resources/images/mime/icon-folder.png \
+html/welcome/resources/images/mime/icon-html.png \
+html/welcome/resources/images/mime/icon-image.png \
+html/welcome/resources/images/mime/icon-text.png
