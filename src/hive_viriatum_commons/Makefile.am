@@ -43,6 +43,10 @@ compression/huffman.c \
 debug/error.c \
 debug/logging.c \
 encoding/base_64.c \
+stream/bit_stream.c \
+stream/file_stream.c \
+stream/io_stream.c \
+stream/memory_stream.c \
 structures/array_list.c \
 structures/hash_map.c \
 structures/iterator.c \
@@ -58,6 +62,10 @@ checksum/crc_32.c \
 debug/error.c \
 debug/logging.c \
 encoding/base_64.c \
+stream/bit_stream.c \
+stream/file_stream.c \
+stream/io_stream.c \
+stream/memory_stream.c \
 structures/array_list.c \
 structures/hash_map.c \
 structures/iterator.c \
