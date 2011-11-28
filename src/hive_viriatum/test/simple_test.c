@@ -304,7 +304,7 @@ void testFileStream() {
     stream->close(stream);
 
     /* compares the read string */
-    assert(strcmp((char *) "hello world", buffer) == 0);
+    assert(strcmp((char *) "hello world", (char *) buffer) == 0);
 
     /* deletes the file stream */
     deleteFileStream(fileStream);
