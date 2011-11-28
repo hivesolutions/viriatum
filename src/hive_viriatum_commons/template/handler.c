@@ -76,7 +76,7 @@ void deleteTemplateHandler(struct TemplateHandler_t *templateHandler) {
         cleanup (removal of all nodes) */
         while(1) {
             /* pops a node from the nodes list */
-            popValueLinkedList(templateHandler->nodes, &node, 1);
+            popValueLinkedList(templateHandler->nodes, (void **) &node, 1);
 
             /* in case the value is invalid (empty list) */
             if(node == NULL) {
@@ -139,7 +139,7 @@ void deleteTemplateNode(struct TemplateNode_t *templateNode) {
         cleanup (removal of all parameters) */
         while(1) {
             /* pops a parameter from the parameters list */
-            popValueLinkedList(templateNode->parameters, &parameter, 1);
+            popValueLinkedList(templateNode->parameters, (void **) &parameter, 1);
 
             /* in case the value is invalid (empty list) */
             if(parameter == NULL) {
@@ -284,7 +284,7 @@ ERROR_CODE _openContextTemplateHandler(struct TemplateHandler_t *templateHandler
 }
 
 ERROR_CODE _closeContextTemplateHandler(struct TemplateHandler_t *templateHandler) {
-    popValueLinkedList(templateHandler->contexts, &templateHandler->currentNode, 1);
+    popValueLinkedList(templateHandler->contexts, (void **) &templateHandler->currentNode, 1);
 
     /* raises no error */
     RAISE_NO_ERROR;
