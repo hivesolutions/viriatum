@@ -57,7 +57,7 @@ void deleteStringBuffer(struct StringBuffer_t *stringBuffer) {
 
 void appendStringBuffer(struct StringBuffer_t *stringBuffer, unsigned char *stringValue) {
     /* retrieves the length of the string value */
-    size_t stringValueLength = strlen(stringValue);
+    size_t stringValueLength = strlen((char *) stringValue);
 
     /* adds the string value to the lsit of strings and then
     increments the (total) string length with the length of
@@ -92,7 +92,7 @@ void joinStringBuffer(struct StringBuffer_t *stringBuffer, unsigned char **strin
     while(1) {
         /* retrieves the next value from the string iterator
         as the partial value */
-        getNextIterator(stringIterator, &partialValue);
+        getNextIterator(stringIterator, (void **) &partialValue);
 
         /* in case the partial value is not set
         there are no more items to be retrieved from
@@ -105,7 +105,7 @@ void joinStringBuffer(struct StringBuffer_t *stringBuffer, unsigned char **strin
         /* retrieves the partial value length and uses
         it to copy the contents of the partial value to
         the buffer "pointed" by pointer */
-        partialValueLength = strlen(partialValue);
+        partialValueLength = strlen((char *) partialValue);
         memcpy(pointer, partialValue, partialValueLength);
 
         /* updates the pointer value with the length of the
