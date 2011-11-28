@@ -76,7 +76,7 @@ VIRIATUM_EXPORT_PREFIX void openFileStream(struct Stream_t *stream) {
     struct FileStream_t *fileStream = (struct FileStream_t *) stream->lower;
 
     /* opens the file reference using the file path and the mode */
-    FOPEN(&fileStream->file, fileStream->filePath, fileStream->mode);
+    FOPEN(&fileStream->file, (char *) fileStream->filePath, fileStream->mode);
 }
 
 VIRIATUM_EXPORT_PREFIX void closeFileStream(struct Stream_t *stream) {
