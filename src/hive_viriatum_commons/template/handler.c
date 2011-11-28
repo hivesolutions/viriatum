@@ -322,6 +322,9 @@ ERROR_CODE tagEnd(struct TemplateEngine_t *templateEngine, const unsigned char *
     }
 
     if(temporaryNode->type == TEMPLATE_NODE_CLOSE) {
+        /* deletes the temporary node (no need to process it) */
+        deleteTemplateNode(temporaryNode);
+
         RAISE_NO_ERROR;
     }
 
