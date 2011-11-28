@@ -39,7 +39,7 @@ ERROR_CODE createHandlerFileContext(struct HandlerFileContext_t **handlerFileCon
     /* sets the handler file default values */
     handlerFileContext->file = NULL;
     handlerFileContext->flags = 0;
-    handlerFileContext->data = NULL;
+    handlerFileContext->templateHandler = NULL;
 
     /* sets the handler file context in the  pointer */
     *handlerFileContextPointer = handlerFileContext;
@@ -177,10 +177,14 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
     it must be checked and the entries retrieved to be rendered */
     if(isDirectory) {
         if(handlerFileContext->url[strlen(handlerFileContext->url) - 1] != '/') {
-            isRedirect = 1;
+            /* creates the new location by adding the slash character to the current
+            handler file context url (avoids directory confusion) */
             memcpy(location, handlerFileContext->url, strlen(handlerFileContext->url));
             location[strlen(handlerFileContext->url)] = '/';
             location[strlen(handlerFileContext->url) + 1] = '\0';
+
+            /* sets the is redirect flag (forces temporary redirect) */
+            isRedirect = 1;
         } else {
             /* creates the directory entries (linked list) */
             createLinkedList(&directoryEntries);
@@ -198,13 +202,12 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
             /* processes the file as a template handler */
             processTemplateHandler(templateHandler, "C:\\repo_extra\\viriatum\\src\\hive_viriatum\\resources\\html\\welcome\\listing.html");
 
-            handlerFileContext->data = templateHandler->stringValue;
+            /* sets the template handler in the handler file context and unsets
+            the flushed flag */
+            handlerFileContext->templateHandler = templateHandler;
+            handlerFileContext->flushed = 0;
 
-            /* deletes the template handler
-            LEAKING MEMORY !!!!! */
-            /*deleteTemplateHandler(templateHandler);*/
-
-            /* deletes the directory entries */
+            /* deletes the directory entries (linked list) */
             deleteLinkedList(directoryEntries);
         }
     }
@@ -238,7 +241,7 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
     /* in case the current situation is a directory list */
     else if(isDirectory) {
         /* writes the http static headers to the response */
-        SPRINTF(headersBuffer, 1024, "HTTP/1.1 200 OK\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nContent-Length: %lu\r\n\r\n", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, strlen(handlerFileContext->data));
+        SPRINTF(headersBuffer, 1024, "HTTP/1.1 200 OK\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nContent-Length: %lu\r\n\r\n", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, strlen(handlerFileContext->templateHandler->stringValue));
 
         /* writes both the headers to the connection, registers for the appropriate callbacks */
         writeConnection(connection, (unsigned char *) headersBuffer, strlen(headersBuffer), _sendDataHandlerFile, handlerFileContext);
@@ -421,16 +424,25 @@ ERROR_CODE _sendChunkHandlerFile(struct Connection_t *connection, struct Data_t 
 }
 
 ERROR_CODE _sendDataHandlerFile(struct Connection_t *connection, struct Data_t *data, void *parameters) {
-    /* casts the parameters as handler file context */
+    /* casts the parameters as handler file context and then
+    retrieves the templat handler from it */
     struct HandlerFileContext_t *handlerFileContext = (struct HandlerFileContext_t *) parameters;
+    struct TemplateHandler_t *templateHandler = handlerFileContext->templateHandler;
 
-    /* writes the (file) data to the connection */
-    writeConnection(connection, handlerFileContext->data, strlen(handlerFileContext->data), NULL, handlerFileContext);
+    /* in case the handler file context is already flushed
+    time to clenaup pending structures */
+    if(handlerFileContext->flushed) {
+        /* deletes the template handler (releases memory) */
+        deleteTemplateHandler(templateHandler);
+    } else {
+        /* writes the (file) data to the connection and sets the handler
+        file context as flushed */
+        writeConnection(connection, templateHandler->stringValue, strlen(templateHandler->stringValue), _sendDataHandlerFile, handlerFileContext);
+        handlerFileContext->flushed = 1;
 
-
-
-    /* @TODO: TENHO DE LIBERTAR MEORIA DO TEMPLATA ENGINE AKI */
-
+        /* unsets the string value in the template handler (avoids double release) */
+        templateHandler->stringValue = NULL;
+    }
 
     /* raise no error */
     RAISE_NO_ERROR;

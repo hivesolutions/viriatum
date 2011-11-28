@@ -93,22 +93,22 @@ typedef struct TemplateParameter_t {
     /**
      * The name of the current parameter.
      */
-    unsigned char *name;
+    unsigned char name[64];
 
     /**
      * The "raw" and unprocessed parameter value.s
      */
-    unsigned char *rawValue;
+    unsigned char rawValue[128];
 
     /**
      * The value as a string of the parameter.
      */
-    unsigned char *stringValue;
+    unsigned char stringValue[128];
 
     /**
      * The value as a refernce of the parameter.
      */
-    unsigned char *referenceValue;
+    unsigned char referenceValue[64];
 
     /**
      * The value as an integer of the parameter.
