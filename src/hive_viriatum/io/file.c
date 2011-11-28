@@ -129,6 +129,8 @@ ERROR_CODE isDirectoryFile(char *filePath, unsigned int *isDirectory) {
     RAISE_NO_ERROR;
 }
 
+#ifdef VIRIATUM_PLATFORM_WIN32
+
 ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries) {
     /* allocates the string to hold the composite wildcard
     listing directory path */
@@ -208,3 +210,39 @@ ERROR_CODE deleteDirectoryEntriesFile(struct LinkedList_t *entries) {
     /* raise no error */
     RAISE_NO_ERROR;
 }
+
+#endif
+
+#ifdef VIRIATUM_PLATFORM_UNIX
+
+ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries) {
+    /* allocates space for the directory reference */
+    DIR *directory;
+    struct dirent *ent;
+
+    /* opens the directory for the file path */
+    directory = opendir(filePath);
+
+    if(dir == NULL) {
+        /* raises an error */
+        RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem listing directory");
+    }
+
+    /* print all the files and directories within directory */
+    while((ent = readdir (dir)) != NULL) {
+        printf ("%s\n", ent->d_name);
+    }
+
+    /* closes the directory reference */
+    closedir (dir);
+
+    /* raise no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE deleteDirectoryEntriesFile(struct LinkedList_t *entries) {
+    /* raise no error */
+    RAISE_NO_ERROR;
+}
+
+#endif

@@ -122,8 +122,6 @@ typedef struct TemplateParameter_t {
 } TemplateParameter;
 
 typedef struct TemplateNode_t {
-    size_t childCount;
-    size_t parameterCount;
     unsigned char *name;
     enum TemplateNodeType_e type;
     struct LinkedList_t *children;
@@ -133,7 +131,6 @@ typedef struct TemplateNode_t {
 } TemplateNode;
 
 typedef struct TemplateHandler_t {
-    size_t nodeCount;
     unsigned char *stringValue;
     struct TemplateNode_t *currentNode;
     struct TemplateNode_t *temporaryNode;

@@ -38,7 +38,6 @@ void createTemplateHandler(struct TemplateHandler_t **templateHandlerPointer) {
 
     /* sets the default values in the template handler */
     templateHandler->stringValue = NULL;
-    templateHandler->nodeCount = 0;
     templateHandler->currentNode = NULL;
     templateHandler->temporaryNode = NULL;
     templateHandler->nodes = NULL;
@@ -114,8 +113,6 @@ void createTemplateNode(struct TemplateNode_t **templateNodePointer, enum Templa
     templateNode->type = type;
 
     /* sets the default values in the template node */
-    templateNode->childCount = 0;
-    templateNode->parameterCount = 0;
     templateNode->name = NULL;
     templateNode->children = NULL;
     templateNode->parameters = NULL;
