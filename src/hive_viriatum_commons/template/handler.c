@@ -501,7 +501,7 @@ void traverseOutBuffer(struct TemplateHandler_t *templateHandler, struct Templat
     struct TemplateParameter_t *valueParameter;
     unsigned char *value;
 
-    getValueStringHashMap(node->parametersMap, "value", (void **) &valueParameter);
+    getValueStringHashMap(node->parametersMap, (unsigned char *) "value", (void **) &valueParameter);
 
     switch(valueParameter->type) {
         case TEMPLATE_PARAMETER_STRING:
@@ -537,8 +537,8 @@ void traverseForEachBuffer(struct TemplateHandler_t *templateHandler, struct Tem
     struct Iterator_t *iterator;
     void *_currentValue;
 
-    getValueStringHashMap(node->parametersMap, "from", (void **) &fromParameter);
-    getValueStringHashMap(node->parametersMap, "item", (void **) &itemParameter);
+    getValueStringHashMap(node->parametersMap, (unsigned char *) "from", (void **) &fromParameter);
+    getValueStringHashMap(node->parametersMap, (unsigned char *) "item", (void **) &itemParameter);
 
     getValueStringHashMap(templateHandler->names, fromParameter->referenceValue, (void **) &value);
 
