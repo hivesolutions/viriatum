@@ -47,6 +47,7 @@ structures/array_list.c \
 structures/hash_map.c \
 structures/iterator.c \
 structures/linked_list.c \
+structures/string_buffer.c \
 system/_thread_win32.c \
 template/engine.c \
 template/handler.c \
@@ -61,6 +62,7 @@ structures/array_list.c \
 structures/hash_map.c \
 structures/iterator.c \
 structures/linked_list.c \
+structures/string_buffer.c \
 system/_thread_win32.c \
 template/engine.c \
 template/handler.c \
