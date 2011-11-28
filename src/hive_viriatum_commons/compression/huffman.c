@@ -56,10 +56,10 @@ void generateTableHuffman(struct Huffman_t *huffman, struct Stream_t *stream) {
     this->fileStream->seekg(0, std::fstream::beg);*/
 
     /* allocates the file buffer */
-    char fileBuffer[HUFFMAN_BUFFER_SIZE];
+    /*char fileBuffer[HUFFMAN_BUFFER_SIZE];*/
 
     /* allocates space for the read size */
-    unsigned int readSize;
+    /*unsigned int readSize;*/
 
     // allocates space for the lowest huffman node
     /*HuffmanNode_t *lowestHuffmanNode;
