@@ -201,20 +201,20 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
             isRedirect = 1;
         } else {
             /* creates the complete path to the template file */
-            SPRINTF(templatePath, 1024, "%s%s", VIRIATUM_CONTENTS_PATH, VIRIATUM_LISTING_PATH);
+            SPRINTF((char *)templatePath, 1024, "%s%s", VIRIATUM_CONTENTS_PATH, VIRIATUM_LISTING_PATH);
 
             /* creates the directory entries (linked list) */
             createLinkedList(&directoryEntries);
 
             /* lists the directory file into the directory
             entries linked list */
-            listDirectoryFile(handlerFileContext->filePath, directoryEntries);
+            listDirectoryFile((char *) handlerFileContext->filePath, directoryEntries);
 
             /* creates the template handler */
             createTemplateHandler(&templateHandler);
 
             /* assigns the cirectory entries to the template handler */
-            assignTemplateHandler(templateHandler, "entries", directoryEntries);
+            assignTemplateHandler(templateHandler, (unsigned char *) "entries", directoryEntries);
 
             /* processes the file as a template handler */
             processTemplateHandler(templateHandler, templatePath);
@@ -261,7 +261,7 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
     /* in case the current situation is a directory list */
     else if(isDirectory) {
         /* writes the http static headers to the response */
-        SPRINTF(headersBuffer, 1024, "HTTP/1.1 200 OK\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nContent-Length: %lu\r\n\r\n", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, strlen(handlerFileContext->templateHandler->stringValue));
+        SPRINTF(headersBuffer, 1024, "HTTP/1.1 200 OK\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nContent-Length: %lu\r\n\r\n", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, strlen((char *) handlerFileContext->templateHandler->stringValue));
 
         /* writes both the headers to the connection, registers for the appropriate callbacks */
         writeConnection(connection, (unsigned char *) headersBuffer, strlen(headersBuffer), _sendDataHandlerFile, handlerFileContext);
