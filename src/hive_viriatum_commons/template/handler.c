@@ -56,12 +56,27 @@ void createTemplateHandler(struct TemplateHandler_t **templateHandlerPointer) {
 }
 
 void deleteTemplateHandler(struct TemplateHandler_t *templateHandler) {
-    /* @TODO: TENHO DE APAGAR TODOS OS PARAMETROS E OS NOS */
+    struct Iterator_t *nodesIterator;
+    struct TemplateNode_t *node;
 
     /* in case the string value is set */
     if(templateHandler->stringValue) {
         /* releases the string value from the template handler */
         FREE(templateHandler->stringValue);
+    }
+
+    if(templateHandler->nodes) {
+        createIteratorLinkedList(templateHandler->nodes, &nodesIterator);
+
+        while(1) {
+            getNextIterator(nodesIterator, &node);
+
+            if(node == NULL) {
+                break;
+            }
+
+            deleteTemplateNode(node);
+        }
     }
 
     /* deletes the string buffer */
@@ -98,8 +113,29 @@ void createTemplateNode(struct TemplateNode_t **templateNodePointer, enum Templa
 }
 
 void deleteTemplateNode(struct TemplateNode_t *templateNode) {
-    /* @TODO Tenho de apagar todos os parametros e todos os nos */
+    struct Iterator_t *parametersIterator;
+    struct TemplateParameter_t *templateParameter;
 
+
+    if(templateNode->parameters) {
+        createIteratorLinkedList(templateNode->parameters, &parametersIterator);
+
+        while(1) {
+            getNextIterator(parametersIterator, &templateParameter);
+
+            if(templateParameter == NULL) {
+                break;
+            }
+
+            deleteTemplateParameter(templateParameter);
+        }
+    }
+
+    /* in case the name is defined in the template node */
+    if(templateNode->name) {
+        /* releases the template node name */
+        FREE(templateNode->name);
+    }
 
     /* releases the template node */
     FREE(templateNode);
@@ -114,10 +150,6 @@ void createTemplateParameter(struct TemplateParameter_t **templateParameterPoint
 
     /* sets the default values in the template parameter */
     templateParameter->type = 0;
-    templateParameter->name = NULL;
-    templateParameter->rawValue = NULL;
-    templateParameter->stringValue = NULL;
-    templateParameter->referenceValue = NULL;
     templateParameter->intValue = 0;
     templateParameter->floatValue = 0.0;
 
@@ -280,6 +312,7 @@ ERROR_CODE tagEnd(struct TemplateEngine_t *templateEngine, const unsigned char *
     appendValueLinkedList(currentNode->children, temporaryNode);
     appendValueLinkedList(templateHandler->nodes, temporaryNode);
 
+    /* raise no error */
     RAISE_NO_ERROR;
 }
 
@@ -297,6 +330,7 @@ ERROR_CODE tagName(struct TemplateEngine_t *templateEngine, const unsigned char 
 
     printf("TAG_NAME: '%s'\n", temporaryNode->name);
 
+    /* raise no error */
     RAISE_NO_ERROR;
 }
 
@@ -329,9 +363,7 @@ ERROR_CODE parameter(struct TemplateEngine_t *templateEngine, const unsigned cha
     temporaryNode->temporaryParameter = templateParameter;
     appendValueLinkedList(temporaryNode->parameters, templateParameter);
 
-    /* allocates the space for the template parameter name and
-    sets it with a memory copy */
-    templateParameter->name = (unsigned char *) MALLOC(size + 1);
+    /* sets the name in the template parameter throught a memory copy */
     memcpy(templateParameter->name, pointer, size);
     templateParameter->name[size] = '\0';
 
@@ -340,6 +372,7 @@ ERROR_CODE parameter(struct TemplateEngine_t *templateEngine, const unsigned cha
 
     printf("PARAMETER: '%s'\n", templateParameter->name);
 
+    /* raise no error */
     RAISE_NO_ERROR;
 }
 
@@ -351,16 +384,13 @@ ERROR_CODE parameterValue(struct TemplateEngine_t *templateEngine, const unsigne
     struct TemplateNode_t *temporaryNode = templateHandler->temporaryNode;
     struct TemplateParameter_t *temporaryParameter = temporaryNode->temporaryParameter;
 
-    /* allocates the space for the temporary parameter raw value and
-    sets it with a memory copy */
-    temporaryParameter->rawValue = (unsigned char *) MALLOC(size + 1);
+    /* sets the raw value in the template parameter throught a memory copy */
     memcpy(temporaryParameter->rawValue, pointer, size);
     temporaryParameter->rawValue[size] = '\0';
 
     /* in case the first character of the raw value is
     a start string character the value must be a string */
     if(temporaryParameter->rawValue[0] == '"') {
-        temporaryParameter->stringValue = (unsigned char *) MALLOC(size - 1);
         memcpy(temporaryParameter->stringValue, pointer + 1, size - 2);
         temporaryParameter->stringValue[size - 2] = '\0';
         temporaryParameter->type = TEMPLATE_PARAMETER_STRING;
@@ -373,7 +403,6 @@ ERROR_CODE parameterValue(struct TemplateEngine_t *templateEngine, const unsigne
     }
     /* othwerwise it must be a (variable) reference value */
     else {
-        temporaryParameter->referenceValue = (unsigned char *) MALLOC(size + 1);
         memcpy(temporaryParameter->referenceValue, pointer, size);
         temporaryParameter->referenceValue[size] = '\0';
         temporaryParameter->type = TEMPLATE_PARAMETER_REFERENCE;
@@ -381,6 +410,7 @@ ERROR_CODE parameterValue(struct TemplateEngine_t *templateEngine, const unsigne
 
     printf("VALUE: '%s'\n", temporaryParameter->stringValue);
 
+    /* raise no error */
     RAISE_NO_ERROR;
 }
 
@@ -438,12 +468,10 @@ void traverseNode(struct TemplateNode_t *node, unsigned int indentation) {
     deleteIterator(childIterator);
 }
 
+void traverseNodeBuffer(struct TemplateHandler_t *templateHandler, struct TemplateNode_t *node);
+void traverseNodesBuffer(struct TemplateHandler_t *templateHandler, struct TemplateNode_t *node);
 
-void traverseNodePrint(struct TemplateHandler_t *templateHandler, struct TemplateNode_t *node);
-void traverseNodesPrint(struct TemplateHandler_t *templateHandler, struct TemplateNode_t *node);
-
-
-void traverseOutPrint(struct TemplateHandler_t *templateHandler, struct TemplateNode_t *node) {
+void traverseOutBuffer(struct TemplateHandler_t *templateHandler, struct TemplateNode_t *node) {
     struct TemplateParameter_t *valueParameter;
     unsigned char *value;
 
@@ -469,7 +497,7 @@ void traverseOutPrint(struct TemplateHandler_t *templateHandler, struct Template
     }
 }
 
-void traverseForEachPrint(struct TemplateHandler_t *templateHandler, struct TemplateNode_t *node) {
+void traverseForEachBuffer(struct TemplateHandler_t *templateHandler, struct TemplateNode_t *node) {
     struct TemplateParameter_t *fromParameter;
     struct TemplateParameter_t *itemParameter;
     struct LinkedList_t *value;
@@ -492,7 +520,7 @@ void traverseForEachPrint(struct TemplateHandler_t *templateHandler, struct Temp
 
         assignTemplateHandler(templateHandler, itemParameter->referenceValue, _currentValue);
 
-        traverseNodesPrint(templateHandler, node);
+        traverseNodesBuffer(templateHandler, node);
     }
 
     /* deletes the iterator */
@@ -502,7 +530,7 @@ void traverseForEachPrint(struct TemplateHandler_t *templateHandler, struct Temp
 
 
 
-void traverseNodesPrint(struct TemplateHandler_t *templateHandler, struct TemplateNode_t *node) {
+void traverseNodesBuffer(struct TemplateHandler_t *templateHandler, struct TemplateNode_t *node) {
     /* allocates space for the iterator to be used to retrieve
     the various children from the node */
     struct Iterator_t *childIterator;
@@ -532,19 +560,19 @@ void traverseNodesPrint(struct TemplateHandler_t *templateHandler, struct Templa
         }
 
         /* traverses the child node (recursion step) */
-        traverseNodePrint(templateHandler, child);
+        traverseNodeBuffer(templateHandler, child);
     }
 
     /* deletes the child iterator */
     deleteIterator(childIterator);
 }
 
-void traverseNodePrint(struct TemplateHandler_t *templateHandler, struct TemplateNode_t *node) {
+void traverseNodeBuffer(struct TemplateHandler_t *templateHandler, struct TemplateNode_t *node) {
     /* switches over the type of node to be traversed,
     to print the correct value */
     switch(node->type) {
         case TEMPLATE_NODE_ROOT:
-            traverseNodesPrint(templateHandler, node);
+            traverseNodesBuffer(templateHandler, node);
 
             break;
 
@@ -556,15 +584,14 @@ void traverseNodePrint(struct TemplateHandler_t *templateHandler, struct Templat
         case TEMPLATE_NODE_SINGLE:
         case TEMPLATE_NODE_OPEN:
             if(strcmp(node->name, "out") == 0) {
-                traverseOutPrint(templateHandler, node);
+                traverseOutBuffer(templateHandler, node);
             } else if(strcmp(node->name, "foreach") == 0) {
-                traverseForEachPrint(templateHandler, node);
+                traverseForEachBuffer(templateHandler, node);
             }
 
             break;
     }
 }
-
 
 void processTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned char *filePath) {
      /* allocates space for the template engine */
@@ -575,16 +602,6 @@ void processTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned 
 
     /* allocates space for the root node */
     struct TemplateNode_t *rootNode;
-
-
-
-    struct LinkedList_t *list;
-
-    createLinkedList(&list);
-    appendValueLinkedList(list, "joao");
-    appendValueLinkedList(list, "sofia");
-    appendValueLinkedList(list, "luis");
-
 
     /* creates the template engine */
     createTemplateEngine(&templateEngine);
@@ -610,20 +627,14 @@ void processTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned 
     templateSettings->onparameter = parameter;
     templateSettings->onparameterValue = parameterValue;
 
-    /* processes the file as a template engine */
+    /* processes the file as a template engine and then uses the
+    created node structure to traverse for string buffer output */
     processTemplateEngine(templateEngine, templateSettings, filePath);
-
-
-    assignTemplateHandler(templateHandler, "tobias", "TOBIAS");
-    assignTemplateHandler(templateHandler, "nomes", list);
-    traverseNodePrint(templateHandler, templateHandler->currentNode);
-
+    traverseNodeBuffer(templateHandler, templateHandler->currentNode);
 
     /* "joins" the template handler string buffer into the string
     value, retrieving the final template result */
     joinStringBuffer(templateHandler->stringBuffer, &templateHandler->stringValue);
-
-
 
     /* deletes the template settings */
     deleteTemplateSettings(templateSettings);

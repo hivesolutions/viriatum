@@ -74,12 +74,14 @@ typedef struct HandlerFileContext_t {
     unsigned char flags;
 
     /**
-     * The data buffer to be used for requests
-     * that provide dynamic data, and that must b
-     * rendered in the beginig of the workflows
+     * The template handler to be used for requests
+     * that provide dynamic data, that must be
+     * processed in the beginning of the workflows
      * (eg: listing the entries of a directory).
      */
-    unsigned char *data;
+    struct TemplateHandler_t *templateHandler;
+
+    unsigned int flushed;
 } HandlerFileContext;
 
 ERROR_CODE createHandlerFileContext(struct HandlerFileContext_t **handlerFileContextPointer);
