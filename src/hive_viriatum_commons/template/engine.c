@@ -110,6 +110,12 @@ void processTemplateEngine(struct TemplateEngine_t *templateEngine, struct Templ
     /* opens the file */
     FOPEN(&file, (char *) filePath, "rb");
 
+    /* in case the file is not correctly loaded */
+    if(file == NULL) {
+        /* returns immediately (no file found) */
+        return;
+    }
+
     /* retrieves the size of the file by seeking to the
     end of it and the seeks the stream back to the initial
     position (for further reading) */

@@ -30,8 +30,23 @@
 #include "iterator.h"
 #include "linked_list.h"
 
+/**
+ * Structure holding internal information
+ * for a buffer (in memory) of strings.
+ * The buffer is linear and contains the various
+ * partial string values.
+ */
 typedef struct StringBuffer_t {
+    /**
+     * The total length for the internal
+     * string value.
+     */
     size_t stringLength;
+
+    /**
+     * The list of strings that compose the
+     * the complete string value.
+     */
     struct LinkedList_t *stringList;
 } StringBuffer;
 
@@ -48,5 +63,22 @@ VIRIATUM_EXPORT_PREFIX void createStringBuffer(struct StringBuffer_t **stringBuf
  * @param linkedList The string buffer to be destroyed.
  */
 VIRIATUM_EXPORT_PREFIX void deleteStringBuffer(struct StringBuffer_t *stringBuffer);
+
+/**
+ * Appends (adds) a string value to the string buffer, this value
+ * will be appended to the final "joined" string.
+ *
+ * @param stringBuffer The string buffer reference.
+ * @param stringValue The string value to be added to the string buffer.
+ */
 VIRIATUM_EXPORT_PREFIX void appendStringBuffer(struct StringBuffer_t *stringBuffer, unsigned char *stringValue);
-VIRIATUM_EXPORT_PREFIX void joinStringBuffer(struct StringBuffer_t *stringBuffer, unsigned char **stringValue);
+
+/**
+ * "Joins" the internal buffer of strings creating the final
+ * string that is returned from the given string value pointer.
+ *
+ * @param stringBuffer The string buffer reference.
+ * @param stringValuePointer The pointer to the string value to
+ * hold the "joined" string value.
+ */
+VIRIATUM_EXPORT_PREFIX void joinStringBuffer(struct StringBuffer_t *stringBuffer, unsigned char **stringValuePointer);
