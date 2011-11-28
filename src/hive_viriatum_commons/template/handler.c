@@ -622,9 +622,9 @@ void traverseNodeBuffer(struct TemplateHandler_t *templateHandler, struct Templa
 
         case TEMPLATE_NODE_SINGLE:
         case TEMPLATE_NODE_OPEN:
-            if(strcmp(node->name, "out") == 0) {
+            if(strcmp((char *) node->name, "out") == 0) {
                 traverseOutBuffer(templateHandler, node);
-            } else if(strcmp(node->name, "foreach") == 0) {
+            } else if(strcmp((char *) node->name, "foreach") == 0) {
                 traverseForEachBuffer(templateHandler, node);
             }
 
