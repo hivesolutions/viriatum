@@ -426,7 +426,7 @@ ERROR_CODE parameterValue(struct TemplateEngine_t *templateEngine, const unsigne
     /* in case the first character of the raw value is a numeric
     value it must be a number */
     else if(temporaryParameter->rawValue[0] > 0x2f && temporaryParameter->rawValue[0] < 0x58) {
-        temporaryParameter->intValue = atoi(temporaryParameter->rawValue);
+        temporaryParameter->intValue = atoi((char *) temporaryParameter->rawValue);
         temporaryParameter->type = TEMPLATE_PARAMETER_INTEGER;
     }
     /* othwerwise it must be a (variable) reference value */
