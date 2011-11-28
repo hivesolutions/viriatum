@@ -56,7 +56,7 @@ void createTemplateHandler(struct TemplateHandler_t **templateHandlerPointer) {
 }
 
 void deleteTemplateHandler(struct TemplateHandler_t *templateHandler) {
-    struct Iterator_t *nodesIterator;
+    /* allocates space for the temporary node variable */
     struct TemplateNode_t *node;
 
     /* in case the string value is set */
@@ -65,18 +65,32 @@ void deleteTemplateHandler(struct TemplateHandler_t *templateHandler) {
         FREE(templateHandler->stringValue);
     }
 
+    /* in case the template contexts are defined */
+    if(templateHandler->contexts) {
+        /* deletes the contexts list */
+        deleteLinkedList(templateHandler->contexts);
+    }
+
+    /* in case the template nodes are defined */
     if(templateHandler->nodes) {
-        createIteratorLinkedList(templateHandler->nodes, &nodesIterator);
-
+        /* iterates continuously for nodes list
+        cleanup (removal of all nodes) */
         while(1) {
-            getNextIterator(nodesIterator, &node);
+            /* pops a node from the nodes list */
+            popValueLinkedList(templateHandler->nodes, &node, 1);
 
+            /* in case the value is invalid (empty list) */
             if(node == NULL) {
+                /* breaks the cycle */
                 break;
             }
 
+            /* deletes the template node */
             deleteTemplateNode(node);
         }
+
+        /* deletes the nodes list */
+        deleteLinkedList(templateHandler->nodes);
     }
 
     /* deletes the string buffer */
@@ -113,22 +127,41 @@ void createTemplateNode(struct TemplateNode_t **templateNodePointer, enum Templa
 }
 
 void deleteTemplateNode(struct TemplateNode_t *templateNode) {
-    struct Iterator_t *parametersIterator;
-    struct TemplateParameter_t *templateParameter;
+    /* allocates space for the temporary parameter variable */
+    struct TemplateParameter_t *parameter;
 
+    /* in case the template parameters map are defined */
+    if(templateNode->parametersMap) {
+        /* deletes the parameters map */
+        deleteHashMap(templateNode->parametersMap);
+    }
 
+    /* in case the template parameters are defined */
     if(templateNode->parameters) {
-        createIteratorLinkedList(templateNode->parameters, &parametersIterator);
-
+        /* iterates continuously for parameters list
+        cleanup (removal of all parameters) */
         while(1) {
-            getNextIterator(parametersIterator, &templateParameter);
+            /* pops a parameter from the parameters list */
+            popValueLinkedList(templateNode->parameters, &parameter, 1);
 
-            if(templateParameter == NULL) {
+            /* in case the value is invalid (empty list) */
+            if(parameter == NULL) {
+                /* breaks the cycle */
                 break;
             }
 
-            deleteTemplateParameter(templateParameter);
+            /* deletes the template parameter */
+            deleteTemplateParameter(parameter);
         }
+
+        /* deletes the parameters list */
+        deleteLinkedList(templateNode->parameters);
+    }
+
+    /* in case the template children are defined */
+    if(templateNode->children) {
+        /* deletes the children list */
+        deleteLinkedList(templateNode->children);
     }
 
     /* in case the name is defined in the template node */
@@ -158,8 +191,6 @@ void createTemplateParameter(struct TemplateParameter_t **templateParameterPoint
 }
 
 void deleteTemplateParameter(struct TemplateParameter_t *templateParameter) {
-    /* @TODO: TENHO DE REMOVER OS PARAMETROS SE EXISTIREM */
-
     /* releases the template parameter */
     FREE(templateParameter);
 }
@@ -236,8 +267,6 @@ ERROR_CODE tagCloseBegin(struct TemplateEngine_t *templateEngine) {
 
     /* sets the temporary node type as close */
     temporaryNode->type = TEMPLATE_NODE_CLOSE;
-
-    printf("TAG_CLOSE_BEGIN\n");
 
     RAISE_NO_ERROR;
 }
@@ -408,8 +437,6 @@ ERROR_CODE parameterValue(struct TemplateEngine_t *templateEngine, const unsigne
         temporaryParameter->type = TEMPLATE_PARAMETER_REFERENCE;
     }
 
-    printf("VALUE: '%s'\n", temporaryParameter->stringValue);
-
     /* raise no error */
     RAISE_NO_ERROR;
 }
@@ -465,7 +492,7 @@ void traverseNode(struct TemplateNode_t *node, unsigned int indentation) {
     }
 
     /* deletes the child iterator */
-    deleteIterator(childIterator);
+    deleteIteratorLinkedList(node->children, childIterator);
 }
 
 void traverseNodeBuffer(struct TemplateHandler_t *templateHandler, struct TemplateNode_t *node);
@@ -524,7 +551,7 @@ void traverseForEachBuffer(struct TemplateHandler_t *templateHandler, struct Tem
     }
 
     /* deletes the iterator */
-    deleteIterator(iterator);
+    deleteIteratorLinkedList(value, iterator);
 }
 
 
@@ -564,7 +591,7 @@ void traverseNodesBuffer(struct TemplateHandler_t *templateHandler, struct Templ
     }
 
     /* deletes the child iterator */
-    deleteIterator(childIterator);
+    deleteIteratorLinkedList(node->children, childIterator);
 }
 
 void traverseNodeBuffer(struct TemplateHandler_t *templateHandler, struct TemplateNode_t *node) {

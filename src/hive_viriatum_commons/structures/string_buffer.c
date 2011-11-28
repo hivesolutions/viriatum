@@ -121,5 +121,5 @@ void joinStringBuffer(struct StringBuffer_t *stringBuffer, unsigned char **strin
     *stringValuePointer = stringValue;
 
     /* deletes the string iterator */
-    deleteIterator(stringIterator);
+    deleteIteratorLinkedList(stringBuffer->stringList, stringIterator);
 }
