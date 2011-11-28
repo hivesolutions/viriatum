@@ -97,10 +97,10 @@ void testLinkedList() {
     removeIndexLinkedList(linkedList, 1, 1);
 
     /* pops a value from the linked list */
-    popValueLinkedList(linkedList, &value, 1);
+    popValueLinkedList(linkedList, (void **) &value, 1);
 
     /* pops a value from the linked list */
-    popValueLinkedList(linkedList, &value, 1);
+    popValueLinkedList(linkedList, (void **) &value, 1);
 
     /* deletes the linked list */
     deleteLinkedList(linkedList);

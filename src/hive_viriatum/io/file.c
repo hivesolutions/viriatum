@@ -119,7 +119,7 @@ ERROR_CODE deleteDirectoryEntriesFile(struct LinkedList_t *entries) {
     cleanup (removal of all nodes) */
     while(1) {
         /* pops an entry from the entries list */
-        popValueLinkedList(entries, &entry, 1);
+        popValueLinkedList(entries, (void **) &entry, 1);
 
         /* in case the value is invalid (empty list) */
         if(entry == NULL) {
