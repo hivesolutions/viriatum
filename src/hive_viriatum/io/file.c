@@ -111,6 +111,30 @@ ERROR_CODE countFile(char *filePath, size_t *fileSizePointer) {
     RAISE_NO_ERROR;
 }
 
+ERROR_CODE deleteDirectoryEntriesFile(struct LinkedList_t *entries) {
+    /* allocates space for an entry */
+    unsigned char *entry;
+
+    /* iterates continuously for entries list
+    cleanup (removal of all nodes) */
+    while(1) {
+        /* pops an entry from the entries list */
+        popValueLinkedList(entries, &entry, 1);
+
+        /* in case the value is invalid (empty list) */
+        if(entry == NULL) {
+            /* breaks the cycle */
+            break;
+        }
+
+        /* releases the entry memory */
+        FREE(entry);
+    }
+
+    /* raise no error */
+    RAISE_NO_ERROR;
+}
+
 #ifdef VIRIATUM_PLATFORM_WIN32
 
 ERROR_CODE isDirectoryFile(char *filePath, unsigned int *isDirectory) {
@@ -185,30 +209,6 @@ ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries) {
 
     /* releases the list path reference */
     FREE(listPath);
-
-    /* raise no error */
-    RAISE_NO_ERROR;
-}
-
-ERROR_CODE deleteDirectoryEntriesFile(struct LinkedList_t *entries) {
-    /* allocates space for an entry */
-    unsigned char *entry;
-
-    /* iterates continuously for entries list
-    cleanup (removal of all nodes) */
-    while(1) {
-        /* pops an entry from the entries list */
-        popValueLinkedList(entries, &entry, 1);
-
-        /* in case the value is invalid (empty list) */
-        if(entry == NULL) {
-            /* breaks the cycle */
-            break;
-        }
-
-        /* releases the entry memory */
-        FREE(entry);
-    }
 
     /* raise no error */
     RAISE_NO_ERROR;
@@ -290,11 +290,6 @@ ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries) {
     /* closes the directory reference */
     closedir(directory);
 
-    /* raise no error */
-    RAISE_NO_ERROR;
-}
-
-ERROR_CODE deleteDirectoryEntriesFile(struct LinkedList_t *entries) {
     /* raise no error */
     RAISE_NO_ERROR;
 }
