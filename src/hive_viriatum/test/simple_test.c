@@ -318,7 +318,7 @@ void testTemplateHandler() {
     createTemplateHandler(&templateHandler);
 
     /* processes the file as a template handler */
-    processTemplateHandler(templateHandler, "c:/tobias.tpl");
+    processTemplateHandler(templateHandler, "test.tpl");
 
     /* deletes the template handler */
     deleteTemplateHandler(templateHandler);
