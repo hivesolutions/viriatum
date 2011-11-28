@@ -316,6 +316,9 @@ ERROR_CODE tagEnd(struct TemplateEngine_t *templateEngine, const unsigned char *
             _closeContextTemplateHandler(templateHandler);
 
             break;
+
+		default:
+			break;
     }
 
     if(temporaryNode->type == TEMPLATE_NODE_CLOSE) {
@@ -521,6 +524,9 @@ void traverseOutBuffer(struct TemplateHandler_t *templateHandler, struct Templat
             printf("%d", valueParameter->intValue);
 
             break;
+
+		default:
+			break;
     }
 }
 
