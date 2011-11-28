@@ -168,7 +168,12 @@ size_t _calculateStringHashMap(unsigned char *keyString) {
 
     /* closes the key value calculation */
     key = key ^ index;
-    key == -1 ? key == -2 : key == key;
+
+	/* checks for aditional abnormal key value */
+	if(key == -1) {
+		/* removes the error code value */
+		key = -2;
+	}
 
     /* returns the (calculated) key */
     return key;
