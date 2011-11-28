@@ -251,17 +251,17 @@ ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries) {
     /* opens the directory for the file path */
     directory = opendir(filePath);
 
-	printf("abriu directorio");
+	printf("abriu directorio\n");
 
 	/* in case the directory reference is not valid */
     if(directory == NULL) {
-		printf("vai sair cenas");
+		printf("vai sair cenas\n");
 
         /* raises an error */
         RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem listing directory");
     }
 
-	printf("continuou directorio");
+	printf("continuou directorio\n");
 
     /* print all the files and directories within directory */
     while((ent = readdir(directory)) != NULL) {
