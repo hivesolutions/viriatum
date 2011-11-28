@@ -35,7 +35,7 @@
  * template nodes that may exist in
  * the template parsing context.
  */
-typedef enum TemplateNodeType_t {
+typedef enum TemplateNodeType_e {
     /**
      * The template node to be used as the root
      * node os the node structure.
@@ -44,9 +44,9 @@ typedef enum TemplateNodeType_t {
 
     /**
      * The template node representing a "simple"
-     * string context.
+     * text context.
      */
-    TEMPLATE_NODE_STRING,
+    TEMPLATE_NODE_TEXT,
 
     /**
      * The template node representing a single
@@ -64,8 +64,21 @@ typedef enum TemplateNodeType_t {
      * The template node representing an
      * close (tag) context.
      */
-    TEMPLATE_NODE_CLOSE
+    TEMPLATE_NODE_CLOSE,
+
+    /**
+     * The template node representing an
+     * undefined context.
+     */
+    TEMPLATE_NODE_UNDEFINED
 } TemplateNodeType;
+
+typedef enum TemplateParameterType_e {
+    TEMPLATE_PARAMETER_STRING = 1,
+    TEMPLATE_PARAMETER_REFERENCE,
+    TEMPLATE_PARAMETER_INTEGER,
+    TEMPLATE_PARAMETER_FLOAT
+} TemplateParameterType;
 
 /**
  * Structure defining the parameter internal
@@ -75,7 +88,7 @@ typedef struct TemplateParameter_t {
     /**
      * The data type of the current parameter.
      */
-    int type;
+    enum TemplateParameterType_e type;
 
     /**
      * The name of the current parameter.
@@ -112,7 +125,7 @@ typedef struct TemplateNode_t {
     size_t childCount;
     size_t parameterCount;
     unsigned char *name;
-    enum TemplateNodeType_t type;
+    enum TemplateNodeType_e type;
     struct LinkedList_t *children;
     struct LinkedList_t *parameters;
     struct TemplateParameter_t *temporaryParameter;
@@ -122,12 +135,13 @@ typedef struct TemplateHandler_t {
     size_t nodeCount;
     struct TemplateNode_t *currentNode;
     struct TemplateNode_t *temporaryNode;
-    struct TemplateNode_t **nodes;
+    struct LinkedList_t *nodes;
+    struct LinkedList_t *contexts;
 } TemplateHandler;
 
 VIRIATUM_EXPORT_PREFIX void createTemplateHandler(struct TemplateHandler_t **templateHandlerPointer);
 VIRIATUM_EXPORT_PREFIX void deleteTemplateHandler(struct TemplateHandler_t *templateHandler);
-VIRIATUM_EXPORT_PREFIX void createTemplateNode(struct TemplateNode_t **templateNodePointer, enum TemplateNodeType_t type);
+VIRIATUM_EXPORT_PREFIX void createTemplateNode(struct TemplateNode_t **templateNodePointer, enum TemplateNodeType_e type);
 VIRIATUM_EXPORT_PREFIX void deleteTemplateNode(struct TemplateNode_t *templateNode);
 VIRIATUM_EXPORT_PREFIX void createTemplateParameter(struct TemplateParameter_t **templateParameterPointer);
 VIRIATUM_EXPORT_PREFIX void deleteTemplateParameter(struct TemplateParameter_t *templateParameter);
