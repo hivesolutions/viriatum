@@ -264,7 +264,7 @@ ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries) {
     }
 
     /* print all the files and directories within directory */
-    while() {
+    while(1) {
 		/* retrieves the entity by reading it from the directory */
 		entity = readdir(directory);
 		
@@ -278,9 +278,9 @@ ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries) {
         /* calculates the length of the entry name and uses
         it to create the memory space for the entry name and then
         copies the contents into it */
-        entryNameLength = strlen(ent->d_name);
+        entryNameLength = strlen(entity->d_name);
         entryName = (char *) MALLOC(entryNameLength + 1);
-        memcpy(entryName, ent->d_name, entryNameLength + 1);
+        memcpy(entryName, entity->d_name, entryNameLength + 1);
 
         /* adds the entrys name to the list of entries for
         the current directory (path) */
