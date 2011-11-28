@@ -49,6 +49,6 @@ if test "x$have_epoll_include" = "xyes" && test "x$wants_epoll" = "xyes"; then
                        epfd = epoll_create(256);
                        exit(epfd == -1 ? 1 : 0);
                    }
-                  ], have_epoll=yes, have_epoll=no, have_epoll=yes)])
+                  ]), have_epoll=yes, have_epoll=no, have_epoll=yes)
     AC_MSG_RESULT($have_epoll)
 fi
