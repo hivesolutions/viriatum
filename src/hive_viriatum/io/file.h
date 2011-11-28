@@ -66,3 +66,5 @@ ERROR_CODE isDirectoryFile(char *filePath, unsigned int *isDirectory);
  * hold the various directory file entries.
  */
 ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries);
+
+ERROR_CODE deleteDirectoryEntriesFile(struct LinkedList_t *entries);

@@ -212,6 +212,9 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
             handlerFileContext->templateHandler = templateHandler;
             handlerFileContext->flushed = 0;
 
+            /* deletes the directory entries */
+            deleteDirectoryEntriesFile(directoryEntries);
+
             /* deletes the directory entries (linked list) */
             deleteLinkedList(directoryEntries);
         }

@@ -178,6 +178,33 @@ ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries) {
         appendValueLinkedList(entries, entryName);
     } while(FindNextFile(handlerFind, &findData) != 0);
 
+    /* releases the list path reference */
+    FREE(listPath);
+
+    /* raise no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE deleteDirectoryEntriesFile(struct LinkedList_t *entries) {
+    /* allocates space for an entry */
+    unsigned char *entry;
+
+    /* iterates continuously for entries list
+    cleanup (removal of all nodes) */
+    while(1) {
+        /* pops an entry from the entries list */
+        popValueLinkedList(entries, &entry, 1);
+
+        /* in case the value is invalid (empty list) */
+        if(entry == NULL) {
+            /* breaks the cycle */
+            break;
+        }
+
+        /* releases the entry memory */
+        FREE(entry);
+    }
+
     /* raise no error */
     RAISE_NO_ERROR;
 }
