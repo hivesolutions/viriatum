@@ -41,6 +41,7 @@ void createTemplateHandler(struct TemplateHandler_t **templateHandlerPointer) {
     templateHandler->currentNode = NULL;
     templateHandler->temporaryNode = NULL;
     templateHandler->nodes = NULL;
+    templateHandler->contexts = NULL;
 
     /* sets the template engine in the template handler pointer */
     *templateHandlerPointer = templateHandler;
@@ -53,7 +54,7 @@ void deleteTemplateHandler(struct TemplateHandler_t *templateHandler) {
     FREE(templateHandler);
 }
 
-void createTemplateNode(struct TemplateNode_t **templateNodePointer, enum TemplateNodeType_t type) {
+void createTemplateNode(struct TemplateNode_t **templateNodePointer, enum TemplateNodeType_e type) {
     /* retrieves the template node size */
     size_t templateNodeSize = sizeof(struct TemplateNode_t);
 
@@ -117,12 +118,42 @@ ERROR_CODE textBegin(struct TemplateEngine_t *templateEngine) {
 }
 
 ERROR_CODE textEnd(struct TemplateEngine_t *templateEngine, const unsigned char *pointer, size_t size) {
-    char buffer[1024];
+    /* allocates space for the template node */
+    struct TemplateNode_t *templateNode;
 
-    memcpy(buffer, pointer, size);
-    buffer[size] = '\0';
+    /* retrieves the template handler from the template engine context
+    and retrieves the current node from it */
+    struct TemplateHandler_t *templateHandler = (struct TemplateHandler_t *) templateEngine->context;
+    struct TemplateNode_t *currentNode = templateHandler->currentNode;
 
-    printf("TEXT_END: '%s'\n", buffer);
+    /* creates a new template node and sets the template
+    node as the temporary node in the template handler */
+    createTemplateNode(&templateNode, TEMPLATE_NODE_TEXT);
+    templateHandler->temporaryNode = templateNode;
+
+    /* allocates the space for the temporary node name and
+    sets it with a memory copy */
+    templateNode->name = (unsigned char *) MALLOC(size + 1);
+    memcpy(templateNode->name, pointer, size);
+    templateNode->name[size] = '\0';
+
+    if(currentNode->children == NULL) {
+        createLinkedList(&currentNode->children);
+    }
+
+    /* in case the nodes (list) are not defined for the
+    temporary node */
+    if(templateHandler->nodes == NULL) {
+        /* creates a new linked list for the nodes */
+        createLinkedList(&templateHandler->nodes);
+    }
+
+    /* adds the temporary node to the current list of nodes
+    in the template handler and to the chilren list of the current node */
+    appendValueLinkedList(templateHandler->nodes, templateNode);
+    appendValueLinkedList(currentNode->children, templateNode);
+
+    printf("TEXT_END: '%s'\n", templateNode->name);
 
     RAISE_NO_ERROR;
 }
@@ -158,13 +189,75 @@ ERROR_CODE tagCloseBegin(struct TemplateEngine_t *templateEngine) {
     RAISE_NO_ERROR;
 }
 
+
+ERROR_CODE _openContextTemplateHandler(struct TemplateHandler_t *templateHandler) {
+    struct TemplateNode_t *currentNode = templateHandler->currentNode;
+    struct TemplateNode_t *temporaryNode = templateHandler->temporaryNode;
+
+    if(templateHandler->contexts == NULL) {
+        createLinkedList(&templateHandler->contexts);
+    }
+
+    appendValueLinkedList(templateHandler->contexts, currentNode);
+
+    templateHandler->currentNode = temporaryNode;
+
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE _closeContextTemplateHandler(struct TemplateHandler_t *templateHandler) {
+    popValueLinkedList(templateHandler->contexts, &templateHandler->currentNode, 1);
+
+    RAISE_NO_ERROR;
+}
+
+
 ERROR_CODE tagEnd(struct TemplateEngine_t *templateEngine, const unsigned char *pointer, size_t size) {
-    char buffer[1024];
+    /* retrieves the template handler from the template engine context
+    and retrieves the temporary node from it */
+    struct TemplateHandler_t *templateHandler = (struct TemplateHandler_t *) templateEngine->context;
+    struct TemplateNode_t *temporaryNode = templateHandler->temporaryNode;
 
-    memcpy(buffer, pointer, size);
-    buffer[size] = '\0';
+    struct TemplateNode_t *currentNode = templateHandler->currentNode;
 
-    printf("TAG_END: '%s'\n", buffer);
+    /* in case the node does contain the closing
+    symbol at the final part of the tag (assumes single node) */
+    if(pointer[size - 2] == '/') {
+        temporaryNode->type = TEMPLATE_NODE_SINGLE;
+    }
+
+    /* switches over the temporary node type */
+    switch(temporaryNode->type) {
+        case TEMPLATE_NODE_OPEN:
+            _openContextTemplateHandler(templateHandler);
+
+            break;
+
+        case TEMPLATE_NODE_CLOSE:
+            _closeContextTemplateHandler(templateHandler);
+
+            break;
+    }
+
+    if(temporaryNode->type == TEMPLATE_NODE_CLOSE) {
+        RAISE_NO_ERROR;
+    }
+
+    if(currentNode->children == NULL) {
+        createLinkedList(&currentNode->children);
+    }
+
+    /* in case the nodes (list) are not defined for the
+    temporary node */
+    if(templateHandler->nodes == NULL) {
+        /* creates a new linked list for the nodes */
+        createLinkedList(&templateHandler->nodes);
+    }
+
+    /* adds the temporary node to the current list of nodes
+    in the template handler and to the chilren list of the temporary node */
+    appendValueLinkedList(currentNode->children, temporaryNode);
+    appendValueLinkedList(templateHandler->nodes, temporaryNode);
 
     RAISE_NO_ERROR;
 }
@@ -233,11 +326,75 @@ ERROR_CODE parameterValue(struct TemplateEngine_t *templateEngine, const unsigne
     memcpy(temporaryParameter->rawValue, pointer, size);
     temporaryParameter->rawValue[size] = '\0';
 
-    /* @TODO: Tenho de processar o valor como deve de ser */
+    /* in case the first character of the raw value is
+    a start string character the value must be a string */
+    if(temporaryParameter->rawValue[0] == '"') {
+        temporaryParameter->stringValue = (unsigned char *) MALLOC(size - 1);
+        memcpy(temporaryParameter->stringValue, pointer + 1, size - 2);
+        temporaryParameter->stringValue[size - 2] = '\0';
+        temporaryParameter->type = TEMPLATE_PARAMETER_STRING;
+    }
+    /* in case the first character of the raw value is a numeric
+    value it must be a number */
+    else if(temporaryParameter->rawValue[0] > 0x2f && temporaryParameter->rawValue[0] < 0x58) {
+        temporaryParameter->intValue = atoi(temporaryParameter->rawValue);
+        temporaryParameter->type = TEMPLATE_PARAMETER_INTEGER;
+    }
+    /* othwerwise it must be a (variable) reference value */
+    else {
+        temporaryParameter->referenceValue = (unsigned char *) MALLOC(size + 1);
+        memcpy(temporaryParameter->referenceValue, pointer, size);
+        temporaryParameter->referenceValue[size] = '\0';
+        temporaryParameter->type = TEMPLATE_PARAMETER_REFERENCE;
+    }
 
     printf("VALUE: '%s'\n", temporaryParameter->stringValue);
 
     RAISE_NO_ERROR;
+}
+
+void traverseNode(struct TemplateNode_t *node, unsigned int indentation) {
+    /* allocates space for the child element */
+    struct TemplateNode_t *child;
+
+    /* allocates space for the index counter */
+    unsigned int index;
+
+    /* iterates over the indentation count to print
+    the indentation spaces */
+    for(index = 0; index < indentation; index++) {
+        /* prints an indentation space */
+        printf("  ");
+    }
+
+    /* prints bot the name and the type in case the name
+    is not valid nothing is print */
+    if(node->name != NULL) {
+        printf("name: '%s' & ", node->name);
+    }
+    printf("type: '%d'\n", node->type);
+
+    /* in case the node contains no children, it should
+    be a leaf node (nothing to be done) */
+    if(node->children == NULL) {
+        /* returns immediately */
+        return;
+    }
+
+    /* iterates continuously for children percolation */
+    while(1) {
+        /* "pops" a value from the children linked list */
+        popValueLinkedList(node->children, &child, 1);
+
+        /* in case the child is not valid (no more items available) */
+        if(child == NULL) {
+            /* breaks the loop */
+            break;
+        }
+
+        /* traverses the child node (recursion step) */
+        traverseNode(child, indentation + 1);
+    }
 }
 
 void processTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned char *filePath) {
@@ -276,6 +433,10 @@ void processTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned 
 
     /* processes the file as a template engine */
     processTemplateEngine(templateEngine, templateSettings, filePath);
+
+    /* traverses the current node recursively, printing
+    the names and type of earch of the values */
+    traverseNode(templateHandler->currentNode, 0);
 
     /* deletes the template settings */
     deleteTemplateSettings(templateSettings);

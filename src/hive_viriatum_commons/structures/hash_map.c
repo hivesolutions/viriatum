@@ -85,6 +85,13 @@ void setValueHashMap(struct HashMap_t *hashMap, size_t key, void *value) {
     element->used = 1;
 }
 
+void setValueStringHashMap(struct HashMap_t *hashMap, unsigned char *keyString, void *value) {
+    /* calculates the key (hash) value from the key string
+    and uses it to set the value in the hash map */
+    size_t key = _calculateStringHashMap(keyString);
+    setValueHashMap(hashMap, key, value);
+}
+
 void getHashMap(struct HashMap_t *hashMap, size_t key, struct HashMapElement_t **elementPointer) {
     /* calculates the index using the modulus */
     size_t index = key % hashMap->elementsBufferSize;
@@ -105,4 +112,61 @@ void getValueHashMap(struct HashMap_t *hashMap, size_t key, void **valuePointer)
 
     /* sets the element value in the value pointer */
     *valuePointer = element->value;
+}
+
+void getValueStringHashMap(struct HashMap_t *hashMap, unsigned char *keyString, void **valuePointer) {
+    /* calculates the key (hash) value from the key string
+    and uses it to retrieve the value from the hash map */
+    size_t key = _calculateStringHashMap(keyString);
+    getValueHashMap(hashMap, key, valuePointer);
+}
+
+size_t _calculateStringHashMap(unsigned char *keyString) {
+    /* creates the value to hold the current character
+    in iteration */
+    unsigned char current;
+
+    /* creates the value to hold the current key value
+    and the current index accumulator */
+    size_t key = 0;
+    unsigned int index = 0;
+
+    /* in case the key string is invalid or in
+    case it's empty */
+    if(keyString == NULL || keyString[0] == '\0') {
+        /* returns the key immediately as zero */
+        return 0;
+    }
+
+    /* calculates the initial key value and
+    increments the initial index value */
+    key = keyString[0] << 7;
+    index++;
+
+    /* iterates continuously for (integer) key calculation */
+    while(1) {
+        /* retrievs the current character from the
+        the key string value */
+        current = keyString[index];
+
+        /* in case the current value is end of string */
+        if(current == '\0') {
+            /* breaks the loop */
+            break;
+        }
+
+        /* re-calculates the key value based uppon the current
+        character value in loop */
+        key = (1000003 * key) ^ current;
+
+        /* increments the index value (iteration) */
+        index++;
+    }
+
+    /* closes the key value calculation */
+    key = key ^ index;
+    key == -1 ? key == -2 : key == key;
+
+    /* returns the (calculated) key */
+    return key;
 }
