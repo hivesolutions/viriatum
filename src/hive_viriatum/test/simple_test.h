@@ -58,6 +58,13 @@ void testArrayList();
 void testHashMap();
 
 /**
+ * Tests the string buffer, used
+ * to buffer string in memory for
+ * fast writing.
+ */
+void testStringBuffer();
+
+/**
  * Tests the base 64 encoding.
  */
 void testBase64();

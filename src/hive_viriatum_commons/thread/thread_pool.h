@@ -58,4 +58,11 @@ VIRIATUM_EXPORT_PREFIX void deleteThreadPool(struct ThreadPool_t *threadPool);
 VIRIATUM_EXPORT_PREFIX void createThreadPoolElement(struct ThreadPool_t *threadPool);
 VIRIATUM_EXPORT_PREFIX void insertTaskThreadPool(struct ThreadPool_t *threadPool, struct ThreadPoolTask_t *threadPoolTask);
 
+/**
+ * Thread than runs a new stage. It controls the frequency of the loading
+ * and manages it.
+ *
+ * @param parameters The thread parameters.
+ * @return The thread result.
+ */
 VIRIATUM_EXPORT_PREFIX THREAD_RETURN poolRunnerThread(THREAD_ARGUMENTS parameters);

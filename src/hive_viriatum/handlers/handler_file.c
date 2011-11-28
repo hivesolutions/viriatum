@@ -149,8 +149,8 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
     unsigned int isDirectory;
 
     struct LinkedList_t *directoryEntries;
-    struct Iterator_t *iterator;
-    char *pathName;
+
+    struct TemplateHandler_t *templateHandler;
 
 
     /* allocates the headers buffer */
@@ -166,28 +166,34 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
     ERROR_CODE readFileResult = countFile((char *) handlerFileContext->filePath, &fileSize);
 
 
-    /*memcpy(handlerFileContext->filePath, "C:\\repo", strlen("C:\\repo"));
+    memcpy(handlerFileContext->filePath, "C:\\repo", strlen("C:\\repo"));
     handlerFileContext->filePath[strlen("C:\\repo")] = 0;
 
     isDirectoryFile(handlerFileContext->filePath, &isDirectory);
 
     if(isDirectory) {
+        /* creates the directory entries (linked list) */
         createLinkedList(&directoryEntries);
 
+        /* lists the directory file into the directory
+        entries linked list */
         listDirectoryFile(handlerFileContext->filePath, directoryEntries);
 
-        createIteratorLinkedList(directoryEntries, &iterator);
+        /* creates the template handler */
+        createTemplateHandler(&templateHandler);
 
-        while(1) {
-            getNextIterator(iterator, &pathName);
+        /* assigns the cirectory entries to the template handler */
+        assignTemplateHandler(templateHandler, "entries", directoryEntries);
 
-            if(pathName == NULL) {
-                break;
-            }
+        /* processes the file as a template handler */
+        processTemplateHandler(templateHandler, "C:\\repo_extra\\viriatum\\src\\hive_viriatum\\resources\\html\\welcome\\listing.html");
 
-            printf("%s\n", pathName);
-        }
-    }*/
+        /* deletes the template handler */
+        deleteTemplateHandler(templateHandler);
+
+        /* delestes the directory entries */
+        deleteLinkedList(directoryEntries);
+    }
 
 
     /* sets the (http) flags in the handler file context */
