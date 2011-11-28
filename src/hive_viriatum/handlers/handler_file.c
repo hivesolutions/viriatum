@@ -56,6 +56,13 @@ ERROR_CODE deleteHandlerFileContext(struct HandlerFileContext_t *handlerFileCont
         fclose(handlerFileContext->file);
     }
 
+	/* in case there is a template handler defined
+	in the handler file context */
+	if(handlerFileContext->templateHandler) {
+		/* deletes the template handler (releases memory) */
+        deleteTemplateHandler(handlerFileContext->templateHandler);
+	}
+
     /* releases the handler file context */
     FREE(handlerFileContext);
 
@@ -157,10 +164,6 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
     /* allocates space for the is directory and the is redirect flags */
     unsigned int isDirectory = 0;
     unsigned int isRedirect = 0;
-
-    float startTime = 0.0;
-    float endTime = 0.0;
-    float timeElapsed = 0.0;
 
     /* allocates space for the new location value for
     redirect request cases and for the path to the
@@ -449,8 +452,10 @@ ERROR_CODE _sendDataHandlerFile(struct Connection_t *connection, struct Data_t *
     /* in case the handler file context is already flushed
     time to clenaup pending structures */
     if(handlerFileContext->flushed) {
-        /* deletes the template handler (releases memory) */
+        /* deletes the template handler (releases memory) and
+		unsets the reference in the handler file context */
         deleteTemplateHandler(templateHandler);
+		handlerFileContext->templateHandler = NULL;
     } else {
         /* writes the (file) data to the connection and sets the handler
         file context as flushed */
