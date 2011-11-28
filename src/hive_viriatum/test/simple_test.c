@@ -144,7 +144,7 @@ void testHashMap() {
     /* sets and retrieves the value (using a string)
     in the hash map */
     setValueStringHashMap(hashMap, "test", (void *) 2);
-    getValueStringHashMap(hashMap, "test", &element);
+    getValueStringHashMap(hashMap, "test", (void **) &element);
 
     /* deletes the hash map */
     deleteHashMap(hashMap);
