@@ -453,7 +453,7 @@ ERROR_CODE _sendDataHandlerFile(struct Connection_t *connection, struct Data_t *
     time to clenaup pending structures */
     if(handlerFileContext->flushed) {
         /* runs the cleanup handler file (releases internal structures) */
-        _cleanupHandlerFile(connection, data, parameters);
+        /*_cleanupHandlerFile(connection, data, parameters); */
 
         /* deletes the template handler (releases memory) and
 		unsets the reference in the handler file context */
