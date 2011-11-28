@@ -78,10 +78,10 @@ void processTemplateEngine(struct TemplateEngine_t *templateEngine, struct Templ
     /* allocates space for the file */
     FILE *file;
 
-    /* allocats space for the current (character) for reading
-    and for the ahead character for look ahead*/
-    char current;
-    char ahead;
+    /* allocates space for the current (character) for reading
+    and for the ahead character for look ahead */
+    char current = '\0';
+    char ahead = '\0';
 
     /* allocates the space for the look ahead valid flag */
     unsigned char aheadSet = 0;
