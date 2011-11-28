@@ -185,7 +185,7 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
     struct Connection_t *connection = (struct Connection_t *) httpParser->parameters;
 
     /* checks if the path being request is in fact a directory */
-    isDirectoryFile(handlerFileContext->filePath, &isDirectory);
+    isDirectoryFile((char *) handlerFileContext->filePath, &isDirectory);
 
     /* in case the file path being request referes a directory
     it must be checked and the entries retrieved to be rendered */
