@@ -112,6 +112,9 @@ ERROR_CODE urlCallbackHandlerFile(struct HttpParser_t *httpParser, const unsigne
         memcpy(url, "/index.html", 12);
     }
 
+    /* copies the url to the url reference in the handler file context */
+    memcpy(handlerFileContext->url, url, strlen(url) + 1);
+
     /* creates the file path from using the base viriatum path */
     SPRINTF((char *) handlerFileContext->filePath, 1024, "%s%s%s", VIRIATUM_CONTENTS_PATH, VIRIATUM_WELCOME_PATH, url);
 
@@ -146,17 +149,19 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
     /* allocates the file size */
     size_t fileSize;
 
-    unsigned int isDirectory;
-
     struct LinkedList_t *directoryEntries;
-
     struct TemplateHandler_t *templateHandler;
 
-    /* allocates the space for the "read" result
-    code (valid by default) */
-    ERROR_CODE readFileResult = 0;
+    unsigned int isDirectory = 0;
+    unsigned int isRedirect = 0;
 
-    /* allocates the headers buffer */
+    unsigned char location[1024];
+
+    /* allocates the space for the "read" result
+    error code (valid by default) */
+    ERROR_CODE errorCode = 0;
+
+    /* allocates the headers buffer (it will be releases automatically by the writter) */
     char *headersBuffer = MALLOC(1024);
 
     /* retrieves the handler file context from the http parser */
@@ -171,43 +176,50 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
     /* in case the file path being request referes a directory
     it must be checked and the entries retrieved to be rendered */
     if(isDirectory) {
-        /* creates the directory entries (linked list) */
-        createLinkedList(&directoryEntries);
+        if(handlerFileContext->url[strlen(handlerFileContext->url) - 1] != '/') {
+            isRedirect = 1;
+            memcpy(location, handlerFileContext->url, strlen(handlerFileContext->url));
+            location[strlen(handlerFileContext->url)] = '/';
+            location[strlen(handlerFileContext->url) + 1] = '\0';
+        } else {
+            /* creates the directory entries (linked list) */
+            createLinkedList(&directoryEntries);
 
-        /* lists the directory file into the directory
-        entries linked list */
-        listDirectoryFile(handlerFileContext->filePath, directoryEntries);
+            /* lists the directory file into the directory
+            entries linked list */
+            listDirectoryFile(handlerFileContext->filePath, directoryEntries);
 
-        /* creates the template handler */
-        createTemplateHandler(&templateHandler);
+            /* creates the template handler */
+            createTemplateHandler(&templateHandler);
 
-        /* assigns the cirectory entries to the template handler */
-        assignTemplateHandler(templateHandler, "entries", directoryEntries);
+            /* assigns the cirectory entries to the template handler */
+            assignTemplateHandler(templateHandler, "entries", directoryEntries);
 
-        /* processes the file as a template handler */
-        processTemplateHandler(templateHandler, "C:\\repo_extra\\viriatum\\src\\hive_viriatum\\resources\\html\\welcome\\listing.html");
+            /* processes the file as a template handler */
+            processTemplateHandler(templateHandler, "C:\\repo_extra\\viriatum\\src\\hive_viriatum\\resources\\html\\welcome\\listing.html");
 
-        handlerFileContext->data = templateHandler->stringValue;
+            handlerFileContext->data = templateHandler->stringValue;
 
-        /* deletes the template handler
-        LEAKING MEMORY !!!!! */
-        /*deleteTemplateHandler(templateHandler);*/
+            /* deletes the template handler
+            LEAKING MEMORY !!!!! */
+            /*deleteTemplateHandler(templateHandler);*/
 
-        /* deletes the directory entries */
-        deleteLinkedList(directoryEntries);
+            /* deletes the directory entries */
+            deleteLinkedList(directoryEntries);
+        }
     }
     /* otherwise the file path must refered a "normal" file path and
     it must be checked */
     else {
         /* counts the total size (in bytes) of the contents in the file path */
-        readFileResult = countFile((char *) handlerFileContext->filePath, &fileSize);
+        errorCode = countFile((char *) handlerFileContext->filePath, &fileSize);
     }
 
     /* sets the (http) flags in the handler file context */
     handlerFileContext->flags = httpParser->flags;
 
     /* tests the error code for error */
-    if(IS_ERROR_CODE(readFileResult)) {
+    if(IS_ERROR_CODE(errorCode)) {
         /* prints the error */
         V_DEBUG_F("%s\n", getLastErrorMessageSafe());
 
@@ -216,6 +228,12 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
 
         /* writes both the headers to the connection, registers for the appropriate callbacks */
         writeConnection(connection, (unsigned char *) headersBuffer, strlen(headersBuffer), _cleanupHandlerFile, handlerFileContext);
+    } else if(isRedirect) {
+        /* writes the http static headers to the response */
+        SPRINTF(headersBuffer, 1024, "HTTP/1.1 307 Temporary Redirect\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nLocation: %s\r\n\r\n", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, location);
+
+        /* writes both the headers to the connection, registers for the appropriate callbacks */
+        writeConnection(connection, (unsigned char *) headersBuffer, strlen(headersBuffer), NULL, handlerFileContext);
     }
     /* in case the current situation is a directory list */
     else if(isDirectory) {
@@ -408,6 +426,11 @@ ERROR_CODE _sendDataHandlerFile(struct Connection_t *connection, struct Data_t *
 
     /* writes the (file) data to the connection */
     writeConnection(connection, handlerFileContext->data, strlen(handlerFileContext->data), NULL, handlerFileContext);
+
+
+
+    /* @TODO: TENHO DE LIBERTAR MEORIA DO TEMPLATA ENGINE AKI */
+
 
     /* raise no error */
     RAISE_NO_ERROR;

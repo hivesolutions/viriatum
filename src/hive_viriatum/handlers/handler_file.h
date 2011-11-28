@@ -51,6 +51,11 @@ struct HttpConnection_t;
  */
 typedef struct HandlerFileContext_t {
     /**
+     * The url to be used for retrieving the file.
+     */
+    unsigned char url[1024];
+
+    /**
      * The path to the file to be handled by
      * the current file request.
      */
