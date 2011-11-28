@@ -67,4 +67,10 @@ ERROR_CODE isDirectoryFile(char *filePath, unsigned int *isDirectory);
  */
 ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries);
 
+/**
+ * Deletes, releases memory from all the directory entries described
+ * in the given entries list.
+ *
+ * @param entries The list of entries to be deleted.
+ */
 ERROR_CODE deleteDirectoryEntriesFile(struct LinkedList_t *entries);
