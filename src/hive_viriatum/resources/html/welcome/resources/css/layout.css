@@ -81,7 +81,7 @@ a:hover {
 }
 
 .main-illustration {
-    background: transparent url(../images/main-illustration.png) no-repeat center center;
+    background: transparent url(../images/illustration/main-illustration.png) no-repeat center center;
     height: 290px;
     width: 960px;
 }
@@ -91,7 +91,7 @@ a:hover {
 }
 
 .branding a {
-    background: transparent url(../images/viriatum-logotype.png) no-repeat center center;
+    background: transparent url(../images/logo/viriatum-logo.png) no-repeat center center;
     display: block;
     height: 48px;
     margin: 10px auto 20px auto;
@@ -190,20 +190,20 @@ a:hover {
     background-position: bottom center;
 }
 
-.icon.folder{
-    background: transparent url(../images/icon-folder.png) center center no-repeat;
+.icon.folder {
+    background: transparent url(../images/mime/icon-folder.png) center center no-repeat;
 }
 
-.icon.image{
-    background: transparent url(../images/icon-image.png) center center no-repeat;
+.icon.image {
+    background: transparent url(../images/mime/icon-image.png) center center no-repeat;
 }
 
-.icon.text{
-    background: transparent url(../images/icon-text.png) center center no-repeat;
+.icon.text {
+    background: transparent url(../images/mime/icon-text.png) center center no-repeat;
 }
 
-.icon.html{
-    background: transparent url(../images/icon-html.png) center center no-repeat;
+.icon.html {
+    background: transparent url(../images/mime/icon-html.png) center center no-repeat;
 }
 
 .table.status {
@@ -225,7 +225,7 @@ a:hover {
     float: left;
     height: 280px;
     width: 200px;
-    background: transparent url(../images/error-illustration.png) no-repeat center center;
+    background: transparent url(../images/illustration/error-illustration.png) no-repeat center center;
 }
 
 .error-content {
@@ -238,7 +238,7 @@ a:hover {
     height: 50px;
     width: 100%;
     font-family: times;
-    text-shadow: 1px 1px 1px #FFFFFF;
+    text-shadow: 1px 1px 1px #ffffff;
     color: #444444;
     font-size: 38pt;
     text-align: center;
