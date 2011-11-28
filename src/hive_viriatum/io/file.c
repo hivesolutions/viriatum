@@ -245,9 +245,9 @@ ERROR_CODE isDirectoryFile(char *filePath, unsigned int *isDirectory) {
 
 ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries) {
     /* allocates space for the directory reference and
-	for the entry reference */
+	for the entity reference */
     DIR *directory;
-    struct dirent *entry;
+    struct dirent *entity;
 
     /* allocates space for both the entry name and the
     length of the entry name */
@@ -264,7 +264,17 @@ ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries) {
     }
 
     /* print all the files and directories within directory */
-    while((ent = readdir(directory)) != NULL) {
+    while() {
+		/* retrieves the entity by reading it from the directory */
+		entity = readdir(directory);
+		
+		/* in case the entity is not defined
+		(the directory list is finished) */
+		if(entity == NULL) {
+			/* breaks the switch */
+			break;
+		}
+
         /* calculates the length of the entry name and uses
         it to create the memory space for the entry name and then
         copies the contents into it */
