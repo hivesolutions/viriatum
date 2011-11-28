@@ -149,12 +149,17 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
     /* allocates the file size */
     size_t fileSize;
 
+    /* allocates space for the directory entries and for
+    the template handler */
     struct LinkedList_t *directoryEntries;
     struct TemplateHandler_t *templateHandler;
 
+    /* allocates space for the is directory and the is redirect flags */
     unsigned int isDirectory = 0;
     unsigned int isRedirect = 0;
 
+    /* allocates space for the new location value for
+    redirect request cases */
     unsigned char location[1024];
 
     /* allocates the space for the "read" result

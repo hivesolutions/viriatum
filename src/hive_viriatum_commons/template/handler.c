@@ -516,7 +516,11 @@ void traverseOutBuffer(struct TemplateHandler_t *templateHandler, struct Templat
         case TEMPLATE_PARAMETER_REFERENCE:
             getValueStringHashMap(templateHandler->names, valueParameter->referenceValue, &value);
 
-            appendStringBuffer(templateHandler->stringBuffer, value);
+            /* in case the value was successfully found */
+            if(value != NULL) {
+                /* adds the value (string) to the string buffer */
+                appendStringBuffer(templateHandler->stringBuffer, value);
+            }
 
             break;
 
@@ -538,6 +542,12 @@ void traverseForEachBuffer(struct TemplateHandler_t *templateHandler, struct Tem
     getValueStringHashMap(node->parametersMap, "item", &itemParameter);
 
     getValueStringHashMap(templateHandler->names, fromParameter->referenceValue, &value);
+
+    /* in case the value was not found */
+    if(value == NULL) {
+        /* returns immediately */
+        return;
+    }
 
     createIteratorLinkedList(value, &iterator);
 
@@ -665,6 +675,9 @@ void processTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned 
     /* "joins" the template handler string buffer into the string
     value, retrieving the final template result */
     joinStringBuffer(templateHandler->stringBuffer, &templateHandler->stringValue);
+
+    /* deletes the now unecessary root node */
+    deleteTemplateNode(rootNode);
 
     /* deletes the template settings */
     deleteTemplateSettings(templateSettings);
