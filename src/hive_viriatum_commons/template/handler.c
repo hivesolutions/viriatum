@@ -478,7 +478,7 @@ void traverseNode(struct TemplateNode_t *node, unsigned int indentation) {
     /* iterates continuously for children percolation */
     while(1) {
         /* retrieves the child element from the child iterator */
-        getNextIterator(childIterator, &child);
+        getNextIterator(childIterator, (void **) &child);
 
         /* in case the child is not valid (no more items available) */
         if(child == NULL) {
@@ -551,7 +551,7 @@ void traverseForEachBuffer(struct TemplateHandler_t *templateHandler, struct Tem
     createIteratorLinkedList(value, &iterator);
 
     while(1) {
-        getNextIterator(iterator, &_currentValue);
+        getNextIterator(iterator, (void **) &_currentValue);
 
         if(_currentValue == NULL) {
             break;
@@ -590,7 +590,7 @@ void traverseNodesBuffer(struct TemplateHandler_t *templateHandler, struct Templ
     /* iterates continuously for children percolation */
     while(1) {
         /* retrieves the child element from the child iterator */
-        getNextIterator(childIterator, &child);
+        getNextIterator(childIterator, (void **) &child);
 
         /* in case the child is not valid (no more items available) */
         if(child == NULL) {
