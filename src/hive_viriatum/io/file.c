@@ -111,6 +111,8 @@ ERROR_CODE countFile(char *filePath, size_t *fileSizePointer) {
     RAISE_NO_ERROR;
 }
 
+#ifdef VIRIATUM_PLATFORM_WIN32
+
 ERROR_CODE isDirectoryFile(char *filePath, unsigned int *isDirectory) {
     /* in case the attributes value contains the file attribute
     directory reference (the file is a directory)*/
@@ -128,8 +130,6 @@ ERROR_CODE isDirectoryFile(char *filePath, unsigned int *isDirectory) {
     /* raise no error */
     RAISE_NO_ERROR;
 }
-
-#ifdef VIRIATUM_PLATFORM_WIN32
 
 ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries) {
     /* allocates the string to hold the composite wildcard
@@ -214,6 +214,28 @@ ERROR_CODE deleteDirectoryEntriesFile(struct LinkedList_t *entries) {
 #endif
 
 #ifdef VIRIATUM_PLATFORM_UNIX
+
+ERROR_CODE isDirectoryFile(char *filePath, unsigned int *isDirectory) {
+    /* allocates space for the directory reference */
+    DIR *directory;
+
+    /* tries to open the directory for the file path */
+    directory = opendir(filePath);
+
+    /* in case the directory reference is valid */
+    if(directory) {
+        /* sets the is directory flag */
+        *isDirectory = 1;
+    }
+    /* otherwise the directory reference is not valid */
+    else {
+        /* unsets the is directory flag */
+        *isDirectory = 0;
+    }
+
+    /* raise no error */
+    RAISE_NO_ERROR;
+}
 
 ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries) {
     /* allocates space for the directory reference */
