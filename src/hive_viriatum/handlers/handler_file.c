@@ -256,7 +256,7 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
         SPRINTF(headersBuffer, 1024, "HTTP/1.1 307 Temporary Redirect\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nLocation: %s\r\n\r\n", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, location);
 
         /* writes both the headers to the connection, registers for the appropriate callbacks */
-        writeConnection(connection, (unsigned char *) headersBuffer, strlen(headersBuffer), NULL, handlerFileContext);
+        writeConnection(connection, (unsigned char *) headersBuffer, strlen(headersBuffer), _cleanupHandlerFile, handlerFileContext);
     }
     /* in case the current situation is a directory list */
     else if(isDirectory) {
@@ -452,6 +452,9 @@ ERROR_CODE _sendDataHandlerFile(struct Connection_t *connection, struct Data_t *
     /* in case the handler file context is already flushed
     time to clenaup pending structures */
     if(handlerFileContext->flushed) {
+        /* runs the cleanup handler file (releases internal structures) */
+        _cleanupHandlerFile(connection, data, parameters);
+
         /* deletes the template handler (releases memory) and
 		unsets the reference in the handler file context */
         deleteTemplateHandler(templateHandler);
