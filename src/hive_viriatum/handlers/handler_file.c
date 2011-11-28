@@ -36,11 +36,10 @@ ERROR_CODE createHandlerFileContext(struct HandlerFileContext_t **handlerFileCon
     /* allocates space for the handler file context */
     struct HandlerFileContext_t *handlerFileContext = (struct HandlerFileContext_t *) MALLOC(handlerFileContextSize);
 
-    /* sets the handler file context file */
+    /* sets the handler file default values */
     handlerFileContext->file = NULL;
-
-    /* sets the handler file context flags */
     handlerFileContext->flags = 0;
+    handlerFileContext->data = NULL;
 
     /* sets the handler file context in the  pointer */
     *handlerFileContextPointer = handlerFileContext;
@@ -147,6 +146,13 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
     /* allocates the file size */
     size_t fileSize;
 
+    unsigned int isDirectory;
+
+    struct LinkedList_t *directoryEntries;
+    struct Iterator_t *iterator;
+    char *pathName;
+
+
     /* allocates the headers buffer */
     char *headersBuffer = MALLOC(1024);
 
@@ -159,6 +165,31 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
     /* reads (the complete) file contents */
     ERROR_CODE readFileResult = countFile((char *) handlerFileContext->filePath, &fileSize);
 
+
+    /*memcpy(handlerFileContext->filePath, "C:\\repo", strlen("C:\\repo"));
+    handlerFileContext->filePath[strlen("C:\\repo")] = 0;
+
+    isDirectoryFile(handlerFileContext->filePath, &isDirectory);
+
+    if(isDirectory) {
+        createLinkedList(&directoryEntries);
+
+        listDirectoryFile(handlerFileContext->filePath, directoryEntries);
+
+        createIteratorLinkedList(directoryEntries, &iterator);
+
+        while(1) {
+            getNextIterator(iterator, &pathName);
+
+            if(pathName == NULL) {
+                break;
+            }
+
+            printf("%s\n", pathName);
+        }
+    }*/
+
+
     /* sets the (http) flags in the handler file context */
     handlerFileContext->flags = httpParser->flags;
 
@@ -170,7 +201,7 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
         /* writes the http static headers to the response */
         SPRINTF(headersBuffer, 1024, "HTTP/1.1 404 Not Found\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nContent-Length: 15\r\n\r\n404 - Not Found", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU);
 
-        /* writes both the headers to the connection */
+        /* writes both the headers to the connection, registers for the appropriate callbacks */
         writeConnection(connection, (unsigned char *) headersBuffer, strlen(headersBuffer), _cleanupHandlerFile, handlerFileContext);
     }
     /* otherwise there was no error in the file */
@@ -178,7 +209,7 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
         /* writes the http static headers to the response */
         SPRINTF(headersBuffer, 1024, "HTTP/1.1 200 OK\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nContent-Length: %lu\r\n\r\n", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, fileSize);
 
-        /* writes both the headers to the connection */
+        /* writes both the headers to the connection, registers for the appropriate callbacks */
         writeConnection(connection, (unsigned char *) headersBuffer, strlen(headersBuffer), _sendChunkHandlerFile, handlerFileContext);
     }
 

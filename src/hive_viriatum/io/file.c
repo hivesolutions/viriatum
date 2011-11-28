@@ -110,3 +110,74 @@ ERROR_CODE countFile(char *filePath, size_t *fileSizePointer) {
     /* raise no error */
     RAISE_NO_ERROR;
 }
+
+ERROR_CODE isDirectoryFile(char *filePath, unsigned int *isDirectory) {
+    /* in case the attributes value contains the file attribute
+    directory reference (the file is a directory)*/
+    if(GetFileAttributes(filePath) & FILE_ATTRIBUTE_DIRECTORY) {
+        /* sets the is directory flag */
+        *isDirectory = 1;
+    }
+    /* otherwise the file path does not refer a directory
+    it must be a file or it may not exist */
+    else {
+        /* unsets the is directory flag */
+        *isDirectory = 0;
+    }
+
+    /* raise no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries) {
+    /* allocates the string to hold the composite wildcard
+    listing directory path */
+    char *listPath;
+
+    /* allocates space for both the entry name and the
+    length of the entry name */
+    char *entryName;
+    size_t entryNameLength;
+
+    /* allocates the various windows internal structures
+    for the findind of the directory entries */
+    WIN32_FIND_DATA findData;
+    HANDLE handlerFind = INVALID_HANDLE_VALUE;
+    DWORD dwError = 0;
+
+    /* retrieves the length of the file path */
+    size_t pathLength = strlen(filePath);
+
+    /* allocates and populates the list (directory) path
+    with the appropriate wildcard value */
+    listPath = (char *) MALLOC(pathLength + 3);
+    memcpy(listPath, filePath, pathLength + 1);
+    memcpy(listPath + pathLength, "\\*", 3);
+
+    /* tries to find the first file with the wildcard
+    value (checks for error) */
+    handlerFind = FindFirstFile(listPath, &findData);
+
+    /* in case the retieved handler is not valid
+    (error) */
+    if(handlerFind == INVALID_HANDLE_VALUE) {
+        /* raises an error */
+        RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem listing directory");
+    }
+
+    do {
+        /* calculates the length of the entry name and uses
+        it to create the memory space for the entry name and then
+        copies the contents into it */
+        entryNameLength = strlen(findData.cFileName);
+        entryName = (char *) MALLOC(entryNameLength + 1);
+        memcpy(entryName, findData.cFileName, entryNameLength + 1);
+
+        /* adds the entrys name to the list of entries for
+        the current directory (path) */
+        appendValueLinkedList(entries, entryName);
+    } while(FindNextFile(handlerFind, &findData) != 0);
+
+    /* raise no error */
+    RAISE_NO_ERROR;
+}

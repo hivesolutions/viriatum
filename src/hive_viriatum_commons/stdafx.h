@@ -78,6 +78,7 @@
 #include <dlfcn.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <dirent.h>
 #include <sys/time.h>
 #include <sys/resource.h>
 #endif

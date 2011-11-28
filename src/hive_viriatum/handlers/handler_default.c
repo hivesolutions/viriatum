@@ -230,7 +230,7 @@ ERROR_CODE _sendResponseHandlerDefault(struct HttpParser_t *httpParser) {
     /* writes the http static headers to the response */
     SPRINTF(responseBuffer, 256, "HTTP/1.1 200 OK\r\nServer: %s/%s (%s @ %s)\r\nConnection: Keep-Alive\r\nContent-Length: 14\r\n\r\nHello Viriatum", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU);
 
-    /* writes the response to the connection */
+    /* writes the response to the connection, registers for the appropriate callbacks */
     writeConnection(connection, (unsigned char *) responseBuffer, strlen(responseBuffer), _sendResponseCallbackHandlerDefault, (void *) httpParser);
 
     /* raise no error */

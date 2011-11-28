@@ -46,3 +46,23 @@ ERROR_CODE readFile(char *filePath, unsigned char **bufferPointer, size_t *fileS
  * @param fileSizePointer The pointer to the file size.
  */
 ERROR_CODE countFile(char *filePath, size_t *fileSizePointer);
+
+/**
+ * Checks if the given file path referes a directory path.
+ * The result is set to the given integer pointer.
+ *
+ * @param filePath The path to be verified to be a directory.
+ * @param isDirectory If the given path refers a directory.
+ */
+ERROR_CODE isDirectoryFile(char *filePath, unsigned int *isDirectory);
+
+/**
+ * Lists the various (copies them) directory entries for the
+ * given file (dirctory) path.
+ * The "new" entries are copied to the given linked list of entries.
+ *
+ * @param filePath The path to the directory to be listed.
+ * @param entries The linked list of entries to be used to
+ * hold the various directory file entries.
+ */
+ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries);

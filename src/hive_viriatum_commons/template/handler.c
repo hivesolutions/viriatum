@@ -43,12 +43,18 @@ void createTemplateHandler(struct TemplateHandler_t **templateHandlerPointer) {
     templateHandler->nodes = NULL;
     templateHandler->contexts = NULL;
 
+    /* creates a new hash map for the names */
+    createHashMap(&templateHandler->names, 0);
+
     /* sets the template engine in the template handler pointer */
     *templateHandlerPointer = templateHandler;
 }
 
 void deleteTemplateHandler(struct TemplateHandler_t *templateHandler) {
     /* @TODO: TENHO DE APAGAR TODOS OS PARAMETROS E OS NOS */
+
+    /* deletes the names hash map */
+    deleteHashMap(templateHandler->names);
 
     /* releases the template handler */
     FREE(templateHandler);
@@ -70,6 +76,7 @@ void createTemplateNode(struct TemplateNode_t **templateNodePointer, enum Templa
     templateNode->name = NULL;
     templateNode->children = NULL;
     templateNode->parameters = NULL;
+    templateNode->parametersMap = NULL;
     templateNode->temporaryParameter = NULL;
 
     /* sets the template engine in the template node pointer */
@@ -295,6 +302,13 @@ ERROR_CODE parameter(struct TemplateEngine_t *templateEngine, const unsigned cha
         createLinkedList(&temporaryNode->parameters);
     }
 
+    /* in case the parameters (map) are not defined for the
+    temporary node */
+    if(temporaryNode->parametersMap == NULL) {
+        /* creates a new hash map for the parameters */
+        createHashMap(&temporaryNode->parametersMap, 0);
+    }
+
     /* creates the template parameter, sets it as the temporary parameter
     in the temporary node and adds it to the list of parameters */
     createTemplateParameter(&templateParameter);
@@ -306,6 +320,9 @@ ERROR_CODE parameter(struct TemplateEngine_t *templateEngine, const unsigned cha
     templateParameter->name = (unsigned char *) MALLOC(size + 1);
     memcpy(templateParameter->name, pointer, size);
     templateParameter->name[size] = '\0';
+
+    /* sets the parameter reference in the parameters map */
+    setValueStringHashMap(temporaryNode->parametersMap, templateParameter->name, templateParameter);
 
     printf("PARAMETER: '%s'\n", templateParameter->name);
 
@@ -354,6 +371,10 @@ ERROR_CODE parameterValue(struct TemplateEngine_t *templateEngine, const unsigne
 }
 
 void traverseNode(struct TemplateNode_t *node, unsigned int indentation) {
+    /* allocates space for the iterator to be used to retrieve
+    the various children from the node */
+    struct Iterator_t *childIterator;
+
     /* allocates space for the child element */
     struct TemplateNode_t *child;
 
@@ -367,7 +388,7 @@ void traverseNode(struct TemplateNode_t *node, unsigned int indentation) {
         printf("  ");
     }
 
-    /* prints bot the name and the type in case the name
+    /* prints both the name and the type in case the name
     is not valid nothing is print */
     if(node->name != NULL) {
         printf("name: '%s' & ", node->name);
@@ -381,10 +402,13 @@ void traverseNode(struct TemplateNode_t *node, unsigned int indentation) {
         return;
     }
 
+    /* creates a "new" iterator for the children linked list */
+    createIteratorLinkedList(node->children, &childIterator);
+
     /* iterates continuously for children percolation */
     while(1) {
-        /* "pops" a value from the children linked list */
-        popValueLinkedList(node->children, &child, 1);
+        /* retrieves the child element from the child iterator */
+        getNextIterator(childIterator, &child);
 
         /* in case the child is not valid (no more items available) */
         if(child == NULL) {
@@ -395,7 +419,138 @@ void traverseNode(struct TemplateNode_t *node, unsigned int indentation) {
         /* traverses the child node (recursion step) */
         traverseNode(child, indentation + 1);
     }
+
+    /* deletes the child iterator */
+    deleteIterator(childIterator);
 }
+
+
+void traverseNodePrint(struct TemplateHandler_t *templateHandler, struct TemplateNode_t *node);
+void traverseNodesPrint(struct TemplateHandler_t *templateHandler, struct TemplateNode_t *node);
+
+
+void traverseOutPrint(struct TemplateHandler_t *templateHandler, struct TemplateNode_t *node) {
+    struct TemplateParameter_t *valueParameter;
+    unsigned char *value;
+
+    getValueStringHashMap(node->parametersMap, "value", &valueParameter);
+
+    switch(valueParameter->type) {
+        case TEMPLATE_PARAMETER_STRING:
+            printf("%s", valueParameter->stringValue);
+
+            break;
+
+        case TEMPLATE_PARAMETER_REFERENCE:
+            getValueStringHashMap(templateHandler->names, valueParameter->referenceValue, &value);
+
+            printf("%s", value);
+
+            break;
+
+        case TEMPLATE_PARAMETER_INTEGER:
+            printf("%d", valueParameter->intValue);
+
+            break;
+    }
+}
+
+void traverseForEachPrint(struct TemplateHandler_t *templateHandler, struct TemplateNode_t *node) {
+    struct TemplateParameter_t *fromParameter;
+    struct TemplateParameter_t *itemParameter;
+    struct LinkedList_t *value;
+    struct Iterator_t *iterator;
+    void *_currentValue;
+
+    getValueStringHashMap(node->parametersMap, "from", &fromParameter);
+    getValueStringHashMap(node->parametersMap, "item", &itemParameter);
+
+    getValueStringHashMap(templateHandler->names, fromParameter->referenceValue, &value);
+
+    createIteratorLinkedList(value, &iterator);
+
+    while(1) {
+        getNextIterator(iterator, &_currentValue);
+
+        if(_currentValue == NULL) {
+            break;
+        }
+
+        assignTemplateHandler(templateHandler, itemParameter->referenceValue, _currentValue);
+
+        traverseNodesPrint(templateHandler, node);
+    }
+
+    /* deletes the iterator */
+    deleteIterator(iterator);
+}
+
+
+
+
+void traverseNodesPrint(struct TemplateHandler_t *templateHandler, struct TemplateNode_t *node) {
+    /* allocates space for the iterator to be used to retrieve
+    the various children from the node */
+    struct Iterator_t *childIterator;
+
+    /* allocates space for the child element */
+    struct TemplateNode_t *child;
+
+    /* in case the node contains no children, it should
+    be a leaf node (nothing to be done) */
+    if(node->children == NULL) {
+        /* returns immediately */
+        return;
+    }
+
+    /* creates a "new" iterator for the children linked list */
+    createIteratorLinkedList(node->children, &childIterator);
+
+    /* iterates continuously for children percolation */
+    while(1) {
+        /* retrieves the child element from the child iterator */
+        getNextIterator(childIterator, &child);
+
+        /* in case the child is not valid (no more items available) */
+        if(child == NULL) {
+            /* breaks the loop */
+            break;
+        }
+
+        /* traverses the child node (recursion step) */
+        traverseNodePrint(templateHandler, child);
+    }
+
+    /* deletes the child iterator */
+    deleteIterator(childIterator);
+}
+
+void traverseNodePrint(struct TemplateHandler_t *templateHandler, struct TemplateNode_t *node) {
+    /* switches over the type of node to be traversed,
+    to print the correct value */
+    switch(node->type) {
+        case TEMPLATE_NODE_ROOT:
+            traverseNodesPrint(templateHandler, node);
+
+            break;
+
+        case TEMPLATE_NODE_TEXT:
+            printf(node->name);
+
+            break;
+
+        case TEMPLATE_NODE_SINGLE:
+        case TEMPLATE_NODE_OPEN:
+            if(strcmp(node->name, "out") == 0) {
+                traverseOutPrint(templateHandler, node);
+            } else if(strcmp(node->name, "foreach") == 0) {
+                traverseForEachPrint(templateHandler, node);
+            }
+
+            break;
+    }
+}
+
 
 void processTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned char *filePath) {
      /* allocates space for the template engine */
@@ -406,6 +561,16 @@ void processTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned 
 
     /* allocates space for the root node */
     struct TemplateNode_t *rootNode;
+
+
+
+    struct LinkedList_t *list;
+
+    createLinkedList(&list);
+    appendValueLinkedList(list, "joao");
+    appendValueLinkedList(list, "sofia");
+    appendValueLinkedList(list, "luis");
+
 
     /* creates the template engine */
     createTemplateEngine(&templateEngine);
@@ -434,13 +599,21 @@ void processTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned 
     /* processes the file as a template engine */
     processTemplateEngine(templateEngine, templateSettings, filePath);
 
-    /* traverses the current node recursively, printing
-    the names and type of earch of the values */
-    traverseNode(templateHandler->currentNode, 0);
+
+    assignTemplateHandler(templateHandler, "tobias", "TOBIAS");
+    assignTemplateHandler(templateHandler, "nomes", list);
+    traverseNodePrint(templateHandler, templateHandler->currentNode);
+
+
 
     /* deletes the template settings */
     deleteTemplateSettings(templateSettings);
 
     /* deletes the template engine */
     deleteTemplateEngine(templateEngine);
+}
+
+void assignTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned char *key, void *value) {
+    /* sets the a new key in the names hash map */
+    setValueStringHashMap(templateHandler->names, key, value);
 }

@@ -128,6 +128,7 @@ typedef struct TemplateNode_t {
     enum TemplateNodeType_e type;
     struct LinkedList_t *children;
     struct LinkedList_t *parameters;
+    struct HashMap_t *parametersMap;
     struct TemplateParameter_t *temporaryParameter;
 } TemplateNode;
 
@@ -137,6 +138,7 @@ typedef struct TemplateHandler_t {
     struct TemplateNode_t *temporaryNode;
     struct LinkedList_t *nodes;
     struct LinkedList_t *contexts;
+    struct HashMap_t *names;
 } TemplateHandler;
 
 VIRIATUM_EXPORT_PREFIX void createTemplateHandler(struct TemplateHandler_t **templateHandlerPointer);
@@ -146,3 +148,4 @@ VIRIATUM_EXPORT_PREFIX void deleteTemplateNode(struct TemplateNode_t *templateNo
 VIRIATUM_EXPORT_PREFIX void createTemplateParameter(struct TemplateParameter_t **templateParameterPointer);
 VIRIATUM_EXPORT_PREFIX void deleteTemplateParameter(struct TemplateParameter_t *templateParameter);
 VIRIATUM_EXPORT_PREFIX void processTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned char *filePath);
+VIRIATUM_EXPORT_PREFIX void assignTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned char *key, void *value);
