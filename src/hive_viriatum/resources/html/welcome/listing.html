@@ -5,10 +5,10 @@
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
         <!-- css inclusion -->
-        <link rel="stylesheet" href="resources/css/layout.css" type="text/css" />
+        <link rel="stylesheet" href="/resources/css/layout.css" type="text/css" />
 
         <!-- favicon inclusion -->
-        <link rel="shortcut icon" href="resources/images/favicon.ico" />
+        <link rel="shortcut icon" href="/resources/images/favicon.ico" />
     </head>
     <body>
         <div id="header-wrapper">
@@ -28,12 +28,12 @@
 				<tbody>
 					<tr class="current-folder">
 						<td class="icon arrow-left"><a></a></td>
-						<td colspan="3"><a href="#">Folder Name</a></td>
+						<td colspan="3"><a href="..">Folder Name</a></td>
 					</tr>
 					${foreach item=entry from=entries     }
 						<tr>
 							<td class="icon folder"></td>
-							<td class="left"><a href="#">${out value=entry /}</a></td>
+							<td class="left"><a href="${out value=entry /}/">${out value=entry /}</a></td>
 							<td class="right">2011-07-28 19:45</td>
 							<td class="right">77 Kb</td>
 						</tr>

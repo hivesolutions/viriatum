@@ -152,6 +152,9 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
 
     struct TemplateHandler_t *templateHandler;
 
+    /* allocates the space for the "read" result
+    code (valid by default) */
+    ERROR_CODE readFileResult = 0;
 
     /* allocates the headers buffer */
     char *headersBuffer = MALLOC(1024);
@@ -162,15 +165,11 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
     /* retrieves the connection from the http parser parameters */
     struct Connection_t *connection = (struct Connection_t *) httpParser->parameters;
 
-    /* reads (the complete) file contents */
-    ERROR_CODE readFileResult = countFile((char *) handlerFileContext->filePath, &fileSize);
-
-
-    memcpy(handlerFileContext->filePath, "C:\\repo", strlen("C:\\repo"));
-    handlerFileContext->filePath[strlen("C:\\repo")] = 0;
-
+    /* checks if the path being request is in fact a directory */
     isDirectoryFile(handlerFileContext->filePath, &isDirectory);
 
+    /* in case the file path being request referes a directory
+    it must be checked and the entries retrieved to be rendered */
     if(isDirectory) {
         /* creates the directory entries (linked list) */
         createLinkedList(&directoryEntries);
@@ -188,13 +187,21 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
         /* processes the file as a template handler */
         processTemplateHandler(templateHandler, "C:\\repo_extra\\viriatum\\src\\hive_viriatum\\resources\\html\\welcome\\listing.html");
 
-        /* deletes the template handler */
-        deleteTemplateHandler(templateHandler);
+        handlerFileContext->data = templateHandler->stringValue;
 
-        /* delestes the directory entries */
+        /* deletes the template handler
+        LEAKING MEMORY !!!!! */
+        /*deleteTemplateHandler(templateHandler);*/
+
+        /* deletes the directory entries */
         deleteLinkedList(directoryEntries);
     }
-
+    /* otherwise the file path must refered a "normal" file path and
+    it must be checked */
+    else {
+        /* counts the total size (in bytes) of the contents in the file path */
+        readFileResult = countFile((char *) handlerFileContext->filePath, &fileSize);
+    }
 
     /* sets the (http) flags in the handler file context */
     handlerFileContext->flags = httpParser->flags;
@@ -210,7 +217,16 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
         /* writes both the headers to the connection, registers for the appropriate callbacks */
         writeConnection(connection, (unsigned char *) headersBuffer, strlen(headersBuffer), _cleanupHandlerFile, handlerFileContext);
     }
-    /* otherwise there was no error in the file */
+    /* in case the current situation is a directory list */
+    else if(isDirectory) {
+        /* writes the http static headers to the response */
+        SPRINTF(headersBuffer, 1024, "HTTP/1.1 200 OK\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nContent-Length: %lu\r\n\r\n", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, strlen(handlerFileContext->data));
+
+        /* writes both the headers to the connection, registers for the appropriate callbacks */
+        writeConnection(connection, (unsigned char *) headersBuffer, strlen(headersBuffer), _sendDataHandlerFile, handlerFileContext);
+    }
+    /* otherwise there was no error in the file and it's a simple
+    file situation (no directory) */
     else {
         /* writes the http static headers to the response */
         SPRINTF(headersBuffer, 1024, "HTTP/1.1 200 OK\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nContent-Length: %lu\r\n\r\n", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, fileSize);
@@ -381,6 +397,17 @@ ERROR_CODE _sendChunkHandlerFile(struct Connection_t *connection, struct Data_t 
         /* releases the current file buffer */
         FREE(fileBuffer);
     }
+
+    /* raise no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE _sendDataHandlerFile(struct Connection_t *connection, struct Data_t *data, void *parameters) {
+    /* casts the parameters as handler file context */
+    struct HandlerFileContext_t *handlerFileContext = (struct HandlerFileContext_t *) parameters;
+
+    /* writes the (file) data to the connection */
+    writeConnection(connection, handlerFileContext->data, strlen(handlerFileContext->data), NULL, handlerFileContext);
 
     /* raise no error */
     RAISE_NO_ERROR;

@@ -134,11 +134,13 @@ typedef struct TemplateNode_t {
 
 typedef struct TemplateHandler_t {
     size_t nodeCount;
+    unsigned char *stringValue;
     struct TemplateNode_t *currentNode;
     struct TemplateNode_t *temporaryNode;
     struct LinkedList_t *nodes;
     struct LinkedList_t *contexts;
     struct HashMap_t *names;
+    struct StringBuffer_t *stringBuffer;
 } TemplateHandler;
 
 VIRIATUM_EXPORT_PREFIX void createTemplateHandler(struct TemplateHandler_t **templateHandlerPointer);

@@ -94,3 +94,4 @@ ERROR_CODE _setHttpSettingsHandlerFile(struct HttpSettings_t *httpSettings);
 ERROR_CODE _unsetHttpSettingsHandlerFile(struct HttpSettings_t *httpSettings);
 ERROR_CODE _cleanupHandlerFile(struct Connection_t *connection, struct Data_t *data, void *parameters);
 ERROR_CODE _sendChunkHandlerFile(struct Connection_t *connection, struct Data_t *data, void *parameter);
+ERROR_CODE _sendDataHandlerFile(struct Connection_t *connection, struct Data_t *data, void *parameters);
