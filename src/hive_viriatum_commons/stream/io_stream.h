@@ -27,7 +27,7 @@
 
 #pragma once
 
-typedef struct Stream_t;
+struct Stream_t;
 
 typedef void (*streamUpdate) (struct Stream_t *stream);
 typedef size_t (*streamRead) (struct Stream_t *stream, unsigned char *buffer, size_t size);
