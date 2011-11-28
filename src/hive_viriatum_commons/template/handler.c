@@ -501,7 +501,7 @@ void traverseOutBuffer(struct TemplateHandler_t *templateHandler, struct Templat
     struct TemplateParameter_t *valueParameter;
     unsigned char *value;
 
-    getValueStringHashMap(node->parametersMap, "value", &valueParameter);
+    getValueStringHashMap(node->parametersMap, "value", (void **) &valueParameter);
 
     switch(valueParameter->type) {
         case TEMPLATE_PARAMETER_STRING:
@@ -510,7 +510,7 @@ void traverseOutBuffer(struct TemplateHandler_t *templateHandler, struct Templat
             break;
 
         case TEMPLATE_PARAMETER_REFERENCE:
-            getValueStringHashMap(templateHandler->names, valueParameter->referenceValue, &value);
+            getValueStringHashMap(templateHandler->names, valueParameter->referenceValue, (void **) &value);
 
             /* in case the value was successfully found */
             if(value != NULL) {
@@ -537,10 +537,10 @@ void traverseForEachBuffer(struct TemplateHandler_t *templateHandler, struct Tem
     struct Iterator_t *iterator;
     void *_currentValue;
 
-    getValueStringHashMap(node->parametersMap, "from", &fromParameter);
-    getValueStringHashMap(node->parametersMap, "item", &itemParameter);
+    getValueStringHashMap(node->parametersMap, "from", (void **) &fromParameter);
+    getValueStringHashMap(node->parametersMap, "item", (void **) &itemParameter);
 
-    getValueStringHashMap(templateHandler->names, fromParameter->referenceValue, &value);
+    getValueStringHashMap(templateHandler->names, fromParameter->referenceValue, (void **) &value);
 
     /* in case the value was not found */
     if(value == NULL) {
