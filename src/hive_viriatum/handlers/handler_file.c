@@ -120,7 +120,7 @@ ERROR_CODE urlCallbackHandlerFile(struct HttpParser_t *httpParser, const unsigne
     }
 
     /* copies the url to the url reference in the handler file context */
-    memcpy(handlerFileContext->url, url, strlen(url) + 1);
+    memcpy(handlerFileContext->url, url, strlen((char *) url) + 1);
 
     /* creates the file path from using the base viriatum path */
     SPRINTF((char *) handlerFileContext->filePath, 1024, "%s%s%s", VIRIATUM_CONTENTS_PATH, VIRIATUM_WELCOME_PATH, url);
@@ -190,12 +190,12 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
     /* in case the file path being request referes a directory
     it must be checked and the entries retrieved to be rendered */
     if(isDirectory) {
-        if(handlerFileContext->url[strlen(handlerFileContext->url) - 1] != '/') {
+        if(handlerFileContext->url[strlen((char *) handlerFileContext->url) - 1] != '/') {
             /* creates the new location by adding the slash character to the current
             handler file context url (avoids directory confusion) */
-            memcpy(location, handlerFileContext->url, strlen(handlerFileContext->url));
-            location[strlen(handlerFileContext->url)] = '/';
-            location[strlen(handlerFileContext->url) + 1] = '\0';
+            memcpy(location, handlerFileContext->url, strlen((char *) handlerFileContext->url));
+            location[strlen((char *) handlerFileContext->url)] = '/';
+            location[strlen((char *) handlerFileContext->url) + 1] = '\0';
 
             /* sets the is redirect flag (forces temporary redirect) */
             isRedirect = 1;
@@ -459,7 +459,7 @@ ERROR_CODE _sendDataHandlerFile(struct Connection_t *connection, struct Data_t *
     } else {
         /* writes the (file) data to the connection and sets the handler
         file context as flushed */
-        writeConnection(connection, templateHandler->stringValue, strlen(templateHandler->stringValue), _sendDataHandlerFile, handlerFileContext);
+        writeConnection(connection, templateHandler->stringValue, strlen((char *) templateHandler->stringValue), _sendDataHandlerFile, handlerFileContext);
         handlerFileContext->flushed = 1;
 
         /* unsets the string value in the template handler (avoids double release) */
