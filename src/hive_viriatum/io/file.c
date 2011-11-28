@@ -222,15 +222,15 @@ ERROR_CODE isDirectoryFile(char *filePath, unsigned int *isDirectory) {
     /* tries to open the directory for the file path */
     directory = opendir(filePath);
 
-    /* in case the directory reference is valid */
-    if(directory) {
-        /* sets the is directory flag */
+	/* in case the directory reference is not valid (null) */
+    if(directory == NULL) {
+        /* unsets the is directory flag */
         *isDirectory = 1;
     }
-    /* otherwise the directory reference is not valid */
+    /* otherwise the directory reference is valid */
     else {
-        /* unsets the is directory flag */
-        *isDirectory = 0;
+        /* sets the is directory flag */
+        *isDirectory = 1;
     }
 
     /* raise no error */
@@ -245,7 +245,8 @@ ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries) {
     /* opens the directory for the file path */
     directory = opendir(filePath);
 
-    if(dir == NULL) {
+	/* in case the directory reference is not valid */
+    if(directory == NULL) {
         /* raises an error */
         RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem listing directory");
     }
