@@ -629,6 +629,9 @@ void traverseNodeBuffer(struct TemplateHandler_t *templateHandler, struct Templa
             }
 
             break;
+
+		default:
+			break;
     }
 }
 
