@@ -150,6 +150,30 @@ void testHashMap() {
     deleteHashMap(hashMap);
 }
 
+void testStringBuffer() {
+    /* allocates space for the string buffer */
+    struct StringBuffer_t *stringBuffer;
+
+    /* allocates the space for the string to
+    hold the various joined values */
+    unsigned char *stringValue;
+
+    /* creates the string buffer */
+    createStringBuffer(&stringBuffer);
+
+    /* adds a set of string to the string buffer */
+    appendStringBuffer(stringBuffer, "hello");
+    appendStringBuffer(stringBuffer, " ");
+    appendStringBuffer(stringBuffer, "world");
+
+    /* "joins" the string buffer values into a single
+    value (from the internal string list) */
+    joinStringBuffer(stringBuffer, &stringValue);
+
+    /* deletes the string buffer */
+    deleteStringBuffer(stringBuffer);
+}
+
 void testBase64() {
     /* allocates space for the buffer */
     char buffer[] = "hello world";
@@ -309,6 +333,9 @@ void runSimpleTests() {
 
     /* tests the hash map */
     testHashMap();
+
+    /* tests the string buffer */
+    testStringBuffer();
 
     /* tests the base 64 encoder */
     testBase64();

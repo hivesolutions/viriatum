@@ -125,13 +125,6 @@ void insertTaskThreadPool(struct ThreadPool_t *threadPool, struct ThreadPoolTask
     CONDITION_UNLOCK(threadPool->taskCondition, threadPool->taskConditionLock);
 }
 
-/*
-* Thread than runs a new stage. It controls the frequency of the loading
-* and manages it.
-*
-* @param parameters The thread parameters.
-* @return The thread result.
-*/
 THREAD_RETURN poolRunnerThread(THREAD_ARGUMENTS parameters) {
     /* allocates space for the work thread task */
     struct ThreadPoolTask_t *workThreadTask;

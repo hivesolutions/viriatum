@@ -17,7 +17,7 @@
  You should have received a copy of the GNU General Public License
  along with Hive Viriatum Commons. If not, see <http://www.gnu.org/licenses/>.
 
- __author__    = Jo√£o Magalh√£es <joamag@hive.pt>
+ __author__    = Jo„o Magalh„es <joamag@hive.pt>
  __version__   = 1.0.0
  __revision__  = $LastChangedRevision$
  __date__      = $LastChangedDate$
@@ -27,8 +27,26 @@
 
 #pragma once
 
-#include "array_list.h"
-#include "hash_map.h"
 #include "iterator.h"
 #include "linked_list.h"
-#include "string_buffer.h"
+
+typedef struct StringBuffer_t {
+    size_t stringLength;
+    struct LinkedList_t *stringList;
+} StringBuffer;
+
+/**
+ * Constructor of the string buffer.
+ *
+ * @param linkedListPointer The pointer to the string buffer to be constructed.
+ */
+VIRIATUM_EXPORT_PREFIX void createStringBuffer(struct StringBuffer_t **stringBufferPointer);
+
+/**
+ * Destructor of the string buffer.
+ *
+ * @param linkedList The string buffer to be destroyed.
+ */
+VIRIATUM_EXPORT_PREFIX void deleteStringBuffer(struct StringBuffer_t *stringBuffer);
+VIRIATUM_EXPORT_PREFIX void appendStringBuffer(struct StringBuffer_t *stringBuffer, unsigned char *stringValue);
+VIRIATUM_EXPORT_PREFIX void joinStringBuffer(struct StringBuffer_t *stringBuffer, unsigned char **stringValue);

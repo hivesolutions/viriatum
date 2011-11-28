@@ -30,30 +30,14 @@
 						<td class="icon arrow-left"><a></a></td>
 						<td colspan="3"><a href="#">Folder Name</a></td>
 					</tr>
-					<tr>
-						<td class="icon folder"></td>
-						<td class="left"><a href="#">Folder x</a></td>
-						<td class="right">2011-07-28 19:45</td>
-						<td class="right">77 Kb</td>
-					</tr>
-					<tr>
-						<td class="icon text"></td>
-						<td class="left"><a href="#">filename.txt</a></td>
-						<td class="right">2011-07-28 19:45</td>
-						<td class="right">77 Kb</td>
-					</tr>
-					<tr>
-						<td class="icon image"></td>
-						<td class="left"><a href="#">filename.png</a></td>
-						<td class="right">2011-07-28 19:45</td>
-						<td class="right">77 Kb</td>
-					</tr>
-					<tr>
-						<td class="icon html"></td>
-						<td class="left"><a href="#">filename.html</a></td>
-						<td class="right">2011-07-28 19:45</td>
-						<td class="right">77 Kb</td>
-					</tr>
+					${foreach item=entry from=entries     }
+						<tr>
+							<td class="icon folder"></td>
+							<td class="left"><a href="#">${out value=entry /}</a></td>
+							<td class="right">2011-07-28 19:45</td>
+							<td class="right">77 Kb</td>
+						</tr>
+					${/foreach}
 				</tbody>
 				<tfoot>
 					<tr>
