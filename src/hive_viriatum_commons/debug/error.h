@@ -39,7 +39,7 @@
 #define RAISE_ERROR_S(errorCode) return errorCode
 #define RAISE_NO_ERROR return 0
 #define IS_ERROR_CODE(errorCode) errorCode != 0
-#define GET_ERROR() getLastErrorMessageSafe
+#define GET_ERROR getLastErrorMessageSafe
 
 VIRIATUM_EXPORT_PREFIX unsigned int lastErrorCode;
 VIRIATUM_EXPORT_PREFIX unsigned char *lastErrorMessage;
