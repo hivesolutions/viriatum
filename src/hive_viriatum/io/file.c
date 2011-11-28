@@ -252,12 +252,12 @@ ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries) {
     }
 
     /* print all the files and directories within directory */
-    while((ent = readdir (dir)) != NULL) {
+    while((ent = readdir(directory)) != NULL) {
         printf ("%s\n", ent->d_name);
     }
 
     /* closes the directory reference */
-    closedir (dir);
+    closedir(directory);
 
     /* raise no error */
     RAISE_NO_ERROR;
