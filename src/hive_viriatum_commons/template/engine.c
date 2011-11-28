@@ -342,7 +342,9 @@ void processTemplateEngine(struct TemplateEngine_t *templateEngine, struct Templ
 
                     TEMPLATE_MARK(textEnd);
 
-                    /* calls the tag end and text begin callbacks */
+                    /* calls the th parameter value, tag end and
+                    text begin callbacks */
+                    TEMPLATE_CALLBACK_DATA_BACK(parameterValue);
                     TEMPLATE_CALLBACK_DATA(tagEnd);
                     TEMPLATE_CALLBACK(textBegin);
 
