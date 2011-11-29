@@ -27,26 +27,7 @@
 
 #pragma once
 
-/**
- * Structure defining the elements
- * of a "sortable" element.
- * This kind of element allows the sorting
- * of a sequence and maintains a "back-reference"
- * to the "original" element.
- */
-typedef struct SortElement_t {
-    /**
-     * The value to be used for comparision
-     * in the sorting algorithm.
-     */
-    int value;
-
-    /**
-     * The reference to the "original" value
-     * of the element.
-     */
-    void *reference;
-} SortElement;
+#include "base.h"
 
 /**
  * Sorts the given sequence in the given range,
@@ -59,8 +40,10 @@ typedef struct SortElement_t {
  * iteration.
  * @param end The final element for the current
  * iteration.
+ * @param cmp The comparator method to be used for value
+ * comparision.
  */
-void sortQuicksort(int sequence[], int beginning, int end);
+void sortQuicksort(void **sequence, size_t beginning, size_t end, comparator cmp);
 
 /**
  * Swaps the values (via reference) of two given elements.
@@ -70,4 +53,4 @@ void sortQuicksort(int sequence[], int beginning, int end);
  * @param second The reference to the second element to be
  * swapped.
  */
-void _swapQuicksort(int *first, int *second);
+void _swapQuicksort(void **first, void **second);

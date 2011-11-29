@@ -27,6 +27,7 @@
 
 #pragma once
 
+#include "../sorting/sorting.h"
 #include "iterator.h"
 
 typedef struct LinkedList_t {
@@ -56,6 +57,7 @@ VIRIATUM_EXPORT_PREFIX void createLinkedList(struct LinkedList_t **linkedListPoi
 VIRIATUM_EXPORT_PREFIX void deleteLinkedList(struct LinkedList_t *linkedList);
 VIRIATUM_EXPORT_PREFIX void createLinkedListNode(struct LinkedListNode_t **linkedListNodePointer);
 VIRIATUM_EXPORT_PREFIX void deleteLinkedListNode(struct LinkedListNode_t *linkedListNode);
+VIRIATUM_EXPORT_PREFIX void clearLinkedList(struct LinkedList_t *linkedList);
 VIRIATUM_EXPORT_PREFIX void appendLinkedList(struct LinkedList_t *linkedList, struct LinkedListNode_t *linkedListNode);
 VIRIATUM_EXPORT_PREFIX void appendValueLinkedList(struct LinkedList_t *linkedList, void *value);
 VIRIATUM_EXPORT_PREFIX void removeLinkedList(struct LinkedList_t *linkedList, struct LinkedListNode_t *linkedListNode, char deleteNode);
@@ -71,3 +73,5 @@ VIRIATUM_EXPORT_PREFIX void createIteratorLinkedList(struct LinkedList_t *linked
 VIRIATUM_EXPORT_PREFIX void deleteIteratorLinkedList(struct LinkedList_t *linkedList, struct Iterator_t *iterator);
 VIRIATUM_EXPORT_PREFIX void resetIteratorLinkedList(struct LinkedList_t *linkedList, struct Iterator_t *iterator);
 VIRIATUM_EXPORT_PREFIX void getNextIteratorLinkedList(struct Iterator_t *iterator, void **nextPointer);
+VIRIATUM_EXPORT_PREFIX void toSequenceLinkedList(struct LinkedList_t *linkedList, void ***sequencePointer);
+VIRIATUM_EXPORT_PREFIX void sortLinkedList(struct LinkedList_t *linkedList, comparator cmp);

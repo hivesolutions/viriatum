@@ -27,4 +27,5 @@
 
 #pragma once
 
+#include "base.h"
 #include "quicksort.h"

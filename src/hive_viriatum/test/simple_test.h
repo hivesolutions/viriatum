@@ -90,6 +90,23 @@ void testFileStream();
 void testTemplateEngine();
 
 /**
+ * Tests the quicksort (algorithm).
+ */
+void testQuicksort();
+
+/**
+ * Tests the quicksort (algorithm),
+ * for the linked list implementation.
+ */
+void testQuicksortLinkedList();
+
+/**
+ * Compars an element with another, usefull
+ * for the sorting tests.
+ */
+int _compare(void *first, void *second);
+
+/**
  * Runs the set of simple tests in the current
  * test case.
  */
