@@ -43,6 +43,8 @@ compression/huffman.c \
 debug/error.c \
 debug/logging.c \
 encoding/base_64.c \
+memory/memory_pool.c \
+sorting/quicksort.c \
 stream/bit_stream.c \
 stream/file_stream.c \
 stream/io_stream.c \
@@ -62,6 +64,8 @@ checksum/crc_32.c \
 debug/error.c \
 debug/logging.c \
 encoding/base_64.c \
+memory/memory_pool.c \
+sorting/quicksort.c \
 stream/bit_stream.c \
 stream/file_stream.c \
 stream/io_stream.c \
