@@ -41,8 +41,7 @@
     do {\
         if(templateSettings->on##FOR) {\
             if(templateSettings->on##FOR(templateEngine) != 0) {\
-                /*SET_ERRNO(HPE_CB_##FOR);*/\
-                /*return (pointer - data);*/\
+                RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem handling callback"); \
             }\
         }\
     } while(0)
@@ -54,8 +53,7 @@
         if(FOR##Mark) {\
             if(templateSettings->on##FOR) {\
                 if(templateSettings->on##FOR(templateEngine, FOR##Mark, pointer - FOR##Mark - N) != 0) {\
-                /*    SET_ERRNO(HPE_CB_##FOR);*/\
-                    /*return (p - data);*/\
+                    RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem handling callback"); \
                 }\
             }\
             FOR##Mark = NULL;\
@@ -201,7 +199,7 @@ VIRIATUM_EXPORT_PREFIX void createTemplateEngine(struct TemplateEngine_t **templ
 VIRIATUM_EXPORT_PREFIX void deleteTemplateEngine(struct TemplateEngine_t *templateEngine);
 VIRIATUM_EXPORT_PREFIX void createTemplateSettings(struct TemplateSettings_t **templateSettingsPointer);
 VIRIATUM_EXPORT_PREFIX void deleteTemplateSettings(struct TemplateSettings_t *templateSettings);
-VIRIATUM_EXPORT_PREFIX void processTemplateEngine(struct TemplateEngine_t *templateEngine, struct TemplateSettings_t *templateSettings, unsigned char *filePath);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE processTemplateEngine(struct TemplateEngine_t *templateEngine, struct TemplateSettings_t *templateSettings, unsigned char *filePath);
 
 /**
  * Retrieves a new character from the file stream

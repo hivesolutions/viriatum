@@ -28,6 +28,7 @@
 #pragma once
 
 #include "../structures/structures.h"
+#include "../util/util.h"
 #include "engine.h"
 
 /**
@@ -73,10 +74,32 @@ typedef enum TemplateNodeType_e {
     TEMPLATE_NODE_UNDEFINED
 } TemplateNodeType;
 
+/**
+ * Enumeration defining the various
+ * types of parameters.
+ */
 typedef enum TemplateParameterType_e {
+    /**
+     * The parameter of type string literal.
+     */
     TEMPLATE_PARAMETER_STRING = 1,
+
+    /**
+     * The parameter of type variable reference
+     * it must be dereferenced first.
+     */
     TEMPLATE_PARAMETER_REFERENCE,
+
+    /**
+     * The parameter of type integer, number with
+     * no decimal part.
+     */
     TEMPLATE_PARAMETER_INTEGER,
+
+    /**
+     * The parameter of type integer, number with
+     * decimal part.
+     */
     TEMPLATE_PARAMETER_FLOAT
 } TemplateParameterType;
 
@@ -148,3 +171,18 @@ VIRIATUM_EXPORT_PREFIX void createTemplateParameter(struct TemplateParameter_t *
 VIRIATUM_EXPORT_PREFIX void deleteTemplateParameter(struct TemplateParameter_t *templateParameter);
 VIRIATUM_EXPORT_PREFIX void processTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned char *filePath);
 VIRIATUM_EXPORT_PREFIX void assignTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned char *key, void *value);
+VIRIATUM_EXPORT_PREFIX void traverseNodeDebug(struct TemplateHandler_t *templateHandler, struct TemplateNode_t *node, unsigned int indentation);
+VIRIATUM_EXPORT_PREFIX void traverseNodeBuffer(struct TemplateHandler_t *templateHandler, struct TemplateNode_t *node);
+VIRIATUM_EXPORT_PREFIX void traverseNodesBuffer(struct TemplateHandler_t *templateHandler, struct TemplateNode_t *node);
+VIRIATUM_EXPORT_PREFIX void _traverseOutBuffer(struct TemplateHandler_t *templateHandler, struct TemplateNode_t *node);
+VIRIATUM_EXPORT_PREFIX void _traverseForEachBuffer(struct TemplateHandler_t *templateHandler, struct TemplateNode_t *node);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _openContextTemplateHandler(struct TemplateHandler_t *templateHandler);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _closeContextTemplateHandler(struct TemplateHandler_t *templateHandler);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _textBeginCallback(struct TemplateEngine_t *templateEngine);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _textEndCallback(struct TemplateEngine_t *templateEngine, const unsigned char *pointer, size_t size);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _tagBeginCallback(struct TemplateEngine_t *templateEngine);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _tagCloseBeginCallback(struct TemplateEngine_t *templateEngine);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _tagEndCallback(struct TemplateEngine_t *templateEngine, const unsigned char *pointer, size_t size);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _tagNameCallback(struct TemplateEngine_t *templateEngine, const unsigned char *pointer, size_t size);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _parameterCallback(struct TemplateEngine_t *templateEngine, const unsigned char *pointer, size_t size);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _parameterValueCallback(struct TemplateEngine_t *templateEngine, const unsigned char *pointer, size_t size);
