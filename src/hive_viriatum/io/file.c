@@ -340,6 +340,17 @@ ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries) {
 
 #endif
 
+void pathJoin(char *basePath, char *name, char **joinedPathPointer) {
+	size_t basePathLength = strlen(basePath);
+	size_t nameLength = strlen(name);
+	char *joinedPath = MALLOC(basePathLength + nameLength + 2);
+	memcpy(joinedPath, basePath, basePathLength);
+	memcpy(joinedPath + basePathLength, "/", 1);
+	memcpy(joinedPath + basePathLength + 1, name, nameLength + 1);
+
+	*joinedPathPointer = joinedPath;
+}
+
 #ifdef VIRIATUM_PLATFORM_UNIX
 
 ERROR_CODE isDirectoryFile(char *filePath, unsigned int *isDirectory) {
@@ -376,7 +387,9 @@ ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries) {
     /* allocates space for both the entry and the
     length of the entry name */
     struct File_t *entry;
+	char *entryFullName;
     size_t entryNameLength;
+	struct stat entryStat;
 
     /* opens the directory for the file path */
     directory = opendir(filePath);
@@ -414,7 +427,9 @@ ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries) {
             entry->type = FILE_TYPE_DIRECTORY;
         }
 
-        entry->size = 199;
+		pathJoin(filePath, entity->d_name, &entryFullName);
+		stat(entryFullName, &entryStat);
+        entry->size = entryStat.st_size;
 
         /* calculates the length of the entry name and uses
         it to create the memory space for the entry name and then
