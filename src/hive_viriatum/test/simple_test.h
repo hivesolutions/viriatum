@@ -103,6 +103,10 @@ void testQuicksortLinkedList();
 /**
  * Compars an element with another, usefull
  * for the sorting tests.
+ *
+ * @param first The first value to be compared.
+ * @param second The second value to be compared.
+ * @return The result of the comparison.
  */
 int _compare(void *first, void *second);
 
