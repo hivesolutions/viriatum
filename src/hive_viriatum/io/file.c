@@ -198,8 +198,6 @@ ERROR_CODE entriesToMapFile(struct LinkedList_t *entries, struct LinkedList_t **
         /* creates the hash map */
         createHashMap(&entryMap, 0);
 
-        printf("%s\n", entry->name);
-
         /* sets the various entry values in the hash map */
         setValueStringHashMap(entryMap, (unsigned char *) "type", (void *) entry->type);
         setValueStringHashMap(entryMap, (unsigned char *) "name", (void *) entry->name);
@@ -404,7 +402,18 @@ ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries) {
         /* allocates a new entry value */
         entry = MALLOC(sizeof(struct File_t));
 
-        entry->type = 1;
+        /* in case the file is of type regular */
+        if(entry.d_type == DT_REG) {
+            /* sets the entry type as regular */
+            entry->type = FILE_TYPE_REGULAR;
+        }
+        /* otherwise in case the file is of
+        type directory */
+        else if(entry.d_type == DT_DIR) {
+            /* sets the entry type as directory */
+            entry->type = FILE_TYPE_DIRECTORY;
+        }
+
         entry->size = 199;
 
         /* calculates the length of the entry name and uses
