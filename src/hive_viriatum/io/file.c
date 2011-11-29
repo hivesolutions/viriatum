@@ -219,16 +219,16 @@ ERROR_CODE entriesToMapFile(struct LinkedList_t *entries, struct LinkedList_t **
 }
 
 ERROR_CODE joinPathFile(char *basePath, char *name, char *joinedPath) {
-	/* retrieves the length for both the base path and
-	the name values */
-	size_t basePathLength = strlen(basePath);
-	size_t nameLength = strlen(name);
+    /* retrieves the length for both the base path and
+    the name values */
+    size_t basePathLength = strlen(basePath);
+    size_t nameLength = strlen(name);
 
-	/* copies the various parts of the path to create
-	the complete joined path */
-	memcpy(joinedPath, basePath, basePathLength);
-	memcpy(joinedPath + basePathLength, "/", 1);
-	memcpy(joinedPath + basePathLength + 1, name, nameLength + 1);
+    /* copies the various parts of the path to create
+    the complete joined path */
+    memcpy(joinedPath, basePath, basePathLength);
+    memcpy(joinedPath + basePathLength, "/", 1);
+    memcpy(joinedPath + basePathLength + 1, name, nameLength + 1);
 
     /* raise no error */
     RAISE_NO_ERROR;
@@ -389,13 +389,13 @@ ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries) {
     DIR *directory;
     struct dirent *entity;
 
-	/* allocates space for the entry (structure), the
+    /* allocates space for the entry (structure), the
     the entry full name, the length of the entry name and
-	the entry stat structure (for file attributes)*/
+    the entry stat structure (for file attributes)*/
     struct File_t *entry;
-	char entryFullName[4096];
+    char entryFullName[4096];
     size_t entryNameLength;
-	struct stat entryStat;
+    struct stat entryStat;
 
     /* opens the directory for the file path */
     directory = opendir(filePath);
@@ -433,11 +433,11 @@ ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries) {
             entry->type = FILE_TYPE_DIRECTORY;
         }
 
-		/* joins the base name with the directory path to
-		retrieve the full entry name then uses it to retrieve
-		the entry stat structure and then uses it to retrieve its size */
-		joinPathFile(filePath, entity->d_name, entryFullName);
-		stat(entryFullName, &entryStat);
+        /* joins the base name with the directory path to
+        retrieve the full entry name then uses it to retrieve
+        the entry stat structure and then uses it to retrieve its size */
+        joinPathFile(filePath, entity->d_name, entryFullName);
+        stat(entryFullName, &entryStat);
         entry->size = entryStat.st_size;
 
         /* calculates the length of the entry name and uses
