@@ -395,7 +395,7 @@ void runSimpleTests() {
     /*testBitStream();*/
 
     /* tests the file stream */
-    /*testFileStream();
+    testFileStream();
 
     /* tests the template handler */
     testTemplateHandler();
