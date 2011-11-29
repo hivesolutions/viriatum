@@ -42,16 +42,27 @@ void sortQuicksort(int sequence[], int beginning, int end) {
         return;
     }
 
+    /* iterates while the right index is greater
+    than the left index */
     while(left < right) {
+        /* in case the left element is smalled
+        or equal to the pivot (left advance) */
         if(sequence[left] <= pivot) {
+            /* increments the left index */
             left++;
         }
+        /* otherwise a swap should be done */
         else {
+            /* swaps the left value with the right one */
             _swapQuicksort(&sequence[left], &sequence[--right]);
         }
     }
 
+    /* swaps the left value with the beginning value */
     _swapQuicksort(&sequence[--left], &sequence[beginning]);
+
+    /* runs the quicksort from the begining to the left
+    and from the right to the end (bi-section) */
     sortQuicksort(sequence, beginning, left);
     sortQuicksort(sequence, right, end);
 }
