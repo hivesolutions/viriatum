@@ -394,9 +394,9 @@ ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries) {
         entry->name = (char *) MALLOC(entryNameLength + 1);
         memcpy(entry->name, entity->d_name, entryNameLength + 1);
 
-        /* adds the entrys name to the list of entries for
+        /* adds the entry to the list of entries for
         the current directory (path) */
-        appendValueLinkedList(entries, entryName);
+        appendValueLinkedList(entries, entry);
     }
 
     /* sorts the entries list according to the entry
