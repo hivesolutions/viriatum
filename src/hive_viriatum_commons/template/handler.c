@@ -262,10 +262,10 @@ void getTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned char
 
     /* copies the name reference into a backup value
     to avoid data corruption (from tokenization) */
-    memcpy(_name, name, strlen(name) + 1);
+    memcpy(_name, name, strlen((char *) name) + 1);
 
     /* tokenizes the name into tokens */
-    nameToken = STRTOK(_name, ".", context);
+    nameToken = STRTOK((char *) _name, ".", context);
 
     /* iterates continuously */
     while(1) {
