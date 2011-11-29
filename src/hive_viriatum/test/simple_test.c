@@ -395,12 +395,12 @@ void runSimpleTests() {
     /*testBitStream();*/
 
     /* tests the file stream */
-    /*testFileStream();*/
+    /*testFileStream();
 
     /* tests the template handler */
-    /*testTemplateHandler();*/
+    testTemplateHandler();
 
     /* tests the quick sort algorithm */
-    /*testQuicksort();
-    testQuicksortLinkedList();*/
+    testQuicksort();
+    testQuicksortLinkedList();
 }
