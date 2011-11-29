@@ -250,6 +250,10 @@ ERROR_CODE isDirectoryFile(char *filePath, unsigned int *isDirectory) {
     RAISE_NO_ERROR;
 }
 
+int entryCompareFile(void *first, void *second) {
+	return strcmp((char *) first, (char *) second);
+}
+
 ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries) {
     /* allocates space for the directory reference and
     for the entity reference */
@@ -293,6 +297,8 @@ ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries) {
         the current directory (path) */
         appendValueLinkedList(entries, entryName);
     }
+
+	sortLinkedList(entries, entryCompareFile);
 
     /* closes the directory reference */
     closedir(directory);
