@@ -79,6 +79,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <dirent.h>
+#include <sys/stat.h>
 #include <sys/time.h>
 #include <sys/resource.h>
 #endif
