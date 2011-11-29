@@ -403,13 +403,13 @@ ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries) {
         entry = MALLOC(sizeof(struct File_t));
 
         /* in case the file is of type regular */
-        if(entry.d_type == DT_REG) {
+        if(entity.d_type == DT_REG) {
             /* sets the entry type as regular */
             entry->type = FILE_TYPE_REGULAR;
         }
         /* otherwise in case the file is of
         type directory */
-        else if(entry.d_type == DT_DIR) {
+        else if(entity.d_type == DT_DIR) {
             /* sets the entry type as directory */
             entry->type = FILE_TYPE_DIRECTORY;
         }
