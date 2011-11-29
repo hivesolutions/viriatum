@@ -221,7 +221,7 @@ ERROR_CODE entriesToMapFile(struct LinkedList_t *entries, struct LinkedList_t **
 int _entryCompareFile(void *first, void *second) {
     /* returns the result of the string comparision
     of both values (second and first) */
-    return strcmp((char *) first, (char *) second);
+    return strcmp(((struct File_t *) first)->name, ((struct File_t *) second)->name);
 }
 
 #ifdef VIRIATUM_PLATFORM_WIN32
