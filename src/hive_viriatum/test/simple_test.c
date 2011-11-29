@@ -352,20 +352,20 @@ void testQuicksortLinkedList() {
 }
 
 int _compare(void *first, void *second) {
-	/* in case the first element is smaller
-	than the second element */
+    /* in case the first element is smaller
+    than the second element */
     if(first < second) {
-		/* returns negative value */
+        /* returns negative value */
         return -1;
     }
-	/* in case the first value is larger
-	than the second element */
-	else if(first > second) {
-		/* returns positive value */
+    /* in case the first value is larger
+    than the second element */
+    else if(first > second) {
+        /* returns positive value */
         return 1;
     }
 
-	/* returns zero value (equals) */
+    /* returns zero value (equals) */
     return 0;
 }
 

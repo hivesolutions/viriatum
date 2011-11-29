@@ -74,7 +74,7 @@ void deleteTemplateSettings(struct TemplateSettings_t *templateSettings) {
     FREE(templateSettings);
 }
 
-void processTemplateEngine(struct TemplateEngine_t *templateEngine, struct TemplateSettings_t *templateSettings, unsigned char *filePath) {
+ERROR_CODE processTemplateEngine(struct TemplateEngine_t *templateEngine, struct TemplateSettings_t *templateSettings, unsigned char *filePath) {
     /* allocates space for the file */
     FILE *file;
 
@@ -113,7 +113,7 @@ void processTemplateEngine(struct TemplateEngine_t *templateEngine, struct Templ
     /* in case the file is not correctly loaded */
     if(file == NULL) {
         /* returns immediately (no file found) */
-        return;
+        RAISE_NO_ERROR;
     }
 
     /* retrieves the size of the file by seeking to the
@@ -181,6 +181,7 @@ void processTemplateEngine(struct TemplateEngine_t *templateEngine, struct Templ
                     to open (tag open) */
                     state = TEMPLATE_ENGINE_OPEN;
 
+                    /* reads ahead and sets the ahead set flag */
                     ahead = _getcTemplateEngine(file, &pointer);
                     aheadSet = 1;
 
@@ -197,13 +198,17 @@ void processTemplateEngine(struct TemplateEngine_t *templateEngine, struct Templ
 
             case TEMPLATE_ENGINE_OPEN:
                 if(current == '/') {
+                    /* reads ahead and sets the ahead set flag */
                     ahead = _getcTemplateEngine(file, &pointer);
                     aheadSet = 1;
 
                     if(ahead == '}') {
                         state = TEMPLATE_ENGINE_NORMAL;
+
+                        /* unsets the ahead set flag */
                         aheadSet = 0;
 
+                        /* marks the text end */
                         TEMPLATE_MARK(textEnd);
 
                         /* calls the tag end and text begin callbacks */
@@ -374,7 +379,10 @@ void processTemplateEngine(struct TemplateEngine_t *templateEngine, struct Templ
         }
     }
 
+    /* in case the current state is engine
+    normal (there must be text to be flushed) */
     if(state == TEMPLATE_ENGINE_NORMAL) {
+        /* calls the text end callback */
         TEMPLATE_CALLBACK_DATA(textEnd);
     }
 
@@ -383,6 +391,9 @@ void processTemplateEngine(struct TemplateEngine_t *templateEngine, struct Templ
 
     /* releases the file buffer */
     FREE(fileBuffer);
+
+    /* raise no error */
+    RAISE_NO_ERROR;
 }
 
 char _getcTemplateEngine(FILE *file, unsigned char **pointer) {

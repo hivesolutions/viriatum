@@ -143,9 +143,9 @@ ERROR_CODE deleteDirectoryEntriesFile(struct LinkedList_t *entries) {
 }
 
 int _entryCompareFile(void *first, void *second) {
-	/* returns the result of the string comparision
-	of both values (second and first) */
-	return strcmp((char *) first, (char *) second);
+    /* returns the result of the string comparision
+    of both values (second and first) */
+    return strcmp((char *) first, (char *) second);
 }
 
 #ifdef VIRIATUM_PLATFORM_WIN32
@@ -300,9 +300,9 @@ ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries) {
         appendValueLinkedList(entries, entryName);
     }
 
-	/* sorts the entries list according to the entry
-	compare file (comparator) function */
-	sortLinkedList(entries, _entryCompareFile);
+    /* sorts the entries list according to the entry
+    compare file (comparator) function */
+    sortLinkedList(entries, _entryCompareFile);
 
     /* closes the directory reference */
     closedir(directory);

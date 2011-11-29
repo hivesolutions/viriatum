@@ -192,12 +192,334 @@ void deleteTemplateParameter(struct TemplateParameter_t *templateParameter) {
     FREE(templateParameter);
 }
 
-ERROR_CODE textBegin(struct TemplateEngine_t *templateEngine) {
+void processTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned char *filePath) {
+     /* allocates space for the template engine */
+    struct TemplateEngine_t *templateEngine;
+
+    /* allocates space for the template settings */
+    struct TemplateSettings_t *templateSettings;
+
+    /* allocates space for the root node */
+    struct TemplateNode_t *rootNode;
+
+    /* creates the template engine */
+    createTemplateEngine(&templateEngine);
+
+    /* creates the template engine */
+    createTemplateSettings(&templateSettings);
+
+    /* creates the root node and sets it as the initial
+    current node */
+    createTemplateNode(&rootNode, TEMPLATE_NODE_ROOT);
+    templateHandler->currentNode = rootNode;
+
+    /* sets the context (template handler) in the template engine */
+    templateEngine->context = templateHandler;
+
+    /* sets the various callbacks in the template settings */
+    templateSettings->ontextBegin = _textBeginCallback;
+    templateSettings->ontextEnd = _textEndCallback;
+    templateSettings->ontagBegin = _tagBeginCallback;
+    templateSettings->ontagCloseBegin = _tagCloseBeginCallback;
+    templateSettings->ontagEnd = _tagEndCallback;
+    templateSettings->ontagName = _tagNameCallback;
+    templateSettings->onparameter = _parameterCallback;
+    templateSettings->onparameterValue = _parameterValueCallback;
+
+    /* processes the file as a template engine and then uses the
+    created node structure to traverse for string buffer output */
+    processTemplateEngine(templateEngine, templateSettings, filePath);
+    traverseNodeBuffer(templateHandler, templateHandler->currentNode);
+
+    /* "joins" the template handler string buffer into the string
+    value, retrieving the final template result */
+    joinStringBuffer(templateHandler->stringBuffer, &templateHandler->stringValue);
+
+    /* deletes the now unecessary root node */
+    deleteTemplateNode(rootNode);
+
+    /* deletes the template settings */
+    deleteTemplateSettings(templateSettings);
+
+    /* deletes the template engine */
+    deleteTemplateEngine(templateEngine);
+}
+
+void assignTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned char *key, void *value) {
+    /* sets the a new key in the names hash map */
+    setValueStringHashMap(templateHandler->names, key, value);
+}
+
+void traverseNodeDebug(struct TemplateHandler_t *templateHandler, struct TemplateNode_t *node, unsigned int indentation) {
+    /* allocates space for the iterator to be used to retrieve
+    the various children from the node */
+    struct Iterator_t *childIterator;
+
+    /* allocates space for the child element */
+    struct TemplateNode_t *child;
+
+    /* allocates space for the index counter */
+    unsigned int index;
+
+    /* iterates over the indentation count to print
+    the indentation spaces */
+    for(index = 0; index < indentation; index++) {
+        /* prints an indentation space */
+        V_DEBUG("  ");
+    }
+
+    /* prints both the name and the type in case the name
+    is not valid nothing is print */
+    if(node->name != NULL) {
+        V_DEBUG_F("name: '%s' & ", node->name);
+    }
+    V_DEBUG_F("type: '%d'\n", node->type);
+
+    /* in case the node contains no children, it should
+    be a leaf node (nothing to be done) */
+    if(node->children == NULL) {
+        /* returns immediately */
+        return;
+    }
+
+    /* creates a "new" iterator for the children linked list */
+    createIteratorLinkedList(node->children, &childIterator);
+
+    /* iterates continuously for children percolation */
+    while(1) {
+        /* retrieves the child element from the child iterator */
+        getNextIterator(childIterator, (void **) &child);
+
+        /* in case the child is not valid (no more items available) */
+        if(child == NULL) {
+            /* breaks the loop */
+            break;
+        }
+
+        /* traverses the child node (recursion step) */
+        traverseNodeDebug(templateHandler, child, indentation + 1);
+    }
+
+    /* deletes the child iterator */
+    deleteIteratorLinkedList(node->children, childIterator);
+}
+
+void traverseNodeBuffer(struct TemplateHandler_t *templateHandler, struct TemplateNode_t *node) {
+    /* switches over the type of node to be traversed,
+    to print the correct value */
+    switch(node->type) {
+        case TEMPLATE_NODE_ROOT:
+            /* traverses all the nodes in the root node */
+            traverseNodesBuffer(templateHandler, node);
+
+            /* breaks the switch */
+            break;
+
+        case TEMPLATE_NODE_TEXT:
+            /* adds the node name (text value) to the string buffer */
+            appendStringBuffer(templateHandler->stringBuffer, node->name);
+
+            /* breaks the switch */
+            break;
+
+        case TEMPLATE_NODE_SINGLE:
+        case TEMPLATE_NODE_OPEN:
+            if(strcmp((char *) node->name, "out") == 0) {
+                /* traverses the out node in buffer mode */
+                _traverseOutBuffer(templateHandler, node);
+            } else if(strcmp((char *) node->name, "foreach") == 0) {
+                /* traverses the foreach node in buffer mode */
+                _traverseForEachBuffer(templateHandler, node);
+            }
+
+            /* breaks the switch */
+            break;
+
+        default:
+            /* breaks the switch */
+            break;
+    }
+}
+
+void traverseNodesBuffer(struct TemplateHandler_t *templateHandler, struct TemplateNode_t *node) {
+    /* allocates space for the iterator to be used to retrieve
+    the various children from the node */
+    struct Iterator_t *childIterator;
+
+    /* allocates space for the child element */
+    struct TemplateNode_t *child;
+
+    /* in case the node contains no children, it should
+    be a leaf node (nothing to be done) */
+    if(node->children == NULL) {
+        /* returns immediately */
+        return;
+    }
+
+    /* creates a "new" iterator for the children linked list */
+    createIteratorLinkedList(node->children, &childIterator);
+
+    /* iterates continuously for children percolation */
+    while(1) {
+        /* retrieves the child element from the child iterator */
+        getNextIterator(childIterator, (void **) &child);
+
+        /* in case the child is not valid (no more items available) */
+        if(child == NULL) {
+            /* breaks the loop */
+            break;
+        }
+
+        /* traverses the child node (recursion step) */
+        traverseNodeBuffer(templateHandler, child);
+    }
+
+    /* deletes the child iterator */
+    deleteIteratorLinkedList(node->children, childIterator);
+}
+
+void _traverseOutBuffer(struct TemplateHandler_t *templateHandler, struct TemplateNode_t *node) {
+    /* allocates space for the value parameter and for
+    the value reference */
+    struct TemplateParameter_t *valueParameter;
+    unsigned char *value;
+
+    /* retrieves value parameter from the parameters map */
+    getValueStringHashMap(node->parametersMap, (unsigned char *) "value", (void **) &valueParameter);
+
+    /* switches over the value parameter type to
+    update the string buffer accordingly */
+    switch(valueParameter->type) {
+        case TEMPLATE_PARAMETER_STRING:
+            /* adds the string value of the value to the string buffer */
+            appendStringBuffer(templateHandler->stringBuffer, valueParameter->stringValue);
+
+            /* breaks the switch */
+            break;
+
+        case TEMPLATE_PARAMETER_REFERENCE:
+            /* retrievs the value reference from the global names map */
+            getValueStringHashMap(templateHandler->names, valueParameter->referenceValue, (void **) &value);
+
+            /* in case the value was successfully found */
+            if(value != NULL) {
+                /* adds the value (string) to the string buffer */
+                appendStringBuffer(templateHandler->stringBuffer, value);
+            }
+
+            /* breaks the switch */
+            break;
+
+        case TEMPLATE_PARAMETER_INTEGER:
+            /* adds the raw value of the value to the string buffer */
+            appendStringBuffer(templateHandler->stringBuffer, valueParameter->rawValue);
+
+            /* breaks the switch */
+            break;
+
+        case TEMPLATE_PARAMETER_FLOAT:
+            /* adds the raw value of the value to the string buffer */
+            appendStringBuffer(templateHandler->stringBuffer, valueParameter->rawValue);
+
+            /* breaks the switch */
+            break;
+
+        default:
+            /* breaks the switch */
+            break;
+    }
+}
+
+void _traverseForEachBuffer(struct TemplateHandler_t *templateHandler, struct TemplateNode_t *node) {
+    /* allocates space for the from and the item parameters */
+    struct TemplateParameter_t *fromParameter;
+    struct TemplateParameter_t *itemParameter;
+
+    /* allocates space fot the value representing the linked
+    list and for the iterator used for percolation */
+    struct LinkedList_t *value;
+    struct Iterator_t *iterator;
+
+    /* allocates space for the current vale temporary variable */
+    void *_currentValue;
+
+    /* retrieves both the from and the item parameters from the parameters map */
+    getValueStringHashMap(node->parametersMap, (unsigned char *) "from", (void **) &fromParameter);
+    getValueStringHashMap(node->parametersMap, (unsigned char *) "item", (void **) &itemParameter);
+
+    /* tries to retrieve the reference value from the map of names in the
+    template handler (dereferencing) */
+    getValueStringHashMap(templateHandler->names, fromParameter->referenceValue, (void **) &value);
+
+    /* in case the value was not found */
+    if(value == NULL) {
+        /* returns immediately */
+        return;
+    }
+
+    /* creates the iterator for the value, assumes it
+    is iterable (fails otherwise) */
+    createIteratorLinkedList(value, &iterator);
+
+    /* iterates over all the available elements in the
+    iterator element */
+    while(1) {
+        /* retrieves the next (current) value from the iterator */
+        getNextIterator(iterator, (void **) &_currentValue);
+
+        /* in case the current value is not set (end of sequence) */
+        if(_currentValue == NULL) {
+            /* breaks the loop */
+            break;
+        }
+
+        /* assigns the current iteration value to the global names
+        in the template handler (to be used in the current context) and
+        then traverses the child nodes of the node */
+        assignTemplateHandler(templateHandler, itemParameter->referenceValue, _currentValue);
+        traverseNodesBuffer(templateHandler, node);
+    }
+
+    /* deletes the iterator */
+    deleteIteratorLinkedList(value, iterator);
+}
+
+ERROR_CODE _openContextTemplateHandler(struct TemplateHandler_t *templateHandler) {
+    /* allocates space for the current and for the temporary node
+    and retieves them from the template handeler */
+    struct TemplateNode_t *currentNode = templateHandler->currentNode;
+    struct TemplateNode_t *temporaryNode = templateHandler->temporaryNode;
+
+    /* in case the list of context is not yet created,
+    must be created for context memory */
+    if(templateHandler->contexts == NULL) {
+        /* creates a new linked list of context for the template handler */
+        createLinkedList(&templateHandler->contexts);
+    }
+
+    /* adds the current node to the list of (past) contexts and
+    sets the temporary node as the currect (context) node */
+    appendValueLinkedList(templateHandler->contexts, currentNode);
+    templateHandler->currentNode = temporaryNode;
+
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE textEnd(struct TemplateEngine_t *templateEngine, const unsigned char *pointer, size_t size) {
+ERROR_CODE _closeContextTemplateHandler(struct TemplateHandler_t *templateHandler) {
+    /* pops the last context into the template handler current node */
+    popValueLinkedList(templateHandler->contexts, (void **) &templateHandler->currentNode, 1);
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE _textBeginCallback(struct TemplateEngine_t *templateEngine) {
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE _textEndCallback(struct TemplateEngine_t *templateEngine, const unsigned char *pointer, size_t size) {
     /* allocates space for the template node */
     struct TemplateNode_t *templateNode;
 
@@ -217,7 +539,10 @@ ERROR_CODE textEnd(struct TemplateEngine_t *templateEngine, const unsigned char 
     memcpy(templateNode->name, pointer, size);
     templateNode->name[size] = '\0';
 
+    /* in case the children (list) are not defined for the
+    current node node */
     if(currentNode->children == NULL) {
+        /* creates a new linked list for the children */
         createLinkedList(&currentNode->children);
     }
 
@@ -237,7 +562,7 @@ ERROR_CODE textEnd(struct TemplateEngine_t *templateEngine, const unsigned char 
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE tagBegin(struct TemplateEngine_t *templateEngine) {
+ERROR_CODE _tagBeginCallback(struct TemplateEngine_t *templateEngine) {
     /* allocates space for the template node */
     struct TemplateNode_t *templateNode;
 
@@ -253,7 +578,7 @@ ERROR_CODE tagBegin(struct TemplateEngine_t *templateEngine) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE tagCloseBegin(struct TemplateEngine_t *templateEngine) {
+ERROR_CODE _tagCloseBeginCallback(struct TemplateEngine_t *templateEngine) {
     /* retrieves the template handler from the template engine context
     and retrieves the temporary node from it */
     struct TemplateHandler_t *templateHandler = (struct TemplateHandler_t *) templateEngine->context;
@@ -266,69 +591,56 @@ ERROR_CODE tagCloseBegin(struct TemplateEngine_t *templateEngine) {
     RAISE_NO_ERROR;
 }
 
-
-ERROR_CODE _openContextTemplateHandler(struct TemplateHandler_t *templateHandler) {
-    struct TemplateNode_t *currentNode = templateHandler->currentNode;
-    struct TemplateNode_t *temporaryNode = templateHandler->temporaryNode;
-
-    if(templateHandler->contexts == NULL) {
-        createLinkedList(&templateHandler->contexts);
-    }
-
-    appendValueLinkedList(templateHandler->contexts, currentNode);
-
-    templateHandler->currentNode = temporaryNode;
-
-    /* raises no error */
-    RAISE_NO_ERROR;
-}
-
-ERROR_CODE _closeContextTemplateHandler(struct TemplateHandler_t *templateHandler) {
-    popValueLinkedList(templateHandler->contexts, (void **) &templateHandler->currentNode, 1);
-
-    /* raises no error */
-    RAISE_NO_ERROR;
-}
-
-
-ERROR_CODE tagEnd(struct TemplateEngine_t *templateEngine, const unsigned char *pointer, size_t size) {
+ERROR_CODE _tagEndCallback(struct TemplateEngine_t *templateEngine, const unsigned char *pointer, size_t size) {
     /* retrieves the template handler from the template engine context
     and retrieves the temporary node from it */
     struct TemplateHandler_t *templateHandler = (struct TemplateHandler_t *) templateEngine->context;
     struct TemplateNode_t *temporaryNode = templateHandler->temporaryNode;
 
+    /* retrieves the current node from the template handler */
     struct TemplateNode_t *currentNode = templateHandler->currentNode;
 
     /* in case the node does contain the closing
     symbol at the final part of the tag (assumes single node) */
     if(pointer[size - 2] == '/') {
+        /* sets the temporary node type as single */
         temporaryNode->type = TEMPLATE_NODE_SINGLE;
     }
 
     /* switches over the temporary node type */
     switch(temporaryNode->type) {
         case TEMPLATE_NODE_OPEN:
+            /* opens a new context for the current node */
             _openContextTemplateHandler(templateHandler);
 
+            /* breaks the switch */
             break;
 
         case TEMPLATE_NODE_CLOSE:
+            /* closes the current context (node closed) */
             _closeContextTemplateHandler(templateHandler);
 
+            /* breaks the switch */
             break;
 
         default:
+            /* breaks the switch */
             break;
     }
 
+    /* in case the temporaru node is of type close */
     if(temporaryNode->type == TEMPLATE_NODE_CLOSE) {
         /* deletes the temporary node (no need to process it) */
         deleteTemplateNode(temporaryNode);
 
+        /* raise no error */
         RAISE_NO_ERROR;
     }
 
+    /* in case the children (list) are not defined for the
+    current node */
     if(currentNode->children == NULL) {
+        /* creates a new linked list for the children */
         createLinkedList(&currentNode->children);
     }
 
@@ -348,7 +660,7 @@ ERROR_CODE tagEnd(struct TemplateEngine_t *templateEngine, const unsigned char *
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE tagName(struct TemplateEngine_t *templateEngine, const unsigned char *pointer, size_t size) {
+ERROR_CODE _tagNameCallback(struct TemplateEngine_t *templateEngine, const unsigned char *pointer, size_t size) {
     /* retrieves the template handler from the template engine context
     and retrieves the temporary node from it */
     struct TemplateHandler_t *templateHandler = (struct TemplateHandler_t *) templateEngine->context;
@@ -364,7 +676,7 @@ ERROR_CODE tagName(struct TemplateEngine_t *templateEngine, const unsigned char 
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE parameter(struct TemplateEngine_t *templateEngine, const unsigned char *pointer, size_t size) {
+ERROR_CODE _parameterCallback(struct TemplateEngine_t *templateEngine, const unsigned char *pointer, size_t size) {
     /* retrieves the template handler from the template engine context
     and retrieves the temporary node from it */
     struct TemplateHandler_t *templateHandler = (struct TemplateHandler_t *) templateEngine->context;
@@ -404,7 +716,7 @@ ERROR_CODE parameter(struct TemplateEngine_t *templateEngine, const unsigned cha
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE parameterValue(struct TemplateEngine_t *templateEngine, const unsigned char *pointer, size_t size) {
+ERROR_CODE _parameterValueCallback(struct TemplateEngine_t *templateEngine, const unsigned char *pointer, size_t size) {
     /* retrieves the template handler from the template engine context
     and retrieves the temporary node from it and then uses it to retrieve
     the temporary parameter */
@@ -438,257 +750,4 @@ ERROR_CODE parameterValue(struct TemplateEngine_t *templateEngine, const unsigne
 
     /* raise no error */
     RAISE_NO_ERROR;
-}
-
-void traverseNode(struct TemplateNode_t *node, unsigned int indentation) {
-    /* allocates space for the iterator to be used to retrieve
-    the various children from the node */
-    struct Iterator_t *childIterator;
-
-    /* allocates space for the child element */
-    struct TemplateNode_t *child;
-
-    /* allocates space for the index counter */
-    unsigned int index;
-
-    /* iterates over the indentation count to print
-    the indentation spaces */
-    for(index = 0; index < indentation; index++) {
-        /* prints an indentation space */
-        printf("  ");
-    }
-
-    /* prints both the name and the type in case the name
-    is not valid nothing is print */
-    if(node->name != NULL) {
-        printf("name: '%s' & ", node->name);
-    }
-    printf("type: '%d'\n", node->type);
-
-    /* in case the node contains no children, it should
-    be a leaf node (nothing to be done) */
-    if(node->children == NULL) {
-        /* returns immediately */
-        return;
-    }
-
-    /* creates a "new" iterator for the children linked list */
-    createIteratorLinkedList(node->children, &childIterator);
-
-    /* iterates continuously for children percolation */
-    while(1) {
-        /* retrieves the child element from the child iterator */
-        getNextIterator(childIterator, (void **) &child);
-
-        /* in case the child is not valid (no more items available) */
-        if(child == NULL) {
-            /* breaks the loop */
-            break;
-        }
-
-        /* traverses the child node (recursion step) */
-        traverseNode(child, indentation + 1);
-    }
-
-    /* deletes the child iterator */
-    deleteIteratorLinkedList(node->children, childIterator);
-}
-
-void traverseNodeBuffer(struct TemplateHandler_t *templateHandler, struct TemplateNode_t *node);
-void traverseNodesBuffer(struct TemplateHandler_t *templateHandler, struct TemplateNode_t *node);
-
-void traverseOutBuffer(struct TemplateHandler_t *templateHandler, struct TemplateNode_t *node) {
-    struct TemplateParameter_t *valueParameter;
-    unsigned char *value;
-
-    getValueStringHashMap(node->parametersMap, (unsigned char *) "value", (void **) &valueParameter);
-
-    switch(valueParameter->type) {
-        case TEMPLATE_PARAMETER_STRING:
-            appendStringBuffer(templateHandler->stringBuffer, valueParameter->stringValue);
-
-            break;
-
-        case TEMPLATE_PARAMETER_REFERENCE:
-            getValueStringHashMap(templateHandler->names, valueParameter->referenceValue, (void **) &value);
-
-            /* in case the value was successfully found */
-            if(value != NULL) {
-                /* adds the value (string) to the string buffer */
-                appendStringBuffer(templateHandler->stringBuffer, value);
-            }
-
-            break;
-
-        case TEMPLATE_PARAMETER_INTEGER:
-            printf("%d", valueParameter->intValue);
-
-            break;
-
-        default:
-            break;
-    }
-}
-
-void traverseForEachBuffer(struct TemplateHandler_t *templateHandler, struct TemplateNode_t *node) {
-    struct TemplateParameter_t *fromParameter;
-    struct TemplateParameter_t *itemParameter;
-    struct LinkedList_t *value;
-    struct Iterator_t *iterator;
-    void *_currentValue;
-
-    getValueStringHashMap(node->parametersMap, (unsigned char *) "from", (void **) &fromParameter);
-    getValueStringHashMap(node->parametersMap, (unsigned char *) "item", (void **) &itemParameter);
-
-    getValueStringHashMap(templateHandler->names, fromParameter->referenceValue, (void **) &value);
-
-    /* in case the value was not found */
-    if(value == NULL) {
-        /* returns immediately */
-        return;
-    }
-
-    createIteratorLinkedList(value, &iterator);
-
-    while(1) {
-        getNextIterator(iterator, (void **) &_currentValue);
-
-        if(_currentValue == NULL) {
-            break;
-        }
-
-        assignTemplateHandler(templateHandler, itemParameter->referenceValue, _currentValue);
-
-        traverseNodesBuffer(templateHandler, node);
-    }
-
-    /* deletes the iterator */
-    deleteIteratorLinkedList(value, iterator);
-}
-
-
-
-
-void traverseNodesBuffer(struct TemplateHandler_t *templateHandler, struct TemplateNode_t *node) {
-    /* allocates space for the iterator to be used to retrieve
-    the various children from the node */
-    struct Iterator_t *childIterator;
-
-    /* allocates space for the child element */
-    struct TemplateNode_t *child;
-
-    /* in case the node contains no children, it should
-    be a leaf node (nothing to be done) */
-    if(node->children == NULL) {
-        /* returns immediately */
-        return;
-    }
-
-    /* creates a "new" iterator for the children linked list */
-    createIteratorLinkedList(node->children, &childIterator);
-
-    /* iterates continuously for children percolation */
-    while(1) {
-        /* retrieves the child element from the child iterator */
-        getNextIterator(childIterator, (void **) &child);
-
-        /* in case the child is not valid (no more items available) */
-        if(child == NULL) {
-            /* breaks the loop */
-            break;
-        }
-
-        /* traverses the child node (recursion step) */
-        traverseNodeBuffer(templateHandler, child);
-    }
-
-    /* deletes the child iterator */
-    deleteIteratorLinkedList(node->children, childIterator);
-}
-
-void traverseNodeBuffer(struct TemplateHandler_t *templateHandler, struct TemplateNode_t *node) {
-    /* switches over the type of node to be traversed,
-    to print the correct value */
-    switch(node->type) {
-        case TEMPLATE_NODE_ROOT:
-            traverseNodesBuffer(templateHandler, node);
-
-            break;
-
-        case TEMPLATE_NODE_TEXT:
-            appendStringBuffer(templateHandler->stringBuffer, node->name);
-
-            break;
-
-        case TEMPLATE_NODE_SINGLE:
-        case TEMPLATE_NODE_OPEN:
-            if(strcmp((char *) node->name, "out") == 0) {
-                traverseOutBuffer(templateHandler, node);
-            } else if(strcmp((char *) node->name, "foreach") == 0) {
-                traverseForEachBuffer(templateHandler, node);
-            }
-
-            break;
-
-        default:
-            break;
-    }
-}
-
-void processTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned char *filePath) {
-     /* allocates space for the template engine */
-    struct TemplateEngine_t *templateEngine;
-
-    /* allocates space for the template settings */
-    struct TemplateSettings_t *templateSettings;
-
-    /* allocates space for the root node */
-    struct TemplateNode_t *rootNode;
-
-    /* creates the template engine */
-    createTemplateEngine(&templateEngine);
-
-    /* creates the template engine */
-    createTemplateSettings(&templateSettings);
-
-    /* creates the root node and sets it as the initial
-    current node */
-    createTemplateNode(&rootNode, TEMPLATE_NODE_ROOT);
-    templateHandler->currentNode = rootNode;
-
-    /* sets the context (template handler) in the template engine */
-    templateEngine->context = templateHandler;
-
-    /* sets the various callbacks in the template settings */
-    templateSettings->ontextBegin = textBegin;
-    templateSettings->ontextEnd = textEnd;
-    templateSettings->ontagBegin = tagBegin;
-    templateSettings->ontagCloseBegin = tagCloseBegin;
-    templateSettings->ontagEnd = tagEnd;
-    templateSettings->ontagName = tagName;
-    templateSettings->onparameter = parameter;
-    templateSettings->onparameterValue = parameterValue;
-
-    /* processes the file as a template engine and then uses the
-    created node structure to traverse for string buffer output */
-    processTemplateEngine(templateEngine, templateSettings, filePath);
-    traverseNodeBuffer(templateHandler, templateHandler->currentNode);
-
-    /* "joins" the template handler string buffer into the string
-    value, retrieving the final template result */
-    joinStringBuffer(templateHandler->stringBuffer, &templateHandler->stringValue);
-
-    /* deletes the now unecessary root node */
-    deleteTemplateNode(rootNode);
-
-    /* deletes the template settings */
-    deleteTemplateSettings(templateSettings);
-
-    /* deletes the template engine */
-    deleteTemplateEngine(templateEngine);
-}
-
-void assignTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned char *key, void *value) {
-    /* sets the a new key in the names hash map */
-    setValueStringHashMap(templateHandler->names, key, value);
 }
