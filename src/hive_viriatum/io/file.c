@@ -384,6 +384,9 @@ ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries) {
         /* allocates a new entry value */
         entry = MALLOC(sizeof(struct File_t));
 
+		entry->type = 1;
+		entry->size = 199;
+
         /* calculates the length of the entry name and uses
         it to create the memory space for the entry name and then
         copies the contents into it */
