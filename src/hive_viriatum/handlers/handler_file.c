@@ -159,6 +159,7 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
     /* allocates space for the directory entries and for
     the template handler */
     struct LinkedList_t *directoryEntries;
+    struct LinkedList_t *directoryEntriesMap;
     struct TemplateHandler_t *templateHandler;
 
     /* allocates space for the is directory and the is redirect flags */
@@ -207,14 +208,15 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
             createLinkedList(&directoryEntries);
 
             /* lists the directory file into the directory
-            entries linked list */
+            entries linked list and then converts them into maps */
             listDirectoryFile((char *) handlerFileContext->filePath, directoryEntries);
+            entriesToMapFile(directoryEntries, &directoryEntriesMap);
 
             /* creates the template handler */
             createTemplateHandler(&templateHandler);
 
             /* assigns the cirectory entries to the template handler */
-            assignTemplateHandler(templateHandler, (unsigned char *) "entries", directoryEntries);
+            assignTemplateHandler(templateHandler, (unsigned char *) "entries", directoryEntriesMap);
 
             /* processes the file as a template handler */
             processTemplateHandler(templateHandler, templatePath);
@@ -224,11 +226,15 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
             handlerFileContext->templateHandler = templateHandler;
             handlerFileContext->flushed = 0;
 
-            /* deletes the directory entries */
+            /* deletes the directory entries and the directory
+            entries map */
             deleteDirectoryEntriesFile(directoryEntries);
+            deleteDirectoryEntriesMapFile(directoryEntriesMap);
 
-            /* deletes the directory entries (linked list) */
+            /* deletes the directory entries (linked list) and
+            the entries map (linked list) */
             deleteLinkedList(directoryEntries);
+            deleteLinkedList(directoryEntriesMap);
         }
     }
     /* otherwise the file path must refered a "normal" file path and

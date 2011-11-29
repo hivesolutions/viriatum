@@ -68,7 +68,9 @@ VIRIATUM_EXPORT_PREFIX void getValueLinkedList(struct LinkedList_t *linkedList, 
 VIRIATUM_EXPORT_PREFIX void peekLinkedList(struct LinkedList_t *linkedList, struct LinkedListNode_t **linkedListNodePointer);
 VIRIATUM_EXPORT_PREFIX void peekValueLinkedList(struct LinkedList_t *linkedList, void **valuePointer);
 VIRIATUM_EXPORT_PREFIX void popLinkedList(struct LinkedList_t *linkedList, struct LinkedListNode_t **linkedListNodePointer);
+VIRIATUM_EXPORT_PREFIX void popTopLinkedList(struct LinkedList_t *linkedList, struct LinkedListNode_t **linkedListNodePointer);
 VIRIATUM_EXPORT_PREFIX void popValueLinkedList(struct LinkedList_t *linkedList, void **valuePointer, char deleteNode);
+VIRIATUM_EXPORT_PREFIX void popTopValueLinkedList(struct LinkedList_t *linkedList, void **valuePointer, char deleteNode);
 VIRIATUM_EXPORT_PREFIX void createIteratorLinkedList(struct LinkedList_t *linkedList, struct Iterator_t **iteratorPointer);
 VIRIATUM_EXPORT_PREFIX void deleteIteratorLinkedList(struct LinkedList_t *linkedList, struct Iterator_t *iterator);
 VIRIATUM_EXPORT_PREFIX void resetIteratorLinkedList(struct LinkedList_t *linkedList, struct Iterator_t *iterator);

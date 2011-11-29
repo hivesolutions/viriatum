@@ -170,12 +170,14 @@ VIRIATUM_EXPORT_PREFIX void deleteTemplateNode(struct TemplateNode_t *templateNo
 VIRIATUM_EXPORT_PREFIX void createTemplateParameter(struct TemplateParameter_t **templateParameterPointer);
 VIRIATUM_EXPORT_PREFIX void deleteTemplateParameter(struct TemplateParameter_t *templateParameter);
 VIRIATUM_EXPORT_PREFIX void processTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned char *filePath);
-VIRIATUM_EXPORT_PREFIX void assignTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned char *key, void *value);
+VIRIATUM_EXPORT_PREFIX void assignTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned char *name, void *value);
+VIRIATUM_EXPORT_PREFIX void getTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned char *name, void **value);
 VIRIATUM_EXPORT_PREFIX void traverseNodeDebug(struct TemplateHandler_t *templateHandler, struct TemplateNode_t *node, unsigned int indentation);
 VIRIATUM_EXPORT_PREFIX void traverseNodeBuffer(struct TemplateHandler_t *templateHandler, struct TemplateNode_t *node);
 VIRIATUM_EXPORT_PREFIX void traverseNodesBuffer(struct TemplateHandler_t *templateHandler, struct TemplateNode_t *node);
 VIRIATUM_EXPORT_PREFIX void _traverseOutBuffer(struct TemplateHandler_t *templateHandler, struct TemplateNode_t *node);
 VIRIATUM_EXPORT_PREFIX void _traverseForEachBuffer(struct TemplateHandler_t *templateHandler, struct TemplateNode_t *node);
+VIRIATUM_EXPORT_PREFIX void _traverseIfBuffer(struct TemplateHandler_t *templateHandler, struct TemplateNode_t *node);
 VIRIATUM_EXPORT_PREFIX ERROR_CODE _openContextTemplateHandler(struct TemplateHandler_t *templateHandler);
 VIRIATUM_EXPORT_PREFIX ERROR_CODE _closeContextTemplateHandler(struct TemplateHandler_t *templateHandler);
 VIRIATUM_EXPORT_PREFIX ERROR_CODE _textBeginCallback(struct TemplateEngine_t *templateEngine);

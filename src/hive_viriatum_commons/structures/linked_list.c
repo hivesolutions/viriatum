@@ -320,12 +320,50 @@ void popLinkedList(struct LinkedList_t *linkedList, struct LinkedListNode_t **li
     *linkedListNodePointer = linkedListNode;
 }
 
+void popTopLinkedList(struct LinkedList_t *linkedList, struct LinkedListNode_t **linkedListNodePointer) {
+    /* allocates space for the linked list node */
+    struct LinkedListNode_t *linkedListNode;
+
+    /* retrieves the final linked list node */
+    getLinkedList(linkedList, linkedList->size - 1, &linkedListNode);
+
+    /* removes the last linked list node from the linked list */
+    removeLinkedList(linkedList, linkedListNode, 0);
+
+    /* sets the linked list node in the linked list node pointer */
+    *linkedListNodePointer = linkedListNode;
+}
+
 void popValueLinkedList(struct LinkedList_t *linkedList, void **valuePointer, char deleteNode) {
     /* allocates space for the linked list node */
     struct LinkedListNode_t *linkedListNode;
 
     /* pops the linked list node */
     popLinkedList(linkedList, &linkedListNode);
+
+    /* in case the linked list node is invalid */
+    if(linkedListNode == NULL) {
+        /* sets the null valie in the value pointer */
+        *valuePointer = NULL;
+    } else {
+        /* sets the linked list node value in the value pointer */
+        *valuePointer = linkedListNode->value;
+    }
+
+    /* in case the linked list node is valid
+    and the delete node flag is set */
+    if(linkedListNode != NULL && deleteNode) {
+        /* deletes the linked list node */
+        deleteLinkedListNode(linkedListNode);
+    }
+}
+
+void popTopValueLinkedList(struct LinkedList_t *linkedList, void **valuePointer, char deleteNode) {
+    /* allocates space for the linked list node */
+    struct LinkedListNode_t *linkedListNode;
+
+    /* pops top the linked list node */
+    popTopLinkedList(linkedList, &linkedListNode);
 
     /* in case the linked list node is invalid */
     if(linkedListNode == NULL) {

@@ -245,9 +245,48 @@ void processTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned 
     deleteTemplateEngine(templateEngine);
 }
 
-void assignTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned char *key, void *value) {
-    /* sets the a new key in the names hash map */
-    setValueStringHashMap(templateHandler->names, key, value);
+void assignTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned char *name, void *value) {
+    /* sets the a new name (key) in the names hash map */
+    setValueStringHashMap(templateHandler->names, name, value);
+}
+
+void getTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned char *name, void **value) {
+	/* allocates space for the temporary (tokanizable) name variable
+	and for the generated token values*/
+    unsigned char _name[64];
+    unsigned char *nameToken;
+	unsigned char *context;
+
+	/* retrieves the template global names as thee base value */
+	struct HashMap_t *_value = templateHandler->names;
+
+    /* copies the name reference into a backup value
+    to avoid data corruption (from tokenization) */
+    memcpy(_name, name, strlen(name) + 1);
+
+    /* tokenizes the name into tokens */
+    nameToken = STRTOK(_name, ".", context);
+
+    /* iterates continuously */
+    while(1) {
+        /* in case the name token is invalid
+        (no more tokens available) */
+        if(nameToken == NULL) {
+            /* breaks the loop */
+            break;
+        }
+
+        /* retrieves the value from the current value with the
+        name token reference key value */
+        getValueStringHashMap(_value, nameToken, (void **) &_value);
+
+        /* retrieves the next token */
+        nameToken = STRTOK(NULL, ".", context);
+    }
+
+    /* sets the value pointer with the internal
+    retrieved value */
+    *value = _value;
 }
 
 void traverseNodeDebug(struct TemplateHandler_t *templateHandler, struct TemplateNode_t *node, unsigned int indentation) {
@@ -330,6 +369,9 @@ void traverseNodeBuffer(struct TemplateHandler_t *templateHandler, struct Templa
             } else if(strcmp((char *) node->name, "foreach") == 0) {
                 /* traverses the foreach node in buffer mode */
                 _traverseForEachBuffer(templateHandler, node);
+            } else if(strcmp((char *) node->name, "if") == 0) {
+                /* traverses the if node in buffer mode */
+                _traverseIfBuffer(templateHandler, node);
             }
 
             /* breaks the switch */
@@ -378,6 +420,11 @@ void traverseNodesBuffer(struct TemplateHandler_t *templateHandler, struct Templ
     deleteIteratorLinkedList(node->children, childIterator);
 }
 
+
+
+
+
+
 void _traverseOutBuffer(struct TemplateHandler_t *templateHandler, struct TemplateNode_t *node) {
     /* allocates space for the value parameter and for
     the value reference */
@@ -399,7 +446,7 @@ void _traverseOutBuffer(struct TemplateHandler_t *templateHandler, struct Templa
 
         case TEMPLATE_PARAMETER_REFERENCE:
             /* retrievs the value reference from the global names map */
-            getValueStringHashMap(templateHandler->names, valueParameter->referenceValue, (void **) &value);
+            getTemplateHandler(templateHandler, valueParameter->referenceValue, (void **) &value);
 
             /* in case the value was successfully found */
             if(value != NULL) {
@@ -431,11 +478,11 @@ void _traverseOutBuffer(struct TemplateHandler_t *templateHandler, struct Templa
 }
 
 void _traverseForEachBuffer(struct TemplateHandler_t *templateHandler, struct TemplateNode_t *node) {
-    /* allocates space for the from and the item parameters */
-    struct TemplateParameter_t *fromParameter;
+    /* allocates space for the item and the from parameters */
     struct TemplateParameter_t *itemParameter;
+    struct TemplateParameter_t *fromParameter;
 
-    /* allocates space fot the value representing the linked
+    /* allocates space for the value representing the linked
     list and for the iterator used for percolation */
     struct LinkedList_t *value;
     struct Iterator_t *iterator;
@@ -443,13 +490,13 @@ void _traverseForEachBuffer(struct TemplateHandler_t *templateHandler, struct Te
     /* allocates space for the current vale temporary variable */
     void *_currentValue;
 
-    /* retrieves both the from and the item parameters from the parameters map */
-    getValueStringHashMap(node->parametersMap, (unsigned char *) "from", (void **) &fromParameter);
+    /* retrieves both the item and from parameters from the parameters map */
     getValueStringHashMap(node->parametersMap, (unsigned char *) "item", (void **) &itemParameter);
+    getValueStringHashMap(node->parametersMap, (unsigned char *) "from", (void **) &fromParameter);
 
     /* tries to retrieve the reference value from the map of names in the
     template handler (dereferencing) */
-    getValueStringHashMap(templateHandler->names, fromParameter->referenceValue, (void **) &value);
+    getTemplateHandler(templateHandler, fromParameter->referenceValue, (void **) &value);
 
     /* in case the value was not found */
     if(value == NULL) {
@@ -484,6 +531,39 @@ void _traverseForEachBuffer(struct TemplateHandler_t *templateHandler, struct Te
     deleteIteratorLinkedList(value, iterator);
 }
 
+void _traverseIfBuffer(struct TemplateHandler_t *templateHandler, struct TemplateNode_t *node) {
+    /* allocates space for the item, the value and the operator parameters */
+    struct TemplateParameter_t *itemParameter;
+    struct TemplateParameter_t *valueParameter;
+    struct TemplateParameter_t *operatorParameter;
+
+    /* allocates space for the value to be retrieved */
+    void *value;
+
+    /* retrieves both the from and the item parameters from the parameters map */
+    getValueStringHashMap(node->parametersMap, (unsigned char *) "item", (void **) &itemParameter);
+    getValueStringHashMap(node->parametersMap, (unsigned char *) "value", (void **) &valueParameter);
+    getValueStringHashMap(node->parametersMap, (unsigned char *) "operator", (void **) &operatorParameter);
+
+    /* tries to retrieve the reference value from the map of names in the
+    template handler (dereferencing) */
+    getTemplateHandler(templateHandler, "entry.type", (void **) &value);
+
+    /* in case the value was not found */
+    if(value == NULL) {
+        /* returns immediately */
+        return;
+    }
+
+    if((int) value != valueParameter->intValue) {
+        return;
+    }
+
+    /* traverses the child nodes of the node
+    (condition validated and verified) */
+    traverseNodesBuffer(templateHandler, node);
+}
+
 ERROR_CODE _openContextTemplateHandler(struct TemplateHandler_t *templateHandler) {
     /* allocates space for the current and for the temporary node
     and retieves them from the template handeler */
@@ -508,7 +588,7 @@ ERROR_CODE _openContextTemplateHandler(struct TemplateHandler_t *templateHandler
 
 ERROR_CODE _closeContextTemplateHandler(struct TemplateHandler_t *templateHandler) {
     /* pops the last context into the template handler current node */
-    popValueLinkedList(templateHandler->contexts, (void **) &templateHandler->currentNode, 1);
+    popTopValueLinkedList(templateHandler->contexts, (void **) &templateHandler->currentNode, 1);
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -628,7 +708,7 @@ ERROR_CODE _tagEndCallback(struct TemplateEngine_t *templateEngine, const unsign
             break;
     }
 
-    /* in case the temporaru node is of type close */
+    /* in case the temporary node is of type close */
     if(temporaryNode->type == TEMPLATE_NODE_CLOSE) {
         /* deletes the temporary node (no need to process it) */
         deleteTemplateNode(temporaryNode);
