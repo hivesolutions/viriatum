@@ -302,7 +302,7 @@ ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries) {
 
 	/* sorts the entries list according to the entry
 	compare file (comparator) function */
-	sortLinkedList(entries, entryCompareFile);
+	sortLinkedList(entries, _entryCompareFile);
 
     /* closes the directory reference */
     closedir(directory);
