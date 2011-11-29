@@ -62,7 +62,7 @@
 
 #ifdef VIRIATUM_PLATFORM_MSC
 #define SPRINTF(buffer, size, format, ...) sprintf_s(buffer, size, format, __VA_ARGS__)
-#define STRTOK(string, delimiter, context) strtok_s(string, delimiter, (char **) context)
+#define STRTOK(string, delimiter, context) strtok_s(string, delimiter, (char **) &context)
 #define FOPEN(filePointer, fileName, mode) fopen_s(filePointer, fileName, mode)
 #endif
 

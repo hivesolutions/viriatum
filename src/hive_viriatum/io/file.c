@@ -169,19 +169,27 @@ ERROR_CODE deleteDirectoryEntriesMapFile(struct LinkedList_t *map) {
 }
 
 ERROR_CODE entriesToMapFile(struct LinkedList_t *entries, struct LinkedList_t **mapPointer) {
-    struct Iterator_t *entriesIterator;
+    /* allocats space for the entry, for the iterator to be used
+	to percolate the various entries and for the entry map and
+	the map object used in the entry map percolation */
     struct File_t *entry;
+	struct Iterator_t *entriesIterator;
     struct HashMap_t *entryMap;
     struct LinkedList_t *map;
 
+	/* creates a new linke list in the for the entries maps */
     createLinkedList(&map);
 
+	/* creates a new linked list iterator for the entries */
     createIteratorLinkedList(entries, &entriesIterator);
 
     /* iterates continuously */
     while(1) {
+		/* retrieves the next entry from the entries iterator */
         getNextIterator(entriesIterator, (void **) &entry);
 
+		/* in case the entry is not valid (no more
+		items available) */
         if(entry == NULL) {
             /* breaks the switch */
             break;
@@ -199,8 +207,11 @@ ERROR_CODE entriesToMapFile(struct LinkedList_t *entries, struct LinkedList_t **
         appendValueLinkedList(map, (void *) entryMap);
     }
 
+	/* deletes the entries iterator */
     deleteIteratorLinkedList(entries, entriesIterator);
 
+	/* sets the entries map in the reference pointed
+	by the map pointer value */
     *mapPointer = map;
 
     /* raise no error */
@@ -213,7 +224,7 @@ int _entryCompareFile(void *first, void *second) {
     return strcmp((char *) first, (char *) second);
 }
 
-/*#ifdef VIRIATUM_PLATFORM_WIN32*/
+#ifdef VIRIATUM_PLATFORM_WIN32
 
 ERROR_CODE isDirectoryFile(char *filePath, unsigned int *isDirectory) {
     /* in case the attributes value contains the file attribute
@@ -309,7 +320,7 @@ ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries) {
     RAISE_NO_ERROR;
 }
 
-/*#endif*/
+#endif
 
 #ifdef VIRIATUM_PLATFORM_UNIX
 
