@@ -119,6 +119,9 @@ int main(int argc, char *argv[]) {
     /* retrieves the description */
     unsigned char *description = descriptionViriatum();
 
+
+    runSimpleTests();
+
     /* registers the kill handler for the int signal */
     signal(SIGINT, killHandler);
 

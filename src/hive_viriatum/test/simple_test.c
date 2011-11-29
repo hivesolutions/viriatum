@@ -352,12 +352,20 @@ void testQuicksortLinkedList() {
 }
 
 int _compare(void *first, void *second) {
-    if(first > second) {
+	/* in case the first element is smaller
+	than the second element */
+    if(first < second) {
+		/* returns negative value */
         return -1;
-    } else if(first < second) {
+    }
+	/* in case the first value is larger
+	than the second element */
+	else if(first > second) {
+		/* returns positive value */
         return 1;
     }
 
+	/* returns zero value (equals) */
     return 0;
 }
 
@@ -393,6 +401,6 @@ void runSimpleTests() {
     testTemplateHandler();
 
     /* tests the quick sort algorithm */
-    testQuicksort();
-    testQuicksortLinkedList();
+    /*testQuicksort();
+    testQuicksortLinkedList();*/
 }
