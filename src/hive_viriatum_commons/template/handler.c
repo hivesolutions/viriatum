@@ -265,7 +265,7 @@ void getTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned char
     memcpy(_name, name, strlen((char *) name) + 1);
 
     /* tokenizes the name into tokens */
-    nameToken = (char *) STRTOK((char *) _name, ".", context);
+    nameToken = (unsigned char *) STRTOK((char *) _name, ".", context);
 
     /* iterates continuously */
     while(1) {
@@ -281,7 +281,7 @@ void getTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned char
         getValueStringHashMap(_value, nameToken, (void **) &_value);
 
         /* retrieves the next token */
-        nameToken = (char *) STRTOK(NULL, ".", context);
+        nameToken = (unsigned char *) STRTOK(NULL, ".", context);
     }
 
     /* sets the value pointer with the internal
@@ -419,11 +419,6 @@ void traverseNodesBuffer(struct TemplateHandler_t *templateHandler, struct Templ
     /* deletes the child iterator */
     deleteIteratorLinkedList(node->children, childIterator);
 }
-
-
-
-
-
 
 void _traverseOutBuffer(struct TemplateHandler_t *templateHandler, struct TemplateNode_t *node) {
     /* allocates space for the value parameter and for
