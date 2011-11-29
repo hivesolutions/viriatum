@@ -502,4 +502,7 @@ void sortLinkedList(struct LinkedList_t *linkedList, comparator cmp) {
         /* sets the current node as the next node */
         currentNode = nextNode;
     }
+
+    /* releases the created sequence */
+    FREE(sequence);
 }
