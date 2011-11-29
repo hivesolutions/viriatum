@@ -227,7 +227,7 @@ int _entryCompareFile(void *first, void *second) {
     if(firstFile->type == secondFile->type) {
         /* returns the result of the string comparision
         of both values (second and first) */
-        return strcmp(firstFile->name, secondFile->name);
+        return strcmp((char *) firstFile->name, (char *) secondFile->name);
     }
     /* otherwise the type of the file shall be used
     as the main comparision method */
