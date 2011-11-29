@@ -27,6 +27,10 @@
 
 #pragma once
 
+/**
+ * The recomended size for a block of
+ * a considered small size.
+ */
 #define SMALL_BLOCK_SIZE 1024
 
 /**

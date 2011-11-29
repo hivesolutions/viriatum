@@ -66,12 +66,12 @@ ERROR_CODE readFile(char *filePath, unsigned char **bufferPointer, size_t *fileS
     /* reads the file contents */
     numberBytes = fread(fileBuffer, 1, fileSize, file);
 
-	/* in case the number of read bytes is not the
-	same as the total bytes in file (error) */
-	if(numberBytes != fileSize) {
-		/* raises an error */
+    /* in case the number of read bytes is not the
+    same as the total bytes in file (error) */
+    if(numberBytes != fileSize) {
+        /* raises an error */
         RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem reading from file");
-	}
+    }
 
     /* closes the file */
     fclose(file);
@@ -211,8 +211,8 @@ ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries) {
         appendValueLinkedList(entries, entryName);
     } while(FindNextFile(handlerFind, &findData) != 0);
 
-	/* closes the handler to find */
-	FindClose(handlerFind);
+    /* closes the handler to find */
+    FindClose(handlerFind);
 
     /* releases the list path reference */
     FREE(listPath);
@@ -232,7 +232,7 @@ ERROR_CODE isDirectoryFile(char *filePath, unsigned int *isDirectory) {
     /* tries to open the directory for the file path */
     directory = opendir(filePath);
 
-	/* in case the directory reference is not valid (null) */
+    /* in case the directory reference is not valid (null) */
     if(directory == NULL) {
         /* unsets the is directory flag */
         *isDirectory = 0;
@@ -252,7 +252,7 @@ ERROR_CODE isDirectoryFile(char *filePath, unsigned int *isDirectory) {
 
 ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries) {
     /* allocates space for the directory reference and
-	for the entity reference */
+    for the entity reference */
     DIR *directory;
     struct dirent *entity;
 
@@ -264,7 +264,7 @@ ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries) {
     /* opens the directory for the file path */
     directory = opendir(filePath);
 
-	/* in case the directory reference is not valid */
+    /* in case the directory reference is not valid */
     if(directory == NULL) {
         /* raises an error */
         RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem listing directory");
@@ -272,15 +272,15 @@ ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries) {
 
     /* print all the files and directories within directory */
     while(1) {
-		/* retrieves the entity by reading it from the directory */
-		entity = readdir(directory);
-		
-		/* in case the entity is not defined
-		(the directory list is finished) */
-		if(entity == NULL) {
-			/* breaks the switch */
-			break;
-		}
+        /* retrieves the entity by reading it from the directory */
+        entity = readdir(directory);
+
+        /* in case the entity is not defined
+        (the directory list is finished) */
+        if(entity == NULL) {
+            /* breaks the switch */
+            break;
+        }
 
         /* calculates the length of the entry name and uses
         it to create the memory space for the entry name and then

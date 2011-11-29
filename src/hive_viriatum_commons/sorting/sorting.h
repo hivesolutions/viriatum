@@ -17,7 +17,7 @@
  You should have received a copy of the GNU General Public License
  along with Hive Viriatum Commons. If not, see <http://www.gnu.org/licenses/>.
 
- __author__    = Jo√£o Magalh√£es <joamag@hive.pt>
+ __author__    = Jo„o Magalh„es <joamag@hive.pt>
  __version__   = 1.0.0
  __revision__  = $LastChangedRevision$
  __date__      = $LastChangedDate$
@@ -27,17 +27,4 @@
 
 #pragma once
 
-#include "stdafx.h"
-
-#include "checksum/checksum.h"
-#include "compression/compression.h"
-#include "debug/debug.h"
-#include "encoding/encoding.h"
-#include "memory/memory.h"
-#include "sorting/sorting.h"
-#include "stream/stream.h"
-#include "structures/structures.h"
-#include "system/system.h"
-#include "template/template.h"
-#include "thread/thread.h"
-#include "util/util.h"
+#include "quicksort.h"
