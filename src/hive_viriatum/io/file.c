@@ -198,6 +198,8 @@ ERROR_CODE entriesToMapFile(struct LinkedList_t *entries, struct LinkedList_t **
         /* creates the hash map */
         createHashMap(&entryMap, 0);
 
+		printf("%s\n", entry->name);
+
         /* sets the various entry values in the hash map */
         setValueStringHashMap(entryMap, (unsigned char *) "type", (void *) entry->type);
         setValueStringHashMap(entryMap, (unsigned char *) "name", (void *) entry->name);
