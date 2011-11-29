@@ -27,9 +27,26 @@
 
 #pragma once
 
+/**
+ * Strucrure defining the various
+ * possible types of files.
+ */
 typedef enum FileType_e {
+    /**
+     * The normal and regular file,
+     * according to the file system.
+     */
     FILE_TYPE_REGULAR = 1,
+
+    /**
+     * The directory, folder reference.
+     */
     FILE_TYPE_DIRECTORY,
+
+    /**
+     * The symbolic or absolute type
+     * file link.
+     */
     FILE_TYPE_LINK
 } FileType;
 
