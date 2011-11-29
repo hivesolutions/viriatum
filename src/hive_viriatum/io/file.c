@@ -120,7 +120,7 @@ ERROR_CODE countFile(char *filePath, size_t *fileSizePointer) {
 
 ERROR_CODE deleteDirectoryEntriesFile(struct LinkedList_t *entries) {
     /* allocates space for an entry */
-    unsigned char *entry;
+    struct File_t *entry;
 
     /* iterates continuously for entries list
     cleanup (removal of all nodes) */
@@ -134,9 +134,74 @@ ERROR_CODE deleteDirectoryEntriesFile(struct LinkedList_t *entries) {
             break;
         }
 
-        /* releases the entry memory */
+        /* releases the entry name memory and
+        the entry memory */
+        FREE(entry->name);
         FREE(entry);
     }
+
+    /* raise no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE deleteDirectoryEntriesMapFile(struct LinkedList_t *map) {
+    /* allocates space for an entry (map) */
+    struct HashMap_t *entryMap;
+
+    /* iterates continuously for entries list
+    cleanup (removal of all nodes) */
+    while(1) {
+        /* pops an entry from the entries (map) list */
+        popValueLinkedList(map, (void **) &entryMap, 1);
+
+        /* in case the value is invalid (empty list) */
+        if(entryMap == NULL) {
+            /* breaks the cycle */
+            break;
+        }
+
+        /* deletes the hash map */
+        deleteHashMap(entryMap);
+    }
+
+    /* raise no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE entriesToMapFile(struct LinkedList_t *entries, struct LinkedList_t **mapPointer) {
+    struct Iterator_t *entriesIterator;
+    struct File_t *entry;
+    struct HashMap_t *entryMap;
+    struct LinkedList_t *map;
+
+    createLinkedList(&map);
+
+    createIteratorLinkedList(entries, &entriesIterator);
+
+    /* iterates continuously */
+    while(1) {
+        getNextIterator(entriesIterator, (void **) &entry);
+
+        if(entry == NULL) {
+            /* breaks the switch */
+            break;
+        }
+
+        /* creates the hash map */
+        createHashMap(&entryMap, 0);
+
+        /* sets the various entry values in the hash map */
+        setValueStringHashMap(entryMap, (unsigned char *) "type", (void *) entry->type);
+        setValueStringHashMap(entryMap, (unsigned char *) "name", (void *) entry->name);
+        setValueStringHashMap(entryMap, (unsigned char *) "size", (void *) entry->size);
+
+        /* adds the entry map to the (list) of maps */
+        appendValueLinkedList(map, (void *) entryMap);
+    }
+
+    deleteIteratorLinkedList(entries, entriesIterator);
+
+    *mapPointer = map;
 
     /* raise no error */
     RAISE_NO_ERROR;
@@ -148,7 +213,7 @@ int _entryCompareFile(void *first, void *second) {
     return strcmp((char *) first, (char *) second);
 }
 
-#ifdef VIRIATUM_PLATFORM_WIN32
+/*#ifdef VIRIATUM_PLATFORM_WIN32*/
 
 ERROR_CODE isDirectoryFile(char *filePath, unsigned int *isDirectory) {
     /* in case the attributes value contains the file attribute
@@ -173,9 +238,9 @@ ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries) {
     listing directory path */
     char *listPath;
 
-    /* allocates space for both the entry name and the
+    /* allocates space for both the entry and the
     length of the entry name */
-    char *entryName;
+    struct File_t *entry;
     size_t entryNameLength;
 
     /* allocates the various windows internal structures
@@ -205,16 +270,33 @@ ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries) {
     }
 
     do {
+        /* allocates a new entry value */
+        entry = MALLOC(sizeof(struct File_t));
+
+        /* in case the file is of type directory */
+        if(findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+            /* sets the entry type as directory */
+            entry->type = FILE_TYPE_DIRECTORY;
+        }
+        /* otherwise it must be a regular file */
+        else {
+            /* sets the entry type as regular */
+            entry->type = FILE_TYPE_REGULAR;
+        }
+
+        /* sets the entry size from the find data information */
+        entry->size = findData.nFileSizeLow;
+
         /* calculates the length of the entry name and uses
         it to create the memory space for the entry name and then
         copies the contents into it */
         entryNameLength = strlen(findData.cFileName);
-        entryName = (char *) MALLOC(entryNameLength + 1);
-        memcpy(entryName, findData.cFileName, entryNameLength + 1);
+        entry->name = (char *) MALLOC(entryNameLength + 1);
+        memcpy(entry->name, findData.cFileName, entryNameLength + 1);
 
-        /* adds the entrys name to the list of entries for
+        /* adds the entry to the list of entries for
         the current directory (path) */
-        appendValueLinkedList(entries, entryName);
+        appendValueLinkedList(entries, entry);
     } while(FindNextFile(handlerFind, &findData) != 0);
 
     /* closes the handler to find */
@@ -227,7 +309,7 @@ ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries) {
     RAISE_NO_ERROR;
 }
 
-#endif
+/*#endif*/
 
 #ifdef VIRIATUM_PLATFORM_UNIX
 

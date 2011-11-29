@@ -27,6 +27,37 @@
 
 #pragma once
 
+typedef enum FileType_e {
+    FILE_TYPE_REGULAR = 1,
+    FILE_TYPE_DIRECTORY,
+    FILE_TYPE_LINK
+} FileType;
+
+/**
+ * Structure defining a series
+ * of meta information about a file
+ * from the file system.
+ */
+typedef struct File_t {
+    /**
+     * The type of file (eg: normal, directory
+     * symbolic link).
+     */
+    enum FileType_e type;
+
+    /**
+     * The name of the file as a
+     * string value.
+     */
+    unsigned char *name;
+
+    /**
+     * The size of the file represented
+     * in the longest manner.
+     */
+    size_t size;
+} File;
+
 /**
  * Reads the file at the given file path to a generated
  * buffer and retrieves the size of the file.
@@ -74,6 +105,25 @@ ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries);
  * @param entries The list of entries to be deleted.
  */
 ERROR_CODE deleteDirectoryEntriesFile(struct LinkedList_t *entries);
+
+/**
+ * Deletes, releases memory from all the directory entries (map) described
+ * in the given entries list (map).
+ *
+ * @param map The list of entries (map) to be deleted.
+ */
+ERROR_CODE deleteDirectoryEntriesMapFile(struct LinkedList_t *map);
+
+/**
+ * Converts a linked list of entries into a list of maps describing
+ * the same entries (for dynamic usage).
+ *
+ * @param entries The list of file entries to be converted into
+ * a list of (descriptive) maps.
+ * @param mapPointer The pointer to the list to hold the various
+ * maps describing the entries.
+ */
+ERROR_CODE entriesToMapFile(struct LinkedList_t *entries, struct LinkedList_t **mapPointer);
 
 /**
  * Comparator function to be used to compare two file
