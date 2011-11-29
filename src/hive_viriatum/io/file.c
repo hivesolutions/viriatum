@@ -438,7 +438,7 @@ ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries) {
         entry->name = (char *) MALLOC(entryNameLength + 1);
         memcpy(entry->name, entity->d_name, entryNameLength + 1);
 
-		printf("%s %d", entry->name, entry->size);
+		printf("%s %d\n", entry->name, entry->size);
 
         /* adds the entry to the list of entries for
         the current directory (path) */
