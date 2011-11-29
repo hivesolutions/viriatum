@@ -439,7 +439,6 @@ ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries) {
 		joinPathFile(filePath, entity->d_name, entryFullName);
 		stat(entryFullName, &entryStat);
         entry->size = entryStat.st_size;
-		FREE(entryFullName);
 
         /* calculates the length of the entry name and uses
         it to create the memory space for the entry name and then
