@@ -29,11 +29,11 @@
 
 #include "quicksort.h"
 
-void sortQuicksort(int sequence[], int beginning, int end) {
+void sortQuicksort(void **sequence, size_t beginning, size_t end, comparator cmp) {
     /* retrieves the initial pivor, left and right elements */
-    int pivot = sequence[beginning];
-    int left = beginning + 1;
-    int right = end;
+    void *pivot = sequence[beginning];
+    size_t left = beginning + 1;
+    size_t right = end;
 
     /* in case the end reference "overflows"
     the beginig reference (end of recursion) */
@@ -45,9 +45,9 @@ void sortQuicksort(int sequence[], int beginning, int end) {
     /* iterates while the right index is greater
     than the left index */
     while(left < right) {
-        /* in case the left element is smalled
+        /* in case the left element is smaller
         or equal to the pivot (left advance) */
-        if(sequence[left] <= pivot) {
+        if(cmp(sequence[left], pivot) <= 0) {
             /* increments the left index */
             left++;
         }
@@ -63,14 +63,14 @@ void sortQuicksort(int sequence[], int beginning, int end) {
 
     /* runs the quicksort from the begining to the left
     and from the right to the end (bi-section) */
-    sortQuicksort(sequence, beginning, left);
-    sortQuicksort(sequence, right, end);
+    sortQuicksort(sequence, beginning, left, cmp);
+    sortQuicksort(sequence, right, end, cmp);
 }
 
-void _swapQuicksort(int *first, int *second) {
+void _swapQuicksort(void **first, void **second) {
     /* saves the first element to the accumulator
     and then swaps both elements using it (accumulator) */
-    int accumulator = *first;
+    void *accumulator = *first;
     *first = *second;
     *second = accumulator;
 }

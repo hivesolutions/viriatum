@@ -96,6 +96,32 @@ void deleteLinkedListNode(struct LinkedListNode_t *linkedListNode) {
     FREE(linkedListNode);
 }
 
+void clearLinkedList(struct LinkedList_t *linkedList) {
+    /* allocates space for the index */
+    unsigned int index;
+
+    /* allocates space for the next node */
+    struct LinkedListNode_t *nextNode;
+
+    /* sets the initial iteration node */
+    struct LinkedListNode_t *currentNode = linkedList->first;
+
+    /* iterates over the index value */
+    for(index = 0; index < linkedList->size; index++) {
+        /* retrieves the next node */
+        nextNode = currentNode->next;
+
+        /* deletes the linked list node */
+        deleteLinkedListNode(currentNode);
+
+        /* sets the current node as the next node */
+        currentNode = nextNode;
+    }
+
+    /* resets the linked list size */
+    linkedList->size = 0;
+}
+
 void appendLinkedList(struct LinkedList_t *linkedList, struct LinkedListNode_t *linkedListNode) {
     /* in case the linked list is empty */
     if(linkedList->size == 0) {
@@ -406,4 +432,74 @@ void getNextIteratorLinkedList(struct Iterator_t *iterator, void **nextPointer) 
 
     /* sets the next in the next pointer */
     *nextPointer = next;
+}
+
+void toSequenceLinkedList(struct LinkedList_t *linkedList, void ***sequencePointer) {
+    /* allocates space for the next and current node node,
+    sets the current node to the linked list first node */
+    struct LinkedListNode_t *nextNode;
+    struct LinkedListNode_t *currentNode = linkedList->first;
+
+    /* allocates space for the iteration index accumulator */
+    size_t index = 0;
+
+    /* retrieves the void pointer size */
+    size_t voidPointerSize = sizeof(void *);
+
+    /* allocates memory space for the sequence of values */
+    void **sequence = (void **) MALLOC(linkedList->size * voidPointerSize);
+
+    /* iterates over the sequence to create the sequence
+    with the linked list nodes value */
+    for(index = 0; index < linkedList->size; index++) {
+        /* retrieves the next node */
+        nextNode = currentNode->next;
+
+        /* sets the current sequence value with
+        the current node value */
+        sequence[index] = currentNode->value;
+
+        /* sets the current node as the next node */
+        currentNode = nextNode;
+    }
+
+    /* sets the sequence "pointed" by the sequence pointer
+    as the "newly" created sequence */
+    *sequencePointer = sequence;
+}
+
+void sortLinkedList(struct LinkedList_t *linkedList, comparator cmp) {
+    /* allocats space for the index accumulator to be
+    used durring the sequence iteration */
+    size_t index;
+
+    /* allocates space for the linear sequence of values to be
+    created for the sorting algorithm execution and then retrieves
+    the target size for it */
+    void **sequence;
+    size_t sequenceSize = linkedList->size;
+
+    /* allocates space for the next and current node node,
+    sets the current node to the linked list first node */
+    struct LinkedListNode_t *nextNode;
+    struct LinkedListNode_t *currentNode = linkedList->first;
+
+    /* converts the linked list into a linear sequence of values
+    then uses the sequence for sorting execution */
+    toSequenceLinkedList(linkedList, &sequence);
+    sortQuicksort(sequence, 0, sequenceSize, cmp);
+
+    /* iterates over the sequence to update the proper
+    elements in the linked list (reuses current nodes) */
+    for(index = 0; index < sequenceSize; index++) {
+        /* retrieves the next node */
+        nextNode = currentNode->next;
+
+        /* updates the current node value with the
+        current value in the sequence */
+        currentNode->value = sequence[index];
+
+        /* sets the current node as the next node */
+        currentNode = nextNode;
+    }
 }

@@ -324,15 +324,41 @@ void testTemplateHandler() {
     deleteTemplateHandler(templateHandler);
 }
 
-
-
 void testQuicksort() {
     /* allocates space for the template handler */
     int list[10] = { 2, 4, 1, 2, 3, 5, 5, 3, 4, 1 };
 
-    sortQuicksort(list, 0, 10);
+    /* sorts the sequence according to the compare function */
+    sortQuicksort((void **) list, 0, 10, _compare);
+}
 
-    printf("asdas");
+void testQuicksortLinkedList() {
+    /* allocates space for the linked list */
+    struct LinkedList_t *linkedList;
+
+    /* creates the linked list */
+    createLinkedList(&linkedList);
+
+    /* adds some element to the linked list */
+    appendValueLinkedList(linkedList, (void *) 2);
+    appendValueLinkedList(linkedList, (void *) 3);
+    appendValueLinkedList(linkedList, (void *) 1);
+
+    /* retrieves a value from the linked list */
+    sortLinkedList(linkedList, _compare);
+
+    /* deletes the linked list */
+    deleteLinkedList(linkedList);
+}
+
+int _compare(void *first, void *second) {
+    if(first > second) {
+        return -1;
+    } else if(first < second) {
+        return 1;
+    }
+
+    return 0;
 }
 
 void runSimpleTests() {
@@ -366,5 +392,7 @@ void runSimpleTests() {
     /* tests the template handler */
     testTemplateHandler();
 
+    /* tests the quick sort algorithm */
     testQuicksort();
+    testQuicksortLinkedList();
 }

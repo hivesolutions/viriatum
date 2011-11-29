@@ -853,6 +853,10 @@
 				Name="Sorting"
 				>
 				<File
+					RelativePath="..\..\src\hive_viriatum_commons\sorting\base.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\src\hive_viriatum_commons\sorting\quicksort.h"
 					>
 				</File>
