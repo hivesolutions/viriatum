@@ -251,14 +251,14 @@ void assignTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned c
 }
 
 void getTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned char *name, void **value) {
-	/* allocates space for the temporary (tokanizable) name variable
-	and for the generated token values*/
+    /* allocates space for the temporary (tokanizable) name variable
+    and for the generated token values*/
     unsigned char _name[64];
     unsigned char *nameToken;
-	unsigned char *context;
+    unsigned char *context;
 
-	/* retrieves the template global names as thee base value */
-	struct HashMap_t *_value = templateHandler->names;
+    /* retrieves the template global names as thee base value */
+    struct HashMap_t *_value = templateHandler->names;
 
     /* copies the name reference into a backup value
     to avoid data corruption (from tokenization) */
