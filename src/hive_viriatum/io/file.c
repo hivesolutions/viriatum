@@ -355,9 +355,9 @@ ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries) {
     DIR *directory;
     struct dirent *entity;
 
-    /* allocates space for both the entry name and the
+    /* allocates space for both the entry and the
     length of the entry name */
-    char *entryName;
+    struct File_t *entry;
     size_t entryNameLength;
 
     /* opens the directory for the file path */
@@ -381,12 +381,15 @@ ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries) {
             break;
         }
 
+        /* allocates a new entry value */
+        entry = MALLOC(sizeof(struct File_t));
+
         /* calculates the length of the entry name and uses
         it to create the memory space for the entry name and then
         copies the contents into it */
         entryNameLength = strlen(entity->d_name);
-        entryName = (char *) MALLOC(entryNameLength + 1);
-        memcpy(entryName, entity->d_name, entryNameLength + 1);
+        entry->name = (char *) MALLOC(entryNameLength + 1);
+        memcpy(entry->name, entity->d_name, entryNameLength + 1);
 
         /* adds the entrys name to the list of entries for
         the current directory (path) */
