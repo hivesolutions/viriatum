@@ -599,6 +599,14 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="Sorting"
+				>
+				<File
+					RelativePath="..\..\src\hive_viriatum_commons\sorting\quicksort.c"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -838,6 +846,18 @@
 				</File>
 				<File
 					RelativePath="..\..\src\hive_viriatum_commons\template\template.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Sorting"
+				>
+				<File
+					RelativePath="..\..\src\hive_viriatum_commons\sorting\quicksort.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\hive_viriatum_commons\sorting\sorting.h"
 					>
 				</File>
 			</Filter>

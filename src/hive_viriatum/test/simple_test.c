@@ -324,6 +324,17 @@ void testTemplateHandler() {
     deleteTemplateHandler(templateHandler);
 }
 
+
+
+void testQuicksort() {
+    /* allocates space for the template handler */
+    int list[10] = { 2, 4, 1, 2, 3, 5, 5, 3, 4, 1 };
+
+    sortQuicksort(list, 0, 10);
+
+    printf("asdas");
+}
+
 void runSimpleTests() {
     /* tests the thread pool */
     testThreadPool();
@@ -354,4 +365,6 @@ void runSimpleTests() {
 
     /* tests the template handler */
     testTemplateHandler();
+
+    testQuicksort();
 }

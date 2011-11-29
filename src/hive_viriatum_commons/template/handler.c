@@ -317,8 +317,8 @@ ERROR_CODE tagEnd(struct TemplateEngine_t *templateEngine, const unsigned char *
 
             break;
 
-		default:
-			break;
+        default:
+            break;
     }
 
     if(temporaryNode->type == TEMPLATE_NODE_CLOSE) {
@@ -525,8 +525,8 @@ void traverseOutBuffer(struct TemplateHandler_t *templateHandler, struct Templat
 
             break;
 
-		default:
-			break;
+        default:
+            break;
     }
 }
 
@@ -630,8 +630,8 @@ void traverseNodeBuffer(struct TemplateHandler_t *templateHandler, struct Templa
 
             break;
 
-		default:
-			break;
+        default:
+            break;
     }
 }
 

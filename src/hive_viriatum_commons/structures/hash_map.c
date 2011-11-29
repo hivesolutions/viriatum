@@ -169,11 +169,11 @@ size_t _calculateStringHashMap(unsigned char *keyString) {
     /* closes the key value calculation */
     key = key ^ index;
 
-	/* checks for aditional abnormal key value */
-	if(key == -1) {
-		/* removes the error code value */
-		key = -2;
-	}
+    /* checks for aditional abnormal key value */
+    if(key == -1) {
+        /* removes the error code value */
+        key = -2;
+    }
 
     /* returns the (calculated) key */
     return key;

@@ -159,15 +159,15 @@ a:hover {
     font-weight: bold;
 }
 
-.table.file-listing td{
+.table.file-listing td {
     padding: 8px 0px 8px 0px;
 }
 
-.table.file-listing tbody td:last-child{
+.table.file-listing tbody td:last-child {
     padding: 8px 10px 8px 0px;
 }
 
-.table.file-listing td.icon{
+.table.file-listing td.icon {
     width: 16px;
     padding: 0px 10px 0px 10px;
 }

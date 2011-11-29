@@ -56,12 +56,12 @@ ERROR_CODE deleteHandlerFileContext(struct HandlerFileContext_t *handlerFileCont
         fclose(handlerFileContext->file);
     }
 
-	/* in case there is a template handler defined
-	in the handler file context */
-	if(handlerFileContext->templateHandler) {
-		/* deletes the template handler (releases memory) */
+    /* in case there is a template handler defined
+    in the handler file context */
+    if(handlerFileContext->templateHandler) {
+        /* deletes the template handler (releases memory) */
         deleteTemplateHandler(handlerFileContext->templateHandler);
-	}
+    }
 
     /* releases the handler file context */
     FREE(handlerFileContext);
@@ -253,7 +253,7 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
         writeConnection(connection, (unsigned char *) headersBuffer, strlen(headersBuffer), _cleanupHandlerFile, handlerFileContext);
     } else if(isRedirect) {
         /* writes the http static headers to the response */
-        SPRINTF(headersBuffer, 1024, "HTTP/1.1 307 Temporary Redirect\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nLocation: %s\r\n\r\n", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, location);
+        SPRINTF(headersBuffer, 1024, "HTTP/1.1 307 Temporary Redirect\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nContent-Length: 0\r\nLocation: %s\r\n\r\n", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, location);
 
         /* writes both the headers to the connection, registers for the appropriate callbacks */
         writeConnection(connection, (unsigned char *) headersBuffer, strlen(headersBuffer), _cleanupHandlerFile, handlerFileContext);
@@ -453,9 +453,9 @@ ERROR_CODE _sendDataHandlerFile(struct Connection_t *connection, struct Data_t *
     time to clenaup pending structures */
     if(handlerFileContext->flushed) {
         /* deletes the template handler (releases memory) and
-		unsets the reference in the handler file context */
+        unsets the reference in the handler file context */
         deleteTemplateHandler(templateHandler);
-		handlerFileContext->templateHandler = NULL;
+        handlerFileContext->templateHandler = NULL;
 
         /* runs the cleanup handler file (releases internal structures) */
         _cleanupHandlerFile(connection, data, parameters);
