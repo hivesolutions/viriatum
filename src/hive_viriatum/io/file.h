@@ -74,3 +74,13 @@ ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries);
  * @param entries The list of entries to be deleted.
  */
 ERROR_CODE deleteDirectoryEntriesFile(struct LinkedList_t *entries);
+
+/**
+ * Comparator function to be used to compare two file
+ * entries value, in order to sort them .
+ *
+ * @param first The first value to be compared.
+ * @param second The second value to be compared.
+ * @return The result of the comparison.
+ */
+int _entryCompareFile(void *first, void *second);
