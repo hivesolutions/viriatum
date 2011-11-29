@@ -265,7 +265,7 @@ void getTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned char
     memcpy(_name, name, strlen((char *) name) + 1);
 
     /* tokenizes the name into tokens */
-    nameToken = STRTOK((char *) _name, ".", context);
+    nameToken = (char *) STRTOK((char *) _name, ".", context);
 
     /* iterates continuously */
     while(1) {
@@ -281,7 +281,7 @@ void getTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned char
         getValueStringHashMap(_value, nameToken, (void **) &_value);
 
         /* retrieves the next token */
-        nameToken = STRTOK(NULL, ".", context);
+        nameToken = (char *) STRTOK(NULL, ".", context);
     }
 
     /* sets the value pointer with the internal
@@ -547,7 +547,7 @@ void _traverseIfBuffer(struct TemplateHandler_t *templateHandler, struct Templat
 
     /* tries to retrieve the reference value from the map of names in the
     template handler (dereferencing) */
-    getTemplateHandler(templateHandler, "entry.type", (void **) &value);
+    getTemplateHandler(templateHandler, (unsigned char *) "entry.type", (void **) &value);
 
     /* in case the value was not found */
     if(value == NULL) {
