@@ -389,13 +389,13 @@ void runSimpleTests() {
     testBase64();
 
     /* tests the huffman encoder */
-    testHuffman();
+   /* testHuffman(); */
 
     /* tests the bit stream */
-    testBitStream();
+    /*testBitStream();*/
 
     /* tests the file stream */
-    testFileStream();
+    /*testFileStream();*/
 
     /* tests the template handler */
     /*testTemplateHandler();*/
