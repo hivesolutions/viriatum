@@ -170,26 +170,26 @@ ERROR_CODE deleteDirectoryEntriesMapFile(struct LinkedList_t *map) {
 
 ERROR_CODE entriesToMapFile(struct LinkedList_t *entries, struct LinkedList_t **mapPointer) {
     /* allocats space for the entry, for the iterator to be used
-	to percolate the various entries and for the entry map and
-	the map object used in the entry map percolation */
+    to percolate the various entries and for the entry map and
+    the map object used in the entry map percolation */
     struct File_t *entry;
-	struct Iterator_t *entriesIterator;
+    struct Iterator_t *entriesIterator;
     struct HashMap_t *entryMap;
     struct LinkedList_t *map;
 
-	/* creates a new linke list in the for the entries maps */
+    /* creates a new linke list in the for the entries maps */
     createLinkedList(&map);
 
-	/* creates a new linked list iterator for the entries */
+    /* creates a new linked list iterator for the entries */
     createIteratorLinkedList(entries, &entriesIterator);
 
     /* iterates continuously */
     while(1) {
-		/* retrieves the next entry from the entries iterator */
+        /* retrieves the next entry from the entries iterator */
         getNextIterator(entriesIterator, (void **) &entry);
 
-		/* in case the entry is not valid (no more
-		items available) */
+        /* in case the entry is not valid (no more
+        items available) */
         if(entry == NULL) {
             /* breaks the switch */
             break;
@@ -198,7 +198,7 @@ ERROR_CODE entriesToMapFile(struct LinkedList_t *entries, struct LinkedList_t **
         /* creates the hash map */
         createHashMap(&entryMap, 0);
 
-		printf("%s\n", entry->name);
+        printf("%s\n", entry->name);
 
         /* sets the various entry values in the hash map */
         setValueStringHashMap(entryMap, (unsigned char *) "type", (void *) entry->type);
@@ -209,11 +209,11 @@ ERROR_CODE entriesToMapFile(struct LinkedList_t *entries, struct LinkedList_t **
         appendValueLinkedList(map, (void *) entryMap);
     }
 
-	/* deletes the entries iterator */
+    /* deletes the entries iterator */
     deleteIteratorLinkedList(entries, entriesIterator);
 
-	/* sets the entries map in the reference pointed
-	by the map pointer value */
+    /* sets the entries map in the reference pointed
+    by the map pointer value */
     *mapPointer = map;
 
     /* raise no error */
@@ -221,9 +221,23 @@ ERROR_CODE entriesToMapFile(struct LinkedList_t *entries, struct LinkedList_t **
 }
 
 int _entryCompareFile(void *first, void *second) {
-    /* returns the result of the string comparision
-    of both values (second and first) */
-    return strcmp(((struct File_t *) first)->name, ((struct File_t *) second)->name);
+    /* casts the first and second item as files */
+    struct File_t *firstFile = (struct File_t *) first;
+    struct File_t *secondFile = (struct File_t *) second;
+
+    /* in case the file type is the same in both elements */
+    if(firstFile->type == secondFile->type) {
+        /* returns the result of the string comparision
+        of both values (second and first) */
+        return strcmp(firstFile->name, secondFile->name);
+    }
+    /* otherwise the type of the file shall be used
+    as the main comparision method */
+    else {
+        /* returns the result of the difference between
+        the second file type and the first file type */
+        return secondFile->type - firstFile->type;
+    }
 }
 
 #ifdef VIRIATUM_PLATFORM_WIN32
@@ -312,6 +326,10 @@ ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries) {
         appendValueLinkedList(entries, entry);
     } while(FindNextFile(handlerFind, &findData) != 0);
 
+    /* sorts the entries list according to the entry
+    compare file (comparator) function */
+    sortLinkedList(entries, _entryCompareFile);
+
     /* closes the handler to find */
     FindClose(handlerFind);
 
@@ -386,8 +404,8 @@ ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries) {
         /* allocates a new entry value */
         entry = MALLOC(sizeof(struct File_t));
 
-		entry->type = 1;
-		entry->size = 199;
+        entry->type = 1;
+        entry->size = 199;
 
         /* calculates the length of the entry name and uses
         it to create the memory space for the entry name and then
