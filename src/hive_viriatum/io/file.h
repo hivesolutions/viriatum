@@ -126,6 +126,16 @@ ERROR_CODE deleteDirectoryEntriesMapFile(struct LinkedList_t *map);
 ERROR_CODE entriesToMapFile(struct LinkedList_t *entries, struct LinkedList_t **mapPointer);
 
 /**
+ * Joins a file path with a given base path.
+ * The joining of the path uses the default system separator.
+ *
+ * @param basePath The base path for the joined path.
+ * @param name The name to be used as sufix in the path joining.
+ * @param joinedPath The joined path buffer to receive the final result.
+ */
+ERROR_CODE joinPathFile(char *basePath, char *name, char *joinedPath);
+
+/**
  * Comparator function to be used to compare two file
  * entries value, in order to sort them .
  *

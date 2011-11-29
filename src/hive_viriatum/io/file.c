@@ -218,6 +218,22 @@ ERROR_CODE entriesToMapFile(struct LinkedList_t *entries, struct LinkedList_t **
     RAISE_NO_ERROR;
 }
 
+ERROR_CODE joinPathFile(char *basePath, char *name, char *joinedPath) {
+	/* retrieves the length for both the base path and
+	the name values */
+	size_t basePathLength = strlen(basePath);
+	size_t nameLength = strlen(name);
+
+	/* copies the various parts of the path to create
+	the complete joined path */
+	memcpy(joinedPath, basePath, basePathLength);
+	memcpy(joinedPath + basePathLength, "/", 1);
+	memcpy(joinedPath + basePathLength + 1, name, nameLength + 1);
+
+    /* raise no error */
+    RAISE_NO_ERROR;
+}
+
 int _entryCompareFile(void *first, void *second) {
     /* casts the first and second item as files */
     struct File_t *firstFile = (struct File_t *) first;
@@ -340,17 +356,6 @@ ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries) {
 
 #endif
 
-void pathJoin(char *basePath, char *name, char **joinedPathPointer) {
-	size_t basePathLength = strlen(basePath);
-	size_t nameLength = strlen(name);
-	char *joinedPath = MALLOC(basePathLength + nameLength + 2);
-	memcpy(joinedPath, basePath, basePathLength);
-	memcpy(joinedPath + basePathLength, "/", 1);
-	memcpy(joinedPath + basePathLength + 1, name, nameLength + 1);
-
-	*joinedPathPointer = joinedPath;
-}
-
 #ifdef VIRIATUM_PLATFORM_UNIX
 
 ERROR_CODE isDirectoryFile(char *filePath, unsigned int *isDirectory) {
@@ -384,10 +389,11 @@ ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries) {
     DIR *directory;
     struct dirent *entity;
 
-    /* allocates space for both the entry and the
-    length of the entry name */
+	/* allocates space for the entry (structure), the
+    the entry full name, the length of the entry name and
+	the entry stat structure (for file attributes)*/
     struct File_t *entry;
-	char *entryFullName;
+	char entryFullName[4096];
     size_t entryNameLength;
 	struct stat entryStat;
 
@@ -427,9 +433,13 @@ ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries) {
             entry->type = FILE_TYPE_DIRECTORY;
         }
 
-		pathJoin(filePath, entity->d_name, &entryFullName);
+		/* joins the base name with the directory path to
+		retrieve the full entry name then uses it to retrieve
+		the entry stat structure and then uses it to retrieve its size */
+		joinPathFile(filePath, entity->d_name, entryFullName);
 		stat(entryFullName, &entryStat);
         entry->size = entryStat.st_size;
+		FREE(entryFullName);
 
         /* calculates the length of the entry name and uses
         it to create the memory space for the entry name and then
@@ -437,8 +447,6 @@ ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries) {
         entryNameLength = strlen(entity->d_name);
         entry->name = (char *) MALLOC(entryNameLength + 1);
         memcpy(entry->name, entity->d_name, entryNameLength + 1);
-
-		printf("%s %d\n", entry->name, entry->size);
 
         /* adds the entry to the list of entries for
         the current directory (path) */
