@@ -26,7 +26,7 @@
 include $(top_srcdir)/Common.am
 
 nobase_dist_resources_DATA = html/base/error.html.tpl \
-html/base/index.html.tpl \
+html/base/index.html \
 html/base/listing.html.tpl \
 html/base/status.html.tpl \
 html/base/resources/css/layout.css \
