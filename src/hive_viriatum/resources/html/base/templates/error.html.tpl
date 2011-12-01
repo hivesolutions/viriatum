@@ -5,10 +5,10 @@
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
         <!-- css inclusion -->
-        <link rel="stylesheet" href="resources/css/layout.css" type="text/css" />
+        <link rel="stylesheet" href="/resources/css/layout.css" type="text/css" />
 
         <!-- favicon inclusion -->
-        <link rel="shortcut icon" href="resources/images/favicon.ico" />
+        <link rel="shortcut icon" href="/resources/images/favicon.ico" />
     </head>
     <body>
 		<div id="content-wrapper">
