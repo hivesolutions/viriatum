@@ -172,6 +172,7 @@ VIRIATUM_EXPORT_PREFIX void createTemplateParameter(struct TemplateParameter_t *
 VIRIATUM_EXPORT_PREFIX void deleteTemplateParameter(struct TemplateParameter_t *templateParameter);
 VIRIATUM_EXPORT_PREFIX void processTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned char *filePath);
 VIRIATUM_EXPORT_PREFIX void assignTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned char *name, struct Type_t *value);
+VIRIATUM_EXPORT_PREFIX void assignIntegerTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned char *name, int value);
 VIRIATUM_EXPORT_PREFIX void assignListTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned char *name, struct LinkedList_t *value);
 VIRIATUM_EXPORT_PREFIX void getTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned char *name, struct Type_t **valuePointer);
 VIRIATUM_EXPORT_PREFIX void traverseNodeDebug(struct TemplateHandler_t *templateHandler, struct TemplateNode_t *node, unsigned int indentation);

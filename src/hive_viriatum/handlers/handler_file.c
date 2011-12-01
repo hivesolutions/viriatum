@@ -217,6 +217,7 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
 
             /* assigns the directory entries to the template handler */
             assignListTemplateHandler(templateHandler, (unsigned char *) "entries", directoryEntriesMap);
+            assignIntegerTemplateHandler(templateHandler, (unsigned char *) "items", directoryEntriesMap->size);
 
             /* processes the file as a template handler */
             processTemplateHandler(templateHandler, templatePath);
@@ -230,7 +231,6 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
             directory entries */
             deleteDirectoryEntriesMapFile(directoryEntriesMap);
             deleteDirectoryEntriesFile(directoryEntries);
-
 
             /* deletes the directory entries (linked list) and
             the entries map (linked list) */

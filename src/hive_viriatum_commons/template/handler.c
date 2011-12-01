@@ -278,6 +278,23 @@ void assignTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned c
     setValueStringHashMap(templateHandler->names, name, value);
 }
 
+void assignIntegerTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned char *name, int value) {
+    /* allocates space for the type */
+    struct Type_t *type;
+
+    /* create a integer type and sets the value
+    to the list to be assigned */
+    createType(&type, INTEGER_TYPE);
+    type->value.valueInt = value;
+
+    /* sets the value (integer) in the template handler names hash map */
+    setValueStringHashMap(templateHandler->names, name, type);
+
+    /* adds the type to the list of types to have the
+    memory release uppon template handler destruction (late removal) */
+    appendValueLinkedList(templateHandler->releaseList, type);
+}
+
 void assignListTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned char *name, struct LinkedList_t *value) {
     /* allocates space for the type */
     struct Type_t *type;
@@ -485,7 +502,8 @@ void _traverseOutBuffer(struct TemplateHandler_t *templateHandler, struct Templa
     struct TemplateParameter_t *valueParameter;
     struct Type_t *value;
 
-
+    /* allocates the buffer to hold the string conversion
+    from the source data type of a possible reference */
     char *buffer;
 
     /* retrieves value parameter from the parameters map */
@@ -505,12 +523,12 @@ void _traverseOutBuffer(struct TemplateHandler_t *templateHandler, struct Templa
             /* retrievs the value reference from the global names map */
             getTemplateHandler(templateHandler, valueParameter->referenceValue, &value);
 
-            /* converts the value into a string representation, to
-            be used in the template generation */
-            toStringType(value, &buffer);
-
             /* in case the value was successfully found */
             if(value != NULL) {
+                /* converts the value into a string representation, to
+                be used in the template generation */
+                toStringType(value, &buffer);
+
                 /* adds the value (string) to the string buffer */
                 _appendStringBuffer(templateHandler->stringBuffer, buffer);
             }
