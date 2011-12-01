@@ -32,3 +32,4 @@
 #include "iterator.h"
 #include "linked_list.h"
 #include "string_buffer.h"
+#include "type.h"
