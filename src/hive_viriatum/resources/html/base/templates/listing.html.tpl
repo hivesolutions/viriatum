@@ -40,13 +40,13 @@
 							${/if}
 							<td class="left"><a href="${out value=entry.name /}">${out value=entry.name /}</a></td>
 							<td class="right">2011-07-28 19:45</td>
-							<td class="right">128 Kb</td>
+							<td class="right">${out value=entry.size /} Bytes</td>
 						</tr>
 					${/foreach}
 				</tbody>
 				<tfoot>
 					<tr>
-						<td colspan="4" class="label center">1 folder, 3 files</td>
+						<td colspan="4" class="label center">${out value=items /} items</td>
 					</tr>
 				</tfoot>
 			</table>
