@@ -215,8 +215,8 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
             /* creates the template handler */
             createTemplateHandler(&templateHandler);
 
-            /* assigns the cirectory entries to the template handler */
-            assignTemplateHandler(templateHandler, (unsigned char *) "entries", directoryEntriesMap);
+            /* assigns the directory entries to the template handler */
+            assignListTemplateHandler(templateHandler, (unsigned char *) "entries", directoryEntriesMap);
 
             /* processes the file as a template handler */
             processTemplateHandler(templateHandler, templatePath);
@@ -226,10 +226,11 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
             handlerFileContext->templateHandler = templateHandler;
             handlerFileContext->flushed = 0;
 
-            /* deletes the directory entries and the directory
-            entries map */
-            deleteDirectoryEntriesFile(directoryEntries);
+            /* deletes the directory entries map and the
+            directory entries */
             deleteDirectoryEntriesMapFile(directoryEntriesMap);
+            deleteDirectoryEntriesFile(directoryEntries);
+
 
             /* deletes the directory entries (linked list) and
             the entries map (linked list) */

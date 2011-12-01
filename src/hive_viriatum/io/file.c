@@ -145,23 +145,35 @@ ERROR_CODE deleteDirectoryEntriesFile(struct LinkedList_t *entries) {
 }
 
 ERROR_CODE deleteDirectoryEntriesMapFile(struct LinkedList_t *map) {
-    /* allocates space for an entry (map) */
-    struct HashMap_t *entryMap;
+    /* allocates space for an entry (type) and
+    for the entry value type */
+    struct Type_t *entryType;
+    struct Type_t *entryValueType;
 
     /* iterates continuously for entries list
     cleanup (removal of all nodes) */
     while(1) {
-        /* pops an entry from the entries (map) list */
-        popValueLinkedList(map, (void **) &entryMap, 1);
+        /* pops an entry from the entries (type) list */
+        popValueLinkedList(map, (void **) &entryType, 1);
 
         /* in case the value is invalid (empty list) */
-        if(entryMap == NULL) {
+        if(entryType == NULL) {
             /* breaks the cycle */
             break;
         }
 
-        /* deletes the hash map */
-        deleteHashMap(entryMap);
+        /* deletes the various values (types) from the hash map
+        (first retrieves them and the excludes them)*/
+        getValueStringHashMap(entryType->value.valueMap, "type", (void **) &entryValueType);
+        deleteType(entryValueType);
+        getValueStringHashMap(entryType->value.valueMap, "name", (void **) &entryValueType);
+        deleteType(entryValueType);
+        getValueStringHashMap(entryType->value.valueMap, "size", (void **) &entryValueType);
+        deleteType(entryValueType);
+
+        /* deletes the hash map and the entry type */
+        deleteHashMap(entryType->value.valueMap);
+        deleteType(entryType);
     }
 
     /* raise no error */
@@ -176,6 +188,11 @@ ERROR_CODE entriesToMapFile(struct LinkedList_t *entries, struct LinkedList_t **
     struct Iterator_t *entriesIterator;
     struct HashMap_t *entryMap;
     struct LinkedList_t *map;
+
+    /* allocates space for an entry (type) and
+    for the entry value type */
+    struct Type_t *entryType;
+    struct Type_t *entryValueType;
 
     /* creates a new linke list in the for the entries maps */
     createLinkedList(&map);
@@ -198,13 +215,25 @@ ERROR_CODE entriesToMapFile(struct LinkedList_t *entries, struct LinkedList_t **
         /* creates the hash map */
         createHashMap(&entryMap, 0);
 
-        /* sets the various entry values in the hash map */
-        setValueStringHashMap(entryMap, (unsigned char *) "type", (void *) entry->type);
-        setValueStringHashMap(entryMap, (unsigned char *) "name", (void *) entry->name);
-        setValueStringHashMap(entryMap, (unsigned char *) "size", (void *) entry->size);
+        /* creates the various types for the various entry values
+        and sets them in the entry map for reference */
+        createType(&entryValueType, INTEGER_TYPE);
+        entryValueType->value.valueInt = entry->type;
+        setValueStringHashMap(entryMap, (unsigned char *) "type", (void *) entryValueType);
+        createType(&entryValueType, STRING_TYPE);
+        entryValueType->value.valueString = entry->name;
+        setValueStringHashMap(entryMap, (unsigned char *) "name", (void *) entryValueType);
+        createType(&entryValueType, INTEGER_TYPE);
+        entryValueType->value.valueInt = entry->size;
+        setValueStringHashMap(entryMap, (unsigned char *) "size", (void *) entryValueType);
 
-        /* adds the entry map to the (list) of maps */
-        appendValueLinkedList(map, (void *) entryMap);
+        /* creates the entry type (for the map) and sets the
+        entry map on it */
+        createType(&entryType, MAP_TYPE);
+        entryType->value.valueMap = entryMap;
+
+        /* adds the entry type to the (list) of maps */
+        appendValueLinkedList(map, (void *) entryType);
     }
 
     /* deletes the entries iterator */
