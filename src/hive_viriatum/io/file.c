@@ -164,11 +164,11 @@ ERROR_CODE deleteDirectoryEntriesMapFile(struct LinkedList_t *map) {
 
         /* deletes the various values (types) from the hash map
         (first retrieves them and the excludes them)*/
-        getValueStringHashMap(entryType->value.valueMap, "type", (void **) &entryValueType);
+        getValueStringHashMap(entryType->value.valueMap, (unsigned char *) "type", (void **) &entryValueType);
         deleteType(entryValueType);
-        getValueStringHashMap(entryType->value.valueMap, "name", (void **) &entryValueType);
+        getValueStringHashMap(entryType->value.valueMap, (unsigned char *) "name", (void **) &entryValueType);
         deleteType(entryValueType);
-        getValueStringHashMap(entryType->value.valueMap, "size", (void **) &entryValueType);
+        getValueStringHashMap(entryType->value.valueMap, (unsigned char *) "size", (void **) &entryValueType);
         deleteType(entryValueType);
 
         /* deletes the hash map and the entry type */
@@ -221,7 +221,7 @@ ERROR_CODE entriesToMapFile(struct LinkedList_t *entries, struct LinkedList_t **
         entryValueType->value.valueInt = entry->type;
         setValueStringHashMap(entryMap, (unsigned char *) "type", (void *) entryValueType);
         createType(&entryValueType, STRING_TYPE);
-        entryValueType->value.valueString = entry->name;
+        entryValueType->value.valueString = (char *) entry->name;
         setValueStringHashMap(entryMap, (unsigned char *) "name", (void *) entryValueType);
         createType(&entryValueType, INTEGER_TYPE);
         entryValueType->value.valueInt = entry->size;
@@ -473,7 +473,7 @@ ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries) {
         it to create the memory space for the entry name and then
         copies the contents into it */
         entryNameLength = strlen(entity->d_name);
-        entry->name = (char *) MALLOC(entryNameLength + 1);
+        entry->name = (unsigned char *) MALLOC(entryNameLength + 1);
         memcpy(entry->name, entity->d_name, entryNameLength + 1);
 
         /* adds the entry to the list of entries for
