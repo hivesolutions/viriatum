@@ -1,0 +1,252 @@
+body {
+    background-color: #e5e5e5;
+    font-family: Georgia, Times;
+}
+
+h1 {
+    color: #595959;
+    font-size: 10pt;
+    margin: 10px 0px 10px 0px;
+    text-align: center;
+    text-shadow: 1px 1px 1px #ffffff;
+    text-transform: uppercase;
+}
+
+p {
+    color: #666666;
+    font-size: 11pt;
+    line-height: 1.5em;
+    margin: 10px 0px 10px 0px;
+    text-align: center;
+    text-shadow: 1px 1px 1px #ffffff;
+}
+
+a {
+    color: #9e9400;
+    font-size: 8pt;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #000000;
+    text-decoration: underline;
+}
+
+.clear {
+    clear: both;
+}
+
+.left {
+    text-align: left;
+}
+
+.right {
+    text-align: right;
+}
+
+.center {
+    text-align: center;
+}
+
+.bold {
+    font-weight: bold;
+}
+
+.label {
+    color: #a1a1a1;
+}
+
+.table a {
+    font-size: 11pt;
+    color: #595959;
+}
+
+.table a:hover {
+    color: #000000;
+}
+
+.separator-horizontal {
+    background: transparent url(../images/separator-horizontal.png) no-repeat center center;
+    height: 10px;
+    margin: 30px auto 6px auto;
+    width: 260px;
+}
+
+#header-wrapper {
+    width: 100%;
+}
+
+#header-wrapper .header-body {
+    margin: 0px auto 0px auto;
+    width: 960px;
+}
+
+.main-illustration {
+    background: transparent url(../images/illustration/main-illustration.png) no-repeat center center;
+    height: 290px;
+    width: 960px;
+}
+
+.branding.simple {
+    margin-top: 50px;
+}
+
+.branding a {
+    background: transparent url(../images/logo/viriatum-logo.png) no-repeat center center;
+    display: block;
+    height: 48px;
+    margin: 10px auto 20px auto;
+    width: 340px;
+}
+
+#content-wrapper {
+    width: 960px;
+    margin: 0px auto 0px auto;
+}
+
+.content-header {
+    margin: 0px auto 0px auto;
+    width: 340px;
+}
+
+.content-body {
+    margin: 0px auto 0px auto;
+    width: 340px;
+}
+
+#footer-wrapper {
+    width: 960px;
+    margin: 0px auto 0px auto;
+}
+
+.footer-body {
+    margin: 0px auto 0px auto;
+    text-align: center;
+    width: 260px;
+}
+
+.footer-body a {
+    text-transform: uppercase;
+    width: 110px;
+}
+
+.footer-body a.left {
+    float: left;
+    text-align: right;
+}
+
+.footer-body a.right {
+    float: right;
+    text-align: left;
+}
+
+.table.file-listing {
+    width: 660px;
+    margin: 80px auto 20px auto;
+    color: #595959;
+}
+
+.table.file-listing th {
+    font-weight: normal;
+    padding: 8px 0px 8px 36px;
+}
+
+.table.file-listing th:last-child {
+    padding: 8px 10px 8px 0px;
+}
+
+.table.file-listing .current-folder td {
+    border-bottom: 1px solid #CCC;
+    font-weight: bold;
+}
+
+.table.file-listing td {
+    padding: 8px 0px 8px 0px;
+}
+
+.table.file-listing tbody td:last-child {
+    padding: 8px 10px 8px 0px;
+}
+
+.table.file-listing td.icon {
+    width: 16px;
+    padding: 0px 10px 0px 10px;
+}
+
+.table.file-listing tfoot tr td {
+    height: 60px;
+    padding: 0px 0px 0px 0px;
+    vertical-align: bottom;
+}
+
+.icon.arrow-left a {
+    display: block;
+    height: 16px;
+    width: 100%;
+    cursor: pointer;
+    background: transparent url(../images/arrow-left.png) top center no-repeat;
+}
+
+.icon.arrow-left a:hover {
+    background-position: bottom center;
+}
+
+.icon.folder {
+    background: transparent url(../images/mime/icon-folder.png) center center no-repeat;
+}
+
+.icon.image {
+    background: transparent url(../images/mime/icon-image.png) center center no-repeat;
+}
+
+.icon.text {
+    background: transparent url(../images/mime/icon-text.png) center center no-repeat;
+}
+
+.icon.html {
+    background: transparent url(../images/mime/icon-html.png) center center no-repeat;
+}
+
+.table.status {
+    width: 960px;
+    margin: 80px auto 20px auto;
+    color: #595959;
+}
+
+.table.status td {
+    padding: 8px 20px 8px 20px;
+}
+
+.content-header.error {
+    width: 400px;
+    margin: 80px auto 80px auto;
+}
+
+.error-illustration {
+    float: left;
+    height: 280px;
+    width: 200px;
+    background: transparent url(../images/illustration/error-illustration.png) no-repeat center center;
+}
+
+.error-content {
+    float: left;
+    width: 200px;
+    margin-top: 70px;
+}
+
+.error-code {
+    height: 50px;
+    width: 100%;
+    font-family: times;
+    text-shadow: 1px 1px 1px #ffffff;
+    color: #444444;
+    font-size: 38pt;
+    text-align: center;
+}
+
+.error-description {
+    font-size: 16pt;
+    font-weight: normal;
+    text-transform: uppercase;
+}
