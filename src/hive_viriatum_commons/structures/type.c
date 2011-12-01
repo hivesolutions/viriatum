@@ -48,7 +48,18 @@ void deleteType(struct Type_t *type) {
     FREE(type);
 }
 
-ERROR_CODE toStringType(struct Type_t *type, unsigned char *buffer, size_t bufferSize) {
+ERROR_CODE toStringType(struct Type_t *type, unsigned char **bufferPointer) {
+    /* allocates space for both the buffer reference and
+    the value to hold the necessary buffer size */
+    unsigned char *buffer;
+    size_t bufferSize;
+
+    /* retrieves the necessary buffer size for the string
+    representation of the given type, then uses the buffer size
+    to allocate an appropriate buffer */
+    _sizeType(type, &bufferSize);
+    buffer = (unsigned char *) MALLOC(bufferSize);
+
     /* switches over the type's type in order to
     execute the proper type conversion */
     switch(type->type) {
@@ -84,6 +95,10 @@ ERROR_CODE toStringType(struct Type_t *type, unsigned char *buffer, size_t buffe
             /* breaks the switch */
             break;
     }
+
+    /* sets the buffer pointer reference to the
+    value in the bufer */
+    *bufferPointer = buffer;
 
     /* raise no error */
     RAISE_NO_ERROR;
@@ -124,7 +139,7 @@ struct Type_t stringType(char *value) {
     return type;
 }
 
-struct Type_t mapType(struct HashMap *value) {
+struct Type_t mapType(struct HashMap_t *value) {
     /* allocates space for the type */
     struct Type_t type;
 
@@ -136,7 +151,7 @@ struct Type_t mapType(struct HashMap *value) {
     return type;
 }
 
-struct Type_t listType(struct LinkedList *value) {
+struct Type_t listType(struct LinkedList_t *value) {
     /* allocates space for the type */
     struct Type_t type;
 
@@ -146,4 +161,44 @@ struct Type_t listType(struct LinkedList *value) {
 
     /* returns the type */
     return type;
+}
+
+ERROR_CODE _sizeType(struct Type_t *type, size_t *size) {
+    /* switches over the type's type in order to
+    execute the proper type conversion */
+    switch(type->type) {
+        case INTEGER_TYPE:
+            /* sets the size considered the maximum for an integer
+            value representation */
+            *size = 64;
+
+            /* breaks the switch */
+            break;
+
+        case FLOAT_TYPE:
+            /* sets the size considered the maximum for a float
+            value representation */
+            *size = 128;
+
+            /* breaks the switch */
+            break;
+
+        case STRING_TYPE:
+            /* sets the size to the length of the value string
+            plus one */
+            *size = strlen(type->value.valueString) + 1;
+
+            /* breaks the switch */
+            break;
+
+        default:
+            /* sets size the default value size */
+            *size = 10;
+
+            /* breaks the switch */
+            break;
+    }
+
+    /* raise no error */
+    RAISE_NO_ERROR;
 }

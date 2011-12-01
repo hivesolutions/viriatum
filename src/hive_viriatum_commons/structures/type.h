@@ -36,8 +36,8 @@ typedef union TypeValue_t {
     int valueInt;
     float valueFloat;
     char *valueString;
-    struct HashMap *valueMap;
-    struct LinkedList *valueList;
+    struct HashMap_t *valueMap;
+    struct LinkedList_t *valueList;
 
     /**
      * Used to store any other value
@@ -61,7 +61,7 @@ typedef enum Type_e {
     STRING_TYPE,
     MAP_TYPE,
     LIST_TYPE,
-    OTHER_TYPE
+    VOID_TYPE
 } _Type;
 
 /**
@@ -90,9 +90,10 @@ typedef struct Type_t {
 
 VIRIATUM_EXPORT_PREFIX void createType(struct Type_t **typePointer, enum Type_e _type);
 VIRIATUM_EXPORT_PREFIX void deleteType(struct Type_t *type);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE toStringType(struct Type_t *type, unsigned char *buffer, size_t bufferSize);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE toStringType(struct Type_t *type, unsigned char **bufferPointer);
 VIRIATUM_EXPORT_PREFIX struct Type_t integerType(int value);
 VIRIATUM_EXPORT_PREFIX struct Type_t floatType(float value);
 VIRIATUM_EXPORT_PREFIX struct Type_t stringType(char *value);
-VIRIATUM_EXPORT_PREFIX struct Type_t mapType(struct HashMap *value);
-VIRIATUM_EXPORT_PREFIX struct Type_t listType(struct LinkedList *value);
+VIRIATUM_EXPORT_PREFIX struct Type_t mapType(struct HashMap_t *value);
+VIRIATUM_EXPORT_PREFIX struct Type_t listType(struct LinkedList_t *value);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _sizeType(struct Type_t *type, size_t *size);

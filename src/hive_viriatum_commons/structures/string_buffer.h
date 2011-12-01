@@ -48,6 +48,13 @@ typedef struct StringBuffer_t {
      * the complete string value.
      */
     struct LinkedList_t *stringList;
+
+    /**
+     * The list of strings to have the memory
+     * released uppon destruction of the string
+     * buffer.
+     */
+    struct LinkedList_t *releaseList;
 } StringBuffer;
 
 /**
@@ -82,3 +89,15 @@ VIRIATUM_EXPORT_PREFIX void appendStringBuffer(struct StringBuffer_t *stringBuff
  * hold the "joined" string value.
  */
 VIRIATUM_EXPORT_PREFIX void joinStringBuffer(struct StringBuffer_t *stringBuffer, unsigned char **stringValuePointer);
+
+/**
+ * Appends (adds) a string value to the string buffer, this value
+ * will be appended to the final "joined" string.
+ * This method releases the memory of the added string value, uppon
+ * releasing the string buffer memory.
+ * Use this method carefully it may cause memory corruption.
+ *
+ * @param stringBuffer The string buffer reference.
+ * @param stringValue The string value to be added to the string buffer.
+ */
+VIRIATUM_EXPORT_PREFIX void _appendStringBuffer(struct StringBuffer_t *stringBuffer, unsigned char *stringValue);
