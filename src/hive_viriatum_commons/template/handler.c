@@ -343,7 +343,7 @@ void getTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned char
 
         /* retrieves the value from the current value with the
         name token reference key value */
-        getValueStringHashMap(_value, nameToken, &value);
+        getValueStringHashMap(_value, nameToken, (void **) &value);
 
         /* in case the retrieve value is not valid
         (not found), must break immediately */
@@ -504,7 +504,7 @@ void _traverseOutBuffer(struct TemplateHandler_t *templateHandler, struct Templa
 
     /* allocates the buffer to hold the string conversion
     from the source data type of a possible reference */
-    char *buffer;
+    unsigned char *buffer;
 
     /* retrieves value parameter from the parameters map */
     getValueStringHashMap(node->parametersMap, (unsigned char *) "value", (void **) &valueParameter);
