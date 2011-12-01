@@ -58,7 +58,7 @@ ERROR_CODE toStringType(struct Type_t *type, unsigned char **bufferPointer) {
     representation of the given type, then uses the buffer size
     to allocate an appropriate buffer */
     _sizeType(type, &bufferSize);
-    buffer = (unsigned char *) MALLOC(bufferSize);
+    buffer = (char *) MALLOC(bufferSize);
 
     /* switches over the type's type in order to
     execute the proper type conversion */
