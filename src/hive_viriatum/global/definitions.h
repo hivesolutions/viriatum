@@ -29,14 +29,14 @@
 
 #ifdef VIRIATUM_PLATFORM_WIN32
 #define VIRIATUM_RESOURCES_PATH "../../src/hive_viriatum/resources"
-#define VIRIATUM_WELCOME_PATH "/html/welcome"
-#define VIRIATUM_LISTING_PATH "/html/welcome/listing.html"
+#define VIRIATUM_BASE_PATH "/html/base"
+#define VIRIATUM_LISTING_PATH "/html/base/listing.html.tpl"
 #define VIRIATUM_CONTENTS_PATH VIRIATUM_RESOURCES_PATH
 #endif
 #ifdef VIRIATUM_PLATFORM_UNIX
 #define VIRIATUM_RESOURCES_PATH "resources"
-#define VIRIATUM_WELCOME_PATH "/html/welcome"
-#define VIRIATUM_LISTING_PATH "/html/welcome/listing.html"
+#define VIRIATUM_BASE_PATH "/html/base"
+#define VIRIATUM_LISTING_PATH "/html/base/listing.html.tpl"
 #define VIRIATUM_CONTENTS_PATH "/var/viriatum"
 #endif
 
