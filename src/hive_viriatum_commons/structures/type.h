@@ -1,0 +1,87 @@
+/*
+ Hive Viriatum Commons
+ Copyright (C) 2008 Hive Solutions Lda.
+
+ This file is part of Hive Viriatum Commons.
+
+ Hive Viriatum Commons is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ Hive Viriatum Commons is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with Hive Viriatum Commons. If not, see <http://www.gnu.org/licenses/>.
+
+ __author__    = João Magalhães <joamag@hive.pt>
+ __version__   = 1.0.0
+ __revision__  = $LastChangedRevision$
+ __date__      = $LastChangedDate$
+ __copyright__ = Copyright (c) 2008 Hive Solutions Lda.
+ __license__   = GNU General Public License (GPL), Version 3
+*/
+
+#pragma once
+
+#include "hash_map.h"
+#include "linked_list.h"
+
+typedef union TypeValue_t {
+    int valueInt;
+    float valueFloat;
+    char *valueString;
+    struct HashMap *valueMap;
+    struct LinkedList *valueList;
+
+    /**
+     * Used to store any other value
+     * described as a type.
+     * This value must be casted uppon
+     * usage.
+     */
+    void *valuePointer;
+} TypeValue;
+
+/**
+ * Enumeration describing the various types
+ * (of types) that can be used in the type
+ * structure.
+ * This types represent both the basic data
+ * types and the "extended" ones.
+ */
+typedef enum Type_e {
+	INTEGER_TYPE = 1,
+	FLOAT_TYPE,
+	STRING_TYPE,
+	HASH_MAP_TYPE,
+	LIST_TYPE,
+	OTHER_TYPE
+} _Type;
+
+/**
+ * Structure that defines a "portable" type
+ * that can be interpreted and correctly
+ * converted at runtime.
+ * This kind of type is inspired by the data
+ * structures used in dynamic languages.
+ */
+typedef struct Type_t {
+	/**
+	 * The type of the current type,
+	 * (eg: integer, float, string).
+	 */
+    enum Type_e type;
+
+	/**
+	 * The value or a pointer to the
+	 * value of the current type.
+	 * It's important to interpret the type
+	 * value before acessing the correct
+	 * value in the union.
+	 */
+    union TypeValue_t value;
+} Type;

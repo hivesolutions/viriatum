@@ -534,6 +534,10 @@
 					RelativePath="..\..\src\hive_viriatum_commons\structures\string_buffer.c"
 					>
 				</File>
+				<File
+					RelativePath="..\..\src\hive_viriatum_commons\structures\type.c"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="Util"
@@ -710,6 +714,10 @@
 				</File>
 				<File
 					RelativePath="..\..\src\hive_viriatum_commons\structures\structures.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\hive_viriatum_commons\structures\type.h"
 					>
 				</File>
 			</Filter>
