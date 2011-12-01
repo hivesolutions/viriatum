@@ -25,10 +25,7 @@
 
 include $(top_srcdir)/Common.am
 
-nobase_dist_resources_DATA = html/base/error.html.tpl \
-html/base/index.html \
-html/base/listing.html.tpl \
-html/base/status.html.tpl \
+nobase_dist_resources_DATA = html/base/index.html \
 html/base/resources/css/layout.css \
 html/base/resources/images/arrow-left.png \
 html/base/resources/images/favicon.ico \
@@ -40,4 +37,7 @@ html/base/resources/images/logo/viriatum-background-logo.png \
 html/base/resources/images/mime/icon-folder.png \
 html/base/resources/images/mime/icon-html.png \
 html/base/resources/images/mime/icon-image.png \
-html/base/resources/images/mime/icon-text.png
+html/base/resources/images/mime/icon-text.png \
+html/base/templates/error.html.tpl \
+html/base/templates/listing.html.tpl \
+html/base/templates/status.html.tpl
