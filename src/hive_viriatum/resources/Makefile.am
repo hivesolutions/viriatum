@@ -33,7 +33,6 @@ html/welcome/resources/css/layout.css \
 html/welcome/resources/images/arrow-left.png \
 html/welcome/resources/images/favicon.ico \
 html/welcome/resources/images/separator-horizontal.png \
-html/welcome/resources/images/error/error-code-404.png \
 html/welcome/resources/images/illustration/error-illustration.png \
 html/welcome/resources/images/illustration/main-illustration.png \
 html/welcome/resources/images/logo/viriatum-logo.png \

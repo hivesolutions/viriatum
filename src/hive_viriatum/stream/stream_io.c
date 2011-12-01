@@ -132,7 +132,8 @@ ERROR_CODE acceptHandlerStreamIo(struct Connection_t *connection) {
         }
     }
 
-    return 0;
+	/* raise no error */
+    RAISE_NO_ERROR;
 }
 
 ERROR_CODE readHandlerStreamIo(struct Connection_t *connection) {
@@ -270,8 +271,8 @@ ERROR_CODE readHandlerStreamIo(struct Connection_t *connection) {
             break;
     }
 
-    /* returns the error code */
-    return error;
+    /* raises the error code */
+    RAISE_ERROR(error);
 }
 
 ERROR_CODE writeHandlerStreamIo(struct Connection_t *connection) {
@@ -420,15 +421,16 @@ ERROR_CODE writeHandlerStreamIo(struct Connection_t *connection) {
             break;
     }
 
-    /* returns the error code */
-    return error;
+    /* raises the error code */
+    RAISE_ERROR(error);
 }
 
 ERROR_CODE errorHandlerStreamIo(struct Connection_t *connection) {
     /* closes the connection */
     connection->closeConnection(connection);
 
-    return 0;
+	/* raise no error */
+    RAISE_NO_ERROR;
 }
 
 ERROR_CODE openHandlerStreamIo(struct Connection_t *connection) {
@@ -456,7 +458,8 @@ ERROR_CODE openHandlerStreamIo(struct Connection_t *connection) {
         V_DEBUG("Finished calling on open handler\n");
     }
 
-    return 0;
+	/* raise no error */
+    RAISE_NO_ERROR;
 }
 
 ERROR_CODE closeHandlerStreamIo(struct Connection_t *connection) {
@@ -478,5 +481,6 @@ ERROR_CODE closeHandlerStreamIo(struct Connection_t *connection) {
     /* deletes the io connection */
     deleteIoConnection(ioConnection);
 
-    return 0;
+	/* raise no error */
+    RAISE_NO_ERROR;
 }
