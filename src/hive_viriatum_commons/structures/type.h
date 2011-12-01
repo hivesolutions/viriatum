@@ -27,6 +27,8 @@
 
 #pragma once
 
+#include "../debug/debug.h"
+#include "../system/system.h"
 #include "hash_map.h"
 #include "linked_list.h"
 
@@ -54,12 +56,12 @@ typedef union TypeValue_t {
  * types and the "extended" ones.
  */
 typedef enum Type_e {
-	INTEGER_TYPE = 1,
-	FLOAT_TYPE,
-	STRING_TYPE,
-	HASH_MAP_TYPE,
-	LIST_TYPE,
-	OTHER_TYPE
+    INTEGER_TYPE = 1,
+    FLOAT_TYPE,
+    STRING_TYPE,
+    MAP_TYPE,
+    LIST_TYPE,
+    OTHER_TYPE
 } _Type;
 
 /**
@@ -70,18 +72,27 @@ typedef enum Type_e {
  * structures used in dynamic languages.
  */
 typedef struct Type_t {
-	/**
-	 * The type of the current type,
-	 * (eg: integer, float, string).
-	 */
+    /**
+     * The type of the current type,
+     * (eg: integer, float, string).
+     */
     enum Type_e type;
 
-	/**
-	 * The value or a pointer to the
-	 * value of the current type.
-	 * It's important to interpret the type
-	 * value before acessing the correct
-	 * value in the union.
-	 */
+    /**
+     * The value or a pointer to the
+     * value of the current type.
+     * It's important to interpret the type
+     * value before acessing the correct
+     * value in the union.
+     */
     union TypeValue_t value;
 } Type;
+
+VIRIATUM_EXPORT_PREFIX void createType(struct Type_t **typePointer, enum Type_e _type);
+VIRIATUM_EXPORT_PREFIX void deleteType(struct Type_t *type);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE toStringType(struct Type_t *type, unsigned char *buffer, size_t bufferSize);
+VIRIATUM_EXPORT_PREFIX struct Type_t integerType(int value);
+VIRIATUM_EXPORT_PREFIX struct Type_t floatType(float value);
+VIRIATUM_EXPORT_PREFIX struct Type_t stringType(char *value);
+VIRIATUM_EXPORT_PREFIX struct Type_t mapType(struct HashMap *value);
+VIRIATUM_EXPORT_PREFIX struct Type_t listType(struct LinkedList *value);
