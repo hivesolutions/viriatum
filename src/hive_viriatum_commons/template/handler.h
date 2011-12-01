@@ -161,6 +161,7 @@ typedef struct TemplateHandler_t {
     struct LinkedList_t *contexts;
     struct HashMap_t *names;
     struct StringBuffer_t *stringBuffer;
+    struct LinkedList_t *releaseList;
 } TemplateHandler;
 
 VIRIATUM_EXPORT_PREFIX void createTemplateHandler(struct TemplateHandler_t **templateHandlerPointer);
@@ -170,8 +171,9 @@ VIRIATUM_EXPORT_PREFIX void deleteTemplateNode(struct TemplateNode_t *templateNo
 VIRIATUM_EXPORT_PREFIX void createTemplateParameter(struct TemplateParameter_t **templateParameterPointer);
 VIRIATUM_EXPORT_PREFIX void deleteTemplateParameter(struct TemplateParameter_t *templateParameter);
 VIRIATUM_EXPORT_PREFIX void processTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned char *filePath);
-VIRIATUM_EXPORT_PREFIX void assignTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned char *name, void *value);
-VIRIATUM_EXPORT_PREFIX void getTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned char *name, void **value);
+VIRIATUM_EXPORT_PREFIX void assignTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned char *name, struct Type_t *value);
+VIRIATUM_EXPORT_PREFIX void assignListTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned char *name, struct LinkedList_t *value);
+VIRIATUM_EXPORT_PREFIX void getTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned char *name, struct Type_t **valuePointer);
 VIRIATUM_EXPORT_PREFIX void traverseNodeDebug(struct TemplateHandler_t *templateHandler, struct TemplateNode_t *node, unsigned int indentation);
 VIRIATUM_EXPORT_PREFIX void traverseNodeBuffer(struct TemplateHandler_t *templateHandler, struct TemplateNode_t *node);
 VIRIATUM_EXPORT_PREFIX void traverseNodesBuffer(struct TemplateHandler_t *templateHandler, struct TemplateNode_t *node);

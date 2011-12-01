@@ -50,6 +50,10 @@ void createTemplateHandler(struct TemplateHandler_t **templateHandlerPointer) {
     the result of the template processing */
     createStringBuffer(&templateHandler->stringBuffer);
 
+    /* creates the list to hold the various types
+    to have the memory released uppon destruction */
+    createLinkedList(&templateHandler->releaseList);
+
     /* sets the template engine in the template handler pointer */
     *templateHandlerPointer = templateHandler;
 }
@@ -57,6 +61,9 @@ void createTemplateHandler(struct TemplateHandler_t **templateHandlerPointer) {
 void deleteTemplateHandler(struct TemplateHandler_t *templateHandler) {
     /* allocates space for the temporary node variable */
     struct TemplateNode_t *node;
+
+    /* allocates space for the temporary type */
+    struct Type_t *type;
 
     /* in case the string value is set */
     if(templateHandler->stringValue) {
@@ -91,6 +98,27 @@ void deleteTemplateHandler(struct TemplateHandler_t *templateHandler) {
         /* deletes the nodes list */
         deleteLinkedList(templateHandler->nodes);
     }
+
+
+
+    /* iterates continuously for release list
+    cleanup (type memory release) */
+    while(1) {
+        /* pops a node from the release list */
+        popValueLinkedList(templateHandler->releaseList, (void **) &type, 1);
+
+        /* in case the value is invalid (empty list) */
+        if(type == NULL) {
+            /* breaks the cycle */
+            break;
+        }
+
+        /* deletes the type */
+        deleteType(type);
+    }
+
+    /* deletes the list of release types from the template handler */
+    deleteLinkedList(templateHandler->releaseList);
 
     /* deletes the string buffer */
     deleteStringBuffer(templateHandler->stringBuffer);
@@ -245,17 +273,37 @@ void processTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned 
     deleteTemplateEngine(templateEngine);
 }
 
-void assignTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned char *name, void *value) {
+void assignTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned char *name, struct Type_t *value) {
     /* sets the a new name (key) in the names hash map */
     setValueStringHashMap(templateHandler->names, name, value);
 }
 
-void getTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned char *name, void **value) {
+void assignListTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned char *name, struct LinkedList_t *value) {
+    /* allocates space for the type */
+    struct Type_t *type;
+
+    /* create a list type and sets the value
+    to the list to be assigned */
+    createType(&type, LIST_TYPE);
+    type->value.valueList = value;
+
+    /* sets the value (list) in the template handler names hash map */
+    setValueStringHashMap(templateHandler->names, name, type);
+
+    /* adds the type to the list of types to have the
+    memory release uppon template handler destruction (late removal) */
+    appendValueLinkedList(templateHandler->releaseList, type);
+}
+
+void getTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned char *name, struct Type_t **valuePointer) {
     /* allocates space for the temporary (tokanizable) name variable
     and for the generated token values*/
     unsigned char _name[64];
     unsigned char *nameToken;
     unsigned char *context;
+
+    /* allocates space for the (type) value */
+    struct Type_t *value;
 
     /* retrieves the template global names as thee base value */
     struct HashMap_t *_value = templateHandler->names;
@@ -278,7 +326,18 @@ void getTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned char
 
         /* retrieves the value from the current value with the
         name token reference key value */
-        getValueStringHashMap(_value, nameToken, (void **) &_value);
+        getValueStringHashMap(_value, nameToken, &value);
+
+        /* in case the retrieve value is not valid
+        (not found), must break immediately */
+        if(value == NULL) {
+            /* breaks the loop */
+            break;
+        }
+
+        /* updates the (hash map) value reference with the "newly"
+        retrieved value */
+        _value = value->value.valueMap;
 
         /* retrieves the next token */
         nameToken = (unsigned char *) STRTOK(NULL, ".", context);
@@ -286,7 +345,7 @@ void getTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned char
 
     /* sets the value pointer with the internal
     retrieved value */
-    *value = _value;
+    *valuePointer = value;
 }
 
 void traverseNodeDebug(struct TemplateHandler_t *templateHandler, struct TemplateNode_t *node, unsigned int indentation) {
@@ -424,7 +483,10 @@ void _traverseOutBuffer(struct TemplateHandler_t *templateHandler, struct Templa
     /* allocates space for the value parameter and for
     the value reference */
     struct TemplateParameter_t *valueParameter;
-    unsigned char *value;
+    struct Type_t *value;
+
+
+    char *buffer;
 
     /* retrieves value parameter from the parameters map */
     getValueStringHashMap(node->parametersMap, (unsigned char *) "value", (void **) &valueParameter);
@@ -441,12 +503,16 @@ void _traverseOutBuffer(struct TemplateHandler_t *templateHandler, struct Templa
 
         case TEMPLATE_PARAMETER_REFERENCE:
             /* retrievs the value reference from the global names map */
-            getTemplateHandler(templateHandler, valueParameter->referenceValue, (void **) &value);
+            getTemplateHandler(templateHandler, valueParameter->referenceValue, &value);
+
+            /* converts the value into a string representation, to
+            be used in the template generation */
+            toStringType(value, &buffer);
 
             /* in case the value was successfully found */
             if(value != NULL) {
                 /* adds the value (string) to the string buffer */
-                appendStringBuffer(templateHandler->stringBuffer, value);
+                _appendStringBuffer(templateHandler->stringBuffer, buffer);
             }
 
             /* breaks the switch */
@@ -477,9 +543,13 @@ void _traverseForEachBuffer(struct TemplateHandler_t *templateHandler, struct Te
     struct TemplateParameter_t *itemParameter;
     struct TemplateParameter_t *fromParameter;
 
-    /* allocates space for the value representing the linked
+    /* allocates space for the (type) value, to be used
+    in the retrieval of the value from the names map */
+    struct Type_t *value;
+
+    /* allocates space for the list representing the linked
     list and for the iterator used for percolation */
-    struct LinkedList_t *value;
+    struct LinkedList_t *list;
     struct Iterator_t *iterator;
 
     /* allocates space for the current vale temporary variable */
@@ -491,7 +561,7 @@ void _traverseForEachBuffer(struct TemplateHandler_t *templateHandler, struct Te
 
     /* tries to retrieve the reference value from the map of names in the
     template handler (dereferencing) */
-    getTemplateHandler(templateHandler, fromParameter->referenceValue, (void **) &value);
+    getTemplateHandler(templateHandler, fromParameter->referenceValue, &value);
 
     /* in case the value was not found */
     if(value == NULL) {
@@ -499,9 +569,12 @@ void _traverseForEachBuffer(struct TemplateHandler_t *templateHandler, struct Te
         return;
     }
 
+    /* sets the list as the value represented by the type */
+    list = value->value.valueList;
+
     /* creates the iterator for the value, assumes it
     is iterable (fails otherwise) */
-    createIteratorLinkedList(value, &iterator);
+    createIteratorLinkedList(list, &iterator);
 
     /* iterates over all the available elements in the
     iterator element */
@@ -523,7 +596,7 @@ void _traverseForEachBuffer(struct TemplateHandler_t *templateHandler, struct Te
     }
 
     /* deletes the iterator */
-    deleteIteratorLinkedList(value, iterator);
+    deleteIteratorLinkedList(list, iterator);
 }
 
 void _traverseIfBuffer(struct TemplateHandler_t *templateHandler, struct TemplateNode_t *node) {
@@ -533,7 +606,7 @@ void _traverseIfBuffer(struct TemplateHandler_t *templateHandler, struct Templat
     struct TemplateParameter_t *operatorParameter;
 
     /* allocates space for the value to be retrieved */
-    void *value;
+    struct Type_t *value;
 
     /* retrieves both the from and the item parameters from the parameters map */
     getValueStringHashMap(node->parametersMap, (unsigned char *) "item", (void **) &itemParameter);
@@ -542,7 +615,7 @@ void _traverseIfBuffer(struct TemplateHandler_t *templateHandler, struct Templat
 
     /* tries to retrieve the reference value from the map of names in the
     template handler (dereferencing) */
-    getTemplateHandler(templateHandler, (unsigned char *) "entry.type", (void **) &value);
+    getTemplateHandler(templateHandler, (unsigned char *) "entry.type", &value);
 
     /* in case the value was not found */
     if(value == NULL) {
@@ -550,7 +623,7 @@ void _traverseIfBuffer(struct TemplateHandler_t *templateHandler, struct Templat
         return;
     }
 
-    if((int) value != valueParameter->intValue) {
+    if(value->value.valueInt != valueParameter->intValue) {
         return;
     }
 
