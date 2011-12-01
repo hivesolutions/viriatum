@@ -51,14 +51,14 @@ void deleteType(struct Type_t *type) {
 ERROR_CODE toStringType(struct Type_t *type, unsigned char **bufferPointer) {
     /* allocates space for both the buffer reference and
     the value to hold the necessary buffer size */
-    char *buffer;
+    unsigned char *buffer;
     size_t bufferSize;
 
     /* retrieves the necessary buffer size for the string
     representation of the given type, then uses the buffer size
     to allocate an appropriate buffer */
     _sizeType(type, &bufferSize);
-    buffer = (char *) MALLOC(bufferSize);
+    buffer = (unsigned char *) MALLOC(bufferSize);
 
     /* switches over the type's type in order to
     execute the proper type conversion */
@@ -66,7 +66,7 @@ ERROR_CODE toStringType(struct Type_t *type, unsigned char **bufferPointer) {
         case INTEGER_TYPE:
             /* converts the integer value using the string
             conversion function for integer values */
-            SPRINTF(buffer, bufferSize, "%d", type->value.valueInt);
+            SPRINTF((char *) buffer, bufferSize, "%d", type->value.valueInt);
 
             /* breaks the switch */
             break;
@@ -74,7 +74,7 @@ ERROR_CODE toStringType(struct Type_t *type, unsigned char **bufferPointer) {
         case FLOAT_TYPE:
             /* converts the float value using the string
             conversion function for float values */
-            SPRINTF(buffer, bufferSize, "%f", type->value.valueFloat);
+            SPRINTF((char *) buffer, bufferSize, "%f", type->value.valueFloat);
 
             /* breaks the switch */
             break;
