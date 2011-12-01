@@ -25,19 +25,19 @@
 
 include $(top_srcdir)/Common.am
 
-nobase_dist_resources_DATA = html/welcome/error.html \
-html/welcome/index.html \
-html/welcome/listing.html \
-html/welcome/status.html \
-html/welcome/resources/css/layout.css \
-html/welcome/resources/images/arrow-left.png \
-html/welcome/resources/images/favicon.ico \
-html/welcome/resources/images/separator-horizontal.png \
-html/welcome/resources/images/illustration/error-illustration.png \
-html/welcome/resources/images/illustration/main-illustration.png \
-html/welcome/resources/images/logo/viriatum-logo.png \
-html/welcome/resources/images/logo/viriatum-background-logo.png \
-html/welcome/resources/images/mime/icon-folder.png \
-html/welcome/resources/images/mime/icon-html.png \
-html/welcome/resources/images/mime/icon-image.png \
-html/welcome/resources/images/mime/icon-text.png
+nobase_dist_resources_DATA = html/base/error.html.tpl \
+html/base/index.html.tpl \
+html/base/listing.html.tpl \
+html/base/status.html.tpl \
+html/base/resources/css/layout.css \
+html/base/resources/images/arrow-left.png \
+html/base/resources/images/favicon.ico \
+html/base/resources/images/separator-horizontal.png \
+html/base/resources/images/illustration/error-illustration.png \
+html/base/resources/images/illustration/main-illustration.png \
+html/base/resources/images/logo/viriatum-logo.png \
+html/base/resources/images/logo/viriatum-background-logo.png \
+html/base/resources/images/mime/icon-folder.png \
+html/base/resources/images/mime/icon-html.png \
+html/base/resources/images/mime/icon-image.png \
+html/base/resources/images/mime/icon-text.png
