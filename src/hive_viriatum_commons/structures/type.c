@@ -64,16 +64,16 @@ ERROR_CODE toStringType(struct Type_t *type, unsigned char **bufferPointer) {
     execute the proper type conversion */
     switch(type->type) {
         case INTEGER_TYPE:
-            /* converts the integer value using the
-            "default" integer to ascii conversion */
-            itoa(type->value.valueInt, buffer, 10);
+            /* converts the integer value using the string
+            conversion function for integer values */
+            SPRINTF(buffer, bufferSize, "%d", type->value.valueInt);
 
             /* breaks the switch */
             break;
 
         case FLOAT_TYPE:
             /* converts the float value using the string
-            *conversion function for float values */
+            conversion function for float values */
             SPRINTF(buffer, bufferSize, "%f", type->value.valueFloat);
 
             /* breaks the switch */
