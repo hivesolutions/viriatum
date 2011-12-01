@@ -43,11 +43,37 @@ void createStringBuffer(struct StringBuffer_t **stringBufferPointer) {
     for the string buffer runtime */
     createLinkedList(&stringBuffer->stringList);
 
+    /* creates the list to hold the various strings
+    to have the memory released uppon destruction */
+    createLinkedList(&stringBuffer->releaseList);
+
     /* sets the string buffer in the string buffer pointer */
     *stringBufferPointer = stringBuffer;
 }
 
 void deleteStringBuffer(struct StringBuffer_t *stringBuffer) {
+    /* allocates space for the temporary string value */
+    unsigned char *stringValue;
+
+    /* iterates continuously for release list
+    cleanup (string value memory release) */
+    while(1) {
+        /* pops a node from the release list */
+        popValueLinkedList(stringBuffer->releaseList, (void **) &stringValue, 1);
+
+        /* in case the value is invalid (empty list) */
+        if(stringValue == NULL) {
+            /* breaks the cycle */
+            break;
+        }
+
+        /* deletes the string value */
+        FREE(stringValue);
+    }
+
+    /* deletes the list of release strings from the string buffer */
+    deleteLinkedList(stringBuffer->releaseList);
+
     /* deletes the list of strings from the string buffer */
     deleteLinkedList(stringBuffer->stringList);
 
@@ -122,4 +148,13 @@ void joinStringBuffer(struct StringBuffer_t *stringBuffer, unsigned char **strin
 
     /* deletes the string iterator */
     deleteIteratorLinkedList(stringBuffer->stringList, stringIterator);
+}
+
+void _appendStringBuffer(struct StringBuffer_t *stringBuffer, unsigned char *stringValue) {
+    /* adds the string value to the list of strings to have
+    the memory released uppon string buffer release */
+    appendValueLinkedList(stringBuffer->releaseList, stringValue);
+
+    /* adds the string value to the string buffer */
+    appendStringBuffer(stringBuffer, stringValue);
 }
