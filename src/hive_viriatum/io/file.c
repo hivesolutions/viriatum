@@ -361,7 +361,7 @@ ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries) {
         it to create the memory space for the entry name and then
         copies the contents into it */
         entryNameLength = strlen(findData.cFileName);
-        entry->name = (char *) MALLOC(entryNameLength + 1);
+        entry->name = (unsigned char *) MALLOC(entryNameLength + 1);
         memcpy(entry->name, findData.cFileName, entryNameLength + 1);
 
         /* adds the entry to the list of entries for
