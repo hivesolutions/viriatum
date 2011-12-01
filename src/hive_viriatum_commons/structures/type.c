@@ -51,7 +51,7 @@ void deleteType(struct Type_t *type) {
 ERROR_CODE toStringType(struct Type_t *type, unsigned char **bufferPointer) {
     /* allocates space for both the buffer reference and
     the value to hold the necessary buffer size */
-    unsigned char *buffer;
+    char *buffer;
     size_t bufferSize;
 
     /* retrieves the necessary buffer size for the string
