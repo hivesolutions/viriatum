@@ -39,6 +39,12 @@
  */
 #define DEFAULT_MAXIMUM_LOAD_FACTOR 0.75
 
+/**
+ * The default factor to be used when resizing the
+ * the hash map due to size overflow.
+ */
+#define DEFAULT_RESIZE_FACTOR 4
+
 typedef struct HashMap_t {
     size_t size;
     size_t maximumSize;
@@ -59,4 +65,5 @@ VIRIATUM_EXPORT_PREFIX void setValueHashMap(struct HashMap_t *hashMap, size_t ke
 VIRIATUM_EXPORT_PREFIX void setValueStringHashMap(struct HashMap_t *hashMap, unsigned char *keyString, void *value);
 VIRIATUM_EXPORT_PREFIX void getValueHashMap(struct HashMap_t *hashMap, size_t key, void **valuePointer);
 VIRIATUM_EXPORT_PREFIX void getValueStringHashMap(struct HashMap_t *hashMap, unsigned char *keyString, void **valuePointer);
+VIRIATUM_EXPORT_PREFIX void _resizeHashMap(struct HashMap_t *hashMap);
 VIRIATUM_EXPORT_PREFIX size_t _calculateStringHashMap(unsigned char *keyString);

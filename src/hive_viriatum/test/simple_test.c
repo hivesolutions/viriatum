@@ -135,15 +135,24 @@ void testHashMap() {
     struct HashMap_t *hashMap;
 
     /* creates the hash map */
-    createHashMap(&hashMap, 0);
+    createHashMap(&hashMap, 3);
 
     /* sets and retrieves the value in the hash map */
-    setValueHashMap(hashMap, 123123, (void *) 1);
-    getValueHashMap(hashMap, 123123, &element);
+    setValueHashMap(hashMap, 1, (void *) 1);
+    getValueHashMap(hashMap, 1, &element);
+
+    /* sets and retrieves the value in the hash map */
+    setValueHashMap(hashMap, 2, (void *) 2);
+    getValueHashMap(hashMap, 2, &element);
+
+    /* sets and retrieves the value in the hash map,
+    (thi set should for re-sizing) */
+    setValueHashMap(hashMap, 3, (void *) 3);
+    getValueHashMap(hashMap, 3, &element);
 
     /* sets and retrieves the value (using a string)
     in the hash map */
-    setValueStringHashMap(hashMap, (unsigned char *) "test", (void *) 2);
+    setValueStringHashMap(hashMap, (unsigned char *) "test", (void *) 4);
     getValueStringHashMap(hashMap, (unsigned char *) "test", (void **) &element);
 
     /* deletes the hash map */

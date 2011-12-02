@@ -76,18 +76,60 @@ void deleteHashMap(struct HashMap_t *hashMap) {
 }
 
 void setValueHashMap(struct HashMap_t *hashMap, size_t key, void *value) {
-    /* calculates the index using the modulus */
-    size_t index = key % hashMap->elementsBufferSize;
+    /* allocates space for the hash map element to be used */
+    struct HashMapElement_t *element;
 
-    /* retrieves the base address value */
-    struct HashMapElement_t *element = &hashMap->elementsBuffer[index];
+    /* allocates space for the index used for element
+    access (computed modulus hash) */
+    size_t index;
+
+    /* in case the current hash map size "overflows"
+    the maximum size (a resizing is required) */
+    if(hashMap->size >= hashMap->maximumSize) {
+        /* resizes the hash map to an appropriate
+        size to avoid collisions */
+        _resizeHashMap(hashMap);
+    }
+
+    /* calculates the index using the modulus */
+    index = key % hashMap->elementsBufferSize;
+
+    /* iterates continously (to get an empty space
+    in the hash map), this conforms with the open
+    addressing strategy for hash maps */
+    while(1) {
+        /* retrieves the base address value */
+        element = &hashMap->elementsBuffer[index];
+
+        /* in case the element is empty or the
+        key is the same (overwrite) */
+        if(element->used == 0 || element->key == key) {
+            /* breaks the loop */
+            break;
+        }
+
+        /* in case the index value is "normal"
+        and sane (normal case) */
+        if(index < hashMap->elementsBufferSize - 1) {
+            /* increment the index value */
+            index++;
+        }
+        /* otherwise the hash map overflows (need
+        to reset the counter value) */
+        else {
+            /* resets the index value (overflow) */
+            index = 0;
+        }
+    }
 
     /* sets the element fields */
     element->value = value;
     element->key = key;
     element->used = 1;
-}
 
+    /* increments the hash map size */
+    hashMap->size++;
+}
 void setValueStringHashMap(struct HashMap_t *hashMap, unsigned char *keyString, void *value) {
     /* calculates the key (hash) value from the key string
     and uses it to set the value in the hash map */
@@ -96,11 +138,46 @@ void setValueStringHashMap(struct HashMap_t *hashMap, unsigned char *keyString, 
 }
 
 void getHashMap(struct HashMap_t *hashMap, size_t key, struct HashMapElement_t **elementPointer) {
+    /* allocates space for the hash map element to be used */
+    struct HashMapElement_t *element;
+
     /* calculates the index using the modulus */
     size_t index = key % hashMap->elementsBufferSize;
 
-    /* retrieves the base address value */
-    struct HashMapElement_t *element = &hashMap->elementsBuffer[index];
+    /* iterates continously (to get retrieve the appropriate
+    element in the hash map), this conforms with the open
+    addressing strategy for hash maps */
+    while(1) {
+        /* retrieves the base address value */
+        element = &hashMap->elementsBuffer[index];
+
+        /* in case the element is not used, the element
+        search is over (element was not found) */
+        if(element->used == 0) {
+            /* breaks the loop */
+            break;
+        }
+
+        /* in case the element key is the same as the
+        requested (element found) */
+        if(element->key == key) {
+            /* breaks the loop */
+            break;
+        }
+
+        /* in case the index value is "normal"
+        and sane (normal case) */
+        if(index < hashMap->elementsBufferSize - 1) {
+            /* increment the index value */
+            index++;
+        }
+        /* otherwise the hash map overflows (need
+        to reset the counter value) */
+        else {
+            /* resets the index value (overflow) */
+            index = 0;
+        }
+    }
 
     /* sets the element in the element pointer */
     *elementPointer = element;
@@ -122,6 +199,54 @@ void getValueStringHashMap(struct HashMap_t *hashMap, unsigned char *keyString, 
     and uses it to retrieve the value from the hash map */
     size_t key = _calculateStringHashMap(keyString);
     getValueHashMap(hashMap, key, valuePointer);
+}
+
+void _resizeHashMap(struct HashMap_t *hashMap) {
+    /* allocates space for the index */
+    size_t index = 0;
+
+    /* allocates space for the hash map element to be used
+    for the copy of the elements data */
+    struct HashMapElement_t *element;
+
+    /* allocates space and copies the "old" elements
+    buffer and size (backup of elements buffer) */
+    struct HashMapElement_t *elementsBuffer = hashMap->elementsBuffer;
+    size_t elementsBufferSize = hashMap->elementsBufferSize;
+
+    /* resets the hash map size to zero (no elements inserted) */
+    hashMap->size = 0;
+
+    /* increments the elements buffer size by the default
+    resize factor and creates the new memory buffer for them */
+    hashMap->elementsBufferSize *= DEFAULT_RESIZE_FACTOR;
+    hashMap->elementsBuffer = (struct HashMapElement_t *) MALLOC(hashMap->elementSize * hashMap->elementsBufferSize);
+
+    /* re-calculates the maximum size that elements buffer may
+    assume before resizing */
+    hashMap->maximumSize = (size_t) ((double) hashMap->elementsBufferSize * DEFAULT_MAXIMUM_LOAD_FACTOR);
+
+    /* resets the elements buffer value */
+    memset(hashMap->elementsBuffer, 0, hashMap->elementSize * hashMap->elementsBufferSize);
+
+    /* iterates over all the "old" elements to copy
+    and set them in the new hash map buffer */
+    for(index = 0; index < elementsBufferSize; index++) {
+        /* retrieves the current element structure from
+        the elements buffer to set the element key and value
+        in the "newly" resized hash map */
+        element = &elementsBuffer[index];
+
+        /* in case the element is not "used", there's
+        no need to set the value in the hash map*/
+        if(element->used == 0) {
+            /* continues the loop */
+            continue;
+        }
+
+        /* sets the value (key and value) in the hash map (copy step) */
+        setValueHashMap(hashMap, element->key, element->value);
+    }
 }
 
 size_t _calculateStringHashMap(unsigned char *keyString) {
