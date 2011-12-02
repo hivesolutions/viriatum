@@ -87,9 +87,11 @@ typedef struct HandlerFileContext_t {
      */
     unsigned int flushed;
 
+    unsigned char cacheControlStatus;
+    unsigned char cacheControl[128];
 
     unsigned char etagStatus;
-    unsigned char etag[9];
+    unsigned char etag[11];
 } HandlerFileContext;
 
 ERROR_CODE createHandlerFileContext(struct HandlerFileContext_t **handlerFileContextPointer);
