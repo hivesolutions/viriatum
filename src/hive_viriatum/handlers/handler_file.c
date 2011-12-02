@@ -310,14 +310,14 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
         extra problems while computing the etag */
         if(!IS_ERROR_CODE(errorCode)) {
             /* retrieve the time of the last write in the file path */
-            getWriteTimeFile(handlerFileContext->filePath, &time);
+            getWriteTimeFile((char *) handlerFileContext->filePath, &time);
 
             /* creates the date time string for the file entry */
             SPRINTF(timeString, 17, "%04d-%02d-%02d %02d:%02d", time.year, time.month, time.day, time.hour, time.minute);
 
             /* creates the crc32 value and prints it into the
             etag as an heexadecimal string value */
-            crc32Value = crc32(timeString, 1);
+            crc32Value = crc32((unsigned char *) timeString, 1);
             SPRINTF(etag, 11, "\"%08x\"",  crc32Value);
         }
     }
@@ -350,7 +350,7 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
         /* writes both the headers to the connection, registers for the appropriate callbacks */
         writeConnection(connection, (unsigned char *) headersBuffer, strlen(headersBuffer), _sendDataHandlerFile, handlerFileContext);
     }
-    else if(handlerFileContext->etagStatus == 2 && strcmp(etag, handlerFileContext->etag) == 0) {
+    else if(handlerFileContext->etagStatus == 2 && strcmp(etag, (char *) handlerFileContext->etag) == 0) {
         /* writes the http static headers to the response */
         SPRINTF(headersBuffer, 1024, "HTTP/1.1 304 Not Modified\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nCache-Control: no-cache, must-revalidate\r\nContent-Length: 0\r\n\r\n", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU);
 
