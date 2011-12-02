@@ -318,7 +318,7 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
             /* creates the crc32 value and prints it into the
             etag as an heexadecimal string value */
             crc32Value = crc32((unsigned char *) timeString, 1);
-            SPRINTF(etag, 11, "\"%08x\"",  crc32Value);
+            SPRINTF(etag, 11, "\"%08x\"", (unsigned int) crc32Value);
         }
     }
 
