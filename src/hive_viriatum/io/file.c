@@ -473,17 +473,20 @@ ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries) {
 
 ERROR_CODE getWriteTimeFile(char *filePath, struct DateTime_t *dateTime) {
 	struct stat fileStat;
+	struct gm time;
 
     stat(filePath, &fileStat);
 
+	struct tm *gmtime_r(&fileStat.st_mtime, &time);
+
     /* populates the date time structure with the information
     on the file various parts */
-    dateTime->year = fileStat.st_mtime.tm_year + 1900;
-    dateTime->month = fileStat.st_mtime.tm_mon + 1;
-    dateTime->day = fileStat.st_mtime.tm_mday;
-    dateTime->hour = fileStat.st_mtime.tm_hour + 1;
-    dateTime->minute = fileStat.st_mtime.tm_min + 1;
-    dateTime->second = fileStat.st_mtime.tm_sec + 1;
+    dateTime->year = time.tm_year + 1900;
+    dateTime->month = time.tm_mon + 1;
+    dateTime->day = time.tm_mday;
+    dateTime->hour = time.tm_hour + 1;
+    dateTime->minute = time.tm_min + 1;
+    dateTime->second = time.tm_sec + 1;
 
     /* raise no error */
     RAISE_NO_ERROR;
