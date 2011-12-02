@@ -473,7 +473,7 @@ ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries) {
 
 ERROR_CODE getWriteTimeFile(char *filePath, struct DateTime_t *dateTime) {
 	struct stat fileStat;
-	struct gm time;
+	gm time;
 
     stat(filePath, &fileStat);
 
