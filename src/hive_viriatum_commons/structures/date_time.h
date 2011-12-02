@@ -68,3 +68,6 @@ typedef struct DateTime_t {
      */
     unsigned short milisecond;
 } DateTime;
+
+VIRIATUM_EXPORT_PREFIX void createDateTime(struct DateTime_t **dateTimePointer);
+VIRIATUM_EXPORT_PREFIX void deleteDateTime(struct DateTime_t *dataTime);
