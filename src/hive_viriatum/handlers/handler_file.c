@@ -40,12 +40,8 @@ ERROR_CODE createHandlerFileContext(struct HandlerFileContext_t **handlerFileCon
     handlerFileContext->file = NULL;
     handlerFileContext->flags = 0;
     handlerFileContext->templateHandler = NULL;
-
-
     handlerFileContext->cacheControlStatus = 0;
     handlerFileContext->etagStatus = 0;
-
-
 
     /* sets the handler file context in the  pointer */
     *handlerFileContextPointer = handlerFileContext;
@@ -142,6 +138,8 @@ ERROR_CODE headerFieldCallbackHandlerFile(struct HttpParser_t *httpParser, const
     /* retrieves the handler file context from the http parser */
     struct HandlerFileContext_t *handlerFileContext = (struct HandlerFileContext_t *) httpParser->context;
 
+    /* TODO: THIS SHOULD BE A BETTER PARSER STRUCTURE */
+
     /* checks for the if none match header value */
     switch(dataSize) {
         case 13:
@@ -173,8 +171,7 @@ ERROR_CODE headerValueCallbackHandlerFile(struct HttpParser_t *httpParser, const
     /* retrieves the handler file context from the http parser */
     struct HandlerFileContext_t *handlerFileContext = (struct HandlerFileContext_t *) httpParser->context;
 
-    /* todo: THIS SHOULD BE A SWITCH */
-
+    /* TODO: THIS SHOULD BE A SWITCH */
     if(handlerFileContext->etagStatus == 1) {
         memcpy(handlerFileContext->etag, data, 10);
         handlerFileContext->etag[10] = '\0';
@@ -225,17 +222,13 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
     unsigned char location[1024];
     unsigned char templatePath[1024];
 
-
-
+    /* allocates space for the computation of the time
+    and of the time string, then allocates space for the
+    etag calculation structure (crc32 value) and for the etag*/
     struct DateTime_t time;
     char timeString[17];
     unsigned long crc32Value;
     char etag[11];
-
-
-
-
-
 
     /* allocates the space for the "read" result
     error code (valid by default) */
@@ -312,15 +305,21 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
 
         /* counts the total size (in bytes) of the contents in the file path */
         errorCode = countFile((char *) handlerFileContext->filePath, &fileSize);
-        getWriteTimeFile(handlerFileContext->filePath, &time);
 
-        /* creates the date time string for the file entry */
-        SPRINTF(timeString, 17, "%04d-%02d-%02d %02d:%02d", time.year, time.month, time.day, time.hour, time.minute);
+        /* in case there is no error count the file size, avoids
+        extra problems while computing the etag */
+        if(!IS_ERROR_CODE(errorCode)) {
+            /* retrieve the time of the last write in the file path */
+            getWriteTimeFile(handlerFileContext->filePath, &time);
 
-        /* creates the crc32 value and prints it into the
-        etag as an heexadecimal string value */
-        crc32Value = crc32(timeString, 1);
-        SPRINTF(etag, 11, "\"%08x\"",  crc32Value);
+            /* creates the date time string for the file entry */
+            SPRINTF(timeString, 17, "%04d-%02d-%02d %02d:%02d", time.year, time.month, time.day, time.hour, time.minute);
+
+            /* creates the crc32 value and prints it into the
+            etag as an heexadecimal string value */
+            crc32Value = crc32(timeString, 1);
+            SPRINTF(etag, 11, "\"%08x\"",  crc32Value);
+        }
     }
 
     /* sets the (http) flags in the handler file context */
