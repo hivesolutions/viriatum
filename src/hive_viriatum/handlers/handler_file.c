@@ -42,6 +42,7 @@ ERROR_CODE createHandlerFileContext(struct HandlerFileContext_t **handlerFileCon
     handlerFileContext->templateHandler = NULL;
 
 
+    handlerFileContext->cacheControlStatus = 0;
     handlerFileContext->etagStatus = 0;
 
 
@@ -142,9 +143,26 @@ ERROR_CODE headerFieldCallbackHandlerFile(struct HttpParser_t *httpParser, const
     struct HandlerFileContext_t *handlerFileContext = (struct HandlerFileContext_t *) httpParser->context;
 
     /* checks for the if none match header value */
-    if(dataSize == 13 && data[0] == 'I') {
-        /* updates the etag status value (is next) */
-        handlerFileContext->etagStatus = 1;
+    switch(dataSize) {
+        case 13:
+            if(data[0] == 'I' && data[1] == 'f' && data[2] == '-' && data[3] == 'N') {
+                /* updates the etag status value (is next) */
+                handlerFileContext->etagStatus = 1;
+
+                /* breaks the switch */
+                break;
+            }
+
+            if(data[0] == 'C' && data[1] == 'a' && data[2] == 'c' && data[3] == 'h') {
+                /* updates the cache control status value (is next) */
+                handlerFileContext->cacheControlStatus = 1;
+
+                /* breaks the switch */
+                break;
+            }
+
+            /* breaks the switch */
+            break;
     }
 
     /* raise no error */
@@ -155,10 +173,22 @@ ERROR_CODE headerValueCallbackHandlerFile(struct HttpParser_t *httpParser, const
     /* retrieves the handler file context from the http parser */
     struct HandlerFileContext_t *handlerFileContext = (struct HandlerFileContext_t *) httpParser->context;
 
+    /* todo: THIS SHOULD BE A SWITCH */
+
     if(handlerFileContext->etagStatus == 1) {
-        memcpy(handlerFileContext->etag, data, 8);
-        handlerFileContext->etag[8] = '\0';
+        memcpy(handlerFileContext->etag, data, 10);
+        handlerFileContext->etag[10] = '\0';
         handlerFileContext->etagStatus = 2;
+
+        RAISE_NO_ERROR;
+    }
+
+    if(handlerFileContext->cacheControlStatus == 1) {
+        memcpy(handlerFileContext->cacheControl, data, dataSize);
+        handlerFileContext->cacheControl[dataSize] = '\0';
+        handlerFileContext->cacheControlStatus = 2;
+
+        RAISE_NO_ERROR;
     }
 
     /* raise no error */
@@ -200,7 +230,7 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
     struct DateTime_t time;
     char timeString[17];
     unsigned long crc32Value;
-    char etag[9];
+    char etag[11];
 
 
 
@@ -276,8 +306,8 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
     /* otherwise the file path must refered a "normal" file path and
     it must be checked */
     else {
-		/* resets the date time structure to avoid invalid
-		date requests */
+        /* resets the date time structure to avoid invalid
+        date requests */
         memset(&time, 0, sizeof(struct DateTime_t));
 
         /* counts the total size (in bytes) of the contents in the file path */
@@ -290,7 +320,8 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
         /* creates the crc32 value and prints it into the
         etag as an heexadecimal string value */
         crc32Value = crc32(timeString, 1);
-        SPRINTF(etag, 9, "%08x",  crc32Value);
+        SPRINTF(etag, 11, "\"%08x\"",  crc32Value);
+        printf("ETAG: '%s'\n", etag);
     }
 
     /* sets the (http) flags in the handler file context */
@@ -302,7 +333,7 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
         V_DEBUG_F("%s\n", getLastErrorMessageSafe());
 
         /* writes the http static headers to the response */
-        SPRINTF(headersBuffer, 1024, "HTTP/1.1 404 Not Found\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nContent-Length: 15\r\n\r\n404 - Not Found", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU);
+        SPRINTF(headersBuffer, 1024, "HTTP/1.1 404 Not Found\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nCache-Control: no-cache, must-revalidate\r\nContent-Length: 15\r\n\r\n404 - Not Found", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU);
 
         /* writes both the headers to the connection, registers for the appropriate callbacks */
         writeConnection(connection, (unsigned char *) headersBuffer, strlen(headersBuffer), _cleanupHandlerFile, handlerFileContext);
@@ -316,14 +347,14 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
     /* in case the current situation is a directory list */
     else if(isDirectory) {
         /* writes the http static headers to the response */
-        SPRINTF(headersBuffer, 1024, "HTTP/1.1 200 OK\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nContent-Length: %lu\r\n\r\n", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, strlen((char *) handlerFileContext->templateHandler->stringValue));
+        SPRINTF(headersBuffer, 1024, "HTTP/1.1 200 OK\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nCache-Control: no-cache, must-revalidate\r\nContent-Length: %lu\r\n\r\n", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, strlen((char *) handlerFileContext->templateHandler->stringValue));
 
         /* writes both the headers to the connection, registers for the appropriate callbacks */
         writeConnection(connection, (unsigned char *) headersBuffer, strlen(headersBuffer), _sendDataHandlerFile, handlerFileContext);
     }
     else if(handlerFileContext->etagStatus == 2 && strcmp(etag, handlerFileContext->etag) == 0) {
         /* writes the http static headers to the response */
-        SPRINTF(headersBuffer, 1024, "HTTP/1.1 304 Not Modified\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nETag: %s\r\nContent-Length: 0\r\n\r\n", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, etag);
+        SPRINTF(headersBuffer, 1024, "HTTP/1.1 304 Not Modified\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nCache-Control: no-cache, must-revalidate\r\nContent-Length: 0\r\n\r\n", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU);
 
         /* writes both the headers to the connection, registers for the appropriate callbacks */
         writeConnection(connection, (unsigned char *) headersBuffer, strlen(headersBuffer), _cleanupHandlerFile, handlerFileContext);
@@ -332,7 +363,7 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
     file situation (no directory) */
     else {
         /* writes the http static headers to the response */
-        SPRINTF(headersBuffer, 1024, "HTTP/1.1 200 OK\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nETag: %s\r\nContent-Length: %lu\r\n\r\n", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, etag, fileSize);
+        SPRINTF(headersBuffer, 1024, "HTTP/1.1 200 OK\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nCache-Control: no-cache, must-revalidate\r\nETag: %s\r\nContent-Length: %lu\r\n\r\n", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, etag, fileSize);
 
         /* writes both the headers to the connection, registers for the appropriate callbacks */
         writeConnection(connection, (unsigned char *) headersBuffer, strlen(headersBuffer), _sendChunkHandlerFile, handlerFileContext);
@@ -376,6 +407,10 @@ ERROR_CODE _resetHttpParserHandlerFile(struct HttpParser_t *httpParser) {
 
     /* unsets the handler file context flags */
     handlerFileContext->flags = 0;
+
+    /* resets both the etag and the cache control status */
+    handlerFileContext->etagStatus = 0;
+    handlerFileContext->cacheControlStatus = 0;
 
     /* raises no error */
     RAISE_NO_ERROR;
