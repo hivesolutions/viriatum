@@ -472,12 +472,12 @@ ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries) {
 #ifdef VIRIATUM_PLATFORM_UNIX
 
 ERROR_CODE getWriteTimeFile(char *filePath, struct DateTime_t *dateTime) {
-	struct stat fileStat;
-	struct tm time;
+    struct stat fileStat;
+    struct tm time;
 
     stat(filePath, &fileStat);
 
-	gmtime_r(&fileStat.st_mtime, &time);
+    gmtime_r(&fileStat.st_mtime, &time);
 
     /* populates the date time structure with the information
     on the file various parts */
@@ -552,8 +552,10 @@ ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries) {
             break;
         }
 
-        /* allocates a new entry value */
+        /* allocates a new entry value and resets the
+        necessary structures (time) */
         entry = MALLOC(sizeof(struct File_t));
+        memset(&entry->time, 0, sizeof(struct DateTime_t));
 
         /* in case the file is of type regular */
         if(entity->d_type == DT_REG) {
@@ -570,11 +572,11 @@ ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries) {
         /* joins the base name with the directory path to
         retrieve the full entry name then uses it to retrieve
         the entry stat structure and then uses it to retrieve its size
-		and it's last write time */
+        and it's last write time */
         joinPathFile(filePath, entity->d_name, entryFullName);
         stat(entryFullName, &entryStat);
         entry->size = entryStat.st_size;
-		getWriteTimeFile(entryFullName, &entry->time);
+        getWriteTimeFile(entryFullName, &entry->time);
 
         /* calculates the length of the entry name and uses
         it to create the memory space for the entry name and then
