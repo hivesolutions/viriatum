@@ -523,6 +523,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\src\hive_viriatum_commons\structures\date_time.c"
+					>
+				</File>
+				<File
 					RelativePath="..\..\src\hive_viriatum_commons\structures\hash_map.c"
 					>
 				</File>
@@ -702,6 +706,10 @@
 				</File>
 				<File
 					RelativePath="..\..\src\hive_viriatum_commons\structures\buffer.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\hive_viriatum_commons\structures\date_time.h"
 					>
 				</File>
 				<File
