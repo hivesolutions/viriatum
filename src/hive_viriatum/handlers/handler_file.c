@@ -42,7 +42,7 @@ ERROR_CODE createHandlerFileContext(struct HandlerFileContext_t **handlerFileCon
     handlerFileContext->templateHandler = NULL;
 
 
-    handlerFileContext->etagNext = 0;
+    handlerFileContext->etagStatus = 0;
 
 
 
@@ -143,8 +143,8 @@ ERROR_CODE headerFieldCallbackHandlerFile(struct HttpParser_t *httpParser, const
 
     /* checks for the if none match header value */
     if(dataSize == 13 && data[0] == 'I') {
-        /* sets the etag next value */
-        handlerFileContext->etagNext = 1;
+        /* updates the etag status value (is next) */
+        handlerFileContext->etagStatus = 1;
     }
 
     /* raise no error */
@@ -155,10 +155,10 @@ ERROR_CODE headerValueCallbackHandlerFile(struct HttpParser_t *httpParser, const
     /* retrieves the handler file context from the http parser */
     struct HandlerFileContext_t *handlerFileContext = (struct HandlerFileContext_t *) httpParser->context;
 
-    if(handlerFileContext->etagNext) {
+    if(handlerFileContext->etagStatus == 1) {
         memcpy(handlerFileContext->etag, data, 8);
         handlerFileContext->etag[8] = '\0';
-        handlerFileContext->etagNext = 0;
+        handlerFileContext->etagStatus = 2;
     }
 
     /* raise no error */
@@ -276,6 +276,8 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
     /* otherwise the file path must refered a "normal" file path and
     it must be checked */
     else {
+		/* resets the date time structure to avoid invalid
+		date requests */
         memset(&time, 0, sizeof(struct DateTime_t));
 
         /* counts the total size (in bytes) of the contents in the file path */
@@ -319,7 +321,7 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
         /* writes both the headers to the connection, registers for the appropriate callbacks */
         writeConnection(connection, (unsigned char *) headersBuffer, strlen(headersBuffer), _sendDataHandlerFile, handlerFileContext);
     }
-    else if(strcmp(etag, handlerFileContext->etag) == 0) {
+    else if(handlerFileContext->etagStatus == 2 && strcmp(etag, handlerFileContext->etag) == 0) {
         /* writes the http static headers to the response */
         SPRINTF(headersBuffer, 1024, "HTTP/1.1 304 Not Modified\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nETag: %s\r\nContent-Length: 0\r\n\r\n", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, etag);
 
