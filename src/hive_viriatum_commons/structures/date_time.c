@@ -28,3 +28,19 @@
 #include "stdafx.h"
 
 #include "date_time.h"
+
+void createDateTime(struct DateTime_t **dateTimePointer) {
+    /* retrieves the date time size */
+    size_t dateTimeSize = sizeof(struct DateTime_t);
+
+    /* allocates space for the date time */
+    struct DateTime_t *dateTime = (struct DateTime_t *) MALLOC(dateTimeSize);
+
+    /* sets the buffer in the date time pointer */
+    *dateTimePointer = dateTime;
+}
+
+void deleteDateTime(struct DateTime_t *dataTime) {
+    /* releases the data time */
+    FREE(dataTime);
+}
