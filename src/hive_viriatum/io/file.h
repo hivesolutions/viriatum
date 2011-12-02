@@ -27,6 +27,19 @@
 
 #pragma once
 
+typedef struct DateTime_t {
+    unsigned short year;
+    unsigned short month;
+    unsigned short day;
+    unsigned short hour;
+    unsigned short minute;
+    unsigned short second;
+    unsigned short milisecond;
+} DateTime;
+
+
+
+
 /**
  * Strucrure defining the various
  * possible types of files.
@@ -73,6 +86,12 @@ typedef struct File_t {
      * in the longest manner.
      */
     size_t size;
+
+    /**
+     * The date time of the last write
+     * access to the file.
+     */
+    struct DateTime_t time;
 } File;
 
 /**

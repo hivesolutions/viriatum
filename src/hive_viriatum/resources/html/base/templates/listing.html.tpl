@@ -39,7 +39,7 @@
 								<td class="icon folder"></td>
 							${/if}
 							<td class="left"><a href="${out value=entry.name /}">${out value=entry.name /}</a></td>
-							<td class="right">2011-07-28 19:45</td>
+							<td class="right">${out value=entry.time /}</td>
 							<td class="right">${out value=entry.size /} Bytes</td>
 						</tr>
 					${/foreach}

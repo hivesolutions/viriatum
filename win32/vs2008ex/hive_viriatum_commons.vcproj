@@ -478,6 +478,10 @@
 					RelativePath="..\..\src\hive_viriatum_commons\checksum\crc_32.c"
 					>
 				</File>
+				<File
+					RelativePath="..\..\src\hive_viriatum_commons\checksum\md5.c"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="Encoding"
@@ -634,6 +638,10 @@
 				</File>
 				<File
 					RelativePath="..\..\src\hive_viriatum_commons\checksum\crc_32.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\hive_viriatum_commons\checksum\md5.h"
 					>
 				</File>
 			</Filter>
