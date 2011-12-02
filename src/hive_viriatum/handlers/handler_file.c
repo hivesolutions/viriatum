@@ -41,6 +41,11 @@ ERROR_CODE createHandlerFileContext(struct HandlerFileContext_t **handlerFileCon
     handlerFileContext->flags = 0;
     handlerFileContext->templateHandler = NULL;
 
+
+    handlerFileContext->etagNext = 0;
+
+
+
     /* sets the handler file context in the  pointer */
     *handlerFileContextPointer = handlerFileContext;
 
@@ -133,11 +138,29 @@ ERROR_CODE urlCallbackHandlerFile(struct HttpParser_t *httpParser, const unsigne
 }
 
 ERROR_CODE headerFieldCallbackHandlerFile(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize) {
+    /* retrieves the handler file context from the http parser */
+    struct HandlerFileContext_t *handlerFileContext = (struct HandlerFileContext_t *) httpParser->context;
+
+    /* checks for the if none match header value */
+    if(dataSize == 13 && data[0] == 'I') {
+        /* sets the etag next value */
+        handlerFileContext->etagNext = 1;
+    }
+
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
 ERROR_CODE headerValueCallbackHandlerFile(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize) {
+    /* retrieves the handler file context from the http parser */
+    struct HandlerFileContext_t *handlerFileContext = (struct HandlerFileContext_t *) httpParser->context;
+
+    if(handlerFileContext->etagNext) {
+        memcpy(handlerFileContext->etag, data, 8);
+        handlerFileContext->etag[8] = '\0';
+        handlerFileContext->etagNext = 0;
+    }
+
     /* raise no error */
     RAISE_NO_ERROR;
 }
@@ -171,6 +194,18 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
     template (for directory listing) */
     unsigned char location[1024];
     unsigned char templatePath[1024];
+
+
+
+    struct DateTime_t time;
+    char timeString[17];
+    unsigned long crc32Value;
+    char etag[9];
+
+
+
+
+
 
     /* allocates the space for the "read" result
     error code (valid by default) */
@@ -241,8 +276,19 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
     /* otherwise the file path must refered a "normal" file path and
     it must be checked */
     else {
+        memset(&time, 0, sizeof(struct DateTime_t));
+
         /* counts the total size (in bytes) of the contents in the file path */
         errorCode = countFile((char *) handlerFileContext->filePath, &fileSize);
+        getWriteTimeFile(handlerFileContext->filePath, &time);
+
+        /* creates the date time string for the file entry */
+        SPRINTF(timeString, 17, "%04d-%02d-%02d %02d:%02d", time.year, time.month, time.day, time.hour, time.minute);
+
+        /* creates the crc32 value and prints it into the
+        etag as an heexadecimal string value */
+        crc32Value = crc32(timeString, 1);
+        SPRINTF(etag, 9, "%08x",  crc32Value);
     }
 
     /* sets the (http) flags in the handler file context */
@@ -273,11 +319,18 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
         /* writes both the headers to the connection, registers for the appropriate callbacks */
         writeConnection(connection, (unsigned char *) headersBuffer, strlen(headersBuffer), _sendDataHandlerFile, handlerFileContext);
     }
+    else if(strcmp(etag, handlerFileContext->etag) == 0) {
+        /* writes the http static headers to the response */
+        SPRINTF(headersBuffer, 1024, "HTTP/1.1 304 Not Modified\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nETag: %s\r\nContent-Length: 0\r\n\r\n", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, etag);
+
+        /* writes both the headers to the connection, registers for the appropriate callbacks */
+        writeConnection(connection, (unsigned char *) headersBuffer, strlen(headersBuffer), _cleanupHandlerFile, handlerFileContext);
+    }
     /* otherwise there was no error in the file and it's a simple
     file situation (no directory) */
     else {
         /* writes the http static headers to the response */
-        SPRINTF(headersBuffer, 1024, "HTTP/1.1 200 OK\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nContent-Length: %lu\r\n\r\n", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, fileSize);
+        SPRINTF(headersBuffer, 1024, "HTTP/1.1 200 OK\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nETag: %s\r\nContent-Length: %lu\r\n\r\n", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, etag, fileSize);
 
         /* writes both the headers to the connection, registers for the appropriate callbacks */
         writeConnection(connection, (unsigned char *) headersBuffer, strlen(headersBuffer), _sendChunkHandlerFile, handlerFileContext);

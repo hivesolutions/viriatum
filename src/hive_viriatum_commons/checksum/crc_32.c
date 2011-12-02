@@ -92,7 +92,7 @@ unsigned long crc32(unsigned char *buffer, unsigned int bufferLength) {
     unsigned long crc32Value;
 
     /* starts the crc 32 value */
-    crc32Value = 0;
+    crc32Value = 0 ^ 0xffffffff;
 
     /* iterates over the length of the buffer */
     for(index = 0; index < bufferLength; index++) {
@@ -101,5 +101,5 @@ unsigned long crc32(unsigned char *buffer, unsigned int bufferLength) {
     }
 
     /* returns the crc 32 value */
-    return crc32Value;
+    return crc32Value ^ 0xffffffff;
 }

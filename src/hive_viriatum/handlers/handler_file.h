@@ -86,6 +86,10 @@ typedef struct HandlerFileContext_t {
      * internal structures of the file handler.
      */
     unsigned int flushed;
+
+
+    unsigned char etagNext;
+    unsigned char etag[9];
 } HandlerFileContext;
 
 ERROR_CODE createHandlerFileContext(struct HandlerFileContext_t **handlerFileContextPointer);
