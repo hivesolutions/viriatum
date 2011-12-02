@@ -471,6 +471,24 @@ ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries) {
 
 #ifdef VIRIATUM_PLATFORM_UNIX
 
+ERROR_CODE getWriteTimeFile(char *filePath, struct DateTime_t *dateTime) {
+	struct stat fileStat;
+
+    stat(filePath, &fileStat);
+
+    /* populates the date time structure with the information
+    on the file various parts */
+    dateTime->year = fileStat.st_mtime.tm_year + 1900;
+    dateTime->month = fileStat.st_mtime.tm_mon + 1;
+    dateTime->day = fileStat.st_mtime.tm_mday;
+    dateTime->hour = fileStat.st_mtime.tm_hour + 1;
+    dateTime->minute = fileStat.st_mtime.tm_min + 1;
+    dateTime->second = fileStat.st_mtime.tm_sec + 1;
+
+    /* raise no error */
+    RAISE_NO_ERROR;
+}
+
 ERROR_CODE isDirectoryFile(char *filePath, unsigned int *isDirectory) {
     /* allocates space for the directory reference */
     DIR *directory;

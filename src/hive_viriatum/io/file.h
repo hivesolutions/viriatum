@@ -102,6 +102,15 @@ ERROR_CODE readFile(char *filePath, unsigned char **bufferPointer, size_t *fileS
 ERROR_CODE countFile(char *filePath, size_t *fileSizePointer);
 
 /**
+ * Retrieves the last write time (as a date time structure)
+ * for the file in the given file path.
+ *
+ * @param filePath The path to the file to retrieve the write time.
+ * @param dateTime The time of the last write time in the file.
+ */
+ERROR_CODE getWriteTimeFile(char *filePath, struct DateTime_t *dateTime);
+
+/**
  * Checks if the given file path referes a directory path.
  * The result is set to the given integer pointer.
  *
