@@ -569,10 +569,12 @@ ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries) {
 
         /* joins the base name with the directory path to
         retrieve the full entry name then uses it to retrieve
-        the entry stat structure and then uses it to retrieve its size */
+        the entry stat structure and then uses it to retrieve its size
+		and it's last write time */
         joinPathFile(filePath, entity->d_name, entryFullName);
         stat(entryFullName, &entryStat);
         entry->size = entryStat.st_size;
+		getWriteTimeFile(entryFullName, &entry->time);
 
         /* calculates the length of the entry name and uses
         it to create the memory space for the entry name and then
