@@ -299,16 +299,16 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
     /* otherwise the file path must refered a "normal" file path and
     it must be checked */
     else {
-        /* resets the date time structure to avoid invalid
-        date requests */
-        memset(&time, 0, sizeof(struct DateTime_t));
-
         /* counts the total size (in bytes) of the contents in the file path */
         errorCode = countFile((char *) handlerFileContext->filePath, &fileSize);
 
         /* in case there is no error count the file size, avoids
         extra problems while computing the etag */
         if(!IS_ERROR_CODE(errorCode)) {
+			/* resets the date time structure to avoid invalid
+			date requests */
+			memset(&time, 0, sizeof(struct DateTime_t));
+
             /* retrieve the time of the last write in the file path */
             getWriteTimeFile((char *) handlerFileContext->filePath, &time);
 

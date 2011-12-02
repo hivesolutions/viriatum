@@ -20,4 +20,5 @@
 
 == Target performance ==
 
-* ab -n 10000 -c 100 -k  http://srio.hive:8181/eclipse should be able to run at 15K-24K requests per seconds in raw power
+* ab -n 10000 -c 100 -k http://servidor2.hive:8282/error should be ablr to rn at 60K requests per second
+* ab -n 10000 -c 100 -k  http://srio.hive:8181/eclipse should be able to run at 15K-24K requests per secondin raw power (not confirmed)
