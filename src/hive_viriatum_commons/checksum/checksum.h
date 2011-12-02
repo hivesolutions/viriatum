@@ -28,3 +28,4 @@
 #pragma once
 
 #include "crc_32.h"
+#include "md5.h"

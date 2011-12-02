@@ -170,6 +170,9 @@ ERROR_CODE deleteDirectoryEntriesMapFile(struct LinkedList_t *map) {
         deleteType(entryValueType);
         getValueStringHashMap(entryType->value.valueMap, (unsigned char *) "size", (void **) &entryValueType);
         deleteType(entryValueType);
+        getValueStringHashMap(entryType->value.valueMap, (unsigned char *) "time", (void **) &entryValueType);
+        FREE(entryValueType->value.valueString);
+        deleteType(entryValueType);
 
         /* deletes the hash map and the entry type */
         deleteHashMap(entryType->value.valueMap);
@@ -194,6 +197,10 @@ ERROR_CODE entriesToMapFile(struct LinkedList_t *entries, struct LinkedList_t **
     struct Type_t *entryType;
     struct Type_t *entryValueType;
 
+    /* allocates space for the date time string
+    to be created for the file entry */
+    char *dateTimeString;
+
     /* creates a new linke list in the for the entries maps */
     createLinkedList(&map);
 
@@ -215,6 +222,12 @@ ERROR_CODE entriesToMapFile(struct LinkedList_t *entries, struct LinkedList_t **
         /* creates the hash map */
         createHashMap(&entryMap, 0);
 
+        /* allocates spac for the date time string */
+        dateTimeString = MALLOC(17);
+
+        /* creates the date time string for the file entry */
+        SPRINTF(dateTimeString, 17, "%04d-%02d-%02d %02d:%02d", entry->time.year, entry->time.month, entry->time.day, entry->time.hour, entry->time.minute);
+
         /* creates the various types for the various entry values
         and sets them in the entry map for reference */
         createType(&entryValueType, INTEGER_TYPE);
@@ -226,6 +239,9 @@ ERROR_CODE entriesToMapFile(struct LinkedList_t *entries, struct LinkedList_t **
         createType(&entryValueType, INTEGER_TYPE);
         entryValueType->value.valueInt = entry->size;
         setValueStringHashMap(entryMap, (unsigned char *) "size", (void *) entryValueType);
+        createType(&entryValueType, STRING_TYPE);
+        entryValueType->value.valueString = dateTimeString;
+        setValueStringHashMap(entryMap, (unsigned char *) "time", (void *) entryValueType);
 
         /* creates the entry type (for the map) and sets the
         entry map on it */
@@ -253,11 +269,23 @@ ERROR_CODE joinPathFile(char *basePath, char *name, char *joinedPath) {
     size_t basePathLength = strlen(basePath);
     size_t nameLength = strlen(name);
 
-    /* copies the various parts of the path to create
-    the complete joined path */
+    /* adds the "initial" base path to the joined
+    path buffer (initial step) */
     memcpy(joinedPath, basePath, basePathLength);
-    memcpy(joinedPath + basePathLength, "/", 1);
-    memcpy(joinedPath + basePathLength + 1, name, nameLength + 1);
+
+    /* in case the base path ends with the separator
+    (no need to add the extra separator)*/
+    if(basePath[basePathLength - 1] == '/') {
+        /* adds the name part to the joined path */
+        memcpy(joinedPath + basePathLength, name, nameLength + 1);
+    }
+    /* otherwise the separator must be added to the joined path */
+    else {
+        /* adds the separator to the joined path and then adds
+        the name to the joined path also */
+        memcpy(joinedPath + basePathLength, "/", 1);
+        memcpy(joinedPath + basePathLength + 1, name, nameLength + 1);
+    }
 
     /* raise no error */
     RAISE_NO_ERROR;
@@ -285,6 +313,53 @@ int _entryCompareFile(void *first, void *second) {
 
 #ifdef VIRIATUM_PLATFORM_WIN32
 
+ERROR_CODE getWriteTimeFile(char *filePath, struct DateTime_t *dateTime) {
+    /* allocates space for the various file times */
+    FILETIME timeCreate;
+    FILETIME timeAccess;
+    FILETIME timeWrite;
+
+    /* allocates space for the structure holding
+    the time write local */
+    SYSTEMTIME timeWriteLocal;
+
+    /* allocates space for the handle to the file */
+    HANDLE fileHandle;
+
+    /* retrieves the file for reading in the requested file path */
+    fileHandle = CreateFile(filePath, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL|FILE_FLAG_BACKUP_SEMANTICS, NULL);
+
+    /* in case the created file handle is not valid */
+    if(fileHandle == INVALID_HANDLE_VALUE) {
+        /* raises an error */
+        RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, "Could not create file");
+    }
+
+    /* retrieve the file times for the file */
+    if(!GetFileTime(fileHandle, &timeCreate, &timeAccess, &timeWrite)) {
+        /* raises an error */
+        RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, "Problem retrieving file time");
+    }
+
+    /* convert the last write time to "local" time */
+    FileTimeToSystemTime(&timeWrite, &timeWriteLocal);
+
+    /* populates the date time structure with the information
+    on the file various parts */
+    dateTime->year = timeWriteLocal.wYear;
+    dateTime->month = timeWriteLocal.wMonth;
+    dateTime->day = timeWriteLocal.wDay;
+    dateTime->hour = timeWriteLocal.wHour;
+    dateTime->minute = timeWriteLocal.wMinute;
+    dateTime->second = timeWriteLocal.wSecond;
+
+    /* closes the file handle */
+    CloseHandle(fileHandle);
+
+    /* raise no error */
+    RAISE_NO_ERROR;
+}
+
 ERROR_CODE isDirectoryFile(char *filePath, unsigned int *isDirectory) {
     /* in case the attributes value contains the file attribute
     directory reference (the file is a directory)*/
@@ -308,9 +383,10 @@ ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries) {
     listing directory path */
     char *listPath;
 
-    /* allocates space for both the entry and the
-    length of the entry name */
+    /* allocates space for the entry, entry full name
+    and the length of the entry name */
     struct File_t *entry;
+    char entryFullName[4096];
     size_t entryNameLength;
 
     /* allocates the various windows internal structures
@@ -340,8 +416,10 @@ ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries) {
     }
 
     do {
-        /* allocates a new entry value */
+        /* allocates a new entry value and resets the
+        necessary structures (time) */
         entry = MALLOC(sizeof(struct File_t));
+        memset(&entry->time, 0, sizeof(struct DateTime_t));
 
         /* in case the file is of type directory */
         if(findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
@@ -356,6 +434,12 @@ ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries) {
 
         /* sets the entry size from the find data information */
         entry->size = findData.nFileSizeLow;
+
+        /* joins the base name with the directory path to
+        retrieve the full entry name then uses it to retrieve
+        the write time for the file */
+        joinPathFile(filePath, findData.cFileName, entryFullName);
+        getWriteTimeFile(entryFullName, &entry->time);
 
         /* calculates the length of the entry name and uses
         it to create the memory space for the entry name and then

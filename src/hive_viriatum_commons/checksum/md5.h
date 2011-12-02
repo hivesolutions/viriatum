@@ -17,7 +17,7 @@
  You should have received a copy of the GNU General Public License
  along with Hive Viriatum Commons. If not, see <http://www.gnu.org/licenses/>.
 
- __author__    = Jo√£o Magalh√£es <joamag@hive.pt>
+ __author__    = Jo„o Magalh„es <joamag@hive.pt>
  __version__   = 1.0.0
  __revision__  = $LastChangedRevision$
  __date__      = $LastChangedDate$
@@ -27,13 +27,15 @@
 
 #pragma once
 
-/**
- * Calculates a crc32 chesum for the given buffer, the process undertakes
- * the typical polynomial approach.
- * The calculated checksum is returned as an unsigned long value.
- *
- * @param buffer The (data) buffer to be used in the checkum calculation.
- * @param bufferLength The length of the (data) buffer to calculate the checksum.
- * @return The calculated crc32 checksum value.
- */
-VIRIATUM_EXPORT_PREFIX unsigned long crc32(unsigned char *buffer, unsigned int bufferLength);
+typedef unsigned int MD5_u32plus;
+
+typedef struct {
+    MD5_u32plus lo, hi;
+    MD5_u32plus a, b, c, d;
+    unsigned char buffer[64];
+    MD5_u32plus block[16];
+} MD5_context;
+
+extern void MD5_Init(MD5_context *context);
+extern void MD5_Update(MD5_context *context, void *data, unsigned long size);
+extern void MD5_Final(unsigned char *result, MD5_context *context);
