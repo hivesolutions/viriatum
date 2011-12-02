@@ -477,7 +477,7 @@ ERROR_CODE getWriteTimeFile(char *filePath, struct DateTime_t *dateTime) {
 
     stat(filePath, &fileStat);
 
-	struct tm *gmtime_r(&fileStat.st_mtime, &time);
+	gmtime_r(&fileStat.st_mtime, &time);
 
     /* populates the date time structure with the information
     on the file various parts */
