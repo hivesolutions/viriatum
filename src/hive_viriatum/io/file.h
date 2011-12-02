@@ -27,19 +27,6 @@
 
 #pragma once
 
-typedef struct DateTime_t {
-    unsigned short year;
-    unsigned short month;
-    unsigned short day;
-    unsigned short hour;
-    unsigned short minute;
-    unsigned short second;
-    unsigned short milisecond;
-} DateTime;
-
-
-
-
 /**
  * Strucrure defining the various
  * possible types of files.

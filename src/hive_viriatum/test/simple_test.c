@@ -412,6 +412,4 @@ void runSimpleTests() {
     /* tests the quick sort algorithm */
     testQuicksort();
     testQuicksortLinkedList();
-
-    testMd5();
 }
