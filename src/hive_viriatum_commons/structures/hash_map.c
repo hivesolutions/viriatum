@@ -144,7 +144,7 @@ void getHashMap(struct HashMap_t *hashMap, size_t key, struct HashMapElement_t *
     /* calculates the index using the modulus */
     size_t index = key % hashMap->elementsBufferSize;
 
-    /* iterates continously (to get retrieve the appropriate
+    /* iterates continously (to retrieve the appropriate
     element in the hash map), this conforms with the open
     addressing strategy for hash maps */
     while(1) {
