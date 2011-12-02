@@ -321,7 +321,6 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
         etag as an heexadecimal string value */
         crc32Value = crc32(timeString, 1);
         SPRINTF(etag, 11, "\"%08x\"",  crc32Value);
-        printf("ETAG: '%s'\n", etag);
     }
 
     /* sets the (http) flags in the handler file context */
