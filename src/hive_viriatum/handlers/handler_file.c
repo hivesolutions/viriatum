@@ -226,7 +226,7 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
     and of the time string, then allocates space for the
     etag calculation structure (crc32 value) and for the etag*/
     struct DateTime_t time;
-    char timeString[17];
+    char timeString[20];
     unsigned long crc32Value;
     char etag[11];
 
@@ -313,11 +313,11 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
             getWriteTimeFile((char *) handlerFileContext->filePath, &time);
 
             /* creates the date time string for the file entry */
-            SPRINTF(timeString, 17, "%04d-%02d-%02d %02d:%02d", time.year, time.month, time.day, time.hour, time.minute);
+			SPRINTF(timeString, 20, "%04d-%02d-%02d %02d:%02d:%02d", time.year, time.month, time.day, time.hour, time.minute, time.second);
 
             /* creates the crc32 value and prints it into the
             etag as an heexadecimal string value */
-            crc32Value = crc32((unsigned char *) timeString, 1);
+            crc32Value = crc32((unsigned char *) timeString, 19);
             SPRINTF(etag, 11, "\"%08x\"", (unsigned int) crc32Value);
         }
     }

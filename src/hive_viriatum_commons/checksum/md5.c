@@ -29,7 +29,7 @@
 
 #include "md5.h"
 
-/*
+/**
  * The basic MD5 functions.
  *
  * F and G are optimized compared to their RFC 1321 definitions for
@@ -41,7 +41,7 @@
 #define H(x, y, z) ((x) ^ (y) ^ (z))
 #define I(x, y, z) ((y) ^ ((x) | ~(z)))
 
-/*
+/**
  * The MD5 transformation for all four rounds.
  */
 #define STEP(f, a, b, c, d, x, t, s)\
