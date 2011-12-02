@@ -88,7 +88,7 @@ typedef struct HandlerFileContext_t {
     unsigned int flushed;
 
 
-    unsigned char etagNext;
+    unsigned char etagStatus;
     unsigned char etag[9];
 } HandlerFileContext;
 
