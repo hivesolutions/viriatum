@@ -26,8 +26,8 @@
 # checks for libraries
 AC_CHECK_LIB([dl], [main], [], [AC_MSG_ERROR(can't build without dynamic linking (libdl) libraries)])
 AC_CHECK_LIB([pthread], [main], [], [AC_MSG_ERROR(can't build without posix threads (libpthread) libraries)])
-AC_CHECK_LIB([ws2_32], [main], [], [have_w2_32 = "false"])
-AC_CHECK_LIB([viriatum], [main], [], [have_viriatum = "false"])
+AC_CHECK_LIB([ws2_32], [main], [], [have_w2_32=false])
+AC_CHECK_LIB([viriatum], [main], [], [have_viriatum=false])
 
 # library variables activation
 AM_CONDITIONAL(LINK_WS2_32, [test "$have_w2_32" != "false"])
