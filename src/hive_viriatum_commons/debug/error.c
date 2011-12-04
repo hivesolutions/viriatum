@@ -29,5 +29,5 @@
 
 #include "error.h"
 
-unsigned int lastErrorCode;
-unsigned char *lastErrorMessage;
+unsigned int lastErrorCode = 0;
+unsigned char *lastErrorMessage = NULL;
