@@ -54,6 +54,37 @@
 		C20C2CE11350B6BB001E22FB /* dump_util.h in Headers */ = {isa = PBXBuildFile; fileRef = C20C2CB21350B6BB001E22FB /* dump_util.h */; };
 		C20C2CE21350B6BB001E22FB /* util.h in Headers */ = {isa = PBXBuildFile; fileRef = C20C2CB31350B6BB001E22FB /* util.h */; };
 		C20C2CE31350B6BB001E22FB /* viriatum_commons.h in Headers */ = {isa = PBXBuildFile; fileRef = C20C2CB41350B6BB001E22FB /* viriatum_commons.h */; };
+		C2C0256C148BB605005E5236 /* date_time.c in Sources */ = {isa = PBXBuildFile; fileRef = C2C02566148BB605005E5236 /* date_time.c */; };
+		C2C0256D148BB605005E5236 /* date_time.h in Headers */ = {isa = PBXBuildFile; fileRef = C2C02567148BB605005E5236 /* date_time.h */; };
+		C2C0256E148BB605005E5236 /* string_buffer.c in Sources */ = {isa = PBXBuildFile; fileRef = C2C02568148BB605005E5236 /* string_buffer.c */; };
+		C2C0256F148BB605005E5236 /* string_buffer.h in Headers */ = {isa = PBXBuildFile; fileRef = C2C02569148BB605005E5236 /* string_buffer.h */; };
+		C2C02570148BB605005E5236 /* type.c in Sources */ = {isa = PBXBuildFile; fileRef = C2C0256A148BB605005E5236 /* type.c */; };
+		C2C02571148BB605005E5236 /* type.h in Headers */ = {isa = PBXBuildFile; fileRef = C2C0256B148BB605005E5236 /* type.h */; };
+		C2C025D6148BB758005E5236 /* md5.c in Sources */ = {isa = PBXBuildFile; fileRef = C2C025D4148BB758005E5236 /* md5.c */; };
+		C2C025D7148BB758005E5236 /* md5.h in Headers */ = {isa = PBXBuildFile; fileRef = C2C025D5148BB758005E5236 /* md5.h */; };
+		C2C025DC148BB760005E5236 /* compression.h in Headers */ = {isa = PBXBuildFile; fileRef = C2C025D9148BB760005E5236 /* compression.h */; };
+		C2C025DD148BB760005E5236 /* huffman.c in Sources */ = {isa = PBXBuildFile; fileRef = C2C025DA148BB760005E5236 /* huffman.c */; };
+		C2C025DE148BB760005E5236 /* huffman.h in Headers */ = {isa = PBXBuildFile; fileRef = C2C025DB148BB760005E5236 /* huffman.h */; };
+		C2C025E0148BB76C005E5236 /* memory.h in Headers */ = {isa = PBXBuildFile; fileRef = C2C025DF148BB76C005E5236 /* memory.h */; };
+		C2C025E6148BB774005E5236 /* base.h in Headers */ = {isa = PBXBuildFile; fileRef = C2C025E2148BB774005E5236 /* base.h */; };
+		C2C025E7148BB774005E5236 /* quicksort.c in Sources */ = {isa = PBXBuildFile; fileRef = C2C025E3148BB774005E5236 /* quicksort.c */; };
+		C2C025E8148BB774005E5236 /* quicksort.h in Headers */ = {isa = PBXBuildFile; fileRef = C2C025E4148BB774005E5236 /* quicksort.h */; };
+		C2C025E9148BB774005E5236 /* sorting.h in Headers */ = {isa = PBXBuildFile; fileRef = C2C025E5148BB774005E5236 /* sorting.h */; };
+		C2C025F4148BB77A005E5236 /* bit_stream.c in Sources */ = {isa = PBXBuildFile; fileRef = C2C025EB148BB77A005E5236 /* bit_stream.c */; };
+		C2C025F5148BB77A005E5236 /* bit_stream.h in Headers */ = {isa = PBXBuildFile; fileRef = C2C025EC148BB77A005E5236 /* bit_stream.h */; };
+		C2C025F6148BB77A005E5236 /* file_stream.c in Sources */ = {isa = PBXBuildFile; fileRef = C2C025ED148BB77A005E5236 /* file_stream.c */; };
+		C2C025F7148BB77A005E5236 /* file_stream.h in Headers */ = {isa = PBXBuildFile; fileRef = C2C025EE148BB77A005E5236 /* file_stream.h */; };
+		C2C025F8148BB77A005E5236 /* io_stream.c in Sources */ = {isa = PBXBuildFile; fileRef = C2C025EF148BB77A005E5236 /* io_stream.c */; };
+		C2C025F9148BB77A005E5236 /* io_stream.h in Headers */ = {isa = PBXBuildFile; fileRef = C2C025F0148BB77A005E5236 /* io_stream.h */; };
+		C2C025FA148BB77A005E5236 /* memory_stream.c in Sources */ = {isa = PBXBuildFile; fileRef = C2C025F1148BB77A005E5236 /* memory_stream.c */; };
+		C2C025FB148BB77A005E5236 /* memory_stream.h in Headers */ = {isa = PBXBuildFile; fileRef = C2C025F2148BB77A005E5236 /* memory_stream.h */; };
+		C2C025FC148BB77A005E5236 /* stream.h in Headers */ = {isa = PBXBuildFile; fileRef = C2C025F3148BB77A005E5236 /* stream.h */; };
+		C2C02603148BB783005E5236 /* engine.c in Sources */ = {isa = PBXBuildFile; fileRef = C2C025FE148BB783005E5236 /* engine.c */; };
+		C2C02604148BB783005E5236 /* engine.h in Headers */ = {isa = PBXBuildFile; fileRef = C2C025FF148BB783005E5236 /* engine.h */; };
+		C2C02605148BB783005E5236 /* handler.c in Sources */ = {isa = PBXBuildFile; fileRef = C2C02600148BB783005E5236 /* handler.c */; };
+		C2C02606148BB783005E5236 /* handler.h in Headers */ = {isa = PBXBuildFile; fileRef = C2C02601148BB783005E5236 /* handler.h */; };
+		C2C02607148BB783005E5236 /* template.h in Headers */ = {isa = PBXBuildFile; fileRef = C2C02602148BB783005E5236 /* template.h */; };
+		C2C02609148BB791005E5236 /* string_util.h in Headers */ = {isa = PBXBuildFile; fileRef = C2C02608148BB791005E5236 /* string_util.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -105,6 +136,37 @@
 		C20C2CB21350B6BB001E22FB /* dump_util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dump_util.h; sourceTree = "<group>"; };
 		C20C2CB31350B6BB001E22FB /* util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = util.h; sourceTree = "<group>"; };
 		C20C2CB41350B6BB001E22FB /* viriatum_commons.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = viriatum_commons.h; path = ../../../src/hive_viriatum_commons/viriatum_commons.h; sourceTree = "<group>"; };
+		C2C02566148BB605005E5236 /* date_time.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = date_time.c; sourceTree = "<group>"; };
+		C2C02567148BB605005E5236 /* date_time.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = date_time.h; sourceTree = "<group>"; };
+		C2C02568148BB605005E5236 /* string_buffer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = string_buffer.c; sourceTree = "<group>"; };
+		C2C02569148BB605005E5236 /* string_buffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = string_buffer.h; sourceTree = "<group>"; };
+		C2C0256A148BB605005E5236 /* type.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = type.c; sourceTree = "<group>"; };
+		C2C0256B148BB605005E5236 /* type.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = type.h; sourceTree = "<group>"; };
+		C2C025D4148BB758005E5236 /* md5.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = md5.c; sourceTree = "<group>"; };
+		C2C025D5148BB758005E5236 /* md5.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = md5.h; sourceTree = "<group>"; };
+		C2C025D9148BB760005E5236 /* compression.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = compression.h; sourceTree = "<group>"; };
+		C2C025DA148BB760005E5236 /* huffman.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = huffman.c; sourceTree = "<group>"; };
+		C2C025DB148BB760005E5236 /* huffman.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = huffman.h; sourceTree = "<group>"; };
+		C2C025DF148BB76C005E5236 /* memory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = memory.h; sourceTree = "<group>"; };
+		C2C025E2148BB774005E5236 /* base.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = base.h; sourceTree = "<group>"; };
+		C2C025E3148BB774005E5236 /* quicksort.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = quicksort.c; sourceTree = "<group>"; };
+		C2C025E4148BB774005E5236 /* quicksort.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = quicksort.h; sourceTree = "<group>"; };
+		C2C025E5148BB774005E5236 /* sorting.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sorting.h; sourceTree = "<group>"; };
+		C2C025EB148BB77A005E5236 /* bit_stream.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = bit_stream.c; sourceTree = "<group>"; };
+		C2C025EC148BB77A005E5236 /* bit_stream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bit_stream.h; sourceTree = "<group>"; };
+		C2C025ED148BB77A005E5236 /* file_stream.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = file_stream.c; sourceTree = "<group>"; };
+		C2C025EE148BB77A005E5236 /* file_stream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = file_stream.h; sourceTree = "<group>"; };
+		C2C025EF148BB77A005E5236 /* io_stream.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = io_stream.c; sourceTree = "<group>"; };
+		C2C025F0148BB77A005E5236 /* io_stream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = io_stream.h; sourceTree = "<group>"; };
+		C2C025F1148BB77A005E5236 /* memory_stream.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = memory_stream.c; sourceTree = "<group>"; };
+		C2C025F2148BB77A005E5236 /* memory_stream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = memory_stream.h; sourceTree = "<group>"; };
+		C2C025F3148BB77A005E5236 /* stream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stream.h; sourceTree = "<group>"; };
+		C2C025FE148BB783005E5236 /* engine.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = engine.c; sourceTree = "<group>"; };
+		C2C025FF148BB783005E5236 /* engine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = engine.h; sourceTree = "<group>"; };
+		C2C02600148BB783005E5236 /* handler.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = handler.c; sourceTree = "<group>"; };
+		C2C02601148BB783005E5236 /* handler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = handler.h; sourceTree = "<group>"; };
+		C2C02602148BB783005E5236 /* template.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = template.h; sourceTree = "<group>"; };
+		C2C02608148BB791005E5236 /* string_util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = string_util.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -137,6 +199,10 @@
 		C20C2C7A1350B6AD001E22FB /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				C2C025FD148BB783005E5236 /* template */,
+				C2C025EA148BB77A005E5236 /* stream */,
+				C2C025E1148BB773005E5236 /* sorting */,
+				C2C025D8148BB760005E5236 /* compression */,
 				C2F8700D1350BAE20003A4A5 /* base */,
 				C20C2C7B1350B6BB001E22FB /* checksum */,
 				C20C2C7F1350B6BB001E22FB /* debug */,
@@ -154,6 +220,8 @@
 		C20C2C7B1350B6BB001E22FB /* checksum */ = {
 			isa = PBXGroup;
 			children = (
+				C2C025D4148BB758005E5236 /* md5.c */,
+				C2C025D5148BB758005E5236 /* md5.h */,
 				C20C2C7C1350B6BB001E22FB /* checksum.h */,
 				C20C2C7D1350B6BB001E22FB /* crc_32.c */,
 				C20C2C7E1350B6BB001E22FB /* crc_32.h */,
@@ -189,6 +257,7 @@
 		C20C2C891350B6BB001E22FB /* global */ = {
 			isa = PBXGroup;
 			children = (
+				C2C025DF148BB76C005E5236 /* memory.h */,
 				C20C2C8A1350B6BB001E22FB /* compilation.h */,
 				C20C2C8B1350B6BB001E22FB /* compiler.h */,
 				C20C2C8C1350B6BB001E22FB /* cpu.h */,
@@ -215,6 +284,12 @@
 		C20C2C991350B6BB001E22FB /* structures */ = {
 			isa = PBXGroup;
 			children = (
+				C2C02566148BB605005E5236 /* date_time.c */,
+				C2C02567148BB605005E5236 /* date_time.h */,
+				C2C02568148BB605005E5236 /* string_buffer.c */,
+				C2C02569148BB605005E5236 /* string_buffer.h */,
+				C2C0256A148BB605005E5236 /* type.c */,
+				C2C0256B148BB605005E5236 /* type.h */,
 				C20C2C9A1350B6BB001E22FB /* array_list.c */,
 				C20C2C9B1350B6BB001E22FB /* array_list.h */,
 				C20C2C9C1350B6BB001E22FB /* buffer.c */,
@@ -260,11 +335,65 @@
 		C20C2CB11350B6BB001E22FB /* util */ = {
 			isa = PBXGroup;
 			children = (
+				C2C02608148BB791005E5236 /* string_util.h */,
 				C20C2CB21350B6BB001E22FB /* dump_util.h */,
 				C20C2CB31350B6BB001E22FB /* util.h */,
 			);
 			name = util;
 			path = ../../../src/hive_viriatum_commons/util;
+			sourceTree = "<group>";
+		};
+		C2C025D8148BB760005E5236 /* compression */ = {
+			isa = PBXGroup;
+			children = (
+				C2C025D9148BB760005E5236 /* compression.h */,
+				C2C025DA148BB760005E5236 /* huffman.c */,
+				C2C025DB148BB760005E5236 /* huffman.h */,
+			);
+			name = compression;
+			path = ../../../src/hive_viriatum_commons/compression;
+			sourceTree = "<group>";
+		};
+		C2C025E1148BB773005E5236 /* sorting */ = {
+			isa = PBXGroup;
+			children = (
+				C2C025E2148BB774005E5236 /* base.h */,
+				C2C025E3148BB774005E5236 /* quicksort.c */,
+				C2C025E4148BB774005E5236 /* quicksort.h */,
+				C2C025E5148BB774005E5236 /* sorting.h */,
+			);
+			name = sorting;
+			path = ../../../src/hive_viriatum_commons/sorting;
+			sourceTree = "<group>";
+		};
+		C2C025EA148BB77A005E5236 /* stream */ = {
+			isa = PBXGroup;
+			children = (
+				C2C025EB148BB77A005E5236 /* bit_stream.c */,
+				C2C025EC148BB77A005E5236 /* bit_stream.h */,
+				C2C025ED148BB77A005E5236 /* file_stream.c */,
+				C2C025EE148BB77A005E5236 /* file_stream.h */,
+				C2C025EF148BB77A005E5236 /* io_stream.c */,
+				C2C025F0148BB77A005E5236 /* io_stream.h */,
+				C2C025F1148BB77A005E5236 /* memory_stream.c */,
+				C2C025F2148BB77A005E5236 /* memory_stream.h */,
+				C2C025F3148BB77A005E5236 /* stream.h */,
+			);
+			name = stream;
+			path = ../../../src/hive_viriatum_commons/stream;
+			sourceTree = "<group>";
+		};
+		C2C025FD148BB783005E5236 /* template */ = {
+			isa = PBXGroup;
+			children = (
+				C2C025FE148BB783005E5236 /* engine.c */,
+				C2C025FF148BB783005E5236 /* engine.h */,
+				C2C02600148BB783005E5236 /* handler.c */,
+				C2C02601148BB783005E5236 /* handler.h */,
+				C2C02602148BB783005E5236 /* template.h */,
+			);
+			name = template;
+			path = ../../../src/hive_viriatum_commons/template;
 			sourceTree = "<group>";
 		};
 		C2F8700D1350BAE20003A4A5 /* base */ = {
@@ -318,6 +447,25 @@
 				C20C2CE11350B6BB001E22FB /* dump_util.h in Headers */,
 				C20C2CE21350B6BB001E22FB /* util.h in Headers */,
 				C20C2CE31350B6BB001E22FB /* viriatum_commons.h in Headers */,
+				C2C0256D148BB605005E5236 /* date_time.h in Headers */,
+				C2C0256F148BB605005E5236 /* string_buffer.h in Headers */,
+				C2C02571148BB605005E5236 /* type.h in Headers */,
+				C2C025D7148BB758005E5236 /* md5.h in Headers */,
+				C2C025DC148BB760005E5236 /* compression.h in Headers */,
+				C2C025DE148BB760005E5236 /* huffman.h in Headers */,
+				C2C025E0148BB76C005E5236 /* memory.h in Headers */,
+				C2C025E6148BB774005E5236 /* base.h in Headers */,
+				C2C025E8148BB774005E5236 /* quicksort.h in Headers */,
+				C2C025E9148BB774005E5236 /* sorting.h in Headers */,
+				C2C025F5148BB77A005E5236 /* bit_stream.h in Headers */,
+				C2C025F7148BB77A005E5236 /* file_stream.h in Headers */,
+				C2C025F9148BB77A005E5236 /* io_stream.h in Headers */,
+				C2C025FB148BB77A005E5236 /* memory_stream.h in Headers */,
+				C2C025FC148BB77A005E5236 /* stream.h in Headers */,
+				C2C02604148BB783005E5236 /* engine.h in Headers */,
+				C2C02606148BB783005E5236 /* handler.h in Headers */,
+				C2C02607148BB783005E5236 /* template.h in Headers */,
+				C2C02609148BB791005E5236 /* string_util.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -381,6 +529,18 @@
 				C20C2CD41350B6BB001E22FB /* linked_list.c in Sources */,
 				C20C2CD71350B6BB001E22FB /* _thread_win32.c in Sources */,
 				C20C2CDF1350B6BB001E22FB /* thread_pool.c in Sources */,
+				C2C0256C148BB605005E5236 /* date_time.c in Sources */,
+				C2C0256E148BB605005E5236 /* string_buffer.c in Sources */,
+				C2C02570148BB605005E5236 /* type.c in Sources */,
+				C2C025D6148BB758005E5236 /* md5.c in Sources */,
+				C2C025DD148BB760005E5236 /* huffman.c in Sources */,
+				C2C025E7148BB774005E5236 /* quicksort.c in Sources */,
+				C2C025F4148BB77A005E5236 /* bit_stream.c in Sources */,
+				C2C025F6148BB77A005E5236 /* file_stream.c in Sources */,
+				C2C025F8148BB77A005E5236 /* io_stream.c in Sources */,
+				C2C025FA148BB77A005E5236 /* memory_stream.c in Sources */,
+				C2C02603148BB783005E5236 /* engine.c in Sources */,
+				C2C02605148BB783005E5236 /* handler.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
