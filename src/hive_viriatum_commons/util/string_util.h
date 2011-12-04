@@ -35,7 +35,7 @@ static __inline unsigned char *baseStringValue(unsigned char *stringValue) {
     unsigned int currentCharacter;
 
     /* retrieves the string value length */
-    unsigned int stringValueLength = strlen((char *) stringValue);
+    unsigned int stringValueLength = (unsigned int) strlen((char *) stringValue);
 
     /* iterates from back throught the string value */
     for(index = stringValueLength; index > 0; index--) {
