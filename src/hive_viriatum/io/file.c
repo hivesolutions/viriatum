@@ -237,7 +237,7 @@ ERROR_CODE entriesToMapFile(struct LinkedList_t *entries, struct LinkedList_t **
         entryValueType->value.valueString = (char *) entry->name;
         setValueStringHashMap(entryMap, (unsigned char *) "name", (void *) entryValueType);
         createType(&entryValueType, INTEGER_TYPE);
-        entryValueType->value.valueInt = entry->size;
+        entryValueType->value.valueInt = (int) entry->size;
         setValueStringHashMap(entryMap, (unsigned char *) "size", (void *) entryValueType);
         createType(&entryValueType, STRING_TYPE);
         entryValueType->value.valueString = dateTimeString;

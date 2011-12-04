@@ -275,7 +275,7 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
 
             /* assigns the directory entries to the template handler */
             assignListTemplateHandler(templateHandler, (unsigned char *) "entries", directoryEntriesMap);
-            assignIntegerTemplateHandler(templateHandler, (unsigned char *) "items", directoryEntriesMap->size);
+            assignIntegerTemplateHandler(templateHandler, (unsigned char *) "items", (int) directoryEntriesMap->size);
 
             /* processes the file as a template handler */
             processTemplateHandler(templateHandler, templatePath);
@@ -334,13 +334,13 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
         SPRINTF(headersBuffer, 1024, "HTTP/1.1 404 Not Found\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nCache-Control: no-cache, must-revalidate\r\nContent-Length: 15\r\n\r\n404 - Not Found", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU);
 
         /* writes both the headers to the connection, registers for the appropriate callbacks */
-        writeConnection(connection, (unsigned char *) headersBuffer, strlen(headersBuffer), _cleanupHandlerFile, handlerFileContext);
+        writeConnection(connection, (unsigned char *) headersBuffer, (unsigned int) strlen(headersBuffer), _cleanupHandlerFile, handlerFileContext);
     } else if(isRedirect) {
         /* writes the http static headers to the response */
         SPRINTF(headersBuffer, 1024, "HTTP/1.1 307 Temporary Redirect\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nContent-Length: 0\r\nLocation: %s\r\n\r\n", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, location);
 
         /* writes both the headers to the connection, registers for the appropriate callbacks */
-        writeConnection(connection, (unsigned char *) headersBuffer, strlen(headersBuffer), _cleanupHandlerFile, handlerFileContext);
+        writeConnection(connection, (unsigned char *) headersBuffer, (unsigned int) strlen(headersBuffer), _cleanupHandlerFile, handlerFileContext);
     }
     /* in case the current situation is a directory list */
     else if(isDirectory) {
@@ -348,14 +348,14 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
         SPRINTF(headersBuffer, 1024, "HTTP/1.1 200 OK\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nCache-Control: no-cache, must-revalidate\r\nContent-Length: %lu\r\n\r\n", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, strlen((char *) handlerFileContext->templateHandler->stringValue));
 
         /* writes both the headers to the connection, registers for the appropriate callbacks */
-        writeConnection(connection, (unsigned char *) headersBuffer, strlen(headersBuffer), _sendDataHandlerFile, handlerFileContext);
+        writeConnection(connection, (unsigned char *) headersBuffer, (unsigned int) strlen(headersBuffer), _sendDataHandlerFile, handlerFileContext);
     }
     else if(handlerFileContext->etagStatus == 2 && strcmp(etag, (char *) handlerFileContext->etag) == 0) {
         /* writes the http static headers to the response */
         SPRINTF(headersBuffer, 1024, "HTTP/1.1 304 Not Modified\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nCache-Control: no-cache, must-revalidate\r\nContent-Length: 0\r\n\r\n", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU);
 
         /* writes both the headers to the connection, registers for the appropriate callbacks */
-        writeConnection(connection, (unsigned char *) headersBuffer, strlen(headersBuffer), _cleanupHandlerFile, handlerFileContext);
+        writeConnection(connection, (unsigned char *) headersBuffer, (unsigned int) strlen(headersBuffer), _cleanupHandlerFile, handlerFileContext);
     }
     /* otherwise there was no error in the file and it's a simple
     file situation (no directory) */
@@ -557,7 +557,7 @@ ERROR_CODE _sendDataHandlerFile(struct Connection_t *connection, struct Data_t *
     } else {
         /* writes the (file) data to the connection and sets the handler
         file context as flushed */
-        writeConnection(connection, templateHandler->stringValue, strlen((char *) templateHandler->stringValue), _sendDataHandlerFile, handlerFileContext);
+        writeConnection(connection, templateHandler->stringValue, (unsigned int) strlen((char *) templateHandler->stringValue), _sendDataHandlerFile, handlerFileContext);
         handlerFileContext->flushed = 1;
 
         /* unsets the string value in the template handler (avoids double release) */
