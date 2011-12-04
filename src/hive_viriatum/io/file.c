@@ -508,10 +508,10 @@ ERROR_CODE isDirectoryFile(char *filePath, unsigned int *isDirectory) {
     else {
         /* sets the is directory flag */
         *isDirectory = 1;
+        
+        /* closes the directory reference */
+        closedir(directory);
     }
-
-    /* closes the directory reference */
-    closedir(directory);
 
     /* raise no error */
     RAISE_NO_ERROR;
