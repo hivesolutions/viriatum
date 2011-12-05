@@ -51,7 +51,7 @@ typedef struct md5Context_t {
     unsigned int block[16];
 } md5Context;
 
-VIRIATUM_EXPORT_PREFIX void md5(unsigned char *buffer, unsigned int bufferLength, char *result);
+VIRIATUM_EXPORT_PREFIX void md5(unsigned char *buffer, unsigned int bufferLength, unsigned char *result);
 VIRIATUM_EXPORT_PREFIX void initMd5(struct md5Context_t *context);
 VIRIATUM_EXPORT_PREFIX void updateMd5(struct md5Context_t *context, void *data, unsigned long size);
 VIRIATUM_EXPORT_PREFIX void finalMd5(unsigned char *result, struct md5Context_t *context);
