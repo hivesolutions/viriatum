@@ -29,7 +29,7 @@
 
 #include "md5.h"
 
-void md5(unsigned char *buffer, unsigned int bufferLength, char *result) {
+void md5(unsigned char *buffer, unsigned int bufferLength, unsigned char *result) {
     /* allocates space for the md5 context */
     struct md5Context_t md5Context;
 

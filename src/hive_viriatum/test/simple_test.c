@@ -362,7 +362,7 @@ void testQuicksortLinkedList() {
 
 void testMd5() {
     /* allocates space for the md5 result */
-    char result[16];
+    unsigned char result[16];
 
     /* calculates the md5 hash value into the result */
     md5((unsigned char *) "Hello World", 11, result);
