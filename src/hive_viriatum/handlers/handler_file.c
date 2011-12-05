@@ -313,7 +313,7 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
             getWriteTimeFile((char *) handlerFileContext->filePath, &time);
 
             /* creates the date time string for the file entry */
-			SPRINTF(timeString, 20, "%04d-%02d-%02d %02d:%02d:%02d", time.year, time.month, time.day, time.hour, time.minute, time.second);
+            SPRINTF(timeString, 20, "%04d-%02d-%02d %02d:%02d:%02d", time.year, time.month, time.day, time.hour, time.minute, time.second);
 
             /* creates the crc32 value and prints it into the
             etag as an heexadecimal string value */
