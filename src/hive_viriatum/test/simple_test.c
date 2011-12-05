@@ -360,6 +360,19 @@ void testQuicksortLinkedList() {
     deleteLinkedList(linkedList);
 }
 
+void testMd5() {
+    /* allocates space for the md5 result */
+    char result[16];
+
+    /* calculates the md5 hash value into the result */
+    md5("Hello World", 11, result);
+}
+
+void testCrc32() {
+    /* calculates the crc32 hash value and returns it */
+    crc32("Hello World", 11);
+}
+
 int _compare(void *first, void *second) {
     /* in case the first element is smaller
     than the second element */
@@ -412,4 +425,10 @@ void runSimpleTests() {
     /* tests the quick sort algorithm */
     testQuicksort();
     testQuicksortLinkedList();
+
+    /* tests the md5 hash function */
+    testMd5();
+
+    /* tests the crc32 hash function */
+    testCrc32();
 }

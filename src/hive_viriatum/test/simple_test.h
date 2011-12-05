@@ -101,6 +101,18 @@ void testQuicksort();
 void testQuicksortLinkedList();
 
 /**
+ * Tests the md5 hash implementation
+ * calculation.
+ */
+void testMd5();
+
+/**
+ * Tests the crc32 hash implementation
+ * calculation.
+ */
+void testCrc32();
+
+/**
  * Compars an element with another, usefull
  * for the sorting tests.
  *

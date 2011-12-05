@@ -29,6 +29,20 @@
 
 #include "md5.h"
 
+void md5(unsigned char *buffer, unsigned int bufferLength, char *result) {
+    /* allocates space for the md5 context */
+    struct md5Context_t md5Context;
+
+    /* initializes the md5 contenxt */
+    initMd5(&md5Context);
+
+    /* updates the md5 structure with the buffer data */
+    updateMd5(&md5Context, buffer, bufferLength);
+
+    /* finalizes the md5 hash */
+    finalMd5(result, &md5Context);
+}
+
 void initMd5(struct md5Context_t *context) {
     context->a = 0x67452301;
     context->b = 0xefcdab89;
