@@ -27,15 +27,31 @@
 
 #pragma once
 
-typedef unsigned int MD5_u32plus;
+#define F(x, y, z) ((z) ^ ((x) & ((y) ^ (z))))
+#define G(x, y, z) ((y) ^ ((z) & ((x) ^ (y))))
+#define H(x, y, z) ((x) ^ (y) ^ (z))
+#define I(x, y, z) ((y) ^ ((x) | ~(z)))
 
-typedef struct {
-    MD5_u32plus lo, hi;
-    MD5_u32plus a, b, c, d;
+#define STEP(f, a, b, c, d, x, t, s)\
+    (a) += f((b), (c), (d)) + (x) + (t);\
+    (a) = (((a) << (s)) | (((a) & 0xffffffff) >> (32 - (s))));\
+    (a) += (b);
+
+#define SET(n) (*(unsigned int *)&pointer[(n) * 4])
+#define GET(n) SET(n)
+
+typedef struct md5Context_t {
+    unsigned int low;
+    unsigned int high;
+    unsigned int a;
+    unsigned int b;
+    unsigned int c;
+    unsigned int d;
     unsigned char buffer[64];
-    MD5_u32plus block[16];
-} MD5_context;
+    unsigned int block[16];
+} md5Context;
 
-extern void MD5_Init(MD5_context *context);
-extern void MD5_Update(MD5_context *context, void *data, unsigned long size);
-extern void MD5_Final(unsigned char *result, MD5_context *context);
+VIRIATUM_EXPORT_PREFIX void md5Init(struct md5Context_t *context);
+VIRIATUM_EXPORT_PREFIX void md5Update(struct md5Context_t *context, void *data, unsigned long size);
+VIRIATUM_EXPORT_PREFIX void md5Final(unsigned char *result, struct md5Context_t *context);
+VIRIATUM_EXPORT_PREFIX void *_bodyMd5(struct md5Context_t *context, void *data, unsigned long size);
