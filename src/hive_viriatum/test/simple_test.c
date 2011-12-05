@@ -365,12 +365,12 @@ void testMd5() {
     char result[16];
 
     /* calculates the md5 hash value into the result */
-    md5("Hello World", 11, result);
+    md5((unsigned char *) "Hello World", 11, result);
 }
 
 void testCrc32() {
     /* calculates the crc32 hash value and returns it */
-    crc32("Hello World", 11);
+    crc32((unsigned char *) "Hello World", 11);
 }
 
 int _compare(void *first, void *second) {
