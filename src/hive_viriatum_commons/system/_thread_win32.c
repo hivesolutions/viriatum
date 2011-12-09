@@ -27,6 +27,8 @@
 
 #include "stdafx.h"
 
+#ifndef VIRIATUM_NO_THREADS
+
 #ifdef VIRIATUM_PLATFORM_WIN32
 
 #include "_thread_win32.h"
@@ -241,5 +243,7 @@ unsigned char _testLockOwnerCondition(struct Condition_t *condition) {
     /* returns valid */
     return 1;
 }
+
+#endif
 
 #endif

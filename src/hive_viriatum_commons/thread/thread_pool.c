@@ -29,6 +29,8 @@
 
 #include "thread_pool.h"
 
+#ifndef VIRIATUM_NO_THREADS
+
 void createThreadPool(struct ThreadPool_t **threadPoolPointer, size_t numberThreads, size_t schedulingAlgorithm, size_t maximumNumberThreads) {
     /* allocates space for the index */
     size_t index;
@@ -156,3 +158,5 @@ THREAD_RETURN poolRunnerThread(THREAD_ARGUMENTS parameters) {
     /* returns valid */
     return 0;
 }
+
+#endif

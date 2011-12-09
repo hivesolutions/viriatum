@@ -27,6 +27,8 @@
 
 #pragma once
 
+#ifndef VIRIATUM_NO_THREADS
+
 #ifdef VIRIATUM_PLATFORM_WIN32
 
 #include "../structures/linked_list.h"
@@ -48,5 +50,7 @@ VIRIATUM_EXPORT_PREFIX void notifyCondition(struct Condition_t *condition);
 VIRIATUM_NO_EXPORT_PREFIX void _pushCondition(struct Condition_t *condition, HANDLE *waitEventPointer);
 VIRIATUM_NO_EXPORT_PREFIX void _popCondition(struct Condition_t *condition, HANDLE *waitEventPointer);
 VIRIATUM_NO_EXPORT_PREFIX unsigned char _testLockOwnerCondition(struct Condition_t *condition);
+
+#endif
 
 #endif

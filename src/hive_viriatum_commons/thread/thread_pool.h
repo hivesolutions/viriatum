@@ -27,6 +27,8 @@
 
 #pragma once
 
+#ifndef VIRIATUM_NO_THREADS
+
 #include "../structures/structures.h"
 #include "../system/system.h"
 
@@ -66,3 +68,5 @@ VIRIATUM_EXPORT_PREFIX void insertTaskThreadPool(struct ThreadPool_t *threadPool
  * @return The thread result.
  */
 VIRIATUM_EXPORT_PREFIX THREAD_RETURN poolRunnerThread(THREAD_ARGUMENTS parameters);
+
+#endif

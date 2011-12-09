@@ -74,7 +74,6 @@
 
 #ifdef VIRIATUM_PLATFORM_UNIX
 #include <unistd.h>
-#include <pthread.h>
 #include <dlfcn.h>
 #include <errno.h>
 #include <fcntl.h>
