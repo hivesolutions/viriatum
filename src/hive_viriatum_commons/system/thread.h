@@ -27,6 +27,8 @@
 
 #pragma once
 
+#ifndef VIRIATUM_NO_THREADS
+
 #ifdef VIRIATUM_PLATFORM_WIN32
 #define THREAD_VALID_RETURN_VALUE 0
 #define THREAD_INVALID_RETURN_VALUE 1
@@ -67,6 +69,7 @@
 #endif
 
 #ifdef VIRIATUM_PLATFORM_UNIX
+#include <pthread.h>
 typedef struct EventHandle_t {
     pthread_cond_t event;
     pthread_mutex_t mutex;
@@ -118,4 +121,6 @@ pthread_cond_init(conditionHandle, NULL)
 #define CONDITION_SIGNAL(conditionHandle) pthread_cond_signal(conditionHandle)
 #define CONDITION_CLOSE(conditionHandle) pthread_cond_destroy(conditionHandle);\
     FREE(conditionHandle)
+#endif
+
 #endif
