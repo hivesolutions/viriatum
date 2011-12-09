@@ -36,6 +36,8 @@
 #include "global/targetver.h"
 #include "global/resource.h"
 
+#define VIRIATUM_NO_THREADS
+
 /* excludes rarely-used stuff from windows headers */
 #define WIN32_LEAN_AND_MEAN
 

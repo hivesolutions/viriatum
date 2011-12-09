@@ -27,6 +27,8 @@
 
 #pragma once
 
+#ifndef VIRIATUM_NO_THREADS
+
 /**
  * Test thread function to be used in the thread
  * pool test.
@@ -41,6 +43,8 @@ int threadPoolStartFunctionTest(void *arguments);
  * Tests the thread pool implementation.
  */
 void testThreadPool();
+
+#endif
 
 /**
  * Tests the linked list structure.

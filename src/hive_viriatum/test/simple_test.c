@@ -29,6 +29,8 @@
 
 #include "simple_test.h"
 
+#ifndef VIRIATUM_NO_THREADS
+
 int threadPoolStartFunctionTest(void *arguments) {
     /* retrieves the current thread identifier */
     THREAD_IDENTIFIER threadId = THREAD_GET_IDENTIFIER();
@@ -71,6 +73,8 @@ void testThreadPool() {
         insertTaskThreadPool(threadPool, threadPoolTask);
     }
 }
+
+#endif
 
 void testLinkedList() {
     /* allocates space for the value */
@@ -392,8 +396,10 @@ int _compare(void *first, void *second) {
 }
 
 void runSimpleTests() {
-    /* tests the thread pool */
+	#ifndef VIRIATUM_NO_THREADS
+	/* tests the thread pool */
     testThreadPool();
+	#endif
 
     /* tests the linked list */
     testLinkedList();
