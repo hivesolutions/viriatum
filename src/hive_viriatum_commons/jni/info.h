@@ -27,6 +27,10 @@
 
 #pragma once
 
+#ifdef VIRIATUM_JNI
+
 #include <jni.h>
 
 VIRIATUM_EXPORT_PREFIX jstring Java_com_example_hellojni_HelloJni_stringFromJNI(JNIEnv* env, jobject thiz);
+
+#endif

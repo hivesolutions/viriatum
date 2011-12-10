@@ -24,7 +24,7 @@
 # __license__   = GNU General Public License (GPL), Version 3
 
 # checks for libraries
-AC_CHECK_LIB([lua5.1], [main], [], [have_lua = "false"])
+AC_CHECK_LIB([lua5.1], [main], [], [have_lua=false])
 
 # library variables activation
 AM_CONDITIONAL(LINK_LUA, [test "$have_lua" != "false"])
