@@ -36,7 +36,14 @@
 #include "global/targetver.h"
 #include "global/resource.h"
 
+
+/* HARDCODES */
 #define VIRIATUM_NO_THREADS
+#define VIRIATUM_JNI
+
+
+
+
 
 /* excludes rarely-used stuff from windows headers */
 #define WIN32_LEAN_AND_MEAN
@@ -83,6 +90,10 @@
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <sys/resource.h>
+#endif
+
+#ifdef VIRIATUM_JNI
+#include <jni.h>
 #endif
 
 #include <stdio.h>
