@@ -619,6 +619,14 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="Jni"
+				>
+				<File
+					RelativePath="..\..\src\hive_viriatum_commons\jni\info.c"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -886,6 +894,18 @@
 				</File>
 				<File
 					RelativePath="..\..\src\hive_viriatum_commons\sorting\sorting.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Jni"
+				>
+				<File
+					RelativePath="..\..\src\hive_viriatum_commons\jni\info.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\hive_viriatum_commons\jni\jni.h"
 					>
 				</File>
 			</Filter>

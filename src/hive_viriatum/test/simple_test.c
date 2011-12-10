@@ -396,10 +396,10 @@ int _compare(void *first, void *second) {
 }
 
 void runSimpleTests() {
-	#ifndef VIRIATUM_NO_THREADS
-	/* tests the thread pool */
+    #ifndef VIRIATUM_NO_THREADS
+    /* tests the thread pool */
     testThreadPool();
-	#endif
+    #endif
 
     /* tests the linked list */
     testLinkedList();
