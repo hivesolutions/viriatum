@@ -41,6 +41,7 @@
 #define VIRIATUM_NO_THREADS
 #define VIRIATUM_JNI
 
+#include <jni.h>
 
 
 
