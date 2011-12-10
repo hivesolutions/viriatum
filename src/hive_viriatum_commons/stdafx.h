@@ -41,9 +41,6 @@
 #define VIRIATUM_NO_THREADS
 #define VIRIATUM_JNI
 
-#include <jni.h>
-
-
 
 
 /* excludes rarely-used stuff from windows headers */
