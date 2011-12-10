@@ -65,6 +65,7 @@ thread/thread_pool.c
 libviriatum_la_SOURCES = stdafx.c \
 checksum/crc_32.c \
 checksum/md5.c \
+compression/huffman.c \
 debug/error.c \
 debug/logging.c \
 encoding/base_64.c \
