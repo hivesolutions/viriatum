@@ -25,23 +25,19 @@
 
 # checks for libraries
 AC_CHECK_LIB([dl], [main], [], [AC_MSG_ERROR(can't build without dynamic linking (libdl) libraries)])
-AC_CHECK_LIB([pthread], [main], [], [AC_MSG_ERROR(can't build without posix threads (libpthread) libraries)])
+AC_CHECK_LIB([pthread], [main], [], [have_pthread=false]])
 AC_CHECK_LIB([ws2_32], [main], [], [have_w2_32=false])
 
 # library variables activation
 AM_CONDITIONAL(LINK_WS2_32, [test "$have_w2_32" != "false"])
 
-
-
-
-
-version_type=linux # correct to gnu/linux during the next big refactor
-need_lib_prefix=no
-need_version=no
-
-library_names_spec='$libname${shared_ext}'
-soname_spec='${libname}${shared_ext}'
-
-finish_cmds='PATH="\$PATH:/sbin" ldconfig -n $libdir'
-shlibpath_var=LD_LIBRARY_PATH
-shlibpath_overrides_runpath=no
+case $host_os in
+  linux-android*)
+    library_names_spec='$libname${shared_ext}'
+	soname_spec='${libname}${shared_ext}'
+  ;;
+  *)
+    library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}$major $libname${shared_ext}'
+    soname_spec='${libname}${release}${shared_ext}$major'
+  ;;
+esac
