@@ -31,8 +31,8 @@
 
 #include <jni.h>
 
-VIRIATUM_EXPORT_PREFIX jstring Java_pt_hive_viriatum_Settings_getName(JNIEnv *env, jobject thiz);
-VIRIATUM_EXPORT_PREFIX jstring Java_pt_hive_viriatum_Settings_getVersion(JNIEnv *env, jobject thiz);
-VIRIATUM_EXPORT_PREFIX jstring Java_pt_hive_viriatum_Settings_getDescription(JNIEnv *env, jobject thiz);
+VIRIATUM_EXPORT_PREFIX jstring Java_pt_hive_viriatum_Settings_getName(JNIEnv *env, jclass cls);
+VIRIATUM_EXPORT_PREFIX jstring Java_pt_hive_viriatum_Settings_getVersion(JNIEnv *env, jclass cls);
+VIRIATUM_EXPORT_PREFIX jstring Java_pt_hive_viriatum_Settings_getDescription(JNIEnv *env, jclass cls);
 
 #endif
