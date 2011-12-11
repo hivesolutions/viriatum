@@ -31,8 +31,16 @@
 
 #ifdef VIRIATUM_JNI
 
+jstring Java_pt_hive_viriatum_Settings_getName(JNIEnv *env, jobject thiz) {
+    return (*env)->NewStringUTF(env, nameViriatumCommons());
+}
+
 jstring Java_pt_hive_viriatum_Settings_getVersion(JNIEnv *env, jobject thiz) {
     return (*env)->NewStringUTF(env, versionViriatumCommons());
+}
+
+jstring Java_pt_hive_viriatum_Settings_getDescription(JNIEnv *env, jobject thiz) {
+    return (*env)->NewStringUTF(env, descriptionViriatumCommons());
 }
 
 #endif
