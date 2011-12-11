@@ -30,14 +30,3 @@ AC_CHECK_LIB([ws2_32], [main], [], [have_w2_32=false])
 
 # library variables activation
 AM_CONDITIONAL(LINK_WS2_32, [test "$have_w2_32" != "false"])
-
-case $host_os in
-  linux-android*)
-    library_names_spec='$libname${shared_ext}'
-	soname_spec='${libname}${shared_ext}'
-  ;;
-  *)
-    library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}$major $libname${shared_ext}'
-    soname_spec='${libname}${release}${shared_ext}$major'
-  ;;
-esac
