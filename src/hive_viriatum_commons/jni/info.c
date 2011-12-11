@@ -32,7 +32,7 @@
 #ifdef VIRIATUM_JNI
 
 jstring Java_pt_hive_viriatum_Settings_getVersion(JNIEnv *env, jobject thiz) {
-    return (*env)->NewStringUTF(env, "Hello from JNI !");
+    return (*env)->NewStringUTF(env, versionViriatumCommons());
 }
 
 #endif
