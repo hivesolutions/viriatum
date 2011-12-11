@@ -27,7 +27,21 @@
 AC_CHECK_LIB([dl], [main], [], [AC_MSG_ERROR(can't build without dynamic linking (libdl) libraries)])
 AC_CHECK_LIB([pthread], [main], [], [AC_MSG_ERROR(can't build without posix threads (libpthread) libraries)])
 AC_CHECK_LIB([ws2_32], [main], [], [have_w2_32=false])
-AC_CHECK_LIB([viriatum], [main], [], [have_viriatum=false])
 
 # library variables activation
 AM_CONDITIONAL(LINK_WS2_32, [test "$have_w2_32" != "false"])
+
+
+
+
+
+version_type=linux # correct to gnu/linux during the next big refactor
+need_lib_prefix=no
+need_version=no
+
+library_names_spec='$libname${shared_ext}'
+soname_spec='${libname}${shared_ext}'
+
+finish_cmds='PATH="\$PATH:/sbin" ldconfig -n $libdir'
+shlibpath_var=LD_LIBRARY_PATH
+shlibpath_overrides_runpath=no
