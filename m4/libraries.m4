@@ -25,7 +25,7 @@
 
 # checks for libraries
 AC_CHECK_LIB([dl], [main], [], [AC_MSG_ERROR(can't build without dynamic linking (libdl) libraries)])
-AC_CHECK_LIB([pthread], [main], [], [have_pthread=false]])
+AC_CHECK_LIB([pthread], [main], [], [have_pthread=false])
 AC_CHECK_LIB([ws2_32], [main], [], [have_w2_32=false])
 
 # library variables activation
