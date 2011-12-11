@@ -27,6 +27,10 @@
 
 #pragma once
 
+#ifdef VIRIATUM_JNI
+
 #include <jni.h>
 
 VIRIATUM_EXPORT_PREFIX jstring Java_pt_hive_viriatum_Settings_getVersion(JNIEnv *env, jobject thiz);
+
+#endif
