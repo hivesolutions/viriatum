@@ -27,6 +27,10 @@
 
 #pragma once
 
+// global definitions (hard definitions)
+#define VIRIATUM_NO_THREADS
+#define VIRIATUM_JNI
+
 #ifdef __MACH__
 #define unix true
 #include <TargetConditionals.h>
@@ -35,13 +39,6 @@
 #ifdef _WIN32
 #include "global/targetver.h"
 #include "global/resource.h"
-
-
-/* HARDCODES */
-#define VIRIATUM_NO_THREADS
-#define VIRIATUM_JNI
-
-
 
 /* excludes rarely-used stuff from windows headers */
 #define WIN32_LEAN_AND_MEAN
