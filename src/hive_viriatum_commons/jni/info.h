@@ -29,4 +29,4 @@
 
 #include <jni.h>
 
-VIRIATUM_EXPORT_PREFIX jstring Java_pt_hive_viriatum_MainActivity_getVersion(JNIEnv *env, jobject thiz);
+VIRIATUM_EXPORT_PREFIX jstring Java_pt_hive_viriatum_Settings_getVersion(JNIEnv *env, jobject thiz);
