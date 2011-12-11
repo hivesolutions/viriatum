@@ -43,4 +43,8 @@ jstring Java_pt_hive_viriatum_Settings_getDescription(JNIEnv *env, jclass cls) {
     return (*env)->NewStringUTF(env, descriptionViriatumCommons());
 }
 
+jstring Java_pt_hive_viriatum_Settings_hello(JNIEnv *env, jobject thiz) {
+    return (*env)->NewStringUTF(env, "hello wolrd");
+}
+
 #endif
