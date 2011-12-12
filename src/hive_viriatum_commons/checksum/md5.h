@@ -40,6 +40,13 @@
 #define SET(n) (*(unsigned int *)&pointer[(n) * 4])
 #define GET(n) SET(n)
 
+/**
+ * Structure defining a context of md5
+ * execution.
+ * For every md5 execution a new context
+ * must be created for temporary values
+ * storage.
+ */
 typedef struct md5Context_t {
     unsigned int low;
     unsigned int high;
