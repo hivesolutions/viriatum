@@ -50,6 +50,7 @@ http/http_parser.c \
 http/http_request.c \
 io/file.c \
 jni/info.c \
+jni/service.c \
 module/loading.c \
 polling/polling_epoll.c\
 polling/polling_kqueue.c\
@@ -68,6 +69,7 @@ http/http_parser.c \
 http/http_request.c \
 io/file.c \
 jni/info.c \
+jni/service.c \
 module/loading.c \
 polling/polling_epoll.c\
 polling/polling_kqueue.c\
