@@ -39,7 +39,7 @@
 #define VIRIATUM_RESOURCES_PATH "resources"
 #define VIRIATUM_BASE_PATH "/html/base"
 #define VIRIATUM_LISTING_PATH "/html/base/templates/listing.html.tpl"
-#define VIRIATUM_CONTENTS_PATH "/"
+#define VIRIATUM_CONTENTS_PATH ""
 #else
 #define VIRIATUM_RESOURCES_PATH "resources"
 #define VIRIATUM_BASE_PATH "/html/base"
