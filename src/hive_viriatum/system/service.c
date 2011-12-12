@@ -217,8 +217,6 @@ ERROR_CODE startService(struct Service_t *service) {
     /* sets the flags to be used in socket */
     SOCKET_FLAGS flags = 1;
 
-	char *tobias;
-
     /* loads (all) the currently available modules */
     loadModulesService(service);
 
@@ -230,19 +228,17 @@ ERROR_CODE startService(struct Service_t *service) {
     /* creates the service socket for the given types */
     service->serviceSocketHandle = SOCKET_CREATE(SOCKET_INTERNET_TYPE, SOCKET_PACKET_TYPE, SOCKET_PROTOCOL_TCP);
 
-	if(SOCKET_TEST_ERROR(service->serviceSocketHandle)) {
+    /* in case there was an error creating the service socket */
+    if(SOCKET_TEST_ERROR(service->serviceSocketHandle)) {
         /* retrieves the creating error code */
         SOCKET_ERROR_CODE creatingErrorCode = SOCKET_GET_ERROR_CODE(socketResult);
 
         /* prints the error */
         V_ERROR_F("Problem creating socket: %d\n", creatingErrorCode);
 
-		tobias = (char *) malloc(1024);
-		SPRINTF(tobias, 1024, "P creating socket: %d", creatingErrorCode);
-
         /* raises an error */
-        RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, tobias);
-	}
+        RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem creating socket");
+    }
 
     /* in case viriatum is set to non blocking */
     if(VIRIATUM_NON_BLOCKING) {
@@ -264,11 +260,8 @@ ERROR_CODE startService(struct Service_t *service) {
         /* closes the service socket */
         SOCKET_CLOSE(service->serviceSocketHandle);
 
-		tobias = (char *) malloc(1024);
-		SPRINTF(tobias, 1024, "P setting socket option: %d", optionErrorCode);
-
         /* raises an error */
-        RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, tobias);
+        RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem setting socket option");
     }
 
     /* binds the service socket */
@@ -285,11 +278,8 @@ ERROR_CODE startService(struct Service_t *service) {
         /* closes the service socket */
         SOCKET_CLOSE(service->serviceSocketHandle);
 
-		tobias = (char *) malloc(1024);
-		SPRINTF(tobias, 1024, "P binding socket: %d", bindingErrorCode);
-
         /* raises an error */
-        RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, tobias);
+        RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem binding socket");
     }
 
     /* listens for a service socket change */
