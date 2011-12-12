@@ -29,7 +29,7 @@
 
 #include "../util/string_util.h"
 
-#ifdef VIRIATUM_ANDROID
+#ifdef VIRIATUM_PLATFORM_ANDROID
 #include <android/log.h>
 #define PRINTF(format, ...) __android_log_print(ANDROID_LOG_INFO, "viriatum", format, __VA_ARGS__)
 #else
