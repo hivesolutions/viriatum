@@ -31,7 +31,7 @@
 
 #ifdef VIRIATUM_ANDROID
 #include <android/log.h>
-#define PRINTF(format, ...) printf(format, __VA_ARGS__)
+#define PRINTF(format, ...) __android_log_print(ANDROID_LOG_INFO, "viriatum", format, __VA_ARGS__)
 #else
 #define PRINTF(format, ...) printf(format, __VA_ARGS__)
 #endif
@@ -45,19 +45,19 @@
 #endif
 
 #ifdef VIRIATUM_DEBUG
-#define V_DEBUG(format) V_MESSAGE("DEBUG"); PRINTF(format)
+#define V_DEBUG(format) V_MESSAGE("DEBUG"); PRINTF(format, NULL)
 #define V_DEBUG_F(format, ...) V_MESSAGE("DEBUG"); PRINTF(format, __VA_ARGS__)
 #endif
 
 #ifndef VIRIATUM_DEBUG
-#define V_DEBUG(format) dump(format)
+#define V_DEBUG(format) dump(format, NULL)
 #define V_DEBUG_F(format, ...) dumpMultiple(format, __VA_ARGS__)
 #endif
 
-#define V_WARNING(format) V_MESSAGE("WARNING"); PRINTF(format)
+#define V_WARNING(format) V_MESSAGE("WARNING"); PRINTF(format, NULL)
 #define V_WARNING_F(format, ...) V_MESSAGE("WARNING"); PRINTF(format, __VA_ARGS__)
 
-#define V_ERROR(format) V_MESSAGE("ERROR"); printf(format)
+#define V_ERROR(format) V_MESSAGE("ERROR"); printf(format, NULL)
 #define V_ERROR_F(format, ...) V_MESSAGE("ERROR"); PRINTF(format, __VA_ARGS__)
 
 #define V_PRINT(format) PRINTF(format)
