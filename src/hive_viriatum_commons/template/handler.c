@@ -263,6 +263,9 @@ void processTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned 
     /* processes the file as a template engine and then uses the
     created node structure to traverse for string buffer output */
     processTemplateEngine(templateEngine, templateSettings, filePath);
+
+	PRINTF("vai fazer traverse");
+
     traverseNodeBuffer(templateHandler, templateHandler->currentNode);
 
 	PRINTF("vai fazer join");
