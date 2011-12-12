@@ -210,6 +210,8 @@ VIRIATUM_EXPORT_PREFIX ERROR_CODE processTemplateEngine(struct TemplateEngine_t 
  * retrieveal.
  * @param pointer The pointer reference to the buffer to
  * updated with the read chracter.
+ * @param size The pointer to the variable containing the
+ * (remaining) size in the file.
  * @return The character read from the file stream.
  */
-VIRIATUM_EXPORT_PREFIX char _getcTemplateEngine(FILE *file, unsigned char **pointer);
+VIRIATUM_EXPORT_PREFIX char _getcTemplateEngine(FILE *file, unsigned char **pointer, size_t *size);
