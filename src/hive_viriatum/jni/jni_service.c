@@ -47,7 +47,7 @@ jstring Java_pt_hive_viriatum_http_Service_run(JNIEnv *env, jclass cls) {
         /* prints an error message */
         V_ERROR_F("Problem running service (%s)\n", (char *) GET_ERROR());
 
-		SPRINTF(buffer, "Problem running service (%s)\n", (char *) GET_ERROR()
+		SPRINTF(buffer, 1024, "Problem running service (%s)\n", (char *) GET_ERROR());
     }
 
 	return (*env)->NewStringUTF(env, buffer);
