@@ -30,6 +30,7 @@ echo
 echo " + Host                  $host_os"
 echo " + Install prefix        $prefix"
 echo " + CFLAGS                $CFLAGS"
+echo " + Log                   $have_log"
 echo " + Python                $have_python"
 echo " + JNI                   $have_jni"
 echo " + Threads               $have_pthread"
