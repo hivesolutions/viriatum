@@ -230,6 +230,47 @@ ERROR_CODE startService(struct Service_t *service) {
     /* creates the service socket for the given types */
     service->serviceSocketHandle = SOCKET_CREATE(SOCKET_INTERNET_TYPE, SOCKET_PACKET_TYPE, SOCKET_PROTOCOL_TCP);
 
+	if(SOCKET_TEST_ERROR(service->serviceSocketHandle)) {
+        /* retrieves the creating error code */
+        SOCKET_ERROR_CODE creatingErrorCode = SOCKET_GET_ERROR_CODE(socketResult);
+
+        /* prints the error */
+        V_ERROR_F("Problem creating socket: %d\n", creatingErrorCode);
+
+		tobias = (char *) malloc(1024);
+		SPRINTF(tobias, 1024, "P creating socket: %d", creatingErrorCode);
+
+        /* raises an error */
+        RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, tobias);
+	}
+
+    /* in case viriatum is set to non blocking */
+    if(VIRIATUM_NON_BLOCKING) {
+        /* sets the socket to non blocking mode */
+        SOCKET_SET_NON_BLOCKING(service->serviceSocketHandle, flags);
+    }
+
+    /* sets the socket reuse address option in the socket */
+    socketResult = SOCKET_SET_OPTIONS(service->serviceSocketHandle, SOCKET_OPTIONS_LEVEL_SOCKET, SOCKET_OPTIONS_REUSE_ADDRESS_SOCKET, optionValue);
+
+    /* in case there was an error binding the socket */
+    if(SOCKET_TEST_ERROR(socketResult)) {
+        /* retrieves the option error code */
+        SOCKET_ERROR_CODE optionErrorCode = SOCKET_GET_ERROR_CODE(socketResult);
+
+        /* prints the error */
+        V_ERROR_F("Problem setting socket option: %d\n", optionErrorCode);
+
+        /* closes the service socket */
+        SOCKET_CLOSE(service->serviceSocketHandle);
+
+		tobias = (char *) malloc(1024);
+		SPRINTF(tobias, 1024, "P setting socket option: %d", optionErrorCode);
+
+        /* raises an error */
+        RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, tobias);
+    }
+
     /* binds the service socket */
     socketResult = SOCKET_BIND(service->serviceSocketHandle, socketAddress);
 
