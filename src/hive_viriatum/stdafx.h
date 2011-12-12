@@ -27,7 +27,13 @@
 
 #pragma once
 
+#ifdef __GNUC__
+#include <config.h>
+#endif
+
+#ifdef _MSC_VER
 #include "config.h"
+#endif
 
 #ifdef _WIN32
 #include "global/targetver.h"

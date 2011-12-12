@@ -26,3 +26,5 @@
 */
 
 #pragma once
+
+#define HAVE_LIBPTHREAD

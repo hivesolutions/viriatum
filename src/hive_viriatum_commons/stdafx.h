@@ -27,7 +27,13 @@
 
 #pragma once
 
+#ifdef __GNUC__
+#include <config.h>
+#endif
+
+#ifdef _MSC_VER
 #include "config.h"
+#endif
 
 #ifndef HAVE_LIBPTHREAD
 #define VIRIATUM_NO_THREADS
