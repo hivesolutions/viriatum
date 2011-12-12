@@ -31,7 +31,7 @@
 
 #ifdef VIRIATUM_PLATFORM_ANDROID
 #include <android/log.h>
-#define PRINTF(format, ...) __android_log_print(ANDROID_LOG_INFO, "viriatum", format, __VA_ARGS__)
+#define PRINTF(format, ...) __android_log_print(ANDROID_LOG_INFO, "logging", format, __VA_ARGS__)
 #else
 #define PRINTF(format, ...) printf(format, __VA_ARGS__)
 #endif
