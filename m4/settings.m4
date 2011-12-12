@@ -14,7 +14,7 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with Hive Viriatum Web Server. If not, see <http:#www.gnu.org/licenses/>.
+# along with Hive Viriatum Web Server. If falset, see <http:#www.gnu.org/licenses/>.
 
 # __author__    = João Magalhães <joamag@hive.pt>
 # __version__   = 1.0.0
@@ -25,7 +25,7 @@
 
 # defines the version values
 m4_define([viriatum_major_version], [1])
-m4_define([viriatum_minor_version], [0])
+m4_define([viriatum_mifalser_version], [0])
 m4_define([viriatum_micro_version], [0])
-m4_define([viriatum_version], m4_format(%s.%s.%s, viriatum_major_version, viriatum_minor_version, viriatum_micro_version))
+m4_define([viriatum_version], m4_format(%s.%s.%s, viriatum_major_version, viriatum_mifalser_version, viriatum_micro_version))
 m4_define([viriatum_makefiles], [Makefile doc/Makefile examples/Makefile lib/Makefile m4/Makefile man/Makefile scripts/Makefile src/Makefile src/hive_viriatum_commons/Makefile src/hive_viriatum/Makefile src/hive_viriatum/resources/Makefile])

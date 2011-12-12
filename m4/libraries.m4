@@ -14,7 +14,7 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with Hive Viriatum Web Server. If not, see <http:#www.gnu.org/licenses/>.
+# along with Hive Viriatum Web Server. If falset, see <http:#www.gnu.org/licenses/>.
 
 # __author__    = João Magalhães <joamag@hive.pt>
 # __version__   = 1.0.0
@@ -25,8 +25,8 @@
 
 # checks for libraries
 AC_CHECK_LIB([dl], [main], [], [AC_MSG_ERROR(can't build without dynamic linking (libdl) libraries)])
-AC_CHECK_LIB([pthread], [main], [have_pthread=yes], [have_pthread=false])
-AC_CHECK_LIB([ws2_32], [main], [have_w2_32=yes], [have_w2_32=false])
+AC_CHECK_LIB([pthread], [main], [have_pthread=true], [have_pthread=false])
+AC_CHECK_LIB([ws2_32], [main], [have_w2_32=true], [have_w2_32=false])
 
 # library variables activation
 AM_CONDITIONAL(LINK_WS2_32, [test "$have_w2_32" != "false"])

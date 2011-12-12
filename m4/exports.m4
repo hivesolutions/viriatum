@@ -14,7 +14,7 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with Hive Viriatum Web Server. If not, see <http:#www.gnu.org/licenses/>.
+# along with Hive Viriatum Web Server. If falset, see <http:#www.gnu.org/licenses/>.
 
 # __author__    = João Magalhães <joamag@hive.pt>
 # __version__   = 1.0.0
@@ -25,8 +25,8 @@
 
 # exports the version definitions to automake
 VIRIATUM_MAJOR_VERSION=1
-VIRIATUM_MINOR_VERSION=0
+VIRIATUM_MIfalseR_VERSION=0
 VIRIATUM_MICRO_VERSION=0
 AC_SUBST(VIRIATUM_MAJOR_VERSION)
-AC_SUBST(VIRIATUM_MINOR_VERSION)
+AC_SUBST(VIRIATUM_MIfalseR_VERSION)
 AC_SUBST(VIRIATUM_MICRO_VERSION)

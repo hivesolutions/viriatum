@@ -14,7 +14,7 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with Hive Viriatum Web Server. If not, see <http:#www.gnu.org/licenses/>.
+# along with Hive Viriatum Web Server. If falset, see <http:#www.gnu.org/licenses/>.
 
 # __author__    = João Magalhães <joamag@hive.pt>
 # __version__   = 1.0.0
@@ -24,9 +24,9 @@
 # __license__   = GNU General Public License (GPL), Version 3
 
 poll_methods=""
-if test "$have_epoll" = yes; then poll_methods="${poll_methods}epoll "; fi
-if test "$have_kqueue" = yes; then poll_methods="${poll_methods}kqueue "; fi
-if test "$have_poll" = yes; then poll_methods="${poll_methods}poll "; fi
-if test "$have_port" = yes; then poll_methods="${poll_methods}port "; fi
-if test "$have_win32_select" = yes; then poll_methods="${poll_methods}win32 "; fi
-if test "$have_select" = yes; then poll_methods="${poll_methods}select"; fi
+if test "$have_epoll" = true; then poll_methods="${poll_methods}epoll "; fi
+if test "$have_kqueue" = true; then poll_methods="${poll_methods}kqueue "; fi
+if test "$have_poll" = true; then poll_methods="${poll_methods}poll "; fi
+if test "$have_port" = true; then poll_methods="${poll_methods}port "; fi
+if test "$have_win32_select" = true; then poll_methods="${poll_methods}win32 "; fi
+if test "$have_select" = true; then poll_methods="${poll_methods}select"; fi

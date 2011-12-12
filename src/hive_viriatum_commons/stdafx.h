@@ -33,7 +33,7 @@
 #define VIRIATUM_NO_THREADS
 #endif
 
-#ifdef HAVE_JNI_H 
+#ifdef HAVE_JNI_H
 #define VIRIATUM_JNI
 #endif
 

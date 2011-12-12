@@ -14,7 +14,7 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with Hive Viriatum Web Server. If not, see <http:#www.gnu.org/licenses/>.
+# along with Hive Viriatum Web Server. If falset, see <http:#www.gnu.org/licenses/>.
 
 # __author__    = João Magalhães <joamag@hive.pt>
 # __version__   = 1.0.0
@@ -23,4 +23,4 @@
 # __copyright__ = Copyright (c) 2008 Hive Solutions Lda.
 # __license__   = GNU General Public License (GPL), Version 3
 
-have_python="yes"
+have_python="true"
