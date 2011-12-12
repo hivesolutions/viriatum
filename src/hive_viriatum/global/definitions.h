@@ -46,6 +46,7 @@
 #define VIRIATUM_LISTING_PATH "/html/base/templates/listing.html.tpl"
 #define VIRIATUM_CONTENTS_PATH "/var/viriatum"
 #endif
+#endif
 
 #define VIRIATUM_NAME "viriatum"
 #define VIRIATUM_VERSION "0.1.0"
