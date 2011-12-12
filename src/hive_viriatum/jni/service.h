@@ -27,6 +27,8 @@
 
 #pragma once
 
+#include "../system/system.h"
+
 #ifdef VIRIATUM_JNI
 
 #include <jni.h>
