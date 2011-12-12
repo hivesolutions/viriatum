@@ -28,4 +28,4 @@
 #pragma once
 
 #include "info.h"
-#include "service.h"
+#include "jni_service.h"

@@ -605,7 +605,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\hive_viriatum\jni\service.c"
+					RelativePath="..\..\src\hive_viriatum\jni\jni_service.c"
 					>
 				</File>
 			</Filter>
@@ -775,7 +775,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\hive_viriatum\jni\service.h"
+					RelativePath="..\..\src\hive_viriatum\jni\jni_service.h"
 					>
 				</File>
 			</Filter>
