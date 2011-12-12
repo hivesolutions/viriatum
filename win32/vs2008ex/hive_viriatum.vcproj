@@ -604,6 +604,10 @@
 					RelativePath="..\..\src\hive_viriatum\jni\info.c"
 					>
 				</File>
+				<File
+					RelativePath="..\..\src\hive_viriatum\jni\service.c"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter
@@ -768,6 +772,10 @@
 				</File>
 				<File
 					RelativePath="..\..\src\hive_viriatum\jni\jni.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\hive_viriatum\jni\service.h"
 					>
 				</File>
 			</Filter>
