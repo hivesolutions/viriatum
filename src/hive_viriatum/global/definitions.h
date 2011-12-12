@@ -37,9 +37,9 @@
 #ifdef VIRIATUM_PLATFORM_UNIX
 #ifdef VIRIATUM_PLATFORM_ANDROID
 #define VIRIATUM_RESOURCES_PATH "resources"
-#define VIRIATUM_BASE_PATH ""
+#define VIRIATUM_BASE_PATH "/html/base"
 #define VIRIATUM_LISTING_PATH "/html/base/templates/listing.html.tpl"
-#define VIRIATUM_CONTENTS_PATH ""
+#define VIRIATUM_CONTENTS_PATH "/sdcard/viriatum"
 #else
 #define VIRIATUM_RESOURCES_PATH "resources"
 #define VIRIATUM_BASE_PATH "/html/base"
