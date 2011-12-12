@@ -130,8 +130,6 @@ ERROR_CODE processTemplateEngine(struct TemplateEngine_t *templateEngine, struct
     fileBuffer = (void *) MALLOC(fileSize);
     pointer = fileBuffer;
 
-    PRINTF_F("PASSOU MALLOC: %d", fileBuffer);
-
     TEMPLATE_MARK(textEnd);
     TEMPLATE_CALLBACK(textBegin);
 
@@ -153,8 +151,6 @@ ERROR_CODE processTemplateEngine(struct TemplateEngine_t *templateEngine, struct
             from the file stream */
             current = _getcTemplateEngine(file, &pointer, &fileSize);
         }
-
-        PRINTF_F("PASSOU COM: %c", current);
 
         /* in case the end of file has been found, or
         the file size is zero (breaks) */
@@ -384,8 +380,6 @@ ERROR_CODE processTemplateEngine(struct TemplateEngine_t *templateEngine, struct
         }
     }
 
-    PRINTF("Saiu do while");
-
     /* in case the current state is engine
     normal (there must be text to be flushed) */
     if(state == TEMPLATE_ENGINE_NORMAL) {
@@ -393,12 +387,8 @@ ERROR_CODE processTemplateEngine(struct TemplateEngine_t *templateEngine, struct
         TEMPLATE_CALLBACK_DATA(textEnd);
     }
 
-    PRINTF("VAI fechar o ficheiro");
-
     /* closes the file */
     fclose(file);
-
-    PRINTF("Vai fazer release da memoria");
 
     /* releases the file buffer */
     FREE(fileBuffer);
