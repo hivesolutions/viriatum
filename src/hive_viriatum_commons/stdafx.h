@@ -27,7 +27,7 @@
 
 #pragma once
 
-// global definitions (hard definitions)
+/* global definitions (hard definitions) */
 #define VIRIATUM_NO_THREADS
 #define VIRIATUM_JNI
 
