@@ -31,7 +31,7 @@ echo " + Host                  $host_os"
 echo " + Install prefix        $prefix"
 echo " + CFLAGS                $CFLAGS"
 echo " + Python                $have_python"
-echo " + JNI                   $have_jni_h"
+echo " + JNI                   $have_jni"
 echo " + Threads               $have_pthread"
 echo " + WinSockets2           $have_w2_32"
 index=1

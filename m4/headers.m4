@@ -24,4 +24,7 @@
 # __license__   = GNU General Public License (GPL), Version 3
 
 # checks for header files
-AC_CHECK_HEADERS([stdlib.h assert.h jni.h])
+AC_CHECK_HEADERS([stdlib.h assert.h])
+
+# checks for specific header files
+AC_CHECK_HEADER([jni.h], [have_jni=yes], [have_jni=false])
