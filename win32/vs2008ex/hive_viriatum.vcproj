@@ -597,6 +597,14 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="Jni"
+				>
+				<File
+					RelativePath="..\..\src\hive_viriatum\jni\info.c"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -748,6 +756,18 @@
 				</File>
 				<File
 					RelativePath="..\..\src\hive_viriatum\polling\polling_select.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Jni"
+				>
+				<File
+					RelativePath="..\..\src\hive_viriatum\jni\info.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\hive_viriatum\jni\jni.h"
 					>
 				</File>
 			</Filter>

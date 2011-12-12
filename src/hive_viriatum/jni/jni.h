@@ -17,7 +17,7 @@
  You should have received a copy of the GNU General Public License
  along with Hive Viriatum Web Server. If not, see <http://www.gnu.org/licenses/>.
 
- __author__    = Jo√£o Magalh√£es <joamag@hive.pt>
+ __author__    = Jo„o Magalh„es <joamag@hive.pt>
  __version__   = 1.0.0
  __revision__  = $LastChangedRevision$
  __date__      = $LastChangedDate$
@@ -27,13 +27,4 @@
 
 #pragma once
 
-#include "stdafx.h"
-
-#include "http/http.h"
-#include "io/io.h"
-#include "jni/jni.h"
-#include "module/module.h"
-#include "polling/polling.h"
-#include "handlers/handlers.h"
-#include "system/system.h"
-#include "test/test.h"
+#include "info.h"

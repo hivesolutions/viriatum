@@ -49,6 +49,7 @@ handlers/handler_file.c \
 http/http_parser.c \
 http/http_request.c \
 io/file.c \
+jni/info.c \
 module/loading.c \
 polling/polling_epoll.c\
 polling/polling_kqueue.c\
@@ -66,6 +67,7 @@ handlers/handler_file.c \
 http/http_parser.c \
 http/http_request.c \
 io/file.c \
+jni/info.c \
 module/loading.c \
 polling/polling_epoll.c\
 polling/polling_kqueue.c\
