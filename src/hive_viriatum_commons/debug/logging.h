@@ -60,7 +60,7 @@
 #define V_ERROR(format) V_MESSAGE("ERROR"); printf(format, NULL)
 #define V_ERROR_F(format, ...) V_MESSAGE("ERROR"); PRINTF(format, __VA_ARGS__)
 
-#define V_PRINT(format) PRINTF(format)
+#define V_PRINT(format) PRINTF(format, NULL)
 #define V_PRINT_F(format, ...) PRINTF(format, __VA_ARGS__)
 
 VIRIATUM_EXPORT_PREFIX void debug(const char *format, ...);
