@@ -17,7 +17,7 @@
  You should have received a copy of the GNU General Public License
  along with Hive Viriatum Web Server. If not, see <http://www.gnu.org/licenses/>.
 
- __author__    = Jo√£o Magalh√£es <joamag@hive.pt>
+ __author__    = Jo„o Magalh„es <joamag@hive.pt>
  __version__   = 1.0.0
  __revision__  = $LastChangedRevision$
  __date__      = $LastChangedDate$
@@ -25,15 +25,26 @@
  __license__   = GNU General Public License (GPL), Version 3
 */
 
-#pragma once
-
 #include "stdafx.h"
 
-#include "http/http.h"
-#include "io/io.h"
-#include "jni/jni.h"
-#include "module/module.h"
-#include "polling/polling.h"
-#include "handlers/handlers.h"
-#include "system/system.h"
-#include "test/test.h"
+#include "info.h"
+
+#ifdef VIRIATUM_JNI
+
+jstring Java_pt_hive_viriatum_http_Info_getName(JNIEnv *env, jclass cls) {
+    return (*env)->NewStringUTF(env, nameViriatum());
+}
+
+jstring Java_pt_hive_viriatum_http_Info_getVersion(JNIEnv *env, jclass cls) {
+    return (*env)->NewStringUTF(env, versionViriatum());
+}
+
+jstring Java_pt_hive_viriatum_http_Info_getDescription(JNIEnv *env, jclass cls) {
+    return (*env)->NewStringUTF(env, descriptionViriatum());
+}
+
+jstring Java_pt_hive_viriatum_http_Info_hello(JNIEnv *env, jobject thiz) {
+    return (*env)->NewStringUTF(env, "hello wolrd");
+}
+
+#endif
