@@ -24,5 +24,4 @@
 # __license__   = GNU General Public License (GPL), Version 3
 
 # checks for library functions
-AC_FUNC_MALLOC
-AC_CHECK_FUNCS([floor memset])
+AC_CHECK_FUNCS([floor malloc realloc memset])

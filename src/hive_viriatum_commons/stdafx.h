@@ -28,7 +28,7 @@
 #pragma once
 
 #ifdef __GNUC__
-#include "../config.h"
+#include <config.h>
 #endif
 
 #ifdef _MSC_VER
