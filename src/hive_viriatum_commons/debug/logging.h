@@ -31,22 +31,24 @@
 
 #ifdef VIRIATUM_PLATFORM_ANDROID
 #include <android/log.h>
-#define PRINTF(format, ...) __android_log_print(ANDROID_LOG_INFO, "logging", format, __VA_ARGS__)
+#define PRINTF(format) __android_log_print(ANDROID_LOG_INFO, "logging", format)
+#define PRINTF_F(format, ...) __android_log_print(ANDROID_LOG_INFO, "logging", format, __VA_ARGS__)
 #else
-#define PRINTF(format, ...) printf(format, __VA_ARGS__)
+#define PRINTF(format) printf(format)
+#define PRINTF_F(format, ...) printf(format, __VA_ARGS__)
 #endif
 
 #ifdef VIRIATUM_DEBUG
-#define V_MESSAGE(level) PRINTF("[%s] [%s:%d] ", level, baseStringValue((unsigned char *) __FILE__), __LINE__)
+#define V_MESSAGE(level) PRINTF_F("[%s] [%s:%d] ", level, baseStringValue((unsigned char *) __FILE__), __LINE__)
 #endif
 
 #ifndef VIRIATUM_DEBUG
-#define V_MESSAGE(level) PRINTF("[%s] ", level)
+#define V_MESSAGE(level) PRINTF_F("[%s] ", level)
 #endif
 
 #ifdef VIRIATUM_DEBUG
-#define V_DEBUG(format) V_MESSAGE("DEBUG"); PRINTF(format, NULL)
-#define V_DEBUG_F(format, ...) V_MESSAGE("DEBUG"); PRINTF(format, __VA_ARGS__)
+#define V_DEBUG(format) V_MESSAGE("DEBUG"); PRINTF(format)
+#define V_DEBUG_F(format, ...) V_MESSAGE("DEBUG"); PRINTF_F(format, __VA_ARGS__)
 #endif
 
 #ifndef VIRIATUM_DEBUG
@@ -55,12 +57,12 @@
 #endif
 
 #define V_WARNING(format) V_MESSAGE("WARNING"); PRINTF(format)
-#define V_WARNING_F(format, ...) V_MESSAGE("WARNING"); PRINTF(format, __VA_ARGS__)
+#define V_WARNING_F(format, ...) V_MESSAGE("WARNING"); PRINTF_F(format, __VA_ARGS__)
 
-#define V_ERROR(format) V_MESSAGE("ERROR"); printf(format)
-#define V_ERROR_F(format, ...) V_MESSAGE("ERROR"); PRINTF(format, __VA_ARGS__)
+#define V_ERROR(format) V_MESSAGE("ERROR"); PRINTF(format)
+#define V_ERROR_F(format, ...) V_MESSAGE("ERROR"); PRINTF_F(format, __VA_ARGS__)
 
-#define V_PRINT(format) PRINTF(format, NULL)
-#define V_PRINT_F(format, ...) PRINTF(format, __VA_ARGS__)
+#define V_PRINT(format) PRINTF(format)
+#define V_PRINT_F(format, ...) PRINTF_F(format, __VA_ARGS__)
 
 VIRIATUM_EXPORT_PREFIX void debug(const char *format, ...);
