@@ -270,20 +270,30 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
             listDirectoryFile((char *) handlerFileContext->filePath, directoryEntries);
             entriesToMapFile(directoryEntries, &directoryEntriesMap);
 
+			PRINTF("criou template handler");
+
             /* creates the template handler */
             createTemplateHandler(&templateHandler);
+
+			PRINTF("vai para os assign");
 
             /* assigns the directory entries to the template handler */
             assignListTemplateHandler(templateHandler, (unsigned char *) "entries", directoryEntriesMap);
             assignIntegerTemplateHandler(templateHandler, (unsigned char *) "items", (int) directoryEntriesMap->size);
 
+			PRINTF("vai processar template handler");
+
             /* processes the file as a template handler */
             processTemplateHandler(templateHandler, templatePath);
+
+			PRINTF("acabou template handler");
 
             /* sets the template handler in the handler file context and unsets
             the flushed flag */
             handlerFileContext->templateHandler = templateHandler;
             handlerFileContext->flushed = 0;
+
+			PRINTF("VAI apagar gajos");
 
             /* deletes the directory entries map and the
             directory entries */
