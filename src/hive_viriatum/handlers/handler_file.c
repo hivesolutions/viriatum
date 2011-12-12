@@ -275,7 +275,7 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
             /* creates the template handler */
             createTemplateHandler(&templateHandler);
 
-			V_ERROR("vai para os assign"));
+			V_ERROR("vai para os assign");
 
             /* assigns the directory entries to the template handler */
             assignListTemplateHandler(templateHandler, (unsigned char *) "entries", directoryEntriesMap);
