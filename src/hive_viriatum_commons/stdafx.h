@@ -28,7 +28,6 @@
 #pragma once
 
 #ifdef __GNUC__
-#include <config.h>
 #endif
 
 #ifdef _MSC_VER
