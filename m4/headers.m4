@@ -27,4 +27,4 @@
 AC_CHECK_HEADERS([stdlib.h assert.h])
 
 # checks for specific header files
-AC_CHECK_HEADER([jni.h], [have_jni=true], [have_jni=false])
+AC_CHECK_HEADERS([jni.h], [have_jni=true], [have_jni=false])
