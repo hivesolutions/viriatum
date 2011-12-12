@@ -604,7 +604,7 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\src\hive_viriatum\config.h"
+				RelativePath="..\..\src\hive_viriatum\_config_win32.h"
 				>
 			</File>
 			<File
