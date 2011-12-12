@@ -14,7 +14,7 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with Hive Viriatum Web Server. If not, see <http:#www.gnu.org/licenses/>.
+# along with Hive Viriatum Web Server. If falset, see <http:#www.gnu.org/licenses/>.
 
 # __author__    = João Magalhães <joamag@hive.pt>
 # __version__   = 1.0.0
@@ -24,13 +24,13 @@
 # __license__   = GNU General Public License (GPL), Version 3
 
 # checks for the epoll
-AC_CHECK_HEADER(sys/epoll.h, have_epoll_include=yes, have_epoll_include=no)
+AC_CHECK_HEADER(sys/epoll.h, have_epoll_include=true, have_epoll_include=false)
 
 # checks if the user wants epoll
-AC_ARG_ENABLE(epoll, AC_HELP_STRING([--disable-epoll], [Disable epoll() support]), wants_epoll="$enableval", wants_epoll="yes")
+AC_ARG_ENABLE(epoll, AC_HELP_STRING([--disable-epoll], [Disable epoll() support]), wants_epoll="$enableval", wants_epoll="true")
 
 # in case the user wants epoll and the system has epoll
-if test "x$have_epoll_include" = "xyes" && test "x$wants_epoll" = "xyes"; then
+if test "x$have_epoll_include" = "xtrue" && test "x$wants_epoll" = "xtrue"; then
     AC_MSG_CHECKING(for epoll system call)
     AC_RUN_IFELSE(
 		[AC_LANG_SOURCE([
@@ -50,6 +50,6 @@ if test "x$have_epoll_include" = "xyes" && test "x$wants_epoll" = "xyes"; then
 				epfd = epoll_create(256);
 				exit(epfd == -1 ? 1 : 0);
 			}
-        ])], have_epoll=yes, have_epoll=no, have_epoll=yes)
+        ])], have_epoll=true, have_epoll=false, have_epoll=true)
     AC_MSG_RESULT($have_epoll)
 fi

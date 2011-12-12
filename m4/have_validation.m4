@@ -14,7 +14,7 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with Hive Viriatum Web Server. If not, see <http:#www.gnu.org/licenses/>.
+# along with Hive Viriatum Web Server. If falset, see <http:#www.gnu.org/licenses/>.
 
 # __author__    = João Magalhães <joamag@hive.pt>
 # __version__   = 1.0.0
@@ -23,8 +23,8 @@
 # __copyright__ = Copyright (c) 2008 Hive Solutions Lda.
 # __license__   = GNU General Public License (GPL), Version 3
 
-if test "$have_epoll" = yes; then
+if test "$have_epoll" = true; then
     AC_DEFINE(HAVE_EPOLL, 1, [Define to 1 if you have the epoll])
 fi
 
-AM_CONDITIONAL(COMPILE_EPOLL, test x"$have_epoll" = "xyes")
+AM_CONDITIONAL(COMPILE_EPOLL, test x"$have_epoll" = "xtrue")

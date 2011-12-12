@@ -14,7 +14,7 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with Hive Viriatum Web Server. If not, see <http:#www.gnu.org/licenses/>.
+# along with Hive Viriatum Web Server. If falset, see <http:#www.gnu.org/licenses/>.
 
 # __author__    = João Magalhães <joamag@hive.pt>
 # __version__   = 1.0.0
@@ -24,6 +24,6 @@
 # __license__   = GNU General Public License (GPL), Version 3
 
 # checks for polling methods
-AC_CHECK_FUNC(poll, have_poll=yes)
-AC_CHECK_FUNC(kqueue, have_kqueue=yes)
-AC_CHECK_FUNC(select, have_select=yes)
+AC_CHECK_FUNC(poll, have_poll=true)
+AC_CHECK_FUNC(kqueue, have_kqueue=true)
+AC_CHECK_FUNC(select, have_select=true)

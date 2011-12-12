@@ -14,7 +14,7 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with Hive Viriatum Web Server. If not, see <http:#www.gnu.org/licenses/>.
+# along with Hive Viriatum Web Server. If falset, see <http:#www.gnu.org/licenses/>.
 
 # __author__    = João Magalhães <joamag@hive.pt>
 # __version__   = 1.0.0
@@ -27,4 +27,4 @@
 AC_CHECK_HEADERS([stdlib.h assert.h])
 
 # checks for specific header files
-AC_CHECK_HEADER([jni.h], [have_jni=yes], [have_jni=false])
+AC_CHECK_HEADER([jni.h], [have_jni=true], [have_jni=false])
