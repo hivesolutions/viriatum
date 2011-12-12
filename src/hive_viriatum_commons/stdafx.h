@@ -27,8 +27,6 @@
 
 #pragma once
 
-#define VIRIATUM_DEBUG
-
 #ifdef __GNUC__
 #include <config.h>
 #endif
