@@ -32,19 +32,19 @@
 #ifdef VIRIATUM_JNI
 
 jstring Java_pt_hive_viriatum_http_Info_getName(JNIEnv *env, jclass cls) {
-    return (*env)->NewStringUTF(env, nameViriatum());
+    return (*env)->NewStringUTF(env, (char *) nameViriatum());
 }
 
 jstring Java_pt_hive_viriatum_http_Info_getVersion(JNIEnv *env, jclass cls) {
-    return (*env)->NewStringUTF(env, versionViriatum());
+    return (*env)->NewStringUTF(env, (char *) versionViriatum());
 }
 
 jstring Java_pt_hive_viriatum_http_Info_getDescription(JNIEnv *env, jclass cls) {
-    return (*env)->NewStringUTF(env, descriptionViriatum());
+    return (*env)->NewStringUTF(env, (char *) descriptionViriatum());
 }
 
 jstring Java_pt_hive_viriatum_http_Info_hello(JNIEnv *env, jobject thiz) {
-    return (*env)->NewStringUTF(env, "hello wolrd");
+    return (*env)->NewStringUTF(env, "hello wolrd, from viriatum http");
 }
 
 #endif

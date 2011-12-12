@@ -25,7 +25,14 @@
  __license__   = GNU General Public License (GPL), Version 3
 */
 
-#pragma once
+#include "stdafx.h"
 
-#include "info.h"
-#include "service.h"
+#include "service.c"
+
+#ifdef VIRIATUM_JNI
+
+jstring Java_pt_hive_viriatum_http_Service_run(JNIEnv *env, jclass cls) {
+
+}
+
+#endif

@@ -27,5 +27,10 @@
 
 #pragma once
 
-#include "info.h"
-#include "service.h"
+#ifdef VIRIATUM_JNI
+
+#include <jni.h>
+
+VIRIATUM_EXPORT_PREFIX jstring Java_pt_hive_viriatum_http_Service_run(JNIEnv *env, jclass cls);
+
+#endif
