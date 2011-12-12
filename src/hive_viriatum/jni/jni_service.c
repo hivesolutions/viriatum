@@ -52,4 +52,25 @@ jstring Java_pt_hive_viriatum_http_Service_run(JNIEnv *env, jclass cls) {
     return (*env)->NewStringUTF(env, buffer);
 }
 
+jstring Java_pt_hive_viriatum_http_Service_ran(JNIEnv *env, jclass cls) {
+    /* allocates the return value */
+    ERROR_CODE returnValue;
+
+    /* allocates space for the result string buffer */
+    char buffer[1024] = "";
+
+    /* "rans" the service */
+    returnValue = ranService();
+
+    /* tests the error code for error */
+    if(IS_ERROR_CODE(returnValue)) {
+        /* prints an error message and copies it to the return
+        value string buffer */
+        V_ERROR_F("Problem ranning service (%s)\n", (char *) GET_ERROR());
+        SPRINTF(buffer, 1024, "Problem ranning service (%s)\n", (char *) GET_ERROR());
+    }
+
+    return (*env)->NewStringUTF(env, buffer);
+}
+
 #endif
