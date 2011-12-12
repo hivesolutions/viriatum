@@ -27,7 +27,7 @@
 
 #include "stdafx.h"
 
-#include "service.c"
+#include "jni_service.h"
 
 #ifdef VIRIATUM_JNI
 
