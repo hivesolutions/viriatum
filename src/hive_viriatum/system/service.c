@@ -269,7 +269,7 @@ ERROR_CODE startService(struct Service_t *service) {
         SOCKET_CLOSE(service->serviceSocketHandle);
 
 		tobias = (char *) malloc(1024);
-		SPRINTF(tobias, 1024, "P binding socket: %d", bindingErrorCode)
+		SPRINTF(tobias, 1024, "P binding socket: %d", bindingErrorCode);
 
         /* raises an error */
         RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, tobias);
