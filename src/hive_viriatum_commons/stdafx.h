@@ -27,8 +27,13 @@
 
 #pragma once
 
-/* global definitions (hard definitions) */
+#include "config.h"
+
+#ifndef HAVE_LIBPTHREAD
 #define VIRIATUM_NO_THREADS
+#endif
+
+/* global definitions (hard definitions) */
 #define VIRIATUM_JNI
 
 #ifdef __MACH__
