@@ -35,6 +35,8 @@ jstring Java_pt_hive_viriatum_http_Service_run(JNIEnv *env, jclass cls) {
     /* allocates the return value */
     ERROR_CODE returnValue;
 
+	printf("VAI CORRER O CENAS");
+
     /* runs the service */
     returnValue = runService();
 
@@ -43,6 +45,7 @@ jstring Java_pt_hive_viriatum_http_Service_run(JNIEnv *env, jclass cls) {
         /* prints an error message */
         V_ERROR_F("Problem running service (%s)\n", (char *) GET_ERROR());
     }
+
 }
 
 #endif
