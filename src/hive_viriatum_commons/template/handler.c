@@ -230,11 +230,15 @@ void processTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned 
     /* allocates space for the root node */
     struct TemplateNode_t *rootNode;
 
+	PRINTF("vai criar o material");
+
     /* creates the template engine */
     createTemplateEngine(&templateEngine);
 
     /* creates the template engine */
     createTemplateSettings(&templateSettings);
+
+	PRINTF("vai criar o no");
 
     /* creates the root node and sets it as the initial
     current node */
@@ -254,10 +258,14 @@ void processTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned 
     templateSettings->onparameter = _parameterCallback;
     templateSettings->onparameterValue = _parameterValueCallback;
 
+	PRINTF("vai _processar");
+
     /* processes the file as a template engine and then uses the
     created node structure to traverse for string buffer output */
     processTemplateEngine(templateEngine, templateSettings, filePath);
     traverseNodeBuffer(templateHandler, templateHandler->currentNode);
+
+	PRINTF("vai fazer join");
 
     /* "joins" the template handler string buffer into the string
     value, retrieving the final template result */
