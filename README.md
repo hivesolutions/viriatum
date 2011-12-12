@@ -10,6 +10,13 @@ For building under unix simple instructions are used:
 * `./configure`
 * `make && make install`
 
+### Unix 32bit from 64bit
+
+* `apt-get libc6-dev-i386`
+* `export CC="cc -m32"`
+* `./configure`
+* `make && make install`
+
 ### Android
 
 Building viriatum for android involves cross compilation and the android ndk toolkit must be used.
@@ -20,6 +27,10 @@ Building viriatum for android involves cross compilation and the android ndk too
 * `export PATH=/opt/android-toolchain/bin:$PATH`
 * `./configure --target=arm-linux-androideabi --host=arm-linux-androideabi --prefix=/opt/android-root`
 * `make && make install`
+
+### Windows
+
+* 
 
 ## License
 
