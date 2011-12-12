@@ -217,6 +217,8 @@ ERROR_CODE startService(struct Service_t *service) {
     /* sets the flags to be used in socket */
     SOCKET_FLAGS flags = 1;
 
+	char *tobias;
+
     /* loads (all) the currently available modules */
     loadModulesService(service);
 
@@ -266,8 +268,11 @@ ERROR_CODE startService(struct Service_t *service) {
         /* closes the service socket */
         SOCKET_CLOSE(service->serviceSocketHandle);
 
+		tobias = (char *) malloc(1024);
+		SPRINTF(tobias, 1024, "Problem binding socket \%d", bindingErrorCode)
+
         /* raises an error */
-        RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem binding socket");
+        RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, tobias);
     }
 
     /* listens for a service socket change */
