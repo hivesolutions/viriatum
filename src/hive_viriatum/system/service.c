@@ -246,10 +246,10 @@ ERROR_CODE startService(struct Service_t *service) {
         V_ERROR_F("Problem setting socket option: %d\n", optionErrorCode);
 
         /* closes the service socket */
-        SOCKET_CLOSE(service->serviceSocketHandle);
+       /* SOCKET_CLOSE(service->serviceSocketHandle);*/
 
         /* raises an error */
-        RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem setting socket option");
+        /*RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem setting socket option");*/
     }
 
     /* binds the service socket */
