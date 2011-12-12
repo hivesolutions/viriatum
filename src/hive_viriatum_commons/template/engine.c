@@ -130,7 +130,7 @@ ERROR_CODE processTemplateEngine(struct TemplateEngine_t *templateEngine, struct
     fileBuffer = (void *) MALLOC(fileSize);
     pointer = fileBuffer;
 
-	PRINTF_F("PASSOU MALLOC: %d", fileBuffer);
+    PRINTF_F("PASSOU MALLOC: %d", fileBuffer);
 
     TEMPLATE_MARK(textEnd);
     TEMPLATE_CALLBACK(textBegin);
@@ -151,13 +151,14 @@ ERROR_CODE processTemplateEngine(struct TemplateEngine_t *templateEngine, struct
         else {
             /* retrieves the current character
             from the file stream */
-            current = _getcTemplateEngine(file, &pointer);
+            current = _getcTemplateEngine(file, &pointer, &fileSize);
         }
 
-		PRINTF_F("PASSOU COM: %c", current);
+        PRINTF_F("PASSOU COM: %c", current);
 
-        /* in case the end of file has been found */
-        if(current == EOF) {
+        /* in case the end of file has been found, or
+        the file size is zero (breaks) */
+        if(current == EOF || fileSize == 0) {
             /* breaks the cycle (end of parsing) */
             break;
         }
@@ -186,7 +187,7 @@ ERROR_CODE processTemplateEngine(struct TemplateEngine_t *templateEngine, struct
                     state = TEMPLATE_ENGINE_OPEN;
 
                     /* reads ahead and sets the ahead set flag */
-                    ahead = _getcTemplateEngine(file, &pointer);
+                    ahead = _getcTemplateEngine(file, &pointer, &fileSize);
                     aheadSet = 1;
 
                     if(ahead == '/') {
@@ -203,7 +204,7 @@ ERROR_CODE processTemplateEngine(struct TemplateEngine_t *templateEngine, struct
             case TEMPLATE_ENGINE_OPEN:
                 if(current == '/') {
                     /* reads ahead and sets the ahead set flag */
-                    ahead = _getcTemplateEngine(file, &pointer);
+                    ahead = _getcTemplateEngine(file, &pointer, &fileSize);
                     aheadSet = 1;
 
                     if(ahead == '}') {
@@ -248,7 +249,7 @@ ERROR_CODE processTemplateEngine(struct TemplateEngine_t *templateEngine, struct
 
             case TEMPLATE_ENGINE_PARAMETERS:
                 if(current == '/') {
-                    ahead = _getcTemplateEngine(file, &pointer);
+                    ahead = _getcTemplateEngine(file, &pointer, &fileSize);
                     aheadSet = 1;
 
                     if(ahead == '}') {
@@ -287,7 +288,7 @@ ERROR_CODE processTemplateEngine(struct TemplateEngine_t *templateEngine, struct
 
             case TEMPLATE_ENGINE_PARAMETER:
                 if(current == '/') {
-                    ahead = _getcTemplateEngine(file, &pointer);
+                    ahead = _getcTemplateEngine(file, &pointer, &fileSize);
                     aheadSet = 1;
 
                     if(ahead == '}') {
@@ -329,7 +330,7 @@ ERROR_CODE processTemplateEngine(struct TemplateEngine_t *templateEngine, struct
 
             case TEMPLATE_ENGINE_PARAMETER_VALUE:
                 if(current == '/') {
-                    ahead = _getcTemplateEngine(file, &pointer);
+                    ahead = _getcTemplateEngine(file, &pointer, &fileSize);
                     aheadSet = 1;
 
                     if(ahead == '}') {
@@ -383,7 +384,7 @@ ERROR_CODE processTemplateEngine(struct TemplateEngine_t *templateEngine, struct
         }
     }
 
-	PRINTF("Saiu do while");
+    PRINTF("Saiu do while");
 
     /* in case the current state is engine
     normal (there must be text to be flushed) */
@@ -392,12 +393,12 @@ ERROR_CODE processTemplateEngine(struct TemplateEngine_t *templateEngine, struct
         TEMPLATE_CALLBACK_DATA(textEnd);
     }
 
-	PRINTF("VAI fechar o ficheiro");
+    PRINTF("VAI fechar o ficheiro");
 
     /* closes the file */
     fclose(file);
 
-	PRINTF("Vai fazer release da memoria");
+    PRINTF("Vai fazer release da memoria");
 
     /* releases the file buffer */
     FREE(fileBuffer);
@@ -406,10 +407,20 @@ ERROR_CODE processTemplateEngine(struct TemplateEngine_t *templateEngine, struct
     RAISE_NO_ERROR;
 }
 
-char _getcTemplateEngine(FILE *file, unsigned char **pointer) {
+char _getcTemplateEngine(FILE *file, unsigned char **pointer, size_t *size) {
+    /* allocates space for the current character
+    to be retrieve in the function */
+    char current;
+
+    /* in case the size is already zero (nothing remaining) */
+    if(size == 0) {
+        /* returns invalid */
+        return 0;
+    }
+
     /* retrieves the current character
     from the file stream */
-    char current = getc(file);
+    current = getc(file);
 
     /* in case the current retrieved character
     is an end of file nothing should be updated */
@@ -422,6 +433,9 @@ char _getcTemplateEngine(FILE *file, unsigned char **pointer) {
     character and increments the pointer reference */
     **pointer = current;
     (*pointer)++;
+
+    /* decrements the file size */
+    (*size)--;
 
     /* returns the current character */
     return current;
