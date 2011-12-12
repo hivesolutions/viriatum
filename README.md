@@ -7,15 +7,18 @@ The Viriatum Web Server is simple and lightweight web server aimed at providing 
 
 For building under unix simple instructions are used:
 
-* ./configure
-* make & make install
+* `./configure`
+* `make && make install`
 
 ### Android
 
 Building viriatum for android involves cross compilation and the android ndk toolkit must be used.
 
 * Check the instructions for downloading the android ndk from the [official website](http://developer.android.com/sdk/ndk/)
-* Unpack the android-ndk package file and `android-ndk/build/tools/make-standalone-toolchain.sh --platform=android-5 --install-dir=/opt/android-toolchain`
+* Unpack the android-ndk package file into the `android-ndk` directory
+* Create the standalone toolchain `android-ndk/build/tools/make-standalone-toolchain.sh --platform=android-5 --install-dir=/opt/android-toolchain`
+* `./configure --target=arm-linux-androideabi --host=arm-linux-androideabi --prefix=/opt/android-root`
+* `make && make install`
 
 ## License
 
