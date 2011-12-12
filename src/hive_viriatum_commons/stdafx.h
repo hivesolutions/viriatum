@@ -28,11 +28,11 @@
 #pragma once
 
 #ifdef __GNUC__
-#include <config.h>
+#include "config.h"
 #endif
 
 #ifdef _MSC_VER
-#include "config.h"
+#include "_config_win32.h"
 #endif
 
 #ifndef HAVE_LIBPTHREAD
