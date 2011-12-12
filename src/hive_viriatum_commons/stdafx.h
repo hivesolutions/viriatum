@@ -33,8 +33,9 @@
 #define VIRIATUM_NO_THREADS
 #endif
 
-/* global definitions (hard definitions) */
+#ifdef HAVE_JNI_H 
 #define VIRIATUM_JNI
+#endif
 
 #ifdef __MACH__
 #define unix true
