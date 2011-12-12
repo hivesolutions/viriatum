@@ -17,6 +17,7 @@ Building viriatum for android involves cross compilation and the android ndk too
 * Check the instructions for downloading the android ndk from the [official website](http://developer.android.com/sdk/ndk/)
 * Unpack the android-ndk package file into the `android-ndk` directory
 * Create the standalone toolchain `android-ndk/build/tools/make-standalone-toolchain.sh --platform=android-5 --install-dir=/opt/android-toolchain`
+* `export PATH=/opt/android-toolchain/bin:$PATH`
 * `./configure --target=arm-linux-androideabi --host=arm-linux-androideabi --prefix=/opt/android-root`
 * `make && make install`
 
