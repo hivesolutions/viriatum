@@ -33,11 +33,19 @@
 #define VIRIATUM_LISTING_PATH "/html/base/templates/listing.html.tpl"
 #define VIRIATUM_CONTENTS_PATH VIRIATUM_RESOURCES_PATH
 #endif
+
 #ifdef VIRIATUM_PLATFORM_UNIX
 #define VIRIATUM_RESOURCES_PATH "resources"
 #define VIRIATUM_BASE_PATH "/html/base"
 #define VIRIATUM_LISTING_PATH "/html/base/templates/listing.html.tpl"
 #define VIRIATUM_CONTENTS_PATH "/var/viriatum"
+#endif
+
+#ifdef VIRIATUM_PLATFORM_ANDROID
+#define VIRIATUM_RESOURCES_PATH "resources"
+#define VIRIATUM_BASE_PATH "/html/base"
+#define VIRIATUM_LISTING_PATH "/html/base/templates/listing.html.tpl"
+#define VIRIATUM_CONTENTS_PATH "/"
 #endif
 
 #define VIRIATUM_NAME "viriatum"
