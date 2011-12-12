@@ -31,6 +31,8 @@ echo " + Host                  $host_os"
 echo " + Install prefix        $prefix"
 echo " + CFLAGS                $CFLAGS"
 echo " + Python                $have_python"
+echo " + Threads               $have_pthread"
+echo " + WinSockets 2          $have_w2_32"
 index=1
 for poll_method in $poll_methods; do
     echo " + Polling method $index      $poll_method"
