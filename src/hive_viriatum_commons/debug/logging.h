@@ -50,7 +50,7 @@
 #endif
 
 #ifndef VIRIATUM_DEBUG
-#define V_DEBUG(format) dump(format, NULL)
+#define V_DEBUG(format) dump(format)
 #define V_DEBUG_F(format, ...) dumpMultiple(format, __VA_ARGS__)
 #endif
 
