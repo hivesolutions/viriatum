@@ -63,6 +63,10 @@
 #define VIRIATUM_PLATFORM_STRING "cygwin"
 #endif
 
+#if defined(__ANDROID__ ) || defined(ANDROID)
+#define VIRIATUM_PLATFORM_ANDROID true
+#endif
+
 /* platform api system */
 
 #ifdef unix
