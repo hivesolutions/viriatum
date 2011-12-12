@@ -130,7 +130,7 @@ ERROR_CODE processTemplateEngine(struct TemplateEngine_t *templateEngine, struct
     fileBuffer = (void *) MALLOC(fileSize);
     pointer = fileBuffer;
 
-	PRINTF_V("PASSOU MALLOC: %d", fileBuffer);
+	PRINTF_F("PASSOU MALLOC: %d", fileBuffer);
 
     TEMPLATE_MARK(textEnd);
     TEMPLATE_CALLBACK(textBegin);
