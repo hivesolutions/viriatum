@@ -32,6 +32,9 @@
 #ifdef VIRIATUM_JNI
 
 jstring Java_pt_hive_viriatum_http_Service_run(JNIEnv *env, jclass cls) {
+    /* allocates the return value */
+    ERROR_CODE returnValue;
+
     /* runs the service */
     returnValue = runService();
 
