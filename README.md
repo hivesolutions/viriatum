@@ -40,7 +40,7 @@ Under construction
 
 There are a lot of possible building features to enable
 
---enable-debug - Enables the extra debugging capabilities in viriatum
+* `--enable-debug` - Enables the extra debugging capabilities in viriatum
 
 ## License
 
