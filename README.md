@@ -36,6 +36,12 @@ Under construction
 * `./configure --target=i586-mingw32msvc --host=i586-mingw32msvc --prefix=/opt/android-root`
 * `make && make install`
 
+## Features
+
+There are a lot of possible building features to enable
+
+--enable-debug - Enables the extra debugging capabilities in viriatum
+
 ## License
 
 Viriatum is an open-source project licensed under the [GNU General Public License Version 3](http://www.gnu.org/licenses/gpl.html).
