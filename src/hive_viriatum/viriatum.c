@@ -30,7 +30,7 @@
 #include "viriatum.h"
 
 /* starts the memory structures */
-START_MEMORY
+START_MEMORY;
 
 static struct Service_t *service;
 
