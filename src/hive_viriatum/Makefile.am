@@ -29,12 +29,39 @@ SUBDIRS = resources
 
 bin_PROGRAMS = viriatum
 
+lib_LTLIBRARIES = libviriatum_http.la
+
 viriatum_CFLAGS = $(AM_CFLAGS)
 viriatum_CXXFLAGS = $(AM_CXXFLAGS)
 
+libviriatum_http_la_CFLAGS = $(AM_CFLAGS)
+libviriatum_http_la_CXXFLAGS = $(AM_CXXFLAGS)
+
 viriatum_LDADD = ../hive_viriatum_commons/libviriatum.a $(INTLLIBS)
 
+libviriatum_http_la_LIBADD = ../hive_viriatum_commons/libviriatum.a $(INTLLIBS)
+libviriatum_http_la_LDFLAGS = -version-info $(VIRIATUM_MAJOR_VERSION):$(VIRIATUM_MINOR_VERSION):$(VIRIATUM_MICRO_VERSION)
+
 viriatum_SOURCES = stdafx.c \
+viriatum.c \
+handlers/handler_default.c \
+handlers/handler_file.c \
+http/http_parser.c \
+http/http_request.c \
+io/file.c \
+jni/info.c \
+jni/jni_service.c \
+module/loading.c \
+polling/polling_epoll.c\
+polling/polling_kqueue.c\
+polling/polling_select.c\
+stream/stream_http.c \
+stream/stream_io.c \
+system/environment.c \
+system/service.c \
+test/simple_test.c
+
+libviriatum_http_la_SOURCES = stdafx.c \
 viriatum.c \
 handlers/handler_default.c \
 handlers/handler_file.c \
