@@ -352,7 +352,7 @@ ERROR_CODE startService(struct Service_t *service) {
         CLOSE_PROCESS(process);
 
         /* prints a debug message */
-        V_DEBUG_F("Memory status: [%d objects] [%d KBytes]\n", ALLOCATIONS, memoryUsage / 1024);
+        V_DEBUG_F("Memory status: [%ld objects] [%ld KBytes]\n", (long int) ALLOCATIONS, (long int) memoryUsage / 1024);
 
         /* polls the connections using the polling (provider) */
         polling->poll(polling);
