@@ -300,7 +300,7 @@ ERROR_CODE writeHandlerStreamIo(struct Connection_t *connection) {
         }
 
         /* prints a debug message */
-        V_DEBUG_F("Sending %d bytes through socket: %d\n", data->size, connection->socketHandle);
+        V_DEBUG_F("Sending %ld bytes through socket: %d\n", (long int) data->size, connection->socketHandle);
 
         /* sends the value retrieving the number of bytes sent */
         numberBytes = SOCKET_SEND(connection->socketHandle, data->data, data->size, 0);
