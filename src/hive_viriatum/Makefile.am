@@ -37,9 +37,9 @@ viriatum_CXXFLAGS = $(AM_CXXFLAGS)
 libviriatum_http_la_CFLAGS = $(AM_CFLAGS)
 libviriatum_http_la_CXXFLAGS = $(AM_CXXFLAGS)
 
-viriatum_LDADD = ../hive_viriatum_commons/libviriatum.a $(INTLLIBS)
+viriatum_LDADD = ../hive_viriatum_commons/libviriatum.la $(INTLLIBS)
 
-libviriatum_http_la_LIBADD = ../hive_viriatum_commons/libviriatum.a $(INTLLIBS)
+libviriatum_http_la_LIBADD = ../hive_viriatum_commons/libviriatum.la $(INTLLIBS)
 libviriatum_http_la_LDFLAGS = -version-info $(VIRIATUM_MAJOR_VERSION):$(VIRIATUM_MINOR_VERSION):$(VIRIATUM_MICRO_VERSION)
 
 viriatum_SOURCES = stdafx.c \
