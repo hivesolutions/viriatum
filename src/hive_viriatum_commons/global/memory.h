@@ -32,7 +32,7 @@
 #ifdef VIRIATUM_DEBUG
 VIRIATUM_EXTERNAL_PREFIX size_t allocations;
 #define ALLOCATIONS allocations
-#define START_MEMORY size_t allocations = 0;
+#define START_MEMORY size_t allocations = 0
 #define MALLOC(size) mallocDebug(size, (char *) baseStringValue((unsigned char *) __FILE__), __LINE__)
 #define CALLOC(count, size) callocDebug(count, size, (char *) baseStringValue((unsigned char *) __FILE__), __LINE__)
 #define REALLOC(pointer, size) realloc(pointer, size)
