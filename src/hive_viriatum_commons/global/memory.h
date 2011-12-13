@@ -33,10 +33,10 @@
 VIRIATUM_EXTERNAL_PREFIX size_t allocations;
 #define ALLOCATIONS allocations
 #define START_MEMORY size_t allocations = 0;
-#define MALLOC(size) mallocDebug(size, baseStringValue((unsigned char *) __FILE__), __LINE__)
-#define CALLOC(count, size) callocDebug(count, size, baseStringValue((unsigned char *) __FILE__), __LINE__)
+#define MALLOC(size) mallocDebug(size, (char *) baseStringValue((unsigned char *) __FILE__), __LINE__)
+#define CALLOC(count, size) callocDebug(count, size, (char *) baseStringValue((unsigned char *) __FILE__), __LINE__)
 #define REALLOC(pointer, size) realloc(pointer, size)
-#define FREE(pointer) freeDebug(pointer, baseStringValue((unsigned char *) __FILE__), __LINE__)
+#define FREE(pointer) freeDebug(pointer, (char *) baseStringValue((unsigned char *) __FILE__), __LINE__)
 #ifdef VIRIATUM_MEMORY_DEBUG
 static __inline void *mallocDebug(size_t size, char *file, int line) { allocations++; printf("[MEMORY] [%s: %d] malloc() called [%d bytes] [%d objects]\n", file, line, size, allocations); return malloc(size); }
 static __inline void *callocDebug(size_t count, size_t size, char *file, int line) { allocations++; printf("[MEMORY] [%s: %d] calloc() called [%d count %d bytes] [%d objects]\n", file, line, count, size, allocations); return calloc(count, size); }
