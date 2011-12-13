@@ -65,7 +65,7 @@ void *allocMemoryPool(struct MemoryPool_t *memoryPool, size_t size) {
     }
     // otherwise it's a small (normal) block size
     else {
-		/*
+		/* unsets hte large block value */
 		currentMemoryPool->largeBlock = NULL;
     }
 
