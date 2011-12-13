@@ -23,4 +23,4 @@
 # __copyright__ = Copyright (c) 2008 Hive Solutions Lda.
 # __license__   = GNU General Public License (GPL), Version 3
 
-AC_ARG_ENABLE([debug], AS_HELP_STRING([--enable-debug], [enable debug features]), AC_DEFINE([VIRIATUM_DEBUG], [1]), [])
+AC_ARG_ENABLE([debug], [AS_HELP_STRING([--enable-debug], [enable debug features])], [AC_DEFINE([VIRIATUM_DEBUG], [1], [])], [])
