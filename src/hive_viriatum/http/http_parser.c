@@ -474,7 +474,7 @@ int processDataHttpParser(struct HttpParser_t *httpParser, struct HttpSettings_t
                      goto error;*/
                 }
 
-                matcher = HttpMethodStrings[httpParser->method - 1];
+                matcher = httpMethodStrings[httpParser->method - 1];
 
                 if(byte == ' ' && matcher[index] == '\0') {
                     state = STATE_REQ_SPACES_BEFORE_URL;

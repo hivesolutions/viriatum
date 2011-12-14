@@ -113,7 +113,7 @@ ERROR_CODE urlCallbackHandlerFile(struct HttpParser_t *httpParser, const unsigne
     url[dataSize] = '\0';
 
 	/* prints a debug message */
-	V_INFO_F("%s %s\n", HttpMethodStrings[httpParser->method - 1], url);
+	V_INFO_F("%s %s\n", httpMethodStrings[httpParser->method - 1], url);
 
     /* in case the string refers the base path (default handler must be used) */
     if(strcmp((char *) url, "/") == 0 || strcmp((char *) url, "") == 0) {
