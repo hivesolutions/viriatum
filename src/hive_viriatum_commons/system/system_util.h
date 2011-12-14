@@ -68,7 +68,7 @@
 
 #ifdef VIRIATUM_PLATFORM_MINGW
 #define SPRINTF(buffer, size, format, ...) sprintf(buffer, format, __VA_ARGS__)
-#define STRTOK(string, delimiter, context) strtok(string, delimiter); dump(context)
+#define STRTOK(string, delimiter, context) strtok(string, delimiter); dump((void *) &context)
 #define FOPEN(filePointer, fileName, mode) *filePointer = fopen(fileName, mode)
 #endif
 
