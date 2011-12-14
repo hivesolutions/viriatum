@@ -49,11 +49,17 @@
 #ifdef VIRIATUM_DEBUG
 #define V_DEBUG(format) V_MESSAGE("DEBUG"); PRINTF(format)
 #define V_DEBUG_F(format, ...) V_MESSAGE("DEBUG"); PRINTF_F(format, __VA_ARGS__)
+
+#define V_INFO(format) V_MESSAGE("INFO"); PRINTF(format)
+#define V_INFO_F(format, ...) V_MESSAGE("INFO"); PRINTF_F(format, __VA_ARGS__)
 #endif
 
 #ifndef VIRIATUM_DEBUG
 #define V_DEBUG(format) dump(format)
 #define V_DEBUG_F(format, ...) dumpMultiple(format, __VA_ARGS__)
+
+#define V_INFO(format) dump(format)
+#define V_INFO_F(format, ...) dumpMultiple(format, __VA_ARGS__)
 #endif
 
 #define V_WARNING(format) V_MESSAGE("WARNING"); PRINTF(format)
