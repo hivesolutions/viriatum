@@ -334,7 +334,7 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
         V_DEBUG_F("%s\n", getLastErrorMessageSafe());
 
         /* writes the http static headers to the response */
-        SPRINTF(headersBuffer, 1024, "HTTP/1.1 404 Not Found\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nCache-Control: no-cache, must-revalidate\r\nContent-Length: %d\r\n\r\n404 - Not Found (%s)", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, (int) strlen((char *) handlerFileContext->filePath) + 18, handlerFileContext->filePath);
+        SPRINTF(headersBuffer, 1024, "HTTP/1.1 404 Not Found\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nCache-Control: no-cache, must-revalidate\r\nContent-Length: %lu\r\n\r\n404 - Not Found (%s)", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, (long unsigned int) strlen((char *) handlerFileContext->filePath) + 18, handlerFileContext->filePath);
 
         /* writes both the headers to the connection, registers for the appropriate callbacks */
         writeConnection(connection, (unsigned char *) headersBuffer, (unsigned int) strlen(headersBuffer), _cleanupHandlerFile, handlerFileContext);
@@ -348,7 +348,7 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
     /* in case the current situation is a directory list */
     else if(isDirectory) {
         /* writes the http static headers to the response */
-        SPRINTF(headersBuffer, 1024, "HTTP/1.1 200 OK\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nCache-Control: no-cache, must-revalidate\r\nContent-Length: %lu\r\n\r\n", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, strlen((char *) handlerFileContext->templateHandler->stringValue));
+        SPRINTF(headersBuffer, 1024, "HTTP/1.1 200 OK\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nCache-Control: no-cache, must-revalidate\r\nContent-Length: %lu\r\n\r\n", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, (long unsigned int) strlen((char *) handlerFileContext->templateHandler->stringValue));
 
         /* writes both the headers to the connection, registers for the appropriate callbacks */
         writeConnection(connection, (unsigned char *) headersBuffer, (unsigned int) strlen(headersBuffer), _sendDataHandlerFile, handlerFileContext);
@@ -364,7 +364,7 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
     file situation (no directory) */
     else {
         /* writes the http static headers to the response */
-        SPRINTF(headersBuffer, 1024, "HTTP/1.1 200 OK\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nCache-Control: no-cache, must-revalidate\r\nETag: %s\r\nContent-Length: %lu\r\n\r\n", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, etag, fileSize);
+        SPRINTF(headersBuffer, 1024, "HTTP/1.1 200 OK\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nCache-Control: no-cache, must-revalidate\r\nETag: %s\r\nContent-Length: %lu\r\n\r\n", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, etag, (long unsigned int) fileSize);
 
         /* writes both the headers to the connection, registers for the appropriate callbacks */
         writeConnection(connection, (unsigned char *) headersBuffer, strlen(headersBuffer), _sendChunkHandlerFile, handlerFileContext);
