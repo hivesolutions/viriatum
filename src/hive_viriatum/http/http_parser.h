@@ -244,7 +244,7 @@ typedef ERROR_CODE (*httpDataCallback) (struct HttpParser_t *, const unsigned ch
  * List of strings defining the various http method
  * names.
  */
-static const char *HttpMethodStrings[] = {
+static const char *HttpMethodStrings[24] = {
     "DELETE",
     "GET",
     "HEAD",
