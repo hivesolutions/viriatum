@@ -124,7 +124,7 @@ ERROR_CODE loadModule(struct Service_t *service, unsigned char *modulePath) {
     symbol = GET_LIBRARY_SYMBOL(modLibrary, "infoModule");
 
     /* retrieves the info module function reference */
-    infoModuleFunction = *(viriatumInfoModule *) (void *) &symbol;
+    infoModuleFunction = *((viriatumInfoModule *)(&symbol));
 
     /* in case the start module function was not found */
     if(infoModuleFunction == NULL) {
