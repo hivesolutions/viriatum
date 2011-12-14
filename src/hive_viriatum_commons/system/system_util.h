@@ -50,7 +50,7 @@
 #define SLEEP(miliseconds) usleep((useconds_t) miliseconds * 1000)
 #define GET_PID() getpid()
 #define SPRINTF(buffer, size, format, ...) sprintf(buffer, format, __VA_ARGS__)
-#define STRTOK(string, delimiter, context) strtok(string, delimiter); dump(context)
+#define STRTOK(string, delimiter, context) strtok(string, delimiter); dump((void *) &context)
 #define FOPEN(filePointer, fileName, mode) *filePointer = fopen(fileName, mode)
 #define GET_ENV(buffer, bufferSize, variableName) buffer = getenv(variableName)
 #define GET_PROCESS() RUSAGE_SELF
