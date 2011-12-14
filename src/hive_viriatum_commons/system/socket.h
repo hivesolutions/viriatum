@@ -83,7 +83,7 @@
 #define SOCKET_CONNECTIONS 256
 #define SOCKET_DATA void *
 #define SOCKET_HANDLE int
-#define SOCKET_ADDRESS_SIZE int
+#define SOCKET_ADDRESS_SIZE socklen_t
 #define SOCKET_ADDRESS struct sockaddr
 #define SOCKET_ADDRESS_INPUT struct sockaddr_in
 #define SOCKET_FLAGS unsigned long
