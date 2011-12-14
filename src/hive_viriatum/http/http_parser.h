@@ -234,7 +234,7 @@ static const unsigned char normalUrlChar[256] = {
  * This names may be used together with an enumeration
  * defining a sequence of http methods.
  */
-const char *httpMethodStrings[24] = {
+static const char *httpMethodStrings[24] = {
     "DELETE",
     "GET",
     "HEAD",
