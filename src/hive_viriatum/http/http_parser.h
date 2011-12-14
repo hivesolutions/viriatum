@@ -490,3 +490,7 @@ void deleteHttpSettings(struct HttpSettings_t *httpSettings);
  * @return The number of bytes used during the processing.
  */
 int processDataHttpParser(struct HttpParser_t *httpParser, struct HttpSettings_t *httpSettings, unsigned char *data, size_t dataSize);
+
+static __inline const char *getHttpMethodString(enum HttpMethod_e httpMethod) {
+    return httpMethodStrings[httpMethod - 1];
+}
