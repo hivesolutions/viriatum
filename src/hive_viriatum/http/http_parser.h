@@ -491,6 +491,15 @@ void deleteHttpSettings(struct HttpSettings_t *httpSettings);
  */
 int processDataHttpParser(struct HttpParser_t *httpParser, struct HttpSettings_t *httpSettings, unsigned char *data, size_t dataSize);
 
+/**
+ * Retrieves the string representing the http method for
+ * the given http method integer represented in the
+ * enumeration.
+ *
+ * @param httpMethod The http method integer to be "converted"
+ * into string representation.
+ * @return The string representation of the http method.
+ */
 static __inline const char *getHttpMethodString(enum HttpMethod_e httpMethod) {
     return httpMethodStrings[httpMethod - 1];
 }
