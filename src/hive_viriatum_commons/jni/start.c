@@ -42,7 +42,7 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
 
     /* retrieves the environment value and checks
     the jni version in case it fails return in error */
-    if((*vm)->GetEnv(vm, (void**) &env, JNI_VERSION_1_4) != JNI_OK){ {
+	if((*vm)->GetEnv(vm, (void**) &env, JNI_VERSION_1_4) != JNI_OK) {
         /* returns in error */
         return -1;
     }
