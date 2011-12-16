@@ -35,6 +35,10 @@
 #include "_config_win32.h"
 #endif
 
+#ifdef HAVE_DEBUG
+#define VIRIATUM_DEBUG
+#endif
+
 #ifndef HAVE_LIBPTHREAD
 #define VIRIATUM_NO_THREADS
 #endif

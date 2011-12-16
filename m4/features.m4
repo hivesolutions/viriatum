@@ -30,5 +30,5 @@ have_debug=false
 AC_ARG_ENABLE([debug], [AS_HELP_STRING([--enable-debug], [enable debug features])], [have_debug=true], [])
 
 if test "$have_debug" = true; then
-    AC_DEFINE(VIRIATUM_DEBUG, 1, [Define to 1 if debug is enabled])
+    AC_DEFINE(HAVE_DEBUG, 1, [Define to 1 if debug is enabled])
 fi
