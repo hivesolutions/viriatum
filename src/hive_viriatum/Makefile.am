@@ -51,6 +51,7 @@ http/http_request.c \
 io/file.c \
 jni/info.c \
 jni/jni_service.c \
+jni/start.c \
 module/loading.c \
 polling/polling_epoll.c\
 polling/polling_kqueue.c\
@@ -70,6 +71,7 @@ http/http_request.c \
 io/file.c \
 jni/info.c \
 jni/jni_service.c \
+jni/start.c \
 module/loading.c \
 polling/polling_epoll.c\
 polling/polling_kqueue.c\

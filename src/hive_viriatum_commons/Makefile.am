@@ -45,6 +45,7 @@ debug/error.c \
 debug/logging.c \
 encoding/base_64.c \
 jni/info.c \
+jni/start.c \
 memory/memory_pool.c \
 sorting/quicksort.c \
 stream/bit_stream.c \
@@ -70,6 +71,7 @@ debug/error.c \
 debug/logging.c \
 encoding/base_64.c \
 jni/info.c \
+jni/start.c \
 memory/memory_pool.c \
 sorting/quicksort.c \
 stream/bit_stream.c \
