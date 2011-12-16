@@ -47,22 +47,4 @@ jstring Java_pt_hive_viriatum_http_Info_hello(JNIEnv *env, jobject thiz) {
     return (*env)->NewStringUTF(env, "hello wolrd, from viriatum http");
 }
 
-jint JNI_OnLoad(JavaVM *vm, void *reserved) {
-    /* allocates space for the current java environment */
-    JNIEnv *env;
-
-    /* saves the current java vm reference */
-    javaVM = vm;
-
-    /* retrieves the environment value and checks
-    the jni version in case it fails return in error */
-    if(vm->GetEnv((void**) &env, JNI_VERSION_1_4) != JNI_OK) {
-        /* returns in error */
-        return -1;
-    }
-
-    /* returns the jni version */
-    return JNI_VERSION_1_4;
-}
-
 #endif
