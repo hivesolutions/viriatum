@@ -109,6 +109,7 @@ void killHandler(int signalNumber) {
     ranService();
 }
 
+#ifndef VIRIATUM_PLATFORM_IPHONE
 int main(int argc, char *argv[]) {
     /* allocates the return value */
     ERROR_CODE returnValue;
@@ -146,3 +147,4 @@ int main(int argc, char *argv[]) {
     /* returns zero (valid) */
     return 0;
 }
+#endif

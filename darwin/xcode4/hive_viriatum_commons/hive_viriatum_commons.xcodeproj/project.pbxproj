@@ -54,6 +54,39 @@
 		C20C2CE11350B6BB001E22FB /* dump_util.h in Headers */ = {isa = PBXBuildFile; fileRef = C20C2CB21350B6BB001E22FB /* dump_util.h */; };
 		C20C2CE21350B6BB001E22FB /* util.h in Headers */ = {isa = PBXBuildFile; fileRef = C20C2CB31350B6BB001E22FB /* util.h */; };
 		C20C2CE31350B6BB001E22FB /* viriatum_commons.h in Headers */ = {isa = PBXBuildFile; fileRef = C20C2CB41350B6BB001E22FB /* viriatum_commons.h */; };
+		C218C359149C5CE600679862 /* info.c in Sources */ = {isa = PBXBuildFile; fileRef = C218C352149C5CE600679862 /* info.c */; };
+		C218C35A149C5CE600679862 /* info.h in Headers */ = {isa = PBXBuildFile; fileRef = C218C353149C5CE600679862 /* info.h */; };
+		C218C35B149C5CE600679862 /* jni.h in Headers */ = {isa = PBXBuildFile; fileRef = C218C354149C5CE600679862 /* jni.h */; };
+		C218C35C149C5CE600679862 /* jni_service.c in Sources */ = {isa = PBXBuildFile; fileRef = C218C355149C5CE600679862 /* jni_service.c */; };
+		C218C35D149C5CE600679862 /* jni_service.h in Headers */ = {isa = PBXBuildFile; fileRef = C218C356149C5CE600679862 /* jni_service.h */; };
+		C218C35E149C5CE600679862 /* start.c in Sources */ = {isa = PBXBuildFile; fileRef = C218C357149C5CE600679862 /* start.c */; };
+		C218C35F149C5CE600679862 /* start.h in Headers */ = {isa = PBXBuildFile; fileRef = C218C358149C5CE600679862 /* start.h */; };
+		C2565FA4149C55F300722EFA /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C2565FA3149C55F300722EFA /* Foundation.framework */; };
+		C2565FAF149C563400722EFA /* engine.c in Sources */ = {isa = PBXBuildFile; fileRef = C2C025FE148BB783005E5236 /* engine.c */; };
+		C2565FB0149C563400722EFA /* handler.c in Sources */ = {isa = PBXBuildFile; fileRef = C2C02600148BB783005E5236 /* handler.c */; };
+		C2565FB1149C563400722EFA /* bit_stream.c in Sources */ = {isa = PBXBuildFile; fileRef = C2C025EB148BB77A005E5236 /* bit_stream.c */; };
+		C2565FB2149C563400722EFA /* file_stream.c in Sources */ = {isa = PBXBuildFile; fileRef = C2C025ED148BB77A005E5236 /* file_stream.c */; };
+		C2565FB3149C563400722EFA /* io_stream.c in Sources */ = {isa = PBXBuildFile; fileRef = C2C025EF148BB77A005E5236 /* io_stream.c */; };
+		C2565FB4149C563400722EFA /* memory_stream.c in Sources */ = {isa = PBXBuildFile; fileRef = C2C025F1148BB77A005E5236 /* memory_stream.c */; };
+		C2565FB5149C565A00722EFA /* quicksort.c in Sources */ = {isa = PBXBuildFile; fileRef = C2C025E3148BB774005E5236 /* quicksort.c */; };
+		C2565FB6149C565A00722EFA /* huffman.c in Sources */ = {isa = PBXBuildFile; fileRef = C2C025DA148BB760005E5236 /* huffman.c */; };
+		C2565FB7149C565A00722EFA /* stdafx.c in Sources */ = {isa = PBXBuildFile; fileRef = C20C2C971350B6BB001E22FB /* stdafx.c */; };
+		C2565FB8149C565A00722EFA /* md5.c in Sources */ = {isa = PBXBuildFile; fileRef = C2C025D4148BB758005E5236 /* md5.c */; };
+		C2565FB9149C565A00722EFA /* crc_32.c in Sources */ = {isa = PBXBuildFile; fileRef = C20C2C7D1350B6BB001E22FB /* crc_32.c */; };
+		C2565FBA149C565A00722EFA /* error.c in Sources */ = {isa = PBXBuildFile; fileRef = C20C2C811350B6BB001E22FB /* error.c */; };
+		C2565FBB149C565A00722EFA /* logging.c in Sources */ = {isa = PBXBuildFile; fileRef = C20C2C831350B6BB001E22FB /* logging.c */; };
+		C2565FBC149C565A00722EFA /* base_64.c in Sources */ = {isa = PBXBuildFile; fileRef = C20C2C861350B6BB001E22FB /* base_64.c */; };
+		C2565FBD149C565A00722EFA /* memory_pool.c in Sources */ = {isa = PBXBuildFile; fileRef = C20C2C941350B6BB001E22FB /* memory_pool.c */; };
+		C2565FBE149C565A00722EFA /* date_time.c in Sources */ = {isa = PBXBuildFile; fileRef = C2C02566148BB605005E5236 /* date_time.c */; };
+		C2565FBF149C565A00722EFA /* string_buffer.c in Sources */ = {isa = PBXBuildFile; fileRef = C2C02568148BB605005E5236 /* string_buffer.c */; };
+		C2565FC0149C565A00722EFA /* type.c in Sources */ = {isa = PBXBuildFile; fileRef = C2C0256A148BB605005E5236 /* type.c */; };
+		C2565FC1149C565A00722EFA /* array_list.c in Sources */ = {isa = PBXBuildFile; fileRef = C20C2C9A1350B6BB001E22FB /* array_list.c */; };
+		C2565FC2149C565A00722EFA /* buffer.c in Sources */ = {isa = PBXBuildFile; fileRef = C20C2C9C1350B6BB001E22FB /* buffer.c */; };
+		C2565FC3149C565A00722EFA /* hash_map.c in Sources */ = {isa = PBXBuildFile; fileRef = C20C2C9E1350B6BB001E22FB /* hash_map.c */; };
+		C2565FC4149C565A00722EFA /* iterator.c in Sources */ = {isa = PBXBuildFile; fileRef = C20C2CA01350B6BB001E22FB /* iterator.c */; };
+		C2565FC5149C565A00722EFA /* linked_list.c in Sources */ = {isa = PBXBuildFile; fileRef = C20C2CA21350B6BB001E22FB /* linked_list.c */; };
+		C2565FC6149C565A00722EFA /* _thread_win32.c in Sources */ = {isa = PBXBuildFile; fileRef = C20C2CA61350B6BB001E22FB /* _thread_win32.c */; };
+		C2565FC7149C565A00722EFA /* thread_pool.c in Sources */ = {isa = PBXBuildFile; fileRef = C20C2CAF1350B6BB001E22FB /* thread_pool.c */; };
 		C2C0256C148BB605005E5236 /* date_time.c in Sources */ = {isa = PBXBuildFile; fileRef = C2C02566148BB605005E5236 /* date_time.c */; };
 		C2C0256D148BB605005E5236 /* date_time.h in Headers */ = {isa = PBXBuildFile; fileRef = C2C02567148BB605005E5236 /* date_time.h */; };
 		C2C0256E148BB605005E5236 /* string_buffer.c in Sources */ = {isa = PBXBuildFile; fileRef = C2C02568148BB605005E5236 /* string_buffer.c */; };
@@ -136,6 +169,15 @@
 		C20C2CB21350B6BB001E22FB /* dump_util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dump_util.h; sourceTree = "<group>"; };
 		C20C2CB31350B6BB001E22FB /* util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = util.h; sourceTree = "<group>"; };
 		C20C2CB41350B6BB001E22FB /* viriatum_commons.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = viriatum_commons.h; path = ../../../src/hive_viriatum_commons/viriatum_commons.h; sourceTree = "<group>"; };
+		C218C352149C5CE600679862 /* info.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = info.c; sourceTree = "<group>"; };
+		C218C353149C5CE600679862 /* info.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = info.h; sourceTree = "<group>"; };
+		C218C354149C5CE600679862 /* jni.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = jni.h; sourceTree = "<group>"; };
+		C218C355149C5CE600679862 /* jni_service.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = jni_service.c; sourceTree = "<group>"; };
+		C218C356149C5CE600679862 /* jni_service.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = jni_service.h; sourceTree = "<group>"; };
+		C218C357149C5CE600679862 /* start.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = start.c; sourceTree = "<group>"; };
+		C218C358149C5CE600679862 /* start.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = start.h; sourceTree = "<group>"; };
+		C2565FA1149C55F300722EFA /* libhive_viriatum_commons_mobile.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libhive_viriatum_commons_mobile.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		C2565FA3149C55F300722EFA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		C2C02566148BB605005E5236 /* date_time.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = date_time.c; sourceTree = "<group>"; };
 		C2C02567148BB605005E5236 /* date_time.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = date_time.h; sourceTree = "<group>"; };
 		C2C02568148BB605005E5236 /* string_buffer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = string_buffer.c; sourceTree = "<group>"; };
@@ -177,6 +219,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		C2565F9E149C55F300722EFA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C2565FA4149C55F300722EFA /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -184,6 +234,7 @@
 			isa = PBXGroup;
 			children = (
 				C20C2C7A1350B6AD001E22FB /* Classes */,
+				C2565FA2149C55F300722EFA /* Frameworks */,
 				C20C2C6E1350B6A5001E22FB /* Products */,
 			);
 			sourceTree = "<group>";
@@ -192,6 +243,7 @@
 			isa = PBXGroup;
 			children = (
 				C20C2C6D1350B6A5001E22FB /* libhive_viriatum_commons.a */,
+				C2565FA1149C55F300722EFA /* libhive_viriatum_commons_mobile.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -199,18 +251,19 @@
 		C20C2C7A1350B6AD001E22FB /* Classes */ = {
 			isa = PBXGroup;
 			children = (
-				C2C025FD148BB783005E5236 /* template */,
-				C2C025EA148BB77A005E5236 /* stream */,
-				C2C025E1148BB773005E5236 /* sorting */,
-				C2C025D8148BB760005E5236 /* compression */,
 				C2F8700D1350BAE20003A4A5 /* base */,
 				C20C2C7B1350B6BB001E22FB /* checksum */,
+				C2C025D8148BB760005E5236 /* compression */,
 				C20C2C7F1350B6BB001E22FB /* debug */,
 				C20C2C851350B6BB001E22FB /* encoding */,
 				C20C2C891350B6BB001E22FB /* global */,
+				C218C351149C5CE600679862 /* jni */,
 				C20C2C921350B6BB001E22FB /* memory */,
+				C2C025E1148BB773005E5236 /* sorting */,
+				C2C025EA148BB77A005E5236 /* stream */,
 				C20C2C991350B6BB001E22FB /* structures */,
 				C20C2CA51350B6BB001E22FB /* system */,
+				C2C025FD148BB783005E5236 /* template */,
 				C20C2CAD1350B6BB001E22FB /* thread */,
 				C20C2CB11350B6BB001E22FB /* util */,
 			);
@@ -343,6 +396,29 @@
 			path = ../../../src/hive_viriatum_commons/util;
 			sourceTree = "<group>";
 		};
+		C218C351149C5CE600679862 /* jni */ = {
+			isa = PBXGroup;
+			children = (
+				C218C352149C5CE600679862 /* info.c */,
+				C218C353149C5CE600679862 /* info.h */,
+				C218C354149C5CE600679862 /* jni.h */,
+				C218C355149C5CE600679862 /* jni_service.c */,
+				C218C356149C5CE600679862 /* jni_service.h */,
+				C218C357149C5CE600679862 /* start.c */,
+				C218C358149C5CE600679862 /* start.h */,
+			);
+			name = jni;
+			path = ../../../src/hive_viriatum/jni;
+			sourceTree = "<group>";
+		};
+		C2565FA2149C55F300722EFA /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				C2565FA3149C55F300722EFA /* Foundation.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		C2C025D8148BB760005E5236 /* compression */ = {
 			isa = PBXGroup;
 			children = (
@@ -466,6 +542,17 @@
 				C2C02606148BB783005E5236 /* handler.h in Headers */,
 				C2C02607148BB783005E5236 /* template.h in Headers */,
 				C2C02609148BB791005E5236 /* string_util.h in Headers */,
+				C218C35A149C5CE600679862 /* info.h in Headers */,
+				C218C35B149C5CE600679862 /* jni.h in Headers */,
+				C218C35D149C5CE600679862 /* jni_service.h in Headers */,
+				C218C35F149C5CE600679862 /* start.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C2565F9F149C55F300722EFA /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -489,6 +576,23 @@
 			productReference = C20C2C6D1350B6A5001E22FB /* libhive_viriatum_commons.a */;
 			productType = "com.apple.product-type.library.static";
 		};
+		C2565FA0149C55F300722EFA /* hive_viriatum_commons_mobile */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C2565FAD149C55F300722EFA /* Build configuration list for PBXNativeTarget "hive_viriatum_commons_mobile" */;
+			buildPhases = (
+				C2565F9D149C55F300722EFA /* Sources */,
+				C2565F9E149C55F300722EFA /* Frameworks */,
+				C2565F9F149C55F300722EFA /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = hive_viriatum_commons_mobile;
+			productName = hive_viriatum_commons_mobile;
+			productReference = C2565FA1149C55F300722EFA /* libhive_viriatum_commons_mobile.a */;
+			productType = "com.apple.product-type.library.static";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -507,6 +611,7 @@
 			projectRoot = "";
 			targets = (
 				C20C2C6C1350B6A5001E22FB /* hive_viriatum_commons */,
+				C2565FA0149C55F300722EFA /* hive_viriatum_commons_mobile */,
 			);
 		};
 /* End PBXProject section */
@@ -541,6 +646,41 @@
 				C2C025FA148BB77A005E5236 /* memory_stream.c in Sources */,
 				C2C02603148BB783005E5236 /* engine.c in Sources */,
 				C2C02605148BB783005E5236 /* handler.c in Sources */,
+				C218C359149C5CE600679862 /* info.c in Sources */,
+				C218C35C149C5CE600679862 /* jni_service.c in Sources */,
+				C218C35E149C5CE600679862 /* start.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C2565F9D149C55F300722EFA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C2565FB5149C565A00722EFA /* quicksort.c in Sources */,
+				C2565FB6149C565A00722EFA /* huffman.c in Sources */,
+				C2565FB7149C565A00722EFA /* stdafx.c in Sources */,
+				C2565FB8149C565A00722EFA /* md5.c in Sources */,
+				C2565FB9149C565A00722EFA /* crc_32.c in Sources */,
+				C2565FBA149C565A00722EFA /* error.c in Sources */,
+				C2565FBB149C565A00722EFA /* logging.c in Sources */,
+				C2565FBC149C565A00722EFA /* base_64.c in Sources */,
+				C2565FBD149C565A00722EFA /* memory_pool.c in Sources */,
+				C2565FBE149C565A00722EFA /* date_time.c in Sources */,
+				C2565FBF149C565A00722EFA /* string_buffer.c in Sources */,
+				C2565FC0149C565A00722EFA /* type.c in Sources */,
+				C2565FC1149C565A00722EFA /* array_list.c in Sources */,
+				C2565FC2149C565A00722EFA /* buffer.c in Sources */,
+				C2565FC3149C565A00722EFA /* hash_map.c in Sources */,
+				C2565FC4149C565A00722EFA /* iterator.c in Sources */,
+				C2565FC5149C565A00722EFA /* linked_list.c in Sources */,
+				C2565FC6149C565A00722EFA /* _thread_win32.c in Sources */,
+				C2565FC7149C565A00722EFA /* thread_pool.c in Sources */,
+				C2565FAF149C563400722EFA /* engine.c in Sources */,
+				C2565FB0149C563400722EFA /* handler.c in Sources */,
+				C2565FB1149C563400722EFA /* bit_stream.c in Sources */,
+				C2565FB2149C563400722EFA /* file_stream.c in Sources */,
+				C2565FB3149C563400722EFA /* io_stream.c in Sources */,
+				C2565FB4149C563400722EFA /* memory_stream.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -603,6 +743,50 @@
 			};
 			name = Release;
 		};
+		C2565FAB149C55F300722EFA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				COPY_PHASE_STRIP = NO;
+				DSTROOT = /tmp/hive_viriatum_commons_mobile.dst;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		C2565FAC149C55F300722EFA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				COPY_PHASE_STRIP = YES;
+				DSTROOT = /tmp/hive_viriatum_commons_mobile.dst;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "";
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -620,6 +804,15 @@
 			buildConfigurations = (
 				C20C2C721350B6A5001E22FB /* Debug */,
 				C20C2C731350B6A5001E22FB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C2565FAD149C55F300722EFA /* Build configuration list for PBXNativeTarget "hive_viriatum_commons_mobile" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C2565FAB149C55F300722EFA /* Debug */,
+				C2565FAC149C55F300722EFA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
