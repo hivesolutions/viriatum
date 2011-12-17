@@ -36,8 +36,7 @@ with_resourceroot=/var/viriatum
 # sets the default values for the various feature
 # control variables
 have_debug=false
-with_wwwroot=$with_resourceroot/www
-with_moduleroot=$with_libroot/modules
+with_wwwroot=false
 
 AC_ARG_ENABLE([debug], [AS_HELP_STRING([--enable-debug], [enable debug features])], [have_debug=true], [])
 AC_ARG_WITH([wwwroot], [AS_HELP_STRING([--with-wwwroot], [set the default base directory])], [], [with_wwwroot=false])
