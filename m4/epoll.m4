@@ -33,23 +33,23 @@ AC_ARG_ENABLE(epoll, AC_HELP_STRING([--disable-epoll], [disable epoll() support]
 if test "x$have_epoll_include" = "xtrue" && test "x$wants_epoll" = "xtrue"; then
     AC_MSG_CHECKING(for epoll system call)
     AC_RUN_IFELSE(
-		[AC_LANG_SOURCE([
-			#include <stdint.h>
-			#include <sys/param.h>
-			#include <sys/types.h>
-			#include <sys/syscall.h>
-			#include <sys/epoll.h>
-			#include <unistd.h>
+        [AC_LANG_SOURCE([
+            #include <stdint.h>
+            #include <sys/param.h>
+            #include <sys/types.h>
+            #include <sys/syscall.h>
+            #include <sys/epoll.h>
+            #include <unistd.h>
 
-			int epoll_create(int size) {
-				return (syscall(__NR_epoll_create, size));
-			}
+            int epoll_create(int size) {
+                return (syscall(__NR_epoll_create, size));
+            }
 
-			int main (int argc, char **argv) {
-				int epfd;
-				epfd = epoll_create(256);
-				exit(epfd == -1 ? 1 : 0);
-			}
+            int main (int argc, char **argv) {
+                int epfd;
+                epfd = epoll_create(256);
+                exit(epfd == -1 ? 1 : 0);
+            }
         ])], have_epoll=true, have_epoll=false, have_epoll=true)
     AC_MSG_RESULT($have_epoll)
 fi
