@@ -39,7 +39,7 @@ have_debug=false
 
 AC_ARG_ENABLE([debug], [AS_HELP_STRING([--enable-debug], [enable debug features])], [have_debug=true], [])
 AC_ARG_WITH([wwwroot], [AS_HELP_STRING([--with-wwwroot], [set the default data directory])], [], [with_wwwroot=$with_resourceroot/www])
-AC_ARG_WITH([moduleroot], [AS_HELP_STRING([--with-moduleroot], [set the default modules directory])], [], [with_wwwroot=$with_libroot/modules])
+AC_ARG_WITH([moduleroot], [AS_HELP_STRING([--with-moduleroot], [set the default modules directory])], [], [with_moduleroot=$with_libroot/modules])
 
 AC_SUBST(WWW_ROOT, with_wwwroot)
 AC_SUBST(MODULE_ROOR, with_moduleroot)
