@@ -35,6 +35,10 @@
 #include "_config_win32.h"
 #endif
 
+#ifdef WITH_MODULE_ROOT
+#define VIRIATUM_MODELS_PATH WITH_MODULE_ROOT
+#endif
+
 #ifdef WITH_WWW_ROOT
 #define VIRIATUM_CONTENTS_PATH WITH_WWW_ROOT
 #endif
