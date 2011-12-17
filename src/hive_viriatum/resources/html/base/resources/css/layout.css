@@ -57,8 +57,8 @@ a:hover {
 }
 
 .table a {
-    font-size: 11pt;
     color: #595959;
+    font-size: 11pt;
 }
 
 .table a:hover {
@@ -100,8 +100,8 @@ a:hover {
 }
 
 #content-wrapper {
-    width: 960px;
     margin: 0px auto 0px auto;
+    width: 960px;
 }
 
 .content-header {
@@ -115,8 +115,8 @@ a:hover {
 }
 
 #footer-wrapper {
-    width: 960px;
     margin: 0px auto 0px auto;
+    width: 960px;
 }
 
 .footer-body {
@@ -141,9 +141,9 @@ a:hover {
 }
 
 .table.file-listing {
-    width: 660px;
-    margin: 80px auto 20px auto;
     color: #595959;
+    margin: 80px auto 20px auto;
+    width: 660px;
 }
 
 .table.file-listing th {
@@ -156,7 +156,7 @@ a:hover {
 }
 
 .table.file-listing .current-folder td {
-    border-bottom: 1px solid #CCC;
+    border-bottom: 1px solid #cccccc;
     font-weight: bold;
 }
 
@@ -169,8 +169,8 @@ a:hover {
 }
 
 .table.file-listing td.icon {
-    width: 16px;
     padding: 0px 10px 0px 10px;
+    width: 16px;
 }
 
 .table.file-listing tfoot tr td {
@@ -180,11 +180,11 @@ a:hover {
 }
 
 .icon.arrow-left a {
+    background: transparent url(../images/arrow-left.png) top center no-repeat;
+    cursor: pointer;
     display: block;
     height: 16px;
     width: 100%;
-    cursor: pointer;
-    background: transparent url(../images/arrow-left.png) top center no-repeat;
 }
 
 .icon.arrow-left a:hover {
@@ -208,9 +208,9 @@ a:hover {
 }
 
 .table.status {
-    width: 960px;
-    margin: 80px auto 20px auto;
     color: #595959;
+    margin: 80px auto 20px auto;
+    width: 960px;
 }
 
 .table.status td {
@@ -218,31 +218,31 @@ a:hover {
 }
 
 .content-header.error {
-    width: 400px;
     margin: 80px auto 80px auto;
+    width: 400px;
 }
 
 .error-illustration {
+    background: transparent url(../images/illustration/error-illustration.png) no-repeat center center;
     float: left;
     height: 280px;
     width: 200px;
-    background: transparent url(../images/illustration/error-illustration.png) no-repeat center center;
 }
 
 .error-content {
     float: left;
-    width: 200px;
     margin-top: 70px;
+    width: 200px;
 }
 
 .error-code {
-    height: 50px;
-    width: 100%;
-    font-family: times;
-    text-shadow: 1px 1px 1px #ffffff;
     color: #444444;
+    font-family: times;
     font-size: 38pt;
+    height: 50px;
     text-align: center;
+    text-shadow: 1px 1px 1px #ffffff;
+    width: 100%;
 }
 
 .error-description {

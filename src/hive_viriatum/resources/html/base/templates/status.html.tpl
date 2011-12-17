@@ -19,22 +19,22 @@
             </div>
         </div>
         <div id="content-wrapper">
-			<table class="table status" cellpadding="0" cellspacing="0">
-				<tbody>
-					<tr>
-						<td class="right label" width="50%">uptime</td>
-						<td class="left value" width="50%">12 days 3 hours</td>
-					</tr>
-					<tr>
-						<td class="right label">version</td>
-						<td class="left value">1.2.4 alpha</td>
-					</tr>
-					<tr>
-						<td class="right label">environment</td>
-						<td class="left value">python win32</td>
-					</tr>
-				</tbody>
-			</table>
+            <table class="table status" cellpadding="0" cellspacing="0">
+                <tbody>
+                    <tr>
+                        <td class="right label" width="50%">uptime</td>
+                        <td class="left value" width="50%">12 days 3 hours</td>
+                    </tr>
+                    <tr>
+                        <td class="right label">version</td>
+                        <td class="left value">1.2.4 alpha</td>
+                    </tr>
+                    <tr>
+                        <td class="right label">environment</td>
+                        <td class="left value">python win32</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
         <div id="footer-wrapper">
             <div class="footer-body">

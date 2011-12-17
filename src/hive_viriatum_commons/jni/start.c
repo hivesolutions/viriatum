@@ -17,7 +17,7 @@
  You should have received a copy of the GNU General Public License
  along with Hive Viriatum Commons. If not, see <http://www.gnu.org/licenses/>.
 
- __author__    = Jo„o Magalh„es <joamag@hive.pt>
+ __author__    = Jo√£o Magalh√£es <joamag@hive.pt>
  __version__   = 1.0.0
  __revision__  = $LastChangedRevision$
  __date__      = $LastChangedDate$
@@ -42,7 +42,7 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
 
     /* retrieves the environment value and checks
     the jni version in case it fails return in error */
-	if((*vm)->GetEnv(vm, (void **) &env, JNI_VERSION_1_4) != JNI_OK) {
+    if((*vm)->GetEnv(vm, (void **) &env, JNI_VERSION_1_4) != JNI_OK) {
         /* returns in error */
         return -1;
     }
