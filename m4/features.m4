@@ -36,5 +36,5 @@ if test "$have_debug" = true; then
 fi
 
 if test "$with_wwwroot" != false; then
-    AC_DEFINE(WITH_WWW_ROOT, with_wwwroot, [Define to a value if www root is set])
+    AC_DEFINE(WITH_WWW_ROOT, "$with_wwwroot", [Define to a value if www root is set])
 fi
