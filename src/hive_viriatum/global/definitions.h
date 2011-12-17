@@ -48,8 +48,8 @@
 #endif
 #endif
 
-#ifdef WITH_WWW_DIR
-#define VIRIATUM_CONTENTS_PATH WITH_WWW_DIR
+#ifdef WITH_WWW_ROOT
+#define VIRIATUM_CONTENTS_PATH WITH_WWW_ROOT
 #endif
 
 #define VIRIATUM_NAME "viriatum"
