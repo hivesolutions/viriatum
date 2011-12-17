@@ -460,7 +460,7 @@ ERROR_CODE loadModulesService(struct Service_t *service) {
 		}
 
 		/* creates the complete module path for the loading of it */
-		SPRINTF(modulePath, VIRIATUM_MAX_PATH_SIZE, "%s/%s", VIRIATUM_PLUGINS_PATH, entry->name);
+		SPRINTF(modulePath, VIRIATUM_MAX_PATH_SIZE, "%s%s", VIRIATUM_PLUGINS_PATH, entry->name);
 
 		/* loads the module, retrieving a possible error code */
 		errorCode = loadModule(service, modulePath);
