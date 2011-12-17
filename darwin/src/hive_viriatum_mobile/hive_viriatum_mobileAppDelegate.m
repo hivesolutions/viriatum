@@ -20,7 +20,7 @@
     // Add the navigation controller's view to the window and display.
     self.window.rootViewController = self.navigationController;
     
-    
+    // start running the service (blocking call)
     runService();
     
     [self.window makeKeyAndVisible];
