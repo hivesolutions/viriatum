@@ -56,3 +56,35 @@ static __inline unsigned char *baseStringValue(unsigned char *stringValue) {
     /* returns the "new" string value pointer */
     return stringValue + index;
 }
+
+static __inline int endsWithString(unsigned char *stringValue, unsigned char *endValue) {
+	/* allocates space for the index value to be used in iteration */
+	size_t index;
+
+	/* retrieves the string size for both the (base) string
+	value and the end value to be verified */
+	size_t stringValueSize = strlen((char *) stringValue);
+	size_t endValueSize = strlen((char *) endValue);
+
+	/* in case the string to compare the end value is bigger
+	than the base string value to be verified (impossible to
+	end with the string) */
+	if(endValueSize > stringValueSize) {
+		/* returns immediately false */
+		return 0;
+	}
+
+	/* iterates over the end value string to compare
+	the various character values */
+	for(index = 0; index < endValueSize; index++) {
+		/* in case the current end values does not match the equivalent
+		value in the base string value */
+		if(endValue[index] != stringValue[stringValueSize - endValueSize + index]) {
+			/* returns in error (failed match) */
+			return 0;
+		}
+	}
+
+	/* return in success (complete match) */
+	return 1;
+}

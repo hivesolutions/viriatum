@@ -342,7 +342,7 @@ ERROR_CODE startService(struct Service_t *service) {
     /* opens the (service) connection */
     serviceConnection->openConnection(serviceConnection);
 
-    /* iterates continuously */
+    /* iterates continuously, while the service is open */
     while(service->status == STATUS_OPEN) {
         /* retrieves the (current) process, to be used
         to retrieves some memory information, and then closes it*/
@@ -422,24 +422,66 @@ ERROR_CODE loadModulesService(struct Service_t *service) {
     /* allocates the error code */
     ERROR_CODE errorCode;
 
-    #ifdef VIRIATUM_PLATFORM_WIN32
-    /* loads the module, retrieving a possible error code */
-    errorCode = loadModule(service, (unsigned char *) "C:/repo_extra/viriatum/bin/hive_viriatum_mod_lua/i386/win32/Debug/hive_viriatum_mod_lua.dll");
-    #endif
+	/* allocates space for the linked list for the entries
+	and for the iterator to iterate "around" them */
+	struct LinkedList_t *entries;
+	struct Iterator_t *entriesIterator;
 
-    #ifdef VIRIATUM_PLATFORM_UNIX
-    /* loads the module, retrieving a possible error code */
-    errorCode = loadModule(service, (unsigned char *) "/usr/local/lib/libviriatum_mod_lua.so");
-    #endif
+	/* allocates space for an entry of the directory */
+	struct File_t *entry;
 
-    /* tests the error code for error */
-    if(IS_ERROR_CODE(errorCode)) {
-        /* prints a warning message */
-        V_WARNING_F("Problem loading module (%s)\n", (char *) GET_ERROR());
+	/* allocates space for the path to be used to load the module */
+	unsigned char modulePath[VIRIATUM_MAX_PATH_SIZE];
 
-        /* raises again the error */
-        RAISE_AGAIN(errorCode);
+	/* creates the linked list for the entries and populates
+	it with the entries from the plugins path */
+	createLinkedList(&entries);
+	listDirectoryFile(VIRIATUM_PLUGINS_PATH, entries);
+	
+	/* creates the iterator for the entries */
+	createIteratorLinkedList(entries, &entriesIterator);
+
+	/* iterates continuously */
+    while(1) {
+        /* retrieves the next value from the iterator */
+        getNextIterator(entriesIterator, (void **) &entry);
+
+        /* in case the current module is null (end of iterator) */
+        if(entry == NULL) {
+            /* breaks the loop */
+            break;
+        }
+
+		/* in case the entry name does not ends with the shared object extension
+		it must not be a module to be loaded */
+		if(endsWithString(entry->name, VIRIATUM_SHARED_OBJECT_EXTENSION) == 0) {
+			/* continue with the loop */
+			continue;
+		}
+
+		/* creates the complete module path for the loading of it */
+		SPRINTF(modulePath, VIRIATUM_MAX_PATH_SIZE, "%s/%s", VIRIATUM_PLUGINS_PATH, entry->name);
+
+		/* loads the module, retrieving a possible error code */
+		errorCode = loadModule(service, modulePath);
+
+		/* tests the error code for error */
+		if(IS_ERROR_CODE(errorCode)) {
+			/* prints a warning message */
+			V_WARNING_F("Problem loading module (%s)\n", (char *) GET_ERROR());
+
+			/* raises again the error */
+			RAISE_AGAIN(errorCode);
+		}
     }
+
+	/* deletes the iterator used for the entries */
+	deleteIteratorLinkedList(entries, entriesIterator);
+
+	/* deletes both the entries internal structures
+	and the entries linked list */
+	deleteDirectoryEntriesFile(entries);
+	deleteLinkedList(entries);
 
     /* raises no error */
     RAISE_NO_ERROR;
