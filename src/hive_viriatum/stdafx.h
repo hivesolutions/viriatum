@@ -35,6 +35,10 @@
 #include "_config_win32.h"
 #endif
 
+#ifdef WITH_WWW_ROOT
+#define VIRIATUM_CONTENTS_PATH WITH_WWW_ROOT
+#endif
+
 #ifdef _WIN32
 #include "global/targetver.h"
 #include "global/resource.h"

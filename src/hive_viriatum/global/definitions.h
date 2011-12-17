@@ -31,7 +31,9 @@
 #define VIRIATUM_RESOURCES_PATH "../../src/hive_viriatum/resources"
 #define VIRIATUM_BASE_PATH "/html/base"
 #define VIRIATUM_LISTING_PATH "/html/base/templates/listing.html.tpl"
+#ifndef VIRIATUM_CONTENTS_PATH
 #define VIRIATUM_CONTENTS_PATH VIRIATUM_RESOURCES_PATH
+#endif
 #endif
 
 #ifdef VIRIATUM_PLATFORM_UNIX
@@ -44,12 +46,10 @@
 #define VIRIATUM_RESOURCES_PATH "resources"
 #define VIRIATUM_BASE_PATH "/html/base"
 #define VIRIATUM_LISTING_PATH "/html/base/templates/listing.html.tpl"
+#ifndef VIRIATUM_CONTENTS_PATH
 #define VIRIATUM_CONTENTS_PATH "/var/viriatum"
 #endif
 #endif
-
-#ifdef WITH_WWW_ROOT
-#define VIRIATUM_CONTENTS_PATH WITH_WWW_ROOT
 #endif
 
 #define VIRIATUM_NAME "viriatum"
