@@ -434,9 +434,9 @@ ERROR_CODE loadModulesService(struct Service_t *service) {
 	unsigned char modulePath[VIRIATUM_MAX_PATH_SIZE];
 
 	/* creates the linked list for the entries and populates
-	it with the entries from the plugins path */
+	it with the entries from the modules path */
 	createLinkedList(&entries);
-	listDirectoryFile(VIRIATUM_PLUGINS_PATH, entries);
+	listDirectoryFile(VIRIATUM_MODULES_PATH, entries);
 	
 	/* creates the iterator for the entries */
 	createIteratorLinkedList(entries, &entriesIterator);
@@ -460,7 +460,7 @@ ERROR_CODE loadModulesService(struct Service_t *service) {
 		}
 
 		/* creates the complete module path for the loading of it */
-		SPRINTF(modulePath, VIRIATUM_MAX_PATH_SIZE, "%s%s", VIRIATUM_PLUGINS_PATH, entry->name);
+		SPRINTF(modulePath, VIRIATUM_MAX_PATH_SIZE, "%s%s", VIRIATUM_MODULES_PATH, entry->name);
 
 		/* loads the module, retrieving a possible error code */
 		errorCode = loadModule(service, modulePath);
