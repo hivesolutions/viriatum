@@ -28,7 +28,7 @@
 #pragma once
 
 #ifdef VIRIATUM_PLATFORM_WIN32
-#define VIRIATUM_PLUGINS_PATH "C:/repo_extra/viriatum/bin/hive_viriatum_mod_lua/i386/win32/Debug/"
+#define VIRIATUM_MODULES_PATH "C:/repo_extra/viriatum/bin/hive_viriatum_mod_lua/i386/win32/Debug/"
 #define VIRIATUM_RESOURCES_PATH "../../src/hive_viriatum/resources"
 #define VIRIATUM_BASE_PATH "/html/base"
 #define VIRIATUM_LISTING_PATH "/html/base/templates/listing.html.tpl"
@@ -39,13 +39,13 @@
 
 #ifdef VIRIATUM_PLATFORM_UNIX
 #ifdef VIRIATUM_PLATFORM_ANDROID
-#define VIRIATUM_PLUGINS_PATH "/sdcard/viriatum/plugins"
+#define VIRIATUM_MODULES_PATH "/sdcard/viriatum/modules"
 #define VIRIATUM_RESOURCES_PATH "resources"
 #define VIRIATUM_BASE_PATH "/html/base"
 #define VIRIATUM_LISTING_PATH "/html/base/templates/listing.html.tpl"
 #define VIRIATUM_CONTENTS_PATH "/sdcard/viriatum"
 #else
-#define VIRIATUM_PLUGINS_PATH "/usr/local/lib"
+#define VIRIATUM_MODULES_PATH "/usr/local/lib"
 #define VIRIATUM_RESOURCES_PATH "resources"
 #define VIRIATUM_BASE_PATH "/html/base"
 #define VIRIATUM_LISTING_PATH "/html/base/templates/listing.html.tpl"
