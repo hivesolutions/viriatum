@@ -37,6 +37,4 @@ if test "$have_debug" = true; then
     AC_DEFINE(HAVE_DEBUG, 1, [Define to 1 if debug is enabled])
 fi
 
-if test "$with_wwwroot" != false; then
-    AC_DEFINE_UNQUOTED(WITH_WWW_ROOT, "$with_wwwroot", [Define to a value if www root is set])
-fi
+AC_DEFINE_UNQUOTED(WITH_WWW_ROOT, "$with_wwwroot", [Define to a value if www root is set])
