@@ -45,7 +45,9 @@
 #define VIRIATUM_LISTING_PATH "/html/base/templates/listing.html.tpl"
 #define VIRIATUM_CONTENTS_PATH "/sdcard/viriatum"
 #else
-#define VIRIATUM_MODULES_PATH "/usr/local/lib"
+#ifndef VIRIATUM_MODULES_PATH
+#define VIRIATUM_MODULES_PATH "/usr/local/lib/viriatum/modules"
+#endif
 #define VIRIATUM_RESOURCES_PATH "resources"
 #define VIRIATUM_BASE_PATH "/html/base"
 #define VIRIATUM_LISTING_PATH "/html/base/templates/listing.html.tpl"
