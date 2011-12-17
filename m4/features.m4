@@ -31,12 +31,12 @@ with_wwwroot = false
 AC_ARG_ENABLE([debug], [AS_HELP_STRING([--enable-debug], [enable debug features])], [have_debug=true], [])
 AC_ARG_WITH([wwwroot], [AS_HELP_STRING([--with-wwwroot], [set the default base directory])], [], [with_wwwroot=false])
 
-AC_SUBST(WITH_WWW_ROOT, with_wwwroot)
+AC_SUBST(WWW_ROOT, with_wwwroot)
 
 if test "$have_debug" = true; then
     AC_DEFINE(HAVE_DEBUG, 1, [Define to 1 if debug is enabled])
 fi
 
-#if test "$with_wwwroot" != false; then
-#    AC_DEFINE(WITH_WWW_ROOT, "$with_wwwroot", [Define to a value if www root is set])
-#fi
+if test "$with_wwwroot" != false; then
+    AC_DEFINE(WITH_WWW_ROOT, ["$with_wwwroot"], [Define to a value if www root is set])
+fi
