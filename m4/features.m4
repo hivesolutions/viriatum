@@ -36,7 +36,7 @@ with_resourceroot=/var/viriatum
 # control variables
 have_debug=false
 with_wwwroot=$with_resourceroot/www
-with_moduleroot=$target_prefix/viriatum/modules
+with_moduleroot=$target_prefix/lib/viriatum/modules
 
 AC_ARG_ENABLE([debug], [AS_HELP_STRING([--enable-debug], [enable debug features])], [have_debug=true], [])
 AC_ARG_WITH([wwwroot], [AS_HELP_STRING([--with-wwwroot], [set the default data directory])], [], [])
