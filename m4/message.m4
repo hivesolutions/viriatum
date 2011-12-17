@@ -30,7 +30,7 @@ echo
 echo " + Host                  $host_os"
 echo " + Install prefix        $prefix"
 echo " + Data directory        $with_wwwroot"
-echo " + Plugins directory     $with_moduleroot"
+echo " + Modules directory     $with_moduleroot"
 echo " + CFLAGS                $CFLAGS"
 echo " + DEBUG                 $have_debug"
 echo " + Log                   $have_log"

@@ -23,20 +23,25 @@
 # __copyright__ = Copyright (c) 2008 Hive Solutions Lda.
 # __license__   = GNU General Public License (GPL), Version 3
 
+# sets the default path to the viriatum resources
+with_resourceroot=/var/viriatum
+
 # sets the default values for the various feature
 # control variables
 have_debug=false
-with_wwwroot=/var/viriatum
+with_wwwroot=$with_resourceroot/www
+with_moduleroot=$with_resourceroot/modules
 
 AC_ARG_ENABLE([debug], [AS_HELP_STRING([--enable-debug], [enable debug features])], [have_debug=true], [])
-AC_ARG_WITH([wwwroot], [AS_HELP_STRING([--with-wwwroot], [set the default base directory])], [], [])
-AC_ARG_WITH([pluginroot], [AS_HELP_STRING([--with-wwwroot], [set the default base directory])], [], [])
-
+AC_ARG_WITH([wwwroot], [AS_HELP_STRING([--with-wwwroot], [set the default data directory])], [], [])
+AC_ARG_WITH([moduleroot], [AS_HELP_STRING([--with-moduleroot], [set the default modules directory])], [], [])
 
 AC_SUBST(wwwdir, with_wwwroot)
+AC_SUBST(moduledir, with_moduleroot)
 
 if test "$have_debug" = true; then
     AC_DEFINE(HAVE_DEBUG, 1, [Define to 1 if debug is enabled])
 fi
 
 AC_DEFINE_UNQUOTED(WITH_WWW_ROOT, "$with_wwwroot", [Define to a value if www root is set])
+AC_DEFINE_UNQUOTED(WITH_WWW_ROOT, "$with_moduleroot", [Define to a value if module root is set])
