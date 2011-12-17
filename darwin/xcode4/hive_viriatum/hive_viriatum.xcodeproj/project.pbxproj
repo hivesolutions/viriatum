@@ -8,6 +8,28 @@
 
 /* Begin PBXBuildFile section */
 		C20C2CE51350B71E001E22FB /* libhive_viriatum_commons.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C20C2CE41350B71E001E22FB /* libhive_viriatum_commons.a */; };
+		C218C34F149C5CD200679862 /* info.c in Sources */ = {isa = PBXBuildFile; fileRef = C218C34A149C5CD200679862 /* info.c */; };
+		C218C350149C5CD200679862 /* start.c in Sources */ = {isa = PBXBuildFile; fileRef = C218C34D149C5CD200679862 /* start.c */; };
+		C2565F7E149C556900722EFA /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C2565F7D149C556900722EFA /* UIKit.framework */; };
+		C2565F80149C556A00722EFA /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C2565F7F149C556A00722EFA /* Foundation.framework */; };
+		C2565F82149C556A00722EFA /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C2565F81149C556A00722EFA /* CoreGraphics.framework */; };
+		C2565FCB149C56C300722EFA /* libhive_viriatum_commons_mobile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C2565FCA149C56C300722EFA /* libhive_viriatum_commons_mobile.a */; };
+		C2565FCC149C56E900722EFA /* stream_http.c in Sources */ = {isa = PBXBuildFile; fileRef = C2C025CB148BB726005E5236 /* stream_http.c */; };
+		C2565FCD149C56E900722EFA /* stream_io.c in Sources */ = {isa = PBXBuildFile; fileRef = C2C025CD148BB726005E5236 /* stream_io.c */; };
+		C2565FCE149C56E900722EFA /* polling_epoll.c in Sources */ = {isa = PBXBuildFile; fileRef = C2C025C0148BB70B005E5236 /* polling_epoll.c */; };
+		C2565FCF149C56E900722EFA /* polling_kqueue.c in Sources */ = {isa = PBXBuildFile; fileRef = C2C025C2148BB70B005E5236 /* polling_kqueue.c */; };
+		C2565FD0149C56E900722EFA /* polling_select.c in Sources */ = {isa = PBXBuildFile; fileRef = C2C025C4148BB70B005E5236 /* polling_select.c */; };
+		C2565FD1149C56E900722EFA /* handler_default.c in Sources */ = {isa = PBXBuildFile; fileRef = C2C02574148BB672005E5236 /* handler_default.c */; };
+		C2565FD2149C56E900722EFA /* handler_file.c in Sources */ = {isa = PBXBuildFile; fileRef = C2C02576148BB672005E5236 /* handler_file.c */; };
+		C2565FD3149C56E900722EFA /* viriatum.c in Sources */ = {isa = PBXBuildFile; fileRef = C27406C51350BE2B0050EEAF /* viriatum.c */; };
+		C2565FD4149C56E900722EFA /* stdafx.c in Sources */ = {isa = PBXBuildFile; fileRef = C27406B91350BE2B0050EEAF /* stdafx.c */; };
+		C2565FD5149C56E900722EFA /* http_parser.c in Sources */ = {isa = PBXBuildFile; fileRef = C2C025B9148BB6CD005E5236 /* http_parser.c */; };
+		C2565FD6149C56E900722EFA /* http_request.c in Sources */ = {isa = PBXBuildFile; fileRef = C27406AF1350BE2B0050EEAF /* http_request.c */; };
+		C2565FD7149C56E900722EFA /* file.c in Sources */ = {isa = PBXBuildFile; fileRef = C27406B21350BE2B0050EEAF /* file.c */; };
+		C2565FD8149C56E900722EFA /* loading.c in Sources */ = {isa = PBXBuildFile; fileRef = C27406B61350BE2B0050EEAF /* loading.c */; };
+		C2565FD9149C56E900722EFA /* environment.c in Sources */ = {isa = PBXBuildFile; fileRef = C2C025D1148BB741005E5236 /* environment.c */; };
+		C2565FDA149C56E900722EFA /* service.c in Sources */ = {isa = PBXBuildFile; fileRef = C27406BC1350BE2B0050EEAF /* service.c */; };
+		C2565FDB149C56E900722EFA /* simple_test.c in Sources */ = {isa = PBXBuildFile; fileRef = C27406C21350BE2B0050EEAF /* simple_test.c */; };
 		C27406C71350BE2B0050EEAF /* http_request.c in Sources */ = {isa = PBXBuildFile; fileRef = C27406AF1350BE2B0050EEAF /* http_request.c */; };
 		C27406C81350BE2B0050EEAF /* file.c in Sources */ = {isa = PBXBuildFile; fileRef = C27406B21350BE2B0050EEAF /* file.c */; };
 		C27406C91350BE2B0050EEAF /* loading.c in Sources */ = {isa = PBXBuildFile; fileRef = C27406B61350BE2B0050EEAF /* loading.c */; };
@@ -15,6 +37,13 @@
 		C27406CB1350BE2B0050EEAF /* service.c in Sources */ = {isa = PBXBuildFile; fileRef = C27406BC1350BE2B0050EEAF /* service.c */; };
 		C27406CD1350BE2B0050EEAF /* simple_test.c in Sources */ = {isa = PBXBuildFile; fileRef = C27406C21350BE2B0050EEAF /* simple_test.c */; };
 		C27406CE1350BE2B0050EEAF /* viriatum.c in Sources */ = {isa = PBXBuildFile; fileRef = C27406C51350BE2B0050EEAF /* viriatum.c */; };
+		C2AF3C44149CC7E300D28507 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = C2AF3C37149CC7E300D28507 /* InfoPlist.strings */; };
+		C2AF3C45149CC7E300D28507 /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = C2AF3C39149CC7E300D28507 /* MainWindow.xib */; };
+		C2AF3C46149CC7E300D28507 /* RootViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = C2AF3C3B149CC7E300D28507 /* RootViewController.xib */; };
+		C2AF3C47149CC7E300D28507 /* hive_viriatum_mobile-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C2AF3C3D149CC7E300D28507 /* hive_viriatum_mobile-Info.plist */; };
+		C2AF3C48149CC7E300D28507 /* hive_viriatum_mobileAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = C2AF3C40149CC7E300D28507 /* hive_viriatum_mobileAppDelegate.m */; };
+		C2AF3C49149CC7E300D28507 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = C2AF3C41149CC7E300D28507 /* main.m */; };
+		C2AF3C4A149CC7E300D28507 /* RootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C2AF3C43149CC7E300D28507 /* RootViewController.m */; };
 		C2C02579148BB672005E5236 /* handler_default.c in Sources */ = {isa = PBXBuildFile; fileRef = C2C02574148BB672005E5236 /* handler_default.c */; };
 		C2C0257A148BB672005E5236 /* handler_file.c in Sources */ = {isa = PBXBuildFile; fileRef = C2C02576148BB672005E5236 /* handler_file.c */; };
 		C2C025BB148BB6CD005E5236 /* http_parser.c in Sources */ = {isa = PBXBuildFile; fileRef = C2C025B9148BB6CD005E5236 /* http_parser.c */; };
@@ -34,6 +63,13 @@
 			remoteGlobalIDString = C20C2C6D1350B6A5001E22FB;
 			remoteInfo = hive_viriatum_commons;
 		};
+		C2565FC9149C56C300722EFA /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C20C2C741350B6A9001E22FB /* hive_viriatum_commons.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = C2565FA1149C55F300722EFA;
+			remoteInfo = hive_viriatum_commons_mobile;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -52,6 +88,15 @@
 		C20C2BBF1350B5D7001E22FB /* hive_viriatum */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = hive_viriatum; sourceTree = BUILT_PRODUCTS_DIR; };
 		C20C2C741350B6A9001E22FB /* hive_viriatum_commons.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = hive_viriatum_commons.xcodeproj; path = ../hive_viriatum_commons/hive_viriatum_commons.xcodeproj; sourceTree = "<group>"; };
 		C20C2CE41350B71E001E22FB /* libhive_viriatum_commons.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libhive_viriatum_commons.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		C218C34A149C5CD200679862 /* info.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = info.c; sourceTree = "<group>"; };
+		C218C34B149C5CD200679862 /* info.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = info.h; sourceTree = "<group>"; };
+		C218C34C149C5CD200679862 /* jni.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = jni.h; sourceTree = "<group>"; };
+		C218C34D149C5CD200679862 /* start.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = start.c; sourceTree = "<group>"; };
+		C218C34E149C5CD200679862 /* start.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = start.h; sourceTree = "<group>"; };
+		C2565F7B149C556900722EFA /* hive_viriatum_mobile.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = hive_viriatum_mobile.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C2565F7D149C556900722EFA /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
+		C2565F7F149C556A00722EFA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		C2565F81149C556A00722EFA /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = Library/Frameworks/CoreGraphics.framework; sourceTree = DEVELOPER_DIR; };
 		C27406AB1350BE2B0050EEAF /* resource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = resource.h; sourceTree = "<group>"; };
 		C27406AC1350BE2B0050EEAF /* targetver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = targetver.h; sourceTree = "<group>"; };
 		C27406AE1350BE2B0050EEAF /* http.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = http.h; sourceTree = "<group>"; };
@@ -74,6 +119,16 @@
 		C27406C51350BE2B0050EEAF /* viriatum.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = viriatum.c; path = ../../../src/hive_viriatum/viriatum.c; sourceTree = "<group>"; };
 		C27406C61350BE2B0050EEAF /* viriatum.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = viriatum.h; path = ../../../src/hive_viriatum/viriatum.h; sourceTree = "<group>"; };
 		C292A4EA149C49C7005716FF /* _config_win32.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = _config_win32.h; path = ../../../src/hive_viriatum/_config_win32.h; sourceTree = "<group>"; };
+		C2AF3C38149CC7E300D28507 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		C2AF3C3A149CC7E300D28507 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainWindow.xib; sourceTree = "<group>"; };
+		C2AF3C3C149CC7E300D28507 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/RootViewController.xib; sourceTree = "<group>"; };
+		C2AF3C3D149CC7E300D28507 /* hive_viriatum_mobile-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "hive_viriatum_mobile-Info.plist"; sourceTree = "<group>"; };
+		C2AF3C3E149CC7E300D28507 /* hive_viriatum_mobile-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "hive_viriatum_mobile-Prefix.pch"; sourceTree = "<group>"; };
+		C2AF3C3F149CC7E300D28507 /* hive_viriatum_mobileAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = hive_viriatum_mobileAppDelegate.h; sourceTree = "<group>"; };
+		C2AF3C40149CC7E300D28507 /* hive_viriatum_mobileAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = hive_viriatum_mobileAppDelegate.m; sourceTree = "<group>"; };
+		C2AF3C41149CC7E300D28507 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		C2AF3C42149CC7E300D28507 /* RootViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RootViewController.h; sourceTree = "<group>"; };
+		C2AF3C43149CC7E300D28507 /* RootViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RootViewController.m; sourceTree = "<group>"; };
 		C2C02574148BB672005E5236 /* handler_default.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = handler_default.c; sourceTree = "<group>"; };
 		C2C02575148BB672005E5236 /* handler_default.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = handler_default.h; sourceTree = "<group>"; };
 		C2C02576148BB672005E5236 /* handler_file.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = handler_file.c; sourceTree = "<group>"; };
@@ -107,6 +162,17 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		C2565F78149C556900722EFA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C2565FCB149C56C300722EFA /* libhive_viriatum_commons_mobile.a in Frameworks */,
+				C2565F7E149C556900722EFA /* UIKit.framework in Frameworks */,
+				C2565F80149C556A00722EFA /* Foundation.framework in Frameworks */,
+				C2565F82149C556A00722EFA /* CoreGraphics.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -124,6 +190,7 @@
 			isa = PBXGroup;
 			children = (
 				C20C2BBF1350B5D7001E22FB /* hive_viriatum */,
+				C2565F7B149C556900722EFA /* hive_viriatum_mobile.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -132,21 +199,37 @@
 			isa = PBXGroup;
 			children = (
 				C20C2C791350B6AA001E22FB /* libhive_viriatum_commons.a */,
+				C2565FCA149C56C300722EFA /* libhive_viriatum_commons_mobile.a */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		C218C349149C5CD200679862 /* jni */ = {
+			isa = PBXGroup;
+			children = (
+				C218C34A149C5CD200679862 /* info.c */,
+				C218C34B149C5CD200679862 /* info.h */,
+				C218C34C149C5CD200679862 /* jni.h */,
+				C218C34D149C5CD200679862 /* start.c */,
+				C218C34E149C5CD200679862 /* start.h */,
+			);
+			name = jni;
+			path = ../../../src/hive_viriatum_commons/jni;
 			sourceTree = "<group>";
 		};
 		C27406A41350BDF10050EEAF /* Classes */ = {
 			isa = PBXGroup;
 			children = (
-				C2C025C9148BB726005E5236 /* stream */,
-				C2C025BE148BB70B005E5236 /* polling */,
-				C2C02573148BB672005E5236 /* handlers */,
+				C2AF3C36149CC7E300D28507 /* hive_viriatum_mobile */,
 				C27406CF1350BE350050EEAF /* base */,
 				C27406AA1350BE2B0050EEAF /* global */,
+				C2C02573148BB672005E5236 /* handlers */,
 				C27406AD1350BE2B0050EEAF /* http */,
 				C27406B11350BE2B0050EEAF /* io */,
+				C218C349149C5CD200679862 /* jni */,
 				C27406B51350BE2B0050EEAF /* module */,
+				C2C025BE148BB70B005E5236 /* polling */,
+				C2C025C9148BB726005E5236 /* stream */,
 				C27406BB1350BE2B0050EEAF /* system */,
 				C27406C11350BE2B0050EEAF /* test */,
 			);
@@ -239,8 +322,29 @@
 			isa = PBXGroup;
 			children = (
 				C20C2CE41350B71E001E22FB /* libhive_viriatum_commons.a */,
+				C2565F7D149C556900722EFA /* UIKit.framework */,
+				C2565F7F149C556A00722EFA /* Foundation.framework */,
+				C2565F81149C556A00722EFA /* CoreGraphics.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		C2AF3C36149CC7E300D28507 /* hive_viriatum_mobile */ = {
+			isa = PBXGroup;
+			children = (
+				C2AF3C37149CC7E300D28507 /* InfoPlist.strings */,
+				C2AF3C39149CC7E300D28507 /* MainWindow.xib */,
+				C2AF3C3B149CC7E300D28507 /* RootViewController.xib */,
+				C2AF3C3D149CC7E300D28507 /* hive_viriatum_mobile-Info.plist */,
+				C2AF3C3E149CC7E300D28507 /* hive_viriatum_mobile-Prefix.pch */,
+				C2AF3C3F149CC7E300D28507 /* hive_viriatum_mobileAppDelegate.h */,
+				C2AF3C40149CC7E300D28507 /* hive_viriatum_mobileAppDelegate.m */,
+				C2AF3C41149CC7E300D28507 /* main.m */,
+				C2AF3C42149CC7E300D28507 /* RootViewController.h */,
+				C2AF3C43149CC7E300D28507 /* RootViewController.m */,
+			);
+			name = hive_viriatum_mobile;
+			path = ../../src/hive_viriatum_mobile;
 			sourceTree = "<group>";
 		};
 		C2C02573148BB672005E5236 /* handlers */ = {
@@ -304,6 +408,23 @@
 			productReference = C20C2BBF1350B5D7001E22FB /* hive_viriatum */;
 			productType = "com.apple.product-type.tool";
 		};
+		C2565F7A149C556900722EFA /* hive_viriatum_mobile */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C2565F9B149C556A00722EFA /* Build configuration list for PBXNativeTarget "hive_viriatum_mobile" */;
+			buildPhases = (
+				C2565F77149C556900722EFA /* Sources */,
+				C2565F78149C556900722EFA /* Frameworks */,
+				C2565F79149C556900722EFA /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = hive_viriatum_mobile;
+			productName = hive_viriatum_mobile;
+			productReference = C2565F7B149C556900722EFA /* hive_viriatum_mobile.app */;
+			productType = "com.apple.product-type.application";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -328,6 +449,7 @@
 			projectRoot = "";
 			targets = (
 				C20C2BBE1350B5D6001E22FB /* hive_viriatum */,
+				C2565F7A149C556900722EFA /* hive_viriatum_mobile */,
 			);
 		};
 /* End PBXProject section */
@@ -340,7 +462,28 @@
 			remoteRef = C20C2C781350B6AA001E22FB /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
+		C2565FCA149C56C300722EFA /* libhive_viriatum_commons_mobile.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libhive_viriatum_commons_mobile.a;
+			remoteRef = C2565FC9149C56C300722EFA /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 /* End PBXReferenceProxy section */
+
+/* Begin PBXResourcesBuildPhase section */
+		C2565F79149C556900722EFA /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C2AF3C44149CC7E300D28507 /* InfoPlist.strings in Resources */,
+				C2AF3C45149CC7E300D28507 /* MainWindow.xib in Resources */,
+				C2AF3C46149CC7E300D28507 /* RootViewController.xib in Resources */,
+				C2AF3C47149CC7E300D28507 /* hive_viriatum_mobile-Info.plist in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		C20C2BBB1350B5D6001E22FB /* Sources */ = {
@@ -363,10 +506,65 @@
 				C2C025CF148BB726005E5236 /* stream_http.c in Sources */,
 				C2C025D0148BB726005E5236 /* stream_io.c in Sources */,
 				C2C025D3148BB741005E5236 /* environment.c in Sources */,
+				C218C34F149C5CD200679862 /* info.c in Sources */,
+				C218C350149C5CD200679862 /* start.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C2565F77149C556900722EFA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C2565FCC149C56E900722EFA /* stream_http.c in Sources */,
+				C2565FCD149C56E900722EFA /* stream_io.c in Sources */,
+				C2565FCE149C56E900722EFA /* polling_epoll.c in Sources */,
+				C2565FCF149C56E900722EFA /* polling_kqueue.c in Sources */,
+				C2565FD0149C56E900722EFA /* polling_select.c in Sources */,
+				C2565FD1149C56E900722EFA /* handler_default.c in Sources */,
+				C2565FD2149C56E900722EFA /* handler_file.c in Sources */,
+				C2565FD3149C56E900722EFA /* viriatum.c in Sources */,
+				C2565FD4149C56E900722EFA /* stdafx.c in Sources */,
+				C2565FD5149C56E900722EFA /* http_parser.c in Sources */,
+				C2565FD6149C56E900722EFA /* http_request.c in Sources */,
+				C2565FD7149C56E900722EFA /* file.c in Sources */,
+				C2565FD8149C56E900722EFA /* loading.c in Sources */,
+				C2565FD9149C56E900722EFA /* environment.c in Sources */,
+				C2565FDA149C56E900722EFA /* service.c in Sources */,
+				C2565FDB149C56E900722EFA /* simple_test.c in Sources */,
+				C2AF3C48149CC7E300D28507 /* hive_viriatum_mobileAppDelegate.m in Sources */,
+				C2AF3C49149CC7E300D28507 /* main.m in Sources */,
+				C2AF3C4A149CC7E300D28507 /* RootViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		C2AF3C37149CC7E300D28507 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				C2AF3C38149CC7E300D28507 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		C2AF3C39149CC7E300D28507 /* MainWindow.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				C2AF3C3A149CC7E300D28507 /* en */,
+			);
+			name = MainWindow.xib;
+			sourceTree = "<group>";
+		};
+		C2AF3C3B149CC7E300D28507 /* RootViewController.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				C2AF3C3C149CC7E300D28507 /* en */,
+			);
+			name = RootViewController.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		C20C2BC61350B5D7001E22FB /* Debug */ = {
@@ -423,6 +621,59 @@
 			};
 			name = Release;
 		};
+		C2565F98149C556A00722EFA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(DEVELOPER_FRAMEWORKS_DIR)\"",
+				);
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "../../src/hive_viriatum_mobile/hive_viriatum_mobile-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				INFOPLIST_FILE = "../../src/hive_viriatum_mobile/hive_viriatum_mobile-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		C2565F99149C556A00722EFA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(DEVELOPER_FRAMEWORKS_DIR)\"",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "../../src/hive_viriatum_mobile/hive_viriatum_mobile-Prefix.pch";
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				INFOPLIST_FILE = "../../src/hive_viriatum_mobile/hive_viriatum_mobile-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -440,6 +691,15 @@
 			buildConfigurations = (
 				C20C2BC91350B5D7001E22FB /* Debug */,
 				C20C2BCA1350B5D7001E22FB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C2565F9B149C556A00722EFA /* Build configuration list for PBXNativeTarget "hive_viriatum_mobile" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C2565F98149C556A00722EFA /* Debug */,
+				C2565F99149C556A00722EFA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
