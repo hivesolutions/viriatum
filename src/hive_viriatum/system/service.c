@@ -424,7 +424,7 @@ ERROR_CODE loadModulesService(struct Service_t *service) {
 
     #ifdef VIRIATUM_PLATFORM_WIN32
     /* loads the module, retrieving a possible error code */
-    errorCode = loadModule(service, (unsigned char *) "C:/Users/joamag/Desktop/repositories/viriatum/bin/hive_viriatum_mod_lua/i386/win32/Debug/hive_viriatum_mod_lua.dll");
+    errorCode = loadModule(service, (unsigned char *) "C:/repo_extra/viriatum/bin/hive_viriatum_mod_lua/i386/win32/Debug/hive_viriatum_mod_lua.dll");
     #endif
 
     #ifdef VIRIATUM_PLATFORM_UNIX
