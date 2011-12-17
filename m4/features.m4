@@ -29,14 +29,15 @@
 target_prefix=$prefix
 test "x$prefix" = xNONE && target_prefix=$ac_default_prefix
 
-# sets the default path to the viriatum resources
+# sets the default path to the viriatum paths
+with_libroot=$target_prefix/lib/viriatum
 with_resourceroot=/var/viriatum
 
 # sets the default values for the various feature
 # control variables
 have_debug=false
 with_wwwroot=$with_resourceroot/www
-with_moduleroot=$target_prefix/lib/viriatum/modules
+with_moduleroot=$with_libroot/modules
 
 AC_ARG_ENABLE([debug], [AS_HELP_STRING([--enable-debug], [enable debug features])], [have_debug=true], [])
 AC_ARG_WITH([wwwroot], [AS_HELP_STRING([--with-wwwroot], [set the default data directory])], [], [])
