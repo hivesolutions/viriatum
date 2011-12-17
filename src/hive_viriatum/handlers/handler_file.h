@@ -59,7 +59,7 @@ typedef struct HandlerFileContext_t {
      * The path to the file to be handled by
      * the current file request.
      */
-    unsigned char filePath[1024];
+    unsigned char filePath[VIRIATUM_MAX_PATH_SIZE];
 
     /**
      * The reference to the file stream to be
