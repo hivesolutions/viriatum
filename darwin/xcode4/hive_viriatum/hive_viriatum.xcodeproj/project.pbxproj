@@ -73,6 +73,7 @@
 		C27406C41350BE2B0050EEAF /* test.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = test.h; sourceTree = "<group>"; };
 		C27406C51350BE2B0050EEAF /* viriatum.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = viriatum.c; path = ../../../src/hive_viriatum/viriatum.c; sourceTree = "<group>"; };
 		C27406C61350BE2B0050EEAF /* viriatum.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = viriatum.h; path = ../../../src/hive_viriatum/viriatum.h; sourceTree = "<group>"; };
+		C292A4EA149C49C7005716FF /* _config_win32.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = _config_win32.h; path = ../../../src/hive_viriatum/_config_win32.h; sourceTree = "<group>"; };
 		C2C02574148BB672005E5236 /* handler_default.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = handler_default.c; sourceTree = "<group>"; };
 		C2C02575148BB672005E5236 /* handler_default.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = handler_default.h; sourceTree = "<group>"; };
 		C2C02576148BB672005E5236 /* handler_file.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = handler_file.c; sourceTree = "<group>"; };
@@ -225,6 +226,7 @@
 		C27406CF1350BE350050EEAF /* base */ = {
 			isa = PBXGroup;
 			children = (
+				C292A4EA149C49C7005716FF /* _config_win32.h */,
 				C27406C51350BE2B0050EEAF /* viriatum.c */,
 				C27406C61350BE2B0050EEAF /* viriatum.h */,
 				C27406B91350BE2B0050EEAF /* stdafx.c */,
