@@ -23,6 +23,12 @@
 # __copyright__ = Copyright (c) 2008 Hive Solutions Lda.
 # __license__   = GNU General Public License (GPL), Version 3
 
+# sets the target prefix (assumes the normal heuristic)
+# must do this because the makefiles have not been generated
+# so the prefix value is not final
+target_prefix=$prefix
+test "x$prefix" = xNONE && target_prefix=$ac_default_prefix
+
 # sets the default path to the viriatum resources
 with_resourceroot=/var/viriatum
 
@@ -30,7 +36,7 @@ with_resourceroot=/var/viriatum
 # control variables
 have_debug=false
 with_wwwroot=$with_resourceroot/www
-with_moduleroot=$prefix/viriatum/modules
+with_moduleroot=$target_prefix/viriatum/modules
 
 AC_ARG_ENABLE([debug], [AS_HELP_STRING([--enable-debug], [enable debug features])], [have_debug=true], [])
 AC_ARG_WITH([wwwroot], [AS_HELP_STRING([--with-wwwroot], [set the default data directory])], [], [])
