@@ -23,8 +23,8 @@
 # __copyright__ = Copyright (c) 2008 Hive Solutions Lda.
 # __license__   = GNU General Public License (GPL), Version 3
 
-exec_prefix=$prefix
-test "x$prefix" = xNONE && exec_prefix=$ac_default_prefix
+#exec_prefix=$prefix
+#test "x$prefix" = xNONE && exec_prefix=$ac_default_prefix
 
 # sets the default path to the viriatum resources
 with_resourceroot=/var/viriatum
