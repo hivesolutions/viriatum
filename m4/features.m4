@@ -30,21 +30,25 @@ target_prefix=$prefix
 test "x$prefix" = xNONE && target_prefix=$ac_default_prefix
 
 # sets the default path to the viriatum paths
-with_libroot=$target_prefix/lib/viriatum
-with_resourceroot=/var/viriatum
+default_libroot=$target_prefix/lib/viriatum
+default_resourceroot=/var/viriatum
 
 # sets the default values for the various feature
 # control variables
 have_debug=false
-with_wwwroot=false
+with_wwwroot=$default_resourceroot/www
+with_moduleroot=$default_libroot/modules
 
 AC_ARG_ENABLE([debug], [AS_HELP_STRING([--enable-debug], [enable debug features])], [have_debug=true], [])
-AC_ARG_WITH([wwwroot], [AS_HELP_STRING([--with-wwwroot], [set the default base directory])], [], [with_wwwroot=false])
+AC_ARG_WITH([wwwroot], [AS_HELP_STRING([--with-wwwroot], [set the default data directory])], [], [with_wwwroot=false])
+AC_ARG_WITH([moduleroot], [AS_HELP_STRING([--with-moduleroot], [set the default modules directory])], [], [])
 
 AC_SUBST(WWW_ROOT, with_wwwroot)
+AC_SUBST(MODULE_ROOR, with_moduleroot)
 
 if test "$have_debug" = true; then
     AC_DEFINE(HAVE_DEBUG, 1, [Define to 1 if debug is enabled])
 fi
 
 AC_DEFINE_UNQUOTED(WITH_WWW_ROOT, "$with_wwwroot", [Define to a value if www root is set])
+AC_DEFINE_UNQUOTED(WITH_WWW_ROOT, "$with_moduleroot", [Define to a value if module root is set])
