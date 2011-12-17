@@ -46,7 +46,7 @@
 #define VIRIATUM_CONTENTS_PATH "/sdcard/viriatum"
 #else
 #ifndef VIRIATUM_MODULES_PATH
-#define VIRIATUM_MODULES_PATH "/usr/local/lib/viriatum/modules"
+#define VIRIATUM_MODULES_PATH "/usr/lib/viriatum/modules"
 #endif
 #define VIRIATUM_RESOURCES_PATH "resources"
 #define VIRIATUM_BASE_PATH "/html/base"
