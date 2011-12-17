@@ -29,7 +29,7 @@ have_debug=false
 with_wwwroot = false
 
 AC_ARG_ENABLE([debug], [AS_HELP_STRING([--enable-debug], [enable debug features])], [have_debug=true], [])
-AC_ARG_ENABLE([wwwroot], [AS_HELP_STRING([--with-wwwroot], [set the default base directory])], [], [with_wwwroot=false])
+AC_ARG_WITH([wwwroot], [AS_HELP_STRING([--with-wwwroot], [set the default base directory])], [], [with_wwwroot=false])
 
 if test "$have_debug" = true; then
     AC_DEFINE(HAVE_DEBUG, 1, [Define to 1 if debug is enabled])
