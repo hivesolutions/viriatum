@@ -58,12 +58,12 @@ void *allocMemoryPool(struct MemoryPool_t *memoryPool, size_t size) {
     /* retrieves the current memory pool */
     struct MemoryPool_t *currentMemoryPool = memoryPool->current;
 
-    // in case the size is larger than the
-    // large block size
+    /* in case the size is larger than the
+    large block size */
     if(size > LARGE_BLOCK_SIZE) {
 
     }
-    // otherwise it's a small (normal) block size
+    /* otherwise it's a small (normal) block size */
     else {
         /* unsets hte large block value */
         currentMemoryPool->largeBlock = NULL;
