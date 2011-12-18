@@ -27,3 +27,8 @@
 AC_HEADER_STDBOOL
 AC_C_INLINE
 AC_TYPE_SIZE_T
+
+# changes the library names spec to a non versioned
+# setting (avoid possible import problems)
+library_names_spec="$libname${shared_ext}"
+soname_spec="${libname}${shared_ext}"
