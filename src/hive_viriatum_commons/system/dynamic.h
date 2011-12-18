@@ -33,6 +33,7 @@
 #define LOAD_LIBRARY(libraryPath) LoadLibrary(libraryPath)
 #define UNLOAD_LIBRARY(libraryReference) FreeLibrary(libraryReference)
 #define GET_LIBRARY_SYMBOL(libraryReference, symbolName) GetProcAddress(libraryReference, symbolName)
+#define GET_LIBRARY_ERROR_MESSAGE() NULL
 #endif
 
 #ifdef VIRIATUM_PLATFORM_UNIX
@@ -41,4 +42,5 @@
 #define LOAD_LIBRARY(libraryPath) dlopen(libraryPath, RTLD_LAZY)
 #define UNLOAD_LIBRARY(libraryReference) dlclose(libraryReference)
 #define GET_LIBRARY_SYMBOL(libraryReference, symbolName) dlsym(libraryReference, symbolName)
+#define GET_LIBRARY_ERROR_MESSAGE() dlerror(void)
 #endif
