@@ -208,8 +208,8 @@ ERROR_CODE infoModule(struct Module_t *module) {
 }
 
 ERROR_CODE errorModule(unsigned char **messagePointer) {
-    /* sets the error message in the (erro) message pointer */
-    *messagePointer = lastErrorMessage;
+    /* sets the error message in the (error) message pointer */
+    *messagePointer = getLastErrorMessage();
 
     /* raises no error */
     RAISE_NO_ERROR;
