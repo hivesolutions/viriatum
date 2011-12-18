@@ -113,8 +113,18 @@ ERROR_CODE loadModule(struct Service_t *service, unsigned char *modulePath) {
 
     /* in case the mod library was not loaded */
     if(modLibrary == NULL) {
+		/* retrieves the library error message */
+		char *errorMessage = GET_LIBRARY_ERROR_MESSAGE();
+
+		/* in case no error message is found, must
+		set the default errro message */
+		if(errorMessage == NULL) {
+			/* sets the default assumed error message */
+			errorMessage = "File not found";
+		}
+
         /* prints a warning message */
-        V_WARNING("Error loading library (File not found)\n");
+        V_WARNING_F("Error loading library (%s)\n", errorMessage);
 
         /* raises an error */
         RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Error loading library");
