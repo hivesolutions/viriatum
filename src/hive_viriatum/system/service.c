@@ -433,6 +433,9 @@ ERROR_CODE loadModulesService(struct Service_t *service) {
 	/* allocates space for the path to be used to load the module */
 	unsigned char modulePath[VIRIATUM_MAX_PATH_SIZE];
 
+	/* prints a debug message */
+	V_DEBUG_F("Loading modules (%s)\n", VIRIATUM_MODULES_PATH);
+
 	/* creates the linked list for the entries and populates
 	it with the entries from the modules path */
 	createLinkedList(&entries);
@@ -482,6 +485,9 @@ ERROR_CODE loadModulesService(struct Service_t *service) {
 	and the entries linked list */
 	deleteDirectoryEntriesFile(entries);
 	deleteLinkedList(entries);
+
+	/* prints a debug message */
+	V_DEBUG("Finished loading modules\n");
 
     /* raises no error */
     RAISE_NO_ERROR;
