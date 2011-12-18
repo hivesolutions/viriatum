@@ -457,13 +457,13 @@ ERROR_CODE loadModulesService(struct Service_t *service) {
 
 		/* in case the entry name does not ends with the shared object extension
 		it must not be a module to be loaded */
-		if(endsWithString(entry->name, VIRIATUM_SHARED_OBJECT_EXTENSION) == 0) {
+		if(endsWithString(entry->name, (unsigned char *) VIRIATUM_SHARED_OBJECT_EXTENSION) == 0) {
 			/* continue with the loop */
 			continue;
 		}
 
 		/* creates the complete module path for the loading of it */
-		SPRINTF(modulePath, VIRIATUM_MAX_PATH_SIZE, "%s/%s", VIRIATUM_MODULES_PATH, entry->name);
+		SPRINTF((char *) modulePath, VIRIATUM_MAX_PATH_SIZE, "%s/%s", VIRIATUM_MODULES_PATH, entry->name);
 
 		/* loads the module, retrieving a possible error code */
 		errorCode = loadModule(service, modulePath);
