@@ -105,6 +105,9 @@ ERROR_CODE loadModule(struct Service_t *service, unsigned char *modulePath) {
     /* the info module function reference */
     viriatumInfoModule infoModuleFunction;
 
+	/* prints a debug message */
+	V_DEBUG_F("Loading module (%s)\n", modulePath);
+
     /* loads the mod library (tries to find the file) */
     modLibrary = LOAD_LIBRARY((const char *) modulePath);
 
