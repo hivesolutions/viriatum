@@ -42,5 +42,5 @@
 #define LOAD_LIBRARY(libraryPath) dlopen(libraryPath, RTLD_LAZY)
 #define UNLOAD_LIBRARY(libraryReference) dlclose(libraryReference)
 #define GET_LIBRARY_SYMBOL(libraryReference, symbolName) dlsym(libraryReference, symbolName)
-#define GET_LIBRARY_ERROR_MESSAGE() dlerror(void)
+#define GET_LIBRARY_ERROR_MESSAGE() dlerror()
 #endif
