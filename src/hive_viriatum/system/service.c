@@ -422,29 +422,29 @@ ERROR_CODE loadModulesService(struct Service_t *service) {
     /* allocates the error code */
     ERROR_CODE errorCode;
 
-	/* allocates space for the linked list for the entries
-	and for the iterator to iterate "around" them */
-	struct LinkedList_t *entries;
-	struct Iterator_t *entriesIterator;
+    /* allocates space for the linked list for the entries
+    and for the iterator to iterate "around" them */
+    struct LinkedList_t *entries;
+    struct Iterator_t *entriesIterator;
 
-	/* allocates space for an entry of the directory */
-	struct File_t *entry;
+    /* allocates space for an entry of the directory */
+    struct File_t *entry;
 
-	/* allocates space for the path to be used to load the module */
-	unsigned char modulePath[VIRIATUM_MAX_PATH_SIZE];
+    /* allocates space for the path to be used to load the module */
+    unsigned char modulePath[VIRIATUM_MAX_PATH_SIZE];
 
-	/* prints a debug message */
-	V_DEBUG_F("Loading modules (%s)\n", VIRIATUM_MODULES_PATH);
+    /* prints a debug message */
+    V_DEBUG_F("Loading modules (%s)\n", VIRIATUM_MODULES_PATH);
 
-	/* creates the linked list for the entries and populates
-	it with the entries from the modules path */
-	createLinkedList(&entries);
-	listDirectoryFile(VIRIATUM_MODULES_PATH, entries);
-	
-	/* creates the iterator for the entries */
-	createIteratorLinkedList(entries, &entriesIterator);
+    /* creates the linked list for the entries and populates
+    it with the entries from the modules path */
+    createLinkedList(&entries);
+    listDirectoryFile(VIRIATUM_MODULES_PATH, entries);
 
-	/* iterates continuously */
+    /* creates the iterator for the entries */
+    createIteratorLinkedList(entries, &entriesIterator);
+
+    /* iterates continuously */
     while(1) {
         /* retrieves the next value from the iterator */
         getNextIterator(entriesIterator, (void **) &entry);
@@ -455,39 +455,39 @@ ERROR_CODE loadModulesService(struct Service_t *service) {
             break;
         }
 
-		/* in case the entry name does not ends with the shared object extension
-		it must not be a module to be loaded */
-		if(endsWithString(entry->name, (unsigned char *) VIRIATUM_SHARED_OBJECT_EXTENSION) == 0) {
-			/* continue with the loop */
-			continue;
-		}
+        /* in case the entry name does not ends with the shared object extension
+        it must not be a module to be loaded */
+        if(endsWithString(entry->name, (unsigned char *) VIRIATUM_SHARED_OBJECT_EXTENSION) == 0) {
+            /* continue with the loop */
+            continue;
+        }
 
-		/* creates the complete module path for the loading of it */
-		SPRINTF((char *) modulePath, VIRIATUM_MAX_PATH_SIZE, "%s/%s", VIRIATUM_MODULES_PATH, entry->name);
+        /* creates the complete module path for the loading of it */
+        SPRINTF((char *) modulePath, VIRIATUM_MAX_PATH_SIZE, "%s/%s", VIRIATUM_MODULES_PATH, entry->name);
 
-		/* loads the module, retrieving a possible error code */
-		errorCode = loadModule(service, modulePath);
+        /* loads the module, retrieving a possible error code */
+        errorCode = loadModule(service, modulePath);
 
-		/* tests the error code for error */
-		if(IS_ERROR_CODE(errorCode)) {
-			/* prints a warning message */
-			V_WARNING_F("Problem loading module (%s)\n", (char *) GET_ERROR());
+        /* tests the error code for error */
+        if(IS_ERROR_CODE(errorCode)) {
+            /* prints a warning message */
+            V_WARNING_F("Problem loading module (%s)\n", (char *) GET_ERROR());
 
-			/* raises again the error */
-			RAISE_AGAIN(errorCode);
-		}
+            /* raises again the error */
+            RAISE_AGAIN(errorCode);
+        }
     }
 
-	/* deletes the iterator used for the entries */
-	deleteIteratorLinkedList(entries, entriesIterator);
+    /* deletes the iterator used for the entries */
+    deleteIteratorLinkedList(entries, entriesIterator);
 
-	/* deletes both the entries internal structures
-	and the entries linked list */
-	deleteDirectoryEntriesFile(entries);
-	deleteLinkedList(entries);
+    /* deletes both the entries internal structures
+    and the entries linked list */
+    deleteDirectoryEntriesFile(entries);
+    deleteLinkedList(entries);
 
-	/* prints a debug message */
-	V_DEBUG("Finished loading modules\n");
+    /* prints a debug message */
+    V_DEBUG("Finished loading modules\n");
 
     /* raises no error */
     RAISE_NO_ERROR;

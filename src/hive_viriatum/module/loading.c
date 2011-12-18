@@ -105,23 +105,23 @@ ERROR_CODE loadModule(struct Service_t *service, unsigned char *modulePath) {
     /* the info module function reference */
     viriatumInfoModule infoModuleFunction;
 
-	/* prints a debug message */
-	V_DEBUG_F("Loading module (%s)\n", modulePath);
+    /* prints a debug message */
+    V_DEBUG_F("Loading module (%s)\n", modulePath);
 
     /* loads the mod library (tries to find the file) */
     modLibrary = LOAD_LIBRARY((const char *) modulePath);
 
     /* in case the mod library was not loaded */
     if(modLibrary == NULL) {
-		/* retrieves the library error message */
-		char *errorMessage = GET_LIBRARY_ERROR_MESSAGE();
+        /* retrieves the library error message */
+        char *errorMessage = GET_LIBRARY_ERROR_MESSAGE();
 
-		/* in case no error message is found, must
-		set the default errro message */
-		if(errorMessage == NULL) {
-			/* sets the default assumed error message */
-			errorMessage = "File not found";
-		}
+        /* in case no error message is found, must
+        set the default errro message */
+        if(errorMessage == NULL) {
+            /* sets the default assumed error message */
+            errorMessage = "File not found";
+        }
 
         /* prints a warning message */
         V_WARNING_F("Error loading library (%s)\n", errorMessage);
