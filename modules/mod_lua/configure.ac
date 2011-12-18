@@ -43,6 +43,7 @@ AM_PROG_LIBTOOL
 
 m4_include([m4/exports.m4])
 m4_include([m4/programs.m4])
+m4_include([m4/features.m4])
 m4_include([m4/characteristics.m4])
 m4_include([m4/libraries.m4])
 m4_include([m4/output.m4])
