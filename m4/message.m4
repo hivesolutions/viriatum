@@ -38,6 +38,7 @@ echo " + Python                $have_python"
 echo " + JNI                   $have_jni"
 echo " + Threads               $have_pthread"
 echo " + WinSockets2           $have_w2_32"
+echo " + PS API                $have_psapi"
 index=1
 for poll_method in $poll_methods; do
     echo " + Polling method $index      $poll_method"
