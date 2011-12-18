@@ -32,7 +32,7 @@ Building viriatum for android involves cross compilation and the android ndk too
 
 Under construction
 
-* `apt-get install mingw32 mingw32-binutils gcc-mingw32`
+* `apt-get install mingw32 mingw32-binutils`
 * ` ./configure --host=i586-mingw32msvc --build=i686-linux --prefix=/opt/i586-mingw32`
 * `make && make install`
 
