@@ -41,8 +41,8 @@ AC_ARG_ENABLE([debug], [AS_HELP_STRING([--enable-debug], [enable debug features]
 AC_ARG_WITH([moduleroot], [AS_HELP_STRING([--with-moduleroot], [set the default modules directory])], [], [with_moduleroot=$with_libroot/modules])
 AC_ARG_WITH([wwwroot], [AS_HELP_STRING([--with-wwwroot], [set the default data directory])], [], [with_wwwroot=$with_resourceroot/www])
 
-AC_SUBST(wwwroot, with_wwwroot)
-AC_SUBST(moduleroot, with_moduleroot)
+AC_SUBST(wwwrootdir, with_wwwroot)
+AC_SUBST(modulerootdir, with_moduleroot)
 
 if test "$have_debug" = true; then
     AC_DEFINE(HAVE_DEBUG, 1, [Define to 1 if debug is enabled])
