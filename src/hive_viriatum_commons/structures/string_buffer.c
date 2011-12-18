@@ -59,7 +59,7 @@ void deleteStringBuffer(struct StringBuffer_t *stringBuffer) {
     cleanup (string value memory release) */
     while(1) {
         /* pops a node from the release list */
-        popValueLinkedList(stringBuffer->releaseList, (void **) &stringValue, 1);
+        popValueLinkedList(stringBuffer->releaseList, &(void *) stringValue, 1);
 
         /* in case the value is invalid (empty list) */
         if(stringValue == NULL) {
