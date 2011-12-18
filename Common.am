@@ -25,6 +25,3 @@
 
 AM_CFLAGS = -pedantic -finline-functions -Wall -Wno-long-long -Wno-variadic-macros -DHAVE_CONFIG_H
 AM_CXXFLAGS = -pedantic -finline-functions  -Wall -Wno-long-long -Wno-variadic-macros -DHAVE_CONFIG_H
-
-sysconfigdir = /var
-resourcesdir = $(sysconfigdir)/viriatum
