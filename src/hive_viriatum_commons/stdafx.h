@@ -88,7 +88,7 @@
 #endif
 
 #ifdef VIRIATUM_PLATFORM_WIN32
-#include <Windows.h>
+#include <windows.h>
 #include <psapi.h>
 #endif
 
