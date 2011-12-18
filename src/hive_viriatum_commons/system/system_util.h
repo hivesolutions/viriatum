@@ -37,7 +37,11 @@
 #define GET_ENV(buffer, bufferSize, variableName) _dupenv_s(&buffer, &bufferSize, variableName)
 #define GET_PROCESS() OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, 0, GET_PID())
 #define CLOSE_PROCESS(process) CloseHandle(process)
+#ifdef VIRIATUM_PLATFORM_MINGW
+#define GET_MEMORY_INFORMATION(process, memoryInformation) getrusage(process, &memoryInformation)
+#else
 #define GET_MEMORY_INFORMATION(process, memoryInformation) GetProcessMemoryInfo(process, &memoryInformation, sizeof(memoryInformation))
+#endif
 #define GET_MEMORY_USAGE(memoryInformation) memoryInformation.PagefileUsage
 #define FILE_EXISTS(filePath) GetFileAttributes(filePath) != 0xffffffff
 #endif
