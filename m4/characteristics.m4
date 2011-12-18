@@ -27,3 +27,6 @@
 AC_HEADER_STDBOOL
 AC_C_INLINE
 AC_TYPE_SIZE_T
+
+# sets the silent rules for compilation
+AM_SILENT_RULES([yes])
