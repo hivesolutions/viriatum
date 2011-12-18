@@ -41,8 +41,8 @@
 #define IS_ERROR_CODE(errorCode) errorCode != 0
 #define GET_ERROR getLastErrorMessageSafe
 
-VIRIATUM_EXTERNAL_PREFIX unsigned int lastErrorCode;
-VIRIATUM_EXTERNAL_PREFIX unsigned char *lastErrorMessage;
+VIRIATUM_EXPORT_PREFIX unsigned int lastErrorCode;
+VIRIATUM_EXPORT_PREFIX unsigned char *lastErrorMessage;
 
 /**
  * Retrieves the last (current) error code available.
