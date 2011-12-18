@@ -38,7 +38,7 @@
 #define GET_PROCESS() OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, 0, GET_PID())
 #define CLOSE_PROCESS(process) CloseHandle(process)
 #ifdef VIRIATUM_PLATFORM_MINGW
-#define GET_MEMORY_INFORMATION(process, memoryInformation) getrusage(process, &memoryInformation)
+#define GET_MEMORY_INFORMATION(process, memoryInformation)
 #else
 #define GET_MEMORY_INFORMATION(process, memoryInformation) GetProcessMemoryInfo(process, &memoryInformation, sizeof(memoryInformation))
 #endif
