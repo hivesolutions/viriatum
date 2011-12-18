@@ -52,7 +52,7 @@
 #define VIRIATUM_BASE_PATH "/"
 #define VIRIATUM_LISTING_PATH "/templates/listing.html.tpl"
 #ifndef VIRIATUM_CONTENTS_PATH
-#define VIRIATUM_CONTENTS_PATH "/var/viriatum"
+#define VIRIATUM_CONTENTS_PATH "/var/viriatum/www"
 #endif
 #endif
 #endif
