@@ -25,15 +25,18 @@
 
 # sets the default values for the various library
 # control variables
+have_dl=true
 have_log=true
 have_pthread=true
 have_w2_32=true
+have_psapi=true
 
 # checks for libraries
-AC_CHECK_LIB([dl], [main], [], [AC_MSG_ERROR(can't build without dynamic linking (libdl) libraries)])
+AC_CHECK_LIB([dl], [main], [], [have_dl=false])
 AC_CHECK_LIB([log], [main], [], [have_log=false])
 AC_CHECK_LIB([pthread], [main], [], [have_pthread=false])
 AC_CHECK_LIB([ws2_32], [main], [], [have_w2_32=false])
+AC_CHECK_LIB([psapi], [main], [], [have_psapi=false])
 
 # library variables activation
 AM_CONDITIONAL(LINK_WS2_32, [test "$have_w2_32" != "false"])
