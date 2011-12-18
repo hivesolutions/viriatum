@@ -25,16 +25,16 @@ Building viriatum for android involves cross compilation and the android ndk too
 * Unpack the android-ndk package file `tar -xvf android-ndk-r[x]-linux-x86.tar.bz2`
 * Create the standalone toolchain `android-ndk-r[x]/build/tools/make-standalone-toolchain.sh --platform=android-4 --install-dir=/opt/android-toolchain`
 * `export PATH=/opt/android-toolchain/bin:$PATH`
-* `./configure --target=arm-linux-androideabi --host=arm-linux-androideabi --prefix=/opt/android-root`
+* `./configure --host=arm-linux-androideabi --target=arm-linux-androideabi --prefix=/opt/android-root`
 * `make && make install`
 
 ### Windows
 
 Under construction
 
-* `apt-get install mingw32 mingw32-binutils`
+* `apt-get install mingw32 mingw32-binutils gcc-mingw32`
 * `export PATH=/opt/android-toolchain/bin:$PATH`
-* `./configure --target=i586-mingw32msvc --host=i586-mingw32msvc --prefix=/opt/android-root`
+* ` ./configure --host=i586-mingw32msvc --build=i686-linux --prefix=/opt/i586-mingw32`
 * `make && make install`
 
 ## Features
