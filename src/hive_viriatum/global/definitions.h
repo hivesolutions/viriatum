@@ -29,9 +29,9 @@
 
 #ifdef VIRIATUM_PLATFORM_WIN32
 #define VIRIATUM_MODULES_PATH "C:/repo_extra/viriatum/bin/hive_viriatum_mod_lua/i386/win32/Debug"
-#define VIRIATUM_RESOURCES_PATH "../../src/hive_viriatum/resources"
-#define VIRIATUM_BASE_PATH "/html/base"
-#define VIRIATUM_LISTING_PATH "/html/base/templates/listing.html.tpl"
+#define VIRIATUM_RESOURCES_PATH "../../src/hive_viriatum/resources/html/base"
+#define VIRIATUM_BASE_PATH "/"
+#define VIRIATUM_LISTING_PATH "/templates/listing.html.tpl"
 #ifndef VIRIATUM_CONTENTS_PATH
 #define VIRIATUM_CONTENTS_PATH VIRIATUM_RESOURCES_PATH
 #endif
@@ -41,16 +41,16 @@
 #ifdef VIRIATUM_PLATFORM_ANDROID
 #define VIRIATUM_MODULES_PATH "/sdcard/viriatum/modules"
 #define VIRIATUM_RESOURCES_PATH "resources"
-#define VIRIATUM_BASE_PATH "/html/base"
-#define VIRIATUM_LISTING_PATH "/html/base/templates/listing.html.tpl"
+#define VIRIATUM_BASE_PATH "/"
+#define VIRIATUM_LISTING_PATH "/templates/listing.html.tpl"
 #define VIRIATUM_CONTENTS_PATH "/sdcard/viriatum"
 #else
 #ifndef VIRIATUM_MODULES_PATH
 #define VIRIATUM_MODULES_PATH "/usr/lib/viriatum/modules"
 #endif
 #define VIRIATUM_RESOURCES_PATH "resources"
-#define VIRIATUM_BASE_PATH "/html/base"
-#define VIRIATUM_LISTING_PATH "/html/base/templates/listing.html.tpl"
+#define VIRIATUM_BASE_PATH "/"
+#define VIRIATUM_LISTING_PATH "/templates/listing.html.tpl"
 #ifndef VIRIATUM_CONTENTS_PATH
 #define VIRIATUM_CONTENTS_PATH "/var/viriatum"
 #endif
