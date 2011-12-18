@@ -28,6 +28,9 @@ AC_HEADER_STDBOOL
 AC_C_INLINE
 AC_TYPE_SIZE_T
 
+# sets the silent rules for compilation
+AM_SILENT_RULES([yes])
+
 # changes the library names spec to a non versioned
 # setting (avoid possible import problems)
 library_names_spec='$libname${shared_ext}'
