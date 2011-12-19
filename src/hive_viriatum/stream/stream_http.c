@@ -29,7 +29,7 @@
 
 #include "stream_http.h"
 
-ERROR_CODE createHttpHandler(struct HttpHandler_t **httpHandlerPointer) {
+ERROR_CODE createHttpHandler(struct HttpHandler_t **httpHandlerPointer, unsigned char *name) {
     /* retrieves the http handler size */
     size_t httpHandlerSize = sizeof(struct HttpHandler_t);
 
@@ -37,6 +37,7 @@ ERROR_CODE createHttpHandler(struct HttpHandler_t **httpHandlerPointer) {
     struct HttpHandler_t *httpHandler = (struct HttpHandler_t *) MALLOC(httpHandlerSize);
 
     /* sets the http handler attributes (default) values */
+    httpHandler->name = name;
     httpHandler->set = NULL;
     httpHandler->unset = NULL;
     httpHandler->reset = NULL;
@@ -57,19 +58,18 @@ ERROR_CODE deleteHttpHandler(struct HttpHandler_t *httpHandler) {
 }
 
 ERROR_CODE createHttpConnection(struct HttpConnection_t **httpConnectionPointer, struct IoConnection_t *ioConnection) {
+    /* allocates space for the http handler reference
+    to be used in this connection */
+    struct HttpHandler_t *httpHandler;
+
     /* retrieves the http connection size */
     size_t httpConnectionSize = sizeof(struct HttpConnection_t);
 
     /* allocates space for the http connection */
     struct HttpConnection_t *httpConnection = (struct HttpConnection_t *) MALLOC(httpConnectionSize);
 
-
-
+    /* retrieves the service associated with the connection */
     struct Service_t *service = ioConnection->connection->service;
-
-    struct HttpHandler_t *httpHandler;
-
-
 
     /* sets the http handler attributes (default) values */
     httpConnection->ioConnection = ioConnection;
@@ -89,20 +89,15 @@ ERROR_CODE createHttpConnection(struct HttpConnection_t **httpConnectionPointer,
 
 
 
+    /* TODO: CHANGE THIS !!!! */
+    getValueStringHashMap(service->httpHandlersMap, "lua", (void **) &httpHandler);
 
-
-
-
-    /*peekValueLinkedList(service->httpHandlersList, (void **) &httpHandler);*/
 
 
     /* sets the structures for the handler */
-    /*httpHandler->set(httpConnection);*/
+    httpHandler->set(httpConnection);
 
-    setHandlerFile(httpConnection);
-
-
-
+    /*setHandlerFile(httpConnection);*/ /* -> CONVERTER ISTO AO NOVO MODELO */
 
     /* sets the http connection in the http connection pointer */
     *httpConnectionPointer = httpConnection;
@@ -112,23 +107,24 @@ ERROR_CODE createHttpConnection(struct HttpConnection_t **httpConnectionPointer,
 }
 
 ERROR_CODE deleteHttpConnection(struct HttpConnection_t *httpConnection) {
-    /* retrieves the
-    struct Connection_t *httpConnection->ioConnection->connection
+    /* allocates space for the http handler reference
+    to be used in this connection */
+    struct HttpHandler_t *httpHandler;
 
     /* retrieves the service from the http connection */
     struct Service_t *service = httpConnection->ioConnection->connection->service;
 
-    struct HttpHandler_t *httpHandler;
 
 
+    /* TODO: CHANGE THIS !!!! */
+    getValueStringHashMap(service->httpHandlersMap, "lua", (void **) &httpHandler);
 
 
-    /*peekValueLinkedList(service->httpHandlersList, (void **) &httpHandler);*/
 
     /* unsets the structures for the handler */
-    /*httpHandler->unset(httpConnection);*/
+    httpHandler->unset(httpConnection);
 
-    unsetHandlerFile(httpConnection);
+    /*unsetHandlerFile(httpConnection);*/
 
 
 
@@ -148,7 +144,8 @@ ERROR_CODE deleteHttpConnection(struct HttpConnection_t *httpConnection) {
 }
 
 ERROR_CODE dataHandlerStreamHttp(struct IoConnection_t *ioConnection, unsigned char *buffer, size_t bufferSize) {
-    /* allocates the http handler */
+    /* allocates space for the http handler reference
+    to be used in this connection */
     struct HttpHandler_t *httpHandler;
 
     /* retrieves the http connection */
@@ -158,13 +155,18 @@ ERROR_CODE dataHandlerStreamHttp(struct IoConnection_t *ioConnection, unsigned c
     struct Service_t *service = httpConnection->ioConnection->connection->service;
 
 
-    /*peekValueLinkedList(service->httpHandlersList, (void **) &httpHandler);
+    /* TODO: CHANGE THIS !!!! */
+    getValueStringHashMap(service->httpHandlersMap, "lua", (void **) &httpHandler);
 
-    httpConnection->httpHandler = httpHandler;*/
+
+    /* sets the correct http handler in the http connection */
+    httpConnection->httpHandler = httpHandler;
+
+
 
     /* TENHO DE POR ESTE METODO como resetHandlerFile() */
 
-    _resetHttpParserHandlerFile(httpConnection->httpParser);
+    /* _resetHttpParserHandlerFile(httpConnection->httpParser); */
 
     // TODO: tenho de testar quantos bytes processei !!!
     /* process the http data for the http parser */

@@ -252,8 +252,9 @@ ERROR_CODE _sendResponseHandlerModule(struct HttpParser_t *httpParser) {
     /* retrieves the connection from the http parser parameters */
     struct Connection_t *connection = (struct Connection_t *) httpParser->parameters;
 
+    /* retrieves the http connection from the io connection and uses it to retrieve
+    the correct (mod lua) handler to operate around it */
     struct HttpConnection_t *httpConnection = (struct HttpConnection_t *) ((struct IoConnection_t *) connection->lower)->lower;
-
     struct ModLuaHttpHandler_t *modLuaHttpHandler = (struct ModLuaHttpHandler_t *) httpConnection->httpHandler->lower;
 
     #ifdef VIRIATUM_PLATFORM_WIN32
@@ -264,6 +265,7 @@ ERROR_CODE _sendResponseHandlerModule(struct HttpParser_t *httpParser) {
     char *filePath = "/teste.lua";
     #endif
 
+    /* allocates space for the result code */
     ERROR_CODE resultCode;
 
     /* registers the current connection in lua */
@@ -348,6 +350,7 @@ int _luaWriteConnection(lua_State *luaState) {
         /* prints a warning message */
         V_WARNING("Incorrect argument 'expected lightuserdata'\n");
 
+        /* pushes an error message to lua */
         lua_pushstring(luaState, "Incorrect argument 'expected lightuserdata'");
         lua_error(luaState);
     }

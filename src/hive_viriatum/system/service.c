@@ -29,9 +29,9 @@
 
 #include "service.h"
 
-ERROR_CODE createHttpHandlerService(struct Service_t *service, struct HttpHandler_t **httpHandlerPointer) {
+ERROR_CODE createHttpHandlerService(struct Service_t *service, struct HttpHandler_t **httpHandlerPointer, unsigned char *name) {
     /* creates the http handler */
-    createHttpHandler(httpHandlerPointer);
+    createHttpHandler(httpHandlerPointer, name);
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -46,16 +46,16 @@ ERROR_CODE deleteHttpHandlerService(struct Service_t *service, struct HttpHandle
 }
 
 ERROR_CODE addHttpHandlerService(struct Service_t *service, struct HttpHandler_t *httpHandler) {
-    /* adds the http handler to the list of http handlers in the service */
-    appendValueLinkedList(service->httpHandlersList, (void *) httpHandler);
+    /* sets the http handler in the http handers map for the handler name */
+    setValueStringHashMap(service->httpHandlersMap, httpHandler->name, (void *) httpHandler);
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
 ERROR_CODE removeHttpHandlerService(struct Service_t *service, struct HttpHandler_t *httpHandler) {
-    /* removes the http handler from the list of http handlers in the service */
-    removeValueLinkedList(service->httpHandlersList, (void *) httpHandler, 1);
+    /* unsets the http handler from the http handers map */
+    setValueStringHashMap(service->httpHandlersMap, httpHandler->name, NULL);
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -66,8 +66,41 @@ ERROR_CODE removeHttpHandlerService(struct Service_t *service, struct HttpHandle
 
 
 void loadOptionsService(struct Service_t *service, struct HashMap_t *arguments) {
+    /* allocates the value reference to be used
+    during the arguments retrieval */
+    void *value;
 
+    /* unpacks the service options from the service */
+    struct ServiceOptions_t *serviceOptions = service->options;
+
+    /* DEFAULT OPTIONS */
+
+    serviceOptions->port = VIRIATUM_DEFAULT_PORT;
+    serviceOptions->address = VIRIATUM_DEFAULT_HOST;
+
+    /* END DEFAULT OPTIONS */
+
+    /* CONFIGURATION FILE OPTIONS */
+
+    /* END CONFIGURATION FILE OPTIONS */
+
+    getValueStringHashMap(arguments, "port", &value);
+
+    /* in case the (port) value is set */
+    if(value != NULL) {
+        serviceOptions->port = (unsigned short) atoi(((struct Argument_t *) value)->value);
+    }
+
+    getValueStringHashMap(arguments, "host", &value);
+
+    /* in case the (host) value is set */
+    if(value != NULL) {
+        serviceOptions->address = ((struct Argument_t *) value)->value;
+    }
 }
+
+
+
 
 
 void createServiceOptions(struct ServiceOptions_t **serviceOptionsPointer) {
@@ -80,12 +113,19 @@ void createServiceOptions(struct ServiceOptions_t **serviceOptionsPointer) {
     /* sets the service options attributes (default) values */
     serviceOptions->port = 0;
     serviceOptions->address = NULL;
+    serviceOptions->defaultVirtualHost = NULL;
+
+    /* creates the hash map for the virtual hosts */
+    createHashMap(&serviceOptions->virtualHosts, 0);
 
     /* sets the service options in the service options pointer */
     *serviceOptionsPointer = serviceOptions;
 }
 
 void deleteServiceOptions(struct ServiceOptions_t *serviceOptions) {
+    /* deletes the hash map for the virtual hosts */
+    deleteHashMap(serviceOptions->virtualHosts);
+
     /* releases the service options */
     FREE(serviceOptions);
 }
@@ -93,7 +133,7 @@ void deleteServiceOptions(struct ServiceOptions_t *serviceOptions) {
 
 
 
-void createService(struct Service_t **servicePointer) {
+void createService(struct Service_t **servicePointer, unsigned char *name) {
     /* retrieves the service size */
     size_t serviceSize = sizeof(struct Service_t);
 
@@ -101,13 +141,16 @@ void createService(struct Service_t **servicePointer) {
     struct Service_t *service = (struct Service_t *) MALLOC(serviceSize);
 
     /* sets the service attributes (default) values */
-    service->name = NULL;
+    service->name = name;
     service->status = STATUS_CLOSED;
     service->serviceSocketHandle = 0;
     service->createHttpHandler = createHttpHandlerService;
     service->deleteHttpHandler = deleteHttpHandlerService;
     service->addHttpHandler = addHttpHandlerService;
     service->removeHttpHandler = removeHttpHandlerService;
+
+    /* creates the service options */
+    createServiceOptions(&service->options);
 
     /* creates the polling (provider) */
     createPolling(&service->polling);
@@ -118,15 +161,8 @@ void createService(struct Service_t **servicePointer) {
     /* creates the http modules list */
     createLinkedList(&service->modulesList);
 
-
-
-
-    /* creates the http handlers list */
-    createLinkedList(&service->httpHandlersList);
-
-
-
-
+    /* creates the http handlers map */
+    createHashMap(&service->httpHandlersMap, 0);
 
     /* sets the service in the service pointer */
     *servicePointer = service;
@@ -139,10 +175,8 @@ void deleteService(struct Service_t *service) {
         SOCKET_CLOSE(service->serviceSocketHandle);
     }
 
-
-    /* deletes the http handlers list */
-    deleteLinkedList(service->httpHandlersList);
-
+    /* deletes the http handlers map */
+    deleteHashMap(service->httpHandlersMap);
 
     /* deletes the http modules list */
     deleteLinkedList(service->modulesList);
@@ -152,6 +186,9 @@ void deleteService(struct Service_t *service) {
 
     /* deletes the polling (provider) */
     deletePolling(service->polling);
+
+    /* deletes the service options */
+    deleteServiceOptions(service->options);
 
     /* releases the service */
     FREE(service);
@@ -242,13 +279,16 @@ ERROR_CODE startService(struct Service_t *service) {
     /* sets the flags to be used in socket */
     SOCKET_FLAGS flags = 1;
 
+    /* unpacks the service options from the service structure */
+    struct ServiceOptions_t *serviceOptions = service->options;
+
     /* loads (all) the currently available modules */
     loadModulesService(service);
 
     /* sets the socket address attributes */
     socketAddress.sin_family = SOCKET_INTERNET_TYPE;
-    socketAddress.sin_addr.s_addr = inet_addr(VIRIATUM_DEFAULT_HOST);
-    socketAddress.sin_port = htons(VIRIATUM_DEFAULT_PORT);
+    socketAddress.sin_addr.s_addr = inet_addr(serviceOptions->address);
+    socketAddress.sin_port = htons(serviceOptions->port);
 
     /* creates the service socket for the given types */
     service->serviceSocketHandle = SOCKET_CREATE(SOCKET_INTERNET_TYPE, SOCKET_PACKET_TYPE, SOCKET_PROTOCOL_TCP);
