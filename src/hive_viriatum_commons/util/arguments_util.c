@@ -33,31 +33,32 @@ ERROR_CODE processArgument(char *argumentValue, struct Argument_t *argument) {
 	/* allocates space for the index counter */
 	unsigned int index;
 
+	/* allocates space for the current value in the
+	parsing loop (iteration item) */
 	char current;
 
-	unsigned int state = 1;
+	/* starts the state value with the initial value */
+	unsigned int state = ARGUMENT_INITIAL;
 
+	/* starts the mark value wth the base index */
 	size_t mark = 0;
-
-	/**
-	 * 1 - intial
-	 * 2 - first -
-	 * 3 - second --
-	 * 4 - key-open
-	 * 5 - value-open
-	 */
 
 	/* retrieves the argument size for processing */
 	size_t argumentSize = strlen(argumentValue);
 
 	/* sets the argument to type key (just a name) */
-	argument->type = 1;
+	argument->type = SINGLE_ARGUMENT;
 
+	/* iterates over all the characters present in
+	the argument string to parse the argument */
 	for(index = 0; index < argumentSize; index++) {
+		/* retrieves the current iteration values, the
+		current character of the argument */
 		current = argumentValue[index];
 
+		/* switch over the current (parsing) state */
 		switch(state) {
-			case 1:
+			case ARGUMENT_INITIAL:
 				/* in case the current character is not a
 				separator character there is an error */
 				if(current != '-') {
@@ -65,36 +66,49 @@ ERROR_CODE processArgument(char *argumentValue, struct Argument_t *argument) {
 					RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem parsing option");
 				}
 
-				state = 2;
+				/* changes the state to the first */
+				state = ARGUMENT_FIRST;
 
 				/* breaks the switch */
 				break;
 
-			case 2:
+			case ARGUMENT_FIRST:
 				if(current == '-') {
-					state = 3;
-
+					/* marks the next index as the start point
+					for the key string */
 					mark = index + 1;
+
+					/* changes the state to the second */
+					state = ARGUMENT_SECOND;
 				} else {
+					/* marks the current index as the start point
+					for the key string */
 					mark = index;
 
-					state = 4;
+					/* changes the state to the key (parsing) */
+					state = ARGUMENT_KEY;
 				}
 
 				/* breaks the switch */
 				break;
 
-			case 3:
-			case 4:
+			case ARGUMENT_SECOND:
+			case ARGUMENT_KEY:
 				if(current == '=') {
-					state = 5;
-
 					/* sets the argument to type key and value */
-					argument->type = 2;
+					argument->type = VALUE_ARGUMENT;
 
+					/* copies the key value into the appropriate variable
+					in the argument */
 					memcpy(argument->key, argumentValue + mark, index - mark);
 					argument->key[index - mark] = '\0';
+
+					/* marks the current index as the start point
+					for the value string */ 
 					mark = index + 1;
+
+					/* changes the state to the value (parsing) */
+					state = ARGUMENT_VALUE;
 				} else {
 				}
 
@@ -103,16 +117,22 @@ ERROR_CODE processArgument(char *argumentValue, struct Argument_t *argument) {
 		}
 	}
 
+	/* switches one final time over the state to close
+	the pending values */
 	switch(state) {
-		case 3:
-		case 4:
+		case ARGUMENT_SECOND:
+		case ARGUMENT_KEY:
+			/* copies the key value into the appropriate variable
+			in the argument */
 			memcpy(argument->key, argumentValue + mark, index - mark);
 			argument->key[index - mark] = '\0';
 
 			/* breaks the switch */
 			break;
 
-		case 5:
+	case ARGUMENT_VALUE:
+			/* copies the value value into the appropriate variable
+			in the argument */
 			memcpy(argument->value, argumentValue + mark, index - mark);
 			argument->value[index - mark] = '\0';
 
@@ -164,12 +184,80 @@ ERROR_CODE processArguments(int argc, char *argv[], struct HashMap_t **arguments
 }
 
 ERROR_CODE deleteArguments(struct HashMap_t *arguments) {
-	/* FALTA LIBERTAR A MEMORIA DOS ARGUMENTOS PORQUE NAO TENHO
-	SUPORTE PARA ITERATOR NO HASH MAP */
+	/* allocates space for the pointer to the key and
+	for the argument to be retrieved */
+	size_t *keyPointer;
+	struct Argument_t *argument;
 
+	/* allocates space for the iterator for the arguments */
+	struct Iterator_t *argumentsIterator;
+
+	/* creates an iterator for the arguments hash map */
+	createIteratorHashMap(arguments, &argumentsIterator);
+
+    /* iterates continuously */
+    while(1) {
+        /* retrieves the next value from the arguments iterator */
+        getNextIterator(argumentsIterator, (void **) &keyPointer);
+
+        /* in case the current module is null (end of iterator) */
+        if(keyPointer == NULL) {
+            /* breaks the loop */
+            break;
+        }
+
+		/* retrievs the hash map value for the key pointer */
+		getValueHashMap(arguments, *keyPointer, (void **) &argument);
+
+		/* releases the argument memory */
+		FREE(argument);
+	}
+
+	/* deletes the iterator for the arguments hash map */
+	deleteIteratorHashMap(arguments, argumentsIterator);
 
 	/* deletes the hash map that holds the arguments */
 	deleteHashMap(arguments);
+
+	/* raises no error */
+	RAISE_NO_ERROR;
+}
+
+ERROR_CODE printArguments(struct HashMap_t *arguments) {
+	size_t *keyPointer;
+	struct Argument_t *argument;
+
+	struct Iterator_t *iterator;
+
+	createIteratorHashMap(arguments, &iterator);
+
+	PRINTF("Arguments\n");
+	PRINTF("=====================\n");
+	PRINTF("\n");
+
+    /* iterates continuously */
+    while(1) {
+        /* retrieves the next value from the iterator */
+        getNextIterator(iterator, (void **) &keyPointer);
+
+        /* in case the current module is null (end of iterator) */
+        if(keyPointer == NULL) {
+            /* breaks the loop */
+            break;
+        }
+
+		getValueHashMap(arguments, *keyPointer, (void **) &argument);
+
+		if(argument->type == VALUE_ARGUMENT) {
+			PRINTF_F(" %s => %s\n", argument->key, argument->value);
+		} else {
+			PRINTF_F(" %s => NULL\n", argument->key);
+		}
+	}
+
+	PRINTF("\n");
+
+	deleteIteratorHashMap(arguments, iterator);
 
 	/* raises no error */
 	RAISE_NO_ERROR;

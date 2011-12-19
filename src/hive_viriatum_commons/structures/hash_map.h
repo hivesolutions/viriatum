@@ -27,6 +27,8 @@
 
 #pragma once
 
+#include "iterator.h"
+
 /**
  * The default size to be used in a newly
  * constructed hash map.
@@ -65,5 +67,9 @@ VIRIATUM_EXPORT_PREFIX void setValueHashMap(struct HashMap_t *hashMap, size_t ke
 VIRIATUM_EXPORT_PREFIX void setValueStringHashMap(struct HashMap_t *hashMap, unsigned char *keyString, void *value);
 VIRIATUM_EXPORT_PREFIX void getValueHashMap(struct HashMap_t *hashMap, size_t key, void **valuePointer);
 VIRIATUM_EXPORT_PREFIX void getValueStringHashMap(struct HashMap_t *hashMap, unsigned char *keyString, void **valuePointer);
+VIRIATUM_EXPORT_PREFIX void createIteratorHashMap(struct HashMap_t *hashMap, struct Iterator_t **iteratorPointer);
+VIRIATUM_EXPORT_PREFIX void deleteIteratorHashMap(struct HashMap_t *hashMap, struct Iterator_t *iterator);
+VIRIATUM_EXPORT_PREFIX void resetIteratorHashMap(struct HashMap_t *hashMap, struct Iterator_t *iterator);
+VIRIATUM_EXPORT_PREFIX void getNextIteratorHashMap(struct Iterator_t *iterator, void **nextPointer);
 VIRIATUM_EXPORT_PREFIX void _resizeHashMap(struct HashMap_t *hashMap);
 VIRIATUM_EXPORT_PREFIX size_t _calculateStringHashMap(unsigned char *keyString);
