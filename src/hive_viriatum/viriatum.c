@@ -45,9 +45,9 @@ ERROR_CODE runService(struct HashMap_t *arguments) {
     SOCKET_INITIALIZE(&socketData);
 
     /* creates the service and loads the options
-	taking into account the arguments */
+    taking into account the arguments */
     createService(&service);
-	loadOptionsService(service, arguments);
+    loadOptionsService(service, arguments);
 
     /* starts the service */
     returnValue = startService(service);
@@ -112,7 +112,7 @@ void killHandler(int signalNumber) {
 }
 
 ERROR_CODE printInformation() {
-	/* retrieves the viriatum version and description */
+    /* retrieves the viriatum version and description */
     unsigned char *version = versionViriatum();
     unsigned char *description = descriptionViriatum();
 
@@ -125,8 +125,8 @@ ERROR_CODE printInformation() {
     /* prints a message */
     V_PRINT_F("%s\n", VIRIATUM_COPYRIGHT);
 
-	/* raises no error */
-	RAISE_NO_ERROR;
+    /* raises no error */
+    RAISE_NO_ERROR;
 }
 
 #ifndef VIRIATUM_PLATFORM_IPHONE
@@ -134,26 +134,26 @@ int main(int argc, char *argv[]) {
     /* allocates the return value */
     ERROR_CODE returnValue;
 
-	/* allocates the map that will contain the various
-	processed arguments, indexed by name */
-	struct HashMap_t *arguments;
+    /* allocates the map that will contain the various
+    processed arguments, indexed by name */
+    struct HashMap_t *arguments;
 
-	/* prints the viriatum information into the standard
-	output "file", the label should be standard */
-	printInformation();
+    /* prints the viriatum information into the standard
+    output "file", the label should be standard */
+    printInformation();
 
     /* prints a debug message */
     V_DEBUG_F("Receiving %d argument(s)\n", argc);
 
-	/* processes the various arguments into a map */
-	processArguments(argc, argv, &arguments);
-	printArguments(arguments);
+    /* processes the various arguments into a map */
+    processArguments(argc, argv, &arguments);
+    printArguments(arguments);
 
     /* runs the service, with the given arguments */
     returnValue = runService(arguments);
 
-	/* deletes the processed arguments */
-	deleteArguments(arguments);
+    /* deletes the processed arguments */
+    deleteArguments(arguments);
 
     /* tests the error code for error */
     if(IS_ERROR_CODE(returnValue)) {

@@ -17,7 +17,7 @@
  You should have received a copy of the GNU General Public License
  along with Hive Viriatum Commons. If not, see <http://www.gnu.org/licenses/>.
 
- __author__    = Jo„o Magalh„es <joamag@hive.pt>
+ __author__    = Jo√£o Magalh√£es <joamag@hive.pt>
  __version__   = 1.0.0
  __revision__  = $LastChangedRevision$
  __date__      = $LastChangedDate$
@@ -35,26 +35,26 @@
  * of possible arguments.
  */
 typedef enum ArgumentType_e {
-	/**
-	 * An argument that contains only
-	 * a key and so the value is considered
-	 * to be null.
-	 */
-	SINGLE_ARGUMENT = 1,
+    /**
+     * An argument that contains only
+     * a key and so the value is considered
+     * to be null.
+     */
+    SINGLE_ARGUMENT = 1,
 
-	/**
-	 * An argument that contains both
-	 * a key and a value.
-	 */
-	VALUE_ARGUMENT
+    /**
+     * An argument that contains both
+     * a key and a value.
+     */
+    VALUE_ARGUMENT
 } ArgumentType;
 
 typedef enum ArgumentState_e {
-	ARGUMENT_INITIAL = 1,
-	ARGUMENT_FIRST,
-	ARGUMENT_SECOND,
-	ARGUMENT_KEY,
-	ARGUMENT_VALUE
+    ARGUMENT_INITIAL = 1,
+    ARGUMENT_FIRST,
+    ARGUMENT_SECOND,
+    ARGUMENT_KEY,
+    ARGUMENT_VALUE
 } ArgumentState;
 
 /**
@@ -62,22 +62,27 @@ typedef enum ArgumentState_e {
  * from an external (data) source.
  */
 typedef struct Argument_t {
-	/**
-	 * The type of argument, to control
-	 * if the value is defined or not.
-	 */
-	enum ArgumentType_e type;
+    /**
+     * The type of argument, to control
+     * if the value is defined or not.
+     */
+    enum ArgumentType_e type;
 
-	/**
-	 * The key to the argument, this value
-	 * should also describe the argument.
-	 */
-	char key[256];
+    /**
+     * The key to the argument, this value
+     * should also describe the argument.
+     */
+    char key[256];
 
-	/**
-	 * The value content of the argument.
-	 * This value is represented as a string
-	 * and must be parsed for interpretation.
-	 */
-	char value[1024];
+    /**
+     * The value content of the argument.
+     * This value is represented as a string
+     * and must be parsed for interpretation.
+     */
+    char value[1024];
 } Argument;
+
+VIRIATUM_EXPORT_PREFIX ERROR_CODE processArguments(int argc, char *argv[], struct HashMap_t **argumentsPointer);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE deleteArguments(struct HashMap_t *arguments);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE printArguments(struct HashMap_t *arguments);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _processArgument(char *argumentValue, struct Argument_t *argument);
