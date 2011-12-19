@@ -67,10 +67,28 @@ ERROR_CODE removeHttpHandlerService(struct Service_t *service, struct HttpHandle
 
 void loadOptionsService(struct Service_t *service, struct HashMap_t *arguments) {
 
-
 }
 
 
+void createServiceOptions(struct ServiceOptions_t **serviceOptionsPointer) {
+    /* retrieves the service options size */
+    size_t serviceOptionsSize = sizeof(struct ServiceOptions_t);
+
+    /* allocates space for the service options */
+    struct ServiceOptions_t *serviceOptions = (struct ServiceOptions_t *) MALLOC(serviceOptionsSize);
+
+    /* sets the service options attributes (default) values */
+    serviceOptions->port = 0;
+    serviceOptions->address = NULL;
+
+    /* sets the service options in the service options pointer */
+    *serviceOptionsPointer = service;
+}
+
+void deleteServiceOptions(struct ServiceOptions_t *serviceOptions) {
+    /* releases the service options */
+    FREE(serviceOptions);
+}
 
 
 

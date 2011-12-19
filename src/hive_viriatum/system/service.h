@@ -190,6 +190,14 @@ typedef struct Service_t {
     unsigned char status;
 
     /**
+     * The set of options that configure
+     * the current service instance.
+     * These options are used both at the
+     * startup and during the runtime.
+     */
+    struct ServiceOptions_t *options;
+
+    /**
      * The socket handle to the service
      * connection.
      */
@@ -215,8 +223,6 @@ typedef struct Service_t {
      * should not be present in this list.
      */
     struct LinkedList_t *modulesList;
-
-
 
     /**
      * The list of http handlers available
