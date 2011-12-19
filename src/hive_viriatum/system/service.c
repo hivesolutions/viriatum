@@ -65,6 +65,11 @@ ERROR_CODE removeHttpHandlerService(struct Service_t *service, struct HttpHandle
 
 
 
+void loadOptionsService(struct Service_t *service, struct HashMap_t *arguments) {
+	
+
+}
+
 
 
 
@@ -97,8 +102,10 @@ void createService(struct Service_t **servicePointer) {
 
 
 
+
     /* creates the http handlers list */
     createLinkedList(&service->httpHandlersList);
+
 
 
 

@@ -230,6 +230,60 @@ typedef struct Service_t {
     serviceHttpHandlerUpdate removeHttpHandler;
 } Service;
 
+
+
+
+typedef struct ServiceOptions_t {
+	/**
+     * The "default" tcp port to bind the service
+	 * associated with these options.
+	 */
+	unsigned short port;
+
+	/**
+     * The "default" address to bind the service
+	 * associated with these options.
+	 */
+	unsigned char *address;
+
+	/**
+	 * The set of virtual hosts associated with the
+	 * current service.
+	 */
+	struct VirtualHost_t *virtualHosts;
+} ServiceOptions;
+
+typedef struct VirtualHost_t {
+	/**
+     * The descriptive name of the viratualç
+	 * host reference.
+     * For textual representation.
+     */
+    unsigned char *name;	
+} VirtualHost_t;
+
+typedef enum RuleType_e {
+    DIRECTORY_RULE = 1,
+    REGEX_RULE
+} RuleType;
+
+typedef struct Rule_t {
+	enum RuleType_e type;
+	void *value;
+} Rule;
+
+typedef struct RuleDirectory_t {
+	char *path;
+} RuleDirectory;
+
+
+
+
+
+
+
+
+
 /**
  * Structure defining a connection
  * conceptually, including the read and write
@@ -356,7 +410,16 @@ typedef struct Connection_t {
  * object or structure.
  */
 typedef enum Status_e {
+	/**
+	 * Status where the object is open
+	 * or in a running "like" state.
+	 */
     STATUS_OPEN = 1,
+
+	/**
+	 * Status where an object is closed
+	 * or in a stopped "like" state.
+	 */
     STATUS_CLOSED
 } Status;
 
