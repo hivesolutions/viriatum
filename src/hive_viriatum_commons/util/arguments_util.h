@@ -17,7 +17,7 @@
  You should have received a copy of the GNU General Public License
  along with Hive Viriatum Commons. If not, see <http://www.gnu.org/licenses/>.
 
- __author__    = Jo√£o Magalh√£es <joamag@hive.pt>
+ __author__    = Jo„o Magalh„es <joamag@hive.pt>
  __version__   = 1.0.0
  __revision__  = $LastChangedRevision$
  __date__      = $LastChangedDate$
@@ -27,6 +27,49 @@
 
 #pragma once
 
-#include "arguments_util.h"
-#include "dump_util.h"
-#include "string_util.h"
+#include "../debug/debug.h"
+#include "../structures/structures.h"
+
+/**
+ * Enumeration describing the various types
+ * of possible arguments.
+ */
+typedef enum ArgumentType_e {
+	/**
+	 * An argument that contains only
+	 * a key and so the value is considered
+	 * to be null.
+	 */
+	SINGLE_ARGUMENT = 1,
+
+	/**
+	 * An argument that contains both
+	 * a key and a value.
+	 */
+	VALUE_ARGUMENT
+} ArgumentType;
+
+/**
+ * Structure defining an argument received
+ * from an external (data) source.
+ */
+typedef struct Argument_t {
+	/**
+	 * The type of argument, to control
+	 * if the value is defined or not.
+	 */
+	enum ArgumentType_e type;
+
+	/**
+	 * The key to the argument, this value
+	 * should also describe the argument.
+	 */
+	char key[256];
+
+	/**
+	 * The value content of the argument.
+	 * This value is represented as a string
+	 * and must be parsed for interpretation.
+	 */
+	char value[1024];
+} Argument;

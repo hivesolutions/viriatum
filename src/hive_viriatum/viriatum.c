@@ -34,7 +34,7 @@ START_MEMORY;
 
 static struct Service_t *service;
 
-ERROR_CODE runService() {
+ERROR_CODE runService(struct HashMap_t *arguments) {
     /* allocates the return value */
     ERROR_CODE returnValue;
 
@@ -44,8 +44,10 @@ ERROR_CODE runService() {
     /* initializes the socket infrastructure */
     SOCKET_INITIALIZE(&socketData);
 
-    /* creates the service */
+    /* creates the service and loads the options
+	taking into account the arguments */
     createService(&service);
+	loadOptionsService(service, arguments);
 
     /* starts the service */
     returnValue = startService(service);
@@ -109,165 +111,6 @@ void killHandler(int signalNumber) {
     ranService();
 }
 
-
-/* METER ISTO NUMA LIB MAIS DE ALTOR NIVEL */
-
-typedef struct Argument_t {
-	char type;
-	char key[256];
-	char value[1024];
-} Argument;
-
-ERROR_CODE processArgument(char *argumentValue, struct Argument_t *argument) {
-	/* allocates space for the index counter */
-	unsigned int index;
-
-	char current;
-
-
-	unsigned int state = 1;
-
-	size_t mark = 0;
-
-	/**
-	 * 1 - intial
-	 * 2 - first -
-	 * 3 - second --
-	 * 4 - key-open
-	 * 5 - value-open
-	 */
-
-	/* retrieves the argument size for processing */
-	size_t argumentSize = strlen(argumentValue);
-
-	/* sets the argument to type key (just a name) */
-	argument->type = 1;
-
-	for(index = 0; index < argumentSize; index++) {
-		current = argumentValue[index];
-
-		switch(state) {
-			case 1:
-				/* in case the current character is not a
-				separator character there is an error */
-				if(current != '-') {
-					/* raises an error */
-					RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem parsing option");
-				}
-
-				state = 2;
-
-				/* breaks the switch */
-				break;
-
-			case 2:
-				if(current == '-') {
-					state = 3;
-
-					mark = index + 1;
-				} else {
-					mark = index;
-
-					state = 4;
-				}
-
-				/* breaks the switch */
-				break;
-
-			case 3:
-			case 4:
-				if(current == '=') {
-					state = 5;
-
-					/* sets the argument to type key and value */
-					argument->type = 2;
-
-					memcpy(argument->key, argumentValue + mark, index - mark);
-					argument->key[index - mark] = '\0';
-					mark = index + 1;
-				} else {
-				}
-
-				/* breaks the switch */
-				break;
-		}
-	}
-
-	switch(state) {
-		case 3:
-		case 4:
-			memcpy(argument->key, argumentValue + mark, index - mark);
-			argument->key[index - mark] = '\0';
-
-			/* breaks the switch */
-			break;
-
-		case 5:
-			memcpy(argument->value, argumentValue + mark, index - mark);
-			argument->value[index - mark] = '\0';
-
-			/* breaks the switch */
-			break;
-	}
-
-	/* raises no error */
-	RAISE_NO_ERROR;
-}
-
-ERROR_CODE processArguments(int argc, char *argv[], struct HashMap_t **argumentsPointer) {
-	/* allocates space for the index counter */
-	unsigned int index;
-
-	/* allocates the space for the current argument string
-	in the iteration */
-	char *currentArgument;
-
-	/* allocates space for both the argument holder, to
-	be created every iteration of the argument retrieval */
-	struct Argument_t *argument;
-	struct HashMap_t *arguments;
-
-	/* creates the hash map that will hold the various
-	arguments */
-	createHashMap(&arguments, 0);
-
-	/* iterates over all the argument except the
-	first (file name value) */
-	for(index = 1; index < (unsigned int) argc; index++) {
-		/* allocates space for the "new" argument to be parsed */
-		argument = (struct Argument_t *) MALLOC(sizeof(struct Argument_t));
-
-		/* retrievs the current argument, then processes it
-		using the default (simple) parser and sets it in
-		the arguments map */
-		currentArgument = argv[index];
-		processArgument(currentArgument, argument);
-		setValueStringHashMap(arguments, (unsigned char *) argument->key, (void *) argument);
-	}
-
-	/* sets the hash map of arguments as the value pointed
-	by the arguments pointer */
-	*argumentsPointer = arguments;
-
-	/* raises no error */
-	RAISE_NO_ERROR;
-}
-
-ERROR_CODE deleteArguments(struct HashMap_t *arguments) {
-	/* FALTA LIBERTAR A MEMORIA DOS ARGUMENTOS PORQUE NAO TENHO
-	SUPORTE PARA ITERATOR NO HASH MAP */
-
-
-	/* deletes the hash map that holds the arguments */
-	deleteHashMap(arguments);
-
-	/* raises no error */
-	RAISE_NO_ERROR;
-}
-
-/* END PUT */
-
-
 ERROR_CODE printInformation() {
 	/* retrieves the viriatum version and description */
     unsigned char *version = versionViriatum();
@@ -305,8 +148,8 @@ int main(int argc, char *argv[]) {
 	/* processes the various arguments into a map */
 	processArguments(argc, argv, &arguments);
 
-    /* runs the service */
-    returnValue = runService();
+    /* runs the service, with the given arguments */
+    returnValue = runService(arguments);
 
 	/* deletes the processed arguments */
 	deleteArguments(arguments);

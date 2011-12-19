@@ -31,9 +31,12 @@
  * Starts the process of running the service, registering the
  * appropriate handlers.
  * This call blocks until the service is correctly stopped
- * from a diferent flow controll.
+ * from a diferent flow control.
+ *
+ * @param parameters The map containing the various parameters
+ * to be used while running the service.
  */
-ERROR_CODE runService();
+ERROR_CODE runService(struct HashMap_t *parameters);
 
 /**
  * Stops the process of a running the service.
