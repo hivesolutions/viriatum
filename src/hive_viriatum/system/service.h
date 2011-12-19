@@ -37,16 +37,16 @@ struct Polling_t;
 struct Connection_t;
 struct HttpHandler_t;
 
+/**
+ * The function used to create a new handler instance
+ * with a name and for the service context.
+ */
+typedef ERROR_CODE (*serviceHttpHandlerCreate) (struct Service_t *, struct HttpHandler_t **, unsigned char *name);
 
-
-
-typedef ERROR_CODE (*serviceHttpHandlerCreate) (struct Service_t *, struct HttpHandler_t **);
-
+/**
+ * The function used to update an handler state or value.
+ */
 typedef ERROR_CODE (*serviceHttpHandlerUpdate) (struct Service_t *, struct HttpHandler_t *);
-
-
-
-
 
 /**
  * The "default" function used to update a state in the connection
@@ -225,16 +225,20 @@ typedef struct Service_t {
     struct LinkedList_t *modulesList;
 
     /**
-     * The list of http handlers available
+     * The map of http handlers available
      * for the service.
+     * The map associates the name of the handler
+     * with the handler instance.
      */
-    struct LinkedList_t *httpHandlersList;
+    struct HashMap_t *httpHandlersMap;
 
     serviceHttpHandlerCreate createHttpHandler;
     serviceHttpHandlerUpdate deleteHttpHandler;
     serviceHttpHandlerUpdate addHttpHandler;
     serviceHttpHandlerUpdate removeHttpHandler;
 } Service;
+
+
 
 
 
@@ -253,19 +257,44 @@ typedef struct ServiceOptions_t {
     unsigned char *address;
 
     /**
+     * The default virtual host to be used in any
+     * non matched host request.
+     */
+    struct VirtualHost_t *defaultVirtualHost;
+
+    /**
      * The set of virtual hosts associated with the
      * current service.
+     * The map key is the (virtual) host name to be
+     * used, default host name is not contained in
+     * the list for performance.
      */
-    struct VirtualHost_t *virtualHosts;
+    struct HashMap_t *virtualHosts;
 } ServiceOptions;
 
 typedef struct VirtualHost_t {
     /**
-     * The descriptive name of the viratualç
+     * The descriptive name of the viratual
      * host reference.
      * For textual representation.
      */
     unsigned char *name;
+
+    /**
+     * The default rule for the virtual to be
+     * used when no other rule is matched or
+     * when the list of rules is empty.
+     * This value is maintained separate for
+     * performance reasons.
+     */
+    struct Rule_t *defaultRule;
+
+    /**
+     * The list of rules to be used for matching
+     * the request, for gathering the correct
+     * handler.
+     */
+    struct LinkedList_t *rules;
 } VirtualHost_t;
 
 typedef enum RuleType_e {
@@ -448,8 +477,9 @@ typedef struct Data_t {
  *
  * @param servicePointer The pointer to the service to
  * be constructed.
+ * @param name The name of the service to be constructed.
  */
-void createService(struct Service_t **servicePointer);
+void createService(struct Service_t **servicePointer, unsigned char *name);
 
 /**
  * Destructor of the service.

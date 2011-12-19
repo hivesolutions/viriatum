@@ -50,6 +50,14 @@ typedef ERROR_CODE (*httpConnectionUpdate) (struct HttpConnection_t *httpConnect
  * on it.
  */
 typedef struct HttpHandler_t {
+    /**
+     * The name that describes the http
+     * handler.
+     * This is going to be used as id and
+     * so it hsould be unique to the system.
+     */
+    unsigned char *name;
+
     httpConnectionUpdate set;
     httpConnectionUpdate unset;
     httpConnectionUpdate reset;
@@ -93,7 +101,7 @@ typedef struct HttpConnection_t {
     struct HttpHandler_t *httpHandler;
 } HttpConnection;
 
-ERROR_CODE createHttpHandler(struct HttpHandler_t **httpHandlerPointer);
+ERROR_CODE createHttpHandler(struct HttpHandler_t **httpHandlerPointer, unsigned char *name);
 ERROR_CODE deleteHttpHandler(struct HttpHandler_t *httpHandler);
 ERROR_CODE createHttpConnection(struct HttpConnection_t **httpConnectionPointer, struct IoConnection_t *ioConnection);
 ERROR_CODE deleteHttpConnection(struct HttpConnection_t *httpConnection);

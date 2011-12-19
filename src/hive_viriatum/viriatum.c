@@ -46,7 +46,7 @@ ERROR_CODE runService(struct HashMap_t *arguments) {
 
     /* creates the service and loads the options
     taking into account the arguments */
-    createService(&service);
+    createService(&service, VIRIATUM_NAME);
     loadOptionsService(service, arguments);
 
     /* starts the service */

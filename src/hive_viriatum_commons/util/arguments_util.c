@@ -122,8 +122,6 @@ ERROR_CODE printArguments(struct HashMap_t *arguments) {
 
     /* prints the initial arguments header */
     PRINTF("Arguments\n");
-    PRINTF("=====================\n");
-    PRINTF("\n");
 
     /* iterates continuously */
     while(1) {
@@ -150,9 +148,6 @@ ERROR_CODE printArguments(struct HashMap_t *arguments) {
             PRINTF_F(" %s => NULL\n", argument->key);
         }
     }
-
-    /* prints the "final" newline value */
-    PRINTF("\n");
 
     /* deletes the iterator for the arguments hash map */
     deleteIteratorHashMap(arguments, argumentsIterator);
