@@ -393,7 +393,6 @@ ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries) {
     for the findind of the directory entries */
     WIN32_FIND_DATA findData;
     HANDLE handlerFind = INVALID_HANDLE_VALUE;
-    DWORD dwError = 0;
 
     /* retrieves the length of the file path */
     size_t pathLength = strlen(filePath);
