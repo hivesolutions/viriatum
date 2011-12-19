@@ -332,13 +332,13 @@ ERROR_CODE getWriteTimeFile(char *filePath, struct DateTime_t *dateTime) {
     /* in case the created file handle is not valid */
     if(fileHandle == INVALID_HANDLE_VALUE) {
         /* raises an error */
-        RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, "Could not create file");
+        RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Could not create file");
     }
 
     /* retrieve the file times for the file */
     if(!GetFileTime(fileHandle, &timeCreate, &timeAccess, &timeWrite)) {
         /* raises an error */
-        RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, "Problem retrieving file time");
+        RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem retrieving file time");
     }
 
     /* convert the last write time to "local" time */
