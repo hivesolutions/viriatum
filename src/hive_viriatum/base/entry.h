@@ -17,7 +17,7 @@
  You should have received a copy of the GNU General Public License
  along with Hive Viriatum Web Server. If not, see <http://www.gnu.org/licenses/>.
 
- __author__    = Jo√£o Magalh√£es <joamag@hive.pt>
+ __author__    = Jo„o Magalh„es <joamag@hive.pt>
  __version__   = 1.0.0
  __revision__  = $LastChangedRevision$
  __date__      = $LastChangedDate$
@@ -27,14 +27,22 @@
 
 #pragma once
 
-#include "../base/base.h"
-#include "../system/system.h"
+/**
+ * Starts the process of running the service, registering the
+ * appropriate handlers.
+ * This call blocks until the service is correctly stopped
+ * from a diferent flow controll.
+ */
+ERROR_CODE runService();
 
-#ifdef VIRIATUM_JNI
+/**
+ * Stops the process of a running the service.
+ * This call unblock a previous run service call.
+ */
+ERROR_CODE ranService();
 
-#include <jni.h>
-
-VIRIATUM_EXPORT_PREFIX jstring Java_pt_hive_viriatum_http_Service_run(JNIEnv *env, jclass cls);
-VIRIATUM_EXPORT_PREFIX jstring Java_pt_hive_viriatum_http_Service_ran(JNIEnv *env, jclass cls);
-
-#endif
+/**
+ * Handler callback for the kill signal.
+ * This callback stops the current service instance.
+ */
+void killHandler(int signalNumber);
