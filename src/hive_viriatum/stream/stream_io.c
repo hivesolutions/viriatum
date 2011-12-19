@@ -165,7 +165,7 @@ ERROR_CODE readHandlerStreamIo(struct Connection_t *connection) {
         }
 
         /* receives from the socket */
-        numberBytes = SOCKET_RECEIVE(connection->socketHandle, bufferPointer, 1024, 0);
+        numberBytes = SOCKET_RECEIVE(connection->socketHandle, (char *) bufferPointer, 1024, 0);
 
         /* in case the number of bytes is zero (connection closed) */
         if(numberBytes == 0) {
@@ -303,7 +303,7 @@ ERROR_CODE writeHandlerStreamIo(struct Connection_t *connection) {
         V_DEBUG_F("Sending %ld bytes through socket: %d\n", (long int) data->size, connection->socketHandle);
 
         /* sends the value retrieving the number of bytes sent */
-        numberBytes = SOCKET_SEND(connection->socketHandle, data->data, data->size, 0);
+        numberBytes = SOCKET_SEND(connection->socketHandle, (char *) data->data, data->size, 0);
 
         /* in case there was an error receiving from the socket */
         if(SOCKET_TEST_ERROR(numberBytes)) {
