@@ -242,7 +242,7 @@ ERROR_CODE processArguments(int argc, char *argv[], struct HashMap_t **arguments
 		the arguments map */
 		currentArgument = argv[index];
 		processArgument(currentArgument, argument);
-		setValueStringHashMap(arguments, argument->key, argument);
+		setValueStringHashMap(arguments, (unsigned char *) argument->key, (void *) argument);
 	}
 
 	/* sets the hash map of arguments as the value pointed
