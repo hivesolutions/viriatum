@@ -31,8 +31,6 @@
 
 #ifdef VIRIATUM_JNI
 
-static JavaVM *javaVM;
-
 jstring Java_pt_hive_viriatum_http_Service_run(JNIEnv *env, jclass cls) {
     /* allocates the return value */
     ERROR_CODE returnValue;
