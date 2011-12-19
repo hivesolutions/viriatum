@@ -228,13 +228,13 @@ void deleteIteratorHashMap(struct HashMap_t *hashMap, struct Iterator_t *iterato
 
 void resetIteratorHashMap(struct HashMap_t *hashMap, struct Iterator_t *iterator) {
     /* sets the iterator parameters as the initial index of
-	the elements buffer in the hash map */
+    the elements buffer in the hash map */
     iterator->parameters = 0;
 }
 
 void getNextIteratorHashMap(struct Iterator_t *iterator, void **nextPointer) {
-	/* retrieves the hash map associated with the iterator */
-	struct HashMap_t *hashMap = (struct HashMap_t *) iterator->structure;
+    /* retrieves the hash map associated with the iterator */
+    struct HashMap_t *hashMap = (struct HashMap_t *) iterator->structure;
 
     /* retrieves the current index offset in the elements buffer  */
     size_t currentIndex = (size_t) iterator->parameters;
@@ -245,39 +245,39 @@ void getNextIteratorHashMap(struct Iterator_t *iterator, void **nextPointer) {
     /* allocates space for the next value */
     void *next;
 
-	/* iterates continuously */
-	while(1) {
-		/* in case the current index excedes the elements
-		buffer size (it's the end of iteration) */
-		if(currentIndex >= hashMap->elementsBufferSize) {
-			/* sets the next element as null (end of iteration) */
-			next = NULL;
+    /* iterates continuously */
+    while(1) {
+        /* in case the current index excedes the elements
+        buffer size (it's the end of iteration) */
+        if(currentIndex >= hashMap->elementsBufferSize) {
+            /* sets the next element as null (end of iteration) */
+            next = NULL;
 
-			/* breaks the cycle (nothing more to process) */
-			break;
-		}
+            /* breaks the cycle (nothing more to process) */
+            break;
+        }
 
-		/* retrieves the current element from the elements
-		buffer */
-		element = &hashMap->elementsBuffer[currentIndex];
+        /* retrieves the current element from the elements
+        buffer */
+        element = &hashMap->elementsBuffer[currentIndex];
 
-		/* increments the current index value */
-		currentIndex++;
+        /* increments the current index value */
+        currentIndex++;
 
-		/* in case the current element is used it is ready
-		to be retrieved as next value in iteration */
-		if(element->used == 1) {
-			/* sets the next value in iteration as 
-			the element key (next value in iteration) */
-			next = (void *) &element->key;
+        /* in case the current element is used it is ready
+        to be retrieved as next value in iteration */
+        if(element->used == 1) {
+            /* sets the next value in iteration as
+            the element key (next value in iteration) */
+            next = (void *) &element->key;
 
-			/* breaks the cycle (found the value) */
-			break;
-		}
-	}
+            /* breaks the cycle (found the value) */
+            break;
+        }
+    }
 
-	/* sets the current index in the iterator parameters */
-	iterator->parameters = (void *) currentIndex;
+    /* sets the current index in the iterator parameters */
+    iterator->parameters = (void *) currentIndex;
 
     /* sets the next in the next pointer */
     *nextPointer = next;

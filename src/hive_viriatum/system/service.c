@@ -66,7 +66,7 @@ ERROR_CODE removeHttpHandlerService(struct Service_t *service, struct HttpHandle
 
 
 void loadOptionsService(struct Service_t *service, struct HashMap_t *arguments) {
-	
+
 
 }
 

@@ -234,32 +234,32 @@ typedef struct Service_t {
 
 
 typedef struct ServiceOptions_t {
-	/**
+    /**
      * The "default" tcp port to bind the service
-	 * associated with these options.
-	 */
-	unsigned short port;
+     * associated with these options.
+     */
+    unsigned short port;
 
-	/**
+    /**
      * The "default" address to bind the service
-	 * associated with these options.
-	 */
-	unsigned char *address;
+     * associated with these options.
+     */
+    unsigned char *address;
 
-	/**
-	 * The set of virtual hosts associated with the
-	 * current service.
-	 */
-	struct VirtualHost_t *virtualHosts;
+    /**
+     * The set of virtual hosts associated with the
+     * current service.
+     */
+    struct VirtualHost_t *virtualHosts;
 } ServiceOptions;
 
 typedef struct VirtualHost_t {
-	/**
+    /**
      * The descriptive name of the viratualç
-	 * host reference.
+     * host reference.
      * For textual representation.
      */
-    unsigned char *name;	
+    unsigned char *name;
 } VirtualHost_t;
 
 typedef enum RuleType_e {
@@ -268,12 +268,12 @@ typedef enum RuleType_e {
 } RuleType;
 
 typedef struct Rule_t {
-	enum RuleType_e type;
-	void *value;
+    enum RuleType_e type;
+    void *value;
 } Rule;
 
 typedef struct RuleDirectory_t {
-	char *path;
+    char *path;
 } RuleDirectory;
 
 
@@ -410,16 +410,16 @@ typedef struct Connection_t {
  * object or structure.
  */
 typedef enum Status_e {
-	/**
-	 * Status where the object is open
-	 * or in a running "like" state.
-	 */
+    /**
+     * Status where the object is open
+     * or in a running "like" state.
+     */
     STATUS_OPEN = 1,
 
-	/**
-	 * Status where an object is closed
-	 * or in a stopped "like" state.
-	 */
+    /**
+     * Status where an object is closed
+     * or in a stopped "like" state.
+     */
     STATUS_CLOSED
 } Status;
 
