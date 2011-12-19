@@ -82,7 +82,7 @@ void createServiceOptions(struct ServiceOptions_t **serviceOptionsPointer) {
     serviceOptions->address = NULL;
 
     /* sets the service options in the service options pointer */
-    *serviceOptionsPointer = service;
+    *serviceOptionsPointer = serviceOptions;
 }
 
 void deleteServiceOptions(struct ServiceOptions_t *serviceOptions) {
