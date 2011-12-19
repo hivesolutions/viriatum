@@ -201,6 +201,88 @@ void getValueStringHashMap(struct HashMap_t *hashMap, unsigned char *keyString, 
     getValueHashMap(hashMap, key, valuePointer);
 }
 
+void createIteratorHashMap(struct HashMap_t *hashMap, struct Iterator_t **iteratorPointer) {
+    /* allocates the iterator */
+    struct Iterator_t *iterator;
+
+    /* creates the iterator */
+    createIterator(&iterator);
+
+    /* sets the hash map in the structure */
+    iterator->structure = (void *) hashMap;
+
+    /* sets the get next function in the iterator */
+    iterator->getNextFunction = getNextIteratorHashMap;
+
+    /* resets the iterator */
+    resetIteratorHashMap(hashMap, iterator);
+
+    /* sets the iterator in the iterator pointer */
+    *iteratorPointer = iterator;
+}
+
+void deleteIteratorHashMap(struct HashMap_t *hashMap, struct Iterator_t *iterator) {
+    /* deletes the iterator */
+    deleteIterator(iterator);
+}
+
+void resetIteratorHashMap(struct HashMap_t *hashMap, struct Iterator_t *iterator) {
+    /* sets the iterator parameters as the initial index of
+	the elements buffer in the hash map */
+    iterator->parameters = 0;
+}
+
+void getNextIteratorHashMap(struct Iterator_t *iterator, void **nextPointer) {
+	/* retrieves the hash map associated with the iterator */
+	struct HashMap_t *hashMap = (struct HashMap_t *) iterator->structure;
+
+    /* retrieves the current index offset in the elements buffer  */
+    size_t currentIndex = (size_t) iterator->parameters;
+
+    /* allocates space for the hash map element to be used */
+    struct HashMapElement_t *element;
+
+    /* allocates space for the next value */
+    void *next;
+
+	/* iterates continuously */
+	while(1) {
+		/* in case the current index excedes the elements
+		buffer size (it's the end of iteration) */
+		if(currentIndex >= hashMap->elementsBufferSize) {
+			/* sets the next element as null (end of iteration) */
+			next = NULL;
+
+			/* breaks the cycle (nothing more to process) */
+			break;
+		}
+
+		/* retrieves the current element from the elements
+		buffer */
+		element = &hashMap->elementsBuffer[currentIndex];
+
+		/* increments the current index value */
+		currentIndex++;
+
+		/* in case the current element is used it is ready
+		to be retrieved as next value in iteration */
+		if(element->used == 1) {
+			/* sets the next value in iteration as 
+			the element key (next value in iteration) */
+			next = (void *) &element->key;
+
+			/* breaks the cycle (found the value) */
+			break;
+		}
+	}
+
+	/* sets the current index in the iterator parameters */
+	iterator->parameters = (void *) currentIndex;
+
+    /* sets the next in the next pointer */
+    *nextPointer = next;
+}
+
 void _resizeHashMap(struct HashMap_t *hashMap) {
     /* allocates space for the index */
     size_t index = 0;

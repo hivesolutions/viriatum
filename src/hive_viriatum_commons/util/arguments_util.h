@@ -49,6 +49,14 @@ typedef enum ArgumentType_e {
 	VALUE_ARGUMENT
 } ArgumentType;
 
+typedef enum ArgumentState_e {
+	ARGUMENT_INITIAL = 1,
+	ARGUMENT_FIRST,
+	ARGUMENT_SECOND,
+	ARGUMENT_KEY,
+	ARGUMENT_VALUE
+} ArgumentState;
+
 /**
  * Structure defining an argument received
  * from an external (data) source.
