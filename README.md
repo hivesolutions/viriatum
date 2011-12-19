@@ -30,11 +30,13 @@ Building viriatum for android involves cross compilation and the android ndk too
 
 ### Windows
 
-Under construction
+For building using the default mingw32 toolchain.
 
 * `apt-get install mingw32 mingw32-binutils`
 * `./configure --host=i586-mingw32msvc --build=i686-linux --prefix=/opt/i586-mingw32`
 * `make && make install`
+
+For building using the mingw-w63 toolchain for 64 and 32 bit options.
 
 * `apt-get install mingw-w64 gcc-mingw-w64 binutils-mingw-w64`
 * `./configure --host=x86_64-w64-mingw32 --build=i686-linux --prefix=/opt/x86_64-w64-mingw32`
