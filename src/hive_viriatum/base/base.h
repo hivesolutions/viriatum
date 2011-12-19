@@ -17,7 +17,7 @@
  You should have received a copy of the GNU General Public License
  along with Hive Viriatum Web Server. If not, see <http://www.gnu.org/licenses/>.
 
- __author__    = Jo√£o Magalh√£es <joamag@hive.pt>
+ __author__    = Jo„o Magalh„es <joamag@hive.pt>
  __version__   = 1.0.0
  __revision__  = $LastChangedRevision$
  __date__      = $LastChangedDate$
@@ -27,14 +27,4 @@
 
 #pragma once
 
-#include "../base/base.h"
-#include "../system/system.h"
-
-#ifdef VIRIATUM_JNI
-
-#include <jni.h>
-
-VIRIATUM_EXPORT_PREFIX jstring Java_pt_hive_viriatum_http_Service_run(JNIEnv *env, jclass cls);
-VIRIATUM_EXPORT_PREFIX jstring Java_pt_hive_viriatum_http_Service_ran(JNIEnv *env, jclass cls);
-
-#endif
+#include "entry.h"
