@@ -218,12 +218,12 @@ typedef struct Service_t {
      */
     SOCKET_HANDLE serviceSocketHandle;
 
-	/**
-	 * The http handler currently in use.
-	 * Only one http (parser) handler can
-	 * be used at one given time.
-	 */
-	struct HttpHandler_t *httpHandler;
+    /**
+     * The http handler currently in use.
+     * Only one http (parser) handler can
+     * be used at one given time.
+     */
+    struct HttpHandler_t *httpHandler;
 
     /**
      * The reference to the polling (provider)
@@ -277,6 +277,13 @@ typedef struct ServiceOptions_t {
      * associated with these options.
      */
     unsigned char *address;
+
+    /**
+     * The name of the "default" handler to be used
+     * in the runtime environment.
+     * Change this name carefully.
+     */
+    unsigned char *handlerName;
 
     /**
      * The default virtual host to be used in any

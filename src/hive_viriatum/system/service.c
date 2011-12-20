@@ -77,13 +77,14 @@ void loadOptionsService(struct Service_t *service, struct HashMap_t *arguments) 
 
     serviceOptions->port = VIRIATUM_DEFAULT_PORT;
     serviceOptions->address = (unsigned char *) VIRIATUM_DEFAULT_HOST;
+    serviceOptions->handlerName = (unsigned char *) VIRIATUM_DEFAULT_HANDLER;
 
     /* END DEFAULT OPTIONS */
 
-	registerHandlerDefault(service);
+    /* TODO: Move this from here */
+    registerHandlerDefault(service);
     registerHandlerFile(service);
 
-	
     /* CONFIGURATION FILE OPTIONS */
 
     /* END CONFIGURATION FILE OPTIONS */
@@ -101,6 +102,13 @@ void loadOptionsService(struct Service_t *service, struct HashMap_t *arguments) 
     if(value != NULL) {
         serviceOptions->address = (unsigned char *) ((struct Argument_t *) value)->value;
     }
+
+    getValueStringHashMap(arguments, (unsigned char *) "handler", &value);
+
+    /* in case the (handler) value is set */
+    if(value != NULL) {
+        serviceOptions->handlerName = (unsigned char *) ((struct Argument_t *) value)->value;
+    }
 }
 
 
@@ -117,6 +125,7 @@ void createServiceOptions(struct ServiceOptions_t **serviceOptionsPointer) {
     /* sets the service options attributes (default) values */
     serviceOptions->port = 0;
     serviceOptions->address = NULL;
+    serviceOptions->handlerName = NULL;
     serviceOptions->defaultVirtualHost = NULL;
 
     /* creates the hash map for the virtual hosts */
@@ -148,7 +157,7 @@ void createService(struct Service_t **servicePointer, unsigned char *name) {
     service->name = name;
     service->status = STATUS_CLOSED;
     service->serviceSocketHandle = 0;
-	service->httpHandler = NULL;
+    service->httpHandler = NULL;
     service->createHttpHandler = createHttpHandlerService;
     service->deleteHttpHandler = deleteHttpHandlerService;
     service->addHttpHandler = addHttpHandlerService;
@@ -290,9 +299,9 @@ ERROR_CODE startService(struct Service_t *service) {
     /* loads (all) the currently available modules */
     loadModulesService(service);
 
-	/* sets the current http handler accoring to the current options
-	in the service, the http handler must be loaded in the handlers map */
-	getValueStringHashMap(service->httpHandlersMap, (unsigned char *) "file", (void **) &service->httpHandler);
+    /* sets the current http handler accoring to the current options
+    in the service, the http handler must be loaded in the handlers map */
+    getValueStringHashMap(service->httpHandlersMap, serviceOptions->handlerName, (void **) &service->httpHandler);
 
     /* sets the socket address attributes */
     socketAddress.sin_family = SOCKET_INTERNET_TYPE;
