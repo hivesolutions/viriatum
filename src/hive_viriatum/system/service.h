@@ -245,11 +245,10 @@ typedef struct Service_t {
     serviceHttpHandlerUpdate removeHttpHandler;
 } Service;
 
-
-
-
-
-
+/**
+ * Structure defining the set of options/configuration
+ * for an associated service.
+ */
 typedef struct ServiceOptions_t {
     /**
      * The "default" tcp port to bind the service
@@ -311,6 +310,11 @@ typedef struct VirtualHost_t {
     struct LinkedList_t *rules;
 } VirtualHost_t;
 
+/**
+ * Enumeration defining the various types
+ * of possible rules for a given rule
+ * aggregation.
+ */
 typedef enum RuleType_e {
     DIRECTORY_RULE = 1,
     REGEX_RULE
@@ -324,14 +328,6 @@ typedef struct Rule_t {
 typedef struct RuleDirectory_t {
     char *path;
 } RuleDirectory;
-
-
-
-
-
-
-
-
 
 /**
  * Structure defining a connection
