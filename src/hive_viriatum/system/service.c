@@ -222,7 +222,7 @@ ERROR_CODE startService(struct Service_t *service) {
 
     /* registers the various "local" handlers
     in the service, for later usage */
-	registerHandlerRequest(service);
+    registerHandlerRequest(service);
     registerHandlerDefault(service);
     registerHandlerFile(service);
 
@@ -387,8 +387,8 @@ ERROR_CODE startService(struct Service_t *service) {
     /* unregisters the various "local" handlers
     from the service, for structure destruction */
     unregisterHandlerFile(service);
-	unregisterHandlerDefault(service);
-	unregisterHandlerRequest(service);
+    unregisterHandlerDefault(service);
+    unregisterHandlerRequest(service);
 
     /* raises no error */
     RAISE_NO_ERROR;
