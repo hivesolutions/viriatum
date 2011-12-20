@@ -46,6 +46,7 @@ viriatum_SOURCES = stdafx.c \
 viriatum.c \
 handlers/handler_default.c \
 handlers/handler_file.c \
+handlers/handler_request.c \
 http/http_parser.c \
 http/http_request.c \
 io/file.c \
@@ -66,6 +67,7 @@ libviriatum_http_la_SOURCES = stdafx.c \
 viriatum.c \
 handlers/handler_default.c \
 handlers/handler_file.c \
+handlers/handler_request.c \
 http/http_parser.c \
 http/http_request.c \
 io/file.c \
