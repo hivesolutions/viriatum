@@ -95,7 +95,7 @@ void loadOptionsService(struct Service_t *service, struct HashMap_t *arguments) 
 
     /* in case the (host) value is set */
     if(value != NULL) {
-        serviceOptions->address = ((struct Argument_t *) value)->value;
+        serviceOptions->address = (unsigned char *) ((struct Argument_t *) value)->value;
     }
 }
 
