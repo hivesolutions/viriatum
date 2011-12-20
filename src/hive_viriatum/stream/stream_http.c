@@ -90,7 +90,7 @@ ERROR_CODE createHttpConnection(struct HttpConnection_t **httpConnectionPointer,
 
 
     /* TODO: CHANGE THIS !!!! */
-    getValueStringHashMap(service->httpHandlersMap, "lua", (void **) &httpHandler);
+    getValueStringHashMap(service->httpHandlersMap, (unsigned char *) "lua", (void **) &httpHandler);
 
 
 
@@ -117,7 +117,7 @@ ERROR_CODE deleteHttpConnection(struct HttpConnection_t *httpConnection) {
 
 
     /* TODO: CHANGE THIS !!!! */
-    getValueStringHashMap(service->httpHandlersMap, "lua", (void **) &httpHandler);
+    getValueStringHashMap(service->httpHandlersMap, (unsigned char *) "lua", (void **) &httpHandler);
 
 
 
@@ -156,7 +156,7 @@ ERROR_CODE dataHandlerStreamHttp(struct IoConnection_t *ioConnection, unsigned c
 
 
     /* TODO: CHANGE THIS !!!! */
-    getValueStringHashMap(service->httpHandlersMap, "lua", (void **) &httpHandler);
+    getValueStringHashMap(service->httpHandlersMap, (unsigned char *) "lua", (void **) &httpHandler);
 
 
     /* sets the correct http handler in the http connection */
