@@ -598,7 +598,9 @@ ERROR_CODE _sendDataHandlerFile(struct Connection_t *connection, struct Data_t *
 
         /* runs the cleanup handler file (releases internal structures) */
         _cleanupHandlerFile(connection, data, parameters);
-    } else {
+    }
+	/* otherwise the "normal" write connection applies */
+	else {
         /* writes the (file) data to the connection and sets the handler
         file context as flushed */
         writeConnection(connection, templateHandler->stringValue, (unsigned int) strlen((char *) templateHandler->stringValue), _sendDataHandlerFile, handlerFileContext);
