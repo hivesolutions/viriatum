@@ -76,7 +76,7 @@ void loadOptionsService(struct Service_t *service, struct HashMap_t *arguments) 
     /* DEFAULT OPTIONS */
 
     serviceOptions->port = VIRIATUM_DEFAULT_PORT;
-    serviceOptions->address = VIRIATUM_DEFAULT_HOST;
+    serviceOptions->address = (unsigned char *) VIRIATUM_DEFAULT_HOST;
 
     /* END DEFAULT OPTIONS */
 
@@ -84,14 +84,14 @@ void loadOptionsService(struct Service_t *service, struct HashMap_t *arguments) 
 
     /* END CONFIGURATION FILE OPTIONS */
 
-    getValueStringHashMap(arguments, "port", &value);
+    getValueStringHashMap(arguments, (unsigned char *) "port", &value);
 
     /* in case the (port) value is set */
     if(value != NULL) {
         serviceOptions->port = (unsigned short) atoi(((struct Argument_t *) value)->value);
     }
 
-    getValueStringHashMap(arguments, "host", &value);
+    getValueStringHashMap(arguments, (unsigned char *) "host", &value);
 
     /* in case the (host) value is set */
     if(value != NULL) {
@@ -287,7 +287,7 @@ ERROR_CODE startService(struct Service_t *service) {
 
     /* sets the socket address attributes */
     socketAddress.sin_family = SOCKET_INTERNET_TYPE;
-    socketAddress.sin_addr.s_addr = inet_addr(serviceOptions->address);
+    socketAddress.sin_addr.s_addr = inet_addr((char *) serviceOptions->address);
     socketAddress.sin_port = htons(serviceOptions->port);
 
     /* creates the service socket for the given types */
