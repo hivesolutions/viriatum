@@ -147,7 +147,6 @@ int main(int argc, char *argv[]) {
 
     /* processes the various arguments into a map */
     processArguments(argc, argv, &arguments);
-    printArguments(arguments);
 
     /* runs the service, with the given arguments */
     returnValue = runService(arguments);
