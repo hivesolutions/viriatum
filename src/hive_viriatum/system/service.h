@@ -389,9 +389,11 @@ typedef struct Connection_t {
      */
     connectionUpdate closeConnection;
 
-
+    /**
+     * Function to be used to write into
+     * a connection.
+     */
     connectionWrite writeConnection;
-
 
     /**
      * Function to be used for registering
@@ -497,6 +499,21 @@ void createService(struct Service_t **servicePointer, unsigned char *name);
  * @param service The service to be destroyed.
  */
 void deleteService(struct Service_t *service);
+
+/**
+ * Constructor of the service options.
+ *
+ * @param serviceOptionsPointer The pointer to the service options to
+ * be constructed.
+ */
+void createServiceOptions(struct ServiceOptions_t **serviceOptionsPointer);
+
+/**
+ * Destructor of the service options.
+ *
+ * @param serviceOptions The service options to be destroyed.
+ */
+void deleteServiceOptions(struct ServiceOptions_t *serviceOptions);
 
 /**
  * Constructor of the data.
@@ -701,7 +718,6 @@ ERROR_CODE unregisterWriteConnection(struct Connection_t *connection);
  * @return The resulting error code.
  */
 ERROR_CODE allocConnection(struct Connection_t *connection, size_t size, void **dataPointer);
-
 ERROR_CODE createHttpHandlerService(struct Service_t *service, struct HttpHandler_t **httpHandlerPointer, unsigned char *name);
 ERROR_CODE deleteHttpHandlerService(struct Service_t *service, struct HttpHandler_t *httpHandler);
 ERROR_CODE addHttpHandlerService(struct Service_t *service, struct HttpHandler_t *httpHandler);

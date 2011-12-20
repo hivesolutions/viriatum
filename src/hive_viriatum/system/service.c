@@ -117,7 +117,7 @@ void deleteServiceOptions(struct ServiceOptions_t *serviceOptions) {
 
     /* releases the service options */
     FREE(serviceOptions);
-
+}
 
 void createData(struct Data_t **dataPointer) {
     /* retrieves the data size */
