@@ -77,7 +77,7 @@ ERROR_CODE registerHandlerFile(struct Service_t *service) {
     struct HttpHandler_t *httpHandler;
 
     /* creates the http handler */
-    service->createHttpHandler(service, &httpHandler, "file");
+    service->createHttpHandler(service, &httpHandler, (unsigned char *) "file");
 
     /* sets the http handler attributes */
     httpHandler->set = setHandlerFile;
