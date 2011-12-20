@@ -37,21 +37,6 @@ struct Polling_t;
 struct Connection_t;
 struct HttpHandler_t;
 
-
-
-
-
-void loadOptionsService(struct Service_t *service, struct HashMap_t *arguments);
-
-
-
-
-
-
-
-
-
-
 /**
  * The function used to create a new handler instance
  * with a name and for the service context.
@@ -547,6 +532,17 @@ void createPolling(struct Polling_t **pollingPointer);
 void deletePolling(struct Polling_t *polling);
 
 /**
+ * Loads the various options, from the various data sources
+ * into the service internal structures.
+ *
+ * @param service The service to be loaded with options.
+ * @param arguments The (command line) argument map to be used
+ * during the options loading.
+ * @return The resulting error code.
+ */
+ERROR_CODE loadOptionsService(struct Service_t *service, struct HashMap_t *arguments);
+
+/**
  * Starts the given service, initializing the
  * internal structures and the main loop.
  *
@@ -709,3 +705,11 @@ ERROR_CODE unregisterWriteConnection(struct Connection_t *connection);
  * @return The resulting error code.
  */
 ERROR_CODE allocConnection(struct Connection_t *connection, size_t size, void **dataPointer);
+
+ERROR_CODE createHttpHandlerService(struct Service_t *service, struct HttpHandler_t **httpHandlerPointer, unsigned char *name);
+ERROR_CODE deleteHttpHandlerService(struct Service_t *service, struct HttpHandler_t *httpHandler);
+ERROR_CODE addHttpHandlerService(struct Service_t *service, struct HttpHandler_t *httpHandler);
+ERROR_CODE removeHttpHandlerService(struct Service_t *service, struct HttpHandler_t *httpHandler);
+ERROR_CODE _defaultOptionsService(struct Service_t *service, struct HashMap_t *arguments);
+ERROR_CODE _fileOptionsService(struct Service_t *service, struct HashMap_t *arguments);
+ERROR_CODE _comandLineOptionsService(struct Service_t *service, struct HashMap_t *arguments);
