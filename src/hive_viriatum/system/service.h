@@ -37,6 +37,21 @@ struct Polling_t;
 struct Connection_t;
 struct HttpHandler_t;
 
+
+
+
+
+void loadOptionsService(struct Service_t *service, struct HashMap_t *arguments);
+
+
+
+
+
+
+
+
+
+
 /**
  * The function used to create a new handler instance
  * with a name and for the service context.
