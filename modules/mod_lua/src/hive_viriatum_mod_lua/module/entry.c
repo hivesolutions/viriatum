@@ -103,7 +103,7 @@ ERROR_CODE startModule(struct Environment_t *environment, struct Module_t *modul
     _startLuaState(luaState);
 
     /* creates the http handler */
-    service->createHttpHandler(service, &httpHandler, "lua");
+    service->createHttpHandler(service, &httpHandler, (unsigned char *) "lua");
 
     /* creates the mod lua http handler */
     createModLuaHttpHandler(&modLuaHttpHandler, httpHandler);
