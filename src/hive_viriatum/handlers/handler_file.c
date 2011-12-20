@@ -91,6 +91,20 @@ ERROR_CODE registerHandlerFile(struct Service_t *service) {
     RAISE_NO_ERROR;
 }
 
+ERROR_CODE unregisterHandlerFile(struct Service_t *service) {
+    /* allocates the http handler */
+    struct HttpHandler_t *httpHandler;
+
+    /* retrieves the http handler from the service, then
+    remove it from the service after that delete the handler */
+    service->getHttpHandler(service, &httpHandler, (unsigned char *) "file");
+    service->removeHttpHandler(service, httpHandler);
+    service->deleteHttpHandler(service, httpHandler);
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
 ERROR_CODE setHandlerFile(struct HttpConnection_t *httpConnection) {
     /* sets the http parser values */
     _setHttpParserHandlerFile(httpConnection->httpParser);
