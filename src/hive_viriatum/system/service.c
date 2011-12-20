@@ -80,6 +80,9 @@ void loadOptionsService(struct Service_t *service, struct HashMap_t *arguments) 
 
     /* END DEFAULT OPTIONS */
 
+
+    registerHandlerFile(service);
+
     /* CONFIGURATION FILE OPTIONS */
 
     /* END CONFIGURATION FILE OPTIONS */

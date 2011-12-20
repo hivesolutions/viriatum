@@ -87,17 +87,10 @@ ERROR_CODE createHttpConnection(struct HttpConnection_t **httpConnectionPointer,
     /* sets the http connection in the (upper) io connection substrate */
     ioConnection->lower = httpConnection;
 
-
-
-    /* TODO: CHANGE THIS !!!! */
-    getValueStringHashMap(service->httpHandlersMap, (unsigned char *) "lua", (void **) &httpHandler);
-
-
-
-    /* sets the structures for the handler */
+    /* retrieves the current (default) service handler and sets the
+    connection on it */
+    getValueStringHashMap(service->httpHandlersMap, (unsigned char *) "file", (void **) &httpHandler);
     httpHandler->set(httpConnection);
-
-    /*setHandlerFile(httpConnection);*/ /* -> CONVERTER ISTO AO NOVO MODELO */
 
     /* sets the http connection in the http connection pointer */
     *httpConnectionPointer = httpConnection;
@@ -114,21 +107,10 @@ ERROR_CODE deleteHttpConnection(struct HttpConnection_t *httpConnection) {
     /* retrieves the service from the http connection */
     struct Service_t *service = httpConnection->ioConnection->connection->service;
 
-
-
-    /* TODO: CHANGE THIS !!!! */
-    getValueStringHashMap(service->httpHandlersMap, (unsigned char *) "lua", (void **) &httpHandler);
-
-
-
-    /* unsets the structures for the handler */
+    /* retrieves the currently assigned handler and usets the connection
+    from with (unregister connection) */
+    getValueStringHashMap(service->httpHandlersMap, (unsigned char *) "file", (void **) &httpHandler);
     httpHandler->unset(httpConnection);
-
-    /*unsetHandlerFile(httpConnection);*/
-
-
-
-
 
     /* deletes the http parser */
     deleteHttpParser(httpConnection->httpParser);
@@ -154,21 +136,22 @@ ERROR_CODE dataHandlerStreamHttp(struct IoConnection_t *ioConnection, unsigned c
     /* retrieves the service from the http connection */
     struct Service_t *service = httpConnection->ioConnection->connection->service;
 
-
-    /* TODO: CHANGE THIS !!!! */
-    getValueStringHashMap(service->httpHandlersMap, (unsigned char *) "lua", (void **) &httpHandler);
-
-
-    /* sets the correct http handler in the http connection */
+    /* retrieves the current (default) service handler and sets its
+    value on the http connection */
+    getValueStringHashMap(service->httpHandlersMap, (unsigned char *) "file", (void **) &httpHandler);
     httpConnection->httpHandler = httpHandler;
 
-
-
-    /* TENHO DE POR ESTE METODO como resetHandlerFile() */
-
-    /* _resetHttpParserHandlerFile(httpConnection->httpParser); */
+    /* in case the reset callback is set in the http
+    handler, must call it */
+    if(httpHandler->reset != NULL) {
+        /* calls the reset callback (for the connection)
+        in the http handler */
+        httpHandler->reset(httpConnection);
+    }
 
     // TODO: tenho de testar quantos bytes processei !!!
+    // NAO posso assumir que por cada pacote de dados que recebo
+    // tenho uma nova mensagem
     /* process the http data for the http parser */
     processDataHttpParser(httpConnection->httpParser, httpConnection->httpSettings, buffer, bufferSize);
 

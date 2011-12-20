@@ -72,6 +72,25 @@ ERROR_CODE deleteHandlerFileContext(struct HandlerFileContext_t *handlerFileCont
     RAISE_NO_ERROR;
 }
 
+ERROR_CODE registerHandlerFile(struct Service_t *service) {
+    /* allocates the http handler */
+    struct HttpHandler_t *httpHandler;
+
+    /* creates the http handler */
+    service->createHttpHandler(service, &httpHandler, "file");
+
+    /* sets the http handler attributes */
+    httpHandler->set = setHandlerFile;
+    httpHandler->unset = unsetHandlerFile;
+    httpHandler->reset = resetHandlerFile;
+
+    /* adds the http handler to the service */
+    service->addHttpHandler(service, httpHandler);
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
 ERROR_CODE setHandlerFile(struct HttpConnection_t *httpConnection) {
     /* sets the http parser values */
     _setHttpParserHandlerFile(httpConnection->httpParser);
@@ -89,6 +108,14 @@ ERROR_CODE unsetHandlerFile(struct HttpConnection_t *httpConnection) {
 
     /* unsets the http settings values */
     _unsetHttpSettingsHandlerFile(httpConnection->httpSettings);
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE resetHandlerFile(struct HttpConnection_t *httpConnection) {
+    /* resets the http parser values */
+    _resetHttpParserHandlerFile(httpConnection->httpParser);
 
     /* raises no error */
     RAISE_NO_ERROR;
