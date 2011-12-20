@@ -29,37 +29,6 @@
 
 #include "service.h"
 
-void createServiceOptions(struct ServiceOptions_t **serviceOptionsPointer) {
-    /* retrieves the service options size */
-    size_t serviceOptionsSize = sizeof(struct ServiceOptions_t);
-
-    /* allocates space for the service options */
-    struct ServiceOptions_t *serviceOptions = (struct ServiceOptions_t *) MALLOC(serviceOptionsSize);
-
-    /* sets the service options attributes (default) values */
-    serviceOptions->port = 0;
-    serviceOptions->address = NULL;
-    serviceOptions->handlerName = NULL;
-    serviceOptions->defaultVirtualHost = NULL;
-
-    /* creates the hash map for the virtual hosts */
-    createHashMap(&serviceOptions->virtualHosts, 0);
-
-    /* sets the service options in the service options pointer */
-    *serviceOptionsPointer = serviceOptions;
-}
-
-void deleteServiceOptions(struct ServiceOptions_t *serviceOptions) {
-    /* deletes the hash map for the virtual hosts */
-    deleteHashMap(serviceOptions->virtualHosts);
-
-    /* releases the service options */
-    FREE(serviceOptions);
-}
-
-
-
-
 void createService(struct Service_t **servicePointer, unsigned char *name) {
     /* retrieves the service size */
     size_t serviceSize = sizeof(struct Service_t);
@@ -121,6 +90,34 @@ void deleteService(struct Service_t *service) {
     /* releases the service */
     FREE(service);
 }
+
+void createServiceOptions(struct ServiceOptions_t **serviceOptionsPointer) {
+    /* retrieves the service options size */
+    size_t serviceOptionsSize = sizeof(struct ServiceOptions_t);
+
+    /* allocates space for the service options */
+    struct ServiceOptions_t *serviceOptions = (struct ServiceOptions_t *) MALLOC(serviceOptionsSize);
+
+    /* sets the service options attributes (default) values */
+    serviceOptions->port = 0;
+    serviceOptions->address = NULL;
+    serviceOptions->handlerName = NULL;
+    serviceOptions->defaultVirtualHost = NULL;
+
+    /* creates the hash map for the virtual hosts */
+    createHashMap(&serviceOptions->virtualHosts, 0);
+
+    /* sets the service options in the service options pointer */
+    *serviceOptionsPointer = serviceOptions;
+}
+
+void deleteServiceOptions(struct ServiceOptions_t *serviceOptions) {
+    /* deletes the hash map for the virtual hosts */
+    deleteHashMap(serviceOptions->virtualHosts);
+
+    /* releases the service options */
+    FREE(serviceOptions);
+
 
 void createData(struct Data_t **dataPointer) {
     /* retrieves the data size */
