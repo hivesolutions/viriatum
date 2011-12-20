@@ -61,7 +61,8 @@ structures/type.c \
 system/_thread_win32.c \
 template/engine.c \
 template/handler.c \
-thread/thread_pool.c
+thread/thread_pool.c \
+util/arguments_util.c
 
 libviriatum_la_SOURCES = stdafx.c \
 checksum/crc_32.c \
@@ -87,4 +88,5 @@ structures/type.c \
 system/_thread_win32.c \
 template/engine.c \
 template/handler.c \
-thread/thread_pool.c
+thread/thread_pool.c \
+util/arguments_util.c
