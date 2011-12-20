@@ -138,7 +138,7 @@ ERROR_CODE dataHandlerStreamHttp(struct IoConnection_t *ioConnection, unsigned c
 
     /* retrieves the current (default) service handler and sets its
     value on the http connection */
-	httpHandler = service->httpHandler;
+    httpHandler = service->httpHandler;
     httpConnection->httpHandler = httpHandler;
 
     /* in case the reset callback is set in the http
