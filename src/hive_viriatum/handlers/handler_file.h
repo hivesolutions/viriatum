@@ -96,8 +96,10 @@ typedef struct HandlerFileContext_t {
 
 ERROR_CODE createHandlerFileContext(struct HandlerFileContext_t **handlerFileContextPointer);
 ERROR_CODE deleteHandlerFileContext(struct HandlerFileContext_t *handlerFileContext);
+ERROR_CODE registerHandlerFile(struct Service_t *service);
 ERROR_CODE setHandlerFile(struct HttpConnection_t *httpConnection);
 ERROR_CODE unsetHandlerFile(struct HttpConnection_t *httpConnection);
+ERROR_CODE resetHandlerFile(struct HttpConnection_t *httpConnection);
 ERROR_CODE messageBeginCallbackHandlerFile(struct HttpParser_t *httpParser);
 ERROR_CODE urlCallbackHandlerFile(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize);
 ERROR_CODE headerFieldCallbackHandlerFile(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize);
@@ -107,6 +109,7 @@ ERROR_CODE bodyCallbackHandlerFile(struct HttpParser_t *httpParser, const unsign
 ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser);
 ERROR_CODE _setHttpParserHandlerFile(struct HttpParser_t *httpParser);
 ERROR_CODE _unsetHttpParserHandlerFile(struct HttpParser_t *httpParser);
+ERROR_CODE _resetHttpParserHandlerFile(struct HttpParser_t *httpParser);
 ERROR_CODE _setHttpSettingsHandlerFile(struct HttpSettings_t *httpSettings);
 ERROR_CODE _unsetHttpSettingsHandlerFile(struct HttpSettings_t *httpSettings);
 ERROR_CODE _cleanupHandlerFile(struct Connection_t *connection, struct Data_t *data, void *parameters);
