@@ -29,3 +29,4 @@
 
 #include "handler_default.h"
 #include "handler_file.h"
+#include "handler_request.h"
