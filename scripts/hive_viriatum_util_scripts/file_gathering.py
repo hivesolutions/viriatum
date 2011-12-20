@@ -99,26 +99,27 @@ for source_dir in SOURCE_DIRS:
     # opens the file
     file = open(filename, "w+")
 
-    # determines the length of path names
-    path_names_size = len(path_names)
+    try:
+        # determines the length of path names
+        path_names_size = len(path_names)
 
-    # prints out the path names
-    for path_name_index in range(path_names_size):
-        # retrieves the current path name
-        path_name = path_names[path_name_index]
+        # prints out the path names
+        for path_name_index in range(path_names_size):
+            # retrieves the current path name
+            path_name = path_names[path_name_index]
 
-        # in case it's the last path
-        if path_name_index == path_names_size - 1:
-            # removes the appending slash
-            file.write(path_name.replace("\\", ""))
-        # otherwise
-        else:
-            file.write(path_name)
+            # in case it's the last path
+            if path_name_index == path_names_size - 1:
+                # removes the appending slash
+                file.write(path_name.replace("\\", ""))
+            # otherwise
+            else:
+                file.write(path_name)
 
+            file.write("\n")
+
+        # adds new line at end of file
         file.write("\n")
-
-    # adds new line at end of file
-    file.write("\n")
-
-    # closes the file
-    file.close()
+    finally:
+        # closes the file
+        file.close()
