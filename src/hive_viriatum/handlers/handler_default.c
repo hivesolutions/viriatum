@@ -29,6 +29,25 @@
 
 #include "handler_default.h"
 
+ERROR_CODE registerHandlerDefault(struct Service_t *service) {
+    /* allocates the http handler */
+    struct HttpHandler_t *httpHandler;
+
+    /* creates the http handler */
+    service->createHttpHandler(service, &httpHandler, (unsigned char *) "default");
+
+    /* sets the http handler attributes */
+    httpHandler->set = setHandlerDefault;
+    httpHandler->unset = unsetHandlerDefault;
+    httpHandler->reset = NULL;
+
+    /* adds the http handler to the service */
+    service->addHttpHandler(service, httpHandler);
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
 ERROR_CODE setHandlerDefault(struct HttpConnection_t *httpConnection) {
     /* sets the http parser values */
     _setHttpParserHandlerDefault(httpConnection->httpParser);

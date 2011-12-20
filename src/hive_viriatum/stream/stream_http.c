@@ -89,7 +89,7 @@ ERROR_CODE createHttpConnection(struct HttpConnection_t **httpConnectionPointer,
 
     /* retrieves the current (default) service handler and sets the
     connection on it */
-    getValueStringHashMap(service->httpHandlersMap, (unsigned char *) "file", (void **) &httpHandler);
+    httpHandler = service->httpHandler;
     httpHandler->set(httpConnection);
 
     /* sets the http connection in the http connection pointer */
@@ -109,7 +109,7 @@ ERROR_CODE deleteHttpConnection(struct HttpConnection_t *httpConnection) {
 
     /* retrieves the currently assigned handler and usets the connection
     from with (unregister connection) */
-    getValueStringHashMap(service->httpHandlersMap, (unsigned char *) "file", (void **) &httpHandler);
+    httpHandler = service->httpHandler;
     httpHandler->unset(httpConnection);
 
     /* deletes the http parser */
@@ -138,7 +138,7 @@ ERROR_CODE dataHandlerStreamHttp(struct IoConnection_t *ioConnection, unsigned c
 
     /* retrieves the current (default) service handler and sets its
     value on the http connection */
-    getValueStringHashMap(service->httpHandlersMap, (unsigned char *) "file", (void **) &httpHandler);
+	httpHandler = service->httpHandler;
     httpConnection->httpHandler = httpHandler;
 
     /* in case the reset callback is set in the http

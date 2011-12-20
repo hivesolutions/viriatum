@@ -35,6 +35,7 @@ struct Data_t;
 struct Connection_t;
 struct HttpConnection_t;
 
+ERROR_CODE registerHandlerDefault(struct Service_t *service);
 ERROR_CODE setHandlerDefault(struct HttpConnection_t *httpConnection);
 ERROR_CODE unsetHandlerDefault(struct HttpConnection_t *httpConnection);
 ERROR_CODE messageBeginCallbackHandlerDefault(struct HttpParser_t *httpParser);

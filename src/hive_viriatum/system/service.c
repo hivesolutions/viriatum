@@ -80,9 +80,10 @@ void loadOptionsService(struct Service_t *service, struct HashMap_t *arguments) 
 
     /* END DEFAULT OPTIONS */
 
-
+	registerHandlerDefault(service);
     registerHandlerFile(service);
 
+	
     /* CONFIGURATION FILE OPTIONS */
 
     /* END CONFIGURATION FILE OPTIONS */
@@ -147,6 +148,7 @@ void createService(struct Service_t **servicePointer, unsigned char *name) {
     service->name = name;
     service->status = STATUS_CLOSED;
     service->serviceSocketHandle = 0;
+	service->httpHandler = NULL;
     service->createHttpHandler = createHttpHandlerService;
     service->deleteHttpHandler = deleteHttpHandlerService;
     service->addHttpHandler = addHttpHandlerService;
@@ -287,6 +289,10 @@ ERROR_CODE startService(struct Service_t *service) {
 
     /* loads (all) the currently available modules */
     loadModulesService(service);
+
+	/* sets the current http handler accoring to the current options
+	in the service, the http handler must be loaded in the handlers map */
+	getValueStringHashMap(service->httpHandlersMap, (unsigned char *) "file", (void **) &service->httpHandler);
 
     /* sets the socket address attributes */
     socketAddress.sin_family = SOCKET_INTERNET_TYPE;

@@ -218,6 +218,13 @@ typedef struct Service_t {
      */
     SOCKET_HANDLE serviceSocketHandle;
 
+	/**
+	 * The http handler currently in use.
+	 * Only one http (parser) handler can
+	 * be used at one given time.
+	 */
+	struct HttpHandler_t *httpHandler;
+
     /**
      * The reference to the polling (provider)
      * used by the service.
