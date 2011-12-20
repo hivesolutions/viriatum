@@ -29,92 +29,6 @@
 
 #include "service.h"
 
-ERROR_CODE createHttpHandlerService(struct Service_t *service, struct HttpHandler_t **httpHandlerPointer, unsigned char *name) {
-    /* creates the http handler */
-    createHttpHandler(httpHandlerPointer, name);
-
-    /* raises no error */
-    RAISE_NO_ERROR;
-}
-
-ERROR_CODE deleteHttpHandlerService(struct Service_t *service, struct HttpHandler_t *httpHandler) {
-    /* deletes the http handler */
-    deleteHttpHandler(httpHandler);
-
-    /* raises no error */
-    RAISE_NO_ERROR;
-}
-
-ERROR_CODE addHttpHandlerService(struct Service_t *service, struct HttpHandler_t *httpHandler) {
-    /* sets the http handler in the http handers map for the handler name */
-    setValueStringHashMap(service->httpHandlersMap, httpHandler->name, (void *) httpHandler);
-
-    /* raises no error */
-    RAISE_NO_ERROR;
-}
-
-ERROR_CODE removeHttpHandlerService(struct Service_t *service, struct HttpHandler_t *httpHandler) {
-    /* unsets the http handler from the http handers map */
-    setValueStringHashMap(service->httpHandlersMap, httpHandler->name, NULL);
-
-    /* raises no error */
-    RAISE_NO_ERROR;
-}
-
-
-
-
-
-void loadOptionsService(struct Service_t *service, struct HashMap_t *arguments) {
-    /* allocates the value reference to be used
-    during the arguments retrieval */
-    void *value;
-
-    /* unpacks the service options from the service */
-    struct ServiceOptions_t *serviceOptions = service->options;
-
-    /* DEFAULT OPTIONS */
-
-    serviceOptions->port = VIRIATUM_DEFAULT_PORT;
-    serviceOptions->address = (unsigned char *) VIRIATUM_DEFAULT_HOST;
-    serviceOptions->handlerName = (unsigned char *) VIRIATUM_DEFAULT_HANDLER;
-
-    /* END DEFAULT OPTIONS */
-
-    /* TODO: Move this from here */
-    registerHandlerDefault(service);
-    registerHandlerFile(service);
-
-    /* CONFIGURATION FILE OPTIONS */
-
-    /* END CONFIGURATION FILE OPTIONS */
-
-    getValueStringHashMap(arguments, (unsigned char *) "port", &value);
-
-    /* in case the (port) value is set */
-    if(value != NULL) {
-        serviceOptions->port = (unsigned short) atoi(((struct Argument_t *) value)->value);
-    }
-
-    getValueStringHashMap(arguments, (unsigned char *) "host", &value);
-
-    /* in case the (host) value is set */
-    if(value != NULL) {
-        serviceOptions->address = (unsigned char *) ((struct Argument_t *) value)->value;
-    }
-
-    getValueStringHashMap(arguments, (unsigned char *) "handler", &value);
-
-    /* in case the (handler) value is set */
-    if(value != NULL) {
-        serviceOptions->handlerName = (unsigned char *) ((struct Argument_t *) value)->value;
-    }
-}
-
-
-
-
-
 void createServiceOptions(struct ServiceOptions_t **serviceOptionsPointer) {
     /* retrieves the service options size */
     size_t serviceOptionsSize = sizeof(struct ServiceOptions_t);
@@ -260,6 +174,23 @@ void createPolling(struct Polling_t **pollingPointer) {
 void deletePolling(struct Polling_t *polling) {
     /* releases the polling */
     FREE(polling);
+}
+
+ERROR_CODE loadOptionsService(struct Service_t *service, struct HashMap_t *arguments) {
+    /* loads the options from the various sources, note
+    that the loading order is important because the last
+    loading takes priority over the previous ones */
+    _defaultOptionsService(service, arguments);
+    _fileOptionsService(service, arguments);
+    _comandLineOptionsService(service, arguments);
+
+    /* registers the various "local" handlers
+    in the service, for later usage */
+    registerHandlerDefault(service);
+    registerHandlerFile(service);
+
+    /* raises no error */
+    RAISE_NO_ERROR;
 }
 
 ERROR_CODE startService(struct Service_t *service) {
@@ -843,6 +774,95 @@ ERROR_CODE unregisterWriteConnection(struct Connection_t *connection) {
 ERROR_CODE allocConnection(struct Connection_t *connection, size_t size, void **dataPointer) {
     /* allocates a data chunk with the required size */
     *dataPointer = MALLOC(size);
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE createHttpHandlerService(struct Service_t *service, struct HttpHandler_t **httpHandlerPointer, unsigned char *name) {
+    /* creates the http handler */
+    createHttpHandler(httpHandlerPointer, name);
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE deleteHttpHandlerService(struct Service_t *service, struct HttpHandler_t *httpHandler) {
+    /* deletes the http handler */
+    deleteHttpHandler(httpHandler);
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE addHttpHandlerService(struct Service_t *service, struct HttpHandler_t *httpHandler) {
+    /* sets the http handler in the http handers map for the handler name */
+    setValueStringHashMap(service->httpHandlersMap, httpHandler->name, (void *) httpHandler);
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE removeHttpHandlerService(struct Service_t *service, struct HttpHandler_t *httpHandler) {
+    /* unsets the http handler from the http handers map */
+    setValueStringHashMap(service->httpHandlersMap, httpHandler->name, NULL);
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE _defaultOptionsService(struct Service_t *service, struct HashMap_t *arguments) {
+    /* unpacks the service options from the service */
+    struct ServiceOptions_t *serviceOptions = service->options;
+
+    /* sets the varius default service options */
+    serviceOptions->port = VIRIATUM_DEFAULT_PORT;
+    serviceOptions->address = (unsigned char *) VIRIATUM_DEFAULT_HOST;
+    serviceOptions->handlerName = (unsigned char *) VIRIATUM_DEFAULT_HANDLER;
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE _fileOptionsService(struct Service_t *service, struct HashMap_t *arguments) {
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE _comandLineOptionsService(struct Service_t *service, struct HashMap_t *arguments) {
+    /* allocates the value reference to be used
+    during the arguments retrieval */
+    void *value;
+
+    /* unpacks the service options from the service */
+    struct ServiceOptions_t *serviceOptions = service->options;
+
+    /* tries to retrieve the port argument from the arguments map */
+    getValueStringHashMap(arguments, (unsigned char *) "port", &value);
+
+    /* in case the (port) value is set */
+    if(value != NULL) {
+        /* casts the port value into integer and set it in the service options */
+        serviceOptions->port = (unsigned short) atoi(((struct Argument_t *) value)->value);
+    }
+
+    /* tries to retrieve the host argument from the arguments map */
+    getValueStringHashMap(arguments, (unsigned char *) "host", &value);
+
+    /* in case the (host) value is set */
+    if(value != NULL) {
+        /* sets the address value in the service options */
+        serviceOptions->address = (unsigned char *) ((struct Argument_t *) value)->value;
+    }
+
+    /* tries to retrieve the handler argument from the arguments map */
+    getValueStringHashMap(arguments, (unsigned char *) "handler", &value);
+
+    /* in case the (handler) value is set */
+    if(value != NULL) {
+        /* sets the handler name value in the service options */
+        serviceOptions->handlerName = (unsigned char *) ((struct Argument_t *) value)->value;
+    }
 
     /* raises no error */
     RAISE_NO_ERROR;
