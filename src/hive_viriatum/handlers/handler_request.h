@@ -27,26 +27,10 @@
 
 #pragma once
 
-typedef enum HttpRequestMethod_e {
-    GET_REQUEST_METHOD = 1,
-    POST_REQUEST_METHOD = 1
-} HttpRequestMethod;
+#include "../system/system.h"
 
-typedef struct HttpRequest_t {
-    enum HttpRequestMethod_e method;
-    unsigned char *data;
-} HttpRequest;
-
-/**
- * Constructor of the http request.
- *
- * @param httpRequestPointer The pointer to the http request to be constructed.
- */
-void createHttpRequest(struct HttpRequest_t **httpRequestPointer);
-
-/**
- * Destructor of the http request.
- *
- * @param httpRequest The http request to be destroyed.
- */
-void deleteHttpRequest(struct HttpRequest_t *httpRequest);
+ERROR_CODE registerHandlerRequest(struct Service_t *service);
+ERROR_CODE unregisterHandlerRequest(struct Service_t *service);
+ERROR_CODE setHandlerRequest(struct HttpConnection_t *httpConnection);
+ERROR_CODE unsetHandlerRequest(struct HttpConnection_t *httpConnection);
+ERROR_CODE resetHandlerRequest(struct HttpConnection_t *httpConnection);

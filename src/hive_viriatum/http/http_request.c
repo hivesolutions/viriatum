@@ -36,6 +36,10 @@ void createHttpRequest(struct HttpRequest_t **httpRequestPointer) {
     /* allocates space for the http request */
     struct HttpRequest_t *httpRequest = (struct HttpRequest_t *) MALLOC(httpRequestSize);
 
+    /* sets the http request default attributes */
+    httpRequest->method = GET_REQUEST_METHOD;
+    httpRequest->data = NULL;
+
     /* sets the http request in the http request pointer */
     *httpRequestPointer = httpRequest;
 }
