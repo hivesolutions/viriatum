@@ -45,6 +45,7 @@ void createService(struct Service_t **servicePointer, unsigned char *name) {
     service->deleteHttpHandler = deleteHttpHandlerService;
     service->addHttpHandler = addHttpHandlerService;
     service->removeHttpHandler = removeHttpHandlerService;
+    service->getHttpHandler = getHttpHandlerService;
 
     /* creates the service options */
     createServiceOptions(&service->options);
@@ -181,11 +182,6 @@ ERROR_CODE loadOptionsService(struct Service_t *service, struct HashMap_t *argum
     _fileOptionsService(service, arguments);
     _comandLineOptionsService(service, arguments);
 
-    /* registers the various "local" handlers
-    in the service, for later usage */
-    registerHandlerDefault(service);
-    registerHandlerFile(service);
-
     /* raises no error */
     RAISE_NO_ERROR;
 }
@@ -223,6 +219,11 @@ ERROR_CODE startService(struct Service_t *service) {
 
     /* unpacks the service options from the service structure */
     struct ServiceOptions_t *serviceOptions = service->options;
+
+    /* registers the various "local" handlers
+    in the service, for later usage */
+    registerHandlerDefault(service);
+    registerHandlerFile(service);
 
     /* loads (all) the currently available modules */
     loadModulesService(service);
@@ -381,6 +382,11 @@ ERROR_CODE startService(struct Service_t *service) {
 
     /* unloads the modules for the service */
     unloadModulesService(service);
+
+    /* unregisters the various "local" handlers
+    from the service, for structure destruction */
+    unregisterHandlerDefault(service);
+    unregisterHandlerFile(service);
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -803,6 +809,15 @@ ERROR_CODE addHttpHandlerService(struct Service_t *service, struct HttpHandler_t
 ERROR_CODE removeHttpHandlerService(struct Service_t *service, struct HttpHandler_t *httpHandler) {
     /* unsets the http handler from the http handers map */
     setValueStringHashMap(service->httpHandlersMap, httpHandler->name, NULL);
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE getHttpHandlerService(struct Service_t *service, struct HttpHandler_t **httpHandlerPointer, unsigned char *name) {
+    /* tries to retrieve the http handler for the given name from the
+    http handlers map to return it as the appropriate handler */
+    getValueStringHashMap(service->httpHandlersMap, name, (void **) httpHandlerPointer);
 
     /* raises no error */
     RAISE_NO_ERROR;

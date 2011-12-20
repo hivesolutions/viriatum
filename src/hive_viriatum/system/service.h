@@ -41,7 +41,7 @@ struct HttpHandler_t;
  * The function used to create a new handler instance
  * with a name and for the service context.
  */
-typedef ERROR_CODE (*serviceHttpHandlerCreate) (struct Service_t *, struct HttpHandler_t **, unsigned char *name);
+typedef ERROR_CODE (*serviceHttpHandlerAccess) (struct Service_t *, struct HttpHandler_t **, unsigned char *name);
 
 /**
  * The function used to update an handler state or value.
@@ -239,10 +239,11 @@ typedef struct Service_t {
      */
     struct HashMap_t *httpHandlersMap;
 
-    serviceHttpHandlerCreate createHttpHandler;
+    serviceHttpHandlerAccess createHttpHandler;
     serviceHttpHandlerUpdate deleteHttpHandler;
     serviceHttpHandlerUpdate addHttpHandler;
     serviceHttpHandlerUpdate removeHttpHandler;
+    serviceHttpHandlerAccess getHttpHandler;
 } Service;
 
 /**
@@ -722,6 +723,7 @@ ERROR_CODE createHttpHandlerService(struct Service_t *service, struct HttpHandle
 ERROR_CODE deleteHttpHandlerService(struct Service_t *service, struct HttpHandler_t *httpHandler);
 ERROR_CODE addHttpHandlerService(struct Service_t *service, struct HttpHandler_t *httpHandler);
 ERROR_CODE removeHttpHandlerService(struct Service_t *service, struct HttpHandler_t *httpHandler);
+ERROR_CODE getHttpHandlerService(struct Service_t *service, struct HttpHandler_t **httpHandlerPointer, unsigned char *name);
 ERROR_CODE _defaultOptionsService(struct Service_t *service, struct HashMap_t *arguments);
 ERROR_CODE _fileOptionsService(struct Service_t *service, struct HashMap_t *arguments);
 ERROR_CODE _comandLineOptionsService(struct Service_t *service, struct HashMap_t *arguments);

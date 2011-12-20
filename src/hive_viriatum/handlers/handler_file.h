@@ -97,6 +97,7 @@ typedef struct HandlerFileContext_t {
 ERROR_CODE createHandlerFileContext(struct HandlerFileContext_t **handlerFileContextPointer);
 ERROR_CODE deleteHandlerFileContext(struct HandlerFileContext_t *handlerFileContext);
 ERROR_CODE registerHandlerFile(struct Service_t *service);
+ERROR_CODE unregisterHandlerFile(struct Service_t *service);
 ERROR_CODE setHandlerFile(struct HttpConnection_t *httpConnection);
 ERROR_CODE unsetHandlerFile(struct HttpConnection_t *httpConnection);
 ERROR_CODE resetHandlerFile(struct HttpConnection_t *httpConnection);
