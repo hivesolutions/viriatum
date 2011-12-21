@@ -114,7 +114,7 @@ ERROR_CODE loadModule(struct Service_t *service, unsigned char *modulePath) {
     /* in case the mod library was not loaded */
     if(modLibrary == NULL) {
         /* retrieves the library error message */
-        char *errorMessage = GET_LIBRARY_ERROR_MESSAGE();
+        const char *errorMessage = GET_LIBRARY_ERROR_MESSAGE();
 
         /* in case no error message is found, must
         set the default errro message */
