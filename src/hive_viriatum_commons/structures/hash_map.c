@@ -130,6 +130,7 @@ void setValueHashMap(struct HashMap_t *hashMap, size_t key, void *value) {
     /* increments the hash map size */
     hashMap->size++;
 }
+
 void setValueStringHashMap(struct HashMap_t *hashMap, unsigned char *keyString, void *value) {
     /* calculates the key (hash) value from the key string
     and uses it to set the value in the hash map */
