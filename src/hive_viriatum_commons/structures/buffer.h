@@ -27,8 +27,24 @@
 
 #pragma once
 
+/**
+ * Structure defining a buffer object
+ * that is a simple sequence of bytes in
+ * memory with an associated size.
+ */
 typedef struct Buffer_t {
+    /**
+     * The memory pointer to the initial
+     * position of the buffer.
+     */
     void *pointer;
+
+    /**
+     * The size (in bytes) of the memory
+     * buffer.
+     * The final pointer position is the
+     * base pointer plus this size.
+     */
     size_t size;
 } Buffer;
 
