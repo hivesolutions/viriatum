@@ -63,3 +63,8 @@ VIRIATUM_EXPORT_PREFIX void deleteBuffer(struct Buffer_t *buffer);
  * object must be released by the caller function (owner).
  */
 VIRIATUM_EXPORT_PREFIX char *toStringBuffer(struct Buffer_t *buffer);
+
+static __inline char equalsBuffer(struct Buffer_t *buffer, struct Buffer_t *target) {
+    return buffer->size == target->size
+        && memcmp(buffer->pointer, target->pointer, buffer->size) == 0;
+}
