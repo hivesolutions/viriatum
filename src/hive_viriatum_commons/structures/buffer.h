@@ -28,8 +28,22 @@
 #pragma once
 
 typedef struct Buffer_t {
+    void *pointer;
     size_t size;
 } Buffer;
 
 VIRIATUM_EXPORT_PREFIX void createBuffer(struct Buffer_t **bufferPointer, size_t initialSize);
 VIRIATUM_EXPORT_PREFIX void deleteBuffer(struct Buffer_t *buffer);
+
+/**
+ * Converts the given buffer into a string representation
+ * of it (memory copy of it).
+ * The allocated string must be released by the caller
+ * function as it becomes the owner of it.
+ *
+ * @param buffer The buffer object to be converted into the
+ * string representation.
+ * @return The string representation of the given buffer, this
+ * object must be released by the caller function (owner).
+ */
+VIRIATUM_EXPORT_PREFIX char *toStringBuffer(struct Buffer_t *buffer);

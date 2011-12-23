@@ -36,6 +36,10 @@ void createBuffer(struct Buffer_t **bufferPointer, size_t initialSize) {
     /* allocates space for the buffer */
     struct Buffer_t *buffer = (struct Buffer_t *) MALLOC(bufferSize);
 
+    /* starts the buffer attributes */
+    buffer->pointer = NULL;
+    buffer->size = 0;
+
     /* sets the buffer in the buffer pointer */
     *bufferPointer = buffer;
 }
@@ -43,4 +47,18 @@ void createBuffer(struct Buffer_t **bufferPointer, size_t initialSize) {
 void deleteBuffer(struct Buffer_t *buffer) {
     /* releases the buffer */
     FREE(buffer);
+}
+
+char *toStringBuffer(struct Buffer_t *buffer) {
+    /* allocates space for the string */
+    char *string = (char *) MALLOC(buffer->size + 1);
+
+    /* copies the buffer value into the string and then
+    finalizes it with an end of string character */
+    memcpy(string, buffer->pointer, buffer->size);
+    string[buffer->size] = '\0';
+
+    /* returns the allocated string, it must
+    be released by the caller */
+    return string;
 }
