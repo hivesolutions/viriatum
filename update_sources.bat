@@ -1,1 +1,1 @@
-python scripts/hive_viriatum_util_scripts/file_gathering.py
+python scripts/util/file_gathering.py
