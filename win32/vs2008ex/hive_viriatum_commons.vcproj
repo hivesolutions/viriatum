@@ -642,6 +642,10 @@
             UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
             >
             <File
+                RelativePath="..\..\src\hive_viriatum_commons\_config_win32.h"
+                >
+            </File>
+            <File
                 RelativePath="..\..\src\hive_viriatum_commons\stdafx.h"
                 >
             </File>
