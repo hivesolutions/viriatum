@@ -99,8 +99,6 @@ void deleteTemplateHandler(struct TemplateHandler_t *templateHandler) {
         deleteLinkedList(templateHandler->nodes);
     }
 
-
-
     /* iterates continuously for release list
     cleanup (type memory release) */
     while(1) {
