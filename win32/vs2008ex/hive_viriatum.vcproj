@@ -44,7 +44,7 @@
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;VIRIATUM_DEBUG;VIRIATUM_MEMORY_DEBUG"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="3"
+				RuntimeLibrary="1"
 				UsePrecompiledHeader="2"
 				WarningLevel="3"
 				DebugInformationFormat="4"
@@ -87,7 +87,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="xcopy /e /y $(SolutionDir)..\..\src\$(ProjectName)\resources\html\base $(OutDir) &amp;&amp; del $(OutDir)\Makefile.am"
+				CommandLine="xcopy /e /y &quot;$(SolutionDir)..\..\src\$(ProjectName)\resources\html\base&quot; &quot;$(OutDir)&quot; &amp;&amp; del &quot;$(OutDir)\Makefile.am&quot;"
 			/>
 		</Configuration>
 		<Configuration
@@ -118,7 +118,7 @@
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
-				RuntimeLibrary="2"
+				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="2"
 				WarningLevel="3"
@@ -164,7 +164,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="xcopy /e /y $(SolutionDir)..\..\src\$(ProjectName)\resources\html\base $(OutDir) &amp;&amp; del $(OutDir)\Makefile.am"
+				CommandLine="xcopy /e /y &quot;$(SolutionDir)..\..\src\$(ProjectName)\resources\html\base&quot; &quot;$(OutDir)&quot; &amp;&amp; del &quot;$(OutDir)\Makefile.am&quot;"
 			/>
 		</Configuration>
 		<Configuration
@@ -195,7 +195,7 @@
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;VIRIATUM_DEBUG"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="3"
+				RuntimeLibrary="1"
 				UsePrecompiledHeader="2"
 				WarningLevel="3"
 				DebugInformationFormat="4"
@@ -238,7 +238,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="xcopy /e /y $(SolutionDir)..\..\src\$(ProjectName)\resources\html\base $(OutDir) &amp;&amp; del $(OutDir)\Makefile.am"
+				CommandLine="xcopy /e /y &quot;$(SolutionDir)..\..\src\$(ProjectName)\resources\html\base&quot; &quot;$(OutDir)&quot; &amp;&amp; del &quot;$(OutDir)\Makefile.am&quot;"
 			/>
 		</Configuration>
 		<Configuration
@@ -269,7 +269,7 @@
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
-				RuntimeLibrary="2"
+				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="2"
 				WarningLevel="3"
@@ -315,7 +315,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="xcopy /e /y $(SolutionDir)..\..\src\$(ProjectName)\resources\html\base $(OutDir) &amp;&amp; del $(OutDir)\Makefile.am"
+				CommandLine="xcopy /e /y &quot;$(SolutionDir)..\..\src\$(ProjectName)\resources\html\base&quot; &quot;$(OutDir)&quot; &amp;&amp; del &quot;$(OutDir)\Makefile.am&quot;"
 			/>
 		</Configuration>
 		<Configuration
@@ -346,7 +346,7 @@
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
-				RuntimeLibrary="2"
+				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="2"
 				WarningLevel="3"
@@ -380,7 +380,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="xcopy /e /y $(SolutionDir)..\..\src\$(ProjectName)\resources\html\base $(OutDir) &amp;&amp; del $(OutDir)\Makefile.am"
+				CommandLine="xcopy /e /y &quot;$(SolutionDir)..\..\src\$(ProjectName)\resources\html\base&quot; &quot;$(OutDir)&quot; &amp;&amp; del &quot;$(OutDir)\Makefile.am&quot;"
 			/>
 		</Configuration>
 		<Configuration
@@ -411,7 +411,7 @@
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
-				RuntimeLibrary="2"
+				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="2"
 				WarningLevel="3"
@@ -445,7 +445,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="xcopy /e /y $(SolutionDir)..\..\src\$(ProjectName)\resources\html\base $(OutDir) &amp;&amp; del $(OutDir)\Makefile.am"
+				CommandLine="xcopy /e /y &quot;$(SolutionDir)..\..\src\$(ProjectName)\resources\html\base&quot; &quot;$(OutDir)&quot; &amp;&amp; del &quot;$(OutDir)\Makefile.am&quot;"
 			/>
 		</Configuration>
 	</Configurations>
