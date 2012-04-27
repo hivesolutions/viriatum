@@ -29,9 +29,9 @@
 
 #ifdef VIRIATUM_PLATFORM_WIN32
 #ifndef VIRIATUM_MODULES_PATH
-#define VIRIATUM_MODULES_PATH "C:/repo_extra/viriatum/bin/hive_viriatum_mod_lua/i386/win32/Debug"
+#define VIRIATUM_MODULES_PATH "./modules"
 #endif
-#define VIRIATUM_RESOURCES_PATH "../../src/hive_viriatum/resources/html/base"
+#define VIRIATUM_RESOURCES_PATH "."
 #define VIRIATUM_BASE_PATH "/"
 #define VIRIATUM_LISTING_PATH "/templates/listing.html.tpl"
 #ifndef VIRIATUM_CONTENTS_PATH
