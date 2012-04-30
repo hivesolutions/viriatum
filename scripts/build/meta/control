@@ -1,0 +1,12 @@
+Package: viriatum
+Version: 0.10
+Section: httpd
+Priority: optional
+Architecture: amd64
+Depends: libc6 (>= 2.5-0ubuntu1)
+Installed-Size: 1010
+Maintainer: Hive Solutions <development@hive.pt>
+Conflicts: geubuntu-artwork-usplash
+Replaces: geubuntu-artwork-usplash
+Description: Viriatum Web Server
+ The fast and simple to use web server.
