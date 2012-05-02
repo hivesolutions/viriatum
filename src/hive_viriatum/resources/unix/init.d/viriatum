@@ -47,8 +47,13 @@ case "$1" in
             /var/run/$NAME.pid --exec $DAEMON -- --daemon || true
         log_end_msg 0
         ;;
+
+	status)
+		status_of_proc -p /var/run/$NAME.pid "$DAEMON" viriatum && exit 0 || exit $?
+		;;
+
     *)
-        echo "Usage: $NAME {start|stop|restart|force-reload}" >&2
+        echo "Usage: $NAME {start|stop|restart|force-reload|status}" >&2
         exit 1
         ;;
 esac
