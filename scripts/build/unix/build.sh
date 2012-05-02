@@ -25,12 +25,20 @@ mkdir -p $deb_build_dir/usr/sbin
 # for compilation
 git clone git://github.com/hivesolutions/viriatum.git $repo --quiet
 
+# in case the previous command didn't exit properly
+# must return immediately with the error
+[ $? != 0 ]; cd $current && exit $?
+
 # runs the necessary make instructions
 # in the repository directory
 cd $repo
 make -f Makefile-autoconfig
 ./configure --prefix=$target
 make && make install
+
+# in case the previous command didn't exit properly
+# must return immediately with the error
+[ $? != 0 ]; cd $current && exit $?
 
 # gets back to the base directory
 cd $current
@@ -43,3 +51,7 @@ echo "Building deb package..."
 
 # creates the deb file from the deb directory
 dpkg-deb --build $deb_build_dir
+
+# in case the previous command didn't exit properly
+# must return immediately with the error
+[ $? != 0 ]; cd $current && exit $?
