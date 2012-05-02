@@ -35,7 +35,7 @@ cd %BUILD_DIR%
 
 :: clones the repository to retrieve the source code
 :: for compilation
-git clone git://github.com/hivesolutions/viriatum.git %REPO_DIR%
+git clone git://github.com/hivesolutions/viriatum.git %REPO_DIR% --quiet
 
 :: runs the build process for the viriatum project, this
 :: will lauch the build utility for it
@@ -45,11 +45,11 @@ msbuild %SOLUTION_DIR%\hive_viriatum.sln /p:Configuration=Release
 :: returns tho the "original" build directory
 cd %SRC_DIR%
 tar -cf %NAME%.tar index.html viriatum.exe resources templates
-xcopy /q /e /k index.html %RESOURCES_DIR%
-xcopy /q /e /k viriatum.exe %RESOURCES_DIR%
-xcopy /q /a /e /k resources %RESOURCES_DIR%\resources
-xcopy /q /a /e /k templates %RESOURCES_DIR%\templates
-xcopy /q /e /k %NAME%.tar %RESOURCES_DIR%
+xcopy /q /y /e /k index.html %RESOURCES_DIR%
+xcopy /q /y /e /k viriatum.exe %RESOURCES_DIR%
+xcopy /q /y /a /e /k resources %RESOURCES_DIR%\resources
+xcopy /q /y /a /e /k templates %RESOURCES_DIR%\templates
+xcopy /q /y /e /k %NAME%.tar %RESOURCES_DIR%
 cd %BUILD_DIR%
 
 echo Building capsule setup package...

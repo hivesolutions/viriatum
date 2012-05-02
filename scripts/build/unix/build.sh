@@ -19,7 +19,7 @@ mkdir -p $deb_build_dir/usr/sbin
 
 # clones the repository to retrieve the source code
 # for compilation
-git clone git://github.com/hivesolutions/viriatum.git $repo
+git clone git://github.com/hivesolutions/viriatum.git $repo --quiet
 
 # runs the necessary make instructions
 # in the repository directory
