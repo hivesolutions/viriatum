@@ -228,6 +228,11 @@ int main(int argc, char *argv[]) {
         V_ERROR_F("Problem running service (%s)\n", (char *) GET_ERROR());
     }
 
+	/* removes the viriatum pid path, so that the daemon
+	watching tool are notified that the process is no
+	longer running in the current environment */
+	remove(VIRIATUM_PID_PATH);
+
     /* prints a debug message */
     V_DEBUG("Finishing process\n");
 
