@@ -28,14 +28,38 @@
 #pragma once
 
 #ifdef VIRIATUM_PLATFORM_WIN32
+
+static char *basePath = NULL;
+
+static __inline const char *getBasePath() {
+	size_t basePathLength;
+	size_t index;
+
+	if(basePath != NULL) { return basePath; }
+
+	basePath = (char *) malloc(VIRIATUM_MAX_PATH_SIZE);
+    GetModuleFileName(NULL, basePath, VIRIATUM_MAX_PATH_SIZE);
+	basePathLength = strlen(basePath);
+
+	for(index = basePathLength; index >= 0; index--) {
+		if(basePath[index] != '\\') { continue; }
+		break;
+	}
+
+	memcpy(basePath, basePath, index);
+	basePath[index] = '\0';
+
+	return basePath;
+}
+
 #ifndef VIRIATUM_MODULES_PATH
 #define VIRIATUM_MODULES_PATH "./modules"
 #endif
-#define VIRIATUM_RESOURCES_PATH "."
+#define VIRIATUM_RESOURCES_PATH getBasePath()
 #define VIRIATUM_BASE_PATH "/"
 #define VIRIATUM_LISTING_PATH "/templates/listing.html.tpl"
 #ifndef VIRIATUM_CONTENTS_PATH
-#define VIRIATUM_CONTENTS_PATH VIRIATUM_RESOURCES_PATH
+#define VIRIATUM_CONTENTS_PATH "."
 #endif
 #endif
 
