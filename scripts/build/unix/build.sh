@@ -9,6 +9,10 @@ target=$build/target
 deb_dir=$target/deb
 deb_build_dir=$deb_dir/$name
 
+# retrieves the path to the current script's
+# directory (parent path)
+script_dir=$(dirname $(readlink -f $0))
+
 # creates the necessary directories
 mkdir -p $build
 mkdir -p $target
@@ -33,7 +37,7 @@ cd $current
 
 # copies the binary files
 cp -rf $target/bin/viriatum $deb_build_dir/usr/sbin
-cp -rf $current/meta/* $deb_build_dir/DEBIAN
+cp -rf $script_dir/meta/* $deb_build_dir/DEBIAN
 
 echo "Building deb package..."
 

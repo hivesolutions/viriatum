@@ -37,9 +37,17 @@ cd %BUILD_DIR%
 :: for compilation
 git clone git://github.com/hivesolutions/viriatum.git %REPO_DIR% --quiet
 
+:: in case the previous command didn't exit properly
+:: must return immediately with the error
+if %ERRORLEVEL% neq 0 ( cd %CURRENT_DIR% && exit /b %ERRORLEVEL% )
+
 :: runs the build process for the viriatum project, this
 :: will lauch the build utility for it
 msbuild %SOLUTION_DIR%\hive_viriatum.sln /p:Configuration=Release
+
+:: in case the previous command didn't exit properly
+:: must return immediately with the error
+if %ERRORLEVEL% neq 0 ( cd %CURRENT_DIR% && exit /b %ERRORLEVEL% )
 
 :: changes the directory in order to group the files and then
 :: returns tho the "original" build directory
@@ -58,6 +66,10 @@ echo Building capsule setup package...
 :: to it in order to create the proper intaller
 capsule clone %SETUP_DIR%\%NAME%.exe
 capsule extend %SETUP_DIR%\%NAME%.exe Viriatum "Viriatum HTTP Server" %RESOURCES_DIR%\%NAME%.tar
+
+:: in case the previous command didn't exit properly
+:: must return immediately with the error
+if %ERRORLEVEL% neq 0 ( cd %CURRENT_DIR% && exit /b %ERRORLEVEL% )
 
 :: moves back to the current directory (back to the base)
 cd %CURRENT_DIR%
