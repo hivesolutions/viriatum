@@ -133,6 +133,66 @@ ERROR_CODE printInformation() {
     RAISE_NO_ERROR;
 }
 
+#ifdef VIRIATUM_PLATFORM_WIN32
+void daemonize() {
+}
+#endif
+
+#ifdef VIRIATUM_PLATFORM_LINUX
+void daemonize() {
+	/* allocates space for the various dameon
+	related variables */
+    PID_TYPE pid;
+	PID_TYPE sid;
+	FILE *pidFile;
+	char pidString[1024];
+	size_t pidStringLength;
+
+    /* forks off the parent process, this
+	is the main trick in the process*/
+    pid = fork();
+
+	/* checks if the pid is invalid in case
+	it's exits the parent process in error */
+    if(pid < 0) { exit(EXIT_FAILURE); }
+    /* checks if the pid of the parent
+	process is good in case it's can exit
+	the parent process */
+    if(pid > 0) { exit(EXIT_SUCCESS); }
+
+    /* changes the file mode mask */
+    umask(0);
+
+    /* create a new sid for the child process and then
+	verifies if it has been successfull */
+    sid = setsid();
+    if(sid < 0) { exit(EXIT_FAILURE); }
+
+    /* changes the current working directory to the
+	base of the dily system */
+    if(chdir("/") < 0) { exit(EXIT_FAILURE); }
+    
+	/* retrieves the pid of the current process this
+	must be called because the current pid value is invalid */
+    pid = GET_PID();
+
+	/* opens the pid file and writes the pid stirng into it
+	this will allow external programs to make sure viriatum
+	is correctly running */
+    FOPEN(&pidFile, VIRIATUM_PID_PATH, "wb");
+    SPRINTF(pidString, 1024, "%d", pid);
+    pidStringLength = strlen(pidString);
+    fwrite(pidString, sizeof(char), pidStringLength, pidFile);
+	fclose(pidFile);
+ 
+	/* closes the various pending streams from the
+	daemon process (not going to output them) */
+    close(STDIN_FILENO);
+    close(STDOUT_FILENO);
+    close(STDERR_FILENO);
+}
+#endif
+
 #ifndef VIRIATUM_PLATFORM_IPHONE
 int main(int argc, char *argv[]) {
     /* allocates the return value */
@@ -151,6 +211,10 @@ int main(int argc, char *argv[]) {
 
     /* processes the various arguments into a map */
     processArguments(argc, argv, &arguments);
+
+	/* daemonizes the current process so that it
+	remains in background and returns the calling */
+	daemonize();
 
     /* runs the service, with the given arguments */
     returnValue = runService(arguments);
