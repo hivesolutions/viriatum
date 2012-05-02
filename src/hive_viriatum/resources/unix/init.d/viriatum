@@ -13,7 +13,7 @@
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 DAEMON=/usr/sbin/viriatum
 NAME=viriatum
-DESC=viriatum
+DESC="Viriatum web server agent"
 
 test -x $DAEMON || DAEMON=/usr/bin/viriatum
 test -x $DAEMON || DAEMON=/usr/local/bin/viriatum
@@ -25,27 +25,27 @@ set -e
 
 case "$1" in
     start)
-        echo -n "Starting $DESC: "
-        start-stop-daemon --start --quiet --pidfile /var/run/$NAME.pid \
+        log_daemon_msg "Starting $DESC" viriatum
+        ret=start-stop-daemon --start --quiet --pidfile /var/run/$NAME.pid \
             --exec $DAEMON -- --daemon || true
-        echo "$NAME."
+        log_end_msg $ret
         ;;
 
     stop)
-        echo -n "Stopping $DESC: "
-        start-stop-daemon --stop --quiet --pidfile /var/run/$NAME.pid \
+        log_daemon_msg "Stopping $DESC" viriatum
+        ret=tart-stop-daemon --stop --quiet --pidfile /var/run/$NAME.pid \
             --exec $DAEMON || true
-        echo "$NAME."
+        log_end_msg $ret
         ;;
 
     restart|force-reload)
-        echo -n "Restarting $DESC: "
+        log_daemon_msg "Restarting $DESC" viriatum
         start-stop-daemon --stop --quiet --pidfile \
             /var/run/$NAME.pid --exec $DAEMON || true
         sleep 1
-        start-stop-daemon --start --quiet --pidfile \
+        ret=start-stop-daemon --start --quiet --pidfile \
             /var/run/$NAME.pid --exec $DAEMON -- --daemon || true
-        echo "$NAME."
+        log_end_msg $ret
         ;;
     *)
         echo "Usage: $NAME {start|stop|restart|force-reload}" >&2
