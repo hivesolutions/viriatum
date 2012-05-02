@@ -180,7 +180,7 @@ void daemonize() {
 	this will allow external programs to make sure viriatum
 	is correctly running */
     FOPEN(&pidFile, VIRIATUM_PID_PATH, "wb");
-    SPRINTF(pidString, 1024, "%d", pid);
+    SPRINTF(pidString, 1024, "%d\n", pid);
     pidStringLength = strlen(pidString);
     fwrite(pidString, sizeof(char), pidStringLength, pidFile);
 	fclose(pidFile);
