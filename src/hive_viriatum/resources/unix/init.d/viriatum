@@ -13,7 +13,7 @@
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 DAEMON=/usr/sbin/viriatum
 NAME=viriatum
-DESC="viriatum web server agent"
+DESC="web server agent"
 
 test -x $DAEMON || DAEMON=/usr/bin/viriatum
 test -x $DAEMON || DAEMON=/usr/local/bin/viriatum
