@@ -144,7 +144,8 @@ ERROR_CODE urlCallbackHandlerFile(struct HttpParser_t *httpParser, const unsigne
     /* retrieves the handler file context from the http parser */
     struct HandlerFileContext_t *handlerFileContext = (struct HandlerFileContext_t *) httpParser->context;
 
-    /* retrieves the connection from the http parser parameters */
+    /* retrieves the connection from the http parser parameters and then
+	uses it to access the service options using the service */
     struct Connection_t *connection = (struct Connection_t *) httpParser->parameters;
     struct Service_t *service = connection->service;
     struct ServiceOptions_t *options = service->options;
@@ -161,7 +162,9 @@ ERROR_CODE urlCallbackHandlerFile(struct HttpParser_t *httpParser, const unsigne
     /* prints a debug message */
     V_INFO_F("%s %s\n", getHttpMethodString(httpParser->method), url);
 
-    /* in case the string refers the base path (default handler must be used) */
+    /* in case the string refers the base path (default handler must be used) 
+	the selection of the index file as defautl is conditioned by the default
+	index configuration option */
     if(options->defaultIndex && (strcmp((char *) url, "/") == 0 || strcmp((char *) url, "") == 0)) {
         /* reallocates the space for the index reference */
         url = (unsigned char *) REALLOC(url, 12);
