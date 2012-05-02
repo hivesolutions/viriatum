@@ -27,7 +27,7 @@ git clone git://github.com/hivesolutions/viriatum.git $repo --quiet
 
 # in case the previous command didn't exit properly
 # must return immediately with the error
-if [ $? -eq 0 ]; then cd $current && exit $?; fi
+if [ $? -neq 0 ]; then cd $current && exit $?; fi
 
 # runs the necessary make instructions
 # in the repository directory
@@ -38,7 +38,7 @@ make && make install
 
 # in case the previous command didn't exit properly
 # must return immediately with the error
-if [ $? -eq 0 ]; then cd $current && exit $?; fi
+if [ $? -neq 0 ]; then cd $current && exit $?; fi
 
 # gets back to the base directory
 cd $current
@@ -54,4 +54,4 @@ dpkg-deb --build $deb_build_dir
 
 # in case the previous command didn't exit properly
 # must return immediately with the error
-if [ $? -eq 0 ]; then cd $current && exit $?; fi
+if [ $? -neq 0 ]; then cd $current && exit $?; fi
