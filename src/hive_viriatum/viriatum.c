@@ -116,8 +116,12 @@ ERROR_CODE printInformation() {
     unsigned char *version = versionViriatum();
     unsigned char *description = descriptionViriatum();
 
-    /* registers the kill handler for the int signal */
+    /* registers the kill handler for the various signals
+	associated with the "destroy" operation */
+    signal(SIGHUP, killHandler);
     signal(SIGINT, killHandler);
+    signal(SIGQUIT, killHandler);
+	signal(SIGTERM, killHandler);
 
     /* prints a message */
     V_PRINT_F("%s %s (%s, %s) [%s %s %d bit (%s)] on %s\n", description, version, VIRIATUM_COMPILATION_DATE, VIRIATUM_COMPILATION_TIME, VIRIATUM_COMPILER, VIRIATUM_COMPILER_VERSION_STRING, (int) VIRIATUM_PLATFORM_CPU_BITS, VIRIATUM_PLATFORM_CPU, VIRIATUM_PLATFORM_STRING);
