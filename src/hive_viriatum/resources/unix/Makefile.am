@@ -25,5 +25,5 @@
 
 include $(top_srcdir)/Common.am
 
-init_d_dir = $(sysconfdir)/init.d 
+init_ddir = $(sysconfdir)/init.d 
 init_d_SCRIPTS = init.d/viriatum
