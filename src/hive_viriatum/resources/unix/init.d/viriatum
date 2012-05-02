@@ -15,6 +15,7 @@ DAEMON=/usr/sbin/viriatum
 NAME=viriatum
 DESC=viriatum
 
+test -x $DAEMON || DAEMON=/usr/bin/viriatum
 test -x $DAEMON || DAEMON=/usr/local/bin/viriatum
 test -x $DAEMON || exit 0
 
