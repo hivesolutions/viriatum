@@ -85,6 +85,19 @@
 
 #ifdef VIRIATUM_PLATFORM_WIN32
 #define FD_SETSIZE 10000
+#ifndef SIGHUP
+#define SIGHUP 1
+#endif
+#ifndef SIGINT
+#define SIGINT 2
+#endif
+#ifndef SIGQUIT
+#define SIGQUIT 3
+#endif
+#ifndef SIGTERM
+#define SIGTERM 15
+#endif
+
 #endif
 
 #ifdef VIRIATUM_PLATFORM_WIN32
