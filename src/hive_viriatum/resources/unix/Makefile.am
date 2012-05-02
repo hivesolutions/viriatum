@@ -25,4 +25,4 @@
 
 include $(top_srcdir)/Common.am
 
-SUBDIRS = html unix
+sysconf_DATA = init.d
