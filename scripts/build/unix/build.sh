@@ -1,3 +1,6 @@
+#!/bin/sh
+# -*- coding: utf-8 -*-
+
 # sets the various global variables
 version=0.1.0
 architecture=amd64
