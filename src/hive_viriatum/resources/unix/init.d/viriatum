@@ -26,16 +26,16 @@ set -e
 case "$1" in
     start)
         log_daemon_msg "Starting $DESC" viriatum
-        ret=start-stop-daemon --start --quiet --pidfile /var/run/$NAME.pid \
+        start-stop-daemon --start --quiet --pidfile /var/run/$NAME.pid \
             --exec $DAEMON -- --daemon || true
-        log_end_msg $ret
+        log_end_msg 0
         ;;
 
     stop)
         log_daemon_msg "Stopping $DESC" viriatum
-        ret=tart-stop-daemon --stop --quiet --pidfile /var/run/$NAME.pid \
+        start-stop-daemon --stop --quiet --pidfile /var/run/$NAME.pid \
             --exec $DAEMON || true
-        log_end_msg $ret
+        log_end_msg 0
         ;;
 
     restart|force-reload)
@@ -43,9 +43,9 @@ case "$1" in
         start-stop-daemon --stop --quiet --pidfile \
             /var/run/$NAME.pid --exec $DAEMON || true
         sleep 1
-        ret=start-stop-daemon --start --quiet --pidfile \
+        start-stop-daemon --start --quiet --pidfile \
             /var/run/$NAME.pid --exec $DAEMON -- --daemon || true
-        log_end_msg $ret
+        log_end_msg 0
         ;;
     *)
         echo "Usage: $NAME {start|stop|restart|force-reload}" >&2
