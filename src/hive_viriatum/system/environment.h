@@ -45,9 +45,4 @@ typedef struct Globals_t {
      * for the global environment.
      */
     struct LinkedList_t *httpHandlersList;
-
-
-    /*serviceHttpHandlerCreate createHttpHandler;
-    serviceHttpHandlerUpdate addHttpHandler;
-    serviceHttpHandlerUpdate removeHttpHandler;*/
 } Globals;

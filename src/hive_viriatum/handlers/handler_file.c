@@ -144,6 +144,11 @@ ERROR_CODE urlCallbackHandlerFile(struct HttpParser_t *httpParser, const unsigne
     /* retrieves the handler file context from the http parser */
     struct HandlerFileContext_t *handlerFileContext = (struct HandlerFileContext_t *) httpParser->context;
 
+    /* retrieves the connection from the http parser parameters */
+    struct Connection_t *connection = (struct Connection_t *) httpParser->parameters;
+    struct Service_t *service = connection->service;
+    struct ServiceOptions_t *options = service->options;
+
     /* allocates the required space for the url */
     unsigned char *url = (unsigned char *) MALLOC(dataSize + 1);
 
@@ -157,7 +162,7 @@ ERROR_CODE urlCallbackHandlerFile(struct HttpParser_t *httpParser, const unsigne
     V_INFO_F("%s %s\n", getHttpMethodString(httpParser->method), url);
 
     /* in case the string refers the base path (default handler must be used) */
-    if(strcmp((char *) url, "/") == 0 || strcmp((char *) url, "") == 0) {
+    if(options->defaultIndex && strcmp((char *) url, "/") == 0 || strcmp((char *) url, "") == 0) {
         /* reallocates the space for the index reference */
         url = (unsigned char *) REALLOC(url, 12);
 
@@ -304,7 +309,7 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
             isRedirect = 1;
         } else {
             /* creates the complete path to the template file */
-            SPRINTF((char *)templatePath, 1024, "%s%s", VIRIATUM_RESOURCES_PATH, VIRIATUM_LISTING_PATH);
+            SPRINTF((char *) templatePath, 1024, "%s%s", VIRIATUM_RESOURCES_PATH, VIRIATUM_LISTING_PATH);
 
             /* creates the directory entries (linked list) */
             createLinkedList(&directoryEntries);

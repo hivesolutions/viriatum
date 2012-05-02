@@ -271,6 +271,13 @@ typedef struct ServiceOptions_t {
     unsigned char *handlerName;
 
     /**
+     * If the default index file should be used in case
+     * the root path file is requested (index.html is
+     * the default file to be served).
+     */
+    unsigned int defaultIndex;
+
+    /**
      * The default virtual host to be used in any
      * non matched host request.
      */

@@ -432,6 +432,13 @@ typedef struct HttpParser_t {
     unsigned char method;
     char upgrade;
     void *context;
+
+    /**
+     * Unstructed reference to a pointer, this may
+     * be used to maintain references to uper objects.
+     * Example usage would include reference to the
+     * connection objects.
+     */
     void *parameters;
 } HttpParser;
 
