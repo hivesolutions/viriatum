@@ -21,6 +21,7 @@ mkdir -p $deb_build_dir
 mkdir -p $deb_build_dir/DEBIAN
 mkdir -p $deb_build_dir/usr/sbin
 mkdir -p $deb_build_dir/etc/init.d
+mkdir -p $deb_build_dir/var/viriatum/www
 
 # clones the repository to retrieve the source code
 # for compilation
@@ -34,7 +35,7 @@ if [ $? -ne 0 ]; then cd $current && exit $?; fi
 # in the repository directory
 cd $repo
 make -f Makefile-autoconfig
-./configure --prefix=$target
+./configure --prefix=$target --with-wwwroot=$target/var/viriatum/www
 make && make install
 
 # in case the previous command didn't exit properly
@@ -47,6 +48,7 @@ cd $current
 # copies the binary files
 cp -rf $target/bin/viriatum $deb_build_dir/usr/sbin
 cp -rf $target/etc/init.d/viriatum $deb_build_dir/etc/init.d
+cp -rf $target/etc/var/viriatum/www $deb_build_dir/var/viriatum/www
 cp -rf $script_dir/meta/* $deb_build_dir/DEBIAN
 
 echo "Building deb package..."
