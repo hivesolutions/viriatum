@@ -304,7 +304,7 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
             isRedirect = 1;
         } else {
             /* creates the complete path to the template file */
-            SPRINTF((char *)templatePath, 1024, "%s%s", VIRIATUM_CONTENTS_PATH, VIRIATUM_LISTING_PATH);
+            SPRINTF((char *)templatePath, 1024, "%s%s", VIRIATUM_RESOURCES_PATH, VIRIATUM_LISTING_PATH);
 
             /* creates the directory entries (linked list) */
             createLinkedList(&directoryEntries);
