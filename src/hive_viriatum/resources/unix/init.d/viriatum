@@ -48,9 +48,9 @@ case "$1" in
         log_end_msg 0
         ;;
 
-	status)
-		status_of_proc -p /var/run/$NAME.pid "$DAEMON" viriatum && exit 0 || exit $?
-		;;
+    status)
+        status_of_proc -p /var/run/$NAME.pid "$DAEMON" viriatum && exit 0 || exit $?
+        ;;
 
     *)
         echo "Usage: $NAME {start|stop|restart|force-reload|status}" >&2
