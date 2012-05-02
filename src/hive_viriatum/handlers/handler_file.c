@@ -162,7 +162,7 @@ ERROR_CODE urlCallbackHandlerFile(struct HttpParser_t *httpParser, const unsigne
     V_INFO_F("%s %s\n", getHttpMethodString(httpParser->method), url);
 
     /* in case the string refers the base path (default handler must be used) */
-    if(options->defaultIndex && strcmp((char *) url, "/") == 0 || strcmp((char *) url, "") == 0) {
+    if(options->defaultIndex && (strcmp((char *) url, "/") == 0 || strcmp((char *) url, "") == 0)) {
         /* reallocates the space for the index reference */
         url = (unsigned char *) REALLOC(url, 12);
 
