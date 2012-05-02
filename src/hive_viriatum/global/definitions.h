@@ -29,15 +29,14 @@
 
 #ifdef VIRIATUM_PLATFORM_WIN32
 
-static char *basePath = NULL;
+static char basePath[VIRIATUM_MAX_PATH_SIZE] = { '\0' };
 
 static __inline const char *getBasePath() {
     size_t basePathLength;
     size_t index;
 
-    if(basePath != NULL) { return basePath; }
+    if(basePath[0] != '\0') { return basePath; }
 
-    basePath = (char *) malloc(VIRIATUM_MAX_PATH_SIZE);
     GetModuleFileName(NULL, basePath, VIRIATUM_MAX_PATH_SIZE);
     basePathLength = strlen(basePath);
 
@@ -104,7 +103,7 @@ static __inline const char *getBasePath() {
 #define VIRIATUM_DEFAULT_HOST "0.0.0.0"
 #define VIRIATUM_DEFAULT_PORT 9090
 #define VIRIATUM_DEFAULT_HANDLER "file"
-#define VIRIATUM_DEFAULT_INDEX 1
+#define VIRIATUM_DEFAULT_INDEX 0
 #define VIRIATUM_NON_BLOCKING 1
 #define VIRIATUM_SOCKET_ERROR 0
 #define VIRIATUM_SELECT_TIMEOUT 1
