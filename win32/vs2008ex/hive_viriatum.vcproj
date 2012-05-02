@@ -87,7 +87,7 @@
             />
             <Tool
                 Name="VCPostBuildEventTool"
-                CommandLine="xcopy /e /y &quot;$(SolutionDir)..\..\src\$(ProjectName)\resources\html\base&quot; &quot;$(OutDir)&quot; &amp;&amp; del &quot;$(OutDir)\Makefile.am&quot;&#x0D;&#x0A;xcopy /e /y &quot;$(SolutionDir)..\..\src\$(ProjectName)\resources\html\base&quot; &quot;$(ProjectDir)&quot; &amp;&amp; del &quot;$(OutDir)\Makefile.am&quot;"
+                CommandLine="xcopy /e /y &quot;$(SolutionDir)..\..\src\$(ProjectName)\resources\html\base&quot; &quot;$(OutDir)&quot; &amp;&amp; del &quot;$(OutDir)\Makefile.am&quot;&#x0D;&#x0A;xcopy /e /y &quot;$(SolutionDir)..\..\src\$(ProjectName)\resources\html\base&quot; &quot;$(ProjectDir)&quot; &amp;&amp; del &quot;$(ProjectDir)\Makefile.am&quot;&#x0D;&#x0A;"
             />
         </Configuration>
         <Configuration
@@ -164,7 +164,7 @@
             />
             <Tool
                 Name="VCPostBuildEventTool"
-                CommandLine="xcopy /e /y &quot;$(SolutionDir)..\..\src\$(ProjectName)\resources\html\base&quot; &quot;$(OutDir)&quot; &amp;&amp; del &quot;$(OutDir)\Makefile.am&quot;&#x0D;&#x0A;xcopy /e /y &quot;$(SolutionDir)..\..\src\$(ProjectName)\resources\html\base&quot; &quot;$(ProjectDir)&quot; &amp;&amp; del &quot;$(OutDir)\Makefile.am&quot;"
+                CommandLine="xcopy /e /y &quot;$(SolutionDir)..\..\src\$(ProjectName)\resources\html\base&quot; &quot;$(OutDir)&quot; &amp;&amp; del &quot;$(OutDir)\Makefile.am&quot;&#x0D;&#x0A;xcopy /e /y &quot;$(SolutionDir)..\..\src\$(ProjectName)\resources\html\base&quot; &quot;$(ProjectDir)&quot; &amp;&amp; del &quot;$(ProjectDir)\Makefile.am&quot;&#x0D;&#x0A;"
             />
         </Configuration>
         <Configuration
@@ -238,7 +238,7 @@
             />
             <Tool
                 Name="VCPostBuildEventTool"
-                CommandLine="xcopy /e /y &quot;$(SolutionDir)..\..\src\$(ProjectName)\resources\html\base&quot; &quot;$(OutDir)&quot; &amp;&amp; del &quot;$(OutDir)\Makefile.am&quot;&#x0D;&#x0A;xcopy /e /y &quot;$(SolutionDir)..\..\src\$(ProjectName)\resources\html\base&quot; &quot;$(ProjectDir)&quot; &amp;&amp; del &quot;$(OutDir)\Makefile.am&quot;"
+                CommandLine="xcopy /e /y &quot;$(SolutionDir)..\..\src\$(ProjectName)\resources\html\base&quot; &quot;$(OutDir)&quot; &amp;&amp; del &quot;$(OutDir)\Makefile.am&quot;&#x0D;&#x0A;xcopy /e /y &quot;$(SolutionDir)..\..\src\$(ProjectName)\resources\html\base&quot; &quot;$(ProjectDir)&quot; &amp;&amp; del &quot;$(ProjectDir)\Makefile.am&quot;&#x0D;&#x0A;"
             />
         </Configuration>
         <Configuration
@@ -315,7 +315,7 @@
             />
             <Tool
                 Name="VCPostBuildEventTool"
-                CommandLine="xcopy /e /y &quot;$(SolutionDir)..\..\src\$(ProjectName)\resources\html\base&quot; &quot;$(OutDir)&quot; &amp;&amp; del &quot;$(OutDir)\Makefile.am&quot;&#x0D;&#x0A;xcopy /e /y &quot;$(SolutionDir)..\..\src\$(ProjectName)\resources\html\base&quot; &quot;$(ProjectDir)&quot; &amp;&amp; del &quot;$(OutDir)\Makefile.am&quot;"
+                CommandLine="xcopy /e /y &quot;$(SolutionDir)..\..\src\$(ProjectName)\resources\html\base&quot; &quot;$(OutDir)&quot; &amp;&amp; del &quot;$(OutDir)\Makefile.am&quot;&#x0D;&#x0A;xcopy /e /y &quot;$(SolutionDir)..\..\src\$(ProjectName)\resources\html\base&quot; &quot;$(ProjectDir)&quot; &amp;&amp; del &quot;$(ProjectDir)\Makefile.am&quot;&#x0D;&#x0A;"
             />
         </Configuration>
         <Configuration
@@ -380,7 +380,7 @@
             />
             <Tool
                 Name="VCPostBuildEventTool"
-                CommandLine="xcopy /e /y &quot;$(SolutionDir)..\..\src\$(ProjectName)\resources\html\base&quot; &quot;$(OutDir)&quot; &amp;&amp; del &quot;$(OutDir)\Makefile.am&quot;&#x0D;&#x0A;xcopy /e /y &quot;$(SolutionDir)..\..\src\$(ProjectName)\resources\html\base&quot; &quot;$(ProjectDir)&quot; &amp;&amp; del &quot;$(OutDir)\Makefile.am&quot;"
+                CommandLine="xcopy /e /y &quot;$(SolutionDir)..\..\src\$(ProjectName)\resources\html\base&quot; &quot;$(OutDir)&quot; &amp;&amp; del &quot;$(OutDir)\Makefile.am&quot;&#x0D;&#x0A;xcopy /e /y &quot;$(SolutionDir)..\..\src\$(ProjectName)\resources\html\base&quot; &quot;$(ProjectDir)&quot; &amp;&amp; del &quot;$(ProjectDir)\Makefile.am&quot;&#x0D;&#x0A;"
             />
         </Configuration>
         <Configuration
@@ -445,7 +445,7 @@
             />
             <Tool
                 Name="VCPostBuildEventTool"
-                CommandLine="xcopy /e /y &quot;$(SolutionDir)..\..\src\$(ProjectName)\resources\html\base&quot; &quot;$(OutDir)&quot; &amp;&amp; del &quot;$(OutDir)\Makefile.am&quot;&#x0D;&#x0A;xcopy /e /y &quot;$(SolutionDir)..\..\src\$(ProjectName)\resources\html\base&quot; &quot;$(ProjectDir)&quot; &amp;&amp; del &quot;$(OutDir)\Makefile.am&quot;"
+                CommandLine="xcopy /e /y &quot;$(SolutionDir)..\..\src\$(ProjectName)\resources\html\base&quot; &quot;$(OutDir)&quot; &amp;&amp; del &quot;$(OutDir)\Makefile.am&quot;&#x0D;&#x0A;xcopy /e /y &quot;$(SolutionDir)..\..\src\$(ProjectName)\resources\html\base&quot; &quot;$(ProjectDir)&quot; &amp;&amp; del &quot;$(ProjectDir)\Makefile.am&quot;&#x0D;&#x0A;"
             />
         </Configuration>
     </Configurations>
