@@ -25,4 +25,4 @@
 
 include $(top_srcdir)/Common.am
 
-sysconf_DATA = init.d/viriatum
+nobase_sysconf_DATA = init.d/viriatum
