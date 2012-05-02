@@ -45,6 +45,7 @@ cd $current
 
 # copies the binary files
 cp -rf $target/bin/viriatum $deb_build_dir/usr/sbin
+cp -rf $target/etc/init.d/viriatum $deb_build_dir/etc/init.d
 cp -rf $script_dir/meta/* $deb_build_dir/DEBIAN
 
 echo "Building deb package..."
