@@ -60,6 +60,7 @@ static __inline const char *getBasePath() {
 #ifndef VIRIATUM_CONTENTS_PATH
 #define VIRIATUM_CONTENTS_PATH "."
 #endif
+#define VIRIATUM_PID_PATH "viriatum.pid"
 #endif
 
 #ifdef VIRIATUM_PLATFORM_UNIX
@@ -80,6 +81,7 @@ static __inline const char *getBasePath() {
 #define VIRIATUM_CONTENTS_PATH "/var/viriatum/www"
 #endif
 #endif
+#define VIRIATUM_PID_PATH "/var/run/viriatum.pid"
 #endif
 
 #define VIRIATUM_NAME "viriatum"
