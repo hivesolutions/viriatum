@@ -11,10 +11,11 @@
 ### END INIT INFO
 
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-DAEMON=/usr/local/bin/viriatum
+DAEMON=/usr/sbin/viriatum
 NAME=viriatum
 DESC=viriatum
 
+test -x $DAEMON || DAEMON=/usr/local/bin/viriatum
 test -x $DAEMON || exit 0
 
 set -e
