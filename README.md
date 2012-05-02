@@ -10,6 +10,10 @@ For building under unix simple instructions are used:
 * `./configure`
 * `make && make install`
 
+In order to provide a correct (system wide) configuration path use:
+
+* `./configure --sysconfdir=/etc`
+
 ### Unix 32bit from 64bit
 
 * `apt-get libc6-dev-i386`
