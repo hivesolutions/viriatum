@@ -97,7 +97,6 @@
 #ifndef SIGTERM
 #define SIGTERM 15
 #endif
-
 #endif
 
 #ifdef VIRIATUM_PLATFORM_WIN32
