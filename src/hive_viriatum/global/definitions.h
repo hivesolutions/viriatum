@@ -32,24 +32,24 @@
 static char *basePath = NULL;
 
 static __inline const char *getBasePath() {
-	size_t basePathLength;
-	size_t index;
+    size_t basePathLength;
+    size_t index;
 
-	if(basePath != NULL) { return basePath; }
+    if(basePath != NULL) { return basePath; }
 
-	basePath = (char *) malloc(VIRIATUM_MAX_PATH_SIZE);
+    basePath = (char *) malloc(VIRIATUM_MAX_PATH_SIZE);
     GetModuleFileName(NULL, basePath, VIRIATUM_MAX_PATH_SIZE);
-	basePathLength = strlen(basePath);
+    basePathLength = strlen(basePath);
 
-	for(index = basePathLength; index >= 0; index--) {
-		if(basePath[index] != '\\') { continue; }
-		break;
-	}
+    for(index = basePathLength; index >= 0; index--) {
+        if(basePath[index] != '\\') { continue; }
+        break;
+    }
 
-	memcpy(basePath, basePath, index);
-	basePath[index] = '\0';
+    memcpy(basePath, basePath, index);
+    basePath[index] = '\0';
 
-	return basePath;
+    return basePath;
 }
 
 #ifndef VIRIATUM_MODULES_PATH
@@ -93,6 +93,7 @@ static __inline const char *getBasePath() {
 #define VIRIATUM_DEFAULT_HOST "0.0.0.0"
 #define VIRIATUM_DEFAULT_PORT 9090
 #define VIRIATUM_DEFAULT_HANDLER "file"
+#define VIRIATUM_DEFAULT_INDEX 0
 #define VIRIATUM_NON_BLOCKING 1
 #define VIRIATUM_SOCKET_ERROR 0
 #define VIRIATUM_SELECT_TIMEOUT 10
@@ -103,6 +104,7 @@ static __inline const char *getBasePath() {
 #define VIRIATUM_DEFAULT_HOST "0.0.0.0"
 #define VIRIATUM_DEFAULT_PORT 9090
 #define VIRIATUM_DEFAULT_HANDLER "file"
+#define VIRIATUM_DEFAULT_INDEX 1
 #define VIRIATUM_NON_BLOCKING 1
 #define VIRIATUM_SOCKET_ERROR 0
 #define VIRIATUM_SELECT_TIMEOUT 1

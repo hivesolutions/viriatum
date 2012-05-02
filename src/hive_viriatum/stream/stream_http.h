@@ -28,6 +28,7 @@
 #pragma once
 
 #include "../http/http.h"
+#include "../system/system.h"
 #include "../handlers/handlers.h"
 #include "stream_io.h"
 
@@ -61,6 +62,14 @@ typedef struct HttpHandler_t {
     httpConnectionUpdate set;
     httpConnectionUpdate unset;
     httpConnectionUpdate reset;
+
+    /**
+     * The reference to the service that "owns"
+     * the current handler.
+     * The creation of the handler implies the
+     * registration of it in this service.
+     */
+    struct Service_t *service;
 
     /**
      * Reference to the lower level

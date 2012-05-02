@@ -361,16 +361,16 @@ ERROR_CODE getWriteTimeFile(char *filePath, struct DateTime_t *dateTime) {
 }
 
 ERROR_CODE isDirectoryFile(char *filePath, unsigned int *isDirectory) {
-	/* retrieves the file attributes from the file in
-	the current path, must be able to detect errors */
-	int fileAttributes = GetFileAttributes(filePath);
+    /* retrieves the file attributes from the file in
+    the current path, must be able to detect errors */
+    int fileAttributes = GetFileAttributes(filePath);
 
-	/* in case there is an error retrieving the file attributes
-	this is considered to be an invalid file */
-	if(fileAttributes == INVALID_FILE_ATTRIBUTES) {
+    /* in case there is an error retrieving the file attributes
+    this is considered to be an invalid file */
+    if(fileAttributes == INVALID_FILE_ATTRIBUTES) {
         /* unsets the is directory flag */
         *isDirectory = 0;
-	}
+    }
     /* in case the attributes value contains the file attribute
     directory reference (the file is a directory)*/
     else if(fileAttributes & FILE_ATTRIBUTE_DIRECTORY) {

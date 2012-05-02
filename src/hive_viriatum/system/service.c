@@ -103,6 +103,7 @@ void createServiceOptions(struct ServiceOptions_t **serviceOptionsPointer) {
     serviceOptions->port = 0;
     serviceOptions->address = NULL;
     serviceOptions->handlerName = NULL;
+    serviceOptions->defaultIndex = 0;
     serviceOptions->defaultVirtualHost = NULL;
 
     /* creates the hash map for the virtual hosts */
@@ -788,6 +789,10 @@ ERROR_CODE createHttpHandlerService(struct Service_t *service, struct HttpHandle
     /* creates the http handler */
     createHttpHandler(httpHandlerPointer, name);
 
+    /* sets a service reference in the http handler
+    (this may be used latter for option reference) */
+    (*httpHandlerPointer)->service = service;
+
     /* raises no error */
     RAISE_NO_ERROR;
 }
@@ -833,6 +838,7 @@ ERROR_CODE _defaultOptionsService(struct Service_t *service, struct HashMap_t *a
     serviceOptions->port = VIRIATUM_DEFAULT_PORT;
     serviceOptions->address = (unsigned char *) VIRIATUM_DEFAULT_HOST;
     serviceOptions->handlerName = (unsigned char *) VIRIATUM_DEFAULT_HANDLER;
+    serviceOptions->defaultIndex = VIRIATUM_DEFAULT_INDEX;
 
     /* raises no error */
     RAISE_NO_ERROR;
