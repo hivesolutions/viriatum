@@ -66,7 +66,7 @@ static __inline const char *getBasePath() {
 #ifdef VIRIATUM_PLATFORM_UNIX
 #ifdef VIRIATUM_PLATFORM_ANDROID
 #define VIRIATUM_MODULES_PATH "/sdcard/viriatum/modules"
-#define VIRIATUM_RESOURCES_PATH "resources"
+#define VIRIATUM_RESOURCES_PATH "/sdcard/viriatum/www"
 #define VIRIATUM_BASE_PATH "/"
 #define VIRIATUM_LISTING_PATH "/templates/listing.html.tpl"
 #define VIRIATUM_CONTENTS_PATH "/sdcard/viriatum/www"
@@ -74,7 +74,7 @@ static __inline const char *getBasePath() {
 #ifndef VIRIATUM_MODULES_PATH
 #define VIRIATUM_MODULES_PATH "/usr/lib/viriatum/modules"
 #endif
-#define VIRIATUM_RESOURCES_PATH "resources"
+#define VIRIATUM_RESOURCES_PATH "/var/viriatum/www"
 #define VIRIATUM_BASE_PATH "/"
 #define VIRIATUM_LISTING_PATH "/templates/listing.html.tpl"
 #ifndef VIRIATUM_CONTENTS_PATH
