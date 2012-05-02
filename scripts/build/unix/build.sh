@@ -5,13 +5,16 @@ current=$PWD
 build=$current/build
 repo=$build/repo
 target=$build/target
-deb_dir=$build/$name
+deb_dir=$target/deb
+deb_build_dir=$deb_dir/$name
 
 # creates the necessary directories
 mkdir -p $build
+mkdir -p $target
 mkdir -p $deb_dir
-mkdir -p $deb_dir/DEBIAN
-mkdir -p $deb_dir/usr/sbin
+mkdir -p $deb_build_dir
+mkdir -p $deb_build_dir/DEBIAN
+mkdir -p $deb_build_dir/usr/sbin
 
 # clones the repository to retrieve the source code
 # for compilation
@@ -28,10 +31,10 @@ make && make install
 cd $current
 
 # copies the binary files
-cp -rf $target/bin/viriatum $deb_dir/usr/sbin
-cp -rf $current/meta/* $deb_dir/DEBIAN
+cp -rf $target/bin/viriatum $deb_build_dir/usr/sbin
+cp -rf $current/meta/* $deb_build_dir/DEBIAN
 
 echo "Building deb package..."
 
 # creates the deb file from the deb directory
-dpkg-deb --build $deb_dir
+dpkg-deb --build $deb_build_dir
