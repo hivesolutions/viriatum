@@ -20,6 +20,7 @@ mkdir -p $deb_dir
 mkdir -p $deb_build_dir
 mkdir -p $deb_build_dir/DEBIAN
 mkdir -p $deb_build_dir/usr/sbin
+mkdir -p $deb_build_dir/etc/init.d
 
 # clones the repository to retrieve the source code
 # for compilation
