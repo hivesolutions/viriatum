@@ -195,6 +195,10 @@ void daemonize() {
 
 #ifndef VIRIATUM_PLATFORM_IPHONE
 int main(int argc, char *argv[]) {
+	/* allocates space for the possible argument
+	for "daemonization" of the current process */
+	void *value;
+
     /* allocates the return value */
     ERROR_CODE returnValue;
 
@@ -202,19 +206,21 @@ int main(int argc, char *argv[]) {
     processed arguments, indexed by name */
     struct HashMap_t *arguments;
 
-    /* prints the viriatum information into the standard
-    output "file", the label should be standard */
-    printInformation();
-
     /* prints a debug message */
     V_DEBUG_F("Receiving %d argument(s)\n", argc);
 
     /* processes the various arguments into a map */
     processArguments(argc, argv, &arguments);
 
-	/* daemonizes the current process so that it
-	remains in background and returns the calling */
-	daemonize();
+    /* tries to retrieve the daemon argument from the
+	arguments map in case the value is set daemonizes
+	the current process so that it remains in background
+	and returns to the caller process immediately, otherwise
+	prints the viriatum information into the standard
+    output "file", the label should be standard */
+    getValueStringHashMap(arguments, (unsigned char *) "daemon", &value);
+	if(value != NULL) { daemonize(); }
+	else { printInformation(); }
 
     /* runs the service, with the given arguments */
     returnValue = runService(arguments);
