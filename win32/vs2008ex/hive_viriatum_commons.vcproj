@@ -641,6 +641,14 @@
                     >
                 </File>
             </Filter>
+            <Filter
+                Name="Ini"
+                >
+                <File
+                    RelativePath="..\..\src\hive_viriatum_commons\ini\ini.c"
+                    >
+                </File>
+            </Filter>
         </Filter>
         <Filter
             Name="Header Files"
@@ -932,6 +940,14 @@
                 </File>
                 <File
                     RelativePath="..\..\src\hive_viriatum_commons\jni\start.h"
+                    >
+                </File>
+            </Filter>
+            <Filter
+                Name="Ini"
+                >
+                <File
+                    RelativePath="..\..\src\hive_viriatum_commons\ini\ini.h"
                     >
                 </File>
             </Filter>
