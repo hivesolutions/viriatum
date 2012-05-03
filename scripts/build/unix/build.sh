@@ -38,7 +38,7 @@ if [ $? -ne 0 ]; then cd $current && exit $?; fi
 # in the repository directory
 cd $repo
 make -f Makefile-autoconfig
-./configure --prefix=$target --with-wwwroot=$target/var/viriatum/www
+./configure --prefix=$target --with-wwwroot=$target/var/viriatum/www --enable-defaults
 make && make install
 
 # in case the previous command didn't exit properly
