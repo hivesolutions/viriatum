@@ -24,6 +24,7 @@
 # __license__   = GNU General Public License (GPL), Version 3
 
 # checks for libraries
+AC_CHECK_LIB([viriatum], [main])
 AC_CHECK_LIB([lua5.1], [main], [], [have_lua=false])
 
 # library variables activation
