@@ -193,105 +193,6 @@ void daemonize() {
 }
 #endif
 
-
-
-
-typedef enum IniState_e {
-    INI_ENGINE_NORMAL = 1,
-    INI_ENGINE_SECTION,
-    INI_ENGINE_KEY,
-	INI_ENGINE_VALUE
-} IniEngineState;
-
-
-#define INI_MARK(FOR) INI_MARK_N(FOR, 0)
-#define INI_MARK_BACK(FOR) INI_MARK_N(FOR, 1)
-#define INI_MARK_N(FOR, N)\
-    do {\
-        FOR##Mark = pointer - N;\
-    } while(0)
-
-
-
-
-ERROR_CODE processIniFile(char *filePath) {
-	ERROR_CODE returnValue;
-	size_t index;
-	size_t fileSize;
-	unsigned char *fileBuffer;
-	unsigned char character;
-	enum IniState_e state;
-
-
-    /* allocates the mark variables used to locate
-    the part of context changing durring the parsing */
-    unsigned char *pointer = 0;
-    unsigned char *textEndMark = 0;
-    unsigned char *tagEndMark = 0;
-    unsigned char *tagNameMark = 0;
-    unsigned char *parameterMark = 0;
-    unsigned char *parameterValueMark = 0;
-
-
-
-	returnValue = readFile(filePath, &fileBuffer, &fileSize);
-
-    /* tests the error code for error, in case there is an
-	error prints it to the error stream output */
-    if(IS_ERROR_CODE(returnValue)) { V_ERROR_F("Problem reading file (%s)\n", (char *) GET_ERROR()); }
-
-	state = INI_ENGINE_NORMAL;
-
-	for(index = 0; index < fileSize; index++) {
-		character = fileBuffer[index];
-
-		switch(state) {
-			case INI_ENGINE_NORMAL:
-				if(character == '[') {
-					state = INI_ENGINE_SECTION;
-				} else if(character == '\n') {
-					state = INI_ENGINE_NORMAL;
-				} else {
-					state = INI_ENGINE_KEY;
-				}
-
-				break;
-
-			case INI_ENGINE_SECTION:
-				if(character == ']') {
-					state = INI_ENGINE_NORMAL;
-
-					/* mando evento para section final */
-				}
-
-				break;
-
-			case INI_ENGINE_KEY:
-				if(character == '=') {
-					state = INI_ENGINE_VALUE;
-
-					/* mando evento para key final */
-				}
-
-				break;
-
-			case INI_ENGINE_VALUE:
-				if(character == '\n') {
-					state = INI_ENGINE_NORMAL;
-
-					/* mando evento para value final */
-				}
-
-				break;
-		}
-	}
-
-	/* raises no error */
-    RAISE_NO_ERROR;
-}
-
-
-
 #ifndef VIRIATUM_PLATFORM_IPHONE
 int main(int argc, char *argv[]) {
     /* allocates space for the possible argument
@@ -304,8 +205,6 @@ int main(int argc, char *argv[]) {
     /* allocates the map that will contain the various
     processed arguments, indexed by name */
     struct HashMap_t *arguments;
-
-	processIniFile("c:\\viriatum.ini");
 
     /* prints a debug message */
     V_DEBUG_F("Receiving %d argument(s)\n", argc);
