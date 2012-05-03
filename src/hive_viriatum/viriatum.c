@@ -117,11 +117,11 @@ ERROR_CODE printInformation() {
     unsigned char *description = descriptionViriatum();
 
     /* registers the kill handler for the various signals
-	associated with the "destroy" operation */
+    associated with the "destroy" operation */
     signal(SIGHUP, killHandler);
     signal(SIGINT, killHandler);
     signal(SIGQUIT, killHandler);
-	signal(SIGTERM, killHandler);
+    signal(SIGTERM, killHandler);
 
     /* prints a message */
     V_PRINT_F("%s %s (%s, %s) [%s %s %d bit (%s)] on %s\n", description, version, VIRIATUM_COMPILATION_DATE, VIRIATUM_COMPILATION_TIME, VIRIATUM_COMPILER, VIRIATUM_COMPILER_VERSION_STRING, (int) VIRIATUM_PLATFORM_CPU_BITS, VIRIATUM_PLATFORM_CPU, VIRIATUM_PLATFORM_STRING);
@@ -140,53 +140,53 @@ void daemonize() {
 
 #ifdef VIRIATUM_PLATFORM_LINUX
 void daemonize() {
-	/* allocates space for the various dameon
-	related variables */
+    /* allocates space for the various dameon
+    related variables */
     PID_TYPE pid;
-	PID_TYPE sid;
-	FILE *pidFile;
-	char pidString[1024];
-	size_t pidStringLength;
+    PID_TYPE sid;
+    FILE *pidFile;
+    char pidString[1024];
+    size_t pidStringLength;
 
     /* forks off the parent process, this
-	is the main trick in the process*/
+    is the main trick in the process*/
     pid = fork();
 
-	/* checks if the pid is invalid in case
-	it's exits the parent process in error */
+    /* checks if the pid is invalid in case
+    it's exits the parent process in error */
     if(pid < 0) { exit(EXIT_FAILURE); }
     /* checks if the pid of the parent
-	process is good in case it's can exit
-	the parent process */
+    process is good in case it's can exit
+    the parent process */
     if(pid > 0) { exit(EXIT_SUCCESS); }
 
     /* changes the file mode mask */
     umask(0);
 
     /* create a new sid for the child process and then
-	verifies if it has been successfull */
+    verifies if it has been successfull */
     sid = setsid();
     if(sid < 0) { exit(EXIT_FAILURE); }
 
     /* changes the current working directory to the
-	base of the dily system */
+    base of the dily system */
     if(chdir("/") < 0) { exit(EXIT_FAILURE); }
-    
-	/* retrieves the pid of the current process this
-	must be called because the current pid value is invalid */
+
+    /* retrieves the pid of the current process this
+    must be called because the current pid value is invalid */
     pid = GET_PID();
 
-	/* opens the pid file and writes the pid stirng into it
-	this will allow external programs to make sure viriatum
-	is correctly running */
+    /* opens the pid file and writes the pid stirng into it
+    this will allow external programs to make sure viriatum
+    is correctly running */
     FOPEN(&pidFile, VIRIATUM_PID_PATH, "wb");
     SPRINTF(pidString, 1024, "%d\n", pid);
     pidStringLength = strlen(pidString);
     fwrite(pidString, sizeof(char), pidStringLength, pidFile);
-	fclose(pidFile);
- 
-	/* closes the various pending streams from the
-	daemon process (not going to output them) */
+    fclose(pidFile);
+
+    /* closes the various pending streams from the
+    daemon process (not going to output them) */
     close(STDIN_FILENO);
     close(STDOUT_FILENO);
     close(STDERR_FILENO);
@@ -195,9 +195,9 @@ void daemonize() {
 
 #ifndef VIRIATUM_PLATFORM_IPHONE
 int main(int argc, char *argv[]) {
-	/* allocates space for the possible argument
-	for "daemonization" of the current process */
-	void *value;
+    /* allocates space for the possible argument
+    for "daemonization" of the current process */
+    void *value;
 
     /* allocates the return value */
     ERROR_CODE returnValue;
@@ -213,14 +213,14 @@ int main(int argc, char *argv[]) {
     processArguments(argc, argv, &arguments);
 
     /* tries to retrieve the daemon argument from the
-	arguments map in case the value is set daemonizes
-	the current process so that it remains in background
-	and returns to the caller process immediately, otherwise
-	prints the viriatum information into the standard
+    arguments map in case the value is set daemonizes
+    the current process so that it remains in background
+    and returns to the caller process immediately, otherwise
+    prints the viriatum information into the standard
     output "file", the label should be standard */
     getValueStringHashMap(arguments, (unsigned char *) "daemon", &value);
-	if(value != NULL) { daemonize(); }
-	else { printInformation(); }
+    if(value != NULL) { daemonize(); }
+    else { printInformation(); }
 
     /* runs the service, with the given arguments */
     returnValue = runService(arguments);
@@ -234,10 +234,10 @@ int main(int argc, char *argv[]) {
         V_ERROR_F("Problem running service (%s)\n", (char *) GET_ERROR());
     }
 
-	/* removes the viriatum pid path, so that the daemon
-	watching tool are notified that the process is no
-	longer running in the current environment */
-	remove(VIRIATUM_PID_PATH);
+    /* removes the viriatum pid path, so that the daemon
+    watching tool are notified that the process is no
+    longer running in the current environment */
+    remove(VIRIATUM_PID_PATH);
 
     /* prints a debug message */
     V_DEBUG("Finishing process\n");
