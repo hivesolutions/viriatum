@@ -871,7 +871,7 @@ ERROR_CODE _fileOptionsService(struct Service_t *service, struct HashMap_t *argu
 
     /* tries to retrieve the general section configuration from the configuration
     map in case none is found returns immediately no need to process anything more */
-    getValueStringHashMap(configuration, (unsigned char *) "general", &general);
+    getValueStringHashMap(configuration, (unsigned char *) "general", (void **) &general);
     if(general == NULL) { RAISE_NO_ERROR; }
 
     /* tries to retrieve the port argument from the arguments map and
