@@ -36,11 +36,15 @@
 #endif
 
 #ifdef WITH_MODULE_ROOT
+#ifndef HAVE_DEFAULTS
 #define VIRIATUM_MODULES_PATH WITH_MODULE_ROOT
+#endif
 #endif
 
 #ifdef WITH_WWW_ROOT
+#ifndef HAVE_DEFAULTS
 #define VIRIATUM_CONTENTS_PATH WITH_WWW_ROOT
+#endif
 #endif
 
 #ifdef _WIN32
