@@ -95,7 +95,7 @@ ERROR_CODE processTemplateEngine(struct TemplateEngine_t *templateEngine, struct
     end of the parsing */
     unsigned char *fileBuffer;
 
-    /* allocates the mark variable used to locate
+    /* allocates the mark variables used to locate
     the part of context changing durring the parsing */
     unsigned char *pointer = 0;
     unsigned char *textEndMark = 0;
