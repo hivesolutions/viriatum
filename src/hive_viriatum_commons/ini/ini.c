@@ -145,7 +145,7 @@ ERROR_CODE _valueEndCallback(struct IniEngine_t *iniEngine, const unsigned char 
     memcpy(iniHandler->value, pointer, size);
     iniHandler->value[size] = '\0';
 
-    getValueStringHashMap(iniHandler->configuration, (unsigned char *) iniHandler->section, &sectionConfiguration);
+    getValueStringHashMap(iniHandler->configuration, (unsigned char *) iniHandler->section, (void **) &sectionConfiguration);
     if(sectionConfiguration == NULL) {
         createHashMap(&sectionConfiguration, 0);
         setValueStringHashMap(iniHandler->configuration, (unsigned char *) iniHandler->section, sectionConfiguration);
