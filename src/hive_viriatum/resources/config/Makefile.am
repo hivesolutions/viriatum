@@ -25,4 +25,4 @@
 
 include $(top_srcdir)/Common.am
 
-sysconf_DATA = viriatum/viriatum.ini
+nobase_sysconf_DATA = viriatum/viriatum.ini
