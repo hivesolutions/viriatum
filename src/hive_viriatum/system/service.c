@@ -39,6 +39,7 @@ void createService(struct Service_t **servicePointer, unsigned char *name) {
     /* sets the service attributes (default) values */
     service->name = name;
     service->status = STATUS_CLOSED;
+    service->configuration = NULL;
     service->serviceSocketHandle = 0;
     service->httpHandler = NULL;
     service->createHttpHandler = createHttpHandlerService;
@@ -849,28 +850,45 @@ ERROR_CODE _fileOptionsService(struct Service_t *service, struct HashMap_t *argu
     during the arguments retrieval */
     void *value;
 
+	/* allocates space for the path to the proper configuration
+	file (the ini base file) */
+	char configPath[VIRIATUM_MAX_PATH_SIZE];
+
+	/* allocates space for both the general configuration hash
+	map and the "concrete" general configuration map */
     struct HashMap_t *configuration;
+    struct HashMap_t *general;
 
     /* unpacks the service options from the service */
     struct ServiceOptions_t *serviceOptions = service->options;
 
-    processIniFile("c:\\viriatum.ini", &configuration);
+    /* creates the configuration file path using the defined viriatum
+	path to the configuration directory and then loads it as an ini file,
+	this should retrieve the configuration as a set of maps */
+	SPRINTF(configPath, VIRIATUM_MAX_PATH_SIZE, "%s/viriatum.ini", VIRIATUM_CONFIG_PATH);
+    processIniFile(configPath, &configuration);
+    service->configuration = configuration;
+
+    /* tries to retrieve the general section configuration from the configuration
+    map in case none is found returns immediately no need to process anything more */
+    getValueStringHashMap(configuration, (unsigned char *) "general", &general);
+    if(general == NULL) { RAISE_NO_ERROR; }
 
     /* tries to retrieve the port argument from the arguments map and
     in case the (port) value is set, casts the port value into integer
     and sets it in the service options */
-    getValueStringHashMap(configuration, (unsigned char *) "port", &value);
-    if(value != NULL) { serviceOptions->port = (unsigned short) atoi(value);}
+    getValueStringHashMap(general, (unsigned char *) "port", &value);
+    if(value != NULL) { serviceOptions->port = (unsigned short) atoi(value); }
 
     /* tries to retrieve the host argument from the arguments map and
     in case the (host) value is set, sets it in the service options */
-    getValueStringHashMap(configuration, (unsigned char *) "host", &value);
-    if(value != NULL) { serviceOptions->address = (unsigned char *) value;}
+    getValueStringHashMap(general, (unsigned char *) "host", &value);
+    if(value != NULL) { serviceOptions->address = (unsigned char *) value; }
 
     /* tries to retrieve the handler argument from the arguments map and
     in case the (handler) value is set, sets it in the service options */
-    getValueStringHashMap(configuration, (unsigned char *) "handler", &value);
-    if(value != NULL) { serviceOptions->address = (unsigned char *) value;}
+    getValueStringHashMap(general, (unsigned char *) "handler", &value);
+    if(value != NULL) { serviceOptions->handlerName = (unsigned char *) value; }
 
     /* raises no error */
     RAISE_NO_ERROR;

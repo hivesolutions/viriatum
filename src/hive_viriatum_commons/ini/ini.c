@@ -135,6 +135,9 @@ ERROR_CODE _keyEndCallback(struct IniEngine_t *iniEngine, const unsigned char *p
 }
 
 ERROR_CODE _valueEndCallback(struct IniEngine_t *iniEngine, const unsigned char *pointer, size_t size) {
+    struct HashMap_t *sectionConfiguration;
+
+
     /* retrieves the ini handler from the template engine context
     then uses it to store the (current) value */
     struct IniHandler_t *iniHandler = (struct IniHandler_t *) iniEngine->context;
@@ -142,9 +145,13 @@ ERROR_CODE _valueEndCallback(struct IniEngine_t *iniEngine, const unsigned char 
     memcpy(iniHandler->value, pointer, size);
     iniHandler->value[size] = '\0';
 
+    getValueStringHashMap(iniHandler->configuration, (unsigned char *) iniHandler->section, &sectionConfiguration);
+    if(sectionConfiguration == NULL) {
+        createHashMap(&sectionConfiguration, 0);
+        setValueStringHashMap(iniHandler->configuration, (unsigned char *) iniHandler->section, sectionConfiguration);
+    }
 
-    setValueStringHashMap(iniHandler->configuration, (unsigned char *) iniHandler->key, iniHandler->value);
-
+    setValueStringHashMap(sectionConfiguration, (unsigned char *) iniHandler->key, iniHandler->value);
 
     V_PRINT_F("VALUE -> '%s'\n", iniHandler->value);
 
@@ -271,7 +278,6 @@ ERROR_CODE processIniFile(char *filePath, struct HashMap_t **configurationPointe
     for(index = 0; index < fileSize; index++) {
         character = fileBuffer[index];
         pointer = &fileBuffer[index];
-
 
         switch(state) {
             case INI_ENGINE_NORMAL:
