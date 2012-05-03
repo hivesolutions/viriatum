@@ -40,7 +40,7 @@ For building using the default mingw32 toolchain.
 * `./configure --host=i586-mingw32msvc --build=i686-linux --prefix=/opt/i586-mingw32`
 * `make && make install`
 
-For building using the mingw-w63 toolchain for 64 and 32 bit options.
+For building using the mingw-w64 toolchain for 64 and 32 bit options.
 
 * `apt-get install mingw-w64 gcc-mingw-w64 binutils-mingw-w64`
 * `./configure --host=x86_64-w64-mingw32 --build=i686-linux --prefix=/opt/x86_64-w64-mingw32`
