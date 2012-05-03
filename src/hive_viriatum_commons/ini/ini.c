@@ -247,9 +247,10 @@ ERROR_CODE processIniFile(char *filePath, struct HashMap_t **configurationPointe
 
 
     /* creates the hash map that will hold the various
-    arguments */
+    arguments, then updates the configuration pointer
+	with the created configuration hash map */
     createHashMap(&configuration, 0);
-
+    *configurationPointer = configuration;
 
 
     iniSettings_s.onsectionStart = NULL;
@@ -268,6 +269,8 @@ ERROR_CODE processIniFile(char *filePath, struct HashMap_t **configurationPointe
 
 
     returnValue = readFilessssss(filePath, &fileBuffer, &fileSize);
+
+
 
     /* tests the error code for error, in case there is an
     error prints it to the error stream output */
@@ -341,10 +344,6 @@ ERROR_CODE processIniFile(char *filePath, struct HashMap_t **configurationPointe
                 break;
         }
     }
-
-    /* updates the configuration pointer with the created
-    configuration has map */
-    *configurationPointer = configuration;
 
     /* raises no error */
     RAISE_NO_ERROR;
