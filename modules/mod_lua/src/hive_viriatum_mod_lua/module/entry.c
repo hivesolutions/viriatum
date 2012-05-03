@@ -115,6 +115,8 @@ ERROR_CODE startModule(struct Environment_t *environment, struct Module_t *modul
 
     /* sets the mod lua handler attributes */
     modLuaHttpHandler->luaState = luaState;
+	modLuaHttpHandler->filePath = DEFAULT_FILE_PATH;
+    modLuaHttpHandler->fileDirty = 1;
 
     /* sets the mod lua module attributes */
     modLuaModule->luaState = luaState;
@@ -123,6 +125,10 @@ ERROR_CODE startModule(struct Environment_t *environment, struct Module_t *modul
 
     /* adds the http handler to the service */
     service->addHttpHandler(service, httpHandler);
+
+	/* loads the service configuration for the http handler
+	this should change some of it's behavior */
+	_loadConfiguration(service, modLuaHttpHandler);
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -210,6 +216,26 @@ ERROR_CODE infoModule(struct Module_t *module) {
 ERROR_CODE errorModule(unsigned char **messagePointer) {
     /* sets the error message in the (error) message pointer */
     *messagePointer = getLastErrorMessage();
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE _loadConfiguration(struct Service_t *service, struct ModLuaHttpHandler_t *modLuaHttpHandler) {
+	/* allocates space for both a configuration item reference
+	(value) and for the configuration to be retrieved */
+	void *value;
+	struct HashMap_t *configuration;
+
+    /* tries to retrieve the mod lua section configuration from the configuration
+    map in case none is found returns immediately no need to process anything more */
+    getValueStringHashMap(service->configuration, (unsigned char *) "mod_lua", &configuration);
+	if(configuration == NULL) { RAISE_NO_ERROR; }
+    
+	/* tries ro retrieve the script path from the lua configuration and in
+	case it exists sets it in the mod lua handler (attribute reference change) */
+	getValueStringHashMap(configuration, (unsigned char *) "script_path", &value);
+    if(value != NULL) { modLuaHttpHandler->filePath = (char *) value; }
 
     /* raises no error */
     RAISE_NO_ERROR;
