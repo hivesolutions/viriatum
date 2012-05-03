@@ -249,7 +249,7 @@ ERROR_CODE processIniFile(char *filePath, struct HashMap_t **configurationPointe
 
     /* creates the hash map that will hold the various
     arguments, then updates the configuration pointer
-	with the created configuration hash map */
+    with the created configuration hash map */
     createHashMap(&configuration, 0);
     *configurationPointer = configuration;
 
