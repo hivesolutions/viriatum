@@ -25,6 +25,8 @@
  __license__   = GNU General Public License (GPL), Version 3
 */
 
+#pragma once
+
 #include "handler.h"
 
 /**
@@ -61,4 +63,7 @@ VIRIATUM_EXPORT_PREFIX ERROR_CODE stopModule(struct Environment_t *environment, 
 VIRIATUM_EXPORT_PREFIX ERROR_CODE infoModule(struct Module_t *module);
 VIRIATUM_EXPORT_PREFIX ERROR_CODE errorModule(unsigned char **messagePointer);
 VIRIATUM_EXPORT_PREFIX ERROR_CODE _loadConfiguration(struct Service_t *service, struct ModLuaHttpHandler_t *modLuaHttpHandler);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _loadLuaState(lua_State **luaStatePointer);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _unloadLuaState(lua_State **luaStatePointer);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _reloadLuaState(lua_State **luaStatePointer);
 VIRIATUM_EXPORT_PREFIX ERROR_CODE _startLuaState(lua_State *luaState);

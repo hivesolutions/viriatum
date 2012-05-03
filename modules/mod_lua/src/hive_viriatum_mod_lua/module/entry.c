@@ -93,14 +93,9 @@ ERROR_CODE startModule(struct Environment_t *environment, struct Module_t *modul
     /* populates the module structure */
     infoModule(module);
 
-    /* initializes the lua interpreter */
-    luaState = lua_open();
-
-    /* load various lua libraries */
-    luaL_openlibs(luaState);
-
-    /* starts the lua state */
-    _startLuaState(luaState);
+	/* loads the lua state populating all the erquired values
+	for state initialization */
+	_loadLuaState(&luaState);
 
     /* creates the http handler */
     service->createHttpHandler(service, &httpHandler, (unsigned char *) "lua");
@@ -236,6 +231,39 @@ ERROR_CODE _loadConfiguration(struct Service_t *service, struct ModLuaHttpHandle
     case it exists sets it in the mod lua handler (attribute reference change) */
     getValueStringHashMap(configuration, (unsigned char *) "script_path", &value);
     if(value != NULL) { modLuaHttpHandler->filePath = (char *) value; }
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE _loadLuaState(lua_State **luaStatePointer) {
+    /* initializes the lua interpreter, then loads
+	various (default) lua libraries and then starts
+	the global values in the environment (symbol injection) */
+    lua_State *luaState = lua_open();
+    luaL_openlibs(luaState);
+    _startLuaState(luaState);
+
+	/* sets the lua state in the pointer reference */
+	*luaStatePointer = luaState;
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE _unloadLuaState(lua_State **luaStatePointer) {
+	lua_State *luaSate = *luaStatePointer;
+
+	lua_close(luaSate);
+	*luaStatePointer = NULL;
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE _reloadLuaState(lua_State **luaStatePointer) {
+	_unloadLuaState(luaStatePointer);
+	_loadLuaState(luaStatePointer);
 
     /* raises no error */
     RAISE_NO_ERROR;
