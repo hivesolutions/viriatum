@@ -35,6 +35,7 @@
 #include "encoding/encoding.h"
 #include "jni/jni.h"
 #include "memory/memory.h"
+#include "ini/ini.h"
 #include "sorting/sorting.h"
 #include "stream/stream.h"
 #include "structures/structures.h"

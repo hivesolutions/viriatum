@@ -845,6 +845,33 @@ ERROR_CODE _defaultOptionsService(struct Service_t *service, struct HashMap_t *a
 }
 
 ERROR_CODE _fileOptionsService(struct Service_t *service, struct HashMap_t *arguments) {
+    /* allocates the value reference to be used
+    during the arguments retrieval */
+    void *value;
+
+    struct HashMap_t *configuration;
+
+    /* unpacks the service options from the service */
+    struct ServiceOptions_t *serviceOptions = service->options;
+
+    processIniFile("c:\\viriatum.ini", &configuration);
+
+    /* tries to retrieve the port argument from the arguments map and
+    in case the (port) value is set, casts the port value into integer
+    and sets it in the service options */
+    getValueStringHashMap(configuration, (unsigned char *) "port", &value);
+    if(value != NULL) { serviceOptions->port = (unsigned short) atoi(value);}
+
+    /* tries to retrieve the host argument from the arguments map and
+    in case the (host) value is set, sets it in the service options */
+    getValueStringHashMap(configuration, (unsigned char *) "host", &value);
+    if(value != NULL) { serviceOptions->address = (unsigned char *) value;}
+
+    /* tries to retrieve the handler argument from the arguments map and
+    in case the (handler) value is set, sets it in the service options */
+    getValueStringHashMap(configuration, (unsigned char *) "handler", &value);
+    if(value != NULL) { serviceOptions->address = (unsigned char *) value;}
+
     /* raises no error */
     RAISE_NO_ERROR;
 }
