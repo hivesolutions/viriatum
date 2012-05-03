@@ -68,6 +68,8 @@ typedef enum IniState_e {
         }\
     } while(0)
 
+struct IniEngine_t;
+
 typedef ERROR_CODE (*iniCallback) (struct IniEngine_t *);
 typedef ERROR_CODE (*iniDataCallback) (struct IniEngine_t *, const unsigned char *, size_t);
 
