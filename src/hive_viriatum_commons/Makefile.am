@@ -44,6 +44,7 @@ compression/huffman.c \
 debug/error.c \
 debug/logging.c \
 encoding/base_64.c \
+ini/ini.c \
 jni/info.c \
 jni/start.c \
 memory/memory_pool.c \
@@ -71,6 +72,7 @@ compression/huffman.c \
 debug/error.c \
 debug/logging.c \
 encoding/base_64.c \
+ini/ini.c \
 jni/info.c \
 jni/start.c \
 memory/memory_pool.c \
