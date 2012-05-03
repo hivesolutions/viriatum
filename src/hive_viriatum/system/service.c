@@ -850,12 +850,12 @@ ERROR_CODE _fileOptionsService(struct Service_t *service, struct HashMap_t *argu
     during the arguments retrieval */
     void *value;
 
-	/* allocates space for the path to the proper configuration
-	file (the ini base file) */
-	char configPath[VIRIATUM_MAX_PATH_SIZE];
+    /* allocates space for the path to the proper configuration
+    file (the ini base file) */
+    char configPath[VIRIATUM_MAX_PATH_SIZE];
 
-	/* allocates space for both the general configuration hash
-	map and the "concrete" general configuration map */
+    /* allocates space for both the general configuration hash
+    map and the "concrete" general configuration map */
     struct HashMap_t *configuration;
     struct HashMap_t *general;
 
@@ -863,9 +863,9 @@ ERROR_CODE _fileOptionsService(struct Service_t *service, struct HashMap_t *argu
     struct ServiceOptions_t *serviceOptions = service->options;
 
     /* creates the configuration file path using the defined viriatum
-	path to the configuration directory and then loads it as an ini file,
-	this should retrieve the configuration as a set of maps */
-	SPRINTF(configPath, VIRIATUM_MAX_PATH_SIZE, "%s/viriatum.ini", VIRIATUM_CONFIG_PATH);
+    path to the configuration directory and then loads it as an ini file,
+    this should retrieve the configuration as a set of maps */
+    SPRINTF(configPath, VIRIATUM_MAX_PATH_SIZE, "%s/viriatum.ini", VIRIATUM_CONFIG_PATH);
     processIniFile(configPath, &configuration);
     service->configuration = configuration;
 
