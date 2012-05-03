@@ -93,7 +93,7 @@ typedef enum TemplateEngineState_e {
     TEMPLATE_ENGINE_DOLAR,
 
     /**
-     * Sate when the tag has been open and the parser
+     * State when the tag has been open and the parser
      * is trying to find the name of the tag.
      */
     TEMPLATE_ENGINE_OPEN,
