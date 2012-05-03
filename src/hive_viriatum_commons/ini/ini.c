@@ -271,7 +271,7 @@ ERROR_CODE processIniFile(char *filePath, struct HashMap_t **configurationPointe
 
     /* tests the error code for error, in case there is an
     error prints it to the error stream output */
-    if(IS_ERROR_CODE(returnValue)) { V_ERROR_F("Problem reading file (%s)\n", (char *) GET_ERROR()); }
+    if(IS_ERROR_CODE(returnValue)) { V_ERROR_F("Problem reading file (%s)\n", (char *) GET_ERROR()); RAISE_NO_ERROR; }
 
     state = INI_ENGINE_NORMAL;
 
