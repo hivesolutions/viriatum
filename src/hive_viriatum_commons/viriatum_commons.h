@@ -46,8 +46,8 @@
 
 #ifdef VIRIATUM_PLATFORM_MSC
 #ifdef VIRIATUM_DEBUG
-#pragma comment(lib, "viriatum_commons.lib")
-#else
 #pragma comment(lib, "viriatum_commons_d.lib")
+#else
+#pragma comment(lib, "viriatum_commons.lib")
 #endif
 #endif
