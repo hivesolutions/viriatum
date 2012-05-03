@@ -21,7 +21,7 @@
             OutputDirectory="$(SolutionDir)..\..\bin\$(ProjectName)\i386\win32\$(ConfigurationName)"
             IntermediateDirectory="$(ProjectName)\$(ConfigurationName)"
             ConfigurationType="2"
-            CharacterSet="1"
+            CharacterSet="0"
             >
             <Tool
                 Name="VCPreBuildEventTool"
@@ -84,6 +84,7 @@
             />
             <Tool
                 Name="VCPostBuildEventTool"
+                CommandLine="xcopy /e /y &quot;$(OutDir)\$(TargetFileName)&quot; &quot;$(SolutionDir)\..\..\bin\hive_viriatum\i386\win32\$(ConfigurationName)\modules\&quot;"
             />
         </Configuration>
         <Configuration
@@ -91,7 +92,7 @@
             OutputDirectory="$(SolutionDir)..\..\bin\$(ProjectName)\i386\win32\$(ConfigurationName)"
             IntermediateDirectory="$(ProjectName)\$(ConfigurationName)"
             ConfigurationType="2"
-            CharacterSet="1"
+            CharacterSet="0"
             WholeProgramOptimization="1"
             >
             <Tool
@@ -155,6 +156,7 @@
             />
             <Tool
                 Name="VCPostBuildEventTool"
+                CommandLine="xcopy /e /y &quot;$(OutDir)\$(TargetFileName)&quot; &quot;$(SolutionDir)\..\..\bin\hive_viriatum\i386\win32\$(ConfigurationName)\modules\&quot;"
             />
         </Configuration>
     </Configurations>
