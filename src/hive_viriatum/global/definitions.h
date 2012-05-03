@@ -30,8 +30,10 @@
 #ifdef VIRIATUM_PLATFORM_WIN32
 
 static char basePath[VIRIATUM_MAX_PATH_SIZE] = { '\0' };
+static char modulesPath[VIRIATUM_MAX_PATH_SIZE] = { '\0' };
+static char configPath[VIRIATUM_MAX_PATH_SIZE] = { '\0' };
 
-static __inline const char *getBasePath() {
+static __inline char *getBasePath() {
     size_t basePathLength;
     size_t index;
 
@@ -51,10 +53,33 @@ static __inline const char *getBasePath() {
     return basePath;
 }
 
+static __inline char *getModulesPath() {
+    const char *basePath;
+
+    if(modulesPath[0] != '\0') { return modulesPath; }
+
+    basePath = getBasePath();
+    sprintf_s(modulesPath, VIRIATUM_MAX_PATH_SIZE, "%s/modules", basePath);
+
+    return modulesPath;
+}
+
+static __inline char *getConfigPath() {
+    const char *basePath;
+
+    if(configPath[0] != '\0') { return configPath; }
+
+    basePath = getBasePath();
+    sprintf_s(configPath, VIRIATUM_MAX_PATH_SIZE, "%s/config", basePath);
+
+    return configPath;
+}
+
 #ifndef VIRIATUM_MODULES_PATH
-#define VIRIATUM_MODULES_PATH "./modules"
+#define VIRIATUM_MODULES_PATH getModulesPath()
 #endif
 #define VIRIATUM_RESOURCES_PATH getBasePath()
+#define VIRIATUM_CONFIG_PATH getConfigPath()
 #define VIRIATUM_BASE_PATH "/"
 #define VIRIATUM_LISTING_PATH "/templates/listing.html.tpl"
 #ifndef VIRIATUM_CONTENTS_PATH
@@ -67,6 +92,7 @@ static __inline const char *getBasePath() {
 #ifdef VIRIATUM_PLATFORM_ANDROID
 #define VIRIATUM_MODULES_PATH "/sdcard/viriatum/modules"
 #define VIRIATUM_RESOURCES_PATH "/sdcard/viriatum/www"
+#define VIRIATUM_CONFIG_PATH "/sdcard/viriatum/config"
 #define VIRIATUM_BASE_PATH "/"
 #define VIRIATUM_LISTING_PATH "/templates/listing.html.tpl"
 #define VIRIATUM_CONTENTS_PATH "/sdcard/viriatum/www"
@@ -75,6 +101,7 @@ static __inline const char *getBasePath() {
 #define VIRIATUM_MODULES_PATH "/usr/lib/viriatum/modules"
 #endif
 #define VIRIATUM_RESOURCES_PATH "/var/viriatum/www"
+#define VIRIATUM_CONFIG_PATH "/etc/viriatum"
 #define VIRIATUM_BASE_PATH "/"
 #define VIRIATUM_LISTING_PATH "/templates/listing.html.tpl"
 #ifndef VIRIATUM_CONTENTS_PATH
