@@ -198,6 +198,14 @@ typedef struct Service_t {
     struct ServiceOptions_t *options;
 
     /**
+     * The map containing a set of configuration
+     * loaded primarly from the configuration files.
+     * This map is structured by domains and the
+     * first level of keys represent these domains.
+     */
+    struct HashMap_t *configuration;
+
+    /**
      * The socket handle to the service
      * connection.
      */
