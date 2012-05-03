@@ -69,6 +69,7 @@ ERROR_CODE createModule(struct Module_t **modulePointer) {
     module->stop = NULL;
     module->info = NULL;
     module->error = NULL;
+    module->library = NULL;
     module->lower = NULL;
 
     /* sets the module in the module pointer */
@@ -90,8 +91,8 @@ ERROR_CODE loadModule(struct Service_t *service, unsigned char *modulePath) {
     /* error code to be used for testing */
     ERROR_CODE errorCode;
 
-    /* the mod library reference */
-    LIBRARY_REFERENCE modLibrary;
+    /* the library reference */
+    LIBRARY_REFERENCE library;
 
     /* the holder of the library symbol */
     LIBRARY_SYMBOL symbol;
@@ -108,11 +109,11 @@ ERROR_CODE loadModule(struct Service_t *service, unsigned char *modulePath) {
     /* prints a debug message */
     V_DEBUG_F("Loading module (%s)\n", modulePath);
 
-    /* loads the mod library (tries to find the file) */
-    modLibrary = LOAD_LIBRARY((const char *) modulePath);
+    /* loads the library (tries to find the file) */
+    library = LOAD_LIBRARY((const char *) modulePath);
 
-    /* in case the mod library was not loaded */
-    if(modLibrary == NULL) {
+    /* in case the library was not loaded */
+    if(library == NULL) {
         /* retrieves the library error message */
         const char *errorMessage = GET_LIBRARY_ERROR_MESSAGE();
 
@@ -133,8 +134,8 @@ ERROR_CODE loadModule(struct Service_t *service, unsigned char *modulePath) {
         V_DEBUG("Loaded library\n");
     }
 
-    /* retrieves the symbol from the mod library */
-    symbol = GET_LIBRARY_SYMBOL(modLibrary, "infoModule");
+    /* retrieves the symbol from the library */
+    symbol = GET_LIBRARY_SYMBOL(library, "infoModule");
 
     /* retrieves the info module function reference */
     infoModuleFunction = *((viriatumInfoModule *)(&symbol));
@@ -184,24 +185,6 @@ ERROR_CODE loadModule(struct Service_t *service, unsigned char *modulePath) {
     /* adds the module to the list of modlues handlers in the service */
     appendValueLinkedList(service->modulesList, (void *) module);
 
-    /* calls the stop module function */
-    /*errorCode = module->stop(environment, module);*/
-
-    /* tests the error code for error */
-    /*if(IS_ERROR_CODE(errorCode)) {*/
-        /* prints a warning message */
-        /*V_WARNING_F("%s\n", GET_ERROR_MODULE(module));*/
-    /*}*/
-
-    /* deletes the module */
-    /*deleteModule(module);*/
-
-    /* deletes the environment */
-    /*deleteEnvironment(environment);*/
-
-    /* unloads the library */
-    /*UNLOAD_LIBRARY(modLibrary);*/
-
     /* raise no error */
     RAISE_NO_ERROR;
 }
@@ -212,6 +195,9 @@ ERROR_CODE unloadModule(struct Service_t *service, struct Module_t *module) {
 
     /* retrieves the environment from the module */
     struct Environment_t *environment = module->environment;
+
+    /* retrieves the library from the module */
+    LIBRARY_REFERENCE library = module->library;
 
     /* removes the module from the list of modlues handlers in the service */
     removeValueLinkedList(service->modulesList, (void *) module, 1);
@@ -232,7 +218,7 @@ ERROR_CODE unloadModule(struct Service_t *service, struct Module_t *module) {
     deleteEnvironment(environment);
 
     /* unloads the library */
-    /*UNLOAD_LIBRARY(modLibrary);*/
+    UNLOAD_LIBRARY(library);
 
     /* raise no error */
     RAISE_NO_ERROR;
