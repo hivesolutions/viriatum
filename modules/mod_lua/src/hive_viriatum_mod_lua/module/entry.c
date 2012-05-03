@@ -229,7 +229,7 @@ ERROR_CODE _loadConfiguration(struct Service_t *service, struct ModLuaHttpHandle
 
     /* tries to retrieve the mod lua section configuration from the configuration
     map in case none is found returns immediately no need to process anything more */
-    getValueStringHashMap(service->configuration, (unsigned char *) "mod_lua", &configuration);
+    getValueStringHashMap(service->configuration, (unsigned char *) "mod_lua", (void **) &configuration);
 	if(configuration == NULL) { RAISE_NO_ERROR; }
     
 	/* tries ro retrieve the script path from the lua configuration and in
