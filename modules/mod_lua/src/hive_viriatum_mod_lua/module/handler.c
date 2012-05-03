@@ -38,6 +38,8 @@ ERROR_CODE createModLuaHttpHandler(struct ModLuaHttpHandler_t **modLuaHttpHandle
 
     /* sets the mod lua http handler attributes (default) values */
     modLuaHttpHandler->luaState = NULL;
+    modLuaHttpHandler->filePath = NULL;
+	modLuaHttpHandler->fileDirty = 0;
 
     /* sets the mod lua http handler in the upper http handler substrate */
     httpHandler->lower = (void *) modLuaHttpHandler;
@@ -257,14 +259,6 @@ ERROR_CODE _sendResponseHandlerModule(struct HttpParser_t *httpParser) {
     struct HttpConnection_t *httpConnection = (struct HttpConnection_t *) ((struct IoConnection_t *) connection->lower)->lower;
     struct ModLuaHttpHandler_t *modLuaHttpHandler = (struct ModLuaHttpHandler_t *) httpConnection->httpHandler->lower;
 
-    #ifdef VIRIATUM_PLATFORM_WIN32
-    char *filePath = "c:/teste.lua";
-    #endif
-
-    #ifdef VIRIATUM_PLATFORM_UNIX
-    char *filePath = "/teste.lua";
-    #endif
-
     /* allocates space for the result code */
     ERROR_CODE resultCode;
 
@@ -275,13 +269,15 @@ ERROR_CODE _sendResponseHandlerModule(struct HttpParser_t *httpParser) {
     /* registers the write connection function in lua */
     lua_register(modLuaHttpHandler->luaState, "write_connection", _luaWriteConnection);
 
-    /* runs the script */
-    resultCode = luaL_dofile(modLuaHttpHandler->luaState, filePath);
+    /* runs the script in case the current file is considered to be
+    dirty, this is the case for the loading of the module and reloading*/
+    if(modLuaHttpHandler->fileDirty) { resultCode = luaL_dofile(modLuaHttpHandler->luaState, modLuaHttpHandler->filePath); modLuaHttpHandler->fileDirty = 0; }
+    else { resultCode = 0; }
 
     /* in case there was an error in lua */
     if(LUA_ERROR(resultCode)) {
         /* prints a warning message */
-        V_WARNING_F("There was a problem executing: %s\n" , filePath);
+        V_WARNING_F("There was a problem executing: %s\n", modLuaHttpHandler->filePath);
 
         /* cleanup lua */
         lua_close(modLuaHttpHandler->luaState);
@@ -289,6 +285,9 @@ ERROR_CODE _sendResponseHandlerModule(struct HttpParser_t *httpParser) {
         /* raises an error */
         RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem executing script file");
     }
+
+    lua_getfield(modLuaHttpHandler->luaState, LUA_GLOBALSINDEX, "handle");
+    lua_call(modLuaHttpHandler->luaState, 0, 0);
 
     /* raise no error */
     RAISE_NO_ERROR;
@@ -328,7 +327,7 @@ int _luaWriteConnection(lua_State *luaState) {
     unsigned int numberArguments = lua_gettop(luaState);
 
     /* in case the number of arguments is invalid */
-    if(numberArguments != 2) {
+    if(numberArguments != 3) {
         /* prints a warning message */
         V_WARNING("Invalid number of arguments\n");
 
@@ -337,7 +336,16 @@ int _luaWriteConnection(lua_State *luaState) {
         lua_error(luaState);
     }
 
-    if(!lua_isstring(luaState, -1)) {
+    if(!lua_isnumber(luaState, -1)) {
+        /* prints a warning message */
+        V_WARNING("Incorrect argument 'expected number'\n");
+
+        /* pushes an error message to lua */
+        lua_pushstring(luaState, "Incorrect argument to 'expected number'");
+        lua_error(luaState);
+    }
+
+    if(!lua_isstring(luaState, -2)) {
         /* prints a warning message */
         V_WARNING("Incorrect argument 'expected string'\n");
 
@@ -346,7 +354,7 @@ int _luaWriteConnection(lua_State *luaState) {
         lua_error(luaState);
     }
 
-    if(!lua_islightuserdata(luaState, 1)) {
+    if(!lua_islightuserdata(luaState, -3)) {
         /* prints a warning message */
         V_WARNING("Incorrect argument 'expected lightuserdata'\n");
 
@@ -355,22 +363,21 @@ int _luaWriteConnection(lua_State *luaState) {
         lua_error(luaState);
     }
 
+    /* converts the third argument into an integer */
+    dataSize = lua_tointeger(luaState, -1);
+
     /* converts the second argument into a string */
-    data = lua_tostring(luaState, -1);
+    data = lua_tostring(luaState, -2);
 
     /* converts the first argument into http parser structure */
-    httpParser = (struct HttpParser_t *) lua_touserdata(luaState, -2);
-
-    /* retrieves the data (string) size */
-    dataSize = strlen(data);
+    httpParser = (struct HttpParser_t *) lua_touserdata(luaState, -3);
 
     /* retrieves the connection from the http parser parameters */
     connection = (struct Connection_t *) httpParser->parameters;
 
-    /* allocates the data buffer (in a safe maner) */
+    /* allocates the data buffer (in a safe maner) then
+    copies the data (from lua) into the buffer */
     connection->allocData(connection, dataSize * sizeof(unsigned char), (void **) &buffer);
-
-    /* copies the data (from lua) into a buffer */
     memcpy(buffer, data, dataSize);
 
     /* writes the response to the connection */
