@@ -28,6 +28,12 @@
 #include "handler.h"
 
 /**
+ * The path to the file to be used as default
+ * in case no other definition exists (configuration).
+ */
+#define DEFAULT_FILE_PATH "default.lua"
+
+/**
  * Structure describing the internal
  * structures and information for the
  * mod lua module.
@@ -54,4 +60,5 @@ VIRIATUM_EXPORT_PREFIX ERROR_CODE startModule(struct Environment_t *environment,
 VIRIATUM_EXPORT_PREFIX ERROR_CODE stopModule(struct Environment_t *environment, struct Module_t *module);
 VIRIATUM_EXPORT_PREFIX ERROR_CODE infoModule(struct Module_t *module);
 VIRIATUM_EXPORT_PREFIX ERROR_CODE errorModule(unsigned char **messagePointer);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _loadConfiguration(struct Service_t *service, struct ModLuaHttpHandler_t *modLuaHttpHandler);
 VIRIATUM_EXPORT_PREFIX ERROR_CODE _startLuaState(lua_State *luaState);
