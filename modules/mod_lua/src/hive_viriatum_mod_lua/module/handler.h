@@ -25,7 +25,11 @@
  __license__   = GNU General Public License (GPL), Version 3
 */
 
-#define LUA_ERROR(error) error == 1
+#pragma once
+
+#include "entry.h"
+
+#define LUA_ERROR(error) error > 0
 
 /**
  * The structure that holds the internal
@@ -69,4 +73,5 @@ ERROR_CODE _unsetHttpSettingsHandlerModule(struct HttpSettings_t *httpSettings);
 ERROR_CODE _messageBeginCallbackHandlerModule(struct HttpParser_t *httpParser);
 ERROR_CODE _sendResponseHandlerModule(struct HttpParser_t *httpParser);
 ERROR_CODE _sendResponseCallbackHandlerModule(struct Connection_t *connection, struct Data_t *data, void *parameters);
+ERROR_CODE _writeErrorConnection(struct HttpParser_t *httpParser, char *message);
 int _luaWriteConnection(lua_State *luaState);
