@@ -168,6 +168,13 @@ typedef struct Module_t {
     viriatumErrorModule error;
 
     /**
+     * The reference to the library that
+     * represents the current module.
+     * This should be a dynamic library reference.
+     */
+    LIBRARY_REFERENCE library;
+
+    /**
      * Reference to the lower level
      * module substrate (child).
      */
