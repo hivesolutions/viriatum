@@ -38,6 +38,18 @@ typedef struct ModLuaHttpHandler_t {
      * all the operations in lua.
      */
     lua_State *luaState;
+
+    /**
+     * The path to the default file to
+     * be used for the parsing.
+     */
+    char *filePath;
+
+    /**
+     * Flag that controls if the script file
+     * to be executed is currently dirty.
+     */
+    unsigned int fileDirty;
 } ModLuaHttpHandler;
 
 ERROR_CODE createModLuaHttpHandler(struct ModLuaHttpHandler_t **modLuaHttpHandlerPonter, struct HttpHandler_t *httpHandlerPonter);
