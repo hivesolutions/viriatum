@@ -43,3 +43,7 @@
 #include "template/template.h"
 #include "thread/thread.h"
 #include "util/util.h"
+
+#ifdef VIRIATUM_PLATFORM_MSC
+#pragma comment(lib, "viriatum_commons.lib")
+#endif
