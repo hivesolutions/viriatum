@@ -54,6 +54,7 @@ There are a lot of possible building features to enable
 * `--with-moduleroot=path` - Sets the path to be used to load the modules
 * `--with-wwwroot=path` - Sets the path to be used to install and serve the default content
 * `--enable-debug` - Enables the extra debugging capabilities in viriatum
+* `--enable-defaults` - Enables the default paths in the viriatum server, ignoring wwwroot and moduleroot at runtime
 
 ## License
 
