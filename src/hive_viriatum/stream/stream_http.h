@@ -106,8 +106,17 @@ typedef struct HttpConnection_t {
      * the connection.
      * This handles may be from an external resource.
      * Security issues apply.
+     * This is an internal value and must be used
+	 * with care.
      */
     struct HttpHandler_t *httpHandler;
+
+	/**
+	 * The base handler for the connection every new
+	 * request entering this connection will be handled
+	 * initialy by this handler.
+	 */
+	struct HttpHandler_t *baseHandler;
 } HttpConnection;
 
 ERROR_CODE createHttpHandler(struct HttpHandler_t **httpHandlerPointer, unsigned char *name);
