@@ -44,8 +44,9 @@
                 PreprocessorDefinitions="WIN32;_DEBUG;_LIB;VIRIATUM_DEBUG;VIRIATUM_MEMORY_DEBUG"
                 MinimalRebuild="true"
                 BasicRuntimeChecks="3"
-                RuntimeLibrary="3"
+                RuntimeLibrary="1"
                 UsePrecompiledHeader="2"
+                ProgramDataBaseFileName="$(TargetDir)$(TargetName).pdb"
                 WarningLevel="3"
                 DebugInformationFormat="3"
                 CompileAs="1"
@@ -62,7 +63,11 @@
             <Tool
                 Name="VCLinkerTool"
                 OutputFile="$(OutDir)\viriatum_mod_lua_d.dll"
-                IgnoreDefaultLibraryNames="msvcrt"
+                LinkIncremental="2"
+                IgnoreDefaultLibraryNames=""
+                GenerateDebugInformation="true"
+                SubSystem="2"
+                TargetMachine="1"
             />
             <Tool
                 Name="VCALinkTool"
@@ -115,9 +120,10 @@
                 Optimization="2"
                 EnableIntrinsicFunctions="true"
                 PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
-                RuntimeLibrary="2"
+                RuntimeLibrary="0"
                 EnableFunctionLevelLinking="true"
                 UsePrecompiledHeader="2"
+                ProgramDataBaseFileName="$(TargetDir)$(TargetName).pdb"
                 WarningLevel="3"
                 DebugInformationFormat="3"
                 CompileAs="1"
@@ -134,7 +140,13 @@
             <Tool
                 Name="VCLinkerTool"
                 OutputFile="$(OutDir)\viriatum_mod_lua.dll"
-                IgnoreDefaultLibraryNames="msvcrtd"
+                LinkIncremental="1"
+                IgnoreDefaultLibraryNames=""
+                GenerateDebugInformation="true"
+                SubSystem="2"
+                OptimizeReferences="2"
+                EnableCOMDATFolding="2"
+                TargetMachine="1"
             />
             <Tool
                 Name="VCALinkTool"
