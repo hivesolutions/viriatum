@@ -467,25 +467,15 @@ ERROR_CODE _resetHttpParserHandlerFile(struct HttpParser_t *httpParser) {
 }
 
 ERROR_CODE _setHttpSettingsHandlerFile(struct HttpSettings_t *httpSettings) {
-    /* sets the http settings on message begin callback */
+    /* sets the various callback functions in the http settings
+	structure, these callbacks are going to be used in the runtime
+	processing of http parser (runtime execution) */
     httpSettings->onmessageBegin = messageBeginCallbackHandlerFile;
-
-    /* sets the http settings on url callback */
     httpSettings->onurl = urlCallbackHandlerFile;
-
-    /* sets the http settings on header field callback */
     httpSettings->onheaderField = headerFieldCallbackHandlerFile;
-
-    /* sets the http settings on header value callback */
     httpSettings->onheaderValue = headerValueCallbackHandlerFile;
-
-    /* sets the http settings on headers complete callback */
     httpSettings->onheadersComplete = headersCompleteCallbackHandlerFile;
-
-    /* sets the http settings on body callback */
     httpSettings->onbody = bodyCallbackHandlerFile;
-
-    /* sets the http settings on message complete callback */
     httpSettings->onmessageComplete = messageCompleteCallbackHandlerFile;
 
     /* raises no error */
@@ -493,25 +483,13 @@ ERROR_CODE _setHttpSettingsHandlerFile(struct HttpSettings_t *httpSettings) {
 }
 
 ERROR_CODE _unsetHttpSettingsHandlerFile(struct HttpSettings_t *httpSettings) {
-    /* unsets the http settings on message begin callback */
+    /* unsets the various callback functions from the http settings */
     httpSettings->onmessageBegin = NULL;
-
-    /* unsets the http settings on url callback */
     httpSettings->onurl = NULL;
-
-    /* unsets the http settings on header field callback */
     httpSettings->onheaderField = NULL;
-
-    /* unsets the http settings on header value callback */
     httpSettings->onheaderValue = NULL;
-
-    /* unsets the http settings on headers complete callback */
     httpSettings->onheadersComplete = NULL;
-
-    /* unsets the http settings on body callback */
     httpSettings->onbody = NULL;
-
-    /* unsets the http settings on message complete callback */
     httpSettings->onmessageComplete = NULL;
 
     /* raises no error */
