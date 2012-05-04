@@ -440,11 +440,15 @@ ERROR_CODE startService(struct Service_t *service) {
     /* unloads the modules for the service */
     unloadModulesService(service);
 
+	printf("unregister de handlers\n");
+
     /* unregisters the various "local" handlers
     from the service, for structure destruction */
     unregisterHandlerFile(service);
     unregisterHandlerDefault(service);
     unregisterHandlerDispatch(service);
+
+	printf("acbou unregisgter\n");
 
     /* raises no error */
     RAISE_NO_ERROR;
