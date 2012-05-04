@@ -132,8 +132,6 @@ ERROR_CODE openPollingSelect(struct Polling_t *polling) {
 }
 
 ERROR_CODE closePollingSelect(struct Polling_t *polling) {
-	printf("cenas23\n");
-
     /* retrieves the polling select */
     struct PollingSelect_t *pollingSelect = (struct PollingSelect_t *) polling->lower;
 
