@@ -29,6 +29,8 @@
 
 #include "ini.h"
 
+#define INI_KEY_MAX_SIZE 1024
+
 typedef enum IniState_e {
     INI_ENGINE_NORMAL = 1,
     INI_ENGINE_SECTION,
@@ -91,9 +93,8 @@ typedef struct IniEngine_t {
 } IniEngine;
 
 typedef struct IniHandler_t {
-    char *section;
-    char *key;
-    char *value;
+    char section[INI_KEY_MAX_SIZE];
+    char key[INI_KEY_MAX_SIZE];
     struct HashMap_t *configuration;
 } IniHandler;
 
@@ -101,7 +102,6 @@ ERROR_CODE _sectionEndCallback(struct IniEngine_t *iniEngine, const unsigned cha
     /* retrieves the ini handler from the template engine context
     then uses it to store the (current) section */
     struct IniHandler_t *iniHandler = (struct IniHandler_t *) iniEngine->context;
-    iniHandler->section = MALLOC(size + 1);
     memcpy(iniHandler->section, pointer, size);
     iniHandler->section[size] = '\0';
 
@@ -125,7 +125,6 @@ ERROR_CODE _keyEndCallback(struct IniEngine_t *iniEngine, const unsigned char *p
     /* retrieves the ini handler from the template engine context
     then uses it to store the (current) value */
     struct IniHandler_t *iniHandler = (struct IniHandler_t *) iniEngine->context;
-    iniHandler->key = MALLOC(size + 1);
     memcpy(iniHandler->key, pointer, size);
     iniHandler->key[size] = '\0';
 
@@ -141,9 +140,9 @@ ERROR_CODE _valueEndCallback(struct IniEngine_t *iniEngine, const unsigned char 
     /* retrieves the ini handler from the template engine context
     then uses it to store the (current) value */
     struct IniHandler_t *iniHandler = (struct IniHandler_t *) iniEngine->context;
-    iniHandler->value = MALLOC(size + 1);
-    memcpy(iniHandler->value, pointer, size);
-    iniHandler->value[size] = '\0';
+    char *value = MALLOC(size + 1);
+    memcpy(value, pointer, size);
+    value[size] = '\0';
 
     getValueStringHashMap(iniHandler->configuration, (unsigned char *) iniHandler->section, (void **) &sectionConfiguration);
     if(sectionConfiguration == NULL) {
@@ -151,9 +150,9 @@ ERROR_CODE _valueEndCallback(struct IniEngine_t *iniEngine, const unsigned char 
         setValueStringHashMap(iniHandler->configuration, (unsigned char *) iniHandler->section, sectionConfiguration);
     }
 
-    setValueStringHashMap(sectionConfiguration, (unsigned char *) iniHandler->key, iniHandler->value);
+    setValueStringHashMap(sectionConfiguration, (unsigned char *) iniHandler->key, value);
 
-    V_PRINT_F("VALUE -> '%s'\n", iniHandler->value);
+    V_PRINT_F("VALUE -> '%s'\n", value);
 
     RAISE_NO_ERROR;
 }
@@ -345,6 +344,10 @@ ERROR_CODE processIniFile(char *filePath, struct HashMap_t **configurationPointe
                 break;
         }
     }
+
+	/* releases the buffer used durring the parsing of
+	the configuration file */
+	FREE(fileBuffer);
 
     /* raises no error */
     RAISE_NO_ERROR;
