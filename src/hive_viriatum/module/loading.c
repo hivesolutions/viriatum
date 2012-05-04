@@ -221,8 +221,6 @@ ERROR_CODE unloadModule(struct Service_t *service, struct Module_t *module) {
     /* unloads the library */
     UNLOAD_LIBRARY(library);
 
-	printf("fez unload lib\n");
-
     /* raise no error */
     RAISE_NO_ERROR;
 }
