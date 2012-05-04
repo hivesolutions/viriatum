@@ -47,7 +47,7 @@
 #endif
 #endif
 
-#ifdef HAVE_PCRE
+#ifdef HAVE_LIBPCRE
 #define VIRIATUM_PCRE
 #endif
 
