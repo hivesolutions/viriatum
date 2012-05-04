@@ -47,7 +47,6 @@ viriatum.c \
 handlers/handler_default.c \
 handlers/handler_dispatch.c \
 handlers/handler_file.c \
-handlers/handler_request.c \
 http/http_parser.c \
 http/http_request.c \
 io/file.c \
