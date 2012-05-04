@@ -93,9 +93,9 @@ ERROR_CODE startModule(struct Environment_t *environment, struct Module_t *modul
     /* populates the module structure */
     infoModule(module);
 
-	/* loads the lua state populating all the erquired values
-	for state initialization */
-	_loadLuaState(&luaState);
+    /* loads the lua state populating all the erquired values
+    for state initialization */
+    _loadLuaState(&luaState);
 
     /* creates the http handler */
     service->createHttpHandler(service, &httpHandler, (unsigned char *) "lua");
@@ -222,9 +222,9 @@ ERROR_CODE _loadConfiguration(struct Service_t *service, struct ModLuaHttpHandle
     void *value;
     struct HashMap_t *configuration;
 
-	/* in case the current service configuration is not set
-	must return immediately (not possible to load it) */
-	if(service->configuration == NULL) { RAISE_NO_ERROR; }
+    /* in case the current service configuration is not set
+    must return immediately (not possible to load it) */
+    if(service->configuration == NULL) { RAISE_NO_ERROR; }
 
     /* tries to retrieve the mod lua section configuration from the configuration
     map in case none is found returns immediately no need to process anything more */
@@ -242,32 +242,32 @@ ERROR_CODE _loadConfiguration(struct Service_t *service, struct ModLuaHttpHandle
 
 ERROR_CODE _loadLuaState(lua_State **luaStatePointer) {
     /* initializes the lua interpreter, then loads
-	various (default) lua libraries and then starts
-	the global values in the environment (symbol injection) */
+    various (default) lua libraries and then starts
+    the global values in the environment (symbol injection) */
     lua_State *luaState = lua_open();
     luaL_openlibs(luaState);
     _startLuaState(luaState);
 
-	/* sets the lua state in the pointer reference */
-	*luaStatePointer = luaState;
+    /* sets the lua state in the pointer reference */
+    *luaStatePointer = luaState;
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
 ERROR_CODE _unloadLuaState(lua_State **luaStatePointer) {
-	lua_State *luaSate = *luaStatePointer;
+    lua_State *luaSate = *luaStatePointer;
 
-	lua_close(luaSate);
-	*luaStatePointer = NULL;
+    lua_close(luaSate);
+    *luaStatePointer = NULL;
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
 ERROR_CODE _reloadLuaState(lua_State **luaStatePointer) {
-	_unloadLuaState(luaStatePointer);
-	_loadLuaState(luaStatePointer);
+    _unloadLuaState(luaStatePointer);
+    _loadLuaState(luaStatePointer);
 
     /* raises no error */
     RAISE_NO_ERROR;

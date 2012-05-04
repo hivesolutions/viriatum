@@ -262,11 +262,11 @@ ERROR_CODE _sendResponseHandlerModule(struct HttpParser_t *httpParser) {
     /* allocates space for the result code */
     ERROR_CODE resultCode;
 
-	/* in case the lua state is not started an error must
-	have occured so need to return immediately in error */
+    /* in case the lua state is not started an error must
+    have occured so need to return immediately in error */
     if(modLuaHttpHandler->luaState == NULL) {
-		/* writes the error to the connection and then returns
-		in error to the caller function */
+        /* writes the error to the connection and then returns
+        in error to the caller function */
         _writeErrorConnection(httpParser, "no lua state available");
         RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem accessing lua state");
     }
@@ -285,15 +285,15 @@ ERROR_CODE _sendResponseHandlerModule(struct HttpParser_t *httpParser) {
 
     /* in case there was an error in lua */
     if(LUA_ERROR(resultCode)) {
-		/* retrieves the error message and then writes it to the connection
-		so that the end user may be able to respond to it */
-		char *errorMessage = (char *) lua_tostring(modLuaHttpHandler->luaState, -1);
+        /* retrieves the error message and then writes it to the connection
+        so that the end user may be able to respond to it */
+        char *errorMessage = (char *) lua_tostring(modLuaHttpHandler->luaState, -1);
         _writeErrorConnection(httpParser, errorMessage);
 
-		/* sets the file as dirty (forces reload) and then reloads the curernt
-		internal lua state, virtual machine reset (to avoid corruption) */
-		modLuaHttpHandler->fileDirty = 1;
-		_reloadLuaState(&modLuaHttpHandler->luaState);
+        /* sets the file as dirty (forces reload) and then reloads the curernt
+        internal lua state, virtual machine reset (to avoid corruption) */
+        modLuaHttpHandler->fileDirty = 1;
+        _reloadLuaState(&modLuaHttpHandler->luaState);
 
         /* prints a warning message, closes the lua interpreter and then
         raises the error to the upper levels */
@@ -301,21 +301,21 @@ ERROR_CODE _sendResponseHandlerModule(struct HttpParser_t *httpParser) {
         RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem executing script file");
     }
 
-	/* retrieves the field reference to the handle method that symbol
-	to call the function (in protected mode) and retrieves the result */
+    /* retrieves the field reference to the handle method that symbol
+    to call the function (in protected mode) and retrieves the result */
     lua_getfield(modLuaHttpHandler->luaState, LUA_GLOBALSINDEX, "handle");
     resultCode = lua_pcall(modLuaHttpHandler->luaState, 0, 0, 0);
 
     /* in case there was an error in lua */
     if(LUA_ERROR(resultCode)) {
-		/* retrieves the error message and then writes it to the connection
-		so that the end user may be able to respond to it */
-		char *errorMessage = (char *) lua_tostring(modLuaHttpHandler->luaState, -1);
+        /* retrieves the error message and then writes it to the connection
+        so that the end user may be able to respond to it */
+        char *errorMessage = (char *) lua_tostring(modLuaHttpHandler->luaState, -1);
         _writeErrorConnection(httpParser, errorMessage);
 
-		/* sets the file reference as dirty, this will force the script file
-		to be reload on next request */
-		modLuaHttpHandler->fileDirty = 1;
+        /* sets the file reference as dirty, this will force the script file
+        to be reload on next request */
+        modLuaHttpHandler->fileDirty = 1;
 
         /* prints a warning message, closes the lua interpreter and then
         raises the error to the upper levels */
@@ -342,20 +342,20 @@ ERROR_CODE _sendResponseCallbackHandlerModule(struct Connection_t *connection, s
 }
 
 ERROR_CODE _writeErrorConnection(struct HttpParser_t *httpParser, char *message) {
-	/* allocates space for the buffer to be used in the message */
+    /* allocates space for the buffer to be used in the message */
     unsigned char *buffer;
 
     /* retrieves the connection from the http parser parameters */
     struct Connection_t *connection = (struct Connection_t *) httpParser->parameters;
 
-	/* retrieves the length of the message so that it's possible to print
-	the proper error */
-	size_t messageLength = strlen(message);
+    /* retrieves the length of the message so that it's possible to print
+    the proper error */
+    size_t messageLength = strlen(message);
 
     /* allocates the data buffer (in a safe maner) then
     writes the http static headers to the response */
     connection->allocData(connection, 1024 * sizeof(unsigned char), (void **) &buffer);
-    SPRINTF(buffer, 1024, "HTTP/1.1 500 Internal Server Error\r\nServer: %s/%s (%s @ %s)\r\nConnection: Keep-Alive\r\nContent-Length: %d\r\n\r\n%s", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, messageLength, message);
+    SPRINTF((char *) buffer, 1024, "HTTP/1.1 500 Internal Server Error\r\nServer: %s/%s (%s @ %s)\r\nConnection: Keep-Alive\r\nContent-Length: %d\r\n\r\n%s", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, messageLength, message);
 
     /* writes the response to the connection, registers for the appropriate callbacks */
     connection->writeConnection(connection, (unsigned char *) buffer, (unsigned int) strlen(buffer), _sendResponseCallbackHandlerModule, (void *) httpParser);
