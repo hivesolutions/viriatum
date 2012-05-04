@@ -88,20 +88,32 @@ void createPollingSelect(struct PollingSelect_t **pollingSelectPointer, struct P
 }
 
 void deletePollingSelect(struct PollingSelect_t *pollingSelect) {
+	printf("fechou 1");
+
     /* releases the remove connections */
     FREE(pollingSelect->removeConnections);
+
+    printf("fechou 2");
 
     /* releases the error connection */
     FREE(pollingSelect->errorConnections);
 
+	printf("fechou 3");
+
     /* releases the write connection */
     FREE(pollingSelect->writeConnections);
+
+	printf("fechou 4");
 
     /* releases the read connection */
     FREE(pollingSelect->readConnections);
 
+	printf("fechou 5");
+
     /* releases the polling select */
     FREE(pollingSelect);
+
+	printf("fechou 6");
 }
 
 ERROR_CODE openPollingSelect(struct Polling_t *polling) {
