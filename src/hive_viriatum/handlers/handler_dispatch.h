@@ -31,6 +31,7 @@
 #include <pcre.h>
 #endif
 
+#include "../http/http.h"
 #include "../system/system.h"
 
 typedef struct DispatchHandler_t {
