@@ -88,9 +88,10 @@ ERROR_CODE createHttpConnection(struct HttpConnection_t **httpConnectionPointer,
     ioConnection->lower = httpConnection;
 
     /* retrieves the current (default) service handler and sets the
-    connection on it */
+    connection on it, then sets this handler as the base handler */
     httpHandler = service->httpHandler;
     httpHandler->set(httpConnection);
+	httpConnection->baseHandler = httpHandler;
 
     /* sets the http connection in the http connection pointer */
     *httpConnectionPointer = httpConnection;
@@ -138,8 +139,16 @@ ERROR_CODE dataHandlerStreamHttp(struct IoConnection_t *ioConnection, unsigned c
 
     /* retrieves the current (default) service handler and sets its
     value on the http connection */
-    httpHandler = service->httpHandler;
+    /*httpHandler = service->httpHandler;*/
+
+
+	/* ISTO SO DEVERIA ACONTECER PARA UM NOVO REQUEST (on new request) */
+	if(httpConnection->httpHandler) { httpConnection->httpHandler->unset(httpConnection); }
+	httpHandler = httpConnection->baseHandler;
+	httpHandler->set(httpConnection);
     httpConnection->httpHandler = httpHandler;
+
+
 
     /* in case the reset callback is set in the http
     handler, must call it */
@@ -151,7 +160,8 @@ ERROR_CODE dataHandlerStreamHttp(struct IoConnection_t *ioConnection, unsigned c
 
     // TODO: tenho de testar quantos bytes processei !!!
     // NAO posso assumir que por cada pacote de dados que recebo
-    // tenho uma nova mensagem
+    // tenho uma nova mensagem (sempre que receber uma nova mensagem
+	// tenho de repor o handler ao base handler (original)
     /* process the http data for the http parser */
     processDataHttpParser(httpConnection->httpParser, httpConnection->httpSettings, buffer, bufferSize);
 
