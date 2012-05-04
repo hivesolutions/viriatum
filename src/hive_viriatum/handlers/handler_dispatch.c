@@ -199,7 +199,7 @@ ERROR_CODE urlCallbackHandlerDispatch(struct HttpParser_t *httpParser, const uns
 
     /* THIS IS EXTREMLY SLOW !!! WARNING */
 
-    handlerName = "file";
+    handlerName = (unsigned char *) "file";
 
     /* iterates over all the regular expressions so that they
     may be tested agains the current url */
@@ -229,7 +229,7 @@ ERROR_CODE urlCallbackHandlerDispatch(struct HttpParser_t *httpParser, const uns
 
     /* sets the current http handler accoring to the current options
     in the service, the http handler must be loaded in the handlers map */
-    getValueStringHashMap(service->httpHandlersMap, handlerName, &handler);
+    getValueStringHashMap(service->httpHandlersMap, handlerName, (void **) &handler);
     handler->set(httpConnection);
     httpConnection->httpHandler = handler;
     httpConnection->httpSettings->onurl(httpParser, data, dataSize);
