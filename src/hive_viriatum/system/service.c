@@ -74,6 +74,12 @@ void deleteService(struct Service_t *service) {
         SOCKET_CLOSE(service->serviceSocketHandle);
     }
 
+	/* in case the service configuration is defined */
+	if(service->configuration) {
+		/* deletes the service configuration */
+		deleteConfiguration(service->configuration, 1);
+	}
+
     /* deletes the http handlers map */
     deleteHashMap(service->httpHandlersMap);
 
@@ -174,6 +180,46 @@ void createPolling(struct Polling_t **pollingPointer) {
 void deletePolling(struct Polling_t *polling) {
     /* releases the polling */
     FREE(polling);
+}
+
+void deleteConfiguration(struct HashMap_t *configuration, int isTop) {
+	/* allocates space for the pointer to the key and
+    for the option to be retrieved */
+    size_t *keyPointer;
+    void *option;
+
+    /* allocates space for the iterator for the configuration */
+    struct Iterator_t *configurationIterator;
+
+    /* creates an iterator for the ´configuration hash map */
+    createIteratorHashMap(configuration, &configurationIterator);
+
+    /* iterates continuously */
+    while(1) {
+        /* retrieves the next value from the configuration iterator */
+        getNextIterator(configurationIterator, (void **) &keyPointer);
+
+        /* in case the current module is null (end of iterator) */
+        if(keyPointer == NULL) {
+            /* breaks the loop */
+            break;
+        }
+
+        /* retrievs the hash map value for the key pointer */
+        getValueHashMap(configuration, *keyPointer, (void **) &option);
+
+		/* in case the current iteration is of type top must delete the
+		inner configuration because this is "just" a section, otherwise
+		releases the memory space occupied by the value */
+		if(isTop) { deleteConfiguration((struct HashMap_t *) option, 0); }
+		else { FREE(option); }
+    }
+
+    /* deletes the iterator for the configuration hash map */
+    deleteIteratorHashMap(configuration, configurationIterator);
+
+    /* deletes the hash map that holds the configuration */
+    deleteHashMap(configuration);
 }
 
 ERROR_CODE loadOptionsService(struct Service_t *service, struct HashMap_t *arguments) {
