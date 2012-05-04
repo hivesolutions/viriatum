@@ -88,32 +88,20 @@ void createPollingSelect(struct PollingSelect_t **pollingSelectPointer, struct P
 }
 
 void deletePollingSelect(struct PollingSelect_t *pollingSelect) {
-	printf("fechou 1\n");
-
     /* releases the remove connections */
     FREE(pollingSelect->removeConnections);
-
-    printf("fechou 2\n");
 
     /* releases the error connection */
     FREE(pollingSelect->errorConnections);
 
-	printf("fechou 3\n");
-
     /* releases the write connection */
     FREE(pollingSelect->writeConnections);
-
-	printf("fechou 4\n");
 
     /* releases the read connection */
     FREE(pollingSelect->readConnections);
 
-	printf("fechou 5\n");
-
     /* releases the polling select */
     FREE(pollingSelect);
-
-	printf("fechou 6\n");
 }
 
 ERROR_CODE openPollingSelect(struct Polling_t *polling) {
@@ -134,8 +122,6 @@ ERROR_CODE openPollingSelect(struct Polling_t *polling) {
 ERROR_CODE closePollingSelect(struct Polling_t *polling) {
     /* retrieves the polling select */
     struct PollingSelect_t *pollingSelect = (struct PollingSelect_t *) polling->lower;
-
-	printf("_cenas23\n");
 
     /* deletes the polling select */
     deletePollingSelect(pollingSelect);
@@ -300,8 +286,6 @@ ERROR_CODE _pollPollingSelect(struct PollingSelect_t *pollingSelect, struct Conn
 
         /* closes the service socket */
         SOCKET_CLOSE(service->serviceSocketHandle);
-
-		printf("cenas1\n");
 
         /* raises an error */
         RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem running select");
