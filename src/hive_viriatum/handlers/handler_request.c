@@ -63,11 +63,23 @@ ERROR_CODE unregisterHandlerRequest(struct Service_t *service) {
 }
 
 ERROR_CODE setHandlerRequest(struct HttpConnection_t *httpConnection) {
+    /* sets the http parser values */
+	_setHttpParserHandlerRequest(httpConnection->httpParser);
+
+    /* sets the http settings values */
+    _setHttpSettingsHandlerRequest(httpConnection->httpSettings);
+
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
 ERROR_CODE unsetHandlerRequest(struct HttpConnection_t *httpConnection) {
+    /* unsets the http parser values */
+    _unsetHttpParserHandlerRequest(httpConnection->httpParser);
+
+    /* unsets the http settings values */
+    _unsetHttpSettingsHandlerRequest(httpConnection->httpSettings);
+
     /* raises no error */
     RAISE_NO_ERROR;
 }
@@ -81,6 +93,17 @@ ERROR_CODE messageBeginCallbackHandlerRequest(struct HttpParser_t *httpParser) {
 }
 
 ERROR_CODE urlCallbackHandlerRequest(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize) {
+    struct HttpHandler_t *handler;
+	
+	struct Connection_t *connection = (struct Connection_t *) httpParser->parameters;
+	struct IoConnection_t *ioConnection = (struct IoConnection_t *) connection->lower;
+	struct HttpConnection_t *httpConnection = (struct HttpConnection_t *) ioConnection->lower;
+    struct Service_t *service = connection->service;
+
+	char *handlerName;
+	
+
+
     /* allocates the required space for the url */
     unsigned char *url = (unsigned char *) MALLOC(dataSize + 1);
 
@@ -92,6 +115,24 @@ ERROR_CODE urlCallbackHandlerRequest(struct HttpParser_t *httpParser, const unsi
 
     /* prints the url */
     V_DEBUG_F("url: %s\n", url);
+
+	
+
+	if(!strcmp(url, "/tobias")) { handlerName = "lua"; }
+	else { handlerName = "file"; }
+
+
+	/* AKI DEVERTIA SER detach */
+
+	httpConnection->httpHandler->unset(httpConnection);
+
+
+    /* sets the current http handler accoring to the current options
+    in the service, the http handler must be loaded in the handlers map */
+    getValueStringHashMap(service->httpHandlersMap, handlerName, &handler);
+	handler->set(httpConnection);
+	httpConnection->httpHandler = handler;
+	httpConnection->httpSettings->onurl(httpParser, data, dataSize);
 
     /* releases the url */
     FREE(url);
@@ -187,25 +228,15 @@ ERROR_CODE _unsetHttpParserHandlerRequest(struct HttpParser_t *httpParser) {
 }
 
 ERROR_CODE _setHttpSettingsHandlerRequest(struct HttpSettings_t *httpSettings) {
-    /* sets the http settings on message begin callback */
+    /* sets the various callback functions in the http settings
+	structure, these callbacks are going to be used in the runtime
+	processing of http parser (runtime execution) */
     httpSettings->onmessageBegin = messageBeginCallbackHandlerRequest;
-
-    /* sets the http settings on url callback */
     httpSettings->onurl = urlCallbackHandlerRequest;
-
-    /* sets the http settings on header field callback */
     httpSettings->onheaderField = headerFieldCallbackHandlerRequest;
-
-    /* sets the http settings on header value callback */
     httpSettings->onheaderValue = headerValueCallbackHandlerRequest;
-
-    /* sets the http settings on headers complete callback */
     httpSettings->onheadersComplete = headersCompleteCallbackHandlerRequest;
-
-    /* sets the http settings on body callback */
     httpSettings->onbody = bodyCallbackHandlerRequest;
-
-    /* sets the http settings on message complete callback */
     httpSettings->onmessageComplete = messageCompleteCallbackHandlerRequest;
 
     /* raises no error */
@@ -213,25 +244,13 @@ ERROR_CODE _setHttpSettingsHandlerRequest(struct HttpSettings_t *httpSettings) {
 }
 
 ERROR_CODE _unsetHttpSettingsHandlerRequest(struct HttpSettings_t *httpSettings) {
-    /* unsets the http settings on message begin callback */
+    /* unsets the various callback functions from the http settings */
     httpSettings->onmessageBegin = NULL;
-
-    /* unsets the http settings on url callback */
     httpSettings->onurl = NULL;
-
-    /* unsets the http settings on header field callback */
     httpSettings->onheaderField = NULL;
-
-    /* unsets the http settings on header value callback */
     httpSettings->onheaderValue = NULL;
-
-    /* unsets the http settings on headers complete callback */
     httpSettings->onheadersComplete = NULL;
-
-    /* unsets the http settings on body callback */
     httpSettings->onbody = NULL;
-
-    /* unsets the http settings on message complete callback */
     httpSettings->onmessageComplete = NULL;
 
     /* raises no error */
