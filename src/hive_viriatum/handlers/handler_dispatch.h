@@ -27,6 +27,10 @@
 
 #pragma once
 
+#ifdef VIRIATUM_PCRE
+#include <pcre.h>
+#endif
+
 #include "../system/system.h"
 
 typedef struct DispatchHandler_t {
@@ -36,7 +40,9 @@ typedef struct DispatchHandler_t {
      * In case this array grows too much the performance
      * of the server may lower significantly.
      */
+	#ifdef VIRIATUM_PCRE
     pcre **regex;
+	#endif
 
     /**
      * The arrays of (handler) names in the same order as
