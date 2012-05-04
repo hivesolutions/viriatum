@@ -562,7 +562,7 @@ void deletePolling(struct Polling_t *polling);
 
 /**
  * Destructor of the configuration map.
- * 
+ *
  * @param configuration The configuration to be destroyed.
  * @param isTop If the current configuration object refers a
  * top level configuration (section) or an inner one.

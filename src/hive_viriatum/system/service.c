@@ -74,11 +74,11 @@ void deleteService(struct Service_t *service) {
         SOCKET_CLOSE(service->serviceSocketHandle);
     }
 
-	/* in case the service configuration is defined */
-	if(service->configuration) {
-		/* deletes the service configuration */
-		deleteConfiguration(service->configuration, 1);
-	}
+    /* in case the service configuration is defined */
+    if(service->configuration) {
+        /* deletes the service configuration */
+        deleteConfiguration(service->configuration, 1);
+    }
 
     /* deletes the http handlers map */
     deleteHashMap(service->httpHandlersMap);
@@ -183,7 +183,7 @@ void deletePolling(struct Polling_t *polling) {
 }
 
 void deleteConfiguration(struct HashMap_t *configuration, int isTop) {
-	/* allocates space for the pointer to the key and
+    /* allocates space for the pointer to the key and
     for the option to be retrieved */
     size_t *keyPointer;
     void *option;
@@ -208,11 +208,11 @@ void deleteConfiguration(struct HashMap_t *configuration, int isTop) {
         /* retrievs the hash map value for the key pointer */
         getValueHashMap(configuration, *keyPointer, (void **) &option);
 
-		/* in case the current iteration is of type top must delete the
-		inner configuration because this is "just" a section, otherwise
-		releases the memory space occupied by the value */
-		if(isTop) { deleteConfiguration((struct HashMap_t *) option, 0); }
-		else { FREE(option); }
+        /* in case the current iteration is of type top must delete the
+        inner configuration because this is "just" a section, otherwise
+        releases the memory space occupied by the value */
+        if(isTop) { deleteConfiguration((struct HashMap_t *) option, 0); }
+        else { FREE(option); }
     }
 
     /* deletes the iterator for the configuration hash map */
