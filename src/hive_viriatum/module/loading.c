@@ -160,6 +160,7 @@ ERROR_CODE loadModule(struct Service_t *service, unsigned char *modulePath) {
 
     /* sets the module attributes */
     module->environment = environment;
+	module->library = library;
 
     /* sets the environment attributes */
     environment->service = service;
