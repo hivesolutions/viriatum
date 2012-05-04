@@ -9,6 +9,10 @@ set VERSION=0.1.0
 set ARCHITECTURE=x86
 set NAME=viriatum-%VERSION%
 
+:: sets the directory to be used as the base
+:: for the retrieval of the development tools
+IF not defined DEV_HOME set DEV_HOME=\dev
+
 :: sets the various path related global
 :: variable with relative names
 set CURRENT_DIR=%cd%
@@ -41,9 +45,12 @@ git clone git://github.com/hivesolutions/viriatum.git %REPO_DIR% --quiet
 :: must return immediately with the error
 if %ERRORLEVEL% neq 0 ( cd %CURRENT_DIR% && exit /b %ERRORLEVEL% )
 
+:: sets the proper include and lib directory for build then
 :: runs the build process for the viriatum project, this
 :: will lauch the build utility for it
-msbuild %SOLUTION_DIR%\hive_viriatum.sln /p:Configuration=Release
+set INCLUDE=%INCLUDE%;%DEV_HOME%\include
+set LIB=%LIB%;%DEV_HOME%\lib
+msbuild %SOLUTION_DIR%\hive_viriatum.sln /p:Configuration=Release /p:"VCBuildAdditionalOptions=/useenv"
 
 :: in case the previous command didn't exit properly
 :: must return immediately with the error
