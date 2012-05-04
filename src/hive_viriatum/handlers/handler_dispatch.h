@@ -34,6 +34,9 @@
 #include "../http/http.h"
 #include "../system/system.h"
 
+/* forward references (avoids loop) */
+struct HttpConnection_t;
+
 typedef struct DispatchHandler_t {
     /**
      * The array of regular expressions that are meant
