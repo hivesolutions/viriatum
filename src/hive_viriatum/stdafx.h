@@ -65,7 +65,7 @@
 #include <pcre.h>
 #ifdef VIRIATUM_PLATFORM_MSC
 #ifdef VIRIATUM_DEBUG
-#pragma comment(lib, "pcred.lib")
+#pragma comment(lib, "pcre_d.lib")
 #else
 #pragma comment(lib, "pcre.lib")
 #endif
