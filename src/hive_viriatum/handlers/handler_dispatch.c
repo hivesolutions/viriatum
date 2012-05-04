@@ -52,7 +52,17 @@ ERROR_CODE createDispatchHandler(struct DispatchHandler_t **dispatchHandlerPoint
 }
 
 ERROR_CODE deleteDispatchHandler(struct DispatchHandler_t *dispatchHandler) {
-    /* in case the regex buffer is defined releases it */
+	/* allocates space for the index counter */
+	size_t index;
+
+	/* iterates over all the regular expressions to release their
+	internal memory contents */
+	for(index = 0; index < dispatchHandler->regexCount; index++ ) {  pcre_free(dispatchHandler->regex[index]); }
+
+    /* in case the names buffer is defined releases it */
+    if(dispatchHandler->names != NULL) { FREE(dispatchHandler->names); }
+	
+	/* in case the regex buffer is defined releases it */
     if(dispatchHandler->regex != NULL) { FREE(dispatchHandler->regex); }
 
     /* releases the dispatch handler */
