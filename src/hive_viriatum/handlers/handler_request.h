@@ -29,6 +29,10 @@
 
 #include "../system/system.h"
 
+typedef struct Tobias_t {
+	pcre *regex;
+} Tobias;
+
 ERROR_CODE registerHandlerRequest(struct Service_t *service);
 ERROR_CODE unregisterHandlerRequest(struct Service_t *service);
 ERROR_CODE setHandlerRequest(struct HttpConnection_t *httpConnection);
