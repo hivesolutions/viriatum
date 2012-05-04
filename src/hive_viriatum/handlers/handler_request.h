@@ -29,10 +29,31 @@
 
 #include "../system/system.h"
 
-typedef struct Tobias_t {
-	pcre *regex;
-} Tobias;
+typedef struct DispatchHandler_t {
+	/**
+	 * The array of regular expressions that are meant
+	 * to be executed in the ordered defined for execution.
+	 * In case this array grows too much the performance
+	 * of the server may lower significantly.
+	 */
+	pcre **regex;
 
+	/**
+	 * The arrays of (handler) names in the same order as
+	 * the corresponding regular expressions, they are going
+	 * to be used at runtime for handler resolution.
+	 */
+	unsigned char **names;
+
+	/**
+	 * The number of regular expressions curently present
+	 * in the dispatch handler.
+	 */
+	size_t regexCount;
+} DispatchHandler;
+
+ERROR_CODE createDispatchHandler(struct DispatchHandler_t **dispatchHandlerPointer, struct HttpHandler_t *httpHandler);
+ERROR_CODE deleteDispatchHandler(struct DispatchHandler_t *dispatchHandler);
 ERROR_CODE registerHandlerRequest(struct Service_t *service);
 ERROR_CODE unregisterHandlerRequest(struct Service_t *service);
 ERROR_CODE setHandlerRequest(struct HttpConnection_t *httpConnection);

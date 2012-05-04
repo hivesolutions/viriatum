@@ -29,17 +29,54 @@
 
 #include "handler_request.h"
 
+ERROR_CODE createDispatchHandler(struct DispatchHandler_t **dispatchHandlerPointer, struct HttpHandler_t *httpHandler) {
+    /* retrieves the dispatch handler size */
+    size_t dispatchHandlerSize = sizeof(struct DispatchHandler_t);
+
+    /* allocates space for the dispatch handler */
+    struct DispatchHandler_t *dispatchHandler = (struct DispatchHandler_t *) MALLOC(dispatchHandlerSize);
+
+    /* sets the dispatch handler attributes (default) values */
+    dispatchHandler->regex = NULL;
+	dispatchHandler->names = NULL;
+    dispatchHandler->regexCount = 0;
+
+    /* sets the dispatch handler in the upper http handler substrate */
+    httpHandler->lower = (void *) dispatchHandler;
+
+    /* sets the dispatch handler in the mod lua http handler pointer */
+    *dispatchHandlerPointer = dispatchHandler;
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE deleteDispatchHandler(struct DispatchHandler_t *dispatchHandler) {
+    /* in case the regex buffer is defined releases it */
+	if(dispatchHandler->regex != NULL) { FREE(dispatchHandler->regex); }
+
+    /* releases the dispatch handler */
+    FREE(dispatchHandler);
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
 ERROR_CODE registerHandlerRequest(struct Service_t *service) {
     /* allocates the http handler */
     struct HttpHandler_t *httpHandler;
 
+	/* allocates space for the dispatch handler */
+	struct DispatchHandler_t *dispatchHandler;
 
-	struct Tobias_t *tobias;
+	/* allocates space for the regex related variables */
     const char *error;
     int errorOffset;
 
-    /* creates the http handler */
+    /* creates the http handler and then uses it to create
+	the dispatch handler (lower substrate) */
     service->createHttpHandler(service, &httpHandler, (unsigned char *) "request");
+	createDispatchHandler(&dispatchHandler, httpHandler);
 
     /* sets the http handler attributes */
     httpHandler->set = setHandlerRequest;
@@ -47,13 +84,13 @@ ERROR_CODE registerHandlerRequest(struct Service_t *service) {
     httpHandler->reset = NULL;
 
 
-	tobias = MALLOC(sizeof(struct Tobias_t));
-
-
-
-	tobias->regex = pcre_compile("[.]*\\.lua", 0, &error, &errorOffset, NULL);
-
-	httpHandler->lower = (void *) tobias;
+	dispatchHandler->regexCount = 2;
+	dispatchHandler->regex = (pcre **) MALLOC(sizeof(pcre *) * dispatchHandler->regexCount);
+	dispatchHandler->regex[0] = pcre_compile("[.]*\\.lua", 0, &error, &errorOffset, NULL);
+	dispatchHandler->regex[1] = pcre_compile("[.]*\\.default", 0, &error, &errorOffset, NULL);
+	dispatchHandler->names = (unsigned char **) MALLOC(sizeof(pcre *) * dispatchHandler->regexCount);
+	dispatchHandler->names[0] = "lua";
+	dispatchHandler->names[1] = "default";
 
 
 
@@ -68,13 +105,23 @@ ERROR_CODE unregisterHandlerRequest(struct Service_t *service) {
     /* allocates the http handler */
     struct HttpHandler_t *httpHandler;
 
-    /* retrieves the http handler from the service, then
-    remove it from the service after that delete the handler */
+	/* allocates space for the dispatch handler */
+	struct DispatchHandler_t *dispatchHandler;
+
+	/* retrieves the http handler from the service, then retrieves
+	the lower substrate as the dispatch handler */
     service->getHttpHandler(service, &httpHandler, (unsigned char *) "request");
+	dispatchHandler = (struct DispatchHandler_t *) httpHandler->lower;
+
+	/* deletes the dispatch handler reference */
+	deleteDispatchHandler(dispatchHandler);
+
+    /* remove the http handler from the service after
+	that deletes the handler reference */
     service->removeHttpHandler(service, httpHandler);
     service->deleteHttpHandler(service, httpHandler);
 
-    /* raises no error */
+	/* raises no error */
     RAISE_NO_ERROR;
 }
 
@@ -111,13 +158,15 @@ ERROR_CODE messageBeginCallbackHandlerRequest(struct HttpParser_t *httpParser) {
 ERROR_CODE urlCallbackHandlerRequest(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize) {
     int matching;
 
+	size_t index;
+
     
 	struct Connection_t *connection = (struct Connection_t *) httpParser->parameters;
 	struct IoConnection_t *ioConnection = (struct IoConnection_t *) connection->lower;
 	struct HttpConnection_t *httpConnection = (struct HttpConnection_t *) ioConnection->lower;
     struct Service_t *service = connection->service;
 	struct HttpHandler_t *handler = httpConnection->httpHandler;
-	struct Tobias_t *tobias = (struct Tobias_t *) handler->lower;
+	struct DispatchHandler_t *dispatchHandler = (struct DispatchHandler_t *) handler->lower;
 
 	char *handlerName;
 	
@@ -140,12 +189,21 @@ ERROR_CODE urlCallbackHandlerRequest(struct HttpParser_t *httpParser, const unsi
 
     /* THIS IS EXTREMLY SLOW !!! WARNING */
 
+	handlerName = "file";
 
-
-    matching = pcre_exec(tobias->regex, NULL, url, dataSize, 0, 0, NULL, 0);
-
-	if(matching == 0) { handlerName = "lua"; }
-	else { handlerName = "file"; }
+	/* iterates over all the regular expressions so that they
+	may be tested agains the current url */
+	for(index = 0; index < dispatchHandler->regexCount; index++) {
+		/* tries to match the current url agains the registered
+		regular expression in case it fails continues the loop */
+		matching = pcre_exec(dispatchHandler->regex[index], NULL, url, dataSize, 0, 0, NULL, 0);
+		if(matching != 0) { continue; }
+		
+		/* sets the name of the handler as the name in the current index
+		the breaks the loop to process it */
+		handlerName = dispatchHandler->names[index];
+		break;
+	}
 
 	/* END OF WARNING */
 
