@@ -215,14 +215,22 @@ ERROR_CODE unloadModule(struct Service_t *service, struct Module_t *module) {
         V_WARNING_F("%s\n", GET_ERROR_MODULE(module));
     }
 
+	printf("vai fazer delete\n");
+
     /* deletes the module */
     deleteModule(module);
+
+	printf("vai fazer delete environment\n");
 
     /* deletes the environment */
     deleteEnvironment(environment);
 
+	printf("vai fazer unload lib\n");
+
     /* unloads the library */
     UNLOAD_LIBRARY(library);
+
+	printf("fez unload lib\n");
 
     /* raise no error */
     RAISE_NO_ERROR;
