@@ -206,12 +206,12 @@ ERROR_CODE urlCallbackHandlerDispatch(struct HttpParser_t *httpParser, const uns
     for(index = 0; index < dispatchHandler->regexCount; index++) {
         /* tries to match the current url agains the registered
         regular expression in case it fails continues the loop */
-        matching = pcre_exec(dispatchHandler->regex[index], NULL, url, dataSize, 0, 0, NULL, 0);
+        matching = pcre_exec(dispatchHandler->regex[index], NULL, (char *) url, dataSize, 0, 0, NULL, 0);
         if(matching != 0) { continue; }
 
         /* sets the name of the handler as the name in the current index
         the breaks the loop to process it */
-        handlerName = dispatchHandler->names[index];
+        handlerName = (char *) dispatchHandler->names[index];
         break;
     }
 
