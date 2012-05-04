@@ -200,8 +200,8 @@ ERROR_CODE _unsetHttpParserHandlerModule(struct HttpParser_t *httpParser) {
 
 ERROR_CODE _setHttpSettingsHandlerModule(struct HttpSettings_t *httpSettings) {
     /* sets the various callback functions in the http settings
-	structure, these callbacks are going to be used in the runtime
-	processing of http parser (runtime execution) */
+    structure, these callbacks are going to be used in the runtime
+    processing of http parser (runtime execution) */
     httpSettings->onmessageBegin = messageBeginCallbackHandlerModule;
     httpSettings->onurl = urlCallbackHandlerModule;
     httpSettings->onheaderField = headerFieldCallbackHandlerModule;

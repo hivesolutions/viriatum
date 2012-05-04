@@ -203,8 +203,8 @@ ERROR_CODE _unsetHttpParserHandlerDefault(struct HttpParser_t *httpParser) {
 
 ERROR_CODE _setHttpSettingsHandlerDefault(struct HttpSettings_t *httpSettings) {
     /* sets the various callback functions in the http settings
-	structure, these callbacks are going to be used in the runtime
-	processing of http parser (runtime execution) */
+    structure, these callbacks are going to be used in the runtime
+    processing of http parser (runtime execution) */
     httpSettings->onmessageBegin = messageBeginCallbackHandlerDefault;
     httpSettings->onurl = urlCallbackHandlerDefault;
     httpSettings->onheaderField = headerFieldCallbackHandlerDefault;
