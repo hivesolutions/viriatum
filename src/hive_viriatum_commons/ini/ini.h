@@ -30,4 +30,4 @@
 #include "../debug/debug.h"
 #include "../structures/structures.h"
 
-ERROR_CODE processIniFile(char *filePath, struct HashMap_t **configurationPointer);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE processIniFile(char *filePath, struct HashMap_t **configurationPointer);
