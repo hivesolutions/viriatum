@@ -343,7 +343,7 @@ ERROR_CODE _sendResponseCallbackHandlerModule(struct Connection_t *connection, s
 
 ERROR_CODE _writeErrorConnection(struct HttpParser_t *httpParser, char *message) {
     /* allocates space for the buffer to be used in the message */
-    unsigned char *buffer;
+    char *buffer;
 
     /* retrieves the connection from the http parser parameters */
     struct Connection_t *connection = (struct Connection_t *) httpParser->parameters;
@@ -354,11 +354,11 @@ ERROR_CODE _writeErrorConnection(struct HttpParser_t *httpParser, char *message)
 
     /* allocates the data buffer (in a safe maner) then
     writes the http static headers to the response */
-    connection->allocData(connection, 1024 * sizeof(unsigned char), (void **) &buffer);
-    SPRINTF((char *) buffer, 1024, "HTTP/1.1 500 Internal Server Error\r\nServer: %s/%s (%s @ %s)\r\nConnection: Keep-Alive\r\nContent-Length: %d\r\n\r\n%s", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, (unsigned int) messageLength, message);
+    connection->allocData(connection, 1024 * sizeof(char), (void **) &buffer);
+    SPRINTF(buffer, 1024, "HTTP/1.1 500 Internal Server Error\r\nServer: %s/%s (%s @ %s)\r\nConnection: Keep-Alive\r\nContent-Length: %d\r\n\r\n%s", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, (unsigned int) messageLength, message);
 
     /* writes the response to the connection, registers for the appropriate callbacks */
-    connection->writeConnection(connection, (unsigned char *) buffer, (unsigned int) strlen((char *) buffer), _sendResponseCallbackHandlerModule, (void *) httpParser);
+    connection->writeConnection(connection, (unsigned char *) buffer, (unsigned int) strlen(buffer), _sendResponseCallbackHandlerModule, (void *) httpParser);
 
     /* raise no error */
     RAISE_NO_ERROR;
