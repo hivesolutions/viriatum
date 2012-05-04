@@ -38,5 +38,9 @@ unsigned char *descriptionViriatumModLua();
 #include <lua5.1/lauxlib.h>
 
 #ifdef VIRIATUM_PLATFORM_MSC
+#ifdef VIRIATUM_DEBUG
+#pragma comment(lib, "lua5.1_d.lib")
+#else
 #pragma comment(lib, "lua5.1.lib")
+#endif
 #endif
