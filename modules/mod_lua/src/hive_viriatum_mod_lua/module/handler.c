@@ -358,7 +358,7 @@ ERROR_CODE _writeErrorConnection(struct HttpParser_t *httpParser, char *message)
     SPRINTF((char *) buffer, 1024, "HTTP/1.1 500 Internal Server Error\r\nServer: %s/%s (%s @ %s)\r\nConnection: Keep-Alive\r\nContent-Length: %d\r\n\r\n%s", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, (unsigned int) messageLength, message);
 
     /* writes the response to the connection, registers for the appropriate callbacks */
-    connection->writeConnection(connection, (unsigned char *) buffer, (unsigned int) strlen(buffer), _sendResponseCallbackHandlerModule, (void *) httpParser);
+    connection->writeConnection(connection, (unsigned char *) buffer, (unsigned int) strlen((char *) buffer), _sendResponseCallbackHandlerModule, (void *) httpParser);
 
     /* raise no error */
     RAISE_NO_ERROR;
