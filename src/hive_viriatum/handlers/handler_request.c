@@ -33,6 +33,11 @@ ERROR_CODE registerHandlerRequest(struct Service_t *service) {
     /* allocates the http handler */
     struct HttpHandler_t *httpHandler;
 
+
+	struct Tobias_t *tobias;
+    const char *error;
+    int errorOffset;
+
     /* creates the http handler */
     service->createHttpHandler(service, &httpHandler, (unsigned char *) "request");
 
@@ -40,6 +45,17 @@ ERROR_CODE registerHandlerRequest(struct Service_t *service) {
     httpHandler->set = setHandlerRequest;
     httpHandler->unset = unsetHandlerRequest;
     httpHandler->reset = NULL;
+
+
+	tobias = MALLOC(sizeof(struct Tobias_t));
+
+
+
+	tobias->regex = pcre_compile("[.]*\\.lua", 0, &error, &errorOffset, NULL);
+
+	httpHandler->lower = (void *) tobias;
+
+
 
     /* adds the http handler to the service */
     service->addHttpHandler(service, httpHandler);
@@ -93,21 +109,22 @@ ERROR_CODE messageBeginCallbackHandlerRequest(struct HttpParser_t *httpParser) {
 }
 
 ERROR_CODE urlCallbackHandlerRequest(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize) {
-    const char *error;
-    int errorOffset;
-    pcre *regex;
     int matching;
 
-    struct HttpHandler_t *handler;	
+    
 	struct Connection_t *connection = (struct Connection_t *) httpParser->parameters;
 	struct IoConnection_t *ioConnection = (struct IoConnection_t *) connection->lower;
 	struct HttpConnection_t *httpConnection = (struct HttpConnection_t *) ioConnection->lower;
     struct Service_t *service = connection->service;
+	struct HttpHandler_t *handler = httpConnection->httpHandler;
+	struct Tobias_t *tobias = (struct Tobias_t *) handler->lower;
 
 	char *handlerName;
 	
 	/* allocates the required space for the url */
     unsigned char *url = (unsigned char *) MALLOC(dataSize + 1);
+
+
 
     /* copies the memory from the data to the url */
     memcpy(url, data, dataSize);
@@ -123,8 +140,9 @@ ERROR_CODE urlCallbackHandlerRequest(struct HttpParser_t *httpParser, const unsi
 
     /* THIS IS EXTREMLY SLOW !!! WARNING */
 
-    regex = pcre_compile("[.]*\\.lua", 0, &error, &errorOffset, NULL);
-    matching = pcre_exec(regex, NULL, url, dataSize, 0, 0, NULL, 0);
+
+
+    matching = pcre_exec(tobias->regex, NULL, url, dataSize, 0, 0, NULL, 0);
 
 	if(matching == 0) { handlerName = "lua"; }
 	else { handlerName = "file"; }
