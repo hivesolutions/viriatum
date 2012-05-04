@@ -129,8 +129,6 @@ ERROR_CODE urlCallbackHandlerRequest(struct HttpParser_t *httpParser, const unsi
 	if(matching == 0) { handlerName = "lua"; }
 	else { handlerName = "file"; }
 
-	printf("HANDLER NAME -> %s\n", handlerName);
-
 	/* END OF WARNING */
 
 
