@@ -418,13 +418,21 @@ ERROR_CODE startService(struct Service_t *service) {
         /* polls the connections using the polling (provider) */
         polling->poll(polling);
 
+		printf("poll\n");
+
         /* calls the callbacks for the connection (events)
         using the polling (provider) */
         polling->call(polling);
+
+		printf("call\n");
     }
+
+	printf("vai fechar connections\n");
 
     /* closes (all) the service connections */
     closeConnectionsService(service);
+
+	printf("fechou connections\n");
 
     /* closes the polling (provider) */
     polling->close(polling);

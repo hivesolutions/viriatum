@@ -272,22 +272,22 @@ ERROR_CODE _pollPollingSelect(struct PollingSelect_t *pollingSelect, struct Conn
 
     /* in case there was an error in select */
     if(SOCKET_TEST_ERROR(selectCount)) {
-		/* resets the values for the various read values,
-		this avoid possible problems in next actions */
-		*readConnectionsSize = 0;
-		*writeConnectionsSize = 0;
-		*errorConnectionsSize = 0;
-
-		printf("cenas1\n");
-
 		/* retrieves the select error code */
         SOCKET_ERROR_CODE selectErrorCode = SOCKET_GET_ERROR_CODE(socketResult);
 
         /* prints the error */
         V_ERROR_F("Problem running select: %d\n", selectErrorCode);
 
+		/* resets the values for the various read values,
+		this avoid possible problems in next actions */
+		*readConnectionsSize = 0;
+		*writeConnectionsSize = 0;
+		*errorConnectionsSize = 0;
+
         /* closes the service socket */
         SOCKET_CLOSE(service->serviceSocketHandle);
+
+		printf("cenas1\n");
 
         /* raises an error */
         RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem running select");
