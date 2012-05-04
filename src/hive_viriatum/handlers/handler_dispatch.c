@@ -158,9 +158,6 @@ ERROR_CODE unsetHandlerDispatch(struct HttpConnection_t *httpConnection) {
 }
 
 ERROR_CODE messageBeginCallbackHandlerDispatch(struct HttpParser_t *httpParser) {
-    /* prints an information */
-    V_DEBUG("HTTP request received\n");
-
     /* raise no error */
     RAISE_NO_ERROR;
 }
@@ -242,77 +239,26 @@ ERROR_CODE urlCallbackHandlerDispatch(struct HttpParser_t *httpParser, const uns
 }
 
 ERROR_CODE headerFieldCallbackHandlerDispatch(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize) {
-    /* allocates the required space for the header field */
-    unsigned char *headerField = (unsigned char *) MALLOC(dataSize + 1);
-
-    /* copies the memory from the data to the header field */
-    memcpy(headerField, data, dataSize);
-
-    /* puts the end of strng in the header field */
-    headerField[dataSize] = '\0';
-
-    /* prints the header field */
-    V_DEBUG_F("header field: %s\n", headerField);
-
-    /* releases the header field */
-    FREE(headerField);
-
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
 ERROR_CODE headerValueCallbackHandlerDispatch(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize) {
-    /* allocates the required space for the header value */
-    unsigned char *headerValue = (unsigned char *) MALLOC(dataSize + 1);
-
-    /* copies the memory from the data to the header value */
-    memcpy(headerValue, data, dataSize);
-
-    /* puts the end of strng in the header value */
-    headerValue[dataSize] = '\0';
-
-    /* prints the header value */
-    V_DEBUG_F("header value: %s\n", headerValue);
-
-    /* releases the header value */
-    FREE(headerValue);
-
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
 ERROR_CODE headersCompleteCallbackHandlerDispatch(struct HttpParser_t *httpParser) {
-    /* prints an information */
-    V_DEBUG("HTTP headers parsed\n");
-
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
 ERROR_CODE bodyCallbackHandlerDispatch(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize) {
-    /* allocates the required space for the body */
-    unsigned char *body = (unsigned char *) MALLOC(dataSize + 1);
-
-    /* copies the memory from the data to the body */
-    memcpy(body, data, dataSize);
-
-    /* puts the end of strng in the body */
-    body[dataSize] = '\0';
-
-    /* prints the body */
-    V_DEBUG_F("body: %s\n", body);
-
-    /* releases the body */
-    FREE(body);
-
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
 ERROR_CODE messageCompleteCallbackHandlerDispatch(struct HttpParser_t *httpParser) {
-    /* prints an information */
-    V_DEBUG("HTTP request parsed\n");
-
     /* raise no error */
     RAISE_NO_ERROR;
 }

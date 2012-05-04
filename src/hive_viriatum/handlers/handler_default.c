@@ -86,7 +86,7 @@ ERROR_CODE unsetHandlerDefault(struct HttpConnection_t *httpConnection) {
 
 ERROR_CODE messageBeginCallbackHandlerDefault(struct HttpParser_t *httpParser) {
     /* prints an information */
-    V_DEBUG("HTTP request received\n");
+    V_DEBUG("http request received\n");
 
     /* raise no error */
     RAISE_NO_ERROR;
@@ -154,7 +154,7 @@ ERROR_CODE headerValueCallbackHandlerDefault(struct HttpParser_t *httpParser, co
 
 ERROR_CODE headersCompleteCallbackHandlerDefault(struct HttpParser_t *httpParser) {
     /* prints an information */
-    V_DEBUG("HTTP headers parsed\n");
+    V_DEBUG("http headers parsed\n");
 
     /* raise no error */
     RAISE_NO_ERROR;
@@ -182,7 +182,7 @@ ERROR_CODE bodyCallbackHandlerDefault(struct HttpParser_t *httpParser, const uns
 
 ERROR_CODE messageCompleteCallbackHandlerDefault(struct HttpParser_t *httpParser) {
     /* prints an information */
-    V_DEBUG("HTTP request parsed\n");
+    V_DEBUG("http request parsed\n");
 
     /* sends (and creates) the reponse */
     _sendResponseHandlerDefault(httpParser);
