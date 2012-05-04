@@ -345,9 +345,9 @@ ERROR_CODE processIniFile(char *filePath, struct HashMap_t **configurationPointe
         }
     }
 
-	/* releases the buffer used durring the parsing of
-	the configuration file */
-	FREE(fileBuffer);
+    /* releases the buffer used durring the parsing of
+    the configuration file */
+    FREE(fileBuffer);
 
     /* raises no error */
     RAISE_NO_ERROR;
