@@ -595,8 +595,12 @@ ERROR_CODE unloadModulesService(struct Service_t *service) {
             break;
         }
 
+		printf("vai descarregar modulo\n");
+
         /* unloads the current module */
         unloadModule(service, currentModule);
+
+		printf("descarregou modulo\n");
     }
 
     /* deletes the iterator linked list */

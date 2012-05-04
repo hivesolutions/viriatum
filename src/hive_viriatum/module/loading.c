@@ -202,8 +202,12 @@ ERROR_CODE unloadModule(struct Service_t *service, struct Module_t *module) {
     /* removes the module from the list of modlues handlers in the service */
     removeValueLinkedList(service->modulesList, (void *) module, 1);
 
+	printf("vai parar modulo\n");
+
     /* calls the stop module function */
     errorCode = module->stop(environment, module);
+
+	printf("parou modulo\n");
 
     /* tests the error code for error */
     if(IS_ERROR_CODE(errorCode)) {
