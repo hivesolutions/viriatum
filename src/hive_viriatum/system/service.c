@@ -437,6 +437,8 @@ ERROR_CODE startService(struct Service_t *service) {
     /* closes the polling (provider) */
     polling->close(polling);
 
+    printf("fechou modulos");
+
     /* unloads the modules for the service */
     unloadModulesService(service);
 
