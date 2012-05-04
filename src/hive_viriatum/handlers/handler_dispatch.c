@@ -99,8 +99,8 @@ ERROR_CODE registerHandlerDispatch(struct Service_t *service) {
     dispatchHandler->regex[0] = pcre_compile("[.]*\\.lua", 0, &error, &errorOffset, NULL);
     dispatchHandler->regex[1] = pcre_compile("[.]*\\.default", 0, &error, &errorOffset, NULL);
     dispatchHandler->names = (unsigned char **) MALLOC(sizeof(pcre *) * dispatchHandler->regexCount);
-    dispatchHandler->names[0] = "lua";
-    dispatchHandler->names[1] = "default";
+    dispatchHandler->names[0] = (unsigned char *) "lua";
+    dispatchHandler->names[1] = (unsigned char *) "default";
 
 
 
