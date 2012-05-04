@@ -222,6 +222,10 @@ ERROR_CODE _loadConfiguration(struct Service_t *service, struct ModLuaHttpHandle
     void *value;
     struct HashMap_t *configuration;
 
+	/* in case the current service configuration is not set
+	must return immediately (not possible to load it) */
+	if(service->configuration == NULL) { RAISE_NO_ERROR; }
+
     /* tries to retrieve the mod lua section configuration from the configuration
     map in case none is found returns immediately no need to process anything more */
     getValueStringHashMap(service->configuration, (unsigned char *) "mod_lua", (void **) &configuration);
