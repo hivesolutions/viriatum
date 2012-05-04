@@ -418,39 +418,25 @@ ERROR_CODE startService(struct Service_t *service) {
         /* polls the connections using the polling (provider) */
         polling->poll(polling);
 
-		printf("poll\n");
-
         /* calls the callbacks for the connection (events)
         using the polling (provider) */
         polling->call(polling);
-
-		printf("call\n");
     }
-
-	printf("vai fechar connections\n");
 
     /* closes (all) the service connections */
     closeConnectionsService(service);
 
-	printf("fechou connections\n");
-
     /* closes the polling (provider) */
     polling->close(polling);
 
-    printf("fechou modulos\n");
-
     /* unloads the modules for the service */
     unloadModulesService(service);
-
-	printf("unregister de handlers\n");
 
     /* unregisters the various "local" handlers
     from the service, for structure destruction */
     unregisterHandlerFile(service);
     unregisterHandlerDefault(service);
     unregisterHandlerDispatch(service);
-
-	printf("acbou unregisgter\n");
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -595,12 +581,8 @@ ERROR_CODE unloadModulesService(struct Service_t *service) {
             break;
         }
 
-		printf("vai descarregar modulo\n");
-
         /* unloads the current module */
         unloadModule(service, currentModule);
-
-		printf("descarregou modulo\n");
     }
 
     /* deletes the iterator linked list */
