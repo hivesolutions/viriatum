@@ -278,6 +278,8 @@ ERROR_CODE _pollPollingSelect(struct PollingSelect_t *pollingSelect, struct Conn
 		*writeConnectionsSize = 0;
 		*errorConnectionsSize = 0;
 
+		printf("cenas1\n");
+
 		/* retrieves the select error code */
         SOCKET_ERROR_CODE selectErrorCode = SOCKET_GET_ERROR_CODE(socketResult);
 
