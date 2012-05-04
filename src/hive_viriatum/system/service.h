@@ -561,6 +561,15 @@ void createPolling(struct Polling_t **pollingPointer);
 void deletePolling(struct Polling_t *polling);
 
 /**
+ * Destructor of the configuration map.
+ * 
+ * @param configuration The configuration to be destroyed.
+ * @param isTop If the current configuration object refers a
+ * top level configuration (section) or an inner one.
+ */
+void deleteConfiguration(struct HashMap_t *configuration, int isTop);
+
+/**
  * Loads the various options, from the various data sources
  * into the service internal structures.
  *
