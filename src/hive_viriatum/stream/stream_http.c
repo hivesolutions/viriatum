@@ -90,7 +90,6 @@ ERROR_CODE createHttpConnection(struct HttpConnection_t **httpConnectionPointer,
     /* retrieves the current (default) service handler and sets the
     connection on it, then sets this handler as the base handler */
     httpHandler = service->httpHandler;
-    httpHandler->set(httpConnection);
 	httpConnection->baseHandler = httpHandler;
 
     /* sets the http connection in the http connection pointer */
@@ -105,13 +104,10 @@ ERROR_CODE deleteHttpConnection(struct HttpConnection_t *httpConnection) {
     to be used in this connection */
     struct HttpHandler_t *httpHandler;
 
-    /* retrieves the service from the http connection */
-    struct Service_t *service = httpConnection->ioConnection->connection->service;
-
     /* retrieves the currently assigned handler and usets the connection
     from with (unregister connection) */
-    httpHandler = service->httpHandler;
-    httpHandler->unset(httpConnection);
+    httpHandler = httpConnection->httpHandler;
+	if(httpHandler) { httpHandler->unset(httpConnection); }
 
     /* deletes the http parser */
     deleteHttpParser(httpConnection->httpParser);
@@ -134,29 +130,15 @@ ERROR_CODE dataHandlerStreamHttp(struct IoConnection_t *ioConnection, unsigned c
     /* retrieves the http connection */
     struct HttpConnection_t *httpConnection = (struct HttpConnection_t *) ioConnection->lower;
 
-    /* retrieves the service from the http connection */
-    struct Service_t *service = httpConnection->ioConnection->connection->service;
-
-    /* retrieves the current (default) service handler and sets its
-    value on the http connection */
-    /*httpHandler = service->httpHandler;*/
-
-
-	/* ISTO SO DEVERIA ACONTECER PARA UM NOVO REQUEST (on new request) */
+	/* in case there is an http handler in the current connection must
+	unset it (remove temporary information) */
 	if(httpConnection->httpHandler) { httpConnection->httpHandler->unset(httpConnection); }
+
+	/* retrieves the current connection's base handler and then sets
+	it in the current connection then sets it as the current http handler */
 	httpHandler = httpConnection->baseHandler;
 	httpHandler->set(httpConnection);
     httpConnection->httpHandler = httpHandler;
-
-
-
-    /* in case the reset callback is set in the http
-    handler, must call it */
-    if(httpHandler->reset != NULL) {
-        /* calls the reset callback (for the connection)
-        in the http handler */
-        httpHandler->reset(httpConnection);
-    }
 
     // TODO: tenho de testar quantos bytes processei !!!
     // NAO posso assumir que por cada pacote de dados que recebo
