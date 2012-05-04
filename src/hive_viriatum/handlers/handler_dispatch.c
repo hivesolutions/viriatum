@@ -178,7 +178,7 @@ ERROR_CODE urlCallbackHandlerDispatch(struct HttpParser_t *httpParser, const uns
     struct HttpHandler_t *handler = httpConnection->httpHandler;
     struct DispatchHandler_t *dispatchHandler = (struct DispatchHandler_t *) handler->lower;
 
-    char *handlerName;
+    unsigned char *handlerName;
 
     /* allocates the required space for the url */
     unsigned char *url = (unsigned char *) MALLOC(dataSize + 1);
@@ -211,7 +211,7 @@ ERROR_CODE urlCallbackHandlerDispatch(struct HttpParser_t *httpParser, const uns
 
         /* sets the name of the handler as the name in the current index
         the breaks the loop to process it */
-        handlerName = (char *) dispatchHandler->names[index];
+        handlerName = dispatchHandler->names[index];
         break;
     }
 
