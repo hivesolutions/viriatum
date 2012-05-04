@@ -39,6 +39,7 @@ echo " + JNI                   $have_jni"
 echo " + Dynamic Linking       $have_dl"
 echo " + Log                   $have_log"
 echo " + Threads               $have_pthread"
+echo " + PCRE (regex)          $have_pcre"
 echo " + WinSockets2           $have_w2_32"
 echo " + PSAPI                 $have_psapi"
 index=1
