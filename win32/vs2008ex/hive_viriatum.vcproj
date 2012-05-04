@@ -583,11 +583,11 @@
                     >
                 </File>
                 <File
-                    RelativePath="..\..\src\hive_viriatum\handlers\handler_file.c"
+                    RelativePath="..\..\src\hive_viriatum\handlers\handler_dispatch.c"
                     >
                 </File>
                 <File
-                    RelativePath="..\..\src\hive_viriatum\handlers\handler_request.c"
+                    RelativePath="..\..\src\hive_viriatum\handlers\handler_file.c"
                     >
                 </File>
             </Filter>
@@ -745,11 +745,11 @@
                     >
                 </File>
                 <File
-                    RelativePath="..\..\src\hive_viriatum\handlers\handler_file.h"
+                    RelativePath="..\..\src\hive_viriatum\handlers\handler_dispatch.h"
                     >
                 </File>
                 <File
-                    RelativePath="..\..\src\hive_viriatum\handlers\handler_request.h"
+                    RelativePath="..\..\src\hive_viriatum\handlers\handler_file.h"
                     >
                 </File>
                 <File

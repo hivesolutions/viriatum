@@ -27,7 +27,7 @@
 
 #include "stdafx.h"
 
-#include "handler_request.h"
+#include "handler_dispatch.h"
 
 ERROR_CODE createDispatchHandler(struct DispatchHandler_t **dispatchHandlerPointer, struct HttpHandler_t *httpHandler) {
     /* retrieves the dispatch handler size */
@@ -38,7 +38,7 @@ ERROR_CODE createDispatchHandler(struct DispatchHandler_t **dispatchHandlerPoint
 
     /* sets the dispatch handler attributes (default) values */
     dispatchHandler->regex = NULL;
-	dispatchHandler->names = NULL;
+    dispatchHandler->names = NULL;
     dispatchHandler->regexCount = 0;
 
     /* sets the dispatch handler in the upper http handler substrate */
@@ -53,7 +53,7 @@ ERROR_CODE createDispatchHandler(struct DispatchHandler_t **dispatchHandlerPoint
 
 ERROR_CODE deleteDispatchHandler(struct DispatchHandler_t *dispatchHandler) {
     /* in case the regex buffer is defined releases it */
-	if(dispatchHandler->regex != NULL) { FREE(dispatchHandler->regex); }
+    if(dispatchHandler->regex != NULL) { FREE(dispatchHandler->regex); }
 
     /* releases the dispatch handler */
     FREE(dispatchHandler);
@@ -62,35 +62,35 @@ ERROR_CODE deleteDispatchHandler(struct DispatchHandler_t *dispatchHandler) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE registerHandlerRequest(struct Service_t *service) {
+ERROR_CODE registerHandlerDispatch(struct Service_t *service) {
     /* allocates the http handler */
     struct HttpHandler_t *httpHandler;
 
-	/* allocates space for the dispatch handler */
-	struct DispatchHandler_t *dispatchHandler;
+    /* allocates space for the dispatch handler */
+    struct DispatchHandler_t *dispatchHandler;
 
-	/* allocates space for the regex related variables */
+    /* allocates space for the regex related variables */
     const char *error;
     int errorOffset;
 
     /* creates the http handler and then uses it to create
-	the dispatch handler (lower substrate) */
-    service->createHttpHandler(service, &httpHandler, (unsigned char *) "request");
-	createDispatchHandler(&dispatchHandler, httpHandler);
+    the dispatch handler (lower substrate) */
+    service->createHttpHandler(service, &httpHandler, (unsigned char *) "dispatch");
+    createDispatchHandler(&dispatchHandler, httpHandler);
 
     /* sets the http handler attributes */
-    httpHandler->set = setHandlerRequest;
-    httpHandler->unset = unsetHandlerRequest;
+    httpHandler->set = setHandlerDispatch;
+    httpHandler->unset = unsetHandlerDispatch;
     httpHandler->reset = NULL;
 
 
-	dispatchHandler->regexCount = 2;
-	dispatchHandler->regex = (pcre **) MALLOC(sizeof(pcre *) * dispatchHandler->regexCount);
-	dispatchHandler->regex[0] = pcre_compile("[.]*\\.lua", 0, &error, &errorOffset, NULL);
-	dispatchHandler->regex[1] = pcre_compile("[.]*\\.default", 0, &error, &errorOffset, NULL);
-	dispatchHandler->names = (unsigned char **) MALLOC(sizeof(pcre *) * dispatchHandler->regexCount);
-	dispatchHandler->names[0] = "lua";
-	dispatchHandler->names[1] = "default";
+    dispatchHandler->regexCount = 2;
+    dispatchHandler->regex = (pcre **) MALLOC(sizeof(pcre *) * dispatchHandler->regexCount);
+    dispatchHandler->regex[0] = pcre_compile("[.]*\\.lua", 0, &error, &errorOffset, NULL);
+    dispatchHandler->regex[1] = pcre_compile("[.]*\\.default", 0, &error, &errorOffset, NULL);
+    dispatchHandler->names = (unsigned char **) MALLOC(sizeof(pcre *) * dispatchHandler->regexCount);
+    dispatchHandler->names[0] = "lua";
+    dispatchHandler->names[1] = "default";
 
 
 
@@ -101,53 +101,53 @@ ERROR_CODE registerHandlerRequest(struct Service_t *service) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE unregisterHandlerRequest(struct Service_t *service) {
+ERROR_CODE unregisterHandlerDispatch(struct Service_t *service) {
     /* allocates the http handler */
     struct HttpHandler_t *httpHandler;
 
-	/* allocates space for the dispatch handler */
-	struct DispatchHandler_t *dispatchHandler;
+    /* allocates space for the dispatch handler */
+    struct DispatchHandler_t *dispatchHandler;
 
-	/* retrieves the http handler from the service, then retrieves
-	the lower substrate as the dispatch handler */
-    service->getHttpHandler(service, &httpHandler, (unsigned char *) "request");
-	dispatchHandler = (struct DispatchHandler_t *) httpHandler->lower;
+    /* retrieves the http handler from the service, then retrieves
+    the lower substrate as the dispatch handler */
+    service->getHttpHandler(service, &httpHandler, (unsigned char *) "dispatch");
+    dispatchHandler = (struct DispatchHandler_t *) httpHandler->lower;
 
-	/* deletes the dispatch handler reference */
-	deleteDispatchHandler(dispatchHandler);
+    /* deletes the dispatch handler reference */
+    deleteDispatchHandler(dispatchHandler);
 
     /* remove the http handler from the service after
-	that deletes the handler reference */
+    that deletes the handler reference */
     service->removeHttpHandler(service, httpHandler);
     service->deleteHttpHandler(service, httpHandler);
 
-	/* raises no error */
+    /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE setHandlerRequest(struct HttpConnection_t *httpConnection) {
+ERROR_CODE setHandlerDispatch(struct HttpConnection_t *httpConnection) {
     /* sets the http parser values */
-	_setHttpParserHandlerRequest(httpConnection->httpParser);
+    _setHttpParserHandlerDispatch(httpConnection->httpParser);
 
     /* sets the http settings values */
-    _setHttpSettingsHandlerRequest(httpConnection->httpSettings);
+    _setHttpSettingsHandlerDispatch(httpConnection->httpSettings);
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE unsetHandlerRequest(struct HttpConnection_t *httpConnection) {
+ERROR_CODE unsetHandlerDispatch(struct HttpConnection_t *httpConnection) {
     /* unsets the http parser values */
-    _unsetHttpParserHandlerRequest(httpConnection->httpParser);
+    _unsetHttpParserHandlerDispatch(httpConnection->httpParser);
 
     /* unsets the http settings values */
-    _unsetHttpSettingsHandlerRequest(httpConnection->httpSettings);
+    _unsetHttpSettingsHandlerDispatch(httpConnection->httpSettings);
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE messageBeginCallbackHandlerRequest(struct HttpParser_t *httpParser) {
+ERROR_CODE messageBeginCallbackHandlerDispatch(struct HttpParser_t *httpParser) {
     /* prints an information */
     V_DEBUG("HTTP request received\n");
 
@@ -155,22 +155,22 @@ ERROR_CODE messageBeginCallbackHandlerRequest(struct HttpParser_t *httpParser) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE urlCallbackHandlerRequest(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize) {
+ERROR_CODE urlCallbackHandlerDispatch(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize) {
     int matching;
 
-	size_t index;
+    size_t index;
 
-    
-	struct Connection_t *connection = (struct Connection_t *) httpParser->parameters;
-	struct IoConnection_t *ioConnection = (struct IoConnection_t *) connection->lower;
-	struct HttpConnection_t *httpConnection = (struct HttpConnection_t *) ioConnection->lower;
+
+    struct Connection_t *connection = (struct Connection_t *) httpParser->parameters;
+    struct IoConnection_t *ioConnection = (struct IoConnection_t *) connection->lower;
+    struct HttpConnection_t *httpConnection = (struct HttpConnection_t *) ioConnection->lower;
     struct Service_t *service = connection->service;
-	struct HttpHandler_t *handler = httpConnection->httpHandler;
-	struct DispatchHandler_t *dispatchHandler = (struct DispatchHandler_t *) handler->lower;
+    struct HttpHandler_t *handler = httpConnection->httpHandler;
+    struct DispatchHandler_t *dispatchHandler = (struct DispatchHandler_t *) handler->lower;
 
-	char *handlerName;
-	
-	/* allocates the required space for the url */
+    char *handlerName;
+
+    /* allocates the required space for the url */
     unsigned char *url = (unsigned char *) MALLOC(dataSize + 1);
 
 
@@ -189,40 +189,40 @@ ERROR_CODE urlCallbackHandlerRequest(struct HttpParser_t *httpParser, const unsi
 
     /* THIS IS EXTREMLY SLOW !!! WARNING */
 
-	handlerName = "file";
+    handlerName = "file";
 
-	/* iterates over all the regular expressions so that they
-	may be tested agains the current url */
-	for(index = 0; index < dispatchHandler->regexCount; index++) {
-		/* tries to match the current url agains the registered
-		regular expression in case it fails continues the loop */
-		matching = pcre_exec(dispatchHandler->regex[index], NULL, url, dataSize, 0, 0, NULL, 0);
-		if(matching != 0) { continue; }
-		
-		/* sets the name of the handler as the name in the current index
-		the breaks the loop to process it */
-		handlerName = dispatchHandler->names[index];
-		break;
-	}
+    /* iterates over all the regular expressions so that they
+    may be tested agains the current url */
+    for(index = 0; index < dispatchHandler->regexCount; index++) {
+        /* tries to match the current url agains the registered
+        regular expression in case it fails continues the loop */
+        matching = pcre_exec(dispatchHandler->regex[index], NULL, url, dataSize, 0, 0, NULL, 0);
+        if(matching != 0) { continue; }
 
-	/* END OF WARNING */
+        /* sets the name of the handler as the name in the current index
+        the breaks the loop to process it */
+        handlerName = dispatchHandler->names[index];
+        break;
+    }
 
-
+    /* END OF WARNING */
 
 
 
 
-	/* retrieves the current handler and then unsets it
-	from the connection (detach) */
-	handler = httpConnection->httpHandler;
-	handler->unset(httpConnection);
+
+
+    /* retrieves the current handler and then unsets it
+    from the connection (detach) */
+    handler = httpConnection->httpHandler;
+    handler->unset(httpConnection);
 
     /* sets the current http handler accoring to the current options
     in the service, the http handler must be loaded in the handlers map */
     getValueStringHashMap(service->httpHandlersMap, handlerName, &handler);
-	handler->set(httpConnection);
-	httpConnection->httpHandler = handler;
-	httpConnection->httpSettings->onurl(httpParser, data, dataSize);
+    handler->set(httpConnection);
+    httpConnection->httpHandler = handler;
+    httpConnection->httpSettings->onurl(httpParser, data, dataSize);
 
     /* releases the url */
     FREE(url);
@@ -231,7 +231,7 @@ ERROR_CODE urlCallbackHandlerRequest(struct HttpParser_t *httpParser, const unsi
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE headerFieldCallbackHandlerRequest(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize) {
+ERROR_CODE headerFieldCallbackHandlerDispatch(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize) {
     /* allocates the required space for the header field */
     unsigned char *headerField = (unsigned char *) MALLOC(dataSize + 1);
 
@@ -251,7 +251,7 @@ ERROR_CODE headerFieldCallbackHandlerRequest(struct HttpParser_t *httpParser, co
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE headerValueCallbackHandlerRequest(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize) {
+ERROR_CODE headerValueCallbackHandlerDispatch(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize) {
     /* allocates the required space for the header value */
     unsigned char *headerValue = (unsigned char *) MALLOC(dataSize + 1);
 
@@ -271,7 +271,7 @@ ERROR_CODE headerValueCallbackHandlerRequest(struct HttpParser_t *httpParser, co
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE headersCompleteCallbackHandlerRequest(struct HttpParser_t *httpParser) {
+ERROR_CODE headersCompleteCallbackHandlerDispatch(struct HttpParser_t *httpParser) {
     /* prints an information */
     V_DEBUG("HTTP headers parsed\n");
 
@@ -279,7 +279,7 @@ ERROR_CODE headersCompleteCallbackHandlerRequest(struct HttpParser_t *httpParser
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE bodyCallbackHandlerRequest(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize) {
+ERROR_CODE bodyCallbackHandlerDispatch(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize) {
     /* allocates the required space for the body */
     unsigned char *body = (unsigned char *) MALLOC(dataSize + 1);
 
@@ -299,7 +299,7 @@ ERROR_CODE bodyCallbackHandlerRequest(struct HttpParser_t *httpParser, const uns
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE messageCompleteCallbackHandlerRequest(struct HttpParser_t *httpParser) {
+ERROR_CODE messageCompleteCallbackHandlerDispatch(struct HttpParser_t *httpParser) {
     /* prints an information */
     V_DEBUG("HTTP request parsed\n");
 
@@ -307,33 +307,33 @@ ERROR_CODE messageCompleteCallbackHandlerRequest(struct HttpParser_t *httpParser
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _setHttpParserHandlerRequest(struct HttpParser_t *httpParser) {
+ERROR_CODE _setHttpParserHandlerDispatch(struct HttpParser_t *httpParser) {
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _unsetHttpParserHandlerRequest(struct HttpParser_t *httpParser) {
+ERROR_CODE _unsetHttpParserHandlerDispatch(struct HttpParser_t *httpParser) {
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _setHttpSettingsHandlerRequest(struct HttpSettings_t *httpSettings) {
+ERROR_CODE _setHttpSettingsHandlerDispatch(struct HttpSettings_t *httpSettings) {
     /* sets the various callback functions in the http settings
-	structure, these callbacks are going to be used in the runtime
-	processing of http parser (runtime execution) */
-    httpSettings->onmessageBegin = messageBeginCallbackHandlerRequest;
-    httpSettings->onurl = urlCallbackHandlerRequest;
-    httpSettings->onheaderField = headerFieldCallbackHandlerRequest;
-    httpSettings->onheaderValue = headerValueCallbackHandlerRequest;
-    httpSettings->onheadersComplete = headersCompleteCallbackHandlerRequest;
-    httpSettings->onbody = bodyCallbackHandlerRequest;
-    httpSettings->onmessageComplete = messageCompleteCallbackHandlerRequest;
+    structure, these callbacks are going to be used in the runtime
+    processing of http parser (runtime execution) */
+    httpSettings->onmessageBegin = messageBeginCallbackHandlerDispatch;
+    httpSettings->onurl = urlCallbackHandlerDispatch;
+    httpSettings->onheaderField = headerFieldCallbackHandlerDispatch;
+    httpSettings->onheaderValue = headerValueCallbackHandlerDispatch;
+    httpSettings->onheadersComplete = headersCompleteCallbackHandlerDispatch;
+    httpSettings->onbody = bodyCallbackHandlerDispatch;
+    httpSettings->onmessageComplete = messageCompleteCallbackHandlerDispatch;
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _unsetHttpSettingsHandlerRequest(struct HttpSettings_t *httpSettings) {
+ERROR_CODE _unsetHttpSettingsHandlerDispatch(struct HttpSettings_t *httpSettings) {
     /* unsets the various callback functions from the http settings */
     httpSettings->onmessageBegin = NULL;
     httpSettings->onurl = NULL;
