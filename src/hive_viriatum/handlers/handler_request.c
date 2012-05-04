@@ -93,8 +93,12 @@ ERROR_CODE messageBeginCallbackHandlerRequest(struct HttpParser_t *httpParser) {
 }
 
 ERROR_CODE urlCallbackHandlerRequest(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize) {
-    struct HttpHandler_t *handler;
-	
+    const char *error;
+    int errorOffset;
+    pcre *regex;
+    int matching;
+
+    struct HttpHandler_t *handler;	
 	struct Connection_t *connection = (struct Connection_t *) httpParser->parameters;
 	struct IoConnection_t *ioConnection = (struct IoConnection_t *) connection->lower;
 	struct HttpConnection_t *httpConnection = (struct HttpConnection_t *) ioConnection->lower;
@@ -102,9 +106,7 @@ ERROR_CODE urlCallbackHandlerRequest(struct HttpParser_t *httpParser, const unsi
 
 	char *handlerName;
 	
-
-
-    /* allocates the required space for the url */
+	/* allocates the required space for the url */
     unsigned char *url = (unsigned char *) MALLOC(dataSize + 1);
 
     /* copies the memory from the data to the url */
@@ -116,16 +118,28 @@ ERROR_CODE urlCallbackHandlerRequest(struct HttpParser_t *httpParser, const unsi
     /* prints the url */
     V_DEBUG_F("url: %s\n", url);
 
-	
 
-	if(!strcmp(url, "/tobias")) { handlerName = "lua"; }
+
+
+    /* THIS IS EXTREMLY SLOW !!! WARNING */
+
+    regex = pcre_compile("[.]*\\.lua", 0, &error, &errorOffset, NULL);
+    matching = pcre_exec(regex, NULL, url, dataSize, 0, 0, NULL, 0);
+
+	if(matching == 0) { handlerName = "lua"; }
 	else { handlerName = "file"; }
 
+	/* END OF WARNING */
 
-	/* AKI DEVERTIA SER detach */
 
-	httpConnection->httpHandler->unset(httpConnection);
 
+
+
+
+	/* retrieves the current handler and then unsets it
+	from the connection (detach) */
+	handler = httpConnection->httpHandler;
+	handler->unset(httpConnection);
 
     /* sets the current http handler accoring to the current options
     in the service, the http handler must be loaded in the handlers map */
