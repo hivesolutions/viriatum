@@ -47,6 +47,10 @@
 #endif
 #endif
 
+#ifdef HAVE_PCRE
+#define VIRIATUM_PCRE
+#endif
+
 #ifdef _WIN32
 #include "global/targetver.h"
 #include "global/resource.h"
@@ -55,6 +59,18 @@
 #include "../hive_viriatum_commons/viriatum_commons.h"
 
 #include "global/definitions.h"
+
+#ifdef VIRIATUM_PCRE
+#define PCRE_STATIC
+#include <pcre.h>
+#ifdef VIRIATUM_PLATFORM_MSC
+#ifdef VIRIATUM_DEBUG
+#pragma comment(lib, "pcred.lib")
+#else
+#pragma comment(lib, "pcre.lib")
+#endif
+#endif
+#endif
 
 unsigned char *nameViriatum();
 unsigned char *versionViriatum();
