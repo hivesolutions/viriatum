@@ -98,7 +98,7 @@ ERROR_CODE processTemplateEngine(struct TemplateEngine_t *templateEngine, struct
 	/* allocates space for the buffer that will serve as
 	cache for the reading of the tempalte file, this has
 	serious implications on the performance of the file */
-	char *_fileBuffer;
+	char _fileBuffer[ENGINE_BUFFER_SIZE];
 
     /* allocates the mark variables used to locate
     the part of context changing durring the parsing */
@@ -128,10 +128,9 @@ ERROR_CODE processTemplateEngine(struct TemplateEngine_t *templateEngine, struct
     fileSize = ftell(file);
     fseek(file, 0, SEEK_SET);
 
-	/* allocates space for the buffer that will hold the
-	file template (important for performance) then sets
-	the buffer on the file for reading */
-	_fileBuffer = MALLOC(ENGINE_BUFFER_SIZE);
+	/* then sets the buffer on the file for reading, this
+	operation has serious implications in the file access
+	performance (buffered reading )*/
 	setvbuf(file, _fileBuffer, _IOFBF, ENGINE_BUFFER_SIZE);
 
     /* allocates the buffer that will hold the complete
@@ -397,10 +396,6 @@ ERROR_CODE processTemplateEngine(struct TemplateEngine_t *templateEngine, struct
         /* calls the text end callback */
         TEMPLATE_CALLBACK_DATA(textEnd);
     }
-
-	/* releases the memory used for the buffer
-	layerd on top of the file */
-	FREE(_fileBuffer);
 
     /* closes the file */
     fclose(file);
