@@ -38,8 +38,9 @@ mkdir %SETUP_DIR%
 cd %BUILD_DIR%
 
 :: clones the repository to retrieve the source code
-:: for compilation
-git clone git://github.com/hivesolutions/viriatum.git %REPO_DIR% --quiet
+:: for compilation, the command is run using the call
+:: operator so that it avoid exiting the current process
+call git clone git://github.com/hivesolutions/viriatum.git %REPO_DIR% --quiet
 
 :: in case the previous command didn't exit properly
 :: must return immediately with the error
