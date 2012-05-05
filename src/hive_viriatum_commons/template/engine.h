@@ -30,7 +30,7 @@
 #include "../debug/debug.h"
 #include "../system/system.h"
 
-#define ENGINE_BUFFER_SIZE 1
+#define ENGINE_BUFFER_SIZE 4096
 
 #define TEMPLATE_MARK(FOR) TEMPLATE_MARK_N(FOR, 0)
 #define TEMPLATE_MARK_BACK(FOR) TEMPLATE_MARK_N(FOR, 1)
