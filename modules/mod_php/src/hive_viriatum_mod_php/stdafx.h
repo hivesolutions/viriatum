@@ -27,20 +27,17 @@
 
 #pragma once
 
+#include <sapi/embed/php_embed.h>
 #include "../../../../src/hive_viriatum/viriatum.h"
 
 unsigned char *nameViriatumModPhp();
 unsigned char *versionViriatumModPhp();
 unsigned char *descriptionViriatumModPhp();
 
-#include <lua5.1/lua.h>
-#include <lua5.1/lualib.h>
-#include <lua5.1/lauxlib.h>
-
 #ifdef VIRIATUM_PLATFORM_MSC
 #ifdef VIRIATUM_DEBUG
-#pragma comment(lib, "lua5.1_d.lib")
+#pragma comment(lib, "php5embed.lib")
 #else
-#pragma comment(lib, "lua5.1.lib")
+#pragma comment(lib, "php5embed.lib")
 #endif
 #endif
