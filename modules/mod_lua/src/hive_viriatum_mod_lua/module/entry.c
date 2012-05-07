@@ -72,13 +72,10 @@ ERROR_CODE startModule(struct Environment_t *environment, struct Module_t *modul
     /* allocates the mod lua http handler */
     struct ModLuaHttpHandler_t *modLuaHttpHandler;
 
-    /* retrieves the name */
+    /* retrieves the name, version and description of
+    the current module loaded */
     unsigned char *name = nameViriatumModLua();
-
-    /* retrieves the version */
     unsigned char *version = versionViriatumModLua();
-
-    /* retrieves the description */
     unsigned char *description = descriptionViriatumModLua();
 
     /* retrieves the (environment) service */

@@ -41,8 +41,28 @@
  * mod php module.
  */
 typedef struct ModPhpModule_t {
-    int tobias;
+    /**
+     * The http handler associated with the
+     * module (upper layer).
+     */
+    struct HttpHandler_t *httpHandler;
+
+    /**
+     * The mod php http handler associated
+     * with the module.
+     */
+    struct ModPhpHttpHandler_t *modPhpHttpHandler;
 } ModPhpModule;
+
+/**
+ * The global reference to the string buffer to
+ * be used to hold the various strings resulting
+ * from the php default execution output.
+ */
+struct StringBuffer_t *_outputBuffer;
+
+char *_buffer;
+size_t _bufferSize;
 
 VIRIATUM_EXPORT_PREFIX ERROR_CODE createModPhpModule(struct ModPhpModule_t **modPhpModulePointer, struct Module_t *module);
 VIRIATUM_EXPORT_PREFIX ERROR_CODE deleteModPhpModule(struct ModPhpModule_t *modPhpModule);
@@ -50,3 +70,8 @@ VIRIATUM_EXPORT_PREFIX ERROR_CODE startModule(struct Environment_t *environment,
 VIRIATUM_EXPORT_PREFIX ERROR_CODE stopModule(struct Environment_t *environment, struct Module_t *module);
 VIRIATUM_EXPORT_PREFIX ERROR_CODE infoModule(struct Module_t *module);
 VIRIATUM_EXPORT_PREFIX ERROR_CODE errorModule(unsigned char **messagePointer);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _loadConfiguration(struct Service_t *service, struct ModPhpHttpHandler_t *modPhpHttpHandler);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _loadPhpState();
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _unloadPhpState();
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _reloaPhpState();
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _startPhpState();
