@@ -160,7 +160,7 @@ ERROR_CODE loadModule(struct Service_t *service, unsigned char *modulePath) {
 
     /* sets the module attributes */
     module->environment = environment;
-	module->library = library;
+    module->library = library;
 
     /* sets the environment attributes */
     environment->service = service;
@@ -206,7 +206,7 @@ ERROR_CODE unloadModule(struct Service_t *service, struct Module_t *module) {
     /* calls the stop module function */
     errorCode = module->stop(environment, module);
 
-	/* tests the error code for error */
+    /* tests the error code for error */
     if(IS_ERROR_CODE(errorCode)) {
         /* prints a warning message */
         V_WARNING_F("%s\n", GET_ERROR_MODULE(module));

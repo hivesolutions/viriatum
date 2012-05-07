@@ -47,10 +47,10 @@ typedef struct ModLuaModule_t {
      */
     lua_State *luaState;
 
-	/**
-	 * The http handler associated with the
-	 * module (upper layer).
-	 */
+    /**
+     * The http handler associated with the
+     * module (upper layer).
+     */
     struct HttpHandler_t *httpHandler;
 
     /**

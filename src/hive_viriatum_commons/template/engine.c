@@ -95,10 +95,10 @@ ERROR_CODE processTemplateEngine(struct TemplateEngine_t *templateEngine, struct
     end of the parsing */
     unsigned char *fileBuffer;
 
-	/* allocates space for the buffer that will serve as
-	cache for the reading of the tempalte file, this has
-	serious implications on the performance of the file */
-	char _fileBuffer[ENGINE_BUFFER_SIZE];
+    /* allocates space for the buffer that will serve as
+    cache for the reading of the tempalte file, this has
+    serious implications on the performance of the file */
+    char _fileBuffer[ENGINE_BUFFER_SIZE];
 
     /* allocates the mark variables used to locate
     the part of context changing durring the parsing */
@@ -128,10 +128,10 @@ ERROR_CODE processTemplateEngine(struct TemplateEngine_t *templateEngine, struct
     fileSize = ftell(file);
     fseek(file, 0, SEEK_SET);
 
-	/* then sets the buffer on the file for reading, this
-	operation has serious implications in the file access
-	performance (buffered reading )*/
-	setvbuf(file, _fileBuffer, _IOFBF, ENGINE_BUFFER_SIZE);
+    /* then sets the buffer on the file for reading, this
+    operation has serious implications in the file access
+    performance (buffered reading )*/
+    setvbuf(file, _fileBuffer, _IOFBF, ENGINE_BUFFER_SIZE);
 
     /* allocates the buffer that will hold the complete
     template file (this allocation may be giant), this is
