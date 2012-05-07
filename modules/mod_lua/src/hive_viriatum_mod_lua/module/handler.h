@@ -34,7 +34,7 @@
 /**
  * The structure that holds the internal
  * structure to support the context
- * of the lua module.s
+ * of the lua module.
  */
 typedef struct ModLuaHttpHandler_t {
     /**
