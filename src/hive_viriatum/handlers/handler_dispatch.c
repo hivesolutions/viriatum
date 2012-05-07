@@ -54,8 +54,10 @@ ERROR_CODE createDispatchHandler(struct DispatchHandler_t **dispatchHandlerPoint
 }
 
 ERROR_CODE deleteDispatchHandler(struct DispatchHandler_t *dispatchHandler) {
+	#ifdef VIRIATUM_PCRE
 	/* allocates space for the index counter */
 	size_t index;
+	#endif
 
 	#ifdef VIRIATUM_PCRE
 	/* iterates over all the regular expressions to release their
@@ -106,7 +108,7 @@ ERROR_CODE registerHandlerDispatch(struct Service_t *service) {
     dispatchHandler->regex[0] = pcre_compile("[.]*\\.lua", 0, &error, &errorOffset, NULL);
     dispatchHandler->regex[1] = pcre_compile("[.]*\\.default", 0, &error, &errorOffset, NULL);
 	#endif
-    dispatchHandler->names = (unsigned char **) MALLOC(sizeof(pcre *) * dispatchHandler->regexCount);
+    dispatchHandler->names = (unsigned char **) MALLOC(sizeof(unsigned char *) * dispatchHandler->regexCount);
     dispatchHandler->names[0] = (unsigned char *) "lua";
     dispatchHandler->names[1] = (unsigned char *) "default";
 
