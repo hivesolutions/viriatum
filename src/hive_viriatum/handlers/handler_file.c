@@ -287,7 +287,7 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
     ERROR_CODE errorCode = 0;
 
     /* allocates the headers buffer (it will be releases automatically by the writter)
-	it need to be allocated in the heap so it gets throught the request cycle */
+    it need to be allocated in the heap so it gets throught the request cycle */
     char *headersBuffer = MALLOC(1024);
 
     /* retrieves the handler file context from the http parser */
