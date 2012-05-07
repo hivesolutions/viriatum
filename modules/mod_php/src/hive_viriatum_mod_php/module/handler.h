@@ -26,3 +26,43 @@
 */
 
 #pragma once
+
+#include "entry.h"
+
+/**
+ * The structure that holds the internal
+ * structure to support the context
+ * of the php module.
+ */
+typedef struct ModPhpHttpHandler_t {
+    /**
+     * The path to the default file to
+     * be used for the parsing.
+     */
+    char *filePath;
+
+    /**
+     * Flag that controls if the script file
+     * to be executed is currently dirty.
+     */
+    unsigned int fileDirty;
+} ModPhpHttpHandler;
+
+ERROR_CODE createModPhpHttpHandler(struct ModPhpHttpHandler_t **modPhpHttpHandlerPonter, struct HttpHandler_t *httpHandlerPonter);
+ERROR_CODE deleteModPhpHttpHandler(struct ModPhpHttpHandler_t *modPhpHttpHandler);
+ERROR_CODE setHandlerModule(struct HttpConnection_t *httpConnection);
+ERROR_CODE unsetHandlerModule(struct HttpConnection_t *httpConnection);
+ERROR_CODE urlCallbackHandlerModule(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize);
+ERROR_CODE headerFieldCallbackHandlerModule(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize);
+ERROR_CODE headerValueCallbackHandlerModule(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize);
+ERROR_CODE headersCompleteCallbackHandlerModule(struct HttpParser_t *httpParser);
+ERROR_CODE bodyCallbackHandlerModule(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize);
+ERROR_CODE messageCompleteCallbackHandlerModule(struct HttpParser_t *httpParser);
+ERROR_CODE _setHttpParserHandlerModule(struct HttpParser_t *httpParser);
+ERROR_CODE _unsetHttpParserHandlerModule(struct HttpParser_t *httpParser);
+ERROR_CODE _setHttpSettingsHandlerModule(struct HttpSettings_t *httpSettings);
+ERROR_CODE _unsetHttpSettingsHandlerModule(struct HttpSettings_t *httpSettings);
+ERROR_CODE _messageBeginCallbackHandlerModule(struct HttpParser_t *httpParser);
+ERROR_CODE _sendResponseHandlerModule(struct HttpParser_t *httpParser);
+ERROR_CODE _sendResponseCallbackHandlerModule(struct Connection_t *connection, struct Data_t *data, void *parameters);
+ERROR_CODE _writeErrorConnection(struct HttpParser_t *httpParser, char *message);
