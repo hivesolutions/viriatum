@@ -138,7 +138,7 @@ void daemonize() {
 }
 #endif
 
-#ifdef VIRIATUM_PLATFORM_LINUX
+#ifdef VIRIATUM_PLATFORM_UNIX
 void daemonize() {
     /* allocates space for the various dameon
     related variables */
