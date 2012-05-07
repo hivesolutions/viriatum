@@ -41,5 +41,5 @@
  * mod php module.
  */
 typedef struct ModPhpModule_t {
-	int tobias;
+    int tobias;
 } ModLuaModule;
