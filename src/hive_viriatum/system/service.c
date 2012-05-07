@@ -532,10 +532,10 @@ ERROR_CODE loadModulesService(struct Service_t *service) {
         /* creates the complete module path for the loading of it */
         SPRINTF((char *) modulePath, VIRIATUM_MAX_PATH_SIZE, "%s/%s", VIRIATUM_MODULES_PATH, entry->name);
 
-		/* tries to find the module prefix in the current entry name
-		in case it's not found continues the loop immediately no library
-		loading is required (not the correct format) */
-		if(strstr(entry->name, "viriatum_") != entry->name) { continue; }
+        /* tries to find the module prefix in the current entry name
+        in case it's not found continues the loop immediately no library
+        loading is required (not the correct format) */
+        if(strstr(entry->name, "viriatum_") != entry->name) { continue; }
 
         /* loads the module, retrieving a possible error code */
         errorCode = loadModule(service, modulePath);
