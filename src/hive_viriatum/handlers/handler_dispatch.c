@@ -102,15 +102,17 @@ ERROR_CODE registerHandlerDispatch(struct Service_t *service) {
     httpHandler->reset = NULL;
 
 
-    dispatchHandler->regexCount = 2;
+    dispatchHandler->regexCount = 3;
     #ifdef VIRIATUM_PCRE
     dispatchHandler->regex = (pcre **) MALLOC(sizeof(pcre *) * dispatchHandler->regexCount);
     dispatchHandler->regex[0] = pcre_compile("[.]*\\.lua", 0, &error, &errorOffset, NULL);
-    dispatchHandler->regex[1] = pcre_compile("[.]*\\.default", 0, &error, &errorOffset, NULL);
+    dispatchHandler->regex[1] = pcre_compile("[.]*\\.php", 0, &error, &errorOffset, NULL);
+    dispatchHandler->regex[2] = pcre_compile("[.]*\\.default", 0, &error, &errorOffset, NULL);
     #endif
     dispatchHandler->names = (unsigned char **) MALLOC(sizeof(unsigned char *) * dispatchHandler->regexCount);
     dispatchHandler->names[0] = (unsigned char *) "lua";
-    dispatchHandler->names[1] = (unsigned char *) "default";
+    dispatchHandler->names[1] = (unsigned char *) "php";
+    dispatchHandler->names[2] = (unsigned char *) "default";
 
 
 
