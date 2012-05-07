@@ -37,7 +37,8 @@ ERROR_CODE createModPhpModule(struct ModPhpModule_t **modPhpModulePointer, struc
     struct ModPhpModule_t *modPhpModule = (struct ModPhpModule_t *) MALLOC(modPhpModuleSize);
 
     /* sets the mod php module attributes (default) values */
-	modPhpModule->tobias = 2;
+    modPhpModule->httpHandler = NULL;
+    modPhpModule->modPhpHttpHandler = NULL;
 
     /* sets the mod php module in the (upper) module substrate */
     module->lower = (void *) modPhpModule;
@@ -58,17 +59,62 @@ ERROR_CODE deleteModPhpModule(struct ModPhpModule_t *modPhpModule) {
 }
 
 ERROR_CODE startModule(struct Environment_t *environment, struct Module_t *module) {
+    /* allocates the mod php module */
+    struct ModPhpModule_t *modPhpModule;
+
+    /* allocates the http handler */
+    struct HttpHandler_t *httpHandler;
+
+    /* allocates the mod php http handler */
+    struct ModPhpHttpHandler_t *modPhpHttpHandler;
+
+    /* retrieves the name, version and description of
+    the current module loaded */
+    unsigned char *name = nameViriatumModPhp();
+    unsigned char *version = versionViriatumModPhp();
+    unsigned char *description = descriptionViriatumModPhp();
+
+    /* retrieves the (environment) service */
+    struct Service_t *service = environment->service;
+
     /* prints a debug message */
-    /*V_DEBUG_F("Starting the module '%s' (%s) v%s\n", name, description, version);*/
-	char *args[1] = { "default" };
+    V_DEBUG_F("Starting the module '%s' (%s) v%s\n", name, description, version);
 
-	printf("Starting PHP...");
+    /* creates the mod php module */
+    createModPhpModule(&modPhpModule, module);
 
-	PHP_EMBED_START_BLOCK(1, args)
-    zend_eval_string("echo 'Hello World';", NULL, "Embedded Code" TSRMLS_CC);
-    PHP_EMBED_END_BLOCK()
+    /* populates the module structure */
+    infoModule(module);
 
-	printf("started\n");
+    /* loads the php state populating all the erquired values
+    for state initialization */
+    _loadPhpState();
+
+    /* creates the http handler */
+    service->createHttpHandler(service, &httpHandler, (unsigned char *) "php");
+
+    /* creates the mod php http handler */
+    createModPhpHttpHandler(&modPhpHttpHandler, httpHandler);
+
+    /* sets the http handler attributes */
+    httpHandler->set = setHandlerModule;
+    httpHandler->unset = unsetHandlerModule;
+    httpHandler->reset = NULL;
+
+    /* sets the mod php handler attributes */
+    modPhpHttpHandler->filePath = DEFAULT_FILE_PATH;
+    modPhpHttpHandler->fileDirty = 1;
+
+    /* sets the mod php module attributes */
+    modPhpModule->httpHandler = httpHandler;
+    modPhpModule->modPhpHttpHandler = modPhpHttpHandler;
+
+    /* adds the http handler to the service */
+    service->addHttpHandler(service, httpHandler);
+
+    /* loads the service configuration for the http handler
+    this should change some of it's behavior */
+    _loadConfiguration(service, modPhpHttpHandler);
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -76,8 +122,8 @@ ERROR_CODE startModule(struct Environment_t *environment, struct Module_t *modul
 
 ERROR_CODE stopModule(struct Environment_t *environment, struct Module_t *module) {
     printf("Stoping PHP");
-	
-	/* raises no error */
+
+    /* raises no error */
     RAISE_NO_ERROR;
 }
 
@@ -105,6 +151,65 @@ ERROR_CODE errorModule(unsigned char **messagePointer) {
     /* sets the error message in the (error) message pointer */
     *messagePointer = getLastErrorMessage();
 
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE _loadConfiguration(struct Service_t *service, struct ModPhpHttpHandler_t *modPhpHttpHandler) {
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+
+int myapp_php_ub_write(const char *data, unsigned int dataSize TSRMLS_DC) {
+    char *_data = MALLOC(dataSize + 1);
+    _data[dataSize] = '\0';
+
+    /* adds a set of string to the string buffer */
+    appendStringBuffer(_outputBuffer, (unsigned char *) _data);
+
+    printf("%d\n", dataSize);
+
+    /*TODO: MONTES DE LEAKING */
+
+    return dataSize;
+}
+
+ERROR_CODE _loadPhpState() {
+    /* creates an array for the default initialization arguments,
+    these arguments are going to be sent to the php virtual machine */
+    char *args[1] = { "default" };
+
+    /* sets the proper write fucntion for the ouput of the php execution
+    this is equivalent to a redirect in the standard output */
+    php_embed_module.ub_write = myapp_php_ub_write;
+
+    /* runs the start block for the php interpreter, this should
+    be able to start all the internal structures */
+    php_embed_init(1, args);
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE _unloadPhpState() {
+    /* runs the stop block for the php interpreter, this should
+    be able to stop all the internal structures */
+    php_embed_shutdown(TSRMLS_C);
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE _reloadPhpState() {
+    _unloadPhpState();
+    _loadPhpState();
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE _startPhpState() {
     /* raises no error */
     RAISE_NO_ERROR;
 }
