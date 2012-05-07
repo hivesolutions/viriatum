@@ -28,3 +28,83 @@
 #include "stdafx.h"
 
 #include "entry.h"
+
+ERROR_CODE createModPhpModule(struct ModPhpModule_t **modPhpModulePointer, struct Module_t *module) {
+    /* retrieves the mod php module size */
+    size_t modPhpModuleSize = sizeof(struct ModPhpModule_t);
+
+    /* allocates space for the mod php module */
+    struct ModPhpModule_t *modPhpModule = (struct ModPhpModule_t *) MALLOC(modPhpModuleSize);
+
+    /* sets the mod php module attributes (default) values */
+	modPhpModule->tobias = 2;
+
+    /* sets the mod php module in the (upper) module substrate */
+    module->lower = (void *) modPhpModule;
+
+    /* sets the mod php module in the module pointer */
+    *modPhpModulePointer = modPhpModule;
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE deleteModPhpModule(struct ModPhpModule_t *modPhpModule) {
+    /* releases the mod php module */
+    FREE(modPhpModule);
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE startModule(struct Environment_t *environment, struct Module_t *module) {
+    /* prints a debug message */
+    /*V_DEBUG_F("Starting the module '%s' (%s) v%s\n", name, description, version);*/
+	char *args[1] = { "default" };
+
+	printf("Starting PHP...");
+
+	PHP_EMBED_START_BLOCK(1, args)
+    zend_eval_string("echo 'Hello World';", NULL, "Embedded Code" TSRMLS_CC);
+    PHP_EMBED_END_BLOCK()
+
+	printf("started\n");
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE stopModule(struct Environment_t *environment, struct Module_t *module) {
+    printf("Stoping PHP");
+	
+	/* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE infoModule(struct Module_t *module) {
+    /* retrieves the name */
+    unsigned char *name = nameViriatumModPhp();
+
+    /* retrieves the version */
+    unsigned char *version = versionViriatumModPhp();
+
+    /* populates the module structure */
+    module->name = name;
+    module->version = version;
+    module->type = MODULE_TYPE_HTTP_HANDLER;
+    module->start = startModule;
+    module->stop = stopModule;
+    module->info = infoModule;
+    module->error = errorModule;
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE errorModule(unsigned char **messagePointer) {
+    /* sets the error message in the (error) message pointer */
+    *messagePointer = getLastErrorMessage();
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
