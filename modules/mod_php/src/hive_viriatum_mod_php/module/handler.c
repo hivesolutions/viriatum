@@ -228,12 +228,14 @@ ERROR_CODE _unsetHttpSettingsHandlerModule(struct HttpSettings_t *httpSettings) 
 }
 
 ERROR_CODE _sendDataCallback(struct Connection_t *connection, struct Data_t *data, void *parameters) {
+    char *buffer;
 
-
-
+    connection->allocData(connection, _inputbufferSize * sizeof(unsigned char), (void **) &buffer);
+    /*memcpy(buffer, stringValue, dataSize);*/
+    memcpy(buffer, _inputbuffer, _inputbufferSize);
 
     /* writes the response to the connection */
-    connection->writeConnection(connection, _buffer, _bufferSize, _sendResponseCallbackHandlerModule, parameters);
+    connection->writeConnection(connection, buffer, _inputbufferSize, _sendResponseCallbackHandlerModule, parameters);
 
 
 
@@ -241,7 +243,7 @@ ERROR_CODE _sendDataCallback(struct Connection_t *connection, struct Data_t *dat
     disot em caso de erro */
 
 
-    FREE(_buffer);
+    FREE(_inputbuffer);
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -260,10 +262,8 @@ ERROR_CODE _sendResponseHandlerModule(struct HttpParser_t *httpParser) {
 
 
 
-    char *buffer;
-
-    size_t dataSize;
-    char *stringValue;
+  /*  size_t dataSize;*/
+   /* char *stringValue;*/
 
     char *headersBuffer;
 
@@ -271,28 +271,34 @@ ERROR_CODE _sendResponseHandlerModule(struct HttpParser_t *httpParser) {
 
     /* creates the string buffer to be used to store
     the complete output of the php interpreter */
-    createStringBuffer(&_outputBuffer);
+   /* createLinkedList(&_outputBuffer);*/
 
     zend_eval_string("phpinfo();", NULL, "Embedded Code" TSRMLS_CC);
 
     /* "joins" the string buffer values into a single
     value (from the internal string list) */
-    joinStringBuffer(_outputBuffer, &stringValue);
+    //joinStringBuffer(_outputBuffer, &stringValue);
+
+
+
+
+
 
     /* deletes the string buffer, no more need to store
     the output from the php interpreter */
-    deleteStringBuffer(_outputBuffer);
+  /*  deleteLinkedList(_outputBuffer);
 
     printf("Vai fazer print %d:\n", _outputBuffer->stringLength);
 
-    dataSize = _outputBuffer->stringLength;
+    dataSize = _outputBuffer->stringLength;*/
 
 
 
     /* allocates the data buffer (in a safe maner) then
     copies the data (from lua) into the buffer */
-    connection->allocData(connection, dataSize * sizeof(unsigned char), (void **) &buffer);
-    memcpy(buffer, stringValue, dataSize);
+ /*  connection->allocData(connection, _inputbufferSize * sizeof(unsigned char), (void **) &buffer); */
+    /*memcpy(buffer, stringValue, dataSize);*/
+    /*memcpy(buffer, _inputbuffer, _inputbufferSize);*/
 
 
 
@@ -301,10 +307,10 @@ ERROR_CODE _sendResponseHandlerModule(struct HttpParser_t *httpParser) {
 
     connection->allocData(connection, 1024, (void **) &headersBuffer);
 
-    SPRINTF(headersBuffer, 1024, "HTTP/1.1 200 OK\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nCache-Control: no-cache, must-revalidate\r\nContent-Length: %lu\r\n\r\n", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, (long unsigned int) dataSize);
+    SPRINTF(headersBuffer, 1024, "HTTP/1.1 200 OK\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nCache-Control: no-cache, must-revalidate\r\nContent-Length: %lu\r\n\r\n", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, (long unsigned int) _inputbufferSize);
 
     /* writes the response to the connection */
-    connection->writeConnection(connection, headersBuffer, 1024, _sendDataCallback, (void *) httpParser);
+    connection->writeConnection(connection, headersBuffer, (unsigned int) strlen(headersBuffer), _sendDataCallback, (void *) httpParser);
 
 
 
