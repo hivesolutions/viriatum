@@ -123,6 +123,9 @@ ERROR_CODE startModule(struct Environment_t *environment, struct Module_t *modul
 ERROR_CODE stopModule(struct Environment_t *environment, struct Module_t *module) {
     printf("Stoping PHP");
 
+    /*TODO: TENHO DE POR O PHP A FECHAR BEM */
+
+
     /* raises no error */
     RAISE_NO_ERROR;
 }
@@ -160,17 +163,17 @@ ERROR_CODE _loadConfiguration(struct Service_t *service, struct ModPhpHttpHandle
     RAISE_NO_ERROR;
 }
 
-
 int myapp_php_ub_write(const char *data, unsigned int dataSize TSRMLS_DC) {
-    char *_data = MALLOC(dataSize + 1);
-    _data[dataSize] = '\0';
+    _inputbuffer = MALLOC(dataSize + 1);
+    _inputbuffer[dataSize] = '\0';
 
-    /* adds a set of string to the string buffer */
-    appendStringBuffer(_outputBuffer, (unsigned char *) _data);
+    _inputbufferSize = dataSize;
 
-    printf("%d\n", dataSize);
+    memcpy(_inputbuffer, data, dataSize);
 
-    /*TODO: MONTES DE LEAKING */
+    /*appendValueLinkedList(_outputBuffer, (void **) _data);*/
+
+    /*TODO: MONTES DE LEAKING por causa do malloc */
 
     return dataSize;
 }

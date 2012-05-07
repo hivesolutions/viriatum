@@ -59,10 +59,14 @@ typedef struct ModPhpModule_t {
  * be used to hold the various strings resulting
  * from the php default execution output.
  */
-struct StringBuffer_t *_outputBuffer;
+struct LinkedList_t *_outputBuffer;
 
-char *_buffer;
-size_t _bufferSize;
+char *_inputbuffer;
+size_t _inputbufferSize;
+
+
+
+
 
 VIRIATUM_EXPORT_PREFIX ERROR_CODE createModPhpModule(struct ModPhpModule_t **modPhpModulePointer, struct Module_t *module);
 VIRIATUM_EXPORT_PREFIX ERROR_CODE deleteModPhpModule(struct ModPhpModule_t *modPhpModule);
