@@ -56,6 +56,7 @@ stream/memory_stream.c \
 structures/array_list.c \
 structures/hash_map.c \
 structures/iterator.c \
+structures/linked_buffer.c \
 structures/linked_list.c \
 structures/string_buffer.c \
 structures/type.c \
@@ -84,6 +85,7 @@ stream/memory_stream.c \
 structures/array_list.c \
 structures/hash_map.c \
 structures/iterator.c \
+structures/linked_buffer.c \
 structures/linked_list.c \
 structures/string_buffer.c \
 structures/type.c \
