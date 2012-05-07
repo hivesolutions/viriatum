@@ -31,6 +31,7 @@
 #include "date_time.h"
 #include "hash_map.h"
 #include "iterator.h"
+#include "linked_buffer.h"
 #include "linked_list.h"
 #include "string_buffer.h"
 #include "type.h"
