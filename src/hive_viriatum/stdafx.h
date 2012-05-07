@@ -48,7 +48,9 @@
 #endif
 
 #ifdef HAVE_LIBPCRE
+#ifdef HAVE_PCRE_H
 #define VIRIATUM_PCRE
+#endif
 #endif
 
 #ifdef _WIN32
