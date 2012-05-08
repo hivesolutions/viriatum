@@ -69,6 +69,13 @@ void testHashMap();
 void testStringBuffer();
 
 /**
+ * Tests the linked buffer, used
+ * to buffer a series of buffers
+ * in memory for fast writing.
+ */
+void testLinkedBuffer();
+
+/**
  * Tests the base 64 encoding.
  */
 void testBase64();

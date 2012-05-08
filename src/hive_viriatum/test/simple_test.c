@@ -174,7 +174,7 @@ void testStringBuffer() {
     /* creates the string buffer */
     createStringBuffer(&stringBuffer);
 
-    /* adds a set of string to the string buffer */
+    /* adds a set of strings to the string buffer */
     appendStringBuffer(stringBuffer, (unsigned char *) "hello");
     appendStringBuffer(stringBuffer, (unsigned char *) " ");
     appendStringBuffer(stringBuffer, (unsigned char *) "world");
@@ -188,6 +188,33 @@ void testStringBuffer() {
 
     /* deletes the string buffer */
     deleteStringBuffer(stringBuffer);
+}
+
+void testLinkedBuffer() {
+    /* allocates space for the linked buffer */
+    struct LinkedBuffer_t *linkedBuffer;
+
+    /* allocates the space for the buffer to
+    hold the various joined values */
+    unsigned char *bufferValue;
+
+    /* creates the linked buffer */
+    createLinkedBuffer(&linkedBuffer);
+
+    /* adds a set of strings to the string buffer */
+    appendLinkedBuffer(linkedBuffer, (void *) "hello", 5, 0);
+    appendLinkedBuffer(linkedBuffer, (void *) " ", 1, 0);
+    appendLinkedBuffer(linkedBuffer, (void *) "world", 5, 0);
+
+    /* "joins" the linked buffer values into a single
+    value (from the internal buffer list) */
+    joinLinkedBuffer(linkedBuffer, &bufferValue);
+
+    /* releases the buffer value */
+    FREE(bufferValue);
+
+    /* deletes the linked buffer */
+    deleteLinkedBuffer(linkedBuffer);
 }
 
 void testBase64() {
@@ -412,6 +439,9 @@ void runSimpleTests() {
 
     /* tests the string buffer */
     testStringBuffer();
+
+    /* tests the linked buffer */
+    testLinkedBuffer();
 
     /* tests the base 64 encoder */
     testBase64();
