@@ -61,11 +61,9 @@ void deleteStringBuffer(struct StringBuffer_t *stringBuffer) {
         /* pops a node from the release list */
         popValueLinkedList(stringBuffer->releaseList, (void **) &stringValue, 1);
 
-        /* in case the value is invalid (empty list) */
-        if(stringValue == NULL) {
-            /* breaks the cycle */
-            break;
-        }
+        /* in case the value is invalid (empty list)
+        need to break the cycle */
+        if(stringValue == NULL) { break; }
 
         /* deletes the string value */
         FREE(stringValue);
@@ -85,7 +83,7 @@ void appendStringBuffer(struct StringBuffer_t *stringBuffer, unsigned char *stri
     /* retrieves the length of the string value */
     size_t stringValueLength = strlen((char *) stringValue);
 
-    /* adds the string value to the lsit of strings and then
+    /* adds the string value to the list of strings and then
     increments the (total) string length with the length of
     the current string value */
     appendValueLinkedList(stringBuffer->stringList, stringValue);
@@ -122,11 +120,8 @@ void joinStringBuffer(struct StringBuffer_t *stringBuffer, unsigned char **strin
 
         /* in case the partial value is not set
         there are no more items to be retrieved from
-        the iterator */
-        if(partialValue == NULL) {
-            /* breaks the loop */
-            break;
-        }
+        the iterator, breaks the loop */
+        if(partialValue == NULL) { break; }
 
         /* retrieves the partial value length and uses
         it to copy the contents of the partial value to
