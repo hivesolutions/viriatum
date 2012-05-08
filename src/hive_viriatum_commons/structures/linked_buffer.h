@@ -57,3 +57,9 @@ typedef struct LinkedBuffer_t {
      */
     struct LinkedList_t *releaseList;
 } LinkedBuffer;
+
+VIRIATUM_EXPORT_PREFIX void createLinkedBuffer(struct LinkedBuffer_t **linkedBufferPointer);
+VIRIATUM_EXPORT_PREFIX void deleteLinkedBuffer(struct LinkedBuffer_t *linkedBuffer);
+VIRIATUM_EXPORT_PREFIX void appendLinkedBuffer(struct LinkedBuffer_t *linkedBuffer, void *pointer, size_t size, unsigned char release);
+VIRIATUM_EXPORT_PREFIX void joinLinkedBuffer(struct LinkedBuffer_t *linkedBuffer, unsigned char **bufferValuePointer);
+VIRIATUM_EXPORT_PREFIX void _appendLinkedBuffer(struct LinkedBuffer_t *linkedBuffer, void *pointer, size_t size);
