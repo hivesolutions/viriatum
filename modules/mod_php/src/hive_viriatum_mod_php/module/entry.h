@@ -55,18 +55,11 @@ typedef struct ModPhpModule_t {
 } ModPhpModule;
 
 /**
- * The global reference to the string buffer to
+ * The global reference to the linked buffer to
  * be used to hold the various strings resulting
  * from the php default execution output.
  */
-struct LinkedList_t *_outputBuffer;
-
-char *_inputbuffer;
-size_t _inputbufferSize;
-
-
-
-
+struct LinkedBuffer_t *_outputBuffer;
 
 VIRIATUM_EXPORT_PREFIX ERROR_CODE createModPhpModule(struct ModPhpModule_t **modPhpModulePointer, struct Module_t *module);
 VIRIATUM_EXPORT_PREFIX ERROR_CODE deleteModPhpModule(struct ModPhpModule_t *modPhpModule);
@@ -79,3 +72,4 @@ VIRIATUM_EXPORT_PREFIX ERROR_CODE _loadPhpState();
 VIRIATUM_EXPORT_PREFIX ERROR_CODE _unloadPhpState();
 VIRIATUM_EXPORT_PREFIX ERROR_CODE _reloaPhpState();
 VIRIATUM_EXPORT_PREFIX ERROR_CODE _startPhpState();
+VIRIATUM_EXPORT_PREFIX int _writePhpState(const char *data, unsigned int dataSize TSRMLS_DC);
