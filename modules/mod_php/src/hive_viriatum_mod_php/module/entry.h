@@ -55,6 +55,13 @@ typedef struct ModPhpModule_t {
 } ModPhpModule;
 
 /**
+ * The global reference to the currently loaded service
+ * this is the reference required for the basic interaction
+ * with the service.
+ */
+struct Service_t *_service;
+
+/**
  * The global reference to the linked buffer to
  * be used to hold the various strings resulting
  * from the php default execution output.
