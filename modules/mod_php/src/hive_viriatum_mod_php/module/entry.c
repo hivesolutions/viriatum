@@ -86,7 +86,7 @@ ERROR_CODE startModule(struct Environment_t *environment, struct Module_t *modul
     /* populates the module structure */
     infoModule(module);
 
-    /* loads the php state populating all the erquired values
+    /* loads the php state populating all the required values
     for state initialization */
     _loadPhpState();
 
@@ -121,10 +121,50 @@ ERROR_CODE startModule(struct Environment_t *environment, struct Module_t *modul
 }
 
 ERROR_CODE stopModule(struct Environment_t *environment, struct Module_t *module) {
-    printf("Stoping PHP");
+    /* retrieves the name, version and description of
+    the current module loaded */
+    unsigned char *name = nameViriatumModPhp();
+    unsigned char *version = versionViriatumModPhp();
+    unsigned char *description = descriptionViriatumModPhp();
 
-    /*TODO: TENHO DE POR O PHP A FECHAR BEM */
+    /* retrieves the (environment) service */
+    struct Service_t *service = environment->service;
 
+    /* retrieves the mod php module (from the module) */
+    struct ModPhpModule_t *modPhpModule = (struct  ModPhpModule_t *) module->lower;
+
+    /* retrieves the http handler from the mod php module */
+    struct HttpHandler_t *httpHandler = modPhpModule->httpHandler;
+
+    /* retrieves the mod php http handler from the mod php module */
+    struct ModPhpHttpHandler_t *modPhpHttpHandler = modPhpModule->modPhpHttpHandler;
+
+    /* prints a debug message */
+    V_DEBUG_F("Stoping the module '%s' (%s) v%s\n", name, description, version);
+
+    /* removes the http handler from the service */
+    service->removeHttpHandler(service, httpHandler);
+
+    /* in case the mod php http handler is valid and
+    initialized (correct state) */
+    if(modPhpHttpHandler != NULL) {
+        /* deletes the mod php http handler */
+        deleteModPhpHttpHandler(modPhpHttpHandler);
+    }
+
+    /* in case the http handler is valid and
+    initialized (correct state) */
+    if(httpHandler != NULL) {
+        /* deletes the http handler */
+        service->deleteHttpHandler(service, httpHandler);
+    }
+
+    /* unloads the php state destroying all the required values
+    for state destroyed */
+    _unloadPhpState();
+
+    /* deletes the mod php module */
+    deleteModPhpModule(modPhpModule);
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -163,21 +203,6 @@ ERROR_CODE _loadConfiguration(struct Service_t *service, struct ModPhpHttpHandle
     RAISE_NO_ERROR;
 }
 
-int myapp_php_ub_write(const char *data, unsigned int dataSize TSRMLS_DC) {
-    _inputbuffer = MALLOC(dataSize + 1);
-    _inputbuffer[dataSize] = '\0';
-
-    _inputbufferSize = dataSize;
-
-    memcpy(_inputbuffer, data, dataSize);
-
-    /*appendValueLinkedList(_outputBuffer, (void **) _data);*/
-
-    /*TODO: MONTES DE LEAKING por causa do malloc */
-
-    return dataSize;
-}
-
 ERROR_CODE _loadPhpState() {
     /* creates an array for the default initialization arguments,
     these arguments are going to be sent to the php virtual machine */
@@ -185,7 +210,7 @@ ERROR_CODE _loadPhpState() {
 
     /* sets the proper write fucntion for the ouput of the php execution
     this is equivalent to a redirect in the standard output */
-    php_embed_module.ub_write = myapp_php_ub_write;
+    php_embed_module.ub_write = _writePhpState;
 
     /* runs the start block for the php interpreter, this should
     be able to start all the internal structures */
@@ -215,4 +240,20 @@ ERROR_CODE _reloadPhpState() {
 ERROR_CODE _startPhpState() {
     /* raises no error */
     RAISE_NO_ERROR;
+}
+
+int _writePhpState(const char *data, unsigned int dataSize TSRMLS_DC) {
+    /* allocates space for the buffer that will hold the write
+    data that has just been sent to the write operation */
+    char *buffer = MALLOC(dataSize + 1);
+    buffer[dataSize] = '\0';
+
+    /* copies the data into the buffer and then adds it to
+    the current output linked buffer */
+    memcpy(buffer, data, dataSize);
+    appendLinkedBuffer(_outputBuffer, buffer, dataSize, 1);
+
+    /* returns the size of the data that has just been
+    writen into the internal structures */
+    return dataSize;
 }

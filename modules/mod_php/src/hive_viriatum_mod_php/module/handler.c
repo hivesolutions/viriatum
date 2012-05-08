@@ -193,6 +193,19 @@ ERROR_CODE _setHttpParserHandlerModule(struct HttpParser_t *httpParser) {
 }
 
 ERROR_CODE _unsetHttpParserHandlerModule(struct HttpParser_t *httpParser) {
+    /* allocates space for the output buffer to be retrieved */
+    struct LinkedBuffer_t *outputBuffer;
+
+    /* in case there is a valid context defined for the http parser
+    it must be the output buffer and must be deleted (avoids memory
+    leaking problems) */
+    if(httpParser->context) {
+        /* retrieves the output buffer from the http parser and then
+        deletes it as a linked buffer */
+        outputBuffer = (struct LinkedBuffer_t *) httpParser->context;
+        deleteLinkedBuffer(outputBuffer);
+    }
+
     /* raises no error */
     RAISE_NO_ERROR;
 }
@@ -228,29 +241,54 @@ ERROR_CODE _unsetHttpSettingsHandlerModule(struct HttpSettings_t *httpSettings) 
 }
 
 ERROR_CODE _sendDataCallback(struct Connection_t *connection, struct Data_t *data, void *parameters) {
+    /* allocates the buffer that will hod the message to be sent
+    through the connection and then allocates the buffer to hold
+    the joined buffer from the linked buffer rerference */
     char *buffer;
+    char *outputData;
 
-    connection->allocData(connection, _inputbufferSize * sizeof(unsigned char), (void **) &buffer);
-    /*memcpy(buffer, stringValue, dataSize);*/
-    memcpy(buffer, _inputbuffer, _inputbufferSize);
+    /* retrieves the http parser and then uses it to retrieve the
+    proper output buffer for the current connection (the context) */
+    struct HttpParser_t *httpParser = (struct HttpParser_t *) parameters;
+    struct LinkedBuffer_t *outputBuffer = (struct LinkedBuffer_t *) httpParser->context;
 
-    /* writes the response to the connection */
-    connection->writeConnection(connection, buffer, _inputbufferSize, _sendResponseCallbackHandlerModule, parameters);
+    /* retrieves the size of the output buffer, this is going to
+    be used to measure the size of the output stream */
+    size_t outputLength = outputBuffer->bufferLength;
 
+    /* joins the output buffer so that the buffer is set as continguous
+    and then deletes the output buffer (no more need to use it) */
+    joinLinkedBuffer(outputBuffer, &outputData);
+    deleteLinkedBuffer(outputBuffer);
 
+    /* allocates data for the current connection and then copues the
+    current output buffer data into it (for writing into the connection) */
+    connection->allocData(connection, outputLength, (void **) &buffer);
+    memcpy(buffer, outputData, outputLength);
 
-    /* TODO: TENHO DE TER CUIDADO PORQUE TAMBEM TENHO DE DE FAZER RELEASE
-    disot em caso de erro */
+    /* writes the response to the connection, this should flush the current
+    data in the output buffer to the network */
+    connection->writeConnection(connection, buffer, outputLength, _sendResponseCallbackHandlerModule, parameters);
 
+    /* unsets the context from the http parser (it's not going) to
+    used anymore (must be released) */
+    httpParser->context = NULL;
 
-    FREE(_inputbuffer);
+    /* releases the output data no more need to use it */
+    FREE(outputData);
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-
 ERROR_CODE _sendResponseHandlerModule(struct HttpParser_t *httpParser) {
+    /* allocates space for the buffer that will hold the headers */
+    char *headersBuffer;
+
+    /* allocates space for the linked buffer to be used for the
+    standard ouput resulting from the php interpreter execution */
+    struct LinkedBuffer_t *outputBuffer = NULL;
+
     /* retrieves the connection from the http parser parameters */
     struct Connection_t *connection = (struct Connection_t *) httpParser->parameters;
 
@@ -259,62 +297,27 @@ ERROR_CODE _sendResponseHandlerModule(struct HttpParser_t *httpParser) {
     struct HttpConnection_t *httpConnection = (struct HttpConnection_t *) ((struct IoConnection_t *) connection->lower)->lower;
     struct ModPhpHttpHandler_t *modPhpHttpHandler = (struct ModPhpHttpHandler_t *) httpConnection->httpHandler->lower;
 
-
-
-
-  /*  size_t dataSize;*/
-   /* char *stringValue;*/
-
-    char *headersBuffer;
-
-
-
-    /* creates the string buffer to be used to store
+    /* creates the linked buffer to be used to store
     the complete output of the php interpreter */
-   /* createLinkedList(&_outputBuffer);*/
+    createLinkedBuffer(&outputBuffer);
 
-    zend_eval_string("phpinfo();", NULL, "Embedded Code" TSRMLS_CC);
+    /* sets the output buffer reference in the global output buffer
+    variable so that the php write handler is able to store the
+    current output stream values, then sets the output buffer also
+    in the current http parser structure reference */
+    _outputBuffer = outputBuffer;
+    httpParser->context = (void *) outputBuffer;
 
-    /* "joins" the string buffer values into a single
-    value (from the internal string list) */
-    //joinStringBuffer(_outputBuffer, &stringValue);
+    zend_eval_string("phpinfo(); echo(\"ola\");", NULL, "Embedded Code" TSRMLS_CC);
 
-
-
-
-
-
-    /* deletes the string buffer, no more need to store
-    the output from the php interpreter */
-  /*  deleteLinkedList(_outputBuffer);
-
-    printf("Vai fazer print %d:\n", _outputBuffer->stringLength);
-
-    dataSize = _outputBuffer->stringLength;*/
-
-
-
-    /* allocates the data buffer (in a safe maner) then
-    copies the data (from lua) into the buffer */
- /*  connection->allocData(connection, _inputbufferSize * sizeof(unsigned char), (void **) &buffer); */
-    /*memcpy(buffer, stringValue, dataSize);*/
-    /*memcpy(buffer, _inputbuffer, _inputbufferSize);*/
-
-
-
-
-
-
+    /* allocates space fot the header buffer and then writes the default values
+    into it the value is dynamicaly contructed based on the current header values */
     connection->allocData(connection, 1024, (void **) &headersBuffer);
+    SPRINTF(headersBuffer, 1024, "HTTP/1.1 200 OK\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nCache-Control: no-cache, must-revalidate\r\nContent-Length: %lu\r\n\r\n", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, (long unsigned int) outputBuffer->bufferLength);
 
-    SPRINTF(headersBuffer, 1024, "HTTP/1.1 200 OK\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nCache-Control: no-cache, must-revalidate\r\nContent-Length: %lu\r\n\r\n", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, (long unsigned int) _inputbufferSize);
-
-    /* writes the response to the connection */
+    /* writes the response to the connection, this will only write
+    the headers the remaining message will be sent on the callback */
     connection->writeConnection(connection, headersBuffer, (unsigned int) strlen(headersBuffer), _sendDataCallback, (void *) httpParser);
-
-
-
-
 
     /* raise no error */
     RAISE_NO_ERROR;
