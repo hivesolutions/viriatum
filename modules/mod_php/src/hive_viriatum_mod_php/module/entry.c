@@ -283,8 +283,8 @@ ERROR_CODE _loadPhpState() {
     /* sets the proper functions for the ouput of the php execution
     this is equivalent to a redirect in the standard output and error */
     php_embed_module.ub_write = _writePhpState;
-	php_embed_module.log_message = _logPhpState;
-	php_embed_module.sapi_error = _errorPhpState;
+    php_embed_module.log_message = _logPhpState;
+    php_embed_module.sapi_error = _errorPhpState;
 
     /* runs the start block for the php interpreter, this should
     be able to start all the internal structures, then loads the
@@ -335,21 +335,21 @@ int _writePhpState(const char *data, unsigned int dataSize TSRMLS_DC) {
 }
 
 void _logPhpState(char *message) {
-	/* logs the error message (critical error) */
-	V_ERROR(message);
+    /* logs the error message (critical error) */
+    V_ERROR(message);
 }
 
 void _errorPhpState(int type, const char *filename, const uint line, const char *format, va_list args) {
-	/* check if the kind of error is of type critical in such case it should
-	return immediately */
-	if (type != E_ERROR && type != E_USER_ERROR && type != E_CORE_ERROR && type != E_PARSE && type != E_COMPILE_ERROR) {
-		/* returns immediately no need to continue */
-		return;
-	}
+    /* check if the kind of error is of type critical in such case it should
+    return immediately */
+    if (type != E_ERROR && type != E_USER_ERROR && type != E_CORE_ERROR && type != E_PARSE && type != E_COMPILE_ERROR) {
+        /* returns immediately no need to continue */
+        return;
+    }
 
-	/* logs the error message (critical error) */
-	V_ERROR("Critical error in user code");
+    /* logs the error message (critical error) */
+    V_ERROR("Critical error in user code");
 
-	/* exits the current code (code jump) */
-	zend_bailout();
+    /* exits the current code (code jump) */
+    zend_bailout();
 }
