@@ -80,3 +80,5 @@ VIRIATUM_EXPORT_PREFIX ERROR_CODE _unloadPhpState();
 VIRIATUM_EXPORT_PREFIX ERROR_CODE _reloaPhpState();
 VIRIATUM_EXPORT_PREFIX ERROR_CODE _startPhpState();
 VIRIATUM_EXPORT_PREFIX int _writePhpState(const char *data, unsigned int dataSize TSRMLS_DC);
+VIRIATUM_EXPORT_PREFIX void _logPhpState(char *message);
+VIRIATUM_EXPORT_PREFIX void _errorPhpState(int type, const char *error_filename, const uint error_lineno, const char *format, va_list args);
