@@ -80,6 +80,10 @@ ERROR_CODE startModule(struct Environment_t *environment, struct Module_t *modul
     /* prints a debug message */
     V_DEBUG_F("Starting the module '%s' (%s) v%s\n", name, description, version);
 
+    /* sets the global service reference to be used in the
+    externalized function for the interpreter */
+    _service = service;
+
     /* creates the mod php module */
     createModPhpModule(&modPhpModule, module);
 
@@ -166,6 +170,10 @@ ERROR_CODE stopModule(struct Environment_t *environment, struct Module_t *module
     /* deletes the mod php module */
     deleteModPhpModule(modPhpModule);
 
+    /* sets the global service reference this is no longer necessary
+    because the module has been unloaded */
+    _service = NULL;
+
     /* raises no error */
     RAISE_NO_ERROR;
 }
@@ -203,18 +211,84 @@ ERROR_CODE _loadConfiguration(struct Service_t *service, struct ModPhpHttpHandle
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _loadPhpState() {
-    /* creates an array for the default initialization arguments,
-    these arguments are going to be sent to the php virtual machine */
-    char *args[1] = { "default" };
 
+
+
+
+PHP_FUNCTION(viriatum_connections) {
+    RETURN_LONG(_service->connectionsList->size);
+}
+
+PHP_FUNCTION(viriatum_name) {
+    RETURN_STRING(VIRIATUM_NAME, 1);
+}
+
+PHP_FUNCTION(viriatum_version) {
+    RETURN_STRING(VIRIATUM_VERSION, 1);
+}
+
+PHP_FUNCTION(viriatum_description) {
+    RETURN_STRING(VIRIATUM_DESCRIPTION, 1);
+}
+
+PHP_FUNCTION(viriatum_observations) {
+    RETURN_STRING(VIRIATUM_OBSERVATIONS, 1);
+}
+
+PHP_FUNCTION(viriatum_copyright) {
+    RETURN_STRING(VIRIATUM_COPYRIGHT, 1);
+}
+
+PHP_FUNCTION(viriatum_platform_string) {
+    RETURN_STRING(VIRIATUM_PLATFORM_STRING, 1);
+}
+
+PHP_FUNCTION(viriatum_platform_cpu) {
+    RETURN_STRING(VIRIATUM_PLATFORM_CPU, 1);
+}
+
+zend_function_entry viriatumFunctions[] = {
+    PHP_FE(viriatum_connections, NULL)
+    PHP_FE(viriatum_name, NULL)
+    PHP_FE(viriatum_version, NULL)
+    PHP_FE(viriatum_description, NULL)
+    PHP_FE(viriatum_observations, NULL)
+    PHP_FE(viriatum_copyright, NULL)
+    PHP_FE(viriatum_platform_string, NULL)
+    PHP_FE(viriatum_platform_cpu, NULL)
+    { NULL, NULL, NULL }
+};
+
+zend_module_entry viriatumModule = {
+#if ZEND_MODULE_API_NO >= 20010901
+    STANDARD_MODULE_HEADER,
+#endif
+    "viriatum",
+    viriatumFunctions,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+#if ZEND_MODULE_API_NO >= 20010901
+    VIRIATUM_VERSION,
+#endif
+    STANDARD_MODULE_PROPERTIES
+};
+
+
+
+
+ERROR_CODE _loadPhpState() {
     /* sets the proper write fucntion for the ouput of the php execution
     this is equivalent to a redirect in the standard output */
     php_embed_module.ub_write = _writePhpState;
 
     /* runs the start block for the php interpreter, this should
-    be able to start all the internal structures */
-    php_embed_init(1, args);
+    be able to start all the internal structures, then loads the
+    viriatum module to export the proper features */
+    php_embed_init(0, NULL);
+    zend_startup_module(&viriatumModule);
 
     /* raises no error */
     RAISE_NO_ERROR;
