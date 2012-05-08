@@ -288,6 +288,14 @@ ERROR_CODE _startLuaState(lua_State *luaState) {
     lua_pushstring(luaState, VIRIATUM_COPYRIGHT);
     lua_setglobal(luaState, "VIRIATUM_COPYRIGHT");
 
+    /* registers the viriatum platform string in lua */
+    lua_pushstring(luaState, VIRIATUM_PLATFORM_STRING);
+    lua_setglobal(luaState, "VIRIATUM_PLATFORM_STRING");
+
+    /* registers the viriatum platform cpu in lua */
+    lua_pushstring(luaState, VIRIATUM_PLATFORM_CPU);
+    lua_setglobal(luaState, "VIRIATUM_PLATFORM_CPU");
+
     /* raises no error */
     RAISE_NO_ERROR;
 }
