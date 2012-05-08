@@ -44,9 +44,9 @@ typedef struct DispatchHandler_t {
      * In case this array grows too much the performance
      * of the server may lower significantly.
      */
-    #ifdef VIRIATUM_PCRE
+#ifdef VIRIATUM_PCRE
     pcre **regex;
-    #endif
+#endif
 
     /**
      * The arrays of (handler) names in the same order as
