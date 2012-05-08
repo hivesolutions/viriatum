@@ -302,7 +302,7 @@ ERROR_CODE _sendResponseHandlerModule(struct HttpParser_t *httpParser) {
     struct HttpConnection_t *httpConnection = (struct HttpConnection_t *) ((struct IoConnection_t *) connection->lower)->lower;
     struct ModPhpHttpHandler_t *modPhpHttpHandler = (struct ModPhpHttpHandler_t *) httpConnection->httpHandler->lower;
 
-    /* creates the linked buffer to be used to store
+	/* creates the linked buffer to be used to store
     the complete output of the php interpreter */
     createLinkedBuffer(&outputBuffer);
 
@@ -316,7 +316,7 @@ ERROR_CODE _sendResponseHandlerModule(struct HttpParser_t *httpParser) {
     /* populates the "base" script reference structure
     with the required value for execution */
     script.type = ZEND_HANDLE_FP;
-    script.filename = "\\handler.php";
+	script.filename = "C:\\handler.php";
     script.opened_path = NULL;
     script.free_filename = 0;
 
@@ -325,10 +325,18 @@ ERROR_CODE _sendResponseHandlerModule(struct HttpParser_t *httpParser) {
     FOPEN(&scriptFile, script.filename, "rb");
     script.handle.fp = scriptFile;
 
-    /* executes the scrpt in the current instantiated virtual
-    machine, this is a blocking call so it will block the current
-    general loop (care is required) */
-    zend_execute_scripts(ZEND_REQUIRE TSRMLS_CC, NULL, 1, &script);
+	/* forrces the logging of the error for the execution in the
+	current php environment */
+	zend_alter_ini_entry("display_errors", sizeof("display_errors"), "0", sizeof("0") - 1, PHP_INI_SYSTEM, PHP_INI_STAGE_RUNTIME);
+	zend_alter_ini_entry("log_errors", sizeof("log_errors"), "1", sizeof("1") - 1, PHP_INI_SYSTEM, PHP_INI_STAGE_RUNTIME);
+
+	zend_try {
+		/* executes the scrpt in the current instantiated virtual
+		machine, this is a blocking call so it will block the current
+		general loop (care is required) */
+		zend_execute_scripts(ZEND_REQUIRE TSRMLS_CC, NULL, 1, &script);
+	} zend_catch {
+	} zend_end_try();
 
     /* allocates space fot the header buffer and then writes the default values
     into it the value is dynamicaly contructed based on the current header values */
