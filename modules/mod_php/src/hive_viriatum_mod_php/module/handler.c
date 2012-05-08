@@ -282,6 +282,11 @@ ERROR_CODE _sendDataCallback(struct Connection_t *connection, struct Data_t *dat
 }
 
 ERROR_CODE _sendResponseHandlerModule(struct HttpParser_t *httpParser) {
+    /* allocates space for the script file structure and
+    for the script php structure to be used for script execution */
+    FILE *scriptFile;
+    zend_file_handle script;
+
     /* allocates space for the buffer that will hold the headers */
     char *headersBuffer;
 
@@ -308,7 +313,22 @@ ERROR_CODE _sendResponseHandlerModule(struct HttpParser_t *httpParser) {
     _outputBuffer = outputBuffer;
     httpParser->context = (void *) outputBuffer;
 
-    zend_eval_string("phpinfo(); echo(\"ola\");", NULL, "Embedded Code" TSRMLS_CC);
+    /* populates the "base" script reference structure
+    with the required value for execution */
+    script.type = ZEND_HANDLE_FP;
+    script.filename = "\\handler.php";
+    script.opened_path = NULL;
+    script.free_filename = 0;
+
+    /* opens the script file and then sets the file pointer
+    in the script reference structure */
+    FOPEN(&scriptFile, script.filename, "rb");
+    script.handle.fp = scriptFile;
+
+    /* executes the scrpt in the current instantiated virtual
+    machine, this is a blocking call so it will block the current
+    general loop (care is required) */
+    zend_execute_scripts(ZEND_REQUIRE TSRMLS_CC, NULL, 1, &script);
 
     /* allocates space fot the header buffer and then writes the default values
     into it the value is dynamicaly contructed based on the current header values */
