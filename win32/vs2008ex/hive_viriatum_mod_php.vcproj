@@ -41,7 +41,7 @@
             <Tool
                 Name="VCCLCompilerTool"
                 Optimization="0"
-                PreprocessorDefinitions="WIN32;_DEBUG;_LIB;VIRIATUM_DEBUG;VIRIATUM_MEMORY_DEBUG;ZEND_WIN32;PHP_WIN32"
+                PreprocessorDefinitions="WIN32;_DEBUG;_LIB;VIRIATUM_DEBUG;VIRIATUM_MEMORY_DEBUG;ZEND_WIN32;PHP_WIN32;ZEND_DEBUG=0"
                 MinimalRebuild="true"
                 BasicRuntimeChecks="3"
                 RuntimeLibrary="3"
@@ -118,7 +118,7 @@
                 Name="VCCLCompilerTool"
                 Optimization="2"
                 EnableIntrinsicFunctions="true"
-                PreprocessorDefinitions="WIN32;NDEBUG;_LIB;ZEND_WIN32;PHP_WIN32"
+                PreprocessorDefinitions="WIN32;NDEBUG;_LIB;ZEND_WIN32;PHP_WIN32;ZEND_DEBUG=0"
                 RuntimeLibrary="2"
                 EnableFunctionLevelLinking="true"
                 UsePrecompiledHeader="2"
