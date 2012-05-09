@@ -137,6 +137,10 @@ ERROR_CODE printInformation() {
     signal(SIGQUIT, killHandler);
     signal(SIGTERM, killHandler);
 
+	/* registers the ignore action in the signal indicating
+	a broken pipe (unexpected close of socket) */
+	signal(SIGPIPE, SIG_IGN);
+
     /* prints a message */
     V_PRINT_F("%s %s (%s, %s) [%s %s %d bit (%s)] on %s\n", description, version, VIRIATUM_COMPILATION_DATE, VIRIATUM_COMPILATION_TIME, VIRIATUM_COMPILER, VIRIATUM_COMPILER_VERSION_STRING, (int) VIRIATUM_PLATFORM_CPU_BITS, VIRIATUM_PLATFORM_CPU, VIRIATUM_PLATFORM_STRING);
 
