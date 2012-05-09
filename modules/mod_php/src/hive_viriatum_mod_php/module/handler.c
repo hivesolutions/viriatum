@@ -268,7 +268,7 @@ ERROR_CODE _sendDataCallback(struct Connection_t *connection, struct Data_t *dat
 
     /* writes the response to the connection, this should flush the current
     data in the output buffer to the network */
-    connection->writeConnection(connection, buffer, outputLength, _sendResponseCallbackHandlerModule, parameters);
+    connection->writeConnection(connection, (unsigned char *) buffer, outputLength, _sendResponseCallbackHandlerModule, parameters);
 
     /* unsets the context from the http parser (it's not going) to
     used anymore (must be released) */
@@ -340,7 +340,7 @@ ERROR_CODE _sendResponseHandlerModule(struct HttpParser_t *httpParser) {
 
     /* writes the response to the connection, this will only write
     the headers the remaining message will be sent on the callback */
-    connection->writeConnection(connection, headersBuffer, (unsigned int) strlen(headersBuffer), _sendDataCallback, (void *) httpParser);
+    connection->writeConnection(connection, (unsigned char *) headersBuffer, (unsigned int) strlen(headersBuffer), _sendDataCallback, (void *) httpParser);
 
     /* raise no error */
     RAISE_NO_ERROR;
