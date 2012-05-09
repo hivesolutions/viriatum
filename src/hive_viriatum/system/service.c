@@ -110,6 +110,7 @@ void createServiceOptions(struct ServiceOptions_t **serviceOptionsPointer) {
     serviceOptions->port = 0;
     serviceOptions->address = NULL;
     serviceOptions->handlerName = NULL;
+    serviceOptions->local = 0;
     serviceOptions->defaultIndex = 0;
     serviceOptions->defaultVirtualHost = NULL;
 
@@ -489,9 +490,9 @@ ERROR_CODE loadModulesService(struct Service_t *service) {
     /* allocates the error code */
     ERROR_CODE errorCode;
 
-	/* allocates space for the pointer to be used in the
-	prefix comparision for the module name */
-	char *pointer;
+    /* allocates space for the pointer to be used in the
+    prefix comparision for the module name */
+    char *pointer;
 
     /* allocates space for the linked list for the entries
     and for the iterator to iterate "around" them */
@@ -539,7 +540,7 @@ ERROR_CODE loadModulesService(struct Service_t *service) {
         /* tries to find the module prefix in the current entry name
         in case it's not found continues the loop immediately no library
         loading is required (not the correct format) */
-		pointer = strstr((char *) entry->name, "viriatum_");
+        pointer = strstr((char *) entry->name, "viriatum_");
         if(pointer != (char *) entry->name && pointer != (char *) entry->name + 3) { continue; }
 
         /* loads the module, retrieving a possible error code */
@@ -946,6 +947,11 @@ ERROR_CODE _fileOptionsService(struct Service_t *service, struct HashMap_t *argu
     getValueStringHashMap(general, (unsigned char *) "handler", &value);
     if(value != NULL) { serviceOptions->handlerName = (unsigned char *) value; }
 
+    /* tries to retrieve the local argument from the arguments map, then
+    in case the (local) value is set, sets the service as local  */
+    getValueStringHashMap(general, (unsigned char *) "local", &value);
+    if(value != NULL) { serviceOptions->local = (unsigned char) atoi(value); }
+
     /* raises no error */
     RAISE_NO_ERROR;
 }
@@ -958,32 +964,28 @@ ERROR_CODE _comandLineOptionsService(struct Service_t *service, struct HashMap_t
     /* unpacks the service options from the service */
     struct ServiceOptions_t *serviceOptions = service->options;
 
-    /* tries to retrieve the port argument from the arguments map */
+    /* tries to retrieve the port argument from the arguments map, then
+    in case the (port) value is set, casts the port value into
+    integer and set it in the service options */
     getValueStringHashMap(arguments, (unsigned char *) "port", &value);
+    if(value != NULL) { serviceOptions->port = (unsigned short) atoi(((struct Argument_t *) value)->value); }
 
-    /* in case the (port) value is set */
-    if(value != NULL) {
-        /* casts the port value into integer and set it in the service options */
-        serviceOptions->port = (unsigned short) atoi(((struct Argument_t *) value)->value);
-    }
-
-    /* tries to retrieve the host argument from the arguments map */
+    /* tries to retrieve the host argument from the arguments map, then
+    in case the (host) value is set, sets the address value in
+    the service options */
     getValueStringHashMap(arguments, (unsigned char *) "host", &value);
+    if(value != NULL) { serviceOptions->address = (unsigned char *) ((struct Argument_t *) value)->value; }
 
-    /* in case the (host) value is set */
-    if(value != NULL) {
-        /* sets the address value in the service options */
-        serviceOptions->address = (unsigned char *) ((struct Argument_t *) value)->value;
-    }
-
-    /* tries to retrieve the handler argument from the arguments map */
+    /* tries to retrieve the handler argument from the arguments map, then
+    in case the (handler) value is set, sets the handler name value
+    in the service options */
     getValueStringHashMap(arguments, (unsigned char *) "handler", &value);
+    if(value != NULL) { serviceOptions->handlerName = (unsigned char *) ((struct Argument_t *) value)->value; }
 
-    /* in case the (handler) value is set */
-    if(value != NULL) {
-        /* sets the handler name value in the service options */
-        serviceOptions->handlerName = (unsigned char *) ((struct Argument_t *) value)->value;
-    }
+    /* tries to retrieve the local argument from the arguments map, then
+    in case the (local) value is set, sets the service as local  */
+    getValueStringHashMap(arguments, (unsigned char *) "local", &value);
+    if(value != NULL) { serviceOptions->local = 1; }
 
     /* raises no error */
     RAISE_NO_ERROR;

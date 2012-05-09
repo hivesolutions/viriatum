@@ -105,7 +105,7 @@ ERROR_CODE _sectionEndCallback(struct IniEngine_t *iniEngine, const unsigned cha
     memcpy(iniHandler->section, pointer, size);
     iniHandler->section[size] = '\0';
 
-	RAISE_NO_ERROR;
+    RAISE_NO_ERROR;
 }
 
 ERROR_CODE _commentEndCallback(struct IniEngine_t *iniEngine, const unsigned char *pointer, size_t size) {

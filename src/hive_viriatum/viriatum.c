@@ -29,9 +29,23 @@
 
 #include "viriatum.h"
 
+#define HELP_STRING "\
+usage: viriatum [--version] [--port[=<port>] [--host[=<hostname>]]\n\
+                [--daemon] [--help]\n\
+\n\
+The most commonly used git commands are:\n\
+   add        Add file contents to the index\n\
+   bisect     Find by binary search the change that introduced a bug\n\
+   branch     List, create, or delete branches\n\
+   checkout   Checkout a branch or paths to the working tree\n\
+   clone      Clone a repository into a new directory\n\
+\n\
+See 'viriatum --help[=<command>]' for more information on a specific command.\n"
+
 /* starts the memory structures */
 START_MEMORY;
 
+unsigned char local = 0;
 static struct Service_t *service;
 
 ERROR_CODE runService(struct HashMap_t *arguments) {
@@ -134,8 +148,7 @@ ERROR_CODE printInformation() {
 }
 
 #ifdef VIRIATUM_PLATFORM_WIN32
-void daemonize() {
-}
+void daemonize() { }
 #endif
 
 #ifdef VIRIATUM_PLATFORM_UNIX
@@ -193,24 +206,33 @@ void daemonize() {
 }
 #endif
 
-#ifndef VIRIATUM_PLATFORM_IPHONE
-int main(int argc, char *argv[]) {
+#ifdef VIRIATUM_PLATFORM_WIN32
+void localize() { local = 1; }
+#endif
+
+#ifdef VIRIATUM_PLATFORM_UNIX
+void localize() { }
+#endif
+
+void help() { V_PRINT(HELP_STRING); }
+void version() { V_PRINT_F("%s version %s (%s, %s)", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_COMPILATION_DATE, VIRIATUM_COMPILATION_TIME); }
+
+void executeArguments(struct HashMap_t *arguments) {
     /* allocates space for the possible argument
-    for "daemonization" of the current process */
+    to be executed from the arguments map */
     void *value;
 
-    /* allocates the return value */
-    ERROR_CODE returnValue;
+    /* tries to retrieve the help argument from the arguments
+    map in case the value exists prints the help value and then
+    exits the current system */
+    getValueStringHashMap(arguments, (unsigned char *) "help", &value);
+    if(value != NULL) { help(); exit(0); }
 
-    /* allocates the map that will contain the various
-    processed arguments, indexed by name */
-    struct HashMap_t *arguments;
-
-    /* prints a debug message */
-    V_DEBUG_F("Receiving %d argument(s)\n", argc);
-
-    /* processes the various arguments into a map */
-    processArguments(argc, argv, &arguments);
+    /* tries to retrieve the version argument from the arguments
+    map in case the value exists prints the version value and then
+    exits the current system */
+    getValueStringHashMap(arguments, (unsigned char *) "version", &value);
+    if(value != NULL) { version(); exit(0); }
 
     /* tries to retrieve the daemon argument from the
     arguments map in case the value is set daemonizes
@@ -221,6 +243,30 @@ int main(int argc, char *argv[]) {
     getValueStringHashMap(arguments, (unsigned char *) "daemon", &value);
     if(value != NULL) { daemonize(); }
     else { printInformation(); }
+
+    /* tries to retrieve the local argument from the arguments
+    map in case the value exists localizes the current service
+    so that any file read is read from the current directory */
+    getValueStringHashMap(arguments, (unsigned char *) "local", &value);
+    if(value != NULL) { localize(); }
+}
+
+#ifndef VIRIATUM_PLATFORM_IPHONE
+int main(int argc, char *argv[]) {
+    /* allocates the return value */
+    ERROR_CODE returnValue;
+
+    /* allocates the map that will contain the various
+    processed arguments, indexed by name */
+    struct HashMap_t *arguments;
+
+    /* prints a debug message */
+    V_DEBUG_F("Receiving %d argument(s)\n", argc);
+
+    /* processes the various arguments into a map and then
+    executes the corresponding (initial) actions */
+    processArguments(argc, argv, &arguments);
+    executeArguments(arguments);
 
     /* runs the service, with the given arguments */
     returnValue = runService(arguments);
