@@ -65,7 +65,7 @@ ERROR_CODE createHandlerPhpContext(struct HandlerPhpContext_t **handlerPhpContex
     struct HandlerPhpContext_t *handlerPhpContext = (struct HandlerPhpContext_t *) MALLOC(handlerPhpContextSize);
 
     /* sets the handler php default values */
-	handlerPhpContext->outputBuffer = NULL;
+    handlerPhpContext->outputBuffer = NULL;
 
     /* sets the handler php context in the  pointer */
     *handlerPhpContextPointer = handlerPhpContext;
@@ -76,14 +76,14 @@ ERROR_CODE createHandlerPhpContext(struct HandlerPhpContext_t **handlerPhpContex
 
 ERROR_CODE deleteHandlerPhpContext(struct HandlerPhpContext_t *handlerPhpContext) {
     /* in case there is a valid output buffer defined in the current
-	handler php context it must be removed (linked buffer removal)
-	this way serious memory leaks are avoided */
+    handler php context it must be removed (linked buffer removal)
+    this way serious memory leaks are avoided */
     if(handlerPhpContext->outputBuffer) { deleteLinkedBuffer(handlerPhpContext->outputBuffer); }
 
-	/* releases the handler php context memory */
-	FREE(handlerPhpContext);
+    /* releases the handler php context memory */
+    FREE(handlerPhpContext);
 
-	/* raises no error */
+    /* raises no error */
     RAISE_NO_ERROR;
 }
 
@@ -118,6 +118,9 @@ ERROR_CODE messageBeginCallbackHandlerModule(struct HttpParser_t *httpParser) {
 }
 
 ERROR_CODE urlCallbackHandlerModule(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize) {
+    /* retrieves the handler php context from the http parser */
+    struct HandlerPhpContext_t *handlerPhpContext = (struct HandlerPhpContext_t *) httpParser->context;
+
     /* allocates the required space for the url */
     unsigned char *url = (unsigned char *) MALLOC(dataSize + 1);
 
@@ -129,6 +132,11 @@ ERROR_CODE urlCallbackHandlerModule(struct HttpParser_t *httpParser, const unsig
 
     /* prints the url */
     V_DEBUG_F("url: %s\n", url);
+
+    /* copies the url to the url reference in the handler file context then
+    creates the file path from using the base viriatum path */
+    memcpy(handlerPhpContext->url, url, strlen((char *) url) + 1);
+    SPRINTF((char *) handlerPhpContext->filePath, VIRIATUM_MAX_PATH_SIZE, "%s%s%s", VIRIATUM_CONTENTS_PATH, VIRIATUM_BASE_PATH, url);
 
     /* releases the url */
     FREE(url);
@@ -218,9 +226,9 @@ ERROR_CODE messageCompleteCallbackHandlerModule(struct HttpParser_t *httpParser)
 
 ERROR_CODE _setHttpParserHandlerModule(struct HttpParser_t *httpParser) {
     /* allocates space for the handler php context and
-	then creates and populates the instance after that 
-	sets the handler file context as the context for
-	the http parser*/
+    then creates and populates the instance after that
+    sets the handler file context as the context for
+    the http parser*/
     struct HandlerPhpContext_t *handlerPhpContext;
     createHandlerPhpContext(&handlerPhpContext);
     httpParser->context = handlerPhpContext;
@@ -231,7 +239,7 @@ ERROR_CODE _setHttpParserHandlerModule(struct HttpParser_t *httpParser) {
 
 ERROR_CODE _unsetHttpParserHandlerModule(struct HttpParser_t *httpParser) {
     /* retrieves the handler php context from the http parser
-	and then deletes (releases memory) */
+    and then deletes (releases memory) */
     struct HandlerPhpContext_t *handlerPhpContext = (struct HandlerPhpContext_t *) httpParser->context;
     deleteHandlerPhpContext(handlerPhpContext);
 
@@ -280,7 +288,7 @@ ERROR_CODE _sendDataCallback(struct Connection_t *connection, struct Data_t *dat
     proper output buffer for the current connection (the context) */
     struct HttpParser_t *httpParser = (struct HttpParser_t *) parameters;
     struct HandlerPhpContext_t *handlerPhpContext = (struct HandlerPhpContext_t *) httpParser->context;
-	struct LinkedBuffer_t *outputBuffer = handlerPhpContext->outputBuffer;
+    struct LinkedBuffer_t *outputBuffer = handlerPhpContext->outputBuffer;
 
     /* retrieves the size of the output buffer, this is going to
     be used to measure the size of the output stream */
@@ -325,7 +333,7 @@ ERROR_CODE _sendResponseHandlerModule(struct HttpParser_t *httpParser) {
     struct LinkedBuffer_t *outputBuffer = NULL;
 
     /* retrieves the connection from the http parser parameters
-	and then retrieves the handler php context*/
+    and then retrieves the handler php context*/
     struct Connection_t *connection = (struct Connection_t *) httpParser->parameters;
     struct HandlerPhpContext_t *handlerPhpContext = (struct HandlerPhpContext_t *) httpParser->context;
 
@@ -343,7 +351,7 @@ ERROR_CODE _sendResponseHandlerModule(struct HttpParser_t *httpParser) {
     /* populates the "base" script reference structure
     with the required value for execution */
     script.type = ZEND_HANDLE_FP;
-	script.filename = "C:\\handler.php";
+    script.filename = handlerPhpContext->filePath;
     script.opened_path = NULL;
     script.free_filename = 0;
 
