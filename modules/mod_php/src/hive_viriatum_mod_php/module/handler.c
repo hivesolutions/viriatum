@@ -258,7 +258,7 @@ ERROR_CODE _sendDataCallback(struct Connection_t *connection, struct Data_t *dat
 
     /* joins the output buffer so that the buffer is set as continguous
     and then deletes the output buffer (no more need to use it) */
-    joinLinkedBuffer(outputBuffer, &outputData);
+    joinLinkedBuffer(outputBuffer, (unsigned char **) &outputData);
     deleteLinkedBuffer(outputBuffer);
 
     /* allocates data for the current connection and then copues the
