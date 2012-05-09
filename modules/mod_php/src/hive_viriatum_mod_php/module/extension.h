@@ -29,7 +29,7 @@
 
 #include "entry.h"
 
-zend_function_entry viriatumFunctions[];
+zend_function_entry viriatumFunctions[12];
 zend_module_entry viriatumModule;
 
 PHP_FUNCTION(viriatum_connections);
