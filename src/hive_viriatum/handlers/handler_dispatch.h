@@ -41,6 +41,8 @@
 #define DISPATCH_ERROR_MESSAGE "Error dispatching request"
 
 /* forward references (avoids loop) */
+struct Data_t;
+struct Connection_t;
 struct HttpConnection_t;
 
 typedef struct DispatchHandler_t {
