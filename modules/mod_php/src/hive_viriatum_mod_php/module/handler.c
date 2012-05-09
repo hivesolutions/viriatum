@@ -325,11 +325,6 @@ ERROR_CODE _sendResponseHandlerModule(struct HttpParser_t *httpParser) {
     FOPEN(&scriptFile, script.filename, "rb");
     script.handle.fp = scriptFile;
 
-    /* forrces the logging of the error for the execution in the
-    current php environment */
-    zend_alter_ini_entry("display_errors", sizeof("display_errors"), "0", sizeof("0") - 1, PHP_INI_SYSTEM, PHP_INI_STAGE_RUNTIME);
-    zend_alter_ini_entry("log_errors", sizeof("log_errors"), "1", sizeof("1") - 1, PHP_INI_SYSTEM, PHP_INI_STAGE_RUNTIME);
-
     zend_try {
         /* executes the scrpt in the current instantiated virtual
         machine, this is a blocking call so it will block the current
