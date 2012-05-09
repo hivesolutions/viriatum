@@ -36,20 +36,35 @@
  */
 typedef struct ModPhpHttpHandler_t {
     /**
-     * The path to the default file to
-     * be used for the parsing.
+     * The path to the base directory to be
+	 * used in the file resolution.
      */
-    char *filePath;
-
-    /**
-     * Flag that controls if the script file
-     * to be executed is currently dirty.
-     */
-    unsigned int fileDirty;
+    char *basePath;
 } ModPhpHttpHandler;
+
+/**
+ * The context structure to be used allong
+ * the interpretation of the request for
+ * the php handler, must be used to control
+ * the url and file resolution.
+ */
+typedef struct HandlerPhpContext_t {
+    /**
+     * The url to be used for retrieving the file.
+     */
+    unsigned char url[1024];
+
+	/**
+	 * The output nbuffer to be used for the
+	 * "printing" operation in the current context.
+	 */
+	struct LinkedBuffer_t *outputBuffer;
+} HandlerPhpContext;
 
 ERROR_CODE createModPhpHttpHandler(struct ModPhpHttpHandler_t **modPhpHttpHandlerPonter, struct HttpHandler_t *httpHandlerPonter);
 ERROR_CODE deleteModPhpHttpHandler(struct ModPhpHttpHandler_t *modPhpHttpHandler);
+ERROR_CODE createHandlerPhpContext(struct HandlerPhpContext_t **handlerPhpContextPointer);
+ERROR_CODE deleteHandlerPhpContext(struct HandlerPhpContext_t *handlerPhpContext);
 ERROR_CODE setHandlerModule(struct HttpConnection_t *httpConnection);
 ERROR_CODE unsetHandlerModule(struct HttpConnection_t *httpConnection);
 ERROR_CODE urlCallbackHandlerModule(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize);

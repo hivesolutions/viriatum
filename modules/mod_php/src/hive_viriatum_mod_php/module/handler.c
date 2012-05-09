@@ -37,8 +37,7 @@ ERROR_CODE createModPhpHttpHandler(struct ModPhpHttpHandler_t **modPhpHttpHandle
     struct ModPhpHttpHandler_t *modPhpHttpHandler = (struct ModPhpHttpHandler_t *) MALLOC(modPhpHttpHandlerSize);
 
     /* sets the mod php http handler attributes (default) values */
-    modPhpHttpHandler->filePath = NULL;
-    modPhpHttpHandler->fileDirty = 0;
+    modPhpHttpHandler->basePath = NULL;
 
     /* sets the mod php http handler in the upper http handler substrate */
     httpHandler->lower = (void *) modPhpHttpHandler;
@@ -55,6 +54,36 @@ ERROR_CODE deleteModPhpHttpHandler(struct ModPhpHttpHandler_t *modPhpHttpHandler
     FREE(modPhpHttpHandler);
 
     /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE createHandlerPhpContext(struct HandlerPhpContext_t **handlerPhpContextPointer) {
+    /* retrieves the handler php context size */
+    size_t handlerPhpContextSize = sizeof(struct HandlerPhpContext_t);
+
+    /* allocates space for the handler php context */
+    struct HandlerPhpContext_t *handlerPhpContext = (struct HandlerPhpContext_t *) MALLOC(handlerPhpContextSize);
+
+    /* sets the handler php default values */
+	handlerPhpContext->outputBuffer = NULL;
+
+    /* sets the handler php context in the  pointer */
+    *handlerPhpContextPointer = handlerPhpContext;
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE deleteHandlerPhpContext(struct HandlerPhpContext_t *handlerPhpContext) {
+    /* in case there is a valid output buffer defined in the current
+	handler php context it must be removed (linked buffer removal)
+	this way serious memory leaks are avoided */
+    if(handlerPhpContext->outputBuffer) { deleteLinkedBuffer(handlerPhpContext->outputBuffer); }
+
+	/* releases the handler php context memory */
+	FREE(handlerPhpContext);
+
+	/* raises no error */
     RAISE_NO_ERROR;
 }
 
@@ -188,23 +217,23 @@ ERROR_CODE messageCompleteCallbackHandlerModule(struct HttpParser_t *httpParser)
 }
 
 ERROR_CODE _setHttpParserHandlerModule(struct HttpParser_t *httpParser) {
+    /* allocates space for the handler php context and
+	then creates and populates the instance after that 
+	sets the handler file context as the context for
+	the http parser*/
+    struct HandlerPhpContext_t *handlerPhpContext;
+    createHandlerPhpContext(&handlerPhpContext);
+    httpParser->context = handlerPhpContext;
+
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
 ERROR_CODE _unsetHttpParserHandlerModule(struct HttpParser_t *httpParser) {
-    /* allocates space for the output buffer to be retrieved */
-    struct LinkedBuffer_t *outputBuffer;
-
-    /* in case there is a valid context defined for the http parser
-    it must be the output buffer and must be deleted (avoids memory
-    leaking problems) */
-    if(httpParser->context) {
-        /* retrieves the output buffer from the http parser and then
-        deletes it as a linked buffer */
-        outputBuffer = (struct LinkedBuffer_t *) httpParser->context;
-        deleteLinkedBuffer(outputBuffer);
-    }
+    /* retrieves the handler php context from the http parser
+	and then deletes (releases memory) */
+    struct HandlerPhpContext_t *handlerPhpContext = (struct HandlerPhpContext_t *) httpParser->context;
+    deleteHandlerPhpContext(handlerPhpContext);
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -250,7 +279,8 @@ ERROR_CODE _sendDataCallback(struct Connection_t *connection, struct Data_t *dat
     /* retrieves the http parser and then uses it to retrieve the
     proper output buffer for the current connection (the context) */
     struct HttpParser_t *httpParser = (struct HttpParser_t *) parameters;
-    struct LinkedBuffer_t *outputBuffer = (struct LinkedBuffer_t *) httpParser->context;
+    struct HandlerPhpContext_t *handlerPhpContext = (struct HandlerPhpContext_t *) httpParser->context;
+	struct LinkedBuffer_t *outputBuffer = handlerPhpContext->outputBuffer;
 
     /* retrieves the size of the output buffer, this is going to
     be used to measure the size of the output stream */
@@ -270,9 +300,9 @@ ERROR_CODE _sendDataCallback(struct Connection_t *connection, struct Data_t *dat
     data in the output buffer to the network */
     connection->writeConnection(connection, (unsigned char *) buffer, outputLength, _sendResponseCallbackHandlerModule, parameters);
 
-    /* unsets the context from the http parser (it's not going) to
-    used anymore (must be released) */
-    httpParser->context = NULL;
+    /* unsets the output buffer from the context (it's not going) to
+    be used anymore (must be released) */
+    handlerPhpContext->outputBuffer = NULL;
 
     /* releases the output data no more need to use it */
     FREE(outputData);
@@ -294,8 +324,10 @@ ERROR_CODE _sendResponseHandlerModule(struct HttpParser_t *httpParser) {
     standard ouput resulting from the php interpreter execution */
     struct LinkedBuffer_t *outputBuffer = NULL;
 
-    /* retrieves the connection from the http parser parameters */
+    /* retrieves the connection from the http parser parameters
+	and then retrieves the handler php context*/
     struct Connection_t *connection = (struct Connection_t *) httpParser->parameters;
+    struct HandlerPhpContext_t *handlerPhpContext = (struct HandlerPhpContext_t *) httpParser->context;
 
     /* creates the linked buffer to be used to store
     the complete output of the php interpreter */
@@ -306,12 +338,12 @@ ERROR_CODE _sendResponseHandlerModule(struct HttpParser_t *httpParser) {
     current output stream values, then sets the output buffer also
     in the current http parser structure reference */
     _outputBuffer = outputBuffer;
-    httpParser->context = (void *) outputBuffer;
+    handlerPhpContext->outputBuffer = outputBuffer;
 
     /* populates the "base" script reference structure
     with the required value for execution */
     script.type = ZEND_HANDLE_FP;
-    script.filename = "/handler.php";
+	script.filename = "C:\\handler.php";
     script.opened_path = NULL;
     script.free_filename = 0;
 
