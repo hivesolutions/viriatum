@@ -34,6 +34,12 @@
 #include "../http/http.h"
 #include "../system/system.h"
 
+/**
+ * The message to be printed to the client in case
+ * the handler propagates to the top (error case).
+ */
+#define DISPATCH_ERROR_MESSAGE "Error dispatching request"
+
 /* forward references (avoids loop) */
 struct HttpConnection_t;
 
@@ -80,3 +86,5 @@ ERROR_CODE _setHttpParserHandlerDispatch(struct HttpParser_t *httpParser);
 ERROR_CODE _unsetHttpParserHandlerDispatch(struct HttpParser_t *httpParser);
 ERROR_CODE _setHttpSettingsHandlerDispatch(struct HttpSettings_t *httpSettings);
 ERROR_CODE _unsetHttpSettingsHandlerDispatch(struct HttpSettings_t *httpSettings);
+ERROR_CODE _sendResponseHandlerDispatch(struct HttpParser_t *httpParser);
+ERROR_CODE _sendResponseCallbackHandlerDispatch(struct Connection_t *connection, struct Data_t *data, void *parameters);
