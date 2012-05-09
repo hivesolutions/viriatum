@@ -29,7 +29,10 @@
 
 #ifdef VIRIATUM_PLATFORM_WIN32
 
+VIRIATUM_EXTERNAL_PREFIX unsigned char local;
+
 static char basePath[VIRIATUM_MAX_PATH_SIZE] = { '\0' };
+static char resourcesPath[VIRIATUM_MAX_PATH_SIZE] = { '\0' };
 static char modulesPath[VIRIATUM_MAX_PATH_SIZE] = { '\0' };
 static char configPath[VIRIATUM_MAX_PATH_SIZE] = { '\0' };
 
@@ -51,6 +54,29 @@ static __inline char *getBasePath() {
     basePath[index] = '\0';
 
     return basePath;
+}
+
+static __inline char *getContentsPath() {
+    const char *basePath;
+
+    if(resourcesPath[0] != '\0') { return resourcesPath; }
+
+    basePath = local ? "." : getBasePath();
+    if(local) { sprintf_s(resourcesPath, VIRIATUM_MAX_PATH_SIZE, "%s", basePath); }
+    else { sprintf_s(resourcesPath, VIRIATUM_MAX_PATH_SIZE, "%s/htdocs", basePath); }
+
+    return resourcesPath;
+}
+
+static __inline char *getResourcesPath() {
+    const char *basePath;
+
+    if(resourcesPath[0] != '\0') { return resourcesPath; }
+
+    basePath = getBasePath();
+    sprintf_s(resourcesPath, VIRIATUM_MAX_PATH_SIZE, "%s/htdocs", basePath);
+
+    return resourcesPath;
 }
 
 static __inline char *getModulesPath() {
@@ -78,12 +104,12 @@ static __inline char *getConfigPath() {
 #ifndef VIRIATUM_MODULES_PATH
 #define VIRIATUM_MODULES_PATH getModulesPath()
 #endif
-#define VIRIATUM_RESOURCES_PATH getBasePath()
+#define VIRIATUM_RESOURCES_PATH getResourcesPath()
 #define VIRIATUM_CONFIG_PATH getConfigPath()
-#define VIRIATUM_BASE_PATH "/"
+#define VIRIATUM_BASE_PATH ""
 #define VIRIATUM_LISTING_PATH "/templates/listing.html.tpl"
 #ifndef VIRIATUM_CONTENTS_PATH
-#define VIRIATUM_CONTENTS_PATH "."
+#define VIRIATUM_CONTENTS_PATH getContentsPath()
 #endif
 #define VIRIATUM_PID_PATH "viriatum.pid"
 #endif
@@ -93,7 +119,7 @@ static __inline char *getConfigPath() {
 #define VIRIATUM_MODULES_PATH "/sdcard/viriatum/modules"
 #define VIRIATUM_RESOURCES_PATH "/sdcard/viriatum/www"
 #define VIRIATUM_CONFIG_PATH "/sdcard/viriatum/config"
-#define VIRIATUM_BASE_PATH "/"
+#define VIRIATUM_BASE_PATH ""
 #define VIRIATUM_LISTING_PATH "/templates/listing.html.tpl"
 #define VIRIATUM_CONTENTS_PATH "/sdcard/viriatum/www"
 #else
@@ -102,7 +128,7 @@ static __inline char *getConfigPath() {
 #endif
 #define VIRIATUM_RESOURCES_PATH "/var/viriatum/www"
 #define VIRIATUM_CONFIG_PATH "/etc/viriatum"
-#define VIRIATUM_BASE_PATH "/"
+#define VIRIATUM_BASE_PATH ""
 #define VIRIATUM_LISTING_PATH "/templates/listing.html.tpl"
 #ifndef VIRIATUM_CONTENTS_PATH
 #define VIRIATUM_CONTENTS_PATH "/var/viriatum/www"

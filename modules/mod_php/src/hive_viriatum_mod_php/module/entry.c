@@ -29,6 +29,8 @@
 
 #include "entry.h"
 
+unsigned char local = 0;
+
 ERROR_CODE createModPhpModule(struct ModPhpModule_t **modPhpModulePointer, struct Module_t *module) {
     /* retrieves the mod php module size */
     size_t modPhpModuleSize = sizeof(struct ModPhpModule_t);
@@ -81,8 +83,10 @@ ERROR_CODE startModule(struct Environment_t *environment, struct Module_t *modul
     V_DEBUG_F("Starting the module '%s' (%s) v%s\n", name, description, version);
 
     /* sets the global service reference to be used in the
-    externalized function for the interpreter */
+    externalized function for the interpreter then updates
+    the global local value according to the service options */
     _service = service;
+    local = service->options->local;
 
     /* creates the mod php module */
     createModPhpModule(&modPhpModule, module);
