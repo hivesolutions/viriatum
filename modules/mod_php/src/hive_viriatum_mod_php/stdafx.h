@@ -27,10 +27,14 @@
 
 #pragma once
 
+#ifdef _MSC_VER
 #pragma warning(disable:4005)
+#endif
 #include <sapi/embed/php_embed.h>
 #include "../../../../src/hive_viriatum/viriatum.h"
+#ifdef _MSC_VER
 #pragma warning(default:4005)
+#endif
 
 unsigned char *nameViriatumModPhp();
 unsigned char *versionViriatumModPhp();
