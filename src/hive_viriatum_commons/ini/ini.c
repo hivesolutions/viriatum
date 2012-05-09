@@ -128,8 +128,6 @@ ERROR_CODE _keyEndCallback(struct IniEngine_t *iniEngine, const unsigned char *p
     memcpy(iniHandler->key, pointer, size);
     iniHandler->key[size] = '\0';
 
-    V_PRINT_F("KEY -> '%s'\n", iniHandler->key);
-
     RAISE_NO_ERROR;
 }
 
@@ -151,8 +149,6 @@ ERROR_CODE _valueEndCallback(struct IniEngine_t *iniEngine, const unsigned char 
     }
 
     setValueStringHashMap(sectionConfiguration, (unsigned char *) iniHandler->key, value);
-
-    V_PRINT_F("VALUE -> '%s'\n", value);
 
     RAISE_NO_ERROR;
 }
