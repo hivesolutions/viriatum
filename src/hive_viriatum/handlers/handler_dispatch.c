@@ -192,16 +192,11 @@ ERROR_CODE urlCallbackHandlerDispatch(struct HttpParser_t *httpParser, const uns
     /* allocates the required space for the url */
     unsigned char *url = (unsigned char *) MALLOC(dataSize + 1);
 
-
-
-    /* copies the memory from the data to the url */
+    /* copies the memory from the data to the url, then
+    puts the end of string in the url */
     memcpy(url, data, dataSize);
-
-    /* puts the end of strng in the url */
     url[dataSize] = '\0';
 
-    /* prints the url */
-    V_DEBUG_F("url: %s\n", url);
 
 
 
@@ -239,7 +234,8 @@ ERROR_CODE urlCallbackHandlerDispatch(struct HttpParser_t *httpParser, const uns
     handler->unset(httpConnection);
 
     /* sets the current http handler accoring to the current options
-    in the service, the http handler must be loaded in the handlers map */
+    in the service, the http handler must be loaded in the handlers map
+	in case the handler is not currently available an error is printed */
     getValueStringHashMap(service->httpHandlersMap, handlerName, (void **) &handler);
 	if(handler) {
 		handler->set(httpConnection);
@@ -277,6 +273,9 @@ ERROR_CODE bodyCallbackHandlerDispatch(struct HttpParser_t *httpParser, const un
 }
 
 ERROR_CODE messageCompleteCallbackHandlerDispatch(struct HttpParser_t *httpParser) {
+	/* sends (and creates) the reponse */
+    _sendResponseHandlerDefault(httpParser);
+
     /* raise no error */
     RAISE_NO_ERROR;
 }
@@ -318,5 +317,36 @@ ERROR_CODE _unsetHttpSettingsHandlerDispatch(struct HttpSettings_t *httpSettings
     httpSettings->onmessageComplete = NULL;
 
     /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE _sendResponseHandlerDispatch(struct HttpParser_t *httpParser) {
+    /* allocates the response buffer */
+    char *responseBuffer = MALLOC(256);
+
+    /* retrieves the connection from the http parser parameters */
+    struct Connection_t *connection = (struct Connection_t *) httpParser->parameters;
+
+    /* writes the http static headers to the response */
+    SPRINTF(responseBuffer, 256, "HTTP/1.1 500 Internal Server Error\r\nServer: %s/%s (%s @ %s)\r\nConnection: Keep-Alive\r\nContent-Length: %d\r\n\r\n%s", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, sizeof(DISPATCH_ERROR_MESSAGE), DISPATCH_ERROR_MESSAGE);
+
+    /* writes the response to the connection, registers for the appropriate callbacks */
+    writeConnection(connection, (unsigned char *) responseBuffer, (unsigned int) strlen(responseBuffer), _sendResponseCallbackHandlerDefault, (void *) httpParser);
+
+    /* raise no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE _sendResponseCallbackHandlerDispatch(struct Connection_t *connection, struct Data_t *data, void *parameters) {
+    /* retrieves the http parser */
+    struct HttpParser_t *httpParser = (struct HttpParser_t *) parameters;
+
+    /* in case the connection is not meant to be kept alive */
+    if(!(httpParser->flags & FLAG_CONNECTION_KEEP_ALIVE)) {
+        /* closes the connection */
+        connection->closeConnection(connection);
+    }
+
+    /* raise no error */
     RAISE_NO_ERROR;
 }
