@@ -241,9 +241,13 @@ ERROR_CODE urlCallbackHandlerDispatch(struct HttpParser_t *httpParser, const uns
     /* sets the current http handler accoring to the current options
     in the service, the http handler must be loaded in the handlers map */
     getValueStringHashMap(service->httpHandlersMap, handlerName, (void **) &handler);
-    handler->set(httpConnection);
-    httpConnection->httpHandler = handler;
-    httpConnection->httpSettings->onurl(httpParser, data, dataSize);
+	if(handler) {
+		handler->set(httpConnection);
+		httpConnection->httpHandler = handler;
+		httpConnection->httpSettings->onurl(httpParser, data, dataSize);
+	} else {
+		V_ERROR_F("Error retrieving handler '%s' from service\n", handlerName)
+	}
 
     /* releases the url */
     FREE(url);
