@@ -31,10 +31,10 @@
 #include "extension.h"
 
 /**
- * The path to the file to be used as default
+ * The bae path to the directory to be used as default
  * in case no other definition exists (configuration).
  */
-#define DEFAULT_FILE_PATH "default.php"
+#define DEFAULT_BASE_PATH "."
 
 /**
  * Structure describing the internal

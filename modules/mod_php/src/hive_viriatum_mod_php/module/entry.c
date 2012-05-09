@@ -106,8 +106,7 @@ ERROR_CODE startModule(struct Environment_t *environment, struct Module_t *modul
     httpHandler->reset = NULL;
 
     /* sets the mod php handler attributes */
-    modPhpHttpHandler->filePath = DEFAULT_FILE_PATH;
-    modPhpHttpHandler->fileDirty = 1;
+    modPhpHttpHandler->basePath = DEFAULT_BASE_PATH;
 
     /* sets the mod php module attributes */
     modPhpModule->httpHandler = httpHandler;
@@ -207,6 +206,25 @@ ERROR_CODE errorModule(unsigned char **messagePointer) {
 }
 
 ERROR_CODE _loadConfiguration(struct Service_t *service, struct ModPhpHttpHandler_t *modPhpHttpHandler) {
+    /* allocates space for both a configuration item reference
+    (value) and for the configuration to be retrieved */
+    void *value;
+    struct HashMap_t *configuration;
+
+    /* in case the current service configuration is not set
+    must return immediately (not possible to load it) */
+    if(service->configuration == NULL) { RAISE_NO_ERROR; }
+
+    /* tries to retrieve the mod php section configuration from the configuration
+    map in case none is found returns immediately no need to process anything more */
+    getValueStringHashMap(service->configuration, (unsigned char *) "mod_php", (void **) &configuration);
+    if(configuration == NULL) { RAISE_NO_ERROR; }
+
+    /* tries ro retrieve the base path from the php configuration and in
+    case it exists sets it in the mod php handler (attribute reference change) */
+    getValueStringHashMap(configuration, (unsigned char *) "base_path", &value);
+    if(value != NULL) { modPhpHttpHandler->basePath = (char *) value; }
+
     /* raises no error */
     RAISE_NO_ERROR;
 }
