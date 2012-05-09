@@ -39,7 +39,7 @@ ERROR_CODE createDispatchHandler(struct DispatchHandler_t **dispatchHandlerPoint
     /* sets the dispatch handler attributes (default) values */
 #ifdef VIRIATUM_PCRE
     dispatchHandler->regex = NULL;
-#endif VIRIATUM_PCRE
+#endif
     dispatchHandler->names = NULL;
     dispatchHandler->regexCount = 0;
 
