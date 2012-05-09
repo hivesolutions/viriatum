@@ -489,6 +489,10 @@ ERROR_CODE loadModulesService(struct Service_t *service) {
     /* allocates the error code */
     ERROR_CODE errorCode;
 
+	/* allocates space for the pointer to be used in the
+	prefix comparision for the module name */
+	char *pointer;
+
     /* allocates space for the linked list for the entries
     and for the iterator to iterate "around" them */
     struct LinkedList_t *entries;
@@ -535,7 +539,8 @@ ERROR_CODE loadModulesService(struct Service_t *service) {
         /* tries to find the module prefix in the current entry name
         in case it's not found continues the loop immediately no library
         loading is required (not the correct format) */
-        if(strstr((char *) entry->name, "viriatum_") != (char *) entry->name) { continue; }
+		pointer = strstr((char *) entry->name, "viriatum_");
+        if(pointer != (char *) entry->name && pointer != (char *) entry->name + 3) { continue; }
 
         /* loads the module, retrieving a possible error code */
         errorCode = loadModule(service, modulePath);
