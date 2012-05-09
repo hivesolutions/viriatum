@@ -112,7 +112,7 @@ ERROR_CODE registerHandlerDispatch(struct Service_t *service) {
     dispatchHandler->names = (unsigned char **) MALLOC(sizeof(unsigned char *) * dispatchHandler->regexCount);
     dispatchHandler->names[0] = (unsigned char *) "lua";
     dispatchHandler->names[1] = (unsigned char *) "php";
-    dispatchHandler->names[2] = (unsigned char *) "default";
+    dispatchHandler->names[2] = (unsigned char *) "dedault";
 
 
 
@@ -323,10 +323,10 @@ ERROR_CODE _sendResponseHandlerDispatch(struct HttpParser_t *httpParser) {
     struct Connection_t *connection = (struct Connection_t *) httpParser->parameters;
 
     /* writes the http static headers to the response */
-    SPRINTF(responseBuffer, 256, "HTTP/1.1 500 Internal Server Error\r\nServer: %s/%s (%s @ %s)\r\nConnection: Keep-Alive\r\nContent-Length: %lu\r\n\r\n%s", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, sizeof(DISPATCH_ERROR_MESSAGE), DISPATCH_ERROR_MESSAGE);
+    SPRINTF(responseBuffer, 256, "HTTP/1.1 500 Internal Server Error\r\nServer: %s/%s (%s @ %s)\r\nConnection: Keep-Alive\r\nContent-Length: %lu\r\n\r\n%s", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, sizeof(DISPATCH_ERROR_MESSAGE) - 1, DISPATCH_ERROR_MESSAGE);
 
     /* writes the response to the connection, registers for the appropriate callbacks */
-    writeConnection(connection, (unsigned char *) responseBuffer, (unsigned int) strlen(responseBuffer), _sendResponseCallbackHandlerDefault, (void *) httpParser);
+    writeConnection(connection, (unsigned char *) responseBuffer, (unsigned int) strlen(responseBuffer), _sendResponseCallbackHandlerDispatch, (void *) httpParser);
 
     /* raise no error */
     RAISE_NO_ERROR;
