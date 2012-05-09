@@ -23,6 +23,10 @@
 # __copyright__ = Copyright (c) 2008 Hive Solutions Lda.
 # __license__   = GNU General Public License (GPL), Version 3
 
+# sets the default values for the various library
+# control variables
+have_lua=true
+
 # checks for libraries
 AC_CHECK_LIB([viriatum], [main])
 AC_CHECK_LIB([lua5.1], [main], [], [have_lua=false])
