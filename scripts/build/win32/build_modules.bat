@@ -51,6 +51,7 @@ if %ERRORLEVEL% neq 0 ( cd %CURRENT_DIR% && exit /b %ERRORLEVEL% )
 :: will lauch the build utility for it
 set INCLUDE=%INCLUDE%;%DEV_HOME%\include;%DEV_HOME%\include\php;%DEV_HOME%\include\php\main;%DEV_HOME%\include\php\TSRM;%DEV_HOME%\include\php\Zend
 set LIB=%LIB%;%DEV_HOME%\lib
+set PATH=%PATH%;%DEV_HOME%\bin;%DEV_HOME%\util
 msbuild %SOLUTION_DIR%\hive_viriatum_mod.sln /p:Configuration=Release /p:"VCBuildAdditionalOptions=/useenv"
 
 :: in case the previous command didn't exit properly
