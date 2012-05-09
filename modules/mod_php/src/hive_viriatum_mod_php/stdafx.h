@@ -27,8 +27,10 @@
 
 #pragma once
 
+#pragma warning(disable:4005)
 #include <sapi/embed/php_embed.h>
 #include "../../../../src/hive_viriatum/viriatum.h"
+#pragma warning(default:4005)
 
 unsigned char *nameViriatumModPhp();
 unsigned char *versionViriatumModPhp();
