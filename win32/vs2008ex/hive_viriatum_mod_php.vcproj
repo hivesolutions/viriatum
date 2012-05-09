@@ -208,6 +208,10 @@
                     >
                 </File>
                 <File
+                    RelativePath="..\..\modules\mod_php\src\hive_viriatum_mod_php\module\extension.c"
+                    >
+                </File>
+                <File
                     RelativePath="..\..\modules\mod_php\src\hive_viriatum_mod_php\module\handler.c"
                     >
                 </File>
@@ -231,6 +235,10 @@
                 >
                 <File
                     RelativePath="..\..\modules\mod_php\src\hive_viriatum_mod_php\module\entry.h"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\modules\mod_php\src\hive_viriatum_mod_php\module\extension.h"
                     >
                 </File>
                 <File

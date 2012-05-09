@@ -28,5 +28,15 @@
 #pragma once
 
 #include "entry.h"
-#include "extension.h"
-#include "handler.h"
+
+zend_function_entry viriatumFunctions[];
+zend_module_entry viriatumModule;
+
+PHP_FUNCTION(viriatum_connections);
+PHP_FUNCTION(viriatum_name);
+PHP_FUNCTION(viriatum_version);
+PHP_FUNCTION(viriatum_description);
+PHP_FUNCTION(viriatum_observations);
+PHP_FUNCTION(viriatum_copyright);
+PHP_FUNCTION(viriatum_platform_string);
+PHP_FUNCTION(viriatum_platform_cpu);
