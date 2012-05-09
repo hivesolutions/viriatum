@@ -37,7 +37,7 @@
 typedef struct ModPhpHttpHandler_t {
     /**
      * The path to the base directory to be
-	 * used in the file resolution.
+     * used in the file resolution.
      */
     char *basePath;
 } ModPhpHttpHandler;
@@ -54,11 +54,17 @@ typedef struct HandlerPhpContext_t {
      */
     unsigned char url[1024];
 
-	/**
-	 * The output nbuffer to be used for the
-	 * "printing" operation in the current context.
-	 */
-	struct LinkedBuffer_t *outputBuffer;
+    /**
+     * The path to the file to be handled by
+     * the current php request.
+     */
+    unsigned char filePath[VIRIATUM_MAX_PATH_SIZE];
+
+    /**
+     * The output nbuffer to be used for the
+     * "printing" operation in the current context.
+     */
+    struct LinkedBuffer_t *outputBuffer;
 } HandlerPhpContext;
 
 ERROR_CODE createModPhpHttpHandler(struct ModPhpHttpHandler_t **modPhpHttpHandlerPonter, struct HttpHandler_t *httpHandlerPonter);
