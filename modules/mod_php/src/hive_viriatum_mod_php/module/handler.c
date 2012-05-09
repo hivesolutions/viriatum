@@ -351,7 +351,7 @@ ERROR_CODE _sendResponseHandlerModule(struct HttpParser_t *httpParser) {
     /* populates the "base" script reference structure
     with the required value for execution */
     script.type = ZEND_HANDLE_FP;
-    script.filename = handlerPhpContext->filePath;
+    script.filename = (char *) handlerPhpContext->filePath;
     script.opened_path = NULL;
     script.free_filename = 0;
 
