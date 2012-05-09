@@ -60,8 +60,7 @@ if %ERRORLEVEL% neq 0 ( cd %CURRENT_DIR% && exit /b %ERRORLEVEL% )
 :: changes the directory in order to group the files and then
 :: returns tho the "original" build directory
 cd %SRC_DIR%
-tar -cf %NAME%.tar index.html viriatum.exe config htdocs
-xcopy /q /y /e /k index.html %RESOURCES_DIR%
+tar -cf %NAME%.tar viriatum.exe config htdocs
 xcopy /q /y /e /k viriatum.exe %RESOURCES_DIR%
 xcopy /q /y /a /e /k config %RESOURCES_DIR%\config
 xcopy /q /y /a /e /k htdocs %RESOURCES_DIR%\htdocs
