@@ -293,11 +293,11 @@ ERROR_CODE _startPhpState() {
 	/*zend_hash_destroy(ht);
 	FREE_HASHTABLE(ht);*/
 
-  /*  MAKE_STD_ZVAL(_array);
+    MAKE_STD_ZVAL(_array);
 	array_init(_array);
 
 	add_next_index_long(_array, 45);
-	ZEND_SET_GLOBAL_VAR("matias", _array);*/
+	ZEND_SET_GLOBAL_VAR("matias", _array);
 
 	ZVAL_STRING(_var, "tobias", 1);
 	ZEND_SET_GLOBAL_VAR("tobias", _var);
