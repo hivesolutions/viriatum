@@ -297,11 +297,6 @@ ERROR_CODE _sendResponseHandlerModule(struct HttpParser_t *httpParser) {
     /* retrieves the connection from the http parser parameters */
     struct Connection_t *connection = (struct Connection_t *) httpParser->parameters;
 
-    /* retrieves the http connection from the io connection and uses it to retrieve
-    the correct (mod php) handler to operate around it */
-    struct HttpConnection_t *httpConnection = (struct HttpConnection_t *) ((struct IoConnection_t *) connection->lower)->lower;
-    struct ModPhpHttpHandler_t *modPhpHttpHandler = (struct ModPhpHttpHandler_t *) httpConnection->httpHandler->lower;
-
     /* creates the linked buffer to be used to store
     the complete output of the php interpreter */
     createLinkedBuffer(&outputBuffer);
