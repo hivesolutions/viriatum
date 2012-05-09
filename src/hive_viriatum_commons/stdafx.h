@@ -94,6 +94,9 @@
 #ifndef SIGQUIT
 #define SIGQUIT 3
 #endif
+#ifndef SIGPIPE
+#define SIGPIPE 13
+#endif
 #ifndef SIGTERM
 #define SIGTERM 15
 #endif
