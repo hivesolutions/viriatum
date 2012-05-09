@@ -38,7 +38,7 @@
  * The message to be printed to the client in case
  * the handler propagates to the top (error case).
  */
-#define DISPATCH_ERROR_MESSAGE "Error dispatching request"
+#define DISPATCH_ERROR_MESSAGE "500 - Error dispatching request"
 
 /* forward references (avoids loop) */
 struct Data_t;
