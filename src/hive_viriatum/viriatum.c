@@ -147,6 +147,9 @@ ERROR_CODE printInformation() {
     RAISE_NO_ERROR;
 }
 
+void help() { V_PRINT(HELP_STRING); }
+void version() { V_PRINT_F("%s version %s (%s, %s)", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_COMPILATION_DATE, VIRIATUM_COMPILATION_TIME); }
+
 #ifdef VIRIATUM_PLATFORM_WIN32
 void daemonize() { }
 #endif
@@ -213,9 +216,6 @@ void localize() { local = 1; }
 #ifdef VIRIATUM_PLATFORM_UNIX
 void localize() { }
 #endif
-
-void help() { V_PRINT(HELP_STRING); }
-void version() { V_PRINT_F("%s version %s (%s, %s)", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_COMPILATION_DATE, VIRIATUM_COMPILATION_TIME); }
 
 void executeArguments(struct HashMap_t *arguments) {
     /* allocates space for the possible argument
