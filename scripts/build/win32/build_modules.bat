@@ -61,7 +61,7 @@ if %ERRORLEVEL% neq 0 ( cd %CURRENT_DIR% && exit /b %ERRORLEVEL% )
 :: returns the "original" build directory
 for %%S in %SRC_DIRS% do (
     cd %%S
-	xcopy /q /y /e /k viriatum_*.dll %RESOURCES_DIR%\modules\
+    xcopy /q /y /e /k viriatum_*.dll %RESOURCES_DIR%\modules\
 )
 cd %RESOURCES_DIR%
 tar -cf %NAME%.tar modules
