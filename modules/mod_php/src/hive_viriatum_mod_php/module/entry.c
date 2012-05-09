@@ -277,18 +277,15 @@ ERROR_CODE _reloadPhpState() {
 }
 
 ERROR_CODE _startPhpState() {
-	zval var;
-	zval aarray;
-	zval *_var = &var;
-	zval *_array = &aarray;
+	#pragma warning(disable:4700)
+	zval *_var;
+	zval *_array;
 
 	// ?=PHPE9568F34-D428-11d2-A769-00AA001ACF42
 
 	/*HashTable *ht;
 	ALLOC_HASHTABLE(ht);
 	zend_hash_init(ht, 50, NULL, ZVAL_PTR_DTOR, 0);*/
-
-
 
 	/*zend_hash_destroy(ht);
 	FREE_HASHTABLE(ht);*/
@@ -299,7 +296,9 @@ ERROR_CODE _startPhpState() {
 	add_next_index_long(_array, 45);
 	ZEND_SET_GLOBAL_VAR("matias", _array);
 
+	#pragma warning(disable:4700)
 	ZVAL_STRING(_var, "tobias", 1);
+	#pragma warning(disable:4700)
 	ZEND_SET_GLOBAL_VAR("tobias", _var);
 
     /* raises no error */
