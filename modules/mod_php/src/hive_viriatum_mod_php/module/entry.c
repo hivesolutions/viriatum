@@ -296,6 +296,7 @@ ERROR_CODE _startPhpState() {
     /* raises no error */
     RAISE_NO_ERROR;
 }
+#pragma warning(default:4700)
 
 int _writePhpState(const char *data, unsigned int dataSize TSRMLS_DC) {
     /* allocates space for the buffer that will hold the write
