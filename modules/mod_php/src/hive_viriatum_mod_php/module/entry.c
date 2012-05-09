@@ -273,7 +273,7 @@ int _writePhpState(const char *data, unsigned int dataSize TSRMLS_DC) {
 
 void _logPhpState(char *message) {
     /* logs the error message (critical error) */
-    V_ERROR_F("%s\n", message);
+   /* V_ERROR_F("%s\n", message);*/
 }
 
 void _errorPhpState(int type, const char *message, ...) {
