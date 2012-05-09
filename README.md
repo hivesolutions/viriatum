@@ -59,7 +59,11 @@ There are a lot of possible building features to enable
 ## Modules
 
 There are a series of modules for the viriatum server in order to compile then
-some rules apply
+some rules apply.
+Current modules include:
+
+* `mod_lua` - For interaction with the lua interpreter
+* `mod_php` - For interaction with the php interpreter (complex compilation)
 
 ## PHP Module
 
