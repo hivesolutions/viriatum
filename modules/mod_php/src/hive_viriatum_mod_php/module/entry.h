@@ -28,6 +28,7 @@
 #pragma once
 
 #include "handler.h"
+#include "extension.h"
 
 /**
  * The path to the file to be used as default
