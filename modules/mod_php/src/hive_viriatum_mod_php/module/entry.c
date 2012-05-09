@@ -276,7 +276,7 @@ void _logPhpState(char *message) {
     V_ERROR_F("%s\n", message);
 }
 
-void _errorPhpState(int type, const char *filename, const uint line, ...) {
+void _errorPhpState(int type, const char *message, ...) {
     /* check if the kind of error is of type critical in such case it should
     return immediately */
     if (type != E_ERROR && type != E_USER_ERROR && type != E_CORE_ERROR && type != E_PARSE && type != E_COMPILE_ERROR) {
