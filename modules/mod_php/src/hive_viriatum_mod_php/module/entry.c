@@ -251,6 +251,10 @@ ERROR_CODE _loadPhpState() {
     zend_alter_ini_entry("display_errors", sizeof("display_errors"), "0", sizeof("0") - 1, PHP_INI_SYSTEM, PHP_INI_STAGE_RUNTIME);
     zend_alter_ini_entry("log_errors", sizeof("log_errors"), "1", sizeof("1") - 1, PHP_INI_SYSTEM, PHP_INI_STAGE_RUNTIME);
 
+	/* starts the php state updating the major global value in
+	the current interpreter state */
+	_startPhpState();
+
     /* raises no error */
     RAISE_NO_ERROR;
 }
@@ -273,6 +277,31 @@ ERROR_CODE _reloadPhpState() {
 }
 
 ERROR_CODE _startPhpState() {
+	zval var;
+	zval aarray;
+	zval *_var = &var;
+	zval *_array = &aarray;
+
+	// ?=PHPE9568F34-D428-11d2-A769-00AA001ACF42
+
+	/*HashTable *ht;
+	ALLOC_HASHTABLE(ht);
+	zend_hash_init(ht, 50, NULL, ZVAL_PTR_DTOR, 0);*/
+
+
+
+	/*zend_hash_destroy(ht);
+	FREE_HASHTABLE(ht);*/
+
+  /*  MAKE_STD_ZVAL(_array);
+	array_init(_array);
+
+	add_next_index_long(_array, 45);
+	ZEND_SET_GLOBAL_VAR("matias", _array);*/
+
+	ZVAL_STRING(_var, "tobias", 1);
+	ZEND_SET_GLOBAL_VAR("tobias", _var);
+
     /* raises no error */
     RAISE_NO_ERROR;
 }
