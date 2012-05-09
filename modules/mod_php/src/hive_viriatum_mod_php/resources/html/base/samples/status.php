@@ -2,10 +2,11 @@
 	<head>
         <script type="text/javascript" src="http://smoothiecharts.org/smoothie.js"></script>
         <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+        <script type="text/javascript" src="status.js"></script>
         <script type="text/javascript">
         var random = new TimeSeries();
       setInterval(function() {
-$.getJSON("stats_json.php", function(data) {
+$.getJSON("status_json.php", function(data) {
   var items = [];
   var connections = data["connections"];
    random.append(new Date().getTime(), connections);
