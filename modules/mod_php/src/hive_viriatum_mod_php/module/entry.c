@@ -276,7 +276,9 @@ ERROR_CODE _reloadPhpState() {
     RAISE_NO_ERROR;
 }
 
+#ifdef _MSC_VER
 #pragma warning(disable:4700)
+#endif
 ERROR_CODE _startPhpState() {
 
 	zval *_var;
@@ -296,7 +298,9 @@ ERROR_CODE _startPhpState() {
     /* raises no error */
     RAISE_NO_ERROR;
 }
+#ifdef _MSC_VER
 #pragma warning(default:4700)
+#endif
 
 int _writePhpState(const char *data, unsigned int dataSize TSRMLS_DC) {
     /* allocates space for the buffer that will hold the write
