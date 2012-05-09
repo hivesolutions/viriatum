@@ -246,7 +246,7 @@ ERROR_CODE urlCallbackHandlerDispatch(struct HttpParser_t *httpParser, const uns
 		httpConnection->httpHandler = handler;
 		httpConnection->httpSettings->onurl(httpParser, data, dataSize);
 	} else {
-		V_ERROR_F("Error retrieving handler '%s' from service\n", handlerName)
+		V_ERROR_F("Error retrieving handler '%s' from service\n", handlerName);
 	}
 
     /* releases the url */
