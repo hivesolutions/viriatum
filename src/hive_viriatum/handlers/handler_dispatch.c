@@ -231,8 +231,7 @@ ERROR_CODE urlCallbackHandlerDispatch(struct HttpParser_t *httpParser, const uns
 		/* retrieves the current handler and then unsets it
 		from the connection (detach) then sets the the prper
 		handler in the connection and notifies it of the url */
-		handler = httpConnection->httpHandler;
-		handler->unset(httpConnection);
+		httpConnection->httpHandler->unset(httpConnection);
 		handler->set(httpConnection);
 		httpConnection->httpHandler = handler;
 		httpConnection->httpSettings->onurl(httpParser, data, dataSize);
