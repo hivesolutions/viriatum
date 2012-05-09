@@ -274,7 +274,7 @@ ERROR_CODE bodyCallbackHandlerDispatch(struct HttpParser_t *httpParser, const un
 
 ERROR_CODE messageCompleteCallbackHandlerDispatch(struct HttpParser_t *httpParser) {
 	/* sends (and creates) the reponse */
-    _sendResponseHandlerDefault(httpParser);
+    _sendResponseHandlerDispatch(httpParser);
 
     /* raise no error */
     RAISE_NO_ERROR;
