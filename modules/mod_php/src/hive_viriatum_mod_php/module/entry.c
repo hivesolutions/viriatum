@@ -292,6 +292,11 @@ ERROR_CODE _loadPhpState() {
     php_embed_init(0, NULL);
     zend_startup_module(&viriatumModule);
 
+    /* forrces the logging of the error for the execution in the
+    current php environment */
+    zend_alter_ini_entry("display_errors", sizeof("display_errors"), "0", sizeof("0") - 1, PHP_INI_SYSTEM, PHP_INI_STAGE_RUNTIME);
+    zend_alter_ini_entry("log_errors", sizeof("log_errors"), "1", sizeof("1") - 1, PHP_INI_SYSTEM, PHP_INI_STAGE_RUNTIME);
+
     /* raises no error */
     RAISE_NO_ERROR;
 }
@@ -336,7 +341,7 @@ int _writePhpState(const char *data, unsigned int dataSize TSRMLS_DC) {
 
 void _logPhpState(char *message) {
     /* logs the error message (critical error) */
-    V_ERROR(message);
+    V_ERROR_F("%s\n", message);
 }
 
 void _errorPhpState(int type, const char *filename, const uint line, const char *format, va_list args) {
@@ -348,7 +353,7 @@ void _errorPhpState(int type, const char *filename, const uint line, const char 
     }
 
     /* logs the error message (critical error) */
-    V_ERROR("Critical error in user code");
+    V_ERROR("Critical error in user code\n");
 
     /* exits the current code (code jump) */
     zend_bailout();
