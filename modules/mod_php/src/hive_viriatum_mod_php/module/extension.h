@@ -40,3 +40,6 @@ PHP_FUNCTION(viriatum_observations);
 PHP_FUNCTION(viriatum_copyright);
 PHP_FUNCTION(viriatum_platform_string);
 PHP_FUNCTION(viriatum_platform_cpu);
+PHP_FUNCTION(viriatum_compilation_date);
+PHP_FUNCTION(viriatum_compilation_time);
+PHP_FUNCTION(viriatum_compiler);
