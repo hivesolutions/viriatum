@@ -326,7 +326,7 @@ ERROR_CODE writeHandlerStreamIo(struct Connection_t *connection) {
                     /* prints the error */
                     V_DEBUG_F("Problem sending from socket: %d\n", receivingErrorCode);
 
-					printf("ERRO FATAL");
+					printf("ERRO FATAL\n");
 					
                     /* sets the error flag */
                     error = 1;
