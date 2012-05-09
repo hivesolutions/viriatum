@@ -11,7 +11,7 @@ set NAME=viriatum-%VERSION%
 
 :: sets the directory to be used as the base
 :: for the retrieval of the development tools
-IF not defined DEV_HOME set DEV_HOME=\dev
+if not defined DEV_HOME set DEV_HOME=\dev
 
 :: sets the various path related global
 :: variable with relative names
@@ -58,13 +58,13 @@ msbuild %SOLUTION_DIR%\hive_viriatum.sln /p:Configuration=Release /p:"VCBuildAdd
 if %ERRORLEVEL% neq 0 ( cd %CURRENT_DIR% && exit /b %ERRORLEVEL% )
 
 :: changes the directory in order to group the files and then
-:: returns tho the "original" build directory
+:: returns the "original" build directory
 cd %SRC_DIR%
-tar -cf %NAME%.tar viriatum.exe config htdocs
 xcopy /q /y /e /k viriatum.exe %RESOURCES_DIR%
 xcopy /q /y /a /e /k config %RESOURCES_DIR%\config
 xcopy /q /y /a /e /k htdocs %RESOURCES_DIR%\htdocs
-xcopy /q /y /e /k %NAME%.tar %RESOURCES_DIR%
+cd %RESOURCES_DIR%
+tar -cf %NAME%.tar viriatum.exe config htdocs
 cd %BUILD_DIR%
 
 echo Building capsule setup package...
