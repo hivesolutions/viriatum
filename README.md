@@ -56,6 +56,17 @@ There are a lot of possible building features to enable
 * `--enable-debug` - Enables the extra debugging capabilities in viriatum
 * `--enable-defaults` - Enables the default paths in the viriatum server, ignoring wwwroot and moduleroot at runtime
 
+## Modules
+
+There are a series of modules for the viriatum server in order to compile then
+some rules apply
+
+## PHP Module
+
+Must compile the php interpreter with special environment variables set
+
+* `export CFLAGS="-I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend"`
+
 ## License
 
 Viriatum is an open-source project licensed under the [GNU General Public License Version 3](http://www.gnu.org/licenses/gpl.html).
