@@ -225,20 +225,20 @@ ERROR_CODE urlCallbackHandlerDispatch(struct HttpParser_t *httpParser, const uns
 
     /* sets the current http handler accoring to the current options
     in the service, the http handler must be loaded in the handlers map
-	in case the handler is not currently available an error is printed */
+    in case the handler is not currently available an error is printed */
     getValueStringHashMap(service->httpHandlersMap, handlerName, (void **) &handler);
-	if(handler) {
-		/* retrieves the current handler and then unsets it
-		from the connection (detach) then sets the the prper
-		handler in the connection and notifies it of the url */
-		httpConnection->httpHandler->unset(httpConnection);
-		handler->set(httpConnection);
-		httpConnection->httpHandler = handler;
-		httpConnection->httpSettings->onurl(httpParser, data, dataSize);
-	} else {
+    if(handler) {
+        /* retrieves the current handler and then unsets it
+        from the connection (detach) then sets the the prper
+        handler in the connection and notifies it of the url */
+        httpConnection->httpHandler->unset(httpConnection);
+        handler->set(httpConnection);
+        httpConnection->httpHandler = handler;
+        httpConnection->httpSettings->onurl(httpParser, data, dataSize);
+    } else {
         /* prints an error message to the output */
-		V_ERROR_F("Error retrieving '%s' handler reference\n", handlerName);
-	}
+        V_ERROR_F("Error retrieving '%s' handler reference\n", handlerName);
+    }
 
     /* releases the url */
     FREE(url);
@@ -268,7 +268,7 @@ ERROR_CODE bodyCallbackHandlerDispatch(struct HttpParser_t *httpParser, const un
 }
 
 ERROR_CODE messageCompleteCallbackHandlerDispatch(struct HttpParser_t *httpParser) {
-	/* sends (and creates) the reponse */
+    /* sends (and creates) the reponse */
     _sendResponseHandlerDispatch(httpParser);
 
     /* raise no error */
