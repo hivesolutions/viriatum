@@ -223,25 +223,21 @@ ERROR_CODE urlCallbackHandlerDispatch(struct HttpParser_t *httpParser, const uns
 
     /* END OF WARNING */
 
-
-
-
-
-
-    /* retrieves the current handler and then unsets it
-    from the connection (detach) */
-    handler = httpConnection->httpHandler;
-    handler->unset(httpConnection);
-
     /* sets the current http handler accoring to the current options
     in the service, the http handler must be loaded in the handlers map
 	in case the handler is not currently available an error is printed */
     getValueStringHashMap(service->httpHandlersMap, handlerName, (void **) &handler);
 	if(handler) {
+		/* retrieves the current handler and then unsets it
+		from the connection (detach) then sets the the prper
+		handler in the connection and notifies it of the url */
+		handler = httpConnection->httpHandler;
+		handler->unset(httpConnection);
 		handler->set(httpConnection);
 		httpConnection->httpHandler = handler;
 		httpConnection->httpSettings->onurl(httpParser, data, dataSize);
 	} else {
+        /* prints an error message to the output */
 		V_ERROR_F("Error retrieving '%s' handler reference\n", handlerName);
 	}
 
