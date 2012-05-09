@@ -535,7 +535,7 @@ ERROR_CODE loadModulesService(struct Service_t *service) {
         /* tries to find the module prefix in the current entry name
         in case it's not found continues the loop immediately no library
         loading is required (not the correct format) */
-        if(strstr((char *) entry->name, "viriatum_") != entry->name) { continue; }
+        if(strstr((char *) entry->name, "viriatum_") != (char *) entry->name) { continue; }
 
         /* loads the module, retrieving a possible error code */
         errorCode = loadModule(service, modulePath);
