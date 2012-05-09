@@ -29,6 +29,35 @@
 
 #include "extension.h"
 
+zend_function_entry viriatumFunctions[] = {
+    PHP_FE(viriatum_connections, NULL)
+    PHP_FE(viriatum_name, NULL)
+    PHP_FE(viriatum_version, NULL)
+    PHP_FE(viriatum_description, NULL)
+    PHP_FE(viriatum_observations, NULL)
+    PHP_FE(viriatum_copyright, NULL)
+    PHP_FE(viriatum_platform_string, NULL)
+    PHP_FE(viriatum_platform_cpu, NULL)
+    { NULL, NULL, NULL }
+};
+
+zend_module_entry viriatumModule = {
+#if ZEND_MODULE_API_NO >= 20010901
+    STANDARD_MODULE_HEADER,
+#endif
+    "viriatum",
+    viriatumFunctions,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+#if ZEND_MODULE_API_NO >= 20010901
+    VIRIATUM_VERSION,
+#endif
+    STANDARD_MODULE_PROPERTIES
+};
+
 PHP_FUNCTION(viriatum_connections) {
     RETURN_LONG(_service->connectionsList->size);
 }
@@ -60,32 +89,3 @@ PHP_FUNCTION(viriatum_platform_string) {
 PHP_FUNCTION(viriatum_platform_cpu) {
     RETURN_STRING(VIRIATUM_PLATFORM_CPU, 1);
 }
-
-zend_function_entry viriatumFunctions[] = {
-    PHP_FE(viriatum_connections, NULL)
-    PHP_FE(viriatum_name, NULL)
-    PHP_FE(viriatum_version, NULL)
-    PHP_FE(viriatum_description, NULL)
-    PHP_FE(viriatum_observations, NULL)
-    PHP_FE(viriatum_copyright, NULL)
-    PHP_FE(viriatum_platform_string, NULL)
-    PHP_FE(viriatum_platform_cpu, NULL)
-    { NULL, NULL, NULL }
-};
-
-zend_module_entry viriatumModule = {
-#if ZEND_MODULE_API_NO >= 20010901
-    STANDARD_MODULE_HEADER,
-#endif
-    "viriatum",
-    viriatumFunctions,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-#if ZEND_MODULE_API_NO >= 20010901
-    VIRIATUM_VERSION,
-#endif
-    STANDARD_MODULE_PROPERTIES
-};
