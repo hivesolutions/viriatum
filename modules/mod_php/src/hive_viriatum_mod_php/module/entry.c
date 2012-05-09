@@ -280,7 +280,6 @@ ERROR_CODE _reloadPhpState() {
 #pragma warning(disable:4700)
 #endif
 ERROR_CODE _startPhpState() {
-
 	zval *_var;
 	zval *_array;
 
