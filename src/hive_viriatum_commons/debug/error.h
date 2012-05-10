@@ -27,6 +27,12 @@
 
 #pragma once
 
+#ifdef VIRIATUM_PLATFORM_WIN32
+#define DEBUGGER __debugbreak();
+#else
+#define DEBUGGER
+#endif
+
 #define EXCEPTION_ERROR_CODE 1
 #define RUNTIME_EXCEPTION_ERROR_CODE 2
 
