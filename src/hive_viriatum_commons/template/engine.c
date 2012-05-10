@@ -117,11 +117,11 @@ ERROR_CODE processTemplateEngine(struct TemplateEngine_t *templateEngine, struct
 
     /* in case the file is not correctly loaded */
     if(file == NULL) {
-		printf("fez raise em error %s\n", filePath);
-
         /* returns immediately (no file found) */
         RAISE_NO_ERROR;
     }
+
+	printf("PASSOU AKI !!!!\n");
 
     /* retrieves the size of the file by seeking to the
     end of it and the seeks the stream back to the initial
