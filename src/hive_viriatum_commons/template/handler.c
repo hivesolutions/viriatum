@@ -266,7 +266,7 @@ void processTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned 
     value, retrieving the final template result */
     joinStringBuffer(templateHandler->stringBuffer, &templateHandler->stringValue);
 
-	printf("fez join string buffer\n");
+	printf("fez join string buffer: %s\n", templateHandler->stringValue);
 
     /* deletes the now unecessary root node */
     deleteTemplateNode(rootNode);
