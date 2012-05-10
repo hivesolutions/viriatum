@@ -31,6 +31,7 @@
 
 zend_function_entry viriatumFunctions[12];
 zend_module_entry viriatumModule;
+sapi_module_struct viriatumSapiModule;
 
 PHP_FUNCTION(viriatum_connections);
 PHP_FUNCTION(viriatum_name);
