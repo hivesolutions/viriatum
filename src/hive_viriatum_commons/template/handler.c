@@ -239,6 +239,9 @@ void processTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned 
     createTemplateNode(&rootNode, TEMPLATE_NODE_ROOT);
     templateHandler->currentNode = rootNode;
 
+	printf("criou template node!!!!\n");
+
+
     /* sets the context (template handler) in the template engine */
     templateEngine->context = templateHandler;
 
@@ -252,6 +255,8 @@ void processTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned 
     templateSettings->onparameter = _parameterCallback;
     templateSettings->onparameterValue = _parameterValueCallback;
 
+	printf("vai processar template engine\n");
+
     /* processes the file as a template engine and then uses the
     created node structure to traverse for string buffer output */
     processTemplateEngine(templateEngine, templateSettings, filePath);
@@ -260,6 +265,8 @@ void processTemplateHandler(struct TemplateHandler_t *templateHandler, unsigned 
     /* "joins" the template handler string buffer into the string
     value, retrieving the final template result */
     joinStringBuffer(templateHandler->stringBuffer, &templateHandler->stringValue);
+
+	printf("fez join string buffer\n");
 
     /* deletes the now unecessary root node */
     deleteTemplateNode(rootNode);
