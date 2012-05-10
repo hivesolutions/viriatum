@@ -117,6 +117,8 @@ ERROR_CODE processTemplateEngine(struct TemplateEngine_t *templateEngine, struct
 
     /* in case the file is not correctly loaded */
     if(file == NULL) {
+		printf("fez raise em error %s\n", filePath);
+
         /* returns immediately (no file found) */
         RAISE_NO_ERROR;
     }
