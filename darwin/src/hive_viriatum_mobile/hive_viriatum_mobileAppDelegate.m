@@ -16,12 +16,23 @@
 @synthesize navigationController = _navigationController;
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    // allocates space for the command line arguments
+    // these are going to be used in the starting of the service
+    struct HashMap_t *arguments;
+    
+    // creates the hashmap used to represent the arguments
+    // from the command line (started as empty)
+    createHashMap(&arguments, 0);
+    
     // Override point for customization after application launch.
     // Add the navigation controller's view to the window and display.
     self.window.rootViewController = self.navigationController;
 
     // start running the service (blocking call)
-    runService();
+    runService(arguments);
+    
+    // deletes the arguments hash map (release memory)
+    deleteHashMap(arguments);
 
     [self.window makeKeyAndVisible];
     return YES;
