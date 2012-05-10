@@ -130,6 +130,8 @@ ERROR_CODE processTemplateEngine(struct TemplateEngine_t *templateEngine, struct
     fileSize = ftell(file);
     fseek(file, 0, SEEK_SET);
 
+	printf("Size %d\n", fileSize);
+
     /* then sets the buffer on the file for reading, this
     operation has serious implications in the file access
     performance (buffered reading )*/
