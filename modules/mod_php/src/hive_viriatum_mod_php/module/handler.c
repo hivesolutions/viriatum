@@ -126,7 +126,7 @@ ERROR_CODE urlCallbackHandlerModule(struct HttpParser_t *httpParser, const unsig
     /* checks the position of the get parameters divisor position
     and then uses it to calculate the size of the (base) path */
     char *pointer = (char *) memchr((char *) data, '?', dataSize);
-    size_t pathSize = pointer == NULL ? dataSize : pointer - data;
+    size_t pathSize = pointer == NULL ? dataSize : pointer - (char *) data;
     size_t querySize = pointer == NULL ? 0 : dataSize - pathSize - 1;
     querySize = querySize > 0 ? querySize : 0;
 

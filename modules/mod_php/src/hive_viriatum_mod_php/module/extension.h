@@ -42,8 +42,8 @@ int _moduleHeader(sapi_header_struct *sapi_header, sapi_header_op_enum op, sapi_
 int _moduleSendHeaders(sapi_headers_struct *sapi_headers TSRMLS_DC);
 int _moduleReadPost(char *buf, uint count_bytes TSRMLS_DC);
 char *_moduleReadCookies(TSRMLS_D);
-static void _moduleRegister(zval *track_vars_array TSRMLS_DC);
-static void _moduleLog(char *msg TSRMLS_DC);
+void _moduleRegister(zval *track_vars_array TSRMLS_DC);
+void _moduleLog(char *msg TSRMLS_DC);
 double _moduleRequestTime(TSRMLS_D);
 PHP_FUNCTION(viriatum_connections);
 PHP_FUNCTION(viriatum_name);

@@ -132,7 +132,7 @@ char *_moduleReadCookies(TSRMLS_D) {
     return NULL;
 }
 
-static void _moduleRegister(zval *track_vars_array TSRMLS_DC) {
+void _moduleRegister(zval *track_vars_array TSRMLS_DC) {
     /* ISTO PARECE SER MUITO LENTO (MELHORAR) usar sempre a mesma alocacao (ver apache) */
     /* nao posso fazer isto por copia */
     add_assoc_string(track_vars_array, "GATEWAY_INTERFACE", "viriatum", 1);
@@ -141,7 +141,7 @@ static void _moduleRegister(zval *track_vars_array TSRMLS_DC) {
     add_assoc_string(track_vars_array, "PHP_SELF", "index.php?=PHPE9568F34-D428-11d2-A769-00AA001ACF42", 1);
 }
 
-static void _moduleLog(char *msg TSRMLS_DC) {
+void _moduleLog(char *msg TSRMLS_DC) {
     V_DEBUG_F("PHP Log: %s\n", msg);
 }
 
