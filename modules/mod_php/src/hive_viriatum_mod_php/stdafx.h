@@ -42,7 +42,7 @@ unsigned char *descriptionViriatumModPhp();
 
 #ifdef VIRIATUM_PLATFORM_MSC
 #ifdef VIRIATUM_DEBUG
-#pragma comment(lib, "php5embed.lib")
+#pragma comment(lib, "php5embed_d.lib")
 #else
 #pragma comment(lib, "php5embed.lib")
 #endif
