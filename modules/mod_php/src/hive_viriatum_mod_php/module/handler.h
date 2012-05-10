@@ -55,6 +55,12 @@ typedef struct HandlerPhpContext_t {
     unsigned char url[1024];
 
     /**
+     * The query string (contents after the '?')
+	 * to be used to create the get parameters map.
+     */
+    unsigned char query[4096];
+
+    /**
      * The path to the file to be handled by
      * the current php request.
      */
@@ -87,3 +93,4 @@ ERROR_CODE _messageBeginCallbackHandlerModule(struct HttpParser_t *httpParser);
 ERROR_CODE _sendResponseHandlerModule(struct HttpParser_t *httpParser);
 ERROR_CODE _sendResponseCallbackHandlerModule(struct Connection_t *connection, struct Data_t *data, void *parameters);
 ERROR_CODE _writeErrorConnection(struct HttpParser_t *httpParser, char *message);
+ERROR_CODE _updateRequest(struct HandlerPhpContext_t *handlerPhpContext);
