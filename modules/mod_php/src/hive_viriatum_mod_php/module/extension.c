@@ -54,7 +54,7 @@ zend_module_entry viriatumModule = {
     NULL,
     NULL,
     NULL,
-    NULL,
+    ZEND_MINFO(viriatum_information),
 #if ZEND_MODULE_API_NO >= 20010901
     VIRIATUM_VERSION,
 #endif
@@ -147,6 +147,15 @@ void _moduleLog(char *message TSRMLS_DC) {
 
 double _moduleRequestTime(TSRMLS_D) {
     return 0;
+}
+
+ZEND_MINFO_FUNCTION(viriatum_information) {
+	php_info_print_table_start();
+	php_info_print_table_row(2, "Name", VIRIATUM_NAME);
+	php_info_print_table_row(2, "Version", VIRIATUM_VERSION);
+	php_info_print_table_row(2, "Compiler", VIRIATUM_COMPILER);
+	php_info_print_table_row(2, "Compilation Date", VIRIATUM_COMPILATION_DATE);
+	php_info_print_table_end();
 }
 
 PHP_FUNCTION(viriatum_connections) {

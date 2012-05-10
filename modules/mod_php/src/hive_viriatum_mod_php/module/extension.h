@@ -45,6 +45,7 @@ char *_moduleReadCookies(TSRMLS_D);
 void _moduleRegister(zval *_array TSRMLS_DC);
 void _moduleLog(char *message TSRMLS_DC);
 double _moduleRequestTime(TSRMLS_D);
+ZEND_MINFO_FUNCTION(viriatum_information);
 PHP_FUNCTION(viriatum_connections);
 PHP_FUNCTION(viriatum_name);
 PHP_FUNCTION(viriatum_version);

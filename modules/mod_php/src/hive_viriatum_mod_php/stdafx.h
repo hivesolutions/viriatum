@@ -31,6 +31,7 @@
 #pragma warning(disable:4005)
 #endif
 #include <sapi/embed/php_embed.h>
+#include <ext/standard/php_standard.h>
 #include "../../../../src/hive_viriatum/viriatum.h"
 #ifdef _MSC_VER
 #pragma warning(default:4005)
