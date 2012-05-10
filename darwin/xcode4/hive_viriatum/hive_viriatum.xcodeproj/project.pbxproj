@@ -8,35 +8,50 @@
 
 /* Begin PBXBuildFile section */
 		C20C2CE51350B71E001E22FB /* libhive_viriatum_commons.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C20C2CE41350B71E001E22FB /* libhive_viriatum_commons.a */; };
-		C218C34F149C5CD200679862 /* info.c in Sources */ = {isa = PBXBuildFile; fileRef = C218C34A149C5CD200679862 /* info.c */; };
-		C218C350149C5CD200679862 /* start.c in Sources */ = {isa = PBXBuildFile; fileRef = C218C34D149C5CD200679862 /* start.c */; };
 		C2565F7E149C556900722EFA /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C2565F7D149C556900722EFA /* UIKit.framework */; };
 		C2565F80149C556A00722EFA /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C2565F7F149C556A00722EFA /* Foundation.framework */; };
 		C2565F82149C556A00722EFA /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C2565F81149C556A00722EFA /* CoreGraphics.framework */; };
 		C2565FCB149C56C300722EFA /* libhive_viriatum_commons_mobile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C2565FCA149C56C300722EFA /* libhive_viriatum_commons_mobile.a */; };
-		C2565FCC149C56E900722EFA /* stream_http.c in Sources */ = {isa = PBXBuildFile; fileRef = C2C025CB148BB726005E5236 /* stream_http.c */; };
-		C2565FCD149C56E900722EFA /* stream_io.c in Sources */ = {isa = PBXBuildFile; fileRef = C2C025CD148BB726005E5236 /* stream_io.c */; };
-		C2565FCE149C56E900722EFA /* polling_epoll.c in Sources */ = {isa = PBXBuildFile; fileRef = C2C025C0148BB70B005E5236 /* polling_epoll.c */; };
-		C2565FCF149C56E900722EFA /* polling_kqueue.c in Sources */ = {isa = PBXBuildFile; fileRef = C2C025C2148BB70B005E5236 /* polling_kqueue.c */; };
-		C2565FD0149C56E900722EFA /* polling_select.c in Sources */ = {isa = PBXBuildFile; fileRef = C2C025C4148BB70B005E5236 /* polling_select.c */; };
-		C2565FD1149C56E900722EFA /* handler_default.c in Sources */ = {isa = PBXBuildFile; fileRef = C2C02574148BB672005E5236 /* handler_default.c */; };
-		C2565FD2149C56E900722EFA /* handler_file.c in Sources */ = {isa = PBXBuildFile; fileRef = C2C02576148BB672005E5236 /* handler_file.c */; };
 		C2565FD3149C56E900722EFA /* viriatum.c in Sources */ = {isa = PBXBuildFile; fileRef = C27406C51350BE2B0050EEAF /* viriatum.c */; };
 		C2565FD4149C56E900722EFA /* stdafx.c in Sources */ = {isa = PBXBuildFile; fileRef = C27406B91350BE2B0050EEAF /* stdafx.c */; };
-		C2565FD5149C56E900722EFA /* http_parser.c in Sources */ = {isa = PBXBuildFile; fileRef = C2C025B9148BB6CD005E5236 /* http_parser.c */; };
-		C2565FD6149C56E900722EFA /* http_request.c in Sources */ = {isa = PBXBuildFile; fileRef = C27406AF1350BE2B0050EEAF /* http_request.c */; };
-		C2565FD7149C56E900722EFA /* file.c in Sources */ = {isa = PBXBuildFile; fileRef = C27406B21350BE2B0050EEAF /* file.c */; };
-		C2565FD8149C56E900722EFA /* loading.c in Sources */ = {isa = PBXBuildFile; fileRef = C27406B61350BE2B0050EEAF /* loading.c */; };
-		C2565FD9149C56E900722EFA /* environment.c in Sources */ = {isa = PBXBuildFile; fileRef = C2C025D1148BB741005E5236 /* environment.c */; };
-		C2565FDA149C56E900722EFA /* service.c in Sources */ = {isa = PBXBuildFile; fileRef = C27406BC1350BE2B0050EEAF /* service.c */; };
-		C2565FDB149C56E900722EFA /* simple_test.c in Sources */ = {isa = PBXBuildFile; fileRef = C27406C21350BE2B0050EEAF /* simple_test.c */; };
-		C27406C71350BE2B0050EEAF /* http_request.c in Sources */ = {isa = PBXBuildFile; fileRef = C27406AF1350BE2B0050EEAF /* http_request.c */; };
-		C27406C81350BE2B0050EEAF /* file.c in Sources */ = {isa = PBXBuildFile; fileRef = C27406B21350BE2B0050EEAF /* file.c */; };
-		C27406C91350BE2B0050EEAF /* loading.c in Sources */ = {isa = PBXBuildFile; fileRef = C27406B61350BE2B0050EEAF /* loading.c */; };
 		C27406CA1350BE2B0050EEAF /* stdafx.c in Sources */ = {isa = PBXBuildFile; fileRef = C27406B91350BE2B0050EEAF /* stdafx.c */; };
-		C27406CB1350BE2B0050EEAF /* service.c in Sources */ = {isa = PBXBuildFile; fileRef = C27406BC1350BE2B0050EEAF /* service.c */; };
-		C27406CD1350BE2B0050EEAF /* simple_test.c in Sources */ = {isa = PBXBuildFile; fileRef = C27406C21350BE2B0050EEAF /* simple_test.c */; };
 		C27406CE1350BE2B0050EEAF /* viriatum.c in Sources */ = {isa = PBXBuildFile; fileRef = C27406C51350BE2B0050EEAF /* viriatum.c */; };
+		C295DF9C155BCAD600036037 /* handler_default.c in Sources */ = {isa = PBXBuildFile; fileRef = C295DF67155BCAD600036037 /* handler_default.c */; };
+		C295DF9D155BCAD600036037 /* handler_default.c in Sources */ = {isa = PBXBuildFile; fileRef = C295DF67155BCAD600036037 /* handler_default.c */; };
+		C295DF9E155BCAD600036037 /* handler_dispatch.c in Sources */ = {isa = PBXBuildFile; fileRef = C295DF69155BCAD600036037 /* handler_dispatch.c */; };
+		C295DF9F155BCAD600036037 /* handler_dispatch.c in Sources */ = {isa = PBXBuildFile; fileRef = C295DF69155BCAD600036037 /* handler_dispatch.c */; };
+		C295DFA0155BCAD600036037 /* handler_file.c in Sources */ = {isa = PBXBuildFile; fileRef = C295DF6B155BCAD600036037 /* handler_file.c */; };
+		C295DFA1155BCAD600036037 /* handler_file.c in Sources */ = {isa = PBXBuildFile; fileRef = C295DF6B155BCAD600036037 /* handler_file.c */; };
+		C295DFA2155BCAD600036037 /* http_parser.c in Sources */ = {isa = PBXBuildFile; fileRef = C295DF70155BCAD600036037 /* http_parser.c */; };
+		C295DFA3155BCAD600036037 /* http_parser.c in Sources */ = {isa = PBXBuildFile; fileRef = C295DF70155BCAD600036037 /* http_parser.c */; };
+		C295DFA4155BCAD600036037 /* http_request.c in Sources */ = {isa = PBXBuildFile; fileRef = C295DF72155BCAD600036037 /* http_request.c */; };
+		C295DFA5155BCAD600036037 /* http_request.c in Sources */ = {isa = PBXBuildFile; fileRef = C295DF72155BCAD600036037 /* http_request.c */; };
+		C295DFA6155BCAD600036037 /* file.c in Sources */ = {isa = PBXBuildFile; fileRef = C295DF75155BCAD600036037 /* file.c */; };
+		C295DFA7155BCAD600036037 /* file.c in Sources */ = {isa = PBXBuildFile; fileRef = C295DF75155BCAD600036037 /* file.c */; };
+		C295DFA8155BCAD600036037 /* info.c in Sources */ = {isa = PBXBuildFile; fileRef = C295DF79155BCAD600036037 /* info.c */; };
+		C295DFA9155BCAD600036037 /* info.c in Sources */ = {isa = PBXBuildFile; fileRef = C295DF79155BCAD600036037 /* info.c */; };
+		C295DFAA155BCAD600036037 /* jni_service.c in Sources */ = {isa = PBXBuildFile; fileRef = C295DF7C155BCAD600036037 /* jni_service.c */; };
+		C295DFAB155BCAD600036037 /* jni_service.c in Sources */ = {isa = PBXBuildFile; fileRef = C295DF7C155BCAD600036037 /* jni_service.c */; };
+		C295DFAC155BCAD600036037 /* start.c in Sources */ = {isa = PBXBuildFile; fileRef = C295DF7E155BCAD600036037 /* start.c */; };
+		C295DFAD155BCAD600036037 /* start.c in Sources */ = {isa = PBXBuildFile; fileRef = C295DF7E155BCAD600036037 /* start.c */; };
+		C295DFAE155BCAD600036037 /* loading.c in Sources */ = {isa = PBXBuildFile; fileRef = C295DF81155BCAD600036037 /* loading.c */; };
+		C295DFAF155BCAD600036037 /* loading.c in Sources */ = {isa = PBXBuildFile; fileRef = C295DF81155BCAD600036037 /* loading.c */; };
+		C295DFB0155BCAD600036037 /* polling_epoll.c in Sources */ = {isa = PBXBuildFile; fileRef = C295DF86155BCAD600036037 /* polling_epoll.c */; };
+		C295DFB1155BCAD600036037 /* polling_epoll.c in Sources */ = {isa = PBXBuildFile; fileRef = C295DF86155BCAD600036037 /* polling_epoll.c */; };
+		C295DFB2155BCAD600036037 /* polling_kqueue.c in Sources */ = {isa = PBXBuildFile; fileRef = C295DF88155BCAD600036037 /* polling_kqueue.c */; };
+		C295DFB3155BCAD600036037 /* polling_kqueue.c in Sources */ = {isa = PBXBuildFile; fileRef = C295DF88155BCAD600036037 /* polling_kqueue.c */; };
+		C295DFB4155BCAD600036037 /* polling_select.c in Sources */ = {isa = PBXBuildFile; fileRef = C295DF8A155BCAD600036037 /* polling_select.c */; };
+		C295DFB5155BCAD600036037 /* polling_select.c in Sources */ = {isa = PBXBuildFile; fileRef = C295DF8A155BCAD600036037 /* polling_select.c */; };
+		C295DFB6155BCAD600036037 /* stream_http.c in Sources */ = {isa = PBXBuildFile; fileRef = C295DF8E155BCAD600036037 /* stream_http.c */; };
+		C295DFB7155BCAD600036037 /* stream_http.c in Sources */ = {isa = PBXBuildFile; fileRef = C295DF8E155BCAD600036037 /* stream_http.c */; };
+		C295DFB8155BCAD600036037 /* stream_io.c in Sources */ = {isa = PBXBuildFile; fileRef = C295DF90155BCAD600036037 /* stream_io.c */; };
+		C295DFB9155BCAD600036037 /* stream_io.c in Sources */ = {isa = PBXBuildFile; fileRef = C295DF90155BCAD600036037 /* stream_io.c */; };
+		C295DFBA155BCAD600036037 /* environment.c in Sources */ = {isa = PBXBuildFile; fileRef = C295DF93155BCAD600036037 /* environment.c */; };
+		C295DFBB155BCAD600036037 /* environment.c in Sources */ = {isa = PBXBuildFile; fileRef = C295DF93155BCAD600036037 /* environment.c */; };
+		C295DFBC155BCAD600036037 /* service.c in Sources */ = {isa = PBXBuildFile; fileRef = C295DF95155BCAD600036037 /* service.c */; };
+		C295DFBD155BCAD600036037 /* service.c in Sources */ = {isa = PBXBuildFile; fileRef = C295DF95155BCAD600036037 /* service.c */; };
+		C295DFBE155BCAD600036037 /* simple_test.c in Sources */ = {isa = PBXBuildFile; fileRef = C295DF99155BCAD600036037 /* simple_test.c */; };
+		C295DFBF155BCAD600036037 /* simple_test.c in Sources */ = {isa = PBXBuildFile; fileRef = C295DF99155BCAD600036037 /* simple_test.c */; };
 		C2AF3C44149CC7E300D28507 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = C2AF3C37149CC7E300D28507 /* InfoPlist.strings */; };
 		C2AF3C45149CC7E300D28507 /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = C2AF3C39149CC7E300D28507 /* MainWindow.xib */; };
 		C2AF3C46149CC7E300D28507 /* RootViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = C2AF3C3B149CC7E300D28507 /* RootViewController.xib */; };
@@ -44,15 +59,6 @@
 		C2AF3C48149CC7E300D28507 /* hive_viriatum_mobileAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = C2AF3C40149CC7E300D28507 /* hive_viriatum_mobileAppDelegate.m */; };
 		C2AF3C49149CC7E300D28507 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = C2AF3C41149CC7E300D28507 /* main.m */; };
 		C2AF3C4A149CC7E300D28507 /* RootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C2AF3C43149CC7E300D28507 /* RootViewController.m */; };
-		C2C02579148BB672005E5236 /* handler_default.c in Sources */ = {isa = PBXBuildFile; fileRef = C2C02574148BB672005E5236 /* handler_default.c */; };
-		C2C0257A148BB672005E5236 /* handler_file.c in Sources */ = {isa = PBXBuildFile; fileRef = C2C02576148BB672005E5236 /* handler_file.c */; };
-		C2C025BB148BB6CD005E5236 /* http_parser.c in Sources */ = {isa = PBXBuildFile; fileRef = C2C025B9148BB6CD005E5236 /* http_parser.c */; };
-		C2C025C6148BB70B005E5236 /* polling_epoll.c in Sources */ = {isa = PBXBuildFile; fileRef = C2C025C0148BB70B005E5236 /* polling_epoll.c */; };
-		C2C025C7148BB70B005E5236 /* polling_kqueue.c in Sources */ = {isa = PBXBuildFile; fileRef = C2C025C2148BB70B005E5236 /* polling_kqueue.c */; };
-		C2C025C8148BB70B005E5236 /* polling_select.c in Sources */ = {isa = PBXBuildFile; fileRef = C2C025C4148BB70B005E5236 /* polling_select.c */; };
-		C2C025CF148BB726005E5236 /* stream_http.c in Sources */ = {isa = PBXBuildFile; fileRef = C2C025CB148BB726005E5236 /* stream_http.c */; };
-		C2C025D0148BB726005E5236 /* stream_io.c in Sources */ = {isa = PBXBuildFile; fileRef = C2C025CD148BB726005E5236 /* stream_io.c */; };
-		C2C025D3148BB741005E5236 /* environment.c in Sources */ = {isa = PBXBuildFile; fileRef = C2C025D1148BB741005E5236 /* environment.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -88,37 +94,65 @@
 		C20C2BBF1350B5D7001E22FB /* hive_viriatum */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = hive_viriatum; sourceTree = BUILT_PRODUCTS_DIR; };
 		C20C2C741350B6A9001E22FB /* hive_viriatum_commons.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = hive_viriatum_commons.xcodeproj; path = ../hive_viriatum_commons/hive_viriatum_commons.xcodeproj; sourceTree = "<group>"; };
 		C20C2CE41350B71E001E22FB /* libhive_viriatum_commons.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libhive_viriatum_commons.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		C218C34A149C5CD200679862 /* info.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = info.c; sourceTree = "<group>"; };
-		C218C34B149C5CD200679862 /* info.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = info.h; sourceTree = "<group>"; };
-		C218C34C149C5CD200679862 /* jni.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = jni.h; sourceTree = "<group>"; };
-		C218C34D149C5CD200679862 /* start.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = start.c; sourceTree = "<group>"; };
-		C218C34E149C5CD200679862 /* start.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = start.h; sourceTree = "<group>"; };
 		C2565F7B149C556900722EFA /* hive_viriatum_mobile.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = hive_viriatum_mobile.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C2565F7D149C556900722EFA /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
 		C2565F7F149C556A00722EFA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		C2565F81149C556A00722EFA /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = Library/Frameworks/CoreGraphics.framework; sourceTree = DEVELOPER_DIR; };
-		C27406AB1350BE2B0050EEAF /* resource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = resource.h; sourceTree = "<group>"; };
-		C27406AC1350BE2B0050EEAF /* targetver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = targetver.h; sourceTree = "<group>"; };
-		C27406AE1350BE2B0050EEAF /* http.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = http.h; sourceTree = "<group>"; };
-		C27406AF1350BE2B0050EEAF /* http_request.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = http_request.c; sourceTree = "<group>"; };
-		C27406B01350BE2B0050EEAF /* http_request.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = http_request.h; sourceTree = "<group>"; };
-		C27406B21350BE2B0050EEAF /* file.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = file.c; sourceTree = "<group>"; };
-		C27406B31350BE2B0050EEAF /* file.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = file.h; sourceTree = "<group>"; };
-		C27406B41350BE2B0050EEAF /* io.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = io.h; sourceTree = "<group>"; };
-		C27406B61350BE2B0050EEAF /* loading.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = loading.c; sourceTree = "<group>"; };
-		C27406B71350BE2B0050EEAF /* loading.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = loading.h; sourceTree = "<group>"; };
-		C27406B81350BE2B0050EEAF /* module.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = module.h; sourceTree = "<group>"; };
 		C27406B91350BE2B0050EEAF /* stdafx.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = stdafx.c; path = ../../../src/hive_viriatum/stdafx.c; sourceTree = "<group>"; };
 		C27406BA1350BE2B0050EEAF /* stdafx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = stdafx.h; path = ../../../src/hive_viriatum/stdafx.h; sourceTree = "<group>"; };
-		C27406BC1350BE2B0050EEAF /* service.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = service.c; sourceTree = "<group>"; };
-		C27406BD1350BE2B0050EEAF /* service.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = service.h; sourceTree = "<group>"; };
-		C27406C01350BE2B0050EEAF /* system.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = system.h; sourceTree = "<group>"; };
-		C27406C21350BE2B0050EEAF /* simple_test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = simple_test.c; sourceTree = "<group>"; };
-		C27406C31350BE2B0050EEAF /* simple_test.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = simple_test.h; sourceTree = "<group>"; };
-		C27406C41350BE2B0050EEAF /* test.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = test.h; sourceTree = "<group>"; };
 		C27406C51350BE2B0050EEAF /* viriatum.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = viriatum.c; path = ../../../src/hive_viriatum/viriatum.c; sourceTree = "<group>"; };
 		C27406C61350BE2B0050EEAF /* viriatum.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = viriatum.h; path = ../../../src/hive_viriatum/viriatum.h; sourceTree = "<group>"; };
 		C292A4EA149C49C7005716FF /* _config_win32.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = _config_win32.h; path = ../../../src/hive_viriatum/_config_win32.h; sourceTree = "<group>"; };
+		C295DF60155BCAD600036037 /* base.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = base.h; sourceTree = "<group>"; };
+		C295DF61155BCAD600036037 /* entry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = entry.h; sourceTree = "<group>"; };
+		C295DF63155BCAD600036037 /* definitions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = definitions.h; sourceTree = "<group>"; };
+		C295DF64155BCAD600036037 /* resource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = resource.h; sourceTree = "<group>"; };
+		C295DF65155BCAD600036037 /* targetver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = targetver.h; sourceTree = "<group>"; };
+		C295DF67155BCAD600036037 /* handler_default.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = handler_default.c; sourceTree = "<group>"; };
+		C295DF68155BCAD600036037 /* handler_default.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = handler_default.h; sourceTree = "<group>"; };
+		C295DF69155BCAD600036037 /* handler_dispatch.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = handler_dispatch.c; sourceTree = "<group>"; };
+		C295DF6A155BCAD600036037 /* handler_dispatch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = handler_dispatch.h; sourceTree = "<group>"; };
+		C295DF6B155BCAD600036037 /* handler_file.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = handler_file.c; sourceTree = "<group>"; };
+		C295DF6C155BCAD600036037 /* handler_file.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = handler_file.h; sourceTree = "<group>"; };
+		C295DF6D155BCAD600036037 /* handlers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = handlers.h; sourceTree = "<group>"; };
+		C295DF6F155BCAD600036037 /* http.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = http.h; sourceTree = "<group>"; };
+		C295DF70155BCAD600036037 /* http_parser.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = http_parser.c; sourceTree = "<group>"; };
+		C295DF71155BCAD600036037 /* http_parser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = http_parser.h; sourceTree = "<group>"; };
+		C295DF72155BCAD600036037 /* http_request.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = http_request.c; sourceTree = "<group>"; };
+		C295DF73155BCAD600036037 /* http_request.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = http_request.h; sourceTree = "<group>"; };
+		C295DF75155BCAD600036037 /* file.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = file.c; sourceTree = "<group>"; };
+		C295DF76155BCAD600036037 /* file.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = file.h; sourceTree = "<group>"; };
+		C295DF77155BCAD600036037 /* io.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = io.h; sourceTree = "<group>"; };
+		C295DF79155BCAD600036037 /* info.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = info.c; sourceTree = "<group>"; };
+		C295DF7A155BCAD600036037 /* info.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = info.h; sourceTree = "<group>"; };
+		C295DF7B155BCAD600036037 /* jni.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = jni.h; sourceTree = "<group>"; };
+		C295DF7C155BCAD600036037 /* jni_service.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = jni_service.c; sourceTree = "<group>"; };
+		C295DF7D155BCAD600036037 /* jni_service.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = jni_service.h; sourceTree = "<group>"; };
+		C295DF7E155BCAD600036037 /* start.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = start.c; sourceTree = "<group>"; };
+		C295DF7F155BCAD600036037 /* start.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = start.h; sourceTree = "<group>"; };
+		C295DF81155BCAD600036037 /* loading.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = loading.c; sourceTree = "<group>"; };
+		C295DF82155BCAD600036037 /* loading.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = loading.h; sourceTree = "<group>"; };
+		C295DF83155BCAD600036037 /* module.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = module.h; sourceTree = "<group>"; };
+		C295DF85155BCAD600036037 /* polling.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = polling.h; sourceTree = "<group>"; };
+		C295DF86155BCAD600036037 /* polling_epoll.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = polling_epoll.c; sourceTree = "<group>"; };
+		C295DF87155BCAD600036037 /* polling_epoll.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = polling_epoll.h; sourceTree = "<group>"; };
+		C295DF88155BCAD600036037 /* polling_kqueue.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = polling_kqueue.c; sourceTree = "<group>"; };
+		C295DF89155BCAD600036037 /* polling_kqueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = polling_kqueue.h; sourceTree = "<group>"; };
+		C295DF8A155BCAD600036037 /* polling_select.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = polling_select.c; sourceTree = "<group>"; };
+		C295DF8B155BCAD600036037 /* polling_select.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = polling_select.h; sourceTree = "<group>"; };
+		C295DF8D155BCAD600036037 /* stream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stream.h; sourceTree = "<group>"; };
+		C295DF8E155BCAD600036037 /* stream_http.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = stream_http.c; sourceTree = "<group>"; };
+		C295DF8F155BCAD600036037 /* stream_http.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stream_http.h; sourceTree = "<group>"; };
+		C295DF90155BCAD600036037 /* stream_io.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = stream_io.c; sourceTree = "<group>"; };
+		C295DF91155BCAD600036037 /* stream_io.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stream_io.h; sourceTree = "<group>"; };
+		C295DF93155BCAD600036037 /* environment.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = environment.c; sourceTree = "<group>"; };
+		C295DF94155BCAD600036037 /* environment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = environment.h; sourceTree = "<group>"; };
+		C295DF95155BCAD600036037 /* service.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = service.c; sourceTree = "<group>"; };
+		C295DF96155BCAD600036037 /* service.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = service.h; sourceTree = "<group>"; };
+		C295DF97155BCAD600036037 /* system.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = system.h; sourceTree = "<group>"; };
+		C295DF99155BCAD600036037 /* simple_test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = simple_test.c; sourceTree = "<group>"; };
+		C295DF9A155BCAD600036037 /* simple_test.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = simple_test.h; sourceTree = "<group>"; };
+		C295DF9B155BCAD600036037 /* test.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = test.h; sourceTree = "<group>"; };
 		C2AF3C38149CC7E300D28507 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		C2AF3C3A149CC7E300D28507 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainWindow.xib; sourceTree = "<group>"; };
 		C2AF3C3C149CC7E300D28507 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/RootViewController.xib; sourceTree = "<group>"; };
@@ -129,28 +163,6 @@
 		C2AF3C41149CC7E300D28507 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		C2AF3C42149CC7E300D28507 /* RootViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RootViewController.h; sourceTree = "<group>"; };
 		C2AF3C43149CC7E300D28507 /* RootViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RootViewController.m; sourceTree = "<group>"; };
-		C2C02574148BB672005E5236 /* handler_default.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = handler_default.c; sourceTree = "<group>"; };
-		C2C02575148BB672005E5236 /* handler_default.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = handler_default.h; sourceTree = "<group>"; };
-		C2C02576148BB672005E5236 /* handler_file.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = handler_file.c; sourceTree = "<group>"; };
-		C2C02577148BB672005E5236 /* handler_file.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = handler_file.h; sourceTree = "<group>"; };
-		C2C02578148BB672005E5236 /* handlers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = handlers.h; sourceTree = "<group>"; };
-		C2C025B9148BB6CD005E5236 /* http_parser.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = http_parser.c; sourceTree = "<group>"; };
-		C2C025BA148BB6CD005E5236 /* http_parser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = http_parser.h; sourceTree = "<group>"; };
-		C2C025BC148BB6EF005E5236 /* definitions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = definitions.h; sourceTree = "<group>"; };
-		C2C025BF148BB70B005E5236 /* polling.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = polling.h; sourceTree = "<group>"; };
-		C2C025C0148BB70B005E5236 /* polling_epoll.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = polling_epoll.c; sourceTree = "<group>"; };
-		C2C025C1148BB70B005E5236 /* polling_epoll.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = polling_epoll.h; sourceTree = "<group>"; };
-		C2C025C2148BB70B005E5236 /* polling_kqueue.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = polling_kqueue.c; sourceTree = "<group>"; };
-		C2C025C3148BB70B005E5236 /* polling_kqueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = polling_kqueue.h; sourceTree = "<group>"; };
-		C2C025C4148BB70B005E5236 /* polling_select.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = polling_select.c; sourceTree = "<group>"; };
-		C2C025C5148BB70B005E5236 /* polling_select.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = polling_select.h; sourceTree = "<group>"; };
-		C2C025CA148BB726005E5236 /* stream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stream.h; sourceTree = "<group>"; };
-		C2C025CB148BB726005E5236 /* stream_http.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = stream_http.c; sourceTree = "<group>"; };
-		C2C025CC148BB726005E5236 /* stream_http.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stream_http.h; sourceTree = "<group>"; };
-		C2C025CD148BB726005E5236 /* stream_io.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = stream_io.c; sourceTree = "<group>"; };
-		C2C025CE148BB726005E5236 /* stream_io.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stream_io.h; sourceTree = "<group>"; };
-		C2C025D1148BB741005E5236 /* environment.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = environment.c; sourceTree = "<group>"; };
-		C2C025D2148BB741005E5236 /* environment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = environment.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -204,109 +216,27 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		C218C349149C5CD200679862 /* jni */ = {
-			isa = PBXGroup;
-			children = (
-				C218C34A149C5CD200679862 /* info.c */,
-				C218C34B149C5CD200679862 /* info.h */,
-				C218C34C149C5CD200679862 /* jni.h */,
-				C218C34D149C5CD200679862 /* start.c */,
-				C218C34E149C5CD200679862 /* start.h */,
-			);
-			name = jni;
-			path = ../../../src/hive_viriatum_commons/jni;
-			sourceTree = "<group>";
-		};
 		C27406A41350BDF10050EEAF /* Classes */ = {
 			isa = PBXGroup;
 			children = (
 				C2AF3C36149CC7E300D28507 /* hive_viriatum_mobile */,
-				C27406CF1350BE350050EEAF /* base */,
-				C27406AA1350BE2B0050EEAF /* global */,
-				C2C02573148BB672005E5236 /* handlers */,
-				C27406AD1350BE2B0050EEAF /* http */,
-				C27406B11350BE2B0050EEAF /* io */,
-				C218C349149C5CD200679862 /* jni */,
-				C27406B51350BE2B0050EEAF /* module */,
-				C2C025BE148BB70B005E5236 /* polling */,
-				C2C025C9148BB726005E5236 /* stream */,
-				C27406BB1350BE2B0050EEAF /* system */,
-				C27406C11350BE2B0050EEAF /* test */,
+				C27406CF1350BE350050EEAF /* root */,
+				C295DF5F155BCAD600036037 /* base */,
+				C295DF62155BCAD600036037 /* global */,
+				C295DF66155BCAD600036037 /* handlers */,
+				C295DF6E155BCAD600036037 /* http */,
+				C295DF74155BCAD600036037 /* io */,
+				C295DF78155BCAD600036037 /* jni */,
+				C295DF80155BCAD600036037 /* module */,
+				C295DF84155BCAD600036037 /* polling */,
+				C295DF8C155BCAD600036037 /* stream */,
+				C295DF92155BCAD600036037 /* system */,
+				C295DF98155BCAD600036037 /* test */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
 		};
-		C27406AA1350BE2B0050EEAF /* global */ = {
-			isa = PBXGroup;
-			children = (
-				C2C025BC148BB6EF005E5236 /* definitions.h */,
-				C27406AB1350BE2B0050EEAF /* resource.h */,
-				C27406AC1350BE2B0050EEAF /* targetver.h */,
-			);
-			name = global;
-			path = ../../../src/hive_viriatum/global;
-			sourceTree = "<group>";
-		};
-		C27406AD1350BE2B0050EEAF /* http */ = {
-			isa = PBXGroup;
-			children = (
-				C2C025B9148BB6CD005E5236 /* http_parser.c */,
-				C2C025BA148BB6CD005E5236 /* http_parser.h */,
-				C27406AE1350BE2B0050EEAF /* http.h */,
-				C27406AF1350BE2B0050EEAF /* http_request.c */,
-				C27406B01350BE2B0050EEAF /* http_request.h */,
-			);
-			name = http;
-			path = ../../../src/hive_viriatum/http;
-			sourceTree = "<group>";
-		};
-		C27406B11350BE2B0050EEAF /* io */ = {
-			isa = PBXGroup;
-			children = (
-				C27406B21350BE2B0050EEAF /* file.c */,
-				C27406B31350BE2B0050EEAF /* file.h */,
-				C27406B41350BE2B0050EEAF /* io.h */,
-			);
-			name = io;
-			path = ../../../src/hive_viriatum/io;
-			sourceTree = "<group>";
-		};
-		C27406B51350BE2B0050EEAF /* module */ = {
-			isa = PBXGroup;
-			children = (
-				C27406B61350BE2B0050EEAF /* loading.c */,
-				C27406B71350BE2B0050EEAF /* loading.h */,
-				C27406B81350BE2B0050EEAF /* module.h */,
-			);
-			name = module;
-			path = ../../../src/hive_viriatum/module;
-			sourceTree = "<group>";
-		};
-		C27406BB1350BE2B0050EEAF /* system */ = {
-			isa = PBXGroup;
-			children = (
-				C2C025D1148BB741005E5236 /* environment.c */,
-				C2C025D2148BB741005E5236 /* environment.h */,
-				C27406BC1350BE2B0050EEAF /* service.c */,
-				C27406BD1350BE2B0050EEAF /* service.h */,
-				C27406C01350BE2B0050EEAF /* system.h */,
-			);
-			name = system;
-			path = ../../../src/hive_viriatum/system;
-			sourceTree = "<group>";
-		};
-		C27406C11350BE2B0050EEAF /* test */ = {
-			isa = PBXGroup;
-			children = (
-				C27406C21350BE2B0050EEAF /* simple_test.c */,
-				C27406C31350BE2B0050EEAF /* simple_test.h */,
-				C27406C41350BE2B0050EEAF /* test.h */,
-			);
-			name = test;
-			path = ../../../src/hive_viriatum/test;
-			sourceTree = "<group>";
-		};
-		C27406CF1350BE350050EEAF /* base */ = {
+		C27406CF1350BE350050EEAF /* root */ = {
 			isa = PBXGroup;
 			children = (
 				C292A4EA149C49C7005716FF /* _config_win32.h */,
@@ -315,7 +245,7 @@
 				C27406B91350BE2B0050EEAF /* stdafx.c */,
 				C27406BA1350BE2B0050EEAF /* stdafx.h */,
 			);
-			name = base;
+			name = root;
 			sourceTree = "<group>";
 		};
 		C294CBBA1350BED0000B52B4 /* Frameworks */ = {
@@ -327,6 +257,144 @@
 				C2565F81149C556A00722EFA /* CoreGraphics.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		C295DF5F155BCAD600036037 /* base */ = {
+			isa = PBXGroup;
+			children = (
+				C295DF60155BCAD600036037 /* base.h */,
+				C295DF61155BCAD600036037 /* entry.h */,
+			);
+			name = base;
+			path = ../../../src/hive_viriatum/base;
+			sourceTree = "<group>";
+		};
+		C295DF62155BCAD600036037 /* global */ = {
+			isa = PBXGroup;
+			children = (
+				C295DF63155BCAD600036037 /* definitions.h */,
+				C295DF64155BCAD600036037 /* resource.h */,
+				C295DF65155BCAD600036037 /* targetver.h */,
+			);
+			name = global;
+			path = ../../../src/hive_viriatum/global;
+			sourceTree = "<group>";
+		};
+		C295DF66155BCAD600036037 /* handlers */ = {
+			isa = PBXGroup;
+			children = (
+				C295DF67155BCAD600036037 /* handler_default.c */,
+				C295DF68155BCAD600036037 /* handler_default.h */,
+				C295DF69155BCAD600036037 /* handler_dispatch.c */,
+				C295DF6A155BCAD600036037 /* handler_dispatch.h */,
+				C295DF6B155BCAD600036037 /* handler_file.c */,
+				C295DF6C155BCAD600036037 /* handler_file.h */,
+				C295DF6D155BCAD600036037 /* handlers.h */,
+			);
+			name = handlers;
+			path = ../../../src/hive_viriatum/handlers;
+			sourceTree = "<group>";
+		};
+		C295DF6E155BCAD600036037 /* http */ = {
+			isa = PBXGroup;
+			children = (
+				C295DF6F155BCAD600036037 /* http.h */,
+				C295DF70155BCAD600036037 /* http_parser.c */,
+				C295DF71155BCAD600036037 /* http_parser.h */,
+				C295DF72155BCAD600036037 /* http_request.c */,
+				C295DF73155BCAD600036037 /* http_request.h */,
+			);
+			name = http;
+			path = ../../../src/hive_viriatum/http;
+			sourceTree = "<group>";
+		};
+		C295DF74155BCAD600036037 /* io */ = {
+			isa = PBXGroup;
+			children = (
+				C295DF75155BCAD600036037 /* file.c */,
+				C295DF76155BCAD600036037 /* file.h */,
+				C295DF77155BCAD600036037 /* io.h */,
+			);
+			name = io;
+			path = ../../../src/hive_viriatum/io;
+			sourceTree = "<group>";
+		};
+		C295DF78155BCAD600036037 /* jni */ = {
+			isa = PBXGroup;
+			children = (
+				C295DF79155BCAD600036037 /* info.c */,
+				C295DF7A155BCAD600036037 /* info.h */,
+				C295DF7B155BCAD600036037 /* jni.h */,
+				C295DF7C155BCAD600036037 /* jni_service.c */,
+				C295DF7D155BCAD600036037 /* jni_service.h */,
+				C295DF7E155BCAD600036037 /* start.c */,
+				C295DF7F155BCAD600036037 /* start.h */,
+			);
+			name = jni;
+			path = ../../../src/hive_viriatum/jni;
+			sourceTree = "<group>";
+		};
+		C295DF80155BCAD600036037 /* module */ = {
+			isa = PBXGroup;
+			children = (
+				C295DF81155BCAD600036037 /* loading.c */,
+				C295DF82155BCAD600036037 /* loading.h */,
+				C295DF83155BCAD600036037 /* module.h */,
+			);
+			name = module;
+			path = ../../../src/hive_viriatum/module;
+			sourceTree = "<group>";
+		};
+		C295DF84155BCAD600036037 /* polling */ = {
+			isa = PBXGroup;
+			children = (
+				C295DF85155BCAD600036037 /* polling.h */,
+				C295DF86155BCAD600036037 /* polling_epoll.c */,
+				C295DF87155BCAD600036037 /* polling_epoll.h */,
+				C295DF88155BCAD600036037 /* polling_kqueue.c */,
+				C295DF89155BCAD600036037 /* polling_kqueue.h */,
+				C295DF8A155BCAD600036037 /* polling_select.c */,
+				C295DF8B155BCAD600036037 /* polling_select.h */,
+			);
+			name = polling;
+			path = ../../../src/hive_viriatum/polling;
+			sourceTree = "<group>";
+		};
+		C295DF8C155BCAD600036037 /* stream */ = {
+			isa = PBXGroup;
+			children = (
+				C295DF8D155BCAD600036037 /* stream.h */,
+				C295DF8E155BCAD600036037 /* stream_http.c */,
+				C295DF8F155BCAD600036037 /* stream_http.h */,
+				C295DF90155BCAD600036037 /* stream_io.c */,
+				C295DF91155BCAD600036037 /* stream_io.h */,
+			);
+			name = stream;
+			path = ../../../src/hive_viriatum/stream;
+			sourceTree = "<group>";
+		};
+		C295DF92155BCAD600036037 /* system */ = {
+			isa = PBXGroup;
+			children = (
+				C295DF93155BCAD600036037 /* environment.c */,
+				C295DF94155BCAD600036037 /* environment.h */,
+				C295DF95155BCAD600036037 /* service.c */,
+				C295DF96155BCAD600036037 /* service.h */,
+				C295DF97155BCAD600036037 /* system.h */,
+			);
+			name = system;
+			path = ../../../src/hive_viriatum/system;
+			sourceTree = "<group>";
+		};
+		C295DF98155BCAD600036037 /* test */ = {
+			isa = PBXGroup;
+			children = (
+				C295DF99155BCAD600036037 /* simple_test.c */,
+				C295DF9A155BCAD600036037 /* simple_test.h */,
+				C295DF9B155BCAD600036037 /* test.h */,
+			);
+			name = test;
+			path = ../../../src/hive_viriatum/test;
 			sourceTree = "<group>";
 		};
 		C2AF3C36149CC7E300D28507 /* hive_viriatum_mobile */ = {
@@ -345,47 +413,6 @@
 			);
 			name = hive_viriatum_mobile;
 			path = ../../src/hive_viriatum_mobile;
-			sourceTree = "<group>";
-		};
-		C2C02573148BB672005E5236 /* handlers */ = {
-			isa = PBXGroup;
-			children = (
-				C2C02574148BB672005E5236 /* handler_default.c */,
-				C2C02575148BB672005E5236 /* handler_default.h */,
-				C2C02576148BB672005E5236 /* handler_file.c */,
-				C2C02577148BB672005E5236 /* handler_file.h */,
-				C2C02578148BB672005E5236 /* handlers.h */,
-			);
-			name = handlers;
-			path = ../../../src/hive_viriatum/handlers;
-			sourceTree = "<group>";
-		};
-		C2C025BE148BB70B005E5236 /* polling */ = {
-			isa = PBXGroup;
-			children = (
-				C2C025BF148BB70B005E5236 /* polling.h */,
-				C2C025C0148BB70B005E5236 /* polling_epoll.c */,
-				C2C025C1148BB70B005E5236 /* polling_epoll.h */,
-				C2C025C2148BB70B005E5236 /* polling_kqueue.c */,
-				C2C025C3148BB70B005E5236 /* polling_kqueue.h */,
-				C2C025C4148BB70B005E5236 /* polling_select.c */,
-				C2C025C5148BB70B005E5236 /* polling_select.h */,
-			);
-			name = polling;
-			path = ../../../src/hive_viriatum/polling;
-			sourceTree = "<group>";
-		};
-		C2C025C9148BB726005E5236 /* stream */ = {
-			isa = PBXGroup;
-			children = (
-				C2C025CA148BB726005E5236 /* stream.h */,
-				C2C025CB148BB726005E5236 /* stream_http.c */,
-				C2C025CC148BB726005E5236 /* stream_http.h */,
-				C2C025CD148BB726005E5236 /* stream_io.c */,
-				C2C025CE148BB726005E5236 /* stream_io.h */,
-			);
-			name = stream;
-			path = ../../../src/hive_viriatum/stream;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -490,24 +517,26 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C27406C71350BE2B0050EEAF /* http_request.c in Sources */,
-				C27406C81350BE2B0050EEAF /* file.c in Sources */,
-				C27406C91350BE2B0050EEAF /* loading.c in Sources */,
 				C27406CA1350BE2B0050EEAF /* stdafx.c in Sources */,
-				C27406CB1350BE2B0050EEAF /* service.c in Sources */,
-				C27406CD1350BE2B0050EEAF /* simple_test.c in Sources */,
 				C27406CE1350BE2B0050EEAF /* viriatum.c in Sources */,
-				C2C02579148BB672005E5236 /* handler_default.c in Sources */,
-				C2C0257A148BB672005E5236 /* handler_file.c in Sources */,
-				C2C025BB148BB6CD005E5236 /* http_parser.c in Sources */,
-				C2C025C6148BB70B005E5236 /* polling_epoll.c in Sources */,
-				C2C025C7148BB70B005E5236 /* polling_kqueue.c in Sources */,
-				C2C025C8148BB70B005E5236 /* polling_select.c in Sources */,
-				C2C025CF148BB726005E5236 /* stream_http.c in Sources */,
-				C2C025D0148BB726005E5236 /* stream_io.c in Sources */,
-				C2C025D3148BB741005E5236 /* environment.c in Sources */,
-				C218C34F149C5CD200679862 /* info.c in Sources */,
-				C218C350149C5CD200679862 /* start.c in Sources */,
+				C295DF9C155BCAD600036037 /* handler_default.c in Sources */,
+				C295DF9E155BCAD600036037 /* handler_dispatch.c in Sources */,
+				C295DFA0155BCAD600036037 /* handler_file.c in Sources */,
+				C295DFA2155BCAD600036037 /* http_parser.c in Sources */,
+				C295DFA4155BCAD600036037 /* http_request.c in Sources */,
+				C295DFA6155BCAD600036037 /* file.c in Sources */,
+				C295DFA8155BCAD600036037 /* info.c in Sources */,
+				C295DFAA155BCAD600036037 /* jni_service.c in Sources */,
+				C295DFAC155BCAD600036037 /* start.c in Sources */,
+				C295DFAE155BCAD600036037 /* loading.c in Sources */,
+				C295DFB0155BCAD600036037 /* polling_epoll.c in Sources */,
+				C295DFB2155BCAD600036037 /* polling_kqueue.c in Sources */,
+				C295DFB4155BCAD600036037 /* polling_select.c in Sources */,
+				C295DFB6155BCAD600036037 /* stream_http.c in Sources */,
+				C295DFB8155BCAD600036037 /* stream_io.c in Sources */,
+				C295DFBA155BCAD600036037 /* environment.c in Sources */,
+				C295DFBC155BCAD600036037 /* service.c in Sources */,
+				C295DFBE155BCAD600036037 /* simple_test.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -515,25 +544,29 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C2565FCC149C56E900722EFA /* stream_http.c in Sources */,
-				C2565FCD149C56E900722EFA /* stream_io.c in Sources */,
-				C2565FCE149C56E900722EFA /* polling_epoll.c in Sources */,
-				C2565FCF149C56E900722EFA /* polling_kqueue.c in Sources */,
-				C2565FD0149C56E900722EFA /* polling_select.c in Sources */,
-				C2565FD1149C56E900722EFA /* handler_default.c in Sources */,
-				C2565FD2149C56E900722EFA /* handler_file.c in Sources */,
 				C2565FD3149C56E900722EFA /* viriatum.c in Sources */,
 				C2565FD4149C56E900722EFA /* stdafx.c in Sources */,
-				C2565FD5149C56E900722EFA /* http_parser.c in Sources */,
-				C2565FD6149C56E900722EFA /* http_request.c in Sources */,
-				C2565FD7149C56E900722EFA /* file.c in Sources */,
-				C2565FD8149C56E900722EFA /* loading.c in Sources */,
-				C2565FD9149C56E900722EFA /* environment.c in Sources */,
-				C2565FDA149C56E900722EFA /* service.c in Sources */,
-				C2565FDB149C56E900722EFA /* simple_test.c in Sources */,
 				C2AF3C48149CC7E300D28507 /* hive_viriatum_mobileAppDelegate.m in Sources */,
 				C2AF3C49149CC7E300D28507 /* main.m in Sources */,
 				C2AF3C4A149CC7E300D28507 /* RootViewController.m in Sources */,
+				C295DF9D155BCAD600036037 /* handler_default.c in Sources */,
+				C295DF9F155BCAD600036037 /* handler_dispatch.c in Sources */,
+				C295DFA1155BCAD600036037 /* handler_file.c in Sources */,
+				C295DFA3155BCAD600036037 /* http_parser.c in Sources */,
+				C295DFA5155BCAD600036037 /* http_request.c in Sources */,
+				C295DFA7155BCAD600036037 /* file.c in Sources */,
+				C295DFA9155BCAD600036037 /* info.c in Sources */,
+				C295DFAB155BCAD600036037 /* jni_service.c in Sources */,
+				C295DFAD155BCAD600036037 /* start.c in Sources */,
+				C295DFAF155BCAD600036037 /* loading.c in Sources */,
+				C295DFB1155BCAD600036037 /* polling_epoll.c in Sources */,
+				C295DFB3155BCAD600036037 /* polling_kqueue.c in Sources */,
+				C295DFB5155BCAD600036037 /* polling_select.c in Sources */,
+				C295DFB7155BCAD600036037 /* stream_http.c in Sources */,
+				C295DFB9155BCAD600036037 /* stream_io.c in Sources */,
+				C295DFBB155BCAD600036037 /* environment.c in Sources */,
+				C295DFBD155BCAD600036037 /* service.c in Sources */,
+				C295DFBF155BCAD600036037 /* simple_test.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
