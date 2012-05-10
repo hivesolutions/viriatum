@@ -121,16 +121,12 @@ ERROR_CODE processTemplateEngine(struct TemplateEngine_t *templateEngine, struct
         RAISE_NO_ERROR;
     }
 
-	printf("PASSOU AKI !!!!\n");
-
     /* retrieves the size of the file by seeking to the
     end of it and the seeks the stream back to the initial
     position (for further reading) */
     fseek(file, 0, SEEK_END);
     fileSize = ftell(file);
     fseek(file, 0, SEEK_SET);
-
-	printf("Size %d\n", fileSize);
 
     /* then sets the buffer on the file for reading, this
     operation has serious implications in the file access
