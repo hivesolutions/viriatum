@@ -125,7 +125,7 @@ ERROR_CODE processTemplateEngine(struct TemplateEngine_t *templateEngine, struct
     operation has serious implications in the file access
     performance (buffered reading )*/
     setvbuf(file, _fileBuffer, _IOFBF, ENGINE_BUFFER_SIZE);
-    
+
     /* retrieves the size of the file by seeking to the
     end of it and the seeks the stream back to the initial
     position (for further reading) */

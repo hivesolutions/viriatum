@@ -240,26 +240,26 @@ ERROR_CODE _loadPhpState() {
     php_embed_module.log_message = _logPhpState;
     php_embed_module.sapi_error = _errorPhpState;
 
-	/* sets a series of default handlers (callbacks) for the viriatum
-	sapi module (required for stability issues) */
-	viriatumSapiModule.default_post_reader = php_default_post_reader;
-	viriatumSapiModule.treat_data = php_default_treat_data;
-	viriatumSapiModule.input_filter = php_default_input_filter;
+    /* sets a series of default handlers (callbacks) for the viriatum
+    sapi module (required for stability issues) */
+    viriatumSapiModule.default_post_reader = php_default_post_reader;
+    viriatumSapiModule.treat_data = php_default_treat_data;
+    viriatumSapiModule.input_filter = php_default_input_filter;
 
     /* runs the start block for the php interpreter, this should
     be able to start all the internal structures, then loads the
     viriatum module to export the proper features */
-	sapi_startup(&viriatumSapiModule);
-	viriatumSapiModule.startup(&viriatumSapiModule);
+    sapi_startup(&viriatumSapiModule);
+    viriatumSapiModule.startup(&viriatumSapiModule);
 
-	/* forrces the logging of the error for the execution in the
+    /* forrces the logging of the error for the execution in the
     current php environment */
     zend_alter_ini_entry("display_errors", sizeof("display_errors"), "0", sizeof("0") - 1, PHP_INI_SYSTEM, PHP_INI_STAGE_RUNTIME);
     zend_alter_ini_entry("log_errors", sizeof("log_errors"), "1", sizeof("1") - 1, PHP_INI_SYSTEM, PHP_INI_STAGE_RUNTIME);
 
-	/* starts the php state updating the major global value in
-	the current interpreter state */
-	_startPhpState();
+    /* starts the php state updating the major global value in
+    the current interpreter state */
+    _startPhpState();
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -268,8 +268,8 @@ ERROR_CODE _loadPhpState() {
 ERROR_CODE _unloadPhpState() {
     /* runs the stop block for the php interpreter, this should
     be able to stop all the internal structures */
-	php_module_shutdown(TSRMLS_C);
-	sapi_shutdown();
+    php_module_shutdown(TSRMLS_C);
+    sapi_shutdown();
 
     /* raises no error */
     RAISE_NO_ERROR;
