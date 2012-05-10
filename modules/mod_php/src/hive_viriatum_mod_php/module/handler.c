@@ -121,25 +121,32 @@ ERROR_CODE urlCallbackHandlerModule(struct HttpParser_t *httpParser, const unsig
     /* retrieves the handler php context from the http parser */
     struct HandlerPhpContext_t *handlerPhpContext = (struct HandlerPhpContext_t *) httpParser->context;
 
-    /* allocates the required space for the url */
-    unsigned char *url = (unsigned char *) MALLOC(dataSize + 1);
+	/* allocates space for the file name that will be executed
+	by the php interpreter, this is necessary to remove the query
+	part of the uri value */
+	unsigned char fileName[VIRIATUM_MAX_PATH_SIZE];
 
-    /* copies the memory from the data to the url */
-    memcpy(url, data, dataSize);
+	/* checks the position of the get parameters divisor position 
+	and then uses it to calculate the size of the (base) path */
+	char *pointer = (char *) memchr((char *) data, '?', dataSize);
+	size_t pathSize = pointer == NULL ? dataSize : pointer - data;
+	size_t querySize = pointer == NULL ? 0 : dataSize - pathSize - 1;
+	querySize = querySize > 0 ? querySize : 0;
 
-    /* puts the end of strng in the url */
-    url[dataSize] = '\0';
+    /* copies the part of the data buffer relative to the file name
+	this avoids copying the query part */
+	memcpy(fileName, data, pathSize);
+	fileName[pathSize] = '\0';
 
-    /* prints the url */
-    V_DEBUG_F("url: %s\n", url);
+	/* in case the pointer is defined (query separator found) copies
+	the query contents into the target query buffer */
+	if(pointer) { memcpy(handlerPhpContext->query, pointer + 1, querySize); }
+	handlerPhpContext->query[querySize] = '\0';
 
     /* copies the url to the url reference in the handler file context then
     creates the file path from using the base viriatum path */
-    memcpy(handlerPhpContext->url, url, strlen((char *) url) + 1);
-    SPRINTF((char *) handlerPhpContext->filePath, VIRIATUM_MAX_PATH_SIZE, "%s%s%s", VIRIATUM_CONTENTS_PATH, VIRIATUM_BASE_PATH, url);
-
-    /* releases the url */
-    FREE(url);
+    memcpy(handlerPhpContext->url, data, dataSize + 1);
+    SPRINTF((char *) handlerPhpContext->filePath, VIRIATUM_MAX_PATH_SIZE, "%s%s%s", VIRIATUM_CONTENTS_PATH, VIRIATUM_BASE_PATH, fileName);
 
     /* raise no error */
     RAISE_NO_ERROR;
@@ -348,6 +355,10 @@ ERROR_CODE _sendResponseHandlerModule(struct HttpParser_t *httpParser) {
     _outputBuffer = outputBuffer;
     handlerPhpContext->outputBuffer = outputBuffer;
 
+	/* updates the current global php reqest information
+	this is the main interface for the sapi modules */
+	_updateRequest(handlerPhpContext);
+
     /* populates the "base" script reference structure
     with the required value for execution */
     script.type = ZEND_HANDLE_FP;
@@ -361,10 +372,16 @@ ERROR_CODE _sendResponseHandlerModule(struct HttpParser_t *httpParser) {
     script.handle.fp = scriptFile;
 
     zend_try {
-        /* executes the scrpt in the current instantiated virtual
-        machine, this is a blocking call so it will block the current
-        general loop (care is required) */
-        zend_execute_scripts(ZEND_REQUIRE TSRMLS_CC, NULL, 1, &script);
+		/* tries to start the request handling and in case it
+		succeedes continues with the execution of it */
+		if(php_request_startup(TSRMLS_C) == SUCCESS) {
+			/* executes the script in the current instantiated virtual
+			machine, this is a blocking call so it will block the current
+			general loop (care is required), then after the execution
+			closes the current request information */
+			php_execute_script(&script TSRMLS_CC);
+			php_request_shutdown(NULL);
+		}
     } zend_catch {
     } zend_end_try();
 
@@ -416,4 +433,20 @@ ERROR_CODE _writeErrorConnection(struct HttpParser_t *httpParser, char *message)
 
     /* raise no error */
     RAISE_NO_ERROR;
+}
+
+ERROR_CODE _updateRequest(struct HandlerPhpContext_t *handlerPhpContext) {
+	SG(sapi_headers).http_response_code = 200;
+	SG(sapi_headers).http_status_line = "OK";
+	SG(request_info).content_type = "text/html";
+	SG(request_info).query_string = handlerPhpContext->query;
+	SG(request_info).request_method = "GET";
+	SG(request_info).proto_num = 1001;
+	SG(request_info).request_uri = handlerPhpContext->url;
+	SG(request_info).path_translated = handlerPhpContext->filePath;
+	SG(request_info).content_length = 0;
+	SG(global_request_time) = 0;
+
+	/* raises no error */
+	RAISE_NO_ERROR;
 }
