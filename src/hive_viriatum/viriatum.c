@@ -152,7 +152,7 @@ ERROR_CODE printInformation() {
 }
 
 void help() { V_PRINT(HELP_STRING); }
-void version() { V_PRINT_F("%s version %s (%s, %s)", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_COMPILATION_DATE, VIRIATUM_COMPILATION_TIME); }
+void version() { V_PRINT_F("%s - %s (%s, %s)\n", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_COMPILATION_DATE, VIRIATUM_COMPILATION_TIME); }
 
 #ifdef VIRIATUM_PLATFORM_WIN32
 void daemonize() { }
