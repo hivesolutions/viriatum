@@ -85,8 +85,8 @@ sapi_module_struct viriatumSapiModule = {
     STANDARD_SAPI_MODULE_PROPERTIES
 };
 
-int _moduleStartup(sapi_module_struct *sapi_module) {
-    return php_module_startup(sapi_module, &viriatumModule, 1);
+int _moduleStartup(sapi_module_struct *module) {
+    return php_module_startup(module, &viriatumModule, 1);
 }
 
 int _moduleWrite(const char *data, uint dataSize TSRMLS_DC) {
@@ -105,55 +105,49 @@ int _moduleWrite(const char *data, uint dataSize TSRMLS_DC) {
     return dataSize;
 }
 
-void _moduleFlush(void *server_context) {
+void _moduleFlush(void *context) {
 }
 
 struct stat *_moduleStat(TSRMLS_D) {
     return NULL;
 }
 
-char *_moduleGetenv(char *name, size_t name_len TSRMLS_DC) {
+char *_moduleGetenv(char *name, size_t size TSRMLS_DC) {
     return NULL;
 }
 
-int _moduleHeader(sapi_header_struct *sapi_header, sapi_header_op_enum op, sapi_headers_struct *sapi_headers TSRMLS_DC) {
+int _moduleHeader(sapi_header_struct *header, sapi_header_op_enum operation, sapi_headers_struct *headers TSRMLS_DC) {
     return 0;
 }
 
-int _moduleSendHeaders(sapi_headers_struct *sapi_headers TSRMLS_DC) {
+int _moduleSendHeaders(sapi_headers_struct *headers TSRMLS_DC) {
     return SAPI_HEADER_SENT_SUCCESSFULLY;
 }
 
-int _moduleReadPost(char *buf, uint count_bytes TSRMLS_DC) {
-    return count_bytes;
+int _moduleReadPost(char *buffer, uint size TSRMLS_DC) {
+    return size;
 }
 
 char *_moduleReadCookies(TSRMLS_D) {
     return NULL;
 }
 
-void _moduleRegister(zval *track_vars_array TSRMLS_DC) {
+void _moduleRegister(zval *_array TSRMLS_DC) {
     /* ISTO PARECE SER MUITO LENTO (MELHORAR) usar sempre a mesma alocacao (ver apache) */
     /* nao posso fazer isto por copia */
-    /*add_assoc_string(track_vars_array, "GATEWAY_INTERFACE", "viriatum", 1);
-    add_assoc_string(track_vars_array, "REQUEST_URI", "http://localhost:9090/index.php", 1);
-    add_assoc_string(track_vars_array, "QUERY_STRING", "=PHPE9568F34-D428-11d2-A769-00AA001ACF42", 1);
-    add_assoc_string(track_vars_array, "PHP_SELF", "index.php?=PHPE9568F34-D428-11d2-A769-00AA001ACF42", 1);*/
+    add_assoc_string(_array, "GATEWAY_INTERFACE", "viriatum", 1);
+    add_assoc_string(_array, "REQUEST_URI", "http://localhost:9090/index.php", 1);
+    add_assoc_string(_array, "QUERY_STRING", "=PHPE9568F34-D428-11d2-A769-00AA001ACF42", 1);
+    add_assoc_string(_array, "PHP_SELF", "index.php?=PHPE9568F34-D428-11d2-A769-00AA001ACF42", 1);
 }
 
-void _moduleLog(char *msg TSRMLS_DC) {
-    V_DEBUG_F("PHP Log: %s\n", msg);
+void _moduleLog(char *message TSRMLS_DC) {
+    V_DEBUG_F("%s\n", message);
 }
 
 double _moduleRequestTime(TSRMLS_D) {
     return 0;
 }
-
-
-
-
-
-
 
 PHP_FUNCTION(viriatum_connections) {
     RETURN_LONG(_service->connectionsList->size);
