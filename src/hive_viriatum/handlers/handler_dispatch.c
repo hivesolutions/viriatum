@@ -87,9 +87,11 @@ ERROR_CODE registerHandlerDispatch(struct Service_t *service) {
     /* allocates space for the dispatch handler */
     struct DispatchHandler_t *dispatchHandler;
 
+#ifdef VIRIATUM_PCRE
     /* allocates space for the regex related variables */
     const char *error;
     int errorOffset;
+#endif
 
     /* creates the http handler and then uses it to create
     the dispatch handler (lower substrate) */
@@ -175,9 +177,10 @@ ERROR_CODE messageBeginCallbackHandlerDispatch(struct HttpParser_t *httpParser) 
 }
 
 ERROR_CODE urlCallbackHandlerDispatch(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize) {
+#ifdef VIRIATUM_PCRE
     int matching;
-
     size_t index;
+#endif
 
 
     struct Connection_t *connection = (struct Connection_t *) httpParser->parameters;
@@ -185,7 +188,9 @@ ERROR_CODE urlCallbackHandlerDispatch(struct HttpParser_t *httpParser, const uns
     struct HttpConnection_t *httpConnection = (struct HttpConnection_t *) ioConnection->lower;
     struct Service_t *service = connection->service;
     struct HttpHandler_t *handler = httpConnection->httpHandler;
+#ifdef VIRIATUM_PCRE
     struct DispatchHandler_t *dispatchHandler = (struct DispatchHandler_t *) handler->lower;
+#endif
 
     unsigned char *handlerName;
 
