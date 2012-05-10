@@ -315,6 +315,9 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
             /* creates the complete path to the template file */
             SPRINTF((char *) templatePath, 1024, "%s%s", VIRIATUM_RESOURCES_PATH, VIRIATUM_LISTING_PATH);
 
+			/* pritns a debug message */
+			V_DEBUG_F("Processing template file '%s'\n", templatePath);
+
             /* creates the directory entries (linked list) */
             createLinkedList(&directoryEntries);
 
@@ -326,7 +329,8 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
             /* creates the template handler */
             createTemplateHandler(&templateHandler);
 
-            /* assigns the directory entries to the template handler */
+            /* assigns the directory entries to the template handler,
+			this variable will be exposed to the template */
             assignListTemplateHandler(templateHandler, (unsigned char *) "entries", directoryEntriesMap);
             assignIntegerTemplateHandler(templateHandler, (unsigned char *) "items", (int) directoryEntriesMap->size);
 
