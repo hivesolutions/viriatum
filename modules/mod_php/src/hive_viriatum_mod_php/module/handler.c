@@ -273,9 +273,8 @@ ERROR_CODE _sendDataCallback(struct Connection_t *connection, struct Data_t *dat
 }
 
 ERROR_CODE _sendResponseHandlerModule(struct HttpParser_t *httpParser) {
-    /* allocates space for the script file structure and
-    for the script php structure to be used for script execution */
-    FILE *scriptFile;
+    /* allocates space for the script file structure to be
+	during for script execution */
     zend_file_handle script;
 
     /* allocates space for the buffer that will hold the headers */
