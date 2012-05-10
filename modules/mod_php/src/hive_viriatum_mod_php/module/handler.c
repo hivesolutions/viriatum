@@ -385,11 +385,11 @@ ERROR_CODE _updateRequest(struct HandlerPhpContext_t *handlerPhpContext) {
     SG(sapi_headers).http_response_code = 200;
     SG(sapi_headers).http_status_line = "OK";
     SG(request_info).content_type = "text/html";
-    SG(request_info).query_string = handlerPhpContext->query;
+    SG(request_info).query_string = (char *) handlerPhpContext->query;
     SG(request_info).request_method = "GET";
     SG(request_info).proto_num = 1001;
-    SG(request_info).request_uri = handlerPhpContext->url;
-    SG(request_info).path_translated = handlerPhpContext->filePath;
+    SG(request_info).request_uri = (char *) handlerPhpContext->url;
+    SG(request_info).path_translated = (char *) handlerPhpContext->filePath;
     SG(request_info).content_length = 0;
     SG(global_request_time) = 0;
 
