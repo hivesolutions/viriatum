@@ -1,5 +1,5 @@
 <html>
-	<head>
+    <head>
         <script type="text/javascript" src="http://smoothiecharts.org/smoothie.js"></script>
         <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
         <script type="text/javascript" src="status.js"></script>
@@ -12,7 +12,7 @@ $.getJSON("status_json.php", function(data) {
    random.append(new Date().getTime(), connections);
 });
       }, 2500);
-      
+
       function createTimeline() {
         var chart = new SmoothieChart();
         chart.addTimeSeries(random, { strokeStyle: "rgba(0, 255, 0, 1)", fillStyle : "rgba(0, 255, 0, 0.2)", lineWidth: 4 });
@@ -25,9 +25,9 @@ $.getJSON("stats_json.php", function(data) {
 
       }
     </script>
-		<title>Viriatum</title>
-	</head>
-	<body onload="createTimeline()">
+        <title>Viriatum</title>
+    </head>
+    <body onload="createTimeline()">
         <div>
             Name: <?php echo(viriatum_name()); ?><br />
             Version: <?php echo(viriatum_version()); ?><br />
@@ -35,5 +35,5 @@ $.getJSON("stats_json.php", function(data) {
             Date: <?php echo(viriatum_compilation_date()); ?>, <?php echo(viriatum_compilation_time()); ?><br />
         </div>
         <canvas id="chart" width="100" height="100"></canvas>
-	</body>
+    </body>
 </html>
