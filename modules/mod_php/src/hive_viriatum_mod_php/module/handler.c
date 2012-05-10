@@ -307,15 +307,10 @@ ERROR_CODE _sendResponseHandlerModule(struct HttpParser_t *httpParser) {
 
     /* populates the "base" script reference structure
     with the required value for execution */
-    script.type = ZEND_HANDLE_FP;
+    script.type = ZEND_HANDLE_FILENAME;
     script.filename = (char *) handlerPhpContext->filePath;
     script.opened_path = NULL;
     script.free_filename = 0;
-
-    /* opens the script file and then sets the file pointer
-    in the script reference structure */
-  /*  FOPEN(&scriptFile, script.filename, "rb");
-    script.handle.fp = scriptFile;*/
 
     zend_try {
         /* tries to start the request handling and in case it
