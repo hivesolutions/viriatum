@@ -56,7 +56,7 @@ typedef struct HandlerPhpContext_t {
 
     /**
      * The query string (contents after the '?')
-	 * to be used to create the get parameters map.
+     * to be used to create the get parameters map.
      */
     unsigned char query[4096];
 

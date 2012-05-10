@@ -33,6 +33,18 @@ zend_function_entry viriatumFunctions[12];
 zend_module_entry viriatumModule;
 sapi_module_struct viriatumSapiModule;
 
+int _moduleStartup(sapi_module_struct *sapi_module);
+int _moduleWrite(const char *data, uint dataSize TSRMLS_DC);
+void _moduleFlush(void *server_context);
+struct stat *_moduleStat(TSRMLS_D);
+char *_moduleGetenv(char *name, size_t name_len TSRMLS_DC);
+int _moduleHeader(sapi_header_struct *sapi_header, sapi_header_op_enum op, sapi_headers_struct *sapi_headers TSRMLS_DC);
+int _moduleSendHeaders(sapi_headers_struct *sapi_headers TSRMLS_DC);
+int _moduleReadPost(char *buf, uint count_bytes TSRMLS_DC);
+char *_moduleReadCookies(TSRMLS_D);
+static void _moduleRegister(zval *track_vars_array TSRMLS_DC);
+static void _moduleLog(char *msg TSRMLS_DC);
+double _moduleRequestTime(TSRMLS_D);
 PHP_FUNCTION(viriatum_connections);
 PHP_FUNCTION(viriatum_name);
 PHP_FUNCTION(viriatum_version);
