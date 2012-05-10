@@ -314,8 +314,8 @@ ERROR_CODE _sendResponseHandlerModule(struct HttpParser_t *httpParser) {
 
     /* opens the script file and then sets the file pointer
     in the script reference structure */
-    FOPEN(&scriptFile, script.filename, "rb");
-    script.handle.fp = scriptFile;
+  /*  FOPEN(&scriptFile, script.filename, "rb");
+    script.handle.fp = scriptFile;*/
 
     zend_try {
         /* tries to start the request handling and in case it
