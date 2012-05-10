@@ -240,13 +240,19 @@ ERROR_CODE _loadPhpState() {
     php_embed_module.log_message = _logPhpState;
     php_embed_module.sapi_error = _errorPhpState;
 
+	/* sets a series of default handlers (callbacks) for the viriatum
+	sapi module (required for stability issues) */
+	viriatumSapiModule.default_post_reader = php_default_post_reader;
+	viriatumSapiModule.treat_data = php_default_treat_data;
+	viriatumSapiModule.input_filter = php_default_input_filter;
+
     /* runs the start block for the php interpreter, this should
     be able to start all the internal structures, then loads the
     viriatum module to export the proper features */
-    php_embed_init(0, NULL);
-    zend_startup_module(&viriatumModule);
+	sapi_startup(&viriatumSapiModule);
+	viriatumSapiModule.startup(&viriatumSapiModule);
 
-    /* forrces the logging of the error for the execution in the
+	/* forrces the logging of the error for the execution in the
     current php environment */
     zend_alter_ini_entry("display_errors", sizeof("display_errors"), "0", sizeof("0") - 1, PHP_INI_SYSTEM, PHP_INI_STAGE_RUNTIME);
     zend_alter_ini_entry("log_errors", sizeof("log_errors"), "1", sizeof("1") - 1, PHP_INI_SYSTEM, PHP_INI_STAGE_RUNTIME);
@@ -262,7 +268,8 @@ ERROR_CODE _loadPhpState() {
 ERROR_CODE _unloadPhpState() {
     /* runs the stop block for the php interpreter, this should
     be able to stop all the internal structures */
-    php_embed_shutdown(TSRMLS_C);
+	php_module_shutdown(TSRMLS_C);
+	sapi_shutdown();
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -280,20 +287,6 @@ ERROR_CODE _reloadPhpState() {
 #pragma warning(disable:4700)
 #endif
 ERROR_CODE _startPhpState() {
-	zval *_var;
-	zval *_array;
-
-	// ?=PHPE9568F34-D428-11d2-A769-00AA001ACF42
-
-    MAKE_STD_ZVAL(_array);
-	array_init(_array);
-
-	add_next_index_long(_array, 45);
-	ZEND_SET_GLOBAL_VAR("matias", _array);
-
-	ZVAL_STRING(_var, "tobias", 1);
-	ZEND_SET_GLOBAL_VAR("tobias", _var);
-
     /* raises no error */
     RAISE_NO_ERROR;
 }
