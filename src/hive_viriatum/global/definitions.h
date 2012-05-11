@@ -126,8 +126,12 @@ static __inline char *getConfigPath() {
 #ifndef VIRIATUM_MODULES_PATH
 #define VIRIATUM_MODULES_PATH "/usr/lib/viriatum/modules"
 #endif
+#ifndef VIRIATUM_RESOURCES_PATH
 #define VIRIATUM_RESOURCES_PATH "/var/viriatum/www"
+#endif
+#ifndef VIRIATUM_CONFIG_PATH
 #define VIRIATUM_CONFIG_PATH "/etc/viriatum"
+#endif
 #define VIRIATUM_BASE_PATH ""
 #define VIRIATUM_LISTING_PATH "/templates/listing.html.tpl"
 #ifndef VIRIATUM_CONTENTS_PATH
