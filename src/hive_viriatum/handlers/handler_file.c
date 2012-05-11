@@ -141,6 +141,10 @@ ERROR_CODE messageBeginCallbackHandlerFile(struct HttpParser_t *httpParser) {
 }
 
 ERROR_CODE urlCallbackHandlerFile(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize) {
+    /* allocates the required space for the url, this
+	is done through static allocation */
+	unsigned char url[VIRIATUM_MAX_URL_SIZE];
+
     /* retrieves the handler file context from the http parser */
     struct HandlerFileContext_t *handlerFileContext = (struct HandlerFileContext_t *) httpParser->context;
 
@@ -149,9 +153,6 @@ ERROR_CODE urlCallbackHandlerFile(struct HttpParser_t *httpParser, const unsigne
     struct Connection_t *connection = (struct Connection_t *) httpParser->parameters;
     struct Service_t *service = connection->service;
     struct ServiceOptions_t *options = service->options;
-
-    /* allocates the required space for the url */
-    unsigned char *url = (unsigned char *) MALLOC(dataSize + 1);
 
     /* copies the memory from the data to the url and then
 	puts the end of string in the url */
@@ -165,9 +166,6 @@ ERROR_CODE urlCallbackHandlerFile(struct HttpParser_t *httpParser, const unsigne
     the selection of the index file as defautl is conditioned by the default
     index configuration option */
     if(options->defaultIndex && (strcmp((char *) url, "/") == 0 || strcmp((char *) url, "") == 0)) {
-        /* reallocates the space for the index reference */
-        url = (unsigned char *) REALLOC(url, 12);
-
         /* copies the index reference as the url */
         memcpy(url, "/index.html", 12);
     }
@@ -177,9 +175,6 @@ ERROR_CODE urlCallbackHandlerFile(struct HttpParser_t *httpParser, const unsigne
 
     /* creates the file path from using the base viriatum path */
     SPRINTF((char *) handlerFileContext->filePath, VIRIATUM_MAX_PATH_SIZE, "%s%s%s", VIRIATUM_CONTENTS_PATH, VIRIATUM_BASE_PATH, url);
-
-    /* releases the url */
-    FREE(url);
 
     /* raise no error */
     RAISE_NO_ERROR;
