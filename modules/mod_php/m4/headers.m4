@@ -27,4 +27,4 @@
 AC_CHECK_HEADERS([stdlib.h assert.h])
 
 # checks for specific header files
-AC_CHECK_HEADERS([sapi/embed/php_embed.h], [have_php=true], [AC_MSG_ERROR([php 5 embed headers are required])])
+AC_CHECK_HEADERS([sapi/embed/php_embed.h], [], [AC_MSG_ERROR([php 5 embed headers are required])])
