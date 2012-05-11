@@ -17,7 +17,7 @@
  You should have received a copy of the GNU General Public License
  along with Hive Viriatum Modules. If not, see <http://www.gnu.org/licenses/>.
 
- __author__    = Jo√£o Magalh√£es <joamag@hive.pt>
+ __author__    = Jo„o Magalh„es <joamag@hive.pt>
  __version__   = 1.0.0
  __revision__  = $LastChangedRevision$
  __date__      = $LastChangedDate$
@@ -25,33 +25,22 @@
  __license__   = GNU General Public License (GPL), Version 3
 */
 
-#pragma once
-
-#ifdef HAVE_CONFIG_H
-#undef HAVE_CONFIG_H
-#include <config.h>
+#ifdef PACKAGE_BUGREPORT
+#undef PACKAGE_BUGREPORT
 #endif
 
-#ifdef _MSC_VER
-#pragma warning(disable:4005)
-#endif
-#include "undef.h"
-#include <sapi/embed/php_embed.h>
-#include <ext/standard/php_standard.h>
-#include "../../../../src/hive_viriatum/viriatum.h"
-#include "undef.h"
-#ifdef _MSC_VER
-#pragma warning(default:4005)
+#ifdef PACKAGE_NAME
+#undef PACKAGE_NAME
 #endif
 
-unsigned char *nameViriatumModPhp();
-unsigned char *versionViriatumModPhp();
-unsigned char *descriptionViriatumModPhp();
-
-#ifdef VIRIATUM_PLATFORM_MSC
-#ifdef VIRIATUM_DEBUG
-#pragma comment(lib, "php5embed_d.lib")
-#else
-#pragma comment(lib, "php5embed.lib")
+#ifdef PACKAGE_STRING
+#undef PACKAGE_STRING
 #endif
+
+#ifdef PACKAGE_TARNAME
+#undef PACKAGE_TARNAME
+#endif
+
+#ifdef PACKAGE_VERSION
+#undef PACKAGE_VERSION
 #endif
