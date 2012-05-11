@@ -30,6 +30,7 @@ target_prefix=$prefix
 test "x$prefix" = xNONE && target_prefix=$ac_default_prefix
 
 # sets the default path to the viriatum paths
+with_configroot=$target_prefix/etc/viriatum
 with_resourceroot=/var/viriatum
 with_libroot=$target_prefix/lib/viriatum
 
@@ -55,5 +56,6 @@ if test "$have_defaults" = true; then
 fi
 
 AC_DEFINE_UNQUOTED(WITH_PREFIX, "$target_prefix", [Define to a value if prefix is set])
+AC_DEFINE_UNQUOTED(WITH_CONFIG_ROOT, "$with_configroot", [Define to a value if config root is set])
 AC_DEFINE_UNQUOTED(WITH_MODULE_ROOT, "$with_moduleroot", [Define to a value if module root is set])
 AC_DEFINE_UNQUOTED(WITH_WWW_ROOT, "$with_wwwroot", [Define to a value if www root is set])
