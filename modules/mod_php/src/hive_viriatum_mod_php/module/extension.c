@@ -133,7 +133,7 @@ char *_moduleReadCookies(TSRMLS_D) {
 }
 
 void _moduleRegister(zval *_array TSRMLS_DC) {
-	php_register_variable_safe("GATEWAY_INTERFACE", "viriatum", sizeof("viriatum") - 1, _array TSRMLS_CC);
+    php_register_variable_safe("GATEWAY_INTERFACE", "viriatum", sizeof("viriatum") - 1, _array TSRMLS_CC);
 }
 
 void _moduleLog(char *message TSRMLS_DC) {
@@ -145,19 +145,19 @@ double _moduleRequestTime(TSRMLS_D) {
 }
 
 ZEND_MINFO_FUNCTION(viriatum_information) {
-	php_info_print_table_start();
-	php_info_print_table_row(2, "Name", VIRIATUM_NAME);
-	php_info_print_table_row(2, "Version", VIRIATUM_VERSION);
-	php_info_print_table_row(2, "Compiler", VIRIATUM_COMPILER);
-	php_info_print_table_row(2, "Compilation Date", VIRIATUM_COMPILATION_DATE);
-	php_info_print_table_end();
-	php_info_print_table_start();
-	php_info_print_table_header(2, "Name", "Path");
-	php_info_print_table_row(2, "Modules", VIRIATUM_MODULES_PATH);
-	php_info_print_table_row(2, "Contents", VIRIATUM_CONTENTS_PATH);
-	php_info_print_table_row(2, "Resources", VIRIATUM_RESOURCES_PATH);
-	php_info_print_table_row(2, "Configuration", VIRIATUM_CONFIG_PATH);
-	php_info_print_table_end();
+    php_info_print_table_start();
+    php_info_print_table_row(2, "Name", VIRIATUM_NAME);
+    php_info_print_table_row(2, "Version", VIRIATUM_VERSION);
+    php_info_print_table_row(2, "Compiler", VIRIATUM_COMPILER);
+    php_info_print_table_row(2, "Compilation Date", VIRIATUM_COMPILATION_DATE);
+    php_info_print_table_end();
+    php_info_print_table_start();
+    php_info_print_table_header(2, "Name", "Path");
+    php_info_print_table_row(2, "Modules", VIRIATUM_MODULES_PATH);
+    php_info_print_table_row(2, "Contents", VIRIATUM_CONTENTS_PATH);
+    php_info_print_table_row(2, "Resources", VIRIATUM_RESOURCES_PATH);
+    php_info_print_table_row(2, "Configuration", VIRIATUM_CONFIG_PATH);
+    php_info_print_table_end();
 }
 
 PHP_FUNCTION(viriatum_connections) {
