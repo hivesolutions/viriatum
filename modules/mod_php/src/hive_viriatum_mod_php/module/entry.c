@@ -242,7 +242,8 @@ ERROR_CODE _loadPhpState() {
 
     /* sets a series of default handlers (callbacks) for the viriatum
     sapi module (required for stability issues) */
-    viriatumSapiModule.default_post_reader = php_default_post_reader;
+    /*viriatumSapiModule.default_post_reader = php_default_post_reader;
+    viriatumSapiModule.treat_data = php_default_treat_data;*/
     viriatumSapiModule.input_filter = php_default_input_filter;
 
     /* runs the start block for the php interpreter, this should
