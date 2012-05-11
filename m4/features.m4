@@ -28,6 +28,8 @@
 # so the prefix value is not final
 target_prefix=$prefix
 test "x$prefix" = xNONE && target_prefix=$ac_default_prefix
+target_sysconf=$sysconf
+test "x$sysconf" = xNONE && target_sysconf=$ac_default_sysconf
 
 # sets the default path to the viriatum paths
 with_resourceroot=/var/viriatum
