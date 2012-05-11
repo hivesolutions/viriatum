@@ -27,6 +27,11 @@
 
 #pragma once
 
+#ifdef HAVE_CONFIG_H
+#undef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include "../../../../src/hive_viriatum/viriatum.h"
 
 unsigned char *nameViriatumModLua();
