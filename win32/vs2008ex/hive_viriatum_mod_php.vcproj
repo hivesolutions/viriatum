@@ -227,6 +227,10 @@
                 >
             </File>
             <File
+                RelativePath="..\..\modules\mod_php\src\hive_viriatum_mod_php\undef.h"
+                >
+            </File>
+            <File
                 RelativePath="..\..\modules\mod_php\src\hive_viriatum_mod_php\viriatum_mod_php.h"
                 >
             </File>
