@@ -182,6 +182,9 @@ ERROR_CODE urlCallbackHandlerDispatch(struct HttpParser_t *httpParser, const uns
     size_t index;
 #endif
 
+    /* allocates the required space for the url, this
+	is done through static allocation */
+	unsigned char url[VIRIATUM_MAX_URL_SIZE];
 
     struct Connection_t *connection = (struct Connection_t *) httpParser->parameters;
     struct IoConnection_t *ioConnection = (struct IoConnection_t *) connection->lower;
@@ -194,8 +197,6 @@ ERROR_CODE urlCallbackHandlerDispatch(struct HttpParser_t *httpParser, const uns
 
     unsigned char *handlerName;
 
-    /* allocates the required space for the url */
-    unsigned char *url = (unsigned char *) MALLOC(dataSize + 1);
 
     /* copies the memory from the data to the url, then
     puts the end of string in the url */
@@ -244,9 +245,6 @@ ERROR_CODE urlCallbackHandlerDispatch(struct HttpParser_t *httpParser, const uns
         /* prints an error message to the output */
         V_ERROR_F("Error retrieving '%s' handler reference\n", handlerName);
     }
-
-    /* releases the url */
-    FREE(url);
 
     /* raise no error */
     RAISE_NO_ERROR;

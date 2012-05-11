@@ -52,13 +52,13 @@ typedef struct HandlerPhpContext_t {
     /**
      * The url to be used for retrieving the file.
      */
-    unsigned char url[1024];
+    unsigned char url[VIRIATUM_MAX_URL_SIZE];
 
     /**
      * The query string (contents after the '?')
      * to be used to create the get parameters map.
      */
-    unsigned char query[4096];
+    unsigned char query[VIRIATUM_MAX_URL_SIZE];
 
     /**
      * The path to the file to be handled by
