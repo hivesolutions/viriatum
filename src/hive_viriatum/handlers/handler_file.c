@@ -153,10 +153,9 @@ ERROR_CODE urlCallbackHandlerFile(struct HttpParser_t *httpParser, const unsigne
     /* allocates the required space for the url */
     unsigned char *url = (unsigned char *) MALLOC(dataSize + 1);
 
-    /* copies the memory from the data to the url */
+    /* copies the memory from the data to the url and then
+	puts the end of string in the url */
     memcpy(url, data, dataSize);
-
-    /* puts the end of string in the url */
     url[dataSize] = '\0';
 
     /* prints a debug message */

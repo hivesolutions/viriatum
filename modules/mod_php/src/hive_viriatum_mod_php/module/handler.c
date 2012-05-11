@@ -142,7 +142,8 @@ ERROR_CODE urlCallbackHandlerModule(struct HttpParser_t *httpParser, const unsig
 
     /* copies the url to the url reference in the handler file context then
     creates the file path from using the base viriatum path */
-    memcpy(handlerPhpContext->url, data, dataSize + 1);
+    memcpy(handlerPhpContext->url, data, dataSize);
+	handlerPhpContext->url[pathSize] = '\0';
     SPRINTF((char *) handlerPhpContext->filePath, VIRIATUM_MAX_PATH_SIZE, "%s%s%s", VIRIATUM_CONTENTS_PATH, VIRIATUM_BASE_PATH, fileName);
 
     /* raise no error */
