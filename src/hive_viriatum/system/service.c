@@ -926,6 +926,8 @@ ERROR_CODE _fileOptionsService(struct Service_t *service, struct HashMap_t *argu
     processIniFile(configPath, &configuration);
     service->configuration = configuration;
 
+	printf("reading from %s\n", configPath);
+
     /* tries to retrieve the general section configuration from the configuration
     map in case none is found returns immediately no need to process anything more */
     getValueStringHashMap(configuration, (unsigned char *) "general", (void **) &general);
