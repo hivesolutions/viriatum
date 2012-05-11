@@ -133,12 +133,7 @@ char *_moduleReadCookies(TSRMLS_D) {
 }
 
 void _moduleRegister(zval *_array TSRMLS_DC) {
-    /* ISTO PARECE SER MUITO LENTO (MELHORAR) usar sempre a mesma alocacao (ver apache) */
-    /* nao posso fazer isto por copia */
-    add_assoc_string(_array, "GATEWAY_INTERFACE", "viriatum", 1);
-    add_assoc_string(_array, "REQUEST_URI", "http://localhost:9090/index.php", 1);
-    add_assoc_string(_array, "QUERY_STRING", "=PHPE9568F34-D428-11d2-A769-00AA001ACF42", 1);
-    add_assoc_string(_array, "PHP_SELF", "index.php?=PHPE9568F34-D428-11d2-A769-00AA001ACF42", 1);
+	php_register_variable_safe("GATEWAY_INTERFACE", "viriatum", sizeof("viriatum") - 1, _array TSRMLS_CC);
 }
 
 void _moduleLog(char *message TSRMLS_DC) {
