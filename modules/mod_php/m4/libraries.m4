@@ -25,11 +25,11 @@
 
 # sets the default values for the various library
 # control variables
-have_php=false
+have_php=true
 
 # checks for libraries
 AC_CHECK_LIB([viriatum], [main])
-AC_CHECK_LIB([php5], [main], [have_php=true], [AC_MSG_ERROR([php 5 library is required])])
+AC_CHECK_LIB([php5], [main], [], [AC_MSG_ERROR([php 5 library is required])])
 
 # library variables activation
 AM_CONDITIONAL(LINK_PHP, [test "$have_php" != "false"])

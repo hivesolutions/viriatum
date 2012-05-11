@@ -25,11 +25,11 @@
 
 # sets the default values for the various library
 # control variables
-have_lua=false
+have_lua=true
 
 # checks for libraries
 AC_CHECK_LIB([viriatum], [main])
-AC_CHECK_LIB([lua5.1], [main], [have_lua=true], [AC_MSG_ERROR([lua 5.1 library is required])])
+AC_CHECK_LIB([lua5.1], [main], [], [AC_MSG_ERROR([lua 5.1 library is required])])
 
 # library variables activation
 AM_CONDITIONAL(LINK_LUA, [test "$have_lua" != "false"])
