@@ -151,6 +151,13 @@ ZEND_MINFO_FUNCTION(viriatum_information) {
 	php_info_print_table_row(2, "Compiler", VIRIATUM_COMPILER);
 	php_info_print_table_row(2, "Compilation Date", VIRIATUM_COMPILATION_DATE);
 	php_info_print_table_end();
+	php_info_print_table_start();
+	php_info_print_table_header(2, "Name", "Path");
+	php_info_print_table_row(2, "Modules", VIRIATUM_MODULES_PATH);
+	php_info_print_table_row(2, "Contents", VIRIATUM_CONTENTS_PATH);
+	php_info_print_table_row(2, "Resources", VIRIATUM_RESOURCES_PATH);
+	php_info_print_table_row(2, "Configuration", VIRIATUM_CONFIG_PATH);
+	php_info_print_table_end();
 }
 
 PHP_FUNCTION(viriatum_connections) {
