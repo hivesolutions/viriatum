@@ -28,8 +28,6 @@
 # so the prefix value is not final
 target_prefix=$prefix
 test "x$prefix" = xNONE && target_prefix=$ac_default_prefix
-target_sysconf=$sysconf
-test "x$sysconf" = xNONE && target_sysconf=$ac_default_sysconf
 
 # sets the default path to the viriatum paths
 with_resourceroot=/var/viriatum
@@ -56,6 +54,6 @@ if test "$have_defaults" = true; then
     AC_DEFINE(HAVE_DEFAULTS, 1, [Define to 1 if defaults is enabled])
 fi
 
-AC_DEFINE_UNQUOTED(WITH_SYSCONF, "$target_sysconf", [Define to a value if sysconf is set])
+AC_DEFINE_UNQUOTED(WITH_SYSCONF, "$sysconf", [Define to a value if sysconf is set])
 AC_DEFINE_UNQUOTED(WITH_MODULE_ROOT, "$with_moduleroot", [Define to a value if module root is set])
 AC_DEFINE_UNQUOTED(WITH_WWW_ROOT, "$with_wwwroot", [Define to a value if www root is set])
