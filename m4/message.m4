@@ -29,6 +29,7 @@ echo "========================"
 echo
 echo " + Host                  $host_os"
 echo " + Install prefix        $prefix"
+echo " + Configuration prefix  $sysconf"
 echo " + Data directory        $with_wwwroot"
 echo " + Modules directory     $with_moduleroot"
 echo " + CFLAGS                $CFLAGS"
