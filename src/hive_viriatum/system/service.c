@@ -372,7 +372,7 @@ ERROR_CODE startService(struct Service_t *service) {
     /* sets the service in the polling */
     polling->service = service;
 
-    /* TODO: This value is hardcoded it should become softcoded */
+    /* TODO: This values are hardcoded it should become softcoded */
     polling->open = openPollingSelect;
     polling->close = closePollingSelect;
     polling->registerConnection = registerConnectionPollingSelect;
