@@ -67,9 +67,10 @@ Current modules include:
 
 ## PHP Module
 
-Must compile the php interpreter with special environment variables set
+Must compile the php interpreter with special environment variables set, and then must compile with support for embedding.
 
 * `export CFLAGS="-I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend"`
+* `./configure --enable-embed`
 
 ## License
 
