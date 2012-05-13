@@ -1,8 +1,8 @@
 == New features ==
 
+* Support for a bittorrent variant of the viriatum server
 * Support for the SPDY protocol (http://dev.chromium.org/spdy)
 * Support for async file reading (http://linux.die.net/man/3/aio_read http://msdn.microsoft.com/en-us/library/windows/desktop/aa365747(v=vs.85).aspx http://lxr.evanmiller.org/http/source/os/unix/ngx_aio_read.c) 
-* Support for a bittorrent variant of the viriatum server
 * Support for Python embedding (mod_python)
 * Support for WSGI (mod_wsgi)
 * Support for Google V8 (mod_v8) 
