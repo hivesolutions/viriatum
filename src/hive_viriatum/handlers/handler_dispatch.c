@@ -182,6 +182,10 @@ ERROR_CODE urlCallbackHandlerDispatch(struct HttpParser_t *httpParser, const uns
     size_t index;
 #endif
 
+	/* allocates space for the name of the handler to be
+	used for the dispatching operation (target handler) */
+    unsigned char *handlerName;
+
     /* allocates the required space for the url, this
 	is done through static allocation */
 	unsigned char url[VIRIATUM_MAX_URL_SIZE];
@@ -195,9 +199,6 @@ ERROR_CODE urlCallbackHandlerDispatch(struct HttpParser_t *httpParser, const uns
     struct DispatchHandler_t *dispatchHandler = (struct DispatchHandler_t *) handler->lower;
 #endif
 
-    unsigned char *handlerName;
-
-
     /* copies the memory from the data to the url, then
     puts the end of string in the url */
     memcpy(url, data, dataSize);
@@ -207,7 +208,9 @@ ERROR_CODE urlCallbackHandlerDispatch(struct HttpParser_t *httpParser, const uns
 
 
 
-    /* THIS IS EXTREMLY SLOW !!! WARNING */
+    /* THIS IS EXTREMLY SLOW !!! WARNING may be a better
+	idea to compile all the regex into a single regex must
+	refer to the nginx documentation for that */
 
     handlerName = (unsigned char *) "file";
 
