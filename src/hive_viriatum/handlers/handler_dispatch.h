@@ -40,6 +40,12 @@
  */
 #define DISPATCH_ERROR_MESSAGE "500 - Internal Server Error (dispatch problem)"
 
+/**
+ * The default handler to be used in case no rule
+ * is matched for a handler.
+ */
+#define DISPATCH_DEFAULT_HANDLER "file"
+
 /* forward references (avoids loop) */
 struct Data_t;
 struct Connection_t;
