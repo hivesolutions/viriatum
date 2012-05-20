@@ -212,7 +212,9 @@ ERROR_CODE urlCallbackHandlerDispatch(struct HttpParser_t *httpParser, const uns
 	idea to compile all the regex into a single regex must
 	refer to the nginx documentation for that */
 
-    handlerName = (unsigned char *) "file";
+	/* sets the default handler, this is considered to be
+	the fallback in case no handler is found */
+    handlerName = (unsigned char *) DISPATCH_DEFAULT_HANDLER;
 
 #ifdef VIRIATUM_PCRE
     /* iterates over all the regular expressions so that they
