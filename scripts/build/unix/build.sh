@@ -43,7 +43,7 @@ if [ $? -ne 0 ]; then cd $current && exit $?; fi
 # in the repository directory
 cd $repo
 make -f Makefile-autoconfig
-./configure --prefix=$target --with-wwwroot=$target/var/viriatum/www --enable-defaults
+./configure --prefix=$result_dir --with-wwwroot=$result_dir/var/viriatum/www --enable-defaults
 make && make install
 
 # in case the previous command didn't exit properly
@@ -54,11 +54,10 @@ if [ $? -ne 0 ]; then cd $current && exit $?; fi
 cd $current
 
 # copies the binary files
-cp -rf $target/* $result_dir
-cp -rf $target/bin/viriatum $deb_build_dir/usr/sbin
-cp -rf $target/etc/viriatum/viriatum.ini $deb_build_dir/etc/viriatum
-cp -rf $target/etc/init.d/viriatum $deb_build_dir/etc/init.d
-cp -rf $target/var/viriatum/www $deb_build_dir/var/viriatum
+cp -rf $result_dir/bin/viriatum $deb_build_dir/usr/sbin
+cp -rf $result_dir/etc/viriatum/viriatum.ini $deb_build_dir/etc/viriatum
+cp -rf $result_dir/etc/init.d/viriatum $deb_build_dir/etc/init.d
+cp -rf $result_dir/var/viriatum/www $deb_build_dir/var/viriatum
 cp -rf $script_dir/meta/* $deb_build_dir/DEBIAN
 
 # creates the various compressed files for the
