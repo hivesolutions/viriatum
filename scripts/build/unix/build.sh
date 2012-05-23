@@ -82,11 +82,22 @@ if [ $? -ne 0 ]; then cd $current && exit $?; fi
 # (and target) dist directory
 mv $deb_dir/$name.deb $dist_dir
 
+# changes the current directory to the dist directory
+# and then generates the checksum files for all the
+# distribution (oriented) files
 cd $dist_dir
 for file in *; do
     md5sum $file > /tmp/$file.md5
+	sha1sum $file > /tmp/$file.sha1
 done
 md5sum * > /tmp/MD5SUMS
+sha1sum * > /tmp/SHA1SUMS
 mv /tmp/*.md5 $dist_dir
+mv /tmp/*.sha1 $dist_dir
 mv /tmp/MD5SUMS $dist_dir
+mv /tmp/SHA1SUMS $dist_dir
 cd $current
+
+# in case the previous command didn't exit properly
+# must return immediately with the error
+if [ $? -ne 0 ]; then cd $current && exit $?; fi
