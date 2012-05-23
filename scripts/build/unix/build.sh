@@ -79,3 +79,12 @@ mv $deb_dir/$name.deb $dist_dir
 # in case the previous command didn't exit properly
 # must return immediately with the error
 if [ $? -ne 0 ]; then cd $current && exit $?; fi
+
+cd $dist_dir
+for file in *; do
+    md5sum $file > /tmp/$f.md5
+done
+md5sum * > /tmp/MD5SUMS
+mv /tmp/*.md5 $dist_dir
+mv /tmp/MD5SUMS $dist_dir
+cd $current
