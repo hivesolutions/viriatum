@@ -72,7 +72,9 @@ cd $current
 echo "Building deb package..."
 
 # creates the deb file from the deb directory
+# and then moves it to dist directory
 dpkg-deb --build $deb_build_dir
+mv $deb_dir/$name.deb $dist_dir
 
 # in case the previous command didn't exit properly
 # must return immediately with the error
