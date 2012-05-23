@@ -72,17 +72,19 @@ cd $current
 echo "Building deb package..."
 
 # creates the deb file from the deb directory
-# and then moves it to dist directory
 dpkg-deb --build $deb_build_dir
-mv $deb_dir/$name.deb $dist_dir
 
 # in case the previous command didn't exit properly
 # must return immediately with the error
 if [ $? -ne 0 ]; then cd $current && exit $?; fi
 
+# moves the generated deb file into the appropriate
+# (and target) dist directory
+mv $deb_dir/$name.deb $dist_dir
+
 cd $dist_dir
 for file in *; do
-    md5sum $file > /tmp/$f.md5
+    md5sum $file > /tmp/$file.md5
 done
 md5sum * > /tmp/MD5SUMS
 mv /tmp/*.md5 $dist_dir
