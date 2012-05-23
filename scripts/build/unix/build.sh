@@ -22,11 +22,11 @@ script_dir=$(dirname $(readlink -f $0))
 mkdir -p $build
 mkdir -p $target
 mkdir -p $result_dir
+mkdir -p $result_dir/usr/sbin
+mkdir -p $result_dir/etc/viriatum
+mkdir -p $result_dir/etc/init.d
+mkdir -p $result_dir/var/viriatum/www
 mkdir -p $dist_dir
-mkdir -p $dist_dir/usr/sbin
-mkdir -p $dist_dir/etc/viriatum
-mkdir -p $dist_dir/etc/init.d
-mkdir -p $dist_dir/var/viriatum/www
 mkdir -p $deb_dir
 mkdir -p $deb_build_dir
 mkdir -p $deb_build_dir/DEBIAN
