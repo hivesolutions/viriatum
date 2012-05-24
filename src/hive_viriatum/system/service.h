@@ -373,6 +373,14 @@ typedef struct Connection_t {
      */
     SOCKET_HANDLE socketHandle;
 
+	/**
+	 * The address for the socket associated
+	 * with the connection.
+	 * This is a somehow complex structure and
+	 * access to it should be made carrefully.
+	 */
+    SOCKET_ADDRESS socketAddress;
+
     /**
      * The reference to the service controlling
      * (managing) this connection (owner).

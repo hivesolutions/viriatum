@@ -237,7 +237,7 @@ ERROR_CODE loadOptionsService(struct Service_t *service, struct HashMap_t *argum
 
 ERROR_CODE startService(struct Service_t *service) {
     /* allocates the socket address structure */
-    SOCKET_ADDRESS_INPUT socketAddress;
+    SOCKET_ADDRESS_INTERNET socketAddress;
 
     /* allocates the socket result */
     SOCKET_ERROR_CODE socketResult;
