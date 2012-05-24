@@ -56,6 +56,16 @@ typedef struct ModPhpModule_t {
 } ModPhpModule;
 
 /**
+ * Structure representing a php request
+ * for rendering of a page.
+ * This structure contains a series of
+ * values useful for request flush.
+ */
+typedef struct PhpRequest_t {
+    char mimeType[1024];
+} PhpRequest;
+
+/**
  * The global reference to the currently loaded service
  * this is the reference required for the basic interaction
  * with the service.
@@ -75,6 +85,13 @@ struct Connection_t *_connection;
  * from the php default execution output.
  */
 struct LinkedBuffer_t *_outputBuffer;
+
+/**
+ * The global structure to be used to "pass" php
+ * information from the virtual machine into the
+ * appropriate viriatum request handler.
+ */
+struct PhpRequest_t _phpRequest;
 
 VIRIATUM_EXPORT_PREFIX ERROR_CODE createModPhpModule(struct ModPhpModule_t **modPhpModulePointer, struct Module_t *module);
 VIRIATUM_EXPORT_PREFIX ERROR_CODE deleteModPhpModule(struct ModPhpModule_t *modPhpModule);
