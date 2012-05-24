@@ -34,7 +34,7 @@
 #define SOCKET_HANDLE SOCKET
 #define SOCKET_ADDRESS_SIZE int
 #define SOCKET_ADDRESS SOCKADDR
-#define SOCKET_ADDRESS_INPUT SOCKADDR_IN
+#define SOCKET_ADDRESS_INTERNET SOCKADDR_IN
 #define SOCKET_FLAGS unsigned long
 #define SOCKET_OPTION char
 #define SOCKET_ERROR_CODE int
@@ -85,7 +85,7 @@
 #define SOCKET_HANDLE int
 #define SOCKET_ADDRESS_SIZE socklen_t
 #define SOCKET_ADDRESS struct sockaddr
-#define SOCKET_ADDRESS_INPUT struct sockaddr_in
+#define SOCKET_ADDRESS_INTERNET struct sockaddr_in
 #define SOCKET_FLAGS unsigned long
 #define SOCKET_OPTION int
 #define SOCKET_ERROR_CODE int
