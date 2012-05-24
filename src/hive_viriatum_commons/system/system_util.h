@@ -51,6 +51,7 @@
 #define GET_PID() getpid()
 #define SPRINTF(buffer, size, format, ...) sprintf(buffer, format, __VA_ARGS__)
 #define STRTOK(string, delimiter, context) strtok(string, delimiter); dump((void *) &context)
+#define STRCPY(destination, size, source) strcpy(destination, source)
 #define FOPEN(filePointer, fileName, mode) *filePointer = fopen(fileName, mode)
 #define GET_ENV(buffer, bufferSize, variableName) buffer = getenv(variableName)
 #define GET_PROCESS() RUSAGE_SELF
@@ -63,12 +64,14 @@
 #ifdef VIRIATUM_PLATFORM_MSC
 #define SPRINTF(buffer, size, format, ...) sprintf_s(buffer, size, format, __VA_ARGS__)
 #define STRTOK(string, delimiter, context) strtok_s(string, delimiter, &context)
+#define STRCPY(destination, size, source) strcpy_s(destination, size, source)
 #define FOPEN(filePointer, fileName, mode) fopen_s(filePointer, fileName, mode)
 #endif
 
 #ifdef VIRIATUM_PLATFORM_MINGW
 #define SPRINTF(buffer, size, format, ...) sprintf(buffer, format, __VA_ARGS__)
 #define STRTOK(string, delimiter, context) strtok(string, delimiter); dump((void *) &context)
+#define STRCPY(destination, size, source) strcpy(destination, source)
 #define FOPEN(filePointer, fileName, mode) *filePointer = fopen(fileName, mode)
 #endif
 

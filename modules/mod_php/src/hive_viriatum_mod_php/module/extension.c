@@ -121,7 +121,7 @@ int _moduleHeader(sapi_header_struct *header, sapi_header_op_enum operation, sap
 }
 
 int _moduleSendHeaders(sapi_headers_struct *headers TSRMLS_DC) {
-	strcpy(_phpRequest.mimeType, headers->mimetype);
+	STRCPY(_phpRequest.mimeType, 1024, headers->mimetype);
     return SAPI_HEADER_SENT_SUCCESSFULLY;
 }
 
