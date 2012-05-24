@@ -290,6 +290,11 @@ ERROR_CODE _sendResponseHandlerModule(struct HttpParser_t *httpParser) {
     struct Connection_t *connection = (struct Connection_t *) httpParser->parameters;
     struct HandlerPhpContext_t *handlerPhpContext = (struct HandlerPhpContext_t *) httpParser->context;
 
+	/* sets the global reference to the connection currently being
+	used for the php interpreter this is the reference that is going
+	to be used while accessing global server values */
+	_connection = connection;
+
     /* creates the linked buffer to be used to store
     the complete output of the php interpreter */
     createLinkedBuffer(&outputBuffer);
