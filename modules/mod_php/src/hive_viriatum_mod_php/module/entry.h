@@ -63,6 +63,13 @@ typedef struct ModPhpModule_t {
 struct Service_t *_service;
 
 /**
+ * The global reference to the current connection being
+ * used, this is going to be used to access connection
+ * information values.
+ */
+struct Connection_t *_connection;
+
+/**
  * The global reference to the linked buffer to
  * be used to hold the various strings resulting
  * from the php default execution output.
