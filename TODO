@@ -8,6 +8,7 @@
 * Support for Python embedding (mod_python)
 * Support for WSGI (mod_wsgi)
 * Support for Google V8 (mod_v8) 
+* Support for HTTP ranges (http://www.web-polygraph.org/docs/userman/ranges.html)
 * Support for configuration using parsing of json (https://github.com/json-c/json-c) or any other in (http://www.json.org)
 * Support for the buffering to support the request object based on the nginx implementation (http://www.slideshare.net/joshzhu/nginx-internals)
 * Apply the famous http parser of node.js http://github.com/ry/http-parser
