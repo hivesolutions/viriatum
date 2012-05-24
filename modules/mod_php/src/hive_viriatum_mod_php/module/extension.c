@@ -121,6 +121,8 @@ int _moduleHeader(sapi_header_struct *header, sapi_header_op_enum operation, sap
 }
 
 int _moduleSendHeaders(sapi_headers_struct *headers TSRMLS_DC) {
+	printf("%s", headers->mimetype);
+
     return SAPI_HEADER_SENT_SUCCESSFULLY;
 }
 
@@ -133,7 +135,21 @@ char *_moduleReadCookies(TSRMLS_D) {
 }
 
 void _moduleRegister(zval *_array TSRMLS_DC) {
+	/* allocates space for the address string reference
+	and then retrieves the current connection's socket
+	address structure to be used to retrieve the address
+	string value (for exporting) */
+	char *addressString;
+	SOCKET_ADDRESS address = _connection->socketAddress;
+
+	/* converts the address of the socket into the representing
+	string value (for exporting the value) */
+	addressString = inet_ntoa(((SOCKET_ADDRESS_INTERNET *) &address)->sin_addr);
+
+	/* registers a series og global wide variable representing the
+	current interface (critical for correct php interpreter usage) */
     php_register_variable_safe("GATEWAY_INTERFACE", "viriatum", sizeof("viriatum") - 1, _array TSRMLS_CC);
+	php_register_variable_safe("REMOTE_ADDR", addressString, strlen(addressString), _array TSRMLS_CC);
 }
 
 void _moduleLog(char *message TSRMLS_DC) {
