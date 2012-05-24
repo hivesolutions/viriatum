@@ -4,27 +4,31 @@
         <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
         <script type="text/javascript" src="status.js"></script>
         <script type="text/javascript">
-        var random = new TimeSeries();
-      setInterval(function() {
-$.getJSON("status_json.php", function(data) {
-  var items = [];
-  var connections = data["connections"];
-   random.append(new Date().getTime(), connections);
-});
-      }, 2500);
+            var random = new TimeSeries();
 
-      function createTimeline() {
-        var chart = new SmoothieChart();
-        chart.addTimeSeries(random, { strokeStyle: "rgba(0, 255, 0, 1)", fillStyle : "rgba(0, 255, 0, 0.2)", lineWidth: 4 });
-        chart.streamTo(document.getElementById("chart"), 500);
-$.getJSON("stats_json.php", function(data) {
-  var items = [];
-  var connections = data["connections"];
-   random.append(new Date().getTime(), connections);
-});
+            setInterval(function() {
+                        $.getJSON("status_json.php", function(data) {
+                                    var items = [];
+                                    var connections = data["connections"];
+                                    random.append(new Date().getTime(), connections);
+                                });
+                    }, 2500);
 
-      }
-    </script>
+            function createTimeline() {
+                var chart = new SmoothieChart();
+                chart.addTimeSeries(random, {
+                            strokeStyle : "rgba(0, 255, 0, 1)",
+                            fillStyle : "rgba(0, 255, 0, 0.2)",
+                            lineWidth : 4
+                        });
+                chart.streamTo(document.getElementById("chart"), 500);
+                $.getJSON("stats_json.php", function(data) {
+                            var items = [];
+                            var connections = data["connections"];
+                            random.append(new Date().getTime(), connections);
+                        });
+            }
+        </script>
         <title>Viriatum</title>
     </head>
     <body onload="createTimeline()">
