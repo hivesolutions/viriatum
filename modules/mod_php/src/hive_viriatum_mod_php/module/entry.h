@@ -63,7 +63,7 @@ typedef struct ModPhpModule_t {
  */
 typedef struct PhpRequest_t {
     char mimeType[1024];
-	struct HandlerPhpContext_t *phpContext;
+    struct HandlerPhpContext_t *phpContext;
 } PhpRequest;
 
 /**

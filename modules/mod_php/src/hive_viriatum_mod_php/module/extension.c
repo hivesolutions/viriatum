@@ -121,20 +121,20 @@ int _moduleHeader(sapi_header_struct *header, sapi_header_op_enum operation, sap
 }
 
 int _moduleSendHeaders(sapi_headers_struct *headers TSRMLS_DC) {
-	STRCPY(_phpRequest.mimeType, 1024, headers->mimetype);
+    STRCPY(_phpRequest.mimeType, 1024, headers->mimetype);
     return SAPI_HEADER_SENT_SUCCESSFULLY;
 }
 
 int _moduleReadPost(char *buffer, uint size TSRMLS_DC) {
-	unsigned char *postData = _phpRequest.phpContext->postData;
-	size_t contentLength = _phpRequest.phpContext->contentLength;
-	size_t _size = contentLength > size ? size : contentLength;
+    unsigned char *postData = _phpRequest.phpContext->postData;
+    size_t contentLength = _phpRequest.phpContext->contentLength;
+    size_t _size = contentLength > size ? size : contentLength;
 
-	if(postData == NULL) { return 0; }
+    if(postData == NULL) { return 0; }
 
-	memcpy(buffer, _phpRequest.phpContext->postData, _size);
-	_phpRequest.phpContext->contentLength -= _size;
-	_phpRequest.phpContext->postData += _size;
+    memcpy(buffer, _phpRequest.phpContext->postData, _size);
+    _phpRequest.phpContext->contentLength -= _size;
+    _phpRequest.phpContext->postData += _size;
 
     return _size;
 }
@@ -144,23 +144,23 @@ char *_moduleReadCookies(TSRMLS_D) {
 }
 
 void _moduleRegister(zval *_array TSRMLS_DC) {
-	/* allocates space for the address string reference
-	and then retrieves the current connection's socket
-	address structure to be used to retrieve the address
-	string value (for exporting) */
-	char *addressString;
-	SOCKET_ADDRESS address = _connection->socketAddress;
+    /* allocates space for the address string reference
+    and then retrieves the current connection's socket
+    address structure to be used to retrieve the address
+    string value (for exporting) */
+    char *addressString;
+    SOCKET_ADDRESS address = _connection->socketAddress;
 
-	/* converts the address of the socket into the representing
-	string value (for exporting the value) */
-	addressString = inet_ntoa(((SOCKET_ADDRESS_INTERNET *) &address)->sin_addr);
+    /* converts the address of the socket into the representing
+    string value (for exporting the value) */
+    addressString = inet_ntoa(((SOCKET_ADDRESS_INTERNET *) &address)->sin_addr);
 
-	/* registers a series og global wide variable representing the
-	current interface (critical for correct php interpreter usage) */
-	php_register_variable_safe("PHP_SELF", "-", 1, _array TSRMLS_CC);
+    /* registers a series og global wide variable representing the
+    current interface (critical for correct php interpreter usage) */
+    php_register_variable_safe("PHP_SELF", "-", 1, _array TSRMLS_CC);
     php_register_variable_safe("GATEWAY_INTERFACE", "viriatum", sizeof("viriatum") - 1, _array TSRMLS_CC);
-	php_register_variable_safe("REQUEST_TYPE", (char *) _phpRequest.phpContext->method, strlen(_phpRequest.phpContext->method), _array TSRMLS_CC);
-	php_register_variable_safe("REMOTE_ADDR", addressString, strlen(addressString), _array TSRMLS_CC);
+    php_register_variable_safe("REQUEST_TYPE", (char *) _phpRequest.phpContext->method, strlen(_phpRequest.phpContext->method), _array TSRMLS_CC);
+    php_register_variable_safe("REMOTE_ADDR", addressString, strlen(addressString), _array TSRMLS_CC);
 }
 
 void _moduleLog(char *message TSRMLS_DC) {

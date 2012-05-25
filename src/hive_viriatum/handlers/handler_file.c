@@ -142,8 +142,8 @@ ERROR_CODE messageBeginCallbackHandlerFile(struct HttpParser_t *httpParser) {
 
 ERROR_CODE urlCallbackHandlerFile(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize) {
     /* allocates the required space for the url, this
-	is done through static allocation */
-	unsigned char url[VIRIATUM_MAX_URL_SIZE];
+    is done through static allocation */
+    unsigned char url[VIRIATUM_MAX_URL_SIZE];
 
     /* retrieves the handler file context from the http parser */
     struct HandlerFileContext_t *handlerFileContext = (struct HandlerFileContext_t *) httpParser->context;
@@ -155,7 +155,7 @@ ERROR_CODE urlCallbackHandlerFile(struct HttpParser_t *httpParser, const unsigne
     struct ServiceOptions_t *options = service->options;
 
     /* copies the memory from the data to the url and then
-	puts the end of string in the url */
+    puts the end of string in the url */
     memcpy(url, data, dataSize);
     url[dataSize] = '\0';
 
@@ -497,23 +497,23 @@ ERROR_CODE _unsetHttpSettingsHandlerFile(struct HttpSettings_t *httpSettings) {
 
 ERROR_CODE _cleanupHandlerFile(struct Connection_t *connection, struct Data_t *data, void *parameters) {
     /* casts the parameters as handler file context and then
-	retrieves the flags argument for checking of connection */
+    retrieves the flags argument for checking of connection */
     struct HandlerFileContext_t *handlerFileContext = (struct HandlerFileContext_t *) parameters;
-	unsigned char flags = handlerFileContext->flags;
+    unsigned char flags = handlerFileContext->flags;
 
-	/* retrieves the underlying connection references in order to be
-	able to operate over them, for unregister */
-	struct IoConnection_t *ioConnection = (struct IoConnection_t *) connection->lower;
-	struct HttpConnection_t *httpConnection = (struct HttpConnection_t *) ioConnection->lower;
+    /* retrieves the underlying connection references in order to be
+    able to operate over them, for unregister */
+    struct IoConnection_t *ioConnection = (struct IoConnection_t *) connection->lower;
+    struct HttpConnection_t *httpConnection = (struct HttpConnection_t *) ioConnection->lower;
 
-	/* in case there is an http handler in the current connection must
+    /* in case there is an http handler in the current connection must
     unset it (remove temporary information) */
     if(httpConnection->httpHandler) {
-		/* unsets the current http connection and then sets the reference
-		to it in the http connection as unset */
-		httpConnection->httpHandler->unset(httpConnection);
-		httpConnection->httpHandler = NULL;
-	}
+        /* unsets the current http connection and then sets the reference
+        to it in the http connection as unset */
+        httpConnection->httpHandler->unset(httpConnection);
+        httpConnection->httpHandler = NULL;
+    }
 
     /* in case the connection is not meant to be kept alive */
     if(!(flags & FLAG_CONNECTION_KEEP_ALIVE)) {
@@ -521,7 +521,7 @@ ERROR_CODE _cleanupHandlerFile(struct Connection_t *connection, struct Data_t *d
         connection->closeConnection(connection);
     }
 
-	/* raise no error */
+    /* raise no error */
     RAISE_NO_ERROR;
 }
 
