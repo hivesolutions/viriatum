@@ -117,6 +117,26 @@ typedef struct HttpConnection_t {
      * initialy by this handler.
      */
     struct HttpHandler_t *baseHandler;
+
+	/**
+	 * The current contiguous buffer for the complete
+	 * http stream in processing.
+	 */
+	unsigned char *buffer;
+
+	/**
+	 * The current size of the buffer containing the http
+	 * data in processing.
+     * This value is used to retrieve the current position
+	 * to be written into the buffer.
+	 */
+	size_t bufferSize;
+
+	/**
+	 * The current offset of the buffer containing the http
+	 * data in processing.
+	 */
+	size_t bufferOffset;
 } HttpConnection;
 
 ERROR_CODE createHttpHandler(struct HttpHandler_t **httpHandlerPointer, unsigned char *name);
