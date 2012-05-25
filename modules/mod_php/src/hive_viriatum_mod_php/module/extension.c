@@ -126,7 +126,7 @@ int _moduleSendHeaders(sapi_headers_struct *headers TSRMLS_DC) {
 }
 
 int _moduleReadPost(char *buffer, uint size TSRMLS_DC) {
-	char *postData = _phpRequest.phpContext->postData;
+	unsigned char *postData = _phpRequest.phpContext->postData;
 	size_t contentLength = _phpRequest.phpContext->contentLength;
 	size_t _size = contentLength > size ? size : contentLength;
 
