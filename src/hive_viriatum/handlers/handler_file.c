@@ -496,16 +496,32 @@ ERROR_CODE _unsetHttpSettingsHandlerFile(struct HttpSettings_t *httpSettings) {
 }
 
 ERROR_CODE _cleanupHandlerFile(struct Connection_t *connection, struct Data_t *data, void *parameters) {
-    /* casts the parameters as handler file context */
+    /* casts the parameters as handler file context and then
+	retrieves the flags argument for checking of connection */
     struct HandlerFileContext_t *handlerFileContext = (struct HandlerFileContext_t *) parameters;
+	unsigned char flags = handlerFileContext->flags;
+
+	/* retrieves the underlying connection references in order to be
+	able to operate over them, for unregister */
+	struct IoConnection_t *ioConnection = (struct IoConnection_t *) connection->lower;
+	struct HttpConnection_t *httpConnection = (struct HttpConnection_t *) ioConnection->lower;
+
+	/* in case there is an http handler in the current connection must
+    unset it (remove temporary information) */
+    if(httpConnection->httpHandler) {
+		/* unsets the current http connection and then sets the reference
+		to it in the http connection as unset */
+		httpConnection->httpHandler->unset(httpConnection);
+		httpConnection->httpHandler = NULL;
+	}
 
     /* in case the connection is not meant to be kept alive */
-    if(!(handlerFileContext->flags & FLAG_CONNECTION_KEEP_ALIVE)) {
+    if(!(flags & FLAG_CONNECTION_KEEP_ALIVE)) {
         /* closes the connection */
         connection->closeConnection(connection);
     }
 
-    /* raise no error */
+	/* raise no error */
     RAISE_NO_ERROR;
 }
 
