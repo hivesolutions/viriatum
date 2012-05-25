@@ -88,7 +88,7 @@ mv $deb_dir/$name.deb $dist_dir
 cd $dist_dir
 for file in *; do
     md5sum $file > /tmp/$file.md5
-	sha1sum $file > /tmp/$file.sha1
+    sha1sum $file > /tmp/$file.sha1
 done
 md5sum * > /tmp/MD5SUMS
 sha1sum * > /tmp/SHA1SUMS

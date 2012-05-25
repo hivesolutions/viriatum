@@ -66,29 +66,29 @@ typedef struct HandlerPhpContext_t {
      */
     unsigned char filePath[VIRIATUM_MAX_PATH_SIZE];
 
-	/**
-	 * The content type for the current request being
-	 * made this is a header value.
-	 */
-	unsigned char contentType[VIRIATUM_MAX_HEADER_SIZE];
+    /**
+     * The content type for the current request being
+     * made this is a header value.
+     */
+    unsigned char contentType[VIRIATUM_MAX_HEADER_SIZE];
 
-	/**
-	 * The string representing the http method
-	 * currently being used.
-	 */
-	char *method;
+    /**
+     * The string representing the http method
+     * currently being used.
+     */
+    char *method;
 
-	/**
+    /**
      * The pointer to the post data buffer to be
-	 * used in the processing.
-	 */
-	unsigned char *postData;
+     * used in the processing.
+     */
+    unsigned char *postData;
 
-	/**
-	 * The content length reference to the current
-	 * request.
-	 */
-	size_t contentLength;
+    /**
+     * The content length reference to the current
+     * request.
+     */
+    size_t contentLength;
 
     /**
      * The output nbuffer to be used for the
@@ -96,11 +96,11 @@ typedef struct HandlerPhpContext_t {
      */
     struct LinkedBuffer_t *outputBuffer;
 
-	/**
-	 * Flag used to control the reading of the content
-	 * type header (private usage only).
-	 */
-	char _nextContentType;
+    /**
+     * Flag used to control the reading of the content
+     * type header (private usage only).
+     */
+    char _nextContentType;
 } HandlerPhpContext;
 
 ERROR_CODE createModPhpHttpHandler(struct ModPhpHttpHandler_t **modPhpHttpHandlerPonter, struct HttpHandler_t *httpHandlerPonter);

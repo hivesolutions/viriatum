@@ -57,7 +57,7 @@ void createHttpParser(struct HttpParser_t **httpParserPointer) {
     struct HttpParser_t *httpParser = (struct HttpParser_t *) MALLOC(httpParserSize);
 
     /* sets the http parser attributes, in the original
-	definition, this should be able to start a parsing */
+    definition, this should be able to start a parsing */
     httpParser->type = 2;
     httpParser->flags = 6;
     httpParser->state = STATE_START_REQ;
@@ -71,7 +71,7 @@ void createHttpParser(struct HttpParser_t **httpParserPointer) {
     httpParser->upgrade = 0;
     httpParser->context = NULL;
     httpParser->parameters = NULL;
-	httpParser->_contentLength = 0;
+    httpParser->_contentLength = 0;
 
     /* sets the http parser in the http parser pointer */
     *httpParserPointer = httpParser;
@@ -1467,7 +1467,7 @@ int processDataHttpParser(struct HttpParser_t *httpParser, struct HttpSettings_t
                     }
 
                     readCount = 0;
-				
+
                     if(httpParser->flags & FLAG_UPGRADE || httpParser->method == HTTP_CONNECT) {
                         httpParser->upgrade = 1;
                     }
@@ -1516,9 +1516,9 @@ int processDataHttpParser(struct HttpParser_t *httpParser, struct HttpSettings_t
                             /* Content-Length header given and non-zero */
                             state = STATE_BODY_IDENTITY;
 
-							/* saves the content length value in the private
-							value so that it can be used later */
-							httpParser->_contentLength = httpParser->contentLength;
+                            /* saves the content length value in the private
+                            value so that it can be used later */
+                            httpParser->_contentLength = httpParser->contentLength;
                         } else {
                             if(httpParser->type == HTTP_REQUEST || httpShouldKeepAlive(httpParser)) {
                                 /* Assume content-length 0 - read the next */

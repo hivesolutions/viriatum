@@ -103,10 +103,10 @@ ERROR_CODE acceptHandlerStreamIo(struct Connection_t *connection) {
             /* creates the (client) connection */
             createConnection(&clientConnection, socketHandle);
 
-			/* sets the socket address in the (client) connection
-			this is going to be very usefull for later connection
-			identification (address, port, etc.) */
-			clientConnection->socketAddress = socketAddress;
+            /* sets the socket address in the (client) connection
+            this is going to be very usefull for later connection
+            identification (address, port, etc.) */
+            clientConnection->socketAddress = socketAddress;
 
             /* sets the service select service as the service in the (client)  connection */
             clientConnection->service = connection->service;

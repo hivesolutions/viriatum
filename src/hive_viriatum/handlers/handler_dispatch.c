@@ -182,13 +182,13 @@ ERROR_CODE urlCallbackHandlerDispatch(struct HttpParser_t *httpParser, const uns
     size_t index;
 #endif
 
-	/* allocates space for the name of the handler to be
-	used for the dispatching operation (target handler) */
+    /* allocates space for the name of the handler to be
+    used for the dispatching operation (target handler) */
     unsigned char *handlerName;
 
     /* allocates the required space for the url, this
-	is done through static allocation */
-	unsigned char url[VIRIATUM_MAX_URL_SIZE];
+    is done through static allocation */
+    unsigned char url[VIRIATUM_MAX_URL_SIZE];
 
     struct Connection_t *connection = (struct Connection_t *) httpParser->parameters;
     struct IoConnection_t *ioConnection = (struct IoConnection_t *) connection->lower;
@@ -209,11 +209,11 @@ ERROR_CODE urlCallbackHandlerDispatch(struct HttpParser_t *httpParser, const uns
 
 
     /* THIS IS EXTREMLY SLOW !!! WARNING may be a better
-	idea to compile all the regex into a single regex must
-	refer to the nginx documentation for that */
+    idea to compile all the regex into a single regex must
+    refer to the nginx documentation for that */
 
-	/* sets the default handler, this is considered to be
-	the fallback in case no handler is found */
+    /* sets the default handler, this is considered to be
+    the fallback in case no handler is found */
     handlerName = (unsigned char *) DISPATCH_DEFAULT_HANDLER;
 
 #ifdef VIRIATUM_PCRE
@@ -245,7 +245,7 @@ ERROR_CODE urlCallbackHandlerDispatch(struct HttpParser_t *httpParser, const uns
         httpConnection->httpHandler->unset(httpConnection);
         handler->set(httpConnection);
         httpConnection->httpHandler = handler;
-		httpConnection->httpSettings->onmessageBegin(httpParser);
+        httpConnection->httpSettings->onmessageBegin(httpParser);
         httpConnection->httpSettings->onurl(httpParser, data, dataSize);
     } else {
         /* prints an error message to the output */
@@ -345,19 +345,19 @@ ERROR_CODE _sendResponseCallbackHandlerDispatch(struct Connection_t *connection,
     /* retrieves the http parser */
     struct HttpParser_t *httpParser = (struct HttpParser_t *) parameters;
 
-	/* retrieves the underlying connection references in order to be
-	able to operate over them, for unregister */
-	struct IoConnection_t *ioConnection = (struct IoConnection_t *) connection->lower;
-	struct HttpConnection_t *httpConnection = (struct HttpConnection_t *) ioConnection->lower;
+    /* retrieves the underlying connection references in order to be
+    able to operate over them, for unregister */
+    struct IoConnection_t *ioConnection = (struct IoConnection_t *) connection->lower;
+    struct HttpConnection_t *httpConnection = (struct HttpConnection_t *) ioConnection->lower;
 
-	/* in case there is an http handler in the current connection must
+    /* in case there is an http handler in the current connection must
     unset it (remove temporary information) */
     if(httpConnection->httpHandler) {
-		/* unsets the current http connection and then sets the reference
-		to it in the http connection as unset */
-		httpConnection->httpHandler->unset(httpConnection);
-		httpConnection->httpHandler = NULL;
-	}
+        /* unsets the current http connection and then sets the reference
+        to it in the http connection as unset */
+        httpConnection->httpHandler->unset(httpConnection);
+        httpConnection->httpHandler = NULL;
+    }
 
     /* in case the connection is not meant to be kept alive */
     if(!(httpParser->flags & FLAG_CONNECTION_KEEP_ALIVE)) {
