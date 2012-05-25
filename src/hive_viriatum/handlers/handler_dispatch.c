@@ -245,6 +245,7 @@ ERROR_CODE urlCallbackHandlerDispatch(struct HttpParser_t *httpParser, const uns
         httpConnection->httpHandler->unset(httpConnection);
         handler->set(httpConnection);
         httpConnection->httpHandler = handler;
+		httpConnection->httpSettings->onmessageBegin(httpParser);
         httpConnection->httpSettings->onurl(httpParser, data, dataSize);
     } else {
         /* prints an error message to the output */
