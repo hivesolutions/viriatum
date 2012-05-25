@@ -126,7 +126,17 @@ int _moduleSendHeaders(sapi_headers_struct *headers TSRMLS_DC) {
 }
 
 int _moduleReadPost(char *buffer, uint size TSRMLS_DC) {
-    return size;
+	char *postData = _phpRequest.phpContext->postData;
+	size_t contentLength = _phpRequest.phpContext->contentLength;
+	size_t _size = contentLength > size ? size : contentLength;
+
+	if(postData == NULL) { return 0; }
+
+	memcpy(buffer, _phpRequest.phpContext->postData, _size);
+	_phpRequest.phpContext->contentLength -= _size;
+	_phpRequest.phpContext->postData += _size;
+
+    return _size;
 }
 
 char *_moduleReadCookies(TSRMLS_D) {
@@ -147,7 +157,9 @@ void _moduleRegister(zval *_array TSRMLS_DC) {
 
 	/* registers a series og global wide variable representing the
 	current interface (critical for correct php interpreter usage) */
+	php_register_variable_safe("PHP_SELF", "-", 1, _array TSRMLS_CC);
     php_register_variable_safe("GATEWAY_INTERFACE", "viriatum", sizeof("viriatum") - 1, _array TSRMLS_CC);
+	php_register_variable_safe("REQUEST_TYPE", (char *) _phpRequest.phpContext->method, strlen(_phpRequest.phpContext->method), _array TSRMLS_CC);
 	php_register_variable_safe("REMOTE_ADDR", addressString, strlen(addressString), _array TSRMLS_CC);
 }
 
