@@ -440,6 +440,12 @@ typedef struct HttpParser_t {
      * connection objects.
      */
     void *parameters;
+
+	/**
+	 * The original content length value, this
+	 * value is not changed across parsing requests.
+	 */
+	size_t _contentLength;
 } HttpParser;
 
 /**
