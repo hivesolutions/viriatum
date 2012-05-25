@@ -49,19 +49,6 @@ int httpShouldKeepAlive(struct HttpParser_t *httpParser) {
     }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 void createHttpParser(struct HttpParser_t **httpParserPointer) {
     /* retrieves the http parser size */
     size_t httpParserSize = sizeof(struct HttpParser_t);
@@ -69,44 +56,22 @@ void createHttpParser(struct HttpParser_t **httpParserPointer) {
     /* allocates space for the http parser */
     struct HttpParser_t *httpParser = (struct HttpParser_t *) MALLOC(httpParserSize);
 
-    /* sets the http parser type */
+    /* sets the http parser attributes, in the original
+	definition, this should be able to start a parsing */
     httpParser->type = 2;
-
-    /* sets the http parser flags */
     httpParser->flags = 6;
-
-    /* sets the http parser state */
     httpParser->state = STATE_START_REQ;
-
-    /* sets the http parser header state */
     httpParser->headerState = 0;
-
-    /* sets the http parser read count */
     httpParser->readCount = 0;
-
-    /* sets the http parser content length */
-    httpParser->contentLength = 0;
-
-    /* sets the http parser http major */
+    httpParser->contentLength = -1;
     httpParser->httpMajor = 0;
-
-    /* sets the http parser http minor */
     httpParser->httpMinor = 0;
-
-    /* sets the http parser http minor */
     httpParser->statusCode = 0;
-
-    /* sets the http parser method */
     httpParser->method = 0;
-
-    /* sets the http parser upgrade */
     httpParser->upgrade = 0;
-
-    /* sets the http parser context */
     httpParser->context = NULL;
-
-    /* sets the http parser parameters */
     httpParser->parameters = NULL;
+	httpParser->_contentLength = 0;
 
     /* sets the http parser in the http parser pointer */
     *httpParserPointer = httpParser;
@@ -1550,6 +1515,10 @@ int processDataHttpParser(struct HttpParser_t *httpParser, struct HttpSettings_t
                         } else if(httpParser->contentLength > 0) {
                             /* Content-Length header given and non-zero */
                             state = STATE_BODY_IDENTITY;
+
+							/* saves the content length value in the private
+							value so that it can be used later */
+							httpParser->_contentLength = httpParser->contentLength;
                         } else {
                             if(httpParser->type == HTTP_REQUEST || httpShouldKeepAlive(httpParser)) {
                                 /* Assume content-length 0 - read the next */
