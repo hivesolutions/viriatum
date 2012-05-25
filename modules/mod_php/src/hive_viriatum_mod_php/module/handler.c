@@ -65,7 +65,11 @@ ERROR_CODE createHandlerPhpContext(struct HandlerPhpContext_t **handlerPhpContex
     struct HandlerPhpContext_t *handlerPhpContext = (struct HandlerPhpContext_t *) MALLOC(handlerPhpContextSize);
 
     /* sets the handler php default values */
+	handlerPhpContext->method = NULL;
+	handlerPhpContext->postData = NULL;
+	handlerPhpContext->contentLength = 0;
     handlerPhpContext->outputBuffer = NULL;
+	handlerPhpContext->_nextContentType = 0;
 
     /* sets the handler php context in the  pointer */
     *handlerPhpContextPointer = handlerPhpContext;
@@ -110,6 +114,12 @@ ERROR_CODE unsetHandlerModule(struct HttpConnection_t *httpConnection) {
 }
 
 ERROR_CODE messageBeginCallbackHandlerModule(struct HttpParser_t *httpParser) {
+    /* retrieves the handler php context from the http parser
+	in order tu use it to update the content type to the default
+	empty value (avoids possible problems in php interpreter)*/
+    struct HandlerPhpContext_t *handlerPhpContext = (struct HandlerPhpContext_t *) httpParser->context;
+	handlerPhpContext->contentType[0] = '\0';
+
     /* raise no error */
     RAISE_NO_ERROR;
 }
@@ -151,11 +161,31 @@ ERROR_CODE urlCallbackHandlerModule(struct HttpParser_t *httpParser, const unsig
 }
 
 ERROR_CODE headerFieldCallbackHandlerModule(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize) {
+    /* retrieves the handler php context from the http parser */
+    struct HandlerPhpContext_t *handlerPhpContext = (struct HandlerPhpContext_t *) httpParser->context;
+
+	/* checks if the current header is not the content type
+	in case it is sets the next content type flag */
+	if(memcmp(data, "Content-Type", dataSize) == 0) { handlerPhpContext->_nextContentType = 1; }
+
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
 ERROR_CODE headerValueCallbackHandlerModule(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize) {
+    /* retrieves the handler php context from the http parser */
+    struct HandlerPhpContext_t *handlerPhpContext = (struct HandlerPhpContext_t *) httpParser->context;
+
+	/* in case the next content type flag is set
+	must copy the header value to the buffer */
+	if(handlerPhpContext->_nextContentType) {
+		/* copies the content type header value into the
+		appropriate buffer in the php context */
+		memcpy(handlerPhpContext->contentType, data, dataSize);
+		handlerPhpContext->contentType[dataSize] = '\0';
+		handlerPhpContext->_nextContentType = 0;
+	}
+
     /* raise no error */
     RAISE_NO_ERROR;
 }
@@ -278,8 +308,11 @@ ERROR_CODE _sendResponseHandlerModule(struct HttpParser_t *httpParser) {
     during for script execution */
     zend_file_handle script;
 
-    /* allocates space for the buffer that will hold the headers */
+    /* allocates space for the buffer that will hold the headers and
+	the pointer that will hold the reference to the buffer containing
+	the post data information */
     char *headersBuffer;
+	unsigned char *postData;
 
     /* allocates space for the linked buffer to be used for the
     standard ouput resulting from the php interpreter execution */
@@ -288,7 +321,18 @@ ERROR_CODE _sendResponseHandlerModule(struct HttpParser_t *httpParser) {
     /* retrieves the connection from the http parser parameters
     and then retrieves the handler php context*/
     struct Connection_t *connection = (struct Connection_t *) httpParser->parameters;
+	struct IoConnection_t *ioConnection = (struct IoConnection_t *) connection->lower;
+	struct HttpConnection_t *httpConnection = (struct HttpConnection_t *) ioConnection->lower;
     struct HandlerPhpContext_t *handlerPhpContext = (struct HandlerPhpContext_t *) httpParser->context;
+
+	/* retrieves the http method string value accessing the array of
+	static string values */
+	char *method = (char *) httpMethodStrings[httpParser->method - 1];
+
+	/* in case there is contents to be read retrieves the appropriate
+	reference to the start of the post data in the connection buffer */
+	if(httpParser->_contentLength > 0) { postData = &httpConnection->buffer[httpConnection->bufferOffset - httpParser->_contentLength];
+	} else { postData = NULL; }
 
 	/* sets the global reference to the connection currently being
 	used for the php interpreter this is the reference that is going
@@ -304,7 +348,14 @@ ERROR_CODE _sendResponseHandlerModule(struct HttpParser_t *httpParser) {
     current output stream values, then sets the output buffer also
     in the current http parser structure reference */
     _outputBuffer = outputBuffer;
+	handlerPhpContext->method = method;
+	handlerPhpContext->postData = postData;
+	handlerPhpContext->contentLength = httpParser->_contentLength;
     handlerPhpContext->outputBuffer = outputBuffer;
+
+	/* sets the php context in the php reques tfor global reference
+	this should be able to allow global access from the handler methods */
+	_phpRequest.phpContext = handlerPhpContext;
 
     /* updates the current global php reqest information
     this is the main interface for the sapi modules */
@@ -348,6 +399,20 @@ ERROR_CODE _sendResponseCallbackHandlerModule(struct Connection_t *connection, s
     /* retrieves the http parser */
     struct HttpParser_t *httpParser = (struct HttpParser_t *) parameters;
 
+	/* retrieves the underlying connection references in order to be
+	able to operate over them, for unregister */
+	struct IoConnection_t *ioConnection = (struct IoConnection_t *) connection->lower;
+	struct HttpConnection_t *httpConnection = (struct HttpConnection_t *) ioConnection->lower;
+
+	/* in case there is an http handler in the current connection must
+    unset it (remove temporary information) */
+    if(httpConnection->httpHandler) {
+		/* unsets the current http connection and then sets the reference
+		to it in the http connection as unset */
+		httpConnection->httpHandler->unset(httpConnection);
+		httpConnection->httpHandler = NULL;
+	}
+
     /* in case the connection is not meant to be kept alive */
     if(!(httpParser->flags & FLAG_CONNECTION_KEEP_ALIVE)) {
         /* closes the connection */
@@ -384,14 +449,17 @@ ERROR_CODE _writeErrorConnection(struct HttpParser_t *httpParser, char *message)
 ERROR_CODE _updateRequest(struct HandlerPhpContext_t *handlerPhpContext) {
     SG(sapi_headers).http_response_code = 200;
     SG(sapi_headers).http_status_line = "OK";
-    SG(request_info).content_type = "text/html";
+	SG(request_info).content_type = (char *) handlerPhpContext->contentType;
     SG(request_info).query_string = (char *) handlerPhpContext->query;
-    SG(request_info).request_method = "GET";
+    SG(request_info).request_method = handlerPhpContext->method;
     SG(request_info).proto_num = 1001;
     SG(request_info).request_uri = (char *) handlerPhpContext->url;
     SG(request_info).path_translated = (char *) handlerPhpContext->filePath;
-    SG(request_info).content_length = 0;
+    SG(request_info).content_length = handlerPhpContext->contentLength;
+
     SG(global_request_time) = 0;
+	SG(read_post_bytes) = 1;
+	SG(server_context) = (void *) 1;
 
     /* raises no error */
     RAISE_NO_ERROR;
