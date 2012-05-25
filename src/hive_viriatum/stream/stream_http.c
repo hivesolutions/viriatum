@@ -155,7 +155,10 @@ ERROR_CODE dataHandlerStreamHttp(struct IoConnection_t *ioConnection, unsigned c
 		if(httpConnection->buffer == NULL) {
 			httpConnection->bufferSize = bufferSize;
 			httpConnection->buffer = (unsigned char *) MALLOC(httpConnection->bufferSize);
-		} else if(httpConnection->bufferOffset + bufferSize > httpConnection->bufferSize) {
+		}
+		/* in case the http connection buffer is currently set but the available
+		space is not enought must reallocate the buffer (increment size) */
+		else if(httpConnection->bufferOffset + bufferSize > httpConnection->bufferSize) {
 			if(httpConnection->httpParser->_contentLength > 0) {
 				httpConnection->bufferSize += httpConnection->httpParser->_contentLength;
 				httpConnection->buffer = REALLOC((void *) httpConnection->buffer, httpConnection->bufferSize);
