@@ -100,7 +100,7 @@ void createHttpParser(struct HttpParser_t **httpParserPointer) {
     httpParser->method = 0;
 
     /* sets the http parser upgrade */
-    httpParser->upgrade = 1;
+    httpParser->upgrade = 0;
 
     /* sets the http parser context */
     httpParser->context = NULL;
@@ -1502,7 +1502,7 @@ int processDataHttpParser(struct HttpParser_t *httpParser, struct HttpSettings_t
                     }
 
                     readCount = 0;
-
+				
                     if(httpParser->flags & FLAG_UPGRADE || httpParser->method == HTTP_CONNECT) {
                         httpParser->upgrade = 1;
                     }

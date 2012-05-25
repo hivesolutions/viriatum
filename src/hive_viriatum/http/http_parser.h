@@ -425,7 +425,7 @@ typedef struct HttpParser_t {
     enum HttpHeaderState_e headerState;
     unsigned char index;
     size_t readCount;
-    size_t contentLength;
+    int contentLength;
     unsigned short httpMajor;
     unsigned short httpMinor;
     unsigned short statusCode;
