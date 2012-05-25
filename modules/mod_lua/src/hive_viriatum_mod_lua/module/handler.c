@@ -240,6 +240,20 @@ ERROR_CODE _sendResponseCallbackHandlerModule(struct Connection_t *connection, s
     /* retrieves the http parser */
     struct HttpParser_t *httpParser = (struct HttpParser_t *) parameters;
 
+	/* retrieves the underlying connection references in order to be
+	able to operate over them, for unregister */
+	struct IoConnection_t *ioConnection = (struct IoConnection_t *) connection->lower;
+	struct HttpConnection_t *httpConnection = (struct HttpConnection_t *) ioConnection->lower;
+
+	/* in case there is an http handler in the current connection must
+    unset it (remove temporary information) */
+    if(httpConnection->httpHandler) {
+		/* unsets the current http connection and then sets the reference
+		to it in the http connection as unset */
+		httpConnection->httpHandler->unset(httpConnection);
+		httpConnection->httpHandler = NULL;
+	}
+
     /* in case the connection is not meant to be kept alive */
     if(!(httpParser->flags & FLAG_CONNECTION_KEEP_ALIVE)) {
         /* closes the connection */
