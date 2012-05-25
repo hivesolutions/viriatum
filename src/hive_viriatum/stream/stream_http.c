@@ -156,8 +156,8 @@ ERROR_CODE dataHandlerStreamHttp(struct IoConnection_t *ioConnection, unsigned c
 			httpConnection->bufferSize = bufferSize;
 			httpConnection->buffer = (unsigned char *) MALLOC(httpConnection->bufferSize);
 		} else if(httpConnection->bufferOffset + bufferSize > httpConnection->bufferSize) {
-			if(httpConnection->httpParser->contentLength > 0) {
-				httpConnection->bufferSize += httpConnection->httpParser->contentLength;
+			if(httpConnection->httpParser->_contentLength > 0) {
+				httpConnection->bufferSize += httpConnection->httpParser->_contentLength;
 				httpConnection->buffer = REALLOC((void *) httpConnection->buffer, httpConnection->bufferSize);
 			}
 			else {
@@ -212,6 +212,7 @@ ERROR_CODE dataHandlerStreamHttp(struct IoConnection_t *ioConnection, unsigned c
 			httpConnection->httpParser->statusCode = 0;
 			httpConnection->httpParser->method = 0;
 			httpConnection->httpParser->upgrade = 0;
+			httpConnection->httpParser->_contentLength = 0;
 		}
 
 		/* in case all the remaining data has been processed
