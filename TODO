@@ -25,6 +25,10 @@
 * Create a structure similiar to the asynchronous model defined in the colony service implementations
 * Separate the concept of service from the handler of the select (select_service does not make sensess)
 
+== Performance refactor ==
+
+* Remove the strlen references and use String_t structures to reduce size calculations (in constant access situations)
+
 == Target performance ==
 
 * ab -n 10000 -c 100 -k http://servidor2.hive:9090/error should be able to run at 45K-60K requests per second (using file handler)
