@@ -36,6 +36,7 @@
 #include "jni/jni.h"
 #include "memory/memory.h"
 #include "ini/ini.h"
+#include "io/io.h"
 #include "sorting/sorting.h"
 #include "stream/stream.h"
 #include "structures/structures.h"
