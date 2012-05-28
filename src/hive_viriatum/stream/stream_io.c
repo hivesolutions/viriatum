@@ -450,7 +450,7 @@ ERROR_CODE openHandlerStreamIo(struct Connection_t *connection) {
     /*ioConnection->onData = dataHandlerStreamTorrent;
     ioConnection->onOpen = openHandlerStreamTorrent;
     ioConnection->onClose = closeHandlerStreamTorrent;*/
-	ioConnection->onData = dataHandlerStreamHttp;
+    ioConnection->onData = dataHandlerStreamHttp;
     ioConnection->onOpen = openHandlerStreamHttp;
     ioConnection->onClose = closeHandlerStreamHttp;
 
