@@ -159,7 +159,7 @@ void _moduleRegister(zval *_array TSRMLS_DC) {
     current interface (critical for correct php interpreter usage) */
     php_register_variable_safe("PHP_SELF", "-", 1, _array TSRMLS_CC);
     php_register_variable_safe("GATEWAY_INTERFACE", "viriatum", sizeof("viriatum") - 1, _array TSRMLS_CC);
-	php_register_variable_safe("QUERY_STRING", (char *) _phpRequest.phpContext->query, strlen(_phpRequest.phpContext->query), _array TSRMLS_CC);
+    php_register_variable_safe("QUERY_STRING", (char *) _phpRequest.phpContext->query, _phpRequest.phpContext->_queryString.length, _array TSRMLS_CC);
     php_register_variable_safe("REQUEST_TYPE", (char *) _phpRequest.phpContext->method, strlen(_phpRequest.phpContext->method), _array TSRMLS_CC);
     php_register_variable_safe("REMOTE_ADDR", addressString, strlen(addressString), _array TSRMLS_CC);
 }
