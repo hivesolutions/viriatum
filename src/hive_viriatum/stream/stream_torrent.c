@@ -34,10 +34,10 @@
 
 typedef struct TorrentHandshake_t {
     unsigned char pstrlen;
-	char pstr[TORRENT_PROTOCOL_SIZE];
+    char pstr[TORRENT_PROTOCOL_SIZE];
     unsigned char reserved[8];
-	unsigned char info_hash[20];
-	unsigned char peer_id[20];
+    unsigned char info_hash[20];
+    unsigned char peer_id[20];
 } TorrentHandshake;
 
 ERROR_CODE createTorrentConnection(struct TorrentConnection_t **torrentConnectionPointer, struct IoConnection_t *ioConnection) {
@@ -91,12 +91,12 @@ ERROR_CODE deleteTorrentConnection(struct TorrentConnection_t *torrentConnection
 }
 
 ERROR_CODE dataHandlerStreamTorrent(struct IoConnection_t *ioConnection, unsigned char *buffer, size_t bufferSize) {
-	char *_buffer = (char *) MALLOC(bufferSize + 1);
+    char *_buffer = (char *) MALLOC(bufferSize + 1);
 
-	memcpy(_buffer, buffer, bufferSize);
-	_buffer[bufferSize] = '\0';
+    memcpy(_buffer, buffer, bufferSize);
+    _buffer[bufferSize] = '\0';
 
-	printf("'%s'", _buffer);
+    printf("'%s'", _buffer);
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -109,9 +109,9 @@ ERROR_CODE openHandlerStreamTorrent(struct IoConnection_t *ioConnection) {
     /* allocates the response buffer */
     struct TorrentHandshake_t *responseBuffer = (struct TorrentHandshake_t *) MALLOC(sizeof(struct TorrentHandshake_t));
 
-	FILE *file = fopen("C:/info_hash.txt", "rb");
-	char *data = (char *) fread(responseBuffer->info_hash, 1, 20, file);
-	fclose(file);
+    FILE *file = fopen("C:/info_hash.txt", "rb");
+    char *data = (char *) fread(responseBuffer->info_hash, 1, 20, file);
+    fclose(file);
 
 
     /* creates the torrent connection */
@@ -119,11 +119,11 @@ ERROR_CODE openHandlerStreamTorrent(struct IoConnection_t *ioConnection) {
 
 
 
-	responseBuffer->pstrlen = TORRENT_PROTOCOL_SIZE;
-	memcpy(responseBuffer->pstr, TORRENT_PROTOCOL_STRING, TORRENT_PROTOCOL_SIZE);
-	memset(responseBuffer->reserved, 0, 8);
-	/*memcpy(responseBuffer->info_hash, "-AZ4702-UCahr9VNImUy", 20);*/
-	memcpy(responseBuffer->peer_id, "-AZ4702-UCJhrsVNImUy", 20);
+    responseBuffer->pstrlen = TORRENT_PROTOCOL_SIZE;
+    memcpy(responseBuffer->pstr, TORRENT_PROTOCOL_STRING, TORRENT_PROTOCOL_SIZE);
+    memset(responseBuffer->reserved, 0, 8);
+    /*memcpy(responseBuffer->info_hash, "-AZ4702-UCahr9VNImUy", 20);*/
+    memcpy(responseBuffer->peer_id, "-AZ4702-UCJhrsVNImUy", 20);
 
 
     /* writes the response to the connection, registers for the appropriate callbacks */
