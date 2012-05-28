@@ -237,34 +237,34 @@ ERROR_CODE loadOptionsService(struct Service_t *service, struct HashMap_t *argum
 
 #ifdef VIRIATUM_PLATFORM_UNIX
 ERROR_CODE createWorkers(unsigned int workerCount) {
-	unsigned int forkCount = 0;
-	PID_TYPE pid;
+    unsigned int forkCount = 0;
+    PID_TYPE pid;
 
-	/* iterates continuously for the forking of the
-	current process (worker creation) */
-	while(1) {
-		/* in case the number of forks is the sames
-		as the worker count, breaks the loop no more
-		forking remaining */
-		if(forkCount == workerCount) { break; }
+    /* iterates continuously for the forking of the
+    current process (worker creation) */
+    while(1) {
+        /* in case the number of forks is the sames
+        as the worker count, breaks the loop no more
+        forking remaining */
+        if(forkCount == workerCount) { break; }
 
-		/* forks off the parent process, this
-		shoud create the child (worker) process */
-		pid = fork();
+        /* forks off the parent process, this
+        shoud create the child (worker) process */
+        pid = fork();
 
-		/* checks if the pid is invalid in case
-		it's exits the parent process in error */
-		if(pid < 0) { exit(EXIT_FAILURE); }
-		
-		/* in case the current pid is zero this is
-		the child process must break to avoid recursive
-		forking of the worker processes */
-		if(pid == 0) { break; }
+        /* checks if the pid is invalid in case
+        it's exits the parent process in error */
+        if(pid < 0) { exit(EXIT_FAILURE); }
 
-		/* increments the fork count variable (one more
-		iteration ran) */
-		forkCount++;
-	}
+        /* in case the current pid is zero this is
+        the child process must break to avoid recursive
+        forking of the worker processes */
+        if(pid == 0) { break; }
+
+        /* increments the fork count variable (one more
+        iteration ran) */
+        forkCount++;
+    }
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -305,7 +305,7 @@ ERROR_CODE startService(struct Service_t *service) {
     /* unpacks the service options from the service structure */
     struct ServiceOptions_t *serviceOptions = service->options;
 
-	/* registers the various "local" handlers
+    /* registers the various "local" handlers
     in the service, for later usage */
     registerHandlerDispatch(service);
     registerHandlerDefault(service);
@@ -435,20 +435,20 @@ ERROR_CODE startService(struct Service_t *service) {
     serviceConnection->unregisterWrite = unregisterWriteConnection;
 
     /* sets the fucntion to be called uppon read on the service
-	connection (it should be the accept handler stream io, default) */
+    connection (it should be the accept handler stream io, default) */
     serviceConnection->onRead = acceptHandlerStreamIo;
 
     /* opens the (service) connection */
     serviceConnection->openConnection(serviceConnection);
 
 #ifdef VIRIATUM_PLATFORM_UNIX
-	/* in case the current os is compatible with the forking of process
-	creates the worker processes to handle more connections at a time,
-	this operation creates a much more flexible and scalable solution */
-	createWorkers(5);
+    /* in case the current os is compatible with the forking of process
+    creates the worker processes to handle more connections at a time,
+    this operation creates a much more flexible and scalable solution */
+    createWorkers(5);
 #endif
 
-	/* iterates continuously, while the service is open */
+    /* iterates continuously, while the service is open */
     while(service->status == STATUS_OPEN) {
         /* retrieves the (current) process, to be used
         to retrieves some memory information, and then closes it*/
