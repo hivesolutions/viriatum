@@ -138,6 +138,9 @@ ERROR_CODE processBencodingFile(char *filePath, struct Type_t **typePointer) {
 
 						break;
 
+					case ' ':
+						break;
+
 					default:
 						state = BENCODING_ENGINE_STRING_SIZE;
 						stringSize = character - '0';
