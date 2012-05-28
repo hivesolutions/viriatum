@@ -445,14 +445,27 @@ ERROR_CODE openHandlerStreamIo(struct Connection_t *connection) {
     /* creates the io connection */
     createIoConnection(&ioConnection, connection);
 
-    /* TODO: this values are hardcoded and should be
-    removed (change also header file reference) */
-    /*ioConnection->onData = dataHandlerStreamTorrent;
-    ioConnection->onOpen = openHandlerStreamTorrent;
-    ioConnection->onClose = closeHandlerStreamTorrent;*/
-    ioConnection->onData = dataHandlerStreamHttp;
-    ioConnection->onOpen = openHandlerStreamHttp;
-    ioConnection->onClose = closeHandlerStreamHttp;
+	/* switches over the connection "desired" protocol to
+	set the appropriate connection handlers */
+	switch(connection->protocol) {
+		case HTTP_PROTOCOL:
+			ioConnection->onData = dataHandlerStreamHttp;
+			ioConnection->onOpen = openHandlerStreamHttp;
+			ioConnection->onClose = closeHandlerStreamHttp;
+			break;
+
+		case TORRENT_PROTOCOL:
+			ioConnection->onData = dataHandlerStreamTorrent;
+			ioConnection->onOpen = openHandlerStreamTorrent;
+			ioConnection->onClose = closeHandlerStreamTorrent;
+			break;
+
+		default:
+			ioConnection->onData = dataHandlerStreamHttp;
+			ioConnection->onOpen = openHandlerStreamHttp;
+			ioConnection->onClose = closeHandlerStreamHttp;
+			break;
+	}
 
     /* in case the on open handler is defined */
     if(ioConnection->onOpen != NULL) {
