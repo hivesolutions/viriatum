@@ -467,6 +467,8 @@ ERROR_CODE _writeErrorConnection(struct HttpParser_t *httpParser, char *message)
 }
 
 ERROR_CODE _updateRequest(struct HandlerPhpContext_t *handlerPhpContext) {
+	/* sets the various sapi headers and request info parameters
+	from the current php context object values */
     SG(sapi_headers).http_response_code = 200;
     SG(sapi_headers).http_status_line = "OK";
     SG(request_info).content_type = (char *) handlerPhpContext->contentType;
@@ -477,6 +479,8 @@ ERROR_CODE _updateRequest(struct HandlerPhpContext_t *handlerPhpContext) {
     SG(request_info).path_translated = (char *) handlerPhpContext->filePath;
     SG(request_info).content_length = handlerPhpContext->contentLength;
 
+    /* updates the global values with the previously defined (static)
+    values the server context is set as one to allow correct php running */
     SG(global_request_time) = 0;
     SG(read_post_bytes) = 1;
     SG(server_context) = (void *) 1;
