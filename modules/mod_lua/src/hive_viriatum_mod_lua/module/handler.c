@@ -238,7 +238,7 @@ ERROR_CODE _sendResponseHandlerModule(struct HttpParser_t *httpParser) {
 
 ERROR_CODE _sendResponseCallbackHandlerModule(struct Connection_t *connection, struct Data_t *data, void *parameters) {
     /* retrieves the current http flags */
-    unsigned char flags = (unsigned char) parameters;
+    unsigned char flags = (unsigned char) (size_t) parameters;
 
     /* retrieves the underlying connection references in order to be
     able to operate over them, for unregister */
@@ -281,7 +281,7 @@ ERROR_CODE _writeErrorConnection(struct HttpParser_t *httpParser, char *message)
     SPRINTF((char *) buffer, 1024, "HTTP/1.1 500 Internal Server Error\r\nServer: %s/%s (%s @ %s)\r\nConnection: Keep-Alive\r\nContent-Length: %d\r\n\r\n%s", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, (unsigned int) messageLength, message);
 
     /* writes the response to the connection, registers for the appropriate callbacks */
-    connection->writeConnection(connection, buffer, (unsigned int) strlen((char *) buffer), _sendResponseCallbackHandlerModule, (void *) httpParser->flags);
+    connection->writeConnection(connection, buffer, (unsigned int) strlen((char *) buffer), _sendResponseCallbackHandlerModule, (void *) (size_t) httpParser->flags);
 
     /* raise no error */
     RAISE_NO_ERROR;
@@ -361,7 +361,7 @@ int _luaWriteConnection(lua_State *luaState) {
     memcpy(buffer, data, dataSize);
 
     /* writes the response to the connection */
-    connection->writeConnection(connection, buffer, dataSize, _sendResponseCallbackHandlerModule, (void *) httpParser->flags);
+    connection->writeConnection(connection, buffer, dataSize, _sendResponseCallbackHandlerModule, (void *) (size_t) httpParser->flags);
 
     /* return the number of results */
     return 0;
