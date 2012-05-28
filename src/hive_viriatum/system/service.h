@@ -342,6 +342,18 @@ typedef enum RuleType_e {
     REGEX_RULE
 } RuleType;
 
+/**
+ * Enumeration defining the various types
+ * of possible protocols, this is an open
+ * enumeration and registration is required.
+ */
+typedef enum ConnectionProtocol_e {
+	UNDEFINED_PROTOCOL = 1,
+	UNKNOWN_PROTOCOL,
+    HTTP_PROTOCOL,
+    TORRENT_PROTOCOL
+} ConnectionType;
+
 typedef struct Rule_t {
     enum RuleType_e type;
     void *value;
@@ -364,6 +376,11 @@ typedef struct Connection_t {
      * Used for connection control.
      */
     unsigned char status;
+
+	/**
+	 * The type of the connection to 
+	 */
+	enum ConnectionProtocol_e protocol;
 
     /**
      * The socket handle associated with
