@@ -27,7 +27,86 @@
 
 #pragma once
 
+#include "../io/io.h"
 #include "../debug/debug.h"
 #include "../structures/structures.h"
 
+/**
+ * The maximum size for a key contained
+ * inside and ini file.
+ */
+#define INI_KEY_MAX_SIZE 1024
+
+#define INI_MARK(FOR) INI_MARK_N(FOR, 0)
+#define INI_MARK_BACK(FOR) INI_MARK_N(FOR, 1)
+#define INI_MARK_N(FOR, N)\
+    do {\
+        FOR##Mark = pointer - N;\
+    } while(0)
+
+#define INI_CALLBACK(FOR)\
+    do {\
+        if(iniSettings->on##FOR) {\
+            if(iniSettings->on##FOR(iniEngine) != 0) {\
+                RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem handling callback"); \
+            }\
+        }\
+    } while(0)
+
+#define INI_CALLBACK_DATA(FOR) INI_CALLBACK_DATA_N(FOR, 0)
+#define INI_CALLBACK_DATA_BACK(FOR) INI_CALLBACK_DATA_N(FOR, 1)
+#define INI_CALLBACK_DATA_N(FOR, N)\
+    do {\
+        if(FOR##Mark) {\
+            if(iniSettings->on##FOR) {\
+                if(iniSettings->on##FOR(iniEngine, FOR##Mark, pointer - FOR##Mark - N) != 0) {\
+                    RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem handling callback"); \
+                }\
+            }\
+            FOR##Mark = NULL;\
+        }\
+    } while(0)
+
+struct IniEngine_t;
+
+typedef ERROR_CODE (*iniCallback) (struct IniEngine_t *);
+typedef ERROR_CODE (*iniDataCallback) (struct IniEngine_t *, const unsigned char *, size_t);
+
+/**
+ * Enumeration describing the various states
+ * occuring during the parsing of an ini file.
+ */
+typedef enum IniState_e {
+    INI_ENGINE_NORMAL = 1,
+    INI_ENGINE_SECTION,
+    INI_ENGINE_KEY,
+    INI_ENGINE_VALUE,
+    INI_ENGINE_COMMENT
+} IniEngineState;
+
+typedef struct IniSettings_t {
+    iniCallback onsectionStart;
+    iniDataCallback onsectionEnd;
+    iniCallback oncommentStart;
+    iniDataCallback oncommentEnd;
+    iniCallback onkeyStart;
+    iniDataCallback onkeyEnd;
+    iniCallback onvalueStart;
+    iniDataCallback onvalueEnd;
+} IniSettings;
+
+typedef struct IniEngine_t {
+    void *context;
+} IniEngine;
+
+typedef struct IniHandler_t {
+    char section[INI_KEY_MAX_SIZE];
+    char key[INI_KEY_MAX_SIZE];
+    struct HashMap_t *configuration;
+} IniHandler;
+
 VIRIATUM_EXPORT_PREFIX ERROR_CODE processIniFile(char *filePath, struct HashMap_t **configurationPointer);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _sectionEndCallback(struct IniEngine_t *iniEngine, const unsigned char *pointer, size_t size);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _commentEndCallback(struct IniEngine_t *iniEngine, const unsigned char *pointer, size_t size);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _keyEndCallback(struct IniEngine_t *iniEngine, const unsigned char *pointer, size_t size);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _valueEndCallback(struct IniEngine_t *iniEngine, const unsigned char *pointer, size_t size);
