@@ -17,7 +17,7 @@
  You should have received a copy of the GNU General Public License
  along with Hive Viriatum Commons. If not, see <http://www.gnu.org/licenses/>.
 
- __author__    = Jo√£o Magalh√£es <joamag@hive.pt>
+ __author__    = Jo„o Magalh„es <joamag@hive.pt>
  __version__   = 1.0.0
  __revision__  = $LastChangedRevision$
  __date__      = $LastChangedDate$
@@ -27,12 +27,20 @@
 
 #pragma once
 
-#include "array_list.h"
-#include "date_time.h"
-#include "hash_map.h"
-#include "iterator.h"
-#include "linked_buffer.h"
-#include "linked_list.h"
-#include "string.h"
-#include "string_buffer.h"
-#include "type.h"
+typedef struct String_t {
+    /**
+     * The buffer containing the internal
+     * string reference.
+     */
+    unsigned char *buffer;
+
+    /**
+     * The total length for the internal
+     * string value (buffer).
+     */
+    size_t length;
+} String;
+
+VIRIATUM_EXPORT_PREFIX void createString(struct String_t **stringPointer);
+VIRIATUM_EXPORT_PREFIX void deleteString(struct String_t *string);
+VIRIATUM_EXPORT_PREFIX void stringPopulate(struct String_t *string, unsigned char *buffer, size_t length, char calculate);
