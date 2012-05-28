@@ -602,6 +602,10 @@
                     RelativePath="..\..\src\hive_viriatum\stream\stream_io.c"
                     >
                 </File>
+                <File
+                    RelativePath="..\..\src\hive_viriatum\stream\stream_torrent.c"
+                    >
+                </File>
             </Filter>
             <Filter
                 Name="Polling"
@@ -770,6 +774,10 @@
                 </File>
                 <File
                     RelativePath="..\..\src\hive_viriatum\stream\stream_io.h"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\hive_viriatum\stream\stream_torrent.h"
                     >
                 </File>
             </Filter>
