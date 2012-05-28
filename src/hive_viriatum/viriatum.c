@@ -272,6 +272,12 @@ int main(int argc, char *argv[]) {
     processArguments(argc, argv, &arguments);
     executeArguments(arguments);
 
+
+
+	runSimpleTests();
+
+
+
     /* runs the service, with the given arguments */
     returnValue = runService(arguments);
 
