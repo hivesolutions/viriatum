@@ -667,6 +667,14 @@
                     >
                 </File>
             </Filter>
+            <Filter
+                Name="Io"
+                >
+                <File
+                    RelativePath="..\..\src\hive_viriatum_commons\io\file.c"
+                    >
+                </File>
+            </Filter>
         </Filter>
         <Filter
             Name="Header Files"
@@ -978,6 +986,18 @@
                 >
                 <File
                     RelativePath="..\..\src\hive_viriatum_commons\ini\ini.h"
+                    >
+                </File>
+            </Filter>
+            <Filter
+                Name="Io"
+                >
+                <File
+                    RelativePath="..\..\src\hive_viriatum_commons\io\file.h"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\hive_viriatum_commons\io\io.h"
                     >
                 </File>
             </Filter>
