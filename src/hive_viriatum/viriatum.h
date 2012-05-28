@@ -31,7 +31,6 @@
 
 #include "base/base.h"
 #include "http/http.h"
-#include "io/io.h"
 #include "jni/jni.h"
 #include "module/module.h"
 #include "polling/polling.h"
