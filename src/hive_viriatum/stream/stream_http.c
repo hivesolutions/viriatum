@@ -114,7 +114,7 @@ ERROR_CODE deleteHttpConnection(struct HttpConnection_t *httpConnection) {
 
     /* in case the http connection buffer is defined must release it to
     avoid any memory leak */
-    if(httpConnection->buffer) { free(httpConnection->buffer); }
+    if(httpConnection->buffer) { FREE(httpConnection->buffer); }
 
     /* deletes the http parser */
     deleteHttpParser(httpConnection->httpParser);
