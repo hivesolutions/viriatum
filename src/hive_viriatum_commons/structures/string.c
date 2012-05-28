@@ -51,5 +51,5 @@ void deleteString(struct String_t *string) {
 
 void stringPopulate(struct String_t *string, unsigned char *buffer, size_t length, char calculate) {
     string->buffer = buffer;
-    string->length = calculate ? strlen(buffer) : length;
+    string->length = calculate ? strlen((char *) buffer) : length;
 }
