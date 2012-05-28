@@ -28,3 +28,4 @@
 #pragma once
 
 #include "base_64.h"
+#include "bencoding.h"
