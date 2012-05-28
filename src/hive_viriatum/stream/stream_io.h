@@ -29,6 +29,7 @@
 
 #include "../system/service.h"
 #include "stream_http.h"
+#include "stream_torrent.h"
 
 struct IoConnection_t;
 
