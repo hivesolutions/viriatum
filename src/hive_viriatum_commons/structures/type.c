@@ -97,7 +97,7 @@ ERROR_CODE toStringType(struct Type_t *type, unsigned char **bufferPointer) {
     }
 
     /* sets the buffer pointer reference to the
-    value in the bufer */
+    value in the buffer */
     *bufferPointer = buffer;
 
     /* raise no error */
