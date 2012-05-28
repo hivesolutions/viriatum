@@ -67,7 +67,7 @@ ERROR_CODE createHandlerPhpContext(struct HandlerPhpContext_t **handlerPhpContex
     /* sets the handler php default values */
     handlerPhpContext->method = NULL;
     handlerPhpContext->postData = NULL;
-	handlerPhpContext->flags = 0;
+    handlerPhpContext->flags = 0;
     handlerPhpContext->contentLength = 0;
     handlerPhpContext->outputBuffer = NULL;
     handlerPhpContext->_nextContentType = 0;
@@ -121,6 +121,10 @@ ERROR_CODE messageBeginCallbackHandlerModule(struct HttpParser_t *httpParser) {
     struct HandlerPhpContext_t *handlerPhpContext = (struct HandlerPhpContext_t *) httpParser->context;
     handlerPhpContext->contentType[0] = '\0';
 
+    /* populates the various generated strings, avoids possible recalculation
+    of the lengths of the string */
+    stringPopulate(&handlerPhpContext->_contentTypeString, handlerPhpContext->contentType, 0, 0);
+
     /* raise no error */
     RAISE_NO_ERROR;
 }
@@ -157,6 +161,12 @@ ERROR_CODE urlCallbackHandlerModule(struct HttpParser_t *httpParser, const unsig
     handlerPhpContext->url[pathSize] = '\0';
     SPRINTF((char *) handlerPhpContext->filePath, VIRIATUM_MAX_PATH_SIZE, "%s%s%s", VIRIATUM_CONTENTS_PATH, VIRIATUM_BASE_PATH, fileName);
 
+    /* populates the various generated strings, avoids possible recalculation
+    of the lengths of the string */
+    stringPopulate(&handlerPhpContext->_queryString, handlerPhpContext->query, querySize, 0);
+    stringPopulate(&handlerPhpContext->_urlString, handlerPhpContext->url, pathSize, 0);
+    stringPopulate(&handlerPhpContext->_filePathString, handlerPhpContext->filePath, 0, 1);
+
     /* raise no error */
     RAISE_NO_ERROR;
 }
@@ -185,6 +195,10 @@ ERROR_CODE headerValueCallbackHandlerModule(struct HttpParser_t *httpParser, con
         memcpy(handlerPhpContext->contentType, data, dataSize);
         handlerPhpContext->contentType[dataSize] = '\0';
         handlerPhpContext->_nextContentType = 0;
+
+        /* populates the various generated strings, avoids possible recalculation
+        of the lengths of the string */
+        stringPopulate(&handlerPhpContext->_contentTypeString, handlerPhpContext->contentType, dataSize, 0);
     }
 
     /* raise no error */
@@ -270,7 +284,7 @@ ERROR_CODE _sendDataCallback(struct Connection_t *connection, struct Data_t *dat
     char *outputData;
 
     /* retrieves the current php context and then uses it to retrieve
-	the proper output buffer for the current connection (the context) */
+    the proper output buffer for the current connection (the context) */
     struct HandlerPhpContext_t *handlerPhpContext = (struct HandlerPhpContext_t *) parameters;
     struct LinkedBuffer_t *outputBuffer = handlerPhpContext->outputBuffer;
 
@@ -350,7 +364,7 @@ ERROR_CODE _sendResponseHandlerModule(struct HttpParser_t *httpParser) {
     _outputBuffer = outputBuffer;
     handlerPhpContext->method = method;
     handlerPhpContext->postData = postData;
-	handlerPhpContext->flags = httpParser->flags;
+    handlerPhpContext->flags = httpParser->flags;
     handlerPhpContext->contentLength = httpParser->_contentLength;
     handlerPhpContext->outputBuffer = outputBuffer;
 
@@ -436,9 +450,9 @@ ERROR_CODE _writeErrorConnection(struct HttpParser_t *httpParser, char *message)
     the proper error */
     size_t messageLength = strlen(message);
 
-	/* updates the flags value in the php context, this is required
-	to avoid problems in the callback handler */
-	handlerPhpContext->flags = httpParser->flags;
+    /* updates the flags value in the php context, this is required
+    to avoid problems in the callback handler */
+    handlerPhpContext->flags = httpParser->flags;
 
     /* allocates the data buffer (in a safe maner) then
     writes the http static headers to the response */

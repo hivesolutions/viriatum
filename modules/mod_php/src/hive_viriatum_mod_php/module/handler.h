@@ -84,11 +84,11 @@ typedef struct HandlerPhpContext_t {
      */
     unsigned char *postData;
 
-	/**
-	 * The current value for the flags describing 
-	 * the status of the current http request.
+    /**
+     * The current value for the flags describing
+     * the status of the current http request.
      */
-	unsigned char flags;
+    unsigned char flags;
 
     /**
      * The content length reference to the current
@@ -107,6 +107,30 @@ typedef struct HandlerPhpContext_t {
      * type header (private usage only).
      */
     char _nextContentType;
+
+    /**
+     * String reference to the url buffer, usefull
+     * for fast attribute calculation (eg: size).
+     */
+    struct String_t _urlString;
+
+    /**
+     * String reference to the query buffer, useful
+     * for fast attribute calculation (eg: size).
+     */
+    struct String_t _queryString;
+
+    /**
+     * String reference to the file path buffer, useful
+     * for fast attribute calculation (eg: size).
+     */
+    struct String_t _filePathString;
+
+    /**
+     * String reference to the content type buffer, useful
+     * for fast attribute calculation (eg: size).
+     */
+    struct String_t _contentTypeString;
 } HandlerPhpContext;
 
 ERROR_CODE createModPhpHttpHandler(struct ModPhpHttpHandler_t **modPhpHttpHandlerPonter, struct HttpHandler_t *httpHandlerPonter);
