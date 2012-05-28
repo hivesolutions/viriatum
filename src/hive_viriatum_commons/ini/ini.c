@@ -39,7 +39,6 @@ typedef enum IniState_e {
     INI_ENGINE_COMMENT
 } IniEngineState;
 
-
 #define INI_MARK(FOR) INI_MARK_N(FOR, 0)
 #define INI_MARK_BACK(FOR) INI_MARK_N(FOR, 1)
 #define INI_MARK_N(FOR, N)\
@@ -74,8 +73,6 @@ struct IniEngine_t;
 
 typedef ERROR_CODE (*iniCallback) (struct IniEngine_t *);
 typedef ERROR_CODE (*iniDataCallback) (struct IniEngine_t *, const unsigned char *, size_t);
-
-
 
 typedef struct IniSettings_t {
     iniCallback onsectionStart;
