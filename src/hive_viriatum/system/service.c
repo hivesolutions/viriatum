@@ -265,6 +265,9 @@ ERROR_CODE createWorkers(unsigned int workerCount) {
 		iteration ran) */
 		forkCount++;
 	}
+
+    /* raises no error */
+    RAISE_NO_ERROR;
 }
 #endif
 
