@@ -169,7 +169,7 @@ void daemonize() {
     size_t pidStringLength;
 
     /* forks off the parent process, this
-    is the main trick in the process*/
+    is the main trick in the process */
     pid = fork();
 
     /* checks if the pid is invalid in case
