@@ -34,11 +34,11 @@ usage: viriatum [--version] [--port[=<port>] [--host[=<hostname>]]\n\
                 [--daemon] [--help]\n\
 \n\
 The most commonly used git commands are:\n\
-   add        Add file contents to the index\n\
-   bisect     Find by binary search the change that introduced a bug\n\
-   branch     List, create, or delete branches\n\
-   checkout   Checkout a branch or paths to the working tree\n\
-   clone      Clone a repository into a new directory\n\
+   --version  Prints the current version\n\
+   --port     Sets the tcp port to be used as primary\n\
+   --host     Sets the tcp host to bind\n\
+   --host     Runs the service as daemon (background)\n\
+   --host     Prints this (help) message\n\
 \n\
 See 'viriatum --help[=<command>]' for more information on a specific command.\n"
 
