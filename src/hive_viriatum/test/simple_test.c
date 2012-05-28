@@ -246,6 +246,11 @@ void testBase64() {
     FREE(decodedBuffer);
 }
 
+void testBencoding() {
+    struct Type_t *type;
+	processBencodingFile("c:/verysleepy_0_82.exe.torrent", &type);
+}
+
 void testHuffman() {
     /* allocates space for the huffman */
     struct Huffman_t *huffman;
@@ -445,6 +450,9 @@ void runSimpleTests() {
 
     /* tests the base 64 encoder */
     testBase64();
+
+	/* tests the bencoding encoder */
+	testBencoding();
 
     /* tests the huffman encoder */
     testHuffman();
