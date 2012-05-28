@@ -109,6 +109,10 @@ ERROR_CODE openHandlerStreamTorrent(struct IoConnection_t *ioConnection) {
     /* allocates the response buffer */
     struct TorrentHandshake_t *responseBuffer = (struct TorrentHandshake_t *) MALLOC(sizeof(struct TorrentHandshake_t));
 
+	FILE *file = fopen("C:/info_hash.txt", "rb");
+	char *data = (char *) fread(responseBuffer->info_hash, 1, 20, file);
+	fclose(file);
+
 
     /* creates the torrent connection */
     createTorrentConnection(&torrentConnection, ioConnection);
@@ -118,7 +122,7 @@ ERROR_CODE openHandlerStreamTorrent(struct IoConnection_t *ioConnection) {
 	responseBuffer->pstrlen = TORRENT_PROTOCOL_SIZE;
 	memcpy(responseBuffer->pstr, TORRENT_PROTOCOL_STRING, TORRENT_PROTOCOL_SIZE);
 	memset(responseBuffer->reserved, 0, 8);
-	memcpy(responseBuffer->info_hash, "-AZ4702-UCahr9VNImUy", 20);
+	/*memcpy(responseBuffer->info_hash, "-AZ4702-UCahr9VNImUy", 20);*/
 	memcpy(responseBuffer->peer_id, "-AZ4702-UCJhrsVNImUy", 20);
 
 
