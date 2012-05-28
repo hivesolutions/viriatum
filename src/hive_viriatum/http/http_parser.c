@@ -1693,6 +1693,11 @@ int processDataHttpParser(struct HttpParser_t *httpParser, struct HttpSettings_t
         }
     }
 
+	if(state == STATE_BODY_IDENTITY_EOF) {
+		HTTP_CALLBACK(messageComplete);
+		state = NEW_MESSAGE();
+	}
+
     HTTP_CALLBACK_DATA(headerField);
     HTTP_CALLBACK_DATA(headerValue);
     HTTP_CALLBACK_DATA(url);
