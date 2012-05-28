@@ -59,6 +59,7 @@ structures/hash_map.c \
 structures/iterator.c \
 structures/linked_buffer.c \
 structures/linked_list.c \
+structures/string.c \
 structures/string_buffer.c \
 structures/type.c \
 system/_thread_win32.c \
@@ -89,6 +90,7 @@ structures/hash_map.c \
 structures/iterator.c \
 structures/linked_buffer.c \
 structures/linked_list.c \
+structures/string.c \
 structures/string_buffer.c \
 structures/type.c \
 system/_thread_win32.c \
