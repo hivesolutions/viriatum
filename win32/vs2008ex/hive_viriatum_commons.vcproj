@@ -555,6 +555,10 @@
                     >
                 </File>
                 <File
+                    RelativePath="..\..\src\hive_viriatum_commons\structures\string.c"
+                    >
+                </File>
+                <File
                     RelativePath="..\..\src\hive_viriatum_commons\structures\string_buffer.c"
                     >
                 </File>
@@ -770,6 +774,10 @@
                 </File>
                 <File
                     RelativePath="..\..\src\hive_viriatum_commons\structures\linked_list.h"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\hive_viriatum_commons\structures\string.h"
                     >
                 </File>
                 <File
