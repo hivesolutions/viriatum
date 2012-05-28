@@ -32,11 +32,45 @@
 #include "hash_map.h"
 #include "linked_list.h"
 
+/**
+ * Union defining a type with all it's
+ * possible values, this union approach is
+ * inspired by many other dynamic approaches.
+ * This union is supposed to be used together
+ * with the typ structure.
+ */
 typedef union TypeValue_t {
+	/**
+	 * The storage space used for the
+	 * integer value representation.
+	 */
     int valueInt;
+
+	/**
+	 * The storage space used for the
+	 * float value representation.
+	 */
     float valueFloat;
+
+	/**
+	 * The storage space used for the
+	 * string value representation, this
+	 * representation is done via a buffer.
+	 */
     char *valueString;
+
+	/**
+	 * The storage space used for the
+	 * hash map (dictionary) value
+	 * representation.
+	 */
     struct HashMap_t *valueMap;
+
+	/**
+	 * The storage space used for the
+	 * linked list (sequence) value
+	 * representation.
+	 */
     struct LinkedList_t *valueList;
 
     /**
