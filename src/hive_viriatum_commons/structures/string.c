@@ -29,6 +29,26 @@
 
 #include "string.h"
 
+void createString(struct String_t **stringPointer) {
+    /* retrieves the string size */
+    size_t stringSize = sizeof(struct String_t);
+
+    /* allocates space for the string */
+    struct String_t *string = (struct String_t *) MALLOC(stringSize);
+
+    /* initializes the string */
+    string->buffer = NULL;
+	string->length = 0;
+
+    /* sets the string in the string pointer */
+    *stringPointer = string;
+}
+
+void deleteString(struct String_t *string) {
+	/* releases the string */
+    FREE(string);
+}
+
 void stringPopulate(struct String_t *string, unsigned char *buffer, size_t length, char calculate) {
     string->buffer = buffer;
     string->length = calculate ? strlen(buffer) : length;
