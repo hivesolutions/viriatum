@@ -38,14 +38,14 @@ void createString(struct String_t **stringPointer) {
 
     /* initializes the string */
     string->buffer = NULL;
-	string->length = 0;
+    string->length = 0;
 
     /* sets the string in the string pointer */
     *stringPointer = string;
 }
 
 void deleteString(struct String_t *string) {
-	/* releases the string */
+    /* releases the string */
     FREE(string);
 }
 
