@@ -312,7 +312,7 @@ ERROR_CODE _createTorrentConnection(struct Connection_t *connection) {
 
     if (connect(socketHandle, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
         printf("PROBLEMA A CONECTAR");
-/*
+
     /* creates the (client) connection */
     createConnection(&clientConnection, socketHandle);
 
