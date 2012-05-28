@@ -271,6 +271,101 @@ ERROR_CODE createWorkers(unsigned int workerCount) {
 }
 #endif
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ERROR_CODE _createTorrentConnection(struct Connection_t *connection) {
+    /* allocates the socket handle */
+    SOCKET_HANDLE socketHandle;
+	SOCKET_ADDRESS_INTERNET serv_addr;
+	struct hostent *server;
+
+	/* allocates the (client) connection */
+    struct Connection_t *clientConnection;
+
+	socketHandle = SOCKET_CREATE(SOCKET_INTERNET_TYPE, SOCKET_PACKET_TYPE, SOCKET_PROTOCOL_TCP);
+
+    /*if(socketHandle < 0) error("ERROR opening socket");*/
+
+    server = SOCKET_GET_HOST_BY_NAME("localhost");
+    
+	if (server == NULL) {
+        fprintf(stderr,"ERROR, no such host\n");
+        exit(0);
+    }
+
+	memset(&serv_addr, 0, sizeof(serv_addr));
+    serv_addr.sin_family = AF_INET;
+    memcpy((char *) &serv_addr.sin_addr.s_addr, (char *) server->h_addr, server->h_length);
+    serv_addr.sin_port = htons(13122);
+    
+	if (connect(socketHandle, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) 
+        printf("PROBLEMA A CONECTAR");
+/*
+    /* creates the (client) connection */
+    createConnection(&clientConnection, socketHandle);
+
+    /* sets the socket address in the (client) connection
+    this is going to be very usefull for later connection
+    identification (address, port, etc.) */
+    /*clientConnection->socketAddress = (SOCKET_ADDRESS) serv_addr;*/
+
+    /* sets the service select service as the service in the (client)  connection */
+	clientConnection->service = connection->service;
+
+    /* sets the base hanlding functions in the client connection */
+	clientConnection->openConnection = openConnection;
+    clientConnection->closeConnection = closeConnection;
+    clientConnection->writeConnection = writeConnection;
+    clientConnection->registerWrite = registerWriteConnection;
+    clientConnection->unregisterWrite = unregisterWriteConnection;
+
+    /* sets the various stream io connection callbacks
+    in the client connection */
+    clientConnection->onRead = readHandlerStreamIo;
+    clientConnection->onWrite = writeHandlerStreamIo;
+    clientConnection->onError = errorHandlerStreamIo;
+    clientConnection->onOpen = openHandlerStreamIo;
+    clientConnection->onClose = closeHandlerStreamIo;
+ 
+	clientConnection->protocol = TORRENT_PROTOCOL;
+
+	/* opens the connection */
+    clientConnection->openConnection(clientConnection);
+
+	RAISE_NO_ERROR;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ERROR_CODE startService(struct Service_t *service) {
     /* allocates the socket address structure */
     SOCKET_ADDRESS_INTERNET socketAddress;
@@ -448,6 +543,24 @@ ERROR_CODE startService(struct Service_t *service) {
     this operation creates a much more flexible and scalable solution */
     createWorkers(5);
 #endif
+
+
+
+
+	_createTorrentConnection(serviceConnection);
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     /* iterates continuously, while the service is open */
     while(service->status == STATUS_OPEN) {
@@ -685,6 +798,7 @@ ERROR_CODE createConnection(struct Connection_t **connectionPointer, SOCKET_HAND
 
     /* sets the connection attributes (default) values */
     connection->status = STATUS_CLOSED;
+	connection->protocol = UNDEFINED_PROTOCOL;
     connection->socketHandle = socketHandle;
     connection->service = NULL;
     connection->writeRegistered = 0;
