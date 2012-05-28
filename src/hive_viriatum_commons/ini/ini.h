@@ -106,7 +106,7 @@ typedef struct IniHandler_t {
 } IniHandler;
 
 VIRIATUM_EXPORT_PREFIX ERROR_CODE processIniFile(char *filePath, struct HashMap_t **configurationPointer);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE _sectionEndCallback(struct IniEngine_t *iniEngine, const unsigned char *pointer, size_t size);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE _commentEndCallback(struct IniEngine_t *iniEngine, const unsigned char *pointer, size_t size);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE _keyEndCallback(struct IniEngine_t *iniEngine, const unsigned char *pointer, size_t size);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE _valueEndCallback(struct IniEngine_t *iniEngine, const unsigned char *pointer, size_t size);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _iniSectionEndCallback(struct IniEngine_t *iniEngine, const unsigned char *pointer, size_t size);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _iniCommentEndCallback(struct IniEngine_t *iniEngine, const unsigned char *pointer, size_t size);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _iniKeyEndCallback(struct IniEngine_t *iniEngine, const unsigned char *pointer, size_t size);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _iniValueEndCallback(struct IniEngine_t *iniEngine, const unsigned char *pointer, size_t size);

@@ -72,13 +72,13 @@ ERROR_CODE processIniFile(char *filePath, struct HashMap_t **configurationPointe
     parsing, they will be used to correctly update the
     provided configuration hash map */
     iniSettings_s.onsectionStart = NULL;
-    iniSettings_s.onsectionEnd = _sectionEndCallback;
+    iniSettings_s.onsectionEnd = _iniSectionEndCallback;
     iniSettings_s.oncommentStart = NULL;
-    iniSettings_s.oncommentEnd = _commentEndCallback;
+    iniSettings_s.oncommentEnd = _iniCommentEndCallback;
     iniSettings_s.onkeyStart = NULL;
-    iniSettings_s.onkeyEnd = _keyEndCallback;
+    iniSettings_s.onkeyEnd = _iniKeyEndCallback;
     iniSettings_s.onvalueStart = NULL;
-    iniSettings_s.onvalueEnd = _valueEndCallback;
+    iniSettings_s.onvalueEnd = _iniValueEndCallback;
 
     /* sets the configuration reference in the ini handler
     so that it may be updatd and then sets the handler in
@@ -176,7 +176,7 @@ ERROR_CODE processIniFile(char *filePath, struct HashMap_t **configurationPointe
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _sectionEndCallback(struct IniEngine_t *iniEngine, const unsigned char *pointer, size_t size) {
+ERROR_CODE _iniSectionEndCallback(struct IniEngine_t *iniEngine, const unsigned char *pointer, size_t size) {
     /* retrieves the ini handler from the template engine context
     then uses it to store the (current) section */
     struct IniHandler_t *iniHandler = (struct IniHandler_t *) iniEngine->context;
@@ -187,12 +187,12 @@ ERROR_CODE _sectionEndCallback(struct IniEngine_t *iniEngine, const unsigned cha
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _commentEndCallback(struct IniEngine_t *iniEngine, const unsigned char *pointer, size_t size) {
+ERROR_CODE _iniCommentEndCallback(struct IniEngine_t *iniEngine, const unsigned char *pointer, size_t size) {
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _keyEndCallback(struct IniEngine_t *iniEngine, const unsigned char *pointer, size_t size) {
+ERROR_CODE _iniKeyEndCallback(struct IniEngine_t *iniEngine, const unsigned char *pointer, size_t size) {
     /* retrieves the ini handler from the template engine context
     then uses it to store the (current) value */
     struct IniHandler_t *iniHandler = (struct IniHandler_t *) iniEngine->context;
@@ -203,7 +203,7 @@ ERROR_CODE _keyEndCallback(struct IniEngine_t *iniEngine, const unsigned char *p
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _valueEndCallback(struct IniEngine_t *iniEngine, const unsigned char *pointer, size_t size) {
+ERROR_CODE _iniValueEndCallback(struct IniEngine_t *iniEngine, const unsigned char *pointer, size_t size) {
     /* allocates space for the hash map reference to
     hold the reference to the current section configuration */
     struct HashMap_t *sectionConfiguration;
