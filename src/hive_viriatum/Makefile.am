@@ -49,7 +49,6 @@ handlers/handler_dispatch.c \
 handlers/handler_file.c \
 http/http_parser.c \
 http/http_request.c \
-io/file.c \
 jni/info.c \
 jni/jni_service.c \
 jni/start.c \
@@ -71,7 +70,6 @@ handlers/handler_dispatch.c \
 handlers/handler_file.c \
 http/http_parser.c \
 http/http_request.c \
-io/file.c \
 jni/info.c \
 jni/jni_service.c \
 jni/start.c \

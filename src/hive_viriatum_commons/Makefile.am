@@ -45,6 +45,7 @@ debug/error.c \
 debug/logging.c \
 encoding/base_64.c \
 ini/ini.c \
+io/file.c \
 jni/info.c \
 jni/start.c \
 memory/memory_pool.c \
@@ -76,6 +77,7 @@ debug/error.c \
 debug/logging.c \
 encoding/base_64.c \
 ini/ini.c \
+io/file.c \
 jni/info.c \
 jni/start.c \
 memory/memory_pool.c \
