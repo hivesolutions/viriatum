@@ -335,15 +335,15 @@ ERROR_CODE _sendResponseHandlerDispatch(struct HttpParser_t *httpParser) {
     SPRINTF(responseBuffer, 256, "HTTP/1.1 500 Internal Server Error\r\nServer: %s/%s (%s @ %s)\r\nConnection: Keep-Alive\r\nContent-Length: %lu\r\n\r\n%s", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, (long unsigned int) sizeof(DISPATCH_ERROR_MESSAGE) - 1, DISPATCH_ERROR_MESSAGE);
 
     /* writes the response to the connection, registers for the appropriate callbacks */
-    writeConnection(connection, (unsigned char *) responseBuffer, (unsigned int) strlen(responseBuffer), _sendResponseCallbackHandlerDispatch, (void *) httpParser);
+    writeConnection(connection, (unsigned char *) responseBuffer, (unsigned int) strlen(responseBuffer), _sendResponseCallbackHandlerDispatch, (void *) httpParser->flags);
 
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
 ERROR_CODE _sendResponseCallbackHandlerDispatch(struct Connection_t *connection, struct Data_t *data, void *parameters) {
-    /* retrieves the http parser */
-    struct HttpParser_t *httpParser = (struct HttpParser_t *) parameters;
+    /* retrieves the current http flags */
+    unsigned char flags = (unsigned char) parameters;
 
     /* retrieves the underlying connection references in order to be
     able to operate over them, for unregister */
@@ -360,7 +360,7 @@ ERROR_CODE _sendResponseCallbackHandlerDispatch(struct Connection_t *connection,
     }
 
     /* in case the connection is not meant to be kept alive */
-    if(!(httpParser->flags & FLAG_CONNECTION_KEEP_ALIVE)) {
+    if(!(flags & FLAG_CONNECTION_KEEP_ALIVE)) {
         /* closes the connection */
         connection->closeConnection(connection);
     }
