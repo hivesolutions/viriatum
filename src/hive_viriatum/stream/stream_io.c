@@ -447,7 +447,10 @@ ERROR_CODE openHandlerStreamIo(struct Connection_t *connection) {
 
     /* TODO: this values are hardcoded and should be
     removed (change also header file reference) */
-    ioConnection->onData = dataHandlerStreamHttp;
+    /*ioConnection->onData = dataHandlerStreamTorrent;
+    ioConnection->onOpen = openHandlerStreamTorrent;
+    ioConnection->onClose = closeHandlerStreamTorrent;*/
+	ioConnection->onData = dataHandlerStreamHttp;
     ioConnection->onOpen = openHandlerStreamHttp;
     ioConnection->onClose = closeHandlerStreamHttp;
 
