@@ -84,6 +84,12 @@ typedef struct HandlerPhpContext_t {
      */
     unsigned char *postData;
 
+	/**
+	 * The current value for the flags describing 
+	 * the status of the current http request.
+     */
+	unsigned char flags;
+
     /**
      * The content length reference to the current
      * request.

@@ -67,6 +67,7 @@ ERROR_CODE createHandlerPhpContext(struct HandlerPhpContext_t **handlerPhpContex
     /* sets the handler php default values */
     handlerPhpContext->method = NULL;
     handlerPhpContext->postData = NULL;
+	handlerPhpContext->flags = 0;
     handlerPhpContext->contentLength = 0;
     handlerPhpContext->outputBuffer = NULL;
     handlerPhpContext->_nextContentType = 0;
@@ -268,10 +269,9 @@ ERROR_CODE _sendDataCallback(struct Connection_t *connection, struct Data_t *dat
     char *buffer;
     char *outputData;
 
-    /* retrieves the http parser and then uses it to retrieve the
-    proper output buffer for the current connection (the context) */
-    struct HttpParser_t *httpParser = (struct HttpParser_t *) parameters;
-    struct HandlerPhpContext_t *handlerPhpContext = (struct HandlerPhpContext_t *) httpParser->context;
+    /* retrieves the current php context and then uses it to retrieve
+	the proper output buffer for the current connection (the context) */
+    struct HandlerPhpContext_t *handlerPhpContext = (struct HandlerPhpContext_t *) parameters;
     struct LinkedBuffer_t *outputBuffer = handlerPhpContext->outputBuffer;
 
     /* retrieves the size of the output buffer, this is going to
@@ -350,6 +350,7 @@ ERROR_CODE _sendResponseHandlerModule(struct HttpParser_t *httpParser) {
     _outputBuffer = outputBuffer;
     handlerPhpContext->method = method;
     handlerPhpContext->postData = postData;
+	handlerPhpContext->flags = httpParser->flags;
     handlerPhpContext->contentLength = httpParser->_contentLength;
     handlerPhpContext->outputBuffer = outputBuffer;
 
@@ -389,15 +390,15 @@ ERROR_CODE _sendResponseHandlerModule(struct HttpParser_t *httpParser) {
 
     /* writes the response to the connection, this will only write
     the headers the remaining message will be sent on the callback */
-    connection->writeConnection(connection, (unsigned char *) headersBuffer, (unsigned int) strlen(headersBuffer), _sendDataCallback, (void *) httpParser);
+    connection->writeConnection(connection, (unsigned char *) headersBuffer, (unsigned int) strlen(headersBuffer), _sendDataCallback, (void *) handlerPhpContext);
 
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
 ERROR_CODE _sendResponseCallbackHandlerModule(struct Connection_t *connection, struct Data_t *data, void *parameters) {
-    /* retrieves the http parser */
-    struct HttpParser_t *httpParser = (struct HttpParser_t *) parameters;
+    /* retrieves the current php context fro the parameters */
+    struct HandlerPhpContext_t *handlerPhpContext = (struct HandlerPhpContext_t *) parameters;
 
     /* retrieves the underlying connection references in order to be
     able to operate over them, for unregister */
@@ -414,7 +415,7 @@ ERROR_CODE _sendResponseCallbackHandlerModule(struct Connection_t *connection, s
     }
 
     /* in case the connection is not meant to be kept alive */
-    if(!(httpParser->flags & FLAG_CONNECTION_KEEP_ALIVE)) {
+    if(!(handlerPhpContext->flags & FLAG_CONNECTION_KEEP_ALIVE)) {
         /* closes the connection */
         connection->closeConnection(connection);
     }
@@ -429,10 +430,15 @@ ERROR_CODE _writeErrorConnection(struct HttpParser_t *httpParser, char *message)
 
     /* retrieves the connection from the http parser parameters */
     struct Connection_t *connection = (struct Connection_t *) httpParser->parameters;
+    struct HandlerPhpContext_t *handlerPhpContext = (struct HandlerPhpContext_t *) httpParser->context;
 
     /* retrieves the length of the message so that it's possible to print
     the proper error */
     size_t messageLength = strlen(message);
+
+	/* updates the flags value in the php context, this is required
+	to avoid problems in the callback handler */
+	handlerPhpContext->flags = httpParser->flags;
 
     /* allocates the data buffer (in a safe maner) then
     writes the http static headers to the response */
@@ -440,7 +446,7 @@ ERROR_CODE _writeErrorConnection(struct HttpParser_t *httpParser, char *message)
     SPRINTF((char *) buffer, 1024, "HTTP/1.1 500 Internal Server Error\r\nServer: %s/%s (%s @ %s)\r\nConnection: Keep-Alive\r\nContent-Length: %d\r\n\r\n%s", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, (unsigned int) messageLength, message);
 
     /* writes the response to the connection, registers for the appropriate callbacks */
-    connection->writeConnection(connection, buffer, (unsigned int) strlen((char *) buffer), _sendResponseCallbackHandlerModule, (void *) httpParser);
+    connection->writeConnection(connection, buffer, (unsigned int) strlen((char *) buffer), _sendResponseCallbackHandlerModule, (void *) handlerPhpContext);
 
     /* raise no error */
     RAISE_NO_ERROR;
