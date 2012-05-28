@@ -409,7 +409,7 @@ ERROR_CODE startService(struct Service_t *service) {
     polling->service = service;
 
     /* sets the various handler values to the polling process
-	they will be called for the various read, write operations */
+    they will be called for the various read, write operations */
     polling->open = openPollingSelect;
     polling->close = closePollingSelect;
     polling->registerConnection = registerConnectionPollingSelect;
