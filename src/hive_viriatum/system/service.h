@@ -348,8 +348,8 @@ typedef enum RuleType_e {
  * enumeration and registration is required.
  */
 typedef enum ConnectionProtocol_e {
-	UNDEFINED_PROTOCOL = 1,
-	UNKNOWN_PROTOCOL,
+    UNDEFINED_PROTOCOL = 1,
+    UNKNOWN_PROTOCOL,
     HTTP_PROTOCOL,
     TORRENT_PROTOCOL
 } ConnectionType;
@@ -377,10 +377,10 @@ typedef struct Connection_t {
      */
     unsigned char status;
 
-	/**
-	 * The type of the connection to 
-	 */
-	enum ConnectionProtocol_e protocol;
+    /**
+     * The type of the connection to
+     */
+    enum ConnectionProtocol_e protocol;
 
     /**
      * The socket handle associated with
