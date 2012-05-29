@@ -401,6 +401,9 @@ ERROR_CODE _runBencodingEngine(struct BencodingEngine_t *bencodingEngine, unsign
                 }
 
                 break;
+
+			default:
+				break;
         }
     }
 
@@ -455,6 +458,10 @@ ERROR_CODE _bencodingIntegerEndCallback(struct BencodingEngine_t *bencodingEngin
 
                 /* breaks the switch */
                 break;
+
+			default:
+				/* breaks the switch */
+				break;
         }
     }
 
@@ -521,6 +528,10 @@ ERROR_CODE _bencodingStringEndCallback(struct BencodingEngine_t *bencodingEngine
 
                 /* breaks the switch */
                 break;
+
+			default:
+				/* breaks the switch */
+				break;
         }
     }
 
@@ -665,6 +676,10 @@ ERROR_CODE _bencodingSequenceEndCallback(struct BencodingEngine_t *bencodingEngi
 
             /* breaks the switch */
             break;
+		
+		default:
+			/* breaks the switch */
+			break;
     }
 
     /* raises no error */
