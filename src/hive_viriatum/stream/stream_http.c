@@ -81,8 +81,8 @@ ERROR_CODE createHttpConnection(struct HttpConnection_t **httpConnectionPointer,
     /* creates the http settings */
     createHttpSettings(&httpConnection->httpSettings);
 
-    /* creates the http parser */
-    createHttpParser(&httpConnection->httpParser);
+    /* creates the http parser (for a request) */
+    createHttpParser(&httpConnection->httpParser, 1);
 
     /* sets the connection as the parser parameter(s) */
     httpConnection->httpParser->parameters = ioConnection->connection;
@@ -157,7 +157,7 @@ ERROR_CODE dataHandlerStreamHttp(struct IoConnection_t *ioConnection, unsigned c
             httpConnection->buffer = (unsigned char *) MALLOC(httpConnection->bufferSize);
         }
         /* in case the http connection buffer is currently set but the available
-        space is not enought must reallocate the buffer (increment size) */
+        space is not enough must reallocate the buffer (increment size) */
         else if(httpConnection->bufferOffset + bufferSize > httpConnection->bufferSize) {
             if(httpConnection->httpParser->_contentLength > 0) {
                 httpConnection->bufferSize += httpConnection->httpParser->_contentLength;
