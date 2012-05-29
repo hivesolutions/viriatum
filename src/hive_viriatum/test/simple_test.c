@@ -248,7 +248,9 @@ void testBase64() {
 
 void testBencoding() {
     struct Type_t *type;
-	processBencodingFile("c:/verysleepy_0_82.exe.torrent", &type);
+	decodeBencoding("d8:___hello5:world7:__helloli1ei2ei3ee6:_hello5:world5:helloli1ed5:helloli1ei2ei3eeei2e5:worldee", 96, &type);
+	printType(type);
+	freeType(type);
 }
 
 void testHuffman() {
@@ -430,49 +432,49 @@ int _compare(void *first, void *second) {
 void runSimpleTests() {
     #ifndef VIRIATUM_NO_THREADS
     /* tests the thread pool */
-    testThreadPool();
+  //  testThreadPool();
     #endif
 
     /* tests the linked list */
-    testLinkedList();
+  //  testLinkedList();
 
     /* tests the array list */
-    testArrayList();
+  //  testArrayList();
 
     /* tests the hash map */
-    testHashMap();
+ //   testHashMap();
 
     /* tests the string buffer */
-    testStringBuffer();
+  //  testStringBuffer();
 
     /* tests the linked buffer */
-    testLinkedBuffer();
+ //   testLinkedBuffer();
 
     /* tests the base 64 encoder */
-    testBase64();
+ //   testBase64();
 
 	/* tests the bencoding encoder */
 	testBencoding();
 
     /* tests the huffman encoder */
-    testHuffman();
+ //   testHuffman();
 
     /* tests the bit stream */
-    testBitStream();
+ //   testBitStream();
 
     /* tests the file stream */
-    testFileStream();
+ //   testFileStream();
 
     /* tests the template handler */
-    testTemplateHandler();
+   // testTemplateHandler();
 
     /* tests the quick sort algorithm */
-    testQuicksort();
-    testQuicksortLinkedList();
+  //  testQuicksort();
+  //  testQuicksortLinkedList();
 
     /* tests the md5 hash function */
-    testMd5();
+  //  testMd5();
 
     /* tests the crc32 hash function */
-    testCrc32();
+    //testCrc32();
 }
