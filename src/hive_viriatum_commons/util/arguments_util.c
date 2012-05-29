@@ -92,7 +92,7 @@ ERROR_CODE deleteArguments(struct HashMap_t *arguments) {
         }
 
         /* retrievs the hash map value for the key */
-		getValueHashMap(arguments, element->key, element->keyString, (void **) &argument);
+        getValueHashMap(arguments, element->key, element->keyString, (void **) &argument);
 
         /* releases the argument memory */
         FREE(argument);

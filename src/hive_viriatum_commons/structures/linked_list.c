@@ -325,8 +325,8 @@ void popTopLinkedList(struct LinkedList_t *linkedList, struct LinkedListNode_t *
     struct LinkedListNode_t *linkedListNode;
 
     /* retrieves the final linked list node, note that
-	there is a validation on the size of the linked list */
-	getLinkedList(linkedList, linkedList->size > 0 ? linkedList->size - 1 : 0, &linkedListNode);
+    there is a validation on the size of the linked list */
+    getLinkedList(linkedList, linkedList->size > 0 ? linkedList->size - 1 : 0, &linkedListNode);
 
     /* removes the last linked list node from the linked list */
     removeLinkedList(linkedList, linkedListNode, 0);
@@ -398,11 +398,11 @@ void peekTopLinkedList(struct LinkedList_t *linkedList, struct LinkedListNode_t 
     /* allocates space for the linked list node */
     struct LinkedListNode_t *linkedListNode;
 
-	/* retrieves the initial linked list node, note that
-	there is a validation on the size of the linked list */
-	getLinkedList(linkedList, linkedList->size > 0 ? linkedList->size - 1 : 0, &linkedListNode);
+    /* retrieves the initial linked list node, note that
+    there is a validation on the size of the linked list */
+    getLinkedList(linkedList, linkedList->size > 0 ? linkedList->size - 1 : 0, &linkedListNode);
 
-	/* sets the linked list node in the linked list node pointer */
+    /* sets the linked list node in the linked list node pointer */
     *linkedListNodePointer = linkedListNode;
 }
 

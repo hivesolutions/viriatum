@@ -68,27 +68,27 @@ void createHashMap(struct HashMap_t **hashMapPointer, size_t initialSize) {
 }
 
 void deleteHashMap(struct HashMap_t *hashMap) {
-	/* allocates space for the index accumulator to be used
-	for the iteration and for the temporary element */
-	size_t index;
-	struct HashMapElement_t *element;
+    /* allocates space for the index accumulator to be used
+    for the iteration and for the temporary element */
+    size_t index;
+    struct HashMapElement_t *element;
 
-	/* iterates over all the elements in the hash map to
-	release the memory present in the buffers */
-	for(index = 0; index < hashMap->elementsBufferSize; index++) {
+    /* iterates over all the elements in the hash map to
+    release the memory present in the buffers */
+    for(index = 0; index < hashMap->elementsBufferSize; index++) {
         /* retrieves the base address value */
         element = &hashMap->elementsBuffer[index];
 
         /* in case the element is not used or in case
-		the key string is not set no need to release 
-		the allocated memory (no memory used) */
-		if(element->used == 0) { continue; }
-		if(element->keyString == NULL) { continue; }
+        the key string is not set no need to release
+        the allocated memory (no memory used) */
+        if(element->used == 0) { continue; }
+        if(element->keyString == NULL) { continue; }
 
-		/* releases the key string buffer, to avoid any
-		possible memory leak */
-		FREE(element->keyString);
-	}
+        /* releases the key string buffer, to avoid any
+        possible memory leak */
+        FREE(element->keyString);
+    }
 
     /* releases the elements buffer */
     FREE(hashMap->elementsBuffer);
@@ -103,9 +103,9 @@ void setValueHashMap(struct HashMap_t *hashMap, size_t key, unsigned char *keySt
 
     /* allocates space for the index used for element
     access (computed modulus hash) and for the size of
-	the key string to be set in the element */
+    the key string to be set in the element */
     size_t index;
-	size_t keyStringSize;
+    size_t keyStringSize;
 
     /* in case the current hash map size "overflows"
     the maximum size (a resizing is required) */
@@ -146,29 +146,29 @@ void setValueHashMap(struct HashMap_t *hashMap, size_t key, unsigned char *keySt
         }
     }
 
-	/* in case the key string is already defined in the
-	element (must release it properly) unsets it */
-	if(element->keyString != NULL) {
-		/* releases the key string memory (avoids memory leak)
-		and then unsets the key string reference in the element */
-		FREE(element->keyString);
-		element->keyString = NULL;
-	}
+    /* in case the key string is already defined in the
+    element (must release it properly) unsets it */
+    if(element->keyString != NULL) {
+        /* releases the key string memory (avoids memory leak)
+        and then unsets the key string reference in the element */
+        FREE(element->keyString);
+        element->keyString = NULL;
+    }
 
     /* sets the element fields */
     element->value = value;
     element->key = key;
     element->used = 1;
 
-	/* in case the key string is defined must copy
-	the string information into the element */
-	if(keyString != NULL) {
-		/* allocates the required memory for the key string
-		and then copies the key string into the element */
-		keyStringSize = strlen(keyString);
-		element->keyString = (unsigned char *) MALLOC(keyStringSize + 1);
-		memcpy(element->keyString, keyString, keyStringSize + 1);
-	}
+    /* in case the key string is defined must copy
+    the string information into the element */
+    if(keyString != NULL) {
+        /* allocates the required memory for the key string
+        and then copies the key string into the element */
+        keyStringSize = strlen(keyString);
+        element->keyString = (unsigned char *) MALLOC(keyStringSize + 1);
+        memcpy(element->keyString, keyString, keyStringSize + 1);
+    }
 
     /* increments the hash map size */
     hashMap->size++;
@@ -204,8 +204,8 @@ void getHashMap(struct HashMap_t *hashMap, size_t key, unsigned char *keyString,
 
         /* in case the element key is the same as the
         requested (element found) note that an extra
-		verification is done to make sure that in case
-		a string key is specified it also matches */
+        verification is done to make sure that in case
+        a string key is specified it also matches */
         if(element->key == key && (keyString == NULL || strcmp(element->keyString, keyString) == 0)) {
             /* breaks the loop */
             break;
@@ -447,9 +447,9 @@ void _resizeHashMap(struct HashMap_t *hashMap) {
         setValueHashMap(hashMap, element->key, element->keyString, element->value);
     }
 
-	/* releases the memory used by the "old" elements
-	buffer (avoids possible memory leak) */
-	FREE(elementsBuffer);
+    /* releases the memory used by the "old" elements
+    buffer (avoids possible memory leak) */
+    FREE(elementsBuffer);
 }
 
 size_t _calculateStringHashMap(unsigned char *keyString) {

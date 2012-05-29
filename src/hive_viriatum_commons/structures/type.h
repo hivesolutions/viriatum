@@ -40,37 +40,37 @@
  * with the typ structure.
  */
 typedef union TypeValue_t {
-	/**
-	 * The storage space used for the
-	 * integer value representation.
-	 */
+    /**
+     * The storage space used for the
+     * integer value representation.
+     */
     int valueInt;
 
-	/**
-	 * The storage space used for the
-	 * float value representation.
-	 */
+    /**
+     * The storage space used for the
+     * float value representation.
+     */
     float valueFloat;
 
-	/**
-	 * The storage space used for the
-	 * string value representation, this
-	 * representation is done via a buffer.
-	 */
+    /**
+     * The storage space used for the
+     * string value representation, this
+     * representation is done via a buffer.
+     */
     char *valueString;
 
-	/**
-	 * The storage space used for the
-	 * hash map (dictionary) value
-	 * representation.
-	 */
+    /**
+     * The storage space used for the
+     * hash map (dictionary) value
+     * representation.
+     */
     struct HashMap_t *valueMap;
 
-	/**
-	 * The storage space used for the
-	 * linked list (sequence) value
-	 * representation.
-	 */
+    /**
+     * The storage space used for the
+     * linked list (sequence) value
+     * representation.
+     */
     struct LinkedList_t *valueList;
 
     /**

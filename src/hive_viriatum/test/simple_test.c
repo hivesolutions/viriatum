@@ -248,9 +248,9 @@ void testBase64() {
 
 void testBencoding() {
     struct Type_t *type;
-	decodeBencoding("d8:___hello5:world7:__helloli1ei2ei3ee6:_hello5:world5:helloli1ed5:helloli1ei2ei3eeei2e5:worldee", 96, &type);
-	printType(type);
-	freeType(type);
+    decodeBencoding("d8:___hello5:world7:__helloli1ei2ei3ee6:_hello5:world5:helloli1ed5:helloli1ei2ei3eeei2e5:worldee", 96, &type);
+    printType(type);
+    freeType(type);
 }
 
 void testHuffman() {
@@ -453,8 +453,8 @@ void runSimpleTests() {
     /* tests the base 64 encoder */
  //   testBase64();
 
-	/* tests the bencoding encoder */
-	testBencoding();
+    /* tests the bencoding encoder */
+    testBencoding();
 
     /* tests the huffman encoder */
  //   testHuffman();
