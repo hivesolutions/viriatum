@@ -26,3 +26,52 @@
 */
 
 #pragma once
+
+#include "../http/http.h"
+#include "stream_io.h"
+
+/* forward references (avoids loop) */
+struct HttpClientConnection_t;
+
+/**
+ * Function used to update the given http client connection
+ * with new information.
+ *
+ * @param httpClientConnection The http client connection to be
+ * update with new information.
+ */
+typedef ERROR_CODE (*httpClientConnectionUpdate) (struct HttpClientConnection_t *httpClientConnection);
+
+/**
+ * Structure defining a logical
+ * http client connection.
+ */
+typedef struct HttpClientConnection_t {
+    /**
+     * The (upper) io connection that owns
+     * manages this connection.
+     */
+    struct IoConnection_t *ioConnection;
+
+    /**
+     * Structure containig the settings to be
+     * used by the http parser.
+     */
+    struct HttpSettings_t *httpSettings;
+
+    /**
+     * Parser to be used during the interpretation
+     * of the http requests.
+     */
+    struct HttpParser_t *httpParser;
+} HttpClientConnection;
+
+typedef struct HttpClientParameters_t {
+    char *url;
+} HttpClientParameters;
+
+ERROR_CODE createHttpClientConnection(struct HttpClientConnection_t **httpClientConnectionPointer, struct IoConnection_t *ioConnection);
+ERROR_CODE deleteHttpClientConnection(struct HttpClientConnection_t *httpClientConnection);
+ERROR_CODE dataHandlerStreamHttpClient(struct IoConnection_t *ioConnection, unsigned char *buffer, size_t bufferSize);
+ERROR_CODE openHandlerStreamHttpClient(struct IoConnection_t *ioConnection);
+ERROR_CODE closeHandlerStreamHttpClient(struct IoConnection_t *ioConnection);

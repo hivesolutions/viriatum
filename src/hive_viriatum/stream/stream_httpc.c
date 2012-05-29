@@ -28,3 +28,132 @@
 #include "stdafx.h"
 
 #include "stream_httpc.h"
+
+ERROR_CODE bodyCallbackHandlerClient(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize) {
+	struct Type_t *type;
+
+	decodeBencoding((unsigned char *) data, dataSize, &type);
+	printType(type);
+	freeType(type);
+
+	/* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE messageCompleteCallbackHandlerClient(struct HttpParser_t *httpParser) {
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+
+
+
+ERROR_CODE createHttpClientConnection(struct HttpClientConnection_t **httpClientConnectionPointer, struct IoConnection_t *ioConnection) {
+    /* retrieves the http client connection size */
+    size_t httpClientConnectionSize = sizeof(struct HttpClientConnection_t);
+
+    /* allocates space for the http client connection */
+    struct HttpClientConnection_t *httpClientConnection = (struct HttpClientConnection_t *) MALLOC(httpClientConnectionSize);
+
+    /* retrieves the service associated with the connection */
+    struct Service_t *service = ioConnection->connection->service;
+
+    /* sets the http handler attributes (default) values */
+    httpClientConnection->ioConnection = ioConnection;
+
+    /* creates the http settings */
+    createHttpSettings(&httpClientConnection->httpSettings);
+
+    /* creates the http parser (for a response) */
+    createHttpParser(&httpClientConnection->httpParser, 0);
+
+	/* sets the default callback functions in the http settings
+	these function are going to be called by the parser */
+	httpClientConnection->httpSettings->onbody = bodyCallbackHandlerClient;
+	httpClientConnection->httpSettings->onmessageComplete = messageCompleteCallbackHandlerClient;
+
+    /* sets the connection as the parser parameter(s) */
+    httpClientConnection->httpParser->parameters = ioConnection->connection;
+
+    /* sets the http client connection in the (upper) io connection substrate */
+    ioConnection->lower = httpClientConnection;
+
+    /* sets the http client connection in the http client connection pointer */
+    *httpClientConnectionPointer = httpClientConnection;
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE deleteHttpClientConnection(struct HttpClientConnection_t *httpClientConnection) {
+    /* deletes the http parser */
+    deleteHttpParser(httpClientConnection->httpParser);
+
+    /* deletes the http settings */
+    deleteHttpSettings(httpClientConnection->httpSettings);
+
+    /* releases the http client connection */
+    FREE(httpClientConnection);
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE dataHandlerStreamHttpClient(struct IoConnection_t *ioConnection, unsigned char *buffer, size_t bufferSize) {
+    /* allocates space for the temporary variable to
+    hold the ammount of bytes processed in a given http
+    data parsing iteration */
+    int processedSize;
+
+    /* retrieves the http client connection */
+    struct HttpClientConnection_t *httpClientConnection = (struct HttpClientConnection_t *) ioConnection->lower;
+
+    /* process the http data for the http parser, this should be
+    a partial processing and some data may remain unprocessed (in
+    case there are multiple http requests) */
+    processedSize = processDataHttpParser(httpClientConnection->httpParser, httpClientConnection->httpSettings, buffer, bufferSize);
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE openHandlerStreamHttpClient(struct IoConnection_t *ioConnection) {
+    /* allocates the http client connection and retrieves the
+	"upper" connection (for parameters retrieval) */
+    struct HttpClientConnection_t *httpClientConnection;
+	struct Connection_t *connection = (struct Connection_t *) ioConnection->connection;
+	struct HttpClientParameters_t *parameters = (struct HttpClientParameters_t *) connection->parameters;
+
+	struct Type_t *type;
+
+	char *buffer = malloc(1024);
+
+	
+	decodeBencodingFile("C:/verysleepy_0_82.exe.torrent", &type);
+
+	//freeType(type);
+
+	
+	SPRINTF(buffer, 1024, "GET %s HTTP/1.1\r\n\User-Agent: viriatum/0.1.0 (linux - intel x64)\r\nConnection: keep-alive\r\n\r\n", parameters->url);
+
+
+    /* creates the http client connection */
+    createHttpClientConnection(&httpClientConnection, ioConnection);
+
+    writeConnection(ioConnection->connection, buffer, strlen(buffer), NULL, NULL);
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE closeHandlerStreamHttpClient(struct IoConnection_t *ioConnection) {
+    /* retrieves the http client connection */
+    struct HttpClientConnection_t *httpClientConnection = (struct HttpClientConnection_t *) ioConnection->lower;
+
+    /* deletes the http client connection */
+    deleteHttpClientConnection(httpClientConnection);
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
