@@ -86,6 +86,23 @@ ERROR_CODE readFile(char *filePath, unsigned char **bufferPointer, size_t *fileS
     RAISE_NO_ERROR;
 }
 
+ERROR_CODE writeFile(char *filePath, unsigned char *buffer, size_t bufferSize) {
+    /* allocates space for the file */
+    FILE *file;
+
+    /* opens the file */
+    FOPEN(&file, filePath, "wb");
+
+    /* writes the provided buffer into the file */
+    fwrite(buffer, sizeof(char), bufferSize, file);
+
+    /* closes the file */
+    fclose(file);
+
+    /* raise no error */
+    RAISE_NO_ERROR;
+}
+
 ERROR_CODE countFile(char *filePath, size_t *fileSizePointer) {
     /* allocates space for the file */
     FILE *file;
