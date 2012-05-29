@@ -296,6 +296,10 @@ void testBencoding() {
     releases its memory recursively */
     printType(type);
     freeType(type);
+
+	/* releases the memory from the encoded buffer, this was
+	created during the encoding using bencoding */
+	FREE(encodedBuffer);
 }
 
 void testHuffman() {
