@@ -256,7 +256,7 @@ ERROR_CODE _encodeType(struct Type_t *type, struct StringBuffer_t *stringBuffer)
 
     /* raises no error */
     RAISE_NO_ERROR;
-};
+}
 
 ERROR_CODE _startBencodingEngine(struct BencodingEngine_t **bencodingEnginePointer) {
     /* allocates space for the various bencoding
