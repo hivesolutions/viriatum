@@ -69,30 +69,30 @@ ERROR_CODE processArguments(int argc, char *argv[], struct HashMap_t **arguments
 }
 
 ERROR_CODE deleteArguments(struct HashMap_t *arguments) {
-    /* allocates space for the pointer to the key and
+    /* allocates space for the pointer to the element and
     for the argument to be retrieved */
-    size_t *keyPointer;
+    struct HashMapElement_t *element;
     struct Argument_t *argument;
 
     /* allocates space for the iterator for the arguments */
     struct Iterator_t *argumentsIterator;
 
     /* creates an iterator for the arguments hash map */
-    createIteratorHashMap(arguments, &argumentsIterator);
+    createElementIteratorHashMap(arguments, &argumentsIterator);
 
     /* iterates continuously */
     while(1) {
         /* retrieves the next value from the arguments iterator */
-        getNextIterator(argumentsIterator, (void **) &keyPointer);
+        getNextIterator(argumentsIterator, (void **) &element);
 
         /* in case the current module is null (end of iterator) */
-        if(keyPointer == NULL) {
+        if(element == NULL) {
             /* breaks the loop */
             break;
         }
 
-        /* retrievs the hash map value for the key pointer */
-        getValueHashMap(arguments, *keyPointer, (void **) &argument);
+        /* retrievs the hash map value for the key */
+		getValueHashMap(arguments, element->key, element->keyString, (void **) &argument);
 
         /* releases the argument memory */
         FREE(argument);
@@ -109,9 +109,9 @@ ERROR_CODE deleteArguments(struct HashMap_t *arguments) {
 }
 
 ERROR_CODE printArguments(struct HashMap_t *arguments) {
-    /* allocates space for the pointer to the key and
+    /* allocates space for the pointer to the element and
     for the argument to be retrieved */
-    size_t *keyPointer;
+    struct HashMapElement_t *element;
     struct Argument_t *argument;
 
     /* allocates space for the iterator for the arguments */
@@ -126,16 +126,16 @@ ERROR_CODE printArguments(struct HashMap_t *arguments) {
     /* iterates continuously */
     while(1) {
         /* retrieves the next value from the arguments iterator */
-        getNextIterator(argumentsIterator, (void **) &keyPointer);
+        getNextIterator(argumentsIterator, (void **) &element);
 
         /* in case the current module is null (end of iterator) */
-        if(keyPointer == NULL) {
+        if(element == NULL) {
             /* breaks the loop */
             break;
         }
 
-        /* retrievs the hash map value for the key pointer */
-        getValueHashMap(arguments, *keyPointer, (void **) &argument);
+        /* retrievs the hash map value for the key */
+        getValueHashMap(arguments, element->key, element->keyString, (void **) &argument);
 
         /* in case the argument is of type value */
         if(argument->type == VALUE_ARGUMENT) {
