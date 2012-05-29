@@ -72,6 +72,10 @@ Must compile the php interpreter with special environment variables set, and the
 * `export CFLAGS="-I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend"`
 * `./configure --enable-embed`
 
+## Debugging
+
+* For windows debugging use [Visual Leak Detector](http://vld.codeplex.com) using the `#include <vld.h>` statement
+
 ## License
 
 Viriatum is an open-source project licensed under the [GNU General Public License Version 3](http://www.gnu.org/licenses/gpl.html).
