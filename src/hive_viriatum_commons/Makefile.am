@@ -62,6 +62,7 @@ structures/hash_map.c \
 structures/iterator.c \
 structures/linked_buffer.c \
 structures/linked_list.c \
+structures/sort_map.c \
 structures/string.c \
 structures/string_buffer.c \
 structures/type.c \
@@ -96,6 +97,7 @@ structures/hash_map.c \
 structures/iterator.c \
 structures/linked_buffer.c \
 structures/linked_list.c \
+structures/sort_map.c \
 structures/string.c \
 structures/string_buffer.c \
 structures/type.c \
