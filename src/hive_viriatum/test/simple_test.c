@@ -278,8 +278,8 @@ void testBencoding() {
     appendValueLinkedList(list, (void *) &_integerType);
 
     /* sets the top level hash map values */
-    setValueStringHashMap(map, "hello", (void *) &_stringType);
-    setValueStringHashMap(map, "_hello", (void *) &_listType);
+    setValueStringHashMap(map, (unsigned char *) "hello", (void *) &_stringType);
+    setValueStringHashMap(map, (unsigned char *) "_hello", (void *) &_listType);
 
     /* encodes the top level map type into the encoded buffer
     and then decodes it from the the encoded buffer back to
