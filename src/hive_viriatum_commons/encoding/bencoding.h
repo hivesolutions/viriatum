@@ -90,7 +90,12 @@ typedef struct BencodingEngine_t {
 } BencodingEngine;
 
 typedef struct BencodingHandler_t {
-    struct HashMap_t *configuration;
+	struct LinkedList_t *sequenceStack;
+	struct LinkedList_t *keyStack;
+    struct Type_t *sequence;
+	struct Type_t *top;
+	char *key;
+    char nextKey;
 } BencodingHandler;
 
 VIRIATUM_EXPORT_PREFIX ERROR_CODE processBencodingFile(char *filePath, struct Type_t **typePointer);
