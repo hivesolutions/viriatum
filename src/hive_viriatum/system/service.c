@@ -193,7 +193,7 @@ void deleteConfiguration(struct HashMap_t *configuration, int isTop) {
     struct Iterator_t *configurationIterator;
 
     /* creates an iterator for the ´configuration hash map */
-    createIteratorHashMap(configuration, &configurationIterator);
+    createElementIteratorHashMap(configuration, &configurationIterator);
 
     /* iterates continuously */
     while(1) {
