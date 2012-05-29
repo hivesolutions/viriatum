@@ -139,7 +139,7 @@ ERROR_CODE openHandlerStreamHttpClient(struct IoConnection_t *ioConnection) {
     /* creates the http client connection */
     createHttpClientConnection(&httpClientConnection, ioConnection);
 
-    writeConnection(ioConnection->connection, buffer, strlen(buffer), NULL, NULL);
+    writeConnection(ioConnection->connection, (unsigned char *) buffer, strlen(buffer), NULL, NULL);
 
     /* raises no error */
     RAISE_NO_ERROR;
