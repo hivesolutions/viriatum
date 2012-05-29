@@ -146,6 +146,15 @@ void setValueHashMap(struct HashMap_t *hashMap, size_t key, unsigned char *keySt
         }
     }
 
+	/* in case the key string is already defined in the
+	element (must release it properly) unsets it */
+	if(element->keyString != NULL) {
+		/* releases the key string memory (avoids memory leak)
+		and then unsets the key string reference in the element */
+		FREE(element->keyString);
+		element->keyString = NULL;
+	}
+
     /* sets the element fields */
     element->value = value;
     element->key = key;
@@ -154,10 +163,6 @@ void setValueHashMap(struct HashMap_t *hashMap, size_t key, unsigned char *keySt
 	/* in case the key string is defined must copy
 	the string information into the element */
 	if(keyString != NULL) {
-		/* in case the key string is already defined in the
-		element (must release it properly) */
-		if(element->keyString != NULL) { FREE(element->keyString); }
-
 		/* allocates the required memory for the key string
 		and then copies the key string into the element */
 		keyStringSize = strlen(keyString);
