@@ -40,8 +40,8 @@
 
 #define BENCODING_CALLBACK(FOR)\
     do {\
-        if(bencodingSettings->on##FOR) {\
-            if(bencodingSettings->on##FOR(bencodingEngine) != 0) {\
+        if(bencodingEngine->settings.on##FOR) {\
+            if(bencodingEngine->settings.on##FOR(bencodingEngine) != 0) {\
                 RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem handling callback"); \
             }\
         }\
@@ -52,8 +52,8 @@
 #define BENCODING_CALLBACK_DATA_N(FOR, N)\
     do {\
         if(FOR##Mark) {\
-            if(bencodingSettings->on##FOR) {\
-                if(bencodingSettings->on##FOR(bencodingEngine, FOR##Mark, pointer - FOR##Mark - N) != 0) {\
+            if(bencodingEngine->settings.on##FOR) {\
+                if(bencodingEngine->settings.on##FOR(bencodingEngine, FOR##Mark, pointer - FOR##Mark - N) != 0) {\
                     RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem handling callback"); \
                 }\
             }\
@@ -86,6 +86,10 @@ typedef struct BencodingSettings_t {
 } BencodingSettings;
 
 typedef struct BencodingEngine_t {
+	enum BencodingState_e state;
+	struct BencodingSettings_t settings;
+	unsigned char *integerEndMark;
+	unsigned char *stringEndMark;
     void *context;
 } BencodingEngine;
 
@@ -98,7 +102,16 @@ typedef struct BencodingHandler_t {
     char nextKey;
 } BencodingHandler;
 
-VIRIATUM_EXPORT_PREFIX ERROR_CODE processBencodingFile(char *filePath, struct Type_t **typePointer);
+VIRIATUM_EXPORT_PREFIX void createBencodingEngine(struct BencodingEngine_t **bencodingEnginePointer, void *context);
+VIRIATUM_EXPORT_PREFIX void deleteBencodingEngine(struct BencodingEngine_t *bencodingEngine);
+VIRIATUM_EXPORT_PREFIX void createBencodingHandler(struct BencodingHandler_t **bencodingHandlerPointer);
+VIRIATUM_EXPORT_PREFIX void deleteBencodingHandler(struct BencodingHandler_t *bencodingHandler);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE encodeBencoding(struct Type_t *type, unsigned char **encodedBufferPointer, size_t *encodedBufferLengthPointer);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE decodeBencoding(unsigned char *encodedBuffer, size_t encodedBufferLength, struct Type_t **typePointer);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE decodeBencodingFile(char *filePath, struct Type_t **typePointer);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _startBencodingEngine(struct BencodingEngine_t **bencodingEnginePointer);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _stopBencodingEngine(struct BencodingEngine_t *bencodingEngine);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _runBencodingEngine(struct BencodingEngine_t *bencodingEngine, unsigned char *buffer, size_t size);
 VIRIATUM_EXPORT_PREFIX ERROR_CODE _bencodingIntegerEndCallback(struct BencodingEngine_t *bencodingEngine, const unsigned char *pointer, size_t size);
 VIRIATUM_EXPORT_PREFIX ERROR_CODE _bencodingStringEndCallback(struct BencodingEngine_t *bencodingEngine, const unsigned char *pointer, size_t size);
 VIRIATUM_EXPORT_PREFIX ERROR_CODE _bencodingListStartCallback(struct BencodingEngine_t *bencodingEngine);
@@ -111,5 +124,3 @@ VIRIATUM_EXPORT_PREFIX ERROR_CODE _bencodingSequenceEndCallback(struct Bencoding
 
 
 
-VIRIATUM_EXPORT_PREFIX int encodeBencoding(unsigned char *buffer, size_t bufferLength, unsigned char **encodedBufferPointer, size_t *encodedBufferLengthPointer);
-VIRIATUM_EXPORT_PREFIX int decodeBencoding(unsigned char *encodedBuffer, size_t encodedBufferLength, unsigned char **decodedBufferPointer, size_t *decodedBufferLengthPointer);
