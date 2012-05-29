@@ -110,7 +110,7 @@ ERROR_CODE dataHandlerStreamHttpClient(struct IoConnection_t *ioConnection, unsi
     case there are multiple http requests) */
     processedSize = processDataHttpParser(httpClientConnection->httpParser, httpClientConnection->httpSettings, buffer, bufferSize);
 
-	printf("%d", processedSize);
+    printf("%d", processedSize);
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -127,19 +127,19 @@ ERROR_CODE openHandlerStreamHttpClient(struct IoConnection_t *ioConnection) {
 
     char *buffer = malloc(1024);
 
-	struct Type_t *_type;
-	char *_buffer;
-	size_t _bufferSize;
+    struct Type_t *_type;
+    char *_buffer;
+    size_t _bufferSize;
 
 
 
     decodeBencodingFile("C:/verysleepy_0_82.exe.torrent", &type);
-	getValueStringHashMap(type->value.valueMap, "info", (void **) &_type);
-	encodeBencoding(_type, &_buffer, &_bufferSize);
-	writeFile("c:/tobias.dumpi", _buffer, _bufferSize);
+    getValueStringHashMap(type->value.valueMap, "info", (void **) &_type);
+    encodeBencoding(_type, &_buffer, &_bufferSize);
+    writeFile("c:/tobias.dumpi", _buffer, _bufferSize);
 
     freeType(type);
-	FREE(_buffer);
+    FREE(_buffer);
 
 
     SPRINTF(buffer, 1024, "GET %s HTTP/1.1\r\nUser-Agent: viriatum/0.1.0 (linux - intel x64)\r\nConnection: keep-alive\r\n\r\n", parameters->url);
