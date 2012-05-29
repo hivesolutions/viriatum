@@ -591,6 +591,10 @@
                     >
                 </File>
                 <File
+                    RelativePath="..\..\src\hive_viriatum\stream\stream_httpc.c"
+                    >
+                </File>
+                <File
                     RelativePath="..\..\src\hive_viriatum\stream\stream_io.c"
                     >
                 </File>
@@ -750,6 +754,10 @@
                 </File>
                 <File
                     RelativePath="..\..\src\hive_viriatum\stream\stream_http.h"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\hive_viriatum\stream\stream_httpc.h"
                     >
                 </File>
                 <File

@@ -25,9 +25,6 @@
  __license__   = GNU General Public License (GPL), Version 3
 */
 
-#pragma once
+#include "stdafx.h"
 
-#include "stream_http.h"
-#include "stream_httpc.h"
-#include "stream_io.h"
-#include "stream_torrent.h"
+#include "stream_http_client.h"

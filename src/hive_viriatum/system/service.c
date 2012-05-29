@@ -279,29 +279,20 @@ ERROR_CODE createWorkers(unsigned int workerCount) {
 
 
 
-
-ERROR_CODE _createTrackerConnection(struct Connection_t *connection) {
-   	/* raises no error */
-    RAISE_NO_ERROR;
-}
-
-
-
-
-ERROR_CODE _createTorrentConnection(struct Connection_t *connection, char *hostname, unsigned int port) {
+ERROR_CODE _createClientConnection(struct Connection_t **connectionPointer, struct Service_t *service, char *hostname, unsigned int port) {
     /* allocates the socket handle */
     SOCKET_HANDLE socketHandle;
     SOCKET_ADDRESS_INTERNET serv_addr;
     SOCKET_HOSTENT *server;
-	SOCKET_ERROR_CODE error;
+    SOCKET_ERROR_CODE error;
 
     /* allocates the (client) connection, this is the
-	structure representing the connection */
-    struct Connection_t *clientConnection;
+    structure representing the connection */
+    struct Connection_t *connection;
 
     socketHandle = SOCKET_CREATE(SOCKET_INTERNET_TYPE, SOCKET_PACKET_TYPE, SOCKET_PROTOCOL_TCP);
 
-	if(SOCKET_TEST_ERROR(socketHandle)) { fprintf(stderr, "ERROR opening socket"); }
+    if(SOCKET_TEST_ERROR(socketHandle)) { fprintf(stderr, "ERROR opening socket"); }
 
     server = SOCKET_GET_HOST_BY_NAME(hostname);
 
@@ -312,41 +303,100 @@ ERROR_CODE _createTorrentConnection(struct Connection_t *connection, char *hostn
     memcpy(&serv_addr.sin_addr.s_addr, server->h_addr, server->h_length);
     serv_addr.sin_port = htons(port);
 
-	error = SOCKET_CONNECT_SIZE(socketHandle, serv_addr, sizeof(SOCKET_ADDRESS_INTERNET));
-	if(SOCKET_TEST_ERROR(error)) { printf("PROBLEMA A CONECTAR"); }
+    error = SOCKET_CONNECT_SIZE(socketHandle, serv_addr, sizeof(SOCKET_ADDRESS_INTERNET));
+    if(SOCKET_TEST_ERROR(error)) { fprintf(stderr, "ERROR connecting host"); }
 
     /* creates the (client) connection */
-    createConnection(&clientConnection, socketHandle);
+    createConnection(&connection, socketHandle);
 
     /* sets the socket address in the (client) connection
     this is going to be very usefull for later connection
     identification (address, port, etc.) */
-    /*clientConnection->socketAddress = (SOCKET_ADDRESS) serv_addr;*/
+    /*connection->socketAddress = (SOCKET_ADDRESS) serv_addr;*/
 
     /* sets the service select service as the service in the (client)  connection */
-    clientConnection->service = connection->service;
+    connection->service = service;
 
     /* sets the base hanlding functions in the client connection */
-    clientConnection->openConnection = openConnection;
-    clientConnection->closeConnection = closeConnection;
-    clientConnection->writeConnection = writeConnection;
-    clientConnection->registerWrite = registerWriteConnection;
-    clientConnection->unregisterWrite = unregisterWriteConnection;
+    connection->openConnection = openConnection;
+    connection->closeConnection = closeConnection;
+    connection->writeConnection = writeConnection;
+    connection->registerWrite = registerWriteConnection;
+    connection->unregisterWrite = unregisterWriteConnection;
 
     /* sets the various stream io connection callbacks
     in the client connection */
-    clientConnection->onRead = readHandlerStreamIo;
-    clientConnection->onWrite = writeHandlerStreamIo;
-    clientConnection->onError = errorHandlerStreamIo;
-    clientConnection->onOpen = openHandlerStreamIo;
-    clientConnection->onClose = closeHandlerStreamIo;
+    connection->onRead = readHandlerStreamIo;
+    connection->onWrite = writeHandlerStreamIo;
+    connection->onError = errorHandlerStreamIo;
+    connection->onOpen = openHandlerStreamIo;
+    connection->onClose = closeHandlerStreamIo;
 
-    clientConnection->protocol = TORRENT_PROTOCOL;
+    *connectionPointer = connection;
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+
+typedef struct HttpClientParameters_t {
+    char *url;
+    /* callback, etc */
+} HttpClientParameters;
+
+
+
+
+ERROR_CODE _createTrackerConnection(struct Connection_t **connectionPointer, struct Service_t *service, char *hostname, unsigned int port) {
+    /* allocates space for the connection reference */
+    struct Connection_t *connection;
+
+    struct HttpClientParameters_t *parameters = (struct HttpClientParameters_t *) malloc(sizeof(struct HttpClientParameters_t));
+
+    /* populates the parameters structure with the
+    required values for the http client request */
+    parameters->url = "/";
+
+    /* creates a general client conneciton structure containing
+    all the general attributes for a connection, then sets the
+    "local" connection reference from the pointer */
+    _createClientConnection(connectionPointer, service, hostname, port);
+    connection = *connectionPointer;
+
+    /* sets the http client protocol as the protocol to be
+    "respected" for this client connection, this should
+    be able to set the apropriate handlers in io */
+    connection->protocol = HTTP_CLIENT_PROTOCOL;
+
+
+    /*GET /path/file.html HTTP/1.0*/
+    /* TOOD: Tenho de libertar esta memoria no http client handler */
+
+    connection->parameters = (void *) parameters;
+
+       /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE _createTorrentConnection(struct Connection_t **connectionPointer, struct Service_t *service, char *hostname, unsigned int port) {
+    /* allocates space for the connection reference */
+    struct Connection_t *connection;
+
+    /* creates a general client conneciton structure containing
+    all the general attributes for a connection, then sets the
+    "local" connection reference from the pointer */
+    _createClientConnection(connectionPointer, service, hostname, port);
+    connection = *connectionPointer;
+
+    /* sets the torrent protocol as the protocol to be
+    "respected" for this client connection, this should
+    be able to set the apropriate handlers in io */
+    connection->protocol = TORRENT_PROTOCOL;
 
     /* opens the connection */
-    clientConnection->openConnection(clientConnection);
+    connection->openConnection(connection);
 
-	/* raises no error */
+    /* raises no error */
     RAISE_NO_ERROR;
 }
 
@@ -381,6 +431,16 @@ ERROR_CODE startService(struct Service_t *service) {
 
     /* allocates the service connection */
     struct Connection_t *serviceConnection;
+
+
+
+
+    /* allocates the misc connections references */
+    struct Connection_t *trackerConnection;
+    struct Connection_t *torrentConnection;
+
+
+
 
     /* allocates the polling (provider) */
     struct Polling_t *polling;
@@ -549,8 +609,8 @@ ERROR_CODE startService(struct Service_t *service) {
 
 
 
-
-    //_createTorrentConnection(serviceConnection);
+    _createTrackerConnection(&trackerConnection, service, "localhost", 8080);
+    _createTorrentConnection(&torrentConnection, service, "localhost", 32967);
 
 
 
@@ -816,6 +876,7 @@ ERROR_CODE createConnection(struct Connection_t **connectionPointer, SOCKET_HAND
     connection->onError = NULL;
     connection->onOpen = NULL;
     connection->onClose = NULL;
+    connection->parameters = NULL;
     connection->lower = NULL;
 
     /* creates the read queue linked list */
