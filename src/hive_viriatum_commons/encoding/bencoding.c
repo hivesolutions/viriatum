@@ -29,6 +29,92 @@
 
 #include "bencoding.h"
 
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// ERROR_CODE freeType() {} // LIBERTA A MEMORIA RECURSIVAMENTE !!!!
+// TENHO MESMO DE IMPLEMENTAR ISTO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+ERROR_CODE printType(struct Type_t *type) {
+	struct Type_t *current;
+	struct Type_t key;
+	struct Iterator_t *iterator;
+	struct HashMapElement_t *element;
+	unsigned char isFirst = 1;
+
+	switch(type->type) {
+        case INTEGER_TYPE:
+            PRINTF_F("%d", type->value.valueInt);
+
+            /* breaks the switch */
+            break;
+
+        case FLOAT_TYPE:
+            PRINTF_F("%f", type->value.valueFloat);
+
+            /* breaks the switch */
+            break;
+
+        case STRING_TYPE:
+            PRINTF_F("'%s'", type->value.valueString);
+
+            /* breaks the switch */
+            break;
+
+        case LIST_TYPE:
+            PRINTF("[");
+
+			createIteratorLinkedList(type->value.valueList, &iterator);
+
+			while(1) {
+				getNextIterator(iterator, (void **) &current);
+				if(current == NULL) { break; }
+				if(isFirst == 0) { PRINTF(", "); };
+				printType(current);
+				isFirst = 0;
+			}
+
+			deleteIteratorLinkedList(type->value.valueList, iterator);
+
+			PRINTF("]");
+
+            /* breaks the switch */
+            break;
+
+		case MAP_TYPE:
+			PRINTF("{");
+
+			createElementIteratorHashMap(type->value.valueMap, &iterator);
+
+			while(1) {
+				getNextIterator(iterator, (void **) &element);
+				if(element == NULL) { break; }
+				if(isFirst == 0) { PRINTF(", "); };
+				key = stringType(element->keyString);
+				printType(&key);
+				PRINTF(" : ");
+				printType((struct Type_t *) element->value);
+				isFirst = 0;
+			}
+
+			deleteIteratorHashMap(type->value.valueMap, iterator);
+
+			PRINTF("}");
+
+            /* breaks the switch */
+            break;
+
+		default:
+            PRINTF("undefined");
+
+			/* breaks the switch */
+			break;
+	}
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+
 ERROR_CODE processBencodingFile(char *filePath, struct Type_t **typePointer) {
 	size_t stringSize;
 
@@ -60,17 +146,13 @@ ERROR_CODE processBencodingFile(char *filePath, struct Type_t **typePointer) {
     struct BencodingEngine_t *bencodingEngine = &bencodingEngine_s;
     struct BencodingHandler_t *bencodingHandler = &bencodingHandler_s;
 
-    /* allocates space for the hash map to be used for
-    the configuration to be created */
-   /* struct HashMap_t *configuration;*/
+    /* allocates space for the sequence and key stacks to be used
+    during the runtime of the parser */
+    struct LinkedList_t *sequenceStack;
+	struct LinkedList_t *keyStack;
 
-
-
-    /* creates the hash map that will hold the various
-    arguments, then updates the configuration pointer
-    with the created configuration hash map */
-   /* createHashMap(&configuration, 0);
-    *typePointer = configuration;*/
+    createLinkedList(&sequenceStack);
+	createLinkedList(&keyStack);
 
 
 
@@ -90,8 +172,19 @@ ERROR_CODE processBencodingFile(char *filePath, struct Type_t **typePointer) {
     so that it may be updatd and then sets the handler in
     the bencoding engine instance to be used for parsing */
    
-	/* bencodingHandler_s.configuration = configuration; */
+
+
+	bencodingHandler_s.sequenceStack = sequenceStack;
+	bencodingHandler_s.keyStack = keyStack;
+	bencodingHandler_s.sequence = NULL;
+	bencodingHandler_s.top = NULL;
+	bencodingHandler_s.key = NULL;
+	bencodingHandler_s.nextKey = 0;
     bencodingEngine_s.context = bencodingHandler;
+
+
+
+
 
     /* reads the file contained in the provided file path
     and then tests the error code for error, in case there is an
@@ -185,6 +278,13 @@ ERROR_CODE processBencodingFile(char *filePath, struct Type_t **typePointer) {
         }
     }
 
+
+
+	printType(bencodingHandler_s.top);
+
+
+
+
     /* releases the buffer used durring the parsing of
     the configuration file */
     FREE(fileBuffer);
@@ -194,49 +294,166 @@ ERROR_CODE processBencodingFile(char *filePath, struct Type_t **typePointer) {
 }
 
 ERROR_CODE _bencodingIntegerEndCallback(struct BencodingEngine_t *bencodingEngine, const unsigned char *pointer, size_t size) {
-    char *integer = malloc(size + 1);
+	int _integer;
+	struct Type_t *type;
 
+    /* retrieves the bencoding handler from the template engine context
+    then uses it to store the (current) value */
+    struct BencodingHandler_t *bencodingHandler = (struct BencodingHandler_t *) bencodingEngine->context;
+
+	/* allocates space for the integer string value and then copies
+	the data buffer into it and terminates the null string */
+    char *integer = MALLOC(size + 1);
 	memcpy(integer, pointer, size);
 	integer[size] = '\0';
 
-	printf("INTEGER -> %s\n", integer);
+	/* converts the integer string into an integer value, then creates
+	the type structure for the integer and sets it as an integer value */
+	_integer = atoi(integer);
+	createType(&type, INTEGER_TYPE);
+	*type = integerType(_integer);
 
-	free(integer);
+	if(bencodingHandler->sequence != NULL) { 
+		switch(bencodingHandler->sequence->type) {
+			case LIST_TYPE:
+				appendValueLinkedList(bencodingHandler->sequence->value.valueList, (void *) type);
+
+				break;
+
+			case MAP_TYPE:
+				setValueStringHashMap(bencodingHandler->sequence->value.valueMap, bencodingHandler->key, (void *) type);
+				bencodingHandler->nextKey = 1;
+
+				break;
+		}
+	}
+	if(bencodingHandler->top == NULL) { bencodingHandler->top = type; }
+
+	/* releases the memory associated with the intger string value
+	in order to avoid memory leaks */
+	FREE(integer);
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
 ERROR_CODE _bencodingStringEndCallback(struct BencodingEngine_t *bencodingEngine, const unsigned char *pointer, size_t size) {
-    char *string = malloc(size + 1);
+	struct Type_t *type;
+
+    /* retrieves the bencoding handler from the template engine context
+    then uses it to store the (current) value */
+    struct BencodingHandler_t *bencodingHandler = (struct BencodingHandler_t *) bencodingEngine->context;
+
+    char *string = MALLOC(size + 1);
 
 	memcpy(string, pointer, size);
 	string[size] = '\0';
 
-	printf("STRING -> %s\n", string);
+	createType(&type, STRING_TYPE);
+	*type = stringType(string);
 
-	free(string);
+	if(bencodingHandler->nextKey == 1) {
+		bencodingHandler->key = string;
+		bencodingHandler->nextKey = 0;
+	} else if(bencodingHandler->sequence != NULL) { 
+		switch(bencodingHandler->sequence->type) {
+			case LIST_TYPE:
+				appendValueLinkedList(bencodingHandler->sequence->value.valueList, (void *) type);
+
+				break;
+
+			case MAP_TYPE:
+				setValueStringHashMap(bencodingHandler->sequence->value.valueMap, bencodingHandler->key, (void *) type);
+				bencodingHandler->nextKey = 1;
+
+				break;
+		}
+	}
+	if(bencodingHandler->top == NULL) { bencodingHandler->top = type; }
 
 	/* raises no error */
     RAISE_NO_ERROR;
 }
 
 ERROR_CODE _bencodingListStartCallback(struct BencodingEngine_t *bencodingEngine) {
-	printf("NEW LIST\n");
+	struct LinkedList_t *list;
+	struct Type_t *type;
+
+    /* retrieves the bencoding handler from the template engine context
+    then uses it to store the (current) value */
+    struct BencodingHandler_t *bencodingHandler = (struct BencodingHandler_t *) bencodingEngine->context;
+
+	createType(&type, LIST_TYPE);
+
+	createLinkedList(&list);
+	*type = listType(list);
+
+	bencodingHandler->sequence = type;
+	if(bencodingHandler->top == NULL) { bencodingHandler->top = type; }
+
+	appendValueLinkedList(bencodingHandler->sequenceStack, (void *) type);
+	appendValueLinkedList(bencodingHandler->keyStack, (void *) NULL);
 
 	/* raises no error */
     RAISE_NO_ERROR;
 }
 
 ERROR_CODE _bencodingDictionaryStartCallback(struct BencodingEngine_t *bencodingEngine) {
-	printf("NEW Dictionary\n");
+	struct HashMap_t *hashMap;
+	struct Type_t *type;
+
+    /* retrieves the bencoding handler from the template engine context
+    then uses it to store the (current) value */
+    struct BencodingHandler_t *bencodingHandler = (struct BencodingHandler_t *) bencodingEngine->context;
+
+	createType(&type, MAP_TYPE);
+
+	createHashMap(&hashMap, 0);
+	*type = mapType(hashMap);
+
+	bencodingHandler->sequence = type;
+	if(bencodingHandler->top == NULL) { bencodingHandler->top = type; }
+	appendValueLinkedList(bencodingHandler->sequenceStack, (void *) type);
+	appendValueLinkedList(bencodingHandler->keyStack, (void *) bencodingHandler->key);
+
+	/* sets the next key flag so that in the next iteration the string
+	is "accepted" as the current key value */
+	bencodingHandler->nextKey = 1;
 
 	/* raises no error */
     RAISE_NO_ERROR;
 }
 
 ERROR_CODE _bencodingSequenceEndCallback(struct BencodingEngine_t *bencodingEngine) {
-	printf("END SEQUENCE\n");
+	char *key;
+	struct Type_t *sequence;
+	struct Type_t *type;
+
+    /* retrieves the bencoding handler from the template engine context
+    then uses it to store the (current) value */
+    struct BencodingHandler_t *bencodingHandler = (struct BencodingHandler_t *) bencodingEngine->context;
+
+	popTopValueLinkedList(bencodingHandler->keyStack, (void **) &key, 1);
+
+	popTopValueLinkedList(bencodingHandler->sequenceStack, (void **) &sequence, 1);
+	peekTopValueLinkedList(bencodingHandler->sequenceStack, (void **) &type);
+	bencodingHandler->sequence = type;
+
+	if(bencodingHandler->sequence != NULL) { 
+		switch(bencodingHandler->sequence->type) {
+			case LIST_TYPE:
+				appendValueLinkedList(bencodingHandler->sequence->value.valueList, (void *) sequence);
+
+				break;
+
+			case MAP_TYPE:
+				setValueStringHashMap(bencodingHandler->sequence->value.valueMap, key, (void *) sequence);
+
+				break;
+		}
+	}
+
+	bencodingHandler->nextKey = 1;
 
 	/* raises no error */
     RAISE_NO_ERROR;
