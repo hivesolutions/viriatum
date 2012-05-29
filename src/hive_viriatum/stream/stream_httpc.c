@@ -30,13 +30,13 @@
 #include "stream_httpc.h"
 
 ERROR_CODE bodyCallbackHandlerClient(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize) {
-	struct Type_t *type;
+    struct Type_t *type;
 
-	decodeBencoding((unsigned char *) data, dataSize, &type);
-	printType(type);
-	freeType(type);
+    decodeBencoding((unsigned char *) data, dataSize, &type);
+    printType(type);
+    freeType(type);
 
-	/* raises no error */
+    /* raises no error */
     RAISE_NO_ERROR;
 }
 
@@ -67,10 +67,10 @@ ERROR_CODE createHttpClientConnection(struct HttpClientConnection_t **httpClient
     /* creates the http parser (for a response) */
     createHttpParser(&httpClientConnection->httpParser, 0);
 
-	/* sets the default callback functions in the http settings
-	these function are going to be called by the parser */
-	httpClientConnection->httpSettings->onbody = bodyCallbackHandlerClient;
-	httpClientConnection->httpSettings->onmessageComplete = messageCompleteCallbackHandlerClient;
+    /* sets the default callback functions in the http settings
+    these function are going to be called by the parser */
+    httpClientConnection->httpSettings->onbody = bodyCallbackHandlerClient;
+    httpClientConnection->httpSettings->onmessageComplete = messageCompleteCallbackHandlerClient;
 
     /* sets the connection as the parser parameter(s) */
     httpClientConnection->httpParser->parameters = ioConnection->connection;
@@ -119,22 +119,22 @@ ERROR_CODE dataHandlerStreamHttpClient(struct IoConnection_t *ioConnection, unsi
 
 ERROR_CODE openHandlerStreamHttpClient(struct IoConnection_t *ioConnection) {
     /* allocates the http client connection and retrieves the
-	"upper" connection (for parameters retrieval) */
+    "upper" connection (for parameters retrieval) */
     struct HttpClientConnection_t *httpClientConnection;
-	struct Connection_t *connection = (struct Connection_t *) ioConnection->connection;
-	struct HttpClientParameters_t *parameters = (struct HttpClientParameters_t *) connection->parameters;
+    struct Connection_t *connection = (struct Connection_t *) ioConnection->connection;
+    struct HttpClientParameters_t *parameters = (struct HttpClientParameters_t *) connection->parameters;
 
-	struct Type_t *type;
+    struct Type_t *type;
 
-	char *buffer = malloc(1024);
+    char *buffer = malloc(1024);
 
-	
-	decodeBencodingFile("C:/verysleepy_0_82.exe.torrent", &type);
 
-	//freeType(type);
+    decodeBencodingFile("C:/verysleepy_0_82.exe.torrent", &type);
 
-	
-	SPRINTF(buffer, 1024, "GET %s HTTP/1.1\r\n\User-Agent: viriatum/0.1.0 (linux - intel x64)\r\nConnection: keep-alive\r\n\r\n", parameters->url);
+    //freeType(type);
+
+
+    SPRINTF(buffer, 1024, "GET %s HTTP/1.1\r\n\User-Agent: viriatum/0.1.0 (linux - intel x64)\r\nConnection: keep-alive\r\n\r\n", parameters->url);
 
 
     /* creates the http client connection */
@@ -156,4 +156,3 @@ ERROR_CODE closeHandlerStreamHttpClient(struct IoConnection_t *ioConnection) {
     /* raises no error */
     RAISE_NO_ERROR;
 }
-

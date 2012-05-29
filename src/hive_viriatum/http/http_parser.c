@@ -60,7 +60,7 @@ void createHttpParser(struct HttpParser_t **httpParserPointer, char request) {
     definition, this should be able to start a parsing */
     httpParser->type = 2;
     httpParser->flags = 6;
-	httpParser->state = request ? STATE_START_REQ : STATE_START_RES;
+    httpParser->state = request ? STATE_START_REQ : STATE_START_RES;
     httpParser->headerState = 0;
     httpParser->readCount = 0;
     httpParser->contentLength = -1;
@@ -90,7 +90,7 @@ void createHttpSettings(struct HttpSettings_t **httpSettingsPointer) {
     struct HttpSettings_t *httpSettings = (struct HttpSettings_t *) MALLOC(httpSettingsSize);
 
     /* sets the http settings callback values to
-	the default settings (unset) */
+    the default settings (unset) */
     httpSettings->onmessageBegin = NULL;
     httpSettings->onurl = NULL;
     httpSettings->onheaderField = NULL;
@@ -265,27 +265,27 @@ int processDataHttpParser(struct HttpParser_t *httpParser, struct HttpSettings_t
                 /* breaks the switch */
                 break;
 
-			 case STATE_RES_HTTP_MAJOR:
-				if(byte == '.') {
-					state = STATE_RES_FIRST_HTTP_MINOR;
-					break;
-				}
+             case STATE_RES_HTTP_MAJOR:
+                if(byte == '.') {
+                    state = STATE_RES_FIRST_HTTP_MINOR;
+                    break;
+                }
 
-				if(!IS_NUM(byte)) {
-					/*SET_ERRNO(HPE_INVALID_VERSION);
-					goto error;*/
-				}
+                if(!IS_NUM(byte)) {
+                    /*SET_ERRNO(HPE_INVALID_VERSION);
+                    goto error;*/
+                }
 
-				httpParser->httpMajor *= 10;
-				httpParser->httpMajor += byte - '0';
+                httpParser->httpMajor *= 10;
+                httpParser->httpMajor += byte - '0';
 
                 if(httpParser->httpMajor > 999) {
                     /*SET_ERRNO(HPE_INVALID_VERSION);
                     goto error;*/
                 }
 
-				/* breaks the switch */
-				break;
+                /* breaks the switch */
+                break;
 
             case STATE_RES_FIRST_HTTP_MINOR:
                 if (!IS_NUM(byte)) {

@@ -17,7 +17,7 @@
  You should have received a copy of the GNU General Public License
  along with Hive Viriatum Commons. If not, see <http://www.gnu.org/licenses/>.
 
- __author__    = Jo„o Magalh„es <joamag@hive.pt>
+ __author__    = Jo√£o Magalh√£es <joamag@hive.pt>
  __version__   = 1.0.0
  __revision__  = $LastChangedRevision$
  __date__      = $LastChangedDate$
@@ -52,8 +52,8 @@ void sha1(unsigned char *buffer, unsigned int bufferLength, unsigned char *resul
     struct sha1Context_t sha1Context;
 
     /* initializes the sha1 context, then updates it
-	with the provided buffer and after that finalizes
-	it retrieving the result */
+    with the provided buffer and after that finalizes
+    it retrieving the result */
     initSha1(&sha1Context);
     updateSha1(&sha1Context, buffer, bufferLength);
     finalSha1(&sha1Context, result);
@@ -82,9 +82,9 @@ void updateSha1(struct sha1Context_t *context, const unsigned char *data, const 
         }
         j = 0;
     }
-	else {
-		i = 0;
-	}
+    else {
+        i = 0;
+    }
 
     memcpy(&context->buffer[j], &data[i], len - i);
 }
@@ -107,9 +107,9 @@ void finalSha1(struct sha1Context_t *context, unsigned char digest[SHA1_DIGEST_S
         digest[i] = (unsigned char)
          ((context->state[i>>2] >> ((3-(i & 3)) * 8) ) & 255);
     }
-    
+
     /* wipes the current variables, no more usage
-	is possible (permanent delete) */
+    is possible (permanent delete) */
     i = 0;
     memset(context->buffer, 0, 64);
     memset(context->state, 0, 20);
@@ -164,6 +164,6 @@ void _transformSha1(unsigned int state[5], const unsigned char buffer[64]) {
     state[4] += e;
 
     /* wipes out all the variable to avoid any reusage
-	of it (private usage) */
+    of it (private usage) */
     a = b = c = d = e = 0;
 }
