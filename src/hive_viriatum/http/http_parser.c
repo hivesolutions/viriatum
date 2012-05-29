@@ -49,7 +49,7 @@ int httpShouldKeepAlive(struct HttpParser_t *httpParser) {
     }
 }
 
-void createHttpParser(struct HttpParser_t **httpParserPointer) {
+void createHttpParser(struct HttpParser_t **httpParserPointer, char request) {
     /* retrieves the http parser size */
     size_t httpParserSize = sizeof(struct HttpParser_t);
 
@@ -60,7 +60,7 @@ void createHttpParser(struct HttpParser_t **httpParserPointer) {
     definition, this should be able to start a parsing */
     httpParser->type = 2;
     httpParser->flags = 6;
-    httpParser->state = STATE_START_REQ;
+	httpParser->state = request ? STATE_START_REQ : STATE_START_RES;
     httpParser->headerState = 0;
     httpParser->readCount = 0;
     httpParser->contentLength = -1;
@@ -89,25 +89,14 @@ void createHttpSettings(struct HttpSettings_t **httpSettingsPointer) {
     /* allocates space for the http settings */
     struct HttpSettings_t *httpSettings = (struct HttpSettings_t *) MALLOC(httpSettingsSize);
 
-    /* sets the http settings on message begin callback */
+    /* sets the http settings callback values to
+	the default settings (unset) */
     httpSettings->onmessageBegin = NULL;
-
-    /* sets the http settings on url callback */
     httpSettings->onurl = NULL;
-
-    /* sets the http settings on header field callback */
     httpSettings->onheaderField = NULL;
-
-    /* sets the http settings on header value callback */
     httpSettings->onheaderValue = NULL;
-
-    /* sets the http settings on headers complete callback */
     httpSettings->onheadersComplete = NULL;
-
-    /* sets the http settings on body callback */
     httpSettings->onbody = NULL;
-
-    /* sets the http settings on message complete callback */
     httpSettings->onmessageComplete = NULL;
 
     /* sets the http settings in the http settings pointer */
@@ -265,7 +254,7 @@ int processDataHttpParser(struct HttpParser_t *httpParser, struct HttpSettings_t
                 break;
 
             case STATE_RES_FIRST_HTTP_MAJOR:
-                if (byte < '1' || byte  > '9') {
+                if(byte < '1' || byte  > '9') {
                     /*SET_ERRNO(HPE_INVALID_VERSION);
                     goto error;*/
                 }
@@ -275,6 +264,28 @@ int processDataHttpParser(struct HttpParser_t *httpParser, struct HttpSettings_t
 
                 /* breaks the switch */
                 break;
+
+			 case STATE_RES_HTTP_MAJOR:
+				if(byte == '.') {
+					state = STATE_RES_FIRST_HTTP_MINOR;
+					break;
+				}
+
+				if(!IS_NUM(byte)) {
+					/*SET_ERRNO(HPE_INVALID_VERSION);
+					goto error;*/
+				}
+
+				httpParser->httpMajor *= 10;
+				httpParser->httpMajor += byte - '0';
+
+                if(httpParser->httpMajor > 999) {
+                    /*SET_ERRNO(HPE_INVALID_VERSION);
+                    goto error;*/
+                }
+
+				/* breaks the switch */
+				break;
 
             case STATE_RES_FIRST_HTTP_MINOR:
                 if (!IS_NUM(byte)) {
