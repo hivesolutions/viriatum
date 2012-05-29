@@ -79,8 +79,9 @@ void deleteHashMap(struct HashMap_t *hashMap) {
         /* retrieves the base address value */
         element = &hashMap->elementsBuffer[index];
 
-        /* in case the element is not used, the element
-        search is over (element was not found) */
+        /* in case the element is not used or in case
+		the key string is not set no need to release 
+		the allocated memory (no memory used) */
 		if(element->used == 0) { continue; }
 		if(element->keyString == NULL) { continue; }
 
@@ -153,6 +154,10 @@ void setValueHashMap(struct HashMap_t *hashMap, size_t key, unsigned char *keySt
 	/* in case the key string is defined must copy
 	the string information into the element */
 	if(keyString != NULL) {
+		/* in case the key string is already defined in the
+		element (must release it properly) */
+		if(element->keyString != NULL) { FREE(element->keyString); }
+
 		/* allocates the required memory for the key string
 		and then copies the key string into the element */
 		keyStringSize = strlen(keyString);
