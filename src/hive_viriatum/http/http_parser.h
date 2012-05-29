@@ -466,8 +466,10 @@ typedef struct HttpSettings_t {
  * Constructor of the http parser.
  *
  * @param httpParserPointer The pointer to the http parser to be constructed.
+ * @param request If the parser is meant to be created for a request if not
+ * set the parser assumes it's a response.
  */
-void createHttpParser(struct HttpParser_t **httpParserPointer);
+void createHttpParser(struct HttpParser_t **httpParserPointer, char request);
 
 /**
  * Destructor of the http parser.
