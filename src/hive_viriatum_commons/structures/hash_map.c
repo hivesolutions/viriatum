@@ -68,6 +68,27 @@ void createHashMap(struct HashMap_t **hashMapPointer, size_t initialSize) {
 }
 
 void deleteHashMap(struct HashMap_t *hashMap) {
+	/* allocates space for the index accumulator to be used
+	for the iteration and for the temporary element */
+	size_t index;
+	struct HashMapElement_t *element;
+
+	/* iterates over all the elements in the hash map to
+	release the memory present in the buffers */
+	for(index = 0; index < hashMap->elementsBufferSize; index++) {
+        /* retrieves the base address value */
+        element = &hashMap->elementsBuffer[index];
+
+        /* in case the element is not used, the element
+        search is over (element was not found) */
+		if(element->used == 0) { continue; }
+		if(element->keyString == NULL) { continue; }
+
+		/* releases the key string buffer, to avoid any
+		possible memory leak */
+		FREE(element->keyString);
+	}
+
     /* releases the elements buffer */
     FREE(hashMap->elementsBuffer);
 
@@ -75,13 +96,15 @@ void deleteHashMap(struct HashMap_t *hashMap) {
     FREE(hashMap);
 }
 
-void setValueHashMap(struct HashMap_t *hashMap, size_t key, void *value) {
+void setValueHashMap(struct HashMap_t *hashMap, size_t key, unsigned char *keyString, void *value) {
     /* allocates space for the hash map element to be used */
     struct HashMapElement_t *element;
 
     /* allocates space for the index used for element
-    access (computed modulus hash) */
+    access (computed modulus hash) and for the size of
+	the key string to be set in the element */
     size_t index;
+	size_t keyStringSize;
 
     /* in case the current hash map size "overflows"
     the maximum size (a resizing is required) */
@@ -127,6 +150,16 @@ void setValueHashMap(struct HashMap_t *hashMap, size_t key, void *value) {
     element->key = key;
     element->used = 1;
 
+	/* in case the key string is defined must copy
+	the string information into the element */
+	if(keyString != NULL) {
+		/* allocates the required memory for the key string
+		and then copies the key string into the element */
+		keyStringSize = strlen(keyString);
+		element->keyString = (unsigned char *) MALLOC(keyStringSize + 1);
+		memcpy(element->keyString, keyString, keyStringSize + 1);
+	}
+
     /* increments the hash map size */
     hashMap->size++;
 }
@@ -135,10 +168,10 @@ void setValueStringHashMap(struct HashMap_t *hashMap, unsigned char *keyString, 
     /* calculates the key (hash) value from the key string
     and uses it to set the value in the hash map */
     size_t key = _calculateStringHashMap(keyString);
-    setValueHashMap(hashMap, key, value);
+    setValueHashMap(hashMap, key, keyString, value);
 }
 
-void getHashMap(struct HashMap_t *hashMap, size_t key, struct HashMapElement_t **elementPointer) {
+void getHashMap(struct HashMap_t *hashMap, size_t key, unsigned char *keyString, struct HashMapElement_t **elementPointer) {
     /* allocates space for the hash map element to be used */
     struct HashMapElement_t *element;
 
@@ -160,8 +193,10 @@ void getHashMap(struct HashMap_t *hashMap, size_t key, struct HashMapElement_t *
         }
 
         /* in case the element key is the same as the
-        requested (element found) */
-        if(element->key == key) {
+        requested (element found) note that an extra
+		verification is done to make sure that in case
+		a string key is specified it also matches */
+        if(element->key == key && (keyString == NULL || strcmp(element->keyString, keyString) == 0)) {
             /* breaks the loop */
             break;
         }
@@ -184,12 +219,12 @@ void getHashMap(struct HashMap_t *hashMap, size_t key, struct HashMapElement_t *
     *elementPointer = element;
 }
 
-void getValueHashMap(struct HashMap_t *hashMap, size_t key, void **valuePointer) {
+void getValueHashMap(struct HashMap_t *hashMap, size_t key, unsigned char *keyString, void **valuePointer) {
     /* allocates space for the element */
     struct HashMapElement_t *element;
 
     /* retrieves the hash map element for the key */
-    getHashMap(hashMap, key, &element);
+    getHashMap(hashMap, key, keyString, &element);
 
     /* sets the element value in the value pointer */
     *valuePointer = element->value;
@@ -199,7 +234,7 @@ void getValueStringHashMap(struct HashMap_t *hashMap, unsigned char *keyString, 
     /* calculates the key (hash) value from the key string
     and uses it to retrieve the value from the hash map */
     size_t key = _calculateStringHashMap(keyString);
-    getValueHashMap(hashMap, key, valuePointer);
+    getValueHashMap(hashMap, key, keyString, valuePointer);
 }
 
 void createIteratorHashMap(struct HashMap_t *hashMap, struct Iterator_t **iteratorPointer) {
@@ -214,6 +249,26 @@ void createIteratorHashMap(struct HashMap_t *hashMap, struct Iterator_t **iterat
 
     /* sets the get next function in the iterator */
     iterator->getNextFunction = getNextIteratorHashMap;
+
+    /* resets the iterator */
+    resetIteratorHashMap(hashMap, iterator);
+
+    /* sets the iterator in the iterator pointer */
+    *iteratorPointer = iterator;
+}
+
+void createElementIteratorHashMap(struct HashMap_t *hashMap, struct Iterator_t **iteratorPointer) {
+    /* allocates the iterator */
+    struct Iterator_t *iterator;
+
+    /* creates the iterator */
+    createIterator(&iterator);
+
+    /* sets the hash map in the structure */
+    iterator->structure = (void *) hashMap;
+
+    /* sets the get next function in the iterator */
+    iterator->getNextFunction = getNextElementIteratorHashMap;
 
     /* resets the iterator */
     resetIteratorHashMap(hashMap, iterator);
@@ -284,6 +339,57 @@ void getNextIteratorHashMap(struct Iterator_t *iterator, void **nextPointer) {
     *nextPointer = next;
 }
 
+void getNextElementIteratorHashMap(struct Iterator_t *iterator, void **nextPointer) {
+    /* retrieves the hash map associated with the iterator */
+    struct HashMap_t *hashMap = (struct HashMap_t *) iterator->structure;
+
+    /* retrieves the current index offset in the elements buffer  */
+    size_t currentIndex = (size_t) iterator->parameters;
+
+    /* allocates space for the hash map element to be used */
+    struct HashMapElement_t *element;
+
+    /* allocates space for the next value */
+    void *next;
+
+    /* iterates continuously */
+    while(1) {
+        /* in case the current index excedes the elements
+        buffer size (it's the end of iteration) */
+        if(currentIndex >= hashMap->elementsBufferSize) {
+            /* sets the next element as null (end of iteration) */
+            next = NULL;
+
+            /* breaks the cycle (nothing more to process) */
+            break;
+        }
+
+        /* retrieves the current element from the elements
+        buffer */
+        element = &hashMap->elementsBuffer[currentIndex];
+
+        /* increments the current index value */
+        currentIndex++;
+
+        /* in case the current element is used it is ready
+        to be retrieved as next value in iteration */
+        if(element->used == 1) {
+            /* sets the next value in iteration as
+            the element (next value in iteration) */
+            next = (void *) element;
+
+            /* breaks the cycle (found the value) */
+            break;
+        }
+    }
+
+    /* sets the current index in the iterator parameters */
+    iterator->parameters = (void *) currentIndex;
+
+    /* sets the next in the next pointer */
+    *nextPointer = next;
+}
+
 void _resizeHashMap(struct HashMap_t *hashMap) {
     /* allocates space for the index */
     size_t index = 0;
@@ -328,8 +434,12 @@ void _resizeHashMap(struct HashMap_t *hashMap) {
         }
 
         /* sets the value (key and value) in the hash map (copy step) */
-        setValueHashMap(hashMap, element->key, element->value);
+        setValueHashMap(hashMap, element->key, element->keyString, element->value);
     }
+
+	/* releases the memory used by the "old" elements
+	buffer (avoids possible memory leak) */
+	FREE(elementsBuffer);
 }
 
 size_t _calculateStringHashMap(unsigned char *keyString) {
