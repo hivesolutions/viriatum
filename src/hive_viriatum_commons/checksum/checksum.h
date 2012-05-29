@@ -29,3 +29,4 @@
 
 #include "crc_32.h"
 #include "md5.h"
+#include "sha1.h"
