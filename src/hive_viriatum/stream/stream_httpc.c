@@ -27,4 +27,4 @@
 
 #include "stdafx.h"
 
-#include "stream_http_client.h"
+#include "stream_httpc.h"
