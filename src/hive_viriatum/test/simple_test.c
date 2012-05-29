@@ -297,9 +297,9 @@ void testBencoding() {
     printType(type);
     freeType(type);
 
-	/* releases the memory from the encoded buffer, this was
-	created during the encoding using bencoding */
-	FREE(encodedBuffer);
+    /* releases the memory from the encoded buffer, this was
+    created during the encoding using bencoding */
+    FREE(encodedBuffer);
 }
 
 void testHuffman() {
