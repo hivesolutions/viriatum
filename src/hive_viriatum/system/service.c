@@ -496,11 +496,9 @@ ERROR_CODE startService(struct Service_t *service) {
         RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem creating socket");
     }
 
-    /* in case viriatum is set to non blocking */
-    if(VIRIATUM_NON_BLOCKING) {
-        /* sets the socket to non blocking mode */
-        SOCKET_SET_NON_BLOCKING(service->serviceSocketHandle, flags);
-    }
+    /* in case viriatum is set to non blocking, changes the current
+	socket behavior to non blocking mode */
+    if(VIRIATUM_NON_BLOCKING) { SOCKET_SET_NON_BLOCKING(service->serviceSocketHandle, flags); }
 
     /* sets the socket reuse address option in the socket */
     socketResult = SOCKET_SET_OPTIONS(service->serviceSocketHandle, SOCKET_OPTIONS_LEVEL_SOCKET, SOCKET_OPTIONS_REUSE_ADDRESS_SOCKET, optionValue);
@@ -625,7 +623,8 @@ ERROR_CODE startService(struct Service_t *service) {
 
 
 
-    /* iterates continuously, while the service is open */
+    /* iterates continuously, while the service is open (this
+	is the main loop triggering all the actions) */
     while(service->status == STATUS_OPEN) {
         /* retrieves the (current) process, to be used
         to retrieves some memory information, and then closes it*/
