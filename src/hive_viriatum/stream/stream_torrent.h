@@ -42,40 +42,6 @@ struct TorrentConnection_t;
 typedef ERROR_CODE (*torrentConnectionUpdate) (struct TorrentConnection_t *torrentConnection);
 
 /**
- * The structure that describes the structure
- * of an handler capable of interpreting an
- * torrent request and construct a response based
- * on it.
- */
-typedef struct TorrentHandler_t {
-    /**
-     * The name that describes the torrent
-     * handler.
-     * This is going to be used as id and
-     * so it hsould be unique to the system.
-     */
-    unsigned char *name;
-
-    torrentConnectionUpdate set;
-    torrentConnectionUpdate unset;
-    torrentConnectionUpdate reset;
-
-    /**
-     * The reference to the service that "owns"
-     * the current handler.
-     * The creation of the handler implies the
-     * registration of it in this service.
-     */
-    struct Service_t *service;
-
-    /**
-     * Reference to the lower level
-     * handler substrate (child).
-     */
-    void *lower;
-} TorrentHandler;
-
-/**
  * Structure defining a logical
  * torrent connection.
  */

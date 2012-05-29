@@ -41,10 +41,6 @@ typedef struct TorrentHandshake_t {
 } TorrentHandshake;
 
 ERROR_CODE createTorrentConnection(struct TorrentConnection_t **torrentConnectionPointer, struct IoConnection_t *ioConnection) {
-    /* allocates space for the torrent handler reference
-    to be used in this connection */
-    struct TorrentHandler_t *torrentHandler;
-
     /* retrieves the torrent connection size */
     size_t torrentConnectionSize = sizeof(struct TorrentConnection_t);
 
@@ -74,15 +70,6 @@ ERROR_CODE createTorrentConnection(struct TorrentConnection_t **torrentConnectio
 }
 
 ERROR_CODE deleteTorrentConnection(struct TorrentConnection_t *torrentConnection) {
-    /* allocates space for the torrent handler reference
-    to be used in this connection */
-    struct TorrentHandler_t *torrentHandler;
-
-    /* retrieves the currently assigned handler and usets the connection
-    from with (unregister connection) */
-    torrentHandler = torrentConnection->torrentHandler;
-    if(torrentHandler) { torrentHandler->unset(torrentConnection); }
-
     /* releases the torrent connection */
     FREE(torrentConnection);
 
