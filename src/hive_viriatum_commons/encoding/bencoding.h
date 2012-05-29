@@ -108,7 +108,9 @@ VIRIATUM_EXPORT_PREFIX void createBencodingHandler(struct BencodingHandler_t **b
 VIRIATUM_EXPORT_PREFIX void deleteBencodingHandler(struct BencodingHandler_t *bencodingHandler);
 VIRIATUM_EXPORT_PREFIX ERROR_CODE encodeBencoding(struct Type_t *type, unsigned char **encodedBufferPointer, size_t *encodedBufferLengthPointer);
 VIRIATUM_EXPORT_PREFIX ERROR_CODE decodeBencoding(unsigned char *encodedBuffer, size_t encodedBufferLength, struct Type_t **typePointer);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE encodeBencodingFile(char *filePath, struct Type_t *type);
 VIRIATUM_EXPORT_PREFIX ERROR_CODE decodeBencodingFile(char *filePath, struct Type_t **typePointer);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _encodeType(struct Type_t *type, struct StringBuffer_t *stringBuffer);
 VIRIATUM_EXPORT_PREFIX ERROR_CODE _startBencodingEngine(struct BencodingEngine_t **bencodingEnginePointer);
 VIRIATUM_EXPORT_PREFIX ERROR_CODE _stopBencodingEngine(struct BencodingEngine_t *bencodingEngine);
 VIRIATUM_EXPORT_PREFIX ERROR_CODE _runBencodingEngine(struct BencodingEngine_t *bencodingEngine, unsigned char *buffer, size_t size);
