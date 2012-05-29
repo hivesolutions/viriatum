@@ -35,6 +35,7 @@
 #define SOCKET_ADDRESS_SIZE int
 #define SOCKET_ADDRESS SOCKADDR
 #define SOCKET_ADDRESS_INTERNET SOCKADDR_IN
+#define SOCKET_HOSTENT HOSTENT
 #define SOCKET_FLAGS unsigned long
 #define SOCKET_OPTION char
 #define SOCKET_ERROR_CODE int
@@ -55,6 +56,7 @@
 #define SOCKET_BIND(socketHandle, socketAddress) bind(socketHandle, (LPSOCKADDR) &socketAddress, sizeof(SOCKET_ADDRESS))
 #define SOCKET_LISTEN(socketHandle) listen(socketHandle, SOCKET_CONNECTIONS)
 #define SOCKET_CONNECT(socketHandle, socketAddress) connect(socketHandle, (LPSOCKADDR) &socketAddress, sizeof(SOCKET_ADDRESS))
+#define SOCKET_CONNECT_SIZE(socketHandle, socketAddress, socketAddressSize) connect(socketHandle, (LPSOCKADDR) &socketAddress, socketAddressSize)
 #define SOCKET_ACCEPT(socketHandle, socketAddress, socketAddressSize) accept(socketHandle, socketAddress, &socketAddressSize)
 #define SOCKET_CLOSE(socketHandle) closesocket(socketHandle)
 #define SOCKET_ADDRESS_CREATE(socketAddress, type, address, port) memset(&socketAddress, 0, sizeof(SOCKET_ADDRESS));\
@@ -87,6 +89,7 @@
 #define SOCKET_ADDRESS_SIZE socklen_t
 #define SOCKET_ADDRESS struct sockaddr
 #define SOCKET_ADDRESS_INTERNET struct sockaddr_in
+#define SOCKET_HOSTENT struct hostent
 #define SOCKET_FLAGS unsigned long
 #define SOCKET_OPTION int
 #define SOCKET_ERROR_CODE int
@@ -108,6 +111,7 @@
 #define SOCKET_BIND(socketHandle, socketAddress) bind(socketHandle, (struct sockaddr *) &socketAddress, sizeof(SOCKET_ADDRESS))
 #define SOCKET_LISTEN(socketHandle) listen(socketHandle, SOCKET_CONNECTIONS)
 #define SOCKET_CONNECT(socketHandle, socketAddress) connect(socketHandle, (struct sockaddr *) &socketAddress, sizeof(SOCKET_ADDRESS))
+#define SOCKET_CONNECT_SIZE(socketHandle, socketAddress, socketAddressSize) connect(socketHandle, (struct sockaddr *) &socketAddress, socketAddressSize)
 #define SOCKET_ACCEPT(socketHandle, socketAddress, socketAddressSize) accept(socketHandle, socketAddress, &socketAddressSize)
 #define SOCKET_CLOSE(socketHandle) close(socketHandle)
 #define SOCKET_ADDRESS_CREATE(socketAddress, type, address, port) memset(&socketAddress, 0, sizeof(SOCKET_ADDRESS));\

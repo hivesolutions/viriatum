@@ -280,7 +280,9 @@ ERROR_CODE createWorkers(unsigned int workerCount) {
 
 
 
-
+ERROR_CODE _createTrackerConnection(struct Connection_t *connection) {
+   
+}
 
 
 
@@ -289,29 +291,27 @@ ERROR_CODE _createTorrentConnection(struct Connection_t *connection) {
     /* allocates the socket handle */
     SOCKET_HANDLE socketHandle;
     SOCKET_ADDRESS_INTERNET serv_addr;
-    struct hostent *server;
+    SOCKET_HOSTENT *server;
 
     /* allocates the (client) connection */
     struct Connection_t *clientConnection;
 
     socketHandle = SOCKET_CREATE(SOCKET_INTERNET_TYPE, SOCKET_PACKET_TYPE, SOCKET_PROTOCOL_TCP);
 
-    /*if(socketHandle < 0) error("ERROR opening socket");*/
+	if(socketHandle < 0) { fprintf(stderr, "ERROR opening socket"); }
 
     server = SOCKET_GET_HOST_BY_NAME("localhost");
 
-    if (server == NULL) {
-        fprintf(stderr,"ERROR, no such host\n");
-        exit(0);
-    }
+    if(server == NULL) { fprintf(stderr, "ERROR, no such host\n"); }
 
-    memset(&serv_addr, 0, sizeof(serv_addr));
+    memset(&serv_addr, 0, sizeof(SOCKET_ADDRESS_INTERNET));
     serv_addr.sin_family = AF_INET;
     memcpy(&serv_addr.sin_addr.s_addr, server->h_addr, server->h_length);
     serv_addr.sin_port = htons(13122);
 
-    if (connect(socketHandle, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
+	if(SOCKET_CONNECT_SIZE(socketHandle, serv_addr, sizeof(SOCKET_ADDRESS_INTERNET)) < 0) {
         printf("PROBLEMA A CONECTAR");
+	}
 
     /* creates the (client) connection */
     createConnection(&clientConnection, socketHandle);
@@ -344,6 +344,7 @@ ERROR_CODE _createTorrentConnection(struct Connection_t *connection) {
     /* opens the connection */
     clientConnection->openConnection(clientConnection);
 
+	/* raises no error */
     RAISE_NO_ERROR;
 }
 
