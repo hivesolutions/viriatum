@@ -165,7 +165,7 @@ void setValueHashMap(struct HashMap_t *hashMap, size_t key, unsigned char *keySt
     if(keyString != NULL) {
         /* allocates the required memory for the key string
         and then copies the key string into the element */
-        keyStringSize = strlen(keyString);
+        keyStringSize = strlen((char *) keyString);
         element->keyString = (unsigned char *) MALLOC(keyStringSize + 1);
         memcpy(element->keyString, keyString, keyStringSize + 1);
     }
