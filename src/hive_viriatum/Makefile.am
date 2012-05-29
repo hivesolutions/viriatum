@@ -57,6 +57,7 @@ polling/polling_epoll.c\
 polling/polling_kqueue.c\
 polling/polling_select.c\
 stream/stream_http.c \
+stream/stream_httpc.c \
 stream/stream_io.c \
 stream/stream_torrent.c \
 system/environment.c \
@@ -78,6 +79,7 @@ polling/polling_epoll.c\
 polling/polling_kqueue.c\
 polling/polling_select.c\
 stream/stream_http.c \
+stream/stream_httpc.c \
 stream/stream_io.c \
 stream/stream_torrent.c \
 system/environment.c \
