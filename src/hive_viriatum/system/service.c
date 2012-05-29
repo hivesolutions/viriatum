@@ -290,6 +290,9 @@ ERROR_CODE _createClientConnection(struct Connection_t **connectionPointer, stru
     structure representing the connection */
     struct Connection_t *connection;
 
+    /* sets the flags to be used in socket */
+    SOCKET_FLAGS flags = 1;
+
     socketHandle = SOCKET_CREATE(SOCKET_INTERNET_TYPE, SOCKET_PACKET_TYPE, SOCKET_PROTOCOL_TCP);
 
     if(SOCKET_TEST_ERROR(socketHandle)) { fprintf(stderr, "ERROR opening socket"); }
@@ -305,6 +308,10 @@ ERROR_CODE _createClientConnection(struct Connection_t **connectionPointer, stru
 
     error = SOCKET_CONNECT_SIZE(socketHandle, serv_addr, sizeof(SOCKET_ADDRESS_INTERNET));
     if(SOCKET_TEST_ERROR(error)) { fprintf(stderr, "ERROR connecting host"); }
+
+    /* in case viriatum is set to non blocking, changes the current
+	socket behavior to non blocking mode */
+    if(VIRIATUM_NON_BLOCKING) { SOCKET_SET_NON_BLOCKING(socketHandle, flags); }
 
     /* creates the (client) connection */
     createConnection(&connection, socketHandle);
@@ -332,30 +339,26 @@ ERROR_CODE _createClientConnection(struct Connection_t **connectionPointer, stru
     connection->onOpen = openHandlerStreamIo;
     connection->onClose = closeHandlerStreamIo;
 
+	/* updats the connection pointer with the refernce
+	to the connection structure */
     *connectionPointer = connection;
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-
-typedef struct HttpClientParameters_t {
-    char *url;
-    /* callback, etc */
-} HttpClientParameters;
-
-
-
-
 ERROR_CODE _createTrackerConnection(struct Connection_t **connectionPointer, struct Service_t *service, char *hostname, unsigned int port) {
     /* allocates space for the connection reference */
     struct Connection_t *connection;
 
+	/* alocates dynamic space for the parameters to the
+	http stream (http client) this structure will be able
+	to guide the stream of http client */
     struct HttpClientParameters_t *parameters = (struct HttpClientParameters_t *) malloc(sizeof(struct HttpClientParameters_t));
 
     /* populates the parameters structure with the
     required values for the http client request */
-    parameters->url = "/";
+    parameters->url = "/ptorrent/announce.php";
 
     /* creates a general client conneciton structure containing
     all the general attributes for a connection, then sets the
@@ -365,16 +368,16 @@ ERROR_CODE _createTrackerConnection(struct Connection_t **connectionPointer, str
 
     /* sets the http client protocol as the protocol to be
     "respected" for this client connection, this should
-    be able to set the apropriate handlers in io */
+    be able to set the apropriate handlers in io then sets
+	the parameters structure in the connection so that the
+	lower layers "know" what to do */
     connection->protocol = HTTP_CLIENT_PROTOCOL;
-
-
-    /*GET /path/file.html HTTP/1.0*/
-    /* TOOD: Tenho de libertar esta memoria no http client handler */
-
     connection->parameters = (void *) parameters;
 
-       /* raises no error */
+    /* opens the connection */
+    connection->openConnection(connection);
+
+    /* raises no error */
     RAISE_NO_ERROR;
 }
 
@@ -607,7 +610,7 @@ ERROR_CODE startService(struct Service_t *service) {
 
 
 
-    _createTrackerConnection(&trackerConnection, service, "localhost", 8080);
+    _createTrackerConnection(&trackerConnection, service, "localhost", 9090);
     _createTorrentConnection(&torrentConnection, service, "localhost", 32967);
 
 
@@ -912,6 +915,10 @@ ERROR_CODE deleteConnection(struct Connection_t *connection) {
         /* deletes the data */
         deleteData(data);
     }
+
+	/* in case the connection parameters are defined their
+	memory must be relased (assumes a contiguous allocation) */
+	if(connection->parameters) { FREE(connection->parameters); }
 
     /* deletes the read queue linked list */
     deleteLinkedList(connection->readQueue);
