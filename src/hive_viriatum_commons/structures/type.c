@@ -48,6 +48,73 @@ void deleteType(struct Type_t *type) {
     FREE(type);
 }
 
+ERROR_CODE freeType(struct Type_t *type) {
+	/* allocats space for the current type in iteration
+	for the iterator and for the possible hash map element */
+	struct Type_t *current;
+	struct Iterator_t *iterator;
+	struct HashMapElement_t *element;
+
+	/* switches over the type's type in order to
+    execute the proper free operation */
+	switch(type->type) {
+        case INTEGER_TYPE:
+            /* breaks the switch */
+            break;
+
+        case FLOAT_TYPE:
+            /* breaks the switch */
+            break;
+
+        case STRING_TYPE:
+			FREE(type->value.valueString);
+
+            /* breaks the switch */
+            break;
+
+        case LIST_TYPE:
+			createIteratorLinkedList(type->value.valueList, &iterator);
+
+			while(1) {
+				getNextIterator(iterator, (void **) &current);
+				if(current == NULL) { break; }
+				freeType(current);
+			}
+
+			deleteIteratorLinkedList(type->value.valueList, iterator);
+			deleteLinkedList(type->value.valueList);
+
+            /* breaks the switch */
+            break;
+
+		case MAP_TYPE:
+			createElementIteratorHashMap(type->value.valueMap, &iterator);
+
+			while(1) {
+				getNextIterator(iterator, (void **) &element);
+				if(element == NULL) { break; }
+				freeType((struct Type_t *) element->value);
+			}
+
+			deleteIteratorHashMap(type->value.valueMap, iterator);
+			deleteHashMap(type->value.valueMap);
+
+            /* breaks the switch */
+            break;
+
+		default:
+			/* breaks the switch */
+			break;
+	}
+
+	/* deltes the base type structure for the
+	current type, this applies to all the types */
+	deleteType(type);
+
+	/* raises no error */
+    RAISE_NO_ERROR;
+}
+
 ERROR_CODE toStringType(struct Type_t *type, unsigned char **bufferPointer) {
     /* allocates space for both the buffer reference and
     the value to hold the necessary buffer size */
@@ -101,6 +168,92 @@ ERROR_CODE toStringType(struct Type_t *type, unsigned char **bufferPointer) {
     *bufferPointer = buffer;
 
     /* raise no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE printType(struct Type_t *type) {
+	/* allocates space for the current type for the
+	type to handler the key values for map for the
+	possible iterator, for the hash map element and
+	for the is first (loop) flag */
+	struct Type_t *current;
+	struct Type_t key;
+	struct Iterator_t *iterator;
+	struct HashMapElement_t *element;
+	unsigned char isFirst = 1;
+
+	/* switches over the type's type in order to
+    execute the proper print operation */
+	switch(type->type) {
+        case INTEGER_TYPE:
+            PRINTF_F("%d", type->value.valueInt);
+
+            /* breaks the switch */
+            break;
+
+        case FLOAT_TYPE:
+            PRINTF_F("%f", type->value.valueFloat);
+
+            /* breaks the switch */
+            break;
+
+        case STRING_TYPE:
+            PRINTF_F("'%s'", type->value.valueString);
+
+            /* breaks the switch */
+            break;
+
+        case LIST_TYPE:
+            PRINTF("[");
+
+			createIteratorLinkedList(type->value.valueList, &iterator);
+
+			while(1) {
+				getNextIterator(iterator, (void **) &current);
+				if(current == NULL) { break; }
+				if(isFirst == 0) { PRINTF(", "); };
+				printType(current);
+				isFirst = 0;
+			}
+
+			deleteIteratorLinkedList(type->value.valueList, iterator);
+
+			PRINTF("]");
+
+            /* breaks the switch */
+            break;
+
+		case MAP_TYPE:
+			PRINTF("{");
+
+			createElementIteratorHashMap(type->value.valueMap, &iterator);
+
+			while(1) {
+				getNextIterator(iterator, (void **) &element);
+				if(element == NULL) { break; }
+				if(isFirst == 0) { PRINTF(", "); };
+				key = stringType(element->keyString);
+				printType(&key);
+				PRINTF(" : ");
+				printType((struct Type_t *) element->value);
+				isFirst = 0;
+			}
+
+			deleteIteratorHashMap(type->value.valueMap, iterator);
+
+			PRINTF("}");
+
+            /* breaks the switch */
+            break;
+
+		default:
+            PRINTF("undefined");
+
+			/* breaks the switch */
+			break;
+	}
+
+    /* raises no error */
     RAISE_NO_ERROR;
 }
 
