@@ -29,6 +29,9 @@
 
 #include "stream_io.h"
 
+/* forward references (avoids loop) */
+struct TorrentConnection_t;
+
 /**
  * Function used to update the given torrent connection
  * with new information.
