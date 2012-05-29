@@ -55,9 +55,6 @@ ERROR_CODE createHttpClientConnection(struct HttpClientConnection_t **httpClient
     /* allocates space for the http client connection */
     struct HttpClientConnection_t *httpClientConnection = (struct HttpClientConnection_t *) MALLOC(httpClientConnectionSize);
 
-    /* retrieves the service associated with the connection */
-    struct Service_t *service = ioConnection->connection->service;
-
     /* sets the http handler attributes (default) values */
     httpClientConnection->ioConnection = ioConnection;
 
@@ -112,6 +109,8 @@ ERROR_CODE dataHandlerStreamHttpClient(struct IoConnection_t *ioConnection, unsi
     a partial processing and some data may remain unprocessed (in
     case there are multiple http requests) */
     processedSize = processDataHttpParser(httpClientConnection->httpParser, httpClientConnection->httpSettings, buffer, bufferSize);
+
+	printf("%d", processedSize);
 
     /* raises no error */
     RAISE_NO_ERROR;
