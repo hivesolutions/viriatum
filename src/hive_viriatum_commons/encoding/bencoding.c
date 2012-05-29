@@ -499,7 +499,7 @@ ERROR_CODE _bencodingStringEndCallback(struct BencodingEngine_t *bencodingEngine
         to avoid memory leaks, then sets the current string as the key
         and unsets the next key flag to save the value */
         if(bencodingHandler->key != NULL) { FREE(bencodingHandler->key); }
-        bencodingHandler->key = string;
+        bencodingHandler->key = (unsigned char *) string;
         bencodingHandler->nextKey = 0;
     }
     /* otherwise in case the sequence type is defined the string must
@@ -618,7 +618,7 @@ ERROR_CODE _bencodingDictionaryStartCallback(struct BencodingEngine_t *bencoding
 ERROR_CODE _bencodingSequenceEndCallback(struct BencodingEngine_t *bencodingEngine) {
     /* allocates space for the map key for the sequence
     type and for the current type */
-    char *key;
+    unsigned char *key;
     struct Type_t *sequence;
     struct Type_t *type;
 
