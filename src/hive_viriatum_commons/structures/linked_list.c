@@ -280,7 +280,7 @@ void getLinkedList(struct LinkedList_t *linkedList, size_t index, struct LinkedL
     size_t _index = 0;
 
     /* allocates space for the current node */
-    struct LinkedListNode_t *currentNode;
+    struct LinkedListNode_t *currentNode = NULL;
 
     /* sets the initial iteration node */
     currentNode = linkedList->first;
@@ -324,8 +324,9 @@ void popTopLinkedList(struct LinkedList_t *linkedList, struct LinkedListNode_t *
     /* allocates space for the linked list node */
     struct LinkedListNode_t *linkedListNode;
 
-    /* retrieves the final linked list node */
-    getLinkedList(linkedList, linkedList->size - 1, &linkedListNode);
+    /* retrieves the final linked list node, note that
+	there is a validation on the size of the linked list */
+	getLinkedList(linkedList, linkedList->size > 0 ? linkedList->size - 1 : 0, &linkedListNode);
 
     /* removes the last linked list node from the linked list */
     removeLinkedList(linkedList, linkedListNode, 0);
@@ -397,10 +398,11 @@ void peekTopLinkedList(struct LinkedList_t *linkedList, struct LinkedListNode_t 
     /* allocates space for the linked list node */
     struct LinkedListNode_t *linkedListNode;
 
-    /* retrieves the initial linked list node */
-    getLinkedList(linkedList, linkedList->size - 1, &linkedListNode);
+	/* retrieves the initial linked list node, note that
+	there is a validation on the size of the linked list */
+	getLinkedList(linkedList, linkedList->size > 0 ? linkedList->size - 1 : 0, &linkedListNode);
 
-    /* sets the linked list node in the linked list node pointer */
+	/* sets the linked list node in the linked list node pointer */
     *linkedListNodePointer = linkedListNode;
 }
 
@@ -426,7 +428,7 @@ void peekTopValueLinkedList(struct LinkedList_t *linkedList, void **valuePointer
     struct LinkedListNode_t *linkedListNode;
 
     /* peeks the top linked list node */
-    peekLinkedList(linkedList, &linkedListNode);
+    peekTopLinkedList(linkedList, &linkedListNode);
 
     /* in case the linked list node is invalid */
     if(linkedListNode == NULL) {
