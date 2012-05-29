@@ -133,7 +133,7 @@ struct Type_t stringType(char *value) {
     struct Type_t type;
 
     /* sets the type's type and value */
-    type.type = FLOAT_TYPE;
+    type.type = STRING_TYPE;
     type.value.valueString = value;
 
     return type;
