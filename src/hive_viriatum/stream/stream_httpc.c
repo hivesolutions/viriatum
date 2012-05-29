@@ -134,7 +134,7 @@ ERROR_CODE openHandlerStreamHttpClient(struct IoConnection_t *ioConnection) {
     //freeType(type);
 
 
-    SPRINTF(buffer, 1024, "GET %s HTTP/1.1\r\n\User-Agent: viriatum/0.1.0 (linux - intel x64)\r\nConnection: keep-alive\r\n\r\n", parameters->url);
+    SPRINTF(buffer, 1024, "GET %s HTTP/1.1\r\nUser-Agent: viriatum/0.1.0 (linux - intel x64)\r\nConnection: keep-alive\r\n\r\n", parameters->url);
 
 
     /* creates the http client connection */
