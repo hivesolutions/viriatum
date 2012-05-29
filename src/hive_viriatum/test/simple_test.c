@@ -247,8 +247,53 @@ void testBase64() {
 }
 
 void testBencoding() {
+    /* allocates space for the various type references
+    and values and also dor the sequence structures */
     struct Type_t *type;
-    decodeBencoding("d8:___hello5:world7:__helloli1ei2ei3ee6:_hello5:world5:helloli1ed5:helloli1ei2ei3eeei2e5:worldee", 96, &type);
+    struct Type_t _mapType;
+    struct Type_t _listType;
+    struct Type_t _stringType;
+    struct Type_t _integerType;
+    struct HashMap_t *map;
+    struct LinkedList_t *list;
+
+    /* allocates space for the encoded buffer reference
+    and for the encoded buffer length integer value */
+    char *encodedBuffer;
+    size_t encodedBufferLength;
+
+    /* creates the sequence structures (map and list), initializing
+    them in the simple (empty) way */
+    createHashMap(&map, 0);
+    createLinkedList(&list);
+
+    /* creates the various type structures from the internal raw values
+    of them, uses the appropriate constructor functions */
+    _mapType = mapType(map);
+    _listType = listType(list);
+    _stringType = stringType("world");
+    _integerType = integerType(1234);
+
+    /* adds the integer value to the list */
+    appendValueLinkedList(list, (void *) &_integerType);
+
+    /* sets the top level hash map values */
+    setValueStringHashMap(map, "hello", (void *) &_stringType);
+    setValueStringHashMap(map, "_hello", (void *) &_listType);
+
+    /* encodes the top level map type into the encoded buffer
+    and then decodes it from the the encoded buffer back to
+    a type structure reference */
+    encodeBencoding(&_mapType, &encodedBuffer, &encodedBufferLength);
+    decodeBencoding(encodedBuffer, encodedBufferLength, &type);
+
+    /* deletes the hash map structure and the list strucuture
+    to avoid any memory leaking */
+    deleteHashMap(map);
+    deleteLinkedList(list);
+
+    /* prints the type structure into the standard output and then
+    releases its memory recursively */
     printType(type);
     freeType(type);
 }
@@ -432,49 +477,49 @@ int _compare(void *first, void *second) {
 void runSimpleTests() {
     #ifndef VIRIATUM_NO_THREADS
     /* tests the thread pool */
-  //  testThreadPool();
+    testThreadPool();
     #endif
 
     /* tests the linked list */
-  //  testLinkedList();
+    testLinkedList();
 
     /* tests the array list */
-  //  testArrayList();
+    testArrayList();
 
     /* tests the hash map */
- //   testHashMap();
+    testHashMap();
 
     /* tests the string buffer */
-  //  testStringBuffer();
+    testStringBuffer();
 
     /* tests the linked buffer */
- //   testLinkedBuffer();
+    testLinkedBuffer();
 
     /* tests the base 64 encoder */
- //   testBase64();
+    testBase64();
 
     /* tests the bencoding encoder */
     testBencoding();
 
     /* tests the huffman encoder */
- //   testHuffman();
+    testHuffman();
 
     /* tests the bit stream */
- //   testBitStream();
+    testBitStream();
 
     /* tests the file stream */
- //   testFileStream();
+    testFileStream();
 
     /* tests the template handler */
-   // testTemplateHandler();
+    testTemplateHandler();
 
     /* tests the quick sort algorithm */
-  //  testQuicksort();
-  //  testQuicksortLinkedList();
+    testQuicksort();
+    testQuicksortLinkedList();
 
     /* tests the md5 hash function */
-  //  testMd5();
+    testMd5();
 
     /* tests the crc32 hash function */
-    //testCrc32();
+    testCrc32();
 }
