@@ -95,6 +95,18 @@ typedef struct File_t {
 ERROR_CODE readFile(char *filePath, unsigned char **bufferPointer, size_t *fileSizePointer);
 
 /**
+ * Writes the provided buffer into the file in the given
+ * path, in case an error occurs it's raised.
+ *
+ * @param filePath The path to the file to be written.
+ * @param buffer The buffer to be used in the writting
+ * operation to the file.
+ * @param bufferSize The size of the buffer to be used
+ * for the writing operation.
+ */
+ERROR_CODE writeFile(char *filePath, unsigned char *buffer, size_t bufferSize);
+
+/**
  * Counts the number of bytes in the file in the
  * given path and returns the resulting count.
  *
