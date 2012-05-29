@@ -34,8 +34,8 @@ void md5(unsigned char *buffer, unsigned int bufferLength, unsigned char *result
     struct md5Context_t md5Context;
 
     /* initializes the md5 context, then updates it
-	with the provided buffer and after that finalizes
-	it retrieving the result */
+    with the provided buffer and after that finalizes
+    it retrieving the result */
     initMd5(&md5Context);
     updateMd5(&md5Context, buffer, bufferLength);
     finalMd5(&md5Context, result);

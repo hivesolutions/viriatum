@@ -310,7 +310,7 @@ ERROR_CODE _createClientConnection(struct Connection_t **connectionPointer, stru
     if(SOCKET_TEST_ERROR(error)) { fprintf(stderr, "ERROR connecting host"); }
 
     /* in case viriatum is set to non blocking, changes the current
-	socket behavior to non blocking mode */
+    socket behavior to non blocking mode */
     if(VIRIATUM_NON_BLOCKING) { SOCKET_SET_NON_BLOCKING(socketHandle, flags); }
 
     /* creates the (client) connection */
@@ -339,8 +339,8 @@ ERROR_CODE _createClientConnection(struct Connection_t **connectionPointer, stru
     connection->onOpen = openHandlerStreamIo;
     connection->onClose = closeHandlerStreamIo;
 
-	/* updats the connection pointer with the refernce
-	to the connection structure */
+    /* updats the connection pointer with the refernce
+    to the connection structure */
     *connectionPointer = connection;
 
     /* raises no error */
@@ -351,9 +351,9 @@ ERROR_CODE _createTrackerConnection(struct Connection_t **connectionPointer, str
     /* allocates space for the connection reference */
     struct Connection_t *connection;
 
-	/* alocates dynamic space for the parameters to the
-	http stream (http client) this structure will be able
-	to guide the stream of http client */
+    /* alocates dynamic space for the parameters to the
+    http stream (http client) this structure will be able
+    to guide the stream of http client */
     struct HttpClientParameters_t *parameters = (struct HttpClientParameters_t *) malloc(sizeof(struct HttpClientParameters_t));
 
     /* populates the parameters structure with the
@@ -369,8 +369,8 @@ ERROR_CODE _createTrackerConnection(struct Connection_t **connectionPointer, str
     /* sets the http client protocol as the protocol to be
     "respected" for this client connection, this should
     be able to set the apropriate handlers in io then sets
-	the parameters structure in the connection so that the
-	lower layers "know" what to do */
+    the parameters structure in the connection so that the
+    lower layers "know" what to do */
     connection->protocol = HTTP_CLIENT_PROTOCOL;
     connection->parameters = (void *) parameters;
 
@@ -500,7 +500,7 @@ ERROR_CODE startService(struct Service_t *service) {
     }
 
     /* in case viriatum is set to non blocking, changes the current
-	socket behavior to non blocking mode */
+    socket behavior to non blocking mode */
     if(VIRIATUM_NON_BLOCKING) { SOCKET_SET_NON_BLOCKING(service->serviceSocketHandle, flags); }
 
     /* sets the socket reuse address option in the socket */
@@ -627,7 +627,7 @@ ERROR_CODE startService(struct Service_t *service) {
 
 
     /* iterates continuously, while the service is open (this
-	is the main loop triggering all the actions) */
+    is the main loop triggering all the actions) */
     while(service->status == STATUS_OPEN) {
         /* retrieves the (current) process, to be used
         to retrieves some memory information, and then closes it*/
@@ -916,9 +916,9 @@ ERROR_CODE deleteConnection(struct Connection_t *connection) {
         deleteData(data);
     }
 
-	/* in case the connection parameters are defined their
-	memory must be relased (assumes a contiguous allocation) */
-	if(connection->parameters) { FREE(connection->parameters); }
+    /* in case the connection parameters are defined their
+    memory must be relased (assumes a contiguous allocation) */
+    if(connection->parameters) { FREE(connection->parameters); }
 
     /* deletes the read queue linked list */
     deleteLinkedList(connection->readQueue);
