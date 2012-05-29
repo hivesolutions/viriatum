@@ -133,6 +133,17 @@ ERROR_CODE decodeBencoding(unsigned char *encodedBuffer, size_t encodedBufferLen
 }
 
 ERROR_CODE encodeBencodingFile(char *filePath, struct Type_t *type) {
+    /* allocates space for the reference to the buffer
+    to hold the encoded contents and for the integer to
+    hold the size of that buffer */
+    unsigned char *encodedBuffer;
+    size_t encodedBufferLength;
+
+    /* runs the encoding process over the provided type structure
+    and then uses the resulting buffer to write it to the file */
+    encodeBencoding(type, &encodedBuffer, &encodedBufferLength);
+    writeFile(filePath, encodedBuffer, encodedBufferLength);
+
     /* raises no error */
     RAISE_NO_ERROR;
 }
