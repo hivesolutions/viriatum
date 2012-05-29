@@ -206,7 +206,7 @@ void getHashMap(struct HashMap_t *hashMap, size_t key, unsigned char *keyString,
         requested (element found) note that an extra
         verification is done to make sure that in case
         a string key is specified it also matches */
-        if(element->key == key && (keyString == NULL || strcmp(element->keyString, keyString) == 0)) {
+        if(element->key == key && (keyString == NULL || strcmp((char *) element->keyString, (char *) keyString) == 0)) {
             /* breaks the loop */
             break;
         }
