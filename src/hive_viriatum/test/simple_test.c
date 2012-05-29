@@ -142,17 +142,17 @@ void testHashMap() {
     createHashMap(&hashMap, 3);
 
     /* sets and retrieves the value in the hash map */
-    setValueHashMap(hashMap, 1, (void *) 1);
-    getValueHashMap(hashMap, 1, &element);
+    setValueHashMap(hashMap, 1, NULL, (void *) 1);
+    getValueHashMap(hashMap, 1, NULL, &element);
 
     /* sets and retrieves the value in the hash map */
-    setValueHashMap(hashMap, 2, (void *) 2);
-    getValueHashMap(hashMap, 2, &element);
+    setValueHashMap(hashMap, 2, NULL, (void *) 2);
+    getValueHashMap(hashMap, 2, NULL, &element);
 
     /* sets and retrieves the value in the hash map,
     (thi set should for re-sizing) */
-    setValueHashMap(hashMap, 3, (void *) 3);
-    getValueHashMap(hashMap, 3, &element);
+    setValueHashMap(hashMap, 3, NULL, (void *) 3);
+    getValueHashMap(hashMap, 3, NULL, &element);
 
     /* sets and retrieves the value (using a string)
     in the hash map */
