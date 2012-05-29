@@ -59,7 +59,7 @@ typedef struct HashMapElement_t {
     void *value;
     unsigned int used;
     size_t key;
-	char *keyString;
+    char *keyString;
 } HashMapElement;
 
 VIRIATUM_EXPORT_PREFIX void createHashMap(struct HashMap_t **hashMapPointer, size_t initialSize);

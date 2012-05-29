@@ -186,7 +186,7 @@ void deletePolling(struct Polling_t *polling) {
 void deleteConfiguration(struct HashMap_t *configuration, int isTop) {
     /* allocates space for the pointer to the element and
     for the option to be retrieved */
-	struct HashMapElement_t *element;
+    struct HashMapElement_t *element;
     void *option;
 
     /* allocates space for the iterator for the configuration */

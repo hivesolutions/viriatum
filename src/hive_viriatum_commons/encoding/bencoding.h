@@ -72,7 +72,7 @@ typedef enum BencodingState_e {
     BENCODING_ENGINE_STRING,
     BENCODING_ENGINE_LIST,
     BENCODING_ENGINE_DICTIONARY,
-	BENCODING_ENGINE_STRING_SIZE
+    BENCODING_ENGINE_STRING_SIZE
 } BencodingState;
 
 typedef struct BencodingSettings_t {
@@ -82,23 +82,23 @@ typedef struct BencodingSettings_t {
     bencodingDataCallback onstringEnd;
     bencodingCallback onlistStart;
     bencodingCallback ondictionaryStart;
-	bencodingCallback onsequenceEnd;
+    bencodingCallback onsequenceEnd;
 } BencodingSettings;
 
 typedef struct BencodingEngine_t {
-	enum BencodingState_e state;
-	struct BencodingSettings_t settings;
-	unsigned char *integerEndMark;
-	unsigned char *stringEndMark;
+    enum BencodingState_e state;
+    struct BencodingSettings_t settings;
+    unsigned char *integerEndMark;
+    unsigned char *stringEndMark;
     void *context;
 } BencodingEngine;
 
 typedef struct BencodingHandler_t {
-	struct LinkedList_t *sequenceStack;
-	struct LinkedList_t *keyStack;
+    struct LinkedList_t *sequenceStack;
+    struct LinkedList_t *keyStack;
     struct Type_t *sequence;
-	struct Type_t *top;
-	char *key;
+    struct Type_t *top;
+    char *key;
     char nextKey;
 } BencodingHandler;
 
@@ -117,10 +117,3 @@ VIRIATUM_EXPORT_PREFIX ERROR_CODE _bencodingStringEndCallback(struct BencodingEn
 VIRIATUM_EXPORT_PREFIX ERROR_CODE _bencodingListStartCallback(struct BencodingEngine_t *bencodingEngine);
 VIRIATUM_EXPORT_PREFIX ERROR_CODE _bencodingDictionaryStartCallback(struct BencodingEngine_t *bencodingEngine);
 VIRIATUM_EXPORT_PREFIX ERROR_CODE _bencodingSequenceEndCallback(struct BencodingEngine_t *bencodingEngine);
-
-
-
-
-
-
-
