@@ -239,7 +239,7 @@ ERROR_CODE _encodeType(struct Type_t *type, struct StringBuffer_t *stringBuffer)
             while(1) {
                 getNextIterator(iterator, (void **) &element);
                 if(element == NULL) { break; }
-                key = stringType(element->keyString);
+                key = stringType((char *) element->keyString);
                 _encodeType(&key, stringBuffer);
                 _encodeType((struct Type_t *) element->value, stringBuffer);
             }
