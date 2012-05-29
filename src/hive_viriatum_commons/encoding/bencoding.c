@@ -84,6 +84,25 @@ void deleteBencodingHandler(struct BencodingHandler_t *bencodingHandler) {
 }
 
 ERROR_CODE encodeBencoding(struct Type_t *type, unsigned char **encodedBufferPointer, size_t *encodedBufferLengthPointer) {
+    /* allocates space for the encoded buffer reference and
+    for the string buffer reference */
+    unsigned char *encodedBuffer;
+    struct StringBuffer_t *stringBuffer;
+
+    /* creates the string buffer an then uses it to support
+    the encoding of the provided type (top level type) then
+    after the encoding is complete joins the string buffer and
+    deletes it from memory*/
+    createStringBuffer(&stringBuffer);
+    _encodeType(type, stringBuffer);
+    joinStringBuffer(stringBuffer, &encodedBuffer);
+    deleteStringBuffer(stringBuffer);
+
+    /* updates the references to the encoded buffer pointer and
+    the reference to the encoded buffer length (from string length) */
+    *encodedBufferPointer = encodedBuffer;
+    *encodedBufferLengthPointer = strlen(encodedBuffer);
+
     /* raises no error */
     RAISE_NO_ERROR;
 }
@@ -109,6 +128,11 @@ ERROR_CODE decodeBencoding(unsigned char *encodedBuffer, size_t encodedBufferLen
     structures, the top type is still defined */
     _stopBencodingEngine(bencodingEngine);
 
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE encodeBencodingFile(char *filePath, struct Type_t *type) {
     /* raises no error */
     RAISE_NO_ERROR;
 }
@@ -150,6 +174,75 @@ ERROR_CODE decodeBencodingFile(char *filePath, struct Type_t **typePointer) {
     /* raises no error */
     RAISE_NO_ERROR;
 }
+
+ERROR_CODE _encodeType(struct Type_t *type, struct StringBuffer_t *stringBuffer) {
+    char *buffer;
+    struct Type_t key;
+    struct Type_t *current;
+    struct Iterator_t *iterator;
+    struct HashMapElement_t *element;
+
+    switch(type->type) {
+        case INTEGER_TYPE:
+            buffer = MALLOC(16);
+            SPRINTF(buffer, 16, "%d", type->value.valueInt);
+
+            appendStringBuffer(stringBuffer, (unsigned char *) "i");
+            _appendStringBuffer(stringBuffer, (unsigned char *) buffer);
+            appendStringBuffer(stringBuffer, (unsigned char *) "e");
+
+            break;
+
+        case STRING_TYPE:
+            buffer = MALLOC(16);
+            SPRINTF(buffer, 16, "%d", strlen(type->value.valueString));
+
+            _appendStringBuffer(stringBuffer, (unsigned char *) buffer);
+            appendStringBuffer(stringBuffer, (unsigned char *) ":");
+            appendStringBuffer(stringBuffer, (unsigned char *) type->value.valueString);
+
+            break;
+
+        case LIST_TYPE:
+            appendStringBuffer(stringBuffer, (unsigned char *) "l");
+
+            createIteratorLinkedList(type->value.valueList, &iterator);
+
+            while(1) {
+                getNextIterator(iterator, (void **) &current);
+                if(current == NULL) { break; }
+                _encodeType(current, stringBuffer);
+            }
+
+            deleteIteratorLinkedList(type->value.valueList, iterator);
+
+            appendStringBuffer(stringBuffer, (unsigned char *) "e");
+
+            break;
+
+        case MAP_TYPE:
+            appendStringBuffer(stringBuffer, (unsigned char *) "d");
+
+            createElementIteratorHashMap(type->value.valueMap, &iterator);
+
+            while(1) {
+                getNextIterator(iterator, (void **) &element);
+                if(element == NULL) { break; }
+                key = stringType(element->keyString);
+                _encodeType(&key, stringBuffer);
+                _encodeType((struct Type_t *) element->value, stringBuffer);
+            }
+
+            deleteIteratorHashMap(type->value.valueMap, iterator);
+
+            appendStringBuffer(stringBuffer, (unsigned char *) "e");
+
+            break;
+    }
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+};
 
 ERROR_CODE _startBencodingEngine(struct BencodingEngine_t **bencodingEnginePointer) {
     /* allocates space for the various bencoding
