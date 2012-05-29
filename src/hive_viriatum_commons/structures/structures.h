@@ -33,6 +33,7 @@
 #include "iterator.h"
 #include "linked_buffer.h"
 #include "linked_list.h"
+#include "sort_map.h"
 #include "string.h"
 #include "string_buffer.h"
 #include "type.h"
