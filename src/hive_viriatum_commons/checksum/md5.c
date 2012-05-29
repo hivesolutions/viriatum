@@ -33,14 +33,12 @@ void md5(unsigned char *buffer, unsigned int bufferLength, unsigned char *result
     /* allocates space for the md5 context */
     struct md5Context_t md5Context;
 
-    /* initializes the md5 contenxt */
+    /* initializes the md5 context, then updates it
+	with the provided buffer and after that finalizes
+	it retrieving the result */
     initMd5(&md5Context);
-
-    /* updates the md5 structure with the buffer data */
     updateMd5(&md5Context, buffer, bufferLength);
-
-    /* finalizes the md5 hash */
-    finalMd5(result, &md5Context);
+    finalMd5(&md5Context, result);
 }
 
 void initMd5(struct md5Context_t *context) {
@@ -88,7 +86,7 @@ void updateMd5(struct md5Context_t *context, void *data, unsigned long size) {
     memcpy(context->buffer, data, size);
 }
 
-void finalMd5(unsigned char *result, struct md5Context_t *context) {
+void finalMd5(struct md5Context_t *context, unsigned char *result) {
     unsigned long used, free;
 
     used = context->low & 0x3f;
