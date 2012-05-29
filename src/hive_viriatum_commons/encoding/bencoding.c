@@ -322,6 +322,10 @@ ERROR_CODE _runBencodingEngine(struct BencodingEngine_t *bencodingEngine, unsign
     integerEndMark = bencodingEngine->integerEndMark;
     stringEndMark = bencodingEngine->stringEndMark;
 
+	/* initializes the string size value, avoids
+	possible problems with no variable initialization */
+	stringSize = 0;
+
     /* iterates over the byte range of the file, all the bytes
     should be contained in the buffer "under" iteration */
     for(index = 0; index < size; index++) {
