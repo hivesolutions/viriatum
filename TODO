@@ -17,7 +17,7 @@
 
 == Refactor / Bug Fixing ==
 
-* Fix the hash map structure so that string are compared by value when retrieved (refer to the python implementation)
+* Fix the hash map structure so that string are compared by value when retrieved (refer to the python implementation (dictobject.c))
 * Implement and refactor win32 conditions (_thread_win32.c) use this link http://thbecker.net/free_software_utilities/fair_monitor_for_win32/start_page.html
 
 == Design decisions ==
