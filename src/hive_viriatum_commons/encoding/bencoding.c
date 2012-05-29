@@ -249,6 +249,9 @@ ERROR_CODE _encodeType(struct Type_t *type, struct StringBuffer_t *stringBuffer)
             appendStringBuffer(stringBuffer, (unsigned char *) "e");
 
             break;
+
+		default:
+			break;
     }
 
     /* raises no error */
