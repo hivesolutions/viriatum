@@ -454,6 +454,12 @@ ERROR_CODE openHandlerStreamIo(struct Connection_t *connection) {
             ioConnection->onClose = closeHandlerStreamHttp;
             break;
 
+        case HTTP_CLIENT_PROTOCOL:
+            ioConnection->onData = dataHandlerStreamHttpClient;
+            ioConnection->onOpen = openHandlerStreamHttpClient;
+            ioConnection->onClose = closeHandlerStreamHttpClient;
+            break;
+
         case TORRENT_PROTOCOL:
             ioConnection->onData = dataHandlerStreamTorrent;
             ioConnection->onOpen = openHandlerStreamTorrent;
