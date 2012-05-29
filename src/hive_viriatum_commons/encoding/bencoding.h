@@ -98,8 +98,8 @@ typedef struct BencodingHandler_t {
     struct LinkedList_t *keyStack;
     struct Type_t *sequence;
     struct Type_t *top;
-    char *key;
-    char nextKey;
+    unsigned char *key;
+    unsigned char nextKey;
 } BencodingHandler;
 
 VIRIATUM_EXPORT_PREFIX void createBencodingEngine(struct BencodingEngine_t **bencodingEnginePointer, void *context);
