@@ -184,9 +184,9 @@ void deletePolling(struct Polling_t *polling) {
 }
 
 void deleteConfiguration(struct HashMap_t *configuration, int isTop) {
-    /* allocates space for the pointer to the key and
+    /* allocates space for the pointer to the element and
     for the option to be retrieved */
-    size_t *keyPointer;
+	struct HashMapElement_t *element;
     void *option;
 
     /* allocates space for the iterator for the configuration */
@@ -198,16 +198,16 @@ void deleteConfiguration(struct HashMap_t *configuration, int isTop) {
     /* iterates continuously */
     while(1) {
         /* retrieves the next value from the configuration iterator */
-        getNextIterator(configurationIterator, (void **) &keyPointer);
+        getNextIterator(configurationIterator, (void **) &element);
 
         /* in case the current module is null (end of iterator) */
-        if(keyPointer == NULL) {
+        if(element == NULL) {
             /* breaks the loop */
             break;
         }
 
         /* retrievs the hash map value for the key pointer */
-        getValueHashMap(configuration, *keyPointer, (void **) &option);
+        getValueHashMap(configuration, element->key, element->keyString, (void **) &option);
 
         /* in case the current iteration is of type top must delete the
         inner configuration because this is "just" a section, otherwise
@@ -547,7 +547,7 @@ ERROR_CODE startService(struct Service_t *service) {
 
 
 
-    _createTorrentConnection(serviceConnection);
+    //_createTorrentConnection(serviceConnection);
 
 
 
