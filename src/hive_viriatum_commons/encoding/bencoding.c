@@ -101,7 +101,7 @@ ERROR_CODE encodeBencoding(struct Type_t *type, unsigned char **encodedBufferPoi
     /* updates the references to the encoded buffer pointer and
     the reference to the encoded buffer length (from string length) */
     *encodedBufferPointer = encodedBuffer;
-    *encodedBufferLengthPointer = strlen(encodedBuffer);
+    *encodedBufferLengthPointer = strlen((char *) encodedBuffer);
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -206,7 +206,7 @@ ERROR_CODE _encodeType(struct Type_t *type, struct StringBuffer_t *stringBuffer)
 
         case STRING_TYPE:
             buffer = MALLOC(16);
-            SPRINTF(buffer, 16, "%d", strlen(type->value.valueString));
+            SPRINTF(buffer, 16, "%lu", strlen(type->value.valueString));
 
             _appendStringBuffer(stringBuffer, (unsigned char *) buffer);
             appendStringBuffer(stringBuffer, (unsigned char *) ":");
