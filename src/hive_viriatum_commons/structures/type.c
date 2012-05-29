@@ -232,7 +232,7 @@ ERROR_CODE printType(struct Type_t *type) {
                 getNextIterator(iterator, (void **) &element);
                 if(element == NULL) { break; }
                 if(isFirst == 0) { PRINTF(", "); };
-                key = stringType(element->keyString);
+                key = stringType((char *) element->keyString);
                 printType(&key);
                 PRINTF(" : ");
                 printType((struct Type_t *) element->value);
