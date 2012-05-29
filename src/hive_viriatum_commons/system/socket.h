@@ -77,9 +77,10 @@
 #endif
 
 #ifdef VIRIATUM_PLATFORM_UNIX
+#include <netdb.h>
+#include <arpa/inet.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
-#include <arpa/inet.h>
 #define SOCKET_CONNECTIONS 256
 #define SOCKET_DATA void *
 #define SOCKET_HANDLE int
