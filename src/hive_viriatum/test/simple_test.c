@@ -259,7 +259,7 @@ void testBencoding() {
 
     /* allocates space for the encoded buffer reference
     and for the encoded buffer length integer value */
-    char *encodedBuffer;
+    unsigned char *encodedBuffer;
     size_t encodedBufferLength;
 
     /* creates the sequence structures (map and list), initializing
