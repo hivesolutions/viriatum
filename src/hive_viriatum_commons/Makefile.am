@@ -44,6 +44,7 @@ compression/huffman.c \
 debug/error.c \
 debug/logging.c \
 encoding/base_64.c \
+encoding/bencoding.c \
 ini/ini.c \
 io/file.c \
 jni/info.c \
@@ -76,6 +77,7 @@ compression/huffman.c \
 debug/error.c \
 debug/logging.c \
 encoding/base_64.c \
+encoding/bencoding.c \
 ini/ini.c \
 io/file.c \
 jni/info.c \
