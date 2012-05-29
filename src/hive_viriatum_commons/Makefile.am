@@ -40,6 +40,7 @@ libviriatum_la_LDFLAGS = -version-info $(VIRIATUM_MAJOR_VERSION):$(VIRIATUM_MINO
 libviriatum_a_SOURCES = stdafx.c \
 checksum/crc_32.c \
 checksum/md5.c \
+checksum/sha1.c \
 compression/huffman.c \
 debug/error.c \
 debug/logging.c \
@@ -73,6 +74,7 @@ util/arguments_util.c
 libviriatum_la_SOURCES = stdafx.c \
 checksum/crc_32.c \
 checksum/md5.c \
+checksum/sha1.c \
 compression/huffman.c \
 debug/error.c \
 debug/logging.c \
