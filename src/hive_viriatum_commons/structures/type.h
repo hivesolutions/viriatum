@@ -124,7 +124,9 @@ typedef struct Type_t {
 
 VIRIATUM_EXPORT_PREFIX void createType(struct Type_t **typePointer, enum Type_e _type);
 VIRIATUM_EXPORT_PREFIX void deleteType(struct Type_t *type);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE freeType(struct Type_t *type);
 VIRIATUM_EXPORT_PREFIX ERROR_CODE toStringType(struct Type_t *type, unsigned char **bufferPointer);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE printType(struct Type_t *type);
 VIRIATUM_EXPORT_PREFIX struct Type_t integerType(int value);
 VIRIATUM_EXPORT_PREFIX struct Type_t floatType(float value);
 VIRIATUM_EXPORT_PREFIX struct Type_t stringType(char *value);
