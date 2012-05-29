@@ -351,7 +351,8 @@ typedef enum ConnectionProtocol_e {
     UNDEFINED_PROTOCOL = 1,
     UNKNOWN_PROTOCOL,
     HTTP_PROTOCOL,
-    TORRENT_PROTOCOL
+    HTTP_CLIENT_PROTOCOL,
+    TORRENT_PROTOCOL,
 } ConnectionType;
 
 typedef struct Rule_t {
@@ -490,6 +491,14 @@ typedef struct Connection_t {
      * when the connection is going to be closed.
      */
     connectionCallback onClose;
+
+    /**
+     * Global wide parameters for interaction with
+     * the lower layer of the connection.
+     * This reference is aimed at configuration
+     * only (do not use it otherwise).
+     */
+    void *parameters;
 
     /**
      * Reference to the lower level

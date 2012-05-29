@@ -250,8 +250,8 @@ ERROR_CODE _encodeType(struct Type_t *type, struct StringBuffer_t *stringBuffer)
 
             break;
 
-		default:
-			break;
+        default:
+            break;
     }
 
     /* raises no error */
@@ -322,9 +322,9 @@ ERROR_CODE _runBencodingEngine(struct BencodingEngine_t *bencodingEngine, unsign
     integerEndMark = bencodingEngine->integerEndMark;
     stringEndMark = bencodingEngine->stringEndMark;
 
-	/* initializes the string size value, avoids
-	possible problems with no variable initialization */
-	stringSize = 0;
+    /* initializes the string size value, avoids
+    possible problems with no variable initialization */
+    stringSize = 0;
 
     /* iterates over the byte range of the file, all the bytes
     should be contained in the buffer "under" iteration */
@@ -406,8 +406,8 @@ ERROR_CODE _runBencodingEngine(struct BencodingEngine_t *bencodingEngine, unsign
 
                 break;
 
-			default:
-				break;
+            default:
+                break;
         }
     }
 
@@ -463,9 +463,9 @@ ERROR_CODE _bencodingIntegerEndCallback(struct BencodingEngine_t *bencodingEngin
                 /* breaks the switch */
                 break;
 
-			default:
-				/* breaks the switch */
-				break;
+            default:
+                /* breaks the switch */
+                break;
         }
     }
 
@@ -533,9 +533,9 @@ ERROR_CODE _bencodingStringEndCallback(struct BencodingEngine_t *bencodingEngine
                 /* breaks the switch */
                 break;
 
-			default:
-				/* breaks the switch */
-				break;
+            default:
+                /* breaks the switch */
+                break;
         }
     }
 
@@ -680,10 +680,10 @@ ERROR_CODE _bencodingSequenceEndCallback(struct BencodingEngine_t *bencodingEngi
 
             /* breaks the switch */
             break;
-		
-		default:
-			/* breaks the switch */
-			break;
+
+        default:
+            /* breaks the switch */
+            break;
     }
 
     /* raises no error */
