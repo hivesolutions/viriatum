@@ -30,6 +30,7 @@
 #include "../debug/debug.h"
 #include "../system/system.h"
 #include "hash_map.h"
+#include "sort_map.h"
 #include "linked_list.h"
 
 /**
@@ -68,6 +69,13 @@ typedef union TypeValue_t {
 
     /**
      * The storage space used for the
+     * sort map (ordered dictionary) value
+     * representation.
+     */
+    struct SortMap_t *valueSortMap;
+
+    /**
+     * The storage space used for the
      * linked list (sequence) value
      * representation.
      */
@@ -94,6 +102,7 @@ typedef enum Type_e {
     FLOAT_TYPE,
     STRING_TYPE,
     MAP_TYPE,
+	SORT_MAP_TYPE,
     LIST_TYPE,
     VOID_TYPE
 } _Type;
@@ -131,5 +140,6 @@ VIRIATUM_EXPORT_PREFIX struct Type_t integerType(int value);
 VIRIATUM_EXPORT_PREFIX struct Type_t floatType(float value);
 VIRIATUM_EXPORT_PREFIX struct Type_t stringType(char *value);
 VIRIATUM_EXPORT_PREFIX struct Type_t mapType(struct HashMap_t *value);
+VIRIATUM_EXPORT_PREFIX struct Type_t sortMapType(struct SortMap_t *value);
 VIRIATUM_EXPORT_PREFIX struct Type_t listType(struct LinkedList_t *value);
 VIRIATUM_EXPORT_PREFIX ERROR_CODE _sizeType(struct Type_t *type, size_t *size);
