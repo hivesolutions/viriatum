@@ -125,19 +125,21 @@ ERROR_CODE openHandlerStreamHttpClient(struct IoConnection_t *ioConnection) {
 
     struct Type_t *type;
 
-    char *buffer = malloc(1024);
+    char *buffer = MALLOC(1024);
 
     struct Type_t *_type;
     char *_buffer;
     size_t _bufferSize;
+	char result[SHA1_DIGEST_SIZE];
 
 
 
     decodeBencodingFile("C:/verysleepy_0_82.exe.torrent", &type);
-    getValueStringHashMap(type->value.valueMap, "info", (void **) &_type);
+    getValueStringSortMap(type->value.valueSortMap, "info", (void **) &_type);
     encodeBencoding(_type, &_buffer, &_bufferSize);
-    writeFile("c:/tobias.dumpi", _buffer, _bufferSize);
+	sha1(_buffer, _bufferSize, result);
 
+	printType(type);
     freeType(type);
     FREE(_buffer);
 
