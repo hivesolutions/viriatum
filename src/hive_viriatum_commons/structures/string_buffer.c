@@ -107,6 +107,12 @@ void appendStringSBuffer(struct StringBuffer_t *stringBuffer, unsigned char *str
     stringBuffer->stringLength += stringLength;
 }
 
+void appendStringTBuffer(struct StringBuffer_t *stringBuffer, struct String_t *string) {
+	/* adds the string structure value to the string buffer,
+	using the length oriented append function */
+	appendStringSBuffer(stringBuffer, string->buffer, string->length);
+}
+
 void joinStringBuffer(struct StringBuffer_t *stringBuffer, unsigned char **stringValuePointer) {
     /* allocates space for the iterators used for percolating
     the various (partial) string values (include string length) */
@@ -185,4 +191,10 @@ void _appendStringLBuffer(struct StringBuffer_t *stringBuffer, unsigned char *st
 
     /* adds the string (with length) value to the string buffer */
     appendStringSBuffer(stringBuffer, stringValue, stringLength);
+}
+
+void _appendStringTBuffer(struct StringBuffer_t *stringBuffer, struct String_t *string) {
+	/* adds the string structure value to the string buffer,
+	using the length oriented append function */
+	_appendStringLBuffer(stringBuffer, string->buffer, string->length);
 }
