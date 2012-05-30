@@ -57,7 +57,7 @@ typedef struct sha1Context_t {
 } sha1Context;
 
 typedef union sha1Block_t {
-	unsigned char c[64];
+    unsigned char c[64];
     unsigned int l[16];
 } sha1Block;
 

@@ -38,7 +38,7 @@ void createBencodingEngine(struct BencodingEngine_t **bencodingEnginePointer, vo
 
     /* initializes the bencoding engine */
     bencodingEngine->state = BENCODING_ENGINE_NORMAL;
-	bencodingEngine->mapType = SORT_MAP_TYPE;
+    bencodingEngine->mapType = SORT_MAP_TYPE;
     bencodingEngine->integerEndMark = 0;
     bencodingEngine->stringEndMark = 0;
     bencodingEngine->context = context;
@@ -633,29 +633,29 @@ ERROR_CODE _bencodingDictionaryStartCallback(struct BencodingEngine_t *bencoding
     struct BencodingHandler_t *bencodingHandler = (struct BencodingHandler_t *) bencodingEngine->context;
 
     /* switchs over the "target" map type to be used to store conceptual
-	maps in the bencoding structure */
-	switch(bencodingEngine->mapType) {
-		case MAP_TYPE:
-			/* creates a new hash map for the new structure (sequence) context
-			and then creates the respective type for the map */
-			createHashMap(&hashMap, 0);
-			createType(&type, MAP_TYPE);
-			*type = mapType(hashMap);
+    maps in the bencoding structure */
+    switch(bencodingEngine->mapType) {
+        case MAP_TYPE:
+            /* creates a new hash map for the new structure (sequence) context
+            and then creates the respective type for the map */
+            createHashMap(&hashMap, 0);
+            createType(&type, MAP_TYPE);
+            *type = mapType(hashMap);
 
-		case SORT_MAP_TYPE:
-			/* creates a new sort map for the new structure (sequence) context
-			and then creates the respective type for the map */
-	        createSortMap(&sortMap, 0);
-			createType(&type, SORT_MAP_TYPE);
-			*type = sortMapType(sortMap);
+        case SORT_MAP_TYPE:
+            /* creates a new sort map for the new structure (sequence) context
+            and then creates the respective type for the map */
+            createSortMap(&sortMap, 0);
+            createType(&type, SORT_MAP_TYPE);
+            *type = sortMapType(sortMap);
 
-		default:
-			/* creates a new sort map for the new structure (sequence) context
-			and then creates the respective type for the map */
-	        createSortMap(&sortMap, 0);
-			createType(&type, SORT_MAP_TYPE);
-			*type = sortMapType(sortMap);
-	}
+        default:
+            /* creates a new sort map for the new structure (sequence) context
+            and then creates the respective type for the map */
+            createSortMap(&sortMap, 0);
+            createType(&type, SORT_MAP_TYPE);
+            *type = sortMapType(sortMap);
+    }
 
     /* adds the sequence type to the sequence stack and then adds the
     current handler key to the key stack, then updates the current sequence
