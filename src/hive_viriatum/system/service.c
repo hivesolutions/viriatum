@@ -354,7 +354,7 @@ ERROR_CODE _createTrackerConnection(struct Connection_t **connectionPointer, str
     /* alocates dynamic space for the parameters to the
     http stream (http client) this structure will be able
     to guide the stream of http client */
-    struct HttpClientParameters_t *parameters = (struct HttpClientParameters_t *) malloc(sizeof(struct HttpClientParameters_t));
+    struct HttpClientParameters_t *parameters = (struct HttpClientParameters_t *) MALLOC(sizeof(struct HttpClientParameters_t));
 
     /* populates the parameters structure with the
     required values for the http client request */
