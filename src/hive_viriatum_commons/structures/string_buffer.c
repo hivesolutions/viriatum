@@ -162,7 +162,8 @@ void joinStringBuffer(struct StringBuffer_t *stringBuffer, unsigned char **strin
         pointer += partialValueLength;
     }
 
-    /* "closes" the string value */
+    /* "closes" the string value, usefull for usage as a "classic"
+	null terminated string */
     stringValue[stringBuffer->stringLength] = '\0';
 
     /* sets the string value in the value "pointed" by
