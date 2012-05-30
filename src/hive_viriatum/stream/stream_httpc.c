@@ -135,6 +135,7 @@ ERROR_CODE randomBuffer(unsigned char *buffer, size_t bufferSize) {
     RAISE_NO_ERROR;
 }
 
+
 ERROR_CODE openHandlerStreamHttpClient(struct IoConnection_t *ioConnection) {
     /* allocates the http client connection and retrieves the
     "upper" connection (for parameters retrieval) */
@@ -153,7 +154,7 @@ ERROR_CODE openHandlerStreamHttpClient(struct IoConnection_t *ioConnection) {
 	unsigned char random[12];
 	unsigned char peerId[20];
 
-	SPRINTF(peerId, 20, "-VR0100-");
+	SPRINTF(peerId, 20, "-%s%d%d%d0-", VIRIATUM_PREFIX, VIRIATUM_MAJOR, VIRIATUM_MINOR, VIRIATUM_MICRO);
 	randomBuffer(random, 12);
 	memcpy(peerId + 8, random, 12);
 	peerId[20] = '\0';
