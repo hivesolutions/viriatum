@@ -258,6 +258,7 @@ ERROR_CODE openHandlerStreamHttpClient(struct IoConnection_t *ioConnection) {
 	struct HashMap_t *parametersMap;
 	unsigned char *getString;
 	size_t getStringSize;
+	struct String_t strings[9];
 
 	SPRINTF((char *) peerId, 20, "-%s%d%d%d0-", VIRIATUM_PREFIX, VIRIATUM_MAJOR, VIRIATUM_MINOR, VIRIATUM_MICRO);
 	randomBuffer(random, 12);
@@ -277,10 +278,17 @@ ERROR_CODE openHandlerStreamHttpClient(struct IoConnection_t *ioConnection) {
 
 	infoHash[SHA1_DIGEST_SIZE] = '\0'; /* THIS IS A HUGE HACK */
 
-	
 	/* tenho de fazer gerador de get parameters !!!! */
 	/* pega nas chaves e nos valores do hash map e gera a get string para um string buffer */
 	createHashMap(&parametersMap, 0);
+	strings[0].buffer = infoHash;
+	strings[0].length = 20;
+	strings[1].buffer = peerId;
+	strings[1].length = 20;
+	strings[2].buffer = "8080";
+	strings[2].length = sizeof("8080");
+	strings[3].buffer = "0";
+	strings[3].length = sizeof("0");
 
 	setValueStringHashMap(parametersMap, "info_hash", (void *) infoHash);
 	setValueStringHashMap(parametersMap, "peer_id", (void *) peerId);
