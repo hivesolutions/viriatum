@@ -17,7 +17,7 @@
  You should have received a copy of the GNU General Public License
  along with Hive Viriatum Commons. If not, see <http://www.gnu.org/licenses/>.
 
- __author__    = Jo‹o Magalh‹es <joamag@hive.pt>
+ __author__    = João Magalhães <joamag@hive.pt>
  __version__   = 1.0.0
  __revision__  = $LastChangedRevision$
  __date__      = $LastChangedDate$
@@ -27,13 +27,39 @@
 
 #pragma once
 
+/**
+ * The size of the buffer resulting
+ * from the sha1 digest calculation.
+ */
+#define SHA1_DIGEST_SIZE 20
+
+#define ROL(value, bits) (((value) << (bits)) | ((value) >> (32 - (bits))))
+
+#ifdef VIRIATUM_BIG_ENDIAN
+#define BLK_0(i) block->l[i]
+#else
+#define BLK_0(i) (block->l[i] = (ROL(block->l[i], 24) & 0xFF00FF00) \
+    |(ROL(block->l[i], 8) & 0x00FF00FF))
+#endif
+#define BLK(i) (block->l[i & 15] = ROL(block->l[(i + 13) & 15] ^ block->l[(i + 8) & 15] \
+    ^block->l[(i + 2) & 15] ^ block->l[i & 15], 1))
+
+#define R0(v, w, x, y, z, i) z += ((w & (x ^ y)) ^ y) + BLK_0(i) + 0x5A827999 + ROL(v, 5); w = ROL(w, 30);
+#define R1(v, w, x, y, z, i) z += ((w & (x ^ y)) ^ y) + BLK(i) + 0x5A827999 + ROL(v, 5); w = ROL(w, 30);
+#define R2(v, w, x, y, z, i) z += (w ^ x ^ y) + BLK(i) + 0x6ED9EBA1 + ROL(v, 5); w = ROL(w, 30);
+#define R3(v, w, x, y, z, i) z += (((w | x) & y) | (w & x)) + BLK(i) + 0x8F1BBCDC + ROL(v, 5); w = ROL(w, 30);
+#define R4(v, w, x, y, z, i) z += ( w ^ x ^ y) + BLK(i) + 0xCA62C1D6 + ROL(v, 5); w = ROL(w, 30);
+
 typedef struct sha1Context_t {
     unsigned int state[5];
     unsigned int count[2];
     unsigned char  buffer[64];
 } sha1Context;
 
-#define SHA1_DIGEST_SIZE 20
+typedef union sha1Block_t {
+	unsigned char c[64];
+    unsigned int l[16];
+} sha1Block;
 
 VIRIATUM_EXPORT_PREFIX void sha1(unsigned char *buffer, unsigned int bufferLength, unsigned char *result);
 VIRIATUM_EXPORT_PREFIX void initSha1(struct sha1Context_t *context);
