@@ -50,6 +50,12 @@ typedef struct StringBuffer_t {
     struct LinkedList_t *stringList;
 
     /**
+     * The list of lengths for the strings
+	 * that compose the complete string value.
+     */
+    struct LinkedList_t *lengthList;
+
+    /**
      * The list of strings to have the memory
      * released uppon destruction of the string
      * buffer.
@@ -74,11 +80,25 @@ VIRIATUM_EXPORT_PREFIX void deleteStringBuffer(struct StringBuffer_t *stringBuff
 /**
  * Appends (adds) a string value to the string buffer, this value
  * will be appended to the final "joined" string.
+ * The length of the provided string is calculated using the "classic"
+ * null terminated string.
  *
  * @param stringBuffer The string buffer reference.
  * @param stringValue The string value to be added to the string buffer.
  */
 VIRIATUM_EXPORT_PREFIX void appendStringBuffer(struct StringBuffer_t *stringBuffer, unsigned char *stringValue);
+
+/**
+ * Appends (adds) a string value to the string buffer, this value
+ * will be appended to the final "joined" string.
+ * The length of the string is provided so no calculation is done.
+ *
+ * @param stringBuffer The string buffer reference.
+ * @param stringValue The string value to be added to the string buffer.
+ * @param stringLength The length of the string value to be added to the
+ * string buffer.
+ */
+VIRIATUM_EXPORT_PREFIX void appendStringLBuffer(struct StringBuffer_t *stringBuffer, unsigned char *stringValue, size_t stringLength);
 
 /**
  * "Joins" the internal buffer of strings creating the final
@@ -93,6 +113,8 @@ VIRIATUM_EXPORT_PREFIX void joinStringBuffer(struct StringBuffer_t *stringBuffer
 /**
  * Appends (adds) a string value to the string buffer, this value
  * will be appended to the final "joined" string.
+ * The length of the provided string is calculated using the "classic"
+ * null terminated string.
  * This method releases the memory of the added string value, uppon
  * releasing the string buffer memory.
  * Use this method carefully it may cause memory corruption.
@@ -101,3 +123,18 @@ VIRIATUM_EXPORT_PREFIX void joinStringBuffer(struct StringBuffer_t *stringBuffer
  * @param stringValue The string value to be added to the string buffer.
  */
 VIRIATUM_EXPORT_PREFIX void _appendStringBuffer(struct StringBuffer_t *stringBuffer, unsigned char *stringValue);
+
+/**
+ * Appends (adds) a string value to the string buffer, this value
+ * will be appended to the final "joined" string.
+ * The length of the string is provided so no calculation is done.
+ * This method releases the memory of the added string value, uppon
+ * releasing the string buffer memory.
+ * Use this method carefully it may cause memory corruption.
+ *
+ * @param stringBuffer The string buffer reference.
+ * @param stringValue The string value to be added to the string buffer.
+ * @param stringLength The length of the string value to be added to the
+ * string buffer.
+ */
+VIRIATUM_EXPORT_PREFIX void _appendStringLBuffer(struct StringBuffer_t *stringBuffer, unsigned char *stringValue, size_t stringLength);

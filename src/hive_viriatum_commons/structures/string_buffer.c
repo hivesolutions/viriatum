@@ -44,6 +44,10 @@ void createStringBuffer(struct StringBuffer_t **stringBufferPointer) {
     createLinkedList(&stringBuffer->stringList);
 
     /* creates the list to hold the various strings
+    lengths for the string in the string buffer runtime */
+    createLinkedList(&stringBuffer->lengthList);
+
+    /* creates the list to hold the various strings
     to have the memory released uppon destruction */
     createLinkedList(&stringBuffer->releaseList);
 
@@ -72,6 +76,9 @@ void deleteStringBuffer(struct StringBuffer_t *stringBuffer) {
     /* deletes the list of release strings from the string buffer */
     deleteLinkedList(stringBuffer->releaseList);
 
+    /* deletes the list of lengths from the string buffer */
+    deleteLinkedList(stringBuffer->lengthList);
+
     /* deletes the list of strings from the string buffer */
     deleteLinkedList(stringBuffer->stringList);
 
@@ -86,14 +93,25 @@ void appendStringBuffer(struct StringBuffer_t *stringBuffer, unsigned char *stri
     /* adds the string value to the list of strings and then
     increments the (total) string length with the length of
     the current string value */
-    appendValueLinkedList(stringBuffer->stringList, stringValue);
+    appendValueLinkedList(stringBuffer->stringList, (void *) stringValue);
+	appendValueLinkedList(stringBuffer->lengthList, (void *) stringValueLength);
     stringBuffer->stringLength += stringValueLength;
 }
 
+void appendStringSBuffer(struct StringBuffer_t *stringBuffer, unsigned char *stringValue, size_t stringLength) {
+    /* adds the string value to the list of strings and then
+    increments the (total) string length with the length of
+    the current string value */
+    appendValueLinkedList(stringBuffer->stringList, (void *) stringValue);
+	appendValueLinkedList(stringBuffer->lengthList, (void *) stringLength);
+    stringBuffer->stringLength += stringLength;
+}
+
 void joinStringBuffer(struct StringBuffer_t *stringBuffer, unsigned char **stringValuePointer) {
-    /* allocates space for the iterator used for percolating
-    the various (partial) string values */
+    /* allocates space for the iterators used for percolating
+    the various (partial) string values (include string length) */
     struct Iterator_t *stringIterator;
+	struct Iterator_t *lengthIterator;
 
     /* allocates space for the partial value and the partial value length */
     unsigned char *partialValue;
@@ -104,9 +122,10 @@ void joinStringBuffer(struct StringBuffer_t *stringBuffer, unsigned char **strin
     unsigned char *pointer;
     unsigned char *stringValue = (unsigned char *) MALLOC(stringBuffer->stringLength + 1);
 
-    /* creates an iterator for the list of strings, to go
+    /* creates the iterators for the list of strings, to go
     arround them joining the strings into a single buffer */
     createIteratorLinkedList(stringBuffer->stringList, &stringIterator);
+    createIteratorLinkedList(stringBuffer->lengthList, &lengthIterator);
 
     /* sets the "initial" pointer value to the "base" string value position */
     pointer = stringValue;
@@ -118,15 +137,18 @@ void joinStringBuffer(struct StringBuffer_t *stringBuffer, unsigned char **strin
         as the partial value */
         getNextIterator(stringIterator, (void **) &partialValue);
 
-        /* in case the partial value is not set
+        /* retrieves the next value from the length iterator
+        as the partial value length (length of the string) */
+        getNextIterator(lengthIterator, (void **) &partialValueLength);
+
+		/* in case the partial value is not set
         there are no more items to be retrieved from
         the iterator, breaks the loop */
         if(partialValue == NULL) { break; }
 
-        /* retrieves the partial value length and uses
-        it to copy the contents of the partial value to
-        the buffer "pointed" by pointer */
-        partialValueLength = strlen((char *) partialValue);
+        /* copoes the contents of the partial value to
+        the buffer "pointed" by pointer, using the previously
+		retrieved partial value length */
         memcpy(pointer, partialValue, partialValueLength);
 
         /* updates the pointer value with the length of the
@@ -141,7 +163,9 @@ void joinStringBuffer(struct StringBuffer_t *stringBuffer, unsigned char **strin
     the string value pointer */
     *stringValuePointer = stringValue;
 
-    /* deletes the string iterator */
+    /* deletes both the length and the string iterators, in order
+	to avoid possible memory leaks */
+	deleteIteratorLinkedList(stringBuffer->lengthList, lengthIterator);
     deleteIteratorLinkedList(stringBuffer->stringList, stringIterator);
 }
 
@@ -152,4 +176,13 @@ void _appendStringBuffer(struct StringBuffer_t *stringBuffer, unsigned char *str
 
     /* adds the string value to the string buffer */
     appendStringBuffer(stringBuffer, stringValue);
+}
+
+void _appendStringLBuffer(struct StringBuffer_t *stringBuffer, unsigned char *stringValue, size_t stringLength) {
+    /* adds the string value to the list of strings to have
+    the memory released uppon string buffer release */
+    appendValueLinkedList(stringBuffer->releaseList, stringValue);
+
+    /* adds the string (with length) value to the string buffer */
+    appendStringSBuffer(stringBuffer, stringValue, stringLength);
 }
