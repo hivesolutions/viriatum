@@ -159,7 +159,7 @@ void getNextIteratorSortMap(struct Iterator_t *iterator, void **nextPointer) {
     of more elements */
     else {
         /* retrieves both the key and the key string values
-		to be used to retrieve the hash element */
+        to be used to retrieve the hash element */
         getValueLinkedList(sortMap->keyList, currentIndex, (void **) &key);
         getValueLinkedList(sortMap->keyStringList, currentIndex, (void **) &keyString);
 
@@ -210,7 +210,7 @@ void getNextElementIteratorSortMap(struct Iterator_t *iterator, void **nextPoint
     of more elements */
     else {
         /* retrieves both the key and the key string values
-		to be used to retrieve the hash element */
+        to be used to retrieve the hash element */
         getValueLinkedList(sortMap->keyList, currentIndex, (void **) &key);
         getValueLinkedList(sortMap->keyStringList, currentIndex, (void **) &keyString);
 

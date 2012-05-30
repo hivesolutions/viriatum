@@ -54,7 +54,7 @@ void updateSha1(struct sha1Context_t *context, const unsigned char *data, const 
     size_t i, j;
 
     j = (context->count[0] >> 3) & 63;
-	if((context->count[0] += len << 3) < (len << 3)) { context->count[1]++; }
+    if((context->count[0] += len << 3) < (len << 3)) { context->count[1]++; }
     context->count[1] += (len >> 29);
     if((j + len) > 63) {
         memcpy(&context->buffer[j], data, (i = 64 - j));
