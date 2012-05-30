@@ -87,6 +87,7 @@ typedef struct BencodingSettings_t {
 
 typedef struct BencodingEngine_t {
     enum BencodingState_e state;
+	enum Type_e mapType;
     struct BencodingSettings_t settings;
     unsigned char *integerEndMark;
     unsigned char *stringEndMark;
