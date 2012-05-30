@@ -94,7 +94,7 @@ void appendStringBuffer(struct StringBuffer_t *stringBuffer, unsigned char *stri
     increments the (total) string length with the length of
     the current string value */
     appendValueLinkedList(stringBuffer->stringList, (void *) stringValue);
-	appendValueLinkedList(stringBuffer->lengthList, (void *) stringValueLength);
+    appendValueLinkedList(stringBuffer->lengthList, (void *) stringValueLength);
     stringBuffer->stringLength += stringValueLength;
 }
 
@@ -103,21 +103,21 @@ void appendStringLBuffer(struct StringBuffer_t *stringBuffer, unsigned char *str
     increments the (total) string length with the length of
     the current string value */
     appendValueLinkedList(stringBuffer->stringList, (void *) stringValue);
-	appendValueLinkedList(stringBuffer->lengthList, (void *) stringLength);
+    appendValueLinkedList(stringBuffer->lengthList, (void *) stringLength);
     stringBuffer->stringLength += stringLength;
 }
 
 void appendStringTBuffer(struct StringBuffer_t *stringBuffer, struct String_t *string) {
-	/* adds the string structure value to the string buffer,
-	using the length oriented append function */
-	appendStringLBuffer(stringBuffer, string->buffer, string->length);
+    /* adds the string structure value to the string buffer,
+    using the length oriented append function */
+    appendStringLBuffer(stringBuffer, string->buffer, string->length);
 }
 
 void joinStringBuffer(struct StringBuffer_t *stringBuffer, unsigned char **stringValuePointer) {
     /* allocates space for the iterators used for percolating
     the various (partial) string values (include string length) */
     struct Iterator_t *stringIterator;
-	struct Iterator_t *lengthIterator;
+    struct Iterator_t *lengthIterator;
 
     /* allocates space for the partial value and the partial value length */
     unsigned char *partialValue;
@@ -147,14 +147,14 @@ void joinStringBuffer(struct StringBuffer_t *stringBuffer, unsigned char **strin
         as the partial value length (length of the string) */
         getNextIterator(lengthIterator, (void **) &partialValueLength);
 
-		/* in case the partial value is not set
+        /* in case the partial value is not set
         there are no more items to be retrieved from
         the iterator, breaks the loop */
         if(partialValue == NULL) { break; }
 
         /* copoes the contents of the partial value to
         the buffer "pointed" by pointer, using the previously
-		retrieved partial value length */
+        retrieved partial value length */
         memcpy(pointer, partialValue, partialValueLength);
 
         /* updates the pointer value with the length of the
@@ -163,7 +163,7 @@ void joinStringBuffer(struct StringBuffer_t *stringBuffer, unsigned char **strin
     }
 
     /* "closes" the string value, usefull for usage as a "classic"
-	null terminated string */
+    null terminated string */
     stringValue[stringBuffer->stringLength] = '\0';
 
     /* sets the string value in the value "pointed" by
@@ -171,8 +171,8 @@ void joinStringBuffer(struct StringBuffer_t *stringBuffer, unsigned char **strin
     *stringValuePointer = stringValue;
 
     /* deletes both the length and the string iterators, in order
-	to avoid possible memory leaks */
-	deleteIteratorLinkedList(stringBuffer->lengthList, lengthIterator);
+    to avoid possible memory leaks */
+    deleteIteratorLinkedList(stringBuffer->lengthList, lengthIterator);
     deleteIteratorLinkedList(stringBuffer->stringList, stringIterator);
 }
 
@@ -195,7 +195,7 @@ void _appendStringLBuffer(struct StringBuffer_t *stringBuffer, unsigned char *st
 }
 
 void _appendStringTBuffer(struct StringBuffer_t *stringBuffer, struct String_t *string) {
-	/* adds the string structure value to the string buffer,
-	using the length oriented append function */
-	_appendStringLBuffer(stringBuffer, string->buffer, string->length);
+    /* adds the string structure value to the string buffer,
+    using the length oriented append function */
+    _appendStringLBuffer(stringBuffer, string->buffer, string->length);
 }
