@@ -66,6 +66,7 @@ VIRIATUM_EXPORT_PREFIX void createHashMap(struct HashMap_t **hashMapPointer, siz
 VIRIATUM_EXPORT_PREFIX void deleteHashMap(struct HashMap_t *hashMap);
 VIRIATUM_EXPORT_PREFIX void setValueHashMap(struct HashMap_t *hashMap, size_t key, unsigned char *keyString, void *value);
 VIRIATUM_EXPORT_PREFIX void setValueStringHashMap(struct HashMap_t *hashMap, unsigned char *keyString, void *value);
+VIRIATUM_EXPORT_PREFIX void getHashMap(struct HashMap_t *hashMap, size_t key, unsigned char *keyString, struct HashMapElement_t **elementPointer);
 VIRIATUM_EXPORT_PREFIX void getValueHashMap(struct HashMap_t *hashMap, size_t key, unsigned char *keyString, void **valuePointer);
 VIRIATUM_EXPORT_PREFIX void getValueStringHashMap(struct HashMap_t *hashMap, unsigned char *keyString, void **valuePointer);
 VIRIATUM_EXPORT_PREFIX void createIteratorHashMap(struct HashMap_t *hashMap, struct Iterator_t **iteratorPointer);
