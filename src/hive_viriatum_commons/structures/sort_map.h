@@ -32,9 +32,9 @@
 #include "linked_list.h"
 
 typedef struct SortMap_t {
-	struct HashMap_t *hashMap;
-	struct LinkedList_t *keyList;
-	struct LinkedList_t *keyStringList;
+    struct HashMap_t *hashMap;
+    struct LinkedList_t *keyList;
+    struct LinkedList_t *keyStringList;
 } SortMap;
 
 VIRIATUM_EXPORT_PREFIX void createSortMap(struct SortMap_t **sortMapPointer, size_t initialSize);
