@@ -163,6 +163,38 @@ void testHashMap() {
     deleteHashMap(hashMap);
 }
 
+void testSortMap() {
+    /* allocates space for the element */
+    void *element;
+
+    /* allocates space for the sort map */
+    struct SortMap_t *sortMap;
+
+    /* creates the sort map */
+    createSortMap(&sortMap, 3);
+
+    /* sets and retrieves the value in the sort map */
+    setValueSortMap(sortMap, 1, NULL, (void *) 1);
+    getValueSortMap(sortMap, 1, NULL, &element);
+
+    /* sets and retrieves the value in the sort map */
+    setValueSortMap(sortMap, 2, NULL, (void *) 2);
+    getValueSortMap(sortMap, 2, NULL, &element);
+
+    /* sets and retrieves the value in the sort map,
+    (thi set should for re-sizing) */
+    setValueSortMap(sortMap, 3, NULL, (void *) 3);
+    getValueSortMap(sortMap, 3, NULL, &element);
+
+    /* sets and retrieves the value (using a string)
+    in the sort map */
+    setValueStringSortMap(sortMap, (unsigned char *) "test", (void *) 4);
+    getValueStringSortMap(sortMap, (unsigned char *) "test", (void **) &element);
+
+    /* deletes the sort map */
+    deleteSortMap(sortMap);
+}
+
 void testStringBuffer() {
     /* allocates space for the string buffer */
     struct StringBuffer_t *stringBuffer;
@@ -447,17 +479,25 @@ void testQuicksortLinkedList() {
     deleteLinkedList(linkedList);
 }
 
+void testCrc32() {
+    /* calculates the crc32 hash value and returns it */
+    crc32((unsigned char *) "Hello World", 11);
+}
+
 void testMd5() {
     /* allocates space for the md5 result */
-    unsigned char result[16];
+    unsigned char result[MD5_DIGEST_SIZE];
 
     /* calculates the md5 hash value into the result */
     md5((unsigned char *) "Hello World", 11, result);
 }
 
-void testCrc32() {
-    /* calculates the crc32 hash value and returns it */
-    crc32((unsigned char *) "Hello World", 11);
+void testSha1() {
+    /* allocates space for the sha1 result */
+    unsigned char result[SHA1_DIGEST_SIZE];
+
+    /* calculates the sha1 hash value into the result */
+    sha1((unsigned char *) "Hello World", 11, result);
 }
 
 int _compare(void *first, void *second) {
@@ -493,6 +533,9 @@ void runSimpleTests() {
     /* tests the hash map */
     testHashMap();
 
+	/* tests the sort map */
+    testSortMap();
+
     /* tests the string buffer */
     testStringBuffer();
 
@@ -521,9 +564,12 @@ void runSimpleTests() {
     testQuicksort();
     testQuicksortLinkedList();
 
+    /* tests the crc32 hash function */
+    testCrc32();
+
     /* tests the md5 hash function */
     testMd5();
 
-    /* tests the crc32 hash function */
-    testCrc32();
+    /* tests the sha1 hash function */
+    testSha1();
 }
