@@ -146,6 +146,10 @@ static __inline char *getConfigPath() {
 #define VIRIATUM_DESCRIPTION "Viriatum"
 #define VIRIATUM_OBSERVATIONS "Viriatum HTTP Server"
 #define VIRIATUM_COPYRIGHT "Copyright (c) 2010 Hive Solutions Lda. All rights reserved."
+#define VIRIATUM_PREFIX "VR"
+#define VIRIATUM_MAJOR 0
+#define VIRIATUM_MINOR 1
+#define VIRIATUM_MICRO 0
 
 #ifdef VIRIATUM_DEBUG
 #define VIRIATUM_DEFAULT_HOST "0.0.0.0"
