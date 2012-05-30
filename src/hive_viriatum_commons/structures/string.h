@@ -27,6 +27,12 @@
 
 #pragma once
 
+/**
+ * Structure that defines the essential
+ * components of a string of bytes.
+ * The structure main components are the
+ * buffer of bytes and the length of it.
+ */
 typedef struct String_t {
     /**
      * The buffer containing the internal
