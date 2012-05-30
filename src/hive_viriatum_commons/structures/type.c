@@ -102,6 +102,21 @@ ERROR_CODE freeType(struct Type_t *type) {
             /* breaks the switch */
             break;
 
+        case SORT_MAP_TYPE:
+            createElementIteratorSortMap(type->value.valueSortMap, &iterator);
+
+            while(1) {
+                getNextIterator(iterator, (void **) &element);
+                if(element == NULL) { break; }
+                freeType((struct Type_t *) element->value);
+            }
+
+            deleteIteratorSortMap(type->value.valueSortMap, iterator);
+            deleteSortMap(type->value.valueSortMap);
+
+            /* breaks the switch */
+            break;
+
         default:
             /* breaks the switch */
             break;
@@ -246,6 +261,30 @@ ERROR_CODE printType(struct Type_t *type) {
             /* breaks the switch */
             break;
 
+        case SORT_MAP_TYPE:
+            PRINTF("{");
+
+            createElementIteratorSortMap(type->value.valueSortMap, &iterator);
+
+            while(1) {
+                getNextIterator(iterator, (void **) &element);
+                if(element == NULL) { break; }
+                if(isFirst == 0) { PRINTF(", "); };
+                key = stringType((char *) element->keyString);
+                printType(&key);
+                PRINTF(" : ");
+                printType((struct Type_t *) element->value);
+                isFirst = 0;
+            }
+
+            deleteIteratorSortMap(type->value.valueSortMap, iterator);
+
+            PRINTF("}");
+
+            /* breaks the switch */
+            break;
+
+
         default:
             PRINTF("undefined");
 
@@ -299,6 +338,18 @@ struct Type_t mapType(struct HashMap_t *value) {
     /* sets the type's type and value */
     type.type = MAP_TYPE;
     type.value.valueMap = value;
+
+    /* returns the type */
+    return type;
+}
+
+struct Type_t sortMapType(struct SortMap_t *value) {
+    /* allocates space for the type */
+    struct Type_t type;
+
+    /* sets the type's type and value */
+    type.type = SORT_MAP_TYPE;
+    type.value.valueSortMap = value;
 
     /* returns the type */
     return type;
