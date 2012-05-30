@@ -35,7 +35,8 @@ typedef struct sha1Context_t {
 
 #define SHA1_DIGEST_SIZE 20
 
-void initSha1(struct sha1Context_t *context);
-void updateSha1(struct sha1Context_t *context, const unsigned char *data, const size_t len);
-void finalSha1(struct sha1Context_t *context, unsigned char digest[SHA1_DIGEST_SIZE]);
-void _transformSha1(unsigned int state[5], const unsigned char buffer[64]);
+VIRIATUM_EXPORT_PREFIX void sha1(unsigned char *buffer, unsigned int bufferLength, unsigned char *result);
+VIRIATUM_EXPORT_PREFIX void initSha1(struct sha1Context_t *context);
+VIRIATUM_EXPORT_PREFIX void updateSha1(struct sha1Context_t *context, const unsigned char *data, const size_t len);
+VIRIATUM_EXPORT_PREFIX void finalSha1(struct sha1Context_t *context, unsigned char *digest);
+VIRIATUM_EXPORT_PREFIX void _transformSha1(unsigned int state[5], const unsigned char buffer[64]);

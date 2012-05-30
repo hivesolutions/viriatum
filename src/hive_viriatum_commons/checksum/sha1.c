@@ -89,7 +89,7 @@ void updateSha1(struct sha1Context_t *context, const unsigned char *data, const 
     memcpy(&context->buffer[j], &data[i], len - i);
 }
 
-void finalSha1(struct sha1Context_t *context, unsigned char digest[SHA1_DIGEST_SIZE]) {
+void finalSha1(struct sha1Context_t *context, unsigned char *digest) {
     unsigned int i;
     unsigned char finalcount[8];
 
