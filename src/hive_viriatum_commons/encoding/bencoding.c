@@ -623,7 +623,7 @@ ERROR_CODE _bencodingListStartCallback(struct BencodingEngine_t *bencodingEngine
 ERROR_CODE _bencodingDictionaryStartCallback(struct BencodingEngine_t *bencodingEngine) {
     /* allocates space for the hash map and for the type
     structure that will encapsulate it */
-	struct HashMap_t *hashMap;
+    struct HashMap_t *hashMap;
     struct SortMap_t *sortMap;
     struct Type_t *type;
 
@@ -631,20 +631,20 @@ ERROR_CODE _bencodingDictionaryStartCallback(struct BencodingEngine_t *bencoding
     then uses it to store the (current) value */
     struct BencodingHandler_t *bencodingHandler = (struct BencodingHandler_t *) bencodingEngine->context;
 
-	/* TODO: put this condition under the bencoding engine */
-	if(1) {
-		/* creates a new sort map for the new structure (sequence) context
-		and then creates the respective type for the map */
-		createSortMap(&sortMap, 0);
-		createType(&type, SORT_MAP_TYPE);
-		*type = sortMapType(sortMap);
-	} else {
-		/* creates a new hash map for the new structure (sequence) context
-		and then creates the respective type for the map */
-		createHashMap(&hashMap, 0);
-		createType(&type, MAP_TYPE);
-		*type = mapType(hashMap);
-	}
+    /* TODO: put this condition under the bencoding engine */
+    if(1) {
+        /* creates a new sort map for the new structure (sequence) context
+        and then creates the respective type for the map */
+        createSortMap(&sortMap, 0);
+        createType(&type, SORT_MAP_TYPE);
+        *type = sortMapType(sortMap);
+    } else {
+        /* creates a new hash map for the new structure (sequence) context
+        and then creates the respective type for the map */
+        createHashMap(&hashMap, 0);
+        createType(&type, MAP_TYPE);
+        *type = mapType(hashMap);
+    }
 
     /* adds the sequence type to the sequence stack and then adds the
     current handler key to the key stack, then updates the current sequence

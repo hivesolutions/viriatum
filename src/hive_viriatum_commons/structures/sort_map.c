@@ -36,33 +36,33 @@ void createSortMap(struct SortMap_t **sortMapPointer, size_t initialSize) {
     /* allocates space for the sort map */
     struct SortMap_t *sortMap = (struct SortMap_t *) MALLOC(sortMapSize);
 
-	/* creates the internal structures for internal
-	control of the items */
-	createHashMap(&sortMap->hashMap, initialSize);
-	createLinkedList(&sortMap->keyList);
-	createLinkedList(&sortMap->keyStringList);
+    /* creates the internal structures for internal
+    control of the items */
+    createHashMap(&sortMap->hashMap, initialSize);
+    createLinkedList(&sortMap->keyList);
+    createLinkedList(&sortMap->keyStringList);
 
     /* sets the sort map in the sort map pointer */
     *sortMapPointer = sortMap;
 }
 
 void deleteSortMap(struct SortMap_t *sortMap) {
-	/* deletes the internal structures */
-	deleteLinkedList(sortMap->keyStringList);
-	deleteLinkedList(sortMap->keyList);
-	deleteHashMap(sortMap->hashMap);
+    /* deletes the internal structures */
+    deleteLinkedList(sortMap->keyStringList);
+    deleteLinkedList(sortMap->keyList);
+    deleteHashMap(sortMap->hashMap);
 
     /* releases the sort map */
     FREE(sortMap);
 }
 
 void setValueSortMap(struct SortMap_t *sortMap, size_t key, unsigned char *keyString, void *value) {
-	struct HashMapElement_t *element;
+    struct HashMapElement_t *element;
 
-	setValueHashMap(sortMap->hashMap, key, keyString, value);
-	getHashMap(sortMap->hashMap, key, keyString, &element);
-	appendValueLinkedList(sortMap->keyList, (void *) key);
-	appendValueLinkedList(sortMap->keyStringList, (void *) element->keyString);
+    setValueHashMap(sortMap->hashMap, key, keyString, value);
+    getHashMap(sortMap->hashMap, key, keyString, &element);
+    appendValueLinkedList(sortMap->keyList, (void *) key);
+    appendValueLinkedList(sortMap->keyStringList, (void *) element->keyString);
 }
 
 void setValueStringSortMap(struct SortMap_t *sortMap, unsigned char *keyString, void *value) {
@@ -73,7 +73,7 @@ void setValueStringSortMap(struct SortMap_t *sortMap, unsigned char *keyString, 
 }
 
 void getValueSortMap(struct SortMap_t *sortMap, size_t key, unsigned char *keyString, void **valuePointer) {
-	getValueHashMap(sortMap->hashMap, key, keyString, valuePointer);
+    getValueHashMap(sortMap->hashMap, key, keyString, valuePointer);
 }
 
 void getValueStringSortMap(struct SortMap_t *sortMap, unsigned char *keyString, void **valuePointer) {
@@ -144,35 +144,35 @@ void getNextIteratorSortMap(struct Iterator_t *iterator, void **nextPointer) {
     /* allocates space for the next value */
     void *next;
 
-	/* allocates space for both the key value and the key
-	string value to be used for value retrieval */
-	size_t key;
-	unsigned char *keyString;
+    /* allocates space for both the key value and the key
+    string value to be used for value retrieval */
+    size_t key;
+    unsigned char *keyString;
 
     /* in case the current index excedes the elements
     in the key list (it's the end of iteration) */
-	if(currentIndex >= sortMap->keyList->size) {
+    if(currentIndex >= sortMap->keyList->size) {
         /* sets the next element as null (end of iteration) */
         next = NULL;
-	}
-	/* otherwise there's still space for retrieval
-	of more elements */
-	else {
+    }
+    /* otherwise there's still space for retrieval
+    of more elements */
+    else {
         /* retrieves the */
-		getValueLinkedList(sortMap->keyList, currentIndex, (void **) &key);
-		getValueLinkedList(sortMap->keyStringList, currentIndex, (void **) &keyString);
+        getValueLinkedList(sortMap->keyList, currentIndex, (void **) &key);
+        getValueLinkedList(sortMap->keyStringList, currentIndex, (void **) &keyString);
 
-		/* retrieves the current element from the elements
-		buffer */
-		getHashMap(sortMap->hashMap, key, keyString, &element);
+        /* retrieves the current element from the elements
+        buffer */
+        getHashMap(sortMap->hashMap, key, keyString, &element);
 
-		/* sets the next value in iteration as
-		the element key (next value in iteration) */
-		next = (void *) &element->key;
+        /* sets the next value in iteration as
+        the element key (next value in iteration) */
+        next = (void *) &element->key;
 
-		/* increments the current index value */
-		currentIndex++;
-	}
+        /* increments the current index value */
+        currentIndex++;
+    }
 
     /* sets the current index in the iterator parameters */
     iterator->parameters = (void *) currentIndex;
@@ -194,35 +194,35 @@ void getNextElementIteratorSortMap(struct Iterator_t *iterator, void **nextPoint
     /* allocates space for the next value */
     void *next;
 
-	/* allocates space for both the key value and the key
-	string value to be used for value retrieval */
-	size_t key;
-	unsigned char *keyString;
+    /* allocates space for both the key value and the key
+    string value to be used for value retrieval */
+    size_t key;
+    unsigned char *keyString;
 
     /* in case the current index excedes the elements
     in the key list (it's the end of iteration) */
-	if(currentIndex >= sortMap->keyList->size) {
+    if(currentIndex >= sortMap->keyList->size) {
         /* sets the next element as null (end of iteration) */
         next = NULL;
-	}
-	/* otherwise there's still space for retrieval
-	of more elements */
-	else {
+    }
+    /* otherwise there's still space for retrieval
+    of more elements */
+    else {
         /* retrieves the */
-		getValueLinkedList(sortMap->keyList, currentIndex, (void **) &key);
-		getValueLinkedList(sortMap->keyStringList, currentIndex, (void **) &keyString);
+        getValueLinkedList(sortMap->keyList, currentIndex, (void **) &key);
+        getValueLinkedList(sortMap->keyStringList, currentIndex, (void **) &keyString);
 
-		/* retrieves the current element from the elements
-		buffer */
-		getHashMap(sortMap->hashMap, key, keyString, &element);
+        /* retrieves the current element from the elements
+        buffer */
+        getHashMap(sortMap->hashMap, key, keyString, &element);
 
-		/* sets the next value in iteration as
-		the element (next value in iteration) */
-		next = (void *) element;
+        /* sets the next value in iteration as
+        the element (next value in iteration) */
+        next = (void *) element;
 
-		/* increments the current index value */
-		currentIndex++;
-	}
+        /* increments the current index value */
+        currentIndex++;
+    }
 
     /* sets the current index in the iterator parameters */
     iterator->parameters = (void *) currentIndex;

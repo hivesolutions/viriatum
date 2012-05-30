@@ -102,7 +102,7 @@ typedef enum Type_e {
     FLOAT_TYPE,
     STRING_TYPE,
     MAP_TYPE,
-	SORT_MAP_TYPE,
+    SORT_MAP_TYPE,
     LIST_TYPE,
     VOID_TYPE
 } _Type;

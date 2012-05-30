@@ -533,7 +533,7 @@ void runSimpleTests() {
     /* tests the hash map */
     testHashMap();
 
-	/* tests the sort map */
+    /* tests the sort map */
     testSortMap();
 
     /* tests the string buffer */
