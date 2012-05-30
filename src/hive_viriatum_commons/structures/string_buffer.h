@@ -52,7 +52,7 @@ typedef struct StringBuffer_t {
 
     /**
      * The list of lengths for the strings
-	 * that compose the complete string value.
+     * that compose the complete string value.
      */
     struct LinkedList_t *lengthList;
 
