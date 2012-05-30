@@ -148,19 +148,19 @@ ERROR_CODE openHandlerStreamHttpClient(struct IoConnection_t *ioConnection) {
     char *buffer = MALLOC(1024);
 
     struct Type_t *_type;
-    char *_buffer;
+    unsigned char *_buffer;
     size_t _bufferSize;
     unsigned char infoHash[SHA1_DIGEST_SIZE];
 	unsigned char random[12];
 	unsigned char peerId[20];
 
-	SPRINTF(peerId, 20, "-%s%d%d%d0-", VIRIATUM_PREFIX, VIRIATUM_MAJOR, VIRIATUM_MINOR, VIRIATUM_MICRO);
+	SPRINTF((char *) peerId, 20, "-%s%d%d%d0-", VIRIATUM_PREFIX, VIRIATUM_MAJOR, VIRIATUM_MINOR, VIRIATUM_MICRO);
 	randomBuffer(random, 12);
 	memcpy(peerId + 8, random, 12);
 	peerId[20] = '\0';
 
     decodeBencodingFile("C:/verysleepy_0_82.exe.torrent", &type);
-    getValueStringSortMap(type->value.valueSortMap, "info", (void **) &_type);
+    getValueStringSortMap(type->value.valueSortMap, (unsigned char *) "info", (void **) &_type);
     encodeBencoding(_type, &_buffer, &_bufferSize);
     sha1(_buffer, _bufferSize, infoHash);
     printType(type);
