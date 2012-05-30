@@ -152,7 +152,7 @@ ERROR_CODE openHandlerStreamHttpClient(struct IoConnection_t *ioConnection) {
     size_t _bufferSize;
     unsigned char infoHash[SHA1_DIGEST_SIZE];
 	unsigned char random[12];
-	unsigned char peerId[20];
+	unsigned char peerId[21];
 
 	SPRINTF((char *) peerId, 20, "-%s%d%d%d0-", VIRIATUM_PREFIX, VIRIATUM_MAJOR, VIRIATUM_MINOR, VIRIATUM_MICRO);
 	randomBuffer(random, 12);
