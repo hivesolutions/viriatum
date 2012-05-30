@@ -136,6 +136,108 @@ ERROR_CODE randomBuffer(unsigned char *buffer, size_t bufferSize) {
 }
 
 
+
+
+
+
+
+/* Converts a hex character to its integer value */
+char from_hex(char ch) {
+  return isdigit(ch) ? ch - '0' : tolower(ch) - 'a' + 10;
+}
+
+/* Converts an integer value to its hex character*/
+char to_hex(char code) {
+  static char hex[] = "0123456789abcdef";
+  return hex[code & 15];
+}
+
+char _isalnum(unsigned char byte) {
+	if((byte >= '0' && byte <= '9') ||
+	   (byte >= 'a' && byte <= 'z') ||
+	   (byte >= 'A' && byte <= 'Z')) {
+        return 1;
+	}
+
+	return 0;
+}
+
+/* Returns a url-encoded version of str */
+/* IMPORTANT: be sure to free() the returned string after use */
+char *url_encode(char *str) {
+  char *pstr = str, *buf = malloc(strlen(str) * 3 + 1), *pbuf = buf;
+  while (*pstr) {
+    if (_isalnum(*pstr) || *pstr == '-' || *pstr == '_' || *pstr == '.' || *pstr == '~') 
+      *pbuf++ = *pstr;
+    else if (*pstr == ' ') 
+      *pbuf++ = '+';
+    else 
+      *pbuf++ = '%', *pbuf++ = to_hex(*pstr >> 4), *pbuf++ = to_hex(*pstr & 15);
+    pstr++;
+  }
+  *pbuf = '\0';
+  return buf;
+}
+
+/* Returns a url-decoded version of str */
+/* IMPORTANT: be sure to free() the returned string after use */
+char *url_decode(char *str) {
+  char *pstr = str, *buf = malloc(strlen(str) + 1), *pbuf = buf;
+  while (*pstr) {
+    if (*pstr == '%') {
+      if (pstr[1] && pstr[2]) {
+        *pbuf++ = from_hex(pstr[1]) << 4 | from_hex(pstr[2]);
+        pstr += 2;
+      }
+    } else if (*pstr == '+') { 
+      *pbuf++ = ' ';
+    } else {
+      *pbuf++ = *pstr;
+    }
+    pstr++;
+  }
+  *pbuf = '\0';
+  return buf;
+}
+
+
+
+ERROR_CODE generateParameters(struct HashMap_t *hashMap, unsigned char **bufferPointer, size_t *bufferLengthPointer) {
+    struct Iterator_t *iterator;
+    struct HashMapElement_t *element;
+	struct StringBuffer_t *stringBuffer;
+	unsigned char *stringValue;
+	char isFirst = 1;
+
+	createStringBuffer(&stringBuffer);
+    createElementIteratorHashMap(hashMap, &iterator);
+
+    while(1) {
+        getNextIterator(iterator, (void **) &element);
+        if(element == NULL) { break; }
+		if(isFirst) { isFirst = 0; }
+		else { appendStringBuffer(stringBuffer, (unsigned char *) "&"); }
+		appendStringBuffer(stringBuffer, (unsigned char *) element->keyString);
+		appendStringBuffer(stringBuffer, (unsigned char *) "=");
+		appendStringBuffer(stringBuffer, (unsigned char *) url_encode(element->value));
+    }
+
+	/* "joins" the string buffer values into a single
+    value (from the internal string list) */
+    joinStringBuffer(stringBuffer, &stringValue);
+
+    deleteIteratorHashMap(hashMap, iterator);
+	deleteStringBuffer(stringBuffer);
+
+	*bufferPointer = stringValue;
+	*bufferLengthPointer = strlen(stringValue);
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+
+
 ERROR_CODE openHandlerStreamHttpClient(struct IoConnection_t *ioConnection) {
     /* allocates the http client connection and retrieves the
     "upper" connection (for parameters retrieval) */
@@ -150,9 +252,12 @@ ERROR_CODE openHandlerStreamHttpClient(struct IoConnection_t *ioConnection) {
     struct Type_t *_type;
     unsigned char *_buffer;
     size_t _bufferSize;
-    unsigned char infoHash[SHA1_DIGEST_SIZE];
+    unsigned char infoHash[SHA1_DIGEST_SIZE + 1];
 	unsigned char random[12];
 	unsigned char peerId[21];
+	struct HashMap_t *parametersMap;
+	unsigned char *getString;
+	size_t getStringSize;
 
 	SPRINTF((char *) peerId, 20, "-%s%d%d%d0-", VIRIATUM_PREFIX, VIRIATUM_MAJOR, VIRIATUM_MINOR, VIRIATUM_MICRO);
 	randomBuffer(random, 12);
@@ -167,15 +272,37 @@ ERROR_CODE openHandlerStreamHttpClient(struct IoConnection_t *ioConnection) {
     freeType(type);
     FREE(_buffer);
 
+	/* VOU TER DE UTILIzAR O STRING_T aki para enviar o info hash, etc senao posso
+	ter problemas graves, se calhar e melhor tambe fazer o string buffer para string_t */
+
+	infoHash[SHA1_DIGEST_SIZE] = '\0'; /* THIS IS A HUGE HACK */
+
 	
 	/* tenho de fazer gerador de get parameters !!!! */
+	/* pega nas chaves e nos valores do hash map e gera a get string para um string buffer */
+	createHashMap(&parametersMap, 0);
+
+	setValueStringHashMap(parametersMap, "info_hash", (void *) infoHash);
+	setValueStringHashMap(parametersMap, "peer_id", (void *) peerId);
+	setValueStringHashMap(parametersMap, "port", (void *) "8080");
+	setValueStringHashMap(parametersMap, "uploaded", (void *) "0");
+	setValueStringHashMap(parametersMap, "downloaded", (void *) "0");
+	setValueStringHashMap(parametersMap, "left", (void *) "3213210");  /* must calculate this value */
+	setValueStringHashMap(parametersMap, "compact", (void *) "0");
+	setValueStringHashMap(parametersMap, "no_peer_id", (void *) "0");
+	setValueStringHashMap(parametersMap, "event", (void *) "started");
+	generateParameters(parametersMap, &getString, &getStringSize);
+
+
+	deleteHashMap(parametersMap);
 
 
 
 
 
-    SPRINTF(buffer, 1024, "GET %s HTTP/1.1\r\nUser-Agent: viriatum/0.1.0 (linux - intel x64)\r\nConnection: keep-alive\r\n\r\n", parameters->url);
+    SPRINTF(buffer, 1024, "GET %s?%s HTTP/1.1\r\nUser-Agent: viriatum/0.1.0 (linux - intel x64)\r\nConnection: keep-alive\r\n\r\n", parameters->url, getString);
 
+	FREE(getString);
 
     /* creates the http client connection */
     createHttpClientConnection(&httpClientConnection, ioConnection);
