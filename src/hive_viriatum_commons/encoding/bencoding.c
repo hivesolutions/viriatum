@@ -250,6 +250,25 @@ ERROR_CODE _encodeType(struct Type_t *type, struct StringBuffer_t *stringBuffer)
 
             break;
 
+        case SORT_MAP_TYPE:
+            appendStringBuffer(stringBuffer, (unsigned char *) "d");
+
+            createElementIteratorSortMap(type->value.valueSortMap, &iterator);
+
+            while(1) {
+                getNextIterator(iterator, (void **) &element);
+                if(element == NULL) { break; }
+                key = stringType((char *) element->keyString);
+                _encodeType(&key, stringBuffer);
+                _encodeType((struct Type_t *) element->value, stringBuffer);
+            }
+
+            deleteIteratorSortMap(type->value.valueSortMap, iterator);
+
+            appendStringBuffer(stringBuffer, (unsigned char *) "e");
+
+            break;
+
         default:
             break;
     }
@@ -463,6 +482,15 @@ ERROR_CODE _bencodingIntegerEndCallback(struct BencodingEngine_t *bencodingEngin
                 /* breaks the switch */
                 break;
 
+            case SORT_MAP_TYPE:
+                /* sets the value in the map for the current key and sets the next key
+                flag so that the next string is saved as a key */
+                setValueStringSortMap(bencodingHandler->sequence->value.valueSortMap, bencodingHandler->key, (void *) type);
+                bencodingHandler->nextKey = 1;
+
+                /* breaks the switch */
+                break;
+
             default:
                 /* breaks the switch */
                 break;
@@ -533,6 +561,15 @@ ERROR_CODE _bencodingStringEndCallback(struct BencodingEngine_t *bencodingEngine
                 /* breaks the switch */
                 break;
 
+            case SORT_MAP_TYPE:
+                /* sets the value in the map for the current key and sets the next key
+                flag so that the next string is saved as a key */
+                setValueStringSortMap(bencodingHandler->sequence->value.valueSortMap, bencodingHandler->key, (void *) type);
+                bencodingHandler->nextKey = 1;
+
+                /* breaks the switch */
+                break;
+
             default:
                 /* breaks the switch */
                 break;
@@ -586,18 +623,28 @@ ERROR_CODE _bencodingListStartCallback(struct BencodingEngine_t *bencodingEngine
 ERROR_CODE _bencodingDictionaryStartCallback(struct BencodingEngine_t *bencodingEngine) {
     /* allocates space for the hash map and for the type
     structure that will encapsulate it */
-    struct HashMap_t *hashMap;
+	struct HashMap_t *hashMap;
+    struct SortMap_t *sortMap;
     struct Type_t *type;
 
     /* retrieves the bencoding handler from the template engine context
     then uses it to store the (current) value */
     struct BencodingHandler_t *bencodingHandler = (struct BencodingHandler_t *) bencodingEngine->context;
 
-    /* creates a new hash map for the new structure (sequence) context
-    and then creates the respective type for the map */
-    createHashMap(&hashMap, 0);
-    createType(&type, MAP_TYPE);
-    *type = mapType(hashMap);
+	/* TODO: put this condition under the bencoding engine */
+	if(1) {
+		/* creates a new sort map for the new structure (sequence) context
+		and then creates the respective type for the map */
+		createSortMap(&sortMap, 0);
+		createType(&type, SORT_MAP_TYPE);
+		*type = sortMapType(sortMap);
+	} else {
+		/* creates a new hash map for the new structure (sequence) context
+		and then creates the respective type for the map */
+		createHashMap(&hashMap, 0);
+		createType(&type, MAP_TYPE);
+		*type = mapType(hashMap);
+	}
 
     /* adds the sequence type to the sequence stack and then adds the
     current handler key to the key stack, then updates the current sequence
@@ -641,7 +688,7 @@ ERROR_CODE _bencodingSequenceEndCallback(struct BencodingEngine_t *bencodingEngi
 
     /* in case the current (previous) sequence is a map, must do some
     garbage collection to avoid leeks */
-    if(sequence->type == MAP_TYPE) {
+    if(sequence->type == MAP_TYPE || sequence->type == SORT_MAP_TYPE) {
         /* in case there is a key currently defined in the handler
         must release its memory (to avoid any leaks) */
         if(bencodingHandler->key != NULL) { FREE(bencodingHandler->key); }
@@ -672,6 +719,19 @@ ERROR_CODE _bencodingSequenceEndCallback(struct BencodingEngine_t *bencodingEngi
             /* sets the lower value in the upper map for the current key
             this is the lower upper layer association */
             setValueStringHashMap(bencodingHandler->sequence->value.valueMap, key, (void *) sequence);
+
+            /* sets the retrieved key as the current key and
+            sets the next key flag to force the retrieval of key */
+            bencodingHandler->key = key;
+            bencodingHandler->nextKey = 1;
+
+            /* breaks the switch */
+            break;
+
+        case SORT_MAP_TYPE:
+            /* sets the lower value in the upper map for the current key
+            this is the lower upper layer association */
+            setValueStringSortMap(bencodingHandler->sequence->value.valueSortMap, key, (void *) sequence);
 
             /* sets the retrieved key as the current key and
             sets the next key flag to force the retrieval of key */
