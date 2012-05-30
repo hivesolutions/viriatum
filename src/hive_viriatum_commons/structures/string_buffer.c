@@ -98,7 +98,7 @@ void appendStringBuffer(struct StringBuffer_t *stringBuffer, unsigned char *stri
     stringBuffer->stringLength += stringValueLength;
 }
 
-void appendStringSBuffer(struct StringBuffer_t *stringBuffer, unsigned char *stringValue, size_t stringLength) {
+void appendStringLBuffer(struct StringBuffer_t *stringBuffer, unsigned char *stringValue, size_t stringLength) {
     /* adds the string value to the list of strings and then
     increments the (total) string length with the length of
     the current string value */
@@ -110,7 +110,7 @@ void appendStringSBuffer(struct StringBuffer_t *stringBuffer, unsigned char *str
 void appendStringTBuffer(struct StringBuffer_t *stringBuffer, struct String_t *string) {
 	/* adds the string structure value to the string buffer,
 	using the length oriented append function */
-	appendStringSBuffer(stringBuffer, string->buffer, string->length);
+	appendStringLBuffer(stringBuffer, string->buffer, string->length);
 }
 
 void joinStringBuffer(struct StringBuffer_t *stringBuffer, unsigned char **stringValuePointer) {
@@ -191,7 +191,7 @@ void _appendStringLBuffer(struct StringBuffer_t *stringBuffer, unsigned char *st
     appendValueLinkedList(stringBuffer->releaseList, stringValue);
 
     /* adds the string (with length) value to the string buffer */
-    appendStringSBuffer(stringBuffer, stringValue, stringLength);
+    appendStringLBuffer(stringBuffer, stringValue, stringLength);
 }
 
 void _appendStringTBuffer(struct StringBuffer_t *stringBuffer, struct String_t *string) {
