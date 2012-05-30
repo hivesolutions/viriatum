@@ -150,21 +150,18 @@ ERROR_CODE randomBuffer(unsigned char *buffer, size_t bufferSize) {
 
 /* Converts a hex character to its integer value */
 char from_hex(char ch) {
-  return isdigit(ch) ? ch - '0' : tolower(ch) - 'a' + 10;
+	return isdigit(ch) ? ch - '0' : tolower(ch) - 'a' + 10;
 }
 
 /* Converts an integer value to its hex character*/
 char to_hex(char code) {
-  static char hex[] = "0123456789abcdef";
-  return hex[code & 15];
+	static char hex[] = "0123456789abcdef";
+	return hex[code & 15];
 }
 
 char _isalnum(unsigned char byte) {
-    if((byte >= '0' && byte <= '9') ||
-       (byte >= 'a' && byte <= 'z') ||
-       (byte >= 'A' && byte <= 'Z')) {
-        return 1;
-    }
+    if((byte >= '0' && byte <= '9') || (byte >= 'a' && byte <= 'z') ||
+       (byte >= 'A' && byte <= 'Z')) { return 1; }
 
     return 0;
 }
