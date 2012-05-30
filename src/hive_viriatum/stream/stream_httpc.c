@@ -116,6 +116,25 @@ ERROR_CODE dataHandlerStreamHttpClient(struct IoConnection_t *ioConnection, unsi
     RAISE_NO_ERROR;
 }
 
+ERROR_CODE randomBuffer(unsigned char *buffer, size_t bufferSize) {
+	size_t index;
+	time_t seconds;
+	int random;
+	unsigned char byte;
+
+	time(&seconds);
+	srand((unsigned int) seconds);
+
+	for(index = 0; index < bufferSize; index++) {
+		random = rand();
+		byte = (unsigned char) (random % 94);
+		buffer[index] = byte + 34;
+	}
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
 ERROR_CODE openHandlerStreamHttpClient(struct IoConnection_t *ioConnection) {
     /* allocates the http client connection and retrieves the
     "upper" connection (for parameters retrieval) */
@@ -130,18 +149,28 @@ ERROR_CODE openHandlerStreamHttpClient(struct IoConnection_t *ioConnection) {
     struct Type_t *_type;
     char *_buffer;
     size_t _bufferSize;
-    char result[SHA1_DIGEST_SIZE];
+    unsigned char infoHash[SHA1_DIGEST_SIZE];
+	unsigned char random[12];
+	unsigned char peerId[20];
 
-
+	SPRINTF(peerId, 20, "-VR0100-");
+	randomBuffer(random, 12);
+	memcpy(peerId + 8, random, 12);
+	peerId[20] = '\0';
 
     decodeBencodingFile("C:/verysleepy_0_82.exe.torrent", &type);
     getValueStringSortMap(type->value.valueSortMap, "info", (void **) &_type);
     encodeBencoding(_type, &_buffer, &_bufferSize);
-    sha1(_buffer, _bufferSize, result);
-
+    sha1(_buffer, _bufferSize, infoHash);
     printType(type);
     freeType(type);
     FREE(_buffer);
+
+	
+	/* tenho de fazer gerador de get parameters !!!! */
+
+
+
 
 
     SPRINTF(buffer, 1024, "GET %s HTTP/1.1\r\nUser-Agent: viriatum/0.1.0 (linux - intel x64)\r\nConnection: keep-alive\r\n\r\n", parameters->url);
