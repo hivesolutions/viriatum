@@ -27,6 +27,7 @@
 
 #pragma once
 
+#include "string.h"
 #include "iterator.h"
 #include "linked_list.h"
 
@@ -101,6 +102,16 @@ VIRIATUM_EXPORT_PREFIX void appendStringBuffer(struct StringBuffer_t *stringBuff
 VIRIATUM_EXPORT_PREFIX void appendStringLBuffer(struct StringBuffer_t *stringBuffer, unsigned char *stringValue, size_t stringLength);
 
 /**
+ * Appends (adds) a string value to the string buffer, this value
+ * will be appended to the final "joined" string.
+ * The string structure is provided so no length calculation is done.
+ *
+ * @param stringBuffer The string buffer reference.
+ * @param string The string structure to be added to the string buffer.
+ */
+VIRIATUM_EXPORT_PREFIX void appendStringTBuffer(struct StringBuffer_t *stringBuffer, struct String_t *string);
+
+/**
  * "Joins" the internal buffer of strings creating the final
  * string that is returned from the given string value pointer.
  *
@@ -138,3 +149,16 @@ VIRIATUM_EXPORT_PREFIX void _appendStringBuffer(struct StringBuffer_t *stringBuf
  * string buffer.
  */
 VIRIATUM_EXPORT_PREFIX void _appendStringLBuffer(struct StringBuffer_t *stringBuffer, unsigned char *stringValue, size_t stringLength);
+
+/**
+ * Appends (adds) a string value to the string buffer, this value
+ * will be appended to the final "joined" string.
+ * The string structure is provided so no length calculation is done.
+ * This method releases the memory of the added string value, uppon
+ * releasing the string buffer memory.
+ * Use this method carefully it may cause memory corruption.
+ *
+ * @param stringBuffer The string buffer reference.
+ * @param string The string structure to be added to the string buffer.
+ */
+VIRIATUM_EXPORT_PREFIX void _appendStringTBuffer(struct StringBuffer_t *stringBuffer, struct String_t *string);
