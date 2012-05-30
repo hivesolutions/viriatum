@@ -29,24 +29,6 @@
 
 #include "sha1.h"
 
-#define rol(value, bits) (((value) << (bits)) | ((value) >> (32 - (bits))))
-
-#ifdef WORDS_BIGENDIAN
-#define blk0(i) block->l[i]
-#else
-#define blk0(i) (block->l[i] = (rol(block->l[i],24)&0xFF00FF00) \
-    |(rol(block->l[i],8)&0x00FF00FF))
-#endif
-#define blk(i) (block->l[i&15] = rol(block->l[(i+13)&15]^block->l[(i+8)&15] \
-    ^block->l[(i+2)&15]^block->l[i&15],1))
-
-/* (R0+R1), R2, R3, R4 are the different operations used in SHA1 */
-#define R0(v,w,x,y,z,i) z +=((w&(x^y))^y)+blk0(i)+0x5A827999+rol(v,5); w=rol(w,30);
-#define R1(v,w,x,y,z,i) z += ((w&(x^y))^y)+blk(i)+0x5A827999+rol(v,5); w=rol(w,30);
-#define R2(v,w,x,y,z,i) z += (w^x^y)+blk(i)+0x6ED9EBA1+rol(v,5); w=rol(w,30);
-#define R3(v,w,x,y,z,i) z += (((w|x)&y)|(w&x))+blk(i)+0x8F1BBCDC+rol(v,5); w=rol(w,30);
-#define R4(v,w,x,y,z,i) z += (w^x^y)+blk(i)+0xCA62C1D6+rol(v,5); w=rol(w,30);
-
 void sha1(unsigned char *buffer, unsigned int bufferLength, unsigned char *result) {
     /* allocates space for the sha1 context */
     struct sha1Context_t sha1Context;
@@ -72,14 +54,12 @@ void updateSha1(struct sha1Context_t *context, const unsigned char *data, const 
     size_t i, j;
 
     j = (context->count[0] >> 3) & 63;
-    if ((context->count[0] += len << 3) < (len << 3)) context->count[1]++;
+	if((context->count[0] += len << 3) < (len << 3)) { context->count[1]++; }
     context->count[1] += (len >> 29);
-    if ((j + len) > 63) {
-        memcpy(&context->buffer[j], data, (i = 64-j));
+    if((j + len) > 63) {
+        memcpy(&context->buffer[j], data, (i = 64 - j));
         _transformSha1(context->state, context->buffer);
-        for ( ; i + 63 < len; i += 64) {
-            _transformSha1(context->state, data + i);
-        }
+        for(; i + 63 < len; i += 64) { _transformSha1(context->state, data + i); }
         j = 0;
     }
     else {
@@ -93,20 +73,12 @@ void finalSha1(struct sha1Context_t *context, unsigned char *digest) {
     unsigned int i;
     unsigned char finalcount[8];
 
-    for (i = 0; i < 8; i++) {
-        finalcount[i] = (unsigned char)((context->count[(i >= 4 ? 0 : 1)]
-         >> ((3-(i & 3)) * 8) ) & 255);  /* Endian independent */
-    }
+    for(i = 0; i < 8; i++) { finalcount[i] = (unsigned char) ((context->count[(i >= 4 ? 0 : 1)] >> ((3-(i & 3)) * 8) ) & 255); }
 
     updateSha1(context, (unsigned char *)"\200", 1);
-    while ((context->count[0] & 504) != 448) {
-        updateSha1(context, (unsigned char *)"\0", 1);
-    }
-    updateSha1(context, finalcount, 8);  /* Should cause a SHA1_Transform() */
-    for (i = 0; i < SHA1_DIGEST_SIZE; i++) {
-        digest[i] = (unsigned char)
-         ((context->state[i>>2] >> ((3-(i & 3)) * 8) ) & 255);
-    }
+    while((context->count[0] & 504) != 448) { updateSha1(context, (unsigned char *)"\0", 1); }
+    updateSha1(context, finalcount, 8);
+    for(i = 0; i < SHA1_DIGEST_SIZE; i++) { digest[i] = (unsigned char) ((context->state[i>>2] >> ((3-(i & 3)) * 8) ) & 255); }
 
     /* wipes the current variables, no more usage
     is possible (permanent delete) */
@@ -119,13 +91,9 @@ void finalSha1(struct sha1Context_t *context, unsigned char *digest) {
 
 void _transformSha1(unsigned int state[5], const unsigned char buffer[64]) {
     unsigned int a, b, c, d, e;
-    typedef union {
-        unsigned char c[64];
-        unsigned int l[16];
-    } CHAR64LONG16;
-    CHAR64LONG16* block;
+    union sha1Block_t *block;
 
-    block = (CHAR64LONG16*)buffer;
+    block = (union sha1Block_t *) buffer;
 
     /* copies context state to working vars */
     a = state[0];
