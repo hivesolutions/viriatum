@@ -143,58 +143,58 @@ ERROR_CODE randomBuffer(unsigned char *buffer, size_t bufferSize) {
 }
 
 ERROR_CODE generateParameters(struct HashMap_t *hashMap, unsigned char **bufferPointer, size_t *bufferLengthPointer) {
-	/* allocates space for an iterator object for an hash map element
-	and for the string buffer to be used to collect all the partial
-	strings that compose the complete url parameters string */
+    /* allocates space for an iterator object for an hash map element
+    and for the string buffer to be used to collect all the partial
+    strings that compose the complete url parameters string */
     struct Iterator_t *iterator;
     struct HashMapElement_t *element;
     struct StringBuffer_t *stringBuffer;
 
-	/* allocates space for the string structure to hold the value of
-	the element for the string value reference for the joined string,
-	for the buffer string from the element and for the corresponding
-	string lengths for both cases */
-	struct String_t *string;
+    /* allocates space for the string structure to hold the value of
+    the element for the string value reference for the joined string,
+    for the buffer string from the element and for the corresponding
+    string lengths for both cases */
+    struct String_t *string;
     unsigned char *stringValue;
     unsigned char *_buffer;
-	size_t stringLength;
+    size_t stringLength;
     size_t _length;
 
-	/* allocates and sets the initial value on the flag that controls
-	if the iteratio to generate key values is the first one */
+    /* allocates and sets the initial value on the flag that controls
+    if the iteratio to generate key values is the first one */
     char isFirst = 1;
 
-	/* creates a new string buffer and a new hash map
-	iterator, these structures are going to be used to
-	handle the string from the hash map and to iterate
-	over the hash map elements */
+    /* creates a new string buffer and a new hash map
+    iterator, these structures are going to be used to
+    handle the string from the hash map and to iterate
+    over the hash map elements */
     createStringBuffer(&stringBuffer);
     createElementIteratorHashMap(hashMap, &iterator);
 
-	/* iterates continuously arround the hash map element
-	the iterator is going to stop the iteration */
+    /* iterates continuously arround the hash map element
+    the iterator is going to stop the iteration */
     while(1) {
-		/* retrieves the next element from the iterator
-		and in case such element is invalid breaks the loop */
+        /* retrieves the next element from the iterator
+        and in case such element is invalid breaks the loop */
         getNextIterator(iterator, (void **) &element);
         if(element == NULL) { break; }
 
-		/* checks if this is the first loop in the iteration
-		in it's not emits the and character */
+        /* checks if this is the first loop in the iteration
+        in it's not emits the and character */
         if(isFirst) { isFirst = 0; }
         else { appendStringBuffer(stringBuffer, (unsigned char *) "&"); }
 
-		/* retrieves the current element value as a string structure
-		then encodes that value using the url encoding (percent encoding)
-		and resets the string reference to contain the new buffer as it'
-		own contents (avoids extra memory usage) */
+        /* retrieves the current element value as a string structure
+        then encodes that value using the url encoding (percent encoding)
+        and resets the string reference to contain the new buffer as it'
+        own contents (avoids extra memory usage) */
         string = (struct String_t *) element->value;
         urlEncode(string->buffer, string->length, &_buffer, &_length);
         string->buffer = _buffer;
         string->length = _length;
 
-		/* adds the various elements for the value to the string buffer
-		first the key the the attribution operator and then the value */
+        /* adds the various elements for the value to the string buffer
+        first the key the the attribution operator and then the value */
         appendStringBuffer(stringBuffer, (unsigned char *) element->keyString);
         appendStringLBuffer(stringBuffer, (unsigned char *) "=", sizeof("=") - 1);
         _appendStringTBuffer(stringBuffer, string);
@@ -202,18 +202,18 @@ ERROR_CODE generateParameters(struct HashMap_t *hashMap, unsigned char **bufferP
 
     /* "joins" the string buffer values into a single
     value (from the internal string list) and then
-	retrieves the length of the string buffer */
+    retrieves the length of the string buffer */
     joinStringBuffer(stringBuffer, &stringValue);
-	stringLength = stringBuffer->stringLength;
+    stringLength = stringBuffer->stringLength;
 
-	/* deletes the hash map iterator and string buffer
-	structures, to avoid memory leak */
+    /* deletes the hash map iterator and string buffer
+    structures, to avoid memory leak */
     deleteIteratorHashMap(hashMap, iterator);
     deleteStringBuffer(stringBuffer);
 
-	/* updates the buffer pointer reference and the
-	buffer length pointer reference with the string
-	value and the string length values */
+    /* updates the buffer pointer reference and the
+    buffer length pointer reference with the string
+    value and the string length values */
     *bufferPointer = stringValue;
     *bufferLengthPointer = stringLength;
 
@@ -232,6 +232,8 @@ ERROR_CODE openHandlerStreamHttpClient(struct IoConnection_t *ioConnection) {
 
     struct Type_t *type;
 
+	ERROR_CODE error;
+
     char *buffer = MALLOC(1024);
 
     struct Type_t *_type;
@@ -249,7 +251,9 @@ ERROR_CODE openHandlerStreamHttpClient(struct IoConnection_t *ioConnection) {
     randomBuffer(random, 12);
     memcpy(peerId + 8, random, 12);
 
-    decodeBencodingFile("C:/verysleepy_0_82.exe.torrent", &type);
+    error = decodeBencodingFile("C:/verysleepy_0_82.exe.torrent", &type);
+	if(error) { RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, "Problem reading torrent file"); }
+
     getValueStringSortMap(type->value.valueSortMap, (unsigned char *) "info", (void **) &_type);
     encodeBencoding(_type, &_buffer, &_bufferSize);
     sha1(_buffer, _bufferSize, infoHash);
