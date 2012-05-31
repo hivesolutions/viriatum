@@ -55,7 +55,7 @@ if %ERRORLEVEL% neq 0 ( cd %CURRENT_DIR% && exit /b %ERRORLEVEL% )
 :: removes the internal git repository directory to avoid
 :: extra files in source distribution
 rmdir /q /s %REPO_DIR%\.git
-del /q /d %REPO_DIR%\.gitignore
+del /q /f %REPO_DIR%\.gitignore
 
 :: sets the proper include and lib directory for build then
 :: runs the build process for the viriatum project, this
