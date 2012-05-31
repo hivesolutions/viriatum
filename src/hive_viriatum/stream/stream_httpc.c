@@ -224,18 +224,16 @@ ERROR_CODE generateParameters(struct HashMap_t *hashMap, unsigned char **bufferP
 
 
 ERROR_CODE openHandlerStreamHttpClient(struct IoConnection_t *ioConnection) {
-    /* allocates the http client connection and retrieves the
+	/* allocates space for the temporary error variable to
+	be used to detect errors in calls */
+    ERROR_CODE error;
+	
+	/* allocates the http client connection and retrieves the
     "upper" connection (for parameters retrieval) */
     struct HttpClientConnection_t *httpClientConnection;
     struct Connection_t *connection = (struct Connection_t *) ioConnection->connection;
     struct HttpClientParameters_t *parameters = (struct HttpClientParameters_t *) connection->parameters;
-
     struct Type_t *type;
-
-	ERROR_CODE error;
-
-    char *buffer = MALLOC(1024);
-
     struct Type_t *_type;
     unsigned char *_buffer;
     size_t _bufferSize;
@@ -246,6 +244,7 @@ ERROR_CODE openHandlerStreamHttpClient(struct IoConnection_t *ioConnection) {
     unsigned char *getString;
     size_t getStringSize;
     struct String_t strings[9];
+	char *buffer = MALLOC(1024);
 
     SPRINTF((char *) peerId, 20, "-%s%d%d%d0-", VIRIATUM_PREFIX, VIRIATUM_MAJOR, VIRIATUM_MINOR, VIRIATUM_MICRO);
     randomBuffer(random, 12);
