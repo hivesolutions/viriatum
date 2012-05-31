@@ -31,6 +31,7 @@ AC_PREREQ(2.61)
 
 # defines the general values
 AC_INIT(hive_viriatum, viriatum_version, development@hive.pt)
+AC_PROG_INSTALL
 AM_INIT_AUTOMAKE(hive_viriatum, viriatum_version)
 AC_CONFIG_SRCDIR([src])
 AC_CONFIG_HEADERS([src/config.h])
@@ -38,7 +39,6 @@ AC_CONFIG_MACRO_DIR([m4])
 
 # requires the libtool
 LT_INIT
-AC_PROG_INSTALL
 AC_PROG_LIBTOOL
 AM_PROG_LIBTOOL
 
