@@ -62,6 +62,18 @@ cd $repo
 rm -rf $repo/autom4te.cache
 rm -f $repo/autogen.sh $repo/Makefile-autoconfig
 
+for module in $repo/modules/*; do
+    cd $repo/modules/$module
+    ./autogen.sh
+    
+    rm -rf $repo/modules/$module/autom4te.cache
+    rm -f $repo/modules/$module/autogen.sh $repo/modules/$module/Makefile-autoconfig
+done
+
+# returns to the repository directory in order to resume
+# the file build (compilation
+cd $repo
+
 # copies the current source code snapshot (with configuration)
 # to the temporary directory to be used latter
 cp -rp $repo $temp_dir/$name_src/
