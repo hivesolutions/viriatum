@@ -43,11 +43,17 @@ git clone git://github.com/hivesolutions/viriatum.git $repo --quiet
 # must return immediately with the error
 if [ $? -ne 0 ]; then cd $current && exit $?; fi
 
-# runs the necessary make instructions
-# in the repository directory
+# runs the necessary make instructions to generate
+# the base scripts for configuration
 cd $repo
-./autogen
+./autogen.sh
+
+# copies the current source code snapshot (with configuration)
+# to the temporary directory to be used latter
 cp -rp $repo $temp/$name_src
+
+# runs the configuration script and then initiates the
+# comlete build process and installation into the result
 ./configure --prefix=$result_dir --with-wwwroot=$result_dir/var/viriatum/www --enable-defaults
 make && make install
 
