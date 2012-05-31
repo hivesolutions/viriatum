@@ -46,16 +46,22 @@ if [ $? -ne 0 ]; then cd $current && exit $?; fi
 # removes the internal git repository directory to avoid
 # extra files in source distribution
 rm -rf $repo/.git
-rm $repo/.gitignore
+rm -f $repo/.gitignore
 
 # removes the extra (non source files) from the source
 # distribution directory
-rm $repo/TODO
+rm -f $repo/TODO
 
 # runs the necessary make instructions to generate
 # the base scripts for configuration
 cd $repo
 ./autogen.sh
+
+# removes the extra (autoconf related files) from the source
+# distribution directory
+rm -rf $repo/autom4te.cache
+rm -f $repo/Common.am $repo/configure.ac
+find $repo -name Makefile.am -delete
 
 # copies the current source code snapshot (with configuration)
 # to the temporary directory to be used latter
