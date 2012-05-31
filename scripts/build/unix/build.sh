@@ -66,8 +66,8 @@ for module in $repo/modules/*; do
     cd $repo/modules/$module
     ./autogen.sh
     
-    rm -rf $repo/modules/$module/autom4te.cache
-    rm -f $repo/modules/$module/autogen.sh $repo/modules/$module/Makefile-autoconfig
+    rm -rf $module/autom4te.cache
+    rm -f $module/autogen.sh $module/Makefile-autoconfig
 done
 
 # returns to the repository directory in order to resume
