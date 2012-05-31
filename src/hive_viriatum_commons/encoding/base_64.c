@@ -31,18 +31,18 @@
 
 const char base64Characters[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
-int encodeBase64(unsigned char *buffer, size_t bufferLength, unsigned char **encodedBufferPointer, size_t *encodedBufferLengthPointer) {
+ERROR_CODE encodeBase64(unsigned char *buffer, size_t bufferLength, unsigned char **encodedBufferPointer, size_t *encodedBufferLengthPointer) {
     /* allocates the encoded buffer, and assigns the encoded buffer length */
     _allocateEncodedBuffer(bufferLength, encodedBufferPointer, encodedBufferLengthPointer);
 
     /* encodes the buffer into base 64 */
     _encodeBase64(buffer, bufferLength, *encodedBufferPointer, *encodedBufferLengthPointer);
 
-    /* returns valid */
-    return 0;
+    /* raises no error */
+    RAISE_NO_ERROR;
 }
 
-int decodeBase64(unsigned char *encodedBuffer, size_t encodedBufferLength, unsigned char **decodedBufferPointer, size_t *decodedBufferLengthPointer) {
+ERROR_CODE decodeBase64(unsigned char *encodedBuffer, size_t encodedBufferLength, unsigned char **decodedBufferPointer, size_t *decodedBufferLengthPointer) {
     /* retrieves the padding count from the encoded buffer */
     unsigned int paddingCount = _getPaddingCount(encodedBuffer, encodedBufferLength);
 
@@ -52,8 +52,8 @@ int decodeBase64(unsigned char *encodedBuffer, size_t encodedBufferLength, unsig
     /* decodes the buffer from base 64 */
     _decodeBase64(encodedBuffer, encodedBufferLength, *decodedBufferPointer, *decodedBufferLengthPointer, paddingCount);
 
-    /* returns valid */
-    return 0;
+    /* raises no error */
+    RAISE_NO_ERROR;
 }
 
 size_t calculateEncodedBufferLengthBase64(size_t bufferLength) {
@@ -84,7 +84,7 @@ size_t calculateDecodedBufferLenghtBase64(size_t encodedBufferLength, size_t pad
     return decodedBufferLength;
 }
 
-int _encodeBase64(unsigned char *buffer, size_t bufferLength, unsigned char *encodedBuffer, size_t encodedBufferLength) {
+ERROR_CODE _encodeBase64(unsigned char *buffer, size_t bufferLength, unsigned char *encodedBuffer, size_t encodedBufferLength) {
     /* allocates space for the the encoded buffer index */
     size_t encodedBufferIndex;
 
@@ -152,11 +152,11 @@ int _encodeBase64(unsigned char *buffer, size_t bufferLength, unsigned char *enc
         }
     }
 
-    /* returns one success */
-    return 1;
+    /* raises no error */
+    RAISE_NO_ERROR;
 }
 
-int _decodeBase64(unsigned char *encodedBuffer, size_t encodedBufferLength, unsigned char *buffer, size_t bufferLength, size_t paddingCount) {
+ERROR_CODE _decodeBase64(unsigned char *encodedBuffer, size_t encodedBufferLength, unsigned char *buffer, size_t bufferLength, size_t paddingCount) {
     /* allocates space for the the buffer index */
     size_t bufferIndex;
 
@@ -202,30 +202,30 @@ int _decodeBase64(unsigned char *encodedBuffer, size_t encodedBufferLength, unsi
         }
     }
 
-    /* returns one success */
-    return 1;
+    /* raises no error */
+    RAISE_NO_ERROR;
 }
 
-int _allocateEncodedBuffer(size_t bufferLength, unsigned char **encodedBufferPointer, size_t *encodedBufferLengthPointer) {
+ERROR_CODE _allocateEncodedBuffer(size_t bufferLength, unsigned char **encodedBufferPointer, size_t *encodedBufferLengthPointer) {
     /* allocates the encoded buffer length */
     *encodedBufferLengthPointer = calculateEncodedBufferLengthBase64(bufferLength);
 
     /* allocates the encoded buffer */
     *encodedBufferPointer = (unsigned char *) MALLOC(*encodedBufferLengthPointer);
 
-    /* returns valid */
-    return 0;
+    /* raises no error */
+    RAISE_NO_ERROR;
 }
 
-int _allocateDecodedBuffer(size_t encodedBufferLength, unsigned char **decodedBufferPointer, size_t *decodedBufferLengthPointer, size_t paddingCount) {
+ERROR_CODE _allocateDecodedBuffer(size_t encodedBufferLength, unsigned char **decodedBufferPointer, size_t *decodedBufferLengthPointer, size_t paddingCount) {
     /* allocates the decoded buffer length */
     *decodedBufferLengthPointer = calculateDecodedBufferLenghtBase64(encodedBufferLength, paddingCount);
 
     /* allocates the decoded buffer */
     *decodedBufferPointer = (unsigned char *) MALLOC(*decodedBufferLengthPointer);
 
-    /* returns valid */
-    return 0;
+    /* raises no error */
+    RAISE_NO_ERROR;
 }
 
 unsigned int _getPaddingCount(unsigned char *encodedBuffer, size_t encodedBufferLength) {
