@@ -101,7 +101,7 @@ ERROR_CODE openHandlerStreamTorrent(struct IoConnection_t *ioConnection) {
     struct TorrentHandshake_t *responseBuffer = (struct TorrentHandshake_t *) MALLOC(sizeof(struct TorrentHandshake_t));
 
     FILE *file = fopen("C:/info_hash.txt", "rb");
-	if(file == NULL) { RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, "Problem opening hash file"); }
+	if(file == NULL) { RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem opening hash file"); }
     data = (char *) fread(responseBuffer->info_hash, 1, 20, file);
     fclose(file);
 
