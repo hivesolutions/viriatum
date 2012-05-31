@@ -179,7 +179,7 @@ ERROR_CODE generateParameters(struct HashMap_t *hashMap, unsigned char **bufferP
         string = (struct String_t *) element->value;
         urlEncode(string->buffer, string->length, &_buffer, &_length);
 
-		urlDecode(_buffer, _length, &__buffer, &__length);
+        urlDecode(_buffer, _length, &__buffer, &__length);
 
         string->buffer = _buffer;
         string->length = _length;
@@ -274,8 +274,6 @@ ERROR_CODE openHandlerStreamHttpClient(struct IoConnection_t *ioConnection) {
 
 
     deleteHashMap(parametersMap);
-
-
 
 
 

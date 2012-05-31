@@ -17,7 +17,7 @@
  You should have received a copy of the GNU General Public License
  along with Hive Viriatum Commons. If not, see <http://www.gnu.org/licenses/>.
 
- __author__    = Jo„o Magalh„es <joamag@hive.pt>
+ __author__    = Jo√£o Magalh√£es <joamag@hive.pt>
  __version__   = 1.0.0
  __revision__  = $LastChangedRevision$
  __date__      = $LastChangedDate$
@@ -35,12 +35,12 @@ ERROR_CODE urlEncode(unsigned char *buffer, size_t length, unsigned char **buffe
 ERROR_CODE urlDecode(unsigned char *buffer, size_t length, unsigned char **bufferPointer, size_t *lengthPointer);
 
 static __inline char fromHex(unsigned char byte) {
-	return isdigit(byte) ? byte - '0' : tolower(byte) - 'a' + 10;
+    return isdigit(byte) ? byte - '0' : tolower(byte) - 'a' + 10;
 }
 
 static __inline char toHex(unsigned char code) {
-	static char hex[] = "0123456789abcdef";
-	return hex[code & 15];
+    static char hex[] = "0123456789abcdef";
+    return hex[code & 15];
 }
 
 static __inline char isalphanum(unsigned char byte) {
