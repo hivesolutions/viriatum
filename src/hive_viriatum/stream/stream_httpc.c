@@ -148,85 +148,7 @@ ERROR_CODE randomBuffer(unsigned char *buffer, size_t bufferSize) {
 
 
 
-/* Converts a hex character to its integer value */
-char from_hex(char ch) {
-	return isdigit(ch) ? ch - '0' : tolower(ch) - 'a' + 10;
-}
 
-/* Converts an integer value to its hex character*/
-char to_hex(char code) {
-	static char hex[] = "0123456789abcdef";
-	return hex[code & 15];
-}
-
-char _isalnum(unsigned char byte) {
-    if((byte >= '0' && byte <= '9') || (byte >= 'a' && byte <= 'z') ||
-       (byte >= 'A' && byte <= 'Z')) { return 1; }
-
-    return 0;
-}
-
-/* Returns a url-encoded version of str */
-/* IMPORTANT: be sure to free() the returned string after use */
-char *url_encode(char *buffer, size_t length, size_t *lengthPointer) {
-    char byte;
-    char *buf = malloc(length * 3 + 1);
-    char *pbuf = buf;
-    size_t index;
-
-    for(index = 0; index < length; index++) {
-        byte = buffer[index];
-
-        if(_isalnum(byte) || byte == '-' || byte == '_' || byte == '.' || byte == '~') {
-            *pbuf++ = byte;
-        } else if(byte == ' ') {
-            *pbuf++ = '+';
-        } else  {
-            *pbuf++ = '%';
-            *pbuf++ = to_hex(byte >> 4);
-            *pbuf++ = to_hex(byte & 15);
-        }
-    }
-
-    *pbuf = '\0';
-
-    *lengthPointer = index;
-
-    return buf;
-}
-
-/* Returns a url-decoded version of str */
-/* IMPORTANT: be sure to free() the returned string after use */
-
-/* TENHO DE REVER MUITO BEM ESTE QUE PODE TAR COM BuGS (MEXI NELE)
- VER MELHOR NO REPOSITORIO DE GIT */
-char *url_decode(char *buffer, size_t length, size_t *lengthPointer) {
-    char *pstr = buffer;
-    char *buf = malloc(length + 1);
-    char *pbuf = buf;
-    size_t index;
-
-    for(index = 0; index < length; index++) {
-        pstr = &buffer[index];
-
-        if (*pstr == '%') {
-            if (pstr[1] && pstr[2]) {
-                *pbuf++ = from_hex(pstr[1]) << 4 | from_hex(pstr[2]);
-                pstr += 2;
-            }
-        } else if (*pstr == '+') {
-            *pbuf++ = ' ';
-        } else {
-            *pbuf++ = *pstr;
-        }
-    }
-
-    *pbuf = '\0';
-
-    *lengthPointer = index;
-
-    return buf;
-}
 
 
 
@@ -237,6 +159,10 @@ ERROR_CODE generateParameters(struct HashMap_t *hashMap, unsigned char **bufferP
     unsigned char *stringValue;
     unsigned char *_buffer;
     size_t _length;
+
+    unsigned char *__buffer;
+    size_t __length;
+
     struct String_t *string;
 
     char isFirst = 1;
@@ -251,7 +177,10 @@ ERROR_CODE generateParameters(struct HashMap_t *hashMap, unsigned char **bufferP
         else { appendStringBuffer(stringBuffer, (unsigned char *) "&"); }
 
         string = (struct String_t *) element->value;
-        _buffer = url_encode(string->buffer, string->length, &_length);
+        urlEncode(string->buffer, string->length, &_buffer, &_length);
+
+		urlDecode(_buffer, _length, &__buffer, &__length);
+
         string->buffer = _buffer;
         string->length = _length;
 
