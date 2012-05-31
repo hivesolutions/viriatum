@@ -43,6 +43,15 @@ git clone git://github.com/hivesolutions/viriatum.git $repo --quiet
 # must return immediately with the error
 if [ $? -ne 0 ]; then cd $current && exit $?; fi
 
+# removes the internal git repository directory to avoid
+# extra files in source distribution
+rm -rf $repo/.git
+rm $repo/.gitignore
+
+# removes the extra (non source files) from the source
+# distribution directory
+rm $repo/TODO
+
 # runs the necessary make instructions to generate
 # the base scripts for configuration
 cd $repo
