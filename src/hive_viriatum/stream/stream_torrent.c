@@ -90,6 +90,10 @@ ERROR_CODE dataHandlerStreamTorrent(struct IoConnection_t *ioConnection, unsigne
 }
 
 ERROR_CODE openHandlerStreamTorrent(struct IoConnection_t *ioConnection) {
+	/* allocates space for the data to be read from the
+	info hash file */
+	char *data;
+
     /* allocates the torrent connection */
     struct TorrentConnection_t *torrentConnection;
 
@@ -97,7 +101,8 @@ ERROR_CODE openHandlerStreamTorrent(struct IoConnection_t *ioConnection) {
     struct TorrentHandshake_t *responseBuffer = (struct TorrentHandshake_t *) MALLOC(sizeof(struct TorrentHandshake_t));
 
     FILE *file = fopen("C:/info_hash.txt", "rb");
-    char *data = (char *) fread(responseBuffer->info_hash, 1, 20, file);
+	if(file == NULL) { RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, "Problem opening hash file"); }
+    data = (char *) fread(responseBuffer->info_hash, 1, 20, file);
     fclose(file);
 
 
