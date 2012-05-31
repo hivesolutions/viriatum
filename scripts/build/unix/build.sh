@@ -5,6 +5,7 @@
 version=0.1.0
 architecture=amd64
 name=viriatum\_$version\_$architecture
+name_src=viriatum\_$version\_$architecture\_src
 name_raw=viriatum\_$version\_$architecture\_raw
 current=$PWD
 build=$current/build
@@ -45,7 +46,8 @@ if [ $? -ne 0 ]; then cd $current && exit $?; fi
 # runs the necessary make instructions
 # in the repository directory
 cd $repo
-make -f Makefile-autoconfig
+./autogen
+cp -rp $repo $temp/$name_src
 ./configure --prefix=$result_dir --with-wwwroot=$result_dir/var/viriatum/www --enable-defaults
 make && make install
 
@@ -73,9 +75,15 @@ cd $temp_dir
 zip -qr $name.zip $name
 tar -cf $name.tar $name
 gzip -c $name.tar > $name.tar.gz
+zip -qr $name_src.zip $name_src
+tar -cf $name_src.tar $name_src
+gzip -c $name_src.tar > $name_src.tar.gz
 mv $name.zip $dist_dir
 mv $name.tar $dist_dir
 mv $name.tar.gz $dist_dir
+mv $name_src.zip $dist_dir
+mv $name_src.tar $dist_dir
+mv $name_src.tar.gz $dist_dir
 cd $current
 
 echo "Building deb package..."
