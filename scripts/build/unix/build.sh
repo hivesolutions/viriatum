@@ -60,6 +60,7 @@ cd $repo
 # removes the extra (autoconf related files) from the source
 # distribution directory
 rm -rf $repo/autom4te.cache
+rm -f $repo/Makefile-autoconfig
 
 # copies the current source code snapshot (with configuration)
 # to the temporary directory to be used latter
