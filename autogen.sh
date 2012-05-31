@@ -1,3 +1,6 @@
+#!/bin/sh
+# -*- coding: utf-8 -*-
+
 # Hive Viriatum Web Server
 # Copyright (C) 2008 Hive Solutions Lda.
 #
