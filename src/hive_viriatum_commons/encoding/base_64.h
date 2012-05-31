@@ -27,6 +27,8 @@
 
 #pragma once
 
+#include "../debug/debug.h"
+
 /**
  * The padding character for base 64.
  */
@@ -40,9 +42,8 @@
  * @param bufferLength The length of the buffer to be encoded into base64.
  * @param encodedBufferPointer The pointer to the created encoded buffer.
  * @param encodedBufferLengthPointer The length of the created encoded buffer.
- * @return The execution status.
  */
-VIRIATUM_EXPORT_PREFIX int encodeBase64(unsigned char *buffer, size_t bufferLength, unsigned char **encodedBufferPointer, size_t *encodedBufferLengthPointer);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE encodeBase64(unsigned char *buffer, size_t bufferLength, unsigned char **encodedBufferPointer, size_t *encodedBufferLengthPointer);
 
 /**
  * Decodes from base 64 the encoded buffer with the given length into a new (decoded) buffer
@@ -51,10 +52,9 @@ VIRIATUM_EXPORT_PREFIX int encodeBase64(unsigned char *buffer, size_t bufferLeng
  * @param encodedBuffer The encoded buffer to be decoded from base 64.
  * @param encodedBufferLength The length of the encoded buffer to be decoded from base64.
  * @param decodedBufferPointer The pointer to the created (decoder) buffer.
- * @param decodedBufferLengthPointer The length of the created (decoder) buffer.
- * @return The execution status.
+ * @param decodedBufferLengthPointer The length of the created (decoder) buffer
  */
-VIRIATUM_EXPORT_PREFIX int decodeBase64(unsigned char *encodedBuffer, size_t encodedBufferLength, unsigned char **decodedBufferPointer, size_t *decodedBufferLengthPointer);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE decodeBase64(unsigned char *encodedBuffer, size_t encodedBufferLength, unsigned char **decodedBufferPointer, size_t *decodedBufferLengthPointer);
 
 /**
  * Calculates the encoded buffer length from the
@@ -82,10 +82,9 @@ VIRIATUM_EXPORT_PREFIX size_t calculateDecodedBufferLenghtBase64(size_t encodedB
  * @param buffer The buffer to be encoded.
  * @param bufferLength The length of the buffer to be encoded.
  * @param encodedBuffer The target encoded buffer.
- * @param encodedBufferLength The target encoded buffer length.
- * @return The execution status.
+ * @param encodedBufferLength The target encoded buffer length
  */
-VIRIATUM_NO_EXPORT_PREFIX int _encodeBase64(unsigned char *buffer, size_t bufferLength, unsigned char *encodedBuffer, size_t encodedBufferLength);
+VIRIATUM_NO_EXPORT_PREFIX ERROR_CODE _encodeBase64(unsigned char *buffer, size_t bufferLength, unsigned char *encodedBuffer, size_t encodedBufferLength);
 
 /**
  * Decodes the given encoded buffer from base64.
@@ -96,9 +95,8 @@ VIRIATUM_NO_EXPORT_PREFIX int _encodeBase64(unsigned char *buffer, size_t buffer
  * @param buffer The target buffer.
  * @param bufferLength The target buffer length.
  * @param paddingCount The ammount of padding in the base 64 encoded string.
- * @return The execution status.
  */
-VIRIATUM_NO_EXPORT_PREFIX int _decodeBase64(unsigned char *encodedBuffer, size_t encodedBufferLength, unsigned char *buffer, size_t bufferLength, size_t paddingCount);
+VIRIATUM_NO_EXPORT_PREFIX ERROR_CODE _decodeBase64(unsigned char *encodedBuffer, size_t encodedBufferLength, unsigned char *buffer, size_t bufferLength, size_t paddingCount);
 
 /**
  * Allocates a new encoded buffer.
@@ -107,9 +105,8 @@ VIRIATUM_NO_EXPORT_PREFIX int _decodeBase64(unsigned char *encodedBuffer, size_t
  * @param bufferLength The size of the buffer to be encoded.
  * @param encodedBufferPointer The pointer to the encoded buffer to be created.
  * @param encodedBufferLengthPointer The length of the encoded buffer to be created.
- * @return The execution status.
  */
-VIRIATUM_NO_EXPORT_PREFIX int _allocateEncodedBuffer(size_t bufferLength, unsigned char **encodedBufferPointer, size_t *encodedBufferLengthPointer);
+VIRIATUM_NO_EXPORT_PREFIX ERROR_CODE _allocateEncodedBuffer(size_t bufferLength, unsigned char **encodedBufferPointer, size_t *encodedBufferLengthPointer);
 
 /**
  * Allocates a new decoded buffer.
@@ -119,9 +116,8 @@ VIRIATUM_NO_EXPORT_PREFIX int _allocateEncodedBuffer(size_t bufferLength, unsign
  * @param decodedBufferPointer The pointer to the decoded buffer to be created.
  * @param decodedBufferLengthPointer The length of the decoded buffer to be created.
  * @param paddingCount The ammount of padding to be used.
- * @return The execution status.
  */
-VIRIATUM_NO_EXPORT_PREFIX int _allocateDecodedBuffer(size_t encodedBufferLength, unsigned char **decodedBufferPointer, size_t *decodedBufferLengthPointer, size_t paddingCount);
+VIRIATUM_NO_EXPORT_PREFIX ERROR_CODE _allocateDecodedBuffer(size_t encodedBufferLength, unsigned char **decodedBufferPointer, size_t *decodedBufferLengthPointer, size_t paddingCount);
 
 /**
  * Retrieves the padding count for the given encoded buffer
