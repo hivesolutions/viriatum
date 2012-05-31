@@ -11,8 +11,8 @@ set ARCHITECTURE=win32
 :: sets the various global related name values
 :: (going to be used for file construction)
 set NAME=viriatum-%VERSION%-%ARCHITECTURE%
-set NAME_SRC=viriatum-%VERSION%-%ARCHITECTURE%-src
 set NAME_RAW=viriatum-%VERSION%-%ARCHITECTURE%-raw
+set NAME_SRC=viriatum-%VERSION%-src
 
 :: sets the directory to be used as the base
 :: for the retrieval of the development tools

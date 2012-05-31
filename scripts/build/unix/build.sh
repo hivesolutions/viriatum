@@ -5,8 +5,8 @@
 version=0.1.0
 architecture=amd64
 name=viriatum\_$version\_$architecture
-name_src=viriatum\_$version\_$architecture\_src
 name_raw=viriatum\_$version\_$architecture\_raw
+name_src=viriatum\_$version\_src
 current=$PWD
 build=$current/build
 repo=$build/repo
