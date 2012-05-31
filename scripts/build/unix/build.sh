@@ -50,7 +50,7 @@ cd $repo
 
 # copies the current source code snapshot (with configuration)
 # to the temporary directory to be used latter
-cp -rp $repo $temp/$name_src
+cp -rp $repo $temp/$name_src/
 
 # runs the configuration script and then initiates the
 # comlete build process and installation into the result
