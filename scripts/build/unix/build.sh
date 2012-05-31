@@ -61,79 +61,79 @@ cd $repo
 # to the temporary directory to be used latter
 cp -rp $repo $temp/$name_src/
 
-# runs the configuration script and then initiates the
-# comlete build process and installation into the result
-./configure --prefix=$result_dir --with-wwwroot=$result_dir/var/viriatum/www --enable-defaults
-make && make install
+# # runs the configuration script and then initiates the
+# # comlete build process and installation into the result
+# ./configure --prefix=$result_dir --with-wwwroot=$result_dir/var/viriatum/www --enable-defaults
+# make && make install
 
 # in case the previous command didn't exit properly
-# must return immediately with the error
-if [ $? -ne 0 ]; then cd $current && exit $?; fi
+# # must return immediately with the error
+# if [ $? -ne 0 ]; then cd $current && exit $?; fi
 
-# gets back to the base directory
-cd $current
+# # gets back to the base directory
+# cd $current
 
-# copies the binary files
-cp -rf $result_dir/bin/viriatum $deb_build_dir/usr/sbin
-cp -rf $result_dir/etc/viriatum/viriatum.ini $deb_build_dir/etc/viriatum
-cp -rf $result_dir/etc/init.d/viriatum $deb_build_dir/etc/init.d
-cp -rf $result_dir/var/viriatum/www $deb_build_dir/var/viriatum
-cp -rf $script_dir/meta/* $deb_build_dir/DEBIAN
-cp -rp $result_dir $temp_dir/$name/
+# # copies the binary files
+# cp -rf $result_dir/bin/viriatum $deb_build_dir/usr/sbin
+# cp -rf $result_dir/etc/viriatum/viriatum.ini $deb_build_dir/etc/viriatum
+# cp -rf $result_dir/etc/init.d/viriatum $deb_build_dir/etc/init.d
+# cp -rf $result_dir/var/viriatum/www $deb_build_dir/var/viriatum
+# cp -rf $script_dir/meta/* $deb_build_dir/DEBIAN
+# cp -rp $result_dir $temp_dir/$name/
 
-# creates the various compressed files for the
-# file and then copies them to the dist directory
-cd $result_dir
-tar -cf $name_raw.tar *
-mv $name_raw.tar $dist_dir
-cd $temp_dir
-zip -qr $name.zip $name
-tar -cf $name.tar $name
-gzip -c $name.tar > $name.tar.gz
-zip -qr $name_src.zip $name_src
-tar -cf $name_src.tar $name_src
-gzip -c $name_src.tar > $name_src.tar.gz
-mv $name.zip $dist_dir
-mv $name.tar $dist_dir
-mv $name.tar.gz $dist_dir
-mv $name_src.zip $dist_dir
-mv $name_src.tar $dist_dir
-mv $name_src.tar.gz $dist_dir
-cd $current
+# # creates the various compressed files for the
+# # file and then copies them to the dist directory
+# cd $result_dir
+# tar -cf $name_raw.tar *
+# mv $name_raw.tar $dist_dir
+# cd $temp_dir
+# zip -qr $name.zip $name
+# tar -cf $name.tar $name
+# gzip -c $name.tar > $name.tar.gz
+# zip -qr $name_src.zip $name_src
+# tar -cf $name_src.tar $name_src
+# gzip -c $name_src.tar > $name_src.tar.gz
+# mv $name.zip $dist_dir
+# mv $name.tar $dist_dir
+# mv $name.tar.gz $dist_dir
+# mv $name_src.zip $dist_dir
+# mv $name_src.tar $dist_dir
+# mv $name_src.tar.gz $dist_dir
+# cd $current
 
-echo "Building deb package..."
+# echo "Building deb package..."
 
-# creates the deb file from the deb directory
-dpkg-deb --build $deb_build_dir
+# # creates the deb file from the deb directory
+# dpkg-deb --build $deb_build_dir
 
-# in case the previous command didn't exit properly
-# must return immediately with the error
-if [ $? -ne 0 ]; then cd $current && exit $?; fi
+# # in case the previous command didn't exit properly
+# # must return immediately with the error
+# if [ $? -ne 0 ]; then cd $current && exit $?; fi
 
-# moves the generated deb file into the appropriate
-# (and target) dist directory
-mv $deb_dir/$name.deb $dist_dir
+# # moves the generated deb file into the appropriate
+# # (and target) dist directory
+# mv $deb_dir/$name.deb $dist_dir
 
-# changes the current directory to the dist directory
-# and then generates the checksum files for all the
-# distribution (oriented) files
-cd $dist_dir
-for file in *; do
-    md5sum $file > $temp_dir/$file.md5
-    sha1sum $file > $temp_dir/$file.sha1
-done
-md5sum * > $temp_dir/MD5SUMS
-sha1sum * > $temp_dir/SHA1SUMS
-mv $temp_dir/*.md5 $dist_dir
-mv $temp_dir/*.sha1 $dist_dir
-mv $temp_dir/MD5SUMS $dist_dir
-mv $temp_dir/SHA1SUMS $dist_dir
-cd $current
+# # changes the current directory to the dist directory
+# # and then generates the checksum files for all the
+# # distribution (oriented) files
+# cd $dist_dir
+# for file in *; do
+    # md5sum $file > $temp_dir/$file.md5
+    # sha1sum $file > $temp_dir/$file.sha1
+# done
+# md5sum * > $temp_dir/MD5SUMS
+# sha1sum * > $temp_dir/SHA1SUMS
+# mv $temp_dir/*.md5 $dist_dir
+# mv $temp_dir/*.sha1 $dist_dir
+# mv $temp_dir/MD5SUMS $dist_dir
+# mv $temp_dir/SHA1SUMS $dist_dir
+# cd $current
 
-# removes the directories that are no longer required
-# for the build
-#rm -rf $temp_dir
+# # removes the directories that are no longer required
+# # for the build
+# #rm -rf $temp_dir
 
-# in case the previous command didn't exit properly
-# must return immediately with the error
-if [ $? -ne 0 ]; then cd $current && exit $?; fi
+# # in case the previous command didn't exit properly
+# # must return immediately with the error
+# if [ $? -ne 0 ]; then cd $current && exit $?; fi
