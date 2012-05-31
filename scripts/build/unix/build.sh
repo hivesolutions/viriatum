@@ -69,7 +69,7 @@ cp -rp $result_dir $temp_dir/$name/
 #xcopy /q /y /a /e /k config %RESULT_DIR%\config
 #xcopy /q /y /a /e /k htdocs %RESULT_DIR%\htdocs
 #xcopy /q /y /a /e /k %RESULT_DIR% %TEMP_DIR%\%NAME%\
-cd %RESULT_DIR%
+#cd %RESULT_DIR%
 #tar -cf %NAME_RAW%.tar viriatum.exe config htdocs
 #move %NAME_RAW%.tar %DIST_DIR%
 #cd %TEMP_DIR%
