@@ -70,8 +70,8 @@ cd $result_dir
 tar -cf $name_raw.tar *
 mv $name_raw.tar $dist_dir
 cd $temp_dir
-zip -qr $name.zip $temp_dir
-tar -cf $name.tar $temp_dir
+zip -qr $name.zip $name
+tar -cf $name.tar $name
 gzip -c $name.tar > $name.tar.gz
 mv $name.zip $dist_dir
 mv $name.tar $dist_dir
