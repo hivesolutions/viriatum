@@ -29,3 +29,4 @@
 
 #include "base_64.h"
 #include "bencoding.h"
+#include "percent.h"
