@@ -4,11 +4,14 @@
 :: sets the version string constant value
 set VERSION=0.1.0
 
+:: sets the arquitecture for the current build
+:: execution process (eg: win32, x64, etc.)
+set ARCHITECTURE=win32
+
 :: sets the various global related name values
 :: (going to be used for file construction)
-set ARCHITECTURE=x86
-set NAME=viriatum-%VERSION%-modules
-set NAME_RAW=viriatum-%VERSION%-modules-raw
+set NAME=viriatum-%VERSION%-%ARCHITECTURE%-modules
+set NAME_RAW=viriatum-%VERSION%-%ARCHITECTURE%-modules-raw
 
 :: sets the directory to be used as the base
 :: for the retrieval of the development tools
