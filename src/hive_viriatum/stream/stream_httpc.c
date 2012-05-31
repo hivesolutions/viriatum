@@ -142,62 +142,80 @@ ERROR_CODE randomBuffer(unsigned char *buffer, size_t bufferSize) {
     RAISE_NO_ERROR;
 }
 
-
-
-
-
-
-
-
-
-
-
 ERROR_CODE generateParameters(struct HashMap_t *hashMap, unsigned char **bufferPointer, size_t *bufferLengthPointer) {
+	/* allocates space for an iterator object for an hash map element
+	and for the string buffer to be used to collect all the partial
+	strings that compose the complete url parameters string */
     struct Iterator_t *iterator;
     struct HashMapElement_t *element;
     struct StringBuffer_t *stringBuffer;
+
+	/* allocates space for the string structure to hold the value of
+	the element for the string value reference for the joined string,
+	for the buffer string from the element and for the corresponding
+	string lengths for both cases */
+	struct String_t *string;
     unsigned char *stringValue;
     unsigned char *_buffer;
+	size_t stringLength;
     size_t _length;
 
-    unsigned char *__buffer;
-    size_t __length;
-
-    struct String_t *string;
-
+	/* allocates and sets the initial value on the flag that controls
+	if the iteratio to generate key values is the first one */
     char isFirst = 1;
 
+	/* creates a new string buffer and a new hash map
+	iterator, these structures are going to be used to
+	handle the string from the hash map and to iterate
+	over the hash map elements */
     createStringBuffer(&stringBuffer);
     createElementIteratorHashMap(hashMap, &iterator);
 
+	/* iterates continuously arround the hash map element
+	the iterator is going to stop the iteration */
     while(1) {
+		/* retrieves the next element from the iterator
+		and in case such element is invalid breaks the loop */
         getNextIterator(iterator, (void **) &element);
         if(element == NULL) { break; }
+
+		/* checks if this is the first loop in the iteration
+		in it's not emits the and character */
         if(isFirst) { isFirst = 0; }
         else { appendStringBuffer(stringBuffer, (unsigned char *) "&"); }
 
+		/* retrieves the current element value as a string structure
+		then encodes that value using the url encoding (percent encoding)
+		and resets the string reference to contain the new buffer as it'
+		own contents (avoids extra memory usage) */
         string = (struct String_t *) element->value;
         urlEncode(string->buffer, string->length, &_buffer, &_length);
-
-        urlDecode(_buffer, _length, &__buffer, &__length);
-
         string->buffer = _buffer;
         string->length = _length;
 
+		/* adds the various elements for the value to the string buffer
+		first the key the the attribution operator and then the value */
         appendStringBuffer(stringBuffer, (unsigned char *) element->keyString);
         appendStringLBuffer(stringBuffer, (unsigned char *) "=", sizeof("=") - 1);
         _appendStringTBuffer(stringBuffer, string);
     }
 
     /* "joins" the string buffer values into a single
-    value (from the internal string list) */
+    value (from the internal string list) and then
+	retrieves the length of the string buffer */
     joinStringBuffer(stringBuffer, &stringValue);
+	stringLength = stringBuffer->stringLength;
 
+	/* deletes the hash map iterator and string buffer
+	structures, to avoid memory leak */
     deleteIteratorHashMap(hashMap, iterator);
     deleteStringBuffer(stringBuffer);
 
+	/* updates the buffer pointer reference and the
+	buffer length pointer reference with the string
+	value and the string length values */
     *bufferPointer = stringValue;
-    *bufferLengthPointer = strlen((char *) stringValue);
+    *bufferLengthPointer = stringLength;
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -252,30 +270,25 @@ ERROR_CODE openHandlerStreamHttpClient(struct IoConnection_t *ioConnection) {
     strings[3].length = sizeof("0") - 1;
     strings[4].buffer = (unsigned char *) "0";
     strings[4].length = sizeof("0") - 1;
-    strings[5].buffer = (unsigned char *) "3213210";
-    strings[5].length = sizeof("3213210") - 1;
+    strings[5].buffer = (unsigned char *) "3213210"; /* must calculate this value */
+    strings[5].length = sizeof("3213210") - 1; /* must calculate this value */
     strings[6].buffer = (unsigned char *) "0";
     strings[6].length = sizeof("0") - 1;
     strings[7].buffer = (unsigned char *) "0";
     strings[7].length = sizeof("0") - 1;
     strings[8].buffer = (unsigned char *) "started";
     strings[8].length = sizeof("started") - 1;
-
     setValueStringHashMap(parametersMap, (unsigned char *) "info_hash", (void *) &strings[0]);
     setValueStringHashMap(parametersMap, (unsigned char *) "peer_id", (void *) &strings[1]);
     setValueStringHashMap(parametersMap, (unsigned char *) "port", (void *) &strings[2]);
     setValueStringHashMap(parametersMap, (unsigned char *) "uploaded", (void *) &strings[3]);
     setValueStringHashMap(parametersMap, (unsigned char *) "downloaded", (void *) &strings[4]);
-    setValueStringHashMap(parametersMap, (unsigned char *) "left", (void *) &strings[5]);  /* must calculate this value */
+    setValueStringHashMap(parametersMap, (unsigned char *) "left", (void *) &strings[5]);
     setValueStringHashMap(parametersMap, (unsigned char *) "compact", (void *) &strings[6]);
     setValueStringHashMap(parametersMap, (unsigned char *) "no_peer_id", (void *) &strings[7]);
     setValueStringHashMap(parametersMap, (unsigned char *) "event", (void *) &strings[8]);
     generateParameters(parametersMap, &getString, &getStringSize);
-
-
     deleteHashMap(parametersMap);
-
-
 
     SPRINTF(buffer, 1024, "GET %s?%s HTTP/1.1\r\nUser-Agent: viriatum/0.1.0 (linux - intel x64)\r\nConnection: keep-alive\r\n\r\n", parameters->url, getString);
 
