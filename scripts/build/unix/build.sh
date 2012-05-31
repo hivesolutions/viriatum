@@ -64,32 +64,16 @@ cp -rf $result_dir/var/viriatum/www $deb_build_dir/var/viriatum
 cp -rf $script_dir/meta/* $deb_build_dir/DEBIAN
 cp -rp $result_dir $temp_dir/$name/
 
-#cd %SRC_DIR%
-#xcopy /q /y /e /k viriatum.exe %RESULT_DIR%
-#xcopy /q /y /a /e /k config %RESULT_DIR%\config
-#xcopy /q /y /a /e /k htdocs %RESULT_DIR%\htdocs
-#xcopy /q /y /a /e /k %RESULT_DIR% %TEMP_DIR%\%NAME%\
-#cd %RESULT_DIR%
-#tar -cf %NAME_RAW%.tar viriatum.exe config htdocs
-#move %NAME_RAW%.tar %DIST_DIR%
-#cd %TEMP_DIR%
-#zip -qr %NAME%.zip %NAME%
-#tar -cf %NAME%.tar %NAME%
-#gzip -c %NAME%.tar > %NAME%.tar.gz
-#move %NAME%.zip %DIST_DIR%
-#move %NAME%.tar %DIST_DIR%
-#move %NAME%.tar.gz %DIST_DIR%
-#cd %BUILD_DIR%
-
 # creates the various compressed files for the
 # file and then copies them to the dist directory
 cd $result_dir
 tar -cf $name_raw.tar *
 mv $name_raw.tar $dist_dir
 cd $temp_dir
-zip -qr $name.tar $temp_dir
+zip -qr $name.zip $temp_dir
 tar -cf $name.tar $temp_dir
 gzip -c $name.tar > $name.tar.gz
+mv $name.zip $dist_dir
 mv $name.tar $dist_dir
 mv $name.tar.gz $dist_dir
 cd $current
