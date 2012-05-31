@@ -4,8 +4,8 @@
 # sets the various global variables
 version=0.1.0
 architecture=amd64
-name=viriatum_$version\_$architecture
-name_raw=viriatum_$version\_$architecture\_raw
+name=viriatum\_$version\_$architecture
+name_raw=viriatum\_$version\_$architecture\_raw
 current=$PWD
 build=$current/build
 repo=$build/repo
