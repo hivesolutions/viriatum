@@ -8,6 +8,7 @@ set VERSION=0.1.0
 :: (going to be used for file construction)
 set ARCHITECTURE=x86
 set NAME=viriatum-%VERSION%-modules
+set NAME_RAW=viriatum-%VERSION%-modules-raw
 
 :: sets the directory to be used as the base
 :: for the retrieval of the development tools
@@ -48,6 +49,11 @@ call git clone git://github.com/hivesolutions/viriatum.git %REPO_DIR% --quiet
 :: must return immediately with the error
 if %ERRORLEVEL% neq 0 ( cd %CURRENT_DIR% && exit /b %ERRORLEVEL% )
 
+:: removes the internal git repository directory to avoid
+:: extra files in source distribution
+rmdir /q /s %REPO_DIR%\.git
+del /q /d %REPO_DIR%\.gitignore
+
 :: sets the proper include and lib directory for build then
 :: runs the build process for the viriatum project, this
 :: will lauch the build utility for it
@@ -66,9 +72,15 @@ for %%S in %SRC_DIRS% do (
     cd %%S
     xcopy /q /y /e /k viriatum_*.dll %RESULT_DIR%\modules\
 )
+xcopy /q /y /a /e /k %RESULT_DIR% %TEMP_DIR%\%NAME%\
 cd %RESULT_DIR%
-tar -cf %NAME%.tar modules
+tar -cf %NAME_RAW%.tar modules
+move %NAME_RAW%.tar %DIST_DIR%
+cd %TEMP_DIR%
+zip -qr %NAME%.zip %NAME%
+tar -cf %NAME%.tar %NAME%
 gzip -c %NAME%.tar > %NAME%.tar.gz
+move %NAME%.zip %DIST_DIR%
 move %NAME%.tar %DIST_DIR%
 move %NAME%.tar.gz %DIST_DIR%
 cd %BUILD_DIR%
@@ -78,7 +90,7 @@ echo Building capsule setup package...
 :: runs the capsule process adding the viriatum group file
 :: to it in order to create the proper intaller
 capsule clone %DIST_DIR%\%NAME%.exe
-capsule extend %DIST_DIR%\%NAME%.exe Viriatum "Viriatum HTTP Server Modules" %DIST_DIR%\%NAME%.tar
+capsule extend %DIST_DIR%\%NAME%.exe Viriatum "Viriatum HTTP Server Modules" %DIST_DIR%\%NAME_RAW%.tar
 
 :: in case the previous command didn't exit properly
 :: must return immediately with the error
@@ -97,7 +109,7 @@ cd %BUILD_DIR%
 
 :: removes the directories that are no longer required
 :: for the build
-rmdir %TEMP_DIR%
+rmdir /q /s %TEMP_DIR%
 
 :: moves back to the current directory (back to the base)
 cd %CURRENT_DIR%
