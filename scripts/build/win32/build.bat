@@ -11,6 +11,7 @@ set ARCHITECTURE=win32
 :: sets the various global related name values
 :: (going to be used for file construction)
 set NAME=viriatum-%VERSION%-%ARCHITECTURE%
+set NAME_SRC=viriatum-%VERSION%-%ARCHITECTURE%-src
 set NAME_RAW=viriatum-%VERSION%-%ARCHITECTURE%-raw
 
 :: sets the directory to be used as the base
@@ -57,6 +58,10 @@ if %ERRORLEVEL% neq 0 ( cd %CURRENT_DIR% && exit /b %ERRORLEVEL% )
 rmdir /q /s %REPO_DIR%\.git
 del /q /f %REPO_DIR%\.gitignore
 
+:: copies the current repository as the source directory
+:: into a temporary directory to be used latter
+xcopy /q /y /a /e /k %REPO_DIR% %TEMP_DIR%\%NAME_SRC%\
+
 :: sets the proper include and lib directory for build then
 :: runs the build process for the viriatum project, this
 :: will lauch the build utility for it
@@ -83,9 +88,15 @@ cd %TEMP_DIR%
 zip -qr %NAME%.zip %NAME%
 tar -cf %NAME%.tar %NAME%
 gzip -c %NAME%.tar > %NAME%.tar.gz
+zip -qr %NAME_SRC%.zip %NAME_SRC%
+tar -cf %NAME_SRC%.tar %NAME_SRC%
+gzip -c %NAME_SRC%.tar > %NAME_SRC%.tar.gz
 move %NAME%.zip %DIST_DIR%
 move %NAME%.tar %DIST_DIR%
 move %NAME%.tar.gz %DIST_DIR%
+move %NAME_SRC%.zip %DIST_DIR%
+move %NAME_SRC%.tar %DIST_DIR%
+move %NAME_SRC%.tar.gz %DIST_DIR%
 cd %BUILD_DIR%
 
 echo Building capsule setup package...
