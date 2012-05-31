@@ -58,6 +58,10 @@ if %ERRORLEVEL% neq 0 ( cd %CURRENT_DIR% && exit /b %ERRORLEVEL% )
 rmdir /q /s %REPO_DIR%\.git
 del /q /f %REPO_DIR%\.gitignore
 
+:: removes the extra (non source files) from the source
+:: distribution directory
+del /q /f %REPO_DIR%\TODO
+
 :: copies the current repository as the source directory
 :: into a temporary directory to be used latter
 xcopy /q /y /a /e /k %REPO_DIR% %TEMP_DIR%\%NAME_SRC%\
