@@ -132,7 +132,7 @@ cd $current
 
 # removes the directories that are no longer required
 # for the build
-rm -rf $temp_dir
+#rm -rf $temp_dir
 
 # in case the previous command didn't exit properly
 # must return immediately with the error
