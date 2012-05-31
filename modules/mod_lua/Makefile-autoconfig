@@ -24,10 +24,10 @@
 # __license__   = GNU General Public License (GPL), Version 3
 
 all:
-	autoheader && libtoolize && aclocal && automake --add-missing && autoconf
+	autoheader && libtoolize && aclocal && automake --add-missing && autoconf --install
 
 darwin:
-	autoheader && glibtoolize && aclocal && automake --add-missing && autoconf
+	autoheader && glibtoolize && aclocal && automake --add-missing && autoconf --install
 
 clean:
 	rm -rf autom4te.cache config.h Makefile Makefile.in aclocal.m4 config.sub config.log config.status config.guess depcomp install-sh ltmain.sh missing stamp-h1 libtool configure
