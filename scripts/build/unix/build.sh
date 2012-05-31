@@ -115,12 +115,12 @@ for file in *; do
     md5sum $file > $temp_dir/$file.md5
     sha1sum $file > $temp_dir/$file.sha1
 done
-md5sum * > /tmp/MD5SUMS
-sha1sum * > /tmp/SHA1SUMS
-mv /tmp/*.md5 $dist_dir
-mv /tmp/*.sha1 $dist_dir
-mv /tmp/MD5SUMS $dist_dir
-mv /tmp/SHA1SUMS $dist_dir
+md5sum * > $temp_dir/MD5SUMS
+sha1sum * > $temp_dir/SHA1SUMS
+mv $temp_dir/*.md5 $dist_dir
+mv $temp_dir/*.sha1 $dist_dir
+mv $temp_dir/MD5SUMS $dist_dir
+mv $temp_dir/SHA1SUMS $dist_dir
 cd $current
 
 # removes the directories that are no longer required
