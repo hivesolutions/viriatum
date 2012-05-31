@@ -252,7 +252,7 @@ ERROR_CODE openHandlerStreamHttpClient(struct IoConnection_t *ioConnection) {
     memcpy(peerId + 8, random, 12);
 
     error = decodeBencodingFile("C:/verysleepy_0_82.exe.torrent", &type);
-	if(error) { RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, "Problem reading torrent file"); }
+	if(error) { RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem reading torrent file"); }
 
     getValueStringSortMap(type->value.valueSortMap, (unsigned char *) "info", (void **) &_type);
     encodeBencoding(_type, &_buffer, &_bufferSize);
