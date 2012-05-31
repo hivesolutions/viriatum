@@ -230,7 +230,6 @@ ERROR_CODE openHandlerStreamHttpClient(struct IoConnection_t *ioConnection) {
     SPRINTF((char *) peerId, 20, "-%s%d%d%d0-", VIRIATUM_PREFIX, VIRIATUM_MAJOR, VIRIATUM_MINOR, VIRIATUM_MICRO);
     randomBuffer(random, 12);
     memcpy(peerId + 8, random, 12);
-    peerId[20] = '\0';
 
     decodeBencodingFile("C:/verysleepy_0_82.exe.torrent", &type);
     getValueStringSortMap(type->value.valueSortMap, (unsigned char *) "info", (void **) &_type);
@@ -239,11 +238,6 @@ ERROR_CODE openHandlerStreamHttpClient(struct IoConnection_t *ioConnection) {
     printType(type);
     freeType(type);
     FREE(_buffer);
-
-    /* VOU TER DE UTILIzAR O STRING_T aki para enviar o info hash, etc senao posso
-    ter problemas graves, se calhar e melhor tambe fazer o string buffer para string_t */
-
-    infoHash[SHA1_DIGEST_SIZE] = '\0'; /* THIS IS A HUGE HACK */
 
     /* tenho de fazer gerador de get parameters !!!! */
     /* pega nas chaves e nos valores do hash map e gera a get string para um string buffer */
