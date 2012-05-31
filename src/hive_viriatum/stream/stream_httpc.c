@@ -267,15 +267,15 @@ ERROR_CODE openHandlerStreamHttpClient(struct IoConnection_t *ioConnection) {
     strings[8].buffer = (unsigned char *) "started";
     strings[8].length = sizeof("started") - 1;
 
-    setValueStringHashMap(parametersMap, "info_hash", (void *) &strings[0]);
-    setValueStringHashMap(parametersMap, "peer_id", (void *) &strings[1]);
-    setValueStringHashMap(parametersMap, "port", (void *) &strings[2]);
-    setValueStringHashMap(parametersMap, "uploaded", (void *) &strings[3]);
-    setValueStringHashMap(parametersMap, "downloaded", (void *) &strings[4]);
-    setValueStringHashMap(parametersMap, "left", (void *) &strings[5]);  /* must calculate this value */
-    setValueStringHashMap(parametersMap, "compact", (void *) &strings[6]);
-    setValueStringHashMap(parametersMap, "no_peer_id", (void *) &strings[7]);
-    setValueStringHashMap(parametersMap, "event", (void *) &strings[8]);
+    setValueStringHashMap(parametersMap, (unsigned char *) "info_hash", (void *) &strings[0]);
+    setValueStringHashMap(parametersMap, (unsigned char *) "peer_id", (void *) &strings[1]);
+    setValueStringHashMap(parametersMap, (unsigned char *) "port", (void *) &strings[2]);
+    setValueStringHashMap(parametersMap, (unsigned char *) "uploaded", (void *) &strings[3]);
+    setValueStringHashMap(parametersMap, (unsigned char *) "downloaded", (void *) &strings[4]);
+    setValueStringHashMap(parametersMap, (unsigned char *) "left", (void *) &strings[5]);  /* must calculate this value */
+    setValueStringHashMap(parametersMap, (unsigned char *) "compact", (void *) &strings[6]);
+    setValueStringHashMap(parametersMap, (unsigned char *) "no_peer_id", (void *) &strings[7]);
+    setValueStringHashMap(parametersMap, (unsigned char *) "event", (void *) &strings[8]);
     generateParameters(parametersMap, &getString, &getStringSize);
 
 
