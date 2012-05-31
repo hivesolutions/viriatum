@@ -63,7 +63,7 @@ rm -rf $repo/autom4te.cache
 rm -f $repo/autogen.sh $repo/Makefile-autoconfig
 
 for module in $repo/modules/*; do
-    cd $repo/modules/$module
+    cd $module
     ./autogen.sh
     
     rm -rf $module/autom4te.cache
