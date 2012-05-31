@@ -307,7 +307,7 @@ ERROR_CODE _createClientConnection(struct Connection_t **connectionPointer, stru
     serv_addr.sin_port = htons(port);
 
     error = SOCKET_CONNECT_SIZE(socketHandle, serv_addr, sizeof(SOCKET_ADDRESS_INTERNET));
-    if(SOCKET_TEST_ERROR(error)) { fprintf(stderr, "ERROR connecting host"); }
+    if(SOCKET_TEST_ERROR(error)) { fprintf(stderr, "ERROR connecting host\n"); }
 
     /* in case viriatum is set to non blocking, changes the current
     socket behavior to non blocking mode */
