@@ -12,7 +12,7 @@ set ARCHITECTURE=win32
 :: (going to be used for file construction)
 set NAME=viriatum-%VERSION%-%ARCHITECTURE%-modules
 set NAME_RAW=viriatum-%VERSION%-%ARCHITECTURE%-modules-raw
-set NAME_SRC=viriatum-%VERSION%-modules-src
+set NAME_SRC=viriatum-%VERSION%-%ARCHITECTURE%-src
 
 :: sets the directory to be used as the base
 :: for the retrieval of the development tools
