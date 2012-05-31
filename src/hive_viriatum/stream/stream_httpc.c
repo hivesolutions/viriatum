@@ -197,7 +197,7 @@ ERROR_CODE generateParameters(struct HashMap_t *hashMap, unsigned char **bufferP
     deleteStringBuffer(stringBuffer);
 
     *bufferPointer = stringValue;
-    *bufferLengthPointer = strlen(stringValue);
+    *bufferLengthPointer = strlen((char *) stringValue);
 
     /* raises no error */
     RAISE_NO_ERROR;
