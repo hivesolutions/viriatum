@@ -252,19 +252,19 @@ ERROR_CODE openHandlerStreamHttpClient(struct IoConnection_t *ioConnection) {
     strings[0].length = 20;
     strings[1].buffer = peerId;
     strings[1].length = 20;
-    strings[2].buffer = "8080";
+    strings[2].buffer = (unsigned char *) "8080";
     strings[2].length = sizeof("8080") - 1;
-    strings[3].buffer = "0";
+    strings[3].buffer = (unsigned char *) "0";
     strings[3].length = sizeof("0") - 1;
-    strings[4].buffer = "0";
+    strings[4].buffer = (unsigned char *) "0";
     strings[4].length = sizeof("0") - 1;
-    strings[5].buffer = "3213210";
+    strings[5].buffer = (unsigned char *) "3213210";
     strings[5].length = sizeof("3213210") - 1;
-    strings[6].buffer = "0";
+    strings[6].buffer = (unsigned char *) "0";
     strings[6].length = sizeof("0") - 1;
-    strings[7].buffer = "0";
+    strings[7].buffer = (unsigned char *) "0";
     strings[7].length = sizeof("0") - 1;
-    strings[8].buffer = "started";
+    strings[8].buffer = (unsigned char *) "started";
     strings[8].length = sizeof("started") - 1;
 
     setValueStringHashMap(parametersMap, "info_hash", (void *) &strings[0]);
