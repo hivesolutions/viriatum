@@ -62,10 +62,16 @@ cd $repo
 rm -rf $repo/autom4te.cache
 rm -f $repo/autogen.sh $repo/Makefile-autoconfig
 
+# iterates over all the modules to prepare their source code
+# for compilation distribution
 for module in $repo/modules/*; do
+    # removes the extra (non source files) from the source
+    # distribution directory (for the module)
     cd $module
     ./autogen.sh
-    
+
+    # removes the extra (autoconf related files) from the source
+    # distribution directory (for the module)
     rm -rf $module/autom4te.cache
     rm -f $module/autogen.sh $module/Makefile-autoconfig
 done
