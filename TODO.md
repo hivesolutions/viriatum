@@ -1,4 +1,4 @@
-== New features ==
+## New features
 
 * Support for a bittorrent variant of the viriatum server
 * Ass support for a directory on ini files (configuration.d) so that all files there are read in sequence (usefull for modules configuration)
@@ -15,27 +15,28 @@
 * Support for huffman compression according to the implementation in the mariachi engine (http://code.google.com/p/mariachi/source/browse/src/hive_mariachi/algorithms/compression/huffman.h)
 * Implement the memory pool structure based on the nginx implementation
 
-== Refactor / Bug Fixing ==
+## Refactor / Bug Fixing
 
 * Implement and refactor win32 conditions (_thread_win32.c) use this link http://thbecker.net/free_software_utilities/fair_monitor_for_win32/start_page.html
 
-== Design decisions ==
+## Design decisions
 
 * Create a structure similiar to the asynchronous model defined in the colony service implementations
 * Separate the concept of service from the handler of the select (select_service does not make sensess)
 
-== Performance refactor ==
+## Performance refactor
 
 * Remove the strlen references and use String_t structures to reduce size calculations (in constant access situations)
 
-== Worker processes ==
-- Spawn for working processes occurs for complete cpu usage (nginx reference - http://wiki.nginx.org/CoreModule#worker_processes)
-- Controlo dos working processes descrito (http://nginx.org/en/docs/control.html)
-- Some general information about nginx architecture (includes worker process) http://www.slideshare.net/joshzhu/nginx-internals
-- Forking a process inherits the hability to handle connections, so thats how nginx works this out (http://stackoverflow.com/questions/670891/is-there-a-way-for-multiple-processes-to-share-a-listening-socket)
-- Verify the upstream support (http://wiki.nginx.org/NginxHttpUpstreamModule#upstream)
+## Worker processes
 
-== Target performance ==
+* Spawn for working processes occurs for complete cpu usage (nginx reference - http://wiki.nginx.org/CoreModule#worker_processes)
+* Controlo dos working processes descrito (http://nginx.org/en/docs/control.html)
+* Some general information about nginx architecture (includes worker process) http://www.slideshare.net/joshzhu/nginx-internals
+* Forking a process inherits the hability to handle connections, so thats how nginx works this out (http://stackoverflow.com/questions/670891/is-there-a-way-for-multiple-processes-to-share-a-listening-socket)
+* Verify the upstream support (http://wiki.nginx.org/NginxHttpUpstreamModule#upstream)
+
+## Target performance
 
 * ab -n 10000 -c 100 -k http://servidor2.hive:9090/error should be able to run at 45K-60K requests per second (using file handler)
 * ab -n 10000 -c 100 -k  http://srio.hive:9090/eclipse should be able to run at 15K-24K requests per second raw power (not confirmed)
