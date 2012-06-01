@@ -6,6 +6,7 @@ The Viriatum Web Server is simple and lightweight web server aimed at providing 
 ### Source Control Repository
 
 If you're going to build viriatum using the git repository you first need to generate the configure files using autoconf.
+
 For that use the pre-contructed script:
 
 * `./autogen.sh`
