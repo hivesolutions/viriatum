@@ -31,7 +31,7 @@
 ## Worker processes
 
 * Spawn for working processes occurs for complete cpu usage (nginx reference - http://wiki.nginx.org/CoreModule#worker_processes)
-* Controlo dos working processes descrito (http://nginx.org/en/docs/control.html)
+* Control of the working processed described here (http://nginx.org/en/docs/control.html)
 * Some general information about nginx architecture (includes worker process) http://www.slideshare.net/joshzhu/nginx-internals
 * Forking a process inherits the hability to handle connections, so thats how nginx works this out (http://stackoverflow.com/questions/670891/is-there-a-way-for-multiple-processes-to-share-a-listening-socket)
 * Verify the upstream support (http://wiki.nginx.org/NginxHttpUpstreamModule#upstream)
