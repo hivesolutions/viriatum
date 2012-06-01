@@ -1,0 +1,6 @@
+{
+    "name" : "Viriatum HTTP Server",
+    "description" : "Automation script for binaries and source code of viriatum",
+    "file" : "build.bat",
+    "recursion" : [0, 0, 1, 0, 0]
+}
