@@ -236,9 +236,7 @@ ERROR_CODE loadOptionsService(struct Service_t *service, struct HashMap_t *argum
 }
 
 #ifdef VIRIATUM_PLATFORM_LINUX
-#ifdef PR_SET_PROCTITLE
 #define SET_PROC_NAME(name) prctl(PR_SET_PROCTITLE, name) 
-#endif
 #endif
 
 #ifdef VIRIATUM_PLATFORM_BSD
