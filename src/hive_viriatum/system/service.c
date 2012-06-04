@@ -235,6 +235,16 @@ ERROR_CODE loadOptionsService(struct Service_t *service, struct HashMap_t *argum
     RAISE_NO_ERROR;
 }
 
+#ifdef VIRIATUM_PLATFORM_LINUX
+#ifdef PR_SET_PROCTITLE
+#define SET_PROC_NAME(name) prctl(PR_SET_PROCTITLE, name) 
+#endif
+#endif
+
+#ifndef SET_PROC_NAME
+#define SET_PROC_NAME(name)
+#endif
+
 #ifdef VIRIATUM_PLATFORM_UNIX
 ERROR_CODE createWorkers(unsigned char workerCount) {
     unsigned int forkCount = 0;
@@ -269,8 +279,8 @@ ERROR_CODE createWorkers(unsigned char workerCount) {
 	/* checks if the current process is a worker (zero based
 	pid value) or the master process and sets the process title
 	according to this value */
-	if(pid == 0) { setproctitle("viriatum - worker"); }
-	else { setproctitle("viriatum - master"); }
+	if(pid == 0) { SET_PROC_NAME("viriatum - worker"); }
+	else { SET_PROC_NAME("viriatum - master"); }
 
     /* raises no error */
     RAISE_NO_ERROR;
