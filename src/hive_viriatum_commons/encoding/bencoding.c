@@ -457,6 +457,8 @@ ERROR_CODE _bencodingIntegerEndCallback(struct BencodingEngine_t *bencodingEngin
     memcpy(integer, pointer, size);
     integer[size] = '\0';
 
+    /* in case the sequence type is defined the integer must
+    be a value and must be associated with the sequence */
     if(bencodingHandler->sequence != NULL) {
         /* converts the integer string into an integer value, then creates
         the type structure for the integer and sets it as an integer value */
