@@ -266,6 +266,12 @@ ERROR_CODE createWorkers(unsigned char workerCount) {
         forkCount++;
     }
 
+	/* checks if the current process is a worker (zero based
+	pid value) or the master process and sets the process title
+	according to this value */
+	if(pid == 0) { setproctitle("viriatum - worker"); }
+	else { setproctitle("viriatum - master"); }
+
     /* raises no error */
     RAISE_NO_ERROR;
 }
@@ -610,8 +616,8 @@ ERROR_CODE startService(struct Service_t *service) {
 
 
 
- /*   _createTrackerConnection(&trackerConnection, service, "localhost", 9090);
-    _createTorrentConnection(&torrentConnection, service, "localhost", 32967);*/
+    _createTrackerConnection(&trackerConnection, service, "localhost", 9090);
+    _createTorrentConnection(&torrentConnection, service, "localhost", 32967);
 
 
 
