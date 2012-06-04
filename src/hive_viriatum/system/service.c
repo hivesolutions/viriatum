@@ -236,7 +236,7 @@ ERROR_CODE loadOptionsService(struct Service_t *service, struct HashMap_t *argum
 }
 
 #ifdef VIRIATUM_PLATFORM_UNIX
-ERROR_CODE createWorkers(unsigned int workerCount) {
+ERROR_CODE createWorkers(unsigned char workerCount) {
     unsigned int forkCount = 0;
     PID_TYPE pid;
 
@@ -605,7 +605,7 @@ ERROR_CODE startService(struct Service_t *service) {
     /* in case the current os is compatible with the forking of process
     creates the worker processes to handle more connections at a time,
     this operation creates a much more flexible and scalable solution */
-    createWorkers(5);
+    createWorkers(serviceOptions->workers);
 #endif
 
 
@@ -1181,6 +1181,11 @@ ERROR_CODE _fileOptionsService(struct Service_t *service, struct HashMap_t *argu
     getValueStringHashMap(general, (unsigned char *) "local", &value);
     if(value != NULL) { serviceOptions->local = (unsigned char) atoi(value); }
 
+    /* tries to retrieve the workers argument from the arguments map, then
+    sets the workers (count) value for the service */
+    getValueStringHashMap(general, (unsigned char *) "workers", &value);
+    if(value != NULL) { serviceOptions->workers = (unsigned char) atoi(value); }
+
     /* raises no error */
     RAISE_NO_ERROR;
 }
@@ -1215,6 +1220,11 @@ ERROR_CODE _comandLineOptionsService(struct Service_t *service, struct HashMap_t
     in case the (local) value is set, sets the service as local  */
     getValueStringHashMap(arguments, (unsigned char *) "local", &value);
     if(value != NULL) { serviceOptions->local = 1; }
+
+    /* tries to retrieve the workers argument from the arguments map, then
+    sets the workers (count) value for the service */
+    getValueStringHashMap(arguments, (unsigned char *) "local", &value);
+    if(value != NULL) { serviceOptions->workers = atoi(((struct Argument_t *) value)->value); }
 
     /* raises no error */
     RAISE_NO_ERROR;
