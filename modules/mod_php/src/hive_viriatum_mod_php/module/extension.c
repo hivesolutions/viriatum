@@ -142,7 +142,7 @@ int _moduleReadPost(char *buffer, uint size TSRMLS_DC) {
 }
 
 char *_moduleReadCookies(TSRMLS_D) {
-    return _phpRequest.phpContext->cookie;
+    return (char *) _phpRequest.phpContext->cookie;
 }
 
 void _moduleRegister(zval *_array TSRMLS_DC) {
