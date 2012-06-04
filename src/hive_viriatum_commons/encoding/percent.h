@@ -29,10 +29,10 @@
 
 #include "../debug/debug.h"
 
-ERROR_CODE encodePercent(unsigned char *buffer, size_t length, unsigned char **bufferPointer, size_t *lengthPointer);
-ERROR_CODE decodePercent(unsigned char *buffer, size_t length, unsigned char **bufferPointer,  size_t *lengthPointer);
-ERROR_CODE urlEncode(unsigned char *buffer, size_t length, unsigned char **bufferPointer, size_t *lengthPointer);
-ERROR_CODE urlDecode(unsigned char *buffer, size_t length, unsigned char **bufferPointer, size_t *lengthPointer);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE encodePercent(unsigned char *buffer, size_t length, unsigned char **bufferPointer, size_t *lengthPointer);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE decodePercent(unsigned char *buffer, size_t length, unsigned char **bufferPointer,  size_t *lengthPointer);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE urlEncode(unsigned char *buffer, size_t length, unsigned char **bufferPointer, size_t *lengthPointer);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE urlDecode(unsigned char *buffer, size_t length, unsigned char **bufferPointer, size_t *lengthPointer);
 
 static __inline char fromHex(unsigned char byte) {
     return isdigit(byte) ? byte - '0' : tolower(byte) - 'a' + 10;
