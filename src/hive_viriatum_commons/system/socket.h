@@ -81,6 +81,7 @@
 #ifdef VIRIATUM_PLATFORM_UNIX
 #include <netdb.h>
 #include <arpa/inet.h>
+#include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #define SOCKET_CONNECTIONS 256
