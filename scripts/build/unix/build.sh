@@ -50,7 +50,7 @@ rm -f $repo/.gitignore
 
 # removes the extra (non source files) from the source
 # distribution directory
-rm -f $repo/TODO
+rm -f $repo/TODO.md
 
 # runs the necessary make instructions to generate
 # the base scripts for configuration

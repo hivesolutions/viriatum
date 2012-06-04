@@ -117,8 +117,8 @@ char *_moduleGetenv(char *name, size_t size TSRMLS_DC) {
 }
 
 int _moduleHeader(sapi_header_struct *header, sapi_header_op_enum operation, sapi_headers_struct *headers TSRMLS_DC) {
-	STRCPY(_phpRequest.headers[_phpRequest.headerCount], 1024, header->header);
-	_phpRequest.headerCount++;
+    STRCPY(_phpRequest.headers[_phpRequest.headerCount], 1024, header->header);
+    _phpRequest.headerCount++;
     return 0;
 }
 

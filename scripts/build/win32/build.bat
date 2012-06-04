@@ -60,7 +60,7 @@ del /q /f %REPO_DIR%\.gitignore
 
 :: removes the extra (non source files) from the source
 :: distribution directory
-del /q /f %REPO_DIR%\TODO
+del /q /f %REPO_DIR%\TODO.md
 
 :: copies the current repository as the source directory
 :: into a temporary directory to be used latter

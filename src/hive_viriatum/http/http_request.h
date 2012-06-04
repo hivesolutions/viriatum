@@ -33,9 +33,9 @@
  * may be used to provided static reference.
  */
 typedef enum HttpHeader_e {
-	UNDEFINED_HEADER = 1,
-	CONTENT_TYPE,
-	COOKIE
+    UNDEFINED_HEADER = 1,
+    CONTENT_TYPE,
+    COOKIE
 } HttpHeader;
 
 typedef enum HttpRequestMethod_e {

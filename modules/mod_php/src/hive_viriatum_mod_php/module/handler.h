@@ -110,8 +110,8 @@ typedef struct HandlerPhpContext_t {
 
     /**
      * Enumeration value that controls the type
-	 * of the next header to be read from the 
-	 * http input buffer.
+     * of the next header to be read from the
+     * http input buffer.
      */
     enum HttpHeader_e _nextHeader;
 

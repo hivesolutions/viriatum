@@ -62,30 +62,30 @@ typedef struct ModPhpModule_t {
  * values useful for request flush.
  */
 typedef struct PhpRequest_t {
-	/**
-	 * The mime type value for the current php
-	 * request, this header value is treated as
-	 * a special case by the php interpreter.
-	 */
+    /**
+     * The mime type value for the current php
+     * request, this header value is treated as
+     * a special case by the php interpreter.
+     */
     char mimeType[1024];
 
-	/**
-	 * The matrix buffer containing the maximum
-	 * possible count for various headers for the
-	 * php interpreter.
-	 */
-	char headers[24][1024];
+    /**
+     * The matrix buffer containing the maximum
+     * possible count for various headers for the
+     * php interpreter.
+     */
+    char headers[24][1024];
 
-	/**
-	 * The number of headers currently present in
-	 * the current php request.
-	 */ 
-	size_t headerCount;
+    /**
+     * The number of headers currently present in
+     * the current php request.
+     */
+    size_t headerCount;
 
-	/**
-	 * The reference to the current php context
-	 * structure in use.
-	 */
+    /**
+     * The reference to the current php context
+     * structure in use.
+     */
     struct HandlerPhpContext_t *phpContext;
 } PhpRequest;
 
