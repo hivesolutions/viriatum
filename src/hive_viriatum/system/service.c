@@ -610,8 +610,8 @@ ERROR_CODE startService(struct Service_t *service) {
 
 
 
-    _createTrackerConnection(&trackerConnection, service, "localhost", 9090);
-    _createTorrentConnection(&torrentConnection, service, "localhost", 32967);
+ /*   _createTrackerConnection(&trackerConnection, service, "localhost", 9090);
+    _createTorrentConnection(&torrentConnection, service, "localhost", 32967);*/
 
 
 
