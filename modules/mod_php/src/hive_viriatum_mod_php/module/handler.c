@@ -70,7 +70,7 @@ ERROR_CODE createHandlerPhpContext(struct HandlerPhpContext_t **handlerPhpContex
     handlerPhpContext->flags = 0;
     handlerPhpContext->contentLength = 0;
     handlerPhpContext->outputBuffer = NULL;
-    handlerPhpContext->_nextContentType = 0;
+	handlerPhpContext->_nextHeader = UNDEFINED_HEADER;
 
     /* sets the handler php context in the  pointer */
     *handlerPhpContextPointer = handlerPhpContext;
@@ -124,6 +124,7 @@ ERROR_CODE messageBeginCallbackHandlerModule(struct HttpParser_t *httpParser) {
     /* populates the various generated strings, avoids possible recalculation
     of the lengths of the string */
     stringPopulate(&handlerPhpContext->_contentTypeString, handlerPhpContext->contentType, 0, 0);
+	stringPopulate(&handlerPhpContext->_cookieString, handlerPhpContext->cookie, 0, 0);
 
     /* raise no error */
     RAISE_NO_ERROR;
@@ -175,9 +176,12 @@ ERROR_CODE headerFieldCallbackHandlerModule(struct HttpParser_t *httpParser, con
     /* retrieves the handler php context from the http parser */
     struct HandlerPhpContext_t *handlerPhpContext = (struct HandlerPhpContext_t *) httpParser->context;
 
-    /* checks if the current header is not the content type
-    in case it is sets the next content type flag */
-    if(memcmp(data, "Content-Type", dataSize) == 0) { handlerPhpContext->_nextContentType = 1; }
+    /* checks if the current header is a valid "capturable"
+	header in such case changes the next header value accordingly
+	otherwise sets the undefined header */
+    if(memcmp(data, "Content-Type", dataSize) == 0) { handlerPhpContext->_nextHeader = CONTENT_TYPE; }
+	else if(memcmp(data, "Cookie", dataSize) == 0) { handlerPhpContext->_nextHeader = COOKIE; }
+	else { handlerPhpContext->_nextHeader = UNDEFINED_HEADER; }
 
     /* raise no error */
     RAISE_NO_ERROR;
@@ -187,19 +191,39 @@ ERROR_CODE headerValueCallbackHandlerModule(struct HttpParser_t *httpParser, con
     /* retrieves the handler php context from the http parser */
     struct HandlerPhpContext_t *handlerPhpContext = (struct HandlerPhpContext_t *) httpParser->context;
 
-    /* in case the next content type flag is set
-    must copy the header value to the buffer */
-    if(handlerPhpContext->_nextContentType) {
-        /* copies the content type header value into the
-        appropriate buffer in the php context */
-        memcpy(handlerPhpContext->contentType, data, dataSize);
-        handlerPhpContext->contentType[dataSize] = '\0';
-        handlerPhpContext->_nextContentType = 0;
+    /* switchs over the next header possible values to
+	copy the current header buffer into the appropriate place */
+	switch(handlerPhpContext->_nextHeader) {
+		case CONTENT_TYPE:
+			/* copies the content type header value into the
+			appropriate buffer in the php context */
+			memcpy(handlerPhpContext->contentType, data, dataSize);
+			handlerPhpContext->contentType[dataSize] = '\0';
 
-        /* populates the various generated strings, avoids possible recalculation
-        of the lengths of the string */
-        stringPopulate(&handlerPhpContext->_contentTypeString, handlerPhpContext->contentType, dataSize, 0);
-    }
+			/* populates the various generated strings, avoids possible recalculation
+			of the lengths of the string */
+			stringPopulate(&handlerPhpContext->_contentTypeString, handlerPhpContext->contentType, dataSize, 0);
+
+			/* breaks the switch */
+			break;
+
+		case COOKIE:
+			/* copies the cookie header value into the
+			appropriate buffer in the php context */
+			memcpy(handlerPhpContext->cookie, data, dataSize);
+			handlerPhpContext->cookie[dataSize] = '\0';
+
+			/* populates the various generated strings, avoids possible recalculation
+			of the lengths of the string */
+			stringPopulate(&handlerPhpContext->_cookieString, handlerPhpContext->cookie, dataSize, 0);
+
+			/* breaks the switch */
+			break;
+
+		default:
+			/* breaks the switch */
+			break;
+	}
 
     /* raise no error */
     RAISE_NO_ERROR;
@@ -322,7 +346,12 @@ ERROR_CODE _sendResponseHandlerModule(struct HttpParser_t *httpParser) {
     during for script execution */
     zend_file_handle script;
 
-    /* allocates space for the buffer that will hold the headers and
+	/* allocates space for both the index to be used for iteration
+	and for the count to be used in pointer increment  */
+	size_t index;
+	size_t count;
+
+	/* allocates space for the buffer that will hold the headers and
     the pointer that will hold the reference to the buffer containing
     the post data information */
     char *headersBuffer;
@@ -368,7 +397,11 @@ ERROR_CODE _sendResponseHandlerModule(struct HttpParser_t *httpParser) {
     handlerPhpContext->contentLength = httpParser->_contentLength;
     handlerPhpContext->outputBuffer = outputBuffer;
 
-    /* sets the php context in the php reques tfor global reference
+	/* resets the number of headers for the current php request
+	to be processed (this is a new php request) */
+	_phpRequest.headerCount = 0;
+
+    /* sets the php context in the php request for global reference
     this should be able to allow global access from the handler methods */
     _phpRequest.phpContext = handlerPhpContext;
 
@@ -399,8 +432,20 @@ ERROR_CODE _sendResponseHandlerModule(struct HttpParser_t *httpParser) {
 
     /* allocates space fot the header buffer and then writes the default values
     into it the value is dynamicaly contructed based on the current header values */
-    connection->allocData(connection, 1024, (void **) &headersBuffer);
-    SPRINTF(headersBuffer, 1024, "HTTP/1.1 200 OK\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nCache-Control: no-cache, must-revalidate\r\nContent-Type: %s\r\nContent-Length: %lu\r\n\r\n", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, _phpRequest.mimeType, (long unsigned int) outputBuffer->bufferLength);
+    connection->allocData(connection, 25602, (void **) &headersBuffer);
+    count = SPRINTF(headersBuffer, 1024, "HTTP/1.1 200 OK\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nContent-Length: %lu\r\n", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, (long unsigned int) outputBuffer->bufferLength);
+	
+	/* iterates over all the headers present in the current php request to copy
+	their content into the current headers buffer */
+	for(index = 0; index < _phpRequest.headerCount; index++) {
+		/* copies the current php header into the current position of the headers
+		buffer (header copy) */
+		count += SPRINTF(&headersBuffer[count], 1026, "%s\r\n", _phpRequest.headers[index]);
+	}
+
+	/* finishes the current headers sequence with the final carriage return newline
+	character values to closes the headers part of the envelope */
+	SPRINTF(&headersBuffer[count], 1024, "\r\n");
 
     /* writes the response to the connection, this will only write
     the headers the remaining message will be sent on the callback */
