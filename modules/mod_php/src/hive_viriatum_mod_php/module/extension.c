@@ -117,6 +117,8 @@ char *_moduleGetenv(char *name, size_t size TSRMLS_DC) {
 }
 
 int _moduleHeader(sapi_header_struct *header, sapi_header_op_enum operation, sapi_headers_struct *headers TSRMLS_DC) {
+	STRCPY(_phpRequest.headers[_phpRequest.headerCount], 1024, header->header);
+	_phpRequest.headerCount++;
     return 0;
 }
 
@@ -140,7 +142,7 @@ int _moduleReadPost(char *buffer, uint size TSRMLS_DC) {
 }
 
 char *_moduleReadCookies(TSRMLS_D) {
-    return NULL;
+    return _phpRequest.phpContext->cookie;
 }
 
 void _moduleRegister(zval *_array TSRMLS_DC) {
