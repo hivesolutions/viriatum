@@ -283,8 +283,8 @@ ERROR_CODE createWorkers(unsigned char workerCount) {
 	/* checks if the current process is a worker (zero based
 	pid value) or the master process and sets the process title
 	according to this value */
-	if(pid == 0) { SET_PROC_NAME("viriatum - worker"); }
-	else { SET_PROC_NAME("viriatum - master"); }
+	if(pid == 0) { SET_PROC_NAME("viriatum/w"); }
+	else { SET_PROC_NAME("viriatum/m"); }
 
     /* raises no error */
     RAISE_NO_ERROR;
