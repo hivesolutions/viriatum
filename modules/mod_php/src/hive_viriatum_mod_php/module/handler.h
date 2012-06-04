@@ -73,6 +73,12 @@ typedef struct HandlerPhpContext_t {
     unsigned char contentType[VIRIATUM_MAX_HEADER_SIZE];
 
     /**
+     * The cookie for the current request being
+     * made this is a header value.
+     */
+    unsigned char cookie[VIRIATUM_MAX_HEADER_SIZE];
+
+    /**
      * The string representing the http method
      * currently being used.
      */
@@ -103,10 +109,11 @@ typedef struct HandlerPhpContext_t {
     struct LinkedBuffer_t *outputBuffer;
 
     /**
-     * Flag used to control the reading of the content
-     * type header (private usage only).
+     * Enumeration value that controls the type
+	 * of the next header to be read from the 
+	 * http input buffer.
      */
-    char _nextContentType;
+    enum HttpHeader_e _nextHeader;
 
     /**
      * String reference to the url buffer, usefull
@@ -131,6 +138,12 @@ typedef struct HandlerPhpContext_t {
      * for fast attribute calculation (eg: size).
      */
     struct String_t _contentTypeString;
+
+    /**
+     * String reference to the cookie buffer, useful
+     * for fast attribute calculation (eg: size).
+     */
+    struct String_t _cookieString;
 } HandlerPhpContext;
 
 ERROR_CODE createModPhpHttpHandler(struct ModPhpHttpHandler_t **modPhpHttpHandlerPonter, struct HttpHandler_t *httpHandlerPonter);
