@@ -27,6 +27,17 @@
 
 #pragma once
 
+/**
+ * Enumeration defining the various possible
+ * and "recognizable" http header types, this
+ * may be used to provided static reference.
+ */
+typedef enum HttpHeader_e {
+	UNDEFINED_HEADER = 1,
+	CONTENT_TYPE,
+	COOKIE
+} HttpHeader;
+
 typedef enum HttpRequestMethod_e {
     GET_REQUEST_METHOD = 1,
     POST_REQUEST_METHOD = 1
