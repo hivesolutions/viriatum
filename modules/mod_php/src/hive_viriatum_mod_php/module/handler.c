@@ -446,10 +446,11 @@ ERROR_CODE _sendResponseHandlerModule(struct HttpParser_t *httpParser) {
     /* finishes the current headers sequence with the final carriage return newline
     character values to closes the headers part of the envelope */
     memcpy(&headersBuffer[count], "\r\n", 2);
+	count += 2;
 
     /* writes the response to the connection, this will only write
     the headers the remaining message will be sent on the callback */
-    connection->writeConnection(connection, (unsigned char *) headersBuffer, (unsigned int) strlen(headersBuffer), _sendDataCallback, (void *) handlerPhpContext);
+    connection->writeConnection(connection, (unsigned char *) headersBuffer, (unsigned int) count, _sendDataCallback, (void *) handlerPhpContext);
 
     /* raise no error */
     RAISE_NO_ERROR;
