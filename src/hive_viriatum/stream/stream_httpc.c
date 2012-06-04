@@ -224,11 +224,11 @@ ERROR_CODE generateParameters(struct HashMap_t *hashMap, unsigned char **bufferP
 
 
 ERROR_CODE openHandlerStreamHttpClient(struct IoConnection_t *ioConnection) {
-	/* allocates space for the temporary error variable to
-	be used to detect errors in calls */
+    /* allocates space for the temporary error variable to
+    be used to detect errors in calls */
     ERROR_CODE error;
-	
-	/* allocates the http client connection and retrieves the
+
+    /* allocates the http client connection and retrieves the
     "upper" connection (for parameters retrieval) */
     struct HttpClientConnection_t *httpClientConnection;
     struct Connection_t *connection = (struct Connection_t *) ioConnection->connection;
@@ -244,14 +244,14 @@ ERROR_CODE openHandlerStreamHttpClient(struct IoConnection_t *ioConnection) {
     unsigned char *getString;
     size_t getStringSize;
     struct String_t strings[9];
-	char *buffer = MALLOC(1024);
+    char *buffer = MALLOC(1024);
 
     SPRINTF((char *) peerId, 20, "-%s%d%d%d0-", VIRIATUM_PREFIX, VIRIATUM_MAJOR, VIRIATUM_MINOR, VIRIATUM_MICRO);
     randomBuffer(random, 12);
     memcpy(peerId + 8, random, 12);
 
     error = decodeBencodingFile("C:/verysleepy_0_82.exe.torrent", &type);
-	if(error) { RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem reading torrent file"); }
+    if(error) { RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem reading torrent file"); }
 
     getValueStringSortMap(type->value.valueSortMap, (unsigned char *) "info", (void **) &_type);
     encodeBencoding(_type, &_buffer, &_bufferSize);
