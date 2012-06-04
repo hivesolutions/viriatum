@@ -285,6 +285,13 @@ typedef struct ServiceOptions_t {
     unsigned char local;
 
     /**
+     * The number of worker processes to be
+	 * used for handling connection (should
+	 * approximate to the number of cpus).
+     */
+    unsigned char workers;
+
+    /**
      * If the default index file should be used in case
      * the root path file is requested (index.html is
      * the default file to be served).
