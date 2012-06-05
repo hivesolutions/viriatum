@@ -6,21 +6,21 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hive_viriatum_mod_php", "hive_viriatum_mod_php.vcproj", "{CA1DE8E0-8EB7-4C5A-811E-DF6511BB9996}"
 EndProject
 Global
-    GlobalSection(SolutionConfigurationPlatforms) = preSolution
-        Debug|Win32 = Debug|Win32
-        Release|Win32 = Release|Win32
-    EndGlobalSection
-    GlobalSection(ProjectConfigurationPlatforms) = postSolution
-        {163E6FE0-BBD8-49AA-9E4C-C88856322601}.Debug|Win32.ActiveCfg = Debug|Win32
-        {163E6FE0-BBD8-49AA-9E4C-C88856322601}.Debug|Win32.Build.0 = Debug|Win32
-        {163E6FE0-BBD8-49AA-9E4C-C88856322601}.Release|Win32.ActiveCfg = Release|Win32
-        {163E6FE0-BBD8-49AA-9E4C-C88856322601}.Release|Win32.Build.0 = Release|Win32
-        {CA1DE8E0-8EB7-4C5A-811E-DF6511BB9996}.Debug|Win32.ActiveCfg = Debug|Win32
-        {CA1DE8E0-8EB7-4C5A-811E-DF6511BB9996}.Debug|Win32.Build.0 = Debug|Win32
-        {CA1DE8E0-8EB7-4C5A-811E-DF6511BB9996}.Release|Win32.ActiveCfg = Release|Win32
-        {CA1DE8E0-8EB7-4C5A-811E-DF6511BB9996}.Release|Win32.Build.0 = Release|Win32
-    EndGlobalSection
-    GlobalSection(SolutionProperties) = preSolution
-        HideSolutionNode = FALSE
-    EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{163E6FE0-BBD8-49AA-9E4C-C88856322601}.Debug|Win32.ActiveCfg = Debug|Win32
+		{163E6FE0-BBD8-49AA-9E4C-C88856322601}.Debug|Win32.Build.0 = Debug|Win32
+		{163E6FE0-BBD8-49AA-9E4C-C88856322601}.Release|Win32.ActiveCfg = Release|Win32
+		{163E6FE0-BBD8-49AA-9E4C-C88856322601}.Release|Win32.Build.0 = Release|Win32
+		{CA1DE8E0-8EB7-4C5A-811E-DF6511BB9996}.Debug|Win32.ActiveCfg = Debug|Win32
+		{CA1DE8E0-8EB7-4C5A-811E-DF6511BB9996}.Debug|Win32.Build.0 = Debug|Win32
+		{CA1DE8E0-8EB7-4C5A-811E-DF6511BB9996}.Release|Win32.ActiveCfg = Release|Win32
+		{CA1DE8E0-8EB7-4C5A-811E-DF6511BB9996}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
 EndGlobal
