@@ -27,23 +27,23 @@
 
 #pragma once
 
-static __inline unsigned char *baseStringValue(unsigned char *stringValue) {
+static __inline unsigned char *base_string_value(unsigned char *string_value) {
     /* allocates the index counter */
     unsigned int index;
 
     /* allocates the current character value */
-    unsigned int currentCharacter;
+    unsigned int current_character;
 
     /* retrieves the string value length */
-    unsigned int stringValueLength = (unsigned int) strlen((char *) stringValue);
+    unsigned int string_value_length = (unsigned int) strlen((char *) string_value);
 
     /* iterates from back throught the string value */
-    for(index = stringValueLength; index > 0; index--) {
+    for(index = string_value_length; index > 0; index--) {
         /* retrieves the current character */
-        currentCharacter = stringValue[index];
+        current_character = string_value[index];
 
         /* in case the current character is a slash or a back-slash */
-        if(currentCharacter == '\\' || currentCharacter == '/') {
+        if(current_character == '\\' || current_character == '/') {
             /* increments the index in order to set the apropriate
             pointer value (need to point to the next chracter after the slash) */
             index += 1;
@@ -54,32 +54,32 @@ static __inline unsigned char *baseStringValue(unsigned char *stringValue) {
     }
 
     /* returns the "new" string value pointer */
-    return stringValue + index;
+    return string_value + index;
 }
 
-static __inline int endsWithString(unsigned char *stringValue, unsigned char *endValue) {
+static __inline int ends_with_string(unsigned char *string_value, unsigned char *end_value) {
     /* allocates space for the index value to be used in iteration */
     size_t index;
 
     /* retrieves the string size for both the (base) string
     value and the end value to be verified */
-    size_t stringValueSize = strlen((char *) stringValue);
-    size_t endValueSize = strlen((char *) endValue);
+    size_t string_value_size = strlen((char *) string_value);
+    size_t end_value_size = strlen((char *) end_value);
 
     /* in case the string to compare the end value is bigger
     than the base string value to be verified (impossible to
     end with the string) */
-    if(endValueSize > stringValueSize) {
+    if(end_value_size > string_value_size) {
         /* returns immediately false */
         return 0;
     }
 
     /* iterates over the end value string to compare
     the various character values */
-    for(index = 0; index < endValueSize; index++) {
+    for(index = 0; index < end_value_size; index++) {
         /* in case the current end values does not match the equivalent
         value in the base string value */
-        if(endValue[index] != stringValue[stringValueSize - endValueSize + index]) {
+        if(end_value[index] != string_value[string_value_size - end_value_size + index]) {
             /* returns in error (failed match) */
             return 0;
         }
