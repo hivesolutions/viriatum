@@ -28,4 +28,4 @@
 #pragma once
 
 static __inline void dump(void *argument) { }
-static __inline void dumpMultiple(void *argument, ...) { }
+static __inline void dump_multiple(void *argument, ...) { }
