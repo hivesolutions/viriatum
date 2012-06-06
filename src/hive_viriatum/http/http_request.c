@@ -29,22 +29,22 @@
 
 #include "http_request.h"
 
-void createHttpRequest(struct HttpRequest_t **httpRequestPointer) {
+void create_http_request(struct http_request_t **http_request_pointer) {
     /* retrieves the http request size */
-    size_t httpRequestSize = sizeof(struct HttpRequest_t);
+    size_t http_request_size = sizeof(struct http_request_t);
 
     /* allocates space for the http request */
-    struct HttpRequest_t *httpRequest = (struct HttpRequest_t *) MALLOC(httpRequestSize);
+    struct http_request_t *http_request = (struct http_request_t *) MALLOC(http_request_size);
 
     /* sets the http request default attributes */
-    httpRequest->method = GET_REQUEST_METHOD;
-    httpRequest->data = NULL;
+    http_request->method = GET_REQUEST_METHOD;
+    http_request->data = NULL;
 
     /* sets the http request in the http request pointer */
-    *httpRequestPointer = httpRequest;
+    *http_request_pointer = http_request;
 }
 
-void deleteHttpRequest(struct HttpRequest_t *httpRequest) {
+void delete_http_request(struct http_request_t *http_request) {
     /* releases the http request */
-    FREE(httpRequest);
+    FREE(http_request);
 }

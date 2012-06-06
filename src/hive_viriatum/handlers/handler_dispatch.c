@@ -29,7 +29,7 @@
 
 #include "handler_dispatch.h"
 
-ERROR_CODE create_dispatch_handler(struct dispatch_handler_t **dispatch_handler_pointer, struct HttpHandler_t *http_handler) {
+ERROR_CODE create_dispatch_handler(struct dispatch_handler_t **dispatch_handler_pointer, struct http_handler_t *http_handler) {
     /* retrieves the dispatch handler size */
     size_t dispatch_handler_size = sizeof(struct dispatch_handler_t);
 
@@ -82,7 +82,7 @@ ERROR_CODE delete_dispatch_handler(struct dispatch_handler_t *dispatch_handler) 
 
 ERROR_CODE register_handler_dispatch(struct Service_t *service) {
     /* allocates the http handler */
-    struct HttpHandler_t *http_handler;
+    struct http_handler_t *http_handler;
 
     /* allocates space for the dispatch handler */
     struct dispatch_handler_t *dispatch_handler;
@@ -127,7 +127,7 @@ ERROR_CODE register_handler_dispatch(struct Service_t *service) {
 
 ERROR_CODE unregister_handler_dispatch(struct Service_t *service) {
     /* allocates the http handler */
-    struct HttpHandler_t *http_handler;
+    struct http_handler_t *http_handler;
 
     /* allocates space for the dispatch handler */
     struct dispatch_handler_t *dispatch_handler;
@@ -149,7 +149,7 @@ ERROR_CODE unregister_handler_dispatch(struct Service_t *service) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE set_handler_dispatch(struct HttpConnection_t *http_connection) {
+ERROR_CODE set_handler_dispatch(struct http_connection_t *http_connection) {
     /* sets the http parser values */
     _set_http_parser_handler_dispatch(http_connection->http_parser);
 
@@ -160,7 +160,7 @@ ERROR_CODE set_handler_dispatch(struct HttpConnection_t *http_connection) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE unset_handler_dispatch(struct HttpConnection_t *http_connection) {
+ERROR_CODE unset_handler_dispatch(struct http_connection_t *http_connection) {
     /* unsets the http parser values */
     _unset_http_parser_handler_dispatch(http_connection->http_parser);
 
@@ -192,9 +192,9 @@ ERROR_CODE url_callback_handler_dispatch(struct http_parser_t *http_parser, cons
 
     struct Connection_t *connection = (struct Connection_t *) http_parser->parameters;
     struct IoConnection_t *io_connection = (struct IoConnection_t *) connection->lower;
-    struct HttpConnection_t *http_connection = (struct HttpConnection_t *) io_connection->lower;
+    struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
     struct Service_t *service = connection->service;
-    struct HttpHandler_t *handler = http_connection->http_handler;
+    struct http_handler_t *handler = http_connection->http_handler;
 #ifdef VIRIATUM_PCRE
     struct dispatch_handler_t *dispatch_handler = (struct dispatch_handler_t *) handler->lower;
 #endif
@@ -348,7 +348,7 @@ ERROR_CODE _send_response_callback_handler_dispatch(struct Connection_t *connect
     /* retrieves the underlying connection references in order to be
     able to operate over them, for unregister */
     struct IoConnection_t *io_connection = (struct IoConnection_t *) connection->lower;
-    struct HttpConnection_t *http_connection = (struct HttpConnection_t *) io_connection->lower;
+    struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
 
     /* in case there is an http handler in the current connection must
     unset it (remove temporary information) */

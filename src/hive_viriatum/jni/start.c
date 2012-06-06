@@ -31,14 +31,14 @@
 
 #ifdef VIRIATUM_JNI
 
-static JavaVM *javaVM;
+static JavaVM *java_vm;
 
 jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     /* allocates space for the current java environment */
     JNIEnv *env;
 
     /* saves the current java vm reference */
-    javaVM = vm;
+    java_vm = vm;
 
     /* retrieves the environment value and checks
     the jni version in case it fails return in error */

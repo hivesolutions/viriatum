@@ -60,7 +60,7 @@ ERROR_CODE createTorrentConnection(struct TorrentConnection_t **torrentConnectio
     /* retrieves the current (default) service handler and sets the
     connection on it, then sets this handler as the base handler */
   /*  torrentHandler = service->torrentHandler;
-    torrentConnection->baseHandler = torrentHandler;*/
+    torrentConnection->base_handler = torrentHandler;*/
 
     /* sets the torrent connection in the torrent connection pointer */
     *torrentConnectionPointer = torrentConnection;

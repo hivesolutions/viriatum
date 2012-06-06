@@ -33,7 +33,7 @@
 #include "stream_io.h"
 
 /* forward references (avoids loop) */
-struct HttpConnection_t;
+struct http_connection_t;
 
 /**
  * Function used to update the given http connection
@@ -42,7 +42,7 @@ struct HttpConnection_t;
  * @param http_connection The http connection to be
  * update with new information.
  */
-typedef ERROR_CODE (*httpConnectionUpdate) (struct HttpConnection_t *http_connection);
+typedef ERROR_CODE (*http_connection_update) (struct http_connection_t *http_connection);
 
 /**
  * The structure that describes the structure
@@ -50,7 +50,7 @@ typedef ERROR_CODE (*httpConnectionUpdate) (struct HttpConnection_t *http_connec
  * http request and construct a response based
  * on it.
  */
-typedef struct HttpHandler_t {
+typedef struct http_handler_t {
     /**
      * The name that describes the http
      * handler.
@@ -59,9 +59,9 @@ typedef struct HttpHandler_t {
      */
     unsigned char *name;
 
-    httpConnectionUpdate set;
-    httpConnectionUpdate unset;
-    httpConnectionUpdate reset;
+    http_connection_update set;
+    http_connection_update unset;
+    http_connection_update reset;
 
     /**
      * The reference to the service that "owns"
@@ -76,13 +76,13 @@ typedef struct HttpHandler_t {
      * handler substrate (child).
      */
     void *lower;
-} HttpHandler;
+} http_handler;
 
 /**
  * Structure defining a logical
  * http connection.
  */
-typedef struct HttpConnection_t {
+typedef struct http_connection_t {
     /**
      * The (upper) io connection that owns
      * manages this connection.
@@ -109,14 +109,14 @@ typedef struct HttpConnection_t {
      * This is an internal value and must be used
      * with care.
      */
-    struct HttpHandler_t *http_handler;
+    struct http_handler_t *http_handler;
 
     /**
      * The base handler for the connection every new
      * request entering this connection will be handled
      * initialy by this handler.
      */
-    struct HttpHandler_t *baseHandler;
+    struct http_handler_t *base_handler;
 
     /**
      * The current contiguous buffer for the complete
@@ -136,13 +136,13 @@ typedef struct HttpConnection_t {
      * The current offset of the buffer containing the http
      * data in processing.
      */
-    size_t bufferOffset;
-} HttpConnection;
+    size_t buffer_offset;
+} http_connection;
 
-ERROR_CODE create_http_handler(struct HttpHandler_t **httpHandlerPointer, unsigned char *name);
-ERROR_CODE delete_http_handler(struct HttpHandler_t *http_handler);
-ERROR_CODE createHttpConnection(struct HttpConnection_t **httpConnectionPointer, struct IoConnection_t *io_connection);
-ERROR_CODE deleteHttpConnection(struct HttpConnection_t *http_connection);
-ERROR_CODE dataHandlerStreamHttp(struct IoConnection_t *io_connection, unsigned char *buffer, size_t buffer_size);
-ERROR_CODE openHandlerStreamHttp(struct IoConnection_t *io_connection);
-ERROR_CODE closeHandlerStreamHttp(struct IoConnection_t *io_connection);
+ERROR_CODE create_http_handler(struct http_handler_t **http_handler_pointer, unsigned char *name);
+ERROR_CODE delete_http_handler(struct http_handler_t *http_handler);
+ERROR_CODE create_http_connection(struct http_connection_t **http_connection_pointer, struct IoConnection_t *io_connection);
+ERROR_CODE delete_http_connection(struct http_connection_t *http_connection);
+ERROR_CODE data_handler_stream_http(struct IoConnection_t *io_connection, unsigned char *buffer, size_t buffer_size);
+ERROR_CODE open_handler_stream_http(struct IoConnection_t *io_connection);
+ERROR_CODE close_handler_stream_http(struct IoConnection_t *io_connection);

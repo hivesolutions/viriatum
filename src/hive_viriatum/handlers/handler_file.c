@@ -74,7 +74,7 @@ ERROR_CODE delete_handler_file_context(struct handler_file_context_t *handler_fi
 
 ERROR_CODE register_handler_file(struct Service_t *service) {
     /* allocates the http handler */
-    struct HttpHandler_t *http_handler;
+    struct http_handler_t *http_handler;
 
     /* creates the http handler */
     service->create_http_handler(service, &http_handler, (unsigned char *) "file");
@@ -93,7 +93,7 @@ ERROR_CODE register_handler_file(struct Service_t *service) {
 
 ERROR_CODE unregister_handler_file(struct Service_t *service) {
     /* allocates the http handler */
-    struct HttpHandler_t *http_handler;
+    struct http_handler_t *http_handler;
 
     /* retrieves the http handler from the service, then
     remove it from the service after that delete the handler */
@@ -105,7 +105,7 @@ ERROR_CODE unregister_handler_file(struct Service_t *service) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE set_handler_file(struct HttpConnection_t *http_connection) {
+ERROR_CODE set_handler_file(struct http_connection_t *http_connection) {
     /* sets the http parser values */
     _set_http_parser_handler_file(http_connection->http_parser);
 
@@ -116,7 +116,7 @@ ERROR_CODE set_handler_file(struct HttpConnection_t *http_connection) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE unset_handler_file(struct HttpConnection_t *http_connection) {
+ERROR_CODE unset_handler_file(struct http_connection_t *http_connection) {
     /* unsets the http parser values */
     _unset_http_parser_handler_file(http_connection->http_parser);
 
@@ -127,7 +127,7 @@ ERROR_CODE unset_handler_file(struct HttpConnection_t *http_connection) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE reset_handler_file(struct HttpConnection_t *http_connection) {
+ERROR_CODE reset_handler_file(struct http_connection_t *http_connection) {
     /* resets the http parser values */
     _reset_http_parser_handler_file(http_connection->http_parser);
 
@@ -504,7 +504,7 @@ ERROR_CODE _cleanup_handler_file(struct Connection_t *connection, struct Data_t 
     /* retrieves the underlying connection references in order to be
     able to operate over them, for unregister */
     struct IoConnection_t *io_connection = (struct IoConnection_t *) connection->lower;
-    struct HttpConnection_t *http_connection = (struct HttpConnection_t *) io_connection->lower;
+    struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
 
     /* in case there is an http handler in the current connection must
     unset it (remove temporary information) */

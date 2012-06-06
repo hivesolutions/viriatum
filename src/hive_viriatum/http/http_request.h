@@ -32,32 +32,32 @@
  * and "recognizable" http header types, this
  * may be used to provided static reference.
  */
-typedef enum HttpHeader_e {
+typedef enum http_header_e {
     UNDEFINED_HEADER = 1,
     CONTENT_TYPE,
     COOKIE
-} HttpHeader;
+} http_header;
 
-typedef enum HttpRequestMethod_e {
+typedef enum http_request_method_e {
     GET_REQUEST_METHOD = 1,
     POST_REQUEST_METHOD = 1
-} HttpRequestMethod;
+} http_request_method;
 
-typedef struct HttpRequest_t {
-    enum HttpRequestMethod_e method;
+typedef struct http_request_t {
+    enum http_request_method_e method;
     unsigned char *data;
-} HttpRequest;
+} http_request;
 
 /**
  * Constructor of the http request.
  *
- * @param httpRequestPointer The pointer to the http request to be constructed.
+ * @param http_request_pointer The pointer to the http request to be constructed.
  */
-void createHttpRequest(struct HttpRequest_t **httpRequestPointer);
+void create_http_request(struct http_request_t **http_request_pointer);
 
 /**
  * Destructor of the http request.
  *
- * @param httpRequest The http request to be destroyed.
+ * @param http_request The http request to be destroyed.
  */
-void deleteHttpRequest(struct HttpRequest_t *httpRequest);
+void delete_http_request(struct http_request_t *http_request);

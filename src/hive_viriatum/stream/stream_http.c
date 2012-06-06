@@ -29,12 +29,12 @@
 
 #include "stream_http.h"
 
-ERROR_CODE create_http_handler(struct HttpHandler_t **httpHandlerPointer, unsigned char *name) {
+ERROR_CODE create_http_handler(struct http_handler_t **http_handler_pointer, unsigned char *name) {
     /* retrieves the http handler size */
-    size_t httpHandlerSize = sizeof(struct HttpHandler_t);
+    size_t http_handler_size = sizeof(struct http_handler_t);
 
     /* allocates space for the http handler */
-    struct HttpHandler_t *http_handler = (struct HttpHandler_t *) MALLOC(httpHandlerSize);
+    struct http_handler_t *http_handler = (struct http_handler_t *) MALLOC(http_handler_size);
 
     /* sets the http handler attributes (default) values */
     http_handler->name = name;
@@ -43,13 +43,13 @@ ERROR_CODE create_http_handler(struct HttpHandler_t **httpHandlerPointer, unsign
     http_handler->reset = NULL;
 
     /* sets the http handler in the http handler pointer */
-    *httpHandlerPointer = http_handler;
+    *http_handler_pointer = http_handler;
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE delete_http_handler(struct HttpHandler_t *http_handler) {
+ERROR_CODE delete_http_handler(struct http_handler_t *http_handler) {
     /* releases the http handler */
     FREE(http_handler);
 
@@ -57,16 +57,16 @@ ERROR_CODE delete_http_handler(struct HttpHandler_t *http_handler) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE createHttpConnection(struct HttpConnection_t **httpConnectionPointer, struct IoConnection_t *io_connection) {
+ERROR_CODE create_http_connection(struct http_connection_t **http_connection_pointer, struct IoConnection_t *io_connection) {
     /* allocates space for the http handler reference
     to be used in this connection */
-    struct HttpHandler_t *http_handler;
+    struct http_handler_t *http_handler;
 
     /* retrieves the http connection size */
-    size_t httpConnectionSize = sizeof(struct HttpConnection_t);
+    size_t http_connection_size = sizeof(struct http_connection_t);
 
     /* allocates space for the http connection */
-    struct HttpConnection_t *http_connection = (struct HttpConnection_t *) MALLOC(httpConnectionSize);
+    struct http_connection_t *http_connection = (struct http_connection_t *) MALLOC(http_connection_size);
 
     /* retrieves the service associated with the connection */
     struct Service_t *service = io_connection->connection->service;
@@ -76,13 +76,13 @@ ERROR_CODE createHttpConnection(struct HttpConnection_t **httpConnectionPointer,
     http_connection->http_handler = NULL;
     http_connection->buffer = NULL;
     http_connection->buffer_size = 0;
-    http_connection->bufferOffset = 0;
+    http_connection->buffer_offset = 0;
 
     /* creates the http settings */
-    createHttpSettings(&http_connection->http_settings);
+    create_http_settings(&http_connection->http_settings);
 
     /* creates the http parser (for a request) */
-    createHttpParser(&http_connection->http_parser, 1);
+    create_http_parser(&http_connection->http_parser, 1);
 
     /* sets the connection as the parser parameter(s) */
     http_connection->http_parser->parameters = io_connection->connection;
@@ -93,19 +93,19 @@ ERROR_CODE createHttpConnection(struct HttpConnection_t **httpConnectionPointer,
     /* retrieves the current (default) service handler and sets the
     connection on it, then sets this handler as the base handler */
     http_handler = service->http_handler;
-    http_connection->baseHandler = http_handler;
+    http_connection->base_handler = http_handler;
 
     /* sets the http connection in the http connection pointer */
-    *httpConnectionPointer = http_connection;
+    *http_connection_pointer = http_connection;
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE deleteHttpConnection(struct HttpConnection_t *http_connection) {
+ERROR_CODE delete_http_connection(struct http_connection_t *http_connection) {
     /* allocates space for the http handler reference
     to be used in this connection */
-    struct HttpHandler_t *http_handler;
+    struct http_handler_t *http_handler;
 
     /* retrieves the currently assigned handler and usets the connection
     from with (unregister connection) */
@@ -117,10 +117,10 @@ ERROR_CODE deleteHttpConnection(struct HttpConnection_t *http_connection) {
     if(http_connection->buffer) { FREE(http_connection->buffer); }
 
     /* deletes the http parser */
-    deleteHttpParser(http_connection->http_parser);
+    delete_http_parser(http_connection->http_parser);
 
     /* deletes the http settings */
-    deleteHttpSettings(http_connection->http_settings);
+    delete_http_settings(http_connection->http_settings);
 
     /* releases the http connection */
     FREE(http_connection);
@@ -129,11 +129,11 @@ ERROR_CODE deleteHttpConnection(struct HttpConnection_t *http_connection) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE dataHandlerStreamHttp(struct IoConnection_t *io_connection, unsigned char *buffer, size_t buffer_size) {
+ERROR_CODE data_handler_stream_http(struct IoConnection_t *io_connection, unsigned char *buffer, size_t buffer_size) {
     /* allocates space for the temporary variable to
     hold the ammount of bytes processed in a given http
     data parsing iteration */
-    int processedSize;
+    int processed_size;
 
     /* allocates the reference to the pointer to current
     buffer position to be parsed (initial position) */
@@ -141,10 +141,10 @@ ERROR_CODE dataHandlerStreamHttp(struct IoConnection_t *io_connection, unsigned 
 
     /* allocates space for the http handler reference
     to be used in this connection */
-    struct HttpHandler_t *http_handler;
+    struct http_handler_t *http_handler;
 
     /* retrieves the http connection */
-    struct HttpConnection_t *http_connection = (struct HttpConnection_t *) io_connection->lower;
+    struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
 
     /* iterates continuously, this allows the stream handler
     to split the stream into possible multiple messages, usefull
@@ -158,9 +158,9 @@ ERROR_CODE dataHandlerStreamHttp(struct IoConnection_t *io_connection, unsigned 
         }
         /* in case the http connection buffer is currently set but the available
         space is not enough must reallocate the buffer (increment size) */
-        else if(http_connection->bufferOffset + buffer_size > http_connection->buffer_size) {
-            if(http_connection->http_parser->_contentLength > 0) {
-                http_connection->buffer_size += http_connection->http_parser->_contentLength;
+        else if(http_connection->buffer_offset + buffer_size > http_connection->buffer_size) {
+            if(http_connection->http_parser->_content_length > 0) {
+                http_connection->buffer_size += http_connection->http_parser->_content_length;
                 http_connection->buffer = REALLOC((void *) http_connection->buffer, http_connection->buffer_size);
             }
             else {
@@ -172,16 +172,16 @@ ERROR_CODE dataHandlerStreamHttp(struct IoConnection_t *io_connection, unsigned 
         /* retrieves the pointer reference to the current position in the
         buffer to be used for writing then copies the current buffer data
         into it and updates the buffer size */
-        _buffer = http_connection->buffer + http_connection->bufferOffset;
+        _buffer = http_connection->buffer + http_connection->buffer_offset;
         memcpy(_buffer, buffer, buffer_size);
-        http_connection->bufferOffset += buffer_size;
+        http_connection->buffer_offset += buffer_size;
 
         /* in case there's currently no http handler associated with the
         http connection (need to create one) */
         if(http_connection->http_handler == NULL) {
             /* retrieves the current connection's base handler and then sets
             it in the current connection then sets it as the current http handler */
-            http_handler = http_connection->baseHandler;
+            http_handler = http_connection->base_handler;
             http_handler->set(http_connection);
             http_connection->http_handler = http_handler;
         }
@@ -189,7 +189,7 @@ ERROR_CODE dataHandlerStreamHttp(struct IoConnection_t *io_connection, unsigned 
         /* process the http data for the http parser, this should be
         a partial processing and some data may remain unprocessed (in
         case there are multiple http requests) */
-        processedSize = processDataHttpParser(http_connection->http_parser, http_connection->http_settings, _buffer, buffer_size);
+        processed_size = process_data_http_parser(http_connection->http_parser, http_connection->http_settings, _buffer, buffer_size);
 
         /* in case the current state in the http parser is the
         start state, ther message is considered to be completly
@@ -201,54 +201,54 @@ ERROR_CODE dataHandlerStreamHttp(struct IoConnection_t *io_connection, unsigned 
             FREE(http_connection->buffer);
             http_connection->buffer = NULL;
             http_connection->buffer_size = 0;
-            http_connection->bufferOffset = 0;
+            http_connection->buffer_offset = 0;
 
             /* resets the http parser state */
             http_connection->http_parser->type = 2;
             http_connection->http_parser->flags = 6;
             http_connection->http_parser->state = STATE_START_REQ;
-            http_connection->http_parser->headerState = 0;
+            http_connection->http_parser->header_state = 0;
             http_connection->http_parser->read_count = 0;
-            http_connection->http_parser->contentLength = -1;
-            http_connection->http_parser->httpMajor = 0;
-            http_connection->http_parser->httpMinor = 0;
-            http_connection->http_parser->statusCode = 0;
+            http_connection->http_parser->content_length = -1;
+            http_connection->http_parser->http_major = 0;
+            http_connection->http_parser->http_minor = 0;
+            http_connection->http_parser->status_code = 0;
             http_connection->http_parser->method = 0;
             http_connection->http_parser->upgrade = 0;
-            http_connection->http_parser->_contentLength = 0;
+            http_connection->http_parser->_content_length = 0;
         }
 
         /* in case all the remaining data has been processed
         no need to process more http data (breaks the loop) */
-        if(processedSize > 0 && (size_t) processedSize == buffer_size) { break; }
+        if(processed_size > 0 && (size_t) processed_size == buffer_size) { break; }
 
         /* increments the buffer pointer and updates the buffer
         size value to the new size */
-        buffer += processedSize;
-        buffer_size -= processedSize;
+        buffer += processed_size;
+        buffer_size -= processed_size;
     }
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE openHandlerStreamHttp(struct IoConnection_t *io_connection) {
+ERROR_CODE open_handler_stream_http(struct IoConnection_t *io_connection) {
     /* allocates the http connection */
-    struct HttpConnection_t *http_connection;
+    struct http_connection_t *http_connection;
 
     /* creates the http connection */
-    createHttpConnection(&http_connection, io_connection);
+    create_http_connection(&http_connection, io_connection);
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE closeHandlerStreamHttp(struct IoConnection_t *io_connection) {
+ERROR_CODE close_handler_stream_http(struct IoConnection_t *io_connection) {
     /* retrieves the http connection */
-    struct HttpConnection_t *http_connection = (struct HttpConnection_t *) io_connection->lower;
+    struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
 
     /* deletes the http connection */
-    deleteHttpConnection(http_connection);
+    delete_http_connection(http_connection);
 
     /* raises no error */
     RAISE_NO_ERROR;

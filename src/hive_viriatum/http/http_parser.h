@@ -53,7 +53,7 @@
 #define IS_URL_CHAR(byte) (normal_url_char[(unsigned char) (byte)])
 #define IS_HOST_CHAR(byte) (IS_ALPHANUM(c) || (c) == '.' || (byte) == '-')
 #else
-#define IS_URL_CHAR(byte) (normalUrlChar[(byte)] || ((byte) & 0x80))
+#define IS_URL_CHAR(byte) (normal_url_char[(byte)] || ((byte) & 0x80))
 #define IS_HOST_CHAR(byte) (IS_ALPHANUM(byte) || (byte) == '.' || (byte) == '-' || (byte) == '_')
 #endif
 
@@ -65,7 +65,7 @@
             goto error;\
         }\
     } while(0)
-#define NEW_MESSAGE() (httpShouldKeepAlive(parser) ? START_STATE : STATE_DEAD)
+#define NEW_MESSAGE() (http_should_keep_alive(parser) ? START_STATE : STATE_DEAD)
 #else
 #define STRICT_CHECK(condition)
 #define NEW_MESSAGE() START_STATE
@@ -193,7 +193,7 @@ static const char unhex[256] = {
  * Chracters that return 0 to this map are considered
  * to be out of the url characters range.
  */
-static const unsigned char normalUrlChar[256] = {
+static const unsigned char normal_url_char[256] = {
 /*   0 nul    1 soh    2 stx    3 etx    4 eot    5 enq    6 ack    7 bel  */
         0,       0,       0,       0,       0,       0,       0,       0,
 /*   8 bs     9 ht    10 nl    11 vt    12 np    13 cr    14 so    15 si   */
@@ -234,7 +234,7 @@ static const unsigned char normalUrlChar[256] = {
  * This names may be used together with an enumeration
  * defining a sequence of http methods.
  */
-static const char *httpMethodStrings[24] = {
+static const char *http_method_strings[24] = {
     "DELETE",
     "GET",
     "HEAD",
@@ -422,13 +422,13 @@ typedef struct http_parser_t {
     unsigned char type;
     unsigned char flags;
     enum http_parser_state_e state;
-    enum http_header_state_e headerState;
+    enum http_header_state_e header_state;
     unsigned char index;
     size_t read_count;
-    int contentLength;
-    unsigned short httpMajor;
-    unsigned short httpMinor;
-    unsigned short statusCode;
+    int content_length;
+    unsigned short http_major;
+    unsigned short http_minor;
+    unsigned short status_code;
     unsigned char method;
     char upgrade;
     void *context;
@@ -445,7 +445,7 @@ typedef struct http_parser_t {
      * The original content length value, this
      * value is not changed across parsing requests.
      */
-    size_t _contentLength;
+    size_t _content_length;
 } http_parser;
 
 /**
@@ -469,28 +469,28 @@ typedef struct http_settings_t {
  * @param request If the parser is meant to be created for a request if not
  * set the parser assumes it's a response.
  */
-void createHttpParser(struct http_parser_t **http_parser_pointer, char request);
+void create_http_parser(struct http_parser_t **http_parser_pointer, char request);
 
 /**
  * Destructor of the http parser.
  *
  * @param http_parser The http parser to be destroyed.
  */
-void deleteHttpParser(struct http_parser_t *http_parser);
+void delete_http_parser(struct http_parser_t *http_parser);
 
 /**
  * Constructor of the http settings.
  *
  * @param http_settings_pointer The pointer to the http settings to be constructed.
  */
-void createHttpSettings(struct http_settings_t **http_settings_pointer);
+void create_http_settings(struct http_settings_t **http_settings_pointer);
 
 /**
  * Destructor of the http settings.
  *
  * @param http_settings The http settings to be destroyed.
  */
-void deleteHttpSettings(struct http_settings_t *http_settings);
+void delete_http_settings(struct http_settings_t *http_settings);
 
 /**
  * Called to process a new data chunk in the context
@@ -504,17 +504,17 @@ void deleteHttpSettings(struct http_settings_t *http_settings);
  * @param data_size The size of the data to be parsed.
  * @return The number of bytes used during the processing.
  */
-int processDataHttpParser(struct http_parser_t *http_parser, struct http_settings_t *http_settings, unsigned char *data, size_t data_size);
+int process_data_http_parser(struct http_parser_t *http_parser, struct http_settings_t *http_settings, unsigned char *data, size_t data_size);
 
 /**
  * Retrieves the string representing the http method for
  * the given http method integer represented in the
  * enumeration.
  *
- * @param httpMethod The http method integer to be "converted"
+ * @param http_method The http method integer to be "converted"
  * into string representation.
  * @return The string representation of the http method.
  */
-static __inline const char *get_http_method_string(enum http_method_e httpMethod) {
-    return httpMethodStrings[httpMethod - 1];
+static __inline const char *get_http_method_string(enum http_method_e http_method) {
+    return http_method_strings[http_method - 1];
 }

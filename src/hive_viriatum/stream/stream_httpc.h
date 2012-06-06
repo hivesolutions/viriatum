@@ -31,22 +31,22 @@
 #include "stream_io.h"
 
 /* forward references (avoids loop) */
-struct HttpClientConnection_t;
+struct http_client_connection_t;
 
 /**
  * Function used to update the given http client connection
  * with new information.
  *
- * @param httpClientConnection The http client connection to be
+ * @param http_client_connection The http client connection to be
  * update with new information.
  */
-typedef ERROR_CODE (*httpClientConnectionUpdate) (struct HttpClientConnection_t *httpClientConnection);
+typedef ERROR_CODE (*http_client_cConnection_update) (struct http_client_connection_t *http_client_connection);
 
 /**
  * Structure defining a logical
  * http client connection.
  */
-typedef struct HttpClientConnection_t {
+typedef struct http_client_connection_t {
     /**
      * The (upper) io connection that owns
      * manages this connection.
@@ -64,14 +64,14 @@ typedef struct HttpClientConnection_t {
      * of the http requests.
      */
     struct http_parser_t *http_parser;
-} HttpClientConnection;
+} http_client_connection;
 
-typedef struct HttpClientParameters_t {
+typedef struct http_client_parameters_t {
     char *url;
 } HttpClientParameters;
 
-ERROR_CODE createHttpClientConnection(struct HttpClientConnection_t **httpClientConnectionPointer, struct IoConnection_t *io_connection);
-ERROR_CODE deleteHttpClientConnection(struct HttpClientConnection_t *httpClientConnection);
-ERROR_CODE dataHandlerStreamHttpClient(struct IoConnection_t *io_connection, unsigned char *buffer, size_t buffer_size);
-ERROR_CODE openHandlerStreamHttpClient(struct IoConnection_t *io_connection);
-ERROR_CODE closeHandlerStreamHttpClient(struct IoConnection_t *io_connection);
+ERROR_CODE create_http_client_connection(struct http_client_connection_t **http_client_connection_pointer, struct IoConnection_t *io_connection);
+ERROR_CODE delete_http_client_connection(struct http_client_connection_t *http_client_connection);
+ERROR_CODE data_handler_stream_http_client(struct IoConnection_t *io_connection, unsigned char *buffer, size_t buffer_size);
+ERROR_CODE open_handler_stream_http_client(struct IoConnection_t *io_connection);
+ERROR_CODE close_handler_stream_http_client(struct IoConnection_t *io_connection);

@@ -33,12 +33,12 @@
 /* forward references (avoids loop) */
 struct Data_t;
 struct Connection_t;
-struct HttpConnection_t;
+struct http_connection_t;
 
 ERROR_CODE register_handler_default(struct Service_t *service);
 ERROR_CODE unregister_handler_default(struct Service_t *service);
-ERROR_CODE set_handler_default(struct HttpConnection_t *http_connection);
-ERROR_CODE unset_handler_default(struct HttpConnection_t *http_connection);
+ERROR_CODE set_handler_default(struct http_connection_t *http_connection);
+ERROR_CODE unset_handler_default(struct http_connection_t *http_connection);
 ERROR_CODE message_begin_callback_handler_default(struct http_parser_t *http_parser);
 ERROR_CODE url_callback_handler_default(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size);
 ERROR_CODE header_field_callback_handler_default(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size);

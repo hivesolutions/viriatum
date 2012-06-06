@@ -40,7 +40,7 @@ void create_service(struct Service_t **servicePointer, unsigned char *name) {
     service->name = name;
     service->status = STATUS_CLOSED;
     service->configuration = NULL;
-    service->serviceSocketHandle = 0;
+    service->service_socket_handle = 0;
     service->http_handler = NULL;
     service->create_http_handler = createHttpHandlerService;
     service->delete_http_handler = deleteHttpHandlerService;
@@ -55,10 +55,10 @@ void create_service(struct Service_t **servicePointer, unsigned char *name) {
     createPolling(&service->polling);
 
     /* creates the connections list */
-    create_linked_list(&service->connectionsList);
+    create_linked_list(&service->connections_list);
 
     /* creates the http modules list */
-    create_linked_list(&service->modulesList);
+    create_linked_list(&service->modules_list);
 
     /* creates the http handlers map */
     create_hash_map(&service->http_handlers_map, 0);
@@ -69,9 +69,9 @@ void create_service(struct Service_t **servicePointer, unsigned char *name) {
 
 void delete_service(struct Service_t *service) {
     /* in case the service socket handle is defined */
-    if(service->serviceSocketHandle) {
+    if(service->service_socket_handle) {
         /* closes the service socket (secure closing) */
-        SOCKET_CLOSE(service->serviceSocketHandle);
+        SOCKET_CLOSE(service->service_socket_handle);
     }
 
     /* in case the service configuration is defined */
@@ -84,10 +84,10 @@ void delete_service(struct Service_t *service) {
     delete_hash_map(service->http_handlers_map);
 
     /* deletes the http modules list */
-    delete_linked_list(service->modulesList);
+    delete_linked_list(service->modules_list);
 
     /* deletes the connections list */
-    delete_linked_list(service->connectionsList);
+    delete_linked_list(service->connections_list);
 
     /* deletes the polling (provider) */
     deletePolling(service->polling);
@@ -360,9 +360,9 @@ ERROR_CODE _createClientConnection(struct Connection_t **connectionPointer, stru
 
     /* sets the various stream io connection callbacks
     in the client connection */
-    connection->onRead = readHandlerStreamIo;
-    connection->onWrite = writeHandlerStreamIo;
-    connection->onError = errorHandlerStreamIo;
+    connection->on_read = readHandlerStreamIo;
+    connection->on_write = writeHandlerStreamIo;
+    connection->on_error = errorHandlerStreamIo;
     connection->onOpen = openHandlerStreamIo;
     connection->onClose = closeHandlerStreamIo;
 
@@ -381,7 +381,7 @@ ERROR_CODE _createTrackerConnection(struct Connection_t **connectionPointer, str
     /* alocates dynamic space for the parameters to the
     http stream (http client) this structure will be able
     to guide the stream of http client */
-    struct HttpClientParameters_t *parameters = (struct HttpClientParameters_t *) MALLOC(sizeof(struct HttpClientParameters_t));
+    struct http_client_parameters_t *parameters = (struct http_client_parameters_t *) MALLOC(sizeof(struct http_client_parameters_t));
 
     /* populates the parameters structure with the
     required values for the http client request */
@@ -454,10 +454,10 @@ ERROR_CODE start_service(struct Service_t *service) {
     SOCKET_ADDRESS_INTERNET socket_address;
 
     /* allocates the socket result */
-    SOCKET_ERROR_CODE socketResult;
+    SOCKET_ERROR_CODE socket_result;
 
     /* allocates the service socket handle */
-    SOCKET_HANDLE serviceSocketHandle;
+    SOCKET_HANDLE service_socket_handle;
 
     /* allocates the service connection */
     struct Connection_t *serviceConnection;
@@ -512,12 +512,12 @@ ERROR_CODE start_service(struct Service_t *service) {
     socket_address.sin_port = htons(serviceOptions->port);
 
     /* creates the service socket for the given types */
-    service->serviceSocketHandle = SOCKET_CREATE(SOCKET_INTERNET_TYPE, SOCKET_PACKET_TYPE, SOCKET_PROTOCOL_TCP);
+    service->service_socket_handle = SOCKET_CREATE(SOCKET_INTERNET_TYPE, SOCKET_PACKET_TYPE, SOCKET_PROTOCOL_TCP);
 
     /* in case there was an error creating the service socket */
-    if(SOCKET_TEST_ERROR(service->serviceSocketHandle)) {
+    if(SOCKET_TEST_ERROR(service->service_socket_handle)) {
         /* retrieves the creating error code */
-        SOCKET_ERROR_CODE creatingErrorCode = SOCKET_GET_ERROR_CODE(socketResult);
+        SOCKET_ERROR_CODE creatingErrorCode = SOCKET_GET_ERROR_CODE(socket_result);
 
         /* prints the error */
         V_ERROR_F("Problem creating socket: %d\n", creatingErrorCode);
@@ -528,57 +528,57 @@ ERROR_CODE start_service(struct Service_t *service) {
 
     /* in case viriatum is set to non blocking, changes the current
     socket behavior to non blocking mode */
-    if(VIRIATUM_NON_BLOCKING) { SOCKET_SET_NON_BLOCKING(service->serviceSocketHandle, flags); }
+    if(VIRIATUM_NON_BLOCKING) { SOCKET_SET_NON_BLOCKING(service->service_socket_handle, flags); }
 
     /* sets the socket reuse address option in the socket */
-    socketResult = SOCKET_SET_OPTIONS(service->serviceSocketHandle, SOCKET_OPTIONS_LEVEL_SOCKET, SOCKET_OPTIONS_REUSE_ADDRESS_SOCKET, option_value);
+    socket_result = SOCKET_SET_OPTIONS(service->service_socket_handle, SOCKET_OPTIONS_LEVEL_SOCKET, SOCKET_OPTIONS_REUSE_ADDRESS_SOCKET, option_value);
 
     /* in case there was an error binding the socket */
-    if(SOCKET_TEST_ERROR(socketResult)) {
+    if(SOCKET_TEST_ERROR(socket_result)) {
         /* retrieves the option error code */
-        SOCKET_ERROR_CODE optionErrorCode = SOCKET_GET_ERROR_CODE(socketResult);
+        SOCKET_ERROR_CODE optionErrorCode = SOCKET_GET_ERROR_CODE(socket_result);
 
         /* prints the error */
         V_ERROR_F("Problem setting socket option: %d\n", optionErrorCode);
 
         /* closes the service socket */
-        SOCKET_CLOSE(service->serviceSocketHandle);
+        SOCKET_CLOSE(service->service_socket_handle);
 
         /* raises an error */
         RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem setting socket option");
     }
 
     /* binds the service socket */
-    socketResult = SOCKET_BIND(service->serviceSocketHandle, socket_address);
+    socket_result = SOCKET_BIND(service->service_socket_handle, socket_address);
 
     /* in case there was an error binding the socket */
-    if(SOCKET_TEST_ERROR(socketResult)) {
+    if(SOCKET_TEST_ERROR(socket_result)) {
         /* retrieves the binding error code */
-        SOCKET_ERROR_CODE bindingErrorCode = SOCKET_GET_ERROR_CODE(socketResult);
+        SOCKET_ERROR_CODE bindingErrorCode = SOCKET_GET_ERROR_CODE(socket_result);
 
         /* prints the error */
         V_ERROR_F("Problem binding socket: %d\n", bindingErrorCode);
 
         /* closes the service socket */
-        SOCKET_CLOSE(service->serviceSocketHandle);
+        SOCKET_CLOSE(service->service_socket_handle);
 
         /* raises an error */
         RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem binding socket");
     }
 
     /* listens for a service socket change */
-    socketResult = SOCKET_LISTEN(service->serviceSocketHandle);
+    socket_result = SOCKET_LISTEN(service->service_socket_handle);
 
     /* in case there was an error listening the socket */
-    if(SOCKET_TEST_ERROR(socketResult)) {
+    if(SOCKET_TEST_ERROR(socket_result)) {
         /* retrieves the listening error code */
-        SOCKET_ERROR_CODE bindingErrorCode = SOCKET_GET_ERROR_CODE(socketResult);
+        SOCKET_ERROR_CODE bindingErrorCode = SOCKET_GET_ERROR_CODE(socket_result);
 
         /* prints the error */
         V_ERROR_F("Problem listening socket: %d\n", bindingErrorCode);
 
         /* closes the service socket */
-        SOCKET_CLOSE(service->serviceSocketHandle);
+        SOCKET_CLOSE(service->service_socket_handle);
 
         /* raises an error */
         RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem listening socket");
@@ -589,27 +589,27 @@ ERROR_CODE start_service(struct Service_t *service) {
 
     /* retrieves the service (required) elements */
     polling = service->polling;
-    serviceSocketHandle = service->serviceSocketHandle;
+    service_socket_handle = service->service_socket_handle;
 
     /* sets the service in the polling */
     polling->service = service;
 
     /* sets the various handler values to the polling process
     they will be called for the various read, write operations */
-    polling->open = openPollingSelect;
-    polling->close = closePollingSelect;
-    polling->registerConnection = registerConnectionPollingSelect;
-    polling->unregisterConnection = unregisterConnectionPollingSelect;
-    polling->registerWrite = registerWritePollingSelect;
-    polling->unregisterWrite = unregisterWritePollingSelect;
-    polling->poll = pollPollingSelect;
-    polling->call = callPollingSelect;
+    polling->open = open_polling_select;
+    polling->close = close_polling_select;
+    polling->registerConnection = register_connection_polling_select;
+    polling->unregisterConnection = unregister_connection_polling_select;
+    polling->registerWrite = register_write_polling_select;
+    polling->unregisterWrite = unregister_write_polling_select;
+    polling->poll = poll_polling_select;
+    polling->call = call_polling_select;
 
     /* opens the polling (provider) */
     polling->open(polling);
 
     /* creates the (service) connection */
-    createConnection(&serviceConnection, serviceSocketHandle);
+    createConnection(&serviceConnection, service_socket_handle);
 
     /* sets the service select service as the service in the service connection */
     serviceConnection->service = service;
@@ -623,7 +623,7 @@ ERROR_CODE start_service(struct Service_t *service) {
 
     /* sets the fucntion to be called uppon read on the service
     connection (it should be the accept handler stream io, default) */
-    serviceConnection->onRead = acceptHandlerStreamIo;
+    serviceConnection->on_read = acceptHandlerStreamIo;
 
     /* opens the (service) connection */
     serviceConnection->openConnection(serviceConnection);
@@ -703,10 +703,10 @@ ERROR_CODE stop_service(struct Service_t *service) {
 
 ERROR_CODE closeConnectionsService(struct Service_t *service) {
     /* allocates space for the current connection */
-    struct Connection_t *currentConnection;
+    struct Connection_t *current_connection;
 
     /* retrieves the service connections list */
-    struct linked_list_t *connectionsList = service->connectionsList;
+    struct linked_list_t *connections_list = service->connections_list;
 
     /* prints a debug message */
     V_DEBUG("Closing the service connections\n");
@@ -714,19 +714,19 @@ ERROR_CODE closeConnectionsService(struct Service_t *service) {
     /* iterates continuously */
     while(1) {
         /* pops a value from the connections list (and deletes the node) */
-        pop_value_linked_list(connectionsList, (void **) &currentConnection, 1);
+        pop_value_linked_list(connections_list, (void **) &current_connection, 1);
 
         /* in case the current connection is null (connections list is empty) */
-        if(currentConnection == NULL) {
+        if(current_connection == NULL) {
             /* breaks the loop */
             break;
         }
 
         /* closes the current connection */
-        currentConnection->close_connection(currentConnection);
+        current_connection->close_connection(current_connection);
 
         /* deletes the current connection */
-        deleteConnection(currentConnection);
+        delete_connection(current_connection);
     }
 
     /* prints a debug message */
@@ -753,7 +753,7 @@ ERROR_CODE loadModulesService(struct Service_t *service) {
     struct file_t *entry;
 
     /* allocates space for the path to be used to load the module */
-    unsigned char modulePath[VIRIATUM_MAX_PATH_SIZE];
+    unsigned char module_path[VIRIATUM_MAX_PATH_SIZE];
 
     /* prints a debug message */
     V_DEBUG_F("Loading modules (%s)\n", VIRIATUM_MODULES_PATH);
@@ -785,7 +785,7 @@ ERROR_CODE loadModulesService(struct Service_t *service) {
         }
 
         /* creates the complete module path for the loading of it */
-        SPRINTF((char *) modulePath, VIRIATUM_MAX_PATH_SIZE, "%s/%s", VIRIATUM_MODULES_PATH, entry->name);
+        SPRINTF((char *) module_path, VIRIATUM_MAX_PATH_SIZE, "%s/%s", VIRIATUM_MODULES_PATH, entry->name);
 
         /* tries to find the module prefix in the current entry name
         in case it's not found continues the loop immediately no library
@@ -794,7 +794,7 @@ ERROR_CODE loadModulesService(struct Service_t *service) {
         if(pointer != (char *) entry->name && pointer != (char *) entry->name + 3) { continue; }
 
         /* loads the module, retrieving a possible error code */
-        error_code = loadModule(service, modulePath);
+        error_code = load_module(service, module_path);
 
         /* tests the error code for error */
         if(IS_ERROR_CODE(error_code)) {
@@ -823,13 +823,13 @@ ERROR_CODE loadModulesService(struct Service_t *service) {
 
 ERROR_CODE unloadModulesService(struct Service_t *service) {
     /* allocates the current module */
-    struct Module_t *currentModule;
+    struct module_t *currentModule;
 
     /* allocates space for the modules list iterator */
     struct iterator_t *modulesListIterator;
 
     /* creates the iterator for the linked list */
-    create_iterator_linked_list(service->modulesList, &modulesListIterator);
+    create_iterator_linked_list(service->modules_list, &modulesListIterator);
 
     /* iterates continuously */
     while(1) {
@@ -843,11 +843,11 @@ ERROR_CODE unloadModulesService(struct Service_t *service) {
         }
 
         /* unloads the current module */
-        unloadModule(service, currentModule);
+        unload_module(service, currentModule);
     }
 
     /* deletes the iterator linked list */
-    delete_iterator_linked_list(service->modulesList, modulesListIterator);
+    delete_iterator_linked_list(service->modules_list, modulesListIterator);
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -858,7 +858,7 @@ ERROR_CODE addConnectionService(struct Service_t *service, struct Connection_t *
     struct Polling_t *polling = service->polling;
 
     /* adds the connection to the connections list */
-    append_value_linked_list(service->connectionsList, connection);
+    append_value_linked_list(service->connections_list, connection);
 
     /* registes the connection in the polling (provider) */
     polling->registerConnection(polling, connection);
@@ -875,7 +875,7 @@ ERROR_CODE removeConnectionService(struct Service_t *service, struct Connection_
     polling->unregisterConnection(polling, connection);
 
     /* removes the connection from the connections list */
-    remove_value_linked_list(service->connectionsList, connection, 1);
+    remove_value_linked_list(service->connections_list, connection, 1);
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -893,16 +893,16 @@ ERROR_CODE createConnection(struct Connection_t **connectionPointer, SOCKET_HAND
     connection->protocol = UNDEFINED_PROTOCOL;
     connection->socket_handle = socket_handle;
     connection->service = NULL;
-    connection->writeRegistered = 0;
+    connection->write_registered = 0;
     connection->openConnection = NULL;
     connection->close_connection = NULL;
     connection->write_connection = NULL;
     connection->registerWrite = NULL;
     connection->unregisterWrite = NULL;
     connection->allocData = allocConnection;
-    connection->onRead = NULL;
-    connection->onWrite = NULL;
-    connection->onError = NULL;
+    connection->on_read = NULL;
+    connection->on_write = NULL;
+    connection->on_error = NULL;
     connection->onOpen = NULL;
     connection->onClose = NULL;
     connection->parameters = NULL;
@@ -921,7 +921,7 @@ ERROR_CODE createConnection(struct Connection_t **connectionPointer, SOCKET_HAND
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE deleteConnection(struct Connection_t *connection) {
+ERROR_CODE delete_connection(struct Connection_t *connection) {
     /* allocates the data */
     struct Data_t *data;
 
@@ -1068,7 +1068,7 @@ ERROR_CODE registerWriteConnection(struct Connection_t *connection) {
     polling->registerWrite(polling, connection);
 
     /* sets the connection as write registered */
-    connection->writeRegistered = 1;
+    connection->write_registered = 1;
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -1085,7 +1085,7 @@ ERROR_CODE unregisterWriteConnection(struct Connection_t *connection) {
     polling->unregisterWrite(polling, connection);
 
     /* sets the connection as not write registered */
-    connection->writeRegistered = 0;
+    connection->write_registered = 0;
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -1099,19 +1099,19 @@ ERROR_CODE allocConnection(struct Connection_t *connection, size_t size, void **
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE createHttpHandlerService(struct Service_t *service, struct HttpHandler_t **httpHandlerPointer, unsigned char *name) {
+ERROR_CODE createHttpHandlerService(struct Service_t *service, struct http_handler_t **http_handler_pointer, unsigned char *name) {
     /* creates the http handler */
-    create_http_handler(httpHandlerPointer, name);
+    create_http_handler(http_handler_pointer, name);
 
     /* sets a service reference in the http handler
     (this may be used latter for option reference) */
-    (*httpHandlerPointer)->service = service;
+    (*http_handler_pointer)->service = service;
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE deleteHttpHandlerService(struct Service_t *service, struct HttpHandler_t *http_handler) {
+ERROR_CODE deleteHttpHandlerService(struct Service_t *service, struct http_handler_t *http_handler) {
     /* deletes the http handler */
     delete_http_handler(http_handler);
 
@@ -1119,7 +1119,7 @@ ERROR_CODE deleteHttpHandlerService(struct Service_t *service, struct HttpHandle
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE addHttpHandlerService(struct Service_t *service, struct HttpHandler_t *http_handler) {
+ERROR_CODE addHttpHandlerService(struct Service_t *service, struct http_handler_t *http_handler) {
     /* sets the http handler in the http handers map for the handler name */
     set_value_string_hash_map(service->http_handlers_map, http_handler->name, (void *) http_handler);
 
@@ -1127,7 +1127,7 @@ ERROR_CODE addHttpHandlerService(struct Service_t *service, struct HttpHandler_t
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE removeHttpHandlerService(struct Service_t *service, struct HttpHandler_t *http_handler) {
+ERROR_CODE removeHttpHandlerService(struct Service_t *service, struct http_handler_t *http_handler) {
     /* unsets the http handler from the http handers map */
     set_value_string_hash_map(service->http_handlers_map, http_handler->name, NULL);
 
@@ -1135,10 +1135,10 @@ ERROR_CODE removeHttpHandlerService(struct Service_t *service, struct HttpHandle
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE getHttpHandlerService(struct Service_t *service, struct HttpHandler_t **httpHandlerPointer, unsigned char *name) {
+ERROR_CODE getHttpHandlerService(struct Service_t *service, struct http_handler_t **http_handler_pointer, unsigned char *name) {
     /* tries to retrieve the http handler for the given name from the
     http handlers map to return it as the appropriate handler */
-    get_value_string_hash_map(service->http_handlers_map, name, (void **) httpHandlerPointer);
+    get_value_string_hash_map(service->http_handlers_map, name, (void **) http_handler_pointer);
 
     /* raises no error */
     RAISE_NO_ERROR;
