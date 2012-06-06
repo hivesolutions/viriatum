@@ -254,28 +254,28 @@ void testBase64() {
     char buffer[] = "hello world";
 
     /* allocates space for the encoded buffer */
-    unsigned char *encodedBuffer;
+    unsigned char *encoded_buffer;
 
     /* allocates space for the encoded buffer length */
-    size_t encodedBufferLength;
+    size_t encoded_buffer_length;
 
     /* allocates space for the decoded buffer */
-    unsigned char *decodedBuffer;
+    unsigned char *decoded_buffer;
 
     /* allocates space for the decoded buffer length */
-    size_t decodedBufferLength;
+    size_t decoded_buffer_length;
 
     /* encodes the value into base64 */
-    encodeBase64((unsigned char *) buffer, strlen(buffer), &encodedBuffer, &encodedBufferLength);
+    encode_base64((unsigned char *) buffer, strlen(buffer), &encoded_buffer, &encoded_buffer_length);
 
     /* decodes the value from base64 */
-    decodeBase64(encodedBuffer, encodedBufferLength, &decodedBuffer, &decodedBufferLength);
+    decode_base64(encoded_buffer, encoded_buffer_length, &decoded_buffer, &decoded_buffer_length);
 
     /* releases the encoded buffer */
-    FREE(encodedBuffer);
+    FREE(encoded_buffer);
 
     /* releases the decoded buffer */
-    FREE(decodedBuffer);
+    FREE(decoded_buffer);
 }
 
 void testBencoding() {

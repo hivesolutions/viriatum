@@ -39,95 +39,95 @@
  * to be created.
  *
  * @param buffer The buffer to be encoded into base 64.
- * @param bufferLength The length of the buffer to be encoded into base64.
- * @param encodedBufferPointer The pointer to the created encoded buffer.
- * @param encodedBufferLengthPointer The length of the created encoded buffer.
+ * @param buffer_length The length of the buffer to be encoded into base64.
+ * @param encoded_buffer_pointer The pointer to the created encoded buffer.
+ * @param encoded_buffer_length_pointer The length of the created encoded buffer.
  */
-VIRIATUM_EXPORT_PREFIX ERROR_CODE encodeBase64(unsigned char *buffer, size_t bufferLength, unsigned char **encodedBufferPointer, size_t *encodedBufferLengthPointer);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE encode_base64(unsigned char *buffer, size_t buffer_length, unsigned char **encoded_buffer_pointer, size_t *encoded_buffer_length_pointer);
 
 /**
  * Decodes from base 64 the encoded buffer with the given length into a new (decoded) buffer
  * to be created.
  *
- * @param encodedBuffer The encoded buffer to be decoded from base 64.
- * @param encodedBufferLength The length of the encoded buffer to be decoded from base64.
- * @param decodedBufferPointer The pointer to the created (decoder) buffer.
- * @param decodedBufferLengthPointer The length of the created (decoder) buffer
+ * @param encoded_buffer The encoded buffer to be decoded from base 64.
+ * @param encoded_buffer_length The length of the encoded buffer to be decoded from base64.
+ * @param decoded_buffer_pointer The pointer to the created (decoder) buffer.
+ * @param decoded_buffer_length_pointer The length of the created (decoder) buffer
  */
-VIRIATUM_EXPORT_PREFIX ERROR_CODE decodeBase64(unsigned char *encodedBuffer, size_t encodedBufferLength, unsigned char **decodedBufferPointer, size_t *decodedBufferLengthPointer);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE decode_base64(unsigned char *encoded_buffer, size_t encoded_buffer_length, unsigned char **decoded_buffer_pointer, size_t *decoded_buffer_length_pointer);
 
 /**
  * Calculates the encoded buffer length from the
  * given (decoded) buffer length.
  *
- * @param bufferLength The length of the (decoded) buffer.
+ * @param buffer_length The length of the (decoded) buffer.
  * @return The length of the encoded buffer.
  */
-VIRIATUM_EXPORT_PREFIX size_t calculateEncodedBufferLengthBase64(size_t bufferLength);
+VIRIATUM_EXPORT_PREFIX size_t calculate_encoded_buffer_length_base64(size_t buffer_length);
 
 /**
  * Calculates the decoded buffer length from the
  * given encoded buffer length.
  *
- * @param encodedBufferLength The length of the encoded buffer.
- * @param paddingCount The ammount of padding in the base 64 encoded string.
+ * @param encoded_buffer_length The length of the encoded buffer.
+ * @param padding_count The ammount of padding in the base 64 encoded string.
  * @return The length of the decoded buffer.
  */
-VIRIATUM_EXPORT_PREFIX size_t calculateDecodedBufferLenghtBase64(size_t encodedBufferLength, size_t paddingCount);
+VIRIATUM_EXPORT_PREFIX size_t calculate_decoded_buffer_length_bse64(size_t encoded_buffer_length, size_t padding_count);
 
 /**
  * Encodes the given buffer into base64.
  * This function is for internal use.
  *
  * @param buffer The buffer to be encoded.
- * @param bufferLength The length of the buffer to be encoded.
- * @param encodedBuffer The target encoded buffer.
- * @param encodedBufferLength The target encoded buffer length
+ * @param buffer_length The length of the buffer to be encoded.
+ * @param encoded_buffer The target encoded buffer.
+ * @param encoded_buffer_length The target encoded buffer length
  */
-VIRIATUM_NO_EXPORT_PREFIX ERROR_CODE _encodeBase64(unsigned char *buffer, size_t bufferLength, unsigned char *encodedBuffer, size_t encodedBufferLength);
+VIRIATUM_NO_EXPORT_PREFIX ERROR_CODE _encode_base64(unsigned char *buffer, size_t buffer_length, unsigned char *encoded_buffer, size_t encoded_buffer_length);
 
 /**
  * Decodes the given encoded buffer from base64.
  * This function is for internal use.
  *
- * @param encodedBuffer The encoded buffer to be decoded.
- * @param encodedBufferLength The length of the encoded buffer to be decoded.
+ * @param encoded_buffer The encoded buffer to be decoded.
+ * @param encoded_buffer_length The length of the encoded buffer to be decoded.
  * @param buffer The target buffer.
- * @param bufferLength The target buffer length.
- * @param paddingCount The ammount of padding in the base 64 encoded string.
+ * @param buffer_length The target buffer length.
+ * @param padding_count The ammount of padding in the base 64 encoded string.
  */
-VIRIATUM_NO_EXPORT_PREFIX ERROR_CODE _decodeBase64(unsigned char *encodedBuffer, size_t encodedBufferLength, unsigned char *buffer, size_t bufferLength, size_t paddingCount);
+VIRIATUM_NO_EXPORT_PREFIX ERROR_CODE _decode_base64(unsigned char *encoded_buffer, size_t encoded_buffer_length, unsigned char *buffer, size_t buffer_length, size_t padding_count);
 
 /**
  * Allocates a new encoded buffer.
  * This function is for internal use.
  *
- * @param bufferLength The size of the buffer to be encoded.
- * @param encodedBufferPointer The pointer to the encoded buffer to be created.
- * @param encodedBufferLengthPointer The length of the encoded buffer to be created.
+ * @param buffer_length The size of the buffer to be encoded.
+ * @param encoded_buffer_pointer The pointer to the encoded buffer to be created.
+ * @param encoded_buffer_length_pointer The length of the encoded buffer to be created.
  */
-VIRIATUM_NO_EXPORT_PREFIX ERROR_CODE _allocateEncodedBuffer(size_t bufferLength, unsigned char **encodedBufferPointer, size_t *encodedBufferLengthPointer);
+VIRIATUM_NO_EXPORT_PREFIX ERROR_CODE _allocate_encoded_buffer(size_t buffer_length, unsigned char **encoded_buffer_pointer, size_t *encoded_buffer_length_pointer);
 
 /**
  * Allocates a new decoded buffer.
  * This function is for internal use.
  *
- * @param encodedBufferLength The (encoded) buffer to be decoded.
- * @param decodedBufferPointer The pointer to the decoded buffer to be created.
- * @param decodedBufferLengthPointer The length of the decoded buffer to be created.
- * @param paddingCount The ammount of padding to be used.
+ * @param encoded_buffer_length The (encoded) buffer to be decoded.
+ * @param decoded_buffer_pointer The pointer to the decoded buffer to be created.
+ * @param decoded_buffer_length_pointer The length of the decoded buffer to be created.
+ * @param padding_count The ammount of padding to be used.
  */
-VIRIATUM_NO_EXPORT_PREFIX ERROR_CODE _allocateDecodedBuffer(size_t encodedBufferLength, unsigned char **decodedBufferPointer, size_t *decodedBufferLengthPointer, size_t paddingCount);
+VIRIATUM_NO_EXPORT_PREFIX ERROR_CODE _allocate_decoded_buffer(size_t encoded_buffer_length, unsigned char **decoded_buffer_pointer, size_t *decoded_buffer_length_pointer, size_t padding_count);
 
 /**
  * Retrieves the padding count for the given encoded buffer
  * and using the given encoded buffer length.
  *
- * @param encodedBuffer The encoded buffer to measure the padding.
- * @param encodedBufferLength The lenght of the encoded buffer.
+ * @param encoded_buffer The encoded buffer to measure the padding.
+ * @param encoded_buffer_length The length of the encoded buffer.
  * @return The padding count for the given encoded buffer.
  */
-VIRIATUM_NO_EXPORT_PREFIX unsigned int _getPaddingCount(unsigned char *encodedBuffer, size_t encodedBufferLength);
+VIRIATUM_NO_EXPORT_PREFIX unsigned int _get_padding_count(unsigned char *encoded_buffer, size_t encoded_buffer_length);
 
 /**
  * Looks up the given value in the reverse
@@ -136,7 +136,7 @@ VIRIATUM_NO_EXPORT_PREFIX unsigned int _getPaddingCount(unsigned char *encodedBu
  * @param value The value to obtain the reverse value.
  * @return The reverse value (result).
  */
-VIRIATUM_NO_EXPORT_PREFIX unsigned char _lookupBase64(unsigned char value);
+VIRIATUM_NO_EXPORT_PREFIX unsigned char _lookup_base64(unsigned char value);
 
 /**
  * Looks up the given value in the reverse
@@ -147,4 +147,4 @@ VIRIATUM_NO_EXPORT_PREFIX unsigned char _lookupBase64(unsigned char value);
  * @param value The value to obtain the reverse value.
  * @return The reverse value (result).
  */
-VIRIATUM_NO_EXPORT_PREFIX unsigned char _lookupFastBase64(unsigned char value);
+VIRIATUM_NO_EXPORT_PREFIX unsigned char _lookup_fast_base64(unsigned char value);
