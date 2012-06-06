@@ -48,7 +48,7 @@ START_MEMORY;
 unsigned char local = 0;
 static struct Service_t *service;
 
-ERROR_CODE runService(struct HashMap_t *arguments) {
+ERROR_CODE runService(struct hash_map_t *arguments) {
     /* allocates the return value */
     ERROR_CODE returnValue;
 
@@ -221,7 +221,7 @@ void localize() { local = 1; }
 void localize() { }
 #endif
 
-void executeArguments(struct HashMap_t *arguments) {
+void executeArguments(struct hash_map_t *arguments) {
     /* allocates space for the possible argument
     to be executed from the arguments map */
     void *value;
@@ -229,13 +229,13 @@ void executeArguments(struct HashMap_t *arguments) {
     /* tries to retrieve the help argument from the arguments
     map in case the value exists prints the help value and then
     exits the current system */
-    getValueStringHashMap(arguments, (unsigned char *) "help", &value);
+    get_value_string_hash_map(arguments, (unsigned char *) "help", &value);
     if(value != NULL) { help(); exit(0); }
 
     /* tries to retrieve the version argument from the arguments
     map in case the value exists prints the version value and then
     exits the current system */
-    getValueStringHashMap(arguments, (unsigned char *) "version", &value);
+    get_value_string_hash_map(arguments, (unsigned char *) "version", &value);
     if(value != NULL) { version(); exit(0); }
 
     /* tries to retrieve the daemon argument from the
@@ -244,14 +244,14 @@ void executeArguments(struct HashMap_t *arguments) {
     and returns to the caller process immediately, otherwise
     prints the viriatum information into the standard
     output "file", the label should be standard */
-    getValueStringHashMap(arguments, (unsigned char *) "daemon", &value);
+    get_value_string_hash_map(arguments, (unsigned char *) "daemon", &value);
     if(value != NULL) { daemonize(); }
     else { printInformation(); }
 
     /* tries to retrieve the local argument from the arguments
     map in case the value exists localizes the current service
     so that any file read is read from the current directory */
-    getValueStringHashMap(arguments, (unsigned char *) "local", &value);
+    get_value_string_hash_map(arguments, (unsigned char *) "local", &value);
     if(value != NULL) { localize(); }
 }
 
@@ -262,7 +262,7 @@ int main(int argc, char *argv[]) {
 
     /* allocates the map that will contain the various
     processed arguments, indexed by name */
-    struct HashMap_t *arguments;
+    struct hash_map_t *arguments;
 
     /* prints a debug message */
     V_DEBUG_F("Receiving %d argument(s)\n", argc);

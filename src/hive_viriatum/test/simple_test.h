@@ -37,91 +37,102 @@
  * the thread.
  * @return The result of the thread execution.
  */
-int threadPoolStartFunctionTest(void *arguments);
+int thread_pool_start_function_test(void *arguments);
 
 /**
  * Tests the thread pool implementation.
  */
-void testThreadPool();
+void test_thread_pool();
 
 #endif
 
 /**
  * Tests the linked list structure.
  */
-void testLinkedList();
+void test_linked_list();
 
 /**
  * Tests the array list structure.
  */
-void testArrayList();
+void test_array_list();
 
 /**
  * Tests the hash map structure.
  */
-void testHashMap();
+void test_hash_map();
+
+/**
+ * Tests the sort map structure.
+ */
+void test_sort_map();
 
 /**
  * Tests the string buffer, used
  * to buffer string in memory for
  * fast writing.
  */
-void testStringBuffer();
+void test_string_buffer();
 
 /**
  * Tests the linked buffer, used
  * to buffer a series of buffers
  * in memory for fast writing.
  */
-void testLinkedBuffer();
+void test_linked_buffer();
 
 /**
  * Tests the base 64 encoding.
  */
-void testBase64();
+void test_base64();
 
 /**
  * Tests the huffman encoding.
  */
-void testHuffman();
+void test_huffman();
 
 /**
  * Tests the bit stream.
  */
-void testBitStream();
+void test_bit_stream();
 
 /**
  * Tests the file stream.
  */
-void testFileStream();
+void test_file_stream();
 
 /**
  * Tests the template engine.
  */
-void testTemplateEngine();
+void test_template_engine();
 
 /**
  * Tests the quicksort (algorithm).
  */
-void testQuicksort();
+void test_quicksort();
 
 /**
  * Tests the quicksort (algorithm),
  * for the linked list implementation.
  */
-void testQuicksortLinkedList();
+void test_quicksort_linked_list();
 
 /**
  * Tests the md5 hash implementation
  * calculation.
  */
-void testMd5();
+void test_md5();
+
+/**
+ * Tests the sha1 hash implementation
+ * calculation.
+ */
+void test_sha1();
 
 /**
  * Tests the crc32 hash implementation
  * calculation.
  */
-void testCrc32();
+void test_crc32();
 
 /**
  * Compars an element with another, usefull
@@ -137,4 +148,4 @@ int _compare(void *first, void *second);
  * Runs the set of simple tests in the current
  * test case.
  */
-void runSimpleTests();
+void run_simple_tests();

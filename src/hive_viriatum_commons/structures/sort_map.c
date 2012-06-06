@@ -29,117 +29,117 @@
 
 #include "sort_map.h"
 
-void createSortMap(struct SortMap_t **sortMapPointer, size_t initialSize) {
+void create_sort_map(struct sort_map_t **sort_map_pointer, size_t initial_size) {
     /* retrieves the sort map size */
-    size_t sortMapSize = sizeof(struct SortMap_t);
+    size_t sort_map_size = sizeof(struct sort_map_t);
 
     /* allocates space for the sort map */
-    struct SortMap_t *sortMap = (struct SortMap_t *) MALLOC(sortMapSize);
+    struct sort_map_t *sort_map = (struct sort_map_t *) MALLOC(sort_map_size);
 
     /* creates the internal structures for internal
     control of the items */
-    createHashMap(&sortMap->hashMap, initialSize);
-    createLinkedList(&sortMap->keyList);
-    createLinkedList(&sortMap->keyStringList);
+    create_hash_map(&sort_map->hash_map, initial_size);
+    create_linked_list(&sort_map->key_list);
+    create_linked_list(&sort_map->key_string_list);
 
     /* sets the sort map in the sort map pointer */
-    *sortMapPointer = sortMap;
+    *sort_map_pointer = sort_map;
 }
 
-void deleteSortMap(struct SortMap_t *sortMap) {
+void delete_sort_map(struct sort_map_t *sort_map) {
     /* deletes the internal structures */
-    deleteLinkedList(sortMap->keyStringList);
-    deleteLinkedList(sortMap->keyList);
-    deleteHashMap(sortMap->hashMap);
+    delete_linked_list(sort_map->key_string_list);
+    delete_linked_list(sort_map->key_list);
+    delete_hash_map(sort_map->hash_map);
 
     /* releases the sort map */
-    FREE(sortMap);
+    FREE(sort_map);
 }
 
-void setValueSortMap(struct SortMap_t *sortMap, size_t key, unsigned char *keyString, void *value) {
-    struct HashMapElement_t *element;
+void set_value_sort_map(struct sort_map_t *sort_map, size_t key, unsigned char *key_string, void *value) {
+    struct hash_map_element_t *element;
 
-    setValueHashMap(sortMap->hashMap, key, keyString, value);
-    getHashMap(sortMap->hashMap, key, keyString, &element);
-    appendValueLinkedList(sortMap->keyList, (void *) key);
-    appendValueLinkedList(sortMap->keyStringList, (void *) element->keyString);
+    set_value_hash_map(sort_map->hash_map, key, key_string, value);
+    get_hash_map(sort_map->hash_map, key, key_string, &element);
+    append_value_linked_list(sort_map->key_list, (void *) key);
+    append_value_linked_list(sort_map->key_string_list, (void *) element->key_string);
 }
 
-void setValueStringSortMap(struct SortMap_t *sortMap, unsigned char *keyString, void *value) {
+void set_value_string_sort_map(struct sort_map_t *sort_map, unsigned char *key_string, void *value) {
     /* calculates the key (hash) value from the key string
     and uses it to set the value in the sort map */
-    size_t key = _calculateStringHashMap(keyString);
-    setValueSortMap(sortMap, key, keyString, value);
+    size_t key = _calculate_string_hash_map(key_string);
+    set_value_sort_map(sort_map, key, key_string, value);
 }
 
-void getValueSortMap(struct SortMap_t *sortMap, size_t key, unsigned char *keyString, void **valuePointer) {
-    getValueHashMap(sortMap->hashMap, key, keyString, valuePointer);
+void get_value_sort_map(struct sort_map_t *sort_map, size_t key, unsigned char *key_string, void **value_pointer) {
+    get_value_hash_map(sort_map->hash_map, key, key_string, value_pointer);
 }
 
-void getValueStringSortMap(struct SortMap_t *sortMap, unsigned char *keyString, void **valuePointer) {
-    getValueStringHashMap(sortMap->hashMap, keyString, valuePointer);
+void get_value_string_sort_map(struct sort_map_t *sort_map, unsigned char *key_string, void **value_pointer) {
+    get_value_string_hash_map(sort_map->hash_map, key_string, value_pointer);
 }
 
-void createIteratorSortMap(struct SortMap_t *sortMap, struct Iterator_t **iteratorPointer) {
+void create_iterator_sort_map(struct sort_map_t *sort_map, struct iterator_t **iterator_pointer) {
     /* allocates the iterator */
-    struct Iterator_t *iterator;
+    struct iterator_t *iterator;
 
     /* creates the iterator */
-    createIterator(&iterator);
+    create_iterator(&iterator);
 
     /* sets the sort map in the structure */
-    iterator->structure = (void *) sortMap;
+    iterator->structure = (void *) sort_map;
 
     /* sets the get next function in the iterator */
-    iterator->getNextFunction = getNextIteratorSortMap;
+    iterator->get_next_function = get_next_iterator_sort_map;
 
     /* resets the iterator */
-    resetIteratorSortMap(sortMap, iterator);
+    reset_iterator_sort_map(sort_map, iterator);
 
     /* sets the iterator in the iterator pointer */
-    *iteratorPointer = iterator;
+    *iterator_pointer = iterator;
 }
 
-void createElementIteratorSortMap(struct SortMap_t *sortMap, struct Iterator_t **iteratorPointer) {
+void create_element_iterator_sort_map(struct sort_map_t *sort_map, struct iterator_t **iterator_pointer) {
     /* allocates the iterator */
-    struct Iterator_t *iterator;
+    struct iterator_t *iterator;
 
     /* creates the iterator */
-    createIterator(&iterator);
+    create_iterator(&iterator);
 
     /* sets the sort map in the structure */
-    iterator->structure = (void *) sortMap;
+    iterator->structure = (void *) sort_map;
 
     /* sets the get next function in the iterator */
-    iterator->getNextFunction = getNextElementIteratorSortMap;
+    iterator->get_next_function = get_next_element_iterator_sort_map;
 
     /* resets the iterator */
-    resetIteratorSortMap(sortMap, iterator);
+    reset_iterator_sort_map(sort_map, iterator);
 
     /* sets the iterator in the iterator pointer */
-    *iteratorPointer = iterator;
+    *iterator_pointer = iterator;
 }
 
-void deleteIteratorSortMap(struct SortMap_t *sortMap, struct Iterator_t *iterator) {
+void delete_iterator_sort_map(struct sort_map_t *sort_map, struct iterator_t *iterator) {
     /* deletes the iterator */
-    deleteIterator(iterator);
+    delete_iterator(iterator);
 }
 
-void resetIteratorSortMap(struct SortMap_t *sortMap, struct Iterator_t *iterator) {
+void reset_iterator_sort_map(struct sort_map_t *sort_map, struct iterator_t *iterator) {
     /* sets the iterator parameters as the initial index of
     the elements buffer in the sort map */
     iterator->parameters = 0;
 }
 
-void getNextIteratorSortMap(struct Iterator_t *iterator, void **nextPointer) {
+void get_next_iterator_sort_map(struct iterator_t *iterator, void **next_pointer) {
     /* retrieves the sort map associated with the iterator */
-    struct SortMap_t *sortMap = (struct SortMap_t *) iterator->structure;
+    struct sort_map_t *sort_map = (struct sort_map_t *) iterator->structure;
 
     /* retrieves the current index offset in the elements buffer  */
-    size_t currentIndex = (size_t) iterator->parameters;
+    size_t current_index = (size_t) iterator->parameters;
 
     /* allocates space for the hash map element to be used */
-    struct HashMapElement_t *element;
+    struct hash_map_element_t *element;
 
     /* allocates space for the next value */
     void *next;
@@ -147,11 +147,11 @@ void getNextIteratorSortMap(struct Iterator_t *iterator, void **nextPointer) {
     /* allocates space for both the key value and the key
     string value to be used for value retrieval */
     size_t key;
-    unsigned char *keyString;
+    unsigned char *key_string;
 
     /* in case the current index excedes the elements
     in the key list (it's the end of iteration) */
-    if(currentIndex >= sortMap->keyList->size) {
+    if(current_index >= sort_map->key_list->size) {
         /* sets the next element as null (end of iteration) */
         next = NULL;
     }
@@ -160,37 +160,37 @@ void getNextIteratorSortMap(struct Iterator_t *iterator, void **nextPointer) {
     else {
         /* retrieves both the key and the key string values
         to be used to retrieve the hash element */
-        getValueLinkedList(sortMap->keyList, currentIndex, (void **) &key);
-        getValueLinkedList(sortMap->keyStringList, currentIndex, (void **) &keyString);
+        get_value_linked_list(sort_map->key_list, current_index, (void **) &key);
+        get_value_linked_list(sort_map->key_string_list, current_index, (void **) &key_string);
 
         /* retrieves the current element from the elements
         buffer */
-        getHashMap(sortMap->hashMap, key, keyString, &element);
+        get_hash_map(sort_map->hash_map, key, key_string, &element);
 
         /* sets the next value in iteration as
         the element key (next value in iteration) */
         next = (void *) &element->key;
 
         /* increments the current index value */
-        currentIndex++;
+        current_index++;
     }
 
     /* sets the current index in the iterator parameters */
-    iterator->parameters = (void *) currentIndex;
+    iterator->parameters = (void *) current_index;
 
     /* sets the next in the next pointer */
-    *nextPointer = next;
+    *next_pointer = next;
 }
 
-void getNextElementIteratorSortMap(struct Iterator_t *iterator, void **nextPointer) {
+void get_next_element_iterator_sort_map(struct iterator_t *iterator, void **next_pointer) {
     /* retrieves the sort map associated with the iterator */
-    struct SortMap_t *sortMap = (struct SortMap_t *) iterator->structure;
+    struct sort_map_t *sort_map = (struct sort_map_t *) iterator->structure;
 
     /* retrieves the current index offset in the elements buffer  */
-    size_t currentIndex = (size_t) iterator->parameters;
+    size_t current_index = (size_t) iterator->parameters;
 
     /* allocates space for the hash map element to be used */
-    struct HashMapElement_t *element;
+    struct hash_map_element_t *element;
 
     /* allocates space for the next value */
     void *next;
@@ -198,11 +198,11 @@ void getNextElementIteratorSortMap(struct Iterator_t *iterator, void **nextPoint
     /* allocates space for both the key value and the key
     string value to be used for value retrieval */
     size_t key;
-    unsigned char *keyString;
+    unsigned char *key_string;
 
     /* in case the current index excedes the elements
     in the key list (it's the end of iteration) */
-    if(currentIndex >= sortMap->keyList->size) {
+    if(current_index >= sort_map->key_list->size) {
         /* sets the next element as null (end of iteration) */
         next = NULL;
     }
@@ -211,24 +211,24 @@ void getNextElementIteratorSortMap(struct Iterator_t *iterator, void **nextPoint
     else {
         /* retrieves both the key and the key string values
         to be used to retrieve the hash element */
-        getValueLinkedList(sortMap->keyList, currentIndex, (void **) &key);
-        getValueLinkedList(sortMap->keyStringList, currentIndex, (void **) &keyString);
+        get_value_linked_list(sort_map->key_list, current_index, (void **) &key);
+        get_value_linked_list(sort_map->key_string_list, current_index, (void **) &key_string);
 
         /* retrieves the current element from the elements
         buffer */
-        getHashMap(sortMap->hashMap, key, keyString, &element);
+        get_hash_map(sort_map->hash_map, key, key_string, &element);
 
         /* sets the next value in iteration as
         the element (next value in iteration) */
         next = (void *) element;
 
         /* increments the current index value */
-        currentIndex++;
+        current_index++;
     }
 
     /* sets the current index in the iterator parameters */
-    iterator->parameters = (void *) currentIndex;
+    iterator->parameters = (void *) current_index;
 
     /* sets the next in the next pointer */
-    *nextPointer = next;
+    *next_pointer = next;
 }

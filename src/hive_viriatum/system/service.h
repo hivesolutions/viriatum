@@ -203,7 +203,7 @@ typedef struct Service_t {
      * This map is structured by domains and the
      * first level of keys represent these domains.
      */
-    struct HashMap_t *configuration;
+    struct hash_map_t *configuration;
 
     /**
      * The socket handle to the service
@@ -228,7 +228,7 @@ typedef struct Service_t {
      * The list of currenly available (active)
      * connections in the service.
      */
-    struct LinkedList_t *connectionsList;
+    struct linked_list_t *connectionsList;
 
     /**
      * The list of modules available for the
@@ -237,7 +237,7 @@ typedef struct Service_t {
      * modules any unloaded or failed module
      * should not be present in this list.
      */
-    struct LinkedList_t *modulesList;
+    struct linked_list_t *modulesList;
 
     /**
      * The map of http handlers available
@@ -245,7 +245,7 @@ typedef struct Service_t {
      * The map associates the name of the handler
      * with the handler instance.
      */
-    struct HashMap_t *httpHandlersMap;
+    struct hash_map_t *httpHandlersMap;
 
     serviceHttpHandlerAccess createHttpHandler;
     serviceHttpHandlerUpdate deleteHttpHandler;
@@ -286,8 +286,8 @@ typedef struct ServiceOptions_t {
 
     /**
      * The number of worker processes to be
-	 * used for handling connection (should
-	 * approximate to the number of cpus).
+     * used for handling connection (should
+     * approximate to the number of cpus).
      */
     unsigned char workers;
 
@@ -311,7 +311,7 @@ typedef struct ServiceOptions_t {
      * used, default host name is not contained in
      * the list for performance.
      */
-    struct HashMap_t *virtualHosts;
+    struct hash_map_t *virtualHosts;
 } ServiceOptions;
 
 typedef struct VirtualHost_t {
@@ -336,7 +336,7 @@ typedef struct VirtualHost_t {
      * the request, for gathering the correct
      * handler.
      */
-    struct LinkedList_t *rules;
+    struct linked_list_t *rules;
 } VirtualHost_t;
 
 /**
@@ -424,13 +424,13 @@ typedef struct Connection_t {
      * Queue containing the set of connections with
      * data pending to be read.
      */
-    struct LinkedList_t *readQueue;
+    struct linked_list_t *readQueue;
 
     /**
      * Queue containing the set of connections which
      * ar ready for reading.
      */
-    struct LinkedList_t *writeQueue;
+    struct linked_list_t *writeQueue;
 
     /**
      * Function to be used for opening a
@@ -614,7 +614,7 @@ void deletePolling(struct Polling_t *polling);
  * @param isTop If the current configuration object refers a
  * top level configuration (section) or an inner one.
  */
-void deleteConfiguration(struct HashMap_t *configuration, int isTop);
+void deleteConfiguration(struct hash_map_t *configuration, int isTop);
 
 /**
  * Loads the various options, from the various data sources
@@ -625,7 +625,7 @@ void deleteConfiguration(struct HashMap_t *configuration, int isTop);
  * during the options loading.
  * @return The resulting error code.
  */
-ERROR_CODE loadOptionsService(struct Service_t *service, struct HashMap_t *arguments);
+ERROR_CODE loadOptionsService(struct Service_t *service, struct hash_map_t *arguments);
 
 /**
  * Starts the given service, initializing the
@@ -795,6 +795,6 @@ ERROR_CODE deleteHttpHandlerService(struct Service_t *service, struct HttpHandle
 ERROR_CODE addHttpHandlerService(struct Service_t *service, struct HttpHandler_t *httpHandler);
 ERROR_CODE removeHttpHandlerService(struct Service_t *service, struct HttpHandler_t *httpHandler);
 ERROR_CODE getHttpHandlerService(struct Service_t *service, struct HttpHandler_t **httpHandlerPointer, unsigned char *name);
-ERROR_CODE _defaultOptionsService(struct Service_t *service, struct HashMap_t *arguments);
-ERROR_CODE _fileOptionsService(struct Service_t *service, struct HashMap_t *arguments);
-ERROR_CODE _comandLineOptionsService(struct Service_t *service, struct HashMap_t *arguments);
+ERROR_CODE _defaultOptionsService(struct Service_t *service, struct hash_map_t *arguments);
+ERROR_CODE _fileOptionsService(struct Service_t *service, struct hash_map_t *arguments);
+ERROR_CODE _comandLineOptionsService(struct Service_t *service, struct hash_map_t *arguments);

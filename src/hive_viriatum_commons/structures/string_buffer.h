@@ -37,46 +37,46 @@
  * The buffer is linear and contains the various
  * partial string values.
  */
-typedef struct StringBuffer_t {
+typedef struct string_buffer_t {
     /**
      * The total length for the internal
      * string value.
      */
-    size_t stringLength;
+    size_t string_length;
 
     /**
      * The list of strings that compose the
      * the complete string value.
      */
-    struct LinkedList_t *stringList;
+    struct linked_list_t *string_list;
 
     /**
      * The list of lengths for the strings
      * that compose the complete string value.
      */
-    struct LinkedList_t *lengthList;
+    struct linked_list_t *length_list;
 
     /**
      * The list of strings to have the memory
      * released uppon destruction of the string
      * buffer.
      */
-    struct LinkedList_t *releaseList;
-} StringBuffer;
+    struct linked_list_t *release_list;
+} string_buffer;
 
 /**
  * Constructor of the string buffer.
  *
- * @param linkedListPointer The pointer to the string buffer to be constructed.
+ * @param linked_list_pointer The pointer to the string buffer to be constructed.
  */
-VIRIATUM_EXPORT_PREFIX void createStringBuffer(struct StringBuffer_t **stringBufferPointer);
+VIRIATUM_EXPORT_PREFIX void create_string_buffer(struct string_buffer_t **linked_list_pointer);
 
 /**
  * Destructor of the string buffer.
  *
- * @param linkedList The string buffer to be destroyed.
+ * @param string_buffer The string buffer to be destroyed.
  */
-VIRIATUM_EXPORT_PREFIX void deleteStringBuffer(struct StringBuffer_t *stringBuffer);
+VIRIATUM_EXPORT_PREFIX void delete_string_buffer(struct string_buffer_t *string_buffer);
 
 /**
  * Appends (adds) a string value to the string buffer, this value
@@ -84,42 +84,42 @@ VIRIATUM_EXPORT_PREFIX void deleteStringBuffer(struct StringBuffer_t *stringBuff
  * The length of the provided string is calculated using the "classic"
  * null terminated string.
  *
- * @param stringBuffer The string buffer reference.
- * @param stringValue The string value to be added to the string buffer.
+ * @param string_buffer The string buffer reference.
+ * @param string_value The string value to be added to the string buffer.
  */
-VIRIATUM_EXPORT_PREFIX void appendStringBuffer(struct StringBuffer_t *stringBuffer, unsigned char *stringValue);
+VIRIATUM_EXPORT_PREFIX void append_string_buffer(struct string_buffer_t *string_buffer, unsigned char *string_value);
 
 /**
  * Appends (adds) a string value to the string buffer, this value
  * will be appended to the final "joined" string.
  * The length of the string is provided so no calculation is done.
  *
- * @param stringBuffer The string buffer reference.
- * @param stringValue The string value to be added to the string buffer.
- * @param stringLength The length of the string value to be added to the
+ * @param string_buffer The string buffer reference.
+ * @param string_value The string value to be added to the string buffer.
+ * @param string_length The length of the string value to be added to the
  * string buffer.
  */
-VIRIATUM_EXPORT_PREFIX void appendStringLBuffer(struct StringBuffer_t *stringBuffer, unsigned char *stringValue, size_t stringLength);
+VIRIATUM_EXPORT_PREFIX void append_string_l_buffer(struct string_buffer_t *string_buffer, unsigned char *string_value, size_t string_length);
 
 /**
  * Appends (adds) a string value to the string buffer, this value
  * will be appended to the final "joined" string.
  * The string structure is provided so no length calculation is done.
  *
- * @param stringBuffer The string buffer reference.
+ * @param string_buffer The string buffer reference.
  * @param string The string structure to be added to the string buffer.
  */
-VIRIATUM_EXPORT_PREFIX void appendStringTBuffer(struct StringBuffer_t *stringBuffer, struct String_t *string);
+VIRIATUM_EXPORT_PREFIX void append_string_t_buffer(struct string_buffer_t *string_buffer, struct string_t *string);
 
 /**
  * "Joins" the internal buffer of strings creating the final
  * string that is returned from the given string value pointer.
  *
- * @param stringBuffer The string buffer reference.
- * @param stringValuePointer The pointer to the string value to
+ * @param string_buffer The string buffer reference.
+ * @param string_value_pointer The pointer to the string value to
  * hold the "joined" string value.
  */
-VIRIATUM_EXPORT_PREFIX void joinStringBuffer(struct StringBuffer_t *stringBuffer, unsigned char **stringValuePointer);
+VIRIATUM_EXPORT_PREFIX void join_string_buffer(struct string_buffer_t *string_buffer, unsigned char **string_value_pointer);
 
 /**
  * Appends (adds) a string value to the string buffer, this value
@@ -130,10 +130,10 @@ VIRIATUM_EXPORT_PREFIX void joinStringBuffer(struct StringBuffer_t *stringBuffer
  * releasing the string buffer memory.
  * Use this method carefully it may cause memory corruption.
  *
- * @param stringBuffer The string buffer reference.
- * @param stringValue The string value to be added to the string buffer.
+ * @param string_buffer The string buffer reference.
+ * @param string_value The string value to be added to the string buffer.
  */
-VIRIATUM_EXPORT_PREFIX void _appendStringBuffer(struct StringBuffer_t *stringBuffer, unsigned char *stringValue);
+VIRIATUM_EXPORT_PREFIX void _append_string_buffer(struct string_buffer_t *string_buffer, unsigned char *string_value);
 
 /**
  * Appends (adds) a string value to the string buffer, this value
@@ -143,12 +143,12 @@ VIRIATUM_EXPORT_PREFIX void _appendStringBuffer(struct StringBuffer_t *stringBuf
  * releasing the string buffer memory.
  * Use this method carefully it may cause memory corruption.
  *
- * @param stringBuffer The string buffer reference.
- * @param stringValue The string value to be added to the string buffer.
- * @param stringLength The length of the string value to be added to the
+ * @param string_buffer The string buffer reference.
+ * @param string_value The string value to be added to the string buffer.
+ * @param string_length The length of the string value to be added to the
  * string buffer.
  */
-VIRIATUM_EXPORT_PREFIX void _appendStringLBuffer(struct StringBuffer_t *stringBuffer, unsigned char *stringValue, size_t stringLength);
+VIRIATUM_EXPORT_PREFIX void _append_string_l_buffer(struct string_buffer_t *string_buffer, unsigned char *string_value, size_t string_length);
 
 /**
  * Appends (adds) a string value to the string buffer, this value
@@ -158,7 +158,7 @@ VIRIATUM_EXPORT_PREFIX void _appendStringLBuffer(struct StringBuffer_t *stringBu
  * releasing the string buffer memory.
  * Use this method carefully it may cause memory corruption.
  *
- * @param stringBuffer The string buffer reference.
+ * @param string_buffer The string buffer reference.
  * @param string The string structure to be added to the string buffer.
  */
-VIRIATUM_EXPORT_PREFIX void _appendStringTBuffer(struct StringBuffer_t *stringBuffer, struct String_t *string);
+VIRIATUM_EXPORT_PREFIX void _append_string_t_buffer(struct string_buffer_t *string_buffer, struct string_t *string);

@@ -55,13 +55,13 @@ void createService(struct Service_t **servicePointer, unsigned char *name) {
     createPolling(&service->polling);
 
     /* creates the connections list */
-    createLinkedList(&service->connectionsList);
+    create_linked_list(&service->connectionsList);
 
     /* creates the http modules list */
-    createLinkedList(&service->modulesList);
+    create_linked_list(&service->modulesList);
 
     /* creates the http handlers map */
-    createHashMap(&service->httpHandlersMap, 0);
+    create_hash_map(&service->httpHandlersMap, 0);
 
     /* sets the service in the service pointer */
     *servicePointer = service;
@@ -81,13 +81,13 @@ void deleteService(struct Service_t *service) {
     }
 
     /* deletes the http handlers map */
-    deleteHashMap(service->httpHandlersMap);
+    delete_hash_map(service->httpHandlersMap);
 
     /* deletes the http modules list */
-    deleteLinkedList(service->modulesList);
+    delete_linked_list(service->modulesList);
 
     /* deletes the connections list */
-    deleteLinkedList(service->connectionsList);
+    delete_linked_list(service->connectionsList);
 
     /* deletes the polling (provider) */
     deletePolling(service->polling);
@@ -115,7 +115,7 @@ void createServiceOptions(struct ServiceOptions_t **serviceOptionsPointer) {
     serviceOptions->defaultVirtualHost = NULL;
 
     /* creates the hash map for the virtual hosts */
-    createHashMap(&serviceOptions->virtualHosts, 0);
+    create_hash_map(&serviceOptions->virtualHosts, 0);
 
     /* sets the service options in the service options pointer */
     *serviceOptionsPointer = serviceOptions;
@@ -123,7 +123,7 @@ void createServiceOptions(struct ServiceOptions_t **serviceOptionsPointer) {
 
 void deleteServiceOptions(struct ServiceOptions_t *serviceOptions) {
     /* deletes the hash map for the virtual hosts */
-    deleteHashMap(serviceOptions->virtualHosts);
+    delete_hash_map(serviceOptions->virtualHosts);
 
     /* releases the service options */
     FREE(serviceOptions);
@@ -183,22 +183,22 @@ void deletePolling(struct Polling_t *polling) {
     FREE(polling);
 }
 
-void deleteConfiguration(struct HashMap_t *configuration, int isTop) {
+void deleteConfiguration(struct hash_map_t *configuration, int isTop) {
     /* allocates space for the pointer to the element and
     for the option to be retrieved */
-    struct HashMapElement_t *element;
+    struct hash_map_element_t *element;
     void *option;
 
     /* allocates space for the iterator for the configuration */
-    struct Iterator_t *configurationIterator;
+    struct iterator_t *configurationIterator;
 
     /* creates an iterator for the ´configuration hash map */
-    createElementIteratorHashMap(configuration, &configurationIterator);
+    create_element_iterator_hash_map(configuration, &configurationIterator);
 
     /* iterates continuously */
     while(1) {
         /* retrieves the next value from the configuration iterator */
-        getNextIterator(configurationIterator, (void **) &element);
+        get_next_iterator(configurationIterator, (void **) &element);
 
         /* in case the current module is null (end of iterator) */
         if(element == NULL) {
@@ -207,23 +207,23 @@ void deleteConfiguration(struct HashMap_t *configuration, int isTop) {
         }
 
         /* retrievs the hash map value for the key pointer */
-        getValueHashMap(configuration, element->key, element->keyString, (void **) &option);
+        get_value_hash_map(configuration, element->key, element->key_string, (void **) &option);
 
         /* in case the current iteration is of type top must delete the
         inner configuration because this is "just" a section, otherwise
         releases the memory space occupied by the value */
-        if(isTop) { deleteConfiguration((struct HashMap_t *) option, 0); }
+        if(isTop) { deleteConfiguration((struct hash_map_t *) option, 0); }
         else { FREE(option); }
     }
 
     /* deletes the iterator for the configuration hash map */
-    deleteIteratorHashMap(configuration, configurationIterator);
+    delete_iterator_hash_map(configuration, configurationIterator);
 
     /* deletes the hash map that holds the configuration */
-    deleteHashMap(configuration);
+    delete_hash_map(configuration);
 }
 
-ERROR_CODE loadOptionsService(struct Service_t *service, struct HashMap_t *arguments) {
+ERROR_CODE loadOptionsService(struct Service_t *service, struct hash_map_t *arguments) {
     /* loads the options from the various sources, note
     that the loading order is important because the last
     loading takes priority over the previous ones */
@@ -244,7 +244,7 @@ ERROR_CODE loadOptionsService(struct Service_t *service, struct HashMap_t *argum
 
 #ifdef VIRIATUM_PLATFORM_LINUX
 #ifdef PR_SET_NAME
-#define SET_PROC_NAME(name) prctl(PR_SET_NAME, name) 
+#define SET_PROC_NAME(name) prctl(PR_SET_NAME, name)
 #endif
 #endif
 
@@ -287,11 +287,11 @@ ERROR_CODE createWorkers(unsigned char workerCount) {
         forkCount++;
     }
 
-	/* checks if the current process is a worker (zero based
-	pid value) or the master process and sets the process title
-	according to this value */
-	if(pid == 0) { SET_PROC_NAME("viriatum/w"); }
-	else { SET_PROC_NAME("viriatum/m"); }
+    /* checks if the current process is a worker (zero based
+    pid value) or the master process and sets the process title
+    according to this value */
+    if(pid == 0) { SET_PROC_NAME("viriatum/w"); }
+    else { SET_PROC_NAME("viriatum/m"); }
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -504,7 +504,7 @@ ERROR_CODE startService(struct Service_t *service) {
 
     /* sets the current http handler accoring to the current options
     in the service, the http handler must be loaded in the handlers map */
-    getValueStringHashMap(service->httpHandlersMap, serviceOptions->handlerName, (void **) &service->httpHandler);
+    get_value_string_hash_map(service->httpHandlersMap, serviceOptions->handlerName, (void **) &service->httpHandler);
 
     /* sets the socket address attributes */
     socketAddress.sin_family = SOCKET_INTERNET_TYPE;
@@ -706,7 +706,7 @@ ERROR_CODE closeConnectionsService(struct Service_t *service) {
     struct Connection_t *currentConnection;
 
     /* retrieves the service connections list */
-    struct LinkedList_t *connectionsList = service->connectionsList;
+    struct linked_list_t *connectionsList = service->connectionsList;
 
     /* prints a debug message */
     V_DEBUG("Closing the service connections\n");
@@ -714,7 +714,7 @@ ERROR_CODE closeConnectionsService(struct Service_t *service) {
     /* iterates continuously */
     while(1) {
         /* pops a value from the connections list (and deletes the node) */
-        popValueLinkedList(connectionsList, (void **) &currentConnection, 1);
+        pop_value_linked_list(connectionsList, (void **) &currentConnection, 1);
 
         /* in case the current connection is null (connections list is empty) */
         if(currentConnection == NULL) {
@@ -746,11 +746,11 @@ ERROR_CODE loadModulesService(struct Service_t *service) {
 
     /* allocates space for the linked list for the entries
     and for the iterator to iterate "around" them */
-    struct LinkedList_t *entries;
-    struct Iterator_t *entriesIterator;
+    struct linked_list_t *entries;
+    struct iterator_t *entries_iterator;
 
     /* allocates space for an entry of the directory */
-    struct File_t *entry;
+    struct file_t *entry;
 
     /* allocates space for the path to be used to load the module */
     unsigned char modulePath[VIRIATUM_MAX_PATH_SIZE];
@@ -760,16 +760,16 @@ ERROR_CODE loadModulesService(struct Service_t *service) {
 
     /* creates the linked list for the entries and populates
     it with the entries from the modules path */
-    createLinkedList(&entries);
-    listDirectoryFile(VIRIATUM_MODULES_PATH, entries);
+    create_linked_list(&entries);
+    list_directory_file(VIRIATUM_MODULES_PATH, entries);
 
     /* creates the iterator for the entries */
-    createIteratorLinkedList(entries, &entriesIterator);
+    create_iterator_linked_list(entries, &entries_iterator);
 
     /* iterates continuously over all the module entries */
     while(1) {
         /* retrieves the next value from the iterator */
-        getNextIterator(entriesIterator, (void **) &entry);
+        get_next_iterator(entries_iterator, (void **) &entry);
 
         /* in case the current module is null (end of iterator) */
         if(entry == NULL) {
@@ -807,12 +807,12 @@ ERROR_CODE loadModulesService(struct Service_t *service) {
     }
 
     /* deletes the iterator used for the entries */
-    deleteIteratorLinkedList(entries, entriesIterator);
+    delete_iterator_linked_list(entries, entries_iterator);
 
     /* deletes both the entries internal structures
     and the entries linked list */
-    deleteDirectoryEntriesFile(entries);
-    deleteLinkedList(entries);
+    delete_directory_entries_file(entries);
+    delete_linked_list(entries);
 
     /* prints a debug message */
     V_DEBUG("Finished loading modules\n");
@@ -826,15 +826,15 @@ ERROR_CODE unloadModulesService(struct Service_t *service) {
     struct Module_t *currentModule;
 
     /* allocates space for the modules list iterator */
-    struct Iterator_t *modulesListIterator;
+    struct iterator_t *modulesListIterator;
 
     /* creates the iterator for the linked list */
-    createIteratorLinkedList(service->modulesList, &modulesListIterator);
+    create_iterator_linked_list(service->modulesList, &modulesListIterator);
 
     /* iterates continuously */
     while(1) {
         /* retrieves the next value from the iterator */
-        getNextIterator(modulesListIterator, (void **) &currentModule);
+        get_next_iterator(modulesListIterator, (void **) &currentModule);
 
         /* in case the current module is null (end of iterator) */
         if(currentModule == NULL) {
@@ -847,7 +847,7 @@ ERROR_CODE unloadModulesService(struct Service_t *service) {
     }
 
     /* deletes the iterator linked list */
-    deleteIteratorLinkedList(service->modulesList, modulesListIterator);
+    delete_iterator_linked_list(service->modulesList, modulesListIterator);
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -858,7 +858,7 @@ ERROR_CODE addConnectionService(struct Service_t *service, struct Connection_t *
     struct Polling_t *polling = service->polling;
 
     /* adds the connection to the connections list */
-    appendValueLinkedList(service->connectionsList, connection);
+    append_value_linked_list(service->connectionsList, connection);
 
     /* registes the connection in the polling (provider) */
     polling->registerConnection(polling, connection);
@@ -875,7 +875,7 @@ ERROR_CODE removeConnectionService(struct Service_t *service, struct Connection_
     polling->unregisterConnection(polling, connection);
 
     /* removes the connection from the connections list */
-    removeValueLinkedList(service->connectionsList, connection, 1);
+    remove_value_linked_list(service->connectionsList, connection, 1);
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -909,10 +909,10 @@ ERROR_CODE createConnection(struct Connection_t **connectionPointer, SOCKET_HAND
     connection->lower = NULL;
 
     /* creates the read queue linked list */
-    createLinkedList(&connection->readQueue);
+    create_linked_list(&connection->readQueue);
 
     /* creates the write queue linked list */
-    createLinkedList(&connection->writeQueue);
+    create_linked_list(&connection->writeQueue);
 
     /* sets the connection in the connection pointer */
     *connectionPointer = connection;
@@ -928,7 +928,7 @@ ERROR_CODE deleteConnection(struct Connection_t *connection) {
     /* iterates continuously */
     while(1) {
         /* pops a value (data) from the linked list (write queue) */
-        popValueLinkedList(connection->writeQueue, (void **) &data, 1);
+        pop_value_linked_list(connection->writeQueue, (void **) &data, 1);
 
         /* in case the data is invalid (list is empty) */
         if(data == NULL) {
@@ -948,10 +948,10 @@ ERROR_CODE deleteConnection(struct Connection_t *connection) {
     if(connection->parameters) { FREE(connection->parameters); }
 
     /* deletes the read queue linked list */
-    deleteLinkedList(connection->readQueue);
+    delete_linked_list(connection->readQueue);
 
     /* deletes the write queue linked list */
-    deleteLinkedList(connection->writeQueue);
+    delete_linked_list(connection->writeQueue);
 
     /* releases the connection */
     FREE(connection);
@@ -975,7 +975,7 @@ ERROR_CODE writeConnection(struct Connection_t *connection, unsigned char *data,
     _data->callbackParameters = callbackParameters;
 
     /* adds the file buffer to the write queue */
-    appendValueLinkedList(connection->writeQueue, (void *) _data);
+    append_value_linked_list(connection->writeQueue, (void *) _data);
 
     /* registers the connection for write */
     connection->registerWrite(connection);
@@ -1121,7 +1121,7 @@ ERROR_CODE deleteHttpHandlerService(struct Service_t *service, struct HttpHandle
 
 ERROR_CODE addHttpHandlerService(struct Service_t *service, struct HttpHandler_t *httpHandler) {
     /* sets the http handler in the http handers map for the handler name */
-    setValueStringHashMap(service->httpHandlersMap, httpHandler->name, (void *) httpHandler);
+    set_value_string_hash_map(service->httpHandlersMap, httpHandler->name, (void *) httpHandler);
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -1129,7 +1129,7 @@ ERROR_CODE addHttpHandlerService(struct Service_t *service, struct HttpHandler_t
 
 ERROR_CODE removeHttpHandlerService(struct Service_t *service, struct HttpHandler_t *httpHandler) {
     /* unsets the http handler from the http handers map */
-    setValueStringHashMap(service->httpHandlersMap, httpHandler->name, NULL);
+    set_value_string_hash_map(service->httpHandlersMap, httpHandler->name, NULL);
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -1138,13 +1138,13 @@ ERROR_CODE removeHttpHandlerService(struct Service_t *service, struct HttpHandle
 ERROR_CODE getHttpHandlerService(struct Service_t *service, struct HttpHandler_t **httpHandlerPointer, unsigned char *name) {
     /* tries to retrieve the http handler for the given name from the
     http handlers map to return it as the appropriate handler */
-    getValueStringHashMap(service->httpHandlersMap, name, (void **) httpHandlerPointer);
+    get_value_string_hash_map(service->httpHandlersMap, name, (void **) httpHandlerPointer);
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _defaultOptionsService(struct Service_t *service, struct HashMap_t *arguments) {
+ERROR_CODE _defaultOptionsService(struct Service_t *service, struct hash_map_t *arguments) {
     /* unpacks the service options from the service */
     struct ServiceOptions_t *serviceOptions = service->options;
 
@@ -1158,7 +1158,7 @@ ERROR_CODE _defaultOptionsService(struct Service_t *service, struct HashMap_t *a
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _fileOptionsService(struct Service_t *service, struct HashMap_t *arguments) {
+ERROR_CODE _fileOptionsService(struct Service_t *service, struct hash_map_t *arguments) {
     /* allocates the value reference to be used
     during the arguments retrieval */
     void *value;
@@ -1169,8 +1169,8 @@ ERROR_CODE _fileOptionsService(struct Service_t *service, struct HashMap_t *argu
 
     /* allocates space for both the general configuration hash
     map and the "concrete" general configuration map */
-    struct HashMap_t *configuration;
-    struct HashMap_t *general;
+    struct hash_map_t *configuration;
+    struct hash_map_t *general;
 
     /* unpacks the service options from the service */
     struct ServiceOptions_t *serviceOptions = service->options;
@@ -1184,40 +1184,40 @@ ERROR_CODE _fileOptionsService(struct Service_t *service, struct HashMap_t *argu
 
     /* tries to retrieve the general section configuration from the configuration
     map in case none is found returns immediately no need to process anything more */
-    getValueStringHashMap(configuration, (unsigned char *) "general", (void **) &general);
+    get_value_string_hash_map(configuration, (unsigned char *) "general", (void **) &general);
     if(general == NULL) { RAISE_NO_ERROR; }
 
     /* tries to retrieve the port argument from the arguments map and
     in case the (port) value is set, casts the port value into integer
     and sets it in the service options */
-    getValueStringHashMap(general, (unsigned char *) "port", &value);
+    get_value_string_hash_map(general, (unsigned char *) "port", &value);
     if(value != NULL) { serviceOptions->port = (unsigned short) atoi(value); }
 
     /* tries to retrieve the host argument from the arguments map and
     in case the (host) value is set, sets it in the service options */
-    getValueStringHashMap(general, (unsigned char *) "host", &value);
+    get_value_string_hash_map(general, (unsigned char *) "host", &value);
     if(value != NULL) { serviceOptions->address = (unsigned char *) value; }
 
     /* tries to retrieve the handler argument from the arguments map and
     in case the (handler) value is set, sets it in the service options */
-    getValueStringHashMap(general, (unsigned char *) "handler", &value);
+    get_value_string_hash_map(general, (unsigned char *) "handler", &value);
     if(value != NULL) { serviceOptions->handlerName = (unsigned char *) value; }
 
     /* tries to retrieve the local argument from the arguments map, then
     in case the (local) value is set, sets the service as local  */
-    getValueStringHashMap(general, (unsigned char *) "local", &value);
+    get_value_string_hash_map(general, (unsigned char *) "local", &value);
     if(value != NULL) { serviceOptions->local = (unsigned char) atoi(value); }
 
     /* tries to retrieve the workers argument from the arguments map, then
     sets the workers (count) value for the service */
-    getValueStringHashMap(general, (unsigned char *) "workers", &value);
+    get_value_string_hash_map(general, (unsigned char *) "workers", &value);
     if(value != NULL) { serviceOptions->workers = (unsigned char) atoi(value); }
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _comandLineOptionsService(struct Service_t *service, struct HashMap_t *arguments) {
+ERROR_CODE _comandLineOptionsService(struct Service_t *service, struct hash_map_t *arguments) {
     /* allocates the value reference to be used
     during the arguments retrieval */
     void *value;
@@ -1228,29 +1228,29 @@ ERROR_CODE _comandLineOptionsService(struct Service_t *service, struct HashMap_t
     /* tries to retrieve the port argument from the arguments map, then
     in case the (port) value is set, casts the port value into
     integer and set it in the service options */
-    getValueStringHashMap(arguments, (unsigned char *) "port", &value);
+    get_value_string_hash_map(arguments, (unsigned char *) "port", &value);
     if(value != NULL) { serviceOptions->port = (unsigned short) atoi(((struct Argument_t *) value)->value); }
 
     /* tries to retrieve the host argument from the arguments map, then
     in case the (host) value is set, sets the address value in
     the service options */
-    getValueStringHashMap(arguments, (unsigned char *) "host", &value);
+    get_value_string_hash_map(arguments, (unsigned char *) "host", &value);
     if(value != NULL) { serviceOptions->address = (unsigned char *) ((struct Argument_t *) value)->value; }
 
     /* tries to retrieve the handler argument from the arguments map, then
     in case the (handler) value is set, sets the handler name value
     in the service options */
-    getValueStringHashMap(arguments, (unsigned char *) "handler", &value);
+    get_value_string_hash_map(arguments, (unsigned char *) "handler", &value);
     if(value != NULL) { serviceOptions->handlerName = (unsigned char *) ((struct Argument_t *) value)->value; }
 
     /* tries to retrieve the local argument from the arguments map, then
     in case the (local) value is set, sets the service as local  */
-    getValueStringHashMap(arguments, (unsigned char *) "local", &value);
+    get_value_string_hash_map(arguments, (unsigned char *) "local", &value);
     if(value != NULL) { serviceOptions->local = 1; }
 
     /* tries to retrieve the workers argument from the arguments map, then
     sets the workers (count) value for the service */
-    getValueStringHashMap(arguments, (unsigned char *) "local", &value);
+    get_value_string_hash_map(arguments, (unsigned char *) "local", &value);
     if(value != NULL) { serviceOptions->workers = atoi(((struct Argument_t *) value)->value); }
 
     /* raises no error */

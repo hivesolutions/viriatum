@@ -77,11 +77,11 @@ ERROR_CODE deleteTorrentConnection(struct TorrentConnection_t *torrentConnection
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE dataHandlerStreamTorrent(struct IoConnection_t *ioConnection, unsigned char *buffer, size_t bufferSize) {
-    char *_buffer = (char *) MALLOC(bufferSize + 1);
+ERROR_CODE dataHandlerStreamTorrent(struct IoConnection_t *ioConnection, unsigned char *buffer, size_t buffer_size) {
+    char *_buffer = (char *) MALLOC(buffer_size + 1);
 
-    memcpy(_buffer, buffer, bufferSize);
-    _buffer[bufferSize] = '\0';
+    memcpy(_buffer, buffer, buffer_size);
+    _buffer[buffer_size] = '\0';
 
     printf("'%s'", _buffer);
 

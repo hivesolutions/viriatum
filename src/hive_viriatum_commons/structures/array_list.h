@@ -33,14 +33,14 @@
  */
 #define DEFAULT_ARRAY_LIST_SIZE 256
 
-typedef struct ArrayList_t {
+typedef struct array_list_t {
     size_t size;
-    size_t elementSize;
-    size_t elementsBufferSize;
-    void **elementsBuffer;
-} ArrayList;
+    size_t element_size;
+    size_t elements_buffer_size;
+    void **elements_buffer;
+} array_list;
 
-VIRIATUM_EXPORT_PREFIX void createArrayList(struct ArrayList_t **arrayListPointer, size_t valueSize, size_t initialSize);
-VIRIATUM_EXPORT_PREFIX void deleteArrayList(struct ArrayList_t *arrayList);
-VIRIATUM_EXPORT_PREFIX void setArrayList(struct ArrayList_t *arrayList, size_t index, void *element);
-VIRIATUM_EXPORT_PREFIX void getArrayList(struct ArrayList_t *arrayList, size_t index, void **elementPointer);
+VIRIATUM_EXPORT_PREFIX void create_array_list(struct array_list_t **array_list_pointer, size_t value_size, size_t initial_size);
+VIRIATUM_EXPORT_PREFIX void delete_array_list(struct array_list_t *array_list);
+VIRIATUM_EXPORT_PREFIX void set_array_list(struct array_list_t *array_list, size_t index, void *element);
+VIRIATUM_EXPORT_PREFIX void get_array_list(struct array_list_t *array_list, size_t index, void **element_pointer);

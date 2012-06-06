@@ -40,7 +40,7 @@ typedef struct FileStream_t {
      * The path to the file to be used
      * in the stream.
      */
-    unsigned char *filePath;
+    unsigned char *file_path;
 
     /**
      * The mode to be used in the opening
@@ -55,9 +55,9 @@ typedef struct FileStream_t {
     struct Stream_t *stream;
 } FileStream;
 
-VIRIATUM_EXPORT_PREFIX void createFileStream(struct FileStream_t **fileStreamPointer, unsigned char *filePath, unsigned char *mode);
-VIRIATUM_EXPORT_PREFIX void deleteFileStream(struct FileStream_t *fileStream);
-VIRIATUM_EXPORT_PREFIX struct Stream_t *getStreamFileStream(struct FileStream_t *fileStream);
+VIRIATUM_EXPORT_PREFIX void create_file_stream(struct FileStream_t **fileStreamPointer, unsigned char *file_path, unsigned char *mode);
+VIRIATUM_EXPORT_PREFIX void delete_file_stream(struct FileStream_t *file_stream);
+VIRIATUM_EXPORT_PREFIX struct Stream_t *getStreamFileStream(struct FileStream_t *file_stream);
 VIRIATUM_EXPORT_PREFIX void openFileStream(struct Stream_t *stream);
 VIRIATUM_EXPORT_PREFIX void closeFileStream(struct Stream_t *stream);
 VIRIATUM_EXPORT_PREFIX size_t readFileStream(struct Stream_t *stream, unsigned char *buffer, size_t size);

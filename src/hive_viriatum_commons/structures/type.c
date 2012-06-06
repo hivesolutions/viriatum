@@ -29,31 +29,31 @@
 
 #include "type.h"
 
-void createType(struct Type_t **typePointer, enum Type_e _type) {
+void create_type(struct type_t **type_pointer, enum type_e _type) {
     /* retrieves the type size */
-    size_t typeSize = sizeof(struct Type_t);
+    size_t type_size = sizeof(struct type_t);
 
     /* allocates space for the type */
-    struct Type_t *type = (struct Type_t *) MALLOC(typeSize);
+    struct type_t *type = (struct type_t *) MALLOC(type_size);
 
     /* sets the type in the type */
     type->type = _type;
 
     /* sets the type in the type pointer */
-    *typePointer = type;
+    *type_pointer = type;
 }
 
-void deleteType(struct Type_t *type) {
+void delete_type(struct type_t *type) {
     /* releases the type */
     FREE(type);
 }
 
-ERROR_CODE freeType(struct Type_t *type) {
+ERROR_CODE free_type(struct type_t *type) {
     /* allocats space for the current type in iteration
     for the iterator and for the possible hash map element */
-    struct Type_t *current;
-    struct Iterator_t *iterator;
-    struct HashMapElement_t *element;
+    struct type_t *current;
+    struct iterator_t *iterator;
+    struct hash_map_element_t *element;
 
     /* switches over the type's type in order to
     execute the proper free operation */
@@ -67,52 +67,52 @@ ERROR_CODE freeType(struct Type_t *type) {
             break;
 
         case STRING_TYPE:
-            FREE(type->value.valueString);
+            FREE(type->value.value_string);
 
             /* breaks the switch */
             break;
 
         case LIST_TYPE:
-            createIteratorLinkedList(type->value.valueList, &iterator);
+            create_iterator_linked_list(type->value.value_list, &iterator);
 
             while(1) {
-                getNextIterator(iterator, (void **) &current);
+                get_next_iterator(iterator, (void **) &current);
                 if(current == NULL) { break; }
-                freeType(current);
+                free_type(current);
             }
 
-            deleteIteratorLinkedList(type->value.valueList, iterator);
-            deleteLinkedList(type->value.valueList);
+            delete_iterator_linked_list(type->value.value_list, iterator);
+            delete_linked_list(type->value.value_list);
 
             /* breaks the switch */
             break;
 
         case MAP_TYPE:
-            createElementIteratorHashMap(type->value.valueMap, &iterator);
+            create_element_iterator_hash_map(type->value.value_map, &iterator);
 
             while(1) {
-                getNextIterator(iterator, (void **) &element);
+                get_next_iterator(iterator, (void **) &element);
                 if(element == NULL) { break; }
-                freeType((struct Type_t *) element->value);
+                free_type((struct type_t *) element->value);
             }
 
-            deleteIteratorHashMap(type->value.valueMap, iterator);
-            deleteHashMap(type->value.valueMap);
+            delete_iterator_hash_map(type->value.value_map, iterator);
+            delete_hash_map(type->value.value_map);
 
             /* breaks the switch */
             break;
 
         case SORT_MAP_TYPE:
-            createElementIteratorSortMap(type->value.valueSortMap, &iterator);
+            create_element_iterator_sort_map(type->value.value_sort_map, &iterator);
 
             while(1) {
-                getNextIterator(iterator, (void **) &element);
+                get_next_iterator(iterator, (void **) &element);
                 if(element == NULL) { break; }
-                freeType((struct Type_t *) element->value);
+                free_type((struct type_t *) element->value);
             }
 
-            deleteIteratorSortMap(type->value.valueSortMap, iterator);
-            deleteSortMap(type->value.valueSortMap);
+            delete_iterator_sort_map(type->value.value_sort_map, iterator);
+            delete_sort_map(type->value.value_sort_map);
 
             /* breaks the switch */
             break;
@@ -124,23 +124,23 @@ ERROR_CODE freeType(struct Type_t *type) {
 
     /* deltes the base type structure for the
     current type, this applies to all the types */
-    deleteType(type);
+    delete_type(type);
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE toStringType(struct Type_t *type, unsigned char **bufferPointer) {
+ERROR_CODE to_string_type(struct type_t *type, unsigned char **buffer_pointer) {
     /* allocates space for both the buffer reference and
     the value to hold the necessary buffer size */
     unsigned char *buffer;
-    size_t bufferSize;
+    size_t buffer_size;
 
     /* retrieves the necessary buffer size for the string
     representation of the given type, then uses the buffer size
     to allocate an appropriate buffer */
-    _sizeType(type, &bufferSize);
-    buffer = (unsigned char *) MALLOC(bufferSize);
+    _size_type(type, &buffer_size);
+    buffer = (unsigned char *) MALLOC(buffer_size);
 
     /* switches over the type's type in order to
     execute the proper type conversion */
@@ -148,7 +148,7 @@ ERROR_CODE toStringType(struct Type_t *type, unsigned char **bufferPointer) {
         case INTEGER_TYPE:
             /* converts the integer value using the string
             conversion function for integer values */
-            SPRINTF((char *) buffer, bufferSize, "%d", type->value.valueInt);
+            SPRINTF((char *) buffer, buffer_size, "%d", type->value.value_int);
 
             /* breaks the switch */
             break;
@@ -156,7 +156,7 @@ ERROR_CODE toStringType(struct Type_t *type, unsigned char **bufferPointer) {
         case FLOAT_TYPE:
             /* converts the float value using the string
             conversion function for float values */
-            SPRINTF((char *) buffer, bufferSize, "%f", type->value.valueFloat);
+            SPRINTF((char *) buffer, buffer_size, "%f", type->value.value_float);
 
             /* breaks the switch */
             break;
@@ -164,7 +164,7 @@ ERROR_CODE toStringType(struct Type_t *type, unsigned char **bufferPointer) {
         case STRING_TYPE:
             /* copies the memory buffer of the value in string
             representation to the buffer */
-            memcpy(buffer, type->value.valueString, strlen(type->value.valueString) + 1);
+            memcpy(buffer, type->value.value_string, strlen(type->value.value_string) + 1);
 
             /* breaks the switch */
             break;
@@ -180,40 +180,40 @@ ERROR_CODE toStringType(struct Type_t *type, unsigned char **bufferPointer) {
 
     /* sets the buffer pointer reference to the
     value in the buffer */
-    *bufferPointer = buffer;
+    *buffer_pointer = buffer;
 
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE printType(struct Type_t *type) {
+ERROR_CODE print_type(struct type_t *type) {
     /* allocates space for the current type for the
     type to handler the key values for map for the
     possible iterator, for the hash map element and
     for the is first (loop) flag */
-    struct Type_t *current;
-    struct Type_t key;
-    struct Iterator_t *iterator;
-    struct HashMapElement_t *element;
-    unsigned char isFirst = 1;
+    struct type_t *current;
+    struct type_t key;
+    struct iterator_t *iterator;
+    struct hash_map_element_t *element;
+    unsigned char is_first = 1;
 
     /* switches over the type's type in order to
     execute the proper print operation */
     switch(type->type) {
         case INTEGER_TYPE:
-            PRINTF_F("%d", type->value.valueInt);
+            PRINTF_F("%d", type->value.value_int);
 
             /* breaks the switch */
             break;
 
         case FLOAT_TYPE:
-            PRINTF_F("%f", type->value.valueFloat);
+            PRINTF_F("%f", type->value.value_float);
 
             /* breaks the switch */
             break;
 
         case STRING_TYPE:
-            PRINTF_F("'%s'", type->value.valueString);
+            PRINTF_F("'%s'", type->value.value_string);
 
             /* breaks the switch */
             break;
@@ -221,17 +221,17 @@ ERROR_CODE printType(struct Type_t *type) {
         case LIST_TYPE:
             PRINTF("[");
 
-            createIteratorLinkedList(type->value.valueList, &iterator);
+            create_iterator_linked_list(type->value.value_list, &iterator);
 
             while(1) {
-                getNextIterator(iterator, (void **) &current);
+                get_next_iterator(iterator, (void **) &current);
                 if(current == NULL) { break; }
-                if(isFirst == 0) { PRINTF(", "); };
-                printType(current);
-                isFirst = 0;
+                if(is_first == 0) { PRINTF(", "); };
+                print_type(current);
+                is_first = 0;
             }
 
-            deleteIteratorLinkedList(type->value.valueList, iterator);
+            delete_iterator_linked_list(type->value.value_list, iterator);
 
             PRINTF("]");
 
@@ -241,20 +241,20 @@ ERROR_CODE printType(struct Type_t *type) {
         case MAP_TYPE:
             PRINTF("{");
 
-            createElementIteratorHashMap(type->value.valueMap, &iterator);
+            create_element_iterator_hash_map(type->value.value_map, &iterator);
 
             while(1) {
-                getNextIterator(iterator, (void **) &element);
+                get_next_iterator(iterator, (void **) &element);
                 if(element == NULL) { break; }
-                if(isFirst == 0) { PRINTF(", "); };
-                key = stringType((char *) element->keyString);
-                printType(&key);
+                if(is_first == 0) { PRINTF(", "); };
+                key = string_type((char *) element->key_string);
+                print_type(&key);
                 PRINTF(" : ");
-                printType((struct Type_t *) element->value);
-                isFirst = 0;
+                print_type((struct type_t *) element->value);
+                is_first = 0;
             }
 
-            deleteIteratorHashMap(type->value.valueMap, iterator);
+            delete_iterator_hash_map(type->value.value_map, iterator);
 
             PRINTF("}");
 
@@ -264,20 +264,20 @@ ERROR_CODE printType(struct Type_t *type) {
         case SORT_MAP_TYPE:
             PRINTF("{");
 
-            createElementIteratorSortMap(type->value.valueSortMap, &iterator);
+            create_element_iterator_sort_map(type->value.value_sort_map, &iterator);
 
             while(1) {
-                getNextIterator(iterator, (void **) &element);
+                get_next_iterator(iterator, (void **) &element);
                 if(element == NULL) { break; }
-                if(isFirst == 0) { PRINTF(", "); };
-                key = stringType((char *) element->keyString);
-                printType(&key);
+                if(is_first == 0) { PRINTF(", "); };
+                key = string_type((char *) element->key_string);
+                print_type(&key);
                 PRINTF(" : ");
-                printType((struct Type_t *) element->value);
-                isFirst = 0;
+                print_type((struct type_t *) element->value);
+                is_first = 0;
             }
 
-            deleteIteratorSortMap(type->value.valueSortMap, iterator);
+            delete_iterator_sort_map(type->value.value_sort_map, iterator);
 
             PRINTF("}");
 
@@ -296,78 +296,78 @@ ERROR_CODE printType(struct Type_t *type) {
     RAISE_NO_ERROR;
 }
 
-struct Type_t integerType(int value) {
+struct type_t integer_type(int value) {
     /* allocates space for the type */
-    struct Type_t type;
+    struct type_t type;
 
     /* sets the type's type and value */
     type.type = INTEGER_TYPE;
-    type.value.valueInt = value;
+    type.value.value_int = value;
 
     /* returns the type */
     return type;
 }
 
-struct Type_t floatType(float value) {
+struct type_t float_type(float value) {
     /* allocates space for the type */
-    struct Type_t type;
+    struct type_t type;
 
     /* sets the type's type and value */
     type.type = FLOAT_TYPE;
-    type.value.valueFloat = value;
+    type.value.value_float = value;
 
     /* returns the type */
     return type;
 }
 
-struct Type_t stringType(char *value) {
+struct type_t string_type(char *value) {
     /* allocates space for the type */
-    struct Type_t type;
+    struct type_t type;
 
     /* sets the type's type and value */
     type.type = STRING_TYPE;
-    type.value.valueString = value;
+    type.value.value_string = value;
 
     return type;
 }
 
-struct Type_t mapType(struct HashMap_t *value) {
+struct type_t map_type(struct hash_map_t *value) {
     /* allocates space for the type */
-    struct Type_t type;
+    struct type_t type;
 
     /* sets the type's type and value */
     type.type = MAP_TYPE;
-    type.value.valueMap = value;
+    type.value.value_map = value;
 
     /* returns the type */
     return type;
 }
 
-struct Type_t sortMapType(struct SortMap_t *value) {
+struct type_t sort_map_type(struct sort_map_t *value) {
     /* allocates space for the type */
-    struct Type_t type;
+    struct type_t type;
 
     /* sets the type's type and value */
     type.type = SORT_MAP_TYPE;
-    type.value.valueSortMap = value;
+    type.value.value_sort_map = value;
 
     /* returns the type */
     return type;
 }
 
-struct Type_t listType(struct LinkedList_t *value) {
+struct type_t list_type(struct linked_list_t *value) {
     /* allocates space for the type */
-    struct Type_t type;
+    struct type_t type;
 
     /* sets the type's type and value */
     type.type = LIST_TYPE;
-    type.value.valueList = value;
+    type.value.value_list = value;
 
     /* returns the type */
     return type;
 }
 
-ERROR_CODE _sizeType(struct Type_t *type, size_t *size) {
+ERROR_CODE _size_type(struct type_t *type, size_t *size) {
     /* switches over the type's type in order to
     execute the proper type conversion */
     switch(type->type) {
@@ -390,7 +390,7 @@ ERROR_CODE _sizeType(struct Type_t *type, size_t *size) {
         case STRING_TYPE:
             /* sets the size to the length of the value string
             plus one */
-            *size = strlen(type->value.valueString) + 1;
+            *size = strlen(type->value.value_string) + 1;
 
             /* breaks the switch */
             break;

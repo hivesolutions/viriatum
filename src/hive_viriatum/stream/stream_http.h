@@ -130,7 +130,7 @@ typedef struct HttpConnection_t {
      * This value is used to retrieve the current position
      * to be written into the buffer.
      */
-    size_t bufferSize;
+    size_t buffer_size;
 
     /**
      * The current offset of the buffer containing the http
@@ -143,6 +143,6 @@ ERROR_CODE createHttpHandler(struct HttpHandler_t **httpHandlerPointer, unsigned
 ERROR_CODE deleteHttpHandler(struct HttpHandler_t *httpHandler);
 ERROR_CODE createHttpConnection(struct HttpConnection_t **httpConnectionPointer, struct IoConnection_t *ioConnection);
 ERROR_CODE deleteHttpConnection(struct HttpConnection_t *httpConnection);
-ERROR_CODE dataHandlerStreamHttp(struct IoConnection_t *ioConnection, unsigned char *buffer, size_t bufferSize);
+ERROR_CODE dataHandlerStreamHttp(struct IoConnection_t *ioConnection, unsigned char *buffer, size_t buffer_size);
 ERROR_CODE openHandlerStreamHttp(struct IoConnection_t *ioConnection);
 ERROR_CODE closeHandlerStreamHttp(struct IoConnection_t *ioConnection);

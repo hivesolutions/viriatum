@@ -40,46 +40,46 @@
  * This union is supposed to be used together
  * with the typ structure.
  */
-typedef union TypeValue_t {
+typedef union type_value_t {
     /**
      * The storage space used for the
      * integer value representation.
      */
-    int valueInt;
+    int value_int;
 
     /**
      * The storage space used for the
      * float value representation.
      */
-    float valueFloat;
+    float value_float;
 
     /**
      * The storage space used for the
      * string value representation, this
      * representation is done via a buffer.
      */
-    char *valueString;
+    char *value_string;
 
     /**
      * The storage space used for the
      * hash map (dictionary) value
      * representation.
      */
-    struct HashMap_t *valueMap;
+    struct hash_map_t *value_map;
 
     /**
      * The storage space used for the
      * sort map (ordered dictionary) value
      * representation.
      */
-    struct SortMap_t *valueSortMap;
+    struct sort_map_t *value_sort_map;
 
     /**
      * The storage space used for the
      * linked list (sequence) value
      * representation.
      */
-    struct LinkedList_t *valueList;
+    struct linked_list_t *value_list;
 
     /**
      * Used to store any other value
@@ -87,8 +87,8 @@ typedef union TypeValue_t {
      * This value must be casted uppon
      * usage.
      */
-    void *valuePointer;
-} TypeValue;
+    void *value_pointer;
+} type_value;
 
 /**
  * Enumeration describing the various types
@@ -97,7 +97,7 @@ typedef union TypeValue_t {
  * This types represent both the basic data
  * types and the "extended" ones.
  */
-typedef enum Type_e {
+typedef enum type_e {
     INTEGER_TYPE = 1,
     FLOAT_TYPE,
     STRING_TYPE,
@@ -105,7 +105,7 @@ typedef enum Type_e {
     SORT_MAP_TYPE,
     LIST_TYPE,
     VOID_TYPE
-} _Type;
+} _type;
 
 /**
  * Structure that defines a "portable" type
@@ -114,12 +114,12 @@ typedef enum Type_e {
  * This kind of type is inspired by the data
  * structures used in dynamic languages.
  */
-typedef struct Type_t {
+typedef struct type_t {
     /**
      * The type of the current type,
      * (eg: integer, float, string).
      */
-    enum Type_e type;
+    enum type_e type;
 
     /**
      * The value or a pointer to the
@@ -128,18 +128,18 @@ typedef struct Type_t {
      * value before acessing the correct
      * value in the union.
      */
-    union TypeValue_t value;
-} Type;
+    union type_value_t value;
+} type;
 
-VIRIATUM_EXPORT_PREFIX void createType(struct Type_t **typePointer, enum Type_e _type);
-VIRIATUM_EXPORT_PREFIX void deleteType(struct Type_t *type);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE freeType(struct Type_t *type);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE toStringType(struct Type_t *type, unsigned char **bufferPointer);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE printType(struct Type_t *type);
-VIRIATUM_EXPORT_PREFIX struct Type_t integerType(int value);
-VIRIATUM_EXPORT_PREFIX struct Type_t floatType(float value);
-VIRIATUM_EXPORT_PREFIX struct Type_t stringType(char *value);
-VIRIATUM_EXPORT_PREFIX struct Type_t mapType(struct HashMap_t *value);
-VIRIATUM_EXPORT_PREFIX struct Type_t sortMapType(struct SortMap_t *value);
-VIRIATUM_EXPORT_PREFIX struct Type_t listType(struct LinkedList_t *value);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE _sizeType(struct Type_t *type, size_t *size);
+VIRIATUM_EXPORT_PREFIX void create_type(struct type_t **type_pointer, enum type_e _type);
+VIRIATUM_EXPORT_PREFIX void delete_type(struct type_t *type);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE free_type(struct type_t *type);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE to_string_type(struct type_t *type, unsigned char **buffer_pointer);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE print_type(struct type_t *type);
+VIRIATUM_EXPORT_PREFIX struct type_t integer_type(int value);
+VIRIATUM_EXPORT_PREFIX struct type_t float_type(float value);
+VIRIATUM_EXPORT_PREFIX struct type_t string_type(char *value);
+VIRIATUM_EXPORT_PREFIX struct type_t map_type(struct hash_map_t *value);
+VIRIATUM_EXPORT_PREFIX struct type_t sort_map_type(struct sort_map_t *value);
+VIRIATUM_EXPORT_PREFIX struct type_t list_type(struct linked_list_t *value);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _size_type(struct type_t *type, size_t *size);

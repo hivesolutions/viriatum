@@ -143,16 +143,16 @@ ERROR_CODE acceptHandlerStreamIo(struct Connection_t *connection) {
 
 ERROR_CODE readHandlerStreamIo(struct Connection_t *connection) {
     /* allocates the number of bytes */
-    SOCKET_ERROR_CODE numberBytes;
+    SOCKET_ERROR_CODE number_bytes;
 
     /* allocates the "simple" buffer */
     unsigned char buffer[10240];
 
     /* retrieves the buffer pointer */
-    unsigned char *bufferPointer = (unsigned char *) buffer;
+    unsigned char *buffer_pointer = (unsigned char *) buffer;
 
     /* allocates the buffer size */
-    size_t bufferSize = 0;
+    size_t buffer_size = 0;
 
     /* flag and value controlling the state of the read */
     ERROR_CODE error = 0;
@@ -164,16 +164,16 @@ ERROR_CODE readHandlerStreamIo(struct Connection_t *connection) {
     while(1) {
         /* in case the buffer size is so big that may
         overflow the current allocated buffer */
-        if(bufferSize + 1024 > 10240) {
+        if(buffer_size + 1024 > 10240) {
             /* breaks the loop */
             break;
         }
 
         /* receives from the socket */
-        numberBytes = SOCKET_RECEIVE(connection->socketHandle, (char *) bufferPointer, 1024, 0);
+        number_bytes = SOCKET_RECEIVE(connection->socketHandle, (char *) buffer_pointer, 1024, 0);
 
         /* in case the number of bytes is zero (connection closed) */
-        if(numberBytes == 0) {
+        if(number_bytes == 0) {
             /* sets the error flag */
             error = 1;
 
@@ -182,9 +182,9 @@ ERROR_CODE readHandlerStreamIo(struct Connection_t *connection) {
         }
 
         /* in case there was an error receiving from the socket */
-        if(SOCKET_TEST_ERROR(numberBytes)) {
+        if(SOCKET_TEST_ERROR(number_bytes)) {
             /* retrieves the receving error code */
-            SOCKET_ERROR_CODE receivingErrorCode = SOCKET_GET_ERROR_CODE(numberBytes);
+            SOCKET_ERROR_CODE receivingErrorCode = SOCKET_GET_ERROR_CODE(number_bytes);
 
             /* switches over the receiving error code */
             switch(receivingErrorCode) {
@@ -214,10 +214,10 @@ ERROR_CODE readHandlerStreamIo(struct Connection_t *connection) {
         }
 
         /* increments the buffer position */
-        bufferPointer += numberBytes;
+        buffer_pointer += number_bytes;
 
         /* increments the buffer size with the number of bytes */
-        bufferSize += numberBytes;
+        buffer_size += number_bytes;
 
         /* in case the viriatum is set to blocking */
         if(!VIRIATUM_NON_BLOCKING) {
@@ -236,7 +236,7 @@ ERROR_CODE readHandlerStreamIo(struct Connection_t *connection) {
                 V_DEBUG("Calling on data handler\n");
 
                 /* calls the on data handler */
-                ioConnection->onData(ioConnection, buffer, bufferSize);
+                ioConnection->onData(ioConnection, buffer, buffer_size);
 
                 /* prints a debug message */
                 V_DEBUG("Finished calling on data handler\n");
@@ -261,7 +261,7 @@ ERROR_CODE readHandlerStreamIo(struct Connection_t *connection) {
                 V_DEBUG("Calling on data handler\n");
 
                 /* calls the on data handler */
-                ioConnection->onData(ioConnection, buffer, bufferSize);
+                ioConnection->onData(ioConnection, buffer, buffer_size);
 
                 /* prints a debug message */
                 V_DEBUG("Finished calling on data handler\n");
@@ -282,7 +282,7 @@ ERROR_CODE readHandlerStreamIo(struct Connection_t *connection) {
 
 ERROR_CODE writeHandlerStreamIo(struct Connection_t *connection) {
     /* allocates the number of bytes */
-    SOCKET_ERROR_CODE numberBytes;
+    SOCKET_ERROR_CODE number_bytes;
 
     /* allocates the data */
     struct Data_t *data;
@@ -296,7 +296,7 @@ ERROR_CODE writeHandlerStreamIo(struct Connection_t *connection) {
         V_DEBUG("Peeking value from write queue\n");
 
         /* peeks a value (data) from the linked list (write queue) */
-        peekValueLinkedList(connection->writeQueue, (void **) &data);
+        peek_value_linked_list(connection->writeQueue, (void **) &data);
 
         /* in case the data is invalid (list is empty) */
         if(data == NULL) {
@@ -308,12 +308,12 @@ ERROR_CODE writeHandlerStreamIo(struct Connection_t *connection) {
         V_DEBUG_F("Sending %ld bytes through socket: %d\n", (long int) data->size, connection->socketHandle);
 
         /* sends the value retrieving the number of bytes sent */
-        numberBytes = SOCKET_SEND(connection->socketHandle, (char *) data->data, data->size, 0);
+        number_bytes = SOCKET_SEND(connection->socketHandle, (char *) data->data, data->size, 0);
 
         /* in case there was an error receiving from the socket */
-        if(SOCKET_TEST_ERROR(numberBytes)) {
+        if(SOCKET_TEST_ERROR(number_bytes)) {
             /* retrieves the receving error code */
-            SOCKET_ERROR_CODE receivingErrorCode = SOCKET_GET_ERROR_CODE(numberBytes);
+            SOCKET_ERROR_CODE receivingErrorCode = SOCKET_GET_ERROR_CODE(number_bytes);
 
             /* switches over the receiving error code */
             switch(receivingErrorCode) {
@@ -343,18 +343,18 @@ ERROR_CODE writeHandlerStreamIo(struct Connection_t *connection) {
         }
 
         /* prints a debug message */
-        V_DEBUG_F("Data [%d bytes] sent without errors\n", numberBytes);
+        V_DEBUG_F("Data [%d bytes] sent without errors\n", number_bytes);
 
         /* in case the number of bytes sent is the same as the value size
         (not all data has been sent) */
-        if(numberBytes != data->size) {
+        if(number_bytes != data->size) {
             /* prints a debug message */
-            V_DEBUG_F("Shrinking data [%d bytes] (partial message sent)\n", numberBytes);
+            V_DEBUG_F("Shrinking data [%d bytes] (partial message sent)\n", number_bytes);
 
             /* updates the data internal structure
             to allow the sending of the pending partial data */
-            data->data += numberBytes;
-            data->size -= numberBytes;
+            data->data += number_bytes;
+            data->size -= number_bytes;
 
             /* sets the error flag (non fatal) */
             error = 2;
@@ -364,7 +364,7 @@ ERROR_CODE writeHandlerStreamIo(struct Connection_t *connection) {
         }
 
         /* pops a value (data) from the linked list (write queue) */
-        popValueLinkedList(connection->writeQueue, (void **) &data, 1);
+        pop_value_linked_list(connection->writeQueue, (void **) &data, 1);
 
         /* in case the data callback is set */
         if(data->callback != NULL) {

@@ -31,12 +31,12 @@
 
 #ifndef VIRIATUM_NO_THREADS
 
-int threadPoolStartFunctionTest(void *arguments) {
+int thread_pool_start_function_test(void *arguments) {
     /* retrieves the current thread identifier */
-    THREAD_IDENTIFIER threadId = THREAD_GET_IDENTIFIER();
+    THREAD_IDENTIFIER thread_id = THREAD_GET_IDENTIFIER();
 
     /* prints an hello world message */
-    V_DEBUG_F("hello world from thread: %lu\n", (unsigned long) threadId);
+    V_DEBUG_F("hello world from thread: %lu\n", (unsigned long) thread_id);
 
     /* sleeps for a while */
     SLEEP(10);
@@ -45,24 +45,24 @@ int threadPoolStartFunctionTest(void *arguments) {
     return 0;
 }
 
-void testThreadPool() {
+void test_thread_pool() {
     /* allocates space for the index */
     unsigned int index;
 
     /* allocates space for the thread pool */
-    struct ThreadPool_t *threadPool;
+    struct ThreadPool_t *thread_pool;
 
     /* allocates space for the thread pool task */
-    struct ThreadPoolTask_t *threadPoolTask = (struct ThreadPoolTask_t *) MALLOC(sizeof(struct ThreadPoolTask_t));
+    struct ThreadPoolTask_t *thread_pool_task = (struct ThreadPoolTask_t *) MALLOC(sizeof(struct ThreadPoolTask_t));
 
     /* sets the start function */
-    threadPoolTask->startFunction = threadPoolStartFunctionTest;
+    thread_pool_task->start_function = thread_pool_start_function_test;
 
     /* prints a debug message */
     V_DEBUG("Creating a thread pool\n");
 
     /* creates the thread pool */
-    createThreadPool(&threadPool, 15, 1, 30);
+    create_thread_pool(&thread_pool, 15, 1, 30);
 
     /* iterates over the range of the index */
     for(index = 0; index < 100; index ++) {
@@ -70,186 +70,186 @@ void testThreadPool() {
         V_DEBUG("Inserting task in thread pool\n");
 
         /* inserts the task in the thread pool */
-        insertTaskThreadPool(threadPool, threadPoolTask);
+        insert_task_thread_pool(thread_pool, thread_pool_task);
     }
 }
 
 #endif
 
-void testLinkedList() {
+void test_linked_list() {
     /* allocates space for the value */
     void *value;
 
     /* allocates space for the linked list */
-    struct LinkedList_t *linkedList;
+    struct linked_list_t *linked_list;
 
     /* creates the linked list */
-    createLinkedList(&linkedList);
+    create_linked_list(&linked_list);
 
     /* adds some element to the linked list */
-    appendValueLinkedList(linkedList, (void *) 1);
-    appendValueLinkedList(linkedList, (void *) 2);
-    appendValueLinkedList(linkedList, (void *) 3);
+    append_value_linked_list(linked_list, (void *) 1);
+    append_value_linked_list(linked_list, (void *) 2);
+    append_value_linked_list(linked_list, (void *) 3);
 
     /* retrieves a value from the linked list */
-    getValueLinkedList(linkedList, 1, &value);
+    get_value_linked_list(linked_list, 1, &value);
 
     /* removes a value from the linked list */
-    removeValueLinkedList(linkedList, (void *) 1, 1);
+    remove_value_linked_list(linked_list, (void *) 1, 1);
 
     /* removes an element from the linked list */
-    removeIndexLinkedList(linkedList, 1, 1);
+    remove_index_linked_list(linked_list, 1, 1);
 
     /* pops a value from the linked list */
-    popValueLinkedList(linkedList, (void **) &value, 1);
+    pop_value_linked_list(linked_list, (void **) &value, 1);
 
     /* pops a value from the linked list */
-    popValueLinkedList(linkedList, (void **) &value, 1);
+    pop_value_linked_list(linked_list, (void **) &value, 1);
 
     /* deletes the linked list */
-    deleteLinkedList(linkedList);
+    delete_linked_list(linked_list);
 }
 
-void testArrayList() {
+void test_array_list() {
     /* allocates space for the element */
     unsigned int element = 1;
 
     /* allocates space for the element pointer */
-    unsigned int *elementPointer;
+    unsigned int *element_pointer;
 
     /* allocates space for the array list */
-    struct ArrayList_t *arrayList;
+    struct array_list_t *array_list;
 
     /* creates the array list */
-    createArrayList(&arrayList, sizeof(unsigned int), 0);
+    create_array_list(&array_list, sizeof(unsigned int), 0);
 
     /* sets and retrieves the value in the array list */
-    setArrayList(arrayList, 0, (void **) &element);
-    getArrayList(arrayList, 0, (void **) &elementPointer);
+    set_array_list(array_list, 0, (void **) &element);
+    get_array_list(array_list, 0, (void **) &element_pointer);
 
     /* deletes the array list */
-    deleteArrayList(arrayList);
+    delete_array_list(array_list);
 }
 
-void testHashMap() {
+void test_hash_map() {
     /* allocates space for the element */
     void *element;
 
     /* allocates space for the hash map */
-    struct HashMap_t *hashMap;
+    struct hash_map_t *hash_map;
 
     /* creates the hash map */
-    createHashMap(&hashMap, 3);
+    create_hash_map(&hash_map, 3);
 
     /* sets and retrieves the value in the hash map */
-    setValueHashMap(hashMap, 1, NULL, (void *) 1);
-    getValueHashMap(hashMap, 1, NULL, &element);
+    set_value_hash_map(hash_map, 1, NULL, (void *) 1);
+    get_value_hash_map(hash_map, 1, NULL, &element);
 
     /* sets and retrieves the value in the hash map */
-    setValueHashMap(hashMap, 2, NULL, (void *) 2);
-    getValueHashMap(hashMap, 2, NULL, &element);
+    set_value_hash_map(hash_map, 2, NULL, (void *) 2);
+    get_value_hash_map(hash_map, 2, NULL, &element);
 
     /* sets and retrieves the value in the hash map,
     (thi set should for re-sizing) */
-    setValueHashMap(hashMap, 3, NULL, (void *) 3);
-    getValueHashMap(hashMap, 3, NULL, &element);
+    set_value_hash_map(hash_map, 3, NULL, (void *) 3);
+    get_value_hash_map(hash_map, 3, NULL, &element);
 
     /* sets and retrieves the value (using a string)
     in the hash map */
-    setValueStringHashMap(hashMap, (unsigned char *) "test", (void *) 4);
-    getValueStringHashMap(hashMap, (unsigned char *) "test", (void **) &element);
+    set_value_string_hash_map(hash_map, (unsigned char *) "test", (void *) 4);
+    get_value_string_hash_map(hash_map, (unsigned char *) "test", (void **) &element);
 
     /* deletes the hash map */
-    deleteHashMap(hashMap);
+    delete_hash_map(hash_map);
 }
 
-void testSortMap() {
+void test_sort_map() {
     /* allocates space for the element */
     void *element;
 
     /* allocates space for the sort map */
-    struct SortMap_t *sortMap;
+    struct sort_map_t *sort_map;
 
     /* creates the sort map */
-    createSortMap(&sortMap, 3);
+    create_sort_map(&sort_map, 3);
 
     /* sets and retrieves the value in the sort map */
-    setValueSortMap(sortMap, 1, NULL, (void *) 1);
-    getValueSortMap(sortMap, 1, NULL, &element);
+    set_value_sort_map(sort_map, 1, NULL, (void *) 1);
+    get_value_sort_map(sort_map, 1, NULL, &element);
 
     /* sets and retrieves the value in the sort map */
-    setValueSortMap(sortMap, 2, NULL, (void *) 2);
-    getValueSortMap(sortMap, 2, NULL, &element);
+    set_value_sort_map(sort_map, 2, NULL, (void *) 2);
+    get_value_sort_map(sort_map, 2, NULL, &element);
 
     /* sets and retrieves the value in the sort map,
     (thi set should for re-sizing) */
-    setValueSortMap(sortMap, 3, NULL, (void *) 3);
-    getValueSortMap(sortMap, 3, NULL, &element);
+    set_value_sort_map(sort_map, 3, NULL, (void *) 3);
+    get_value_sort_map(sort_map, 3, NULL, &element);
 
     /* sets and retrieves the value (using a string)
     in the sort map */
-    setValueStringSortMap(sortMap, (unsigned char *) "test", (void *) 4);
-    getValueStringSortMap(sortMap, (unsigned char *) "test", (void **) &element);
+    set_value_string_sort_map(sort_map, (unsigned char *) "test", (void *) 4);
+    get_value_string_sort_map(sort_map, (unsigned char *) "test", (void **) &element);
 
     /* deletes the sort map */
-    deleteSortMap(sortMap);
+    delete_sort_map(sort_map);
 }
 
-void testStringBuffer() {
+void test_string_buffer() {
     /* allocates space for the string buffer */
-    struct StringBuffer_t *stringBuffer;
+    struct string_buffer_t *string_buffer;
 
     /* allocates the space for the string to
     hold the various joined values */
-    unsigned char *stringValue;
+    unsigned char *string_value;
 
     /* creates the string buffer */
-    createStringBuffer(&stringBuffer);
+    create_string_buffer(&string_buffer);
 
     /* adds a set of strings to the string buffer */
-    appendStringBuffer(stringBuffer, (unsigned char *) "hello");
-    appendStringBuffer(stringBuffer, (unsigned char *) " ");
-    appendStringBuffer(stringBuffer, (unsigned char *) "world");
+    append_string_buffer(string_buffer, (unsigned char *) "hello");
+    append_string_buffer(string_buffer, (unsigned char *) " ");
+    append_string_buffer(string_buffer, (unsigned char *) "world");
 
     /* "joins" the string buffer values into a single
     value (from the internal string list) */
-    joinStringBuffer(stringBuffer, &stringValue);
+    join_string_buffer(string_buffer, &string_value);
 
     /* releases the string value (string) */
-    FREE(stringValue);
+    FREE(string_value);
 
     /* deletes the string buffer */
-    deleteStringBuffer(stringBuffer);
+    delete_string_buffer(string_buffer);
 }
 
-void testLinkedBuffer() {
+void test_linked_buffer() {
     /* allocates space for the linked buffer */
-    struct LinkedBuffer_t *linkedBuffer;
+    struct linked_buffer_t *linked_buffer;
 
     /* allocates the space for the buffer to
     hold the various joined values */
-    unsigned char *bufferValue;
+    unsigned char *buffer_value;
 
     /* creates the linked buffer */
-    createLinkedBuffer(&linkedBuffer);
+    create_linked_buffer(&linked_buffer);
 
     /* adds a set of strings to the string buffer */
-    appendLinkedBuffer(linkedBuffer, (void *) "hello", 5, 0);
-    appendLinkedBuffer(linkedBuffer, (void *) " ", 1, 0);
-    appendLinkedBuffer(linkedBuffer, (void *) "world", 5, 0);
+    append_linked_buffer(linked_buffer, (void *) "hello", 5, 0);
+    append_linked_buffer(linked_buffer, (void *) " ", 1, 0);
+    append_linked_buffer(linked_buffer, (void *) "world", 5, 0);
 
     /* "joins" the linked buffer values into a single
     value (from the internal buffer list) */
-    joinLinkedBuffer(linkedBuffer, &bufferValue);
+    join_linked_buffer(linked_buffer, &buffer_value);
 
     /* releases the buffer value */
-    FREE(bufferValue);
+    FREE(buffer_value);
 
     /* deletes the linked buffer */
-    deleteLinkedBuffer(linkedBuffer);
+    delete_linked_buffer(linked_buffer);
 }
 
-void testBase64() {
+void test_base64() {
     /* allocates space for the buffer */
     char buffer[] = "hello world";
 
@@ -278,63 +278,63 @@ void testBase64() {
     FREE(decoded_buffer);
 }
 
-void testBencoding() {
+void test_bencoding() {
     /* allocates space for the various type references
     and values and also dor the sequence structures */
-    struct Type_t *type;
-    struct Type_t _mapType;
-    struct Type_t _listType;
-    struct Type_t _stringType;
-    struct Type_t _integerType;
-    struct HashMap_t *map;
-    struct LinkedList_t *list;
+    struct type_t *type;
+    struct type_t _map_type;
+    struct type_t _list_type;
+    struct type_t _string_type;
+    struct type_t _integer_type;
+    struct hash_map_t *map;
+    struct linked_list_t *list;
 
     /* allocates space for the encoded buffer reference
     and for the encoded buffer length integer value */
-    unsigned char *encodedBuffer;
-    size_t encodedBufferLength;
+    unsigned char *encoded_buffer;
+    size_t encoded_buffer_length;
 
     /* creates the sequence structures (map and list), initializing
     them in the simple (empty) way */
-    createHashMap(&map, 0);
-    createLinkedList(&list);
+    create_hash_map(&map, 0);
+    create_linked_list(&list);
 
     /* creates the various type structures from the internal raw values
     of them, uses the appropriate constructor functions */
-    _mapType = mapType(map);
-    _listType = listType(list);
-    _stringType = stringType("world");
-    _integerType = integerType(1234);
+    _map_type = map_type(map);
+    _list_type = list_type(list);
+    _string_type = string_type("world");
+    _integer_type = integer_type(1234);
 
     /* adds the integer value to the list */
-    appendValueLinkedList(list, (void *) &_integerType);
+    append_value_linked_list(list, (void *) &_integer_type);
 
     /* sets the top level hash map values */
-    setValueStringHashMap(map, (unsigned char *) "hello", (void *) &_stringType);
-    setValueStringHashMap(map, (unsigned char *) "_hello", (void *) &_listType);
+    set_value_string_hash_map(map, (unsigned char *) "hello", (void *) &_string_type);
+    set_value_string_hash_map(map, (unsigned char *) "_hello", (void *) &_list_type);
 
     /* encodes the top level map type into the encoded buffer
     and then decodes it from the the encoded buffer back to
     a type structure reference */
-    encodeBencoding(&_mapType, &encodedBuffer, &encodedBufferLength);
-    decodeBencoding(encodedBuffer, encodedBufferLength, &type);
+    encode_bencoding(&_map_type, &encoded_buffer, &encoded_buffer_length);
+    decode_bencoding(encoded_buffer, encoded_buffer_length, &type);
 
     /* deletes the hash map structure and the list strucuture
     to avoid any memory leaking */
-    deleteHashMap(map);
-    deleteLinkedList(list);
+    delete_hash_map(map);
+    delete_linked_list(list);
 
     /* prints the type structure into the standard output and then
     releases its memory recursively */
-    printType(type);
-    freeType(type);
+    print_type(type);
+    free_type(type);
 
     /* releases the memory from the encoded buffer, this was
     created during the encoding using bencoding */
-    FREE(encodedBuffer);
+    FREE(encoded_buffer);
 }
 
-void testHuffman() {
+void test_huffman() {
     /* allocates space for the huffman */
     struct huffman_t *huffman;
 
@@ -348,47 +348,47 @@ void testHuffman() {
     delete_huffman(huffman);
 }
 
-void testBitStream() {
+void test_bit_stream() {
     /* allocates space for the file stream */
-    struct FileStream_t *fileStream;
+    struct FileStream_t *file_stream;
 
     /* allocates space for the bit stream */
-    struct BitStream_t *bitStream;
+    struct BitStream_t *bit_stream;
 
     /* creates the file stream */
-    createFileStream(&fileStream, (unsigned char *) "bit_stream.txt", (unsigned char *) "wb");
+    create_file_stream(&file_stream, (unsigned char *) "bit_stream.txt", (unsigned char *) "wb");
 
     /* creates the bit stream */
-    createBitStream(&bitStream, fileStream->stream);
+    create_bit_stream(&bit_stream, file_stream->stream);
 
     /* opens the bit stream */
-    openBitStream(bitStream);
+    open_bit_stream(bit_stream);
 
     /* writes the 0100 bit set to the bit stream
     and then writes the 0001 bit set */
-    writeByteBitStream(bitStream, 0x04, 4);
-    writeByteBitStream(bitStream, 0x01, 4);
+    write_byte_bit_stream(bit_stream, 0x04, 4);
+    write_byte_bit_stream(bit_stream, 0x01, 4);
 
     /* checks if the written 8 bits are
     01000001 (0x41) the correct value */
-    assert(bitStream->buffer[0] == 0x41);
+    assert(bit_stream->buffer[0] == 0x41);
 
     /* writes a the 0100 bit set to the bit stream */
-    writeByteBitStream(bitStream, 0x04, 4);
+    write_byte_bit_stream(bit_stream, 0x04, 4);
 
     /* closes the bit stream */
-    closeBitStream(bitStream);
+    close_bit_stream(bit_stream);
 
     /* deletes the bit stream */
-    deleteBitStream(bitStream);
+    delete_bit_stream(bit_stream);
 
     /* deletes the file stream */
-    deleteFileStream(fileStream);
+    delete_file_stream(file_stream);
 }
 
-void testFileStream() {
+void test_file_stream() {
     /* allocates space for the file stream */
-    struct FileStream_t *fileStream;
+    struct FileStream_t *file_stream;
 
     /* allocates space for the stream */
     struct Stream_t *stream;
@@ -397,11 +397,11 @@ void testFileStream() {
     unsigned char buffer[128];
 
     /* creates the file stream */
-    createFileStream(&fileStream, (unsigned char *) "hello.txt", (unsigned char *) "wb");
+    create_file_stream(&file_stream, (unsigned char *) "hello.txt", (unsigned char *) "wb");
 
     /* retrieves the stream from the file stream, in order
     to be able to use the "normal" stream functions */
-    stream = fileStream->stream;
+    stream = file_stream->stream;
 
     /* opens the stream */
     stream->open(stream);
@@ -413,11 +413,11 @@ void testFileStream() {
     stream->close(stream);
 
     /* creates the file stream */
-    createFileStream(&fileStream, (unsigned char *) "hello.txt", (unsigned char *) "rb");
+    create_file_stream(&file_stream, (unsigned char *) "hello.txt", (unsigned char *) "rb");
 
     /* retrieves the stream from the file stream, in order
     to be able to use the "normal" stream functions */
-    stream = fileStream->stream;
+    stream = file_stream->stream;
 
     /* opens the stream */
     stream->open(stream);
@@ -435,56 +435,56 @@ void testFileStream() {
     assert(strcmp((char *) "hello world", (char *) buffer) == 0);
 
     /* deletes the file stream */
-    deleteFileStream(fileStream);
+    delete_file_stream(file_stream);
 }
 
-void testTemplateHandler() {
+void test_template_handler() {
     /* allocates space for the template handler */
-    struct TemplateHandler_t *templateHandler;
+    struct TemplateHandler_t *template_handler;
 
     /* creates the template handler */
-    createTemplateHandler(&templateHandler);
+    create_template_handler(&template_handler);
 
     /* processes the file as a template handler */
-    processTemplateHandler(templateHandler, (unsigned char *) "test.tpl");
+    process_template_handler(template_handler, (unsigned char *) "test.tpl");
 
     /* deletes the template handler */
-    deleteTemplateHandler(templateHandler);
+    delete_template_handler(template_handler);
 }
 
-void testQuicksort() {
+void test_quicksort() {
     /* allocates space for the template handler */
     int list[10] = { 2, 4, 1, 2, 3, 5, 5, 3, 4, 1 };
 
     /* sorts the sequence according to the compare function */
-    sortQuicksort((void **) list, 0, 10, _compare);
+    sort_quicksort((void **) list, 0, 10, _compare);
 }
 
-void testQuicksortLinkedList() {
+void test_quicksort_linked_list() {
     /* allocates space for the linked list */
-    struct LinkedList_t *linkedList;
+    struct linked_list_t *linked_list;
 
     /* creates the linked list */
-    createLinkedList(&linkedList);
+    create_linked_list(&linked_list);
 
     /* adds some element to the linked list */
-    appendValueLinkedList(linkedList, (void *) 2);
-    appendValueLinkedList(linkedList, (void *) 3);
-    appendValueLinkedList(linkedList, (void *) 1);
+    append_value_linked_list(linked_list, (void *) 2);
+    append_value_linked_list(linked_list, (void *) 3);
+    append_value_linked_list(linked_list, (void *) 1);
 
     /* retrieves a value from the linked list */
-    sortLinkedList(linkedList, _compare);
+    sort_linked_list(linked_list, _compare);
 
     /* deletes the linked list */
-    deleteLinkedList(linkedList);
+    delete_linked_list(linked_list);
 }
 
-void testCrc32() {
+void test_crc32() {
     /* calculates the crc32 hash value and returns it */
     crc32((unsigned char *) "Hello World", 11);
 }
 
-void testMd5() {
+void test_md5() {
     /* allocates space for the md5 result */
     unsigned char result[MD5_DIGEST_SIZE];
 
@@ -492,7 +492,7 @@ void testMd5() {
     md5((unsigned char *) "Hello World", 11, result);
 }
 
-void testSha1() {
+void test_sha1() {
     /* allocates space for the sha1 result */
     unsigned char result[SHA1_DIGEST_SIZE];
 
@@ -518,58 +518,58 @@ int _compare(void *first, void *second) {
     return 0;
 }
 
-void runSimpleTests() {
+void run_simple_tests() {
     #ifndef VIRIATUM_NO_THREADS
     /* tests the thread pool */
-    testThreadPool();
+    test_thread_pool();
     #endif
 
     /* tests the linked list */
-    testLinkedList();
+    test_linked_list();
 
     /* tests the array list */
-    testArrayList();
+    test_array_list();
 
     /* tests the hash map */
-    testHashMap();
+    test_hash_map();
 
     /* tests the sort map */
-    testSortMap();
+    test_sort_map();
 
     /* tests the string buffer */
-    testStringBuffer();
+    test_string_buffer();
 
     /* tests the linked buffer */
-    testLinkedBuffer();
+    test_linked_buffer();
 
     /* tests the base 64 encoder */
-    testBase64();
+    test_base64();
 
     /* tests the bencoding encoder */
-    testBencoding();
+    test_bencoding();
 
     /* tests the huffman encoder */
-    testHuffman();
+    test_huffman();
 
     /* tests the bit stream */
-    testBitStream();
+    test_bit_stream();
 
     /* tests the file stream */
-    testFileStream();
+    test_file_stream();
 
     /* tests the template handler */
-    testTemplateHandler();
+    test_template_handler();
 
     /* tests the quick sort algorithm */
-    testQuicksort();
-    testQuicksortLinkedList();
+    test_quicksort();
+    test_quicksort_linked_list();
 
     /* tests the crc32 hash function */
-    testCrc32();
+    test_crc32();
 
     /* tests the md5 hash function */
-    testMd5();
+    test_md5();
 
     /* tests the sha1 hash function */
-    testSha1();
+    test_sha1();
 }

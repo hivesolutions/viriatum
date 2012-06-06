@@ -29,37 +29,37 @@
 
 #include "linked_buffer.h"
 
-void createLinkedBuffer(struct LinkedBuffer_t **linkedBufferPointer) {
+void create_linked_buffer(struct linked_buffer_t **linked_buffer_pointer) {
     /* retrieves the linked buffer size */
-    size_t linkedBufferSize = sizeof(struct LinkedBuffer_t);
+    size_t linked_buffer_size = sizeof(struct linked_buffer_t);
 
     /* allocates space for the linked buffer */
-    struct LinkedBuffer_t *linkedBuffer = (struct LinkedBuffer_t *) MALLOC(linkedBufferSize);
+    struct linked_buffer_t *linked_buffer = (struct linked_buffer_t *) MALLOC(linked_buffer_size);
 
     /* sets the default values in the linked buffer */
-    linkedBuffer->bufferLength = 0;
+    linked_buffer->buffer_length = 0;
 
     /* creates the list to hold the various buffers
     for the linked buffer runtime */
-    createLinkedList(&linkedBuffer->bufferList);
+    create_linked_list(&linked_buffer->buffer_list);
 
     /* creates the list to hold the various buffers
     to have the memory released uppon destruction */
-    createLinkedList(&linkedBuffer->releaseList);
+    create_linked_list(&linked_buffer->release_list);
 
     /* sets the linked buffer in the linked buffer pointer */
-    *linkedBufferPointer = linkedBuffer;
+    *linked_buffer_pointer = linked_buffer;
 }
 
-void deleteLinkedBuffer(struct LinkedBuffer_t *linkedBuffer) {
+void delete_linked_buffer(struct linked_buffer_t *linked_buffer) {
     /* allocates space for the temporary buffer value */
-    struct Buffer_t *buffer;
+    struct buffer_t *buffer;
 
     /* iterates continuously for release list
     cleanup (buffer pointer memory release) */
     while(1) {
         /* pops a node from the release list */
-        popValueLinkedList(linkedBuffer->releaseList, (void **) &buffer, 1);
+        pop_value_linked_list(linked_buffer->release_list, (void **) &buffer, 1);
 
         /* in case the value is invalid (empty list)
         need to break the cycle */
@@ -73,99 +73,99 @@ void deleteLinkedBuffer(struct LinkedBuffer_t *linkedBuffer) {
     cleanup (buffer value memory release) */
     while(1) {
         /* pops a node from the buffer list */
-        popValueLinkedList(linkedBuffer->bufferList, (void **) &buffer, 1);
+        pop_value_linked_list(linked_buffer->buffer_list, (void **) &buffer, 1);
 
         /* in case the value is invalid (empty list)
         need to break the cycle */
         if(buffer == NULL) { break; }
 
         /* deletes the buffer value */
-        deleteBuffer(buffer);
+        delete_buffer(buffer);
     }
 
     /* deletes the list of release buffers from the linked buffer */
-    deleteLinkedList(linkedBuffer->releaseList);
+    delete_linked_list(linked_buffer->release_list);
 
     /* deletes the list of buffers from the linked buffer */
-    deleteLinkedList(linkedBuffer->bufferList);
+    delete_linked_list(linked_buffer->buffer_list);
 
     /* releases the linked buffer */
-    FREE(linkedBuffer);
+    FREE(linked_buffer);
 }
 
-void appendLinkedBuffer(struct LinkedBuffer_t *linkedBuffer, void *pointer, size_t size, unsigned char release) {
+void append_linked_buffer(struct linked_buffer_t *linked_buffer, void *pointer, size_t size, unsigned char release) {
     /* allocates space for the buffer structure to be used to
     hold the meta information on the buffer to be added */
-    struct Buffer_t *buffer;
+    struct buffer_t *buffer;
 
     /* creates the buffer structure and then populates it with
     the cirrect pointer and size */
-    createBuffer(&buffer, 0);
+    create_buffer(&buffer, 0);
     buffer->pointer = pointer;
     buffer->size = size;
 
     /* adds the buffer value to the list of buffers and then
     increments the (total) buffer length with the length of
     the current buffer value */
-    appendValueLinkedList(linkedBuffer->bufferList, buffer);
-    linkedBuffer->bufferLength += size;
+    append_value_linked_list(linked_buffer->buffer_list, buffer);
+    linked_buffer->buffer_length += size;
 
     /* in case the release flag is set must add the buffer
     element to the release list (releases memory on destroy) */
-    if(release) { appendValueLinkedList(linkedBuffer->releaseList, buffer); }
+    if(release) { append_value_linked_list(linked_buffer->release_list, buffer); }
 }
 
-void joinLinkedBuffer(struct LinkedBuffer_t *linkedBuffer, unsigned char **bufferValuePointer) {
+void join_linked_buffer(struct linked_buffer_t *linked_buffer, unsigned char **buffer_value_pointer) {
     /* allocates space for the iterator used for percolating
     the various (partial) buffer values */
-    struct Iterator_t *bufferIterator;
+    struct iterator_t *buffer_iterator;
 
     /* allocates space for the partial value this is the buffer
     structure used in every iteration for the buffer object */
-    struct Buffer_t *partialValue;
+    struct buffer_t *partial_value;
 
     /* allocates space for the pointer and allocates the buffer to hold
     the complete "joined" buffer value */
     unsigned char *pointer;
-    unsigned char *bufferValue = (unsigned char *) MALLOC(linkedBuffer->bufferLength);
+    unsigned char *buffer_value = (unsigned char *) MALLOC(linked_buffer->buffer_length);
 
     /* creates an iterator for the list of buffers, to go
     arround them joining the buffers into a single buffer */
-    createIteratorLinkedList(linkedBuffer->bufferList, &bufferIterator);
+    create_iterator_linked_list(linked_buffer->buffer_list, &buffer_iterator);
 
     /* sets the "initial" pointer value to the "base" buffer value position */
-    pointer = bufferValue;
+    pointer = buffer_value;
 
     /* iterates continuously to process to "join" the
     various "partial" string values into a single buffer */
     while(1) {
         /* retrieves the next value from the buffer iterator
         as the partial value */
-        getNextIterator(bufferIterator, (void **) &partialValue);
+        get_next_iterator(buffer_iterator, (void **) &partial_value);
 
         /* in case the partial value is not set
         there are no more items to be retrieved from
         the iterator, breaks the loop */
-        if(partialValue == NULL) { break; }
+        if(partial_value == NULL) { break; }
 
         /* uses the partial value pointer and size to copy the
         values to the target buffer pointer (fast copy operation) */
-        memcpy(pointer, partialValue->pointer, partialValue->size);
+        memcpy(pointer, partial_value->pointer, partial_value->size);
 
         /* updates the pointer value with the size of the partial
         buffer value (buffer length) */
-        pointer += partialValue->size;
+        pointer += partial_value->size;
     }
 
     /* sets the buffer value in the value "pointed" by
     the buffer value pointer */
-    *bufferValuePointer = bufferValue;
+    *buffer_value_pointer = buffer_value;
 
     /* deletes the buffer iterator */
-    deleteIteratorLinkedList(linkedBuffer->bufferList, bufferIterator);
+    delete_iterator_linked_list(linked_buffer->buffer_list, buffer_iterator);
 }
 
-void _appendLinkedBuffer(struct LinkedBuffer_t *linkedBuffer, void *pointer, size_t size) {
+void _append_linked_buffer(struct linked_buffer_t *linked_buffer, void *pointer, size_t size) {
     /* adds the buffer value to the linked buffer */
-    appendLinkedBuffer(linkedBuffer, pointer, size, 1);
+    append_linked_buffer(linked_buffer, pointer, size, 1);
 }

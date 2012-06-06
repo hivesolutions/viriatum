@@ -50,7 +50,7 @@ void createCondition(struct Condition_t **conditionPointer) {
     InitializeCriticalSection(&condition->lockCriticalSection);
 
     /* creates the wait set */
-    createLinkedList(&condition->waitSet);
+    create_linked_list(&condition->waitSet);
 
     /* sets the condition in the condition pointer */
     *conditionPointer = condition;
@@ -58,7 +58,7 @@ void createCondition(struct Condition_t **conditionPointer) {
 
 void deleteCondition(struct Condition_t *condition) {
     /* deletes the wait set */
-    deleteLinkedList(condition->waitSet);
+    delete_linked_list(condition->waitSet);
 
     /* deletes the lock critical section */
     DeleteCriticalSection(&condition->lockCriticalSection);
@@ -185,7 +185,7 @@ void _pushCondition(struct Condition_t *condition, HANDLE *waitEventPointer) {
     EnterCriticalSection(&condition->waitCriticalSection);
 
     /* adds the wait event to the wait set */
-    appendValueLinkedList(condition->waitSet, (void *) waitEvent);
+    append_value_linked_list(condition->waitSet, (void *) waitEvent);
 
     /* leaves the wait critical section */
     LeaveCriticalSection(&condition->waitCriticalSection);
@@ -202,7 +202,7 @@ void _popCondition(struct Condition_t *condition, HANDLE *waitEventPointer) {
     EnterCriticalSection(&condition->waitCriticalSection);
 
     /* pops the wait event from the wait set */
-    popValueLinkedList(condition->waitSet, (void **) &waitEvent, 0);
+    pop_value_linked_list(condition->waitSet, (void **) &waitEvent, 0);
 
     /* leaves the wait critical section */
     LeaveCriticalSection(&condition->waitCriticalSection);

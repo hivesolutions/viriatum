@@ -72,6 +72,6 @@ typedef struct HttpClientParameters_t {
 
 ERROR_CODE createHttpClientConnection(struct HttpClientConnection_t **httpClientConnectionPointer, struct IoConnection_t *ioConnection);
 ERROR_CODE deleteHttpClientConnection(struct HttpClientConnection_t *httpClientConnection);
-ERROR_CODE dataHandlerStreamHttpClient(struct IoConnection_t *ioConnection, unsigned char *buffer, size_t bufferSize);
+ERROR_CODE dataHandlerStreamHttpClient(struct IoConnection_t *ioConnection, unsigned char *buffer, size_t buffer_size);
 ERROR_CODE openHandlerStreamHttpClient(struct IoConnection_t *ioConnection);
 ERROR_CODE closeHandlerStreamHttpClient(struct IoConnection_t *ioConnection);

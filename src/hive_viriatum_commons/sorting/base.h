@@ -41,7 +41,7 @@ typedef int (*comparator) (void *, void *);
  * of a sequence and maintains a "back-reference"
  * to the "original" element.
  */
-typedef struct SortElement_t {
+typedef struct sort_element_t {
     /**
      * The value to be used for comparision
      * in the sorting algorithm.
@@ -53,4 +53,4 @@ typedef struct SortElement_t {
      * of the element.
      */
     void *reference;
-} SortElement;
+} sort_element;

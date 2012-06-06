@@ -32,7 +32,7 @@
  * components of both a date and
  * a time description.
  */
-typedef struct DateTime_t {
+typedef struct date_time_t {
     /**
      * The year component of the date.
      */
@@ -67,7 +67,7 @@ typedef struct DateTime_t {
      * The milisecond component of the time.
      */
     unsigned short milisecond;
-} DateTime;
+} date_time;
 
-VIRIATUM_EXPORT_PREFIX void createDateTime(struct DateTime_t **dateTimePointer);
-VIRIATUM_EXPORT_PREFIX void deleteDateTime(struct DateTime_t *dataTime);
+VIRIATUM_EXPORT_PREFIX void create_date_time(struct date_time_t **date_time_pointer);
+VIRIATUM_EXPORT_PREFIX void delete_date_time(struct date_time_t *data_time);

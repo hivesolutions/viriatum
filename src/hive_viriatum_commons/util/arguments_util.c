@@ -29,7 +29,7 @@
 
 #include "arguments_util.h"
 
-ERROR_CODE processArguments(int argc, char *argv[], struct HashMap_t **argumentsPointer) {
+ERROR_CODE processArguments(int argc, char *argv[], struct hash_map_t **argumentsPointer) {
     /* allocates space for the index counter */
     unsigned int index;
 
@@ -40,11 +40,11 @@ ERROR_CODE processArguments(int argc, char *argv[], struct HashMap_t **arguments
     /* allocates space for both the argument holder, to
     be created every iteration of the argument retrieval */
     struct Argument_t *argument;
-    struct HashMap_t *arguments;
+    struct hash_map_t *arguments;
 
     /* creates the hash map that will hold the various
     arguments */
-    createHashMap(&arguments, 0);
+    create_hash_map(&arguments, 0);
 
     /* iterates over all the argument except the
     first (file name value) */
@@ -57,7 +57,7 @@ ERROR_CODE processArguments(int argc, char *argv[], struct HashMap_t **arguments
         the arguments map */
         currentArgument = argv[index];
         _processArgument(currentArgument, argument);
-        setValueStringHashMap(arguments, (unsigned char *) argument->key, (void *) argument);
+        set_value_string_hash_map(arguments, (unsigned char *) argument->key, (void *) argument);
     }
 
     /* sets the hash map of arguments as the value pointed
@@ -68,22 +68,22 @@ ERROR_CODE processArguments(int argc, char *argv[], struct HashMap_t **arguments
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE deleteArguments(struct HashMap_t *arguments) {
+ERROR_CODE deleteArguments(struct hash_map_t *arguments) {
     /* allocates space for the pointer to the element and
     for the argument to be retrieved */
-    struct HashMapElement_t *element;
+    struct hash_map_element_t *element;
     struct Argument_t *argument;
 
     /* allocates space for the iterator for the arguments */
-    struct Iterator_t *argumentsIterator;
+    struct iterator_t *argumentsIterator;
 
     /* creates an iterator for the arguments hash map */
-    createElementIteratorHashMap(arguments, &argumentsIterator);
+    create_element_iterator_hash_map(arguments, &argumentsIterator);
 
     /* iterates continuously */
     while(1) {
         /* retrieves the next value from the arguments iterator */
-        getNextIterator(argumentsIterator, (void **) &element);
+        get_next_iterator(argumentsIterator, (void **) &element);
 
         /* in case the current module is null (end of iterator) */
         if(element == NULL) {
@@ -92,33 +92,33 @@ ERROR_CODE deleteArguments(struct HashMap_t *arguments) {
         }
 
         /* retrievs the hash map value for the key */
-        getValueHashMap(arguments, element->key, element->keyString, (void **) &argument);
+        get_value_hash_map(arguments, element->key, element->key_string, (void **) &argument);
 
         /* releases the argument memory */
         FREE(argument);
     }
 
     /* deletes the iterator for the arguments hash map */
-    deleteIteratorHashMap(arguments, argumentsIterator);
+    delete_iterator_hash_map(arguments, argumentsIterator);
 
     /* deletes the hash map that holds the arguments */
-    deleteHashMap(arguments);
+    delete_hash_map(arguments);
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE printArguments(struct HashMap_t *arguments) {
+ERROR_CODE printArguments(struct hash_map_t *arguments) {
     /* allocates space for the pointer to the element and
     for the argument to be retrieved */
-    struct HashMapElement_t *element;
+    struct hash_map_element_t *element;
     struct Argument_t *argument;
 
     /* allocates space for the iterator for the arguments */
-    struct Iterator_t *argumentsIterator;
+    struct iterator_t *argumentsIterator;
 
     /* creates an iterator for the arguments hash map */
-    createIteratorHashMap(arguments, &argumentsIterator);
+    create_iterator_hash_map(arguments, &argumentsIterator);
 
     /* prints the initial arguments header */
     PRINTF("Arguments\n");
@@ -126,7 +126,7 @@ ERROR_CODE printArguments(struct HashMap_t *arguments) {
     /* iterates continuously */
     while(1) {
         /* retrieves the next value from the arguments iterator */
-        getNextIterator(argumentsIterator, (void **) &element);
+        get_next_iterator(argumentsIterator, (void **) &element);
 
         /* in case the current module is null (end of iterator) */
         if(element == NULL) {
@@ -135,7 +135,7 @@ ERROR_CODE printArguments(struct HashMap_t *arguments) {
         }
 
         /* retrievs the hash map value for the key */
-        getValueHashMap(arguments, element->key, element->keyString, (void **) &argument);
+        get_value_hash_map(arguments, element->key, element->key_string, (void **) &argument);
 
         /* in case the argument is of type value */
         if(argument->type == VALUE_ARGUMENT) {
@@ -150,7 +150,7 @@ ERROR_CODE printArguments(struct HashMap_t *arguments) {
     }
 
     /* deletes the iterator for the arguments hash map */
-    deleteIteratorHashMap(arguments, argumentsIterator);
+    delete_iterator_hash_map(arguments, argumentsIterator);
 
     /* raises no error */
     RAISE_NO_ERROR;

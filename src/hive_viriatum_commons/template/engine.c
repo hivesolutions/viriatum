@@ -74,7 +74,7 @@ void deleteTemplateSettings(struct TemplateSettings_t *templateSettings) {
     FREE(templateSettings);
 }
 
-ERROR_CODE processTemplateEngine(struct TemplateEngine_t *templateEngine, struct TemplateSettings_t *templateSettings, unsigned char *filePath) {
+ERROR_CODE processTemplateEngine(struct TemplateEngine_t *templateEngine, struct TemplateSettings_t *templateSettings, unsigned char *file_path) {
     /* allocates space for the file */
     FILE *file;
 
@@ -88,12 +88,12 @@ ERROR_CODE processTemplateEngine(struct TemplateEngine_t *templateEngine, struct
 
     /* allocates the space for the variable that will hold
     the size of the file to be parsed */
-    size_t fileSize;
+    size_t file_size;
 
     /* allocates the buffer thath will hold the contents
     of the read file, this buffer is realeased uppon the
     end of the parsing */
-    unsigned char *fileBuffer;
+    unsigned char *file_buffer;
 
     /* allocates space for the buffer that will serve as
     cache for the reading of the tempalte file, this has
@@ -113,7 +113,7 @@ ERROR_CODE processTemplateEngine(struct TemplateEngine_t *templateEngine, struct
     enum TemplateEngineState_e state = TEMPLATE_ENGINE_NORMAL;
 
     /* opens the file */
-    FOPEN(&file, (char *) filePath, "rb");
+    FOPEN(&file, (char *) file_path, "rb");
 
     /* in case the file is not correctly loaded */
     if(file == NULL) {
@@ -130,15 +130,15 @@ ERROR_CODE processTemplateEngine(struct TemplateEngine_t *templateEngine, struct
     end of it and the seeks the stream back to the initial
     position (for further reading) */
     fseek(file, 0, SEEK_END);
-    fileSize = ftell(file);
+    file_size = ftell(file);
     fseek(file, 0, SEEK_SET);
 
     /* allocates the buffer that will hold the complete
     template file (this allocation may be giant), this is
     necessary for the correct execution of the parser, uses
     the file buffer reference as the (initial) pointer value */
-    fileBuffer = (void *) MALLOC(fileSize);
-    pointer = fileBuffer;
+    file_buffer = (void *) MALLOC(file_size);
+    pointer = file_buffer;
 
     TEMPLATE_MARK(textEnd);
     TEMPLATE_CALLBACK(textBegin);
@@ -159,12 +159,12 @@ ERROR_CODE processTemplateEngine(struct TemplateEngine_t *templateEngine, struct
         else {
             /* retrieves the current character
             from the file stream */
-            current = _getcTemplateEngine(file, &pointer, &fileSize);
+            current = _getcTemplateEngine(file, &pointer, &file_size);
         }
 
         /* in case the end of file has been found, or
         the file size is zero (breaks) */
-        if(current == EOF || fileSize == 0) {
+        if(current == EOF || file_size == 0) {
             /* breaks the cycle (end of parsing) */
             break;
         }
@@ -193,7 +193,7 @@ ERROR_CODE processTemplateEngine(struct TemplateEngine_t *templateEngine, struct
                     state = TEMPLATE_ENGINE_OPEN;
 
                     /* reads ahead and sets the ahead set flag */
-                    ahead = _getcTemplateEngine(file, &pointer, &fileSize);
+                    ahead = _getcTemplateEngine(file, &pointer, &file_size);
                     aheadSet = 1;
 
                     if(ahead == '/') {
@@ -210,7 +210,7 @@ ERROR_CODE processTemplateEngine(struct TemplateEngine_t *templateEngine, struct
             case TEMPLATE_ENGINE_OPEN:
                 if(current == '/') {
                     /* reads ahead and sets the ahead set flag */
-                    ahead = _getcTemplateEngine(file, &pointer, &fileSize);
+                    ahead = _getcTemplateEngine(file, &pointer, &file_size);
                     aheadSet = 1;
 
                     if(ahead == '}') {
@@ -255,7 +255,7 @@ ERROR_CODE processTemplateEngine(struct TemplateEngine_t *templateEngine, struct
 
             case TEMPLATE_ENGINE_PARAMETERS:
                 if(current == '/') {
-                    ahead = _getcTemplateEngine(file, &pointer, &fileSize);
+                    ahead = _getcTemplateEngine(file, &pointer, &file_size);
                     aheadSet = 1;
 
                     if(ahead == '}') {
@@ -294,7 +294,7 @@ ERROR_CODE processTemplateEngine(struct TemplateEngine_t *templateEngine, struct
 
             case TEMPLATE_ENGINE_PARAMETER:
                 if(current == '/') {
-                    ahead = _getcTemplateEngine(file, &pointer, &fileSize);
+                    ahead = _getcTemplateEngine(file, &pointer, &file_size);
                     aheadSet = 1;
 
                     if(ahead == '}') {
@@ -336,7 +336,7 @@ ERROR_CODE processTemplateEngine(struct TemplateEngine_t *templateEngine, struct
 
             case TEMPLATE_ENGINE_PARAMETER_VALUE:
                 if(current == '/') {
-                    ahead = _getcTemplateEngine(file, &pointer, &fileSize);
+                    ahead = _getcTemplateEngine(file, &pointer, &file_size);
                     aheadSet = 1;
 
                     if(ahead == '}') {
@@ -401,7 +401,7 @@ ERROR_CODE processTemplateEngine(struct TemplateEngine_t *templateEngine, struct
     fclose(file);
 
     /* releases the file buffer */
-    FREE(fileBuffer);
+    FREE(file_buffer);
 
     /* raise no error */
     RAISE_NO_ERROR;

@@ -234,13 +234,13 @@ ERROR_CODE _pollPollingSelect(struct PollingSelect_t *pollingSelect, struct Conn
     struct Connection_t *currentConnection;
 
     /* allocates space for the connections list iterator */
-    struct Iterator_t *connectionsListIterator;
+    struct iterator_t *connectionsListIterator;
 
     /* retrieves the service */
     struct Service_t *service = pollingSelect->polling->service;
 
     /* retrieves the service connections list */
-    struct LinkedList_t *connectionsList = service->connectionsList;
+    struct linked_list_t *connectionsList = service->connectionsList;
 
     /* initializes the read index */
     unsigned int readIndex = 0;
@@ -259,7 +259,7 @@ ERROR_CODE _pollPollingSelect(struct PollingSelect_t *pollingSelect, struct Conn
     pollingSelect->selectTimeoutTemporary = pollingSelect->selectTimeout;
 
     /* creates the iterator for the linked list */
-    createIteratorLinkedList(connectionsList, &connectionsListIterator);
+    create_iterator_linked_list(connectionsList, &connectionsListIterator);
 
     /* prints a debug message */
     V_DEBUG("Entering select statement\n");
@@ -300,7 +300,7 @@ ERROR_CODE _pollPollingSelect(struct PollingSelect_t *pollingSelect, struct Conn
         }
 
         /* retrieves the next value from the iterator */
-        getNextIterator(connectionsListIterator, (void **) &currentConnection);
+        get_next_iterator(connectionsListIterator, (void **) &currentConnection);
 
         /* in case the current connection is null (end of iterator) */
         if(currentConnection == NULL) {
@@ -355,7 +355,7 @@ ERROR_CODE _pollPollingSelect(struct PollingSelect_t *pollingSelect, struct Conn
     V_DEBUG("Finished file testing\n");
 
     /* deletes the iterator linked list */
-    deleteIteratorLinkedList(connectionsList, connectionsListIterator);
+    delete_iterator_linked_list(connectionsList, connectionsListIterator);
 
     /* prints a debug message */
     V_DEBUG("Deleted iterator linked list\n");

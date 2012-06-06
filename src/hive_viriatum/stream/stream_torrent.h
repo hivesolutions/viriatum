@@ -65,6 +65,6 @@ typedef struct TorrentConnection_t {
 
 ERROR_CODE createTorrentConnection(struct TorrentConnection_t **torrentConnectionPointer, struct IoConnection_t *ioConnection);
 ERROR_CODE deleteTorrentConnection(struct TorrentConnection_t *torrentConnection);
-ERROR_CODE dataHandlerStreamTorrent(struct IoConnection_t *ioConnection, unsigned char *buffer, size_t bufferSize);
+ERROR_CODE dataHandlerStreamTorrent(struct IoConnection_t *ioConnection, unsigned char *buffer, size_t buffer_size);
 ERROR_CODE openHandlerStreamTorrent(struct IoConnection_t *ioConnection);
 ERROR_CODE closeHandlerStreamTorrent(struct IoConnection_t *ioConnection);

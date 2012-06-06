@@ -27,12 +27,12 @@
 
 #pragma once
 
-typedef struct Iterator_t {
+typedef struct iterator_t {
     void *structure;
     void *parameters;
-    void (*getNextFunction) (struct Iterator_t *iterator, void **next);
-} Iterator;
+    void (*get_next_function) (struct iterator_t *iterator, void **next);
+} iterator;
 
-VIRIATUM_EXPORT_PREFIX void createIterator(struct Iterator_t **iteratorPointer);
-VIRIATUM_EXPORT_PREFIX void deleteIterator(struct Iterator_t *iterator);
-VIRIATUM_EXPORT_PREFIX void getNextIterator(struct Iterator_t *iterator, void **nextPointer);
+VIRIATUM_EXPORT_PREFIX void create_iterator(struct iterator_t **iterator_pointer);
+VIRIATUM_EXPORT_PREFIX void delete_iterator(struct iterator_t *iterator);
+VIRIATUM_EXPORT_PREFIX void get_next_iterator(struct iterator_t *iterator, void **next_pointer);
