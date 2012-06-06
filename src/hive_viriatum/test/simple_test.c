@@ -336,16 +336,16 @@ void testBencoding() {
 
 void testHuffman() {
     /* allocates space for the huffman */
-    struct Huffman_t *huffman;
+    struct huffman_t *huffman;
 
     /* creates the huffman (encoder) */
-    createHuffman(&huffman);
+    create_huffman(&huffman);
 
     /* generates the huffman table */
-    generateTableHuffman(huffman, NULL);
+    generate_table_huffman(huffman, NULL);
 
     /* deletes the huffman (encoder) */
-    deleteHuffman(huffman);
+    delete_huffman(huffman);
 }
 
 void testBitStream() {

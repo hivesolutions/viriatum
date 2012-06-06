@@ -40,11 +40,11 @@
  */
 #define HUFFMAN_BUFFER_SIZE 4096
 
-typedef struct Huffman_t {
-    struct Stream_t *stream;
+typedef struct huffman_t {
+    struct stream_t *stream;
     size_t size;
-} Huffman;
+} huffman;
 
-VIRIATUM_EXPORT_PREFIX void createHuffman(struct Huffman_t **huffmanPointer);
-VIRIATUM_EXPORT_PREFIX void deleteHuffman(struct Huffman_t *huffman);
-VIRIATUM_EXPORT_PREFIX void generateTableHuffman(struct Huffman_t *huffman, struct Stream_t *stream);
+VIRIATUM_EXPORT_PREFIX void create_huffman(struct huffman_t **huffman_pointer);
+VIRIATUM_EXPORT_PREFIX void delete_huffman(struct huffman_t *huffman);
+VIRIATUM_EXPORT_PREFIX void generate_table_huffman(struct huffman_t *huffman, struct stream_t *stream);

@@ -29,43 +29,43 @@
 
 #include "huffman.h"
 
-void createHuffman(struct Huffman_t **huffmanPointer) {
+void create_huffman(struct huffman_t **huffman_pointer) {
     /* retrieves the huffman size */
-    size_t huffmanSize = sizeof(struct Huffman_t);
+    size_t huffman_size = sizeof(struct huffman_t);
 
     /* allocates space for the huffman */
-    struct Huffman_t *huffman = (struct Huffman_t *) MALLOC(huffmanSize);
+    struct huffman_t *huffman = (struct huffman_t *) MALLOC(huffman_size);
 
     /* sets the huffman in the huffman pointer */
-    *huffmanPointer = huffman;
+    *huffman_pointer = huffman;
 }
 
-void deleteHuffman(struct Huffman_t *huffman) {
+void delete_huffman(struct huffman_t *huffman) {
     /* releases the huffman */
     FREE(huffman);
 }
 
-void generateTableHuffman(struct Huffman_t *huffman, struct Stream_t *stream) {
+void generate_table_huffman(struct huffman_t *huffman, struct stream_t *stream) {
     // seeks to the end of the file
-    /*this->fileStream->seekg(0, std::fstream::end);
+    /*this->file_stream->seekg(0, std::fstream::end);
 
     // get length of file:
-    this->originalFileSize = this->fileStream->tellg();
+    this->original_file_size = this->file_stream->tellg();
 
     // seeks to the beginning of the file
-    this->fileStream->seekg(0, std::fstream::beg);*/
+    this->file_stream->seekg(0, std::fstream::beg);*/
 
     /* allocates the file buffer */
-    /*char fileBuffer[HUFFMAN_BUFFER_SIZE];*/
+    /*char file_buffer[HUFFMAN_BUFFER_SIZE];*/
 
     /* allocates space for the read size */
-    /*unsigned int readSize;*/
+    /*unsigned int read_size;*/
 
     // allocates space for the lowest huffman node
-    /*HuffmanNode_t *lowestHuffmanNode;
+    /*HuffmanNode_t *lowest_huffman_node;
 
     // allocates space for the second lowest huffman node
-    HuffmanNode_t *secondLowestHuffmanNode;*/
+    HuffmanNode_t *second_lowest_huffman_node;*/
 
     /* sets the (inner) stream */
     huffman->stream = stream;
@@ -73,101 +73,101 @@ void generateTableHuffman(struct Huffman_t *huffman, struct Stream_t *stream) {
     // iterates continuously
     while(1) {
         // reads the buffer
-        this->fileStream->read(fileBuffer, HUFFMAN_FILE_BUFFER_SIZE);
+        this->file_stream->read(file_buffer, HUFFMAN_FILE_BUFFER_SIZE);
 
         // retrieves the read size
-        readSize = this->fileStream->gcount();
+        read_size = this->file_stream->gcount();
 
         // updates the occurence values for the file buffer
-        this->updateOccurrenceValues(fileBuffer, readSize);
+        this->update_occurrence_values(file_buffer, read_size);
 
         // in case the end of file was reached
-        if(this->fileStream->eof()) {
+        if(this->file_stream->eof()) {
             // breaks the cycle
             break;
         }
     }
 
     // clears the error bits
-    this->fileStream->clear();
+    this->file_stream->clear();
 
     // seeks to the beginning of the file
-    this->fileStream->seekg(0, std::fstream::beg);
+    this->file_stream->seekg(0, std::fstream::beg);
 
     // creates the code table priority queue
-    std::priority_queue<HuffmanNode_t *, std::vector<HuffmanNode_t *>, HuffmanNodeCompare> codeTable;
+    std::priority_queue<HuffmanNode_t *, std::vector<HuffmanNode_t *>, HuffmanNodeCompare> code_table;
 
     // allocates space for the huffman nodes buffer
-    HuffmanNode_t huffmanNodesBuffer[HUFFMAN_SYMBOL_TABLE_SIZE];
+    HuffmanNode_t huffman_nodes_buffer[HUFFMAN_SYMBOL_TABLE_SIZE];
 
     // iterates over all the huffman symbols
     for(unsigned int index = 0; index < HUFFMAN_SYMBOL_TABLE_SIZE; index++) {
         // in case the digit did not occurred any time
-        if(!this->occurrenceCountList[index]) {
+        if(!this->occurrence_count_list[index]) {
             // continues the loop
             continue;
         }
 
         // retrieves the current huffman node
-        HuffmanNode_t &currentHuffmanNode = huffmanNodesBuffer[index];
+        HuffmanNode_t &current_huffman_node = huffman_nodes_buffer[index];
 
         // sets the current huffman node values
-        currentHuffmanNode.value = this->occurrenceCountList[index];
-        currentHuffmanNode.symbol = index;
-        currentHuffmanNode.code = std::string();
-        currentHuffmanNode.left = NULL;
-        currentHuffmanNode.right = NULL;
-        currentHuffmanNode.parent = NULL;
+        current_huffman_node.value = this->occurrence_count_list[index];
+        current_huffman_node.symbol = index;
+        current_huffman_node.code = std::string();
+        current_huffman_node.left = NULL;
+        current_huffman_node.right = NULL;
+        current_huffman_node.parent = NULL;
 
         // adds the current huffman node to the code table
-        codeTable.push(&currentHuffmanNode);
+        code_table.push(&current_huffman_node);
     }
 
     // iterates continuously
     while(1) {
         // the lowest value node
-        lowestHuffmanNode = codeTable.top();
+        lowest_huffman_node = code_table.top();
 
         // pops the code table
-        codeTable.pop();
+        code_table.pop();
 
         // in case
-        if(codeTable.empty()) {
+        if(code_table.empty()) {
             // breaks the cycle
             break;
         } else {
             // the second lowest value node
-            secondLowestHuffmanNode = codeTable.top();
+            second_lwowest_huffman_node = code_table.top();
 
             // pops the code table
-            codeTable.pop();
+            code_table.pop();
 
             // creates the merged huffman node
-            HuffmanNode_t *mergedHuffmanNode = new HuffmanNode_t();
+            HuffmanNode_t *merged_huffman_node = new huffman_node_t();
 
             // sets the merged huffman node values
-            mergedHuffmanNode->value = lowestHuffmanNode->value + secondLowestHuffmanNode->value;
-            mergedHuffmanNode->symbol = HUFFMAN_SYMBOL_TABLE_EXTRA_VALUE;
-            mergedHuffmanNode->code = std::string();
-            mergedHuffmanNode->left = secondLowestHuffmanNode;
-            mergedHuffmanNode->right = lowestHuffmanNode;
-            mergedHuffmanNode->parent = NULL;
+            merged_huffman_node->value = lowest_huffman_node->value + second_lowest_huffman_node->value;
+            merged_huffman_node->symbol = HUFFMAN_SYMBOL_TABLE_EXTRA_VALUE;
+            merged_huffman_node->code = std::string();
+            merged_huffman_node->left = second_lowest_huffman_node;
+            merged_huffman_node->right = lowest_huffman_node;
+            merged_huffman_node->parent = NULL;
 
             // sets the parent in the huffman nodes
-            lowestHuffmanNode->parent = mergedHuffmanNode;
-            secondLowestHuffmanNode->parent = mergedHuffmanNode;
+            lowest_huffman_node->parent = merged_huffman_node;
+            second_lowest_huffman_node->parent = merged_huffman_node;
 
             // adds the merged node to the priority_queue
-            codeTable.push(mergedHuffmanNode);
+            code_table.push(merged_huffman_node);
         }
     }
 
     // generates the huffman table
-    this->_generateTable(lowestHuffmanNode);
+    this->_generate_table(lowest_huffman_node);
 
     // computes the table
-    this->computeTable();
+    this->compute_table();
 
     // cleans the structures
-    this->cleanStructures(lowestHuffmanNode);*/
+    this->clean_structures(lowest_huffman_node);*/
 }
