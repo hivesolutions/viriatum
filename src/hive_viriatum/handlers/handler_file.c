@@ -379,7 +379,7 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
     /* tests the error code for error */
     if(IS_ERROR_CODE(errorCode)) {
         /* prints the error */
-        V_DEBUG_F("%s\n", getLastErrorMessageSafe());
+        V_DEBUG_F("%s\n", get_last_error_message_safe());
 
         /* writes the http static headers to the response */
         SPRINTF(headersBuffer, 1024, "HTTP/1.1 404 Not Found\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nCache-Control: no-cache, must-revalidate\r\nContent-Length: %lu\r\n\r\n404 - Not Found (%s)", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, (long unsigned int) strlen((char *) handlerFileContext->filePath) + 18, handlerFileContext->filePath);
