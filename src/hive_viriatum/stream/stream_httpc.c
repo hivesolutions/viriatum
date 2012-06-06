@@ -189,7 +189,7 @@ ERROR_CODE generateParameters(struct hash_map_t *hash_map, unsigned char **buffe
         and resets the string reference to contain the new buffer as it'
         own contents (avoids extra memory usage) */
         string = (struct string_t *) element->value;
-        urlEncode(string->buffer, string->length, &_buffer, &_length);
+        url_encode(string->buffer, string->length, &_buffer, &_length);
         string->buffer = _buffer;
         string->length = _length;
 

@@ -137,6 +137,6 @@
 
 #include "global/memory.h"
 
-unsigned char *nameViriatumCommons();
-unsigned char *versionViriatumCommons();
-unsigned char *descriptionViriatumCommons();
+unsigned char *name_viriatum_commons();
+unsigned char *version_viriatum_commons();
+unsigned char *description_viriatum_commons();

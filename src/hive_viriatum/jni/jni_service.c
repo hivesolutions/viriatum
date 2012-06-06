@@ -33,16 +33,16 @@
 
 jstring Java_pt_hive_viriatum_http_Service_run(JNIEnv *env, jclass cls) {
     /* allocates the return value */
-    ERROR_CODE returnValue;
+    ERROR_CODE return_value;
 
     /* allocates space for the result string buffer */
     char buffer[1024] = "";
 
     /* runs the service */
-    returnValue = runService();
+    return_value = runService();
 
     /* tests the error code for error */
-    if(IS_ERROR_CODE(returnValue)) {
+    if(IS_ERROR_CODE(return_value)) {
         /* prints an error message and copies it to the return
         value string buffer */
         V_ERROR_F("Problem running service (%s)\n", (char *) GET_ERROR());
@@ -54,16 +54,16 @@ jstring Java_pt_hive_viriatum_http_Service_run(JNIEnv *env, jclass cls) {
 
 jstring Java_pt_hive_viriatum_http_Service_ran(JNIEnv *env, jclass cls) {
     /* allocates the return value */
-    ERROR_CODE returnValue;
+    ERROR_CODE return_value;
 
     /* allocates space for the result string buffer */
     char buffer[1024] = "";
 
     /* "rans" the service */
-    returnValue = ranService();
+    return_value = ranService();
 
     /* tests the error code for error */
-    if(IS_ERROR_CODE(returnValue)) {
+    if(IS_ERROR_CODE(return_value)) {
         /* prints an error message and copies it to the return
         value string buffer */
         V_ERROR_F("Problem ranning service (%s)\n", (char *) GET_ERROR());

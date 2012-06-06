@@ -41,13 +41,13 @@
 #define INI_MARK_BACK(FOR) INI_MARK_N(FOR, 1)
 #define INI_MARK_N(FOR, N)\
     do {\
-        FOR##Mark = pointer - N;\
+        FOR##_mark = pointer - N;\
     } while(0)
 
 #define INI_CALLBACK(FOR)\
     do {\
-        if(iniSettings->on##FOR) {\
-            if(iniSettings->on##FOR(iniEngine) != 0) {\
+        if(ini_settings->on_##FOR) {\
+            if(ini_settings->on_##FOR(ini_engine) != 0) {\
                 RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem handling callback"); \
             }\
         }\
@@ -57,56 +57,56 @@
 #define INI_CALLBACK_DATA_BACK(FOR) INI_CALLBACK_DATA_N(FOR, 1)
 #define INI_CALLBACK_DATA_N(FOR, N)\
     do {\
-        if(FOR##Mark) {\
-            if(iniSettings->on##FOR) {\
-                if(iniSettings->on##FOR(iniEngine, FOR##Mark, pointer - FOR##Mark - N) != 0) {\
+        if(FOR##_mark) {\
+            if(ini_settings->on_##FOR) {\
+                if(ini_settings->on_##FOR(ini_engine, FOR##_mark, pointer - FOR##_mark - N) != 0) {\
                     RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem handling callback"); \
                 }\
             }\
-            FOR##Mark = NULL;\
+            FOR##_mark = NULL;\
         }\
     } while(0)
 
-struct IniEngine_t;
+struct ini_engine_t;
 
-typedef ERROR_CODE (*iniCallback) (struct IniEngine_t *);
-typedef ERROR_CODE (*iniDataCallback) (struct IniEngine_t *, const unsigned char *, size_t);
+typedef ERROR_CODE (*ini_callback) (struct ini_engine_t *);
+typedef ERROR_CODE (*ini_data_callback) (struct ini_engine_t *, const unsigned char *, size_t);
 
 /**
  * Enumeration describing the various states
  * occuring during the parsing of an ini file.
  */
-typedef enum IniState_e {
+typedef enum ini_state_e {
     INI_ENGINE_NORMAL = 1,
     INI_ENGINE_SECTION,
     INI_ENGINE_KEY,
     INI_ENGINE_VALUE,
     INI_ENGINE_COMMENT
-} IniEngineState;
+} ini_state;
 
-typedef struct IniSettings_t {
-    iniCallback onsectionStart;
-    iniDataCallback onsectionEnd;
-    iniCallback oncommentStart;
-    iniDataCallback oncommentEnd;
-    iniCallback onkeyStart;
-    iniDataCallback onkeyEnd;
-    iniCallback onvalueStart;
-    iniDataCallback onvalueEnd;
-} IniSettings;
+typedef struct ini_settings_t {
+    ini_callback on_section_start;
+    ini_data_callback on_section_end;
+    ini_callback on_comment_start;
+    ini_data_callback on_comment_end;
+    ini_callback on_key_start;
+    ini_data_callback on_key_end;
+    ini_callback on_value_start;
+    ini_data_callback on_value_end;
+} ini_settings;
 
-typedef struct IniEngine_t {
+typedef struct ini_engine_t {
     void *context;
-} IniEngine;
+} ini_engine;
 
-typedef struct IniHandler_t {
+typedef struct ini_handler_t {
     char section[INI_KEY_MAX_SIZE];
     char key[INI_KEY_MAX_SIZE];
     struct hash_map_t *configuration;
-} IniHandler;
+} ini_handler;
 
-VIRIATUM_EXPORT_PREFIX ERROR_CODE processIniFile(char *file_path, struct hash_map_t **configurationPointer);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE _iniSectionEndCallback(struct IniEngine_t *iniEngine, const unsigned char *pointer, size_t size);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE _iniCommentEndCallback(struct IniEngine_t *iniEngine, const unsigned char *pointer, size_t size);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE _iniKeyEndCallback(struct IniEngine_t *iniEngine, const unsigned char *pointer, size_t size);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE _iniValueEndCallback(struct IniEngine_t *iniEngine, const unsigned char *pointer, size_t size);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE process_ini_file(char *file_path, struct hash_map_t **configuration_pointer);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _ini_section_end_callback(struct ini_engine_t *ini_engine, const unsigned char *pointer, size_t size);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _ini_comment_end_callback(struct ini_engine_t *ini_engine, const unsigned char *pointer, size_t size);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _ini_key_end_callback(struct ini_engine_t *ini_engine, const unsigned char *pointer, size_t size);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _ini_value_end_callback(struct ini_engine_t *ini_engine, const unsigned char *pointer, size_t size);

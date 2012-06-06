@@ -29,16 +29,16 @@
 
 #include "../debug/debug.h"
 
-VIRIATUM_EXPORT_PREFIX ERROR_CODE encodePercent(unsigned char *buffer, size_t length, unsigned char **buffer_pointer, size_t *lengthPointer);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE decodePercent(unsigned char *buffer, size_t length, unsigned char **buffer_pointer,  size_t *lengthPointer);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE urlEncode(unsigned char *buffer, size_t length, unsigned char **buffer_pointer, size_t *lengthPointer);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE urlDecode(unsigned char *buffer, size_t length, unsigned char **buffer_pointer, size_t *lengthPointer);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE encode_percent(unsigned char *buffer, size_t length, unsigned char **buffer_pointer, size_t *length_pointer);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE decode_percent(unsigned char *buffer, size_t length, unsigned char **buffer_pointer,  size_t *length_pointer);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE url_encode(unsigned char *buffer, size_t length, unsigned char **buffer_pointer, size_t *length_pointer);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE url_decode(unsigned char *buffer, size_t length, unsigned char **buffer_pointer, size_t *length_pointer);
 
-static __inline char fromHex(unsigned char byte) {
+static __inline char from_hex(unsigned char byte) {
     return isdigit(byte) ? byte - '0' : tolower(byte) - 'a' + 10;
 }
 
-static __inline char toHex(unsigned char code) {
+static __inline char to_hex(unsigned char code) {
     static char hex[] = "0123456789abcdef";
     return hex[code & 15];
 }

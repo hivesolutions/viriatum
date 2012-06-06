@@ -48,24 +48,24 @@
  * Structure defining a large block for memory pool.
  * The large blocks represent data to be allocated dynamically.
  */
-typedef struct MemoryPoolLargeBlock_t {
+typedef struct memory_pool_large_block_t {
     /**
      * The next large memory block in the list.
      */
-    struct MemoryPoolLargeBlock_t *next;
+    struct memory_pool_large_block_t *next;
 
     /**
      * The pointer to the data in the large
      * memory block.
      */
     void *data;
-} MemoryPoolLargeBlock;
+} memory_pool_large_block;
 
 /**
  * Structure defining the positioning of the data inside
  * the memory pool "item".
  */
-typedef struct MemoryPoolData_t {
+typedef struct memory_pool_data_t {
     /**
      * Pointer to the last occupied slot index in
      * the memory pool data.
@@ -76,18 +76,18 @@ typedef struct MemoryPoolData_t {
      * Pointer to the end of the memory pool data.
      */
     void *end;
-} MemoryPoolData;
+} memory_pool_data;
 
 /**
  * Structure defining a memory pool.
  */
-typedef struct MemoryPool_t {
+typedef struct memory_pool_t {
     /**
      * The data associated with the memory pool.
      * The data of a pool sets its position in the global
      * memory pool sequence.
      */
-    struct MemoryPoolData_t data;
+    struct memory_pool_data_t data;
 
     /**
      * The current size of the memory pool in bytes.
@@ -97,46 +97,46 @@ typedef struct MemoryPool_t {
     /**
      * The maximum block size to be used.
      */
-    size_t maximumBlockSize;
+    size_t maximum_block_size;
 
     /**
      * The current memory pool reference.
      */
-    struct MemoryPool_t *current;
+    struct memory_pool_t *current;
 
     /**
      * The next memory pool reference.
      */
-    struct MemoryPool_t *next;
+    struct memory_pool_t *next;
 
     /**
      * Reference to the initial large block reference.
      */
-    struct MemoryPoolLargeBlock_t *largeBlock;
-} MemoryPool;
+    struct memory_pool_large_block_t *large_block;
+} memory_pool;
 
 /**
  * Creates a new memory pool object.
  *
- * @param memoryPoolPointer The pointer to the memory
+ * @param memory_pool_pointer The pointer to the memory
  * pool object to be created.
  */
-void createMemoryPool(struct MemoryPool_t **memoryPoolPointer);
+void create_memory_pool(struct memory_pool_t **memory_pool_pointer);
 
 /**
  * Deletes an existing memory pool object.
  *
- * @param memoryPool The memory pool object to be deleted.
+ * @param memory_pool The memory pool object to be deleted.
  */
-void deleteMemoryPool(struct MemoryPool_t *memoryPool);
+void delete_memory_pool(struct memory_pool_t *memory_pool);
 
 /**
  * Allocates a memory buffer the memory pool and
  * with the given size.
  *
- * @param memoryPool The memory pool object to be used.
+ * @param memory_pool The memory pool object to be used.
  * @param size The size in bytes of the memory buffer to
  * allocated.
  * @return The allocated buffer.
  */
-void *allocMemoryPool(struct MemoryPool_t *memoryPool, size_t size);
+void *alloc_memory_pool(struct memory_pool_t *memory_pool, size_t size);

@@ -29,34 +29,34 @@
 
 #include "ini.h"
 
-ERROR_CODE processIniFile(char *file_path, struct hash_map_t **configurationPointer) {
+ERROR_CODE process_ini_file(char *file_path, struct hash_map_t **configuration_pointer) {
     /* allocates space for the general (temporary) variables
     to be used durring the parsing of the file */
-    ERROR_CODE returnValue;
+    ERROR_CODE return_value;
     size_t index;
     size_t file_size;
     unsigned char *file_buffer;
     unsigned char character;
-    enum IniState_e state;
+    enum ini_state_e state;
 
     /* allocates the mark variables used to locate
     the part of context changing durring the parsing */
     unsigned char *pointer = 0;
-    unsigned char *sectionEndMark = 0;
-    unsigned char *commentEndMark = 0;
-    unsigned char *keyEndMark = 0;
-    unsigned char *valueEndMark = 0;
+    unsigned char *section_end_mark = 0;
+    unsigned char *comment_end_mark = 0;
+    unsigned char *key_end_mark = 0;
+    unsigned char *value_end_mark = 0;
 
     /* allocates space for the settings to be used by
     the engine for the engine instance itself and for
     the handler to be used to "catch" the events, then
     retrieves the pointers to these structures*/
-    struct IniSettings_t iniSettings_s;
-    struct IniEngine_t iniEngine_s;
-    struct IniHandler_t iniHandler_s;
-    struct IniSettings_t *iniSettings = &iniSettings_s;
-    struct IniEngine_t *iniEngine = &iniEngine_s;
-    struct IniHandler_t *iniHandler = &iniHandler_s;
+    struct ini_settings_t iniSettings_s;
+    struct ini_engine_t iniEngine_s;
+    struct ini_handler_t iniHandler_s;
+    struct ini_settings_t *ini_settings = &iniSettings_s;
+    struct ini_engine_t *ini_engine = &iniEngine_s;
+    struct ini_handler_t *ini_handler = &iniHandler_s;
 
     /* allocates space for the hash map to be used for
     the configuration to be created */
@@ -66,31 +66,31 @@ ERROR_CODE processIniFile(char *file_path, struct hash_map_t **configurationPoin
     arguments, then updates the configuration pointer
     with the created configuration hash map */
     create_hash_map(&configuration, 0);
-    *configurationPointer = configuration;
+    *configuration_pointer = configuration;
 
     /* sets the various handlers for the ini settings
     parsing, they will be used to correctly update the
     provided configuration hash map */
-    iniSettings_s.onsectionStart = NULL;
-    iniSettings_s.onsectionEnd = _iniSectionEndCallback;
-    iniSettings_s.oncommentStart = NULL;
-    iniSettings_s.oncommentEnd = _iniCommentEndCallback;
-    iniSettings_s.onkeyStart = NULL;
-    iniSettings_s.onkeyEnd = _iniKeyEndCallback;
-    iniSettings_s.onvalueStart = NULL;
-    iniSettings_s.onvalueEnd = _iniValueEndCallback;
+    iniSettings_s.on_section_start = NULL;
+    iniSettings_s.on_section_end = _ini_section_end_callback;
+    iniSettings_s.on_comment_start = NULL;
+    iniSettings_s.on_comment_end = _ini_comment_end_callback;
+    iniSettings_s.on_key_start = NULL;
+    iniSettings_s.on_key_end = _ini_key_end_callback;
+    iniSettings_s.on_value_start = NULL;
+    iniSettings_s.on_value_end = _ini_value_end_callback;
 
     /* sets the configuration reference in the ini handler
     so that it may be updatd and then sets the handler in
     the ini engine instance to be used for parsing */
     iniHandler_s.configuration = configuration;
-    iniEngine_s.context = iniHandler;
+    iniEngine_s.context = ini_handler;
 
     /* reads the file contained in the provided file path
     and then tests the error code for error, in case there is an
     error prints it to the error stream output */
-    returnValue = read_file(file_path, &file_buffer, &file_size);
-    if(IS_ERROR_CODE(returnValue)) { RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem reading file"); }
+    return_value = read_file(file_path, &file_buffer, &file_size);
+    if(IS_ERROR_CODE(return_value)) { RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem reading file"); }
 
     /* sets the initial state for the parsing process this
     is considered to be the "general loop" state */
@@ -110,20 +110,20 @@ ERROR_CODE processIniFile(char *file_path, struct hash_map_t **configurationPoin
                 if(character == '[') {
                     state = INI_ENGINE_SECTION;
 
-                    INI_MARK_N(sectionEnd, -1);
-                    INI_CALLBACK(sectionStart);
+                    INI_MARK_N(section_end, -1);
+                    INI_CALLBACK(section_start);
                 } else if(character == ';') {
                     state = INI_ENGINE_COMMENT;
 
-                    INI_MARK_N(commentEnd, -1);
-                    INI_CALLBACK(commentStart);
+                    INI_MARK_N(comment_end, -1);
+                    INI_CALLBACK(comment_start);
                 } else if(character == '\n' || character == '\r') {
                     state = INI_ENGINE_NORMAL;
                 } else {
                     state = INI_ENGINE_KEY;
 
-                    INI_MARK(keyEnd);
-                    INI_CALLBACK(keyStart);
+                    INI_MARK(key_end);
+                    INI_CALLBACK(key_start);
                 }
 
                 break;
@@ -132,7 +132,7 @@ ERROR_CODE processIniFile(char *file_path, struct hash_map_t **configurationPoin
                 if(character == ']') {
                     state = INI_ENGINE_NORMAL;
 
-                    INI_CALLBACK_DATA(sectionEnd);
+                    INI_CALLBACK_DATA(section_end);
                 }
 
                 break;
@@ -141,7 +141,7 @@ ERROR_CODE processIniFile(char *file_path, struct hash_map_t **configurationPoin
                 if(character == '\n' || character == '\r') {
                     state = INI_ENGINE_NORMAL;
 
-                    INI_CALLBACK_DATA(commentEnd);
+                    INI_CALLBACK_DATA(comment_end);
                 }
 
                 break;
@@ -150,9 +150,9 @@ ERROR_CODE processIniFile(char *file_path, struct hash_map_t **configurationPoin
                 if(character == '=') {
                     state = INI_ENGINE_VALUE;
 
-                    INI_MARK_N(valueEnd, -1);
-                    INI_CALLBACK_DATA(keyEnd);
-                    INI_CALLBACK(valueStart);
+                    INI_MARK_N(value_end, -1);
+                    INI_CALLBACK_DATA(key_end);
+                    INI_CALLBACK(value_start);
                 }
 
                 break;
@@ -161,7 +161,7 @@ ERROR_CODE processIniFile(char *file_path, struct hash_map_t **configurationPoin
                 if(character == '\n' || character == '\r') {
                     state = INI_ENGINE_NORMAL;
 
-                    INI_CALLBACK_DATA(valueEnd);
+                    INI_CALLBACK_DATA(value_end);
                 }
 
                 break;
@@ -176,41 +176,41 @@ ERROR_CODE processIniFile(char *file_path, struct hash_map_t **configurationPoin
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _iniSectionEndCallback(struct IniEngine_t *iniEngine, const unsigned char *pointer, size_t size) {
+ERROR_CODE _ini_section_end_callback(struct ini_engine_t *ini_engine, const unsigned char *pointer, size_t size) {
     /* retrieves the ini handler from the template engine context
     then uses it to store the (current) section */
-    struct IniHandler_t *iniHandler = (struct IniHandler_t *) iniEngine->context;
-    memcpy(iniHandler->section, pointer, size);
-    iniHandler->section[size] = '\0';
+    struct ini_handler_t *ini_handler = (struct ini_handler_t *) ini_engine->context;
+    memcpy(ini_handler->section, pointer, size);
+    ini_handler->section[size] = '\0';
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _iniCommentEndCallback(struct IniEngine_t *iniEngine, const unsigned char *pointer, size_t size) {
+ERROR_CODE _ini_comment_end_callback(struct ini_engine_t *ini_engine, const unsigned char *pointer, size_t size) {
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _iniKeyEndCallback(struct IniEngine_t *iniEngine, const unsigned char *pointer, size_t size) {
+ERROR_CODE _ini_key_end_callback(struct ini_engine_t *ini_engine, const unsigned char *pointer, size_t size) {
     /* retrieves the ini handler from the template engine context
     then uses it to store the (current) value */
-    struct IniHandler_t *iniHandler = (struct IniHandler_t *) iniEngine->context;
-    memcpy(iniHandler->key, pointer, size);
-    iniHandler->key[size] = '\0';
+    struct ini_handler_t *ini_handler = (struct ini_handler_t *) ini_engine->context;
+    memcpy(ini_handler->key, pointer, size);
+    ini_handler->key[size] = '\0';
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _iniValueEndCallback(struct IniEngine_t *iniEngine, const unsigned char *pointer, size_t size) {
+ERROR_CODE _ini_value_end_callback(struct ini_engine_t *ini_engine, const unsigned char *pointer, size_t size) {
     /* allocates space for the hash map reference to
     hold the reference to the current section configuration */
-    struct hash_map_t *sectionConfiguration;
+    struct hash_map_t *section_configuration;
 
     /* retrieves the ini handler from the template engine context
     then uses it to store the (current) value */
-    struct IniHandler_t *iniHandler = (struct IniHandler_t *) iniEngine->context;
+    struct ini_handler_t *ini_handler = (struct ini_handler_t *) ini_engine->context;
     char *value = MALLOC(size + 1);
     memcpy(value, pointer, size);
     value[size] = '\0';
@@ -218,18 +218,18 @@ ERROR_CODE _iniValueEndCallback(struct IniEngine_t *iniEngine, const unsigned ch
     /* tries to retrieve the current section configuration from the
     configuration in case it's not possible to retrieve it a new
     configuration map must be created */
-    get_value_string_hash_map(iniHandler->configuration, (unsigned char *) iniHandler->section, (void **) &sectionConfiguration);
-    if(sectionConfiguration == NULL) {
+    get_value_string_hash_map(ini_handler->configuration, (unsigned char *) ini_handler->section, (void **) &section_configuration);
+    if(section_configuration == NULL) {
         /* creates a new hash map to contain the section configuration
         and sets it under the current configuration variable in the ini
         handler for the current section name */
-        create_hash_map(&sectionConfiguration, 0);
-        set_value_string_hash_map(iniHandler->configuration, (unsigned char *) iniHandler->section, sectionConfiguration);
+        create_hash_map(&section_configuration, 0);
+        set_value_string_hash_map(ini_handler->configuration, (unsigned char *) ini_handler->section, section_configuration);
     }
 
     /* sets the current key and value under the current section configuration
     this is the main handler action */
-    set_value_string_hash_map(sectionConfiguration, (unsigned char *) iniHandler->key, value);
+    set_value_string_hash_map(section_configuration, (unsigned char *) ini_handler->key, value);
 
     /* raises no error */
     RAISE_NO_ERROR;

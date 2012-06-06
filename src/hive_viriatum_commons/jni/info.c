@@ -32,15 +32,15 @@
 #ifdef VIRIATUM_JNI
 
 jstring Java_pt_hive_viriatum_commons_Info_getName(JNIEnv *env, jclass cls) {
-    return (*env)->NewStringUTF(env, (char *) nameViriatumCommons());
+    return (*env)->NewStringUTF(env, (char *) name_viriatum_commons());
 }
 
 jstring Java_pt_hive_viriatum_commons_Info_getVersion(JNIEnv *env, jclass cls) {
-    return (*env)->NewStringUTF(env, (char *) versionViriatumCommons());
+    return (*env)->NewStringUTF(env, (char *) version_viriatum_commons());
 }
 
 jstring Java_pt_hive_viriatum_commons_Info_getDescription(JNIEnv *env, jclass cls) {
-    return (*env)->NewStringUTF(env, (char *) descriptionViriatumCommons());
+    return (*env)->NewStringUTF(env, (char *) description_viriatum_commons());
 }
 
 jstring Java_pt_hive_viriatum_commons_Info_hello(JNIEnv *env, jobject thiz) {

@@ -29,34 +29,34 @@
 
 #include "memory_pool.h"
 
-void createMemoryPool(struct MemoryPool_t **memoryPoolPointer) {
+void create_memory_pool(struct memory_pool_t **memory_pool_pointer) {
     /* retrieves the memory pool size */
-    size_t memoryPoolSize = sizeof(struct MemoryPool_t);
+    size_t memory_pool_size = sizeof(struct memory_pool_t);
 
     /* allocates space for the memory pool */
-    struct MemoryPool_t *memoryPool = (struct MemoryPool_t *) MALLOC(memoryPoolSize);
+    struct memory_pool_t *memory_pool = (struct memory_pool_t *) MALLOC(memory_pool_size);
 
     /* sets the memory pool size */
-    memoryPool->size = MEMORY_POOL_SIZE;
+    memory_pool->size = MEMORY_POOL_SIZE;
 
     /* sets the memory pool current */
-    memoryPool->current = memoryPool;
+    memory_pool->current = memory_pool;
 
     /* sets the memory pool large block */
-    memoryPool->largeBlock = NULL;
+    memory_pool->large_block = NULL;
 
     /* sets the memory pool in the memory pool pointer */
-    *memoryPoolPointer = memoryPool;
+    *memory_pool_pointer = memory_pool;
 }
 
-void deleteMemoryPool(struct MemoryPool_t *memoryPool) {
+void delete_memory_pool(struct memory_pool_t *memory_pool) {
     /* releases the memory pool */
-    FREE(memoryPool);
+    FREE(memory_pool);
 }
 
-void *allocMemoryPool(struct MemoryPool_t *memoryPool, size_t size) {
+void *alloc_memory_pool(struct memory_pool_t *memory_pool, size_t size) {
     /* retrieves the current memory pool */
-    struct MemoryPool_t *currentMemoryPool = memoryPool->current;
+    struct memory_pool_t *current_memory_pool = memory_pool->current;
 
     /* in case the size is larger than the
     large block size */
@@ -66,7 +66,7 @@ void *allocMemoryPool(struct MemoryPool_t *memoryPool, size_t size) {
     /* otherwise it's a small (normal) block size */
     else {
         /* unsets hte large block value */
-        currentMemoryPool->largeBlock = NULL;
+        current_memory_pool->large_block = NULL;
     }
 
     /* returns invalid */
