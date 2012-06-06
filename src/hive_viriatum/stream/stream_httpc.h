@@ -51,27 +51,27 @@ typedef struct HttpClientConnection_t {
      * The (upper) io connection that owns
      * manages this connection.
      */
-    struct IoConnection_t *ioConnection;
+    struct IoConnection_t *io_connection;
 
     /**
      * Structure containig the settings to be
      * used by the http parser.
      */
-    struct HttpSettings_t *httpSettings;
+    struct http_settings_t *http_settings;
 
     /**
      * Parser to be used during the interpretation
      * of the http requests.
      */
-    struct HttpParser_t *httpParser;
+    struct http_parser_t *http_parser;
 } HttpClientConnection;
 
 typedef struct HttpClientParameters_t {
     char *url;
 } HttpClientParameters;
 
-ERROR_CODE createHttpClientConnection(struct HttpClientConnection_t **httpClientConnectionPointer, struct IoConnection_t *ioConnection);
+ERROR_CODE createHttpClientConnection(struct HttpClientConnection_t **httpClientConnectionPointer, struct IoConnection_t *io_connection);
 ERROR_CODE deleteHttpClientConnection(struct HttpClientConnection_t *httpClientConnection);
-ERROR_CODE dataHandlerStreamHttpClient(struct IoConnection_t *ioConnection, unsigned char *buffer, size_t buffer_size);
-ERROR_CODE openHandlerStreamHttpClient(struct IoConnection_t *ioConnection);
-ERROR_CODE closeHandlerStreamHttpClient(struct IoConnection_t *ioConnection);
+ERROR_CODE dataHandlerStreamHttpClient(struct IoConnection_t *io_connection, unsigned char *buffer, size_t buffer_size);
+ERROR_CODE openHandlerStreamHttpClient(struct IoConnection_t *io_connection);
+ERROR_CODE closeHandlerStreamHttpClient(struct IoConnection_t *io_connection);

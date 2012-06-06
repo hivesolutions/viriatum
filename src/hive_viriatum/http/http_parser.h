@@ -37,7 +37,7 @@
  */
 #define LF '\n'
 
-#define START_STATE (httpParser->type == HTTP_REQUEST ? STATE_START_REQ : STATE_START_RES)
+#define START_STATE (http_parser->type == HTTP_REQUEST ? STATE_START_REQ : STATE_START_RES)
 
 #ifndef MIN
 #define MIN(first, second) ((first) < (second) ? (first) : (second))
@@ -78,8 +78,8 @@
 
 #define HTTP_CALLBACK(FOR)\
     do {\
-        if(httpSettings->on_##FOR) {\
-            if(httpSettings->on_##FOR(httpParser) != 0) {\
+        if(http_settings->on_##FOR) {\
+            if(http_settings->on_##FOR(http_parser) != 0) {\
                 /*SET_ERRNO(HPE_CB_##FOR);*/\
                 /*return (pointer - data);*/\
             }\
@@ -89,8 +89,8 @@
 #define HTTP_CALLBACK_DATA(FOR)\
     do {\
         if(FOR##_mark) {\
-            if(httpSettings->on_##FOR) {\
-                if(httpSettings->on_##FOR(httpParser, FOR##_mark, pointer - FOR##_mark) != 0) {\
+            if(http_settings->on_##FOR) {\
+                if(http_settings->on_##FOR(http_parser, FOR##_mark, pointer - FOR##_mark) != 0) {\
                 /*    SET_ERRNO(HPE_CB_##FOR);*/\
                     /*return (p - data);*/\
                 }\
@@ -139,7 +139,7 @@
  */
 #define HTTP_CLOSE "close"
 
-struct HttpParser_t;
+struct http_parser_t;
 
 static const char tokens[256] = {
 /*   0 nul    1 soh    2 stx    3 etx    4 eot    5 enq    6 ack    7 bel  */
@@ -265,13 +265,13 @@ static const char *httpMethodStrings[24] = {
  * The "default" callback function to be used, without
  * any extra arguments.
  */
-typedef ERROR_CODE (*httpCallback) (struct HttpParser_t *);
+typedef ERROR_CODE (*http_callback) (struct http_parser_t *);
 
 /**
  * Callback function type used for callbacks that require
  * "extra" data to be send as argument.
  */
-typedef ERROR_CODE (*httpDataCallback) (struct HttpParser_t *, const unsigned char *, size_t);
+typedef ERROR_CODE (*http_data_callback) (struct http_parser_t *, const unsigned char *, size_t);
 
 /**
  * Defines the various types of http request.
@@ -286,7 +286,7 @@ typedef enum HttpRequestType_e {
  * Defines the various http request mehtods.
  * The methods are defined in a random order.
  */
-typedef enum HttpMethod_e {
+typedef enum http_method_e {
     HTTP_DELETE = 1,
     HTTP_GET,
     HTTP_HEAD,
@@ -311,9 +311,9 @@ typedef enum HttpMethod_e {
     HTTP_SUBSCRIBE,
     HTTP_UNSUBSCRIBE,
     HTTP_PATCH
-} HttpMethod;
+} http_method;
 
-typedef enum HttpParserState_e {
+typedef enum http_parser_state_e {
     STATE_DEAD = 1,
     STATE_START_REQ_OR_RES,
 
@@ -376,9 +376,9 @@ typedef enum HttpParserState_e {
 
     STATE_BODY_IDENTITY,
     STATE_BODY_IDENTITY_EOF
-} HttpRequestState;
+} http_parser_state;
 
-typedef enum HttpHeaderState_e {
+typedef enum http_header_state_e {
     HEADER_STATE_GENERAL = 1,
     HEADER_STATE_C,
     HEADER_STATE_CO,
@@ -402,27 +402,27 @@ typedef enum HttpHeaderState_e {
     HEADER_STATE_TRANSFER_ENCODING_CHUNKED,
     HEADER_STATE_CONNECTION_KEEP_ALIVE,
     HEADER_STATE_CONNECTION_CLOSE
-} HttpRequestHeaderState;
+} http_header_state;
 
-typedef enum HttpFlags_e {
+typedef enum http_flags_e {
     FLAG_CHUNKED = 1 << 0,
     FLAG_CONNECTION_KEEP_ALIVE = 1 << 1,
     FLAG_CONNECTION_CLOSE = 1 << 2,
     FLAG_TRAILING = 1 << 3,
     FLAG_UPGRADE = 1 << 4,
     FLAG_SKIPBODY = 1 << 5
-} HttpFlags;
+} http_flags;
 
 /**
  * Structure representing an http parser
  * it contains information about parsing
  * including state, size contents and control flags.
  */
-typedef struct HttpParser_t {
+typedef struct http_parser_t {
     unsigned char type;
     unsigned char flags;
-    enum HttpParserState_e state;
-    enum HttpHeaderState_e headerState;
+    enum http_parser_state_e state;
+    enum http_header_state_e headerState;
     unsigned char index;
     size_t read_count;
     int contentLength;
@@ -446,51 +446,51 @@ typedef struct HttpParser_t {
      * value is not changed across parsing requests.
      */
     size_t _contentLength;
-} HttpParser;
+} http_parser;
 
 /**
  * Structure representing the various settings
  * to be used for parsing the http message.
  */
-typedef struct HttpSettings_t {
-    httpCallback on_message_begin;
-    httpDataCallback on_url;
-    httpDataCallback on_header_field;
-    httpDataCallback on_header_value;
-    httpCallback on_headers_complete;
-    httpDataCallback on_body;
-    httpCallback on_message_complete;
-} HttpSettings;
+typedef struct http_settings_t {
+    http_callback on_message_begin;
+    http_data_callback on_url;
+    http_data_callback on_header_field;
+    http_data_callback on_header_value;
+    http_callback on_headers_complete;
+    http_data_callback on_body;
+    http_callback on_message_complete;
+} http_settings;
 
 /**
  * Constructor of the http parser.
  *
- * @param httpParserPointer The pointer to the http parser to be constructed.
+ * @param http_parser_pointer The pointer to the http parser to be constructed.
  * @param request If the parser is meant to be created for a request if not
  * set the parser assumes it's a response.
  */
-void createHttpParser(struct HttpParser_t **httpParserPointer, char request);
+void createHttpParser(struct http_parser_t **http_parser_pointer, char request);
 
 /**
  * Destructor of the http parser.
  *
- * @param httpParser The http parser to be destroyed.
+ * @param http_parser The http parser to be destroyed.
  */
-void deleteHttpParser(struct HttpParser_t *httpParser);
+void deleteHttpParser(struct http_parser_t *http_parser);
 
 /**
  * Constructor of the http settings.
  *
- * @param httpSettingsPointer The pointer to the http settings to be constructed.
+ * @param http_settings_pointer The pointer to the http settings to be constructed.
  */
-void createHttpSettings(struct HttpSettings_t **httpSettingsPointer);
+void createHttpSettings(struct http_settings_t **http_settings_pointer);
 
 /**
  * Destructor of the http settings.
  *
- * @param httpSettings The http settings to be destroyed.
+ * @param http_settings The http settings to be destroyed.
  */
-void deleteHttpSettings(struct HttpSettings_t *httpSettings);
+void deleteHttpSettings(struct http_settings_t *http_settings);
 
 /**
  * Called to process a new data chunk in the context
@@ -498,13 +498,13 @@ void deleteHttpSettings(struct HttpSettings_t *httpSettings);
  * This function should be called whenever a new data
  * chunk is received.
  *
- * @param httpParser The http parser object.
- * @param httpSettings The http settings for the processing.
+ * @param http_parser The http parser object.
+ * @param http_settings The http settings for the processing.
  * @param data The data to be parsed.
- * @param dataSize The size of the data to be parsed.
+ * @param data_size The size of the data to be parsed.
  * @return The number of bytes used during the processing.
  */
-int processDataHttpParser(struct HttpParser_t *httpParser, struct HttpSettings_t *httpSettings, unsigned char *data, size_t dataSize);
+int processDataHttpParser(struct http_parser_t *http_parser, struct http_settings_t *http_settings, unsigned char *data, size_t data_size);
 
 /**
  * Retrieves the string representing the http method for
@@ -515,6 +515,6 @@ int processDataHttpParser(struct HttpParser_t *httpParser, struct HttpSettings_t
  * into string representation.
  * @return The string representation of the http method.
  */
-static __inline const char *getHttpMethodString(enum HttpMethod_e httpMethod) {
+static __inline const char *get_http_method_string(enum http_method_e httpMethod) {
     return httpMethodStrings[httpMethod - 1];
 }

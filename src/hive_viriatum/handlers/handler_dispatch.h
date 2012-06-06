@@ -51,7 +51,7 @@ struct Data_t;
 struct Connection_t;
 struct HttpConnection_t;
 
-typedef struct DispatchHandler_t {
+typedef struct dispatch_handler_t {
     /**
      * The array of regular expressions that are meant
      * to be executed in the ordered defined for execution.
@@ -73,26 +73,26 @@ typedef struct DispatchHandler_t {
      * The number of regular expressions curently present
      * in the dispatch handler.
      */
-    size_t regexCount;
-} DispatchHandler;
+    size_t regex_count;
+} dispatch_handler;
 
-ERROR_CODE createDispatchHandler(struct DispatchHandler_t **dispatchHandlerPointer, struct HttpHandler_t *httpHandler);
-ERROR_CODE deleteDispatchHandler(struct DispatchHandler_t *dispatchHandler);
-ERROR_CODE registerHandlerDispatch(struct Service_t *service);
-ERROR_CODE unregisterHandlerDispatch(struct Service_t *service);
-ERROR_CODE setHandlerDispatch(struct HttpConnection_t *httpConnection);
-ERROR_CODE unsetHandlerDispatch(struct HttpConnection_t *httpConnection);
-ERROR_CODE resetHandlerDispatch(struct HttpConnection_t *httpConnection);
-ERROR_CODE messageBeginCallbackHandlerDispatch(struct HttpParser_t *httpParser);
-ERROR_CODE urlCallbackHandlerDispatch(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize);
-ERROR_CODE headerFieldCallbackHandlerDispatch(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize);
-ERROR_CODE headerValueCallbackHandlerDispatch(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize);
-ERROR_CODE headersCompleteCallbackHandlerDispatch(struct HttpParser_t *httpParser);
-ERROR_CODE bodyCallbackHandlerDispatch(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize);
-ERROR_CODE messageCompleteCallbackHandlerDispatch(struct HttpParser_t *httpParser);
-ERROR_CODE _setHttpParserHandlerDispatch(struct HttpParser_t *httpParser);
-ERROR_CODE _unsetHttpParserHandlerDispatch(struct HttpParser_t *httpParser);
-ERROR_CODE _setHttpSettingsHandlerDispatch(struct HttpSettings_t *httpSettings);
-ERROR_CODE _unsetHttpSettingsHandlerDispatch(struct HttpSettings_t *httpSettings);
-ERROR_CODE _sendResponseHandlerDispatch(struct HttpParser_t *httpParser);
-ERROR_CODE _sendResponseCallbackHandlerDispatch(struct Connection_t *connection, struct Data_t *data, void *parameters);
+ERROR_CODE create_dispatch_handler(struct dispatch_handler_t **dispatch_handler_pointer, struct HttpHandler_t *http_handler);
+ERROR_CODE delete_dispatch_handler(struct dispatch_handler_t *dispatch_handler);
+ERROR_CODE register_handler_dispatch(struct Service_t *service);
+ERROR_CODE unregister_handler_dispatch(struct Service_t *service);
+ERROR_CODE set_handler_dispatch(struct HttpConnection_t *http_connection);
+ERROR_CODE unset_handler_dispatch(struct HttpConnection_t *http_connection);
+ERROR_CODE reset_handler_dispatch(struct HttpConnection_t *http_connection);
+ERROR_CODE message_begin_callback_handler_dispatch(struct http_parser_t *http_parser);
+ERROR_CODE url_callback_handler_dispatch(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size);
+ERROR_CODE header_field_callback_handler_dispatch(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size);
+ERROR_CODE header_value_callback_handler_dispatch(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size);
+ERROR_CODE headers_complete_callback_handler_dispatch(struct http_parser_t *http_parser);
+ERROR_CODE body_callback_handler_dispatch(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size);
+ERROR_CODE message_complete_callback_handler_dispatch(struct http_parser_t *http_parser);
+ERROR_CODE _set_http_parser_handler_dispatch(struct http_parser_t *http_parser);
+ERROR_CODE _unset_http_parser_handler_dispatch(struct http_parser_t *http_parser);
+ERROR_CODE _set_http_settings_handler_dispatch(struct http_settings_t *http_settings);
+ERROR_CODE _unset_http_settings_handler_dispatch(struct http_settings_t *http_settings);
+ERROR_CODE _send_response_handler_dispatch(struct http_parser_t *http_parser);
+ERROR_CODE _send_response_callback_handler_dispatch(struct Connection_t *connection, struct Data_t *data, void *parameters);

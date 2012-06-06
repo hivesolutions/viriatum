@@ -74,7 +74,7 @@ typedef struct IoConnection_t {
 } IoConnection;
 
 void createIoConnection(struct IoConnection_t **ioConnectionPointer, struct Connection_t *connection);
-void deleteIoConnection(struct IoConnection_t *ioConnection);
+void deleteIoConnection(struct IoConnection_t *io_connection);
 ERROR_CODE acceptHandlerStreamIo(struct Connection_t *connection);
 ERROR_CODE readHandlerStreamIo(struct Connection_t *connection);
 ERROR_CODE writeHandlerStreamIo(struct Connection_t *connection);

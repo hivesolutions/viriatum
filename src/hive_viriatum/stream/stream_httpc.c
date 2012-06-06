@@ -29,10 +29,10 @@
 
 #include "stream_httpc.h"
 
-ERROR_CODE bodyCallbackHandlerClient(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize) {
+ERROR_CODE bodyCallbackHandlerClient(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
     struct type_t *type;
 
-    decode_bencoding((unsigned char *) data, dataSize, &type);
+    decode_bencoding((unsigned char *) data, data_size, &type);
     print_type(type);
     free_type(type);
 
@@ -40,7 +40,7 @@ ERROR_CODE bodyCallbackHandlerClient(struct HttpParser_t *httpParser, const unsi
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE messageCompleteCallbackHandlerClient(struct HttpParser_t *httpParser) {
+ERROR_CODE messageCompleteCallbackHandlerClient(struct http_parser_t *http_parser) {
     /* raises no error */
     RAISE_NO_ERROR;
 }
@@ -48,7 +48,7 @@ ERROR_CODE messageCompleteCallbackHandlerClient(struct HttpParser_t *httpParser)
 
 
 
-ERROR_CODE createHttpClientConnection(struct HttpClientConnection_t **httpClientConnectionPointer, struct IoConnection_t *ioConnection) {
+ERROR_CODE createHttpClientConnection(struct HttpClientConnection_t **httpClientConnectionPointer, struct IoConnection_t *io_connection) {
     /* retrieves the http client connection size */
     size_t httpClientConnectionSize = sizeof(struct HttpClientConnection_t);
 
@@ -56,24 +56,24 @@ ERROR_CODE createHttpClientConnection(struct HttpClientConnection_t **httpClient
     struct HttpClientConnection_t *httpClientConnection = (struct HttpClientConnection_t *) MALLOC(httpClientConnectionSize);
 
     /* sets the http handler attributes (default) values */
-    httpClientConnection->ioConnection = ioConnection;
+    httpClientConnection->io_connection = io_connection;
 
     /* creates the http settings */
-    createHttpSettings(&httpClientConnection->httpSettings);
+    createHttpSettings(&httpClientConnection->http_settings);
 
     /* creates the http parser (for a response) */
-    createHttpParser(&httpClientConnection->httpParser, 0);
+    createHttpParser(&httpClientConnection->http_parser, 0);
 
     /* sets the default callback functions in the http settings
     these function are going to be called by the parser */
-    httpClientConnection->httpSettings->on_body = bodyCallbackHandlerClient;
-    httpClientConnection->httpSettings->on_message_complete = messageCompleteCallbackHandlerClient;
+    httpClientConnection->http_settings->on_body = bodyCallbackHandlerClient;
+    httpClientConnection->http_settings->on_message_complete = messageCompleteCallbackHandlerClient;
 
     /* sets the connection as the parser parameter(s) */
-    httpClientConnection->httpParser->parameters = ioConnection->connection;
+    httpClientConnection->http_parser->parameters = io_connection->connection;
 
     /* sets the http client connection in the (upper) io connection substrate */
-    ioConnection->lower = httpClientConnection;
+    io_connection->lower = httpClientConnection;
 
     /* sets the http client connection in the http client connection pointer */
     *httpClientConnectionPointer = httpClientConnection;
@@ -84,10 +84,10 @@ ERROR_CODE createHttpClientConnection(struct HttpClientConnection_t **httpClient
 
 ERROR_CODE deleteHttpClientConnection(struct HttpClientConnection_t *httpClientConnection) {
     /* deletes the http parser */
-    deleteHttpParser(httpClientConnection->httpParser);
+    deleteHttpParser(httpClientConnection->http_parser);
 
     /* deletes the http settings */
-    deleteHttpSettings(httpClientConnection->httpSettings);
+    deleteHttpSettings(httpClientConnection->http_settings);
 
     /* releases the http client connection */
     FREE(httpClientConnection);
@@ -96,19 +96,19 @@ ERROR_CODE deleteHttpClientConnection(struct HttpClientConnection_t *httpClientC
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE dataHandlerStreamHttpClient(struct IoConnection_t *ioConnection, unsigned char *buffer, size_t buffer_size) {
+ERROR_CODE dataHandlerStreamHttpClient(struct IoConnection_t *io_connection, unsigned char *buffer, size_t buffer_size) {
     /* allocates space for the temporary variable to
     hold the ammount of bytes processed in a given http
     data parsing iteration */
     int processedSize;
 
     /* retrieves the http client connection */
-    struct HttpClientConnection_t *httpClientConnection = (struct HttpClientConnection_t *) ioConnection->lower;
+    struct HttpClientConnection_t *httpClientConnection = (struct HttpClientConnection_t *) io_connection->lower;
 
     /* process the http data for the http parser, this should be
     a partial processing and some data may remain unprocessed (in
     case there are multiple http requests) */
-    processedSize = processDataHttpParser(httpClientConnection->httpParser, httpClientConnection->httpSettings, buffer, buffer_size);
+    processedSize = processDataHttpParser(httpClientConnection->http_parser, httpClientConnection->http_settings, buffer, buffer_size);
 
     printf("%d", processedSize);
 
@@ -223,7 +223,7 @@ ERROR_CODE generateParameters(struct hash_map_t *hash_map, unsigned char **buffe
 
 
 
-ERROR_CODE openHandlerStreamHttpClient(struct IoConnection_t *ioConnection) {
+ERROR_CODE openHandlerStreamHttpClient(struct IoConnection_t *io_connection) {
     /* allocates space for the temporary error variable to
     be used to detect errors in calls */
     ERROR_CODE error;
@@ -231,7 +231,7 @@ ERROR_CODE openHandlerStreamHttpClient(struct IoConnection_t *ioConnection) {
     /* allocates the http client connection and retrieves the
     "upper" connection (for parameters retrieval) */
     struct HttpClientConnection_t *httpClientConnection;
-    struct Connection_t *connection = (struct Connection_t *) ioConnection->connection;
+    struct Connection_t *connection = (struct Connection_t *) io_connection->connection;
     struct HttpClientParameters_t *parameters = (struct HttpClientParameters_t *) connection->parameters;
     struct type_t *type;
     struct type_t *_type;
@@ -298,17 +298,17 @@ ERROR_CODE openHandlerStreamHttpClient(struct IoConnection_t *ioConnection) {
     FREE(getString);
 
     /* creates the http client connection */
-    createHttpClientConnection(&httpClientConnection, ioConnection);
+    createHttpClientConnection(&httpClientConnection, io_connection);
 
-    writeConnection(ioConnection->connection, (unsigned char *) buffer, strlen(buffer), NULL, NULL);
+    write_connection(io_connection->connection, (unsigned char *) buffer, strlen(buffer), NULL, NULL);
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE closeHandlerStreamHttpClient(struct IoConnection_t *ioConnection) {
+ERROR_CODE closeHandlerStreamHttpClient(struct IoConnection_t *io_connection) {
     /* retrieves the http client connection */
-    struct HttpClientConnection_t *httpClientConnection = (struct HttpClientConnection_t *) ioConnection->lower;
+    struct HttpClientConnection_t *httpClientConnection = (struct HttpClientConnection_t *) io_connection->lower;
 
     /* deletes the http client connection */
     deleteHttpClientConnection(httpClientConnection);

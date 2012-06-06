@@ -82,6 +82,6 @@
 #endif
 #endif
 
-unsigned char *nameViriatum();
-unsigned char *versionViriatum();
-unsigned char *descriptionViriatum();
+unsigned char *name_viriatum();
+unsigned char *version_viriatum();
+unsigned char *description_viriatum();

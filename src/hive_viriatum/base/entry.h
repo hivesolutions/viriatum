@@ -36,16 +36,16 @@
  * @param parameters The map containing the various parameters
  * to be used while running the service.
  */
-ERROR_CODE runService(struct hash_map_t *parameters);
+ERROR_CODE run_service(struct hash_map_t *parameters);
 
 /**
  * Stops the process of a running the service.
  * This call unblock a previous run service call.
  */
-ERROR_CODE ranService();
+ERROR_CODE ran_service();
 
 /**
  * Handler callback for the kill signal.
  * This callback stops the current service instance.
  */
-void killHandler(int signalNumber);
+void kill_handler(int signal_number);

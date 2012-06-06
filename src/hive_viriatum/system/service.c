@@ -29,7 +29,7 @@
 
 #include "service.h"
 
-void createService(struct Service_t **servicePointer, unsigned char *name) {
+void create_service(struct Service_t **servicePointer, unsigned char *name) {
     /* retrieves the service size */
     size_t serviceSize = sizeof(struct Service_t);
 
@@ -41,12 +41,12 @@ void createService(struct Service_t **servicePointer, unsigned char *name) {
     service->status = STATUS_CLOSED;
     service->configuration = NULL;
     service->serviceSocketHandle = 0;
-    service->httpHandler = NULL;
-    service->createHttpHandler = createHttpHandlerService;
-    service->deleteHttpHandler = deleteHttpHandlerService;
-    service->addHttpHandler = addHttpHandlerService;
-    service->removeHttpHandler = removeHttpHandlerService;
-    service->getHttpHandler = getHttpHandlerService;
+    service->http_handler = NULL;
+    service->create_http_handler = createHttpHandlerService;
+    service->delete_http_handler = deleteHttpHandlerService;
+    service->add_http_handler = addHttpHandlerService;
+    service->remove_http_handler = removeHttpHandlerService;
+    service->get_http_handler = getHttpHandlerService;
 
     /* creates the service options */
     createServiceOptions(&service->options);
@@ -61,13 +61,13 @@ void createService(struct Service_t **servicePointer, unsigned char *name) {
     create_linked_list(&service->modulesList);
 
     /* creates the http handlers map */
-    create_hash_map(&service->httpHandlersMap, 0);
+    create_hash_map(&service->http_handlers_map, 0);
 
     /* sets the service in the service pointer */
     *servicePointer = service;
 }
 
-void deleteService(struct Service_t *service) {
+void delete_service(struct Service_t *service) {
     /* in case the service socket handle is defined */
     if(service->serviceSocketHandle) {
         /* closes the service socket (secure closing) */
@@ -81,7 +81,7 @@ void deleteService(struct Service_t *service) {
     }
 
     /* deletes the http handlers map */
-    delete_hash_map(service->httpHandlersMap);
+    delete_hash_map(service->http_handlers_map);
 
     /* deletes the http modules list */
     delete_linked_list(service->modulesList);
@@ -109,9 +109,9 @@ void createServiceOptions(struct ServiceOptions_t **serviceOptionsPointer) {
     /* sets the service options attributes (default) values */
     serviceOptions->port = 0;
     serviceOptions->address = NULL;
-    serviceOptions->handlerName = NULL;
+    serviceOptions->handler_name = NULL;
     serviceOptions->local = 0;
-    serviceOptions->defaultIndex = 0;
+    serviceOptions->default_index = 0;
     serviceOptions->defaultVirtualHost = NULL;
 
     /* creates the hash map for the virtual hosts */
@@ -131,10 +131,10 @@ void deleteServiceOptions(struct ServiceOptions_t *serviceOptions) {
 
 void createData(struct Data_t **dataPointer) {
     /* retrieves the data size */
-    size_t dataSize = sizeof(struct Data_t);
+    size_t data_size = sizeof(struct Data_t);
 
     /* allocates space for the data */
-    struct Data_t *data = (struct Data_t *) MALLOC(dataSize);
+    struct Data_t *data = (struct Data_t *) MALLOC(data_size);
 
     /* sets the data attributes (default) values */
     data->data = NULL;
@@ -223,7 +223,7 @@ void deleteConfiguration(struct hash_map_t *configuration, int isTop) {
     delete_hash_map(configuration);
 }
 
-ERROR_CODE loadOptionsService(struct Service_t *service, struct hash_map_t *arguments) {
+ERROR_CODE load_options_service(struct Service_t *service, struct hash_map_t *arguments) {
     /* loads the options from the various sources, note
     that the loading order is important because the last
     loading takes priority over the previous ones */
@@ -353,8 +353,8 @@ ERROR_CODE _createClientConnection(struct Connection_t **connectionPointer, stru
 
     /* sets the base hanlding functions in the client connection */
     connection->openConnection = openConnection;
-    connection->closeConnection = closeConnection;
-    connection->writeConnection = writeConnection;
+    connection->close_connection = close_connection;
+    connection->write_connection = write_connection;
     connection->registerWrite = registerWriteConnection;
     connection->unregisterWrite = unregisterWriteConnection;
 
@@ -449,7 +449,7 @@ ERROR_CODE _createTorrentConnection(struct Connection_t **connectionPointer, str
 
 
 
-ERROR_CODE startService(struct Service_t *service) {
+ERROR_CODE start_service(struct Service_t *service) {
     /* allocates the socket address structure */
     SOCKET_ADDRESS_INTERNET socket_address;
 
@@ -495,16 +495,16 @@ ERROR_CODE startService(struct Service_t *service) {
 
     /* registers the various "local" handlers
     in the service, for later usage */
-    registerHandlerDispatch(service);
-    registerHandlerDefault(service);
-    registerHandlerFile(service);
+    register_handler_dispatch(service);
+    register_handler_default(service);
+    register_handler_file(service);
 
     /* loads (all) the currently available modules */
     loadModulesService(service);
 
     /* sets the current http handler accoring to the current options
     in the service, the http handler must be loaded in the handlers map */
-    get_value_string_hash_map(service->httpHandlersMap, serviceOptions->handlerName, (void **) &service->httpHandler);
+    get_value_string_hash_map(service->http_handlers_map, serviceOptions->handler_name, (void **) &service->http_handler);
 
     /* sets the socket address attributes */
     socket_address.sin_family = SOCKET_INTERNET_TYPE;
@@ -616,8 +616,8 @@ ERROR_CODE startService(struct Service_t *service) {
 
     /* sets the base hanlding functions in the service connection */
     serviceConnection->openConnection = openConnection;
-    serviceConnection->closeConnection = closeConnection;
-    serviceConnection->writeConnection = writeConnection;
+    serviceConnection->close_connection = close_connection;
+    serviceConnection->write_connection = write_connection;
     serviceConnection->registerWrite = registerWriteConnection;
     serviceConnection->unregisterWrite = unregisterWriteConnection;
 
@@ -685,15 +685,15 @@ ERROR_CODE startService(struct Service_t *service) {
 
     /* unregisters the various "local" handlers
     from the service, for structure destruction */
-    unregisterHandlerFile(service);
-    unregisterHandlerDefault(service);
-    unregisterHandlerDispatch(service);
+    unregister_handler_file(service);
+    unregister_handler_default(service);
+    unregister_handler_dispatch(service);
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE stopService(struct Service_t *service) {
+ERROR_CODE stop_service(struct Service_t *service) {
     /* sets the service status as closed */
     service->status = STATUS_CLOSED;
 
@@ -723,7 +723,7 @@ ERROR_CODE closeConnectionsService(struct Service_t *service) {
         }
 
         /* closes the current connection */
-        currentConnection->closeConnection(currentConnection);
+        currentConnection->close_connection(currentConnection);
 
         /* deletes the current connection */
         deleteConnection(currentConnection);
@@ -738,7 +738,7 @@ ERROR_CODE closeConnectionsService(struct Service_t *service) {
 
 ERROR_CODE loadModulesService(struct Service_t *service) {
     /* allocates the error code */
-    ERROR_CODE errorCode;
+    ERROR_CODE error_code;
 
     /* allocates space for the pointer to be used in the
     prefix comparision for the module name */
@@ -794,15 +794,15 @@ ERROR_CODE loadModulesService(struct Service_t *service) {
         if(pointer != (char *) entry->name && pointer != (char *) entry->name + 3) { continue; }
 
         /* loads the module, retrieving a possible error code */
-        errorCode = loadModule(service, modulePath);
+        error_code = loadModule(service, modulePath);
 
         /* tests the error code for error */
-        if(IS_ERROR_CODE(errorCode)) {
+        if(IS_ERROR_CODE(error_code)) {
             /* prints a warning message */
             V_WARNING_F("Problem loading module (%s)\n", (char *) GET_ERROR());
 
             /* raises again the error */
-            RAISE_AGAIN(errorCode);
+            RAISE_AGAIN(error_code);
         }
     }
 
@@ -895,8 +895,8 @@ ERROR_CODE createConnection(struct Connection_t **connectionPointer, SOCKET_HAND
     connection->service = NULL;
     connection->writeRegistered = 0;
     connection->openConnection = NULL;
-    connection->closeConnection = NULL;
-    connection->writeConnection = NULL;
+    connection->close_connection = NULL;
+    connection->write_connection = NULL;
     connection->registerWrite = NULL;
     connection->unregisterWrite = NULL;
     connection->allocData = allocConnection;
@@ -960,7 +960,7 @@ ERROR_CODE deleteConnection(struct Connection_t *connection) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE writeConnection(struct Connection_t *connection, unsigned char *data, unsigned int size, connectionDataCallback callback, void *callbackParameters) {
+ERROR_CODE write_connection(struct Connection_t *connection, unsigned char *data, unsigned int size, connectionDataCallback callback, void *callbackParameters) {
     /* allocates the data */
     struct Data_t *_data;
 
@@ -1016,7 +1016,7 @@ ERROR_CODE openConnection(struct Connection_t *connection) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE closeConnection(struct Connection_t *connection) {
+ERROR_CODE close_connection(struct Connection_t *connection) {
     /* in case the connection is (already) closed */
     if(connection->status == STATUS_CLOSED) {
         /* raises no error */
@@ -1043,7 +1043,7 @@ ERROR_CODE closeConnection(struct Connection_t *connection) {
 
     /* unsets the base hanlding functions from the connection */
     connection->openConnection = NULL;
-    connection->closeConnection = NULL;
+    connection->close_connection = NULL;
     connection->registerWrite = NULL;
     connection->unregisterWrite = NULL;
 
@@ -1101,7 +1101,7 @@ ERROR_CODE allocConnection(struct Connection_t *connection, size_t size, void **
 
 ERROR_CODE createHttpHandlerService(struct Service_t *service, struct HttpHandler_t **httpHandlerPointer, unsigned char *name) {
     /* creates the http handler */
-    createHttpHandler(httpHandlerPointer, name);
+    create_http_handler(httpHandlerPointer, name);
 
     /* sets a service reference in the http handler
     (this may be used latter for option reference) */
@@ -1111,25 +1111,25 @@ ERROR_CODE createHttpHandlerService(struct Service_t *service, struct HttpHandle
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE deleteHttpHandlerService(struct Service_t *service, struct HttpHandler_t *httpHandler) {
+ERROR_CODE deleteHttpHandlerService(struct Service_t *service, struct HttpHandler_t *http_handler) {
     /* deletes the http handler */
-    deleteHttpHandler(httpHandler);
+    delete_http_handler(http_handler);
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE addHttpHandlerService(struct Service_t *service, struct HttpHandler_t *httpHandler) {
+ERROR_CODE addHttpHandlerService(struct Service_t *service, struct HttpHandler_t *http_handler) {
     /* sets the http handler in the http handers map for the handler name */
-    set_value_string_hash_map(service->httpHandlersMap, httpHandler->name, (void *) httpHandler);
+    set_value_string_hash_map(service->http_handlers_map, http_handler->name, (void *) http_handler);
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE removeHttpHandlerService(struct Service_t *service, struct HttpHandler_t *httpHandler) {
+ERROR_CODE removeHttpHandlerService(struct Service_t *service, struct HttpHandler_t *http_handler) {
     /* unsets the http handler from the http handers map */
-    set_value_string_hash_map(service->httpHandlersMap, httpHandler->name, NULL);
+    set_value_string_hash_map(service->http_handlers_map, http_handler->name, NULL);
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -1138,7 +1138,7 @@ ERROR_CODE removeHttpHandlerService(struct Service_t *service, struct HttpHandle
 ERROR_CODE getHttpHandlerService(struct Service_t *service, struct HttpHandler_t **httpHandlerPointer, unsigned char *name) {
     /* tries to retrieve the http handler for the given name from the
     http handlers map to return it as the appropriate handler */
-    get_value_string_hash_map(service->httpHandlersMap, name, (void **) httpHandlerPointer);
+    get_value_string_hash_map(service->http_handlers_map, name, (void **) httpHandlerPointer);
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -1151,8 +1151,8 @@ ERROR_CODE _defaultOptionsService(struct Service_t *service, struct hash_map_t *
     /* sets the varius default service options */
     serviceOptions->port = VIRIATUM_DEFAULT_PORT;
     serviceOptions->address = (unsigned char *) VIRIATUM_DEFAULT_HOST;
-    serviceOptions->handlerName = (unsigned char *) VIRIATUM_DEFAULT_HANDLER;
-    serviceOptions->defaultIndex = VIRIATUM_DEFAULT_INDEX;
+    serviceOptions->handler_name = (unsigned char *) VIRIATUM_DEFAULT_HANDLER;
+    serviceOptions->default_index = VIRIATUM_DEFAULT_INDEX;
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -1165,7 +1165,7 @@ ERROR_CODE _fileOptionsService(struct Service_t *service, struct hash_map_t *arg
 
     /* allocates space for the path to the proper configuration
     file (the ini base file) */
-    char configPath[VIRIATUM_MAX_PATH_SIZE];
+    char config_path[VIRIATUM_MAX_PATH_SIZE];
 
     /* allocates space for both the general configuration hash
     map and the "concrete" general configuration map */
@@ -1178,8 +1178,8 @@ ERROR_CODE _fileOptionsService(struct Service_t *service, struct hash_map_t *arg
     /* creates the configuration file path using the defined viriatum
     path to the configuration directory and then loads it as an ini file,
     this should retrieve the configuration as a set of maps */
-    SPRINTF(configPath, VIRIATUM_MAX_PATH_SIZE, "%s/viriatum.ini", VIRIATUM_CONFIG_PATH);
-    process_ini_file(configPath, &configuration);
+    SPRINTF(config_path, VIRIATUM_MAX_PATH_SIZE, "%s/viriatum.ini", VIRIATUM_CONFIG_PATH);
+    process_ini_file(config_path, &configuration);
     service->configuration = configuration;
 
     /* tries to retrieve the general section configuration from the configuration
@@ -1201,7 +1201,7 @@ ERROR_CODE _fileOptionsService(struct Service_t *service, struct hash_map_t *arg
     /* tries to retrieve the handler argument from the arguments map and
     in case the (handler) value is set, sets it in the service options */
     get_value_string_hash_map(general, (unsigned char *) "handler", &value);
-    if(value != NULL) { serviceOptions->handlerName = (unsigned char *) value; }
+    if(value != NULL) { serviceOptions->handler_name = (unsigned char *) value; }
 
     /* tries to retrieve the local argument from the arguments map, then
     in case the (local) value is set, sets the service as local  */
@@ -1241,7 +1241,7 @@ ERROR_CODE _comandLineOptionsService(struct Service_t *service, struct hash_map_
     in case the (handler) value is set, sets the handler name value
     in the service options */
     get_value_string_hash_map(arguments, (unsigned char *) "handler", &value);
-    if(value != NULL) { serviceOptions->handlerName = (unsigned char *) ((struct argument_t *) value)->value; }
+    if(value != NULL) { serviceOptions->handler_name = (unsigned char *) ((struct argument_t *) value)->value; }
 
     /* tries to retrieve the local argument from the arguments map, then
     in case the (local) value is set, sets the service as local  */

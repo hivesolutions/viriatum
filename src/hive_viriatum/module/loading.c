@@ -89,7 +89,7 @@ ERROR_CODE deleteModule(struct Module_t *module) {
 
 ERROR_CODE loadModule(struct Service_t *service, unsigned char *modulePath) {
     /* error code to be used for testing */
-    ERROR_CODE errorCode;
+    ERROR_CODE error_code;
 
     /* the library reference */
     LIBRARY_REFERENCE library;
@@ -166,19 +166,19 @@ ERROR_CODE loadModule(struct Service_t *service, unsigned char *modulePath) {
     environment->service = service;
 
     /* calls the info module function */
-    errorCode = infoModuleFunction(module);
+    error_code = infoModuleFunction(module);
 
     /* tests the error code for error */
-    if(IS_ERROR_CODE(errorCode)) {
+    if(IS_ERROR_CODE(error_code)) {
         /* prints a warning message */
         V_WARNING_F("%s\n", GET_ERROR_MODULE(module));
     }
 
     /* calls the start module function */
-    errorCode = module->start(environment, module);
+    error_code = module->start(environment, module);
 
     /* tests the error code for error */
-    if(IS_ERROR_CODE(errorCode)) {
+    if(IS_ERROR_CODE(error_code)) {
         /* prints a warning message */
         V_WARNING_F("%s\n", GET_ERROR_MODULE(module));
     }
@@ -192,7 +192,7 @@ ERROR_CODE loadModule(struct Service_t *service, unsigned char *modulePath) {
 
 ERROR_CODE unloadModule(struct Service_t *service, struct Module_t *module) {
     /* allocates the error code */
-    ERROR_CODE errorCode;
+    ERROR_CODE error_code;
 
     /* retrieves the environment from the module */
     struct Environment_t *environment = module->environment;
@@ -204,10 +204,10 @@ ERROR_CODE unloadModule(struct Service_t *service, struct Module_t *module) {
     remove_value_linked_list(service->modulesList, (void *) module, 1);
 
     /* calls the stop module function */
-    errorCode = module->stop(environment, module);
+    error_code = module->stop(environment, module);
 
     /* tests the error code for error */
-    if(IS_ERROR_CODE(errorCode)) {
+    if(IS_ERROR_CODE(error_code)) {
         /* prints a warning message */
         V_WARNING_F("%s\n", GET_ERROR_MODULE(module));
     }

@@ -39,7 +39,7 @@ jstring Java_pt_hive_viriatum_http_Service_run(JNIEnv *env, jclass cls) {
     char buffer[1024] = "";
 
     /* runs the service */
-    return_value = runService();
+    return_value = run_service();
 
     /* tests the error code for error */
     if(IS_ERROR_CODE(return_value)) {
@@ -60,7 +60,7 @@ jstring Java_pt_hive_viriatum_http_Service_ran(JNIEnv *env, jclass cls) {
     char buffer[1024] = "";
 
     /* "rans" the service */
-    return_value = ranService();
+    return_value = ran_service();
 
     /* tests the error code for error */
     if(IS_ERROR_CODE(return_value)) {

@@ -29,169 +29,169 @@
 
 #include "handler_file.h"
 
-ERROR_CODE createHandlerFileContext(struct HandlerFileContext_t **handlerFileContextPointer) {
+ERROR_CODE create_handler_file_context(struct handler_file_context_t **handler_file_context_pointer) {
     /* retrieves the handler file context size */
-    size_t handlerFileContextSize = sizeof(struct HandlerFileContext_t);
+    size_t handler_file_context_size = sizeof(struct handler_file_context_t);
 
     /* allocates space for the handler file context */
-    struct HandlerFileContext_t *handlerFileContext = (struct HandlerFileContext_t *) MALLOC(handlerFileContextSize);
+    struct handler_file_context_t *handler_file_context = (struct handler_file_context_t *) MALLOC(handler_file_context_size);
 
     /* sets the handler file default values */
-    handlerFileContext->file = NULL;
-    handlerFileContext->flags = 0;
-    handlerFileContext->template_handler = NULL;
-    handlerFileContext->cacheControlStatus = 0;
-    handlerFileContext->etagStatus = 0;
+    handler_file_context->file = NULL;
+    handler_file_context->flags = 0;
+    handler_file_context->template_handler = NULL;
+    handler_file_context->cache_control_status = 0;
+    handler_file_context->etag_status = 0;
 
     /* sets the handler file context in the  pointer */
-    *handlerFileContextPointer = handlerFileContext;
+    *handler_file_context_pointer = handler_file_context;
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE deleteHandlerFileContext(struct HandlerFileContext_t *handlerFileContext) {
+ERROR_CODE delete_handler_file_context(struct handler_file_context_t *handler_file_context) {
     /* in case there is a file defined in
     the handler file context */
-    if(handlerFileContext->file != NULL) {
+    if(handler_file_context->file != NULL) {
         /* closes the file */
-        fclose(handlerFileContext->file);
+        fclose(handler_file_context->file);
     }
 
     /* in case there is a template handler defined
     in the handler file context */
-    if(handlerFileContext->template_handler) {
+    if(handler_file_context->template_handler) {
         /* deletes the template handler (releases memory) */
-        delete_template_handler(handlerFileContext->template_handler);
+        delete_template_handler(handler_file_context->template_handler);
     }
 
     /* releases the handler file context */
-    FREE(handlerFileContext);
+    FREE(handler_file_context);
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE registerHandlerFile(struct Service_t *service) {
+ERROR_CODE register_handler_file(struct Service_t *service) {
     /* allocates the http handler */
-    struct HttpHandler_t *httpHandler;
+    struct HttpHandler_t *http_handler;
 
     /* creates the http handler */
-    service->createHttpHandler(service, &httpHandler, (unsigned char *) "file");
+    service->create_http_handler(service, &http_handler, (unsigned char *) "file");
 
     /* sets the http handler attributes */
-    httpHandler->set = setHandlerFile;
-    httpHandler->unset = unsetHandlerFile;
-    httpHandler->reset = resetHandlerFile;
+    http_handler->set = set_handler_file;
+    http_handler->unset = unset_handler_file;
+    http_handler->reset = reset_handler_file;
 
     /* adds the http handler to the service */
-    service->addHttpHandler(service, httpHandler);
+    service->add_http_handler(service, http_handler);
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE unregisterHandlerFile(struct Service_t *service) {
+ERROR_CODE unregister_handler_file(struct Service_t *service) {
     /* allocates the http handler */
-    struct HttpHandler_t *httpHandler;
+    struct HttpHandler_t *http_handler;
 
     /* retrieves the http handler from the service, then
     remove it from the service after that delete the handler */
-    service->getHttpHandler(service, &httpHandler, (unsigned char *) "file");
-    service->removeHttpHandler(service, httpHandler);
-    service->deleteHttpHandler(service, httpHandler);
+    service->get_http_handler(service, &http_handler, (unsigned char *) "file");
+    service->remove_http_handler(service, http_handler);
+    service->delete_http_handler(service, http_handler);
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE setHandlerFile(struct HttpConnection_t *httpConnection) {
+ERROR_CODE set_handler_file(struct HttpConnection_t *http_connection) {
     /* sets the http parser values */
-    _setHttpParserHandlerFile(httpConnection->httpParser);
+    _set_http_parser_handler_file(http_connection->http_parser);
 
     /* sets the http settings values */
-    _setHttpSettingsHandlerFile(httpConnection->httpSettings);
+    _set_http_settings_handler_file(http_connection->http_settings);
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE unsetHandlerFile(struct HttpConnection_t *httpConnection) {
+ERROR_CODE unset_handler_file(struct HttpConnection_t *http_connection) {
     /* unsets the http parser values */
-    _unsetHttpParserHandlerFile(httpConnection->httpParser);
+    _unset_http_parser_handler_file(http_connection->http_parser);
 
     /* unsets the http settings values */
-    _unsetHttpSettingsHandlerFile(httpConnection->httpSettings);
+    _unset_http_settings_handler_file(http_connection->http_settings);
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE resetHandlerFile(struct HttpConnection_t *httpConnection) {
+ERROR_CODE reset_handler_file(struct HttpConnection_t *http_connection) {
     /* resets the http parser values */
-    _resetHttpParserHandlerFile(httpConnection->httpParser);
+    _reset_http_parser_handler_file(http_connection->http_parser);
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE messageBeginCallbackHandlerFile(struct HttpParser_t *httpParser) {
+ERROR_CODE message_begin_callback_handler_file(struct http_parser_t *http_parser) {
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE urlCallbackHandlerFile(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize) {
+ERROR_CODE url_callback_handler_file(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
     /* allocates the required space for the url, this
     is done through static allocation */
     unsigned char url[VIRIATUM_MAX_URL_SIZE];
 
     /* retrieves the handler file context from the http parser */
-    struct HandlerFileContext_t *handlerFileContext = (struct HandlerFileContext_t *) httpParser->context;
+    struct handler_file_context_t *handler_file_context = (struct handler_file_context_t *) http_parser->context;
 
     /* retrieves the connection from the http parser parameters and then
     uses it to access the service options using the service */
-    struct Connection_t *connection = (struct Connection_t *) httpParser->parameters;
+    struct Connection_t *connection = (struct Connection_t *) http_parser->parameters;
     struct Service_t *service = connection->service;
     struct ServiceOptions_t *options = service->options;
 
     /* copies the memory from the data to the url and then
     puts the end of string in the url */
-    memcpy(url, data, dataSize);
-    url[dataSize] = '\0';
+    memcpy(url, data, data_size);
+    url[data_size] = '\0';
 
     /* prints a debug message */
-    V_INFO_F("%s %s\n", getHttpMethodString(httpParser->method), url);
+    V_INFO_F("%s %s\n", get_http_method_string(http_parser->method), url);
 
     /* in case the string refers the base path (default handler must be used)
     the selection of the index file as defautl is conditioned by the default
     index configuration option */
-    if(options->defaultIndex && (strcmp((char *) url, "/") == 0 || strcmp((char *) url, "") == 0)) {
+    if(options->default_index && (strcmp((char *) url, "/") == 0 || strcmp((char *) url, "") == 0)) {
         /* copies the index reference as the url */
         memcpy(url, "/index.html", 12);
     }
 
     /* copies the url to the url reference in the handler file context */
-    memcpy(handlerFileContext->url, url, dataSize + 1);
+    memcpy(handler_file_context->url, url, data_size + 1);
 
     /* creates the file path from using the base viriatum path */
-    SPRINTF((char *) handlerFileContext->file_path, VIRIATUM_MAX_PATH_SIZE, "%s%s%s", VIRIATUM_CONTENTS_PATH, VIRIATUM_BASE_PATH, url);
+    SPRINTF((char *) handler_file_context->file_path, VIRIATUM_MAX_PATH_SIZE, "%s%s%s", VIRIATUM_CONTENTS_PATH, VIRIATUM_BASE_PATH, url);
 
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE headerFieldCallbackHandlerFile(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize) {
+ERROR_CODE header_field_callback_handler_file(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
     /* retrieves the handler file context from the http parser */
-    struct HandlerFileContext_t *handlerFileContext = (struct HandlerFileContext_t *) httpParser->context;
+    struct handler_file_context_t *handler_file_context = (struct handler_file_context_t *) http_parser->context;
 
     /* TODO: THIS SHOULD BE A BETTER PARSER STRUCTURE */
 
     /* checks for the if none match header value */
-    switch(dataSize) {
+    switch(data_size) {
         case 13:
             if(data[0] == 'I' && data[1] == 'f' && data[2] == '-' && data[3] == 'N') {
                 /* updates the etag status value (is next) */
-                handlerFileContext->etagStatus = 1;
+                handler_file_context->etag_status = 1;
 
                 /* breaks the switch */
                 break;
@@ -199,7 +199,7 @@ ERROR_CODE headerFieldCallbackHandlerFile(struct HttpParser_t *httpParser, const
 
             if(data[0] == 'C' && data[1] == 'a' && data[2] == 'c' && data[3] == 'h') {
                 /* updates the cache control status value (is next) */
-                handlerFileContext->cacheControlStatus = 1;
+                handler_file_context->cache_control_status = 1;
 
                 /* breaks the switch */
                 break;
@@ -213,23 +213,23 @@ ERROR_CODE headerFieldCallbackHandlerFile(struct HttpParser_t *httpParser, const
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE headerValueCallbackHandlerFile(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize) {
+ERROR_CODE header_value_callback_handler_file(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
     /* retrieves the handler file context from the http parser */
-    struct HandlerFileContext_t *handlerFileContext = (struct HandlerFileContext_t *) httpParser->context;
+    struct handler_file_context_t *handler_file_context = (struct handler_file_context_t *) http_parser->context;
 
     /* TODO: THIS SHOULD BE A SWITCH */
-    if(handlerFileContext->etagStatus == 1) {
-        memcpy(handlerFileContext->etag, data, 10);
-        handlerFileContext->etag[10] = '\0';
-        handlerFileContext->etagStatus = 2;
+    if(handler_file_context->etag_status == 1) {
+        memcpy(handler_file_context->etag, data, 10);
+        handler_file_context->etag[10] = '\0';
+        handler_file_context->etag_status = 2;
 
         RAISE_NO_ERROR;
     }
 
-    if(handlerFileContext->cacheControlStatus == 1) {
-        memcpy(handlerFileContext->cacheControl, data, dataSize);
-        handlerFileContext->cacheControl[dataSize] = '\0';
-        handlerFileContext->cacheControlStatus = 2;
+    if(handler_file_context->cache_control_status == 1) {
+        memcpy(handler_file_context->cache_control, data, data_size);
+        handler_file_context->cache_control[data_size] = '\0';
+        handler_file_context->cache_control_status = 2;
 
         RAISE_NO_ERROR;
     }
@@ -238,305 +238,305 @@ ERROR_CODE headerValueCallbackHandlerFile(struct HttpParser_t *httpParser, const
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE headersCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
+ERROR_CODE headers_complete_callback_handler_file(struct http_parser_t *http_parser) {
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE bodyCallbackHandlerFile(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize) {
+ERROR_CODE body_callback_handler_file(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
+ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_parser) {
     /* allocates the file size */
     size_t file_size;
 
     /* allocates space for the directory entries and for
     the template handler */
-    struct linked_list_t *directoryEntries;
-    struct linked_list_t *directoryEntriesMap;
+    struct linked_list_t *directory_entries;
+    struct linked_list_t *directory_entries_map;
     struct template_handler_t *template_handler;
 
     /* allocates space for the is directory and the is redirect flags */
     unsigned int is_directory = 0;
-    unsigned int isRedirect = 0;
+    unsigned int is_redirect = 0;
 
     /* allocates space for the new location value for
     redirect request cases and for the path to the
     template (for directory listing) */
     unsigned char location[1024];
-    unsigned char templatePath[1024];
+    unsigned char template_path[1024];
 
     /* allocates space for the computation of the time
     and of the time string, then allocates space for the
     etag calculation structure (crc32 value) and for the etag*/
     struct date_time_t time;
-    char timeString[20];
-    unsigned long crc32Value;
+    char time_string[20];
+    unsigned long crc32_value;
     char etag[11];
 
     /* allocates the space for the "read" result
     error code (valid by default) */
-    ERROR_CODE errorCode = 0;
+    ERROR_CODE error_code = 0;
 
     /* allocates the headers buffer (it will be releases automatically by the writter)
     it need to be allocated in the heap so it gets throught the request cycle */
-    char *headersBuffer = MALLOC(1024);
+    char *headers_buffer = MALLOC(1024);
 
     /* retrieves the handler file context from the http parser */
-    struct HandlerFileContext_t *handlerFileContext = (struct HandlerFileContext_t *) httpParser->context;
+    struct handler_file_context_t *handler_file_context = (struct handler_file_context_t *) http_parser->context;
 
     /* retrieves the connection from the http parser parameters */
-    struct Connection_t *connection = (struct Connection_t *) httpParser->parameters;
+    struct Connection_t *connection = (struct Connection_t *) http_parser->parameters;
 
     /* checks if the path being request is in fact a directory */
-    is_directory_file((char *) handlerFileContext->file_path, &is_directory);
+    is_directory_file((char *) handler_file_context->file_path, &is_directory);
 
     /* in case the file path being request referes a directory
     it must be checked and the entries retrieved to be rendered */
     if(is_directory) {
-        if(handlerFileContext->url[strlen((char *) handlerFileContext->url) - 1] != '/') {
+        if(handler_file_context->url[strlen((char *) handler_file_context->url) - 1] != '/') {
             /* creates the new location by adding the slash character to the current
             handler file context url (avoids directory confusion) */
-            memcpy(location, handlerFileContext->url, strlen((char *) handlerFileContext->url));
-            location[strlen((char *) handlerFileContext->url)] = '/';
-            location[strlen((char *) handlerFileContext->url) + 1] = '\0';
+            memcpy(location, handler_file_context->url, strlen((char *) handler_file_context->url));
+            location[strlen((char *) handler_file_context->url)] = '/';
+            location[strlen((char *) handler_file_context->url) + 1] = '\0';
 
             /* sets the is redirect flag (forces temporary redirect) */
-            isRedirect = 1;
+            is_redirect = 1;
         } else {
             /* creates the complete path to the template file */
-            SPRINTF((char *) templatePath, 1024, "%s%s", VIRIATUM_RESOURCES_PATH, VIRIATUM_LISTING_PATH);
+            SPRINTF((char *) template_path, 1024, "%s%s", VIRIATUM_RESOURCES_PATH, VIRIATUM_LISTING_PATH);
 
             /* pritns a debug message */
-            V_DEBUG_F("Processing template file '%s'\n", templatePath);
+            V_DEBUG_F("Processing template file '%s'\n", template_path);
 
             /* creates the directory entries (linked list) */
-            create_linked_list(&directoryEntries);
+            create_linked_list(&directory_entries);
 
             /* lists the directory file into the directory
             entries linked list and then converts them into maps */
-            list_directory_file((char *) handlerFileContext->file_path, directoryEntries);
-            entries_to_map_file(directoryEntries, &directoryEntriesMap);
+            list_directory_file((char *) handler_file_context->file_path, directory_entries);
+            entries_to_map_file(directory_entries, &directory_entries_map);
 
             /* creates the template handler */
             create_template_handler(&template_handler);
 
             /* assigns the directory entries to the template handler,
             this variable will be exposed to the template */
-            assign_list_template_handler(template_handler, (unsigned char *) "entries", directoryEntriesMap);
-            assign_integer_template_handler(template_handler, (unsigned char *) "items", (int) directoryEntriesMap->size);
+            assign_list_template_handler(template_handler, (unsigned char *) "entries", directory_entries_map);
+            assign_integer_template_handler(template_handler, (unsigned char *) "items", (int) directory_entries_map->size);
 
             /* processes the file as a template handler */
-            process_template_handler(template_handler, templatePath);
+            process_template_handler(template_handler, template_path);
 
             /* sets the template handler in the handler file context and unsets
             the flushed flag */
-            handlerFileContext->template_handler = template_handler;
-            handlerFileContext->flushed = 0;
+            handler_file_context->template_handler = template_handler;
+            handler_file_context->flushed = 0;
 
             /* deletes the directory entries map and the
             directory entries */
-            delete_directory_entries_map_file(directoryEntriesMap);
-            delete_directory_entries_file(directoryEntries);
+            delete_directory_entries_map_file(directory_entries_map);
+            delete_directory_entries_file(directory_entries);
 
             /* deletes the directory entries (linked list) and
             the entries map (linked list) */
-            delete_linked_list(directoryEntries);
-            delete_linked_list(directoryEntriesMap);
+            delete_linked_list(directory_entries);
+            delete_linked_list(directory_entries_map);
         }
     }
     /* otherwise the file path must refered a "normal" file path and
     it must be checked */
     else {
         /* counts the total size (in bytes) of the contents in the file path */
-        errorCode = count_file((char *) handlerFileContext->file_path, &file_size);
+        error_code = count_file((char *) handler_file_context->file_path, &file_size);
 
         /* in case there is no error count the file size, avoids
         extra problems while computing the etag */
-        if(!IS_ERROR_CODE(errorCode)) {
+        if(!IS_ERROR_CODE(error_code)) {
             /* resets the date time structure to avoid invalid
             date requests */
             memset(&time, 0, sizeof(struct date_time_t));
 
             /* retrieve the time of the last write in the file path */
-            get_write_time_file((char *) handlerFileContext->file_path, &time);
+            get_write_time_file((char *) handler_file_context->file_path, &time);
 
             /* creates the date time string for the file entry */
-            SPRINTF(timeString, 20, "%04d-%02d-%02d %02d:%02d:%02d", time.year, time.month, time.day, time.hour, time.minute, time.second);
+            SPRINTF(time_string, 20, "%04d-%02d-%02d %02d:%02d:%02d", time.year, time.month, time.day, time.hour, time.minute, time.second);
 
             /* creates the crc32 value and prints it into the
             etag as an heexadecimal string value */
-            crc32Value = crc32((unsigned char *) timeString, 19);
-            SPRINTF(etag, 11, "\"%08x\"", (unsigned int) crc32Value);
+            crc32_value = crc32((unsigned char *) time_string, 19);
+            SPRINTF(etag, 11, "\"%08x\"", (unsigned int) crc32_value);
         }
     }
 
     /* sets the (http) flags in the handler file context */
-    handlerFileContext->flags = httpParser->flags;
+    handler_file_context->flags = http_parser->flags;
 
     /* tests the error code for error */
-    if(IS_ERROR_CODE(errorCode)) {
+    if(IS_ERROR_CODE(error_code)) {
         /* prints the error */
         V_DEBUG_F("%s\n", get_last_error_message_safe());
 
         /* writes the http static headers to the response */
-        SPRINTF(headersBuffer, 1024, "HTTP/1.1 404 Not Found\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nCache-Control: no-cache, must-revalidate\r\nContent-Length: %lu\r\n\r\n404 - Not Found (%s)", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, (long unsigned int) strlen((char *) handlerFileContext->file_path) + 18, handlerFileContext->file_path);
+        SPRINTF(headers_buffer, 1024, "HTTP/1.1 404 Not Found\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nCache-Control: no-cache, must-revalidate\r\nContent-Length: %lu\r\n\r\n404 - Not Found (%s)", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, (long unsigned int) strlen((char *) handler_file_context->file_path) + 18, handler_file_context->file_path);
 
         /* writes both the headers to the connection, registers for the appropriate callbacks */
-        writeConnection(connection, (unsigned char *) headersBuffer, (unsigned int) strlen(headersBuffer), _cleanupHandlerFile, handlerFileContext);
-    } else if(isRedirect) {
+        write_connection(connection, (unsigned char *) headers_buffer, (unsigned int) strlen(headers_buffer), _cleanup_handler_file, handler_file_context);
+    } else if(is_redirect) {
         /* writes the http static headers to the response */
-        SPRINTF(headersBuffer, 1024, "HTTP/1.1 307 Temporary Redirect\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nContent-Length: 0\r\nLocation: %s\r\n\r\n", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, location);
+        SPRINTF(headers_buffer, 1024, "HTTP/1.1 307 Temporary Redirect\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nContent-Length: 0\r\nLocation: %s\r\n\r\n", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, location);
 
         /* writes both the headers to the connection, registers for the appropriate callbacks */
-        writeConnection(connection, (unsigned char *) headersBuffer, (unsigned int) strlen(headersBuffer), _cleanupHandlerFile, handlerFileContext);
+        write_connection(connection, (unsigned char *) headers_buffer, (unsigned int) strlen(headers_buffer), _cleanup_handler_file, handler_file_context);
     }
     /* in case the current situation is a directory list */
     else if(is_directory) {
         /* writes the http static headers to the response */
-        SPRINTF(headersBuffer, 1024, "HTTP/1.1 200 OK\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nCache-Control: no-cache, must-revalidate\r\nContent-Length: %lu\r\n\r\n", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, (long unsigned int) strlen((char *) handlerFileContext->template_handler->string_value));
+        SPRINTF(headers_buffer, 1024, "HTTP/1.1 200 OK\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nCache-Control: no-cache, must-revalidate\r\nContent-Length: %lu\r\n\r\n", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, (long unsigned int) strlen((char *) handler_file_context->template_handler->string_value));
 
         /* writes both the headers to the connection, registers for the appropriate callbacks */
-        writeConnection(connection, (unsigned char *) headersBuffer, (unsigned int) strlen(headersBuffer), _sendDataHandlerFile, handlerFileContext);
+        write_connection(connection, (unsigned char *) headers_buffer, (unsigned int) strlen(headers_buffer), _send_data_handler_file, handler_file_context);
     }
-    else if(handlerFileContext->etagStatus == 2 && strcmp(etag, (char *) handlerFileContext->etag) == 0) {
+    else if(handler_file_context->etag_status == 2 && strcmp(etag, (char *) handler_file_context->etag) == 0) {
         /* writes the http static headers to the response */
-        SPRINTF(headersBuffer, 1024, "HTTP/1.1 304 Not Modified\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nCache-Control: no-cache, must-revalidate\r\nContent-Length: 0\r\n\r\n", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU);
+        SPRINTF(headers_buffer, 1024, "HTTP/1.1 304 Not Modified\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nCache-Control: no-cache, must-revalidate\r\nContent-Length: 0\r\n\r\n", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU);
 
         /* writes both the headers to the connection, registers for the appropriate callbacks */
-        writeConnection(connection, (unsigned char *) headersBuffer, (unsigned int) strlen(headersBuffer), _cleanupHandlerFile, handlerFileContext);
+        write_connection(connection, (unsigned char *) headers_buffer, (unsigned int) strlen(headers_buffer), _cleanup_handler_file, handler_file_context);
     }
     /* otherwise there was no error in the file and it's a simple
     file situation (no directory) */
     else {
         /* writes the http static headers to the response */
-        SPRINTF(headersBuffer, 1024, "HTTP/1.1 200 OK\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nCache-Control: no-cache, must-revalidate\r\nETag: %s\r\nContent-Length: %lu\r\n\r\n", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, etag, (long unsigned int) file_size);
+        SPRINTF(headers_buffer, 1024, "HTTP/1.1 200 OK\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nCache-Control: no-cache, must-revalidate\r\nETag: %s\r\nContent-Length: %lu\r\n\r\n", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, etag, (long unsigned int) file_size);
 
         /* writes both the headers to the connection, registers for the appropriate callbacks */
-        writeConnection(connection, (unsigned char *) headersBuffer, strlen(headersBuffer), _sendChunkHandlerFile, handlerFileContext);
+        write_connection(connection, (unsigned char *) headers_buffer, strlen(headers_buffer), _send_chunk_handler_file, handler_file_context);
     }
 
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _setHttpParserHandlerFile(struct HttpParser_t *httpParser) {
+ERROR_CODE _set_http_parser_handler_file(struct http_parser_t *http_parser) {
     /* allocates space for the handler file context */
-    struct HandlerFileContext_t *handlerFileContext;
+    struct handler_file_context_t *handler_file_context;
 
     /* creates the handler file context */
-    createHandlerFileContext(&handlerFileContext);
+    create_handler_file_context(&handler_file_context);
 
     /* sets the handler file context as the context for the http parser */
-    httpParser->context = handlerFileContext;
+    http_parser->context = handler_file_context;
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _unsetHttpParserHandlerFile(struct HttpParser_t *httpParser) {
+ERROR_CODE _unset_http_parser_handler_file(struct http_parser_t *http_parser) {
     /* retrieves the handler file context from the http parser */
-    struct HandlerFileContext_t *handlerFileContext = (struct HandlerFileContext_t *) httpParser->context;
+    struct handler_file_context_t *handler_file_context = (struct handler_file_context_t *) http_parser->context;
 
     /* deletes the handler file context */
-    deleteHandlerFileContext(handlerFileContext);
+    delete_handler_file_context(handler_file_context);
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _resetHttpParserHandlerFile(struct HttpParser_t *httpParser) {
+ERROR_CODE _reset_http_parser_handler_file(struct http_parser_t *http_parser) {
     /* retrieves the handler file context from the http parser */
-    struct HandlerFileContext_t *handlerFileContext = (struct HandlerFileContext_t *) httpParser->context;
+    struct handler_file_context_t *handler_file_context = (struct handler_file_context_t *) http_parser->context;
 
     /* unsets the handler file context file */
-    handlerFileContext->file = NULL;
+    handler_file_context->file = NULL;
 
     /* unsets the handler file context flags */
-    handlerFileContext->flags = 0;
+    handler_file_context->flags = 0;
 
     /* resets both the etag and the cache control status */
-    handlerFileContext->etagStatus = 0;
-    handlerFileContext->cacheControlStatus = 0;
+    handler_file_context->etag_status = 0;
+    handler_file_context->cache_control_status = 0;
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _setHttpSettingsHandlerFile(struct HttpSettings_t *httpSettings) {
+ERROR_CODE _set_http_settings_handler_file(struct http_settings_t *http_settings) {
     /* sets the various callback functions in the http settings
     structure, these callbacks are going to be used in the runtime
     processing of http parser (runtime execution) */
-    httpSettings->on_message_begin = messageBeginCallbackHandlerFile;
-    httpSettings->on_url = urlCallbackHandlerFile;
-    httpSettings->on_header_field = headerFieldCallbackHandlerFile;
-    httpSettings->on_header_value = headerValueCallbackHandlerFile;
-    httpSettings->on_headers_complete = headersCompleteCallbackHandlerFile;
-    httpSettings->on_body = bodyCallbackHandlerFile;
-    httpSettings->on_message_complete = messageCompleteCallbackHandlerFile;
+    http_settings->on_message_begin = message_begin_callback_handler_file;
+    http_settings->on_url = url_callback_handler_file;
+    http_settings->on_header_field = header_field_callback_handler_file;
+    http_settings->on_header_value = header_value_callback_handler_file;
+    http_settings->on_headers_complete = headers_complete_callback_handler_file;
+    http_settings->on_body = body_callback_handler_file;
+    http_settings->on_message_complete = message_complete_callback_handler_file;
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _unsetHttpSettingsHandlerFile(struct HttpSettings_t *httpSettings) {
+ERROR_CODE _unset_http_settings_handler_file(struct http_settings_t *http_settings) {
     /* unsets the various callback functions from the http settings */
-    httpSettings->on_message_begin = NULL;
-    httpSettings->on_url = NULL;
-    httpSettings->on_header_field = NULL;
-    httpSettings->on_header_value = NULL;
-    httpSettings->on_headers_complete = NULL;
-    httpSettings->on_body = NULL;
-    httpSettings->on_message_complete = NULL;
+    http_settings->on_message_begin = NULL;
+    http_settings->on_url = NULL;
+    http_settings->on_header_field = NULL;
+    http_settings->on_header_value = NULL;
+    http_settings->on_headers_complete = NULL;
+    http_settings->on_body = NULL;
+    http_settings->on_message_complete = NULL;
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _cleanupHandlerFile(struct Connection_t *connection, struct Data_t *data, void *parameters) {
+ERROR_CODE _cleanup_handler_file(struct Connection_t *connection, struct Data_t *data, void *parameters) {
     /* casts the parameters as handler file context and then
     retrieves the flags argument for checking of connection */
-    struct HandlerFileContext_t *handlerFileContext = (struct HandlerFileContext_t *) parameters;
-    unsigned char flags = handlerFileContext->flags;
+    struct handler_file_context_t *handler_file_context = (struct handler_file_context_t *) parameters;
+    unsigned char flags = handler_file_context->flags;
 
     /* retrieves the underlying connection references in order to be
     able to operate over them, for unregister */
-    struct IoConnection_t *ioConnection = (struct IoConnection_t *) connection->lower;
-    struct HttpConnection_t *httpConnection = (struct HttpConnection_t *) ioConnection->lower;
+    struct IoConnection_t *io_connection = (struct IoConnection_t *) connection->lower;
+    struct HttpConnection_t *http_connection = (struct HttpConnection_t *) io_connection->lower;
 
     /* in case there is an http handler in the current connection must
     unset it (remove temporary information) */
-    if(httpConnection->httpHandler) {
+    if(http_connection->http_handler) {
         /* unsets the current http connection and then sets the reference
         to it in the http connection as unset */
-        httpConnection->httpHandler->unset(httpConnection);
-        httpConnection->httpHandler = NULL;
+        http_connection->http_handler->unset(http_connection);
+        http_connection->http_handler = NULL;
     }
 
     /* in case the connection is not meant to be kept alive */
     if(!(flags & FLAG_CONNECTION_KEEP_ALIVE)) {
         /* closes the connection */
-        connection->closeConnection(connection);
+        connection->close_connection(connection);
     }
 
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _sendChunkHandlerFile(struct Connection_t *connection, struct Data_t *data, void *parameters) {
+ERROR_CODE _send_chunk_handler_file(struct Connection_t *connection, struct Data_t *data, void *parameters) {
     /* allocates the number of bytes */
     size_t number_bytes;
 
     /* casts the parameters as handler file context */
-    struct HandlerFileContext_t *handlerFileContext = (struct HandlerFileContext_t *) parameters;
+    struct handler_file_context_t *handler_file_context = (struct handler_file_context_t *) parameters;
 
     /* retrieves the file path from the handler file context */
-    unsigned char *file_path = handlerFileContext->file_path;
+    unsigned char *file_path = handler_file_context->file_path;
 
     /* retrieves the file from the handler file context */
-    FILE *file = handlerFileContext->file;
+    FILE *file = handler_file_context->file;
 
     /* allocates the required buffer for the file */
     unsigned char *file_buffer = MALLOC(FILE_BUFFER_SIZE_HANDLER_FILE);
@@ -553,7 +553,7 @@ ERROR_CODE _sendChunkHandlerFile(struct Connection_t *connection, struct Data_t 
         }
 
         /* sets the file in the handler file context */
-        handlerFileContext->file = file;
+        handler_file_context->file = file;
     }
 
     /* reads the file contents */
@@ -562,15 +562,15 @@ ERROR_CODE _sendChunkHandlerFile(struct Connection_t *connection, struct Data_t 
     /* in case the number of read bytes is valid */
     if(number_bytes > 0) {
         /* writes both the file buffer to the connection */
-        writeConnection(connection, file_buffer, number_bytes, _sendChunkHandlerFile, handlerFileContext);
+        write_connection(connection, file_buffer, number_bytes, _send_chunk_handler_file, handler_file_context);
     }
     /* otherwise the file "transfer" is complete */
     else {
         /* unsets the file from the handler file context */
-        handlerFileContext->file = NULL;
+        handler_file_context->file = NULL;
 
         /* runs the cleanup handler file (releases internal structures) */
-        _cleanupHandlerFile(connection, data, parameters);
+        _cleanup_handler_file(connection, data, parameters);
 
         /* closes the file */
         fclose(file);
@@ -583,29 +583,29 @@ ERROR_CODE _sendChunkHandlerFile(struct Connection_t *connection, struct Data_t 
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _sendDataHandlerFile(struct Connection_t *connection, struct Data_t *data, void *parameters) {
+ERROR_CODE _send_data_handler_file(struct Connection_t *connection, struct Data_t *data, void *parameters) {
     /* casts the parameters as handler file context and then
     retrieves the templat handler from it */
-    struct HandlerFileContext_t *handlerFileContext = (struct HandlerFileContext_t *) parameters;
-    struct template_handler_t *template_handler = handlerFileContext->template_handler;
+    struct handler_file_context_t *handler_file_context = (struct handler_file_context_t *) parameters;
+    struct template_handler_t *template_handler = handler_file_context->template_handler;
 
     /* in case the handler file context is already flushed
     time to clenaup pending structures */
-    if(handlerFileContext->flushed) {
+    if(handler_file_context->flushed) {
         /* deletes the template handler (releases memory) and
         unsets the reference in the handler file context */
         delete_template_handler(template_handler);
-        handlerFileContext->template_handler = NULL;
+        handler_file_context->template_handler = NULL;
 
         /* runs the cleanup handler file (releases internal structures) */
-        _cleanupHandlerFile(connection, data, parameters);
+        _cleanup_handler_file(connection, data, parameters);
     }
     /* otherwise the "normal" write connection applies */
     else {
         /* writes the (file) data to the connection and sets the handler
         file context as flushed */
-        writeConnection(connection, template_handler->string_value, (unsigned int) strlen((char *) template_handler->string_value), _sendDataHandlerFile, handlerFileContext);
-        handlerFileContext->flushed = 1;
+        write_connection(connection, template_handler->string_value, (unsigned int) strlen((char *) template_handler->string_value), _send_data_handler_file, handler_file_context);
+        handler_file_context->flushed = 1;
 
         /* unsets the string value in the template handler (avoids double release) */
         template_handler->string_value = NULL;

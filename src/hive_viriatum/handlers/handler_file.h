@@ -48,7 +48,7 @@ struct HttpConnection_t;
  * the interpretation of the request for
  * the file handler.
  */
-typedef struct HandlerFileContext_t {
+typedef struct handler_file_context_t {
     /**
      * The url to be used for retrieving the file.
      */
@@ -86,32 +86,32 @@ typedef struct HandlerFileContext_t {
      */
     unsigned int flushed;
 
-    unsigned char cacheControlStatus;
-    unsigned char cacheControl[128];
+    unsigned char cache_control_status;
+    unsigned char cache_control[128];
 
-    unsigned char etagStatus;
+    unsigned char etag_status;
     unsigned char etag[11];
-} HandlerFileContext;
+} handler_file_context;
 
-ERROR_CODE createHandlerFileContext(struct HandlerFileContext_t **handlerFileContextPointer);
-ERROR_CODE deleteHandlerFileContext(struct HandlerFileContext_t *handlerFileContext);
-ERROR_CODE registerHandlerFile(struct Service_t *service);
-ERROR_CODE unregisterHandlerFile(struct Service_t *service);
-ERROR_CODE setHandlerFile(struct HttpConnection_t *httpConnection);
-ERROR_CODE unsetHandlerFile(struct HttpConnection_t *httpConnection);
-ERROR_CODE resetHandlerFile(struct HttpConnection_t *httpConnection);
-ERROR_CODE messageBeginCallbackHandlerFile(struct HttpParser_t *httpParser);
-ERROR_CODE urlCallbackHandlerFile(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize);
-ERROR_CODE headerFieldCallbackHandlerFile(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize);
-ERROR_CODE headerValueCallbackHandlerFile(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize);
-ERROR_CODE headersCompleteCallbackHandlerFile(struct HttpParser_t *httpParser);
-ERROR_CODE bodyCallbackHandlerFile(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize);
-ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser);
-ERROR_CODE _setHttpParserHandlerFile(struct HttpParser_t *httpParser);
-ERROR_CODE _unsetHttpParserHandlerFile(struct HttpParser_t *httpParser);
-ERROR_CODE _resetHttpParserHandlerFile(struct HttpParser_t *httpParser);
-ERROR_CODE _setHttpSettingsHandlerFile(struct HttpSettings_t *httpSettings);
-ERROR_CODE _unsetHttpSettingsHandlerFile(struct HttpSettings_t *httpSettings);
-ERROR_CODE _cleanupHandlerFile(struct Connection_t *connection, struct Data_t *data, void *parameters);
-ERROR_CODE _sendChunkHandlerFile(struct Connection_t *connection, struct Data_t *data, void *parameter);
-ERROR_CODE _sendDataHandlerFile(struct Connection_t *connection, struct Data_t *data, void *parameters);
+ERROR_CODE create_handler_file_context(struct handler_file_context_t **handler_file_context_pointer);
+ERROR_CODE delete_handler_file_context(struct handler_file_context_t *handler_file_context);
+ERROR_CODE register_handler_file(struct Service_t *service);
+ERROR_CODE unregister_handler_file(struct Service_t *service);
+ERROR_CODE set_handler_file(struct HttpConnection_t *http_connection);
+ERROR_CODE unset_handler_file(struct HttpConnection_t *http_connection);
+ERROR_CODE reset_handler_file(struct HttpConnection_t *http_connection);
+ERROR_CODE message_begin_callback_handler_file(struct http_parser_t *http_parser);
+ERROR_CODE url_callback_handler_file(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size);
+ERROR_CODE header_field_callback_handler_file(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size);
+ERROR_CODE header_value_callback_handler_file(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size);
+ERROR_CODE headers_complete_callback_handler_file(struct http_parser_t *http_parser);
+ERROR_CODE body_callback_handler_file(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size);
+ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_parser);
+ERROR_CODE _set_http_parser_handler_file(struct http_parser_t *http_parser);
+ERROR_CODE _unset_http_parser_handler_file(struct http_parser_t *http_parser);
+ERROR_CODE _reset_http_parser_handler_file(struct http_parser_t *http_parser);
+ERROR_CODE _set_http_settings_handler_file(struct http_settings_t *http_settings);
+ERROR_CODE _unset_http_settings_handler_file(struct http_settings_t *http_settings);
+ERROR_CODE _cleanup_handler_file(struct Connection_t *connection, struct Data_t *data, void *parameters);
+ERROR_CODE _send_chunk_handler_file(struct Connection_t *connection, struct Data_t *data, void *parameter);
+ERROR_CODE _send_data_handler_file(struct Connection_t *connection, struct Data_t *data, void *parameters);
