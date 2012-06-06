@@ -49,7 +49,7 @@
 /* forward references (avoids loop) */
 struct Data_t;
 struct Connection_t;
-struct HttpConnection_t;
+struct http_connection_t;
 
 typedef struct dispatch_handler_t {
     /**
@@ -76,13 +76,13 @@ typedef struct dispatch_handler_t {
     size_t regex_count;
 } dispatch_handler;
 
-ERROR_CODE create_dispatch_handler(struct dispatch_handler_t **dispatch_handler_pointer, struct HttpHandler_t *http_handler);
+ERROR_CODE create_dispatch_handler(struct dispatch_handler_t **dispatch_handler_pointer, struct http_handler_t *http_handler);
 ERROR_CODE delete_dispatch_handler(struct dispatch_handler_t *dispatch_handler);
 ERROR_CODE register_handler_dispatch(struct Service_t *service);
 ERROR_CODE unregister_handler_dispatch(struct Service_t *service);
-ERROR_CODE set_handler_dispatch(struct HttpConnection_t *http_connection);
-ERROR_CODE unset_handler_dispatch(struct HttpConnection_t *http_connection);
-ERROR_CODE reset_handler_dispatch(struct HttpConnection_t *http_connection);
+ERROR_CODE set_handler_dispatch(struct http_connection_t *http_connection);
+ERROR_CODE unset_handler_dispatch(struct http_connection_t *http_connection);
+ERROR_CODE reset_handler_dispatch(struct http_connection_t *http_connection);
 ERROR_CODE message_begin_callback_handler_dispatch(struct http_parser_t *http_parser);
 ERROR_CODE url_callback_handler_dispatch(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size);
 ERROR_CODE header_field_callback_handler_dispatch(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size);

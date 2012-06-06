@@ -35,18 +35,18 @@
 struct Data_t;
 struct Polling_t;
 struct Connection_t;
-struct HttpHandler_t;
+struct http_handler_t;
 
 /**
  * The function used to create a new handler instance
  * with a name and for the service context.
  */
-typedef ERROR_CODE (*serviceHttpHandlerAccess) (struct Service_t *, struct HttpHandler_t **, unsigned char *name);
+typedef ERROR_CODE (*serviceHttpHandlerAccess) (struct Service_t *, struct http_handler_t **, unsigned char *name);
 
 /**
  * The function used to update an handler state or value.
  */
-typedef ERROR_CODE (*serviceHttpHandlerUpdate) (struct Service_t *, struct HttpHandler_t *);
+typedef ERROR_CODE (*serviceHttpHandlerUpdate) (struct Service_t *, struct http_handler_t *);
 
 /**
  * The "default" function used to update a state in the connection
@@ -209,14 +209,14 @@ typedef struct Service_t {
      * The socket handle to the service
      * connection.
      */
-    SOCKET_HANDLE serviceSocketHandle;
+    SOCKET_HANDLE service_socket_handle;
 
     /**
      * The http handler currently in use.
      * Only one http (parser) handler can
      * be used at one given time.
      */
-    struct HttpHandler_t *http_handler;
+    struct http_handler_t *http_handler;
 
     /**
      * The reference to the polling (provider)
@@ -228,7 +228,7 @@ typedef struct Service_t {
      * The list of currenly available (active)
      * connections in the service.
      */
-    struct linked_list_t *connectionsList;
+    struct linked_list_t *connections_list;
 
     /**
      * The list of modules available for the
@@ -237,7 +237,7 @@ typedef struct Service_t {
      * modules any unloaded or failed module
      * should not be present in this list.
      */
-    struct linked_list_t *modulesList;
+    struct linked_list_t *modules_list;
 
     /**
      * The map of http handlers available
@@ -418,7 +418,7 @@ typedef struct Connection_t {
      * (provider).
      * This flag shall be used carefully.
      */
-    unsigned char writeRegistered;
+    unsigned char write_registered;
 
     /**
      * Queue containing the set of connections with
@@ -473,19 +473,19 @@ typedef struct Connection_t {
      * Callback function reference to be called
      * when data is available for reading.
      */
-    connectionCallback onRead;
+    connectionCallback on_read;
 
     /**
      * Callback function reference to be called
      * when the connection is ready for writing.
      */
-    connectionCallback onWrite;
+    connectionCallback on_write;
 
     /**
      * Callback function reference to be called
      * when the connection is an erroneous state.
      */
-    connectionCallback onError;
+    connectionCallback on_error;
 
     /**
      * Callback function reference to be called
@@ -713,7 +713,7 @@ ERROR_CODE createConnection(struct Connection_t **connectionPointer, SOCKET_HAND
  * @param connection The connection to be destroyed.
  * @return The resulting error code.
  */
-ERROR_CODE deleteConnection(struct Connection_t *connection);
+ERROR_CODE delete_connection(struct Connection_t *connection);
 
 /**
  * Writes the given data to the connection.
@@ -790,11 +790,11 @@ ERROR_CODE unregisterWriteConnection(struct Connection_t *connection);
  * @return The resulting error code.
  */
 ERROR_CODE allocConnection(struct Connection_t *connection, size_t size, void **dataPointer);
-ERROR_CODE createHttpHandlerService(struct Service_t *service, struct HttpHandler_t **httpHandlerPointer, unsigned char *name);
-ERROR_CODE deleteHttpHandlerService(struct Service_t *service, struct HttpHandler_t *http_handler);
-ERROR_CODE addHttpHandlerService(struct Service_t *service, struct HttpHandler_t *http_handler);
-ERROR_CODE removeHttpHandlerService(struct Service_t *service, struct HttpHandler_t *http_handler);
-ERROR_CODE getHttpHandlerService(struct Service_t *service, struct HttpHandler_t **httpHandlerPointer, unsigned char *name);
+ERROR_CODE createHttpHandlerService(struct Service_t *service, struct http_handler_t **http_handler_pointer, unsigned char *name);
+ERROR_CODE deleteHttpHandlerService(struct Service_t *service, struct http_handler_t *http_handler);
+ERROR_CODE addHttpHandlerService(struct Service_t *service, struct http_handler_t *http_handler);
+ERROR_CODE removeHttpHandlerService(struct Service_t *service, struct http_handler_t *http_handler);
+ERROR_CODE getHttpHandlerService(struct Service_t *service, struct http_handler_t **http_handler_pointer, unsigned char *name);
 ERROR_CODE _defaultOptionsService(struct Service_t *service, struct hash_map_t *arguments);
 ERROR_CODE _fileOptionsService(struct Service_t *service, struct hash_map_t *arguments);
 ERROR_CODE _comandLineOptionsService(struct Service_t *service, struct hash_map_t *arguments);

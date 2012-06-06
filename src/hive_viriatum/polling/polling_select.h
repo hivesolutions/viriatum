@@ -29,7 +29,7 @@
 
 #include "../system/system.h"
 
-typedef struct PollingSelect_t {
+typedef struct polling_select_t {
     /**
      * The polling reference, for top
      * level reference.
@@ -40,7 +40,7 @@ typedef struct PollingSelect_t {
      * The value of the highest socket
      * reference (performance issue).
      */
-    SOCKET_HANDLE socketsSetHighest;
+    SOCKET_HANDLE sockets_set_highest;
 
     /**
      * The socket set for the read sockets.
@@ -55,135 +55,137 @@ typedef struct PollingSelect_t {
     /**
      * The socket set for the error sockets.
      */
-    SOCKET_SET socketsErrorSet;
+    SOCKET_SET sockets_error_set;
 
     /**
      * The temporary socket set for the
      * read sockets.
      */
-    SOCKET_SET socketsReadSetTemporary;
+    SOCKET_SET sockets_read_set_temporary;
 
     /**
      * The temporary socket set for the
      * write sockets.
      */
-    SOCKET_SET socketsWriteSetTemporary;
+    SOCKET_SET sockets_write_set_temporary;
 
     /**
      * The temporary socket set for the
      * error sockets.
      */
-    SOCKET_SET socketsErrorSetTemporary;
+    SOCKET_SET sockets_error_set_temporary;
 
     /**
      * The buffer that holds the connections
      * with data available for read.
      */
-    struct Connection_t **readConnections;
+    struct Connection_t **read_connections;
 
     /**
      * The buffer that holds the connections
      * with data available for write.
      */
-    struct Connection_t **writeConnections;
+    struct Connection_t **write_connections;
 
     /**
      * The buffer that holds the connections
      * that are in an erroneous state
      */
-    struct Connection_t **errorConnections;
+    struct Connection_t **error_connections;
 
     /**
      * The buffer thatn holds the connections
      * to be house-jept (removed) at the end
      * of the polling cycle.
      */
-    struct Connection_t **removeConnections;
+    struct Connection_t **remove_connections;
 
     /**
      * The size of the read connections
      * buffer.
      */
-    unsigned int readConnectionsSize;
+    unsigned int read_connections_size;
 
     /**
      * The size of the write connections
      * buffer.
      */
-    unsigned int writeConnectionsSize;
+    unsigned int write_connections_size;
 
     /**
      * The size of the error connections
      * buffer.
      */
-    unsigned int errorConnectionsSize;
+    unsigned int error_connections_size;
 
     /**
      * The size of the remove connections
      * buffer.
      */
-    unsigned int removeConnectionsSize;
+    unsigned int remove_connections_size;
 
     /**
      * The timeout value used for the
      * select call.
      */
-    struct timeval selectTimeout;
+    struct timeval select_timeout;
 
     /**
      * The temporary select timeout value.
      */
-    struct timeval selectTimeoutTemporary;
-} PollingSelect;
+    struct timeval select_timeout_temporary;
+} polling_select;
 
-ERROR_CODE openPollingSelect(struct Polling_t *polling);
-ERROR_CODE closePollingSelect(struct Polling_t *polling);
-ERROR_CODE registerConnectionPollingSelect(struct Polling_t *polling, struct Connection_t *connection);
-ERROR_CODE unregisterConnectionPollingSelect(struct Polling_t *polling, struct Connection_t *connection);
-ERROR_CODE registerWritePollingSelect(struct Polling_t *polling, struct Connection_t *connection);
-ERROR_CODE unregisterWritePollingSelect(struct Polling_t *polling, struct Connection_t *connection);
-ERROR_CODE pollPollingSelect(struct Polling_t *polling);
-ERROR_CODE callPollingSelect(struct Polling_t *polling);
-ERROR_CODE _pollPollingSelect(struct PollingSelect_t *pollingSelect, struct Connection_t **readConnections, struct Connection_t **writeConnections, struct Connection_t **errorConnections, unsigned int *readConnectionsSize, unsigned int *writeConnectionsSize, unsigned int *errorConnectionsSize);
-ERROR_CODE _callPollingSelect(struct PollingSelect_t *pollingSelect, struct Connection_t **readConnections, struct Connection_t **writeConnections, struct Connection_t **errorConnections, struct Connection_t **removeConnections, unsigned int readConnectionsSize, unsigned int writeConnectionsSize, unsigned int errorConnectionsSize);
-ERROR_CODE _registerSocketsSetPollingSelect(struct PollingSelect_t *pollingSelect, SOCKET_HANDLE socket_handle, SOCKET_SET *sockets_set);
-ERROR_CODE _unregisterSocketsSetPollingSelect(struct PollingSelect_t *pollingSelect, SOCKET_HANDLE socket_handle, SOCKET_SET *sockets_set);
+void create_polling_select(struct polling_select_t **polling_select_pointer, struct Polling_t *polling);
+void delete_polling_select(struct polling_select_t *polling_select);
+ERROR_CODE open_polling_select(struct Polling_t *polling);
+ERROR_CODE close_polling_select(struct Polling_t *polling);
+ERROR_CODE register_connection_polling_select(struct Polling_t *polling, struct Connection_t *connection);
+ERROR_CODE unregister_connection_polling_select(struct Polling_t *polling, struct Connection_t *connection);
+ERROR_CODE register_write_polling_select(struct Polling_t *polling, struct Connection_t *connection);
+ERROR_CODE unregister_write_polling_select(struct Polling_t *polling, struct Connection_t *connection);
+ERROR_CODE poll_polling_select(struct Polling_t *polling);
+ERROR_CODE call_polling_select(struct Polling_t *polling);
+ERROR_CODE _poll_polling_select(struct polling_select_t *polling_select, struct Connection_t **read_connections, struct Connection_t **write_connections, struct Connection_t **error_connections, unsigned int *read_connections_size, unsigned int *write_connections_size, unsigned int *error_connections_size);
+ERROR_CODE _call_polling_select(struct polling_select_t *polling_select, struct Connection_t **read_connections, struct Connection_t **write_connections, struct Connection_t **error_connections, struct Connection_t **remove_connections, unsigned int read_connections_size, unsigned int write_connections_size, unsigned int error_connections_size);
+ERROR_CODE _register_sockets_set_polling_select(struct polling_select_t *polling_select, SOCKET_HANDLE socket_handle, SOCKET_SET *sockets_set);
+ERROR_CODE _unregister_sockets_set_polling_select(struct polling_select_t *polling_select, SOCKET_HANDLE socket_handle, SOCKET_SET *sockets_set);
 
 /**
  * Removes a connection from the remove connections array.
  * This method checks for duplicates and in case they exist, no
  * connection is added.
  *
- * @param removeConnections The list of connection for removal.
- * @param removeConnectionsSizePointer A pointer to the sisze
+ * @param remove_connections The list of connection for removal.
+ * @param remove_connections_size_pointer A pointer to the sisze
  * of the remove connections array.
  * @param connection The connection to be removed (deleted).
  */
-static __inline void removeConnection(struct Connection_t **removeConnections, unsigned int *removeConnectionsSizePointer, struct Connection_t *connection) {
+static __inline void remove_connection(struct Connection_t **remove_connections, unsigned int *remove_connections_size_pointer, struct Connection_t *connection) {
     /* allocates the index */
     unsigned int index;
 
     /* allocates the current connection */
-    struct Connection_t *currentConnection;
+    struct Connection_t *current_connection;
 
     /* retrieves the remove connections size */
-    unsigned int removeConnectionsSize = *removeConnectionsSizePointer;
+    unsigned int remove_connections_size = *remove_connections_size_pointer;
 
     /* iterates over the remove connections */
-    for(index = 0; index < removeConnectionsSize; index++) {
+    for(index = 0; index < remove_connections_size; index++) {
         /* retrieves the current connection */
-        currentConnection = removeConnections[index];
+        current_connection = remove_connections[index];
 
         /* in case the current connection already exists */
-        if(currentConnection == connection) {
+        if(current_connection == connection) {
             /* returns immediately */
             return;
         }
     }
 
     /* adds the connection to the remove connections */
-    removeConnections[removeConnectionsSize] = connection;
+    remove_connections[remove_connections_size] = connection;
 
     /* increments the remove connections size */
-    (*removeConnectionsSizePointer)++;
+    (*remove_connections_size_pointer)++;
 }

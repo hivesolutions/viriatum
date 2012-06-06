@@ -120,9 +120,9 @@ ERROR_CODE acceptHandlerStreamIo(struct Connection_t *connection) {
 
             /* sets the various stream io connection callbacks
             in the client connection */
-            clientConnection->onRead = readHandlerStreamIo;
-            clientConnection->onWrite = writeHandlerStreamIo;
-            clientConnection->onError = errorHandlerStreamIo;
+            clientConnection->on_read = readHandlerStreamIo;
+            clientConnection->on_write = writeHandlerStreamIo;
+            clientConnection->on_error = errorHandlerStreamIo;
             clientConnection->onOpen = openHandlerStreamIo;
             clientConnection->onClose = closeHandlerStreamIo;
 
@@ -449,15 +449,15 @@ ERROR_CODE openHandlerStreamIo(struct Connection_t *connection) {
     set the appropriate connection handlers */
     switch(connection->protocol) {
         case HTTP_PROTOCOL:
-            io_connection->onData = dataHandlerStreamHttp;
-            io_connection->onOpen = openHandlerStreamHttp;
-            io_connection->onClose = closeHandlerStreamHttp;
+            io_connection->onData = data_handler_stream_http;
+            io_connection->onOpen = open_handler_stream_http;
+            io_connection->onClose = close_handler_stream_http;
             break;
 
         case HTTP_CLIENT_PROTOCOL:
-            io_connection->onData = dataHandlerStreamHttpClient;
-            io_connection->onOpen = openHandlerStreamHttpClient;
-            io_connection->onClose = closeHandlerStreamHttpClient;
+            io_connection->onData = data_handler_stream_http_client;
+            io_connection->onOpen = open_handler_stream_http_client;
+            io_connection->onClose = close_handler_stream_http_client;
             break;
 
         case TORRENT_PROTOCOL:
@@ -467,9 +467,9 @@ ERROR_CODE openHandlerStreamIo(struct Connection_t *connection) {
             break;
 
         default:
-            io_connection->onData = dataHandlerStreamHttp;
-            io_connection->onOpen = openHandlerStreamHttp;
-            io_connection->onClose = closeHandlerStreamHttp;
+            io_connection->onData = data_handler_stream_http;
+            io_connection->onOpen = open_handler_stream_http;
+            io_connection->onClose = close_handler_stream_http;
             break;
     }
 

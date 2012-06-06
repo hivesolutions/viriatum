@@ -29,7 +29,7 @@
 
 /* forward references (avoids loop) */
 struct Service_t;
-struct HttpHandler_t;
+struct http_handler_t;
 
 typedef struct Globals_t {
     unsigned char *lastErrorMessage;

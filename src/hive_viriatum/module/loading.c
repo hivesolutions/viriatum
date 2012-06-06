@@ -29,24 +29,24 @@
 
 #include "loading.h"
 
-ERROR_CODE createEnvironment(struct Environment_t **environmentPointer) {
+ERROR_CODE create_environment(struct environment_t **environment_pointer) {
     /* retrieves the environment size */
-    size_t environmentSize = sizeof(struct Environment_t);
+    size_t environment_size = sizeof(struct environment_t);
 
     /* allocates space for the environment */
-    struct Environment_t *environment = (struct Environment_t *) MALLOC(environmentSize);
+    struct environment_t *environment = (struct environment_t *) MALLOC(environment_size);
 
     /* sets the environment attributes (default) values */
     environment->name = NULL;
 
     /* sets the environment in the environment pointer */
-    *environmentPointer = environment;
+    *environment_pointer = environment;
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE deleteEnvironment(struct Environment_t *environment) {
+ERROR_CODE delete_environment(struct environment_t *environment) {
     /* releases the environment */
     FREE(environment);
 
@@ -54,12 +54,12 @@ ERROR_CODE deleteEnvironment(struct Environment_t *environment) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE createModule(struct Module_t **modulePointer) {
+ERROR_CODE create_module(struct module_t **module_pointer) {
     /* retrieves the module size */
-    size_t moduleSize = sizeof(struct Module_t);
+    size_t module_size = sizeof(struct module_t);
 
     /* allocates space for the module */
-    struct Module_t *module = (struct Module_t *) MALLOC(moduleSize);
+    struct module_t *module = (struct module_t *) MALLOC(module_size);
 
      /* sets the module attributes (default) values */
     module->name = NULL;
@@ -73,13 +73,13 @@ ERROR_CODE createModule(struct Module_t **modulePointer) {
     module->lower = NULL;
 
     /* sets the module in the module pointer */
-    *modulePointer = module;
+    *module_pointer = module;
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE deleteModule(struct Module_t *module) {
+ERROR_CODE delete_module(struct module_t *module) {
     /* releases the module */
     FREE(module);
 
@@ -87,7 +87,7 @@ ERROR_CODE deleteModule(struct Module_t *module) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE loadModule(struct Service_t *service, unsigned char *modulePath) {
+ERROR_CODE load_module(struct Service_t *service, unsigned char *module_path) {
     /* error code to be used for testing */
     ERROR_CODE error_code;
 
@@ -98,34 +98,34 @@ ERROR_CODE loadModule(struct Service_t *service, unsigned char *modulePath) {
     LIBRARY_SYMBOL symbol;
 
     /* the environment parameters reference */
-    struct Environment_t *environment;
+    struct environment_t *environment;
 
     /* the module structure reference */
-    struct Module_t *module;
+    struct module_t *module;
 
     /* the info module function reference */
-    viriatumInfoModule infoModuleFunction;
+    viriatum_info_module info_module_function;
 
     /* prints a debug message */
-    V_DEBUG_F("Loading module (%s)\n", modulePath);
+    V_DEBUG_F("Loading module (%s)\n", module_path);
 
     /* loads the library (tries to find the file) */
-    library = LOAD_LIBRARY((const char *) modulePath);
+    library = LOAD_LIBRARY((const char *) module_path);
 
     /* in case the library was not loaded */
     if(library == NULL) {
         /* retrieves the library error message */
-        const char *errorMessage = GET_LIBRARY_ERROR_MESSAGE();
+        const char *error_message = GET_LIBRARY_ERROR_MESSAGE();
 
         /* in case no error message is found, must
         set the default errro message */
-        if(errorMessage == NULL) {
+        if(error_message == NULL) {
             /* sets the default assumed error message */
-            errorMessage = "File not found";
+            error_message = "File not found";
         }
 
         /* prints a warning message */
-        V_WARNING_F("Error loading library (%s)\n", errorMessage);
+        V_WARNING_F("Error loading library (%s)\n", error_message);
 
         /* raises an error */
         RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Error loading library");
@@ -138,10 +138,10 @@ ERROR_CODE loadModule(struct Service_t *service, unsigned char *modulePath) {
     symbol = GET_LIBRARY_SYMBOL(library, "infoModule");
 
     /* retrieves the info module function reference */
-    infoModuleFunction = *((viriatumInfoModule *)(&symbol));
+    info_module_function = *((viriatum_info_module *)(&symbol));
 
     /* in case the start module function was not found */
-    if(infoModuleFunction == NULL) {
+    if(info_module_function == NULL) {
         /* prints a warning message */
         V_WARNING_F("No such symbol '%s' in library\n", "infoModule");
 
@@ -153,10 +153,10 @@ ERROR_CODE loadModule(struct Service_t *service, unsigned char *modulePath) {
     }
 
     /* creates the environment */
-    createEnvironment(&environment);
+    create_environment(&environment);
 
     /* creates the module */
-    createModule(&module);
+    create_module(&module);
 
     /* sets the module attributes */
     module->environment = environment;
@@ -166,7 +166,7 @@ ERROR_CODE loadModule(struct Service_t *service, unsigned char *modulePath) {
     environment->service = service;
 
     /* calls the info module function */
-    error_code = infoModuleFunction(module);
+    error_code = info_module_function(module);
 
     /* tests the error code for error */
     if(IS_ERROR_CODE(error_code)) {
@@ -184,24 +184,24 @@ ERROR_CODE loadModule(struct Service_t *service, unsigned char *modulePath) {
     }
 
     /* adds the module to the list of modlues handlers in the service */
-    append_value_linked_list(service->modulesList, (void *) module);
+    append_value_linked_list(service->modules_list, (void *) module);
 
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE unloadModule(struct Service_t *service, struct Module_t *module) {
+ERROR_CODE unload_module(struct Service_t *service, struct module_t *module) {
     /* allocates the error code */
     ERROR_CODE error_code;
 
     /* retrieves the environment from the module */
-    struct Environment_t *environment = module->environment;
+    struct environment_t *environment = module->environment;
 
     /* retrieves the library from the module */
     LIBRARY_REFERENCE library = module->library;
 
     /* removes the module from the list of modlues handlers in the service */
-    remove_value_linked_list(service->modulesList, (void *) module, 1);
+    remove_value_linked_list(service->modules_list, (void *) module, 1);
 
     /* calls the stop module function */
     error_code = module->stop(environment, module);
@@ -213,10 +213,10 @@ ERROR_CODE unloadModule(struct Service_t *service, struct Module_t *module) {
     }
 
     /* deletes the module */
-    deleteModule(module);
+    delete_module(module);
 
     /* deletes the environment */
-    deleteEnvironment(environment);
+    delete_environment(environment);
 
     /* unloads the library */
     UNLOAD_LIBRARY(library);
