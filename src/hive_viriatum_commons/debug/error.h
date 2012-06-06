@@ -28,7 +28,7 @@
 #pragma once
 
 #ifdef VIRIATUM_PLATFORM_WIN32
-#define DEBUGGER __debugbreak();
+#define DEBUGGER __debugreak();
 #else
 #define DEBUGGER
 #endif
@@ -39,16 +39,16 @@
 #define EMPTY_ERROR_MESSAGE "N/A"
 
 #define ERROR_CODE unsigned int
-#define RAISE_AGAIN(errorCode) return errorCode
-#define RAISE_ERROR(errorCode) setLastErrorMessage(NULL); return errorCode
-#define RAISE_ERROR_M(errorCode, errorMessage) setLastErrorMessage(errorMessage); return errorCode
-#define RAISE_ERROR_S(errorCode) return errorCode
+#define RAISE_AGAIN(error_code) return error_code
+#define RAISE_ERROR(error_code) set_last_error_message(NULL); return error_code
+#define RAISE_ERROR_M(error_code, error_message) set_last_error_message(error_message); return error_code
+#define RAISE_ERROR_S(error_code) return error_code
 #define RAISE_NO_ERROR return 0
-#define IS_ERROR_CODE(errorCode) errorCode != 0
-#define GET_ERROR getLastErrorMessageSafe
+#define IS_ERROR_CODE(error_code) error_code != 0
+#define GET_ERROR get_last_error_message_safe
 
-VIRIATUM_EXTERNAL_PREFIX unsigned int lastErrorCode;
-VIRIATUM_EXTERNAL_PREFIX unsigned char *lastErrorMessage;
+VIRIATUM_EXTERNAL_PREFIX unsigned int last_error_code;
+VIRIATUM_EXTERNAL_PREFIX unsigned char *last_error_message;
 
 /**
  * Retrieves the last (current) error code available.
@@ -57,31 +57,31 @@ VIRIATUM_EXTERNAL_PREFIX unsigned char *lastErrorMessage;
  *
  * @return The last (current) error code available.
  */
-static __inline unsigned int getLastErrorCode() {
-    return lastErrorCode;
+static __inline unsigned int get_last_error_code() {
+    return last_error_code;
 }
 
-static __inline void setLastErrorCode(ERROR_CODE errorCode) {
-    lastErrorCode = errorCode;
+static __inline void set_last_error_code(ERROR_CODE error_code) {
+    last_error_code = error_code;
 }
 
-static __inline unsigned char *getLastErrorMessage() {
-    return lastErrorMessage;
+static __inline unsigned char *get_last_error_message() {
+    return last_error_message;
 }
 
-static __inline unsigned char *getLastErrorMessageSafe() {
+static __inline unsigned char *get_last_error_message_safe() {
     /* in case the last error message is not set */
-    if(lastErrorMessage == NULL) {
+    if(last_error_message == NULL) {
         /* returns the empty error message */
         return (unsigned char *) EMPTY_ERROR_MESSAGE;
     }
     /* otherwise (normal behaviour */
     else {
         /* returns the last error message */
-        return lastErrorMessage;
+        return last_error_message;
     }
 }
 
-static __inline void setLastErrorMessage(unsigned char *errorMessage) {
-    lastErrorMessage = errorMessage;
+static __inline void set_last_error_message(unsigned char *error_message) {
+    last_error_message = error_message;
 }
