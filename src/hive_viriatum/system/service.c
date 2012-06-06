@@ -779,7 +779,7 @@ ERROR_CODE loadModulesService(struct Service_t *service) {
 
         /* in case the entry name does not ends with the shared object extension
         it must not be a module to be loaded */
-        if(endsWithString(entry->name, (unsigned char *) VIRIATUM_SHARED_OBJECT_EXTENSION) == 0) {
+        if(ends_with_string(entry->name, (unsigned char *) VIRIATUM_SHARED_OBJECT_EXTENSION) == 0) {
             /* continue with the loop */
             continue;
         }
