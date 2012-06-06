@@ -29,17 +29,17 @@
 
 #include "handler.h"
 
-void create_template_handler(struct TemplateHandler_t **templateHandlerPointer) {
+void create_template_handler(struct template_handler_t **template_handler_pointer) {
     /* retrieves the template handler size */
-    size_t templateHandlerSize = sizeof(struct TemplateHandler_t);
+    size_t template_handler_size = sizeof(struct template_handler_t);
 
     /* allocates space for the template handler */
-    struct TemplateHandler_t *template_handler = (struct TemplateHandler_t *) MALLOC(templateHandlerSize);
+    struct template_handler_t *template_handler = (struct template_handler_t *) MALLOC(template_handler_size);
 
     /* sets the default values in the template handler */
     template_handler->string_value = NULL;
-    template_handler->currentNode = NULL;
-    template_handler->temporaryNode = NULL;
+    template_handler->current_node = NULL;
+    template_handler->temporary_node = NULL;
     template_handler->nodes = NULL;
     template_handler->contexts = NULL;
 
@@ -52,15 +52,15 @@ void create_template_handler(struct TemplateHandler_t **templateHandlerPointer) 
 
     /* creates the list to hold the various types
     to have the memory released uppon destruction */
-    create_linked_list(&template_handler->releaseList);
+    create_linked_list(&template_handler->release_list);
 
     /* sets the template engine in the template handler pointer */
-    *templateHandlerPointer = template_handler;
+    *template_handler_pointer = template_handler;
 }
 
-void delete_template_handler(struct TemplateHandler_t *template_handler) {
+void delete_template_handler(struct template_handler_t *template_handler) {
     /* allocates space for the temporary node variable */
-    struct TemplateNode_t *node;
+    struct template_node_t *node;
 
     /* allocates space for the temporary type */
     struct type_t *type;
@@ -92,7 +92,7 @@ void delete_template_handler(struct TemplateHandler_t *template_handler) {
             }
 
             /* deletes the template node */
-            deleteTemplateNode(node);
+            delete_template_node(node);
         }
 
         /* deletes the nodes list */
@@ -103,7 +103,7 @@ void delete_template_handler(struct TemplateHandler_t *template_handler) {
     cleanup (type memory release) */
     while(1) {
         /* pops a node from the release list */
-        pop_value_linked_list(template_handler->releaseList, (void **) &type, 1);
+        pop_value_linked_list(template_handler->release_list, (void **) &type, 1);
 
         /* in case the value is invalid (empty list) */
         if(type == NULL) {
@@ -116,7 +116,7 @@ void delete_template_handler(struct TemplateHandler_t *template_handler) {
     }
 
     /* deletes the list of release types from the template handler */
-    delete_linked_list(template_handler->releaseList);
+    delete_linked_list(template_handler->release_list);
 
     /* deletes the string buffer */
     delete_string_buffer(template_handler->string_buffer);
@@ -128,44 +128,44 @@ void delete_template_handler(struct TemplateHandler_t *template_handler) {
     FREE(template_handler);
 }
 
-void createTemplateNode(struct TemplateNode_t **templateNodePointer, enum TemplateNodeType_e type) {
+void create_template_node(struct template_node_t **template_node_pointer, enum template_node_type_e type) {
     /* retrieves the template node size */
-    size_t templateNodeSize = sizeof(struct TemplateNode_t);
+    size_t template_node_size = sizeof(struct template_node_t);
 
     /* allocates space for the template node */
-    struct TemplateNode_t *templateNode = (struct TemplateNode_t *) MALLOC(templateNodeSize);
+    struct template_node_t *template_node = (struct template_node_t *) MALLOC(template_node_size);
 
     /* sets the (node) type in the template node */
-    templateNode->type = type;
+    template_node->type = type;
 
     /* sets the default values in the template node */
-    templateNode->name = NULL;
-    templateNode->children = NULL;
-    templateNode->parameters = NULL;
-    templateNode->parametersMap = NULL;
-    templateNode->temporaryParameter = NULL;
+    template_node->name = NULL;
+    template_node->children = NULL;
+    template_node->parameters = NULL;
+    template_node->parameters_map = NULL;
+    template_node->temporary_parameter = NULL;
 
     /* sets the template engine in the template node pointer */
-    *templateNodePointer = templateNode;
+    *template_node_pointer = template_node;
 }
 
-void deleteTemplateNode(struct TemplateNode_t *templateNode) {
+void delete_template_node(struct template_node_t *template_node) {
     /* allocates space for the temporary parameter variable */
-    struct TemplateParameter_t *parameter;
+    struct template_parameter_t *parameter;
 
     /* in case the template parameters map are defined */
-    if(templateNode->parametersMap) {
+    if(template_node->parameters_map) {
         /* deletes the parameters map */
-        delete_hash_map(templateNode->parametersMap);
+        delete_hash_map(template_node->parameters_map);
     }
 
     /* in case the template parameters are defined */
-    if(templateNode->parameters) {
+    if(template_node->parameters) {
         /* iterates continuously for parameters list
         cleanup (removal of all parameters) */
         while(1) {
             /* pops a parameter from the parameters list */
-            pop_value_linked_list(templateNode->parameters, (void **) &parameter, 1);
+            pop_value_linked_list(template_node->parameters, (void **) &parameter, 1);
 
             /* in case the value is invalid (empty list) */
             if(parameter == NULL) {
@@ -174,109 +174,109 @@ void deleteTemplateNode(struct TemplateNode_t *templateNode) {
             }
 
             /* deletes the template parameter */
-            deleteTemplateParameter(parameter);
+            delete_template_parameter(parameter);
         }
 
         /* deletes the parameters list */
-        delete_linked_list(templateNode->parameters);
+        delete_linked_list(template_node->parameters);
     }
 
     /* in case the template children are defined */
-    if(templateNode->children) {
+    if(template_node->children) {
         /* deletes the children list */
-        delete_linked_list(templateNode->children);
+        delete_linked_list(template_node->children);
     }
 
     /* in case the name is defined in the template node */
-    if(templateNode->name) {
+    if(template_node->name) {
         /* releases the template node name */
-        FREE(templateNode->name);
+        FREE(template_node->name);
     }
 
     /* releases the template node */
-    FREE(templateNode);
+    FREE(template_node);
 }
 
-void createTemplateParameter(struct TemplateParameter_t **templateParameterPointer) {
+void create_template_parameter(struct template_parameter_t **template_parameter_pointer) {
     /* retrieves the template parameter size */
-    size_t templateParameterSize = sizeof(struct TemplateParameter_t);
+    size_t template_parameter_size = sizeof(struct template_parameter_t);
 
     /* allocates space for the template parameter */
-    struct TemplateParameter_t *templateParameter = (struct TemplateParameter_t *) MALLOC(templateParameterSize);
+    struct template_parameter_t *template_parameter = (struct template_parameter_t *) MALLOC(template_parameter_size);
 
     /* sets the default values in the template parameter */
-    templateParameter->type = 0;
-    templateParameter->intValue = 0;
-    templateParameter->floatValue = 0.0;
+    template_parameter->type = 0;
+    template_parameter->int_value = 0;
+    template_parameter->float_value = 0.0;
 
     /* sets the template engine in the template parameter pointer */
-    *templateParameterPointer = templateParameter;
+    *template_parameter_pointer = template_parameter;
 }
 
-void deleteTemplateParameter(struct TemplateParameter_t *templateParameter) {
+void delete_template_parameter(struct template_parameter_t *template_parameter) {
     /* releases the template parameter */
-    FREE(templateParameter);
+    FREE(template_parameter);
 }
 
-void process_template_handler(struct TemplateHandler_t *template_handler, unsigned char *file_path) {
+void process_template_handler(struct template_handler_t *template_handler, unsigned char *file_path) {
      /* allocates space for the template engine */
-    struct TemplateEngine_t *templateEngine;
+    struct template_engine_t *template_engine;
 
     /* allocates space for the template settings */
-    struct TemplateSettings_t *templateSettings;
+    struct template_settings_t *template_settings;
 
     /* allocates space for the root node */
-    struct TemplateNode_t *rootNode;
+    struct template_node_t *root_node;
 
     /* creates the template engine */
-    createTemplateEngine(&templateEngine);
+    create_template_engine(&template_engine);
 
     /* creates the template engine */
-    createTemplateSettings(&templateSettings);
+    create_template_settings(&template_settings);
 
     /* creates the root node and sets it as the initial
     current node */
-    createTemplateNode(&rootNode, TEMPLATE_NODE_ROOT);
-    template_handler->currentNode = rootNode;
+    create_template_node(&root_node, TEMPLATE_NODE_ROOT);
+    template_handler->current_node = root_node;
 
     /* sets the context (template handler) in the template engine */
-    templateEngine->context = template_handler;
+    template_engine->context = template_handler;
 
     /* sets the various callbacks in the template settings */
-    templateSettings->ontextBegin = _textBeginCallback;
-    templateSettings->ontextEnd = _textEndCallback;
-    templateSettings->ontagBegin = _tagBeginCallback;
-    templateSettings->ontagCloseBegin = _tagCloseBeginCallback;
-    templateSettings->ontagEnd = _tagEndCallback;
-    templateSettings->ontagName = _tagNameCallback;
-    templateSettings->onparameter = _parameterCallback;
-    templateSettings->onparameterValue = _parameterValueCallback;
+    template_settings->on_text_begin = _text_begin_callback;
+    template_settings->on_text_end = _text_end_callback;
+    template_settings->on_tag_begin = _tag_begin_callback;
+    template_settings->on_tag_close_begin = _tag_close_begin_callback;
+    template_settings->on_tag_end = _tag_end_callback;
+    template_settings->on_tag_name = _tag_name_callback;
+    template_settings->on_parameter = _parameter_callback;
+    template_settings->on_parameter_value = _parameter_value_callback;
 
     /* processes the file as a template engine and then uses the
     created node structure to traverse for string buffer output */
-    processTemplateEngine(templateEngine, templateSettings, file_path);
-    traverseNodeBuffer(template_handler, template_handler->currentNode);
+    process_template_engine(template_engine, template_settings, file_path);
+    traverse_node_buffer(template_handler, template_handler->current_node);
 
     /* "joins" the template handler string buffer into the string
     value, retrieving the final template result */
     join_string_buffer(template_handler->string_buffer, &template_handler->string_value);
 
     /* deletes the now unecessary root node */
-    deleteTemplateNode(rootNode);
+    delete_template_node(root_node);
 
     /* deletes the template settings */
-    deleteTemplateSettings(templateSettings);
+    delete_template_settings(template_settings);
 
     /* deletes the template engine */
-    deleteTemplateEngine(templateEngine);
+    delete_template_engine(template_engine);
 }
 
-void assignTemplateHandler(struct TemplateHandler_t *template_handler, unsigned char *name, struct type_t *value) {
+void assign_template_handler(struct template_handler_t *template_handler, unsigned char *name, struct type_t *value) {
     /* sets the a new name (key) in the names hash map */
     set_value_string_hash_map(template_handler->names, name, value);
 }
 
-void assignIntegerTemplateHandler(struct TemplateHandler_t *template_handler, unsigned char *name, int value) {
+void assign_integer_template_handler(struct template_handler_t *template_handler, unsigned char *name, int value) {
     /* allocates space for the type */
     struct type_t *type;
 
@@ -290,10 +290,10 @@ void assignIntegerTemplateHandler(struct TemplateHandler_t *template_handler, un
 
     /* adds the type to the list of types to have the
     memory release uppon template handler destruction (late removal) */
-    append_value_linked_list(template_handler->releaseList, type);
+    append_value_linked_list(template_handler->release_list, type);
 }
 
-void assignListTemplateHandler(struct TemplateHandler_t *template_handler, unsigned char *name, struct linked_list_t *value) {
+void assign_list_template_handler(struct template_handler_t *template_handler, unsigned char *name, struct linked_list_t *value) {
     /* allocates space for the type */
     struct type_t *type;
 
@@ -307,14 +307,14 @@ void assignListTemplateHandler(struct TemplateHandler_t *template_handler, unsig
 
     /* adds the type to the list of types to have the
     memory release uppon template handler destruction (late removal) */
-    append_value_linked_list(template_handler->releaseList, type);
+    append_value_linked_list(template_handler->release_list, type);
 }
 
-void getTemplateHandler(struct TemplateHandler_t *template_handler, unsigned char *name, struct type_t **value_pointer) {
+void get_template_handler(struct template_handler_t *template_handler, unsigned char *name, struct type_t **value_pointer) {
     /* allocates space for the temporary (tokanizable) name variable
     and for the generated token values*/
     unsigned char _name[64];
-    unsigned char *nameToken;
+    unsigned char *name_token;
     unsigned char *context;
 
     /* allocates space for the (type) value */
@@ -328,20 +328,20 @@ void getTemplateHandler(struct TemplateHandler_t *template_handler, unsigned cha
     memcpy(_name, name, strlen((char *) name) + 1);
 
     /* tokenizes the name into tokens */
-    nameToken = (unsigned char *) STRTOK((char *) _name, ".", context);
+    name_token = (unsigned char *) STRTOK((char *) _name, ".", context);
 
     /* iterates continuously */
     while(1) {
         /* in case the name token is invalid
         (no more tokens available) */
-        if(nameToken == NULL) {
+        if(name_token == NULL) {
             /* breaks the loop */
             break;
         }
 
         /* retrieves the value from the current value with the
         name token reference key value */
-        get_value_string_hash_map(_value, nameToken, (void **) &value);
+        get_value_string_hash_map(_value, name_token, (void **) &value);
 
         /* in case the retrieve value is not valid
         (not found), must break immediately */
@@ -355,7 +355,7 @@ void getTemplateHandler(struct TemplateHandler_t *template_handler, unsigned cha
         _value = value->value.value_map;
 
         /* retrieves the next token */
-        nameToken = (unsigned char *) STRTOK(NULL, ".", context);
+        name_token = (unsigned char *) STRTOK(NULL, ".", context);
     }
 
     /* sets the value pointer with the internal
@@ -363,13 +363,13 @@ void getTemplateHandler(struct TemplateHandler_t *template_handler, unsigned cha
     *value_pointer = value;
 }
 
-void traverseNodeDebug(struct TemplateHandler_t *template_handler, struct TemplateNode_t *node, unsigned int indentation) {
+void traverse_node_debug(struct template_handler_t *template_handler, struct template_node_t *node, unsigned int indentation) {
     /* allocates space for the iterator to be used to retrieve
     the various children from the node */
-    struct iterator_t *childIterator;
+    struct iterator_t *child_iterator;
 
     /* allocates space for the child element */
-    struct TemplateNode_t *child;
+    struct template_node_t *child;
 
     /* allocates space for the index counter */
     unsigned int index;
@@ -396,12 +396,12 @@ void traverseNodeDebug(struct TemplateHandler_t *template_handler, struct Templa
     }
 
     /* creates a "new" iterator for the children linked list */
-    create_iterator_linked_list(node->children, &childIterator);
+    create_iterator_linked_list(node->children, &child_iterator);
 
     /* iterates continuously for children percolation */
     while(1) {
         /* retrieves the child element from the child iterator */
-        get_next_iterator(childIterator, (void **) &child);
+        get_next_iterator(child_iterator, (void **) &child);
 
         /* in case the child is not valid (no more items available) */
         if(child == NULL) {
@@ -410,20 +410,20 @@ void traverseNodeDebug(struct TemplateHandler_t *template_handler, struct Templa
         }
 
         /* traverses the child node (recursion step) */
-        traverseNodeDebug(template_handler, child, indentation + 1);
+        traverse_node_debug(template_handler, child, indentation + 1);
     }
 
     /* deletes the child iterator */
-    delete_iterator_linked_list(node->children, childIterator);
+    delete_iterator_linked_list(node->children, child_iterator);
 }
 
-void traverseNodeBuffer(struct TemplateHandler_t *template_handler, struct TemplateNode_t *node) {
+void traverse_node_buffer(struct template_handler_t *template_handler, struct template_node_t *node) {
     /* switches over the type of node to be traversed,
     to print the correct value */
     switch(node->type) {
         case TEMPLATE_NODE_ROOT:
             /* traverses all the nodes in the root node */
-            traverseNodesBuffer(template_handler, node);
+            traverse_nodes_buffer(template_handler, node);
 
             /* breaks the switch */
             break;
@@ -439,13 +439,13 @@ void traverseNodeBuffer(struct TemplateHandler_t *template_handler, struct Templ
         case TEMPLATE_NODE_OPEN:
             if(strcmp((char *) node->name, "out") == 0) {
                 /* traverses the out node in buffer mode */
-                _traverseOutBuffer(template_handler, node);
+                _traverse_out_buffer(template_handler, node);
             } else if(strcmp((char *) node->name, "foreach") == 0) {
                 /* traverses the foreach node in buffer mode */
-                _traverseForEachBuffer(template_handler, node);
+                _traverse_for_each_buffer(template_handler, node);
             } else if(strcmp((char *) node->name, "if") == 0) {
                 /* traverses the if node in buffer mode */
-                _traverseIfBuffer(template_handler, node);
+                _traverse_if_buffer(template_handler, node);
             }
 
             /* breaks the switch */
@@ -457,13 +457,13 @@ void traverseNodeBuffer(struct TemplateHandler_t *template_handler, struct Templ
     }
 }
 
-void traverseNodesBuffer(struct TemplateHandler_t *template_handler, struct TemplateNode_t *node) {
+void traverse_nodes_buffer(struct template_handler_t *template_handler, struct template_node_t *node) {
     /* allocates space for the iterator to be used to retrieve
     the various children from the node */
-    struct iterator_t *childIterator;
+    struct iterator_t *child_iterator;
 
     /* allocates space for the child element */
-    struct TemplateNode_t *child;
+    struct template_node_t *child;
 
     /* in case the node contains no children, it should
     be a leaf node (nothing to be done) */
@@ -473,12 +473,12 @@ void traverseNodesBuffer(struct TemplateHandler_t *template_handler, struct Temp
     }
 
     /* creates a "new" iterator for the children linked list */
-    create_iterator_linked_list(node->children, &childIterator);
+    create_iterator_linked_list(node->children, &child_iterator);
 
     /* iterates continuously for children percolation */
     while(1) {
         /* retrieves the child element from the child iterator */
-        get_next_iterator(childIterator, (void **) &child);
+        get_next_iterator(child_iterator, (void **) &child);
 
         /* in case the child is not valid (no more items available) */
         if(child == NULL) {
@@ -487,17 +487,17 @@ void traverseNodesBuffer(struct TemplateHandler_t *template_handler, struct Temp
         }
 
         /* traverses the child node (recursion step) */
-        traverseNodeBuffer(template_handler, child);
+        traverse_node_buffer(template_handler, child);
     }
 
     /* deletes the child iterator */
-    delete_iterator_linked_list(node->children, childIterator);
+    delete_iterator_linked_list(node->children, child_iterator);
 }
 
-void _traverseOutBuffer(struct TemplateHandler_t *template_handler, struct TemplateNode_t *node) {
+void _traverse_out_buffer(struct template_handler_t *template_handler, struct template_node_t *node) {
     /* allocates space for the value parameter and for
     the value reference */
-    struct TemplateParameter_t *valueParameter;
+    struct template_parameter_t *value_parameter;
     struct type_t *value;
 
     /* allocates the buffer to hold the string conversion
@@ -505,21 +505,21 @@ void _traverseOutBuffer(struct TemplateHandler_t *template_handler, struct Templ
     unsigned char *buffer;
 
     /* retrieves value parameter from the parameters map */
-    get_value_string_hash_map(node->parametersMap, (unsigned char *) "value", (void **) &valueParameter);
+    get_value_string_hash_map(node->parameters_map, (unsigned char *) "value", (void **) &value_parameter);
 
     /* switches over the value parameter type to
     update the string buffer accordingly */
-    switch(valueParameter->type) {
+    switch(value_parameter->type) {
         case TEMPLATE_PARAMETER_STRING:
             /* adds the string value of the value to the string buffer */
-            append_string_buffer(template_handler->string_buffer, valueParameter->string_value);
+            append_string_buffer(template_handler->string_buffer, value_parameter->string_value);
 
             /* breaks the switch */
             break;
 
         case TEMPLATE_PARAMETER_REFERENCE:
             /* retrievs the value reference from the global names map */
-            getTemplateHandler(template_handler, valueParameter->referenceValue, &value);
+            get_template_handler(template_handler, value_parameter->reference_value, &value);
 
             /* in case the value was successfully found */
             if(value != NULL) {
@@ -536,14 +536,14 @@ void _traverseOutBuffer(struct TemplateHandler_t *template_handler, struct Templ
 
         case TEMPLATE_PARAMETER_INTEGER:
             /* adds the raw value of the value to the string buffer */
-            append_string_buffer(template_handler->string_buffer, valueParameter->rawValue);
+            append_string_buffer(template_handler->string_buffer, value_parameter->raw_value);
 
             /* breaks the switch */
             break;
 
         case TEMPLATE_PARAMETER_FLOAT:
             /* adds the raw value of the value to the string buffer */
-            append_string_buffer(template_handler->string_buffer, valueParameter->rawValue);
+            append_string_buffer(template_handler->string_buffer, value_parameter->raw_value);
 
             /* breaks the switch */
             break;
@@ -554,10 +554,10 @@ void _traverseOutBuffer(struct TemplateHandler_t *template_handler, struct Templ
     }
 }
 
-void _traverseForEachBuffer(struct TemplateHandler_t *template_handler, struct TemplateNode_t *node) {
+void _traverse_for_each_buffer(struct template_handler_t *template_handler, struct template_node_t *node) {
     /* allocates space for the item and the from parameters */
-    struct TemplateParameter_t *itemParameter;
-    struct TemplateParameter_t *fromParameter;
+    struct template_parameter_t *item_parameter;
+    struct template_parameter_t *from_parameter;
 
     /* allocates space for the (type) value, to be used
     in the retrieval of the value from the names map */
@@ -569,15 +569,15 @@ void _traverseForEachBuffer(struct TemplateHandler_t *template_handler, struct T
     struct iterator_t *iterator;
 
     /* allocates space for the current vale temporary variable */
-    void *_currentValue;
+    void *_current_value;
 
     /* retrieves both the item and from parameters from the parameters map */
-    get_value_string_hash_map(node->parametersMap, (unsigned char *) "item", (void **) &itemParameter);
-    get_value_string_hash_map(node->parametersMap, (unsigned char *) "from", (void **) &fromParameter);
+    get_value_string_hash_map(node->parameters_map, (unsigned char *) "item", (void **) &item_parameter);
+    get_value_string_hash_map(node->parameters_map, (unsigned char *) "from", (void **) &from_parameter);
 
     /* tries to retrieve the reference value from the map of names in the
     template handler (dereferencing) */
-    getTemplateHandler(template_handler, fromParameter->referenceValue, &value);
+    get_template_handler(template_handler, from_parameter->reference_value, &value);
 
     /* in case the value was not found */
     if(value == NULL) {
@@ -596,10 +596,10 @@ void _traverseForEachBuffer(struct TemplateHandler_t *template_handler, struct T
     iterator element */
     while(1) {
         /* retrieves the next (current) value from the iterator */
-        get_next_iterator(iterator, (void **) &_currentValue);
+        get_next_iterator(iterator, (void **) &_current_value);
 
         /* in case the current value is not set (end of sequence) */
-        if(_currentValue == NULL) {
+        if(_current_value == NULL) {
             /* breaks the loop */
             break;
         }
@@ -607,31 +607,31 @@ void _traverseForEachBuffer(struct TemplateHandler_t *template_handler, struct T
         /* assigns the current iteration value to the global names
         in the template handler (to be used in the current context) and
         then traverses the child nodes of the node */
-        assignTemplateHandler(template_handler, itemParameter->referenceValue, _currentValue);
-        traverseNodesBuffer(template_handler, node);
+        assign_template_handler(template_handler, item_parameter->reference_value, _current_value);
+        traverse_nodes_buffer(template_handler, node);
     }
 
     /* deletes the iterator */
     delete_iterator_linked_list(list, iterator);
 }
 
-void _traverseIfBuffer(struct TemplateHandler_t *template_handler, struct TemplateNode_t *node) {
+void _traverse_if_buffer(struct template_handler_t *template_handler, struct template_node_t *node) {
     /* allocates space for the item, the value and the operator parameters */
-    struct TemplateParameter_t *itemParameter;
-    struct TemplateParameter_t *valueParameter;
-    struct TemplateParameter_t *operatorParameter;
+    struct template_parameter_t *item_parameter;
+    struct template_parameter_t *value_parameter;
+    struct template_parameter_t *operator_parameter;
 
     /* allocates space for the value to be retrieved */
     struct type_t *value;
 
     /* retrieves both the from and the item parameters from the parameters map */
-    get_value_string_hash_map(node->parametersMap, (unsigned char *) "item", (void **) &itemParameter);
-    get_value_string_hash_map(node->parametersMap, (unsigned char *) "value", (void **) &valueParameter);
-    get_value_string_hash_map(node->parametersMap, (unsigned char *) "operator", (void **) &operatorParameter);
+    get_value_string_hash_map(node->parameters_map, (unsigned char *) "item", (void **) &item_parameter);
+    get_value_string_hash_map(node->parameters_map, (unsigned char *) "value", (void **) &value_parameter);
+    get_value_string_hash_map(node->parameters_map, (unsigned char *) "operator", (void **) &operator_parameter);
 
     /* tries to retrieve the reference value from the map of names in the
     template handler (dereferencing) */
-    getTemplateHandler(template_handler, (unsigned char *) "entry.type", &value);
+    get_template_handler(template_handler, (unsigned char *) "entry.type", &value);
 
     /* in case the value was not found */
     if(value == NULL) {
@@ -639,20 +639,20 @@ void _traverseIfBuffer(struct TemplateHandler_t *template_handler, struct Templa
         return;
     }
 
-    if(value->value.value_int != valueParameter->intValue) {
+    if(value->value.value_int != value_parameter->int_value) {
         return;
     }
 
     /* traverses the child nodes of the node
     (condition validated and verified) */
-    traverseNodesBuffer(template_handler, node);
+    traverse_nodes_buffer(template_handler, node);
 }
 
-ERROR_CODE _openContextTemplateHandler(struct TemplateHandler_t *template_handler) {
+ERROR_CODE _open_context_template_handler(struct template_handler_t *template_handler) {
     /* allocates space for the current and for the temporary node
     and retieves them from the template handeler */
-    struct TemplateNode_t *currentNode = template_handler->currentNode;
-    struct TemplateNode_t *temporaryNode = template_handler->temporaryNode;
+    struct template_node_t *current_node = template_handler->current_node;
+    struct template_node_t *temporary_node = template_handler->temporary_node;
 
     /* in case the list of context is not yet created,
     must be created for context memory */
@@ -663,51 +663,51 @@ ERROR_CODE _openContextTemplateHandler(struct TemplateHandler_t *template_handle
 
     /* adds the current node to the list of (past) contexts and
     sets the temporary node as the currect (context) node */
-    append_value_linked_list(template_handler->contexts, currentNode);
-    template_handler->currentNode = temporaryNode;
+    append_value_linked_list(template_handler->contexts, current_node);
+    template_handler->current_node = temporary_node;
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _closeContextTemplateHandler(struct TemplateHandler_t *template_handler) {
+ERROR_CODE _close_context_template_handler(struct template_handler_t *template_handler) {
     /* pops the last context into the template handler current node */
-    pop_top_value_linked_list(template_handler->contexts, (void **) &template_handler->currentNode, 1);
+    pop_top_value_linked_list(template_handler->contexts, (void **) &template_handler->current_node, 1);
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _textBeginCallback(struct TemplateEngine_t *templateEngine) {
+ERROR_CODE _text_begin_callback(struct template_engine_t *template_engine) {
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _textEndCallback(struct TemplateEngine_t *templateEngine, const unsigned char *pointer, size_t size) {
+ERROR_CODE _text_end_callback(struct template_engine_t *template_engine, const unsigned char *pointer, size_t size) {
     /* allocates space for the template node */
-    struct TemplateNode_t *templateNode;
+    struct template_node_t *template_node;
 
     /* retrieves the template handler from the template engine context
     and retrieves the current node from it */
-    struct TemplateHandler_t *template_handler = (struct TemplateHandler_t *) templateEngine->context;
-    struct TemplateNode_t *currentNode = template_handler->currentNode;
+    struct template_handler_t *template_handler = (struct template_handler_t *) template_engine->context;
+    struct template_node_t *current_node = template_handler->current_node;
 
     /* creates a new template node and sets the template
     node as the temporary node in the template handler */
-    createTemplateNode(&templateNode, TEMPLATE_NODE_TEXT);
-    template_handler->temporaryNode = templateNode;
+    create_template_node(&template_node, TEMPLATE_NODE_TEXT);
+    template_handler->temporary_node = template_node;
 
     /* allocates the space for the temporary node name and
     sets it with a memory copy */
-    templateNode->name = (unsigned char *) MALLOC(size + 1);
-    memcpy(templateNode->name, pointer, size);
-    templateNode->name[size] = '\0';
+    template_node->name = (unsigned char *) MALLOC(size + 1);
+    memcpy(template_node->name, pointer, size);
+    template_node->name[size] = '\0';
 
     /* in case the children (list) are not defined for the
     current node node */
-    if(currentNode->children == NULL) {
+    if(current_node->children == NULL) {
         /* creates a new linked list for the children */
-        create_linked_list(&currentNode->children);
+        create_linked_list(&current_node->children);
     }
 
     /* in case the nodes (list) are not defined for the
@@ -719,70 +719,70 @@ ERROR_CODE _textEndCallback(struct TemplateEngine_t *templateEngine, const unsig
 
     /* adds the temporary node to the current list of nodes
     in the template handler and to the chilren list of the current node */
-    append_value_linked_list(template_handler->nodes, templateNode);
-    append_value_linked_list(currentNode->children, templateNode);
+    append_value_linked_list(template_handler->nodes, template_node);
+    append_value_linked_list(current_node->children, template_node);
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _tagBeginCallback(struct TemplateEngine_t *templateEngine) {
+ERROR_CODE _tag_begin_callback(struct template_engine_t *template_engine) {
     /* allocates space for the template node */
-    struct TemplateNode_t *templateNode;
+    struct template_node_t *template_node;
 
     /* retrieves the template handler from the template engine context */
-    struct TemplateHandler_t *template_handler = (struct TemplateHandler_t *) templateEngine->context;
+    struct template_handler_t *template_handler = (struct template_handler_t *) template_engine->context;
 
     /* creates a new template node and sets the template
     node as the temporary node in the template handler */
-    createTemplateNode(&templateNode, TEMPLATE_NODE_OPEN);
-    template_handler->temporaryNode = templateNode;
+    create_template_node(&template_node, TEMPLATE_NODE_OPEN);
+    template_handler->temporary_node = template_node;
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _tagCloseBeginCallback(struct TemplateEngine_t *templateEngine) {
+ERROR_CODE _tag_close_begin_callback(struct template_engine_t *template_engine) {
     /* retrieves the template handler from the template engine context
     and retrieves the temporary node from it */
-    struct TemplateHandler_t *template_handler = (struct TemplateHandler_t *) templateEngine->context;
-    struct TemplateNode_t *temporaryNode = template_handler->temporaryNode;
+    struct template_handler_t *template_handler = (struct template_handler_t *) template_engine->context;
+    struct template_node_t *temporary_node = template_handler->temporary_node;
 
     /* sets the temporary node type as close */
-    temporaryNode->type = TEMPLATE_NODE_CLOSE;
+    temporary_node->type = TEMPLATE_NODE_CLOSE;
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _tagEndCallback(struct TemplateEngine_t *templateEngine, const unsigned char *pointer, size_t size) {
+ERROR_CODE _tag_end_callback(struct template_engine_t *template_engine, const unsigned char *pointer, size_t size) {
     /* retrieves the template handler from the template engine context
     and retrieves the temporary node from it */
-    struct TemplateHandler_t *template_handler = (struct TemplateHandler_t *) templateEngine->context;
-    struct TemplateNode_t *temporaryNode = template_handler->temporaryNode;
+    struct template_handler_t *template_handler = (struct template_handler_t *) template_engine->context;
+    struct template_node_t *temporary_node = template_handler->temporary_node;
 
     /* retrieves the current node from the template handler */
-    struct TemplateNode_t *currentNode = template_handler->currentNode;
+    struct template_node_t *current_node = template_handler->current_node;
 
     /* in case the node does contain the closing
     symbol at the final part of the tag (assumes single node) */
     if(pointer[size - 2] == '/') {
         /* sets the temporary node type as single */
-        temporaryNode->type = TEMPLATE_NODE_SINGLE;
+        temporary_node->type = TEMPLATE_NODE_SINGLE;
     }
 
     /* switches over the temporary node type */
-    switch(temporaryNode->type) {
+    switch(temporary_node->type) {
         case TEMPLATE_NODE_OPEN:
             /* opens a new context for the current node */
-            _openContextTemplateHandler(template_handler);
+            _open_context_template_handler(template_handler);
 
             /* breaks the switch */
             break;
 
         case TEMPLATE_NODE_CLOSE:
             /* closes the current context (node closed) */
-            _closeContextTemplateHandler(template_handler);
+            _close_context_template_handler(template_handler);
 
             /* breaks the switch */
             break;
@@ -793,9 +793,9 @@ ERROR_CODE _tagEndCallback(struct TemplateEngine_t *templateEngine, const unsign
     }
 
     /* in case the temporary node is of type close */
-    if(temporaryNode->type == TEMPLATE_NODE_CLOSE) {
+    if(temporary_node->type == TEMPLATE_NODE_CLOSE) {
         /* deletes the temporary node (no need to process it) */
-        deleteTemplateNode(temporaryNode);
+        delete_template_node(temporary_node);
 
         /* raise no error */
         RAISE_NO_ERROR;
@@ -803,9 +803,9 @@ ERROR_CODE _tagEndCallback(struct TemplateEngine_t *templateEngine, const unsign
 
     /* in case the children (list) are not defined for the
     current node */
-    if(currentNode->children == NULL) {
+    if(current_node->children == NULL) {
         /* creates a new linked list for the children */
-        create_linked_list(&currentNode->children);
+        create_linked_list(&current_node->children);
     }
 
     /* in case the nodes (list) are not defined for the
@@ -817,99 +817,99 @@ ERROR_CODE _tagEndCallback(struct TemplateEngine_t *templateEngine, const unsign
 
     /* adds the temporary node to the current list of nodes
     in the template handler and to the chilren list of the temporary node */
-    append_value_linked_list(currentNode->children, temporaryNode);
-    append_value_linked_list(template_handler->nodes, temporaryNode);
+    append_value_linked_list(current_node->children, temporary_node);
+    append_value_linked_list(template_handler->nodes, temporary_node);
 
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _tagNameCallback(struct TemplateEngine_t *templateEngine, const unsigned char *pointer, size_t size) {
+ERROR_CODE _tag_name_callback(struct template_engine_t *template_engine, const unsigned char *pointer, size_t size) {
     /* retrieves the template handler from the template engine context
     and retrieves the temporary node from it */
-    struct TemplateHandler_t *template_handler = (struct TemplateHandler_t *) templateEngine->context;
-    struct TemplateNode_t *temporaryNode = template_handler->temporaryNode;
+    struct template_handler_t *template_handler = (struct template_handler_t *) template_engine->context;
+    struct template_node_t *temporary_node = template_handler->temporary_node;
 
     /* allocates the space for the temporary node name and
     sets it with a memory copy */
-    temporaryNode->name = (unsigned char *) MALLOC(size + 1);
-    memcpy(temporaryNode->name, pointer, size);
-    temporaryNode->name[size] = '\0';
+    temporary_node->name = (unsigned char *) MALLOC(size + 1);
+    memcpy(temporary_node->name, pointer, size);
+    temporary_node->name[size] = '\0';
 
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _parameterCallback(struct TemplateEngine_t *templateEngine, const unsigned char *pointer, size_t size) {
+ERROR_CODE _parameter_callback(struct template_engine_t *template_engine, const unsigned char *pointer, size_t size) {
     /* retrieves the template handler from the template engine context
     and retrieves the temporary node from it */
-    struct TemplateHandler_t *template_handler = (struct TemplateHandler_t *) templateEngine->context;
-    struct TemplateNode_t *temporaryNode = template_handler->temporaryNode;
+    struct template_handler_t *template_handler = (struct template_handler_t *) template_engine->context;
+    struct template_node_t *temporary_node = template_handler->temporary_node;
 
     /* allocates space for the parameter to be created */
-    struct TemplateParameter_t *templateParameter;
+    struct template_parameter_t *template_parameter;
 
     /* in case the parameters (list) are not defined for the
     temporary node */
-    if(temporaryNode->parameters == NULL) {
+    if(temporary_node->parameters == NULL) {
         /* creates a new linked list for the parameters */
-        create_linked_list(&temporaryNode->parameters);
+        create_linked_list(&temporary_node->parameters);
     }
 
     /* in case the parameters (map) are not defined for the
     temporary node */
-    if(temporaryNode->parametersMap == NULL) {
+    if(temporary_node->parameters_map == NULL) {
         /* creates a new hash map for the parameters */
-        create_hash_map(&temporaryNode->parametersMap, 0);
+        create_hash_map(&temporary_node->parameters_map, 0);
     }
 
     /* creates the template parameter, sets it as the temporary parameter
     in the temporary node and adds it to the list of parameters */
-    createTemplateParameter(&templateParameter);
-    temporaryNode->temporaryParameter = templateParameter;
-    append_value_linked_list(temporaryNode->parameters, templateParameter);
+    create_template_parameter(&template_parameter);
+    temporary_node->temporary_parameter = template_parameter;
+    append_value_linked_list(temporary_node->parameters, template_parameter);
 
     /* sets the name in the template parameter throught a memory copy */
-    memcpy(templateParameter->name, pointer, size);
-    templateParameter->name[size] = '\0';
+    memcpy(template_parameter->name, pointer, size);
+    template_parameter->name[size] = '\0';
 
     /* sets the parameter reference in the parameters map */
-    set_value_string_hash_map(temporaryNode->parametersMap, templateParameter->name, templateParameter);
+    set_value_string_hash_map(temporary_node->parameters_map, template_parameter->name, template_parameter);
 
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _parameterValueCallback(struct TemplateEngine_t *templateEngine, const unsigned char *pointer, size_t size) {
+ERROR_CODE _parameter_value_callback(struct template_engine_t *template_engine, const unsigned char *pointer, size_t size) {
     /* retrieves the template handler from the template engine context
     and retrieves the temporary node from it and then uses it to retrieve
     the temporary parameter */
-    struct TemplateHandler_t *template_handler = (struct TemplateHandler_t *) templateEngine->context;
-    struct TemplateNode_t *temporaryNode = template_handler->temporaryNode;
-    struct TemplateParameter_t *temporaryParameter = temporaryNode->temporaryParameter;
+    struct template_handler_t *template_handler = (struct template_handler_t *) template_engine->context;
+    struct template_node_t *temporary_node = template_handler->temporary_node;
+    struct template_parameter_t *temporary_parameter = temporary_node->temporary_parameter;
 
     /* sets the raw value in the template parameter throught a memory copy */
-    memcpy(temporaryParameter->rawValue, pointer, size);
-    temporaryParameter->rawValue[size] = '\0';
+    memcpy(temporary_parameter->raw_value, pointer, size);
+    temporary_parameter->raw_value[size] = '\0';
 
     /* in case the first character of the raw value is
     a start string character the value must be a string */
-    if(temporaryParameter->rawValue[0] == '"') {
-        memcpy(temporaryParameter->string_value, pointer + 1, size - 2);
-        temporaryParameter->string_value[size - 2] = '\0';
-        temporaryParameter->type = TEMPLATE_PARAMETER_STRING;
+    if(temporary_parameter->raw_value[0] == '"') {
+        memcpy(temporary_parameter->string_value, pointer + 1, size - 2);
+        temporary_parameter->string_value[size - 2] = '\0';
+        temporary_parameter->type = TEMPLATE_PARAMETER_STRING;
     }
     /* in case the first character of the raw value is a numeric
     value it must be a number */
-    else if(temporaryParameter->rawValue[0] > 0x2f && temporaryParameter->rawValue[0] < 0x58) {
-        temporaryParameter->intValue = atoi((char *) temporaryParameter->rawValue);
-        temporaryParameter->type = TEMPLATE_PARAMETER_INTEGER;
+    else if(temporary_parameter->raw_value[0] > 0x2f && temporary_parameter->raw_value[0] < 0x58) {
+        temporary_parameter->int_value = atoi((char *) temporary_parameter->raw_value);
+        temporary_parameter->type = TEMPLATE_PARAMETER_INTEGER;
     }
     /* othwerwise it must be a (variable) reference value */
     else {
-        memcpy(temporaryParameter->referenceValue, pointer, size);
-        temporaryParameter->referenceValue[size] = '\0';
-        temporaryParameter->type = TEMPLATE_PARAMETER_REFERENCE;
+        memcpy(temporary_parameter->reference_value, pointer, size);
+        temporary_parameter->reference_value[size] = '\0';
+        temporary_parameter->type = TEMPLATE_PARAMETER_REFERENCE;
     }
 
     /* raise no error */

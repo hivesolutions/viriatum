@@ -30,7 +30,7 @@
 #include "../system/system.h"
 #include "io_stream.h"
 
-typedef struct FileStream_t {
+typedef struct file_stream_t {
     /**
      * The reference to the file object.
      */
@@ -52,14 +52,14 @@ typedef struct FileStream_t {
      * The reference to the upper stream
      * structure.
      */
-    struct Stream_t *stream;
-} FileStream;
+    struct stream_t *stream;
+} file_stream;
 
-VIRIATUM_EXPORT_PREFIX void create_file_stream(struct FileStream_t **fileStreamPointer, unsigned char *file_path, unsigned char *mode);
-VIRIATUM_EXPORT_PREFIX void delete_file_stream(struct FileStream_t *file_stream);
-VIRIATUM_EXPORT_PREFIX struct Stream_t *getStreamFileStream(struct FileStream_t *file_stream);
-VIRIATUM_EXPORT_PREFIX void openFileStream(struct Stream_t *stream);
-VIRIATUM_EXPORT_PREFIX void closeFileStream(struct Stream_t *stream);
-VIRIATUM_EXPORT_PREFIX size_t readFileStream(struct Stream_t *stream, unsigned char *buffer, size_t size);
-VIRIATUM_EXPORT_PREFIX size_t writeFileStream(struct Stream_t *stream, unsigned char *buffer, size_t size);
-VIRIATUM_EXPORT_PREFIX void flushFileStream(struct Stream_t *stream);
+VIRIATUM_EXPORT_PREFIX void create_file_stream(struct file_stream_t **file_stream_pointer, unsigned char *file_path, unsigned char *mode);
+VIRIATUM_EXPORT_PREFIX void delete_file_stream(struct file_stream_t *file_stream);
+VIRIATUM_EXPORT_PREFIX struct stream_t *get_stream_file_stream(struct file_stream_t *file_stream);
+VIRIATUM_EXPORT_PREFIX void open_file_stream(struct stream_t *stream);
+VIRIATUM_EXPORT_PREFIX void close_file_stream(struct stream_t *stream);
+VIRIATUM_EXPORT_PREFIX size_t read_file_stream(struct stream_t *stream, unsigned char *buffer, size_t size);
+VIRIATUM_EXPORT_PREFIX size_t write_file_stream(struct stream_t *stream, unsigned char *buffer, size_t size);
+VIRIATUM_EXPORT_PREFIX void flush_file_stream(struct stream_t *stream);

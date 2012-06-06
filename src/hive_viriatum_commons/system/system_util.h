@@ -31,14 +31,14 @@
 #define PID_TYPE DWORD
 #define PROCESS_TYPE HANDLE
 #define MEMORY_INFORMATION_TYPE PROCESS_MEMORY_COUNTERS
-#define LOCAL_TIME(localTimeValue, timeValue) tm localTimeValueValue; localTimeValue = &localTimeValueValue; localtime_s(localTimeValue, timeValue)
+#define LOCAL_TIME(local_time_value, time_value) tm local_time_value_value; local_time_value = &local_time_value_value; localtime_s(local_time_value, time_value)
 #define SLEEP(miliseconds) Sleep(miliseconds)
 #define GET_PID() GetCurrentProcessId()
-#define GET_ENV(buffer, buffer_size, variableName) _dupenv_s(&buffer, &buffer_size, variableName)
+#define GET_ENV(buffer, buffer_size, variable_name) _dupenv_s(&buffer, &buffer_size, variable_name)
 #define GET_PROCESS() OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, 0, GET_PID())
 #define CLOSE_PROCESS(process) CloseHandle(process)
-#define GET_MEMORY_INFORMATION(process, memoryInformation) GetProcessMemoryInfo(process, &memoryInformation, sizeof(memoryInformation))
-#define GET_MEMORY_USAGE(memoryInformation) memoryInformation.PagefileUsage
+#define GET_MEMORY_INFORMATION(process, memory_information) GetProcessMemoryInfo(process, &memory_information, sizeof(memory_information))
+#define GET_MEMORY_USAGE(memory_information) memory_information.PagefileUsage
 #define FILE_EXISTS(file_path) GetFileAttributes(file_path) != 0xffffffff
 #endif
 
@@ -46,18 +46,18 @@
 #define PID_TYPE pid_t
 #define PROCESS_TYPE int
 #define MEMORY_INFORMATION_TYPE struct rusage
-#define LOCAL_TIME(localTimeValue, timeValue) localTimeValue = localtime(timeValue)
+#define LOCAL_TIME(local_time_value, time_value) local_time_value = localtime(time_value)
 #define SLEEP(miliseconds) usleep((useconds_t) miliseconds * 1000)
 #define GET_PID() getpid()
 #define SPRINTF(buffer, size, format, ...) sprintf(buffer, format, __VA_ARGS__)
 #define STRTOK(string, delimiter, context) strtok(string, delimiter); dump((void *) &context)
 #define STRCPY(destination, size, source) strcpy(destination, source)
-#define FOPEN(filePointer, fileName, mode) *filePointer = fopen(fileName, mode)
-#define GET_ENV(buffer, buffer_size, variableName) buffer = getenv(variableName)
+#define FOPEN(file_pointer, file_name, mode) *file_pointer = fopen(file_name, mode)
+#define GET_ENV(buffer, buffer_size, variable_name) buffer = getenv(variable_name)
 #define GET_PROCESS() RUSAGE_SELF
 #define CLOSE_PROCESS(process)
-#define GET_MEMORY_INFORMATION(process, memoryInformation) getrusage(process, &memoryInformation)
-#define GET_MEMORY_USAGE(memoryInformation) memoryInformation.ru_ixrss
+#define GET_MEMORY_INFORMATION(process, memory_information) getrusage(process, &memory_information)
+#define GET_MEMORY_USAGE(memory_information) memory_information.ru_ixrss
 #define FILE_EXISTS(file_path) access(file_path, F_OK) == 0
 #endif
 
@@ -65,14 +65,14 @@
 #define SPRINTF(buffer, size, format, ...) sprintf_s(buffer, size, format, __VA_ARGS__)
 #define STRTOK(string, delimiter, context) strtok_s(string, delimiter, &context)
 #define STRCPY(destination, size, source) strcpy_s(destination, size, source)
-#define FOPEN(filePointer, fileName, mode) fopen_s(filePointer, fileName, mode)
+#define FOPEN(file_pointer, file_name, mode) fopen_s(file_pointer, file_name, mode)
 #endif
 
 #ifdef VIRIATUM_PLATFORM_MINGW
 #define SPRINTF(buffer, size, format, ...) sprintf(buffer, format, __VA_ARGS__)
 #define STRTOK(string, delimiter, context) strtok(string, delimiter); dump((void *) &context)
 #define STRCPY(destination, size, source) strcpy(destination, source)
-#define FOPEN(filePointer, fileName, mode) *filePointer = fopen(fileName, mode)
+#define FOPEN(file_pointer, file_name, mode) *file_pointer = fopen(file_name, mode)
 #endif
 
 #define CLOCK() clock()

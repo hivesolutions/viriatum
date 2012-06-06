@@ -100,10 +100,10 @@ void createThreadPoolElement(struct ThreadPool_t *thread_pool) {
     struct ThreadPoolElement_t *threadPoolElement = (struct ThreadPoolElement_t *) MALLOC(threadPoolElementSize);
 
     /* creates the engine runnner thread */
-    THREAD_HANDLE threadHandle = THREAD_CREATE_BASE(thread_id, poolRunnerThread, (THREAD_ARGUMENTS) thread_pool);
+    THREAD_HANDLE thread_handle = THREAD_CREATE_BASE(thread_id, poolRunnerThread, (THREAD_ARGUMENTS) thread_pool);
 
     /* sets the thread pool element attributes */
-    threadPoolElement->threadHandle = threadHandle;
+    threadPoolElement->thread_handle = thread_handle;
     threadPoolElement->thread_id = thread_id;
 
     /* adds the thread pool element to the thread pool worker threads list */

@@ -53,10 +53,10 @@ ERROR_CODE runService(struct hash_map_t *arguments) {
     ERROR_CODE return_value;
 
     /* allocates the socket data */
-    SOCKET_DATA socketData;
+    SOCKET_DATA socket_data;
 
     /* initializes the socket infrastructure */
-    SOCKET_INITIALIZE(&socketData);
+    SOCKET_INITIALIZE(&socket_data);
 
     /* creates the service and loads the options
     taking into account the arguments */

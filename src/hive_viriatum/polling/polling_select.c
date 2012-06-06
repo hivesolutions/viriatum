@@ -46,10 +46,10 @@ void createPollingSelect(struct PollingSelect_t **pollingSelectPointer, struct P
     pollingSelect->socketsSetHighest = 0;
 
     /* zeros the sockets read set */
-    SOCKET_SET_ZERO(&pollingSelect->socketsReadSet);
+    SOCKET_SET_ZERO(&pollingSelect->sockets_read_set);
 
     /* zeros the sockets write set */
-    SOCKET_SET_ZERO(&pollingSelect->socketsWriteSet);
+    SOCKET_SET_ZERO(&pollingSelect->sockets_write_set);
 
     /* zeros the sockets error set */
     SOCKET_SET_ZERO(&pollingSelect->socketsErrorSet);
@@ -135,12 +135,12 @@ ERROR_CODE registerConnectionPollingSelect(struct Polling_t *polling, struct Con
     struct PollingSelect_t *pollingSelect = (struct PollingSelect_t *) polling->lower;
 
     /* registers the socket handle in the sockets read set */
-    _registerSocketsSetPollingSelect(pollingSelect, connection->socketHandle, &pollingSelect->socketsReadSet);
+    _registerSocketsSetPollingSelect(pollingSelect, connection->socket_handle, &pollingSelect->sockets_read_set);
 
     /* in case the socket error are meant to be processed */
     if(VIRIATUM_SOCKET_ERROR) {
         /* registers the socket handle in the sockets error set */
-        _registerSocketsSetPollingSelect(pollingSelect, connection->socketHandle, &pollingSelect->socketsReadSet);
+        _registerSocketsSetPollingSelect(pollingSelect, connection->socket_handle, &pollingSelect->sockets_read_set);
     }
 
     /* raises no error */
@@ -152,18 +152,18 @@ ERROR_CODE unregisterConnectionPollingSelect(struct Polling_t *polling, struct C
     struct PollingSelect_t *pollingSelect = (struct PollingSelect_t *) polling->lower;
 
     /* unregister the socket handle from the sockets read set */
-    _unregisterSocketsSetPollingSelect(pollingSelect, connection->socketHandle, &pollingSelect->socketsReadSet);
+    _unregisterSocketsSetPollingSelect(pollingSelect, connection->socket_handle, &pollingSelect->sockets_read_set);
 
     /* in case the socket error are meant to be processed */
     if(VIRIATUM_SOCKET_ERROR) {
         /* unregister the socket handle from the sockets error set */
-        _unregisterSocketsSetPollingSelect(pollingSelect, connection->socketHandle, &pollingSelect->socketsErrorSet);
+        _unregisterSocketsSetPollingSelect(pollingSelect, connection->socket_handle, &pollingSelect->socketsErrorSet);
     }
 
     /* in case the connection write is registered */
     if(connection->writeRegistered == 1) {
         /* unregister the socket handle from the sockets write set */
-        _unregisterSocketsSetPollingSelect(pollingSelect, connection->socketHandle, &pollingSelect->socketsWriteSet);
+        _unregisterSocketsSetPollingSelect(pollingSelect, connection->socket_handle, &pollingSelect->sockets_write_set);
     }
 
     /* raises no error */
@@ -181,7 +181,7 @@ ERROR_CODE registerWritePollingSelect(struct Polling_t *polling, struct Connecti
     }
 
     /* register the socket handle from the sockets write set */
-    _registerSocketsSetPollingSelect(pollingSelect, connection->socketHandle, &pollingSelect->socketsWriteSet);
+    _registerSocketsSetPollingSelect(pollingSelect, connection->socket_handle, &pollingSelect->sockets_write_set);
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -198,7 +198,7 @@ ERROR_CODE unregisterWritePollingSelect(struct Polling_t *polling, struct Connec
     }
 
     /* unregister the socket handle from the sockets write set */
-    _unregisterSocketsSetPollingSelect(pollingSelect, connection->socketHandle, &pollingSelect->socketsWriteSet);
+    _unregisterSocketsSetPollingSelect(pollingSelect, connection->socket_handle, &pollingSelect->sockets_write_set);
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -252,8 +252,8 @@ ERROR_CODE _pollPollingSelect(struct PollingSelect_t *pollingSelect, struct Conn
     unsigned int errorIndex = 0;
 
     /* copies the socket sets to the socket sets temporary */
-    pollingSelect->socketsReadSetTemporary = pollingSelect->socketsReadSet;
-    pollingSelect->socketsWriteSetTemporary = pollingSelect->socketsWriteSet;
+    pollingSelect->socketsReadSetTemporary = pollingSelect->sockets_read_set;
+    pollingSelect->socketsWriteSetTemporary = pollingSelect->sockets_write_set;
 
     /* copies the select timeout to the select timeout temporary */
     pollingSelect->selectTimeoutTemporary = pollingSelect->selectTimeout;
@@ -309,11 +309,11 @@ ERROR_CODE _pollPollingSelect(struct PollingSelect_t *pollingSelect, struct Conn
         }
 
         /* prints a debug message */
-        V_DEBUG_F("Testing file for select: %d\n", currentConnection->socketHandle);
+        V_DEBUG_F("Testing file for select: %d\n", currentConnection->socket_handle);
 
         /* in case the current connection socket handle is set in
         the sockets read ready set */
-        if(SOCKET_SET_IS_SET(currentConnection->socketHandle, &pollingSelect->socketsReadSetTemporary) > 0)  {
+        if(SOCKET_SET_IS_SET(currentConnection->socket_handle, &pollingSelect->socketsReadSetTemporary) > 0)  {
             /* sets the current connection in the read connections */
             readConnections[readIndex] = currentConnection;
 
@@ -326,7 +326,7 @@ ERROR_CODE _pollPollingSelect(struct PollingSelect_t *pollingSelect, struct Conn
 
         /* in case the current connection socket handle is set in
         the sockets write ready set */
-        if(SOCKET_SET_IS_SET(currentConnection->socketHandle, &pollingSelect->socketsWriteSetTemporary) > 0)  {
+        if(SOCKET_SET_IS_SET(currentConnection->socket_handle, &pollingSelect->socketsWriteSetTemporary) > 0)  {
             /* sets the current connection in the write connections */
             writeConnections[writeIndex] = currentConnection;
 
@@ -339,7 +339,7 @@ ERROR_CODE _pollPollingSelect(struct PollingSelect_t *pollingSelect, struct Conn
 
         /* in case the current connection socket handle is set in
         the sockets error ready set */
-        if(SOCKET_SET_IS_SET(currentConnection->socketHandle, &pollingSelect->socketsErrorSetTemporary) > 0)  {
+        if(SOCKET_SET_IS_SET(currentConnection->socket_handle, &pollingSelect->socketsErrorSetTemporary) > 0)  {
             /* sets the current connection in the error connections */
             errorConnections[errorIndex] = currentConnection;
 
@@ -398,7 +398,7 @@ ERROR_CODE _callPollingSelect(struct PollingSelect_t *pollingSelect, struct Conn
         currentConnection = readConnections[index];
 
         /* prints a debug message */
-        V_DEBUG_F("Processing read connection: %d\n", currentConnection->socketHandle);
+        V_DEBUG_F("Processing read connection: %d\n", currentConnection->socket_handle);
 
         /* in case the current connection is open */
         if(currentConnection->status == STATUS_OPEN && currentConnection->onRead != NULL) {
@@ -428,7 +428,7 @@ ERROR_CODE _callPollingSelect(struct PollingSelect_t *pollingSelect, struct Conn
         currentConnection = writeConnections[index];
 
         /* prints a debug message */
-        V_DEBUG_F("Processing write connection: %d\n", currentConnection->socketHandle);
+        V_DEBUG_F("Processing write connection: %d\n", currentConnection->socket_handle);
 
         /* in case the current connection is open */
         if(currentConnection->status == STATUS_OPEN && currentConnection->onWrite != NULL) {
@@ -458,7 +458,7 @@ ERROR_CODE _callPollingSelect(struct PollingSelect_t *pollingSelect, struct Conn
         currentConnection = errorConnections[index];
 
         /* prints a debug message */
-        V_DEBUG_F("Processing error connection: %d\n", currentConnection->socketHandle);
+        V_DEBUG_F("Processing error connection: %d\n", currentConnection->socket_handle);
 
         /* in case the current connection is open */
         if(currentConnection->status == STATUS_OPEN && currentConnection->onError != NULL) {
@@ -492,24 +492,24 @@ ERROR_CODE _callPollingSelect(struct PollingSelect_t *pollingSelect, struct Conn
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _registerSocketsSetPollingSelect(struct PollingSelect_t *pollingSelect, SOCKET_HANDLE socketHandle,  SOCKET_SET *socketsSet) {
+ERROR_CODE _registerSocketsSetPollingSelect(struct PollingSelect_t *pollingSelect, SOCKET_HANDLE socket_handle,  SOCKET_SET *sockets_set) {
     /* in case the current socket handle is bigger than the polling
     select sockets set highest value */
-    if(socketHandle > pollingSelect->socketsSetHighest) {
+    if(socket_handle > pollingSelect->socketsSetHighest) {
         /* sets the socket handle as the sockets set highest */
-        pollingSelect->socketsSetHighest = socketHandle;
+        pollingSelect->socketsSetHighest = socket_handle;
     }
 
     /* adds the socket handle to the sockets set */
-    SOCKET_SET_SET(socketHandle, socketsSet);
+    SOCKET_SET_SET(socket_handle, sockets_set);
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _unregisterSocketsSetPollingSelect(struct PollingSelect_t *pollingSelect, SOCKET_HANDLE socketHandle,  SOCKET_SET *socketsSet) {
+ERROR_CODE _unregisterSocketsSetPollingSelect(struct PollingSelect_t *pollingSelect, SOCKET_HANDLE socket_handle,  SOCKET_SET *sockets_set) {
     /* removes the socket handle from the sockets set */
-    SOCKET_SET_CLEAR(socketHandle, socketsSet);
+    SOCKET_SET_CLEAR(socket_handle, sockets_set);
 
     /* raises no error */
     RAISE_NO_ERROR;

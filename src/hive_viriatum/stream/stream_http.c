@@ -208,7 +208,7 @@ ERROR_CODE dataHandlerStreamHttp(struct IoConnection_t *ioConnection, unsigned c
             httpConnection->httpParser->flags = 6;
             httpConnection->httpParser->state = STATE_START_REQ;
             httpConnection->httpParser->headerState = 0;
-            httpConnection->httpParser->readCount = 0;
+            httpConnection->httpParser->read_count = 0;
             httpConnection->httpParser->contentLength = -1;
             httpConnection->httpParser->httpMajor = 0;
             httpConnection->httpParser->httpMinor = 0;

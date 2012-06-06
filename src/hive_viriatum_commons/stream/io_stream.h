@@ -27,18 +27,18 @@
 
 #pragma once
 
-struct Stream_t;
+struct stream_t;
 
-typedef void (*streamUpdate) (struct Stream_t *stream);
-typedef size_t (*streamRead) (struct Stream_t *stream, unsigned char *buffer, size_t size);
-typedef size_t (*streamWrite) (struct Stream_t *stream, unsigned char *buffer, size_t size);
+typedef void (*stream_update) (struct stream_t *stream);
+typedef size_t (*stream_read) (struct stream_t *stream, unsigned char *buffer, size_t size);
+typedef size_t (*stream_write) (struct stream_t *stream, unsigned char *buffer, size_t size);
 
-typedef struct Stream_t {
-    streamUpdate open;
-    streamUpdate close;
-    streamRead read;
-    streamWrite write;
-    streamUpdate flush;
+typedef struct stream_t {
+    stream_update open;
+    stream_update close;
+    stream_read read;
+    stream_write write;
+    stream_update flush;
 
     /**
      * Reference to the lower level
@@ -47,5 +47,5 @@ typedef struct Stream_t {
     void *lower;
 } Stream;
 
-VIRIATUM_EXPORT_PREFIX void createStream(struct Stream_t **streamPointer);
-VIRIATUM_EXPORT_PREFIX void deleteStream(struct Stream_t *stream);
+VIRIATUM_EXPORT_PREFIX void create_stream(struct stream_t **stream_pointer);
+VIRIATUM_EXPORT_PREFIX void delete_stream(struct stream_t *stream);

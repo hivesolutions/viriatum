@@ -78,7 +78,7 @@ typedef struct HandlerFileContext_t {
      * processed in the beginning of the workflows
      * (eg: listing the entries of a directory).
      */
-    struct TemplateHandler_t *template_handler;
+    struct template_handler_t *template_handler;
 
     /**
      * The flag that controlls the flushing of the

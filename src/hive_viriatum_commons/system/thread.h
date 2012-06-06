@@ -37,43 +37,43 @@
 #define THREAD_HANDLE HANDLE
 #define THREAD_IDENTIFIER DWORD
 #define THREAD_REFERENCE THREAD_HANDLE
-#define THREAD_CREATE(threadAttributes, stackSize, startAddress, parameter, creationFlags, thread_id) CreateThread(threadAttributes, stackSize, startAddress, (THREAD_ARGUMENTS) parameter, creationFlags, &thread_id)
-#define THREAD_CREATE_BASE(thread_id, startAddress, parameter) THREAD_CREATE(NULL, 0, startAddress, (THREAD_ARGUMENTS) parameter, 0, thread_id)
-#define THREAD_JOIN(threadHandle) WaitForSingleObject(threadHandle, INFINITE)
-#define THREAD_JOIN_BASE(threadHandle, threadIdentifier) THREAD_JOIN(threadHandle)
-#define THREAD_CLOSE(threadHandle) CloseHandle(threadHandle)
+#define THREAD_CREATE(thread_attributes, stack_size, start_address, parameter, creation_flags, thread_id) CreateThread(thread_attributes, stack_size, start_address, (THREAD_ARGUMENTS) parameter, creation_flags, &thread_id)
+#define THREAD_CREATE_BASE(thread_id, start_address, parameter) THREAD_CREATE(NULL, 0, start_address, (THREAD_ARGUMENTS) parameter, 0, thread_id)
+#define THREAD_JOIN(thread_handle) WaitForSingleObject(thread_handle, INFINITE)
+#define THREAD_JOIN_BASE(thread_handle, thread_identifier) THREAD_JOIN(thread_handle)
+#define THREAD_CLOSE(thread_handle) CloseHandle(thread_handle)
 #define THREAD_GET_IDENTIFIER() GetCurrentThreadId()
 #define MUTEX_HANDLE HANDLE
-#define MUTEX_CREATE(mutexHandle) mutexHandle = CreateMutex(NULL, 0, NULL)
-#define MUTEX_LOCK(mutexHandle) WaitForSingleObject(mutexHandle, INFINITE)
-#define MUTEX_UNLOCK(mutexHandle) ReleaseMutex(mutexHandle)
-#define MUTEX_CLOSE(mutexHandle) CloseHandle(mutexHandle)
+#define MUTEX_CREATE(mutex_handle) mutex_handle = CreateMutex(NULL, 0, NULL)
+#define MUTEX_LOCK(mutex_handle) WaitForSingleObject(mutex_handle, INFINITE)
+#define MUTEX_UNLOCK(mutex_handle) ReleaseMutex(mutex_handle)
+#define MUTEX_CLOSE(mutex_handle) CloseHandle(mutex_handle)
 #define EVENT_HANDLE HANDLE
-#define EVENT_CREATE(eventHandle) eventHandle = CreateEvent(NULL, 1, 0, NULL)
-#define EVENT_WAIT(eventHandle) WaitForSingleObject(eventHandle, INFINITE)
-#define EVENT_SIGNAL(eventHandle) SetEvent(eventHandle)
-#define EVENT_RESET(eventHandle) ResetEvent(eventHandle)
-#define EVENT_CLOSE(eventHandle) CloseHandle(eventHandle)
+#define EVENT_CREATE(event_handle) event_handle = CreateEvent(NULL, 1, 0, NULL)
+#define EVENT_WAIT(event_handle) WaitForSingleObject(event_handle, INFINITE)
+#define EVENT_SIGNAL(event_handle) SetEvent(event_handle)
+#define EVENT_RESET(event_handle) ResetEvent(event_handle)
+#define EVENT_CLOSE(event_handle) CloseHandle(event_handle)
 #define CRITICAL_SECTION_HANDLE CRITICAL_SECTION
-#define CRITICAL_SECTION_CREATE(criticalSectionHandle) InitializeCriticalSection(&criticalSectionHandle)
-#define CRITICAL_SECTION_ENTER(criticalSectionHandle) EnterCriticalSection(&criticalSectionHandle)
-#define CRITICAL_SECTION_LEAVE(criticalSectionHandle) LeaveCriticalSection(&criticalSectionHandle)
-#define CRITICAL_SECTION_CLOSE(criticalSectionHandle) DeleteCriticalSection(&criticalSectionHandle)
-#define CONDITION_HANDLE struct Condition_t*
-#define CONDITION_CREATE(conditionHandle) createCondition(&conditionHandle)
-#define CONDITION_LOCK(conditionHandle, criticalSectionHandle) lockCondition(conditionHandle)
-#define CONDITION_UNLOCK(conditionHandle, criticalSectionHandle) unlockCondition(conditionHandle)
-#define CONDITION_WAIT(conditionHandle, criticalSectionHandle) waitCondition(conditionHandle)
-#define CONDITION_SIGNAL(conditionHandle) notifyCondition(conditionHandle)
-#define CONDITION_CLOSE(conditionHandle) deleteCondition(conditionHandle)
+#define CRITICAL_SECTION_CREATE(critical_section_handle) InitializeCriticalSection(&critical_section_handle)
+#define CRITICAL_SECTION_ENTER(critical_section_handle) EnterCriticalSection(&critical_section_handle)
+#define CRITICAL_SECTION_LEAVE(critical_section_handle) LeaveCriticalSection(&critical_section_handle)
+#define CRITICAL_SECTION_CLOSE(critical_section_handle) DeleteCriticalSection(&critical_section_handle)
+#define CONDITION_HANDLE struct condition_t*
+#define CONDITION_CREATE(condition_handle) create_condition(&condition_handle)
+#define CONDITION_LOCK(condition_handle, critical_section_handle) lock_condition(condition_handle)
+#define CONDITION_UNLOCK(condition_handle, critical_section_handle) unlock_condition(condition_handle)
+#define CONDITION_WAIT(condition_handle, critical_section_handle) wait_condition(condition_handle)
+#define CONDITION_SIGNAL(condition_handle) notify_condition(condition_handle)
+#define CONDITION_CLOSE(condition_handle) delete_condition(condition_handle)
 #endif
 
 #ifdef VIRIATUM_PLATFORM_UNIX
 #include <pthread.h>
-typedef struct EventHandle_t {
+typedef struct event_handle_t {
     pthread_cond_t event;
     pthread_mutex_t mutex;
-} EventHandle;
+} event_handle;
 #define THREAD_VALID_RETURN_VALUE 0
 #define THREAD_INVALID_RETURN_VALUE 0
 #define THREAD_RETURN void *
@@ -82,45 +82,45 @@ typedef struct EventHandle_t {
 #define THREAD_IDENTIFIER pthread_t
 #define THREAD_REFERENCE THREAD_IDENTIFIER
 #define THREAD_CREATION_FUNCTION CreateThread
-#define THREAD_CREATE(thread_id, creationFlags, startAddress, parameter) pthread_create(&thread_id, creationFlags, startAddress, (THREAD_ARGUMENTS) parameter)
-#define THREAD_CREATE_BASE(thread_id, startAddress, parameter) THREAD_CREATE(thread_id, NULL, startAddress, parameter)
-#define THREAD_JOIN(threadIdentifier) pthread_join(threadIdentifier, NULL)
-#define THREAD_JOIN_BASE(threadHandle, threadIdentifier) THREAD_JOIN(threadIdentifier)
-#define THREAD_CLOSE(threadHandle)
+#define THREAD_CREATE(thread_id, creation_flags, start_address, parameter) pthread_create(&thread_id, creation_flags, start_address, (THREAD_ARGUMENTS) parameter)
+#define THREAD_CREATE_BASE(thread_id, start_address, parameter) THREAD_CREATE(thread_id, NULL, start_address, parameter)
+#define THREAD_JOIN(thread_identifier) pthread_join(thread_identifier, NULL)
+#define THREAD_JOIN_BASE(thread_handle, thread_identifier) THREAD_JOIN(thread_identifier)
+#define THREAD_CLOSE(thread_handle)
 #define THREAD_GET_IDENTIFIER() pthread_self()
 #define MUTEX_HANDLE pthread_mutex_t *
-#define MUTEX_CREATE(mutexHandle) mutexHandle = (MUTEX_HANDLE) MALLOC(sizeof(pthread_mutex_t));\
-    pthread_mutex_init(mutexHandle, NULL)
-#define MUTEX_LOCK(mutexHandle) pthread_mutex_lock(mutexHandle)
-#define MUTEX_UNLOCK(mutexHandle) pthread_mutex_unlock(mutexHandle)
-#define MUTEX_CLOSE(mutexHandle) pthread_mutex_destroy(mutexHandle);\
-    FREE(mutexHandle)
+#define MUTEX_CREATE(mutex_handle) mutex_handle = (MUTEX_HANDLE) MALLOC(sizeof(pthread_mutex_t));\
+    pthread_mutex_init(mutex_handle, NULL)
+#define MUTEX_LOCK(mutex_handle) pthread_mutex_lock(mutex_handle)
+#define MUTEX_UNLOCK(mutex_handle) pthread_mutex_unlock(mutex_handle)
+#define MUTEX_CLOSE(mutex_handle) pthread_mutex_destroy(mutex_handle);\
+    FREE(mutex_handle)
 #define EVENT_HANDLE EventHandle_t *
-#define EVENT_CREATE(eventHandle) eventHandle = (EVENT_HANDLE) MALLOC(sizeof(EventHandle_t));\
-    pthread_mutex_init(&eventHandle->mutex, NULL);\
-    pthread_cond_init(&eventHandle->event, NULL)
-#define EVENT_WAIT(eventHandle) pthread_mutex_lock(&eventHandle->mutex);\
-    pthread_cond_wait(&eventHandle->event, &eventHandle->mutex);\
-    pthread_mutex_unlock(&eventHandle->mutex)
-#define EVENT_SIGNAL(eventHandle) pthread_cond_signal(&eventHandle->event)
-#define EVENT_RESET(eventHandle)
-#define EVENT_CLOSE(eventHandle) pthread_mutex_destroy(&eventHandle->mutex);\
-    pthread_cond_destroy(&eventHandle->event);\
-    FREE(eventHandle)
+#define EVENT_CREATE(event_handle) event_handle = (EVENT_HANDLE) MALLOC(sizeof(EventHandle_t));\
+    pthread_mutex_init(&event_handle->mutex, NULL);\
+    pthread_cond_init(&event_handle->event, NULL)
+#define EVENT_WAIT(event_handle) pthread_mutex_lock(&event_handle->mutex);\
+    pthread_cond_wait(&event_handle->event, &event_handle->mutex);\
+    pthread_mutex_unlock(&event_handle->mutex)
+#define EVENT_SIGNAL(event_handle) pthread_cond_signal(&event_handle->event)
+#define EVENT_RESET(event_handle)
+#define EVENT_CLOSE(event_handle) pthread_mutex_destroy(&event_handle->mutex);\
+    pthread_cond_destroy(&event_handle->event);\
+    FREE(event_handle)
 #define CRITICAL_SECTION_HANDLE MUTEX_HANDLE
-#define CRITICAL_SECTION_CREATE(criticalSectionHandle) MUTEX_CREATE(criticalSectionHandle)
-#define CRITICAL_SECTION_ENTER(criticalSectionHandle) MUTEX_LOCK(criticalSectionHandle)
-#define CRITICAL_SECTION_LEAVE(criticalSectionHandle) MUTEX_UNLOCK(criticalSectionHandle)
-#define CRITICAL_SECTION_CLOSE(criticalSectionHandle) MUTEX_CLOSE(criticalSectionHandle)
+#define CRITICAL_SECTION_CREATE(critical_section_handle) MUTEX_CREATE(critical_section_handle)
+#define CRITICAL_SECTION_ENTER(critical_section_handle) MUTEX_LOCK(critical_section_handle)
+#define CRITICAL_SECTION_LEAVE(critical_section_handle) MUTEX_UNLOCK(critical_section_handle)
+#define CRITICAL_SECTION_CLOSE(critical_section_handle) MUTEX_CLOSE(critical_section_handle)
 #define CONDITION_HANDLE pthread_cond_t *
-#define CONDITION_CREATE(conditionHandle) conditionHandle = (CONDITION_HANDLE) MALLOC(sizeof(pthread_cond_t));\
-pthread_cond_init(conditionHandle, NULL)
-#define CONDITION_LOCK(conditionHandle, criticalSectionHandle) CRITICAL_SECTION_ENTER(criticalSectionHandle)
-#define CONDITION_UNLOCK(conditionHandle, criticalSectionHandle) CRITICAL_SECTION_LEAVE(criticalSectionHandle)
-#define CONDITION_WAIT(conditionHandle, criticalSectionHandle) pthread_cond_wait(conditionHandle, criticalSectionHandle);
-#define CONDITION_SIGNAL(conditionHandle) pthread_cond_signal(conditionHandle)
-#define CONDITION_CLOSE(conditionHandle) pthread_cond_destroy(conditionHandle);\
-    FREE(conditionHandle)
+#define CONDITION_CREATE(condition_handle) condition_handle = (CONDITION_HANDLE) MALLOC(sizeof(pthread_cond_t));\
+pthread_cond_init(condition_handle, NULL)
+#define CONDITION_LOCK(condition_handle, critical_section_handle) CRITICAL_SECTION_ENTER(critical_section_handle)
+#define CONDITION_UNLOCK(condition_handle, critical_section_handle) CRITICAL_SECTION_LEAVE(critical_section_handle)
+#define CONDITION_WAIT(condition_handle, critical_section_handle) pthread_cond_wait(condition_handle, critical_section_handle);
+#define CONDITION_SIGNAL(condition_handle) pthread_cond_signal(condition_handle)
+#define CONDITION_CLOSE(condition_handle) pthread_cond_destroy(condition_handle);\
+    FREE(condition_handle)
 #endif
 
 #endif

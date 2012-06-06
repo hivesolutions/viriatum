@@ -66,8 +66,8 @@ ERROR_CODE createHttpClientConnection(struct HttpClientConnection_t **httpClient
 
     /* sets the default callback functions in the http settings
     these function are going to be called by the parser */
-    httpClientConnection->httpSettings->onbody = bodyCallbackHandlerClient;
-    httpClientConnection->httpSettings->onmessageComplete = messageCompleteCallbackHandlerClient;
+    httpClientConnection->httpSettings->on_body = bodyCallbackHandlerClient;
+    httpClientConnection->httpSettings->on_message_complete = messageCompleteCallbackHandlerClient;
 
     /* sets the connection as the parser parameter(s) */
     httpClientConnection->httpParser->parameters = ioConnection->connection;
@@ -240,7 +240,7 @@ ERROR_CODE openHandlerStreamHttpClient(struct IoConnection_t *ioConnection) {
     unsigned char infoHash[SHA1_DIGEST_SIZE + 1];
     unsigned char random[12];
     unsigned char peerId[21];
-    struct hash_map_t *parametersMap;
+    struct hash_map_t *parameters_map;
     unsigned char *getString;
     size_t getStringSize;
     struct string_t strings[9];
@@ -262,7 +262,7 @@ ERROR_CODE openHandlerStreamHttpClient(struct IoConnection_t *ioConnection) {
 
     /* tenho de fazer gerador de get parameters !!!! */
     /* pega nas chaves e nos valores do hash map e gera a get string para um string buffer */
-    create_hash_map(&parametersMap, 0);
+    create_hash_map(&parameters_map, 0);
     strings[0].buffer = infoHash;
     strings[0].length = 20;
     strings[1].buffer = peerId;
@@ -281,17 +281,17 @@ ERROR_CODE openHandlerStreamHttpClient(struct IoConnection_t *ioConnection) {
     strings[7].length = sizeof("0") - 1;
     strings[8].buffer = (unsigned char *) "started";
     strings[8].length = sizeof("started") - 1;
-    set_value_string_hash_map(parametersMap, (unsigned char *) "info_hash", (void *) &strings[0]);
-    set_value_string_hash_map(parametersMap, (unsigned char *) "peer_id", (void *) &strings[1]);
-    set_value_string_hash_map(parametersMap, (unsigned char *) "port", (void *) &strings[2]);
-    set_value_string_hash_map(parametersMap, (unsigned char *) "uploaded", (void *) &strings[3]);
-    set_value_string_hash_map(parametersMap, (unsigned char *) "downloaded", (void *) &strings[4]);
-    set_value_string_hash_map(parametersMap, (unsigned char *) "left", (void *) &strings[5]);
-    set_value_string_hash_map(parametersMap, (unsigned char *) "compact", (void *) &strings[6]);
-    set_value_string_hash_map(parametersMap, (unsigned char *) "no_peer_id", (void *) &strings[7]);
-    set_value_string_hash_map(parametersMap, (unsigned char *) "event", (void *) &strings[8]);
-    generateParameters(parametersMap, &getString, &getStringSize);
-    delete_hash_map(parametersMap);
+    set_value_string_hash_map(parameters_map, (unsigned char *) "info_hash", (void *) &strings[0]);
+    set_value_string_hash_map(parameters_map, (unsigned char *) "peer_id", (void *) &strings[1]);
+    set_value_string_hash_map(parameters_map, (unsigned char *) "port", (void *) &strings[2]);
+    set_value_string_hash_map(parameters_map, (unsigned char *) "uploaded", (void *) &strings[3]);
+    set_value_string_hash_map(parameters_map, (unsigned char *) "downloaded", (void *) &strings[4]);
+    set_value_string_hash_map(parameters_map, (unsigned char *) "left", (void *) &strings[5]);
+    set_value_string_hash_map(parameters_map, (unsigned char *) "compact", (void *) &strings[6]);
+    set_value_string_hash_map(parameters_map, (unsigned char *) "no_peer_id", (void *) &strings[7]);
+    set_value_string_hash_map(parameters_map, (unsigned char *) "event", (void *) &strings[8]);
+    generateParameters(parameters_map, &getString, &getStringSize);
+    delete_hash_map(parameters_map);
 
     SPRINTF(buffer, 1024, "GET %s?%s HTTP/1.1\r\nUser-Agent: viriatum/0.1.0 (linux - intel x64)\r\nConnection: keep-alive\r\n\r\n", parameters->url, getString);
 
