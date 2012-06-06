@@ -50,19 +50,19 @@
 #define R3(v, w, x, y, z, i) z += (((w | x) & y) | (w & x)) + BLK(i) + 0x8F1BBCDC + ROL(v, 5); w = ROL(w, 30);
 #define R4(v, w, x, y, z, i) z += ( w ^ x ^ y) + BLK(i) + 0xCA62C1D6 + ROL(v, 5); w = ROL(w, 30);
 
-typedef struct sha1Context_t {
+typedef struct sha1_context_t {
     unsigned int state[5];
     unsigned int count[2];
     unsigned char  buffer[64];
-} sha1Context;
+} sha1_context;
 
-typedef union sha1Block_t {
+typedef union sha1_block_t {
     unsigned char c[64];
     unsigned int l[16];
-} sha1Block;
+} sha1_block;
 
-VIRIATUM_EXPORT_PREFIX void sha1(unsigned char *buffer, unsigned int bufferLength, unsigned char *result);
-VIRIATUM_EXPORT_PREFIX void initSha1(struct sha1Context_t *context);
-VIRIATUM_EXPORT_PREFIX void updateSha1(struct sha1Context_t *context, const unsigned char *data, const size_t len);
-VIRIATUM_EXPORT_PREFIX void finalSha1(struct sha1Context_t *context, unsigned char *digest);
-VIRIATUM_EXPORT_PREFIX void _transformSha1(unsigned int state[5], const unsigned char buffer[64]);
+VIRIATUM_EXPORT_PREFIX void sha1(unsigned char *buffer, unsigned int buffer_length, unsigned char *result);
+VIRIATUM_EXPORT_PREFIX void init_sha1(struct sha1_context_t *context);
+VIRIATUM_EXPORT_PREFIX void update_sha1(struct sha1_context_t *context, const unsigned char *data, const size_t size);
+VIRIATUM_EXPORT_PREFIX void final_sha1(struct sha1_context_t *context, unsigned char *digest);
+VIRIATUM_EXPORT_PREFIX void _transform_sha1(unsigned int state[5], const unsigned char buffer[64]);

@@ -30,19 +30,19 @@
 
 #include "sha1.h"
 
-void sha1(unsigned char *buffer, unsigned int bufferLength, unsigned char *result) {
+void sha1(unsigned char *buffer, unsigned int buffer_length, unsigned char *result) {
     /* allocates space for the sha1 context */
-    struct sha1Context_t sha1Context;
+    struct sha1_context_t sha1_context;
 
     /* initializes the sha1 context, then updates it
     with the provided buffer and after that finalizes
     it retrieving the result */
-    initSha1(&sha1Context);
-    updateSha1(&sha1Context, buffer, bufferLength);
-    finalSha1(&sha1Context, result);
+    init_sha1(&sha1_context);
+    update_sha1(&sha1_context, buffer, buffer_length);
+    final_sha1(&sha1_context, result);
 }
 
-void initSha1(struct sha1Context_t *context) {
+void init_sha1(struct sha1_context_t *context) {
     context->state[0] = 0x67452301;
     context->state[1] = 0xEFCDAB89;
     context->state[2] = 0x98BADCFE;
@@ -51,34 +51,34 @@ void initSha1(struct sha1Context_t *context) {
     context->count[0] = context->count[1] = 0;
 }
 
-void updateSha1(struct sha1Context_t *context, const unsigned char *data, const size_t len) {
+void update_sha1(struct sha1_context_t *context, const unsigned char *data, const size_t size) {
     size_t i, j;
 
     j = (context->count[0] >> 3) & 63;
-    if((context->count[0] += len << 3) < (len << 3)) { context->count[1]++; }
-    context->count[1] += (len >> 29);
-    if((j + len) > 63) {
+    if((context->count[0] += size << 3) < (size << 3)) { context->count[1]++; }
+    context->count[1] += (size >> 29);
+    if((j + size) > 63) {
         memcpy(&context->buffer[j], data, (i = 64 - j));
-        _transformSha1(context->state, context->buffer);
-        for(; i + 63 < len; i += 64) { _transformSha1(context->state, data + i); }
+        _transform_sha1(context->state, context->buffer);
+        for(; i + 63 < size; i += 64) { _transform_sha1(context->state, data + i); }
         j = 0;
     }
     else {
         i = 0;
     }
 
-    memcpy(&context->buffer[j], &data[i], len - i);
+    memcpy(&context->buffer[j], &data[i], size - i);
 }
 
-void finalSha1(struct sha1Context_t *context, unsigned char *digest) {
+void final_sha1(struct sha1_context_t *context, unsigned char *digest) {
     unsigned int i;
     unsigned char finalcount[8];
 
     for(i = 0; i < 8; i++) { finalcount[i] = (unsigned char) ((context->count[(i >= 4 ? 0 : 1)] >> ((3-(i & 3)) * 8) ) & 255); }
 
-    updateSha1(context, (unsigned char *)"\200", 1);
-    while((context->count[0] & 504) != 448) { updateSha1(context, (unsigned char *)"\0", 1); }
-    updateSha1(context, finalcount, 8);
+    update_sha1(context, (unsigned char *)"\200", 1);
+    while((context->count[0] & 504) != 448) { update_sha1(context, (unsigned char *)"\0", 1); }
+    update_sha1(context, finalcount, 8);
     for(i = 0; i < SHA1_DIGEST_SIZE; i++) { digest[i] = (unsigned char) ((context->state[i>>2] >> ((3-(i & 3)) * 8) ) & 255); }
 
     /* wipes the current variables, no more usage
@@ -90,11 +90,11 @@ void finalSha1(struct sha1Context_t *context, unsigned char *digest) {
     memset(finalcount, 0, 8);
 }
 
-void _transformSha1(unsigned int state[5], const unsigned char buffer[64]) {
+void _transform_sha1(unsigned int state[5], const unsigned char buffer[64]) {
     unsigned int a, b, c, d, e;
-    union sha1Block_t *block;
+    union sha1_block_t *block;
 
-    block = (union sha1Block_t *) buffer;
+    block = (union sha1_block_t *) buffer;
 
     /* copies context state to working vars */
     a = state[0];
