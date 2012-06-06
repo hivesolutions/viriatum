@@ -33,7 +33,7 @@
  * The calculated checksum is returned as an unsigned long value.
  *
  * @param buffer The (data) buffer to be used in the checkum calculation.
- * @param bufferLength The length of the (data) buffer to calculate the checksum.
+ * @param buffer_length The length of the (data) buffer to calculate the checksum.
  * @return The calculated crc32 checksum value.
  */
-VIRIATUM_EXPORT_PREFIX unsigned long crc32(unsigned char *buffer, unsigned int bufferLength);
+VIRIATUM_EXPORT_PREFIX unsigned long crc32(unsigned char *buffer, unsigned int buffer_length);

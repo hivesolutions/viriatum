@@ -29,17 +29,17 @@
 
 #include "arguments_util.h"
 
-ERROR_CODE processArguments(int argc, char *argv[], struct hash_map_t **argumentsPointer) {
+ERROR_CODE process_arguments(int argc, char *argv[], struct hash_map_t **arguments_pointer) {
     /* allocates space for the index counter */
     unsigned int index;
 
     /* allocates the space for the current argument string
     in the iteration */
-    char *currentArgument;
+    char *current_argument;
 
     /* allocates space for both the argument holder, to
     be created every iteration of the argument retrieval */
-    struct Argument_t *argument;
+    struct argument_t *argument;
     struct hash_map_t *arguments;
 
     /* creates the hash map that will hold the various
@@ -50,40 +50,40 @@ ERROR_CODE processArguments(int argc, char *argv[], struct hash_map_t **argument
     first (file name value) */
     for(index = 1; index < (unsigned int) argc; index++) {
         /* allocates space for the "new" argument to be parsed */
-        argument = (struct Argument_t *) MALLOC(sizeof(struct Argument_t));
+        argument = (struct argument_t *) MALLOC(sizeof(struct argument_t));
 
         /* retrievs the current argument, then processes it
         using the default (simple) parser and sets it in
         the arguments map */
-        currentArgument = argv[index];
-        _processArgument(currentArgument, argument);
+        current_argument = argv[index];
+        _process_argument(current_argument, argument);
         set_value_string_hash_map(arguments, (unsigned char *) argument->key, (void *) argument);
     }
 
     /* sets the hash map of arguments as the value pointed
     by the arguments pointer */
-    *argumentsPointer = arguments;
+    *arguments_pointer = arguments;
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE deleteArguments(struct hash_map_t *arguments) {
+ERROR_CODE delete_arguments(struct hash_map_t *arguments) {
     /* allocates space for the pointer to the element and
     for the argument to be retrieved */
     struct hash_map_element_t *element;
-    struct Argument_t *argument;
+    struct argument_t *argument;
 
     /* allocates space for the iterator for the arguments */
-    struct iterator_t *argumentsIterator;
+    struct iterator_t *arguments_iterator;
 
     /* creates an iterator for the arguments hash map */
-    create_element_iterator_hash_map(arguments, &argumentsIterator);
+    create_element_iterator_hash_map(arguments, &arguments_iterator);
 
     /* iterates continuously */
     while(1) {
         /* retrieves the next value from the arguments iterator */
-        get_next_iterator(argumentsIterator, (void **) &element);
+        get_next_iterator(arguments_iterator, (void **) &element);
 
         /* in case the current module is null (end of iterator) */
         if(element == NULL) {
@@ -99,7 +99,7 @@ ERROR_CODE deleteArguments(struct hash_map_t *arguments) {
     }
 
     /* deletes the iterator for the arguments hash map */
-    delete_iterator_hash_map(arguments, argumentsIterator);
+    delete_iterator_hash_map(arguments, arguments_iterator);
 
     /* deletes the hash map that holds the arguments */
     delete_hash_map(arguments);
@@ -108,17 +108,17 @@ ERROR_CODE deleteArguments(struct hash_map_t *arguments) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE printArguments(struct hash_map_t *arguments) {
+ERROR_CODE print_arguments(struct hash_map_t *arguments) {
     /* allocates space for the pointer to the element and
     for the argument to be retrieved */
     struct hash_map_element_t *element;
-    struct Argument_t *argument;
+    struct argument_t *argument;
 
     /* allocates space for the iterator for the arguments */
-    struct iterator_t *argumentsIterator;
+    struct iterator_t *arguments_iterator;
 
     /* creates an iterator for the arguments hash map */
-    create_iterator_hash_map(arguments, &argumentsIterator);
+    create_iterator_hash_map(arguments, &arguments_iterator);
 
     /* prints the initial arguments header */
     PRINTF("Arguments\n");
@@ -126,7 +126,7 @@ ERROR_CODE printArguments(struct hash_map_t *arguments) {
     /* iterates continuously */
     while(1) {
         /* retrieves the next value from the arguments iterator */
-        get_next_iterator(argumentsIterator, (void **) &element);
+        get_next_iterator(arguments_iterator, (void **) &element);
 
         /* in case the current module is null (end of iterator) */
         if(element == NULL) {
@@ -150,13 +150,13 @@ ERROR_CODE printArguments(struct hash_map_t *arguments) {
     }
 
     /* deletes the iterator for the arguments hash map */
-    delete_iterator_hash_map(arguments, argumentsIterator);
+    delete_iterator_hash_map(arguments, arguments_iterator);
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _processArgument(char *argumentValue, struct Argument_t *argument) {
+ERROR_CODE _process_argument(char *argument_value, struct argument_t *argument) {
     /* allocates space for the index counter */
     unsigned int index;
 
@@ -171,17 +171,17 @@ ERROR_CODE _processArgument(char *argumentValue, struct Argument_t *argument) {
     size_t mark = 0;
 
     /* retrieves the argument size for processing */
-    size_t argumentSize = strlen(argumentValue);
+    size_t argument_size = strlen(argument_value);
 
     /* sets the argument to type key (just a name) */
     argument->type = SINGLE_ARGUMENT;
 
     /* iterates over all the characters present in
     the argument string to parse the argument */
-    for(index = 0; index < argumentSize; index++) {
+    for(index = 0; index < argument_size; index++) {
         /* retrieves the current iteration values, the
         current character of the argument */
-        current = argumentValue[index];
+        current = argument_value[index];
 
         /* switch over the current (parsing) state */
         switch(state) {
@@ -227,7 +227,7 @@ ERROR_CODE _processArgument(char *argumentValue, struct Argument_t *argument) {
 
                     /* copies the key value into the appropriate variable
                     in the argument */
-                    memcpy(argument->key, argumentValue + mark, index - mark);
+                    memcpy(argument->key, argument_value + mark, index - mark);
                     argument->key[index - mark] = '\0';
 
                     /* marks the current index as the start point
@@ -251,7 +251,7 @@ ERROR_CODE _processArgument(char *argumentValue, struct Argument_t *argument) {
         case ARGUMENT_KEY:
             /* copies the key value into the appropriate variable
             in the argument */
-            memcpy(argument->key, argumentValue + mark, index - mark);
+            memcpy(argument->key, argument_value + mark, index - mark);
             argument->key[index - mark] = '\0';
 
             /* breaks the switch */
@@ -260,7 +260,7 @@ ERROR_CODE _processArgument(char *argumentValue, struct Argument_t *argument) {
         case ARGUMENT_VALUE:
             /* copies the value value into the appropriate variable
             in the argument */
-            memcpy(argument->value, argumentValue + mark, index - mark);
+            memcpy(argument->value, argument_value + mark, index - mark);
             argument->value[index - mark] = '\0';
 
             /* breaks the switch */

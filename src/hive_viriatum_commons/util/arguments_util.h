@@ -34,7 +34,7 @@
  * Enumeration describing the various types
  * of possible arguments.
  */
-typedef enum ArgumentType_e {
+typedef enum argument_type_e {
     /**
      * An argument that contains only
      * a key and so the value is considered
@@ -47,26 +47,26 @@ typedef enum ArgumentType_e {
      * a key and a value.
      */
     VALUE_ARGUMENT
-} ArgumentType;
+} argument_type;
 
-typedef enum ArgumentState_e {
+typedef enum argument_state_e {
     ARGUMENT_INITIAL = 1,
     ARGUMENT_FIRST,
     ARGUMENT_SECOND,
     ARGUMENT_KEY,
     ARGUMENT_VALUE
-} ArgumentState;
+} argument_state;
 
 /**
  * Structure defining an argument received
  * from an external (data) source.
  */
-typedef struct Argument_t {
+typedef struct argument_t {
     /**
      * The type of argument, to control
      * if the value is defined or not.
      */
-    enum ArgumentType_e type;
+    enum argument_type_e type;
 
     /**
      * The key to the argument, this value
@@ -80,9 +80,9 @@ typedef struct Argument_t {
      * and must be parsed for interpretation.
      */
     char value[1024];
-} Argument;
+} argument;
 
-VIRIATUM_EXPORT_PREFIX ERROR_CODE processArguments(int argc, char *argv[], struct hash_map_t **argumentsPointer);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE deleteArguments(struct hash_map_t *arguments);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE printArguments(struct hash_map_t *arguments);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE _processArgument(char *argumentValue, struct Argument_t *argument);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE process_arguments(int argc, char *argv[], struct hash_map_t **arguments_pointer);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE delete_arguments(struct hash_map_t *arguments);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE print_arguments(struct hash_map_t *arguments);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _process_argument(char *argument_value, struct argument_t *argument);

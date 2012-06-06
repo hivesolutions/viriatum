@@ -31,11 +31,11 @@
 
 void debug(const char *format, ...) {
     /* allocates the arguments list */
-    va_list argumentsList;
+    va_list arguments_list;
 
     /* loads the arguments list */
-    va_start(argumentsList, format);
+    va_start(arguments_list, format);
 
     /* calls the print function */
-    vprintf(format, argumentsList);
+    vprintf(format, arguments_list);
 }

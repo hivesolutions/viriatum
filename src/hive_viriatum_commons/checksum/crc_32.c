@@ -84,7 +84,7 @@ static unsigned long crc32Table[] = {
     0x2d02ef8dL
 };
 
-unsigned long crc32(unsigned char *buffer, unsigned int bufferLength) {
+unsigned long crc32(unsigned char *buffer, unsigned int buffer_length) {
     /* allocates space for the index */
     unsigned int index;
 
@@ -95,7 +95,7 @@ unsigned long crc32(unsigned char *buffer, unsigned int bufferLength) {
     crc32Value = 0 ^ 0xffffffff;
 
     /* iterates over the length of the buffer */
-    for(index = 0; index < bufferLength; index++) {
+    for(index = 0; index < buffer_length; index++) {
         /* recalculates the new crc 32 value for the "new" byte */
         crc32Value = crc32Table[(crc32Value ^ buffer[index]) & 0xff] ^ (crc32Value >> 8);
     }

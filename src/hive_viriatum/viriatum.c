@@ -269,14 +269,14 @@ int main(int argc, char *argv[]) {
 
     /* processes the various arguments into a map and then
     executes the corresponding (initial) actions */
-    processArguments(argc, argv, &arguments);
+    process_arguments(argc, argv, &arguments);
     executeArguments(arguments);
 
     /* runs the service, with the given arguments */
     return_value = runService(arguments);
 
     /* deletes the processed arguments */
-    deleteArguments(arguments);
+    delete_arguments(arguments);
 
     /* tests the error code for error */
     if(IS_ERROR_CODE(return_value)) {
