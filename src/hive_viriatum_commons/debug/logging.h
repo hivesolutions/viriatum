@@ -39,7 +39,7 @@
 #endif
 
 #ifdef VIRIATUM_DEBUG
-#define V_MESSAGE(level) PRINTF_F("[%s] [%s:%d] ", level, baseStringValue((unsigned char *) __FILE__), __LINE__)
+#define V_MESSAGE(level) PRINTF_F("[%s] [%s:%d] ", level, base_string_value((unsigned char *) __FILE__), __LINE__)
 #endif
 
 #ifndef VIRIATUM_DEBUG
@@ -56,10 +56,10 @@
 
 #ifndef VIRIATUM_DEBUG
 #define V_DEBUG(format) dump(format)
-#define V_DEBUG_F(format, ...) dumpMultiple(format, __VA_ARGS__)
+#define V_DEBUG_F(format, ...) dump_multiple(format, __VA_ARGS__)
 
 #define V_INFO(format) dump(format)
-#define V_INFO_F(format, ...) dumpMultiple(format, __VA_ARGS__)
+#define V_INFO_F(format, ...) dump_multiple(format, __VA_ARGS__)
 #endif
 
 #define V_WARNING(format) V_MESSAGE("WARNING"); PRINTF(format)
