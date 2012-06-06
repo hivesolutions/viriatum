@@ -37,29 +37,29 @@
  * The buffer is linear and contains the various
  * partial buffer values.
  */
-typedef struct LinkedBuffer_t {
+typedef struct linked_buffer_t {
     /**
      * The total length for the internal
      * buffers value.
      */
-    size_t bufferLength;
+    size_t buffer_length;
 
     /**
      * The list of buffers that compose the
      * the complete buffer value.
      */
-    struct LinkedList_t *bufferList;
+    struct linked_list_t *buffer_list;
 
     /**
      * The list of buffers to have the memory
      * released uppon destruction of the linked
      * buffer.
      */
-    struct LinkedList_t *releaseList;
-} LinkedBuffer;
+    struct linked_list_t *release_list;
+} linked_buffer;
 
-VIRIATUM_EXPORT_PREFIX void createLinkedBuffer(struct LinkedBuffer_t **linkedBufferPointer);
-VIRIATUM_EXPORT_PREFIX void deleteLinkedBuffer(struct LinkedBuffer_t *linkedBuffer);
-VIRIATUM_EXPORT_PREFIX void appendLinkedBuffer(struct LinkedBuffer_t *linkedBuffer, void *pointer, size_t size, unsigned char release);
-VIRIATUM_EXPORT_PREFIX void joinLinkedBuffer(struct LinkedBuffer_t *linkedBuffer, unsigned char **bufferValuePointer);
-VIRIATUM_EXPORT_PREFIX void _appendLinkedBuffer(struct LinkedBuffer_t *linkedBuffer, void *pointer, size_t size);
+VIRIATUM_EXPORT_PREFIX void create_linked_buffer(struct linked_buffer_t **linked_buffer_pointer);
+VIRIATUM_EXPORT_PREFIX void delete_linked_buffer(struct linked_buffer_t *linked_buffer);
+VIRIATUM_EXPORT_PREFIX void append_linked_buffer(struct linked_buffer_t *linked_buffer, void *pointer, size_t size, unsigned char release);
+VIRIATUM_EXPORT_PREFIX void join_linked_buffer(struct linked_buffer_t *linked_buffer, unsigned char **buffer_value_pointer);
+VIRIATUM_EXPORT_PREFIX void _append_linked_buffer(struct linked_buffer_t *linked_buffer, void *pointer, size_t size);

@@ -29,173 +29,173 @@
 
 #include "string_buffer.h"
 
-void createStringBuffer(struct StringBuffer_t **stringBufferPointer) {
+void create_string_buffer(struct string_buffer_t **string_buffer_pointer) {
     /* retrieves the string buffer size */
-    size_t stringBufferSize = sizeof(struct StringBuffer_t);
+    size_t string_buffer_size = sizeof(struct string_buffer_t);
 
     /* allocates space for the string buffer */
-    struct StringBuffer_t *stringBuffer = (struct StringBuffer_t *) MALLOC(stringBufferSize);
+    struct string_buffer_t *string_buffer = (struct string_buffer_t *) MALLOC(string_buffer_size);
 
     /* sets the default values in the string buffer */
-    stringBuffer->stringLength = 0;
+    string_buffer->string_length = 0;
 
     /* creates the list to hold the various strings
     for the string buffer runtime */
-    createLinkedList(&stringBuffer->stringList);
+    create_linked_list(&string_buffer->string_list);
 
     /* creates the list to hold the various strings
     lengths for the string in the string buffer runtime */
-    createLinkedList(&stringBuffer->lengthList);
+    create_linked_list(&string_buffer->length_list);
 
     /* creates the list to hold the various strings
     to have the memory released uppon destruction */
-    createLinkedList(&stringBuffer->releaseList);
+    create_linked_list(&string_buffer->release_list);
 
     /* sets the string buffer in the string buffer pointer */
-    *stringBufferPointer = stringBuffer;
+    *string_buffer_pointer = string_buffer;
 }
 
-void deleteStringBuffer(struct StringBuffer_t *stringBuffer) {
+void delete_string_buffer(struct string_buffer_t *string_buffer) {
     /* allocates space for the temporary string value */
-    unsigned char *stringValue;
+    unsigned char *string_value;
 
     /* iterates continuously for release list
     cleanup (string value memory release) */
     while(1) {
         /* pops a node from the release list */
-        popValueLinkedList(stringBuffer->releaseList, (void **) &stringValue, 1);
+        pop_value_linked_list(string_buffer->release_list, (void **) &string_value, 1);
 
         /* in case the value is invalid (empty list)
         need to break the cycle */
-        if(stringValue == NULL) { break; }
+        if(string_value == NULL) { break; }
 
         /* deletes the string value */
-        FREE(stringValue);
+        FREE(string_value);
     }
 
     /* deletes the list of release strings from the string buffer */
-    deleteLinkedList(stringBuffer->releaseList);
+    delete_linked_list(string_buffer->release_list);
 
     /* deletes the list of lengths from the string buffer */
-    deleteLinkedList(stringBuffer->lengthList);
+    delete_linked_list(string_buffer->length_list);
 
     /* deletes the list of strings from the string buffer */
-    deleteLinkedList(stringBuffer->stringList);
+    delete_linked_list(string_buffer->string_list);
 
     /* releases the string buffer */
-    FREE(stringBuffer);
+    FREE(string_buffer);
 }
 
-void appendStringBuffer(struct StringBuffer_t *stringBuffer, unsigned char *stringValue) {
+void append_string_buffer(struct string_buffer_t *string_buffer, unsigned char *string_value) {
     /* retrieves the length of the string value */
-    size_t stringValueLength = strlen((char *) stringValue);
+    size_t string_value_length = strlen((char *) string_value);
 
     /* adds the string value to the list of strings and then
     increments the (total) string length with the length of
     the current string value */
-    appendValueLinkedList(stringBuffer->stringList, (void *) stringValue);
-    appendValueLinkedList(stringBuffer->lengthList, (void *) stringValueLength);
-    stringBuffer->stringLength += stringValueLength;
+    append_value_linked_list(string_buffer->string_list, (void *) string_value);
+    append_value_linked_list(string_buffer->length_list, (void *) string_value_length);
+    string_buffer->string_length += string_value_length;
 }
 
-void appendStringLBuffer(struct StringBuffer_t *stringBuffer, unsigned char *stringValue, size_t stringLength) {
+void append_string_l_buffer(struct string_buffer_t *string_buffer, unsigned char *string_value, size_t string_length) {
     /* adds the string value to the list of strings and then
     increments the (total) string length with the length of
     the current string value */
-    appendValueLinkedList(stringBuffer->stringList, (void *) stringValue);
-    appendValueLinkedList(stringBuffer->lengthList, (void *) stringLength);
-    stringBuffer->stringLength += stringLength;
+    append_value_linked_list(string_buffer->string_list, (void *) string_value);
+    append_value_linked_list(string_buffer->length_list, (void *) string_length);
+    string_buffer->string_length += string_length;
 }
 
-void appendStringTBuffer(struct StringBuffer_t *stringBuffer, struct String_t *string) {
+void append_string_t_buffer(struct string_buffer_t *string_buffer, struct string_t *string) {
     /* adds the string structure value to the string buffer,
     using the length oriented append function */
-    appendStringLBuffer(stringBuffer, string->buffer, string->length);
+    append_string_l_buffer(string_buffer, string->buffer, string->length);
 }
 
-void joinStringBuffer(struct StringBuffer_t *stringBuffer, unsigned char **stringValuePointer) {
+void join_string_buffer(struct string_buffer_t *string_buffer, unsigned char **string_value_pointer) {
     /* allocates space for the iterators used for percolating
     the various (partial) string values (include string length) */
-    struct Iterator_t *stringIterator;
-    struct Iterator_t *lengthIterator;
+    struct iterator_t *string_iterator;
+    struct iterator_t *length_iterator;
 
     /* allocates space for the partial value and the partial value length */
-    unsigned char *partialValue;
-    size_t partialValueLength;
+    unsigned char *partial_value;
+    size_t partial_value_length;
 
     /* allocates space for the pointer and allocates the buffer to hold
     the complete "joined" string value */
     unsigned char *pointer;
-    unsigned char *stringValue = (unsigned char *) MALLOC(stringBuffer->stringLength + 1);
+    unsigned char *string_value = (unsigned char *) MALLOC(string_buffer->string_length + 1);
 
     /* creates the iterators for the list of strings, to go
     arround them joining the strings into a single buffer */
-    createIteratorLinkedList(stringBuffer->stringList, &stringIterator);
-    createIteratorLinkedList(stringBuffer->lengthList, &lengthIterator);
+    create_iterator_linked_list(string_buffer->string_list, &string_iterator);
+    create_iterator_linked_list(string_buffer->length_list, &length_iterator);
 
     /* sets the "initial" pointer value to the "base" string value position */
-    pointer = stringValue;
+    pointer = string_value;
 
     /* iterates continuously to process to "join" the
     various "partial" string values into a single buffer */
     while(1) {
         /* retrieves the next value from the string iterator
         as the partial value */
-        getNextIterator(stringIterator, (void **) &partialValue);
+        get_next_iterator(string_iterator, (void **) &partial_value);
 
         /* retrieves the next value from the length iterator
         as the partial value length (length of the string) */
-        getNextIterator(lengthIterator, (void **) &partialValueLength);
+        get_next_iterator(length_iterator, (void **) &partial_value_length);
 
         /* in case the partial value is not set
         there are no more items to be retrieved from
         the iterator, breaks the loop */
-        if(partialValue == NULL) { break; }
+        if(partial_value == NULL) { break; }
 
         /* copoes the contents of the partial value to
         the buffer "pointed" by pointer, using the previously
         retrieved partial value length */
-        memcpy(pointer, partialValue, partialValueLength);
+        memcpy(pointer, partial_value, partial_value_length);
 
         /* updates the pointer value with the length of the
         partial (string) value */
-        pointer += partialValueLength;
+        pointer += partial_value_length;
     }
 
     /* "closes" the string value, usefull for usage as a "classic"
     null terminated string */
-    stringValue[stringBuffer->stringLength] = '\0';
+    string_value[string_buffer->string_length] = '\0';
 
     /* sets the string value in the value "pointed" by
     the string value pointer */
-    *stringValuePointer = stringValue;
+    *string_value_pointer = string_value;
 
     /* deletes both the length and the string iterators, in order
     to avoid possible memory leaks */
-    deleteIteratorLinkedList(stringBuffer->lengthList, lengthIterator);
-    deleteIteratorLinkedList(stringBuffer->stringList, stringIterator);
+    delete_iterator_linked_list(string_buffer->length_list, length_iterator);
+    delete_iterator_linked_list(string_buffer->string_list, string_iterator);
 }
 
-void _appendStringBuffer(struct StringBuffer_t *stringBuffer, unsigned char *stringValue) {
+void _append_string_buffer(struct string_buffer_t *string_buffer, unsigned char *string_value) {
     /* adds the string value to the list of strings to have
     the memory released uppon string buffer release */
-    appendValueLinkedList(stringBuffer->releaseList, stringValue);
+    append_value_linked_list(string_buffer->release_list, string_value);
 
     /* adds the string value to the string buffer */
-    appendStringBuffer(stringBuffer, stringValue);
+    append_string_buffer(string_buffer, string_value);
 }
 
-void _appendStringLBuffer(struct StringBuffer_t *stringBuffer, unsigned char *stringValue, size_t stringLength) {
+void _append_string_l_buffer(struct string_buffer_t *string_buffer, unsigned char *string_value, size_t string_length) {
     /* adds the string value to the list of strings to have
     the memory released uppon string buffer release */
-    appendValueLinkedList(stringBuffer->releaseList, stringValue);
+    append_value_linked_list(string_buffer->release_list, string_value);
 
     /* adds the string (with length) value to the string buffer */
-    appendStringLBuffer(stringBuffer, stringValue, stringLength);
+    append_string_l_buffer(string_buffer, string_value, string_length);
 }
 
-void _appendStringTBuffer(struct StringBuffer_t *stringBuffer, struct String_t *string) {
+void _append_string_t_buffer(struct string_buffer_t *string_buffer, struct string_t *string) {
     /* adds the string structure value to the string buffer,
     using the length oriented append function */
-    _appendStringLBuffer(stringBuffer, string->buffer, string->length);
+    _append_string_l_buffer(string_buffer, string->buffer, string->length);
 }

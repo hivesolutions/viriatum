@@ -47,33 +47,33 @@
  */
 #define DEFAULT_RESIZE_FACTOR 4
 
-typedef struct HashMap_t {
+typedef struct hash_map_t {
     size_t size;
-    size_t maximumSize;
-    size_t elementSize;
-    size_t elementsBufferSize;
-    struct HashMapElement_t *elementsBuffer;
-} HashMap;
+    size_t maximum_size;
+    size_t element_size;
+    size_t elements_buffer_size;
+    struct hash_map_element_t *elements_buffer;
+} hash_map;
 
-typedef struct HashMapElement_t {
+typedef struct hash_map_element_t {
     void *value;
     unsigned int used;
     size_t key;
-    unsigned char *keyString;
-} HashMapElement;
+    unsigned char *key_string;
+} hash_map_element;
 
-VIRIATUM_EXPORT_PREFIX void createHashMap(struct HashMap_t **hashMapPointer, size_t initialSize);
-VIRIATUM_EXPORT_PREFIX void deleteHashMap(struct HashMap_t *hashMap);
-VIRIATUM_EXPORT_PREFIX void setValueHashMap(struct HashMap_t *hashMap, size_t key, unsigned char *keyString, void *value);
-VIRIATUM_EXPORT_PREFIX void setValueStringHashMap(struct HashMap_t *hashMap, unsigned char *keyString, void *value);
-VIRIATUM_EXPORT_PREFIX void getHashMap(struct HashMap_t *hashMap, size_t key, unsigned char *keyString, struct HashMapElement_t **elementPointer);
-VIRIATUM_EXPORT_PREFIX void getValueHashMap(struct HashMap_t *hashMap, size_t key, unsigned char *keyString, void **valuePointer);
-VIRIATUM_EXPORT_PREFIX void getValueStringHashMap(struct HashMap_t *hashMap, unsigned char *keyString, void **valuePointer);
-VIRIATUM_EXPORT_PREFIX void createIteratorHashMap(struct HashMap_t *hashMap, struct Iterator_t **iteratorPointer);
-VIRIATUM_EXPORT_PREFIX void createElementIteratorHashMap(struct HashMap_t *hashMap, struct Iterator_t **iteratorPointer);
-VIRIATUM_EXPORT_PREFIX void deleteIteratorHashMap(struct HashMap_t *hashMap, struct Iterator_t *iterator);
-VIRIATUM_EXPORT_PREFIX void resetIteratorHashMap(struct HashMap_t *hashMap, struct Iterator_t *iterator);
-VIRIATUM_EXPORT_PREFIX void getNextIteratorHashMap(struct Iterator_t *iterator, void **nextPointer);
-VIRIATUM_EXPORT_PREFIX void getNextElementIteratorHashMap(struct Iterator_t *iterator, void **nextPointer);
-VIRIATUM_EXPORT_PREFIX void _resizeHashMap(struct HashMap_t *hashMap);
-VIRIATUM_EXPORT_PREFIX size_t _calculateStringHashMap(unsigned char *keyString);
+VIRIATUM_EXPORT_PREFIX void create_hash_map(struct hash_map_t **hash_map_pointer, size_t initial_size);
+VIRIATUM_EXPORT_PREFIX void delete_hash_map(struct hash_map_t *hash_map);
+VIRIATUM_EXPORT_PREFIX void set_value_hash_map(struct hash_map_t *hash_map, size_t key, unsigned char *key_string, void *value);
+VIRIATUM_EXPORT_PREFIX void set_value_string_hash_map(struct hash_map_t *hash_map, unsigned char *key_string, void *value);
+VIRIATUM_EXPORT_PREFIX void get_hash_map(struct hash_map_t *hash_map, size_t key, unsigned char *key_string, struct hash_map_element_t **element_pointer);
+VIRIATUM_EXPORT_PREFIX void get_value_hash_map(struct hash_map_t *hash_map, size_t key, unsigned char *key_string, void **value_pointer);
+VIRIATUM_EXPORT_PREFIX void get_value_string_hash_map(struct hash_map_t *hash_map, unsigned char *key_string, void **value_pointer);
+VIRIATUM_EXPORT_PREFIX void create_iterator_hash_map(struct hash_map_t *hash_map, struct iterator_t **iterator_pointer);
+VIRIATUM_EXPORT_PREFIX void create_element_iterator_hash_map(struct hash_map_t *hash_map, struct iterator_t **iterator_pointer);
+VIRIATUM_EXPORT_PREFIX void delete_iterator_hash_map(struct hash_map_t *hash_map, struct iterator_t *iterator);
+VIRIATUM_EXPORT_PREFIX void reset_iterator_hash_map(struct hash_map_t *hash_map, struct iterator_t *iterator);
+VIRIATUM_EXPORT_PREFIX void get_next_iterator_hash_map(struct iterator_t *iterator, void **next_pointer);
+VIRIATUM_EXPORT_PREFIX void get_next_element_iterator_hash_map(struct iterator_t *iterator, void **next_pointer);
+VIRIATUM_EXPORT_PREFIX void _resize_hash_map(struct hash_map_t *hash_map);
+VIRIATUM_EXPORT_PREFIX size_t _calculate_string_hash_map(unsigned char *key_string);

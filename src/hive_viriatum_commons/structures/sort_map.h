@@ -31,21 +31,21 @@
 #include "hash_map.h"
 #include "linked_list.h"
 
-typedef struct SortMap_t {
-    struct HashMap_t *hashMap;
-    struct LinkedList_t *keyList;
-    struct LinkedList_t *keyStringList;
-} SortMap;
+typedef struct sort_map_t {
+    struct hash_map_t *hash_map;
+    struct linked_list_t *key_list;
+    struct linked_list_t *key_string_list;
+} sort_map;
 
-VIRIATUM_EXPORT_PREFIX void createSortMap(struct SortMap_t **sortMapPointer, size_t initialSize);
-VIRIATUM_EXPORT_PREFIX void deleteSortMap(struct SortMap_t *sortMap);
-VIRIATUM_EXPORT_PREFIX void setValueSortMap(struct SortMap_t *sortMap, size_t key, unsigned char *keyString, void *value);
-VIRIATUM_EXPORT_PREFIX void setValueStringSortMap(struct SortMap_t *sortMap, unsigned char *keyString, void *value);
-VIRIATUM_EXPORT_PREFIX void getValueSortMap(struct SortMap_t *sortMap, size_t key, unsigned char *keyString, void **valuePointer);
-VIRIATUM_EXPORT_PREFIX void getValueStringSortMap(struct SortMap_t *sortMap, unsigned char *keyString, void **valuePointer);
-VIRIATUM_EXPORT_PREFIX void createIteratorSortMap(struct SortMap_t *sortMap, struct Iterator_t **iteratorPointer);
-VIRIATUM_EXPORT_PREFIX void createElementIteratorSortMap(struct SortMap_t *sortMap, struct Iterator_t **iteratorPointer);
-VIRIATUM_EXPORT_PREFIX void deleteIteratorSortMap(struct SortMap_t *sortMap, struct Iterator_t *iterator);
-VIRIATUM_EXPORT_PREFIX void resetIteratorSortMap(struct SortMap_t *sortMap, struct Iterator_t *iterator);
-VIRIATUM_EXPORT_PREFIX void getNextIteratorSortMap(struct Iterator_t *iterator, void **nextPointer);
-VIRIATUM_EXPORT_PREFIX void getNextElementIteratorSortMap(struct Iterator_t *iterator, void **nextPointer);
+VIRIATUM_EXPORT_PREFIX void create_sort_map(struct sort_map_t **sort_map_pointer, size_t initial_size);
+VIRIATUM_EXPORT_PREFIX void delete_sort_map(struct sort_map_t *sort_map);
+VIRIATUM_EXPORT_PREFIX void set_value_sort_map(struct sort_map_t *sort_map, size_t key, unsigned char *key_string, void *value);
+VIRIATUM_EXPORT_PREFIX void set_value_string_sort_map(struct sort_map_t *sort_map, unsigned char *key_string, void *value);
+VIRIATUM_EXPORT_PREFIX void get_value_sort_map(struct sort_map_t *sort_map, size_t key, unsigned char *key_string, void **value_pointer);
+VIRIATUM_EXPORT_PREFIX void get_value_string_sort_map(struct sort_map_t *sort_map, unsigned char *key_string, void **value_pointer);
+VIRIATUM_EXPORT_PREFIX void create_iterator_sort_map(struct sort_map_t *sort_map, struct iterator_t **iterator_pointer);
+VIRIATUM_EXPORT_PREFIX void create_element_iterator_sort_map(struct sort_map_t *sort_map, struct iterator_t **iterator_pointer);
+VIRIATUM_EXPORT_PREFIX void delete_iterator_sort_map(struct sort_map_t *sort_map, struct iterator_t *iterator);
+VIRIATUM_EXPORT_PREFIX void reset_iterator_sort_map(struct sort_map_t *sort_map, struct iterator_t *iterator);
+VIRIATUM_EXPORT_PREFIX void get_next_iterator_sort_map(struct iterator_t *iterator, void **next_pointer);
+VIRIATUM_EXPORT_PREFIX void get_next_element_iterator_sort_map(struct iterator_t *iterator, void **next_pointer);

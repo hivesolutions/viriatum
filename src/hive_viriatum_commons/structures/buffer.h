@@ -32,7 +32,7 @@
  * that is a simple sequence of bytes in
  * memory with an associated size.
  */
-typedef struct Buffer_t {
+typedef struct buffer_t {
     /**
      * The memory pointer to the initial
      * position of the buffer.
@@ -46,10 +46,10 @@ typedef struct Buffer_t {
      * base pointer plus this size.
      */
     size_t size;
-} Buffer;
+} buffer;
 
-VIRIATUM_EXPORT_PREFIX void createBuffer(struct Buffer_t **bufferPointer, size_t initialSize);
-VIRIATUM_EXPORT_PREFIX void deleteBuffer(struct Buffer_t *buffer);
+VIRIATUM_EXPORT_PREFIX void create_buffer(struct buffer_t **buffer_pointer, size_t initial_size);
+VIRIATUM_EXPORT_PREFIX void delete_buffer(struct buffer_t *buffer);
 
 /**
  * Converts the given buffer into a string representation
@@ -62,9 +62,9 @@ VIRIATUM_EXPORT_PREFIX void deleteBuffer(struct Buffer_t *buffer);
  * @return The string representation of the given buffer, this
  * object must be released by the caller function (owner).
  */
-VIRIATUM_EXPORT_PREFIX char *toStringBuffer(struct Buffer_t *buffer);
+VIRIATUM_EXPORT_PREFIX char *to_string_buffer(struct buffer_t *buffer);
 
-static __inline char equalsBuffer(struct Buffer_t *buffer, struct Buffer_t *target) {
+static __inline char equals_buffer(struct buffer_t *buffer, struct buffer_t *target) {
     return buffer->size == target->size
         && memcmp(buffer->pointer, target->pointer, buffer->size) == 0;
 }

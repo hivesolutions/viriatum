@@ -36,7 +36,7 @@
  * @param parameters The map containing the various parameters
  * to be used while running the service.
  */
-ERROR_CODE runService(struct HashMap_t *parameters);
+ERROR_CODE runService(struct hash_map_t *parameters);
 
 /**
  * Stops the process of a running the service.

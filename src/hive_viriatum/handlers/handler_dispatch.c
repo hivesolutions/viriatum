@@ -237,7 +237,7 @@ ERROR_CODE urlCallbackHandlerDispatch(struct HttpParser_t *httpParser, const uns
     /* sets the current http handler accoring to the current options
     in the service, the http handler must be loaded in the handlers map
     in case the handler is not currently available an error is printed */
-    getValueStringHashMap(service->httpHandlersMap, handlerName, (void **) &handler);
+    get_value_string_hash_map(service->httpHandlersMap, handlerName, (void **) &handler);
     if(handler) {
         /* retrieves the current handler and then unsets it
         from the connection (detach) then sets the the prper

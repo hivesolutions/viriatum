@@ -201,7 +201,7 @@ VIRIATUM_EXPORT_PREFIX void createTemplateEngine(struct TemplateEngine_t **templ
 VIRIATUM_EXPORT_PREFIX void deleteTemplateEngine(struct TemplateEngine_t *templateEngine);
 VIRIATUM_EXPORT_PREFIX void createTemplateSettings(struct TemplateSettings_t **templateSettingsPointer);
 VIRIATUM_EXPORT_PREFIX void deleteTemplateSettings(struct TemplateSettings_t *templateSettings);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE processTemplateEngine(struct TemplateEngine_t *templateEngine, struct TemplateSettings_t *templateSettings, unsigned char *filePath);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE processTemplateEngine(struct TemplateEngine_t *templateEngine, struct TemplateSettings_t *templateSettings, unsigned char *file_path);
 
 /**
  * Retrieves a new character from the file stream

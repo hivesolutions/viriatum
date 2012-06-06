@@ -58,7 +58,7 @@ typedef struct HandlerFileContext_t {
      * The path to the file to be handled by
      * the current file request.
      */
-    unsigned char filePath[VIRIATUM_MAX_PATH_SIZE];
+    unsigned char file_path[VIRIATUM_MAX_PATH_SIZE];
 
     /**
      * The reference to the file stream to be
@@ -78,7 +78,7 @@ typedef struct HandlerFileContext_t {
      * processed in the beginning of the workflows
      * (eg: listing the entries of a directory).
      */
-    struct TemplateHandler_t *templateHandler;
+    struct TemplateHandler_t *template_handler;
 
     /**
      * The flag that controlls the flushing of the

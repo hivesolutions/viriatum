@@ -33,7 +33,7 @@
  * Strucrure defining the various
  * possible types of files.
  */
-typedef enum FileType_e {
+typedef enum file_type_e {
     /**
      * The normal and regular file,
      * according to the file system.
@@ -50,19 +50,19 @@ typedef enum FileType_e {
      * file link.
      */
     FILE_TYPE_LINK
-} FileType;
+} file_type;
 
 /**
  * Structure defining a series
  * of meta information about a file
  * from the file system.
  */
-typedef struct File_t {
+typedef struct file_t {
     /**
      * The type of file (eg: normal, directory
      * symbolic link).
      */
-    enum FileType_e type;
+    enum file_type_e type;
 
     /**
      * The name of the file as a
@@ -80,69 +80,69 @@ typedef struct File_t {
      * The date time of the last write
      * access to the file.
      */
-    struct DateTime_t time;
-} File;
+    struct date_time_t time;
+} file;
 
 /**
  * Reads the file at the given file path to a generated
  * buffer and retrieves the size of the file.
  *
- * @param filePath The path to the file to be read.
- * @param bufferPointer The pointer to the generated buffer
+ * @param file_path The path to the file to be read.
+ * @param buffer_pointer The pointer to the generated buffer
  * containing the file contents.
- * @param fileSizePointer The pointer to the file size.
+ * @param file_size_pointer The pointer to the file size.
  */
-VIRIATUM_EXPORT_PREFIX ERROR_CODE readFile(char *filePath, unsigned char **bufferPointer, size_t *fileSizePointer);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE read_file(char *file_path, unsigned char **buffer_pointer, size_t *file_size_pointer);
 
 /**
  * Writes the provided buffer into the file in the given
  * path, in case an error occurs it's raised.
  *
- * @param filePath The path to the file to be written.
+ * @param file_path The path to the file to be written.
  * @param buffer The buffer to be used in the writting
  * operation to the file.
- * @param bufferSize The size of the buffer to be used
+ * @param buffer_size The size of the buffer to be used
  * for the writing operation.
  */
-VIRIATUM_EXPORT_PREFIX ERROR_CODE writeFile(char *filePath, unsigned char *buffer, size_t bufferSize);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE write_file(char *file_path, unsigned char *buffer, size_t buffer_size);
 
 /**
  * Counts the number of bytes in the file in the
  * given path and returns the resulting count.
  *
- * @param filePath The path to the file to be "counted".
- * @param fileSizePointer The pointer to the file size.
+ * @param file_path The path to the file to be "counted".
+ * @param file_size_pointer The pointer to the file size.
  */
-VIRIATUM_EXPORT_PREFIX ERROR_CODE countFile(char *filePath, size_t *fileSizePointer);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE count_file(char *file_path, size_t *file_size_pointer);
 
 /**
  * Retrieves the last write time (as a date time structure)
  * for the file in the given file path.
  *
- * @param filePath The path to the file to retrieve the write time.
- * @param dateTime The time of the last write time in the file.
+ * @param file_path The path to the file to retrieve the write time.
+ * @param date_time The time of the last write time in the file.
  */
-VIRIATUM_EXPORT_PREFIX ERROR_CODE getWriteTimeFile(char *filePath, struct DateTime_t *dateTime);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE get_write_time_file(char *file_path, struct date_time_t *date_time);
 
 /**
  * Checks if the given file path referes a directory path.
  * The result is set to the given integer pointer.
  *
- * @param filePath The path to be verified to be a directory.
- * @param isDirectory If the given path refers a directory.
+ * @param file_path The path to be verified to be a directory.
+ * @param is_directory If the given path refers a directory.
  */
-VIRIATUM_EXPORT_PREFIX ERROR_CODE isDirectoryFile(char *filePath, unsigned int *isDirectory);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE is_directory_file(char *file_path, unsigned int *is_directory);
 
 /**
  * Lists the various (copies them) directory entries for the
  * given file (dirctory) path.
  * The "new" entries are copied to the given linked list of entries.
  *
- * @param filePath The path to the directory to be listed.
+ * @param file_path The path to the directory to be listed.
  * @param entries The linked list of entries to be used to
  * hold the various directory file entries.
  */
-VIRIATUM_EXPORT_PREFIX ERROR_CODE listDirectoryFile(char *filePath, struct LinkedList_t *entries);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE list_directory_file(char *file_path, struct linked_list_t *entries);
 
 /**
  * Deletes, releases memory from all the directory entries described
@@ -150,7 +150,7 @@ VIRIATUM_EXPORT_PREFIX ERROR_CODE listDirectoryFile(char *filePath, struct Linke
  *
  * @param entries The list of entries to be deleted.
  */
-VIRIATUM_EXPORT_PREFIX ERROR_CODE deleteDirectoryEntriesFile(struct LinkedList_t *entries);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE delete_directory_entries_file(struct linked_list_t *entries);
 
 /**
  * Deletes, releases memory from all the directory entries (map) described
@@ -158,7 +158,7 @@ VIRIATUM_EXPORT_PREFIX ERROR_CODE deleteDirectoryEntriesFile(struct LinkedList_t
  *
  * @param map The list of entries (map) to be deleted.
  */
-VIRIATUM_EXPORT_PREFIX ERROR_CODE deleteDirectoryEntriesMapFile(struct LinkedList_t *map);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE delete_directory_entries_map_file(struct linked_list_t *map);
 
 /**
  * Converts a linked list of entries into a list of maps describing
@@ -166,20 +166,20 @@ VIRIATUM_EXPORT_PREFIX ERROR_CODE deleteDirectoryEntriesMapFile(struct LinkedLis
  *
  * @param entries The list of file entries to be converted into
  * a list of (descriptive) maps.
- * @param mapPointer The pointer to the list to hold the various
+ * @param map_pointer The pointer to the list to hold the various
  * maps describing the entries.
  */
-VIRIATUM_EXPORT_PREFIX ERROR_CODE entriesToMapFile(struct LinkedList_t *entries, struct LinkedList_t **mapPointer);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE entries_to_map_file(struct linked_list_t *entries, struct linked_list_t **map_pointer);
 
 /**
  * Joins a file path with a given base path.
  * The joining of the path uses the default system separator.
  *
- * @param basePath The base path for the joined path.
+ * @param base_path The base path for the joined path.
  * @param name The name to be used as sufix in the path joining.
- * @param joinedPath The joined path buffer to receive the final result.
+ * @param joined_path The joined path buffer to receive the final result.
  */
-VIRIATUM_EXPORT_PREFIX ERROR_CODE joinPathFile(char *basePath, char *name, char *joinedPath);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE join_path_file(char *base_path, char *name, char *joined_path);
 
 /**
  * Comparator function to be used to compare two file
@@ -189,4 +189,4 @@ VIRIATUM_EXPORT_PREFIX ERROR_CODE joinPathFile(char *basePath, char *name, char 
  * @param second The second value to be compared.
  * @return The result of the comparison.
  */
-VIRIATUM_EXPORT_PREFIX int _entryCompareFile(void *first, void *second);
+VIRIATUM_EXPORT_PREFIX int _entry_compare_file(void *first, void *second);

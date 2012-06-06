@@ -39,7 +39,7 @@ ERROR_CODE createHandlerFileContext(struct HandlerFileContext_t **handlerFileCon
     /* sets the handler file default values */
     handlerFileContext->file = NULL;
     handlerFileContext->flags = 0;
-    handlerFileContext->templateHandler = NULL;
+    handlerFileContext->template_handler = NULL;
     handlerFileContext->cacheControlStatus = 0;
     handlerFileContext->etagStatus = 0;
 
@@ -60,9 +60,9 @@ ERROR_CODE deleteHandlerFileContext(struct HandlerFileContext_t *handlerFileCont
 
     /* in case there is a template handler defined
     in the handler file context */
-    if(handlerFileContext->templateHandler) {
+    if(handlerFileContext->template_handler) {
         /* deletes the template handler (releases memory) */
-        deleteTemplateHandler(handlerFileContext->templateHandler);
+        delete_template_handler(handlerFileContext->template_handler);
     }
 
     /* releases the handler file context */
@@ -174,7 +174,7 @@ ERROR_CODE urlCallbackHandlerFile(struct HttpParser_t *httpParser, const unsigne
     memcpy(handlerFileContext->url, url, dataSize + 1);
 
     /* creates the file path from using the base viriatum path */
-    SPRINTF((char *) handlerFileContext->filePath, VIRIATUM_MAX_PATH_SIZE, "%s%s%s", VIRIATUM_CONTENTS_PATH, VIRIATUM_BASE_PATH, url);
+    SPRINTF((char *) handlerFileContext->file_path, VIRIATUM_MAX_PATH_SIZE, "%s%s%s", VIRIATUM_CONTENTS_PATH, VIRIATUM_BASE_PATH, url);
 
     /* raise no error */
     RAISE_NO_ERROR;
@@ -250,16 +250,16 @@ ERROR_CODE bodyCallbackHandlerFile(struct HttpParser_t *httpParser, const unsign
 
 ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
     /* allocates the file size */
-    size_t fileSize;
+    size_t file_size;
 
     /* allocates space for the directory entries and for
     the template handler */
-    struct LinkedList_t *directoryEntries;
-    struct LinkedList_t *directoryEntriesMap;
-    struct TemplateHandler_t *templateHandler;
+    struct linked_list_t *directoryEntries;
+    struct linked_list_t *directoryEntriesMap;
+    struct TemplateHandler_t *template_handler;
 
     /* allocates space for the is directory and the is redirect flags */
-    unsigned int isDirectory = 0;
+    unsigned int is_directory = 0;
     unsigned int isRedirect = 0;
 
     /* allocates space for the new location value for
@@ -271,7 +271,7 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
     /* allocates space for the computation of the time
     and of the time string, then allocates space for the
     etag calculation structure (crc32 value) and for the etag*/
-    struct DateTime_t time;
+    struct date_time_t time;
     char timeString[20];
     unsigned long crc32Value;
     char etag[11];
@@ -291,11 +291,11 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
     struct Connection_t *connection = (struct Connection_t *) httpParser->parameters;
 
     /* checks if the path being request is in fact a directory */
-    isDirectoryFile((char *) handlerFileContext->filePath, &isDirectory);
+    is_directory_file((char *) handlerFileContext->file_path, &is_directory);
 
     /* in case the file path being request referes a directory
     it must be checked and the entries retrieved to be rendered */
-    if(isDirectory) {
+    if(is_directory) {
         if(handlerFileContext->url[strlen((char *) handlerFileContext->url) - 1] != '/') {
             /* creates the new location by adding the slash character to the current
             handler file context url (avoids directory confusion) */
@@ -313,55 +313,55 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
             V_DEBUG_F("Processing template file '%s'\n", templatePath);
 
             /* creates the directory entries (linked list) */
-            createLinkedList(&directoryEntries);
+            create_linked_list(&directoryEntries);
 
             /* lists the directory file into the directory
             entries linked list and then converts them into maps */
-            listDirectoryFile((char *) handlerFileContext->filePath, directoryEntries);
-            entriesToMapFile(directoryEntries, &directoryEntriesMap);
+            list_directory_file((char *) handlerFileContext->file_path, directoryEntries);
+            entries_to_map_file(directoryEntries, &directoryEntriesMap);
 
             /* creates the template handler */
-            createTemplateHandler(&templateHandler);
+            create_template_handler(&template_handler);
 
             /* assigns the directory entries to the template handler,
             this variable will be exposed to the template */
-            assignListTemplateHandler(templateHandler, (unsigned char *) "entries", directoryEntriesMap);
-            assignIntegerTemplateHandler(templateHandler, (unsigned char *) "items", (int) directoryEntriesMap->size);
+            assignListTemplateHandler(template_handler, (unsigned char *) "entries", directoryEntriesMap);
+            assignIntegerTemplateHandler(template_handler, (unsigned char *) "items", (int) directoryEntriesMap->size);
 
             /* processes the file as a template handler */
-            processTemplateHandler(templateHandler, templatePath);
+            process_template_handler(template_handler, templatePath);
 
             /* sets the template handler in the handler file context and unsets
             the flushed flag */
-            handlerFileContext->templateHandler = templateHandler;
+            handlerFileContext->template_handler = template_handler;
             handlerFileContext->flushed = 0;
 
             /* deletes the directory entries map and the
             directory entries */
-            deleteDirectoryEntriesMapFile(directoryEntriesMap);
-            deleteDirectoryEntriesFile(directoryEntries);
+            delete_directory_entries_map_file(directoryEntriesMap);
+            delete_directory_entries_file(directoryEntries);
 
             /* deletes the directory entries (linked list) and
             the entries map (linked list) */
-            deleteLinkedList(directoryEntries);
-            deleteLinkedList(directoryEntriesMap);
+            delete_linked_list(directoryEntries);
+            delete_linked_list(directoryEntriesMap);
         }
     }
     /* otherwise the file path must refered a "normal" file path and
     it must be checked */
     else {
         /* counts the total size (in bytes) of the contents in the file path */
-        errorCode = countFile((char *) handlerFileContext->filePath, &fileSize);
+        errorCode = count_file((char *) handlerFileContext->file_path, &file_size);
 
         /* in case there is no error count the file size, avoids
         extra problems while computing the etag */
         if(!IS_ERROR_CODE(errorCode)) {
             /* resets the date time structure to avoid invalid
             date requests */
-            memset(&time, 0, sizeof(struct DateTime_t));
+            memset(&time, 0, sizeof(struct date_time_t));
 
             /* retrieve the time of the last write in the file path */
-            getWriteTimeFile((char *) handlerFileContext->filePath, &time);
+            get_write_time_file((char *) handlerFileContext->file_path, &time);
 
             /* creates the date time string for the file entry */
             SPRINTF(timeString, 20, "%04d-%02d-%02d %02d:%02d:%02d", time.year, time.month, time.day, time.hour, time.minute, time.second);
@@ -382,7 +382,7 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
         V_DEBUG_F("%s\n", get_last_error_message_safe());
 
         /* writes the http static headers to the response */
-        SPRINTF(headersBuffer, 1024, "HTTP/1.1 404 Not Found\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nCache-Control: no-cache, must-revalidate\r\nContent-Length: %lu\r\n\r\n404 - Not Found (%s)", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, (long unsigned int) strlen((char *) handlerFileContext->filePath) + 18, handlerFileContext->filePath);
+        SPRINTF(headersBuffer, 1024, "HTTP/1.1 404 Not Found\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nCache-Control: no-cache, must-revalidate\r\nContent-Length: %lu\r\n\r\n404 - Not Found (%s)", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, (long unsigned int) strlen((char *) handlerFileContext->file_path) + 18, handlerFileContext->file_path);
 
         /* writes both the headers to the connection, registers for the appropriate callbacks */
         writeConnection(connection, (unsigned char *) headersBuffer, (unsigned int) strlen(headersBuffer), _cleanupHandlerFile, handlerFileContext);
@@ -394,9 +394,9 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
         writeConnection(connection, (unsigned char *) headersBuffer, (unsigned int) strlen(headersBuffer), _cleanupHandlerFile, handlerFileContext);
     }
     /* in case the current situation is a directory list */
-    else if(isDirectory) {
+    else if(is_directory) {
         /* writes the http static headers to the response */
-        SPRINTF(headersBuffer, 1024, "HTTP/1.1 200 OK\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nCache-Control: no-cache, must-revalidate\r\nContent-Length: %lu\r\n\r\n", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, (long unsigned int) strlen((char *) handlerFileContext->templateHandler->stringValue));
+        SPRINTF(headersBuffer, 1024, "HTTP/1.1 200 OK\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nCache-Control: no-cache, must-revalidate\r\nContent-Length: %lu\r\n\r\n", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, (long unsigned int) strlen((char *) handlerFileContext->template_handler->string_value));
 
         /* writes both the headers to the connection, registers for the appropriate callbacks */
         writeConnection(connection, (unsigned char *) headersBuffer, (unsigned int) strlen(headersBuffer), _sendDataHandlerFile, handlerFileContext);
@@ -412,7 +412,7 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
     file situation (no directory) */
     else {
         /* writes the http static headers to the response */
-        SPRINTF(headersBuffer, 1024, "HTTP/1.1 200 OK\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nCache-Control: no-cache, must-revalidate\r\nETag: %s\r\nContent-Length: %lu\r\n\r\n", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, etag, (long unsigned int) fileSize);
+        SPRINTF(headersBuffer, 1024, "HTTP/1.1 200 OK\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nCache-Control: no-cache, must-revalidate\r\nETag: %s\r\nContent-Length: %lu\r\n\r\n", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, etag, (long unsigned int) file_size);
 
         /* writes both the headers to the connection, registers for the appropriate callbacks */
         writeConnection(connection, (unsigned char *) headersBuffer, strlen(headersBuffer), _sendChunkHandlerFile, handlerFileContext);
@@ -527,24 +527,24 @@ ERROR_CODE _cleanupHandlerFile(struct Connection_t *connection, struct Data_t *d
 
 ERROR_CODE _sendChunkHandlerFile(struct Connection_t *connection, struct Data_t *data, void *parameters) {
     /* allocates the number of bytes */
-    size_t numberBytes;
+    size_t number_bytes;
 
     /* casts the parameters as handler file context */
     struct HandlerFileContext_t *handlerFileContext = (struct HandlerFileContext_t *) parameters;
 
     /* retrieves the file path from the handler file context */
-    unsigned char *filePath = handlerFileContext->filePath;
+    unsigned char *file_path = handlerFileContext->file_path;
 
     /* retrieves the file from the handler file context */
     FILE *file = handlerFileContext->file;
 
     /* allocates the required buffer for the file */
-    unsigned char *fileBuffer = MALLOC(FILE_BUFFER_SIZE_HANDLER_FILE);
+    unsigned char *file_buffer = MALLOC(FILE_BUFFER_SIZE_HANDLER_FILE);
 
     /* in case the file is not defined (should be opened) */
     if(file == NULL) {
         /* opens the file */
-        FOPEN(&file, (char *) filePath, "rb");
+        FOPEN(&file, (char *) file_path, "rb");
 
         /* in case the file is not found */
         if(file == NULL) {
@@ -557,12 +557,12 @@ ERROR_CODE _sendChunkHandlerFile(struct Connection_t *connection, struct Data_t 
     }
 
     /* reads the file contents */
-    numberBytes = fread(fileBuffer, 1, FILE_BUFFER_SIZE_HANDLER_FILE, file);
+    number_bytes = fread(file_buffer, 1, FILE_BUFFER_SIZE_HANDLER_FILE, file);
 
     /* in case the number of read bytes is valid */
-    if(numberBytes > 0) {
+    if(number_bytes > 0) {
         /* writes both the file buffer to the connection */
-        writeConnection(connection, fileBuffer, numberBytes, _sendChunkHandlerFile, handlerFileContext);
+        writeConnection(connection, file_buffer, number_bytes, _sendChunkHandlerFile, handlerFileContext);
     }
     /* otherwise the file "transfer" is complete */
     else {
@@ -576,7 +576,7 @@ ERROR_CODE _sendChunkHandlerFile(struct Connection_t *connection, struct Data_t 
         fclose(file);
 
         /* releases the current file buffer */
-        FREE(fileBuffer);
+        FREE(file_buffer);
     }
 
     /* raise no error */
@@ -587,15 +587,15 @@ ERROR_CODE _sendDataHandlerFile(struct Connection_t *connection, struct Data_t *
     /* casts the parameters as handler file context and then
     retrieves the templat handler from it */
     struct HandlerFileContext_t *handlerFileContext = (struct HandlerFileContext_t *) parameters;
-    struct TemplateHandler_t *templateHandler = handlerFileContext->templateHandler;
+    struct TemplateHandler_t *template_handler = handlerFileContext->template_handler;
 
     /* in case the handler file context is already flushed
     time to clenaup pending structures */
     if(handlerFileContext->flushed) {
         /* deletes the template handler (releases memory) and
         unsets the reference in the handler file context */
-        deleteTemplateHandler(templateHandler);
-        handlerFileContext->templateHandler = NULL;
+        delete_template_handler(template_handler);
+        handlerFileContext->template_handler = NULL;
 
         /* runs the cleanup handler file (releases internal structures) */
         _cleanupHandlerFile(connection, data, parameters);
@@ -604,11 +604,11 @@ ERROR_CODE _sendDataHandlerFile(struct Connection_t *connection, struct Data_t *
     else {
         /* writes the (file) data to the connection and sets the handler
         file context as flushed */
-        writeConnection(connection, templateHandler->stringValue, (unsigned int) strlen((char *) templateHandler->stringValue), _sendDataHandlerFile, handlerFileContext);
+        writeConnection(connection, template_handler->string_value, (unsigned int) strlen((char *) template_handler->string_value), _sendDataHandlerFile, handlerFileContext);
         handlerFileContext->flushed = 1;
 
         /* unsets the string value in the template handler (avoids double release) */
-        templateHandler->stringValue = NULL;
+        template_handler->string_value = NULL;
     }
 
     /* raise no error */

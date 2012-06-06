@@ -33,7 +33,7 @@
  * The structure main components are the
  * buffer of bytes and the length of it.
  */
-typedef struct String_t {
+typedef struct string_t {
     /**
      * The buffer containing the internal
      * string reference.
@@ -45,8 +45,8 @@ typedef struct String_t {
      * string value (buffer).
      */
     size_t length;
-} String;
+} string;
 
-VIRIATUM_EXPORT_PREFIX void createString(struct String_t **stringPointer);
-VIRIATUM_EXPORT_PREFIX void deleteString(struct String_t *string);
-VIRIATUM_EXPORT_PREFIX void stringPopulate(struct String_t *string, unsigned char *buffer, size_t length, char calculate);
+VIRIATUM_EXPORT_PREFIX void create_string(struct string_t **string_pointer);
+VIRIATUM_EXPORT_PREFIX void delete_string(struct string_t *string);
+VIRIATUM_EXPORT_PREFIX void string_populate(struct string_t *string, unsigned char *buffer, size_t length, char calculate);

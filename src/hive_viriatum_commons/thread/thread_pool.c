@@ -31,7 +31,7 @@
 
 #ifndef VIRIATUM_NO_THREADS
 
-void createThreadPool(struct ThreadPool_t **threadPoolPointer, size_t numberThreads, size_t schedulingAlgorithm, size_t maximumNumberThreads) {
+void create_thread_pool(struct ThreadPool_t **threadPoolPointer, size_t numberThreads, size_t schedulingAlgorithm, size_t maximumNumberThreads) {
     /* allocates space for the index */
     size_t index;
 
@@ -39,59 +39,59 @@ void createThreadPool(struct ThreadPool_t **threadPoolPointer, size_t numberThre
     size_t threadPoolSize = sizeof(struct ThreadPool_t);
 
     /* allocates space for the thread pool */
-    struct ThreadPool_t *threadPool = (struct ThreadPool_t *) MALLOC(threadPoolSize);
+    struct ThreadPool_t *thread_pool = (struct ThreadPool_t *) MALLOC(threadPoolSize);
 
     /* sets the number of threads */
-    threadPool->numberThreads = numberThreads;
+    thread_pool->numberThreads = numberThreads;
 
     /* sets the scheduling algorithm */
-    threadPool->schedulingAlgorithm = schedulingAlgorithm;
+    thread_pool->schedulingAlgorithm = schedulingAlgorithm;
 
     /* sets the maximum number of threads */
-    threadPool->maximumNumberThreads = maximumNumberThreads;
+    thread_pool->maximumNumberThreads = maximumNumberThreads;
 
     /* initializes the thread pool current number of threads */
-    threadPool->currentNumberThreads = 0;
+    thread_pool->currentNumberThreads = 0;
 
     /* creates the task condition */
-    CONDITION_CREATE(threadPool->taskCondition);
+    CONDITION_CREATE(thread_pool->taskCondition);
 
     /* creates the task condition lock */
-    CRITICAL_SECTION_CREATE(threadPool->taskConditionLock);
+    CRITICAL_SECTION_CREATE(thread_pool->taskConditionLock);
 
     /* creates the worker threads list */
-    createLinkedList(&threadPool->workerThreadsList);
+    create_linked_list(&thread_pool->workerThreadsList);
 
     /* creates the task queue */
-    createLinkedList(&threadPool->taskQueue);
+    create_linked_list(&thread_pool->taskQueue);
 
     /* iterates over the number of threas */
     for(index = 0; index < numberThreads; index++) {
         /* creates a thread pool elememt for the thread pool */
-        createThreadPoolElement(threadPool);
+        createThreadPoolElement(thread_pool);
     }
 
     /* sets the thread pool in the thread pool pointer */
-    *threadPoolPointer = threadPool;
+    *threadPoolPointer = thread_pool;
 }
 
-void deleteThreadPool(struct ThreadPool_t *threadPool) {
+void deleteThreadPool(struct ThreadPool_t *thread_pool) {
     /* closes the task condition */
-    CONDITION_CLOSE(threadPool->taskCondition);
+    CONDITION_CLOSE(thread_pool->taskCondition);
 
     /* delete the worker threads list */
-    deleteLinkedList(threadPool->workerThreadsList);
+    delete_linked_list(thread_pool->workerThreadsList);
 
     /* deletes the task queue */
-    deleteLinkedList(threadPool->taskQueue);
+    delete_linked_list(thread_pool->taskQueue);
 
     /* releases the thread pool */
-    FREE(threadPool);
+    FREE(thread_pool);
 }
 
-void createThreadPoolElement(struct ThreadPool_t *threadPool) {
+void createThreadPoolElement(struct ThreadPool_t *thread_pool) {
     /* allocates space for the thread id */
-    THREAD_IDENTIFIER threadId;
+    THREAD_IDENTIFIER thread_id;
 
     /* retrieves the thread pool element size */
     size_t threadPoolElementSize = sizeof(struct ThreadPoolElement_t);
@@ -100,31 +100,31 @@ void createThreadPoolElement(struct ThreadPool_t *threadPool) {
     struct ThreadPoolElement_t *threadPoolElement = (struct ThreadPoolElement_t *) MALLOC(threadPoolElementSize);
 
     /* creates the engine runnner thread */
-    THREAD_HANDLE threadHandle = THREAD_CREATE_BASE(threadId, poolRunnerThread, (THREAD_ARGUMENTS) threadPool);
+    THREAD_HANDLE threadHandle = THREAD_CREATE_BASE(thread_id, poolRunnerThread, (THREAD_ARGUMENTS) thread_pool);
 
     /* sets the thread pool element attributes */
     threadPoolElement->threadHandle = threadHandle;
-    threadPoolElement->threadId = threadId;
+    threadPoolElement->thread_id = thread_id;
 
     /* adds the thread pool element to the thread pool worker threads list */
-    appendValueLinkedList(threadPool->workerThreadsList, (void *) threadPoolElement);
+    append_value_linked_list(thread_pool->workerThreadsList, (void *) threadPoolElement);
 
     /* increments the current number of threads */
-    threadPool->currentNumberThreads++;
+    thread_pool->currentNumberThreads++;
 }
 
-void insertTaskThreadPool(struct ThreadPool_t *threadPool, struct ThreadPoolTask_t *threadPoolTask) {
+void insert_task_thread_pool(struct ThreadPool_t *thread_pool, struct ThreadPoolTask_t *thread_pool_task) {
     /* locks the task condition lock */
-    CONDITION_LOCK(threadPool->taskCondition, threadPool->taskConditionLock);
+    CONDITION_LOCK(thread_pool->taskCondition, thread_pool->taskConditionLock);
 
     /* adds the the thread pool task to the task queue */
-    appendValueLinkedList(threadPool->taskQueue, threadPoolTask);
+    append_value_linked_list(thread_pool->taskQueue, thread_pool_task);
 
     /* signals the task condition */
-    CONDITION_SIGNAL(threadPool->taskCondition);
+    CONDITION_SIGNAL(thread_pool->taskCondition);
 
     /* unlock the task condition lock */
-    CONDITION_UNLOCK(threadPool->taskCondition, threadPool->taskConditionLock);
+    CONDITION_UNLOCK(thread_pool->taskCondition, thread_pool->taskConditionLock);
 }
 
 THREAD_RETURN poolRunnerThread(THREAD_ARGUMENTS parameters) {
@@ -132,27 +132,27 @@ THREAD_RETURN poolRunnerThread(THREAD_ARGUMENTS parameters) {
     struct ThreadPoolTask_t *workThreadTask;
 
     /* retrieves the thread pool from the arguments */
-    struct ThreadPool_t *threadPool = (struct ThreadPool_t *) parameters;
+    struct ThreadPool_t *thread_pool = (struct ThreadPool_t *) parameters;
 
     /* ierates continuously */
     while(1) {
         /* locks the task condition lock */
-        CONDITION_LOCK(threadPool->taskCondition, threadPool->taskConditionLock);
+        CONDITION_LOCK(thread_pool->taskCondition, thread_pool->taskConditionLock);
 
         /* iterates while the task queue is empty */
-        while(threadPool->taskQueue->size == 0) {
+        while(thread_pool->taskQueue->size == 0) {
             /* waits for the task condition */
-            CONDITION_WAIT(threadPool->taskCondition, threadPool->taskConditionLock);
+            CONDITION_WAIT(thread_pool->taskCondition, thread_pool->taskConditionLock);
         }
 
         /* retrieves the work thread task */
-        popValueLinkedList(threadPool->taskQueue, (void **) &workThreadTask, 0);
+        pop_value_linked_list(thread_pool->taskQueue, (void **) &workThreadTask, 0);
 
         /* unlock the task condition lock */
-        CONDITION_UNLOCK(threadPool->taskCondition, threadPool->taskConditionLock);
+        CONDITION_UNLOCK(thread_pool->taskCondition, thread_pool->taskConditionLock);
 
         /* calls the start function */
-        workThreadTask->startFunction(NULL);
+        workThreadTask->start_function(NULL);
     }
 
     /* returns valid */

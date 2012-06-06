@@ -44,5 +44,5 @@ typedef struct Globals_t {
      * The list of http handlers available
      * for the global environment.
      */
-    struct LinkedList_t *httpHandlersList;
+    struct linked_list_t *httpHandlersList;
 } Globals;

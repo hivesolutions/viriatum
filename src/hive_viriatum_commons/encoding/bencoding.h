@@ -35,13 +35,13 @@
 #define BENCODING_MARK_BACK(FOR) BENCODING_MARK_N(FOR, 1)
 #define BENCODING_MARK_N(FOR, N)\
     do {\
-        FOR##Mark = pointer - N;\
+        FOR##_mark = pointer - N;\
     } while(0)
 
 #define BENCODING_CALLBACK(FOR)\
     do {\
-        if(bencodingEngine->settings.on##FOR) {\
-            if(bencodingEngine->settings.on##FOR(bencodingEngine) != 0) {\
+        if(bencoding_engine->settings.on_##FOR) {\
+            if(bencoding_engine->settings.on_##FOR(bencoding_engine) != 0) {\
                 RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem handling callback"); \
             }\
         }\
@@ -51,72 +51,72 @@
 #define BENCODING_CALLBACK_DATA_BACK(FOR) BENCODING_CALLBACK_DATA_N(FOR, 1)
 #define BENCODING_CALLBACK_DATA_N(FOR, N)\
     do {\
-        if(FOR##Mark) {\
-            if(bencodingEngine->settings.on##FOR) {\
-                if(bencodingEngine->settings.on##FOR(bencodingEngine, FOR##Mark, pointer - FOR##Mark - N) != 0) {\
+        if(FOR##_mark) {\
+            if(bencoding_engine->settings.on_##FOR) {\
+                if(bencoding_engine->settings.on_##FOR(bencoding_engine, FOR##_mark, pointer - FOR##_mark - N) != 0) {\
                     RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem handling callback"); \
                 }\
             }\
-            FOR##Mark = NULL;\
+            FOR##_mark = NULL;\
         }\
     } while(0)
 
-struct BencodingEngine_t;
+struct bencoding_engine_t;
 
-typedef ERROR_CODE (*bencodingCallback) (struct BencodingEngine_t *);
-typedef ERROR_CODE (*bencodingDataCallback) (struct BencodingEngine_t *, const unsigned char *, size_t);
+typedef ERROR_CODE (*bencoding_callback) (struct bencoding_engine_t *);
+typedef ERROR_CODE (*bencoding_data_callback) (struct bencoding_engine_t *, const unsigned char *, size_t);
 
-typedef enum BencodingState_e {
+typedef enum bencoding_state_e {
     BENCODING_ENGINE_NORMAL = 1,
     BENCODING_ENGINE_INTEGER,
     BENCODING_ENGINE_STRING,
     BENCODING_ENGINE_LIST,
     BENCODING_ENGINE_DICTIONARY,
     BENCODING_ENGINE_STRING_SIZE
-} BencodingState;
+} bencoding_state;
 
-typedef struct BencodingSettings_t {
-    bencodingCallback onintegerStart;
-    bencodingDataCallback onintegerEnd;
-    bencodingCallback onstringStart;
-    bencodingDataCallback onstringEnd;
-    bencodingCallback onlistStart;
-    bencodingCallback ondictionaryStart;
-    bencodingCallback onsequenceEnd;
-} BencodingSettings;
+typedef struct bencoding_settings_t {
+    bencoding_callback on_integer_start;
+    bencoding_data_callback on_integer_end;
+    bencoding_callback on_string_start;
+    bencoding_data_callback on_string_end;
+    bencoding_callback on_list_start;
+    bencoding_callback on_dictionary_start;
+    bencoding_callback on_sequence_end;
+} bencoding_settings;
 
-typedef struct BencodingEngine_t {
-    enum BencodingState_e state;
-    enum Type_e mapType;
-    struct BencodingSettings_t settings;
-    unsigned char *integerEndMark;
-    unsigned char *stringEndMark;
+typedef struct bencoding_engine_t {
+    enum bencoding_state_e state;
+    enum type_e map_type;
+    struct bencoding_settings_t settings;
+    unsigned char *integer_end_mark;
+    unsigned char *string_end_mark;
     void *context;
-} BencodingEngine;
+} bencoding_engine;
 
-typedef struct BencodingHandler_t {
-    struct LinkedList_t *sequenceStack;
-    struct LinkedList_t *keyStack;
-    struct Type_t *sequence;
-    struct Type_t *top;
+typedef struct bencoding_handler_t {
+    struct linked_list_t *sequence_stack;
+    struct linked_list_t *key_stack;
+    struct type_t *sequence;
+    struct type_t *top;
     unsigned char *key;
-    unsigned char nextKey;
-} BencodingHandler;
+    unsigned char next_key;
+} bencoding_handler;
 
-VIRIATUM_EXPORT_PREFIX void createBencodingEngine(struct BencodingEngine_t **bencodingEnginePointer, void *context);
-VIRIATUM_EXPORT_PREFIX void deleteBencodingEngine(struct BencodingEngine_t *bencodingEngine);
-VIRIATUM_EXPORT_PREFIX void createBencodingHandler(struct BencodingHandler_t **bencodingHandlerPointer);
-VIRIATUM_EXPORT_PREFIX void deleteBencodingHandler(struct BencodingHandler_t *bencodingHandler);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE encodeBencoding(struct Type_t *type, unsigned char **encodedBufferPointer, size_t *encodedBufferLengthPointer);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE decodeBencoding(unsigned char *encodedBuffer, size_t encodedBufferLength, struct Type_t **typePointer);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE encodeBencodingFile(char *filePath, struct Type_t *type);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE decodeBencodingFile(char *filePath, struct Type_t **typePointer);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE _encodeType(struct Type_t *type, struct StringBuffer_t *stringBuffer);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE _startBencodingEngine(struct BencodingEngine_t **bencodingEnginePointer);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE _stopBencodingEngine(struct BencodingEngine_t *bencodingEngine);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE _runBencodingEngine(struct BencodingEngine_t *bencodingEngine, unsigned char *buffer, size_t size);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE _bencodingIntegerEndCallback(struct BencodingEngine_t *bencodingEngine, const unsigned char *pointer, size_t size);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE _bencodingStringEndCallback(struct BencodingEngine_t *bencodingEngine, const unsigned char *pointer, size_t size);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE _bencodingListStartCallback(struct BencodingEngine_t *bencodingEngine);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE _bencodingDictionaryStartCallback(struct BencodingEngine_t *bencodingEngine);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE _bencodingSequenceEndCallback(struct BencodingEngine_t *bencodingEngine);
+VIRIATUM_EXPORT_PREFIX void create_bencoding_engine(struct bencoding_engine_t **bencoding_engine_pointer, void *context);
+VIRIATUM_EXPORT_PREFIX void delete_bencoding_engine(struct bencoding_engine_t *bencoding_engine);
+VIRIATUM_EXPORT_PREFIX void create_bencoding_handler(struct bencoding_handler_t **bencoding_handler_pointer);
+VIRIATUM_EXPORT_PREFIX void delete_bencoding_handler(struct bencoding_handler_t *bencoding_handler);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE encode_bencoding(struct type_t *type, unsigned char **encoded_buffer_pointer, size_t *encoded_buffer_length_pointer);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE decode_bencoding(unsigned char *encoded_buffer, size_t encoded_buffer_length, struct type_t **type_pointer);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE encode_bencoding_file(char *file_path, struct type_t *type);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE decode_bencoding_file(char *file_path, struct type_t **type_pointer);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _encode_type(struct type_t *type, struct string_buffer_t *string_buffer);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _start_bencoding_engine(struct bencoding_engine_t **bencoding_engine_pointer);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _stop_bencoding_engine(struct bencoding_engine_t *bencoding_engine);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _run_bencoding_engine(struct bencoding_engine_t *bencoding_engine, unsigned char *buffer, size_t size);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _bencoding_integer_end_callback(struct bencoding_engine_t *bencoding_engine, const unsigned char *pointer, size_t size);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _bencoding_string_end_callback(struct bencoding_engine_t *bencoding_engine, const unsigned char *pointer, size_t size);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _bencoding_list_start_callback(struct bencoding_engine_t *bencoding_engine);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _bencoding_dictionary_start_callback(struct bencoding_engine_t *bencoding_engine);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _bencoding_sequence_end_callback(struct bencoding_engine_t *bencoding_engine);

@@ -29,27 +29,27 @@
 
 #include "string.h"
 
-void createString(struct String_t **stringPointer) {
+void create_string(struct string_t **string_pointer) {
     /* retrieves the string size */
-    size_t stringSize = sizeof(struct String_t);
+    size_t string_size = sizeof(struct string_t);
 
     /* allocates space for the string */
-    struct String_t *string = (struct String_t *) MALLOC(stringSize);
+    struct string_t *string = (struct string_t *) MALLOC(string_size);
 
     /* initializes the string */
     string->buffer = NULL;
     string->length = 0;
 
     /* sets the string in the string pointer */
-    *stringPointer = string;
+    *string_pointer = string;
 }
 
-void deleteString(struct String_t *string) {
+void delete_string(struct string_t *string) {
     /* releases the string */
     FREE(string);
 }
 
-void stringPopulate(struct String_t *string, unsigned char *buffer, size_t length, char calculate) {
+void string_populate(struct string_t *string, unsigned char *buffer, size_t length, char calculate) {
     string->buffer = buffer;
     string->length = calculate ? strlen((char *) buffer) : length;
 }

@@ -29,27 +29,27 @@
 
 #include "buffer.h"
 
-void createBuffer(struct Buffer_t **bufferPointer, size_t initialSize) {
+void create_buffer(struct buffer_t **buffer_pointer, size_t initial_size) {
     /* retrieves the buffer size */
-    size_t bufferSize = sizeof(struct Buffer_t);
+    size_t buffer_size = sizeof(struct buffer_t);
 
     /* allocates space for the buffer */
-    struct Buffer_t *buffer = (struct Buffer_t *) MALLOC(bufferSize);
+    struct buffer_t *buffer = (struct buffer_t *) MALLOC(buffer_size);
 
     /* starts the buffer attributes */
     buffer->pointer = NULL;
     buffer->size = 0;
 
     /* sets the buffer in the buffer pointer */
-    *bufferPointer = buffer;
+    *buffer_pointer = buffer;
 }
 
-void deleteBuffer(struct Buffer_t *buffer) {
+void delete_buffer(struct buffer_t *buffer) {
     /* releases the buffer */
     FREE(buffer);
 }
 
-char *toStringBuffer(struct Buffer_t *buffer) {
+char *to_string_buffer(struct buffer_t *buffer) {
     /* allocates space for the string */
     char *string = (char *) MALLOC(buffer->size + 1);
 

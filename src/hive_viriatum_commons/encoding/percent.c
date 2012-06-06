@@ -29,7 +29,7 @@
 
 #include "percent.h"
 
-ERROR_CODE encodePercent(unsigned char *buffer, size_t length, unsigned char **bufferPointer, size_t *lengthPointer) {
+ERROR_CODE encodePercent(unsigned char *buffer, size_t length, unsigned char **buffer_pointer, size_t *lengthPointer) {
     /* allocates space for the byte value to be read in
     each iteration and allocates space for the index accumulator
     value for the iteration process */
@@ -77,14 +77,14 @@ ERROR_CODE encodePercent(unsigned char *buffer, size_t length, unsigned char **b
 
     /* sets the current encoded buffer in the buffer pointer value
     and sets the apropriate length inthe length pointer value */
-    *bufferPointer = _buffer;
+    *buffer_pointer = _buffer;
     *lengthPointer = __buffer - _buffer;
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE decodePercent(unsigned char *buffer, size_t length, unsigned char **bufferPointer,  size_t *lengthPointer) {
+ERROR_CODE decodePercent(unsigned char *buffer, size_t length, unsigned char **buffer_pointer,  size_t *lengthPointer) {
     /* allocates the pointer to be used durring the iteration
     process for the url decoding */
     unsigned char *pointer;
@@ -132,7 +132,7 @@ ERROR_CODE decodePercent(unsigned char *buffer, size_t length, unsigned char **b
 
     /* sets the current encoded buffer in the buffer pointer value
     and sets the apropriate length inthe length pointer value */
-    *bufferPointer = _bufffer;
+    *buffer_pointer = _bufffer;
     *lengthPointer = __buffer - _bufffer;
 
     /* raises no error */
@@ -140,10 +140,10 @@ ERROR_CODE decodePercent(unsigned char *buffer, size_t length, unsigned char **b
 }
 
 
-ERROR_CODE urlEncode(unsigned char *buffer, size_t length, unsigned char **bufferPointer, size_t *lengthPointer) {
-    return encodePercent(buffer, length, bufferPointer, lengthPointer);
+ERROR_CODE urlEncode(unsigned char *buffer, size_t length, unsigned char **buffer_pointer, size_t *lengthPointer) {
+    return encodePercent(buffer, length, buffer_pointer, lengthPointer);
 }
 
-ERROR_CODE urlDecode(unsigned char *buffer, size_t length, unsigned char **bufferPointer, size_t *lengthPointer) {
-    return decodePercent(buffer, length, bufferPointer, lengthPointer);
+ERROR_CODE urlDecode(unsigned char *buffer, size_t length, unsigned char **buffer_pointer, size_t *lengthPointer) {
+    return decodePercent(buffer, length, buffer_pointer, lengthPointer);
 }

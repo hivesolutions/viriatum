@@ -102,10 +102,10 @@ typedef struct IniEngine_t {
 typedef struct IniHandler_t {
     char section[INI_KEY_MAX_SIZE];
     char key[INI_KEY_MAX_SIZE];
-    struct HashMap_t *configuration;
+    struct hash_map_t *configuration;
 } IniHandler;
 
-VIRIATUM_EXPORT_PREFIX ERROR_CODE processIniFile(char *filePath, struct HashMap_t **configurationPointer);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE processIniFile(char *file_path, struct hash_map_t **configurationPointer);
 VIRIATUM_EXPORT_PREFIX ERROR_CODE _iniSectionEndCallback(struct IniEngine_t *iniEngine, const unsigned char *pointer, size_t size);
 VIRIATUM_EXPORT_PREFIX ERROR_CODE _iniCommentEndCallback(struct IniEngine_t *iniEngine, const unsigned char *pointer, size_t size);
 VIRIATUM_EXPORT_PREFIX ERROR_CODE _iniKeyEndCallback(struct IniEngine_t *iniEngine, const unsigned char *pointer, size_t size);

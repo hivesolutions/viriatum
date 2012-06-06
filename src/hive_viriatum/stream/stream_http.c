@@ -75,7 +75,7 @@ ERROR_CODE createHttpConnection(struct HttpConnection_t **httpConnectionPointer,
     httpConnection->ioConnection = ioConnection;
     httpConnection->httpHandler = NULL;
     httpConnection->buffer = NULL;
-    httpConnection->bufferSize = 0;
+    httpConnection->buffer_size = 0;
     httpConnection->bufferOffset = 0;
 
     /* creates the http settings */
@@ -129,7 +129,7 @@ ERROR_CODE deleteHttpConnection(struct HttpConnection_t *httpConnection) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE dataHandlerStreamHttp(struct IoConnection_t *ioConnection, unsigned char *buffer, size_t bufferSize) {
+ERROR_CODE dataHandlerStreamHttp(struct IoConnection_t *ioConnection, unsigned char *buffer, size_t buffer_size) {
     /* allocates space for the temporary variable to
     hold the ammount of bytes processed in a given http
     data parsing iteration */
@@ -153,19 +153,19 @@ ERROR_CODE dataHandlerStreamHttp(struct IoConnection_t *ioConnection, unsigned c
         /* in case no http connection buffer is not currently set, time to start
         a new one from the provided buffer (fast access) */
         if(httpConnection->buffer == NULL) {
-            httpConnection->bufferSize = bufferSize;
-            httpConnection->buffer = (unsigned char *) MALLOC(httpConnection->bufferSize);
+            httpConnection->buffer_size = buffer_size;
+            httpConnection->buffer = (unsigned char *) MALLOC(httpConnection->buffer_size);
         }
         /* in case the http connection buffer is currently set but the available
         space is not enough must reallocate the buffer (increment size) */
-        else if(httpConnection->bufferOffset + bufferSize > httpConnection->bufferSize) {
+        else if(httpConnection->bufferOffset + buffer_size > httpConnection->buffer_size) {
             if(httpConnection->httpParser->_contentLength > 0) {
-                httpConnection->bufferSize += httpConnection->httpParser->_contentLength;
-                httpConnection->buffer = REALLOC((void *) httpConnection->buffer, httpConnection->bufferSize);
+                httpConnection->buffer_size += httpConnection->httpParser->_contentLength;
+                httpConnection->buffer = REALLOC((void *) httpConnection->buffer, httpConnection->buffer_size);
             }
             else {
-                httpConnection->bufferSize += bufferSize;
-                httpConnection->buffer = REALLOC((void *) httpConnection->buffer, httpConnection->bufferSize);
+                httpConnection->buffer_size += buffer_size;
+                httpConnection->buffer = REALLOC((void *) httpConnection->buffer, httpConnection->buffer_size);
             }
         }
 
@@ -173,8 +173,8 @@ ERROR_CODE dataHandlerStreamHttp(struct IoConnection_t *ioConnection, unsigned c
         buffer to be used for writing then copies the current buffer data
         into it and updates the buffer size */
         _buffer = httpConnection->buffer + httpConnection->bufferOffset;
-        memcpy(_buffer, buffer, bufferSize);
-        httpConnection->bufferOffset += bufferSize;
+        memcpy(_buffer, buffer, buffer_size);
+        httpConnection->bufferOffset += buffer_size;
 
         /* in case there's currently no http handler associated with the
         http connection (need to create one) */
@@ -189,7 +189,7 @@ ERROR_CODE dataHandlerStreamHttp(struct IoConnection_t *ioConnection, unsigned c
         /* process the http data for the http parser, this should be
         a partial processing and some data may remain unprocessed (in
         case there are multiple http requests) */
-        processedSize = processDataHttpParser(httpConnection->httpParser, httpConnection->httpSettings, _buffer, bufferSize);
+        processedSize = processDataHttpParser(httpConnection->httpParser, httpConnection->httpSettings, _buffer, buffer_size);
 
         /* in case the current state in the http parser is the
         start state, ther message is considered to be completly
@@ -200,7 +200,7 @@ ERROR_CODE dataHandlerStreamHttp(struct IoConnection_t *ioConnection, unsigned c
             of it to the initial empty value (buffer reset) */
             FREE(httpConnection->buffer);
             httpConnection->buffer = NULL;
-            httpConnection->bufferSize = 0;
+            httpConnection->buffer_size = 0;
             httpConnection->bufferOffset = 0;
 
             /* resets the http parser state */
@@ -220,12 +220,12 @@ ERROR_CODE dataHandlerStreamHttp(struct IoConnection_t *ioConnection, unsigned c
 
         /* in case all the remaining data has been processed
         no need to process more http data (breaks the loop) */
-        if(processedSize > 0 && (size_t) processedSize == bufferSize) { break; }
+        if(processedSize > 0 && (size_t) processedSize == buffer_size) { break; }
 
         /* increments the buffer pointer and updates the buffer
         size value to the new size */
         buffer += processedSize;
-        bufferSize -= processedSize;
+        buffer_size -= processedSize;
     }
 
     /* raises no error */

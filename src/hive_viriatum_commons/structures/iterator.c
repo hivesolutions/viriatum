@@ -29,23 +29,23 @@
 
 #include "iterator.h"
 
-void createIterator(struct Iterator_t **iteratorPointer) {
+void create_iterator(struct iterator_t **iterator_pointer) {
     /* retrieves the iterator size */
-    size_t iteratorSize = sizeof(struct Iterator_t);
+    size_t iterator_size = sizeof(struct iterator_t);
 
     /* allocates space for the iterator */
-    struct Iterator_t *iterator = (struct Iterator_t *) MALLOC(iteratorSize);
+    struct iterator_t *iterator = (struct iterator_t *) MALLOC(iterator_size);
 
     /* sets the iterator in the iterator pointer */
-    *iteratorPointer = iterator;
+    *iterator_pointer = iterator;
 }
 
-void deleteIterator(struct Iterator_t *iterator) {
+void delete_iterator(struct iterator_t *iterator) {
     /* releases the iterator */
     FREE(iterator);
 }
 
-void getNextIterator(struct Iterator_t *iterator, void **nextPointer) {
+void get_next_iterator(struct iterator_t *iterator, void **next_pointer) {
     /* calls the iterator get next function */
-    iterator->getNextFunction(iterator, nextPointer);
+    iterator->get_next_function(iterator, next_pointer);
 }

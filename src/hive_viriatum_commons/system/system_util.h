@@ -34,12 +34,12 @@
 #define LOCAL_TIME(localTimeValue, timeValue) tm localTimeValueValue; localTimeValue = &localTimeValueValue; localtime_s(localTimeValue, timeValue)
 #define SLEEP(miliseconds) Sleep(miliseconds)
 #define GET_PID() GetCurrentProcessId()
-#define GET_ENV(buffer, bufferSize, variableName) _dupenv_s(&buffer, &bufferSize, variableName)
+#define GET_ENV(buffer, buffer_size, variableName) _dupenv_s(&buffer, &buffer_size, variableName)
 #define GET_PROCESS() OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, 0, GET_PID())
 #define CLOSE_PROCESS(process) CloseHandle(process)
 #define GET_MEMORY_INFORMATION(process, memoryInformation) GetProcessMemoryInfo(process, &memoryInformation, sizeof(memoryInformation))
 #define GET_MEMORY_USAGE(memoryInformation) memoryInformation.PagefileUsage
-#define FILE_EXISTS(filePath) GetFileAttributes(filePath) != 0xffffffff
+#define FILE_EXISTS(file_path) GetFileAttributes(file_path) != 0xffffffff
 #endif
 
 #ifdef VIRIATUM_PLATFORM_UNIX
@@ -53,12 +53,12 @@
 #define STRTOK(string, delimiter, context) strtok(string, delimiter); dump((void *) &context)
 #define STRCPY(destination, size, source) strcpy(destination, source)
 #define FOPEN(filePointer, fileName, mode) *filePointer = fopen(fileName, mode)
-#define GET_ENV(buffer, bufferSize, variableName) buffer = getenv(variableName)
+#define GET_ENV(buffer, buffer_size, variableName) buffer = getenv(variableName)
 #define GET_PROCESS() RUSAGE_SELF
 #define CLOSE_PROCESS(process)
 #define GET_MEMORY_INFORMATION(process, memoryInformation) getrusage(process, &memoryInformation)
 #define GET_MEMORY_USAGE(memoryInformation) memoryInformation.ru_ixrss
-#define FILE_EXISTS(filePath) access(filePath, F_OK) == 0
+#define FILE_EXISTS(file_path) access(file_path, F_OK) == 0
 #endif
 
 #ifdef VIRIATUM_PLATFORM_MSC

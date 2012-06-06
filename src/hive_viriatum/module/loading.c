@@ -184,7 +184,7 @@ ERROR_CODE loadModule(struct Service_t *service, unsigned char *modulePath) {
     }
 
     /* adds the module to the list of modlues handlers in the service */
-    appendValueLinkedList(service->modulesList, (void *) module);
+    append_value_linked_list(service->modulesList, (void *) module);
 
     /* raise no error */
     RAISE_NO_ERROR;
@@ -201,7 +201,7 @@ ERROR_CODE unloadModule(struct Service_t *service, struct Module_t *module) {
     LIBRARY_REFERENCE library = module->library;
 
     /* removes the module from the list of modlues handlers in the service */
-    removeValueLinkedList(service->modulesList, (void *) module, 1);
+    remove_value_linked_list(service->modulesList, (void *) module, 1);
 
     /* calls the stop module function */
     errorCode = module->stop(environment, module);

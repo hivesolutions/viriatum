@@ -43,7 +43,7 @@
  * @param cmp The comparator method to be used for value
  * comparision.
  */
-VIRIATUM_EXPORT_PREFIX void sortQuicksort(void **sequence, size_t beginning, size_t end, comparator cmp);
+VIRIATUM_EXPORT_PREFIX void sort_quicksort(void **sequence, size_t beginning, size_t end, comparator cmp);
 
 /**
  * Swaps the values (via reference) of two given elements.
@@ -53,4 +53,4 @@ VIRIATUM_EXPORT_PREFIX void sortQuicksort(void **sequence, size_t beginning, siz
  * @param second The reference to the second element to be
  * swapped.
  */
-VIRIATUM_EXPORT_PREFIX void _swapQuicksort(void **first, void **second);
+VIRIATUM_EXPORT_PREFIX void _swap_quicksort(void **first, void **second);

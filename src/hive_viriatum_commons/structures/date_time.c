@@ -29,18 +29,18 @@
 
 #include "date_time.h"
 
-void createDateTime(struct DateTime_t **dateTimePointer) {
+void create_date_time(struct date_time_t **date_time_pointer) {
     /* retrieves the date time size */
-    size_t dateTimeSize = sizeof(struct DateTime_t);
+    size_t date_time_size = sizeof(struct date_time_t);
 
     /* allocates space for the date time */
-    struct DateTime_t *dateTime = (struct DateTime_t *) MALLOC(dateTimeSize);
+    struct date_time_t *date_time = (struct date_time_t *) MALLOC(date_time_size);
 
     /* sets the buffer in the date time pointer */
-    *dateTimePointer = dateTime;
+    *date_time_pointer = date_time;
 }
 
-void deleteDateTime(struct DateTime_t *dataTime) {
+void delete_date_time(struct date_time_t *date_time) {
     /* releases the data time */
-    FREE(dataTime);
+    FREE(date_time);
 }

@@ -82,7 +82,7 @@ typedef struct Argument_t {
     char value[1024];
 } Argument;
 
-VIRIATUM_EXPORT_PREFIX ERROR_CODE processArguments(int argc, char *argv[], struct HashMap_t **argumentsPointer);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE deleteArguments(struct HashMap_t *arguments);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE printArguments(struct HashMap_t *arguments);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE processArguments(int argc, char *argv[], struct hash_map_t **argumentsPointer);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE deleteArguments(struct hash_map_t *arguments);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE printArguments(struct hash_map_t *arguments);
 VIRIATUM_EXPORT_PREFIX ERROR_CODE _processArgument(char *argumentValue, struct Argument_t *argument);

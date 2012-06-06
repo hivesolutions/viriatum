@@ -37,8 +37,8 @@
 #define THREAD_HANDLE HANDLE
 #define THREAD_IDENTIFIER DWORD
 #define THREAD_REFERENCE THREAD_HANDLE
-#define THREAD_CREATE(threadAttributes, stackSize, startAddress, parameter, creationFlags, threadId) CreateThread(threadAttributes, stackSize, startAddress, (THREAD_ARGUMENTS) parameter, creationFlags, &threadId)
-#define THREAD_CREATE_BASE(threadId, startAddress, parameter) THREAD_CREATE(NULL, 0, startAddress, (THREAD_ARGUMENTS) parameter, 0, threadId)
+#define THREAD_CREATE(threadAttributes, stackSize, startAddress, parameter, creationFlags, thread_id) CreateThread(threadAttributes, stackSize, startAddress, (THREAD_ARGUMENTS) parameter, creationFlags, &thread_id)
+#define THREAD_CREATE_BASE(thread_id, startAddress, parameter) THREAD_CREATE(NULL, 0, startAddress, (THREAD_ARGUMENTS) parameter, 0, thread_id)
 #define THREAD_JOIN(threadHandle) WaitForSingleObject(threadHandle, INFINITE)
 #define THREAD_JOIN_BASE(threadHandle, threadIdentifier) THREAD_JOIN(threadHandle)
 #define THREAD_CLOSE(threadHandle) CloseHandle(threadHandle)
@@ -82,8 +82,8 @@ typedef struct EventHandle_t {
 #define THREAD_IDENTIFIER pthread_t
 #define THREAD_REFERENCE THREAD_IDENTIFIER
 #define THREAD_CREATION_FUNCTION CreateThread
-#define THREAD_CREATE(threadId, creationFlags, startAddress, parameter) pthread_create(&threadId, creationFlags, startAddress, (THREAD_ARGUMENTS) parameter)
-#define THREAD_CREATE_BASE(threadId, startAddress, parameter) THREAD_CREATE(threadId, NULL, startAddress, parameter)
+#define THREAD_CREATE(thread_id, creationFlags, startAddress, parameter) pthread_create(&thread_id, creationFlags, startAddress, (THREAD_ARGUMENTS) parameter)
+#define THREAD_CREATE_BASE(thread_id, startAddress, parameter) THREAD_CREATE(thread_id, NULL, startAddress, parameter)
 #define THREAD_JOIN(threadIdentifier) pthread_join(threadIdentifier, NULL)
 #define THREAD_JOIN_BASE(threadHandle, threadIdentifier) THREAD_JOIN(threadIdentifier)
 #define THREAD_CLOSE(threadHandle)

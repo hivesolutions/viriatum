@@ -37,7 +37,7 @@ typedef struct Condition_t {
     unsigned int lockCount;
     CRITICAL_SECTION waitCriticalSection;
     CRITICAL_SECTION lockCriticalSection;
-    struct LinkedList_t *waitSet;
+    struct linked_list_t *waitSet;
 } Condition;
 
 VIRIATUM_EXPORT_PREFIX void createCondition(struct Condition_t **conditionPointer);
