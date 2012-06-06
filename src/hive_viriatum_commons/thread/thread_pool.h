@@ -32,33 +32,33 @@
 #include "../structures/structures.h"
 #include "../system/system.h"
 
-typedef struct ThreadPoolTask_t {
+typedef struct thread_pool_task_t {
     int (*start_function)(void *arguments);
-    int (*stopFunction)(void *arguments);
-    int (*pauseFunction)(void *arguments);
-    int (*resumeFunction)(void *arguments);
-} ThreadPoolTask;
+    int (*stop_function)(void *arguments);
+    int (*pause_function)(void *arguments);
+    int (*resume_function)(void *arguments);
+} thread_pool_task;
 
-typedef struct ThreadPoolElement_t {
+typedef struct thread_pool_element_t {
     THREAD_HANDLE thread_handle;
     THREAD_IDENTIFIER thread_id;
 } ThreadPoolElement;
 
-typedef struct ThreadPool_t {
-    size_t numberThreads;
-    size_t schedulingAlgorithm;
-    size_t maximumNumberThreads;
-    size_t currentNumberThreads;
-    CONDITION_HANDLE taskCondition;
-    CRITICAL_SECTION_HANDLE taskConditionLock;
-    struct linked_list_t *workerThreadsList;
-    struct linked_list_t *taskQueue;
-} ThreadPool;
+typedef struct thread_pool_t {
+    size_t number_threads;
+    size_t scheduling_algorithm;
+    size_t maximum_number_threads;
+    size_t current_number_threads;
+    CONDITION_HANDLE task_condition;
+    CRITICAL_SECTION_HANDLE task_condition_lock;
+    struct linked_list_t *worker_threads_list;
+    struct linked_list_t *task_queue;
+} thread_pool;
 
-VIRIATUM_EXPORT_PREFIX void create_thread_pool(struct ThreadPool_t **threadPoolPointer, size_t numberThreads, size_t schedulingAlgorithm, size_t maximumNumberThreads);
-VIRIATUM_EXPORT_PREFIX void deleteThreadPool(struct ThreadPool_t *thread_pool);
-VIRIATUM_EXPORT_PREFIX void createThreadPoolElement(struct ThreadPool_t *thread_pool);
-VIRIATUM_EXPORT_PREFIX void insert_task_thread_pool(struct ThreadPool_t *thread_pool, struct ThreadPoolTask_t *thread_pool_task);
+VIRIATUM_EXPORT_PREFIX void create_thread_pool(struct thread_pool_t **thread_pool_pointer, size_t number_threads, size_t scheduling_algorithm, size_t maximum_number_threads);
+VIRIATUM_EXPORT_PREFIX void delete_thread_pool(struct thread_pool_t *thread_pool);
+VIRIATUM_EXPORT_PREFIX void create_thread_pool_element(struct thread_pool_t *thread_pool);
+VIRIATUM_EXPORT_PREFIX void insert_task_thread_pool(struct thread_pool_t *thread_pool, struct thread_pool_task_t *thread_pool_task);
 
 /**
  * Thread than runs a new stage. It controls the frequency of the loading
@@ -67,6 +67,6 @@ VIRIATUM_EXPORT_PREFIX void insert_task_thread_pool(struct ThreadPool_t *thread_
  * @param parameters The thread parameters.
  * @return The thread result.
  */
-VIRIATUM_EXPORT_PREFIX THREAD_RETURN poolRunnerThread(THREAD_ARGUMENTS parameters);
+VIRIATUM_EXPORT_PREFIX THREAD_RETURN pool_runner_thread(THREAD_ARGUMENTS parameters);
 
 #endif

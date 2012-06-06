@@ -1229,19 +1229,19 @@ ERROR_CODE _comandLineOptionsService(struct Service_t *service, struct hash_map_
     in case the (port) value is set, casts the port value into
     integer and set it in the service options */
     get_value_string_hash_map(arguments, (unsigned char *) "port", &value);
-    if(value != NULL) { serviceOptions->port = (unsigned short) atoi(((struct Argument_t *) value)->value); }
+    if(value != NULL) { serviceOptions->port = (unsigned short) atoi(((struct argument_t *) value)->value); }
 
     /* tries to retrieve the host argument from the arguments map, then
     in case the (host) value is set, sets the address value in
     the service options */
     get_value_string_hash_map(arguments, (unsigned char *) "host", &value);
-    if(value != NULL) { serviceOptions->address = (unsigned char *) ((struct Argument_t *) value)->value; }
+    if(value != NULL) { serviceOptions->address = (unsigned char *) ((struct argument_t *) value)->value; }
 
     /* tries to retrieve the handler argument from the arguments map, then
     in case the (handler) value is set, sets the handler name value
     in the service options */
     get_value_string_hash_map(arguments, (unsigned char *) "handler", &value);
-    if(value != NULL) { serviceOptions->handlerName = (unsigned char *) ((struct Argument_t *) value)->value; }
+    if(value != NULL) { serviceOptions->handlerName = (unsigned char *) ((struct argument_t *) value)->value; }
 
     /* tries to retrieve the local argument from the arguments map, then
     in case the (local) value is set, sets the service as local  */
@@ -1251,7 +1251,7 @@ ERROR_CODE _comandLineOptionsService(struct Service_t *service, struct hash_map_
     /* tries to retrieve the workers argument from the arguments map, then
     sets the workers (count) value for the service */
     get_value_string_hash_map(arguments, (unsigned char *) "local", &value);
-    if(value != NULL) { serviceOptions->workers = atoi(((struct Argument_t *) value)->value); }
+    if(value != NULL) { serviceOptions->workers = atoi(((struct argument_t *) value)->value); }
 
     /* raises no error */
     RAISE_NO_ERROR;

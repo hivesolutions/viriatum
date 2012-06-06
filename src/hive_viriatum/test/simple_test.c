@@ -50,10 +50,10 @@ void test_thread_pool() {
     unsigned int index;
 
     /* allocates space for the thread pool */
-    struct ThreadPool_t *thread_pool;
+    struct thread_pool_t *thread_pool;
 
     /* allocates space for the thread pool task */
-    struct ThreadPoolTask_t *thread_pool_task = (struct ThreadPoolTask_t *) MALLOC(sizeof(struct ThreadPoolTask_t));
+    struct thread_pool_task_t *thread_pool_task = (struct thread_pool_task_t *) MALLOC(sizeof(struct thread_pool_task_t));
 
     /* sets the start function */
     thread_pool_task->start_function = thread_pool_start_function_test;
