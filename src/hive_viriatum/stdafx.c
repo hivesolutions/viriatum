@@ -31,6 +31,6 @@ static unsigned char name[] = VIRIATUM_NAME;
 static unsigned char version[] = VIRIATUM_VERSION;
 static unsigned char description[] = VIRIATUM_DESCRIPTION;
 
-unsigned char *nameViriatum() { return name; }
-unsigned char *versionViriatum() { return version; }
-unsigned char *descriptionViriatum() { return description; }
+unsigned char *name_viriatum() { return name; }
+unsigned char *version_viriatum() { return version; }
+unsigned char *description_viriatum() { return description; }

@@ -216,7 +216,7 @@ typedef struct Service_t {
      * Only one http (parser) handler can
      * be used at one given time.
      */
-    struct HttpHandler_t *httpHandler;
+    struct HttpHandler_t *http_handler;
 
     /**
      * The reference to the polling (provider)
@@ -245,13 +245,13 @@ typedef struct Service_t {
      * The map associates the name of the handler
      * with the handler instance.
      */
-    struct hash_map_t *httpHandlersMap;
+    struct hash_map_t *http_handlers_map;
 
-    serviceHttpHandlerAccess createHttpHandler;
-    serviceHttpHandlerUpdate deleteHttpHandler;
-    serviceHttpHandlerUpdate addHttpHandler;
-    serviceHttpHandlerUpdate removeHttpHandler;
-    serviceHttpHandlerAccess getHttpHandler;
+    serviceHttpHandlerAccess create_http_handler;
+    serviceHttpHandlerUpdate delete_http_handler;
+    serviceHttpHandlerUpdate add_http_handler;
+    serviceHttpHandlerUpdate remove_http_handler;
+    serviceHttpHandlerAccess get_http_handler;
 } Service;
 
 /**
@@ -276,7 +276,7 @@ typedef struct ServiceOptions_t {
      * in the runtime environment.
      * Change this name carefully.
      */
-    unsigned char *handlerName;
+    unsigned char *handler_name;
 
     /**
      * If the current service is running in
@@ -296,7 +296,7 @@ typedef struct ServiceOptions_t {
      * the root path file is requested (index.html is
      * the default file to be served).
      */
-    unsigned int defaultIndex;
+    unsigned int default_index;
 
     /**
      * The default virtual host to be used in any
@@ -442,13 +442,13 @@ typedef struct Connection_t {
      * Function to be used for closing a
      * connection.
      */
-    connectionUpdate closeConnection;
+    connectionUpdate close_connection;
 
     /**
      * Function to be used to write into
      * a connection.
      */
-    connectionWrite writeConnection;
+    connectionWrite write_connection;
 
     /**
      * Function to be used for registering
@@ -554,14 +554,14 @@ typedef struct Data_t {
  * be constructed.
  * @param name The name of the service to be constructed.
  */
-void createService(struct Service_t **servicePointer, unsigned char *name);
+void create_service(struct Service_t **servicePointer, unsigned char *name);
 
 /**
  * Destructor of the service.
  *
  * @param service The service to be destroyed.
  */
-void deleteService(struct Service_t *service);
+void delete_service(struct Service_t *service);
 
 /**
  * Constructor of the service options.
@@ -625,7 +625,7 @@ void deleteConfiguration(struct hash_map_t *configuration, int isTop);
  * during the options loading.
  * @return The resulting error code.
  */
-ERROR_CODE loadOptionsService(struct Service_t *service, struct hash_map_t *arguments);
+ERROR_CODE load_options_service(struct Service_t *service, struct hash_map_t *arguments);
 
 /**
  * Starts the given service, initializing the
@@ -634,7 +634,7 @@ ERROR_CODE loadOptionsService(struct Service_t *service, struct hash_map_t *argu
  * @param service The service to be initialized.
  * @return The resulting error code.
  */
-ERROR_CODE startService(struct Service_t *service);
+ERROR_CODE start_service(struct Service_t *service);
 
 /**
  * Stops the given service, stopping and cleaning
@@ -644,7 +644,7 @@ ERROR_CODE startService(struct Service_t *service);
  * @param service The service to be stopped.
  * @return The resulting error code.
  */
-ERROR_CODE stopService(struct Service_t *service);
+ERROR_CODE stop_service(struct Service_t *service);
 
 /**
  * Closes all the current active connection in the
@@ -731,7 +731,7 @@ ERROR_CODE deleteConnection(struct Connection_t *connection);
  * back to the callback.
  * @return The resulting error code.
  */
-ERROR_CODE writeConnection(struct Connection_t *connection, unsigned char *data, unsigned int size, connectionDataCallback callback, void *callbackParameters);
+ERROR_CODE write_connection(struct Connection_t *connection, unsigned char *data, unsigned int size, connectionDataCallback callback, void *callbackParameters);
 
 /**
  * Opens the given connection, creating (and starting) all
@@ -751,7 +751,7 @@ ERROR_CODE openConnection(struct Connection_t *connection);
  * @param connection The connection to be closed.
  * @return The resulting error code.
  */
-ERROR_CODE closeConnection(struct Connection_t *connection);
+ERROR_CODE close_connection(struct Connection_t *connection);
 
 /**
  * Registers the given connection for write events.
@@ -791,9 +791,9 @@ ERROR_CODE unregisterWriteConnection(struct Connection_t *connection);
  */
 ERROR_CODE allocConnection(struct Connection_t *connection, size_t size, void **dataPointer);
 ERROR_CODE createHttpHandlerService(struct Service_t *service, struct HttpHandler_t **httpHandlerPointer, unsigned char *name);
-ERROR_CODE deleteHttpHandlerService(struct Service_t *service, struct HttpHandler_t *httpHandler);
-ERROR_CODE addHttpHandlerService(struct Service_t *service, struct HttpHandler_t *httpHandler);
-ERROR_CODE removeHttpHandlerService(struct Service_t *service, struct HttpHandler_t *httpHandler);
+ERROR_CODE deleteHttpHandlerService(struct Service_t *service, struct HttpHandler_t *http_handler);
+ERROR_CODE addHttpHandlerService(struct Service_t *service, struct HttpHandler_t *http_handler);
+ERROR_CODE removeHttpHandlerService(struct Service_t *service, struct HttpHandler_t *http_handler);
 ERROR_CODE getHttpHandlerService(struct Service_t *service, struct HttpHandler_t **httpHandlerPointer, unsigned char *name);
 ERROR_CODE _defaultOptionsService(struct Service_t *service, struct hash_map_t *arguments);
 ERROR_CODE _fileOptionsService(struct Service_t *service, struct hash_map_t *arguments);

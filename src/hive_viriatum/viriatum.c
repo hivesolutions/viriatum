@@ -48,7 +48,7 @@ START_MEMORY;
 unsigned char local = 0;
 static struct Service_t *service;
 
-ERROR_CODE runService(struct hash_map_t *arguments) {
+ERROR_CODE run_service(struct hash_map_t *arguments) {
     /* allocates the return value */
     ERROR_CODE return_value;
 
@@ -60,11 +60,11 @@ ERROR_CODE runService(struct hash_map_t *arguments) {
 
     /* creates the service and loads the options
     taking into account the arguments */
-    createService(&service, (unsigned char *) VIRIATUM_NAME);
-    loadOptionsService(service, arguments);
+    create_service(&service, (unsigned char *) VIRIATUM_NAME);
+    load_options_service(service, arguments);
 
     /* starts the service */
-    return_value = startService(service);
+    return_value = start_service(service);
 
     /* tests the error code for error */
     if(IS_ERROR_CODE(return_value)) {
@@ -76,7 +76,7 @@ ERROR_CODE runService(struct hash_map_t *arguments) {
     }
 
     /* deletes the service */
-    deleteService(service);
+    delete_service(service);
 
     /* runs the socket finish */
     SOCKET_FINISH();
@@ -85,7 +85,7 @@ ERROR_CODE runService(struct hash_map_t *arguments) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE ranService() {
+ERROR_CODE ran_service() {
     /* allocates the return value */
     ERROR_CODE return_value;
 
@@ -98,7 +98,7 @@ ERROR_CODE ranService() {
         V_DEBUG("Stopping service\n");
 
         /* stops the service */
-        return_value = stopService(service);
+        return_value = stop_service(service);
 
         /* tests the error code for error */
         if(IS_ERROR_CODE(return_value)) {
@@ -117,25 +117,25 @@ ERROR_CODE ranService() {
     RAISE_NO_ERROR;
 }
 
-void killHandler(int signalNumber) {
+void kill_handler(int signal_number) {
     /* defaults the signal handler (only one handling) */
-    signal(signalNumber, SIG_DFL);
+    signal(signal_number, SIG_DFL);
 
     /* runs the "ran" service */
-    ranService();
+    ran_service();
 }
 
-ERROR_CODE printInformation() {
+ERROR_CODE print_information() {
     /* retrieves the viriatum version and description */
-    unsigned char *version = versionViriatum();
-    unsigned char *description = descriptionViriatum();
+    unsigned char *version = version_viriatum();
+    unsigned char *description = description_viriatum();
 
     /* registers the kill handler for the various signals
     associated with the "destroy" operation */
-    signal(SIGHUP, killHandler);
-    signal(SIGINT, killHandler);
-    signal(SIGQUIT, killHandler);
-    signal(SIGTERM, killHandler);
+    signal(SIGHUP, kill_handler);
+    signal(SIGINT, kill_handler);
+    signal(SIGQUIT, kill_handler);
+    signal(SIGTERM, kill_handler);
 
     /* registers the ignore action in the signal indicating
     a broken pipe (unexpected close of socket) */
@@ -164,9 +164,9 @@ void daemonize() {
     related variables */
     PID_TYPE pid;
     PID_TYPE sid;
-    FILE *pidFile;
-    char pidString[1024];
-    size_t pidStringLength;
+    FILE *pid_file;
+    char pid_string[1024];
+    size_t pid_string_length;
 
     /* forks off the parent process, this
     is the main trick in the process */
@@ -199,11 +199,11 @@ void daemonize() {
     /* opens the pid file and writes the pid stirng into it
     this will allow external programs to make sure viriatum
     is correctly running */
-    FOPEN(&pidFile, VIRIATUM_PID_PATH, "wb");
-    SPRINTF(pidString, 1024, "%d\n", pid);
-    pidStringLength = strlen(pidString);
-    fwrite(pidString, sizeof(char), pidStringLength, pidFile);
-    fclose(pidFile);
+    FOPEN(&pid_file, VIRIATUM_PID_PATH, "wb");
+    SPRINTF(pid_string, 1024, "%d\n", pid);
+    pid_string_length = strlen(pid_string);
+    fwrite(pid_string, sizeof(char), pid_string_length, pid_file);
+    fclose(pid_file);
 
     /* closes the various pending streams from the
     daemon process (not going to output them) */
@@ -221,7 +221,7 @@ void localize() { local = 1; }
 void localize() { }
 #endif
 
-void executeArguments(struct hash_map_t *arguments) {
+void execute_arguments(struct hash_map_t *arguments) {
     /* allocates space for the possible argument
     to be executed from the arguments map */
     void *value;
@@ -246,7 +246,7 @@ void executeArguments(struct hash_map_t *arguments) {
     output "file", the label should be standard */
     get_value_string_hash_map(arguments, (unsigned char *) "daemon", &value);
     if(value != NULL) { daemonize(); }
-    else { printInformation(); }
+    else { print_information(); }
 
     /* tries to retrieve the local argument from the arguments
     map in case the value exists localizes the current service
@@ -270,10 +270,10 @@ int main(int argc, char *argv[]) {
     /* processes the various arguments into a map and then
     executes the corresponding (initial) actions */
     process_arguments(argc, argv, &arguments);
-    executeArguments(arguments);
+    execute_arguments(arguments);
 
     /* runs the service, with the given arguments */
-    return_value = runService(arguments);
+    return_value = run_service(arguments);
 
     /* deletes the processed arguments */
     delete_arguments(arguments);

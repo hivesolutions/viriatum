@@ -29,62 +29,62 @@
 
 #include "handler_default.h"
 
-ERROR_CODE registerHandlerDefault(struct Service_t *service) {
+ERROR_CODE register_handler_default(struct Service_t *service) {
     /* allocates the http handler */
-    struct HttpHandler_t *httpHandler;
+    struct HttpHandler_t *http_handler;
 
     /* creates the http handler */
-    service->createHttpHandler(service, &httpHandler, (unsigned char *) "default");
+    service->create_http_handler(service, &http_handler, (unsigned char *) "default");
 
     /* sets the http handler attributes */
-    httpHandler->set = setHandlerDefault;
-    httpHandler->unset = unsetHandlerDefault;
-    httpHandler->reset = NULL;
+    http_handler->set = set_handler_default;
+    http_handler->unset = unset_handler_default;
+    http_handler->reset = NULL;
 
     /* adds the http handler to the service */
-    service->addHttpHandler(service, httpHandler);
+    service->add_http_handler(service, http_handler);
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE unregisterHandlerDefault(struct Service_t *service) {
+ERROR_CODE unregister_handler_default(struct Service_t *service) {
     /* allocates the http handler */
-    struct HttpHandler_t *httpHandler;
+    struct HttpHandler_t *http_handler;
 
     /* retrieves the http handler from the service, then
     remove it from the service after that delete the handler */
-    service->getHttpHandler(service, &httpHandler, (unsigned char *) "default");
-    service->removeHttpHandler(service, httpHandler);
-    service->deleteHttpHandler(service, httpHandler);
+    service->get_http_handler(service, &http_handler, (unsigned char *) "default");
+    service->remove_http_handler(service, http_handler);
+    service->delete_http_handler(service, http_handler);
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE setHandlerDefault(struct HttpConnection_t *httpConnection) {
+ERROR_CODE set_handler_default(struct HttpConnection_t *http_connection) {
     /* sets the http parser values */
-    _setHttpParserHandlerDefault(httpConnection->httpParser);
+    _set_http_parser_handler_default(http_connection->http_parser);
 
     /* sets the http settings values */
-    _setHttpSettingsHandlerDefault(httpConnection->httpSettings);
+    _set_http_settings_handler_default(http_connection->http_settings);
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE unsetHandlerDefault(struct HttpConnection_t *httpConnection) {
+ERROR_CODE unset_handler_default(struct HttpConnection_t *http_connection) {
     /* unsets the http parser values */
-    _unsetHttpParserHandlerDefault(httpConnection->httpParser);
+    _unset_http_parser_handler_default(http_connection->http_parser);
 
     /* unsets the http settings values */
-    _unsetHttpSettingsHandlerDefault(httpConnection->httpSettings);
+    _unset_http_settings_handler_default(http_connection->http_settings);
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE messageBeginCallbackHandlerDefault(struct HttpParser_t *httpParser) {
+ERROR_CODE message_begin_callback_handler_default(struct http_parser_t *http_parser) {
     /* prints an information */
     V_DEBUG("http request received\n");
 
@@ -92,15 +92,15 @@ ERROR_CODE messageBeginCallbackHandlerDefault(struct HttpParser_t *httpParser) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE urlCallbackHandlerDefault(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize) {
+ERROR_CODE url_callback_handler_default(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
     /* allocates the required space for the url */
-    unsigned char *url = (unsigned char *) MALLOC(dataSize + 1);
+    unsigned char *url = (unsigned char *) MALLOC(data_size + 1);
 
     /* copies the memory from the data to the url */
-    memcpy(url, data, dataSize);
+    memcpy(url, data, data_size);
 
     /* puts the end of strng in the url */
-    url[dataSize] = '\0';
+    url[data_size] = '\0';
 
     /* prints the url */
     V_DEBUG_F("url: %s\n", url);
@@ -112,15 +112,15 @@ ERROR_CODE urlCallbackHandlerDefault(struct HttpParser_t *httpParser, const unsi
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE headerFieldCallbackHandlerDefault(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize) {
+ERROR_CODE header_field_callback_handler_default(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
     /* allocates the required space for the header field */
-    unsigned char *header_field = (unsigned char *) MALLOC(dataSize + 1);
+    unsigned char *header_field = (unsigned char *) MALLOC(data_size + 1);
 
     /* copies the memory from the data to the header field */
-    memcpy(header_field, data, dataSize);
+    memcpy(header_field, data, data_size);
 
     /* puts the end of strng in the header field */
-    header_field[dataSize] = '\0';
+    header_field[data_size] = '\0';
 
     /* prints the header field */
     V_DEBUG_F("header field: %s\n", header_field);
@@ -132,15 +132,15 @@ ERROR_CODE headerFieldCallbackHandlerDefault(struct HttpParser_t *httpParser, co
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE headerValueCallbackHandlerDefault(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize) {
+ERROR_CODE header_value_callback_handler_default(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
     /* allocates the required space for the header value */
-    unsigned char *header_value = (unsigned char *) MALLOC(dataSize + 1);
+    unsigned char *header_value = (unsigned char *) MALLOC(data_size + 1);
 
     /* copies the memory from the data to the header value */
-    memcpy(header_value, data, dataSize);
+    memcpy(header_value, data, data_size);
 
     /* puts the end of strng in the header value */
-    header_value[dataSize] = '\0';
+    header_value[data_size] = '\0';
 
     /* prints the header value */
     V_DEBUG_F("header value: %s\n", header_value);
@@ -152,7 +152,7 @@ ERROR_CODE headerValueCallbackHandlerDefault(struct HttpParser_t *httpParser, co
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE headersCompleteCallbackHandlerDefault(struct HttpParser_t *httpParser) {
+ERROR_CODE headers_complete_callback_handler_default(struct http_parser_t *http_parser) {
     /* prints an information */
     V_DEBUG("http headers parsed\n");
 
@@ -160,15 +160,15 @@ ERROR_CODE headersCompleteCallbackHandlerDefault(struct HttpParser_t *httpParser
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE bodyCallbackHandlerDefault(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize) {
+ERROR_CODE body_callback_handler_default(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
     /* allocates the required space for the body */
-    unsigned char *body = (unsigned char *) MALLOC(dataSize + 1);
+    unsigned char *body = (unsigned char *) MALLOC(data_size + 1);
 
     /* copies the memory from the data to the body */
-    memcpy(body, data, dataSize);
+    memcpy(body, data, data_size);
 
     /* puts the end of strng in the body */
-    body[dataSize] = '\0';
+    body[data_size] = '\0';
 
     /* prints the body */
     V_DEBUG_F("body: %s\n", body);
@@ -180,96 +180,96 @@ ERROR_CODE bodyCallbackHandlerDefault(struct HttpParser_t *httpParser, const uns
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE messageCompleteCallbackHandlerDefault(struct HttpParser_t *httpParser) {
+ERROR_CODE message_complete_callback_handler_default(struct http_parser_t *http_parser) {
     /* prints an information */
     V_DEBUG("http request parsed\n");
 
     /* sends (and creates) the reponse */
-    _sendResponseHandlerDefault(httpParser);
+    _send_response_handler_default(http_parser);
 
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _setHttpParserHandlerDefault(struct HttpParser_t *httpParser) {
+ERROR_CODE _set_http_parser_handler_default(struct http_parser_t *http_parser) {
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _unsetHttpParserHandlerDefault(struct HttpParser_t *httpParser) {
+ERROR_CODE _unset_http_parser_handler_default(struct http_parser_t *http_parser) {
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _setHttpSettingsHandlerDefault(struct HttpSettings_t *httpSettings) {
+ERROR_CODE _set_http_settings_handler_default(struct http_settings_t *http_settings) {
     /* sets the various callback functions in the http settings
     structure, these callbacks are going to be used in the runtime
     processing of http parser (runtime execution) */
-    httpSettings->on_message_begin = messageBeginCallbackHandlerDefault;
-    httpSettings->on_url = urlCallbackHandlerDefault;
-    httpSettings->on_header_field = headerFieldCallbackHandlerDefault;
-    httpSettings->on_header_value = headerValueCallbackHandlerDefault;
-    httpSettings->on_headers_complete = headersCompleteCallbackHandlerDefault;
-    httpSettings->on_body = bodyCallbackHandlerDefault;
-    httpSettings->on_message_complete = messageCompleteCallbackHandlerDefault;
+    http_settings->on_message_begin = message_begin_callback_handler_default;
+    http_settings->on_url = url_callback_handler_default;
+    http_settings->on_header_field = header_field_callback_handler_default;
+    http_settings->on_header_value = header_value_callback_handler_default;
+    http_settings->on_headers_complete = headers_complete_callback_handler_default;
+    http_settings->on_body = body_callback_handler_default;
+    http_settings->on_message_complete = message_complete_callback_handler_default;
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _unsetHttpSettingsHandlerDefault(struct HttpSettings_t *httpSettings) {
+ERROR_CODE _unset_http_settings_handler_default(struct http_settings_t *http_settings) {
     /* unsets the various callback functions from the http settings */
-    httpSettings->on_message_begin = NULL;
-    httpSettings->on_url = NULL;
-    httpSettings->on_header_field = NULL;
-    httpSettings->on_header_value = NULL;
-    httpSettings->on_headers_complete = NULL;
-    httpSettings->on_body = NULL;
-    httpSettings->on_message_complete = NULL;
+    http_settings->on_message_begin = NULL;
+    http_settings->on_url = NULL;
+    http_settings->on_header_field = NULL;
+    http_settings->on_header_value = NULL;
+    http_settings->on_headers_complete = NULL;
+    http_settings->on_body = NULL;
+    http_settings->on_message_complete = NULL;
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _sendResponseHandlerDefault(struct HttpParser_t *httpParser) {
+ERROR_CODE _send_response_handler_default(struct http_parser_t *http_parser) {
     /* allocates the response buffer */
-    char *responseBuffer = MALLOC(256);
+    char *response_buffer = MALLOC(256);
 
     /* retrieves the connection from the http parser parameters */
-    struct Connection_t *connection = (struct Connection_t *) httpParser->parameters;
+    struct Connection_t *connection = (struct Connection_t *) http_parser->parameters;
 
     /* writes the http static headers to the response */
-    SPRINTF(responseBuffer, 256, "HTTP/1.1 200 OK\r\nServer: %s/%s (%s @ %s)\r\nConnection: Keep-Alive\r\nContent-Length: 14\r\n\r\nHello Viriatum", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU);
+    SPRINTF(response_buffer, 256, "HTTP/1.1 200 OK\r\nServer: %s/%s (%s @ %s)\r\nConnection: Keep-Alive\r\nContent-Length: 14\r\n\r\nHello Viriatum", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU);
 
     /* writes the response to the connection, registers for the appropriate callbacks */
-    writeConnection(connection, (unsigned char *) responseBuffer, (unsigned int) strlen(responseBuffer), _sendResponseCallbackHandlerDefault, (void *) (size_t) httpParser->flags);
+    write_connection(connection, (unsigned char *) response_buffer, (unsigned int) strlen(response_buffer), _send_response_callback_handler_default, (void *) (size_t) http_parser->flags);
 
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _sendResponseCallbackHandlerDefault(struct Connection_t *connection, struct Data_t *data, void *parameters) {
+ERROR_CODE _send_response_callback_handler_default(struct Connection_t *connection, struct Data_t *data, void *parameters) {
     /* retrieves the current http flags */
     unsigned char flags = (unsigned char) (size_t) parameters;
 
     /* retrieves the underlying connection references in order to be
     able to operate over them, for unregister */
-    struct IoConnection_t *ioConnection = (struct IoConnection_t *) connection->lower;
-    struct HttpConnection_t *httpConnection = (struct HttpConnection_t *) ioConnection->lower;
+    struct IoConnection_t *io_connection = (struct IoConnection_t *) connection->lower;
+    struct HttpConnection_t *http_connection = (struct HttpConnection_t *) io_connection->lower;
 
     /* in case there is an http handler in the current connection must
     unset it (remove temporary information) */
-    if(httpConnection->httpHandler) {
+    if(http_connection->http_handler) {
         /* unsets the current http connection and then sets the reference
         to it in the http connection as unset */
-        httpConnection->httpHandler->unset(httpConnection);
-        httpConnection->httpHandler = NULL;
+        http_connection->http_handler->unset(http_connection);
+        http_connection->http_handler = NULL;
     }
 
     /* in case the connection is not meant to be kept alive */
     if(!(flags & FLAG_CONNECTION_KEEP_ALIVE)) {
         /* closes the connection */
-        connection->closeConnection(connection);
+        connection->close_connection(connection);
     }
 
     /* raise no error */

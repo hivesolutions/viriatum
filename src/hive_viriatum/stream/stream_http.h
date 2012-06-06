@@ -39,10 +39,10 @@ struct HttpConnection_t;
  * Function used to update the given http connection
  * with new information.
  *
- * @param httpConnection The http connection to be
+ * @param http_connection The http connection to be
  * update with new information.
  */
-typedef ERROR_CODE (*httpConnectionUpdate) (struct HttpConnection_t *httpConnection);
+typedef ERROR_CODE (*httpConnectionUpdate) (struct HttpConnection_t *http_connection);
 
 /**
  * The structure that describes the structure
@@ -87,19 +87,19 @@ typedef struct HttpConnection_t {
      * The (upper) io connection that owns
      * manages this connection.
      */
-    struct IoConnection_t *ioConnection;
+    struct IoConnection_t *io_connection;
 
     /**
      * Structure containig the settings to be
      * used by the http parser.
      */
-    struct HttpSettings_t *httpSettings;
+    struct http_settings_t *http_settings;
 
     /**
      * Parser to be used during the interpretation
      * of the http requests.
      */
-    struct HttpParser_t *httpParser;
+    struct http_parser_t *http_parser;
 
     /**
      * The handler currently being used to handle
@@ -109,7 +109,7 @@ typedef struct HttpConnection_t {
      * This is an internal value and must be used
      * with care.
      */
-    struct HttpHandler_t *httpHandler;
+    struct HttpHandler_t *http_handler;
 
     /**
      * The base handler for the connection every new
@@ -139,10 +139,10 @@ typedef struct HttpConnection_t {
     size_t bufferOffset;
 } HttpConnection;
 
-ERROR_CODE createHttpHandler(struct HttpHandler_t **httpHandlerPointer, unsigned char *name);
-ERROR_CODE deleteHttpHandler(struct HttpHandler_t *httpHandler);
-ERROR_CODE createHttpConnection(struct HttpConnection_t **httpConnectionPointer, struct IoConnection_t *ioConnection);
-ERROR_CODE deleteHttpConnection(struct HttpConnection_t *httpConnection);
-ERROR_CODE dataHandlerStreamHttp(struct IoConnection_t *ioConnection, unsigned char *buffer, size_t buffer_size);
-ERROR_CODE openHandlerStreamHttp(struct IoConnection_t *ioConnection);
-ERROR_CODE closeHandlerStreamHttp(struct IoConnection_t *ioConnection);
+ERROR_CODE create_http_handler(struct HttpHandler_t **httpHandlerPointer, unsigned char *name);
+ERROR_CODE delete_http_handler(struct HttpHandler_t *http_handler);
+ERROR_CODE createHttpConnection(struct HttpConnection_t **httpConnectionPointer, struct IoConnection_t *io_connection);
+ERROR_CODE deleteHttpConnection(struct HttpConnection_t *http_connection);
+ERROR_CODE dataHandlerStreamHttp(struct IoConnection_t *io_connection, unsigned char *buffer, size_t buffer_size);
+ERROR_CODE openHandlerStreamHttp(struct IoConnection_t *io_connection);
+ERROR_CODE closeHandlerStreamHttp(struct IoConnection_t *io_connection);

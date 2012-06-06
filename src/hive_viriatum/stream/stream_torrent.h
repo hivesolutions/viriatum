@@ -36,7 +36,7 @@ struct TorrentConnection_t;
  * Function used to update the given torrent connection
  * with new information.
  *
- * @param httpConnection The http connection to be
+ * @param http_connection The http connection to be
  * update with new information.
  */
 typedef ERROR_CODE (*torrentConnectionUpdate) (struct TorrentConnection_t *torrentConnection);
@@ -50,7 +50,7 @@ typedef struct TorrentConnection_t {
      * The (upper) io connection that owns
      * manages this connection.
      */
-    struct IoConnection_t *ioConnection;
+    struct IoConnection_t *io_connection;
 
     /**
      * The handler currently being used to handle
@@ -63,8 +63,8 @@ typedef struct TorrentConnection_t {
     struct TorrentHandler_t *torrentHandler;
 } TorrentConnection;
 
-ERROR_CODE createTorrentConnection(struct TorrentConnection_t **torrentConnectionPointer, struct IoConnection_t *ioConnection);
+ERROR_CODE createTorrentConnection(struct TorrentConnection_t **torrentConnectionPointer, struct IoConnection_t *io_connection);
 ERROR_CODE deleteTorrentConnection(struct TorrentConnection_t *torrentConnection);
-ERROR_CODE dataHandlerStreamTorrent(struct IoConnection_t *ioConnection, unsigned char *buffer, size_t buffer_size);
-ERROR_CODE openHandlerStreamTorrent(struct IoConnection_t *ioConnection);
-ERROR_CODE closeHandlerStreamTorrent(struct IoConnection_t *ioConnection);
+ERROR_CODE dataHandlerStreamTorrent(struct IoConnection_t *io_connection, unsigned char *buffer, size_t buffer_size);
+ERROR_CODE openHandlerStreamTorrent(struct IoConnection_t *io_connection);
+ERROR_CODE closeHandlerStreamTorrent(struct IoConnection_t *io_connection);
