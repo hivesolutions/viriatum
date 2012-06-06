@@ -245,8 +245,8 @@ ERROR_CODE urlCallbackHandlerDispatch(struct HttpParser_t *httpParser, const uns
         httpConnection->httpHandler->unset(httpConnection);
         handler->set(httpConnection);
         httpConnection->httpHandler = handler;
-        httpConnection->httpSettings->onmessageBegin(httpParser);
-        httpConnection->httpSettings->onurl(httpParser, data, dataSize);
+        httpConnection->httpSettings->on_message_begin(httpParser);
+        httpConnection->httpSettings->on_url(httpParser, data, dataSize);
     } else {
         /* prints an error message to the output */
         V_ERROR_F("Error retrieving '%s' handler reference\n", handlerName);
@@ -298,13 +298,13 @@ ERROR_CODE _setHttpSettingsHandlerDispatch(struct HttpSettings_t *httpSettings) 
     /* sets the various callback functions in the http settings
     structure, these callbacks are going to be used in the runtime
     processing of http parser (runtime execution) */
-    httpSettings->onmessageBegin = messageBeginCallbackHandlerDispatch;
-    httpSettings->onurl = urlCallbackHandlerDispatch;
-    httpSettings->onheaderField = headerFieldCallbackHandlerDispatch;
-    httpSettings->onheaderValue = headerValueCallbackHandlerDispatch;
-    httpSettings->onheadersComplete = headersCompleteCallbackHandlerDispatch;
-    httpSettings->onbody = bodyCallbackHandlerDispatch;
-    httpSettings->onmessageComplete = messageCompleteCallbackHandlerDispatch;
+    httpSettings->on_message_begin = messageBeginCallbackHandlerDispatch;
+    httpSettings->on_url = urlCallbackHandlerDispatch;
+    httpSettings->on_header_field = headerFieldCallbackHandlerDispatch;
+    httpSettings->on_header_value = headerValueCallbackHandlerDispatch;
+    httpSettings->on_headers_complete = headersCompleteCallbackHandlerDispatch;
+    httpSettings->on_body = bodyCallbackHandlerDispatch;
+    httpSettings->on_message_complete = messageCompleteCallbackHandlerDispatch;
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -312,13 +312,13 @@ ERROR_CODE _setHttpSettingsHandlerDispatch(struct HttpSettings_t *httpSettings) 
 
 ERROR_CODE _unsetHttpSettingsHandlerDispatch(struct HttpSettings_t *httpSettings) {
     /* unsets the various callback functions from the http settings */
-    httpSettings->onmessageBegin = NULL;
-    httpSettings->onurl = NULL;
-    httpSettings->onheaderField = NULL;
-    httpSettings->onheaderValue = NULL;
-    httpSettings->onheadersComplete = NULL;
-    httpSettings->onbody = NULL;
-    httpSettings->onmessageComplete = NULL;
+    httpSettings->on_message_begin = NULL;
+    httpSettings->on_url = NULL;
+    httpSettings->on_header_field = NULL;
+    httpSettings->on_header_value = NULL;
+    httpSettings->on_headers_complete = NULL;
+    httpSettings->on_body = NULL;
+    httpSettings->on_message_complete = NULL;
 
     /* raises no error */
     RAISE_NO_ERROR;

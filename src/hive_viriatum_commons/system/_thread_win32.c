@@ -33,201 +33,201 @@
 
 #include "_thread_win32.h"
 
-void createCondition(struct Condition_t **conditionPointer) {
+void create_condition(struct condition_t **condition_pointer) {
     /* retrieves the condition size */
-    size_t conditionSize = sizeof(struct Condition_t);
+    size_t condition_size = sizeof(struct condition_t);
 
     /* allocates space for the condition */
-    struct Condition_t *condition = (struct Condition_t *) MALLOC(conditionSize);
+    struct condition_t *condition = (struct condition_t *) MALLOC(condition_size);
 
     /* starts the lock count */
-    condition->lockCount = 0;
+    condition->lock_count = 0;
 
     /* initializes the wait critical section */
-    InitializeCriticalSection(&condition->waitCriticalSection);
+    InitializeCriticalSection(&condition->wait_critical_section);
 
     /* initializes the lock critical section */
-    InitializeCriticalSection(&condition->lockCriticalSection);
+    InitializeCriticalSection(&condition->lock_critical_section);
 
     /* creates the wait set */
-    create_linked_list(&condition->waitSet);
+    create_linked_list(&condition->wait_set);
 
     /* sets the condition in the condition pointer */
-    *conditionPointer = condition;
+    *condition_pointer = condition;
 }
 
-void deleteCondition(struct Condition_t *condition) {
+void delete_condition(struct condition_t *condition) {
     /* deletes the wait set */
-    delete_linked_list(condition->waitSet);
+    delete_linked_list(condition->wait_set);
 
     /* deletes the lock critical section */
-    DeleteCriticalSection(&condition->lockCriticalSection);
+    DeleteCriticalSection(&condition->lock_critical_section);
 
     /* deletes the wait critical section */
-    DeleteCriticalSection(&condition->waitCriticalSection);
+    DeleteCriticalSection(&condition->wait_critical_section);
 
     /* releases the condition */
     FREE(condition);
 }
 
-void lockCondition(struct Condition_t *condition) {
+void lock_condition(struct condition_t *condition) {
     /* enters the lock critical section */
-    EnterCriticalSection(&condition->lockCriticalSection);
+    EnterCriticalSection(&condition->lock_critical_section);
 
     /* increments the condition lock count */
-    condition->lockCount++;
+    condition->lock_count++;
 }
 
-void unlockCondition(struct Condition_t *condition) {
+void unlock_condition(struct condition_t *condition) {
     /* in case the test lock owner condition fails */
-    if(!_testLockOwnerCondition(condition)) {
+    if(!_test_lock_owner_condition(condition)) {
         SetLastError(ERROR_INVALID_FUNCTION);
     }
 
     /* decrements the condition lock count */
-    condition->lockCount--;
+    condition->lock_count--;
 
     /* leaves the lock critical section */
-    LeaveCriticalSection(&condition->lockCriticalSection);
+    LeaveCriticalSection(&condition->lock_critical_section);
 }
 
-void waitCondition(struct Condition_t *condition) {
+void wait_condition(struct condition_t *condition) {
     /* allocates the index */
     unsigned int index;
 
     /* allocates the wait event */
-    HANDLE waitEvent;
+    HANDLE wait_event;
 
     /* allocates the wait result */
-    DWORD waitResult;
+    DWORD wait_result;
 
     /* saves the current lock count */
-    unsigned int currentLockCount = condition->lockCount;
+    unsigned int current_lock_count = condition->lock_count;
 
     /* pushes the wait event */
-    _pushCondition(condition, &waitEvent);
+    _push_condition(condition, &wait_event);
 
     /* in case the wait event is not set */
-    if(waitEvent == NULL) {
+    if(wait_event == NULL) {
         /* returns immediately */
         return;
     }
 
     /* resets the lock count */
-    condition->lockCount = 0;
+    condition->lock_count = 0;
 
     /* iterates over the current lock count */
-    for(index = 0; index < currentLockCount; index++) {
+    for(index = 0; index < current_lock_count; index++) {
         /* leaves the lock critical section */
-        LeaveCriticalSection(&condition->lockCriticalSection);
+        LeaveCriticalSection(&condition->lock_critical_section);
     }
 
     /* waits for the event to become signalled */
-    waitResult = WaitForSingleObjectEx(waitEvent, INFINITE, 0);
+    wait_result = WaitForSingleObjectEx(wait_event, INFINITE, 0);
 
   // If the wait failed, store the last error because it will get
   // overwritten when acquiring the lock.
-    /* DWORD dwLastError;
-     if( WAIT_FAILED == dwWaitResult )
-        dwLastError = ::GetLastError();*/
+    /* DWORD dw_last_error;
+     if( WAIT_FAILED == dw_wait_result )
+        dw_last_error = ::GetLastError();*/
 
     /* iterates over the current lock count */
-    for(index = 0; index < currentLockCount; index++) {
+    for(index = 0; index < current_lock_count; index++) {
         /* enters the lock critical section */
-        EnterCriticalSection(&condition->lockCriticalSection);
+        EnterCriticalSection(&condition->lock_critical_section);
     }
 
     /* restores the lock count */
-    condition->lockCount = currentLockCount;
+    condition->lock_count = current_lock_count;
 
     /* in case the closing of the wait event failed */
-    if(!CloseHandle(waitEvent)) {
+    if(!CloseHandle(wait_event)) {
         /* returns in failure */
         //return WAIT_FAILED;
         return;
     }
 
-  /*if( WAIT_FAILED == dwWaitResult )
-    ::SetLastError(dwLastError);*/
+  /*if( WAIT_FAILED == dw_wait_result )
+    ::SetLastError(dw_last_error);*/
 
-    /*return dwWaitResult;*/
+    /*return dw_wait_result;*/
     return;
 }
 
-void notifyCondition(struct Condition_t *condition) {
+void notify_condition(struct condition_t *condition) {
     /* allocates the wait event */
-    HANDLE waitEvent;
+    HANDLE wait_event;
 
     /* pops the wait event */
-    _popCondition(condition, &waitEvent);
+    _pop_condition(condition, &wait_event);
 
     /* in case the wait event is not set */
-    if(waitEvent == NULL) {
+    if(wait_event == NULL) {
         /* returns immediately */
         return;
     }
 
     /* signals the event */
-    SetEvent(waitEvent);
+    SetEvent(wait_event);
 }
 
-void _pushCondition(struct Condition_t *condition, HANDLE *waitEventPointer) {
+void _push_condition(struct condition_t *condition, HANDLE *wait_event_pointer) {
     /* creates the new event */
-    HANDLE waitEvent = CreateEvent(NULL, 0, 0, NULL);
+    HANDLE wait_event = CreateEvent(NULL, 0, 0, NULL);
 
     /* in case the creation of the wait event failed */
-    if(waitEvent == NULL) {
+    if(wait_event == NULL) {
         /* returns immediately */
         return;
     }
 
     /* enters the wait critical section */
-    EnterCriticalSection(&condition->waitCriticalSection);
+    EnterCriticalSection(&condition->wait_critical_section);
 
     /* adds the wait event to the wait set */
-    append_value_linked_list(condition->waitSet, (void *) waitEvent);
+    append_value_linked_list(condition->wait_set, (void *) wait_event);
 
     /* leaves the wait critical section */
-    LeaveCriticalSection(&condition->waitCriticalSection);
+    LeaveCriticalSection(&condition->wait_critical_section);
 
     /* sets the wait event in the wait event pointer */
-    *waitEventPointer = waitEvent;
+    *wait_event_pointer = wait_event;
 }
 
-void _popCondition(struct Condition_t *condition, HANDLE *waitEventPointer) {
+void _pop_condition(struct condition_t *condition, HANDLE *wait_event_pointer) {
     /* allocates the wait event */
-    HANDLE waitEvent;
+    HANDLE wait_event;
 
     /* enters the wait critical section */
-    EnterCriticalSection(&condition->waitCriticalSection);
+    EnterCriticalSection(&condition->wait_critical_section);
 
     /* pops the wait event from the wait set */
-    pop_value_linked_list(condition->waitSet, (void **) &waitEvent, 0);
+    pop_value_linked_list(condition->wait_set, (void **) &wait_event, 0);
 
     /* leaves the wait critical section */
-    LeaveCriticalSection(&condition->waitCriticalSection);
+    LeaveCriticalSection(&condition->wait_critical_section);
 
     /* sets the wait event in the wait event pointer */
-    *waitEventPointer = waitEvent;
+    *wait_event_pointer = wait_event;
 }
 
-unsigned char _testLockOwnerCondition(struct Condition_t *condition) {
+unsigned char _test_lock_owner_condition(struct condition_t *condition) {
     /* tries to enter the lock critical section */
-    BOOL tryLockResult = TryEnterCriticalSection(&condition->lockCriticalSection);
+    BOOL try_lock_result = TryEnterCriticalSection(&condition->lock_critical_section);
 
     /* in case the lock is not successfully held */
-    if(!tryLockResult) {
+    if(!try_lock_result) {
         /* returns invalid */
         return 0;
     }
 
     /* if we got the lock, but the lock count is zero, then nobody had it */
-    if(condition->lockCount == 0) {
+    if(condition->lock_count == 0) {
         /* asserts that the try lock result is valid */
-        assert(tryLockResult);
+        assert(try_lock_result);
 
         /* leaves the lock critical section */
-        LeaveCriticalSection(&condition->lockCriticalSection);
+        LeaveCriticalSection(&condition->lock_critical_section);
 
         /* returns invalid */
         return 0;
@@ -235,10 +235,10 @@ unsigned char _testLockOwnerCondition(struct Condition_t *condition) {
 
     /* asserts that the try lock result is valid
     and that the lock count is greater than zero */
-    assert(tryLockResult && condition->lockCount > 0);
+    assert(try_lock_result && condition->lock_count > 0);
 
     /* leaves the lock critical section */
-    LeaveCriticalSection(&condition->lockCriticalSection);
+    LeaveCriticalSection(&condition->lock_critical_section);
 
     /* returns valid */
     return 1;

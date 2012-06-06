@@ -73,13 +73,13 @@
 
 #define HTTP_MARK(FOR)\
     do {\
-        FOR##Mark = pointer;\
+        FOR##_mark = pointer;\
     } while(0)
 
 #define HTTP_CALLBACK(FOR)\
     do {\
-        if(httpSettings->on##FOR) {\
-            if(httpSettings->on##FOR(httpParser) != 0) {\
+        if(httpSettings->on_##FOR) {\
+            if(httpSettings->on_##FOR(httpParser) != 0) {\
                 /*SET_ERRNO(HPE_CB_##FOR);*/\
                 /*return (pointer - data);*/\
             }\
@@ -88,14 +88,14 @@
 
 #define HTTP_CALLBACK_DATA(FOR)\
     do {\
-        if(FOR##Mark) {\
-            if(httpSettings->on##FOR) {\
-                if(httpSettings->on##FOR(httpParser, FOR##Mark, pointer - FOR##Mark) != 0) {\
+        if(FOR##_mark) {\
+            if(httpSettings->on_##FOR) {\
+                if(httpSettings->on_##FOR(httpParser, FOR##_mark, pointer - FOR##_mark) != 0) {\
                 /*    SET_ERRNO(HPE_CB_##FOR);*/\
                     /*return (p - data);*/\
                 }\
             }\
-            FOR##Mark = NULL;\
+            FOR##_mark = NULL;\
         }\
     } while(0)
 
@@ -424,7 +424,7 @@ typedef struct HttpParser_t {
     enum HttpParserState_e state;
     enum HttpHeaderState_e headerState;
     unsigned char index;
-    size_t readCount;
+    size_t read_count;
     int contentLength;
     unsigned short httpMajor;
     unsigned short httpMinor;
@@ -453,13 +453,13 @@ typedef struct HttpParser_t {
  * to be used for parsing the http message.
  */
 typedef struct HttpSettings_t {
-    httpCallback onmessageBegin;
-    httpDataCallback onurl;
-    httpDataCallback onheaderField;
-    httpDataCallback onheaderValue;
-    httpCallback onheadersComplete;
-    httpDataCallback onbody;
-    httpCallback onmessageComplete;
+    httpCallback on_message_begin;
+    httpDataCallback on_url;
+    httpDataCallback on_header_field;
+    httpDataCallback on_header_value;
+    httpCallback on_headers_complete;
+    httpDataCallback on_body;
+    httpCallback on_message_complete;
 } HttpSettings;
 
 /**

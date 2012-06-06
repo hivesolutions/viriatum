@@ -36,13 +36,13 @@
 #define TEMPLATE_MARK_BACK(FOR) TEMPLATE_MARK_N(FOR, 1)
 #define TEMPLATE_MARK_N(FOR, N)\
     do {\
-        FOR##Mark = pointer - N;\
+        FOR##_mark = pointer - N;\
     } while(0)
 
 #define TEMPLATE_CALLBACK(FOR)\
     do {\
-        if(templateSettings->on##FOR) {\
-            if(templateSettings->on##FOR(templateEngine) != 0) {\
+        if(template_settings->on_##FOR) {\
+            if(template_settings->on_##FOR(template_engine) != 0) {\
                 RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem handling callback"); \
             }\
         }\
@@ -52,35 +52,35 @@
 #define TEMPLATE_CALLBACK_DATA_BACK(FOR) TEMPLATE_CALLBACK_DATA_N(FOR, 1)
 #define TEMPLATE_CALLBACK_DATA_N(FOR, N)\
     do {\
-        if(FOR##Mark) {\
-            if(templateSettings->on##FOR) {\
-                if(templateSettings->on##FOR(templateEngine, FOR##Mark, pointer - FOR##Mark - N) != 0) {\
+        if(FOR##_mark) {\
+            if(template_settings->on_##FOR) {\
+                if(template_settings->on_##FOR(template_engine, FOR##_mark, pointer - FOR##_mark - N) != 0) {\
                     RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem handling callback"); \
                 }\
             }\
-            FOR##Mark = NULL;\
+            FOR##_mark = NULL;\
         }\
     } while(0)
 
-struct TemplateEngine_t;
+struct template_engine_t;
 
 /**
  * The "default" callback function to be used, without
  * any extra arguments.
  */
-typedef ERROR_CODE (*templateCallback) (struct TemplateEngine_t *);
+typedef ERROR_CODE (*template_callback) (struct template_engine_t *);
 
 /**
  * Callback function type used for callbacks that require
  * "extra" data to be send as argument.
  */
-typedef ERROR_CODE (*templateDataCallback) (struct TemplateEngine_t *, const unsigned char *, size_t);
+typedef ERROR_CODE (*template_data_callback) (struct template_engine_t *, const unsigned char *, size_t);
 
 /**
  * Enumeration defining all the states occuring
  * durring the template parsing.
  */
-typedef enum TemplateEngineState_e {
+typedef enum template_engine_state_e {
     /**
      * Normal state for the template engin where
      * it is trying to find new tags.
@@ -126,61 +126,61 @@ typedef enum TemplateEngineState_e {
      * found for complete string value assert.
      */
     TEMPLATE_ENGINE_PARAMETER_VALUE_STRING
-} TemplateEngineState;
+} template_engine_state;
 
 /**
  * Structure representing the various settings
  * to be used for (and during) parsing the template.
  */
-typedef struct TemplateSettings_t {
+typedef struct template_settings_t {
     /**
      * Callabck function called when a new text
      * sequence is opened.
      */
-    templateCallback ontextBegin;
+    template_callback on_text_begin;
 
     /**
      * Callback function called when an existing
      * text sequence is closed.
      */
-    templateDataCallback ontextEnd;
+    template_data_callback on_text_end;
 
     /**
      * Callabck function called when a new tag
      * is opened.
      */
-    templateCallback ontagBegin;
+    template_callback on_tag_begin;
 
     /**
      * Callback function called when a new close
      * type tag is opened.
      */
-    templateCallback ontagCloseBegin;
+    template_callback on_tag_close_begin;
 
     /**
      * Callback function called when an existing
      * tag is closed.
      */
-    templateDataCallback ontagEnd;
+    template_data_callback on_tag_end;
 
     /**
      * Callback function called when a name of a tag
      * is parsed correctly.
      */
-    templateDataCallback ontagName;
+    template_data_callback on_tag_name;
 
     /**
      * Callback function called when a parameter name
      * is parsed correctly.
      */
-    templateDataCallback onparameter;
+    template_data_callback on_parameter;
 
     /**
      * Callback function called when a parameter value
      * is parsed correctly.
      */
-    templateDataCallback onparameterValue;
-} TemplateSettings;
+    template_data_callback on_parameter_value;
+} template_settings;
 
 /**
  * Structure repsenting the template engine (parser)
@@ -189,19 +189,19 @@ typedef struct TemplateSettings_t {
  * Additional options may be used to store context
  * information that can be used in the callbacks.
  */
-typedef struct TemplateEngine_t {
+typedef struct template_engine_t {
     /**
      * Context information to be used by the parsing
      * handlers (callbacks) for context.
      */
     void *context;
-} TemplateEngine;
+} template_engine;
 
-VIRIATUM_EXPORT_PREFIX void createTemplateEngine(struct TemplateEngine_t **templateEnginePointer);
-VIRIATUM_EXPORT_PREFIX void deleteTemplateEngine(struct TemplateEngine_t *templateEngine);
-VIRIATUM_EXPORT_PREFIX void createTemplateSettings(struct TemplateSettings_t **templateSettingsPointer);
-VIRIATUM_EXPORT_PREFIX void deleteTemplateSettings(struct TemplateSettings_t *templateSettings);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE processTemplateEngine(struct TemplateEngine_t *templateEngine, struct TemplateSettings_t *templateSettings, unsigned char *file_path);
+VIRIATUM_EXPORT_PREFIX void create_template_engine(struct template_engine_t **template_engine_pointer);
+VIRIATUM_EXPORT_PREFIX void delete_template_engine(struct template_engine_t *template_engine);
+VIRIATUM_EXPORT_PREFIX void create_template_settings(struct template_settings_t **template_settings_pointer);
+VIRIATUM_EXPORT_PREFIX void delete_template_settings(struct template_settings_t *template_settings);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE process_template_engine(struct template_engine_t *template_engine, struct template_settings_t *template_settings, unsigned char *file_path);
 
 /**
  * Retrieves a new character from the file stream
@@ -216,4 +216,4 @@ VIRIATUM_EXPORT_PREFIX ERROR_CODE processTemplateEngine(struct TemplateEngine_t 
  * (remaining) size in the file.
  * @return The character read from the file stream.
  */
-VIRIATUM_EXPORT_PREFIX char _getcTemplateEngine(FILE *file, unsigned char **pointer, size_t *size);
+VIRIATUM_EXPORT_PREFIX char _getc_template_engine(FILE *file, unsigned char **pointer, size_t *size);

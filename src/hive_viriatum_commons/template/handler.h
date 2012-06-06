@@ -36,7 +36,7 @@
  * template nodes that may exist in
  * the template parsing context.
  */
-typedef enum TemplateNodeType_e {
+typedef enum template_node_type_e {
     /**
      * The template node to be used as the root
      * node os the node structure.
@@ -72,13 +72,13 @@ typedef enum TemplateNodeType_e {
      * undefined context.
      */
     TEMPLATE_NODE_UNDEFINED
-} TemplateNodeType;
+} template_node_type;
 
 /**
  * Enumeration defining the various
  * types of parameters.
  */
-typedef enum TemplateParameterType_e {
+typedef enum template_parameter_type_e {
     /**
      * The parameter of type string literal.
      */
@@ -101,17 +101,17 @@ typedef enum TemplateParameterType_e {
      * decimal part.
      */
     TEMPLATE_PARAMETER_FLOAT
-} TemplateParameterType;
+} template_parameter_type;
 
 /**
  * Structure defining the parameter internal
  * parameters and the references to the value.
  */
-typedef struct TemplateParameter_t {
+typedef struct template_parameter_t {
     /**
      * The data type of the current parameter.
      */
-    enum TemplateParameterType_e type;
+    enum template_parameter_type_e type;
 
     /**
      * The name of the current parameter.
@@ -121,7 +121,7 @@ typedef struct TemplateParameter_t {
     /**
      * The "raw" and unprocessed parameter value.s
      */
-    unsigned char rawValue[128];
+    unsigned char raw_value[128];
 
     /**
      * The value as a string of the parameter.
@@ -131,63 +131,63 @@ typedef struct TemplateParameter_t {
     /**
      * The value as a refernce of the parameter.
      */
-    unsigned char referenceValue[64];
+    unsigned char reference_value[64];
 
     /**
      * The value as an integer of the parameter.
      */
-    int intValue;
+    int int_value;
 
     /**
      * The value as a float of the parameter.
      */
-    float floatValue;
-} TemplateParameter;
+    float float_value;
+} template_parameter;
 
-typedef struct TemplateNode_t {
+typedef struct template_node_t {
     unsigned char *name;
-    enum TemplateNodeType_e type;
+    enum template_node_type_e type;
     struct linked_list_t *children;
     struct linked_list_t *parameters;
-    struct hash_map_t *parametersMap;
-    struct TemplateParameter_t *temporaryParameter;
-} TemplateNode;
+    struct hash_map_t *parameters_map;
+    struct template_parameter_t *temporary_parameter;
+} template_node;
 
-typedef struct TemplateHandler_t {
+typedef struct template_handler_t {
     unsigned char *string_value;
-    struct TemplateNode_t *currentNode;
-    struct TemplateNode_t *temporaryNode;
+    struct template_node_t *current_node;
+    struct template_node_t *temporary_node;
     struct linked_list_t *nodes;
     struct linked_list_t *contexts;
     struct hash_map_t *names;
     struct string_buffer_t *string_buffer;
-    struct linked_list_t *releaseList;
-} TemplateHandler;
+    struct linked_list_t *release_list;
+} template_handler;
 
-VIRIATUM_EXPORT_PREFIX void create_template_handler(struct TemplateHandler_t **templateHandlerPointer);
-VIRIATUM_EXPORT_PREFIX void delete_template_handler(struct TemplateHandler_t *template_handler);
-VIRIATUM_EXPORT_PREFIX void createTemplateNode(struct TemplateNode_t **templateNodePointer, enum TemplateNodeType_e type);
-VIRIATUM_EXPORT_PREFIX void deleteTemplateNode(struct TemplateNode_t *templateNode);
-VIRIATUM_EXPORT_PREFIX void createTemplateParameter(struct TemplateParameter_t **templateParameterPointer);
-VIRIATUM_EXPORT_PREFIX void deleteTemplateParameter(struct TemplateParameter_t *templateParameter);
-VIRIATUM_EXPORT_PREFIX void process_template_handler(struct TemplateHandler_t *template_handler, unsigned char *file_path);
-VIRIATUM_EXPORT_PREFIX void assignTemplateHandler(struct TemplateHandler_t *template_handler, unsigned char *name, struct type_t *value);
-VIRIATUM_EXPORT_PREFIX void assignIntegerTemplateHandler(struct TemplateHandler_t *template_handler, unsigned char *name, int value);
-VIRIATUM_EXPORT_PREFIX void assignListTemplateHandler(struct TemplateHandler_t *template_handler, unsigned char *name, struct linked_list_t *value);
-VIRIATUM_EXPORT_PREFIX void getTemplateHandler(struct TemplateHandler_t *template_handler, unsigned char *name, struct type_t **value_pointer);
-VIRIATUM_EXPORT_PREFIX void traverseNodeDebug(struct TemplateHandler_t *template_handler, struct TemplateNode_t *node, unsigned int indentation);
-VIRIATUM_EXPORT_PREFIX void traverseNodeBuffer(struct TemplateHandler_t *template_handler, struct TemplateNode_t *node);
-VIRIATUM_EXPORT_PREFIX void traverseNodesBuffer(struct TemplateHandler_t *template_handler, struct TemplateNode_t *node);
-VIRIATUM_EXPORT_PREFIX void _traverseOutBuffer(struct TemplateHandler_t *template_handler, struct TemplateNode_t *node);
-VIRIATUM_EXPORT_PREFIX void _traverseForEachBuffer(struct TemplateHandler_t *template_handler, struct TemplateNode_t *node);
-VIRIATUM_EXPORT_PREFIX void _traverseIfBuffer(struct TemplateHandler_t *template_handler, struct TemplateNode_t *node);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE _openContextTemplateHandler(struct TemplateHandler_t *template_handler);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE _closeContextTemplateHandler(struct TemplateHandler_t *template_handler);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE _textBeginCallback(struct TemplateEngine_t *templateEngine);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE _textEndCallback(struct TemplateEngine_t *templateEngine, const unsigned char *pointer, size_t size);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE _tagBeginCallback(struct TemplateEngine_t *templateEngine);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE _tagCloseBeginCallback(struct TemplateEngine_t *templateEngine);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE _tagEndCallback(struct TemplateEngine_t *templateEngine, const unsigned char *pointer, size_t size);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE _tagNameCallback(struct TemplateEngine_t *templateEngine, const unsigned char *pointer, size_t size);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE _parameterCallback(struct TemplateEngine_t *templateEngine, const unsigned char *pointer, size_t size);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE _parameterValueCallback(struct TemplateEngine_t *templateEngine, const unsigned char *pointer, size_t size);
+VIRIATUM_EXPORT_PREFIX void create_template_handler(struct template_handler_t **template_handler_pointer);
+VIRIATUM_EXPORT_PREFIX void delete_template_handler(struct template_handler_t *template_handler);
+VIRIATUM_EXPORT_PREFIX void create_template_node(struct template_node_t **template_node_pointer, enum template_node_type_e type);
+VIRIATUM_EXPORT_PREFIX void delete_template_node(struct template_node_t *template_node);
+VIRIATUM_EXPORT_PREFIX void create_template_parameter(struct template_parameter_t **template_parameter_pointer);
+VIRIATUM_EXPORT_PREFIX void delete_template_parameter(struct template_parameter_t *template_parameter);
+VIRIATUM_EXPORT_PREFIX void process_template_handler(struct template_handler_t *template_handler, unsigned char *file_path);
+VIRIATUM_EXPORT_PREFIX void assign_template_handler(struct template_handler_t *template_handler, unsigned char *name, struct type_t *value);
+VIRIATUM_EXPORT_PREFIX void assign_integer_template_handler(struct template_handler_t *template_handler, unsigned char *name, int value);
+VIRIATUM_EXPORT_PREFIX void assign_list_template_handler(struct template_handler_t *template_handler, unsigned char *name, struct linked_list_t *value);
+VIRIATUM_EXPORT_PREFIX void get_template_handler(struct template_handler_t *template_handler, unsigned char *name, struct type_t **value_pointer);
+VIRIATUM_EXPORT_PREFIX void traverse_node_debug(struct template_handler_t *template_handler, struct template_node_t *node, unsigned int indentation);
+VIRIATUM_EXPORT_PREFIX void traverse_node_buffer(struct template_handler_t *template_handler, struct template_node_t *node);
+VIRIATUM_EXPORT_PREFIX void traverse_nodes_buffer(struct template_handler_t *template_handler, struct template_node_t *node);
+VIRIATUM_EXPORT_PREFIX void _traverse_out_buffer(struct template_handler_t *template_handler, struct template_node_t *node);
+VIRIATUM_EXPORT_PREFIX void _traverse_for_each_buffer(struct template_handler_t *template_handler, struct template_node_t *node);
+VIRIATUM_EXPORT_PREFIX void _traverse_if_buffer(struct template_handler_t *template_handler, struct template_node_t *node);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _open_context_template_handler(struct template_handler_t *template_handler);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _close_context_template_handler(struct template_handler_t *template_handler);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _text_begin_callback(struct template_engine_t *template_engine);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _text_end_callback(struct template_engine_t *template_engine, const unsigned char *pointer, size_t size);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _tag_begin_callback(struct template_engine_t *template_engine);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _tag_close_begin_callback(struct template_engine_t *template_engine);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _tag_end_callback(struct template_engine_t *template_engine, const unsigned char *pointer, size_t size);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _tag_name_callback(struct template_engine_t *template_engine, const unsigned char *pointer, size_t size);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _parameter_callback(struct template_engine_t *template_engine, const unsigned char *pointer, size_t size);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _parameter_value_callback(struct template_engine_t *template_engine, const unsigned char *pointer, size_t size);

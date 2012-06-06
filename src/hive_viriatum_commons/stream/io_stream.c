@@ -29,18 +29,18 @@
 
 #include "io_stream.h"
 
-VIRIATUM_EXPORT_PREFIX void createStream(struct Stream_t **streamPointer) {
+VIRIATUM_EXPORT_PREFIX void create_stream(struct stream_t **stream_pointer) {
     /* retrieves the stream size */
-    size_t streamSize = sizeof(struct Stream_t);
+    size_t stream_size = sizeof(struct stream_t);
 
     /* allocates space for the stream */
-    struct Stream_t *stream = (struct Stream_t *) MALLOC(streamSize);
+    struct stream_t *stream = (struct stream_t *) MALLOC(stream_size);
 
     /* sets the stream in the stream pointer */
-    *streamPointer = stream;
+    *stream_pointer = stream;
 }
 
-VIRIATUM_EXPORT_PREFIX void deleteStream(struct Stream_t *stream) {
+VIRIATUM_EXPORT_PREFIX void delete_stream(struct stream_t *stream) {
     /* releases the stream */
     FREE(stream);
 }

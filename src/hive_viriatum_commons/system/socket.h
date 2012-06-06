@@ -50,32 +50,32 @@
 #define SOCKET_OPTIONS_LEVEL_SOCKET SOL_SOCKET
 #define SOCKET_OPTIONS_REUSE_ADDRESS_SOCKET SO_REUSEADDR
 #define SOCKET_SET fd_set
-#define SOCKET_INITIALIZE(socketData) WSAStartup(MAKEWORD(2, 0), socketData)
+#define SOCKET_INITIALIZE(socket_data) WSAStartup(MAKEWORD(2, 0), socket_data)
 #define SOCKET_FINISH() WSACleanup()
-#define SOCKET_CREATE(type, streamType, protocolType) socket(type, streamType, protocolType)
-#define SOCKET_BIND(socketHandle, socketAddress) bind(socketHandle, (LPSOCKADDR) &socketAddress, sizeof(SOCKET_ADDRESS))
-#define SOCKET_LISTEN(socketHandle) listen(socketHandle, SOCKET_CONNECTIONS)
-#define SOCKET_CONNECT(socketHandle, socketAddress) connect(socketHandle, (LPSOCKADDR) &socketAddress, sizeof(SOCKET_ADDRESS))
-#define SOCKET_CONNECT_SIZE(socketHandle, socketAddress, socketAddressSize) connect(socketHandle, (LPSOCKADDR) &socketAddress, socketAddressSize)
-#define SOCKET_ACCEPT(socketHandle, socketAddress, socketAddressSize) accept(socketHandle, socketAddress, &socketAddressSize)
-#define SOCKET_CLOSE(socketHandle) closesocket(socketHandle)
-#define SOCKET_ADDRESS_CREATE(socketAddress, type, address, port) memset(&socketAddress, 0, sizeof(SOCKET_ADDRESS));\
-    socketAddress.sin_family = type;\
-    socketAddress.sin_port = htons(port);\
-    if(address == NULL) { socketAddress.sin_addr.s_addr = INADDR_ANY; } else { socketAddress.sin_addr.s_addr = inet_addr(address); }
+#define SOCKET_CREATE(type, stream_type, protocol_type) socket(type, stream_type, protocol_type)
+#define SOCKET_BIND(socket_handle, socket_address) bind(socket_handle, (LPSOCKADDR) &socket_address, sizeof(SOCKET_ADDRESS))
+#define SOCKET_LISTEN(socket_handle) listen(socket_handle, SOCKET_CONNECTIONS)
+#define SOCKET_CONNECT(socket_handle, socket_address) connect(socket_handle, (LPSOCKADDR) &socket_address, sizeof(SOCKET_ADDRESS))
+#define SOCKET_CONNECT_SIZE(socket_handle, socket_address, socket_address_size) connect(socket_handle, (LPSOCKADDR) &socket_address, socket_address_size)
+#define SOCKET_ACCEPT(socket_handle, socket_address, socket_address_size) accept(socket_handle, socket_address, &socket_address_size)
+#define SOCKET_CLOSE(socket_handle) closesocket(socket_handle)
+#define SOCKET_ADDRESS_CREATE(socket_address, type, address, port) memset(&socket_address, 0, sizeof(SOCKET_ADDRESS));\
+    socket_address.sin_family = type;\
+    socket_address.sin_port = htons(port);\
+    if(address == NULL) { socket_address.sin_addr.s_addr = INADDR_ANY; } else { socket_address.sin_addr.s_addr = inet_addr(address); }
 #define SOCKET_GET_HOST_BY_NAME(hostname) gethostbyname(hostname)
-#define SOCKET_TEST_SOCKET(socketHandle) socketHandle == INVALID_SOCKET
+#define SOCKET_TEST_SOCKET(socket_handle) socket_handle == INVALID_SOCKET
 #define SOCKET_TEST_ERROR(result) result == SOCKET_ERROR
 #define SOCKET_GET_ERROR_CODE(result) WSAGetLastError()
-#define SOCKET_SEND(socketHandle, buffer, length, flags) send(socketHandle, buffer, length, flags)
-#define SOCKET_RECEIVE(socketHandle, buffer, length, flags) recv(socketHandle, buffer, length, flags)
-#define SOCKET_SET_OPTIONS(socketHandle, level, optionName, optionValue) setsockopt(socketHandle, level, optionName, &optionValue, sizeof(optionValue))
-#define SOCKET_SELECT(numberSocket, socketsReadSet, socketsWriteSet, socketsExceptionSet, timeout) select(numberSocket, socketsReadSet, socketsWriteSet, socketsExceptionSet, timeout)
-#define SOCKET_SET_ZERO(socketsSet) FD_ZERO(socketsSet)
-#define SOCKET_SET_SET(socketHandle, socketsSet) FD_SET(socketHandle, socketsSet)
-#define SOCKET_SET_CLEAR(socketHandle, socketsSet) FD_CLR(socketHandle, socketsSet)
-#define SOCKET_SET_IS_SET(socketHandle, socketsSet) FD_ISSET(socketHandle, socketsSet)
-#define SOCKET_SET_NON_BLOCKING(socketHandle, flags) SOCKET_IOCTL(socketHandle, FIONBIO, &flags)
+#define SOCKET_SEND(socket_handle, buffer, length, flags) send(socket_handle, buffer, length, flags)
+#define SOCKET_RECEIVE(socket_handle, buffer, length, flags) recv(socket_handle, buffer, length, flags)
+#define SOCKET_SET_OPTIONS(socket_handle, level, option_name, option_value) setsockopt(socket_handle, level, option_name, &option_value, sizeof(option_value))
+#define SOCKET_SELECT(number_socket, sockets_read_set, sockets_write_set, sockets_exception_set, timeout) select(number_socket, sockets_read_set, sockets_write_set, sockets_exception_set, timeout)
+#define SOCKET_SET_ZERO(sockets_set) FD_ZERO(sockets_set)
+#define SOCKET_SET_SET(socket_handle, sockets_set) FD_SET(socket_handle, sockets_set)
+#define SOCKET_SET_CLEAR(socket_handle, sockets_set) FD_CLR(socket_handle, sockets_set)
+#define SOCKET_SET_IS_SET(socket_handle, sockets_set) FD_ISSET(socket_handle, sockets_set)
+#define SOCKET_SET_NON_BLOCKING(socket_handle, flags) SOCKET_IOCTL(socket_handle, FIONBIO, &flags)
 #endif
 
 #ifdef VIRIATUM_PLATFORM_UNIX
@@ -105,33 +105,33 @@
 #define SOCKET_OPTIONS_LEVEL_SOCKET SOL_SOCKET
 #define SOCKET_OPTIONS_REUSE_ADDRESS_SOCKET SO_REUSEADDR
 #define SOCKET_SET fd_set
-#define SOCKET_INITIALIZE(socketData) dump((void *) socketData)
+#define SOCKET_INITIALIZE(socket_data) dump((void *) socket_data)
 #define SOCKET_FINISH()
-#define SOCKET_CREATE(type, streamType, protocolType) socket(type, streamType, protocolType)
-#define SOCKET_BIND(socketHandle, socketAddress) bind(socketHandle, (struct sockaddr *) &socketAddress, sizeof(SOCKET_ADDRESS))
-#define SOCKET_LISTEN(socketHandle) listen(socketHandle, SOCKET_CONNECTIONS)
-#define SOCKET_CONNECT(socketHandle, socketAddress) connect(socketHandle, (struct sockaddr *) &socketAddress, sizeof(SOCKET_ADDRESS))
-#define SOCKET_CONNECT_SIZE(socketHandle, socketAddress, socketAddressSize) connect(socketHandle, (struct sockaddr *) &socketAddress, socketAddressSize)
-#define SOCKET_ACCEPT(socketHandle, socketAddress, socketAddressSize) accept(socketHandle, socketAddress, &socketAddressSize)
-#define SOCKET_CLOSE(socketHandle) close(socketHandle)
-#define SOCKET_ADDRESS_CREATE(socketAddress, type, address, port) memset(&socketAddress, 0, sizeof(SOCKET_ADDRESS));\
-    socketAddress.sin_family = type;\
-    socketAddress.sin_port = htons(port);\
-    if(address == NULL) { socketAddress.sin_addr.s_addr = INADDR_ANY; } else { socketAddress.sin_addr.s_addr = inet_addr(address); }
+#define SOCKET_CREATE(type, stream_type, protocol_type) socket(type, stream_type, protocol_type)
+#define SOCKET_BIND(socket_handle, socket_address) bind(socket_handle, (struct sockaddr *) &socket_address, sizeof(SOCKET_ADDRESS))
+#define SOCKET_LISTEN(socket_handle) listen(socket_handle, SOCKET_CONNECTIONS)
+#define SOCKET_CONNECT(socket_handle, socket_address) connect(socket_handle, (struct sockaddr *) &socket_address, sizeof(SOCKET_ADDRESS))
+#define SOCKET_CONNECT_SIZE(socket_handle, socket_address, socket_address_size) connect(socket_handle, (struct sockaddr *) &socket_address, socket_address_size)
+#define SOCKET_ACCEPT(socket_handle, socket_address, socket_address_size) accept(socket_handle, socket_address, &socket_address_size)
+#define SOCKET_CLOSE(socket_handle) close(socket_handle)
+#define SOCKET_ADDRESS_CREATE(socket_address, type, address, port) memset(&socket_address, 0, sizeof(SOCKET_ADDRESS));\
+    socket_address.sin_family = type;\
+    socket_address.sin_port = htons(port);\
+    if(address == NULL) { socket_address.sin_addr.s_addr = INADDR_ANY; } else { socket_address.sin_addr.s_addr = inet_addr(address); }
 #define SOCKET_GET_HOST_BY_NAME(hostname) gethostbyname(hostname)
-#define SOCKET_TEST_SOCKET(socketHandle) socketHandle < 0
+#define SOCKET_TEST_SOCKET(socket_handle) socket_handle < 0
 #define SOCKET_TEST_ERROR(result) result < 0
 #define SOCKET_GET_ERROR_CODE(result) (SOCKET_ERROR_CODE) errno
-#define SOCKET_SEND(socketHandle, buffer, length, flags) write(socketHandle, buffer, length)
-#define SOCKET_RECEIVE(socketHandle, buffer, length, flags) read(socketHandle, buffer, length)
-#define SOCKET_SET_OPTIONS(socketHandle, level, optionName, optionValue) setsockopt(socketHandle, level, optionName, &optionValue, sizeof(optionValue))
-#define SOCKET_SELECT(numberSocket, socketsReadSet, socketsWriteSet, socketsExceptionSet, timeout) select(numberSocket, socketsReadSet, socketsWriteSet, socketsExceptionSet, timeout)
-#define SOCKET_SET_ZERO(socketsSet) FD_ZERO(socketsSet)
-#define SOCKET_SET_SET(socketHandle, socketsSet) FD_SET(socketHandle, socketsSet)
-#define SOCKET_SET_CLEAR(socketHandle, socketsSet) FD_CLR(socketHandle, socketsSet)
-#define SOCKET_SET_IS_SET(socketHandle, socketsSet) FD_ISSET(socketHandle, socketsSet)
-#define SOCKET_SET_NON_BLOCKING(socketHandle, flags) if((flags = SOCKET_FCNTL(socketHandle, F_GETFL, 0) == -1)) { flags = 0; }\
-    SOCKET_FCNTL(socketHandle, F_SETFL, flags | O_NONBLOCK)
+#define SOCKET_SEND(socket_handle, buffer, length, flags) write(socket_handle, buffer, length)
+#define SOCKET_RECEIVE(socket_handle, buffer, length, flags) read(socket_handle, buffer, length)
+#define SOCKET_SET_OPTIONS(socket_handle, level, option_name, option_value) setsockopt(socket_handle, level, option_name, &option_value, sizeof(option_value))
+#define SOCKET_SELECT(number_socket, sockets_read_set, sockets_write_set, sockets_exception_set, timeout) select(number_socket, sockets_read_set, sockets_write_set, sockets_exception_set, timeout)
+#define SOCKET_SET_ZERO(sockets_set) FD_ZERO(sockets_set)
+#define SOCKET_SET_SET(socket_handle, sockets_set) FD_SET(socket_handle, sockets_set)
+#define SOCKET_SET_CLEAR(socket_handle, sockets_set) FD_CLR(socket_handle, sockets_set)
+#define SOCKET_SET_IS_SET(socket_handle, sockets_set) FD_ISSET(socket_handle, sockets_set)
+#define SOCKET_SET_NON_BLOCKING(socket_handle, flags) if((flags = SOCKET_FCNTL(socket_handle, F_GETFL, 0) == -1)) { flags = 0; }\
+    SOCKET_FCNTL(socket_handle, F_SETFL, flags | O_NONBLOCK)
 #endif
 
 #ifdef VIRIATUM_PLATFORM_MSC

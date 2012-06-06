@@ -50,13 +50,13 @@
  * This kind of stream allows a bit level
  * control over a buffer of bytes.
  */
-typedef struct BitStream_t {
+typedef struct bit_stream_t {
     /**
      * The internal stream used as the final
      * target for the stream.
      * This stream is updated in every flush.
      */
-    struct Stream_t *stream;
+    struct stream_t *stream;
 
     /**
      * The buffer containing the bit stream
@@ -79,27 +79,27 @@ typedef struct BitStream_t {
      * The current byte used in the writting
      * procedure.
      */
-    unsigned char currentByteWrite;
+    unsigned char current_byte_write;
 
     /**
      * The position of the "cursor" in the
      * current byte.
      * Used for the write mode in the current byte.
      */
-    unsigned char currentByteOffsetWrite;
+    unsigned char current_byte_offset_write;
 
     /**
      * The counter (of bits) used for the writting
      * procedure in the current bit stream.
      */
-    size_t bitCounterWrite;
+    size_t bit_counter_write;
 
     /**
      * The counter (of bytes) used for the writting
      * procedure in the current bit stream.
      */
-    size_t byteCounterWrite;
-} BitStream;
+    size_t byte_counter_write;
+} bit_stream;
 
 /**
  * Structure that describes a chunk (piece)
@@ -108,7 +108,7 @@ typedef struct BitStream_t {
  * trunked (padded with zeros) to the bit
  * stream size.
  */
-typedef struct BitChunk_t {
+typedef struct bit_chunk_t {
     /**
      * The byte buffer with the bit contents
      * of the chunk.
@@ -119,14 +119,14 @@ typedef struct BitChunk_t {
      * The size of the bit buffer in bits.
      */
     size_t size;
-} BitChunk;
+} bit_chunk;
 
-VIRIATUM_EXPORT_PREFIX void create_bit_stream(struct BitStream_t **bitStreamPointer, struct Stream_t *stream);
-VIRIATUM_EXPORT_PREFIX void delete_bit_stream(struct BitStream_t *bit_stream);
-VIRIATUM_EXPORT_PREFIX void open_bit_stream(struct BitStream_t *bit_stream);
-VIRIATUM_EXPORT_PREFIX void close_bit_stream(struct BitStream_t *bit_stream);
-VIRIATUM_EXPORT_PREFIX void readBitStream(struct BitStream_t *bit_stream, unsigned char *buffer, size_t count, size_t *readCount);
-VIRIATUM_EXPORT_PREFIX void writeBitStream(struct BitStream_t *bit_stream, unsigned char *buffer, size_t size);
-VIRIATUM_EXPORT_PREFIX void write_byte_bit_stream(struct BitStream_t *bit_stream, unsigned char byte, unsigned char size);
-VIRIATUM_EXPORT_PREFIX void flushWriteBitStream(struct BitStream_t *bit_stream);
-VIRIATUM_EXPORT_PREFIX void flushBitStream(struct BitStream_t *bit_stream);
+VIRIATUM_EXPORT_PREFIX void create_bit_stream(struct bit_stream_t **bit_stream_pointer, struct stream_t *stream);
+VIRIATUM_EXPORT_PREFIX void delete_bit_stream(struct bit_stream_t *bit_stream);
+VIRIATUM_EXPORT_PREFIX void open_bit_stream(struct bit_stream_t *bit_stream);
+VIRIATUM_EXPORT_PREFIX void close_bit_stream(struct bit_stream_t *bit_stream);
+VIRIATUM_EXPORT_PREFIX void read_bit_stream(struct bit_stream_t *bit_stream, unsigned char *buffer, size_t count, size_t *read_count);
+VIRIATUM_EXPORT_PREFIX void write_bit_stream(struct bit_stream_t *bit_stream, unsigned char *buffer, size_t size);
+VIRIATUM_EXPORT_PREFIX void write_byte_bit_stream(struct bit_stream_t *bit_stream, unsigned char byte, unsigned char size);
+VIRIATUM_EXPORT_PREFIX void flush_write_bit_stream(struct bit_stream_t *bit_stream);
+VIRIATUM_EXPORT_PREFIX void flush_bit_stream(struct bit_stream_t *bit_stream);

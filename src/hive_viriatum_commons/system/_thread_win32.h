@@ -33,23 +33,23 @@
 
 #include "../structures/linked_list.h"
 
-typedef struct Condition_t {
-    unsigned int lockCount;
-    CRITICAL_SECTION waitCriticalSection;
-    CRITICAL_SECTION lockCriticalSection;
-    struct linked_list_t *waitSet;
-} Condition;
+typedef struct condition_t {
+    unsigned int lock_count;
+    CRITICAL_SECTION wait_critical_section;
+    CRITICAL_SECTION lock_critical_section;
+    struct linked_list_t *wait_set;
+} condition;
 
-VIRIATUM_EXPORT_PREFIX void createCondition(struct Condition_t **conditionPointer);
-VIRIATUM_EXPORT_PREFIX void deleteCondition(struct Condition_t *condition);
-VIRIATUM_EXPORT_PREFIX void lockCondition(struct Condition_t *condition);
-VIRIATUM_EXPORT_PREFIX void unlockCondition(struct Condition_t *condition);
-VIRIATUM_EXPORT_PREFIX void waitCondition(struct Condition_t *condition);
-VIRIATUM_EXPORT_PREFIX void notifyCondition(struct Condition_t *condition);
+VIRIATUM_EXPORT_PREFIX void create_condition(struct condition_t **condition_pointer);
+VIRIATUM_EXPORT_PREFIX void delete_condition(struct condition_t *condition);
+VIRIATUM_EXPORT_PREFIX void lock_condition(struct condition_t *condition);
+VIRIATUM_EXPORT_PREFIX void unlock_condition(struct condition_t *condition);
+VIRIATUM_EXPORT_PREFIX void wait_condition(struct condition_t *condition);
+VIRIATUM_EXPORT_PREFIX void notify_condition(struct condition_t *condition);
 
-VIRIATUM_NO_EXPORT_PREFIX void _pushCondition(struct Condition_t *condition, HANDLE *waitEventPointer);
-VIRIATUM_NO_EXPORT_PREFIX void _popCondition(struct Condition_t *condition, HANDLE *waitEventPointer);
-VIRIATUM_NO_EXPORT_PREFIX unsigned char _testLockOwnerCondition(struct Condition_t *condition);
+VIRIATUM_NO_EXPORT_PREFIX void _push_condition(struct condition_t *condition, HANDLE *wait_event_pointer);
+VIRIATUM_NO_EXPORT_PREFIX void _pop_condition(struct condition_t *condition, HANDLE *wait_event_pointer);
+VIRIATUM_NO_EXPORT_PREFIX unsigned char _test_lock_owner_condition(struct condition_t *condition);
 
 #endif
 

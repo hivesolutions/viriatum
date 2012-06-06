@@ -308,7 +308,7 @@ ERROR_CODE createWorkers(unsigned char workerCount) {
 
 ERROR_CODE _createClientConnection(struct Connection_t **connectionPointer, struct Service_t *service, char *hostname, unsigned int port) {
     /* allocates the socket handle */
-    SOCKET_HANDLE socketHandle;
+    SOCKET_HANDLE socket_handle;
     SOCKET_ADDRESS_INTERNET serv_addr;
     SOCKET_HOSTENT *server;
     SOCKET_ERROR_CODE error;
@@ -320,9 +320,9 @@ ERROR_CODE _createClientConnection(struct Connection_t **connectionPointer, stru
     /* sets the flags to be used in socket */
     SOCKET_FLAGS flags = 1;
 
-    socketHandle = SOCKET_CREATE(SOCKET_INTERNET_TYPE, SOCKET_PACKET_TYPE, SOCKET_PROTOCOL_TCP);
+    socket_handle = SOCKET_CREATE(SOCKET_INTERNET_TYPE, SOCKET_PACKET_TYPE, SOCKET_PROTOCOL_TCP);
 
-    if(SOCKET_TEST_ERROR(socketHandle)) { fprintf(stderr, "ERROR opening socket"); }
+    if(SOCKET_TEST_ERROR(socket_handle)) { fprintf(stderr, "ERROR opening socket"); }
 
     server = SOCKET_GET_HOST_BY_NAME(hostname);
 
@@ -333,20 +333,20 @@ ERROR_CODE _createClientConnection(struct Connection_t **connectionPointer, stru
     memcpy(&serv_addr.sin_addr.s_addr, server->h_addr, server->h_length);
     serv_addr.sin_port = htons(port);
 
-    error = SOCKET_CONNECT_SIZE(socketHandle, serv_addr, sizeof(SOCKET_ADDRESS_INTERNET));
+    error = SOCKET_CONNECT_SIZE(socket_handle, serv_addr, sizeof(SOCKET_ADDRESS_INTERNET));
     if(SOCKET_TEST_ERROR(error)) { fprintf(stderr, "ERROR connecting host\n"); }
 
     /* in case viriatum is set to non blocking, changes the current
     socket behavior to non blocking mode */
-    if(VIRIATUM_NON_BLOCKING) { SOCKET_SET_NON_BLOCKING(socketHandle, flags); }
+    if(VIRIATUM_NON_BLOCKING) { SOCKET_SET_NON_BLOCKING(socket_handle, flags); }
 
     /* creates the (client) connection */
-    createConnection(&connection, socketHandle);
+    createConnection(&connection, socket_handle);
 
     /* sets the socket address in the (client) connection
     this is going to be very usefull for later connection
     identification (address, port, etc.) */
-    /*connection->socketAddress = (SOCKET_ADDRESS) serv_addr;*/
+    /*connection->socket_address = (SOCKET_ADDRESS) serv_addr;*/
 
     /* sets the service select service as the service in the (client)  connection */
     connection->service = service;
@@ -451,7 +451,7 @@ ERROR_CODE _createTorrentConnection(struct Connection_t **connectionPointer, str
 
 ERROR_CODE startService(struct Service_t *service) {
     /* allocates the socket address structure */
-    SOCKET_ADDRESS_INTERNET socketAddress;
+    SOCKET_ADDRESS_INTERNET socket_address;
 
     /* allocates the socket result */
     SOCKET_ERROR_CODE socketResult;
@@ -479,13 +479,13 @@ ERROR_CODE startService(struct Service_t *service) {
     PROCESS_TYPE process;
 
     /* allocates the memory information */
-    MEMORY_INFORMATION_TYPE memoryInformation;
+    MEMORY_INFORMATION_TYPE memory_information;
 
     /* allocates the memory ussage */
     size_t memoryUsage;
 
     /* allocates the option value and sets it to one (valid) */
-    SOCKET_OPTION optionValue = 1;
+    SOCKET_OPTION option_value = 1;
 
     /* sets the flags to be used in socket */
     SOCKET_FLAGS flags = 1;
@@ -507,9 +507,9 @@ ERROR_CODE startService(struct Service_t *service) {
     get_value_string_hash_map(service->httpHandlersMap, serviceOptions->handlerName, (void **) &service->httpHandler);
 
     /* sets the socket address attributes */
-    socketAddress.sin_family = SOCKET_INTERNET_TYPE;
-    socketAddress.sin_addr.s_addr = inet_addr((char *) serviceOptions->address);
-    socketAddress.sin_port = htons(serviceOptions->port);
+    socket_address.sin_family = SOCKET_INTERNET_TYPE;
+    socket_address.sin_addr.s_addr = inet_addr((char *) serviceOptions->address);
+    socket_address.sin_port = htons(serviceOptions->port);
 
     /* creates the service socket for the given types */
     service->serviceSocketHandle = SOCKET_CREATE(SOCKET_INTERNET_TYPE, SOCKET_PACKET_TYPE, SOCKET_PROTOCOL_TCP);
@@ -531,7 +531,7 @@ ERROR_CODE startService(struct Service_t *service) {
     if(VIRIATUM_NON_BLOCKING) { SOCKET_SET_NON_BLOCKING(service->serviceSocketHandle, flags); }
 
     /* sets the socket reuse address option in the socket */
-    socketResult = SOCKET_SET_OPTIONS(service->serviceSocketHandle, SOCKET_OPTIONS_LEVEL_SOCKET, SOCKET_OPTIONS_REUSE_ADDRESS_SOCKET, optionValue);
+    socketResult = SOCKET_SET_OPTIONS(service->serviceSocketHandle, SOCKET_OPTIONS_LEVEL_SOCKET, SOCKET_OPTIONS_REUSE_ADDRESS_SOCKET, option_value);
 
     /* in case there was an error binding the socket */
     if(SOCKET_TEST_ERROR(socketResult)) {
@@ -549,7 +549,7 @@ ERROR_CODE startService(struct Service_t *service) {
     }
 
     /* binds the service socket */
-    socketResult = SOCKET_BIND(service->serviceSocketHandle, socketAddress);
+    socketResult = SOCKET_BIND(service->serviceSocketHandle, socket_address);
 
     /* in case there was an error binding the socket */
     if(SOCKET_TEST_ERROR(socketResult)) {
@@ -659,8 +659,8 @@ ERROR_CODE startService(struct Service_t *service) {
         /* retrieves the (current) process, to be used
         to retrieves some memory information, and then closes it*/
         process = GET_PROCESS();
-        GET_MEMORY_INFORMATION(process, memoryInformation);
-        memoryUsage = GET_MEMORY_USAGE(memoryInformation);
+        GET_MEMORY_INFORMATION(process, memory_information);
+        memoryUsage = GET_MEMORY_USAGE(memory_information);
         CLOSE_PROCESS(process);
 
         /* prints a debug message */
@@ -881,7 +881,7 @@ ERROR_CODE removeConnectionService(struct Service_t *service, struct Connection_
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE createConnection(struct Connection_t **connectionPointer, SOCKET_HANDLE socketHandle) {
+ERROR_CODE createConnection(struct Connection_t **connectionPointer, SOCKET_HANDLE socket_handle) {
     /* retrieves the connection size */
     size_t connectionSize = sizeof(struct Connection_t);
 
@@ -891,7 +891,7 @@ ERROR_CODE createConnection(struct Connection_t **connectionPointer, SOCKET_HAND
     /* sets the connection attributes (default) values */
     connection->status = STATUS_CLOSED;
     connection->protocol = UNDEFINED_PROTOCOL;
-    connection->socketHandle = socketHandle;
+    connection->socket_handle = socket_handle;
     connection->service = NULL;
     connection->writeRegistered = 0;
     connection->openConnection = NULL;
@@ -992,7 +992,7 @@ ERROR_CODE openConnection(struct Connection_t *connection) {
     }
 
     /* prints a debug message */
-    V_DEBUG_F("Opening connection: %d\n", connection->socketHandle);
+    V_DEBUG_F("Opening connection: %d\n", connection->socket_handle);
 
     /* sets the connection status as open */
     connection->status = STATUS_OPEN;
@@ -1024,7 +1024,7 @@ ERROR_CODE closeConnection(struct Connection_t *connection) {
     }
 
     /* prints a debug message */
-    V_DEBUG_F("Closing connection: %d\n", connection->socketHandle);
+    V_DEBUG_F("Closing connection: %d\n", connection->socket_handle);
 
     /* in case the on close handler is defined */
     if(connection->onClose != NULL) {
@@ -1048,7 +1048,7 @@ ERROR_CODE closeConnection(struct Connection_t *connection) {
     connection->unregisterWrite = NULL;
 
     /* closes the socket */
-    SOCKET_CLOSE(connection->socketHandle);
+    SOCKET_CLOSE(connection->socket_handle);
 
     /* sets the connection status as closed */
     connection->status = STATUS_CLOSED;

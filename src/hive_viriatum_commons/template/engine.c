@@ -29,52 +29,52 @@
 
 #include "engine.h"
 
-void createTemplateEngine(struct TemplateEngine_t **templateEnginePointer) {
+void create_template_engine(struct template_engine_t **template_engine_pointer) {
     /* retrieves the template engine size */
-    size_t templateEngineSize = sizeof(struct TemplateEngine_t);
+    size_t template_engine_size = sizeof(struct template_engine_t);
 
     /* allocates space for the template engine */
-    struct TemplateEngine_t *templateEngine = (struct TemplateEngine_t *) MALLOC(templateEngineSize);
+    struct template_engine_t *template_engine = (struct template_engine_t *) MALLOC(template_engine_size);
 
     /* sets the default values */
-    templateEngine->context = NULL;
+    template_engine->context = NULL;
 
     /* sets the template engine in the template engine pointer */
-    *templateEnginePointer = templateEngine;
+    *template_engine_pointer = template_engine;
 }
 
-void deleteTemplateEngine(struct TemplateEngine_t *templateEngine) {
+void delete_template_engine(struct template_engine_t *template_engine) {
     /* releases the template engine */
-    FREE(templateEngine);
+    FREE(template_engine);
 }
 
-void createTemplateSettings(struct TemplateSettings_t **templateSettingsPointer) {
+void create_template_settings(struct template_settings_t **template_settings_pointer) {
     /* retrieves the template settings size */
-    size_t templateSettingsSize = sizeof(struct TemplateSettings_t);
+    size_t template_settings_size = sizeof(struct template_settings_t);
 
     /* allocates space for the template settings */
-    struct TemplateSettings_t *templateSettings = (struct TemplateSettings_t *) MALLOC(templateSettingsSize);
+    struct template_settings_t *template_settings = (struct template_settings_t *) MALLOC(template_settings_size);
 
     /* sets the template settings callback values */
-    templateSettings->ontextBegin = NULL;
-    templateSettings->ontextEnd = NULL;
-    templateSettings->ontagBegin = NULL;
-    templateSettings->ontagCloseBegin = NULL;
-    templateSettings->ontagEnd = NULL;
-    templateSettings->ontagName = NULL;
-    templateSettings->onparameter = NULL;
-    templateSettings->onparameterValue = NULL;
+    template_settings->on_text_begin = NULL;
+    template_settings->on_text_end = NULL;
+    template_settings->on_tag_begin = NULL;
+    template_settings->on_tag_close_begin = NULL;
+    template_settings->on_tag_end = NULL;
+    template_settings->on_tag_name = NULL;
+    template_settings->on_parameter = NULL;
+    template_settings->on_parameter_value = NULL;
 
     /* sets the template settings in the template settings pointer */
-    *templateSettingsPointer = templateSettings;
+    *template_settings_pointer = template_settings;
 }
 
-void deleteTemplateSettings(struct TemplateSettings_t *templateSettings) {
+void delete_template_settings(struct template_settings_t *template_settings) {
     /* releases the template settings */
-    FREE(templateSettings);
+    FREE(template_settings);
 }
 
-ERROR_CODE processTemplateEngine(struct TemplateEngine_t *templateEngine, struct TemplateSettings_t *templateSettings, unsigned char *file_path) {
+ERROR_CODE process_template_engine(struct template_engine_t *template_engine, struct template_settings_t *template_settings, unsigned char *file_path) {
     /* allocates space for the file */
     FILE *file;
 
@@ -84,7 +84,7 @@ ERROR_CODE processTemplateEngine(struct TemplateEngine_t *templateEngine, struct
     char ahead = '\0';
 
     /* allocates the space for the look ahead valid flag */
-    unsigned char aheadSet = 0;
+    unsigned char ahead_set = 0;
 
     /* allocates the space for the variable that will hold
     the size of the file to be parsed */
@@ -98,19 +98,19 @@ ERROR_CODE processTemplateEngine(struct TemplateEngine_t *templateEngine, struct
     /* allocates space for the buffer that will serve as
     cache for the reading of the tempalte file, this has
     serious implications on the performance of the file */
-    char _fileBuffer[ENGINE_BUFFER_SIZE];
+    char _file_buffer[ENGINE_BUFFER_SIZE];
 
     /* allocates the mark variables used to locate
     the part of context changing durring the parsing */
     unsigned char *pointer = 0;
-    unsigned char *textEndMark = 0;
-    unsigned char *tagEndMark = 0;
-    unsigned char *tagNameMark = 0;
-    unsigned char *parameterMark = 0;
-    unsigned char *parameterValueMark = 0;
+    unsigned char *text_end_mark = 0;
+    unsigned char *tag_end_mark = 0;
+    unsigned char *tag_name_mark = 0;
+    unsigned char *parameter_mark = 0;
+    unsigned char *parameter_value_mark = 0;
 
     /* allocates and starts the state for the template parsing */
-    enum TemplateEngineState_e state = TEMPLATE_ENGINE_NORMAL;
+    enum template_engine_state_e state = TEMPLATE_ENGINE_NORMAL;
 
     /* opens the file */
     FOPEN(&file, (char *) file_path, "rb");
@@ -124,7 +124,7 @@ ERROR_CODE processTemplateEngine(struct TemplateEngine_t *templateEngine, struct
     /* then sets the buffer on the file for reading, this
     operation has serious implications in the file access
     performance (buffered reading )*/
-    setvbuf(file, _fileBuffer, _IOFBF, ENGINE_BUFFER_SIZE);
+    setvbuf(file, _file_buffer, _IOFBF, ENGINE_BUFFER_SIZE);
 
     /* retrieves the size of the file by seeking to the
     end of it and the seeks the stream back to the initial
@@ -140,8 +140,8 @@ ERROR_CODE processTemplateEngine(struct TemplateEngine_t *templateEngine, struct
     file_buffer = (void *) MALLOC(file_size);
     pointer = file_buffer;
 
-    TEMPLATE_MARK(textEnd);
-    TEMPLATE_CALLBACK(textBegin);
+    TEMPLATE_MARK(text_end);
+    TEMPLATE_CALLBACK(text_begin);
 
     /* iterates continuously too run the parser
     over the complete set of file contents */
@@ -149,17 +149,17 @@ ERROR_CODE processTemplateEngine(struct TemplateEngine_t *templateEngine, struct
         /* in case the look ahead mode is set, should
         read from the look ahead instead of the normal
         file reading */
-        if(aheadSet) {
+        if(ahead_set) {
             /* sets the current read character as the look
             ahead character and unsets the ahead set flag */
             current = ahead;
-            aheadSet = 0;
+            ahead_set = 0;
         }
         /* otherwise it must be a normal reading */
         else {
             /* retrieves the current character
             from the file stream */
-            current = _getcTemplateEngine(file, &pointer, &file_size);
+            current = _getc_template_engine(file, &pointer, &file_size);
         }
 
         /* in case the end of file has been found, or
@@ -183,22 +183,22 @@ ERROR_CODE processTemplateEngine(struct TemplateEngine_t *templateEngine, struct
                 if(current == '{') {
                     /* marks the tag element and calls
                     the text end and tag begin callbacks */
-                    TEMPLATE_MARK(tagName);
-                    TEMPLATE_MARK_N(tagEnd, 2);
-                    TEMPLATE_CALLBACK_DATA_N(textEnd, 2);
-                    TEMPLATE_CALLBACK(tagBegin);
+                    TEMPLATE_MARK(tag_name);
+                    TEMPLATE_MARK_N(tag_end, 2);
+                    TEMPLATE_CALLBACK_DATA_N(text_end, 2);
+                    TEMPLATE_CALLBACK(tag_begin);
 
                     /* changes the state of the parser
                     to open (tag open) */
                     state = TEMPLATE_ENGINE_OPEN;
 
                     /* reads ahead and sets the ahead set flag */
-                    ahead = _getcTemplateEngine(file, &pointer, &file_size);
-                    aheadSet = 1;
+                    ahead = _getc_template_engine(file, &pointer, &file_size);
+                    ahead_set = 1;
 
                     if(ahead == '/') {
-                        TEMPLATE_CALLBACK(tagCloseBegin);
-                        aheadSet = 0;
+                        TEMPLATE_CALLBACK(tag_close_begin);
+                        ahead_set = 0;
                     }
                 } else {
                     /* resets the state to the "normal" */
@@ -210,21 +210,21 @@ ERROR_CODE processTemplateEngine(struct TemplateEngine_t *templateEngine, struct
             case TEMPLATE_ENGINE_OPEN:
                 if(current == '/') {
                     /* reads ahead and sets the ahead set flag */
-                    ahead = _getcTemplateEngine(file, &pointer, &file_size);
-                    aheadSet = 1;
+                    ahead = _getc_template_engine(file, &pointer, &file_size);
+                    ahead_set = 1;
 
                     if(ahead == '}') {
                         state = TEMPLATE_ENGINE_NORMAL;
 
                         /* unsets the ahead set flag */
-                        aheadSet = 0;
+                        ahead_set = 0;
 
                         /* marks the text end */
-                        TEMPLATE_MARK(textEnd);
+                        TEMPLATE_MARK(text_end);
 
                         /* calls the tag end and text begin callbacks */
-                        TEMPLATE_CALLBACK_DATA(tagEnd);
-                        TEMPLATE_CALLBACK(textBegin);
+                        TEMPLATE_CALLBACK_DATA(tag_end);
+                        TEMPLATE_CALLBACK(text_begin);
 
                         break;
                     }
@@ -233,18 +233,18 @@ ERROR_CODE processTemplateEngine(struct TemplateEngine_t *templateEngine, struct
                 if(current == '}') {
                     state = TEMPLATE_ENGINE_NORMAL;
 
-                    TEMPLATE_MARK(textEnd);
+                    TEMPLATE_MARK(text_end);
 
                     /* calls the tag end and text begin callbacks */
-                    TEMPLATE_CALLBACK_DATA(tagEnd);
-                    TEMPLATE_CALLBACK(textBegin);
+                    TEMPLATE_CALLBACK_DATA(tag_end);
+                    TEMPLATE_CALLBACK(text_begin);
 
                     break;
                 }
 
                 if(current == ' ') {
                     /* calls the tag name callback */
-                    TEMPLATE_CALLBACK_DATA_BACK(tagName);
+                    TEMPLATE_CALLBACK_DATA_BACK(tag_name);
 
                     /* changes the state of the template engine
                     to parametrs (parameters finding) */
@@ -255,18 +255,18 @@ ERROR_CODE processTemplateEngine(struct TemplateEngine_t *templateEngine, struct
 
             case TEMPLATE_ENGINE_PARAMETERS:
                 if(current == '/') {
-                    ahead = _getcTemplateEngine(file, &pointer, &file_size);
-                    aheadSet = 1;
+                    ahead = _getc_template_engine(file, &pointer, &file_size);
+                    ahead_set = 1;
 
                     if(ahead == '}') {
                         state = TEMPLATE_ENGINE_NORMAL;
-                        aheadSet = 0;
+                        ahead_set = 0;
 
-                        TEMPLATE_MARK(textEnd);
+                        TEMPLATE_MARK(text_end);
 
                         /* calls the tag end and text begin callbacks */
-                        TEMPLATE_CALLBACK_DATA(tagEnd);
-                        TEMPLATE_CALLBACK(textBegin);
+                        TEMPLATE_CALLBACK_DATA(tag_end);
+                        TEMPLATE_CALLBACK(text_begin);
 
                         break;
                     }
@@ -275,11 +275,11 @@ ERROR_CODE processTemplateEngine(struct TemplateEngine_t *templateEngine, struct
                 if(current == '}') {
                     state = TEMPLATE_ENGINE_NORMAL;
 
-                    TEMPLATE_MARK(textEnd);
+                    TEMPLATE_MARK(text_end);
 
                     /* calls the tag end and text begin callbacks */
-                    TEMPLATE_CALLBACK_DATA(tagEnd);
-                    TEMPLATE_CALLBACK(textBegin);
+                    TEMPLATE_CALLBACK_DATA(tag_end);
+                    TEMPLATE_CALLBACK(text_begin);
 
                     break;
                 }
@@ -294,18 +294,18 @@ ERROR_CODE processTemplateEngine(struct TemplateEngine_t *templateEngine, struct
 
             case TEMPLATE_ENGINE_PARAMETER:
                 if(current == '/') {
-                    ahead = _getcTemplateEngine(file, &pointer, &file_size);
-                    aheadSet = 1;
+                    ahead = _getc_template_engine(file, &pointer, &file_size);
+                    ahead_set = 1;
 
                     if(ahead == '}') {
                         state = TEMPLATE_ENGINE_NORMAL;
-                        aheadSet = 0;
+                        ahead_set = 0;
 
-                        TEMPLATE_MARK(textEnd);
+                        TEMPLATE_MARK(text_end);
 
                         /* calls the tag end and text begin callbacks */
-                        TEMPLATE_CALLBACK_DATA(tagEnd);
-                        TEMPLATE_CALLBACK(textBegin);
+                        TEMPLATE_CALLBACK_DATA(tag_end);
+                        TEMPLATE_CALLBACK(text_begin);
 
                         break;
                     }
@@ -314,11 +314,11 @@ ERROR_CODE processTemplateEngine(struct TemplateEngine_t *templateEngine, struct
                 if(current == '}') {
                     state = TEMPLATE_ENGINE_NORMAL;
 
-                    TEMPLATE_MARK(textEnd);
+                    TEMPLATE_MARK(text_end);
 
                     /* calls the tag end and text begin callbacks */
-                    TEMPLATE_CALLBACK_DATA(tagEnd);
-                    TEMPLATE_CALLBACK(textBegin);
+                    TEMPLATE_CALLBACK_DATA(tag_end);
+                    TEMPLATE_CALLBACK(text_begin);
 
                     break;
                 }
@@ -327,7 +327,7 @@ ERROR_CODE processTemplateEngine(struct TemplateEngine_t *templateEngine, struct
                     /* calls the parameter callback and marks
                     the template engine parameter value */
                     TEMPLATE_CALLBACK_DATA_BACK(parameter);
-                    TEMPLATE_MARK(parameterValue);
+                    TEMPLATE_MARK(parameter_value);
 
                     state = TEMPLATE_ENGINE_PARAMETER_VALUE;
                 }
@@ -336,18 +336,18 @@ ERROR_CODE processTemplateEngine(struct TemplateEngine_t *templateEngine, struct
 
             case TEMPLATE_ENGINE_PARAMETER_VALUE:
                 if(current == '/') {
-                    ahead = _getcTemplateEngine(file, &pointer, &file_size);
-                    aheadSet = 1;
+                    ahead = _getc_template_engine(file, &pointer, &file_size);
+                    ahead_set = 1;
 
                     if(ahead == '}') {
                         state = TEMPLATE_ENGINE_NORMAL;
-                        aheadSet = 0;
+                        ahead_set = 0;
 
-                        TEMPLATE_MARK(textEnd);
+                        TEMPLATE_MARK(text_end);
 
                         /* calls the tag end and text begin callbacks */
-                        TEMPLATE_CALLBACK_DATA(tagEnd);
-                        TEMPLATE_CALLBACK(textBegin);
+                        TEMPLATE_CALLBACK_DATA(tag_end);
+                        TEMPLATE_CALLBACK(text_begin);
 
                         break;
                     }
@@ -356,13 +356,13 @@ ERROR_CODE processTemplateEngine(struct TemplateEngine_t *templateEngine, struct
                 if(current == '}') {
                     state = TEMPLATE_ENGINE_NORMAL;
 
-                    TEMPLATE_MARK(textEnd);
+                    TEMPLATE_MARK(text_end);
 
                     /* calls the th parameter value, tag end and
                     text begin callbacks */
-                    TEMPLATE_CALLBACK_DATA_BACK(parameterValue);
-                    TEMPLATE_CALLBACK_DATA(tagEnd);
-                    TEMPLATE_CALLBACK(textBegin);
+                    TEMPLATE_CALLBACK_DATA_BACK(parameter_value);
+                    TEMPLATE_CALLBACK_DATA(tag_end);
+                    TEMPLATE_CALLBACK(text_begin);
 
                     break;
                 }
@@ -371,7 +371,7 @@ ERROR_CODE processTemplateEngine(struct TemplateEngine_t *templateEngine, struct
                     state = TEMPLATE_ENGINE_PARAMETER_VALUE_STRING;
                 } else if(current == ' ') {
                     /* calls the parameter value callback */
-                    TEMPLATE_CALLBACK_DATA_BACK(parameterValue);
+                    TEMPLATE_CALLBACK_DATA_BACK(parameter_value);
 
                     state = TEMPLATE_ENGINE_PARAMETERS;
                 }
@@ -381,7 +381,7 @@ ERROR_CODE processTemplateEngine(struct TemplateEngine_t *templateEngine, struct
             case TEMPLATE_ENGINE_PARAMETER_VALUE_STRING:
                 if(current == '\"') {
                     /* calls the parameter value callback */
-                    TEMPLATE_CALLBACK_DATA(parameterValue);
+                    TEMPLATE_CALLBACK_DATA(parameter_value);
 
                     state = TEMPLATE_ENGINE_PARAMETERS;
                 }
@@ -394,7 +394,7 @@ ERROR_CODE processTemplateEngine(struct TemplateEngine_t *templateEngine, struct
     normal (there must be text to be flushed) */
     if(state == TEMPLATE_ENGINE_NORMAL) {
         /* calls the text end callback */
-        TEMPLATE_CALLBACK_DATA(textEnd);
+        TEMPLATE_CALLBACK_DATA(text_end);
     }
 
     /* closes the file */
@@ -407,7 +407,7 @@ ERROR_CODE processTemplateEngine(struct TemplateEngine_t *templateEngine, struct
     RAISE_NO_ERROR;
 }
 
-char _getcTemplateEngine(FILE *file, unsigned char **pointer, size_t *size) {
+char _getc_template_engine(FILE *file, unsigned char **pointer, size_t *size) {
     /* allocates space for the current character
     to be retrieve in the function */
     char current;

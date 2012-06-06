@@ -65,10 +65,10 @@ void deleteIoConnection(struct IoConnection_t *ioConnection) {
 
 ERROR_CODE acceptHandlerStreamIo(struct Connection_t *connection) {
     /* allocates the socket handle */
-    SOCKET_HANDLE socketHandle;
+    SOCKET_HANDLE socket_handle;
 
     /* allocates the socket address */
-    SOCKET_ADDRESS socketAddress;
+    SOCKET_ADDRESS socket_address;
 
     /* allocates the (client) connection */
     struct Connection_t *clientConnection;
@@ -82,10 +82,10 @@ ERROR_CODE acceptHandlerStreamIo(struct Connection_t *connection) {
     /* iterates continuously */
     while(1) {
         /* accepts the socket, retrieving the socket handle */
-        socketHandle = SOCKET_ACCEPT(connection->socketHandle, &socketAddress, clientSocketAddressSize);
+        socket_handle = SOCKET_ACCEPT(connection->socket_handle, &socket_address, clientSocketAddressSize);
 
         /* in case there was an error accepting the socket */
-        if(SOCKET_TEST_ERROR(socketHandle)) {
+        if(SOCKET_TEST_ERROR(socket_handle)) {
             /* breaks the loop */
             break;
         }
@@ -94,19 +94,19 @@ ERROR_CODE acceptHandlerStreamIo(struct Connection_t *connection) {
             /* in case viriatum is set to non blocking */
             if(VIRIATUM_NON_BLOCKING) {
                 /* sets the socket to non blocking mode */
-                SOCKET_SET_NON_BLOCKING(socketHandle, flags);
+                SOCKET_SET_NON_BLOCKING(socket_handle, flags);
             }
 
             /* prints a debug message */
-            V_DEBUG_F("Accepted connection: %d\n", socketHandle);
+            V_DEBUG_F("Accepted connection: %d\n", socket_handle);
 
             /* creates the (client) connection */
-            createConnection(&clientConnection, socketHandle);
+            createConnection(&clientConnection, socket_handle);
 
             /* sets the socket address in the (client) connection
             this is going to be very usefull for later connection
             identification (address, port, etc.) */
-            clientConnection->socketAddress = socketAddress;
+            clientConnection->socket_address = socket_address;
 
             /* sets the service select service as the service in the (client)  connection */
             clientConnection->service = connection->service;
@@ -170,7 +170,7 @@ ERROR_CODE readHandlerStreamIo(struct Connection_t *connection) {
         }
 
         /* receives from the socket */
-        number_bytes = SOCKET_RECEIVE(connection->socketHandle, (char *) buffer_pointer, 1024, 0);
+        number_bytes = SOCKET_RECEIVE(connection->socket_handle, (char *) buffer_pointer, 1024, 0);
 
         /* in case the number of bytes is zero (connection closed) */
         if(number_bytes == 0) {
@@ -305,10 +305,10 @@ ERROR_CODE writeHandlerStreamIo(struct Connection_t *connection) {
         }
 
         /* prints a debug message */
-        V_DEBUG_F("Sending %ld bytes through socket: %d\n", (long int) data->size, connection->socketHandle);
+        V_DEBUG_F("Sending %ld bytes through socket: %d\n", (long int) data->size, connection->socket_handle);
 
         /* sends the value retrieving the number of bytes sent */
-        number_bytes = SOCKET_SEND(connection->socketHandle, (char *) data->data, data->size, 0);
+        number_bytes = SOCKET_SEND(connection->socket_handle, (char *) data->data, data->size, 0);
 
         /* in case there was an error receiving from the socket */
         if(SOCKET_TEST_ERROR(number_bytes)) {

@@ -114,19 +114,19 @@ ERROR_CODE urlCallbackHandlerDefault(struct HttpParser_t *httpParser, const unsi
 
 ERROR_CODE headerFieldCallbackHandlerDefault(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize) {
     /* allocates the required space for the header field */
-    unsigned char *headerField = (unsigned char *) MALLOC(dataSize + 1);
+    unsigned char *header_field = (unsigned char *) MALLOC(dataSize + 1);
 
     /* copies the memory from the data to the header field */
-    memcpy(headerField, data, dataSize);
+    memcpy(header_field, data, dataSize);
 
     /* puts the end of strng in the header field */
-    headerField[dataSize] = '\0';
+    header_field[dataSize] = '\0';
 
     /* prints the header field */
-    V_DEBUG_F("header field: %s\n", headerField);
+    V_DEBUG_F("header field: %s\n", header_field);
 
     /* releases the header field */
-    FREE(headerField);
+    FREE(header_field);
 
     /* raise no error */
     RAISE_NO_ERROR;
@@ -134,19 +134,19 @@ ERROR_CODE headerFieldCallbackHandlerDefault(struct HttpParser_t *httpParser, co
 
 ERROR_CODE headerValueCallbackHandlerDefault(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize) {
     /* allocates the required space for the header value */
-    unsigned char *headerValue = (unsigned char *) MALLOC(dataSize + 1);
+    unsigned char *header_value = (unsigned char *) MALLOC(dataSize + 1);
 
     /* copies the memory from the data to the header value */
-    memcpy(headerValue, data, dataSize);
+    memcpy(header_value, data, dataSize);
 
     /* puts the end of strng in the header value */
-    headerValue[dataSize] = '\0';
+    header_value[dataSize] = '\0';
 
     /* prints the header value */
-    V_DEBUG_F("header value: %s\n", headerValue);
+    V_DEBUG_F("header value: %s\n", header_value);
 
     /* releases the header value */
-    FREE(headerValue);
+    FREE(header_value);
 
     /* raise no error */
     RAISE_NO_ERROR;
@@ -205,13 +205,13 @@ ERROR_CODE _setHttpSettingsHandlerDefault(struct HttpSettings_t *httpSettings) {
     /* sets the various callback functions in the http settings
     structure, these callbacks are going to be used in the runtime
     processing of http parser (runtime execution) */
-    httpSettings->onmessageBegin = messageBeginCallbackHandlerDefault;
-    httpSettings->onurl = urlCallbackHandlerDefault;
-    httpSettings->onheaderField = headerFieldCallbackHandlerDefault;
-    httpSettings->onheaderValue = headerValueCallbackHandlerDefault;
-    httpSettings->onheadersComplete = headersCompleteCallbackHandlerDefault;
-    httpSettings->onbody = bodyCallbackHandlerDefault;
-    httpSettings->onmessageComplete = messageCompleteCallbackHandlerDefault;
+    httpSettings->on_message_begin = messageBeginCallbackHandlerDefault;
+    httpSettings->on_url = urlCallbackHandlerDefault;
+    httpSettings->on_header_field = headerFieldCallbackHandlerDefault;
+    httpSettings->on_header_value = headerValueCallbackHandlerDefault;
+    httpSettings->on_headers_complete = headersCompleteCallbackHandlerDefault;
+    httpSettings->on_body = bodyCallbackHandlerDefault;
+    httpSettings->on_message_complete = messageCompleteCallbackHandlerDefault;
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -219,13 +219,13 @@ ERROR_CODE _setHttpSettingsHandlerDefault(struct HttpSettings_t *httpSettings) {
 
 ERROR_CODE _unsetHttpSettingsHandlerDefault(struct HttpSettings_t *httpSettings) {
     /* unsets the various callback functions from the http settings */
-    httpSettings->onmessageBegin = NULL;
-    httpSettings->onurl = NULL;
-    httpSettings->onheaderField = NULL;
-    httpSettings->onheaderValue = NULL;
-    httpSettings->onheadersComplete = NULL;
-    httpSettings->onbody = NULL;
-    httpSettings->onmessageComplete = NULL;
+    httpSettings->on_message_begin = NULL;
+    httpSettings->on_url = NULL;
+    httpSettings->on_header_field = NULL;
+    httpSettings->on_header_value = NULL;
+    httpSettings->on_headers_complete = NULL;
+    httpSettings->on_body = NULL;
+    httpSettings->on_message_complete = NULL;
 
     /* raises no error */
     RAISE_NO_ERROR;

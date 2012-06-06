@@ -256,7 +256,7 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
     the template handler */
     struct linked_list_t *directoryEntries;
     struct linked_list_t *directoryEntriesMap;
-    struct TemplateHandler_t *template_handler;
+    struct template_handler_t *template_handler;
 
     /* allocates space for the is directory and the is redirect flags */
     unsigned int is_directory = 0;
@@ -325,8 +325,8 @@ ERROR_CODE messageCompleteCallbackHandlerFile(struct HttpParser_t *httpParser) {
 
             /* assigns the directory entries to the template handler,
             this variable will be exposed to the template */
-            assignListTemplateHandler(template_handler, (unsigned char *) "entries", directoryEntriesMap);
-            assignIntegerTemplateHandler(template_handler, (unsigned char *) "items", (int) directoryEntriesMap->size);
+            assign_list_template_handler(template_handler, (unsigned char *) "entries", directoryEntriesMap);
+            assign_integer_template_handler(template_handler, (unsigned char *) "items", (int) directoryEntriesMap->size);
 
             /* processes the file as a template handler */
             process_template_handler(template_handler, templatePath);
@@ -469,13 +469,13 @@ ERROR_CODE _setHttpSettingsHandlerFile(struct HttpSettings_t *httpSettings) {
     /* sets the various callback functions in the http settings
     structure, these callbacks are going to be used in the runtime
     processing of http parser (runtime execution) */
-    httpSettings->onmessageBegin = messageBeginCallbackHandlerFile;
-    httpSettings->onurl = urlCallbackHandlerFile;
-    httpSettings->onheaderField = headerFieldCallbackHandlerFile;
-    httpSettings->onheaderValue = headerValueCallbackHandlerFile;
-    httpSettings->onheadersComplete = headersCompleteCallbackHandlerFile;
-    httpSettings->onbody = bodyCallbackHandlerFile;
-    httpSettings->onmessageComplete = messageCompleteCallbackHandlerFile;
+    httpSettings->on_message_begin = messageBeginCallbackHandlerFile;
+    httpSettings->on_url = urlCallbackHandlerFile;
+    httpSettings->on_header_field = headerFieldCallbackHandlerFile;
+    httpSettings->on_header_value = headerValueCallbackHandlerFile;
+    httpSettings->on_headers_complete = headersCompleteCallbackHandlerFile;
+    httpSettings->on_body = bodyCallbackHandlerFile;
+    httpSettings->on_message_complete = messageCompleteCallbackHandlerFile;
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -483,13 +483,13 @@ ERROR_CODE _setHttpSettingsHandlerFile(struct HttpSettings_t *httpSettings) {
 
 ERROR_CODE _unsetHttpSettingsHandlerFile(struct HttpSettings_t *httpSettings) {
     /* unsets the various callback functions from the http settings */
-    httpSettings->onmessageBegin = NULL;
-    httpSettings->onurl = NULL;
-    httpSettings->onheaderField = NULL;
-    httpSettings->onheaderValue = NULL;
-    httpSettings->onheadersComplete = NULL;
-    httpSettings->onbody = NULL;
-    httpSettings->onmessageComplete = NULL;
+    httpSettings->on_message_begin = NULL;
+    httpSettings->on_url = NULL;
+    httpSettings->on_header_field = NULL;
+    httpSettings->on_header_value = NULL;
+    httpSettings->on_headers_complete = NULL;
+    httpSettings->on_body = NULL;
+    httpSettings->on_message_complete = NULL;
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -587,7 +587,7 @@ ERROR_CODE _sendDataHandlerFile(struct Connection_t *connection, struct Data_t *
     /* casts the parameters as handler file context and then
     retrieves the templat handler from it */
     struct HandlerFileContext_t *handlerFileContext = (struct HandlerFileContext_t *) parameters;
-    struct TemplateHandler_t *template_handler = handlerFileContext->template_handler;
+    struct template_handler_t *template_handler = handlerFileContext->template_handler;
 
     /* in case the handler file context is already flushed
     time to clenaup pending structures */

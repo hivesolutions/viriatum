@@ -396,7 +396,7 @@ typedef struct Connection_t {
      * Typically this represent a file
      * descriptor.
      */
-    SOCKET_HANDLE socketHandle;
+    SOCKET_HANDLE socket_handle;
 
     /**
      * The address for the socket associated
@@ -404,7 +404,7 @@ typedef struct Connection_t {
      * This is a somehow complex structure and
      * access to it should be made carrefully.
      */
-    SOCKET_ADDRESS socketAddress;
+    SOCKET_ADDRESS socket_address;
 
     /**
      * The reference to the service controlling
@@ -701,11 +701,11 @@ ERROR_CODE removeConnectionService(struct Service_t *service, struct Connection_
  *
  * @param servicePointer The pointer to the connetcion to
  * be constructed.
- * @param socketHandle The socket handle to be associated
+ * @param socket_handle The socket handle to be associated
  * with the connection.
  * @return The resulting error code.
  */
-ERROR_CODE createConnection(struct Connection_t **connectionPointer, SOCKET_HANDLE socketHandle);
+ERROR_CODE createConnection(struct Connection_t **connectionPointer, SOCKET_HANDLE socket_handle);
 
 /**
  * Destructor of the connection.

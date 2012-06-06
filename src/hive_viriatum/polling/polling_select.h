@@ -45,12 +45,12 @@ typedef struct PollingSelect_t {
     /**
      * The socket set for the read sockets.
      */
-    SOCKET_SET socketsReadSet;
+    SOCKET_SET sockets_read_set;
 
     /**
      * The socket set for the write sockets.
      */
-    SOCKET_SET socketsWriteSet;
+    SOCKET_SET sockets_write_set;
 
     /**
      * The socket set for the error sockets.
@@ -146,8 +146,8 @@ ERROR_CODE pollPollingSelect(struct Polling_t *polling);
 ERROR_CODE callPollingSelect(struct Polling_t *polling);
 ERROR_CODE _pollPollingSelect(struct PollingSelect_t *pollingSelect, struct Connection_t **readConnections, struct Connection_t **writeConnections, struct Connection_t **errorConnections, unsigned int *readConnectionsSize, unsigned int *writeConnectionsSize, unsigned int *errorConnectionsSize);
 ERROR_CODE _callPollingSelect(struct PollingSelect_t *pollingSelect, struct Connection_t **readConnections, struct Connection_t **writeConnections, struct Connection_t **errorConnections, struct Connection_t **removeConnections, unsigned int readConnectionsSize, unsigned int writeConnectionsSize, unsigned int errorConnectionsSize);
-ERROR_CODE _registerSocketsSetPollingSelect(struct PollingSelect_t *pollingSelect, SOCKET_HANDLE socketHandle, SOCKET_SET *socketsSet);
-ERROR_CODE _unregisterSocketsSetPollingSelect(struct PollingSelect_t *pollingSelect, SOCKET_HANDLE socketHandle, SOCKET_SET *socketsSet);
+ERROR_CODE _registerSocketsSetPollingSelect(struct PollingSelect_t *pollingSelect, SOCKET_HANDLE socket_handle, SOCKET_SET *sockets_set);
+ERROR_CODE _unregisterSocketsSetPollingSelect(struct PollingSelect_t *pollingSelect, SOCKET_HANDLE socket_handle, SOCKET_SET *sockets_set);
 
 /**
  * Removes a connection from the remove connections array.

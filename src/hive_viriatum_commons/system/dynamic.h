@@ -30,17 +30,17 @@
 #ifdef VIRIATUM_PLATFORM_WIN32
 #define LIBRARY_REFERENCE HMODULE
 #define LIBRARY_SYMBOL FARPROC
-#define LOAD_LIBRARY(libraryPath) LoadLibrary(libraryPath)
-#define UNLOAD_LIBRARY(libraryReference) FreeLibrary(libraryReference)
-#define GET_LIBRARY_SYMBOL(libraryReference, symbolName) GetProcAddress(libraryReference, symbolName)
+#define LOAD_LIBRARY(library_path) LoadLibrary(library_path)
+#define UNLOAD_LIBRARY(library_reference) FreeLibrary(library_reference)
+#define GET_LIBRARY_SYMBOL(library_reference, symbol_name) GetProcAddress(library_reference, symbol_name)
 #define GET_LIBRARY_ERROR_MESSAGE() NULL
 #endif
 
 #ifdef VIRIATUM_PLATFORM_UNIX
 #define LIBRARY_REFERENCE void *
 #define LIBRARY_SYMBOL void *
-#define LOAD_LIBRARY(libraryPath) dlopen(libraryPath, RTLD_LAZY)
-#define UNLOAD_LIBRARY(libraryReference) dlclose(libraryReference)
-#define GET_LIBRARY_SYMBOL(libraryReference, symbolName) dlsym(libraryReference, symbolName)
+#define LOAD_LIBRARY(library_path) dlopen(library_path, RTLD_LAZY)
+#define UNLOAD_LIBRARY(library_reference) dlclose(library_reference)
+#define GET_LIBRARY_SYMBOL(library_reference, symbol_name) dlsym(library_reference, symbol_name)
 #define GET_LIBRARY_ERROR_MESSAGE() dlerror()
 #endif

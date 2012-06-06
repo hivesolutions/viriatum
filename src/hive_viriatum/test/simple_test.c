@@ -350,10 +350,10 @@ void test_huffman() {
 
 void test_bit_stream() {
     /* allocates space for the file stream */
-    struct FileStream_t *file_stream;
+    struct file_stream_t *file_stream;
 
     /* allocates space for the bit stream */
-    struct BitStream_t *bit_stream;
+    struct bit_stream_t *bit_stream;
 
     /* creates the file stream */
     create_file_stream(&file_stream, (unsigned char *) "bit_stream.txt", (unsigned char *) "wb");
@@ -388,10 +388,10 @@ void test_bit_stream() {
 
 void test_file_stream() {
     /* allocates space for the file stream */
-    struct FileStream_t *file_stream;
+    struct file_stream_t *file_stream;
 
     /* allocates space for the stream */
-    struct Stream_t *stream;
+    struct stream_t *stream;
 
     /* allocates some space for the test buffer */
     unsigned char buffer[128];
@@ -440,7 +440,7 @@ void test_file_stream() {
 
 void test_template_handler() {
     /* allocates space for the template handler */
-    struct TemplateHandler_t *template_handler;
+    struct template_handler_t *template_handler;
 
     /* creates the template handler */
     create_template_handler(&template_handler);

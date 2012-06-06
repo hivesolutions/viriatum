@@ -40,7 +40,7 @@ typedef struct ThreadPoolTask_t {
 } ThreadPoolTask;
 
 typedef struct ThreadPoolElement_t {
-    THREAD_HANDLE threadHandle;
+    THREAD_HANDLE thread_handle;
     THREAD_IDENTIFIER thread_id;
 } ThreadPoolElement;
 
