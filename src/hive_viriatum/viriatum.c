@@ -50,7 +50,7 @@ static struct Service_t *service;
 
 ERROR_CODE runService(struct hash_map_t *arguments) {
     /* allocates the return value */
-    ERROR_CODE returnValue;
+    ERROR_CODE return_value;
 
     /* allocates the socket data */
     SOCKET_DATA socketData;
@@ -64,15 +64,15 @@ ERROR_CODE runService(struct hash_map_t *arguments) {
     loadOptionsService(service, arguments);
 
     /* starts the service */
-    returnValue = startService(service);
+    return_value = startService(service);
 
     /* tests the error code for error */
-    if(IS_ERROR_CODE(returnValue)) {
+    if(IS_ERROR_CODE(return_value)) {
          /* runs the socket finish */
         SOCKET_FINISH();
 
         /* raises the error again */
-        RAISE_AGAIN(returnValue);
+        RAISE_AGAIN(return_value);
     }
 
     /* deletes the service */
@@ -87,7 +87,7 @@ ERROR_CODE runService(struct hash_map_t *arguments) {
 
 ERROR_CODE ranService() {
     /* allocates the return value */
-    ERROR_CODE returnValue;
+    ERROR_CODE return_value;
 
     /* in case the service status is open */
     if(service->status == STATUS_CLOSED) {
@@ -98,15 +98,15 @@ ERROR_CODE ranService() {
         V_DEBUG("Stopping service\n");
 
         /* stops the service */
-        returnValue = stopService(service);
+        return_value = stopService(service);
 
         /* tests the error code for error */
-        if(IS_ERROR_CODE(returnValue)) {
+        if(IS_ERROR_CODE(return_value)) {
             /* runs the socket finish */
             SOCKET_FINISH();
 
             /* raises the error again */
-            RAISE_AGAIN(returnValue);
+            RAISE_AGAIN(return_value);
         }
 
         /* prints a warning message */
@@ -258,7 +258,7 @@ void executeArguments(struct hash_map_t *arguments) {
 #ifndef VIRIATUM_PLATFORM_IPHONE
 int main(int argc, char *argv[]) {
     /* allocates the return value */
-    ERROR_CODE returnValue;
+    ERROR_CODE return_value;
 
     /* allocates the map that will contain the various
     processed arguments, indexed by name */
@@ -273,13 +273,13 @@ int main(int argc, char *argv[]) {
     executeArguments(arguments);
 
     /* runs the service, with the given arguments */
-    returnValue = runService(arguments);
+    return_value = runService(arguments);
 
     /* deletes the processed arguments */
     deleteArguments(arguments);
 
     /* tests the error code for error */
-    if(IS_ERROR_CODE(returnValue)) {
+    if(IS_ERROR_CODE(return_value)) {
         /* prints an error message */
         V_ERROR_F("Problem running service (%s)\n", (char *) GET_ERROR());
     }

@@ -1179,7 +1179,7 @@ ERROR_CODE _fileOptionsService(struct Service_t *service, struct hash_map_t *arg
     path to the configuration directory and then loads it as an ini file,
     this should retrieve the configuration as a set of maps */
     SPRINTF(configPath, VIRIATUM_MAX_PATH_SIZE, "%s/viriatum.ini", VIRIATUM_CONFIG_PATH);
-    processIniFile(configPath, &configuration);
+    process_ini_file(configPath, &configuration);
     service->configuration = configuration;
 
     /* tries to retrieve the general section configuration from the configuration

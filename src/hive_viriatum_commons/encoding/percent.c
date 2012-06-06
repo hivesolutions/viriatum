@@ -29,7 +29,7 @@
 
 #include "percent.h"
 
-ERROR_CODE encodePercent(unsigned char *buffer, size_t length, unsigned char **buffer_pointer, size_t *lengthPointer) {
+ERROR_CODE encode_percent(unsigned char *buffer, size_t length, unsigned char **buffer_pointer, size_t *length_pointer) {
     /* allocates space for the byte value to be read in
     each iteration and allocates space for the index accumulator
     value for the iteration process */
@@ -67,8 +67,8 @@ ERROR_CODE encodePercent(unsigned char *buffer, size_t length, unsigned char **b
             /* sets the current buffer values with the hexadecimal
             encoded characters */
             *__buffer++ = '%';
-            *__buffer++ = toHex(byte >> 4);
-            *__buffer++ = toHex(byte & 15);
+            *__buffer++ = to_hex(byte >> 4);
+            *__buffer++ = to_hex(byte & 15);
         }
     }
 
@@ -78,13 +78,13 @@ ERROR_CODE encodePercent(unsigned char *buffer, size_t length, unsigned char **b
     /* sets the current encoded buffer in the buffer pointer value
     and sets the apropriate length inthe length pointer value */
     *buffer_pointer = _buffer;
-    *lengthPointer = __buffer - _buffer;
+    *length_pointer = __buffer - _buffer;
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE decodePercent(unsigned char *buffer, size_t length, unsigned char **buffer_pointer,  size_t *lengthPointer) {
+ERROR_CODE decode_percent(unsigned char *buffer, size_t length, unsigned char **buffer_pointer,  size_t *length_pointer) {
     /* allocates the pointer to be used durring the iteration
     process for the url decoding */
     unsigned char *pointer;
@@ -105,7 +105,7 @@ ERROR_CODE decodePercent(unsigned char *buffer, size_t length, unsigned char **b
                 /* converts the character using the hexadecimal value
                 from it and then increments the current buffer pointer
                 by a value of two (buffer advancing) */
-                *__buffer++ = fromHex(pointer[1]) << 4 | fromHex(pointer[2]);
+                *__buffer++ = from_hex(pointer[1]) << 4 | from_hex(pointer[2]);
                 pointer += 2;
             } else {
                 /* raises an error */
@@ -133,17 +133,17 @@ ERROR_CODE decodePercent(unsigned char *buffer, size_t length, unsigned char **b
     /* sets the current encoded buffer in the buffer pointer value
     and sets the apropriate length inthe length pointer value */
     *buffer_pointer = _bufffer;
-    *lengthPointer = __buffer - _bufffer;
+    *length_pointer = __buffer - _bufffer;
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
 
-ERROR_CODE urlEncode(unsigned char *buffer, size_t length, unsigned char **buffer_pointer, size_t *lengthPointer) {
-    return encodePercent(buffer, length, buffer_pointer, lengthPointer);
+ERROR_CODE url_encode(unsigned char *buffer, size_t length, unsigned char **buffer_pointer, size_t *length_pointer) {
+    return encode_percent(buffer, length, buffer_pointer, length_pointer);
 }
 
-ERROR_CODE urlDecode(unsigned char *buffer, size_t length, unsigned char **buffer_pointer, size_t *lengthPointer) {
-    return decodePercent(buffer, length, buffer_pointer, lengthPointer);
+ERROR_CODE url_decode(unsigned char *buffer, size_t length, unsigned char **buffer_pointer, size_t *length_pointer) {
+    return decode_percent(buffer, length, buffer_pointer, length_pointer);
 }
