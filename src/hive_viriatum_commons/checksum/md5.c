@@ -29,19 +29,19 @@
 
 #include "md5.h"
 
-void md5(unsigned char *buffer, unsigned int bufferLength, unsigned char *result) {
+void md5(unsigned char *buffer, unsigned int buffer_length, unsigned char *result) {
     /* allocates space for the md5 context */
-    struct md5Context_t md5Context;
+    struct md5_context_t md5_context;
 
     /* initializes the md5 context, then updates it
     with the provided buffer and after that finalizes
     it retrieving the result */
-    initMd5(&md5Context);
-    updateMd5(&md5Context, buffer, bufferLength);
-    finalMd5(&md5Context, result);
+    init_md5(&md5_context);
+    update_md5(&md5_context, buffer, buffer_length);
+    final_md5(&md5_context, result);
 }
 
-void initMd5(struct md5Context_t *context) {
+void init_md5(struct md5_context_t *context) {
     context->a = 0x67452301;
     context->b = 0xefcdab89;
     context->c = 0x98badcfe;
@@ -51,18 +51,18 @@ void initMd5(struct md5Context_t *context) {
     context->high = 0;
 }
 
-void updateMd5(struct md5Context_t *context, void *data, unsigned long size) {
-    unsigned int savedLow;
+void update_md5(struct md5_context_t *context, void *data, unsigned long size) {
+    unsigned int saved_low;
     unsigned long used;
     unsigned long free;
 
-    savedLow = context->low;
-    if((context->low = (savedLow + size) & 0x1fffffff) < savedLow) {
+    saved_low = context->low;
+    if((context->low = (saved_low + size) & 0x1fffffff) < saved_low) {
         context->high++;
     }
     context->high += size >> 29;
 
-    used = savedLow & 0x3f;
+    used = saved_low & 0x3f;
 
     if(used) {
         free = 64 - used;
@@ -75,18 +75,18 @@ void updateMd5(struct md5Context_t *context, void *data, unsigned long size) {
         memcpy(&context->buffer[used], data, free);
         data = (unsigned char *) data + free;
         size -= free;
-        _bodyMd5(context, context->buffer, 64);
+        _body_md5(context, context->buffer, 64);
     }
 
     if (size >= 64) {
-        data = _bodyMd5(context, data, size & ~ (unsigned long) 0x3f);
+        data = _body_md5(context, data, size & ~ (unsigned long) 0x3f);
         size &= 0x3f;
     }
 
     memcpy(context->buffer, data, size);
 }
 
-void finalMd5(struct md5Context_t *context, unsigned char *result) {
+void final_md5(struct md5_context_t *context, unsigned char *result) {
     unsigned long used, free;
 
     used = context->low & 0x3f;
@@ -97,7 +97,7 @@ void finalMd5(struct md5Context_t *context, unsigned char *result) {
 
     if(free < 8) {
         memset(&context->buffer[used], 0, free);
-        _bodyMd5(context, context->buffer, 64);
+        _body_md5(context, context->buffer, 64);
         used = 0;
         free = 64;
     }
@@ -114,7 +114,7 @@ void finalMd5(struct md5Context_t *context, unsigned char *result) {
     context->buffer[62] = context->high >> 16;
     context->buffer[63] = context->high >> 24;
 
-    _bodyMd5(context, context->buffer, 64);
+    _body_md5(context, context->buffer, 64);
 
     result[0] = context->a;
     result[1] = context->a >> 8;
@@ -136,16 +136,16 @@ void finalMd5(struct md5Context_t *context, unsigned char *result) {
     memset(context, 0, sizeof(*context));
 }
 
-void *_bodyMd5(struct md5Context_t *context, void *data, unsigned long size) {
+void *_body_md5(struct md5_context_t *context, void *data, unsigned long size) {
     unsigned char *pointer;
     unsigned int a;
     unsigned int b;
     unsigned int c;
     unsigned int d;
-    unsigned int savedA;
-    unsigned int savedB;
-    unsigned int savedC;
-    unsigned int savedD;
+    unsigned int saved_a;
+    unsigned int saved_b;
+    unsigned int saved_c;
+    unsigned int saved_d;
 
     pointer = data;
 
@@ -155,10 +155,10 @@ void *_bodyMd5(struct md5Context_t *context, void *data, unsigned long size) {
     d = context->d;
 
     do {
-        savedA = a;
-        savedB = b;
-        savedC = c;
-        savedD = d;
+        saved_a = a;
+        saved_b = b;
+        saved_c = c;
+        saved_d = d;
 
         /* executes the round 1 computation */
         STEP(F, a, b, c, d, SET(0), 0xd76aa478, 7)
@@ -232,10 +232,10 @@ void *_bodyMd5(struct md5Context_t *context, void *data, unsigned long size) {
         STEP(I, c, d, a, b, GET(2), 0x2ad7d2bb, 15)
         STEP(I, b, c, d, a, GET(9), 0xeb86d391, 21)
 
-        a += savedA;
-        b += savedB;
-        c += savedC;
-        d += savedD;
+        a += saved_a;
+        b += saved_b;
+        c += saved_c;
+        d += saved_d;
 
         pointer += 64;
     } while(size -= 64);

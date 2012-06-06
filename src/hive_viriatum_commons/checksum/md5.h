@@ -53,7 +53,7 @@
  * must be created for temporary values
  * storage.
  */
-typedef struct md5Context_t {
+typedef struct md5_context_t {
     unsigned int low;
     unsigned int high;
     unsigned int a;
@@ -62,10 +62,10 @@ typedef struct md5Context_t {
     unsigned int d;
     unsigned char buffer[64];
     unsigned int block[16];
-} md5Context;
+} md5_context;
 
-VIRIATUM_EXPORT_PREFIX void md5(unsigned char *buffer, unsigned int bufferLength, unsigned char *result);
-VIRIATUM_EXPORT_PREFIX void initMd5(struct md5Context_t *context);
-VIRIATUM_EXPORT_PREFIX void updateMd5(struct md5Context_t *context, void *data, unsigned long size);
-VIRIATUM_EXPORT_PREFIX void finalMd5(struct md5Context_t *context, unsigned char *result);
-VIRIATUM_EXPORT_PREFIX void *_bodyMd5(struct md5Context_t *context, void *data, unsigned long size);
+VIRIATUM_EXPORT_PREFIX void md5(unsigned char *buffer, unsigned int buffer_length, unsigned char *result);
+VIRIATUM_EXPORT_PREFIX void init_md5(struct md5_context_t *context);
+VIRIATUM_EXPORT_PREFIX void update_md5(struct md5_context_t *context, void *data, unsigned long size);
+VIRIATUM_EXPORT_PREFIX void final_md5(struct md5_context_t *context, unsigned char *result);
+VIRIATUM_EXPORT_PREFIX void *_body_md5(struct md5_context_t *context, void *data, unsigned long size);
