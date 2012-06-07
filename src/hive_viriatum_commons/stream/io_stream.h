@@ -45,7 +45,7 @@ typedef struct stream_t {
      * handler substrate (child).
      */
     void *lower;
-} Stream;
+} stream;
 
 VIRIATUM_EXPORT_PREFIX void create_stream(struct stream_t **stream_pointer);
 VIRIATUM_EXPORT_PREFIX void delete_stream(struct stream_t *stream);
