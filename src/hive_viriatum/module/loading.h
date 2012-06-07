@@ -179,7 +179,7 @@ typedef struct module_t {
      * module substrate (child).
      */
     void *lower;
-} Module;
+} module;
 
 /**
  * Constructor of the environment.
