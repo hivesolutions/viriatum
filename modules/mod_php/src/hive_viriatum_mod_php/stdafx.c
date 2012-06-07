@@ -31,6 +31,6 @@ static unsigned char name[] = "viriatum_mod_php";
 static unsigned char version[] = "1.0.0";
 static unsigned char description[] = "Viriatum Php Module";
 
-unsigned char *nameViriatumModPhp() { return name; }
-unsigned char *versionViriatumModPhp() { return version; }
-unsigned char *descriptionViriatumModPhp() { return description; }
+unsigned char *name_viriatum_mod_php() { return name; }
+unsigned char *version_viriatum_mod_php() { return version; }
+unsigned char *description_viriatum_mod_php() { return description; }

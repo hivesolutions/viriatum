@@ -40,34 +40,34 @@
  * structures and information for the
  * mod lua module.
  */
-typedef struct ModLuaModule_t {
+typedef struct mod_lua_module_t {
     /**
      * The global lua state used over
      * all the operations in lua.
      */
-    lua_State *luaState;
+    lua_State *lua_state;
 
     /**
      * The http handler associated with the
      * module (upper layer).
      */
-    struct HttpHandler_t *httpHandler;
+    struct http_handler_t *http_handler;
 
     /**
      * The mod lua http handler associated
      * with the module.
      */
-    struct ModLuaHttpHandler_t *modLuaHttpHandler;
-} ModLuaModule;
+    struct mod_lua_http_handler_t *mod_lua_http_handler;
+} mod_lua_module;
 
-VIRIATUM_EXPORT_PREFIX ERROR_CODE createModLuaModule(struct ModLuaModule_t **modLuaModulePointer, struct Module_t *module);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE deleteModLuaModule(struct ModLuaModule_t *modLuaModule);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE startModule(struct Environment_t *environment, struct Module_t *module);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE stopModule(struct Environment_t *environment, struct Module_t *module);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE infoModule(struct Module_t *module);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE errorModule(unsigned char **messagePointer);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE _loadConfiguration(struct Service_t *service, struct ModLuaHttpHandler_t *modLuaHttpHandler);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE _loadLuaState(lua_State **luaStatePointer);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE _unloadLuaState(lua_State **luaStatePointer);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE _reloadLuaState(lua_State **luaStatePointer);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE _startLuaState(lua_State *luaState);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE create_mod_lua_module(struct mod_lua_module_t **mod_lua_module_pointer, struct module_t *module);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE delete_mod_lua_module(struct mod_lua_module_t *mod_lua_module);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE start_module(struct environment_t *environment, struct module_t *module);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE stop_module(struct environment_t *environment, struct module_t *module);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE info_module(struct module_t *module);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE error_module(unsigned char **message_pointer);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _load_configuration(struct service_t *service, struct mod_lua_http_handler_t *mod_lua_http_handler);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _load_lua_state(lua_State **lua_state_pointer);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _unload_lua_state(lua_State **lua_state_pointer);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _reload_lua_state(lua_State **lua_state_pointer);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _start_lua_state(lua_State *lua_state);

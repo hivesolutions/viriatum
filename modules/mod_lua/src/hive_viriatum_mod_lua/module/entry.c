@@ -29,192 +29,192 @@
 
 #include "entry.h"
 
-ERROR_CODE createModLuaModule(struct ModLuaModule_t **modLuaModulePointer, struct Module_t *module) {
+ERROR_CODE create_mod_lua_module(struct mod_lua_module_t **mod_lua_module_pointer, struct module_t *module) {
     /* retrieves the mod lua module size */
-    size_t modLuaModuleSize = sizeof(struct ModLuaModule_t);
+    size_t mod_lua_module_size = sizeof(struct mod_lua_module_t);
 
     /* allocates space for the mod lua module */
-    struct ModLuaModule_t *modLuaModule = (struct ModLuaModule_t *) MALLOC(modLuaModuleSize);
+    struct mod_lua_module_t *mod_lua_module = (struct mod_lua_module_t *) MALLOC(mod_lua_module_size);
 
      /* sets the mod lua module attributes (default) values */
-    modLuaModule->luaState = NULL;
-    modLuaModule->httpHandler = NULL;
-    modLuaModule->modLuaHttpHandler = NULL;
+    mod_lua_module->lua_state = NULL;
+    mod_lua_module->http_handler = NULL;
+    mod_lua_module->mod_lua_http_handler = NULL;
 
     /* sets the mod lua module in the (upper) module substrate */
-    module->lower = (void *) modLuaModule;
+    module->lower = (void *) mod_lua_module;
 
     /* sets the mod lua module in the module pointer */
-    *modLuaModulePointer = modLuaModule;
+    *mod_lua_module_pointer = mod_lua_module;
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE deleteModLuaModule(struct ModLuaModule_t *modLuaModule) {
+ERROR_CODE delete_mod_lua_module(struct mod_lua_module_t *mod_lua_module) {
     /* releases the mod lua module */
-    FREE(modLuaModule);
+    FREE(mod_lua_module);
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE startModule(struct Environment_t *environment, struct Module_t *module) {
+ERROR_CODE start_module(struct environment_t *environment, struct module_t *module) {
     /* allocates the lua state */
-    lua_State *luaState;
+    lua_State *lua_state;
 
     /* allocates the mod lua module */
-    struct ModLuaModule_t *modLuaModule;
+    struct mod_lua_module_t *mod_lua_module;
 
     /* allocates the http handler */
-    struct HttpHandler_t *httpHandler;
+    struct http_handler_t *http_handler;
 
     /* allocates the mod lua http handler */
-    struct ModLuaHttpHandler_t *modLuaHttpHandler;
+    struct mod_lua_http_handler_t *mod_lua_http_handler;
 
     /* retrieves the name, version and description of
     the current module loaded */
-    unsigned char *name = nameViriatumModLua();
-    unsigned char *version = versionViriatumModLua();
-    unsigned char *description = descriptionViriatumModLua();
+    unsigned char *name = name_viriatum_mod_lua();
+    unsigned char *version = version_viriatum_mod_lua();
+    unsigned char *description = description_viriatum_mod_lua();
 
     /* retrieves the (environment) service */
-    struct Service_t *service = environment->service;
+    struct service_t *service = environment->service;
 
     /* prints a debug message */
     V_DEBUG_F("Starting the module '%s' (%s) v%s\n", name, description, version);
 
     /* creates the mod lua module */
-    createModLuaModule(&modLuaModule, module);
+    create_mod_lua_module(&mod_lua_module, module);
 
     /* populates the module structure */
-    infoModule(module);
+    info_module(module);
 
     /* loads the lua state populating all the erquired values
     for state initialization */
-    _loadLuaState(&luaState);
+    _load_lua_state(&lua_state);
 
     /* creates the http handler */
-    service->createHttpHandler(service, &httpHandler, (unsigned char *) "lua");
+    service->create_http_handler(service, &http_handler, (unsigned char *) "lua");
 
     /* creates the mod lua http handler */
-    createModLuaHttpHandler(&modLuaHttpHandler, httpHandler);
+    create_mod_lua_http_handler(&mod_lua_http_handler, http_handler);
 
     /* sets the http handler attributes */
-    httpHandler->set = setHandlerModule;
-    httpHandler->unset = unsetHandlerModule;
-    httpHandler->reset = NULL;
+    http_handler->set = set_handler_module;
+    http_handler->unset = unset_handler_module;
+    http_handler->reset = NULL;
 
     /* sets the mod lua handler attributes */
-    modLuaHttpHandler->luaState = luaState;
-    modLuaHttpHandler->filePath = DEFAULT_FILE_PATH;
-    modLuaHttpHandler->fileDirty = 1;
+    mod_lua_http_handler->lua_state = lua_state;
+    mod_lua_http_handler->file_path = DEFAULT_FILE_PATH;
+    mod_lua_http_handler->file_dirty = 1;
 
     /* sets the mod lua module attributes */
-    modLuaModule->luaState = luaState;
-    modLuaModule->httpHandler = httpHandler;
-    modLuaModule->modLuaHttpHandler = modLuaHttpHandler;
+    mod_lua_module->lua_state = lua_state;
+    mod_lua_module->http_handler = http_handler;
+    mod_lua_module->mod_lua_http_handler = mod_lua_http_handler;
 
     /* adds the http handler to the service */
-    service->addHttpHandler(service, httpHandler);
+    service->add_http_handler(service, http_handler);
 
     /* loads the service configuration for the http handler
     this should change some of it's behavior */
-    _loadConfiguration(service, modLuaHttpHandler);
+    _load_configuration(service, mod_lua_http_handler);
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE stopModule(struct Environment_t *environment, struct Module_t *module) {
+ERROR_CODE stop_module(struct environment_t *environment, struct module_t *module) {
     /* retrieves the name, version and description of
     the current module loaded */
-    unsigned char *name = nameViriatumModLua();
-    unsigned char *version = versionViriatumModLua();
-    unsigned char *description = descriptionViriatumModLua();
+    unsigned char *name = name_viriatum_mod_lua();
+    unsigned char *version = version_viriatum_mod_lua();
+    unsigned char *description = description_viriatum_mod_lua();
 
     /* retrieves the (environment) service */
-    struct Service_t *service = environment->service;
+    struct service_t *service = environment->service;
 
     /* retrieves the mod lua module (from the module) */
-    struct ModLuaModule_t *modLuaModule = (struct  ModLuaModule_t *) module->lower;
+    struct mod_lua_module_t *mod_lua_module = (struct  mod_lua_module_t *) module->lower;
 
     /* retrieves the http handler from the mod lua module */
-    struct HttpHandler_t *httpHandler = modLuaModule->httpHandler;
+    struct http_handler_t *http_handler = mod_lua_module->http_handler;
 
     /* retrieves the mod lua http handler from the mod lua module */
-    struct ModLuaHttpHandler_t *modLuaHttpHandler = modLuaModule->modLuaHttpHandler;
+    struct mod_lua_http_handler_t *mod_lua_http_handler = mod_lua_module->mod_lua_http_handler;
 
     /* retrieves the lua state from the mod lua http handler */
-    lua_State *luaState = modLuaHttpHandler->luaState;
+    lua_State *lua_state = mod_lua_http_handler->lua_state;
 
     /* prints a debug message */
     V_DEBUG_F("Stoping the module '%s' (%s) v%s\n", name, description, version);
 
     /* removes the http handler from the service */
-    service->removeHttpHandler(service, httpHandler);
+    service->remove_http_handler(service, http_handler);
 
     /* in case the mod lua http handler is valid and
     initialized (correct state) */
-    if(modLuaHttpHandler != NULL) {
+    if(mod_lua_http_handler != NULL) {
         /* deletes the mod lua http handler */
-        deleteModLuaHttpHandler(modLuaHttpHandler);
+        delete_mod_lua_http_handler(mod_lua_http_handler);
     }
 
     /* in case the http handler is valid and
     initialized (correct state) */
-    if(httpHandler != NULL) {
+    if(http_handler != NULL) {
         /* deletes the http handler */
-        service->deleteHttpHandler(service, httpHandler);
+        service->delete_http_handler(service, http_handler);
     }
 
     /* in case the lua state is valid and
     initialized (correct state) */
-    if(luaState != NULL) {
+    if(lua_state != NULL) {
         /* cleanup lua */
-        lua_close(luaState);
+        lua_close(lua_state);
     }
 
     /* deletes the mod lua module */
-    deleteModLuaModule(modLuaModule);
+    delete_mod_lua_module(mod_lua_module);
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE infoModule(struct Module_t *module) {
+ERROR_CODE info_module(struct module_t *module) {
     /* retrieves the name */
-    unsigned char *name = nameViriatumModLua();
+    unsigned char *name = name_viriatum_mod_lua();
 
     /* retrieves the version */
-    unsigned char *version = versionViriatumModLua();
+    unsigned char *version = version_viriatum_mod_lua();
 
     /* populates the module structure */
     module->name = name;
     module->version = version;
     module->type = MODULE_TYPE_HTTP_HANDLER;
-    module->start = startModule;
-    module->stop = stopModule;
-    module->info = infoModule;
-    module->error = errorModule;
+    module->start = start_module;
+    module->stop = stop_module;
+    module->info = info_module;
+    module->error = error_module;
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE errorModule(unsigned char **messagePointer) {
+ERROR_CODE error_module(unsigned char **message_pointer) {
     /* sets the error message in the (error) message pointer */
-    *messagePointer = getLastErrorMessage();
+    *message_pointer = get_last_error_message();
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _loadConfiguration(struct Service_t *service, struct ModLuaHttpHandler_t *modLuaHttpHandler) {
+ERROR_CODE _load_configuration(struct service_t *service, struct mod_lua_http_handler_t *mod_lua_http_handler) {
     /* allocates space for both a configuration item reference
     (value) and for the configuration to be retrieved */
     void *value;
-    struct HashMap_t *configuration;
+    struct hash_map_t *configuration;
 
     /* in case the current service configuration is not set
     must return immediately (not possible to load it) */
@@ -222,79 +222,79 @@ ERROR_CODE _loadConfiguration(struct Service_t *service, struct ModLuaHttpHandle
 
     /* tries to retrieve the mod lua section configuration from the configuration
     map in case none is found returns immediately no need to process anything more */
-    getValueStringHashMap(service->configuration, (unsigned char *) "mod_lua", (void **) &configuration);
+    get_value_string_hash_map(service->configuration, (unsigned char *) "mod_lua", (void **) &configuration);
     if(configuration == NULL) { RAISE_NO_ERROR; }
 
     /* tries ro retrieve the script path from the lua configuration and in
     case it exists sets it in the mod lua handler (attribute reference change) */
-    getValueStringHashMap(configuration, (unsigned char *) "script_path", &value);
-    if(value != NULL) { modLuaHttpHandler->filePath = (char *) value; }
+    get_value_string_hash_map(configuration, (unsigned char *) "script_path", &value);
+    if(value != NULL) { mod_lua_http_handler->file_path = (char *) value; }
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _loadLuaState(lua_State **luaStatePointer) {
+ERROR_CODE _load_lua_state(lua_State **lua_state_pointer) {
     /* initializes the lua interpreter, then loads
     various (default) lua libraries and then starts
     the global values in the environment (symbol injection) */
-    lua_State *luaState = lua_open();
-    luaL_openlibs(luaState);
-    _startLuaState(luaState);
+    lua_State *lua_state = lua_open();
+    luaL_openlibs(lua_state);
+    _start_lua_state(lua_state);
 
     /* sets the lua state in the pointer reference */
-    *luaStatePointer = luaState;
+    *lua_state_pointer = lua_state;
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _unloadLuaState(lua_State **luaStatePointer) {
-    lua_State *luaSate = *luaStatePointer;
+ERROR_CODE _unload_lua_state(lua_State **lua_state_pointer) {
+    lua_State *lua_state = *lua_state_pointer;
 
-    lua_close(luaSate);
-    *luaStatePointer = NULL;
-
-    /* raises no error */
-    RAISE_NO_ERROR;
-}
-
-ERROR_CODE _reloadLuaState(lua_State **luaStatePointer) {
-    _unloadLuaState(luaStatePointer);
-    _loadLuaState(luaStatePointer);
+    lua_close(lua_state);
+    *lua_state_pointer = NULL;
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _startLuaState(lua_State *luaState) {
+ERROR_CODE _reload_lua_state(lua_State **lua_state_pointer) {
+    _unload_lua_state(lua_state_pointer);
+    _load_lua_state(lua_state_pointer);
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE _start_lua_state(lua_State *lua_state) {
     /* registers the viriatum name in lua */
-    lua_pushstring(luaState, VIRIATUM_NAME);
-    lua_setglobal(luaState, "VIRIATUM_NAME");
+    lua_pushstring(lua_state, VIRIATUM_NAME);
+    lua_setglobal(lua_state, "VIRIATUM_NAME");
 
     /* registers the viriatum version in lua */
-    lua_pushstring(luaState, VIRIATUM_VERSION);
-    lua_setglobal(luaState, "VIRIATUM_VERSION");
+    lua_pushstring(lua_state, VIRIATUM_VERSION);
+    lua_setglobal(lua_state, "VIRIATUM_VERSION");
 
     /* registers the viriatum description in lua */
-    lua_pushstring(luaState, VIRIATUM_DESCRIPTION);
-    lua_setglobal(luaState, "VIRIATUM_DESCRIPTION");
+    lua_pushstring(lua_state, VIRIATUM_DESCRIPTION);
+    lua_setglobal(lua_state, "VIRIATUM_DESCRIPTION");
 
     /* registers the viriatum observations in lua */
-    lua_pushstring(luaState, VIRIATUM_OBSERVATIONS);
-    lua_setglobal(luaState, "VIRIATUM_OBSERVATIONS");
+    lua_pushstring(lua_state, VIRIATUM_OBSERVATIONS);
+    lua_setglobal(lua_state, "VIRIATUM_OBSERVATIONS");
 
     /* registers the viriatum copyright in lua */
-    lua_pushstring(luaState, VIRIATUM_COPYRIGHT);
-    lua_setglobal(luaState, "VIRIATUM_COPYRIGHT");
+    lua_pushstring(lua_state, VIRIATUM_COPYRIGHT);
+    lua_setglobal(lua_state, "VIRIATUM_COPYRIGHT");
 
     /* registers the viriatum platform string in lua */
-    lua_pushstring(luaState, VIRIATUM_PLATFORM_STRING);
-    lua_setglobal(luaState, "VIRIATUM_PLATFORM_STRING");
+    lua_pushstring(lua_state, VIRIATUM_PLATFORM_STRING);
+    lua_setglobal(lua_state, "VIRIATUM_PLATFORM_STRING");
 
     /* registers the viriatum platform cpu in lua */
-    lua_pushstring(luaState, VIRIATUM_PLATFORM_CPU);
-    lua_setglobal(luaState, "VIRIATUM_PLATFORM_CPU");
+    lua_pushstring(lua_state, VIRIATUM_PLATFORM_CPU);
+    lua_setglobal(lua_state, "VIRIATUM_PLATFORM_CPU");
 
     /* raises no error */
     RAISE_NO_ERROR;

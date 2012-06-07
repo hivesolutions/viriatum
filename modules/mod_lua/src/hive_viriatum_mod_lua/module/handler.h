@@ -36,42 +36,42 @@
  * structure to support the context
  * of the lua module.
  */
-typedef struct ModLuaHttpHandler_t {
+typedef struct mod_lua_http_handler_t {
     /**
      * The global lua state used over
      * all the operations in lua.
      */
-    lua_State *luaState;
+    lua_State *lua_state;
 
     /**
      * The path to the default file to
      * be used for the parsing.
      */
-    char *filePath;
+    char *file_path;
 
     /**
      * Flag that controls if the script file
      * to be executed is currently dirty.
      */
-    unsigned int fileDirty;
-} ModLuaHttpHandler;
+    unsigned int file_dirty;
+} mod_lua_http_handler;
 
-ERROR_CODE createModLuaHttpHandler(struct ModLuaHttpHandler_t **modLuaHttpHandlerPonter, struct HttpHandler_t *httpHandlerPonter);
-ERROR_CODE deleteModLuaHttpHandler(struct ModLuaHttpHandler_t *modLuaHttpHandler);
-ERROR_CODE setHandlerModule(struct HttpConnection_t *httpConnection);
-ERROR_CODE unsetHandlerModule(struct HttpConnection_t *httpConnection);
-ERROR_CODE urlCallbackHandlerModule(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize);
-ERROR_CODE headerFieldCallbackHandlerModule(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize);
-ERROR_CODE headerValueCallbackHandlerModule(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize);
-ERROR_CODE headersCompleteCallbackHandlerModule(struct HttpParser_t *httpParser);
-ERROR_CODE bodyCallbackHandlerModule(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize);
-ERROR_CODE messageCompleteCallbackHandlerModule(struct HttpParser_t *httpParser);
-ERROR_CODE _setHttpParserHandlerModule(struct HttpParser_t *httpParser);
-ERROR_CODE _unsetHttpParserHandlerModule(struct HttpParser_t *httpParser);
-ERROR_CODE _setHttpSettingsHandlerModule(struct HttpSettings_t *httpSettings);
-ERROR_CODE _unsetHttpSettingsHandlerModule(struct HttpSettings_t *httpSettings);
-ERROR_CODE _messageBeginCallbackHandlerModule(struct HttpParser_t *httpParser);
-ERROR_CODE _sendResponseHandlerModule(struct HttpParser_t *httpParser);
-ERROR_CODE _sendResponseCallbackHandlerModule(struct Connection_t *connection, struct Data_t *data, void *parameters);
-ERROR_CODE _writeErrorConnection(struct HttpParser_t *httpParser, char *message);
-int _luaWriteConnection(lua_State *luaState);
+ERROR_CODE create_mod_lua_http_handler(struct mod_lua_http_handler_t **mod_lua_http_handler_pointer, struct http_handler_t *http_handler_pointer);
+ERROR_CODE delete_mod_lua_http_handler(struct mod_lua_http_handler_t *mod_lua_http_handler);
+ERROR_CODE set_handler_module(struct http_connection_t *http_connection);
+ERROR_CODE unset_handler_module(struct http_connection_t *http_connection);
+ERROR_CODE url_callback_handler_module(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size);
+ERROR_CODE header_field_callback_handler_module(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size);
+ERROR_CODE header_value_callback_handler_module(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size);
+ERROR_CODE headers_complete_callback_handler_module(struct http_parser_t *http_parser);
+ERROR_CODE body_callback_handler_module(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size);
+ERROR_CODE message_complete_callback_handler_module(struct http_parser_t *http_parser);
+ERROR_CODE _set_http_parser_handler_module(struct http_parser_t *http_parser);
+ERROR_CODE _unset_http_parser_handler_module(struct http_parser_t *http_parser);
+ERROR_CODE _set_http_settings_handler_module(struct http_settings_t *http_settings);
+ERROR_CODE _unset_http_settings_handler_module(struct http_settings_t *http_settings);
+ERROR_CODE _message_begin_callback_handler_module(struct http_parser_t *http_parser);
+ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser);
+ERROR_CODE _send_response_callback_handler_module(struct connection_t *connection, struct Data_t *data, void *parameters);
+ERROR_CODE _write_error_connection(struct http_parser_t *http_parser, char *message);
+int _lua_write_connection(lua_State *lua_state);

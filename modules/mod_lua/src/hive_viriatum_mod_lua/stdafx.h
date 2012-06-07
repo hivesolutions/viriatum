@@ -34,9 +34,9 @@
 
 #include "../../../../src/hive_viriatum/viriatum.h"
 
-unsigned char *nameViriatumModLua();
-unsigned char *versionViriatumModLua();
-unsigned char *descriptionViriatumModLua();
+unsigned char *name_viriatum_mod_lua();
+unsigned char *version_viriatum_mod_lua();
+unsigned char *description_viriatum_mod_lua();
 
 #include <lua5.1/lua.h>
 #include <lua5.1/lualib.h>

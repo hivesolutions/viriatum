@@ -44,9 +44,9 @@
 #pragma warning(default:4005)
 #endif
 
-unsigned char *nameViriatumModPhp();
-unsigned char *versionViriatumModPhp();
-unsigned char *descriptionViriatumModPhp();
+unsigned char *name_viriatum_mod_php();
+unsigned char *version_viriatum_mod_php();
+unsigned char *description_viriatum_mod_php();
 
 #ifdef VIRIATUM_PLATFORM_MSC
 #ifdef VIRIATUM_DEBUG

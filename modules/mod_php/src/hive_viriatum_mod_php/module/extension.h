@@ -29,22 +29,22 @@
 
 #include "entry.h"
 
-zend_function_entry viriatumFunctions[12];
-zend_module_entry viriatumModule;
-sapi_module_struct viriatumSapiModule;
+zend_function_entry viriatum_functions[12];
+zend_module_entry viriatum_module;
+sapi_module_struct viriatum_sapi_module;
 
-int _moduleStartup(sapi_module_struct *module);
-int _moduleWrite(const char *data, uint dataSize TSRMLS_DC);
-void _moduleFlush(void *context);
-struct stat *_moduleStat(TSRMLS_D);
-char *_moduleGetenv(char *name, size_t size TSRMLS_DC);
-int _moduleHeader(sapi_header_struct *header, sapi_header_op_enum operation, sapi_headers_struct *headers TSRMLS_DC);
-int _moduleSendHeaders(sapi_headers_struct *headers TSRMLS_DC);
-int _moduleReadPost(char *buffer, uint size TSRMLS_DC);
-char *_moduleReadCookies(TSRMLS_D);
-void _moduleRegister(zval *_array TSRMLS_DC);
-void _moduleLog(char *message TSRMLS_DC);
-double _moduleRequestTime(TSRMLS_D);
+int _module_startup(sapi_module_struct *module);
+int _module_write(const char *data, uint data_size TSRMLS_DC);
+void _module_flush(void *context);
+struct stat *_module_stat(TSRMLS_D);
+char *_module_getenv(char *name, size_t size TSRMLS_DC);
+int _module_header(sapi_header_struct *header, sapi_header_op_enum operation, sapi_headers_struct *headers TSRMLS_DC);
+int _module_send_headers(sapi_headers_struct *headers TSRMLS_DC);
+int _module_read_post(char *buffer, uint size TSRMLS_DC);
+char *_module_read_cookies(TSRMLS_D);
+void _module_register(zval *_array TSRMLS_DC);
+void _module_log(char *message TSRMLS_DC);
+double _module_request_time(TSRMLS_D);
 ZEND_MINFO_FUNCTION(viriatum_information);
 PHP_FUNCTION(viriatum_connections);
 PHP_FUNCTION(viriatum_name);
