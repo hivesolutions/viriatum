@@ -76,7 +76,7 @@ typedef ERROR_CODE (*connection_data_callback) (struct connection_t *, struct da
  * Function used to write data into a connection, optional
  * parameters allow a callback uppon the end of writing.
  */
-typedef ERROR_CODE (*connection_write) (struct connection_t *connection, unsigned char *data, unsigned int size, connection_data_callback callback, void *callback_parameters);
+typedef ERROR_CODE (*connection_write) (struct connection_t *connection, unsigned char *, unsigned int, connection_data_callback, void *);
 
 /**
  * The "default" function used to update a state in the polling
