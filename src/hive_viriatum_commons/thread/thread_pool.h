@@ -42,7 +42,7 @@ typedef struct thread_pool_task_t {
 typedef struct thread_pool_element_t {
     THREAD_HANDLE thread_handle;
     THREAD_IDENTIFIER thread_id;
-} ThreadPoolElement;
+} thread_pool_element;
 
 typedef struct thread_pool_t {
     size_t number_threads;
