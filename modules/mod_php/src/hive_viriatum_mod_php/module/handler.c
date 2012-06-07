@@ -300,7 +300,7 @@ ERROR_CODE _unset_http_settings_handler_module(struct http_settings_t *http_sett
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _send_data_callback(struct connection_t *connection, struct Data_t *data, void *parameters) {
+ERROR_CODE _send_data_callback(struct connection_t *connection, struct data_t *data, void *parameters) {
     /* allocates the buffer that will hod the message to be sent
     through the connection and then allocates the buffer to hold
     the joined buffer from the linked buffer rerference */
@@ -456,7 +456,7 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _send_response_callback_handler_module(struct connection_t *connection, struct Data_t *data, void *parameters) {
+ERROR_CODE _send_response_callback_handler_module(struct connection_t *connection, struct data_t *data, void *parameters) {
     /* retrieves the current php context fro the parameters */
     struct handler_php_context_t *handler_php_context = (struct handler_php_context_t *) parameters;
 
