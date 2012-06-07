@@ -41,19 +41,19 @@
  * structures and information for the
  * mod php module.
  */
-typedef struct ModPhpModule_t {
+typedef struct mod_php_module_t {
     /**
      * The http handler associated with the
      * module (upper layer).
      */
-    struct HttpHandler_t *httpHandler;
+    struct http_handler_t *http_handler;
 
     /**
      * The mod php http handler associated
      * with the module.
      */
-    struct ModPhpHttpHandler_t *modPhpHttpHandler;
-} ModPhpModule;
+    struct mod_php_http_handler_t *mod_php_http_handler;
+} mod_php_module;
 
 /**
  * Structure representing a php request
@@ -61,13 +61,13 @@ typedef struct ModPhpModule_t {
  * This structure contains a series of
  * values useful for request flush.
  */
-typedef struct PhpRequest_t {
+typedef struct php_request_t {
     /**
      * The mime type value for the current php
      * request, this header value is treated as
      * a special case by the php interpreter.
      */
-    char mimeType[1024];
+    char mime_type[1024];
 
     /**
      * The matrix buffer containing the maximum
@@ -80,54 +80,54 @@ typedef struct PhpRequest_t {
      * The number of headers currently present in
      * the current php request.
      */
-    size_t headerCount;
+    size_t header_count;
 
     /**
      * The reference to the current php context
      * structure in use.
      */
-    struct HandlerPhpContext_t *phpContext;
-} PhpRequest;
+    struct handler_php_context_t *php_context;
+} php_request;
 
 /**
  * The global reference to the currently loaded service
  * this is the reference required for the basic interaction
  * with the service.
  */
-struct Service_t *_service;
+struct service_t *_service;
 
 /**
  * The global reference to the current connection being
  * used, this is going to be used to access connection
  * information values.
  */
-struct Connection_t *_connection;
+struct connection_t *_connection;
 
 /**
  * The global reference to the linked buffer to
  * be used to hold the various strings resulting
  * from the php default execution output.
  */
-struct LinkedBuffer_t *_outputBuffer;
+struct linked_buffer_t *_output_buffer;
 
 /**
  * The global structure to be used to "pass" php
  * information from the virtual machine into the
  * appropriate viriatum request handler.
  */
-struct PhpRequest_t _phpRequest;
+struct php_request_t _php_request;
 
-VIRIATUM_EXPORT_PREFIX ERROR_CODE createModPhpModule(struct ModPhpModule_t **modPhpModulePointer, struct Module_t *module);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE deleteModPhpModule(struct ModPhpModule_t *modPhpModule);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE startModule(struct Environment_t *environment, struct Module_t *module);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE stopModule(struct Environment_t *environment, struct Module_t *module);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE infoModule(struct Module_t *module);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE errorModule(unsigned char **messagePointer);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE _loadConfiguration(struct Service_t *service, struct ModPhpHttpHandler_t *modPhpHttpHandler);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE _loadPhpState();
-VIRIATUM_EXPORT_PREFIX ERROR_CODE _unloadPhpState();
-VIRIATUM_EXPORT_PREFIX ERROR_CODE _reloaPhpState();
-VIRIATUM_EXPORT_PREFIX ERROR_CODE _startPhpState();
-VIRIATUM_EXPORT_PREFIX int _writePhpState(const char *data, unsigned int dataSize TSRMLS_DC);
-VIRIATUM_EXPORT_PREFIX void _logPhpState(char *message);
-VIRIATUM_EXPORT_PREFIX void _errorPhpState(int type, const char *message, ...);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE create_mod_php_module(struct mod_php_module_t **mod_php_module_pointer, struct module_t *module);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE delete_mod_php_module(struct mod_php_module_t *mod_php_module);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE start_module(struct environment_t *environment, struct module_t *module);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE stop_module(struct environment_t *environment, struct module_t *module);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE info_module(struct module_t *module);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE error_module(unsigned char **message_pointer);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _load_configuration(struct service_t *service, struct mod_php_http_handler_t *mod_php_http_handler);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _load_php_state();
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _unload_php_state();
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _reload_php_state();
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _start_php_state();
+VIRIATUM_EXPORT_PREFIX int _write_php_state(const char *data, unsigned int data_size TSRMLS_DC);
+VIRIATUM_EXPORT_PREFIX void _log_php_state(char *message);
+VIRIATUM_EXPORT_PREFIX void _error_php_state(int type, const char *message, ...);

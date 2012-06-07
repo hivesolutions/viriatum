@@ -31,6 +31,6 @@ static unsigned char name[] = "viriatum_mod_lua";
 static unsigned char version[] = "1.0.0";
 static unsigned char description[] = "Viriatum Lua Module";
 
-unsigned char *nameViriatumModLua() { return name; }
-unsigned char *versionViriatumModLua() { return version; }
-unsigned char *descriptionViriatumModLua() { return description; }
+unsigned char *name_viriatum_mod_lua() { return name; }
+unsigned char *version_viriatum_mod_lua() { return version; }
+unsigned char *description_viriatum_mod_lua() { return description; }

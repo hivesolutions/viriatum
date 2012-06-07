@@ -34,13 +34,13 @@
  * structure to support the context
  * of the php module.
  */
-typedef struct ModPhpHttpHandler_t {
+typedef struct mod_php_http_handler_t {
     /**
      * The path to the base directory to be
      * used in the file resolution.
      */
-    char *basePath;
-} ModPhpHttpHandler;
+    char *base_path;
+} mod_php_http_handler;
 
 /**
  * The context structure to be used allong
@@ -48,7 +48,7 @@ typedef struct ModPhpHttpHandler_t {
  * the php handler, must be used to control
  * the url and file resolution.
  */
-typedef struct HandlerPhpContext_t {
+typedef struct handler_php_context_t {
     /**
      * The url to be used for retrieving the file.
      */
@@ -64,13 +64,13 @@ typedef struct HandlerPhpContext_t {
      * The path to the file to be handled by
      * the current php request.
      */
-    unsigned char filePath[VIRIATUM_MAX_PATH_SIZE];
+    unsigned char file_path[VIRIATUM_MAX_PATH_SIZE];
 
     /**
      * The content type for the current request being
      * made this is a header value.
      */
-    unsigned char contentType[VIRIATUM_MAX_HEADER_SIZE];
+    unsigned char content_type[VIRIATUM_MAX_HEADER_SIZE];
 
     /**
      * The cookie for the current request being
@@ -88,7 +88,7 @@ typedef struct HandlerPhpContext_t {
      * The pointer to the post data buffer to be
      * used in the processing.
      */
-    unsigned char *postData;
+    unsigned char *post_data;
 
     /**
      * The current value for the flags describing
@@ -100,70 +100,70 @@ typedef struct HandlerPhpContext_t {
      * The content length reference to the current
      * request.
      */
-    size_t contentLength;
+    size_t content_length;
 
     /**
      * The output nbuffer to be used for the
      * "printing" operation in the current context.
      */
-    struct LinkedBuffer_t *outputBuffer;
+    struct linked_buffer_t *output_buffer;
 
     /**
      * Enumeration value that controls the type
      * of the next header to be read from the
      * http input buffer.
      */
-    enum HttpHeader_e _nextHeader;
+    enum http_header_e _next_header;
 
     /**
      * String reference to the url buffer, usefull
      * for fast attribute calculation (eg: size).
      */
-    struct String_t _urlString;
+    struct string_t _url_string;
 
     /**
      * String reference to the query buffer, useful
      * for fast attribute calculation (eg: size).
      */
-    struct String_t _queryString;
+    struct string_t _query_string;
 
     /**
      * String reference to the file path buffer, useful
      * for fast attribute calculation (eg: size).
      */
-    struct String_t _filePathString;
+    struct string_t _file_path_string;
 
     /**
      * String reference to the content type buffer, useful
      * for fast attribute calculation (eg: size).
      */
-    struct String_t _contentTypeString;
+    struct string_t _content_type_string;
 
     /**
      * String reference to the cookie buffer, useful
      * for fast attribute calculation (eg: size).
      */
-    struct String_t _cookieString;
-} HandlerPhpContext;
+    struct string_t _cookie_string;
+} handler_php_context;
 
-ERROR_CODE createModPhpHttpHandler(struct ModPhpHttpHandler_t **modPhpHttpHandlerPonter, struct HttpHandler_t *httpHandlerPonter);
-ERROR_CODE deleteModPhpHttpHandler(struct ModPhpHttpHandler_t *modPhpHttpHandler);
-ERROR_CODE createHandlerPhpContext(struct HandlerPhpContext_t **handlerPhpContextPointer);
-ERROR_CODE deleteHandlerPhpContext(struct HandlerPhpContext_t *handlerPhpContext);
-ERROR_CODE setHandlerModule(struct HttpConnection_t *httpConnection);
-ERROR_CODE unsetHandlerModule(struct HttpConnection_t *httpConnection);
-ERROR_CODE urlCallbackHandlerModule(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize);
-ERROR_CODE headerFieldCallbackHandlerModule(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize);
-ERROR_CODE headerValueCallbackHandlerModule(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize);
-ERROR_CODE headersCompleteCallbackHandlerModule(struct HttpParser_t *httpParser);
-ERROR_CODE bodyCallbackHandlerModule(struct HttpParser_t *httpParser, const unsigned char *data, size_t dataSize);
-ERROR_CODE messageCompleteCallbackHandlerModule(struct HttpParser_t *httpParser);
-ERROR_CODE _setHttpParserHandlerModule(struct HttpParser_t *httpParser);
-ERROR_CODE _unsetHttpParserHandlerModule(struct HttpParser_t *httpParser);
-ERROR_CODE _setHttpSettingsHandlerModule(struct HttpSettings_t *httpSettings);
-ERROR_CODE _unsetHttpSettingsHandlerModule(struct HttpSettings_t *httpSettings);
-ERROR_CODE _messageBeginCallbackHandlerModule(struct HttpParser_t *httpParser);
-ERROR_CODE _sendResponseHandlerModule(struct HttpParser_t *httpParser);
-ERROR_CODE _sendResponseCallbackHandlerModule(struct Connection_t *connection, struct Data_t *data, void *parameters);
-ERROR_CODE _writeErrorConnection(struct HttpParser_t *httpParser, char *message);
-ERROR_CODE _updateRequest(struct HandlerPhpContext_t *handlerPhpContext);
+ERROR_CODE create_mod_php_http_handler(struct mod_php_http_handler_t **mod_php_http_handler_pointer, struct http_handler_t *http_handler_pointer);
+ERROR_CODE delete_mod_php_http_handler(struct mod_php_http_handler_t *mod_php_http_handler);
+ERROR_CODE create_handler_php_context(struct handler_php_context_t **handler_php_context_pointer);
+ERROR_CODE delete_handler_php_context(struct handler_php_context_t *handler_php_context);
+ERROR_CODE set_handler_module(struct http_connection_t *http_connection);
+ERROR_CODE unset_handler_module(struct http_connection_t *http_connection);
+ERROR_CODE url_callback_handler_module(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size);
+ERROR_CODE header_field_callback_handler_module(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size);
+ERROR_CODE header_value_callback_handler_module(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size);
+ERROR_CODE headers_complete_callback_handler_module(struct http_parser_t *http_parser);
+ERROR_CODE body_callback_handler_module(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size);
+ERROR_CODE message_complete_callback_handler_module(struct http_parser_t *http_parser);
+ERROR_CODE _set_http_parser_handler_module(struct http_parser_t *http_parser);
+ERROR_CODE _unset_http_parser_handler_module(struct http_parser_t *http_parser);
+ERROR_CODE _set_http_settings_handler_module(struct http_settings_t *http_settings);
+ERROR_CODE _unset_http_settings_handler_module(struct http_settings_t *http_settings);
+ERROR_CODE _message_begin_callback_handler_module(struct http_parser_t *http_parser);
+ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser);
+ERROR_CODE _send_response_callback_handler_module(struct connection_t *connection, struct Data_t *data, void *parameters);
+ERROR_CODE _write_error_connection(struct http_parser_t *http_parser, char *message);
+ERROR_CODE _update_request(struct handler_php_context_t *handler_php_context);

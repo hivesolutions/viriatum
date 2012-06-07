@@ -29,7 +29,7 @@
 
 #include "extension.h"
 
-zend_function_entry viriatumFunctions[] = {
+zend_function_entry viriatum_functions[] = {
     PHP_FE(viriatum_connections, NULL)
     PHP_FE(viriatum_name, NULL)
     PHP_FE(viriatum_version, NULL)
@@ -44,12 +44,12 @@ zend_function_entry viriatumFunctions[] = {
     { NULL, NULL, NULL }
 };
 
-zend_module_entry viriatumModule = {
+zend_module_entry viriatum_module = {
 #if ZEND_MODULE_API_NO >= 20010901
     STANDARD_MODULE_HEADER,
 #endif
     "viriatum",
-    viriatumFunctions,
+    viriatum_functions,
     NULL,
     NULL,
     NULL,
@@ -61,116 +61,116 @@ zend_module_entry viriatumModule = {
     STANDARD_MODULE_PROPERTIES
 };
 
-sapi_module_struct viriatumSapiModule = {
+sapi_module_struct viriatum_sapi_module = {
     "viriatum_handler",
     "Viriatum PHP Handler",
-    _moduleStartup,
+    _module_startup,
     php_module_shutdown_wrapper,
     NULL,
     NULL,
-    _moduleWrite,
-    _moduleFlush,
-    _moduleStat,
-    _moduleGetenv,
+    _module_write,
+    _module_flush,
+    _module_stat,
+    _module_getenv,
     php_error,
-    _moduleHeader,
-    _moduleSendHeaders,
+    _module_header,
+    _module_send_headers,
     NULL,
-    _moduleReadPost,
-    _moduleReadCookies,
-    _moduleRegister,
-    _moduleLog,
-    _moduleRequestTime,
+    _module_read_post,
+    _module_read_cookies,
+    _module_register,
+    _module_log,
+    _module_request_time,
     NULL,
     STANDARD_SAPI_MODULE_PROPERTIES
 };
 
-int _moduleStartup(sapi_module_struct *module) {
-    return php_module_startup(module, &viriatumModule, 1);
+int _module_startup(sapi_module_struct *module) {
+    return php_module_startup(module, &viriatum_module, 1);
 }
 
-int _moduleWrite(const char *data, uint dataSize TSRMLS_DC) {
+int _module_write(const char *data, uint data_size TSRMLS_DC) {
     /* allocates space for the buffer that will hold the write
     data that has just been sent to the write operation */
-    char *buffer = MALLOC(dataSize + 1);
-    buffer[dataSize] = '\0';
+    char *buffer = MALLOC(data_size + 1);
+    buffer[data_size] = '\0';
 
     /* copies the data into the buffer and then adds it to
     the current output linked buffer */
-    memcpy(buffer, data, dataSize);
-    appendLinkedBuffer(_outputBuffer, buffer, dataSize, 1);
+    memcpy(buffer, data, data_size);
+    append_linked_buffer(_output_buffer, buffer, data_size, 1);
 
     /* returns the size of the data that has just been
     writen into the internal structures */
-    return dataSize;
+    return data_size;
 }
 
-void _moduleFlush(void *context) {
+void _module_flush(void *context) {
 }
 
-struct stat *_moduleStat(TSRMLS_D) {
+struct stat *_module_stat(TSRMLS_D) {
     return NULL;
 }
 
-char *_moduleGetenv(char *name, size_t size TSRMLS_DC) {
+char *_module_getenv(char *name, size_t size TSRMLS_DC) {
     return NULL;
 }
 
-int _moduleHeader(sapi_header_struct *header, sapi_header_op_enum operation, sapi_headers_struct *headers TSRMLS_DC) {
-    STRCPY(_phpRequest.headers[_phpRequest.headerCount], 1024, header->header);
-    _phpRequest.headerCount++;
+int _module_header(sapi_header_struct *header, sapi_header_op_enum operation, sapi_headers_struct *headers TSRMLS_DC) {
+    STRCPY(_php_request.headers[_php_request.header_count], 1024, header->header);
+    _php_request.header_count++;
     return 0;
 }
 
-int _moduleSendHeaders(sapi_headers_struct *headers TSRMLS_DC) {
-    STRCPY(_phpRequest.mimeType, 1024, headers->mimetype);
+int _module_send_headers(sapi_headers_struct *headers TSRMLS_DC) {
+    STRCPY(_php_request.mime_type, 1024, headers->mimetype);
     return SAPI_HEADER_SENT_SUCCESSFULLY;
 }
 
-int _moduleReadPost(char *buffer, uint size TSRMLS_DC) {
-    unsigned char *postData = _phpRequest.phpContext->postData;
-    size_t contentLength = _phpRequest.phpContext->contentLength;
-    size_t _size = contentLength > size ? size : contentLength;
+int _module_read_post(char *buffer, uint size TSRMLS_DC) {
+    unsigned char *post_data = _php_request.php_context->post_data;
+    size_t content_length = _php_request.php_context->content_length;
+    size_t _size = content_length > size ? size : content_length;
 
-    if(postData == NULL) { return 0; }
+    if(post_data == NULL) { return 0; }
 
-    memcpy(buffer, _phpRequest.phpContext->postData, _size);
-    _phpRequest.phpContext->contentLength -= _size;
-    _phpRequest.phpContext->postData += _size;
+    memcpy(buffer, _php_request.php_context->post_data, _size);
+    _php_request.php_context->content_length -= _size;
+    _php_request.php_context->post_data += _size;
 
     return _size;
 }
 
-char *_moduleReadCookies(TSRMLS_D) {
-    return (char *) _phpRequest.phpContext->cookie;
+char *_module_read_cookies(TSRMLS_D) {
+    return (char *) _php_request.php_context->cookie;
 }
 
-void _moduleRegister(zval *_array TSRMLS_DC) {
+void _module_register(zval *_array TSRMLS_DC) {
     /* allocates space for the address string reference
     and then retrieves the current connection's socket
     address structure to be used to retrieve the address
     string value (for exporting) */
-    char *addressString;
-    SOCKET_ADDRESS address = _connection->socketAddress;
+    char *address_string;
+    SOCKET_ADDRESS address = _connection->socket_address;
 
     /* converts the address of the socket into the representing
     string value (for exporting the value) */
-    addressString = inet_ntoa(((SOCKET_ADDRESS_INTERNET *) &address)->sin_addr);
+    address_string = inet_ntoa(((SOCKET_ADDRESS_INTERNET *) &address)->sin_addr);
 
     /* registers a series og global wide variable representing the
     current interface (critical for correct php interpreter usage) */
     php_register_variable_safe("PHP_SELF", "-", 1, _array TSRMLS_CC);
     php_register_variable_safe("GATEWAY_INTERFACE", "viriatum", sizeof("viriatum") - 1, _array TSRMLS_CC);
-    php_register_variable_safe("QUERY_STRING", (char *) _phpRequest.phpContext->query, _phpRequest.phpContext->_queryString.length, _array TSRMLS_CC);
-    php_register_variable_safe("REQUEST_TYPE", (char *) _phpRequest.phpContext->method, strlen(_phpRequest.phpContext->method), _array TSRMLS_CC);
-    php_register_variable_safe("REMOTE_ADDR", addressString, strlen(addressString), _array TSRMLS_CC);
+    php_register_variable_safe("QUERY_STRING", (char *) _php_request.php_context->query, _php_request.php_context->_query_string.length, _array TSRMLS_CC);
+    php_register_variable_safe("REQUEST_TYPE", (char *) _php_request.php_context->method, strlen(_php_request.php_context->method), _array TSRMLS_CC);
+    php_register_variable_safe("REMOTE_ADDR", address_string, strlen(address_string), _array TSRMLS_CC);
 }
 
-void _moduleLog(char *message TSRMLS_DC) {
+void _module_log(char *message TSRMLS_DC) {
     V_DEBUG_F("%s\n", message);
 }
 
-double _moduleRequestTime(TSRMLS_D) {
+double _module_request_time(TSRMLS_D) {
     return 0;
 }
 
@@ -191,7 +191,7 @@ ZEND_MINFO_FUNCTION(viriatum_information) {
 }
 
 PHP_FUNCTION(viriatum_connections) {
-    RETURN_LONG(_service->connectionsList->size);
+    RETURN_LONG(_service->connections_list->size);
 }
 
 PHP_FUNCTION(viriatum_name) {

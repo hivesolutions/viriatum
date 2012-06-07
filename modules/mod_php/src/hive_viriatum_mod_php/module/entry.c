@@ -31,53 +31,53 @@
 
 unsigned char local = 0;
 
-ERROR_CODE createModPhpModule(struct ModPhpModule_t **modPhpModulePointer, struct Module_t *module) {
+ERROR_CODE create_mod_php_module(struct mod_php_module_t **mod_php_module_pointer, struct module_t *module) {
     /* retrieves the mod php module size */
-    size_t modPhpModuleSize = sizeof(struct ModPhpModule_t);
+    size_t mod_php_module_size = sizeof(struct mod_php_module_t);
 
     /* allocates space for the mod php module */
-    struct ModPhpModule_t *modPhpModule = (struct ModPhpModule_t *) MALLOC(modPhpModuleSize);
+    struct mod_php_module_t *mod_php_module = (struct mod_php_module_t *) MALLOC(mod_php_module_size);
 
     /* sets the mod php module attributes (default) values */
-    modPhpModule->httpHandler = NULL;
-    modPhpModule->modPhpHttpHandler = NULL;
+    mod_php_module->http_handler = NULL;
+    mod_php_module->mod_php_http_handler = NULL;
 
     /* sets the mod php module in the (upper) module substrate */
-    module->lower = (void *) modPhpModule;
+    module->lower = (void *) mod_php_module;
 
     /* sets the mod php module in the module pointer */
-    *modPhpModulePointer = modPhpModule;
+    *mod_php_module_pointer = mod_php_module;
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE deleteModPhpModule(struct ModPhpModule_t *modPhpModule) {
+ERROR_CODE delete_mod_php_module(struct mod_php_module_t *mod_php_module) {
     /* releases the mod php module */
-    FREE(modPhpModule);
+    FREE(mod_php_module);
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE startModule(struct Environment_t *environment, struct Module_t *module) {
+ERROR_CODE start_module(struct environment_t *environment, struct module_t *module) {
     /* allocates the mod php module */
-    struct ModPhpModule_t *modPhpModule;
+    struct mod_php_module_t *mod_php_module;
 
     /* allocates the http handler */
-    struct HttpHandler_t *httpHandler;
+    struct http_handler_t *http_handler;
 
     /* allocates the mod php http handler */
-    struct ModPhpHttpHandler_t *modPhpHttpHandler;
+    struct mod_php_http_handler_t *mod_php_http_handler;
 
     /* retrieves the name, version and description of
     the current module loaded */
-    unsigned char *name = nameViriatumModPhp();
-    unsigned char *version = versionViriatumModPhp();
-    unsigned char *description = descriptionViriatumModPhp();
+    unsigned char *name = name_viriatum_mod_php();
+    unsigned char *version = version_viriatum_mod_php();
+    unsigned char *description = description_viriatum_mod_php();
 
     /* retrieves the (environment) service */
-    struct Service_t *service = environment->service;
+    struct service_t *service = environment->service;
 
     /* prints a debug message */
     V_DEBUG_F("Starting the module '%s' (%s) v%s\n", name, description, version);
@@ -89,89 +89,89 @@ ERROR_CODE startModule(struct Environment_t *environment, struct Module_t *modul
     local = service->options->local;
 
     /* creates the mod php module */
-    createModPhpModule(&modPhpModule, module);
+    create_mod_php_module(&mod_php_module, module);
 
     /* populates the module structure */
-    infoModule(module);
+    info_module(module);
 
     /* loads the php state populating all the required values
     for state initialization */
-    _loadPhpState();
+    _load_php_state();
 
     /* creates the http handler */
-    service->createHttpHandler(service, &httpHandler, (unsigned char *) "php");
+    service->create_http_handler(service, &http_handler, (unsigned char *) "php");
 
     /* creates the mod php http handler */
-    createModPhpHttpHandler(&modPhpHttpHandler, httpHandler);
+    create_mod_php_http_handler(&mod_php_http_handler, http_handler);
 
     /* sets the http handler attributes */
-    httpHandler->set = setHandlerModule;
-    httpHandler->unset = unsetHandlerModule;
-    httpHandler->reset = NULL;
+    http_handler->set = set_handler_module;
+    http_handler->unset = unset_handler_module;
+    http_handler->reset = NULL;
 
     /* sets the mod php handler attributes */
-    modPhpHttpHandler->basePath = DEFAULT_BASE_PATH;
+    mod_php_http_handler->base_path = DEFAULT_BASE_PATH;
 
     /* sets the mod php module attributes */
-    modPhpModule->httpHandler = httpHandler;
-    modPhpModule->modPhpHttpHandler = modPhpHttpHandler;
+    mod_php_module->http_handler = http_handler;
+    mod_php_module->mod_php_http_handler = mod_php_http_handler;
 
     /* adds the http handler to the service */
-    service->addHttpHandler(service, httpHandler);
+    service->add_http_handler(service, http_handler);
 
     /* loads the service configuration for the http handler
     this should change some of it's behavior */
-    _loadConfiguration(service, modPhpHttpHandler);
+    _load_configuration(service, mod_php_http_handler);
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE stopModule(struct Environment_t *environment, struct Module_t *module) {
+ERROR_CODE stop_module(struct environment_t *environment, struct module_t *module) {
     /* retrieves the name, version and description of
     the current module loaded */
-    unsigned char *name = nameViriatumModPhp();
-    unsigned char *version = versionViriatumModPhp();
-    unsigned char *description = descriptionViriatumModPhp();
+    unsigned char *name = name_viriatum_mod_php();
+    unsigned char *version = version_viriatum_mod_php();
+    unsigned char *description = description_viriatum_mod_php();
 
     /* retrieves the (environment) service */
-    struct Service_t *service = environment->service;
+    struct service_t *service = environment->service;
 
     /* retrieves the mod php module (from the module) */
-    struct ModPhpModule_t *modPhpModule = (struct  ModPhpModule_t *) module->lower;
+    struct mod_php_module_t *mod_php_module = (struct  mod_php_module_t *) module->lower;
 
     /* retrieves the http handler from the mod php module */
-    struct HttpHandler_t *httpHandler = modPhpModule->httpHandler;
+    struct http_handler_t *http_handler = mod_php_module->http_handler;
 
     /* retrieves the mod php http handler from the mod php module */
-    struct ModPhpHttpHandler_t *modPhpHttpHandler = modPhpModule->modPhpHttpHandler;
+    struct mod_php_http_handler_t *mod_php_http_handler = mod_php_module->mod_php_http_handler;
 
     /* prints a debug message */
     V_DEBUG_F("Stoping the module '%s' (%s) v%s\n", name, description, version);
 
     /* removes the http handler from the service */
-    service->removeHttpHandler(service, httpHandler);
+    service->remove_http_handler(service, http_handler);
 
     /* in case the mod php http handler is valid and
     initialized (correct state) */
-    if(modPhpHttpHandler != NULL) {
+    if(mod_php_http_handler != NULL) {
         /* deletes the mod php http handler */
-        deleteModPhpHttpHandler(modPhpHttpHandler);
+        delete_mod_php_http_handler(mod_php_http_handler);
     }
 
     /* in case the http handler is valid and
     initialized (correct state) */
-    if(httpHandler != NULL) {
+    if(http_handler != NULL) {
         /* deletes the http handler */
-        service->deleteHttpHandler(service, httpHandler);
+        service->delete_http_handler(service, http_handler);
     }
 
     /* unloads the php state destroying all the required values
     for state destroyed */
-    _unloadPhpState();
+    _unload_php_state();
 
     /* deletes the mod php module */
-    deleteModPhpModule(modPhpModule);
+    delete_mod_php_module(mod_php_module);
 
     /* sets the global service reference this is no longer necessary
     because the module has been unloaded */
@@ -181,39 +181,39 @@ ERROR_CODE stopModule(struct Environment_t *environment, struct Module_t *module
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE infoModule(struct Module_t *module) {
+ERROR_CODE info_module(struct module_t *module) {
     /* retrieves the name */
-    unsigned char *name = nameViriatumModPhp();
+    unsigned char *name = name_viriatum_mod_php();
 
     /* retrieves the version */
-    unsigned char *version = versionViriatumModPhp();
+    unsigned char *version = version_viriatum_mod_php();
 
     /* populates the module structure */
     module->name = name;
     module->version = version;
     module->type = MODULE_TYPE_HTTP_HANDLER;
-    module->start = startModule;
-    module->stop = stopModule;
-    module->info = infoModule;
-    module->error = errorModule;
+    module->start = start_module;
+    module->stop = stop_module;
+    module->info = info_module;
+    module->error = error_module;
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE errorModule(unsigned char **messagePointer) {
+ERROR_CODE error_module(unsigned char **message_pointer) {
     /* sets the error message in the (error) message pointer */
-    *messagePointer = getLastErrorMessage();
+    *message_pointer = get_last_error_message();
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _loadConfiguration(struct Service_t *service, struct ModPhpHttpHandler_t *modPhpHttpHandler) {
+ERROR_CODE _load_configuration(struct service_t *service, struct mod_php_http_handler_t *mod_php_http_handler) {
     /* allocates space for both a configuration item reference
     (value) and for the configuration to be retrieved */
     void *value;
-    struct HashMap_t *configuration;
+    struct hash_map_t *configuration;
 
     /* in case the current service configuration is not set
     must return immediately (not possible to load it) */
@@ -221,36 +221,36 @@ ERROR_CODE _loadConfiguration(struct Service_t *service, struct ModPhpHttpHandle
 
     /* tries to retrieve the mod php section configuration from the configuration
     map in case none is found returns immediately no need to process anything more */
-    getValueStringHashMap(service->configuration, (unsigned char *) "mod_php", (void **) &configuration);
+    get_value_string_hash_map(service->configuration, (unsigned char *) "mod_php", (void **) &configuration);
     if(configuration == NULL) { RAISE_NO_ERROR; }
 
     /* tries ro retrieve the base path from the php configuration and in
     case it exists sets it in the mod php handler (attribute reference change) */
-    getValueStringHashMap(configuration, (unsigned char *) "base_path", &value);
-    if(value != NULL) { modPhpHttpHandler->basePath = (char *) value; }
+    get_value_string_hash_map(configuration, (unsigned char *) "base_path", &value);
+    if(value != NULL) { mod_php_http_handler->base_path = (char *) value; }
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _loadPhpState() {
+ERROR_CODE _load_php_state() {
     /* sets the proper functions for the ouput of the php execution
     this is equivalent to a redirect in the standard output and error */
-    php_embed_module.ub_write = _writePhpState;
-    php_embed_module.log_message = _logPhpState;
-    php_embed_module.sapi_error = _errorPhpState;
+    php_embed_module.ub_write = _write_php_state;
+    php_embed_module.log_message = _log_php_state;
+    php_embed_module.sapi_error = _error_php_state;
 
     /* sets a series of default handlers (callbacks) for the viriatum
     sapi module (required for stability issues) */
-    viriatumSapiModule.default_post_reader = php_default_post_reader;
-    viriatumSapiModule.treat_data = php_default_treat_data;
-    viriatumSapiModule.input_filter = php_default_input_filter;
+    viriatum_sapi_module.default_post_reader = php_default_post_reader;
+    viriatum_sapi_module.treat_data = php_default_treat_data;
+    viriatum_sapi_module.input_filter = php_default_input_filter;
 
     /* runs the start block for the php interpreter, this should
     be able to start all the internal structures, then loads the
     viriatum module to export the proper features */
-    sapi_startup(&viriatumSapiModule);
-    viriatumSapiModule.startup(&viriatumSapiModule);
+    sapi_startup(&viriatum_sapi_module);
+    viriatum_sapi_module.startup(&viriatum_sapi_module);
 
     /* forrces the logging of the error for the execution in the
     current php environment */
@@ -259,13 +259,13 @@ ERROR_CODE _loadPhpState() {
 
     /* starts the php state updating the major global value in
     the current interpreter state */
-    _startPhpState();
+    _start_php_state();
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _unloadPhpState() {
+ERROR_CODE _unload_php_state() {
     /* runs the stop block for the php interpreter, this should
     be able to stop all the internal structures */
     php_module_shutdown(TSRMLS_C);
@@ -275,9 +275,9 @@ ERROR_CODE _unloadPhpState() {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _reloadPhpState() {
-    _unloadPhpState();
-    _loadPhpState();
+ERROR_CODE _reload_php_state() {
+    _unload_php_state();
+    _load_php_state();
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -286,7 +286,7 @@ ERROR_CODE _reloadPhpState() {
 #ifdef _MSC_VER
 #pragma warning(disable:4700)
 #endif
-ERROR_CODE _startPhpState() {
+ERROR_CODE _start_php_state() {
     /* raises no error */
     RAISE_NO_ERROR;
 }
@@ -294,28 +294,28 @@ ERROR_CODE _startPhpState() {
 #pragma warning(default:4700)
 #endif
 
-int _writePhpState(const char *data, unsigned int dataSize TSRMLS_DC) {
+int _write_php_state(const char *data, unsigned int data_size TSRMLS_DC) {
     /* allocates space for the buffer that will hold the write
     data that has just been sent to the write operation */
-    char *buffer = MALLOC(dataSize + 1);
-    buffer[dataSize] = '\0';
+    char *buffer = MALLOC(data_size + 1);
+    buffer[data_size] = '\0';
 
     /* copies the data into the buffer and then adds it to
     the current output linked buffer */
-    memcpy(buffer, data, dataSize);
-    appendLinkedBuffer(_outputBuffer, buffer, dataSize, 1);
+    memcpy(buffer, data, data_size);
+    append_linked_buffer(_output_buffer, buffer, data_size, 1);
 
     /* returns the size of the data that has just been
     writen into the internal structures */
-    return dataSize;
+    return data_size;
 }
 
-void _logPhpState(char *message) {
+void _log_php_state(char *message) {
     /* logs the error message (critical error) */
     V_ERROR_F("%s\n", message);
 }
 
-void _errorPhpState(int type, const char *message, ...) {
+void _error_php_state(int type, const char *message, ...) {
     /* check if the kind of error is of type critical in such case it should
     return immediately */
     if (type != E_ERROR && type != E_USER_ERROR && type != E_CORE_ERROR && type != E_PARSE && type != E_COMPILE_ERROR) {
