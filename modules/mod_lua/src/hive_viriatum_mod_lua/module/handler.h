@@ -72,6 +72,6 @@ ERROR_CODE _set_http_settings_handler_module(struct http_settings_t *http_settin
 ERROR_CODE _unset_http_settings_handler_module(struct http_settings_t *http_settings);
 ERROR_CODE _message_begin_callback_handler_module(struct http_parser_t *http_parser);
 ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser);
-ERROR_CODE _send_response_callback_handler_module(struct connection_t *connection, struct Data_t *data, void *parameters);
+ERROR_CODE _send_response_callback_handler_module(struct connection_t *connection, struct data_t *data, void *parameters);
 ERROR_CODE _write_error_connection(struct http_parser_t *http_parser, char *message);
 int _lua_write_connection(lua_State *lua_state);
