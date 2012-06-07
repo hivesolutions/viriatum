@@ -51,7 +51,7 @@ typedef struct http_client_connection_t {
      * The (upper) io connection that owns
      * manages this connection.
      */
-    struct IoConnection_t *io_connection;
+    struct io_connection_t *io_connection;
 
     /**
      * Structure containig the settings to be
@@ -68,10 +68,10 @@ typedef struct http_client_connection_t {
 
 typedef struct http_client_parameters_t {
     char *url;
-} HttpClientParameters;
+} http_client_parameters;
 
-ERROR_CODE create_http_client_connection(struct http_client_connection_t **http_client_connection_pointer, struct IoConnection_t *io_connection);
+ERROR_CODE create_http_client_connection(struct http_client_connection_t **http_client_connection_pointer, struct io_connection_t *io_connection);
 ERROR_CODE delete_http_client_connection(struct http_client_connection_t *http_client_connection);
-ERROR_CODE data_handler_stream_http_client(struct IoConnection_t *io_connection, unsigned char *buffer, size_t buffer_size);
-ERROR_CODE open_handler_stream_http_client(struct IoConnection_t *io_connection);
-ERROR_CODE close_handler_stream_http_client(struct IoConnection_t *io_connection);
+ERROR_CODE data_handler_stream_http_client(struct io_connection_t *io_connection, unsigned char *buffer, size_t buffer_size);
+ERROR_CODE open_handler_stream_http_client(struct io_connection_t *io_connection);
+ERROR_CODE close_handler_stream_http_client(struct io_connection_t *io_connection);

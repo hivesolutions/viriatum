@@ -31,12 +31,12 @@
 #include "../system/system.h"
 
 /* forward references (avoids loop) */
-struct Data_t;
-struct Connection_t;
+struct data_t;
+struct connection_t;
 struct http_connection_t;
 
-ERROR_CODE register_handler_default(struct Service_t *service);
-ERROR_CODE unregister_handler_default(struct Service_t *service);
+ERROR_CODE register_handler_default(struct service_t *service);
+ERROR_CODE unregister_handler_default(struct service_t *service);
 ERROR_CODE set_handler_default(struct http_connection_t *http_connection);
 ERROR_CODE unset_handler_default(struct http_connection_t *http_connection);
 ERROR_CODE message_begin_callback_handler_default(struct http_parser_t *http_parser);
@@ -51,4 +51,4 @@ ERROR_CODE _unset_http_parser_handler_default(struct http_parser_t *http_parser)
 ERROR_CODE _set_http_settings_handler_default(struct http_settings_t *http_settings);
 ERROR_CODE _unset_http_settings_handler_default(struct http_settings_t *http_settings);
 ERROR_CODE _send_response_handler_default(struct http_parser_t *http_parser);
-ERROR_CODE _send_response_callback_handler_default(struct Connection_t *connection, struct Data_t *data, void *parameters);
+ERROR_CODE _send_response_callback_handler_default(struct connection_t *connection, struct data_t *data, void *parameters);

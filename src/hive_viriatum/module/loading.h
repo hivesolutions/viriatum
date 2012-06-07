@@ -109,7 +109,7 @@ typedef struct environment_t {
     /**
      * The current environment service.
      */
-    struct Service_t *service;
+    struct service_t *service;
 } environment;
 
 /**
@@ -226,7 +226,7 @@ ERROR_CODE delete_module(struct module_t *module);
  * containing the module.
  * @return The resulting error code.
  */
-ERROR_CODE load_module(struct Service_t *service, unsigned char *module_path);
+ERROR_CODE load_module(struct service_t *service, unsigned char *module_path);
 
 /**
  * Unloads the module in the given module structure.
@@ -239,7 +239,7 @@ ERROR_CODE load_module(struct Service_t *service, unsigned char *module_path);
  * to be unloaded.
  * @return The resulting error code.
  */
-ERROR_CODE unload_module(struct Service_t *service, struct module_t *module);
+ERROR_CODE unload_module(struct service_t *service, struct module_t *module);
 
 /**
  * Retrieves the (last) error message for the given module.

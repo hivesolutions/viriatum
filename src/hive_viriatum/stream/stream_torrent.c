@@ -32,52 +32,52 @@
 #define TORRENT_PROTOCOL_STRING "BitTorrent protocol"
 #define TORRENT_PROTOCOL_SIZE 19
 
-typedef struct TorrentHandshake_t {
+typedef struct torrent_handshake_t {
     unsigned char pstrlen;
     char pstr[TORRENT_PROTOCOL_SIZE];
     unsigned char reserved[8];
     unsigned char info_hash[20];
     unsigned char peer_id[20];
-} TorrentHandshake;
+} torrent_handshake;
 
-ERROR_CODE createTorrentConnection(struct TorrentConnection_t **torrentConnectionPointer, struct IoConnection_t *io_connection) {
+ERROR_CODE create_torrent_connection(struct torrent_connection_t **torrent_connection_pointer, struct io_connection_t *io_connection) {
     /* retrieves the torrent connection size */
-    size_t torrentConnectionSize = sizeof(struct TorrentConnection_t);
+    size_t torrent_connection_size = sizeof(struct torrent_connection_t);
 
     /* allocates space for the torrent connection */
-    struct TorrentConnection_t *torrentConnection = (struct TorrentConnection_t *) MALLOC(torrentConnectionSize);
+    struct torrent_connection_t *torrent_connection = (struct torrent_connection_t *) MALLOC(torrent_connection_size);
 
     /* retrieves the service associated with the connection */
-    struct Service_t *service = io_connection->connection->service;
+    struct service_t *service = io_connection->connection->service;
 
     /* sets the torrent handler attributes (default) values */
-    torrentConnection->io_connection = io_connection;
-    torrentConnection->torrentHandler = NULL;
+    torrent_connection->io_connection = io_connection;
+    torrent_connection->torrent_handler = NULL;
 
     /* sets the torrent connection in the (upper) io connection substrate */
-    io_connection->lower = torrentConnection;
+    io_connection->lower = torrent_connection;
 
     /* retrieves the current (default) service handler and sets the
     connection on it, then sets this handler as the base handler */
-  /*  torrentHandler = service->torrentHandler;
-    torrentConnection->base_handler = torrentHandler;*/
+  /*  torrent_handler = service->torrent_handler;
+    torrent_connection->base_handler = torrent_handler;*/
 
     /* sets the torrent connection in the torrent connection pointer */
-    *torrentConnectionPointer = torrentConnection;
+    *torrent_connection_pointer = torrent_connection;
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE deleteTorrentConnection(struct TorrentConnection_t *torrentConnection) {
+ERROR_CODE delete_torrent_connection(struct torrent_connection_t *torrent_connection) {
     /* releases the torrent connection */
-    FREE(torrentConnection);
+    FREE(torrent_connection);
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE dataHandlerStreamTorrent(struct IoConnection_t *io_connection, unsigned char *buffer, size_t buffer_size) {
+ERROR_CODE data_handler_stream_torrent(struct io_connection_t *io_connection, unsigned char *buffer, size_t buffer_size) {
     char *_buffer = (char *) MALLOC(buffer_size + 1);
 
     memcpy(_buffer, buffer, buffer_size);
@@ -89,16 +89,16 @@ ERROR_CODE dataHandlerStreamTorrent(struct IoConnection_t *io_connection, unsign
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE openHandlerStreamTorrent(struct IoConnection_t *io_connection) {
+ERROR_CODE open_handler_stream_torrent(struct io_connection_t *io_connection) {
     /* allocates space for the data to be read from the
     info hash file */
     char *data;
 
     /* allocates the torrent connection */
-    struct TorrentConnection_t *torrentConnection;
+    struct torrent_connection_t *torrent_connection;
 
     /* allocates the response buffer */
-    struct TorrentHandshake_t *response_buffer = (struct TorrentHandshake_t *) MALLOC(sizeof(struct TorrentHandshake_t));
+    struct torrent_handshake_t *response_buffer = (struct torrent_handshake_t *) MALLOC(sizeof(struct torrent_handshake_t));
 
     FILE *file = fopen("C:/info_hash.txt", "rb");
     if(file == NULL) { RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem opening hash file"); }
@@ -107,7 +107,7 @@ ERROR_CODE openHandlerStreamTorrent(struct IoConnection_t *io_connection) {
 
 
     /* creates the torrent connection */
-    createTorrentConnection(&torrentConnection, io_connection);
+    create_torrent_connection(&torrent_connection, io_connection);
 
 
 
@@ -119,19 +119,19 @@ ERROR_CODE openHandlerStreamTorrent(struct IoConnection_t *io_connection) {
 
 
     /* writes the response to the connection, registers for the appropriate callbacks */
-    write_connection(io_connection->connection, (unsigned char *) response_buffer, sizeof(struct TorrentHandshake_t), NULL, NULL);
+    write_connection(io_connection->connection, (unsigned char *) response_buffer, sizeof(struct torrent_handshake_t), NULL, NULL);
 
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE closeHandlerStreamTorrent(struct IoConnection_t *io_connection) {
+ERROR_CODE close_handler_stream_torrent(struct io_connection_t *io_connection) {
     /* retrieves the torrent connection */
-    struct TorrentConnection_t *torrentConnection = (struct TorrentConnection_t *) io_connection->lower;
+    struct torrent_connection_t *torrent_connection = (struct torrent_connection_t *) io_connection->lower;
 
     /* deletes the torrent connection */
-    deleteTorrentConnection(torrentConnection);
+    delete_torrent_connection(torrent_connection);
 
     /* raises no error */
     RAISE_NO_ERROR;

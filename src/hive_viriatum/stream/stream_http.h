@@ -69,7 +69,7 @@ typedef struct http_handler_t {
      * The creation of the handler implies the
      * registration of it in this service.
      */
-    struct Service_t *service;
+    struct service_t *service;
 
     /**
      * Reference to the lower level
@@ -87,7 +87,7 @@ typedef struct http_connection_t {
      * The (upper) io connection that owns
      * manages this connection.
      */
-    struct IoConnection_t *io_connection;
+    struct io_connection_t *io_connection;
 
     /**
      * Structure containig the settings to be
@@ -141,8 +141,8 @@ typedef struct http_connection_t {
 
 ERROR_CODE create_http_handler(struct http_handler_t **http_handler_pointer, unsigned char *name);
 ERROR_CODE delete_http_handler(struct http_handler_t *http_handler);
-ERROR_CODE create_http_connection(struct http_connection_t **http_connection_pointer, struct IoConnection_t *io_connection);
+ERROR_CODE create_http_connection(struct http_connection_t **http_connection_pointer, struct io_connection_t *io_connection);
 ERROR_CODE delete_http_connection(struct http_connection_t *http_connection);
-ERROR_CODE data_handler_stream_http(struct IoConnection_t *io_connection, unsigned char *buffer, size_t buffer_size);
-ERROR_CODE open_handler_stream_http(struct IoConnection_t *io_connection);
-ERROR_CODE close_handler_stream_http(struct IoConnection_t *io_connection);
+ERROR_CODE data_handler_stream_http(struct io_connection_t *io_connection, unsigned char *buffer, size_t buffer_size);
+ERROR_CODE open_handler_stream_http(struct io_connection_t *io_connection);
+ERROR_CODE close_handler_stream_http(struct io_connection_t *io_connection);

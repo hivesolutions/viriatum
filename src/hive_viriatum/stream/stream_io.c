@@ -29,24 +29,24 @@
 
 #include "stream_io.h"
 
-void createIoConnection(struct IoConnection_t **ioConnectionPointer, struct Connection_t *connection) {
+void create_io_connection(struct io_connection_t **io_connection_pointer, struct connection_t *connection) {
     /* retrieves the io connection size */
-    size_t ioConnectionSize = sizeof(struct IoConnection_t);
+    size_t io_connection_size = sizeof(struct io_connection_t);
 
     /* allocates space for the io connection */
-    struct IoConnection_t *io_connection = (struct IoConnection_t *) MALLOC(ioConnectionSize);
+    struct io_connection_t *io_connection = (struct io_connection_t *) MALLOC(io_connection_size);
 
     /* sets the io connection connection */
     io_connection->connection = connection;
 
     /* sets the on data to unset */
-    io_connection->onData = NULL;
+    io_connection->on_data = NULL;
 
     /* sets the on open to unset */
-    io_connection->onOpen = NULL;
+    io_connection->on_open = NULL;
 
     /* sets the on close to unset */
-    io_connection->onClose = NULL;
+    io_connection->on_close = NULL;
 
     /* sets the lower to unset */
     io_connection->lower = NULL;
@@ -55,15 +55,15 @@ void createIoConnection(struct IoConnection_t **ioConnectionPointer, struct Conn
     connection->lower = (void *) io_connection;
 
     /* sets the io connection in the io connection pointer */
-    *ioConnectionPointer = io_connection;
+    *io_connection_pointer = io_connection;
 }
 
-void deleteIoConnection(struct IoConnection_t *io_connection) {
+void delete_io_connection(struct io_connection_t *io_connection) {
     /* releases the io connection */
     FREE(io_connection);
 }
 
-ERROR_CODE acceptHandlerStreamIo(struct Connection_t *connection) {
+ERROR_CODE accept_handler_stream_io(struct connection_t *connection) {
     /* allocates the socket handle */
     SOCKET_HANDLE socket_handle;
 
@@ -71,18 +71,18 @@ ERROR_CODE acceptHandlerStreamIo(struct Connection_t *connection) {
     SOCKET_ADDRESS socket_address;
 
     /* allocates the (client) connection */
-    struct Connection_t *clientConnection;
+    struct connection_t *client_connection;
 
     /* sets the flags to be used in socket */
     SOCKET_FLAGS flags = 1;
 
     /* calculates the size of the socket address */
-    SOCKET_ADDRESS_SIZE clientSocketAddressSize = sizeof(SOCKET_ADDRESS);
+    SOCKET_ADDRESS_SIZE client_socket_address_size = sizeof(SOCKET_ADDRESS);
 
     /* iterates continuously */
     while(1) {
         /* accepts the socket, retrieving the socket handle */
-        socket_handle = SOCKET_ACCEPT(connection->socket_handle, &socket_address, clientSocketAddressSize);
+        socket_handle = SOCKET_ACCEPT(connection->socket_handle, &socket_address, client_socket_address_size);
 
         /* in case there was an error accepting the socket */
         if(SOCKET_TEST_ERROR(socket_handle)) {
@@ -101,33 +101,33 @@ ERROR_CODE acceptHandlerStreamIo(struct Connection_t *connection) {
             V_DEBUG_F("Accepted connection: %d\n", socket_handle);
 
             /* creates the (client) connection */
-            createConnection(&clientConnection, socket_handle);
+            create_connection(&client_connection, socket_handle);
 
             /* sets the socket address in the (client) connection
             this is going to be very usefull for later connection
             identification (address, port, etc.) */
-            clientConnection->socket_address = socket_address;
+            client_connection->socket_address = socket_address;
 
             /* sets the service select service as the service in the (client)  connection */
-            clientConnection->service = connection->service;
+            client_connection->service = connection->service;
 
             /* sets the base hanlding functions in the client connection */
-            clientConnection->openConnection = openConnection;
-            clientConnection->close_connection = close_connection;
-            clientConnection->write_connection = write_connection;
-            clientConnection->registerWrite = registerWriteConnection;
-            clientConnection->unregisterWrite = unregisterWriteConnection;
+            client_connection->open_connection = open_connection;
+            client_connection->close_connection = close_connection;
+            client_connection->write_connection = write_connection;
+            client_connection->register_write = register_write_connection;
+            client_connection->unregister_write = unregister_write_connection;
 
             /* sets the various stream io connection callbacks
             in the client connection */
-            clientConnection->on_read = readHandlerStreamIo;
-            clientConnection->on_write = writeHandlerStreamIo;
-            clientConnection->on_error = errorHandlerStreamIo;
-            clientConnection->onOpen = openHandlerStreamIo;
-            clientConnection->onClose = closeHandlerStreamIo;
+            client_connection->on_read = read_handler_stream_io;
+            client_connection->on_write = write_handler_stream_io;
+            client_connection->on_error = error_handler_stream_io;
+            client_connection->on_open = open_handler_stream_io;
+            client_connection->on_close = close_handler_stream_io;
 
             /* opens the connection */
-            clientConnection->openConnection(clientConnection);
+            client_connection->open_connection(client_connection);
         }
 
         /* in case viriatum is set to blocking */
@@ -141,7 +141,7 @@ ERROR_CODE acceptHandlerStreamIo(struct Connection_t *connection) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE readHandlerStreamIo(struct Connection_t *connection) {
+ERROR_CODE read_handler_stream_io(struct connection_t *connection) {
     /* allocates the number of bytes */
     SOCKET_ERROR_CODE number_bytes;
 
@@ -158,7 +158,7 @@ ERROR_CODE readHandlerStreamIo(struct Connection_t *connection) {
     ERROR_CODE error = 0;
 
     /* retrieves the io connection */
-    struct IoConnection_t *io_connection = (struct IoConnection_t *) connection->lower;
+    struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
 
     /* iterates continuously */
     while(1) {
@@ -184,10 +184,10 @@ ERROR_CODE readHandlerStreamIo(struct Connection_t *connection) {
         /* in case there was an error receiving from the socket */
         if(SOCKET_TEST_ERROR(number_bytes)) {
             /* retrieves the receving error code */
-            SOCKET_ERROR_CODE receivingErrorCode = SOCKET_GET_ERROR_CODE(number_bytes);
+            SOCKET_ERROR_CODE receiving_error_code = SOCKET_GET_ERROR_CODE(number_bytes);
 
             /* switches over the receiving error code */
-            switch(receivingErrorCode) {
+            switch(receiving_error_code) {
                 case SOCKET_WOULDBLOCK:
                     /* prints a debug message */
                     V_DEBUG("Read structures not ready: WOULDBLOCK\n");
@@ -200,7 +200,7 @@ ERROR_CODE readHandlerStreamIo(struct Connection_t *connection) {
 
                 default:
                     /* prints the error */
-                    V_DEBUG_F("Problem receiving from socket: %d\n", receivingErrorCode);
+                    V_DEBUG_F("Problem receiving from socket: %d\n", receiving_error_code);
 
                     /* sets the error flag */
                     error = 1;
@@ -231,12 +231,12 @@ ERROR_CODE readHandlerStreamIo(struct Connection_t *connection) {
         /* in case there's no error */
         case 0:
             /* in case the on data handler is defined */
-            if(io_connection->onData != NULL) {
+            if(io_connection->on_data != NULL) {
                 /* prints a debug message */
                 V_DEBUG("Calling on data handler\n");
 
                 /* calls the on data handler */
-                io_connection->onData(io_connection, buffer, buffer_size);
+                io_connection->on_data(io_connection, buffer, buffer_size);
 
                 /* prints a debug message */
                 V_DEBUG("Finished calling on data handler\n");
@@ -256,12 +256,12 @@ ERROR_CODE readHandlerStreamIo(struct Connection_t *connection) {
         /* in case it's a non fatal error */
         case 2:
             /* in case the on data handler is defined */
-            if(io_connection->onData != NULL) {
+            if(io_connection->on_data != NULL) {
                 /* prints a debug message */
                 V_DEBUG("Calling on data handler\n");
 
                 /* calls the on data handler */
-                io_connection->onData(io_connection, buffer, buffer_size);
+                io_connection->on_data(io_connection, buffer, buffer_size);
 
                 /* prints a debug message */
                 V_DEBUG("Finished calling on data handler\n");
@@ -280,12 +280,12 @@ ERROR_CODE readHandlerStreamIo(struct Connection_t *connection) {
     RAISE_ERROR(error);
 }
 
-ERROR_CODE writeHandlerStreamIo(struct Connection_t *connection) {
+ERROR_CODE write_handler_stream_io(struct connection_t *connection) {
     /* allocates the number of bytes */
     SOCKET_ERROR_CODE number_bytes;
 
     /* allocates the data */
-    struct Data_t *data;
+    struct data_t *data;
 
     /* flag and value controlling the state of the write */
     ERROR_CODE error = 0;
@@ -296,7 +296,7 @@ ERROR_CODE writeHandlerStreamIo(struct Connection_t *connection) {
         V_DEBUG("Peeking value from write queue\n");
 
         /* peeks a value (data) from the linked list (write queue) */
-        peek_value_linked_list(connection->writeQueue, (void **) &data);
+        peek_value_linked_list(connection->write_queue, (void **) &data);
 
         /* in case the data is invalid (list is empty) */
         if(data == NULL) {
@@ -313,10 +313,10 @@ ERROR_CODE writeHandlerStreamIo(struct Connection_t *connection) {
         /* in case there was an error receiving from the socket */
         if(SOCKET_TEST_ERROR(number_bytes)) {
             /* retrieves the receving error code */
-            SOCKET_ERROR_CODE receivingErrorCode = SOCKET_GET_ERROR_CODE(number_bytes);
+            SOCKET_ERROR_CODE receiving_error_code = SOCKET_GET_ERROR_CODE(number_bytes);
 
             /* switches over the receiving error code */
-            switch(receivingErrorCode) {
+            switch(receiving_error_code) {
                 case SOCKET_WOULDBLOCK:
                     /* prints a debug message */
                     V_DEBUG("Write structures not ready: WOULDBLOCK\n");
@@ -329,7 +329,7 @@ ERROR_CODE writeHandlerStreamIo(struct Connection_t *connection) {
 
                 default:
                     /* prints the error */
-                    V_DEBUG_F("Problem sending from socket: %d\n", receivingErrorCode);
+                    V_DEBUG_F("Problem sending from socket: %d\n", receiving_error_code);
 
                     /* sets the error flag */
                     error = 1;
@@ -364,7 +364,7 @@ ERROR_CODE writeHandlerStreamIo(struct Connection_t *connection) {
         }
 
         /* pops a value (data) from the linked list (write queue) */
-        pop_value_linked_list(connection->writeQueue, (void **) &data, 1);
+        pop_value_linked_list(connection->write_queue, (void **) &data, 1);
 
         /* in case the data callback is set */
         if(data->callback != NULL) {
@@ -372,7 +372,7 @@ ERROR_CODE writeHandlerStreamIo(struct Connection_t *connection) {
             V_DEBUG("Calling write callback\n");
 
             /* calls the callback with the callback parameters */
-            data->callback(connection, data, data->callbackParameters);
+            data->callback(connection, data, data->callback_parameters);
 
             /* prints a debug message */
             V_DEBUG("Finished calling write callback\n");
@@ -382,7 +382,7 @@ ERROR_CODE writeHandlerStreamIo(struct Connection_t *connection) {
         V_DEBUG("Deleting data (cleanup structures)\n");
 
         /* deletes the data */
-        deleteData(data);
+        delete_data(data);
 
         /* in case the connection has been closed */
         if(connection->status == STATUS_CLOSED) {
@@ -402,7 +402,7 @@ ERROR_CODE writeHandlerStreamIo(struct Connection_t *connection) {
         /* in case there's no error */
         case 0:
             /* unregisters the connection for write */
-            connection->unregisterWrite(connection);
+            connection->unregister_write(connection);
 
             /* breaks the switch */
             break;
@@ -430,7 +430,7 @@ ERROR_CODE writeHandlerStreamIo(struct Connection_t *connection) {
     RAISE_ERROR(error);
 }
 
-ERROR_CODE errorHandlerStreamIo(struct Connection_t *connection) {
+ERROR_CODE error_handler_stream_io(struct connection_t *connection) {
     /* closes the connection */
     connection->close_connection(connection);
 
@@ -438,48 +438,48 @@ ERROR_CODE errorHandlerStreamIo(struct Connection_t *connection) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE openHandlerStreamIo(struct Connection_t *connection) {
+ERROR_CODE open_handler_stream_io(struct connection_t *connection) {
     /* allocates the io connection */
-    struct IoConnection_t *io_connection;
+    struct io_connection_t *io_connection;
 
     /* creates the io connection */
-    createIoConnection(&io_connection, connection);
+    create_io_connection(&io_connection, connection);
 
     /* switches over the connection "desired" protocol to
     set the appropriate connection handlers */
     switch(connection->protocol) {
         case HTTP_PROTOCOL:
-            io_connection->onData = data_handler_stream_http;
-            io_connection->onOpen = open_handler_stream_http;
-            io_connection->onClose = close_handler_stream_http;
+            io_connection->on_data = data_handler_stream_http;
+            io_connection->on_open = open_handler_stream_http;
+            io_connection->on_close = close_handler_stream_http;
             break;
 
         case HTTP_CLIENT_PROTOCOL:
-            io_connection->onData = data_handler_stream_http_client;
-            io_connection->onOpen = open_handler_stream_http_client;
-            io_connection->onClose = close_handler_stream_http_client;
+            io_connection->on_data = data_handler_stream_http_client;
+            io_connection->on_open = open_handler_stream_http_client;
+            io_connection->on_close = close_handler_stream_http_client;
             break;
 
         case TORRENT_PROTOCOL:
-            io_connection->onData = dataHandlerStreamTorrent;
-            io_connection->onOpen = openHandlerStreamTorrent;
-            io_connection->onClose = closeHandlerStreamTorrent;
+            io_connection->on_data = data_handler_stream_torrent;
+            io_connection->on_open = open_handler_stream_torrent;
+            io_connection->on_close = close_handler_stream_torrent;
             break;
 
         default:
-            io_connection->onData = data_handler_stream_http;
-            io_connection->onOpen = open_handler_stream_http;
-            io_connection->onClose = close_handler_stream_http;
+            io_connection->on_data = data_handler_stream_http;
+            io_connection->on_open = open_handler_stream_http;
+            io_connection->on_close = close_handler_stream_http;
             break;
     }
 
     /* in case the on open handler is defined */
-    if(io_connection->onOpen != NULL) {
+    if(io_connection->on_open != NULL) {
         /* prints a debug message */
         V_DEBUG("Calling on open handler\n");
 
         /* calls the on open handler */
-        io_connection->onOpen(io_connection);
+        io_connection->on_open(io_connection);
 
         /* prints a debug message */
         V_DEBUG("Finished calling on open handler\n");
@@ -489,24 +489,24 @@ ERROR_CODE openHandlerStreamIo(struct Connection_t *connection) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE closeHandlerStreamIo(struct Connection_t *connection) {
+ERROR_CODE close_handler_stream_io(struct connection_t *connection) {
     /* retrieves the io connection */
-    struct IoConnection_t *io_connection = (struct IoConnection_t *) connection->lower;
+    struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
 
     /* in case the on close handler is defined */
-    if(io_connection->onClose != NULL) {
+    if(io_connection->on_close != NULL) {
         /* prints a debug message */
         V_DEBUG("Calling on close handler\n");
 
         /* calls the on close handler */
-        io_connection->onClose(io_connection);
+        io_connection->on_close(io_connection);
 
         /* prints a debug message */
         V_DEBUG("Finished calling on close handler\n");
     }
 
     /* deletes the io connection */
-    deleteIoConnection(io_connection);
+    delete_io_connection(io_connection);
 
     /* raise no error */
     RAISE_NO_ERROR;

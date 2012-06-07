@@ -30,7 +30,7 @@
 #include "stream_io.h"
 
 /* forward references (avoids loop) */
-struct TorrentConnection_t;
+struct torrent_connection_t;
 
 /**
  * Function used to update the given torrent connection
@@ -39,18 +39,18 @@ struct TorrentConnection_t;
  * @param http_connection The http connection to be
  * update with new information.
  */
-typedef ERROR_CODE (*torrentConnectionUpdate) (struct TorrentConnection_t *torrentConnection);
+typedef ERROR_CODE (*torrent_connection_update) (struct torrent_connection_t *torrent_connection);
 
 /**
  * Structure defining a logical
  * torrent connection.
  */
-typedef struct TorrentConnection_t {
+typedef struct torrent_connection_t {
     /**
      * The (upper) io connection that owns
      * manages this connection.
      */
-    struct IoConnection_t *io_connection;
+    struct io_connection_t *io_connection;
 
     /**
      * The handler currently being used to handle
@@ -60,11 +60,11 @@ typedef struct TorrentConnection_t {
      * This is an internal value and must be used
      * with care.
      */
-    struct TorrentHandler_t *torrentHandler;
-} TorrentConnection;
+    struct TorrentHandler_t *torrent_handler;
+} torrent_connection;
 
-ERROR_CODE createTorrentConnection(struct TorrentConnection_t **torrentConnectionPointer, struct IoConnection_t *io_connection);
-ERROR_CODE deleteTorrentConnection(struct TorrentConnection_t *torrentConnection);
-ERROR_CODE dataHandlerStreamTorrent(struct IoConnection_t *io_connection, unsigned char *buffer, size_t buffer_size);
-ERROR_CODE openHandlerStreamTorrent(struct IoConnection_t *io_connection);
-ERROR_CODE closeHandlerStreamTorrent(struct IoConnection_t *io_connection);
+ERROR_CODE create_torrent_connection(struct torrent_connection_t **torrent_connection_pointer, struct io_connection_t *io_connection);
+ERROR_CODE delete_torrent_connection(struct torrent_connection_t *torrent_connection);
+ERROR_CODE data_handler_stream_torrent(struct io_connection_t *io_connection, unsigned char *buffer, size_t buffer_size);
+ERROR_CODE open_handler_stream_torrent(struct io_connection_t *io_connection);
+ERROR_CODE close_handler_stream_torrent(struct io_connection_t *io_connection);

@@ -47,8 +47,8 @@
 #define DISPATCH_DEFAULT_HANDLER "file"
 
 /* forward references (avoids loop) */
-struct Data_t;
-struct Connection_t;
+struct data_t;
+struct connection_t;
 struct http_connection_t;
 
 typedef struct dispatch_handler_t {
@@ -78,8 +78,8 @@ typedef struct dispatch_handler_t {
 
 ERROR_CODE create_dispatch_handler(struct dispatch_handler_t **dispatch_handler_pointer, struct http_handler_t *http_handler);
 ERROR_CODE delete_dispatch_handler(struct dispatch_handler_t *dispatch_handler);
-ERROR_CODE register_handler_dispatch(struct Service_t *service);
-ERROR_CODE unregister_handler_dispatch(struct Service_t *service);
+ERROR_CODE register_handler_dispatch(struct service_t *service);
+ERROR_CODE unregister_handler_dispatch(struct service_t *service);
 ERROR_CODE set_handler_dispatch(struct http_connection_t *http_connection);
 ERROR_CODE unset_handler_dispatch(struct http_connection_t *http_connection);
 ERROR_CODE reset_handler_dispatch(struct http_connection_t *http_connection);
@@ -95,4 +95,4 @@ ERROR_CODE _unset_http_parser_handler_dispatch(struct http_parser_t *http_parser
 ERROR_CODE _set_http_settings_handler_dispatch(struct http_settings_t *http_settings);
 ERROR_CODE _unset_http_settings_handler_dispatch(struct http_settings_t *http_settings);
 ERROR_CODE _send_response_handler_dispatch(struct http_parser_t *http_parser);
-ERROR_CODE _send_response_callback_handler_dispatch(struct Connection_t *connection, struct Data_t *data, void *parameters);
+ERROR_CODE _send_response_callback_handler_dispatch(struct connection_t *connection, struct data_t *data, void *parameters);

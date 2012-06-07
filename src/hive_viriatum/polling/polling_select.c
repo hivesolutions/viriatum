@@ -29,12 +29,12 @@
 
 #include "polling_select.h"
 
-void create_polling_select(struct polling_select_t **polling_select_pointer, struct Polling_t *polling) {
+void create_polling_select(struct polling_select_t **polling_select_pointer, struct polling_t *polling) {
     /* retrieves the polling select size */
     size_t polling_select_size = sizeof(struct polling_select_t);
 
     /* retrieves the connection pointer size */
-    size_t connection_pointer_size = sizeof(struct Connection_t *);
+    size_t connection_pointer_size = sizeof(struct connection_t *);
 
     /* allocates space for the polling select */
     struct polling_select_t *polling_select = (struct polling_select_t *) MALLOC(polling_select_size);
@@ -65,19 +65,19 @@ void create_polling_select(struct polling_select_t **polling_select_pointer, str
 
     /* allocates the read connection for internal
     polling select usage */
-    polling_select->read_connections = (struct Connection_t **) MALLOC(VIRIATUM_MAXIMUM_CONNECTIONS * connection_pointer_size);
+    polling_select->read_connections = (struct connection_t **) MALLOC(VIRIATUM_MAXIMUM_CONNECTIONS * connection_pointer_size);
 
     /* allocates the write connection for internal
     polling select usage */
-    polling_select->write_connections = (struct Connection_t **) MALLOC(VIRIATUM_MAXIMUM_CONNECTIONS * connection_pointer_size);
+    polling_select->write_connections = (struct connection_t **) MALLOC(VIRIATUM_MAXIMUM_CONNECTIONS * connection_pointer_size);
 
     /* allocates the error connection for internal
     polling select usage */
-    polling_select->error_connections = (struct Connection_t **) MALLOC(VIRIATUM_MAXIMUM_CONNECTIONS * connection_pointer_size);
+    polling_select->error_connections = (struct connection_t **) MALLOC(VIRIATUM_MAXIMUM_CONNECTIONS * connection_pointer_size);
 
     /* allocates the remove connection for internal
     polling select usage */
-    polling_select->remove_connections = (struct Connection_t **) MALLOC(VIRIATUM_MAXIMUM_CONNECTIONS * connection_pointer_size);
+    polling_select->remove_connections = (struct connection_t **) MALLOC(VIRIATUM_MAXIMUM_CONNECTIONS * connection_pointer_size);
 
     /* sets the default timeout */
     polling_select->select_timeout.tv_sec = VIRIATUM_SELECT_TIMEOUT;
@@ -104,7 +104,7 @@ void delete_polling_select(struct polling_select_t *polling_select) {
     FREE(polling_select);
 }
 
-ERROR_CODE open_polling_select(struct Polling_t *polling) {
+ERROR_CODE open_polling_select(struct polling_t *polling) {
     /* allocates the polling select */
     struct polling_select_t *polling_select;
 
@@ -119,7 +119,7 @@ ERROR_CODE open_polling_select(struct Polling_t *polling) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE close_polling_select(struct Polling_t *polling) {
+ERROR_CODE close_polling_select(struct polling_t *polling) {
     /* retrieves the polling select */
     struct polling_select_t *polling_select = (struct polling_select_t *) polling->lower;
 
@@ -130,7 +130,7 @@ ERROR_CODE close_polling_select(struct Polling_t *polling) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE register_connection_polling_select(struct Polling_t *polling, struct Connection_t *connection) {
+ERROR_CODE register_connection_polling_select(struct polling_t *polling, struct connection_t *connection) {
     /* retrieves the polling select */
     struct polling_select_t *polling_select = (struct polling_select_t *) polling->lower;
 
@@ -147,7 +147,7 @@ ERROR_CODE register_connection_polling_select(struct Polling_t *polling, struct 
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE unregister_connection_polling_select(struct Polling_t *polling, struct Connection_t *connection)  {
+ERROR_CODE unregister_connection_polling_select(struct polling_t *polling, struct connection_t *connection)  {
     /* retrieves the polling select */
     struct polling_select_t *polling_select = (struct polling_select_t *) polling->lower;
 
@@ -170,7 +170,7 @@ ERROR_CODE unregister_connection_polling_select(struct Polling_t *polling, struc
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE register_write_polling_select(struct Polling_t *polling, struct Connection_t *connection) {
+ERROR_CODE register_write_polling_select(struct polling_t *polling, struct connection_t *connection) {
     /* retrieves the polling select */
     struct polling_select_t *polling_select = (struct polling_select_t *) polling->lower;
 
@@ -187,7 +187,7 @@ ERROR_CODE register_write_polling_select(struct Polling_t *polling, struct Conne
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE unregister_write_polling_select(struct Polling_t *polling, struct Connection_t *connection) {
+ERROR_CODE unregister_write_polling_select(struct polling_t *polling, struct connection_t *connection) {
     /* retrieves the polling select */
     struct polling_select_t *polling_select = (struct polling_select_t *) polling->lower;
 
@@ -204,7 +204,7 @@ ERROR_CODE unregister_write_polling_select(struct Polling_t *polling, struct Con
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE poll_polling_select(struct Polling_t *polling) {
+ERROR_CODE poll_polling_select(struct polling_t *polling) {
     /* retrieves the polling select */
     struct polling_select_t *polling_select = (struct polling_select_t *) polling->lower;
 
@@ -215,7 +215,7 @@ ERROR_CODE poll_polling_select(struct Polling_t *polling) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE call_polling_select(struct Polling_t *polling) {
+ERROR_CODE call_polling_select(struct polling_t *polling) {
     /* retrieves the polling select */
     struct polling_select_t *polling_select = (struct polling_select_t *) polling->lower;
 
@@ -226,18 +226,18 @@ ERROR_CODE call_polling_select(struct Polling_t *polling) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _poll_polling_select(struct polling_select_t *polling_select, struct Connection_t **read_connections, struct Connection_t **write_connections, struct Connection_t **error_connections, unsigned int *read_connections_size, unsigned int *write_connections_size, unsigned int *error_connections_size) {
+ERROR_CODE _poll_polling_select(struct polling_select_t *polling_select, struct connection_t **read_connections, struct connection_t **write_connections, struct connection_t **error_connections, unsigned int *read_connections_size, unsigned int *write_connections_size, unsigned int *error_connections_size) {
     /* allocates space for the select count */
     int select_count;
 
     /* allocates space for the current connection */
-    struct Connection_t *current_connection;
+    struct connection_t *current_connection;
 
     /* allocates space for the connections list iterator */
     struct iterator_t *connections_list_iterator;
 
     /* retrieves the service */
-    struct Service_t *service = polling_select->polling->service;
+    struct service_t *service = polling_select->polling->service;
 
     /* retrieves the service connections list */
     struct linked_list_t *connections_list = service->connections_list;
@@ -379,12 +379,12 @@ ERROR_CODE _poll_polling_select(struct polling_select_t *polling_select, struct 
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _call_polling_select(struct polling_select_t *polling_select, struct Connection_t **read_connections, struct Connection_t **write_connections, struct Connection_t **error_connections, struct Connection_t **remove_connections, unsigned int read_connections_size, unsigned int write_connections_size, unsigned int error_connections_size) {
+ERROR_CODE _call_polling_select(struct polling_select_t *polling_select, struct connection_t **read_connections, struct connection_t **write_connections, struct connection_t **error_connections, struct connection_t **remove_connections, unsigned int read_connections_size, unsigned int write_connections_size, unsigned int error_connections_size) {
     /* allocates the index */
     unsigned int index;
 
     /* allocates the current connection */
-    struct Connection_t *current_connection;
+    struct connection_t *current_connection;
 
     /* resets the remove connections size */
     unsigned int remove_connections_size = 0;
