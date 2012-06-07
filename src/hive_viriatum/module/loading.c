@@ -135,7 +135,7 @@ ERROR_CODE load_module(struct service_t *service, unsigned char *module_path) {
     }
 
     /* retrieves the symbol from the library */
-    symbol = GET_LIBRARY_SYMBOL(library, "infoModule");
+    symbol = GET_LIBRARY_SYMBOL(library, "info_module");
 
     /* retrieves the info module function reference */
     info_module_function = *((viriatum_info_module *)(&symbol));
@@ -143,13 +143,13 @@ ERROR_CODE load_module(struct service_t *service, unsigned char *module_path) {
     /* in case the start module function was not found */
     if(info_module_function == NULL) {
         /* prints a warning message */
-        V_WARNING_F("No such symbol '%s' in library\n", "infoModule");
+        V_WARNING_F("No such symbol '%s' in library\n", "info_module");
 
         /* raises an error */
         RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem finding symbol");
     } else {
         /* prints a debug message */
-        V_DEBUG_F("Found symbol '%s' in library\n", "infoModule");
+        V_DEBUG_F("Found symbol '%s' in library\n", "info_module");
     }
 
     /* creates the environment */
