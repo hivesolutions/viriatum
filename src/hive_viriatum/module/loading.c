@@ -87,7 +87,7 @@ ERROR_CODE delete_module(struct module_t *module) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE load_module(struct Service_t *service, unsigned char *module_path) {
+ERROR_CODE load_module(struct service_t *service, unsigned char *module_path) {
     /* error code to be used for testing */
     ERROR_CODE error_code;
 
@@ -190,7 +190,7 @@ ERROR_CODE load_module(struct Service_t *service, unsigned char *module_path) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE unload_module(struct Service_t *service, struct module_t *module) {
+ERROR_CODE unload_module(struct service_t *service, struct module_t *module) {
     /* allocates the error code */
     ERROR_CODE error_code;
 

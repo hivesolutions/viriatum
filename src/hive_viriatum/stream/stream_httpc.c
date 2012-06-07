@@ -48,7 +48,7 @@ ERROR_CODE message_complete_callback_handler_client(struct http_parser_t *http_p
 
 
 
-ERROR_CODE create_http_client_connection(struct http_client_connection_t **http_client_connection_pointer, struct IoConnection_t *io_connection) {
+ERROR_CODE create_http_client_connection(struct http_client_connection_t **http_client_connection_pointer, struct io_connection_t *io_connection) {
     /* retrieves the http client connection size */
     size_t http_client_connection_size = sizeof(struct http_client_connection_t);
 
@@ -96,7 +96,7 @@ ERROR_CODE delete_http_client_connection(struct http_client_connection_t *http_c
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE data_handler_stream_http_client(struct IoConnection_t *io_connection, unsigned char *buffer, size_t buffer_size) {
+ERROR_CODE data_handler_stream_http_client(struct io_connection_t *io_connection, unsigned char *buffer, size_t buffer_size) {
     /* allocates space for the temporary variable to
     hold the ammount of bytes processed in a given http
     data parsing iteration */
@@ -223,7 +223,7 @@ ERROR_CODE generate_parameters(struct hash_map_t *hash_map, unsigned char **buff
 
 
 
-ERROR_CODE open_handler_stream_http_client(struct IoConnection_t *io_connection) {
+ERROR_CODE open_handler_stream_http_client(struct io_connection_t *io_connection) {
     /* allocates space for the temporary error variable to
     be used to detect errors in calls */
     ERROR_CODE error;
@@ -231,7 +231,7 @@ ERROR_CODE open_handler_stream_http_client(struct IoConnection_t *io_connection)
     /* allocates the http client connection and retrieves the
     "upper" connection (for parameters retrieval) */
     struct http_client_connection_t *http_client_connection;
-    struct Connection_t *connection = (struct Connection_t *) io_connection->connection;
+    struct connection_t *connection = (struct connection_t *) io_connection->connection;
     struct http_client_parameters_t *parameters = (struct http_client_parameters_t *) connection->parameters;
     struct type_t *type;
     struct type_t *_type;
@@ -306,7 +306,7 @@ ERROR_CODE open_handler_stream_http_client(struct IoConnection_t *io_connection)
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE close_handler_stream_http_client(struct IoConnection_t *io_connection) {
+ERROR_CODE close_handler_stream_http_client(struct io_connection_t *io_connection) {
     /* retrieves the http client connection */
     struct http_client_connection_t *http_client_connection = (struct http_client_connection_t *) io_connection->lower;
 

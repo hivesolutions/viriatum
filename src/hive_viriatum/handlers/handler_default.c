@@ -29,7 +29,7 @@
 
 #include "handler_default.h"
 
-ERROR_CODE register_handler_default(struct Service_t *service) {
+ERROR_CODE register_handler_default(struct service_t *service) {
     /* allocates the http handler */
     struct http_handler_t *http_handler;
 
@@ -48,7 +48,7 @@ ERROR_CODE register_handler_default(struct Service_t *service) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE unregister_handler_default(struct Service_t *service) {
+ERROR_CODE unregister_handler_default(struct service_t *service) {
     /* allocates the http handler */
     struct http_handler_t *http_handler;
 
@@ -236,7 +236,7 @@ ERROR_CODE _send_response_handler_default(struct http_parser_t *http_parser) {
     char *response_buffer = MALLOC(256);
 
     /* retrieves the connection from the http parser parameters */
-    struct Connection_t *connection = (struct Connection_t *) http_parser->parameters;
+    struct connection_t *connection = (struct connection_t *) http_parser->parameters;
 
     /* writes the http static headers to the response */
     SPRINTF(response_buffer, 256, "HTTP/1.1 200 OK\r\nServer: %s/%s (%s @ %s)\r\nConnection: Keep-Alive\r\nContent-Length: 14\r\n\r\nHello Viriatum", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU);
@@ -248,13 +248,13 @@ ERROR_CODE _send_response_handler_default(struct http_parser_t *http_parser) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _send_response_callback_handler_default(struct Connection_t *connection, struct Data_t *data, void *parameters) {
+ERROR_CODE _send_response_callback_handler_default(struct connection_t *connection, struct data_t *data, void *parameters) {
     /* retrieves the current http flags */
     unsigned char flags = (unsigned char) (size_t) parameters;
 
     /* retrieves the underlying connection references in order to be
     able to operate over them, for unregister */
-    struct IoConnection_t *io_connection = (struct IoConnection_t *) connection->lower;
+    struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
     struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
 
     /* in case there is an http handler in the current connection must

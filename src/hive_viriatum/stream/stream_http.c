@@ -57,7 +57,7 @@ ERROR_CODE delete_http_handler(struct http_handler_t *http_handler) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE create_http_connection(struct http_connection_t **http_connection_pointer, struct IoConnection_t *io_connection) {
+ERROR_CODE create_http_connection(struct http_connection_t **http_connection_pointer, struct io_connection_t *io_connection) {
     /* allocates space for the http handler reference
     to be used in this connection */
     struct http_handler_t *http_handler;
@@ -69,7 +69,7 @@ ERROR_CODE create_http_connection(struct http_connection_t **http_connection_poi
     struct http_connection_t *http_connection = (struct http_connection_t *) MALLOC(http_connection_size);
 
     /* retrieves the service associated with the connection */
-    struct Service_t *service = io_connection->connection->service;
+    struct service_t *service = io_connection->connection->service;
 
     /* sets the http handler attributes (default) values */
     http_connection->io_connection = io_connection;
@@ -129,7 +129,7 @@ ERROR_CODE delete_http_connection(struct http_connection_t *http_connection) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE data_handler_stream_http(struct IoConnection_t *io_connection, unsigned char *buffer, size_t buffer_size) {
+ERROR_CODE data_handler_stream_http(struct io_connection_t *io_connection, unsigned char *buffer, size_t buffer_size) {
     /* allocates space for the temporary variable to
     hold the ammount of bytes processed in a given http
     data parsing iteration */
@@ -232,7 +232,7 @@ ERROR_CODE data_handler_stream_http(struct IoConnection_t *io_connection, unsign
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE open_handler_stream_http(struct IoConnection_t *io_connection) {
+ERROR_CODE open_handler_stream_http(struct io_connection_t *io_connection) {
     /* allocates the http connection */
     struct http_connection_t *http_connection;
 
@@ -243,7 +243,7 @@ ERROR_CODE open_handler_stream_http(struct IoConnection_t *io_connection) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE close_handler_stream_http(struct IoConnection_t *io_connection) {
+ERROR_CODE close_handler_stream_http(struct io_connection_t *io_connection) {
     /* retrieves the http connection */
     struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
 

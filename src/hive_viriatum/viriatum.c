@@ -46,7 +46,7 @@ See 'viriatum --help[=<command>]' for more information on a specific command.\n"
 START_MEMORY;
 
 unsigned char local = 0;
-static struct Service_t *service;
+static struct service_t *service;
 
 ERROR_CODE run_service(struct hash_map_t *arguments) {
     /* allocates the return value */

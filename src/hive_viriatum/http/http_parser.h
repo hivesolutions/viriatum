@@ -276,11 +276,11 @@ typedef ERROR_CODE (*http_data_callback) (struct http_parser_t *, const unsigned
 /**
  * Defines the various types of http request.
  */
-typedef enum HttpRequestType_e {
+typedef enum http_request_type_e {
     HTTP_REQUEST = 1,
     HTTP_RESPONSE,
     HTTP_BOTH
-} HttpRequestType;
+} http_request_type;
 
 /**
  * Defines the various http request mehtods.

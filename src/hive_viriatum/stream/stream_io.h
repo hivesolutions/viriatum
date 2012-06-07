@@ -32,52 +32,52 @@
 #include "stream_httpc.h"
 #include "stream_torrent.h"
 
-struct IoConnection_t;
+struct io_connection_t;
 
-typedef ERROR_CODE (*dataIoConnectionCallback) (struct IoConnection_t *, unsigned char *, size_t);
-typedef ERROR_CODE (*ioConnectionCallback) (struct IoConnection_t *);
+typedef ERROR_CODE (*data_io_connection_callback) (struct io_connection_t *, unsigned char *, size_t);
+typedef ERROR_CODE (*io_connection_callback) (struct io_connection_t *);
 
 /**
  * Structure defining a logical
  * io connection.
  */
-typedef struct IoConnection_t {
+typedef struct io_connection_t {
     /**
      * The (upper) connection that owns
      * manages this connection.
      */
-    struct Connection_t *connection;
+    struct connection_t *connection;
 
     /**
      * Callback function reference to be called
      * when data is available for processing.
      */
-    dataIoConnectionCallback onData;
+    data_io_connection_callback on_data;
 
     /**
      * Callback function reference to be called
      * when a connection is has been open.
      */
-    ioConnectionCallback onOpen;
+    io_connection_callback on_open;
 
     /**
      * Callback function reference to be called
      * when a connection is going to be closed.
      */
-    ioConnectionCallback onClose;
+    io_connection_callback on_close;
 
     /**
      * Reference to the lower level
      * stream substrate (child).
      */
     void *lower;
-} IoConnection;
+} io_connection;
 
-void createIoConnection(struct IoConnection_t **ioConnectionPointer, struct Connection_t *connection);
-void deleteIoConnection(struct IoConnection_t *io_connection);
-ERROR_CODE acceptHandlerStreamIo(struct Connection_t *connection);
-ERROR_CODE readHandlerStreamIo(struct Connection_t *connection);
-ERROR_CODE writeHandlerStreamIo(struct Connection_t *connection);
-ERROR_CODE errorHandlerStreamIo(struct Connection_t *connection);
-ERROR_CODE openHandlerStreamIo(struct Connection_t *connection);
-ERROR_CODE closeHandlerStreamIo(struct Connection_t *connection);
+void create_io_connection(struct io_connection_t **io_connection_pointer, struct connection_t *connection);
+void delete_io_connection(struct io_connection_t *io_connection);
+ERROR_CODE accept_handler_stream_io(struct connection_t *connection);
+ERROR_CODE read_handler_stream_io(struct connection_t *connection);
+ERROR_CODE write_handler_stream_io(struct connection_t *connection);
+ERROR_CODE error_handler_stream_io(struct connection_t *connection);
+ERROR_CODE open_handler_stream_io(struct connection_t *connection);
+ERROR_CODE close_handler_stream_io(struct connection_t *connection);

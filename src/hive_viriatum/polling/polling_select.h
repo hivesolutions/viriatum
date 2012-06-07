@@ -34,7 +34,7 @@ typedef struct polling_select_t {
      * The polling reference, for top
      * level reference.
      */
-    struct Polling_t *polling;
+    struct polling_t *polling;
 
     /**
      * The value of the highest socket
@@ -79,26 +79,26 @@ typedef struct polling_select_t {
      * The buffer that holds the connections
      * with data available for read.
      */
-    struct Connection_t **read_connections;
+    struct connection_t **read_connections;
 
     /**
      * The buffer that holds the connections
      * with data available for write.
      */
-    struct Connection_t **write_connections;
+    struct connection_t **write_connections;
 
     /**
      * The buffer that holds the connections
      * that are in an erroneous state
      */
-    struct Connection_t **error_connections;
+    struct connection_t **error_connections;
 
     /**
      * The buffer thatn holds the connections
      * to be house-jept (removed) at the end
      * of the polling cycle.
      */
-    struct Connection_t **remove_connections;
+    struct connection_t **remove_connections;
 
     /**
      * The size of the read connections
@@ -136,18 +136,18 @@ typedef struct polling_select_t {
     struct timeval select_timeout_temporary;
 } polling_select;
 
-void create_polling_select(struct polling_select_t **polling_select_pointer, struct Polling_t *polling);
+void create_polling_select(struct polling_select_t **polling_select_pointer, struct polling_t *polling);
 void delete_polling_select(struct polling_select_t *polling_select);
-ERROR_CODE open_polling_select(struct Polling_t *polling);
-ERROR_CODE close_polling_select(struct Polling_t *polling);
-ERROR_CODE register_connection_polling_select(struct Polling_t *polling, struct Connection_t *connection);
-ERROR_CODE unregister_connection_polling_select(struct Polling_t *polling, struct Connection_t *connection);
-ERROR_CODE register_write_polling_select(struct Polling_t *polling, struct Connection_t *connection);
-ERROR_CODE unregister_write_polling_select(struct Polling_t *polling, struct Connection_t *connection);
-ERROR_CODE poll_polling_select(struct Polling_t *polling);
-ERROR_CODE call_polling_select(struct Polling_t *polling);
-ERROR_CODE _poll_polling_select(struct polling_select_t *polling_select, struct Connection_t **read_connections, struct Connection_t **write_connections, struct Connection_t **error_connections, unsigned int *read_connections_size, unsigned int *write_connections_size, unsigned int *error_connections_size);
-ERROR_CODE _call_polling_select(struct polling_select_t *polling_select, struct Connection_t **read_connections, struct Connection_t **write_connections, struct Connection_t **error_connections, struct Connection_t **remove_connections, unsigned int read_connections_size, unsigned int write_connections_size, unsigned int error_connections_size);
+ERROR_CODE open_polling_select(struct polling_t *polling);
+ERROR_CODE close_polling_select(struct polling_t *polling);
+ERROR_CODE register_connection_polling_select(struct polling_t *polling, struct connection_t *connection);
+ERROR_CODE unregister_connection_polling_select(struct polling_t *polling, struct connection_t *connection);
+ERROR_CODE register_write_polling_select(struct polling_t *polling, struct connection_t *connection);
+ERROR_CODE unregister_write_polling_select(struct polling_t *polling, struct connection_t *connection);
+ERROR_CODE poll_polling_select(struct polling_t *polling);
+ERROR_CODE call_polling_select(struct polling_t *polling);
+ERROR_CODE _poll_polling_select(struct polling_select_t *polling_select, struct connection_t **read_connections, struct connection_t **write_connections, struct connection_t **error_connections, unsigned int *read_connections_size, unsigned int *write_connections_size, unsigned int *error_connections_size);
+ERROR_CODE _call_polling_select(struct polling_select_t *polling_select, struct connection_t **read_connections, struct connection_t **write_connections, struct connection_t **error_connections, struct connection_t **remove_connections, unsigned int read_connections_size, unsigned int write_connections_size, unsigned int error_connections_size);
 ERROR_CODE _register_sockets_set_polling_select(struct polling_select_t *polling_select, SOCKET_HANDLE socket_handle, SOCKET_SET *sockets_set);
 ERROR_CODE _unregister_sockets_set_polling_select(struct polling_select_t *polling_select, SOCKET_HANDLE socket_handle, SOCKET_SET *sockets_set);
 
@@ -161,12 +161,12 @@ ERROR_CODE _unregister_sockets_set_polling_select(struct polling_select_t *polli
  * of the remove connections array.
  * @param connection The connection to be removed (deleted).
  */
-static __inline void remove_connection(struct Connection_t **remove_connections, unsigned int *remove_connections_size_pointer, struct Connection_t *connection) {
+static __inline void remove_connection(struct connection_t **remove_connections, unsigned int *remove_connections_size_pointer, struct connection_t *connection) {
     /* allocates the index */
     unsigned int index;
 
     /* allocates the current connection */
-    struct Connection_t *current_connection;
+    struct connection_t *current_connection;
 
     /* retrieves the remove connections size */
     unsigned int remove_connections_size = *remove_connections_size_pointer;

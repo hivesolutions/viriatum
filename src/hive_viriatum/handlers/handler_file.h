@@ -31,8 +31,8 @@
 #include "../system/system.h"
 
 /* forward references (avoids loop) */
-struct Data_t;
-struct Connection_t;
+struct data_t;
+struct connection_t;
 struct http_connection_t;
 
 /**
@@ -95,8 +95,8 @@ typedef struct handler_file_context_t {
 
 ERROR_CODE create_handler_file_context(struct handler_file_context_t **handler_file_context_pointer);
 ERROR_CODE delete_handler_file_context(struct handler_file_context_t *handler_file_context);
-ERROR_CODE register_handler_file(struct Service_t *service);
-ERROR_CODE unregister_handler_file(struct Service_t *service);
+ERROR_CODE register_handler_file(struct service_t *service);
+ERROR_CODE unregister_handler_file(struct service_t *service);
 ERROR_CODE set_handler_file(struct http_connection_t *http_connection);
 ERROR_CODE unset_handler_file(struct http_connection_t *http_connection);
 ERROR_CODE reset_handler_file(struct http_connection_t *http_connection);
@@ -112,6 +112,6 @@ ERROR_CODE _unset_http_parser_handler_file(struct http_parser_t *http_parser);
 ERROR_CODE _reset_http_parser_handler_file(struct http_parser_t *http_parser);
 ERROR_CODE _set_http_settings_handler_file(struct http_settings_t *http_settings);
 ERROR_CODE _unset_http_settings_handler_file(struct http_settings_t *http_settings);
-ERROR_CODE _cleanup_handler_file(struct Connection_t *connection, struct Data_t *data, void *parameters);
-ERROR_CODE _send_chunk_handler_file(struct Connection_t *connection, struct Data_t *data, void *parameter);
-ERROR_CODE _send_data_handler_file(struct Connection_t *connection, struct Data_t *data, void *parameters);
+ERROR_CODE _cleanup_handler_file(struct connection_t *connection, struct data_t *data, void *parameters);
+ERROR_CODE _send_chunk_handler_file(struct connection_t *connection, struct data_t *data, void *parameter);
+ERROR_CODE _send_data_handler_file(struct connection_t *connection, struct data_t *data, void *parameters);

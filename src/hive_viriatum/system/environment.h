@@ -28,21 +28,21 @@
 #pragma once
 
 /* forward references (avoids loop) */
-struct Service_t;
+struct service_t;
 struct http_handler_t;
 
-typedef struct Globals_t {
-    unsigned char *lastErrorMessage;
+typedef struct globals_t {
+    unsigned char *last_error_message;
 
     /**
      * The current active service in the
      * global environment.
      */
-    struct Service_t *service;
+    struct service_t *service;
 
     /**
      * The list of http handlers available
      * for the global environment.
      */
-    struct linked_list_t *httpHandlersList;
-} Globals;
+    struct linked_list_t *http_handlers_list;
+} globals;

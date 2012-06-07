@@ -80,7 +80,7 @@ ERROR_CODE delete_dispatch_handler(struct dispatch_handler_t *dispatch_handler) 
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE register_handler_dispatch(struct Service_t *service) {
+ERROR_CODE register_handler_dispatch(struct service_t *service) {
     /* allocates the http handler */
     struct http_handler_t *http_handler;
 
@@ -125,7 +125,7 @@ ERROR_CODE register_handler_dispatch(struct Service_t *service) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE unregister_handler_dispatch(struct Service_t *service) {
+ERROR_CODE unregister_handler_dispatch(struct service_t *service) {
     /* allocates the http handler */
     struct http_handler_t *http_handler;
 
@@ -190,10 +190,10 @@ ERROR_CODE url_callback_handler_dispatch(struct http_parser_t *http_parser, cons
     is done through static allocation */
     unsigned char url[VIRIATUM_MAX_URL_SIZE];
 
-    struct Connection_t *connection = (struct Connection_t *) http_parser->parameters;
-    struct IoConnection_t *io_connection = (struct IoConnection_t *) connection->lower;
+    struct connection_t *connection = (struct connection_t *) http_parser->parameters;
+    struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
     struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
-    struct Service_t *service = connection->service;
+    struct service_t *service = connection->service;
     struct http_handler_t *handler = http_connection->http_handler;
 #ifdef VIRIATUM_PCRE
     struct dispatch_handler_t *dispatch_handler = (struct dispatch_handler_t *) handler->lower;
@@ -329,7 +329,7 @@ ERROR_CODE _send_response_handler_dispatch(struct http_parser_t *http_parser) {
     char *response_buffer = MALLOC(256);
 
     /* retrieves the connection from the http parser parameters */
-    struct Connection_t *connection = (struct Connection_t *) http_parser->parameters;
+    struct connection_t *connection = (struct connection_t *) http_parser->parameters;
 
     /* writes the http static headers to the response */
     SPRINTF(response_buffer, 256, "HTTP/1.1 500 Internal Server Error\r\nServer: %s/%s (%s @ %s)\r\nConnection: Keep-Alive\r\nContent-Length: %lu\r\n\r\n%s", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, (long unsigned int) sizeof(DISPATCH_ERROR_MESSAGE) - 1, DISPATCH_ERROR_MESSAGE);
@@ -341,13 +341,13 @@ ERROR_CODE _send_response_handler_dispatch(struct http_parser_t *http_parser) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _send_response_callback_handler_dispatch(struct Connection_t *connection, struct Data_t *data, void *parameters) {
+ERROR_CODE _send_response_callback_handler_dispatch(struct connection_t *connection, struct data_t *data, void *parameters) {
     /* retrieves the current http flags */
     unsigned char flags = (unsigned char) (size_t) parameters;
 
     /* retrieves the underlying connection references in order to be
     able to operate over them, for unregister */
-    struct IoConnection_t *io_connection = (struct IoConnection_t *) connection->lower;
+    struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
     struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
 
     /* in case there is an http handler in the current connection must

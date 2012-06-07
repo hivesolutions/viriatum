@@ -72,7 +72,7 @@ ERROR_CODE delete_handler_file_context(struct handler_file_context_t *handler_fi
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE register_handler_file(struct Service_t *service) {
+ERROR_CODE register_handler_file(struct service_t *service) {
     /* allocates the http handler */
     struct http_handler_t *http_handler;
 
@@ -91,7 +91,7 @@ ERROR_CODE register_handler_file(struct Service_t *service) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE unregister_handler_file(struct Service_t *service) {
+ERROR_CODE unregister_handler_file(struct service_t *service) {
     /* allocates the http handler */
     struct http_handler_t *http_handler;
 
@@ -150,9 +150,9 @@ ERROR_CODE url_callback_handler_file(struct http_parser_t *http_parser, const un
 
     /* retrieves the connection from the http parser parameters and then
     uses it to access the service options using the service */
-    struct Connection_t *connection = (struct Connection_t *) http_parser->parameters;
-    struct Service_t *service = connection->service;
-    struct ServiceOptions_t *options = service->options;
+    struct connection_t *connection = (struct connection_t *) http_parser->parameters;
+    struct service_t *service = connection->service;
+    struct service_options_t *options = service->options;
 
     /* copies the memory from the data to the url and then
     puts the end of string in the url */
@@ -288,7 +288,7 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
     struct handler_file_context_t *handler_file_context = (struct handler_file_context_t *) http_parser->context;
 
     /* retrieves the connection from the http parser parameters */
-    struct Connection_t *connection = (struct Connection_t *) http_parser->parameters;
+    struct connection_t *connection = (struct connection_t *) http_parser->parameters;
 
     /* checks if the path being request is in fact a directory */
     is_directory_file((char *) handler_file_context->file_path, &is_directory);
@@ -495,7 +495,7 @@ ERROR_CODE _unset_http_settings_handler_file(struct http_settings_t *http_settin
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _cleanup_handler_file(struct Connection_t *connection, struct Data_t *data, void *parameters) {
+ERROR_CODE _cleanup_handler_file(struct connection_t *connection, struct data_t *data, void *parameters) {
     /* casts the parameters as handler file context and then
     retrieves the flags argument for checking of connection */
     struct handler_file_context_t *handler_file_context = (struct handler_file_context_t *) parameters;
@@ -503,7 +503,7 @@ ERROR_CODE _cleanup_handler_file(struct Connection_t *connection, struct Data_t 
 
     /* retrieves the underlying connection references in order to be
     able to operate over them, for unregister */
-    struct IoConnection_t *io_connection = (struct IoConnection_t *) connection->lower;
+    struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
     struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
 
     /* in case there is an http handler in the current connection must
@@ -525,7 +525,7 @@ ERROR_CODE _cleanup_handler_file(struct Connection_t *connection, struct Data_t 
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _send_chunk_handler_file(struct Connection_t *connection, struct Data_t *data, void *parameters) {
+ERROR_CODE _send_chunk_handler_file(struct connection_t *connection, struct data_t *data, void *parameters) {
     /* allocates the number of bytes */
     size_t number_bytes;
 
@@ -583,7 +583,7 @@ ERROR_CODE _send_chunk_handler_file(struct Connection_t *connection, struct Data
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _send_data_handler_file(struct Connection_t *connection, struct Data_t *data, void *parameters) {
+ERROR_CODE _send_data_handler_file(struct connection_t *connection, struct data_t *data, void *parameters) {
     /* casts the parameters as handler file context and then
     retrieves the templat handler from it */
     struct handler_file_context_t *handler_file_context = (struct handler_file_context_t *) parameters;

@@ -51,12 +51,12 @@ ERROR_CODE process_ini_file(char *file_path, struct hash_map_t **configuration_p
     the engine for the engine instance itself and for
     the handler to be used to "catch" the events, then
     retrieves the pointers to these structures*/
-    struct ini_settings_t iniSettings_s;
-    struct ini_engine_t iniEngine_s;
-    struct ini_handler_t iniHandler_s;
-    struct ini_settings_t *ini_settings = &iniSettings_s;
-    struct ini_engine_t *ini_engine = &iniEngine_s;
-    struct ini_handler_t *ini_handler = &iniHandler_s;
+    struct ini_settings_t ini_settings_s;
+    struct ini_engine_t ini_engine_s;
+    struct ini_handler_t ini_handler_s;
+    struct ini_settings_t *ini_settings = &ini_settings_s;
+    struct ini_engine_t *ini_engine = &ini_engine_s;
+    struct ini_handler_t *ini_handler = &ini_handler_s;
 
     /* allocates space for the hash map to be used for
     the configuration to be created */
@@ -71,20 +71,20 @@ ERROR_CODE process_ini_file(char *file_path, struct hash_map_t **configuration_p
     /* sets the various handlers for the ini settings
     parsing, they will be used to correctly update the
     provided configuration hash map */
-    iniSettings_s.on_section_start = NULL;
-    iniSettings_s.on_section_end = _ini_section_end_callback;
-    iniSettings_s.on_comment_start = NULL;
-    iniSettings_s.on_comment_end = _ini_comment_end_callback;
-    iniSettings_s.on_key_start = NULL;
-    iniSettings_s.on_key_end = _ini_key_end_callback;
-    iniSettings_s.on_value_start = NULL;
-    iniSettings_s.on_value_end = _ini_value_end_callback;
+    ini_settings_s.on_section_start = NULL;
+    ini_settings_s.on_section_end = _ini_section_end_callback;
+    ini_settings_s.on_comment_start = NULL;
+    ini_settings_s.on_comment_end = _ini_comment_end_callback;
+    ini_settings_s.on_key_start = NULL;
+    ini_settings_s.on_key_end = _ini_key_end_callback;
+    ini_settings_s.on_value_start = NULL;
+    ini_settings_s.on_value_end = _ini_value_end_callback;
 
     /* sets the configuration reference in the ini handler
     so that it may be updatd and then sets the handler in
     the ini engine instance to be used for parsing */
-    iniHandler_s.configuration = configuration;
-    iniEngine_s.context = ini_handler;
+    ini_handler_s.configuration = configuration;
+    ini_engine_s.context = ini_handler;
 
     /* reads the file contained in the provided file path
     and then tests the error code for error, in case there is an
