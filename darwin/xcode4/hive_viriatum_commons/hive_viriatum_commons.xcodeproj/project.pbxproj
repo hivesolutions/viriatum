@@ -36,6 +36,9 @@
 		C24EF49E15820FC800FAE3A0 /* sha1.c in Sources */ = {isa = PBXBuildFile; fileRef = C24EF49B15820FC800FAE3A0 /* sha1.c */; };
 		C24EF49F15820FC800FAE3A0 /* sha1.h in Headers */ = {isa = PBXBuildFile; fileRef = C24EF49C15820FC800FAE3A0 /* sha1.h */; };
 		C24EF4A015820FC800FAE3A0 /* sha1.h in Headers */ = {isa = PBXBuildFile; fileRef = C24EF49C15820FC800FAE3A0 /* sha1.h */; };
+		C24EF4A1158211C000FAE3A0 /* stdafx.h in Headers */ = {isa = PBXBuildFile; fileRef = C20C2C981350B6BB001E22FB /* stdafx.h */; };
+		C24EF4A2158211C500FAE3A0 /* viriatum_commons.h in Headers */ = {isa = PBXBuildFile; fileRef = C20C2CB41350B6BB001E22FB /* viriatum_commons.h */; };
+		C24EF4A3158211C700FAE3A0 /* _config_win32.h in Headers */ = {isa = PBXBuildFile; fileRef = C295E075155BCB6200036037 /* _config_win32.h */; };
 		C2565FA4149C55F300722EFA /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C2565FA3149C55F300722EFA /* Foundation.framework */; };
 		C2565FB7149C565A00722EFA /* stdafx.c in Sources */ = {isa = PBXBuildFile; fileRef = C20C2C971350B6BB001E22FB /* stdafx.c */; };
 		C295E076155BCB6200036037 /* _config_win32.h in Headers */ = {isa = PBXBuildFile; fileRef = C295E075155BCB6200036037 /* _config_win32.h */; };
@@ -774,6 +777,9 @@
 				C24EF49615820FB400FAE3A0 /* bencoding.h in Headers */,
 				C24EF49A15820FB400FAE3A0 /* percent.h in Headers */,
 				C24EF4A015820FC800FAE3A0 /* sha1.h in Headers */,
+				C24EF4A1158211C000FAE3A0 /* stdafx.h in Headers */,
+				C24EF4A2158211C500FAE3A0 /* viriatum_commons.h in Headers */,
+				C24EF4A3158211C700FAE3A0 /* _config_win32.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
