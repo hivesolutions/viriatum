@@ -10,6 +10,32 @@
 		C20C2CCA1350B6BB001E22FB /* stdafx.c in Sources */ = {isa = PBXBuildFile; fileRef = C20C2C971350B6BB001E22FB /* stdafx.c */; };
 		C20C2CCB1350B6BB001E22FB /* stdafx.h in Headers */ = {isa = PBXBuildFile; fileRef = C20C2C981350B6BB001E22FB /* stdafx.h */; };
 		C20C2CE31350B6BB001E22FB /* viriatum_commons.h in Headers */ = {isa = PBXBuildFile; fileRef = C20C2CB41350B6BB001E22FB /* viriatum_commons.h */; };
+		C24EF47415820F4C00FAE3A0 /* file.c in Sources */ = {isa = PBXBuildFile; fileRef = C24EF47115820F4C00FAE3A0 /* file.c */; };
+		C24EF47515820F4C00FAE3A0 /* file.c in Sources */ = {isa = PBXBuildFile; fileRef = C24EF47115820F4C00FAE3A0 /* file.c */; };
+		C24EF47615820F4C00FAE3A0 /* file.h in Headers */ = {isa = PBXBuildFile; fileRef = C24EF47215820F4C00FAE3A0 /* file.h */; };
+		C24EF47715820F4C00FAE3A0 /* file.h in Headers */ = {isa = PBXBuildFile; fileRef = C24EF47215820F4C00FAE3A0 /* file.h */; };
+		C24EF47815820F4C00FAE3A0 /* io.h in Headers */ = {isa = PBXBuildFile; fileRef = C24EF47315820F4C00FAE3A0 /* io.h */; };
+		C24EF47915820F4C00FAE3A0 /* io.h in Headers */ = {isa = PBXBuildFile; fileRef = C24EF47315820F4C00FAE3A0 /* io.h */; };
+		C24EF48715820F9B00FAE3A0 /* sort_map.c in Sources */ = {isa = PBXBuildFile; fileRef = C24EF48315820F9B00FAE3A0 /* sort_map.c */; };
+		C24EF48815820F9B00FAE3A0 /* sort_map.c in Sources */ = {isa = PBXBuildFile; fileRef = C24EF48315820F9B00FAE3A0 /* sort_map.c */; };
+		C24EF48915820F9B00FAE3A0 /* sort_map.h in Headers */ = {isa = PBXBuildFile; fileRef = C24EF48415820F9B00FAE3A0 /* sort_map.h */; };
+		C24EF48A15820F9B00FAE3A0 /* sort_map.h in Headers */ = {isa = PBXBuildFile; fileRef = C24EF48415820F9B00FAE3A0 /* sort_map.h */; };
+		C24EF48B15820F9B00FAE3A0 /* string.c in Sources */ = {isa = PBXBuildFile; fileRef = C24EF48515820F9B00FAE3A0 /* string.c */; };
+		C24EF48C15820F9B00FAE3A0 /* string.c in Sources */ = {isa = PBXBuildFile; fileRef = C24EF48515820F9B00FAE3A0 /* string.c */; };
+		C24EF48D15820F9B00FAE3A0 /* string.h in Headers */ = {isa = PBXBuildFile; fileRef = C24EF48615820F9B00FAE3A0 /* string.h */; };
+		C24EF48E15820F9B00FAE3A0 /* string.h in Headers */ = {isa = PBXBuildFile; fileRef = C24EF48615820F9B00FAE3A0 /* string.h */; };
+		C24EF49315820FB400FAE3A0 /* bencoding.c in Sources */ = {isa = PBXBuildFile; fileRef = C24EF48F15820FB400FAE3A0 /* bencoding.c */; };
+		C24EF49415820FB400FAE3A0 /* bencoding.c in Sources */ = {isa = PBXBuildFile; fileRef = C24EF48F15820FB400FAE3A0 /* bencoding.c */; };
+		C24EF49515820FB400FAE3A0 /* bencoding.h in Headers */ = {isa = PBXBuildFile; fileRef = C24EF49015820FB400FAE3A0 /* bencoding.h */; };
+		C24EF49615820FB400FAE3A0 /* bencoding.h in Headers */ = {isa = PBXBuildFile; fileRef = C24EF49015820FB400FAE3A0 /* bencoding.h */; };
+		C24EF49715820FB400FAE3A0 /* percent.c in Sources */ = {isa = PBXBuildFile; fileRef = C24EF49115820FB400FAE3A0 /* percent.c */; };
+		C24EF49815820FB400FAE3A0 /* percent.c in Sources */ = {isa = PBXBuildFile; fileRef = C24EF49115820FB400FAE3A0 /* percent.c */; };
+		C24EF49915820FB400FAE3A0 /* percent.h in Headers */ = {isa = PBXBuildFile; fileRef = C24EF49215820FB400FAE3A0 /* percent.h */; };
+		C24EF49A15820FB400FAE3A0 /* percent.h in Headers */ = {isa = PBXBuildFile; fileRef = C24EF49215820FB400FAE3A0 /* percent.h */; };
+		C24EF49D15820FC800FAE3A0 /* sha1.c in Sources */ = {isa = PBXBuildFile; fileRef = C24EF49B15820FC800FAE3A0 /* sha1.c */; };
+		C24EF49E15820FC800FAE3A0 /* sha1.c in Sources */ = {isa = PBXBuildFile; fileRef = C24EF49B15820FC800FAE3A0 /* sha1.c */; };
+		C24EF49F15820FC800FAE3A0 /* sha1.h in Headers */ = {isa = PBXBuildFile; fileRef = C24EF49C15820FC800FAE3A0 /* sha1.h */; };
+		C24EF4A015820FC800FAE3A0 /* sha1.h in Headers */ = {isa = PBXBuildFile; fileRef = C24EF49C15820FC800FAE3A0 /* sha1.h */; };
 		C2565FA4149C55F300722EFA /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C2565FA3149C55F300722EFA /* Foundation.framework */; };
 		C2565FB7149C565A00722EFA /* stdafx.c in Sources */ = {isa = PBXBuildFile; fileRef = C20C2C971350B6BB001E22FB /* stdafx.c */; };
 		C295E076155BCB6200036037 /* _config_win32.h in Headers */ = {isa = PBXBuildFile; fileRef = C295E075155BCB6200036037 /* _config_win32.h */; };
@@ -192,6 +218,19 @@
 		C20C2C971350B6BB001E22FB /* stdafx.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = stdafx.c; path = ../../../src/hive_viriatum_commons/stdafx.c; sourceTree = "<group>"; };
 		C20C2C981350B6BB001E22FB /* stdafx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = stdafx.h; path = ../../../src/hive_viriatum_commons/stdafx.h; sourceTree = "<group>"; };
 		C20C2CB41350B6BB001E22FB /* viriatum_commons.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = viriatum_commons.h; path = ../../../src/hive_viriatum_commons/viriatum_commons.h; sourceTree = "<group>"; };
+		C24EF47115820F4C00FAE3A0 /* file.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = file.c; sourceTree = "<group>"; };
+		C24EF47215820F4C00FAE3A0 /* file.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = file.h; sourceTree = "<group>"; };
+		C24EF47315820F4C00FAE3A0 /* io.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = io.h; sourceTree = "<group>"; };
+		C24EF48315820F9B00FAE3A0 /* sort_map.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sort_map.c; sourceTree = "<group>"; };
+		C24EF48415820F9B00FAE3A0 /* sort_map.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sort_map.h; sourceTree = "<group>"; };
+		C24EF48515820F9B00FAE3A0 /* string.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = string.c; sourceTree = "<group>"; };
+		C24EF48615820F9B00FAE3A0 /* string.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = string.h; sourceTree = "<group>"; };
+		C24EF48F15820FB400FAE3A0 /* bencoding.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = bencoding.c; sourceTree = "<group>"; };
+		C24EF49015820FB400FAE3A0 /* bencoding.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bencoding.h; sourceTree = "<group>"; };
+		C24EF49115820FB400FAE3A0 /* percent.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = percent.c; sourceTree = "<group>"; };
+		C24EF49215820FB400FAE3A0 /* percent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = percent.h; sourceTree = "<group>"; };
+		C24EF49B15820FC800FAE3A0 /* sha1.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sha1.c; sourceTree = "<group>"; };
+		C24EF49C15820FC800FAE3A0 /* sha1.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sha1.h; sourceTree = "<group>"; };
 		C2565FA1149C55F300722EFA /* libhive_viriatum_commons_mobile.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libhive_viriatum_commons_mobile.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		C2565FA3149C55F300722EFA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		C295E075155BCB6200036037 /* _config_win32.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = _config_win32.h; path = ../../../src/hive_viriatum_commons/_config_win32.h; sourceTree = "<group>"; };
@@ -330,6 +369,7 @@
 				C295E087155BCB7800036037 /* encoding */,
 				C295E08B155BCB7800036037 /* global */,
 				C295E094155BCB7800036037 /* ini */,
+				C24EF47015820F4C00FAE3A0 /* io */,
 				C295E097155BCB7800036037 /* jni */,
 				C295E09D155BCB7800036037 /* memory */,
 				C295E0A1155BCB7800036037 /* sorting */,
@@ -343,6 +383,17 @@
 			name = Classes;
 			sourceTree = "<group>";
 		};
+		C24EF47015820F4C00FAE3A0 /* io */ = {
+			isa = PBXGroup;
+			children = (
+				C24EF47115820F4C00FAE3A0 /* file.c */,
+				C24EF47215820F4C00FAE3A0 /* file.h */,
+				C24EF47315820F4C00FAE3A0 /* io.h */,
+			);
+			name = io;
+			path = ../../../src/hive_viriatum_commons/io;
+			sourceTree = "<group>";
+		};
 		C2565FA2149C55F300722EFA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -354,6 +405,8 @@
 		C295E077155BCB7800036037 /* checksum */ = {
 			isa = PBXGroup;
 			children = (
+				C24EF49B15820FC800FAE3A0 /* sha1.c */,
+				C24EF49C15820FC800FAE3A0 /* sha1.h */,
 				C295E078155BCB7800036037 /* checksum.h */,
 				C295E079155BCB7800036037 /* crc_32.c */,
 				C295E07A155BCB7800036037 /* crc_32.h */,
@@ -391,6 +444,10 @@
 		C295E087155BCB7800036037 /* encoding */ = {
 			isa = PBXGroup;
 			children = (
+				C24EF48F15820FB400FAE3A0 /* bencoding.c */,
+				C24EF49015820FB400FAE3A0 /* bencoding.h */,
+				C24EF49115820FB400FAE3A0 /* percent.c */,
+				C24EF49215820FB400FAE3A0 /* percent.h */,
 				C295E088155BCB7800036037 /* base_64.c */,
 				C295E089155BCB7800036037 /* base_64.h */,
 				C295E08A155BCB7800036037 /* encoding.h */,
@@ -481,6 +538,10 @@
 		C295E0B0155BCB7800036037 /* structures */ = {
 			isa = PBXGroup;
 			children = (
+				C24EF48315820F9B00FAE3A0 /* sort_map.c */,
+				C24EF48415820F9B00FAE3A0 /* sort_map.h */,
+				C24EF48515820F9B00FAE3A0 /* string.c */,
+				C24EF48615820F9B00FAE3A0 /* string.h */,
 				C295E0B1155BCB7800036037 /* array_list.c */,
 				C295E0B2155BCB7800036037 /* array_list.h */,
 				C295E0B3155BCB7800036037 /* buffer.c */,
@@ -635,6 +696,13 @@
 				C295E182155BCB7800036037 /* dump_util.h in Headers */,
 				C295E184155BCB7800036037 /* string_util.h in Headers */,
 				C295E186155BCB7800036037 /* util.h in Headers */,
+				C24EF47615820F4C00FAE3A0 /* file.h in Headers */,
+				C24EF47815820F4C00FAE3A0 /* io.h in Headers */,
+				C24EF48915820F9B00FAE3A0 /* sort_map.h in Headers */,
+				C24EF48D15820F9B00FAE3A0 /* string.h in Headers */,
+				C24EF49515820FB400FAE3A0 /* bencoding.h in Headers */,
+				C24EF49915820FB400FAE3A0 /* percent.h in Headers */,
+				C24EF49F15820FC800FAE3A0 /* sha1.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -699,6 +767,13 @@
 				C295E183155BCB7800036037 /* dump_util.h in Headers */,
 				C295E185155BCB7800036037 /* string_util.h in Headers */,
 				C295E187155BCB7800036037 /* util.h in Headers */,
+				C24EF47715820F4C00FAE3A0 /* file.h in Headers */,
+				C24EF47915820F4C00FAE3A0 /* io.h in Headers */,
+				C24EF48A15820F9B00FAE3A0 /* sort_map.h in Headers */,
+				C24EF48E15820F9B00FAE3A0 /* string.h in Headers */,
+				C24EF49615820FB400FAE3A0 /* bencoding.h in Headers */,
+				C24EF49A15820FB400FAE3A0 /* percent.h in Headers */,
+				C24EF4A015820FC800FAE3A0 /* sha1.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -797,6 +872,12 @@
 				C295E172155BCB7800036037 /* handler.c in Sources */,
 				C295E17A155BCB7800036037 /* thread_pool.c in Sources */,
 				C295E17E155BCB7800036037 /* arguments_util.c in Sources */,
+				C24EF47415820F4C00FAE3A0 /* file.c in Sources */,
+				C24EF48715820F9B00FAE3A0 /* sort_map.c in Sources */,
+				C24EF48B15820F9B00FAE3A0 /* string.c in Sources */,
+				C24EF49315820FB400FAE3A0 /* bencoding.c in Sources */,
+				C24EF49715820FB400FAE3A0 /* percent.c in Sources */,
+				C24EF49D15820FC800FAE3A0 /* sha1.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -834,6 +915,12 @@
 				C295E173155BCB7800036037 /* handler.c in Sources */,
 				C295E17B155BCB7800036037 /* thread_pool.c in Sources */,
 				C295E17F155BCB7800036037 /* arguments_util.c in Sources */,
+				C24EF47515820F4C00FAE3A0 /* file.c in Sources */,
+				C24EF48815820F9B00FAE3A0 /* sort_map.c in Sources */,
+				C24EF48C15820F9B00FAE3A0 /* string.c in Sources */,
+				C24EF49415820FB400FAE3A0 /* bencoding.c in Sources */,
+				C24EF49815820FB400FAE3A0 /* percent.c in Sources */,
+				C24EF49E15820FC800FAE3A0 /* sha1.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
