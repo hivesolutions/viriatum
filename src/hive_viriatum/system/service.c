@@ -245,9 +245,10 @@ ERROR_CODE load_options_service(struct service_t *service, struct hash_map_t *ar
 #ifdef VIRIATUM_PLATFORM_LINUX
 #ifdef VIRIATUM_PLATFORM_ANDROID
 #define SET_PROC_NAME(name)
-#endif
+#else
 #ifdef PR_SET_NAME
 #define SET_PROC_NAME(name) prctl(PR_SET_NAME, name)
+#endif
 #endif
 #endif
 
