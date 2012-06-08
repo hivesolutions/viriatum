@@ -8,6 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		C20C2CE51350B71E001E22FB /* libhive_viriatum_commons.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C20C2CE41350B71E001E22FB /* libhive_viriatum_commons.a */; };
+		C24EF47F15820F7400FAE3A0 /* stream_httpc.c in Sources */ = {isa = PBXBuildFile; fileRef = C24EF47B15820F7400FAE3A0 /* stream_httpc.c */; };
+		C24EF48015820F7400FAE3A0 /* stream_httpc.c in Sources */ = {isa = PBXBuildFile; fileRef = C24EF47B15820F7400FAE3A0 /* stream_httpc.c */; };
+		C24EF48115820F7400FAE3A0 /* stream_torrent.c in Sources */ = {isa = PBXBuildFile; fileRef = C24EF47D15820F7400FAE3A0 /* stream_torrent.c */; };
+		C24EF48215820F7400FAE3A0 /* stream_torrent.c in Sources */ = {isa = PBXBuildFile; fileRef = C24EF47D15820F7400FAE3A0 /* stream_torrent.c */; };
 		C2565F7E149C556900722EFA /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C2565F7D149C556900722EFA /* UIKit.framework */; };
 		C2565F80149C556A00722EFA /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C2565F7F149C556A00722EFA /* Foundation.framework */; };
 		C2565F82149C556A00722EFA /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C2565F81149C556A00722EFA /* CoreGraphics.framework */; };
@@ -26,8 +30,6 @@
 		C295DFA3155BCAD600036037 /* http_parser.c in Sources */ = {isa = PBXBuildFile; fileRef = C295DF70155BCAD600036037 /* http_parser.c */; };
 		C295DFA4155BCAD600036037 /* http_request.c in Sources */ = {isa = PBXBuildFile; fileRef = C295DF72155BCAD600036037 /* http_request.c */; };
 		C295DFA5155BCAD600036037 /* http_request.c in Sources */ = {isa = PBXBuildFile; fileRef = C295DF72155BCAD600036037 /* http_request.c */; };
-		C295DFA6155BCAD600036037 /* file.c in Sources */ = {isa = PBXBuildFile; fileRef = C295DF75155BCAD600036037 /* file.c */; };
-		C295DFA7155BCAD600036037 /* file.c in Sources */ = {isa = PBXBuildFile; fileRef = C295DF75155BCAD600036037 /* file.c */; };
 		C295DFA8155BCAD600036037 /* info.c in Sources */ = {isa = PBXBuildFile; fileRef = C295DF79155BCAD600036037 /* info.c */; };
 		C295DFA9155BCAD600036037 /* info.c in Sources */ = {isa = PBXBuildFile; fileRef = C295DF79155BCAD600036037 /* info.c */; };
 		C295DFAA155BCAD600036037 /* jni_service.c in Sources */ = {isa = PBXBuildFile; fileRef = C295DF7C155BCAD600036037 /* jni_service.c */; };
@@ -94,6 +96,10 @@
 		C20C2BBF1350B5D7001E22FB /* hive_viriatum */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = hive_viriatum; sourceTree = BUILT_PRODUCTS_DIR; };
 		C20C2C741350B6A9001E22FB /* hive_viriatum_commons.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = hive_viriatum_commons.xcodeproj; path = ../hive_viriatum_commons/hive_viriatum_commons.xcodeproj; sourceTree = "<group>"; };
 		C20C2CE41350B71E001E22FB /* libhive_viriatum_commons.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libhive_viriatum_commons.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		C24EF47B15820F7400FAE3A0 /* stream_httpc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = stream_httpc.c; sourceTree = "<group>"; };
+		C24EF47C15820F7400FAE3A0 /* stream_httpc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stream_httpc.h; sourceTree = "<group>"; };
+		C24EF47D15820F7400FAE3A0 /* stream_torrent.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = stream_torrent.c; sourceTree = "<group>"; };
+		C24EF47E15820F7400FAE3A0 /* stream_torrent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stream_torrent.h; sourceTree = "<group>"; };
 		C2565F7B149C556900722EFA /* hive_viriatum_mobile.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = hive_viriatum_mobile.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C2565F7D149C556900722EFA /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
 		C2565F7F149C556A00722EFA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
@@ -120,9 +126,6 @@
 		C295DF71155BCAD600036037 /* http_parser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = http_parser.h; sourceTree = "<group>"; };
 		C295DF72155BCAD600036037 /* http_request.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = http_request.c; sourceTree = "<group>"; };
 		C295DF73155BCAD600036037 /* http_request.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = http_request.h; sourceTree = "<group>"; };
-		C295DF75155BCAD600036037 /* file.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = file.c; sourceTree = "<group>"; };
-		C295DF76155BCAD600036037 /* file.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = file.h; sourceTree = "<group>"; };
-		C295DF77155BCAD600036037 /* io.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = io.h; sourceTree = "<group>"; };
 		C295DF79155BCAD600036037 /* info.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = info.c; sourceTree = "<group>"; };
 		C295DF7A155BCAD600036037 /* info.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = info.h; sourceTree = "<group>"; };
 		C295DF7B155BCAD600036037 /* jni.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = jni.h; sourceTree = "<group>"; };
@@ -225,7 +228,6 @@
 				C295DF62155BCAD600036037 /* global */,
 				C295DF66155BCAD600036037 /* handlers */,
 				C295DF6E155BCAD600036037 /* http */,
-				C295DF74155BCAD600036037 /* io */,
 				C295DF78155BCAD600036037 /* jni */,
 				C295DF80155BCAD600036037 /* module */,
 				C295DF84155BCAD600036037 /* polling */,
@@ -308,17 +310,6 @@
 			path = ../../../src/hive_viriatum/http;
 			sourceTree = "<group>";
 		};
-		C295DF74155BCAD600036037 /* io */ = {
-			isa = PBXGroup;
-			children = (
-				C295DF75155BCAD600036037 /* file.c */,
-				C295DF76155BCAD600036037 /* file.h */,
-				C295DF77155BCAD600036037 /* io.h */,
-			);
-			name = io;
-			path = ../../../src/hive_viriatum/io;
-			sourceTree = "<group>";
-		};
 		C295DF78155BCAD600036037 /* jni */ = {
 			isa = PBXGroup;
 			children = (
@@ -363,6 +354,10 @@
 		C295DF8C155BCAD600036037 /* stream */ = {
 			isa = PBXGroup;
 			children = (
+				C24EF47B15820F7400FAE3A0 /* stream_httpc.c */,
+				C24EF47C15820F7400FAE3A0 /* stream_httpc.h */,
+				C24EF47D15820F7400FAE3A0 /* stream_torrent.c */,
+				C24EF47E15820F7400FAE3A0 /* stream_torrent.h */,
 				C295DF8D155BCAD600036037 /* stream.h */,
 				C295DF8E155BCAD600036037 /* stream_http.c */,
 				C295DF8F155BCAD600036037 /* stream_http.h */,
@@ -524,7 +519,6 @@
 				C295DFA0155BCAD600036037 /* handler_file.c in Sources */,
 				C295DFA2155BCAD600036037 /* http_parser.c in Sources */,
 				C295DFA4155BCAD600036037 /* http_request.c in Sources */,
-				C295DFA6155BCAD600036037 /* file.c in Sources */,
 				C295DFA8155BCAD600036037 /* info.c in Sources */,
 				C295DFAA155BCAD600036037 /* jni_service.c in Sources */,
 				C295DFAC155BCAD600036037 /* start.c in Sources */,
@@ -537,6 +531,8 @@
 				C295DFBA155BCAD600036037 /* environment.c in Sources */,
 				C295DFBC155BCAD600036037 /* service.c in Sources */,
 				C295DFBE155BCAD600036037 /* simple_test.c in Sources */,
+				C24EF47F15820F7400FAE3A0 /* stream_httpc.c in Sources */,
+				C24EF48115820F7400FAE3A0 /* stream_torrent.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -554,7 +550,6 @@
 				C295DFA1155BCAD600036037 /* handler_file.c in Sources */,
 				C295DFA3155BCAD600036037 /* http_parser.c in Sources */,
 				C295DFA5155BCAD600036037 /* http_request.c in Sources */,
-				C295DFA7155BCAD600036037 /* file.c in Sources */,
 				C295DFA9155BCAD600036037 /* info.c in Sources */,
 				C295DFAB155BCAD600036037 /* jni_service.c in Sources */,
 				C295DFAD155BCAD600036037 /* start.c in Sources */,
@@ -567,6 +562,8 @@
 				C295DFBB155BCAD600036037 /* environment.c in Sources */,
 				C295DFBD155BCAD600036037 /* service.c in Sources */,
 				C295DFBF155BCAD600036037 /* simple_test.c in Sources */,
+				C24EF48015820F7400FAE3A0 /* stream_httpc.c in Sources */,
+				C24EF48215820F7400FAE3A0 /* stream_torrent.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

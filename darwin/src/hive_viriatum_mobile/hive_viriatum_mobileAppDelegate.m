@@ -22,17 +22,17 @@
 
     // creates the hashmap used to represent the arguments
     // from the command line (started as empty)
-    createHashMap(&arguments, 0);
+    create_hash_map(&arguments, 0);
 
     // Override point for customization after application launch.
     // Add the navigation controller's view to the window and display.
     self.window.rootViewController = self.navigationController;
 
     // start running the service (blocking call)
-    runService(arguments);
+    run_service(arguments);
 
     // deletes the arguments hash map (release memory)
-    deleteHashMap(arguments);
+    delete_hash_map(arguments);
 
     [self.window makeKeyAndVisible];
     return YES;
