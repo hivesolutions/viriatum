@@ -26,7 +26,7 @@
 all:
 	libtoolize --copy && aclocal && autoheader && automake --add-missing --copy && autoconf
 
-darwin:
+mac-darwin:
 	glibtoolize --copy && aclocal && autoheader && automake --add-missing --copy && autoconf
 
 clean:
