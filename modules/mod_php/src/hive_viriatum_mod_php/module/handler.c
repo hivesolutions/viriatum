@@ -237,12 +237,13 @@ ERROR_CODE header_value_callback_handler_module(struct http_parser_t *http_parse
 
 
 			pointer = strchr(handler_php_context->host, ':');
-			_data_size = pointer - handler_php_context->host;
+			if(pointer == NULL) { _data_size = data_size; }
+			else { _data_size = pointer - handler_php_context->host; }
 
 			/* copies the server name header value into the
             appropriate buffer in the php context */
             memcpy(handler_php_context->server_name, data, _data_size);
-            handler_php_context->host[_data_size] = '\0';
+            handler_php_context->server_name[_data_size] = '\0';
 
             /* populates the various generated strings, avoids possible recalculation
             of the lengths of the string */
