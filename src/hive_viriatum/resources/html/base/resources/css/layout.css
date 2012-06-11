@@ -146,6 +146,14 @@ a:hover {
     width: 660px;
 }
 
+.table.file-listing a {
+    padding-bottom: 2px;
+}
+
+.table.file-listing a:hover {
+    border-bottom: 1px solid #595959;
+}
+
 .table.file-listing th {
     font-weight: normal;
     padding: 8px 0px 8px 36px;
@@ -191,9 +199,8 @@ a:hover {
     vertical-align: bottom;
 }
 
-.icon.arrow-left a {
+.icon.arrow-left span {
     background: transparent url(../images/arrow-left.png) top center no-repeat;
-    cursor: pointer;
     display: block;
     height: 16px;
     width: 100%;
