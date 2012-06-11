@@ -27,7 +27,7 @@
                 </thead>
                 <tbody>
                     <tr class="current-folder">
-                        <td class="icon arrow-left"><a></a></td>
+                        <td class="icon arrow-left"><span></span></td>
                         <td colspan="3"><a href="../">Folder Name</a></td>
                     </tr>
                     ${foreach item=entry from=entries}
