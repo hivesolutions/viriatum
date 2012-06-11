@@ -85,6 +85,12 @@ typedef struct handler_php_context_t {
     unsigned char host[VIRIATUM_MAX_HEADER_SIZE];
 
     /**
+     * The server name for the current request being
+     * made this is a header value.
+     */
+    unsigned char server_name[VIRIATUM_MAX_HEADER_SIZE];
+
+    /**
      * The string representing the http method
      * currently being used.
      */
@@ -156,6 +162,12 @@ typedef struct handler_php_context_t {
      * for fast attribute calculation (eg: size).
      */
     struct string_t _host_string;
+
+	/**
+     * String reference to the server name buffer, useful
+     * for fast attribute calculation (eg: size).
+     */
+    struct string_t _server_name_string;
 } handler_php_context;
 
 ERROR_CODE create_mod_php_http_handler(struct mod_php_http_handler_t **mod_php_http_handler_pointer, struct http_handler_t *http_handler_pointer);

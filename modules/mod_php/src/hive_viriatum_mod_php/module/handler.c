@@ -192,6 +192,9 @@ ERROR_CODE header_value_callback_handler_module(struct http_parser_t *http_parse
     /* retrieves the handler php context from the http parser */
     struct handler_php_context_t *handler_php_context = (struct handler_php_context_t *) http_parser->context;
 
+	char *pointer;
+	size_t _data_size;
+
     /* switchs over the next header possible values to
     copy the current header buffer into the appropriate place */
     switch(handler_php_context->_next_header) {
@@ -230,6 +233,24 @@ ERROR_CODE header_value_callback_handler_module(struct http_parser_t *http_parse
             /* populates the various generated strings, avoids possible recalculation
             of the lengths of the string */
             string_populate(&handler_php_context->_host_string, handler_php_context->host, data_size, 0);
+
+
+
+			pointer = strchr(handler_php_context->host, ':');
+			_data_size = pointer - handler_php_context->host;
+
+			/* copies the server name header value into the
+            appropriate buffer in the php context */
+            memcpy(handler_php_context->server_name, data, _data_size);
+            handler_php_context->host[_data_size] = '\0';
+
+            /* populates the various generated strings, avoids possible recalculation
+            of the lengths of the string */
+            string_populate(&handler_php_context->_server_name_string, handler_php_context->server_name, _data_size, 0);
+
+
+
+
 
             /* breaks the switch */
             break;
