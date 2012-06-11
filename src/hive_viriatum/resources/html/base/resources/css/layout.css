@@ -135,8 +135,8 @@ a:hover {
 }
 
 .footer-list li {
-    list-style: none;
     display: inline;
+    list-style: none;
     margin: 0px 12px 0px 12px;
 }
 
@@ -165,15 +165,15 @@ a:hover {
 }
 
 .table.file-listing td.date {
+    max-width: 160px;
     min-width: 160px;
     width: 160px;
-    max-width: 160px;
 }
 
 .table.file-listing td.size {
+    max-width: 130px;
     min-width: 130px;
     width: 130px;
-    max-width: 130px;
 }
 
 .table.file-listing tbody td:last-child {

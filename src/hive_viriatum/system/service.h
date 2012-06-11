@@ -268,15 +268,15 @@ typedef struct service_options_t {
     /**
      * The "default" tcp port to bind the service
      * associated with these options, this is the
-	 * string value corresponding to the integer.
+     * string value corresponding to the integer.
      */
     unsigned char _port[128];
 
-	/**
-	 * The string value structure to the port buffer
-	 * to be used, this value will be used for caching
-	 * length values.
-	 */
+    /**
+     * The string value structure to the port buffer
+     * to be used, this value will be used for caching
+     * length values.
+     */
     struct string_t _port_string;
 
     /**

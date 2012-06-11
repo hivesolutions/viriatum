@@ -153,10 +153,10 @@ void _module_register(zval *_array TSRMLS_DC) {
     char *address_string;
     SOCKET_ADDRESS address = _connection->socket_address;
 
-	/* retrieves the current port buffer value and the
-	string structure that controls it */
-	unsigned char *port = _connection->service->options->_port;
-	struct string_t *port_string = &_connection->service->options->_port_string;
+    /* retrieves the current port buffer value and the
+    string structure that controls it */
+    unsigned char *port = _connection->service->options->_port;
+    struct string_t *port_string = &_connection->service->options->_port_string;
 
     /* converts the address of the socket into the representing
     string value (for exporting the value) */
@@ -166,12 +166,12 @@ void _module_register(zval *_array TSRMLS_DC) {
     current interface (critical for correct php interpreter usage) */
     php_register_variable_safe("PHP_SELF", "-", 1, _array TSRMLS_CC);
     php_register_variable_safe("GATEWAY_INTERFACE", "viriatum", sizeof("viriatum") - 1, _array TSRMLS_CC);
-	php_register_variable_safe("SERVER_NAME", (char *) _php_request.php_context->server_name, _php_request.php_context->_server_name_string.length, _array TSRMLS_CC);
-	php_register_variable_safe("SERVER_PORT", (char *) port, port_string->length, _array TSRMLS_CC);
-	php_register_variable_safe("SCRIPT_NAME", (char *)_php_request.php_context->file_name, _php_request.php_context->_file_name_string.length, _array TSRMLS_CC);
-	php_register_variable_safe("SCRIPT_FILENAME", (char *)_php_request.php_context->file_path, _php_request.php_context->_file_path_string.length, _array TSRMLS_CC);
-	php_register_variable_safe("QUERY_STRING", (char *) _php_request.php_context->query, _php_request.php_context->_query_string.length, _array TSRMLS_CC);
-	php_register_variable_safe("REQUEST_METHOD", (char *) _php_request.php_context->method, strlen(_php_request.php_context->method), _array TSRMLS_CC);
+    php_register_variable_safe("SERVER_NAME", (char *) _php_request.php_context->server_name, _php_request.php_context->_server_name_string.length, _array TSRMLS_CC);
+    php_register_variable_safe("SERVER_PORT", (char *) port, port_string->length, _array TSRMLS_CC);
+    php_register_variable_safe("SCRIPT_NAME", (char *)_php_request.php_context->file_name, _php_request.php_context->_file_name_string.length, _array TSRMLS_CC);
+    php_register_variable_safe("SCRIPT_FILENAME", (char *)_php_request.php_context->file_path, _php_request.php_context->_file_path_string.length, _array TSRMLS_CC);
+    php_register_variable_safe("QUERY_STRING", (char *) _php_request.php_context->query, _php_request.php_context->_query_string.length, _array TSRMLS_CC);
+    php_register_variable_safe("REQUEST_METHOD", (char *) _php_request.php_context->method, strlen(_php_request.php_context->method), _array TSRMLS_CC);
     php_register_variable_safe("REMOTE_ADDR", address_string, strlen(address_string), _array TSRMLS_CC);
 }
 
