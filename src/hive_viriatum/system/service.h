@@ -312,6 +312,14 @@ typedef struct service_options_t {
      */
     unsigned int default_index;
 
+	/**
+	 * If the instance should use templates for error
+	 * messages providing a better look and feel at the
+	 * cost of more computer power (may create problems
+	 * for denial of service (dos) attacks).
+	 */
+	unsigned int use_template;
+
     /**
      * The default virtual host to be used in any
      * non matched host request.

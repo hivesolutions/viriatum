@@ -108,6 +108,7 @@ static __inline char *get_config_path() {
 #define VIRIATUM_CONFIG_PATH get_config_path()
 #define VIRIATUM_BASE_PATH ""
 #define VIRIATUM_LISTING_PATH "/templates/listing.html.tpl"
+#define VIRIATUM_ERROR_PATH "/templates/error.html.tpl"
 #ifndef VIRIATUM_CONTENTS_PATH
 #define VIRIATUM_CONTENTS_PATH get_contents_path()
 #endif
@@ -121,6 +122,7 @@ static __inline char *get_config_path() {
 #define VIRIATUM_CONFIG_PATH "/sdcard/viriatum/config"
 #define VIRIATUM_BASE_PATH ""
 #define VIRIATUM_LISTING_PATH "/templates/listing.html.tpl"
+#define VIRIATUM_ERROR_PATH "/templates/error.html.tpl"
 #define VIRIATUM_CONTENTS_PATH "/sdcard/viriatum/www"
 #else
 #ifndef VIRIATUM_MODULES_PATH
@@ -134,6 +136,7 @@ static __inline char *get_config_path() {
 #endif
 #define VIRIATUM_BASE_PATH ""
 #define VIRIATUM_LISTING_PATH "/templates/listing.html.tpl"
+#define VIRIATUM_ERROR_PATH "/templates/error.html.tpl"
 #ifndef VIRIATUM_CONTENTS_PATH
 #define VIRIATUM_CONTENTS_PATH "/var/viriatum/www"
 #endif

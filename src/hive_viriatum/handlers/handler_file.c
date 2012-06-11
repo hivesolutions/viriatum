@@ -292,8 +292,11 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
     /* retrieves the handler file context from the http parser */
     struct handler_file_context_t *handler_file_context = (struct handler_file_context_t *) http_parser->context;
 
-    /* retrieves the connection from the http parser parameters */
+    /* retrieves the connection from the http parser parameters
+	and then retrieves the service options from it */
     struct connection_t *connection = (struct connection_t *) http_parser->parameters;
+	struct service_t *service = connection->service;
+	struct service_options_t *options = service->options;
 
     /* checks if the path being request is in fact a directory */
     is_directory_file((char *) handler_file_context->file_path, &is_directory);
@@ -325,9 +328,6 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
             list_directory_file((char *) handler_file_context->file_path, directory_entries);
             entries_to_map_file(directory_entries, &directory_entries_map);
 
-            /* creates the template handler */
-            create_template_handler(&template_handler);
-
 			/* retrieves the current size of the url and copies into
 			the folder path the appropriate part of it, this strategy
 			takes into account the size of the url */
@@ -335,6 +335,9 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
 			if(url_size > 2) { memcpy(folder_path, &handler_file_context->url[1], url_size - 2); }
 			if(url_size > 2) { folder_path[url_size - 2] = '\0'; }
 			else { folder_path[0] = '\0'; }
+
+            /* creates the template handler */
+            create_template_handler(&template_handler);
 
 			/* assigns the name of the current folder being listed to
 			the template handler (to be set on the template) */
@@ -398,11 +401,43 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
         /* prints the error */
         V_DEBUG_F("%s\n", get_last_error_message_safe());
 
-        /* writes the http static headers to the response */
-        SPRINTF(headers_buffer, 1024, "HTTP/1.1 404 Not Found\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nCache-Control: no-cache, must-revalidate\r\nContent-Length: %lu\r\n\r\n404 - Not Found (%s)", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, (long unsigned int) strlen((char *) handler_file_context->file_path) + 18, handler_file_context->file_path);
+		/* in case the use template flag is set the error
+		should be displayed using the template */
+		if(options->use_template) {
+			/* creates the complete path to the template file */
+			SPRINTF((char *) template_path, 1024, "%s%s", VIRIATUM_RESOURCES_PATH, VIRIATUM_ERROR_PATH);
 
-        /* writes both the headers to the connection, registers for the appropriate callbacks */
-        write_connection(connection, (unsigned char *) headers_buffer, (unsigned int) strlen(headers_buffer), _cleanup_handler_file, handler_file_context);
+			/* pritns a debug message */
+			V_DEBUG_F("Processing template file '%s'\n", template_path);
+
+			/* creates the template handler */
+			create_template_handler(&template_handler);
+
+			/* assigns the name of the current folder being listed to
+			the template handler (to be set on the template) */
+			assign_string_template_handler(template_handler, (unsigned char *) "error_code", "404");
+			assign_string_template_handler(template_handler, (unsigned char *) "error_message", "file not found");
+
+			/* processes the file as a template handler */
+			process_template_handler(template_handler, template_path);
+
+			/* sets the template handler in the handler file context and unsets
+			the flushed flag */
+			handler_file_context->template_handler = template_handler;
+			handler_file_context->flushed = 0;
+
+			/* writes the http static headers to the response */
+			SPRINTF(headers_buffer, 1024, "HTTP/1.1 404 Not Found\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nCache-Control: no-cache, must-revalidate\r\nContent-Length: %lu\r\n\r\n", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, (long unsigned int) strlen((char *) handler_file_context->template_handler->string_value));
+
+			/* writes both the headers to the connection, registers for the appropriate callbacks */
+			write_connection(connection, (unsigned char *) headers_buffer, (unsigned int) strlen(headers_buffer), _send_data_handler_file, handler_file_context);
+		} else {
+			/* writes the http static headers to the response */
+			SPRINTF(headers_buffer, 1024, "HTTP/1.1 404 Not Found\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nCache-Control: no-cache, must-revalidate\r\nContent-Length: %lu\r\n\r\n404 - Not Found (%s)", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, (long unsigned int) strlen((char *) handler_file_context->file_path) + 18, handler_file_context->file_path);
+
+			/* writes both the headers to the connection, registers for the appropriate callbacks */
+			write_connection(connection, (unsigned char *) headers_buffer, (unsigned int) strlen(headers_buffer), _cleanup_handler_file, handler_file_context);
+		}
     } else if(is_redirect) {
         /* writes the http static headers to the response */
         SPRINTF(headers_buffer, 1024, "HTTP/1.1 307 Temporary Redirect\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nContent-Length: 0\r\nLocation: %s\r\n\r\n", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, location);
