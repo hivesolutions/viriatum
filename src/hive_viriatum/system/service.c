@@ -235,6 +235,16 @@ ERROR_CODE load_options_service(struct service_t *service, struct hash_map_t *ar
     RAISE_NO_ERROR;
 }
 
+ERROR_CODE calculate_options_service(struct service_t *service) {
+	/* converts the service port value into a string value
+	using a base ten encoding and then populates the correspoding
+	string value to use prefetched values */
+	SPRINTF(service->options->_port, 128, "%d", service->options->port);
+	string_populate(&service->options->_port_string, service->options->_port, 0, 1);
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
 
 
 
