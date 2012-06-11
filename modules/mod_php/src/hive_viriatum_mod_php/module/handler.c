@@ -134,11 +134,6 @@ ERROR_CODE url_callback_handler_module(struct http_parser_t *http_parser, const 
     /* retrieves the handler php context from the http parser */
     struct handler_php_context_t *handler_php_context = (struct handler_php_context_t *) http_parser->context;
 
-    /* allocates space for the file name that will be executed
-    by the php interpreter, this is necessary to remove the query
-    part of the uri value */
-    unsigned char file_name[VIRIATUM_MAX_PATH_SIZE];
-
     /* checks the position of the get parameters divisor position
     and then uses it to calculate the size of the (base) path */
     char *pointer = (char *) memchr((char *) data, '?', data_size);
@@ -148,8 +143,8 @@ ERROR_CODE url_callback_handler_module(struct http_parser_t *http_parser, const 
 
     /* copies the part of the data buffer relative to the file name
     this avoids copying the query part */
-    memcpy(file_name, data, path_size);
-    file_name[path_size] = '\0';
+    memcpy(handler_php_context->file_name, data, path_size);
+    handler_php_context->file_name[path_size] = '\0';
 
     /* in case the pointer is defined (query separator found) copies
     the query contents into the target query buffer */
@@ -160,10 +155,11 @@ ERROR_CODE url_callback_handler_module(struct http_parser_t *http_parser, const 
     creates the file path from using the base viriatum path */
     memcpy(handler_php_context->url, data, data_size);
     handler_php_context->url[path_size] = '\0';
-    SPRINTF((char *) handler_php_context->file_path, VIRIATUM_MAX_PATH_SIZE, "%s%s%s", VIRIATUM_CONTENTS_PATH, VIRIATUM_BASE_PATH, file_name);
+    SPRINTF((char *) handler_php_context->file_path, VIRIATUM_MAX_PATH_SIZE, "%s%s%s", VIRIATUM_CONTENTS_PATH, VIRIATUM_BASE_PATH, handler_php_context->file_name);
 
     /* populates the various generated strings, avoids possible recalculation
     of the lengths of the string */
+	string_populate(&handler_php_context->_file_name_string, handler_php_context->file_name, path_size, 0);
     string_populate(&handler_php_context->_query_string, handler_php_context->query, query_size, 0);
     string_populate(&handler_php_context->_url_string, handler_php_context->url, path_size, 0);
     string_populate(&handler_php_context->_file_path_string, handler_php_context->file_path, 0, 1);
