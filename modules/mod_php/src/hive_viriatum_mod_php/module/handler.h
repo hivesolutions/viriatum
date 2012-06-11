@@ -55,6 +55,11 @@ typedef struct handler_php_context_t {
     unsigned char url[VIRIATUM_MAX_URL_SIZE];
 
     /**
+     * The file name to be used for retrieving the file.
+     */
+    unsigned char file_name[VIRIATUM_MAX_URL_SIZE];
+
+    /**
      * The query string (contents after the '?')
      * to be used to create the get parameters map.
      */
@@ -132,6 +137,12 @@ typedef struct handler_php_context_t {
      * for fast attribute calculation (eg: size).
      */
     struct string_t _url_string;
+
+    /**
+     * String reference to the file name buffer, useful
+     * for fast attribute calculation (eg: size).
+     */
+    struct string_t _file_name_string;
 
     /**
      * String reference to the query buffer, useful

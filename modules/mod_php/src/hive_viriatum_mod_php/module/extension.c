@@ -166,7 +166,7 @@ void _module_register(zval *_array TSRMLS_DC) {
 
 
 	php_register_variable_safe("SERVER_PORT", (char *) "9090", 4, _array TSRMLS_CC);
-	php_register_variable_safe("SCRIPT_NAME", (char *)_php_request.php_context->file_path, _php_request.php_context->_file_path_string.length, _array TSRMLS_CC);
+	php_register_variable_safe("SCRIPT_NAME", (char *)_php_request.php_context->file_name, _php_request.php_context->_file_name_string.length, _array TSRMLS_CC);
 	php_register_variable_safe("SCRIPT_FILENAME", (char *)_php_request.php_context->file_path, _php_request.php_context->_file_path_string.length, _array TSRMLS_CC);
 	
 
