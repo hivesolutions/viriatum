@@ -482,13 +482,18 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
 }
 
 ERROR_CODE _send_response_callback_handler_module(struct connection_t *connection, struct data_t *data, void *parameters) {
-    /* retrieves the current php context fro the parameters */
+    /* retrieves the current php context for the parameters */
     struct handler_php_context_t *handler_php_context = (struct handler_php_context_t *) parameters;
 
     /* retrieves the underlying connection references in order to be
     able to operate over them, for unregister */
     struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
     struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
+
+	/* checks if the current connection should be kept alive, this must
+	be done prior to the unseting of the connection as the current php
+	context structrue will be destroyed there */
+	unsigned char keep_alive = handler_php_context->flags & FLAG_CONNECTION_KEEP_ALIVE;
 
     /* in case there is an http handler in the current connection must
     unset it (remove temporary information) */
@@ -499,11 +504,9 @@ ERROR_CODE _send_response_callback_handler_module(struct connection_t *connectio
         http_connection->http_handler = NULL;
     }
 
-    /* in case the connection is not meant to be kept alive */
-    if(!(handler_php_context->flags & FLAG_CONNECTION_KEEP_ALIVE)) {
-        /* closes the connection */
-        connection->close_connection(connection);
-    }
+    /* in case the connection is not meant to be kept alive must be closed
+	in the normal manner (using the close connection function) */
+    if(!keep_alive) { connection->close_connection(connection); }
 
     /* raise no error */
     RAISE_NO_ERROR;
