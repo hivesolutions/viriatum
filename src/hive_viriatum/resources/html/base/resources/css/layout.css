@@ -29,7 +29,6 @@ a {
 
 a:hover {
     color: #000000;
-    text-decoration: underline;
 }
 
 .clear {
@@ -130,14 +129,15 @@ a:hover {
     width: 110px;
 }
 
-.footer-body a.left {
-    float: left;
-    text-align: right;
+.footer-list {
+    margin: 12px auto 12px auto;
+    padding: 0px 0px 0px 0px;
 }
 
-.footer-body a.right {
-    float: right;
-    text-align: left;
+.footer-list li {
+    list-style: none;
+    display: inline;
+    margin: 0px 12px 0px 12px;
 }
 
 .table.file-listing {
@@ -162,6 +162,18 @@ a:hover {
 
 .table.file-listing td {
     padding: 8px 0px 8px 0px;
+}
+
+.table.file-listing td.date {
+    min-width: 160px;
+    width: 160px;
+    max-width: 160px;
+}
+
+.table.file-listing td.size {
+    min-width: 130px;
+    width: 130px;
+    max-width: 130px;
 }
 
 .table.file-listing tbody td:last-child {
