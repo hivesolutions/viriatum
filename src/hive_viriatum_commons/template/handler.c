@@ -289,7 +289,24 @@ void assign_integer_template_handler(struct template_handler_t *template_handler
     set_value_string_hash_map(template_handler->names, name, type);
 
     /* adds the type to the list of types to have the
-    memory release uppon template handler destruction (late removal) */
+    memory released uppon template handler destruction (late removal) */
+    append_value_linked_list(template_handler->release_list, type);
+}
+
+void assign_string_template_handler(struct template_handler_t *template_handler, unsigned char *name, char *value) {
+    /* allocates space for the type */
+    struct type_t *type;
+
+    /* create a string type and sets the value
+    to the list to be assigned */
+    create_type(&type, STRING_TYPE);
+	type->value.value_string = value;
+
+    /* sets the value (string) in the template handler names hash map */
+    set_value_string_hash_map(template_handler->names, name, type);
+
+    /* adds the type to the list of types to have the
+    memory released uppon template handler destruction (late removal) */
     append_value_linked_list(template_handler->release_list, type);
 }
 
@@ -306,7 +323,7 @@ void assign_list_template_handler(struct template_handler_t *template_handler, u
     set_value_string_hash_map(template_handler->names, name, type);
 
     /* adds the type to the list of types to have the
-    memory release uppon template handler destruction (late removal) */
+    memory released uppon template handler destruction (late removal) */
     append_value_linked_list(template_handler->release_list, type);
 }
 

@@ -173,6 +173,7 @@ VIRIATUM_EXPORT_PREFIX void delete_template_parameter(struct template_parameter_
 VIRIATUM_EXPORT_PREFIX void process_template_handler(struct template_handler_t *template_handler, unsigned char *file_path);
 VIRIATUM_EXPORT_PREFIX void assign_template_handler(struct template_handler_t *template_handler, unsigned char *name, struct type_t *value);
 VIRIATUM_EXPORT_PREFIX void assign_integer_template_handler(struct template_handler_t *template_handler, unsigned char *name, int value);
+VIRIATUM_EXPORT_PREFIX void assign_string_template_handler(struct template_handler_t *template_handler, unsigned char *name, char *value);
 VIRIATUM_EXPORT_PREFIX void assign_list_template_handler(struct template_handler_t *template_handler, unsigned char *name, struct linked_list_t *value);
 VIRIATUM_EXPORT_PREFIX void get_template_handler(struct template_handler_t *template_handler, unsigned char *name, struct type_t **value_pointer);
 VIRIATUM_EXPORT_PREFIX void traverse_node_debug(struct template_handler_t *template_handler, struct template_node_t *node, unsigned int indentation);

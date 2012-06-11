@@ -265,8 +265,8 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
     /* allocates space for the new location value for
     redirect request cases and for the path to the
     template (for directory listing) */
-    unsigned char location[1024];
-    unsigned char template_path[1024];
+    unsigned char location[VIRIATUM_MAX_PATH_SIZE];
+    unsigned char template_path[VIRIATUM_MAX_PATH_SIZE];
 
     /* allocates space for the computation of the time
     and of the time string, then allocates space for the
@@ -275,6 +275,11 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
     char time_string[20];
     unsigned long crc32_value;
     char etag[11];
+
+	/* allocates space for the size of the url string to
+	be calculates and for the folder path variable */
+	size_t url_size;
+	char folder_path[VIRIATUM_MAX_PATH_SIZE];
 
     /* allocates the space for the "read" result
     error code (valid by default) */
@@ -322,6 +327,18 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
 
             /* creates the template handler */
             create_template_handler(&template_handler);
+
+			/* retrieves the current size of the url and copies into
+			the folder path the appropriate part of it, this strategy
+			takes into account the size of the url */
+			url_size = strlen(handler_file_context->url);
+			if(url_size > 2) { memcpy(folder_path, &handler_file_context->url[1], url_size - 2); }
+			if(url_size > 2) { folder_path[url_size - 2] = '\0'; }
+			else { folder_path[0] = '\0'; }
+
+			/* assigns the name of the current folder being listed to
+			the template handler (to be set on the template) */
+			assign_string_template_handler(template_handler, (unsigned char *) "folder_path", folder_path);
 
             /* assigns the directory entries to the template handler,
             this variable will be exposed to the template */
