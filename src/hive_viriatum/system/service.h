@@ -266,6 +266,20 @@ typedef struct service_options_t {
     unsigned short port;
 
     /**
+     * The "default" tcp port to bind the service
+     * associated with these options, this is the
+	 * string value corresponding to the integer.
+     */
+    unsigned char _port[128];
+
+	/**
+	 * The string value structure to the port buffer
+	 * to be used, this value will be used for caching
+	 * length values.
+	 */
+    struct string_t _port_string;
+
+    /**
      * The "default" address to bind the service
      * associated with these options.
      */
@@ -626,6 +640,16 @@ void delete_configuration(struct hash_map_t *configuration, int is_top);
  * @return The resulting error code.
  */
 ERROR_CODE load_options_service(struct service_t *service, struct hash_map_t *arguments);
+
+/**
+ * Calculates the various options, these values correspond to the
+ * various calculated attributes in the options.
+ *
+ * @param service The service to hasve the options calculated.
+ * during the options loading.
+ * @return The resulting error code.
+ */
+ERROR_CODE calculate_options_service(struct service_t *service);
 
 /**
  * Starts the given service, initializing the
