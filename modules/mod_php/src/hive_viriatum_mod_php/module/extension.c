@@ -161,6 +161,7 @@ void _module_register(zval *_array TSRMLS_DC) {
     current interface (critical for correct php interpreter usage) */
     php_register_variable_safe("PHP_SELF", "-", 1, _array TSRMLS_CC);
     php_register_variable_safe("GATEWAY_INTERFACE", "viriatum", sizeof("viriatum") - 1, _array TSRMLS_CC);
+	php_register_variable_safe("SERVER_NAME", (char *) _php_request.php_context->host, _php_request.php_context->_host_string.length, _array TSRMLS_CC);
 	php_register_variable_safe("QUERY_STRING", (char *) _php_request.php_context->query, _php_request.php_context->_query_string.length, _array TSRMLS_CC);
 	php_register_variable_safe("REQUEST_METHOD", (char *) _php_request.php_context->method, strlen(_php_request.php_context->method), _array TSRMLS_CC);
     php_register_variable_safe("REMOTE_ADDR", address_string, strlen(address_string), _array TSRMLS_CC);
