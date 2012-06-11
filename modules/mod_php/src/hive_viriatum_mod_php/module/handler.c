@@ -181,6 +181,7 @@ ERROR_CODE header_field_callback_handler_module(struct http_parser_t *http_parse
     otherwise sets the undefined header */
     if(memcmp(data, "Content-Type", data_size) == 0) { handler_php_context->_next_header = CONTENT_TYPE; }
     else if(memcmp(data, "Cookie", data_size) == 0) { handler_php_context->_next_header = COOKIE; }
+	else if(memcmp(data, "Host", data_size) == 0) { handler_php_context->_next_header = HOST; }
     else { handler_php_context->_next_header = UNDEFINED_HEADER; }
 
     /* raise no error */
@@ -216,6 +217,19 @@ ERROR_CODE header_value_callback_handler_module(struct http_parser_t *http_parse
             /* populates the various generated strings, avoids possible recalculation
             of the lengths of the string */
             string_populate(&handler_php_context->_cookie_string, handler_php_context->cookie, data_size, 0);
+
+            /* breaks the switch */
+            break;
+
+        case HOST:
+            /* copies the host header value into the
+            appropriate buffer in the php context */
+            memcpy(handler_php_context->host, data, data_size);
+            handler_php_context->host[data_size] = '\0';
+
+            /* populates the various generated strings, avoids possible recalculation
+            of the lengths of the string */
+            string_populate(&handler_php_context->_host_string, handler_php_context->host, data_size, 0);
 
             /* breaks the switch */
             break;

@@ -35,7 +35,8 @@
 typedef enum http_header_e {
     UNDEFINED_HEADER = 1,
     CONTENT_TYPE,
-    COOKIE
+    COOKIE,
+	HOST
 } http_header;
 
 typedef enum http_request_method_e {
