@@ -226,12 +226,8 @@ ERROR_CODE header_value_callback_handler_module(struct http_parser_t *http_parse
             memcpy(handler_php_context->host, data, data_size);
             handler_php_context->host[data_size] = '\0';
 
-            /* populates the various generated strings, avoids possible recalculation
-            of the lengths of the string */
-            string_populate(&handler_php_context->_host_string, handler_php_context->host, data_size, 0);
-
-
-
+			/* tries to find the port part of the host in case
+			it's possible sets the base data size for the server name */
 			pointer = strchr(handler_php_context->host, ':');
 			if(pointer == NULL) { _data_size = data_size; }
 			else { _data_size = pointer - handler_php_context->host; }
@@ -241,13 +237,10 @@ ERROR_CODE header_value_callback_handler_module(struct http_parser_t *http_parse
             memcpy(handler_php_context->server_name, data, _data_size);
             handler_php_context->server_name[_data_size] = '\0';
 
-            /* populates the various generated strings, avoids possible recalculation
+		    /* populates the various generated strings, avoids possible recalculation
             of the lengths of the string */
+			string_populate(&handler_php_context->_host_string, handler_php_context->host, data_size, 0);
             string_populate(&handler_php_context->_server_name_string, handler_php_context->server_name, _data_size, 0);
-
-
-
-
 
             /* breaks the switch */
             break;
