@@ -159,7 +159,7 @@ ERROR_CODE url_callback_handler_module(struct http_parser_t *http_parser, const 
 
     /* populates the various generated strings, avoids possible recalculation
     of the lengths of the string */
-	string_populate(&handler_php_context->_file_name_string, handler_php_context->file_name, path_size, 0);
+    string_populate(&handler_php_context->_file_name_string, handler_php_context->file_name, path_size, 0);
     string_populate(&handler_php_context->_query_string, handler_php_context->query, query_size, 0);
     string_populate(&handler_php_context->_url_string, handler_php_context->url, path_size, 0);
     string_populate(&handler_php_context->_file_path_string, handler_php_context->file_path, 0, 1);
@@ -177,7 +177,7 @@ ERROR_CODE header_field_callback_handler_module(struct http_parser_t *http_parse
     otherwise sets the undefined header */
     if(memcmp(data, "Content-Type", data_size) == 0) { handler_php_context->_next_header = CONTENT_TYPE; }
     else if(memcmp(data, "Cookie", data_size) == 0) { handler_php_context->_next_header = COOKIE; }
-	else if(memcmp(data, "Host", data_size) == 0) { handler_php_context->_next_header = HOST; }
+    else if(memcmp(data, "Host", data_size) == 0) { handler_php_context->_next_header = HOST; }
     else { handler_php_context->_next_header = UNDEFINED_HEADER; }
 
     /* raise no error */
@@ -188,8 +188,8 @@ ERROR_CODE header_value_callback_handler_module(struct http_parser_t *http_parse
     /* retrieves the handler php context from the http parser */
     struct handler_php_context_t *handler_php_context = (struct handler_php_context_t *) http_parser->context;
 
-	char *pointer;
-	size_t _data_size;
+    char *pointer;
+    size_t _data_size;
 
     /* switchs over the next header possible values to
     copy the current header buffer into the appropriate place */
@@ -226,20 +226,20 @@ ERROR_CODE header_value_callback_handler_module(struct http_parser_t *http_parse
             memcpy(handler_php_context->host, data, data_size);
             handler_php_context->host[data_size] = '\0';
 
-			/* tries to find the port part of the host in case
-			it's possible sets the base data size for the server name */
-			pointer = strchr(handler_php_context->host, ':');
-			if(pointer == NULL) { _data_size = data_size; }
-			else { _data_size = pointer - handler_php_context->host; }
+            /* tries to find the port part of the host in case
+            it's possible sets the base data size for the server name */
+            pointer = strchr(handler_php_context->host, ':');
+            if(pointer == NULL) { _data_size = data_size; }
+            else { _data_size = pointer - handler_php_context->host; }
 
-			/* copies the server name header value into the
+            /* copies the server name header value into the
             appropriate buffer in the php context */
             memcpy(handler_php_context->server_name, data, _data_size);
             handler_php_context->server_name[_data_size] = '\0';
 
-		    /* populates the various generated strings, avoids possible recalculation
+            /* populates the various generated strings, avoids possible recalculation
             of the lengths of the string */
-			string_populate(&handler_php_context->_host_string, handler_php_context->host, data_size, 0);
+            string_populate(&handler_php_context->_host_string, handler_php_context->host, data_size, 0);
             string_populate(&handler_php_context->_server_name_string, handler_php_context->server_name, _data_size, 0);
 
             /* breaks the switch */
@@ -490,10 +490,10 @@ ERROR_CODE _send_response_callback_handler_module(struct connection_t *connectio
     struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
     struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
 
-	/* checks if the current connection should be kept alive, this must
-	be done prior to the unseting of the connection as the current php
-	context structrue will be destroyed there */
-	unsigned char keep_alive = handler_php_context->flags & FLAG_CONNECTION_KEEP_ALIVE;
+    /* checks if the current connection should be kept alive, this must
+    be done prior to the unseting of the connection as the current php
+    context structrue will be destroyed there */
+    unsigned char keep_alive = handler_php_context->flags & FLAG_CONNECTION_KEEP_ALIVE;
 
     /* in case there is an http handler in the current connection must
     unset it (remove temporary information) */
@@ -505,7 +505,7 @@ ERROR_CODE _send_response_callback_handler_module(struct connection_t *connectio
     }
 
     /* in case the connection is not meant to be kept alive must be closed
-	in the normal manner (using the close connection function) */
+    in the normal manner (using the close connection function) */
     if(!keep_alive) { connection->close_connection(connection); }
 
     /* raise no error */

@@ -174,7 +174,7 @@ typedef struct handler_php_context_t {
      */
     struct string_t _host_string;
 
-	/**
+    /**
      * String reference to the server name buffer, useful
      * for fast attribute calculation (eg: size).
      */

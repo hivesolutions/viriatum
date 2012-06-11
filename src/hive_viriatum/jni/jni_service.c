@@ -35,18 +35,18 @@ jstring Java_pt_hive_viriatum_http_Service_run(JNIEnv *env, jclass cls) {
     /* allocates the return value */
     ERROR_CODE return_value;
 
-	/* allocates space for the hash map that will hold
-	the arguments for the service execution */
-	struct hash_map_t *arguments;
+    /* allocates space for the hash map that will hold
+    the arguments for the service execution */
+    struct hash_map_t *arguments;
 
     /* allocates space for the result string buffer */
     char buffer[1024] = "";
 
     /* runs the service, with the given arguments, they are
-	crated on the fly as an empty map and deleted after*/
-	create_hash_map(&arguments, 0);
+    crated on the fly as an empty map and deleted after*/
+    create_hash_map(&arguments, 0);
     return_value = run_service(arguments);
-	delete_hash_map(arguments);
+    delete_hash_map(arguments);
 
     /* tests the error code for error */
     if(IS_ERROR_CODE(return_value)) {
