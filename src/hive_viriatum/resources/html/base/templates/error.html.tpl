@@ -15,8 +15,8 @@
             <div class="content-header error">
                 <div class="error-illustration"></div>
                 <div class="error-content">
-                    <div class="error-code">404</div>
-                    <h1 class="error-description">File not found</h1>
+                    <div class="error-code">${out value=error_code /}</div>
+                    <h1 class="error-description">${out value=error_message /}</h1>
                     <p>Maybe you've missed something, please double check the url value</p>
                 </div>
                 <div class="clear"></div>
