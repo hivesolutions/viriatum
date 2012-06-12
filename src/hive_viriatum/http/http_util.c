@@ -103,6 +103,10 @@ ERROR_CODE write_http_error(struct connection_t *connection, char *header, char 
         join_string_buffer(string_buffer, &result_buffer);
         result_length = string_buffer->string_length;
         delete_string_buffer(string_buffer);
+		
+		/* deletes the template handler as all the processing on it
+		has been done (buffer generated) */
+		delete_template_handler(template_handler);
 
         /* releases the contents of the headers buffer, no more need to
         continue using them (not requried) */
