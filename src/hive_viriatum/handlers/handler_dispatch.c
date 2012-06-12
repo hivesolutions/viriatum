@@ -331,9 +331,9 @@ ERROR_CODE _send_response_handler_dispatch(struct http_parser_t *http_parser) {
     /* retrieves the connection from the http parser parameters */
     struct connection_t *connection = (struct connection_t *) http_parser->parameters;
 
-	/* writes the response to the connection, registers for the appropriate callbacks
-	this method uses the http error util to correctly format the error message */
-	write_http_error(connection, response_buffer, "500", "Internal Server Error", DISPATCH_ERROR_MESSAGE, _send_response_callback_handler_dispatch, (void *) (size_t) http_parser->flags);
+    /* writes the response to the connection, registers for the appropriate callbacks
+    this method uses the http error util to correctly format the error message */
+    write_http_error(connection, response_buffer, "500", "Internal Server Error", DISPATCH_ERROR_MESSAGE, _send_response_callback_handler_dispatch, (void *) (size_t) http_parser->flags);
 
     /* raise no error */
     RAISE_NO_ERROR;

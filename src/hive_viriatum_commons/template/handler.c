@@ -300,7 +300,7 @@ void assign_string_template_handler(struct template_handler_t *template_handler,
     /* create a string type and sets the value
     to the list to be assigned */
     create_type(&type, STRING_TYPE);
-	type->value.value_string = value;
+    type->value.value_string = value;
 
     /* sets the value (string) in the template handler names hash map */
     set_value_string_hash_map(template_handler->names, name, type);
