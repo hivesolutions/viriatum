@@ -331,11 +331,9 @@ ERROR_CODE _send_response_handler_dispatch(struct http_parser_t *http_parser) {
     /* retrieves the connection from the http parser parameters */
     struct connection_t *connection = (struct connection_t *) http_parser->parameters;
 
-    /* writes the http static headers to the response */
-    SPRINTF(response_buffer, 256, "HTTP/1.1 500 Internal Server Error\r\nServer: %s/%s (%s @ %s)\r\nConnection: Keep-Alive\r\nContent-Length: %lu\r\n\r\n%s", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, (long unsigned int) sizeof(DISPATCH_ERROR_MESSAGE) - 1, DISPATCH_ERROR_MESSAGE);
-
-    /* writes the response to the connection, registers for the appropriate callbacks */
-    write_connection(connection, (unsigned char *) response_buffer, (unsigned int) strlen(response_buffer), _send_response_callback_handler_dispatch, (void *) (size_t) http_parser->flags);
+	/* writes the response to the connection, registers for the appropriate callbacks
+	this method uses the http error util to correctly format the error message */
+	write_http_error(connection, response_buffer, "500", "Internal Server Error", DISPATCH_ERROR_MESSAGE, _send_response_callback_handler_dispatch, (void *) (size_t) http_parser->flags);
 
     /* raise no error */
     RAISE_NO_ERROR;
