@@ -29,4 +29,7 @@
 
 #include "../system/service.h"
 
+/* forward references (avoids loop) */
+struct connection_t;
+
 ERROR_CODE write_http_error(struct connection_t *connection, char *header, char *error_code, char *error_message, char *error_description, void *callback, void *callback_parameters);
