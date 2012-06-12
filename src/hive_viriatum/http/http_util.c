@@ -29,7 +29,7 @@
 
 #include "http_util.h"
 
-ERROR_CODE write_http_error(struct connection_t *connection, char *header, char *error_code, char *error_message, char *error_description, connection_data_callback callback, void *callback_parameters) {
+ERROR_CODE write_http_error(struct connection_t *connection, char *header, char *error_code, char *error_message, char *error_description, _connection_data_callback callback, void *callback_parameters) {
     /* allocates space for the result buffer related
     variables (for both the buffer pointer and size) */
     size_t result_length;
