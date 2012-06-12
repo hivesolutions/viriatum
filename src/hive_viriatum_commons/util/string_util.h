@@ -88,3 +88,11 @@ static __inline int ends_with_string(unsigned char *string_value, unsigned char 
     /* return in success (complete match) */
     return 1;
 }
+
+static __inline void uppercase(char *string_value) {
+    while(*string_value != '\0') {
+		if(*string_value == '-') { *string_value = '_'; }
+		else { *string_value = toupper((unsigned char) *string_value); }
+		string_value++;
+    }
+}
