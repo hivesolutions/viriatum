@@ -164,8 +164,8 @@ void _module_register(zval *_array TSRMLS_DC) {
 
 	/* sets the self server variable with the path to the file to be
 	executed, this is of major importance for execution (conditional
-	usage of this variable is set based on the file path existence) */
-	if(_php_request.php_context->file_path) { php_register_variable_safe("PHP_SELF", (char *) _php_request.php_context->file_path, _php_request.php_context->_file_path_string.length, _array TSRMLS_CC); }
+	usage of this variable is set based on the file name existence) */
+	if(_php_request.php_context->file_name) { php_register_variable_safe("PHP_SELF", (char *) _php_request.php_context->file_name, _php_request.php_context->_file_name_string.length, _array TSRMLS_CC); }
 	else { php_register_variable_safe("PHP_SELF", "-", 1, _array TSRMLS_CC); } 
 
     /* registers a series og global wide variable representing the
