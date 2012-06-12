@@ -98,7 +98,7 @@ ERROR_CODE write_http_error(struct connection_t *connection, char *header, char 
         to be sent to the client then first writes the buffer containing
         the headers and then the resulting contents from the template handler */
         create_string_buffer(&string_buffer);
-        append_string_buffer(string_buffer, headers_buffer);
+        append_string_buffer(string_buffer, (unsigned char *) headers_buffer);
         append_string_buffer(string_buffer, template_handler->string_value);
         join_string_buffer(string_buffer, &result_buffer);
         result_length = string_buffer->string_length;
