@@ -112,7 +112,7 @@ void create_service_options(struct service_options_t **service_options_pointer) 
     service_options->handler_name = NULL;
     service_options->local = 0;
     service_options->default_index = 0;
-	service_options->use_template = 0;
+    service_options->use_template = 0;
     service_options->default_virtual_host = NULL;
 
     /* creates the hash map for the virtual hosts */
@@ -1168,7 +1168,7 @@ ERROR_CODE _default_options_service(struct service_t *service, struct hash_map_t
     service_options->address = (unsigned char *) VIRIATUM_DEFAULT_HOST;
     service_options->handler_name = (unsigned char *) VIRIATUM_DEFAULT_HANDLER;
     service_options->default_index = VIRIATUM_DEFAULT_INDEX;
-	service_options->use_template = VIRIATUM_DEFAULT_USE_TEMPLATE;
+    service_options->use_template = VIRIATUM_DEFAULT_USE_TEMPLATE;
 
     /* raises no error */
     RAISE_NO_ERROR;
