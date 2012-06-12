@@ -31,5 +31,6 @@
 
 /* forward references (avoids loop) */
 struct connection_t;
+typedef ERROR_CODE (*connection_data_callback) (struct connection_t *, struct data_t *, void *);
 
-ERROR_CODE write_http_error(struct connection_t *connection, char *header, char *error_code, char *error_message, char *error_description, void *callback, void *callback_parameters);
+ERROR_CODE write_http_error(struct connection_t *connection, char *header, char *error_code, char *error_message, char *error_description, connection_data_callback callback, void *callback_parameters);
