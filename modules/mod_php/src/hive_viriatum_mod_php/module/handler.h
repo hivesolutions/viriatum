@@ -78,6 +78,12 @@ typedef struct handler_php_context_t {
     unsigned char content_type[VIRIATUM_MAX_HEADER_SIZE];
 
     /**
+     * The content length for the current request being
+     * made this is a header value.
+     */
+    unsigned char content_length_[VIRIATUM_MAX_HEADER_SIZE];
+
+    /**
      * The cookie for the current request being
      * made this is a header value.
      */
@@ -94,6 +100,22 @@ typedef struct handler_php_context_t {
      * made this is a header value.
      */
     unsigned char server_name[VIRIATUM_MAX_HEADER_SIZE];
+
+	/**
+	 * The current header structure, represeting the
+	 * header currently being parsed.
+	 * In case no value is defined there's no header
+	 * "in parsing".
+	 */
+	struct http_header_value_t *header;
+
+	/**
+	 * The list of headers parsed for the current request
+	 * this value changes over the parsing of the request.
+	 * The name of the header is not reliable as it changes
+	 * after exposing it to the php interpreter.
+	 */
+	struct linked_list_t *headers;
 
     /**
      * The string representing the http method
@@ -161,6 +183,12 @@ typedef struct handler_php_context_t {
      * for fast attribute calculation (eg: size).
      */
     struct string_t _content_type_string;
+
+    /**
+     * String reference to the content length buffer, useful
+     * for fast attribute calculation (eg: size).
+     */
+    struct string_t _content_length_string;
 
     /**
      * String reference to the cookie buffer, useful
