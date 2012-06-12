@@ -45,6 +45,13 @@ typedef enum http_request_method_e {
     POST_REQUEST_METHOD = 1
 } http_request_method;
 
+typedef struct http_header_value_t {
+	char name[VIRIATUM_MAX_HEADER_SIZE];
+	char value[VIRIATUM_MAX_HEADER_V_SIZE];
+	size_t name_size;
+	size_t value_size;
+} http_header_value;
+
 typedef struct http_request_t {
     enum http_request_method_e method;
     unsigned char *data;
