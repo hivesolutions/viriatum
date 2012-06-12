@@ -566,6 +566,10 @@
                     RelativePath="..\..\src\hive_viriatum\http\http_request.c"
                     >
                 </File>
+                <File
+                    RelativePath="..\..\src\hive_viriatum\http\http_util.c"
+                    >
+                </File>
             </Filter>
             <Filter
                 Name="Handlers"
@@ -722,6 +726,10 @@
                 </File>
                 <File
                     RelativePath="..\..\src\hive_viriatum\http\http_request.h"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\hive_viriatum\http\http_util.h"
                     >
                 </File>
             </Filter>
