@@ -416,7 +416,7 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
 			/* assigns the name of the current folder being listed to
 			the template handler (to be set on the template) */
 			assign_string_template_handler(template_handler, (unsigned char *) "error_code", "404");
-			assign_string_template_handler(template_handler, (unsigned char *) "error_message", "file not found");
+			assign_string_template_handler(template_handler, (unsigned char *) "error_message", "Not Found");
 
 			/* processes the file as a template handler */
 			process_template_handler(template_handler, template_path);
