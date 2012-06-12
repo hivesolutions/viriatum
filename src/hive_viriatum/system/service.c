@@ -1229,6 +1229,11 @@ ERROR_CODE _file_options_service(struct service_t *service, struct hash_map_t *a
     get_value_string_hash_map(general, (unsigned char *) "workers", &value);
     if(value != NULL) { service_options->workers = (unsigned char) atoi(value); }
 
+    /* tries to retrieve the use template argument from the arguments map, then
+    sets the use template (boolean) value for the service */
+    get_value_string_hash_map(general, (unsigned char *) "use_template", &value);
+    if(value != NULL) { service_options->use_template = (unsigned char) atoi(value); }
+
     /* raises no error */
     RAISE_NO_ERROR;
 }

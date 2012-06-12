@@ -310,7 +310,7 @@ typedef struct service_options_t {
      * the root path file is requested (index.html is
      * the default file to be served).
      */
-    unsigned int default_index;
+    unsigned char default_index;
 
 	/**
 	 * If the instance should use templates for error
@@ -318,7 +318,7 @@ typedef struct service_options_t {
 	 * cost of more computer power (may create problems
 	 * for denial of service (dos) attacks).
 	 */
-	unsigned int use_template;
+	unsigned char use_template;
 
     /**
      * The default virtual host to be used in any
