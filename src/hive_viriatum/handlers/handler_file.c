@@ -297,11 +297,8 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
     /* retrieves the handler file context from the http parser */
     struct handler_file_context_t *handler_file_context = (struct handler_file_context_t *) http_parser->context;
 
-    /* retrieves the connection from the http parser parameters
-    and then retrieves the service options from it */
+    /* retrieves the connection from the http parser parameters */
     struct connection_t *connection = (struct connection_t *) http_parser->parameters;
-    struct service_t *service = connection->service;
-    struct service_options_t *options = service->options;
 
 	/* checks if the path being request is in fact a directory */
     is_directory_file((char *) handler_file_context->file_path, &is_directory);
