@@ -240,7 +240,7 @@ ERROR_CODE calculate_options_service(struct service_t *service) {
     /* converts the service port value into a string value
     using a base ten encoding and then populates the correspoding
     string value to use prefetched values */
-    SPRINTF(service->options->_port, 128, "%d", service->options->port);
+    SPRINTF((char *) service->options->_port, 128, "%d", service->options->port);
     string_populate(&service->options->_port_string, service->options->_port, 0, 1);
 
     /* raises no error */
