@@ -154,10 +154,16 @@ ERROR_CODE url_callback_handler_file(struct http_parser_t *http_parser, const un
     struct service_t *service = connection->service;
     struct service_options_t *options = service->options;
 
+    /* checks the position of the get parameters divisor position
+    and then uses it to calculate the size of the (base) path */
+    char *pointer = (char *) memchr((char *) data, '?', data_size);
+    size_t path_size = pointer == NULL ? data_size : pointer - (char *) data;
+
     /* copies the memory from the data to the url and then
-    puts the end of string in the url */
-    memcpy(url, data, data_size);
-    url[data_size] = '\0';
+    puts the end of string in the url, note that only the path
+	part of the string is used for the url */
+    memcpy(url, data, path_size);
+    url[path_size] = '\0';
 
     /* prints a debug message */
     V_INFO_F("%s %s\n", get_http_method_string(http_parser->method), url);
