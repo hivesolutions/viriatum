@@ -228,9 +228,9 @@ ERROR_CODE header_value_callback_handler_module(struct http_parser_t *http_parse
 
             /* tries to find the port part of the host in case
             it's possible sets the base data size for the server name */
-            pointer = strchr(handler_php_context->host, ':');
+            pointer = strchr((char *) handler_php_context->host, ':');
             if(pointer == NULL) { _data_size = data_size; }
-            else { _data_size = pointer - handler_php_context->host; }
+            else { _data_size = pointer - (char *) handler_php_context->host; }
 
             /* copies the server name header value into the
             appropriate buffer in the php context */
