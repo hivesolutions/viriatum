@@ -71,6 +71,19 @@ ERROR_CODE create_handler_php_context(struct handler_php_context_t **handler_php
     handler_php_context->content_length = 0;
     handler_php_context->output_buffer = NULL;
     handler_php_context->_next_header = UNDEFINED_HEADER;
+	handler_php_context->_url_string.length = 0;
+	handler_php_context->_file_name_string.length = 0;
+	handler_php_context->_query_string.length = 0;
+	handler_php_context->_file_path_string.length = 0;
+	handler_php_context->_content_type_string.length = 0;
+	handler_php_context->_content_length_string.length = 0;
+	handler_php_context->_cookie_string.length = 0;
+	handler_php_context->_host_string.length = 0;
+	handler_php_context->_server_name_string.length = 0;
+
+	/* creates the linked list that will hold the various
+	header values to be persisted */
+	create_linked_list(&handler_php_context->headers);
 
     /* sets the handler php context in the  pointer */
     *handler_php_context_pointer = handler_php_context;
@@ -80,10 +93,36 @@ ERROR_CODE create_handler_php_context(struct handler_php_context_t **handler_php
 }
 
 ERROR_CODE delete_handler_php_context(struct handler_php_context_t *handler_php_context) {
+	/* allocates space for the iterator to be used to "go around"
+	the various header elements and for the header (element) */
+	struct iterator_t *headers_iterator;
+	struct header_value_t *header;
+
     /* in case there is a valid output buffer defined in the current
     handler php context it must be removed (linked buffer removal)
     this way serious memory leaks are avoided */
     if(handler_php_context->output_buffer) { delete_linked_buffer(handler_php_context->output_buffer); }
+
+	/* in case the linked list that hold the various headers is
+	defined deletes it to release its memory */
+	if(handler_php_context->headers) {
+		/* creates an iterator to be used to release the memory of the
+		header structures used for definition */
+		create_iterator_linked_list(handler_php_context->headers, &headers_iterator);
+
+		/* iterates over all the header elements in the headers iterator to
+		release their memory (avoids memory leaking) */
+		while(1) {
+			get_next_iterator(headers_iterator, (void **) &header);
+			if(header == NULL) { break; }
+			FREE(header);
+		}
+
+		/* deletes both the iterator used for the removal of the element
+		and the headers linked list itself */
+		delete_iterator_linked_list(handler_php_context->headers, headers_iterator);
+		delete_linked_list(handler_php_context->headers);
+	}
 
     /* releases the handler php context memory */
     FREE(handler_php_context);
@@ -172,10 +211,18 @@ ERROR_CODE header_field_callback_handler_module(struct http_parser_t *http_parse
     /* retrieves the handler php context from the http parser */
     struct handler_php_context_t *handler_php_context = (struct handler_php_context_t *) http_parser->context;
 
+	/* copies the current header name into the appropriate structure
+	and also updates the size of the name string in it */
+	handler_php_context->header = MALLOC(sizeof(struct http_header_value_t));
+	memcpy(handler_php_context->header->name, data, data_size);
+	handler_php_context->header->name[data_size] = '\0';
+	handler_php_context->header->name_size = data_size;
+
     /* checks if the current header is a valid "capturable"
     header in such case changes the next header value accordingly
     otherwise sets the undefined header */
     if(memcmp(data, "Content-Type", data_size) == 0) { handler_php_context->_next_header = CONTENT_TYPE; }
+	else if(memcmp(data, "Content-Length", data_size) == 0) { handler_php_context->_next_header = CONTENT_LENGTH; }
     else if(memcmp(data, "Cookie", data_size) == 0) { handler_php_context->_next_header = COOKIE; }
     else if(memcmp(data, "Host", data_size) == 0) { handler_php_context->_next_header = HOST; }
     else { handler_php_context->_next_header = UNDEFINED_HEADER; }
@@ -188,10 +235,23 @@ ERROR_CODE header_value_callback_handler_module(struct http_parser_t *http_parse
     /* retrieves the handler php context from the http parser */
     struct handler_php_context_t *handler_php_context = (struct handler_php_context_t *) http_parser->context;
 
+	/* allocates space for the pointer to be used for partial
+	calculation on the header values */
     char *pointer;
     size_t _data_size;
 
-    /* switchs over the next header possible values to
+	/* copies the current header value into the appropriate structure
+	and alse updates the size of the value string in it */
+	memcpy(handler_php_context->header->value, data, data_size);
+	handler_php_context->header->value[data_size] = '\0';
+	handler_php_context->header->value_size = data_size;
+
+	/* adds the current header to the list of headers (push) and then
+	unsets the header structure (avois further usage of the header) */
+	append_value_linked_list(handler_php_context->headers, (void *) handler_php_context->header);
+	handler_php_context->header = NULL;
+
+	/* switchs over the next header possible values to
     copy the current header buffer into the appropriate place */
     switch(handler_php_context->_next_header) {
         case CONTENT_TYPE:
@@ -203,6 +263,19 @@ ERROR_CODE header_value_callback_handler_module(struct http_parser_t *http_parse
             /* populates the various generated strings, avoids possible recalculation
             of the lengths of the string */
             string_populate(&handler_php_context->_content_type_string, handler_php_context->content_type, data_size, 0);
+
+            /* breaks the switch */
+            break;
+
+        case CONTENT_LENGTH:
+            /* copies the content length header value into the
+            appropriate buffer in the php context */
+            memcpy(handler_php_context->content_length_, data, data_size);
+            handler_php_context->content_length_[data_size] = '\0';
+
+            /* populates the various generated strings, avoids possible recalculation
+            of the lengths of the string */
+            string_populate(&handler_php_context->_content_length_string, handler_php_context->content_length_, data_size, 0);
 
             /* breaks the switch */
             break;
