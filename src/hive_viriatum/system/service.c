@@ -274,7 +274,7 @@ ERROR_CODE calculate_options_service(struct service_t *service) {
 #ifdef VIRIATUM_PLATFORM_UNIX
 ERROR_CODE create_workers(unsigned char worker_count) {
     unsigned int fork_count = 0;
-    PID_TYPE pid;
+    PID_TYPE pid = 0;
 
     /* iterates continuously for the forking of the
     current process (worker creation) */

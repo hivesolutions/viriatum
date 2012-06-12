@@ -331,7 +331,7 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
 			/* retrieves the current size of the url and copies into
 			the folder path the appropriate part of it, this strategy
 			takes into account the size of the url */
-			url_size = strlen(handler_file_context->url);
+			url_size = strlen((char *) handler_file_context->url);
 			if(url_size > 2) { memcpy(folder_path, &handler_file_context->url[1], url_size - 2); }
 			if(url_size > 2) { folder_path[url_size - 2] = '\0'; }
 			else { folder_path[0] = '\0'; }
