@@ -199,7 +199,9 @@ void _module_register(zval *_array TSRMLS_DC) {
 
     /* registers a series og global wide variable representing the
     current interface (critical for correct php interpreter usage) */
-    php_register_variable_safe("GATEWAY_INTERFACE", "viriatum", sizeof("viriatum") - 1, _array TSRMLS_CC);
+	php_register_variable_safe("SERVER_SOFTWARE", "viriatum", sizeof("viriatum") - 1, _array TSRMLS_CC);
+    php_register_variable_safe("GATEWAY_INTERFACE", "CGI/1.1", sizeof("CGI/1.1") - 1, _array TSRMLS_CC);
+	php_register_variable_safe("SERVER_PROTOCOL", "HTTP/1.1", sizeof("HTTP/1.1") - 1, _array TSRMLS_CC);
     php_register_variable_safe("SERVER_NAME", (char *) _php_request.php_context->server_name, _php_request.php_context->_server_name_string.length, _array TSRMLS_CC);
     php_register_variable_safe("SERVER_PORT", (char *) port, port_string->length, _array TSRMLS_CC);
 	php_register_variable_safe("REQUEST_URI'", (char *) _php_request.php_context->file_name, _php_request.php_context->_file_name_string.length, _array TSRMLS_CC);
