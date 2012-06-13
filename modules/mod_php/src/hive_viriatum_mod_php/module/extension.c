@@ -146,13 +146,6 @@ char *_module_read_cookies(TSRMLS_D) {
 }
 
 void _module_register(zval *_array TSRMLS_DC) {
-    /* allocates space for the address string reference
-    and then retrieves the current connection's socket
-    address structure to be used to retrieve the address
-    string value (for exporting) */
-    char *address_string;
-    SOCKET_ADDRESS address = _connection->socket_address;
-
 	/* allocates space for the iterator to be used to "go around"
 	the various header elements and for the header (element) */
 	struct iterator_t *headers_iterator;
@@ -161,6 +154,13 @@ void _module_register(zval *_array TSRMLS_DC) {
 	/* allocates space for the "new" name of the header element
 	this anme should be uppercased and (slash) transformed */
 	char name[VIRIATUM_MAX_HEADER_SIZE];
+
+    /* allocates space for the address string reference
+    and then retrieves the current connection's socket
+    address structure to be used to retrieve the address
+    string value (for exporting) */
+    char *address_string;
+    SOCKET_ADDRESS address = _connection->socket_address;
 
     /* retrieves the current port buffer value and the
     string structure that controls it */
