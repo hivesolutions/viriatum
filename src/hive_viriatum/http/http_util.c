@@ -93,17 +93,21 @@ ERROR_CODE write_http_error(struct connection_t *connection, char *header, char 
         /* populates the headers buffer with the proper headers for
         the template oriented representation of the error */
         SPRINTF(
-			headers_buffer,
-			1024,
-			"HTTP/1.1 %s %s\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nCache-Control: no-cache, must-revalidate\r\nContent-Length: %lu\r\n\r\n",
-			error_code,
-			error_message,
-			VIRIATUM_NAME,
-			VIRIATUM_VERSION,
-			VIRIATUM_PLATFORM_STRING,
-			VIRIATUM_PLATFORM_CPU,
-			(long unsigned int) strlen((char *) template_handler->string_value)
-		);
+            headers_buffer,
+            1024,
+            "HTTP/1.1 %s %s\r\n\
+            Server: %s/%s (%s - %s)\r\n\
+            Connection: Keep-Alive\r\n\
+            Cache-Control: no-cache, must-revalidate\r\n\
+            Content-Length: %lu\r\n\r\n",
+            error_code,
+            error_message,
+            VIRIATUM_NAME,
+            VIRIATUM_VERSION,
+            VIRIATUM_PLATFORM_STRING,
+            VIRIATUM_PLATFORM_CPU,
+            (long unsigned int) strlen((char *) template_handler->string_value)
+        );
 
         /* creates a new string buffer to hold the complete set of contents
         to be sent to the client then first writes the buffer containing
@@ -129,17 +133,21 @@ ERROR_CODE write_http_error(struct connection_t *connection, char *header, char 
     } else {
         /* writes the http static headers to the response */
         SPRINTF(
-			headers_buffer,
-			1024,
-			"HTTP/1.1 %s %s\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nCache-Control: no-cache, must-revalidate\r\nContent-Length: %lu\r\n\r\n%s",
-			error_code,
-			error_message,
-			VIRIATUM_NAME,
-			VIRIATUM_VERSION,
-			VIRIATUM_PLATFORM_STRING,
-			VIRIATUM_PLATFORM_CPU,
-			(long unsigned int) strlen(error_description), error_description
-		);
+            headers_buffer,
+            1024,
+            "HTTP/1.1 %s %s\r\n\
+            Server: %s/%s (%s - %s)\r\n\
+            Connection: Keep-Alive\r\n\
+            Cache-Control: no-cache, must-revalidate\r\n\
+            Content-Length: %lu\r\n\r\n%s",
+            error_code,
+            error_message,
+            VIRIATUM_NAME,
+            VIRIATUM_VERSION,
+            VIRIATUM_PLATFORM_STRING,
+            VIRIATUM_PLATFORM_CPU,
+            (long unsigned int) strlen(error_description), error_description
+        );
 
         /* writes both the headers to the connection, registers for the appropriate callbacks */
         write_connection(connection, (unsigned char *) headers_buffer, (unsigned int) strlen(headers_buffer), (connection_data_callback) callback, callback_parameters);
@@ -169,17 +177,17 @@ ERROR_CODE log_http_request(char *host, char *identity, char *user, char *method
     the other (sent) variables to format the output buffer */
     strftime(date_buffer, 1024, "%d/%b/%Y %H:%M:%S", _local_time);
     PRINTF_F(
-		"%s %s %s [%s] \"%s %s %s\" %d %ul\n",
-		host,
-		identity,
-		user,
-		date_buffer,
-		method,
-		uri,
-		protocol,
-		error_code,
-		content_length
-	);
+        "%s %s %s [%s] \"%s %s %s\" %d %ul\n",
+        host,
+        identity,
+        user,
+        date_buffer,
+        method,
+        uri,
+        protocol,
+        error_code,
+        content_length
+    );
 
     /* raises no error */
     RAISE_NO_ERROR;
