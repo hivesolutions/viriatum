@@ -28,7 +28,7 @@ set TEMP_DIR=%TARGET_DIR%\tmp
 set RESULT_DIR=%TARGET_DIR%\result
 set DIST_DIR=%TARGET_DIR%\dist
 set BASE_DIR=%REPO_DIR%
-set SRC_DIRS=(%BASE_DIR%\bin\hive_viriatum_mod_lua\i386\win32\Release %BASE_DIR%\bin\hive_viriatum_mod_php\i386\win32\Release)
+set SRC_DIRS=(%BASE_DIR%\bin\hive_viriatum_mod_lua\i386\win32\Release %BASE_DIR%\bin\hive_viriatum_mod_php\i386\win32\Release %BASE_DIR%\bin\hive_viriatum_mod_wsgi\i386\win32\Release)
 set SOLUTION_DIR=%BASE_DIR%\win32\vs2008ex
 
 :: creates the various directories that are going to be
