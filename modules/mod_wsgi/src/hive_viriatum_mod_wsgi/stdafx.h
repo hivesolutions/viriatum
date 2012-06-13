@@ -38,6 +38,8 @@ unsigned char *name_viriatum_mod_wsgi();
 unsigned char *version_viriatum_mod_wsgi();
 unsigned char *description_viriatum_mod_wsgi();
 
+#include <Python.h>
+
 #ifdef VIRIATUM_PLATFORM_MSC
 #ifdef VIRIATUM_DEBUG
 #pragma comment(lib, "python25_d.lib")
