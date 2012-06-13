@@ -462,6 +462,11 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
     char *headers_buffer;
     unsigned char *post_data;
 
+    /* allocates space for the address string reference
+    and for the structure defining a socket address */
+    char *address_string;
+    SOCKET_ADDRESS address;
+
     /* allocates space for the linked buffer to be used for the
     standard ouput resulting from the php interpreter execution */
     struct linked_buffer_t *output_buffer = NULL;
@@ -540,10 +545,40 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
 	status_code = SG(sapi_headers).http_response_code;
 	status_message = (char *) GET_HTTP_STATUS(status_code);
 
+    /* converts the address of the socket into the representing
+    string value (for exporting the value) */
+	address = connection->socket_address;
+    address_string = inet_ntoa(((SOCKET_ADDRESS_INTERNET *) &address)->sin_addr);
+
+	/* logs the current request using the available functions at the
+	http connection level, this will put the log into the currently
+	defined output stream */
+	http_connection->log_request(
+		address_string,
+		"-",
+		"mod_php",
+		handler_php_context->method,
+		handler_php_context->url,
+		"HTTP/1.1",
+		status_code,
+		output_buffer->buffer_length
+	);
+
     /* allocates space fot the header buffer and then writes the default values
     into it the value is dynamicaly contructed based on the current header values */
     connection->alloc_data(connection, 25602, (void **) &headers_buffer);
-    count = SPRINTF(headers_buffer, 1024, "HTTP/1.1 %d %s\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nContent-Length: %lu\r\n", status_code, status_message, VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, (long unsigned int) output_buffer->buffer_length);
+    count = SPRINTF(
+		headers_buffer,
+		1024,
+		"HTTP/1.1 %d %s\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nContent-Length: %lu\r\n",
+		status_code,
+		status_message,
+		VIRIATUM_NAME,
+		VIRIATUM_VERSION,
+		VIRIATUM_PLATFORM_STRING,
+		VIRIATUM_PLATFORM_CPU,
+		(long unsigned int) output_buffer->buffer_length
+	);
 
     /* iterates over all the headers present in the current php request to copy
     their content into the current headers buffer */
@@ -616,7 +651,17 @@ ERROR_CODE _write_error_connection(struct http_parser_t *http_parser, char *mess
     /* allocates the data buffer (in a safe maner) then
     writes the http static headers to the response */
     connection->alloc_data(connection, 1024 * sizeof(unsigned char), (void **) &buffer);
-    SPRINTF((char *) buffer, 1024, "HTTP/1.1 500 Internal Server Error\r\nServer: %s/%s (%s @ %s)\r\nConnection: Keep-Alive\r\nContent-Length: %d\r\n\r\n%s", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, (unsigned int) message_length, message);
+    SPRINTF(
+		(char *) buffer,
+		1024,
+		"HTTP/1.1 500 Internal Server Error\r\nServer: %s/%s (%s @ %s)\r\nConnection: Keep-Alive\r\nContent-Length: %d\r\n\r\n%s",
+		VIRIATUM_NAME,
+		VIRIATUM_VERSION,
+		VIRIATUM_PLATFORM_STRING,
+		VIRIATUM_PLATFORM_CPU,
+		(unsigned int) message_length,
+		message
+	);
 
     /* writes the response to the connection, registers for the appropriate callbacks */
     connection->write_connection(connection, buffer, (unsigned int) strlen((char *) buffer), _send_response_callback_handler_module, (void *) handler_php_context);
