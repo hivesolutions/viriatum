@@ -184,7 +184,7 @@ ERROR_CODE url_callback_handler_module(struct http_parser_t *http_parser, const 
     this avoids copying the query part */
     memcpy(handler_php_context->file_name, data, path_size);
     handler_php_context->file_name[path_size] = '\0';
-    normalize_path(handler_php_context->file_name);
+    normalize_path((char *) handler_php_context->file_name);
 
     /* in case the pointer is defined (query separator found) copies
     the query contents into the target query buffer */
@@ -196,7 +196,7 @@ ERROR_CODE url_callback_handler_module(struct http_parser_t *http_parser, const 
     memcpy(handler_php_context->url, data, data_size);
     handler_php_context->url[path_size] = '\0';
     SPRINTF((char *) handler_php_context->file_path, VIRIATUM_MAX_PATH_SIZE, "%s%s%s", VIRIATUM_CONTENTS_PATH, VIRIATUM_BASE_PATH, handler_php_context->file_name);
-    normalize_path(handler_php_context->file_path);
+    normalize_path((char *) handler_php_context->file_path);
 
     /* populates the various generated strings, avoids possible recalculation
     of the lengths of the string */
@@ -558,7 +558,7 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
         "-",
         "mod_php",
         handler_php_context->method,
-        handler_php_context->url,
+        (char *) handler_php_context->url,
         "HTTP/1.1",
         status_code,
         output_buffer->buffer_length
