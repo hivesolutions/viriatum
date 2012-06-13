@@ -194,82 +194,6 @@ ERROR_CODE _send_data_callback(struct connection_t *connection, struct data_t *d
     RAISE_NO_ERROR;
 }
 
-
-
-static PyObject *wsgi_start_response(PyObject *self, PyObject *args) {
-    PyObject *wsgi_module;
-    PyObject *write_function;
-
-    PyObject *return_value;
-
-    /* allocates space for all the arguments, the status line (error
-    code), for the headers list and for the execution information */
-    const char *error_code;
-    PyObject *headers;
-    PyObject *exc_info;
-
-    /* allocates space for the result value from the parsing of the
-    arguments, in the initial part of the function */
-    int result;
-
-    /* start the exc info object to the initial none value (unset)
-    this is used because the argument is optional */
-    exc_info = Py_None;
-
-    /* parses the arguments, unpacking them into the error code
-    and the headers to be used in the function */
-    result = PyArg_ParseTuple(args, "sO|O", &error_code, &headers, &exc_info);
-    if(result == 0) { return NULL; }
-
-    /* TODO tenho de por esta informacao no tal context
-    object global (tal e qual como no php) */
-    printf("---%s---\n", error_code);
-
-    wsgi_module = PyImport_ImportModule("viriatum_wsgi");
-    if(wsgi_module == NULL) { return NULL; }
-
-    write_function = PyObject_GetAttrString(wsgi_module, "write");
-    if(!write_function || !PyCallable_Check(write_function)) { RAISE_NO_ERROR; }
-
-    /* builds the return value with the write function so
-    that the caller function may write directly to the stream */
-    return_value = Py_BuildValue("O", write_function);
-
-    /* decrements the reference count of the write function and
-    of the module they are not important anymore */
-    Py_DECREF(write_function);
-    Py_DECREF(wsgi_module);
-
-    /* returns the return value to the caller function, this value
-    should include the write function */
-    return return_value;
-}
-
-static PyObject *wsgi_write(PyObject *self, PyObject *args) {
-    return Py_BuildValue("i", 23);
-}
-
-static PyMethodDef wsgi_methods[] = {
-    {
-        "start_response",
-        wsgi_start_response,
-        METH_VARARGS,
-        NULL
-    },
-    {
-        "write",
-        wsgi_write,
-        METH_VARARGS,
-        NULL
-    },
-    {
-        NULL,
-        NULL,
-        0,
-        NULL
-    }
-};
-
 ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
     PyObject *module;
     PyObject *wsgi_module;
@@ -286,10 +210,6 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
 
     char *cenas;
 
-    /* TODO: ISTO TEM DE SER METIDO NO INCIO do interpretador
-    E NO FICHEIRO extension.c */
-    Py_InitModule("viriatum_wsgi", wsgi_methods);
-
     wsgi_module = PyImport_ImportModule("viriatum_wsgi");
     if(wsgi_module == NULL) { RAISE_NO_ERROR; }
 
@@ -299,13 +219,13 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
     /* imports the associated (handler) module and retrieves
     its reference to be used for the calling, in case the
     reference is invalid raises an error */
-    module = PyImport_ImportModule("tobias");
+    module = PyImport_ImportModule("wsgi_demo");
     if(module == NULL) { RAISE_NO_ERROR; }
 
     /* retrieves the function to be used as handler for the
     wsgi request, then check if the reference is valid and
     if it refers a valid function */
-    handler_function = PyObject_GetAttrString(module, "simple_app");
+    handler_function = PyObject_GetAttrString(module, "application");
     if(!handler_function || !PyCallable_Check(handler_function)) { RAISE_NO_ERROR; }
 
     /* creates a new tuple to hold the various arguments to

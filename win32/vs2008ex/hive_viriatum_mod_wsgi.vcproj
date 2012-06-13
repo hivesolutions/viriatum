@@ -204,6 +204,10 @@
                     >
                 </File>
                 <File
+                    RelativePath="..\..\modules\mod_wsgi\src\hive_viriatum_mod_wsgi\module\extension.c"
+                    >
+                </File>
+                <File
                     RelativePath="..\..\modules\mod_wsgi\src\hive_viriatum_mod_wsgi\module\handler.c"
                     >
                 </File>
@@ -231,6 +235,10 @@
                 >
                 <File
                     RelativePath="..\..\modules\mod_wsgi\src\hive_viriatum_mod_wsgi\module\entry.h"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\modules\mod_wsgi\src\hive_viriatum_mod_wsgi\module\extension.h"
                     >
                 </File>
                 <File
