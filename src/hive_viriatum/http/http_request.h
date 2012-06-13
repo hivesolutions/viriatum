@@ -35,7 +35,7 @@
 typedef enum http_header_e {
     UNDEFINED_HEADER = 1,
     CONTENT_TYPE,
-	CONTENT_LENGTH,
+    CONTENT_LENGTH,
     COOKIE,
     HOST
 } http_header;
@@ -46,10 +46,10 @@ typedef enum http_request_method_e {
 } http_request_method;
 
 typedef struct http_header_value_t {
-	char name[VIRIATUM_MAX_HEADER_SIZE];
-	char value[VIRIATUM_MAX_HEADER_V_SIZE];
-	size_t name_size;
-	size_t value_size;
+    char name[VIRIATUM_MAX_HEADER_SIZE];
+    char value[VIRIATUM_MAX_HEADER_V_SIZE];
+    size_t name_size;
+    size_t value_size;
 } http_header_value;
 
 typedef struct http_request_t {

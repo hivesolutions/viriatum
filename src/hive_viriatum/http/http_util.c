@@ -128,26 +128,26 @@ ERROR_CODE write_http_error(struct connection_t *connection, char *header, char 
 }
 
 ERROR_CODE log_http_request(char *host, char *identity, char *user, char *method, char *uri, char *protocol, int error_code, size_t content_length) {
-	/* allocates space for the buffer to hild the date and time
-	information to be logged */
-	char date_buffer[1024];
+    /* allocates space for the buffer to hild the date and time
+    information to be logged */
+    char date_buffer[1024];
 
-	/* allocates space for the internal date structures to be used
-	for the retrieval of the time information and retrieves the
-	current time to be used converting it then to the local time*/
-	struct tm *_local_time;
+    /* allocates space for the internal date structures to be used
+    for the retrieval of the time information and retrieves the
+    current time to be used converting it then to the local time*/
+    struct tm *_local_time;
     time_t _time = time(NULL);
     LOCAL_TIME(_local_time, &_time);
 
-	/* checks if the converted local time is invalid and in case it
-	is raises the apropriate runtime error to be caught */
-	if(_local_time == NULL) { RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem retrieving local time"); }
+    /* checks if the converted local time is invalid and in case it
+    is raises the apropriate runtime error to be caught */
+    if(_local_time == NULL) { RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem retrieving local time"); }
 
-	/* formats the local time into the data buffer and then uses it and
-	the other (sent) variables to format the output buffer */
-	strftime(date_buffer, 1024, "%d/%b/%Y %H:%M:%S", _local_time);
-	PRINTF_F("%s %s %s [%s] \"%s %s %s\" %d %ul\n", host, identity, user, date_buffer, method, uri, protocol, error_code, content_length);
+    /* formats the local time into the data buffer and then uses it and
+    the other (sent) variables to format the output buffer */
+    strftime(date_buffer, 1024, "%d/%b/%Y %H:%M:%S", _local_time);
+    PRINTF_F("%s %s %s [%s] \"%s %s %s\" %d %ul\n", host, identity, user, date_buffer, method, uri, protocol, error_code, content_length);
 
-	/* raises no error */
-	RAISE_NO_ERROR;
+    /* raises no error */
+    RAISE_NO_ERROR;
 }

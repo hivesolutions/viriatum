@@ -161,7 +161,7 @@ ERROR_CODE url_callback_handler_file(struct http_parser_t *http_parser, const un
 
     /* copies the memory from the data to the url and then
     puts the end of string in the url, note that only the path
-	part of the string is used for the url */
+    part of the string is used for the url */
     memcpy(url, data, path_size);
     url[path_size] = '\0';
 

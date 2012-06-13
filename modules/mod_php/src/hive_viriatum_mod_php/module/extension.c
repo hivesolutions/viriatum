@@ -146,14 +146,14 @@ char *_module_read_cookies(TSRMLS_D) {
 }
 
 void _module_register(zval *_array TSRMLS_DC) {
-	/* allocates space for the iterator to be used to "go around"
-	the various header elements and for the header (element) */
-	struct iterator_t *headers_iterator;
-	struct http_header_value_t *header;
+    /* allocates space for the iterator to be used to "go around"
+    the various header elements and for the header (element) */
+    struct iterator_t *headers_iterator;
+    struct http_header_value_t *header;
 
-	/* allocates space for the "new" name of the header element
-	this anme should be uppercased and (slash) transformed */
-	char name[VIRIATUM_MAX_HEADER_SIZE];
+    /* allocates space for the "new" name of the header element
+    this anme should be uppercased and (slash) transformed */
+    char name[VIRIATUM_MAX_HEADER_SIZE];
 
     /* allocates space for the address string reference
     and then retrieves the current connection's socket
@@ -171,47 +171,47 @@ void _module_register(zval *_array TSRMLS_DC) {
     string value (for exporting the value) */
     address_string = inet_ntoa(((SOCKET_ADDRESS_INTERNET *) &address)->sin_addr);
 
-	/* creates the iterator to the headers linked list so that it's possible
-	to "go arround" the headers to expose them to the php interpreter */
-	create_iterator_linked_list(_php_request.php_context->headers, &headers_iterator);
+    /* creates the iterator to the headers linked list so that it's possible
+    to "go arround" the headers to expose them to the php interpreter */
+    create_iterator_linked_list(_php_request.php_context->headers, &headers_iterator);
 
     /* iterates continuously over all the headers to export them
-	to the php interpreter */
+    to the php interpreter */
     while(1) {
-		/* retrieves the next header element and in case it's null
-		finishes the iteration otherwise converts the name to uppercase,
-		prepends the prefix value and exposes it to the php interpreter */
+        /* retrieves the next header element and in case it's null
+        finishes the iteration otherwise converts the name to uppercase,
+        prepends the prefix value and exposes it to the php interpreter */
         get_next_iterator(headers_iterator, (void **) &header);
-		if(header == NULL) { break; }
-		uppercase(header->name);
-		SPRINTF(name, 1024, "HTTP_%s", header->name);
-		php_register_variable_safe(name, (char *) header->value, header->value_size, _array TSRMLS_CC);
+        if(header == NULL) { break; }
+        uppercase(header->name);
+        SPRINTF(name, 1024, "HTTP_%s", header->name);
+        php_register_variable_safe(name, (char *) header->value, header->value_size, _array TSRMLS_CC);
     }
 
-	/* deletes the headers iterator (it's no longer required) */
+    /* deletes the headers iterator (it's no longer required) */
     delete_iterator_linked_list(_php_request.php_context->headers, headers_iterator);
 
-	/* sets the self server variable with the path to the file to be
-	executed, this is of major importance for execution (conditional
-	usage of this variable is set based on the file name existence) */
-	if(_php_request.php_context->file_name) { php_register_variable_safe("PHP_SELF", (char *) _php_request.php_context->file_name, _php_request.php_context->_file_name_string.length, _array TSRMLS_CC); }
-	else { php_register_variable_safe("PHP_SELF", "-", 1, _array TSRMLS_CC); } 
+    /* sets the self server variable with the path to the file to be
+    executed, this is of major importance for execution (conditional
+    usage of this variable is set based on the file name existence) */
+    if(_php_request.php_context->file_name) { php_register_variable_safe("PHP_SELF", (char *) _php_request.php_context->file_name, _php_request.php_context->_file_name_string.length, _array TSRMLS_CC); }
+    else { php_register_variable_safe("PHP_SELF", "-", 1, _array TSRMLS_CC); }
 
     /* registers a series og global wide variable representing the
     current interface (critical for correct php interpreter usage) */
-	php_register_variable_safe("SERVER_SOFTWARE", "viriatum", sizeof("viriatum") - 1, _array TSRMLS_CC);
+    php_register_variable_safe("SERVER_SOFTWARE", "viriatum", sizeof("viriatum") - 1, _array TSRMLS_CC);
     php_register_variable_safe("GATEWAY_INTERFACE", "CGI/1.1", sizeof("CGI/1.1") - 1, _array TSRMLS_CC);
-	php_register_variable_safe("SERVER_PROTOCOL", "HTTP/1.1", sizeof("HTTP/1.1") - 1, _array TSRMLS_CC);
+    php_register_variable_safe("SERVER_PROTOCOL", "HTTP/1.1", sizeof("HTTP/1.1") - 1, _array TSRMLS_CC);
     php_register_variable_safe("SERVER_NAME", (char *) _php_request.php_context->server_name, _php_request.php_context->_server_name_string.length, _array TSRMLS_CC);
     php_register_variable_safe("SERVER_PORT", (char *) port, port_string->length, _array TSRMLS_CC);
-	php_register_variable_safe("REQUEST_URI", (char *) _php_request.php_context->file_name, _php_request.php_context->_file_name_string.length, _array TSRMLS_CC);
+    php_register_variable_safe("REQUEST_URI", (char *) _php_request.php_context->file_name, _php_request.php_context->_file_name_string.length, _array TSRMLS_CC);
     php_register_variable_safe("SCRIPT_NAME", (char *) _php_request.php_context->file_name, _php_request.php_context->_file_name_string.length, _array TSRMLS_CC);
     php_register_variable_safe("SCRIPT_FILENAME", (char *) _php_request.php_context->file_path, _php_request.php_context->_file_path_string.length, _array TSRMLS_CC);
     php_register_variable_safe("QUERY_STRING", (char *) _php_request.php_context->query, _php_request.php_context->_query_string.length, _array TSRMLS_CC);
     php_register_variable_safe("REQUEST_METHOD", (char *) _php_request.php_context->method, strlen(_php_request.php_context->method), _array TSRMLS_CC);
     php_register_variable_safe("REMOTE_ADDR", address_string, strlen(address_string), _array TSRMLS_CC);
-	if(_php_request.php_context->_content_type_string.length > 0) { php_register_variable_safe("CONTENT_TYPE", (char *)  _php_request.php_context->content_type, _php_request.php_context->_content_type_string.length, _array TSRMLS_CC); }
-	if(_php_request.php_context->_content_length_string.length > 0) { php_register_variable_safe("CONTENT_LENGTH", (char *) _php_request.php_context->content_length_, _php_request.php_context->_content_length_string.length, _array TSRMLS_CC); }
+    if(_php_request.php_context->_content_type_string.length > 0) { php_register_variable_safe("CONTENT_TYPE", (char *)  _php_request.php_context->content_type, _php_request.php_context->_content_type_string.length, _array TSRMLS_CC); }
+    if(_php_request.php_context->_content_length_string.length > 0) { php_register_variable_safe("CONTENT_LENGTH", (char *) _php_request.php_context->content_length_, _php_request.php_context->_content_length_string.length, _array TSRMLS_CC); }
 }
 
 void _module_log(char *message TSRMLS_DC) {
