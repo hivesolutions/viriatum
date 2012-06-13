@@ -80,6 +80,10 @@ ERROR_CODE start_module(struct environment_t *environment, struct module_t *modu
     /* prints a debug message */
     V_DEBUG_F("Starting the module '%s' (%s) v%s\n", name, description, version);
 
+    /* sets the global service reference to be used in the
+    externalized function for the interpreter */
+    _service = service;
+
     /* creates the mod wsgi module */
     create_mod_wsgi_module(&mod_wsgi_module, module);
 

@@ -143,7 +143,5 @@ PyObject *wsgi_start_response(PyObject *self, PyObject *args) {
 }
 
 PyObject *wsgi_write(PyObject *self, PyObject *args) {
-
-
-    return Py_BuildValue("i", 23);
+    return Py_BuildValue("i", 0);
 }
