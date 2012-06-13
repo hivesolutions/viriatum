@@ -27,6 +27,8 @@
 
 #pragma once
 
+#include "entry.h"
+
 PyMethodDef wsgi_methods[3];
 
 PyObject *wsgi_start_response(PyObject *self, PyObject *args);
