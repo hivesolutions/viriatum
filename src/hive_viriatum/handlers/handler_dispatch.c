@@ -109,13 +109,13 @@ ERROR_CODE register_handler_dispatch(struct service_t *service) {
     dispatch_handler->regex = (pcre **) MALLOC(sizeof(pcre *) * dispatch_handler->regex_count);
     dispatch_handler->regex[0] = pcre_compile("[.]*\\.lua", 0, &error, &error_offset, NULL);
     dispatch_handler->regex[1] = pcre_compile("[.]*\\.php", 0, &error, &error_offset, NULL);
-	dispatch_handler->regex[2] = pcre_compile("[.]*\\.wsgi", 0, &error, &error_offset, NULL);
+    dispatch_handler->regex[2] = pcre_compile("[.]*\\.wsgi", 0, &error, &error_offset, NULL);
     dispatch_handler->regex[3] = pcre_compile("[.]*\\.default", 0, &error, &error_offset, NULL);
 #endif
     dispatch_handler->names = (unsigned char **) MALLOC(sizeof(unsigned char *) * dispatch_handler->regex_count);
     dispatch_handler->names[0] = (unsigned char *) "lua";
     dispatch_handler->names[1] = (unsigned char *) "php";
-	dispatch_handler->names[2] = (unsigned char *) "wsgi";
+    dispatch_handler->names[2] = (unsigned char *) "wsgi";
     dispatch_handler->names[3] = (unsigned char *) "dedault";
 
 
