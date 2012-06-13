@@ -214,6 +214,8 @@ static PyObject *wsgi_start_response(PyObject *self, PyObject *args) {
 	result = PyArg_ParseTuple(args, "sO", &error_code, &headers);
 	if(result == 0) { return NULL; }
 
+	/* TODO tenho de por esta informacao no tal context
+	object global (tal e qual como no php) */
 	printf("---%s---\n", error_code);
 
 	wsgi_module = PyImport_ImportModule("viriatum_wsgi");
@@ -267,9 +269,15 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
 	PyObject *handler_function;
 	PyObject *start_response_function;
 
+	PyObject *iterator;
+	PyObject *item;
+
 	PyObject *args;
 	PyObject *environ;
 	PyObject *result;
+
+
+	char *cenas;
 
 	/* TODO: ISTO TEM DE SER METIDO NO INCIO do interpretador
 	E NO FICHEIRO extension.c */
@@ -311,6 +319,29 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
 		Py_DECREF(wsgi_module);
 		RAISE_NO_ERROR;
 	}
+
+
+
+	iterator = PyObject_GetIter(result);
+	if(iterator == NULL) { RAISE_NO_ERROR; }
+
+	while(1) {
+		item = PyIter_Next(iterator);
+		if(item == NULL) { break; }
+		cenas = PyString_AsString(item);
+
+		/* tenho de ir escrevendo estas varias
+		strings ate o gajo ficar starved sempre de
+		modo assyncrono (quando acabo uma peço mais) */
+		printf("%s\n", cenas);
+
+		Py_DECREF(item);
+	}
+
+	Py_DECREF(iterator);
+
+
+
 
 	/* releases the references on the various resources used in this
 	function (memory will be deallocated if necessary) */
