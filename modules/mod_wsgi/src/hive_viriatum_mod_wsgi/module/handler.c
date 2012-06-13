@@ -61,6 +61,11 @@ ERROR_CODE create_handler_wsgi_context(struct handler_wsgi_context_t **handler_w
     /* allocates space for the handler wsgi context */
     struct handler_wsgi_context_t *handler_wsgi_context = (struct handler_wsgi_context_t *) MALLOC(handler_wsgi_context_size);
 
+	/* set the default value in the handler wsgi context
+	structure (resets the structure) */
+	handler_wsgi_context->flags = 0;
+	handler_wsgi_context->iterator = NULL;
+
     /* sets the handler wsgi context in the  pointer */
     *handler_wsgi_context_pointer = handler_wsgi_context;
 
@@ -69,6 +74,10 @@ ERROR_CODE create_handler_wsgi_context(struct handler_wsgi_context_t **handler_w
 }
 
 ERROR_CODE delete_handler_wsgi_context(struct handler_wsgi_context_t *handler_wsgi_context) {
+	/* in case the iterator in the wsgi is not null it must be
+	released by decrementing the reference count */
+	if(handler_wsgi_context->iterator != NULL) { Py_DECREF(handler_wsgi_context->iterator); }
+
     /* releases the handler wsgi context memory */
     FREE(handler_wsgi_context);
 
@@ -190,6 +199,39 @@ ERROR_CODE _unset_http_settings_handler_module(struct http_settings_t *http_sett
 }
 
 ERROR_CODE _send_data_callback(struct connection_t *connection, struct data_t *data, void *parameters) {
+	char *buffer;
+	char *_buffer;
+	size_t buffer_size;
+
+    struct handler_wsgi_context_t *handler_wsgi_context = (struct handler_wsgi_context_t *) parameters;
+	PyObject *iterator = handler_wsgi_context->iterator;
+	PyObject *item = PyIter_Next(iterator);
+
+	if(item == NULL) {
+		Py_DECREF(iterator);
+		handler_wsgi_context->iterator = NULL;
+		_send_response_callback_handler_module(connection, data, parameters);
+
+		/* raises no error */
+		RAISE_NO_ERROR;
+	}
+
+	/* retieves the buffer from the current item and then retrieves the
+	size of it (to be used for the allocation of the connection buffer) */
+	buffer = PyString_AsString(item);
+	buffer_size = PyString_Size(item);
+
+	/* allocates data for the current connection and then copies the
+    current python buffer data into it (for writing into the connection) */
+    connection->alloc_data(connection, buffer_size, (void **) &_buffer);
+    memcpy(_buffer, buffer, buffer_size);
+
+	/* decrements the item reference it's no longer required to exist
+	the data has been already copied */
+	Py_DECREF(item);
+
+    connection->write_connection(connection, (unsigned char *) _buffer, buffer_size, _send_data_callback, parameters);
+
     /* raises no error */
     RAISE_NO_ERROR;
 }
@@ -201,14 +243,26 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
     PyObject *start_response_function;
 
     PyObject *iterator;
-    PyObject *item;
 
     PyObject *args;
     PyObject *environ;
     PyObject *result;
 
 
-    char *cenas;
+    /* allocates space for both the index to be used for iteration
+    and for the count to be used in pointer increment  */
+    size_t index;
+    size_t count;
+
+
+    char *headers_buffer;
+
+    /* retrieves the connection from the http parser parameters
+    and then retrieves the handler wsgi context*/
+    struct connection_t *connection = (struct connection_t *) http_parser->parameters;
+    struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
+    struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
+    struct handler_wsgi_context_t *handler_wsgi_context = (struct handler_wsgi_context_t *) http_parser->context;
 
     wsgi_module = PyImport_ImportModule("viriatum_wsgi");
     if(wsgi_module == NULL) { RAISE_NO_ERROR; }
@@ -227,6 +281,22 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
     if it refers a valid function */
     handler_function = PyObject_GetAttrString(module, "application");
     if(!handler_function || !PyCallable_Check(handler_function)) { RAISE_NO_ERROR; }
+
+	/* updates the global reference to the connection to be
+	used for the wsgi request handling */
+	_connection = connection;
+
+    /* sets the flags from the current http parser in the wsgi
+	context for latter reference */
+    handler_wsgi_context->flags = http_parser->flags;
+
+    /* resets the number of headers for the current wsgi request
+    to be processed (this is a new php request) */
+    _wsgi_request.header_count = 0;
+
+    /* sets the wsgi context in the wsgi request for global reference
+    this should be able to allow global access from the handler methods */
+    _wsgi_request.wsgi_context = handler_wsgi_context;
 
     /* creates a new tuple to hold the various arguments to
     the call and then populates it with the environment variables
@@ -247,28 +317,42 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
         RAISE_NO_ERROR;
     }
 
+    /* allocates space for the header buffer and then writes the default values
+    into it the value is dynamicaly contructed based on the current header values */
+    connection->alloc_data(connection, 25602, (void **) &headers_buffer);
+    count = SPRINTF(
+        headers_buffer,
+        1024,
+        "HTTP/1.1 %d %s\r\n"
+		"Server: %s/%s (%s - %s)\r\n",
+		_wsgi_request.status_code,
+        _wsgi_request.status_message,
+        VIRIATUM_NAME,
+        VIRIATUM_VERSION,
+        VIRIATUM_PLATFORM_STRING,
+        VIRIATUM_PLATFORM_CPU
+    );
 
-
-    iterator = PyObject_GetIter(result);
-    if(iterator == NULL) { RAISE_NO_ERROR; }
-
-    while(1) {
-        item = PyIter_Next(iterator);
-        if(item == NULL) { break; }
-        cenas = PyString_AsString(item);
-
-        /* tenho de ir escrevendo estas varias
-        strings ate o gajo ficar starved sempre de
-        modo assyncrono (quando acabo uma peço mais) */
-        printf("%s\n", cenas);
-
-        Py_DECREF(item);
+    /* iterates over all the headers present in the current wsgi request to copy
+    their content into the current headers buffer */
+    for(index = 0; index < _wsgi_request.header_count; index++) {
+        /* copies the current php header into the current position of the headers
+        buffer (header copy) */
+        count += SPRINTF(&headers_buffer[count], 1026, "%s\r\n", _wsgi_request.headers[index]);
     }
 
-    Py_DECREF(iterator);
+    /* finishes the current headers sequence with the final carriage return newline
+    character values to closes the headers part of the envelope */
+    memcpy(&headers_buffer[count], "\r\n", 2);
+    count += 2;
 
+	iterator = PyObject_GetIter(result);
+	if(iterator == NULL) { RAISE_NO_ERROR; }
+	handler_wsgi_context->iterator = iterator;
 
-
+    /* writes the response to the connection, this will only write
+    the headers the remaining message will be sent on the callback */
+    connection->write_connection(connection, (unsigned char *) headers_buffer, (unsigned int) count, _send_data_callback, (void *) handler_wsgi_context);
 
     /* releases the references on the various resources used in this
     function (memory will be deallocated if necessary) */
@@ -282,6 +366,32 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
 }
 
 ERROR_CODE _send_response_callback_handler_module(struct connection_t *connection, struct data_t *data, void *parameters) {
+    /* retrieves the current wsgi context for the parameters */
+    struct handler_wsgi_context_t *handler_wsgi_context = (struct handler_wsgi_context_t *) parameters;
+
+    /* retrieves the underlying connection references in order to be
+    able to operate over them, for unregister */
+    struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
+    struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
+
+    /* checks if the current connection should be kept alive, this must
+    be done prior to the unseting of the connection as the current php
+    context structrue will be destroyed there */
+    unsigned char keep_alive = handler_wsgi_context->flags & FLAG_CONNECTION_KEEP_ALIVE;
+
+    /* in case there is an http handler in the current connection must
+    unset it (remove temporary information) */
+    if(http_connection->http_handler) {
+        /* unsets the current http connection and then sets the reference
+        to it in the http connection as unset */
+        http_connection->http_handler->unset(http_connection);
+        http_connection->http_handler = NULL;
+    }
+
+    /* in case the connection is not meant to be kept alive must be closed
+    in the normal manner (using the close connection function) */
+    if(!keep_alive) { connection->close_connection(connection); }
+
     /* raise no error */
     RAISE_NO_ERROR;
 }
