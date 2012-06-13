@@ -95,11 +95,11 @@ ERROR_CODE write_http_error(struct connection_t *connection, char *header, char 
         SPRINTF(
             headers_buffer,
             1024,
-            "HTTP/1.1 %s %s\r\n\
-            Server: %s/%s (%s - %s)\r\n\
-            Connection: Keep-Alive\r\n\
-            Cache-Control: no-cache, must-revalidate\r\n\
-            Content-Length: %lu\r\n\r\n",
+            "HTTP/1.1 %s %s\r\n"
+            "Server: %s/%s (%s - %s)\r\n"
+            "Connection: Keep-Alive\r\n"
+            "Cache-Control: no-cache, must-revalidate\r\n"
+            "Content-Length: %lu\r\n\r\n",
             error_code,
             error_message,
             VIRIATUM_NAME,
@@ -135,11 +135,11 @@ ERROR_CODE write_http_error(struct connection_t *connection, char *header, char 
         SPRINTF(
             headers_buffer,
             1024,
-            "HTTP/1.1 %s %s\r\n\
-            Server: %s/%s (%s - %s)\r\n\
-            Connection: Keep-Alive\r\n\
-            Cache-Control: no-cache, must-revalidate\r\n\
-            Content-Length: %lu\r\n\r\n%s",
+            "HTTP/1.1 %s %s\r\n"
+            "Server: %s/%s (%s - %s)\r\n"
+            "Connection: Keep-Alive\r\n"
+            "Cache-Control: no-cache, must-revalidate\r\n"
+            "Content-Length: %lu\r\n\r\n%s",
             error_code,
             error_message,
             VIRIATUM_NAME,
