@@ -177,7 +177,7 @@ ERROR_CODE log_http_request(char *host, char *identity, char *user, char *method
     the other (sent) variables to format the output buffer */
     strftime(date_buffer, 1024, "%d/%b/%Y %H:%M:%S", _local_time);
     PRINTF_F(
-        "%s %s %s [%s] \"%s %s %s\" %d %ul\n",
+        "%s %s %s [%s] \"%s %s %s\" %d %lu\n",
         host,
         identity,
         user,
