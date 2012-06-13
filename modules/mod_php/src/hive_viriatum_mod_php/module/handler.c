@@ -570,7 +570,10 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
     count = SPRINTF(
         headers_buffer,
         1024,
-        "HTTP/1.1 %d %s\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nContent-Length: %lu\r\n",
+        "HTTP/1.1 %d %s\r\n\
+		Server: %s/%s (%s - %s)\r\n\
+		Connection: Keep-Alive\r\n\
+		Content-Length: %lu\r\n",
         status_code,
         status_message,
         VIRIATUM_NAME,
@@ -654,7 +657,10 @@ ERROR_CODE _write_error_connection(struct http_parser_t *http_parser, char *mess
     SPRINTF(
         (char *) buffer,
         1024,
-        "HTTP/1.1 500 Internal Server Error\r\nServer: %s/%s (%s @ %s)\r\nConnection: Keep-Alive\r\nContent-Length: %d\r\n\r\n%s",
+        "HTTP/1.1 500 Internal Server Error\r\n\
+		Server: %s/%s (%s @ %s)\r\n\
+		Connection: Keep-Alive\r\n\
+		Content-Length: %d\r\n\r\n%s",
         VIRIATUM_NAME,
         VIRIATUM_VERSION,
         VIRIATUM_PLATFORM_STRING,
