@@ -25,3 +25,6 @@
 
 # checks for header files
 AC_CHECK_HEADERS([stdlib.h assert.h])
+
+# checks for specific header files
+AC_CHECK_HEADERS([Python.h], [], [AC_MSG_ERROR([python embed headers are required])])
