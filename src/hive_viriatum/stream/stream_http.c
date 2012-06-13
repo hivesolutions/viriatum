@@ -78,6 +78,11 @@ ERROR_CODE create_http_connection(struct http_connection_t **http_connection_poi
     http_connection->buffer_size = 0;
     http_connection->buffer_offset = 0;
 
+	/* sets the proper functions in the http connection
+	they may be used by the handlers to interact with 
+	the connection (at the http level) */
+	http_connection->log_request = log_http_request;
+
     /* creates the http settings */
     create_http_settings(&http_connection->http_settings);
 

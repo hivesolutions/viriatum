@@ -45,6 +45,27 @@ struct http_connection_t;
 typedef ERROR_CODE (*http_connection_update) (struct http_connection_t *http_connection);
 
 /**
+ * Function used to log request information in the common
+ * log format into the current output stream.
+ *
+ * @param host The (client) host associated with the request
+ * to be logged.
+ * @param identity The identity of the "driver" that is logging
+ * the current request.
+ * @param user The user that is logging the current, request
+ * in case it's an automated script the name should be used.
+ * @param method The uppercased name of the http method used.
+ * @param uri The path to the resource refered by the url.
+ * @param protocol The version of the http protocol used in
+ * the request to be loggerd.
+ * @param error_code The error (status) code to be sent back to
+ * the client in the associated response.
+ * @param content_length The size of the content to be sent back
+ * as the response.
+ */
+typedef ERROR_CODE (*http_connection_log) (char *host, char *identity, char *user, char *method, char *uri, char *protocol, int error_code, size_t content_length);
+
+/**
  * The structure that describes the structure
  * of an handler capable of interpreting an
  * http request and construct a response based
@@ -137,6 +158,13 @@ typedef struct http_connection_t {
      * data in processing.
      */
     size_t buffer_offset;
+
+	/**
+     * Function to be used for logging a connection into the
+	 * appropriate output streams in the default common log
+	 * format.
+     */
+    http_connection_log log_request;
 } http_connection;
 
 ERROR_CODE create_http_handler(struct http_handler_t **http_handler_pointer, unsigned char *name);
