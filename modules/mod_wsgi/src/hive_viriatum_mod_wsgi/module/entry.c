@@ -204,16 +204,27 @@ ERROR_CODE _load_configuration(struct service_t *service, struct mod_wsgi_http_h
 }
 
 ERROR_CODE _load_wsgi_state() {
+	/* starts the python interpreter initializing all the resources
+	related with the virtual machine */
+	Py_Initialize();
+
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
 ERROR_CODE _unload_wsgi_state() {
+	/* shutsdown the python interpreter, releasing all the resources
+	associated with it (everything is destroyed) */
+	Py_Finalize();
+
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
 ERROR_CODE _reload_wsgi_state() {
+    _unload_wsgi_state();
+    _load_wsgi_state();
+
     /* raises no error */
     RAISE_NO_ERROR;
 }
