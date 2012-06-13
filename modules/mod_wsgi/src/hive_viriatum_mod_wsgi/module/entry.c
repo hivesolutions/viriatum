@@ -208,6 +208,10 @@ ERROR_CODE _load_wsgi_state() {
     related with the virtual machine */
     Py_Initialize();
 
+    /* starts the wsgi state updating the major global value in
+    the current interpreter state */
+    _start_wsgi_state();
+
     /* raises no error */
     RAISE_NO_ERROR;
 }
@@ -230,6 +234,10 @@ ERROR_CODE _reload_wsgi_state() {
 }
 
 ERROR_CODE _start_wsgi_state() {
+    /* registers the viriatum wsgi module in the python interpreter
+    this module may be used to provide wsgi functions */
+    Py_InitModule("viriatum_wsgi", wsgi_methods);
+
     /* raises no error */
     RAISE_NO_ERROR;
 }

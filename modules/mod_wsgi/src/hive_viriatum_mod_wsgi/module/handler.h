@@ -35,17 +35,16 @@
  * of the wsgi module.
  */
 typedef struct mod_wsgi_http_handler_t {
-
-
-    int dummy;
-
+    /**
+     * The path to the default file to
+     * be used for the parsing.
+     */
+    char *file_path;
 } mod_wsgi_http_handler;
-
 
 typedef struct handler_wsgi_context_t {
 
-    int dummy;
-
+    int error_code;
 
 } handler_wsgi_context;
 

@@ -27,6 +27,7 @@
 
 #pragma once
 
-#include "entry.h"
-#include "extension.h"
-#include "handler.h"
+PyMethodDef wsgi_methods[3];
+
+PyObject *wsgi_start_response(PyObject *self, PyObject *args);
+PyObject *wsgi_write(PyObject *self, PyObject *args);
