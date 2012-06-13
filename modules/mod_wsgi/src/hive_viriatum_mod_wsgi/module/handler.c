@@ -194,9 +194,124 @@ ERROR_CODE _send_data_callback(struct connection_t *connection, struct data_t *d
     RAISE_NO_ERROR;
 }
 
+
+
+static PyObject *wsgi_start_response(PyObject *self, PyObject *args) {
+	PyObject *wsgi_module;
+	PyObject *write_function;
+	
+	PyObject *return_value;
+
+	/* allocates space for both arguments for the start response
+	function, the status line (error code) and for the headers list */
+    const char *error_code;
+    PyObject *headers;
+
+	/* allocates space for the result value from the parsing of the
+	arguments, in the initial part of the function */
+	int result;
+
+	result = PyArg_ParseTuple(args, "sO", &error_code, &headers);
+	if(result == 0) { return NULL; }
+
+	printf("---%s---\n", error_code);
+
+	wsgi_module = PyImport_ImportModule("viriatum_wsgi");
+	if(wsgi_module == NULL) { return NULL; }
+
+    write_function = PyObject_GetAttrString(wsgi_module, "write");
+	if(!write_function || !PyCallable_Check(write_function)) { RAISE_NO_ERROR; }
+
+	/* builds the return value with the write function so
+	that the caller function may write directly to the stream */
+    return_value = Py_BuildValue("O", write_function);
+
+	/* decrements the reference count of the write function and
+	of the module they are not important anymore */
+	Py_DECREF(write_function);
+	Py_DECREF(wsgi_module);
+
+	/* returns the return value to the caller function, this value
+	should include the write function */
+	return return_value;
+}
+
+static PyObject *wsgi_write(PyObject *self, PyObject *args) {
+    return Py_BuildValue("i", 23);
+}
+
+static PyMethodDef wsgi_methods[] = {
+    {
+		"start_response",
+		wsgi_start_response,
+		METH_VARARGS,
+		NULL
+	},
+	{
+		"write",
+		wsgi_write,
+		METH_VARARGS,
+		NULL
+	},
+    {
+		NULL,
+		NULL,
+		0,
+		NULL
+	}
+};
+
 ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
-	PyRun_SimpleString("from time import time,ctime\n"
-					   "print 'Today is',ctime(time())\n");
+	PyObject *module;
+	PyObject *wsgi_module;
+	PyObject *handler_function;
+	PyObject *start_response_function;
+
+	PyObject *args;
+	PyObject *environ;
+	PyObject *result;
+
+	Py_InitModule("viriatum_wsgi", wsgi_methods);
+
+	wsgi_module = PyImport_ImportModule("viriatum_wsgi");
+	if(wsgi_module == NULL) { RAISE_NO_ERROR; }
+
+    start_response_function = PyObject_GetAttrString(wsgi_module, "start_response");
+	if(!start_response_function || !PyCallable_Check(start_response_function)) { RAISE_NO_ERROR; }
+
+	/* imports the associated (handler) module and retrieves
+	its reference to be used for the calling, in case the
+	reference is invalid raises an error */
+	module = PyImport_ImportModule("tobias");
+	if(module == NULL) { RAISE_NO_ERROR; }
+
+	/* retrieves the function to be used as handler for the
+	wsgi request, then check if the reference is valid and
+	if it refers a valid function */
+    handler_function = PyObject_GetAttrString(module, "simple_app");
+	if(!handler_function || !PyCallable_Check(handler_function)) { RAISE_NO_ERROR; }
+
+	/* creates a new tuple to hold the various arguments to
+	the call and then populates it with the environment variables
+	dictionary and with the start response function */
+	args = PyTuple_New(2);
+	environ = PyDict_New();
+	PyTuple_SetItem(args, 0, environ);
+	PyTuple_SetItem(args, 1, start_response_function);
+
+	result = PyObject_CallObject(handler_function, args);
+	if(result == NULL) {
+		Py_DECREF(handler_function);
+		Py_DECREF(args);
+		Py_DECREF(module);
+		Py_DECREF(wsgi_module);
+		RAISE_NO_ERROR;
+	}
+
+	Py_DECREF(handler_function);
+	Py_DECREF(args);
+	Py_DECREF(module);
+	Py_DECREF(wsgi_module);
 
     /* raise no error */
     RAISE_NO_ERROR;
