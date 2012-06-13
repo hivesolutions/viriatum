@@ -31,7 +31,7 @@
 #define PID_TYPE DWORD
 #define PROCESS_TYPE HANDLE
 #define MEMORY_INFORMATION_TYPE PROCESS_MEMORY_COUNTERS
-#define LOCAL_TIME(local_time_value, time_value) tm local_time_value_value; local_time_value = &local_time_value_value; localtime_s(local_time_value, time_value)
+#define LOCAL_TIME(local_time_value, time_value) struct tm local_time_value_value; local_time_value = &local_time_value_value; localtime_s(local_time_value, time_value)
 #define SLEEP(miliseconds) Sleep(miliseconds)
 #define GET_PID() GetCurrentProcessId()
 #define GET_ENV(buffer, buffer_size, variable_name) _dupenv_s(&buffer, &buffer_size, variable_name)
