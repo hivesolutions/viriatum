@@ -62,21 +62,21 @@ typedef struct mod_wsgi_module_t {
  * values useful for request flush.
  */
 typedef struct wsgi_request_t {
-	/**
-	 * The integer code describing the status
-	 * of the response assocaited with this
-	 * request, this information is provided
-	 * by the wsgi application.
-	 */
+    /**
+     * The integer code describing the status
+     * of the response assocaited with this
+     * request, this information is provided
+     * by the wsgi application.
+     */
     int status_code;
 
-	/**
-	 * The message string describing the status
-	 * of the response assocaited with this
-	 * request, this information is provided
-	 * by the wsgi application.
-	 */
-	char status_message[256];
+    /**
+     * The message string describing the status
+     * of the response assocaited with this
+     * request, this information is provided
+     * by the wsgi application.
+     */
+    char status_message[256];
 
     /**
      * The matrix buffer containing the maximum

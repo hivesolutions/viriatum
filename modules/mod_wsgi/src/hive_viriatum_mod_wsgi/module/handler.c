@@ -61,10 +61,10 @@ ERROR_CODE create_handler_wsgi_context(struct handler_wsgi_context_t **handler_w
     /* allocates space for the handler wsgi context */
     struct handler_wsgi_context_t *handler_wsgi_context = (struct handler_wsgi_context_t *) MALLOC(handler_wsgi_context_size);
 
-	/* set the default value in the handler wsgi context
-	structure (resets the structure) */
-	handler_wsgi_context->flags = 0;
-	handler_wsgi_context->iterator = NULL;
+    /* set the default value in the handler wsgi context
+    structure (resets the structure) */
+    handler_wsgi_context->flags = 0;
+    handler_wsgi_context->iterator = NULL;
 
     /* sets the handler wsgi context in the  pointer */
     *handler_wsgi_context_pointer = handler_wsgi_context;
@@ -74,9 +74,9 @@ ERROR_CODE create_handler_wsgi_context(struct handler_wsgi_context_t **handler_w
 }
 
 ERROR_CODE delete_handler_wsgi_context(struct handler_wsgi_context_t *handler_wsgi_context) {
-	/* in case the iterator in the wsgi is not null it must be
-	released by decrementing the reference count */
-	if(handler_wsgi_context->iterator != NULL) { Py_DECREF(handler_wsgi_context->iterator); }
+    /* in case the iterator in the wsgi is not null it must be
+    released by decrementing the reference count */
+    if(handler_wsgi_context->iterator != NULL) { Py_DECREF(handler_wsgi_context->iterator); }
 
     /* releases the handler wsgi context memory */
     FREE(handler_wsgi_context);
@@ -199,36 +199,36 @@ ERROR_CODE _unset_http_settings_handler_module(struct http_settings_t *http_sett
 }
 
 ERROR_CODE _send_data_callback(struct connection_t *connection, struct data_t *data, void *parameters) {
-	char *buffer;
-	char *_buffer;
-	size_t buffer_size;
+    char *buffer;
+    char *_buffer;
+    size_t buffer_size;
 
     struct handler_wsgi_context_t *handler_wsgi_context = (struct handler_wsgi_context_t *) parameters;
-	PyObject *iterator = handler_wsgi_context->iterator;
-	PyObject *item = PyIter_Next(iterator);
+    PyObject *iterator = handler_wsgi_context->iterator;
+    PyObject *item = PyIter_Next(iterator);
 
-	if(item == NULL) {
-		Py_DECREF(iterator);
-		handler_wsgi_context->iterator = NULL;
-		_send_response_callback_handler_module(connection, data, parameters);
+    if(item == NULL) {
+        Py_DECREF(iterator);
+        handler_wsgi_context->iterator = NULL;
+        _send_response_callback_handler_module(connection, data, parameters);
 
-		/* raises no error */
-		RAISE_NO_ERROR;
-	}
+        /* raises no error */
+        RAISE_NO_ERROR;
+    }
 
-	/* retieves the buffer from the current item and then retrieves the
-	size of it (to be used for the allocation of the connection buffer) */
-	buffer = PyString_AsString(item);
-	buffer_size = PyString_Size(item);
+    /* retieves the buffer from the current item and then retrieves the
+    size of it (to be used for the allocation of the connection buffer) */
+    buffer = PyString_AsString(item);
+    buffer_size = PyString_Size(item);
 
-	/* allocates data for the current connection and then copies the
+    /* allocates data for the current connection and then copies the
     current python buffer data into it (for writing into the connection) */
     connection->alloc_data(connection, buffer_size, (void **) &_buffer);
     memcpy(_buffer, buffer, buffer_size);
 
-	/* decrements the item reference it's no longer required to exist
-	the data has been already copied */
-	Py_DECREF(item);
+    /* decrements the item reference it's no longer required to exist
+    the data has been already copied */
+    Py_DECREF(item);
 
     connection->write_connection(connection, (unsigned char *) _buffer, buffer_size, _send_data_callback, parameters);
 
@@ -282,12 +282,12 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
     handler_function = PyObject_GetAttrString(module, "application");
     if(!handler_function || !PyCallable_Check(handler_function)) { RAISE_NO_ERROR; }
 
-	/* updates the global reference to the connection to be
-	used for the wsgi request handling */
-	_connection = connection;
+    /* updates the global reference to the connection to be
+    used for the wsgi request handling */
+    _connection = connection;
 
     /* sets the flags from the current http parser in the wsgi
-	context for latter reference */
+    context for latter reference */
     handler_wsgi_context->flags = http_parser->flags;
 
     /* resets the number of headers for the current wsgi request
@@ -324,8 +324,8 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
         headers_buffer,
         1024,
         "HTTP/1.1 %d %s\r\n"
-		"Server: %s/%s (%s - %s)\r\n",
-		_wsgi_request.status_code,
+        "Server: %s/%s (%s - %s)\r\n",
+        _wsgi_request.status_code,
         _wsgi_request.status_message,
         VIRIATUM_NAME,
         VIRIATUM_VERSION,
@@ -346,9 +346,9 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
     memcpy(&headers_buffer[count], "\r\n", 2);
     count += 2;
 
-	iterator = PyObject_GetIter(result);
-	if(iterator == NULL) { RAISE_NO_ERROR; }
-	handler_wsgi_context->iterator = iterator;
+    iterator = PyObject_GetIter(result);
+    if(iterator == NULL) { RAISE_NO_ERROR; }
+    handler_wsgi_context->iterator = iterator;
 
     /* writes the response to the connection, this will only write
     the headers the remaining message will be sent on the callback */
