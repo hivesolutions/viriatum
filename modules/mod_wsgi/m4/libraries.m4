@@ -29,7 +29,7 @@ have_python=true
 
 # checks for libraries
 AC_CHECK_LIB([viriatum], [main])
-AC_CHECK_LIB([python], [main], [], [AC_MSG_ERROR([python library is required])])
+AC_CHECK_LIB([python2.7], [main], [], [AC_MSG_ERROR([python 2.7 library is required])])
 
 # library variables activation
 AM_CONDITIONAL(LINK_PYTHON, [test "$have_python" != "false"])
