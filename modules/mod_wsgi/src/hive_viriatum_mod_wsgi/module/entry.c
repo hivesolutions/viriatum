@@ -86,11 +86,6 @@ ERROR_CODE start_module(struct environment_t *environment, struct module_t *modu
     /* populates the module structure */
     info_module(module);
 
-    Py_Initialize();
-    PyRun_SimpleString("from time import time,ctime\n"
-                       "print 'Today is',ctime(time())\n");
-    Py_Finalize();
-
     /* loads the wsgi state populating all the required values
     for state initialization */
     _load_wsgi_state();
