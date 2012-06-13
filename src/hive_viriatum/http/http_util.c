@@ -186,7 +186,7 @@ ERROR_CODE log_http_request(char *host, char *identity, char *user, char *method
         uri,
         protocol,
         error_code,
-        content_length
+        (long unsigned int) content_length
     );
 
     /* raises no error */
