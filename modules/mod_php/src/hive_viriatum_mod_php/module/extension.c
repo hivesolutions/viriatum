@@ -204,7 +204,7 @@ void _module_register(zval *_array TSRMLS_DC) {
 	php_register_variable_safe("SERVER_PROTOCOL", "HTTP/1.1", sizeof("HTTP/1.1") - 1, _array TSRMLS_CC);
     php_register_variable_safe("SERVER_NAME", (char *) _php_request.php_context->server_name, _php_request.php_context->_server_name_string.length, _array TSRMLS_CC);
     php_register_variable_safe("SERVER_PORT", (char *) port, port_string->length, _array TSRMLS_CC);
-	php_register_variable_safe("REQUEST_URI'", (char *) _php_request.php_context->file_name, _php_request.php_context->_file_name_string.length, _array TSRMLS_CC);
+	php_register_variable_safe("REQUEST_URI", (char *) _php_request.php_context->file_name, _php_request.php_context->_file_name_string.length, _array TSRMLS_CC);
     php_register_variable_safe("SCRIPT_NAME", (char *) _php_request.php_context->file_name, _php_request.php_context->_file_name_string.length, _array TSRMLS_CC);
     php_register_variable_safe("SCRIPT_FILENAME", (char *) _php_request.php_context->file_path, _php_request.php_context->_file_path_string.length, _array TSRMLS_CC);
     php_register_variable_safe("QUERY_STRING", (char *) _php_request.php_context->query, _php_request.php_context->_query_string.length, _array TSRMLS_CC);
