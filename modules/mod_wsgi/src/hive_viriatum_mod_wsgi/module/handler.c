@@ -271,6 +271,8 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
 	PyObject *environ;
 	PyObject *result;
 
+	/* TODO: ISTO TEM DE SER METIDO NO INCIO do interpretador
+	E NO FICHEIRO extension.c */
 	Py_InitModule("viriatum_wsgi", wsgi_methods);
 
 	wsgi_module = PyImport_ImportModule("viriatum_wsgi");
@@ -299,6 +301,8 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
 	PyTuple_SetItem(args, 0, environ);
 	PyTuple_SetItem(args, 1, start_response_function);
 
+	/* calls the handler function retrieving the result and releasing
+	the resources immediately in case the result is not valid */
 	result = PyObject_CallObject(handler_function, args);
 	if(result == NULL) {
 		Py_DECREF(handler_function);
@@ -308,6 +312,8 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
 		RAISE_NO_ERROR;
 	}
 
+	/* releases the references on the various resources used in this
+	function (memory will be deallocated if necessary) */
 	Py_DECREF(handler_function);
 	Py_DECREF(args);
 	Py_DECREF(module);
