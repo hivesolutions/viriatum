@@ -62,12 +62,21 @@ typedef struct mod_wsgi_module_t {
  * values useful for request flush.
  */
 typedef struct wsgi_request_t {
-    /**
-     * The mime type value for the current wsgi
-     * request, this header value is treated as
-     * a special case by the wsgi interpreter.
-     */
-    char mime_type[1024];
+	/**
+	 * The integer code describing the status
+	 * of the response assocaited with this
+	 * request, this information is provided
+	 * by the wsgi application.
+	 */
+    int status_code;
+
+	/**
+	 * The message string describing the status
+	 * of the response assocaited with this
+	 * request, this information is provided
+	 * by the wsgi application.
+	 */
+	char status_message[256];
 
     /**
      * The matrix buffer containing the maximum
@@ -102,13 +111,6 @@ struct service_t *_service;
  * information values.
  */
 struct connection_t *_connection;
-
-/**
- * The global reference to the linked buffer to
- * be used to hold the various strings resulting
- * from the wsgi default execution output.
- */
-struct linked_buffer_t *_output_buffer;
 
 /**
  * The global structure to be used to "pass" wsgi
