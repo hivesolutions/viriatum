@@ -79,6 +79,12 @@ Must compile the php interpreter with special environment variables set, and the
 * `export CFLAGS="-I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend"`
 * `./configure --enable-embed`
 
+## WSGI Module
+
+Must compile the php interpreter with special environment variables set to point to the correct headers directory.
+
+* `export CFLAGS="-I/usr/include/python2.7"`
+
 ## Debugging
 
 * For windows debugging use [Visual Leak Detector](http://vld.codeplex.com) using the `#include <vld.h>` statement
