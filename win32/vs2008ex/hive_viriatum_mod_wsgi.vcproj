@@ -44,7 +44,7 @@
                 PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;HIVE_VIRIATUM_MOD_WSGI_EXPORTS"
                 MinimalRebuild="true"
                 BasicRuntimeChecks="3"
-                RuntimeLibrary="3"
+                RuntimeLibrary="2"
                 UsePrecompiledHeader="2"
                 ProgramDataBaseFileName="$(TargetDir)$(TargetName).pdb"
                 WarningLevel="3"
@@ -61,6 +61,7 @@
             />
             <Tool
                 Name="VCLinkerTool"
+                OutputFile="$(OutDir)\viriatum_mod_wsgi_d.dll"
                 LinkIncremental="2"
                 GenerateDebugInformation="true"
                 SubSystem="2"
@@ -86,6 +87,7 @@
             />
             <Tool
                 Name="VCPostBuildEventTool"
+                CommandLine="xcopy /e /y &quot;$(OutDir)\$(TargetFileName)&quot; &quot;$(SolutionDir)\..\..\bin\hive_viriatum\i386\win32\$(ConfigurationName)\modules\&quot;"
             />
         </Configuration>
         <Configuration
@@ -116,7 +118,7 @@
                 Optimization="2"
                 EnableIntrinsicFunctions="true"
                 PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;HIVE_VIRIATUM_MOD_WSGI_EXPORTS"
-                RuntimeLibrary="2"
+                RuntimeLibrary="0"
                 EnableFunctionLevelLinking="true"
                 UsePrecompiledHeader="2"
                 ProgramDataBaseFileName="$(TargetDir)$(TargetName).pdb"
@@ -134,6 +136,7 @@
             />
             <Tool
                 Name="VCLinkerTool"
+                OutputFile="$(OutDir)\viriatum_mod_wsgi.dll"
                 LinkIncremental="1"
                 GenerateDebugInformation="true"
                 SubSystem="2"
@@ -161,6 +164,7 @@
             />
             <Tool
                 Name="VCPostBuildEventTool"
+                CommandLine="xcopy /e /y &quot;$(OutDir)\$(TargetFileName)&quot; &quot;$(SolutionDir)\..\..\bin\hive_viriatum\i386\win32\$(ConfigurationName)\modules\&quot;"
             />
         </Configuration>
     </Configurations>
@@ -177,6 +181,14 @@
                 >
                 <FileConfiguration
                     Name="Debug|Win32"
+                    >
+                    <Tool
+                        Name="VCCLCompilerTool"
+                        UsePrecompiledHeader="1"
+                    />
+                </FileConfiguration>
+                <FileConfiguration
+                    Name="Release|Win32"
                     >
                     <Tool
                         Name="VCCLCompilerTool"
