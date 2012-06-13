@@ -43,9 +43,19 @@ typedef struct mod_wsgi_http_handler_t {
 } mod_wsgi_http_handler;
 
 typedef struct handler_wsgi_context_t {
+    /**
+     * The current value for the flags describing
+     * the status of the current http request.
+     */
+    unsigned char flags;
 
-    int error_code;
-
+	/**
+	 * The reference to the buffer iterator
+	 * to be used to retrive data from the wsgi
+	 * application sequence of data, and to use
+	 * it to print to the output buffer.
+	 */
+	PyObject *iterator;
 } handler_wsgi_context;
 
 ERROR_CODE create_mod_wsgi_http_handler(struct mod_wsgi_http_handler_t **mod_wsgi_http_handler_pointer, struct http_handler_t *http_handler_pointer);
