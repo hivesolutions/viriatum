@@ -239,7 +239,19 @@ ERROR_CODE _send_response_handler_default(struct http_parser_t *http_parser) {
     struct connection_t *connection = (struct connection_t *) http_parser->parameters;
 
     /* writes the http static headers to the response */
-    SPRINTF(response_buffer, 256, "HTTP/1.1 200 OK\r\nServer: %s/%s (%s @ %s)\r\nConnection: Keep-Alive\r\nContent-Length: 14\r\n\r\nHello Viriatum", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU);
+    SPRINTF(
+		response_buffer,
+		256,
+		"HTTP/1.1 200 OK\r\n\
+		Server: %s/%s (%s @ %s)\r\n\
+		Connection: Keep-Alive\r\n\
+		Content-Length: 14\r\n\r\n\
+		Hello Viriatum",
+		VIRIATUM_NAME,
+		VIRIATUM_VERSION,
+		VIRIATUM_PLATFORM_STRING,
+		VIRIATUM_PLATFORM_CPU
+	);
 
     /* writes the response to the connection, registers for the appropriate callbacks */
     write_connection(connection, (unsigned char *) response_buffer, (unsigned int) strlen(response_buffer), _send_response_callback_handler_default, (void *) (size_t) http_parser->flags);
