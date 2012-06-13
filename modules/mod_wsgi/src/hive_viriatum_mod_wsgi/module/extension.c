@@ -62,6 +62,18 @@ PyObject *wsgi_start_response(PyObject *self, PyObject *args) {
     PyObject *headers;
     PyObject *exc_info;
 
+	/* allocates space for the iterator and for the item to be used
+	to percolate the list containing the various header tuples */
+    PyObject *iterator;
+    PyObject *item;
+
+	PyObject *header_name;
+	PyObject *header_value;
+	char *_header_name;
+	char *_header_value;
+
+	size_t index;
+
     /* allocates space for the result value from the parsing of the
     arguments, in the initial part of the function */
     int result;
@@ -75,9 +87,40 @@ PyObject *wsgi_start_response(PyObject *self, PyObject *args) {
     result = PyArg_ParseTuple(args, "sO|O", &error_code, &headers, &exc_info);
     if(result == 0) { return NULL; }
 
-    /* TODO tenho de por esta informacao no tal context
-    object global (tal e qual como no php) */
-    printf("---%s---\n", error_code);
+#ifdef VIRIATUM_PLATFORM_MSC
+	SSCANF(error_code, "%d %s", &_wsgi_request.status_code, &_wsgi_request.status_message, 256);
+#else
+	SSCANF(error_code, "%d %s", &_wsgi_request.status_code, &_wsgi_request.status_message);
+#endif
+
+
+
+	iterator = PyObject_GetIter(headers);
+    if(iterator == NULL) { RAISE_NO_ERROR; }
+
+	index = 0;
+
+    while(1) {
+        item = PyIter_Next(iterator);
+        if(item == NULL) { break; }
+		header_name = PySequence_GetItem(item, 0);
+		header_value = PySequence_GetItem(item, 1);
+
+		_header_name = PyString_AsString(header_name);
+		_header_value = PyString_AsString(header_value);
+
+		SPRINTF(_wsgi_request.headers[_wsgi_request.header_count], 1024, "%s: %s", _header_name, _header_value);
+		_wsgi_request.header_count++;
+
+		Py_XDECREF(header_value);
+		Py_XDECREF(header_name);
+        Py_DECREF(item);
+    }
+
+    Py_DECREF(iterator);
+
+
+
 
     wsgi_module = PyImport_ImportModule("viriatum_wsgi");
     if(wsgi_module == NULL) { return NULL; }
@@ -100,5 +143,7 @@ PyObject *wsgi_start_response(PyObject *self, PyObject *args) {
 }
 
 PyObject *wsgi_write(PyObject *self, PyObject *args) {
+
+
     return Py_BuildValue("i", 23);
 }
