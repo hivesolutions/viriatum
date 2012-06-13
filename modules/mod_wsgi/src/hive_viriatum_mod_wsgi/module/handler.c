@@ -195,6 +195,9 @@ ERROR_CODE _send_data_callback(struct connection_t *connection, struct data_t *d
 }
 
 ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
+	PyRun_SimpleString("from time import time,ctime\n"
+					   "print 'Today is',ctime(time())\n");
+
     /* raise no error */
     RAISE_NO_ERROR;
 }
