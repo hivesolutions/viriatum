@@ -421,7 +421,7 @@ ERROR_CODE _send_data_callback(struct connection_t *connection, struct data_t *d
     join_linked_buffer(output_buffer, (unsigned char **) &output_data);
     delete_linked_buffer(output_buffer);
 
-    /* allocates data for the current connection and then copues the
+    /* allocates data for the current connection and then copies the
     current output buffer data into it (for writing into the connection) */
     connection->alloc_data(connection, output_length, (void **) &buffer);
     memcpy(buffer, output_data, output_length);
@@ -564,16 +564,16 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
         output_buffer->buffer_length
     );
 
-    /* allocates space fot the header buffer and then writes the default values
+    /* allocates space for the header buffer and then writes the default values
     into it the value is dynamicaly contructed based on the current header values */
     connection->alloc_data(connection, 25602, (void **) &headers_buffer);
     count = SPRINTF(
         headers_buffer,
         1024,
-        "HTTP/1.1 %d %s\r\n\
-        Server: %s/%s (%s - %s)\r\n\
-        Connection: Keep-Alive\r\n\
-        Content-Length: %lu\r\n",
+        "HTTP/1.1 %d %s\r\n"
+        "Server: %s/%s (%s - %s)\r\n"
+        "Connection: Keep-Alive\r\n"
+        "Content-Length: %lu\r\n",
         status_code,
         status_message,
         VIRIATUM_NAME,
@@ -657,10 +657,10 @@ ERROR_CODE _write_error_connection(struct http_parser_t *http_parser, char *mess
     SPRINTF(
         (char *) buffer,
         1024,
-        "HTTP/1.1 500 Internal Server Error\r\n\
-        Server: %s/%s (%s @ %s)\r\n\
-        Connection: Keep-Alive\r\n\
-        Content-Length: %d\r\n\r\n%s",
+        "HTTP/1.1 500 Internal Server Error\r\n"
+        "Server: %s/%s (%s @ %s)\r\n"
+        "Connection: Keep-Alive\r\n"
+        "Content-Length: %d\r\n\r\n%s",
         VIRIATUM_NAME,
         VIRIATUM_VERSION,
         VIRIATUM_PLATFORM_STRING,
