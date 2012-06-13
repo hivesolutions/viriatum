@@ -159,10 +159,10 @@ typedef struct http_connection_t {
      */
     size_t buffer_offset;
 
-	/**
+    /**
      * Function to be used for logging a connection into the
-	 * appropriate output streams in the default common log
-	 * format.
+     * appropriate output streams in the default common log
+     * format.
      */
     http_connection_log log_request;
 } http_connection;

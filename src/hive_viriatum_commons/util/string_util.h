@@ -91,15 +91,15 @@ static __inline int ends_with_string(unsigned char *string_value, unsigned char 
 
 static __inline void uppercase(char *string_value) {
     while(*string_value != '\0') {
-		if(*string_value == '-') { *string_value = '_'; }
-		else { *string_value = toupper((unsigned char) *string_value); }
-		string_value++;
+        if(*string_value == '-') { *string_value = '_'; }
+        else { *string_value = toupper((unsigned char) *string_value); }
+        string_value++;
     }
 }
 
 static __inline void normalize_path(char *string_value) {
     while(*string_value != '\0') {
-		if(*string_value == '\\') { *string_value = '/'; }
-		string_value++;
+        if(*string_value == '\\') { *string_value = '/'; }
+        string_value++;
     }
 }
