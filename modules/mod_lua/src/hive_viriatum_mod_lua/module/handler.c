@@ -278,7 +278,20 @@ ERROR_CODE _write_error_connection(struct http_parser_t *http_parser, char *mess
     /* allocates the data buffer (in a safe maner) then
     writes the http static headers to the response */
     connection->alloc_data(connection, 1024 * sizeof(unsigned char), (void **) &buffer);
-    SPRINTF((char *) buffer, 1024, "HTTP/1.1 500 Internal Server Error\r\nServer: %s/%s (%s @ %s)\r\nConnection: Keep-Alive\r\nContent-Length: %d\r\n\r\n%s", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, (unsigned int) message_length, message);
+    SPRINTF(
+		(char *) buffer,
+		1024,
+		"HTTP/1.1 500 Internal Server Error\r\n\
+		Server: %s/%s (%s @ %s)\r\n\
+		Connection: Keep-Alive\r\n\
+		Content-Length: %d\r\n\r\n%s",
+		VIRIATUM_NAME,
+		VIRIATUM_VERSION,
+		VIRIATUM_PLATFORM_STRING,
+		VIRIATUM_PLATFORM_CPU,
+		(unsigned int) message_length,
+		message
+	);
 
     /* writes the response to the connection, registers for the appropriate callbacks */
     connection->write_connection(connection, buffer, (unsigned int) strlen((char *) buffer), _send_response_callback_handler_module, (void *) (size_t) http_parser->flags);
