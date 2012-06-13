@@ -50,6 +50,7 @@
 #define SLEEP(miliseconds) usleep((useconds_t) miliseconds * 1000)
 #define GET_PID() getpid()
 #define SPRINTF(buffer, size, format, ...) sprintf(buffer, format, __VA_ARGS__)
+#define SSCANF(buffer, format, ...) sscanf(buffer, format, __VA_ARGS__)
 #define STRTOK(string, delimiter, context) strtok(string, delimiter); dump((void *) &context)
 #define STRCPY(destination, size, source) strcpy(destination, source)
 #define FOPEN(file_pointer, file_name, mode) *file_pointer = fopen(file_name, mode)
@@ -63,6 +64,7 @@
 
 #ifdef VIRIATUM_PLATFORM_MSC
 #define SPRINTF(buffer, size, format, ...) sprintf_s(buffer, size, format, __VA_ARGS__)
+#define SSCANF(buffer, format, ...) sscanf_s(buffer, format, __VA_ARGS__)
 #define STRTOK(string, delimiter, context) strtok_s(string, delimiter, &context)
 #define STRCPY(destination, size, source) strcpy_s(destination, size, source)
 #define FOPEN(file_pointer, file_name, mode) fopen_s(file_pointer, file_name, mode)
@@ -70,6 +72,7 @@
 
 #ifdef VIRIATUM_PLATFORM_MINGW
 #define SPRINTF(buffer, size, format, ...) sprintf(buffer, format, __VA_ARGS__)
+#define SSCANF(buffer, format, ...) sscanf(buffer, format, __VA_ARGS__)
 #define STRTOK(string, delimiter, context) strtok(string, delimiter); dump((void *) &context)
 #define STRCPY(destination, size, source) strcpy(destination, source)
 #define FOPEN(file_pointer, file_name, mode) *file_pointer = fopen(file_name, mode)
