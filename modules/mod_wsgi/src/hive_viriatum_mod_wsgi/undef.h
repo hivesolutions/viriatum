@@ -44,3 +44,7 @@
 #ifdef PACKAGE_VERSION
 #undef PACKAGE_VERSION
 #endif
+
+#ifdef _POSIX_C_SOURCE
+#undef _POSIX_C_SOURCE
+#endif
