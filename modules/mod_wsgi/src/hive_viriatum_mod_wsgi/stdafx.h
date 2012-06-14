@@ -32,13 +32,14 @@
 #include <config.h>
 #endif
 
-#include "../../../../src/hive_viriatum/viriatum.h"
-
 unsigned char *name_viriatum_mod_wsgi();
 unsigned char *version_viriatum_mod_wsgi();
 unsigned char *description_viriatum_mod_wsgi();
 
+#include "undef.h"
 #include <Python.h>
+#include "../../../../src/hive_viriatum/viriatum.h"
+#include "undef.h"
 
 #ifdef VIRIATUM_PLATFORM_MSC
 #ifdef VIRIATUM_DEBUG
