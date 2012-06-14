@@ -25,24 +25,24 @@
 
 include $(top_srcdir)/Common.am
 
-lib_LIBRARIES = libviriatum_mod_php.a
+lib_LIBRARIES = libviriatum_mod_wsgi.a
 
-lib_LTLIBRARIES = libviriatum_mod_php.la
+lib_LTLIBRARIES = libviriatum_mod_wsgi.la
 
-libviriatum_mod_php_a_CFLAGS = $(AM_CFLAGS)
-libviriatum_mod_php_a_CXXFLAGS = $(AM_CXXFLAGS)
+libviriatum_mod_wsgi_a_CFLAGS = $(AM_CFLAGS)
+libviriatum_mod_wsgi_a_CXXFLAGS = $(AM_CXXFLAGS)
 
-libviriatum_mod_php_la_CFLAGS = $(AM_CFLAGS)
-libviriatum_mod_php_la_CXXFLAGS = $(AM_CXXFLAGS)
+libviriatum_mod_wsgi_la_CFLAGS = $(AM_CFLAGS)
+libviriatum_mod_wsgi_la_CXXFLAGS = $(AM_CXXFLAGS)
 
-libviriatum_mod_php_la_LDFLAGS = -version-info $(MOD_PHP_MAJOR_VERSION):$(MOD_PHP_MINOR_VERSION):$(MOD_PHP_MICRO_VERSION)
+libviriatum_mod_wsgi_la_LDFLAGS = -version-info $(MOD_WSGI_MAJOR_VERSION):$(MOD_WSGI_MINOR_VERSION):$(MOD_WSGI_MICRO_VERSION)
 
-libviriatum_mod_php_a_SOURCES = stdafx.c \
+libviriatum_mod_wsgi_a_SOURCES = stdafx.c \
 module/entry.c \
 module/extension.c \
 module/handler.c
 
-libviriatum_mod_php_la_SOURCES = stdafx.c \
+libviriatum_mod_wsgi_la_SOURCES = stdafx.c \
 module/entry.c \
 module/extension.c \
 module/handler.c

@@ -30,8 +30,8 @@ m4_include([m4/settings.m4])
 AC_PREREQ(2.61)
 
 # defines the general values
-AC_INIT(hive_viriatum_mod_php, mod_php_version, development@hive.pt)
-AM_INIT_AUTOMAKE(hive_viriatum_mod_php, mod_php_version)
+AC_INIT(hive_viriatum_mod_wsgi, mod_wsgi_version, development@hive.pt)
+AM_INIT_AUTOMAKE(hive_viriatum_mod_wsgi, mod_wsgi_version)
 AC_CONFIG_SRCDIR([src])
 AC_CONFIG_HEADERS([src/config.h])
 AC_CONFIG_MACRO_DIR([m4])
