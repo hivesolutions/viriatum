@@ -199,6 +199,7 @@ ERROR_CODE _unset_http_settings_handler_module(struct http_settings_t *http_sett
 }
 
 ERROR_CODE _send_data_callback(struct connection_t *connection, struct data_t *data, void *parameters) {
+
     char *buffer;
     char *_buffer;
     size_t buffer_size;
@@ -248,12 +249,10 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
     PyObject *environ;
     PyObject *result;
 
-
     /* allocates space for both the index to be used for iteration
     and for the count to be used in pointer increment  */
     size_t index;
     size_t count;
-
 
     char *headers_buffer;
 
@@ -389,7 +388,10 @@ ERROR_CODE _send_response_callback_handler_module(struct connection_t *connectio
 
     /* in case the connection is not meant to be kept alive must be closed
     in the normal manner (using the close connection function) */
-    if(!keep_alive) { connection->close_connection(connection); }
+    if(!keep_alive) {
+		printf("vai fechar conexao");
+		connection->close_connection(connection);
+	}
 
     /* raise no error */
     RAISE_NO_ERROR;
