@@ -48,7 +48,7 @@ START_MEMORY;
 unsigned char local = 0;
 static struct service_t *service;
 
-ERROR_CODE run_service(struct hash_map_t *arguments) {
+ERROR_CODE run_service(char *program_name, struct hash_map_t *arguments) {
     /* allocates the return value */
     ERROR_CODE return_value;
 
@@ -60,7 +60,7 @@ ERROR_CODE run_service(struct hash_map_t *arguments) {
 
     /* creates the service and loads the options
     taking into account the arguments */
-    create_service(&service, (unsigned char *) VIRIATUM_NAME);
+    create_service(&service, (unsigned char *) VIRIATUM_NAME, (unsigned char *) program_name);
     load_options_service(service, arguments);
     calculate_options_service(service);
 
@@ -256,8 +256,22 @@ void execute_arguments(struct hash_map_t *arguments) {
     if(value != NULL) { localize(); }
 }
 
+void cleanup() {
+    /* prints a debug message */
+    V_DEBUG("Cleaning the process information\n");
+
+    /* removes the viriatum pid path, so that the daemon
+    watching tool are notified that the process is no
+    longer running in the current environment */
+    remove(VIRIATUM_PID_PATH);
+}
+
 #ifndef VIRIATUM_PLATFORM_IPHONE
 int main(int argc, char *argv[]) {
+	/* allocates space for the name of the program
+	(process) to be executed */
+	char *program_name;
+
     /* allocates the return value */
     ERROR_CODE return_value;
 
@@ -268,13 +282,21 @@ int main(int argc, char *argv[]) {
     /* prints a debug message */
     V_DEBUG_F("Receiving %d argument(s)\n", argc);
 
+	/* in case the number of arguments is less than one
+	(exception case) returns in error */
+	if(argc < 1) { cleanup(); return -1; }
+
+	/* retrieves the first argument value as the name
+	of the process (program) to be executed */
+	program_name = argv[0];
+
     /* processes the various arguments into a map and then
     executes the corresponding (initial) actions */
     process_arguments(argc, argv, &arguments);
     execute_arguments(arguments);
 
     /* runs the service, with the given arguments */
-    return_value = run_service(arguments);
+    return_value = run_service(program_name, arguments);
 
     /* deletes the processed arguments */
     delete_arguments(arguments);
@@ -285,10 +307,10 @@ int main(int argc, char *argv[]) {
         V_ERROR_F("Problem running service (%s)\n", (char *) GET_ERROR());
     }
 
-    /* removes the viriatum pid path, so that the daemon
-    watching tool are notified that the process is no
-    longer running in the current environment */
-    remove(VIRIATUM_PID_PATH);
+	/* cleans the current process information so that
+	no remaining structure or resource is left in an
+	invalid or erroneous state */
+	cleanup();
 
     /* prints a debug message */
     V_DEBUG("Finishing process\n");

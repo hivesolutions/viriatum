@@ -29,7 +29,7 @@
 
 #include "service.h"
 
-void create_service(struct service_t **service_pointer, unsigned char *name) {
+void create_service(struct service_t **service_pointer, unsigned char *name, unsigned char *program_name) {
     /* retrieves the service size */
     size_t service_size = sizeof(struct service_t);
 
@@ -38,6 +38,7 @@ void create_service(struct service_t **service_pointer, unsigned char *name) {
 
     /* sets the service attributes (default) values */
     service->name = name;
+	service->program_name = program_name;
     service->status = STATUS_CLOSED;
     service->configuration = NULL;
     service->service_socket_handle = 0;

@@ -33,10 +33,12 @@
  * This call blocks until the service is correctly stopped
  * from a diferent flow control.
  *
+ * @param program_name The name (path) to the current program
+ * (process) in execution for the service context.
  * @param parameters The map containing the various parameters
  * to be used while running the service.
  */
-ERROR_CODE run_service(struct hash_map_t *parameters);
+ERROR_CODE run_service(char *program_name, struct hash_map_t *parameters);
 
 /**
  * Stops the process of a running the service.

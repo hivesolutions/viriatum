@@ -183,6 +183,12 @@ typedef struct service_t {
      */
     unsigned char *name;
 
+	/**
+	 * The name (path) to the current program
+	 * (process) in execution for the service context.
+	 */
+	unsigned char *program_name;
+
     /**
      * The current status of the service.
      * Used for service life-cycle control.
@@ -575,8 +581,10 @@ typedef struct data_t {
  * @param service_pointer The pointer to the service to
  * be constructed.
  * @param name The name of the service to be constructed.
+ * @param program_name The name (path) to the current program
+ * (process) in execution for the service context.
  */
-void create_service(struct service_t **service_pointer, unsigned char *name);
+void create_service(struct service_t **service_pointer, unsigned char *name, unsigned char *program_name);
 
 /**
  * Destructor of the service.
