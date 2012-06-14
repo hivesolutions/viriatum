@@ -116,7 +116,7 @@ ERROR_CODE register_handler_dispatch(struct service_t *service) {
     dispatch_handler->names[0] = (unsigned char *) "lua";
     dispatch_handler->names[1] = (unsigned char *) "php";
     dispatch_handler->names[2] = (unsigned char *) "wsgi";
-    dispatch_handler->names[3] = (unsigned char *) "dedault";
+    dispatch_handler->names[3] = (unsigned char *) "default";
 
 
 
