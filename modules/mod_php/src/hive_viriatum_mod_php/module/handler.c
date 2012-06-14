@@ -194,7 +194,7 @@ ERROR_CODE url_callback_handler_module(struct http_parser_t *http_parser, const 
     /* copies the url to the url reference in the handler file context then
     creates the file path from using the base viriatum path */
     memcpy(handler_php_context->url, data, data_size);
-    handler_php_context->url[path_size] = '\0';
+    handler_php_context->url[data_size] = '\0';
     SPRINTF((char *) handler_php_context->file_path, VIRIATUM_MAX_PATH_SIZE, "%s%s%s", VIRIATUM_CONTENTS_PATH, VIRIATUM_BASE_PATH, handler_php_context->file_name);
     normalize_path((char *) handler_php_context->file_path);
 
