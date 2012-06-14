@@ -136,7 +136,14 @@
 #define SOCKET_SET_NON_BLOCKING(socket_handle, flags) if((flags = SOCKET_FCNTL(socket_handle, F_GETFL, 0) == -1)) { flags = 0; }\
     SOCKET_FCNTL(socket_handle, F_SETFL, flags | O_NONBLOCK)
 #define SOCKET_SET_NO_WAIT(socket_handle, option_value) option_value = 1; SOCKET_SET_OPTIONS(socket_handle, SOCKET_PROTOCOL_TCP, TCP_NODELAY, option_value)
-#define SOCKET_SET_NO_PUSH(socket_handle, option_value) option_value = 0; SOCKET_SET_OPTIONS(socket_handle, SOCKET_PROTOCOL_TCP, TCP_CORK, option_value)
+#ifdef TCP_CORK
+#define TCP_NOPUSH = TCP_CORK
+#endif
+#ifdef TCP_NOPUSH
+#define SOCKET_SET_NO_PUSH(socket_handle, option_value) option_value = 0; SOCKET_SET_OPTIONS(socket_handle, SOCKET_PROTOCOL_TCP, TCP_NOPUSH, option_value)
+#else
+#define SOCKET_SET_NO_PUSH(socket_handle, option_value)
+#endif
 #endif
 
 #ifdef VIRIATUM_PLATFORM_MSC
