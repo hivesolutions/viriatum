@@ -322,6 +322,7 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
         headers_buffer,
         1024,
         "HTTP/1.1 %d %s\r\n"
+		"Connection: Keep-Alive\r\n"
         "Server: %s/%s (%s - %s)\r\n",
         _wsgi_request.status_code,
         _wsgi_request.status_message,
