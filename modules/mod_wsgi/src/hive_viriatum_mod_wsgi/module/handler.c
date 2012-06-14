@@ -291,7 +291,7 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
     handler_wsgi_context->flags = http_parser->flags;
 
     /* resets the number of headers for the current wsgi request
-    to be processed (this is a new php request) */
+    to be processed (this is a new wsgi request) */
     _wsgi_request.header_count = 0;
 
     /* sets the wsgi context in the wsgi request for global reference
@@ -336,7 +336,7 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
     /* iterates over all the headers present in the current wsgi request to copy
     their content into the current headers buffer */
     for(index = 0; index < _wsgi_request.header_count; index++) {
-        /* copies the current php header into the current position of the headers
+        /* copies the current wsgi header into the current position of the headers
         buffer (header copy) */
         count += SPRINTF(&headers_buffer[count], 1026, "%s\r\n", _wsgi_request.headers[index]);
     }
@@ -375,7 +375,7 @@ ERROR_CODE _send_response_callback_handler_module(struct connection_t *connectio
     struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
 
     /* checks if the current connection should be kept alive, this must
-    be done prior to the unseting of the connection as the current php
+    be done prior to the unseting of the connection as the current wsgi
     context structrue will be destroyed there */
     unsigned char keep_alive = handler_wsgi_context->flags & FLAG_CONNECTION_KEEP_ALIVE;
 
