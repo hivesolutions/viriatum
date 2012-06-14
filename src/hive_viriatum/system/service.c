@@ -554,14 +554,6 @@ ERROR_CODE start_service(struct service_t *service) {
 		option_value
 	);
 
-	socket_result = SOCKET_SET_OPTIONS(
-		service->service_socket_handle,
-		SOCKET_OPTIONS_LEVEL_SOCKET,
-		TCP_NODELAY,
-		option_value
-	);
-
-
     /* in case there was an error binding the socket */
     if(SOCKET_TEST_ERROR(socket_result)) {
         /* retrieves the option error code */
