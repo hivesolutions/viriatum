@@ -73,6 +73,9 @@ ERROR_CODE accept_handler_stream_io(struct connection_t *connection) {
     /* allocates the (client) connection */
     struct connection_t *client_connection;
 
+    /* allocates the option value and sets it to one (valid) */
+    SOCKET_OPTION option_value = 1;
+
     /* sets the flags to be used in socket */
     SOCKET_FLAGS flags = 1;
 
@@ -92,11 +95,12 @@ ERROR_CODE accept_handler_stream_io(struct connection_t *connection) {
         /* otherwise the socket was accepted corretly */
         else {
 			/* in case viriatum is set to non blocking, changes the current
-			socket behavior to non blocking mode then sets the socket to then
-			non push mode in case it's required by configuration */
+			socket behavior to non blocking mode then sets the socket to the
+			non push mode in case it's required by configuration this implies
+			also checking for the no (tcp) wait variable */
             if(VIRIATUM_NON_BLOCKING) { SOCKET_SET_NON_BLOCKING(socket_handle, flags); }
-			if(VIRIATUM_NO_WAIT) { SOCKET_SET_NO_WAIT(socket_handle, flags); }
-			if(VIRIATUM_NO_PUSH) { SOCKET_SET_NO_PUSH(socket_handle, flags); }
+			if(VIRIATUM_NO_WAIT) { SOCKET_SET_NO_WAIT(socket_handle, option_value); }
+			if(VIRIATUM_NO_PUSH) { SOCKET_SET_NO_PUSH(socket_handle, option_value); }
 
             /* prints a debug message */
             V_DEBUG_F("Accepted connection: %d\n", socket_handle);
