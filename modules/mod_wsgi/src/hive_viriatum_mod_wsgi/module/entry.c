@@ -240,7 +240,7 @@ ERROR_CODE _reload_wsgi_state() {
 ERROR_CODE _start_wsgi_state() {
 	/* sets the current program name in the python interpreter
 	the name used is the same as the process running the service */
-	Py_SetProgramName(_service->program_name);
+	Py_SetProgramName((char *) _service->program_name);
 
     /* registers the viriatum wsgi module in the python interpreter
     this module may be used to provide wsgi functions */
