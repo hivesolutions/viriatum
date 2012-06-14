@@ -51,9 +51,13 @@ PyMethodDef wsgi_methods[3] = {
 };
 
 PyObject *wsgi_start_response(PyObject *self, PyObject *args) {
+	/* allocates space for the wsgi (utils) module and from the write
+	function reference contained in it */
     PyObject *wsgi_module;
     PyObject *write_function;
 
+	/* allocates space for the return value as a python reference to
+	be returned to the calling python function */
     PyObject *return_value;
 
     /* allocates space for all the arguments, the status line (error
@@ -67,6 +71,8 @@ PyObject *wsgi_start_response(PyObject *self, PyObject *args) {
     PyObject *iterator;
     PyObject *item;
 
+	/* allocates space for both the python representation of the header
+	name and value but also for their internal buffers */
     PyObject *header_name;
     PyObject *header_value;
     char *_header_name;
@@ -129,11 +135,15 @@ PyObject *wsgi_start_response(PyObject *self, PyObject *args) {
 	count (avoids memory leak) */
     Py_DECREF(iterator);
 
+	/* imports the wsgi module containing the util methos to be used by the
+	application to access viriatum wsgi functions */
     wsgi_module = PyImport_ImportModule("viriatum_wsgi");
     if(wsgi_module == NULL) { return NULL; }
 
+	/* retrieves the reference to the write function from the wsgi module
+	and then verifies that it's a valid python function */
     write_function = PyObject_GetAttrString(wsgi_module, "write");
-    if(!write_function || !PyCallable_Check(write_function)) { RAISE_NO_ERROR; }
+    if(!write_function || !PyCallable_Check(write_function)) { return NULL; }
 
     /* builds the return value with the write function so
     that the caller function may write directly to the stream */
