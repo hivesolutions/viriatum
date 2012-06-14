@@ -388,10 +388,7 @@ ERROR_CODE _send_response_callback_handler_module(struct connection_t *connectio
 
     /* in case the connection is not meant to be kept alive must be closed
     in the normal manner (using the close connection function) */
-    if(!keep_alive) {
-		printf("vai fechar conexao");
-		connection->close_connection(connection);
-	}
+    if(!keep_alive) { connection->close_connection(connection); }
 
     /* raise no error */
     RAISE_NO_ERROR;
