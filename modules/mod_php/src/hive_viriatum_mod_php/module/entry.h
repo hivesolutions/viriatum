@@ -74,7 +74,7 @@ typedef struct php_request_t {
      * possible count for various headers for the
      * php interpreter.
      */
-    char headers[24][1024];
+    char headers[VIRIATUM_MAX_HEADER_COUNT][VIRIATUM_MAX_HEADER_SIZE];
 
     /**
      * The number of headers currently present in
