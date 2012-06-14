@@ -532,8 +532,6 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
 	_value = PyInt_FromLong(0);
 	PyTuple_SetItem(_value_, 1, _value);
 	PyDict_SetItemString(environ, "wsgi.version", _value_);
-	Py_DECREF(_value);
-	Py_DECREF(_value);
 	Py_DECREF(_value_);
 
 	_value = PyString_FromString("http");
