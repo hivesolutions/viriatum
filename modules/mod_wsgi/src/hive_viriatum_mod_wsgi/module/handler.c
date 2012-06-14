@@ -199,18 +199,29 @@ ERROR_CODE _unset_http_settings_handler_module(struct http_settings_t *http_sett
 }
 
 ERROR_CODE _send_data_callback(struct connection_t *connection, struct data_t *data, void *parameters) {
-
+	/* allocates space for the buffers (both the python internal and
+	the copy) and for the size of both of them */
     char *buffer;
     char *_buffer;
     size_t buffer_size;
 
+	/* retrieves the current wsgi context object as the parameters object
+	then uses it to retrieve the iterator and then retrieves the next 
+	element from the iterator (the next data to be sent) */
     struct handler_wsgi_context_t *handler_wsgi_context = (struct handler_wsgi_context_t *) parameters;
     PyObject *iterator = handler_wsgi_context->iterator;
     PyObject *item = PyIter_Next(iterator);
 
+	/* in case the item is not defined (end of iteration) no more data is
+	available to be sent in the response must cleanup the request */
     if(item == NULL) {
+		/* decrements the iterator reference count (should release its memory)
+		and then unsets it from the wsgi context (no more access) */
         Py_DECREF(iterator);
         handler_wsgi_context->iterator = NULL;
+
+		/* redirect the handling to the send response callback handler module
+		so that the proper cleanup is done (eg: closing connection check) */
         _send_response_callback_handler_module(connection, data, parameters);
 
         /* raises no error */
@@ -231,6 +242,9 @@ ERROR_CODE _send_data_callback(struct connection_t *connection, struct data_t *d
     the data has been already copied */
     Py_DECREF(item);
 
+	/* writes the buffer to the connection, this will write another
+	chunk of data into the connection and return to this same callback
+	function to try to write more data */
     connection->write_connection(connection, (unsigned char *) _buffer, buffer_size, _send_data_callback, parameters);
 
     /* raises no error */
@@ -357,6 +371,9 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
     memcpy(&headers_buffer[count], "\r\n", 2);
     count += 2;
 
+	/* retrieves the iterator associated with the result, that should be a sequence
+	object (iterable) containg the various parts of the message to be returned, then
+	sets the iterator in the wsgi context structure to be used in the callback */
     iterator = PyObject_GetIter(result);
     if(iterator == NULL) { RAISE_NO_ERROR; }
     handler_wsgi_context->iterator = iterator;
