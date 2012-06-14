@@ -547,7 +547,20 @@ ERROR_CODE start_service(struct service_t *service) {
     if(VIRIATUM_NON_BLOCKING) { SOCKET_SET_NON_BLOCKING(service->service_socket_handle, flags); }
 
     /* sets the socket reuse address option in the socket */
-    socket_result = SOCKET_SET_OPTIONS(service->service_socket_handle, SOCKET_OPTIONS_LEVEL_SOCKET, SOCKET_OPTIONS_REUSE_ADDRESS_SOCKET, option_value);
+    socket_result = SOCKET_SET_OPTIONS(
+		service->service_socket_handle,
+		SOCKET_OPTIONS_LEVEL_SOCKET,
+		SOCKET_OPTIONS_REUSE_ADDRESS_SOCKET,
+		option_value
+	);
+
+	socket_result = SOCKET_SET_OPTIONS(
+		service->service_socket_handle,
+		SOCKET_OPTIONS_LEVEL_SOCKET,
+		TCP_NODELAY,
+		option_value
+	);
+
 
     /* in case there was an error binding the socket */
     if(SOCKET_TEST_ERROR(socket_result)) {
