@@ -88,9 +88,9 @@ PyObject *wsgi_start_response(PyObject *self, PyObject *args) {
     if(result == 0) { return NULL; }
 
 #ifdef VIRIATUM_PLATFORM_MSC
-    SSCANF(error_code, "%d %s", &_wsgi_request.status_code, &_wsgi_request.status_message, 256);
+    SSCANF(error_code, "%d %s", &_wsgi_request.status_code, _wsgi_request.status_message, 256);
 #else
-    SSCANF(error_code, "%d %s", &_wsgi_request.status_code, &_wsgi_request.status_message);
+    SSCANF(error_code, "%d %s", &_wsgi_request.status_code, _wsgi_request.status_message);
 #endif
 
 
