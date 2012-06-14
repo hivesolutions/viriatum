@@ -76,6 +76,7 @@
 #define SOCKET_SET_CLEAR(socket_handle, sockets_set) FD_CLR(socket_handle, sockets_set)
 #define SOCKET_SET_IS_SET(socket_handle, sockets_set) FD_ISSET(socket_handle, sockets_set)
 #define SOCKET_SET_NON_BLOCKING(socket_handle, flags) SOCKET_IOCTL(socket_handle, FIONBIO, &flags)
+#define SOCKET_SET_NO_WAIT(socket_handle, flags)
 #define SOCKET_SET_NO_PUSH(socket_handle, flags)
 #endif
 
@@ -134,7 +135,8 @@
 #define SOCKET_SET_IS_SET(socket_handle, sockets_set) FD_ISSET(socket_handle, sockets_set)
 #define SOCKET_SET_NON_BLOCKING(socket_handle, flags) if((flags = SOCKET_FCNTL(socket_handle, F_GETFL, 0) == -1)) { flags = 0; }\
     SOCKET_FCNTL(socket_handle, F_SETFL, flags | O_NONBLOCK)
-#define SOCKET_SET_NO_PUSH(socket_handle, flags) flags = 1; SOCKET_SET_OPTIONS(socket_handle, SOCKET_PROTOCOL_TCP, TCP_CORK, &flags, sizeof(flags));
+#define SOCKET_SET_NO_WAIT(socket_handle, flags) flags = 1; SOCKET_SET_OPTIONS(socket_handle, SOCKET_PROTOCOL_TCP, TCP_NOWAIT, flags)
+#define SOCKET_SET_NO_PUSH(socket_handle, flags) flags = 0; SOCKET_SET_OPTIONS(socket_handle, SOCKET_PROTOCOL_TCP, TCP_CORK, flags)
 #endif
 
 #ifdef VIRIATUM_PLATFORM_MSC

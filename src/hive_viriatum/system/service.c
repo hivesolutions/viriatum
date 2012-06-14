@@ -356,6 +356,7 @@ ERROR_CODE _create_client_connection(struct connection_t **connection_pointer, s
     socket behavior to non blocking mode the sets the socket to the
 	non push mode in case it's required by configuration */
     if(VIRIATUM_NON_BLOCKING) { SOCKET_SET_NON_BLOCKING(socket_handle, flags); }
+	if(VIRIATUM_NO_WAIT) { SOCKET_SET_NO_WAIT(socket_handle, flags); }
 	if(VIRIATUM_NO_PUSH) { SOCKET_SET_NO_PUSH(socket_handle, flags); }
 
     /* creates the (client) connection */
@@ -548,6 +549,7 @@ ERROR_CODE start_service(struct service_t *service) {
     socket behavior to non blocking mode the sets the socket to then
 	non push mode in case it's required by configuration */
     if(VIRIATUM_NON_BLOCKING) { SOCKET_SET_NON_BLOCKING(service->service_socket_handle, flags); }
+	if(VIRIATUM_NO_WAIT) { SOCKET_SET_NO_WAIT(socket_handle, flags); }
 	if(VIRIATUM_NO_PUSH) { SOCKET_SET_NO_PUSH(socket_handle, flags); }
 
     /* sets the socket reuse address option in the socket */

@@ -95,6 +95,7 @@ ERROR_CODE accept_handler_stream_io(struct connection_t *connection) {
 			socket behavior to non blocking mode then sets the socket to then
 			non push mode in case it's required by configuration */
             if(VIRIATUM_NON_BLOCKING) { SOCKET_SET_NON_BLOCKING(socket_handle, flags); }
+			if(VIRIATUM_NO_WAIT) { SOCKET_SET_NO_WAIT(socket_handle, flags); }
 			if(VIRIATUM_NO_PUSH) { SOCKET_SET_NO_PUSH(socket_handle, flags); }
 
             /* prints a debug message */
