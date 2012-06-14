@@ -72,8 +72,6 @@ PyObject *wsgi_start_response(PyObject *self, PyObject *args) {
     char *_header_name;
     char *_header_value;
 
-    size_t index;
-
     /* allocates space for the result value from the parsing of the
     arguments, in the initial part of the function */
     int result;
@@ -97,8 +95,6 @@ PyObject *wsgi_start_response(PyObject *self, PyObject *args) {
 
     iterator = PyObject_GetIter(headers);
     if(iterator == NULL) { RAISE_NO_ERROR; }
-
-    index = 0;
 
     while(1) {
         item = PyIter_Next(iterator);
