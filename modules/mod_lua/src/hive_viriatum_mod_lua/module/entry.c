@@ -149,7 +149,7 @@ ERROR_CODE stop_module(struct environment_t *environment, struct module_t *modul
     lua_State *lua_state = mod_lua_http_handler->lua_state;
 
     /* prints a debug message */
-    V_DEBUG_F("Stoping the module '%s' (%s) v%s\n", name, description, version);
+    V_DEBUG_F("Stopping the module '%s' (%s) v%s\n", name, description, version);
 
     /* removes the http handler from the service */
     service->remove_http_handler(service, http_handler);

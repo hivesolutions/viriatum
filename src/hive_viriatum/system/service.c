@@ -38,7 +38,7 @@ void create_service(struct service_t **service_pointer, unsigned char *name, uns
 
     /* sets the service attributes (default) values */
     service->name = name;
-	service->program_name = program_name;
+    service->program_name = program_name;
     service->status = STATUS_CLOSED;
     service->configuration = NULL;
     service->service_socket_handle = 0;
@@ -355,13 +355,13 @@ ERROR_CODE _create_client_connection(struct connection_t **connection_pointer, s
     error = SOCKET_CONNECT_SIZE(socket_handle, serv_addr, sizeof(SOCKET_ADDRESS_INTERNET));
     if(SOCKET_TEST_ERROR(error)) { fprintf(stderr, "ERROR connecting host\n"); }
 
-	/* in case viriatum is set to non blocking, changes the current
-	socket behavior to non blocking mode then sets the socket to the
-	non push mode in case it's required by configuration this implies
-	also checking for the no (tcp) wait variable */
+    /* in case viriatum is set to non blocking, changes the current
+    socket behavior to non blocking mode then sets the socket to the
+    non push mode in case it's required by configuration this implies
+    also checking for the no (tcp) wait variable */
     if(VIRIATUM_NON_BLOCKING) { SOCKET_SET_NON_BLOCKING(socket_handle, flags); }
-	if(VIRIATUM_NO_WAIT) { SOCKET_SET_NO_WAIT(socket_handle, option_value); }
-	if(VIRIATUM_NO_PUSH) { SOCKET_SET_NO_PUSH(socket_handle, option_value); }
+    if(VIRIATUM_NO_WAIT) { SOCKET_SET_NO_WAIT(socket_handle, option_value); }
+    if(VIRIATUM_NO_PUSH) { SOCKET_SET_NO_PUSH(socket_handle, option_value); }
 
     /* creates the (client) connection */
     create_connection(&connection, socket_handle);
@@ -549,23 +549,23 @@ ERROR_CODE start_service(struct service_t *service) {
         RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem creating socket");
     }
 
-	/* in case viriatum is set to non blocking, changes the current
-	socket behavior to non blocking mode then sets the socket to the
-	non push mode in case it's required by configuration this implies
-	also checking for the no (tcp) wait variable */
+    /* in case viriatum is set to non blocking, changes the current
+    socket behavior to non blocking mode then sets the socket to the
+    non push mode in case it's required by configuration this implies
+    also checking for the no (tcp) wait variable */
     if(VIRIATUM_NON_BLOCKING) { SOCKET_SET_NON_BLOCKING(service->service_socket_handle, flags); }
-	if(VIRIATUM_NO_WAIT) { SOCKET_SET_NO_WAIT(service->service_socket_handle, option_value); }
-	if(VIRIATUM_NO_PUSH) { SOCKET_SET_NO_PUSH(service->service_socket_handle, option_value); }
+    if(VIRIATUM_NO_WAIT) { SOCKET_SET_NO_WAIT(service->service_socket_handle, option_value); }
+    if(VIRIATUM_NO_PUSH) { SOCKET_SET_NO_PUSH(service->service_socket_handle, option_value); }
 
     /* sets the socket reuse address option in the socket, this should
-	be done by first setting the option value to the original set value */
-	option_value = 1;
+    be done by first setting the option value to the original set value */
+    option_value = 1;
     socket_result = SOCKET_SET_OPTIONS(
-		service->service_socket_handle,
-		SOCKET_OPTIONS_LEVEL_SOCKET,
-		SOCKET_OPTIONS_REUSE_ADDRESS_SOCKET,
-		option_value
-	);
+        service->service_socket_handle,
+        SOCKET_OPTIONS_LEVEL_SOCKET,
+        SOCKET_OPTIONS_REUSE_ADDRESS_SOCKET,
+        option_value
+    );
 
     /* in case there was an error binding the socket */
     if(SOCKET_TEST_ERROR(socket_result)) {

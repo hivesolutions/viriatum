@@ -51,13 +51,13 @@ PyMethodDef wsgi_methods[3] = {
 };
 
 PyObject *wsgi_start_response(PyObject *self, PyObject *args) {
-	/* allocates space for the wsgi (utils) module and from the write
-	function reference contained in it */
+    /* allocates space for the wsgi (utils) module and from the write
+    function reference contained in it */
     PyObject *wsgi_module;
     PyObject *write_function;
 
-	/* allocates space for the return value as a python reference to
-	be returned to the calling python function */
+    /* allocates space for the return value as a python reference to
+    be returned to the calling python function */
     PyObject *return_value;
 
     /* allocates space for all the arguments, the status line (error
@@ -71,8 +71,8 @@ PyObject *wsgi_start_response(PyObject *self, PyObject *args) {
     PyObject *iterator;
     PyObject *item;
 
-	/* allocates space for both the python representation of the header
-	name and value but also for their internal buffers */
+    /* allocates space for both the python representation of the header
+    name and value but also for their internal buffers */
     PyObject *header_name;
     PyObject *header_value;
     char *_header_name;
@@ -97,51 +97,51 @@ PyObject *wsgi_start_response(PyObject *self, PyObject *args) {
     SSCANF(error_code, "%d %s", &_wsgi_request.status_code, _wsgi_request.status_message);
 #endif
 
-	/* creates the iterator to be used to percolate arround
-	the various header tuples */
+    /* creates the iterator to be used to percolate arround
+    the various header tuples */
     iterator = PyObject_GetIter(headers);
     if(iterator == NULL) { RAISE_NO_ERROR; }
 
-	/* iterates continuously to percolate arround the various
-	header tuples */
+    /* iterates continuously to percolate arround the various
+    header tuples */
     while(1) {
-		/* retrieves the next iterator item and breaks the
-		loop in case an invalid (end of iteration) item is
-		found, otherwise retrieves the first and second items
-		from the presumably sequence item */
+        /* retrieves the next iterator item and breaks the
+        loop in case an invalid (end of iteration) item is
+        found, otherwise retrieves the first and second items
+        from the presumably sequence item */
         item = PyIter_Next(iterator);
         if(item == NULL) { break; }
         header_name = PySequence_GetItem(item, 0);
         header_value = PySequence_GetItem(item, 1);
 
-		/* converts the header name and value into a linear
-		string buffer so that is possible to format them */
+        /* converts the header name and value into a linear
+        string buffer so that is possible to format them */
         _header_name = PyString_AsString(header_name);
         _header_value = PyString_AsString(header_value);
 
-		/* formats the header into the "normal" format and sets
-		it under the headers buffer in the wsgi request */
+        /* formats the header into the "normal" format and sets
+        it under the headers buffer in the wsgi request */
         SPRINTF(_wsgi_request.headers[_wsgi_request.header_count], 1024, "%s: %s", _header_name, _header_value);
         _wsgi_request.header_count++;
 
-		/* updates the reference count of the various elements
-		used in the iteration cycle */
+        /* updates the reference count of the various elements
+        used in the iteration cycle */
         Py_XDECREF(header_value);
         Py_XDECREF(header_name);
         Py_DECREF(item);
     }
 
-	/* releases the iterator by decrementing its reference
-	count (avoids memory leak) */
+    /* releases the iterator by decrementing its reference
+    count (avoids memory leak) */
     Py_DECREF(iterator);
 
-	/* imports the wsgi module containing the util methos to be used by the
-	application to access viriatum wsgi functions */
+    /* imports the wsgi module containing the util methos to be used by the
+    application to access viriatum wsgi functions */
     wsgi_module = PyImport_ImportModule("viriatum_wsgi");
     if(wsgi_module == NULL) { return NULL; }
 
-	/* retrieves the reference to the write function from the wsgi module
-	and then verifies that it's a valid python function */
+    /* retrieves the reference to the write function from the wsgi module
+    and then verifies that it's a valid python function */
     write_function = PyObject_GetAttrString(wsgi_module, "write");
     if(!write_function || !PyCallable_Check(write_function)) { return NULL; }
 

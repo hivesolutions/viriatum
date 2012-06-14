@@ -140,7 +140,7 @@ ERROR_CODE stop_module(struct environment_t *environment, struct module_t *modul
     struct mod_wsgi_http_handler_t *mod_wsgi_http_handler = mod_wsgi_module->mod_wsgi_http_handler;
 
     /* prints a debug message */
-    V_DEBUG_F("Stoping the module '%s' (%s) v%s\n", name, description, version);
+    V_DEBUG_F("Stopping the module '%s' (%s) v%s\n", name, description, version);
 
     /* removes the http handler from the service */
     service->remove_http_handler(service, http_handler);
@@ -208,13 +208,14 @@ ERROR_CODE _load_configuration(struct service_t *service, struct mod_wsgi_http_h
 }
 
 ERROR_CODE _load_wsgi_state() {
-	/* sets the current program name in the python interpreter
-	the name used is the same as the process running the service */
-	Py_SetProgramName((char *) _service->program_name);
+    /* sets the current program name in the python interpreter
+    the name used is the same as the process running the service */
+    Py_SetProgramName((char *) _service->program_name);
 
     /* starts the python interpreter initializing all the resources
-    related with the virtual machine */
-    Py_Initialize();
+    related with the virtual machine, this version of the initializer
+    avoid the registration of the signal handlers */
+    Py_InitializeEx(0);
 
     /* starts the wsgi state updating the major global value in
     the current interpreter state */
@@ -242,12 +243,12 @@ ERROR_CODE _reload_wsgi_state() {
 }
 
 ERROR_CODE _start_wsgi_state() {
-	/* retrieves the system path list and then appends
-	the various relative local paths into in */
-	PyObject *current_path = PyString_FromString("");
-	PyObject *path = PySys_GetObject("path");
-	PyList_Append(path, current_path);
-	Py_DECREF(current_path);
+    /* retrieves the system path list and then appends
+    the various relative local paths into in */
+    PyObject *current_path = PyString_FromString("");
+    PyObject *path = PySys_GetObject("path");
+    PyList_Append(path, current_path);
+    Py_DECREF(current_path);
 
     /* registers the viriatum wsgi module in the python interpreter
     this module may be used to provide wsgi functions */
