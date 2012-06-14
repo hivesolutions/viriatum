@@ -353,8 +353,10 @@ ERROR_CODE _create_client_connection(struct connection_t **connection_pointer, s
     if(SOCKET_TEST_ERROR(error)) { fprintf(stderr, "ERROR connecting host\n"); }
 
     /* in case viriatum is set to non blocking, changes the current
-    socket behavior to non blocking mode */
+    socket behavior to non blocking mode the sets the socket to the
+	non push mode in case it's required by configuration */
     if(VIRIATUM_NON_BLOCKING) { SOCKET_SET_NON_BLOCKING(socket_handle, flags); }
+	if(VIRIATUM_NO_PUSH) { SOCKET_SET_NO_PUSH(socket_handle, flags); }
 
     /* creates the (client) connection */
     create_connection(&connection, socket_handle);
