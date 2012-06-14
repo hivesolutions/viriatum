@@ -45,7 +45,7 @@ jstring Java_pt_hive_viriatum_http_Service_run(JNIEnv *env, jclass cls) {
     /* runs the service, with the given arguments, they are
     crated on the fly as an empty map and deleted after*/
     create_hash_map(&arguments, 0);
-    return_value = run_service(arguments);
+    return_value = run_service("jni", arguments);
     delete_hash_map(arguments);
 
     /* tests the error code for error */
