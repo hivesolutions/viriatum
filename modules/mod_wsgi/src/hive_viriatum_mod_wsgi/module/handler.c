@@ -444,10 +444,16 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
 	PyObject *_value_;
 	struct http_header_value_t *header;
 
+	unsigned char *post_data;
+
+	struct wsgi_input_t *wsgi_input;
+
 
     /* retrieves the connection from the http parser parameters
     and then retrieves the handler wsgi context */
     struct connection_t *connection = (struct connection_t *) http_parser->parameters;
+    struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
+    struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
     struct handler_wsgi_context_t *handler_wsgi_context = (struct handler_wsgi_context_t *) http_parser->context;
 
     /* retrieves the http method string value accessing the array of
@@ -457,6 +463,14 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
 
 
     unsigned char *port = connection->service->options->_port;
+
+
+
+
+    /* in case there is contents to be read retrieves the appropriate
+    reference to the start of the post data in the connection buffer */
+    if(http_parser->_content_length > 0) { post_data = &http_connection->buffer[http_connection->buffer_offset - http_parser->_content_length];
+    } else { post_data = NULL; }
 
 
     /* imports the wsgi module containing the util methos to be used by the
@@ -472,7 +486,7 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
     /* imports the associated (handler) module and retrieves
     its reference to be used for the calling, in case the
     reference is invalid raises an error */
-    module = PyImport_ImportModule("wsgi_demo");
+    module = PyImport_ImportModule("flask_test");
     if(module == NULL) { RAISE_NO_ERROR; }
 
     /* retrieves the function to be used as handler for the
@@ -525,7 +539,6 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
 		Py_DECREF(_value);
 	}
 
-
 	_value_ = PyTuple_New(2);
 	_value = PyInt_FromLong(1);
 	PyTuple_SetItem(_value_, 0, _value);
@@ -538,9 +551,9 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
 	PyDict_SetItemString(environ, "wsgi.url_scheme", _value);
 	Py_DECREF(_value);
 
-	_value = PyString_FromString("TENHO DE POR ALGUMA COISA");
-	PyDict_SetItemString(environ, "wsgi.input", _value);
-	Py_DECREF(_value);
+	wsgi_input = _new_wsgi_input(post_data, http_parser->_content_length);
+	PyDict_SetItemString(environ, "wsgi.input", (PyObject *) wsgi_input);
+	Py_DECREF(wsgi_input);
 
 	_value = PyBool_FromLong(0);
 	PyDict_SetItemString(environ, "wsgi.multithread", _value);

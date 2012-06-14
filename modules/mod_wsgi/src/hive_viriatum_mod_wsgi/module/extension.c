@@ -29,7 +29,7 @@
 
 #include "extension.h"
 
-PyMethodDef wsgi_methods[3] = {
+PyMethodDef wsgi_methods[4] = {
     {
         "start_response",
         wsgi_start_response,
@@ -162,3 +162,151 @@ PyObject *wsgi_start_response(PyObject *self, PyObject *args) {
 PyObject *wsgi_write(PyObject *self, PyObject *args) {
     return Py_BuildValue("i", 0);
 }
+
+
+
+
+
+
+
+struct wsgi_input_t *_new_wsgi_input(unsigned char *post_data, size_t size) {
+	struct wsgi_input_t *self;
+
+    self = PyObject_New(struct wsgi_input_t, &input_type);
+	self->post_data = post_data;
+	self->size = size;
+	self->position = 0;
+
+	return self;
+}
+
+PyObject *new_wsgi_input(PyObject *args) {
+	return (PyObject *) _new_wsgi_input(NULL, 0);
+}
+
+void dealloc_wsgi_input(PyObject *self) {
+	PyObject_Del(self);
+}
+
+PyObject *wsgi_input_iter(PyObject *self, PyObject *args) {
+	Py_RETURN_NONE;
+}
+
+PyObject *wsgi_input_iternext(PyObject *self, PyObject *args) {
+	Py_RETURN_NONE;
+}
+
+PyObject *wsgi_input_close(PyObject *self, PyObject *args) {
+	Py_RETURN_NONE;
+}
+
+PyObject *wsgi_input_read(PyObject *self, PyObject *args) {
+	struct wsgi_input_t *_self = (struct wsgi_input_t *) self;
+
+	size_t remaining = _self->size - _self->position;
+	PyObject *buffer = PyString_FromStringAndSize(&_self->post_data[_self->position], remaining);
+	_self->position += remaining;
+
+	return buffer;
+}
+
+PyObject *wsgi_input_readline(PyObject *self, PyObject *args) {
+	Py_RETURN_NONE;
+}
+
+PyObject *wsgi_input_readlines(PyObject *self, PyObject *args) {
+	Py_RETURN_NONE;
+}
+
+PyMethodDef input_methods[5] = {
+    {
+		"close",
+		(PyCFunction) wsgi_input_close,
+		METH_VARARGS,
+		0
+	},
+    {
+		"read",
+		(PyCFunction) wsgi_input_read,
+		METH_VARARGS,
+		0
+	},
+    {
+		"readline",
+		(PyCFunction) wsgi_input_readline,
+		METH_VARARGS,
+		0
+	},
+    {
+		"readlines",
+		(PyCFunction) wsgi_input_readlines,
+		METH_VARARGS,
+		0 
+	},
+    {
+		NULL,
+        NULL,
+        0,
+        NULL
+	}
+};
+
+
+PyTypeObject input_type = {
+	PyObject_HEAD_INIT(NULL)
+	0,
+    "viriatum_wsgi.input",                     /* tp_name */
+    sizeof(struct wsgi_input_t),               /* tp_basicsize */
+    0,                                         /* tp_itemsize*/
+    (destructor) dealloc_wsgi_input,           /* tp_dealloc */
+    0,                                         /* tp_print */
+    0,                                         /* tp_getattr */
+    0,                                         /* tp_setattr */
+    0,                                         /* tp_compare */
+    0,                                         /* tp_repr */
+    0,                                         /* tp_as_number */
+    0,                                         /* tp_as_sequence */
+    0,                                         /* tp_as_mapping */
+    0,                                         /* tp_hash */
+    0,                                         /* tp_call */
+    0,                                         /* tp_str */
+    0,                                         /* tp_getattro */
+    0,										   /* tp_setattro */
+    0,                                         /* tp_as_buffer */
+#if defined(Py_TPFLAGS_HAVE_ITER)
+    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_HAVE_ITER, /* tp_flags */
+#else
+    Py_TPFLAGS_DEFAULT,                        /* tp_flags */
+#endif
+    0,                                         /* tp_doc */
+    0,                                         /* tp_traverse */
+    0,                                         /* tp_clear */
+    0,                                         /* tp_richcompare */
+    0,                                         /* tp_weaklistoffset */
+    (getiterfunc) wsgi_input_iter,             /* tp_iter */
+    (iternextfunc) wsgi_input_iternext,        /* tp_iternext */
+    input_methods,                             /* tp_methods */
+    0,                                         /* tp_members */
+    0,                                         /* tp_getset */
+    0,                                         /* tp_base */
+    0,                                         /* tp_dict */
+    0,                                         /* tp_descr_get */
+    0,                                         /* tp_descr_set */
+    0,                                         /* tp_dictoffset */
+    0,                                         /* tp_init */
+    0,                                         /* tp_alloc */
+    (newfunc) new_wsgi_input,                  /* tp_new */
+    0,                                         /* tp_free */
+    0,                                         /* tp_is_gc */
+};
+
+
+
+
+
+
+
+
+
+
+
