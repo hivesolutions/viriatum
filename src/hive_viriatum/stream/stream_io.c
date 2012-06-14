@@ -91,11 +91,11 @@ ERROR_CODE accept_handler_stream_io(struct connection_t *connection) {
         }
         /* otherwise the socket was accepted corretly */
         else {
-            /* in case viriatum is set to non blocking */
-            if(VIRIATUM_NON_BLOCKING) {
-                /* sets the socket to non blocking mode */
-                SOCKET_SET_NON_BLOCKING(socket_handle, flags);
-            }
+			/* in case viriatum is set to non blocking, changes the current
+			socket behavior to non blocking mode then sets the socket to then
+			non push mode in case it's required by configuration */
+            if(VIRIATUM_NON_BLOCKING) { SOCKET_SET_NON_BLOCKING(socket_handle, flags); }
+			if(VIRIATUM_NO_PUSH) { SOCKET_SET_NO_PUSH(socket_handle, flags); }
 
             /* prints a debug message */
             V_DEBUG_F("Accepted connection: %d\n", socket_handle);
