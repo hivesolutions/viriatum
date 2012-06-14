@@ -242,11 +242,11 @@ ERROR_CODE _reload_wsgi_state() {
 }
 
 ERROR_CODE _start_wsgi_state() {
-	PyRun_SimpleString(
-	   "import sys\n"
-	   "sys.path.append('')\n"
-	   "sys.path.append('.')\n"
-	);
+	PyObject *current_path = PyString_FromString("");
+	PyObject *path = PySys_GetObject("path");
+	PyList_Append(path, current_path);
+	Py_DECREF(path);
+	Py_DECREF(current_path);
 
     /* registers the viriatum wsgi module in the python interpreter
     this module may be used to provide wsgi functions */
