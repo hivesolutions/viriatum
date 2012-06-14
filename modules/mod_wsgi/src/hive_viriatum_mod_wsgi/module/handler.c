@@ -262,6 +262,8 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
     struct connection_t *connection = (struct connection_t *) http_parser->parameters;
     struct handler_wsgi_context_t *handler_wsgi_context = (struct handler_wsgi_context_t *) http_parser->context;
 
+	printf("PYTHON_PATH -> %s\n", Py_GetPath());
+
     wsgi_module = PyImport_ImportModule("viriatum_wsgi");
     if(wsgi_module == NULL) { RAISE_NO_ERROR; }
 
