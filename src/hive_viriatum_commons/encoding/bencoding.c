@@ -207,7 +207,7 @@ ERROR_CODE _encode_type(struct type_t *type, struct string_buffer_t *string_buff
 
         case STRING_TYPE:
             buffer = MALLOC(16);
-            SPRINTF(buffer, 16, "%lu", strlen(type->value.value_string));
+            SPRINTF(buffer, 16, "%lu", (long unsigned int) strlen(type->value.value_string));
 
             _append_string_buffer(string_buffer, (unsigned char *) buffer);
             append_string_buffer(string_buffer, (unsigned char *) ":");
