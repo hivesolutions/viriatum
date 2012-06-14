@@ -83,7 +83,7 @@ typedef struct wsgi_request_t {
      * possible count for various headers for the
      * wsgi interpreter.
      */
-    char headers[24][1024];
+    char headers[VIRIATUM_MAX_HEADER_COUNT][VIRIATUM_MAX_HEADER_SIZE];
 
     /**
      * The number of headers currently present in
@@ -111,6 +111,15 @@ struct service_t *_service;
  * information values.
  */
 struct connection_t *_connection;
+
+/**
+ * The global headers structure that provides a "cache"
+ * like mechanism for the buffer that contains the various
+ * headers to be parsed.
+ * This strategy avoid the allocation of a "huge buffer
+ * for each request received.
+ */
+struct http_headers_t _headers;
 
 /**
  * The global structure to be used to "pass" wsgi
