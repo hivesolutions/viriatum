@@ -29,7 +29,22 @@
 
 #include "entry.h"
 
-PyMethodDef wsgi_methods[3];
+PyMethodDef wsgi_methods[4];
+PyMethodDef input_methods[5];
+
+PyTypeObject input_type;
+
+typedef struct wsgi_input_t {
+	PyObject_HEAD
+	unsigned char *post_data;
+	size_t position;
+	size_t size;
+} wsgi_intput;
 
 PyObject *wsgi_start_response(PyObject *self, PyObject *args);
 PyObject *wsgi_write(PyObject *self, PyObject *args);
+PyObject *wsgi_file(PyObject *self, PyObject *args);
+
+struct wsgi_input_t *_new_wsgi_input(unsigned char *post_data, size_t size);
+
+PyObject *new_wsgi_input(PyObject *args);
