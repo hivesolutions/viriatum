@@ -268,9 +268,9 @@ void cleanup() {
 
 #ifndef VIRIATUM_PLATFORM_IPHONE
 int main(int argc, char *argv[]) {
-	/* allocates space for the name of the program
-	(process) to be executed */
-	char *program_name;
+    /* allocates space for the name of the program
+    (process) to be executed */
+    char *program_name;
 
     /* allocates the return value */
     ERROR_CODE return_value;
@@ -282,13 +282,13 @@ int main(int argc, char *argv[]) {
     /* prints a debug message */
     V_DEBUG_F("Receiving %d argument(s)\n", argc);
 
-	/* in case the number of arguments is less than one
-	(exception case) returns in error */
-	if(argc < 1) { cleanup(); return -1; }
+    /* in case the number of arguments is less than one
+    (exception case) returns in error */
+    if(argc < 1) { cleanup(); return -1; }
 
-	/* retrieves the first argument value as the name
-	of the process (program) to be executed */
-	program_name = argv[0];
+    /* retrieves the first argument value as the name
+    of the process (program) to be executed */
+    program_name = argv[0];
 
     /* processes the various arguments into a map and then
     executes the corresponding (initial) actions */
@@ -307,10 +307,10 @@ int main(int argc, char *argv[]) {
         V_ERROR_F("Problem running service (%s)\n", (char *) GET_ERROR());
     }
 
-	/* cleans the current process information so that
-	no remaining structure or resource is left in an
-	invalid or erroneous state */
-	cleanup();
+    /* cleans the current process information so that
+    no remaining structure or resource is left in an
+    invalid or erroneous state */
+    cleanup();
 
     /* prints a debug message */
     V_DEBUG("Finishing process\n");

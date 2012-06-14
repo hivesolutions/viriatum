@@ -183,11 +183,11 @@ typedef struct service_t {
      */
     unsigned char *name;
 
-	/**
-	 * The name (path) to the current program
-	 * (process) in execution for the service context.
-	 */
-	unsigned char *program_name;
+    /**
+     * The name (path) to the current program
+     * (process) in execution for the service context.
+     */
+    unsigned char *program_name;
 
     /**
      * The current status of the service.

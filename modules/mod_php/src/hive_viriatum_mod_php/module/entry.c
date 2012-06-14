@@ -147,7 +147,7 @@ ERROR_CODE stop_module(struct environment_t *environment, struct module_t *modul
     struct mod_php_http_handler_t *mod_php_http_handler = mod_php_module->mod_php_http_handler;
 
     /* prints a debug message */
-    V_DEBUG_F("Stoping the module '%s' (%s) v%s\n", name, description, version);
+    V_DEBUG_F("Stopping the module '%s' (%s) v%s\n", name, description, version);
 
     /* removes the http handler from the service */
     service->remove_http_handler(service, http_handler);
