@@ -392,7 +392,17 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
             get_write_time_file((char *) handler_file_context->file_path, &time);
 
             /* creates the date time string for the file entry */
-            SPRINTF(time_string, 20, "%04d-%02d-%02d %02d:%02d:%02d", time.year, time.month, time.day, time.hour, time.minute, time.second);
+            SPRINTF(
+				time_string,
+				20,
+				"%04d-%02d-%02d %02d:%02d:%02d",
+				time.year,
+				time.month,
+				time.day,
+				time.hour,
+				time.minute,
+				time.second
+			);
 
             /* creates the crc32 value and prints it into the
             etag as an heexadecimal string value */
@@ -415,7 +425,20 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
         write_http_error(connection, headers_buffer, "404", "Not Found", error_description, _cleanup_handler_file, handler_file_context);
     } else if(is_redirect) {
         /* writes the http static headers to the response */
-        SPRINTF(headers_buffer, 1024, "HTTP/1.1 307 Temporary Redirect\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nContent-Length: 0\r\nLocation: %s\r\n\r\n", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, location);
+        SPRINTF(
+			headers_buffer,
+			1024,
+			"HTTP/1.1 307 Temporary Redirect\r\n"
+			"Server: %s/%s (%s - %s)\r\n"
+			"Connection: Keep-Alive\r\n"
+			"Content-Length: 0\r\n"
+			"Location: %s\r\n\r\n",
+			VIRIATUM_NAME,
+			VIRIATUM_VERSION,
+			VIRIATUM_PLATFORM_STRING,
+			VIRIATUM_PLATFORM_CPU,
+			location
+		);
 
         /* writes both the headers to the connection, registers for the appropriate callbacks */
         write_connection(connection, (unsigned char *) headers_buffer, (unsigned int) strlen(headers_buffer), _cleanup_handler_file, handler_file_context);
@@ -423,14 +446,39 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
     /* in case the current situation is a directory list */
     else if(is_directory) {
         /* writes the http static headers to the response */
-        SPRINTF(headers_buffer, 1024, "HTTP/1.1 200 OK\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nCache-Control: no-cache, must-revalidate\r\nContent-Length: %lu\r\n\r\n", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, (long unsigned int) strlen((char *) handler_file_context->template_handler->string_value));
+        SPRINTF(
+			headers_buffer,
+			1024, 
+			"HTTP/1.1 200 OK\r\n"
+			"Server: %s/%s (%s - %s)\r\n"
+			"Connection: Keep-Alive\r\n"
+			"Cache-Control: no-cache, must-revalidate\r\n"
+			"Content-Length: %lu\r\n\r\n",
+			VIRIATUM_NAME,
+			VIRIATUM_VERSION,
+			VIRIATUM_PLATFORM_STRING,
+			VIRIATUM_PLATFORM_CPU,
+			(long unsigned int) strlen((char *) handler_file_context->template_handler->string_value)
+		);
 
         /* writes both the headers to the connection, registers for the appropriate callbacks */
         write_connection(connection, (unsigned char *) headers_buffer, (unsigned int) strlen(headers_buffer), _send_data_handler_file, handler_file_context);
     }
     else if(handler_file_context->etag_status == 2 && strcmp(etag, (char *) handler_file_context->etag) == 0) {
         /* writes the http static headers to the response */
-        SPRINTF(headers_buffer, 1024, "HTTP/1.1 304 Not Modified\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nCache-Control: no-cache, must-revalidate\r\nContent-Length: 0\r\n\r\n", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU);
+        SPRINTF(
+			headers_buffer,
+			1024,
+			"HTTP/1.1 304 Not Modified\r\n"
+			"Server: %s/%s (%s - %s)\r\n"
+			"Connection: Keep-Alive\r\n"
+			"Cache-Control: no-cache, must-revalidate\r\n"
+			"Content-Length: 0\r\n\r\n",
+			VIRIATUM_NAME,
+			VIRIATUM_VERSION,
+			VIRIATUM_PLATFORM_STRING,
+			VIRIATUM_PLATFORM_CPU
+		);
 
         /* writes both the headers to the connection, registers for the appropriate callbacks */
         write_connection(connection, (unsigned char *) headers_buffer, (unsigned int) strlen(headers_buffer), _cleanup_handler_file, handler_file_context);
@@ -439,7 +487,22 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
     file situation (no directory) */
     else {
         /* writes the http static headers to the response */
-        SPRINTF(headers_buffer, 1024, "HTTP/1.1 200 OK\r\nServer: %s/%s (%s - %s)\r\nConnection: Keep-Alive\r\nCache-Control: no-cache, must-revalidate\r\nETag: %s\r\nContent-Length: %lu\r\n\r\n", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_PLATFORM_STRING, VIRIATUM_PLATFORM_CPU, etag, (long unsigned int) file_size);
+        SPRINTF(
+			headers_buffer,
+			1024,
+			"HTTP/1.1 200 OK\r\n"
+			"Server: %s/%s (%s - %s)\r\n"
+			"Connection: Keep-Alive\r\n"
+			"Cache-Control: no-cache, must-revalidate\r\n"
+			"ETag: %s\r\n"
+			"Content-Length: %lu\r\n\r\n",
+			VIRIATUM_NAME,
+			VIRIATUM_VERSION,
+			VIRIATUM_PLATFORM_STRING,
+			VIRIATUM_PLATFORM_CPU,
+			etag,
+			(long unsigned int) file_size
+		);
 
         /* writes both the headers to the connection, registers for the appropriate callbacks */
         write_connection(connection, (unsigned char *) headers_buffer, strlen(headers_buffer), _send_chunk_handler_file, handler_file_context);
