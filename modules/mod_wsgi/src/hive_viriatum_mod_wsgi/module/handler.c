@@ -486,7 +486,7 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
     /* imports the associated (handler) module and retrieves
     its reference to be used for the calling, in case the
     reference is invalid raises an error */
-    module = PyImport_ImportModule("flask_test");
+    module = PyImport_ImportModule("wsgi_demo");
     if(module == NULL) { RAISE_NO_ERROR; }
 
     /* retrieves the function to be used as handler for the
