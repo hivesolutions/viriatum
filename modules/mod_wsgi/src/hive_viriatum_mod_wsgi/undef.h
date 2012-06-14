@@ -48,3 +48,7 @@
 #ifdef _POSIX_C_SOURCE
 #undef _POSIX_C_SOURCE
 #endif
+
+#ifdef CURRENT
+#undef CURRENT
+#endif
