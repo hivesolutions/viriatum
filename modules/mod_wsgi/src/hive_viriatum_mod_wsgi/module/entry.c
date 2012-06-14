@@ -242,10 +242,11 @@ ERROR_CODE _reload_wsgi_state() {
 }
 
 ERROR_CODE _start_wsgi_state() {
+	/* retrieves the system path list and then appends
+	the various relative local paths into in */
 	PyObject *current_path = PyString_FromString("");
 	PyObject *path = PySys_GetObject("path");
 	PyList_Append(path, current_path);
-	Py_DECREF(path);
 	Py_DECREF(current_path);
 
     /* registers the viriatum wsgi module in the python interpreter
