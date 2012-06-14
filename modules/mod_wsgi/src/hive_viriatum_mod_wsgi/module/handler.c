@@ -238,32 +238,45 @@ ERROR_CODE _send_data_callback(struct connection_t *connection, struct data_t *d
 }
 
 ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
+	/* allocates space for the local (application) module, for the global
+	wsgi module (containing util function) an then allocates also space
+	for the application handler function and for the start response function */
     PyObject *module;
     PyObject *wsgi_module;
     PyObject *handler_function;
     PyObject *start_response_function;
 
+	/* allocates space for the iterator reference to be used as a temporary
+	variable holding the various message items for the response */
     PyObject *iterator;
 
+	/* allocates space for the tuple to hold the arguments to be sent to the
+	application handler and then allocates space for both arguments */
     PyObject *args;
     PyObject *environ;
     PyObject *result;
 
     /* allocates space for both the index to be used for iteration
-    and for the count to be used in pointer increment  */
+    and for the count to be used in pointer increment */
     size_t index;
     size_t count;
 
+	/* allocates space for the reference to the buffer that will the initial
+	(headers) part of the http message to be sent as response */
     char *headers_buffer;
 
     /* retrieves the connection from the http parser parameters
-    and then retrieves the handler wsgi context*/
+    and then retrieves the handler wsgi context */
     struct connection_t *connection = (struct connection_t *) http_parser->parameters;
     struct handler_wsgi_context_t *handler_wsgi_context = (struct handler_wsgi_context_t *) http_parser->context;
 
+	/* imports the wsgi module containing the util methos to be used by the
+	application to access viriatum wsgi functions */
     wsgi_module = PyImport_ImportModule("viriatum_wsgi");
     if(wsgi_module == NULL) { RAISE_NO_ERROR; }
 
+	/* retrieves the reference to the start response function from the wsgi module
+	and then verifies that it's a valid python function */
     start_response_function = PyObject_GetAttrString(wsgi_module, "start_response");
     if(!start_response_function || !PyCallable_Check(start_response_function)) { RAISE_NO_ERROR; }
 
