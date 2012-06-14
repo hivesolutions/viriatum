@@ -243,6 +243,11 @@ ERROR_CODE _reload_wsgi_state() {
 }
 
 ERROR_CODE _start_wsgi_state() {
+	/* allocates space for the reference to the to be created
+	wsgi module and the type to be exported */
+	PyObject *wsgi_module;
+	PyTypeObject *type;
+
     /* retrieves the system path list and then appends
     the various relative local paths into in */
     PyObject *current_path = PyString_FromString("");
@@ -252,7 +257,13 @@ ERROR_CODE _start_wsgi_state() {
 
     /* registers the viriatum wsgi module in the python interpreter
     this module may be used to provide wsgi functions */
-    Py_InitModule("viriatum_wsgi", wsgi_methods);
+	wsgi_module = Py_InitModule("viriatum_wsgi", wsgi_methods);
+
+	/* checks the input type for readyness and then casts the
+	type as a python type and registers it as input */
+    PyType_Ready(&input_type);
+    type = &input_type;
+    PyModule_AddObject(wsgi_module, "input", (PyObject *) type);
 
     /* raises no error */
     RAISE_NO_ERROR;
