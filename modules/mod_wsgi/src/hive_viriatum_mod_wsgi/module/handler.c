@@ -388,6 +388,7 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
     Py_DECREF(args);
     Py_DECREF(module);
     Py_DECREF(wsgi_module);
+	Py_DECREF(result);
 
     /* raise no error */
     RAISE_NO_ERROR;
