@@ -52,6 +52,11 @@ typedef struct http_header_value_t {
     size_t value_size;
 } http_header_value;
 
+typedef struct http_headers_t {
+    struct http_header_value_t values[VIRIATUM_MAX_HEADER_COUNT];
+	size_t count;
+} http_headers_value;
+
 typedef struct http_request_t {
     enum http_request_method_e method;
     unsigned char *data;
