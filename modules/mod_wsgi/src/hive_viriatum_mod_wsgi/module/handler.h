@@ -44,10 +44,139 @@ typedef struct mod_wsgi_http_handler_t {
 
 typedef struct handler_wsgi_context_t {
     /**
+     * The url to be used for retrieving the file.
+     */
+    unsigned char url[VIRIATUM_MAX_URL_SIZE];
+
+    /**
+     * The file name to be used for retrieving the file.
+     */
+    unsigned char file_name[VIRIATUM_MAX_URL_SIZE];
+
+    /**
+     * The query string (contents after the '?')
+     * to be used to create the get parameters map.
+     */
+    unsigned char query[VIRIATUM_MAX_URL_SIZE];
+
+    /**
+     * The path to the file to be handled by
+     * the current php request.
+     */
+    unsigned char file_path[VIRIATUM_MAX_PATH_SIZE];
+
+    /**
+     * The content type for the current request being
+     * made this is a header value.
+     */
+    unsigned char content_type[VIRIATUM_MAX_HEADER_SIZE];
+
+    /**
+     * The content length for the current request being
+     * made this is a header value.
+     */
+    unsigned char content_length_[VIRIATUM_MAX_HEADER_SIZE];
+
+    /**
+     * The cookie for the current request being
+     * made this is a header value.
+     */
+    unsigned char cookie[VIRIATUM_MAX_HEADER_SIZE];
+
+    /**
+     * The host for the current request being
+     * made this is a header value.
+     */
+    unsigned char host[VIRIATUM_MAX_HEADER_SIZE];
+
+    /**
+     * The server name for the current request being
+     * made this is a header value.
+     */
+    unsigned char server_name[VIRIATUM_MAX_HEADER_SIZE];
+
+    /**
+     * The current header structure, represeting the
+     * header currently being parsed.
+     * In case no value is defined there's no header
+     * "in parsing".
+     */
+    struct http_header_value_t *header;
+
+    /**
+     * The list of headers parsed for the current request
+     * this value changes over the parsing of the request.
+     * The name of the header is not reliable as it changes
+     * after exposing it to the php interpreter.
+     */
+    struct http_headers_t *headers;
+
+    /**
      * The current value for the flags describing
      * the status of the current http request.
      */
     unsigned char flags;
+
+    /**
+     * Enumeration value that controls the type
+     * of the next header to be read from the
+     * http input buffer.
+     */
+    enum http_header_e _next_header;
+
+    /**
+     * String reference to the url buffer, usefull
+     * for fast attribute calculation (eg: size).
+     */
+    struct string_t _url_string;
+
+    /**
+     * String reference to the file name buffer, useful
+     * for fast attribute calculation (eg: size).
+     */
+    struct string_t _file_name_string;
+
+    /**
+     * String reference to the query buffer, useful
+     * for fast attribute calculation (eg: size).
+     */
+    struct string_t _query_string;
+
+    /**
+     * String reference to the file path buffer, useful
+     * for fast attribute calculation (eg: size).
+     */
+    struct string_t _file_path_string;
+
+    /**
+     * String reference to the content type buffer, useful
+     * for fast attribute calculation (eg: size).
+     */
+    struct string_t _content_type_string;
+
+    /**
+     * String reference to the content length buffer, useful
+     * for fast attribute calculation (eg: size).
+     */
+    struct string_t _content_length_string;
+
+    /**
+     * String reference to the cookie buffer, useful
+     * for fast attribute calculation (eg: size).
+     */
+    struct string_t _cookie_string;
+
+    /**
+     * String reference to the host buffer, useful
+     * for fast attribute calculation (eg: size).
+     */
+    struct string_t _host_string;
+
+    /**
+     * String reference to the server name buffer, useful
+     * for fast attribute calculation (eg: size).
+     */
+    struct string_t _server_name_string;
 
     /**
      * The reference to the buffer iterator
