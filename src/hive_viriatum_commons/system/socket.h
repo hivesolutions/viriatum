@@ -137,7 +137,7 @@
     SOCKET_FCNTL(socket_handle, F_SETFL, flags | O_NONBLOCK)
 #define SOCKET_SET_NO_WAIT(socket_handle, option_value) option_value = 1; SOCKET_SET_OPTIONS(socket_handle, SOCKET_PROTOCOL_TCP, TCP_NODELAY, option_value)
 #ifdef TCP_CORK
-#define TCP_NOPUSH = TCP_CORK
+#define TCP_NOPUSH TCP_CORK
 #endif
 #ifdef TCP_NOPUSH
 #define SOCKET_SET_NO_PUSH(socket_handle, option_value) option_value = 0; SOCKET_SET_OPTIONS(socket_handle, SOCKET_PROTOCOL_TCP, TCP_NOPUSH, option_value)
