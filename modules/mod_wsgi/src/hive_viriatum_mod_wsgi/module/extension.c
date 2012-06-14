@@ -91,32 +91,43 @@ PyObject *wsgi_start_response(PyObject *self, PyObject *args) {
     SSCANF(error_code, "%d %s", &_wsgi_request.status_code, _wsgi_request.status_message);
 #endif
 
-
-
+	/* creates the iterator to be used to percolate arround
+	the various header tuples */
     iterator = PyObject_GetIter(headers);
     if(iterator == NULL) { RAISE_NO_ERROR; }
 
+	/* iterates continuously to percolate arround the various
+	header tuples */
     while(1) {
+		/* retrieves the next iterator item and breaks the
+		loop in case an invalid (end of iteration) item is
+		found, otherwise retrieves the first and second items
+		from the presumably sequence item */
         item = PyIter_Next(iterator);
         if(item == NULL) { break; }
         header_name = PySequence_GetItem(item, 0);
         header_value = PySequence_GetItem(item, 1);
 
+		/* converts the header name and value into a linear
+		string buffer so that is possible to format them */
         _header_name = PyString_AsString(header_name);
         _header_value = PyString_AsString(header_value);
 
+		/* formats the header into the "normal" format and sets
+		it under the headers buffer in the wsgi request */
         SPRINTF(_wsgi_request.headers[_wsgi_request.header_count], 1024, "%s: %s", _header_name, _header_value);
         _wsgi_request.header_count++;
 
+		/* updates the reference count of the various elements
+		used in the iteration cycle */
         Py_XDECREF(header_value);
         Py_XDECREF(header_name);
         Py_DECREF(item);
     }
 
+	/* releases the iterator by decrementing its reference
+	count (avoids memory leak) */
     Py_DECREF(iterator);
-
-
-
 
     wsgi_module = PyImport_ImportModule("viriatum_wsgi");
     if(wsgi_module == NULL) { return NULL; }
