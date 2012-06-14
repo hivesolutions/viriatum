@@ -1283,7 +1283,7 @@ ERROR_CODE _comand_line_options_service(struct service_t *service, struct hash_m
 
     /* tries to retrieve the workers argument from the arguments map, then
     sets the workers (count) value for the service */
-    get_value_string_hash_map(arguments, (unsigned char *) "local", &value);
+    get_value_string_hash_map(arguments, (unsigned char *) "workers", &value);
     if(value != NULL) { service_options->workers = atoi(((struct argument_t *) value)->value); }
 
     /* raises no error */
