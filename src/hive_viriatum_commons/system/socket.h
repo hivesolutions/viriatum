@@ -76,7 +76,7 @@
 #define SOCKET_SET_CLEAR(socket_handle, sockets_set) FD_CLR(socket_handle, sockets_set)
 #define SOCKET_SET_IS_SET(socket_handle, sockets_set) FD_ISSET(socket_handle, sockets_set)
 #define SOCKET_SET_NON_BLOCKING(socket_handle, flags) SOCKET_IOCTL(socket_handle, FIONBIO, &flags)
-#define SOCKET_SET_NO_WAIT(socket_handle, flags)
+#define SOCKET_SET_NO_WAIT(socket_handle, flags) flags = 1; SOCKET_SET_OPTIONS(socket_handle, SOCKET_PROTOCOL_TCP, TCP_NODELAY, flags)
 #define SOCKET_SET_NO_PUSH(socket_handle, flags)
 #endif
 
