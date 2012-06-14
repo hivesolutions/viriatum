@@ -265,14 +265,20 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
     wsgi_module = PyImport_ImportModule("viriatum_wsgi");
     if(wsgi_module == NULL) { RAISE_NO_ERROR; }
 
+	printf("importou com sucesso viriatum_wsgi");
+
     start_response_function = PyObject_GetAttrString(wsgi_module, "start_response");
     if(!start_response_function || !PyCallable_Check(start_response_function)) { RAISE_NO_ERROR; }
+
+	printf("importou com sucesso start_response");
 
     /* imports the associated (handler) module and retrieves
     its reference to be used for the calling, in case the
     reference is invalid raises an error */
     module = PyImport_ImportModule("wsgi_demo");
     if(module == NULL) { RAISE_NO_ERROR; }
+
+	printf("importou com sucesso wsgi_demo");
 
     /* retrieves the function to be used as handler for the
     wsgi request, then check if the reference is valid and
