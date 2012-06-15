@@ -288,7 +288,7 @@ ERROR_CODE create_workers(struct service_t *service) {
     /* iterates continuously for the forking of the
     current process (worker creation) */
     while(1) {
-        /* in case the number of forks is the sames
+        /* in case the number of forks is the same
         as the worker count, breaks the loop no more
         forking remaining */
         if(fork_count == worker_count) { break; }
@@ -319,7 +319,7 @@ ERROR_CODE create_workers(struct service_t *service) {
     pid value) or the master process and sets the service
 	process type accortin to this value */
     if(pid == 0) { service->process_type = WORKER_PROCESS; }
-    else {  service->process_type = MASTER_PROCESS; }
+    else { service->process_type = MASTER_PROCESS; }
 
     /* checks if the current process is a worker (zero based
     pid value) or the master process and sets the process title
@@ -354,10 +354,17 @@ ERROR_CODE join_workers(struct service_t *service) {
     /* iterates continuously for the joining of the
     current process (worker creation) */
     while(1) {
+        /* in case the number of joins is the same
+        as the worker count, breaks the loop no more
+        joining remaining */
+        if(fork_count == worker_count) { break; }
+
 		/* retrieves the pid of the worker to be "killed"
 		and then joined */
 		pid = service->worker_pids[join_count];
 		kill(pid, SIGINT);
+
+		printf("vai matar %d\n", pid);
 
 		/* wiats for the process to exit it's existence
 		this may hang the current process in case there's
