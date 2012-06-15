@@ -48,6 +48,7 @@ void create_service(struct service_t **service_pointer, unsigned char *name, uns
     service->add_http_handler = add_http_handler_service;
     service->remove_http_handler = remove_http_handler_service;
     service->get_http_handler = get_http_handler_service;
+	service->locations.count = 0;
 
     /* creates the service options */
     create_service_options(&service->options);
@@ -185,7 +186,7 @@ void delete_polling(struct polling_t *polling) {
     FREE(polling);
 }
 
-void delete_configuration(struct hash_map_t *configuration, int is_top) {
+void delete_configuration(struct sort_map_t *configuration, int is_top) {
     /* allocates space for the pointer to the element and
     for the option to be retrieved */
     struct hash_map_element_t *element;
@@ -194,8 +195,8 @@ void delete_configuration(struct hash_map_t *configuration, int is_top) {
     /* allocates space for the iterator for the configuration */
     struct iterator_t *configuration_iterator;
 
-    /* creates an iterator for the ´configuration hash map */
-    create_element_iterator_hash_map(configuration, &configuration_iterator);
+    /* creates an iterator for the ´configuration sort map */
+    create_element_iterator_sort_map(configuration, &configuration_iterator);
 
     /* iterates continuously */
     while(1) {
@@ -208,21 +209,21 @@ void delete_configuration(struct hash_map_t *configuration, int is_top) {
             break;
         }
 
-        /* retrievs the hash map value for the key pointer */
-        get_value_hash_map(configuration, element->key, element->key_string, (void **) &option);
+        /* retrievs the sort map value for the key pointer */
+        get_value_sort_map(configuration, element->key, element->key_string, (void **) &option);
 
         /* in case the current iteration is of type top must delete the
         inner configuration because this is "just" a section, otherwise
         releases the memory space occupied by the value */
-        if(is_top) { delete_configuration((struct hash_map_t *) option, 0); }
+        if(is_top) { delete_configuration((struct sort_map_t *) option, 0); }
         else { FREE(option); }
     }
 
-    /* deletes the iterator for the configuration hash map */
-    delete_iterator_hash_map(configuration, configuration_iterator);
+    /* deletes the iterator for the configuration sort map */
+    delete_iterator_sort_map(configuration, configuration_iterator);
 
-    /* deletes the hash map that holds the configuration */
-    delete_hash_map(configuration);
+    /* deletes the sort map that holds the configuration */
+    delete_sort_map(configuration);
 }
 
 ERROR_CODE load_options_service(struct service_t *service, struct hash_map_t *arguments) {
@@ -247,6 +248,51 @@ ERROR_CODE calculate_options_service(struct service_t *service) {
     /* raises no error */
     RAISE_NO_ERROR;
 }
+
+ERROR_CODE calculate_locations_service(struct service_t *service) {
+	struct iterator_t *iterator;
+	struct sort_map_t *location;
+	struct hash_map_element_t *element;
+
+	struct location_t *_location;
+
+	unsigned char *name;
+	unsigned char *path;
+	unsigned char *handler;
+	int is_equal;
+
+	struct sort_map_t *configuration = service->configuration;
+	create_element_iterator_sort_map(configuration, &iterator);
+
+	while(1) {
+		get_next_iterator(iterator, (void **) &element);
+		if(element == NULL) { break; }
+
+		is_equal = memcmp(element->key_string, "location:", sizeof("location:") - 1);
+		if(is_equal != 0) { continue; }
+
+		get_value_string_sort_map(configuration, element->key_string, (void **) &location);
+		if(location == NULL) { continue; }
+
+		get_value_string_sort_map(location, (unsigned char *) "path", &path);
+		if(path == NULL) { continue; }
+
+		get_value_string_sort_map(location, (unsigned char *) "handler", &handler);
+		if(handler == NULL) { continue; }
+
+		name = &element->key_string[sizeof("location:") - 1];
+
+		_location = &service->locations.values[service->locations.count];
+		_location->name = name;
+		_location->path = path;
+		_location->handler = handler;
+		_location->configuration = location;
+		service->locations.count++;
+	}
+
+	delete_iterator_sort_map(configuration, iterator);
+}
+
 
 
 
@@ -1271,10 +1317,10 @@ ERROR_CODE _file_options_service(struct service_t *service, struct hash_map_t *a
     file (the ini base file) */
     char config_path[VIRIATUM_MAX_PATH_SIZE];
 
-    /* allocates space for both the general configuration hash
+    /* allocates space for both the general configuration sort
     map and the "concrete" general configuration map */
-    struct hash_map_t *configuration;
-    struct hash_map_t *general;
+    struct sort_map_t *configuration;
+    struct sort_map_t *general;
 
     /* unpacks the service options from the service */
     struct service_options_t *service_options = service->options;
@@ -1288,38 +1334,38 @@ ERROR_CODE _file_options_service(struct service_t *service, struct hash_map_t *a
 
     /* tries to retrieve the general section configuration from the configuration
     map in case none is found returns immediately no need to process anything more */
-    get_value_string_hash_map(configuration, (unsigned char *) "general", (void **) &general);
+    get_value_string_sort_map(configuration, (unsigned char *) "general", (void **) &general);
     if(general == NULL) { RAISE_NO_ERROR; }
 
     /* tries to retrieve the port argument from the arguments map and
     in case the (port) value is set, casts the port value into integer
     and sets it in the service options */
-    get_value_string_hash_map(general, (unsigned char *) "port", &value);
+    get_value_string_sort_map(general, (unsigned char *) "port", &value);
     if(value != NULL) { service_options->port = (unsigned short) atoi(value); }
 
     /* tries to retrieve the host argument from the arguments map and
     in case the (host) value is set, sets it in the service options */
-    get_value_string_hash_map(general, (unsigned char *) "host", &value);
+    get_value_string_sort_map(general, (unsigned char *) "host", &value);
     if(value != NULL) { service_options->address = (unsigned char *) value; }
 
     /* tries to retrieve the handler argument from the arguments map and
     in case the (handler) value is set, sets it in the service options */
-    get_value_string_hash_map(general, (unsigned char *) "handler", &value);
+    get_value_string_sort_map(general, (unsigned char *) "handler", &value);
     if(value != NULL) { service_options->handler_name = (unsigned char *) value; }
 
     /* tries to retrieve the local argument from the arguments map, then
     in case the (local) value is set, sets the service as local  */
-    get_value_string_hash_map(general, (unsigned char *) "local", &value);
+    get_value_string_sort_map(general, (unsigned char *) "local", &value);
     if(value != NULL) { service_options->local = (unsigned char) atoi(value); }
 
     /* tries to retrieve the workers argument from the arguments map, then
     sets the workers (count) value for the service */
-    get_value_string_hash_map(general, (unsigned char *) "workers", &value);
+    get_value_string_sort_map(general, (unsigned char *) "workers", &value);
     if(value != NULL) { service_options->workers = (unsigned char) atoi(value); }
 
     /* tries to retrieve the use template argument from the arguments map, then
     sets the use template (boolean) value for the service */
-    get_value_string_hash_map(general, (unsigned char *) "use_template", &value);
+    get_value_string_sort_map(general, (unsigned char *) "use_template", &value);
     if(value != NULL) { service_options->use_template = (unsigned char) atoi(value); }
 
     /* raises no error */
