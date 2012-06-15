@@ -204,7 +204,7 @@ PyObject *wsgi_input_read(PyObject *self, PyObject *args) {
     struct wsgi_input_t *_self = (struct wsgi_input_t *) self;
 
     size_t remaining = _self->size - _self->position;
-    PyObject *buffer = PyString_FromStringAndSize(&_self->post_data[_self->position], remaining);
+    PyObject *buffer = PyString_FromStringAndSize((char *) &_self->post_data[_self->position], remaining);
     _self->position += remaining;
 
     return buffer;
