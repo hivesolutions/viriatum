@@ -98,6 +98,7 @@ void create_http_settings(struct http_settings_t **http_settings_pointer) {
     http_settings->on_headers_complete = NULL;
     http_settings->on_body = NULL;
     http_settings->on_message_complete = NULL;
+	http_settings->on_location = NULL;
 
     /* sets the http settings in the http settings pointer */
     *http_settings_pointer = http_settings;
