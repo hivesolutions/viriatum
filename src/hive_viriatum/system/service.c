@@ -280,7 +280,7 @@ ERROR_CODE create_workers(struct service_t *service) {
     PID_TYPE pid = 0;
 
 	/* retrives the number of worker to be created from the options
-	of the provided service if this value is invalid return immeditely */
+	of the provided service if this value is invalid returns immeditely */
     struct service_options_t *service_options = service->options;
 	unsigned char worker_count = service_options->workers;
 	if(worker_count == 0) { RAISE_NO_ERROR; }
@@ -337,10 +337,12 @@ ERROR_CODE join_workers(struct service_t *service) {
     unsigned int join_count = 0;
     PID_TYPE pid = 0;
 
+	/* allocates space for the variable that will hold the
+	status of the process aftwer the wait call */
 	int status;
 
-	/* retrives the number of worker to be created from the options
-	of the provided service if this value is invalid return immeditely */
+	/* retrives the number of worker to be "destroyed" from the options
+	of the provided service if this value is invalid returns immeditely */
     struct service_options_t *service_options = service->options;
 	unsigned char worker_count = service_options->workers;
 	if(worker_count == 0) { RAISE_NO_ERROR; }
