@@ -34,7 +34,9 @@
 /* forward references (avoids loop) */
 struct data_t;
 struct polling_t;
+struct location_t;
 struct connection_t;
+struct virtual_host_t;
 struct http_handler_t;
 
 /**
@@ -98,6 +100,55 @@ typedef ERROR_CODE (*polling_update) (struct polling_t *);
  * using the given connection as reference.
  */
 typedef ERROR_CODE (*polling_connection_update) (struct polling_t *, struct connection_t *);
+
+/**
+ * Structure describing a location to be
+ * used by the service in the resolution
+ * process.
+ */
+typedef struct location_t {
+	/**
+	 * The name as a single (soft) description
+	 * for the location, this is not required
+	 * to be set or even unique.
+	 */
+	unsigned char *name;
+
+	/**
+	 * The path describing the location, this
+	 * may be a regular expression, a wildcard
+     * or even something else.
+	 */
+	unsigned char *path;
+
+	/**
+	 * The name of the handler associated with
+	 * this location, this is going to be used
+	 * by the dispatched for correct relocation.
+	 */
+	unsigned char *handler;
+
+	/**
+	 * The hash map containg the configuration
+	 * of the location, this value should contain
+	 * the complete set of attributes parsed.
+	 */
+	struct sort_map_t *configuration;
+} location;
+
+typedef struct locations_t {
+	struct location_t values[1024];
+	size_t count;
+} locations;
+
+typedef struct virtual_host_t {
+    /**
+     * The descriptive name of the viratual
+     * host reference.
+     * For textual representation.
+     */
+    unsigned char *name;
+} virtual_host;
 
 /**
  * Structure used to describe a polling (provider)
@@ -211,6 +262,12 @@ typedef struct service_t {
 	enum process_type_e process_type;
 
 	/**
+	 * The set of locations currently loaded
+	 * into the service.
+	 */
+	struct locations_t locations;
+
+	/**
 	 * The buffer containing the various pid values
 	 * for the worker processes in case they exists.
 	 * This buffer is used to kill the workers on
@@ -232,7 +289,7 @@ typedef struct service_t {
      * This map is structured by domains and the
      * first level of keys represent these domains.
      */
-    struct hash_map_t *configuration;
+    struct sort_map_t *configuration;
 
     /**
      * The socket handle to the service
@@ -365,41 +422,6 @@ typedef struct service_options_t {
     struct hash_map_t *virtual_hosts;
 } service_options;
 
-typedef struct virtual_host_t {
-    /**
-     * The descriptive name of the viratual
-     * host reference.
-     * For textual representation.
-     */
-    unsigned char *name;
-
-    /**
-     * The default rule for the virtual to be
-     * used when no other rule is matched or
-     * when the list of rules is empty.
-     * This value is maintained separate for
-     * performance reasons.
-     */
-    struct rule_t *default_rule;
-
-    /**
-     * The list of rules to be used for matching
-     * the request, for gathering the correct
-     * handler.
-     */
-    struct linked_list_t *rules;
-} virtual_host;
-
-/**
- * Enumeration defining the various types
- * of possible rules for a given rule
- * aggregation.
- */
-typedef enum rule_type_e {
-    DIRECTORY_RULE = 1,
-    REGEX_RULE
-} rule_type;
-
 /**
  * Enumeration defining the various types
  * of possible protocols, this is an open
@@ -412,15 +434,6 @@ typedef enum connection_protocol_e {
     HTTP_CLIENT_PROTOCOL,
     TORRENT_PROTOCOL,
 } connection_protocol;
-
-typedef struct rule_t {
-    enum rule_type_e type;
-    void *value;
-} rule;
-
-typedef struct rule_directory_t {
-    char *path;
-} rule_directory;
 
 /**
  * Structure defining a connection
@@ -667,7 +680,7 @@ void delete_polling(struct polling_t *polling);
  * @param is_top If the current configuration object refers a
  * top level configuration (section) or an inner one.
  */
-void delete_configuration(struct hash_map_t *configuration, int is_top);
+void delete_configuration(struct sort_map_t *configuration, int is_top);
 
 /**
  * Loads the various options, from the various data sources
@@ -684,11 +697,21 @@ ERROR_CODE load_options_service(struct service_t *service, struct hash_map_t *ar
  * Calculates the various options, these values correspond to the
  * various calculated attributes in the options.
  *
- * @param service The service to hasve the options calculated.
+ * @param service The service to have the options calculated.
  * during the options loading.
  * @return The resulting error code.
  */
 ERROR_CODE calculate_options_service(struct service_t *service);
+
+/**
+ * Calculates the various locations, these values correspond to the
+ * various calculated attributes in the options.
+ *
+ * @param service The service to have the locations calculated.
+ * during the options loading.
+ * @return The resulting error code.
+ */
+ERROR_CODE calculate_locations_service(struct service_t *service);
 
 /**
  * Starts the given service, initializing the
