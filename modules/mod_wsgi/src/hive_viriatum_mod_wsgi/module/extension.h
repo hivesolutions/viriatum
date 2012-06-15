@@ -48,3 +48,11 @@ PyObject *wsgi_file(PyObject *self, PyObject *args);
 PyObject *_new_wsgi_input(unsigned char *post_data, size_t size);
 
 PyObject *new_wsgi_input(PyObject *args);
+void dealloc_wsgi_input(PyObject *self);
+
+PyObject *wsgi_input_iter(PyObject *self, PyObject *args);
+PyObject *wsgi_input_iternext(PyObject *self, PyObject *args);
+PyObject *wsgi_input_close(PyObject *self, PyObject *args);
+PyObject *wsgi_input_read(PyObject *self, PyObject *args);
+PyObject *wsgi_input_readline(PyObject *self, PyObject *args);
+PyObject *wsgi_input_readlines(PyObject *self, PyObject *args);
