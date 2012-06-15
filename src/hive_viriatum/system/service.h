@@ -44,8 +44,8 @@ struct http_handler_t;
  * of service processes that may exist.
  */
 typedef enum process_type_e {
-	MASTER_PROCESS = 1,
-	WORKER_PROCESS
+    MASTER_PROCESS = 1,
+    WORKER_PROCESS
 } process_type;
 
 /**
@@ -107,38 +107,38 @@ typedef ERROR_CODE (*polling_connection_update) (struct polling_t *, struct conn
  * process.
  */
 typedef struct location_t {
-	/**
-	 * The name as a single (soft) description
-	 * for the location, this is not required
-	 * to be set or even unique.
-	 */
-	unsigned char *name;
+    /**
+     * The name as a single (soft) description
+     * for the location, this is not required
+     * to be set or even unique.
+     */
+    unsigned char *name;
 
-	/**
-	 * The path describing the location, this
-	 * may be a regular expression, a wildcard
+    /**
+     * The path describing the location, this
+     * may be a regular expression, a wildcard
      * or even something else.
-	 */
-	unsigned char *path;
+     */
+    unsigned char *path;
 
-	/**
-	 * The name of the handler associated with
-	 * this location, this is going to be used
-	 * by the dispatched for correct relocation.
-	 */
-	unsigned char *handler;
+    /**
+     * The name of the handler associated with
+     * this location, this is going to be used
+     * by the dispatched for correct relocation.
+     */
+    unsigned char *handler;
 
-	/**
-	 * The hash map containg the configuration
-	 * of the location, this value should contain
-	 * the complete set of attributes parsed.
-	 */
-	struct sort_map_t *configuration;
+    /**
+     * The hash map containg the configuration
+     * of the location, this value should contain
+     * the complete set of attributes parsed.
+     */
+    struct sort_map_t *configuration;
 } location;
 
 typedef struct locations_t {
-	struct location_t values[1024];
-	size_t count;
+    struct location_t values[1024];
+    size_t count;
 } locations;
 
 typedef struct virtual_host_t {
@@ -255,25 +255,25 @@ typedef struct service_t {
      */
     unsigned char status;
 
-	/**
-	 * The type of process that hold the
-	 * reference to this service.
-	 */
-	enum process_type_e process_type;
+    /**
+     * The type of process that hold the
+     * reference to this service.
+     */
+    enum process_type_e process_type;
 
-	/**
-	 * The set of locations currently loaded
-	 * into the service.
-	 */
-	struct locations_t locations;
+    /**
+     * The set of locations currently loaded
+     * into the service.
+     */
+    struct locations_t locations;
 
-	/**
-	 * The buffer containing the various pid values
-	 * for the worker processes in case they exists.
-	 * This buffer is used to kill the workers on
-	 * service closing.
-	 */
-	PID_TYPE worker_pids[VIRIATUM_MAX_WORKERS];
+    /**
+     * The buffer containing the various pid values
+     * for the worker processes in case they exists.
+     * This buffer is used to kill the workers on
+     * service closing.
+     */
+    PID_TYPE worker_pids[VIRIATUM_MAX_WORKERS];
 
     /**
      * The set of options that configure

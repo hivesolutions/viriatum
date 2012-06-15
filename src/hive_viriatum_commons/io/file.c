@@ -244,15 +244,15 @@ ERROR_CODE entries_to_map_file(struct linked_list_t *entries, struct linked_list
 
         /* creates the date time string for the file entry */
         SPRINTF(
-			date_time_string,
-			17,
-			"%04d-%02d-%02d %02d:%02d",
-			entry->time.year,
-			entry->time.month,
-			entry->time.day,
-			entry->time.hour,
-			entry->time.minute
-		);
+            date_time_string,
+            17,
+            "%04d-%02d-%02d %02d:%02d",
+            entry->time.year,
+            entry->time.month,
+            entry->time.day,
+            entry->time.hour,
+            entry->time.minute
+        );
 
         /* creates the various types for the various entry values
         and sets them in the entry map for reference */
@@ -354,14 +354,14 @@ ERROR_CODE get_write_time_file(char *file_path, struct date_time_t *date_time) {
 
     /* retrieves the file for reading in the requested file path */
     file_handle = CreateFile(
-		file_path,
-		GENERIC_READ,
-		FILE_SHARE_READ,
-		NULL,
-		OPEN_EXISTING,
-		FILE_ATTRIBUTE_NORMAL | FILE_FLAG_BACKUP_SEMANTICS,
-		NULL
-	);
+        file_path,
+        GENERIC_READ,
+        FILE_SHARE_READ,
+        NULL,
+        OPEN_EXISTING,
+        FILE_ATTRIBUTE_NORMAL | FILE_FLAG_BACKUP_SEMANTICS,
+        NULL
+    );
 
     /* in case the created file handle is not valid */
     if(file_handle == INVALID_HANDLE_VALUE) {
