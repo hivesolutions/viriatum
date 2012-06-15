@@ -273,9 +273,18 @@ ERROR_CODE calculate_options_service(struct service_t *service) {
 #endif
 
 #ifdef VIRIATUM_PLATFORM_UNIX
-ERROR_CODE create_workers(unsigned char worker_count) {
+ERROR_CODE create_workers(struct service_t *service) {
+	/* creates the variables to hold the current pid value and
+	the variable to hold the number of fork occurring */
     unsigned int fork_count = 0;
     PID_TYPE pid = 0;
+
+	/* retrives the number of worker to be created from the options
+	of the provided service if this value is invalid return immeditely */
+    struct service_options_t *service_options = service->options;
+	unsigned char worker_count = service_options->workers;
+	if(worker_count == NULL) { RAISE_NO_ERROR; }
+	if(worker_count == 0) { RAISE_NO_ERROR; }
 
     /* iterates continuously for the forking of the
     current process (worker creation) */
@@ -298,6 +307,10 @@ ERROR_CODE create_workers(unsigned char worker_count) {
         forking of the worker processes */
         if(pid == 0) { break; }
 
+		/* sets the pid of the worker process as the
+		current pid (save for latter kill) */
+		service->worker_pids[fork_count] = pid;
+
         /* increments the fork count variable (one more
         iteration ran) */
         fork_count++;
@@ -311,6 +324,20 @@ ERROR_CODE create_workers(unsigned char worker_count) {
 
     /* raises no error */
     RAISE_NO_ERROR;
+}
+
+void join_workers(struct service_t *service) {
+	/* creates the variables to hold the current pid value and
+	the variable to hold the number of fork occurring */
+    unsigned int fork_count = 0;
+    PID_TYPE pid = 0;
+
+	/* retrives the number of worker to be created from the options
+	of the provided service if this value is invalid return immeditely */
+    struct service_options_t *service_options = service->options;
+	unsigned char worker_count = service_options->workers;
+	if(worker_count == NULL) { RAISE_NO_ERROR; }
+	if(worker_count == 0) { RAISE_NO_ERROR; }
 }
 #endif
 
@@ -666,7 +693,7 @@ ERROR_CODE start_service(struct service_t *service) {
     /* in case the current os is compatible with the forking of process
     creates the worker processes to handle more connections at a time,
     this operation creates a much more flexible and scalable solution */
-    create_workers(service_options->workers);
+    create_workers(service);
 #endif
 
 
