@@ -57,18 +57,14 @@ ERROR_CODE delete_dispatch_handler(struct dispatch_handler_t *dispatch_handler) 
 #ifdef VIRIATUM_PCRE
     /* allocates space for the index counter */
     size_t index;
-#endif
 
-#ifdef VIRIATUM_PCRE
     /* iterates over all the regular expressions to release their
     internal memory contents */
     for(index = 0; index < dispatch_handler->regex_count; index++ ) {  pcre_free(dispatch_handler->regex[index]); }
-#endif
 
     /* in case the names buffer is defined releases it */
     if(dispatch_handler->names != NULL) { FREE(dispatch_handler->names); }
 
-#ifdef VIRIATUM_PCRE
     /* in case the regex buffer is defined releases it */
     if(dispatch_handler->regex != NULL) { FREE(dispatch_handler->regex); }
 #endif
@@ -88,9 +84,12 @@ ERROR_CODE register_handler_dispatch(struct service_t *service) {
     struct dispatch_handler_t *dispatch_handler;
 
 #ifdef VIRIATUM_PCRE
-    /* allocates space for the regex related variables */
+    /* allocates space for the regex related variables,
+	this should include the location structure */
+	size_t index;
     const char *error;
     int error_offset;
+	struct location_t *location;
 #endif
 
     /* creates the http handler and then uses it to create
@@ -103,22 +102,22 @@ ERROR_CODE register_handler_dispatch(struct service_t *service) {
     http_handler->unset = unset_handler_dispatch;
     http_handler->reset = NULL;
 
-
-    dispatch_handler->regex_count = 4;
 #ifdef VIRIATUM_PCRE
-    dispatch_handler->regex = (pcre **) MALLOC(sizeof(pcre *) * dispatch_handler->regex_count);
-    dispatch_handler->regex[0] = pcre_compile("[.]*\\.lua", 0, &error, &error_offset, NULL);
-    dispatch_handler->regex[1] = pcre_compile("[.]*\\.php", 0, &error, &error_offset, NULL);
-    dispatch_handler->regex[2] = pcre_compile("[.]*\\.wsgi", 0, &error, &error_offset, NULL);
-    dispatch_handler->regex[3] = pcre_compile("[.]*\\.default", 0, &error, &error_offset, NULL);
+	/* sets the number of regular expressions as the number of
+	locations currently available in the service and then allocates
+	the required space for the regular expressions */
+	dispatch_handler->regex_count = service->locations.count;
+	dispatch_handler->regex = (pcre **) MALLOC(sizeof(pcre *) * dispatch_handler->regex_count);
+	dispatch_handler->names = (unsigned char **) MALLOC(sizeof(unsigned char *) * dispatch_handler->regex_count);
+
+	/* iterates over all the locations in the service to compile
+	the associated regular expressions */
+	for(index = 0; index < service->locations.count; index++) {
+		location = &service->locations.values[index];
+		dispatch_handler->regex[index] = pcre_compile(location->path, 0, &error, &error_offset, NULL);	
+		dispatch_handler->names[index] = location->handler;
+	}
 #endif
-    dispatch_handler->names = (unsigned char **) MALLOC(sizeof(unsigned char *) * dispatch_handler->regex_count);
-    dispatch_handler->names[0] = (unsigned char *) "lua";
-    dispatch_handler->names[1] = (unsigned char *) "php";
-    dispatch_handler->names[2] = (unsigned char *) "wsgi";
-    dispatch_handler->names[3] = (unsigned char *) "default";
-
-
 
     /* adds the http handler to the service */
     service->add_http_handler(service, http_handler);
@@ -206,14 +205,6 @@ ERROR_CODE url_callback_handler_dispatch(struct http_parser_t *http_parser, cons
     memcpy(url, data, data_size);
     url[data_size] = '\0';
 
-
-
-
-
-    /* THIS IS EXTREMLY SLOW !!! WARNING may be a better
-    idea to compile all the regex into a single regex must
-    refer to the nginx documentation for that */
-
     /* sets the default handler, this is considered to be
     the fallback in case no handler is found */
     handler_name = (unsigned char *) DISPATCH_DEFAULT_HANDLER;
@@ -233,8 +224,6 @@ ERROR_CODE url_callback_handler_dispatch(struct http_parser_t *http_parser, cons
         break;
     }
 #endif
-
-    /* END OF WARNING */
 
     /* sets the current http handler accoring to the current options
     in the service, the http handler must be loaded in the handlers map
