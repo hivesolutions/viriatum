@@ -48,6 +48,14 @@ typedef struct mod_wsgi_http_handler_t {
      * and should never be used in production.
      */
     char reload;
+
+	/**
+  	 * The reference to the module object reprenting
+	 * the parsed and compiled file to be used.
+	 * This reference is used to avoid constant reloading
+	 * of the file in case the reload flag is not set.
+	 */ 
+	PyObject *module;
 } mod_wsgi_http_handler;
 
 typedef struct handler_wsgi_context_t {
