@@ -478,7 +478,7 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
 		_load_module(
 			&mod_wsgi_http_handler->module,
 			"wsgi_app",
-			mod_wsgi_http_handler->file_path
+			file_path
 		);
 	}
 
