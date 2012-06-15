@@ -36,6 +36,10 @@ ERROR_CODE create_mod_wsgi_http_handler(struct mod_wsgi_http_handler_t **mod_wsg
     /* allocates space for the mod wsgi http handler */
     struct mod_wsgi_http_handler_t *mod_wsgi_http_handler = (struct mod_wsgi_http_handler_t *) MALLOC(mod_wsgi_http_handler_size);
 
+    /* sets the mod wsgi http handler attributes (default) values */
+    mod_wsgi_http_handler->file_path = NULL;
+    mod_wsgi_http_handler->reload = 0;
+
     /* sets the mod wsgi http handler in the upper http handler substrate */
     http_handler->lower = (void *) mod_wsgi_http_handler;
 
@@ -74,12 +78,12 @@ ERROR_CODE create_handler_wsgi_context(struct handler_wsgi_context_t **handler_w
     handler_wsgi_context->_cookie_string.length = 0;
     handler_wsgi_context->_host_string.length = 0;
     handler_wsgi_context->_server_name_string.length = 0;
-	handler_wsgi_context->iterator = NULL;
+    handler_wsgi_context->iterator = NULL;
 
-	/* sets the correct headers global reference in the wsgi
-	context and then resets the number of count to zero */
-	handler_wsgi_context->headers = &_headers;
-	handler_wsgi_context->headers->count = 0;
+    /* sets the correct headers global reference in the wsgi
+    context and then resets the number of count to zero */
+    handler_wsgi_context->headers = &_headers;
+    handler_wsgi_context->headers->count = 0;
 
     /* sets the handler wsgi context in the  pointer */
     *handler_wsgi_context_pointer = handler_wsgi_context;
@@ -207,7 +211,7 @@ ERROR_CODE header_value_callback_handler_module(struct http_parser_t *http_parse
     handler_wsgi_context->header->value_size = data_size;
 
     /* adds the current header to the list of headers this is accomplished
-	by incrementing the current headers counter by one value*/
+    by incrementing the current headers counter by one value*/
     handler_wsgi_context->headers->count++;
 
     /* switchs over the next header possible values to
@@ -438,40 +442,12 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
     (headers) part of the http message to be sent as response */
     char *headers_buffer;
 
-
-	char name[1024];
-	PyObject *_value;
-	PyObject *_value_;
-	struct http_header_value_t *header;
-
-	unsigned char *post_data;
-
-	struct wsgi_input_t *wsgi_input;
-
-
     /* retrieves the connection from the http parser parameters
     and then retrieves the handler wsgi context */
     struct connection_t *connection = (struct connection_t *) http_parser->parameters;
     struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
     struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
     struct handler_wsgi_context_t *handler_wsgi_context = (struct handler_wsgi_context_t *) http_parser->context;
-
-    /* retrieves the http method string value accessing the array of
-    static string values */
-    char *method = (char *) http_method_strings[http_parser->method - 1];
-
-
-
-    unsigned char *port = connection->service->options->_port;
-
-
-
-
-    /* in case there is contents to be read retrieves the appropriate
-    reference to the start of the post data in the connection buffer */
-    if(http_parser->_content_length > 0) { post_data = &http_connection->buffer[http_connection->buffer_offset - http_parser->_content_length];
-    } else { post_data = NULL; }
-
 
     /* imports the wsgi module containing the util methos to be used by the
     application to access viriatum wsgi functions */
@@ -486,8 +462,8 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
     /* imports the associated (handler) module and retrieves
     its reference to be used for the calling, in case the
     reference is invalid raises an error */
-    module = PyImport_ImportModule("wsgi_demo");
-    if(module == NULL) { RAISE_NO_ERROR; }
+    module = PyImport_ImportModule("flask_test");
+    if(module == NULL) { PyErr_Print();  RAISE_NO_ERROR; }
 
     /* retrieves the function to be used as handler for the
     wsgi request, then check if the reference is valid and
@@ -516,96 +492,12 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
     dictionary and with the start response function */
     args = PyTuple_New(2);
     environ = PyDict_New();
-    PyTuple_SetItem(args, 0, environ);
-    PyTuple_SetItem(args, 1, start_response_function);
+    PyTuple_SET_ITEM(args, 0, environ);
+    PyTuple_SET_ITEM(args, 1, start_response_function);
 
-	/* iterates over all the heades in order to "export" them
-	into the environ dictionary to expose them to the application */
-	for(index = 0; index < _headers.count; index++) {
-		/* retrieves the current header structure for the
-		iteration cycle in course */
-		header = &_headers.values[index];
-
-		/* converts the current header name to uppercase
-		and appends the http prefix into it, then converts
-		the header value into a python string object */
-		uppercase(header->name);
-		SPRINTF(name, 1024, "HTTP_%s", header->name);
-		_value = PyString_FromString(header->value);
-
-		/* sets the value using the provided string name 
-		and decrements the reference count of the value */
-		PyDict_SetItemString(environ, name, _value);
-		Py_DECREF(_value);
-	}
-
-	_value_ = PyTuple_New(2);
-	_value = PyInt_FromLong(1);
-	PyTuple_SetItem(_value_, 0, _value);
-	_value = PyInt_FromLong(0);
-	PyTuple_SetItem(_value_, 1, _value);
-	PyDict_SetItemString(environ, "wsgi.version", _value_);
-	Py_DECREF(_value_);
-
-	_value = PyString_FromString("http");
-	PyDict_SetItemString(environ, "wsgi.url_scheme", _value);
-	Py_DECREF(_value);
-
-	wsgi_input = _new_wsgi_input(post_data, http_parser->_content_length);
-	PyDict_SetItemString(environ, "wsgi.input", (PyObject *) wsgi_input);
-	Py_DECREF(wsgi_input);
-
-	_value = PyBool_FromLong(0);
-	PyDict_SetItemString(environ, "wsgi.multithread", _value);
-	Py_DECREF(_value);
-
-	_value = PyBool_FromLong(1);
-	PyDict_SetItemString(environ, "wsgi.multiprocess", _value);
-	Py_DECREF(_value);
-
-	_value = PyBool_FromLong(0);
-	PyDict_SetItemString(environ, "wsgi.run_once", _value);
-	Py_DECREF(_value);
-
-	_value = PyString_FromString(method);
-	PyDict_SetItemString(environ, "REQUEST_METHOD", _value);
-	Py_DECREF(_value);
-
-	_value = PyString_FromString(handler_wsgi_context->file_name);
-	PyDict_SetItemString(environ, "SCRIPT_NAME", _value);
-	Py_DECREF(_value);
-
-	_value = PyString_FromString(handler_wsgi_context->url);
-	PyDict_SetItemString(environ, "PATH_INFO", _value);
-	Py_DECREF(_value);
-
-	_value = PyString_FromString(handler_wsgi_context->query);
-	PyDict_SetItemString(environ, "QUERY_STRING", _value);
-	Py_DECREF(_value);
-
-	_value = PyString_FromString(handler_wsgi_context->server_name);
-	PyDict_SetItemString(environ, "SERVER_NAME", _value);
-	Py_DECREF(_value);
-
-	_value = PyString_FromString(port);
-	PyDict_SetItemString(environ, "SERVER_PORT", _value);
-	Py_DECREF(_value);
-
-	_value = PyString_FromString("HTTP/1.1");
-	PyDict_SetItemString(environ, "SERVER_PROTOCOL", _value);
-	Py_DECREF(_value);
-
-	if(handler_wsgi_context->_content_type_string.length > 0) {
-		_value = PyString_FromString(handler_wsgi_context->content_type);
-		PyDict_SetItemString(environ, "CONTENT_TYPE", _value);
-		Py_DECREF(_value);
-	}
-
-	if(handler_wsgi_context->_content_length_string.length > 0) {
-		_value = PyString_FromString(handler_wsgi_context->content_length_);
-		PyDict_SetItemString(environ, "CONTENT_LENGTH", _value);
-		Py_DECREF(_value);
-	}
+    /* starts the environ dictionary object with the various values
+    indirectly associated with the parser of the current request */
+    _start_environ(environ, http_parser);
 
     /* calls the handler function retrieving the result and releasing
     the resources immediately in case the result is not valid */
@@ -665,7 +557,7 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
     Py_DECREF(args);
     Py_DECREF(module);
     Py_DECREF(wsgi_module);
-	Py_DECREF(result);
+    Py_DECREF(result);
 
     /* raise no error */
     RAISE_NO_ERROR;
@@ -699,5 +591,134 @@ ERROR_CODE _send_response_callback_handler_module(struct connection_t *connectio
     if(!keep_alive) { connection->close_connection(connection); }
 
     /* raise no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE _start_environ(PyObject *environ, struct http_parser_t *http_parser) {
+    /* allocates space for the counter to be used for iteration
+    on the various header values */
+    size_t index;
+
+    /* allocates space for the final name of the exporting header,
+    for the temporary values to eb used in the exports and for the
+    temporary header value structure pointer */
+    char name[VIRIATUM_MAX_HEADER_SIZE + sizeof("HTTP_")];
+    PyObject *_value;
+    PyObject *_value_;
+    struct http_header_value_t *header;
+
+    /* allocates the buffer reference to the used to store the
+    data from the post part of the message */
+    unsigned char *post_data;
+
+    /* retrieves the connection from the http parser parameters
+    and then retrieves the handler wsgi context */
+    struct connection_t *connection = (struct connection_t *) http_parser->parameters;
+    struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
+    struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
+    struct handler_wsgi_context_t *handler_wsgi_context = (struct handler_wsgi_context_t *) http_parser->context;
+
+    /* retrieves the port (string representation) from the service
+    options associated with the current connection */
+    unsigned char *port = connection->service->options->_port;
+
+    /* retrieves the http method string value accessing the array of
+    static string values */
+    char *method = (char *) http_method_strings[http_parser->method - 1];
+
+    /* in case there is contents to be read retrieves the appropriate
+    reference to the start of the post data in the connection buffer */
+    if(http_parser->_content_length > 0) { post_data = &http_connection->buffer[http_connection->buffer_offset - http_parser->_content_length];
+    } else { post_data = NULL; }
+
+    /* iterates over all the heades in order to "export" them
+    into the environ dictionary to expose them to the application */
+    for(index = 0; index < _headers.count; index++) {
+        /* retrieves the current header structure for the
+        iteration cycle in course */
+        header = &_headers.values[index];
+
+        /* converts the current header name to uppercase
+        and appends the http prefix into it, then converts
+        the header value into a python string object */
+        uppercase(header->name);
+        SPRINTF(name, VIRIATUM_MAX_HEADER_SIZE + sizeof("HTTP_"), "HTTP_%s", header->name);
+        _value = PyString_FromString(header->value);
+
+        /* sets the value using the provided string name
+        and decrements the reference count of the value */
+        PyDict_SetItemString(environ, name, _value);
+        Py_DECREF(_value);
+    }
+
+    _value_ = PyTuple_New(2);
+    _value = PyInt_FromLong(1);
+    PyTuple_SET_ITEM(_value_, 0, _value);
+    _value = PyInt_FromLong(0);
+    PyTuple_SET_ITEM(_value_, 1, _value);
+    PyDict_SetItemString(environ, "wsgi.version", _value_);
+    Py_DECREF(_value_);
+
+    _value = PyString_FromString("http");
+    PyDict_SetItemString(environ, "wsgi.url_scheme", _value);
+    Py_DECREF(_value);
+
+    _value = _new_wsgi_input(post_data, http_parser->_content_length);
+    PyDict_SetItemString(environ, "wsgi.input", _value);
+    Py_DECREF(_value);
+
+    _value = PyBool_FromLong(0);
+    PyDict_SetItemString(environ, "wsgi.multithread", _value);
+    Py_DECREF(_value);
+
+    _value = PyBool_FromLong(1);
+    PyDict_SetItemString(environ, "wsgi.multiprocess", _value);
+    Py_DECREF(_value);
+
+    _value = PyBool_FromLong(0);
+    PyDict_SetItemString(environ, "wsgi.run_once", _value);
+    Py_DECREF(_value);
+
+    _value = PyString_FromString(method);
+    PyDict_SetItemString(environ, "REQUEST_METHOD", _value);
+    Py_DECREF(_value);
+
+    _value = PyString_FromString(handler_wsgi_context->file_name);
+    PyDict_SetItemString(environ, "SCRIPT_NAME", _value);
+    Py_DECREF(_value);
+
+    _value = PyString_FromString(handler_wsgi_context->url);
+    PyDict_SetItemString(environ, "PATH_INFO", _value);
+    Py_DECREF(_value);
+
+    _value = PyString_FromString(handler_wsgi_context->query);
+    PyDict_SetItemString(environ, "QUERY_STRING", _value);
+    Py_DECREF(_value);
+
+    _value = PyString_FromString(handler_wsgi_context->server_name);
+    PyDict_SetItemString(environ, "SERVER_NAME", _value);
+    Py_DECREF(_value);
+
+    _value = PyString_FromString(port);
+    PyDict_SetItemString(environ, "SERVER_PORT", _value);
+    Py_DECREF(_value);
+
+    _value = PyString_FromString("HTTP/1.1");
+    PyDict_SetItemString(environ, "SERVER_PROTOCOL", _value);
+    Py_DECREF(_value);
+
+    if(handler_wsgi_context->_content_type_string.length > 0) {
+        _value = PyString_FromString(handler_wsgi_context->content_type);
+        PyDict_SetItemString(environ, "CONTENT_TYPE", _value);
+        Py_DECREF(_value);
+    }
+
+    if(handler_wsgi_context->_content_length_string.length > 0) {
+        _value = PyString_FromString(handler_wsgi_context->content_length_);
+        PyDict_SetItemString(environ, "CONTENT_LENGTH", _value);
+        Py_DECREF(_value);
+    }
+
+    /* raises no error */
     RAISE_NO_ERROR;
 }

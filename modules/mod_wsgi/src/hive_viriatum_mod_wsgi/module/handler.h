@@ -40,6 +40,14 @@ typedef struct mod_wsgi_http_handler_t {
      * be used for the parsing.
      */
     char *file_path;
+
+    /**
+     * Flag that controls if the script should
+     * be reload everytime a request si received.
+     * This options is usefull for debugging purposes,
+     * and should never be used in production.
+     */
+    char reload;
 } mod_wsgi_http_handler;
 
 typedef struct handler_wsgi_context_t {
@@ -206,3 +214,4 @@ ERROR_CODE _unset_http_settings_handler_module(struct http_settings_t *http_sett
 ERROR_CODE _message_begin_callback_handler_module(struct http_parser_t *http_parser);
 ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser);
 ERROR_CODE _send_response_callback_handler_module(struct connection_t *connection, struct data_t *data, void *parameters);
+ERROR_CODE _start_environ(PyObject *environ, struct http_parser_t *http_parser);
