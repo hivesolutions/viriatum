@@ -274,10 +274,10 @@ ERROR_CODE calculate_locations_service(struct service_t *service) {
 		get_value_string_sort_map(configuration, element->key_string, (void **) &location);
 		if(location == NULL) { continue; }
 
-		get_value_string_sort_map(location, (unsigned char *) "path", &path);
+		get_value_string_sort_map(location, (unsigned char *) "path", (void **) &path);
 		if(path == NULL) { continue; }
 
-		get_value_string_sort_map(location, (unsigned char *) "handler", &handler);
+		get_value_string_sort_map(location, (unsigned char *) "handler", (void **) &handler);
 		if(handler == NULL) { continue; }
 
 		name = &element->key_string[sizeof("location:") - 1];
