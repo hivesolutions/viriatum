@@ -161,14 +161,6 @@ typedef struct polling_t {
      */
     polling_update call;
 
-	/**
-	 * The buffer containing the various pid values
-	 * for the worker processes in case they exists.
-	 * This buffer is used to kill the workers on
-	 * service closing.
-	 */
-	PID_TYPE worker_pids[VIRIATUM_MAX_WORKERS] ;
-
     /**
      * Reference to the lower level
      * connection substrate (child).
@@ -202,6 +194,14 @@ typedef struct service_t {
      * Used for service life-cycle control.
      */
     unsigned char status;
+
+	/**
+	 * The buffer containing the various pid values
+	 * for the worker processes in case they exists.
+	 * This buffer is used to kill the workers on
+	 * service closing.
+	 */
+	PID_TYPE worker_pids[VIRIATUM_MAX_WORKERS];
 
     /**
      * The set of options that configure
