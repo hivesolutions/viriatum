@@ -223,14 +223,15 @@ void daemonize() {
 	dup2(log_file, STDOUT_FILENO);
 	close(log_file);
 
-	printf("TOBIAS\n");
-	fflush(stdout);
-
     /* closes the various pending streams from the
     daemon process (not going to output them) */
-    /*close(STDIN_FILENO);
+    close(STDIN_FILENO);
     close(STDOUT_FILENO);
-    close(STDERR_FILENO);*/
+    close(STDERR_FILENO);
+
+
+	printf("TOBIAS !!!!!!!!!!!!!!!\n");
+	fflush(stdout);
 }
 #endif
 
