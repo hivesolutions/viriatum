@@ -206,9 +206,11 @@ void daemonize() {
     fwrite(pid_string, sizeof(char), pid_string_length, pid_file);
     fclose(pid_file);
 
+	printf("Fez o forking para o daemon");
+
     /* closes the various pending streams from the
     daemon process (not going to output them) */
-   /* close(STDIN_FILENO);
+    /*close(STDIN_FILENO);
     close(STDOUT_FILENO);
     close(STDERR_FILENO);*/
 }
