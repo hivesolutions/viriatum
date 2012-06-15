@@ -325,7 +325,7 @@ ERROR_CODE create_workers(struct service_t *service) {
     RAISE_NO_ERROR;
 }
 
-void join_workers(struct service_t *service) {
+ERROR_CODE join_workers(struct service_t *service) {
 	/* creates the variables to hold the current pid value and
 	the variable to hold the number of joins occurring */
     unsigned int join_count = 0;
