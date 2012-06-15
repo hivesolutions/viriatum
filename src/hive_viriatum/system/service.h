@@ -38,6 +38,15 @@ struct connection_t;
 struct http_handler_t;
 
 /**
+ * Enumeration defining the various types
+ * of service processes that may exist.
+ */
+typedef enum process_type_e {
+	MASTER_PROCESS = 1,
+	WORKER_PROCESS
+} process_type;
+
+/**
  * The function used to create a new handler instance
  * with a name and for the service context.
  */
@@ -194,6 +203,12 @@ typedef struct service_t {
      * Used for service life-cycle control.
      */
     unsigned char status;
+
+	/**
+	 * The type of process that hold the
+	 * reference to this service.
+	 */
+	enum process_type_e process_type;
 
 	/**
 	 * The buffer containing the various pid values

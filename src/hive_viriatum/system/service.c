@@ -316,6 +316,12 @@ ERROR_CODE create_workers(struct service_t *service) {
     }
 
     /* checks if the current process is a worker (zero based
+    pid value) or the master process and sets the service
+	process type accortin to this value */
+    if(pid == 0) { service->process_type = WORKER_PROCESS; }
+    else {  service->process_type = MASTER_PROCESS; }
+
+    /* checks if the current process is a worker (zero based
     pid value) or the master process and sets the process title
     according to this value */
     if(pid == 0) { SET_PROC_NAME("viriatum/w"); }
@@ -331,16 +337,28 @@ ERROR_CODE join_workers(struct service_t *service) {
     unsigned int join_count = 0;
     PID_TYPE pid = 0;
 
+	int status;
+
 	/* retrives the number of worker to be created from the options
 	of the provided service if this value is invalid return immeditely */
     struct service_options_t *service_options = service->options;
 	unsigned char worker_count = service_options->workers;
-	if(worker_count == NULL) { RAISE_NO_ERROR; }
 	if(worker_count == 0) { RAISE_NO_ERROR; }
+
+	/* in case the current process type for the service is not master
+	no need to join (and kill) the workers, it's not the responsible */
+	if(service->process_type != MASTER_PROCESS) { RAISE_NO_ERROR; }
 
     /* iterates continuously for the joining of the
     current process (worker creation) */
     while(1) {
+		/* retrieves the pid of the worker to be "killed"
+		and then joined */
+		pid = service->worker_pids[join_count];
+		kill(pid, SIGHUP);
+
+		waitpid(pid, &status, WUNTRACED);
+
         /* increments the join count variable (one more
         iteration ran) */
         join_count++;
@@ -756,6 +774,10 @@ ERROR_CODE start_service(struct service_t *service) {
     unregister_handler_file(service);
     unregister_handler_default(service);
     unregister_handler_dispatch(service);
+
+#ifdef VIRIATUM_PLATFORM_UNIX
+    join_workers(service);
+#endif
 
     /* raises no error */
     RAISE_NO_ERROR;
