@@ -175,9 +175,8 @@ void daemonize() {
     size_t pid_string_length;
 
 	/* allocates space for the file descriptors
-	of the output stream and the log file */
+	to be used to redirect the default stream */
 	int log_file;
-	int out_file;
 
     /* forks off the parent process, this
     is the main trick in the process */
