@@ -375,6 +375,9 @@ ERROR_CODE join_workers(struct service_t *service) {
         iteration ran) */
         join_count++;
     }
+
+    /* raises no error */
+    RAISE_NO_ERROR;
 }
 #endif
 
