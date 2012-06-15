@@ -683,19 +683,19 @@ ERROR_CODE _start_environ(PyObject *environ, struct http_parser_t *http_parser) 
     PyDict_SetItemString(environ, "REQUEST_METHOD", _value);
     Py_DECREF(_value);
 
-    _value = PyString_FromString(handler_wsgi_context->file_name);
+    _value = PyString_FromString((char *) handler_wsgi_context->file_name);
     PyDict_SetItemString(environ, "SCRIPT_NAME", _value);
     Py_DECREF(_value);
 
-    _value = PyString_FromString(handler_wsgi_context->url);
+    _value = PyString_FromString((char *) handler_wsgi_context->url);
     PyDict_SetItemString(environ, "PATH_INFO", _value);
     Py_DECREF(_value);
 
-    _value = PyString_FromString(handler_wsgi_context->query);
+    _value = PyString_FromString((char *) handler_wsgi_context->query);
     PyDict_SetItemString(environ, "QUERY_STRING", _value);
     Py_DECREF(_value);
 
-    _value = PyString_FromString(handler_wsgi_context->server_name);
+    _value = PyString_FromString((char *) handler_wsgi_context->server_name);
     PyDict_SetItemString(environ, "SERVER_NAME", _value);
     Py_DECREF(_value);
 
