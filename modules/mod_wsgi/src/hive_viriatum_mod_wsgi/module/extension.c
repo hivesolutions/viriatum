@@ -264,7 +264,7 @@ PyTypeObject input_type = {
     0,                                         /* tp_call */
     0,                                         /* tp_str */
     0,                                         /* tp_getattro */
-    0,                                           /* tp_setattro */
+    0,                                         /* tp_setattro */
     0,                                         /* tp_as_buffer */
 #if defined(Py_TPFLAGS_HAVE_ITER)
     Py_TPFLAGS_DEFAULT | Py_TPFLAGS_HAVE_ITER, /* tp_flags */
