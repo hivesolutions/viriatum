@@ -85,11 +85,11 @@ ERROR_CODE register_handler_dispatch(struct service_t *service) {
 
 #ifdef VIRIATUM_PCRE
     /* allocates space for the regex related variables,
-	this should include the location structure */
-	size_t index;
+    this should include the location structure */
+    size_t index;
     const char *error;
     int error_offset;
-	struct location_t *location;
+    struct location_t *location;
 #endif
 
     /* creates the http handler and then uses it to create
@@ -103,20 +103,20 @@ ERROR_CODE register_handler_dispatch(struct service_t *service) {
     http_handler->reset = NULL;
 
 #ifdef VIRIATUM_PCRE
-	/* sets the number of regular expressions as the number of
-	locations currently available in the service and then allocates
-	the required space for the regular expressions */
-	dispatch_handler->regex_count = service->locations.count;
-	dispatch_handler->regex = (pcre **) MALLOC(sizeof(pcre *) * dispatch_handler->regex_count);
-	dispatch_handler->names = (unsigned char **) MALLOC(sizeof(unsigned char *) * dispatch_handler->regex_count);
+    /* sets the number of regular expressions as the number of
+    locations currently available in the service and then allocates
+    the required space for the regular expressions */
+    dispatch_handler->regex_count = service->locations.count;
+    dispatch_handler->regex = (pcre **) MALLOC(sizeof(pcre *) * dispatch_handler->regex_count);
+    dispatch_handler->names = (unsigned char **) MALLOC(sizeof(unsigned char *) * dispatch_handler->regex_count);
 
-	/* iterates over all the locations in the service to compile
-	the associated regular expressions */
-	for(index = 0; index < service->locations.count; index++) {
-		location = &service->locations.values[index];
-		dispatch_handler->regex[index] = pcre_compile((char *) location->path, 0, &error, &error_offset, NULL);	
-		dispatch_handler->names[index] = location->handler;
-	}
+    /* iterates over all the locations in the service to compile
+    the associated regular expressions */
+    for(index = 0; index < service->locations.count; index++) {
+        location = &service->locations.values[index];
+        dispatch_handler->regex[index] = pcre_compile((char *) location->path, 0, &error, &error_offset, NULL);
+        dispatch_handler->names[index] = location->handler;
+    }
 #endif
 
     /* adds the http handler to the service */
@@ -191,9 +191,9 @@ ERROR_CODE url_callback_handler_dispatch(struct http_parser_t *http_parser, cons
     is done through static allocation */
     unsigned char path[VIRIATUM_MAX_URL_SIZE];
 
-	/* retrieves the various connection elements and lower substrates
-	fomr the parser parameters and then uses them to retrieves the handler
-	and the dispath handler to be used for dispatching */
+    /* retrieves the various connection elements and lower substrates
+    fomr the parser parameters and then uses them to retrieves the handler
+    and the dispath handler to be used for dispatching */
     struct connection_t *connection = (struct connection_t *) http_parser->parameters;
     struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
     struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
@@ -205,11 +205,11 @@ ERROR_CODE url_callback_handler_dispatch(struct http_parser_t *http_parser, cons
 
     /* checks the position of the get parameters divisor position
     and then uses it to calculate the size of the (base) path */
-	char *pointer = (char *) memchr((char *) data, '?', data_size);
+    char *pointer = (char *) memchr((char *) data, '?', data_size);
     size_t path_size = pointer == NULL ? data_size : pointer - (char *) data;
 
     /* copies the memory from the data to the path (partial url),
-	then puts the end of string in the path */
+    then puts the end of string in the path */
     memcpy(path, data, path_size);
     path[path_size] = '\0';
 

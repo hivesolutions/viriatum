@@ -39,7 +39,7 @@ ERROR_CODE create_mod_wsgi_http_handler(struct mod_wsgi_http_handler_t **mod_wsg
     /* sets the mod wsgi http handler attributes (default) values */
     mod_wsgi_http_handler->file_path = NULL;
     mod_wsgi_http_handler->reload = 0;
-	mod_wsgi_http_handler->module = NULL;
+    mod_wsgi_http_handler->module = NULL;
 
     /* sets the mod wsgi http handler in the upper http handler substrate */
     http_handler->lower = (void *) mod_wsgi_http_handler;
@@ -52,9 +52,9 @@ ERROR_CODE create_mod_wsgi_http_handler(struct mod_wsgi_http_handler_t **mod_wsg
 }
 
 ERROR_CODE delete_mod_wsgi_http_handler(struct mod_wsgi_http_handler_t *mod_wsgi_http_handler) {
-	/* in case the execution module is defined for the wsgi handler
-	it must be released by decrementing the reference count */
-	if(mod_wsgi_http_handler->module != NULL) { Py_DECREF(mod_wsgi_http_handler->module); }
+    /* in case the execution module is defined for the wsgi handler
+    it must be released by decrementing the reference count */
+    if(mod_wsgi_http_handler->module != NULL) { Py_DECREF(mod_wsgi_http_handler->module); }
 
     /* releases the mod wsgi http handler */
     FREE(mod_wsgi_http_handler);
@@ -443,9 +443,9 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
     size_t index;
     size_t count;
 
-	/* allocates space for the path to the file to be interpreted as the
-	application execution module */
-	char *file_path;
+    /* allocates space for the path to the file to be interpreted as the
+    application execution module */
+    char *file_path;
 
     /* allocates space for the reference to the buffer that will the initial
     (headers) part of the http message to be sent as response */
@@ -457,30 +457,30 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
     struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
     struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
     struct handler_wsgi_context_t *handler_wsgi_context = (struct handler_wsgi_context_t *) http_parser->context;
-	struct mod_wsgi_http_handler_t *mod_wsgi_http_handler = (struct mod_wsgi_http_handler_t *) http_connection->http_handler->lower;
+    struct mod_wsgi_http_handler_t *mod_wsgi_http_handler = (struct mod_wsgi_http_handler_t *) http_connection->http_handler->lower;
 
-	/* in case the reload flag is set and the module is already loaded must
-	release its memory and unset it from the handler */
-	if(mod_wsgi_http_handler->reload && mod_wsgi_http_handler->module) {
-		mod_wsgi_http_handler->module = NULL;
-	}
+    /* in case the reload flag is set and the module is already loaded must
+    release its memory and unset it from the handler */
+    if(mod_wsgi_http_handler->reload && mod_wsgi_http_handler->module) {
+        mod_wsgi_http_handler->module = NULL;
+    }
 
-	/* in cae the module is not defined, must be loaded again from the
-	file into the python interpreter */
-	if(mod_wsgi_http_handler->module == NULL) {
-		/* retrieves the correct file path for the module to be loaded
-		defaulting to the preddefined path in case none is defined */
-		file_path = mod_wsgi_http_handler->file_path == NULL
-			? DEFAULT_FILE_PATH : mod_wsgi_http_handler->file_path;
+    /* in cae the module is not defined, must be loaded again from the
+    file into the python interpreter */
+    if(mod_wsgi_http_handler->module == NULL) {
+        /* retrieves the correct file path for the module to be loaded
+        defaulting to the preddefined path in case none is defined */
+        file_path = mod_wsgi_http_handler->file_path == NULL
+            ? DEFAULT_FILE_PATH : mod_wsgi_http_handler->file_path;
 
-		/* loads the module as wsgi app from the provided file path and
-		then updates the module variable to contain a reference to it */
-		_load_module(
-			&mod_wsgi_http_handler->module,
-			"wsgi_app",
-			file_path
-		);
-	}
+        /* loads the module as wsgi app from the provided file path and
+        then updates the module variable to contain a reference to it */
+        _load_module(
+            &mod_wsgi_http_handler->module,
+            "wsgi_app",
+            file_path
+        );
+    }
 
     /* imports the wsgi module containing the util methos to be used by the
     application to access viriatum wsgi functions */
@@ -495,7 +495,7 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
     /* imports the associated (handler) module and retrieves
     its reference to be used for the calling, in case the
     reference is invalid raises an error */
-	module = mod_wsgi_http_handler->module;
+    module = mod_wsgi_http_handler->module;
     if(module == NULL) { RAISE_NO_ERROR; }
 
     /* retrieves the function to be used as handler for the
@@ -757,69 +757,69 @@ ERROR_CODE _start_environ(PyObject *environ, struct http_parser_t *http_parser) 
 }
 
 ERROR_CODE _load_module(PyObject **module_pointer, char *name, char *file_path) {
-	/* allocates space for the pointer to the file object to be
-	used for reading the module file */
-	FILE *file;
+    /* allocates space for the pointer to the file object to be
+    used for reading the module file */
+    FILE *file;
 
-	/* allocates space for the node to hold the root node of the
-	ast and to the code and module python objects */
-	struct _node *node;
-	PyObject *code;
-	PyObject *module;
+    /* allocates space for the node to hold the root node of the
+    ast and to the code and module python objects */
+    struct _node *node;
+    PyObject *code;
+    PyObject *module;
 
-	/* allocates space for the number of bytes for the file size
-	and for the buffer that will hold the file */
-	size_t number_bytes;
+    /* allocates space for the number of bytes for the file size
+    and for the buffer that will hold the file */
+    size_t number_bytes;
     size_t file_size;
-	char *file_buffer;
+    char *file_buffer;
 
-	/* resets the provided module pointer to the "default" invalid
-	value to provide error detection */
-	*module_pointer = NULL;
+    /* resets the provided module pointer to the "default" invalid
+    value to provide error detection */
+    *module_pointer = NULL;
 
-	/* opens the file for reading (in binary mode) and checks if
-	there was a problem opening it, raising an error in such case */
-	FOPEN(&file, file_path, "r");
-	if(file == NULL) { RAISE_NO_ERROR; }
+    /* opens the file for reading (in binary mode) and checks if
+    there was a problem opening it, raising an error in such case */
+    FOPEN(&file, file_path, "r");
+    if(file == NULL) { RAISE_NO_ERROR; }
 
     /* seeks the file until the end of the file and then
-	retrieves the current position as the size at the end
-	restores the file position back the beginning */
+    retrieves the current position as the size at the end
+    restores the file position back the beginning */
     fseek(file, 0, SEEK_END);
     file_size = ftell(file);
     fseek(file, 0, SEEK_SET);
 
     /* allocates space for the file buffer that will contain the
-	complete python file, this should be a null terminated string */
+    complete python file, this should be a null terminated string */
     file_buffer = (char *) MALLOC(file_size + 1);
     number_bytes = fread(file_buffer, 1, file_size, file);
-	file_buffer[number_bytes] = '\0';
+    file_buffer[number_bytes] = '\0';
 
-	/* parses the "just" read file using the python parser and then
-	closes the file to avoid any file memory leaking (possible problems) */
-	node = PyParser_SimpleParseString(file_buffer, Py_file_input);
-	fclose(file);
-	FREE(file_buffer);
+    /* parses the "just" read file using the python parser and then
+    closes the file to avoid any file memory leaking (possible problems) */
+    node = PyParser_SimpleParseString(file_buffer, Py_file_input);
+    fclose(file);
+    FREE(file_buffer);
 
-	/* in case the parsed node is not valid (something wrong occurred
-	while parsing the file) raises an error */
-	if(node == NULL) { RAISE_NO_ERROR; }
+    /* in case the parsed node is not valid (something wrong occurred
+    while parsing the file) raises an error */
+    if(node == NULL) { RAISE_NO_ERROR; }
 
-	/* compiles the top level node (ast) into a python code object
-	so that it can be executed */
-	code = (PyObject *) PyNode_Compile(node, file_path);
+    /* compiles the top level node (ast) into a python code object
+    so that it can be executed */
+    code = (PyObject *) PyNode_Compile(node, file_path);
     PyNode_Free(node);
-	if(code == NULL) { RAISE_NO_ERROR; }
+    if(code == NULL) { RAISE_NO_ERROR; }
 
-	/* executes the code in the code object provided, retrieveing the
-	module and setting it in the module pointer reference */
+    /* executes the code in the code object provided, retrieveing the
+    module and setting it in the module pointer reference */
     module = PyImport_ExecCodeModuleEx(name, code, file_path);
-	*module_pointer = module;
+    *module_pointer = module;
 
-	/* decrements the reference count in the code object so that it's
-	able to release itself */
+    /* decrements the reference count in the code object so that it's
+    able to release itself */
     Py_XDECREF(code);
 
-	/* raises no error */
-	RAISE_NO_ERROR;
+    /* raises no error */
+    RAISE_NO_ERROR;
 }

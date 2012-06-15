@@ -64,11 +64,11 @@ ERROR_CODE run_service(char *program_name, struct hash_map_t *arguments) {
     load_options_service(service, arguments);
     calculate_options_service(service);
 
-	/* calculates the locations structure for the service based
-	on the currently loaded configuration, this a complex operation */
-	calculate_locations_service(service);
+    /* calculates the locations structure for the service based
+    on the currently loaded configuration, this a complex operation */
+    calculate_locations_service(service);
 
-	/* starts the service */
+    /* starts the service */
     return_value = start_service(service);
 
     /* tests the error code for error */
@@ -138,7 +138,7 @@ ERROR_CODE register_signals() {
     signal(SIGQUIT, kill_handler);
     signal(SIGTERM, kill_handler);
 
-	/* registers the ignore action in the signal indicating
+    /* registers the ignore action in the signal indicating
     a broken pipe (unexpected close of socket) */
     signal(SIGPIPE, SIG_IGN);
 
@@ -178,9 +178,9 @@ void daemonize() {
     char pid_string[1024];
     size_t pid_string_length;
 
-	/* allocates space for the file descriptors
-	to be used to redirect the default stream */
-	int log_file;
+    /* allocates space for the file descriptors
+    to be used to redirect the default stream */
+    int log_file;
 
     /* forks off the parent process, this
     is the main trick in the process */
@@ -219,17 +219,17 @@ void daemonize() {
     fwrite(pid_string, sizeof(char), pid_string_length, pid_file);
     fclose(pid_file);
 
-	/* opens the log file and redirects the standard output stream
-	into it so that every log message is sent there */
-	log_file = open(VIRIATUM_LOG_PATH, O_CREAT | O_WRONLY | O_APPEND, 0640);
-	dup2(log_file, STDOUT_FILENO);
-	close(log_file);
+    /* opens the log file and redirects the standard output stream
+    into it so that every log message is sent there */
+    log_file = open(VIRIATUM_LOG_PATH, O_CREAT | O_WRONLY | O_APPEND, 0640);
+    dup2(log_file, STDOUT_FILENO);
+    close(log_file);
 
-	/* opens the error file and redirects the standard error stream
-	into it so that every error message is sent there */
-	log_file = open(VIRIATUM_LOG_E_PATH, O_CREAT | O_WRONLY | O_APPEND, 0640);
-	dup2(log_file, STDERR_FILENO);
-	close(log_file);
+    /* opens the error file and redirects the standard error stream
+    into it so that every error message is sent there */
+    log_file = open(VIRIATUM_LOG_E_PATH, O_CREAT | O_WRONLY | O_APPEND, 0640);
+    dup2(log_file, STDERR_FILENO);
+    close(log_file);
 
     /* closes the various pending streams from the
     daemon process (not going to output them) */
@@ -272,10 +272,10 @@ void execute_arguments(struct hash_map_t *arguments) {
     if(value != NULL) { daemonize(); }
     else { print_information(); }
 
-	/* registers the various kill signal handlers so that
-	in case such event happens it's possible to correctly
-	"destroy" the various internal structures and processes */
-	register_signals();
+    /* registers the various kill signal handlers so that
+    in case such event happens it's possible to correctly
+    "destroy" the various internal structures and processes */
+    register_signals();
 
     /* tries to retrieve the local argument from the arguments
     map in case the value exists localizes the current service

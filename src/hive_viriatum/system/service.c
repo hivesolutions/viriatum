@@ -48,7 +48,7 @@ void create_service(struct service_t **service_pointer, unsigned char *name, uns
     service->add_http_handler = add_http_handler_service;
     service->remove_http_handler = remove_http_handler_service;
     service->get_http_handler = get_http_handler_service;
-	service->locations.count = 0;
+    service->locations.count = 0;
 
     /* creates the service options */
     create_service_options(&service->options);
@@ -250,47 +250,47 @@ ERROR_CODE calculate_options_service(struct service_t *service) {
 }
 
 ERROR_CODE calculate_locations_service(struct service_t *service) {
-	struct iterator_t *iterator;
-	struct sort_map_t *location;
-	struct hash_map_element_t *element;
+    struct iterator_t *iterator;
+    struct sort_map_t *location;
+    struct hash_map_element_t *element;
 
-	struct location_t *_location;
+    struct location_t *_location;
 
-	unsigned char *name;
-	unsigned char *path;
-	unsigned char *handler;
-	int is_equal;
+    unsigned char *name;
+    unsigned char *path;
+    unsigned char *handler;
+    int is_equal;
 
-	struct sort_map_t *configuration = service->configuration;
-	create_element_iterator_sort_map(configuration, &iterator);
+    struct sort_map_t *configuration = service->configuration;
+    create_element_iterator_sort_map(configuration, &iterator);
 
-	while(1) {
-		get_next_iterator(iterator, (void **) &element);
-		if(element == NULL) { break; }
+    while(1) {
+        get_next_iterator(iterator, (void **) &element);
+        if(element == NULL) { break; }
 
-		is_equal = memcmp(element->key_string, "location:", sizeof("location:") - 1);
-		if(is_equal != 0) { continue; }
+        is_equal = memcmp(element->key_string, "location:", sizeof("location:") - 1);
+        if(is_equal != 0) { continue; }
 
-		get_value_string_sort_map(configuration, element->key_string, (void **) &location);
-		if(location == NULL) { continue; }
+        get_value_string_sort_map(configuration, element->key_string, (void **) &location);
+        if(location == NULL) { continue; }
 
-		get_value_string_sort_map(location, (unsigned char *) "path", (void **) &path);
-		if(path == NULL) { continue; }
+        get_value_string_sort_map(location, (unsigned char *) "path", (void **) &path);
+        if(path == NULL) { continue; }
 
-		get_value_string_sort_map(location, (unsigned char *) "handler", (void **) &handler);
-		if(handler == NULL) { continue; }
+        get_value_string_sort_map(location, (unsigned char *) "handler", (void **) &handler);
+        if(handler == NULL) { continue; }
 
-		name = &element->key_string[sizeof("location:") - 1];
+        name = &element->key_string[sizeof("location:") - 1];
 
-		_location = &service->locations.values[service->locations.count];
-		_location->name = name;
-		_location->path = path;
-		_location->handler = handler;
-		_location->configuration = location;
-		service->locations.count++;
-	}
+        _location = &service->locations.values[service->locations.count];
+        _location->name = name;
+        _location->path = path;
+        _location->handler = handler;
+        _location->configuration = location;
+        service->locations.count++;
+    }
 
-	delete_iterator_sort_map(configuration, iterator);
+    delete_iterator_sort_map(configuration, iterator);
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -323,16 +323,16 @@ ERROR_CODE calculate_locations_service(struct service_t *service) {
 
 #ifdef VIRIATUM_PLATFORM_UNIX
 ERROR_CODE create_workers(struct service_t *service) {
-	/* creates the variables to hold the current pid value and
-	the variable to hold the number of fork occurring */
+    /* creates the variables to hold the current pid value and
+    the variable to hold the number of fork occurring */
     unsigned int fork_count = 0;
     PID_TYPE pid = 0;
 
-	/* retrives the number of worker to be created from the options
-	of the provided service if this value is invalid returns immeditely */
+    /* retrives the number of worker to be created from the options
+    of the provided service if this value is invalid returns immeditely */
     struct service_options_t *service_options = service->options;
-	unsigned char worker_count = service_options->workers;
-	if(worker_count == 0) { RAISE_NO_ERROR; }
+    unsigned char worker_count = service_options->workers;
+    if(worker_count == 0) { RAISE_NO_ERROR; }
 
     /* iterates continuously for the forking of the
     current process (worker creation) */
@@ -355,9 +355,9 @@ ERROR_CODE create_workers(struct service_t *service) {
         forking of the worker processes */
         if(pid == 0) { break; }
 
-		/* sets the pid of the worker process as the
-		current pid (save for latter kill) */
-		service->worker_pids[fork_count] = pid;
+        /* sets the pid of the worker process as the
+        current pid (save for latter kill) */
+        service->worker_pids[fork_count] = pid;
 
         /* increments the fork count variable (one more
         iteration ran) */
@@ -366,7 +366,7 @@ ERROR_CODE create_workers(struct service_t *service) {
 
     /* checks if the current process is a worker (zero based
     pid value) or the master process and sets the service
-	process type accortin to this value */
+    process type accortin to this value */
     if(pid == 0) { service->process_type = WORKER_PROCESS; }
     else { service->process_type = MASTER_PROCESS; }
 
@@ -381,24 +381,24 @@ ERROR_CODE create_workers(struct service_t *service) {
 }
 
 ERROR_CODE join_workers(struct service_t *service) {
-	/* creates the variables to hold the current pid value and
-	the variable to hold the number of joins occurring */
+    /* creates the variables to hold the current pid value and
+    the variable to hold the number of joins occurring */
     unsigned int join_count = 0;
     PID_TYPE pid = 0;
 
-	/* allocates space for the variable that will hold the
-	status of the process aftwer the wait call */
-	int status;
+    /* allocates space for the variable that will hold the
+    status of the process aftwer the wait call */
+    int status;
 
-	/* retrives the number of worker to be "destroyed" from the options
-	of the provided service if this value is invalid returns immeditely */
+    /* retrives the number of worker to be "destroyed" from the options
+    of the provided service if this value is invalid returns immeditely */
     struct service_options_t *service_options = service->options;
-	unsigned char worker_count = service_options->workers;
-	if(worker_count == 0) { RAISE_NO_ERROR; }
+    unsigned char worker_count = service_options->workers;
+    if(worker_count == 0) { RAISE_NO_ERROR; }
 
-	/* in case the current process type for the service is not master
-	no need to join (and kill) the workers, it's not the responsible */
-	if(service->process_type != MASTER_PROCESS) { RAISE_NO_ERROR; }
+    /* in case the current process type for the service is not master
+    no need to join (and kill) the workers, it's not the responsible */
+    if(service->process_type != MASTER_PROCESS) { RAISE_NO_ERROR; }
 
     /* iterates continuously for the joining of the
     current process (worker creation) */
@@ -408,15 +408,15 @@ ERROR_CODE join_workers(struct service_t *service) {
         joining remaining */
         if(join_count == worker_count) { break; }
 
-		/* retrieves the pid of the worker to be "killed"
-		and then joined */
-		pid = service->worker_pids[join_count];
-		kill(pid, SIGINT);
+        /* retrieves the pid of the worker to be "killed"
+        and then joined */
+        pid = service->worker_pids[join_count];
+        kill(pid, SIGINT);
 
-		/* wiats for the process to exit it's existence
-		this may hang the current process in case there's
-		a problem in the child process */
-		waitpid(pid, &status, WUNTRACED);
+        /* wiats for the process to exit it's existence
+        this may hang the current process in case there's
+        a problem in the child process */
+        waitpid(pid, &status, WUNTRACED);
 
         /* increments the join count variable (one more
         iteration ran) */
