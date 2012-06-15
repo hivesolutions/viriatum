@@ -67,14 +67,14 @@ typedef struct php_request_t {
      * request, this header value is treated as
      * a special case by the php interpreter.
      */
-    char mime_type[1024];
+    char mime_type[VIRIATUM_MAX_HEADER_V_SIZE];
 
     /**
      * The matrix buffer containing the maximum
      * possible count for various headers for the
      * php interpreter.
      */
-    char headers[VIRIATUM_MAX_HEADER_COUNT][VIRIATUM_MAX_HEADER_SIZE];
+    char headers[VIRIATUM_MAX_HEADER_COUNT][VIRIATUM_MAX_HEADER_C_SIZE];
 
     /**
      * The number of headers currently present in

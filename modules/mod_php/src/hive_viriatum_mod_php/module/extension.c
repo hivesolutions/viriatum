@@ -117,13 +117,13 @@ char *_module_getenv(char *name, size_t size TSRMLS_DC) {
 }
 
 int _module_header(sapi_header_struct *header, sapi_header_op_enum operation, sapi_headers_struct *headers TSRMLS_DC) {
-    STRCPY(_php_request.headers[_php_request.header_count], 1024, header->header);
+    STRCPY(_php_request.headers[_php_request.header_count], VIRIATUM_MAX_HEADER_C_SIZE, header->header);
     _php_request.header_count++;
     return 0;
 }
 
 int _module_send_headers(sapi_headers_struct *headers TSRMLS_DC) {
-    STRCPY(_php_request.mime_type, 1024, headers->mimetype);
+	STRCPY(_php_request.mime_type, VIRIATUM_MAX_HEADER_V_SIZE, headers->mimetype);
     return SAPI_HEADER_SENT_SUCCESSFULLY;
 }
 
