@@ -218,13 +218,13 @@ void daemonize() {
 
 	/* opens the log file and redirects the standard output stream
 	into it so that every log message is sent there */
-	log_file = open("/var/log/viriatum.log", O_CREAT | O_WRONLY | O_APPEND, 0640);
+	log_file = open(VIRIATUM_LOG_PATH, O_CREAT | O_WRONLY | O_APPEND, 0640);
 	dup2(log_file, STDOUT_FILENO);
 	close(log_file);
 
 	/* opens the error file and redirects the standard error stream
 	into it so that every error message is sent there */
-	log_file = open("/var/log/viriatum.err", O_CREAT | O_WRONLY | O_APPEND, 0640);
+	log_file = open(VIRIATUM_ERROR_PATH, O_CREAT | O_WRONLY | O_APPEND, 0640);
 	dup2(log_file, STDERR_FILENO);
 	close(log_file);
 
@@ -234,8 +234,8 @@ void daemonize() {
 
 	/* prints the start of the log file to both output
 	stream (notification) */
-	PRINTF("----- Log File started ------\n");
-	PRINTF_E("----- Log File started ------\n");
+	PRINTF("[LOG] Log file started\n");
+	PRINTF_E("[LOG] Error file started\n");
 	fflush(stdout);
 }
 #endif
