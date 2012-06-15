@@ -29,7 +29,7 @@
 
 #include "ini.h"
 
-ERROR_CODE process_ini_file(char *file_path, struct hash_map_t **configuration_pointer) {
+ERROR_CODE process_ini_file(char *file_path, struct sort_map_t **configuration_pointer) {
     /* allocates space for the general (temporary) variables
     to be used durring the parsing of the file */
     ERROR_CODE return_value;
@@ -58,19 +58,19 @@ ERROR_CODE process_ini_file(char *file_path, struct hash_map_t **configuration_p
     struct ini_engine_t *ini_engine = &ini_engine_s;
     struct ini_handler_t *ini_handler = &ini_handler_s;
 
-    /* allocates space for the hash map to be used for
+    /* allocates space for the sort map to be used for
     the configuration to be created */
-    struct hash_map_t *configuration;
+    struct sort_map_t *configuration;
 
-    /* creates the hash map that will hold the various
+    /* creates the sort map that will hold the various
     arguments, then updates the configuration pointer
-    with the created configuration hash map */
-    create_hash_map(&configuration, 0);
+    with the created configuration sort map */
+    create_sort_map(&configuration, 0);
     *configuration_pointer = configuration;
 
     /* sets the various handlers for the ini settings
     parsing, they will be used to correctly update the
-    provided configuration hash map */
+    provided configuration sort map */
     ini_settings_s.on_section_start = NULL;
     ini_settings_s.on_section_end = _ini_section_end_callback;
     ini_settings_s.on_comment_start = NULL;
@@ -204,9 +204,9 @@ ERROR_CODE _ini_key_end_callback(struct ini_engine_t *ini_engine, const unsigned
 }
 
 ERROR_CODE _ini_value_end_callback(struct ini_engine_t *ini_engine, const unsigned char *pointer, size_t size) {
-    /* allocates space for the hash map reference to
+    /* allocates space for the sort map reference to
     hold the reference to the current section configuration */
-    struct hash_map_t *section_configuration;
+    struct sort_map_t *section_configuration;
 
     /* retrieves the ini handler from the template engine context
     then uses it to store the (current) value */
@@ -218,18 +218,18 @@ ERROR_CODE _ini_value_end_callback(struct ini_engine_t *ini_engine, const unsign
     /* tries to retrieve the current section configuration from the
     configuration in case it's not possible to retrieve it a new
     configuration map must be created */
-    get_value_string_hash_map(ini_handler->configuration, (unsigned char *) ini_handler->section, (void **) &section_configuration);
+    get_value_string_sort_map(ini_handler->configuration, (unsigned char *) ini_handler->section, (void **) &section_configuration);
     if(section_configuration == NULL) {
-        /* creates a new hash map to contain the section configuration
+        /* creates a new sort map to contain the section configuration
         and sets it under the current configuration variable in the ini
         handler for the current section name */
-        create_hash_map(&section_configuration, 0);
-        set_value_string_hash_map(ini_handler->configuration, (unsigned char *) ini_handler->section, section_configuration);
+        create_sort_map(&section_configuration, 0);
+        set_value_string_sort_map(ini_handler->configuration, (unsigned char *) ini_handler->section, section_configuration);
     }
 
     /* sets the current key and value under the current section configuration
     this is the main handler action */
-    set_value_string_hash_map(section_configuration, (unsigned char *) ini_handler->key, value);
+    set_value_string_sort_map(section_configuration, (unsigned char *) ini_handler->key, value);
 
     /* raises no error */
     RAISE_NO_ERROR;
