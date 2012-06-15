@@ -169,6 +169,11 @@ void daemonize() {
     char pid_string[1024];
     size_t pid_string_length;
 
+	/* allocates space for the file descriptors
+	of the output stream and the log file */
+	int log_file;
+	int out_file;
+
     /* forks off the parent process, this
     is the main trick in the process */
     pid = fork();
@@ -206,7 +211,11 @@ void daemonize() {
     fwrite(pid_string, sizeof(char), pid_string_length, pid_file);
     fclose(pid_file);
 
-	printf("Fez o forking para o daemon");
+ 	log_file = open("/viriatum.log", O_CREAT | O_RDWR, 0666);
+    out_file = dup(STDOUT_FILENO);
+	dup2(log_file, STDOUT_FILENO);
+
+	printf("ola mundo\n");
 
     /* closes the various pending streams from the
     daemon process (not going to output them) */
