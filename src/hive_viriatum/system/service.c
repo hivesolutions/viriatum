@@ -776,7 +776,7 @@ ERROR_CODE start_service(struct service_t *service) {
     unregister_handler_dispatch(service);
 
 #ifdef VIRIATUM_PLATFORM_UNIX
-    join_workers(service);
+    /*join_workers(service);*/
 #endif
 
     /* raises no error */
