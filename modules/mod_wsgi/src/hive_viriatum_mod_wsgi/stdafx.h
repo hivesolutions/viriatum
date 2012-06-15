@@ -38,6 +38,7 @@ unsigned char *description_viriatum_mod_wsgi();
 
 #include "undef.h"
 #include <Python.h>
+#include <node.h>
 #include "../../../../src/hive_viriatum/viriatum.h"
 #include "undef.h"
 
