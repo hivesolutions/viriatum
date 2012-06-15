@@ -114,7 +114,7 @@ ERROR_CODE register_handler_dispatch(struct service_t *service) {
 	the associated regular expressions */
 	for(index = 0; index < service->locations.count; index++) {
 		location = &service->locations.values[index];
-		dispatch_handler->regex[index] = pcre_compile(location->path, 0, &error, &error_offset, NULL);	
+		dispatch_handler->regex[index] = pcre_compile((char *) location->path, 0, &error, &error_offset, NULL);	
 		dispatch_handler->names[index] = location->handler;
 	}
 #endif
