@@ -191,6 +191,9 @@ ERROR_CODE url_callback_handler_dispatch(struct http_parser_t *http_parser, cons
     is done through static allocation */
     unsigned char path[VIRIATUM_MAX_URL_SIZE];
 
+	/* retrieves the various connection elements and lower substrates
+	fomr the parser parameters and then uses them to retrieves the handler
+	and the dispath handler to be used for dispatching */
     struct connection_t *connection = (struct connection_t *) http_parser->parameters;
     struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
     struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
@@ -208,7 +211,7 @@ ERROR_CODE url_callback_handler_dispatch(struct http_parser_t *http_parser, cons
     /* copies the memory from the data to the path (partial url),
 	then puts the end of string in the path */
     memcpy(path, data, path_size);
-    path[data_size] = '\0';
+    path[path_size] = '\0';
 
     /* sets the default handler, this is considered to be
     the fallback in case no handler is found */
@@ -220,7 +223,7 @@ ERROR_CODE url_callback_handler_dispatch(struct http_parser_t *http_parser, cons
     for(index = 0; index < dispatch_handler->regex_count; index++) {
         /* tries to match the current path against the registered
         regular expression in case it fails continues the loop */
-        matching = pcre_exec(dispatch_handler->regex[index], NULL, (char *) path, data_size, 0, 0, NULL, 0);
+        matching = pcre_exec(dispatch_handler->regex[index], NULL, (char *) path, path_size, 0, 0, NULL, 0);
         if(matching != 0) { continue; }
 
         /* sets the name of the handler as the name in the current index
