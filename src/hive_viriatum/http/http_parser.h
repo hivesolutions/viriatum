@@ -274,6 +274,12 @@ typedef ERROR_CODE (*http_callback) (struct http_parser_t *);
 typedef ERROR_CODE (*http_data_callback) (struct http_parser_t *, const unsigned char *, size_t);
 
 /**
+ * Callback function type used for callbacks that require
+ * "extra" indexes to be send as argument.
+ */
+typedef ERROR_CODE (*http_index_callback) (struct http_parser_t *, size_t, size_t);
+
+/**
  * Defines the various types of http request.
  */
 typedef enum http_request_type_e {
@@ -460,6 +466,7 @@ typedef struct http_settings_t {
     http_callback on_headers_complete;
     http_data_callback on_body;
     http_callback on_message_complete;
+	http_index_callback on_location;
 } http_settings;
 
 /**

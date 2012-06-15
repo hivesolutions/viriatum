@@ -181,6 +181,8 @@ ERROR_CODE url_callback_handler_dispatch(struct http_parser_t *http_parser, cons
 #ifdef VIRIATUM_PCRE
     int matching;
     size_t index;
+	int offsets[3] = { 0, 0, 0 };
+	char regex_match = 0;
 #endif
 
     /* allocates space for the name of the handler to be
@@ -223,12 +225,13 @@ ERROR_CODE url_callback_handler_dispatch(struct http_parser_t *http_parser, cons
     for(index = 0; index < dispatch_handler->regex_count; index++) {
         /* tries to match the current path against the registered
         regular expression in case it fails continues the loop */
-        matching = pcre_exec(dispatch_handler->regex[index], NULL, (char *) path, path_size, 0, 0, NULL, 0);
-        if(matching != 0) { continue; }
+        matching = pcre_exec(dispatch_handler->regex[index], NULL, (char *) path, path_size, 0, 0, offsets, 3);
+        if(matching < 0) { continue; }
 
         /* sets the name of the handler as the name in the current index
-        the breaks the loop to process it */
+        and updates the match flag and the breaks the loop to process it */
         handler_name = dispatch_handler->names[index];
+		regex_match = 1;
         break;
     }
 #endif
@@ -239,13 +242,19 @@ ERROR_CODE url_callback_handler_dispatch(struct http_parser_t *http_parser, cons
     get_value_string_hash_map(service->http_handlers_map, handler_name, (void **) &handler);
     if(handler) {
         /* retrieves the current handler and then unsets it
-        from the connection (detach) then sets the the prper
+        from the connection (detach) then sets the the proper
         handler in the connection and notifies it of the url */
         http_connection->http_handler->unset(http_connection);
         handler->set(http_connection);
         http_connection->http_handler = handler;
         http_connection->http_settings->on_message_begin(http_parser);
         http_connection->http_settings->on_url(http_parser, data, data_size);
+
+		/* in case there was a regex (location) match the dispatcher
+		must also notify the handler about the "new" location sending
+		both the index of the location in the service locations and the
+		offset in the matched path of the url for virtual path resolution */
+		if(regex_match) { http_connection->http_settings->on_location(http_parser, index, offsets[1]); }
     } else {
         /* prints an error message to the output */
         V_ERROR_F("Error retrieving '%s' handler reference\n", handler_name);
