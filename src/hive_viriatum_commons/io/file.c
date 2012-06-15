@@ -243,7 +243,16 @@ ERROR_CODE entries_to_map_file(struct linked_list_t *entries, struct linked_list
         date_time_string = MALLOC(17);
 
         /* creates the date time string for the file entry */
-        SPRINTF(date_time_string, 17, "%04d-%02d-%02d %02d:%02d", entry->time.year, entry->time.month, entry->time.day, entry->time.hour, entry->time.minute);
+        SPRINTF(
+			date_time_string,
+			17,
+			"%04d-%02d-%02d %02d:%02d",
+			entry->time.year,
+			entry->time.month,
+			entry->time.day,
+			entry->time.hour,
+			entry->time.minute
+		);
 
         /* creates the various types for the various entry values
         and sets them in the entry map for reference */
