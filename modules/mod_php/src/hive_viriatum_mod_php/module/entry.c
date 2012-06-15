@@ -213,7 +213,7 @@ ERROR_CODE _load_configuration(struct service_t *service, struct mod_php_http_ha
     /* allocates space for both a configuration item reference
     (value) and for the configuration to be retrieved */
     void *value;
-    struct hash_map_t *configuration;
+    struct sort_map_t *configuration;
 
     /* in case the current service configuration is not set
     must return immediately (not possible to load it) */
@@ -221,12 +221,12 @@ ERROR_CODE _load_configuration(struct service_t *service, struct mod_php_http_ha
 
     /* tries to retrieve the mod php section configuration from the configuration
     map in case none is found returns immediately no need to process anything more */
-    get_value_string_hash_map(service->configuration, (unsigned char *) "mod_php", (void **) &configuration);
+    get_value_string_sort_map(service->configuration, (unsigned char *) "mod_php", (void **) &configuration);
     if(configuration == NULL) { RAISE_NO_ERROR; }
 
     /* tries ro retrieve the base path from the php configuration and in
     case it exists sets it in the mod php handler (attribute reference change) */
-    get_value_string_hash_map(configuration, (unsigned char *) "base_path", &value);
+    get_value_string_sort_map(configuration, (unsigned char *) "base_path", &value);
     if(value != NULL) { mod_php_http_handler->base_path = (char *) value; }
 
     /* raises no error */
