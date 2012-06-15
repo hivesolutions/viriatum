@@ -291,6 +291,9 @@ ERROR_CODE calculate_locations_service(struct service_t *service) {
 	}
 
 	delete_iterator_sort_map(configuration, iterator);
+
+    /* raises no error */
+    RAISE_NO_ERROR;
 }
 
 
