@@ -187,9 +187,9 @@ ERROR_CODE url_callback_handler_dispatch(struct http_parser_t *http_parser, cons
     used for the dispatching operation (target handler) */
     unsigned char *handler_name;
 
-    /* allocates the required space for the url, this
+    /* allocates the required space for the path, this
     is done through static allocation */
-    unsigned char url[VIRIATUM_MAX_URL_SIZE];
+    unsigned char path[VIRIATUM_MAX_URL_SIZE];
 
     struct connection_t *connection = (struct connection_t *) http_parser->parameters;
     struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
@@ -200,10 +200,15 @@ ERROR_CODE url_callback_handler_dispatch(struct http_parser_t *http_parser, cons
     struct dispatch_handler_t *dispatch_handler = (struct dispatch_handler_t *) handler->lower;
 #endif
 
-    /* copies the memory from the data to the url, then
-    puts the end of string in the url */
-    memcpy(url, data, data_size);
-    url[data_size] = '\0';
+    /* checks the position of the get parameters divisor position
+    and then uses it to calculate the size of the (base) path */
+	char *pointer = (char *) memchr((char *) data, '?', data_size);
+    size_t path_size = pointer == NULL ? data_size : pointer - (char *) data;
+
+    /* copies the memory from the data to the path (partial url),
+	then puts the end of string in the path */
+    memcpy(path, data, path_size);
+    path[data_size] = '\0';
 
     /* sets the default handler, this is considered to be
     the fallback in case no handler is found */
@@ -211,11 +216,11 @@ ERROR_CODE url_callback_handler_dispatch(struct http_parser_t *http_parser, cons
 
 #ifdef VIRIATUM_PCRE
     /* iterates over all the regular expressions so that they
-    may be tested agains the current url */
+    may be tested agains the current path */
     for(index = 0; index < dispatch_handler->regex_count; index++) {
-        /* tries to match the current url agains the registered
+        /* tries to match the current path against the registered
         regular expression in case it fails continues the loop */
-        matching = pcre_exec(dispatch_handler->regex[index], NULL, (char *) url, data_size, 0, 0, NULL, 0);
+        matching = pcre_exec(dispatch_handler->regex[index], NULL, (char *) path, data_size, 0, 0, NULL, 0);
         if(matching != 0) { continue; }
 
         /* sets the name of the handler as the name in the current index
