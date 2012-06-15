@@ -231,12 +231,6 @@ void daemonize() {
     /* closes the various pending streams from the
     daemon process (not going to output them) */
     close(STDIN_FILENO);
-
-	/* prints the start of the log file to both output
-	stream (notification) */
-	PRINTF("[LOG] Log file started\n");
-	PRINTF_E("[LOG] Error file started\n");
-	fflush(stdout);
 }
 #endif
 
