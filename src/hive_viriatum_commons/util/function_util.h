@@ -27,7 +27,4 @@
 
 #pragma once
 
-#include "arguments_util.h"
-#include "dump_util.h"
-#include "function_util.h"
-#include "string_util.h"
+#define CALL_V(callback, ...) if(callback != NULL) { callback(__VA_ARGS__); }
