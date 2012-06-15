@@ -213,7 +213,7 @@ void daemonize() {
 
 	/* opens the log file and redirect the standard output stream
 	into it so that every log message is sent there */
-	log_file = open("/viriatum.log", O_CREAT | O_WRONLY, 0666);
+	log_file = open("/viriatum.log", O_CREAT | O_WRONLY | O_APPEND, 0666);
 	out_file = dup(STDOUT_FILENO);
 	dup2(log_file, STDOUT_FILENO);
 	close(log_file);
