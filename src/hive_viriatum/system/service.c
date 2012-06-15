@@ -364,7 +364,7 @@ ERROR_CODE join_workers(struct service_t *service) {
 		pid = service->worker_pids[join_count];
 		kill(pid, SIGINT);
 
-		printf("joining %d", pid);
+		printf("joining %d\n", pid);
 
 		/* wiats for the process to exit it's existence
 		this may hang the current process in case there's
