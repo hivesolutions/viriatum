@@ -39,6 +39,7 @@ ERROR_CODE create_mod_wsgi_http_handler(struct mod_wsgi_http_handler_t **mod_wsg
     /* sets the mod wsgi http handler attributes (default) values */
     mod_wsgi_http_handler->file_path = NULL;
     mod_wsgi_http_handler->reload = 0;
+	mod_wsgi_http_handler->module = NULL;
 
     /* sets the mod wsgi http handler in the upper http handler substrate */
     http_handler->lower = (void *) mod_wsgi_http_handler;
@@ -51,6 +52,10 @@ ERROR_CODE create_mod_wsgi_http_handler(struct mod_wsgi_http_handler_t **mod_wsg
 }
 
 ERROR_CODE delete_mod_wsgi_http_handler(struct mod_wsgi_http_handler_t *mod_wsgi_http_handler) {
+	/* in case the execution module is defined for the wsgi handler
+	it must be released by decrementing the reference count */
+	if(mod_wsgi_http_handler->module != NULL) { Py_DECREF(mod_wsgi_http_handler->module); }
+
     /* releases the mod wsgi http handler */
     FREE(mod_wsgi_http_handler);
 
@@ -442,10 +447,40 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
     (headers) part of the http message to be sent as response */
     char *headers_buffer;
 
+	/* allocates space for the path to the file to be interpreted as the
+	application execution module */
+	char *file_path;
+
     /* retrieves the connection from the http parser parameters
-    and then retrieves the handler wsgi context */
+    and then retrieves the handler wsgi context and mod wsgi handler */
     struct connection_t *connection = (struct connection_t *) http_parser->parameters;
+    struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
+    struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
     struct handler_wsgi_context_t *handler_wsgi_context = (struct handler_wsgi_context_t *) http_parser->context;
+	struct mod_wsgi_http_handler_t *mod_wsgi_http_handler = (struct mod_wsgi_http_handler_t *) http_connection->http_handler->lower;
+
+	/* in case the reload flag is set and the module is already loaded must
+	release its memory and unset it from the handler */
+	if(mod_wsgi_http_handler->reload && mod_wsgi_http_handler->module) {
+		mod_wsgi_http_handler->module = NULL;
+	}
+
+	/* in cae the module is not defined, must be loaded again from the
+	file into the python interpreter */
+	if(mod_wsgi_http_handler->module == NULL) {
+		/* retrieves the correct file path for the module to be loaded
+		defaulting to the preddefined path in case none is defined */
+		file_path = mod_wsgi_http_handler->file_path == NULL
+			? DEFAULT_FILE_PATH : mod_wsgi_http_handler->file_path;
+
+		/* loads the module as wsgi app from the provided file path and
+		then updates the module variable to contain a reference to it */
+		_load_module(
+			&mod_wsgi_http_handler->module,
+			"wsgi_app",
+			mod_wsgi_http_handler->file_path
+		);
+	}
 
     /* imports the wsgi module containing the util methos to be used by the
     application to access viriatum wsgi functions */
@@ -460,7 +495,7 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
     /* imports the associated (handler) module and retrieves
     its reference to be used for the calling, in case the
     reference is invalid raises an error */
-    _load_module(&module, "wsgi_app", "wsgi_demo.py");
+	module = mod_wsgi_http_handler->module;
     if(module == NULL) { RAISE_NO_ERROR; }
 
     /* retrieves the function to be used as handler for the
@@ -737,6 +772,10 @@ ERROR_CODE _load_module(PyObject **module_pointer, char *name, char *file_path) 
 	size_t number_bytes;
     size_t file_size;
 	char *file_buffer;
+
+	/* resets the provided module pointer to the "default" invalid
+	value to provide error detection */
+	*module_pointer = NULL;
 
 	/* opens the file for reading (in binary mode) and checks if
 	there was a problem opening it, raising an error in such case */
