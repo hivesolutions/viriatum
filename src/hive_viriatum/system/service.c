@@ -355,8 +355,11 @@ ERROR_CODE join_workers(struct service_t *service) {
 		/* retrieves the pid of the worker to be "killed"
 		and then joined */
 		pid = service->worker_pids[join_count];
-		kill(pid, SIGHUP);
+		kill(pid, SIGINT);
 
+		/* wiats for the process to exit it's existence
+		this may hang the current process in case there's
+		a problem in the child process */
 		waitpid(pid, &status, WUNTRACED);
 
         /* increments the join count variable (one more
@@ -776,7 +779,7 @@ ERROR_CODE start_service(struct service_t *service) {
     unregister_handler_dispatch(service);
 
 #ifdef VIRIATUM_PLATFORM_UNIX
-    /*join_workers(service);*/
+    join_workers(service);
 #endif
 
     /* raises no error */
