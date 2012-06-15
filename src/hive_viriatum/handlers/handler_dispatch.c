@@ -181,8 +181,9 @@ ERROR_CODE url_callback_handler_dispatch(struct http_parser_t *http_parser, cons
 #ifdef VIRIATUM_PCRE
     int matching;
     size_t index;
-	int offsets[3] = { 0, 0, 0 };
-	char regex_match = 0;
+    size_t match_size;
+    int offsets[3] = { 0, 0, 0 };
+    char regex_match = 0;
 #endif
 
     /* allocates space for the name of the handler to be
@@ -231,7 +232,8 @@ ERROR_CODE url_callback_handler_dispatch(struct http_parser_t *http_parser, cons
         /* sets the name of the handler as the name in the current index
         and updates the match flag and the breaks the loop to process it */
         handler_name = dispatch_handler->names[index];
-		regex_match = 1;
+        regex_match = 1;
+        match_size = (size_t) offsets[1];
         break;
     }
 #endif
@@ -247,14 +249,17 @@ ERROR_CODE url_callback_handler_dispatch(struct http_parser_t *http_parser, cons
         http_connection->http_handler->unset(http_connection);
         handler->set(http_connection);
         http_connection->http_handler = handler;
-        http_connection->http_settings->on_message_begin(http_parser);
-        http_connection->http_settings->on_url(http_parser, data, data_size);
+        CALL_V(http_connection->http_settings->on_message_begin, http_parser);
+        CALL_V(http_connection->http_settings->on_url, http_parser, data, data_size);
 
-		/* in case there was a regex (location) match the dispatcher
-		must also notify the handler about the "new" location sending
-		both the index of the location in the service locations and the
-		offset in the matched path of the url for virtual path resolution */
-		if(regex_match) { http_connection->http_settings->on_location(http_parser, index, offsets[1]); }
+        /* in case there was a regex (location) match the dispatcher
+        must also notify the handler about the "new" location sending
+        both the index of the location in the service locations and the
+        offset in the matched path of the url for virtual path resolution */
+        if(regex_match) {
+            CALL_V(http_connection->http_settings->on_location, http_parser, index, match_size);
+            CALL_V(http_connection->http_settings->on_virtual_url, http_parser, data + match_size, data_size - match_size);
+        }
     } else {
         /* prints an error message to the output */
         V_ERROR_F("Error retrieving '%s' handler reference\n", handler_name);
