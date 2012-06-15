@@ -64,7 +64,11 @@ ERROR_CODE run_service(char *program_name, struct hash_map_t *arguments) {
     load_options_service(service, arguments);
     calculate_options_service(service);
 
-    /* starts the service */
+	/* calculates the locations structure for the service based
+	on the currently loaded configuration, this a complex operation */
+	calculate_locations_service(service);
+
+	/* starts the service */
     return_value = start_service(service);
 
     /* tests the error code for error */
