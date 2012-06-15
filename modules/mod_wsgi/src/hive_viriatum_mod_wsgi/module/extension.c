@@ -121,7 +121,7 @@ PyObject *wsgi_start_response(PyObject *self, PyObject *args) {
 
         /* formats the header into the "normal" format and sets
         it under the headers buffer in the wsgi request */
-        SPRINTF(_wsgi_request.headers[_wsgi_request.header_count], 1024, "%s: %s", _header_name, _header_value);
+        SPRINTF(_wsgi_request.headers[_wsgi_request.header_count], VIRIATUM_MAX_HEADER_C_SIZE, "%s: %s", _header_name, _header_value);
         _wsgi_request.header_count++;
 
         /* updates the reference count of the various elements

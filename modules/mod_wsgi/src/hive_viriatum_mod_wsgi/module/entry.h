@@ -83,7 +83,7 @@ typedef struct wsgi_request_t {
      * possible count for various headers for the
      * wsgi interpreter.
      */
-    char headers[VIRIATUM_MAX_HEADER_COUNT][VIRIATUM_MAX_HEADER_SIZE];
+    char headers[VIRIATUM_MAX_HEADER_COUNT][VIRIATUM_MAX_HEADER_C_SIZE];
 
     /**
      * The number of headers currently present in
