@@ -357,7 +357,7 @@ ERROR_CODE join_workers(struct service_t *service) {
         /* in case the number of joins is the same
         as the worker count, breaks the loop no more
         joining remaining */
-        if(fork_count == worker_count) { break; }
+        if(join_count == worker_count) { break; }
 
 		/* retrieves the pid of the worker to be "killed"
 		and then joined */
