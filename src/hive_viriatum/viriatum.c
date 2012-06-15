@@ -119,6 +119,9 @@ ERROR_CODE ran_service() {
 }
 
 void kill_handler(int signal_number) {
+	printf("APAHOU SIGNAL\n");
+	fflush(stdout);
+
     /* defaults the signal handler (only one handling) */
     signal(signal_number, SIG_DFL);
 
