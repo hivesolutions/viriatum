@@ -134,8 +134,8 @@ static __inline char *get_config_path() {
 #ifndef VIRIATUM_LOG_PATH
 #define VIRIATUM_LOG_PATH "/var/log/viriatum.log"
 #endif
-#ifndef VIRIATUM_ERROR_PATH
-#define VIRIATUM_ERROR_PATH "/var/log/viriatum.err"
+#ifndef VIRIATUM_LOG_E_PATH
+#define VIRIATUM_LOG_E_PATH "/var/log/viriatum.err"
 #endif
 #ifndef VIRIATUM_CONFIG_PATH
 #define VIRIATUM_CONFIG_PATH "/etc/viriatum"

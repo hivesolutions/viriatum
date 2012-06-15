@@ -224,7 +224,7 @@ void daemonize() {
 
 	/* opens the error file and redirects the standard error stream
 	into it so that every error message is sent there */
-	log_file = open(VIRIATUM_ERROR_PATH, O_CREAT | O_WRONLY | O_APPEND, 0640);
+	log_file = open(VIRIATUM_LOG_E_PATH, O_CREAT | O_WRONLY | O_APPEND, 0640);
 	dup2(log_file, STDERR_FILENO);
 	close(log_file);
 
