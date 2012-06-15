@@ -203,6 +203,30 @@ ERROR_CODE error_module(unsigned char **message_pointer) {
 }
 
 ERROR_CODE _load_configuration(struct service_t *service, struct mod_wsgi_http_handler_t *mod_wsgi_http_handler) {
+    /* allocates space for both a configuration item reference
+    (value) and for the configuration to be retrieved */
+    void *value;
+    struct hash_map_t *configuration;
+
+    /* in case the current service configuration is not set
+    must return immediately (not possible to load it) */
+    if(service->configuration == NULL) { RAISE_NO_ERROR; }
+
+    /* tries to retrieve the mod wsgi section configuration from the configuration
+    map in case none is found returns immediately no need to process anything more */
+    get_value_string_hash_map(service->configuration, (unsigned char *) "mod_wsgi", (void **) &configuration);
+    if(configuration == NULL) { RAISE_NO_ERROR; }
+
+    /* tries ro retrieve the script path from the wsgi configuration and in
+    case it exists sets it in the mod wsgi handler (attribute reference change) */
+    get_value_string_hash_map(configuration, (unsigned char *) "script_path", &value);
+    if(value != NULL) { mod_wsgi_http_handler->file_path = (char *) value; }
+
+    /* tries to retrieve the script argument from the arguments map, then
+    sets the reload (boolean) value for the service */
+    get_value_string_hash_map(configuration, (unsigned char *) "script_reload", &value);
+    if(value != NULL) { mod_wsgi_http_handler->reload = atoi(((struct argument_t *) value)->value); }
+
     /* raises no error */
     RAISE_NO_ERROR;
 }
@@ -243,10 +267,10 @@ ERROR_CODE _reload_wsgi_state() {
 }
 
 ERROR_CODE _start_wsgi_state() {
-	/* allocates space for the reference to the to be created
-	wsgi module and the type to be exported */
-	PyObject *wsgi_module;
-	PyTypeObject *type;
+    /* allocates space for the reference to the to be created
+    wsgi module and the type to be exported */
+    PyObject *wsgi_module;
+    PyTypeObject *type;
 
     /* retrieves the system path list and then appends
     the various relative local paths into in */
@@ -257,10 +281,10 @@ ERROR_CODE _start_wsgi_state() {
 
     /* registers the viriatum wsgi module in the python interpreter
     this module may be used to provide wsgi functions */
-	wsgi_module = Py_InitModule("viriatum_wsgi", wsgi_methods);
+    wsgi_module = Py_InitModule("viriatum_wsgi", wsgi_methods);
 
-	/* checks the input type for readyness and then casts the
-	type as a python type and registers it as input */
+    /* checks the input type for readyness and then casts the
+    type as a python type and registers it as input */
     PyType_Ready(&input_type);
     type = &input_type;
     PyModule_AddObject(wsgi_module, "input", (PyObject *) type);

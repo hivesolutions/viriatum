@@ -54,7 +54,7 @@ typedef struct http_header_value_t {
 
 typedef struct http_headers_t {
     struct http_header_value_t values[VIRIATUM_MAX_HEADER_COUNT];
-	size_t count;
+    size_t count;
 } http_headers_value;
 
 typedef struct http_request_t {

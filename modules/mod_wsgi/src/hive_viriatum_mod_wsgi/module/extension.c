@@ -163,98 +163,91 @@ PyObject *wsgi_write(PyObject *self, PyObject *args) {
     return Py_BuildValue("i", 0);
 }
 
-
-
-
-
-
-
-struct wsgi_input_t *_new_wsgi_input(unsigned char *post_data, size_t size) {
-	struct wsgi_input_t *self;
+PyObject *_new_wsgi_input(unsigned char *post_data, size_t size) {
+    struct wsgi_input_t *self;
 
     self = PyObject_New(struct wsgi_input_t, &input_type);
-	self->post_data = post_data;
-	self->size = size;
-	self->position = 0;
+    self->post_data = post_data;
+    self->size = size;
+    self->position = 0;
 
-	return self;
+    return (PyObject *) self;
 }
 
 PyObject *new_wsgi_input(PyObject *args) {
-	return (PyObject *) _new_wsgi_input(NULL, 0);
+    return (PyObject *) _new_wsgi_input(NULL, 0);
 }
 
 void dealloc_wsgi_input(PyObject *self) {
-	PyObject_Del(self);
+    PyObject_Del(self);
 }
 
 PyObject *wsgi_input_iter(PyObject *self, PyObject *args) {
-	Py_RETURN_NONE;
+    Py_RETURN_NONE;
 }
 
 PyObject *wsgi_input_iternext(PyObject *self, PyObject *args) {
-	Py_RETURN_NONE;
+    Py_RETURN_NONE;
 }
 
 PyObject *wsgi_input_close(PyObject *self, PyObject *args) {
-	Py_RETURN_NONE;
+    Py_RETURN_NONE;
 }
 
 PyObject *wsgi_input_read(PyObject *self, PyObject *args) {
-	struct wsgi_input_t *_self = (struct wsgi_input_t *) self;
+    struct wsgi_input_t *_self = (struct wsgi_input_t *) self;
 
-	size_t remaining = _self->size - _self->position;
-	PyObject *buffer = PyString_FromStringAndSize(&_self->post_data[_self->position], remaining);
-	_self->position += remaining;
+    size_t remaining = _self->size - _self->position;
+    PyObject *buffer = PyString_FromStringAndSize(&_self->post_data[_self->position], remaining);
+    _self->position += remaining;
 
-	return buffer;
+    return buffer;
 }
 
 PyObject *wsgi_input_readline(PyObject *self, PyObject *args) {
-	Py_RETURN_NONE;
+    Py_RETURN_NONE;
 }
 
 PyObject *wsgi_input_readlines(PyObject *self, PyObject *args) {
-	Py_RETURN_NONE;
+    Py_RETURN_NONE;
 }
 
 PyMethodDef input_methods[5] = {
     {
-		"close",
-		(PyCFunction) wsgi_input_close,
-		METH_VARARGS,
-		0
-	},
+        "close",
+        (PyCFunction) wsgi_input_close,
+        METH_VARARGS,
+        0
+    },
     {
-		"read",
-		(PyCFunction) wsgi_input_read,
-		METH_VARARGS,
-		0
-	},
+        "read",
+        (PyCFunction) wsgi_input_read,
+        METH_VARARGS,
+        0
+    },
     {
-		"readline",
-		(PyCFunction) wsgi_input_readline,
-		METH_VARARGS,
-		0
-	},
+        "readline",
+        (PyCFunction) wsgi_input_readline,
+        METH_VARARGS,
+        0
+    },
     {
-		"readlines",
-		(PyCFunction) wsgi_input_readlines,
-		METH_VARARGS,
-		0 
-	},
+        "readlines",
+        (PyCFunction) wsgi_input_readlines,
+        METH_VARARGS,
+        0
+    },
     {
-		NULL,
+        NULL,
         NULL,
         0,
         NULL
-	}
+    }
 };
 
-
 PyTypeObject input_type = {
-	PyObject_HEAD_INIT(NULL)
-	0,
+    PyObject_HEAD_INIT(NULL)
+    0,
     "viriatum_wsgi.input",                     /* tp_name */
     sizeof(struct wsgi_input_t),               /* tp_basicsize */
     0,                                         /* tp_itemsize*/
@@ -271,7 +264,7 @@ PyTypeObject input_type = {
     0,                                         /* tp_call */
     0,                                         /* tp_str */
     0,                                         /* tp_getattro */
-    0,										   /* tp_setattro */
+    0,                                           /* tp_setattro */
     0,                                         /* tp_as_buffer */
 #if defined(Py_TPFLAGS_HAVE_ITER)
     Py_TPFLAGS_DEFAULT | Py_TPFLAGS_HAVE_ITER, /* tp_flags */
@@ -299,14 +292,3 @@ PyTypeObject input_type = {
     0,                                         /* tp_free */
     0,                                         /* tp_is_gc */
 };
-
-
-
-
-
-
-
-
-
-
-
