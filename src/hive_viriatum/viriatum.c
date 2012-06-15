@@ -119,9 +119,6 @@ ERROR_CODE ran_service() {
 }
 
 void kill_handler(int signal_number) {
-	printf("APAHOU SIGNAL\n");
-	fflush(stdout);
-
     /* defaults the signal handler (only one handling) */
     signal(signal_number, SIG_DFL);
 
@@ -129,11 +126,7 @@ void kill_handler(int signal_number) {
     ran_service();
 }
 
-ERROR_CODE print_information() {
-    /* retrieves the viriatum version and description */
-    unsigned char *version = version_viriatum();
-    unsigned char *description = description_viriatum();
-
+ERROR_CODE register_signals() {
     /* registers the kill handler for the various signals
     associated with the "destroy" operation */
     signal(SIGHUP, kill_handler);
@@ -141,9 +134,18 @@ ERROR_CODE print_information() {
     signal(SIGQUIT, kill_handler);
     signal(SIGTERM, kill_handler);
 
-    /* registers the ignore action in the signal indicating
+	/* registers the ignore action in the signal indicating
     a broken pipe (unexpected close of socket) */
     signal(SIGPIPE, SIG_IGN);
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE print_information() {
+    /* retrieves the viriatum version and description */
+    unsigned char *version = version_viriatum();
+    unsigned char *description = description_viriatum();
 
     /* prints a message */
     V_PRINT_F("%s %s (%s, %s) [%s %s %d bit (%s)] on %s\n", description, version, VIRIATUM_COMPILATION_DATE, VIRIATUM_COMPILATION_TIME, VIRIATUM_COMPILER, VIRIATUM_COMPILER_VERSION_STRING, (int) VIRIATUM_PLATFORM_CPU_BITS, VIRIATUM_PLATFORM_CPU, VIRIATUM_PLATFORM_STRING);
@@ -267,6 +269,11 @@ void execute_arguments(struct hash_map_t *arguments) {
     if(value != NULL) { daemonize(); }
     else { print_information(); }
 
+	/* registers the various kill signal handlers so that
+	in case such event happens it's possible to correctly
+	"destroy" the various internal structures and processes */
+	register_signals();
+
     /* tries to retrieve the local argument from the arguments
     map in case the value exists localizes the current service
     so that any file read is read from the current directory */
@@ -332,9 +339,6 @@ int main(int argc, char *argv[]) {
 
     /* prints a debug message */
     V_DEBUG("Finishing process\n");
-
-	printf("ACABOU PROCESSO\n");
-	fflush(stdout);
 
     /* returns zero (valid) */
     return 0;
