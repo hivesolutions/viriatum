@@ -344,7 +344,15 @@ ERROR_CODE get_write_time_file(char *file_path, struct date_time_t *date_time) {
     HANDLE file_handle;
 
     /* retrieves the file for reading in the requested file path */
-    file_handle = CreateFile(file_path, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL|FILE_FLAG_BACKUP_SEMANTICS, NULL);
+    file_handle = CreateFile(
+		file_path,
+		GENERIC_READ,
+		FILE_SHARE_READ,
+		NULL,
+		OPEN_EXISTING,
+		FILE_ATTRIBUTE_NORMAL | FILE_FLAG_BACKUP_SEMANTICS,
+		NULL
+	);
 
     /* in case the created file handle is not valid */
     if(file_handle == INVALID_HANDLE_VALUE) {
