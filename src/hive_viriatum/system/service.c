@@ -283,7 +283,6 @@ ERROR_CODE create_workers(struct service_t *service) {
 	of the provided service if this value is invalid return immeditely */
     struct service_options_t *service_options = service->options;
 	unsigned char worker_count = service_options->workers;
-	if(worker_count == NULL) { RAISE_NO_ERROR; }
 	if(worker_count == 0) { RAISE_NO_ERROR; }
 
     /* iterates continuously for the forking of the
@@ -328,8 +327,8 @@ ERROR_CODE create_workers(struct service_t *service) {
 
 void join_workers(struct service_t *service) {
 	/* creates the variables to hold the current pid value and
-	the variable to hold the number of fork occurring */
-    unsigned int fork_count = 0;
+	the variable to hold the number of joins occurring */
+    unsigned int join_count = 0;
     PID_TYPE pid = 0;
 
 	/* retrives the number of worker to be created from the options
@@ -338,6 +337,14 @@ void join_workers(struct service_t *service) {
 	unsigned char worker_count = service_options->workers;
 	if(worker_count == NULL) { RAISE_NO_ERROR; }
 	if(worker_count == 0) { RAISE_NO_ERROR; }
+
+    /* iterates continuously for the joining of the
+    current process (worker creation) */
+    while(1) {
+        /* increments the join count variable (one more
+        iteration ran) */
+        join_count++;
+    }
 }
 #endif
 
