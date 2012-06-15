@@ -215,3 +215,4 @@ ERROR_CODE _message_begin_callback_handler_module(struct http_parser_t *http_par
 ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser);
 ERROR_CODE _send_response_callback_handler_module(struct connection_t *connection, struct data_t *data, void *parameters);
 ERROR_CODE _start_environ(PyObject *environ, struct http_parser_t *http_parser);
+ERROR_CODE _load_module(PyObject **module_pointer, char *name, char *file_path);
