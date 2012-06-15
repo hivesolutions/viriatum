@@ -443,13 +443,13 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
     size_t index;
     size_t count;
 
-    /* allocates space for the reference to the buffer that will the initial
-    (headers) part of the http message to be sent as response */
-    char *headers_buffer;
-
 	/* allocates space for the path to the file to be interpreted as the
 	application execution module */
 	char *file_path;
+
+    /* allocates space for the reference to the buffer that will the initial
+    (headers) part of the http message to be sent as response */
+    char *headers_buffer;
 
     /* retrieves the connection from the http parser parameters
     and then retrieves the handler wsgi context and mod wsgi handler */
