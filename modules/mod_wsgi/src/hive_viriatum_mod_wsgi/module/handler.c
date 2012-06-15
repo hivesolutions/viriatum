@@ -699,7 +699,7 @@ ERROR_CODE _start_environ(PyObject *environ, struct http_parser_t *http_parser) 
     PyDict_SetItemString(environ, "SERVER_NAME", _value);
     Py_DECREF(_value);
 
-    _value = PyString_FromString(port);
+    _value = PyString_FromString((char *) port);
     PyDict_SetItemString(environ, "SERVER_PORT", _value);
     Py_DECREF(_value);
 
@@ -708,13 +708,13 @@ ERROR_CODE _start_environ(PyObject *environ, struct http_parser_t *http_parser) 
     Py_DECREF(_value);
 
     if(handler_wsgi_context->_content_type_string.length > 0) {
-        _value = PyString_FromString(handler_wsgi_context->content_type);
+        _value = PyString_FromString((char *) handler_wsgi_context->content_type);
         PyDict_SetItemString(environ, "CONTENT_TYPE", _value);
         Py_DECREF(_value);
     }
 
     if(handler_wsgi_context->_content_length_string.length > 0) {
-        _value = PyString_FromString(handler_wsgi_context->content_length_);
+        _value = PyString_FromString((char *) handler_wsgi_context->content_length_);
         PyDict_SetItemString(environ, "CONTENT_LENGTH", _value);
         Py_DECREF(_value);
     }
