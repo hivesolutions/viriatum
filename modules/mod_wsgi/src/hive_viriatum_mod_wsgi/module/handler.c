@@ -460,8 +460,8 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
     /* imports the associated (handler) module and retrieves
     its reference to be used for the calling, in case the
     reference is invalid raises an error */
-    module = PyImport_ImportModule("flask_test");
-    if(module == NULL) { PyErr_Print();  RAISE_NO_ERROR; }
+    _load_module(&module, "wsgi_app", "wsgi_demo.py");
+    if(module == NULL) { RAISE_NO_ERROR; }
 
     /* retrieves the function to be used as handler for the
     wsgi request, then check if the reference is valid and
@@ -719,4 +719,68 @@ ERROR_CODE _start_environ(PyObject *environ, struct http_parser_t *http_parser) 
 
     /* raises no error */
     RAISE_NO_ERROR;
+}
+
+ERROR_CODE _load_module(PyObject **module_pointer, char *name, char *file_path) {
+	/* allocates space for the pointer to the file object to be
+	used for reading the module file */
+	FILE *file;
+
+	/* allocates space for the node to hold the root node of the
+	ast and to the code and module python objects */
+	struct _node *node;
+	PyObject *code;
+	PyObject *module;
+
+	/* allocates space for the number of bytes for the file size
+	and for the buffer that will hold the file */
+	size_t number_bytes;
+    size_t file_size;
+	char *file_buffer;
+
+	/* opens the file for reading (in binary mode) and checks if
+	there was a problem opening it, raising an error in such case */
+	FOPEN(&file, file_path, "r");
+	if(file == NULL) { RAISE_NO_ERROR; }
+
+    /* seeks the file until the end of the file and then
+	retrieves the current position as the size at the end
+	restores the file position back the beginning */
+    fseek(file, 0, SEEK_END);
+    file_size = ftell(file);
+    fseek(file, 0, SEEK_SET);
+
+    /* allocates space for the file buffer that will contain the
+	complete python file, this should be a null terminated string */
+    file_buffer = (unsigned char *) MALLOC(file_size + 1);
+    number_bytes = fread(file_buffer, 1, file_size, file);
+	file_buffer[number_bytes] = '\0';
+
+	/* parses the "just" read file using the python parser and then
+	closes the file to avoid any file memory leaking (possible problems) */
+	node = PyParser_SimpleParseString(file_buffer, Py_file_input);
+	fclose(file);
+	FREE(file_buffer);
+
+	/* in case the parsed node is not valid (something wrong occurred
+	while parsing the file) raises an error */
+	if(node == NULL) { RAISE_NO_ERROR; }
+
+	/* compiles the top level node (ast) into a python code object
+	so that it can be executed */
+	code = (PyObject *) PyNode_Compile(node, file_path);
+    PyNode_Free(node);
+	if(code == NULL) { RAISE_NO_ERROR; }
+
+	/* executes the code in the code object provided, retrieveing the
+	module and setting it in the module pointer reference */
+    module = PyImport_ExecCodeModuleEx(name, code, file_path);
+	*module_pointer = module;
+
+	/* decrements the reference count in the code object so that it's
+	able to release itself */
+    Py_XDECREF(code);
+
+	/* raises no error */
+	RAISE_NO_ERROR;
 }
