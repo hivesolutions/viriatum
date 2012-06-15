@@ -33,9 +33,13 @@
 #include <android/log.h>
 #define PRINTF(format) __android_log_print(ANDROID_LOG_INFO, "logging", format)
 #define PRINTF_F(format, ...) __android_log_print(ANDROID_LOG_INFO, "logging", format, __VA_ARGS__)
+#define PRINTF_E(format) __android_log_print(ANDROID_LOG_ERROR, "logging", format)
+#define PRINTF_E_F(format, ...) __android_log_print(ANDROID_LOG_ERROR, "logging", format, __VA_ARGS__)
 #else
 #define PRINTF(format) printf(format)
 #define PRINTF_F(format, ...) printf(format, __VA_ARGS__)
+#define PRINTF_E(format) fprintf(stderr, format);
+#define PRINTF_E_F(format, ...) fprintf(stderr, format, __VA_ARGS__);
 #endif
 
 #ifdef VIRIATUM_DEBUG

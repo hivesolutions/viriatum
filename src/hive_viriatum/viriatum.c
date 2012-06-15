@@ -232,7 +232,10 @@ void daemonize() {
     daemon process (not going to output them) */
     close(STDIN_FILENO);
 
-	printf("TOBIAS !!!!!!!!!!!!!!!\n");
+	/* prints the start of the log file to both output
+	stream (notification) */
+	PRINTF("----- Log File started ------\n");
+	PRINTF_E("----- Log File started ------\n");
 	fflush(stdout);
 }
 #endif
