@@ -211,11 +211,13 @@ void daemonize() {
     fwrite(pid_string, sizeof(char), pid_string_length, pid_file);
     fclose(pid_file);
 
-	log_file = open("/viriatum.log", O_CREAT | O_RDWR, 0666);
+	log_file = open("/viriatum.log", O_CREAT | O_WRONLY, 0666);
 	out_file = dup(STDOUT_FILENO);
 	dup2(log_file, STDOUT_FILENO);
+	close(log_file);
 
 	printf("ola mundo\n");
+	fflush(stdout);
 
     /* closes the various pending streams from the
     daemon process (not going to output them) */
