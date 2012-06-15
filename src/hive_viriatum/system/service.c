@@ -310,6 +310,9 @@ ERROR_CODE create_workers(struct service_t *service) {
 		current pid (save for latter kill) */
 		service->worker_pids[fork_count] = pid;
 
+		printf("forked to %d\n", pid);
+		fflush(stdout);
+
         /* increments the fork count variable (one more
         iteration ran) */
         fork_count++;
@@ -365,6 +368,7 @@ ERROR_CODE join_workers(struct service_t *service) {
 		kill(pid, SIGINT);
 
 		printf("joining %d\n", pid);
+		fflush(stdout);
 
 		/* wiats for the process to exit it's existence
 		this may hang the current process in case there's
