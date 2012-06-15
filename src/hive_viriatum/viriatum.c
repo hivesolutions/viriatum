@@ -208,9 +208,9 @@ void daemonize() {
 
     /* closes the various pending streams from the
     daemon process (not going to output them) */
-    close(STDIN_FILENO);
+   /* close(STDIN_FILENO);
     close(STDOUT_FILENO);
-    close(STDERR_FILENO);
+    close(STDERR_FILENO);*/
 }
 #endif
 
