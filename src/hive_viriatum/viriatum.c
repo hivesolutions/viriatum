@@ -331,6 +331,7 @@ int main(int argc, char *argv[]) {
     V_DEBUG("Finishing process\n");
 
 	printf("ACABOU PROCESSO\n");
+	fflush(stdout);
 
     /* returns zero (valid) */
     return 0;
