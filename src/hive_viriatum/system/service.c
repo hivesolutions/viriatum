@@ -357,7 +357,7 @@ ERROR_CODE join_workers(struct service_t *service) {
 		pid = service->worker_pids[join_count];
 		kill(pid, SIGHUP);
 
-		/*waitpid(pid, &status, WUNTRACED);*/
+		waitpid(pid, &status, WUNTRACED);
 
         /* increments the join count variable (one more
         iteration ran) */
