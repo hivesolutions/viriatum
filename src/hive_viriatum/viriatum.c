@@ -216,19 +216,21 @@ void daemonize() {
     fwrite(pid_string, sizeof(char), pid_string_length, pid_file);
     fclose(pid_file);
 
-	/* opens the log file and redirect the standard output stream
+	/* opens the log file and redirects the standard output stream
 	into it so that every log message is sent there */
-	log_file = open("/viriatum.log", O_CREAT | O_WRONLY | O_APPEND, 0666);
-	out_file = dup(STDOUT_FILENO);
+	log_file = open("/var/log/viriatum.log", O_CREAT | O_WRONLY | O_APPEND, 0640);
 	dup2(log_file, STDOUT_FILENO);
+	close(log_file);
+
+	/* opens the error file and redirects the standard error stream
+	into it so that every error message is sent there */
+	log_file = open("/var/log/viriatum.err", O_CREAT | O_WRONLY | O_APPEND, 0640);
+	dup2(log_file, STDERR_FILENO);
 	close(log_file);
 
     /* closes the various pending streams from the
     daemon process (not going to output them) */
     close(STDIN_FILENO);
-    close(STDOUT_FILENO);
-    close(STDERR_FILENO);
-
 
 	printf("TOBIAS !!!!!!!!!!!!!!!\n");
 	fflush(stdout);
