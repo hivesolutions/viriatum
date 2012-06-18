@@ -82,6 +82,13 @@ ERROR_CODE accept_handler_stream_io(struct connection_t *connection) {
     /* calculates the size of the socket address */
     SOCKET_ADDRESS_SIZE client_socket_address_size = sizeof(SOCKET_ADDRESS);
 
+#ifdef VIRIATUM_SSL
+	/* allocates space for the "possible" ssl handle and
+	for the socket result for the ssl operations */
+    SSL *ssl_handle;
+	SOCKET_ERROR_CODE socket_result;
+#endif
+
     /* iterates continuously */
     while(1) {
         /* accepts the socket, retrieving the socket handle */
@@ -89,7 +96,8 @@ ERROR_CODE accept_handler_stream_io(struct connection_t *connection) {
 
         /* in case there was an error accepting the socket */
         if(SOCKET_TEST_ERROR(socket_handle)) {
-            /* breaks the loop */
+            /* breaks the loop, nothing to be handled not possible
+            to accept the connection for now */
             break;
         }
         /* otherwise the socket was accepted corretly */
@@ -127,12 +135,47 @@ ERROR_CODE accept_handler_stream_io(struct connection_t *connection) {
             in the client connection */
             client_connection->on_read = read_handler_stream_io;
             client_connection->on_write = write_handler_stream_io;
+            client_connection->on_handshake = handshake_handler_stream_io;
             client_connection->on_error = error_handler_stream_io;
             client_connection->on_open = open_handler_stream_io;
             client_connection->on_close = close_handler_stream_io;
 
-            /* opens the connection */
+            /* opens the connection, this should add the client
+            connection to the polling system */
             client_connection->open_connection(client_connection);
+
+#ifdef VIRIATUM_SSL
+			/* in case the connection "contains" an ssl context defined
+			the client connection "should also" be considered an encrypted
+			ssl connection (secure connection) */
+			if(connection->ssl_context) {
+				/* creates the new ssl handle using the current service connection
+				ssl conext and sets the correct socked file descriptor in it */
+				ssl_handle = SSL_new(connection->ssl_context);
+				SSL_set_fd(ssl_handle, socket_handle);
+
+				/* runs the accept operation in the ssl handle, this is possible to
+				break as this operation involves the handshake operation non blocking
+				sockets may block on this */
+				socket_result = SSL_accept(ssl_handle);
+
+				/* in case the result of the accept operation in the ssl handle is not
+				the scoket_result (error) must handle it gracefully (normal) */
+				if(socket_result < 0) {
+					/* retrieves the error code for the current problem
+					and updates the client connection to the handshake
+					status so that any further read request is redirected
+					as an handshake data request */
+					socket_result = SSL_get_error(ssl_handle, socket_result);
+					client_connection->status = STATUS_HANDSHAKE;
+				}
+
+				/* updates boths the ssl context and ssl handle reference in the
+				client connection structure reference */
+				client_connection->ssl_context = connection->ssl_context;
+				client_connection->ssl_handle = ssl_handle;
+			}
+#endif
         }
 
         /* in case viriatum is set to blocking */
@@ -174,8 +217,9 @@ ERROR_CODE read_handler_stream_io(struct connection_t *connection) {
             break;
         }
 
-        /* receives from the socket */
-        number_bytes = SOCKET_RECEIVE(connection->socket_handle, (char *) buffer_pointer, 1024, 0);
+        /* receives from the connection socket (takes into account the type
+		of socket in use) should be able to take care of secure connections */
+        number_bytes = CONNECTION_RECEIVE(connection, (char *) buffer_pointer, 1024, 0);
 
         /* in case the number of bytes is zero (connection closed) */
         if(number_bytes == 0) {
@@ -188,11 +232,11 @@ ERROR_CODE read_handler_stream_io(struct connection_t *connection) {
 
         /* in case there was an error receiving from the socket */
         if(SOCKET_TEST_ERROR(number_bytes)) {
-            /* retrieves the receving error code */
-            SOCKET_ERROR_CODE receiving_error_code = SOCKET_GET_ERROR_CODE(number_bytes);
+            /* retrieves the (receving) error code */
+            SOCKET_ERROR_CODE error_code = CONNECTION_GET_ERROR_CODE(connection, number_bytes);
 
-            /* switches over the receiving error code */
-            switch(receiving_error_code) {
+			/* switches over the receiving error code */
+            switch(error_code) {
                 case SOCKET_WOULDBLOCK:
                     /* prints a debug message */
                     V_DEBUG("Read structures not ready: WOULDBLOCK\n");
@@ -203,9 +247,21 @@ ERROR_CODE read_handler_stream_io(struct connection_t *connection) {
                     /* breaks the switch */
                     break;
 
+#ifdef VIRIATUM_SSL
+                case SSL_ERROR_WANT_READ:
+                    /* prints a debug message */
+                    V_DEBUG("Read structures not ready: SSL_ERROR_WANT_READ\n");
+
+                    /* sets the error flag (non fatal) */
+                    error = 2;
+
+                    /* breaks the switch */
+                    break;
+#endif
+
                 default:
                     /* prints the error */
-                    V_DEBUG_F("Problem receiving from socket: %d\n", receiving_error_code);
+                    V_DEBUG_F("Problem receiving from socket: %d\n", error_code);
 
                     /* sets the error flag */
                     error = 1;
@@ -312,16 +368,17 @@ ERROR_CODE write_handler_stream_io(struct connection_t *connection) {
         /* prints a debug message */
         V_DEBUG_F("Sending %ld bytes through socket: %d\n", (long int) data->size, connection->socket_handle);
 
-        /* sends the value retrieving the number of bytes sent */
-        number_bytes = SOCKET_SEND(connection->socket_handle, (char *) data->data, data->size, 0);
+		/* sends the value into the connection socket (takes into account the type
+		of socket in use) should be able to take care of secure connections */
+        number_bytes = CONNECTION_SEND(connection, (char *) data->data, data->size, 0);
 
         /* in case there was an error receiving from the socket */
         if(SOCKET_TEST_ERROR(number_bytes)) {
-            /* retrieves the receving error code */
-            SOCKET_ERROR_CODE receiving_error_code = SOCKET_GET_ERROR_CODE(number_bytes);
+            /* retrieves the (sending) error code */
+            SOCKET_ERROR_CODE error_code = CONNECTION_GET_ERROR_CODE(connection, number_bytes);
 
-            /* switches over the receiving error code */
-            switch(receiving_error_code) {
+            /* switches over the (sending) error code */
+            switch(error_code) {
                 case SOCKET_WOULDBLOCK:
                     /* prints a debug message */
                     V_DEBUG("Write structures not ready: WOULDBLOCK\n");
@@ -332,9 +389,21 @@ ERROR_CODE write_handler_stream_io(struct connection_t *connection) {
                     /* breaks the switch */
                     break;
 
+#ifdef VIRIATUM_SSL
+                case SSL_ERROR_WANT_WRITE:
+                    /* prints a debug message */
+                    V_DEBUG("Write structures not ready: SSL_ERROR_WANT_WRITE\n");
+
+                    /* sets the error flag (non fatal) */
+                    error = 2;
+
+                    /* breaks the switch */
+                    break;
+#endif
+
                 default:
                     /* prints the error */
-                    V_DEBUG_F("Problem sending from socket: %d\n", receiving_error_code);
+                    V_DEBUG_F("Problem sending from socket: %d\n", error_code);
 
                     /* sets the error flag */
                     error = 1;
@@ -433,6 +502,56 @@ ERROR_CODE write_handler_stream_io(struct connection_t *connection) {
 
     /* raises the error code */
     RAISE_ERROR(error);
+}
+
+ERROR_CODE handshake_handler_stream_io(struct connection_t *connection) {
+#ifdef VIRIATUM_SSL
+    /* allocates space for the variable that will hold the result of
+    the operation, to take the appropriate measures */
+    SOCKET_ERROR_CODE result;
+
+    /* runs the accept operation in the ssl handle, this is possible to
+    break as this operation involves the handshake operation non blocking
+    sockets may block on this */
+    result = SSL_accept(connection->ssl_handle);
+
+    /* in case the result of the accept operation in the ssl handle is not
+    the expected (error) must handle it gracefully (normal) */
+    if(result == 1) {
+        /* udpates the status of the (client) connection to open
+        so that any further data is correctly handled by read */
+        connection->status = STATUS_OPEN;
+    } else if(result == 0) {
+        /* closes the connection, the ssl connection has been closed
+        from the other side */
+        connection->close_connection(connection);
+    } else {
+        /* retrieves the error code for the current problem
+        and updates the client connection to the handshake
+        status so that any further read request is redirected
+        as an handshake data request */
+        result = SSL_get_error(connection->ssl_handle, result);
+        connection->status = STATUS_HANDSHAKE;
+
+        /* switches over the result of the error checking
+        in order to properly handle it */
+        switch(result) {
+            case SSL_ERROR_WANT_READ:
+                /* breaks the switch must try to accept
+                the connection again in a different loop */
+                break;
+
+            default:
+                /* closes the connection, the ssl connection it has been
+                closed from the other side (client side) */
+                connection->close_connection(connection);
+                break;
+        }
+    }
+#endif
+
+    /* raise no error */
+    RAISE_NO_ERROR;
 }
 
 ERROR_CODE error_handler_stream_io(struct connection_t *connection) {

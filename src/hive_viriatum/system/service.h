@@ -404,6 +404,12 @@ typedef struct service_options_t {
      */
     unsigned char *address;
 
+	/**
+	 * Flag that controls if the service is meant
+	 * to be run "inside" an encrypted ssl channel.
+	 */
+	unsigned char ssl;
+
     /**
      * The name of the "default" handler to be used
      * in the runtime environment.
