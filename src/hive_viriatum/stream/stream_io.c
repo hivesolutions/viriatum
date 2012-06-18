@@ -154,26 +154,46 @@ ERROR_CODE accept_handler_stream_io(struct connection_t *connection) {
 				ssl_handle = SSL_new(connection->ssl_context);
 				SSL_set_fd(ssl_handle, socket_handle);
 
+				/* updates boths the ssl context and ssl handle reference in the
+				client connection structure reference */
+				client_connection->ssl_context = connection->ssl_context;
+				client_connection->ssl_handle = ssl_handle;
+
 				/* runs the accept operation in the ssl handle, this is possible to
 				break as this operation involves the handshake operation non blocking
 				sockets may block on this */
 				socket_result = SSL_accept(ssl_handle);
 
 				/* in case the result of the accept operation in the ssl handle is not
-				the scoket_result (error) must handle it gracefully (normal) */
+				the socket result (error) must handle it gracefully (normal) */
 				if(socket_result < 0) {
 					/* retrieves the error code for the current problem
-					and updates the client connection to the handshake
-					status so that any further read request is redirected
-					as an handshake data request */
+					in order to gracefully handle it */
 					socket_result = SSL_get_error(ssl_handle, socket_result);
-					client_connection->status = STATUS_HANDSHAKE;
-				}
 
-				/* updates boths the ssl context and ssl handle reference in the
-				client connection structure reference */
-				client_connection->ssl_context = connection->ssl_context;
-				client_connection->ssl_handle = ssl_handle;
+					/* switches over the result of the error checking
+					in order to properly handle it */
+					switch(socket_result) {
+						case SSL_ERROR_WANT_READ:
+							/* updates the client connection status to handshake
+							status so that the complete handshake may be resumed */
+							client_connection->status = STATUS_HANDSHAKE;
+
+							/* breaks the switch must try to accept
+							the connection again in a different loop */
+							break;
+
+						default:
+							/* prints a warning message about the closing of
+							the ssl connection (due to a connection problem) */
+							V_WARNING_F("Failed to accept SSL connection (%s)\n", ssl_errors[socket_result]);
+
+							/* closes the connection, the ssl connection it has been
+							closed from the other side (client side) */
+							connection->close_connection(connection);
+							break;
+					}
+				}
 			}
 #endif
         }
@@ -522,6 +542,11 @@ ERROR_CODE handshake_handler_stream_io(struct connection_t *connection) {
         so that any further data is correctly handled by read */
         connection->status = STATUS_OPEN;
     } else if(result == 0) {
+		/* retrieves the current ssl error description, to be displayed
+		as a warning message */
+		result = SSL_get_error(connection->ssl_handle, result);
+		V_WARNING_F("Closing the SSL connection (%s)\n", ssl_errors[result]);
+
         /* closes the connection, the ssl connection has been closed
         from the other side */
         connection->close_connection(connection);
@@ -542,6 +567,10 @@ ERROR_CODE handshake_handler_stream_io(struct connection_t *connection) {
                 break;
 
             default:
+				/* prints a warning message about the closing of
+				the ssl connection (due to a connection problem) */
+				V_WARNING_F("Closing the SSL connection (%s)\n", ssl_errors[result]);
+
                 /* closes the connection, the ssl connection it has been
                 closed from the other side (client side) */
                 connection->close_connection(connection);
