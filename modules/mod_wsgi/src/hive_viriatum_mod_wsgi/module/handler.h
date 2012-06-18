@@ -30,6 +30,34 @@
 #include "entry.h"
 
 /**
+ * Structure describing the internal parameters
+ * for a location in the wsgi context.
+ */
+typedef struct mod_wsgi_location_t {
+    /**
+     * The path to the default file to
+     * be used for the parsing.
+     */
+    char *file_path;
+
+    /**
+     * Flag that controls if the script should
+     * be reload everytime a request is received.
+     * This options is usefull for debugging purposes,
+     * and should never be used in production.
+     */
+    char reload;
+
+	/**
+     * The reference to the module object reprenting
+     * the parsed and compiled file to be used.
+     * This reference is used to avoid constant reloading
+     * of the file in case the reload flag is not set.
+     */
+    PyObject *module;
+} mod_wsgi_location_t;
+
+/**
  * The structure that holds the internal
  * structure to support the context
  * of the wsgi module.
@@ -43,19 +71,26 @@ typedef struct mod_wsgi_http_handler_t {
 
     /**
      * Flag that controls if the script should
-     * be reload everytime a request si received.
+     * be reload everytime a request is received.
      * This options is usefull for debugging purposes,
      * and should never be used in production.
      */
     char reload;
 
     /**
-       * The reference to the module object reprenting
+     * The reference to the module object reprenting
      * the parsed and compiled file to be used.
      * This reference is used to avoid constant reloading
      * of the file in case the reload flag is not set.
      */
     PyObject *module;
+
+	/**
+	 * The various locations loaded from the configuration
+	 * they refer the cofiruation attributes associated
+	 * with the wsgi structures.
+	 */
+	struct mod_wsgi_location_t *locations;
 } mod_wsgi_http_handler;
 
 typedef struct handler_wsgi_context_t {

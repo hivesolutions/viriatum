@@ -141,6 +141,7 @@ VIRIATUM_EXPORT_PREFIX ERROR_CODE stop_module(struct environment_t *environment,
 VIRIATUM_EXPORT_PREFIX ERROR_CODE info_module(struct module_t *module);
 VIRIATUM_EXPORT_PREFIX ERROR_CODE error_module(unsigned char **message_pointer);
 VIRIATUM_EXPORT_PREFIX ERROR_CODE _load_configuration(struct service_t *service, struct mod_wsgi_http_handler_t *mod_wsgi_http_handler);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _load_locations(struct service_t *service, struct mod_wsgi_http_handler_t *mod_wsgi_http_handler);
 VIRIATUM_EXPORT_PREFIX ERROR_CODE _load_wsgi_state();
 VIRIATUM_EXPORT_PREFIX ERROR_CODE _unload_wsgi_state();
 VIRIATUM_EXPORT_PREFIX ERROR_CODE _reload_wsgi_state();
