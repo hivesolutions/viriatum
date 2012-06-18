@@ -692,7 +692,7 @@ typedef struct data_t {
  * The buffer containing the various possible
  * error codes for an ssl read/write operation.
  */
-const char *ssl_errors[9] = {
+static const char *ssl_errors[9] = {
 	"SSL_ERROR_NONE",
 	"SSL_ERROR_SSL",
 	"SSL_ERROR_WANT_READ",
@@ -979,4 +979,4 @@ ERROR_CODE _default_options_service(struct service_t *service, struct hash_map_t
 ERROR_CODE _file_options_service(struct service_t *service, struct hash_map_t *arguments);
 ERROR_CODE _comand_line_options_service(struct service_t *service, struct hash_map_t *arguments);
 
-__inline const char *get_ssl_error_code(size_t index) { return ssl_errors[index]; }
+__inline static const char *get_ssl_error_code(size_t index) { return ssl_errors[index]; }
