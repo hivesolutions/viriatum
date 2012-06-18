@@ -152,18 +152,30 @@ ERROR_CODE unregister_connection_polling_select(struct polling_t *polling, struc
     struct polling_select_t *polling_select = (struct polling_select_t *) polling->lower;
 
     /* unregister the socket handle from the sockets read set */
-    _unregister_sockets_set_polling_select(polling_select, connection->socket_handle, &polling_select->sockets_read_set);
+    _unregister_sockets_set_polling_select(
+        polling_select,
+        connection->socket_handle,
+        &polling_select->sockets_read_set
+    );
 
     /* in case the socket error are meant to be processed */
     if(VIRIATUM_SOCKET_ERROR) {
         /* unregister the socket handle from the sockets error set */
-        _unregister_sockets_set_polling_select(polling_select, connection->socket_handle, &polling_select->sockets_error_set);
+        _unregister_sockets_set_polling_select(
+            polling_select,
+            connection->socket_handle,
+            &polling_select->sockets_error_set
+        );
     }
 
     /* in case the connection write is registered */
     if(connection->write_registered == 1) {
         /* unregister the socket handle from the sockets write set */
-        _unregister_sockets_set_polling_select(polling_select, connection->socket_handle, &polling_select->sockets_write_set);
+        _unregister_sockets_set_polling_select(
+            polling_select,
+            connection->socket_handle,
+            &polling_select->sockets_write_set
+        );
     }
 
     /* raises no error */
@@ -198,7 +210,11 @@ ERROR_CODE unregister_write_polling_select(struct polling_t *polling, struct con
     }
 
     /* unregister the socket handle from the sockets write set */
-    _unregister_sockets_set_polling_select(polling_select, connection->socket_handle, &polling_select->sockets_write_set);
+    _unregister_sockets_set_polling_select(
+        polling_select,
+        connection->socket_handle,
+        &polling_select->sockets_write_set
+    );
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -209,7 +225,15 @@ ERROR_CODE poll_polling_select(struct polling_t *polling) {
     struct polling_select_t *polling_select = (struct polling_select_t *) polling->lower;
 
     /* polls the polling select */
-    _poll_polling_select(polling_select, polling_select->read_connections, polling_select->write_connections, polling_select->error_connections, &polling_select->read_connections_size, &polling_select->write_connections_size, &polling_select->error_connections_size);
+    _poll_polling_select(
+        polling_select,
+        polling_select->read_connections,
+        polling_select->write_connections,
+        polling_select->error_connections,
+        &polling_select->read_connections_size,
+        &polling_select->write_connections_size,
+        &polling_select->error_connections_size
+    );
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -220,7 +244,16 @@ ERROR_CODE call_polling_select(struct polling_t *polling) {
     struct polling_select_t *polling_select = (struct polling_select_t *) polling->lower;
 
     /* calls the polling select */
-    _call_polling_select(polling_select, polling_select->read_connections, polling_select->write_connections, polling_select->error_connections, polling_select->remove_connections, polling_select->read_connections_size, polling_select->write_connections_size, polling_select->error_connections_size);
+    _call_polling_select(
+        polling_select,
+        polling_select->read_connections,
+        polling_select->write_connections,
+        polling_select->error_connections,
+        polling_select->remove_connections,
+        polling_select->read_connections_size,
+        polling_select->write_connections_size,
+        polling_select->error_connections_size
+    );
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -265,7 +298,13 @@ ERROR_CODE _poll_polling_select(struct polling_select_t *polling_select, struct 
     V_DEBUG("Entering select statement\n");
 
     /* runs the select over the sockets set */
-    select_count = SOCKET_SELECT(polling_select->sockets_set_highest + 1, &polling_select->sockets_read_set_temporary, &polling_select->sockets_write_set_temporary, &polling_select->sockets_error_set_temporary, &polling_select->select_timeout_temporary);
+    select_count = SOCKET_SELECT(
+        polling_select->sockets_set_highest + 1,
+        &polling_select->sockets_read_set_temporary,
+        &polling_select->sockets_write_set_temporary,
+        &polling_select->sockets_error_set_temporary,
+        &polling_select->select_timeout_temporary
+    );
 
     /* prints a debug message */
     V_DEBUG_F("Exiting select statement with value: %d\n", select_count);
@@ -400,13 +439,28 @@ ERROR_CODE _call_polling_select(struct polling_select_t *polling_select, struct 
         /* prints a debug message */
         V_DEBUG_F("Processing read connection: %d\n", current_connection->socket_handle);
 
-        /* in case the current connection is open */
+        /* in case the current connection is open and the read
+        handler is correclty set (must call it) */
         if(current_connection->status == STATUS_OPEN && current_connection->on_read != NULL) {
             /* prints a debug message */
             V_DEBUG("Calling on read handler\n");
 
             /* calls the on read handler */
             current_connection->on_read(current_connection);
+
+            /* prints a debug message */
+            V_DEBUG("Finished calling on read handler\n");
+        }
+
+        /* in case the current connection is in the handshake
+        section and the handshake handler is correclty set (must
+        call it to initialize the connection) */
+        if(current_connection->status == STATUS_HANDSHAKE && current_connection->on_handshake != NULL) {
+            /* prints a debug message */
+            V_DEBUG("Calling on handshake handler\n");
+
+            /* calls the on read handler */
+            current_connection->on_handshake(current_connection);
 
             /* prints a debug message */
             V_DEBUG("Finished calling on read handler\n");
