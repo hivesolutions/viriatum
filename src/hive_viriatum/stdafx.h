@@ -56,7 +56,7 @@
 #endif
 
 #ifdef HAVE_LIBSSL
-#ifdef HAVE_SSL_H
+#ifdef HAVE_OPENSSL_SSL_H
 #define VIRIATUM_SSL
 #endif
 #endif
