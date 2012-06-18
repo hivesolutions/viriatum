@@ -55,6 +55,12 @@
 #endif
 #endif
 
+#ifdef HAVE_LIBSSL
+#ifdef HAVE_SSL_H
+#define VIRIATUM_SSL
+#endif
+#endif
+
 #ifdef HAVE_LIBPCRE
 #ifdef HAVE_PCRE_H
 #define VIRIATUM_PCRE
