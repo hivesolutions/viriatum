@@ -726,14 +726,20 @@ ERROR_CODE start_service(struct service_t *service) {
 		SSL_CTX_set_options(service->ssl_context, SSL_OP_SINGLE_DH_USE);
 		socket_result = SSL_CTX_use_certificate_file(service->ssl_context, "dummy.crt" , SSL_FILETYPE_PEM);
 
+		/* tests if there was an error loading the certificate file and
+		if it did closes the socket and returns in error (major problem) */
 		if(SOCKET_EX_TEST_ERROR(socket_result)) {
 			SOCKET_CLOSE(service->service_socket_handle);
 			V_ERROR("Problem loading the ssl certificate file (*.crt)\n");
 			RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem loading ssl certificate");
 		}
 
+		/* loads the private key file into the ssl context so that the
+		context is correctly validated */
 		socket_result = SSL_CTX_use_PrivateKey_file(service->ssl_context, "dummy.key", SSL_FILETYPE_PEM);
 
+		/* tests if there was an error loading private key file and
+		if it did closes the socket and returns in error (major problem) */
 		if(SOCKET_EX_TEST_ERROR(socket_result)) {
 			SOCKET_CLOSE(service->service_socket_handle);
 			V_ERROR("Problem loading the ssl key file (*.key)\n");
