@@ -50,7 +50,7 @@ struct http_handler_t;
 	SOCKET_GET_ERROR_CODE(error_code) :\
 	SSL_get_error(connection->ssl_handle, error_code)
 #else
-#define CONNECTION_READ(connection, buffer, length, flags) \
+#define CONNECTION_SEND(connection, buffer, length, flags) \
 	SOCKET_SEND(connection->socket_handle, buffer, length, flags)
 #define CONNECTION_RECEIVE(connection, buffer, length, flags) \
 	SOCKET_RECEIVE(connection->socket_handle, buffer, length, flags)
