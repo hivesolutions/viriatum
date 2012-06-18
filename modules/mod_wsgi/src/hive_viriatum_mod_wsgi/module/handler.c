@@ -392,8 +392,8 @@ ERROR_CODE _set_http_settings_handler_module(struct http_settings_t *http_settin
     http_settings->on_headers_complete = headers_complete_callback_handler_module;
     http_settings->on_body = body_callback_handler_module;
     http_settings->on_message_complete = message_complete_callback_handler_module;
-	http_settings->on_location = location_callback_handler_module;
-	http_settings->on_virtual_url = virtual_url_callback_handler_module;
+    http_settings->on_location = location_callback_handler_module;
+    http_settings->on_virtual_url = virtual_url_callback_handler_module;
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -408,8 +408,8 @@ ERROR_CODE _unset_http_settings_handler_module(struct http_settings_t *http_sett
     http_settings->on_headers_complete = NULL;
     http_settings->on_body = NULL;
     http_settings->on_message_complete = NULL;
-	http_settings->on_location = NULL;
-	http_settings->on_virtual_url = NULL;
+    http_settings->on_location = NULL;
+    http_settings->on_virtual_url = NULL;
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -769,7 +769,7 @@ ERROR_CODE _start_environ(PyObject *environ, struct http_parser_t *http_parser) 
     PyDict_SetItemString(environ, "SCRIPT_NAME", _value);
     Py_DECREF(_value);
 
-    _value = PyString_FromString((char *) handler_wsgi_context->url);
+    _value = PyString_FromString((char *) handler_wsgi_context->file_name);
     PyDict_SetItemString(environ, "PATH_INFO", _value);
     Py_DECREF(_value);
 

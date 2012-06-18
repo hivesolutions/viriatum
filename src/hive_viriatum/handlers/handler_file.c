@@ -422,20 +422,20 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
         /* creats the error description string from the error message and then
         sends the error to the connection (with the current format) */
         SPRINTF(
-			error_description,
-			VIRIATUM_MAX_PATH_SIZE,
-			"404 - Not Found (%s)",
-			handler_file_context->file_path
-		);
+            error_description,
+            VIRIATUM_MAX_PATH_SIZE,
+            "404 - Not Found (%s)",
+            handler_file_context->file_path
+        );
         write_http_error(
-			connection,
-			headers_buffer,
-			"404",
-			"Not Found",
-			error_description,
-			_cleanup_handler_file,
-			handler_file_context
-		);
+            connection,
+            headers_buffer,
+            "404",
+            "Not Found",
+            error_description,
+            _cleanup_handler_file,
+            handler_file_context
+        );
     } else if(is_redirect) {
         /* writes the http static headers to the response */
         SPRINTF(
