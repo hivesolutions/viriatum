@@ -41,19 +41,19 @@ struct http_handler_t;
 
 #ifdef VIRIATUM_SSL
 #define CONNECTION_SEND(connection, buffer, length, flags) connection->ssl_handle == NULL ? \
-	SOCKET_SEND(connection->socket_handle, buffer, length, flags) :\
-	SSL_write(connection->ssl_handle, buffer, length)
+    SOCKET_SEND(connection->socket_handle, buffer, length, flags) :\
+    SSL_write(connection->ssl_handle, buffer, length)
 #define CONNECTION_RECEIVE(connection, buffer, length, flags) connection->ssl_handle == NULL ? \
-	SOCKET_RECEIVE(connection->socket_handle, buffer, length, flags) :\
-	SSL_read(connection->ssl_handle, buffer, length)
+    SOCKET_RECEIVE(connection->socket_handle, buffer, length, flags) :\
+    SSL_read(connection->ssl_handle, buffer, length)
 #define CONNECTION_GET_ERROR_CODE(connection, error_code) connection->ssl_handle == NULL ? \
-	SOCKET_GET_ERROR_CODE(error_code) :\
-	SSL_get_error(connection->ssl_handle, error_code)
+    SOCKET_GET_ERROR_CODE(error_code) :\
+    SSL_get_error(connection->ssl_handle, error_code)
 #else
 #define CONNECTION_SEND(connection, buffer, length, flags) \
-	SOCKET_SEND(connection->socket_handle, buffer, length, flags)
+    SOCKET_SEND(connection->socket_handle, buffer, length, flags)
 #define CONNECTION_RECEIVE(connection, buffer, length, flags) \
-	SOCKET_RECEIVE(connection->socket_handle, buffer, length, flags)
+    SOCKET_RECEIVE(connection->socket_handle, buffer, length, flags)
 #define CONNECTION_GET_ERROR_CODE(connection, error_code) SOCKET_GET_ERROR_CODE(error_code)
 #endif
 
@@ -404,11 +404,11 @@ typedef struct service_options_t {
      */
     unsigned char *address;
 
-	/**
-	 * Flag that controls if the service is meant
-	 * to be run "inside" an encrypted ssl channel.
-	 */
-	unsigned char ssl;
+    /**
+     * Flag that controls if the service is meant
+     * to be run "inside" an encrypted ssl channel.
+     */
+    unsigned char ssl;
 
     /**
      * The name of the "default" handler to be used
@@ -693,15 +693,15 @@ typedef struct data_t {
  * error codes for an ssl read/write operation.
  */
 static const char *ssl_errors[9] = {
-	"SSL_ERROR_NONE",
-	"SSL_ERROR_SSL",
-	"SSL_ERROR_WANT_READ",
-	"SSL_ERROR_WANT_WRITE",
-	"SSL_ERROR_WANT_X509_LOOKUP",
-	"SSL_ERROR_SYSCALL",
-	"SSL_ERROR_ZERO_RETURN",
-	"SSL_ERROR_WANT_CONNECT",
-	"SSL_ERROR_WANT_ACCEPT"
+    "SSL_ERROR_NONE",
+    "SSL_ERROR_SSL",
+    "SSL_ERROR_WANT_READ",
+    "SSL_ERROR_WANT_WRITE",
+    "SSL_ERROR_WANT_X509_LOOKUP",
+    "SSL_ERROR_SYSCALL",
+    "SSL_ERROR_ZERO_RETURN",
+    "SSL_ERROR_WANT_CONNECT",
+    "SSL_ERROR_WANT_ACCEPT"
 };
 #endif
 

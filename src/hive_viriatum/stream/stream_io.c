@@ -83,10 +83,10 @@ ERROR_CODE accept_handler_stream_io(struct connection_t *connection) {
     SOCKET_ADDRESS_SIZE client_socket_address_size = sizeof(SOCKET_ADDRESS);
 
 #ifdef VIRIATUM_SSL
-	/* allocates space for the "possible" ssl handle and
-	for the socket result for the ssl operations */
+    /* allocates space for the "possible" ssl handle and
+    for the socket result for the ssl operations */
     SSL *ssl_handle;
-	SOCKET_ERROR_CODE socket_result;
+    SOCKET_ERROR_CODE socket_result;
 #endif
 
     /* iterates continuously */
@@ -145,56 +145,56 @@ ERROR_CODE accept_handler_stream_io(struct connection_t *connection) {
             client_connection->open_connection(client_connection);
 
 #ifdef VIRIATUM_SSL
-			/* in case the connection "contains" an ssl context defined
-			the client connection "should also" be considered an encrypted
-			ssl connection (secure connection) */
-			if(connection->ssl_context) {
-				/* creates the new ssl handle using the current service connection
-				ssl conext and sets the correct socked file descriptor in it */
-				ssl_handle = SSL_new(connection->ssl_context);
-				SSL_set_fd(ssl_handle, socket_handle);
+            /* in case the connection "contains" an ssl context defined
+            the client connection "should also" be considered an encrypted
+            ssl connection (secure connection) */
+            if(connection->ssl_context) {
+                /* creates the new ssl handle using the current service connection
+                ssl conext and sets the correct socked file descriptor in it */
+                ssl_handle = SSL_new(connection->ssl_context);
+                SSL_set_fd(ssl_handle, socket_handle);
 
-				/* updates boths the ssl context and ssl handle reference in the
-				client connection structure reference */
-				client_connection->ssl_context = connection->ssl_context;
-				client_connection->ssl_handle = ssl_handle;
+                /* updates boths the ssl context and ssl handle reference in the
+                client connection structure reference */
+                client_connection->ssl_context = connection->ssl_context;
+                client_connection->ssl_handle = ssl_handle;
 
-				/* runs the accept operation in the ssl handle, this is possible to
-				break as this operation involves the handshake operation non blocking
-				sockets may block on this */
-				socket_result = SSL_accept(ssl_handle);
+                /* runs the accept operation in the ssl handle, this is possible to
+                break as this operation involves the handshake operation non blocking
+                sockets may block on this */
+                socket_result = SSL_accept(ssl_handle);
 
-				/* in case the result of the accept operation in the ssl handle is not
-				the socket result (error) must handle it gracefully (normal) */
-				if(socket_result < 0) {
-					/* retrieves the error code for the current problem
-					in order to gracefully handle it */
-					socket_result = SSL_get_error(ssl_handle, socket_result);
+                /* in case the result of the accept operation in the ssl handle is not
+                the socket result (error) must handle it gracefully (normal) */
+                if(socket_result < 0) {
+                    /* retrieves the error code for the current problem
+                    in order to gracefully handle it */
+                    socket_result = SSL_get_error(ssl_handle, socket_result);
 
-					/* switches over the result of the error checking
-					in order to properly handle it */
-					switch(socket_result) {
-						case SSL_ERROR_WANT_READ:
-							/* updates the client connection status to handshake
-							status so that the complete handshake may be resumed */
-							client_connection->status = STATUS_HANDSHAKE;
+                    /* switches over the result of the error checking
+                    in order to properly handle it */
+                    switch(socket_result) {
+                        case SSL_ERROR_WANT_READ:
+                            /* updates the client connection status to handshake
+                            status so that the complete handshake may be resumed */
+                            client_connection->status = STATUS_HANDSHAKE;
 
-							/* breaks the switch must try to accept
-							the connection again in a different loop */
-							break;
+                            /* breaks the switch must try to accept
+                            the connection again in a different loop */
+                            break;
 
-						default:
-							/* prints a warning message about the closing of
-							the ssl connection (due to a connection problem) */
-							V_WARNING_F("Failed to accept SSL connection (%s)\n", ssl_errors[socket_result]);
+                        default:
+                            /* prints a warning message about the closing of
+                            the ssl connection (due to a connection problem) */
+                            V_WARNING_F("Failed to accept SSL connection (%s)\n", ssl_errors[socket_result]);
 
-							/* closes the connection, the ssl connection it has been
-							closed from the other side (client side) */
-							connection->close_connection(connection);
-							break;
-					}
-				}
-			}
+                            /* closes the connection, the ssl connection it has been
+                            closed from the other side (client side) */
+                            connection->close_connection(connection);
+                            break;
+                    }
+                }
+            }
 #endif
         }
 
@@ -238,7 +238,7 @@ ERROR_CODE read_handler_stream_io(struct connection_t *connection) {
         }
 
         /* receives from the connection socket (takes into account the type
-		of socket in use) should be able to take care of secure connections */
+        of socket in use) should be able to take care of secure connections */
         number_bytes = CONNECTION_RECEIVE(connection, (char *) buffer_pointer, 1024, 0);
 
         /* in case the number of bytes is zero (connection closed) */
@@ -255,7 +255,7 @@ ERROR_CODE read_handler_stream_io(struct connection_t *connection) {
             /* retrieves the (receving) error code */
             SOCKET_ERROR_CODE error_code = CONNECTION_GET_ERROR_CODE(connection, number_bytes);
 
-			/* switches over the receiving error code */
+            /* switches over the receiving error code */
             switch(error_code) {
                 case SOCKET_WOULDBLOCK:
                     /* prints a debug message */
@@ -388,8 +388,8 @@ ERROR_CODE write_handler_stream_io(struct connection_t *connection) {
         /* prints a debug message */
         V_DEBUG_F("Sending %ld bytes through socket: %d\n", (long int) data->size, connection->socket_handle);
 
-		/* sends the value into the connection socket (takes into account the type
-		of socket in use) should be able to take care of secure connections */
+        /* sends the value into the connection socket (takes into account the type
+        of socket in use) should be able to take care of secure connections */
         number_bytes = CONNECTION_SEND(connection, (char *) data->data, data->size, 0);
 
         /* in case there was an error receiving from the socket */
@@ -542,10 +542,10 @@ ERROR_CODE handshake_handler_stream_io(struct connection_t *connection) {
         so that any further data is correctly handled by read */
         connection->status = STATUS_OPEN;
     } else if(result == 0) {
-		/* retrieves the current ssl error description, to be displayed
-		as a warning message */
-		result = SSL_get_error(connection->ssl_handle, result);
-		V_WARNING_F("Closing the SSL connection (%s)\n", ssl_errors[result]);
+        /* retrieves the current ssl error description, to be displayed
+        as a warning message */
+        result = SSL_get_error(connection->ssl_handle, result);
+        V_WARNING_F("Closing the SSL connection (%s)\n", ssl_errors[result]);
 
         /* closes the connection, the ssl connection has been closed
         from the other side */
@@ -567,9 +567,9 @@ ERROR_CODE handshake_handler_stream_io(struct connection_t *connection) {
                 break;
 
             default:
-				/* prints a warning message about the closing of
-				the ssl connection (due to a connection problem) */
-				V_WARNING_F("Closing the SSL connection (%s)\n", ssl_errors[result]);
+                /* prints a warning message about the closing of
+                the ssl connection (due to a connection problem) */
+                V_WARNING_F("Closing the SSL connection (%s)\n", ssl_errors[result]);
 
                 /* closes the connection, the ssl connection it has been
                 closed from the other side (client side) */

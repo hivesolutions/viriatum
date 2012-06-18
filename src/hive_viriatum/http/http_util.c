@@ -194,5 +194,5 @@ ERROR_CODE log_http_request(char *host, char *identity, char *user, char *method
 }
 
 const char *_get_http_status_code(size_t major, size_t minor) {
-	return http_status_codes[major][minor];
+    return http_status_codes[major][minor];
 }

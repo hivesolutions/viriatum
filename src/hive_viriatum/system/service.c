@@ -116,7 +116,7 @@ void create_service_options(struct service_options_t **service_options_pointer) 
     /* sets the service options attributes (default) values */
     service_options->port = 0;
     service_options->address = NULL;
-	service_options->ssl = 1;
+    service_options->ssl = 1;
     service_options->handler_name = NULL;
     service_options->local = 0;
     service_options->default_index = 0;
@@ -712,40 +712,40 @@ ERROR_CODE start_service(struct service_t *service) {
     }
 
 #ifdef VIRIATUM_SSL
-	/* in case the ssl encryption flag is set the ssl sub system
-	should be loaded */
-	if(service_options->ssl) {
-		/* loads the ssl error strings and starts the ssl library, this
-		should be enought to get the ssl sub system running */
-		SSL_load_error_strings();
-		SSL_library_init();
+    /* in case the ssl encryption flag is set the ssl sub system
+    should be loaded */
+    if(service_options->ssl) {
+        /* loads the ssl error strings and starts the ssl library, this
+        should be enought to get the ssl sub system running */
+        SSL_load_error_strings();
+        SSL_library_init();
 
-		/* creates the new ssl context and updates the context with the
-		correct certificate file and (private) key file */
-		service->ssl_context = SSL_CTX_new(TLSv1_server_method());
-		SSL_CTX_set_options(service->ssl_context, SSL_OP_SINGLE_DH_USE);
-		socket_result = SSL_CTX_use_certificate_file(service->ssl_context, "dummy.crt" , SSL_FILETYPE_PEM);
+        /* creates the new ssl context and updates the context with the
+        correct certificate file and (private) key file */
+        service->ssl_context = SSL_CTX_new(TLSv1_server_method());
+        SSL_CTX_set_options(service->ssl_context, SSL_OP_SINGLE_DH_USE);
+        socket_result = SSL_CTX_use_certificate_file(service->ssl_context, "dummy.crt" , SSL_FILETYPE_PEM);
 
-		/* tests if there was an error loading the certificate file and
-		if it did closes the socket and returns in error (major problem) */
-		if(SOCKET_EX_TEST_ERROR(socket_result)) {
-			SOCKET_CLOSE(service->service_socket_handle);
-			V_ERROR("Problem loading the ssl certificate file (*.crt)\n");
-			RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem loading ssl certificate");
-		}
+        /* tests if there was an error loading the certificate file and
+        if it did closes the socket and returns in error (major problem) */
+        if(SOCKET_EX_TEST_ERROR(socket_result)) {
+            SOCKET_CLOSE(service->service_socket_handle);
+            V_ERROR("Problem loading the ssl certificate file (*.crt)\n");
+            RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem loading ssl certificate");
+        }
 
-		/* loads the private key file into the ssl context so that the
-		context is correctly validated */
-		socket_result = SSL_CTX_use_PrivateKey_file(service->ssl_context, "dummy.key", SSL_FILETYPE_PEM);
+        /* loads the private key file into the ssl context so that the
+        context is correctly validated */
+        socket_result = SSL_CTX_use_PrivateKey_file(service->ssl_context, "dummy.key", SSL_FILETYPE_PEM);
 
-		/* tests if there was an error loading private key file and
-		if it did closes the socket and returns in error (major problem) */
-		if(SOCKET_EX_TEST_ERROR(socket_result)) {
-			SOCKET_CLOSE(service->service_socket_handle);
-			V_ERROR("Problem loading the ssl key file (*.key)\n");
-			RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem loading ssl key");
-		}
-	}
+        /* tests if there was an error loading private key file and
+        if it did closes the socket and returns in error (major problem) */
+        if(SOCKET_EX_TEST_ERROR(socket_result)) {
+            SOCKET_CLOSE(service->service_socket_handle);
+            V_ERROR("Problem loading the ssl key file (*.key)\n");
+            RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem loading ssl key");
+        }
+    }
 #endif
 
     /* binds the service socket */
@@ -809,14 +809,14 @@ ERROR_CODE start_service(struct service_t *service) {
     create_connection(&service_connection, service_socket_handle);
 
 #ifdef VIRIATUM_SSL
-	/* in case the ssl encryption flag is set the ssl sub system
-	should be unloaded (to avoid memmory leaks) */
-	if(service_options->ssl) {
-		/* updates the ssl context and handle in the service connection
-		so that it's possible to access the ssl connection */
-		service_connection->ssl_context = service->ssl_context;
-		service_connection->ssl_handle = service->ssl_handle;
-	}
+    /* in case the ssl encryption flag is set the ssl sub system
+    should be unloaded (to avoid memmory leaks) */
+    if(service_options->ssl) {
+        /* updates the ssl context and handle in the service connection
+        so that it's possible to access the ssl connection */
+        service_connection->ssl_context = service->ssl_context;
+        service_connection->ssl_handle = service->ssl_handle;
+    }
 #endif
 
     /* sets the service select service as the service in the service connection */
@@ -1504,5 +1504,5 @@ ERROR_CODE _comand_line_options_service(struct service_t *service, struct hash_m
 }
 
 const char *_get_ssl_error_code(size_t index) {
-	return ssl_errors[index];
+    return ssl_errors[index];
 }
