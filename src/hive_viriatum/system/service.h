@@ -692,7 +692,7 @@ typedef struct data_t {
  * The buffer containing the various possible
  * error codes for an ssl read/write operation.
  */
-static const char *ssl_errors[9] = {
+const char *ssl_errors[9] = {
 	"SSL_ERROR_NONE",
 	"SSL_ERROR_SSL",
 	"SSL_ERROR_WANT_READ",
