@@ -555,7 +555,7 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
         file_path = mod_wsgi_http_handler->file_path == NULL
             ? DEFAULT_FILE_PATH : mod_wsgi_http_handler->file_path;
 		file_path = handler_wsgi_context->_file_path_string.length > 0 ?
-		handler_wsgi_context->file_path : file_path;
+			(char *) handler_wsgi_context->file_path : file_path;
 
         /* loads the module as wsgi app from the provided file path and
         then updates the module variable to contain a reference to it */
