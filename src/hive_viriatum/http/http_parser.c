@@ -1485,12 +1485,11 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                         http_parser->upgrade = 1;
                     }
 
-                    /* Here we call the headers_complete callback. This is somewhat
-                     * different than other callbacks because if the user returns 1, we
-                     * will interpret that as saying that this message has no body. This
-                     * is needed for the annoying case of recieving a response to a HEAD
-                     * request.
-                     */
+                    /* here we call the headers_complete callback, this is somewhat
+                    * different than other callbacks because if the user returns 1, we
+                    * will interpret that as saying that this message has no body. This
+                    * is needed for the annoying case of recieving a response to a HEAD
+                    * request */
                     if(http_settings->on_headers_complete) {
                         switch (http_settings->on_headers_complete(http_parser)) {
                             case 0:
@@ -1552,9 +1551,7 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                 to_read = MIN(pointer_end - pointer, (long long) http_parser->content_length);
 
                 if(to_read > 0) {
-                    if(http_settings->on_body) {
-                        http_settings->on_body(http_parser, pointer, to_read);
-                    }
+                    CALL_V(http_settings->on_body, http_parser, pointer, to_read);
 
                     pointer += to_read - 1;
 
@@ -1574,9 +1571,7 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                 to_read = pointer_end - pointer;
 
                 if(to_read > 0) {
-                    if(http_settings->on_body) {
-                        http_settings->on_body(http_parser, pointer, to_read);
-                    }
+                    CALL_V(http_settings->on_body, http_parser, pointer, to_read);
 
                     pointer += to_read - 1;
                 }
@@ -1667,9 +1662,7 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                 to_read = MIN(pointer_end - pointer, (long long) (http_parser->content_length));
 
                 if(to_read > 0) {
-                    if (http_settings->on_body) {
-                        http_settings->on_body(http_parser, pointer, to_read);
-                    }
+                    CALL_V(http_settings->on_body, http_parser, pointer, to_read);
 
                     pointer += to_read - 1;
                 }
