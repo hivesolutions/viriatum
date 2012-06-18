@@ -40,7 +40,7 @@ ERROR_CODE create_mod_wsgi_http_handler(struct mod_wsgi_http_handler_t **mod_wsg
     mod_wsgi_http_handler->file_path = NULL;
     mod_wsgi_http_handler->reload = 0;
     mod_wsgi_http_handler->module = NULL;
-	mod_wsgi_http_handler->locations = NULL;
+    mod_wsgi_http_handler->locations = NULL;
 
     /* sets the mod wsgi http handler in the upper http handler substrate */
     http_handler->lower = (void *) mod_wsgi_http_handler;
@@ -54,7 +54,7 @@ ERROR_CODE create_mod_wsgi_http_handler(struct mod_wsgi_http_handler_t **mod_wsg
 
 ERROR_CODE delete_mod_wsgi_http_handler(struct mod_wsgi_http_handler_t *mod_wsgi_http_handler) {
     /* in case the locations buffer is set it must be released
-	to avoid any memory leak (not going to be used) */
+    to avoid any memory leak (not going to be used) */
     if(mod_wsgi_http_handler->locations != NULL) { FREE(mod_wsgi_http_handler->locations); }
 
     /* in case the execution module is defined for the wsgi handler
@@ -164,7 +164,7 @@ ERROR_CODE url_callback_handler_module(struct http_parser_t *http_parser, const 
     handler_wsgi_context->query[query_size] = '\0';
 
     /* copies the url to the url reference in the handler file context to
-	be used in the message handler */
+    be used in the message handler */
     memcpy(handler_wsgi_context->url, data, data_size);
     handler_wsgi_context->url[data_size] = '\0';
 
@@ -316,39 +316,39 @@ ERROR_CODE message_complete_callback_handler_module(struct http_parser_t *http_p
 }
 
 ERROR_CODE location_callback_handler_module(struct http_parser_t *http_parser, size_t index, size_t offset) {
-	/* allocates space for the temporary file path size variables
-	to be used in internal string size calculations */
-	size_t file_path_size;
+    /* allocates space for the temporary file path size variables
+    to be used in internal string size calculations */
+    size_t file_path_size;
 
     /* retrieves the handler wsgi context from the http parser */
     struct handler_wsgi_context_t *handler_wsgi_context =
-		(struct handler_wsgi_context_t *) http_parser->context;
+        (struct handler_wsgi_context_t *) http_parser->context;
 
-	/* retrieves the connection from the parser and then used it to retreives the
-	the correct wsgi http handler reference from the http connection */
-	struct connection_t *connection = (struct connection_t *) http_parser->parameters;
+    /* retrieves the connection from the parser and then used it to retreives the
+    the correct wsgi http handler reference from the http connection */
+    struct connection_t *connection = (struct connection_t *) http_parser->parameters;
     struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
     struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
     struct mod_wsgi_http_handler_t *mod_wsgi_http_handler =
-		(struct mod_wsgi_http_handler_t *) http_connection->http_handler->lower;
+        (struct mod_wsgi_http_handler_t *) http_connection->http_handler->lower;
 
-	/* retrieves the current location from the location buffer and checks if the
-	file path value is correctly set */
-	struct mod_wsgi_location_t *location = &mod_wsgi_http_handler->locations[index];
-	if(location->file_path == NULL) { RAISE_NO_ERROR; }
+    /* retrieves the current location from the location buffer and checks if the
+    file path value is correctly set */
+    struct mod_wsgi_location_t *location = &mod_wsgi_http_handler->locations[index];
+    if(location->file_path == NULL) { RAISE_NO_ERROR; }
 
-	/* retrieves the size of the file path associated with the location and copies
-	it to the current context file path string then updates the file path string
-	to the required size */
-	file_path_size = strlen(location->file_path);
-	memcpy(handler_wsgi_context->file_path, location->file_path, file_path_size);
-	handler_wsgi_context->file_path[file_path_size] = '\0';
+    /* retrieves the size of the file path associated with the location and copies
+    it to the current context file path string then updates the file path string
+    to the required size */
+    file_path_size = strlen(location->file_path);
+    memcpy(handler_wsgi_context->file_path, location->file_path, file_path_size);
+    handler_wsgi_context->file_path[file_path_size] = '\0';
     string_populate(
-		&handler_wsgi_context->_file_path_string,
-		handler_wsgi_context->file_path,
-		file_path_size,
-		0
-	);
+        &handler_wsgi_context->_file_path_string,
+        handler_wsgi_context->file_path,
+        file_path_size,
+        0
+    );
 
     /* raise no error */
     RAISE_NO_ERROR;
@@ -377,7 +377,7 @@ ERROR_CODE virtual_url_callback_handler_module(struct http_parser_t *http_parser
     handler_wsgi_context->query[query_size] = '\0';
 
     /* copies the url to the url reference in the handler file context to
-	be used in the message handler */
+    be used in the message handler */
     memcpy(handler_wsgi_context->url, data, data_size);
     handler_wsgi_context->url[data_size] = '\0';
 
@@ -554,8 +554,8 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
         defaulting to the preddefined path in case none is defined */
         file_path = mod_wsgi_http_handler->file_path == NULL
             ? DEFAULT_FILE_PATH : mod_wsgi_http_handler->file_path;
-		file_path = handler_wsgi_context->_file_path_string.length > 0 ?
-			(char *) handler_wsgi_context->file_path : file_path;
+        file_path = handler_wsgi_context->_file_path_string.length > 0 ?
+            (char *) handler_wsgi_context->file_path : file_path;
 
         /* loads the module as wsgi app from the provided file path and
         then updates the module variable to contain a reference to it */
