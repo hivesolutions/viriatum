@@ -70,6 +70,21 @@
 
 #include "global/definitions.h"
 
+#ifdef VIRIATUM_SSL
+#include <openssl/err.h>
+#include <openssl/ssl.h>
+#include <openssl/rand.h>
+#ifdef VIRIATUM_PLATFORM_MSC
+#ifdef VIRIATUM_DEBUG
+#pragma comment(lib, "libeay32_d.lib")
+#pragma comment(lib, "ssleay32_d.lib")
+#else
+#pragma comment(lib, "libeay32.lib")
+#pragma comment(lib, "ssleay32.lib")
+#endif
+#endif
+#endif
+
 #ifdef VIRIATUM_PCRE
 #define PCRE_STATIC
 #include <pcre.h>
