@@ -313,6 +313,16 @@ ERROR_CODE message_complete_callback_handler_module(struct http_parser_t *http_p
     RAISE_NO_ERROR;
 }
 
+ERROR_CODE location_callback_handler_module(struct http_parser_t *http_parser, size_t index, size_t offset) {
+    /* raise no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE virtual_url_callback_handler_module(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+    /* raise no error */
+    RAISE_NO_ERROR;
+}
+
 ERROR_CODE _set_http_parser_handler_module(struct http_parser_t *http_parser) {
     /* allocates space for the handler wsgi context and
     then creates and populates the instance after that
@@ -347,6 +357,8 @@ ERROR_CODE _set_http_settings_handler_module(struct http_settings_t *http_settin
     http_settings->on_headers_complete = headers_complete_callback_handler_module;
     http_settings->on_body = body_callback_handler_module;
     http_settings->on_message_complete = message_complete_callback_handler_module;
+	http_settings->on_location = location_callback_handler_module;
+	http_settings->on_virtual_url = virtual_url_callback_handler_module;
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -361,6 +373,8 @@ ERROR_CODE _unset_http_settings_handler_module(struct http_settings_t *http_sett
     http_settings->on_headers_complete = NULL;
     http_settings->on_body = NULL;
     http_settings->on_message_complete = NULL;
+	http_settings->on_location = NULL;
+	http_settings->on_virtual_url = NULL;
 
     /* raises no error */
     RAISE_NO_ERROR;
