@@ -66,6 +66,7 @@
 #define SOCKET_GET_HOST_BY_NAME(hostname) gethostbyname(hostname)
 #define SOCKET_TEST_SOCKET(socket_handle) socket_handle == INVALID_SOCKET
 #define SOCKET_TEST_ERROR(result) result == SOCKET_ERROR
+#define SOCKET_EX_TEST_ERROR(result) result == SOCKET_ERROR || result == 0
 #define SOCKET_GET_ERROR_CODE(result) WSAGetLastError()
 #define SOCKET_SEND(socket_handle, buffer, length, flags) send(socket_handle, buffer, length, flags)
 #define SOCKET_RECEIVE(socket_handle, buffer, length, flags) recv(socket_handle, buffer, length, flags)
@@ -124,6 +125,7 @@
 #define SOCKET_GET_HOST_BY_NAME(hostname) gethostbyname(hostname)
 #define SOCKET_TEST_SOCKET(socket_handle) socket_handle < 0
 #define SOCKET_TEST_ERROR(result) result < 0
+#define SOCKET_EX_TEST_ERROR(result) result <= 0
 #define SOCKET_GET_ERROR_CODE(result) (SOCKET_ERROR_CODE) errno
 #define SOCKET_SEND(socket_handle, buffer, length, flags) write(socket_handle, buffer, length)
 #define SOCKET_RECEIVE(socket_handle, buffer, length, flags) read(socket_handle, buffer, length)
