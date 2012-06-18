@@ -113,8 +113,11 @@ ERROR_CODE start_module(struct environment_t *environment, struct module_t *modu
     service->add_http_handler(service, http_handler);
 
     /* loads the service configuration for the http handler
-    this should change some of it's behavior */
+    this should change some of it's behavior then loads the
+	locations (configurations) associated with the current
+	service environment */
     _load_configuration(service, mod_wsgi_http_handler);
+	_load_locations(service, mod_wsgi_http_handler);
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -228,6 +231,55 @@ ERROR_CODE _load_configuration(struct service_t *service, struct mod_wsgi_http_h
     if(value != NULL) { mod_wsgi_http_handler->reload = (unsigned char) atoi(value); }
 
     /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE _load_locations(struct service_t *service, struct mod_wsgi_http_handler_t *mod_wsgi_http_handler) {
+	/* allocates space for the temporary value object and for
+	the index counter to be used in the iteration of configurations */
+	void *value;
+	size_t index;
+
+	/* allocates space for both the location and the configuration
+	reference stuctures */
+	struct location_t *location;
+	struct sort_map_t *configuration;
+
+	/* allocates space for the mod wsgi location structure
+	reference to be used to resolve the request */
+	struct mod_wsgi_location_t *_location;
+
+	/* allocates space for the various location structures
+	that will be used to resolve the wsgi request */
+	mod_wsgi_http_handler->locations = (struct mod_wsgi_location_t *)
+		MALLOC(service->locations.count * sizeof(struct mod_wsgi_location_t));
+	memset(mod_wsgi_http_handler->locations, 0,
+		service->locations.count * sizeof(struct mod_wsgi_location_t));
+	
+	/* iterates over all the locations in the service to create the
+	proper configuration structures to the module */
+    for(index = 0; index < service->locations.count; index++) {
+		/* retrieves the current (service) location and then uses it
+		to retrieve the configuration sort map */
+		location = &service->locations.values[index];
+		configuration = location->configuration;
+
+		/* retrieves the current mod wsgi configuration reference from
+		the location buffer, this is going t be populated */
+		_location = &mod_wsgi_http_handler->locations[index];
+
+		/* tries ro retrieve the script path from the wsgi configuration and in
+		case it exists sets it in the location (attribute reference change) */
+		get_value_string_sort_map(configuration, (unsigned char *) "script_path", &value);
+		if(value != NULL) { _location->file_path = (char *) value; }
+
+		/* tries to retrieve the script argument from the arguments map, then
+		sets the reload (boolean) value for the service */
+		get_value_string_sort_map(configuration, (unsigned char *) "script_reload", &value);
+		if(value != NULL) { _location->reload = (unsigned char) atoi(value); }
+    }
+
+	/* raises no error */
     RAISE_NO_ERROR;
 }
 
