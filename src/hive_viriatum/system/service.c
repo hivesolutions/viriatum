@@ -50,6 +50,11 @@ void create_service(struct service_t **service_pointer, unsigned char *name, uns
     service->get_http_handler = get_http_handler_service;
     service->locations.count = 0;
 
+#ifdef VIRIATUM_SSL
+    service->ssl_handle = NULL;
+    service->ssl_context = NULL;
+#endif
+
     /* creates the service options */
     create_service_options(&service->options);
 
@@ -111,15 +116,16 @@ void create_service_options(struct service_options_t **service_options_pointer) 
     /* sets the service options attributes (default) values */
     service_options->port = 0;
     service_options->address = NULL;
+	service_options->ssl = 1;
     service_options->handler_name = NULL;
     service_options->local = 0;
     service_options->default_index = 0;
     service_options->use_template = 0;
     service_options->default_virtual_host = NULL;
 
-	/* resets the memry buffer on the index sequence structure so
-	that no index is considered before configuration */
-	memset(service_options->index, 0, sizeof(service_options->index));
+    /* resets the memry buffer on the index sequence structure so
+    that no index is considered before configuration */
+    memset(service_options->index, 0, sizeof(service_options->index));
 
     /* creates the hash map for the virtual hosts */
     create_hash_map(&service_options->virtual_hosts, 0);
@@ -504,6 +510,7 @@ ERROR_CODE _create_client_connection(struct connection_t **connection_pointer, s
     connection->on_read = read_handler_stream_io;
     connection->on_write = write_handler_stream_io;
     connection->on_error = error_handler_stream_io;
+    connection->on_handshake = handshake_handler_stream_io;
     connection->on_open = open_handler_stream_io;
     connection->on_close = close_handler_stream_io;
 
@@ -634,6 +641,10 @@ ERROR_CODE start_service(struct service_t *service) {
     /* unpacks the service options from the service structure */
     struct service_options_t *service_options = service->options;
 
+    /* sets the service status as open, this should mark the
+    service loop as iterable (breaks on stop) */
+    service->status = STATUS_OPEN;
+
     /* registers the various "local" handlers
     in the service, for later usage */
     register_handler_dispatch(service);
@@ -700,6 +711,37 @@ ERROR_CODE start_service(struct service_t *service) {
         RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem setting socket option");
     }
 
+#ifdef VIRIATUM_SSL
+	/* in case the ssl encryption flag is set the ssl sub system
+	should be loaded */
+	if(service_options->ssl) {
+		/* loads the ssl error strings and starts the ssl library, this
+		should be enought to get the ssl sub system running */
+		SSL_load_error_strings();
+		SSL_library_init();
+
+		/* creates the new ssl context and updates the context with the
+		correct certificate file and (private) key file */
+		service->ssl_context = SSL_CTX_new(TLSv1_server_method());
+		SSL_CTX_set_options(service->ssl_context, SSL_OP_SINGLE_DH_USE);
+		socket_result = SSL_CTX_use_certificate_file(service->ssl_context, "dummy.crt" , SSL_FILETYPE_PEM);
+
+		if(SOCKET_EX_TEST_ERROR(socket_result)) {
+			SOCKET_CLOSE(service->service_socket_handle);
+			V_ERROR("Problem loading the ssl certificate file (*.crt)\n");
+			RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem loading ssl certificate");
+		}
+
+		socket_result = SSL_CTX_use_PrivateKey_file(service->ssl_context, "dummy.key", SSL_FILETYPE_PEM);
+
+		if(SOCKET_EX_TEST_ERROR(socket_result)) {
+			SOCKET_CLOSE(service->service_socket_handle);
+			V_ERROR("Problem loading the ssl key file (*.key)\n");
+			RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem loading ssl key");
+		}
+	}
+#endif
+
     /* binds the service socket */
     socket_result = SOCKET_BIND(service->service_socket_handle, socket_address);
 
@@ -736,9 +778,6 @@ ERROR_CODE start_service(struct service_t *service) {
         RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem listening socket");
     }
 
-    /* sets the service status as open */
-    service->status = STATUS_OPEN;
-
     /* retrieves the service (required) elements */
     polling = service->polling;
     service_socket_handle = service->service_socket_handle;
@@ -762,6 +801,17 @@ ERROR_CODE start_service(struct service_t *service) {
 
     /* creates the (service) connection */
     create_connection(&service_connection, service_socket_handle);
+
+#ifdef VIRIATUM_SSL
+	/* in case the ssl encryption flag is set the ssl sub system
+	should be unloaded (to avoid memmory leaks) */
+	if(service_options->ssl) {
+		/* updates the ssl context and handle in the service connection
+		so that it's possible to access the ssl connection */
+		service_connection->ssl_context = service->ssl_context;
+		service_connection->ssl_handle = service->ssl_handle;
+	}
+#endif
 
     /* sets the service select service as the service in the service connection */
     service_connection->service = service;
@@ -791,17 +841,6 @@ ERROR_CODE start_service(struct service_t *service) {
 
 /*    _create_tracker_connection(&tracker_connection, service, "localhost", 9090);
     _create_torrent_connection(&torrent_connection, service, "localhost", 32967);*/
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -840,6 +879,13 @@ ERROR_CODE start_service(struct service_t *service) {
     unregister_handler_file(service);
     unregister_handler_default(service);
     unregister_handler_dispatch(service);
+
+#ifdef VIRIATUM_SSL
+    /* releases the ssl error string and runs the final event process
+    clenaup structure */
+    ERR_free_strings();
+    EVP_cleanup();
+#endif
 
 #ifdef VIRIATUM_PLATFORM_UNIX
     join_workers(service);
@@ -883,6 +929,15 @@ ERROR_CODE close_connections_service(struct service_t *service) {
 
         /* deletes the current connection */
         delete_connection(current_connection);
+
+#ifdef VIRIATUM_SSL
+        /* closes the ssl context for the current serice, this should disable
+        all the metadata access to the ssl */
+        if(service->ssl_context != NULL) {
+            SSL_CTX_free(service->ssl_context);
+            service->ssl_context = NULL;
+        }
+#endif
     }
 
     /* prints a debug message */
@@ -1059,10 +1114,16 @@ ERROR_CODE create_connection(struct connection_t **connection_pointer, SOCKET_HA
     connection->on_read = NULL;
     connection->on_write = NULL;
     connection->on_error = NULL;
+    connection->on_handshake = NULL;
     connection->on_open = NULL;
     connection->on_close = NULL;
     connection->parameters = NULL;
     connection->lower = NULL;
+
+#ifdef VIRIATUM_SSL
+    connection->ssl_handle = NULL;
+    connection->ssl_context = NULL;
+#endif
 
     /* creates the read queue linked list */
     create_linked_list(&connection->read_queue);
@@ -1202,6 +1263,18 @@ ERROR_CODE close_connection(struct connection_t *connection) {
     connection->close_connection = NULL;
     connection->register_write = NULL;
     connection->unregister_write = NULL;
+
+#ifdef VIRIATUM_SSL
+    /* in case there is a valid ssl connection set must release
+    it correcly to avoid any memory leak */
+    if(connection->ssl_handle) {
+        /* shutsdown the ssl handle a releases it memory, unsetting
+        the reference from the connection (avoids leaks) */
+        SSL_shutdown(connection->ssl_handle);
+        SSL_free(connection->ssl_handle);
+        connection->ssl_handle = NULL;
+    }
+#endif
 
     /* closes the socket */
     SOCKET_CLOSE(connection->socket_handle);
