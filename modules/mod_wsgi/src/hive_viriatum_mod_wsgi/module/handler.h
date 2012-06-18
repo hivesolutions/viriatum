@@ -215,6 +215,8 @@ ERROR_CODE header_value_callback_handler_module(struct http_parser_t *http_parse
 ERROR_CODE headers_complete_callback_handler_module(struct http_parser_t *http_parser);
 ERROR_CODE body_callback_handler_module(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size);
 ERROR_CODE message_complete_callback_handler_module(struct http_parser_t *http_parser);
+ERROR_CODE location_callback_handler_module(struct http_parser_t *http_parser, size_t index, size_t offset);
+ERROR_CODE virtual_url_callback_handler_module(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size);
 ERROR_CODE _set_http_parser_handler_module(struct http_parser_t *http_parser);
 ERROR_CODE _unset_http_parser_handler_module(struct http_parser_t *http_parser);
 ERROR_CODE _set_http_settings_handler_module(struct http_settings_t *http_settings);
