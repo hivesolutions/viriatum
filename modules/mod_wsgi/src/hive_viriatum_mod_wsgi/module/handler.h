@@ -48,7 +48,7 @@ typedef struct mod_wsgi_location_t {
      */
     char reload;
 
-	/**
+    /**
      * The reference to the module object reprenting
      * the parsed and compiled file to be used.
      * This reference is used to avoid constant reloading
@@ -85,12 +85,12 @@ typedef struct mod_wsgi_http_handler_t {
      */
     PyObject *module;
 
-	/**
-	 * The various locations loaded from the configuration
-	 * they refer the cofiruation attributes associated
-	 * with the wsgi structures.
-	 */
-	struct mod_wsgi_location_t *locations;
+    /**
+     * The various locations loaded from the configuration
+     * they refer the cofiruation attributes associated
+     * with the wsgi structures.
+     */
+    struct mod_wsgi_location_t *locations;
 } mod_wsgi_http_handler;
 
 typedef struct handler_wsgi_context_t {
