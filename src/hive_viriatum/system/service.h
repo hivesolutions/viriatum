@@ -688,6 +688,10 @@ typedef struct data_t {
 } data_;
 
 #ifdef VIRIATUM_SSL
+/**
+ * The buffer containing the various possible
+ * error codes for an ssl read/write operation.
+ */
 static const char *ssl_errors[9] = {
 	"SSL_ERROR_NONE",
 	"SSL_ERROR_SSL",
@@ -974,3 +978,5 @@ ERROR_CODE get_http_handler_service(struct service_t *service, struct http_handl
 ERROR_CODE _default_options_service(struct service_t *service, struct hash_map_t *arguments);
 ERROR_CODE _file_options_service(struct service_t *service, struct hash_map_t *arguments);
 ERROR_CODE _comand_line_options_service(struct service_t *service, struct hash_map_t *arguments);
+
+__inline const char *get_ssl_error_code(size_t index) { return ssl_errors[index]; }
