@@ -116,7 +116,7 @@ void create_service_options(struct service_options_t **service_options_pointer) 
     /* sets the service options attributes (default) values */
     service_options->port = 0;
     service_options->address = NULL;
-    service_options->ssl = 1;
+    service_options->ssl = 0;
     service_options->handler_name = NULL;
     service_options->local = 0;
     service_options->default_index = 0;
@@ -1433,6 +1433,11 @@ ERROR_CODE _file_options_service(struct service_t *service, struct hash_map_t *a
     in case the (host) value is set, sets it in the service options */
     get_value_string_sort_map(general, (unsigned char *) "host", &value);
     if(value != NULL) { service_options->address = (unsigned char *) value; }
+
+    /* tries to retrieve the ssl argument from the arguments map and
+    in case the (host) value is set, sets it in the service options */
+    get_value_string_sort_map(general, (unsigned char *) "ssl", &value);
+    if(value != NULL) { service_options->ssl = (unsigned char) atoi(value); }
 
     /* tries to retrieve the handler argument from the arguments map and
     in case the (handler) value is set, sets it in the service options */
