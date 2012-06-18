@@ -27,10 +27,6 @@
 
 #pragma once
 
-#ifdef VIRIATUM_PCRE
-#include <pcre.h>
-#endif
-
 #include "../http/http.h"
 #include "../system/system.h"
 
