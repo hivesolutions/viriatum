@@ -78,6 +78,7 @@ void delete_io_connection(struct io_connection_t *io_connection);
 ERROR_CODE accept_handler_stream_io(struct connection_t *connection);
 ERROR_CODE read_handler_stream_io(struct connection_t *connection);
 ERROR_CODE write_handler_stream_io(struct connection_t *connection);
+ERROR_CODE handshake_handler_stream_io(struct connection_t *connection);
 ERROR_CODE error_handler_stream_io(struct connection_t *connection);
 ERROR_CODE open_handler_stream_io(struct connection_t *connection);
 ERROR_CODE close_handler_stream_io(struct connection_t *connection);
