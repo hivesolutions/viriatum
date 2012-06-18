@@ -29,7 +29,7 @@
 
 #include "entry.h"
 
-PyMethodDef wsgi_methods[4];
+PyMethodDef wsgi_methods[3];
 PyMethodDef input_methods[5];
 
 PyTypeObject input_type;

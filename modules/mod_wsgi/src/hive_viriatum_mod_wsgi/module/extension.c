@@ -29,7 +29,7 @@
 
 #include "extension.h"
 
-PyMethodDef wsgi_methods[4] = {
+PyMethodDef wsgi_methods[3] = {
     {
         "start_response",
         wsgi_start_response,
