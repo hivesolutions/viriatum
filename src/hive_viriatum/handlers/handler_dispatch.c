@@ -353,14 +353,22 @@ ERROR_CODE _unset_http_settings_handler_dispatch(struct http_settings_t *http_se
 
 ERROR_CODE _send_response_handler_dispatch(struct http_parser_t *http_parser) {
     /* allocates the response buffer */
-    char *response_buffer = MALLOC(256);
+    char *response_buffer = MALLOC(1024);
 
     /* retrieves the connection from the http parser parameters */
     struct connection_t *connection = (struct connection_t *) http_parser->parameters;
 
     /* writes the response to the connection, registers for the appropriate callbacks
     this method uses the http error util to correctly format the error message */
-    write_http_error(connection, response_buffer, "500", "Internal Server Error", DISPATCH_ERROR_MESSAGE, _send_response_callback_handler_dispatch, (void *) (size_t) http_parser->flags);
+    write_http_error(
+		connection,
+		response_buffer,
+		"500",
+		"Internal Server Error",
+		DISPATCH_ERROR_MESSAGE,
+		_send_response_callback_handler_dispatch,
+		(void *) (size_t) http_parser->flags
+	);
 
     /* raise no error */
     RAISE_NO_ERROR;
