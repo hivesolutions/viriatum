@@ -319,6 +319,41 @@ ERROR_CODE location_callback_handler_module(struct http_parser_t *http_parser, s
 }
 
 ERROR_CODE virtual_url_callback_handler_module(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+    /* retrieves the handler wsgi context from the http parser */
+    struct handler_wsgi_context_t *handler_wsgi_context = (struct handler_wsgi_context_t *) http_parser->context;
+
+    /* checks the position of the get parameters divisor position
+    and then uses it to calculate the size of the (base) path */
+    char *pointer = (char *) memchr((char *) data, '?', data_size);
+    size_t path_size = pointer == NULL ? data_size : pointer - (char *) data;
+    size_t query_size = pointer == NULL ? 0 : data_size - path_size - 1;
+    query_size = query_size > 0 ? query_size : 0;
+
+    /* copies the part of the data buffer relative to the file name
+    this avoids copying the query part */
+    memcpy(handler_wsgi_context->file_name, data, path_size);
+    handler_wsgi_context->file_name[path_size] = '\0';
+    normalize_path((char *) handler_wsgi_context->file_name);
+
+    /* in case the pointer is defined (query separator found) copies
+    the query contents into the target query buffer */
+    if(pointer) { memcpy(handler_wsgi_context->query, pointer + 1, query_size); }
+    handler_wsgi_context->query[query_size] = '\0';
+
+    /* copies the url to the url reference in the handler file context then
+    creates the file path from using the base viriatum path */
+    memcpy(handler_wsgi_context->url, data, data_size);
+    handler_wsgi_context->url[data_size] = '\0';
+    SPRINTF((char *) handler_wsgi_context->file_path, VIRIATUM_MAX_PATH_SIZE, "%s%s%s", VIRIATUM_CONTENTS_PATH, VIRIATUM_BASE_PATH, handler_wsgi_context->file_name);
+    normalize_path((char *) handler_wsgi_context->file_path);
+
+    /* populates the various generated strings, avoids possible recalculation
+    of the lengths of the string */
+    string_populate(&handler_wsgi_context->_file_name_string, handler_wsgi_context->file_name, path_size, 0);
+    string_populate(&handler_wsgi_context->_query_string, handler_wsgi_context->query, query_size, 0);
+    string_populate(&handler_wsgi_context->_url_string, handler_wsgi_context->url, path_size, 0);
+    string_populate(&handler_wsgi_context->_file_path_string, handler_wsgi_context->file_path, 0, 1);
+
     /* raise no error */
     RAISE_NO_ERROR;
 }
