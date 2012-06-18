@@ -687,6 +687,20 @@ typedef struct data_t {
     void *callback_parameters;
 } data_;
 
+#ifdef VIRIATUM_SSL
+static const char *ssl_errors[9] = {
+	"SSL_ERROR_NONE",
+	"SSL_ERROR_SSL",
+	"SSL_ERROR_WANT_READ",
+	"SSL_ERROR_WANT_WRITE",
+	"SSL_ERROR_WANT_X509_LOOKUP",
+	"SSL_ERROR_SYSCALL",
+	"SSL_ERROR_ZERO_RETURN",
+	"SSL_ERROR_WANT_CONNECT",
+	"SSL_ERROR_WANT_ACCEPT"
+};
+#endif
+
 /**
  * Constructor of the service.
  *
