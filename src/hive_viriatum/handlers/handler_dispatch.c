@@ -328,8 +328,8 @@ ERROR_CODE _set_http_settings_handler_dispatch(struct http_settings_t *http_sett
     http_settings->on_headers_complete = headers_complete_callback_handler_dispatch;
     http_settings->on_body = body_callback_handler_dispatch;
     http_settings->on_message_complete = message_complete_callback_handler_dispatch;
-	http_settings->on_location = location_callback_handler_dispatch;
-	http_settings->on_virtual_url = virtual_url_callback_handler_dispatch;
+    http_settings->on_location = location_callback_handler_dispatch;
+    http_settings->on_virtual_url = virtual_url_callback_handler_dispatch;
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -344,8 +344,8 @@ ERROR_CODE _unset_http_settings_handler_dispatch(struct http_settings_t *http_se
     http_settings->on_headers_complete = NULL;
     http_settings->on_body = NULL;
     http_settings->on_message_complete = NULL;
-	http_settings->on_location = NULL;
-	http_settings->on_virtual_url = NULL;
+    http_settings->on_location = NULL;
+    http_settings->on_virtual_url = NULL;
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -361,14 +361,14 @@ ERROR_CODE _send_response_handler_dispatch(struct http_parser_t *http_parser) {
     /* writes the response to the connection, registers for the appropriate callbacks
     this method uses the http error util to correctly format the error message */
     write_http_error(
-		connection,
-		response_buffer,
-		"500",
-		"Internal Server Error",
-		DISPATCH_ERROR_MESSAGE,
-		_send_response_callback_handler_dispatch,
-		(void *) (size_t) http_parser->flags
-	);
+        connection,
+        response_buffer,
+        "500",
+        "Internal Server Error",
+        DISPATCH_ERROR_MESSAGE,
+        _send_response_callback_handler_dispatch,
+        (void *) (size_t) http_parser->flags
+    );
 
     /* raise no error */
     RAISE_NO_ERROR;
