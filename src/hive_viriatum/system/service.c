@@ -117,6 +117,10 @@ void create_service_options(struct service_options_t **service_options_pointer) 
     service_options->use_template = 0;
     service_options->default_virtual_host = NULL;
 
+	/* resets the memry buffer on the index sequence structure so
+	that no index is considered before configuration */
+	memset(service_options->index, 0, sizeof(service_options->index));
+
     /* creates the hash map for the virtual hosts */
     create_hash_map(&service_options->virtual_hosts, 0);
 
@@ -1370,6 +1374,11 @@ ERROR_CODE _file_options_service(struct service_t *service, struct hash_map_t *a
     sets the use template (boolean) value for the service */
     get_value_string_sort_map(general, (unsigned char *) "use_template", &value);
     if(value != NULL) { service_options->use_template = (unsigned char) atoi(value); }
+
+    /* tries to retrieve the index (file) argument from the arguments map, then
+    sets the split value arround the space character in the index value */
+    get_value_string_sort_map(general, (unsigned char *) "index", &value);
+    if(value != NULL) { split(value, (char *) service_options->index, 128, ' '); }
 
     /* raises no error */
     RAISE_NO_ERROR;
