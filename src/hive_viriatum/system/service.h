@@ -39,6 +39,24 @@ struct connection_t;
 struct virtual_host_t;
 struct http_handler_t;
 
+#ifdef VIRIATUM_SSL
+#define CONNECTION_SEND(connection, buffer, length, flags) connection->ssl_handle == NULL ? \
+	SOCKET_SEND(connection->socket_handle, buffer, length, flags) :\
+	SSL_write(connection->ssl_handle, buffer, length)
+#define CONNECTION_RECEIVE(connection, buffer, length, flags) connection->ssl_handle == NULL ? \
+	SOCKET_RECEIVE(connection->socket_handle, buffer, length, flags) :\
+	SSL_read(connection->ssl_handle, buffer, length)
+#define CONNECTION_GET_ERROR_CODE(connection, error_code) connection->ssl_handle == NULL ? \
+	SOCKET_GET_ERROR_CODE(error_code) :\
+	SSL_get_error(connection->ssl_handle, error_code)
+#else
+#define CONNECTION_READ(connection, buffer, length, flags) \
+	SOCKET_SEND(connection->socket_handle, buffer, length, flags)
+#define CONNECTION_RECEIVE(connection, buffer, length, flags) \
+	SOCKET_RECEIVE(connection->socket_handle, buffer, length, flags)
+#define CONNECTION_GET_ERROR_CODE(connection, error_code) SOCKET_GET_ERROR_CODE(error_code)
+#endif
+
 /**
  * Enumeration defining the various types
  * of service processes that may exist.
@@ -338,6 +356,21 @@ typedef struct service_t {
     service_http_handler_update add_http_handler;
     service_http_handler_update remove_http_handler;
     service_http_handler_access get_http_handler;
+
+#ifdef VIRIATUM_SSL
+    /**
+     * The handle to the ssl socket reference that is encapsulating
+     * the encrypted access to the socket.
+     */
+    SSL *ssl_handle;
+
+    /**
+     * The ssl configuration context that is currenly being
+     * used in the ssl socket handle.
+     * This object is used in the construction of the handle.
+     */
+    SSL_CTX *ssl_context;
+#endif
 } service_;
 
 /**
@@ -412,13 +445,13 @@ typedef struct service_options_t {
      */
     struct virtual_host_t *default_virtual_host;
 
-	/**
-	 * The string absed buffer of file apths to the
-	 * index files to be used for root directory listing.
-	 * This value should be used as the default way to
-	 * discover the file to be used for directory listing.
-	 */
-	unsigned char index[32][128];
+    /**
+     * The string absed buffer of file apths to the
+     * index files to be used for root directory listing.
+     * This value should be used as the default way to
+     * discover the file to be used for directory listing.
+     */
+    unsigned char index[32][128];
 
     /**
      * The set of virtual hosts associated with the
@@ -555,7 +588,13 @@ typedef struct connection_t {
 
     /**
      * Callback function reference to be called
-     * when the connection is an erroneous state.
+     * when the connection in an handshake state.
+     */
+    connection_callback on_handshake;
+
+    /**
+     * Callback function reference to be called
+     * when the connection in an erroneous state.
      */
     connection_callback on_error;
 
@@ -584,6 +623,21 @@ typedef struct connection_t {
      * connection substrate (child).
      */
     void *lower;
+
+#ifdef VIRIATUM_SSL
+    /**
+     * The handle to the ssl socket reference that is encapsulating
+     * the encrypted access to the socket.
+     */
+    SSL *ssl_handle;
+
+    /**
+     * The ssl configuration context that is currenly being
+     * used in the ssl socket handle.
+     * This object is used in the construction of the handle.
+     */
+    SSL_CTX *ssl_context;
+#endif
 } connection;
 
 /**
@@ -602,7 +656,15 @@ typedef enum status_e {
      * Status where an object is closed
      * or in a stopped "like" state.
      */
-    STATUS_CLOSED
+    STATUS_CLOSED,
+
+    /**
+     * Status where an object is in the
+     * handshake state, this is the typical
+     * status for the initial part of a
+     * secure encrypted connection.
+     */
+    STATUS_HANDSHAKE
 } status;
 
 /**
