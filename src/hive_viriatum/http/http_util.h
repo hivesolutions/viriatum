@@ -36,7 +36,7 @@ struct data_t;
 struct connection_t;
 typedef ERROR_CODE (*_connection_data_callback) (struct connection_t *, struct data_t *, void *);
 
-static const char http_status_codes[5][64][256] = {
+static const char *http_status_codes[5][64] = {
     {
         "Continue",
         "Switching Protocols",
