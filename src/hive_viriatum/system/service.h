@@ -979,4 +979,4 @@ ERROR_CODE _default_options_service(struct service_t *service, struct hash_map_t
 ERROR_CODE _file_options_service(struct service_t *service, struct hash_map_t *arguments);
 ERROR_CODE _comand_line_options_service(struct service_t *service, struct hash_map_t *arguments);
 
-__inline static const char *get_ssl_error_code(size_t index) { return ssl_errors[index]; }
+const char *_get_ssl_error_code(size_t index);
