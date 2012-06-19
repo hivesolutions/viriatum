@@ -131,8 +131,8 @@ void create_service_options(struct service_options_t **service_options_pointer) 
     service_options->port = 0;
     service_options->address = NULL;
     service_options->ssl = 0;
-	service_options->ssl_csr = NULL;
-	service_options->ssl_key = NULL;
+    service_options->ssl_csr = NULL;
+    service_options->ssl_key = NULL;
     service_options->handler_name = NULL;
     service_options->local = 0;
     service_options->default_index = 0;
@@ -645,11 +645,11 @@ ERROR_CODE start_service(struct service_t *service) {
     /* allocates the memory ussage */
     size_t memory_usage;
 
-	/* alocates space for the various configuration file paths
-	to be loaded for the start of the service, this is a local
-	temporary variable to work with configuration paths */
-	char config_path[VIRIATUM_MAX_PATH_SIZE];
-	char *_config_path;
+    /* alocates space for the various configuration file paths
+    to be loaded for the start of the service, this is a local
+    temporary variable to work with configuration paths */
+    char config_path[VIRIATUM_MAX_PATH_SIZE];
+    char *_config_path;
 
     /* allocates the option value and sets it to one (valid) */
     SOCKET_OPTION option_value = 1;
@@ -744,15 +744,15 @@ ERROR_CODE start_service(struct service_t *service) {
         service->ssl_context = SSL_CTX_new(TLSv1_server_method());
         SSL_CTX_set_options(service->ssl_context, SSL_OP_SINGLE_DH_USE);
 
-		/* resolves the configuration file from the ssl certificate defaulting to
-		the predefined "server" certificate file */
-		_config_path = resolve_config_path(
-			service_options->ssl_key,
-			"cert/server.crt",
-			config_path
-		);
+        /* resolves the configuration file from the ssl certificate defaulting to
+        the predefined "server" certificate file */
+        _config_path = resolve_config_path(
+            service_options->ssl_key,
+            "cert/server.crt",
+            config_path
+        );
 
-		/* loads the certificate file into the ssl context so that the
+        /* loads the certificate file into the ssl context so that the
         context is correctly validated */
         socket_result = SSL_CTX_use_certificate_file(service->ssl_context, _config_path, SSL_FILETYPE_PEM);
 
@@ -764,17 +764,17 @@ ERROR_CODE start_service(struct service_t *service) {
             RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem loading ssl certificate");
         }
 
-		/* resolves the configuration file from the ssl key defaulting to
-		the predefined "server" key file */
-		_config_path = resolve_config_path(
-			service_options->ssl_key,
-			"cert/server.key",
-			config_path
-		);
+        /* resolves the configuration file from the ssl key defaulting to
+        the predefined "server" key file */
+        _config_path = resolve_config_path(
+            service_options->ssl_key,
+            "cert/server.key",
+            config_path
+        );
 
-		/* loads the private key file into the ssl context so that the
+        /* loads the private key file into the ssl context so that the
         context is correctly validated */
-		socket_result = SSL_CTX_use_PrivateKey_file(service->ssl_context, _config_path, SSL_FILETYPE_PEM);
+        socket_result = SSL_CTX_use_PrivateKey_file(service->ssl_context, _config_path, SSL_FILETYPE_PEM);
 
         /* tests if there was an error loading private key file and
         if it did closes the socket and returns in error (major problem) */
@@ -925,14 +925,14 @@ ERROR_CODE start_service(struct service_t *service) {
     unregister_handler_dispatch(service);
 
 #ifdef VIRIATUM_SSL
-	/* in case the ssl encryption flag is set the ssl sub system
+    /* in case the ssl encryption flag is set the ssl sub system
     should be unloaded (to avoid memmory leaks) */
     if(service_options->ssl) {
-		/* releases the ssl error string and runs the final event process
-		clenaup structure */
-		ERR_free_strings();
-		EVP_cleanup();
-	}
+        /* releases the ssl error string and runs the final event process
+        clenaup structure */
+        ERR_free_strings();
+        EVP_cleanup();
+    }
 #endif
 
 #ifdef VIRIATUM_PLATFORM_UNIX

@@ -410,19 +410,19 @@ typedef struct service_options_t {
      */
     unsigned char ssl;
 
-	/**
-	 * The path to the ssl certificate file to be used
-	 * in the loading of the secure connection for this
-	 * service.
-	 */
-	unsigned char *ssl_csr;
+    /**
+     * The path to the ssl certificate file to be used
+     * in the loading of the secure connection for this
+     * service.
+     */
+    unsigned char *ssl_csr;
 
-	/**
-	 * The path to the ssl private key file to be used
-	 * in the loading of the secure connection for this
-	 * service.
-	 */
-	unsigned char *ssl_key;
+    /**
+     * The path to the ssl private key file to be used
+     * in the loading of the secure connection for this
+     * service.
+     */
+    unsigned char *ssl_key;
 
     /**
      * The name of the "default" handler to be used
