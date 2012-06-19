@@ -739,10 +739,20 @@ ERROR_CODE start_service(struct service_t *service) {
     /* resets the ipv6 socket address into a zero occupied buffer
     for the range of the socket address */
     memset(&_socket6_address, 0, sizeof(_socket6_address));
+
+#ifdef VIRIATUM_PLATFORM_WIN32
     _socket6_address.ai_family = SOCKET_INTERNET6_TYPE;
     _socket6_address.ai_socktype = SOCKET_PACKET_TYPE;
     _socket6_address.ai_flags = AI_NUMERICHOST | AI_PASSIVE;
     socket_result = getaddrinfo(NULL, service_options->_port, &_socket6_address, &socket6_address);
+#endif
+
+#ifdef VIRIATUM_PLATFORM_UNIX
+   _socket6_address.sin6_len = sizeof(server);
+   _socket6_address.sin6_family = SOCKET_INTERNET6_TYPE;
+   _socket6_address.sin6_addr = in6addr_any;
+   _socket6_address.sin6_port = htons(service_options->port);
+#endif
 
     /* in case there was an error retrieving the address information
     must be correctly displayed */
