@@ -252,6 +252,7 @@ ERROR_CODE url_callback_handler_dispatch(struct http_parser_t *http_parser, cons
         CALL_V(http_connection->http_settings->on_message_begin, http_parser);
         CALL_V(http_connection->http_settings->on_url, http_parser, data, data_size);
 
+#ifdef VIRIATUM_PCRE
         /* in case there was a regex (location) match the dispatcher
         must also notify the handler about the "new" location sending
         both the index of the location in the service locations and the
@@ -260,6 +261,7 @@ ERROR_CODE url_callback_handler_dispatch(struct http_parser_t *http_parser, cons
             CALL_V(http_connection->http_settings->on_location, http_parser, index, match_size);
             CALL_V(http_connection->http_settings->on_virtual_url, http_parser, data + match_size, data_size - match_size);
         }
+#endif
     } else {
         /* prints an error message to the output */
         V_ERROR_F("Error retrieving '%s' handler reference\n", handler_name);
