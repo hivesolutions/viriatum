@@ -596,8 +596,8 @@ ERROR_CODE start_service(struct service_t *service) {
 #endif
     SOCKET_ADDRESS_INTERNET6 _socket6_address;
 
-	/* allocates space for the service socket handle and for
-	the associated connection structure */
+    /* allocates space for the service socket handle and for
+    the associated connection structure */
     SOCKET_HANDLE service_socket6_handle;
     struct connection_t *service6_connection;
 #endif
@@ -606,8 +606,8 @@ ERROR_CODE start_service(struct service_t *service) {
     /* allocates the socket address structure */
     SOCKET_ADDRESS_INTERNET socket_address;
 
-	/* allocates space for the service socket handle and for
-	the associated connection structure */
+    /* allocates space for the service socket handle and for
+    the associated connection structure */
     SOCKET_HANDLE service_socket_handle;
     struct connection_t *service_connection;
 #endif
@@ -900,13 +900,13 @@ ERROR_CODE start_service(struct service_t *service) {
 
 #ifdef VIRIATUM_IP6
 #ifdef VIRIATUM_PLATFORM_WIN32
-	/* binds the ipv6 service socket */
+    /* binds the ipv6 service socket */
     socket_result = SOCKET_BIND_EX(service->service_socket6_handle, socket6_address->ai_addr, socket6_address->ai_addrlen);
 #endif
 
 #ifdef VIRIATUM_PLATFORM_UNIX
-	/* binds the ipv6 service socket */
-	socket_result = SOCKET_BIND_EX(service->service_socket6_handle, _socket6_address, sizeof(_socket6_address));
+    /* binds the ipv6 service socket */
+    socket_result = SOCKET_BIND_EX(service->service_socket6_handle, _socket6_address, sizeof(_socket6_address));
 #endif
 
     /* in case there was an error binding the socket */
@@ -944,18 +944,18 @@ ERROR_CODE start_service(struct service_t *service) {
 #endif
 
     /* retrieves the polling service currently in use
-	for the service */
+    for the service */
     polling = service->polling;
 
 #ifndef VIRIATUM_IP6_DUAL
-	/* retrieves the required elements (eg: the handle
-	to the (normal) socket) */
+    /* retrieves the required elements (eg: the handle
+    to the (normal) socket) */
     service_socket_handle = service->service_socket_handle;
 #endif
 
 #ifdef VIRIATUM_IP6
-	/* retrieves the ipv6 required elements (eg: the handle
-	to the ipv6 socket) */
+    /* retrieves the ipv6 required elements (eg: the handle
+    to the ipv6 socket) */
     service_socket6_handle = service->service_socket6_handle;
 #endif
 
@@ -977,7 +977,7 @@ ERROR_CODE start_service(struct service_t *service) {
     polling->open(polling);
 
 #ifndef VIRIATUM_IP6_DUAL
-	/* creates the (service) connection */
+    /* creates the (service) connection */
     create_connection(&service_connection, service_socket_handle);
 #endif
 
