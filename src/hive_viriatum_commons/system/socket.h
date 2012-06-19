@@ -128,6 +128,7 @@
 #define SOCKET_FINISH()
 #define SOCKET_CREATE(type, stream_type, protocol_type) socket(type, stream_type, protocol_type)
 #define SOCKET_BIND(socket_handle, socket_address) bind(socket_handle, (struct sockaddr *) &socket_address, sizeof(SOCKET_ADDRESS))
+#define SOCKET_BIND_EX(socket_handle, socket_address, socket_address_size) bind(socket_handle, (struct sockaddr *) &socket_address, socket_address_size)
 #define SOCKET_LISTEN(socket_handle) listen(socket_handle, SOCKET_CONNECTIONS)
 #define SOCKET_CONNECT(socket_handle, socket_address) connect(socket_handle, (struct sockaddr *) &socket_address, sizeof(SOCKET_ADDRESS))
 #define SOCKET_CONNECT_SIZE(socket_handle, socket_address, socket_address_size) connect(socket_handle, (struct sockaddr *) &socket_address, socket_address_size)
