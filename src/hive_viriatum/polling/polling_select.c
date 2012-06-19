@@ -333,14 +333,14 @@ ERROR_CODE _poll_polling_select(struct polling_select_t *polling_select, struct 
     /* iterates continuously */
     while(1) {
         /* in case the select count is zero, time to break the
-		current loop of iteration */
+        current loop of iteration */
         if(select_count == 0) { break; }
 
         /* retrieves the next value from the iterator */
         get_next_iterator(connections_list_iterator, (void **) &current_connection);
 
         /* in case the current connection is null (end of iterator)
-		should break the loop */
+        should break the loop */
         if(current_connection == NULL) { break; }
 
         /* prints a debug message */

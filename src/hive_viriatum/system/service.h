@@ -312,16 +312,16 @@ typedef struct service_t {
     /**
      * The socket handle to the service
      * connection, used to accept connections.
-	 * This is the base socket handle for
-	 * the service for the ipv4 connection.
+     * This is the base socket handle for
+     * the service for the ipv4 connection.
      */
     SOCKET_HANDLE service_socket_handle;
 
     /**
      * The socket handle to the service
      * connection, used to accept connections.
-	 * This is the "extra" socket handle for
-	 * the service for the ipv6 connection.
+     * This is the "extra" socket handle for
+     * the service for the ipv6 connection.
      */
     SOCKET_HANDLE service_socket6_handle;
 
