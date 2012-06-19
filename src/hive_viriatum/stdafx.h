@@ -75,6 +75,7 @@
 #include "../hive_viriatum_commons/viriatum_commons.h"
 
 #include "global/definitions.h"
+#include "global/common.h"
 
 #ifdef VIRIATUM_SSL
 #include <openssl/err.h>

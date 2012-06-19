@@ -661,6 +661,10 @@
                 Name="Global"
                 >
                 <File
+                    RelativePath="..\..\src\hive_viriatum\global\common.h"
+                    >
+                </File>
+                <File
                     RelativePath="..\..\src\hive_viriatum\global\definitions.h"
                     >
                 </File>

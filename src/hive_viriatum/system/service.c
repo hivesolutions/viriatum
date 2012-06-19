@@ -747,7 +747,7 @@ ERROR_CODE start_service(struct service_t *service) {
         /* resolves the configuration file from the ssl certificate defaulting to
         the predefined "server" certificate file */
         _config_path = VIRIATUM_RESOLVE_PATH(
-			(char *) service_options->ssl_csr,
+            (char *) service_options->ssl_csr,
             "cert/server.crt",
             config_path
         );
