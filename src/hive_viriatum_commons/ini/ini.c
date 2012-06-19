@@ -220,7 +220,7 @@ ERROR_CODE _ini_value_end_callback(struct ini_engine_t *ini_engine, const unsign
 	size_t _size = size - offset;
     char *value = MALLOC(_size + 1);
     memcpy(value, pointer + offset, _size);
-    value[size - _size] = '\0';
+    value[_size] = '\0';
 
     /* tries to retrieve the current section configuration from the
     configuration in case it's not possible to retrieve it a new
