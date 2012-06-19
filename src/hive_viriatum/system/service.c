@@ -912,8 +912,13 @@ ERROR_CODE start_service(struct service_t *service) {
     socket_result = SOCKET_BIND_EX(service->service_socket6_handle, socket6_address->ai_addr, socket6_address->ai_addrlen);
 #endif
 
+
+
+
+
 #ifdef VIRIATUM_PLATFORM_UNIX
-	socket_result = bind(service->service_socket6_handle, (struct sockaddr *) &socket6_address, sizeof(socket6_address));
+	/* binds the ipv6 service socket */
+	socket_result = bind(service->service_socket6_handle, (struct sockaddr *) &_socket6_address, sizeof(_socket6_address));
 #endif
 
     /* in case there was an error binding the socket */
