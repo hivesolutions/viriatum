@@ -747,7 +747,7 @@ ERROR_CODE start_service(struct service_t *service) {
         /* resolves the configuration file from the ssl certificate defaulting to
         the predefined "server" certificate file */
         _config_path = resolve_config_path(
-            service_options->ssl_key,
+			service_options->ssl_csr,
             "cert/server.crt",
             config_path
         );
