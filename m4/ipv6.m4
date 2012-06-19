@@ -23,7 +23,12 @@
 # __copyright__ = Copyright (c) 2008 Hive Solutions Lda.
 # __license__   = GNU General Public License (GPL), Version 3
 
-AC_ARG_ENABLE(ipv6, AC_HELP_STRING([--disable-ipv6], [disable ipv6 support]), [ if test "$enableval" = "no"; then disabled_ip6=1 fi ], [ disabled_ip6=0 ] )
+AC_ARG_ENABLE(ipv6,
+  AC_HELP_STRING([--disable-ipv6], [Disable IPv6 support]),
+  [ if test "$enableval" = "no"; then
+       disabled_ipv6=1
+    fi ],
+  [ disabled_ipv6=0 ] )
 
 AC_SEARCH_LIBS(getaddrinfo, socket inet6)
 AC_SEARCH_LIBS(getnameinfo, socket inet6)
@@ -41,7 +46,7 @@ AC_ACME_SOCKADDR_STORAGE
 AC_MSG_CHECKING(if the system supports ipv6)
 have_ip6=false
 
-if test "$disabled_ip6" = 1; then
+if test "$disabled_ipv6" = 1; then
     AC_MSG_RESULT([no -- disabled by user])
 else
     if test "x$ac_cv_acme_sockaddr_in6" = "xyes"; then
