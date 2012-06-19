@@ -25,4 +25,7 @@
 
 include $(top_srcdir)/Common.am
 
-nobase_sysconf_DATA = viriatum/viriatum.ini
+nobase_sysconf_DATA = viriatum/viriatum.ini \
+viriatum/cert/server.crt \
+viriatum/cert/server.csr \
+viriatum/cert/server.key
