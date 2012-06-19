@@ -28,12 +28,23 @@
 #pragma once
 
 #ifdef VIRIATUM_PLATFORM_WIN32
+
+#ifdef VIRIATUM_IP6
+#include <Ws2tcpip.h>
+#else
 #include <winsock.h>
+#endif
+#ifdef VIRIATUM_IP6
+#define SOCKET_ADDRESS SOCKADDR_STORAGE
+#define SOCKET_ADDRESS_INTERNET6 SOCKET_INFO
+#else
+#define SOCKET_ADDRESS SOCKADDR
+#endif
 #define SOCKET_CONNECTIONS 256
 #define SOCKET_DATA WSADATA
+#define SOCKET_INFO ADDRINFO
 #define SOCKET_HANDLE SOCKET
 #define SOCKET_ADDRESS_SIZE int
-#define SOCKET_ADDRESS SOCKADDR
 #define SOCKET_ADDRESS_INTERNET SOCKADDR_IN
 #define SOCKET_HOSTENT HOSTENT
 #define SOCKET_FLAGS unsigned long
@@ -43,6 +54,7 @@
 #define SOCKET_WOULDBLOCK WSAEWOULDBLOCK
 #define SOCKET_INTERNET_TYPE AF_INET
 #define SOCKET_INTERNET6_TYPE AF_INET6
+#define SOCKET_INTERNET_ALL_TYPE PF_UNSPEC
 #define SOCKET_PACKET_TYPE SOCK_STREAM
 #define SOCKET_DATAGRAM_TYPE SOCK_DGRAM
 #define SOCKET_PROTOCOL_TCP IPPROTO_TCP
@@ -54,10 +66,11 @@
 #define SOCKET_FINISH() WSACleanup()
 #define SOCKET_CREATE(type, stream_type, protocol_type) socket(type, stream_type, protocol_type)
 #define SOCKET_BIND(socket_handle, socket_address) bind(socket_handle, (LPSOCKADDR) &socket_address, sizeof(SOCKET_ADDRESS))
+#define SOCKET_BIND_EX(socket_handle, socket_address, socket_address_size) bind(socket_handle, (LPSOCKADDR) socket_address, socket_address_size)
 #define SOCKET_LISTEN(socket_handle) listen(socket_handle, SOCKET_CONNECTIONS)
 #define SOCKET_CONNECT(socket_handle, socket_address) connect(socket_handle, (LPSOCKADDR) &socket_address, sizeof(SOCKET_ADDRESS))
 #define SOCKET_CONNECT_SIZE(socket_handle, socket_address, socket_address_size) connect(socket_handle, (LPSOCKADDR) &socket_address, socket_address_size)
-#define SOCKET_ACCEPT(socket_handle, socket_address, socket_address_size) accept(socket_handle, socket_address, &socket_address_size)
+#define SOCKET_ACCEPT(socket_handle, socket_address, socket_address_size) accept(socket_handle, (LPSOCKADDR) socket_address, &socket_address_size)
 #define SOCKET_CLOSE(socket_handle) closesocket(socket_handle)
 #define SOCKET_ADDRESS_CREATE(socket_address, type, address, port) memset(&socket_address, 0, sizeof(SOCKET_ADDRESS));\
     socket_address.sin_family = type;\
