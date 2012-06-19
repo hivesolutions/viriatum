@@ -1477,9 +1477,19 @@ ERROR_CODE _file_options_service(struct service_t *service, struct hash_map_t *a
     if(value != NULL) { service_options->address = (unsigned char *) value; }
 
     /* tries to retrieve the ssl argument from the arguments map and
-    in case the (host) value is set, sets it in the service options */
+    in case the (ssl) value is set, sets it in the service options */
     get_value_string_sort_map(general, (unsigned char *) "ssl", &value);
     if(value != NULL) { service_options->ssl = (unsigned char) atoi(value); }
+
+    /* tries to retrieve the ssl certificate from the arguments map and
+    in case the (ssl csr) value is set, sets it in the service options */
+    get_value_string_sort_map(general, (unsigned char *) "ssl_csr", &value);
+    if(value != NULL) { service_options->ssl_csr = (unsigned char *) value;  }
+
+    /* tries to retrieve the ssl (private) key from the arguments map and
+    in case the (ssl key) value is set, sets it in the service options */
+    get_value_string_sort_map(general, (unsigned char *) "ssl_key", &value);
+    if(value != NULL) { service_options->ssl_key = (unsigned char *) value;  }
 
     /* tries to retrieve the handler argument from the arguments map and
     in case the (handler) value is set, sets it in the service options */
