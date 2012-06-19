@@ -62,10 +62,11 @@ There are a lot of possible building features to enable
 * `--with-wwwroot=path` - Sets the path to be used to install and serve the default content
 * `--enable-debug` - Enables the extra debugging capabilities in viriatum
 * `--enable-defaults` - Enables the default paths in the viriatum server, ignoring wwwroot and moduleroot at runtime
+* `--disable-ipv6` - Disables the support for the ipv6 protocol stack
 
 ## Notes
 
-* In order to compile to WIN_NT 500 (Windows 2000) disable IPv6 support (#undef VIRIATUM_IP6)
+* In order to compile to WINVER <= 0x0500 (Windows 2000 or older) disable IPv6 support (#undef VIRIATUM_IP6)
 
 ## Modules
 
