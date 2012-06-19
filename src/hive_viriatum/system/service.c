@@ -810,7 +810,7 @@ ERROR_CODE start_service(struct service_t *service) {
 
 #ifdef VIRIATUM_SSL
     /* in case the ssl encryption flag is set the ssl sub system
-    should be unloaded (to avoid memmory leaks) */
+    should be set in the service connection */
     if(service_options->ssl) {
         /* updates the ssl context and handle in the service connection
         so that it's possible to access the ssl connection */
@@ -887,10 +887,14 @@ ERROR_CODE start_service(struct service_t *service) {
     unregister_handler_dispatch(service);
 
 #ifdef VIRIATUM_SSL
-    /* releases the ssl error string and runs the final event process
-    clenaup structure */
-    ERR_free_strings();
-    EVP_cleanup();
+	/* in case the ssl encryption flag is set the ssl sub system
+    should be unloaded (to avoid memmory leaks) */
+    if(service_options->ssl) {
+		/* releases the ssl error string and runs the final event process
+		clenaup structure */
+		ERR_free_strings();
+		EVP_cleanup();
+	}
 #endif
 
 #ifdef VIRIATUM_PLATFORM_UNIX
