@@ -774,7 +774,7 @@ ERROR_CODE start_service(struct service_t *service) {
         SOCKET_ERROR_CODE creating_error_code = SOCKET_GET_ERROR_CODE(socket_result);
 
         /* prints the error */
-        V_ERROR_F("Problem creating socket: %d\n", creating_error_code);
+        V_ERROR_F("Problem creating ip6 socket: %d\n", creating_error_code);
 
         /* raises an error */
         RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem creating socket");
@@ -804,7 +804,7 @@ ERROR_CODE start_service(struct service_t *service) {
         SOCKET_ERROR_CODE option_error_code = SOCKET_GET_ERROR_CODE(socket_result);
 
         /* prints the error */
-        V_ERROR_F("Problem setting socket option: %d\n", option_error_code);
+        V_ERROR_F("Problem setting ip6 socket option: %d\n", option_error_code);
 
         /* closes the service socket */
         SOCKET_CLOSE(service->service_socket6_handle);
@@ -921,13 +921,15 @@ ERROR_CODE start_service(struct service_t *service) {
 	socket_result = bind(service->service_socket6_handle, (struct sockaddr *) &_socket6_address, sizeof(_socket6_address));
 #endif
 
+
+
     /* in case there was an error binding the socket */
     if(SOCKET_TEST_ERROR(socket_result)) {
         /* retrieves the binding error code */
         SOCKET_ERROR_CODE binding_error_code = SOCKET_GET_ERROR_CODE(socket_result);
 
         /* prints the error */
-        V_ERROR_F("Problem binding socket: %d\n", binding_error_code);
+        V_ERROR_F("Problem binding ip6 socket: %d\n", binding_error_code);
 
         /* closes the service socket */
         SOCKET_CLOSE(service->service_socket_handle);
@@ -945,7 +947,7 @@ ERROR_CODE start_service(struct service_t *service) {
         SOCKET_ERROR_CODE binding_error_code = SOCKET_GET_ERROR_CODE(socket_result);
 
         /* prints the error */
-        V_ERROR_F("Problem listening socket: %d\n", binding_error_code);
+        V_ERROR_F("Problem listening ip6 socket: %d\n", binding_error_code);
 
         /* closes the service socket */
         SOCKET_CLOSE(service->service_socket_handle);
