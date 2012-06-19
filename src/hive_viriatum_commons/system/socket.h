@@ -100,13 +100,15 @@
 #include <netinet/in.h>
 #include <netinet/tcp.h>
 #ifdef VIRIATUM_IP6
+#define SOCKET_ADDRESS struct sockaddr_in6
 #define SOCKET_ADDRESS_INTERNET6 struct sockaddr_in6
+#else
+#define SOCKET_ADDRESS struct sockaddr
 #endif
 #define SOCKET_CONNECTIONS 256
 #define SOCKET_DATA void *
 #define SOCKET_HANDLE int
 #define SOCKET_ADDRESS_SIZE socklen_t
-#define SOCKET_ADDRESS struct sockaddr
 #define SOCKET_ADDRESS_INTERNET struct sockaddr_in
 #define SOCKET_HOSTENT struct hostent
 #define SOCKET_FLAGS unsigned long
