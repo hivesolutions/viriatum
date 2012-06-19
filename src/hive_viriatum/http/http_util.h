@@ -36,6 +36,12 @@ struct data_t;
 struct connection_t;
 typedef ERROR_CODE (*_connection_data_callback) (struct connection_t *, struct data_t *, void *);
 
+/**
+ * The buffer containing sequences of the
+ * descriptions to the various http error
+ * codes orderes by major and minor parts
+ * of the error code.
+ */
 const char *http_status_codes[5][64];
 
 ERROR_CODE write_http_error(struct connection_t *connection, char *header, char *error_code, char *error_message, char *error_description, _connection_data_callback callback, void *callback_parameters);
