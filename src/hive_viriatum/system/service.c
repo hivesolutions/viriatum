@@ -616,7 +616,7 @@ ERROR_CODE start_service(struct service_t *service) {
     struct connection_t *service6_connection;
 #endif
 
-#ifdef VIRIATUM_IP6_DUAL
+#ifndef VIRIATUM_IP6_DUAL
     /* allocates the socket address structure */
     SOCKET_ADDRESS_INTERNET socket_address;
 
