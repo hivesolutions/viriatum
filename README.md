@@ -63,6 +63,10 @@ There are a lot of possible building features to enable
 * `--enable-debug` - Enables the extra debugging capabilities in viriatum
 * `--enable-defaults` - Enables the default paths in the viriatum server, ignoring wwwroot and moduleroot at runtime
 
+## Notes
+
+* In order to compile to WIN_NT 500 (Windows 2000) disable IPv6 support (#undef VIRIATUM_IP6)
+
 ## Modules
 
 There are a series of modules for the viriatum server in order to compile then
