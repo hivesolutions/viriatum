@@ -112,5 +112,5 @@ ERROR_CODE write_http_error(struct connection_t *connection, char *header, char 
 ERROR_CODE log_http_request(char *host, char *identity, char *user, char *method, char *uri, char *protocol, int error_code, size_t content_length);
 
 __inline static const char *_get_http_status_code(size_t major, size_t minor) {
-	return http_status_codes[major][minor];
+    return http_status_codes[major][minor];
 }

@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Hive Viriatum Web Server. If falset, see <http://www.gnu.org/licenses/>.
 
-# __author__    = Jo„o Magalh„es <joamag@hive.pt>
+# __author__    = Jo√£o Magalh√£es <joamag@hive.pt>
 # __version__   = 1.0.0
 # __revision__  = $LastChangedRevision: 2390 $
 # __date__      = $LastChangedDate: 2009-04-02 08:36:50 +0100 (qui, 02 Abr 2009) $
@@ -49,7 +49,7 @@ else
             if test "x$ac_cv_working_getnameinfo" = "xyes"; then
                 have_ip6=true
                 AC_MSG_RESULT([yes])
- 		        AC_DEFINE(HAVE_IP6, 1, [Define if you have ipv6 support])
+                 AC_DEFINE(HAVE_IP6, 1, [Define if you have ipv6 support])
             else
                 AC_MSG_RESULT([no -- no getnameinfo])
             fi
