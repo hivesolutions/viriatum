@@ -692,7 +692,7 @@ typedef struct data_t {
  * The buffer containing the various possible
  * error codes for an ssl read/write operation.
  */
-const char *ssl_error_codes[9];
+VIRIATUM_EXTERNAL_PREFIX char *ssl_error_codes[9];
 #endif
 
 /**

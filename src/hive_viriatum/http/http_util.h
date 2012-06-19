@@ -42,7 +42,7 @@ typedef ERROR_CODE (*_connection_data_callback) (struct connection_t *, struct d
  * codes orderes by major and minor parts
  * of the error code.
  */
-const char *http_status_codes[5][64];
+VIRIATUM_EXTERNAL_PREFIX char *http_status_codes[5][64];
 
 ERROR_CODE write_http_error(struct connection_t *connection, char *header, char *error_code, char *error_message, char *error_description, _connection_data_callback callback, void *callback_parameters);
 ERROR_CODE log_http_request(char *host, char *identity, char *user, char *method, char *uri, char *protocol, int error_code, size_t content_length);

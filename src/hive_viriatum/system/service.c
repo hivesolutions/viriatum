@@ -30,7 +30,7 @@
 #include "service.h"
 
 #ifdef VIRIATUM_SSL
-const char *ssl_error_codes[9] = {
+char *ssl_error_codes[9] = {
     "SSL_ERROR_NONE",
     "SSL_ERROR_SSL",
     "SSL_ERROR_WANT_READ",

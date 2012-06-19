@@ -29,7 +29,7 @@
 
 #include "http_util.h"
 
-const char *http_status_codes[5][64] = {
+char *http_status_codes[5][64] = {
     {
         "Continue",
         "Switching Protocols",
