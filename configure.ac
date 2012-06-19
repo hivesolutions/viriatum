@@ -41,7 +41,7 @@ LT_INIT
 AC_PROG_LIBTOOL
 AM_PROG_LIBTOOL
 
-m4_include([m4/extra/initialization.m4])
+m4_include([m4/extra/network.m4])
 m4_include([m4/initialization.m4])
 m4_include([m4/exports.m4])
 m4_include([m4/programs.m4])
