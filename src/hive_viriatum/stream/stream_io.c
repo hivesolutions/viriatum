@@ -165,15 +165,15 @@ ERROR_CODE accept_handler_stream_io(struct connection_t *connection) {
                 socket_result = SSL_accept(ssl_handle);
 
                 /* in case the socket result is zero the connection has been closed
-				from the other side must close it from here also */
-				if(socket_result == 0) {
+                from the other side must close it from here also */
+                if(socket_result == 0) {
                     /* closes the (client) connection, the ssl connection has been
                     closed from the other side (client side) */
                     client_connection->close_connection(client_connection);
-				}
-				/* in case the result of the accept operation in the ssl handle is not
+                }
+                /* in case the result of the accept operation in the ssl handle is not
                 the socket result (error) must handle it gracefully (normal) */
-				else if(socket_result < 0) {
+                else if(socket_result < 0) {
                     /* retrieves the error code for the current problem
                     in order to gracefully handle it */
                     socket_result = SSL_get_error(ssl_handle, socket_result);
