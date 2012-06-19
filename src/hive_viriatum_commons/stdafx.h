@@ -61,6 +61,12 @@
 #include "global/targetver.h"
 #include "global/resource.h"
 
+/* in case the target windows version is lower than
+the windows xp operative system, must disable ipv6 */
+#if (WINVER < 0x0501)
+#undef VIRIATUM_IP6
+#endif
+
 /* excludes rarely-used stuff from windows headers */
 #define WIN32_LEAN_AND_MEAN
 
