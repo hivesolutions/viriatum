@@ -28,7 +28,6 @@
 #pragma once
 
 #ifdef VIRIATUM_PLATFORM_WIN32
-
 #ifdef VIRIATUM_IP6
 #include <Ws2tcpip.h>
 #else
