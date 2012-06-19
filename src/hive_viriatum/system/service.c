@@ -605,7 +605,9 @@ ERROR_CODE start_service(struct service_t *service) {
 #ifdef VIRIATUM_IP6
     /* allocates the socket address structure for the ipv6
     connection elements */
+#ifdef VIRIATUM_PLATFORM_WIN32
     SOCKET_ADDRESS_INTERNET6 *socket6_address;
+#endif
     SOCKET_ADDRESS_INTERNET6 _socket6_address;
 
 	/* allocates space for the service socket handle and for
@@ -614,20 +616,18 @@ ERROR_CODE start_service(struct service_t *service) {
     struct connection_t *service6_connection;
 #endif
 
+#ifdef VIRIATUM_IP6_DUAL
     /* allocates the socket address structure */
     SOCKET_ADDRESS_INTERNET socket_address;
 
+	/* allocates space for the service socket handle and for
+	the associated connection structure */
+    SOCKET_HANDLE service_socket_handle;
+    struct connection_t *service_connection;
+#endif
+
     /* allocates the socket result */
     SOCKET_ERROR_CODE socket_result;
-
-    /* allocates the service socket handle */
-    SOCKET_HANDLE service_socket_handle;
-
-    /* allocates the service connection */
-    struct connection_t *service_connection;
-
-
-
 
     /* allocates the misc connections references */
     struct connection_t *tracker_connection;
@@ -957,9 +957,15 @@ ERROR_CODE start_service(struct service_t *service) {
     }
 #endif
 
-    /* retrieves the service (required) elements */
+    /* retrieves the polling service currently in use
+	for the service */
     polling = service->polling;
+
+#ifndef VIRIATUM_IP6_DUAL
+	/* retrieves the required elements (eg: the handle
+	to the (normal) socket) */
     service_socket_handle = service->service_socket_handle;
+#endif
 
 #ifdef VIRIATUM_IP6
 	/* retrieves the ipv6 required elements (eg: the handle
@@ -984,8 +990,10 @@ ERROR_CODE start_service(struct service_t *service) {
     /* opens the polling (provider) */
     polling->open(polling);
 
-    /* creates the (service) connection */
+#ifndef VIRIATUM_IP6_DUAL
+	/* creates the (service) connection */
     create_connection(&service_connection, service_socket_handle);
+#endif
 
 #ifdef VIRIATUM_IP6
     /* creates the (service) connection for the ipv6 based
