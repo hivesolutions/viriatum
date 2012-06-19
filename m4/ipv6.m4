@@ -23,6 +23,25 @@
 # __copyright__ = Copyright (c) 2008 Hive Solutions Lda.
 # __license__   = GNU General Public License (GPL), Version 3
 
+AC_ARG_ENABLE(ipv6,
+  AC_HELP_STRING([--disable-ipv6], [Disable IPv6 support]),
+  [ if test "$enableval" = "no"; then
+       disabled_ipv6=1
+    fi ],
+  [ disabled_ipv6=0 ] )
+
+AC_SEARCH_LIBS(getaddrinfo, socket inet6)
+AC_SEARCH_LIBS(getnameinfo, socket inet6)
+AC_SEARCH_LIBS(gai_strerror, socket inet6)
+AC_CHECK_FUNC(gai_strerror)
+
+APR_CHECK_WORKING_GETADDRINFO
+APR_CHECK_WORKING_GETNAMEINFO
+
+AC_ACME_SOCKADDR_UN
+AC_ACME_SOCKADDR_IN6
+AC_ACME_SOCKADDR_STORAGE
+
 # prints an info message about ipv6
 AC_MSG_CHECKING(if the system supports ipv6)
 have_ipv6=false
