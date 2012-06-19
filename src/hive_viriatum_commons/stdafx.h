@@ -40,6 +40,10 @@
 #define VIRIATUM_DEBUG
 #endif
 
+#ifdef HAVE_IP6
+#define VIRIATUM_IP6
+#endif
+
 #ifndef HAVE_LIBPTHREAD
 #define VIRIATUM_NO_THREADS
 #endif
