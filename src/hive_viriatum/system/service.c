@@ -734,7 +734,7 @@ ERROR_CODE start_service(struct service_t *service) {
     _socket6_address.ai_family = SOCKET_INTERNET6_TYPE;
     _socket6_address.ai_socktype = SOCKET_PACKET_TYPE;
     _socket6_address.ai_flags = AI_NUMERICHOST | AI_PASSIVE;
-    socket_result = getaddrinfo(NULL, service_options->_port, &_socket6_address, &socket6_address);
+	socket_result = getaddrinfo("[::]", service_options->_port, &_socket6_address, &socket6_address);
 
     /* in case there was an error retrieving the address information
     must be correctly displayed */
