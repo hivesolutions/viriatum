@@ -23,7 +23,7 @@
 # __copyright__ = Copyright (c) 2008 Hive Solutions Lda.
 # __license__   = GNU General Public License (GPL), Version 3
 
-AC_ARG_ENABLE(ipv6, AC_HELP_STRING([--disable-ipv6], [disable ipv6 support]), [ if test "$enableval" = "no"; then disabled_ip6=1 fi ], disabled_ip6=0)
+AC_ARG_ENABLE(ipv6, AC_HELP_STRING([--disable-ipv6], [disable ipv6 support]), [ if test "$enableval" = "no"; then disabled_ip6=1 fi ], [ disabled_ip6=0 ] )
 
 AC_SEARCH_LIBS(getaddrinfo, socket inet6)
 AC_SEARCH_LIBS(getnameinfo, socket inet6)
