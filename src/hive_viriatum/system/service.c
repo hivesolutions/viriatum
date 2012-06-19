@@ -680,6 +680,7 @@ ERROR_CODE start_service(struct service_t *service) {
     in the service, the http handler must be loaded in the handlers map */
     get_value_string_hash_map(service->http_handlers_map, service_options->handler_name, (void **) &service->http_handler);
 
+#ifndef VIRIATUM_IP6_DUAL
     /* sets the socket address attributes */
     socket_address.sin_family = SOCKET_INTERNET_TYPE;
     socket_address.sin_addr.s_addr = inet_addr((char *) service_options->address);
@@ -736,6 +737,7 @@ ERROR_CODE start_service(struct service_t *service) {
         /* raises an error */
         RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem setting socket option");
     }
+#endif
 
 #ifdef VIRIATUM_IP6
     /* resets the ipv6 socket address into a zero occupied buffer
@@ -747,13 +749,6 @@ ERROR_CODE start_service(struct service_t *service) {
     _socket6_address.ai_socktype = SOCKET_PACKET_TYPE;
     _socket6_address.ai_flags = AI_NUMERICHOST | AI_PASSIVE;
     socket_result = getaddrinfo(NULL, service_options->_port, &_socket6_address, &socket6_address);
-#endif
-
-#ifdef VIRIATUM_PLATFORM_UNIX
-   _socket6_address.sin6_family = SOCKET_INTERNET6_TYPE;
-   _socket6_address.sin6_addr = in6addr_any;
-   _socket6_address.sin6_port = htons(service_options->port);
-#endif
 
     /* in case there was an error retrieving the address information
     must be correctly displayed */
@@ -762,6 +757,13 @@ ERROR_CODE start_service(struct service_t *service) {
         V_ERROR_F("Problem getting address information: %d\n", creating_error_code);
         RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem getting address information");
     }
+#endif
+
+#ifdef VIRIATUM_PLATFORM_UNIX
+   _socket6_address.sin6_family = SOCKET_INTERNET6_TYPE;
+   _socket6_address.sin6_addr = in6addr_any;
+   _socket6_address.sin6_port = htons(service_options->port);
+#endif
 
     /* creates the service socket for the given types */
     service->service_socket6_handle = SOCKET_CREATE(
@@ -872,8 +874,9 @@ ERROR_CODE start_service(struct service_t *service) {
     }
 #endif
 
+#ifndef VIRIATUM_IP6_DUAL
     /* binds the service socket */
- /*   socket_result = SOCKET_BIND(service->service_socket_handle, socket_address);*/
+    socket_result = SOCKET_BIND(service->service_socket_handle, socket_address);
 
     /* in case there was an error binding the socket */
     if(SOCKET_TEST_ERROR(socket_result)) {
@@ -907,6 +910,7 @@ ERROR_CODE start_service(struct service_t *service) {
         /* raises an error */
         RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem listening socket");
     }
+#endif
 
 #ifdef VIRIATUM_IP6
 #ifdef VIRIATUM_PLATFORM_WIN32
@@ -1007,6 +1011,7 @@ ERROR_CODE start_service(struct service_t *service) {
     }
 #endif
 
+#ifndef VIRIATUM_IP6_DUAL
     /* sets the service select service as the service in the service connection */
     service_connection->service = service;
 
@@ -1023,6 +1028,7 @@ ERROR_CODE start_service(struct service_t *service) {
 
     /* opens the (service) connection */
     service_connection->open_connection(service_connection);
+#endif
 
 #ifdef VIRIATUM_IP6
     /* sets the service select service as the service in the service connection */

@@ -100,6 +100,7 @@
 #include <netinet/in.h>
 #include <netinet/tcp.h>
 #ifdef VIRIATUM_IP6
+#define VIRIATUM_IP6_DUAL
 #define SOCKET_ADDRESS_INTERNET6 struct sockaddr_in6
 #endif
 #define SOCKET_CONNECTIONS 256
