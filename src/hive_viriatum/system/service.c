@@ -29,6 +29,7 @@
 
 #include "service.h"
 
+#ifdef VIRIATUM_SSL
 const char *ssl_errors[9] = {
     "SSL_ERROR_NONE",
     "SSL_ERROR_SSL",
@@ -40,6 +41,7 @@ const char *ssl_errors[9] = {
     "SSL_ERROR_WANT_CONNECT",
     "SSL_ERROR_WANT_ACCEPT"
 };
+#endif
 
 void create_service(struct service_t **service_pointer, unsigned char *name, unsigned char *program_name) {
     /* retrieves the service size */
