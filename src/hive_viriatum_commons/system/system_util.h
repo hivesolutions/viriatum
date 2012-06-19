@@ -28,6 +28,18 @@
 #pragma once
 
 #ifdef VIRIATUM_PLATFORM_WIN32
+#ifndef F_OK
+#define F_OK 00
+#endif
+#ifndef W_OK
+#define W_OK 02
+#endif
+#ifndef R_OK
+#define R_OK 04
+#endif
+#ifndef X_OK
+#define X_OK 06
+#endif
 #define PID_TYPE DWORD
 #define PROCESS_TYPE HANDLE
 #define MEMORY_INFORMATION_TYPE PROCESS_MEMORY_COUNTERS
@@ -40,6 +52,7 @@
 #define GET_MEMORY_INFORMATION(process, memory_information) GetProcessMemoryInfo(process, &memory_information, sizeof(memory_information))
 #define GET_MEMORY_USAGE(memory_information) memory_information.PagefileUsage
 #define FILE_EXISTS(file_path) GetFileAttributes(file_path) != 0xffffffff
+#define ACCESS(path, mode) _access(path, mode)
 #endif
 
 #ifdef VIRIATUM_PLATFORM_UNIX
@@ -60,6 +73,7 @@
 #define GET_MEMORY_INFORMATION(process, memory_information) getrusage(process, &memory_information)
 #define GET_MEMORY_USAGE(memory_information) memory_information.ru_ixrss
 #define FILE_EXISTS(file_path) access(file_path, F_OK) == 0
+#define ACCESS(path, mode) access(path, mode)
 #endif
 
 #ifdef VIRIATUM_PLATFORM_MSC
