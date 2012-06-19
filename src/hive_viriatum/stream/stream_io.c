@@ -193,7 +193,7 @@ ERROR_CODE accept_handler_stream_io(struct connection_t *connection) {
                         default:
                             /* prints a warning message about the closing of
                             the ssl connection (due to a connection problem) */
-                            V_WARNING_F("Failed to accept SSL connection (%s)\n", ssl_errors[socket_result]);
+                            V_WARNING_F("Failed to accept SSL connection (%s)\n", ssl_error_codes[socket_result]);
 
                             /* closes the (client) connection, the ssl connection has been
                             closed from the other side (client side) */
@@ -552,7 +552,7 @@ ERROR_CODE handshake_handler_stream_io(struct connection_t *connection) {
         /* retrieves the current ssl error description, to be displayed
         as a warning message */
         result = SSL_get_error(connection->ssl_handle, result);
-        V_WARNING_F("Closing the SSL connection (%s)\n", ssl_errors[result]);
+        V_WARNING_F("Closing the SSL connection (%s)\n", ssl_error_codes[result]);
 
         /* closes the connection, the ssl connection has been closed
         from the other side */
@@ -576,7 +576,7 @@ ERROR_CODE handshake_handler_stream_io(struct connection_t *connection) {
             default:
                 /* prints a warning message about the closing of
                 the ssl connection (due to a connection problem) */
-                V_WARNING_F("Closing the SSL connection (%s)\n", ssl_errors[result]);
+                V_WARNING_F("Closing the SSL connection (%s)\n", ssl_error_codes[result]);
 
                 /* closes the connection, the ssl connection it has been
                 closed from the other side (client side) */
