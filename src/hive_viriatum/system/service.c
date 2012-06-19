@@ -30,7 +30,7 @@
 #include "service.h"
 
 #ifdef VIRIATUM_SSL
-char *ssl_errors[9] = {
+char *ssl_error_codes[9] = {
     "SSL_ERROR_NONE",
     "SSL_ERROR_SSL",
     "SSL_ERROR_WANT_READ",
@@ -1528,6 +1528,6 @@ ERROR_CODE _comand_line_options_service(struct service_t *service, struct hash_m
 
 #ifdef VIRIATUM_SSL
 const char *_get_ssl_error_code(size_t index) {
-    return ssl_errors[index];
+    return ssl_error_codes[index];
 }
 #endif
