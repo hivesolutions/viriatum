@@ -101,6 +101,66 @@ static __inline char *get_config_path() {
     return config_path;
 }
 
+static __inline char *resolve_config_path(char *file_path, char *default_path, char *result_path) {
+	/* allocates space for the temporary valid flag to be used
+	to store the validation result and for the pointer to the
+	config path to be retrieved */
+	int valid;
+	char *config_path;
+
+	/* checks if the file is ready to be accessed (present in the
+	file system) and returns its path in such case */
+	valid = file_path == NULL ? -1 : ACCESS(file_path, F_OK);
+	if(valid == 0) { return file_path; }
+
+	/* retrieves the configuration path because "now" this path
+	is going to be required for complete path construction */
+	config_path = get_config_path();
+
+	/* in case the file path is not defined (invalid) there's no
+	need to construct the complete configuration path */
+	if(file_path != NULL) {
+		SPRINTF(
+			result_path,
+			VIRIATUM_MAX_PATH_SIZE,
+			"%s/%s",
+			config_path,
+			file_path
+		);
+	}
+
+	/* checks if the file is ready to be accessed (present in the
+	file system) and returns its path in such case */
+	valid = file_path == NULL ? -1 : ACCESS(result_path, F_OK);
+	if(valid == 0) { return result_path; }
+
+	/* checks if the file is ready to be accessed (present in the
+	file system) and returns its path in such case */
+	valid = default_path == NULL ? -1 : ACCESS(default_path, F_OK);
+	if(valid == 0) { return default_path; }
+
+	/* in case the default path is not defined (invalid) there's no
+	need to construct the complete configuration path */
+	if(default_path != NULL) {
+		SPRINTF(
+			result_path,
+			VIRIATUM_MAX_PATH_SIZE,
+			"%s/%s",
+			config_path,
+			default_path
+		);
+	}
+
+	/* checks if the file is ready to be accessed (present in the
+	file system) and returns its path in such case */
+	valid = default_path == NULL ? -1 : ACCESS(result_path, F_OK);
+	if(valid == 0) { return result_path; }
+
+	/* returns the "default" invalid result for the because no file
+	path was found using the "regular" strategy */
+	return NULL;
+}
+
 #ifndef VIRIATUM_MODULES_PATH
 #define VIRIATUM_MODULES_PATH get_modules_path()
 #endif
