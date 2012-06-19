@@ -748,7 +748,6 @@ ERROR_CODE start_service(struct service_t *service) {
 #endif
 
 #ifdef VIRIATUM_PLATFORM_UNIX
-   _socket6_address.sin6_len = sizeof(_socket6_address);
    _socket6_address.sin6_family = SOCKET_INTERNET6_TYPE;
    _socket6_address.sin6_addr = in6addr_any;
    _socket6_address.sin6_port = htons(service_options->port);
@@ -908,8 +907,14 @@ ERROR_CODE start_service(struct service_t *service) {
     }
 
 #ifdef VIRIATUM_IP6
+#ifdef VIRIATUM_PLATFORM_WIN32
 	/* binds the ipv6 service socket */
     socket_result = SOCKET_BIND_EX(service->service_socket6_handle, socket6_address->ai_addr, socket6_address->ai_addrlen);
+#endif
+
+#ifdef VIRIATUM_PLATFORM_UNIX
+	socket_result = bind(service->service_socket6_handle, (struct sockaddr *) &socket6_address, sizeof(socket6_address));
+#endif
 
     /* in case there was an error binding the socket */
     if(SOCKET_TEST_ERROR(socket_result)) {
