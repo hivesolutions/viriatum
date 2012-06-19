@@ -104,6 +104,37 @@ static __inline void normalize_path(char *string_value) {
     }
 }
 
+static __inline size_t trailing_size(char *buffer, size_t size) {
+	char byte;
+	char *_pointer = buffer + size - 1;
+
+	while(1) {
+		byte = *_pointer;
+		if(byte != ' ') { break; }
+		_pointer--;
+		size--;
+		if(size == 0) { break; }
+	}
+
+	return size;
+}
+
+static __inline size_t leading_offset(char *buffer, size_t size) {
+	char byte;
+	size_t _size = 0;
+	char *_pointer = buffer;
+
+	while(1) {
+		byte = *_pointer;
+		if(byte != ' ') { break; }
+		_pointer++;
+		_size++;
+		if(_size == size) { break; }
+	}
+
+	return _size;
+}
+
 static __inline void split(char *string_value, char *buffer, size_t size_e, char token) {
     /* allocates space for the temporary token to be used to
     store the current token in iteration */

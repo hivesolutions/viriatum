@@ -100,6 +100,7 @@ typedef struct ini_engine_t {
 } ini_engine;
 
 typedef struct ini_handler_t {
+	char remove_spaces;
     char section[INI_KEY_MAX_SIZE];
     char key[INI_KEY_MAX_SIZE];
     struct sort_map_t *configuration;

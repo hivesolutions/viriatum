@@ -86,6 +86,10 @@ ERROR_CODE process_ini_file(char *file_path, struct sort_map_t **configuration_p
     ini_handler_s.configuration = configuration;
     ini_engine_s.context = ini_handler;
 
+	/* sets the flag that controls if the trailing space
+	characters should be removesd from key and values */
+	ini_handler_s.remove_spaces = 1;
+
     /* reads the file contained in the provided file path
     and then tests the error code for error, in case there is an
     error prints it to the error stream output */
@@ -196,6 +200,7 @@ ERROR_CODE _ini_key_end_callback(struct ini_engine_t *ini_engine, const unsigned
     /* retrieves the ini handler from the template engine context
     then uses it to store the (current) value */
     struct ini_handler_t *ini_handler = (struct ini_handler_t *) ini_engine->context;
+	size = ini_handler->remove_spaces ? trailing_size((char *) pointer, size) : size;
     memcpy(ini_handler->key, pointer, size);
     ini_handler->key[size] = '\0';
 
@@ -211,9 +216,11 @@ ERROR_CODE _ini_value_end_callback(struct ini_engine_t *ini_engine, const unsign
     /* retrieves the ini handler from the template engine context
     then uses it to store the (current) value */
     struct ini_handler_t *ini_handler = (struct ini_handler_t *) ini_engine->context;
-    char *value = MALLOC(size + 1);
-    memcpy(value, pointer, size);
-    value[size] = '\0';
+	size_t offset = ini_handler->remove_spaces ? leading_offset((char *) pointer, size) : 0;
+	size_t _size = size - offset;
+    char *value = MALLOC(_size + 1);
+    memcpy(value, pointer + offset, _size);
+    value[size - _size] = '\0';
 
     /* tries to retrieve the current section configuration from the
     configuration in case it's not possible to retrieve it a new
