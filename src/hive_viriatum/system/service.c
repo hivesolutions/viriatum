@@ -898,6 +898,7 @@ ERROR_CODE start_service(struct service_t *service) {
     }
 
 #ifdef VIRIATUM_IP6
+	/* binds the ipv6 service socket */
     socket_result = SOCKET_BIND_EX(service->service_socket6_handle, socket6_address->ai_addr, socket6_address->ai_addrlen);
 
     /* in case there was an error binding the socket */
@@ -939,6 +940,8 @@ ERROR_CODE start_service(struct service_t *service) {
     service_socket_handle = service->service_socket_handle;
 
 #ifdef VIRIATUM_IP6
+	/* retrieves the ipv6 required elements (eg: the handle
+	to the ipv6 socket) */
     service_socket6_handle = service->service_socket6_handle;
 #endif
 
