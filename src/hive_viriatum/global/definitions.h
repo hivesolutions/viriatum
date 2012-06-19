@@ -164,7 +164,7 @@ static __inline char *resolve_config_path(char *file_path, char *default_path, c
 
     /* retrieves the configuration path because "now" this path
     is going to be required for complete path construction */
-    config_path = get_config_path();
+    config_path = VIRIATUM_CONFIG_PATH;
 
     /* in case the file path is not defined (invalid) there's no
     need to construct the complete configuration path */
