@@ -1005,10 +1005,12 @@ ERROR_CODE start_service(struct service_t *service) {
     /* in case the ssl encryption flag is set the ssl sub system
     should be set in the service connection */
     if(service_options->ssl) {
+#ifndef VIRIATUM_IP6_DUAL
         /* updates the ssl context and handle in the service connection
         so that it's possible to access the ssl connection */
         service_connection->ssl_context = service->ssl_context;
         service_connection->ssl_handle = service->ssl_handle;
+#endif
 
 #ifdef VIRIATUM_IP6
         /* updates the ssl context and handle in the service connection
