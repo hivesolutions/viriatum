@@ -56,7 +56,7 @@ void create_service(struct service_t **service_pointer, unsigned char *name, uns
     service->status = STATUS_CLOSED;
     service->configuration = NULL;
     service->service_socket_handle = 0;
-	service->service_socket6_handle = 0;
+    service->service_socket6_handle = 0;
     service->http_handler = NULL;
     service->create_http_handler = create_http_handler_service;
     service->delete_http_handler = delete_http_handler_service;
@@ -604,12 +604,12 @@ ERROR_CODE _create_torrent_connection(struct connection_t **connection_pointer, 
 ERROR_CODE start_service(struct service_t *service) {
 #ifdef VIRIATUM_IP6
     /* allocates the socket address structure for the ipv6
-	connection elements */
-	SOCKET_ADDRESS_INTERNET6 *socket6_address;
-	SOCKET_ADDRESS_INTERNET6 _socket6_address;
+    connection elements */
+    SOCKET_ADDRESS_INTERNET6 *socket6_address;
+    SOCKET_ADDRESS_INTERNET6 _socket6_address;
 
-	SOCKET_HANDLE service_socket6_handle;
-	struct connection_t *service6_connection;
+    SOCKET_HANDLE service_socket6_handle;
+    struct connection_t *service6_connection;
 #endif
 
     /* allocates the socket address structure */
@@ -678,17 +678,17 @@ ERROR_CODE start_service(struct service_t *service) {
     in the service, the http handler must be loaded in the handlers map */
     get_value_string_hash_map(service->http_handlers_map, service_options->handler_name, (void **) &service->http_handler);
 
-	/* sets the socket address attributes */
+    /* sets the socket address attributes */
     socket_address.sin_family = SOCKET_INTERNET_TYPE;
     socket_address.sin_addr.s_addr = inet_addr((char *) service_options->address);
     socket_address.sin_port = htons(service_options->port);
 
     /* creates the service socket for the given types */
     service->service_socket_handle = SOCKET_CREATE(
-		SOCKET_INTERNET_TYPE,
-		SOCKET_PACKET_TYPE,
-		SOCKET_PROTOCOL_TCP
-	);
+        SOCKET_INTERNET_TYPE,
+        SOCKET_PACKET_TYPE,
+        SOCKET_PROTOCOL_TCP
+    );
 
     /* in case there was an error creating the service socket */
     if(SOCKET_TEST_ERROR(service->service_socket_handle)) {
@@ -736,16 +736,16 @@ ERROR_CODE start_service(struct service_t *service) {
     }
 
 #ifdef VIRIATUM_IP6
-	/* resets the ipv6 socket address into a zero occupied buffer
-	for the range of the socket address */
-	memset(&_socket6_address, 0, sizeof(_socket6_address));
-	_socket6_address.ai_family = SOCKET_INTERNET6_TYPE;
-	_socket6_address.ai_socktype = SOCKET_PACKET_TYPE;
+    /* resets the ipv6 socket address into a zero occupied buffer
+    for the range of the socket address */
+    memset(&_socket6_address, 0, sizeof(_socket6_address));
+    _socket6_address.ai_family = SOCKET_INTERNET6_TYPE;
+    _socket6_address.ai_socktype = SOCKET_PACKET_TYPE;
     _socket6_address.ai_flags = AI_NUMERICHOST | AI_PASSIVE;
-	socket_result = getaddrinfo(NULL, service_options->_port, &_socket6_address, &socket6_address);
+    socket_result = getaddrinfo(NULL, service_options->_port, &_socket6_address, &socket6_address);
 
-	/* in case there was an error retrieving the address information
-	must be correctly displayed */
+    /* in case there was an error retrieving the address information
+    must be correctly displayed */
     if(SOCKET_TEST_ERROR(socket_result)) {
         SOCKET_ERROR_CODE creating_error_code = SOCKET_GET_ERROR_CODE(socket_result);
         V_ERROR_F("Problem getting address information: %d\n", creating_error_code);
@@ -754,10 +754,10 @@ ERROR_CODE start_service(struct service_t *service) {
 
     /* creates the service socket for the given types */
     service->service_socket6_handle = SOCKET_CREATE(
-		SOCKET_INTERNET6_TYPE,
-		SOCKET_PACKET_TYPE,
-		SOCKET_PROTOCOL_TCP
-	);
+        SOCKET_INTERNET6_TYPE,
+        SOCKET_PACKET_TYPE,
+        SOCKET_PROTOCOL_TCP
+    );
 
     /* in case there was an error creating the service socket */
     if(SOCKET_TEST_ERROR(service->service_socket6_handle)) {
@@ -898,7 +898,7 @@ ERROR_CODE start_service(struct service_t *service) {
     }
 
 #ifdef VIRIATUM_IP6
-	socket_result = SOCKET_BIND_EX(service->service_socket6_handle, socket6_address->ai_addr, socket6_address->ai_addrlen);
+    socket_result = SOCKET_BIND_EX(service->service_socket6_handle, socket6_address->ai_addr, socket6_address->ai_addrlen);
 
     /* in case there was an error binding the socket */
     if(SOCKET_TEST_ERROR(socket_result)) {
@@ -939,7 +939,7 @@ ERROR_CODE start_service(struct service_t *service) {
     service_socket_handle = service->service_socket_handle;
 
 #ifdef VIRIATUM_IP6
-	service_socket6_handle = service->service_socket6_handle;
+    service_socket6_handle = service->service_socket6_handle;
 #endif
 
     /* sets the service in the polling */
@@ -963,9 +963,9 @@ ERROR_CODE start_service(struct service_t *service) {
     create_connection(&service_connection, service_socket_handle);
 
 #ifdef VIRIATUM_IP6
-	/* creates the (service) connection for the ipv6 based
-	connection (for upper compatibility) */
-	create_connection(&service6_connection, service_socket6_handle);
+    /* creates the (service) connection for the ipv6 based
+    connection (for upper compatibility) */
+    create_connection(&service6_connection, service_socket6_handle);
 #endif
 
 #ifdef VIRIATUM_SSL
@@ -978,7 +978,7 @@ ERROR_CODE start_service(struct service_t *service) {
         service_connection->ssl_handle = service->ssl_handle;
 
 #ifdef VIRIATUM_IP6
-		/* updates the ssl context and handle in the service connection
+        /* updates the ssl context and handle in the service connection
         so that it's possible to access the ssl connection */
         service6_connection->ssl_context = service->ssl_context;
         service6_connection->ssl_handle = service->ssl_handle;
