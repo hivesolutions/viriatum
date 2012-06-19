@@ -106,6 +106,7 @@
 #ifdef VIRIATUM_PLATFORM_WIN32
 #include <windows.h>
 #include <psapi.h>
+#include <io.h>
 #endif
 
 #ifdef VIRIATUM_PLATFORM_UNIX
