@@ -873,7 +873,7 @@ ERROR_CODE start_service(struct service_t *service) {
 #endif
 
     /* binds the service socket */
-    socket_result = SOCKET_BIND(service->service_socket_handle, socket_address);
+ /*   socket_result = SOCKET_BIND(service->service_socket_handle, socket_address);*/
 
     /* in case there was an error binding the socket */
     if(SOCKET_TEST_ERROR(socket_result)) {
@@ -915,7 +915,8 @@ ERROR_CODE start_service(struct service_t *service) {
 #endif
 
 
-
+/* TENHO DE MELHORAR E MUIOTO ASDASDASDASDASDASD ISTO "!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
 
 
 #ifdef VIRIATUM_PLATFORM_UNIX
