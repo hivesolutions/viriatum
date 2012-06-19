@@ -101,6 +101,55 @@ static __inline char *get_config_path() {
     return config_path;
 }
 
+#ifndef VIRIATUM_MODULES_PATH
+#define VIRIATUM_MODULES_PATH get_modules_path()
+#endif
+#define VIRIATUM_RESOURCES_PATH get_resources_path()
+#define VIRIATUM_CONFIG_PATH get_config_path()
+#define VIRIATUM_BASE_PATH ""
+#define VIRIATUM_LISTING_PATH "/templates/listing.html.tpl"
+#define VIRIATUM_ERROR_PATH "/templates/error.html.tpl"
+#ifndef VIRIATUM_CONTENTS_PATH
+#define VIRIATUM_CONTENTS_PATH get_contents_path()
+#endif
+#define VIRIATUM_PID_PATH "viriatum.pid"
+#endif
+
+#ifdef VIRIATUM_PLATFORM_UNIX
+#ifdef VIRIATUM_PLATFORM_ANDROID
+#define VIRIATUM_MODULES_PATH "/sdcard/viriatum/modules"
+#define VIRIATUM_RESOURCES_PATH "/sdcard/viriatum/www"
+#define VIRIATUM_CONFIG_PATH "/sdcard/viriatum/config"
+#define VIRIATUM_BASE_PATH ""
+#define VIRIATUM_LISTING_PATH "/templates/listing.html.tpl"
+#define VIRIATUM_ERROR_PATH "/templates/error.html.tpl"
+#define VIRIATUM_CONTENTS_PATH "/sdcard/viriatum/www"
+#else
+#ifndef VIRIATUM_MODULES_PATH
+#define VIRIATUM_MODULES_PATH "/usr/lib/viriatum/modules"
+#endif
+#ifndef VIRIATUM_RESOURCES_PATH
+#define VIRIATUM_RESOURCES_PATH "/var/viriatum/www"
+#endif
+#ifndef VIRIATUM_LOG_PATH
+#define VIRIATUM_LOG_PATH "/var/log/viriatum.log"
+#endif
+#ifndef VIRIATUM_LOG_E_PATH
+#define VIRIATUM_LOG_E_PATH "/var/log/viriatum.err"
+#endif
+#ifndef VIRIATUM_CONFIG_PATH
+#define VIRIATUM_CONFIG_PATH "/etc/viriatum"
+#endif
+#define VIRIATUM_BASE_PATH ""
+#define VIRIATUM_LISTING_PATH "/templates/listing.html.tpl"
+#define VIRIATUM_ERROR_PATH "/templates/error.html.tpl"
+#ifndef VIRIATUM_CONTENTS_PATH
+#define VIRIATUM_CONTENTS_PATH "/var/viriatum/www"
+#endif
+#endif
+#define VIRIATUM_PID_PATH "/var/run/viriatum.pid"
+#endif
+
 static __inline char *resolve_config_path(char *file_path, char *default_path, char *result_path) {
     /* allocates space for the temporary valid flag to be used
     to store the validation result and for the pointer to the
@@ -161,57 +210,8 @@ static __inline char *resolve_config_path(char *file_path, char *default_path, c
     return NULL;
 }
 
-#define VIRIATUM_RESOLVE_PATH(file_path, default_path, result_path) resolve_config_path(file_path, default_path, result_path)
-
-
-#ifndef VIRIATUM_MODULES_PATH
-#define VIRIATUM_MODULES_PATH get_modules_path()
-#endif
-#define VIRIATUM_RESOURCES_PATH get_resources_path()
-#define VIRIATUM_CONFIG_PATH get_config_path()
-#define VIRIATUM_BASE_PATH ""
-#define VIRIATUM_LISTING_PATH "/templates/listing.html.tpl"
-#define VIRIATUM_ERROR_PATH "/templates/error.html.tpl"
-#ifndef VIRIATUM_CONTENTS_PATH
-#define VIRIATUM_CONTENTS_PATH get_contents_path()
-#endif
-#define VIRIATUM_PID_PATH "viriatum.pid"
-#endif
-
-#ifdef VIRIATUM_PLATFORM_UNIX
-#ifdef VIRIATUM_PLATFORM_ANDROID
-#define VIRIATUM_MODULES_PATH "/sdcard/viriatum/modules"
-#define VIRIATUM_RESOURCES_PATH "/sdcard/viriatum/www"
-#define VIRIATUM_CONFIG_PATH "/sdcard/viriatum/config"
-#define VIRIATUM_BASE_PATH ""
-#define VIRIATUM_LISTING_PATH "/templates/listing.html.tpl"
-#define VIRIATUM_ERROR_PATH "/templates/error.html.tpl"
-#define VIRIATUM_CONTENTS_PATH "/sdcard/viriatum/www"
-#else
-#ifndef VIRIATUM_MODULES_PATH
-#define VIRIATUM_MODULES_PATH "/usr/lib/viriatum/modules"
-#endif
-#ifndef VIRIATUM_RESOURCES_PATH
-#define VIRIATUM_RESOURCES_PATH "/var/viriatum/www"
-#endif
-#ifndef VIRIATUM_LOG_PATH
-#define VIRIATUM_LOG_PATH "/var/log/viriatum.log"
-#endif
-#ifndef VIRIATUM_LOG_E_PATH
-#define VIRIATUM_LOG_E_PATH "/var/log/viriatum.err"
-#endif
-#ifndef VIRIATUM_CONFIG_PATH
-#define VIRIATUM_CONFIG_PATH "/etc/viriatum"
-#endif
-#define VIRIATUM_BASE_PATH ""
-#define VIRIATUM_LISTING_PATH "/templates/listing.html.tpl"
-#define VIRIATUM_ERROR_PATH "/templates/error.html.tpl"
-#ifndef VIRIATUM_CONTENTS_PATH
-#define VIRIATUM_CONTENTS_PATH "/var/viriatum/www"
-#endif
-#endif
-#define VIRIATUM_PID_PATH "/var/run/viriatum.pid"
-#endif
+#define VIRIATUM_RESOLVE_PATH(file_path, default_path, result_path)\
+	resolve_config_path(file_path, default_path, result_path)
 
 #define VIRIATUM_NAME "viriatum"
 #define VIRIATUM_VERSION "0.1.0"
