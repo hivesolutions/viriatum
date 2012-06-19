@@ -161,6 +161,9 @@ static __inline char *resolve_config_path(char *file_path, char *default_path, c
     return NULL;
 }
 
+#define VIRIATUM_RESOLVE_PATH(file_path, default_path, result_path) resolve_config_path(file_path, default_path, result_path)
+
+
 #ifndef VIRIATUM_MODULES_PATH
 #define VIRIATUM_MODULES_PATH get_modules_path()
 #endif
