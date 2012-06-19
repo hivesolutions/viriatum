@@ -1512,6 +1512,8 @@ ERROR_CODE _comand_line_options_service(struct service_t *service, struct hash_m
     RAISE_NO_ERROR;
 }
 
+#ifdef VIRIATUM_SSL
 const char *_get_ssl_error_code(size_t index) {
     return ssl_errors[index];
 }
+#endif
