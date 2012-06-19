@@ -36,71 +36,7 @@ struct data_t;
 struct connection_t;
 typedef ERROR_CODE (*_connection_data_callback) (struct connection_t *, struct data_t *, void *);
 
-static const char *http_status_codes[5][64] = {
-    {
-        "Continue",
-        "Switching Protocols",
-        "Processing"
-    },
-    {
-        "OK",
-        "Created",
-        "Accepted",
-        "Non-Authoritative Information (since HTTP/1.1)",
-        "No Content",
-        "Reset Content",
-        "Partial Content",
-        "Multi-Status",
-        "Already Reported",
-        "IM Used"
-    },
-    {
-        "Multiple Choices",
-        "Moved Permanently",
-        "Found",
-        "See Other",
-        "Not Modified",
-        "Use Proxy",
-        "Switch Proxy",
-        "Temporary Redirect",
-        "Permanent Redirect"
-    },
-    {
-        "Bad Request",
-        "Unauthorized",
-        "Payment Required",
-        "Forbidden",
-        "Not Found",
-        "Method Not Allowed",
-        "Not Acceptable",
-        "Proxy Authentication Required",
-        "Request Timeout",
-        "Conflict",
-        "Gone",
-        "Length Required"
-        "Precondition Failed",
-        "Request Entity Too Large",
-        "Request-URI Too Long",
-        "Unsupported Media Type",
-        "Requested Range Not Satisfiable",
-        "Expectation Failed",
-        "I'm a teapot"
-    },
-    {
-        "Internal Server Error",
-        "Not Implemented",
-        "Bad Gateway",
-        "Service Unavailable",
-        "Gateway Timeout",
-        "HTTP Version Not Supported",
-        "Variant Also Negotiates",
-        "Insufficient Storage",
-        "Loop Detected",
-        "Bandwidth Limit Exceeded",
-        "Not Extended",
-        "Network Authentication Required"
-    }
-};
+const char *http_status_codes[5][64];
 
 ERROR_CODE write_http_error(struct connection_t *connection, char *header, char *error_code, char *error_message, char *error_description, _connection_data_callback callback, void *callback_parameters);
 ERROR_CODE log_http_request(char *host, char *identity, char *user, char *method, char *uri, char *protocol, int error_code, size_t content_length);
