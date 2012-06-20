@@ -29,10 +29,10 @@
 
 #include "entry.h"
 
-PyMethodDef wsgi_methods[3];
-PyMethodDef input_methods[5];
+VIRIATUM_EXTERNAL_PREFIX PyMethodDef wsgi_methods[3];
+VIRIATUM_EXTERNAL_PREFIX PyMethodDef input_methods[5];
 
-PyTypeObject input_type;
+VIRIATUM_EXTERNAL_PREFIX PyTypeObject input_type;
 
 typedef struct wsgi_input_t {
     PyObject_HEAD
