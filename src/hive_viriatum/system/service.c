@@ -640,8 +640,10 @@ ERROR_CODE start_service(struct service_t *service) {
     char config_path[VIRIATUM_MAX_PATH_SIZE];
     char *_config_path;
 
-    /* allocates the option value and sets it to one (valid) */
+    /* allocates the option value and sets it to one (valid)
+	not that a larger value is also created */
     SOCKET_OPTION option_value = 1;
+	SOCKET_OPTION_LARGE option_value_l = 1;
 
     /* sets the flags to be used in socket */
     SOCKET_FLAGS flags = 1;
@@ -775,12 +777,12 @@ ERROR_CODE start_service(struct service_t *service) {
 #ifdef VIRIATUM_IP6_DUAL
 	/* unsets the socket ip6 only address option in the socket, this should
     be done by first setting the option value to the original set value */
-	option_value = 0;
+	option_value_l = 0;
 	socket_result = SOCKET_SET_OPTIONS(
 		service->service_socket6_handle,
 		SOCKET_OPTIONS_IP6_SOCKET,
 		SOCKET_OPTIONS_IP6_ONLY_SOCKET, 
-		option_value
+		option_value_l
 	);
 
     /* in case there was an error settings the socket option
@@ -794,12 +796,12 @@ ERROR_CODE start_service(struct service_t *service) {
 #else
     /* sets the socket ip6 only address option in the socket, this should
     be done by first setting the option value to the original set value */
-	option_value = 1;
+	option_value_l = 1;
 	socket_result = SOCKET_SET_OPTIONS(
 		service->service_socket6_handle,
 		SOCKET_OPTIONS_IP6_SOCKET,
 		SOCKET_OPTIONS_IP6_ONLY_SOCKET, 
-		option_value
+		option_value_l
 	); 
 
     /* in case there was an error settings the socket option
