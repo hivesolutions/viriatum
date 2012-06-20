@@ -788,9 +788,23 @@ ERROR_CODE start_service(struct service_t *service) {
 		SOCKET_OPTIONS_IP6_ONLY_SOCKET, 
 		option_value
 	);
-#endif
 
-	/* sets the socket ip6 only address option in the socket, this should
+    /* in case there was an error binding the socket */
+    if(SOCKET_TEST_ERROR(socket_result)) {
+        /* retrieves the option error code */
+        SOCKET_ERROR_CODE option_error_code = SOCKET_GET_ERROR_CODE(socket_result);
+
+        /* prints the error */
+        V_ERROR_F("Problem setting ip6 socket option: %d\n", option_error_code);
+
+        /* closes the service socket */
+        SOCKET_CLOSE(service->service_socket6_handle);
+
+        /* raises an error */
+        RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem setting ip6 socket option");
+    }
+#else
+    /* sets the socket ip6 only address option in the socket, this should
     be done by first setting the option value to the original set value */
 	option_value = 1;
 	socket_result = SOCKET_SET_OPTIONS(
@@ -799,6 +813,22 @@ ERROR_CODE start_service(struct service_t *service) {
 		SOCKET_OPTIONS_IP6_ONLY_SOCKET, 
 		option_value
 	); 
+
+    /* in case there was an error binding the socket */
+    if(SOCKET_TEST_ERROR(socket_result)) {
+        /* retrieves the option error code */
+        SOCKET_ERROR_CODE option_error_code = SOCKET_GET_ERROR_CODE(socket_result);
+
+        /* prints the error */
+        V_ERROR_F("Problem setting ip6 socket option: %d\n", option_error_code);
+
+        /* closes the service socket */
+        SOCKET_CLOSE(service->service_socket6_handle);
+
+        /* raises an error */
+        RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem setting ip6 socket option");
+    }
+#endif
 
     /* sets the socket reuse address option in the socket, this should
     be done by first setting the option value to the original set value */
