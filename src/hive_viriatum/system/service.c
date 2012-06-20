@@ -754,7 +754,7 @@ ERROR_CODE start_service(struct service_t *service) {
     _socket6_address.sin6_port = htons(service_options->port);
     socket_result = inet_pton(
 		SOCKET_INTERNET6_TYPE,
-	    (const char *) service_options->address6,
+		"::",
 	    (void *) &_socket6_address.sin6_addr
     );
 	printf("%s -> %d\n", service_options->address6, socket_result);
