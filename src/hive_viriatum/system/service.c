@@ -117,8 +117,8 @@ void create_service_options(struct service_options_t **service_options_pointer) 
     /* sets the service options attributes (default) values */
     service_options->port = 0;
     service_options->address = NULL;
-	service_options->ip6 = 0;
-	service_options->address6 = NULL;
+    service_options->ip6 = 0;
+    service_options->address6 = NULL;
     service_options->ssl = 0;
     service_options->ssl_csr = NULL;
     service_options->ssl_key = NULL;
@@ -600,7 +600,7 @@ ERROR_CODE start_service(struct service_t *service) {
 
     /* allocates space for the service socket handle and for
     the associated connection structure, these values must be
-	initialized in order to avoid warnings */
+    initialized in order to avoid warnings */
     SOCKET_HANDLE service_socket6_handle = 0;
     struct connection_t *service6_connection = NULL;
 #endif
@@ -613,7 +613,7 @@ ERROR_CODE start_service(struct service_t *service) {
     SOCKET_HANDLE service_socket_handle;
     struct connection_t *service_connection;
 
-	/* allocates the socket result */
+    /* allocates the socket result */
     SOCKET_ERROR_CODE socket_result;
 
     /* allocates the misc connections references */
@@ -669,175 +669,175 @@ ERROR_CODE start_service(struct service_t *service) {
     in the service, the http handler must be loaded in the handlers map */
     get_value_string_hash_map(service->http_handlers_map, service_options->handler_name, (void **) &service->http_handler);
 
-	/* sets the socket address attributes */
-	socket_address.sin_family = SOCKET_INTERNET_TYPE;
-	socket_address.sin_addr.s_addr = inet_addr((char *) service_options->address);
-	socket_address.sin_port = htons(service_options->port);
+    /* sets the socket address attributes */
+    socket_address.sin_family = SOCKET_INTERNET_TYPE;
+    socket_address.sin_addr.s_addr = inet_addr((char *) service_options->address);
+    socket_address.sin_port = htons(service_options->port);
 
-	/* creates the service socket for the given types */
-	service->service_socket_handle = SOCKET_CREATE(
-		SOCKET_INTERNET_TYPE,
-		SOCKET_PACKET_TYPE,
-		SOCKET_PROTOCOL_TCP
-	);
+    /* creates the service socket for the given types */
+    service->service_socket_handle = SOCKET_CREATE(
+        SOCKET_INTERNET_TYPE,
+        SOCKET_PACKET_TYPE,
+        SOCKET_PROTOCOL_TCP
+    );
 
-	/* in case there was an error creating the service socket */
-	if(SOCKET_TEST_ERROR(service->service_socket_handle)) {
-		/* retrieves the creating error code */
-		SOCKET_ERROR_CODE creating_error_code = SOCKET_GET_ERROR_CODE(socket_result);
+    /* in case there was an error creating the service socket */
+    if(SOCKET_TEST_ERROR(service->service_socket_handle)) {
+        /* retrieves the creating error code */
+        SOCKET_ERROR_CODE creating_error_code = SOCKET_GET_ERROR_CODE(socket_result);
 
-		/* prints the error */
-		V_ERROR_F("Problem creating socket: %d\n", creating_error_code);
+        /* prints the error */
+        V_ERROR_F("Problem creating socket: %d\n", creating_error_code);
 
-		/* raises an error */
-		RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem creating socket");
-	}
+        /* raises an error */
+        RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem creating socket");
+    }
 
-	/* in case viriatum is set to non blocking, changes the current
-	socket behavior to non blocking mode then sets the socket to the
-	non push mode in case it's required by configuration this implies
-	also checking for the no (tcp) wait variable */
-	if(VIRIATUM_NON_BLOCKING) { SOCKET_SET_NON_BLOCKING(service->service_socket_handle, flags); }
-	if(VIRIATUM_NO_WAIT) { SOCKET_SET_NO_WAIT(service->service_socket_handle, option_value); }
-	if(VIRIATUM_NO_PUSH) { SOCKET_SET_NO_PUSH(service->service_socket_handle, option_value); }
+    /* in case viriatum is set to non blocking, changes the current
+    socket behavior to non blocking mode then sets the socket to the
+    non push mode in case it's required by configuration this implies
+    also checking for the no (tcp) wait variable */
+    if(VIRIATUM_NON_BLOCKING) { SOCKET_SET_NON_BLOCKING(service->service_socket_handle, flags); }
+    if(VIRIATUM_NO_WAIT) { SOCKET_SET_NO_WAIT(service->service_socket_handle, option_value); }
+    if(VIRIATUM_NO_PUSH) { SOCKET_SET_NO_PUSH(service->service_socket_handle, option_value); }
 
-	/* sets the socket reuse address option in the socket, this should
-	be done by first setting the option value to the original set value */
-	option_value = 1;
-	socket_result = SOCKET_SET_OPTIONS(
-		service->service_socket_handle,
-		SOCKET_OPTIONS_LEVEL_SOCKET,
-		SOCKET_OPTIONS_REUSE_ADDRESS_SOCKET,
-		option_value
-	);
+    /* sets the socket reuse address option in the socket, this should
+    be done by first setting the option value to the original set value */
+    option_value = 1;
+    socket_result = SOCKET_SET_OPTIONS(
+        service->service_socket_handle,
+        SOCKET_OPTIONS_LEVEL_SOCKET,
+        SOCKET_OPTIONS_REUSE_ADDRESS_SOCKET,
+        option_value
+    );
 
-	/* in case there was an error settings the socket option
-	must handle it prompting the error information */
-	if(SOCKET_TEST_ERROR(socket_result)) {
-		SOCKET_ERROR_CODE option_error_code = SOCKET_GET_ERROR_CODE(socket_result);
-		V_ERROR_F("Problem setting socket option: %d\n", option_error_code);
-		SOCKET_CLOSE(service->service_socket_handle);
-		RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem setting socket option");
-	}
+    /* in case there was an error settings the socket option
+    must handle it prompting the error information */
+    if(SOCKET_TEST_ERROR(socket_result)) {
+        SOCKET_ERROR_CODE option_error_code = SOCKET_GET_ERROR_CODE(socket_result);
+        V_ERROR_F("Problem setting socket option: %d\n", option_error_code);
+        SOCKET_CLOSE(service->service_socket_handle);
+        RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem setting socket option");
+    }
 
 #ifdef VIRIATUM_IP6
-	/* in case the ip6 connection flag is set the ip6 connection
-	must be correctly initialized (structure initialized) */
-	if(service_options->ip6) {
-		/* resets the ip6 socket address into a zero occupied buffer
-		for the range of the socket address */
-		memset(&_socket6_address, 0, sizeof(_socket6_address));
+    /* in case the ip6 connection flag is set the ip6 connection
+    must be correctly initialized (structure initialized) */
+    if(service_options->ip6) {
+        /* resets the ip6 socket address into a zero occupied buffer
+        for the range of the socket address */
+        memset(&_socket6_address, 0, sizeof(_socket6_address));
 
 #ifdef VIRIATUM_PLATFORM_WIN32
-		_socket6_address.ai_family = SOCKET_INTERNET6_TYPE;
-		_socket6_address.ai_socktype = SOCKET_PACKET_TYPE;
-		_socket6_address.ai_flags = AI_NUMERICHOST | AI_PASSIVE;
-		socket_result = getaddrinfo(
-			service_options->address6,
-			service_options->_port,
-			&_socket6_address,
-			&socket6_address
-		);
+        _socket6_address.ai_family = SOCKET_INTERNET6_TYPE;
+        _socket6_address.ai_socktype = SOCKET_PACKET_TYPE;
+        _socket6_address.ai_flags = AI_NUMERICHOST | AI_PASSIVE;
+        socket_result = getaddrinfo(
+            service_options->address6,
+            service_options->_port,
+            &_socket6_address,
+            &socket6_address
+        );
 
-		/* in case there was an error retrieving the address information
-		must be correctly displayed */
-		if(SOCKET_TEST_ERROR(socket_result)) {
-			SOCKET_ERROR_CODE error_code = SOCKET_GET_ERROR_CODE(socket_result);
-			V_ERROR_F("Problem getting ip6 address information: %d\n", error_code);
-			RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem getting ip6 address information");
-		}
+        /* in case there was an error retrieving the address information
+        must be correctly displayed */
+        if(SOCKET_TEST_ERROR(socket_result)) {
+            SOCKET_ERROR_CODE error_code = SOCKET_GET_ERROR_CODE(socket_result);
+            V_ERROR_F("Problem getting ip6 address information: %d\n", error_code);
+            RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem getting ip6 address information");
+        }
 #endif
 
 #ifdef VIRIATUM_PLATFORM_UNIX
-		service_options->address6 = trim(service_options->address6);
-		_socket6_address.sin6_family = SOCKET_INTERNET6_TYPE;
-		_socket6_address.sin6_addr = in6addr_any;
-		_socket6_address.sin6_port = htons(service_options->port);
-		socket_result = inet_pton(
-			SOCKET_INTERNET6_TYPE,
-			(const char *) service_options->address6,
-			(void *) &_socket6_address.sin6_addr
-		);
-		service_options->address6 = untrim(service_options->address6, ']');
+        service_options->address6 = trim(service_options->address6);
+        _socket6_address.sin6_family = SOCKET_INTERNET6_TYPE;
+        _socket6_address.sin6_addr = in6addr_any;
+        _socket6_address.sin6_port = htons(service_options->port);
+        socket_result = inet_pton(
+            SOCKET_INTERNET6_TYPE,
+            (const char *) service_options->address6,
+            (void *) &_socket6_address.sin6_addr
+        );
+        service_options->address6 = untrim(service_options->address6, ']');
 
-		/* in case there was an error retrieving the address information
-		must be correctly displayed */
-		if(SOCKET_EX_TEST_ERROR(socket_result)) {
-			SOCKET_ERROR_CODE error_code = SOCKET_GET_ERROR_CODE(socket_result);
-			V_ERROR_F("Problem getting ip6 address information: %d\n", error_code);
-			RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem getting ip6 address information");
-		}
+        /* in case there was an error retrieving the address information
+        must be correctly displayed */
+        if(SOCKET_EX_TEST_ERROR(socket_result)) {
+            SOCKET_ERROR_CODE error_code = SOCKET_GET_ERROR_CODE(socket_result);
+            V_ERROR_F("Problem getting ip6 address information: %d\n", error_code);
+            RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem getting ip6 address information");
+        }
 #endif
 
-		/* creates the service socket for the given types */
-		service->service_socket6_handle = SOCKET_CREATE(
-			SOCKET_INTERNET6_TYPE,
-			SOCKET_PACKET_TYPE,
-			SOCKET_PROTOCOL_TCP
-		);
+        /* creates the service socket for the given types */
+        service->service_socket6_handle = SOCKET_CREATE(
+            SOCKET_INTERNET6_TYPE,
+            SOCKET_PACKET_TYPE,
+            SOCKET_PROTOCOL_TCP
+        );
 
-		/* in case there was an error creating the service socket */
-		if(SOCKET_TEST_ERROR(service->service_socket6_handle)) {
-			/* retrieves the creating error code */
-			SOCKET_ERROR_CODE creating_error_code = SOCKET_GET_ERROR_CODE(socket_result);
+        /* in case there was an error creating the service socket */
+        if(SOCKET_TEST_ERROR(service->service_socket6_handle)) {
+            /* retrieves the creating error code */
+            SOCKET_ERROR_CODE creating_error_code = SOCKET_GET_ERROR_CODE(socket_result);
 
-			/* prints the error */
-			V_ERROR_F("Problem creating ip6 socket: %d\n", creating_error_code);
+            /* prints the error */
+            V_ERROR_F("Problem creating ip6 socket: %d\n", creating_error_code);
 
-			/* raises an error */
-			RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem creating ip6 socket");
-		}
+            /* raises an error */
+            RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem creating ip6 socket");
+        }
 
-		/* in case viriatum is set to non blocking, changes the current
-		socket behavior to non blocking mode then sets the socket to the
-		non push mode in case it's required by configuration this implies
-		also checking for the no (tcp) wait variable */
-		if(VIRIATUM_NON_BLOCKING) { SOCKET_SET_NON_BLOCKING(service->service_socket6_handle, flags); }
-		if(VIRIATUM_NO_WAIT) { SOCKET_SET_NO_WAIT(service->service_socket6_handle, option_value); }
-		if(VIRIATUM_NO_PUSH) { SOCKET_SET_NO_PUSH(service->service_socket6_handle, option_value); }
+        /* in case viriatum is set to non blocking, changes the current
+        socket behavior to non blocking mode then sets the socket to the
+        non push mode in case it's required by configuration this implies
+        also checking for the no (tcp) wait variable */
+        if(VIRIATUM_NON_BLOCKING) { SOCKET_SET_NON_BLOCKING(service->service_socket6_handle, flags); }
+        if(VIRIATUM_NO_WAIT) { SOCKET_SET_NO_WAIT(service->service_socket6_handle, option_value); }
+        if(VIRIATUM_NO_PUSH) { SOCKET_SET_NO_PUSH(service->service_socket6_handle, option_value); }
 
-		/* sets the socket ip6 only address option in the socket, this should
-		be done by first setting the option value to the original set value */
-		option_value_l = 1;
-		socket_result = SOCKET_SET_OPTIONS(
-			service->service_socket6_handle,
-			SOCKET_OPTIONS_IP6_SOCKET,
-			SOCKET_OPTIONS_IP6_ONLY_SOCKET,
-			option_value_l
-		);
+        /* sets the socket ip6 only address option in the socket, this should
+        be done by first setting the option value to the original set value */
+        option_value_l = 1;
+        socket_result = SOCKET_SET_OPTIONS(
+            service->service_socket6_handle,
+            SOCKET_OPTIONS_IP6_SOCKET,
+            SOCKET_OPTIONS_IP6_ONLY_SOCKET,
+            option_value_l
+        );
 
-		/* in case there was an error settings the socket option
-		must handle it prompting the error information */
-		if(SOCKET_TEST_ERROR(socket_result)) {
+        /* in case there was an error settings the socket option
+        must handle it prompting the error information */
+        if(SOCKET_TEST_ERROR(socket_result)) {
 #ifdef VIRIATUM_PLATFORM_WIN32
-			SOCKET_GET_ERROR_CODE(socket_result);
+            SOCKET_GET_ERROR_CODE(socket_result);
 #else
-			SOCKET_ERROR_CODE option_error_code = SOCKET_GET_ERROR_CODE(socket_result);
-			V_ERROR_F("Problem setting ip6 socket option: %d\n", option_error_code);
-			SOCKET_CLOSE(service->service_socket6_handle);
-			RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem setting ip6 socket option");
+            SOCKET_ERROR_CODE option_error_code = SOCKET_GET_ERROR_CODE(socket_result);
+            V_ERROR_F("Problem setting ip6 socket option: %d\n", option_error_code);
+            SOCKET_CLOSE(service->service_socket6_handle);
+            RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem setting ip6 socket option");
 #endif
-		}
+        }
 
-		/* sets the socket reuse address option in the socket, this should
-		be done by first setting the option value to the original set value */
-		option_value = 1;
-		socket_result = SOCKET_SET_OPTIONS(
-			service->service_socket6_handle,
-			SOCKET_OPTIONS_LEVEL_SOCKET,
-			SOCKET_OPTIONS_REUSE_ADDRESS_SOCKET,
-			option_value
-		);
+        /* sets the socket reuse address option in the socket, this should
+        be done by first setting the option value to the original set value */
+        option_value = 1;
+        socket_result = SOCKET_SET_OPTIONS(
+            service->service_socket6_handle,
+            SOCKET_OPTIONS_LEVEL_SOCKET,
+            SOCKET_OPTIONS_REUSE_ADDRESS_SOCKET,
+            option_value
+        );
 
-		/* in case there was an error settings the socket option
-		must handle it prompting the error information */
-		if(SOCKET_TEST_ERROR(socket_result)) {
-			SOCKET_ERROR_CODE option_error_code = SOCKET_GET_ERROR_CODE(socket_result);
-			V_ERROR_F("Problem setting ip6 socket option: %d\n", option_error_code);
-			SOCKET_CLOSE(service->service_socket6_handle);
-			RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem setting ip6 socket option");
-		}
-	}
+        /* in case there was an error settings the socket option
+        must handle it prompting the error information */
+        if(SOCKET_TEST_ERROR(socket_result)) {
+            SOCKET_ERROR_CODE option_error_code = SOCKET_GET_ERROR_CODE(socket_result);
+            V_ERROR_F("Problem setting ip6 socket option: %d\n", option_error_code);
+            SOCKET_CLOSE(service->service_socket6_handle);
+            RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem setting ip6 socket option");
+        }
+    }
 #endif
 
 #ifdef VIRIATUM_SSL
@@ -896,107 +896,107 @@ ERROR_CODE start_service(struct service_t *service) {
     }
 #endif
 
-	/* binds the service socket */
-	socket_result = SOCKET_BIND(service->service_socket_handle, socket_address);
+    /* binds the service socket */
+    socket_result = SOCKET_BIND(service->service_socket_handle, socket_address);
 
-	/* in case there was an error binding the socket */
-	if(SOCKET_TEST_ERROR(socket_result)) {
-		/* retrieves the binding error code */
-		SOCKET_ERROR_CODE binding_error_code = SOCKET_GET_ERROR_CODE(socket_result);
+    /* in case there was an error binding the socket */
+    if(SOCKET_TEST_ERROR(socket_result)) {
+        /* retrieves the binding error code */
+        SOCKET_ERROR_CODE binding_error_code = SOCKET_GET_ERROR_CODE(socket_result);
 
-		/* prints the error */
-		V_ERROR_F("Problem binding socket: %d\n", binding_error_code);
+        /* prints the error */
+        V_ERROR_F("Problem binding socket: %d\n", binding_error_code);
 
-		/* closes the service socket */
-		SOCKET_CLOSE(service->service_socket_handle);
+        /* closes the service socket */
+        SOCKET_CLOSE(service->service_socket_handle);
 
-		/* raises an error */
-		RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem binding socket");
-	}
+        /* raises an error */
+        RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem binding socket");
+    }
 
-	/* listens for a service socket change */
-	socket_result = SOCKET_LISTEN(service->service_socket_handle);
+    /* listens for a service socket change */
+    socket_result = SOCKET_LISTEN(service->service_socket_handle);
 
-	/* in case there was an error listening the socket */
-	if(SOCKET_TEST_ERROR(socket_result)) {
-		/* retrieves the listening error code */
-		SOCKET_ERROR_CODE binding_error_code = SOCKET_GET_ERROR_CODE(socket_result);
+    /* in case there was an error listening the socket */
+    if(SOCKET_TEST_ERROR(socket_result)) {
+        /* retrieves the listening error code */
+        SOCKET_ERROR_CODE binding_error_code = SOCKET_GET_ERROR_CODE(socket_result);
 
-		/* prints the error */
-		V_ERROR_F("Problem listening socket: %d\n", binding_error_code);
+        /* prints the error */
+        V_ERROR_F("Problem listening socket: %d\n", binding_error_code);
 
-		/* closes the service socket */
-		SOCKET_CLOSE(service->service_socket_handle);
+        /* closes the service socket */
+        SOCKET_CLOSE(service->service_socket_handle);
 
-		/* raises an error */
-		RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem listening socket");
-	}
+        /* raises an error */
+        RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem listening socket");
+    }
 
 #ifdef VIRIATUM_IP6
-	/* in case the ip6 connection flag is set the ip6 connection
-	must be bound to the current context (bind operation) */
-	if(service_options->ip6) {
+    /* in case the ip6 connection flag is set the ip6 connection
+    must be bound to the current context (bind operation) */
+    if(service_options->ip6) {
 #ifdef VIRIATUM_PLATFORM_WIN32
-		/* binds the ip6 service socket */
-		socket_result = SOCKET_BIND_EX(service->service_socket6_handle, socket6_address->ai_addr, socket6_address->ai_addrlen);
+        /* binds the ip6 service socket */
+        socket_result = SOCKET_BIND_EX(service->service_socket6_handle, socket6_address->ai_addr, socket6_address->ai_addrlen);
 #endif
 
 #ifdef VIRIATUM_PLATFORM_UNIX
-		/* binds the ip6 service socket */
-		socket_result = SOCKET_BIND_EX(service->service_socket6_handle, _socket6_address, sizeof(_socket6_address));
+        /* binds the ip6 service socket */
+        socket_result = SOCKET_BIND_EX(service->service_socket6_handle, _socket6_address, sizeof(_socket6_address));
 #endif
 
-		/* in case there was an error binding the socket */
-		if(SOCKET_TEST_ERROR(socket_result)) {
-			/* retrieves the binding error code */
-			SOCKET_ERROR_CODE binding_error_code = SOCKET_GET_ERROR_CODE(socket_result);
+        /* in case there was an error binding the socket */
+        if(SOCKET_TEST_ERROR(socket_result)) {
+            /* retrieves the binding error code */
+            SOCKET_ERROR_CODE binding_error_code = SOCKET_GET_ERROR_CODE(socket_result);
 
-			/* prints the error */
-			V_ERROR_F("Problem binding ip6 socket: %d\n", binding_error_code);
+            /* prints the error */
+            V_ERROR_F("Problem binding ip6 socket: %d\n", binding_error_code);
 
-			/* closes the service socket */
-			SOCKET_CLOSE(service->service_socket_handle);
+            /* closes the service socket */
+            SOCKET_CLOSE(service->service_socket_handle);
 
-			/* raises an error */
-			RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem binding socket");
-		}
+            /* raises an error */
+            RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem binding socket");
+        }
 
-		/* listens for a service socket change */
-		socket_result = SOCKET_LISTEN(service->service_socket6_handle);
+        /* listens for a service socket change */
+        socket_result = SOCKET_LISTEN(service->service_socket6_handle);
 
-		/* in case there was an error listening the socket */
-		if(SOCKET_TEST_ERROR(socket_result)) {
-			/* retrieves the listening error code */
-			SOCKET_ERROR_CODE binding_error_code = SOCKET_GET_ERROR_CODE(socket_result);
+        /* in case there was an error listening the socket */
+        if(SOCKET_TEST_ERROR(socket_result)) {
+            /* retrieves the listening error code */
+            SOCKET_ERROR_CODE binding_error_code = SOCKET_GET_ERROR_CODE(socket_result);
 
-			/* prints the error */
-			V_ERROR_F("Problem listening ip6 socket: %d\n", binding_error_code);
+            /* prints the error */
+            V_ERROR_F("Problem listening ip6 socket: %d\n", binding_error_code);
 
-			/* closes the service socket */
-			SOCKET_CLOSE(service->service_socket_handle);
+            /* closes the service socket */
+            SOCKET_CLOSE(service->service_socket_handle);
 
-			/* raises an error */
-			RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem listening socket");
-		}
-	}
+            /* raises an error */
+            RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem listening socket");
+        }
+    }
 #endif
 
     /* retrieves the polling service currently in use
     for the service */
     polling = service->polling;
 
-	/* retrieves the required elements (eg: the handle
-	to the (normal) socket) */
-	service_socket_handle = service->service_socket_handle;
+    /* retrieves the required elements (eg: the handle
+    to the (normal) socket) */
+    service_socket_handle = service->service_socket_handle;
 
 #ifdef VIRIATUM_IP6
-	/* in case the ip6 connection flag is set the ip6 connection
-	must be retrieved into the temporary variable */
-	if(service_options->ip6) {
-		/* retrieves the ip6 required elements (eg: the handle
-		to the ip6 socket) */
-		service_socket6_handle = service->service_socket6_handle;
-	}
+    /* in case the ip6 connection flag is set the ip6 connection
+    must be retrieved into the temporary variable */
+    if(service_options->ip6) {
+        /* retrieves the ip6 required elements (eg: the handle
+        to the ip6 socket) */
+        service_socket6_handle = service->service_socket6_handle;
+    }
 #endif
 
     /* sets the service in the polling */
@@ -1016,37 +1016,37 @@ ERROR_CODE start_service(struct service_t *service) {
     /* opens the polling (provider) */
     polling->open(polling);
 
-	/* creates the (service) connection */
-	create_connection(&service_connection, service_socket_handle);
+    /* creates the (service) connection */
+    create_connection(&service_connection, service_socket_handle);
 
 #ifdef VIRIATUM_IP6
-	/* in case the ip6 connection flag is set the ip6 connection
-	must be correctly created */
-	if(service_options->ip6) {
-		/* creates the (service) connection for the ip6 based
-		connection (for upper compatibility) */
-		create_connection(&service6_connection, service_socket6_handle);
-	}
+    /* in case the ip6 connection flag is set the ip6 connection
+    must be correctly created */
+    if(service_options->ip6) {
+        /* creates the (service) connection for the ip6 based
+        connection (for upper compatibility) */
+        create_connection(&service6_connection, service_socket6_handle);
+    }
 #endif
 
 #ifdef VIRIATUM_SSL
     /* in case the ssl encryption flag is set the ssl sub system
     should be set in the service connection */
     if(service_options->ssl) {
-		/* updates the ssl context and handle in the service connection
-		so that it's possible to access the ssl connection */
-		service_connection->ssl_context = service->ssl_context;
-		service_connection->ssl_handle = service->ssl_handle;
+        /* updates the ssl context and handle in the service connection
+        so that it's possible to access the ssl connection */
+        service_connection->ssl_context = service->ssl_context;
+        service_connection->ssl_handle = service->ssl_handle;
 
 #ifdef VIRIATUM_IP6
-		/* in case the ip6 connection flag is set the ssl sub system
-		should be set in the service ip6 connection */
-		if(service_options->ip6) {
-			/* updates the ssl context and handle in the service connection
-			so that it's possible to access the ssl connection */
-			service6_connection->ssl_context = service->ssl_context;
-			service6_connection->ssl_handle = service->ssl_handle;
-		}
+        /* in case the ip6 connection flag is set the ssl sub system
+        should be set in the service ip6 connection */
+        if(service_options->ip6) {
+            /* updates the ssl context and handle in the service connection
+            so that it's possible to access the ssl connection */
+            service6_connection->ssl_context = service->ssl_context;
+            service6_connection->ssl_handle = service->ssl_handle;
+        }
 #endif
     }
 #endif
@@ -1069,26 +1069,26 @@ ERROR_CODE start_service(struct service_t *service) {
     service_connection->open_connection(service_connection);
 
 #ifdef VIRIATUM_IP6
-	/* in case the ip6 connection flag is set the ip6 connection
-	must be correctly "opened" */
-	if(service_options->ip6) {
-		/* sets the service select service as the service in the service connection */
-		service6_connection->service = service;
+    /* in case the ip6 connection flag is set the ip6 connection
+    must be correctly "opened" */
+    if(service_options->ip6) {
+        /* sets the service select service as the service in the service connection */
+        service6_connection->service = service;
 
-		/* sets the base hanlding functions in the service connection */
-		service6_connection->open_connection = open_connection;
-		service6_connection->close_connection = close_connection;
-		service6_connection->write_connection = write_connection;
-		service6_connection->register_write = register_write_connection;
-		service6_connection->unregister_write = unregister_write_connection;
+        /* sets the base hanlding functions in the service connection */
+        service6_connection->open_connection = open_connection;
+        service6_connection->close_connection = close_connection;
+        service6_connection->write_connection = write_connection;
+        service6_connection->register_write = register_write_connection;
+        service6_connection->unregister_write = unregister_write_connection;
 
-		/* sets the fucntion to be called uppon read on the service
-		connection (it should be the accept handler stream io, default) */
-		service6_connection->on_read = accept_handler_stream_io;
+        /* sets the fucntion to be called uppon read on the service
+        connection (it should be the accept handler stream io, default) */
+        service6_connection->on_read = accept_handler_stream_io;
 
-		/* opens the (service) connection */
-		service6_connection->open_connection(service6_connection);
-	}
+        /* opens the (service) connection */
+        service6_connection->open_connection(service6_connection);
+    }
 #endif
 
 #ifdef VIRIATUM_PLATFORM_UNIX
@@ -1645,7 +1645,7 @@ ERROR_CODE _default_options_service(struct service_t *service, struct hash_map_t
     /* sets the varius default service options */
     service_options->port = VIRIATUM_DEFAULT_PORT;
     service_options->address = (unsigned char *) VIRIATUM_DEFAULT_HOST;
-	service_options->address6 = (unsigned char *) VIRIATUM_DEFAULT_HOST6;
+    service_options->address6 = (unsigned char *) VIRIATUM_DEFAULT_HOST6;
     service_options->handler_name = (unsigned char *) VIRIATUM_DEFAULT_HANDLER;
     service_options->default_index = VIRIATUM_DEFAULT_INDEX;
     service_options->use_template = VIRIATUM_DEFAULT_USE_TEMPLATE;

@@ -105,17 +105,17 @@ static __inline int ends_with_string(unsigned char *string_value, unsigned char 
 
 
 static __inline unsigned char *trim(unsigned char *string_value) {
-	size_t length = strlen((char *) string_value);
-	if(length < 3) { return string_value; }
-	string_value[length - 1] = '\0';
-	return &string_value[1];
+    size_t length = strlen((char *) string_value);
+    if(length < 3) { return string_value; }
+    string_value[length - 1] = '\0';
+    return &string_value[1];
 }
 
 static __inline unsigned char *untrim(unsigned char *string_value, char last) {
-	size_t length = strlen((char *) string_value);
-	if(length < 1) { return string_value; }
-	string_value[length] = last;
-	return string_value - 1;
+    size_t length = strlen((char *) string_value);
+    if(length < 1) { return string_value; }
+    string_value[length] = last;
+    return string_value - 1;
 }
 
 static __inline void uppercase(char *string_value) {
