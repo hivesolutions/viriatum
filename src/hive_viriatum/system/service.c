@@ -598,6 +598,12 @@ ERROR_CODE start_service(struct service_t *service) {
 #endif
     SOCKET_ADDRESS_INTERNET6 _socket6_address;
 
+#ifdef VIRIATUM_PLATFORM_UNIX
+	/* allocates space for the temporary variable to be used
+	to sttore the address to be "treated" (trimmed) */
+	unsigned char address6[64];
+#endif
+
     /* allocates space for the service socket handle and for
     the associated connection structure, these values must be
     initialized in order to avoid warnings */
@@ -749,16 +755,16 @@ ERROR_CODE start_service(struct service_t *service) {
 #endif
 
 #ifdef VIRIATUM_PLATFORM_UNIX
-        service_options->address6 = trim(service_options->address6);
+		STRCPY(address6, 64, service_options->address6);
+        address6 = trim(address6);
         _socket6_address.sin6_family = SOCKET_INTERNET6_TYPE;
         _socket6_address.sin6_addr = in6addr_any;
         _socket6_address.sin6_port = htons(service_options->port);
         socket_result = inet_pton(
             SOCKET_INTERNET6_TYPE,
-            (const char *) service_options->address6,
+            (const char *) address6,
             (void *) &_socket6_address.sin6_addr
         );
-        service_options->address6 = untrim(service_options->address6, ']');
 
         /* in case there was an error retrieving the address information
         must be correctly displayed */
