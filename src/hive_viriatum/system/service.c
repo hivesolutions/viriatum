@@ -755,8 +755,8 @@ ERROR_CODE start_service(struct service_t *service) {
 #endif
 
 #ifdef VIRIATUM_PLATFORM_UNIX
-		STRCPY(address6, 64, service_options->address6);
-        address6 = trim(address6);
+		STRCPY((char *) address6, 64, (char *) service_options->address6);
+        address6 = trim((unsigned char *) address6);
         _socket6_address.sin6_family = SOCKET_INTERNET6_TYPE;
         _socket6_address.sin6_addr = in6addr_any;
         _socket6_address.sin6_port = htons(service_options->port);
