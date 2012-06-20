@@ -1650,7 +1650,7 @@ ERROR_CODE _file_options_service(struct service_t *service, struct hash_map_t *a
     /* tries to retrieve the ssl argument from the arguments map and
     in case the (ssl) value is set, sets it in the service options */
     get_value_string_sort_map(general, (unsigned char *) "ssl", &value);
-    if(value != NULL) { service_options->ssl = (unsigned char) atoi(value); }
+    if(value != NULL) { service_options->ssl = (unsigned char) atob(value); }
 
     /* tries to retrieve the ssl certificate from the arguments map and
     in case the (ssl csr) value is set, sets it in the service options */
@@ -1670,7 +1670,7 @@ ERROR_CODE _file_options_service(struct service_t *service, struct hash_map_t *a
     /* tries to retrieve the local argument from the arguments map, then
     in case the (local) value is set, sets the service as local  */
     get_value_string_sort_map(general, (unsigned char *) "local", &value);
-    if(value != NULL) { service_options->local = (unsigned char) atoi(value); }
+    if(value != NULL) { service_options->local = (unsigned char) atob(value); }
 
     /* tries to retrieve the workers argument from the arguments map, then
     sets the workers (count) value for the service */
@@ -1680,7 +1680,7 @@ ERROR_CODE _file_options_service(struct service_t *service, struct hash_map_t *a
     /* tries to retrieve the use template argument from the arguments map, then
     sets the use template (boolean) value for the service */
     get_value_string_sort_map(general, (unsigned char *) "use_template", &value);
-    if(value != NULL) { service_options->use_template = (unsigned char) atoi(value); }
+    if(value != NULL) { service_options->use_template = (unsigned char) atob(value); }
 
     /* tries to retrieve the index (file) argument from the arguments map, then
     sets the split value arround the space character in the index value */
