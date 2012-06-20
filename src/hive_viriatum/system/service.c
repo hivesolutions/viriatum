@@ -729,7 +729,6 @@ ERROR_CODE start_service(struct service_t *service) {
     memset(&_socket6_address, 0, sizeof(_socket6_address));
 
 #ifdef VIRIATUM_PLATFORM_WIN32
-	service_options->address6 = trim_string_value(service_options->address6);
     _socket6_address.ai_family = SOCKET_INTERNET6_TYPE;
     _socket6_address.ai_socktype = SOCKET_PACKET_TYPE;
     _socket6_address.ai_flags = AI_NUMERICHOST | AI_PASSIVE;
@@ -739,9 +738,6 @@ ERROR_CODE start_service(struct service_t *service) {
 		&_socket6_address,
 		&socket6_address
 	);
-	printf("address -> %s\n", service_options->address6);
-	service_options->address6 = untrim_string_value(service_options->address6, ']');
-	printf("new_address -> %s\n", service_options->address6);
 
     /* in case there was an error retrieving the address information
     must be correctly displayed */
@@ -753,6 +749,7 @@ ERROR_CODE start_service(struct service_t *service) {
 #endif
 
 #ifdef VIRIATUM_PLATFORM_UNIX
+	service_options->address6 = trim_string_value(service_options->address6);
     _socket6_address.sin6_family = SOCKET_INTERNET6_TYPE;
     _socket6_address.sin6_addr = in6addr_any;
     _socket6_address.sin6_port = htons(service_options->port);
@@ -761,6 +758,9 @@ ERROR_CODE start_service(struct service_t *service) {
 		service_options->address6,
 	    (void *) &_socket6_address.sin6_addr
     );
+	printf("address -> %s\n", service_options->address6);
+	service_options->address6 = untrim_string_value(service_options->address6, ']');
+	printf("new_address -> %s\n", service_options->address6);
 
     /* in case there was an error retrieving the address information
     must be correctly displayed */
