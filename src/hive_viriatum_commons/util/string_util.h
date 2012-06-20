@@ -27,6 +27,18 @@
 
 #pragma once
 
+/**
+ * Group of string values to be used as
+ * "valid" (evaluating to true) in the
+ * ascii to boolean converter (atob).
+ */
+static const char *atob_strings[4] = {
+	"On",
+	"True",
+	"1",
+	NULL
+};
+
 static __inline unsigned char *base_string_value(unsigned char *string_value) {
     /* allocates the index counter */
     unsigned int index;
@@ -105,10 +117,13 @@ static __inline void normalize_path(char *string_value) {
 }
 
 static __inline char atob(char *string_value) {
-	if(strcmp(string_value, "On") == 0) {
-		return 1;
-	} else if(strcmp(string_value, "True") == 0) {
-		return 1;
+	const char *_string_value;
+	size_t index = 0;
+
+	while(1) {
+		_string_value = atob_strings[index];
+		if(_string_value == NULL) { break; }
+		if(strcmp(_string_value, string_value) == 0) { return 1; }
 	}
 
 	return 0;
