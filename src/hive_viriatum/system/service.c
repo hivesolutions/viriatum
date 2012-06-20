@@ -784,7 +784,7 @@ ERROR_CODE start_service(struct service_t *service) {
 	option_value = 0;
 	socket_result = SOCKET_SET_OPTIONS(
 		service->service_socket6_handle,
-		SOCKET_OPTIONS_LEVEL_SOCKET,
+		SOCKET_OPTIONS_IP6_SOCKET,
 		SOCKET_OPTIONS_IP6_ONLY_SOCKET, 
 		option_value
 	);
@@ -809,7 +809,7 @@ ERROR_CODE start_service(struct service_t *service) {
 	option_value = 1;
 	socket_result = SOCKET_SET_OPTIONS(
 		service->service_socket6_handle,
-		SOCKET_OPTIONS_LEVEL_SOCKET,
+		SOCKET_OPTIONS_IP6_SOCKET,
 		SOCKET_OPTIONS_IP6_ONLY_SOCKET, 
 		option_value
 	); 
