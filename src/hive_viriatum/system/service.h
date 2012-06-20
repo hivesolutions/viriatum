@@ -490,12 +490,18 @@ typedef struct service_options_t {
     struct virtual_host_t *default_virtual_host;
 
     /**
-     * The string absed buffer of file apths to the
+     * The string based buffer of file apths to the
      * index files to be used for root directory listing.
      * This value should be used as the default way to
      * discover the file to be used for directory listing.
      */
     unsigned char index[32][128];
+
+	/**
+	 * The number of index objects currently available and
+	 * parsed from the line value.
+	 */
+	size_t index_count;
 
     /**
      * The set of virtual hosts associated with the
