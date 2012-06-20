@@ -297,7 +297,7 @@ ERROR_CODE open_handler_stream_http_client(struct io_connection_t *io_connection
         buffer,
         1024,
         "GET %s?%s HTTP/1.1\r\n"
-        "User-Agent: viriatum/0.1.0 (linux - intel x64)\r\n"
+        "User-Agent: viriatum/0.2.0 (linux - intel x64)\r\n"
         "Connection: Keep-Alive\r\n\r\n",
         parameters->url,
         get_string
