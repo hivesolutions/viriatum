@@ -585,7 +585,7 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
         headers_buffer,
         1024,
         "HTTP/1.1 %d %s\r\n"
-		"Server: %s/%s (%s - %s) (%s)\r\n"
+        "Server: %s/%s (%s - %s) (%s)\r\n"
         "Connection: Keep-Alive\r\n"
         "Content-Length: %lu\r\n",
         status_code,
@@ -594,7 +594,7 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
         VIRIATUM_VERSION,
         VIRIATUM_PLATFORM_STRING,
         VIRIATUM_PLATFORM_CPU,
-		VIRIATUM_FLAGS,
+        VIRIATUM_FLAGS,
         (long unsigned int) output_buffer->buffer_length
     );
 
@@ -673,14 +673,14 @@ ERROR_CODE _write_error_connection(struct http_parser_t *http_parser, char *mess
         (char *) buffer,
         1024,
         "HTTP/1.1 500 Internal Server Error\r\n"
-		"Server: %s/%s (%s - %s) (%s)\r\n"
+        "Server: %s/%s (%s - %s) (%s)\r\n"
         "Connection: Keep-Alive\r\n"
         "Content-Length: %d\r\n\r\n%s",
         VIRIATUM_NAME,
         VIRIATUM_VERSION,
         VIRIATUM_PLATFORM_STRING,
         VIRIATUM_PLATFORM_CPU,
-		VIRIATUM_FLAGS,
+        VIRIATUM_FLAGS,
         (unsigned int) message_length,
         message
     );

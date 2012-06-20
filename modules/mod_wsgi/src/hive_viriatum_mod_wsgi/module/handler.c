@@ -642,7 +642,7 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
         VIRIATUM_VERSION,
         VIRIATUM_PLATFORM_STRING,
         VIRIATUM_PLATFORM_CPU,
-		VIRIATUM_FLAGS
+        VIRIATUM_FLAGS
     );
 
     /* iterates over all the headers present in the current wsgi request to copy

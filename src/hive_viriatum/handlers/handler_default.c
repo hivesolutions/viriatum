@@ -257,7 +257,7 @@ ERROR_CODE _send_response_handler_default(struct http_parser_t *http_parser) {
         response_buffer,
         256,
         "HTTP/1.1 200 OK\r\n"
-		"Server: %s/%s (%s - %s) (%s)\r\n"
+        "Server: %s/%s (%s - %s) (%s)\r\n"
         "Connection: Keep-Alive\r\n"
         "Content-Type: text/plain\r\n"
         "Content-Length: 14\r\n\r\n"
@@ -266,7 +266,7 @@ ERROR_CODE _send_response_handler_default(struct http_parser_t *http_parser) {
         VIRIATUM_VERSION,
         VIRIATUM_PLATFORM_STRING,
         VIRIATUM_PLATFORM_CPU,
-		VIRIATUM_FLAGS
+        VIRIATUM_FLAGS
     );
 
     /* writes the response to the connection, registers for the appropriate callbacks */

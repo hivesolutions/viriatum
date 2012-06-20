@@ -96,7 +96,7 @@ ERROR_CODE write_http_error(struct connection_t *connection, char *header, char 
             headers_buffer,
             1024,
             "HTTP/1.1 %s %s\r\n"
-			"Server: %s/%s (%s - %s) (%s)\r\n"
+            "Server: %s/%s (%s - %s) (%s)\r\n"
             "Connection: Keep-Alive\r\n"
             "Cache-Control: no-cache, must-revalidate\r\n"
             "Content-Length: %lu\r\n\r\n",
@@ -106,7 +106,7 @@ ERROR_CODE write_http_error(struct connection_t *connection, char *header, char 
             VIRIATUM_VERSION,
             VIRIATUM_PLATFORM_STRING,
             VIRIATUM_PLATFORM_CPU,
-			VIRIATUM_FLAGS,
+            VIRIATUM_FLAGS,
             (long unsigned int) strlen((char *) template_handler->string_value)
         );
 
@@ -137,7 +137,7 @@ ERROR_CODE write_http_error(struct connection_t *connection, char *header, char 
             headers_buffer,
             1024,
             "HTTP/1.1 %s %s\r\n"
-			"Server: %s/%s (%s - %s) (%s)\r\n"
+            "Server: %s/%s (%s - %s) (%s)\r\n"
             "Connection: Keep-Alive\r\n"
             "Cache-Control: no-cache, must-revalidate\r\n"
             "Content-Length: %lu\r\n\r\n%s",
@@ -147,7 +147,7 @@ ERROR_CODE write_http_error(struct connection_t *connection, char *header, char 
             VIRIATUM_VERSION,
             VIRIATUM_PLATFORM_STRING,
             VIRIATUM_PLATFORM_CPU,
-			VIRIATUM_FLAGS,
+            VIRIATUM_FLAGS,
             (long unsigned int) strlen(error_description), error_description
         );
 
