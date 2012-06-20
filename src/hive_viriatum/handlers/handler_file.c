@@ -140,10 +140,40 @@ ERROR_CODE message_begin_callback_handler_file(struct http_parser_t *http_parser
     RAISE_NO_ERROR;
 }
 
+
+static __inline char *validate_files(char *base_path, char *buffer, size_t count, size_t size) {
+	char valid;
+	size_t index;
+	char file_path[VIRIATUM_MAX_PATH_SIZE];
+
+	for(index = 0; index < count; index++) {
+		SPRINTF(
+			file_path,
+			VIRIATUM_MAX_PATH_SIZE,
+			"%s/%s",
+			base_path,
+			buffer
+		);
+
+		valid = ACCESS(file_path, F_OK) == 0;
+		if(valid) { return buffer; }
+
+		buffer += size;
+	}
+
+    return NULL;
+}
+
+
 ERROR_CODE url_callback_handler_file(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
-    /* allocates the required space for the url, this
-    is done through static allocation */
+    /* allocates the required space for the url and base paht
+	this is done through static allocation */
     unsigned char url[VIRIATUM_MAX_URL_SIZE];
+	unsigned char base_path[VIRIATUM_MAX_PATH_SIZE];
+
+	/* initializes the index file path pointer to the
+	original invalid value */
+	char *index = NULL;
 
     /* retrieves the handler file context from the http parser */
     struct handler_file_context_t *handler_file_context = (struct handler_file_context_t *) http_parser->context;
@@ -169,18 +199,48 @@ ERROR_CODE url_callback_handler_file(struct http_parser_t *http_parser, const un
     V_INFO_F("%s %s\n", get_http_method_string(http_parser->method), url);
 
     /* in case the string refers the base path (default handler must be used)
-    the selection of the index file as defautl is conditioned by the default
+    the selection of the index file as default is conditioned by the default
     index configuration option */
-    if(options->default_index && (strcmp((char *) url, "/") == 0 || strcmp((char *) url, "") == 0)) {
-        /* copies the index reference as the url */
-        memcpy(url, "/index.html", 12);
+	if(options->default_index && (path_size == 0 || url[path_size - 1] == '/')) {
+        /* creates the base path from the viriatum contents path 
+		and the current provided url and then runs the file existence
+		validation process using the index array provided */
+        SPRINTF(base_path, VIRIATUM_MAX_PATH_SIZE, "%s%s", VIRIATUM_CONTENTS_PATH, url);
+		index = validate_files(base_path, (char *) options->index, 32, 128);
     }
 
     /* copies the url to the url reference in the handler file context */
     memcpy(handler_file_context->url, url, data_size + 1);
 
-    /* creates the file path from using the base viriatum path */
-    SPRINTF((char *) handler_file_context->file_path, VIRIATUM_MAX_PATH_SIZE, "%s%s%s", VIRIATUM_CONTENTS_PATH, VIRIATUM_BASE_PATH, url);
+	/* in case the index file "was not found" must handle the request
+	file path "normally" (simple construction) */
+	if(index == NULL) {
+		/* creates the file path from using the base viriatum path
+		this should be the complete absolute path */
+		SPRINTF(
+			(char *) handler_file_context->file_path,
+			VIRIATUM_MAX_PATH_SIZE,
+			"%s%s%s",
+			VIRIATUM_CONTENTS_PATH,
+			VIRIATUM_BASE_PATH,
+			url
+		);
+	}
+	/* otherwise must use the "resolved" index file path to create
+	the "final" file path to be read */
+	else {
+		/* creates the file path from using the base viriatum path
+		this should be the complete absolute path */
+		SPRINTF(
+			(char *) handler_file_context->file_path,
+			VIRIATUM_MAX_PATH_SIZE,
+			"%s%s%s%s",
+			VIRIATUM_CONTENTS_PATH,
+			VIRIATUM_BASE_PATH,
+			url,
+			index
+		);
+	}
 
     /* raise no error */
     RAISE_NO_ERROR;
