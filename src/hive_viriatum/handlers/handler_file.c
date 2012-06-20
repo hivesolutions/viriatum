@@ -140,31 +140,6 @@ ERROR_CODE message_begin_callback_handler_file(struct http_parser_t *http_parser
     RAISE_NO_ERROR;
 }
 
-
-static __inline char *validate_files(char *base_path, char *buffer, size_t count, size_t size) {
-	char valid;
-	size_t index;
-	char file_path[VIRIATUM_MAX_PATH_SIZE];
-
-	for(index = 0; index < count; index++) {
-		SPRINTF(
-			file_path,
-			VIRIATUM_MAX_PATH_SIZE,
-			"%s/%s",
-			base_path,
-			buffer
-		);
-
-		valid = ACCESS(file_path, F_OK) == 0;
-		if(valid) { return buffer; }
-
-		buffer += size;
-	}
-
-    return NULL;
-}
-
-
 ERROR_CODE url_callback_handler_file(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
     /* allocates the required space for the url and base paht
 	this is done through static allocation */
@@ -206,7 +181,7 @@ ERROR_CODE url_callback_handler_file(struct http_parser_t *http_parser, const un
 		and the current provided url and then runs the file existence
 		validation process using the index array provided */
         SPRINTF(base_path, VIRIATUM_MAX_PATH_SIZE, "%s%s", VIRIATUM_CONTENTS_PATH, url);
-		index = validate_files(base_path, (char *) options->index, 32, 128);
+		index = validate_file(base_path, (char *) options->index, 32, 128);
     }
 
     /* copies the url to the url reference in the handler file context */
