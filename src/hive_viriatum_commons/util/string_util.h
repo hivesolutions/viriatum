@@ -41,18 +41,6 @@ static const char *atob_strings[4] = {
     NULL
 };
 
-static __inline unsigned char *trim_string_value(unsigned char *string_value) {
-	size_t length = strlen(string_value);
-	string_value[length - 1] = '\0';
-	return &string_value[1];
-}
-
-static __inline unsigned char *untrim_string_value(unsigned char *string_value, char last) {
-	size_t length = strlen(string_value);
-	string_value[length] = last;
-	return string_value - 1;
-}
-
 static __inline unsigned char *base_string_value(unsigned char *string_value) {
     /* allocates the index counter */
     unsigned int index;
@@ -113,6 +101,21 @@ static __inline int ends_with_string(unsigned char *string_value, unsigned char 
 
     /* return in success (complete match) */
     return 1;
+}
+
+
+static __inline unsigned char *trim(unsigned char *string_value) {
+	size_t length = strlen((char *) string_value);
+	if(length < 3) { return string_value; }
+	string_value[length - 1] = '\0';
+	return &string_value[1];
+}
+
+static __inline unsigned char *untrim(unsigned char *string_value, char last) {
+	size_t length = (char *) strlen(string_value);
+	if(length < 1) { return string_value; }
+	string_value[length] = last;
+	return string_value - 1;
 }
 
 static __inline void uppercase(char *string_value) {
