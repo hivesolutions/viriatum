@@ -418,7 +418,7 @@ typedef struct service_options_t {
      * Flag that controls if the service is meant
      * to be run "inside" an ipv6 protocol connection.
      */
-	unsigned char ipv6;
+	unsigned char ip6;
 
     /**
      * The "default" address to bind the service
