@@ -149,8 +149,8 @@ static __inline char atob(char *string_value) {
 
 static __inline size_t atoa(char *string_value, char *buffer, size_t elements, size_t element_size) {
     size_t size;
-    size_t copies = 0;
-    size_t counter = 0;
+    size_t count = 0;
+    size_t index = 0;
     char *_base_value = string_value;
 
     while(1) {
@@ -159,14 +159,14 @@ static __inline size_t atoa(char *string_value, char *buffer, size_t elements, s
             case '\0':
                 size = string_value - _base_value;
                 if(size + 1 > element_size) { return 0; }
-                if(copies + 1 > elements) { return 0; }
+                if(count + 1 > elements) { return 0; }
 
-                memcpy(&buffer[counter], _base_value, size);
-                buffer[counter + size] = '\0';
+                memcpy(&buffer[index], _base_value, size);
+                buffer[index + size] = '\0';
 
-                counter += element_size;
+                count += element_size;
                 _base_value = string_value + 1;
-                copies++;
+                count++;
 
                 break;
 
@@ -179,7 +179,7 @@ static __inline size_t atoa(char *string_value, char *buffer, size_t elements, s
         string_value++;
     }
 
-    return copies;
+    return count;
 }
 
 static __inline size_t trailing_size(char *buffer, size_t size) {
@@ -213,7 +213,7 @@ static __inline size_t leading_offset(char *buffer, size_t size) {
     return _size;
 }
 
-static __inline void split(char *string_value, char *buffer, size_t size_e, char token) {
+static __inline size_t split(char *string_value, char *buffer, size_t size_e, char token) {
     /* allocates space for the temporary token to be used to
     store the current token in iteration */
     char _token;
@@ -223,6 +223,7 @@ static __inline void split(char *string_value, char *buffer, size_t size_e, char
     size_t size;
     size_t index = 0;
     size_t _index = 0;
+	size_t count = 0;
 
     /* iterates continuousuly over the string value to correctly
     parse the string value and split it */
@@ -245,6 +246,10 @@ static __inline void split(char *string_value, char *buffer, size_t size_e, char
             buffer element and then re-sets the auxiliary buffer value */
             buffer += size_e;
             _index = index + 1;
+
+			/* increments the count (number of parsed elements)
+			because one more split occured */
+			count++;
         }
         /* otherwise in case the current token isthe end of string
         the current string must be copied as the last trunk */
@@ -256,6 +261,10 @@ static __inline void split(char *string_value, char *buffer, size_t size_e, char
             memcpy(buffer, &string_value[_index], size);
             buffer[size] = '\0';
 
+			/* increments the count (number of parsed elements)
+			because one more split occured (final split) */
+			count++;
+
             /* breaks the current loop (no more tokens to be split) */
             break;
         }
@@ -264,4 +273,8 @@ static __inline void split(char *string_value, char *buffer, size_t size_e, char
         iteration increment) */
         index++;
     }
+
+	/* returns the count value, number of parsed elements
+	from the provided string */
+	return count;
 }
