@@ -187,3 +187,24 @@ static __inline char *get_config_path() {
 #define VIRIATUM_SELECT_TIMEOUT 1
 #define VIRIATUM_MAXIMUM_CONNECTIONS 10000
 #endif
+
+#ifdef VIRIATUM_IP6
+#define VIRIATUM_IP6_S " ipv6"
+#else
+#define VIRIATUM_IP6_S ""
+#endif
+
+#ifdef VIRIATUM_SSL
+#define VIRIATUM_SSL_S " ssl"
+#else
+#define VIRIATUM_SSL_S ""
+#endif
+
+#ifdef VIRIATUM_PCRE
+#define VIRIATUM_PCRE_S " pcre"
+#else
+#define VIRIATUM_PCRE_S ""
+#endif
+
+#define _VIRIATUM_FLAGS VIRIATUM_IP6_S VIRIATUM_SSL_S VIRIATUM_PCRE_S
+#define VIRIATUM_FLAGS TRIM_STRING(_VIRIATUM_FLAGS)
