@@ -29,7 +29,7 @@ AC_C_INLINE
 AC_TYPE_SIZE_T
 
 # sets the silent rules for compilation
-AM_SILENT_RULES([yes])
+m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 # changes the library names spec to a non versioned
 # setting (avoid possible import problems)
