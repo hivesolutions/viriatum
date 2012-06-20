@@ -635,13 +635,14 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
         1024,
         "HTTP/1.1 %d %s\r\n"
         "Connection: Keep-Alive\r\n"
-        "Server: %s/%s (%s - %s)\r\n",
+        "Server: %s/%s (%s - %s) (%s)\r\n",
         _wsgi_request.status_code,
         _wsgi_request.status_message,
         VIRIATUM_NAME,
         VIRIATUM_VERSION,
         VIRIATUM_PLATFORM_STRING,
-        VIRIATUM_PLATFORM_CPU
+        VIRIATUM_PLATFORM_CPU,
+		VIRIATUM_FLAGS
     );
 
     /* iterates over all the headers present in the current wsgi request to copy
