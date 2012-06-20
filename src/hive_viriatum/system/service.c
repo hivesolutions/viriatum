@@ -788,10 +788,12 @@ ERROR_CODE start_service(struct service_t *service) {
     /* in case there was an error settings the socket option
 	must handle it prompting the error information */
     if(SOCKET_TEST_ERROR(socket_result)) {
+#ifndef VIRIATUM_PLATFORM_WIN32
         SOCKET_ERROR_CODE option_error_code = SOCKET_GET_ERROR_CODE(socket_result);
         V_ERROR_F("Problem setting ip6 socket option: %d\n", option_error_code);
         SOCKET_CLOSE(service->service_socket6_handle);
         RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem setting ip6 socket option");
+#endif
     }
 #else
     /* sets the socket ip6 only address option in the socket, this should
@@ -807,10 +809,12 @@ ERROR_CODE start_service(struct service_t *service) {
     /* in case there was an error settings the socket option
 	must handle it prompting the error information */
     if(SOCKET_TEST_ERROR(socket_result)) {
+#ifndef VIRIATUM_PLATFORM_WIN32
         SOCKET_ERROR_CODE option_error_code = SOCKET_GET_ERROR_CODE(socket_result);
         V_ERROR_F("Problem setting ip6 socket option: %d\n", option_error_code);
         SOCKET_CLOSE(service->service_socket6_handle);
         RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem setting ip6 socket option");
+#endif
     }
 #endif
 
