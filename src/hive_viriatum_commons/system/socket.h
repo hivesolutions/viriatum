@@ -48,6 +48,7 @@
 #define SOCKET_HOSTENT HOSTENT
 #define SOCKET_FLAGS unsigned long
 #define SOCKET_OPTION char
+#define SOCKET_OPTION_LARGE int
 #define SOCKET_ERROR_CODE int
 #define SOCKET_IOCTL ioctlsocket
 #define SOCKET_WOULDBLOCK WSAEWOULDBLOCK
@@ -84,7 +85,7 @@
 #define SOCKET_GET_ERROR_CODE(result) WSAGetLastError()
 #define SOCKET_SEND(socket_handle, buffer, length, flags) send(socket_handle, buffer, length, flags)
 #define SOCKET_RECEIVE(socket_handle, buffer, length, flags) recv(socket_handle, buffer, length, flags)
-#define SOCKET_SET_OPTIONS(socket_handle, level, option_name, option_value) setsockopt(socket_handle, level, option_name, &option_value, sizeof(option_value))
+#define SOCKET_SET_OPTIONS(socket_handle, level, option_name, option_value) setsockopt(socket_handle, level, option_name, (SOCKET_OPTION *) &option_value, sizeof(option_value))
 #define SOCKET_SELECT(number_socket, sockets_read_set, sockets_write_set, sockets_exception_set, timeout) select(number_socket, sockets_read_set, sockets_write_set, sockets_exception_set, timeout)
 #define SOCKET_SET_ZERO(sockets_set) FD_ZERO(sockets_set)
 #define SOCKET_SET_SET(socket_handle, sockets_set) FD_SET(socket_handle, sockets_set)
@@ -113,6 +114,7 @@
 #define SOCKET_HOSTENT struct hostent
 #define SOCKET_FLAGS unsigned long
 #define SOCKET_OPTION int
+#define SOCKET_OPTION_LARGE int
 #define SOCKET_ERROR_CODE int
 #define SOCKET_IOCTL ioctl
 #define SOCKET_FCNTL fcntl
@@ -149,7 +151,7 @@
 #define SOCKET_GET_ERROR_CODE(result) (SOCKET_ERROR_CODE) errno
 #define SOCKET_SEND(socket_handle, buffer, length, flags) write(socket_handle, buffer, length)
 #define SOCKET_RECEIVE(socket_handle, buffer, length, flags) read(socket_handle, buffer, length)
-#define SOCKET_SET_OPTIONS(socket_handle, level, option_name, option_value) setsockopt(socket_handle, level, option_name, &option_value, sizeof(option_value))
+#define SOCKET_SET_OPTIONS(socket_handle, level, option_name, option_value) setsockopt(socket_handle, level, option_name, (SOCKET_OPTION *) &option_value, sizeof(option_value))
 #define SOCKET_SELECT(number_socket, sockets_read_set, sockets_write_set, sockets_exception_set, timeout) select(number_socket, sockets_read_set, sockets_write_set, sockets_exception_set, timeout)
 #define SOCKET_SET_ZERO(sockets_set) FD_ZERO(sockets_set)
 #define SOCKET_SET_SET(socket_handle, sockets_set) FD_SET(socket_handle, sockets_set)
