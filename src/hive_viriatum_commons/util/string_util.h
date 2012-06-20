@@ -27,6 +27,8 @@
 
 #pragma once
 
+#define TRIM_STRING(string_buffer) &string_buffer[1]
+
 /**
  * Group of string values to be used as
  * "valid" (evaluating to true) in the
