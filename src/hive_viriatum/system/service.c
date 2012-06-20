@@ -749,10 +749,14 @@ ERROR_CODE start_service(struct service_t *service) {
 #endif
 
 #ifdef VIRIATUM_PLATFORM_UNIX
-   _socket6_address.sin6_family = SOCKET_INTERNET6_TYPE;
-   _socket6_address.sin6_addr = in6addr_any;
-   _socket6_address.sin6_port = htons(service_options->port);
-   inet_pton(SOCKET_INTERNET6_TYPE, (const char *) service_options->address6, (void *) &_socket6_address.sin6_addr);
+    _socket6_address.sin6_family = SOCKET_INTERNET6_TYPE;
+    _socket6_address.sin6_addr = in6addr_any;
+    _socket6_address.sin6_port = htons(service_options->port);
+    inet_pton(
+		SOCKET_INTERNET6_TYPE,
+	    (const char *) service_options->address6,
+	    (void *) &_socket6_address.sin6_addr
+    );
 #endif
 
     /* creates the service socket for the given types */
