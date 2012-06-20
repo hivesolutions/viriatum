@@ -124,6 +124,7 @@ static __inline char atob(char *string_value) {
 		_string_value = atob_strings[index];
 		if(_string_value == NULL) { break; }
 		if(strcmp(_string_value, string_value) == 0) { return 1; }
+		index++;
 	}
 
 	return 0;
