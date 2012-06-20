@@ -104,6 +104,16 @@ static __inline void normalize_path(char *string_value) {
     }
 }
 
+static __inline char atob(char *string_value) {
+	if(strcmp(string_value, "On") == 0) {
+		return 1;
+	} else if(strcmp(string_value, "True") == 0) {
+		return 1;
+	}
+
+	return 0;
+}
+
 static __inline size_t trailing_size(char *buffer, size_t size) {
 	char byte;
 	char *_pointer = buffer + size - 1;

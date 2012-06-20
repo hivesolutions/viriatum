@@ -228,7 +228,7 @@ ERROR_CODE _load_configuration(struct service_t *service, struct mod_wsgi_http_h
     /* tries to retrieve the script argument from the arguments map, then
     sets the reload (boolean) value for the service */
     get_value_string_sort_map(configuration, (unsigned char *) "script_reload", &value);
-    if(value != NULL) { mod_wsgi_http_handler->reload = (unsigned char) atoi(value); }
+    if(value != NULL) { mod_wsgi_http_handler->reload = (unsigned char) atob(value); }
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -276,7 +276,7 @@ ERROR_CODE _load_locations(struct service_t *service, struct mod_wsgi_http_handl
         /* tries to retrieve the script argument from the arguments map, then
         sets the reload (boolean) value for the service */
         get_value_string_sort_map(configuration, (unsigned char *) "script_reload", &value);
-        if(value != NULL) { _location->reload = (unsigned char) atoi(value); }
+        if(value != NULL) { _location->reload = (unsigned char) atob(value); }
     }
 
     /* raises no error */
