@@ -709,18 +709,12 @@ ERROR_CODE start_service(struct service_t *service) {
         option_value
     );
 
-    /* in case there was an error binding the socket */
+    /* in case there was an error settings the socket option
+	must handle it prompting the error information */
     if(SOCKET_TEST_ERROR(socket_result)) {
-        /* retrieves the option error code */
         SOCKET_ERROR_CODE option_error_code = SOCKET_GET_ERROR_CODE(socket_result);
-
-        /* prints the error */
         V_ERROR_F("Problem setting socket option: %d\n", option_error_code);
-
-        /* closes the service socket */
         SOCKET_CLOSE(service->service_socket_handle);
-
-        /* raises an error */
         RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem setting socket option");
     }
 #endif
@@ -789,18 +783,12 @@ ERROR_CODE start_service(struct service_t *service) {
 		option_value
 	);
 
-    /* in case there was an error binding the socket */
+    /* in case there was an error settings the socket option
+	must handle it prompting the error information */
     if(SOCKET_TEST_ERROR(socket_result)) {
-        /* retrieves the option error code */
         SOCKET_ERROR_CODE option_error_code = SOCKET_GET_ERROR_CODE(socket_result);
-
-        /* prints the error */
         V_ERROR_F("Problem setting ip6 socket option: %d\n", option_error_code);
-
-        /* closes the service socket */
         SOCKET_CLOSE(service->service_socket6_handle);
-
-        /* raises an error */
         RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem setting ip6 socket option");
     }
 #else
@@ -814,18 +802,12 @@ ERROR_CODE start_service(struct service_t *service) {
 		option_value
 	); 
 
-    /* in case there was an error binding the socket */
+    /* in case there was an error settings the socket option
+	must handle it prompting the error information */
     if(SOCKET_TEST_ERROR(socket_result)) {
-        /* retrieves the option error code */
         SOCKET_ERROR_CODE option_error_code = SOCKET_GET_ERROR_CODE(socket_result);
-
-        /* prints the error */
         V_ERROR_F("Problem setting ip6 socket option: %d\n", option_error_code);
-
-        /* closes the service socket */
         SOCKET_CLOSE(service->service_socket6_handle);
-
-        /* raises an error */
         RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem setting ip6 socket option");
     }
 #endif
@@ -840,18 +822,12 @@ ERROR_CODE start_service(struct service_t *service) {
         option_value
     );
 
-    /* in case there was an error binding the socket */
+    /* in case there was an error settings the socket option
+	must handle it prompting the error information */
     if(SOCKET_TEST_ERROR(socket_result)) {
-        /* retrieves the option error code */
         SOCKET_ERROR_CODE option_error_code = SOCKET_GET_ERROR_CODE(socket_result);
-
-        /* prints the error */
         V_ERROR_F("Problem setting ip6 socket option: %d\n", option_error_code);
-
-        /* closes the service socket */
         SOCKET_CLOSE(service->service_socket6_handle);
-
-        /* raises an error */
         RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem setting ip6 socket option");
     }
 #endif
