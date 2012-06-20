@@ -613,6 +613,14 @@ ERROR_CODE start_service(struct service_t *service) {
     struct connection_t *service6_connection = NULL;
 #endif
 
+#ifdef VIRIATUM_SSL
+    /* alocates space for the various configuration file paths
+    to be loaded for the start of the service, this is a local
+    temporary variable to work with configuration paths */
+    char config_path[VIRIATUM_MAX_PATH_SIZE];
+    char *_config_path;
+#endif
+
     /* allocates the socket address structure */
     SOCKET_ADDRESS_INTERNET socket_address;
 
@@ -642,12 +650,6 @@ ERROR_CODE start_service(struct service_t *service) {
 
     /* allocates the memory ussage */
     size_t memory_usage;
-
-    /* alocates space for the various configuration file paths
-    to be loaded for the start of the service, this is a local
-    temporary variable to work with configuration paths */
-    char config_path[VIRIATUM_MAX_PATH_SIZE];
-    char *_config_path;
 
     /* allocates the option value and sets it to one (valid)
     not that a larger value is also created */
