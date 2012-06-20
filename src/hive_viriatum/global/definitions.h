@@ -162,6 +162,7 @@ static __inline char *get_config_path() {
 
 #ifdef VIRIATUM_DEBUG
 #define VIRIATUM_DEFAULT_HOST "0.0.0.0"
+#define VIRIATUM_DEFAULT_HOST6 "[::]"
 #define VIRIATUM_DEFAULT_PORT 9090
 #define VIRIATUM_DEFAULT_HANDLER "file"
 #define VIRIATUM_DEFAULT_INDEX 1
@@ -176,6 +177,7 @@ static __inline char *get_config_path() {
 
 #ifndef VIRIATUM_DEBUG
 #define VIRIATUM_DEFAULT_HOST "0.0.0.0"
+#define VIRIATUM_DEFAULT_HOST6 "[::]"
 #define VIRIATUM_DEFAULT_PORT 9090
 #define VIRIATUM_DEFAULT_HANDLER "file"
 #define VIRIATUM_DEFAULT_INDEX 1

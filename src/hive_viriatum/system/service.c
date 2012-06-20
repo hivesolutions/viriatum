@@ -117,6 +117,8 @@ void create_service_options(struct service_options_t **service_options_pointer) 
     /* sets the service options attributes (default) values */
     service_options->port = 0;
     service_options->address = NULL;
+	service_options->ipv6 = 0;
+	service_options->address6 = NULL;
     service_options->ssl = 0;
     service_options->ssl_csr = NULL;
     service_options->ssl_key = NULL;
@@ -730,7 +732,12 @@ ERROR_CODE start_service(struct service_t *service) {
     _socket6_address.ai_family = SOCKET_INTERNET6_TYPE;
     _socket6_address.ai_socktype = SOCKET_PACKET_TYPE;
     _socket6_address.ai_flags = AI_NUMERICHOST | AI_PASSIVE;
-    socket_result = getaddrinfo("[::]", service_options->_port, &_socket6_address, &socket6_address);
+    socket_result = getaddrinfo(
+		service_options->address6,
+		service_options->_port,
+		&_socket6_address,
+		&socket6_address
+	);
 
     /* in case there was an error retrieving the address information
     must be correctly displayed */
@@ -745,6 +752,7 @@ ERROR_CODE start_service(struct service_t *service) {
    _socket6_address.sin6_family = SOCKET_INTERNET6_TYPE;
    _socket6_address.sin6_addr = in6addr_any;
    _socket6_address.sin6_port = htons(service_options->port);
+   inet_pton(SOCKET_INTERNET6_TYPE, service_options->address6, _socket6_address.sin6_addr);
 #endif
 
     /* creates the service socket for the given types */
@@ -1633,6 +1641,7 @@ ERROR_CODE _default_options_service(struct service_t *service, struct hash_map_t
     /* sets the varius default service options */
     service_options->port = VIRIATUM_DEFAULT_PORT;
     service_options->address = (unsigned char *) VIRIATUM_DEFAULT_HOST;
+	service_options->address6 = (unsigned char *) VIRIATUM_DEFAULT_HOST6;
     service_options->handler_name = (unsigned char *) VIRIATUM_DEFAULT_HANDLER;
     service_options->default_index = VIRIATUM_DEFAULT_INDEX;
     service_options->use_template = VIRIATUM_DEFAULT_USE_TEMPLATE;
@@ -1680,6 +1689,16 @@ ERROR_CODE _file_options_service(struct service_t *service, struct hash_map_t *a
     in case the (host) value is set, sets it in the service options */
     get_value_string_sort_map(general, (unsigned char *) "host", &value);
     if(value != NULL) { service_options->address = (unsigned char *) value; }
+
+    /* tries to retrieve the ip6 argument from the arguments map and
+    in case the (ip6) value is set, sets it in the service options */
+    get_value_string_sort_map(general, (unsigned char *) "ipv6", &value);
+    if(value != NULL) { service_options->ipv6 = (unsigned char) atob(value); }
+
+    /* tries to retrieve the ip6 host argument from the arguments map and
+    in case the (host) value is set, sets it in the service options */
+    get_value_string_sort_map(general, (unsigned char *) "ipv6_host", &value);
+    if(value != NULL) { service_options->address6 = (unsigned char *) value; }
 
     /* tries to retrieve the ssl argument from the arguments map and
     in case the (ssl) value is set, sets it in the service options */
