@@ -739,7 +739,9 @@ ERROR_CODE start_service(struct service_t *service) {
 		&_socket6_address,
 		&socket6_address
 	);
+	printf("address -> %s\n", service_options->address6);
 	service_options->address6 = untrim_string_value(service_options->address6, ']');
+	printf("new_address -> %s\n", service_options->address6);
 
     /* in case there was an error retrieving the address information
     must be correctly displayed */
