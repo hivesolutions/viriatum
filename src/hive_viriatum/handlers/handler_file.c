@@ -180,8 +180,8 @@ ERROR_CODE url_callback_handler_file(struct http_parser_t *http_parser, const un
         /* creates the base path from the viriatum contents path 
 		and the current provided url and then runs the file existence
 		validation process using the index array provided */
-        SPRINTF(base_path, VIRIATUM_MAX_PATH_SIZE, "%s%s", VIRIATUM_CONTENTS_PATH, url);
-		index = validate_file(base_path, (char *) options->index, 32, 128);
+        SPRINTF((char *) base_path, VIRIATUM_MAX_PATH_SIZE, "%s%s", VIRIATUM_CONTENTS_PATH, url);
+		index = validate_file((char *) base_path, (char *) options->index, 32, 128);
     }
 
     /* copies the url to the url reference in the handler file context */
