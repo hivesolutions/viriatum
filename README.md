@@ -90,6 +90,12 @@ Must compile the php interpreter with special environment variables set to point
 
 * `export CFLAGS="-I/usr/include/python2.7"`
 
+## FreeBSD
+
+FreeBSD ignores the usr local directory by default so it must be included in order to conform with dependencies.
+
+* `setenv CFLAGS "-L/usr/local/lib -I/usr/local/include"`
+
 ## Debugging
 
 * For windows debugging use [Visual Leak Detector](http://vld.codeplex.com) using the `#include <vld.h>` statement
