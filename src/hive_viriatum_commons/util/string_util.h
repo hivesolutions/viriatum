@@ -35,10 +35,10 @@
  * ascii to boolean converter (atob).
  */
 static const char *atob_strings[4] = {
-	"On",
-	"True",
-	"1",
-	NULL
+    "On",
+    "True",
+    "1",
+    NULL
 };
 
 static __inline unsigned char *base_string_value(unsigned char *string_value) {
@@ -119,48 +119,48 @@ static __inline void normalize_path(char *string_value) {
 }
 
 static __inline char atob(char *string_value) {
-	const char *_string_value;
-	size_t index = 0;
+    const char *_string_value;
+    size_t index = 0;
 
-	while(1) {
-		_string_value = atob_strings[index];
-		if(_string_value == NULL) { break; }
-		if(strcmp(_string_value, string_value) == 0) { return 1; }
-		index++;
-	}
+    while(1) {
+        _string_value = atob_strings[index];
+        if(_string_value == NULL) { break; }
+        if(strcmp(_string_value, string_value) == 0) { return 1; }
+        index++;
+    }
 
-	return 0;
+    return 0;
 }
 
 static __inline size_t trailing_size(char *buffer, size_t size) {
-	char byte;
-	char *_pointer = buffer + size - 1;
+    char byte;
+    char *_pointer = buffer + size - 1;
 
-	while(1) {
-		byte = *_pointer;
-		if(byte != ' ') { break; }
-		_pointer--;
-		size--;
-		if(size == 0) { break; }
-	}
+    while(1) {
+        byte = *_pointer;
+        if(byte != ' ') { break; }
+        _pointer--;
+        size--;
+        if(size == 0) { break; }
+    }
 
-	return size;
+    return size;
 }
 
 static __inline size_t leading_offset(char *buffer, size_t size) {
-	char byte;
-	size_t _size = 0;
-	char *_pointer = buffer;
+    char byte;
+    size_t _size = 0;
+    char *_pointer = buffer;
 
-	while(1) {
-		byte = *_pointer;
-		if(byte != ' ') { break; }
-		_pointer++;
-		_size++;
-		if(_size == size) { break; }
-	}
+    while(1) {
+        byte = *_pointer;
+        if(byte != ' ') { break; }
+        _pointer++;
+        _size++;
+        if(_size == size) { break; }
+    }
 
-	return _size;
+    return _size;
 }
 
 static __inline void split(char *string_value, char *buffer, size_t size_e, char token) {

@@ -442,7 +442,7 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
             headers_buffer,
             1024,
             "HTTP/1.1 307 Temporary Redirect\r\n"
-			"Server: %s/%s (%s - %s) (%s)\r\n"
+            "Server: %s/%s (%s - %s) (%s)\r\n"
             "Connection: Keep-Alive\r\n"
             "Content-Length: 0\r\n"
             "Location: %s\r\n\r\n",
@@ -450,7 +450,7 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
             VIRIATUM_VERSION,
             VIRIATUM_PLATFORM_STRING,
             VIRIATUM_PLATFORM_CPU,
-			VIRIATUM_FLAGS,
+            VIRIATUM_FLAGS,
             location
         );
 
@@ -472,7 +472,7 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
             VIRIATUM_VERSION,
             VIRIATUM_PLATFORM_STRING,
             VIRIATUM_PLATFORM_CPU,
-			VIRIATUM_FLAGS,
+            VIRIATUM_FLAGS,
             (long unsigned int) strlen((char *) handler_file_context->template_handler->string_value)
         );
 
@@ -485,7 +485,7 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
             headers_buffer,
             1024,
             "HTTP/1.1 304 Not Modified\r\n"
-			"Server: %s/%s (%s - %s) (%s)\r\n"
+            "Server: %s/%s (%s - %s) (%s)\r\n"
             "Connection: Keep-Alive\r\n"
             "Cache-Control: no-cache, must-revalidate\r\n"
             "Content-Length: 0\r\n\r\n",
@@ -493,7 +493,7 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
             VIRIATUM_VERSION,
             VIRIATUM_PLATFORM_STRING,
             VIRIATUM_PLATFORM_CPU,
-			VIRIATUM_FLAGS
+            VIRIATUM_FLAGS
         );
 
         /* writes both the headers to the connection, registers for the appropriate callbacks */
@@ -507,7 +507,7 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
             headers_buffer,
             1024,
             "HTTP/1.1 200 OK\r\n"
-			"Server: %s/%s (%s - %s) (%s)\r\n"
+            "Server: %s/%s (%s - %s) (%s)\r\n"
             "Connection: Keep-Alive\r\n"
             "Cache-Control: no-cache, must-revalidate\r\n"
             "ETag: %s\r\n"
@@ -516,7 +516,7 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
             VIRIATUM_VERSION,
             VIRIATUM_PLATFORM_STRING,
             VIRIATUM_PLATFORM_CPU,
-			VIRIATUM_FLAGS,
+            VIRIATUM_FLAGS,
             etag,
             (long unsigned int) file_size
         );

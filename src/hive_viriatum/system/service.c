@@ -641,9 +641,9 @@ ERROR_CODE start_service(struct service_t *service) {
     char *_config_path;
 
     /* allocates the option value and sets it to one (valid)
-	not that a larger value is also created */
+    not that a larger value is also created */
     SOCKET_OPTION option_value = 1;
-	SOCKET_OPTION_LARGE option_value_l = 1;
+    SOCKET_OPTION_LARGE option_value_l = 1;
 
     /* sets the flags to be used in socket */
     SOCKET_FLAGS flags = 1;
@@ -712,7 +712,7 @@ ERROR_CODE start_service(struct service_t *service) {
     );
 
     /* in case there was an error settings the socket option
-	must handle it prompting the error information */
+    must handle it prompting the error information */
     if(SOCKET_TEST_ERROR(socket_result)) {
         SOCKET_ERROR_CODE option_error_code = SOCKET_GET_ERROR_CODE(socket_result);
         V_ERROR_F("Problem setting socket option: %d\n", option_error_code);
@@ -730,7 +730,7 @@ ERROR_CODE start_service(struct service_t *service) {
     _socket6_address.ai_family = SOCKET_INTERNET6_TYPE;
     _socket6_address.ai_socktype = SOCKET_PACKET_TYPE;
     _socket6_address.ai_flags = AI_NUMERICHOST | AI_PASSIVE;
-	socket_result = getaddrinfo("[::]", service_options->_port, &_socket6_address, &socket6_address);
+    socket_result = getaddrinfo("[::]", service_options->_port, &_socket6_address, &socket6_address);
 
     /* in case there was an error retrieving the address information
     must be correctly displayed */
@@ -775,18 +775,18 @@ ERROR_CODE start_service(struct service_t *service) {
     if(VIRIATUM_NO_PUSH) { SOCKET_SET_NO_PUSH(service->service_socket6_handle, option_value); }
 
 #ifdef VIRIATUM_IP6_DUAL
-	/* unsets the socket ip6 only address option in the socket, this should
+    /* unsets the socket ip6 only address option in the socket, this should
     be done by first setting the option value to the original set value */
-	option_value_l = 0;
-	socket_result = SOCKET_SET_OPTIONS(
-		service->service_socket6_handle,
-		SOCKET_OPTIONS_IP6_SOCKET,
-		SOCKET_OPTIONS_IP6_ONLY_SOCKET, 
-		option_value_l
-	);
+    option_value_l = 0;
+    socket_result = SOCKET_SET_OPTIONS(
+        service->service_socket6_handle,
+        SOCKET_OPTIONS_IP6_SOCKET,
+        SOCKET_OPTIONS_IP6_ONLY_SOCKET,
+        option_value_l
+    );
 
     /* in case there was an error settings the socket option
-	must handle it prompting the error information */
+    must handle it prompting the error information */
     if(SOCKET_TEST_ERROR(socket_result)) {
 #ifndef VIRIATUM_PLATFORM_WIN32
         SOCKET_ERROR_CODE option_error_code = SOCKET_GET_ERROR_CODE(socket_result);
@@ -798,16 +798,16 @@ ERROR_CODE start_service(struct service_t *service) {
 #else
     /* sets the socket ip6 only address option in the socket, this should
     be done by first setting the option value to the original set value */
-	option_value_l = 1;
-	socket_result = SOCKET_SET_OPTIONS(
-		service->service_socket6_handle,
-		SOCKET_OPTIONS_IP6_SOCKET,
-		SOCKET_OPTIONS_IP6_ONLY_SOCKET, 
-		option_value_l
-	); 
+    option_value_l = 1;
+    socket_result = SOCKET_SET_OPTIONS(
+        service->service_socket6_handle,
+        SOCKET_OPTIONS_IP6_SOCKET,
+        SOCKET_OPTIONS_IP6_ONLY_SOCKET,
+        option_value_l
+    );
 
     /* in case there was an error settings the socket option
-	must handle it prompting the error information */
+    must handle it prompting the error information */
     if(SOCKET_TEST_ERROR(socket_result)) {
 #ifndef VIRIATUM_PLATFORM_WIN32
         SOCKET_ERROR_CODE option_error_code = SOCKET_GET_ERROR_CODE(socket_result);
@@ -829,7 +829,7 @@ ERROR_CODE start_service(struct service_t *service) {
     );
 
     /* in case there was an error settings the socket option
-	must handle it prompting the error information */
+    must handle it prompting the error information */
     if(SOCKET_TEST_ERROR(socket_result)) {
         SOCKET_ERROR_CODE option_error_code = SOCKET_GET_ERROR_CODE(socket_result);
         V_ERROR_F("Problem setting ip6 socket option: %d\n", option_error_code);
