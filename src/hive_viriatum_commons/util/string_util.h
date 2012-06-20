@@ -112,7 +112,7 @@ static __inline unsigned char *trim(unsigned char *string_value) {
 }
 
 static __inline unsigned char *untrim(unsigned char *string_value, char last) {
-	size_t length = (char *) strlen(string_value);
+	size_t length = strlen((char *) string_value);
 	if(length < 1) { return string_value; }
 	string_value[length] = last;
 	return string_value - 1;
