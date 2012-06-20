@@ -787,9 +787,10 @@ ERROR_CODE start_service(struct service_t *service) {
 		SOCKET_OPTIONS_LEVEL_SOCKET,
 		SOCKET_OPTIONS_IP6_ONLY_SOCKET, 
 		option_value
-	); 
-#else
-    /* sets the socket ip6 only address option in the socket, this should
+	);
+#endif
+
+	/* sets the socket ip6 only address option in the socket, this should
     be done by first setting the option value to the original set value */
 	option_value = 1;
 	socket_result = SOCKET_SET_OPTIONS(
@@ -798,7 +799,6 @@ ERROR_CODE start_service(struct service_t *service) {
 		SOCKET_OPTIONS_IP6_ONLY_SOCKET, 
 		option_value
 	); 
-#endif
 
     /* sets the socket reuse address option in the socket, this should
     be done by first setting the option value to the original set value */
