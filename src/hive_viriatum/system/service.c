@@ -599,9 +599,10 @@ ERROR_CODE start_service(struct service_t *service) {
     SOCKET_ADDRESS_INTERNET6 _socket6_address;
 
     /* allocates space for the service socket handle and for
-    the associated connection structure */
-    SOCKET_HANDLE service_socket6_handle;
-    struct connection_t *service6_connection;
+    the associated connection structure, these values must be
+	initialized in order to avoid warnings */
+    SOCKET_HANDLE service_socket6_handle = 0;
+    struct connection_t *service6_connection = NULL;
 #endif
 
     /* allocates the socket address structure */
