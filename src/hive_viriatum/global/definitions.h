@@ -151,13 +151,13 @@ static __inline char *get_config_path() {
 #endif
 
 #define VIRIATUM_NAME "viriatum"
-#define VIRIATUM_VERSION "0.1.0"
+#define VIRIATUM_VERSION "0.2.0"
 #define VIRIATUM_DESCRIPTION "Viriatum"
 #define VIRIATUM_OBSERVATIONS "Viriatum HTTP Server"
 #define VIRIATUM_COPYRIGHT "Copyright (c) 2010 Hive Solutions Lda. All rights reserved."
 #define VIRIATUM_PREFIX "VR"
 #define VIRIATUM_MAJOR 0
-#define VIRIATUM_MINOR 1
+#define VIRIATUM_MINOR 2
 #define VIRIATUM_MICRO 0
 
 #ifdef VIRIATUM_DEBUG
