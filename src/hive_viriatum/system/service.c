@@ -127,6 +127,7 @@ void create_service_options(struct service_options_t **service_options_pointer) 
     service_options->default_index = 0;
     service_options->use_template = 0;
     service_options->default_virtual_host = NULL;
+	service_options->index_count = 0;
 
     /* resets the memry buffer on the index sequence structure so
     that no index is considered before configuration */
@@ -1757,7 +1758,7 @@ ERROR_CODE _file_options_service(struct service_t *service, struct hash_map_t *a
     /* tries to retrieve the index (file) argument from the arguments map, then
     sets the split value arround the space character in the index value */
     get_value_string_sort_map(general, (unsigned char *) "index", &value);
-    if(value != NULL) { split(value, (char *) service_options->index, 128, ' '); }
+    if(value != NULL) { service_options->index_count = split(value, (char *) service_options->index, 128, ' '); }
 
     /* raises no error */
     RAISE_NO_ERROR;
