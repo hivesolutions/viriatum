@@ -147,6 +147,41 @@ static __inline char atob(char *string_value) {
     return 0;
 }
 
+static __inline size_t atoa(char *string_value, char *buffer, size_t elements, size_t element_size) {
+	size_t size;
+	size_t copies = 0;	
+	size_t counter = 0;
+	char *_base_value = string_value;
+
+    while(1) {
+		switch(*string_value) {
+			case ' ':
+			case '\0':
+				size = string_value - _base_value;
+				if(size + 1 > element_size) { return 0; }
+				if(copies + 1 > elements) { return 0; }
+
+				memcpy(&buffer[counter], _base_value, size);
+				buffer[counter + size] = '\0';
+
+				counter += element_size;
+				_base_value = string_value + 1;
+				copies++;
+
+				break;
+			
+			default:
+				break;
+		}
+
+		if(*string_value == '\0') { break; }
+
+        string_value++;
+    }
+
+    return copies;
+}
+
 static __inline size_t trailing_size(char *buffer, size_t size) {
     char byte;
     char *_pointer = buffer + size - 1;
