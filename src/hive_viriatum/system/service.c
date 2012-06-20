@@ -599,10 +599,10 @@ ERROR_CODE start_service(struct service_t *service) {
     SOCKET_ADDRESS_INTERNET6 _socket6_address;
 
 #ifdef VIRIATUM_PLATFORM_UNIX
-	/* allocates space for the temporary variable to be used
-	to sttore the address to be "treated" (trimmed) */
-	unsigned char address6[64];
-	unsigned char *_address6;
+    /* allocates space for the temporary variable to be used
+    to sttore the address to be "treated" (trimmed) */
+    unsigned char address6[64];
+    unsigned char *_address6;
 #endif
 
     /* allocates space for the service socket handle and for
@@ -736,6 +736,8 @@ ERROR_CODE start_service(struct service_t *service) {
         memset(&_socket6_address, 0, sizeof(_socket6_address));
 
 #ifdef VIRIATUM_PLATFORM_WIN32
+        /* populates the socket ip6 address with the values provided
+        from the configuration of the service */
         _socket6_address.ai_family = SOCKET_INTERNET6_TYPE;
         _socket6_address.ai_socktype = SOCKET_PACKET_TYPE;
         _socket6_address.ai_flags = AI_NUMERICHOST | AI_PASSIVE;
@@ -756,8 +758,14 @@ ERROR_CODE start_service(struct service_t *service) {
 #endif
 
 #ifdef VIRIATUM_PLATFORM_UNIX
-		STRCPY((char *) address6, 64, (char *) service_options->address6);
+        /* copies the ip6 address to a temporary buffer and then
+        uses the buffer to trim the string remogin the first and
+        last chracters from it (ip6 normal representation) */
+        STRCPY((char *) address6, 64, (char *) service_options->address6);
         _address6 = trim(address6);
+
+        /* populates the socket ip6 address with the values provided
+        from the configuration of the service */
         _socket6_address.sin6_family = SOCKET_INTERNET6_TYPE;
         _socket6_address.sin6_addr = in6addr_any;
         _socket6_address.sin6_port = htons(service_options->port);
