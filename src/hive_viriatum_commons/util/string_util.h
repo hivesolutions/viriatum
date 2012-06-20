@@ -41,6 +41,18 @@ static const char *atob_strings[4] = {
     NULL
 };
 
+static __inline unsigned char *trim_string_value(unsigned char *string_value) {
+	size_t length = strlen(string_value);
+	string_value[length - 1] = '\0';
+	return &string_value[1];
+}
+
+static __inline unsigned char *untrim_string_value(unsigned char *string_value, char last) {
+	size_t length = strlen(string_value);
+	string_value[length] = last;
+	return string_value - 1;
+}
+
 static __inline unsigned char *base_string_value(unsigned char *string_value) {
     /* allocates the index counter */
     unsigned int index;

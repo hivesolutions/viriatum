@@ -729,6 +729,7 @@ ERROR_CODE start_service(struct service_t *service) {
     memset(&_socket6_address, 0, sizeof(_socket6_address));
 
 #ifdef VIRIATUM_PLATFORM_WIN32
+	service_options->address6 = trim_string_value(service_options->address6);
     _socket6_address.ai_family = SOCKET_INTERNET6_TYPE;
     _socket6_address.ai_socktype = SOCKET_PACKET_TYPE;
     _socket6_address.ai_flags = AI_NUMERICHOST | AI_PASSIVE;
@@ -738,13 +739,14 @@ ERROR_CODE start_service(struct service_t *service) {
 		&_socket6_address,
 		&socket6_address
 	);
+	service_options->address6 = untrim_string_value(service_options->address6, ']');
 
     /* in case there was an error retrieving the address information
     must be correctly displayed */
     if(SOCKET_TEST_ERROR(socket_result)) {
-        SOCKET_ERROR_CODE creating_error_code = SOCKET_GET_ERROR_CODE(socket_result);
-        V_ERROR_F("Problem getting address information: %d\n", creating_error_code);
-        RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem getting address information");
+        SOCKET_ERROR_CODE error_code = SOCKET_GET_ERROR_CODE(socket_result);
+        V_ERROR_F("Problem getting ip6 address information: %d\n", error_code);
+        RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem getting ip6 address information");
     }
 #endif
 
@@ -754,10 +756,17 @@ ERROR_CODE start_service(struct service_t *service) {
     _socket6_address.sin6_port = htons(service_options->port);
     socket_result = inet_pton(
 		SOCKET_INTERNET6_TYPE,
-		"::",
+		service_options->address6,
 	    (void *) &_socket6_address.sin6_addr
     );
-	printf("%s -> %d\n", service_options->address6, socket_result);
+
+    /* in case there was an error retrieving the address information
+    must be correctly displayed */
+    if(SOCKET_EX_TEST_ERROR(socket_result)) {
+        SOCKET_ERROR_CODE error_code = SOCKET_GET_ERROR_CODE(socket_result);
+        V_ERROR_F("Problem getting ip6 address information: %d\n", error_code);
+        RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem getting ip6 address information");
+    }
 #endif
 
     /* creates the service socket for the given types */
@@ -776,7 +785,7 @@ ERROR_CODE start_service(struct service_t *service) {
         V_ERROR_F("Problem creating ip6 socket: %d\n", creating_error_code);
 
         /* raises an error */
-        RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem creating socket");
+        RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem creating ip6 socket");
     }
 
     /* in case viriatum is set to non blocking, changes the current
