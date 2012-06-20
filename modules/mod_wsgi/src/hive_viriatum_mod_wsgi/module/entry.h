@@ -147,7 +147,7 @@ VIRIATUM_EXPORT_PREFIX ERROR_CODE _unload_wsgi_state();
 VIRIATUM_EXPORT_PREFIX ERROR_CODE _reload_wsgi_state();
 VIRIATUM_EXPORT_PREFIX ERROR_CODE _start_wsgi_state();
 
-__inline static const char *_get_service() { return _service; }
-__inline static const char *_get_connection() { return _connection; }
-__inline static const char *_get_headers() { return _headers; }
-__inline static const char *_get_wsgi_request() { return _wsgi_request; }
+__inline static const struct service_t *_get_service() { return _service; }
+__inline static const struct connection_t *_get_connection() { return _connection; }
+__inline static const struct http_headers_t *_get_headers() { return &_headers; }
+__inline static const struct wsgi_request_t *_get_wsgi_request() { return &_wsgi_request; }
