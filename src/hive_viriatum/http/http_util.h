@@ -154,6 +154,22 @@ ERROR_CODE write_http_headers_m(struct service_t *service, char *buffer, size_t 
 ERROR_CODE write_http_error(struct connection_t *connection, char *header, int error_code, char *error_message, char *error_description, _connection_data_callback callback, void *callback_parameters);
 ERROR_CODE log_http_request(char *host, char *identity, char *user, char *method, char *uri, char *protocol, int error_code, size_t content_length);
 
+__inline static const char *_get_http_version_code(size_t index) {
+    return http_version_codes[index];
+}
+
+__inline static const char *_get_keep_alive_code(size_t index) {
+    return keep_alive_codes[index];
+}
+
+__inline static const char *_get_cache_code(size_t index) {
+    return cache_codes[index];
+}
+
+__inline static const char *_get_close_code(size_t index) {
+    return close_codes[index];
+}
+
 __inline static const char *_get_http_status_code(size_t major, size_t minor) {
     return http_status_codes[major][minor];
 }
