@@ -307,6 +307,9 @@ ERROR_CODE _call_polling_epoll(struct polling_epoll_t *polling_epoll, struct con
         /* prints a debug message */
         V_DEBUG_F("Processing read connection: %d\n", current_connection->socket_handle);
 
+
+		printf("Connections status -> %d\n", current_connection->status);
+
         /* in case the current connection is open and the read
         handler is correclty set (must call it) */
         if(current_connection->status == STATUS_OPEN && current_connection->on_read != NULL) {
