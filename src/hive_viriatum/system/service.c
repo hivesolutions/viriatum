@@ -1042,6 +1042,13 @@ ERROR_CODE start_service(struct service_t *service) {
     }
 #endif
 
+#ifdef VIRIATUM_PLATFORM_UNIX
+    /* in case the current os is compatible with the forking of process
+    creates the worker processes to handle more connections at a time,
+    this operation creates a much more flexible and scalable solution */
+    create_workers(service);
+#endif
+
     /* sets the service in the polling */
     polling->service = service;
 
@@ -1107,13 +1114,6 @@ ERROR_CODE start_service(struct service_t *service) {
     }
 #endif
 
-#ifdef VIRIATUM_PLATFORM_UNIX
-    /* in case the current os is compatible with the forking of process
-    creates the worker processes to handle more connections at a time,
-    this operation creates a much more flexible and scalable solution */
-    create_workers(service);
-#endif
-
     /* sets the service select service as the service in the service connection */
     service_connection->service = service;
 
@@ -1130,7 +1130,6 @@ ERROR_CODE start_service(struct service_t *service) {
 
     /* opens the (service) connection */
     service_connection->open_connection(service_connection);
-
 
 #ifdef VIRIATUM_IP6
     /* in case the ip6 connection flag is set the ip6 connection
@@ -1154,6 +1153,8 @@ ERROR_CODE start_service(struct service_t *service) {
         service6_connection->open_connection(service6_connection);
     }
 #endif
+
+
 
 /*  _create_tracker_connection(&tracker_connection, service, "localhost", 9090);
     _create_torrent_connection(&torrent_connection, service, "localhost", 32967);*/
