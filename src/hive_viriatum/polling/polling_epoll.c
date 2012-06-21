@@ -136,10 +136,6 @@ ERROR_CODE register_connection_polling_epoll(struct polling_t *polling, struct c
 	_event.data.ptr = (void *) connection;
 	epoll_ctl(polling_epoll->epoll_fd, EPOLL_CTL_ADD, connection->socket_handle, &_event);
 	
-	/* sets the connection value in the hash map this should
-	be able to provide a file descriptor to connection association */
-	set_value_hash_map(polling_epoll->connections, connection->socket_handle, NULL, (void *) connection);
-
 	/* raises no error */
     RAISE_NO_ERROR;
 }
@@ -150,10 +146,6 @@ ERROR_CODE unregister_connection_polling_epoll(struct polling_t *polling, struct
     struct polling_epoll_t *polling_epoll = (struct polling_epoll_t *) polling->lower;
 
 	epoll_ctl(polling_epoll->epoll_fd, EPOLL_CTL_DEL, connection->socket_handle, NULL);
-
-	/* unsets the connection value from the hash map this should
-	be able to remove the file descriptor connection association */
-	set_value_hash_map(polling_epoll->connections, connection->socket_handle, NULL, NULL);
 
     /* raises no error */
     RAISE_NO_ERROR;
