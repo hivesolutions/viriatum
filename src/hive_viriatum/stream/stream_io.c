@@ -238,11 +238,9 @@ ERROR_CODE read_handler_stream_io(struct connection_t *connection) {
     /* iterates continuously */
     while(1) {
         /* in case the buffer size is so big that may
-        overflow the current allocated buffer */
-        if(buffer_size + 1024 > 10240) {
-            /* breaks the loop */
-            break;
-        }
+        overflow the current allocated buffer, must
+		break the loop to avoid corruption */
+        if(buffer_size + 1024 > 10240) { break; }
 
         /* receives from the connection socket (takes into account the type
         of socket in use) should be able to take care of secure connections */
@@ -386,11 +384,9 @@ ERROR_CODE write_handler_stream_io(struct connection_t *connection) {
         /* peeks a value (data) from the linked list (write queue) */
         peek_value_linked_list(connection->write_queue, (void **) &data);
 
-        /* in case the data is invalid (list is empty) */
-        if(data == NULL) {
-            /* breaks the loop */
-            break;
-        }
+        /* in case the data is invalid (list is empty)
+		end of iteration must break the loop */
+        if(data == NULL) { break; }
 
         /* prints a debug message */
         V_DEBUG_F("Sending %ld bytes through socket: %d\n", (long int) data->size, connection->socket_handle);
