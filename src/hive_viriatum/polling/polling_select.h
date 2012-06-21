@@ -95,7 +95,7 @@ typedef struct polling_select_t {
 
     /**
      * The buffer thatn holds the connections
-     * to be house-jept (removed) at the end
+     * to be house-kept (removed) at the end
      * of the polling cycle.
      */
     struct connection_t **remove_connections;
@@ -104,25 +104,25 @@ typedef struct polling_select_t {
      * The size of the read connections
      * buffer.
      */
-    unsigned int read_connections_size;
+    size_t read_connections_size;
 
     /**
      * The size of the write connections
      * buffer.
      */
-    unsigned int write_connections_size;
+    size_t write_connections_size;
 
     /**
      * The size of the error connections
      * buffer.
      */
-    unsigned int error_connections_size;
+    size_t error_connections_size;
 
     /**
      * The size of the remove connections
      * buffer.
      */
-    unsigned int remove_connections_size;
+    size_t remove_connections_size;
 
     /**
      * The timeout value used for the
