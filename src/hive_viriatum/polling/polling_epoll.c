@@ -27,7 +27,7 @@
 
 #include "stdafx.h"
 
-//#ifdef VIRIATUM_EPOLL
+#ifdef VIRIATUM_EPOLL
 
 #include "polling_epoll.h"
 
@@ -233,25 +233,25 @@ ERROR_CODE poll_polling_epoll(struct polling_t *polling) {
         _event = &events[index];
 		connection = (struct connection_t *) _event->data.ptr;
 
+		if(_event->events & EPOLLIN) {
+			/* sets the current connection in the read connections
+			and then increments the read index counter */
+			polling_epoll->read_connections[read_index] = connection;
+			read_index++;
+		}
+
+		if(_event->events & EPOLLOUT) {
+			/* sets the current connection in the write connections
+			and then increments the write index counter */
+			polling_epoll->write_connections[write_index] = connection;
+			write_index++;
+		}
+
 		if(_event->events & (EPOLLERR | EPOLLHUP)) {
             /* sets the current connection in the error connections
 			and then increments the error index counter */
 			polling_epoll->error_connections[error_index] = connection;
 			error_index++;
-		} else {
-			if(_event->events & EPOLLIN) {
-				/* sets the current connection in the read connections
-				and then increments the read index counter */
-				polling_epoll->read_connections[read_index] = connection;
-				read_index++;
-			}
-
-			if(_event->events & EPOLLOUT) {
-				/* sets the current connection in the write connections
-				and then increments the write index counter */
-				polling_epoll->write_connections[write_index] = connection;
-				write_index++;
-			}
 		}
     }
 	
@@ -414,4 +414,4 @@ ERROR_CODE _call_polling_epoll(struct polling_epoll_t *polling_epoll, struct con
     RAISE_NO_ERROR;
 }
 
-//#endif
+#endif
