@@ -435,7 +435,7 @@ ERROR_CODE _send_response_handler_dispatch(struct http_parser_t *http_parser) {
     write_http_error(
         connection,
         response_buffer,
-        "500",
+        500,
         "Internal Server Error",
         DISPATCH_ERROR_MESSAGE,
         _send_response_callback_handler_dispatch,
