@@ -136,6 +136,11 @@ ERROR_CODE poll_polling_epoll(struct polling_t *polling) {
 	size_t _index = 0;
 
 
+    unsigned int read_index = 0;
+    unsigned int write_index = 0;
+    unsigned int error_index = 0;
+
+
     /* retrieves the polling epoll structure from the upper
 	polling control structure */
     struct polling_epoll_t *polling_epoll = (struct polling_epoll_t *) polling->lower;
@@ -151,14 +156,23 @@ ERROR_CODE poll_polling_epoll(struct polling_t *polling) {
         &polling_select->error_connections_size
     )*/
 
+	/* TODO: se isto funcionar ten ho de tentar com memoria estatica
+	events[64] */
+	events = calloc(64, sizeofevent(struct epoll_event));
 
-
-	event_count = epoll_wait(polling_epoll->epoll_fd, events, 1024, -1);
+	event_count = epoll_wait(polling_epoll->epoll_fd, events, 64, -1);
 	for(index = 0; index < event_count; index++) {
         _event = &events[index];
 
 		if(_event->events & EPOLLIN) {
+
+            /* sets the current connection in the error connections */
+            error_connections[error_index] = current_connection;
+
+
 			/* tenho de adicionar aos read */
+
+			read_index
 		}
 
 		if(_event->events & EPOLLOUT) {
@@ -171,8 +185,11 @@ ERROR_CODE poll_polling_epoll(struct polling_t *polling) {
 
     }
 	
-
-
+    /* updates the various operation counters for the three
+	operation to be "polled" (this is done by reference) */
+/*    *read_connections_size = read_index;
+    *write_connections_size = write_index;
+    *error_connections_size = error_index;*/
 
     /* raises no error */
     RAISE_NO_ERROR;
