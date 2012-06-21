@@ -259,7 +259,7 @@ ERROR_CODE call_polling_select(struct polling_t *polling) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _poll_polling_select(struct polling_select_t *polling_select, struct connection_t **read_connections, struct connection_t **write_connections, struct connection_t **error_connections, unsigned int *read_connections_size, unsigned int *write_connections_size, unsigned int *error_connections_size) {
+ERROR_CODE _poll_polling_select(struct polling_select_t *polling_select, struct connection_t **read_connections, struct connection_t **write_connections, struct connection_t **error_connections, size_t *read_connections_size, size_t *write_connections_size, size_t *error_connections_size) {
     /* allocates space for the select count */
     int select_count;
 
@@ -408,7 +408,7 @@ ERROR_CODE _poll_polling_select(struct polling_select_t *polling_select, struct 
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _call_polling_select(struct polling_select_t *polling_select, struct connection_t **read_connections, struct connection_t **write_connections, struct connection_t **error_connections, struct connection_t **remove_connections, unsigned int read_connections_size, unsigned int write_connections_size, unsigned int error_connections_size) {
+ERROR_CODE _call_polling_select(struct polling_select_t *polling_select, struct connection_t **read_connections, struct connection_t **write_connections, struct connection_t **error_connections, struct connection_t **remove_connections, size_t read_connections_size, size_t write_connections_size, size_t error_connections_size) {
     /* allocates the index */
     unsigned int index;
 

@@ -146,8 +146,8 @@ ERROR_CODE register_write_polling_select(struct polling_t *polling, struct conne
 ERROR_CODE unregister_write_polling_select(struct polling_t *polling, struct connection_t *connection);
 ERROR_CODE poll_polling_select(struct polling_t *polling);
 ERROR_CODE call_polling_select(struct polling_t *polling);
-ERROR_CODE _poll_polling_select(struct polling_select_t *polling_select, struct connection_t **read_connections, struct connection_t **write_connections, struct connection_t **error_connections, unsigned int *read_connections_size, unsigned int *write_connections_size, unsigned int *error_connections_size);
-ERROR_CODE _call_polling_select(struct polling_select_t *polling_select, struct connection_t **read_connections, struct connection_t **write_connections, struct connection_t **error_connections, struct connection_t **remove_connections, unsigned int read_connections_size, unsigned int write_connections_size, unsigned int error_connections_size);
+ERROR_CODE _poll_polling_select(struct polling_select_t *polling_select, struct connection_t **read_connections, struct connection_t **write_connections, struct connection_t **error_connections, size_t *read_connections_size, size_t *write_connections_size, size_t *error_connections_size);
+ERROR_CODE _call_polling_select(struct polling_select_t *polling_select, struct connection_t **read_connections, struct connection_t **write_connections, struct connection_t **error_connections, struct connection_t **remove_connections, size_t read_connections_size, size_t write_connections_size, size_t error_connections_size);
 ERROR_CODE _register_sockets_set_polling_select(struct polling_select_t *polling_select, SOCKET_HANDLE socket_handle, SOCKET_SET *sockets_set);
 ERROR_CODE _unregister_sockets_set_polling_select(struct polling_select_t *polling_select, SOCKET_HANDLE socket_handle, SOCKET_SET *sockets_set);
 
