@@ -141,7 +141,7 @@ ERROR_CODE register_connection_polling_epoll(struct polling_t *polling, struct c
 	/* populates the event structure with the appropriate
 	structures in order to register for the right events 
 	and then inserts the event request into the epoll fd */
-	_event.events = EPOLLIN | EPOLLOUT | EPOLLET;
+	_event.events = EPOLLIN | EPOLLOUT | EPOLLET | EPOLLRDHUP;
 	_event.data.ptr = (void *) connection;
 	epoll_ctl(polling_epoll->epoll_fd, EPOLL_CTL_ADD, connection->socket_handle, &_event);
 	
