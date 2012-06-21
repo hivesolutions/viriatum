@@ -355,9 +355,6 @@ int main(int argc, char *argv[]) {
     /* runs the service, with the given arguments */
     return_value = run_service(program_name, arguments);
 
-    /* deletes the processed arguments */
-    delete_arguments(arguments);
-
     /* tests the error code for error */
     if(IS_ERROR_CODE(return_value)) {
         /* prints an error message */
@@ -368,6 +365,9 @@ int main(int argc, char *argv[]) {
     no remaining structure or resource is left in an
     invalid or erroneous state */
     cleanup(arguments);
+
+    /* deletes the processed arguments */
+    delete_arguments(arguments);
 
     /* prints a debug message */
     V_DEBUG("Finishing process\n");
