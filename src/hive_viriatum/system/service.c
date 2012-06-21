@@ -243,25 +243,25 @@ void delete_configuration(struct sort_map_t *configuration, int is_top) {
 }
 
 ERROR_CODE load_specifications(struct service_t *service) {
-	/* sets the basic specification values from the global
-	wide contsnt values */
-	service->version = VIRIATUM_VERSION;
-	service->platform = VIRIATUM_PLATFORM_COMPLETE;
-	service->flags = VIRIATUM_FLAGS;
-	service->compiler = VIRIATUM_COMPILER;
-	service->compilation_date = VIRIATUM_COMPILATION_DATE;
+    /* sets the basic specification values from the global
+    wide contsnt values */
+    service->version = VIRIATUM_VERSION;
+    service->platform = VIRIATUM_PLATFORM_COMPLETE;
+    service->flags = VIRIATUM_FLAGS;
+    service->compiler = VIRIATUM_COMPILER;
+    service->compilation_date = VIRIATUM_COMPILATION_DATE;
 
-	/* "compiles" the various specification values into the
-	the description value present in the service */
-	SPRINTF(
-		service->description,
-		sizeof(service->description),
-		"%s/%s (%s) (%s)",
-		service->name,
-		service->version,
-		service->platform,
-		service->flags
-	);
+    /* "compiles" the various specification values into the
+    the description value present in the service */
+    SPRINTF(
+        service->description,
+        sizeof(service->description),
+        "%s/%s (%s) (%s)",
+        service->name,
+        service->version,
+        service->platform,
+        service->flags
+    );
 
     /* raises no error */
     RAISE_NO_ERROR;

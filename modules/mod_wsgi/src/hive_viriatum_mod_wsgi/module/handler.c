@@ -645,7 +645,7 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
         "Server: %s\r\n",
         _wsgi_request.status_code,
         _wsgi_request.status_message,
-		connection->service->description
+        connection->service->description
     );
 
     /* iterates over all the headers present in the current wsgi request to copy

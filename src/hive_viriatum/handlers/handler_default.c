@@ -261,18 +261,18 @@ ERROR_CODE _send_response_handler_default(struct http_parser_t *http_parser) {
     struct connection_t *connection = (struct connection_t *) http_parser->parameters;
 
     /* writes the http static headers (and message) to the response */
-	write_http_headers_m(
-		connection->service,
-		response_buffer,
-		256,
-		HTTP11,
-		200,
-		"OK",
-		KEEP_ALIVE,
-		14,
-		NO_CACHE,
-		"Hello Viriatum"
-	);
+    write_http_headers_m(
+        connection->service,
+        response_buffer,
+        256,
+        HTTP11,
+        200,
+        "OK",
+        KEEP_ALIVE,
+        14,
+        NO_CACHE,
+        "Hello Viriatum"
+    );
 
     /* writes the response to the connection, registers for the appropriate callbacks */
     write_connection(connection, (unsigned char *) response_buffer, (unsigned int) strlen(response_buffer), _send_response_callback_handler_default, (void *) (size_t) http_parser->flags);

@@ -244,9 +244,9 @@ ERROR_CODE body_callback_handler_file(struct http_parser_t *http_parser, const u
 
 ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_parser) {
     /* allocates the file size and for the temporary count
-	variable used to count the written bytes */
+    variable used to count the written bytes */
     size_t file_size;
-	size_t count;
+    size_t count;
 
     /* allocates space for the directory entries and for
     the template handler */
@@ -427,17 +427,17 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
             handler_file_context
         );
     } else if(is_redirect) {
-		/* writes the http static headers to the response */
-		count = write_http_headers(
-			connection->service,
-			headers_buffer,
-			1024,
-			HTTP11,
-			307,
-			"Temporary Redirect",
-			KEEP_ALIVE,
-			FALSE
-		);
+        /* writes the http static headers to the response */
+        count = write_http_headers(
+            connection->service,
+            headers_buffer,
+            1024,
+            HTTP11,
+            307,
+            "Temporary Redirect",
+            KEEP_ALIVE,
+            FALSE
+        );
         SPRINTF(
             &headers_buffer[count],
             1024 - count,
@@ -451,37 +451,37 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
     }
     /* in case the current situation is a directory list */
     else if(is_directory) {
-		/* writes the http static headers to the response */
-		write_http_headers_c(
-			connection->service,
-			headers_buffer,
-			1024,
-			HTTP11,
-			200,
-			"OK",
-			KEEP_ALIVE,
-			strlen((char *) handler_file_context->template_handler->string_value),
-			NO_CACHE,
-			TRUE
-		);
+        /* writes the http static headers to the response */
+        write_http_headers_c(
+            connection->service,
+            headers_buffer,
+            1024,
+            HTTP11,
+            200,
+            "OK",
+            KEEP_ALIVE,
+            strlen((char *) handler_file_context->template_handler->string_value),
+            NO_CACHE,
+            TRUE
+        );
 
         /* writes both the headers to the connection, registers for the appropriate callbacks */
         write_connection(connection, (unsigned char *) headers_buffer, (unsigned int) strlen(headers_buffer), _send_data_handler_file, handler_file_context);
     }
     else if(handler_file_context->etag_status == 2 && strcmp(etag, (char *) handler_file_context->etag) == 0) {
         /* writes the http static headers to the response */
-		write_http_headers_c(
-			connection->service,
-			headers_buffer,
-			1024,
-			HTTP11,
-			304,
-			"Not Modified",
-			KEEP_ALIVE,
-			0,
-			NO_CACHE,
-			TRUE
-		);
+        write_http_headers_c(
+            connection->service,
+            headers_buffer,
+            1024,
+            HTTP11,
+            304,
+            "Not Modified",
+            KEEP_ALIVE,
+            0,
+            NO_CACHE,
+            TRUE
+        );
 
         /* writes both the headers to the connection, registers for the appropriate callbacks */
         write_connection(connection, (unsigned char *) headers_buffer, (unsigned int) strlen(headers_buffer), _cleanup_handler_file, handler_file_context);
@@ -490,18 +490,18 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
     file situation (no directory) */
     else {
         /* writes the http static headers to the response */
-		count = write_http_headers_c(
-			connection->service,
-			headers_buffer,
-			1024,
-			HTTP11,
-			200,
-			"OK",
-			KEEP_ALIVE,
-			file_size,
-			NO_CACHE,
-			FALSE
-		);
+        count = write_http_headers_c(
+            connection->service,
+            headers_buffer,
+            1024,
+            HTTP11,
+            200,
+            "OK",
+            KEEP_ALIVE,
+            file_size,
+            NO_CACHE,
+            FALSE
+        );
         SPRINTF(
             &headers_buffer[count],
             1024 - count,
