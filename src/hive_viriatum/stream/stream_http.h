@@ -34,6 +34,7 @@
 
 /* forward references (avoids loop) */
 struct http_connection_t;
+typedef ERROR_CODE (*_connection_data_callback) (struct connection_t *, struct data_t *, void *);
 
 /**
  * Function used to update the given http connection
@@ -43,6 +44,37 @@ struct http_connection_t;
  * update with new information.
  */
 typedef ERROR_CODE (*http_connection_update) (struct http_connection_t *http_connection);
+
+/**
+ * Function used to populate a provided buffer with http
+ * headers information using the context of the provided
+ * connection.
+ */
+typedef size_t (*http_connection_headers) (struct connection_t *, char *, size_t, enum http_version_e, int, char *, enum http_keep_alive_e, char);
+
+/**
+ * Function used to populate a provided buffer with http
+ * headers information using the context of the provided
+ * connection.
+ * This functions uses a more complete approach to the fill
+ * of the http headers.
+ */
+typedef size_t (*http_connection_headers_c) (struct connection_t *, char *, size_t, enum http_version_e, int, char *, enum http_keep_alive_e, size_t, enum http_cache_e, int );
+
+/**
+ * Function used to populate a provided buffer with http
+ * headers information using the context of the provided
+ * connection.
+ * This functions also populates the buffer with the message
+ * part (contents) of the http message.
+ */
+typedef size_t (*http_connection_headers_m) (struct connection_t *, char *, size_t, enum http_version_e, int, char *, enum http_keep_alive_e, size_t, enum http_cache_e, char *);
+
+/**
+ * Function used to send a message through the provided connection
+ * using the predefined structured pipes.
+ */
+typedef ERROR_CODE (*http_connection_message) (struct connection_t *, char *, size_t, enum http_version_e, int, char *, char *, _connection_data_callback, void *);
 
 /**
  * Function used to log request information in the common
@@ -182,6 +214,40 @@ typedef struct http_connection_t {
      * data in processing.
      */
     size_t buffer_offset;
+
+	/**
+	 * Function used to create and write header into a sent
+	 * buffer of data.
+	 */
+    http_connection_headers write_headers;
+
+	/**
+	 * Function used to create and write header into a sent
+	 * buffer of data.
+	 * This function writes an extended version of the heders.
+	 */
+	http_connection_headers_c write_headers_c;
+
+	/**
+	 * Function used to create and write header into a sent
+	 * buffer of data.
+     * This function should also write the message into the
+	 * provided buffer.
+	 */
+	http_connection_headers_m write_headers_m;
+
+	/**
+	 * Function to be used for writing of message is a simplistic
+	 * but inefficient way.
+	 * This function is usefull for debugging purposes.
+	 */
+	http_connection_message write_message;
+
+	/**
+	 * Function to be used for the writing of the errors
+	 * in the connection context using the "normal" pipe.
+	 */
+	http_connection_message write_error;
 
     /**
      * Function to be used for logging a connection into the
