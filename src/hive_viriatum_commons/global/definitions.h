@@ -28,6 +28,7 @@
 #pragma once
 
 #include "cpu.h"
+#include "types.h"
 #include "platforms.h"
 #include "compiler.h"
 #include "compilation.h"
