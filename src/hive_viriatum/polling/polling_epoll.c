@@ -237,7 +237,7 @@ ERROR_CODE poll_polling_epoll(struct polling_t *polling) {
             /* sets the current connection in the error connections
 			and then increments the error index counter */
 			polling_epoll->error_connections[write_index] = connection;
-			write_index++;
+			error_index++;
 		} else {
 			if(_event->events & EPOLLIN) {
 				/* sets the current connection in the read connections
@@ -307,7 +307,7 @@ ERROR_CODE _call_polling_epoll(struct polling_epoll_t *polling_epoll, struct con
         /* prints a debug message */
         V_DEBUG_F("Processing read connection: %d\n", current_connection->socket_handle);
 
-
+		/* ESTE VALOR DE CONEXAO É invalido */
 		printf("Connections status -> %d\n", current_connection->status);
 
         /* in case the current connection is open and the read
