@@ -162,7 +162,7 @@ ERROR_CODE unregister_write_polling_epoll(struct polling_t *polling, struct conn
 }
 
 ERROR_CODE poll_polling_epoll(struct polling_t *polling) {
-	struct epoll_event events[64];
+	struct epoll_event *events;
 	struct epoll_event *_event;
 	int event_count;
 	int index;
@@ -191,6 +191,9 @@ ERROR_CODE poll_polling_epoll(struct polling_t *polling) {
 	/* TODO: se isto funcionar ten ho de tentar c
 	om memoria estatica
 	events[64] */
+
+	events = calloc(64, sizeof(struct epoll_event));
+
 
     /* prints a debug message */
     V_DEBUG("Entering epoll statement\n");
