@@ -27,7 +27,7 @@
 
 #include "stdafx.h"
 
-//#ifdef VIRIATUM_EPOLL
+#ifdef VIRIATUM_EPOLL
 
 #include "polling_epoll.h"
 
@@ -201,6 +201,9 @@ ERROR_CODE poll_polling_epoll(struct polling_t *polling) {
 	events = calloc(64, sizeof(struct epoll_event));
 
 	event_count = epoll_wait(polling_epoll->epoll_fd, events, 64, -1);
+
+	printf("acabou epoll com %d\n", event_count);
+
 	for(index = 0; index < event_count; index++) {
         _event = &events[index];
 		get_value_hash_map(polling_epoll->connections, _event->data.fd, NULL, (void **) &connection);
@@ -386,4 +389,4 @@ ERROR_CODE _call_polling_epoll(struct polling_epoll_t *polling_epoll, struct con
     RAISE_NO_ERROR;
 }
 
-//#endif
+#endif
