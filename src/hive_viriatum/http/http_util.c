@@ -29,7 +29,74 @@
 
 #include "http_util.h"
 
-ERROR_CODE write_http_error(struct connection_t *connection, char *header, char *error_code, char *error_message, char *error_description, _connection_data_callback callback, void *callback_parameters) {
+ERROR_CODE write_http_headers(struct service_t *service, char *buffer, size_t size, enum http_version_e version, int status_code, char *status_message, enum http_keep_alive_e keep_alive, char close) {
+	/* writes the header information into the provided buffer, the writing
+	into this buffer uses the most of static structures possible in order
+	to accelerate the writing speed at the end of the writing the number
+	of written bytes is retrieved as the count value */
+	size_t count = SPRINTF(
+        buffer,
+        size,
+        "%s %d %s\r\n"
+        CONNECTION_H ": %s\r\n"
+		SERVER_H ": %s\r\n"
+		"%s",
+        http_version_codes[version - 1],
+		status_code,
+        status_message,
+		keep_alive_codes[keep_alive - 1],
+		service->description,
+		close_codes[close]
+    );
+
+	/* returns the number of bytes written into the buffer */
+	return count;
+}
+
+ERROR_CODE write_http_headers_c(struct service_t *service, char *buffer, size_t size, enum http_version_e version, int status_code, char *status_message, enum http_keep_alive_e keep_alive, size_t content_length, enum http_cache_e cache, int close) {
+	size_t count = write_http_headers(
+		service,
+		buffer,
+		size,
+		version,
+		status_code,
+		status_message,
+		keep_alive,
+		FALSE
+	);
+	count += SPRINTF(
+        &buffer[count],
+        size - count,
+		CONTENT_LENGTH_H ": %lu\r\n"
+		CACHE_CONTROL_H ": %s\r\n"
+		"%s",
+		(long unsigned int) content_length,
+		cache_codes[cache - 1],
+		close_codes[close]
+    );
+
+	return count;
+}
+
+ERROR_CODE write_http_headers_m(struct service_t *service, char *buffer, size_t size, enum http_version_e version, int status_code, char *status_message, enum http_keep_alive_e keep_alive, size_t content_length, enum http_cache_e cache, char *message) {
+	size_t count = write_http_headers_c(
+		service,
+		buffer,
+		size,
+		version,
+		status_code,
+		status_message,
+		keep_alive,
+		content_length,
+		cache,
+		TRUE
+	);
+	memcpy(&buffer[count], message, content_length + 1);
+
+	return count;
+}
+
+ERROR_CODE write_http_error(struct connection_t *connection, char *header, int error_code, char *error_message, char *error_description, _connection_data_callback callback, void *callback_parameters) {
     /* allocates space for the result buffer related
     variables (for both the buffer pointer and size) */
     size_t result_length;
@@ -82,33 +149,25 @@ ERROR_CODE write_http_error(struct connection_t *connection, char *header, char 
         /* assigns the various error related variables into the
         template handler to be used, they may be used to display
         information arround the error */
-        assign_string_template_handler(template_handler, (unsigned char *) "error_code", error_code);
+        assign_integer_template_handler(template_handler, (unsigned char *) "error_code", error_code);
         assign_string_template_handler(template_handler, (unsigned char *) "error_message", error_message);
         assign_string_template_handler(template_handler, (unsigned char *) "error_description", error_description);
 
         /* processes the file as a template handler, at this point
         the output buffer of the template engine should be populated */
         process_template_handler(template_handler, template_path);
-
-        /* populates the headers buffer with the proper headers for
-        the template oriented representation of the error */
-        SPRINTF(
-            headers_buffer,
-            1024,
-            "HTTP/1.1 %s %s\r\n"
-            "Server: %s/%s (%s - %s) (%s)\r\n"
-            "Connection: Keep-Alive\r\n"
-            "Cache-Control: no-cache, must-revalidate\r\n"
-            "Content-Length: %lu\r\n\r\n",
-            error_code,
-            error_message,
-            VIRIATUM_NAME,
-            VIRIATUM_VERSION,
-            VIRIATUM_PLATFORM_STRING,
-            VIRIATUM_PLATFORM_CPU,
-            VIRIATUM_FLAGS,
-            (long unsigned int) strlen((char *) template_handler->string_value)
-        );
+		write_http_headers_c(
+			service,
+			headers_buffer,
+			1024,
+			HTTP11,
+			error_code,
+			error_message,
+			KEEP_ALIVE,
+			strlen((char *) template_handler->string_value),
+			NO_CACHE,
+			TRUE
+		);
 
         /* creates a new string buffer to hold the complete set of contents
         to be sent to the client then first writes the buffer containing
@@ -132,24 +191,20 @@ ERROR_CODE write_http_error(struct connection_t *connection, char *header, char 
         to the client (sends the template results) in one chunk */
         write_connection(connection, result_buffer, result_length, (connection_data_callback) callback, callback_parameters);
     } else {
-        /* writes the http static headers to the response */
-        SPRINTF(
-            headers_buffer,
-            1024,
-            "HTTP/1.1 %s %s\r\n"
-            "Server: %s/%s (%s - %s) (%s)\r\n"
-            "Connection: Keep-Alive\r\n"
-            "Cache-Control: no-cache, must-revalidate\r\n"
-            "Content-Length: %lu\r\n\r\n%s",
-            error_code,
-            error_message,
-            VIRIATUM_NAME,
-            VIRIATUM_VERSION,
-            VIRIATUM_PLATFORM_STRING,
-            VIRIATUM_PLATFORM_CPU,
-            VIRIATUM_FLAGS,
-            (long unsigned int) strlen(error_description), error_description
-        );
+        /* writes the http static headers to the response and
+		then writes the error description itself */
+		write_http_headers_m(
+			service,
+			headers_buffer,
+			1024,
+			HTTP11,
+			error_code,
+			error_message,
+			KEEP_ALIVE,
+			strlen(error_description),
+			NO_CACHE,
+			error_description
+		);
 
         /* writes both the headers to the connection, registers for the appropriate callbacks */
         write_connection(connection, (unsigned char *) headers_buffer, (unsigned int) strlen(headers_buffer), (connection_data_callback) callback, callback_parameters);
