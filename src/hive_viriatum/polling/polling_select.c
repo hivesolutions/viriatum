@@ -453,7 +453,7 @@ ERROR_CODE _call_polling_select(struct polling_select_t *polling_select, struct 
             CALL_V(current_connection->on_handshake, current_connection);
 
             /* prints a debug message */
-            V_DEBUG("Finished calling on read handler\n");
+            V_DEBUG("Finished calling on handshake handler\n");
         }
 
         /* in case the current connection is closed */

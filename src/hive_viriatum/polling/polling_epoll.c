@@ -294,7 +294,7 @@ ERROR_CODE _call_polling_epoll(struct polling_epoll_t *polling_epoll, struct con
             CALL_V(current_connection->on_handshake, current_connection);
 
             /* prints a debug message */
-            V_DEBUG("Finished calling on read handler\n");
+            V_DEBUG("Finished calling on handshake handler\n");
         }
 
         /* in case the current connection is closed */
