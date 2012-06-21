@@ -123,6 +123,9 @@ ERROR_CODE unregister_connection_polling_epoll(struct polling_t *polling, struct
 
 	/*   !!!! PENDING IMPLEMENTATION    !!!!!! */
 
+	/* unsets the connection value from the hash map this should
+	be able to remove the file descriptor connection association */
+	set_value_hash_map(polling_epoll->connections, connection->socket_handle, NULL, NULL);
 
     /* raises no error */
     RAISE_NO_ERROR;
