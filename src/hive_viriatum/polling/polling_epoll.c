@@ -165,7 +165,7 @@ ERROR_CODE unregister_connection_polling_epoll(struct polling_t *polling, struct
 	polling control structure */
     struct polling_epoll_t *polling_epoll = (struct polling_epoll_t *) polling->lower;
 
-	epoll_ctl(polling_epoll->epoll_fd, EPOLL_CTL_DEL, connection->socket_handle, NULL);
+	result_code = epoll_ctl(polling_epoll->epoll_fd, EPOLL_CTL_DEL, connection->socket_handle, NULL);
 
 	/* in case there was an error in epoll */
 	if(SOCKET_TEST_ERROR(result_code)) {
