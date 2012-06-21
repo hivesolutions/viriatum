@@ -482,7 +482,13 @@ ERROR_CODE _send_data_callback(struct connection_t *connection, struct data_t *d
 
     /* writes the response to the connection, this should flush the current
     data in the output buffer to the network */
-    connection->write_connection(connection, (unsigned char *) buffer, output_length, _send_response_callback_handler_module, parameters);
+    connection->write_connection(
+		connection,
+		(unsigned char *) buffer,
+		output_length,
+		_send_response_callback_handler_module,
+		parameters
+	);
 
     /* unsets the output buffer from the context (it's not going) to
     be used anymore (must be released) */
@@ -621,16 +627,20 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
     /* allocates space for the header buffer and then writes the default values
     into it the value is dynamicaly contructed based on the current header values */
     connection->alloc_data(connection, 25602, (void **) &headers_buffer);
-    count = SPRINTF(
+	count = http_connection->write_headers(
+        connection,
         headers_buffer,
         1024,
-        "HTTP/1.1 %d %s\r\n"
-        "Server: %s\r\n"
-        "Connection: Keep-Alive\r\n"
-        "Content-Length: %lu\r\n",
+        HTTP11,
         status_code,
         status_message,
-        connection->service->description,
+        KEEP_ALIVE,
+        FALSE
+    );
+    count += SPRINTF(
+        &headers_buffer[count],
+        1024 - count,
+        CONTENT_LENGTH_H ": %lu\r\n",
         (long unsigned int) output_buffer->buffer_length
     );
 
@@ -649,7 +659,13 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
 
     /* writes the response to the connection, this will only write
     the headers the remaining message will be sent on the callback */
-    connection->write_connection(connection, (unsigned char *) headers_buffer, (unsigned int) count, _send_data_callback, (void *) handler_php_context);
+    connection->write_connection(
+		connection,
+		(unsigned char *) headers_buffer,
+		(unsigned int) count,
+		_send_data_callback,
+		(void *) handler_php_context
+	);
 
     /* raise no error */
     RAISE_NO_ERROR;
