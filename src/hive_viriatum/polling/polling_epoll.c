@@ -160,11 +160,6 @@ ERROR_CODE unregister_connection_polling_epoll(struct polling_t *polling, struct
     struct polling_epoll_t *polling_epoll = (struct polling_epoll_t *) polling->lower;
 
 	epoll_ctl(polling_epoll->epoll_fd, EPOLL_CTL_DEL, connection->socket_handle, NULL);
-	
-
-	/*   !!!! PENDING IMPLEMENTATION    !!!!!! */
-
-	printf("fez unregister normal\n");
 
 	/* unsets the connection value from the hash map this should
 	be able to remove the file descriptor connection association */
@@ -222,7 +217,7 @@ ERROR_CODE poll_polling_epoll(struct polling_t *polling) {
 
 	for(index = 0; index < event_count; index++) {
         _event = &events[index];
-		get_value_hash_map(polling_epoll->connections, _event->data.fd, NULL, (void **) &connection);
+		connection = (struct connection_t *) _event->data.ptr;
 
 		if(_event->events & EPOLLIN) {
             /* sets the current connection in the read connections
