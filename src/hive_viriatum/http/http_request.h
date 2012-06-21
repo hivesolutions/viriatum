@@ -68,11 +68,19 @@ typedef enum http_request_method_e {
     POST_REQUEST_METHOD
 } http_request_method;
 
+/**
+ * Enumeration defining the various possible
+ * keep alive situations (modes).
+ */
 typedef enum http_keep_alive_e {
 	KEEP_CLOSE = 1,
 	KEEP_ALIVE
 } http_keep_alive;
 
+/**
+ * Enumeration defining the various possible
+ * http cache control strategies.
+ */
 typedef enum http_cache_e {
 	NO_CACHE = 1
 } http_cache;
