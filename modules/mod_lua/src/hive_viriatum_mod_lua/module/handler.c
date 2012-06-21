@@ -297,10 +297,6 @@ ERROR_CODE _write_error_connection(struct http_parser_t *http_parser, char *mess
     struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
     struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
 
-    /* retrieves the length of the message so that it's possible to print
-    the proper error */
-    size_t message_length = strlen(message);
-
     /* allocates the data buffer (in a safe maner) then
     writes the http static headers to the response */
     connection->alloc_data(connection, 1024 * sizeof(unsigned char), (void **) &buffer);
