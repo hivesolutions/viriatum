@@ -536,7 +536,7 @@ ERROR_CODE _call_polling_select(struct polling_select_t *polling_select, struct 
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _register_sockets_set_polling_select(struct polling_select_t *polling_select, SOCKET_HANDLE socket_handle,  SOCKET_SET *sockets_set) {
+ERROR_CODE _register_sockets_set_polling_select(struct polling_select_t *polling_select, SOCKET_HANDLE socket_handle, SOCKET_SET *sockets_set) {
     /* in case the current socket handle is bigger than the polling
     select sockets set highest value */
     if(socket_handle > polling_select->sockets_set_highest) {
@@ -551,7 +551,7 @@ ERROR_CODE _register_sockets_set_polling_select(struct polling_select_t *polling
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _unregister_sockets_set_polling_select(struct polling_select_t *polling_select, SOCKET_HANDLE socket_handle,  SOCKET_SET *sockets_set) {
+ERROR_CODE _unregister_sockets_set_polling_select(struct polling_select_t *polling_select, SOCKET_HANDLE socket_handle, SOCKET_SET *sockets_set) {
     /* removes the socket handle from the sockets set */
     SOCKET_SET_CLEAR(socket_handle, sockets_set);
 
