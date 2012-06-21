@@ -223,7 +223,7 @@ static __inline size_t split(char *string_value, char *buffer, size_t size_e, ch
     size_t size;
     size_t index = 0;
     size_t _index = 0;
-	size_t count = 0;
+    size_t count = 0;
 
     /* iterates continuousuly over the string value to correctly
     parse the string value and split it */
@@ -247,9 +247,9 @@ static __inline size_t split(char *string_value, char *buffer, size_t size_e, ch
             buffer += size_e;
             _index = index + 1;
 
-			/* increments the count (number of parsed elements)
-			because one more split occured */
-			count++;
+            /* increments the count (number of parsed elements)
+            because one more split occured */
+            count++;
         }
         /* otherwise in case the current token isthe end of string
         the current string must be copied as the last trunk */
@@ -261,9 +261,9 @@ static __inline size_t split(char *string_value, char *buffer, size_t size_e, ch
             memcpy(buffer, &string_value[_index], size);
             buffer[size] = '\0';
 
-			/* increments the count (number of parsed elements)
-			because one more split occured (final split) */
-			count++;
+            /* increments the count (number of parsed elements)
+            because one more split occured (final split) */
+            count++;
 
             /* breaks the current loop (no more tokens to be split) */
             break;
@@ -274,7 +274,7 @@ static __inline size_t split(char *string_value, char *buffer, size_t size_e, ch
         index++;
     }
 
-	/* returns the count value, number of parsed elements
-	from the provided string */
-	return count;
+    /* returns the count value, number of parsed elements
+    from the provided string */
+    return count;
 }

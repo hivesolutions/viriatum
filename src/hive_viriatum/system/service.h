@@ -497,11 +497,11 @@ typedef struct service_options_t {
      */
     unsigned char index[32][128];
 
-	/**
-	 * The number of index objects currently available and
-	 * parsed from the line value.
-	 */
-	size_t index_count;
+    /**
+     * The number of index objects currently available and
+     * parsed from the line value.
+     */
+    size_t index_count;
 
     /**
      * The set of virtual hosts associated with the

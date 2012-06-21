@@ -127,7 +127,7 @@ void create_service_options(struct service_options_t **service_options_pointer) 
     service_options->default_index = 0;
     service_options->use_template = 0;
     service_options->default_virtual_host = NULL;
-	service_options->index_count = 0;
+    service_options->index_count = 0;
 
     /* resets the memry buffer on the index sequence structure so
     that no index is considered before configuration */

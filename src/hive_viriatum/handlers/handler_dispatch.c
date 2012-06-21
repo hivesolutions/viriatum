@@ -98,7 +98,7 @@ ERROR_CODE register_handler_dispatch(struct service_t *service) {
     create_dispatch_handler(&dispatch_handler, http_handler);
 
     /* sets the http handler attributes */
-	http_handler->resolve_index = 0;
+    http_handler->resolve_index = 0;
     http_handler->set = set_handler_dispatch;
     http_handler->unset = unset_handler_dispatch;
     http_handler->reset = NULL;
@@ -182,26 +182,26 @@ ERROR_CODE url_callback_handler_dispatch(struct http_parser_t *http_parser, cons
 #ifdef VIRIATUM_PCRE
     int matching;
     size_t index;
-	size_t _index;
+    size_t _index;
     size_t match_size;
     int offsets[3] = { 0, 0, 0 };
     char regex_match = 0;
 #endif
 
-	/* allocates space for the pointer to the index file name
-	to be "resolved" and also allocates space for the integer
-	size of the that index file */
-	char *index_;
-	size_t index_size;
+    /* allocates space for the pointer to the index file name
+    to be "resolved" and also allocates space for the integer
+    size of the that index file */
+    char *index_;
+    size_t index_size;
 
     /* allocates space for the name of the handler to be
     used for the dispatching operation (target handler) */
     unsigned char *handler_name;
 
     /* allocates the required space for the path and the
-	base path, this is done through static allocation */
+    base path, this is done through static allocation */
     unsigned char path[VIRIATUM_MAX_URL_SIZE];
-	unsigned char base_path[VIRIATUM_MAX_URL_SIZE];
+    unsigned char base_path[VIRIATUM_MAX_URL_SIZE];
 
     /* retrieves the various connection elements and lower substrates
     fomr the parser parameters and then uses them to retrieves the handler
@@ -210,7 +210,7 @@ ERROR_CODE url_callback_handler_dispatch(struct http_parser_t *http_parser, cons
     struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
     struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
     struct service_t *service = connection->service;
-	struct service_options_t *options = service->options;
+    struct service_options_t *options = service->options;
     struct http_handler_t *handler = http_connection->http_handler;
 #ifdef VIRIATUM_PCRE
     struct dispatch_handler_t *dispatch_handler = (struct dispatch_handler_t *) handler->lower;
@@ -253,57 +253,57 @@ ERROR_CODE url_callback_handler_dispatch(struct http_parser_t *http_parser, cons
     in case the handler is not currently available an error is printed */
     get_value_string_hash_map(service->http_handlers_map, handler_name, (void **) &handler);
     if(handler) {
-		/* in case the string refers the base path (default handler must be used)
-		the selection of the index file as default is conditioned by the default
-		index configuration option */
-		if(handler->resolve_index && options->default_index
-			&& (path_size == 0 || path[path_size - 1] == '/')) {
-			/* creates the base path from the viriatum contents path 
-			and the current provided path and then runs the file existence
-			validation process using the index array provided */
-			SPRINTF((char *) base_path, VIRIATUM_MAX_PATH_SIZE, "%s%s", VIRIATUM_CONTENTS_PATH, path);
-			index_ = validate_file((char *) base_path, (char *) options->index, 32, 128);
-			index_size = strlen(index_);
+        /* in case the string refers the base path (default handler must be used)
+        the selection of the index file as default is conditioned by the default
+        index configuration option */
+        if(handler->resolve_index && options->default_index
+            && (path_size == 0 || path[path_size - 1] == '/')) {
+            /* creates the base path from the viriatum contents path
+            and the current provided path and then runs the file existence
+            validation process using the index array provided */
+            SPRINTF((char *) base_path, VIRIATUM_MAX_PATH_SIZE, "%s%s", VIRIATUM_CONTENTS_PATH, path);
+            index_ = validate_file((char *) base_path, (char *) options->index, 32, 128);
+            index_size = strlen(index_);
 
-			/* copies the index file name to the reamining part of
-			the path buffer closing the buffer with the end of string
-			character (normal closing) */
-			memcpy(&path[path_size], index_, index_size);
-			path_size = path_size + index_size;
-			path[path_size] = '\0';
+            /* copies the index file name to the reamining part of
+            the path buffer closing the buffer with the end of string
+            character (normal closing) */
+            memcpy(&path[path_size], index_, index_size);
+            path_size = path_size + index_size;
+            path[path_size] = '\0';
 
-			/* in case the index file resolution was successfull
-			(a new file was resolved) must match the file path through
-			the regular expression pipe, for handler resolution */
-			if(index_ != NULL) {
+            /* in case the index file resolution was successfull
+            (a new file was resolved) must match the file path through
+            the regular expression pipe, for handler resolution */
+            if(index_ != NULL) {
 #ifdef VIRIATUM_PCRE
-				/* saves the current match index so that it's possible
-				to detect if the index file resolution changed the handler
-				for the current request */
-				_index = index;
+                /* saves the current match index so that it's possible
+                to detect if the index file resolution changed the handler
+                for the current request */
+                _index = index;
 
-				/* iterates over all the regular expressions so that they
-				may be tested agains the current path */
-				for(index = 0; index < dispatch_handler->regex_count; index++) {
-					/* tries to match the current path against the registered
-					regular expression in case it fails continues the loop */
-					matching = pcre_exec(dispatch_handler->regex[index], NULL, (char *) path, path_size, 0, 0, offsets, 3);
-					if(matching < 0) { continue; }
+                /* iterates over all the regular expressions so that they
+                may be tested agains the current path */
+                for(index = 0; index < dispatch_handler->regex_count; index++) {
+                    /* tries to match the current path against the registered
+                    regular expression in case it fails continues the loop */
+                    matching = pcre_exec(dispatch_handler->regex[index], NULL, (char *) path, path_size, 0, 0, offsets, 3);
+                    if(matching < 0) { continue; }
 
-					/* sets the name of the handler as the name in the current index
-					and updates the match flag and the breaks the loop to process it */
-					handler_name = dispatch_handler->names[index];
-					regex_match = 1;
-					match_size = (size_t) offsets[1];
-					break;
-				}
-				
-				/* in case the matching index has changed a new handler reference
-				must be retrieved from the map containing the http handlers */
-				if(index != _index) { get_value_string_hash_map(service->http_handlers_map, handler_name, (void **) &handler); }
+                    /* sets the name of the handler as the name in the current index
+                    and updates the match flag and the breaks the loop to process it */
+                    handler_name = dispatch_handler->names[index];
+                    regex_match = 1;
+                    match_size = (size_t) offsets[1];
+                    break;
+                }
+
+                /* in case the matching index has changed a new handler reference
+                must be retrieved from the map containing the http handlers */
+                if(index != _index) { get_value_string_hash_map(service->http_handlers_map, handler_name, (void **) &handler); }
 #endif
-			}
-		}
+            }
+        }
 
         /* retrieves the current handler and then unsets it
         from the connection (detach) then sets the the proper
@@ -313,7 +313,7 @@ ERROR_CODE url_callback_handler_dispatch(struct http_parser_t *http_parser, cons
         http_connection->http_handler = handler;
         CALL_V(http_connection->http_settings->on_message_begin, http_parser);
         CALL_V(http_connection->http_settings->on_url, http_parser, data, data_size);
-		CALL_V(http_connection->http_settings->on_path, http_parser, path, path_size);
+        CALL_V(http_connection->http_settings->on_path, http_parser, path, path_size);
 
 #ifdef VIRIATUM_PCRE
         /* in case there was a regex (location) match the dispatcher
@@ -398,7 +398,7 @@ ERROR_CODE _set_http_settings_handler_dispatch(struct http_settings_t *http_sett
     http_settings->on_headers_complete = headers_complete_callback_handler_dispatch;
     http_settings->on_body = body_callback_handler_dispatch;
     http_settings->on_message_complete = message_complete_callback_handler_dispatch;
-	http_settings->on_path = path_callback_handler_dispatch;
+    http_settings->on_path = path_callback_handler_dispatch;
     http_settings->on_location = location_callback_handler_dispatch;
     http_settings->on_virtual_url = virtual_url_callback_handler_dispatch;
 
@@ -415,7 +415,7 @@ ERROR_CODE _unset_http_settings_handler_dispatch(struct http_settings_t *http_se
     http_settings->on_headers_complete = NULL;
     http_settings->on_body = NULL;
     http_settings->on_message_complete = NULL;
-	http_settings->on_path = NULL;
+    http_settings->on_path = NULL;
     http_settings->on_location = NULL;
     http_settings->on_virtual_url = NULL;
 
