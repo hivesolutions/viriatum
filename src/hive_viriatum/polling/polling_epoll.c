@@ -170,12 +170,10 @@ ERROR_CODE poll_polling_epoll(struct polling_t *polling) {
 		if(_event->events & EPOLLIN) {
 
             /* sets the current connection in the error connections */
-            error_connections[error_index] = current_connection;
+         /*   error_connections[error_index] = current_connection;*/
 
 
 			/* tenho de adicionar aos read */
-
-			read_index
 		}
 
 		if(_event->events & EPOLLOUT) {
