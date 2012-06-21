@@ -233,6 +233,8 @@ ERROR_CODE poll_polling_epoll(struct polling_t *polling) {
         _event = &events[index];
 		connection = (struct connection_t *) _event->data.ptr;
 
+		printf("!!! Evento em %d !!!\n", connection->socket_handle);
+
 		if(_event->events & (EPOLLERR | EPOLLHUP)) {
             /* sets the current connection in the error connections
 			and then increments the error index counter */
