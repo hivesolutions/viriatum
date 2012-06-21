@@ -1107,6 +1107,13 @@ ERROR_CODE start_service(struct service_t *service) {
     }
 #endif
 
+#ifdef VIRIATUM_PLATFORM_UNIX
+    /* in case the current os is compatible with the forking of process
+    creates the worker processes to handle more connections at a time,
+    this operation creates a much more flexible and scalable solution */
+    create_workers(service);
+#endif
+
     /* sets the service select service as the service in the service connection */
     service_connection->service = service;
 
@@ -1120,6 +1127,9 @@ ERROR_CODE start_service(struct service_t *service) {
     /* sets the fucntion to be called uppon read on the service
     connection (it should be the accept handler stream io, default) */
     service_connection->on_read = accept_handler_stream_io;
+
+    /* opens the (service) connection */
+    service_connection->open_connection(service_connection);
 
 
 #ifdef VIRIATUM_IP6
@@ -1139,26 +1149,10 @@ ERROR_CODE start_service(struct service_t *service) {
         /* sets the fucntion to be called uppon read on the service
         connection (it should be the accept handler stream io, default) */
         service6_connection->on_read = accept_handler_stream_io;
-    }
-#endif
 
-#ifdef VIRIATUM_PLATFORM_UNIX
-    /* in case the current os is compatible with the forking of process
-    creates the worker processes to handle more connections at a time,
-    this operation creates a much more flexible and scalable solution */
-    create_workers(service);
-#endif
-
-    /* opens the (service) connection */
-    service_connection->open_connection(service_connection);
-
-#ifdef VIRIATUM_IP6
-	/* in case the ip6 connection flag is set the ip6 connection
-    must be correctly "opened" */
-    if(service_options->ip6) {
         /* opens the (service) connection */
         service6_connection->open_connection(service6_connection);
-	}
+    }
 #endif
 
 /*  _create_tracker_connection(&tracker_connection, service, "localhost", 9090);
