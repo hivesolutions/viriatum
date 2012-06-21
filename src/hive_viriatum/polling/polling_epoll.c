@@ -254,6 +254,8 @@ ERROR_CODE poll_polling_epoll(struct polling_t *polling) {
 		get_value_hash_map(polling_epoll->connections, _event->data.fd, NULL, (void **) &connection);
 
 		if(_event->events & EPOLLIN) {
+			printf("encontrou read '%d' -> '%d'\n", _event->data.fd, connection);
+
             /* sets the current connection in the read connections
 			and then increments the read index counter */
 			polling_epoll->read_connections[read_index] = connection;
@@ -261,6 +263,8 @@ ERROR_CODE poll_polling_epoll(struct polling_t *polling) {
 		}
 
 		if(_event->events & EPOLLOUT) {
+			printf("encontrou write '%d' -> '%d'\n", _event->data.fd, connection);
+
             /* sets the current connection in the write connections
 			and then increments the write index counter */
 			polling_epoll->write_connections[write_index] = connection;
@@ -268,6 +272,8 @@ ERROR_CODE poll_polling_epoll(struct polling_t *polling) {
 		}
 
 		if(_event->events & (EPOLLERR | EPOLLHUP)) {
+			printf("encontrou error '%d' -> '%d'\n", _event->data.fd, connection);
+
             /* sets the current connection in the error connections
 			and then increments the error index counter */
 			polling_epoll->error_connections[write_index] = connection;
