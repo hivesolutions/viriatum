@@ -145,12 +145,6 @@ ERROR_CODE url_callback_handler_file(struct http_parser_t *http_parser, const un
     /* retrieves the handler file context from the http parser */
     struct handler_file_context_t *handler_file_context = (struct handler_file_context_t *) http_parser->context;
 
-    /* retrieves the connection from the http parser parameters and then
-    uses it to access the service options using the service */
-    struct connection_t *connection = (struct connection_t *) http_parser->parameters;
-    struct service_t *service = connection->service;
-    struct service_options_t *options = service->options;
-
     /* checks the position of the get parameters divisor position
     and then uses it to calculate the size of the (base) path */
     char *pointer = (char *) memchr((char *) data, '?', data_size);
