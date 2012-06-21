@@ -224,10 +224,10 @@ double _module_request_time(TSRMLS_D) {
 
 ZEND_MINFO_FUNCTION(viriatum_information) {
     php_info_print_table_start();
-    php_info_print_table_row(2, "Name", VIRIATUM_NAME);
-    php_info_print_table_row(2, "Version", VIRIATUM_VERSION);
-    php_info_print_table_row(2, "Compiler", VIRIATUM_COMPILER);
-    php_info_print_table_row(2, "Compilation Date", VIRIATUM_COMPILATION_DATE);
+	php_info_print_table_row(2, "Name", _service->name);
+    php_info_print_table_row(2, "Version", _service->version);
+    php_info_print_table_row(2, "Compiler", _service->compiler);
+    php_info_print_table_row(2, "Compilation Date", _service->compilation_date);
     php_info_print_table_end();
     php_info_print_table_start();
     php_info_print_table_header(2, "Name", "Path");
