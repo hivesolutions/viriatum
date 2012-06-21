@@ -243,6 +243,8 @@ ERROR_CODE poll_polling_epoll(struct polling_t *polling) {
 	events[64] */
 	events = calloc(64, sizeof(struct epoll_event));
 
+	printf("entrou epoll\n");
+
 	event_count = epoll_wait(polling_epoll->epoll_fd, events, 64, -1);
 
 	printf("acabou epoll com %d\n", event_count);
