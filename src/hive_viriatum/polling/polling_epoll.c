@@ -48,11 +48,6 @@ void create_polling_epoll(struct polling_epoll_t **polling_epoll_pointer, struct
 	size (this no longer used by the kernel) */
 	polling_epoll->epoll_fd = epoll_create(1024);
 
-	/* creates the hash map for the connection this hash map
-	will be responsible for the mapping of the file descriptors
-	(fds) into references to connection structures */
-	create_hash_map(&polling_epoll->connections, 0);
-
 
 
     /* allocates the read connection for internal
@@ -82,10 +77,6 @@ void delete_polling_epoll(struct polling_epoll_t *polling_epoll) {
 	/* in case the polling fd is defined it must be closed
 	in order to avoid any memory leak problem */
 	if(polling_epoll->epoll_fd) { close(polling_epoll->epoll_fd); } 
-
-	/* deletes the hash map used for the connections to fd assiciations
-	(this is no longer required) */
-	delete_hash_map(polling_epoll->connections);
 
     /* releases the remove connections */
     FREE(polling_epoll->remove_connections);

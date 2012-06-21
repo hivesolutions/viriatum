@@ -40,8 +40,6 @@ typedef struct polling_epoll_t {
 
     int epoll_fd;
 
-	struct hash_map_t *connections;
-
     struct connection_t **read_connections;
     struct connection_t **write_connections;
     struct connection_t **error_connections;
