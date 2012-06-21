@@ -292,6 +292,11 @@ ERROR_CODE _write_error_connection(struct http_parser_t *http_parser, char *mess
     /* retrieves the connection from the http parser parameters */
     struct connection_t *connection = (struct connection_t *) http_parser->parameters;
 
+    /* retrieves the underlying connection references in order to be
+    able to operate over them, for unregister */
+    struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
+    struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
+
     /* retrieves the length of the message so that it's possible to print
     the proper error */
     size_t message_length = strlen(message);
@@ -299,24 +304,17 @@ ERROR_CODE _write_error_connection(struct http_parser_t *http_parser, char *mess
     /* allocates the data buffer (in a safe maner) then
     writes the http static headers to the response */
     connection->alloc_data(connection, 1024 * sizeof(unsigned char), (void **) &buffer);
-    SPRINTF(
-        (char *) buffer,
+	http_connection->write_error(
+        connection,
+        buffer,
         1024,
-        "HTTP/1.1 500 Internal Server Error\r\n"
-        "Server: %s/%s (%s - %s) (%s)\r\n"
-        "Connection: Keep-Alive\r\n"
-        "Content-Length: %d\r\n\r\n%s",
-        VIRIATUM_NAME,
-        VIRIATUM_VERSION,
-        VIRIATUM_PLATFORM_STRING,
-        VIRIATUM_PLATFORM_CPU,
-        VIRIATUM_FLAGS,
-        (unsigned int) message_length,
-        message
+        HTTP11,
+        500,
+        "Internal Server Error",
+        message,
+        (void *) _send_response_callback_handler_module,
+		(void *) (size_t) http_parser->flags
     );
-
-    /* writes the response to the connection, registers for the appropriate callbacks */
-    connection->write_connection(connection, buffer, (unsigned int) strlen((char *) buffer), _send_response_callback_handler_module, (void *) (size_t) http_parser->flags);
 
     /* raise no error */
     RAISE_NO_ERROR;
@@ -396,7 +394,13 @@ int _lua_write_connection(lua_State *lua_state) {
     memcpy(buffer, data, data_size);
 
     /* writes the response to the connection */
-    connection->write_connection(connection, buffer, data_size, _send_response_callback_handler_module, (void *) (size_t) http_parser->flags);
+    connection->write_connection(
+		connection,
+		buffer,
+		data_size,
+		_send_response_callback_handler_module,
+		(void *) (size_t) http_parser->flags
+	);
 
     /* return the number of results */
     return 0;
