@@ -306,7 +306,7 @@ ERROR_CODE _write_error_connection(struct http_parser_t *http_parser, char *mess
     connection->alloc_data(connection, 1024 * sizeof(unsigned char), (void **) &buffer);
     http_connection->write_error(
         connection,
-        buffer,
+        (char *) buffer,
         1024,
         HTTP11,
         500,
