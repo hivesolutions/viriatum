@@ -146,7 +146,7 @@ ERROR_CODE register_connection_polling_epoll(struct polling_t *polling, struct c
         SOCKET_ERROR_CODE epoll_error_code = SOCKET_GET_ERROR_CODE(socket_result);
 
         /* prints an info message */
-        V_INFO_F("Problem registering connection epoll: %d\n", select_error_code);
+        V_INFO_F("Problem registering connection epoll: %d\n", epoll_error_code);
 
         /* raises an error */
         RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem registering connection epoll");
@@ -173,7 +173,7 @@ ERROR_CODE unregister_connection_polling_epoll(struct polling_t *polling, struct
         SOCKET_ERROR_CODE epoll_error_code = SOCKET_GET_ERROR_CODE(socket_result);
 
         /* prints an info message */
-        V_INFO_F("Problem unregistering connection epoll: %d\n", select_error_code);
+        V_INFO_F("Problem unregistering connection epoll: %d\n", epoll_error_code);
 
         /* raises an error */
         RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem unregistering connection epoll");
