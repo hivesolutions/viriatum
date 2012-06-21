@@ -27,13 +27,16 @@
 
 #include "stdafx.h"
 
-#ifdef VIRIATUM_EPOLL
+//#ifdef VIRIATUM_EPOLL
 
 #include "polling_epoll.h"
 
 void create_polling_epoll(struct polling_epoll_t **polling_epoll_pointer, struct polling_t *polling) {
     /* retrieves the polling epoll size */
     size_t polling_epoll_size = sizeof(struct polling_epoll_t);
+
+    /* retrieves the connection pointer size */
+    size_t connection_pointer_size = sizeof(struct connection_t *);
 
     /* allocates space for the polling epoll */
     struct polling_epoll_t *polling_epoll = (struct polling_epoll_t *) MALLOC(polling_epoll_size);
@@ -50,6 +53,27 @@ void create_polling_epoll(struct polling_epoll_t **polling_epoll_pointer, struct
 	(fds) into references to connection structures */
 	create_hash_map(&polling_epoll->connections, 0);
 
+
+
+    /* allocates the read connection for internal
+    polling epoll usage */
+    polling_epoll->read_connections = (struct connection_t **) MALLOC(VIRIATUM_MAXIMUM_CONNECTIONS * connection_pointer_size);
+
+    /* allocates the write connection for internal
+    polling epoll usage */
+    polling_epoll->write_connections = (struct connection_t **) MALLOC(VIRIATUM_MAXIMUM_CONNECTIONS * connection_pointer_size);
+
+    /* allocates the error connection for internal
+    polling epoll usage */
+    polling_epoll->error_connections = (struct connection_t **) MALLOC(VIRIATUM_MAXIMUM_CONNECTIONS * connection_pointer_size);
+
+    /* allocates the remove connection for internal
+    polling epoll usage */
+    polling_epoll->remove_connections = (struct connection_t **) MALLOC(VIRIATUM_MAXIMUM_CONNECTIONS * connection_pointer_size);
+
+
+
+
     /* sets the polling epoll in the polling epoll pointer */
     *polling_epoll_pointer = polling_epoll;
 }
@@ -62,6 +86,18 @@ void delete_polling_epoll(struct polling_epoll_t *polling_epoll) {
 	/* deletes the hash map used for the connections to fd assiciations
 	(this is no longer required) */
 	delete_hash_map(polling_epoll->connections);
+
+    /* releases the remove connections */
+    FREE(polling_epoll->remove_connections);
+
+    /* releases the error connection */
+    FREE(polling_epoll->error_connections);
+
+    /* releases the write connection */
+    FREE(polling_epoll->write_connections);
+
+    /* releases the read connection */
+    FREE(polling_epoll->read_connections);
 
     /* releases the polling epoll */
     FREE(polling_epoll);
@@ -111,7 +147,7 @@ ERROR_CODE register_connection_polling_epoll(struct polling_t *polling, struct c
 	
 	/* sets the connection value in the hash map this should
 	be able to provide a file descriptor to connection association */
-	set_value_hash_map(polling_epoll->connections, connection->socket_handle, NULL, connection);
+	set_value_hash_map(polling_epoll->connections, connection->socket_handle, NULL, (void *) connection);
 
 	/* raises no error */
     RAISE_NO_ERROR;
@@ -139,10 +175,13 @@ ERROR_CODE poll_polling_epoll(struct polling_t *polling) {
 	int event_count;
 	int index;
 
+	struct connection_t *connection;
 
-    unsigned int read_index = 0;
-    unsigned int write_index = 0;
-    unsigned int error_index = 0;
+    size_t read_index = 0;
+    size_t write_index = 0;
+    size_t error_index = 0;
+
+	
 
 
     /* retrieves the polling epoll structure from the upper
@@ -167,34 +206,38 @@ ERROR_CODE poll_polling_epoll(struct polling_t *polling) {
 	event_count = epoll_wait(polling_epoll->epoll_fd, events, 64, -1);
 	for(index = 0; index < event_count; index++) {
         _event = &events[index];
+		get_value_hash_map(polling_epoll->connections, _event.data.fd, NULL, (void **) &connection)
 
 		if(_event->events & EPOLLIN) {
-
-            /* sets the current connection in the error connections */
-         /*   error_connections[error_index] = current_connection;*/
-
-
-			/* tenho de adicionar aos read */
+            /* sets the current connection in the read connections
+			and then increments the read index counter */
+			polling_epoll->read_connections[read_index] = connection;
+			read_index++;
 		}
 
 		if(_event->events & EPOLLOUT) {
-			/* tenho de adicionar aos write */
+            /* sets the current connection in the write connections
+			and then increments the write index counter */
+			polling_epoll->write_connections[write_index] = connection;
+			write_index++;
 		}
 
 		if(_event->events & (EPOLLERR | EPOLLHUP)) {
-			/* tenho de adicionar aos error */
+            /* sets the current connection in the error connections
+			and then increments the error index counter */
+			polling_epoll->error_connections[write_index] = connection;
+			write_index++;
 		}
-
     }
 	
     /* updates the various operation counters for the three
 	operation to be "polled" (this is done by reference) */
-/*    *read_connections_size = read_index;
-    *write_connections_size = write_index;
-    *error_connections_size = error_index;*/
+    polling_epoll->read_connections_size = read_index;
+    polling_epoll->write_connections_size = write_index;
+    polling_epoll->error_connections_size = error_index;
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-#endif
+//#endif
