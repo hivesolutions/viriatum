@@ -33,9 +33,6 @@ void create_polling_epoll(struct polling_epoll_t **polling_epoll_pointer, struct
     /* retrieves the polling epoll size */
     size_t polling_epoll_size = sizeof(struct polling_epoll_t);
 
-    /* retrieves the connection pointer size */
-    size_t connection_pointer_size = sizeof(struct connection_t *);
-
     /* allocates space for the polling epoll */
     struct polling_epoll_t *polling_epoll = (struct polling_epoll_t *) MALLOC(polling_epoll_size);
 
@@ -92,7 +89,7 @@ ERROR_CODE register_connection_polling_epoll(struct polling_t *polling, struct c
 
     /* retrieves the polling epoll structure from the upper
 	polling control structure */
-    struct polling_select_t *polling_epoll = (struct polling_select_t *) polling->lower;
+    struct polling_epoll_t *polling_epoll = (struct polling_epoll_t *) polling->lower;
 
 	/* populates the event structure with the appropriate
 	structures in order to register for the right events 
@@ -105,10 +102,10 @@ ERROR_CODE register_connection_polling_epoll(struct polling_t *polling, struct c
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE unregister_connection_polling_select(struct polling_t *polling, struct connection_t *connection)  {
+ERROR_CODE unregister_connection_polling_epoll(struct polling_t *polling, struct connection_t *connection)  {
     /* retrieves the polling epoll structure from the upper
 	polling control structure */
-    struct polling_select_t *polling_select = (struct polling_select_t *) polling->lower;
+    struct polling_epoll_t *polling_epoll = (struct polling_epoll_t *) polling->lower;
 
 
 	/*   !!!! PENDING IMPLEMENTATION    !!!!!! */
