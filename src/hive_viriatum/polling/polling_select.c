@@ -352,10 +352,9 @@ ERROR_CODE _poll_polling_select(struct polling_select_t *polling_select, struct 
             /* sets the current connection in the read connections */
             read_connections[read_index] = current_connection;
 
-            /* increments the read index */
+            /* increments the read index and the select count (one
+			more read and one more count) */
             read_index++;
-
-            /* decrements the select count */
             select_count--;
         }
 
@@ -365,10 +364,9 @@ ERROR_CODE _poll_polling_select(struct polling_select_t *polling_select, struct 
             /* sets the current connection in the write connections */
             write_connections[write_index] = current_connection;
 
-            /* increments the write index */
+            /* increments the write index and the select count (one
+			more write and one more count) */
             write_index++;
-
-            /* decrements the select count */
             select_count--;
         }
 
@@ -378,10 +376,9 @@ ERROR_CODE _poll_polling_select(struct polling_select_t *polling_select, struct 
             /* sets the current connection in the error connections */
             error_connections[error_index] = current_connection;
 
-            /* increments the error index */
+            /* increments the error index and the select count (one
+			more error and one more count) */
             error_index++;
-
-            /* decrements the select count */
             select_count--;
         }
     }
