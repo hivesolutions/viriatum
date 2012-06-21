@@ -261,6 +261,43 @@ typedef struct service_t {
      */
     unsigned char *name;
 
+	/**
+	 * The version number as a string
+	 * for the current service structure.
+	 */
+	unsigned char *version;
+
+	/**
+	 * The platform as a string in which
+	 * the current service is running.
+	 */
+	unsigned char *platform;
+
+	/**
+	 * The abstract compilation flags for
+	 * the current service.
+	 */
+	unsigned char *flags;
+
+	/**
+	 * The description (string) of the compiler
+	 * used to compile the service structures.
+	 */
+	unsigned char *compiler;
+
+	/**
+	 * The date (as a string) for the compilation
+	 * of the service internal structures.
+	 */
+	unsigned char *compilation_date;
+
+	/**
+	 * The string describing the current service
+	 * and its configuration, usefull for a quick
+	 * visual description of the service.
+	 */
+	unsigned char description[1024];
+
     /**
      * The name (path) to the current program
      * (process) in execution for the service context.
@@ -819,6 +856,15 @@ void delete_polling(struct polling_t *polling);
  * top level configuration (section) or an inner one.
  */
 void delete_configuration(struct sort_map_t *configuration, int is_top);
+
+/**
+ * Loads the global wide service specifications into the
+ * internal data structures that describe it.
+ *
+ * @param service The service to be loaded with specifications.
+ * @return The resulting error code.
+ */
+ERROR_CODE load_specifications(struct service_t *service);
 
 /**
  * Loads the various options, from the various data sources
