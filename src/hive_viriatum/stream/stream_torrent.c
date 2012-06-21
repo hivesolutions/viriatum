@@ -119,7 +119,13 @@ ERROR_CODE open_handler_stream_torrent(struct io_connection_t *io_connection) {
 
 
     /* writes the response to the connection, registers for the appropriate callbacks */
-    write_connection(io_connection->connection, (unsigned char *) response_buffer, sizeof(struct torrent_handshake_t), NULL, NULL);
+    write_connection(
+		io_connection->connection,
+		(unsigned char *) response_buffer,
+		sizeof(struct torrent_handshake_t),
+		NULL,
+		NULL
+	);
 
 
     /* raises no error */
