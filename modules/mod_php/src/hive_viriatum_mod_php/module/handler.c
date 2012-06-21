@@ -613,7 +613,7 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
         "mod_php",
         handler_php_context->method,
         (char *) handler_php_context->url,
-        "HTTP/1.1",
+        HTTP11,
         status_code,
         output_buffer->buffer_length
     );
