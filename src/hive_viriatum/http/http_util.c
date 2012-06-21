@@ -54,6 +54,9 @@ ERROR_CODE write_http_headers(struct service_t *service, char *buffer, size_t si
 }
 
 ERROR_CODE write_http_headers_c(struct service_t *service, char *buffer, size_t size, enum http_version_e version, int status_code, char *status_message, enum http_keep_alive_e keep_alive, size_t content_length, enum http_cache_e cache, int close) {
+	/* writes the header information into the buffer using the basic
+	function then uses the count offset to determine the buffer position
+	to write the remaining headers for the complete write */
     size_t count = write_http_headers(
         service,
         buffer,
@@ -75,10 +78,14 @@ ERROR_CODE write_http_headers_c(struct service_t *service, char *buffer, size_t 
         close_codes[close]
     );
 
+    /* returns the number of bytes written into the buffer */
     return count;
 }
 
 ERROR_CODE write_http_headers_m(struct service_t *service, char *buffer, size_t size, enum http_version_e version, int status_code, char *status_message, enum http_keep_alive_e keep_alive, size_t content_length, enum http_cache_e cache, char *message) {
+	/* writes the complete set of buffer using the appropriate function and then
+	uses the count offset to copy the contents part of the message into the final
+	part of the buffer (message writing) */
     size_t count = write_http_headers_c(
         service,
         buffer,
@@ -93,6 +100,7 @@ ERROR_CODE write_http_headers_m(struct service_t *service, char *buffer, size_t 
     );
     memcpy(&buffer[count], message, content_length + 1);
 
+    /* returns the number of bytes written into the buffer */
     return count;
 }
 
@@ -214,7 +222,7 @@ ERROR_CODE write_http_error(struct connection_t *connection, char *header, int e
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE log_http_request(char *host, char *identity, char *user, char *method, char *uri, char *protocol, int error_code, size_t content_length) {
+ERROR_CODE log_http_request(char *host, char *identity, char *user, char *method, char *uri, enum http_version_e version, int error_code, size_t content_length) {
     /* allocates space for the buffer to hild the date and time
     information to be logged */
     char date_buffer[1024];
@@ -241,7 +249,7 @@ ERROR_CODE log_http_request(char *host, char *identity, char *user, char *method
         date_buffer,
         method,
         uri,
-        protocol,
+        http_version_codes[version - 1],
         error_code,
         (long unsigned int) content_length
     );
