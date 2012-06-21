@@ -48,12 +48,21 @@ typedef enum http_header_e {
     HOST
 } http_header;
 
+/**
+ * Enumeration defining the various possible
+ * and "recognizable" protocol versions for
+ * the http protocol.
+ */
 typedef enum http_version_e {
 	HTTP09 = 1,
 	HTTP10,
 	HTTP11
 } http_version;
 
+/**
+ * Enumeration defining the various possible
+ * methods for an http request.
+ */
 typedef enum http_request_method_e {
     GET_REQUEST_METHOD = 1,
     POST_REQUEST_METHOD
