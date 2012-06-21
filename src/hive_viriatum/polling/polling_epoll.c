@@ -133,8 +133,6 @@ ERROR_CODE register_connection_polling_epoll(struct polling_t *polling, struct c
 	polling control structure */
     struct polling_epoll_t *polling_epoll = (struct polling_epoll_t *) polling->lower;
 
-	printf("!!!!Inserido %d!!!!!\n", connection->socket_handle);
-
 	/* populates the event structure with the appropriate
 	structures in order to register for the right events 
 	and then inserts the event request into the epoll fd */
@@ -235,8 +233,6 @@ ERROR_CODE poll_polling_epoll(struct polling_t *polling) {
         _event = &events[index];
 		connection = (struct connection_t *) _event->data.ptr;
 
-		printf("!!! Evento em %d !!!\n", connection->socket_handle);
-
 		if(_event->events & (EPOLLERR | EPOLLHUP)) {
             /* sets the current connection in the error connections
 			and then increments the error index counter */
@@ -310,9 +306,6 @@ ERROR_CODE _call_polling_epoll(struct polling_epoll_t *polling_epoll, struct con
 
         /* prints a debug message */
         V_DEBUG_F("Processing read connection: %d\n", current_connection->socket_handle);
-
-		/* ESTE VALOR DE CONEXAO É invalido */
-		printf("Connections status -> %d\n", current_connection->status);
 
         /* in case the current connection is open and the read
         handler is correclty set (must call it) */
@@ -388,8 +381,6 @@ ERROR_CODE _call_polling_epoll(struct polling_epoll_t *polling_epoll, struct con
 
         /* prints a debug message */
         V_DEBUG_F("Processing error connection: %d\n", current_connection->socket_handle);
-
-		printf("A PROCESSAR ERRO\n");
 
         /* in case the current connection is open */
         if(current_connection->status == STATUS_OPEN && current_connection->on_error != NULL) {
