@@ -154,10 +154,15 @@ ERROR_CODE register_connection_polling_epoll(struct polling_t *polling, struct c
 }
 
 ERROR_CODE unregister_connection_polling_epoll(struct polling_t *polling, struct connection_t *connection)  {
+	struct connection_t *connection;
+
     /* retrieves the polling epoll structure from the upper
 	polling control structure */
     struct polling_epoll_t *polling_epoll = (struct polling_epoll_t *) polling->lower;
 
+	get_value_hash_map(polling_epoll->connections, _event->data.fd, NULL, (void **) &connection);
+	epoll_ctl(polling_epoll->epoll_fd, EPOLL_CTL_DEL, connection->socket_handle, NULL);
+	
 
 	/*   !!!! PENDING IMPLEMENTATION    !!!!!! */
 
