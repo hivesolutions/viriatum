@@ -121,6 +121,10 @@ ERROR_CODE close_polling_epoll(struct polling_t *polling) {
 }
 
 ERROR_CODE register_connection_polling_epoll(struct polling_t *polling, struct connection_t *connection) {
+	/* allocates space for the result of the poll call
+	to add a new element to the poll structure */
+	SOCKET_ERROR_CODE result_code;
+
 	/* allocates space for teh new event to be inserted into
 	the epoll polling system (this is an internal kernel structure) */
 	struct epoll_event _event;
@@ -134,18 +138,46 @@ ERROR_CODE register_connection_polling_epoll(struct polling_t *polling, struct c
 	and then inserts the event request into the epoll fd */
 	_event.events = EPOLLIN | EPOLLOUT | EPOLLET;
 	_event.data.ptr = (void *) connection;
-	epoll_ctl(polling_epoll->epoll_fd, EPOLL_CTL_ADD, connection->socket_handle, &_event);
+	result_code = epoll_ctl(polling_epoll->epoll_fd, EPOLL_CTL_ADD, connection->socket_handle, &_event);
 	
+	/* in case there was an error in epoll */
+	if(SOCKET_TEST_ERROR(result_code)) {
+		/* retrieves the select error code */
+        SOCKET_ERROR_CODE epoll_error_code = SOCKET_GET_ERROR_CODE(socket_result);
+
+        /* prints an info message */
+        V_INFO_F("Problem registering connection epoll: %d\n", select_error_code);
+
+        /* raises an error */
+        RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem registering connection epoll");
+	}
+
 	/* raises no error */
     RAISE_NO_ERROR;
 }
 
 ERROR_CODE unregister_connection_polling_epoll(struct polling_t *polling, struct connection_t *connection)  {
+	/* allocates space for the result of the poll call
+	to add a new element to the poll structure */
+	SOCKET_ERROR_CODE result_code;
+
     /* retrieves the polling epoll structure from the upper
 	polling control structure */
     struct polling_epoll_t *polling_epoll = (struct polling_epoll_t *) polling->lower;
 
 	epoll_ctl(polling_epoll->epoll_fd, EPOLL_CTL_DEL, connection->socket_handle, NULL);
+
+	/* in case there was an error in epoll */
+	if(SOCKET_TEST_ERROR(result_code)) {
+		/* retrieves the select error code */
+        SOCKET_ERROR_CODE epoll_error_code = SOCKET_GET_ERROR_CODE(socket_result);
+
+        /* prints an info message */
+        V_INFO_F("Problem unregistering connection epoll: %d\n", select_error_code);
+
+        /* raises an error */
+        RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem unregistering connection epoll");
+	}
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -162,7 +194,7 @@ ERROR_CODE unregister_write_polling_epoll(struct polling_t *polling, struct conn
 }
 
 ERROR_CODE poll_polling_epoll(struct polling_t *polling) {
-	struct epoll_event *events;
+	struct epoll_event events[64];
 	struct epoll_event *_event;
 	int event_count;
 	int index;
@@ -191,9 +223,6 @@ ERROR_CODE poll_polling_epoll(struct polling_t *polling) {
 	/* TODO: se isto funcionar ten ho de tentar c
 	om memoria estatica
 	events[64] */
-
-	events = calloc(64, sizeof(struct epoll_event));
-
 
     /* prints a debug message */
     V_DEBUG("Entering epoll statement\n");
