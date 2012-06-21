@@ -436,7 +436,7 @@ ERROR_CODE _call_polling_select(struct polling_select_t *polling_select, struct 
             V_DEBUG("Calling on read handler\n");
 
             /* calls the on read handler */
-            current_connection->on_read(current_connection);
+            CALL_V(current_connection->on_read, current_connection);
 
             /* prints a debug message */
             V_DEBUG("Finished calling on read handler\n");
@@ -450,7 +450,7 @@ ERROR_CODE _call_polling_select(struct polling_select_t *polling_select, struct 
             V_DEBUG("Calling on handshake handler\n");
 
             /* calls the on read handler */
-            current_connection->on_handshake(current_connection);
+            CALL_V(current_connection->on_handshake, current_connection);
 
             /* prints a debug message */
             V_DEBUG("Finished calling on read handler\n");
@@ -480,7 +480,7 @@ ERROR_CODE _call_polling_select(struct polling_select_t *polling_select, struct 
             V_DEBUG("Calling on write handler\n");
 
             /* calls the on write handler */
-            current_connection->on_write(current_connection);
+            CALL_V(current_connection->on_write, current_connection);
 
             /* prints a debug message */
             V_DEBUG("Finished calling on write handler\n");
@@ -510,7 +510,7 @@ ERROR_CODE _call_polling_select(struct polling_select_t *polling_select, struct 
             V_DEBUG("Calling on error handler\n");
 
             /* calls the on error handler */
-            current_connection->on_error(current_connection);
+            CALL_V(current_connection->on_error, current_connection);
 
             /* prints a debug message */
             V_DEBUG("Finished calling on error handler\n");

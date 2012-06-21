@@ -27,7 +27,7 @@
 
 #include "stdafx.h"
 
-/*#ifdef VIRIATUM_EPOLL*/
+#ifdef VIRIATUM_EPOLL
 
 #include "polling_epoll.h"
 
@@ -339,8 +339,10 @@ ERROR_CODE _call_polling_epoll(struct polling_epoll_t *polling_epoll, struct con
             /* prints a debug message */
             V_DEBUG("Calling on read handler\n");
 
+			printf("vai chamar read handler %d\n", current_connection->on_read);
+
             /* calls the on read handler */
-            current_connection->on_read(current_connection);
+            CALL_V(current_connection->on_read, current_connection);
 
             /* prints a debug message */
             V_DEBUG("Finished calling on read handler\n");
@@ -353,8 +355,10 @@ ERROR_CODE _call_polling_epoll(struct polling_epoll_t *polling_epoll, struct con
             /* prints a debug message */
             V_DEBUG("Calling on handshake handler\n");
 
+			printf("vai chamar handshake handler %d\n", current_connection->on_handshake);
+
             /* calls the on read handler */
-            current_connection->on_handshake(current_connection);
+            CALL_V(current_connection->on_handshake, current_connection);
 
             /* prints a debug message */
             V_DEBUG("Finished calling on read handler\n");
@@ -384,7 +388,7 @@ ERROR_CODE _call_polling_epoll(struct polling_epoll_t *polling_epoll, struct con
             V_DEBUG("Calling on write handler\n");
 
             /* calls the on write handler */
-            current_connection->on_write(current_connection);
+            CALL_V(current_connection->on_write, current_connection);
 
             /* prints a debug message */
             V_DEBUG("Finished calling on write handler\n");
@@ -414,7 +418,7 @@ ERROR_CODE _call_polling_epoll(struct polling_epoll_t *polling_epoll, struct con
             V_DEBUG("Calling on error handler\n");
 
             /* calls the on error handler */
-            current_connection->on_error(current_connection);
+            CALL_V(current_connection->on_error, current_connection);
 
             /* prints a debug message */
             V_DEBUG("Finished calling on error handler\n");
@@ -440,4 +444,4 @@ ERROR_CODE _call_polling_epoll(struct polling_epoll_t *polling_epoll, struct con
     RAISE_NO_ERROR;
 }
 
-/*#endif*/
+#endif
