@@ -133,7 +133,7 @@ ERROR_CODE register_connection_polling_epoll(struct polling_t *polling, struct c
 	polling control structure */
     struct polling_epoll_t *polling_epoll = (struct polling_epoll_t *) polling->lower;
 
-	printf("!!!!Inserido %d!!!!!\n", connection);
+	printf("!!!!Inserido %d!!!!!\n", connection->socket_handle);
 
 	/* populates the event structure with the appropriate
 	structures in order to register for the right events 
