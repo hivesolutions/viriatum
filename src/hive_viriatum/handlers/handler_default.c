@@ -37,7 +37,8 @@ ERROR_CODE register_handler_default(struct service_t *service) {
     service->create_http_handler(service, &http_handler, (unsigned char *) "default");
 
     /* sets the http handler attributes */
-    http_handler->set = set_handler_default;
+    http_handler->resolve_index = 0;
+	http_handler->set = set_handler_default;
     http_handler->unset = unset_handler_default;
     http_handler->reset = NULL;
 
@@ -191,6 +192,11 @@ ERROR_CODE message_complete_callback_handler_default(struct http_parser_t *http_
     RAISE_NO_ERROR;
 }
 
+ERROR_CODE path_callback_handler_default(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+    /* raise no error */
+    RAISE_NO_ERROR;
+}
+
 ERROR_CODE location_callback_handler_default(struct http_parser_t *http_parser, size_t index, size_t offset) {
     /* raise no error */
     RAISE_NO_ERROR;
@@ -222,6 +228,7 @@ ERROR_CODE _set_http_settings_handler_default(struct http_settings_t *http_setti
     http_settings->on_headers_complete = headers_complete_callback_handler_default;
     http_settings->on_body = body_callback_handler_default;
     http_settings->on_message_complete = message_complete_callback_handler_default;
+	http_settings->on_path = path_callback_handler_default;
     http_settings->on_location = location_callback_handler_default;
     http_settings->on_virtual_url = virtual_url_callback_handler_default;
 
@@ -238,6 +245,7 @@ ERROR_CODE _unset_http_settings_handler_default(struct http_settings_t *http_set
     http_settings->on_headers_complete = NULL;
     http_settings->on_body = NULL;
     http_settings->on_message_complete = NULL;
+	http_settings->on_path = NULL;
     http_settings->on_location = NULL;
     http_settings->on_virtual_url = NULL;
 
