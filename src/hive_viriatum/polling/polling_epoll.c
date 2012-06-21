@@ -188,8 +188,13 @@ ERROR_CODE poll_polling_epoll(struct polling_t *polling) {
         &polling_epoll->error_connections_size
     )*/
 
-	/* TODO: se isto funcionar ten ho de tentar com memoria estatica
+	/* TODO: se isto funcionar ten ho de tentar c
+	om memoria estatica
 	events[64] */
+
+    /* prints a debug message */
+    V_DEBUG("Entering epoll statement\n");
+
 	event_count = epoll_wait(polling_epoll->epoll_fd, events, 64, -1);
 
 	for(index = 0; index < event_count; index++) {
