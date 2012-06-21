@@ -231,5 +231,4 @@ ERROR_CODE _unset_http_settings_handler_module(struct http_settings_t *http_sett
 ERROR_CODE _message_begin_callback_handler_module(struct http_parser_t *http_parser);
 ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser);
 ERROR_CODE _send_response_callback_handler_module(struct connection_t *connection, struct data_t *data, void *parameters);
-ERROR_CODE _write_error_connection(struct http_parser_t *http_parser, char *message);
 ERROR_CODE _update_request(struct handler_php_context_t *handler_php_context);
