@@ -175,9 +175,6 @@ ERROR_CODE register_write_polling_epoll(struct polling_t *polling, struct connec
 }
 
 ERROR_CODE unregister_write_polling_epoll(struct polling_t *polling, struct connection_t *connection)  {
-	printf("fez unregister write\n");
-
-
     /* raises no error */
     RAISE_NO_ERROR;
 }
