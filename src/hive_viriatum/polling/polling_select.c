@@ -398,13 +398,10 @@ ERROR_CODE _poll_polling_select(struct polling_select_t *polling_select, struct 
         V_DEBUG_F("Extraordinary select file descriptors not found: %d\n", select_count);
     }
 
-    /* sets the read index in the read connections size */
+    /* updates the various operation counters for the three
+	operation to be "polled" (this is done by reference) */
     *read_connections_size = read_index;
-
-    /* sets the write index in the write connections size */
     *write_connections_size = write_index;
-
-    /* sets the error index in the error connections size */
     *error_connections_size = error_index;
 
     /* raises no error */
