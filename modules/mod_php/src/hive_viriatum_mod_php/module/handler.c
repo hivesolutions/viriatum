@@ -192,7 +192,7 @@ ERROR_CODE url_callback_handler_module(struct http_parser_t *http_parser, const 
     handler_php_context->query[query_size] = '\0';
 
     /* copies the url to the url reference in the handler file context then
-    creates the file path from using the base viriatum path */
+    creates the file path using the base viriatum path */
     memcpy(handler_php_context->url, data, data_size);
     handler_php_context->url[data_size] = '\0';
     SPRINTF(
@@ -364,7 +364,7 @@ ERROR_CODE path_callback_handler_module(struct http_parser_t *http_parser, const
     handler_php_context->file_name[data_size] = '\0';
     normalize_path((char *) handler_php_context->file_name);
 
-    /* creates the file path from using the base viriatum path and
+    /* creates the file path using the base viriatum path and
     then normalizes it into the default representation */
     SPRINTF(
         (char *) handler_php_context->file_path,
