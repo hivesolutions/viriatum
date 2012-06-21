@@ -245,11 +245,11 @@ void delete_configuration(struct sort_map_t *configuration, int is_top) {
 ERROR_CODE load_specifications(struct service_t *service) {
     /* sets the basic specification values from the global
     wide contsnt values */
-    service->version = VIRIATUM_VERSION;
-    service->platform = VIRIATUM_PLATFORM_COMPLETE;
-    service->flags = VIRIATUM_FLAGS;
-    service->compiler = VIRIATUM_COMPILER;
-    service->compilation_date = VIRIATUM_COMPILATION_DATE;
+    service->version = (unsigned char *) VIRIATUM_VERSION;
+    service->platform = (unsigned char *) VIRIATUM_PLATFORM_COMPLETE;
+    service->flags = (unsigned char *) VIRIATUM_FLAGS;
+    service->compiler = (unsigned char *) VIRIATUM_COMPILER;
+    service->compilation_date = (unsigned char *) VIRIATUM_COMPILATION_DATE;
 
     /* "compiles" the various specification values into the
     the description value present in the service */
