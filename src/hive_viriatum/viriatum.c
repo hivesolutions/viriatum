@@ -178,6 +178,7 @@ void version() { V_PRINT_F("%s - %s (%s, %s)\n", VIRIATUM_NAME, VIRIATUM_VERSION
 
 #ifdef VIRIATUM_PLATFORM_WIN32
 void daemonize() { }
+void daemonclean() { }
 #endif
 
 #ifdef VIRIATUM_PLATFORM_UNIX
@@ -247,6 +248,12 @@ void daemonize() {
     daemon process (not going to output them) */
     close(STDIN_FILENO);
 }
+void daemonclean() {
+    /* removes the viriatum pid path, so that the daemon
+    watching tool are notified that the process is no
+    longer running in the current environment */
+    remove(VIRIATUM_PID_PATH);
+}
 #endif
 
 #ifdef VIRIATUM_PLATFORM_WIN32
@@ -296,14 +303,24 @@ void execute_arguments(struct hash_map_t *arguments) {
     if(value != NULL) { localize(); }
 }
 
-void cleanup() {
+void cleanup(struct hash_map_t *arguments) {
+    /* allocates space for the possible argument
+    to be executed from the arguments map */
+    void *value;
+
     /* prints a debug message */
     V_DEBUG("Cleaning the process information\n");
 
-    /* removes the viriatum pid path, so that the daemon
-    watching tool are notified that the process is no
-    longer running in the current environment */
-    remove(VIRIATUM_PID_PATH);
+	/* in case no arguments map is provided must return
+	immediately nothing left to be processed */
+	if(arguments == NULL) { return; }
+
+	/* tries to retrieve the daemon argument from the
+    arguments map in case the value is set daemonclean
+    the current process so that no structures remaining
+	from the daemon process are left */
+    get_value_string_hash_map(arguments, (unsigned char *) "daemon", &value);
+	if(value != NULL) { daemonclean(); }
 }
 
 #ifndef VIRIATUM_PLATFORM_IPHONE
@@ -324,7 +341,7 @@ int main(int argc, char *argv[]) {
 
     /* in case the number of arguments is less than one
     (exception case) returns in error */
-    if(argc < 1) { cleanup(); return -1; }
+    if(argc < 1) { cleanup(NULL); return -1; }
 
     /* retrieves the first argument value as the name
     of the process (program) to be executed */
@@ -350,7 +367,7 @@ int main(int argc, char *argv[]) {
     /* cleans the current process information so that
     no remaining structure or resource is left in an
     invalid or erroneous state */
-    cleanup();
+    cleanup(arguments);
 
     /* prints a debug message */
     V_DEBUG("Finishing process\n");
