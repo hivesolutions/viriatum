@@ -169,7 +169,7 @@ ERROR_CODE unregister_connection_polling_epoll(struct polling_t *polling, struct
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE register_connection_polling_epoll(struct polling_t *polling, struct connection_t *connection) {
+ERROR_CODE register_write_polling_epoll(struct polling_t *polling, struct connection_t *connection) {
 	/* allocates space for teh new event to be inserted into
 	the epoll polling system (this is an internal kernel structure) */
 	struct epoll_event _event;
