@@ -221,7 +221,7 @@ ERROR_CODE read_handler_stream_io(struct connection_t *connection) {
     SOCKET_ERROR_CODE number_bytes;
 
     /* allocates the "simple" buffer */
-    unsigned char buffer[10240];
+    unsigned char buffer[102400];
 
     /* retrieves the buffer pointer */
     unsigned char *buffer_pointer = (unsigned char *) buffer;
@@ -240,9 +240,7 @@ ERROR_CODE read_handler_stream_io(struct connection_t *connection) {
         /* in case the buffer size is so big that may
         overflow the current allocated buffer, must
 		break the loop to avoid corruption */
-        if(buffer_size + 1024 > 10240) { 
-			printf("ESTE E O CASO !!!!!\n");
-		}
+        if(buffer_size + 1024 > 102400) { break; }
 
         /* receives from the connection socket (takes into account the type
         of socket in use) should be able to take care of secure connections */
