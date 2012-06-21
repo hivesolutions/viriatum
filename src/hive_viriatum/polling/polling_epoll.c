@@ -206,7 +206,7 @@ ERROR_CODE poll_polling_epoll(struct polling_t *polling) {
 	event_count = epoll_wait(polling_epoll->epoll_fd, events, 64, -1);
 	for(index = 0; index < event_count; index++) {
         _event = &events[index];
-		get_value_hash_map(polling_epoll->connections, _event.data.fd, NULL, (void **) &connection)
+		get_value_hash_map(polling_epoll->connections, _event->data.fd, NULL, (void **) &connection);
 
 		if(_event->events & EPOLLIN) {
             /* sets the current connection in the read connections
