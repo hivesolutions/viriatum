@@ -27,7 +27,7 @@
 
 #include "stdafx.h"
 
-#ifdef VIRIATUM_EPOLL
+//#ifdef VIRIATUM_EPOLL
 
 #include "polling_epoll.h"
 
@@ -141,7 +141,7 @@ ERROR_CODE register_connection_polling_epoll(struct polling_t *polling, struct c
 	/* populates the event structure with the appropriate
 	structures in order to register for the right events 
 	and then inserts the event request into the epoll fd */
-	_event.events = EPOLLIN | EPOLLET;
+	_event.events = EPOLLIN | EPOLLOUT | EPOLLET;
     _event.data.fd = connection->socket_handle;
 	epoll_ctl(polling_epoll->epoll_fd, EPOLL_CTL_ADD, connection->socket_handle, &_event);
 	
@@ -170,44 +170,11 @@ ERROR_CODE unregister_connection_polling_epoll(struct polling_t *polling, struct
 }
 
 ERROR_CODE register_write_polling_epoll(struct polling_t *polling, struct connection_t *connection) {
-	/* allocates space for teh new event to be inserted into
-	the epoll polling system (this is an internal kernel structure) */
-	struct epoll_event _event;
-
-    /* retrieves the polling epoll structure from the upper
-	polling control structure */
-    struct polling_epoll_t *polling_epoll = (struct polling_epoll_t *) polling->lower;
-
-	/* populates the event structure with the appropriate
-	structures in order to register for the right events 
-	and then inserts the event request into the epoll fd */
-	_event.events = EPOLLOUT | EPOLLET;
-    _event.data.fd = connection->socket_handle;
-	epoll_ctl(polling_epoll->epoll_fd, EPOLL_CTL_ADD, connection->socket_handle, &_event);
-	
-	/* sets the connection value in the hash map this should
-	be able to provide a file descriptor to connection association */
-	set_value_hash_map(polling_epoll->connections, connection->socket_handle, NULL, (void *) connection);
-
 	/* raises no error */
     RAISE_NO_ERROR;
 }
 
 ERROR_CODE unregister_write_polling_epoll(struct polling_t *polling, struct connection_t *connection)  {
-    /* retrieves the polling epoll structure from the upper
-	polling control structure */
-    struct polling_epoll_t *polling_epoll = (struct polling_epoll_t *) polling->lower;
-
-
-	/*   !!!! PENDING IMPLEMENTATION    !!!!!! */
-
-	/* unsets the connection value from the hash map this should
-	be able to remove the file descriptor connection association */
-
-	/* TENHO DE TER CUIDADO COM ISTO ELE AINDA PODE ESTAR LA  VER read / write relations*/
-
-	/*set_value_hash_map(polling_epoll->connections, connection->socket_handle, NULL, NULL);*/
-
     /* raises no error */
     RAISE_NO_ERROR;
 }
@@ -444,4 +411,4 @@ ERROR_CODE _call_polling_epoll(struct polling_epoll_t *polling_epoll, struct con
     RAISE_NO_ERROR;
 }
 
-#endif
+//#endif
