@@ -196,13 +196,13 @@ ERROR_CODE url_callback_handler_module(struct http_parser_t *http_parser, const 
     memcpy(handler_php_context->url, data, data_size);
     handler_php_context->url[data_size] = '\0';
     SPRINTF(
-		(char *) handler_php_context->file_path,
-		VIRIATUM_MAX_PATH_SIZE,
-		"%s%s%s",
-		VIRIATUM_CONTENTS_PATH,
-		VIRIATUM_BASE_PATH,
-		handler_php_context->file_name
-	);
+        (char *) handler_php_context->file_path,
+        VIRIATUM_MAX_PATH_SIZE,
+        "%s%s%s",
+        VIRIATUM_CONTENTS_PATH,
+        VIRIATUM_BASE_PATH,
+        handler_php_context->file_name
+    );
     normalize_path((char *) handler_php_context->file_path);
 
     /* populates the various generated strings, avoids possible recalculation
@@ -364,16 +364,16 @@ ERROR_CODE path_callback_handler_module(struct http_parser_t *http_parser, const
     handler_php_context->file_name[data_size] = '\0';
     normalize_path((char *) handler_php_context->file_name);
 
-	/* creates the file path from using the base viriatum path and
-	then normalizes it into the default representation */
+    /* creates the file path from using the base viriatum path and
+    then normalizes it into the default representation */
     SPRINTF(
-		(char *) handler_php_context->file_path,
-		VIRIATUM_MAX_PATH_SIZE,
-		"%s%s%s",
-		VIRIATUM_CONTENTS_PATH,
-		VIRIATUM_BASE_PATH,
-		handler_php_context->file_name
-	);
+        (char *) handler_php_context->file_path,
+        VIRIATUM_MAX_PATH_SIZE,
+        "%s%s%s",
+        VIRIATUM_CONTENTS_PATH,
+        VIRIATUM_BASE_PATH,
+        handler_php_context->file_name
+    );
     normalize_path((char *) handler_php_context->file_path);
 
     /* populates the various generated strings, avoids possible recalculation
@@ -429,7 +429,7 @@ ERROR_CODE _set_http_settings_handler_module(struct http_settings_t *http_settin
     http_settings->on_headers_complete = headers_complete_callback_handler_module;
     http_settings->on_body = body_callback_handler_module;
     http_settings->on_message_complete = message_complete_callback_handler_module;
-	http_settings->on_path = path_callback_handler_module;
+    http_settings->on_path = path_callback_handler_module;
     http_settings->on_location = location_callback_handler_module;
     http_settings->on_virtual_url = virtual_url_callback_handler_module;
 
@@ -446,7 +446,7 @@ ERROR_CODE _unset_http_settings_handler_module(struct http_settings_t *http_sett
     http_settings->on_headers_complete = NULL;
     http_settings->on_body = NULL;
     http_settings->on_message_complete = NULL;
-	http_settings->on_path = NULL;
+    http_settings->on_path = NULL;
     http_settings->on_location = NULL;
     http_settings->on_virtual_url = NULL;
 

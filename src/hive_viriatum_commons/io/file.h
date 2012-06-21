@@ -192,41 +192,41 @@ VIRIATUM_EXPORT_PREFIX ERROR_CODE join_path_file(char *base_path, char *name, ch
 VIRIATUM_EXPORT_PREFIX int _entry_compare_file(void *first, void *second);
 
 static __inline char *validate_file(char *base_path, char *buffer, size_t count, size_t size) {
-	/* allocates space for the valid flag and for the
-	internal index counter */
-	char valid;
-	size_t index;
+    /* allocates space for the valid flag and for the
+    internal index counter */
+    char valid;
+    size_t index;
 
-	/* allocates space for the temporary file path to
-	be used for access verification */
-	char file_path[VIRIATUM_MAX_PATH_SIZE];
+    /* allocates space for the temporary file path to
+    be used for access verification */
+    char file_path[VIRIATUM_MAX_PATH_SIZE];
 
-	/* iterate over the range of element in the buffer
-	to be verified */
-	for(index = 0; index < count; index++) {
-		/* creates the complete file path using the
-		current buffer pointer value (current file
-		path for validation) */
-		SPRINTF(
-			file_path,
-			VIRIATUM_MAX_PATH_SIZE,
-			"%s/%s",
-			base_path,
-			buffer
-		);
+    /* iterate over the range of element in the buffer
+    to be verified */
+    for(index = 0; index < count; index++) {
+        /* creates the complete file path using the
+        current buffer pointer value (current file
+        path for validation) */
+        SPRINTF(
+            file_path,
+            VIRIATUM_MAX_PATH_SIZE,
+            "%s/%s",
+            base_path,
+            buffer
+        );
 
-		/* checks if the created file path really exists
-		and in case it does returns immediately with the
+        /* checks if the created file path really exists
+        and in case it does returns immediately with the
         the buffer pointer value (value in verification) */
-		valid = ACCESS(file_path, F_OK) == 0;
-		if(valid) { return buffer; }
+        valid = ACCESS(file_path, F_OK) == 0;
+        if(valid) { return buffer; }
 
-		/* increments the buffer pointer with the size of
-		one element in the buffer (iteration increment) */
-		buffer += size;
-	}
+        /* increments the buffer pointer with the size of
+        one element in the buffer (iteration increment) */
+        buffer += size;
+    }
 
-	/* returns an invalid pointer because it was not possible
-	to find any valid file path in the provided buffer */
+    /* returns an invalid pointer because it was not possible
+    to find any valid file path in the provided buffer */
     return NULL;
 }

@@ -81,7 +81,7 @@ ERROR_CODE register_handler_file(struct service_t *service) {
 
     /* sets the http handler attributes */
     http_handler->resolve_index = 1;
-	http_handler->set = set_handler_file;
+    http_handler->set = set_handler_file;
     http_handler->unset = unset_handler_file;
     http_handler->reset = reset_handler_file;
 
@@ -143,13 +143,13 @@ ERROR_CODE message_begin_callback_handler_file(struct http_parser_t *http_parser
 
 ERROR_CODE url_callback_handler_file(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
     /* allocates the required space for the url and base paht
-	this is done through static allocation */
+    this is done through static allocation */
     unsigned char url[VIRIATUM_MAX_URL_SIZE];
-	unsigned char base_path[VIRIATUM_MAX_PATH_SIZE];
+    unsigned char base_path[VIRIATUM_MAX_PATH_SIZE];
 
-	/* initializes the index file path pointer to the
-	original invalid value */
-	char *index = NULL;
+    /* initializes the index file path pointer to the
+    original invalid value */
+    char *index = NULL;
 
     /* retrieves the handler file context from the http parser */
     struct handler_file_context_t *handler_file_context = (struct handler_file_context_t *) http_parser->context;
@@ -177,46 +177,46 @@ ERROR_CODE url_callback_handler_file(struct http_parser_t *http_parser, const un
     /* in case the string refers the base path (default handler must be used)
     the selection of the index file as default is conditioned by the default
     index configuration option */
-	if(options->default_index && (path_size == 0 || url[path_size - 1] == '/')) {
-        /* creates the base path from the viriatum contents path 
-		and the current provided url and then runs the file existence
-		validation process using the index array provided */
+    if(options->default_index && (path_size == 0 || url[path_size - 1] == '/')) {
+        /* creates the base path from the viriatum contents path
+        and the current provided url and then runs the file existence
+        validation process using the index array provided */
         SPRINTF((char *) base_path, VIRIATUM_MAX_PATH_SIZE, "%s%s", VIRIATUM_CONTENTS_PATH, url);
-		index = validate_file((char *) base_path, (char *) options->index, 32, 128);
+        index = validate_file((char *) base_path, (char *) options->index, 32, 128);
     }
 
     /* copies the url to the url reference in the handler file context */
     memcpy(handler_file_context->url, url, data_size + 1);
 
-	/* in case the index file "was not found" must handle the request
-	file path "normally" (simple construction) */
-	if(index == NULL) {
-		/* creates the file path from using the base viriatum path
-		this should be the complete absolute path */
-		SPRINTF(
-			(char *) handler_file_context->file_path,
-			VIRIATUM_MAX_PATH_SIZE,
-			"%s%s%s",
-			VIRIATUM_CONTENTS_PATH,
-			VIRIATUM_BASE_PATH,
-			url
-		);
-	}
-	/* otherwise must use the "resolved" index file path to create
-	the "final" file path to be read */
-	else {
-		/* creates the file path from using the base viriatum path
-		this should be the complete absolute path */
-		SPRINTF(
-			(char *) handler_file_context->file_path,
-			VIRIATUM_MAX_PATH_SIZE,
-			"%s%s%s%s",
-			VIRIATUM_CONTENTS_PATH,
-			VIRIATUM_BASE_PATH,
-			url,
-			index
-		);
-	}
+    /* in case the index file "was not found" must handle the request
+    file path "normally" (simple construction) */
+    if(index == NULL) {
+        /* creates the file path from using the base viriatum path
+        this should be the complete absolute path */
+        SPRINTF(
+            (char *) handler_file_context->file_path,
+            VIRIATUM_MAX_PATH_SIZE,
+            "%s%s%s",
+            VIRIATUM_CONTENTS_PATH,
+            VIRIATUM_BASE_PATH,
+            url
+        );
+    }
+    /* otherwise must use the "resolved" index file path to create
+    the "final" file path to be read */
+    else {
+        /* creates the file path from using the base viriatum path
+        this should be the complete absolute path */
+        SPRINTF(
+            (char *) handler_file_context->file_path,
+            VIRIATUM_MAX_PATH_SIZE,
+            "%s%s%s%s",
+            VIRIATUM_CONTENTS_PATH,
+            VIRIATUM_BASE_PATH,
+            url,
+            index
+        );
+    }
 
     /* raise no error */
     RAISE_NO_ERROR;
@@ -634,7 +634,7 @@ ERROR_CODE _set_http_settings_handler_file(struct http_settings_t *http_settings
     http_settings->on_headers_complete = headers_complete_callback_handler_file;
     http_settings->on_body = body_callback_handler_file;
     http_settings->on_message_complete = message_complete_callback_handler_file;
-	http_settings->on_path = path_callback_handler_file;
+    http_settings->on_path = path_callback_handler_file;
     http_settings->on_location = location_callback_handler_file;
     http_settings->on_virtual_url = virtual_url_callback_handler_file;
 
@@ -651,7 +651,7 @@ ERROR_CODE _unset_http_settings_handler_file(struct http_settings_t *http_settin
     http_settings->on_headers_complete = NULL;
     http_settings->on_body = NULL;
     http_settings->on_message_complete = NULL;
-	http_settings->on_path = NULL;
+    http_settings->on_path = NULL;
     http_settings->on_location = NULL;
     http_settings->on_virtual_url = NULL;
 
