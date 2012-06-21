@@ -143,7 +143,6 @@ ERROR_CODE register_connection_polling_epoll(struct polling_t *polling, struct c
 	and then inserts the event request into the epoll fd */
 	_event.events = EPOLLIN | EPOLLOUT | EPOLLET;
 	_event.data.ptr = (void *) connection;
-    _event.data.fd = connection->socket_handle;
 	epoll_ctl(polling_epoll->epoll_fd, EPOLL_CTL_ADD, connection->socket_handle, &_event);
 	
 	/* sets the connection value in the hash map this should
