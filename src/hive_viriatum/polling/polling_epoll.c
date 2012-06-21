@@ -161,7 +161,7 @@ ERROR_CODE poll_polling_epoll(struct polling_t *polling) {
 
 	/* TODO: se isto funcionar ten ho de tentar com memoria estatica
 	events[64] */
-	events = calloc(64, sizeofevent(struct epoll_event));
+	events = calloc(64, sizeof(struct epoll_event));
 
 	event_count = epoll_wait(polling_epoll->epoll_fd, events, 64, -1);
 	for(index = 0; index < event_count; index++) {
