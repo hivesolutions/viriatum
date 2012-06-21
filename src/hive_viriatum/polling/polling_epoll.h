@@ -26,3 +26,27 @@
 */
 
 #pragma once
+
+#include "../system/system.h"
+
+typedef struct polling_epoll_t {
+    /**
+     * The polling reference, for top
+     * level reference.
+     */
+    struct polling_t *polling;
+
+    int epoll_fd;
+} polling_epoll;
+
+void create_polling_epoll(struct polling_epoll_t **polling_epoll_pointer, struct polling_t *polling);
+void delete_polling_epoll(struct polling_epoll_t *polling_epoll);
+ERROR_CODE open_polling_epoll(struct polling_t *polling);
+ERROR_CODE close_polling_epoll(struct polling_t *polling);
+
+
+ERROR_CODE register_connection_polling_epoll(struct polling_t *polling, struct connection_t *connection);
+ERROR_CODE unregister_connection_polling_epoll(struct polling_t *polling, struct connection_t *connection);
+ERROR_CODE register_write_polling_epoll(struct polling_t *polling, struct connection_t *connection);
+ERROR_CODE unregister_write_polling_epoll(struct polling_t *polling, struct connection_t *connection);
+
