@@ -38,6 +38,7 @@ ERROR_CODE create_http_handler(struct http_handler_t **http_handler_pointer, uns
 
     /* sets the http handler attributes (default) values */
     http_handler->name = name;
+	http_handler->resolve_index = 0;
     http_handler->set = NULL;
     http_handler->unset = NULL;
     http_handler->reset = NULL;

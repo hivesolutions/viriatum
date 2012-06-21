@@ -80,9 +80,33 @@ typedef struct http_handler_t {
      */
     unsigned char *name;
 
+	/**
+	 * If the index path should be automatically
+	 * "resolved" by external handlers or any other
+	 * associated object.
+	 */
+	char resolve_index;
+
+	/**
+	 * Callback method called uppon setting
+	 * the current handler in the provided
+	 * connection object.
+	 */
     http_connection_update set;
+
+	/**
+	 * Callback method called uppon unsetting
+	 * the current handler from the provided
+	 * connection object.
+	 */
     http_connection_update unset;
-    http_connection_update reset;
+
+	/**
+	 * Callback method called uppon resetting
+	 * the current handler from the provided
+	 * connection object.
+	 */
+	http_connection_update reset;
 
     /**
      * The reference to the service that "owns"
