@@ -198,9 +198,10 @@ ERROR_CODE url_callback_handler_dispatch(struct http_parser_t *http_parser, cons
     used for the dispatching operation (target handler) */
     unsigned char *handler_name;
 
-    /* allocates the required space for the path, this
-    is done through static allocation */
+    /* allocates the required space for the path and the
+	base path, this is done through static allocation */
     unsigned char path[VIRIATUM_MAX_URL_SIZE];
+	unsigned char base_path[VIRIATUM_MAX_URL_SIZE];
 
     /* retrieves the various connection elements and lower substrates
     fomr the parser parameters and then uses them to retrieves the handler
