@@ -308,7 +308,13 @@ ERROR_CODE open_handler_stream_http_client(struct io_connection_t *io_connection
     /* creates the http client connection */
     create_http_client_connection(&http_client_connection, io_connection);
 
-    write_connection(io_connection->connection, (unsigned char *) buffer, strlen(buffer), NULL, NULL);
+    write_connection(
+		io_connection->connection,
+		(unsigned char *) buffer,
+		strlen(buffer),
+		NULL,
+		NULL
+	);
 
     /* raises no error */
     RAISE_NO_ERROR;
