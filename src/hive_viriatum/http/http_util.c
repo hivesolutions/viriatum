@@ -46,7 +46,7 @@ ERROR_CODE write_http_headers(struct service_t *service, char *buffer, size_t si
         status_message,
         keep_alive_codes[keep_alive - 1],
         service->description,
-        close_codes[close]
+        close_codes[(size_t) close]
     );
 
     /* returns the number of bytes written into the buffer */
