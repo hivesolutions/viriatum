@@ -54,9 +54,9 @@ size_t write_http_headers(struct connection_t *connection, char *buffer, size_t 
 }
 
 size_t write_http_headers_c(struct connection_t *connection, char *buffer, size_t size, enum http_version_e version, int status_code, char *status_message, enum http_keep_alive_e keep_alive, size_t content_length, enum http_cache_e cache, int close) {
-	/* writes the header information into the buffer using the basic
-	function then uses the count offset to determine the buffer position
-	to write the remaining headers for the complete write */
+    /* writes the header information into the buffer using the basic
+    function then uses the count offset to determine the buffer position
+    to write the remaining headers for the complete write */
     size_t count = write_http_headers(
         connection,
         buffer,
@@ -83,9 +83,9 @@ size_t write_http_headers_c(struct connection_t *connection, char *buffer, size_
 }
 
 size_t write_http_headers_m(struct connection_t *connection, char *buffer, size_t size, enum http_version_e version, int status_code, char *status_message, enum http_keep_alive_e keep_alive, size_t content_length, enum http_cache_e cache, char *message) {
-	/* writes the complete set of buffer using the appropriate function and then
-	uses the count offset to copy the contents part of the message into the final
-	part of the buffer (message writing) */
+    /* writes the complete set of buffer using the appropriate function and then
+    uses the count offset to copy the contents part of the message into the final
+    part of the buffer (message writing) */
     size_t count = write_http_headers_c(
         connection,
         buffer,
@@ -108,7 +108,7 @@ ERROR_CODE write_http_message(struct connection_t *connection, char *buffer, siz
     /* allocates the headers buffer (it will be releases automatically by the writter)
     it need to be allocated in the heap so it gets throught the request cycle */
     char *headers_buffer = buffer == NULL ? MALLOC(1024) : buffer;
-	size = size == 0 ? 1024 : size;
+    size = size == 0 ? 1024 : size;
 
     /* writes the http static headers to the response and
     then writes the error description itself */
@@ -127,12 +127,12 @@ ERROR_CODE write_http_message(struct connection_t *connection, char *buffer, siz
 
     /* writes both the headers to the connection, registers for the appropriate callbacks */
     write_connection(
-		connection,
-		(unsigned char *) headers_buffer,
-		(unsigned int) strlen(headers_buffer),
-		(connection_data_callback) callback,
-		callback_parameters
-	);
+        connection,
+        (unsigned char *) headers_buffer,
+        (unsigned int) strlen(headers_buffer),
+        (connection_data_callback) callback,
+        callback_parameters
+    );
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -165,7 +165,7 @@ ERROR_CODE write_http_error(struct connection_t *connection, char *buffer, size_
     /* allocates the headers buffer (it will be releases automatically by the writter)
     it need to be allocated in the heap so it gets throught the request cycle */
     char *headers_buffer = buffer == NULL ? MALLOC(1024) : buffer;
-	size = size == 0 ? 1024 : size;
+    size = size == 0 ? 1024 : size;
 
     /* in case no error description is sent one must be created from the currently
     staticly allocated buffer and then formatted properly */
@@ -174,12 +174,12 @@ ERROR_CODE write_http_error(struct connection_t *connection, char *buffer, size_
         string according to the error code and message */
         error_description = _error_description;
         SPRINTF(
-			error_description,
-			sizeof(_error_description),
-			"%d - %s",
-			error_code,
-			error_message
-		);
+            error_description,
+            sizeof(_error_description),
+            "%d - %s",
+            error_code,
+            error_message
+        );
     }
 
     /* in case the use template flag is set the error
@@ -187,12 +187,12 @@ ERROR_CODE write_http_error(struct connection_t *connection, char *buffer, size_
     if(options->use_template) {
         /* creates the complete path to the template file */
         SPRINTF(
-			(char *) template_path,
-			1024,
-			"%s%s",
-			VIRIATUM_RESOURCES_PATH,
-			VIRIATUM_ERROR_PATH
-		);
+            (char *) template_path,
+            1024,
+            "%s%s",
+            VIRIATUM_RESOURCES_PATH,
+            VIRIATUM_ERROR_PATH
+        );
 
         /* prints a debug message */
         V_DEBUG_F("Processing template file '%s'\n", template_path);
@@ -245,12 +245,12 @@ ERROR_CODE write_http_error(struct connection_t *connection, char *buffer, size_
         /* writes the resulting buffer into the connection in order to be sent
         to the client (sends the template results) in one chunk */
         write_connection(
-			connection,
-			result_buffer,
-			result_length,
-			(connection_data_callback) callback,
-			callback_parameters
-		);
+            connection,
+            result_buffer,
+            result_length,
+            (connection_data_callback) callback,
+            callback_parameters
+        );
     } else {
         /* writes the http static headers to the response and
         then writes the error description itself */
@@ -269,12 +269,12 @@ ERROR_CODE write_http_error(struct connection_t *connection, char *buffer, size_
 
         /* writes both the headers to the connection, registers for the appropriate callbacks */
         write_connection(
-			connection,
-			(unsigned char *) headers_buffer,
-			(unsigned int) strlen(headers_buffer),
-			(connection_data_callback) callback,
-			callback_parameters
-		);
+            connection,
+            (unsigned char *) headers_buffer,
+            (unsigned int) strlen(headers_buffer),
+            (connection_data_callback) callback,
+            callback_parameters
+        );
     }
 
     /* raises no error */

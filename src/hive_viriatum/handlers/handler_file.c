@@ -420,8 +420,8 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
         write_http_error(
             connection,
             headers_buffer,
-			1024,
-			HTTP11,
+            1024,
+            HTTP11,
             404,
             "Not Found",
             error_description,
@@ -450,12 +450,12 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
 
         /* writes both the headers to the connection, registers for the appropriate callbacks */
         write_connection(
-			connection,
-			(unsigned char *) headers_buffer,
-			(unsigned int) strlen(headers_buffer),
-			_cleanup_handler_file,
-			handler_file_context
-		);
+            connection,
+            (unsigned char *) headers_buffer,
+            (unsigned int) strlen(headers_buffer),
+            _cleanup_handler_file,
+            handler_file_context
+        );
     }
     /* in case the current situation is a directory list */
     else if(is_directory) {
@@ -475,12 +475,12 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
 
         /* writes both the headers to the connection, registers for the appropriate callbacks */
         write_connection(
-			connection,
-			(unsigned char *) headers_buffer,
-			(unsigned int) strlen(headers_buffer), 
-			_send_data_handler_file, 
-			handler_file_context
-		);
+            connection,
+            (unsigned char *) headers_buffer,
+            (unsigned int) strlen(headers_buffer),
+            _send_data_handler_file,
+            handler_file_context
+        );
     }
     else if(handler_file_context->etag_status == 2 && strcmp(etag, (char *) handler_file_context->etag) == 0) {
         /* writes the http static headers to the response */
@@ -499,12 +499,12 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
 
         /* writes both the headers to the connection, registers for the appropriate callbacks */
         write_connection(
-			connection,
-			(unsigned char *) headers_buffer,
-			(unsigned int) strlen(headers_buffer),
-			_cleanup_handler_file,
-			handler_file_context
-		);
+            connection,
+            (unsigned char *) headers_buffer,
+            (unsigned int) strlen(headers_buffer),
+            _cleanup_handler_file,
+            handler_file_context
+        );
     }
     /* otherwise there was no error in the file and it's a simple
     file situation (no directory) */
@@ -531,12 +531,12 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
 
         /* writes both the headers to the connection, registers for the appropriate callbacks */
         write_connection(
-			connection, 
-			(unsigned char *) headers_buffer, 
-			strlen(headers_buffer),
-			_send_chunk_handler_file,
-			handler_file_context
-		);
+            connection,
+            (unsigned char *) headers_buffer,
+            strlen(headers_buffer),
+            _send_chunk_handler_file,
+            handler_file_context
+        );
     }
 
     /* raise no error */
@@ -728,12 +728,12 @@ ERROR_CODE _send_chunk_handler_file(struct connection_t *connection, struct data
     if(number_bytes > 0) {
         /* writes both the file buffer to the connection */
         write_connection(
-			connection,
-			file_buffer,
-			number_bytes,
-			_send_chunk_handler_file,
-			handler_file_context
-		);
+            connection,
+            file_buffer,
+            number_bytes,
+            _send_chunk_handler_file,
+            handler_file_context
+        );
     }
     /* otherwise the file "transfer" is complete */
     else {
@@ -776,12 +776,12 @@ ERROR_CODE _send_data_handler_file(struct connection_t *connection, struct data_
         /* writes the (file) data to the connection and sets the handler
         file context as flushed */
         write_connection(
-			connection, 
-			template_handler->string_value,
-			(unsigned int) strlen((char *) template_handler->string_value),
-			_send_data_handler_file,
-			handler_file_context
-		);
+            connection,
+            template_handler->string_value,
+            (unsigned int) strlen((char *) template_handler->string_value),
+            _send_data_handler_file,
+            handler_file_context
+        );
         handler_file_context->flushed = 1;
 
         /* unsets the string value in the template handler (avoids double release) */

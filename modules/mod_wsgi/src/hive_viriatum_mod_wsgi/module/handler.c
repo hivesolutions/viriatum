@@ -503,12 +503,12 @@ ERROR_CODE _send_data_callback(struct connection_t *connection, struct data_t *d
     chunk of data into the connection and return to this same callback
     function to try to write more data */
     connection->write_connection(
-		connection,
-		(unsigned char *) _buffer,
-		buffer_size,
-		_send_data_callback,
-		parameters
-	);
+        connection,
+        (unsigned char *) _buffer,
+        buffer_size,
+        _send_data_callback,
+        parameters
+    );
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -643,7 +643,7 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
     /* allocates space for the header buffer and then writes the default values
     into it the value is dynamicaly contructed based on the current header values */
     connection->alloc_data(connection, 25602, (void **) &headers_buffer);
-	count = http_connection->write_headers(
+    count = http_connection->write_headers(
         connection,
         headers_buffer,
         1024,
@@ -677,12 +677,12 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
     /* writes the response to the connection, this will only write
     the headers the remaining message will be sent on the callback */
     connection->write_connection(
-		connection,
-		(unsigned char *) headers_buffer,
-		(unsigned int) count,
-		_send_data_callback,
-		(void *) handler_wsgi_context
-	);
+        connection,
+        (unsigned char *) headers_buffer,
+        (unsigned int) count,
+        _send_data_callback,
+        (void *) handler_wsgi_context
+    );
 
     /* releases the references on the various resources used in this
     function (memory will be deallocated if necessary) */
