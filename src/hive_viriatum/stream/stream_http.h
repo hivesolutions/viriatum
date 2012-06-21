@@ -56,14 +56,14 @@ typedef ERROR_CODE (*http_connection_update) (struct http_connection_t *http_con
  * in case it's an automated script the name should be used.
  * @param method The uppercased name of the http method used.
  * @param uri The path to the resource refered by the url.
- * @param protocol The version of the http protocol used in
+ * @param version The version of the http protocol used in
  * the request to be loggerd.
  * @param error_code The error (status) code to be sent back to
  * the client in the associated response.
  * @param content_length The size of the content to be sent back
  * as the response.
  */
-typedef ERROR_CODE (*http_connection_log) (char *host, char *identity, char *user, char *method, char *uri, char *protocol, int error_code, size_t content_length);
+typedef ERROR_CODE (*http_connection_log) (char *host, char *identity, char *user, char *method, char *uri, enum http_version_e version, int error_code, size_t content_length);
 
 /**
  * The structure that describes the structure
