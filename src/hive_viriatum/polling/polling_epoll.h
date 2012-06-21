@@ -29,6 +29,8 @@
 
 #include "../system/system.h"
 
+#ifdef VIRIATUM_EPOLL
+
 typedef struct polling_epoll_t {
     /**
      * The polling reference, for top
@@ -39,6 +41,16 @@ typedef struct polling_epoll_t {
     int epoll_fd;
 
 	struct hash_map_t *connections;
+
+    struct connection_t **read_connections;
+    struct connection_t **write_connections;
+    struct connection_t **error_connections;
+    struct connection_t **remove_connections;
+
+    size_t read_connections_size;
+    size_t write_connections_size;
+    size_t error_connections_size;
+    size_t remove_connections_size;
 } polling_epoll;
 
 void create_polling_epoll(struct polling_epoll_t **polling_epoll_pointer, struct polling_t *polling);
@@ -51,3 +63,5 @@ ERROR_CODE register_write_polling_epoll(struct polling_t *polling, struct connec
 ERROR_CODE unregister_write_polling_epoll(struct polling_t *polling, struct connection_t *connection);
 ERROR_CODE poll_polling_epoll(struct polling_t *polling);
 ERROR_CODE call_polling_epoll(struct polling_t *polling);
+
+#endif
