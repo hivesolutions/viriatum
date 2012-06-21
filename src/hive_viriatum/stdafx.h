@@ -55,6 +55,10 @@
 #endif
 #endif
 
+#ifdef HAVE_EPOLL
+#define VIRIATUM_EPOLL
+#endif
+
 #ifdef HAVE_LIBSSL
 #ifdef HAVE_OPENSSL_SSL_H
 #define VIRIATUM_SSL
@@ -76,6 +80,10 @@
 
 #include "global/definitions.h"
 #include "global/common.h"
+
+#ifdef HAVE_EPOLL
+#include <sys/epoll.h>
+#endif
 
 #ifdef VIRIATUM_SSL
 #include <openssl/err.h>
