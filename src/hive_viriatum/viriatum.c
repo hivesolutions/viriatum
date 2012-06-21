@@ -311,16 +311,16 @@ void cleanup(struct hash_map_t *arguments) {
     /* prints a debug message */
     V_DEBUG("Cleaning the process information\n");
 
-	/* in case no arguments map is provided must return
-	immediately nothing left to be processed */
-	if(arguments == NULL) { return; }
+    /* in case no arguments map is provided must return
+    immediately nothing left to be processed */
+    if(arguments == NULL) { return; }
 
-	/* tries to retrieve the daemon argument from the
+    /* tries to retrieve the daemon argument from the
     arguments map in case the value is set daemonclean
     the current process so that no structures remaining
-	from the daemon process are left */
+    from the daemon process are left */
     get_value_string_hash_map(arguments, (unsigned char *) "daemon", &value);
-	if(value != NULL) { daemonclean(); }
+    if(value != NULL) { daemonclean(); }
 }
 
 #ifndef VIRIATUM_PLATFORM_IPHONE
