@@ -312,7 +312,7 @@ ERROR_CODE _write_error_connection(struct http_parser_t *http_parser, char *mess
         500,
         "Internal Server Error",
         message,
-        (void *) _send_response_callback_handler_module,
+        _send_response_callback_handler_module,
 		(void *) (size_t) http_parser->flags
     );
 
