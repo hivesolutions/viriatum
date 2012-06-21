@@ -46,6 +46,7 @@ ERROR_CODE header_value_callback_handler_default(struct http_parser_t *http_pars
 ERROR_CODE headers_complete_callback_handler_default(struct http_parser_t *http_parser);
 ERROR_CODE body_callback_handler_default(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size);
 ERROR_CODE message_complete_callback_handler_default(struct http_parser_t *http_parser);
+ERROR_CODE path_callback_handler_default(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size);
 ERROR_CODE location_callback_handler_default(struct http_parser_t *http_parser, size_t index, size_t offset);
 ERROR_CODE virtual_url_callback_handler_default(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size);
 ERROR_CODE _set_http_parser_handler_default(struct http_parser_t *http_parser);
