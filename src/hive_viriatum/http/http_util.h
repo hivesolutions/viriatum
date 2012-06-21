@@ -33,6 +33,7 @@
 
 /* forward references (avoids loop) */
 struct data_t;
+struct service_t;
 struct connection_t;
 typedef ERROR_CODE (*_connection_data_callback) (struct connection_t *, struct data_t *, void *);
 
