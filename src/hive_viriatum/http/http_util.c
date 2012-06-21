@@ -130,7 +130,7 @@ ERROR_CODE write_http_error(struct connection_t *connection, char *header, int e
         /* sets the proper error description buffer and then formats the
         string according to the error code and message */
         error_description = _error_description;
-        SPRINTF(error_description, 1024, "%s - %s", error_code, error_message);
+        SPRINTF(error_description, 1024, "%d - %s", error_code, error_message);
     }
 
     /* in case the use template flag is set the error
