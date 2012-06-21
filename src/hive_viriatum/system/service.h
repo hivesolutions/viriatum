@@ -261,42 +261,42 @@ typedef struct service_t {
      */
     unsigned char *name;
 
-	/**
-	 * The version number as a string
-	 * for the current service structure.
-	 */
-	unsigned char *version;
+    /**
+     * The version number as a string
+     * for the current service structure.
+     */
+    unsigned char *version;
 
-	/**
-	 * The platform as a string in which
-	 * the current service is running.
-	 */
-	unsigned char *platform;
+    /**
+     * The platform as a string in which
+     * the current service is running.
+     */
+    unsigned char *platform;
 
-	/**
-	 * The abstract compilation flags for
-	 * the current service.
-	 */
-	unsigned char *flags;
+    /**
+     * The abstract compilation flags for
+     * the current service.
+     */
+    unsigned char *flags;
 
-	/**
-	 * The description (string) of the compiler
-	 * used to compile the service structures.
-	 */
-	unsigned char *compiler;
+    /**
+     * The description (string) of the compiler
+     * used to compile the service structures.
+     */
+    unsigned char *compiler;
 
-	/**
-	 * The date (as a string) for the compilation
-	 * of the service internal structures.
-	 */
-	unsigned char *compilation_date;
+    /**
+     * The date (as a string) for the compilation
+     * of the service internal structures.
+     */
+    unsigned char *compilation_date;
 
-	/**
-	 * The string describing the current service
-	 * and its configuration, usefull for a quick
-	 * visual description of the service.
-	 */
-	unsigned char description[1024];
+    /**
+     * The string describing the current service
+     * and its configuration, usefull for a quick
+     * visual description of the service.
+     */
+    unsigned char description[1024];
 
     /**
      * The name (path) to the current program

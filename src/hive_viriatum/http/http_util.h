@@ -43,9 +43,9 @@ typedef ERROR_CODE (*_connection_data_callback) (struct connection_t *, struct d
  * status line printing part of the http message.
  */
 static const char *http_version_codes[3] = {
-	"HTTP/0.9",
-	"HTTP/1.0",
-	"HTTP/1.1"
+    "HTTP/0.9",
+    "HTTP/1.0",
+    "HTTP/1.1"
 };
 
 /**
@@ -53,8 +53,8 @@ static const char *http_version_codes[3] = {
  * various keep alive values.
  */
 static const char *keep_alive_codes[2] = {
-	"close",
-	"keep-alive"
+    "close",
+    "keep-alive"
 };
 
 /**
@@ -62,7 +62,7 @@ static const char *keep_alive_codes[2] = {
  * system values.
  */
 static const char *cache_codes[1] = {
-	"no-cache, must-revalidate"
+    "no-cache, must-revalidate"
 };
 
 /**
@@ -72,8 +72,8 @@ static const char *cache_codes[1] = {
  * the driver index for printing.
  */
 static const char *close_codes[2] = {
-	"",
-	"\r\n"
+    "",
+    "\r\n"
 };
 
 /**

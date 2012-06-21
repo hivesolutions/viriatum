@@ -54,9 +54,9 @@ typedef enum http_header_e {
  * the http protocol.
  */
 typedef enum http_version_e {
-	HTTP09 = 1,
-	HTTP10,
-	HTTP11
+    HTTP09 = 1,
+    HTTP10,
+    HTTP11
 } http_version;
 
 /**
@@ -73,8 +73,8 @@ typedef enum http_request_method_e {
  * keep alive situations (modes).
  */
 typedef enum http_keep_alive_e {
-	KEEP_CLOSE = 1,
-	KEEP_ALIVE
+    KEEP_CLOSE = 1,
+    KEEP_ALIVE
 } http_keep_alive;
 
 /**
@@ -82,7 +82,7 @@ typedef enum http_keep_alive_e {
  * http cache control strategies.
  */
 typedef enum http_cache_e {
-	NO_CACHE = 1
+    NO_CACHE = 1
 } http_cache;
 
 typedef struct http_header_value_t {

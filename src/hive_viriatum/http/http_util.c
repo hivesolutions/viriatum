@@ -30,70 +30,70 @@
 #include "http_util.h"
 
 ERROR_CODE write_http_headers(struct service_t *service, char *buffer, size_t size, enum http_version_e version, int status_code, char *status_message, enum http_keep_alive_e keep_alive, char close) {
-	/* writes the header information into the provided buffer, the writing
-	into this buffer uses the most of static structures possible in order
-	to accelerate the writing speed at the end of the writing the number
-	of written bytes is retrieved as the count value */
-	size_t count = SPRINTF(
+    /* writes the header information into the provided buffer, the writing
+    into this buffer uses the most of static structures possible in order
+    to accelerate the writing speed at the end of the writing the number
+    of written bytes is retrieved as the count value */
+    size_t count = SPRINTF(
         buffer,
         size,
         "%s %d %s\r\n"
         CONNECTION_H ": %s\r\n"
-		SERVER_H ": %s\r\n"
-		"%s",
+        SERVER_H ": %s\r\n"
+        "%s",
         http_version_codes[version - 1],
-		status_code,
+        status_code,
         status_message,
-		keep_alive_codes[keep_alive - 1],
-		service->description,
-		close_codes[close]
+        keep_alive_codes[keep_alive - 1],
+        service->description,
+        close_codes[close]
     );
 
-	/* returns the number of bytes written into the buffer */
-	return count;
+    /* returns the number of bytes written into the buffer */
+    return count;
 }
 
 ERROR_CODE write_http_headers_c(struct service_t *service, char *buffer, size_t size, enum http_version_e version, int status_code, char *status_message, enum http_keep_alive_e keep_alive, size_t content_length, enum http_cache_e cache, int close) {
-	size_t count = write_http_headers(
-		service,
-		buffer,
-		size,
-		version,
-		status_code,
-		status_message,
-		keep_alive,
-		FALSE
-	);
-	count += SPRINTF(
+    size_t count = write_http_headers(
+        service,
+        buffer,
+        size,
+        version,
+        status_code,
+        status_message,
+        keep_alive,
+        FALSE
+    );
+    count += SPRINTF(
         &buffer[count],
         size - count,
-		CONTENT_LENGTH_H ": %lu\r\n"
-		CACHE_CONTROL_H ": %s\r\n"
-		"%s",
-		(long unsigned int) content_length,
-		cache_codes[cache - 1],
-		close_codes[close]
+        CONTENT_LENGTH_H ": %lu\r\n"
+        CACHE_CONTROL_H ": %s\r\n"
+        "%s",
+        (long unsigned int) content_length,
+        cache_codes[cache - 1],
+        close_codes[close]
     );
 
-	return count;
+    return count;
 }
 
 ERROR_CODE write_http_headers_m(struct service_t *service, char *buffer, size_t size, enum http_version_e version, int status_code, char *status_message, enum http_keep_alive_e keep_alive, size_t content_length, enum http_cache_e cache, char *message) {
-	size_t count = write_http_headers_c(
-		service,
-		buffer,
-		size,
-		version,
-		status_code,
-		status_message,
-		keep_alive,
-		content_length,
-		cache,
-		TRUE
-	);
-	memcpy(&buffer[count], message, content_length + 1);
+    size_t count = write_http_headers_c(
+        service,
+        buffer,
+        size,
+        version,
+        status_code,
+        status_message,
+        keep_alive,
+        content_length,
+        cache,
+        TRUE
+    );
+    memcpy(&buffer[count], message, content_length + 1);
 
-	return count;
+    return count;
 }
 
 ERROR_CODE write_http_error(struct connection_t *connection, char *header, int error_code, char *error_message, char *error_description, _connection_data_callback callback, void *callback_parameters) {
@@ -156,18 +156,18 @@ ERROR_CODE write_http_error(struct connection_t *connection, char *header, int e
         /* processes the file as a template handler, at this point
         the output buffer of the template engine should be populated */
         process_template_handler(template_handler, template_path);
-		write_http_headers_c(
-			service,
-			headers_buffer,
-			1024,
-			HTTP11,
-			error_code,
-			error_message,
-			KEEP_ALIVE,
-			strlen((char *) template_handler->string_value),
-			NO_CACHE,
-			TRUE
-		);
+        write_http_headers_c(
+            service,
+            headers_buffer,
+            1024,
+            HTTP11,
+            error_code,
+            error_message,
+            KEEP_ALIVE,
+            strlen((char *) template_handler->string_value),
+            NO_CACHE,
+            TRUE
+        );
 
         /* creates a new string buffer to hold the complete set of contents
         to be sent to the client then first writes the buffer containing
@@ -192,19 +192,19 @@ ERROR_CODE write_http_error(struct connection_t *connection, char *header, int e
         write_connection(connection, result_buffer, result_length, (connection_data_callback) callback, callback_parameters);
     } else {
         /* writes the http static headers to the response and
-		then writes the error description itself */
-		write_http_headers_m(
-			service,
-			headers_buffer,
-			1024,
-			HTTP11,
-			error_code,
-			error_message,
-			KEEP_ALIVE,
-			strlen(error_description),
-			NO_CACHE,
-			error_description
-		);
+        then writes the error description itself */
+        write_http_headers_m(
+            service,
+            headers_buffer,
+            1024,
+            HTTP11,
+            error_code,
+            error_message,
+            KEEP_ALIVE,
+            strlen(error_description),
+            NO_CACHE,
+            error_description
+        );
 
         /* writes both the headers to the connection, registers for the appropriate callbacks */
         write_connection(connection, (unsigned char *) headers_buffer, (unsigned int) strlen(headers_buffer), (connection_data_callback) callback, callback_parameters);

@@ -61,7 +61,7 @@ ERROR_CODE run_service(char *program_name, struct hash_map_t *arguments) {
     /* creates the service and loads the options
     taking into account the arguments */
     create_service(&service, (unsigned char *) VIRIATUM_NAME, (unsigned char *) program_name);
-	load_specifications(service);
+    load_specifications(service);
     load_options_service(service, arguments);
     calculate_options_service(service);
 
