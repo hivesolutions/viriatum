@@ -254,7 +254,7 @@ ERROR_CODE load_specifications(struct service_t *service) {
     /* "compiles" the various specification values into the
     the description value present in the service */
     SPRINTF(
-        service->description,
+        (char *) service->description,
         sizeof(service->description),
         "%s/%s (%s) (%s)",
         service->name,
