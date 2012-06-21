@@ -27,6 +27,14 @@
 
 #pragma once
 
+#define ETAG_H "ETag"
+#define HOST_H "Host"
+#define SERVER_H "Server"
+#define LOCATION_H "Location"
+#define CONNECTION_H "Connection"
+#define CACHE_CONTROL_H "Cache-Control"
+#define CONTENT_LENGTH_H "Content-Length"
+
 /**
  * Enumeration defining the various possible
  * and "recognizable" http header types, this
@@ -40,10 +48,25 @@ typedef enum http_header_e {
     HOST
 } http_header;
 
+typedef enum http_version_e {
+	HTTP09 = 1,
+	HTTP10,
+	HTTP11
+} http_version;
+
 typedef enum http_request_method_e {
     GET_REQUEST_METHOD = 1,
-    POST_REQUEST_METHOD = 1
+    POST_REQUEST_METHOD
 } http_request_method;
+
+typedef enum http_keep_alive_e {
+	KEEP_CLOSE = 1,
+	KEEP_ALIVE
+} http_keep_alive;
+
+typedef enum http_cache_e {
+	NO_CACHE = 1
+} http_cache;
 
 typedef struct http_header_value_t {
     char name[VIRIATUM_MAX_HEADER_SIZE];
