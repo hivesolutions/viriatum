@@ -304,7 +304,7 @@ ERROR_CODE _write_error_connection(struct http_parser_t *http_parser, char *mess
     /* allocates the data buffer (in a safe maner) then
     writes the http static headers to the response */
     connection->alloc_data(connection, 1024 * sizeof(unsigned char), (void **) &buffer);
-	http_connection->write_error(
+    http_connection->write_error(
         connection,
         buffer,
         1024,
@@ -313,7 +313,7 @@ ERROR_CODE _write_error_connection(struct http_parser_t *http_parser, char *mess
         "Internal Server Error",
         message,
         _send_response_callback_handler_module,
-		(void *) (size_t) http_parser->flags
+        (void *) (size_t) http_parser->flags
     );
 
     /* raise no error */
@@ -395,12 +395,12 @@ int _lua_write_connection(lua_State *lua_state) {
 
     /* writes the response to the connection */
     connection->write_connection(
-		connection,
-		buffer,
-		data_size,
-		_send_response_callback_handler_module,
-		(void *) (size_t) http_parser->flags
-	);
+        connection,
+        buffer,
+        data_size,
+        _send_response_callback_handler_module,
+        (void *) (size_t) http_parser->flags
+    );
 
     /* return the number of results */
     return 0;

@@ -261,8 +261,8 @@ ERROR_CODE _send_response_handler_default(struct http_parser_t *http_parser) {
     struct connection_t *connection = (struct connection_t *) http_parser->parameters;
 
     /* writes the http static headers (and message) as the response and
-	registers for the appropriate callbacks (for cleanup) */
-	write_http_message(
+    registers for the appropriate callbacks (for cleanup) */
+    write_http_message(
         connection,
         response_buffer,
         256,
@@ -270,8 +270,8 @@ ERROR_CODE _send_response_handler_default(struct http_parser_t *http_parser) {
         200,
         "OK",
         "Hello Viriatum",
-		_send_response_callback_handler_default,
-		(void *) (size_t) http_parser->flags
+        _send_response_callback_handler_default,
+        (void *) (size_t) http_parser->flags
     );
 
     /* raise no error */

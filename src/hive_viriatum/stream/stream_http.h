@@ -215,39 +215,39 @@ typedef struct http_connection_t {
      */
     size_t buffer_offset;
 
-	/**
-	 * Function used to create and write header into a sent
-	 * buffer of data.
-	 */
+    /**
+     * Function used to create and write header into a sent
+     * buffer of data.
+     */
     http_connection_headers write_headers;
 
-	/**
-	 * Function used to create and write header into a sent
-	 * buffer of data.
-	 * This function writes an extended version of the heders.
-	 */
-	http_connection_headers_c write_headers_c;
+    /**
+     * Function used to create and write header into a sent
+     * buffer of data.
+     * This function writes an extended version of the heders.
+     */
+    http_connection_headers_c write_headers_c;
 
-	/**
-	 * Function used to create and write header into a sent
-	 * buffer of data.
+    /**
+     * Function used to create and write header into a sent
+     * buffer of data.
      * This function should also write the message into the
-	 * provided buffer.
-	 */
-	http_connection_headers_m write_headers_m;
+     * provided buffer.
+     */
+    http_connection_headers_m write_headers_m;
 
-	/**
-	 * Function to be used for writing of message is a simplistic
-	 * but inefficient way.
-	 * This function is usefull for debugging purposes.
-	 */
-	http_connection_message write_message;
+    /**
+     * Function to be used for writing of message is a simplistic
+     * but inefficient way.
+     * This function is usefull for debugging purposes.
+     */
+    http_connection_message write_message;
 
-	/**
-	 * Function to be used for the writing of the errors
-	 * in the connection context using the "normal" pipe.
-	 */
-	http_connection_message write_error;
+    /**
+     * Function to be used for the writing of the errors
+     * in the connection context using the "normal" pipe.
+     */
+    http_connection_message write_error;
 
     /**
      * Function to be used for logging a connection into the

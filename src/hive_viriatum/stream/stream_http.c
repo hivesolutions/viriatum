@@ -82,11 +82,11 @@ ERROR_CODE create_http_connection(struct http_connection_t **http_connection_poi
     /* sets the proper functions in the http connection
     they may be used by the handlers to interact with
     the connection (at the http level) */
-	http_connection->write_headers = write_http_headers;
-	http_connection->write_headers_c = write_http_headers_c;
-	http_connection->write_headers_m = write_http_headers_m;
-	http_connection->write_message = write_http_message;
-	http_connection->write_error = write_http_error;
+    http_connection->write_headers = write_http_headers;
+    http_connection->write_headers_c = write_http_headers_c;
+    http_connection->write_headers_m = write_http_headers_m;
+    http_connection->write_message = write_http_message;
+    http_connection->write_error = write_http_error;
     http_connection->log_request = log_http_request;
 
     /* creates the http settings */
