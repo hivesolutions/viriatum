@@ -141,7 +141,7 @@ ERROR_CODE register_connection_polling_epoll(struct polling_t *polling, struct c
 	/* populates the event structure with the appropriate
 	structures in order to register for the right events 
 	and then inserts the event request into the epoll fd */
-	_event.events = EPOLLIN | EPOLLOUT | EPOLLET | EPOLLRDHUP;
+	_event.events = EPOLLIN | EPOLLOUT | EPOLLET;
 	_event.data.ptr = (void *) connection;
 	epoll_ctl(polling_epoll->epoll_fd, EPOLL_CTL_ADD, connection->socket_handle, &_event);
 	
@@ -179,7 +179,7 @@ ERROR_CODE unregister_write_polling_epoll(struct polling_t *polling, struct conn
 }
 
 ERROR_CODE poll_polling_epoll(struct polling_t *polling) {
-	struct epoll_event *events;
+	struct epoll_event events[64];
 	struct epoll_event *_event;
 	int event_count;
 	int index;
@@ -207,8 +207,6 @@ ERROR_CODE poll_polling_epoll(struct polling_t *polling) {
 
 	/* TODO: se isto funcionar ten ho de tentar com memoria estatica
 	events[64] */
-	events = calloc(64, sizeof(struct epoll_event));
-
 	event_count = epoll_wait(polling_epoll->epoll_fd, events, 64, -1);
 
 	for(index = 0; index < event_count; index++) {
