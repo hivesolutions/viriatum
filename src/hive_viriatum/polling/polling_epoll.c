@@ -52,19 +52,19 @@ void create_polling_epoll(struct polling_epoll_t **polling_epoll_pointer, struct
 
     /* allocates the read connection for internal
     polling epoll usage */
-    polling_epoll->read_connections = (struct connection_t **) MALLOC(VIRIATUM_MAXIMUM_CONNECTIONS * connection_pointer_size);
+    polling_epoll->read_connections = (struct connection_t **) MALLOC(VIRIATUM_MAX_CONNECTIONS * connection_pointer_size);
 
     /* allocates the write connection for internal
     polling epoll usage */
-    polling_epoll->write_connections = (struct connection_t **) MALLOC(VIRIATUM_MAXIMUM_CONNECTIONS * connection_pointer_size);
+    polling_epoll->write_connections = (struct connection_t **) MALLOC(VIRIATUM_MAX_CONNECTIONS * connection_pointer_size);
 
     /* allocates the error connection for internal
     polling epoll usage */
-    polling_epoll->error_connections = (struct connection_t **) MALLOC(VIRIATUM_MAXIMUM_CONNECTIONS * connection_pointer_size);
+    polling_epoll->error_connections = (struct connection_t **) MALLOC(VIRIATUM_MAX_CONNECTIONS * connection_pointer_size);
 
     /* allocates the remove connection for internal
     polling epoll usage */
-    polling_epoll->remove_connections = (struct connection_t **) MALLOC(VIRIATUM_MAXIMUM_CONNECTIONS * connection_pointer_size);
+    polling_epoll->remove_connections = (struct connection_t **) MALLOC(VIRIATUM_MAX_CONNECTIONS * connection_pointer_size);
 
 
 

@@ -65,19 +65,19 @@ void create_polling_select(struct polling_select_t **polling_select_pointer, str
 
     /* allocates the read connection for internal
     polling select usage */
-    polling_select->read_connections = (struct connection_t **) MALLOC(VIRIATUM_MAXIMUM_CONNECTIONS * connection_pointer_size);
+    polling_select->read_connections = (struct connection_t **) MALLOC(VIRIATUM_MAX_CONNECTIONS * connection_pointer_size);
 
     /* allocates the write connection for internal
     polling select usage */
-    polling_select->write_connections = (struct connection_t **) MALLOC(VIRIATUM_MAXIMUM_CONNECTIONS * connection_pointer_size);
+    polling_select->write_connections = (struct connection_t **) MALLOC(VIRIATUM_MAX_CONNECTIONS * connection_pointer_size);
 
     /* allocates the error connection for internal
     polling select usage */
-    polling_select->error_connections = (struct connection_t **) MALLOC(VIRIATUM_MAXIMUM_CONNECTIONS * connection_pointer_size);
+    polling_select->error_connections = (struct connection_t **) MALLOC(VIRIATUM_MAX_CONNECTIONS * connection_pointer_size);
 
     /* allocates the remove connection for internal
     polling select usage */
-    polling_select->remove_connections = (struct connection_t **) MALLOC(VIRIATUM_MAXIMUM_CONNECTIONS * connection_pointer_size);
+    polling_select->remove_connections = (struct connection_t **) MALLOC(VIRIATUM_MAX_CONNECTIONS * connection_pointer_size);
 
     /* sets the default timeout */
     polling_select->select_timeout.tv_sec = VIRIATUM_SELECT_TIMEOUT;
