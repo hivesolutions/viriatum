@@ -27,6 +27,8 @@
 
 #include "stdafx.h"
 
+#ifdef VIRIATUM_EPOLL
+
 #include "polling_epoll.h"
 
 void create_polling_epoll(struct polling_epoll_t **polling_epoll_pointer, struct polling_t *polling) {
@@ -136,7 +138,6 @@ ERROR_CODE poll_polling_epoll(struct polling_t *polling) {
 	struct epoll_event *_event;
 	int event_count;
 	int index;
-	size_t _index = 0;
 
 
     unsigned int read_index = 0;
@@ -196,9 +197,4 @@ ERROR_CODE poll_polling_epoll(struct polling_t *polling) {
     RAISE_NO_ERROR;
 }
 
-
-
-
-
-
-
+#endif
