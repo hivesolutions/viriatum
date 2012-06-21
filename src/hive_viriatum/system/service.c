@@ -1045,6 +1045,18 @@ ERROR_CODE start_service(struct service_t *service) {
     /* sets the service in the polling */
     polling->service = service;
 
+#ifdef VIRIATUM_EPOLL
+    /* sets the various handler values to the polling process
+    they will be called for the various read, write operations */
+    polling->open = open_polling_epoll;
+    polling->close = close_polling_epoll;
+    polling->register_connection = register_connection_polling_epoll;
+    polling->unregister_connection = unregister_connection_polling_epoll;
+    polling->register_write = register_write_polling_epoll;
+    polling->unregister_write = unregister_write_polling_epoll;
+    polling->poll = poll_polling_epoll;
+    polling->call = call_polling_epoll;
+#else
     /* sets the various handler values to the polling process
     they will be called for the various read, write operations */
     polling->open = open_polling_select;
@@ -1055,6 +1067,7 @@ ERROR_CODE start_service(struct service_t *service) {
     polling->unregister_write = unregister_write_polling_select;
     polling->poll = poll_polling_select;
     polling->call = call_polling_select;
+#endif
 
     /* opens the polling (provider) */
     polling->open(polling);
