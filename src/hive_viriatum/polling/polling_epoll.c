@@ -236,7 +236,7 @@ ERROR_CODE poll_polling_epoll(struct polling_t *polling) {
 		if(_event->events & (EPOLLERR | EPOLLHUP)) {
             /* sets the current connection in the error connections
 			and then increments the error index counter */
-			polling_epoll->error_connections[write_index] = connection;
+			polling_epoll->error_connections[error_index] = connection;
 			error_index++;
 		} else {
 			if(_event->events & EPOLLIN) {
