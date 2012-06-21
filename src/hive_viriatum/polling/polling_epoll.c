@@ -181,22 +181,19 @@ ERROR_CODE poll_polling_epoll(struct polling_t *polling) {
     size_t write_index = 0;
     size_t error_index = 0;
 
-	
-
-
     /* retrieves the polling epoll structure from the upper
 	polling control structure */
     struct polling_epoll_t *polling_epoll = (struct polling_epoll_t *) polling->lower;
 
     /* polls the polling epoll */
     /*_poll_polling_epoll(
-        polling_select,
-        polling_select->read_connections,
-        polling_select->write_connections,
-        polling_select->error_connections,
-        &polling_select->read_connections_size,
-        &polling_select->write_connections_size,
-        &polling_select->error_connections_size
+        polling_epoll,
+        polling_epoll->read_connections,
+        polling_epoll->write_connections,
+        polling_epoll->error_connections,
+        &polling_epoll->read_connections_size,
+        &polling_epoll->write_connections_size,
+        &polling_epoll->error_connections_size
     )*/
 
 	/* TODO: se isto funcionar ten ho de tentar com memoria estatica
@@ -235,6 +232,155 @@ ERROR_CODE poll_polling_epoll(struct polling_t *polling) {
     polling_epoll->read_connections_size = read_index;
     polling_epoll->write_connections_size = write_index;
     polling_epoll->error_connections_size = error_index;
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE call_polling_epoll(struct polling_t *polling) {
+    /* retrieves the polling epoll structure from the upper
+	polling control structure */
+    struct polling_epoll_t *polling_epoll = (struct polling_epoll_t *) polling->lower;
+
+    /* calls the polling epoll */
+    _call_polling_epoll(
+        polling_epoll,
+        polling_epoll->read_connections,
+        polling_epoll->write_connections,
+        polling_epoll->error_connections,
+        polling_epoll->remove_connections,
+        polling_epoll->read_connections_size,
+        polling_epoll->write_connections_size,
+        polling_epoll->error_connections_size
+    );
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE _call_polling_epoll(struct polling_epoll_t *polling_epoll, struct connection_t **read_connections, struct connection_t **write_connections, struct connection_t **error_connections, struct connection_t **remove_connections, size_t read_connections_size, size_t write_connections_size, size_t error_connections_size) {
+    /* allocates the index */
+    unsigned int index;
+
+    /* allocates the current connection */
+    struct connection_t *current_connection;
+
+    /* resets the remove connections size */
+    unsigned int remove_connections_size = 0;
+
+    /* prints a debug message */
+    V_DEBUG_F("Processing %d read connections\n", read_connections_size);
+
+    /* iterates over the read connections */
+    for(index = 0; index < read_connections_size; index++) {
+        /* retrieves the current connection */
+        current_connection = read_connections[index];
+
+        /* prints a debug message */
+        V_DEBUG_F("Processing read connection: %d\n", current_connection->socket_handle);
+
+        /* in case the current connection is open and the read
+        handler is correclty set (must call it) */
+        if(current_connection->status == STATUS_OPEN && current_connection->on_read != NULL) {
+            /* prints a debug message */
+            V_DEBUG("Calling on read handler\n");
+
+            /* calls the on read handler */
+            current_connection->on_read(current_connection);
+
+            /* prints a debug message */
+            V_DEBUG("Finished calling on read handler\n");
+        }
+
+        /* in case the current connection is in the handshake
+        section and the handshake handler is correclty set (must
+        call it to initialize the connection) */
+        if(current_connection->status == STATUS_HANDSHAKE && current_connection->on_handshake != NULL) {
+            /* prints a debug message */
+            V_DEBUG("Calling on handshake handler\n");
+
+            /* calls the on read handler */
+            current_connection->on_handshake(current_connection);
+
+            /* prints a debug message */
+            V_DEBUG("Finished calling on read handler\n");
+        }
+
+        /* in case the current connection is closed */
+        if(current_connection->status == STATUS_CLOSED) {
+            /* tries to add the current connection to the remove connections list */
+            remove_connection(remove_connections, &remove_connections_size, current_connection);
+        }
+    }
+
+    /* prints a debug message */
+    V_DEBUG_F("Processing %d write connections\n", write_connections_size);
+
+    /* iterates over the write connections */
+    for(index = 0; index < write_connections_size; index++) {
+        /* retrieves the current connection */
+        current_connection = write_connections[index];
+
+        /* prints a debug message */
+        V_DEBUG_F("Processing write connection: %d\n", current_connection->socket_handle);
+
+        /* in case the current connection is open */
+        if(current_connection->status == STATUS_OPEN && current_connection->on_write != NULL) {
+            /* prints a debug message */
+            V_DEBUG("Calling on write handler\n");
+
+            /* calls the on write handler */
+            current_connection->on_write(current_connection);
+
+            /* prints a debug message */
+            V_DEBUG("Finished calling on write handler\n");
+        }
+
+        /* in case the current connection is closed */
+        if(current_connection->status == STATUS_CLOSED) {
+            /* tries to add the current connection to the remove connections list */
+            remove_connection(remove_connections, &remove_connections_size, current_connection);
+        }
+    }
+
+    /* prints a debug message */
+    V_DEBUG_F("Processing %d error connections\n", error_connections_size);
+
+    /* iterates over the error connections */
+    for(index = 0; index < error_connections_size; index++) {
+        /* retrieves the current connection */
+        current_connection = error_connections[index];
+
+        /* prints a debug message */
+        V_DEBUG_F("Processing error connection: %d\n", current_connection->socket_handle);
+
+        /* in case the current connection is open */
+        if(current_connection->status == STATUS_OPEN && current_connection->on_error != NULL) {
+            /* prints a debug message */
+            V_DEBUG("Calling on error handler\n");
+
+            /* calls the on error handler */
+            current_connection->on_error(current_connection);
+
+            /* prints a debug message */
+            V_DEBUG("Finished calling on error handler\n");
+        }
+
+        /* in case the current connection is closed */
+        if(current_connection->status == STATUS_CLOSED) {
+            /* tries to add the current connection to the remove connections list */
+            remove_connection(remove_connections, &remove_connections_size, current_connection);
+        }
+    }
+
+    /* iterates over the remove connections */
+    for(index = 0; index < remove_connections_size; index++) {
+        /* retrieves the current connection */
+        current_connection = remove_connections[index];
+
+        /* deletes the current connection (house keeping) */
+        delete_connection(current_connection);
+    }
 
     /* raises no error */
     RAISE_NO_ERROR;
