@@ -466,6 +466,7 @@ typedef struct http_settings_t {
     http_callback on_headers_complete;
     http_data_callback on_body;
     http_callback on_message_complete;
+	http_data_callback on_path;
     http_index_callback on_location;
     http_data_callback on_virtual_url;
 } http_settings;
