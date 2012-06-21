@@ -260,22 +260,19 @@ ERROR_CODE _send_response_handler_default(struct http_parser_t *http_parser) {
     /* retrieves the connection from the http parser parameters */
     struct connection_t *connection = (struct connection_t *) http_parser->parameters;
 
-    /* writes the http static headers (and message) to the response */
-    write_http_headers_m(
-        connection->service,
+    /* writes the http static headers (and message) as the response and
+	registers for the appropriate callbacks (for cleanup) */
+	write_http_message(
+        connection,
         response_buffer,
         256,
         HTTP11,
         200,
         "OK",
-        KEEP_ALIVE,
-        14,
-        NO_CACHE,
-        "Hello Viriatum"
+        "Hello Viriatum",
+		_send_response_callback_handler_default,
+		(void *) (size_t) http_parser->flags
     );
-
-    /* writes the response to the connection, registers for the appropriate callbacks */
-    write_connection(connection, (unsigned char *) response_buffer, (unsigned int) strlen(response_buffer), _send_response_callback_handler_default, (void *) (size_t) http_parser->flags);
 
     /* raise no error */
     RAISE_NO_ERROR;
