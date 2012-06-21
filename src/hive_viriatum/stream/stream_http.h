@@ -34,7 +34,7 @@
 
 /* forward references (avoids loop) */
 struct http_connection_t;
-typedef ERROR_CODE (*__connection_data_callback) (struct connection_t *, struct data_t *, void *);
+typedef ERROR_CODE (*connection_data_callback_sh) (struct connection_t *, struct data_t *, void *);
 
 /**
  * Function used to update the given http connection
@@ -74,7 +74,7 @@ typedef size_t (*http_connection_headers_m) (struct connection_t *, char *, size
  * Function used to send a message through the provided connection
  * using the predefined structured pipes.
  */
-typedef ERROR_CODE (*http_connection_message) (struct connection_t *, char *, size_t, enum http_version_e, int, char *, char *, __connection_data_callback, void *);
+typedef ERROR_CODE (*http_connection_message) (struct connection_t *, char *, size_t, enum http_version_e, int, char *, char *, connection_data_callback_sh, void *);
 
 /**
  * Function used to log request information in the common

@@ -35,7 +35,7 @@
 struct data_t;
 struct service_t;
 struct connection_t;
-typedef ERROR_CODE (*_connection_data_callback) (struct connection_t *, struct data_t *, void *);
+typedef ERROR_CODE (*connection_data_callback_hu) (struct connection_t *, struct data_t *, void *);
 
 /**
  * The string representations for the various
@@ -152,8 +152,8 @@ static const char *http_status_codes[5][64] = {
 size_t write_http_headers(struct connection_t *connection, char *buffer, size_t size, enum http_version_e version, int status_code, char *status_message, enum http_keep_alive_e keep_alive, char close);
 size_t write_http_headers_c(struct connection_t *connection, char *buffer, size_t size, enum http_version_e version, int status_code, char *status_message, enum http_keep_alive_e keep_alive, size_t content_length, enum http_cache_e cache, int close);
 size_t write_http_headers_m(struct connection_t *connection, char *buffer, size_t size, enum http_version_e version, int status_code, char *status_message, enum http_keep_alive_e keep_alive, size_t content_length, enum http_cache_e cache, char *message);
-ERROR_CODE write_http_message(struct connection_t *connection, char *buffer, size_t size, enum http_version_e version, int status_code, char *status_message, char *message, _connection_data_callback callback, void *callback_parameters);
-ERROR_CODE write_http_error(struct connection_t *connection, char *buffer, size_t size, enum http_version_e version, int error_code, char *error_message, char *error_description, _connection_data_callback callback, void *callback_parameters);
+ERROR_CODE write_http_message(struct connection_t *connection, char *buffer, size_t size, enum http_version_e version, int status_code, char *status_message, char *message, connection_data_callback_hu callback, void *callback_parameters);
+ERROR_CODE write_http_error(struct connection_t *connection, char *buffer, size_t size, enum http_version_e version, int error_code, char *error_message, char *error_description, connection_data_callback_hu callback, void *callback_parameters);
 ERROR_CODE log_http_request(char *host, char *identity, char *user, char *method, char *uri, enum http_version_e version, int error_code, size_t content_length);
 
 __inline static const char *_get_http_version_code(size_t index) {
