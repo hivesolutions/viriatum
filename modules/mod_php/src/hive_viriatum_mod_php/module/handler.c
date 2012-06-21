@@ -625,16 +625,12 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
         headers_buffer,
         1024,
         "HTTP/1.1 %d %s\r\n"
-        "Server: %s/%s (%s - %s) (%s)\r\n"
+        "Server: %s\r\n"
         "Connection: Keep-Alive\r\n"
         "Content-Length: %lu\r\n",
         status_code,
         status_message,
-        VIRIATUM_NAME,
-        VIRIATUM_VERSION,
-        VIRIATUM_PLATFORM_STRING,
-        VIRIATUM_PLATFORM_CPU,
-        VIRIATUM_FLAGS,
+        connection->service->description,
         (long unsigned int) output_buffer->buffer_length
     );
 
@@ -685,48 +681,6 @@ ERROR_CODE _send_response_callback_handler_module(struct connection_t *connectio
     /* in case the connection is not meant to be kept alive must be closed
     in the normal manner (using the close connection function) */
     if(!keep_alive) { connection->close_connection(connection); }
-
-    /* raise no error */
-    RAISE_NO_ERROR;
-}
-
-ERROR_CODE _write_error_connection(struct http_parser_t *http_parser, char *message) {
-    /* allocates space for the buffer to be used in the message */
-    unsigned char *buffer;
-
-    /* retrieves the connection from the http parser parameters */
-    struct connection_t *connection = (struct connection_t *) http_parser->parameters;
-    struct handler_php_context_t *handler_php_context = (struct handler_php_context_t *) http_parser->context;
-
-    /* retrieves the length of the message so that it's possible to print
-    the proper error */
-    size_t message_length = strlen(message);
-
-    /* updates the flags value in the php context, this is required
-    to avoid problems in the callback handler */
-    handler_php_context->flags = http_parser->flags;
-
-    /* allocates the data buffer (in a safe maner) then
-    writes the http static headers to the response */
-    connection->alloc_data(connection, 1024 * sizeof(unsigned char), (void **) &buffer);
-    SPRINTF(
-        (char *) buffer,
-        1024,
-        "HTTP/1.1 500 Internal Server Error\r\n"
-        "Server: %s/%s (%s - %s) (%s)\r\n"
-        "Connection: Keep-Alive\r\n"
-        "Content-Length: %d\r\n\r\n%s",
-        VIRIATUM_NAME,
-        VIRIATUM_VERSION,
-        VIRIATUM_PLATFORM_STRING,
-        VIRIATUM_PLATFORM_CPU,
-        VIRIATUM_FLAGS,
-        (unsigned int) message_length,
-        message
-    );
-
-    /* writes the response to the connection, registers for the appropriate callbacks */
-    connection->write_connection(connection, buffer, (unsigned int) strlen((char *) buffer), _send_response_callback_handler_module, (void *) handler_php_context);
 
     /* raise no error */
     RAISE_NO_ERROR;
