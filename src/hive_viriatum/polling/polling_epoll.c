@@ -345,7 +345,7 @@ ERROR_CODE _call_polling_epoll(struct polling_epoll_t *polling_epoll, struct con
         /* prints a debug message */
         V_DEBUG_F("Processing error connection: %d\n", current_connection->socket_handle);
 
-		printf("A PROCESSAR ERRO");
+		printf("A PROCESSAR ERRO\n");
 
         /* in case the current connection is open */
         if(current_connection->status == STATUS_OPEN && current_connection->on_error != NULL) {
