@@ -257,6 +257,10 @@ a:hover {
     background: transparent url(../images/mime/icon-html.png) center center no-repeat;
 }
 
+.icon.link {
+    background: transparent url(../images/mime/icon-link.png) center center no-repeat;
+}
+
 .table.status {
     color: #595959;
     margin: 80px auto 20px auto;
