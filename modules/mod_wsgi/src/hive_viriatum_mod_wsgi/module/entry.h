@@ -48,7 +48,7 @@
  */
 #define START_GLOBALS struct service_t *_service;\
     struct connection_t *_connection;\
-    struct linked_buffer_t *_output_buffer;\
+    struct http_headers_t _headers;\
     struct wsgi_request_t _wsgi_request
 
 /**
