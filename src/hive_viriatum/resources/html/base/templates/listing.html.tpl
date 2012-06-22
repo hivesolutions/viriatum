@@ -40,7 +40,7 @@
                             ${/if}
                             <td class="left"><a href="${out value=entry.name /}">${out value=entry.name /}</a></td>
                             <td class="right date">${out value=entry.time /}</td>
-                            <td class="right size">${out value=entry.size /} Bytes</td>
+                            <td class="right size">${out value=entry.size_string /}</td>
                         </tr>
                     ${/foreach}
                 </tbody>
