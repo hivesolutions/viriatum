@@ -98,7 +98,7 @@ typedef struct polling_select_t {
      * to be house-kept (removed) at the end
      * of the polling cycle.
      */
-	struct connection_t *remove_connections[VIRIATUM_MAX_EVENTS];
+    struct connection_t *remove_connections[VIRIATUM_MAX_EVENTS];
 
     /**
      * The size of the read connections

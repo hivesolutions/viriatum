@@ -314,12 +314,12 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
         } else {
             /* creates the complete path to the template file */
             SPRINTF(
-				(char *) template_path,
-				sizeof(template_path),
-				"%s%s", 
-				VIRIATUM_RESOURCES_PATH,
-				VIRIATUM_LISTING_PATH
-			);
+                (char *) template_path,
+                sizeof(template_path),
+                "%s%s",
+                VIRIATUM_RESOURCES_PATH,
+                VIRIATUM_LISTING_PATH
+            );
 
             /* prints a debug message */
             V_DEBUG_F("Processing template file '%s'\n", template_path);
@@ -519,7 +519,7 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
         count = write_http_headers_c(
             connection,
             headers_buffer,
-			VIRIATUM_HTTP_SIZE,
+            VIRIATUM_HTTP_SIZE,
             HTTP11,
             200,
             "OK",

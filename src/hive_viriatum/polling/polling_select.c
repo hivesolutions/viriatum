@@ -368,7 +368,7 @@ ERROR_CODE _poll_polling_select(struct polling_select_t *polling_select, struct 
     }
 
     /* updates the various operation counters for the three
-	operation to be "polled" (this is done by reference) */
+    operation to be "polled" (this is done by reference) */
     *read_connections_size = read_index;
     *write_connections_size = write_index;
     *error_connections_size = error_index;

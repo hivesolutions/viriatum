@@ -38,21 +38,21 @@ typedef struct polling_epoll_t {
      */
     struct polling_t *polling;
 
-	/** 
-	 * The file descriptor tp the object
-	 * that control the epoll structure.
-	 * This object is used for each polling
-	 * operation to be done.
-	 */
+    /**
+     * The file descriptor tp the object
+     * that control the epoll structure.
+     * This object is used for each polling
+     * operation to be done.
+     */
     int epoll_fd;
 
-	/**
-	 * Counter that controls the number of events
-	 * currently present in the epoll structure.
-	 * This counter is very usefull for debugging
-	 * purposes and printing information.
-	 */
-	size_t poll_count;
+    /**
+     * Counter that controls the number of events
+     * currently present in the epoll structure.
+     * This counter is very usefull for debugging
+     * purposes and printing information.
+     */
+    size_t poll_count;
 
     /**
      * The buffer that holds the connections
@@ -77,7 +77,7 @@ typedef struct polling_epoll_t {
      * to be house-kept (removed) at the end
      * of the polling cycle.
      */
-	struct connection_t *remove_connections[VIRIATUM_MAX_EVENTS];
+    struct connection_t *remove_connections[VIRIATUM_MAX_EVENTS];
 
     /**
      * The size of the read connections
