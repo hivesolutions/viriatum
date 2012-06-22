@@ -38,16 +38,16 @@ void create_polling_epoll(struct polling_epoll_t **polling_epoll_pointer, struct
     /* allocates space for the polling epoll */
     struct polling_epoll_t *polling_epoll = (struct polling_epoll_t *) MALLOC(polling_epoll_size);
 
-
+	/* initializes the polling epoll structure default values
+	so that the default setting is used by default */
 	polling_epoll->poll_count = 0;
-
 
     /* resets the polling in the polling epoll */
     polling_epoll->polling = polling;
 
 	/* creates the epoll file descriptor with an arbitrary
 	size (this no longer used by the kernel) */
-	polling_epoll->epoll_fd = epoll_create(1024);
+	polling_epoll->epoll_fd = epoll_create(VIRIATUM_MAX_EVENTS);
 
     /* sets the polling epoll in the polling epoll pointer */
     *polling_epoll_pointer = polling_epoll;
