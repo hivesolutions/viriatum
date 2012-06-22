@@ -34,7 +34,7 @@
  * The message to be printed to the client in case
  * the handler propagates to the top (error case).
  */
-#define DISPATCH_ERROR_MESSAGE "500 - Internal Server Error (dispatch problem)"
+#define DISPATCH_ERROR_MESSAGE "Dispatch error"
 
 /**
  * The default handler to be used in case no rule
