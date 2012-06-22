@@ -227,7 +227,7 @@ ERROR_CODE _poll_polling_epoll(struct polling_epoll_t *polling_epoll, struct con
     struct service_t *service = polling_epoll->polling->service;
 
 	/* prints a debug message (include the poll count) */
-    V_DEBUG("Entering epoll statement (%lu)\n", polling_epoll->poll_count);
+    V_DEBUG_F("Entering epoll statement (%lu)\n", polling_epoll->poll_count);
 
 	/* runs the wait process in the epoll, this is the main call
 	of the epoll loop as it si the on responsible for the polling
