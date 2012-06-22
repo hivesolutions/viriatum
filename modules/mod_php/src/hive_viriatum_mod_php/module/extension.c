@@ -33,6 +33,7 @@ zend_function_entry viriatum_functions[] = {
     PHP_FE(viriatum_connections, NULL)
     PHP_FE(viriatum_name, NULL)
     PHP_FE(viriatum_version, NULL)
+	PHP_FE(viriatum_platform, NULL)
     PHP_FE(viriatum_flags, NULL)
     PHP_FE(viriatum_description, NULL)
     PHP_FE(viriatum_compiler, NULL)
@@ -223,6 +224,7 @@ ZEND_MINFO_FUNCTION(viriatum_information) {
     php_info_print_table_start();
     php_info_print_table_row(2, "Name", _service->name);
     php_info_print_table_row(2, "Version", _service->version);
+	php_info_print_table_row(2, "Platform", _service->platform);
     php_info_print_table_row(2, "Flags", _service->flags);
     php_info_print_table_row(2, "Compiler", _service->compiler);
     php_info_print_table_row(2, "Compiler Version", _service->compiler_version);
@@ -249,12 +251,12 @@ PHP_FUNCTION(viriatum_version) {
     RETURN_STRING(_service->version, 1);
 }
 
-PHP_FUNCTION(viriatum_flags) {
-    RETURN_STRING(_service->flags, 1);
+PHP_FUNCTION(viriatum_platform) {
+    RETURN_STRING(_service->platform, 1);
 }
 
-PHP_FUNCTION(viriatum_description) {
-    RETURN_STRING(_service->description, 1);
+PHP_FUNCTION(viriatum_flags) {
+    RETURN_STRING(_service->flags, 1);
 }
 
 PHP_FUNCTION(viriatum_compiler) {
@@ -267,4 +269,8 @@ PHP_FUNCTION(viriatum_compiler_version) {
 
 PHP_FUNCTION(viriatum_compilation_date) {
     RETURN_STRING(_service->compilation_date, 1);
+}
+
+PHP_FUNCTION(viriatum_description) {
+    RETURN_STRING(_service->description, 1);
 }

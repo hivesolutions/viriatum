@@ -49,6 +49,7 @@ ZEND_MINFO_FUNCTION(viriatum_information);
 PHP_FUNCTION(viriatum_connections);
 PHP_FUNCTION(viriatum_name);
 PHP_FUNCTION(viriatum_version);
+PHP_FUNCTION(viriatum_platform);
 PHP_FUNCTION(viriatum_flags);
 PHP_FUNCTION(viriatum_description);
 PHP_FUNCTION(viriatum_compiler);
