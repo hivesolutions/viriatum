@@ -626,11 +626,11 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
 
     /* allocates space for the header buffer and then writes the default values
     into it the value is dynamicaly contructed based on the current header values */
-    connection->alloc_data(connection, 25602, (void **) &headers_buffer);
+    connection->alloc_data(connection, VIRIATUM_HTTP_MAX_SIZE, (void **) &headers_buffer);
     count = http_connection->write_headers(
         connection,
         headers_buffer,
-        1024,
+        VIRIATUM_HTTP_SIZE,
         HTTP11,
         status_code,
         status_message,
@@ -639,7 +639,7 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
     );
     count += SPRINTF(
         &headers_buffer[count],
-        1024 - count,
+        VIRIATUM_HTTP_SIZE - count,
         CONTENT_LENGTH_H ": %lu\r\n",
         (long unsigned int) output_buffer->buffer_length
     );
@@ -648,8 +648,13 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
     their content into the current headers buffer */
     for(index = 0; index < _php_request.header_count; index++) {
         /* copies the current php header into the current position of the headers
-        buffer (header copy) */
-        count += SPRINTF(&headers_buffer[count], 1026, "%s\r\n", _php_request.headers[index]);
+        buffer (header copy), note that the trailing newlines are count in size */
+        count += SPRINTF(
+			&headers_buffer[count],
+			VIRIATUM_MAX_HEADER_C_SIZE,
+			"%s\r\n",
+			_php_request.headers[index]
+		);
     }
 
     /* finishes the current headers sequence with the final carriage return newline
