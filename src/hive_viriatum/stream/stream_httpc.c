@@ -244,7 +244,7 @@ ERROR_CODE open_handler_stream_http_client(struct io_connection_t *io_connection
     unsigned char *get_string;
     size_t get_string_size;
     struct string_t strings[9];
-    char *buffer = MALLOC(1024);
+    char *buffer = MALLOC(VIRIATUM_HTTP_SIZE);
 
     SPRINTF((char *) peer_id, 20, "-%s%d%d%d0-", VIRIATUM_PREFIX, VIRIATUM_MAJOR, VIRIATUM_MINOR, VIRIATUM_MICRO);
     random_buffer(random, 12);
@@ -295,7 +295,7 @@ ERROR_CODE open_handler_stream_http_client(struct io_connection_t *io_connection
 
     SPRINTF(
         buffer,
-        1024,
+        VIRIATUM_HTTP_SIZE,
         "GET %s?%s HTTP/1.1\r\n"
         "User-Agent: viriatum/0.2.0 (linux - intel x64)\r\n"
         "Connection: Keep-Alive\r\n\r\n",
