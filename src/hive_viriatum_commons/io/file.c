@@ -625,6 +625,18 @@ ERROR_CODE list_directory_file(char *file_path, struct linked_list_t *entries) {
             /* sets the entry type as directory */
             entry->type = FILE_TYPE_DIRECTORY;
         }
+		/* otherwise in case the file is of
+		type link */
+		else if(entity->d_type == DT_LNK) {
+            /* sets the entry type as directory */
+            entry->type = FILE_TYPE_LINK;
+		}
+		/* otherwise it's considered as a regular
+		file (fallback strategy) */
+		else {
+            /* sets the entry type as regular */
+            entry->type = FILE_TYPE_REGULAR;
+		}
 
         /* joins the base name with the directory path to
         retrieve the full entry name then uses it to retrieve
