@@ -35,9 +35,6 @@ void create_polling_epoll(struct polling_epoll_t **polling_epoll_pointer, struct
     /* retrieves the polling epoll size */
     size_t polling_epoll_size = sizeof(struct polling_epoll_t);
 
-    /* retrieves the connection pointer size */
-    size_t connection_pointer_size = sizeof(struct connection_t *);
-
     /* allocates space for the polling epoll */
     struct polling_epoll_t *polling_epoll = (struct polling_epoll_t *) MALLOC(polling_epoll_size);
 
@@ -216,6 +213,10 @@ ERROR_CODE _poll_polling_epoll(struct polling_epoll_t *polling_epoll, struct con
     size_t read_index = 0;
     size_t write_index = 0;
     size_t error_index = 0;
+
+    /* retrieves the service associated with the current polling
+	structure in order to be able to modify it */
+    struct service_t *service = polling_epoll->polling->service;
 
     /* prints a debug message */
     V_DEBUG("Entering epoll statement\n");
