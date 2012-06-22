@@ -26,6 +26,8 @@
 include $(top_srcdir)/Common.am
 
 nobase_dist_wwwroot_DATA = index.html \
+extras/about.html.tpl \
+extras/status.html.tpl \
 resources/css/layout.css \
 resources/images/arrow-left.png \
 resources/images/favicon.ico \
