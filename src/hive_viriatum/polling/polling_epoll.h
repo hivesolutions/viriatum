@@ -38,12 +38,18 @@ typedef struct polling_epoll_t {
      */
     struct polling_t *polling;
 
+	/** 
+	 * The file descriptor tp the object
+	 * that control the epoll structure.
+	 * This object is used for each polling
+	 * operation to be done.
+	 */
     int epoll_fd;
 
-    struct connection_t **read_connections;
-    struct connection_t **write_connections;
-    struct connection_t **error_connections;
-    struct connection_t **remove_connections;
+    struct connection_t *read_connections[VIRIATUM_MAX_EVENTS];
+    struct connection_t *write_connections[VIRIATUM_MAX_EVENTS];
+    struct connection_t *error_connections[VIRIATUM_MAX_EVENTS];
+    struct connection_t *remove_connections[VIRIATUM_MAX_EVENTS];
 
     size_t read_connections_size;
     size_t write_connections_size;
@@ -61,6 +67,7 @@ ERROR_CODE register_write_polling_epoll(struct polling_t *polling, struct connec
 ERROR_CODE unregister_write_polling_epoll(struct polling_t *polling, struct connection_t *connection);
 ERROR_CODE poll_polling_epoll(struct polling_t *polling);
 ERROR_CODE call_polling_epoll(struct polling_t *polling);
+ERROR_CODE _poll_polling_epoll(struct polling_epoll_t *polling_epoll, struct connection_t **read_connections, struct connection_t **write_connections, struct connection_t **error_connections, struct connection_t **remove_connections, size_t read_connections_size, size_t write_connections_size, size_t error_connections_size);
 ERROR_CODE _call_polling_epoll(struct polling_epoll_t *polling_epoll, struct connection_t **read_connections, struct connection_t **write_connections, struct connection_t **error_connections, struct connection_t **remove_connections, size_t read_connections_size, size_t write_connections_size, size_t error_connections_size);
 
 #endif
