@@ -150,7 +150,7 @@ ERROR_CODE write_http_error(struct connection_t *connection, char *buffer, size_
     struct template_handler_t *template_handler;
 
     /* allocates space for the "possible" locally generated
-    error description (in case none is provided) */
+    error description (format based generation) */
     char _error_description[1024];
 
     /* allocates space to the path to the template file to
@@ -167,20 +167,12 @@ ERROR_CODE write_http_error(struct connection_t *connection, char *buffer, size_
     char *headers_buffer = buffer == NULL ? MALLOC(VIRIATUM_HTTP_SIZE) : buffer;
     size = size == 0 ? VIRIATUM_HTTP_SIZE : size;
 
-    /* in case no error description is sent one must be created from the currently
-    staticly allocated buffer and then formatted properly */
-    if(error_description == NULL) {
-        /* sets the proper error description buffer and then formats the
-        string according to the error code and message */
-        error_description = _error_description;
-        SPRINTF(
-            error_description,
-            sizeof(_error_description),
-            "%d - %s",
-            error_code,
-            error_message
-        );
-    }
+#ifndef VIRIATUM_DEBUG
+	/* sets the error description as null in order to avoid any
+	display of the (internal) message, otherwise a possible
+	security hole would be created */
+	error_description = NULL;
+#endif
 
     /* in case the use template flag is set the error
     should be displayed using the template */
@@ -203,12 +195,13 @@ ERROR_CODE write_http_error(struct connection_t *connection, char *buffer, size_
 
         /* assigns the various error related variables into the
         template handler to be used, they may be used to display
-        information arround the error */
+        information arround the error, note that the error description
+		value is conditional and may not be set */
         assign_integer_template_handler(template_handler, (unsigned char *) "error_code", error_code);
         assign_string_template_handler(template_handler, (unsigned char *) "error_message", error_message);
-#ifdef VIRIATUM_DEBUG
-        assign_string_template_handler(template_handler, (unsigned char *) "error_description", error_description);
-#endif
+		if(error_description != NULL) {
+			assign_string_template_handler(template_handler, (unsigned char *) "error_description", error_description);
+		}
 
         /* processes the file as a template handler, at this point
         the output buffer of the template engine should be populated */
@@ -254,6 +247,19 @@ ERROR_CODE write_http_error(struct connection_t *connection, char *buffer, size_
             callback_parameters
         );
     } else {
+		/* "stringfies" a possible null error description into a description
+		string in order to be correctly displayed then formats the error
+		message using the code, message and description */
+		error_description = error_description == NULL ? service->description : error_description;
+        SPRINTF(
+            _error_description,
+            sizeof(_error_description),
+            "%d - %s - %s",
+            error_code,
+            error_message,
+			error_description
+        );
+
         /* writes the http static headers to the response and
         then writes the error description itself */
         write_http_headers_m(
@@ -264,9 +270,9 @@ ERROR_CODE write_http_error(struct connection_t *connection, char *buffer, size_
             error_code,
             error_message,
             KEEP_ALIVE,
-            strlen(error_description),
+            strlen(_error_description),
             NO_CACHE,
-            error_description
+            _error_description
         );
 
         /* writes both the headers to the connection, registers for the appropriate callbacks */
