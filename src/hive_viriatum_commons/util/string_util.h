@@ -27,6 +27,8 @@
 
 #pragma once
 
+#include "../system/system.h"
+
 #define TRIM_STRING(string_buffer) &string_buffer[1]
 
 /**
@@ -102,7 +104,6 @@ static __inline int ends_with_string(unsigned char *string_value, unsigned char 
     /* return in success (complete match) */
     return 1;
 }
-
 
 static __inline unsigned char *trim(unsigned char *string_value) {
     size_t length = strlen((char *) string_value);
@@ -277,4 +278,90 @@ static __inline size_t split(char *string_value, char *buffer, size_t size_e, ch
     /* returns the count value, number of parsed elements
     from the provided string */
     return count;
+}
+
+
+static __inline char *format_delta(char *buffer, size_t size, unsigned long long delta, size_t counts) {
+	char *format;
+	char valid = FALSE;
+	size_t count = 0;
+	size_t counter = 0;
+	unsigned long long value;
+
+	value = delta / 86400;
+	if(value > 0) {
+		if(value == 1) { format = "%d day "; }
+		else { format = "%d days "; }
+
+		count += SPRINTF(
+			&buffer[count],
+			size,
+			format,
+			value
+		);
+		counter++;
+		valid = TRUE;
+	}
+
+	if(counter == counts) {
+		buffer[count - 1] = '\0';
+		return buffer;
+	}
+
+	value = (delta % 86400) / 3600;
+	if(valid || value > 0) {
+		if(value == 1) { format = "%d hour "; }
+		else { format = "%d hours "; }
+
+		count += SPRINTF(
+			&buffer[count],
+			size,
+			format,
+			value
+		);
+		counter++;
+		valid = TRUE;
+	}
+
+	if(counter == counts) {
+		buffer[count - 1] = '\0';
+		return buffer;
+	}
+
+	value = (delta % 3600) / 60;
+	if(valid || value > 0) {
+		if(value == 1) { format = "%d minute "; }
+		else { format = "%d minutes "; }
+
+		count += SPRINTF(
+			&buffer[count],
+			size,
+			format,
+			value
+		);
+		counter++;
+		valid = TRUE;
+	}
+
+	if(counter == counts) {
+		buffer[count - 1] = '\0';
+		return buffer;
+	}
+
+	value = delta % 60;
+	if(valid || value > 0) {
+		if(value == 1) { format = "%d second "; }
+		else { format = "%d seconds "; }
+
+		count += SPRINTF(
+			&buffer[count],
+			size,
+			format,
+			value
+		);
+		counter++;
+		valid = TRUE;
+	}
+
+	return buffer;
 }

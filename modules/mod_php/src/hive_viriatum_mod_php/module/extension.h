@@ -47,6 +47,7 @@ void _module_log(char *message TSRMLS_DC);
 double _module_request_time(TSRMLS_D);
 ZEND_MINFO_FUNCTION(viriatum_information);
 PHP_FUNCTION(viriatum_connections);
+PHP_FUNCTION(viriatum_uptime);
 PHP_FUNCTION(viriatum_name);
 PHP_FUNCTION(viriatum_version);
 PHP_FUNCTION(viriatum_platform);

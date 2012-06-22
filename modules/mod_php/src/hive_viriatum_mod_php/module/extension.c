@@ -31,6 +31,7 @@
 
 zend_function_entry viriatum_functions[] = {
     PHP_FE(viriatum_connections, NULL)
+	PHP_FE(viriatum_uptime, NULL)
     PHP_FE(viriatum_name, NULL)
     PHP_FE(viriatum_version, NULL)
 	PHP_FE(viriatum_platform, NULL)
@@ -241,6 +242,10 @@ ZEND_MINFO_FUNCTION(viriatum_information) {
 
 PHP_FUNCTION(viriatum_connections) {
     RETURN_LONG(_service->connections_list->size);
+}
+
+PHP_FUNCTION(viriatum_uptime) {
+    RETURN_STRING(_service->get_uptime(_service, 2), 1);
 }
 
 PHP_FUNCTION(viriatum_name) {
