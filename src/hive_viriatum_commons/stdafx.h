@@ -93,6 +93,7 @@ the windows xp operative system, must disable ipv6 */
 #endif
 
 #include "global/definitions.h"
+#include "global/common.h"
 
 #ifdef VIRIATUM_PLATFORM_WIN32
 #define FD_SETSIZE 10000
