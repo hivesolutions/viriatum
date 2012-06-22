@@ -425,7 +425,7 @@ ERROR_CODE _unset_http_settings_handler_dispatch(struct http_settings_t *http_se
 
 ERROR_CODE _send_response_handler_dispatch(struct http_parser_t *http_parser) {
     /* allocates the response buffer */
-    char *response_buffer = MALLOC(1024);
+    char *response_buffer = MALLOC(VIRIATUM_HTTP_SIZE);
 
     /* retrieves the connection from the http parser parameters */
     struct connection_t *connection = (struct connection_t *) http_parser->parameters;
@@ -435,7 +435,7 @@ ERROR_CODE _send_response_handler_dispatch(struct http_parser_t *http_parser) {
     write_http_error(
         connection,
         response_buffer,
-        1024,
+        VIRIATUM_HTTP_SIZE,
         HTTP11,
         500,
         "Internal Server Error",
