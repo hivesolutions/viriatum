@@ -195,7 +195,7 @@ ERROR_CODE call_polling_epoll(struct polling_t *polling) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _poll_polling_epoll(struct polling_epoll_t *polling_epoll, struct connection_t **read_connections, struct connection_t **write_connections, struct connection_t **error_connections, struct connection_t **remove_connections, size_t read_connections_size, size_t write_connections_size, size_t error_connections_size) {
+ERROR_CODE _poll_polling_epoll(struct polling_epoll_t *polling_epoll, struct connection_t **read_connections, struct connection_t **write_connections, struct connection_t **error_connections, size_t *read_connections_size, size_t *write_connections_size, size_t *error_connections_size) {
 	/* allocates space for the buffer to hold the various
 	events generated from the wait call and for the event
 	pointer for the iteration cycle */
