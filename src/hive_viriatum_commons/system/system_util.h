@@ -75,7 +75,7 @@
 #define GET_MEMORY_USAGE(memory_information) memory_information.ru_ixrss
 #define FILE_EXISTS(file_path) access(file_path, F_OK) == 0
 #define ACCESS(path, mode) access(path, mode)
-#define ROUND(value) round(value)
+#define ROUND(value) floor(value + 0.5f)
 #endif
 
 #ifdef VIRIATUM_PLATFORM_MSC
