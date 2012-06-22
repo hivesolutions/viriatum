@@ -33,9 +33,6 @@ void create_polling_select(struct polling_select_t **polling_select_pointer, str
     /* retrieves the polling select size */
     size_t polling_select_size = sizeof(struct polling_select_t);
 
-    /* retrieves the connection pointer size */
-    size_t connection_pointer_size = sizeof(struct connection_t *);
-
     /* allocates space for the polling select */
     struct polling_select_t *polling_select = (struct polling_select_t *) MALLOC(polling_select_size);
 
