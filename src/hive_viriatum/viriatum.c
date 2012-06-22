@@ -154,7 +154,7 @@ ERROR_CODE print_information() {
 
     /* prints a message */
     V_PRINT_F(
-        "%s %s (%s, %s) [%s %s %d bit (%s)] on %s\n",
+        "%s %s (%s, %s) [%s %s %d bit (%s)] %s\n",
         description,
         version,
         VIRIATUM_COMPILATION_DATE,
