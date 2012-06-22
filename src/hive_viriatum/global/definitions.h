@@ -190,6 +190,12 @@ static __inline char *get_config_path() {
 #define VIRIATUM_MAX_EVENTS 1024
 #endif
 
+#ifdef VIRIATUM_DEBUG
+#define VIRIATUM_DEBUG_S " debug"
+#else
+#define VIRIATUM_DEBUG_S ""
+#endif
+
 #ifdef VIRIATUM_IP6
 #define VIRIATUM_IP6_S " ipv6"
 #else
@@ -214,5 +220,5 @@ static __inline char *get_config_path() {
 #define VIRIATUM_PCRE_S ""
 #endif
 
-#define _VIRIATUM_FLAGS VIRIATUM_IP6_S VIRIATUM_EPOLL_S VIRIATUM_SSL_S VIRIATUM_PCRE_S
+#define _VIRIATUM_FLAGS VIRIATUM_DEBUG_S VIRIATUM_IP6_S VIRIATUM_EPOLL_S VIRIATUM_SSL_S VIRIATUM_PCRE_S
 #define VIRIATUM_FLAGS TRIM_STRING(_VIRIATUM_FLAGS)
