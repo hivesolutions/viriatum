@@ -27,7 +27,7 @@
                     </tr>
                     <tr>
                         <td class="right label">load</td>
-                        <td class="left value"><?php echo(viriatum_connections()) ?></td>
+                        <td class="left value"><?php echo(viriatum_connections()) ?> connections</td>
                     </tr>
                     <tr>
                         <td class="right label">version</td>
