@@ -374,7 +374,7 @@ static __inline size_t format_bytes(char *buffer, size_t size, size_t bytes) {
     char valid = FALSE;
     char is_float = TRUE;
 
-    value = bytes / 1073741824;
+    value = (size_t) ROUND((double) bytes / 1073741824.0f);
     if(value > 0) {
         if(value == 1) { format = "%.1f GByte"; }
         else if(value < 10) { format = "%.1f GBytes"; }
@@ -385,7 +385,7 @@ static __inline size_t format_bytes(char *buffer, size_t size, size_t bytes) {
         valid = TRUE;
     }
 
-    value = bytes / 1048576;
+    value = (size_t) ROUND((double) bytes / 1048576.0f);
     if(!valid && value > 0) {
         if(value == 1) { format = "%.1f MByte"; }
         else if(value < 10) { format = "%.1f MBytes"; }
@@ -396,7 +396,7 @@ static __inline size_t format_bytes(char *buffer, size_t size, size_t bytes) {
         valid = TRUE;
     }
 
-    value = bytes / 1024;
+    value = (size_t) ROUND((double) bytes / 1024.0f);
     if(!valid && value > 0) {
         if(value == 1) { format = "%.1f KByte"; }
         else if(value < 10) { format = "%.1f KBytes"; }
