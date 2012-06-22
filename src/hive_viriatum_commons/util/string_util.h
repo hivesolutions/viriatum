@@ -280,13 +280,12 @@ static __inline size_t split(char *string_value, char *buffer, size_t size_e, ch
     return count;
 }
 
-
-static __inline char *format_delta(char *buffer, size_t size, unsigned long long delta, size_t counts) {
+static __inline size_t format_delta(char *buffer, size_t size, unsigned long long delta, size_t counts) {
 	char *format;
-	char valid = FALSE;
+	unsigned long long value;
 	size_t count = 0;
 	size_t counter = 0;
-	unsigned long long value;
+	char valid = FALSE;
 
 	value = delta / 86400;
 	if(value > 0) {
@@ -305,7 +304,7 @@ static __inline char *format_delta(char *buffer, size_t size, unsigned long long
 
 	if(counter == counts) {
 		buffer[count - 1] = '\0';
-		return buffer;
+		return count;
 	}
 
 	value = (delta % 86400) / 3600;
@@ -325,7 +324,7 @@ static __inline char *format_delta(char *buffer, size_t size, unsigned long long
 
 	if(counter == counts) {
 		buffer[count - 1] = '\0';
-		return buffer;
+		return count;
 	}
 
 	value = (delta % 3600) / 60;
@@ -345,11 +344,11 @@ static __inline char *format_delta(char *buffer, size_t size, unsigned long long
 
 	if(counter == counts) {
 		buffer[count - 1] = '\0';
-		return buffer;
+		return count;
 	}
 
 	value = delta % 60;
-	if(valid || value > 0) {
+	if(valid || value >= 0) {
 		if(value == 1) { format = "%d second "; }
 		else { format = "%d seconds "; }
 
@@ -363,5 +362,69 @@ static __inline char *format_delta(char *buffer, size_t size, unsigned long long
 		valid = TRUE;
 	}
 
-	return buffer;
+	return count;
+}
+
+static __inline size_t format_bytes(char *buffer, size_t size, size_t bytes) {
+	char *format;
+	size_t count = 0;
+	size_t value;
+
+	value = bytes / 1073741824;
+	if(value > 0) {
+		if(value == 1) { format = "%d GByte"; }
+		else { format = "%d GBytes"; }
+
+		count += SPRINTF(
+			&buffer[count],
+			size,
+			format,
+			value
+		);
+		return count;
+	}
+
+	value = bytes / 1048576;
+	if(value > 0) {
+		if(value == 1) { format = "%d MByte"; }
+		else { format = "%d MBytes"; }
+
+		count += SPRINTF(
+			&buffer[count],
+			size,
+			format,
+			value
+		);
+		return count;
+	}
+
+	value = bytes / 1024;
+	if(value > 0) {
+		if(value == 1) { format = "%d KByte"; }
+		else { format = "%d KBytes"; }
+
+		count += SPRINTF(
+			&buffer[count],
+			size,
+			format,
+			value
+		);
+		return count;
+	}
+
+	value = bytes;
+	if(value >= 0) {
+		if(value == 1) { format = "%d Byte"; }
+		else { format = "%d Bytes"; }
+
+		count += SPRINTF(
+			&buffer[count],
+			size,
+			format,
+			value
+		);
+		return count;
+	}
+
+	return count;
 }
