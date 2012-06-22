@@ -48,27 +48,6 @@ void create_polling_epoll(struct polling_epoll_t **polling_epoll_pointer, struct
 	size (this no longer used by the kernel) */
 	polling_epoll->epoll_fd = epoll_create(1024);
 
-
-
-    /* allocates the read connection for internal
-    polling epoll usage */
-    polling_epoll->read_connections = (struct connection_t **) MALLOC(VIRIATUM_MAX_CONNECTIONS * connection_pointer_size);
-
-    /* allocates the write connection for internal
-    polling epoll usage */
-    polling_epoll->write_connections = (struct connection_t **) MALLOC(VIRIATUM_MAX_CONNECTIONS * connection_pointer_size);
-
-    /* allocates the error connection for internal
-    polling epoll usage */
-    polling_epoll->error_connections = (struct connection_t **) MALLOC(VIRIATUM_MAX_CONNECTIONS * connection_pointer_size);
-
-    /* allocates the remove connection for internal
-    polling epoll usage */
-    polling_epoll->remove_connections = (struct connection_t **) MALLOC(VIRIATUM_MAX_CONNECTIONS * connection_pointer_size);
-
-
-
-
     /* sets the polling epoll in the polling epoll pointer */
     *polling_epoll_pointer = polling_epoll;
 }
@@ -77,18 +56,6 @@ void delete_polling_epoll(struct polling_epoll_t *polling_epoll) {
 	/* in case the polling fd is defined it must be closed
 	in order to avoid any memory leak problem */
 	if(polling_epoll->epoll_fd) { close(polling_epoll->epoll_fd); } 
-
-    /* releases the remove connections */
-    FREE(polling_epoll->remove_connections);
-
-    /* releases the error connection */
-    FREE(polling_epoll->error_connections);
-
-    /* releases the write connection */
-    FREE(polling_epoll->write_connections);
-
-    /* releases the read connection */
-    FREE(polling_epoll->read_connections);
 
     /* releases the polling epoll */
     FREE(polling_epoll);
@@ -140,15 +107,11 @@ ERROR_CODE register_connection_polling_epoll(struct polling_t *polling, struct c
 	_event.data.ptr = (void *) connection;
 	result_code = epoll_ctl(polling_epoll->epoll_fd, EPOLL_CTL_ADD, connection->socket_handle, &_event);
 	
-	/* in case there was an error in epoll */
+	/* in case there was an error in epoll need to correctly
+	handle it and propagate it to the caller */
 	if(SOCKET_TEST_ERROR(result_code)) {
-		/* retrieves the select error code */
         SOCKET_ERROR_CODE epoll_error_code = SOCKET_GET_ERROR_CODE(socket_result);
-
-        /* prints an info message */
         V_INFO_F("Problem registering connection epoll: %d\n", epoll_error_code);
-
-        /* raises an error */
         RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem registering connection epoll");
 	}
 
@@ -165,17 +128,15 @@ ERROR_CODE unregister_connection_polling_epoll(struct polling_t *polling, struct
 	polling control structure */
     struct polling_epoll_t *polling_epoll = (struct polling_epoll_t *) polling->lower;
 
+	/* removes the associated socket handle (fd) from the epoll
+	structure to avoid any leak */
 	result_code = epoll_ctl(polling_epoll->epoll_fd, EPOLL_CTL_DEL, connection->socket_handle, NULL);
 
-	/* in case there was an error in epoll */
+	/* in case there was an error in epoll need to correctly
+	handle it and propagate it to the caller */
 	if(SOCKET_TEST_ERROR(result_code)) {
-		/* retrieves the select error code */
         SOCKET_ERROR_CODE epoll_error_code = SOCKET_GET_ERROR_CODE(socket_result);
-
-        /* prints an info message */
         V_INFO_F("Problem unregistering connection epoll: %d\n", epoll_error_code);
-
-        /* raises an error */
         RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem unregistering connection epoll");
 	}
 
@@ -194,23 +155,12 @@ ERROR_CODE unregister_write_polling_epoll(struct polling_t *polling, struct conn
 }
 
 ERROR_CODE poll_polling_epoll(struct polling_t *polling) {
-	struct epoll_event events[64];
-	struct epoll_event *_event;
-	int event_count;
-	int index;
-
-	struct connection_t *connection;
-
-    size_t read_index = 0;
-    size_t write_index = 0;
-    size_t error_index = 0;
-
     /* retrieves the polling epoll structure from the upper
 	polling control structure */
     struct polling_epoll_t *polling_epoll = (struct polling_epoll_t *) polling->lower;
 
     /* polls the polling epoll */
-    /*_poll_polling_epoll(
+    _poll_polling_epoll(
         polling_epoll,
         polling_epoll->read_connections,
         polling_epoll->write_connections,
@@ -218,48 +168,7 @@ ERROR_CODE poll_polling_epoll(struct polling_t *polling) {
         &polling_epoll->read_connections_size,
         &polling_epoll->write_connections_size,
         &polling_epoll->error_connections_size
-    )*/
-
-	/* TODO: se isto funcionar ten ho de tentar c
-	om memoria estatica
-	events[64] */
-
-    /* prints a debug message */
-    V_DEBUG("Entering epoll statement\n");
-
-	event_count = epoll_wait(polling_epoll->epoll_fd, events, 64, -1);
-
-	for(index = 0; index < event_count; index++) {
-        _event = &events[index];
-		connection = (struct connection_t *) _event->data.ptr;
-
-		if(_event->events & EPOLLIN) {
-			/* sets the current connection in the read connections
-			and then increments the read index counter */
-			polling_epoll->read_connections[read_index] = connection;
-			read_index++;
-		}
-
-		if(_event->events & EPOLLOUT) {
-			/* sets the current connection in the write connections
-			and then increments the write index counter */
-			polling_epoll->write_connections[write_index] = connection;
-			write_index++;
-		}
-
-		if(_event->events & (EPOLLERR | EPOLLHUP)) {
-            /* sets the current connection in the error connections
-			and then increments the error index counter */
-			polling_epoll->error_connections[error_index] = connection;
-			error_index++;
-		}
-    }
-	
-    /* updates the various operation counters for the three
-	operation to be "polled" (this is done by reference) */
-    polling_epoll->read_connections_size = read_index;
-    polling_epoll->write_connections_size = write_index;
-    polling_epoll->error_connections_size = error_index;
+    );
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -281,6 +190,108 @@ ERROR_CODE call_polling_epoll(struct polling_t *polling) {
         polling_epoll->write_connections_size,
         polling_epoll->error_connections_size
     );
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE _poll_polling_epoll(struct polling_epoll_t *polling_epoll, struct connection_t **read_connections, struct connection_t **write_connections, struct connection_t **error_connections, struct connection_t **remove_connections, size_t read_connections_size, size_t write_connections_size, size_t error_connections_size) {
+	/* allocates space for the buffer to hold the various
+	events generated from the wait call and for the event
+	pointer for the iteration cycle */
+	struct epoll_event events[VIRIATUM_MAX_EVENTS];
+	struct epoll_event *_event;
+
+	/* allocates space for the index counter to be used in
+	the iteration and for the counter of event from the wait */
+	int index;
+	int event_count;
+
+	/* allocates space for the reference to the connection
+	to eb used in the iteration cycle (temporary object) */
+	struct connection_t *connection;
+
+	/* starts the various temporary index counters for
+	the various types of socket operations */
+    size_t read_index = 0;
+    size_t write_index = 0;
+    size_t error_index = 0;
+
+    /* prints a debug message */
+    V_DEBUG("Entering epoll statement\n");
+
+	/* runs the wait process in the epoll, this is the main call
+	of the epoll loop as it si the on responsible for the polling
+	operation and generation of the events */
+	event_count = epoll_wait(polling_epoll->epoll_fd, events, VIRIATUM_MAX_EVENTS, -1);
+
+    /* prints a debug message */
+    V_DEBUG_F("Exiting epoll statement with value: %d\n", event_count);
+
+    /* in case there was an error in epoll, in case there was this is
+	considered to be a critical error */
+	if(SOCKET_TEST_ERROR(event_count)) {
+        /* retrieves the epoll error code */
+        SOCKET_ERROR_CODE epoll_error_code = SOCKET_GET_ERROR_CODE(socket_result);
+
+        /* prints an info message */
+        V_INFO_F("Problem running epoll: %d\n", epoll_error_code);
+
+        /* resets the values for the various read values,
+        this avoid possible problems in next actions */
+        *read_connections_size = 0;
+        *write_connections_size = 0;
+        *error_connections_size = 0;
+
+        /* closes the service socket */
+        SOCKET_CLOSE(service->service_socket_handle);
+
+        /* raises an error */
+        RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem running epoll");
+	}
+
+	/* iterates over the range of "generated" events in order
+	to correctly handle them to the upper levels */
+	for(index = 0; index < event_count; index++) {
+		/* retrieves the current event in iteration (epoll structure)
+		and uses it to retrieve the associated pointer to the connection
+		for event resolution */
+        _event = &events[index];
+		connection = (struct connection_t *) _event->data.ptr;
+
+		/* checks if the event is of type input (read) must be
+		added to the read operations queue */
+		if(_event->events & EPOLLIN) {
+			/* sets the current connection in the read connections
+			and then increments the read index counter */
+			read_connections[read_index] = connection;
+			read_index++;
+		}
+
+		/* checks if the event is of type output (write) must be
+		added to the write operations queue */
+		if(_event->events & EPOLLOUT) {
+			/* sets the current connection in the write connections
+			and then increments the write index counter */
+			write_connections[write_index] = connection;
+			write_index++;
+		}
+
+		/* checks if the event is of type exception (error) must be
+		added to the error operations queue */
+		if(_event->events & (EPOLLERR | EPOLLHUP)) {
+            /* sets the current connection in the error connections
+			and then increments the error index counter */
+			error_connections[error_index] = connection;
+			error_index++;
+		}
+    }
+	
+    /* updates the various operation counters for the three
+	operation to be "polled" (this is done by reference) */
+    *read_connections_size = read_index;
+    *write_connections_size = write_index;
+    *error_connections_size = error_index;
 
     /* raises no error */
     RAISE_NO_ERROR;
