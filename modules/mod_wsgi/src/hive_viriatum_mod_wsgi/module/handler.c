@@ -660,11 +660,11 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
         /* copies the current wsgi header into the current position of the headers
         buffer (header copy), note that the trailing newlines are count in size */
         count += SPRINTF(
-			&headers_buffer[count],
-			VIRIATUM_MAX_HEADER_C_SIZE,
-			"%s\r\n",
-			_wsgi_request.headers[index]
-		);
+            &headers_buffer[count],
+            VIRIATUM_MAX_HEADER_C_SIZE,
+            "%s\r\n",
+            _wsgi_request.headers[index]
+        );
     }
 
     /* finishes the current headers sequence with the final carriage return newline
