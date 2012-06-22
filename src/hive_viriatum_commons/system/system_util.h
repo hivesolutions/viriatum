@@ -53,7 +53,7 @@
 #define GET_MEMORY_USAGE(memory_information) memory_information.PagefileUsage
 #define FILE_EXISTS(file_path) GetFileAttributes(file_path) != 0xffffffff
 #define ACCESS(path, mode) _access(path, mode)
-#define ROUND(value) floor(value + 0.5f)
+#define ROUND(value) (value + 0.5f)
 #endif
 
 #ifdef VIRIATUM_PLATFORM_UNIX
@@ -75,7 +75,7 @@
 #define GET_MEMORY_USAGE(memory_information) memory_information.ru_ixrss
 #define FILE_EXISTS(file_path) access(file_path, F_OK) == 0
 #define ACCESS(path, mode) access(path, mode)
-#define ROUND(value) floor(value + 0.5f)
+#define ROUND(value) (value + 0.5f)
 #endif
 
 #ifdef VIRIATUM_PLATFORM_MSC
