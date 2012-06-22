@@ -241,7 +241,8 @@ ERROR_CODE read_handler_stream_io(struct connection_t *connection) {
         overflow the current allocated buffer, must
 		flush the current buffer avoid corruption */
         if(buffer_size + VIRIATUM_READ_SIZE > VIRIATUM_READB_SIZE) {
-            /* in case the on data handler is defined */
+            /* in case the on data handler is defined must call
+			the handler to flush the buffer */
             if(io_connection->on_data != NULL) {
                 /* prints a debug message */
                 V_DEBUG("Calling on data handler\n");
@@ -332,8 +333,9 @@ ERROR_CODE read_handler_stream_io(struct connection_t *connection) {
     switch(error) {
         /* in case there's no error */
         case 0:
-            /* in case the on data handler is defined */
-            if(io_connection->on_data != NULL) {
+            /* in case the on data handler is defined and there
+			is data to be provided (buffer size available )*/
+            if(buffer_size > 0 && io_connection->on_data != NULL) {
                 /* prints a debug message */
                 V_DEBUG("Calling on data handler\n");
 
@@ -357,8 +359,9 @@ ERROR_CODE read_handler_stream_io(struct connection_t *connection) {
 
         /* in case it's a non fatal error */
         case 2:
-            /* in case the on data handler is defined */
-            if(io_connection->on_data != NULL) {
+            /* in case the on data handler is defined and there
+			is data to be provided (buffer size available )*/
+            if(buffer_size > 0 && io_connection->on_data != NULL) {
                 /* prints a debug message */
                 V_DEBUG("Calling on data handler\n");
 
