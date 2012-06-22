@@ -46,6 +46,8 @@ typedef struct polling_epoll_t {
 	 */
     int epoll_fd;
 
+	size_t poll_count;
+
     /**
      * The buffer that holds the connections
      * with data available for read.
