@@ -38,6 +38,10 @@ void create_polling_epoll(struct polling_epoll_t **polling_epoll_pointer, struct
     /* allocates space for the polling epoll */
     struct polling_epoll_t *polling_epoll = (struct polling_epoll_t *) MALLOC(polling_epoll_size);
 
+
+	polling_epoll->poll_count = 0;
+
+
     /* resets the polling in the polling epoll */
     polling_epoll->polling = polling;
 
@@ -89,7 +93,7 @@ ERROR_CODE register_connection_polling_epoll(struct polling_t *polling, struct c
 	to add a new element to the poll structure */
 	SOCKET_ERROR_CODE result_code;
 
-	/* allocates space for teh new event to be inserted into
+	/* allocates space for the new event to be inserted into
 	the epoll polling system (this is an internal kernel structure) */
 	struct epoll_event _event;
 
@@ -111,6 +115,8 @@ ERROR_CODE register_connection_polling_epoll(struct polling_t *polling, struct c
         V_INFO_F("Problem registering connection epoll: %d\n", epoll_error_code);
         RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem registering connection epoll");
 	}
+
+	polling_epoll->poll_count++;
 
 	/* raises no error */
     RAISE_NO_ERROR;
@@ -136,6 +142,8 @@ ERROR_CODE unregister_connection_polling_epoll(struct polling_t *polling, struct
         V_INFO_F("Problem unregistering connection epoll: %d\n", epoll_error_code);
         RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem unregistering connection epoll");
 	}
+
+	polling_epoll->poll_count--;
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -218,8 +226,8 @@ ERROR_CODE _poll_polling_epoll(struct polling_epoll_t *polling_epoll, struct con
 	structure in order to be able to modify it */
     struct service_t *service = polling_epoll->polling->service;
 
-    /* prints a debug message */
-    V_DEBUG("Entering epoll statement\n");
+	/* prints a debug message (include the poll count) */
+    V_DEBUG("Entering epoll statement (%lu)\n", polling_epoll->poll_count);
 
 	/* runs the wait process in the epoll, this is the main call
 	of the epoll loop as it si the on responsible for the polling
