@@ -249,33 +249,33 @@ PHP_FUNCTION(viriatum_uptime) {
 }
 
 PHP_FUNCTION(viriatum_name) {
-    RETURN_STRING(_service->name, 1);
+    RETURN_STRING((char *) _service->name, 1);
 }
 
 PHP_FUNCTION(viriatum_version) {
-    RETURN_STRING(_service->version, 1);
+    RETURN_STRING((char *) _service->version, 1);
 }
 
 PHP_FUNCTION(viriatum_platform) {
-    RETURN_STRING(_service->platform, 1);
+    RETURN_STRING((char *) _service->platform, 1);
 }
 
 PHP_FUNCTION(viriatum_flags) {
-    RETURN_STRING(_service->flags, 1);
+    RETURN_STRING((char *) _service->flags, 1);
 }
 
 PHP_FUNCTION(viriatum_compiler) {
-    RETURN_STRING(_service->compiler, 1);
+    RETURN_STRING((char *) _service->compiler, 1);
 }
 
 PHP_FUNCTION(viriatum_compiler_version) {
-    RETURN_STRING(_service->compiler_version, 1);
+    RETURN_STRING((char *) _service->compiler_version, 1);
 }
 
 PHP_FUNCTION(viriatum_compilation_date) {
-    RETURN_STRING(_service->compilation_date, 1);
+    RETURN_STRING((char *) _service->compilation_date, 1);
 }
 
 PHP_FUNCTION(viriatum_description) {
-    RETURN_STRING(_service->description, 1);
+    RETURN_STRING((char *) _service->description, 1);
 }
