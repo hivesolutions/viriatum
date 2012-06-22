@@ -63,22 +63,6 @@ void create_polling_select(struct polling_select_t **polling_select_pointer, str
     /* zeros the sockets error set temporary */
     SOCKET_SET_ZERO(&polling_select->sockets_error_set_temporary);
 
-    /* allocates the read connection for internal
-    polling select usage */
-    polling_select->read_connections = (struct connection_t **) MALLOC(VIRIATUM_MAX_CONNECTIONS * connection_pointer_size);
-
-    /* allocates the write connection for internal
-    polling select usage */
-    polling_select->write_connections = (struct connection_t **) MALLOC(VIRIATUM_MAX_CONNECTIONS * connection_pointer_size);
-
-    /* allocates the error connection for internal
-    polling select usage */
-    polling_select->error_connections = (struct connection_t **) MALLOC(VIRIATUM_MAX_CONNECTIONS * connection_pointer_size);
-
-    /* allocates the remove connection for internal
-    polling select usage */
-    polling_select->remove_connections = (struct connection_t **) MALLOC(VIRIATUM_MAX_CONNECTIONS * connection_pointer_size);
-
     /* sets the default timeout */
     polling_select->select_timeout.tv_sec = VIRIATUM_SELECT_TIMEOUT;
     polling_select->select_timeout.tv_usec = 0;
@@ -88,18 +72,6 @@ void create_polling_select(struct polling_select_t **polling_select_pointer, str
 }
 
 void delete_polling_select(struct polling_select_t *polling_select) {
-    /* releases the remove connections */
-    FREE(polling_select->remove_connections);
-
-    /* releases the error connection */
-    FREE(polling_select->error_connections);
-
-    /* releases the write connection */
-    FREE(polling_select->write_connections);
-
-    /* releases the read connection */
-    FREE(polling_select->read_connections);
-
     /* releases the polling select */
     FREE(polling_select);
 }
