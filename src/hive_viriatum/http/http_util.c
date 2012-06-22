@@ -250,7 +250,7 @@ ERROR_CODE write_http_error(struct connection_t *connection, char *buffer, size_
         /* "stringfies" a possible null error description into a description
         string in order to be correctly displayed then formats the error
         message using the code, message and description */
-        error_description = error_description == NULL ? service->description : error_description;
+        error_description = error_description == NULL ? (char *) service->description : error_description;
         SPRINTF(
             _error_description,
             sizeof(_error_description),
