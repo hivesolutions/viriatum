@@ -288,7 +288,7 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
 
     /* allocates the headers buffer (it will be releases automatically by the writter)
     it need to be allocated in the heap so it gets throught the request cycle */
-    char *headers_buffer = MALLOC(1024);
+    char *headers_buffer = MALLOC(VIRIATUM_HTTP_SIZE);
 
     /* retrieves the handler file context from the http parser */
     struct handler_file_context_t *handler_file_context = (struct handler_file_context_t *) http_parser->context;
@@ -313,7 +313,13 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
             is_redirect = 1;
         } else {
             /* creates the complete path to the template file */
-            SPRINTF((char *) template_path, 1024, "%s%s", VIRIATUM_RESOURCES_PATH, VIRIATUM_LISTING_PATH);
+            SPRINTF(
+				(char *) template_path,
+				sizeof(template_path),
+				"%s%s", 
+				VIRIATUM_RESOURCES_PATH,
+				VIRIATUM_LISTING_PATH
+			);
 
             /* prints a debug message */
             V_DEBUG_F("Processing template file '%s'\n", template_path);
@@ -420,7 +426,7 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
         write_http_error(
             connection,
             headers_buffer,
-            1024,
+            VIRIATUM_HTTP_SIZE,
             HTTP11,
             404,
             "Not Found",
@@ -433,7 +439,7 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
         count = write_http_headers(
             connection,
             headers_buffer,
-            1024,
+            VIRIATUM_HTTP_SIZE,
             HTTP11,
             307,
             "Temporary Redirect",
@@ -442,7 +448,7 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
         );
         SPRINTF(
             &headers_buffer[count],
-            1024 - count,
+            VIRIATUM_HTTP_SIZE - count,
             CONTENT_LENGTH_H ": 0\r\n"
             LOCATION_H ": %s\r\n\r\n",
             location
@@ -463,7 +469,7 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
         write_http_headers_c(
             connection,
             headers_buffer,
-            1024,
+            VIRIATUM_HTTP_SIZE,
             HTTP11,
             200,
             "OK",
@@ -487,7 +493,7 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
         write_http_headers_c(
             connection,
             headers_buffer,
-            1024,
+            VIRIATUM_HTTP_SIZE,
             HTTP11,
             304,
             "Not Modified",
@@ -513,7 +519,7 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
         count = write_http_headers_c(
             connection,
             headers_buffer,
-            1024,
+			VIRIATUM_HTTP_SIZE,
             HTTP11,
             200,
             "OK",
@@ -524,7 +530,7 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
         );
         SPRINTF(
             &headers_buffer[count],
-            1024 - count,
+            VIRIATUM_HTTP_SIZE - count,
             ETAG_H ": %s\r\n\r\n",
             etag
         );
