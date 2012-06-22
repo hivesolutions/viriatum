@@ -38,6 +38,9 @@
                             ${if item=entry.type value=2 operator=eq}
                                 <td class="icon folder"></td>
                             ${/if}
+                            ${if item=entry.type value=3 operator=eq}
+                                <td class="icon text"></td>
+                            ${/if}
                             <td class="left"><a href="${out value=entry.name /}">${out value=entry.name /}</a></td>
                             <td class="right date">${out value=entry.time /}</td>
                             <td class="right size">${out value=entry.size_string /}</td>
