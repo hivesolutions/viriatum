@@ -46,6 +46,12 @@ typedef struct polling_epoll_t {
 	 */
     int epoll_fd;
 
+	/**
+	 * Counter that controls the number of events
+	 * currently present in the epoll structure.
+	 * This counter is very usefull for debugging
+	 * purposes and printing information.
+	 */
 	size_t poll_count;
 
     /**

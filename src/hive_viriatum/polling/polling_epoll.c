@@ -116,6 +116,8 @@ ERROR_CODE register_connection_polling_epoll(struct polling_t *polling, struct c
         RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem registering connection epoll");
 	}
 
+	/* increments the counter that controls the number of events
+	currently in the polling state in the epoll */
 	polling_epoll->poll_count++;
 
 	/* raises no error */
@@ -143,6 +145,8 @@ ERROR_CODE unregister_connection_polling_epoll(struct polling_t *polling, struct
         RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem unregistering connection epoll");
 	}
 
+	/* decrements the counter that controls the number of events
+	currently in the polling state in the epoll */
 	polling_epoll->poll_count--;
 
     /* raises no error */
