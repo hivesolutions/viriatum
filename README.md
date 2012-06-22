@@ -98,7 +98,7 @@ FreeBSD ignores the usr local directory by default so it must be included in ord
 
 ## Benchmarking
 
-* Most of the information presented in this site [gwan benchmark](http://gwan.ch/en_apachebench_httperf.html) is applicable for benchmarking Viriatum
+* Most of the information presented in [gwan benchmark](http://gwan.ch/en_apachebench_httperf.html) is applicable for benchmarking Viriatum
 
 ## Debugging
 
