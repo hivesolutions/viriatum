@@ -46,14 +46,53 @@ typedef struct polling_epoll_t {
 	 */
     int epoll_fd;
 
+    /**
+     * The buffer that holds the connections
+     * with data available for read.
+     */
     struct connection_t *read_connections[VIRIATUM_MAX_EVENTS];
-    struct connection_t *write_connections[VIRIATUM_MAX_EVENTS];
-    struct connection_t *error_connections[VIRIATUM_MAX_EVENTS];
-    struct connection_t *remove_connections[VIRIATUM_MAX_EVENTS];
 
+    /**
+     * The buffer that holds the connections
+     * with data available for write.
+     */
+    struct connection_t *write_connections[VIRIATUM_MAX_EVENTS];
+
+    /**
+     * The buffer that holds the connections
+     * that are in an erroneous state
+     */
+    struct connection_t *error_connections[VIRIATUM_MAX_EVENTS];
+
+    /**
+     * The buffer thatn holds the connections
+     * to be house-kept (removed) at the end
+     * of the polling cycle.
+     */
+	struct connection_t *remove_connections[VIRIATUM_MAX_EVENTS];
+
+    /**
+     * The size of the read connections
+     * buffer.
+     */
     size_t read_connections_size;
+
+    /**
+     * The size of the write connections
+     * buffer.
+     */
     size_t write_connections_size;
+
+    /**
+     * The size of the error connections
+     * buffer.
+     */
     size_t error_connections_size;
+
+    /**
+     * The size of the remove connections
+     * buffer.
+     */
     size_t remove_connections_size;
 } polling_epoll;
 
