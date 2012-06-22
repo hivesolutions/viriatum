@@ -44,14 +44,14 @@ void create_service(struct service_t **service_pointer, unsigned char *name, uns
     service->service_socket_handle = 0;
     service->service_socket6_handle = 0;
     service->http_handler = NULL;
-	service->get_uptime = _get_uptime_service;
+    service->get_uptime = _get_uptime_service;
     service->create_http_handler = create_http_handler_service;
     service->delete_http_handler = delete_http_handler_service;
     service->add_http_handler = add_http_handler_service;
     service->remove_http_handler = remove_http_handler_service;
     service->get_http_handler = get_http_handler_service;
     service->locations.count = 0;
-	
+
 #ifdef VIRIATUM_SSL
     service->ssl_handle = NULL;
     service->ssl_context = NULL;
@@ -691,9 +691,9 @@ ERROR_CODE start_service(struct service_t *service) {
     service loop as iterable (breaks on stop) */
     service->status = STATUS_OPEN;
 
-	/* saves the current time so that it's possible to calculate
-	the uptime for the current service */
-	service->start_time = (unsigned long long) time(NULL);
+    /* saves the current time so that it's possible to calculate
+    the uptime for the current service */
+    service->start_time = (unsigned long long) time(NULL);
 
     /* registers the various "local" handlers
     in the service, for later usage */
@@ -1849,10 +1849,10 @@ ERROR_CODE _comand_line_options_service(struct service_t *service, struct hash_m
 }
 
 const char *_get_uptime_service(struct service_t *service, size_t count) {
-	/* calculates the delata time (in seconds) and uses it to format
-	the delta using the provied count value (number of parts), the
-	uptime string is store in the service constant and then returned */
+    /* calculates the delata time (in seconds) and uses it to format
+    the delta using the provied count value (number of parts), the
+    uptime string is store in the service constant and then returned */
     unsigned long long delta = (unsigned long long) time(NULL) - service->start_time;
-	format_delta(service->_uptime, sizeof(service->_uptime), delta, count);
-	return service->_uptime;
+    format_delta(service->_uptime, sizeof(service->_uptime), delta, count);
+    return service->_uptime;
 }

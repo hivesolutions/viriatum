@@ -281,150 +281,150 @@ static __inline size_t split(char *string_value, char *buffer, size_t size_e, ch
 }
 
 static __inline size_t format_delta(char *buffer, size_t size, unsigned long long delta, size_t counts) {
-	char *format;
-	unsigned long long value;
-	size_t count = 0;
-	size_t counter = 0;
-	char valid = FALSE;
+    char *format;
+    unsigned long long value;
+    size_t count = 0;
+    size_t counter = 0;
+    char valid = FALSE;
 
-	value = delta / 86400;
-	if(value > 0) {
-		if(value == 1) { format = "%d day "; }
-		else { format = "%d days "; }
+    value = delta / 86400;
+    if(value > 0) {
+        if(value == 1) { format = "%d day "; }
+        else { format = "%d days "; }
 
-		count += SPRINTF(
-			&buffer[count],
-			size,
-			format,
-			value
-		);
-		counter++;
-		valid = TRUE;
-	}
+        count += SPRINTF(
+            &buffer[count],
+            size,
+            format,
+            value
+        );
+        counter++;
+        valid = TRUE;
+    }
 
-	if(counter == counts) {
-		buffer[count - 1] = '\0';
-		return count;
-	}
+    if(counter == counts) {
+        buffer[count - 1] = '\0';
+        return count;
+    }
 
-	value = (delta % 86400) / 3600;
-	if(valid || value > 0) {
-		if(value == 1) { format = "%d hour "; }
-		else { format = "%d hours "; }
+    value = (delta % 86400) / 3600;
+    if(valid || value > 0) {
+        if(value == 1) { format = "%d hour "; }
+        else { format = "%d hours "; }
 
-		count += SPRINTF(
-			&buffer[count],
-			size,
-			format,
-			value
-		);
-		counter++;
-		valid = TRUE;
-	}
+        count += SPRINTF(
+            &buffer[count],
+            size,
+            format,
+            value
+        );
+        counter++;
+        valid = TRUE;
+    }
 
-	if(counter == counts) {
-		buffer[count - 1] = '\0';
-		return count;
-	}
+    if(counter == counts) {
+        buffer[count - 1] = '\0';
+        return count;
+    }
 
-	value = (delta % 3600) / 60;
-	if(valid || value > 0) {
-		if(value == 1) { format = "%d minute "; }
-		else { format = "%d minutes "; }
+    value = (delta % 3600) / 60;
+    if(valid || value > 0) {
+        if(value == 1) { format = "%d minute "; }
+        else { format = "%d minutes "; }
 
-		count += SPRINTF(
-			&buffer[count],
-			size,
-			format,
-			value
-		);
-		counter++;
-		valid = TRUE;
-	}
+        count += SPRINTF(
+            &buffer[count],
+            size,
+            format,
+            value
+        );
+        counter++;
+        valid = TRUE;
+    }
 
-	if(counter == counts) {
-		buffer[count - 1] = '\0';
-		return count;
-	}
+    if(counter == counts) {
+        buffer[count - 1] = '\0';
+        return count;
+    }
 
-	value = delta % 60;
-	if(valid || value >= 0) {
-		if(value == 1) { format = "%d second "; }
-		else { format = "%d seconds "; }
+    value = delta % 60;
+    if(valid || value >= 0) {
+        if(value == 1) { format = "%d second "; }
+        else { format = "%d seconds "; }
 
-		count += SPRINTF(
-			&buffer[count],
-			size,
-			format,
-			value
-		);
-		counter++;
-		valid = TRUE;
-	}
+        count += SPRINTF(
+            &buffer[count],
+            size,
+            format,
+            value
+        );
+        counter++;
+        valid = TRUE;
+    }
 
-	return count;
+    return count;
 }
 
 static __inline size_t format_bytes(char *buffer, size_t size, size_t bytes) {
-	char *format;
-	size_t count = 0;
-	size_t value;
+    char *format;
+    size_t count = 0;
+    size_t value;
 
-	value = bytes / 1073741824;
-	if(value > 0) {
-		if(value == 1) { format = "%d GByte"; }
-		else { format = "%d GBytes"; }
+    value = bytes / 1073741824;
+    if(value > 0) {
+        if(value == 1) { format = "%d GByte"; }
+        else { format = "%d GBytes"; }
 
-		count += SPRINTF(
-			&buffer[count],
-			size,
-			format,
-			value
-		);
-		return count;
-	}
+        count += SPRINTF(
+            &buffer[count],
+            size,
+            format,
+            value
+        );
+        return count;
+    }
 
-	value = bytes / 1048576;
-	if(value > 0) {
-		if(value == 1) { format = "%d MByte"; }
-		else { format = "%d MBytes"; }
+    value = bytes / 1048576;
+    if(value > 0) {
+        if(value == 1) { format = "%d MByte"; }
+        else { format = "%d MBytes"; }
 
-		count += SPRINTF(
-			&buffer[count],
-			size,
-			format,
-			value
-		);
-		return count;
-	}
+        count += SPRINTF(
+            &buffer[count],
+            size,
+            format,
+            value
+        );
+        return count;
+    }
 
-	value = bytes / 1024;
-	if(value > 0) {
-		if(value == 1) { format = "%d KByte"; }
-		else { format = "%d KBytes"; }
+    value = bytes / 1024;
+    if(value > 0) {
+        if(value == 1) { format = "%d KByte"; }
+        else { format = "%d KBytes"; }
 
-		count += SPRINTF(
-			&buffer[count],
-			size,
-			format,
-			value
-		);
-		return count;
-	}
+        count += SPRINTF(
+            &buffer[count],
+            size,
+            format,
+            value
+        );
+        return count;
+    }
 
-	value = bytes;
-	if(value >= 0) {
-		if(value == 1) { format = "%d Byte"; }
-		else { format = "%d Bytes"; }
+    value = bytes;
+    if(value >= 0) {
+        if(value == 1) { format = "%d Byte"; }
+        else { format = "%d Bytes"; }
 
-		count += SPRINTF(
-			&buffer[count],
-			size,
-			format,
-			value
-		);
-		return count;
-	}
+        count += SPRINTF(
+            &buffer[count],
+            size,
+            format,
+            value
+        );
+        return count;
+    }
 
-	return count;
+    return count;
 }

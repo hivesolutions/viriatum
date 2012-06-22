@@ -219,9 +219,9 @@ ERROR_CODE entries_to_map_file(struct linked_list_t *entries, struct linked_list
 
     /* allocates space for the date time string
     to be created for the file entry and also
-	for the size string */
+    for the size string */
     char *date_time_string;
-	char *size_string;
+    char *size_string;
 
     /* creates a new linke list in the for the entries maps */
     create_linked_list(&map);
@@ -260,9 +260,9 @@ ERROR_CODE entries_to_map_file(struct linked_list_t *entries, struct linked_list
         );
 
         /* allocates space for the size string and populates it
-		by formating the size integer accoringly */
-		size_string = MALLOC(128);
-		format_bytes(size_string, 128, entry->size);
+        by formating the size integer accoringly */
+        size_string = MALLOC(128);
+        format_bytes(size_string, 128, entry->size);
 
         /* creates the various types for the various entry values
         and sets them in the entry map for reference */
@@ -278,7 +278,7 @@ ERROR_CODE entries_to_map_file(struct linked_list_t *entries, struct linked_list
         create_type(&entry_value_type, STRING_TYPE);
         entry_value_type->value.value_string = date_time_string;
         set_value_string_hash_map(entry_map, (unsigned char *) "time", (void *) entry_value_type);
-		create_type(&entry_value_type, STRING_TYPE);
+        create_type(&entry_value_type, STRING_TYPE);
         entry_value_type->value.value_string = size_string;
         set_value_string_hash_map(entry_map, (unsigned char *) "size_string", (void *) entry_value_type);
 

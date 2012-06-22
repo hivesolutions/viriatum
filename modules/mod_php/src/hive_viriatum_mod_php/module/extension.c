@@ -31,10 +31,10 @@
 
 zend_function_entry viriatum_functions[] = {
     PHP_FE(viriatum_connections, NULL)
-	PHP_FE(viriatum_uptime, NULL)
+    PHP_FE(viriatum_uptime, NULL)
     PHP_FE(viriatum_name, NULL)
     PHP_FE(viriatum_version, NULL)
-	PHP_FE(viriatum_platform, NULL)
+    PHP_FE(viriatum_platform, NULL)
     PHP_FE(viriatum_flags, NULL)
     PHP_FE(viriatum_description, NULL)
     PHP_FE(viriatum_compiler, NULL)
@@ -225,7 +225,7 @@ ZEND_MINFO_FUNCTION(viriatum_information) {
     php_info_print_table_start();
     php_info_print_table_row(2, "Name", _service->name);
     php_info_print_table_row(2, "Version", _service->version);
-	php_info_print_table_row(2, "Platform", _service->platform);
+    php_info_print_table_row(2, "Platform", _service->platform);
     php_info_print_table_row(2, "Flags", _service->flags);
     php_info_print_table_row(2, "Compiler", _service->compiler);
     php_info_print_table_row(2, "Compiler Version", _service->compiler_version);

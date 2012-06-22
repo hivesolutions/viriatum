@@ -344,7 +344,7 @@ ERROR_CODE _start_wsgi_state() {
     PyModule_AddStringConstant(wsgi_module, "PLATFORM", (char *) _service->platform);
     PyModule_AddStringConstant(wsgi_module, "FLAGS", (char *) _service->flags);
     PyModule_AddStringConstant(wsgi_module, "COMPILER", (char *) _service->compiler);
-	PyModule_AddStringConstant(wsgi_module, "COMPILER_VERSION", (char *) _service->compiler_version);
+    PyModule_AddStringConstant(wsgi_module, "COMPILER_VERSION", (char *) _service->compiler_version);
     PyModule_AddStringConstant(wsgi_module, "COMPILATION_DATE", (char *) _service->compilation_date);
     PyModule_AddStringConstant(wsgi_module, "DESCRIPTION", (char *) _service->compiler);
 
