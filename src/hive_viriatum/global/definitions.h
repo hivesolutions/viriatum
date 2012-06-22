@@ -196,6 +196,12 @@ static __inline char *get_config_path() {
 #define VIRIATUM_IP6_S ""
 #endif
 
+#ifdef VIRIATUM_EPOLL
+#define VIRIATUM_EPOLL_S " epoll"
+#else
+#define VIRIATUM_EPOLL_S ""
+#endif
+
 #ifdef VIRIATUM_SSL
 #define VIRIATUM_SSL_S " ssl"
 #else
@@ -208,5 +214,5 @@ static __inline char *get_config_path() {
 #define VIRIATUM_PCRE_S ""
 #endif
 
-#define _VIRIATUM_FLAGS VIRIATUM_IP6_S VIRIATUM_SSL_S VIRIATUM_PCRE_S
+#define _VIRIATUM_FLAGS VIRIATUM_IP6_S VIRIATUM_EPOLL_S VIRIATUM_SSL_S VIRIATUM_PCRE_S
 #define VIRIATUM_FLAGS TRIM_STRING(_VIRIATUM_FLAGS)
