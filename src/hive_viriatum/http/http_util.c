@@ -107,8 +107,8 @@ size_t write_http_headers_m(struct connection_t *connection, char *buffer, size_
 ERROR_CODE write_http_message(struct connection_t *connection, char *buffer, size_t size, enum http_version_e version, int status_code, char *status_message, char *message, connection_data_callback_hu callback, void *callback_parameters) {
     /* allocates the headers buffer (it will be releases automatically by the writter)
     it need to be allocated in the heap so it gets throught the request cycle */
-    char *headers_buffer = buffer == NULL ? MALLOC(1024) : buffer;
-    size = size == 0 ? 1024 : size;
+    char *headers_buffer = buffer == NULL ? MALLOC(VIRIATUM_HTTP_SIZE) : buffer;
+    size = size == 0 ? VIRIATUM_HTTP_SIZE : size;
 
     /* writes the http static headers to the response and
     then writes the error description itself */
@@ -164,8 +164,8 @@ ERROR_CODE write_http_error(struct connection_t *connection, char *buffer, size_
 
     /* allocates the headers buffer (it will be releases automatically by the writter)
     it need to be allocated in the heap so it gets throught the request cycle */
-    char *headers_buffer = buffer == NULL ? MALLOC(1024) : buffer;
-    size = size == 0 ? 1024 : size;
+    char *headers_buffer = buffer == NULL ? MALLOC(VIRIATUM_HTTP_SIZE) : buffer;
+    size = size == 0 ? VIRIATUM_HTTP_SIZE : size;
 
     /* in case no error description is sent one must be created from the currently
     staticly allocated buffer and then formatted properly */
@@ -188,7 +188,7 @@ ERROR_CODE write_http_error(struct connection_t *connection, char *buffer, size_
         /* creates the complete path to the template file */
         SPRINTF(
             (char *) template_path,
-            1024,
+            sizeof(template_path),
             "%s%s",
             VIRIATUM_RESOURCES_PATH,
             VIRIATUM_ERROR_PATH
