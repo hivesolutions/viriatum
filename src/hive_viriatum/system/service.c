@@ -249,6 +249,7 @@ ERROR_CODE load_specifications(struct service_t *service) {
     service->platform = (unsigned char *) VIRIATUM_PLATFORM_COMPLETE;
     service->flags = (unsigned char *) VIRIATUM_FLAGS;
     service->compiler = (unsigned char *) VIRIATUM_COMPILER;
+    service->compiler_version = (unsigned char *) VIRIATUM_COMPILER_VERSION_STRING;
     service->compilation_date = (unsigned char *) VIRIATUM_COMPILATION_DATE;
 
     /* "compiles" the various specification values into the

@@ -286,6 +286,12 @@ typedef struct service_t {
     unsigned char *compiler;
 
     /**
+     * The version (string) of the compiler
+     * used to compile the service structures.
+     */
+    unsigned char *compiler_version;
+
+    /**
      * The date (as a string) for the compilation
      * of the service internal structures.
      */

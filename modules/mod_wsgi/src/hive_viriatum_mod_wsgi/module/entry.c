@@ -339,6 +339,13 @@ ERROR_CODE _start_wsgi_state() {
     /* registers the viriatum wsgi module in the python interpreter
     this module may be used to provide wsgi functions */
     wsgi_module = Py_InitModule("viriatum_wsgi", wsgi_methods);
+    PyModule_AddStringConstant(wsgi_module, "NAME", (char *) _service->name);
+    PyModule_AddStringConstant(wsgi_module, "VERSION", (char *) _service->version);
+    PyModule_AddStringConstant(wsgi_module, "PLATFORM", (char *) _service->platform);
+    PyModule_AddStringConstant(wsgi_module, "FLAGS", (char *) _service->flags);
+    PyModule_AddStringConstant(wsgi_module, "COMPILER", (char *) _service->compiler);
+    PyModule_AddStringConstant(wsgi_module, "COMPILATION_DATA", (char *) _service->compilation_date);
+    PyModule_AddStringConstant(wsgi_module, "DESCRIPTION", (char *) _service->compiler);
 
     /* checks the input type for readyness and then casts the
     type as a python type and registers it as input */

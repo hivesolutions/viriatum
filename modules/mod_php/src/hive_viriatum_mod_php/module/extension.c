@@ -33,14 +33,11 @@ zend_function_entry viriatum_functions[] = {
     PHP_FE(viriatum_connections, NULL)
     PHP_FE(viriatum_name, NULL)
     PHP_FE(viriatum_version, NULL)
+    PHP_FE(viriatum_flags, NULL)
     PHP_FE(viriatum_description, NULL)
-    PHP_FE(viriatum_observations, NULL)
-    PHP_FE(viriatum_copyright, NULL)
-    PHP_FE(viriatum_platform_string, NULL)
-    PHP_FE(viriatum_platform_cpu, NULL)
-    PHP_FE(viriatum_compilation_date, NULL)
-    PHP_FE(viriatum_compilation_time, NULL)
     PHP_FE(viriatum_compiler, NULL)
+    PHP_FE(viriatum_compiler_version, NULL)
+    PHP_FE(viriatum_compilation_date, NULL)
     { NULL, NULL, NULL }
 };
 
@@ -226,7 +223,9 @@ ZEND_MINFO_FUNCTION(viriatum_information) {
     php_info_print_table_start();
     php_info_print_table_row(2, "Name", _service->name);
     php_info_print_table_row(2, "Version", _service->version);
+    php_info_print_table_row(2, "Flags", _service->flags);
     php_info_print_table_row(2, "Compiler", _service->compiler);
+    php_info_print_table_row(2, "Compiler Version", _service->compiler_version);
     php_info_print_table_row(2, "Compilation Date", _service->compilation_date);
     php_info_print_table_end();
     php_info_print_table_start();
@@ -243,41 +242,29 @@ PHP_FUNCTION(viriatum_connections) {
 }
 
 PHP_FUNCTION(viriatum_name) {
-    RETURN_STRING(VIRIATUM_NAME, 1);
+    RETURN_STRING(_service->name, 1);
 }
 
 PHP_FUNCTION(viriatum_version) {
-    RETURN_STRING(VIRIATUM_VERSION, 1);
+    RETURN_STRING(_service->version, 1);
+}
+
+PHP_FUNCTION(viriatum_flags) {
+    RETURN_STRING(_service->flags, 1);
 }
 
 PHP_FUNCTION(viriatum_description) {
-    RETURN_STRING(VIRIATUM_DESCRIPTION, 1);
-}
-
-PHP_FUNCTION(viriatum_observations) {
-    RETURN_STRING(VIRIATUM_OBSERVATIONS, 1);
-}
-
-PHP_FUNCTION(viriatum_copyright) {
-    RETURN_STRING(VIRIATUM_COPYRIGHT, 1);
-}
-
-PHP_FUNCTION(viriatum_platform_string) {
-    RETURN_STRING(VIRIATUM_PLATFORM_STRING, 1);
-}
-
-PHP_FUNCTION(viriatum_platform_cpu) {
-    RETURN_STRING(VIRIATUM_PLATFORM_CPU, 1);
-}
-
-PHP_FUNCTION(viriatum_compilation_date) {
-    RETURN_STRING(VIRIATUM_COMPILATION_DATE, 1);
-}
-
-PHP_FUNCTION(viriatum_compilation_time) {
-    RETURN_STRING(VIRIATUM_COMPILATION_TIME, 1);
+    RETURN_STRING(_service->description, 1);
 }
 
 PHP_FUNCTION(viriatum_compiler) {
-    RETURN_STRING(VIRIATUM_COMPILER, 1);
+    RETURN_STRING(_service->compiler, 1);
+}
+
+PHP_FUNCTION(viriatum_compiler_version) {
+    RETURN_STRING(_service->compiler_version, 1);
+}
+
+PHP_FUNCTION(viriatum_compilation_date) {
+    RETURN_STRING(_service->compilation_date, 1);
 }
