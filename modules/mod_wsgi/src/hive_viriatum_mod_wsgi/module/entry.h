@@ -109,14 +109,14 @@ typedef struct wsgi_request_t {
  * this is the reference required for the basic interaction
  * with the service.
  */
-static struct service_t *_service;
+struct service_t *_service;
 
 /**
  * The global reference to the current connection being
  * used, this is going to be used to access connection
  * information values.
  */
-static struct connection_t *_connection;
+struct connection_t *_connection;
 
 /**
  * The global headers structure that provides a "cache"
@@ -125,14 +125,14 @@ static struct connection_t *_connection;
  * This strategy avoid the allocation of a "huge buffer
  * for each request received.
  */
-static struct http_headers_t _headers;
+struct http_headers_t _headers;
 
 /**
  * The global structure to be used to "pass" wsgi
  * information from the virtual machine into the
  * appropriate viriatum request handler.
  */
-static struct wsgi_request_t _wsgi_request;
+struct wsgi_request_t _wsgi_request;
 
 VIRIATUM_EXPORT_PREFIX ERROR_CODE create_mod_wsgi_module(struct mod_wsgi_module_t **mod_wsgi_module_pointer, struct module_t *module);
 VIRIATUM_EXPORT_PREFIX ERROR_CODE delete_mod_wsgi_module(struct mod_wsgi_module_t *mod_wsgi_module);
@@ -146,8 +146,3 @@ VIRIATUM_EXPORT_PREFIX ERROR_CODE _load_wsgi_state();
 VIRIATUM_EXPORT_PREFIX ERROR_CODE _unload_wsgi_state();
 VIRIATUM_EXPORT_PREFIX ERROR_CODE _reload_wsgi_state();
 VIRIATUM_EXPORT_PREFIX ERROR_CODE _start_wsgi_state();
-
-__inline static const struct service_t *_get_service() { return _service; }
-__inline static const struct connection_t *_get_connection() { return _connection; }
-__inline static const struct http_headers_t *_get_headers() { return &_headers; }
-__inline static const struct wsgi_request_t *_get_wsgi_request() { return &_wsgi_request; }
