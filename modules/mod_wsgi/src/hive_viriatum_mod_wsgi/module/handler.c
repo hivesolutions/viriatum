@@ -308,17 +308,17 @@ ERROR_CODE body_callback_handler_module(struct http_parser_t *http_parser, const
 }
 
 ERROR_CODE message_complete_callback_handler_module(struct http_parser_t *http_parser) {
-	/* allocates space for the error return valid from the sending
-	of the response (loaging, execution, etc.) */
-	ERROR_CODE return_value;
+    /* allocates space for the error return valid from the sending
+    of the response (loaging, execution, etc.) */
+    ERROR_CODE return_value;
 
     /* sends (and creates) the reponse and retreives the (possible)
-	error code from in then in such case sends the error code to
-	the connection throught the upstream pipe */
+    error code from in then in such case sends the error code to
+    the connection throught the upstream pipe */
     return_value = _send_response_handler_module(http_parser);
     if(IS_ERROR_CODE(return_value)) {
-		_write_error_connection(http_parser, (char *) GET_ERROR());
-	}
+        _write_error_connection(http_parser, (char *) GET_ERROR());
+    }
 
     /* raise no error */
     RAISE_NO_ERROR;
@@ -592,31 +592,31 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
     application to access viriatum wsgi functions */
     wsgi_module = PyImport_ImportModule("viriatum_wsgi");
     if(wsgi_module == NULL) {
-		RAISE_ERROR_M(D_ERROR_CODE, (unsigned char *) "Problem loading module");
-	}
+        RAISE_ERROR_M(D_ERROR_CODE, (unsigned char *) "Problem loading module");
+    }
 
     /* retrieves the reference to the start response function from the wsgi module
     and then verifies that it's a valid python function */
     start_response_function = PyObject_GetAttrString(wsgi_module, "start_response");
     if(!start_response_function || !PyCallable_Check(start_response_function)) {
-		RAISE_ERROR_M(D_ERROR_CODE, (unsigned char *) "Problem retrieving function");
-	}
+        RAISE_ERROR_M(D_ERROR_CODE, (unsigned char *) "Problem retrieving function");
+    }
 
     /* imports the associated (handler) module and retrieves
     its reference to be used for the calling, in case the
     reference is invalid raises an error */
     module = mod_wsgi_http_handler->module;
     if(module == NULL) {
-		RAISE_ERROR_M(D_ERROR_CODE, (unsigned char *) "Problem loading module");
-	}
+        RAISE_ERROR_M(D_ERROR_CODE, (unsigned char *) "Problem loading module");
+    }
 
     /* retrieves the function to be used as handler for the
     wsgi request, then check if the reference is valid and
     if it refers a valid function */
     handler_function = PyObject_GetAttrString(module, "application");
     if(!handler_function || !PyCallable_Check(handler_function)) {
-		RAISE_ERROR_M(D_ERROR_CODE, (unsigned char *) "Problem retrieving application");
-	}
+        RAISE_ERROR_M(D_ERROR_CODE, (unsigned char *) "Problem retrieving application");
+    }
 
     /* updates the global reference to the connection to be
     used for the wsgi request handling */
@@ -654,7 +654,7 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
         Py_DECREF(args);
         Py_DECREF(module);
         Py_DECREF(wsgi_module);
-		RAISE_ERROR_M(D_ERROR_CODE, (unsigned char *) "Problem executing application");
+        RAISE_ERROR_M(D_ERROR_CODE, (unsigned char *) "Problem executing application");
     }
 
     /* allocates space for the header buffer and then writes the default values
