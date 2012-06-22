@@ -388,7 +388,7 @@ ERROR_CODE _call_polling_select(struct polling_select_t *polling_select, struct 
     unsigned int remove_connections_size = 0;
 
     /* prints a debug message */
-    V_DEBUG_F("Processing %d read connections\n", read_connections_size);
+    V_DEBUG_F("Processing %lu read connections\n", (long unsigned int) read_connections_size);
 
     /* iterates over the read connections */
     for(index = 0; index < read_connections_size; index++) {
@@ -433,7 +433,7 @@ ERROR_CODE _call_polling_select(struct polling_select_t *polling_select, struct 
     }
 
     /* prints a debug message */
-    V_DEBUG_F("Processing %d write connections\n", write_connections_size);
+    V_DEBUG_F("Processing %lu write connections\n", (long unsigned int) write_connections_size);
 
     /* iterates over the write connections */
     for(index = 0; index < write_connections_size; index++) {
@@ -463,7 +463,7 @@ ERROR_CODE _call_polling_select(struct polling_select_t *polling_select, struct 
     }
 
     /* prints a debug message */
-    V_DEBUG_F("Processing %d error connections\n", error_connections_size);
+    V_DEBUG_F("Processing %lu error connections\n", (long unsigned int) error_connections_size);
 
     /* iterates over the error connections */
     for(index = 0; index < error_connections_size; index++) {
