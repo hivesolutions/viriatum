@@ -66,6 +66,13 @@ typedef enum process_type_e {
     WORKER_PROCESS
 } process_type;
 
+
+/**
+ * The function used to retrieve a string in english representing
+ * the uptime of the service refered.
+ */
+typedef const char *(*service_uptime) (struct service_t *, size_t);
+
 /**
  * The function used to create a new handler instance
  * with a name and for the service context.
@@ -316,6 +323,14 @@ typedef struct service_t {
      */
     unsigned char status;
 
+	/**
+	 * The start the (as seconds since epoch)
+	 * for the current service.
+	 * This value may be sued to calculate the
+	 * service uptime.
+	 */
+	unsigned long long start_time;
+
     /**
      * The type of process that hold the
      * reference to this service.
@@ -404,6 +419,14 @@ typedef struct service_t {
      */
     struct hash_map_t *http_handlers_map;
 
+	/**
+	 * Buffer used as static reference to the
+	 * value to be returned in the retrieal of
+	 * the uptime function.
+	 */
+	char _uptime[128];
+
+	service_uptime get_uptime;
     service_http_handler_access create_http_handler;
     service_http_handler_update delete_http_handler;
     service_http_handler_update add_http_handler;
@@ -1074,6 +1097,7 @@ ERROR_CODE get_http_handler_service(struct service_t *service, struct http_handl
 ERROR_CODE _default_options_service(struct service_t *service, struct hash_map_t *arguments);
 ERROR_CODE _file_options_service(struct service_t *service, struct hash_map_t *arguments);
 ERROR_CODE _comand_line_options_service(struct service_t *service, struct hash_map_t *arguments);
+const char *_get_uptime_service(struct service_t *service, size_t count);
 
 #ifdef VIRIATUM_SSL
 __inline static const char *_get_ssl_error_code(size_t index) {
