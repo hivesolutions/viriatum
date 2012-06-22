@@ -367,64 +367,74 @@ static __inline size_t format_delta(char *buffer, size_t size, unsigned long lon
 
 static __inline size_t format_bytes(char *buffer, size_t size, size_t bytes) {
     char *format;
-    size_t count = 0;
     size_t value;
+	size_t value_i;
+	double value_f;
+	size_t count = 0;
+	char valid = FALSE;
+	char is_float = TRUE;
 
     value = bytes / 1073741824;
     if(value > 0) {
-        if(value == 1) { format = "%d GByte"; }
-        else { format = "%d GBytes"; }
-
-        count += SPRINTF(
-            &buffer[count],
-            size,
-            format,
-            value
-        );
-        return count;
+        if(value == 1) { format = "%.1f GByte"; }
+		else if(value < 10) { format = "%.1f GBytes"; }
+        else { format = "%d GBytes"; is_float = FALSE; }
+	
+		value_i = value;
+		if(is_float) { value_f = (double) bytes / 1073741824.0f; }
+		valid = TRUE;
     }
 
     value = bytes / 1048576;
-    if(value > 0) {
-        if(value == 1) { format = "%d MByte"; }
-        else { format = "%d MBytes"; }
-
-        count += SPRINTF(
-            &buffer[count],
-            size,
-            format,
-            value
-        );
-        return count;
-    }
+    if(!valid && value > 0) {
+        if(value == 1) { format = "%.1f MByte"; }
+		else if(value < 10) { format = "%.1f MBytes"; }
+        else { format = "%d MBytes"; is_float = FALSE; }
+	
+		value_i = value;
+		if(is_float) { value_f = (double) bytes / 1048576; }
+		valid = TRUE;
+	}
 
     value = bytes / 1024;
-    if(value > 0) {
-        if(value == 1) { format = "%d KByte"; }
-        else { format = "%d KBytes"; }
+    if(!valid && value > 0) {
+        if(value == 1) { format = "%.1f KByte"; }
+		else if(value < 10) { format = "%.1f KBytes"; }
+        else { format = "%d KBytes"; is_float = FALSE; }
 
-        count += SPRINTF(
-            &buffer[count],
-            size,
-            format,
-            value
-        );
-        return count;
+		value_i = value;
+		if(is_float) { value_f = (double) bytes / 1024.0f; }
+		valid = TRUE;
     }
 
     value = bytes;
-    if(value >= 0) {
-        if(value == 1) { format = "%d Byte"; }
-        else { format = "%d Bytes"; }
+    if(!valid && value >= 0) {
+        if(value == 1) { format = "%.1f Byte"; }
+		else if(value < 10) { format = "%.1f Bytes"; }
+        else { format = "%d Bytes"; is_float = FALSE; }
 
+		value_i = value;
+		if(is_float) { value_f = (double) bytes; }
+		valid = TRUE;
+    }
+
+	if(!valid) { return count; }
+
+	if(is_float) {
         count += SPRINTF(
             &buffer[count],
             size,
             format,
-            value
+            value_f
         );
-        return count;
-    }
+	} else {
+        count += SPRINTF(
+            &buffer[count],
+            size,
+            format,
+            value_i
+        );
+	}
 
     return count;
 }

@@ -210,9 +210,9 @@ a:hover {
 }
 
 .table.file-listing td.size {
-    max-width: 130px;
-    min-width: 130px;
-    width: 130px;
+    max-width: 110px;
+    min-width: 110px;
+    width: 110px;
 }
 
 .table.file-listing tbody td:last-child {
