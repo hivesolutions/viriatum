@@ -308,8 +308,17 @@ ERROR_CODE body_callback_handler_module(struct http_parser_t *http_parser, const
 }
 
 ERROR_CODE message_complete_callback_handler_module(struct http_parser_t *http_parser) {
-    /* sends (and creates) the reponse */
-    _send_response_handler_module(http_parser);
+	/* allocates space for the error return valid from the sending
+	of the response (loaging, execution, etc.) */
+	ERROR_CODE return_value;
+
+    /* sends (and creates) the reponse and retreives the (possible)
+	error code from in then in such case sends the error code to
+	the connection throught the upstream pipe */
+    return_value = _send_response_handler_module(http_parser);
+    if(IS_ERROR_CODE(return_value)) {
+		_write_error_connection(http_parser, (char *) GET_ERROR());
+	}
 
     /* raise no error */
     RAISE_NO_ERROR;
@@ -582,24 +591,32 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
     /* imports the wsgi module containing the util methos to be used by the
     application to access viriatum wsgi functions */
     wsgi_module = PyImport_ImportModule("viriatum_wsgi");
-    if(wsgi_module == NULL) { RAISE_NO_ERROR; }
+    if(wsgi_module == NULL) {
+		RAISE_ERROR_M(D_ERROR_CODE, (unsigned char *) "Problem loading module");
+	}
 
     /* retrieves the reference to the start response function from the wsgi module
     and then verifies that it's a valid python function */
     start_response_function = PyObject_GetAttrString(wsgi_module, "start_response");
-    if(!start_response_function || !PyCallable_Check(start_response_function)) { RAISE_NO_ERROR; }
+    if(!start_response_function || !PyCallable_Check(start_response_function)) {
+		RAISE_ERROR_M(D_ERROR_CODE, (unsigned char *) "Problem retrieving function");
+	}
 
     /* imports the associated (handler) module and retrieves
     its reference to be used for the calling, in case the
     reference is invalid raises an error */
     module = mod_wsgi_http_handler->module;
-    if(module == NULL) { RAISE_NO_ERROR; }
+    if(module == NULL) {
+		RAISE_ERROR_M(D_ERROR_CODE, (unsigned char *) "Problem loading module");
+	}
 
     /* retrieves the function to be used as handler for the
     wsgi request, then check if the reference is valid and
     if it refers a valid function */
     handler_function = PyObject_GetAttrString(module, "application");
-    if(!handler_function || !PyCallable_Check(handler_function)) { RAISE_NO_ERROR; }
+    if(!handler_function || !PyCallable_Check(handler_function)) {
+		RAISE_ERROR_M(D_ERROR_CODE, (unsigned char *) "Problem retrieving application");
+	}
 
     /* updates the global reference to the connection to be
     used for the wsgi request handling */
@@ -637,7 +654,7 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
         Py_DECREF(args);
         Py_DECREF(module);
         Py_DECREF(wsgi_module);
-        RAISE_NO_ERROR;
+		RAISE_ERROR_M(D_ERROR_CODE, (unsigned char *) "Problem executing application");
     }
 
     /* allocates space for the header buffer and then writes the default values
@@ -727,6 +744,38 @@ ERROR_CODE _send_response_callback_handler_module(struct connection_t *connectio
     /* in case the connection is not meant to be kept alive must be closed
     in the normal manner (using the close connection function) */
     if(!keep_alive) { connection->close_connection(connection); }
+
+    /* raise no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE _write_error_connection(struct http_parser_t *http_parser, char *message) {
+    /* allocates space for the buffer to be used in the message */
+    unsigned char *buffer;
+
+    /* retrieves the connection from the http parser parameters */
+    struct connection_t *connection = (struct connection_t *) http_parser->parameters;
+
+    /* retrieves the underlying connection references in order to be
+    able to operate over them, for unregister */
+    struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
+    struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
+    struct handler_wsgi_context_t *handler_wsgi_context = (struct handler_wsgi_context_t *) http_parser->context;
+
+    /* allocates the data buffer (in a safe maner) then
+    writes the http static headers to the response */
+    connection->alloc_data(connection, VIRIATUM_HTTP_SIZE, (void **) &buffer);
+    http_connection->write_error(
+        connection,
+        (char *) buffer,
+        VIRIATUM_HTTP_SIZE,
+        HTTP11,
+        500,
+        "Internal Server Error",
+        message,
+        _send_response_callback_handler_module,
+        (void *) handler_wsgi_context
+    );
 
     /* raise no error */
     RAISE_NO_ERROR;
