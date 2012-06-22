@@ -420,7 +420,7 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
         SPRINTF(
             error_description,
             VIRIATUM_MAX_PATH_SIZE,
-            "404 - Not Found (%s)",
+            "File not found (%s)",
             handler_file_context->file_path
         );
         write_http_error(
