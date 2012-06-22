@@ -39,6 +39,7 @@ resources/images/logo/viriatum-background-logo.png \
 resources/images/mime/icon-folder.png \
 resources/images/mime/icon-html.png \
 resources/images/mime/icon-image.png \
+resources/images/mime/icon-link.png \
 resources/images/mime/icon-text.png \
 templates/error.html.tpl \
 templates/listing.html.tpl
