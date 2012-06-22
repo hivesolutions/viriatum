@@ -299,11 +299,11 @@ ERROR_CODE _write_error_connection(struct http_parser_t *http_parser, char *mess
 
     /* allocates the data buffer (in a safe maner) then
     writes the http static headers to the response */
-    connection->alloc_data(connection, 1024 * sizeof(unsigned char), (void **) &buffer);
+    connection->alloc_data(connection, VIRIATUM_HTTP_SIZE * sizeof(unsigned char), (void **) &buffer);
     http_connection->write_error(
         connection,
         (char *) buffer,
-        1024,
+        VIRIATUM_HTTP_SIZE,
         HTTP11,
         500,
         "Internal Server Error",
