@@ -29,6 +29,10 @@
 
 #include "entry.h"
 
+/* initializes the module global variables this
+values will be used accross functions */
+START_GLOBALS;
+
 ERROR_CODE create_mod_wsgi_module(struct mod_wsgi_module_t **mod_wsgi_module_pointer, struct module_t *module) {
     /* retrieves the mod wsgi module size */
     size_t mod_wsgi_module_size = sizeof(struct mod_wsgi_module_t);
