@@ -29,7 +29,9 @@
 
 #include "entry.h"
 
-unsigned char local = 0;
+/* initializes the module global variables this
+values will be used accross functions */
+START_GLOBALS;
 
 ERROR_CODE create_mod_php_module(struct mod_php_module_t **mod_php_module_pointer, struct module_t *module) {
     /* retrieves the mod php module size */
@@ -82,11 +84,9 @@ ERROR_CODE start_module(struct environment_t *environment, struct module_t *modu
     /* prints a debug message */
     V_DEBUG_F("Starting the module '%s' (%s) v%s\n", name, description, version);
 
-    /* sets the global service reference to be used in the
-    externalized function for the interpreter then updates
-    the global local value according to the service options */
+
+	/* retrieves th
     _service = service;
-    local = service->options->local;
 
     /* creates the mod php module */
     create_mod_php_module(&mod_php_module, module);
