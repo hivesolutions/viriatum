@@ -96,6 +96,10 @@ FreeBSD ignores the usr local directory by default so it must be included in ord
 
 * `setenv CFLAGS "-L/usr/local/lib -I/usr/local/include"`
 
+## Benchmarking
+
+* Most of the information presented on this site [gwan benchmark](http://gwan.ch/en_apachebench_httperf.html) is applicable to benchmarking viriatum
+
 ## Debugging
 
 * For windows debugging use [Visual Leak Detector](http://vld.codeplex.com) using the `#include <vld.h>` statement
