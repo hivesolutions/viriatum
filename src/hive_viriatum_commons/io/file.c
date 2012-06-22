@@ -262,8 +262,8 @@ ERROR_CODE entries_to_map_file(struct linked_list_t *entries, struct linked_list
         /* allocates space for the size string and populates it
         by formating the size integer accoringly */
         size_string = MALLOC(128);
-		if(entry->type == FILE_TYPE_DIRECTORY) { memcpy(size_string, "-", sizeof("-")); }
-		else { format_bytes(size_string, 128, entry->size); }
+        if(entry->type == FILE_TYPE_DIRECTORY) { memcpy(size_string, "-", sizeof("-")); }
+        else { format_bytes(size_string, 128, entry->size); }
 
         /* creates the various types for the various entry values
         and sets them in the entry map for reference */
