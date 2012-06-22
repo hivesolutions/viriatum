@@ -190,6 +190,9 @@ ERROR_CODE delete_directory_entries_map_file(struct linked_list_t *map) {
         get_value_string_hash_map(entry_type->value.value_map, (unsigned char *) "time", (void **) &entry_value_type);
         FREE(entry_value_type->value.value_string);
         delete_type(entry_value_type);
+        get_value_string_hash_map(entry_type->value.value_map, (unsigned char *) "size_string", (void **) &entry_value_type);
+        FREE(entry_value_type->value.value_string);
+        delete_type(entry_value_type);
 
         /* deletes the hash map and the entry type */
         delete_hash_map(entry_type->value.value_map);
@@ -215,8 +218,10 @@ ERROR_CODE entries_to_map_file(struct linked_list_t *entries, struct linked_list
     struct type_t *entry_value_type;
 
     /* allocates space for the date time string
-    to be created for the file entry */
+    to be created for the file entry and also
+	for the size string */
     char *date_time_string;
+	char *size_string;
 
     /* creates a new linke list in the for the entries maps */
     create_linked_list(&map);
@@ -239,7 +244,7 @@ ERROR_CODE entries_to_map_file(struct linked_list_t *entries, struct linked_list
         /* creates the hash map */
         create_hash_map(&entry_map, 0);
 
-        /* allocates spac for the date time string */
+        /* allocates space for the date time string */
         date_time_string = MALLOC(17);
 
         /* creates the date time string for the file entry */
@@ -253,6 +258,11 @@ ERROR_CODE entries_to_map_file(struct linked_list_t *entries, struct linked_list
             entry->time.hour,
             entry->time.minute
         );
+
+        /* allocates space for the size string and populates it
+		by formating the size integer accoringly */
+		size_string = MALLOC(128);
+		format_bytes(size_string, 128, entry->size);
 
         /* creates the various types for the various entry values
         and sets them in the entry map for reference */
@@ -268,6 +278,9 @@ ERROR_CODE entries_to_map_file(struct linked_list_t *entries, struct linked_list
         create_type(&entry_value_type, STRING_TYPE);
         entry_value_type->value.value_string = date_time_string;
         set_value_string_hash_map(entry_map, (unsigned char *) "time", (void *) entry_value_type);
+		create_type(&entry_value_type, STRING_TYPE);
+        entry_value_type->value.value_string = size_string;
+        set_value_string_hash_map(entry_map, (unsigned char *) "size_string", (void *) entry_value_type);
 
         /* creates the entry type (for the map) and sets the
         entry map on it */
