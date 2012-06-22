@@ -43,6 +43,15 @@
 #define DEFAULT_BASE_PATH "."
 
 /**
+ * Starts (initializes) the global variables defined
+ * as external in the header definition.
+ */
+#define START_GLOBALS struct service_t *_service;\
+	struct connection_t *_connection;\
+	struct linked_buffer_t *_output_buffer;\
+	struct wsgi_request_t _wsgi_request
+
+/**
  * Structure describing the internal
  * structures and information for the
  * mod wsgi module.
@@ -109,14 +118,14 @@ typedef struct wsgi_request_t {
  * this is the reference required for the basic interaction
  * with the service.
  */
-struct service_t *_service;
+VIRIATUM_EXTERNAL_PREFIX struct service_t *_service;
 
 /**
  * The global reference to the current connection being
  * used, this is going to be used to access connection
  * information values.
  */
-struct connection_t *_connection;
+VIRIATUM_EXTERNAL_PREFIX struct connection_t *_connection;
 
 /**
  * The global headers structure that provides a "cache"
@@ -125,14 +134,14 @@ struct connection_t *_connection;
  * This strategy avoid the allocation of a "huge buffer
  * for each request received.
  */
-struct http_headers_t _headers;
+VIRIATUM_EXTERNAL_PREFIX struct http_headers_t _headers;
 
 /**
  * The global structure to be used to "pass" wsgi
  * information from the virtual machine into the
  * appropriate viriatum request handler.
  */
-struct wsgi_request_t _wsgi_request;
+VIRIATUM_EXTERNAL_PREFIX struct wsgi_request_t _wsgi_request;
 
 VIRIATUM_EXPORT_PREFIX ERROR_CODE create_mod_wsgi_module(struct mod_wsgi_module_t **mod_wsgi_module_pointer, struct module_t *module);
 VIRIATUM_EXPORT_PREFIX ERROR_CODE delete_mod_wsgi_module(struct mod_wsgi_module_t *mod_wsgi_module);
