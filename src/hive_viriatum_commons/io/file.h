@@ -35,15 +35,16 @@
  */
 typedef enum file_type_e {
     /**
+     * The directory, folder reference.
+	 * For folder or equivalent structures.
+     */
+    FILE_TYPE_DIRECTORY = 1,
+
+    /**
      * The normal and regular file,
      * according to the file system.
      */
-    FILE_TYPE_REGULAR = 1,
-
-    /**
-     * The directory, folder reference.
-     */
-    FILE_TYPE_DIRECTORY,
+    FILE_TYPE_REGULAR,
 
     /**
      * The symbolic or absolute type

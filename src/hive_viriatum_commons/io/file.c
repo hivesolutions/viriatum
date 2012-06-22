@@ -346,8 +346,8 @@ int _entry_compare_file(void *first, void *second) {
     as the main comparision method */
     else {
         /* returns the result of the difference between
-        the second file type and the first file type */
-        return second_file->type - first_file->type;
+        the first file type and the second file type */
+        return first_file->type - second_file->type;
     }
 }
 
