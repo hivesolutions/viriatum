@@ -368,8 +368,8 @@ static __inline size_t format_delta(char *buffer, size_t size, unsigned long lon
 static __inline size_t format_bytes(char *buffer, size_t size, size_t bytes) {
     char *format;
     size_t value;
-    size_t value_i;
-    double value_f;
+    size_t value_i = 0;
+    double value_f = 0.0f;
     size_t count = 0;
     char valid = FALSE;
     char is_float = TRUE;

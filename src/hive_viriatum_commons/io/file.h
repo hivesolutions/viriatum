@@ -36,7 +36,7 @@
 typedef enum file_type_e {
     /**
      * The directory, folder reference.
-	 * For folder or equivalent structures.
+     * For folder or equivalent structures.
      */
     FILE_TYPE_DIRECTORY = 1,
 
