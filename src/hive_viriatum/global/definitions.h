@@ -172,6 +172,8 @@ static __inline char *get_config_path() {
 #define VIRIATUM_NO_PUSH 1
 #define VIRIATUM_SOCKET_ERROR 0
 #define VIRIATUM_SELECT_TIMEOUT 10
+#define VIRIATUM_READB_SIZE 10240
+#define VIRIATUM_READ_SIZE 1024
 #define VIRIATUM_MAX_EVENTS 1024
 #endif
 
@@ -187,6 +189,8 @@ static __inline char *get_config_path() {
 #define VIRIATUM_NO_PUSH 1
 #define VIRIATUM_SOCKET_ERROR 0
 #define VIRIATUM_SELECT_TIMEOUT 1
+#define VIRIATUM_READB_SIZE 10240
+#define VIRIATUM_READ_SIZE 1024
 #define VIRIATUM_MAX_EVENTS 1024
 #endif
 

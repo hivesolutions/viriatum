@@ -221,7 +221,7 @@ ERROR_CODE read_handler_stream_io(struct connection_t *connection) {
     SOCKET_ERROR_CODE number_bytes;
 
     /* allocates the "simple" buffer */
-    unsigned char buffer[10240];
+    unsigned char buffer[VIRIATUM_READB_SIZE];
 
     /* retrieves the buffer pointer */
     unsigned char *buffer_pointer = (unsigned char *) buffer;
@@ -239,12 +239,28 @@ ERROR_CODE read_handler_stream_io(struct connection_t *connection) {
     while(1) {
         /* in case the buffer size is so big that may
         overflow the current allocated buffer, must
-		break the loop to avoid corruption */
-        if(buffer_size + 1024 > 10240) { break; }
+		flush the current buffer avoid corruption */
+        if(buffer_size + VIRIATUM_READ_SIZE > VIRIATUM_READB_SIZE) {
+            /* in case the on data handler is defined */
+            if(io_connection->on_data != NULL) {
+                /* prints a debug message */
+                V_DEBUG("Calling on data handler\n");
+
+                /* calls the on data handler */
+                io_connection->on_data(io_connection, buffer, buffer_size);
+
+                /* prints a debug message */
+                V_DEBUG("Finished calling on data handler\n");
+            }
+
+			/* resets the buffer size to the original (initial)
+			position so that it can be reused */
+			buffer_size = 0;
+		}
 
         /* receives from the connection socket (takes into account the type
         of socket in use) should be able to take care of secure connections */
-        number_bytes = CONNECTION_RECEIVE(connection, (char *) buffer_pointer, 1024, 0);
+        number_bytes = CONNECTION_RECEIVE(connection, (char *) buffer_pointer, VIRIATUM_READ_SIZE, 0);
 
         /* in case the number of bytes is zero (connection closed) */
         if(number_bytes == 0) {
