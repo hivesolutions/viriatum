@@ -172,7 +172,7 @@ static __inline char *get_config_path() {
 #define VIRIATUM_NO_PUSH 1
 #define VIRIATUM_SOCKET_ERROR 0
 #define VIRIATUM_SELECT_TIMEOUT 10
-#define VIRIATUM_MAX_CONNECTIONS 10000
+#define VIRIATUM_MAX_EVENTS 1024
 #endif
 
 #ifndef VIRIATUM_DEBUG
@@ -187,7 +187,7 @@ static __inline char *get_config_path() {
 #define VIRIATUM_NO_PUSH 1
 #define VIRIATUM_SOCKET_ERROR 0
 #define VIRIATUM_SELECT_TIMEOUT 1
-#define VIRIATUM_MAX_CONNECTIONS 10000
+#define VIRIATUM_MAX_EVENTS 1024
 #endif
 
 #ifdef VIRIATUM_IP6
