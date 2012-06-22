@@ -206,7 +206,9 @@ ERROR_CODE write_http_error(struct connection_t *connection, char *buffer, size_
         information arround the error */
         assign_integer_template_handler(template_handler, (unsigned char *) "error_code", error_code);
         assign_string_template_handler(template_handler, (unsigned char *) "error_message", error_message);
+#ifdef VIRIATUM_DEBUG
         assign_string_template_handler(template_handler, (unsigned char *) "error_description", error_description);
+#endif
 
         /* processes the file as a template handler, at this point
         the output buffer of the template engine should be populated */

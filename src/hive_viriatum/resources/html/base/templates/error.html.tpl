@@ -17,6 +17,7 @@
                 <div class="error-content">
                     <div class="error-code">${out value=error_code /}</div>
                     <h1 class="error-description">${out value=error_message /}</h1>
+                    <h1 class="error-details">${out value=error_description /}</h1>
                     <p>Maybe you've missed something, please double check the url value</p>
                 </div>
                 <div class="clear"></div>

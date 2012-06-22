@@ -281,7 +281,7 @@ a:hover {
 
 .error-content {
     float: left;
-    margin-top: 70px;
+    margin-top: 60px;
     width: 200px;
 }
 
@@ -297,6 +297,12 @@ a:hover {
 
 .error-description {
     font-size: 16pt;
+    font-weight: normal;
+    text-transform: uppercase;
+}
+
+.error-details {
+    font-size: 8pt;
     font-weight: normal;
     text-transform: uppercase;
 }
