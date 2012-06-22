@@ -41,5 +41,4 @@ resources/images/mime/icon-html.png \
 resources/images/mime/icon-image.png \
 resources/images/mime/icon-text.png \
 templates/error.html.tpl \
-templates/listing.html.tpl \
-templates/status.html.tpl
+templates/listing.html.tpl
