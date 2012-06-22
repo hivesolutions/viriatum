@@ -140,11 +140,11 @@ static __inline char atob(char *string_value) {
     while(1) {
         _string_value = atob_strings[index];
         if(_string_value == NULL) { break; }
-        if(strcmp(_string_value, string_value) == 0) { return 1; }
+        if(strcmp(_string_value, string_value) == 0) { return TRUE; }
         index++;
     }
 
-    return 0;
+    return FALSE;
 }
 
 static __inline size_t atoa(char *string_value, char *buffer, size_t elements, size_t element_size) {
