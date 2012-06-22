@@ -33,10 +33,10 @@
                     ${foreach item=entry from=entries}
                         <tr>
                             ${if item=entry.type value=1 operator=eq}
-                                <td class="icon text"></td>
+                                <td class="icon folder"></td>
                             ${/if}
                             ${if item=entry.type value=2 operator=eq}
-                                <td class="icon folder"></td>
+                                <td class="icon text"></td>
                             ${/if}
                             ${if item=entry.type value=3 operator=eq}
                                 <td class="icon link"></td>
