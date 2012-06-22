@@ -94,28 +94,28 @@ typedef struct php_request_t {
  * this is the reference required for the basic interaction
  * with the service.
  */
-struct service_t *_service;
+VIRIATUM_EXTERNAL_PREFIX struct service_t *_service;
 
 /**
  * The global reference to the current connection being
  * used, this is going to be used to access connection
  * information values.
  */
-struct connection_t *_connection;
+VIRIATUM_EXTERNAL_PREFIX struct connection_t *_connection;
 
 /**
  * The global reference to the linked buffer to
  * be used to hold the various strings resulting
  * from the php default execution output.
  */
-struct linked_buffer_t *_output_buffer;
+VIRIATUM_EXTERNAL_PREFIX struct linked_buffer_t *_output_buffer;
 
 /**
  * The global structure to be used to "pass" php
  * information from the virtual machine into the
  * appropriate viriatum request handler.
  */
-struct php_request_t _php_request;
+VIRIATUM_EXTERNAL_PREFIX struct php_request_t _php_request;
 
 VIRIATUM_EXPORT_PREFIX ERROR_CODE create_mod_php_module(struct mod_php_module_t **mod_php_module_pointer, struct module_t *module);
 VIRIATUM_EXPORT_PREFIX ERROR_CODE delete_mod_php_module(struct mod_php_module_t *mod_php_module);
