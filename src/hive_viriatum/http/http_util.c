@@ -168,10 +168,10 @@ ERROR_CODE write_http_error(struct connection_t *connection, char *buffer, size_
     size = size == 0 ? VIRIATUM_HTTP_SIZE : size;
 
 #ifndef VIRIATUM_DEBUG
-	/* sets the error description as null in order to avoid any
-	display of the (internal) message, otherwise a possible
-	security hole would be created */
-	error_description = NULL;
+    /* sets the error description as null in order to avoid any
+    display of the (internal) message, otherwise a possible
+    security hole would be created */
+    error_description = NULL;
 #endif
 
     /* in case the use template flag is set the error
@@ -196,12 +196,12 @@ ERROR_CODE write_http_error(struct connection_t *connection, char *buffer, size_
         /* assigns the various error related variables into the
         template handler to be used, they may be used to display
         information arround the error, note that the error description
-		value is conditional and may not be set */
+        value is conditional and may not be set */
         assign_integer_template_handler(template_handler, (unsigned char *) "error_code", error_code);
         assign_string_template_handler(template_handler, (unsigned char *) "error_message", error_message);
-		if(error_description != NULL) {
-			assign_string_template_handler(template_handler, (unsigned char *) "error_description", error_description);
-		}
+        if(error_description != NULL) {
+            assign_string_template_handler(template_handler, (unsigned char *) "error_description", error_description);
+        }
 
         /* processes the file as a template handler, at this point
         the output buffer of the template engine should be populated */
@@ -247,17 +247,17 @@ ERROR_CODE write_http_error(struct connection_t *connection, char *buffer, size_
             callback_parameters
         );
     } else {
-		/* "stringfies" a possible null error description into a description
-		string in order to be correctly displayed then formats the error
-		message using the code, message and description */
-		error_description = error_description == NULL ? service->description : error_description;
+        /* "stringfies" a possible null error description into a description
+        string in order to be correctly displayed then formats the error
+        message using the code, message and description */
+        error_description = error_description == NULL ? service->description : error_description;
         SPRINTF(
             _error_description,
             sizeof(_error_description),
             "%d - %s - %s",
             error_code,
             error_message,
-			error_description
+            error_description
         );
 
         /* writes the http static headers to the response and
