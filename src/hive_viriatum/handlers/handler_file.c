@@ -266,11 +266,14 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
 
     /* allocates space for the computation of the time
     and of the time string, then allocates space for the
-    etag calculation structure (crc32 value) and for the etag*/
+    etag calculation structure (crc32 value), for the etag
+	value and for the (file) extension and mime type */
     struct date_time_t time;
     char time_string[20];
     unsigned long crc32_value;
     char etag[11];
+	char *extension;
+	const char *mime_type;
 
     /* allocates space for the size of the url string to
     be calculates and for the folder path variable */
@@ -528,6 +531,21 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
             NO_CACHE,
             FALSE
         );
+
+		/* retrieves the extension part of the file path and then uses
+		it to try to retrieve the mime type string for it in case it's
+		successfull "puts" the content type in the headers buffer, then
+		puts the etag value in the file */
+		extension = extension_path(handler_file_context->file_path);
+		mime_type = connection->service->get_mime_type(connection->service, extension);
+		if(mime_type != NULL) {
+			count += SPRINTF(
+				&headers_buffer[count],
+				VIRIATUM_HTTP_SIZE - count,
+				CONTENT_TYPE_H ": %s\r\n",
+				mime_type
+			);
+		}
         SPRINTF(
             &headers_buffer[count],
             VIRIATUM_HTTP_SIZE - count,
