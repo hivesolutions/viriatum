@@ -2073,6 +2073,10 @@ const char *_get_mime_type_service(struct service_t *service, char *extension) {
 	extension string value and returns it to the caller function */
 	char *mime_type;
     struct service_options_t *service_options = service->options;
-	get_value_string_hash_map(service_options->mime_types, (unsigned char *) extension, &mime_type);
+	get_value_string_hash_map(
+		service_options->mime_types,
+		(unsigned char *) extension,
+		(void **) &mime_type
+	);
 	return mime_type;
 }
