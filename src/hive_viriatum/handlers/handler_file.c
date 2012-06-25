@@ -536,7 +536,7 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
 		it to try to retrieve the mime type string for it in case it's
 		successfull "puts" the content type in the headers buffer, then
 		puts the etag value in the file */
-		extension = extension_path(handler_file_context->file_path);
+		extension = extension_path((char *) handler_file_context->file_path);
 		mime_type = connection->service->get_mime_type(connection->service, extension);
 		if(mime_type != NULL) {
 			count += SPRINTF(
