@@ -32,6 +32,7 @@
 #define SERVER_H "Server"
 #define LOCATION_H "Location"
 #define CONNECTION_H "Connection"
+#define CONTENT_TYPE_H "Content-Type"
 #define CACHE_CONTROL_H "Cache-Control"
 #define CONTENT_LENGTH_H "Content-Length"
 
