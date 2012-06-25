@@ -134,6 +134,12 @@ static __inline void normalize_path(char *string_value) {
     }
 }
 
+static __inline char *extension_path(char *string_value) {
+	size_t index = strlen(string_value) - 1;
+    while(string_value[index] != '.' && index != 0) { index--; }
+	return &string_value[index];
+}
+
 static __inline char atob(char *string_value) {
     const char *_string_value;
     size_t index = 0;
