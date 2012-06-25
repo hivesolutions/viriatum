@@ -66,12 +66,17 @@ typedef enum process_type_e {
     WORKER_PROCESS
 } process_type;
 
-
 /**
  * The function used to retrieve a string in english representing
  * the uptime of the service refered.
  */
 typedef const char *(*service_uptime) (struct service_t *, size_t);
+
+/**
+ * The function used to resolve a provided file extension (dot
+ * prefixed) into the appropriate mime type.
+ */
+typedef const char *(*service_mime) (struct service_t *, char *);
 
 /**
  * The function used to create a new handler instance
@@ -427,6 +432,7 @@ typedef struct service_t {
     char _uptime[128];
 
     service_uptime get_uptime;
+	service_mime get_mime_type;
     service_http_handler_access create_http_handler;
     service_http_handler_update delete_http_handler;
     service_http_handler_update add_http_handler;
@@ -568,6 +574,13 @@ typedef struct service_options_t {
      * parsed from the line value.
      */
     size_t index_count;
+
+	/**
+	 * The map (dictionary) containg the relations between
+	 * the file extension (dot prefixed) and the string based
+	 * mime type according to IANA.
+	 */
+	struct hash_map_t *mime_types;
 
     /**
      * The set of virtual hosts associated with the
@@ -1098,6 +1111,7 @@ ERROR_CODE _default_options_service(struct service_t *service, struct hash_map_t
 ERROR_CODE _file_options_service(struct service_t *service, struct hash_map_t *arguments);
 ERROR_CODE _comand_line_options_service(struct service_t *service, struct hash_map_t *arguments);
 const char *_get_uptime_service(struct service_t *service, size_t count);
+const char *_get_mime_type_service(struct service_t *service, char *extension);
 
 #ifdef VIRIATUM_SSL
 __inline static const char *_get_ssl_error_code(size_t index) {

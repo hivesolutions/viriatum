@@ -45,6 +45,7 @@ void create_service(struct service_t **service_pointer, unsigned char *name, uns
     service->service_socket6_handle = 0;
     service->http_handler = NULL;
     service->get_uptime = _get_uptime_service;
+	service->get_mime_type = _get_mime_type_service;
     service->create_http_handler = create_http_handler_service;
     service->delete_http_handler = delete_http_handler_service;
     service->add_http_handler = add_http_handler_service;
@@ -134,6 +135,9 @@ void create_service_options(struct service_options_t **service_options_pointer) 
     that no index is considered before configuration */
     memset(service_options->index, 0, sizeof(service_options->index));
 
+    /* creates the hash map for the mime types */
+    create_hash_map(&service_options->mime_types, 64);
+
     /* creates the hash map for the virtual hosts */
     create_hash_map(&service_options->virtual_hosts, 0);
 
@@ -142,6 +146,9 @@ void create_service_options(struct service_options_t **service_options_pointer) 
 }
 
 void delete_service_options(struct service_options_t *service_options) {
+	/* deletes the hash map for the mime types */
+	delete_hash_map(service_options->mime_types);
+
     /* deletes the hash map for the virtual hosts */
     delete_hash_map(service_options->virtual_hosts);
 
@@ -1710,6 +1717,208 @@ ERROR_CODE _default_options_service(struct service_t *service, struct hash_map_t
     service_options->default_index = VIRIATUM_DEFAULT_INDEX;
     service_options->use_template = VIRIATUM_DEFAULT_USE_TEMPLATE;
 
+	/* sets the default and staticaly defined mime type values
+	for the evaluation of the basic file extensions */
+	set_value_string_hash_map(service_options->mime_types, ".323", "text/h323");
+	set_value_string_hash_map(service_options->mime_types, ".*", "application/octet-stream");
+	set_value_string_hash_map(service_options->mime_types, ".acx", "application/internet-property-stream");
+	set_value_string_hash_map(service_options->mime_types, ".ai", "application/postscript");
+	set_value_string_hash_map(service_options->mime_types, ".aif", "audio/x-aiff");
+	set_value_string_hash_map(service_options->mime_types, ".aifc", "audio/x-aiff");
+	set_value_string_hash_map(service_options->mime_types, ".aiff", "audio/x-aiff");
+	set_value_string_hash_map(service_options->mime_types, ".asf", "video/x-ms-asf");
+	set_value_string_hash_map(service_options->mime_types, ".asr", "video/x-ms-asf");
+	set_value_string_hash_map(service_options->mime_types, ".asx", "video/x-ms-asf");
+	set_value_string_hash_map(service_options->mime_types, ".au", "audio/basic");
+	set_value_string_hash_map(service_options->mime_types, ".avi", "video/x-msvideo");
+	set_value_string_hash_map(service_options->mime_types, ".axs", "application/olescript");
+	set_value_string_hash_map(service_options->mime_types, ".bas", "text/plain");
+	set_value_string_hash_map(service_options->mime_types, ".bcpio", "application/x-bcpio");
+	set_value_string_hash_map(service_options->mime_types, ".bin", "application/octet-stream");
+	set_value_string_hash_map(service_options->mime_types, ".bmp", "image/bmp");
+	set_value_string_hash_map(service_options->mime_types, ".c", "text/plain");
+	set_value_string_hash_map(service_options->mime_types, ".cat", "application/vnd.ms-pkiseccat");
+	set_value_string_hash_map(service_options->mime_types, ".cbx", "application/colony-bundle");
+	set_value_string_hash_map(service_options->mime_types, ".ccx", "application/colony-container");
+	set_value_string_hash_map(service_options->mime_types, ".cdf", "application/x-cdf");
+	set_value_string_hash_map(service_options->mime_types, ".cdf", "application/x-netcdf");
+	set_value_string_hash_map(service_options->mime_types, ".cer", "application/x-x509-ca-cert");
+	set_value_string_hash_map(service_options->mime_types, ".class", "application/octet-stream");
+	set_value_string_hash_map(service_options->mime_types, ".clp", "application/x-msclip");
+	set_value_string_hash_map(service_options->mime_types, ".cmx", "image/x-cmx");
+	set_value_string_hash_map(service_options->mime_types, ".cod", "image/cis-cod");
+	set_value_string_hash_map(service_options->mime_types, ".cpio", "application/x-cpio");
+	set_value_string_hash_map(service_options->mime_types, ".cpx", "application/colony-plugin");
+	set_value_string_hash_map(service_options->mime_types, ".crd", "application/x-mscardfile");
+	set_value_string_hash_map(service_options->mime_types, ".crl", "application/pkix-crl");
+	set_value_string_hash_map(service_options->mime_types, ".crt", "application/x-x509-ca-cert");
+	set_value_string_hash_map(service_options->mime_types, ".csh", "application/x-csh");
+	set_value_string_hash_map(service_options->mime_types, ".css", "text/css");
+	set_value_string_hash_map(service_options->mime_types, ".dcr", "application/x-director");
+	set_value_string_hash_map(service_options->mime_types, ".der", "application/x-x509-ca-cert");
+	set_value_string_hash_map(service_options->mime_types, ".dir", "application/x-director");
+	set_value_string_hash_map(service_options->mime_types, ".dll", "application/x-msdownload");
+	set_value_string_hash_map(service_options->mime_types, ".dms", "application/octet-stream");
+	set_value_string_hash_map(service_options->mime_types, ".doc", "application/msword");
+	set_value_string_hash_map(service_options->mime_types, ".dot", "application/msword");
+	set_value_string_hash_map(service_options->mime_types, ".dvi", "application/x-dvi");
+	set_value_string_hash_map(service_options->mime_types, ".dxr", "application/x-director");
+	set_value_string_hash_map(service_options->mime_types, ".eps", "application/postscript");
+	set_value_string_hash_map(service_options->mime_types, ".etx", "text/x-setext");
+	set_value_string_hash_map(service_options->mime_types, ".evy", "application/envoy");
+	set_value_string_hash_map(service_options->mime_types, ".exe", "application/octet-stream");
+	set_value_string_hash_map(service_options->mime_types, ".fif", "application/fractals");
+	set_value_string_hash_map(service_options->mime_types, ".flr", "x-world/x-vrml");
+	set_value_string_hash_map(service_options->mime_types, ".gif", "image/gif");
+	set_value_string_hash_map(service_options->mime_types, ".gtar", "application/x-gtar");
+	set_value_string_hash_map(service_options->mime_types, ".gz", "application/x-gzip");
+	set_value_string_hash_map(service_options->mime_types, ".h", "text/plain");
+	set_value_string_hash_map(service_options->mime_types, ".hdf", "application/x-hdf");
+	set_value_string_hash_map(service_options->mime_types, ".hlp", "application/winhlp");
+	set_value_string_hash_map(service_options->mime_types, ".hqx", "application/mac-binhex40");
+	set_value_string_hash_map(service_options->mime_types, ".hta", "application/hta");
+	set_value_string_hash_map(service_options->mime_types, ".htc", "text/x-component");
+	set_value_string_hash_map(service_options->mime_types, ".htm", "text/html");
+	set_value_string_hash_map(service_options->mime_types, ".html", "text/html");
+	set_value_string_hash_map(service_options->mime_types, ".htt", "text/webviewhtml");
+	set_value_string_hash_map(service_options->mime_types, ".ico", "image/x-icon");
+	set_value_string_hash_map(service_options->mime_types, ".ief", "image/ief");
+	set_value_string_hash_map(service_options->mime_types, ".iii", "application/x-iphone");
+	set_value_string_hash_map(service_options->mime_types, ".ins", "application/x-internet-signup");
+	set_value_string_hash_map(service_options->mime_types, ".isp", "application/x-internet-signup");
+	set_value_string_hash_map(service_options->mime_types, ".jfif", "image/pipeg");
+	set_value_string_hash_map(service_options->mime_types, ".jpe", "image/jpeg");
+	set_value_string_hash_map(service_options->mime_types, ".jpeg", "image/jpeg");
+	set_value_string_hash_map(service_options->mime_types, ".jpg", "image/jpeg");
+	set_value_string_hash_map(service_options->mime_types, ".js", "application/x-javascript");
+	set_value_string_hash_map(service_options->mime_types, ".json", "application/json");
+	set_value_string_hash_map(service_options->mime_types, ".latex", "application/x-latex");
+	set_value_string_hash_map(service_options->mime_types, ".lha", "application/octet-stream");
+	set_value_string_hash_map(service_options->mime_types, ".lsf", "video/x-la-asf");
+	set_value_string_hash_map(service_options->mime_types, ".lsx", "video/x-la-asf");
+	set_value_string_hash_map(service_options->mime_types, ".lzh", "application/octet-stream");
+	set_value_string_hash_map(service_options->mime_types, ".m13", "application/x-msmediaview");
+	set_value_string_hash_map(service_options->mime_types, ".m14", "application/x-msmediaview");
+	set_value_string_hash_map(service_options->mime_types, ".m3u", "audio/x-mpegurl");
+	set_value_string_hash_map(service_options->mime_types, ".man", "application/x-troff-man");
+	set_value_string_hash_map(service_options->mime_types, ".mdb", "application/x-msaccess");
+	set_value_string_hash_map(service_options->mime_types, ".me", "application/x-troff-me");
+	set_value_string_hash_map(service_options->mime_types, ".mht", "message/rfc822");
+	set_value_string_hash_map(service_options->mime_types, ".mhtml", "message/rfc822");
+	set_value_string_hash_map(service_options->mime_types, ".mid", "audio/mid");
+	set_value_string_hash_map(service_options->mime_types, ".mny", "application/x-msmoney");
+	set_value_string_hash_map(service_options->mime_types, ".mov", "video/quicktime");
+	set_value_string_hash_map(service_options->mime_types, ".movie", "video/x-sgi-movie");
+	set_value_string_hash_map(service_options->mime_types, ".mp2", "video/mpeg");
+	set_value_string_hash_map(service_options->mime_types, ".mp3", "audio/mpeg");
+	set_value_string_hash_map(service_options->mime_types, ".mpa", "video/mpeg");
+	set_value_string_hash_map(service_options->mime_types, ".mpe", "video/mpeg");
+	set_value_string_hash_map(service_options->mime_types, ".mpeg", "video/mpeg");
+	set_value_string_hash_map(service_options->mime_types, ".mpg", "video/mpeg");
+	set_value_string_hash_map(service_options->mime_types, ".mpp", "application/vnd.ms-project");
+	set_value_string_hash_map(service_options->mime_types, ".mpv2", "video/mpeg");
+	set_value_string_hash_map(service_options->mime_types, ".ms", "application/x-troff-ms");
+	set_value_string_hash_map(service_options->mime_types, ".msg", "application/vnd.ms-outlook");
+	set_value_string_hash_map(service_options->mime_types, ".mvb", "application/x-msmediaview");
+	set_value_string_hash_map(service_options->mime_types, ".nc", "application/x-netcdf");
+	set_value_string_hash_map(service_options->mime_types, ".nws", "message/rfc822");
+	set_value_string_hash_map(service_options->mime_types, ".oda", "application/oda");
+	set_value_string_hash_map(service_options->mime_types, ".odf", "font/opentype");
+	set_value_string_hash_map(service_options->mime_types, ".p10", "application/pkcs10");
+	set_value_string_hash_map(service_options->mime_types, ".p12", "application/x-pkcs12");
+	set_value_string_hash_map(service_options->mime_types, ".p7b", "application/x-pkcs7-certificates");
+	set_value_string_hash_map(service_options->mime_types, ".p7c", "application/x-pkcs7-mime");
+	set_value_string_hash_map(service_options->mime_types, ".p7m", "application/x-pkcs7-mime");
+	set_value_string_hash_map(service_options->mime_types, ".p7r", "application/x-pkcs7-certreqresp");
+	set_value_string_hash_map(service_options->mime_types, ".p7s", "application/x-pkcs7-signature");
+	set_value_string_hash_map(service_options->mime_types, ".pbm", "image/x-portable-bitmap");
+	set_value_string_hash_map(service_options->mime_types, ".pdf", "application/pdf");
+	set_value_string_hash_map(service_options->mime_types, ".pfx", "application/x-pkcs12");
+	set_value_string_hash_map(service_options->mime_types, ".pgm", "image/x-portable-graymap");
+	set_value_string_hash_map(service_options->mime_types, ".pko", "application/ynd.ms-pkipko");
+	set_value_string_hash_map(service_options->mime_types, ".pma", "application/x-perfmon");
+	set_value_string_hash_map(service_options->mime_types, ".pmc", "application/x-perfmon");
+	set_value_string_hash_map(service_options->mime_types, ".pml", "application/x-perfmon");
+	set_value_string_hash_map(service_options->mime_types, ".pmr", "application/x-perfmon");
+	set_value_string_hash_map(service_options->mime_types, ".pmw", "application/x-perfmon");
+	set_value_string_hash_map(service_options->mime_types, ".png", "image/png");
+	set_value_string_hash_map(service_options->mime_types, ".pnm", "image/x-portable-anymap");
+	set_value_string_hash_map(service_options->mime_types, ".pot", "application/vnd.ms-powerpoint");
+	set_value_string_hash_map(service_options->mime_types, ".ppm", "image/x-portable-pixmap");
+	set_value_string_hash_map(service_options->mime_types, ".pps", "application/vnd.ms-powerpoint");
+	set_value_string_hash_map(service_options->mime_types, ".ppt", "application/vnd.ms-powerpoint");
+	set_value_string_hash_map(service_options->mime_types, ".prf", "application/pics-rules");
+	set_value_string_hash_map(service_options->mime_types, ".ps", "application/postscript");
+	set_value_string_hash_map(service_options->mime_types, ".pub", "application/x-mspublisher");
+	set_value_string_hash_map(service_options->mime_types, ".qt", "video/quicktime");
+	set_value_string_hash_map(service_options->mime_types, ".ra", "audio/x-pn-realaudio");
+	set_value_string_hash_map(service_options->mime_types, ".ram", "audio/x-pn-realaudio");
+	set_value_string_hash_map(service_options->mime_types, ".ras", "image/x-cmu-raster");
+	set_value_string_hash_map(service_options->mime_types, ".rgb", "image/x-rgb");
+	set_value_string_hash_map(service_options->mime_types, ".rmi", "audio/mid");
+	set_value_string_hash_map(service_options->mime_types, ".roff", "application/x-troff");
+	set_value_string_hash_map(service_options->mime_types, ".rtf", "application/rtf");
+	set_value_string_hash_map(service_options->mime_types, ".rtx", "text/richtext");
+	set_value_string_hash_map(service_options->mime_types, ".scd", "application/x-msschedule");
+	set_value_string_hash_map(service_options->mime_types, ".sct", "text/scriptlet");
+	set_value_string_hash_map(service_options->mime_types, ".setpay", "application/set-payment-initiation");
+	set_value_string_hash_map(service_options->mime_types, ".setreg", "application/set-registration-initiation");
+	set_value_string_hash_map(service_options->mime_types, ".sh", "application/x-sh");
+	set_value_string_hash_map(service_options->mime_types, ".shar", "application/x-shar");
+	set_value_string_hash_map(service_options->mime_types, ".sit", "application/x-stuffit");
+	set_value_string_hash_map(service_options->mime_types, ".snd", "audio/basic");
+	set_value_string_hash_map(service_options->mime_types, ".spc", "application/x-pkcs7-certificates");
+	set_value_string_hash_map(service_options->mime_types, ".spl", "application/futuresplash");
+	set_value_string_hash_map(service_options->mime_types, ".src", "application/x-wais-source");
+	set_value_string_hash_map(service_options->mime_types, ".sst", "application/vnd.ms-pkicertstore");
+	set_value_string_hash_map(service_options->mime_types, ".stl", "application/vnd.ms-pkistl");
+	set_value_string_hash_map(service_options->mime_types, ".stm", "text/html");
+	set_value_string_hash_map(service_options->mime_types, ".sv4cpio", "application/x-sv4cpio");
+	set_value_string_hash_map(service_options->mime_types, ".sv4crc", "application/x-sv4crc");
+	set_value_string_hash_map(service_options->mime_types, ".svg", "image/svg+xml");
+	set_value_string_hash_map(service_options->mime_types, ".swf", "application/x-shockwave-flash");
+	set_value_string_hash_map(service_options->mime_types, ".t", "application/x-troff");
+	set_value_string_hash_map(service_options->mime_types, ".tar", "application/x-tar");
+	set_value_string_hash_map(service_options->mime_types, ".tcl", "application/x-tcl");
+	set_value_string_hash_map(service_options->mime_types, ".tex", "application/x-tex");
+	set_value_string_hash_map(service_options->mime_types, ".texi", "application/x-texinfo");
+	set_value_string_hash_map(service_options->mime_types, ".texinfo", "application/x-texinfo");
+	set_value_string_hash_map(service_options->mime_types, ".tgz", "application/x-compressed");
+	set_value_string_hash_map(service_options->mime_types, ".tif", "image/tiff");
+	set_value_string_hash_map(service_options->mime_types, ".tiff", "image/tiff");
+	set_value_string_hash_map(service_options->mime_types, ".tr", "application/x-troff");
+	set_value_string_hash_map(service_options->mime_types, ".trm", "application/x-msterminal");
+	set_value_string_hash_map(service_options->mime_types, ".tsv", "text/tab-separated-values");
+	set_value_string_hash_map(service_options->mime_types, ".ttf", "application/x-font-ttf");
+	set_value_string_hash_map(service_options->mime_types, ".txt", "text/plain");
+	set_value_string_hash_map(service_options->mime_types, ".uls", "text/iuls");
+	set_value_string_hash_map(service_options->mime_types, ".ustar", "application/x-ustar");
+	set_value_string_hash_map(service_options->mime_types, ".vcf", "text/x-vcard");
+	set_value_string_hash_map(service_options->mime_types, ".vrml", "x-world/x-vrml");
+	set_value_string_hash_map(service_options->mime_types, ".wav", "audio/x-wav");
+	set_value_string_hash_map(service_options->mime_types, ".wcm", "application/vnd.ms-works");
+	set_value_string_hash_map(service_options->mime_types, ".wdb", "application/vnd.ms-works");
+	set_value_string_hash_map(service_options->mime_types, ".wks", "application/vnd.ms-works");
+	set_value_string_hash_map(service_options->mime_types, ".wmf", "application/x-msmetafile");
+	set_value_string_hash_map(service_options->mime_types, ".wps", "application/vnd.ms-works");
+	set_value_string_hash_map(service_options->mime_types, ".wri", "application/x-mswrite");
+	set_value_string_hash_map(service_options->mime_types, ".wrl", "x-world/x-vrml");
+	set_value_string_hash_map(service_options->mime_types, ".wrz", "x-world/x-vrml");
+	set_value_string_hash_map(service_options->mime_types, ".xaf", "x-world/x-vrml");
+	set_value_string_hash_map(service_options->mime_types, ".xbm", "image/x-xbitmap");
+	set_value_string_hash_map(service_options->mime_types, ".xla", "application/vnd.ms-excel");
+	set_value_string_hash_map(service_options->mime_types, ".xlc", "application/vnd.ms-excel");
+	set_value_string_hash_map(service_options->mime_types, ".xlm", "application/vnd.ms-excel");
+	set_value_string_hash_map(service_options->mime_types, ".xls", "application/vnd.ms-excel");
+	set_value_string_hash_map(service_options->mime_types, ".xlt", "application/vnd.ms-excel");
+	set_value_string_hash_map(service_options->mime_types, ".xlw", "application/vnd.ms-excel");
+	set_value_string_hash_map(service_options->mime_types, ".xml", "application/xml");
+	set_value_string_hash_map(service_options->mime_types, ".xof", "x-world/x-vrml");
+	set_value_string_hash_map(service_options->mime_types, ".xpm", "image/x-xpixmap");
+	set_value_string_hash_map(service_options->mime_types, ".xwd", "image/x-xwindowdump");
+	set_value_string_hash_map(service_options->mime_types, ".z", "application/x-compress");
+	set_value_string_hash_map(service_options->mime_types, ".zip", "application/zip");
+
     /* raises no error */
     RAISE_NO_ERROR;
 }
@@ -1855,4 +2064,15 @@ const char *_get_uptime_service(struct service_t *service, size_t count) {
     unsigned long long delta = (unsigned long long) time(NULL) - service->start_time;
     format_delta(service->_uptime, sizeof(service->_uptime), delta, count);
     return service->_uptime;
+}
+
+const char *_get_mime_type_service(struct service_t *service, char *extension) {
+	/* allocates space for the buffer reference that will hold the mime type
+    then unpacks the service options from the service and uses it to access
+	the mmime types hash map and retrieve the mime type string from the provided
+	extension string value and returns it to the caller function */
+	char *mime_type;
+    struct service_options_t *service_options = service->options;
+	get_value_string_hash_map(service_options->mime_types, extension, &mime_type);
+	return mime_type;
 }
