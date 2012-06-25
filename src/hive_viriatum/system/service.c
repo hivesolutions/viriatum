@@ -2069,7 +2069,7 @@ const char *_get_uptime_service(struct service_t *service, size_t count) {
 const char *_get_mime_type_service(struct service_t *service, char *extension) {
 	/* allocates space for the buffer reference that will hold the mime type
     then unpacks the service options from the service and uses it to access
-	the mmime types hash map and retrieve the mime type string from the provided
+	the mime types hash map and retrieve the mime type string from the provided
 	extension string value and returns it to the caller function */
 	char *mime_type;
     struct service_options_t *service_options = service->options;
