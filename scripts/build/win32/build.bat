@@ -4,7 +4,7 @@
 :: sets the version string constant value
 set VERSION=0.3.0a1
 
-:: sets the arquitecture for the current build
+:: sets the architecture for the current build
 :: execution process (eg: win32, x64, etc.)
 set ARCHITECTURE=win32
 
