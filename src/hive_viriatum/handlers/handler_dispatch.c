@@ -263,19 +263,22 @@ ERROR_CODE url_callback_handler_dispatch(struct http_parser_t *http_parser, cons
             validation process using the index array provided */
             SPRINTF((char *) base_path, VIRIATUM_MAX_PATH_SIZE, "%s%s", VIRIATUM_CONTENTS_PATH, path);
             index_ = validate_file((char *) base_path, (char *) options->index, 32, 128);
-            index_size = strlen(index_);
-
-            /* copies the index file name to the reamining part of
-            the path buffer closing the buffer with the end of string
-            character (normal closing) */
-            memcpy(&path[path_size], index_, index_size);
-            path_size = path_size + index_size;
-            path[path_size] = '\0';
 
             /* in case the index file resolution was successfull
             (a new file was resolved) must match the file path through
             the regular expression pipe, for handler resolution */
             if(index_ != NULL) {
+                /* calculates the size of the index path so that
+                it's possible to copy it into the path string */
+                index_size = strlen(index_);
+
+                /* copies the index file name to the reamining part of
+                the path buffer closing the buffer with the end of string
+                character (normal closing) */
+                memcpy(&path[path_size], index_, index_size);
+                path_size = path_size + index_size;
+                path[path_size] = '\0';
+
 #ifdef VIRIATUM_PCRE
                 /* saves the current match index so that it's possible
                 to detect if the index file resolution changed the handler

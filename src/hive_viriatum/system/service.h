@@ -432,7 +432,7 @@ typedef struct service_t {
     char _uptime[128];
 
     service_uptime get_uptime;
-	service_mime get_mime_type;
+    service_mime get_mime_type;
     service_http_handler_access create_http_handler;
     service_http_handler_update delete_http_handler;
     service_http_handler_update add_http_handler;
@@ -575,12 +575,12 @@ typedef struct service_options_t {
      */
     size_t index_count;
 
-	/**
-	 * The map (dictionary) containg the relations between
-	 * the file extension (dot prefixed) and the string based
-	 * mime type according to IANA.
-	 */
-	struct hash_map_t *mime_types;
+    /**
+     * The map (dictionary) containg the relations between
+     * the file extension (dot prefixed) and the string based
+     * mime type according to IANA.
+     */
+    struct hash_map_t *mime_types;
 
     /**
      * The set of virtual hosts associated with the

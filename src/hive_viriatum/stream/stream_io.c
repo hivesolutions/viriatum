@@ -255,7 +255,9 @@ ERROR_CODE read_handler_stream_io(struct connection_t *connection) {
             }
 
             /* resets the buffer size to the original (initial)
-            position so that it can be reused */
+            position so that it can be reused, note that both
+            the buffer pointer and the buffer size are reseted */
+            buffer_pointer = (unsigned char *) buffer;
             buffer_size = 0;
         }
 
