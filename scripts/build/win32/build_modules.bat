@@ -2,7 +2,7 @@
 @echo off
 
 :: sets the version string constant value
-set VERSION=0.1.0
+set VERSION=0.3.0a1
 
 :: sets the arquitecture for the current build
 :: execution process (eg: win32, x64, etc.)
