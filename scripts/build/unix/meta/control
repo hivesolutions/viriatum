@@ -1,5 +1,5 @@
 Package: viriatum
-Version: 0.10
+Version: 0.30
 Section: httpd
 Priority: optional
 Architecture: amd64

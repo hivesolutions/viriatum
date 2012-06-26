@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # sets the various global variables
-version=0.1.0
+version=0.3.0a1
 architecture=amd64
 name=viriatum\_$version\_$architecture
 name_raw=viriatum\_$version\_$architecture\_raw
