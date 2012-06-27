@@ -398,7 +398,7 @@ static __inline size_t format_bytes(char *buffer, size_t size, size_t bytes) {
         else { format = "%d MBytes"; is_float = FALSE; }
 
         value_i = value;
-        if(is_float) { value_f = (double) bytes / 1048576; }
+        if(is_float) { value_f = (double) bytes / 1048576.0f; }
         valid = TRUE;
     }
 
