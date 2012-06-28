@@ -168,11 +168,16 @@ ERROR_CODE url_callback_handler_module(struct http_parser_t *http_parser, const 
     memcpy(handler_wsgi_context->url, data, data_size);
     handler_wsgi_context->url[data_size] = '\0';
 
+	/* sets the prefix name as non existent this is the default behaviour
+	to be overriden by the virtual url handler */
+	handler_wsgi_context->prefix_name[0] = '\0';
+
     /* populates the various generated strings, avoids possible recalculation
     of the lengths of the string */
     string_populate(&handler_wsgi_context->_file_name_string, handler_wsgi_context->file_name, path_size, 0);
     string_populate(&handler_wsgi_context->_query_string, handler_wsgi_context->query, query_size, 0);
     string_populate(&handler_wsgi_context->_url_string, handler_wsgi_context->url, path_size, 0);
+	string_populate(&handler_wsgi_context->_prefix_name_string, handler_wsgi_context->prefix_name, 0, 0);
 
     /* raise no error */
     RAISE_NO_ERROR;
@@ -369,8 +374,16 @@ ERROR_CODE location_callback_handler_module(struct http_parser_t *http_parser, s
 }
 
 ERROR_CODE virtual_url_callback_handler_module(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
-    /* retrieves the handler wsgi context from the http parser */
+	/* allocates space for the variable that will hold the new size
+	of the preffix path to be used, be removing the new virtual url
+	from the previously set file name (path) */
+    size_t prefix_size;
+	
+	/* retrieves the handler wsgi context from the http parser and then
+	uses it to retrieves the size of the file name (path) for prefix
+	size calculation (to be used as the prefix path) */
     struct handler_wsgi_context_t *handler_wsgi_context = (struct handler_wsgi_context_t *) http_parser->context;
+	size_t _path_size = handler_wsgi_context->_file_name_string.length;
 
     /* checks the position of the get parameters divisor position
     and then uses it to calculate the size of the (base) path */
@@ -378,6 +391,12 @@ ERROR_CODE virtual_url_callback_handler_module(struct http_parser_t *http_parser
     size_t path_size = pointer == NULL ? data_size : pointer - (char *) data;
     size_t query_size = pointer == NULL ? 0 : data_size - path_size - 1;
     query_size = query_size > 0 ? query_size : 0;
+	prefix_size = _path_size - path_size;
+
+	/* sets the prefix name as non existent this is the default behaviour
+	to be overriden by the virtual url handler */
+	memcpy(handler_wsgi_context->prefix_name, handler_wsgi_context->file_name, prefix_size);
+	handler_wsgi_context->prefix_name[prefix_size] = '\0';
 
     /* copies the part of the data buffer relative to the file name
     this avoids copying the query part */
@@ -400,6 +419,7 @@ ERROR_CODE virtual_url_callback_handler_module(struct http_parser_t *http_parser
     string_populate(&handler_wsgi_context->_file_name_string, handler_wsgi_context->file_name, path_size, 0);
     string_populate(&handler_wsgi_context->_query_string, handler_wsgi_context->query, query_size, 0);
     string_populate(&handler_wsgi_context->_url_string, handler_wsgi_context->url, path_size, 0);
+	string_populate(&handler_wsgi_context->_prefix_name_string, handler_wsgi_context->prefix_name, prefix_size, 0);
 
     /* raise no error */
     RAISE_NO_ERROR;
@@ -870,7 +890,7 @@ ERROR_CODE _start_environ(PyObject *environ, struct http_parser_t *http_parser) 
     PyDict_SetItemString(environ, "REQUEST_METHOD", _value);
     Py_DECREF(_value);
 
-    _value = PyString_FromString((char *) handler_wsgi_context->file_name);
+    _value = PyString_FromString((char *) handler_wsgi_context->prefix_name);
     PyDict_SetItemString(environ, "SCRIPT_NAME", _value);
     Py_DECREF(_value);
 
