@@ -279,7 +279,7 @@ ERROR_CODE _load_locations(struct service_t *service, struct mod_wsgi_http_handl
         if(value != NULL) { _location->file_path = (char *) value; }
 
         /* tries to retrieve the script argument from the arguments map, then
-        sets the reload (boolean) value for the service */
+        sets the reload (boolean) value for the location */
         get_value_string_sort_map(configuration, (unsigned char *) "script_reload", &value);
         if(value != NULL) { _location->reload = (unsigned char) atob(value); }
     }
