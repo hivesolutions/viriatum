@@ -111,6 +111,13 @@ typedef struct handler_wsgi_context_t {
     unsigned char query[VIRIATUM_MAX_URL_SIZE];
 
     /**
+     * The name to be considered the preffix in the
+	 * internal wsgi structure for internal guide.
+	 * This value is used for "virtual" location guide.
+     */
+    unsigned char prefix_name[VIRIATUM_MAX_PATH_SIZE];
+
+    /**
      * The path to the file to be handled by
      * the current php request.
      */
@@ -188,10 +195,16 @@ typedef struct handler_wsgi_context_t {
     struct string_t _file_name_string;
 
     /**
-     * String reference to the query buffer, useful
+     * String reference to the query string, useful
      * for fast attribute calculation (eg: size).
      */
     struct string_t _query_string;
+
+    /**
+     * String reference to the prefix name buffer, useful
+     * for fast attribute calculation (eg: size).
+     */
+    struct string_t _prefix_name_string;
 
     /**
      * String reference to the file path buffer, useful
