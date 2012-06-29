@@ -44,6 +44,7 @@ void create_service(struct service_t **service_pointer, unsigned char *name, uns
     service->service_socket_handle = 0;
     service->service_socket6_handle = 0;
     service->http_handler = NULL;
+    service->register_signals = NULL;
     service->get_uptime = _get_uptime_service;
     service->get_mime_type = _get_mime_type_service;
     service->create_http_handler = create_http_handler_service;
@@ -708,8 +709,14 @@ ERROR_CODE start_service(struct service_t *service) {
     register_handler_default(service);
     register_handler_file(service);
 
-    /* loads (all) the currently available modules */
+    /* loads (all) the currently available modules, this operation may
+    affect a series of internal structures including signal handlers */
     load_modules_service(service);
+
+    /* registers the signal handler for the service, this must
+    be done at this stage so that no module creates problems and
+    overrides the default signal handlers */
+    CALL_V(service->register_signals);
 
     /* sets the current http handler accoring to the current options
     in the service, the http handler must be loaded in the handlers map */
