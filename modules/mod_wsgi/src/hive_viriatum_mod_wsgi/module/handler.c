@@ -168,16 +168,16 @@ ERROR_CODE url_callback_handler_module(struct http_parser_t *http_parser, const 
     memcpy(handler_wsgi_context->url, data, data_size);
     handler_wsgi_context->url[data_size] = '\0';
 
-	/* sets the prefix name as non existent this is the default behaviour
-	to be overriden by the virtual url handler */
-	handler_wsgi_context->prefix_name[0] = '\0';
+    /* sets the prefix name as non existent this is the default behaviour
+    to be overriden by the virtual url handler */
+    handler_wsgi_context->prefix_name[0] = '\0';
 
     /* populates the various generated strings, avoids possible recalculation
     of the lengths of the string */
     string_populate(&handler_wsgi_context->_file_name_string, handler_wsgi_context->file_name, path_size, 0);
     string_populate(&handler_wsgi_context->_query_string, handler_wsgi_context->query, query_size, 0);
     string_populate(&handler_wsgi_context->_url_string, handler_wsgi_context->url, path_size, 0);
-	string_populate(&handler_wsgi_context->_prefix_name_string, handler_wsgi_context->prefix_name, 0, 0);
+    string_populate(&handler_wsgi_context->_prefix_name_string, handler_wsgi_context->prefix_name, 0, 0);
 
     /* raise no error */
     RAISE_NO_ERROR;
@@ -374,16 +374,16 @@ ERROR_CODE location_callback_handler_module(struct http_parser_t *http_parser, s
 }
 
 ERROR_CODE virtual_url_callback_handler_module(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
-	/* allocates space for the variable that will hold the new size
-	of the preffix path to be used, be removing the new virtual url
-	from the previously set file name (path) */
+    /* allocates space for the variable that will hold the new size
+    of the preffix path to be used, be removing the new virtual url
+    from the previously set file name (path) */
     size_t prefix_size;
-	
-	/* retrieves the handler wsgi context from the http parser and then
-	uses it to retrieves the size of the file name (path) for prefix
-	size calculation (to be used as the prefix path) */
+
+    /* retrieves the handler wsgi context from the http parser and then
+    uses it to retrieves the size of the file name (path) for prefix
+    size calculation (to be used as the prefix path) */
     struct handler_wsgi_context_t *handler_wsgi_context = (struct handler_wsgi_context_t *) http_parser->context;
-	size_t _path_size = handler_wsgi_context->_file_name_string.length;
+    size_t _path_size = handler_wsgi_context->_file_name_string.length;
 
     /* checks the position of the get parameters divisor position
     and then uses it to calculate the size of the (base) path */
@@ -391,12 +391,12 @@ ERROR_CODE virtual_url_callback_handler_module(struct http_parser_t *http_parser
     size_t path_size = pointer == NULL ? data_size : pointer - (char *) data;
     size_t query_size = pointer == NULL ? 0 : data_size - path_size - 1;
     query_size = query_size > 0 ? query_size : 0;
-	prefix_size = _path_size - path_size;
+    prefix_size = _path_size - path_size;
 
-	/* sets the prefix name as non existent this is the default behaviour
-	to be overriden by the virtual url handler */
-	memcpy(handler_wsgi_context->prefix_name, handler_wsgi_context->file_name, prefix_size);
-	handler_wsgi_context->prefix_name[prefix_size] = '\0';
+    /* sets the prefix name as non existent this is the default behaviour
+    to be overriden by the virtual url handler */
+    memcpy(handler_wsgi_context->prefix_name, handler_wsgi_context->file_name, prefix_size);
+    handler_wsgi_context->prefix_name[prefix_size] = '\0';
 
     /* copies the part of the data buffer relative to the file name
     this avoids copying the query part */
@@ -419,7 +419,7 @@ ERROR_CODE virtual_url_callback_handler_module(struct http_parser_t *http_parser
     string_populate(&handler_wsgi_context->_file_name_string, handler_wsgi_context->file_name, path_size, 0);
     string_populate(&handler_wsgi_context->_query_string, handler_wsgi_context->query, query_size, 0);
     string_populate(&handler_wsgi_context->_url_string, handler_wsgi_context->url, path_size, 0);
-	string_populate(&handler_wsgi_context->_prefix_name_string, handler_wsgi_context->prefix_name, prefix_size, 0);
+    string_populate(&handler_wsgi_context->_prefix_name_string, handler_wsgi_context->prefix_name, prefix_size, 0);
 
     /* raise no error */
     RAISE_NO_ERROR;
@@ -491,23 +491,23 @@ ERROR_CODE _send_data_callback(struct connection_t *connection, struct data_t *d
     char *_buffer;
     size_t buffer_size;
 
-	/* allocates space for the object reference to the next item to be
-	retrieved from the currently selected iterator */
-	PyObject *item;
+    /* allocates space for the object reference to the next item to be
+    retrieved from the currently selected iterator */
+    PyObject *item;
 
     /* retrieves the current wsgi context object as the parameters object
     then uses it to retrieve the iterator and then retrieves the next
     element from the iterator (the next data to be sent) */
     struct handler_wsgi_context_t *handler_wsgi_context = (struct handler_wsgi_context_t *) parameters;
     PyObject *iterator = handler_wsgi_context->iterator;
-		
-    /* acquires the global interpreter state an changes the
-	current state to the base thread state */
-	VIRIATUM_ACQUIRE_GIL;
 
-	/* retrieves the next item to be selected from the iterator
-	to be processed in the current iteration cycle */
-	item = PyIter_Next(iterator);
+    /* acquires the global interpreter state an changes the
+    current state to the base thread state */
+    VIRIATUM_ACQUIRE_GIL;
+
+    /* retrieves the next item to be selected from the iterator
+    to be processed in the current iteration cycle */
+    item = PyIter_Next(iterator);
 
     /* in case the item is not defined (end of iteration) no more data is
     available to be sent in the response must cleanup the request */
@@ -517,9 +517,9 @@ ERROR_CODE _send_data_callback(struct connection_t *connection, struct data_t *d
         Py_DECREF(iterator);
         handler_wsgi_context->iterator = NULL;
 
-		/* changes the current thread state releasing it and releases the
-		lock on the global interpreter state */
-		VIRIATUM_RELEASE_GIL;
+        /* changes the current thread state releasing it and releases the
+        lock on the global interpreter state */
+        VIRIATUM_RELEASE_GIL;
 
         /* redirect the handling to the send response callback handler module
         so that the proper cleanup is done (eg: closing connection check) */
@@ -543,9 +543,9 @@ ERROR_CODE _send_data_callback(struct connection_t *connection, struct data_t *d
     the data has been already copied */
     Py_DECREF(item);
 
-	/* changes the current thread state releasing it and releases the
-	lock on the global interpreter state */
-	VIRIATUM_RELEASE_GIL;
+    /* changes the current thread state releasing it and releases the
+    lock on the global interpreter state */
+    VIRIATUM_RELEASE_GIL;
 
     /* writes the buffer to the connection, this will write another
     chunk of data into the connection and return to this same callback
@@ -609,8 +609,8 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
     }
 
     /* acquires the global interpreter state an changes the
-	current state to the base thread state */
-	VIRIATUM_ACQUIRE_GIL;
+    current state to the base thread state */
+    VIRIATUM_ACQUIRE_GIL;
 
     /* in case the module is not defined, must be loaded again from the
     file into the python interpreter */
@@ -635,7 +635,7 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
     application to access viriatum wsgi functions */
     wsgi_module = PyImport_ImportModule("viriatum_wsgi");
     if(wsgi_module == NULL) {
-		VIRIATUM_RELEASE_GIL;
+        VIRIATUM_RELEASE_GIL;
         RAISE_ERROR_M(D_ERROR_CODE, (unsigned char *) "Problem loading module");
     }
 
@@ -643,7 +643,7 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
     and then verifies that it's a valid python function */
     start_response_function = PyObject_GetAttrString(wsgi_module, "start_response");
     if(!start_response_function || !PyCallable_Check(start_response_function)) {
-		VIRIATUM_RELEASE_GIL;
+        VIRIATUM_RELEASE_GIL;
         RAISE_ERROR_M(D_ERROR_CODE, (unsigned char *) "Problem retrieving function");
     }
 
@@ -652,7 +652,7 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
     reference is invalid raises an error */
     module = mod_wsgi_http_handler->module;
     if(module == NULL) {
-		VIRIATUM_RELEASE_GIL;
+        VIRIATUM_RELEASE_GIL;
         RAISE_ERROR_M(D_ERROR_CODE, (unsigned char *) "Problem loading module");
     }
 
@@ -661,7 +661,7 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
     if it refers a valid function */
     handler_function = PyObject_GetAttrString(module, "application");
     if(!handler_function || !PyCallable_Check(handler_function)) {
-		VIRIATUM_RELEASE_GIL;
+        VIRIATUM_RELEASE_GIL;
         RAISE_ERROR_M(D_ERROR_CODE, (unsigned char *) "Problem retrieving application");
     }
 
@@ -700,7 +700,7 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
         Py_DECREF(handler_function);
         Py_DECREF(args);
         Py_DECREF(wsgi_module);
-		VIRIATUM_RELEASE_GIL;
+        VIRIATUM_RELEASE_GIL;
         RAISE_ERROR_M(D_ERROR_CODE, (unsigned char *) "Problem executing application");
     }
 
@@ -741,9 +741,9 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
     sets the iterator in the wsgi context structure to be used in the callback */
     iterator = PyObject_GetIter(result);
     if(iterator == NULL) {
-		VIRIATUM_RELEASE_GIL;
-		RAISE_ERROR_M(D_ERROR_CODE, (unsigned char *) "Invalid iterator object");
-	}
+        VIRIATUM_RELEASE_GIL;
+        RAISE_ERROR_M(D_ERROR_CODE, (unsigned char *) "Invalid iterator object");
+    }
     handler_wsgi_context->iterator = iterator;
 
     /* writes the response to the connection, this will only write
@@ -763,9 +763,9 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
     Py_DECREF(wsgi_module);
     Py_DECREF(result);
 
-	/* changes the current thread state releasing it and releases the
-	lock on the global interpreter state */
-	VIRIATUM_RELEASE_GIL;
+    /* changes the current thread state releasing it and releases the
+    lock on the global interpreter state */
+    VIRIATUM_RELEASE_GIL;
 
     /* raise no error */
     RAISE_NO_ERROR;
