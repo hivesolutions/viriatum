@@ -49,5 +49,15 @@ ERROR_CODE ran_service();
 /**
  * Handler callback for the kill signal.
  * This callback stops the current service instance.
+ *
+ * @param signal_number The signal number (context) for
+ * which this event is being generated.
  */
 void kill_handler(int signal_number);
+
+/**
+ * Registers the various signal handlers for the default
+ * events, this must be done so that the proper action
+ * occur for such events.
+ */
+ERROR_CODE register_signals();
