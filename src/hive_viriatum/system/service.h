@@ -431,6 +431,7 @@ typedef struct service_t {
      */
     char _uptime[128];
 
+    base_void register_signals;
     service_uptime get_uptime;
     service_mime get_mime_type;
     service_http_handler_access create_http_handler;
