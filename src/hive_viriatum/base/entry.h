@@ -60,4 +60,4 @@ void kill_handler(int signal_number);
  * events, this must be done so that the proper action
  * occur for such events.
  */
-ERROR_CODE register_signals();
+void register_signals();

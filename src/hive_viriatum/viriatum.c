@@ -136,7 +136,7 @@ void kill_handler(int signal_number) {
     ran_service();
 }
 
-ERROR_CODE register_signals() {
+void register_signals() {
     /* registers the kill handler for the various signals
     associated with the "destroy" operation */
     signal(SIGHUP, kill_handler);
@@ -147,9 +147,6 @@ ERROR_CODE register_signals() {
     /* registers the ignore action in the signal indicating
     a broken pipe (unexpected close of socket) */
     signal(SIGPIPE, SIG_IGN);
-
-    /* raises no error */
-    RAISE_NO_ERROR;
 }
 
 ERROR_CODE print_information() {
