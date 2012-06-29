@@ -37,6 +37,7 @@ unsigned char *version_viriatum_mod_wsgi();
 unsigned char *description_viriatum_mod_wsgi();
 
 #define PYTHON_26
+#define PYTHON_THREADS
 
 #include "undef.h"
 #include <Python.h>
