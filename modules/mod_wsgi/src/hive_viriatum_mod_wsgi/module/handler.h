@@ -91,6 +91,13 @@ typedef struct mod_wsgi_http_handler_t {
      * with the wsgi structures.
      */
     struct mod_wsgi_location_t *locations;
+
+	/**
+	 * The thread state for the current thread in execution
+	 * this value is required to avoid thread synchronization
+	 * problems in a python multi threaded environment.
+	 */
+	PyThreadState *_state;
 } mod_wsgi_http_handler;
 
 typedef struct handler_wsgi_context_t {
@@ -242,7 +249,7 @@ typedef struct handler_wsgi_context_t {
      */
     struct string_t _server_name_string;
 
-    /**
+	/**
      * The reference to the buffer iterator
      * to be used to retrive data from the wsgi
      * application sequence of data, and to use
