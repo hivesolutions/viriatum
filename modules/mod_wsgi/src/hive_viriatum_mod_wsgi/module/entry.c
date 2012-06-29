@@ -295,15 +295,15 @@ ERROR_CODE _load_wsgi_state() {
 
     /* starts the python interpreter initializing all the resources
     related with the virtual machine, this is the main entry point
-	for the python interpreter (virtual machine) */
+    for the python interpreter (virtual machine) */
     Py_Initialize();
 #ifdef PYTHON_THREADS
-	PyEval_InitThreads();
-	_state = PyThreadState_Get();
-	PyEval_ReleaseLock();
+    PyEval_InitThreads();
+    _state = PyThreadState_Get();
+    PyEval_ReleaseLock();
 #endif
 
-	/* starts the wsgi state updating the major global value in
+    /* starts the wsgi state updating the major global value in
     the current interpreter state */
     _start_wsgi_state();
 
@@ -312,17 +312,17 @@ ERROR_CODE _load_wsgi_state() {
 }
 
 ERROR_CODE _unload_wsgi_state() {
-	/* allocates space that will hold the reference to the
-	function to notify the modules about the end of the
-	python interpreter execution */
-	PyObject *exit_func;
-	
+    /* allocates space that will hold the reference to the
+    function to notify the modules about the end of the
+    python interpreter execution */
+    PyObject *exit_func;
+
     /* retrieves the reference to the exit function to be
-	uses to notify the caller modules about the finaliztion
-	process from the interpreter */
-	VIRIATUM_ACQUIRE_GIL;
-	exit_func = PySys_GetObject("exitfunc");
-	if(exit_func != NULL) { PyEval_CallObject(exit_func, (PyObject *) NULL); }
+    uses to notify the caller modules about the finaliztion
+    process from the interpreter */
+    VIRIATUM_ACQUIRE_GIL;
+    exit_func = PySys_GetObject("exitfunc");
+    if(exit_func != NULL) { PyEval_CallObject(exit_func, (PyObject *) NULL); }
 
     /* shutsdown the python interpreter, releasing all the resources
     associated with it (everything is destroyed) */
