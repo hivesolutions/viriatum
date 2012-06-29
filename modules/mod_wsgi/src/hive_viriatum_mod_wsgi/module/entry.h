@@ -34,9 +34,9 @@
 #define VIRIATUM_ACQUIRE_GIL PyEval_AcquireLock();\
     PyThreadState_Swap(_state)
 #define VIRIATUM_RELEASE_GIL PyThreadState_Swap(NULL);\
-	PyEval_ReleaseLock()
+    PyEval_ReleaseLock()
 #else
-#define VIRIATUM_ACQUIRE_GIL 
+#define VIRIATUM_ACQUIRE_GIL
 #define VIRIATUM_RELEASE_GIL
 #endif
 
@@ -60,7 +60,7 @@
     struct connection_t *_connection;\
     struct http_headers_t _headers;\
     struct wsgi_request_t _wsgi_request;\
-	PyThreadState *_state
+    PyThreadState *_state
 
 /**
  * Structure describing the internal
