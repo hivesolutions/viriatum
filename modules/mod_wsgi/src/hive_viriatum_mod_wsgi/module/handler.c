@@ -491,12 +491,23 @@ ERROR_CODE _send_data_callback(struct connection_t *connection, struct data_t *d
     char *_buffer;
     size_t buffer_size;
 
+	/* allocates space for the object reference to the next item to be
+	retrieved from the currently selected iterator */
+	PyObject *item;
+
     /* retrieves the current wsgi context object as the parameters object
     then uses it to retrieve the iterator and then retrieves the next
     element from the iterator (the next data to be sent) */
     struct handler_wsgi_context_t *handler_wsgi_context = (struct handler_wsgi_context_t *) parameters;
     PyObject *iterator = handler_wsgi_context->iterator;
-    PyObject *item = PyIter_Next(iterator);
+		
+    /* acquires the global interpreter state an changes the
+	current state to the base thread state */
+	VIRIATUM_ACQUIRE_GIL;
+
+	/* retrieves the next item to be selected from the iterator
+	to be processed in the current iteration cycle */
+	item = PyIter_Next(iterator);
 
     /* in case the item is not defined (end of iteration) no more data is
     available to be sent in the response must cleanup the request */
@@ -505,6 +516,10 @@ ERROR_CODE _send_data_callback(struct connection_t *connection, struct data_t *d
         and then unsets it from the wsgi context (no more access) */
         Py_DECREF(iterator);
         handler_wsgi_context->iterator = NULL;
+
+		/* changes the current thread state releasing it and releases the
+		lock on the global interpreter state */
+		VIRIATUM_RELEASE_GIL;
 
         /* redirect the handling to the send response callback handler module
         so that the proper cleanup is done (eg: closing connection check) */
@@ -527,6 +542,10 @@ ERROR_CODE _send_data_callback(struct connection_t *connection, struct data_t *d
     /* decrements the item reference it's no longer required to exist
     the data has been already copied */
     Py_DECREF(item);
+
+	/* changes the current thread state releasing it and releases the
+	lock on the global interpreter state */
+	VIRIATUM_RELEASE_GIL;
 
     /* writes the buffer to the connection, this will write another
     chunk of data into the connection and return to this same callback
@@ -589,7 +608,11 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
         mod_wsgi_http_handler->module = NULL;
     }
 
-    /* in cae the module is not defined, must be loaded again from the
+    /* acquires the global interpreter state an changes the
+	current state to the base thread state */
+	VIRIATUM_ACQUIRE_GIL;
+
+    /* in case the module is not defined, must be loaded again from the
     file into the python interpreter */
     if(mod_wsgi_http_handler->module == NULL) {
         /* retrieves the correct file path for the module to be loaded
@@ -612,6 +635,7 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
     application to access viriatum wsgi functions */
     wsgi_module = PyImport_ImportModule("viriatum_wsgi");
     if(wsgi_module == NULL) {
+		VIRIATUM_RELEASE_GIL;
         RAISE_ERROR_M(D_ERROR_CODE, (unsigned char *) "Problem loading module");
     }
 
@@ -619,6 +643,7 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
     and then verifies that it's a valid python function */
     start_response_function = PyObject_GetAttrString(wsgi_module, "start_response");
     if(!start_response_function || !PyCallable_Check(start_response_function)) {
+		VIRIATUM_RELEASE_GIL;
         RAISE_ERROR_M(D_ERROR_CODE, (unsigned char *) "Problem retrieving function");
     }
 
@@ -627,6 +652,7 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
     reference is invalid raises an error */
     module = mod_wsgi_http_handler->module;
     if(module == NULL) {
+		VIRIATUM_RELEASE_GIL;
         RAISE_ERROR_M(D_ERROR_CODE, (unsigned char *) "Problem loading module");
     }
 
@@ -635,6 +661,7 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
     if it refers a valid function */
     handler_function = PyObject_GetAttrString(module, "application");
     if(!handler_function || !PyCallable_Check(handler_function)) {
+		VIRIATUM_RELEASE_GIL;
         RAISE_ERROR_M(D_ERROR_CODE, (unsigned char *) "Problem retrieving application");
     }
 
@@ -672,8 +699,8 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
     if(result == NULL) {
         Py_DECREF(handler_function);
         Py_DECREF(args);
-        Py_DECREF(module);
         Py_DECREF(wsgi_module);
+		VIRIATUM_RELEASE_GIL;
         RAISE_ERROR_M(D_ERROR_CODE, (unsigned char *) "Problem executing application");
     }
 
@@ -713,7 +740,10 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
     object (iterable) containg the various parts of the message to be returned, then
     sets the iterator in the wsgi context structure to be used in the callback */
     iterator = PyObject_GetIter(result);
-    if(iterator == NULL) { RAISE_NO_ERROR; }
+    if(iterator == NULL) {
+		VIRIATUM_RELEASE_GIL;
+		RAISE_ERROR_M(D_ERROR_CODE, (unsigned char *) "Invalid iterator object");
+	}
     handler_wsgi_context->iterator = iterator;
 
     /* writes the response to the connection, this will only write
@@ -730,9 +760,12 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
     function (memory will be deallocated if necessary) */
     Py_DECREF(handler_function);
     Py_DECREF(args);
-    Py_DECREF(module);
     Py_DECREF(wsgi_module);
     Py_DECREF(result);
+
+	/* changes the current thread state releasing it and releases the
+	lock on the global interpreter state */
+	VIRIATUM_RELEASE_GIL;
 
     /* raise no error */
     RAISE_NO_ERROR;
