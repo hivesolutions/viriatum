@@ -65,11 +65,16 @@ ERROR_CODE run_service(char *program_name, struct hash_map_t *arguments) {
     load_options_service(service, arguments);
     calculate_options_service(service);
 
+    /* updates the registers signals handler so that the service
+    may be able to register the handlers at the proper timing */
+    service->register_signals = register_signals;
+
     /* calculates the locations structure for the service based
     on the currently loaded configuration, this a complex operation */
     calculate_locations_service(service);
 
-    /* starts the service */
+    /* starts the service, this call should be able to bootstrap
+    all the required structures and initialize the main loop */
     return_value = start_service(service);
 
     /* tests the error code for error */
@@ -290,11 +295,6 @@ void execute_arguments(struct hash_map_t *arguments) {
     get_value_string_hash_map(arguments, (unsigned char *) "daemon", &value);
     if(value != NULL) { daemonize(); }
     else { print_information(); }
-
-    /* registers the various kill signal handlers so that
-    in case such event happens it's possible to correctly
-    "destroy" the various internal structures and processes */
-    register_signals();
 
     /* tries to retrieve the local argument from the arguments
     map in case the value exists localizes the current service
