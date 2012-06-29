@@ -29,3 +29,9 @@
 
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)
+
+/**
+ * The basic global function used when providing no arguments
+ * and not returning any value.
+ */
+typedef void (*base_void) ();
