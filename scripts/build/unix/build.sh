@@ -35,6 +35,10 @@ mkdir -p $deb_build_dir/etc/viriatum
 mkdir -p $deb_build_dir/etc/init.d
 mkdir -p $deb_build_dir/var/viriatum/www
 
+# changes the permissions of some directories to
+# comply with the security measures of the system
+chmod -R -s $deb_build_dir
+
 # clones the repository to retrieve the source code
 # for compilation
 git clone git://github.com/hivesolutions/viriatum.git $repo --quiet
