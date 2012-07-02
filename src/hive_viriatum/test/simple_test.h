@@ -132,7 +132,7 @@ void test_sha1();
  * Tests the crc32 hash implementation
  * calculation.
  */
-void test_crc32();
+void test_crc_32();
 
 /**
  * Compars an element with another, usefull
