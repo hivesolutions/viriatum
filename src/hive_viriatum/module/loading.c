@@ -106,15 +106,15 @@ ERROR_CODE load_module(struct service_t *service, unsigned char *module_path) {
     /* the info module function reference */
     viriatum_info_module info_module_function;
 
-	/* allocates space for both the name of the module (base name)
-	and for the name of the information fnction to be called for
-	the population of the module structure */
-	unsigned char _module_name[VIRIATUM_MAX_PATH_SIZE];
-	char info_module_name[VIRIATUM_MAX_PATH_SIZE];;
+    /* allocates space for both the name of the module (base name)
+    and for the name of the information fnction to be called for
+    the population of the module structure */
+    unsigned char _module_name[VIRIATUM_MAX_PATH_SIZE];
+    char info_module_name[VIRIATUM_MAX_PATH_SIZE];;
 
-	/* retrieves the base name for the module to be loaded, this is
-	retrieved from the name of the module */
-	module_name(module_path, _module_name);
+    /* retrieves the base name for the module to be loaded, this is
+    retrieved from the name of the module */
+    module_name(module_path, _module_name);
 
     /* prints a debug message */
     V_DEBUG_F("Loading module (%s)\n", module_path);
@@ -145,13 +145,13 @@ ERROR_CODE load_module(struct service_t *service, unsigned char *module_path) {
     }
 
     /* retrieves the information loading symbol from the library
-	the name of this symbol is created by the module name suffix */
-	SPRINTF(
-		info_module_name,
-		VIRIATUM_MAX_PATH_SIZE,
-		"info_module_%s",
-		(char *) _module_name
-	);
+    the name of this symbol is created by the module name suffix */
+    SPRINTF(
+        info_module_name,
+        VIRIATUM_MAX_PATH_SIZE,
+        "info_module_%s",
+        (char *) _module_name
+    );
     symbol = GET_LIBRARY_SYMBOL(library, info_module_name);
 
     /* retrieves the info module function reference */
@@ -183,7 +183,7 @@ ERROR_CODE load_module(struct service_t *service, unsigned char *module_path) {
     environment->service = service;
 
     /* calls the info module function so that
-	the module structure is correctly populated */
+    the module structure is correctly populated */
     error_code = info_module_function(module);
 
     /* tests the error code for error */
@@ -193,7 +193,7 @@ ERROR_CODE load_module(struct service_t *service, unsigned char *module_path) {
     }
 
     /* calls the start module function, this sould
-	start all the module internal structures */
+    start all the module internal structures */
     error_code = module->start(environment, module);
 
     /* tests the error code for error */
@@ -223,7 +223,7 @@ ERROR_CODE unload_module(struct service_t *service, struct module_t *module) {
     remove_value_linked_list(service->modules_list, (void *) module, 1);
 
     /* calls the stop module function, this sould
-	destroy (stop) all the module internal structures  */
+    destroy (stop) all the module internal structures  */
     error_code = module->stop(environment, module);
 
     /* tests the error code for error */

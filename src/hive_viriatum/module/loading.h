@@ -289,28 +289,28 @@ static __inline unsigned char *get_error_message_module(struct module_t *module)
  * @param buffer The buffer to hold the resulting base name.
  */
 static __inline void module_name(unsigned char *module_path, unsigned char *buffer) {
-	/* starts the index counter and start the module name with
-	the base file name from the module path */
-	size_t index = 0;
-	unsigned char *module_name = base_string_value(module_path);
+    /* starts the index counter and start the module name with
+    the base file name from the module path */
+    size_t index = 0;
+    unsigned char *module_name = base_string_value(module_path);
 
-	/* "removes" the initial part of the module name refering
-	to the "mandatory" viriatum suffix */
-	module_name = &module_name[VIRIATUM_MODULE_PREFIX];
-    
-	/* iterates continuously to find the appropriate file name
-	of the module element */
-	while(TRUE) {
-		/* in case the underscore element or the end of string element
-		is found the name final index is found (must break) */
-		if(module_name[index] == '_'
-			|| module_name[index] == '.'
-			|| module_name[index] == '\0') { break ;}
-		index++;
-	}
+    /* "removes" the initial part of the module name refering
+    to the "mandatory" viriatum suffix */
+    module_name = &module_name[VIRIATUM_MODULE_PREFIX];
 
-	/* copies the base name part of the module name into
-	the associated buffer then closes the buffer */
-	memcpy(buffer, module_name, index);
-	buffer[index] = '\0';
+    /* iterates continuously to find the appropriate file name
+    of the module element */
+    while(TRUE) {
+        /* in case the underscore element or the end of string element
+        is found the name final index is found (must break) */
+        if(module_name[index] == '_'
+            || module_name[index] == '.'
+            || module_name[index] == '\0') { break ;}
+        index++;
+    }
+
+    /* copies the base name part of the module name into
+    the associated buffer then closes the buffer */
+    memcpy(buffer, module_name, index);
+    buffer[index] = '\0';
 }
