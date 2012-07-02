@@ -29,6 +29,14 @@
 
 #include "../system/system.h"
 
+#ifdef VIRIATUM_PLATFORM_WIN32
+#define MODULE_PREFIX_INDEX sizeof("viriatum_mod_") - 1
+#endif
+
+#ifdef VIRIATUM_PLATFORM_UNIX
+#define MODULE_PREFIX_INDEX sizeof("libviriatum_mod_") - 1
+#endif
+
 #define GET_ERROR_MODULE(module) get_error_message_module(module)
 
 /* forward references (avoids loop) */
@@ -296,7 +304,7 @@ static __inline void module_name(unsigned char *module_path, unsigned char *buff
 
 	/* "removes" the initial part of the module name refering
 	to the "mandatory" viriatum suffix */
-	module_name = &module_name[13];
+	module_name = &module_name[MODULE_PREFIX_INDEX];
     
 	/* iterates continuously to find the appropriate file name
 	of the module element */
