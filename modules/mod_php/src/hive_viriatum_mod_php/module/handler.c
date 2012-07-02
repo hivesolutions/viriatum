@@ -131,23 +131,23 @@ ERROR_CODE delete_handler_php_context(struct handler_php_context_t *handler_php_
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE set_handler_module(struct http_connection_t *http_connection) {
+ERROR_CODE set_handler_php(struct http_connection_t *http_connection) {
     /* sets the http parser values */
-    _set_http_parser_handler_module(http_connection->http_parser);
+    _set_http_parser_handler_php(http_connection->http_parser);
 
     /* sets the http settings values */
-    _set_http_settings_handler_module(http_connection->http_settings);
+    _set_http_settings_handler_php(http_connection->http_settings);
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE unset_handler_module(struct http_connection_t *http_connection) {
+ERROR_CODE unset_handler_php(struct http_connection_t *http_connection) {
     /* unsets the http parser values */
-    _unset_http_parser_handler_module(http_connection->http_parser);
+    _unset_http_parser_handler_php(http_connection->http_parser);
 
     /* unsets the http settings values */
-    _unset_http_settings_handler_module(http_connection->http_settings);
+    _unset_http_settings_handler_php(http_connection->http_settings);
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -169,7 +169,7 @@ ERROR_CODE message_begin_callback_handler_module(struct http_parser_t *http_pars
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE url_callback_handler_module(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE url_callback_handler_php(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
     /* retrieves the handler php context from the http parser */
     struct handler_php_context_t *handler_php_context = (struct handler_php_context_t *) http_parser->context;
 
@@ -216,7 +216,7 @@ ERROR_CODE url_callback_handler_module(struct http_parser_t *http_parser, const 
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE header_field_callback_handler_module(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE header_field_callback_handler_php(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
     /* retrieves the handler php context from the http parser */
     struct handler_php_context_t *handler_php_context = (struct handler_php_context_t *) http_parser->context;
 
@@ -240,7 +240,7 @@ ERROR_CODE header_field_callback_handler_module(struct http_parser_t *http_parse
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE header_value_callback_handler_module(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE header_value_callback_handler_php(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
     /* retrieves the handler php context from the http parser */
     struct handler_php_context_t *handler_php_context = (struct handler_php_context_t *) http_parser->context;
 
@@ -336,25 +336,25 @@ ERROR_CODE header_value_callback_handler_module(struct http_parser_t *http_parse
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE headers_complete_callback_handler_module(struct http_parser_t *http_parser) {
+ERROR_CODE headers_complete_callback_handler_php(struct http_parser_t *http_parser) {
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE body_callback_handler_module(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE body_callback_handler_php(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE message_complete_callback_handler_module(struct http_parser_t *http_parser) {
+ERROR_CODE message_complete_callback_handler_php(struct http_parser_t *http_parser) {
     /* sends (and creates) the reponse */
-    _send_response_handler_module(http_parser);
+    _send_response_handler_php(http_parser);
 
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE path_callback_handler_module(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE path_callback_handler_php(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
     /* retrieves the handler php context from the http parser */
     struct handler_php_context_t *handler_php_context = (struct handler_php_context_t *) http_parser->context;
 
@@ -385,17 +385,17 @@ ERROR_CODE path_callback_handler_module(struct http_parser_t *http_parser, const
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE location_callback_handler_module(struct http_parser_t *http_parser, size_t index, size_t offset) {
+ERROR_CODE location_callback_handler_php(struct http_parser_t *http_parser, size_t index, size_t offset) {
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE virtual_url_callback_handler_module(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE virtual_url_callback_handler_php(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _set_http_parser_handler_module(struct http_parser_t *http_parser) {
+ERROR_CODE _set_http_parser_handler_php(struct http_parser_t *http_parser) {
     /* allocates space for the handler php context and
     then creates and populates the instance after that
     sets the handler file context as the context for
@@ -408,7 +408,7 @@ ERROR_CODE _set_http_parser_handler_module(struct http_parser_t *http_parser) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _unset_http_parser_handler_module(struct http_parser_t *http_parser) {
+ERROR_CODE _unset_http_parser_handler_php(struct http_parser_t *http_parser) {
     /* retrieves the handler php context from the http parser
     and then deletes (releases memory) */
     struct handler_php_context_t *handler_php_context = (struct handler_php_context_t *) http_parser->context;
@@ -418,26 +418,26 @@ ERROR_CODE _unset_http_parser_handler_module(struct http_parser_t *http_parser) 
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _set_http_settings_handler_module(struct http_settings_t *http_settings) {
+ERROR_CODE _set_http_settings_handler_php(struct http_settings_t *http_settings) {
     /* sets the various callback functions in the http settings
     structure, these callbacks are going to be used in the runtime
     processing of http parser (runtime execution) */
     http_settings->on_message_begin = message_begin_callback_handler_module;
-    http_settings->on_url = url_callback_handler_module;
-    http_settings->on_header_field = header_field_callback_handler_module;
-    http_settings->on_header_value = header_value_callback_handler_module;
-    http_settings->on_headers_complete = headers_complete_callback_handler_module;
-    http_settings->on_body = body_callback_handler_module;
-    http_settings->on_message_complete = message_complete_callback_handler_module;
-    http_settings->on_path = path_callback_handler_module;
-    http_settings->on_location = location_callback_handler_module;
-    http_settings->on_virtual_url = virtual_url_callback_handler_module;
+    http_settings->on_url = url_callback_handler_php;
+    http_settings->on_header_field = header_field_callback_handler_php;
+    http_settings->on_header_value = header_value_callback_handler_php;
+    http_settings->on_headers_complete = headers_complete_callback_handler_php;
+    http_settings->on_body = body_callback_handler_php;
+    http_settings->on_message_complete = message_complete_callback_handler_php;
+    http_settings->on_path = path_callback_handler_php;
+    http_settings->on_location = location_callback_handler_php;
+    http_settings->on_virtual_url = virtual_url_callback_handler_php;
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _unset_http_settings_handler_module(struct http_settings_t *http_settings) {
+ERROR_CODE _unset_http_settings_handler_php(struct http_settings_t *http_settings) {
     /* unsets the various callback functions from the http settings */
     http_settings->on_message_begin = NULL;
     http_settings->on_url = NULL;
@@ -486,7 +486,7 @@ ERROR_CODE _send_data_callback(struct connection_t *connection, struct data_t *d
         connection,
         (unsigned char *) buffer,
         output_length,
-        _send_response_callback_handler_module,
+        _send_response_callback_handler_php,
         parameters
     );
 
@@ -501,7 +501,7 @@ ERROR_CODE _send_data_callback(struct connection_t *connection, struct data_t *d
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
+ERROR_CODE _send_response_handler_php(struct http_parser_t *http_parser) {
     /* allocates space for the script file structure to be
     during for script execution */
     zend_file_handle script;
@@ -577,7 +577,7 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
 
     /* updates the current global php reqest information
     this is the main interface for the sapi modules */
-    _update_request(handler_php_context);
+    _update_request_php(handler_php_context);
 
     /* populates the "base" script reference structure
     with the required value for execution */
@@ -676,7 +676,7 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _send_response_callback_handler_module(struct connection_t *connection, struct data_t *data, void *parameters) {
+ERROR_CODE _send_response_callback_handler_php(struct connection_t *connection, struct data_t *data, void *parameters) {
     /* retrieves the current php context for the parameters */
     struct handler_php_context_t *handler_php_context = (struct handler_php_context_t *) parameters;
 
@@ -707,7 +707,7 @@ ERROR_CODE _send_response_callback_handler_module(struct connection_t *connectio
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _update_request(struct handler_php_context_t *handler_php_context) {
+ERROR_CODE _update_request_php(struct handler_php_context_t *handler_php_context) {
     /* sets the various sapi headers and request info parameters
     from the current php context object values */
     SG(sapi_headers).http_response_code = 200;
