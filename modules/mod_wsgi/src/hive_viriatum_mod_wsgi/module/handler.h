@@ -270,6 +270,7 @@ ERROR_CODE _set_http_parser_handler_wsgi(struct http_parser_t *http_parser);
 ERROR_CODE _unset_http_parser_handler_wsgi(struct http_parser_t *http_parser);
 ERROR_CODE _set_http_settings_handler_wsgi(struct http_settings_t *http_settings);
 ERROR_CODE _unset_http_settings_handler_wsgi(struct http_settings_t *http_settings);
+ERROR_CODE _send_data_callback_wsgi(struct connection_t *connection, struct data_t *data, void *parameters);
 ERROR_CODE _message_begin_callback_handler_wsgi(struct http_parser_t *http_parser);
 ERROR_CODE _send_response_handler_wsgi(struct http_parser_t *http_parser);
 ERROR_CODE _send_response_callback_handler_wsgi(struct connection_t *connection, struct data_t *data, void *parameters);

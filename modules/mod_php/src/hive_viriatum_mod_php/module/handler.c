@@ -454,7 +454,7 @@ ERROR_CODE _unset_http_settings_handler_php(struct http_settings_t *http_setting
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _send_data_callback(struct connection_t *connection, struct data_t *data, void *parameters) {
+ERROR_CODE _send_data_callback_php(struct connection_t *connection, struct data_t *data, void *parameters) {
     /* allocates the buffer that will hod the message to be sent
     through the connection and then allocates the buffer to hold
     the joined buffer from the linked buffer rerference */
@@ -668,7 +668,7 @@ ERROR_CODE _send_response_handler_php(struct http_parser_t *http_parser) {
         connection,
         (unsigned char *) headers_buffer,
         (unsigned int) count,
-        _send_data_callback,
+        _send_data_callback_php,
         (void *) handler_php_context
     );
 

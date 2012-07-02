@@ -484,7 +484,7 @@ ERROR_CODE _unset_http_settings_handler_wsgi(struct http_settings_t *http_settin
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _send_data_callback(struct connection_t *connection, struct data_t *data, void *parameters) {
+ERROR_CODE _send_data_callback_wsgi(struct connection_t *connection, struct data_t *data, void *parameters) {
     /* allocates space for the buffers (both the python internal and
     the copy) and for the size of both of them */
     char *buffer;
@@ -554,7 +554,7 @@ ERROR_CODE _send_data_callback(struct connection_t *connection, struct data_t *d
         connection,
         (unsigned char *) _buffer,
         buffer_size,
-        _send_data_callback,
+        _send_data_callback_wsgi,
         parameters
     );
 
@@ -752,7 +752,7 @@ ERROR_CODE _send_response_handler_wsgi(struct http_parser_t *http_parser) {
         connection,
         (unsigned char *) headers_buffer,
         (unsigned int) count,
-        _send_data_callback,
+        _send_data_callback_wsgi,
         (void *) handler_wsgi_context
     );
 
