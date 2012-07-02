@@ -479,9 +479,9 @@ void test_quicksort_linked_list() {
     delete_linked_list(linked_list);
 }
 
-void test_crc32() {
+void test_crc_32() {
     /* calculates the crc32 hash value and returns it */
-    crc32((unsigned char *) "Hello World", 11);
+    crc_32((unsigned char *) "Hello World", 11);
 }
 
 void test_md5() {
@@ -565,7 +565,7 @@ void run_simple_tests() {
     test_quicksort_linked_list();
 
     /* tests the crc32 hash function */
-    test_crc32();
+    test_crc_32();
 
     /* tests the md5 hash function */
     test_md5();

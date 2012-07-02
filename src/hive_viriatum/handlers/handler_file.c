@@ -405,7 +405,7 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
 
             /* creates the crc32 value and prints it into the
             etag as an heexadecimal string value */
-            crc32_value = crc32((unsigned char *) time_string, 19);
+            crc32_value = crc_32((unsigned char *) time_string, 19);
             SPRINTF(etag, 11, "\"%08x\"", (unsigned int) crc32_value);
         }
     }

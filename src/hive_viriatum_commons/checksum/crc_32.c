@@ -84,7 +84,7 @@ static unsigned long crc32_table[] = {
     0x2d02ef8d
 };
 
-unsigned long crc32(unsigned char *buffer, unsigned int buffer_length) {
+unsigned long crc_32(unsigned char *buffer, unsigned int buffer_length) {
     /* allocates space for the index */
     unsigned int index;
 
