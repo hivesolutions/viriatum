@@ -288,11 +288,11 @@ static __inline unsigned char *get_error_message_module(struct module_t *module)
  * file to be used to retrieve the base name.
  * @param buffer The buffer to hold the resulting base name.
  */
-static __inline void module_name(char *module_path, char *buffer) {
+static __inline void module_name(unsigned char *module_path, unsigned char *buffer) {
 	/* starts the index counter and start the module name with
 	the base file name from the module path */
 	size_t index = 0;
-	char *module_name = base_string_value(module_path);
+	unsigned char *module_name = base_string_value(module_path);
 
 	/* "removes" the initial part of the module name refering
 	to the "mandatory" viriatum suffix */

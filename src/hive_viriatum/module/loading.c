@@ -114,7 +114,7 @@ ERROR_CODE load_module(struct service_t *service, unsigned char *module_path) {
 
 	/* retrieves the base name for the module to be loaded, this is
 	retrieved from the name of the module */
-	module_name((char * ) module_path, (char *) _module_name);
+	module_name(module_path, _module_name);
 
     /* prints a debug message */
     V_DEBUG_F("Loading module (%s)\n", module_path);
@@ -150,7 +150,7 @@ ERROR_CODE load_module(struct service_t *service, unsigned char *module_path) {
 		info_module_name,
 		VIRIATUM_MAX_PATH_SIZE,
 		"info_module_%s",
-		_module_name
+		(char *) _module_name
 	);
     symbol = GET_LIBRARY_SYMBOL(library, info_module_name);
 
