@@ -38,6 +38,7 @@ mkdir -p $deb_build_dir/var/viriatum/www
 # changes the permissions of some directories to
 # comply with the security measures of the system
 chmod -R -s $deb_build_dir
+chmod -R 755 $deb_build_dir
 
 # clones the repository to retrieve the source code
 # for compilation
