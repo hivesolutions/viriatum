@@ -167,6 +167,135 @@
                 CommandLine="xcopy /e /y &quot;$(OutDir)\$(TargetFileName)&quot; &quot;$(SolutionDir)\..\..\bin\hive_viriatum\i386\win32\$(ConfigurationName)\modules\&quot;"
             />
         </Configuration>
+        <Configuration
+            Name="Debug (Static)|Win32"
+            OutputDirectory="$(SolutionDir)..\..\bin\$(ProjectName)\i386\win32\$(ConfigurationName)"
+            IntermediateDirectory="$(ProjectName)\$(ConfigurationName)"
+            ConfigurationType="4"
+            CharacterSet="0"
+            >
+            <Tool
+                Name="VCPreBuildEventTool"
+            />
+            <Tool
+                Name="VCCustomBuildTool"
+            />
+            <Tool
+                Name="VCXMLDataGeneratorTool"
+            />
+            <Tool
+                Name="VCWebServiceProxyGeneratorTool"
+            />
+            <Tool
+                Name="VCMIDLTool"
+            />
+            <Tool
+                Name="VCCLCompilerTool"
+                Optimization="0"
+                PreprocessorDefinitions="WIN32;_DEBUG;_LIB;VIRIATUM_DEBUG;VIRIATUM_MEMORY_DEBUG"
+                MinimalRebuild="true"
+                BasicRuntimeChecks="3"
+                RuntimeLibrary="1"
+                UsePrecompiledHeader="2"
+                ProgramDataBaseFileName="$(TargetDir)$(TargetName).pdb"
+                WarningLevel="3"
+                DebugInformationFormat="4"
+            />
+            <Tool
+                Name="VCManagedResourceCompilerTool"
+            />
+            <Tool
+                Name="VCResourceCompilerTool"
+            />
+            <Tool
+                Name="VCPreLinkEventTool"
+            />
+            <Tool
+                Name="VCLibrarianTool"
+                OutputFile="$(OutDir)\viriatum_mod_wsgi_d.lib"
+            />
+            <Tool
+                Name="VCALinkTool"
+            />
+            <Tool
+                Name="VCXDCMakeTool"
+            />
+            <Tool
+                Name="VCBscMakeTool"
+            />
+            <Tool
+                Name="VCFxCopTool"
+            />
+            <Tool
+                Name="VCPostBuildEventTool"
+                CommandLine="xcopy /e /y &quot;$(OutDir)\$(TargetFileName)&quot; &quot;$(SolutionDir)\..\..\bin\hive_viriatum\i386\win32\$(ConfigurationName)\modules\&quot;"
+            />
+        </Configuration>
+        <Configuration
+            Name="Release (Static)|Win32"
+            OutputDirectory="$(SolutionDir)..\..\bin\$(ProjectName)\i386\win32\$(ConfigurationName)"
+            IntermediateDirectory="$(ProjectName)\$(ConfigurationName)"
+            ConfigurationType="4"
+            CharacterSet="0"
+            WholeProgramOptimization="1"
+            >
+            <Tool
+                Name="VCPreBuildEventTool"
+            />
+            <Tool
+                Name="VCCustomBuildTool"
+            />
+            <Tool
+                Name="VCXMLDataGeneratorTool"
+            />
+            <Tool
+                Name="VCWebServiceProxyGeneratorTool"
+            />
+            <Tool
+                Name="VCMIDLTool"
+            />
+            <Tool
+                Name="VCCLCompilerTool"
+                Optimization="2"
+                EnableIntrinsicFunctions="true"
+                PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
+                RuntimeLibrary="0"
+                EnableFunctionLevelLinking="true"
+                UsePrecompiledHeader="2"
+                ProgramDataBaseFileName="$(TargetDir)$(TargetName).pdb"
+                WarningLevel="3"
+                DebugInformationFormat="3"
+            />
+            <Tool
+                Name="VCManagedResourceCompilerTool"
+            />
+            <Tool
+                Name="VCResourceCompilerTool"
+            />
+            <Tool
+                Name="VCPreLinkEventTool"
+            />
+            <Tool
+                Name="VCLibrarianTool"
+                OutputFile="$(OutDir)\viriatum_mod_wsgi.lib"
+            />
+            <Tool
+                Name="VCALinkTool"
+            />
+            <Tool
+                Name="VCXDCMakeTool"
+            />
+            <Tool
+                Name="VCBscMakeTool"
+            />
+            <Tool
+                Name="VCFxCopTool"
+            />
+            <Tool
+                Name="VCPostBuildEventTool"
+                CommandLine="xcopy /e /y &quot;$(OutDir)\$(TargetFileName)&quot; &quot;$(SolutionDir)\..\..\bin\hive_viriatum\i386\win32\$(ConfigurationName)\modules\&quot;"
+            />
+        </Configuration>
     </Configurations>
     <References>
     </References>
@@ -189,6 +318,22 @@
                 </FileConfiguration>
                 <FileConfiguration
                     Name="Release|Win32"
+                    >
+                    <Tool
+                        Name="VCCLCompilerTool"
+                        UsePrecompiledHeader="1"
+                    />
+                </FileConfiguration>
+                <FileConfiguration
+                    Name="Debug (Static)|Win32"
+                    >
+                    <Tool
+                        Name="VCCLCompilerTool"
+                        UsePrecompiledHeader="1"
+                    />
+                </FileConfiguration>
+                <FileConfiguration
+                    Name="Release (Static)|Win32"
                     >
                     <Tool
                         Name="VCCLCompilerTool"
