@@ -114,23 +114,23 @@ ERROR_CODE delete_handler_wsgi_context(struct handler_wsgi_context_t *handler_ws
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE set_handler_module(struct http_connection_t *http_connection) {
+ERROR_CODE set_handler_wsgi(struct http_connection_t *http_connection) {
     /* sets the http parser values */
-    _set_http_parser_handler_module(http_connection->http_parser);
+    _set_http_parser_handler_wsgi(http_connection->http_parser);
 
     /* sets the http settings values */
-    _set_http_settings_handler_module(http_connection->http_settings);
+    _set_http_settings_handler_wsgi(http_connection->http_settings);
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE unset_handler_module(struct http_connection_t *http_connection) {
+ERROR_CODE unset_handler_wsgi(struct http_connection_t *http_connection) {
     /* unsets the http parser values */
-    _unset_http_parser_handler_module(http_connection->http_parser);
+    _unset_http_parser_handler_wsgi(http_connection->http_parser);
 
     /* unsets the http settings values */
-    _unset_http_settings_handler_module(http_connection->http_settings);
+    _unset_http_settings_handler_wsgi(http_connection->http_settings);
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -141,7 +141,7 @@ ERROR_CODE message_begin_callback_handler_module(struct http_parser_t *http_pars
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE url_callback_handler_module(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE url_callback_handler_wsgi(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
     /* retrieves the handler wsgi context from the http parser */
     struct handler_wsgi_context_t *handler_wsgi_context = (struct handler_wsgi_context_t *) http_parser->context;
 
@@ -183,7 +183,7 @@ ERROR_CODE url_callback_handler_module(struct http_parser_t *http_parser, const 
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE header_field_callback_handler_module(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE header_field_callback_handler_wsgi(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
     /* retrieves the handler wsgi context from the http parser */
     struct handler_wsgi_context_t *handler_wsgi_context = (struct handler_wsgi_context_t *) http_parser->context;
 
@@ -207,7 +207,7 @@ ERROR_CODE header_field_callback_handler_module(struct http_parser_t *http_parse
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE header_value_callback_handler_module(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE header_value_callback_handler_wsgi(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
     /* retrieves the handler wsgi context from the http parser */
     struct handler_wsgi_context_t *handler_wsgi_context = (struct handler_wsgi_context_t *) http_parser->context;
 
@@ -302,17 +302,17 @@ ERROR_CODE header_value_callback_handler_module(struct http_parser_t *http_parse
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE headers_complete_callback_handler_module(struct http_parser_t *http_parser) {
+ERROR_CODE headers_complete_callback_handler_wsgi(struct http_parser_t *http_parser) {
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE body_callback_handler_module(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE body_callback_handler_wsgi(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE message_complete_callback_handler_module(struct http_parser_t *http_parser) {
+ERROR_CODE message_complete_callback_handler_wsgi(struct http_parser_t *http_parser) {
     /* allocates space for the error return valid from the sending
     of the response (loaging, execution, etc.) */
     ERROR_CODE return_value;
@@ -320,21 +320,21 @@ ERROR_CODE message_complete_callback_handler_module(struct http_parser_t *http_p
     /* sends (and creates) the reponse and retreives the (possible)
     error code from in then in such case sends the error code to
     the connection throught the upstream pipe */
-    return_value = _send_response_handler_module(http_parser);
+    return_value = _send_response_handler_wsgi(http_parser);
     if(IS_ERROR_CODE(return_value)) {
-        _write_error_connection(http_parser, (char *) GET_ERROR());
+        _write_error_connection_wsgi(http_parser, (char *) GET_ERROR());
     }
 
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE path_callback_handler_module(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE path_callback_handler_wsgi(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE location_callback_handler_module(struct http_parser_t *http_parser, size_t index, size_t offset) {
+ERROR_CODE location_callback_handler_wsgi(struct http_parser_t *http_parser, size_t index, size_t offset) {
     /* allocates space for the temporary file path size variables
     to be used in internal string size calculations */
     size_t file_path_size;
@@ -373,7 +373,7 @@ ERROR_CODE location_callback_handler_module(struct http_parser_t *http_parser, s
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE virtual_url_callback_handler_module(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE virtual_url_callback_handler_wsgi(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
     /* allocates space for the variable that will hold the new size
     of the preffix path to be used, be removing the new virtual url
     from the previously set file name (path) */
@@ -425,7 +425,7 @@ ERROR_CODE virtual_url_callback_handler_module(struct http_parser_t *http_parser
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _set_http_parser_handler_module(struct http_parser_t *http_parser) {
+ERROR_CODE _set_http_parser_handler_wsgi(struct http_parser_t *http_parser) {
     /* allocates space for the handler wsgi context and
     then creates and populates the instance after that
     sets the handler file context as the context for
@@ -438,7 +438,7 @@ ERROR_CODE _set_http_parser_handler_module(struct http_parser_t *http_parser) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _unset_http_parser_handler_module(struct http_parser_t *http_parser) {
+ERROR_CODE _unset_http_parser_handler_wsgi(struct http_parser_t *http_parser) {
     /* retrieves the handler wsgi context from the http parser
     and then deletes (releases memory) */
     struct handler_wsgi_context_t *handler_wsgi_context = (struct handler_wsgi_context_t *) http_parser->context;
@@ -448,26 +448,26 @@ ERROR_CODE _unset_http_parser_handler_module(struct http_parser_t *http_parser) 
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _set_http_settings_handler_module(struct http_settings_t *http_settings) {
+ERROR_CODE _set_http_settings_handler_wsgi(struct http_settings_t *http_settings) {
     /* sets the various callback functions in the http settings
     structure, these callbacks are going to be used in the runtime
     processing of http parser (runtime execution) */
     http_settings->on_message_begin = message_begin_callback_handler_module;
-    http_settings->on_url = url_callback_handler_module;
-    http_settings->on_header_field = header_field_callback_handler_module;
-    http_settings->on_header_value = header_value_callback_handler_module;
-    http_settings->on_headers_complete = headers_complete_callback_handler_module;
-    http_settings->on_body = body_callback_handler_module;
-    http_settings->on_message_complete = message_complete_callback_handler_module;
-    http_settings->on_path = path_callback_handler_module;
-    http_settings->on_location = location_callback_handler_module;
-    http_settings->on_virtual_url = virtual_url_callback_handler_module;
+    http_settings->on_url = url_callback_handler_wsgi;
+    http_settings->on_header_field = header_field_callback_handler_wsgi;
+    http_settings->on_header_value = header_value_callback_handler_wsgi;
+    http_settings->on_headers_complete = headers_complete_callback_handler_wsgi;
+    http_settings->on_body = body_callback_handler_wsgi;
+    http_settings->on_message_complete = message_complete_callback_handler_wsgi;
+    http_settings->on_path = path_callback_handler_wsgi;
+    http_settings->on_location = location_callback_handler_wsgi;
+    http_settings->on_virtual_url = virtual_url_callback_handler_wsgi;
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _unset_http_settings_handler_module(struct http_settings_t *http_settings) {
+ERROR_CODE _unset_http_settings_handler_wsgi(struct http_settings_t *http_settings) {
     /* unsets the various callback functions from the http settings */
     http_settings->on_message_begin = NULL;
     http_settings->on_url = NULL;
@@ -523,7 +523,7 @@ ERROR_CODE _send_data_callback(struct connection_t *connection, struct data_t *d
 
         /* redirect the handling to the send response callback handler module
         so that the proper cleanup is done (eg: closing connection check) */
-        _send_response_callback_handler_module(connection, data, parameters);
+        _send_response_callback_handler_wsgi(connection, data, parameters);
 
         /* raises no error */
         RAISE_NO_ERROR;
@@ -562,7 +562,7 @@ ERROR_CODE _send_data_callback(struct connection_t *connection, struct data_t *d
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
+ERROR_CODE _send_response_handler_wsgi(struct http_parser_t *http_parser) {
     /* allocates space for the local (application) module, for the global
     wsgi module (containing util function) an then allocates also space
     for the application handler function and for the start response function */
@@ -624,7 +624,7 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
 
         /* loads the module as wsgi app from the provided file path and
         then updates the module variable to contain a reference to it */
-        _load_module(
+        _load_module_wsgi(
             &mod_wsgi_http_handler->module,
             "wsgi_app",
             file_path
@@ -691,7 +691,7 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
 
     /* starts the environ dictionary object with the various values
     indirectly associated with the parser of the current request */
-    _start_environ(environ, http_parser);
+    _start_environ_wsgi(environ, http_parser);
 
     /* calls the handler function retrieving the result and releasing
     the resources immediately in case the result is not valid */
@@ -771,7 +771,7 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _send_response_callback_handler_module(struct connection_t *connection, struct data_t *data, void *parameters) {
+ERROR_CODE _send_response_callback_handler_wsgi(struct connection_t *connection, struct data_t *data, void *parameters) {
     /* retrieves the current wsgi context for the parameters */
     struct handler_wsgi_context_t *handler_wsgi_context = (struct handler_wsgi_context_t *) parameters;
 
@@ -802,7 +802,7 @@ ERROR_CODE _send_response_callback_handler_module(struct connection_t *connectio
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _write_error_connection(struct http_parser_t *http_parser, char *message) {
+ERROR_CODE _write_error_connection_wsgi(struct http_parser_t *http_parser, char *message) {
     /* allocates space for the buffer to be used in the message */
     unsigned char *buffer;
 
@@ -826,7 +826,7 @@ ERROR_CODE _write_error_connection(struct http_parser_t *http_parser, char *mess
         500,
         "Internal Server Error",
         message,
-        _send_response_callback_handler_module,
+        _send_response_callback_handler_wsgi,
         (void *) handler_wsgi_context
     );
 
@@ -834,7 +834,7 @@ ERROR_CODE _write_error_connection(struct http_parser_t *http_parser, char *mess
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _start_environ(PyObject *environ, struct http_parser_t *http_parser) {
+ERROR_CODE _start_environ_wsgi(PyObject *environ, struct http_parser_t *http_parser) {
     /* allocates space for the counter to be used for iteration
     on the various header values */
     size_t index;
@@ -963,7 +963,7 @@ ERROR_CODE _start_environ(PyObject *environ, struct http_parser_t *http_parser) 
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _load_module(PyObject **module_pointer, char *name, char *file_path) {
+ERROR_CODE _load_module_wsgi(PyObject **module_pointer, char *name, char *file_path) {
     /* allocates space for the pointer to the file object to be
     used for reading the module file */
     FILE *file;

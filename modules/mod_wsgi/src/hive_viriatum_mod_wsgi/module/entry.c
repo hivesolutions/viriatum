@@ -109,8 +109,8 @@ ERROR_CODE start_module_wsgi(struct environment_t *environment, struct module_t 
 
     /* sets the http handler attributes */
     http_handler->resolve_index = 0;
-    http_handler->set = set_handler_module;
-    http_handler->unset = unset_handler_module;
+    http_handler->set = set_handler_wsgi;
+    http_handler->unset = unset_handler_wsgi;
     http_handler->reset = NULL;
 
     /* sets the mod wsgi module attributes */
