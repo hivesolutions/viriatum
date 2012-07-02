@@ -62,7 +62,7 @@ ERROR_CODE delete_mod_lua_module(struct mod_lua_module_t *mod_lua_module) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE start_module(struct environment_t *environment, struct module_t *module) {
+ERROR_CODE start_module_lua(struct environment_t *environment, struct module_t *module) {
     /* allocates the lua state */
     lua_State *lua_state;
 
@@ -91,7 +91,7 @@ ERROR_CODE start_module(struct environment_t *environment, struct module_t *modu
     create_mod_lua_module(&mod_lua_module, module);
 
     /* populates the module structure */
-    info_module(module);
+    info_module_lua(module);
 
     /* loads the lua state populating all the erquired values
     for state initialization */
@@ -124,13 +124,13 @@ ERROR_CODE start_module(struct environment_t *environment, struct module_t *modu
 
     /* loads the service configuration for the http handler
     this should change some of it's behavior */
-    _load_configuration(service, mod_lua_http_handler);
+    _load_configuration_lua(service, mod_lua_http_handler);
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE stop_module(struct environment_t *environment, struct module_t *module) {
+ERROR_CODE stop_module_lua(struct environment_t *environment, struct module_t *module) {
     /* retrieves the name, version and description of
     the current module loaded */
     unsigned char *name = name_viriatum_mod_lua();
@@ -186,7 +186,7 @@ ERROR_CODE stop_module(struct environment_t *environment, struct module_t *modul
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE info_module(struct module_t *module) {
+ERROR_CODE info_module_lua(struct module_t *module) {
     /* retrieves the name */
     unsigned char *name = name_viriatum_mod_lua();
 
@@ -197,16 +197,16 @@ ERROR_CODE info_module(struct module_t *module) {
     module->name = name;
     module->version = version;
     module->type = MODULE_TYPE_HTTP_HANDLER;
-    module->start = start_module;
-    module->stop = stop_module;
-    module->info = info_module;
-    module->error = error_module;
+    module->start = start_module_lua;
+    module->stop = stop_module_lua;
+    module->info = info_module_lua;
+    module->error = error_module_lua;
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE error_module(unsigned char **message_pointer) {
+ERROR_CODE error_module_lua(unsigned char **message_pointer) {
     /* sets the error message in the (error) message pointer */
     *message_pointer = get_last_error_message();
 
@@ -214,7 +214,7 @@ ERROR_CODE error_module(unsigned char **message_pointer) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _load_configuration(struct service_t *service, struct mod_lua_http_handler_t *mod_lua_http_handler) {
+ERROR_CODE _load_configuration_lua(struct service_t *service, struct mod_lua_http_handler_t *mod_lua_http_handler) {
     /* allocates space for both a configuration item reference
     (value) and for the configuration to be retrieved */
     void *value;

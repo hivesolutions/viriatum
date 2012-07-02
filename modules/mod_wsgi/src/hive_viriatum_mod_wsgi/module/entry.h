@@ -163,12 +163,12 @@ VIRIATUM_EXTERNAL_PREFIX PyThreadState *_state;
 
 VIRIATUM_EXPORT_PREFIX ERROR_CODE create_mod_wsgi_module(struct mod_wsgi_module_t **mod_wsgi_module_pointer, struct module_t *module);
 VIRIATUM_EXPORT_PREFIX ERROR_CODE delete_mod_wsgi_module(struct mod_wsgi_module_t *mod_wsgi_module);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE start_module(struct environment_t *environment, struct module_t *module);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE stop_module(struct environment_t *environment, struct module_t *module);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE info_module(struct module_t *module);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE error_module(unsigned char **message_pointer);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE _load_configuration(struct service_t *service, struct mod_wsgi_http_handler_t *mod_wsgi_http_handler);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE _load_locations(struct service_t *service, struct mod_wsgi_http_handler_t *mod_wsgi_http_handler);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE start_module_wsgi(struct environment_t *environment, struct module_t *module);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE stop_module_wsgi(struct environment_t *environment, struct module_t *module);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE info_module_wsgi(struct module_t *module);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE error_module_wsgi(unsigned char **message_pointer);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _load_configuration_wsgi(struct service_t *service, struct mod_wsgi_http_handler_t *mod_wsgi_http_handler);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _load_locations_wsgi(struct service_t *service, struct mod_wsgi_http_handler_t *mod_wsgi_http_handler);
 VIRIATUM_EXPORT_PREFIX ERROR_CODE _load_wsgi_state();
 VIRIATUM_EXPORT_PREFIX ERROR_CODE _unload_wsgi_state();
 VIRIATUM_EXPORT_PREFIX ERROR_CODE _reload_wsgi_state();

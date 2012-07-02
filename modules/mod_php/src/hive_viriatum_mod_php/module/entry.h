@@ -128,11 +128,11 @@ VIRIATUM_EXTERNAL_PREFIX struct php_request_t _php_request;
 
 VIRIATUM_EXPORT_PREFIX ERROR_CODE create_mod_php_module(struct mod_php_module_t **mod_php_module_pointer, struct module_t *module);
 VIRIATUM_EXPORT_PREFIX ERROR_CODE delete_mod_php_module(struct mod_php_module_t *mod_php_module);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE start_module(struct environment_t *environment, struct module_t *module);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE stop_module(struct environment_t *environment, struct module_t *module);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE info_module(struct module_t *module);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE error_module(unsigned char **message_pointer);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE _load_configuration(struct service_t *service, struct mod_php_http_handler_t *mod_php_http_handler);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE start_module_php(struct environment_t *environment, struct module_t *module);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE stop_module_php(struct environment_t *environment, struct module_t *module);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE info_module_php(struct module_t *module);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE error_module_php(unsigned char **message_pointer);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _load_configuration_php(struct service_t *service, struct mod_php_http_handler_t *mod_php_http_handler);
 VIRIATUM_EXPORT_PREFIX ERROR_CODE _load_php_state();
 VIRIATUM_EXPORT_PREFIX ERROR_CODE _unload_php_state();
 VIRIATUM_EXPORT_PREFIX ERROR_CODE _reload_php_state();
