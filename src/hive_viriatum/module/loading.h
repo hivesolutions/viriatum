@@ -310,8 +310,10 @@ static __inline void module_name(unsigned char *module_path, unsigned char *buff
 	of the module element */
 	while(TRUE) {
 		/* in case the underscore element or the end of string element
-		is found the name final index is foud (must break) */
-		if(module_name[index] == '_' || module_name[index] == '\0') { break ;}
+		is found the name final index is found (must break) */
+		if(module_name[index] == '_'
+			|| module_name[index] == '.'
+			|| module_name[index] == '\0') { break ;}
 		index++;
 	}
 
