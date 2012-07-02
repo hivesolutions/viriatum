@@ -29,6 +29,9 @@
 
 #include "entry.h"
 
+/* starts the memory structures */
+START_MEMORY;
+
 ERROR_CODE create_mod_lua_module(struct mod_lua_module_t **mod_lua_module_pointer, struct module_t *module) {
     /* retrieves the mod lua module size */
     size_t mod_lua_module_size = sizeof(struct mod_lua_module_t);

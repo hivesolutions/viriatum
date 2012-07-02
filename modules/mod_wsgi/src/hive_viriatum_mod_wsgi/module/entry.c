@@ -29,6 +29,9 @@
 
 #include "entry.h"
 
+/* starts the memory structures */
+START_MEMORY;
+
 /* initializes the module global variables this
 values will be used accross functions */
 START_GLOBALS;
