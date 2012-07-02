@@ -59,23 +59,23 @@ ERROR_CODE delete_mod_lua_http_handler(struct mod_lua_http_handler_t *mod_lua_ht
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE set_handler_module(struct http_connection_t *http_connection) {
+ERROR_CODE set_handler_lua(struct http_connection_t *http_connection) {
     /* sets the http parser values */
-    _set_http_parser_handler_module(http_connection->http_parser);
+    _set_http_parser_handler_lua(http_connection->http_parser);
 
     /* sets the http settings values */
-    _set_http_settings_handler_module(http_connection->http_settings);
+    _set_http_settings_handler_lua(http_connection->http_settings);
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE unset_handler_module(struct http_connection_t *http_connection) {
+ERROR_CODE unset_handler_lua(struct http_connection_t *http_connection) {
     /* unsets the http parser values */
-    _unset_http_parser_handler_module(http_connection->http_parser);
+    _unset_http_parser_handler_lua(http_connection->http_parser);
 
     /* unsets the http settings values */
-    _unset_http_settings_handler_module(http_connection->http_settings);
+    _unset_http_settings_handler_lua(http_connection->http_settings);
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -86,84 +86,84 @@ ERROR_CODE message_begin_callback_handler_module(struct http_parser_t *http_pars
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE url_callback_handler_module(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE url_callback_handler_lua(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE header_field_callback_handler_module(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE header_field_callback_handler_lua(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE header_value_callback_handler_module(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE header_value_callback_handler_lua(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE headers_complete_callback_handler_module(struct http_parser_t *http_parser) {
+ERROR_CODE headers_complete_callback_handler_lua(struct http_parser_t *http_parser) {
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE body_callback_handler_module(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE body_callback_handler_lua(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE message_complete_callback_handler_module(struct http_parser_t *http_parser) {
+ERROR_CODE message_complete_callback_handler_lua(struct http_parser_t *http_parser) {
     /* sends (and creates) the reponse */
-    _send_response_handler_module(http_parser);
+    _send_response_handler_lua(http_parser);
 
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE path_callback_handler_module(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE path_callback_handler_lua(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE location_callback_handler_module(struct http_parser_t *http_parser, size_t index, size_t offset) {
+ERROR_CODE location_callback_handler_lua(struct http_parser_t *http_parser, size_t index, size_t offset) {
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE virtual_url_callback_handler_module(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE virtual_url_callback_handler_lua(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _set_http_parser_handler_module(struct http_parser_t *http_parser) {
+ERROR_CODE _set_http_parser_handler_lua(struct http_parser_t *http_parser) {
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _unset_http_parser_handler_module(struct http_parser_t *http_parser) {
+ERROR_CODE _unset_http_parser_handler_lua(struct http_parser_t *http_parser) {
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _set_http_settings_handler_module(struct http_settings_t *http_settings) {
+ERROR_CODE _set_http_settings_handler_lua(struct http_settings_t *http_settings) {
     /* sets the various callback functions in the http settings
     structure, these callbacks are going to be used in the runtime
     processing of http parser (runtime execution) */
     http_settings->on_message_begin = message_begin_callback_handler_module;
-    http_settings->on_url = url_callback_handler_module;
-    http_settings->on_header_field = header_field_callback_handler_module;
-    http_settings->on_header_value = header_value_callback_handler_module;
-    http_settings->on_headers_complete = headers_complete_callback_handler_module;
-    http_settings->on_body = body_callback_handler_module;
-    http_settings->on_message_complete = message_complete_callback_handler_module;
-    http_settings->on_path = path_callback_handler_module;
-    http_settings->on_location = location_callback_handler_module;
-    http_settings->on_virtual_url = virtual_url_callback_handler_module;
+    http_settings->on_url = url_callback_handler_lua;
+    http_settings->on_header_field = header_field_callback_handler_lua;
+    http_settings->on_header_value = header_value_callback_handler_lua;
+    http_settings->on_headers_complete = headers_complete_callback_handler_lua;
+    http_settings->on_body = body_callback_handler_lua;
+    http_settings->on_message_complete = message_complete_callback_handler_lua;
+    http_settings->on_path = path_callback_handler_lua;
+    http_settings->on_location = location_callback_handler_lua;
+    http_settings->on_virtual_url = virtual_url_callback_handler_lua;
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _unset_http_settings_handler_module(struct http_settings_t *http_settings) {
+ERROR_CODE _unset_http_settings_handler_lua(struct http_settings_t *http_settings) {
     /* unsets the various callback functions from the http settings */
     http_settings->on_message_begin = NULL;
     http_settings->on_url = NULL;
@@ -180,7 +180,7 @@ ERROR_CODE _unset_http_settings_handler_module(struct http_settings_t *http_sett
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
+ERROR_CODE _send_response_handler_lua(struct http_parser_t *http_parser) {
     /* retrieves the connection from the http parser parameters */
     struct connection_t *connection = (struct connection_t *) http_parser->parameters;
 
@@ -197,7 +197,7 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
     if(mod_lua_http_handler->lua_state == NULL) {
         /* writes the error to the connection and then returns
         in error to the caller function */
-        _write_error_connection(http_parser, "no lua state available");
+        _write_error_connection_lua(http_parser, "no lua state available");
         RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem accessing lua state");
     }
 
@@ -218,7 +218,7 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
         /* retrieves the error message and then writes it to the connection
         so that the end user may be able to respond to it */
         char *error_message = (char *) lua_tostring(mod_lua_http_handler->lua_state, -1);
-        _write_error_connection(http_parser, error_message);
+        _write_error_connection_lua(http_parser, error_message);
 
         /* sets the file as dirty (forces reload) and then reloads the curernt
         internal lua state, virtual machine reset (to avoid corruption) */
@@ -241,7 +241,7 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
         /* retrieves the error message and then writes it to the connection
         so that the end user may be able to respond to it */
         char *error_message = (char *) lua_tostring(mod_lua_http_handler->lua_state, -1);
-        _write_error_connection(http_parser, error_message);
+        _write_error_connection_lua(http_parser, error_message);
 
         /* sets the file reference as dirty, this will force the script file
         to be reload on next request */
@@ -257,7 +257,7 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _send_response_callback_handler_module(struct connection_t *connection, struct data_t *data, void *parameters) {
+ERROR_CODE _send_response_callback_handler_lua(struct connection_t *connection, struct data_t *data, void *parameters) {
     /* retrieves the current http flags */
     unsigned char flags = (unsigned char) (size_t) parameters;
 
@@ -285,7 +285,7 @@ ERROR_CODE _send_response_callback_handler_module(struct connection_t *connectio
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _write_error_connection(struct http_parser_t *http_parser, char *message) {
+ERROR_CODE _write_error_connection_lua(struct http_parser_t *http_parser, char *message) {
     /* allocates space for the buffer to be used in the message */
     unsigned char *buffer;
 
@@ -308,7 +308,7 @@ ERROR_CODE _write_error_connection(struct http_parser_t *http_parser, char *mess
         500,
         "Internal Server Error",
         message,
-        _send_response_callback_handler_module,
+        _send_response_callback_handler_lua,
         (void *) (size_t) http_parser->flags
     );
 
@@ -394,7 +394,7 @@ int _lua_write_connection(lua_State *lua_state) {
         connection,
         buffer,
         data_size,
-        _send_response_callback_handler_module,
+        _send_response_callback_handler_lua,
         (void *) (size_t) http_parser->flags
     );
 
