@@ -174,7 +174,8 @@ ERROR_CODE load_module(struct service_t *service, unsigned char *module_path) {
         V_WARNING_F("%s\n", GET_ERROR_MODULE(module));
     }
 
-    /* calls the start module function */
+    /* calls the start module function, this sould
+	start all the module internal structures */
     error_code = module->start(environment, module);
 
     /* tests the error code for error */
@@ -203,7 +204,8 @@ ERROR_CODE unload_module(struct service_t *service, struct module_t *module) {
     /* removes the module from the list of modlues handlers in the service */
     remove_value_linked_list(service->modules_list, (void *) module, 1);
 
-    /* calls the stop module function */
+    /* calls the stop module function, this sould
+	destroy (stop) all the module internal structures  */
     error_code = module->stop(environment, module);
 
     /* tests the error code for error */
