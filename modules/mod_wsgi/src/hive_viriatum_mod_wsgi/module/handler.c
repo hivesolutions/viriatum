@@ -636,7 +636,7 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
     wsgi_module = PyImport_ImportModule("viriatum_wsgi");
     if(wsgi_module == NULL) {
         VIRIATUM_RELEASE_GIL;
-        RAISE_ERROR_M(D_ERROR_CODE, (unsigned char *) "Problem loading module");
+        RAISE_ERROR_M(D_ERROR_CODE, (unsigned char *) "Problem loading (wsgi) module");
     }
 
     /* retrieves the reference to the start response function from the wsgi module
@@ -644,7 +644,7 @@ ERROR_CODE _send_response_handler_module(struct http_parser_t *http_parser) {
     start_response_function = PyObject_GetAttrString(wsgi_module, "start_response");
     if(!start_response_function || !PyCallable_Check(start_response_function)) {
         VIRIATUM_RELEASE_GIL;
-        RAISE_ERROR_M(D_ERROR_CODE, (unsigned char *) "Problem retrieving function");
+        RAISE_ERROR_M(D_ERROR_CODE, (unsigned char *) "Problem retrieving (wsgi) function");
     }
 
     /* imports the associated (handler) module and retrieves
