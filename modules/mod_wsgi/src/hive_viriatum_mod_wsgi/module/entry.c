@@ -349,11 +349,11 @@ ERROR_CODE _start_wsgi_state() {
     PyObject *wsgi_module;
     PyTypeObject *type;
 
-    /* retrieves the system path list and then appends
-    the various relative local paths into in */
+    /* retrieves the system path list and then appends (inserts)
+    the various relative local paths into it (for relative usage) */
     PyObject *current_path = PyString_FromString("");
     PyObject *path = PySys_GetObject("path");
-    PyList_Append(path, current_path);
+    PyList_Insert(path, 0, current_path);
     Py_DECREF(current_path);
 
     /* registers the viriatum wsgi module in the python interpreter
