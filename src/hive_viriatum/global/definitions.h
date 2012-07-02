@@ -113,6 +113,7 @@ static __inline char *get_config_path() {
 #define VIRIATUM_CONTENTS_PATH get_contents_path()
 #endif
 #define VIRIATUM_PID_PATH "viriatum.pid"
+#define VIRIATUM_MODULE_PREFIX sizeof("viriatum_mod_") - 1
 #endif
 
 #ifdef VIRIATUM_PLATFORM_UNIX
@@ -148,6 +149,7 @@ static __inline char *get_config_path() {
 #endif
 #endif
 #define VIRIATUM_PID_PATH "/var/run/viriatum.pid"
+#define VIRIATUM_MODULE_PREFIX sizeof("libviriatum_mod_") - 1
 #endif
 
 #define VIRIATUM_NAME "viriatum"
