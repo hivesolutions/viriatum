@@ -891,6 +891,8 @@ ERROR_CODE _start_environ(PyObject *environ, struct http_parser_t *http_parser) 
         Py_DECREF(_value);
     }
 
+	PyErr_SetFromErrno(PyExc_SystemError);
+
     _value_ = PyTuple_New(2);
     _value = PyInt_FromLong(1);
     PyTuple_SET_ITEM(_value_, 0, _value);
