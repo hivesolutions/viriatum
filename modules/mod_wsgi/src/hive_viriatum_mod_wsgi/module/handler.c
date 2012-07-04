@@ -59,7 +59,7 @@ ERROR_CODE delete_mod_wsgi_http_handler(struct mod_wsgi_http_handler_t *mod_wsgi
 
     /* in case the execution module is defined for the wsgi handler
     it must be released by decrementing the reference count */
-    if(mod_wsgi_http_handler->module != NULL) { Py_DECREF(mod_wsgi_http_handler->module); }
+	if(mod_wsgi_http_handler->module != NULL) { Py_DECREF(mod_wsgi_http_handler->module); }
 
     /* releases the mod wsgi http handler */
     FREE(mod_wsgi_http_handler);
@@ -104,8 +104,13 @@ ERROR_CODE create_handler_wsgi_context(struct handler_wsgi_context_t **handler_w
 
 ERROR_CODE delete_handler_wsgi_context(struct handler_wsgi_context_t *handler_wsgi_context) {
     /* in case the iterator in the wsgi is not null it must be
-    released by decrementing the reference count */
-    //if(handler_wsgi_context->iterator != NULL) { Py_XDECREF(handler_wsgi_context->iterator); }
+    released by decrementing the reference count, note that the
+	relesease of the memory is protected by acquiring the gil */
+    if(handler_wsgi_context->iterator != NULL) {
+		VIRIATUM_ACQUIRE_GIL;
+		Py_DECREF(handler_wsgi_context->iterator);
+		VIRIATUM_RELEASE_GIL;
+	}
 
     /* releases the handler wsgi context memory */
     FREE(handler_wsgi_context);
