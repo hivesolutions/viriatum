@@ -220,7 +220,7 @@ void delete_configuration(struct sort_map_t *configuration, int is_top) {
     /* allocates space for the iterator for the configuration */
     struct iterator_t *configuration_iterator;
 
-    /* creates an iterator for the ´configuration sort map */
+    /* creates an iterator for the configuration sort map */
     create_element_iterator_sort_map(configuration, &configuration_iterator);
 
     /* iterates continuously */
