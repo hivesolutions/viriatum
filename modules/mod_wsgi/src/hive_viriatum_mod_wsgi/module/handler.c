@@ -586,6 +586,15 @@ ERROR_CODE _send_response_handler_wsgi(struct http_parser_t *http_parser) {
     size_t index;
     size_t count;
 
+    /* allocates space for the length of the sequence returned with
+    the contentns of the message to be sent */
+    size_t sequence_length;
+
+    /* allocates space for the temporary item to be used to possible calculate
+    the length of the message to be transfered */
+    PyObject *item;
+    size_t item_size;
+
     /* allocates space for the path to the file to be interpreted as the
     application execution module */
     char *file_path;
@@ -674,8 +683,11 @@ ERROR_CODE _send_response_handler_wsgi(struct http_parser_t *http_parser) {
     handler_wsgi_context->flags = http_parser->flags;
 
     /* resets the number of headers for the current wsgi request
-    to be processed (this is a new wsgi request) */
+    to be processed (this is a new wsgi request) then sets the
+    flag that controls if the wsgi request contains the content
+    length ehader to false (default value) */
     _wsgi_request.header_count = 0;
+    _wsgi_request.has_length = FALSE;
 
     /* sets the wsgi context in the wsgi request for global reference
     this should be able to allow global access from the handler methods */
@@ -717,6 +729,55 @@ ERROR_CODE _send_response_handler_wsgi(struct http_parser_t *http_parser) {
         KEEP_ALIVE,
         FALSE
     );
+
+    /* in case the length of the wsgi request is not set this is a special
+    situation and requires special handling according to the various possible
+    situation, (this handling is specified in the pep 333) */
+    if(_wsgi_request.has_length == FALSE) {
+        /* retrieves the length of the sequence containing
+        the message parts to be sent to the client and the
+        swiches over the size to handle the sizes accordingly */
+        sequence_length = PySequence_Length(result);
+        switch(sequence_length) {
+            case 0:
+                /* copies the content length header into the headers
+                with the zero value associated so that the client is
+                notified about the zero length message */
+                count += SPRINTF(
+                    &headers_buffer[count],
+                    VIRIATUM_MAX_HEADER_C_SIZE,
+                    "%s: %d\r\n",
+                    CONTENT_LENGTH_H,
+                    0
+                );
+
+                break;
+            case 1:
+                /* retrieves the reference to the first item and then
+                checks its (byte) length, this value is going to be used
+                and the size for the message to be sent, then the header
+                is created whit this value */
+                item = PySequence_GetItem(result, 0);
+                item_size = PySequence_Length(item);
+                Py_DECREF(item);
+                count += SPRINTF(
+                    &headers_buffer[count],
+                    VIRIATUM_MAX_HEADER_C_SIZE,
+                    "%s: %d\r\n",
+                    CONTENT_LENGTH_H,
+                    item_size
+                );
+
+                break;
+
+            default:
+                /* removes the connection keep alive from the flags to be
+                used, this action will force the connection to be closed */
+                handler_wsgi_context->flags &= ~FLAG_CONNECTION_KEEP_ALIVE;
+
+                break;
+        }
+    }
 
     /* iterates over all the headers present in the current wsgi request to copy
     their content into the current headers buffer */
