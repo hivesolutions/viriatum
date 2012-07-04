@@ -65,7 +65,7 @@ typedef struct hash_map_element_t {
 VIRIATUM_EXPORT_PREFIX void create_hash_map(struct hash_map_t **hash_map_pointer, size_t initial_size);
 VIRIATUM_EXPORT_PREFIX void delete_hash_map(struct hash_map_t *hash_map);
 VIRIATUM_EXPORT_PREFIX void delete_values_hash_map(struct hash_map_t *hash_map);
-VIRIATUM_EXPORT_PREFIX void set_value_hash_map(struct hash_map_t *hash_map, size_t key, unsigned char *key_string, void *value, char copy);
+VIRIATUM_EXPORT_PREFIX void set_value_hash_map(struct hash_map_t *hash_map, size_t key, unsigned char *key_string, void *value);
 VIRIATUM_EXPORT_PREFIX void set_value_string_hash_map(struct hash_map_t *hash_map, unsigned char *key_string, void *value);
 VIRIATUM_EXPORT_PREFIX void get_hash_map(struct hash_map_t *hash_map, size_t key, unsigned char *key_string, struct hash_map_element_t **element_pointer);
 VIRIATUM_EXPORT_PREFIX void get_value_hash_map(struct hash_map_t *hash_map, size_t key, unsigned char *key_string, void **value_pointer);
@@ -76,5 +76,6 @@ VIRIATUM_EXPORT_PREFIX void delete_iterator_hash_map(struct hash_map_t *hash_map
 VIRIATUM_EXPORT_PREFIX void reset_iterator_hash_map(struct hash_map_t *hash_map, struct iterator_t *iterator);
 VIRIATUM_EXPORT_PREFIX void get_next_iterator_hash_map(struct iterator_t *iterator, void **next_pointer);
 VIRIATUM_EXPORT_PREFIX void get_next_element_iterator_hash_map(struct iterator_t *iterator, void **next_pointer);
+VIRIATUM_EXPORT_PREFIX void _set_value_hash_map(struct hash_map_t *hash_map, size_t key, unsigned char *key_string, void *value, char copy);
 VIRIATUM_EXPORT_PREFIX void _resize_hash_map(struct hash_map_t *hash_map);
 VIRIATUM_EXPORT_PREFIX size_t _calculate_string_hash_map(unsigned char *key_string);

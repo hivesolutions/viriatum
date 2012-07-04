@@ -129,90 +129,18 @@ void delete_values_hash_map(struct hash_map_t *hash_map) {
     delete_iterator_hash_map(hash_map, iterator);
 }
 
-void set_value_hash_map(struct hash_map_t *hash_map, size_t key, unsigned char *key_string, void *value, char copy) {
-    /* allocates space for the hash map element to be used */
-    struct hash_map_element_t *element;
-
-    /* allocates space for the index used for element
-    access (computed modulus hash) and for the size of
-    the key string to be set in the element */
-    size_t index;
-    size_t key_string_size;
-
-    /* in case the current hash map size "overflows"
-    the maximum size (a resizing is required) */
-    if(hash_map->size >= hash_map->maximum_size) {
-        /* resizes the hash map to an appropriate
-        size to avoid collisions */
-        _resize_hash_map(hash_map);
-    }
-
-    /* calculates the index using the modulus */
-    index = key % hash_map->elements_buffer_size;
-
-    /* iterates continously (to get an empty space
-    in the hash map), this conforms with the open
-    addressing strategy for hash maps */
-    while(1) {
-        /* retrieves the base address value */
-        element = &hash_map->elements_buffer[index];
-
-        /* in case the element is empty or the
-        key is the same (overwrite) */
-        if(element->used == 0 || element->key == key) {
-            /* breaks the loop */
-            break;
-        }
-
-        /* in case the index value is "normal"
-        and sane (normal case) */
-        if(index < hash_map->elements_buffer_size - 1) {
-            /* increment the index value */
-            index++;
-        }
-        /* otherwise the hash map overflows (need
-        to reset the counter value) */
-        else {
-            /* resets the index value (overflow) */
-            index = 0;
-        }
-    }
-
-    /* in case the key string is already defined in the
-    element (must release it properly) unsets it */
-    if(element->key_string != NULL) {
-        /* releases the key string memory (avoids memory leak)
-        and then unsets the key string reference in the element */
-        FREE(element->key_string);
-        element->key_string = NULL;
-    }
-
-    /* sets the element fields */
-    element->value = value;
-    element->key = key;
-	element->key_string = key_string;
-    element->used = 1;
-
-    /* in case the key string is defined must copy
-    the string information into the element in case
-	the copy flag is set (memory duplicate) */
-    if(key_string != NULL && copy == TRUE) {
-        /* allocates the required memory for the key string
-        and then copies the key string into the element */
-        key_string_size = strlen((char *) key_string);
-        element->key_string = (unsigned char *) MALLOC(key_string_size + 1);
-        memcpy(element->key_string, key_string, key_string_size + 1);
-    }
-
-    /* increments the hash map size */
-    hash_map->size++;
+void set_value_hash_map(struct hash_map_t *hash_map, size_t key, unsigned char *key_string, void *value) {
+	/* calls the underlying (privte) set value function with the
+	copy flag set so that if the key string is set it is copyied
+	as a new string into memory (key copy operation) */
+	_set_value_hash_map(hash_map, key, key_string, value, TRUE);
 }
 
 void set_value_string_hash_map(struct hash_map_t *hash_map, unsigned char *key_string, void *value) {
     /* calculates the key (hash) value from the key string
     and uses it to set the value in the hash map */
     size_t key = _calculate_string_hash_map(key_string);
-    set_value_hash_map(hash_map, key, key_string, value, TRUE);
+    set_value_hash_map(hash_map, key, key_string, value);
 }
 
 void get_hash_map(struct hash_map_t *hash_map, size_t key, unsigned char *key_string, struct hash_map_element_t **element_pointer) {
@@ -434,6 +362,85 @@ void get_next_element_iterator_hash_map(struct iterator_t *iterator, void **next
     *next_pointer = next;
 }
 
+void _set_value_hash_map(struct hash_map_t *hash_map, size_t key, unsigned char *key_string, void *value, char copy) {
+    /* allocates space for the hash map element to be used */
+    struct hash_map_element_t *element;
+
+    /* allocates space for the index used for element
+    access (computed modulus hash) and for the size of
+    the key string to be set in the element */
+    size_t index;
+    size_t key_string_size;
+
+    /* in case the current hash map size "overflows"
+    the maximum size (a resizing is required) */
+    if(hash_map->size >= hash_map->maximum_size) {
+        /* resizes the hash map to an appropriate
+        size to avoid collisions */
+        _resize_hash_map(hash_map);
+    }
+
+    /* calculates the index using the modulus */
+    index = key % hash_map->elements_buffer_size;
+
+    /* iterates continously (to get an empty space
+    in the hash map), this conforms with the open
+    addressing strategy for hash maps */
+    while(1) {
+        /* retrieves the base address value */
+        element = &hash_map->elements_buffer[index];
+
+        /* in case the element is empty or the
+        key is the same (overwrite) */
+        if(element->used == 0 || element->key == key) {
+            /* breaks the loop */
+            break;
+        }
+
+        /* in case the index value is "normal"
+        and sane (normal case) */
+        if(index < hash_map->elements_buffer_size - 1) {
+            /* increment the index value */
+            index++;
+        }
+        /* otherwise the hash map overflows (need
+        to reset the counter value) */
+        else {
+            /* resets the index value (overflow) */
+            index = 0;
+        }
+    }
+
+    /* in case the key string is already defined in the
+    element (must release it properly) unsets it */
+    if(element->key_string != NULL) {
+        /* releases the key string memory (avoids memory leak)
+        and then unsets the key string reference in the element */
+        FREE(element->key_string);
+        element->key_string = NULL;
+    }
+
+    /* sets the element fields */
+    element->value = value;
+    element->key = key;
+	element->key_string = key_string;
+    element->used = 1;
+
+    /* in case the key string is defined must copy
+    the string information into the element in case
+	the copy flag is set (memory duplicate) */
+    if(key_string != NULL && copy == TRUE) {
+        /* allocates the required memory for the key string
+        and then copies the key string into the element */
+        key_string_size = strlen((char *) key_string);
+        element->key_string = (unsigned char *) MALLOC(key_string_size + 1);
+        memcpy(element->key_string, key_string, key_string_size + 1);
+    }
+
+    /* increments the hash map size */
+    hash_map->size++;
+}
+
 void _resize_hash_map(struct hash_map_t *hash_map) {
     /* allocates space for the index */
     size_t index = 0;
@@ -477,8 +484,10 @@ void _resize_hash_map(struct hash_map_t *hash_map) {
             continue;
         }
 
-        /* sets the value (key and value) in the hash map (copy step) */
-        set_value_hash_map(hash_map, element->key, element->key_string, element->value, FALSE);
+        /* sets the value (key and value) in the hash map (copy step) 
+		uses the private function to avoid the string to be copied again
+		into memory (duplicating the memory space) */
+        _set_value_hash_map(hash_map, element->key, element->key_string, element->value, FALSE);
     }
 
     /* releases the memory used by the "old" elements

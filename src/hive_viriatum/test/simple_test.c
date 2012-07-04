@@ -142,16 +142,16 @@ void test_hash_map() {
     create_hash_map(&hash_map, 3);
 
     /* sets and retrieves the value in the hash map */
-    set_value_hash_map(hash_map, 1, NULL, (void *) 1, FALSE);
+    set_value_hash_map(hash_map, 1, NULL, (void *) 1);
     get_value_hash_map(hash_map, 1, NULL, &element);
 
     /* sets and retrieves the value in the hash map */
-    set_value_hash_map(hash_map, 2, NULL, (void *) 2, FALSE);
+    set_value_hash_map(hash_map, 2, NULL, (void *) 2);
     get_value_hash_map(hash_map, 2, NULL, &element);
 
     /* sets and retrieves the value in the hash map,
     (thi set should for re-sizing) */
-    set_value_hash_map(hash_map, 3, NULL, (void *) 3, FALSE);
+    set_value_hash_map(hash_map, 3, NULL, (void *) 3);
     get_value_hash_map(hash_map, 3, NULL, &element);
 
     /* sets and retrieves the value (using a string)
