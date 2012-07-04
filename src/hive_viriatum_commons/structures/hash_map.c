@@ -99,41 +99,41 @@ void delete_hash_map(struct hash_map_t *hash_map) {
 
 void delete_values_hash_map(struct hash_map_t *hash_map) {
     /* allocates space for the iterator for the elements
-	of the hash map and allocates space for the reference
-	to the element to be used in the iteration */
+    of the hash map and allocates space for the reference
+    to the element to be used in the iteration */
     struct iterator_t *iterator;
     struct hash_map_element_t *element;
 
     /* creates an elements iterator for the hash map to
-	be used to release the memory from the values */
+    be used to release the memory from the values */
     create_element_iterator_hash_map(hash_map, &iterator);
 
     /* iterates continuously to release the memory used
-	by the various values in the hash map */
+    by the various values in the hash map */
     while(1) {
         /* retrieves the element structure from the iterator
-		so that it's possible to release the value memory */
+        so that it's possible to release the value memory */
         get_next_iterator(iterator, (void **) &element);
 
         /* in case the current module is null (end of iterator)
-		must break the current loop */
+        must break the current loop */
         if(element == NULL) { break; }
 
-		/* releases the memory used by the element value, this
-		value must not be used in further calls */
-		FREE(element->value);
+        /* releases the memory used by the element value, this
+        value must not be used in further calls */
+        FREE(element->value);
     }
 
     /* deletes the iterator for the element of the hash map
-	the values have been completly released */
+    the values have been completly released */
     delete_iterator_hash_map(hash_map, iterator);
 }
 
 void set_value_hash_map(struct hash_map_t *hash_map, size_t key, unsigned char *key_string, void *value) {
-	/* calls the underlying (privte) set value function with the
-	copy flag set so that if the key string is set it is copyied
-	as a new string into memory (key copy operation) */
-	_set_value_hash_map(hash_map, key, key_string, value, TRUE);
+    /* calls the underlying (privte) set value function with the
+    copy flag set so that if the key string is set it is copyied
+    as a new string into memory (key copy operation) */
+    _set_value_hash_map(hash_map, key, key_string, value, TRUE);
 }
 
 void set_value_string_hash_map(struct hash_map_t *hash_map, unsigned char *key_string, void *value) {
@@ -423,12 +423,12 @@ void _set_value_hash_map(struct hash_map_t *hash_map, size_t key, unsigned char 
     /* sets the element fields */
     element->value = value;
     element->key = key;
-	element->key_string = key_string;
+    element->key_string = key_string;
     element->used = 1;
 
     /* in case the key string is defined must copy
     the string information into the element in case
-	the copy flag is set (memory duplicate) */
+    the copy flag is set (memory duplicate) */
     if(key_string != NULL && copy == TRUE) {
         /* allocates the required memory for the key string
         and then copies the key string into the element */
@@ -484,9 +484,9 @@ void _resize_hash_map(struct hash_map_t *hash_map) {
             continue;
         }
 
-        /* sets the value (key and value) in the hash map (copy step) 
-		uses the private function to avoid the string to be copied again
-		into memory (duplicating the memory space) */
+        /* sets the value (key and value) in the hash map (copy step)
+        uses the private function to avoid the string to be copied again
+        into memory (duplicating the memory space) */
         _set_value_hash_map(hash_map, element->key, element->key_string, element->value, FALSE);
     }
 

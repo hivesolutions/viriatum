@@ -59,12 +59,12 @@ ERROR_CODE delete_mod_wsgi_http_handler(struct mod_wsgi_http_handler_t *mod_wsgi
 
     /* in case the execution module is defined for the wsgi handler
     it must be released by decrementing the reference count, note
-	that the reelease of the memory is protected by acquiring the gil*/
-	if(mod_wsgi_http_handler->module != NULL) {
-		VIRIATUM_ACQUIRE_GIL;
-		Py_DECREF(mod_wsgi_http_handler->module);
-		VIRIATUM_RELEASE_GIL;
-	}
+    that the reelease of the memory is protected by acquiring the gil*/
+    if(mod_wsgi_http_handler->module != NULL) {
+        VIRIATUM_ACQUIRE_GIL;
+        Py_DECREF(mod_wsgi_http_handler->module);
+        VIRIATUM_RELEASE_GIL;
+    }
 
     /* releases the mod wsgi http handler */
     FREE(mod_wsgi_http_handler);
@@ -110,12 +110,12 @@ ERROR_CODE create_handler_wsgi_context(struct handler_wsgi_context_t **handler_w
 ERROR_CODE delete_handler_wsgi_context(struct handler_wsgi_context_t *handler_wsgi_context) {
     /* in case the iterator in the wsgi is not null it must be
     released by decrementing the reference count, note that the
-	reelease of the memory is protected by acquiring the gil */
+    reelease of the memory is protected by acquiring the gil */
     if(handler_wsgi_context->iterator != NULL) {
-		VIRIATUM_ACQUIRE_GIL;
-		Py_DECREF(handler_wsgi_context->iterator);
-		VIRIATUM_RELEASE_GIL;
-	}
+        VIRIATUM_ACQUIRE_GIL;
+        Py_DECREF(handler_wsgi_context->iterator);
+        VIRIATUM_RELEASE_GIL;
+    }
 
     /* releases the handler wsgi context memory */
     FREE(handler_wsgi_context);
@@ -600,9 +600,9 @@ ERROR_CODE _send_response_handler_wsgi(struct http_parser_t *http_parser) {
     the contentns of the message to be sent */
     size_t sequence_length;
 
-	/* allocates space for the reference to the modules object that
-	may be used to unregister the module from the python interpreter */
-	PyObject *modules;
+    /* allocates space for the reference to the modules object that
+    may be used to unregister the module from the python interpreter */
+    PyObject *modules;
 
     /* allocates space for the temporary item to be used to possible calculate
     the length of the message to be transfered */
@@ -632,12 +632,12 @@ ERROR_CODE _send_response_handler_wsgi(struct http_parser_t *http_parser) {
 
     /* in case the reload flag is set and the module is already loaded must
     release its memory and unset it from the handler then removes the module
-	reference from the modules object in the python interpreter */
+    reference from the modules object in the python interpreter */
     if(mod_wsgi_http_handler->reload && mod_wsgi_http_handler->module) {
         Py_DECREF(mod_wsgi_http_handler->module);
         mod_wsgi_http_handler->module = NULL;
-		modules = PyImport_GetModuleDict();
-		PyDict_DelItemString(modules, "wsgi_app");
+        modules = PyImport_GetModuleDict();
+        PyDict_DelItemString(modules, "wsgi_app");
     }
 
     /* in case the module is not defined, must be loaded again from the
