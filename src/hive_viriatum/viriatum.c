@@ -147,10 +147,6 @@ void register_signals() {
     signal(SIGINT, kill_handler);
     signal(SIGQUIT, kill_handler);
     signal(SIGTERM, kill_handler);
-
-    /* registers the ignore action in the signal indicating
-    a broken pipe (unexpected close of socket) */
-    signal(SIGPIPE, SIG_IGN);
 }
 
 ERROR_CODE print_information() {
