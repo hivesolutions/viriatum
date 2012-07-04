@@ -65,6 +65,10 @@ ERROR_CODE run_service(char *program_name, struct hash_map_t *arguments) {
     load_options_service(service, arguments);
     calculate_options_service(service);
 
+    /* registers the ignore action in the signal indicating
+    a broken pipe (unexpected close of socket) */
+    signal(SIGPIPE, SIG_IGN);
+
     /* updates the registers signals handler so that the service
     may be able to register the handlers at the proper timing */
     service->register_signals = register_signals;
