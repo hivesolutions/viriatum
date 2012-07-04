@@ -230,10 +230,10 @@ ERROR_CODE header_field_callback_handler_php(struct http_parser_t *http_parser, 
     /* checks if the current header is a valid "capturable"
     header in such case changes the next header value accordingly
     otherwise sets the undefined header */
-    if(memcmp(data, "Content-Type", data_size) == 0) { handler_php_context->_next_header = CONTENT_TYPE; }
-    else if(memcmp(data, "Content-Length", data_size) == 0) { handler_php_context->_next_header = CONTENT_LENGTH; }
-    else if(memcmp(data, "Cookie", data_size) == 0) { handler_php_context->_next_header = COOKIE; }
-    else if(memcmp(data, "Host", data_size) == 0) { handler_php_context->_next_header = HOST; }
+    if(memcmp(data, CONTENT_TYPE_H, data_size) == 0) { handler_php_context->_next_header = CONTENT_TYPE; }
+    else if(memcmp(data, CONTENT_LENGTH_H, data_size) == 0) { handler_php_context->_next_header = CONTENT_LENGTH; }
+    else if(memcmp(data, COOKIE_H, data_size) == 0) { handler_php_context->_next_header = COOKIE; }
+    else if(memcmp(data, HOST_H, data_size) == 0) { handler_php_context->_next_header = HOST; }
     else { handler_php_context->_next_header = UNDEFINED_HEADER; }
 
     /* raise no error */

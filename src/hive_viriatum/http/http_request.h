@@ -29,6 +29,7 @@
 
 #define ETAG_H "ETag"
 #define HOST_H "Host"
+#define COOKIE_H "Cookie"
 #define SERVER_H "Server"
 #define LOCATION_H "Location"
 #define CONNECTION_H "Connection"
