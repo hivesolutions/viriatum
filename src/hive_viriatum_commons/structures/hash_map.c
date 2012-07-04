@@ -97,7 +97,39 @@ void delete_hash_map(struct hash_map_t *hash_map) {
     FREE(hash_map);
 }
 
-void set_value_hash_map(struct hash_map_t *hash_map, size_t key, unsigned char *key_string, void *value) {
+void delete_values_hash_map(struct hash_map_t *hash_map) {
+    /* allocates space for the iterator for the elements
+	of the hash map and allocates space for the reference
+	to the element to be used in the iteration */
+    struct iterator_t *iterator;
+    struct hash_map_element_t *element;
+
+    /* creates an elements iterator for the hash map to
+	be used to release the memory from the values */
+    create_element_iterator_hash_map(hash_map, &iterator);
+
+    /* iterates continuously to release the memory used
+	by the various values in the hash map */
+    while(1) {
+        /* retrieves the element structure from the iterator
+		so that it's possible to release the value memory */
+        get_next_iterator(iterator, (void **) &element);
+
+        /* in case the current module is null (end of iterator)
+		must break the current loop */
+        if(element == NULL) { break; }
+
+		/* releases the memory used by the element value, this
+		value must not be used in further calls */
+		FREE(element->value);
+    }
+
+    /* deletes the iterator for the element of the hash map
+	the values have been completly released */
+    delete_iterator_hash_map(hash_map, iterator);
+}
+
+void set_value_hash_map(struct hash_map_t *hash_map, size_t key, unsigned char *key_string, void *value, char copy) {
     /* allocates space for the hash map element to be used */
     struct hash_map_element_t *element;
 
@@ -158,11 +190,13 @@ void set_value_hash_map(struct hash_map_t *hash_map, size_t key, unsigned char *
     /* sets the element fields */
     element->value = value;
     element->key = key;
+	element->key_string = key_string;
     element->used = 1;
 
     /* in case the key string is defined must copy
-    the string information into the element */
-    if(key_string != NULL) {
+    the string information into the element in case
+	the copy flag is set (memory duplicate) */
+    if(key_string != NULL && copy == TRUE) {
         /* allocates the required memory for the key string
         and then copies the key string into the element */
         key_string_size = strlen((char *) key_string);
@@ -178,7 +212,7 @@ void set_value_string_hash_map(struct hash_map_t *hash_map, unsigned char *key_s
     /* calculates the key (hash) value from the key string
     and uses it to set the value in the hash map */
     size_t key = _calculate_string_hash_map(key_string);
-    set_value_hash_map(hash_map, key, key_string, value);
+    set_value_hash_map(hash_map, key, key_string, value, TRUE);
 }
 
 void get_hash_map(struct hash_map_t *hash_map, size_t key, unsigned char *key_string, struct hash_map_element_t **element_pointer) {
@@ -444,7 +478,7 @@ void _resize_hash_map(struct hash_map_t *hash_map) {
         }
 
         /* sets the value (key and value) in the hash map (copy step) */
-        set_value_hash_map(hash_map, element->key, element->key_string, element->value);
+        set_value_hash_map(hash_map, element->key, element->key_string, element->value, FALSE);
     }
 
     /* releases the memory used by the "old" elements
