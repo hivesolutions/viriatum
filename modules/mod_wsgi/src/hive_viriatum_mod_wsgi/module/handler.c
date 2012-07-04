@@ -105,7 +105,7 @@ ERROR_CODE create_handler_wsgi_context(struct handler_wsgi_context_t **handler_w
 ERROR_CODE delete_handler_wsgi_context(struct handler_wsgi_context_t *handler_wsgi_context) {
     /* in case the iterator in the wsgi is not null it must be
     released by decrementing the reference count */
-    if(handler_wsgi_context->iterator != NULL) { Py_DECREF(handler_wsgi_context->iterator); }
+    if(handler_wsgi_context->iterator != NULL) { Py_XDECREF(handler_wsgi_context->iterator); }
 
     /* releases the handler wsgi context memory */
     FREE(handler_wsgi_context);
