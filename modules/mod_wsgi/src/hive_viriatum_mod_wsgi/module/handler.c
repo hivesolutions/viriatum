@@ -764,7 +764,7 @@ ERROR_CODE _send_response_handler_wsgi(struct http_parser_t *http_parser) {
                 count += SPRINTF(
                     &headers_buffer[count],
                     VIRIATUM_MAX_HEADER_C_SIZE,
-                    "%s: %d\r\n",
+                    "%s: %lu\r\n",
                     CONTENT_LENGTH_H,
                     item_size
                 );
