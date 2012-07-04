@@ -369,6 +369,8 @@ int main(int argc, char *argv[]) {
     /* prints a debug message */
     V_DEBUG("Finishing process\n");
 
+	printf("acabou\n");
+
     /* returns zero (valid) */
     return 0;
 }
