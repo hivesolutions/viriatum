@@ -600,6 +600,10 @@ ERROR_CODE _send_response_handler_wsgi(struct http_parser_t *http_parser) {
     the contentns of the message to be sent */
     size_t sequence_length;
 
+	/* allocates space for the reference to the modules object that
+	may be used to unregister the module from the python interpreter */
+	PyObject *modules;
+
     /* allocates space for the temporary item to be used to possible calculate
     the length of the message to be transfered */
     PyObject *item;
@@ -631,6 +635,8 @@ ERROR_CODE _send_response_handler_wsgi(struct http_parser_t *http_parser) {
     if(mod_wsgi_http_handler->reload && mod_wsgi_http_handler->module) {
         Py_DECREF(mod_wsgi_http_handler->module);
         mod_wsgi_http_handler->module = NULL;
+		modules = PyImport_GetModuleDict();
+		PyDict_DelItemString(modules, "wsgi_app");
     }
 
     /* in case the module is not defined, must be loaded again from the
