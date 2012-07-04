@@ -207,10 +207,10 @@ ERROR_CODE header_field_callback_handler_wsgi(struct http_parser_t *http_parser,
     /* checks if the current header is a valid "capturable"
     header in such case changes the next header value accordingly
     otherwise sets the undefined header */
-    if(memcmp(data, "Content-Type", data_size) == 0) { handler_wsgi_context->_next_header = CONTENT_TYPE; }
-    else if(memcmp(data, "Content-Length", data_size) == 0) { handler_wsgi_context->_next_header = CONTENT_LENGTH; }
-    else if(memcmp(data, "Cookie", data_size) == 0) { handler_wsgi_context->_next_header = COOKIE; }
-    else if(memcmp(data, "Host", data_size) == 0) { handler_wsgi_context->_next_header = HOST; }
+    if(memcmp(data, CONTENT_TYPE_H, data_size) == 0) { handler_wsgi_context->_next_header = CONTENT_TYPE; }
+    else if(memcmp(data, CONTENT_LENGTH_H, data_size) == 0) { handler_wsgi_context->_next_header = CONTENT_LENGTH; }
+    else if(memcmp(data, COOKIE_H, data_size) == 0) { handler_wsgi_context->_next_header = COOKIE; }
+    else if(memcmp(data, HOST_H, data_size) == 0) { handler_wsgi_context->_next_header = HOST; }
     else { handler_wsgi_context->_next_header = UNDEFINED_HEADER; }
 
     /* raise no error */
@@ -631,7 +631,8 @@ ERROR_CODE _send_response_handler_wsgi(struct http_parser_t *http_parser) {
     VIRIATUM_ACQUIRE_GIL;
 
     /* in case the reload flag is set and the module is already loaded must
-    release its memory and unset it from the handler */
+    release its memory and unset it from the handler then removes the module
+	reference from the modules object in the python interpreter */
     if(mod_wsgi_http_handler->reload && mod_wsgi_http_handler->module) {
         Py_DECREF(mod_wsgi_http_handler->module);
         mod_wsgi_http_handler->module = NULL;
