@@ -611,15 +611,16 @@ ERROR_CODE _send_response_handler_wsgi(struct http_parser_t *http_parser) {
     struct handler_wsgi_context_t *handler_wsgi_context = (struct handler_wsgi_context_t *) http_parser->context;
     struct mod_wsgi_http_handler_t *mod_wsgi_http_handler = (struct mod_wsgi_http_handler_t *) http_connection->http_handler->lower;
 
-    /* in case the reload flag is set and the module is already loaded must
-    release its memory and unset it from the handler */
-    if(mod_wsgi_http_handler->reload && mod_wsgi_http_handler->module) {
-        mod_wsgi_http_handler->module = NULL;
-    }
-
     /* acquires the global interpreter state an changes the
     current state to the base thread state */
     VIRIATUM_ACQUIRE_GIL;
+
+    /* in case the reload flag is set and the module is already loaded must
+    release its memory and unset it from the handler */
+    if(mod_wsgi_http_handler->reload && mod_wsgi_http_handler->module) {
+		Py_DECREF(mod_wsgi_http_handler->module);
+        mod_wsgi_http_handler->module = NULL;
+    }
 
     /* in case the module is not defined, must be loaded again from the
     file into the python interpreter */
