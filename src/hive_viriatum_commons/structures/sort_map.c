@@ -59,7 +59,7 @@ void delete_sort_map(struct sort_map_t *sort_map) {
 void set_value_sort_map(struct sort_map_t *sort_map, size_t key, unsigned char *key_string, void *value) {
     struct hash_map_element_t *element;
 
-    set_value_hash_map(sort_map->hash_map, key, key_string, value);
+    set_value_hash_map(sort_map->hash_map, key, key_string, value, TRUE);
     get_hash_map(sort_map->hash_map, key, key_string, &element);
     append_value_linked_list(sort_map->key_list, (void *) key);
     append_value_linked_list(sort_map->key_string_list, (void *) element->key_string);
