@@ -118,6 +118,13 @@ typedef struct wsgi_request_t {
     size_t header_count;
 
     /**
+     * Flag that controls if the current wsgi resquest
+     * contains the content length header, and so the
+     * length is specified.
+     */
+    char has_length;
+
+    /**
      * The reference to the current wsgi context
      * structure in use.
      */
