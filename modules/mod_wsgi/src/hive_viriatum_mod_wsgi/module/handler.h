@@ -49,7 +49,7 @@ typedef struct mod_wsgi_location_t {
     char reload;
 
     /**
-     * The reference to the module object reprenting
+     * The reference to the module object representing
      * the parsed and compiled file to be used.
      * This reference is used to avoid constant reloading
      * of the file in case the reload flag is not set.
@@ -78,7 +78,7 @@ typedef struct mod_wsgi_http_handler_t {
     char reload;
 
     /**
-     * The reference to the module object reprenting
+     * The reference to the module object representing
      * the parsed and compiled file to be used.
      * This reference is used to avoid constant reloading
      * of the file in case the reload flag is not set.
