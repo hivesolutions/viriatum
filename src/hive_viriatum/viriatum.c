@@ -147,7 +147,6 @@ void register_signals() {
     /* registers the ignore action in the signal indicating
     a broken pipe (unexpected close of socket) */
     signal(SIGPIPE, SIG_IGN);
-	printf("regbistou sig ignore\n");
 }
 
 ERROR_CODE print_information() {
