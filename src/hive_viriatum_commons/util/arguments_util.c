@@ -85,11 +85,9 @@ ERROR_CODE delete_arguments(struct hash_map_t *arguments) {
         /* retrieves the next value from the arguments iterator */
         get_next_iterator(arguments_iterator, (void **) &element);
 
-        /* in case the current module is null (end of iterator) */
-        if(element == NULL) {
-            /* breaks the loop */
-            break;
-        }
+        /* in case the current module is null (end of iterator)
+		must break the current loop */
+        if(element == NULL) { break; }
 
         /* retrievs the hash map value for the key */
         get_value_hash_map(arguments, element->key, element->key_string, (void **) &argument);
