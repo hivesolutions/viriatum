@@ -594,6 +594,7 @@ ERROR_CODE _send_response_handler_wsgi(struct http_parser_t *http_parser) {
     the length of the message to be transfered */
     PyObject *item;
     size_t item_size;
+    char has_size;
 
     /* allocates space for the path to the file to be interpreted as the
     application execution module */
@@ -618,7 +619,7 @@ ERROR_CODE _send_response_handler_wsgi(struct http_parser_t *http_parser) {
     /* in case the reload flag is set and the module is already loaded must
     release its memory and unset it from the handler */
     if(mod_wsgi_http_handler->reload && mod_wsgi_http_handler->module) {
-		Py_DECREF(mod_wsgi_http_handler->module);
+        Py_DECREF(mod_wsgi_http_handler->module);
         mod_wsgi_http_handler->module = NULL;
     }
 
@@ -717,19 +718,10 @@ ERROR_CODE _send_response_handler_wsgi(struct http_parser_t *http_parser) {
         RAISE_ERROR_M(D_ERROR_CODE, (unsigned char *) "Problem executing application");
     }
 
-    /* allocates space for the header buffer and then writes the default values
-    into it the value is dynamicaly contructed based on the current header values */
-    connection->alloc_data(connection, VIRIATUM_HTTP_MAX_SIZE, (void **) &headers_buffer);
-    count = http_connection->write_headers(
-        connection,
-        headers_buffer,
-        VIRIATUM_HTTP_SIZE,
-        HTTP11,
-        _wsgi_request.status_code,
-        _wsgi_request.status_message,
-        KEEP_ALIVE,
-        FALSE
-    );
+    /* unsets the flag that controls if the size of the message
+    is meant to be controlled by the wsgi module instead of the
+    user application directly */
+    has_size = FALSE;
 
     /* in case the length of the wsgi request is not set this is a special
     situation and requires special handling according to the various possible
@@ -741,16 +733,10 @@ ERROR_CODE _send_response_handler_wsgi(struct http_parser_t *http_parser) {
         sequence_length = PySequence_Length(result);
         switch(sequence_length) {
             case 0:
-                /* copies the content length header into the headers
-                with the zero value associated so that the client is
-                notified about the zero length message */
-                count += SPRINTF(
-                    &headers_buffer[count],
-                    VIRIATUM_MAX_HEADER_C_SIZE,
-                    "%s: %d\r\n",
-                    CONTENT_LENGTH_H,
-                    0
-                );
+                /* sets the flag for the content size and upadate
+                the size of the item with the zero value */
+                has_size = TRUE;
+                item_size = 0;
 
                 break;
             case 1:
@@ -758,16 +744,10 @@ ERROR_CODE _send_response_handler_wsgi(struct http_parser_t *http_parser) {
                 checks its (byte) length, this value is going to be used
                 and the size for the message to be sent, then the header
                 is created whit this value */
+                has_size = TRUE;
                 item = PySequence_GetItem(result, 0);
                 item_size = PySequence_Length(item);
                 Py_DECREF(item);
-                count += SPRINTF(
-                    &headers_buffer[count],
-                    VIRIATUM_MAX_HEADER_C_SIZE,
-                    "%s: %lu\r\n",
-                    CONTENT_LENGTH_H,
-                    item_size
-                );
 
                 break;
 
@@ -778,6 +758,35 @@ ERROR_CODE _send_response_handler_wsgi(struct http_parser_t *http_parser) {
 
                 break;
         }
+    }
+
+    /* allocates space for the header buffer and then writes the default values
+    into it the value is dynamicaly contructed based on the current header values */
+    connection->alloc_data(connection, VIRIATUM_HTTP_MAX_SIZE, (void **) &headers_buffer);
+    count = http_connection->write_headers(
+        connection,
+        headers_buffer,
+        VIRIATUM_HTTP_SIZE,
+        HTTP11,
+        _wsgi_request.status_code,
+        _wsgi_request.status_message,
+        handler_wsgi_context->flags & FLAG_CONNECTION_KEEP_ALIVE ? KEEP_ALIVE : KEEP_CLOSE,
+        FALSE
+    );
+
+    /* in case the current message is meant to have the content length
+    header controlled by the wsgi module it must be set in the headers */
+    if(has_size == TRUE) {
+        /* copies the content length header into the headers
+        with the size value associated so that the client is
+        notified about the length of the message */
+        count += SPRINTF(
+            &headers_buffer[count],
+            VIRIATUM_MAX_HEADER_C_SIZE,
+            "%s: %lu\r\n",
+            CONTENT_LENGTH_H,
+            item_size
+        );
     }
 
     /* iterates over all the headers present in the current wsgi request to copy
