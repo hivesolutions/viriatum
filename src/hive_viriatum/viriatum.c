@@ -352,9 +352,9 @@ int main(int argc, char *argv[]) {
     /* runs the service, with the given arguments */
     return_value = run_service(program_name, arguments);
 
-    /* tests the error code for error */
+    /* tests the error code for error in case it exists
+	prints a message indicating the problem that occurred */
     if(IS_ERROR_CODE(return_value)) {
-        /* prints an error message */
         V_ERROR_F("Problem running service (%s)\n", (char *) GET_ERROR());
     }
 
