@@ -703,8 +703,6 @@ ERROR_CODE _send_response_handler_wsgi(struct http_parser_t *http_parser) {
         );
         mod_wsgi_http_handler->counter++;
 
-        printf("reloading %s\n", file_path);
-
         /* loads the module as wsgi app from the provided file path and
         then updates the module variable to contain a reference to it */
         _load_module_wsgi(
