@@ -698,7 +698,7 @@ ERROR_CODE _send_response_handler_wsgi(struct http_parser_t *http_parser) {
         SPRINTF(
             handler_wsgi_context->module_name,
             VIRIATUM_WSGI_MODULE_SIZE,
-            "wsgi_app_%d",
+            "wsgi_app_%lu",
             mod_wsgi_http_handler->counter
         );
         mod_wsgi_http_handler->counter++;
