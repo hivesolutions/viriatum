@@ -264,9 +264,9 @@ ERROR_CODE _load_locations_wsgi(struct service_t *service, struct mod_wsgi_http_
     memset(mod_wsgi_http_handler->locations, 0,
         service->locations.count * sizeof(struct mod_wsgi_location_t));
 
-	/* updates the locations count variable in the wsgi handler so
-	that it's possible to iterate over the locations */
-	mod_wsgi_http_handler->locations_count = service->locations.count;
+    /* updates the locations count variable in the wsgi handler so
+    that it's possible to iterate over the locations */
+    mod_wsgi_http_handler->locations_count = service->locations.count;
 
     /* iterates over all the locations in the service to create the
     proper configuration structures to the module */
@@ -278,9 +278,9 @@ ERROR_CODE _load_locations_wsgi(struct service_t *service, struct mod_wsgi_http_
 
         /* retrieves the current mod wsgi configuration reference from
         the location buffer, this is going ot be populated and sets the
-		default values in it */
+        default values in it */
         _location = &mod_wsgi_http_handler->locations[index];
-		_location->reload = UNSET;
+        _location->reload = UNSET;
 
         /* tries ro retrieve the script path from the wsgi configuration and in
         case it exists sets it in the location (attribute reference change) */

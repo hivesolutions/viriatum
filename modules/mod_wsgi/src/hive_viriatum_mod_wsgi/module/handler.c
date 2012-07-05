@@ -39,10 +39,10 @@ ERROR_CODE create_mod_wsgi_http_handler(struct mod_wsgi_http_handler_t **mod_wsg
     /* sets the mod wsgi http handler attributes (default) values */
     mod_wsgi_http_handler->file_path = NULL;
     mod_wsgi_http_handler->reload = FALSE;
-	mod_wsgi_http_handler->counter = 0;
+    mod_wsgi_http_handler->counter = 0;
     mod_wsgi_http_handler->module = NULL;
     mod_wsgi_http_handler->locations = NULL;
-	mod_wsgi_http_handler->locations_count = 0;
+    mod_wsgi_http_handler->locations_count = 0;
 
     /* sets the mod wsgi http handler in the upper http handler substrate */
     http_handler->lower = (void *) mod_wsgi_http_handler;
@@ -55,22 +55,22 @@ ERROR_CODE create_mod_wsgi_http_handler(struct mod_wsgi_http_handler_t **mod_wsg
 }
 
 ERROR_CODE delete_mod_wsgi_http_handler(struct mod_wsgi_http_handler_t *mod_wsgi_http_handler) {
-	/* allocates space for the index counter to be used to iterate
-	arround the various locations and space for the location in iteration */
-	size_t index;
-	struct mod_wsgi_location_t *location;
+    /* allocates space for the index counter to be used to iterate
+    arround the various locations and space for the location in iteration */
+    size_t index;
+    struct mod_wsgi_location_t *location;
 
-	/* acquires the global interpreter state an changes the
+    /* acquires the global interpreter state an changes the
     current state to the base thread state */
-	VIRIATUM_ACQUIRE_GIL;
+    VIRIATUM_ACQUIRE_GIL;
 
-	/* iterates over all the locations to (possibly) release the
-	various loaded modules in their controll, this is considered
-	a garbage collection operation */
-	for(index = 0; index < mod_wsgi_http_handler->locations_count; index++) {
-		location = &mod_wsgi_http_handler->locations[index];
-		if(location->module != NULL) { Py_DECREF(location->module); }
-	}
+    /* iterates over all the locations to (possibly) release the
+    various loaded modules in their controll, this is considered
+    a garbage collection operation */
+    for(index = 0; index < mod_wsgi_http_handler->locations_count; index++) {
+        location = &mod_wsgi_http_handler->locations[index];
+        if(location->module != NULL) { Py_DECREF(location->module); }
+    }
 
     /* in case the locations buffer is set it must be released
     to avoid any memory leak (not going to be used) */
@@ -82,7 +82,7 @@ ERROR_CODE delete_mod_wsgi_http_handler(struct mod_wsgi_http_handler_t *mod_wsgi
 
     /* changes the current thread state releasing it and releases the
     lock on the global interpreter state */
-	VIRIATUM_RELEASE_GIL;
+    VIRIATUM_RELEASE_GIL;
 
     /* releases the mod wsgi http handler */
     FREE(mod_wsgi_http_handler);
@@ -101,10 +101,10 @@ ERROR_CODE create_handler_wsgi_context(struct handler_wsgi_context_t **handler_w
     /* set the default value in the handler wsgi context
     structure (resets the structure) */
     handler_wsgi_context->flags = 0;
-	handler_wsgi_context->module = NULL;
-	handler_wsgi_context->module_pointer = NULL;
-	handler_wsgi_context->module_name = NULL;
-	handler_wsgi_context->reload = UNSET;
+    handler_wsgi_context->module = NULL;
+    handler_wsgi_context->module_pointer = NULL;
+    handler_wsgi_context->module_name = NULL;
+    handler_wsgi_context->reload = UNSET;
     handler_wsgi_context->_next_header = UNDEFINED_HEADER;
     handler_wsgi_context->_url_string.length = 0;
     handler_wsgi_context->_file_name_string.length = 0;
@@ -401,12 +401,12 @@ ERROR_CODE location_callback_handler_wsgi(struct http_parser_t *http_parser, siz
         0
     );
 
-	/* updates the module reference in the context and provides the
-	pointer to the module in the location to be updated by the handler */
-	handler_wsgi_context->module = location->module;
-	handler_wsgi_context->module_pointer = &location->module;
-	handler_wsgi_context->module_name = location->module_name;
-	handler_wsgi_context->reload = location->reload;
+    /* updates the module reference in the context and provides the
+    pointer to the module in the location to be updated by the handler */
+    handler_wsgi_context->module = location->module;
+    handler_wsgi_context->module_pointer = &location->module;
+    handler_wsgi_context->module_name = location->module_name;
+    handler_wsgi_context->reload = location->reload;
 
     /* raise no error */
     RAISE_NO_ERROR;
@@ -659,24 +659,24 @@ ERROR_CODE _send_response_handler_wsgi(struct http_parser_t *http_parser) {
     current state to the base thread state */
     VIRIATUM_ACQUIRE_GIL;
 
-	/* calculates the various context value according to their various default
-	values and the current set values, this allows the handler to work under 
-	default values for the current execution (fallback values )*/
-	handler_wsgi_context->reload = handler_wsgi_context->reload == UNSET ?
-		mod_wsgi_http_handler->reload : handler_wsgi_context->reload;
-	handler_wsgi_context->module = handler_wsgi_context->module_pointer == NULL ?
-		mod_wsgi_http_handler->module : handler_wsgi_context->module;
-	handler_wsgi_context->module_pointer = handler_wsgi_context->module_pointer == NULL ?
-		&mod_wsgi_http_handler->module : handler_wsgi_context->module_pointer;
-	handler_wsgi_context->module_name = handler_wsgi_context->module_name == NULL ?
-		mod_wsgi_http_handler->module_name : handler_wsgi_context->module_name;
+    /* calculates the various context value according to their various default
+    values and the current set values, this allows the handler to work under
+    default values for the current execution (fallback values )*/
+    handler_wsgi_context->reload = handler_wsgi_context->reload == UNSET ?
+        mod_wsgi_http_handler->reload : handler_wsgi_context->reload;
+    handler_wsgi_context->module = handler_wsgi_context->module_pointer == NULL ?
+        mod_wsgi_http_handler->module : handler_wsgi_context->module;
+    handler_wsgi_context->module_pointer = handler_wsgi_context->module_pointer == NULL ?
+        &mod_wsgi_http_handler->module : handler_wsgi_context->module_pointer;
+    handler_wsgi_context->module_name = handler_wsgi_context->module_name == NULL ?
+        mod_wsgi_http_handler->module_name : handler_wsgi_context->module_name;
 
     /* in case the reload flag is set and the module is already loaded must
     release its memory and unset it from the handler then removes the module
     reference from the modules object in the python interpreter */
     if(handler_wsgi_context->reload && handler_wsgi_context->module) {
         Py_DECREF(handler_wsgi_context->module);
-		handler_wsgi_context->module = NULL;
+        handler_wsgi_context->module = NULL;
         *handler_wsgi_context->module_pointer = NULL;
         modules = PyImport_GetModuleDict();
         PyDict_DelItemString(modules, handler_wsgi_context->module_name);
@@ -692,18 +692,18 @@ ERROR_CODE _send_response_handler_wsgi(struct http_parser_t *http_parser) {
         file_path = handler_wsgi_context->_file_path_string.length > 0 ?
             (char *) handler_wsgi_context->file_path : file_path;
 
-		/* creates hte "new" module name for the current module to be
-		loaded with the current counter value as the suffix and updates
-		the counter value (increments the value by one) */
-		SPRINTF(
-			handler_wsgi_context->module_name,
-			VIRIATUM_WSGI_MODULE_SIZE,
-			"wsgi_app_%d",
-			mod_wsgi_http_handler->counter
-		);
-		mod_wsgi_http_handler->counter++;
+        /* creates hte "new" module name for the current module to be
+        loaded with the current counter value as the suffix and updates
+        the counter value (increments the value by one) */
+        SPRINTF(
+            handler_wsgi_context->module_name,
+            VIRIATUM_WSGI_MODULE_SIZE,
+            "wsgi_app_%d",
+            mod_wsgi_http_handler->counter
+        );
+        mod_wsgi_http_handler->counter++;
 
-		printf("reloading %s\n", file_path);
+        printf("reloading %s\n", file_path);
 
         /* loads the module as wsgi app from the provided file path and
         then updates the module variable to contain a reference to it */
@@ -712,7 +712,7 @@ ERROR_CODE _send_response_handler_wsgi(struct http_parser_t *http_parser) {
             handler_wsgi_context->module_name,
             file_path
         );
-		*handler_wsgi_context->module_pointer = handler_wsgi_context->module;
+        *handler_wsgi_context->module_pointer = handler_wsgi_context->module;
     }
 
     /* imports the wsgi module containing the util methos to be used by the
