@@ -27,6 +27,10 @@
 
 #pragma once
 
+#ifndef UNSET
+#define UNSET -1
+#endif
+
 #ifndef FALSE
 #define FALSE 0
 #endif
