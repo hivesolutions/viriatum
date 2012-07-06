@@ -122,7 +122,8 @@ PyObject *wsgi_start_response(PyObject *self, PyObject *args) {
         /* checks if the current header is the content length
         header in such case the length set flag must be set in
         the request so that operation may be taken accordingly */
-        _wsgi_request.has_length = strcmp(_header_name, CONTENT_LENGTH_H) == 0 ? TRUE : FALSE;
+        _wsgi_request.has_length = strcmp(_header_name, CONTENT_LENGTH_H) == 0 ?
+			TRUE : _wsgi_request.has_length;
 
         /* formats the header into the "normal" format and sets
         it under the headers buffer in the wsgi request */
