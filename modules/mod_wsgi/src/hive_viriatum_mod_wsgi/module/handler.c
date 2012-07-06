@@ -782,7 +782,7 @@ ERROR_CODE _send_response_handler_wsgi(struct http_parser_t *http_parser) {
     the resources immediately in case the result is not valid */
     result = PyObject_CallObject(handler_function, args);
     if(result == NULL) {
-		PyErr_Clear();
+        PyErr_Clear();
         Py_DECREF(handler_function);
         Py_DECREF(args);
         Py_DECREF(wsgi_module);
@@ -802,7 +802,7 @@ ERROR_CODE _send_response_handler_wsgi(struct http_parser_t *http_parser) {
         /* retrieves the length of the sequence containing
         the message parts to be sent to the client and the
         swiches over the size to handle the sizes accordingly */
-		sequence_length = PySequence_Check(result) ? PySequence_Length(result) : 2;
+        sequence_length = PySequence_Check(result) ? PySequence_Length(result) : 2;
         switch(sequence_length) {
             case 0:
                 /* sets the flag for the content size and upadate
@@ -1149,26 +1149,26 @@ ERROR_CODE _load_module_wsgi(PyObject **module_pointer, char *name, char *file_p
     closes the file to avoid any file memory leaking (possible problems) */
     node = PyParser_SimpleParseString(file_buffer, Py_file_input);
     fclose(file);
-	FREE(file_buffer);
+    FREE(file_buffer);
 
     /* in case the parsed node is not valid (something wrong occurred
     while parsing the file) raises an error */
-	if(node == NULL) { PyErr_Clear(); RAISE_NO_ERROR; }
+    if(node == NULL) { PyErr_Clear(); RAISE_NO_ERROR; }
 
     /* compiles the top level node (ast) into a python code object
     so that it can be executed */
     code = (PyObject *) PyNode_Compile(node, file_path);
     PyNode_Free(node);
-	if(code == NULL) { PyErr_Clear(); RAISE_NO_ERROR; }
+    if(code == NULL) { PyErr_Clear(); RAISE_NO_ERROR; }
 
     /* executes the code in the code object provided, retrieveing the
     module and setting it in the module pointer reference */
     module = PyImport_ExecCodeModuleEx(name, code, file_path);
     *module_pointer = module;
 
-	/* in case the module was not correctly loaded must clear the error
-	pending to be printed from the error buffer */
-	if(module == NULL) { PyErr_Clear(); }
+    /* in case the module was not correctly loaded must clear the error
+    pending to be printed from the error buffer */
+    if(module == NULL) { PyErr_Clear(); }
 
     /* decrements the reference count in the code object so that it's
     able to release itself */
