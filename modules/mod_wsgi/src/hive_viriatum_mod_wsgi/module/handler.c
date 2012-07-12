@@ -1130,7 +1130,10 @@ ERROR_CODE _load_module_wsgi(PyObject **module_pointer, char *name, char *file_p
     /* opens the file for reading (in binary mode) and checks if
     there was a problem opening it, raising an error in such case */
     FOPEN(&file, file_path, "r");
-    if(file == NULL) { PyErr_Clear(); RAISE_NO_ERROR; }
+    if(file == NULL) {
+		V_DEBUG_F("Module file not found '%s'\n", file_path);
+		RAISE_NO_ERROR;
+	}
 
     /* seeks the file until the end of the file and then
     retrieves the current position as the size at the end
@@ -1153,13 +1156,19 @@ ERROR_CODE _load_module_wsgi(PyObject **module_pointer, char *name, char *file_p
 
     /* in case the parsed node is not valid (something wrong occurred
     while parsing the file) raises an error */
-    if(node == NULL) { PyErr_Clear(); RAISE_NO_ERROR; }
+    if(node == NULL) {
+		V_DEBUG_F("Error while parsing module file\n");
+		PyErr_Clear(); RAISE_NO_ERROR;
+	}
 
     /* compiles the top level node (ast) into a python code object
     so that it can be executed */
     code = (PyObject *) PyNode_Compile(node, file_path);
     PyNode_Free(node);
-    if(code == NULL) { PyErr_Clear(); RAISE_NO_ERROR; }
+    if(code == NULL) {
+		V_DEBUG_F("Error while compiling module file\n");
+		PyErr_Clear(); RAISE_NO_ERROR;
+	}
 
     /* executes the code in the code object provided, retrieveing the
     module and setting it in the module pointer reference */
@@ -1168,7 +1177,10 @@ ERROR_CODE _load_module_wsgi(PyObject **module_pointer, char *name, char *file_p
 
     /* in case the module was not correctly loaded must clear the error
     pending to be printed from the error buffer */
-    if(module == NULL) { PyErr_Clear(); }
+    if(module == NULL) {
+		V_DEBUG_F("Error while executing module file\n");
+		PyErr_Clear();
+	}
 
     /* decrements the reference count in the code object so that it's
     able to release itself */
