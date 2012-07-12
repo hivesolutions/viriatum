@@ -105,6 +105,9 @@
 #ifdef VIRIATUM_IP6
 #define SOCKET_ADDRESS_INTERNET6 struct sockaddr_in6
 #endif
+#ifndef MSG_NOSIGNAL
+#define MSG_NOSIGNAL 0
+#endif
 #define SOCKET_CONNECTIONS 256
 #define SOCKET_DATA void *
 #define SOCKET_HANDLE int
