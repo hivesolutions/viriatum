@@ -89,6 +89,7 @@ Must compile the php interpreter with special environment variables set, and the
 Must compile the php interpreter with special environment variables set to point to the correct headers directory.
 
 * `export CFLAGS="-I/usr/include/python2.7"`
+* `export CFLAGS="/System/Library/Frameworks/Python.framework/Headers"`
 
 ## FreeBSD
 
