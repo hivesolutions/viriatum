@@ -105,6 +105,9 @@
 #ifdef VIRIATUM_IP6
 #define SOCKET_ADDRESS_INTERNET6 struct sockaddr_in6
 #endif
+#ifndef MSG_NOSIGNAL
+#define MSG_NOSIGNAL SO_NOSIGPIPE
+#endif
 #define SOCKET_CONNECTIONS 256
 #define SOCKET_DATA void *
 #define SOCKET_HANDLE int
@@ -149,8 +152,8 @@
 #define SOCKET_TEST_ERROR(result) result < 0
 #define SOCKET_EX_TEST_ERROR(result) result <= 0
 #define SOCKET_GET_ERROR_CODE(result) (SOCKET_ERROR_CODE) errno
-#define SOCKET_SEND(socket_handle, buffer, length, flags) send(socket_handle, buffer, length, flags)
-#define SOCKET_RECEIVE(socket_handle, buffer, length, flags) recv(socket_handle, buffer, length, flags)
+#define SOCKET_SEND(socket_handle, buffer, length, flags) send(socket_handle, buffer, length, flags | MSG_NOSIGNAL)
+#define SOCKET_RECEIVE(socket_handle, buffer, length, flags) recv(socket_handle, buffer, length, flags | MSG_NOSIGNAL)
 #define SOCKET_SET_OPTIONS(socket_handle, level, option_name, option_value) setsockopt(socket_handle, level, option_name, (SOCKET_OPTION *) &option_value, sizeof(option_value))
 #define SOCKET_SELECT(number_socket, sockets_read_set, sockets_write_set, sockets_exception_set, timeout) select(number_socket, sockets_read_set, sockets_write_set, sockets_exception_set, timeout)
 #define SOCKET_SET_ZERO(sockets_set) FD_ZERO(sockets_set)
