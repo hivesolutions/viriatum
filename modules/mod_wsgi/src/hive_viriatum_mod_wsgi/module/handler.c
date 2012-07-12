@@ -1107,6 +1107,8 @@ ERROR_CODE _start_environ_wsgi(PyObject *environ, struct http_parser_t *http_par
 }
 
 ERROR_CODE _load_module_wsgi(PyObject **module_pointer, char *name, char *file_path) {
+	size_t index;
+
     /* allocates space for the pointer to the file object to be
     used for reading the module file */
     FILE *file;
@@ -1151,6 +1153,11 @@ ERROR_CODE _load_module_wsgi(PyObject **module_pointer, char *name, char *file_p
     file_buffer = (char *) MALLOC(file_size + 1);
     number_bytes = fread(file_buffer, 1, file_size, file);
     file_buffer[number_bytes] = '\0';
+
+	for(index = 0; index < number_bytes; index++) {
+		if(file_buffer[index] != '\r') { continue; }
+		file_buffer[index] = ' ';
+	}
 
     /* parses the "just" read file using the python parser and then
     closes the file to avoid any file memory leaking (possible problems) */
