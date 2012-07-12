@@ -725,7 +725,7 @@ ERROR_CODE _send_response_handler_wsgi(struct http_parser_t *http_parser) {
     and then verifies that it's a valid python function */
     start_response_function = PyObject_GetAttrString(wsgi_module, "start_response");
     if(!start_response_function || !PyCallable_Check(start_response_function)) {
-		PyErr_Clear(); VIRIATUM_RELEASE_GIL;
+        PyErr_Clear(); VIRIATUM_RELEASE_GIL;
         RAISE_ERROR_M(D_ERROR_CODE, (unsigned char *) "Problem retrieving (wsgi) function");
     }
 
@@ -743,7 +743,7 @@ ERROR_CODE _send_response_handler_wsgi(struct http_parser_t *http_parser) {
     if it refers a valid function */
     handler_function = PyObject_GetAttrString(module, "application");
     if(!handler_function || !PyCallable_Check(handler_function)) {
-		PyErr_Clear(); VIRIATUM_RELEASE_GIL;
+        PyErr_Clear(); VIRIATUM_RELEASE_GIL;
         RAISE_ERROR_M(D_ERROR_CODE, (unsigned char *) "Problem retrieving application");
     }
 
@@ -1107,7 +1107,9 @@ ERROR_CODE _start_environ_wsgi(PyObject *environ, struct http_parser_t *http_par
 }
 
 ERROR_CODE _load_module_wsgi(PyObject **module_pointer, char *name, char *file_path) {
-	size_t index;
+    /* allocates space for the index counter to be used in the
+    character replacement loop for the carriage return */
+    size_t index;
 
     /* allocates space for the pointer to the file object to be
     used for reading the module file */
@@ -1129,17 +1131,17 @@ ERROR_CODE _load_module_wsgi(PyObject **module_pointer, char *name, char *file_p
     value to provide error detection */
     *module_pointer = NULL;
 
-	/* prints a debug message to notify the system abou the loading
-	of the wsgi module (provides logging) */
-	V_DEBUG_F("Loading wsgi module '%s'\n", file_path);
+    /* prints a debug message to notify the system abou the loading
+    of the wsgi module (provides logging) */
+    V_DEBUG_F("Loading wsgi module '%s'\n", file_path);
 
     /* opens the file for reading (in binary mode) and checks if
     there was a problem opening it, raising an error in such case */
     FOPEN(&file, file_path, "rb");
     if(file == NULL) {
-		V_DEBUG_F("Module file not found '%s'\n", file_path);
-		RAISE_NO_ERROR;
-	}
+        V_DEBUG_F("Module file not found '%s'\n", file_path);
+        RAISE_NO_ERROR;
+    }
 
     /* seeks the file until the end of the file and then
     retrieves the current position as the size at the end
@@ -1154,10 +1156,16 @@ ERROR_CODE _load_module_wsgi(PyObject **module_pointer, char *name, char *file_p
     number_bytes = fread(file_buffer, 1, file_size, file);
     file_buffer[number_bytes] = '\0';
 
-	for(index = 0; index < number_bytes; index++) {
-		if(file_buffer[index] != '\r') { continue; }
-		file_buffer[index] = ' ';
-	}
+    /* iterates over all the bytes in the file buffer to replace
+    the carrige return characters by "simple space" characters to
+    provide compatability for old unix system where shuch characters
+    are not allowed and woul break string parsing */
+    for(index = 0; index < number_bytes; index++) {
+        /* in case the current character is not a carriage return
+        must continue with the loop otherwise executes the change */
+        if(file_buffer[index] != '\r') { continue; }
+        file_buffer[index] = ' ';
+    }
 
     /* parses the "just" read file using the python parser and then
     closes the file to avoid any file memory leaking (possible problems) */
@@ -1168,18 +1176,18 @@ ERROR_CODE _load_module_wsgi(PyObject **module_pointer, char *name, char *file_p
     /* in case the parsed node is not valid (something wrong occurred
     while parsing the file) raises an error */
     if(node == NULL) {
-		V_DEBUG("Error while parsing module\n");
-		PyErr_Clear(); RAISE_NO_ERROR;
-	}
+        V_DEBUG("Error while parsing module\n");
+        PyErr_Clear(); RAISE_NO_ERROR;
+    }
 
     /* compiles the top level node (ast) into a python code object
     so that it can be executed */
     code = (PyObject *) PyNode_Compile(node, file_path);
     PyNode_Free(node);
     if(code == NULL) {
-		V_DEBUG("Error while compiling module\n");
-		PyErr_Clear(); RAISE_NO_ERROR;
-	}
+        V_DEBUG("Error while compiling module\n");
+        PyErr_Clear(); RAISE_NO_ERROR;
+    }
 
     /* executes the code in the code object provided, retrieveing the
     module and setting it in the module pointer reference */
@@ -1189,9 +1197,9 @@ ERROR_CODE _load_module_wsgi(PyObject **module_pointer, char *name, char *file_p
     /* in case the module was not correctly loaded must clear the error
     pending to be printed from the error buffer */
     if(module == NULL) {
-		V_DEBUG("Error while executing module\n");
-		PyErr_Clear();
-	}
+        V_DEBUG("Error while executing module\n");
+        PyErr_Clear();
+    }
 
     /* decrements the reference count in the code object so that it's
     able to release itself */
