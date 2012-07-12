@@ -8,25 +8,25 @@ The Viriatum Web Server is simple and lightweight web server aimed at providing 
 
 If you're going to build viriatum using the git repository you first need to generate the configure files using autoconf.
 
-`./autogen.sh`
+* `./autogen.sh`
 
 ### Unix
 
 For building under unix simple instructions are used:
 
-`./configure
-make && make install`
+* `./configure`
+* `make && make install`
 
 In order to provide a correct (system wide) configuration path use:
 
-`./configure --sysconfdir=/etc`
+* `./configure --sysconfdir=/etc`
 
 ### Unix 32bit from 64bit
 
-`apt-get libc6-dev-i386
-export CC="cc -m32"
-./configure
-make && make install`
+* `apt-get libc6-dev-i386`
+* `export CC="cc -m32"`
+* `./configure`
+* `make && make install`
 
 ### Android
 
@@ -43,16 +43,16 @@ Building viriatum for android involves cross compilation and the android ndk too
 
 For building using the default mingw32 toolchain.
 
-`apt-get install mingw32 mingw32-binutils
-./configure --host=i586-mingw32msvc --build=i686-linux --prefix=/opt/i586-mingw32
-make && make install`
+* `apt-get install mingw32 mingw32-binutils`
+* `./configure --host=i586-mingw32msvc --build=i686-linux --prefix=/opt/i586-mingw32`
+* `make && make install`
 
 For building using the mingw-w64 toolchain for 64 and 32 bit options.
 
-`apt-get install mingw-w64 gcc-mingw-w64 binutils-mingw-w64
-./configure --host=x86_64-w64-mingw32 --build=i686-linux --prefix=/opt/x86_64-w64-mingw32
-./configure --host=i686-w64-mingw32 --build=i686-linux --prefix=/opt/i686-w64-mingw32
-make && make install`
+* `apt-get install mingw-w64 gcc-mingw-w64 binutils-mingw-w64`
+* `./configure --host=x86_64-w64-mingw32 --build=i686-linux --prefix=/opt/x86_64-w64-mingw32`
+* `./configure --host=i686-w64-mingw32 --build=i686-linux --prefix=/opt/i686-w64-mingw32`
+* `make && make install`
 
 ## Features
 
