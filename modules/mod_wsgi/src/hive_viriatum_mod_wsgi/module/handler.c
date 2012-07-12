@@ -1133,7 +1133,7 @@ ERROR_CODE _load_module_wsgi(PyObject **module_pointer, char *name, char *file_p
 
     /* opens the file for reading (in binary mode) and checks if
     there was a problem opening it, raising an error in such case */
-    FOPEN(&file, file_path, "r");
+    FOPEN(&file, file_path, "rb");
     if(file == NULL) {
 		V_DEBUG_F("Module file not found '%s'\n", file_path);
 		RAISE_NO_ERROR;
