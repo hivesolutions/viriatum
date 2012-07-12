@@ -305,6 +305,8 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
     /* in case the file path being request referes a directory
     it must be checked and the entries retrieved to be rendered */
     if(is_directory) {
+        /* in case the current url does not ends with the trailing slash must
+        redirect the user agent to the same location but with the trauling slash */
         if(handler_file_context->url[strlen((char *) handler_file_context->url) - 1] != '/') {
             /* creates the new location by adding the slash character to the current
             handler file context url (avoids directory confusion) */
@@ -314,7 +316,10 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
 
             /* sets the is redirect flag (forces temporary redirect) */
             is_redirect = 1;
-        } else {
+        }
+        /* otherwise it's the correct directory location and must present the
+        listing of the directory to the user agent */
+        else {
             /* creates the complete path to the template file */
             SPRINTF(
                 (char *) template_path,
@@ -735,9 +740,9 @@ ERROR_CODE _send_chunk_handler_file(struct connection_t *connection, struct data
         /* opens the file */
         FOPEN(&file, (char *) file_path, "rb");
 
-        /* in case the file is not found */
+        /* in case the file is not found, must raise an error
+        indicating that there was a problem loading the file */
         if(file == NULL) {
-            /* raises an error */
             RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem loading file");
         }
 

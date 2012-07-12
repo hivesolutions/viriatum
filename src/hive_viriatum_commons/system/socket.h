@@ -106,7 +106,7 @@
 #define SOCKET_ADDRESS_INTERNET6 struct sockaddr_in6
 #endif
 #ifndef MSG_NOSIGNAL
-#define MSG_NOSIGNAL SO_NOSIGPIPE 
+#define MSG_NOSIGNAL SO_NOSIGPIPE
 #endif
 #define SOCKET_CONNECTIONS 256
 #define SOCKET_DATA void *
