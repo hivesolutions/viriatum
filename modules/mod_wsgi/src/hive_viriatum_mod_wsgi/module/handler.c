@@ -1127,6 +1127,10 @@ ERROR_CODE _load_module_wsgi(PyObject **module_pointer, char *name, char *file_p
     value to provide error detection */
     *module_pointer = NULL;
 
+	/* prints a debug message to notify the system abou the loading
+	of the wsgi module (provides logging) */
+	V_DEBUG("Loading wsgi module '%s'\n", file_path);
+
     /* opens the file for reading (in binary mode) and checks if
     there was a problem opening it, raising an error in such case */
     FOPEN(&file, file_path, "r");
