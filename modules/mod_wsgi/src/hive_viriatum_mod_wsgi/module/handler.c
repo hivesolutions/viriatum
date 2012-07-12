@@ -1161,7 +1161,7 @@ ERROR_CODE _load_module_wsgi(PyObject **module_pointer, char *name, char *file_p
     /* in case the parsed node is not valid (something wrong occurred
     while parsing the file) raises an error */
     if(node == NULL) {
-		V_DEBUG("Error while parsing module file\n");
+		V_DEBUG("Error while parsing module\n");
 		PyErr_Clear(); RAISE_NO_ERROR;
 	}
 
@@ -1170,7 +1170,7 @@ ERROR_CODE _load_module_wsgi(PyObject **module_pointer, char *name, char *file_p
     code = (PyObject *) PyNode_Compile(node, file_path);
     PyNode_Free(node);
     if(code == NULL) {
-		V_DEBUG("Error while compiling module file\n");
+		V_DEBUG("Error while compiling module\n");
 		PyErr_Clear(); RAISE_NO_ERROR;
 	}
 
@@ -1182,7 +1182,7 @@ ERROR_CODE _load_module_wsgi(PyObject **module_pointer, char *name, char *file_p
     /* in case the module was not correctly loaded must clear the error
     pending to be printed from the error buffer */
     if(module == NULL) {
-		V_DEBUG("Error while executing module file\n");
+		V_DEBUG("Error while executing module\n");
 		PyErr_Clear();
 	}
 
