@@ -717,7 +717,7 @@ ERROR_CODE _send_response_handler_wsgi(struct http_parser_t *http_parser) {
     application to access viriatum wsgi functions */
     wsgi_module = PyImport_ImportModule("viriatum_wsgi");
     if(wsgi_module == NULL) {
-        VIRIATUM_RELEASE_GIL;
+        PyErr_Clear(); VIRIATUM_RELEASE_GIL;
         RAISE_ERROR_M(D_ERROR_CODE, (unsigned char *) "Problem loading (wsgi) module");
     }
 
@@ -725,7 +725,7 @@ ERROR_CODE _send_response_handler_wsgi(struct http_parser_t *http_parser) {
     and then verifies that it's a valid python function */
     start_response_function = PyObject_GetAttrString(wsgi_module, "start_response");
     if(!start_response_function || !PyCallable_Check(start_response_function)) {
-        VIRIATUM_RELEASE_GIL;
+		PyErr_Clear(); VIRIATUM_RELEASE_GIL;
         RAISE_ERROR_M(D_ERROR_CODE, (unsigned char *) "Problem retrieving (wsgi) function");
     }
 
@@ -743,7 +743,7 @@ ERROR_CODE _send_response_handler_wsgi(struct http_parser_t *http_parser) {
     if it refers a valid function */
     handler_function = PyObject_GetAttrString(module, "application");
     if(!handler_function || !PyCallable_Check(handler_function)) {
-        VIRIATUM_RELEASE_GIL;
+		PyErr_Clear(); VIRIATUM_RELEASE_GIL;
         RAISE_ERROR_M(D_ERROR_CODE, (unsigned char *) "Problem retrieving application");
     }
 
