@@ -153,7 +153,9 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
         }
     }
 
-    /* iterates over the data incrementing the pointer by a value for iteration */
+    /* iterates over the data incrementing the pointer by a value for iteration
+    this is the main iteration cycle and all the actions should occur from this
+    execution cycle and from the inner switch operation */
     for(pointer = data, pointer_end = data + data_size; pointer != pointer_end; pointer++) {
         /* retrieves the current iteration byte */
         byte = *pointer;
