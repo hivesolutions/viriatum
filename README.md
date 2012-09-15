@@ -79,21 +79,21 @@ Current modules include:
 
 ## PHP Module
 
-Must compile the php interpreter with special environment variables set, and then must compile with support for embedding.
+Must compile the php interpreter with support for embeding, and then must compile the module with special variables set.
 
-* `export CFLAGS="-I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend"`
 * `./configure --enable-embed`
+* `export CFLAGS="-I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend"`
 
 ## WSGI Module
 
-Must compile the php interpreter with special environment variables set to point to the correct headers directory.
+Must compile viriatum with special environment variables set to point to the correct headers directory.
 
 * `export CFLAGS="-I/usr/include/python2.7"`
 * `export CFLAGS="-I/System/Library/Frameworks/Python.framework/Headers"`
 
 ## FreeBSD
 
-FreeBSD ignores the usr local directory by default so it must be included in order to conform with dependencies.
+FreeBSD ignores the /usr/local directory by default so it must be included in order to conform with dependencies.
 
 * `setenv CFLAGS "-L/usr/local/lib -I/usr/local/include"`
 
