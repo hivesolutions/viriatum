@@ -76,6 +76,7 @@ Current modules include:
 
 * `mod_lua` - For interaction with the lua interpreter
 * `mod_php` - For interaction with the php interpreter (complex compilation)
+* `mod_wsgi` - For interaction with the python interpreter using the [WSGI](http://wsgi.org) specification.
 
 ## PHP Module
 
