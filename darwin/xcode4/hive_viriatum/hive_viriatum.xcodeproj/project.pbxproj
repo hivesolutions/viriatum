@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		C20C2CE51350B71E001E22FB /* libhive_viriatum_commons.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C20C2CE41350B71E001E22FB /* libhive_viriatum_commons.a */; };
+		C2282ED61609324200048F70 /* http_util.c in Sources */ = {isa = PBXBuildFile; fileRef = C2282ED41609324200048F70 /* http_util.c */; };
+		C2282ED71609324200048F70 /* http_util.c in Sources */ = {isa = PBXBuildFile; fileRef = C2282ED41609324200048F70 /* http_util.c */; };
 		C24EF47F15820F7400FAE3A0 /* stream_httpc.c in Sources */ = {isa = PBXBuildFile; fileRef = C24EF47B15820F7400FAE3A0 /* stream_httpc.c */; };
 		C24EF48015820F7400FAE3A0 /* stream_httpc.c in Sources */ = {isa = PBXBuildFile; fileRef = C24EF47B15820F7400FAE3A0 /* stream_httpc.c */; };
 		C24EF48115820F7400FAE3A0 /* stream_torrent.c in Sources */ = {isa = PBXBuildFile; fileRef = C24EF47D15820F7400FAE3A0 /* stream_torrent.c */; };
@@ -96,6 +98,8 @@
 		C20C2BBF1350B5D7001E22FB /* hive_viriatum */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = hive_viriatum; sourceTree = BUILT_PRODUCTS_DIR; };
 		C20C2C741350B6A9001E22FB /* hive_viriatum_commons.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = hive_viriatum_commons.xcodeproj; path = ../hive_viriatum_commons/hive_viriatum_commons.xcodeproj; sourceTree = "<group>"; };
 		C20C2CE41350B71E001E22FB /* libhive_viriatum_commons.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libhive_viriatum_commons.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		C2282ED41609324200048F70 /* http_util.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = http_util.c; sourceTree = "<group>"; };
+		C2282ED51609324200048F70 /* http_util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = http_util.h; sourceTree = "<group>"; };
 		C24EF47B15820F7400FAE3A0 /* stream_httpc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = stream_httpc.c; sourceTree = "<group>"; };
 		C24EF47C15820F7400FAE3A0 /* stream_httpc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stream_httpc.h; sourceTree = "<group>"; };
 		C24EF47D15820F7400FAE3A0 /* stream_torrent.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = stream_torrent.c; sourceTree = "<group>"; };
@@ -300,6 +304,8 @@
 		C295DF6E155BCAD600036037 /* http */ = {
 			isa = PBXGroup;
 			children = (
+				C2282ED41609324200048F70 /* http_util.c */,
+				C2282ED51609324200048F70 /* http_util.h */,
 				C295DF6F155BCAD600036037 /* http.h */,
 				C295DF70155BCAD600036037 /* http_parser.c */,
 				C295DF71155BCAD600036037 /* http_parser.h */,
@@ -533,6 +539,7 @@
 				C295DFBE155BCAD600036037 /* simple_test.c in Sources */,
 				C24EF47F15820F7400FAE3A0 /* stream_httpc.c in Sources */,
 				C24EF48115820F7400FAE3A0 /* stream_torrent.c in Sources */,
+				C2282ED61609324200048F70 /* http_util.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -564,6 +571,7 @@
 				C295DFBF155BCAD600036037 /* simple_test.c in Sources */,
 				C24EF48015820F7400FAE3A0 /* stream_httpc.c in Sources */,
 				C24EF48215820F7400FAE3A0 /* stream_torrent.c in Sources */,
+				C2282ED71609324200048F70 /* http_util.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
