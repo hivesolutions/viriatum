@@ -161,7 +161,7 @@ ERROR_CODE data_handler_stream_http(struct io_connection_t *io_connection, unsig
     to split the stream into possible multiple messages, usefull
     for http pipelining (multiple sequenced requests) */
     while(1) {
-        /* in case no http connection buffer is not currently set, time to start
+        /* in case no http connection buffer is currently set, time to start
         a new one from the provided buffer (fast access) */
         if(http_connection->buffer == NULL) {
             http_connection->buffer_size = buffer_size;
@@ -203,7 +203,7 @@ ERROR_CODE data_handler_stream_http(struct io_connection_t *io_connection, unsig
         processed_size = process_data_http_parser(http_connection->http_parser, http_connection->http_settings, _buffer, buffer_size);
 
         /* in case the current state in the http parser is the
-        start state, ther message is considered to be completly
+        start state, the message is considered to be completly
         parsed (new message may come after) */
         if(http_connection->http_parser->state == STATE_START_RES) {
             /* releases the current http connection buffer and then
