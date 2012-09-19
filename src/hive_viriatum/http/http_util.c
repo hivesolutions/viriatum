@@ -242,7 +242,7 @@ ERROR_CODE write_http_error(struct connection_t *connection, char *buffer, size_
         write_connection(
             connection,
             result_buffer,
-            result_length,
+            (unsigned int) result_length,
             (connection_data_callback) callback,
             callback_parameters
         );
