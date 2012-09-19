@@ -562,7 +562,7 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
         write_connection(
             connection,
             (unsigned char *) headers_buffer,
-            strlen(headers_buffer),
+            (unsigned int) strlen(headers_buffer),
             _send_chunk_handler_file,
             handler_file_context
         );
@@ -759,7 +759,7 @@ ERROR_CODE _send_chunk_handler_file(struct connection_t *connection, struct data
         write_connection(
             connection,
             file_buffer,
-            number_bytes,
+            (unsigned int) number_bytes,
             _send_chunk_handler_file,
             handler_file_context
         );
