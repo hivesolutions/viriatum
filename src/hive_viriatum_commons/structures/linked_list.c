@@ -144,18 +144,54 @@ void append_linked_list(struct linked_list_t *linked_list, struct linked_list_no
     linked_list->size++;
 }
 
+void append_front_linked_list(struct linked_list_t *linked_list, struct linked_list_node_t *linked_list_node) {
+    /* in case the linked list is empty */
+    if(linked_list->size == 0) {
+        /* sets the linked list node as the last node */
+        linked_list->last = linked_list_node;
+    } else {
+        /* sets the previous element of the first element as
+        the new linked list node */
+        linked_list->first->previous = linked_list_node;
+        
+        /* sets the next element of the linked list
+        node as the firs one of the linked list */
+        linked_list_node->next = linked_list->first;
+    }
+    
+    /* sets the linked list node as the first node */
+    linked_list->first = linked_list_node;
+    
+    /* increments the linked list size */
+    linked_list->size++;
+}
+
 void append_value_linked_list(struct linked_list_t *linked_list, void *value) {
     /* allocates space for the linked list node */
     struct linked_list_node_t *linked_list_node;
-
+    
     /* creates the linked list node */
     create_linked_list_node(&linked_list_node);
-
+    
     /* sets the value in the linked list node */
     linked_list_node->value = value;
-
+    
     /* appends the linked list node to the linked list */
     append_linked_list(linked_list, linked_list_node);
+}
+
+void append_front_value_linked_list(struct linked_list_t *linked_list, void *value) {
+    /* allocates space for the linked list node */
+    struct linked_list_node_t *linked_list_node;
+    
+    /* creates the linked list node */
+    create_linked_list_node(&linked_list_node);
+    
+    /* sets the value in the linked list node */
+    linked_list_node->value = value;
+    
+    /* appends (front) the linked list node to the linked list */
+    append_front_linked_list(linked_list, linked_list_node);
 }
 
 void remove_linked_list(struct linked_list_t *linked_list, struct linked_list_node_t *linked_list_node, char delete_node) {
