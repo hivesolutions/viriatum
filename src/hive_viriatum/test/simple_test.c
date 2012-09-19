@@ -86,7 +86,7 @@ void test_linked_list() {
     /* creates the linked list */
     create_linked_list(&linked_list);
 
-    /* adds some element to the linked list */
+    /* adds some elements to the linked list */
     append_value_linked_list(linked_list, (void *) 1);
     append_value_linked_list(linked_list, (void *) 2);
     append_value_linked_list(linked_list, (void *) 3);
@@ -95,16 +95,23 @@ void test_linked_list() {
     get_value_linked_list(linked_list, 1, &value);
 
     /* removes a value from the linked list */
-    remove_value_linked_list(linked_list, (void *) 1, 1);
+    remove_value_linked_list(linked_list, (void *) 1, TRUE);
 
     /* removes an element from the linked list */
-    remove_index_linked_list(linked_list, 1, 1);
+    remove_index_linked_list(linked_list, 1, TRUE);
 
     /* pops a value from the linked list */
-    pop_value_linked_list(linked_list, (void **) &value, 1);
+    pop_value_linked_list(linked_list, (void **) &value, TRUE);
 
     /* pops a value from the linked list */
-    pop_value_linked_list(linked_list, (void **) &value, 1);
+    pop_value_linked_list(linked_list, (void **) &value, TRUE);
+    
+    /* appends vome elements to the front of the linked list,
+    then pops them out again */
+    append_front_value_linked_list(linked_list, (void *) 4);
+    append_front_value_linked_list(linked_list, (void *) 5);
+    pop_value_linked_list(linked_list, (void **) &value, TRUE);
+    pop_value_linked_list(linked_list, (void **) &value, TRUE);
 
     /* deletes the linked list */
     delete_linked_list(linked_list);
@@ -234,9 +241,9 @@ void test_linked_buffer() {
     create_linked_buffer(&linked_buffer);
 
     /* adds a set of strings to the string buffer */
-    append_linked_buffer(linked_buffer, (void *) "hello", 5, 0);
-    append_linked_buffer(linked_buffer, (void *) " ", 1, 0);
-    append_linked_buffer(linked_buffer, (void *) "world", 5, 0);
+    append_linked_buffer(linked_buffer, (void *) "hello", 5, FALSE);
+    append_linked_buffer(linked_buffer, (void *) " ", 1, FALSE);
+    append_linked_buffer(linked_buffer, (void *) "world", 5, FALSE);
 
     /* "joins" the linked buffer values into a single
     value (from the internal buffer list) */
@@ -454,10 +461,10 @@ void test_template_handler() {
 
 void test_quicksort() {
     /* allocates space for the template handler */
-    int list[10] = { 2, 4, 1, 2, 3, 5, 5, 3, 4, 1 };
+    size_t list[10] = { 2, 4, 1, 2, 3, 5, 5, 3, 4, 1 };
 
     /* sorts the sequence according to the compare function */
-    sort_quicksort((void **) list, 0, 10, _compare);
+    sort_quicksort((void **) &list, 0, 10, _compare);
 }
 
 void test_quicksort_linked_list() {
