@@ -255,7 +255,7 @@ ERROR_CODE open_handler_stream_http_client(struct io_connection_t *io_connection
 
     get_value_string_sort_map(type->value.value_sort_map, (unsigned char *) "info", (void **) &_type);
     encode_bencoding(_type, &_buffer, &_buffer_size);
-    sha1(_buffer, _buffer_size, info_hash);
+    sha1(_buffer, (unsigned int) _buffer_size, info_hash);
     print_type(type);
     free_type(type);
     FREE(_buffer);
@@ -311,7 +311,7 @@ ERROR_CODE open_handler_stream_http_client(struct io_connection_t *io_connection
     write_connection(
         io_connection->connection,
         (unsigned char *) buffer,
-        strlen(buffer),
+        (unsigned int) strlen(buffer),
         NULL,
         NULL
     );
