@@ -354,7 +354,7 @@ static __inline size_t format_delta(char *buffer, size_t size, unsigned long lon
     }
 
     value = delta % 60;
-    if(valid || value >= 0) {
+    if(valid) {
         if(value == 1) { format = "%d second "; }
         else { format = "%d seconds "; }
 
@@ -414,7 +414,7 @@ static __inline size_t format_bytes(char *buffer, size_t size, size_t bytes) {
     }
 
     value = bytes;
-    if(!valid && value >= 0) {
+    if(!valid) {
         if(value == 1) { format = "%.1f Byte"; }
         else if(value < 10) { format = "%.1f Bytes"; }
         else { format = "%d Bytes"; is_float = FALSE; }
