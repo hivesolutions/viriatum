@@ -201,8 +201,8 @@ ERROR_CODE data_handler_stream_http(struct io_connection_t *io_connection, unsig
         a partial processing and some data may remain unprocessed (in
         case there are multiple http requests) */
         processed_size = process_data_http_parser(
-			http_connection->http_parser, http_connection->http_settings, _buffer, buffer_size
-		);
+            http_connection->http_parser, http_connection->http_settings, _buffer, buffer_size
+        );
 
         /* in case the current state in the http parser is the
         start state, the message is considered to be completly
