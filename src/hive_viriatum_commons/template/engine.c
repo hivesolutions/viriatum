@@ -174,12 +174,12 @@ ERROR_CODE process_template_engine(struct template_engine_t *template_engine, st
         switch(state) {
             case TEMPLATE_ENGINE_NORMAL:
                 if(current == '$') {
-                    state = TEMPLATE_ENGINE_DOLAR;
+                    state = TEMPLATE_ENGINE_DOLLAR;
                 }
 
                 break;
 
-            case TEMPLATE_ENGINE_DOLAR:
+            case TEMPLATE_ENGINE_DOLLAR:
                 if(current == '{') {
                     /* marks the tag element and calls
                     the text end and tag begin callbacks */

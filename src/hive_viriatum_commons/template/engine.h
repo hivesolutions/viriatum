@@ -92,7 +92,7 @@ typedef enum template_engine_state_e {
      * a dollar sign and is trying to open a tage with an
      * open braces chracter.
      */
-    TEMPLATE_ENGINE_DOLAR,
+    TEMPLATE_ENGINE_DOLLAR,
 
     /**
      * State when the tag has been open and the parser
