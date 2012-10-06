@@ -32,13 +32,13 @@
                     </tr>
                     ${foreach item=entry from=entries}
                         <tr>
-                            ${if item=entry.type value=1 op=eq}
+                            ${if item=entry.type value=1 operator=eq}
                                 <td class="icon folder"></td>
                             ${/if}
-                            ${if item=entry.type value=2 op=eq}
+                            ${if item=entry.type value=2 operator=eq}
                                 <td class="icon text"></td>
                             ${/if}
-                            ${if item=entry.type value=3 op=eq}
+                            ${if item=entry.type value=3 operator=eq}
                                 <td class="icon link"></td>
                             ${/if}
                             <td class="left"><a href="${out value=entry.name /}">${out value=entry.name /}</a></td>

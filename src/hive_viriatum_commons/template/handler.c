@@ -644,7 +644,7 @@ void _traverse_if_buffer(struct template_handler_t *template_handler, struct tem
     /* retrieves both the from and the item parameters from the parameters map */
     get_value_string_hash_map(node->parameters_map, (unsigned char *) "item", (void **) &item_parameter);
     get_value_string_hash_map(node->parameters_map, (unsigned char *) "value", (void **) &value_parameter);
-    get_value_string_hash_map(node->parameters_map, (unsigned char *) "op", (void **) &operator_parameter);
+    get_value_string_hash_map(node->parameters_map, (unsigned char *) "operator", (void **) &operator_parameter);
 
     /* tries to retrieve the reference value from the map of names in the
     template handler (dereferencing) */
