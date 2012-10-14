@@ -110,8 +110,6 @@ ERROR_CODE data_handler_stream_http_client(struct io_connection_t *io_connection
     case there are multiple http requests) */
     processed_size = process_data_http_parser(http_client_connection->http_parser, http_client_connection->http_settings, buffer, buffer_size);
 
-    printf("%d", processed_size);
-
     /* raises no error */
     RAISE_NO_ERROR;
 }
