@@ -149,7 +149,7 @@ ERROR_CODE acquire_http_connection(struct http_connection_t *http_connection) {
     message processing should be blocked until this
     value is released */
     http_connection->lock = TRUE;
-    
+
     /* raises no error */
     RAISE_NO_ERROR;
 }
@@ -158,14 +158,14 @@ ERROR_CODE release_http_connection(struct http_connection_t *http_connection) {
     /* retrieves the parent io connection from the http
     connection to be used for event triggering */
     struct io_connection_t *io_connection = http_connection->io_connection;
-    
+
     /* retieves the current locked state in order to make
     assumptions if pending should be processed again in this
     event loop, then unsests the lock flag */
     unsigned char locked = http_connection->lock;
     http_connection->lock = FALSE;
     if(locked) { CALL_V(http_connection->io_connection->on_data, io_connection, NULL, (size_t) 0); }
-    
+
     /* raises no error */
     RAISE_NO_ERROR;
 }
@@ -179,7 +179,7 @@ ERROR_CODE data_handler_stream_http(struct io_connection_t *io_connection, unsig
     /* allocates the reference to the pointer to current
     buffer position to be used in writing (initial position) */
     unsigned char *_buffer;
-    
+
     /* allocates the reference to the pointer to the position
     in the connection buffer to continue the parsing */
     unsigned char *_read;
@@ -210,14 +210,14 @@ ERROR_CODE data_handler_stream_http(struct io_connection_t *io_connection, unsig
             http_connection->buffer = REALLOC((void *) http_connection->buffer, http_connection->buffer_size);
         }
     }
-    
+
     /* retrieves the pointer reference to the current position in the
     buffer to be used for writing then copies the current buffer data
     into it and updates the buffer size */
     _buffer = http_connection->buffer + http_connection->buffer_offset;
     memcpy(_buffer, buffer, buffer_size);
     http_connection->buffer_offset += buffer_size;
-    
+
     /* iterates continuously, this allows the stream handler
     to split the stream into possible multiple messages, usefull
     for http pipelining (multiple sequenced requests) */
@@ -228,7 +228,7 @@ ERROR_CODE data_handler_stream_http(struct io_connection_t *io_connection, unsig
         processed part of the buffer from the buffer offset) */
         _read = http_connection->buffer + http_connection->read_offset;
         _read_size = http_connection->buffer_offset - http_connection->read_offset;
-        
+
         /* in case the http connection is currently locked
         breaks immediately to avoid multiple simultaneously
         processing of messages in the same connection */
@@ -243,22 +243,22 @@ ERROR_CODE data_handler_stream_http(struct io_connection_t *io_connection, unsig
             http_handler->set(http_connection);
             http_connection->http_handler = http_handler;
         }
-        
+
         /* process the http data for the http parser, this should be
         a partial processing and some data may remain unprocessed (in
         case there are multiple http requests) */
         processed_size = process_data_http_parser(
-			http_connection->http_parser, http_connection->http_settings, _read, _read_size
-		);
-        
+            http_connection->http_parser, http_connection->http_settings, _read, _read_size
+        );
+
         /* increments the (buffer) read offset with the processed
         size so that the next process starts at the read offset */
         http_connection->read_offset += processed_size;
-        
+
         /* in case the current state in the http parser is the
         start state, the message is considered to be completly
         parsed (new message may come after) */
-        if(http_connection->http_parser->state == STATE_START_RES) {            
+        if(http_connection->http_parser->state == STATE_START_RES) {
             /* resets the http parser state */
             http_connection->http_parser->type = 2;
             http_connection->http_parser->flags = 6;
@@ -272,12 +272,12 @@ ERROR_CODE data_handler_stream_http(struct io_connection_t *io_connection, unsig
             http_connection->http_parser->method = 0;
             http_connection->http_parser->upgrade = 0;
             http_connection->http_parser->_content_length = 0;
-            
+
             /* resets the internal parser state values */
             http_connection->http_parser->header_field_mark = 0;
             http_connection->http_parser->header_value_mark = 0;
             http_connection->http_parser->url_mark = 0;
-        
+
             /* in case the current http connection read offset has reached
             the buffer size it's time to reset the buffer (no more data to
             be processed), the buffer size should come from the content length
@@ -293,11 +293,11 @@ ERROR_CODE data_handler_stream_http(struct io_connection_t *io_connection, unsig
                 http_connection->read_offset = 0;
             }
         }
-        
+
         /* in case all the data has been read from the connection
         buffer must break the loop */
         if(http_connection->read_offset == http_connection->buffer_size) { break; }
-        
+
         /* in case all the remaining data has been processed
         no need to process more http data (breaks the loop) */
         if(processed_size == 0 || (size_t) processed_size == _read_size) { break; }

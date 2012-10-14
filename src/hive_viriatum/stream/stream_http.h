@@ -216,14 +216,14 @@ typedef struct http_connection_t {
      * data (the rest would be empty buffer).
      */
     size_t buffer_offset;
-    
+
     /**
      * The current offset to the already read (processed) data from
      * the current buffer. This determined the next bytes for
      * processing in the buffer.
      */
     size_t read_offset;
-    
+
     /**
      * The lock flag that controls the data stream flood, this
      * way only one message is processed at a given time, even
@@ -271,14 +271,14 @@ typedef struct http_connection_t {
      * format.
      */
     http_connection_log log_request;
-    
+
     /**
      * Function to be used to acquire the lock on the processing
      * of the data in the connection, this lock avoid that two
      * different requests write to the same connection in parallel.
      */
     http_connection_update acquire;
-    
+
     /**
      * Function to be used to release the lock on the processing
      * of the data in the connection.

@@ -162,7 +162,7 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
     for(pointer = data, pointer_end = data + data_size; pointer != pointer_end; pointer++) {
         /* retrieves the current iteration byte */
         byte = *pointer;
-        
+
         /* in case the current state is start of response
         the parsing of the requrest is complete, must break
         parsing loop */
@@ -1722,7 +1722,7 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
     http_parser->header_field_mark = header_field_mark;
     http_parser->header_value_mark = header_value_mark;
     http_parser->url_mark = url_mark;
-    
+
     /* calculates the final processed size by subtracting
     the data pointer (original position) ot the (current)
     pointer (current position) */
