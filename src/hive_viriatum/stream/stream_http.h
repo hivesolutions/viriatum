@@ -211,9 +211,25 @@ typedef struct http_connection_t {
 
     /**
      * The current offset of the buffer containing the http
-     * data in processing.
+     * data in processing. This value may be used to determine
+     * the final (valid part) of the current buffer that contains
+     * data (the rest would be empty buffer).
      */
     size_t buffer_offset;
+    
+    /**
+     * The current offset to the already read (processed) data from
+     * the current buffer. This determined the next bytes for
+     * processing in the buffer.
+     */
+    size_t read_offset;
+    
+    /**
+     * The lock flag that controls the data stream flood, this
+     * way only one message is processed at a given time, even
+     * using http pipeling.
+     */
+    unsigned char lock;
 
     /**
      * Function used to create and write header into a sent
@@ -255,12 +271,27 @@ typedef struct http_connection_t {
      * format.
      */
     http_connection_log log_request;
+    
+    /**
+     * Function to be used to acquire the lock on the processing
+     * of the data in the connection, this lock avoid that two
+     * different requests write to the same connection in parallel.
+     */
+    http_connection_update acquire;
+    
+    /**
+     * Function to be used to release the lock on the processing
+     * of the data in the connection.
+     */
+    http_connection_update release;
 } http_connection;
 
 ERROR_CODE create_http_handler(struct http_handler_t **http_handler_pointer, unsigned char *name);
 ERROR_CODE delete_http_handler(struct http_handler_t *http_handler);
 ERROR_CODE create_http_connection(struct http_connection_t **http_connection_pointer, struct io_connection_t *io_connection);
 ERROR_CODE delete_http_connection(struct http_connection_t *http_connection);
+ERROR_CODE acquire_http_connection(struct http_connection_t *http_connection);
+ERROR_CODE release_http_connection(struct http_connection_t *http_connection);
 ERROR_CODE data_handler_stream_http(struct io_connection_t *io_connection, unsigned char *buffer, size_t buffer_size);
 ERROR_CODE open_handler_stream_http(struct io_connection_t *io_connection);
 ERROR_CODE close_handler_stream_http(struct io_connection_t *io_connection);

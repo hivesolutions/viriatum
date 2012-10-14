@@ -78,6 +78,8 @@ ERROR_CODE create_http_connection(struct http_connection_t **http_connection_poi
     http_connection->buffer = NULL;
     http_connection->buffer_size = 0;
     http_connection->buffer_offset = 0;
+    http_connection->read_offset = 0;
+    http_connection->lock = FALSE;
 
     /* sets the proper functions in the http connection
     they may be used by the handlers to interact with
@@ -88,6 +90,8 @@ ERROR_CODE create_http_connection(struct http_connection_t **http_connection_poi
     http_connection->write_message = write_http_message;
     http_connection->write_error = write_http_error;
     http_connection->log_request = log_http_request;
+    http_connection->acquire = acquire_http_connection;
+    http_connection->release = release_http_connection;
 
     /* creates the http settings */
     create_http_settings(&http_connection->http_settings);
@@ -140,6 +144,32 @@ ERROR_CODE delete_http_connection(struct http_connection_t *http_connection) {
     RAISE_NO_ERROR;
 }
 
+ERROR_CODE acquire_http_connection(struct http_connection_t *http_connection) {
+    /* sets the http connection lock flag, any further
+     message processing should be blocked until this
+     value is released */
+    http_connection->lock = TRUE;
+    
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE release_http_connection(struct http_connection_t *http_connection) {
+    /* retrieves the parent io connection from the http
+     connection to be used for event triggering */
+    struct io_connection_t *io_connection = http_connection->io_connection;
+    
+    /* retieves the current locked state in order to make
+     assumptions if pending should be processed again in this
+     event loop, then unsests the lock flag */
+    unsigned char locked = http_connection->lock;
+    http_connection->lock = FALSE;
+    if(locked) { CALL_V(http_connection->io_connection->on_data, io_connection, NULL, (size_t) 0); }
+    
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
 ERROR_CODE data_handler_stream_http(struct io_connection_t *io_connection, unsigned char *buffer, size_t buffer_size) {
     /* allocates space for the temporary variable to
     hold the ammount of bytes processed in a given http
@@ -147,8 +177,13 @@ ERROR_CODE data_handler_stream_http(struct io_connection_t *io_connection, unsig
     int processed_size;
 
     /* allocates the reference to the pointer to current
-    buffer position to be parsed (initial position) */
+    buffer position to be used in writing (initial position) */
     unsigned char *_buffer;
+    
+    /* allocates the reference to the pointer to the position
+    in the connection buffer to continue the parsing */
+    unsigned char *_read;
+    size_t _read_size;
 
     /* allocates space for the http handler reference
     to be used in this connection */
@@ -157,35 +192,47 @@ ERROR_CODE data_handler_stream_http(struct io_connection_t *io_connection, unsig
     /* retrieves the http connection */
     struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
 
+    /* in case no http connection buffer is currently set, time to start
+    a new one from the provided buffer (fast access) */
+    if(http_connection->buffer == NULL) {
+        http_connection->buffer_size = buffer_size;
+        http_connection->buffer = (unsigned char *) MALLOC(http_connection->buffer_size);
+    }
+    /* in case the http connection buffer is currently set but the available
+    space is not enough must reallocate the buffer (increment size) */
+    else if(http_connection->buffer_offset + buffer_size > http_connection->buffer_size) {
+        if(http_connection->http_parser->_content_length > 0) {
+            http_connection->buffer_size += http_connection->http_parser->_content_length;
+            http_connection->buffer = REALLOC((void *) http_connection->buffer, http_connection->buffer_size);
+        }
+        else {
+            http_connection->buffer_size += buffer_size;
+            http_connection->buffer = REALLOC((void *) http_connection->buffer, http_connection->buffer_size);
+        }
+    }
+    
+    /* retrieves the pointer reference to the current position in the
+    buffer to be used for writing then copies the current buffer data
+    into it and updates the buffer size */
+    _buffer = http_connection->buffer + http_connection->buffer_offset;
+    memcpy(_buffer, buffer, buffer_size);
+    http_connection->buffer_offset += buffer_size;
+    
     /* iterates continuously, this allows the stream handler
     to split the stream into possible multiple messages, usefull
     for http pipelining (multiple sequenced requests) */
     while(1) {
-        /* in case no http connection buffer is currently set, time to start
-        a new one from the provided buffer (fast access) */
-        if(http_connection->buffer == NULL) {
-            http_connection->buffer_size = buffer_size;
-            http_connection->buffer = (unsigned char *) MALLOC(http_connection->buffer_size);
-        }
-        /* in case the http connection buffer is currently set but the available
-        space is not enough must reallocate the buffer (increment size) */
-        else if(http_connection->buffer_offset + buffer_size > http_connection->buffer_size) {
-            if(http_connection->http_parser->_content_length > 0) {
-                http_connection->buffer_size += http_connection->http_parser->_content_length;
-                http_connection->buffer = REALLOC((void *) http_connection->buffer, http_connection->buffer_size);
-            }
-            else {
-                http_connection->buffer_size += buffer_size;
-                http_connection->buffer = REALLOC((void *) http_connection->buffer, http_connection->buffer_size);
-            }
-        }
-
-        /* retrieves the pointer reference to the current position in the
-        buffer to be used for writing then copies the current buffer data
-        into it and updates the buffer size */
-        _buffer = http_connection->buffer + http_connection->buffer_offset;
-        memcpy(_buffer, buffer, buffer_size);
-        http_connection->buffer_offset += buffer_size;
+        /* retrieves the pointer to the read position as the connection buffer
+        added to the read offset and then retrieves the current size for reading
+        by removing the read offset from the buffer offset (must deduct the already
+        processed part of the buffer from the buffer offset) */
+        _read = http_connection->buffer + http_connection->read_offset;
+        _read_size = http_connection->buffer_offset - http_connection->read_offset;
+        
+        /* in case the http connection is currently locked
+        breaks immediately to avoid multiple simultaneously
+        processing of messages in the same connection */
+        if(http_connection->lock) { break; }
 
         /* in case there's currently no http handler associated with the
         http connection (need to create one) */
@@ -196,26 +243,22 @@ ERROR_CODE data_handler_stream_http(struct io_connection_t *io_connection, unsig
             http_handler->set(http_connection);
             http_connection->http_handler = http_handler;
         }
-
+        
         /* process the http data for the http parser, this should be
         a partial processing and some data may remain unprocessed (in
         case there are multiple http requests) */
         processed_size = process_data_http_parser(
-			http_connection->http_parser, http_connection->http_settings, _buffer, buffer_size
+			http_connection->http_parser, http_connection->http_settings, _read, _read_size
 		);
-
+        
+        /* increments the (buffer) read offset with the processed
+        size so that the next process starts at the read offset */
+        http_connection->read_offset += processed_size;
+        
         /* in case the current state in the http parser is the
         start state, the message is considered to be completly
         parsed (new message may come after) */
-        if(http_connection->http_parser->state == STATE_START_RES) {
-            /* releases the current http connection buffer and then
-            unsets the buffer from the connection and update the size
-            of it to the initial empty value (buffer reset) */
-            FREE(http_connection->buffer);
-            http_connection->buffer = NULL;
-            http_connection->buffer_size = 0;
-            http_connection->buffer_offset = 0;
-
+        if(http_connection->http_parser->state == STATE_START_RES) {            
             /* resets the http parser state */
             http_connection->http_parser->type = 2;
             http_connection->http_parser->flags = 6;
@@ -229,16 +272,35 @@ ERROR_CODE data_handler_stream_http(struct io_connection_t *io_connection, unsig
             http_connection->http_parser->method = 0;
             http_connection->http_parser->upgrade = 0;
             http_connection->http_parser->_content_length = 0;
+            
+            /* resets the internal parser state values */
+            http_connection->http_parser->header_field_mark = 0;
+            http_connection->http_parser->header_value_mark = 0;
+            http_connection->http_parser->url_mark = 0;
+        
+            /* in case the current http connection read offset has reached
+            the buffer size it's time to reset the buffer (no more data to
+            be processed), the buffer size should come from the content length
+            value of the actual message */
+            if(http_connection->read_offset == http_connection->buffer_size) {
+                /* releases the current http connection buffer and then
+                unsets the buffer from the connection and updates the size
+                of it to the initial empty value (buffer reset) */
+                FREE(http_connection->buffer);
+                http_connection->buffer = NULL;
+                http_connection->buffer_size = 0;
+                http_connection->buffer_offset = 0;
+                http_connection->read_offset = 0;
+            }
         }
-
+        
+        /* in case all the data has been read from the connection
+        buffer must break the loop */
+        if(http_connection->read_offset == http_connection->buffer_size) { break; }
+        
         /* in case all the remaining data has been processed
         no need to process more http data (breaks the loop) */
-        if(processed_size > 0 && (size_t) processed_size == buffer_size) { break; }
-
-        /* increments the buffer pointer and updates the buffer
-        size value to the new size */
-        buffer += processed_size;
-        buffer_size -= processed_size;
+        if(processed_size == 0 || (size_t) processed_size == _read_size) { break; }
     }
 
     /* raises no error */
