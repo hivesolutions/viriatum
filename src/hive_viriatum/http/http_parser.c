@@ -121,8 +121,8 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
     const char *matcher;
     size_t to_read;
     size_t processed_size;
-    const unsigned char *pointer_end;
-    const unsigned char *pointer = data;
+    unsigned char *pointer_end;
+    unsigned char *pointer = data;
     size_t read_count = http_parser->read_count;
     size_t index = http_parser->index;
     unsigned char state = http_parser->state;
@@ -1513,7 +1513,7 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                             default:
                                 http_parser->state = state;
                                 /*SET_ERRNO(HPE_CB_headers_complete);*/
-                                return pointer - data; /* Error */
+                                return (int) (pointer - data); /* Error */
                         }
                     }
 
@@ -1521,7 +1521,7 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                     if(http_parser->upgrade) {
                         HTTP_CALLBACK(message_complete);
 
-                        return (pointer - data) + 1;
+                        return (int) (pointer - data) + 1;
                     }
 
                     if(http_parser->flags & FLAG_SKIPBODY) {
