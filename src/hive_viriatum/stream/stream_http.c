@@ -146,8 +146,8 @@ ERROR_CODE delete_http_connection(struct http_connection_t *http_connection) {
 
 ERROR_CODE acquire_http_connection(struct http_connection_t *http_connection) {
     /* sets the http connection lock flag, any further
-     message processing should be blocked until this
-     value is released */
+    message processing should be blocked until this
+    value is released */
     http_connection->lock = TRUE;
     
     /* raises no error */
@@ -156,12 +156,12 @@ ERROR_CODE acquire_http_connection(struct http_connection_t *http_connection) {
 
 ERROR_CODE release_http_connection(struct http_connection_t *http_connection) {
     /* retrieves the parent io connection from the http
-     connection to be used for event triggering */
+    connection to be used for event triggering */
     struct io_connection_t *io_connection = http_connection->io_connection;
     
     /* retieves the current locked state in order to make
-     assumptions if pending should be processed again in this
-     event loop, then unsests the lock flag */
+    assumptions if pending should be processed again in this
+    event loop, then unsests the lock flag */
     unsigned char locked = http_connection->lock;
     http_connection->lock = FALSE;
     if(locked) { CALL_V(http_connection->io_connection->on_data, io_connection, NULL, (size_t) 0); }
