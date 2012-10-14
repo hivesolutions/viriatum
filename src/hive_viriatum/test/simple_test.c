@@ -105,7 +105,7 @@ void test_linked_list() {
 
     /* pops a value from the linked list */
     pop_value_linked_list(linked_list, (void **) &value, TRUE);
-    
+
     /* appends vome elements to the front of the linked list,
     then pops them out again */
     append_front_value_linked_list(linked_list, (void *) 4);
