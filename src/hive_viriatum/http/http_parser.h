@@ -438,6 +438,9 @@ typedef struct http_parser_t {
     unsigned char method;
     char upgrade;
     void *context;
+    unsigned char *header_field_mark;
+    unsigned char *header_value_mark;
+    unsigned char *url_mark;
 
     /**
      * Unstructed reference to a pointer, this may

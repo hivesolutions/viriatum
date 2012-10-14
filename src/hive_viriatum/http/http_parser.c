@@ -72,6 +72,9 @@ void create_http_parser(struct http_parser_t **http_parser_pointer, char request
     http_parser->context = NULL;
     http_parser->parameters = NULL;
     http_parser->_content_length = 0;
+    http_parser->header_field_mark = 0;
+    http_parser->header_value_mark = 0;
+    http_parser->url_mark = 0;
 
     /* sets the http parser in the http parser pointer */
     *http_parser_pointer = http_parser;
@@ -117,16 +120,16 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
     char unhex_value;
     const char *matcher;
     size_t to_read;
+    size_t processed_size;
     const unsigned char *pointer_end;
     const unsigned char *pointer = data;
     size_t read_count = http_parser->read_count;
     size_t index = http_parser->index;
     unsigned char state = http_parser->state;
-    unsigned char header_state = 0;
-
-    const unsigned char *header_field_mark = 0;
-    const unsigned char *header_value_mark = 0;
-    const unsigned char *url_mark = 0;
+    unsigned char header_state = http_parser->header_state;
+    unsigned char *header_field_mark = http_parser->header_field_mark;
+    unsigned char *header_value_mark = http_parser->header_value_mark;
+    unsigned char *url_mark = http_parser->url_mark;
 
     /* in case the received data size is empty */
     if(data_size == 0) {
@@ -159,6 +162,11 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
     for(pointer = data, pointer_end = data + data_size; pointer != pointer_end; pointer++) {
         /* retrieves the current iteration byte */
         byte = *pointer;
+        
+        /* in case the current state is start of response
+        the parsing of the requrest is complete, must break
+        parsing loop */
+        if(state == STATE_START_RES) { break; }
 
         /* switch over the current state */
         switch(state) {
@@ -1707,15 +1715,21 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
         state = NEW_MESSAGE();
     }
 
-    HTTP_CALLBACK_DATA(header_field);
-    HTTP_CALLBACK_DATA(header_value);
-    HTTP_CALLBACK_DATA(url);
-
     http_parser->state = state;
     http_parser->header_state = header_state;
     http_parser->index = index;
     http_parser->read_count = read_count;
+    http_parser->header_field_mark = header_field_mark;
+    http_parser->header_value_mark = header_value_mark;
+    http_parser->url_mark = url_mark;
+    
+    /* calculates the final processed size by subtracting
+    the data pointer (original position) ot the (current)
+    pointer (current position) */
+    processed_size = pointer - data;
 
-    /* returns the data size (processed data size) */
-    return data_size;
+    /* returns the data size (processed data size) to the
+    caller function to indicate the ammount of bytes
+    processed by the parser */
+    return (int) processed_size;
 }
