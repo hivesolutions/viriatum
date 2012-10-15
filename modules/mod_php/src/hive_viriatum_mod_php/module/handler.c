@@ -154,6 +154,14 @@ ERROR_CODE unset_handler_php(struct http_connection_t *http_connection) {
 }
 
 ERROR_CODE message_begin_callback_handler_module(struct http_parser_t *http_parser) {
+    /* retrieves the connection from the http parser parameters */
+    struct connection_t *connection = (struct connection_t *) http_parser->parameters;
+
+    /* retrieves the underlying connection references in order to be
+    able to operate over them, for unregister */
+    struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
+    struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
+
     /* retrieves the handler php context from the http parser
     in order tu use it to update the content type to the default
     empty value (avoids possible problems in php interpreter)*/
@@ -164,6 +172,10 @@ ERROR_CODE message_begin_callback_handler_module(struct http_parser_t *http_pars
     of the lengths of the string */
     string_populate(&handler_php_context->_content_type_string, handler_php_context->content_type, 0, 0);
     string_populate(&handler_php_context->_cookie_string, handler_php_context->cookie, 0, 0);
+
+	/* acquires the lock on the http connection, this will avoids further
+    messages to be processed, no parallel request handling problems */
+    http_connection->acquire(http_connection);
 
     /* raise no error */
     RAISE_NO_ERROR;
@@ -700,8 +712,12 @@ ERROR_CODE _send_response_callback_handler_php(struct connection_t *connection, 
     }
 
     /* in case the connection is not meant to be kept alive must be closed
-    in the normal manner (using the close connection function) */
+    in the normal manner (using the close connection function) otherwise
+	releases the lock on the http connection, this will allow further
+    messages to be processed, an update event should raised following this
+    lock releasing call */
     if(!keep_alive) { connection->close_connection(connection); }
+	else { http_connection->release(http_connection); }
 
     /* raise no error */
     RAISE_NO_ERROR;
