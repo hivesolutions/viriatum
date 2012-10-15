@@ -468,7 +468,9 @@ ERROR_CODE list_directory_file(char *file_path, struct linked_list_t *entries) {
     /* in case the retieved handler is not valid
     (error) */
     if(handler_find == INVALID_HANDLE_VALUE) {
-        /* raises an error */
+        /* releases the currently allocated memory and
+        raises an error indicating the listing problem */
+        FREE(list_path);
         RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem listing directory");
     }
 
