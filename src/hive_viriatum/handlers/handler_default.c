@@ -308,7 +308,7 @@ ERROR_CODE _send_response_callback_handler_default(struct connection_t *connecti
         http_connection->http_handler = NULL;
     }
 
-	/* in case the connection is not meant to be kept alive */
+    /* in case the connection is not meant to be kept alive */
     if(!(flags & FLAG_CONNECTION_KEEP_ALIVE)) {
         /* closes the connection */
         connection->close_connection(connection);

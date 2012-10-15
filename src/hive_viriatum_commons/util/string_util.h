@@ -352,8 +352,8 @@ static __inline size_t format_delta(char *buffer, size_t size, unsigned long lon
         buffer[count - 1] = '\0';
         return count;
     }
-	
-	valid = TRUE;
+
+    valid = TRUE;
     value = delta % 60;
     if(valid) {
         if(value == 1) { format = "%d second "; }

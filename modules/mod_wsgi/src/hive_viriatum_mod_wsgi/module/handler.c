@@ -951,11 +951,11 @@ ERROR_CODE _send_response_callback_handler_wsgi(struct connection_t *connection,
 
     /* in case the connection is not meant to be kept alive must be closed
     in the normal manner (using the close connection function) otherwise
-	releases the lock on the http connection, this will allow further
+    releases the lock on the http connection, this will allow further
     messages to be processed, an update event should raised following this
     lock releasing call */
     if(!keep_alive) { connection->close_connection(connection); }
-	else { http_connection->release(http_connection); }
+    else { http_connection->release(http_connection); }
 
     /* raise no error */
     RAISE_NO_ERROR;
