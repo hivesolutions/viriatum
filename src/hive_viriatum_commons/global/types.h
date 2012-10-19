@@ -27,12 +27,6 @@
 
 #pragma once
 
-#ifdef _MSC_VER
-#ifndef NULL
-#define NULL 0
-#endif
-#endif
-
 #ifndef UNSET
 #define UNSET -1
 #endif
