@@ -1,6 +1,11 @@
 # [Viriatum Web Server](http://viriatum.com) dump area
 
+This is the area where there are no boundaries between useful and stupidity.
+Just throw random content to this section.
+
 ## Configuration Locations
+
+Examples of location sections that can be used to confgiure wsgi for example for colony or automium.
 
     [location:colony]
     path = /colony
