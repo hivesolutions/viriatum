@@ -3,7 +3,7 @@
 This is the area where there are no boundaries between useful and stupidity.
 Just throw random content to this section.
 
-## Configuration Locations
+## Config Locations
 
 Examples of location sections that can be used to confgiure wsgi for example for colony or automium.
 
