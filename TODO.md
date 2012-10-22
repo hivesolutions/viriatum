@@ -39,5 +39,5 @@
 
 ## Target performance
 
-* ab -n 10000 -c 100 -k http://servidor2.hive:9090/error should be able to run at 45K-60K requests per second (using file handler with no template for erro)
-* ab -n 10000 -c 100 -k  http://srio.hive:9090/eclipse should be able to run at 15K-24K requests per second raw power (not confirmed)
+* `ab -n 10000 -c 100 -k http://servidor2.hive:9090/error` should be able to run at 45K-60K requests per second (*using file handler with no template for error*)
+* `ab -n 10000 -c 100 -k  http://srio.hive:9090/eclipse` should be able to run at 15K-24K requests per second raw power (not confirmed)
