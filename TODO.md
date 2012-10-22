@@ -41,3 +41,4 @@
 
 * `ab -n 10000 -c 100 -k http://servidor2.hive:9090/error` should be able to run at 45K-60K requests per second (using file handler without template for error)
 * `ab -n 10000 -c 100 -k  http://srio.hive:9090/eclipse` should be able to run at 15K-24K requests per second raw power (not confirmed)
+* `weighttp -n 10000 -t 5 -c 8 http://127.0.0.1:9090/resources/images/illustration/main-illustration.png` should be able to handle between 320MB and 500MB per second or 13K-20K request (under node2.startomni.com)
