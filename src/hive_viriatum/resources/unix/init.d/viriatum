@@ -42,7 +42,7 @@ case "$1" in
         log_daemon_msg "Restarting $DESC" viriatum
         start-stop-daemon --stop --quiet --pidfile \
             /var/run/$NAME.pid --exec $DAEMON || true
-        sleep 1
+        sleep 3
         start-stop-daemon --start --quiet --pidfile \
             /var/run/$NAME.pid --exec $DAEMON -- --daemon || true
         log_end_msg 0
