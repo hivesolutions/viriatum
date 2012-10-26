@@ -26,7 +26,7 @@ set -e
 case "$1" in
     start)
         log_daemon_msg "Starting $DESC" viriatum
-        start-stop-daemon --start --quiet --pidfile /var/run/$NAME.pid \
+        start-stop-daemon --start --quiet --retry 60 --pidfile /var/run/$NAME.pid \
             --exec $DAEMON -- --daemon || true
         log_end_msg 0
         ;;
@@ -40,7 +40,7 @@ case "$1" in
 
     restart|force-reload)
         log_daemon_msg "Restarting $DESC" viriatum
-        start-stop-daemon --stop --quiet --pidfile \
+        start-stop-daemon --stop --quiet --retry 60 --pidfile \
             /var/run/$NAME.pid --exec $DAEMON || true
         sleep 3
         start-stop-daemon --start --quiet --pidfile \
