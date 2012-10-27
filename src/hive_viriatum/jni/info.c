@@ -44,7 +44,7 @@ jstring Java_pt_hive_viriatum_http_Info_getDescription(JNIEnv *env, jclass cls) 
 }
 
 jstring Java_pt_hive_viriatum_http_Info_hello(JNIEnv *env, jobject thiz) {
-    return (*env)->NewStringUTF(env, "hello wolrd, from viriatum http");
+    return (*env)->NewStringUTF(env, "hello world, from viriatum http");
 }
 
 #endif
