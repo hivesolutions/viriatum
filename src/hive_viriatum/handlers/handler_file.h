@@ -44,6 +44,39 @@ struct http_connection_t;
 #define FILE_BUFFER_SIZE_HANDLER_FILE 4096
 
 /**
+ * Structure describing the internal parameters
+ * for a location in the file context.
+ */
+typedef struct file_location_t {
+    /**
+     * The path to be used as the base for the
+     * "computation" of the files to be retrieved.
+     */
+    char *base_path;
+} file_location_t;
+
+/**
+ * The structure that holds the internal
+ * structure to support the context
+ * of the file (handler).
+ */
+typedef struct file_handler_t {
+    /**
+     * The various locations loaded from the configuration
+     * they refer the cofiruation attributes associated
+     * with the file structures.
+     */
+    struct file_location_t *locations;
+
+    /**
+     * The number of locations currently loaded in the handler
+     * this value is used for iteration arround the locations
+     * buffer.
+     */
+    size_t locations_count;
+} file_handler;
+
+/**
  * The context structure to be used allong
  * the interpretation of the request for
  * the file handler.
@@ -59,6 +92,14 @@ typedef struct handler_file_context_t {
      * the current file request.
      */
     unsigned char file_path[VIRIATUM_MAX_PATH_SIZE];
+
+    /**
+     * The base path of the directory to be used for
+     * the contruction of the full path for the file
+     * this value may be unset and in such case the
+     * the default value is used instead.
+     */
+    unsigned char *base_path;
 
     /**
      * The reference to the file stream to be
@@ -86,13 +127,34 @@ typedef struct handler_file_context_t {
      */
     unsigned int flushed;
 
+    /**
+     * The flag that controls if the cache control value
+     * has already been retrieved (and parsed).
+     */
     unsigned char cache_control_status;
+
+    /**
+     * The value of the cache control header processed for
+     * the file retrieval.
+     */
     unsigned char cache_control[128];
 
+    /**
+     * The flag that controls if the etag (control) value
+     * has already been retrieved (and parsed).
+     */
     unsigned char etag_status;
+
+    /**
+     * The value of the etag header processed for the file
+     * retrieval. This value is going to be used to control
+     * if a new file must be sent to the client.
+     */
     unsigned char etag[11];
 } handler_file_context;
 
+ERROR_CODE create_file_handler(struct file_handler_t **file_handler_pointer, struct http_handler_t *http_handler);
+ERROR_CODE delete_file_handler(struct file_handler_t *file_handler);
 ERROR_CODE create_handler_file_context(struct handler_file_context_t **handler_file_context_pointer);
 ERROR_CODE delete_handler_file_context(struct handler_file_context_t *handler_file_context);
 ERROR_CODE register_handler_file(struct service_t *service);

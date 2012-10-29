@@ -29,6 +29,39 @@
 
 #include "handler_file.h"
 
+ERROR_CODE create_file_handler(struct file_handler_t **file_handler_pointer, struct http_handler_t *http_handler) {
+    /* retrieves the file handler size */
+    size_t file_handler_size = sizeof(struct file_handler_t);
+
+    /* allocates space for the file handler */
+    struct file_handler_t *file_handler = (struct file_handler_t *) MALLOC(file_handler_size);
+
+    /* sets the file handler attributes (default) values */
+    file_handler->locations = NULL;
+    file_handler->locations_count = 0;
+
+    /* sets the file handler in the upper http handler substrate */
+    http_handler->lower = (void *) file_handler;
+
+    /* sets the file handler in the file handler pointer */
+    *file_handler_pointer = file_handler;
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE delete_file_handler(struct file_handler_t *file_handler) {
+    /* in case the locations buffer is set it must be released
+    to avoid any memory leak (not going to be used) */
+    if(file_handler->locations != NULL) { FREE(file_handler->locations); }
+
+    /* releases the file handler */
+    FREE(file_handler);
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
 ERROR_CODE create_handler_file_context(struct handler_file_context_t **handler_file_context_pointer) {
     /* retrieves the handler file context size */
     size_t handler_file_context_size = sizeof(struct handler_file_context_t);
@@ -37,6 +70,7 @@ ERROR_CODE create_handler_file_context(struct handler_file_context_t **handler_f
     struct handler_file_context_t *handler_file_context = (struct handler_file_context_t *) MALLOC(handler_file_context_size);
 
     /* sets the handler file default values */
+    handler_file_context->base_path = NULL;
     handler_file_context->file = NULL;
     handler_file_context->flags = 0;
     handler_file_context->template_handler = NULL;
@@ -73,17 +107,67 @@ ERROR_CODE delete_handler_file_context(struct handler_file_context_t *handler_fi
 }
 
 ERROR_CODE register_handler_file(struct service_t *service) {
+    /* allocates space for the temporary value object and for
+    the index counter to be used in the iteration of configurations */
+    void *value;
+    size_t index;
+
+    /* allocates space for both the location and the configuration
+    reference stuctures */
+    struct location_t *location;
+    struct sort_map_t *configuration;
+
+    /* allocates space for the mod file location structure
+    reference to be used to resolve the request */
+    struct file_location_t *_location;
+
     /* allocates the http handler */
     struct http_handler_t *http_handler;
 
-    /* creates the http handler */
+    /* allocates space for the file handler */
+    struct file_handler_t *file_handler;
+
+    /* creates the http handler and then uses it to create
+    the file handler (lower substrate) */
     service->create_http_handler(service, &http_handler, (unsigned char *) "file");
+    create_file_handler(&file_handler, http_handler);
 
     /* sets the http handler attributes */
     http_handler->resolve_index = 1;
     http_handler->set = set_handler_file;
     http_handler->unset = unset_handler_file;
     http_handler->reset = reset_handler_file;
+
+    /* allocates space for the various location structures
+    that will be used to resolve the file request */
+    file_handler->locations = (struct file_location_t *)
+        MALLOC(service->locations.count * sizeof(struct file_location_t));
+    memset(file_handler->locations, 0,
+        service->locations.count * sizeof(struct file_location_t));
+
+    /* updates the locations count variable in the file handler so
+    that it's possible to iterate over the locations */
+    file_handler->locations_count = service->locations.count;
+
+    /* iterates over all the locations in the service to create the
+    proper configuration structures to the module */
+    for(index = 0; index < service->locations.count; index++) {
+        /* retrieves the current (service) location and then uses it
+        to retrieve the configuration sort map */
+        location = &service->locations.values[index];
+        configuration = location->configuration;
+
+        /* retrieves the current mod file configuration reference from
+        the location buffer, this is going ot be populated and sets the
+        default values in it */
+        _location = &file_handler->locations[index];
+        _location->base_path = NULL;
+
+        /* tries ro retrieve the script path from the file configuration and in
+        case it exists sets it in the location (attribute reference change) */
+        get_value_string_sort_map(configuration, (unsigned char *) "base_path", &value);
+        if(value != NULL) { _location->base_path = (char *) value; }
+    }
 
     /* adds the http handler to the service */
     service->add_http_handler(service, http_handler);
@@ -96,9 +180,19 @@ ERROR_CODE unregister_handler_file(struct service_t *service) {
     /* allocates the http handler */
     struct http_handler_t *http_handler;
 
-    /* retrieves the http handler from the service, then
-    remove it from the service after that delete the handler */
+    /* allocates space for the file handler */
+    struct file_handler_t *file_handler;
+
+    /* retrieves the http handler from the service, then retrieves
+    the lower substrate as the file handler */
     service->get_http_handler(service, &http_handler, (unsigned char *) "file");
+    file_handler = (struct file_handler_t *) http_handler->lower;
+
+    /* deletes the file handler reference */
+    delete_file_handler(file_handler);
+
+    /* remove the http handler from the service after
+    that deletes the handler reference */
     service->remove_http_handler(service, http_handler);
     service->delete_http_handler(service, http_handler);
 
@@ -585,8 +679,10 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
 }
 
 ERROR_CODE path_callback_handler_file(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
-    /* retrieves the handler file context from the http parser */
+    /* retrieves the handler file context from the http parser
+    and uses it to retrieve the reference to the base path in context */
     struct handler_file_context_t *handler_file_context = (struct handler_file_context_t *) http_parser->context;
+    unsigned char *base_path = handler_file_context->base_path;
 
     /* copies the memory from the data to the url and then
     puts the end of string in the url, note that only the path
@@ -597,22 +693,79 @@ ERROR_CODE path_callback_handler_file(struct http_parser_t *http_parser, const u
     /* prints a debug message */
     V_INFO_F("%s %s\n", get_http_method_string(http_parser->method), handler_file_context->url);
 
-    /* creates the file path using the base viriatum path
-    this should be the complete absolute path */
-    SPRINTF(
-        (char *) handler_file_context->file_path,
-        VIRIATUM_MAX_PATH_SIZE,
-        "%s%s%s",
-        VIRIATUM_CONTENTS_PATH,
-        VIRIATUM_BASE_PATH,
-        handler_file_context->url
-    );
+    /* in case a base path is not defined the contant values
+    for the contents and base path must be used */
+    if(base_path == NULL) {
+        /* creates the file path using the base viriatum path
+        this should be the complete absolute path */
+        SPRINTF(
+            (char *) handler_file_context->file_path,
+            VIRIATUM_MAX_PATH_SIZE,
+            "%s%s%s",
+            VIRIATUM_CONTENTS_PATH,
+            VIRIATUM_BASE_PATH,
+            handler_file_context->url
+        );
+    }
+    /* otherwise the currently set base path is used instead for
+    the resolution of the file path */
+    else {
+        /* creates the file path using the base viriatum path
+        this should be the complete absolute path */
+        SPRINTF(
+            (char *) handler_file_context->file_path,
+            VIRIATUM_MAX_PATH_SIZE,
+            "%s%s",
+            base_path,
+            handler_file_context->url
+        );
+    }
 
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
 ERROR_CODE location_callback_handler_file(struct http_parser_t *http_parser, size_t index, size_t offset) {
+    /* allocates space for the partial url, resulting from the
+    remaining part from the matching of the location */
+    unsigned char *partial_url;
+
+    /* retrieves the handler file context from the http parser */
+    struct handler_file_context_t *handler_file_context =
+        (struct handler_file_context_t *) http_parser->context;
+
+    /* retrieves the connection from the parser and then uses it to  the
+    the correct file handler reference from the http connection */
+    struct connection_t *connection = (struct connection_t *) http_parser->parameters;
+    struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
+    struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
+    struct file_handler_t *file_handler =
+        (struct file_handler_t *) http_connection->http_handler->lower;
+
+    /* retrieves the current location from the location buffer and checks if the
+    file path value is correctly set */
+    struct file_location_t *location = &file_handler->locations[index];
+    if(location->base_path == NULL) { RAISE_NO_ERROR; }
+
+    /* updates the base path reference in the current context, this
+    should reflect the one present in the location */
+    handler_file_context->base_path = location->base_path;
+
+    /* retrieves the partial url match by "removing" the initial part
+    of the url in context */
+    partial_url = &handler_file_context->url[offset];
+
+    /* creates the file path using the base viriatum path
+    this should be the complete absolute path, note that
+    only the partial url is used (offset from location) */
+    SPRINTF(
+        (char *) handler_file_context->file_path,
+        VIRIATUM_MAX_PATH_SIZE,
+        "%s%s",
+        location->base_path,
+        partial_url
+    );
+
     /* raise no error */
     RAISE_NO_ERROR;
 }
