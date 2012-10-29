@@ -228,11 +228,9 @@ void delete_configuration(struct sort_map_t *configuration, int is_top) {
         /* retrieves the next value from the configuration iterator */
         get_next_iterator(configuration_iterator, (void **) &element);
 
-        /* in case the current module is null (end of iterator) */
-        if(element == NULL) {
-            /* breaks the loop */
-            break;
-        }
+        /* in case the current module is null (end of iterator)
+		must break the loop immediately */
+        if(element == NULL) { break; }
 
         /* retrievs the sort map value for the key pointer */
         get_value_sort_map(configuration, element->key, element->key_string, (void **) &option);
