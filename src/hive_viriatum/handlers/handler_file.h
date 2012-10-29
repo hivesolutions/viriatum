@@ -52,7 +52,7 @@ typedef struct file_location_t {
      * The path to be used as the base for the
      * "computation" of the files to be retrieved.
      */
-    char *base_path;
+    unsigned char *base_path;
 } file_location_t;
 
 /**
