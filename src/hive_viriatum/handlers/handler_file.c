@@ -166,7 +166,7 @@ ERROR_CODE register_handler_file(struct service_t *service) {
         /* tries ro retrieve the script path from the file configuration and in
         case it exists sets it in the location (attribute reference change) */
         get_value_string_sort_map(configuration, (unsigned char *) "base_path", &value);
-        if(value != NULL) { _location->base_path = (char *) value; }
+        if(value != NULL) { _location->base_path = (unsigned char *) value; }
     }
 
     /* adds the http handler to the service */
