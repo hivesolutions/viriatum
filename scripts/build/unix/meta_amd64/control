@@ -2,7 +2,7 @@ Package: viriatum
 Version: 0.30
 Section: httpd
 Priority: optional
-Architecture: all
+Architecture: amd64
 Depends: libc6 (>= 2.5-0ubuntu1)
 Installed-Size: 512
 Maintainer: Hive Solutions <development@hive.pt>
