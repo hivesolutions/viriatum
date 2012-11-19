@@ -3,7 +3,7 @@ Version: 0.30
 Section: httpd
 Priority: optional
 Architecture: armhf
-Depends: libc6 (>= 2.5-0ubuntu1)
+Depends: libc6 (>= 2.13-28)
 Installed-Size: 512
 Maintainer: Hive Solutions <development@hive.pt>
 Description: Viriatum Web Server
