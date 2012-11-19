@@ -1,9 +1,14 @@
 #!/bin/sh
 # -*- coding: utf-8 -*-
 
+# exports the architectures for the current system
+# this command allows the access to the achitecture
+# variable for the system
+eval `dpkg-architecture -s`
+
 # sets the various global variables
 version=0.3.0a1
-architecture=amd64
+architecture=$DEB_BUILD_ARCH
 name=viriatum\_$version\_$architecture
 name_raw=viriatum\_$version\_$architecture\_raw
 name_src=viriatum\_$version\_src
