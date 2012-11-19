@@ -53,6 +53,10 @@ call git clone git://github.com/hivesolutions/viriatum.git %REPO_DIR% --quiet
 :: must return immediately with the error
 if %ERRORLEVEL% neq 0 ( cd %CURRENT_DIR% && exit /b %ERRORLEVEL% )
 
+:: copies the current git version (hash) as the version value
+:: for the current build (avoids duplicate running)
+cd %REPO_DIR% && call git rev-parse HEAD > %BUILD_DIR%\VERSION && cd %BUILD_DIR%
+
 :: removes the internal git repository directory to avoid
 :: extra files in source distribution
 rmdir /q /s %REPO_DIR%\.git

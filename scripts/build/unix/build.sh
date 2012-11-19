@@ -53,6 +53,10 @@ git clone git://github.com/hivesolutions/viriatum.git $repo --quiet
 # must return immediately with the error
 if [ $? -ne 0 ]; then cd $current && exit $?; fi
 
+# copies the current git version (hash) as the version value
+# for the current build (avoids duplicate running)
+cd $repo && git rev-parse HEAD > $build/VERSION && cd $build
+
 # removes the internal git repository directory to avoid
 # extra files in source distribution
 rm -rf $repo/.git
