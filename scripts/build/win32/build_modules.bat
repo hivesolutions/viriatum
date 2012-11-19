@@ -49,6 +49,10 @@ cd %BUILD_DIR%
 :: operator so that it avoid exiting the current process
 call git clone git://github.com/hivesolutions/viriatum.git %REPO_DIR% --quiet
 
+:: copies the current git version (hash) as the version value
+:: for the current build (avoids duplicate running)
+cd %REPO_DIR% && call git rev-parse HEAD > %BUILD_DIR%\VERSION && cd %BUILD_DIR%
+
 :: in case the previous command didn't exit properly
 :: must return immediately with the error
 if %ERRORLEVEL% neq 0 ( cd %CURRENT_DIR% && exit /b %ERRORLEVEL% )
