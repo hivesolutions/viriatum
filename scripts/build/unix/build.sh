@@ -111,8 +111,8 @@ cp -rf $result_dir/bin/viriatum $deb_build_dir/usr/sbin
 cp -rf $result_dir/etc/viriatum/viriatum.ini $deb_build_dir/etc/viriatum
 cp -rf $result_dir/etc/init.d/viriatum $deb_build_dir/etc/init.d
 cp -rf $result_dir/var/viriatum/www $deb_build_dir/var/viriatum
-cp -rf $script_dir/meta/* $deb_build_dir/DEBIAN
-cp -rf $script_dir/meta_$architecture/* $deb_build_dir/DEBIAN
+cp -rf $script_dir/meta/all/* $deb_build_dir/DEBIAN
+cp -rf $script_dir/meta/$architecture/* $deb_build_dir/DEBIAN
 cp -rp $result_dir $temp_dir/$name/
 
 # creates the various compressed files for the
