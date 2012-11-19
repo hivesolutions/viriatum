@@ -52,7 +52,7 @@ reading of the response value """
 
 SIMPLE = [
     "GET /index.html HTTP/1.1\r\n"
-     "Host: 127.0.0.1\r\n"
+    "Host: 127.0.0.1\r\n"
     "\r\n"
 ]
 """ The simple example sequence of data
@@ -60,17 +60,17 @@ string (to be used for simple testing) """
 
 COMPLEX = [
     "GET /index.html HTTP/1.1\r\n"
-     "Host: 127.0.0.1\r\n"
-     "Connection: keep-alive\r\n"
+    "Host: 127.0.0.1\r\n"
+    "Connection: keep-alive\r\n"
     "\r\n",
     "GET /index.html HTTP/1.1\r\n"
     "Connection: keep-alive\r\n"
-     "Hos",
-     "t: 127.0.0.1\r\n"
+    "Hos",
+    "t: 127.0.0.1\r\n"
     "\r\n"
     "GET /index.html HTTP/1.1\r\n"
-     "Host: 127.0.0.1\r\n"
-     "Connection: keep-alive\r\n"
+    "Host: 127.0.0.1\r\n"
+    "Connection: keep-alive\r\n"
     "\r\n"
 ]
 
