@@ -1479,7 +1479,7 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                 /* breaks the switch */
                 break;
 
-            case STATE_HEADERS_ALMOST_DONE:
+			case STATE_HEADERS_ALMOST_DONE:
                 headers_almost_done:
                     STRICT_CHECK(byte != LF);
 
@@ -1502,7 +1502,7 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                     * is needed for the annoying case of recieving a response to a HEAD
                     * request */
                     if(http_settings->on_headers_complete) {
-                        switch (http_settings->on_headers_complete(http_parser)) {
+                        switch(http_settings->on_headers_complete(http_parser)) {
                             case 0:
                                 break;
 
