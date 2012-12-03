@@ -79,6 +79,21 @@ COMPLEX = [
     "\r\n"
 ]
 
+PILELINING = [
+    "GET /index.html HTTP/1.1\r\n"
+    "Host: 127.0.0.1\r\n"
+    "Connection: keep-alive\r\n"
+    "\r\n"
+    "GET /index.html HTTP/1.1\r\n"
+    "Host: 127.0.0.1\r\n"
+    "Connection: keep-alive\r\n"
+    "\r\n"
+    "GET /index.html HTTP/1.1\r\n"
+    "Host: 127.0.0.1\r\n"
+    "Connection: keep-alive\r\n"
+    "\r\n"
+]
+
 def call(messages):
     # creates the socket object and connects it to the
     # target host and port
@@ -105,3 +120,4 @@ def call(messages):
     _socket.close()
 
 call(COMPLEX)
+call(PILELINING)
