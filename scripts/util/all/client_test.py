@@ -51,7 +51,7 @@ SIZE = 10024
 """ The size of the buffer to be used in the
 reading of the response value """
 
-WRITE_SLEEP = 0.20
+WRITE_SLEEP = 0.25
 """ The ammount of time to be used between write
 operations (this should ensure message separation) """
 
