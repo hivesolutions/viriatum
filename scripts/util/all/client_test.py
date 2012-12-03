@@ -79,7 +79,7 @@ COMPLEX = [
     "\r\n"
 ]
 
-PILELINING = [
+PIPELINING = [
     "GET /index.html HTTP/1.1\r\n"
     "Host: 127.0.0.1\r\n"
     "Connection: keep-alive\r\n"
@@ -119,5 +119,4 @@ def call(messages):
     # closes the socket, no more data is transmitted
     _socket.close()
 
-call(COMPLEX)
-call(PILELINING)
+call(COMPLEX + PIPELINING)
