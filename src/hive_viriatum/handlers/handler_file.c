@@ -394,7 +394,7 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
     struct connection_t *connection = (struct connection_t *) http_parser->parameters;
 
     /* retrieves the underlying connection references in order to be
-    able to operate over them, for unregister */
+    able to operate over them, for register */
     struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
     struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
 

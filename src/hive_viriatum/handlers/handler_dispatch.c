@@ -434,7 +434,7 @@ ERROR_CODE _send_response_handler_dispatch(struct http_parser_t *http_parser) {
     struct connection_t *connection = (struct connection_t *) http_parser->parameters;
 
     /* retrieves the underlying connection references in order to be
-    able to operate over them, for unregister */
+    able to operate over them, for register */
     struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
     struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
 
