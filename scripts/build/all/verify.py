@@ -26,7 +26,7 @@ def run():
         os.chdir(cwd)
 
     if version == _version: sys.exit(1)
-    else: sys.exit(0)  
+    else: sys.exit(0)
 
 if __name__ == "__main__":
     run()
