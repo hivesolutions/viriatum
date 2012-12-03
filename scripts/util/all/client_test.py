@@ -78,6 +78,8 @@ COMPLEX = [
     "Connection: keep-alive\r\n"
     "\r\n"
 ]
+""" The complex example sequence of data
+string (to be used for cutted string testing) """
 
 PIPELINING = [
     "GET /index.html HTTP/1.1\r\n"
@@ -93,6 +95,9 @@ PIPELINING = [
     "Connection: keep-alive\r\n"
     "\r\n"
 ]
+""" The complex example sequence of data
+string (to be used for long pipellined string
+testing) one string containing three messages """
 
 def call(messages):
     # creates the socket object and connects it to the
@@ -119,4 +124,6 @@ def call(messages):
     # closes the socket, no more data is transmitted
     _socket.close()
 
-call(COMPLEX + PIPELINING)
+# runs the call operation on the complete set
+# of calls to be processed
+call(SIMPLE + COMPLEX + PIPELINING)
