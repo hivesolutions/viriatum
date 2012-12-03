@@ -1479,7 +1479,7 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                 /* breaks the switch */
                 break;
 
-			case STATE_HEADERS_ALMOST_DONE:
+            case STATE_HEADERS_ALMOST_DONE:
                 headers_almost_done:
                     STRICT_CHECK(byte != LF);
 
