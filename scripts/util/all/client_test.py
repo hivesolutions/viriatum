@@ -37,6 +37,7 @@ __copyright__ = "Copyright (c) 2008-2012-2012 Hive Solutions Lda."
 __license__ = "GNU General Public License (GPL), Version 3"
 """ The license for the module """
 
+import time
 import socket
 
 HOST = "127.0.0.1"
@@ -49,6 +50,10 @@ PORT = 9090
 SIZE = 10024
 """ The size of the buffer to be used in the
 reading of the response value """
+
+WRITE_SLEEP = 0.20
+""" The ammount of time to be used between write
+operations (this should ensure message separation) """
 
 SIMPLE = [
     "GET /index.html HTTP/1.1\r\n"
@@ -82,8 +87,11 @@ def call(messages):
     _socket.connect((HOST, PORT))
 
     # iterates over each of the message to be
-    # sent and sends them to the server side
-    for message in messages: _socket.send(message)
+    # sent and sends them to the server side, note
+    # that a delay time is used to separate messages
+    for message in messages:
+        _socket.send(message)
+        time.sleep(WRITE_SLEEP)
 
     # receives the complete chunk of responses
     # from the server side and then breaks
