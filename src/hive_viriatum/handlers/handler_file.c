@@ -231,18 +231,6 @@ ERROR_CODE reset_handler_file(struct http_connection_t *http_connection) {
 }
 
 ERROR_CODE message_begin_callback_handler_file(struct http_parser_t *http_parser) {
-    /* retrieves the connection from the http parser parameters */
-    struct connection_t *connection = (struct connection_t *) http_parser->parameters;
-
-    /* retrieves the underlying connection references in order to be
-    able to operate over them, for unregister */
-    struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
-    struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
-
-    /* acquires the lock on the http connection, this will avoids further
-    messages to be processed, no parallel request handling problems */
-    http_connection->acquire(http_connection);
-
     /* raise no error */
     RAISE_NO_ERROR;
 }
@@ -404,6 +392,15 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
 
     /* retrieves the connection from the http parser parameters */
     struct connection_t *connection = (struct connection_t *) http_parser->parameters;
+
+    /* retrieves the underlying connection references in order to be
+    able to operate over them, for unregister */
+    struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
+    struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
+
+    /* acquires the lock on the http connection, this will avoids further
+    messages to be processed, no parallel request handling problems */
+    http_connection->acquire(http_connection);
 
     /* checks if the path being request is in fact a directory */
     is_directory_file((char *) handler_file_context->file_path, &is_directory);
