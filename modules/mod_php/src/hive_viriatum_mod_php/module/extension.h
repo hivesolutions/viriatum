@@ -56,3 +56,4 @@ PHP_FUNCTION(viriatum_description);
 PHP_FUNCTION(viriatum_compiler);
 PHP_FUNCTION(viriatum_compiler_version);
 PHP_FUNCTION(viriatum_compilation_date);
+PHP_FUNCTION(viriatum_compilation_time);
