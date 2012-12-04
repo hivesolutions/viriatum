@@ -95,7 +95,7 @@ PIPELINING = [
     "Connection: keep-alive\r\n"
     "\r\n"
 ]
-""" The complex example sequence of data
+""" The pipelining example sequence of data
 string (to be used for long pipellined string
 testing) one string containing three messages """
 
