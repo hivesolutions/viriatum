@@ -41,13 +41,19 @@
                         <td class="right label">environment</td>
                         <td class="left value"><?php echo(viriatum_platform()) ?></td>
                     </tr>
+                    <tr>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td class="right label">compiler</td>
+                        <td class="left value"><?php echo(viriatum_compiler()) ?> / <?php echo(viriatum_compiler_version()) ?></td>
+                    </tr>
+                    <tr>
+                        <td class="right label">compilation date</td>
+                        <td class="left value"><?php echo(viriatum_compilation_date()) ?> @ <?php echo(viriatum_compilation_time()) ?></td>
+                    </tr>
                 </tbody>
             </table>
-        </div>
-        <div id="footer-wrapper">
-            <div class="footer-body">
-                <div class="separator-horizontal"></div>
-            </div>
         </div>
     </body>
 </html>
