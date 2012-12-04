@@ -310,6 +310,12 @@ typedef struct service_t {
     unsigned char *compilation_date;
 
     /**
+     * The time (as a string) for the compilation
+     * of the service internal structures.
+     */
+    unsigned char *compilation_time;
+
+    /**
      * The string describing the current service
      * and its configuration, usefull for a quick
      * visual description of the service.
