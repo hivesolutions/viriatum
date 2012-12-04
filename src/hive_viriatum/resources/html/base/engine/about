@@ -22,7 +22,7 @@
             <div class="description-body">
                 <p>Viriatum is the new <strong>minimalistic web server</strong>, targetting enthusiasts
                 that love simplicity and speed at the same time.</p>
-                <p>It's core design is based on the concept of asynchronous non blocking IO server and is
+                <p>It's core design is based on the concept of asynchronous non blocking I/O server and is
                 meant to be able to handle as much as one million connections at a given time.</p>
                 <p>Viriatum also takes a <strong>modular approach</strong> to the problem and allows
                 the loading of 3rd party modules providing functionality like: WSGI, PHP, Lua, etc. to
