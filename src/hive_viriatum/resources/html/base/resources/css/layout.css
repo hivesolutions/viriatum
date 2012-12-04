@@ -144,6 +144,15 @@ a:hover {
     width: 340px;
 }
 
+.description-body {
+    margin: 40px auto 40px auto;
+    width: 480px;
+}
+
+.description-body  > p {
+    margin: 20px 0px 20px 0px;
+}
+
 #footer-wrapper {
     margin: 0px auto 0px auto;
     width: 960px;
