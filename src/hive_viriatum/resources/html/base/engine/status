@@ -55,5 +55,10 @@
                 </tbody>
             </table>
         </div>
+        <div id="footer-wrapper">
+            <div class="footer-body">
+                <div class="separator-horizontal"></div>
+            </div>
+        </div>
     </body>
 </html>
