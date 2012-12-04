@@ -145,7 +145,7 @@ a:hover {
 }
 
 .description-body {
-    margin: 40px auto 40px auto;
+    margin: 60px auto 40px auto;
     width: 480px;
 }
 
@@ -170,14 +170,14 @@ a:hover {
 }
 
 .footer-list {
-    margin: 12px auto 12px auto;
+    margin: 30px auto 0px auto;
     padding: 0px 0px 0px 0px;
 }
 
 .footer-list li {
     display: inline;
     list-style: none;
-    margin: 0px 12px 0px 12px;
+    margin: 0px 8px 0px 8px;
 }
 
 .table.file-listing {
@@ -239,6 +239,11 @@ a:hover {
     vertical-align: bottom;
 }
 
+span.separator {
+    color: #aaaaaa;
+    text-shadow: 2px 1px 1px #ffffff;
+}
+
 .icon.arrow-left span {
     background: transparent url(../images/arrow-left.png) top center no-repeat;
     display: block;
@@ -272,7 +277,7 @@ a:hover {
 
 .table.status {
     color: #595959;
-    margin: 80px auto 20px auto;
+    margin: 60px auto 40px auto;
     width: 960px;
 }
 
