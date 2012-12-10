@@ -258,7 +258,7 @@ ERROR_CODE load_specifications(struct service_t *service) {
     service->compiler = (unsigned char *) VIRIATUM_COMPILER;
     service->compiler_version = (unsigned char *) VIRIATUM_COMPILER_VERSION_STRING;
     service->compilation_date = (unsigned char *) VIRIATUM_COMPILATION_DATE;
-	service->compilation_time = (unsigned char *) VIRIATUM_COMPILATION_TIME;
+    service->compilation_time = (unsigned char *) VIRIATUM_COMPILATION_TIME;
 
     /* "compiles" the various specification values into the
     the description value present in the service */
