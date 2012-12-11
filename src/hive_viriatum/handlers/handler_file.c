@@ -349,8 +349,8 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
     struct template_handler_t *template_handler;
 
     /* allocates space for the is directory and the is redirect flags */
-    unsigned int is_directory = 0;
-    unsigned int is_redirect = 0;
+    unsigned int is_directory = FALSE;
+    unsigned int is_redirect = FALSE;
 
     /* allocates space for the new location value for
     redirect request cases and for the path to the
@@ -418,7 +418,7 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
             location[strlen((char *) handler_file_context->url) + 1] = '\0';
 
             /* sets the is redirect flag (forces temporary redirect) */
-            is_redirect = 1;
+            is_redirect = TRUE;
         }
         /* otherwise it's the correct directory location and must present the
         listing of the directory to the user agent */
