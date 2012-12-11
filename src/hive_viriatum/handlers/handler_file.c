@@ -469,7 +469,7 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
             /* sets the template handler in the handler file context and unsets
             the flushed flag */
             handler_file_context->template_handler = template_handler;
-            handler_file_context->flushed = 0;
+            handler_file_context->flushed = FALSE;
 
             /* deletes the directory entries map and the
             directory entries */
@@ -978,7 +978,7 @@ ERROR_CODE _send_data_handler_file(struct connection_t *connection, struct data_
             _send_data_handler_file,
             handler_file_context
         );
-        handler_file_context->flushed = 1;
+        handler_file_context->flushed = TRUE;
 
         /* unsets the string value in the template handler (avoids double release) */
         template_handler->string_value = NULL;
