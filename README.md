@@ -84,7 +84,7 @@ Must compile the php interpreter with support for embeding, and then must compil
 
     ./configure --enable-embed
     export CFLAGS="-I/usr/local/include/php -I/usr/local/include/php/main\
-    -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend"
+        -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend"
 
 ## WSGI Module
 
