@@ -83,7 +83,8 @@ Current modules include:
 Must compile the php interpreter with support for embeding, and then must compile the module with special variables set.
 
     ./configure --enable-embed
-    export CFLAGS="-I/usr/local/include/php -I/usr/local/include/php/main -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend"
+    export CFLAGS="-I/usr/local/include/php -I/usr/local/include/php/main\
+    -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend"
 
 ## WSGI Module
 
