@@ -14,19 +14,19 @@ If you're going to build viriatum using the git repository you first need to gen
 
 For building under unix simple instructions are used:
 
-* `./configure`
-* `make && make install`
+    $ ./configure
+    $ make && make install
 
 In order to provide a correct (system wide) configuration path use:
 
-* `./configure --sysconfdir=/etc`
+    $ ./configure --sysconfdir=/etc
 
 ### Unix 32bit from 64bit
 
-* `apt-get libc6-dev-i386`
-* `export CC="cc -m32"`
-* `./configure`
-* `make && make install`
+    $ apt-get libc6-dev-i386
+    $ export CC="cc -m32"
+    $ ./configure
+    $ make && make install
 
 ### Android
 
