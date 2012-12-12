@@ -57,6 +57,12 @@ For building using the mingw-w64 toolchain for 64 and 32 bit options.
     ./configure --host=i686-w64-mingw32 --build=i686-linux --prefix=/opt/i686-w64-mingw32
     make && make install
 
+### FreeBSD
+
+FreeBSD ignores the /usr/local directory by default so it must be included in order to conform with dependencies.
+
+    setenv CFLAGS "-L/usr/local/lib -I/usr/local/include"
+    
 ## Features
 
 There are a lot of possible building features to enable
@@ -81,7 +87,7 @@ Current modules include:
 * `mod_php` - For interaction with the php interpreter (complex compilation)
 * `mod_wsgi` - For interaction with the python interpreter using the [WSGI](http://wsgi.org) specification.
 
-## PHP Module
+### PHP Module
 
 Must compile the php interpreter with support for embeding, and then must compile the module with special variables set.
 
@@ -89,18 +95,12 @@ Must compile the php interpreter with support for embeding, and then must compil
     export CFLAGS="-I/usr/local/include/php -I/usr/local/include/php/main\
         -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend"
 
-## WSGI Module
+### WSGI Module
 
 Must compile viriatum with special environment variables set to point to the correct headers directory.
 
     export CFLAGS="-I/usr/include/python2.7"
     export CFLAGS="-I/System/Library/Frameworks/Python.framework/Headers"
-
-## FreeBSD
-
-FreeBSD ignores the /usr/local directory by default so it must be included in order to conform with dependencies.
-
-    setenv CFLAGS "-L/usr/local/lib -I/usr/local/include"
 
 ## Benchmarking
 
