@@ -57,6 +57,10 @@ For building using the mingw-w64 toolchain for 64 and 32 bit options.
     ./configure --host=i686-w64-mingw32 --build=i686-linux --prefix=/opt/i686-w64-mingw32
     make && make install
 
+#### Notes
+
+* In order to compile to WINVER <= 0x0500 (Windows 2000 or older) disable IPv6 support (#undef VIRIATUM_IP6)
+ 
 ### FreeBSD
 
 FreeBSD ignores the /usr/local directory by default so it must be included in order to conform with dependencies.
@@ -72,10 +76,6 @@ There are a lot of possible building features to enable
 * `--enable-debug` - Enables the extra debugging capabilities in viriatum
 * `--enable-defaults` - Enables the default paths in the viriatum server, ignoring wwwroot and moduleroot at runtime
 * `--disable-ipv6` - Disables the support for the ipv6 protocol stack
-
-## Notes
-
-* In order to compile to WINVER <= 0x0500 (Windows 2000 or older) disable IPv6 support (#undef VIRIATUM_IP6)
 
 ## Modules
 
