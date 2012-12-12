@@ -36,7 +36,7 @@ In order to provide a correct (system wide) configuration path use:
 Building viriatum for android involves cross compilation and the android ndk toolkit must be used.
 
 * Check the instructions for downloading the android ndk from the [official website](http://developer.android.com/sdk/ndk/)
-* Unpack the android-ndk package file ```tar -xvf android-ndk-r[x]-linux-x86.tar.bz2```
+* Unpack the android-ndk package file `tar -xvf android-ndk-r[x]-linux-x86.tar.bz2`
 * Create the standalone toolchain `android-ndk-r[x]/build/tools/make-standalone-toolchain.sh --platform=android-4 --install-dir=/opt/android-toolchain`
 * `export PATH=/opt/android-toolchain/bin:$PATH`
 * `./configure --host=arm-linux-androideabi --target=arm-linux-androideabi --prefix=/opt/android-root`
