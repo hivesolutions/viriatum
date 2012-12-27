@@ -30,7 +30,7 @@
 */
 
 body {
-    background-color: #e5e5e5;
+    background: #e8e8e8 url(../images/background.png) repeat;
     font-family: Georgia, Times;
 }
 
@@ -179,6 +179,10 @@ a:hover {
     display: inline;
     list-style: none;
     margin: 0px 8px 0px 8px;
+}
+
+.footer-logo {
+    margin-top: 28px;
 }
 
 .table.file-listing {
