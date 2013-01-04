@@ -35,7 +35,7 @@ ERROR_CODE create_mod_lua_http_handler(struct mod_lua_http_handler_t **mod_lua_h
 
     /* allocates space for the mod lua http handler */
     struct mod_lua_http_handler_t *mod_lua_http_handler =
-		(struct mod_lua_http_handler_t *) MALLOC(mod_lua_http_handler_size);
+        (struct mod_lua_http_handler_t *) MALLOC(mod_lua_http_handler_size);
 
     /* sets the mod lua http handler attributes (default) values */
     mod_lua_http_handler->lua_state = NULL;

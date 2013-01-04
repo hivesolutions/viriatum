@@ -35,7 +35,7 @@ ERROR_CODE create_mod_wsgi_http_handler(struct mod_wsgi_http_handler_t **mod_wsg
 
     /* allocates space for the mod wsgi http handler */
     struct mod_wsgi_http_handler_t *mod_wsgi_http_handler =
-		(struct mod_wsgi_http_handler_t *) MALLOC(mod_wsgi_http_handler_size);
+        (struct mod_wsgi_http_handler_t *) MALLOC(mod_wsgi_http_handler_size);
 
     /* sets the mod wsgi http handler attributes (default) values */
     mod_wsgi_http_handler->file_path = NULL;

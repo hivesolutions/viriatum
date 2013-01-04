@@ -35,7 +35,7 @@ ERROR_CODE create_mod_php_http_handler(struct mod_php_http_handler_t **mod_php_h
 
     /* allocates space for the mod php http handler */
     struct mod_php_http_handler_t *mod_php_http_handler =
-		(struct mod_php_http_handler_t *) MALLOC(mod_php_http_handler_size);
+        (struct mod_php_http_handler_t *) MALLOC(mod_php_http_handler_size);
 
     /* sets the mod php http handler attributes (default) values */
     mod_php_http_handler->base_path = NULL;
