@@ -29,6 +29,18 @@
 
 #include "stream_io.h"
 
+/**
+ * The static protocol string that is used in the
+ * handshake part of the protocol.
+ */
+#define TORRENT_PROTOCOL_STRING "BitTorrent protocol"
+
+/**
+ * The size of the static protocol string that is used
+ * in the handshake part of the protocol.
+ */
+#define TORRENT_PROTOCOL_SIZE 19
+
 /* forward references (avoids loop) */
 struct torrent_connection_t;
 
@@ -40,6 +52,21 @@ struct torrent_connection_t;
  * update with new information.
  */
 typedef ERROR_CODE (*torrent_connection_update) (struct torrent_connection_t *torrent_connection);
+
+/**
+ * Structure defining the various components
+ * of the torrent handshake as defined in the
+ * official bittorrent specification.
+ *
+ * @see: http://www.bittorrent.org/beps/bep_0003.html
+ */
+typedef struct torrent_handshake_t {
+    unsigned char torrent_size;
+    char torrent_string[TORRENT_PROTOCOL_SIZE];
+    unsigned char reserved[8];
+    unsigned char info_hash[20];
+    unsigned char peer_id[20];
+} torrent_handshake;
 
 /**
  * Structure defining a logical
@@ -60,7 +87,7 @@ typedef struct torrent_connection_t {
      * This is an internal value and must be used
      * with care.
      */
-    struct TorrentHandler_t *torrent_handler;
+    struct torrent_handler_t *torrent_handler;
 } torrent_connection;
 
 ERROR_CODE create_torrent_connection(struct torrent_connection_t **torrent_connection_pointer, struct io_connection_t *io_connection);

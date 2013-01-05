@@ -29,17 +29,6 @@
 
 #include "stream_torrent.h"
 
-#define TORRENT_PROTOCOL_STRING "BitTorrent protocol"
-#define TORRENT_PROTOCOL_SIZE 19
-
-typedef struct torrent_handshake_t {
-    unsigned char pstrlen;
-    char pstr[TORRENT_PROTOCOL_SIZE];
-    unsigned char reserved[8];
-    unsigned char info_hash[20];
-    unsigned char peer_id[20];
-} torrent_handshake;
-
 ERROR_CODE create_torrent_connection(struct torrent_connection_t **torrent_connection_pointer, struct io_connection_t *io_connection) {
     /* retrieves the torrent connection size */
     size_t torrent_connection_size = sizeof(struct torrent_connection_t);
@@ -57,10 +46,9 @@ ERROR_CODE create_torrent_connection(struct torrent_connection_t **torrent_conne
     /* sets the torrent connection in the (upper) io connection substrate */
     io_connection->lower = torrent_connection;
 
-    /* retrieves the current (default) service handler and sets the
-    connection on it, then sets this handler as the base handler */
-  /*  torrent_handler = service->torrent_handler;
-    torrent_connection->base_handler = torrent_handler;*/
+    /* sets the current torrent handler for the created connection as
+	not valid no delegation will occur */
+    torrent_connection->torrent_handler = NULL;
 
     /* sets the torrent connection in the torrent connection pointer */
     *torrent_connection_pointer = torrent_connection;
@@ -90,29 +78,33 @@ ERROR_CODE data_handler_stream_torrent(struct io_connection_t *io_connection, un
 }
 
 ERROR_CODE open_handler_stream_torrent(struct io_connection_t *io_connection) {
-    /* allocates space for the data to be read from the
-    info hash file */
-    char *data;
-
-    /* allocates the torrent connection */
+    /* allocates the torrent connection and the space
+	to be used for the buffer for the response */
     struct torrent_connection_t *torrent_connection;
-
-    /* allocates the response buffer */
     struct torrent_handshake_t *response_buffer = (struct torrent_handshake_t *) MALLOC(sizeof(struct torrent_handshake_t));
 
+
+
     FILE *file = fopen("C:/info_hash.txt", "rb");
-    if(file == NULL) { RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem opening hash file"); }
-    data = (char *) fread(response_buffer->info_hash, 1, 20, file);
+    if(file == NULL) {
+		RAISE_ERROR_M(
+			RUNTIME_EXCEPTION_ERROR_CODE,
+			(unsigned char *) "Problem opening hash file"
+		);
+	}
+    fread(response_buffer->info_hash, 1, 20, file);
     fclose(file);
 
 
-    /* creates the torrent connection */
+    /* creates the torrent connection for the currently used
+	io connection structure */
     create_torrent_connection(&torrent_connection, io_connection);
 
 
-
-    response_buffer->pstrlen = TORRENT_PROTOCOL_SIZE;
-    memcpy(response_buffer->pstr, TORRENT_PROTOCOL_STRING, TORRENT_PROTOCOL_SIZE);
+    /* populates the various elements of the response buffer structure
+	using the static values and the info hash and peer id provided */
+    response_buffer->torrent_size = TORRENT_PROTOCOL_SIZE;
+    memcpy(response_buffer->torrent_string, TORRENT_PROTOCOL_STRING, TORRENT_PROTOCOL_SIZE);
     memset(response_buffer->reserved, 0, 8);
     /*memcpy(response_buffer->info_hash, "-AZ4702-UCahr9VNImUy", 20);*/
     memcpy(response_buffer->peer_id, "-AZ4702-UCJhrsVNImUy", 20);
@@ -126,7 +118,6 @@ ERROR_CODE open_handler_stream_torrent(struct io_connection_t *io_connection) {
         NULL,
         NULL
     );
-
 
     /* raises no error */
     RAISE_NO_ERROR;
