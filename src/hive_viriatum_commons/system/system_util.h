@@ -78,21 +78,21 @@
 #endif
 
 #ifdef VIRIATUM_PLATFORM_MSC
+#define LOCAL_TIME(local_time_value, time_value) struct tm local_time_value_value; local_time_value = &local_time_value_value; localtime_s(local_time_value, time_value)
 #define SPRINTF(buffer, size, format, ...) sprintf_s(buffer, size, format, __VA_ARGS__)
 #define SSCANF(buffer, format, ...) sscanf_s(buffer, format, __VA_ARGS__)
 #define STRTOK(string, delimiter, context) strtok_s(string, delimiter, &context)
 #define STRCPY(destination, size, source) strcpy_s(destination, size, source)
 #define FOPEN(file_pointer, file_name, mode) fopen_s(file_pointer, file_name, mode)
-#define LOCAL_TIME(local_time_value, time_value) struct tm local_time_value_value; local_time_value = &local_time_value_value; localtime_s(local_time_value, time_value)
 #endif
 
 #ifdef VIRIATUM_PLATFORM_MINGW
+#define LOCAL_TIME(local_time_value, time_value) local_time_value = localtime(time_value)
 #define SPRINTF(buffer, size, format, ...) sprintf(buffer, format, __VA_ARGS__)
 #define SSCANF(buffer, format, ...) sscanf(buffer, format, __VA_ARGS__)
 #define STRTOK(string, delimiter, context) strtok(string, delimiter); dump((void *) &context)
 #define STRCPY(destination, size, source) strcpy(destination, source)
 #define FOPEN(file_pointer, file_name, mode) *file_pointer = fopen(file_name, mode)
-#define LOCAL_TIME(local_time_value, time_value) local_time_value = localtime(time_value)
 #endif
 
 #define CLOCK() clock()
