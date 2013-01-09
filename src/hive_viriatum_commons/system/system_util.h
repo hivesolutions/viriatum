@@ -43,7 +43,6 @@
 #define PID_TYPE DWORD
 #define PROCESS_TYPE HANDLE
 #define MEMORY_INFORMATION_TYPE PROCESS_MEMORY_COUNTERS
-#define LOCAL_TIME(local_time_value, time_value) struct tm local_time_value_value; local_time_value = &local_time_value_value; localtime_s(local_time_value, time_value)
 #define SLEEP(miliseconds) Sleep(miliseconds)
 #define GET_PID() GetCurrentProcessId()
 #define GET_ENV(buffer, buffer_size, variable_name) _dupenv_s(&buffer, &buffer_size, variable_name)
@@ -84,6 +83,7 @@
 #define STRTOK(string, delimiter, context) strtok_s(string, delimiter, &context)
 #define STRCPY(destination, size, source) strcpy_s(destination, size, source)
 #define FOPEN(file_pointer, file_name, mode) fopen_s(file_pointer, file_name, mode)
+#define LOCAL_TIME(local_time_value, time_value) struct tm local_time_value_value; local_time_value = &local_time_value_value; localtime_s(local_time_value, time_value)
 #endif
 
 #ifdef VIRIATUM_PLATFORM_MINGW
@@ -92,6 +92,7 @@
 #define STRTOK(string, delimiter, context) strtok(string, delimiter); dump((void *) &context)
 #define STRCPY(destination, size, source) strcpy(destination, source)
 #define FOPEN(file_pointer, file_name, mode) *file_pointer = fopen(file_name, mode)
+#define LOCAL_TIME(local_time_value, time_value) local_time_value = localtime(time_value)
 #endif
 
 #define CLOCK() clock()
