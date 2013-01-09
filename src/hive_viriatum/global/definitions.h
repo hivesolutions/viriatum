@@ -104,8 +104,12 @@ static __inline char *get_config_path() {
 #ifndef VIRIATUM_MODULES_PATH
 #define VIRIATUM_MODULES_PATH get_modules_path()
 #endif
+#ifndef VIRIATUM_RESOURCES_PATH
 #define VIRIATUM_RESOURCES_PATH get_resources_path()
+#endif
+#ifndef VIRIATUM_CONFIG_PATH
 #define VIRIATUM_CONFIG_PATH get_config_path()
+#endif
 #define VIRIATUM_BASE_PATH ""
 #define VIRIATUM_LISTING_PATH "/templates/listing.html.tpl"
 #define VIRIATUM_ERROR_PATH "/templates/error.html.tpl"
