@@ -116,7 +116,7 @@ void crypt_md4(char *message, char *key, char **result_pointer) {
     for the message range, then delete the rc4 structure */
     result = (char *) MALLOC(message_length);
     create_rc4(key, &rc4);
-    crypt_rc4(rc4, message, message_length, result);
+    cipher_md4(rc4, message, message_length, result);
     delete_rc4(rc4);
 
     /* sets the resulting buffer pointer as the result
