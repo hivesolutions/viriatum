@@ -42,6 +42,7 @@ checksum/crc_32.c \
 checksum/md5.c \
 checksum/sha1.c \
 compression/huffman.c \
+crypto/rc4.c \
 debug/error.c \
 debug/logging.c \
 encoding/base_64.c \
