@@ -70,7 +70,7 @@ void delete_rc4(struct rc4_t *rc4) {
     FREE(rc4);
 }
 
-void cipher_md4(struct rc4_t *rc4, char *data, size_t size, char *data_c) {
+void cipher_rc4(struct rc4_t *rc4, char *data, size_t size, char *data_c) {
     /* allocates the sapce for the various variables
     to be used in this encoding "round" */
     size_t i;
@@ -103,7 +103,7 @@ void cipher_md4(struct rc4_t *rc4, char *data, size_t size, char *data_c) {
     }
 }
 
-void crypt_md4(char *message, char *key, char **result_pointer) {
+void crypt_rc4(char *message, char *key, char **result_pointer) {
     /* allocates space for both the resulting buffer
     pointer and for the rc4 structure to be used */
     char *result;
@@ -116,7 +116,7 @@ void crypt_md4(char *message, char *key, char **result_pointer) {
     for the message range, then delete the rc4 structure */
     result = (char *) MALLOC(message_length);
     create_rc4(key, &rc4);
-    cipher_md4(rc4, message, message_length, result);
+    cipher_rc4(rc4, message, message_length, result);
     delete_rc4(rc4);
 
     /* sets the resulting buffer pointer as the result

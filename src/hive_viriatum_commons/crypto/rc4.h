@@ -34,7 +34,7 @@ typedef struct rc4_t {
     unsigned char box[255];
 } rc4;
 
-void create_rc4(char *key, struct rc4_t **rc4_pointer);
-void delete_rc4(struct rc4_t *rc4);
-void cipher_md4(struct rc4_t *rc4, char *data, size_t size, char *data_c);
-void crypt_md4(char *message, char *key, char **result_pointer);
+VIRIATUM_EXPORT_PREFIX void create_rc4(char *key, struct rc4_t **rc4_pointer);
+VIRIATUM_EXPORT_PREFIX void delete_rc4(struct rc4_t *rc4);
+VIRIATUM_EXPORT_PREFIX void cipher_rc4(struct rc4_t *rc4, char *data, size_t size, char *data_c);
+VIRIATUM_EXPORT_PREFIX void crypt_rc4(char *message, char *key, char **result_pointer);
