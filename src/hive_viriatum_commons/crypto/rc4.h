@@ -27,39 +27,6 @@
 
 #pragma once
 
-#define RC4_PRINT_OFFSET 10000
-#define RC4_BUFFER_SIZE 4096
-#define RC4_TEST_MESSAGE "Lorem ipsum dolor sit amet, consectetur\
-vestibulum, mauris et ultrices luctus, ligula turpis semper lectus, sit\
-amet tincidunt arcu eros in massa. Sed lobortis tincidunt vestibulum.\
-Integer aliquam suscipit nibh, sit amet volutpat enim tempus in.\
-Curabitur nisl orci, bibendum sit amet porta sed, viverra laoreet massa.\
-Praesent quis mi in arcu vulputate ornare. Duis sed volutpat magna.\
-Duis suscipit leo sed neque varius aliquet. Phasellus eu justo erat, non\
-sagittis sem. Donec magna orci, tristique nec pharetra sed, rutrum at\
-eros. Etiam ultricies diam eget justo fermentum vestibulum. In hac\
-habitasse platea dictumst. Etiam eget mi risus.\
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque\
-vestibulum, mauris et ultrices luctus, ligula turpis semper lectus, sit\
-amet tincidunt arcu eros in massa. Sed lobortis tincidunt vestibulum.\
-Integer aliquam suscipit nibh, sit amet volutpat enim tempus in.\
-Curabitur nisl orci, bibendum sit amet porta sed, viverra laoreet massa.\
-Praesent quis mi in arcu vulputate ornare. Duis sed volutpat magna.\
-Duis suscipit leo sed neque varius aliquet. Phasellus eu justo erat, non\
-sagittis sem. Donec magna orci, tristique nec pharetra sed, rutrum at\
-eros. Etiam ultricies diam eget justo fermentum vestibulum. In hac\
-habitasse platea dictumst. Etiam eget mi risus.\
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque\
-vestibulum, mauris et ultrices luctus, ligula turpis semper lectus, sit\
-amet tincidunt arcu eros in massa. Sed lobortis tincidunt vestibulum.\
-Integer aliquam suscipit nibh, sit amet volutpat enim tempus in.\
-Curabitur nisl orci, bibendum sit amet porta sed, viverra laoreet massa.\
-Praesent quis mi in arcu vulputate ornare. Duis sed volutpat magna.\
-Duis suscipit leo sed neque varius aliquet. Phasellus eu justo erat, non\
-sagittis sem. Donec magna orci, tristique nec pharetra sed, rutrum at\
-eros. Etiam ultricies diam eget justo fermentum vestibulum. In hac\
-habitasse platea dictumst. Etiam eget mi risus."
-
 typedef struct rc4_t {
     char *key;
     unsigned char x;
