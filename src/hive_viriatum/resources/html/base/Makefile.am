@@ -34,6 +34,7 @@ resources/images/favicon.ico \
 resources/images/separator-horizontal.png \
 resources/images/illustration/error-illustration.png \
 resources/images/illustration/main-illustration.png \
+resources/images/logo/steamfire-logo.png \
 resources/images/logo/viriatum-logo.png \
 resources/images/logo/viriatum-background-logo.png \
 resources/images/mime/icon-folder.png \
