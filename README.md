@@ -93,7 +93,20 @@ Must compile the PHP interpreter with support for embeding, this should create t
 symbols loaded.
 
     ./configure --enable-embed
-    
+
+For static linking of the PHP library, useful for package distribution the following command may be used so
+that no external library dependencies are created. Note that the `-fPIc` flag must be set to allow the creation
+of static library for position independent code.
+
+    export CFGLAS="-fpic"
+    ./configure --enable-embed=static --disable-libxml --disable-dom --disable-simplexml\
+        --disable-xml --disable-xmlreader --disable-xmlwriter --without-pear --without-iconv
+
+Additional libraries may be linked and a typical compilation of the PHP distribution would include the following
+flags required by most of the applications.
+
+    -with-mysql --with-mysqli --with-gmp --with-openssl --enable-bcmath
+
 Addiotional information about the compilation flags may be found [here](http://php.net/manual/en/configure.about.php).
 
 The PHP module must then be compiled with `CFLAGS` variable set to point to the proper include directories.
