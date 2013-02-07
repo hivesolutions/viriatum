@@ -105,7 +105,7 @@ of static library for position independent code.
 Additional libraries may be linked and a typical compilation of the PHP distribution would include the following
 flags required by most of the applications.
 
-    -with-mysql --with-mysqli --with-gmp --with-openssl --enable-bcmath
+    --with-mysql --with-mysqli --with-gmp --with-openssl --enable-bcmath
 
 Addiotional information about the compilation flags may be found [here](http://php.net/manual/en/configure.about.php).
 
