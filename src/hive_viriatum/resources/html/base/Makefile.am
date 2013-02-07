@@ -30,6 +30,7 @@ engine/about \
 engine/status \
 resources/css/layout.css \
 resources/images/arrow-left.png \
+resources/images/background.png \
 resources/images/favicon.ico \
 resources/images/separator-horizontal.png \
 resources/images/illustration/error-illustration.png \
