@@ -29,6 +29,7 @@ have_php=true
 
 # checks for libraries
 AC_CHECK_LIB([viriatum], [main])
+AC_CHECK_LIB([resolv], [main], [], [AC_MSG_ERROR([resolv library is required])])
 AC_CHECK_LIB([php5], [main], [], [AC_MSG_ERROR([php 5 library is required])])
 
 # library variables activation
