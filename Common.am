@@ -24,4 +24,4 @@
 # __license__   = GNU General Public License (GPL), Version 3
 
 AM_CFLAGS = -pedantic -finline-functions -Wall -Wno-long-long -Wno-variadic-macros -Wno-strict-aliasing -DHAVE_CONFIG_H
-AM_CXXFLAGS = -pedantic -finline-functions  -Wall -Wno-long-long -Wno-variadic-macros -Wno-strict-aliasing -DHAVE_CONFIG_H
+AM_CXXFLAGS = -pedantic -finline-functions -Wall -Wno-long-long -Wno-variadic-macros -Wno-strict-aliasing -DHAVE_CONFIG_H
