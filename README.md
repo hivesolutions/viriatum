@@ -96,7 +96,7 @@ symbols loaded.
     
 Addiotional information about the compilation flags may be found [here](http://php.net/manual/en/configure.about.php).
 
-Then the PHP modules must be compiled with `CFLAGS` variable set to point to the proper include directories.
+The PHP module must then be compiled with `CFLAGS` variable set to point to the proper include directories.
 
     export CFLAGS="-I/usr/local/include/php -I/usr/local/include/php/main\
         -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend"
