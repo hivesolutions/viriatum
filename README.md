@@ -89,9 +89,13 @@ Current modules include:
 
 ### PHP Module
 
-Must compile the php interpreter with support for embeding, and then must compile the module with special variables set.
+Must compile the PHP interpreter with support for embeding, this should create the library with the propr SAPI
+symbols loaded.
 
     ./configure --enable-embed
+
+Then the PHP modules must be compiled with `CFLAGS` variable set to point to the proper include directories.
+
     export CFLAGS="-I/usr/local/include/php -I/usr/local/include/php/main\
         -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend"
 
