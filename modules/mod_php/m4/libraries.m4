@@ -25,6 +25,8 @@
 
 # sets the default values for the various library
 # control variables
+have_m=true
+have_resolv=true
 have_php=true
 
 # checks for libraries
@@ -33,4 +35,6 @@ AC_CHECK_LIB([resolv], [main], [], [AC_MSG_ERROR([resolv library is required])])
 AC_CHECK_LIB([php5], [main], [], [AC_MSG_ERROR([php 5 library is required])])
 
 # library variables activation
+AM_CONDITIONAL(LINK_M, [test "$have_m" != "false"])
+AM_CONDITIONAL(LINK_RESOLV, [test "$have_resolv" != "false"])
 AM_CONDITIONAL(LINK_PHP, [test "$have_php" != "false"])
