@@ -107,7 +107,7 @@ flags required by most of the applications.
 
     --with-mysql --with-mysqli --with-gmp --with-openssl --enable-bcmath
 
-Addiotional information about the compilation flags may be found [here](http://php.net/manual/en/configure.about.php).
+Additional information about the compilation flags may be found [here](http://php.net/manual/en/configure.about.php).
 
 The PHP module must then be compiled with `CFLAGS` variable set to point to the proper include directories.
 
