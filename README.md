@@ -79,13 +79,13 @@ There are a lot of possible building features to enable
 
 ## Modules
 
-There are a series of modules for the viriatum server in order to compile then
-some rules apply.
+There are a series of modules for the viriatum server that are used to extend functionaly
+of the base server, in order to compile then some rules apply.
 Current modules include:
 
-* `mod_lua` - For interaction with the lua interpreter
-* `mod_php` - For interaction with the php interpreter (complex compilation)
-* `mod_wsgi` - For interaction with the python interpreter using the [WSGI](http://wsgi.org) specification.
+* `mod_lua` - For interaction with the Lua interpreter
+* `mod_php` - For interaction with the PHP interpreter (complex compilation)
+* `mod_wsgi` - For interaction with the Python interpreter using the [WSGI](http://wsgi.org) specification.
 
 ### PHP Module
 
