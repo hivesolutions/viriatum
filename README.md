@@ -109,7 +109,8 @@ flags required by most of the applications.
 
 Additional information about the compilation flags may be found [here](http://php.net/manual/en/configure.about.php).
 
-The PHP module must then be compiled with `CFLAGS` variable set to point to the proper include directories.
+The PHP module must then be compiled with `CFLAGS` environment variable set to point to the proper include directories
+so that the module code is able to compiled agains these header files.
 
     export CFLAGS="-I/usr/local/include/php -I/usr/local/include/php/main\
         -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend"
