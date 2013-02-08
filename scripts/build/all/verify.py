@@ -3,7 +3,6 @@
 
 import os
 import sys
-import shutil
 
 def run():
     # in case a version value was sent to the program
@@ -11,6 +10,11 @@ def run():
     # version is set as invalid (unset)
     if len(sys.argv) > 1: _version = sys.argv[1]
     else: _version = None
+    
+    # in case there's no version provided the build
+    # is considered invalid immediately (if not version
+    # is provided there's nothing to be verified)
+    if _version == None: exit(0)
 
     os.system("git clone git://github.com/hivesolutions/viriatum.git verify")
     cwd = os.getcwd()
