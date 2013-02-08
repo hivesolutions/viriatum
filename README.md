@@ -98,7 +98,7 @@ For static linking of the PHP library, useful for package distribution the follo
 that no external library dependencies are created. Note that the `-fPIc` flag must be set to allow the creation
 of static library for position independent code.
 
-    export CFGLAS="-fpic"
+    export CFLAGS="-fpic"
     ./configure --enable-embed=static --disable-libxml --disable-dom --disable-simplexml\
         --disable-xml --disable-xmlreader --disable-xmlwriter --without-pear --without-iconv
 
