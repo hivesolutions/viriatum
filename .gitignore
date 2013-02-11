@@ -4,6 +4,8 @@
 .DS_Store
 
 bin
+build
+dist
 win32/vs2008ex/*/*
 scripts/build/builds/
 scripts/build/win32/base/
