@@ -47,7 +47,7 @@ DEV_HOME = "\\dev"
 to be used in the building stages """
 
 def autogen(path = None, clean = False):
-    path = path or "autogen.sh"
+    path = path or "./autogen.sh"
     result = subprocess.call([
         path
     ])
@@ -60,6 +60,27 @@ def autogen(path = None, clean = False):
     makefile = os.path.join(base_path, "Makefile-autoconfig")
     atm.remove(cache)
     atm.remove(makefile)
+
+def configure(path = None, args = ()):
+    path = path or "./configure"
+    result = subprocess.call([
+        path
+    ] + list(args))
+    if not result == 0: raise RuntimeError("Problem executing configure not successful")
+
+def make(install = True):
+    result = subprocess.call([
+        "make"
+    ])
+    if not result == 0: raise RuntimeError("Problem executing make not successful")
+    
+    if not install: return
+    
+    result = subprocess.call([
+        "make",
+        "install"
+    ])
+    if not result == 0: raise RuntimeError("Problem executing make install not successful")
 
 def msbuild(path, dev = True):
     # ensures that the development settings are correctly set
