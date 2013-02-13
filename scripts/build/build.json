@@ -1,6 +1,7 @@
 {
-    "name" : "Viriatum HTTP Server",
-    "description" : "Automation script for binaries and source code of viriatum",
+    "name" : "viriatum",
+    "version" : "0.3.0a1",
+    "description" : "Viriatum HTTP Server",
     "repo" : "git://github.com/hivesolutions/viriatum.git",
     "scripts" : {
         "*" : "all/build.py"
