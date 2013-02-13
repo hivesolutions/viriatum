@@ -127,6 +127,9 @@ def move(src, dst):
 
 def copy(src, dst, create = True):
     is_dir = os.path.isdir(src)
+    _is_dir = os.path.exists(dst)
+    exists = os.path.exists(dst)
+    if not _is_dir and exists: os.remove(dst) 
     if not os.path.exists(dst) and create and not is_dir: os.makedirs(dst)
     if is_dir: shutil.copytree(src, dst)
     else: shutil.copy(src, dst)
