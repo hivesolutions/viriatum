@@ -74,7 +74,7 @@ def run():
 
     os.chdir(deb_f)
     atm.deb()
-    atm.move(os.path.join(deb_f, name_arc + ".deb"), dist_f)
+    atm.move(os.path.join(deb_base_f, name_arc + ".deb"), dist_f)
 
     os.chdir(result_f)
     atm.tar(name_raw + ".tar")
