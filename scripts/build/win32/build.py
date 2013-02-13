@@ -14,7 +14,7 @@ def run():
 
     # starts the build process with the configuration file
     # that was provided to the configuration script
-    atm.build(_file)
+    atm.build(_file, arch = "win32")
 
     # creates the various paths to the folders to be used
     # for the build operation, from the ones already loaded
