@@ -89,5 +89,8 @@ def cleanup():
     atm.cleanup()
 
 if __name__ == "__main__":
-    try: run()
-    except: cleanup()
+    try:
+        run()
+    except:
+        cleanup()
+        raise
