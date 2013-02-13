@@ -20,6 +20,7 @@ def run():
     # that are going to be used around the configuration
     arch = atm.conf("arch")
     name_arc = atm.conf("name_arc")
+    name_raw = atm.conf("name_raw")
     name_src = atm.conf("name_src")
 
     # creates the various paths to the folders to be used
