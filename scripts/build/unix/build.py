@@ -27,6 +27,7 @@ def run():
     repo_f = atm.path("repo")
     result_f = atm.path("result")
     tmp_f = atm.path("tmp")
+    dist_f = atm.path("dist")
     target_f = atm.path("target")
     modules_f = os.path.join(repo_f, "modules")
     deb_base_f = os.path.join(target_f, "deb")
@@ -73,7 +74,7 @@ def run():
 
     os.chdir(deb_f)
     atm.deb()
-    atm.move(deb_f + "/" + name_arc + ".deb", dist_f)
+    atm.move(os.path.join(deb_f, name_arc + ".deb"), dist_f)
 
     os.chdir(result_f)
     atm.tar(name_raw + ".tar")
