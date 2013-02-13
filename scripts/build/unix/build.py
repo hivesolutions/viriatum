@@ -32,6 +32,7 @@ def run():
     deb_base_f = os.path.join(target_f, "deb")
     deb_f = os.path.join(deb_base_f, name_arc)
     script_f = os.path.dirname(__file__)
+    script_f = os.path.abspath(script_f)
 
     # clones the current repository using the git command this
     # should retrieve all the source data from the server
@@ -67,7 +68,7 @@ def run():
     atm.copy(result_f + "/etc/init.d/viriatum", deb_f + "/etc/init.d")
     atm.copy(result_f + "/var/viriatum/www", deb_f + "/var/viriatum")
     atm.copy(script_f + "/meta/all", deb_f + "/DEBIAN")
-    atm.copy(script_f + "/meta/all" + arch, deb_f + "/DEBIAN")
+    atm.copy(script_f + "/meta/" + arch, deb_f + "/DEBIAN")
     atm.copy(result_f, tmp_f + "/" + name_arc)
 
     os.chdir(deb_f)
