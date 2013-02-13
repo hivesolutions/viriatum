@@ -73,17 +73,22 @@ def run():
 
     os.chdir(deb_f)
     atm.deb()
+    atm.move(deb_f + "/" + name_arc + ".deb", dist_f)
+
+    os.chdir(result_f)
+    atm.tar(name_raw + ".tar")
+    atm.move(name_raw + ".tar", dist_f)
 
     # creates the various compressed files for both the archive and
     # source directories (distribution files)
-    #os.chdir(tmp_f)
-    #atm.compress(name_arc, target = dist_f)
-    #atm.compress(name_src, target = dist_f)
+    os.chdir(tmp_f)
+    atm.compress(name_arc, target = dist_f)
+    atm.compress(name_src, target = dist_f)
 
     # creates the various hash files for the complete set of files in
     # the distribution directory
-    #os.chdir(dist_f)
-    #atm.hash_d()
+    os.chdir(dist_f)
+    atm.hash_d()
 
 def cleanup():
     atm.cleanup()

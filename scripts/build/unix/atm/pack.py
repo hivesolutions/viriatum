@@ -84,7 +84,9 @@ def capsule(path, data_path, name = None, description = None):
     ])
     if not result == 0: raise RuntimeError("Capsule extend operation failed")
 
-def zip(name, names):
+def zip(name, names = None):
+    path = os.getcwd()
+    names = names or os.listdir(path)
     _zip = zipfile.ZipFile(file = name, mode = "w")
     try:
         for _name in names:
@@ -101,7 +103,9 @@ def zip(name, names):
     finally:
         _zip.close()
 
-def tar(name, names, compress = False):
+def tar(name, names = None, compress = False):
+    path = os.getcwd()
+    names = names or os.listdir(path)
     _tar = tarfile.open(name = name, mode = compress and "w:gz" or "w")
     try:
         for _name in names: _tar.add(_name)
