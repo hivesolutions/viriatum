@@ -33,11 +33,10 @@ def run():
     name_raw = atm.conf("name_raw")
     name_src = atm.conf("name_src")
 
-    # clones the current repository using the git command and then
-    # copies the resulting directory to the temporary directory
+    # clones the current repository using the git command this
+    # should retrieve all the source data from the server
     atm.git(clean = True)
-    atm.copy(repo_f, os.path.join(tmp_f, name_src))
-    
+
     modules = os.listdir(modules_f)
     
     os.chdir(repo_f)
@@ -49,8 +48,19 @@ def run():
         # removes the extra (non source files) from the source
         # distribution directory (for the module)
         module_f = os.path.join(modules_f, module)
-        os.chdir(repo_f)
+        os.chdir(module_f)
         atm.autogen(clean = True)
+        
+    os.chdir(repo_f)
+    atm.copy(repo_f, os.path.join(tmp_f, name_src))
+    atm.configure(
+        args = (
+            "--prefix=" + result_f,
+            "--with-wwwroot=" + result_f + "/var/viriatum/www",
+            "--enable-defaults"
+        )
+    )
+    atm.make()
         
     # creates the various compressed files for both the archive and
     # source directories (distribution files)
