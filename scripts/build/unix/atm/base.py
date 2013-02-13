@@ -65,6 +65,7 @@ def build(config_path):
     name = _config.get("name", "default")
     version = _config.get("version", "0.0.0")
     architecture = "win32"  #@TODO: this is hardcoded
+    arch = "amd64"  #@TODO: this is hardcoded
     name_arc = name + "-" + version + "-" + architecture
     name_raw = name_arc + "-raw"
     name_src = name_arc + "-src"
@@ -90,6 +91,7 @@ def build(config_path):
     # to be sets for the current environment
     _config["paths"] = paths
     _config["architecture"] = architecture
+    _config["arch"] = arch
     _config["name_arc"] = name_arc
     _config["name_raw"] = name_raw
     _config["name_src"] = name_src

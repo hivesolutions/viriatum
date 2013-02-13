@@ -57,8 +57,10 @@ def autogen(path = None, clean = False):
 
     base_path = os.path.dirname(path)
     cache = os.path.join(base_path, "autom4te.cache")
+    autogen = os.path.join(base_path, "autogen.sh")
     makefile = os.path.join(base_path, "Makefile-autoconfig")
     atm.remove(cache)
+    atm.remove(autogen)
     atm.remove(makefile)
 
 def configure(path = None, args = ()):
@@ -73,9 +75,9 @@ def make(install = True):
         "make"
     ])
     if not result == 0: raise RuntimeError("Problem executing make not successful")
-    
+
     if not install: return
-    
+
     result = subprocess.call([
         "make",
         "install"

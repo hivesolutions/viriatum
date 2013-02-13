@@ -53,8 +53,15 @@ def compress(folder, target = None):
     atm.move(folder + ".tar", target)
     atm.move(folder + ".tar.gz", target)
 
-def deb(path):
-    pass
+def deb(path = None):
+    path = path or os.getcwd()
+
+    result = subprocess.call([
+        "dpkg-deb",
+        "--build",
+        path
+    ])
+    if not result == 0: raise RuntimeError("Debian file package operation failed")
 
 def capsule(path, data_path, name = None, description = None):
     name = name or atm.conf("name", "default")
