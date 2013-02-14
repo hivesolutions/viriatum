@@ -48,11 +48,20 @@ config = {}
 be used across all the definitions and
 operations """
 
-def build(config_path):
+def build(config_path, arch = None):
     # in case the provided config path is not valid raises an
     # error indicating the problem
     if not config_path:
         raise RuntimeError("Invalid configuration path '%s'" % config_path)
+
+    # calls the default underlying build command to be able
+    # initialize the proper structures for each os
+    _build()
+
+    # tries to retrieve the proper architecture definition in
+    # accordance with the specification defaulting to the pre-defined
+    # values (smart values) in case no architecture is provided
+    arch = arch or _arch()
 
     # opens the configuration file for reading and
     # reads the complete set of contents creating the
@@ -61,15 +70,18 @@ def build(config_path):
     try: _config = json.load(file)
     except: file.close()
 
-    # @TODO: this is completely hardcoded
+    # creates the various configuration variables
+    # from the provided configuration map , defaulting
+    # to the pre-defined values in some cases
     name = _config.get("name", "default")
     version = _config.get("version", "0.0.0")
-    architecture = "win32"  #@TODO: this is hardcoded
-    arch = "amd64"  #@TODO: this is hardcoded
-    name_arc = name + "-" + version + "-" + architecture
+    name_arc = name + "-" + version + "-" + arch
     name_raw = name_arc + "-raw"
     name_src = name_arc + "-src"
 
+    # retrieves the current working directory and uses
+    # it to construct the various base directories to be
+    # set in the paths related map
     cwd = os.getcwd()
     build_f = os.path.join(cwd, "build")
     repo_f = os.path.join(build_f, "repo")
@@ -77,7 +89,6 @@ def build(config_path):
     tmp_f = os.path.join(target_f, "tmp")
     result_f = os.path.join(target_f, "result")
     dist_f = os.path.join(target_f, "dist")
-
     paths = {
         "build" : build_f,
         "repo" : repo_f,
@@ -90,7 +101,7 @@ def build(config_path):
     # sets the various "new" elements of the configuration
     # to be sets for the current environment
     _config["paths"] = paths
-    _config["architecture"] = architecture
+    _config["architecture"] = arch
     _config["arch"] = arch
     _config["name_arc"] = name_arc
     _config["name_raw"] = name_raw
@@ -150,6 +161,28 @@ def conf_s(name, value):
 def path(name, default = None):
     paths = config.get("paths", {})
     return paths.get(name, default)
+
+def _build_nt():
+    pass
+
+def _build_default():
+    os.system("eval `dpkg-architecture -s`")
+
+def _build():
+    name = os.name
+    if name == "nt": return _build_nt()
+    else: return _build_default()
+
+def _arch_nt():
+    return os.environ.get("PROCESSOR_ARCHITECTURE", "all")
+
+def _arch_default():
+    return os.environ.get("DEB_BUILD_ARCH", "all")
+
+def _arch():
+    name = os.name
+    if name == "nt": return _arch_nt()
+    else: return _arch_default()
 
 def _remove_error(func, path, exc):
     excvalue = exc[1]

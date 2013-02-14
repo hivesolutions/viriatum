@@ -59,9 +59,7 @@ def run():
     atm.configure(
         args = (
             "--prefix=" + result_f,
-            "--with-configroot=/etc/viriatum",
-            "--with-moduleroot=/usr/lib/viriatum/modules",
-            "--with-wwwroot=/var/viriatum/www",
+            "--with-wwwroot=" + result_f + "/var/viriatum/www",
             "--enable-defaults"
         )
     )
