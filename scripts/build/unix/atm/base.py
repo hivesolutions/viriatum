@@ -42,6 +42,8 @@ import json
 import stat
 import errno
 import shutil
+import cStringIO
+import subprocess
 
 config = {}
 """ The top level global configuration to
@@ -166,7 +168,7 @@ def _build_nt():
     pass
 
 def _build_default():
-    os.system("eval `dpkg-architecture -s`")
+    pass
 
 def _build():
     name = os.name
@@ -177,7 +179,38 @@ def _arch_nt():
     return os.environ.get("PROCESSOR_ARCHITECTURE", "all")
 
 def _arch_default():
-    return os.environ.get("DEB_BUILD_ARCH", "all")
+    # creates the buffer that will hold the data resulting
+    # from the output of the architecture information command
+    # and then starts the map that contains each of the variables
+    buffer = cStringIO.StringIO()
+    variables = {}
+
+    try:
+        # calls the command that outputs the architecture variables
+        # information and then retrieves the buffer contents
+        process = subprocess.Popen(["dpkg-architecture"], stdout = subprocess.PIPE)
+        output, _error = process.communicate()
+        result = process.returncode
+        contents = result == 0 and output or ""
+    except: contents = ""
+    finally: buffer.close()
+
+    # strips the contents information to avoid any additional
+    # unused characters (provides better compatibility)
+    contents = contents.strip()
+
+    # splits the retrieved contents around the newline
+    # character (line splitting) and then iterates over
+    # them to retrieve the name and values for each of
+    # them and set them in the variables map
+    lines = contents and contents.split("\n") or []
+    for line in lines:
+        name, value = line.split("=")
+        variables[name] = value
+
+    # returns the building architecture to be used for the
+    # process of building the package
+    return variables.get("DEB_BUILD_ARCH", "all")
 
 def _arch():
     name = os.name
