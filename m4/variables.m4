@@ -22,5 +22,3 @@
 # __date__      = $LastChangedDate$
 # __copyright__ = Copyright (c) 2008-2012 Hive Solutions Lda.
 # __license__   = GNU General Public License (GPL), Version 3
-
-have_python=true
