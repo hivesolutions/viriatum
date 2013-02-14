@@ -39,9 +39,15 @@ def run():
     # clones the current repository using the git command this
     # should retrieve all the source data from the server
     atm.git(clean = True)
-
+    
+    # lists the modules directory so that all the modules are
+    # discovered (module folder names) this will be used to
+    # build the various modules (iteration trigger)
     modules = os.listdir(modules_f)
 
+    # changes thew current directory into the repository one and
+    # runs the autogeneration process for the creation of the 
+    # configuration files
     os.chdir(repo_f)
     atm.autogen(clean = True)
 
