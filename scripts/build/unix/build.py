@@ -60,6 +60,10 @@ def run():
         os.chdir(module_f)
         atm.autogen(clean = True)
 
+    # changes the current directory to the repository one and
+    # copies the contents of it into the temporary folder named
+    # after the project name, then runs the configuration program
+    # and the build process (compilation of the project)
     os.chdir(repo_f)
     atm.copy(repo_f, os.path.join(tmp_f, name_src))
     atm.configure(
@@ -71,6 +75,9 @@ def run():
     )
     atm.make()
 
+    # copies the various build resulting files into the apropriate
+    # deb associated directories and the resulting binaries into the
+    # temporary folder associated with the project
     atm.copy(result_f + "/bin/viriatum", deb_f + "/usr/sbin")
     atm.copy(result_f + "/etc/viriatum/viriatum.ini", deb_f + "/etc/viriatum")
     atm.copy(result_f + "/etc/init.d/viriatum", deb_f + "/etc/init.d")
@@ -79,10 +86,17 @@ def run():
     atm.copy(script_f + "/meta/" + arch, deb_f + "/DEBIAN")
     atm.copy(result_f, tmp_f + "/" + name_arc)
 
+    # changes the current directory to the deb folder and starts
+    # the process of packing the deb file from the files in the
+    # folder and then moves the resulting deb file to the distribution
+    # based directory
     os.chdir(deb_f)
     atm.deb()
     atm.move(os.path.join(deb_base_f, name_arc + ".deb"), dist_f)
 
+    # changes the current directory to the resulting folder and
+    # creates the tar file for it moving it then to the distribution
+    # based folder (final place)
     os.chdir(result_f)
     atm.tar(name_raw + ".tar")
     atm.move(name_raw + ".tar", dist_f)
