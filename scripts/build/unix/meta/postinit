@@ -1,0 +1,2 @@
+update-rc.d viriatum defaults
+service viriatum start

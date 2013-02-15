@@ -1,0 +1,2 @@
+service viriatum stop
+update-rc.d -f viriatum remove
