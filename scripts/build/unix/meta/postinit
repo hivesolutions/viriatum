@@ -1,2 +1,5 @@
+#!/bin/sh
+# -*- coding: utf-8 -*-
+
 update-rc.d viriatum defaults
 service viriatum start

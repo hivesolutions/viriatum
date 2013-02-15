@@ -1,2 +1,5 @@
+#!/bin/sh
+# -*- coding: utf-8 -*-
+
 service viriatum stop
 update-rc.d -f viriatum remove
