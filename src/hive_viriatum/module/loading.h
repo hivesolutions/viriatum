@@ -118,10 +118,16 @@ typedef struct environment_t {
  */
 typedef struct module_t {
     /**
-     * The name or description of
-     * the module.
+     * The name or description of the module,
+	 * should be unique among modules.
      */
     unsigned char *name;
+
+    /**
+     * The simplified version of the name meant
+	 * to be used with reduced layout space.
+     */
+    unsigned char *name_s;
 
     /**
      * A string representing the
