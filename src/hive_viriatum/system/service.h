@@ -315,6 +315,14 @@ typedef struct service_t {
      */
     unsigned char *compilation_time;
 
+	/**
+	 * The string that described the currently loaded
+	 * modules, this string is created from the modules
+	 * structure list decribed "inside" the current
+	 * service structure.
+	 */
+	unsigned char modules[4096];
+
     /**
      * The string describing the current service
      * and its configuration, usefull for a quick
@@ -992,6 +1000,16 @@ ERROR_CODE load_modules_service(struct service_t *service);
  * @return The resulting error code.
  */
 ERROR_CODE unload_modules_service(struct service_t *service);
+
+/**
+ * Creates the modules label, updating it with the
+ * latest state for the loaded modules.
+ *
+ * @param service The service to be used when creating
+ * and updating the modules label.
+ * @return The resulting error code.
+ */
+ERROR_CODE create_modules_label(struct service_t *service);
 
 /**
  * Adds a connection to the given service.
