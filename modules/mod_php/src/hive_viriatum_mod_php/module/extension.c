@@ -229,6 +229,7 @@ ZEND_MINFO_FUNCTION(viriatum_information) {
     php_info_print_table_row(2, "Version", _service->version);
     php_info_print_table_row(2, "Platform", _service->platform);
     php_info_print_table_row(2, "Flags", _service->flags);
+    php_info_print_table_row(2, "Modules", _service->modules);
     php_info_print_table_row(2, "Compiler", _service->compiler);
     php_info_print_table_row(2, "Compiler Version", _service->compiler_version);
     php_info_print_table_row(2, "Compilation Date", _service->compilation_date);
