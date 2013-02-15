@@ -186,14 +186,15 @@ ERROR_CODE stop_module_wsgi(struct environment_t *environment, struct module_t *
 }
 
 ERROR_CODE info_module_wsgi(struct module_t *module) {
-    /* retrieves the name */
+    /* retrieves the various elemnts that are going
+	to be used in the contruction of the of the module */
     unsigned char *name = name_viriatum_mod_wsgi();
-
-    /* retrieves the version */
+	unsigned char *name_s = name_s_viriatum_mod_wsgi();
     unsigned char *version = version_viriatum_mod_wsgi();
 
     /* populates the module structure */
     module->name = name;
+	module->name_s = name_s;
     module->version = version;
     module->type = MODULE_TYPE_HTTP_HANDLER;
     module->start = start_module_wsgi;
