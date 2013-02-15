@@ -55,8 +55,8 @@ def run(build_m = True):
     # build the various modules (iteration trigger)
     modules = os.listdir(modules_f)
 
-    # changes thew current directory into the repository one and
-    # runs the autogeneration process for the creation of the
+    # changes the current directory into the repository one and
+    # runs the auto generation process for the creation of the
     # configuration files
     os.chdir(repo_f)
     atm.autogen(clean = True)
@@ -68,8 +68,6 @@ def run(build_m = True):
         os.chdir(module_f)
         atm.autogen(clean = True)
 
-    atm.)
-        
     # changes the current directory to the repository one and
     # copies the contents of it into the temporary folder named
     # after the project name, then runs the configuration program
@@ -98,7 +96,7 @@ def run(build_m = True):
         )
         atm.make()
 
-    # copies the various build resulting files into the apropriate
+    # copies the various build resulting files into the appropriate
     # deb associated directories and the resulting binaries into the
     # temporary folder associated with the project
     atm.copy(result_f + "/bin/viriatum", deb_f + "/usr/sbin")
