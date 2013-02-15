@@ -92,7 +92,8 @@ def run(build_m = True):
             args = (
                 "--prefix=" + result_f,
             ),
-            includes = INCLUDES
+            includes = INCLUDES,
+            libraries = (result_f + "/lib")
         )
         atm.make()
 
