@@ -98,7 +98,7 @@ def run(build_m = True):
     # copies the various build resulting files into the appropriate
     # deb associated directories and the resulting binaries into the
     # temporary folder associated with the project
-    atm.copy(result_f + "/lib", deb_f + "/usr")
+    atm.copy(result_f + "/lib/viriatum", deb_f + "/usr/lib/viriatum")
     atm.copy(result_f + "/bin/viriatum", deb_f + "/usr/sbin")
     atm.copy(result_f + "/etc/viriatum/viriatum.ini", deb_f + "/etc/viriatum")
     atm.copy(result_f + "/etc/init.d/viriatum", deb_f + "/etc/init.d")
