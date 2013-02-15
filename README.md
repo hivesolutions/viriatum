@@ -107,6 +107,10 @@ of static library for position independent code.
     export CFLAGS="-fpic"
     ./configure --enable-embed=static --disable-libxml --disable-dom --disable-simplexml\
         --disable-xml --disable-xmlreader --disable-xmlwriter --without-pear --without-iconv
+        
+In order to be configure the PHP interpreter to locate the php.ini file in the correct location use:
+
+    --with-config-file-path=/usr/lib
 
 Additional libraries may be linked and a typical compilation of the PHP distribution would include the following
 flags required by most of the applications.
