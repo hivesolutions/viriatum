@@ -28,7 +28,7 @@
 have_lua=true
 
 # checks for libraries
-AC_CHECK_LIB([viriatum], [main], [], [AC_MSG_ERROR([viriatum library is required]))
+AC_CHECK_LIB([viriatum], [main], [], [AC_MSG_ERROR([viriatum library is required])])
 AC_CHECK_LIB([lua5.1], [main], [], [AC_MSG_ERROR([lua 5.1 library is required])])
 
 # library variables activation

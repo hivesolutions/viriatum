@@ -28,7 +28,7 @@
 have_python=true
 
 # checks for libraries
-AC_CHECK_LIB([viriatum], [main], [], [AC_MSG_ERROR([viriatum library is required]))
+AC_CHECK_LIB([viriatum], [main], [], [AC_MSG_ERROR([viriatum library is required])])
 AC_CHECK_LIB([python2.7], [main], [], [AC_MSG_ERROR([python 2.7 library is required])])
 
 # library variables activation
