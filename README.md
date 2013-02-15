@@ -108,7 +108,7 @@ of static library for position independent code.
     ./configure --enable-embed=static --disable-libxml --disable-dom --disable-simplexml\
         --disable-xml --disable-xmlreader --disable-xmlwriter --without-pear --without-iconv
         
-In order to be configure the PHP interpreter to locate the php.ini file in the correct location use:
+In order to configure the PHP interpreter to locate the php.ini file in the correct location use:
 
     --with-config-file-path=/usr/lib
 
