@@ -6,6 +6,16 @@ import sys
 
 import atm
 
+INCLUDES = (
+    "/usr/local/include/php",
+    "/usr/local/include/php/main",
+    "/usr/local/include/php/TSRM",
+    "/usr/local/include/php/Zend",
+    "/usr/include/python2.7"
+)
+""" The list of extra include directories
+for the build process """
+
 def run(build_m = True):
     # tries to retrieve the configuration file path
     # from the provided arguments
@@ -54,12 +64,12 @@ def run(build_m = True):
     # iterates over all the modules to prepare their source code
     # for compilation distribution
     for module in modules:
-        # removes the extra (non source files) from the source
-        # distribution directory (for the module)
         module_f = os.path.join(modules_f, module)
         os.chdir(module_f)
         atm.autogen(clean = True)
 
+    atm.)
+        
     # changes the current directory to the repository one and
     # copies the contents of it into the temporary folder named
     # after the project name, then runs the configuration program
@@ -75,6 +85,19 @@ def run(build_m = True):
     )
     atm.make()
 
+    # iterates over each of the modules to run the build process
+    # operations for each of them
+    for module in modules:
+        module_f = os.path.join(modules_f, module)
+        os.chdir(module_f)
+        atm.configure(
+            args = (
+                "--prefix=" + result_f
+            ),
+            includes = INCLUDES
+        )
+        atm.make()
+
     # copies the various build resulting files into the apropriate
     # deb associated directories and the resulting binaries into the
     # temporary folder associated with the project
@@ -82,6 +105,7 @@ def run(build_m = True):
     atm.copy(result_f + "/etc/viriatum/viriatum.ini", deb_f + "/etc/viriatum")
     atm.copy(result_f + "/etc/init.d/viriatum", deb_f + "/etc/init.d")
     atm.copy(result_f + "/var/viriatum/www", deb_f + "/var/viriatum")
+    atm.copy(result_f + "/lib", deb_f + "/usr")
     atm.copy(script_f + "/meta/all", deb_f + "/DEBIAN")
     atm.copy(script_f + "/meta/" + arch, deb_f + "/DEBIAN")
     atm.copy(result_f, tmp_f + "/" + name_arc)

@@ -38,6 +38,7 @@ __license__ = "GNU General Public License (GPL), Version 3"
 """ The license for the module """
 
 import os
+import copy
 import subprocess
 
 import atm
@@ -63,11 +64,24 @@ def autogen(path = None, clean = False):
     atm.remove(autogen)
     atm.remove(makefile)
 
-def configure(path = None, args = ()):
+def configure(path = None, args = (), includes = ()):
+    # creates the pre-defined path for the configuration
+    # file to be used in case it was not provided
     path = path or "./configure"
+    
+    # copies the current set of environment variables and
+    # creates the includes string from the various provided
+    # include paths and sets the cflags variable with it
+    env = copy.copy(os.environ)
+    includes_s = ""
+    for include in includes: includes_s += "-I" + include + " "
+    env["CFLAGS"] = includes_s
+    
+    # runs the configuration process with the newly set environment
+    # variables and in case the execution fails raises an exception
     result = subprocess.call([
         path
-    ] + list(args))
+    ] + list(args), env = env)
     if not result == 0: raise RuntimeError("Problem executing configure not successful")
 
 def make(install = True):
