@@ -38,6 +38,10 @@
                         <td class="left value"><?php echo(viriatum_flags()) ?></td>
                     </tr>
                     <tr>
+                        <td class="right label">modules</td>
+                        <td class="left value"><?php echo(viriatum_modules()) ?></td>
+                    </tr>
+                    <tr>
                         <td class="right label">environment</td>
                         <td class="left value"><?php echo(viriatum_platform()) ?></td>
                     </tr>
