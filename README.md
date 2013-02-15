@@ -87,6 +87,12 @@ Current modules include:
 * `mod_php` - For interaction with the PHP interpreter (complex compilation)
 * `mod_wsgi` - For interaction with the Python interpreter using the [WSGI](http://wsgi.org) specification.
 
+### Lua Module
+
+For an ubuntu linux environment the lua 5.1 development packages must be included using:
+
+    apt-get install liblua5.1-0-dev
+
 ### PHP Module
 
 Must compile the PHP interpreter with support for embeding, this should create the library with the propr SAPI
@@ -116,6 +122,10 @@ so that the module code is able to compiled agains these header files.
         -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend"
 
 ### WSGI Module
+
+For an ubuntu linux environment the python development packages must be included using:
+
+    apt-get install python2.7-dev
 
 Must compile viriatum with special environment variables set to point to the correct headers directory.
 
