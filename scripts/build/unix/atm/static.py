@@ -19,6 +19,9 @@
 # You should have received a copy of the GNU General Public License
 # along with Hive Automium System. If not, see <http://www.gnu.org/licenses/>.
 
+__author__ = "João Magalhães <joamag@hive.pt>"
+""" The author(s) of the module """
+
 __version__ = "1.0.0"
 """ The version of the module """
 
@@ -34,20 +37,14 @@ __copyright__ = "Copyright (c) 2008-2012 Hive Solutions Lda."
 __license__ = "GNU General Public License (GPL), Version 3"
 """ The license for the module """
 
-import base
-import build
-import environ
-import exceptions
-import hash
-import pack
-import repo
-import static
-
-from base import *
-from build import *
-from environ import *
-from exceptions import *
-from hash import *
-from pack import *
-from repo import *
-from static import *
+DEB_CONTROL = "Package: %s\n\
+Version: %s\n\
+Section: %s\n\
+Priority: %s\n\
+Architecture: %s\n\
+Depends: %s\n\
+Installed-Size: %s\n\
+Maintainer: %s\n\
+Description: %s"
+""" The template to be used in the generation
+of the control file for deb packaging """

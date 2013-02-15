@@ -2,6 +2,7 @@
     "name" : "viriatum",
     "version" : "0.3.0a1",
     "description" : "Viriatum HTTP Server",
+    "author" : "Hive Solutions <development@hive.pt>",
     "repo" : "git://github.com/hivesolutions/viriatum.git",
     "scripts" : {
         "win32" : "win32/build.py",

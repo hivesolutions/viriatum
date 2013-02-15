@@ -104,8 +104,6 @@ def run(build_m = True):
     atm.copy(result_f + "/etc/init.d/viriatum", deb_f + "/etc/init.d")
     atm.copy(result_f + "/var/viriatum/www", deb_f + "/var/viriatum")
     atm.copy(result_f + "/lib", deb_f + "/usr")
-    atm.copy(script_f + "/meta/all", deb_f + "/DEBIAN")
-    atm.copy(script_f + "/meta/" + arch, deb_f + "/DEBIAN")
     atm.copy(result_f, tmp_f + "/" + name_arc)
 
     # changes the current directory to the deb folder and starts

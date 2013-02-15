@@ -53,8 +53,29 @@ def compress(folder, target = None):
     atm.move(folder + ".tar", target)
     atm.move(folder + ".tar.gz", target)
 
-def deb(path = None):
+def deb(path = None, **kwargs):
     path = path or os.getcwd()
+
+    debian_path = os.path.join(path, "DEBIAN")
+    control_path = os.path.join(debian_path, "control")
+    if not os.path.exists(debian_path): os.makedirs(debian_path)
+
+    name = kwargs.get("name") or atm.conf("name", "default")
+    version = kwargs.get("version") or atm.conf("version", "0.0.0")
+    priority = kwargs.get("priority") or atm.conf("priority", "optional")
+    arch = kwargs.get("arch") or atm.conf("arch", "all")
+    depends = kwargs.get("depends") or atm.conf("depends", "")
+    size = kwargs.get("size") or atm.conf("size", "0")
+    author = kwargs.get("author") or atm.conf("author", "default")
+    description = kwargs.get("description") or atm.conf("description", "")
+
+    contents = atm.DEB_CONTROL % (
+        name, version, priority, arch, depends, size, author, description
+    )
+
+    file = open(control_path, "wb")
+    try: file.write(contents)
+    finally: file.close()
 
     result = subprocess.call([
         "dpkg-deb",
