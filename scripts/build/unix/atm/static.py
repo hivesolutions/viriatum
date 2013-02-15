@@ -45,6 +45,6 @@ Architecture: %s\n\
 Depends: %s\n\
 Installed-Size: %s\n\
 Maintainer: %s\n\
-Description: %s"
+Description: %s\n"
 """ The template to be used in the generation
 of the control file for deb packaging """

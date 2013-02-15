@@ -62,6 +62,7 @@ def deb(path = None, **kwargs):
 
     name = kwargs.get("name") or atm.conf("name", "default")
     version = kwargs.get("version") or atm.conf("version", "0.0.0")
+    section = kwargs.get("section") or atm.conf("section", "devel")
     priority = kwargs.get("priority") or atm.conf("priority", "optional")
     arch = kwargs.get("arch") or atm.conf("arch", "all")
     depends = kwargs.get("depends") or atm.conf("depends", "")
@@ -70,7 +71,15 @@ def deb(path = None, **kwargs):
     description = kwargs.get("description") or atm.conf("description", "")
 
     contents = atm.DEB_CONTROL % (
-        name, version, priority, arch, depends, size, author, description
+        name,
+        version,
+        section,
+        priority,
+        arch,
+        depends,
+        size,
+        author,
+        description
     )
 
     file = open(control_path, "wb")

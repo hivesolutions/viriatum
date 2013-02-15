@@ -111,7 +111,7 @@ def run(build_m = True):
     # folder and then moves the resulting deb file to the distribution
     # based directory
     os.chdir(deb_f)
-    atm.deb()
+    atm.deb(section = "httpd", depends = "libc6 (>= 2.5-0ubuntu1)")
     atm.move(os.path.join(deb_base_f, name_arc + ".deb"), dist_f)
 
     # changes the current directory to the resulting folder and
