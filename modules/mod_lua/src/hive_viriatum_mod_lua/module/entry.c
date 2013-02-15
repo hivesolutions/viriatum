@@ -188,14 +188,14 @@ ERROR_CODE stop_module_lua(struct environment_t *environment, struct module_t *m
 
 ERROR_CODE info_module_lua(struct module_t *module) {
     /* retrieves the various elemnts that are going
-	to be used in the contruction of the of the module */
+    to be used in the contruction of the of the module */
     unsigned char *name = name_viriatum_mod_lua();
-	unsigned char *name_s = name_s_viriatum_mod_lua();
+    unsigned char *name_s = name_s_viriatum_mod_lua();
     unsigned char *version = version_viriatum_mod_lua();
 
     /* populates the module structure */
     module->name = name;
-	module->name_s = name_s;
+    module->name_s = name_s;
     module->version = version;
     module->type = MODULE_TYPE_HTTP_HANDLER;
     module->start = start_module_lua;

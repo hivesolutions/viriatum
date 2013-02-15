@@ -56,7 +56,7 @@ typedef struct handler_php_context_t {
 
     /**
      * The file name to be used for retrieving the file,
-	 * it should represent the final url path to be resolved.
+     * it should represent the final url path to be resolved.
      */
     unsigned char file_name[VIRIATUM_MAX_URL_SIZE];
 

@@ -1321,7 +1321,7 @@ ERROR_CODE load_modules_service(struct service_t *service) {
         get_next_iterator(entries_iterator, (void **) &entry);
 
         /* in case the current module is null (end of iterator)
-		must break the current loop */
+        must break the current loop */
         if(entry == NULL) {  break; }
 
         /* in case the entry name does not ends with the shared object extension
@@ -1331,14 +1331,14 @@ ERROR_CODE load_modules_service(struct service_t *service) {
         }
 
         /* creates the complete module path for the loading of it (this
-		should be the path to the module file) */
+        should be the path to the module file) */
         SPRINTF(
-		    (char *) module_path,
-			VIRIATUM_MAX_PATH_SIZE,
-			"%s/%s",
-			VIRIATUM_MODULES_PATH,
-			entry->name
-		);
+            (char *) module_path,
+            VIRIATUM_MAX_PATH_SIZE,
+            "%s/%s",
+            VIRIATUM_MODULES_PATH,
+            entry->name
+        );
 
         /* tries to find the module prefix in the current entry name
         in case it's not found continues the loop immediately no library
@@ -1367,9 +1367,9 @@ ERROR_CODE load_modules_service(struct service_t *service) {
     delete_directory_entries_file(entries);
     delete_linked_list(entries);
 
-	/* re-creates the new modules label for the service
-	this should be able to update the names as a buffer */
-	create_modules_label(service);
+    /* re-creates the new modules label for the service
+    this should be able to update the names as a buffer */
+    create_modules_label(service);
 
     /* prints a debug message */
     V_DEBUG("Finished loading modules\n");
@@ -1392,7 +1392,7 @@ ERROR_CODE unload_modules_service(struct service_t *service) {
     while(1) {
         /* retrieves the next value from the iterator and
         in case the current module is null (end of iterator)
-		must break the current loop */
+        must break the current loop */
         get_next_iterator(modules_list_iterator, (void **) &current_module);
         if(current_module == NULL) { break; }
 
@@ -1408,45 +1408,45 @@ ERROR_CODE unload_modules_service(struct service_t *service) {
 }
 
 ERROR_CODE create_modules_label(struct service_t *service) {
-	/* allocates space for the various structures to
-	be used for the creation of the label */
+    /* allocates space for the various structures to
+    be used for the creation of the label */
     size_t name_size;
-	struct module_t *current_module;
+    struct module_t *current_module;
     struct iterator_t *modules_list_iterator;
-	unsigned char is_first = TRUE;
-	unsigned char *buffer = service->modules;
+    unsigned char is_first = TRUE;
+    unsigned char *buffer = service->modules;
 
     /* creates the iterator for the linked list */
     create_iterator_linked_list(service->modules_list, &modules_list_iterator);
 
     /* iterates continuously over the list of modules
-	to create the modules label */
+    to create the modules label */
     while(1) {
         /* retrieves the next value from the iterator and
         in case the current module is null (end of iterator)
-		must break the current loop */
+        must break the current loop */
         get_next_iterator(modules_list_iterator, (void **) &current_module);
         if(current_module == NULL) { break; }
 
-		/* in case this is the first iteration no extra space
-		copy occurs, otherwise the space is copied to the buffer */
-		if(is_first) {
-			is_first = FALSE;
-		} else {
-			memcpy(buffer, " ", 1);
-			buffer += 1;
-		}
+        /* in case this is the first iteration no extra space
+        copy occurs, otherwise the space is copied to the buffer */
+        if(is_first) {
+            is_first = FALSE;
+        } else {
+            memcpy(buffer, " ", 1);
+            buffer += 1;
+        }
 
-		/* retrieves the size of the current module name and
-		then copies the name of it into the buffer */
-		name_size = strlen(current_module->name_s);
-		memcpy(buffer, current_module->name_s, name_size);
-		buffer += name_size;
+        /* retrieves the size of the current module name and
+        then copies the name of it into the buffer */
+        name_size = strlen(current_module->name_s);
+        memcpy(buffer, current_module->name_s, name_size);
+        buffer += name_size;
     }
 
-	/* closes the buffer with the final end of string charater
-	so that the string becomes null closed */
-	*buffer = '\0';
+    /* closes the buffer with the final end of string charater
+    so that the string becomes null closed */
+    *buffer = '\0';
 
     /* deletes the iterator linked list */
     delete_iterator_linked_list(service->modules_list, modules_list_iterator);

@@ -47,7 +47,7 @@ def run():
 
     # changes to the binary directory and copies the built files
     # to the result directory and then copies the resulting files
-    # to the temporary directory also 
+    # to the temporary directory also
     os.chdir(bin_f)
     atm.copy("viriatum.exe", result_f)
     atm.copy("config", os.path.join(result_f, "config"))
@@ -74,7 +74,7 @@ def run():
     os.chdir(tmp_f)
     atm.compress(name_arc, target = dist_f)
     atm.compress(name_src, target = dist_f)
-    
+
     # creates the various hash files for the complete set of files in
     # the distribution directory
     os.chdir(dist_f)

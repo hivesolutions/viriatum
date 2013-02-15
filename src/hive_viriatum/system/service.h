@@ -315,13 +315,13 @@ typedef struct service_t {
      */
     unsigned char *compilation_time;
 
-	/**
-	 * The string that described the currently loaded
-	 * modules, this string is created from the modules
-	 * structure list decribed "inside" the current
-	 * service structure.
-	 */
-	unsigned char modules[4096];
+    /**
+     * The string that described the currently loaded
+     * modules, this string is created from the modules
+     * structure list decribed "inside" the current
+     * service structure.
+     */
+    unsigned char modules[4096];
 
     /**
      * The string describing the current service
