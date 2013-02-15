@@ -53,7 +53,7 @@ def run(build_m = True):
     # lists the modules directory so that all the modules are
     # discovered (module folder names) this will be used to
     # build the various modules (iteration trigger)
-    modules = os.listdir(modules_f)
+    modules = build_m and os.listdir(modules_f) or []
 
     # changes the current directory into the repository one and
     # runs the auto generation process for the creation of the
