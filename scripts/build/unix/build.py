@@ -117,7 +117,7 @@ def run(build_m = True):
         depends = "libc6 (>= 2.5-0ubuntu1)",
         size = "1024"
     )
-    atm.move(os.path.join(deb_base_f, name_arc + ".deb"), dist_f)
+    atm.move(os.path.join(deb_base_f, name_deb + ".deb"), dist_f)
 
     # changes the current directory to the resulting folder and
     # creates the tar file for it moving it then to the distribution
