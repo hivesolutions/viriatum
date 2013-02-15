@@ -90,7 +90,7 @@ def run(build_m = True):
         os.chdir(module_f)
         atm.configure(
             args = (
-                "--prefix=" + result_f
+                "--prefix=" + result_f,
             ),
             includes = INCLUDES
         )
