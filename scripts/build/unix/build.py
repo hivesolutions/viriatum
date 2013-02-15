@@ -28,7 +28,6 @@ def run(build_m = True):
 
     # retrieves the various values from the global configuration
     # that are going to be used around the configuration
-    arch = atm.conf("arch")
     name_arc = atm.conf("name_arc")
     name_raw = atm.conf("name_raw")
     name_src = atm.conf("name_src")
@@ -111,7 +110,11 @@ def run(build_m = True):
     # folder and then moves the resulting deb file to the distribution
     # based directory
     os.chdir(deb_f)
-    atm.deb(section = "httpd", depends = "libc6 (>= 2.5-0ubuntu1)")
+    atm.deb(
+        section = "httpd",
+        depends = "libc6 (>= 2.5-0ubuntu1)",
+        size = "1024"
+    )
     atm.move(os.path.join(deb_base_f, name_arc + ".deb"), dist_f)
 
     # changes the current directory to the resulting folder and
