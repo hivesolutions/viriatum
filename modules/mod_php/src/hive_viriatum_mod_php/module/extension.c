@@ -36,6 +36,7 @@ zend_function_entry viriatum_functions[] = {
     PHP_FE(viriatum_version, NULL)
     PHP_FE(viriatum_platform, NULL)
     PHP_FE(viriatum_flags, NULL)
+	PHP_FE(viriatum_modules, NULL)
     PHP_FE(viriatum_description, NULL)
     PHP_FE(viriatum_compiler, NULL)
     PHP_FE(viriatum_compiler_version, NULL)
@@ -280,6 +281,10 @@ PHP_FUNCTION(viriatum_compilation_date) {
 
 PHP_FUNCTION(viriatum_compilation_time) {
     RETURN_STRING((char *) _service->compilation_time, 1);
+}
+
+PHP_FUNCTION(viriatum_modules) {
+    RETURN_STRING((char *) _service->modules, 1);
 }
 
 PHP_FUNCTION(viriatum_description) {
