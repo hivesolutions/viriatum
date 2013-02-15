@@ -36,6 +36,7 @@
 #define PYTHON_THREADS
 
 unsigned char *name_viriatum_mod_wsgi();
+unsigned char *name_s_viriatum_mod_wsgi();
 unsigned char *version_viriatum_mod_wsgi();
 unsigned char *description_viriatum_mod_wsgi();
 

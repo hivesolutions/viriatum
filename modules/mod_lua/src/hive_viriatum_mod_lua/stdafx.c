@@ -28,9 +28,11 @@
 #include "stdafx.h"
 
 static unsigned char name[] = "viriatum_mod_lua";
+static unsigned char name_s[] = "lua";
 static unsigned char version[] = "1.0.0";
 static unsigned char description[] = "Viriatum Lua Module";
 
 unsigned char *name_viriatum_mod_lua() { return name; }
+unsigned char *name_s_viriatum_mod_lua() { return name_s; }
 unsigned char *version_viriatum_mod_lua() { return version; }
 unsigned char *description_viriatum_mod_lua() { return description; }

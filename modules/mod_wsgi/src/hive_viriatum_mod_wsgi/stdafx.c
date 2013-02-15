@@ -28,9 +28,11 @@
 #include "stdafx.h"
 
 static unsigned char name[] = "viriatum_mod_wsgi";
+static unsigned char name_s[] = "wsgi";
 static unsigned char version[] = "1.0.0";
 static unsigned char description[] = "Viriatum Wsgi Module";
 
 unsigned char *name_viriatum_mod_wsgi() { return name; }
+unsigned char *name_s_viriatum_mod_wsgi() { return name_s; }
 unsigned char *version_viriatum_mod_wsgi() { return version; }
 unsigned char *description_viriatum_mod_wsgi() { return description; }

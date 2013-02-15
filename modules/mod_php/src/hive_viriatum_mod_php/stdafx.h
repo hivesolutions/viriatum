@@ -45,6 +45,7 @@
 #endif
 
 unsigned char *name_viriatum_mod_php();
+unsigned char *name_s_viriatum_mod_php();
 unsigned char *version_viriatum_mod_php();
 unsigned char *description_viriatum_mod_php();
 
