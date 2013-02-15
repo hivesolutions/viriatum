@@ -1439,7 +1439,7 @@ ERROR_CODE create_modules_label(struct service_t *service) {
 
         /* retrieves the size of the current module name and
         then copies the name of it into the buffer */
-        name_size = strlen(current_module->name_s);
+        name_size = strlen((char *) current_module->name_s);
         memcpy(buffer, current_module->name_s, name_size);
         buffer += name_size;
     }
