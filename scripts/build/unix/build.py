@@ -6,7 +6,7 @@ import sys
 
 import atm
 
-def run():
+def run(build_m = True):
     # tries to retrieve the configuration file path
     # from the provided arguments
     if len(sys.argv) > 1: _file = sys.argv[1]
