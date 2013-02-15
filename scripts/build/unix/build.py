@@ -31,6 +31,7 @@ def run(build_m = True):
     name_arc = atm.conf("name_arc")
     name_raw = atm.conf("name_raw")
     name_src = atm.conf("name_src")
+    name_deb = name_arc.replace("-", "_")
 
     # creates the various paths to the folders to be used
     # for the build operation, from the ones already loaded
@@ -41,7 +42,7 @@ def run(build_m = True):
     target_f = atm.path("target")
     modules_f = os.path.join(repo_f, "modules")
     deb_base_f = os.path.join(target_f, "deb")
-    deb_f = os.path.join(deb_base_f, name_arc)
+    deb_f = os.path.join(deb_base_f, name_deb)
     script_f = os.path.dirname(__file__)
     script_f = os.path.abspath(script_f)
 
