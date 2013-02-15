@@ -103,7 +103,7 @@ def run(build_m = True):
     atm.copy(result_f + "/bin/viriatum", deb_f + "/usr/sbin")
     atm.copy(result_f + "/etc/viriatum/viriatum.ini", deb_f + "/etc/viriatum")
     atm.copy(result_f + "/etc/init.d/viriatum", deb_f + "/etc/init.d")
-    atm.copy(result_f + "/var/viriatum/www", deb_f + "/var/viriatum")
+    atm.copy(result_f + "/var/viriatum/www", deb_f + "/var/viriatum/www")
     atm.copy(script_f + "/meta", deb_f + "/DEBIAN")
     atm.copy(result_f, tmp_f + "/" + name_arc)
 
