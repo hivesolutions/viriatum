@@ -1,5 +1,11 @@
 #!/bin/sh
 # -*- coding: utf-8 -*-
 
-update-rc.d viriatum defaults
-service viriatum start
+set -e
+
+case "$1" in
+    configure)
+        update-rc.d viriatum defaults
+        service viriatum start
+        ;;
+esac

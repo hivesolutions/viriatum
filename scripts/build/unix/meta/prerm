@@ -1,5 +1,11 @@
 #!/bin/sh
 # -*- coding: utf-8 -*-
 
-service viriatum stop
-update-rc.d -f viriatum remove
+set -e
+
+case "$1" in
+    remove)
+        service viriatum stop
+        update-rc.d -f viriatum remove
+        ;;
+esac
