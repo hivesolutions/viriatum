@@ -24,7 +24,8 @@ def run(build_m = True):
 
     # starts the build process with the configuration file
     # that was provided to the configuration script
-    atm.build(_file)
+    atm.build(_file, arch = "armhf")
+    #atm.build(_file)
 
     # retrieves the various values from the global configuration
     # that are going to be used around the configuration
@@ -79,7 +80,8 @@ def run(build_m = True):
             "--prefix=" + result_f,
             "--with-wwwroot=" + result_f + "/var/viriatum/www",
             "--enable-defaults"
-        )
+        ),
+        cross = "arm-unknown-linux-gnueabi"
     )
     atm.make()
 
@@ -93,7 +95,8 @@ def run(build_m = True):
                 "--prefix=" + result_f,
             ),
             includes = INCLUDES,
-            libraries = (result_f + "/lib",)
+            libraries = (result_f + "/lib",),
+            cross = "arm-unknown-linux-gnueabi"
         )
         atm.make()
 
@@ -115,7 +118,7 @@ def run(build_m = True):
     os.chdir(deb_f)
     atm.deb(
         section = "httpd",
-        depends = "libc6 (>= 2.5-0ubuntu1)",
+        depends = "libc6",
         size = "1024"
     )
     atm.move(os.path.join(deb_base_f, name_deb + ".deb"), dist_f)
