@@ -6,12 +6,19 @@ import sys
 
 import atm
 
+#INCLUDES = (
+#    "/usr/local/include/php",
+#    "/usr/local/include/php/main",
+#    "/usr/local/include/php/TSRM",
+#    "/usr/local/include/php/Zend",
+#    "/usr/include/python2.7"
+#)
 INCLUDES = (
-    "/usr/local/include/php",
-    "/usr/local/include/php/main",
-    "/usr/local/include/php/TSRM",
-    "/usr/local/include/php/Zend",
-    "/usr/include/python2.7"
+    "/opt/arm-unknown-linux-gnueabi/include/php",
+    "/opt/arm-unknown-linux-gnueabi/include/php/main",
+    "/opt/arm-unknown-linux-gnueabi/include/php/TSRM",
+    "/opt/arm-unknown-linux-gnueabi/include/php/Zend",
+    "/opt/arm-unknown-linux-gnueabi/include/python2.7"
 )
 """ The list of extra include directories
 for the build process """
