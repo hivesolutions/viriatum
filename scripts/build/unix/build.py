@@ -39,12 +39,9 @@ def run(build_m = True):
     if len(sys.argv) > 2: cross = sys.argv[2]
     else: cross = None
 
-    if cross: arch = "armhf" #@TODO: this is hardcoded
-    else: arch = None #@TODO: this is hardcoded
-
     # starts the build process with the configuration file
     # that was provided to the configuration script
-    atm.build(_file, arch = arch)
+    atm.build(_file, cross = cross)
 
     # retrieves the various values from the global configuration
     # that are going to be used around the configuration
