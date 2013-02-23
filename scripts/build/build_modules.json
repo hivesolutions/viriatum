@@ -1,9 +1,0 @@
-{
-    "name" : "Viriatum HTTP Server Modules",
-    "description" : "Automation script for binaries and source code of viriatum modules",
-    "files" : {
-        "win32" : "win32/build_modules.bat",
-        "unix" : "unix/build_modules.sh"
-    },
-    "recursion" : [0, 0, 1, 0, 0]
-}
