@@ -7,9 +7,21 @@ The current implementation support both x86/x64 and ARM architectures.
 
 ## Building
 
+### Automium
+
+Building viriatum using automium is quite simple even for complex builds like cross compilation.
+Just use the apropriate 'build.json' located under 'scripts/build' and under such directory execute:
+
+    atm.sh
+
+For cross compilation (eg: arm-linux) use the following command:
+
+    atm.sh arm-unknown-linux-gnueabi
+
 ### Source Control Repository
 
-If you're going to build viriatum using the git repository you first need to generate the configure files using autoconf.
+If you're going to build viriatum using the git repository you first need to generate the configure
+files using autoconf.
 
     ./autogen.sh
 
