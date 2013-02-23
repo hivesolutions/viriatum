@@ -6,22 +6,27 @@ import sys
 
 import atm
 
-#INCLUDES = (
-#    "/usr/local/include/php",
-#    "/usr/local/include/php/main",
-#    "/usr/local/include/php/TSRM",
-#    "/usr/local/include/php/Zend",
-#    "/usr/include/python2.7"
-#)
 INCLUDES = (
-    "/opt/arm-unknown-linux-gnueabi/include/php",
-    "/opt/arm-unknown-linux-gnueabi/include/php/main",
-    "/opt/arm-unknown-linux-gnueabi/include/php/TSRM",
-    "/opt/arm-unknown-linux-gnueabi/include/php/Zend",
-    "/opt/arm-unknown-linux-gnueabi/include/python2.7"
+    "/usr/local/include/php",
+    "/usr/local/include/php/main",
+    "/usr/local/include/php/TSRM",
+    "/usr/local/include/php/Zend",
+    "/usr/include/python2.7"
 )
 """ The list of extra include directories
 for the build process """
+
+INCLUDES_CROSS = (
+    "/opt/%s/include/php",
+    "/opt/%s/include/php/main",
+    "/opt/%s/include/php/TSRM",
+    "/opt/%s/include/php/Zend",
+    "/opt/%s/include/python2.7"
+)
+""" The list of extra include directories
+for the build process, these values are just
+templates that should be completed with the
+cross compialation host value """
 
 def run(build_m = True):
     # tries to retrieve the configuration file path
@@ -29,10 +34,17 @@ def run(build_m = True):
     if len(sys.argv) > 1: _file = sys.argv[1]
     else: _file = None
 
+    # tries to retrieve the cross compilation value
+    # from the provided arguments
+    if len(sys.argv) > 2: cross = sys.argv[2]
+    else: cross = None
+
+    if cross: arch = "armhf" #@TODO: this is hardcoded
+    else: arch = None #@TODO: this is hardcoded
+
     # starts the build process with the configuration file
     # that was provided to the configuration script
-    atm.build(_file, arch = "armhf")
-    #atm.build(_file)
+    atm.build(_file, arch = arch)
 
     # retrieves the various values from the global configuration
     # that are going to be used around the configuration
@@ -88,7 +100,7 @@ def run(build_m = True):
             "--with-wwwroot=" + result_f + "/var/viriatum/www",
             "--enable-defaults"
         ),
-        cross = "arm-unknown-linux-gnueabi"
+        cross = cross
     )
     atm.make()
 
@@ -101,9 +113,9 @@ def run(build_m = True):
             args = (
                 "--prefix=" + result_f,
             ),
-            includes = INCLUDES,
+            includes = cross and INCLUDES_CROSS or INCLUDES,
             libraries = (result_f + "/lib",),
-            cross = "arm-unknown-linux-gnueabi"
+            cross = cross
         )
         atm.make()
 
