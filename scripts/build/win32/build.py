@@ -76,7 +76,7 @@ def run(build_m = True, mode = "Release"):
     build_m and atm.msbuild(mod_sln_path, includes = INCLUDES)
 
     # iterates over all the modules to copy their resulting files
-    # into the apropriate modules directory
+    # into the appropriate modules directory
     for module in modules:
         module_bin_f = os.path.join(
             base_f,
@@ -96,7 +96,7 @@ def run(build_m = True, mode = "Release"):
     atm.move(name_raw + ".tar", dist_f)
 
     # changes to build directory and creates the capsule file for the
-    # current configuration, the metada values will be used from the
+    # current configuration, the metadata values will be used from the
     # context that is currently defined
     os.chdir(build_f)
     atm.capsule(

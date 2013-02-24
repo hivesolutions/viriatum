@@ -26,7 +26,7 @@ INCLUDES_CROSS = (
 """ The list of extra include directories
 for the build process, these values are just
 templates that should be completed with the
-cross compialation host value """
+cross compilation host value """
 
 def run(build_m = True):
     # tries to retrieve the configuration file path
