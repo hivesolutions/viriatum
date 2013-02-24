@@ -44,8 +44,6 @@ def run(build_m = True, mode = "Release"):
 
     # retrieves the various values from the global configuration
     # that are going to be used around the configuration
-    name = atm.conf("name")
-    description = atm.conf("description")
     name_arc = atm.conf("name_arc")
     name_raw = atm.conf("name_raw")
     name_src = atm.conf("name_src")
@@ -86,7 +84,7 @@ def run(build_m = True, mode = "Release"):
         )
         os.chdir(module_bin_f)
         atm.copy("viriatum_%s.dll" % module, os.path.join(result_f, "modules"))
-    
+
     # copies the resulting files to the temporary directory with
     # the name of the build for later compression
     atm.copy(result_f, os.path.join(tmp_f, name_arc))
