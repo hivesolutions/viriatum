@@ -66,13 +66,11 @@ def run(build_m = True, mode = "Release"):
     atm.msbuild(sln_path)
 
     # changes to the binary directory and copies the built files
-    # to the result directory and then copies the resulting files
-    # to the temporary directory also
+    # to the result directory
     os.chdir(bin_f)
     atm.copy("viriatum.exe", result_f)
     atm.copy("config", os.path.join(result_f, "config"))
     atm.copy("htdocs", os.path.join(result_f, "htdocs"))
-    atm.copy(result_f, os.path.join(tmp_f, name_arc))
 
     # constructs the path to the solution file and uses it for
     # the msbuild command to build the project
@@ -88,6 +86,10 @@ def run(build_m = True, mode = "Release"):
         )
         os.chdir(module_bin_f)
         atm.copy("viriatum_%s.dll" % module, os.path.join(result_f, "modules"))
+    
+    # copies the resulting files to the temporary directory with
+    # the name of the build for later compression
+    atm.copy(result_f, os.path.join(tmp_f, name_arc))
     
     # changes the current directory to the result directory and
     # creates a tar based file with the binary contents
