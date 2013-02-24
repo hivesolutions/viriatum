@@ -87,7 +87,7 @@ def run(build_m = True, mode = "Release"):
             "bin/hive_viriatum_%s/i386/win32/%s" % (module, mode)
         )
         os.chdir(module_bin_f)
-        atm.copy("viriatum_%s" % modules, os.path.join(result_f, "modules"))
+        atm.copy("viriatum_%s.dll" % module, os.path.join(result_f, "modules"))
     
     # changes the current directory to the result directory and
     # creates a tar based file with the binary contents

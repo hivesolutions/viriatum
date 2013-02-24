@@ -8,6 +8,7 @@
 /build/
 /dist/
 /win32/vs2008ex/*/*
+/scripts/build/tmp/
 /scripts/build/builds/
 /scripts/build/win32/build/
 /scripts/build/win32/base/
