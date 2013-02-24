@@ -39,6 +39,11 @@ def run(build_m = True):
     if len(sys.argv) > 2: cross = sys.argv[2]
     else: cross = None
 
+    # runs the initial assertion for the various commands
+    # that are mandatory for execution, this should avoid
+    # errors in the middle of the build
+    atm.assert_c(("git", "make", "dpkg-deb"))
+
     # starts the build process with the configuration file
     # that was provided to the configuration script
     atm.build(_file, cross = cross)

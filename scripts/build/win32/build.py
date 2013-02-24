@@ -25,6 +25,11 @@ def run(build_m = True, mode = "Release"):
     # from the provided arguments
     if len(sys.argv) > 1: _file = sys.argv[1]
     else: _file = None
+    
+    # runs the initial assertion for the various commands
+    # that are mandatory for execution, this should avoid
+    # errors in the middle of the build
+    atm.assert_c(("git", "msbuild", "capsule test"))
 
     # starts the build process with the configuration file
     # that was provided to the configuration script
