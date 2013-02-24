@@ -6,6 +6,19 @@ import sys
 
 import atm
 
+DEV_HOME = atm.environ("DEV_HOME", "\\dev")
+""" The development directory to be used
+as the root for the includes, libraries and
+binary utilities """
+
+INCLUDES = (
+    DEV_HOME + "\include\php\main",
+    DEV_HOME + "\include\php\TSRM",
+    DEV_HOME + "\include\php\Zend"
+)
+""" The list of extra include directories
+for the build process """
+
 def run():
     # tries to retrieve the configuration file path
     # from the provided arguments
@@ -26,6 +39,7 @@ def run():
     base_f = repo_f
     bin_f = os.path.join(base_f, "bin/hive_viriatum/i386/win32/Release")
     solution_f = os.path.join(base_f, "win32/vs2008ex")
+    modules_f = os.path.join(repo_f, "modules")
 
     # retrieves the various values from the global configuration
     # that are going to be used around the configuration
@@ -54,10 +68,22 @@ def run():
     atm.copy("htdocs", os.path.join(result_f, "htdocs"))
     atm.copy(result_f, os.path.join(tmp_f, name_arc))
 
+    # constructs the path to the solution file and uses it for
+    # the msbuild command to build the project
+    mod_sln_path = os.path.join(solution_f, "hive_viriatum_mod.sln")
+    atm.msbuild(mod_sln_path, includes = INCLUDES)
+
+    # iterates over all the modules to prepare their source code
+    # for compilation distribution
+    for module in modules:
+        module_f = os.path.join(modules_f, module)
+        os.chdir(module_f)
+        atm.autogen(clean = True)
+    
     # changes the current directory to the result directory and
     # creates a tar based file with the binary contents
     os.chdir(result_f)
-    atm.tar(name_raw + ".tar", ("viriatum.exe", "config", "htdocs"))
+    atm.tar(name_raw + ".tar", ("viriatum.exe", "config", "htdocs", "modules"))
     atm.move(name_raw + ".tar", dist_f)
 
     # changes to build directory and creates the capsule file for the
