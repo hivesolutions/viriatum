@@ -12,6 +12,7 @@ as the root for the includes, libraries and
 binary utilities """
 
 INCLUDES = (
+    DEV_HOME + "\include\php",
     DEV_HOME + "\include\php\main",
     DEV_HOME + "\include\php\TSRM",
     DEV_HOME + "\include\php\Zend"
