@@ -20,7 +20,7 @@ INCLUDES = (
 """ The list of extra include directories
 for the build process """
 
-def run():
+def run(build_m = True, mode = "Release"):
     # tries to retrieve the configuration file path
     # from the provided arguments
     if len(sys.argv) > 1: _file = sys.argv[1]
@@ -38,7 +38,7 @@ def run():
     dist_f = atm.path("dist")
     build_f = atm.path("build")
     base_f = repo_f
-    bin_f = os.path.join(base_f, "bin/hive_viriatum/i386/win32/Release")
+    bin_f = os.path.join(base_f, "bin/hive_viriatum/i386/win32/%s" % mode)
     solution_f = os.path.join(base_f, "win32/vs2008ex")
     modules_f = os.path.join(repo_f, "modules")
 
@@ -55,6 +55,11 @@ def run():
     atm.git(clean = True)
     atm.copy(repo_f, os.path.join(tmp_f, name_src))
 
+    # lists the modules directory so that all the modules are
+    # discovered (module folder names) this will be used to
+    # build the various modules (iteration trigger)
+    modules = build_m and os.listdir(modules_f) or []
+    
     # constructs the path to the solution file and uses it for
     # the msbuild command to build the project
     sln_path = os.path.join(solution_f, "hive_viriatum.sln")
@@ -72,14 +77,17 @@ def run():
     # constructs the path to the solution file and uses it for
     # the msbuild command to build the project
     mod_sln_path = os.path.join(solution_f, "hive_viriatum_mod.sln")
-    atm.msbuild(mod_sln_path, includes = INCLUDES)
+    build_m and atm.msbuild(mod_sln_path, includes = INCLUDES)
 
-    # iterates over all the modules to prepare their source code
-    # for compilation distribution
+    # iterates over all the modules to copy their resulting files
+    # into the apropriate modules directory
     for module in modules:
-        module_f = os.path.join(modules_f, module)
-        os.chdir(module_f)
-        atm.autogen(clean = True)
+        module_bin_f = os.path.join(
+            base_f,
+            "bin/hive_viriatum_%s/i386/win32/%s" % (module, mode)
+        )
+        os.chdir(module_bin_f)
+        atm.copy("viriatum_%s" % modules, os.path.join(result_f, "modules"))
     
     # changes the current directory to the result directory and
     # creates a tar based file with the binary contents
