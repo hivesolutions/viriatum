@@ -83,7 +83,11 @@ def run(build_m = True, mode = "Release"):
             "bin/hive_viriatum_%s/i386/win32/%s" % (module, mode)
         )
         os.chdir(module_bin_f)
-        atm.copy("viriatum_%s.dll" % module, os.path.join(result_f, "modules"))
+        atm.copy(
+            "viriatum_%s.dll" % module,
+            os.path.join(result_f, "modules"),
+            replace = False
+        )
 
     # copies the resulting files to the temporary directory with
     # the name of the build for later compression
