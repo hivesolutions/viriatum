@@ -28,17 +28,7 @@ for the build process, these values are just
 templates that should be completed with the
 cross compilation host value """
 
-def run(build_m = True):
-    # tries to retrieve the configuration file path
-    # from the provided arguments
-    if len(sys.argv) > 1: _file = sys.argv[1]
-    else: _file = None
-
-    # tries to retrieve the cross compilation value
-    # from the provided arguments
-    if len(sys.argv) > 2: cross = sys.argv[2]
-    else: cross = None
-
+def build(file = None, build_m = True, cross = None):
     # runs the initial assertion for the various commands
     # that are mandatory for execution, this should avoid
     # errors in the middle of the build
@@ -46,7 +36,7 @@ def run(build_m = True):
 
     # starts the build process with the configuration file
     # that was provided to the configuration script
-    atm.build(_file, cross = cross)
+    atm.build(file, cross = cross)
 
     # retrieves the various values from the global configuration
     # that are going to be used around the configuration
@@ -161,6 +151,27 @@ def run(build_m = True):
     # the distribution directory
     os.chdir(dist_f)
     atm.hash_d()
+
+def run():
+    # tries to retrieve the configuration file path
+    # from the provided arguments
+    if len(sys.argv) > 1: file = sys.argv[1]
+    else: file = None
+
+    # parses the various arguments provided by the
+    # command line and retrieves it defaulting to
+    # pre-defined values in case they do not exist
+    arguments = atm.parse_args(names = ("no-modules", "cross=")
+    build_m = not arguments.get("no-modules", False)
+    cross = arguments.get("cross", None)
+
+    # starts the build process with the parameters
+    # retrieved from the current environment
+    build(
+        file = file,
+        build_m = build_m,
+        cross = cross
+    )
 
 def cleanup():
     atm.cleanup()
