@@ -7,17 +7,12 @@ import sys
 import atm
 
 def run():
-    # in case a file path value was sent to the program
-    # must retrieve it to be validated, otherwise the
-    # file is set as invalid (unset)
-    if len(sys.argv) > 1: _file = sys.argv[1]
-    else: _file = None
-
-    # in case a version value was sent to the program
-    # must retrieve it to be validated, otherwise the
-    # version is set as invalid (unset)
-    if len(sys.argv) > 2: _version = sys.argv[2]
-    else: _version = None
+    # parses the various arguments provided by the
+    # command line and retrieves it defaulting to
+    # pre-defined values in case they do not exist
+    arguments = atm.parse_args()
+    _file = arguments.get("file", None)
+    _version = arguments.get("version", None)
 
     try:
         # starts the build process with the configuration file

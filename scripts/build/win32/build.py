@@ -138,15 +138,11 @@ def build(file = None, build_m = True, arch = "win32", mode = "Release"):
     atm.hash_d()
 
 def run():
-    # tries to retrieve the configuration file path
-    # from the provided arguments
-    if len(sys.argv) > 1: file = sys.argv[1]
-    else: file = None
-
     # parses the various arguments provided by the
     # command line and retrieves it defaulting to
     # pre-defined values in case they do not exist
     arguments = atm.parse_args(names = ("no-modules", "arch=", "mode="))
+    file = arguments.get("file", None)
     build_m = not arguments.get("no-modules", False)
     arch = arguments.get("arch", "win32")
     mode = arguments.get("mode", "Release")
