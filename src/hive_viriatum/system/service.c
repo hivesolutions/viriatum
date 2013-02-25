@@ -1350,7 +1350,7 @@ ERROR_CODE load_modules_service(struct service_t *service) {
         error_code = load_module(service, module_path);
 
         /* tests the error code for error, and in case there's an
-		error prints a warning message */
+        error prints a warning message */
         if(IS_ERROR_CODE(error_code)) {
             V_WARNING_F("Problem loading module (%s)\n", (char *) GET_ERROR());
         }
