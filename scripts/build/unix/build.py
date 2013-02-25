@@ -161,7 +161,7 @@ def run():
     # parses the various arguments provided by the
     # command line and retrieves it defaulting to
     # pre-defined values in case they do not exist
-    arguments = atm.parse_args(names = ("no-modules", "cross=")
+    arguments = atm.parse_args(names = ("no-modules", "cross="))
     build_m = not arguments.get("no-modules", False)
     cross = arguments.get("cross", None)
 
