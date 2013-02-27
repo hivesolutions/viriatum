@@ -1,6 +1,6 @@
-# Raspberry Pi
+# Cross Compilation
 
-## Cross Compilation
+## Raspberry Pi
 
 These cross compilation steps are meant to be used for an Ubuntu Linux stystem.
 
