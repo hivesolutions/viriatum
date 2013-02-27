@@ -158,6 +158,17 @@ For more information regarding benchmarking please check the list of [todo](doc/
 
 * For windows debugging use [Visual Leak Detector](http://vld.codeplex.com) using the `#include <vld.h>` statement
 
+## Cross Compilation
+
+Cross compilation is an advanced topic and a full description of the steps
+to create a cross compilation toolchain are described in a separated document.
+
+[More information](doc/cross.md)
+
+## More
+
+For more information re
+
 ## License
 
 Viriatum is an open-source project licensed under the [GNU General Public License Version 3](http://www.gnu.org/licenses/gpl.html).
