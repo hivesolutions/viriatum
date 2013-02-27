@@ -152,6 +152,8 @@ Must compile viriatum with special environment variables set to point to the cor
 
 * Most of the information presented in [gwan benchmark](http://gwan.ch/en_apachebench_httperf.html) is applicable for benchmarking Viriatum
 
+For more information regarding benchmarking please check the list of [todo](doc/todo.md) information.
+
 ## Debugging
 
 * For windows debugging use [Visual Leak Detector](http://vld.codeplex.com) using the `#include <vld.h>` statement
