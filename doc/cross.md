@@ -16,6 +16,13 @@ http://www.bootc.net/archives/2012/05/26/how-to-build-a-cross-compiler-for-your-
     ./Configure dist --prefix=/opt/arm-unknown-linux-gnueabi
     make CC="arm-unknown-linux-gnueabi-gcc" AR="arm-unknown-linux-gnueabi-ar"\
         RANLIB="arm-unknown-linux-gnueabi-ranlib"
+    make install
+
+### PCRE
+
+    ./configure --host=arm-unknown-linux-gnueabi --build=arm --prefix=/opt/arm-unknown-linux-gnueabi\
+        --disable-shared --enable-static --disable-cpp
+    make && make install
 
 ### PHP
 
@@ -24,6 +31,7 @@ http://www.bootc.net/archives/2012/05/26/how-to-build-a-cross-compiler-for-your-
         -enable-embed=static --disable-libxml --disable-dom --disable-simplexml --disable-xml\
         --disable-xmlreader --disable-xmlwriter --disable-phar --without-pear --without-iconv\
         --with-config-file-path=/usr/lib
+    make && make install
  
 ### Python
 
