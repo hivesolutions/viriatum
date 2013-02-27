@@ -1,4 +1,4 @@
-# [Viriatum Web Server](http://viriatum.com) dump area
+# Dump area
 
 This is the area where there are no boundaries between useful and stupidity.
 Just throw random content to this section.
