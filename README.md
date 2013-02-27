@@ -160,8 +160,9 @@ For more information regarding benchmarking please check the list of [todo](doc/
 
 ## Cross Compilation
 
-Cross compilation is an advanced topic and a full description of the steps
-to create a cross compilation toolchain are described in a separated document.
+Cross compilation is an advanced topic and a full description of the steps to create a cross
+compilation toolchain are described in a separated document for space reasons. Please refer
+to the proper document for infomration on it.
 
 [More information](doc/cross.md)
 
