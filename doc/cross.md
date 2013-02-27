@@ -14,7 +14,8 @@ http://www.bootc.net/archives/2012/05/26/how-to-build-a-cross-compiler-for-your-
     export PATH=/home/joamag/x-tools/arm-unknown-linux-gnueabi/bin:$PATH
     ./config --prefix=/opt/arm-unknown-linux-gnueabi
     ./Configure dist --prefix=/opt/arm-unknown-linux-gnueabi
-    make CC="arm-unknown-linux-gnueabi-gcc" AR="arm-unknown-linux-gnueabi-ar r" RANLIB="arm-unknown-linux-gnueabi-ranlib"
+    make CC="arm-unknown-linux-gnueabi-gcc" AR="arm-unknown-linux-gnueabi-ar"\
+        RANLIB="arm-unknown-linux-gnueabi-ranlib"
 
 ### PHP
 
