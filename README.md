@@ -18,6 +18,8 @@ For cross compilation (eg: arm-linux) use the following command:
 
     atm.sh --cross=arm-unknown-linux-gnueabi
 
+If you want to know more about cross compilation please refer to the [cross](doc/cross.md) document.
+
 ### Source Control Repository
 
 If you're going to build viriatum using the git repository you first need to generate the configure
@@ -157,18 +159,6 @@ For more information regarding benchmarking please check the list of [todo](doc/
 ## Debugging
 
 * For windows debugging use [Visual Leak Detector](http://vld.codeplex.com) using the `#include <vld.h>` statement
-
-## Cross Compilation
-
-Cross compilation is an advanced topic and a full description of the steps to create a cross
-compilation toolchain are described in a separated document for space reasons. Please refer
-to the proper document for infomration on it.
-
-[More information](doc/cross.md)
-
-## More
-
-For more information re
 
 ## License
 
