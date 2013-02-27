@@ -11,8 +11,9 @@ http://www.bootc.net/archives/2012/05/26/how-to-build-a-cross-compiler-for-your-
 ### PHP
 
     export LDFLAGS="-ldl"
-    ./configure --host=arm-unknown-linux-gnueabi --build=arm --prefix=/opt/arm-unknown-linux-gnueabi -enable-embed=static --disable-libxml\
-        --disable-dom --disable-simplexml --disable-xml --disable-xmlreader --disable-xmlwriter --disable-phar --without-pear --without-iconv\
+    ./configure --host=arm-unknown-linux-gnueabi --build=arm --prefix=/opt/arm-unknown-linux-gnueabi\
+        -enable-embed=static --disable-libxml --disable-dom --disable-simplexml --disable-xml\
+        --disable-xmlreader --disable-xmlwriter --disable-phar --without-pear --without-iconv\
         --with-config-file-path=/usr/lib
  
 ### Python
