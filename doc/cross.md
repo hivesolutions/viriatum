@@ -15,7 +15,7 @@ http://www.bootc.net/archives/2012/05/26/how-to-build-a-cross-compiler-for-your-
 
 ### OpenSSL
 
-    export cross=arm-unknown-linux-
+    export cross=arm-linux-
     export PATH=/opt/arm-unknown-linux-gnueabi/bin:$PATH
     ./config --prefix=/opt/arm-unknown-linux-gnueabi
     ./Configure dist --prefix=/opt/arm-unknown-linux-gnueabi
