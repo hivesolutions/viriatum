@@ -35,12 +35,14 @@ The configuration for the raspberry toolchain is the following.
 
 ### PCRE
 
+    export PATH=/opt/arm-unknown-linux-gnueabi/bin:$PATH
     ./configure --host=arm-unknown-linux-gnueabi --build=arm --prefix=/opt/arm-unknown-linux-gnueabi\
         --disable-shared --enable-static --disable-cpp
     make && make install
 
 ### PHP
 
+    export PATH=/opt/arm-unknown-linux-gnueabi/bin:$PATH
     export LDFLAGS="-ldl"
     ./configure --host=arm-unknown-linux-gnueabi --build=arm --prefix=/opt/arm-unknown-linux-gnueabi\
         -enable-embed=static --disable-libxml --disable-dom --disable-simplexml --disable-xml\
@@ -58,6 +60,8 @@ The configuration for the raspberry toolchain is the following.
     
     wget https://raw.github.com/hivesolutions/patches/master/python/Python-2.7.3-xcompile.patch
     patch -p1 < Python-2.7.3-xcompile.patch
+    
+    export PATH=/opt/arm-unknown-linux-gnueabi/bin:$PATH
     
     CC=arm-unknown-linux-gnueabi-gcc CXX=arm-unknown-linux-gnueabi-g++\
         AR=arm-unknown-linux-gnueabi-ar RANLIB=arm-unknown-linux-gnueabi-ranlib\
