@@ -35,10 +35,6 @@ http://www.bootc.net/archives/2012/05/26/how-to-build-a-cross-compiler-for-your-
  
 ### Python
 
-    export CFLAGS="-L/opt/arm-unknown-linux-gnueabi/lib -I/opt/arm-unknown-linux-gnueabi/include\
-        -I/opt/arm-unknown-linux-gnueabi/include/php -I/opt/arm-unknown-linux-gnueabi/include/php/main\
-        -I/opt/arm-unknown-linux-gnueabi/include/php/TSRM -I/opt/arm-unknown-linux-gnueabi/include/php/Zend"
-
 http://randomsplat.com/id5-cross-compiling-python-for-embedded-linux.html
 
 ### Lua
