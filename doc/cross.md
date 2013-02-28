@@ -41,3 +41,6 @@ http://www.bootc.net/archives/2012/05/26/how-to-build-a-cross-compiler-for-your-
 http://randomsplat.com/id5-cross-compiling-python-for-embedded-linux.html
 
 ### Lua
+
+Some change to the building files is required in order to build a static based version of the lua
+interpreter.
