@@ -77,3 +77,9 @@ The configuration for the raspberry toolchain is the following.
 
 Some change to the building files is required in order to build a static based version of the lua
 interpreter.
+
+### General
+
+    export PATH=/opt/arm-unknown-linux-gnueabi/bin:$PATH
+    ./configure --host=arm-unknown-linux-gnueabi --build=arm --prefix=/opt/arm-unknown-linux-gnueabi
+    make && make install
