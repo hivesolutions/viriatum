@@ -6,12 +6,22 @@ These cross compilation steps are meant to be used for an Ubuntu Linux stystem.
 
 ### Toolchain
 
+In order to create the toolchain for the raspberry pi environment the easiest way to go is by
+using the [crosstool-ng](http://crosstool-ng.org) utility meant to support the creation of the
+toolchains for embedded devices.
+
+A series of commands exist to control the creation of the toolchain but the most important ones
+are the following.
+
+    ct-ng menuconfig
+    ct-ng build
+
+The configuration for the raspberry toolchain is the following.
+
     Crosstool-NG version: 1.17.0
     CPU Architecture: ARM
     Operative System: Linux
     Toolchain Path: /opt/${CT_TARGET}
-
-http://www.bootc.net/archives/2012/05/26/how-to-build-a-cross-compiler-for-your-raspberry-pi/
 
 ### OpenSSL
 
