@@ -8,13 +8,14 @@ These cross compilation steps are meant to be used for an Ubuntu Linux stystem.
 
     CPU Architecture: ARM
     Operative System: Linux
+    Toolchain Path: /opt/${CT_TARGET}
 
 http://www.bootc.net/archives/2012/05/26/how-to-build-a-cross-compiler-for-your-raspberry-pi/
 
 ### OpenSSL
 
     export cross=arm-unknown-linux-
-    export PATH=/home/joamag/x-tools/arm-unknown-linux-gnueabi/bin:$PATH
+    export PATH=/opt/arm-unknown-linux-gnueabi/bin:$PATH
     ./config --prefix=/opt/arm-unknown-linux-gnueabi
     ./Configure dist --prefix=/opt/arm-unknown-linux-gnueabi
     make CC="arm-unknown-linux-gnueabi-gcc" AR="arm-unknown-linux-gnueabi-ar"\
