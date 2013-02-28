@@ -75,8 +75,14 @@ The configuration for the raspberry toolchain is the following.
 
 ### Lua
 
-Some change to the building files is required in order to build a static based version of the lua
-interpreter.
+    wget https://raw.github.com/hivesolutions/patches/master/lua/lua-5.1.5-xcompile.patch
+    patch -p1 < lua-5.1.5-xcompile.patch
+    
+    export PATH=/opt/arm-unknown-linux-gnueabi/bin:$PATH 
+    make linux CC="arm-unknown-linux-gnueabi-gcc" AR="arm-unknown-linux-gnueabi-ar rcu"\
+        RANLIB="arm-unknown-linux-gnueabi-ranlib" CFLAGS="-I/opt/arm-unknown-linux-gnueabi/include\
+        -L/opt/arm-unknown-linux-gnueabi/lib -R/opt/arm-unknown-linux-gnueabi/lib"
+    make install INSTALL_TOP=/opt/arm-unknown-linux-gnueabi
 
 ### General
 
