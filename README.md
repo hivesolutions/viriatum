@@ -18,7 +18,7 @@ For cross compilation (eg: arm-linux) use the following command:
 
     atm.sh --cross=arm-unknown-linux-gnueabi
 
-If you want to know more about cross compilation please refer to the [cross](doc/cross.md) document.
+If you want to know more about cross compilation please refer to the [Cross Compilation](doc/cross.md) document.
 
 ### Source Control Repository
 
