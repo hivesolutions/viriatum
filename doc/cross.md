@@ -6,6 +6,9 @@ These cross compilation steps are meant to be used for an Ubuntu Linux stystem.
 
 ### Toolchain
 
+    CPU Architecture: ARM
+    Operative System: Linux
+
 http://www.bootc.net/archives/2012/05/26/how-to-build-a-cross-compiler-for-your-raspberry-pi/
 
 ### OpenSSL
