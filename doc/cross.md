@@ -56,20 +56,18 @@ The configuration for the raspberry toolchain is the following.
     mv Parser/pgen Parser/hostpgen
     make distclean
     
-    wget http://randomsplat.com/wp-content/uploads/2012/10/Python-2.7.3-xcompile.patch
+    wget https://raw.github.com/hivesolutions/patches/master/python/Python-2.7.3-xcompile.patch
     patch -p1 < Python-2.7.3-xcompile.patch
     
     CC=arm-unknown-linux-gnueabi-gcc CXX=arm-unknown-linux-gnueabi-g++\
         AR=arm-unknown-linux-gnueabi-ar RANLIB=arm-unknown-linux-gnueabi-ranlib\
-        ./configure --host=arm-unknown-linux-gnueabi --build=arm --prefix=/opt/arm-unknown-linux-gnueabi
+        ./configure --host=arm-unknown-linux-gnueabi --build=arm --prefix=/opt/arm-unknown-linux-gnueabi --enable-shared 
     
-    make HOSTPYTHON=./hostpython HOSTPGEN=./Parser/hostpgen BLDSHARED="arm-unknown-linux-gcc -shared"\
-        CROSS_COMPILE=arm-unknown-linux- CROSS_COMPILE_TARGET=yes HOSTARCH=arm-unknown-linux-gnueabi BUILDARCH=arm
+    make HOSTPYTHON=./hostpython HOSTPGEN=./Parser/hostpgen BLDSHARED="arm-unknown-linux-gnueabi-gcc -shared"\
+        CROSS_COMPILE=arm-unknown-linux-gnueabi- CROSS_COMPILE_TARGET=yes HOSTARCH=arm-unknown-linux-gnueabi BUILDARCH=arm
     
     make install HOSTPYTHON=./hostpython BLDSHARED="arm-unknown-linux-gcc -shared"\
-        CROSS_COMPILE=arm-unknown-linuxx- CROSS_COMPILE_TARGET=yes prefix=/opt/arm-unknown-linux-gnueabi
-
-http://randomsplat.com/id5-cross-compiling-python-for-embedded-linux.html
+        CROSS_COMPILE=arm-unknown-linux-gnueabi- CROSS_COMPILE_TARGET=yes prefix=/opt/arm-unknown-linux-gnueabi
 
 ### Lua
 
