@@ -55,6 +55,7 @@ The configuration for the raspberry toolchain is the following.
     mv python hostpython
     mv Parser/pgen Parser/hostpgen
     make distclean
+    
     wget http://randomsplat.com/wp-content/uploads/2012/10/Python-2.7.3-xcompile.patch
     patch -p1 < Python-2.7.3-xcompile.patch
     
