@@ -6,6 +6,7 @@ These cross compilation steps are meant to be used for an Ubuntu Linux stystem.
 
 ### Toolchain
 
+    Crosstool-NG version: 1.16.0
     CPU Architecture: ARM
     Operative System: Linux
     Toolchain Path: /opt/${CT_TARGET}
