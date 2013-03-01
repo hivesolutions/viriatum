@@ -22,6 +22,7 @@ The configuration for the raspberry toolchain is the following.
     CPU Architecture: ARM
     Operative System: Linux
     Toolchain Path: /opt/${CT_TARGET}
+    Compilers: gcc and g++
 
 ### OpenSSL
 
