@@ -28,7 +28,7 @@ for the build process, these values are just
 templates that should be completed with the
 cross compilation host value """
 
-def build(file = None, build_m = True, cross = None):
+def build(file = None, build_m = True, cflags = None, cross = None):
     # runs the initial assertion for the various commands
     # that are mandatory for execution, this should avoid
     # errors in the middle of the build
@@ -92,6 +92,7 @@ def build(file = None, build_m = True, cross = None):
             "--with-wwwroot=" + result_f + "/var/viriatum/www",
             "--enable-defaults"
         ),
+		cflags = cflags,
         cross = cross
     )
     atm.make()
@@ -156,9 +157,10 @@ def run():
     # parses the various arguments provided by the
     # command line and retrieves it defaulting to
     # pre-defined values in case they do not exist
-    arguments = atm.parse_args(names = ("no-modules", "cross="))
+    arguments = atm.parse_args(names = ("no-modules", "cflags=", "cross="))
     file = arguments.get("file", None)
     build_m = not arguments.get("no-modules", False)
+	cflags = arguments.get("cflags", None)
     cross = arguments.get("cross", None)
 
     # starts the build process with the parameters
@@ -166,6 +168,7 @@ def run():
     build(
         file = file,
         build_m = build_m,
+		cflags = cflags,
         cross = cross
     )
 
