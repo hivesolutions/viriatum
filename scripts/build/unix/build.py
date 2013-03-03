@@ -108,6 +108,7 @@ def build(file = None, build_m = True, cflags = None, cross = None):
             ),
             includes = cross and INCLUDES_CROSS or INCLUDES,
             libraries = (result_f + "/lib",),
+			cflags = cflags,
             cross = cross
         )
         atm.make()
