@@ -14,7 +14,7 @@ Just use the apropriate 'build.json' located under 'scripts/build' and under suc
 
     atm.sh
 
-For cross compilation (eg: arm-linux) use the following command:
+For cross compilation (eg: arm-rasp-linux) use the following command:
 
     atm.sh --cross=arm-rasp-linux-gnueabi
 
