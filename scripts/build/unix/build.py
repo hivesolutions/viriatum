@@ -92,7 +92,7 @@ def build(file = None, build_m = True, cflags = None, cross = None):
             "--with-wwwroot=" + result_f + "/var/viriatum/www",
             "--enable-defaults"
         ),
-		cflags = cflags,
+        cflags = cflags,
         cross = cross
     )
     atm.make()
@@ -108,7 +108,7 @@ def build(file = None, build_m = True, cflags = None, cross = None):
             ),
             includes = cross and INCLUDES_CROSS or INCLUDES,
             libraries = (result_f + "/lib",),
-			cflags = cflags,
+            cflags = cflags,
             cross = cross
         )
         atm.make()
@@ -161,7 +161,7 @@ def run():
     arguments = atm.parse_args(names = ("no-modules", "cflags=", "cross="))
     file = arguments.get("file", None)
     build_m = not arguments.get("no-modules", False)
-	cflags = arguments.get("cflags", None)
+    cflags = arguments.get("cflags", None)
     cross = arguments.get("cross", None)
 
     # starts the build process with the parameters
@@ -169,7 +169,7 @@ def run():
     build(
         file = file,
         build_m = build_m,
-		cflags = cflags,
+        cflags = cflags,
         cross = cross
     )
 
