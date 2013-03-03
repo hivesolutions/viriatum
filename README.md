@@ -16,7 +16,7 @@ Just use the apropriate 'build.json' located under 'scripts/build' and under suc
 
 For cross compilation (eg: arm-rasp-linux) use the following command:
 
-    atm.sh --cross=arm-rasp-linux-gnueabi
+    atm.sh --cflags=-O3 --cross=arm-rasp-linux-gnueabi
 
 If you want to know more about cross compilation please refer to the [Cross Compilation](doc/cross.md) document.
 
