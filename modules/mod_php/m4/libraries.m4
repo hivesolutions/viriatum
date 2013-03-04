@@ -33,7 +33,6 @@ have_php=true
 AC_CHECK_LIB([z], [main])
 AC_CHECK_LIB([rt], [main])
 AC_CHECK_LIB([bz2], [main])
-AC_CHECK_LIB([zip], [main])
 AC_CHECK_LIB([gmp], [main])
 AC_CHECK_LIB([png], [main])
 AC_CHECK_LIB([crypto], [main])
