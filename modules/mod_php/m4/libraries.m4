@@ -30,8 +30,12 @@ have_resolv=true
 have_php=true
 
 # checks for libraries
+AC_CHECK_LIB([z], [main])
 AC_CHECK_LIB([gmp], [main])
+AC_CHECK_LIB([png], [main])
+AC_CHECK_LIB([jpeg], [main])
 AC_CHECK_LIB([xml2], [main])
+AC_CHECK_LIB([freetype], [main])
 AC_CHECK_LIB([viriatum], [main], [], [AC_MSG_ERROR([viriatum library is required])])
 AC_CHECK_LIB([m], [main], [], [AC_MSG_ERROR([m library is required])])
 AC_CHECK_LIB([resolv], [main], [], [AC_MSG_ERROR([resolv library is required])])
