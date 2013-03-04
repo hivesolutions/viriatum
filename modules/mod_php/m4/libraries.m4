@@ -31,6 +31,7 @@ have_php=true
 
 # checks for libraries
 AC_CHECK_LIB([z], [main])
+AC_CHECK_LIB([rt], [main])
 AC_CHECK_LIB([bz2], [main])
 AC_CHECK_LIB([zip], [main])
 AC_CHECK_LIB([gmp], [main])
