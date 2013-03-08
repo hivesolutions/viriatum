@@ -200,12 +200,16 @@ a:hover {
 }
 
 .table.file-listing th {
+    line-height: 24px;
+}
+
+.table.file-listing th {
     font-weight: normal;
-    padding: 8px 0px 8px 36px;
+    padding: 5px 0px 5px 36px;
 }
 
 .table.file-listing th:last-child {
-    padding: 8px 10px 8px 0px;
+    padding: 5px 10px 5px 0px;
 }
 
 .table.file-listing .current-folder td {
@@ -214,7 +218,14 @@ a:hover {
 }
 
 .table.file-listing td {
-    padding: 8px 0px 8px 0px;
+    line-height: 24px;
+    padding: 5px 0px 5px 0px;
+}
+
+.table.file-listing td.name {
+    max-width: 330px;
+    min-width: 330px;
+    width: 330px;
 }
 
 .table.file-listing td.date {
@@ -224,16 +235,18 @@ a:hover {
 }
 
 .table.file-listing td.size {
-    max-width: 110px;
-    min-width: 110px;
-    width: 110px;
+    max-width: 102px;
+    min-width: 102px;
+    width: 102px;
 }
 
 .table.file-listing tbody td:last-child {
-    padding: 8px 10px 8px 0px;
+    padding: 5px 10px 5px 0px;
 }
 
 .table.file-listing td.icon {
+    max-width: 16px;
+    min-width: 16px;
     padding: 0px 10px 0px 10px;
     width: 16px;
 }
