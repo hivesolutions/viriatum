@@ -201,7 +201,7 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                 } else {
                     if (byte != 'E') {
                         /*SET_ERRNO(HPE_INVALID_CONSTANT); */
-                        /*goto error; */
+                        goto error;
                     }
 
                     http_parser->type = HTTP_REQUEST;
@@ -230,9 +230,9 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                     case LF:
                         break;
 
-/*                     default:*/
-                        /*SET_ERRNO(HPE_INVALID_CONSTANT);
-                        goto error;*/
+                    default:
+                        /*SET_ERRNO(HPE_INVALID_CONSTANT); */
+                        goto error;
                 }
 
                 /* breaks the switch */
@@ -268,8 +268,8 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
 
             case STATE_RES_FIRST_HTTP_MAJOR:
                 if(byte < '1' || byte  > '9') {
-                    /*SET_ERRNO(HPE_INVALID_VERSION);
-                    goto error;*/
+                    /*SET_ERRNO(HPE_INVALID_VERSION); */
+                    goto error;
                 }
 
                 http_parser->http_major = byte - '0';
@@ -285,16 +285,16 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                 }
 
                 if(!IS_NUM(byte)) {
-                    /*SET_ERRNO(HPE_INVALID_VERSION);
-                    goto error;*/
+                    /*SET_ERRNO(HPE_INVALID_VERSION); */
+                    goto error;
                 }
 
                 http_parser->http_major *= 10;
                 http_parser->http_major += byte - '0';
 
                 if(http_parser->http_major > 999) {
-                    /*SET_ERRNO(HPE_INVALID_VERSION);
-                    goto error;*/
+                    /*SET_ERRNO(HPE_INVALID_VERSION);*/
+                    goto error;
                 }
 
                 /* breaks the switch */
@@ -302,8 +302,8 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
 
             case STATE_RES_FIRST_HTTP_MINOR:
                 if (!IS_NUM(byte)) {
-                    /*SET_ERRNO(HPE_INVALID_VERSION);
-                    goto error;*/
+                    /*SET_ERRNO(HPE_INVALID_VERSION); */
+                    goto error;
                 }
 
                 http_parser->http_minor = byte - '0';
@@ -321,16 +321,16 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                 }
 
                 if(!IS_NUM(byte)) {
-                    /*SET_ERRNO(HPE_INVALID_VERSION);
-                    goto error;*/
+                    /*SET_ERRNO(HPE_INVALID_VERSION); */
+                    goto error;
                 }
 
                 http_parser->http_minor *= 10;
                 http_parser->http_minor += byte - '0';
 
                 if(http_parser->http_minor > 999) {
-                    /*SET_ERRNO(HPE_INVALID_VERSION);
-                    goto error;*/
+                    /*SET_ERRNO(HPE_INVALID_VERSION); */
+                    goto error;
                 }
 
                 /* breaks the switch */
@@ -342,8 +342,8 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                         break;
                     }
 
-                    /*SET_ERRNO(HPE_INVALID_STATUS);
-                    goto error;*/
+                    /*SET_ERRNO(HPE_INVALID_STATUS); */
+                    goto error;
                 }
 
                 http_parser->status_code = byte - '0';
@@ -364,9 +364,9 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                         case LF:
                             state = STATE_HEADER_FIELD_START;
                             break;
-                        /*default:*/
-                            /*SET_ERRNO(HPE_INVALID_STATUS);
-                            goto error;*/
+                        default:
+                            /*SET_ERRNO(HPE_INVALID_STATUS);*/
+                            goto error;
                     }
 
                     /* breaks the switch */
@@ -377,8 +377,8 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                 http_parser->status_code += byte - '0';
 
                 if(http_parser->status_code > 999) {
-                    /*SET_ERRNO(HPE_INVALID_STATUS);
-                    goto error;*/
+                    /*SET_ERRNO(HPE_INVALID_STATUS);*/
+                    goto error;
                 }
 
                 /* breaks the switch */
@@ -422,10 +422,8 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                 HTTP_CALLBACK(message_begin);
 
                 if(!IS_ALPHA(byte)) {
-                    /*
-                    SET_ERRNO(HPE_INVALID_METHOD);
+                    /*SET_ERRNO(HPE_INVALID_METHOD);*/
                     goto error;
-                    */
                 }
 
                 start_req_method_assign:
@@ -446,10 +444,9 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                         case 'S': http_parser->method = HTTP_SUBSCRIBE; break;
                         case 'T': http_parser->method = HTTP_TRACE; break;
                         case 'U': http_parser->method = HTTP_UNLOCK; /* or UNSUBSCRIBE */ break;
-
-                        /*default:
-                        SET_ERRNO(HPE_INVALID_METHOD);
-                        goto error;*/
+                        default:
+                            /*SET_ERRNO(HPE_INVALID_METHOD);*/
+                            goto error;
                     }
 
                     state = STATE_REQ_METHOD;
@@ -459,8 +456,8 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
 
             case STATE_REQ_METHOD:
                 if(byte == '\0') {
-                     /*SET_ERRNO(HPE_INVALID_METHOD);
-                     goto error;*/
+                     /*SET_ERRNO(HPE_INVALID_METHOD);*/
+                     goto error;
                 }
 
                 matcher = http_method_strings[http_parser->method - 1];
@@ -474,7 +471,7 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                     } else if(index == 2  && byte == 'P') {
                         http_parser->method = HTTP_COPY;
                     } else {
-                        /*goto error;*/
+                        goto error;
                     }
                 } else if(http_parser->method == HTTP_MKCOL) {
                     if(index == 1 && byte == 'O') {
@@ -486,7 +483,7 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                     } else if(index == 2 && byte == 'A') {
                         http_parser->method = HTTP_MKACTIVITY;
                     } else {
-                        /*goto error;*/
+                        goto error;
                     }
                 } else if(index == 1 && http_parser->method == HTTP_POST) {
                     if(byte == 'R') {
@@ -496,15 +493,15 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                     } else if(byte == 'A') {
                         http_parser->method = HTTP_PATCH;
                     } else {
-                        /*goto error;*/
+                       goto error;
                     }
                 } else if(index == 2 && http_parser->method == HTTP_UNLOCK && byte == 'S') {
                     http_parser->method = HTTP_UNSUBSCRIBE;
                 } else if(index == 4 && http_parser->method == HTTP_PROPFIND && byte == 'P') {
                     http_parser->method = HTTP_PROPPATCH;
                 } else {
-                    /*SET_ERRNO(HPE_INVALID_METHOD);
-                    goto error;*/
+                    /*SET_ERRNO(HPE_INVALID_METHOD);*/
+                    goto error;
                 }
 
                 /* increments the index */
@@ -539,8 +536,8 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                     break;
                 }
 
-                /*SET_ERRNO(HPE_INVALID_URL);
-                goto error;*/
+                /*SET_ERRNO(HPE_INVALID_URL);*/
+                goto error;
 
             case STATE_REQ_SCHEMA:
                 if(IS_ALPHA(byte)) {
@@ -555,8 +552,8 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                     break;
                 }
 
-                /*SET_ERRNO(HPE_INVALID_URL);
-                goto error;*/
+                /*SET_ERRNO(HPE_INVALID_URL);*/
+                goto error;
 
             case STATE_REQ_SCHEMA_SLASH:
                 STRICT_CHECK(byte != '/');
@@ -604,9 +601,9 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
 
                         /* breaks the switch */
                         break;
-                    /*default:
-                        SET_ERRNO(HPE_INVALID_HOST);
-                        goto error;*/
+                    default:
+                        /*SET_ERRNO(HPE_INVALID_HOST);*/
+                        goto error;
                 }
 
                 /* breaks the switch */
@@ -633,9 +630,9 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                     case '?':
                         state = STATE_REQ_QUERY_STRING_START;
                         break;
-                    /*default:
-                        SET_ERRNO(HPE_INVALID_PORT);
-                        goto error;*/
+                    default:
+                        /*SET_ERRNO(HPE_INVALID_PORT);*/
+                        goto error;
                 }
 
                 /* breaks the switch */
@@ -685,9 +682,9 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                         /* breaks the switch */
                         break;
 
-                    /*default:
-                        SET_ERRNO(HPE_INVALID_PATH);
-                        goto error;*/
+                    default:
+                        /*SET_ERRNO(HPE_INVALID_PATH);*/
+                        goto error;
                 }
 
                 /* breaks the switch */
@@ -735,9 +732,9 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                         /* breaks the switch */
                         break;
 
-                    /*default:
-                        SET_ERRNO(HPE_INVALID_QUERY_STRING);
-                        goto error;*/
+                    default:
+                        /*SET_ERRNO(HPE_INVALID_QUERY_STRING);*/
+                        goto error;
                 }
 
                 /* breaks the switch */
@@ -786,9 +783,9 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                         /* breaks the switch */
                         break;
 
-                    /*default:
-                        SET_ERRNO(HPE_INVALID_QUERY_STRING);
-                        goto error;*/
+                    default:
+                        /*SET_ERRNO(HPE_INVALID_QUERY_STRING);*/
+                        goto error;
                 }
 
                 /* breaks the switch */
@@ -837,9 +834,10 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                     case '#':
                         /* breaks the switch */
                         break;
-                    /*default:
-                        SET_ERRNO(HPE_INVALID_FRAGMENT);
-                        goto error;*/
+
+                    default:
+                        /*SET_ERRNO(HPE_INVALID_FRAGMENT);*/
+                        goto error;
                 }
 
                 /* breaks the switch */
@@ -882,9 +880,9 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                         /* breaks the switch */
                         break;
 
-                  /*default:
-                        SET_ERRNO(HPE_INVALID_FRAGMENT);
-                        goto error;*/
+                  default:
+                        /*SET_ERRNO(HPE_INVALID_FRAGMENT);*/
+                        goto error;
                 }
 
                 /* breaks the switch */
@@ -902,9 +900,9 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                         /* breaks the switch */
                         break;
 
-                    /*default:
-                        SET_ERRNO(HPE_INVALID_CONSTANT);
-                        goto error;*/
+                    default:
+                        /*SET_ERRNO(HPE_INVALID_CONSTANT);*/
+                        goto error;
                 }
 
                 /* breaks the switch */
@@ -940,8 +938,8 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
 
             case STATE_REQ_FIRST_HTTP_MAJOR:
                 if(byte < '1' || byte > '9') {
-                    /*SET_ERRNO(HPE_INVALID_VERSION);
-                    goto error;*/
+                    /*SET_ERRNO(HPE_INVALID_VERSION);*/
+                    goto error;
                 }
 
                 http_parser->http_major = byte - '0';
@@ -959,16 +957,16 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                 }
 
                 if(!IS_NUM(byte)) {
-                    /*SET_ERRNO(HPE_INVALID_VERSION);
-                    goto error;*/
+                    /*SET_ERRNO(HPE_INVALID_VERSION);*/
+                    goto error;
                 }
 
                 http_parser->http_major *= 10;
                 http_parser->http_major += byte - '0';
 
                 if(http_parser->http_major > 999) {
-                    /*SET_ERRNO(HPE_INVALID_VERSION);
-                    goto error;*/
+                    /*SET_ERRNO(HPE_INVALID_VERSION);*/
+                    goto error;
                 }
 
                 /* breaks the switch */
@@ -976,8 +974,8 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
 
             case STATE_REQ_FIRST_HTTP_MINOR:
                 if(!IS_NUM(byte)) {
-                    /*SET_ERRNO(HPE_INVALID_VERSION);
-                    goto error;*/
+                    /*SET_ERRNO(HPE_INVALID_VERSION);*/
+                    goto error;
                 }
 
                 http_parser->http_minor = byte - '0';
@@ -1002,16 +1000,16 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                 }
 
                 if(!IS_NUM(byte)) {
-                    /*SET_ERRNO(HPE_INVALID_VERSION);
-                    goto error;*/
+                    /*SET_ERRNO(HPE_INVALID_VERSION);*/
+                    goto error;
                 }
 
                 http_parser->http_minor *= 10;
                 http_parser->http_minor += byte - '0';
 
                 if (http_parser->http_minor > 999) {
-                    /*SET_ERRNO(HPE_INVALID_VERSION);
-                    goto error;*/
+                    /*SET_ERRNO(HPE_INVALID_VERSION);*/
+                    goto error;
                 }
 
                 /* breaks the switch */
@@ -1019,8 +1017,8 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
 
             case STATE_REQ_LINE_ALMOST_DONE:
                 if(byte != LF) {
-                    /*SET_ERRNO(HPE_LF_EXPECTED);
-                    goto error;*/
+                    /*SET_ERRNO(HPE_LF_EXPECTED);*/
+                    goto error;
                 }
 
                 state = STATE_HEADER_FIELD_START;
@@ -1048,8 +1046,8 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                     byte_token = TOKEN(byte);
 
                     if (!byte_token) {
-                        /*SET_ERRNO(HPE_INVALID_HEADER_TOKEN);
-                        goto error;*/
+                        /*SET_ERRNO(HPE_INVALID_HEADER_TOKEN);*/
+                        goto error;
                     }
 
                     HTTP_MARK(header_field);
@@ -1246,8 +1244,8 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                     break;
                 }
 
-                /*SET_ERRNO(HPE_INVALID_HEADER_TOKEN);
-                goto error;*/
+                /*SET_ERRNO(HPE_INVALID_HEADER_TOKEN);*/
+                goto error;
 
             case STATE_HEADER_VALUE_START:
                 if(byte == ' ' || byte == '\t') {
@@ -1300,8 +1298,8 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
 
                     case HEADER_STATE_CONTENT_LENGTH:
                         if(!IS_NUM(byte)) {
-                            /*SET_ERRNO(HPE_INVALID_CONTENT_LENGTH);
-                            goto error;*/
+                            /*SET_ERRNO(HPE_INVALID_CONTENT_LENGTH);*/
+                            goto error;
                         }
 
                         http_parser->content_length = byte - '0';
@@ -1364,8 +1362,8 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                         }
 
                         if(!IS_NUM(byte)) {
-                            /*SET_ERRNO(HPE_INVALID_CONTENT_LENGTH);
-                            goto error;*/
+                            /*SET_ERRNO(HPE_INVALID_CONTENT_LENGTH);*/
+                            goto error;
                         }
 
                         http_parser->content_length *= 10;
@@ -1597,8 +1595,8 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                 unhex_value = unhex[byte];
 
                 if(unhex_value == -1) {
-                    /*SET_ERRNO(HPE_INVALID_CHUNK_SIZE);
-                    goto error;*/
+                    /*SET_ERRNO(HPE_INVALID_CHUNK_SIZE);*/
+                    goto error;
                 }
 
                 http_parser->content_length = unhex_value;
@@ -1627,8 +1625,8 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                         break;
                     }
 
-                    /*SET_ERRNO(HPE_INVALID_CHUNK_SIZE);
-                    goto error;*/
+                    /*SET_ERRNO(HPE_INVALID_CHUNK_SIZE);*/
+                    goto error;
                 }
 
                 http_parser->content_length *= 16;
@@ -1705,8 +1703,8 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
 
             default:
                 assert(0 && "unhandled state");
-                /*SET_ERRNO(HPE_INVALID_INTERNAL_STATE);
-                goto error;*/
+                /*SET_ERRNO(HPE_INVALID_INTERNAL_STATE);*/
+                goto error;
         }
     }
 
@@ -1732,4 +1730,7 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
     caller function to indicate the ammount of bytes
     processed by the parser */
     return (int) processed_size;
+
+error:
+    return -1;
 }

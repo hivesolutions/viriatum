@@ -189,7 +189,9 @@ ERROR_CODE data_handler_stream_http(struct io_connection_t *io_connection, unsig
     to be used in this connection */
     struct http_handler_t *http_handler;
 
-    /* retrieves the http connection */
+    /* retrieves the references to both the connection (upper)
+    and the http connection (lower) data structures */
+    struct connection_t *connection = io_connection->connection;
     struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
 
     /* in case no http connection buffer is currently set, time to start
@@ -249,10 +251,19 @@ ERROR_CODE data_handler_stream_http(struct io_connection_t *io_connection, unsig
         case there are multiple http requests) */
         processed_size = process_data_http_parser(
             http_connection->http_parser,
-			http_connection->http_settings,
-			_read,
-			_read_size
+            http_connection->http_settings,
+            _read,
+            _read_size
         );
+
+        /* in case the processed size value is set to an invalid value
+        an error has occurred and proper handling must occur */
+        if(processed_size == -1) {
+            /* closes the connection, this is the default response
+            to an error in the parsing (fallback) */
+            connection->close_connection(connection);
+            RAISE_NO_ERROR;
+        }
 
         /* increments the (buffer) read offset with the processed
         size so that the next process starts at the read offset */
