@@ -11,7 +11,7 @@
 * Support for HTTP ranges (http://www.web-polygraph.org/docs/userman/ranges.html)
 * Support for configuration using parsing of json (https://github.com/json-c/json-c) or any other in (http://www.json.org)
 * Support for the buffering to support the request object based on the nginx implementation (http://www.slideshare.net/joshzhu/nginx-internals)
-* Apply the famous http parser of node.js http://github.com/ry/http-parser
+* Apply the famous http parser of node.js http://github.com/ry/http-parser or https://github.com/joyent/node/blob/master/tools/wrk/src/http_parser.c
 * Support for huffman compression according to the implementation in the mariachi engine (http://code.google.com/p/mariachi/source/browse/src/hive_mariachi/algorithms/compression/huffman.h)
 * Implement the memory pool structure based on the nginx implementation
 
