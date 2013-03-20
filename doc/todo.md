@@ -20,6 +20,10 @@
 * Compile all the regular expression into a single one like nginx (http://nginx.sourcearchive.com/documentation/1.1.4-2/ngx__regex_8c_source.html)
 * Implement and refactor win32 conditions (_thread_win32.c) use this link http://thbecker.net/free_software_utilities/fair_monitor_for_win32/start_page.html
 
+## Fuzzy Testing
+
+* [pathoc](http://pathod.net) (a perverse HTTP client) is a nice tool for testing [simple examples](http://corte.si/posts/code/pathod/pythonservers/index.html)
+
 ## Design decisions
 
 * Create a structure similiar to the asynchronous model defined in the colony service implementations
