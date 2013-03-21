@@ -58,6 +58,7 @@ operations (this should ensure message separation) """
 SIMPLE = [
     "GET /index.html HTTP/1.1\r\n"
     "Host: 127.0.0.1\r\n"
+    "Connection: keep-alive\r\n"
     "\r\n"
 ]
 """ The simple example sequence of data
@@ -111,6 +112,7 @@ def call(messages):
     # that a delay time is used to separate messages
     for message in messages:
         _socket.send(message)
+        print "Sent:", message
         time.sleep(WRITE_SLEEP)
 
     # receives the complete chunk of responses
@@ -124,6 +126,7 @@ def call(messages):
     # closes the socket, no more data is transmitted
     _socket.close()
 
-# runs the call operation on the complete set
-# of calls to be processed
-call(SIMPLE + COMPLEX + PIPELINING)
+if __name__ == "__main__":
+    # runs the call operation on the complete set
+    # of calls to be processed
+    call(SIMPLE + COMPLEX + PIPELINING)
