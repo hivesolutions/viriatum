@@ -262,7 +262,7 @@ ERROR_CODE data_handler_stream_http(struct io_connection_t *io_connection, unsig
             /* closes the connection, this is the default response
             to an error in the parsing (fallback) */
             connection->close_connection(connection);
-            RAISE_NO_ERROR;
+            break;
         }
 
         /* increments the (buffer) read offset with the processed
