@@ -43,7 +43,7 @@ ERROR_CODE read_file(char *file_path, unsigned char **buffer_pointer, size_t *fi
     size_t number_bytes;
 
     /* opens the file and in case the retrieved value
-	is not valid raises an error */
+    is not valid raises an error */
     FOPEN(&file, file_path, "rb");
     if(file == NULL) {
         /* raises an error */
@@ -51,14 +51,14 @@ ERROR_CODE read_file(char *file_path, unsigned char **buffer_pointer, size_t *fi
     }
 
     /* seeks the file until the end then retrieves its offset
-	as the size of it and restores the current position in
-	the file to the "original" zero position */
+    as the size of it and restores the current position in
+    the file to the "original" zero position */
     fseek(file, 0, SEEK_END);
     file_size = ftell(file);
     fseek(file, 0, SEEK_SET);
 
     /* allocates space for the file buffer and then stores the
-	complete set of contents from the file in it */
+    complete set of contents from the file in it */
     file_buffer = (unsigned char *) MALLOC(file_size);
     number_bytes = fread(file_buffer, 1, file_size, file);
 
@@ -87,8 +87,8 @@ ERROR_CODE write_file(char *file_path, unsigned char *buffer, size_t buffer_size
     FILE *file;
 
     /* opens the file, then writes the complete set of contents
-	from the provided buffer into it and closes the file to avoid
-	any memory leaks */
+    from the provided buffer into it and closes the file to avoid
+    any memory leaks */
     FOPEN(&file, file_path, "wb");
     fwrite(buffer, sizeof(char), buffer_size, file);
     fclose(file);
@@ -105,7 +105,7 @@ ERROR_CODE count_file(char *file_path, size_t *file_size_pointer) {
     size_t file_size;
 
     /* opens the file and in case the retrieved value
-	is not valid raises an error */
+    is not valid raises an error */
     FOPEN(&file, file_path, "rb");
     if(file == NULL) {
         /* raises an error */
@@ -113,8 +113,8 @@ ERROR_CODE count_file(char *file_path, size_t *file_size_pointer) {
     }
 
     /* seeks the file until the end retrieves the
-	current offset from it (file size) and then closes
-	it again to avoid any memory leak */
+    current offset from it (file size) and then closes
+    it again to avoid any memory leak */
     fseek(file, 0, SEEK_END);
     file_size = ftell(file);
     fclose(file);
