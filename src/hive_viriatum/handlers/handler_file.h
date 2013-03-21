@@ -41,7 +41,7 @@ struct http_connection_t;
  * Increasing this value will allow the transfer
  * of bigger chunks.
  */
-#define FILE_BUFFER_SIZE_HANDLER_FILE 4096
+#define FILE_BUFFER_SIZE_HANDLER_FILE 65536
 
 /**
  * Structure describing the internal parameters

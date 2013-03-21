@@ -982,25 +982,39 @@ ERROR_CODE _send_chunk_handler_file(struct connection_t *connection, struct data
     /* retrieves the file from the handler file context */
     FILE *file = handler_file_context->file;
 
-    /* allocates the required buffer for the file */
+    /* allocates the required buffer for the file, this value
+    of allocation assumes worst case scenario (file larger or
+    equal to the buffer size) */
     unsigned char *file_buffer = MALLOC(FILE_BUFFER_SIZE_HANDLER_FILE);
+
+    /* ensures that the file path is correctly converted
+    into the proper system path, through encoding conversion */
+    SYSTEM_PATH(file_path);
 
     /* in case the file is not defined (should be opened) */
     if(file == NULL) {
-        /* opens the file */
+        /* opens the file for reading the contents from it
+        this file pointer will be used throught various chunks */
         FOPEN(&file, (char *) file_path, "rb");
 
         /* in case the file is not found, must raise an error
         indicating that there was a problem loading the file */
         if(file == NULL) {
-            RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem loading file");
+            RAISE_ERROR_M(
+                RUNTIME_EXCEPTION_ERROR_CODE,
+                (unsigned char *) "Problem loading file"
+            );
         }
 
-        /* sets the file in the handler file context */
+        /* sets the file in the handler file context, this is
+        the pointer that will be used for the sending of the
+        various chunks of the file */
         handler_file_context->file = file;
     }
 
-    /* reads the file contents */
+    /* reads the file contents, should read either the size
+    of a chunk or the size of the complete file in case it's
+    shorter than the chunk size */
     number_bytes = fread(file_buffer, 1, FILE_BUFFER_SIZE_HANDLER_FILE, file);
 
     /* in case the number of read bytes is valid */
