@@ -29,7 +29,7 @@
 
 #include "file.h"
 
-ERROR_CODE open_file(char *file_path, FILE *file) {
+ERROR_CODE open_file(char *file_path, FILE **file_pointer) {
     /* allocates space for the file pointer to be used
     in the open operation */
     FILE *file;
