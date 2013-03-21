@@ -29,7 +29,7 @@
 
 #include "file.h"
 
-ERROR_CODE open_file(char *file_path, FILE **file_pointer) {
+ERROR_CODE open_file(char *file_path, char *mode, FILE **file_pointer) {
     /* allocates space for the file pointer to be used
     in the open operation */
     FILE *file;
@@ -40,7 +40,7 @@ ERROR_CODE open_file(char *file_path, FILE **file_pointer) {
 
     /* opens the file for reading the contents from it
     this file pointer will be used throught various chunks */
-    FOPEN(&file, (char *) file_path, "rb");
+    FOPEN(&file, (char *) file_path, mode);
 
     /* in case the file is not found, must raise an error
     indicating that there was a problem loading the file */
@@ -54,6 +54,9 @@ ERROR_CODE open_file(char *file_path, FILE **file_pointer) {
     /* updates the file pointer value to point to the currently
     used file structure */
     *file_pointer = file;
+
+    /* raise no error */
+    RAISE_NO_ERROR;
 }
 
 ERROR_CODE read_file(char *file_path, unsigned char **buffer_pointer, size_t *file_size_pointer) {
@@ -136,10 +139,12 @@ ERROR_CODE write_file(char *file_path, unsigned char *buffer, size_t buffer_size
 }
 
 ERROR_CODE count_file(char *file_path, size_t *file_size_pointer) {
-    /* allocates space for the file */
+    /* allocates space for the file structure to be used
+	in the opening of the file */
     FILE *file;
 
-    /* allocates space for the file size */
+    /* allocates space for the file size value, this value
+	is limited by the processor integer size */
     size_t file_size;
 
     /* ensures that the file path is correctly converted
