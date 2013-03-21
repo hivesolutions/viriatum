@@ -361,7 +361,7 @@ int _entry_compare_file(void *first, void *second) {
 
 #ifdef VIRIATUM_PLATFORM_WIN32
 
-ERROR_CODE path_from_system(char *path_s, char *path) {
+size_t path_from_system(char *path_s, char *path) {
     /* allocates space for the buffer that will hold
     the temporary unicode version of the path */
     wchar_t path_u[VIRIATUM_MAX_PATH_SIZE];
@@ -377,7 +377,7 @@ ERROR_CODE path_from_system(char *path_s, char *path) {
         path_u,
         VIRIATUM_MAX_PATH_SIZE
     );
-    WideCharToMultiByte(
+    return WideCharToMultiByte(
         CP_UTF8,
         (DWORD) NULL,
         path_u,
@@ -387,12 +387,9 @@ ERROR_CODE path_from_system(char *path_s, char *path) {
         NULL,
         NULL
     );
-
-    /* raise no error */
-    RAISE_NO_ERROR;
 }
 
-ERROR_CODE path_to_system(char *path, char *path_s) {
+size_t path_to_system(char *path, char *path_s) {
     /* allocates space for the buffer that will hold
     the temporary unicode version of the path */
     wchar_t path_u[VIRIATUM_MAX_PATH_SIZE];
@@ -408,7 +405,7 @@ ERROR_CODE path_to_system(char *path, char *path_s) {
         path_u,
         VIRIATUM_MAX_PATH_SIZE
     );
-    WideCharToMultiByte(
+    return WideCharToMultiByte(
         CP_ACP,
         (DWORD) NULL,
         path_u,
@@ -418,9 +415,6 @@ ERROR_CODE path_to_system(char *path, char *path_s) {
         NULL,
         NULL
     );
-
-    /* raise no error */
-    RAISE_NO_ERROR;
 }
 
 ERROR_CODE get_write_time_file(char *file_path, struct date_time_t *date_time) {
@@ -435,6 +429,10 @@ ERROR_CODE get_write_time_file(char *file_path, struct date_time_t *date_time) {
 
     /* allocates space for the handle to the file */
     HANDLE file_handle;
+
+    /* ensures that the file path is correctly converted
+    into the proper system path, through encoding conversion */
+    SYSTEM_PATH(file_path);
 
     /* retrieves the file for reading in the requested file path */
     file_handle = CreateFile(
@@ -527,7 +525,7 @@ ERROR_CODE list_directory_file(char *file_path, struct linked_list_t *entries) {
     /* allocates space for the entry data structure and for
     the full name of the entry */
     struct file_t *entry;
-    char entry_full_name[4096];
+    char entry_full_name[VIRIATUM_MAX_PATH_SIZE];
 
     /* allocates space for the unicode based temporary buffer
     to be used in the conversion of the entry name into viriatum
@@ -538,6 +536,10 @@ ERROR_CODE list_directory_file(char *file_path, struct linked_list_t *entries) {
     for the findind of the directory entries */
     WIN32_FIND_DATA find_data;
     HANDLE handler_find = INVALID_HANDLE_VALUE;
+
+    /* stores the original file path, before system encoding
+    conversion so that it may be used for standard calls */
+    char *file_path_o = file_path;
 
     /* ensures that the file path is correctly converted
     into the proper system path, through encoding conversion */
@@ -571,25 +573,15 @@ ERROR_CODE list_directory_file(char *file_path, struct linked_list_t *entries) {
         entry = MALLOC(sizeof(struct file_t));
         memset(&entry->time, 0, sizeof(struct date_time_t));
 
-        /* in case the file is of type directory */
+        /* in case the file is of type directory, the type must
+        be set in conformance, otherwise assumes that the file
+        is of type regular (simplified file system) */
         if(find_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-            /* sets the entry type as directory */
             entry->type = FILE_TYPE_DIRECTORY;
-        }
-        /* otherwise it must be a regular file */
-        else {
-            /* sets the entry type as regular */
-            entry->type = FILE_TYPE_REGULAR;
-        }
+        } else { entry->type = FILE_TYPE_REGULAR; }
 
         /* sets the entry size from the find data information */
         entry->size = find_data.nFileSizeLow;
-
-        /* joins the base name with the directory path to
-        retrieve the full entry name then uses it to retrieve
-        the write time for the file */
-        join_path_file(file_path, find_data.cFileName, entry_full_name);
-        get_write_time_file(entry_full_name, &entry->time);
 
         /* converts the system oriented entry name into a wide
         char representation and uses a "virtual" conversion to utf8
@@ -628,6 +620,12 @@ ERROR_CODE list_directory_file(char *file_path, struct linked_list_t *entries) {
             NULL,
             NULL
         );
+
+        /* joins the base name with the directory path to
+        retrieve the full entry name then uses it to retrieve
+        the write time for the file */
+        join_path_file(file_path_o, entry->name, entry_full_name);
+        get_write_time_file(entry_full_name, &entry->time);
 
         /* adds the entry to the list of entries for
         the current directory (path) */
