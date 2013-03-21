@@ -36,12 +36,14 @@ struct connection_t;
 struct http_connection_t;
 
 /**
- * The size of the file buffer to be used
+ * The (maximum) size of the file buffer to be used
  * durring a file transfer.
  * Increasing this value will allow the transfer
- * of bigger chunks.
+ * of bigger chunks, note that this is just the
+ * maximum value for the buffer smaller files will
+ * use smaller buffers.
  */
-#define FILE_BUFFER_SIZE_HANDLER_FILE 65536
+#define FILE_BUFFER_SIZE_HANDLER_FILE 262144
 
 /**
  * Structure describing the internal parameters
