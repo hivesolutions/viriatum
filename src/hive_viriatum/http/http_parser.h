@@ -453,6 +453,9 @@ typedef struct http_parser_t {
     /**
      * The original content length value, this
      * value is not changed across parsing requests.
+     * Saving this value overcomes the issue created
+     * by reseting the content value along the parsing
+     * logic.
      */
     size_t _content_length;
 } http_parser;
