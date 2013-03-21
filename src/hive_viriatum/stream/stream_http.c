@@ -176,6 +176,12 @@ ERROR_CODE data_handler_stream_http(struct io_connection_t *io_connection, unsig
     data parsing iteration */
     int processed_size;
 
+    /* allocates the space to be used for the the calculus
+    arround the new buffer sizes, both for the offset and the
+    content length strategies */
+    size_t size_offset;
+    size_t size_length;
+
     /* allocates the reference to the pointer to current
     buffer position to be used in writing (initial position) */
     unsigned char *_buffer;
@@ -194,6 +200,12 @@ ERROR_CODE data_handler_stream_http(struct io_connection_t *io_connection, unsig
     struct connection_t *connection = io_connection->connection;
     struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
 
+    /* retrieves the content length value from the parser associated
+    with the current connection, this value is maitained accross multiple
+    parsing loops and is not considered transient, the value remains at the
+    initial zero value until the proper header is parsed */
+    size_t content_length = http_connection->http_parser->_content_length;
+
     /* in case no http connection buffer is currently set, time to start
     a new one from the provided buffer (fast access) */
     if(http_connection->buffer == NULL) {
@@ -201,16 +213,18 @@ ERROR_CODE data_handler_stream_http(struct io_connection_t *io_connection, unsig
         http_connection->buffer = (unsigned char *) MALLOC(http_connection->buffer_size);
     }
     /* in case the http connection buffer is currently set but the available
-    space is not enough must reallocate the buffer (increment size) */
+    space is not enough must reallocate the buffer (increment size) in order
+    to hold the required space for the new contents */
     else if(http_connection->buffer_offset + buffer_size > http_connection->buffer_size) {
-        if(http_connection->http_parser->_content_length > 0) {
-            http_connection->buffer_size += http_connection->http_parser->_content_length;
-            http_connection->buffer = REALLOC((void *) http_connection->buffer, http_connection->buffer_size);
-        }
-        else {
-            http_connection->buffer_size += buffer_size;
-            http_connection->buffer = REALLOC((void *) http_connection->buffer, http_connection->buffer_size);
-        }
+        /* creates two strategies for the reallocation of the buffer, one based on the
+        minimal size required for the handling the memory copy (offset strategy) and
+        another that aims at pre-allocating size for the complete message buffer (content
+        length strategy) the maximum value of both is selected as the new buffer size
+        and is used for the reallocation of the buffer */
+        size_offset = http_connection->buffer_offset + buffer_size;
+        size_length = http_connection->buffer_size + content_length;
+        http_connection->buffer_size = size_length > size_offset ? size_length : size_offset;
+        http_connection->buffer = REALLOC((void *) http_connection->buffer, http_connection->buffer_size);
     }
 
     /* retrieves the pointer reference to the current position in the
