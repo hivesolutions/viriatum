@@ -140,11 +140,11 @@ ERROR_CODE write_file(char *file_path, unsigned char *buffer, size_t buffer_size
 
 ERROR_CODE count_file(char *file_path, size_t *file_size_pointer) {
     /* allocates space for the file structure to be used
-	in the opening of the file */
+    in the opening of the file */
     FILE *file;
 
     /* allocates space for the file size value, this value
-	is limited by the processor integer size */
+    is limited by the processor integer size */
     size_t file_size;
 
     /* ensures that the file path is correctly converted
