@@ -1555,17 +1555,23 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                     /* breaks the switch */
                     break;
 
-
             case STATE_BODY_IDENTITY:
                 to_read = MIN(pointer_end - pointer, (long long) http_parser->content_length);
 
                 if(to_read > 0) {
+					/* calls the on body event handler with the pointer to the
+					data to be read and the number of bytes to be read (new body
+					data should be processed) */
                     CALL_V(http_settings->on_body, http_parser, pointer, to_read);
 
+					/* updates the current pointer to the end of the current
+					data and decrements the current content length by the number
+					of bytes that were "just" read */
                     pointer += to_read - 1;
-
                     http_parser->content_length -= to_read;
 
+					/* in case teh current content length has reached zero the
+					state should be updated to a new message (restart) */
                     if(http_parser->content_length == 0) {
                         HTTP_CALLBACK(message_complete);
                         state = NEW_MESSAGE();
