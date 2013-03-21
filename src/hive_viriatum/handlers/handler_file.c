@@ -72,6 +72,7 @@ ERROR_CODE create_handler_file_context(struct handler_file_context_t **handler_f
     /* sets the handler file default values */
     handler_file_context->base_path = NULL;
     handler_file_context->file = NULL;
+    handler_file_context->file_size = 0;
     handler_file_context->flags = 0;
     handler_file_context->template_handler = NULL;
     handler_file_context->cache_control_status = 0;
@@ -970,28 +971,41 @@ ERROR_CODE _cleanup_handler_file(struct connection_t *connection, struct data_t 
 }
 
 ERROR_CODE _send_chunk_handler_file(struct connection_t *connection, struct data_t *data, void *parameters) {
-    /* allocates the number of bytes */
+    /* allocates the number of bytes value to be used in
+    the read operation (read bytes) */
     size_t number_bytes;
 
-    /* casts the parameters as handler file context */
-    struct handler_file_context_t *handler_file_context = (struct handler_file_context_t *) parameters;
+    /* reserves space for the offset, reamingin and buffer
+    size values to be used in the calculus of the "optimal"
+    buffer size for allocation */
+    size_t offset;
+    size_t remaining;
+    size_t buffer_size;
 
-    /* retrieves the file path from the handler file context */
+    /* allocates space for the pointer to the buffer to be
+    used in the reading operation from the file */
+    unsigned char *file_buffer;
+
+    /* casts the parameters as handler file context and uses it
+    to retrieve the proper file path for the sending */
+    struct handler_file_context_t *handler_file_context = (struct handler_file_context_t *) parameters;
     unsigned char *file_path = handler_file_context->file_path_d;
 
     /* retrieves the file from the handler file context */
     FILE *file = handler_file_context->file;
 
-    /* allocates the required buffer for the file, this value
-    of allocation assumes worst case scenario (file larger or
-    equal to the buffer size) */
-    unsigned char *file_buffer = MALLOC(FILE_BUFFER_SIZE_HANDLER_FILE);
-
     /* in case the file is not defined (should be opened) */
     if(file == NULL) {
         /* opens the file in the most secure manner making sure
         that the proper encoding is set for the path */
-        open_file(file_path, &file);
+        open_file(file_path, "rb", &file);
+
+        /* seeks to the end of the file and then to the
+        beginig in order to correctly retrieve the size
+        of the current file for reading */
+        fseek(file, 0, SEEK_END);
+        handler_file_context->file_size = ftell(file);
+        fseek(file, 0, SEEK_SET);
 
         /* sets the file in the handler file context, this is
         the pointer that will be used for the sending of the
@@ -999,14 +1013,24 @@ ERROR_CODE _send_chunk_handler_file(struct connection_t *connection, struct data
         handler_file_context->file = file;
     }
 
+    /* retrieves the current offset position in the file reading
+    and uses it to calculate the remaining bytes to be read, then
+    calculates the "target" buffer size from the minimum value
+    between the (maximum) file buffer size and the remaining number
+    of bytes to be read from the file (optimal buffer sizing) */
+    offset = ftell(file);
+    remaining = handler_file_context->file_size - offset;
+    buffer_size = remaining < FILE_BUFFER_SIZE_HANDLER_FILE ?\
+        remaining : FILE_BUFFER_SIZE_HANDLER_FILE;
+    file_buffer = MALLOC(buffer_size);
+
     /* reads the file contents, should read either the size
     of a chunk or the size of the complete file in case it's
     shorter than the chunk size */
-    number_bytes = fread(
-        file_buffer, 1, FILE_BUFFER_SIZE_HANDLER_FILE, file
-    );
+    number_bytes = fread(file_buffer, 1, buffer_size, file);
 
-    /* in case the number of read bytes is valid */
+    /* in case the number of read bytes is valid, there's
+    data to be sent to the client side */
     if(number_bytes > 0) {
         /* writes the complete set of contents in the file
         buffer to the current connection (send operation) */

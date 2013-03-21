@@ -120,6 +120,14 @@ typedef struct handler_file_context_t {
     FILE *file;
 
     /**
+     * The size of the file that is being opened
+     * in bytes.
+     * This value is limited by the proess architecutre
+     * which may cause problems in 32 bit or less.
+     */
+    size_t file_size;
+
+    /**
      * The flags to be used during the file
      * handling process.
      */
