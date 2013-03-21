@@ -42,28 +42,24 @@ ERROR_CODE read_file(char *file_path, unsigned char **buffer_pointer, size_t *fi
     /* allocates space for the number of bytes */
     size_t number_bytes;
 
-    /* opens the file */
+    /* opens the file and in case the retrieved value
+	is not valid raises an error */
     FOPEN(&file, file_path, "rb");
-
-    /* in case the file is not found */
     if(file == NULL) {
         /* raises an error */
         RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem loading file");
     }
 
-    /* seeks the file until the end */
+    /* seeks the file until the end then retrieves its offset
+	as the size of it and restores the current position in
+	the file to the "original" zero position */
     fseek(file, 0, SEEK_END);
-
-    /* retrieves the file size */
     file_size = ftell(file);
-
-    /* seeks the file until the beginning */
     fseek(file, 0, SEEK_SET);
 
-    /* allocates space for the file buffer */
+    /* allocates space for the file buffer and then stores the
+	complete set of contents from the file in it */
     file_buffer = (unsigned char *) MALLOC(file_size);
-
-    /* reads the file contents */
     number_bytes = fread(file_buffer, 1, file_size, file);
 
     /* in case the number of read bytes is not the
@@ -90,13 +86,11 @@ ERROR_CODE write_file(char *file_path, unsigned char *buffer, size_t buffer_size
     /* allocates space for the file */
     FILE *file;
 
-    /* opens the file */
+    /* opens the file, then writes the complete set of contents
+	from the provided buffer into it and closes the file to avoid
+	any memory leaks */
     FOPEN(&file, file_path, "wb");
-
-    /* writes the provided buffer into the file */
     fwrite(buffer, sizeof(char), buffer_size, file);
-
-    /* closes the file */
     fclose(file);
 
     /* raise no error */
@@ -110,22 +104,19 @@ ERROR_CODE count_file(char *file_path, size_t *file_size_pointer) {
     /* allocates space for the file size */
     size_t file_size;
 
-    /* opens the file */
+    /* opens the file and in case the retrieved value
+	is not valid raises an error */
     FOPEN(&file, file_path, "rb");
-
-    /* in case the file is not found */
     if(file == NULL) {
         /* raises an error */
         RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem loading file");
     }
 
-    /* seeks the file until the end */
+    /* seeks the file until the end retrieves the
+	current offset from it (file size) and then closes
+	it again to avoid any memory leak */
     fseek(file, 0, SEEK_END);
-
-    /* retrieves the file size */
     file_size = ftell(file);
-
-    /* closes the file */
     fclose(file);
 
     /* sets the file size as the file size pointer */
