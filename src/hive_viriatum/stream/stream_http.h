@@ -83,7 +83,7 @@ typedef ERROR_CODE (*http_connection_message) (struct connection_t *, char *, si
  * @param host The (client) host associated with the request
  * to be logged.
  * @param identity The identity of the "driver" that is logging
- * the current request.
+ * the current request (eg: file, dispatch, default, etc).
  * @param user The user that is logging the current, request
  * in case it's an automated script the name should be used.
  * @param method The uppercased name of the http method used.
