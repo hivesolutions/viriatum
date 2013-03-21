@@ -192,6 +192,26 @@ VIRIATUM_EXPORT_PREFIX ERROR_CODE join_path_file(char *base_path, char *name, ch
  */
 VIRIATUM_EXPORT_PREFIX int _entry_compare_file(void *first, void *second);
 
+#ifdef VIRIATUM_PLATFORM_WIN32
+#define SYSTEM_PATH(PATH)\
+    char PATH ## _s[VIRIATUM_MAX_PATH_SIZE];\
+    path_to_system(PATH, PATH ## _s);\
+    PATH = PATH ## _s
+
+#define UTF8_PATH(PATH)\
+    char PATH ## _u[VIRIATUM_MAX_PATH_SIZE];\
+    path_from_system(PATH, PATH ## _u);\
+    PATH = PATH ## _u
+
+VIRIATUM_EXPORT_PREFIX ERROR_CODE path_from_system(char *path_s, char *path);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE path_to_system(char *path, char *path_s);
+#endif
+
+#ifdef VIRIATUM_PLATFORM_UNIX
+#define SYSTEM_PATH(PATH)
+#define UTF8_PATH(PATH)
+#endif
+
 static __inline char *validate_file(char *base_path, char *buffer, size_t count, size_t size) {
     /* allocates space for the valid flag and for the
     internal index counter */

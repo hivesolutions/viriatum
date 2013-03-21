@@ -42,12 +42,18 @@ ERROR_CODE read_file(char *file_path, unsigned char **buffer_pointer, size_t *fi
     /* allocates space for the number of bytes */
     size_t number_bytes;
 
+    /* ensures that the file path is correctly converted
+    into the proper system path, through encoding conversion */
+    SYSTEM_PATH(file_path);
+
     /* opens the file and in case the retrieved value
     is not valid raises an error */
     FOPEN(&file, file_path, "rb");
     if(file == NULL) {
-        /* raises an error */
-        RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem loading file");
+        RAISE_ERROR_M(
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Problem loading file"
+        );
     }
 
     /* seeks the file until the end then retrieves its offset
@@ -65,17 +71,18 @@ ERROR_CODE read_file(char *file_path, unsigned char **buffer_pointer, size_t *fi
     /* in case the number of read bytes is not the
     same as the total bytes in file (error) */
     if(number_bytes != file_size) {
-        /* raises an error */
-        RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem reading from file");
+        RAISE_ERROR_M(
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Problem reading from file"
+        );
     }
 
-    /* closes the file */
+    /* closes the file to avoid any memory leak */
     fclose(file);
 
-    /* sets the buffer as the buffer pointer */
+    /* updates both the buffer and file size pointers from
+    the provider values (output variables) */
     *buffer_pointer = file_buffer;
-
-    /* sets the file size as the file size pointer */
     *file_size_pointer = file_size;
 
     /* raise no error */
@@ -85,6 +92,10 @@ ERROR_CODE read_file(char *file_path, unsigned char **buffer_pointer, size_t *fi
 ERROR_CODE write_file(char *file_path, unsigned char *buffer, size_t buffer_size) {
     /* allocates space for the file */
     FILE *file;
+
+    /* ensures that the file path is correctly converted
+    into the proper system path, through encoding conversion */
+    SYSTEM_PATH(file_path);
 
     /* opens the file, then writes the complete set of contents
     from the provided buffer into it and closes the file to avoid
@@ -104,12 +115,18 @@ ERROR_CODE count_file(char *file_path, size_t *file_size_pointer) {
     /* allocates space for the file size */
     size_t file_size;
 
+    /* ensures that the file path is correctly converted
+    into the proper system path, through encoding conversion */
+    SYSTEM_PATH(file_path);
+
     /* opens the file and in case the retrieved value
     is not valid raises an error */
     FOPEN(&file, file_path, "rb");
     if(file == NULL) {
-        /* raises an error */
-        RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem loading file");
+        RAISE_ERROR_M(
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Problem loading file"
+        );
     }
 
     /* seeks the file until the end retrieves the
@@ -344,6 +361,68 @@ int _entry_compare_file(void *first, void *second) {
 
 #ifdef VIRIATUM_PLATFORM_WIN32
 
+ERROR_CODE path_from_system(char *path_s, char *path) {
+    /* allocates space for the buffer that will hold
+    the temporary unicode version of the path */
+    wchar_t path_u[VIRIATUM_MAX_PATH_SIZE];
+
+    /* converts the provided system path into a temporary
+    unicode buffer and then uses it to convert the path
+    to the standard viriatum (utf8) version of the string */
+    MultiByteToWideChar(
+        CP_ACP,
+        (DWORD) NULL,
+        path_s,
+        -1,
+        path_u,
+        VIRIATUM_MAX_PATH_SIZE
+    );
+    WideCharToMultiByte(
+        CP_UTF8,
+        (DWORD) NULL,
+        path_u,
+        -1,
+        path,
+        VIRIATUM_MAX_PATH_SIZE,
+        NULL,
+        NULL
+    );
+
+    /* raise no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE path_to_system(char *path, char *path_s) {
+    /* allocates space for the buffer that will hold
+    the temporary unicode version of the path */
+    wchar_t path_u[VIRIATUM_MAX_PATH_SIZE];
+
+    /* converts the viriatum (utf8) encoded version
+    of the path into an unicode version and then convert
+    the value back into the system's encoding */
+    MultiByteToWideChar(
+        CP_UTF8,
+        (DWORD) NULL,
+        path,
+        -1,
+        path_u,
+        VIRIATUM_MAX_PATH_SIZE
+    );
+    WideCharToMultiByte(
+        CP_ACP,
+        (DWORD) NULL,
+        path_u,
+        -1,
+        path_s,
+        VIRIATUM_MAX_PATH_SIZE,
+        NULL,
+        NULL
+    );
+
+    /* raise no error */
+    RAISE_NO_ERROR;
+}
+
 ERROR_CODE get_write_time_file(char *file_path, struct date_time_t *date_time) {
     /* allocates space for the various file times */
     FILETIME time_create;
@@ -400,9 +479,17 @@ ERROR_CODE get_write_time_file(char *file_path, struct date_time_t *date_time) {
 }
 
 ERROR_CODE is_directory_file(char *file_path, unsigned int *is_directory) {
+    /* allocates space for the integer that will hold the
+    resulting attributes map from the "query" */
+    int file_attributes;
+
+    /* ensures that the file path is correctly converted
+    into the proper system path, through encoding conversion */
+    SYSTEM_PATH(file_path);
+
     /* retrieves the file attributes from the file in
     the current path, must be able to detect errors */
-    int file_attributes = GetFileAttributes(file_path);
+    file_attributes = GetFileAttributes(file_path);
 
     /* in case there is an error retrieving the file attributes
     this is considered to be an invalid file */
@@ -432,19 +519,32 @@ ERROR_CODE list_directory_file(char *file_path, struct linked_list_t *entries) {
     listing directory path */
     char *list_path;
 
-    /* allocates space for the entry, entry full name
-    and the length of the entry name */
+    /* allocates space for the size of the name's entry and
+    for the length of the path*/
+    int name_size;
+    size_t path_length;
+
+    /* allocates space for the entry data structure and for
+    the full name of the entry */
     struct file_t *entry;
     char entry_full_name[4096];
-    size_t entry_name_length;
+
+    /* allocates space for the unicode based temporary buffer
+    to be used in the conversion of the entry name into viriatum
+    encoding (required for standards compliance) */
+    wchar_t name_u[VIRIATUM_MAX_PATH_SIZE];
 
     /* allocates the various windows internal structures
     for the findind of the directory entries */
     WIN32_FIND_DATA find_data;
     HANDLE handler_find = INVALID_HANDLE_VALUE;
 
+    /* ensures that the file path is correctly converted
+    into the proper system path, through encoding conversion */
+    SYSTEM_PATH(file_path);
+
     /* retrieves the length of the file path */
-    size_t path_length = strlen(file_path);
+    path_length = strlen(file_path);
 
     /* allocates and populates the list (directory) path
     with the appropriate wildcard value */
@@ -491,12 +591,43 @@ ERROR_CODE list_directory_file(char *file_path, struct linked_list_t *entries) {
         join_path_file(file_path, find_data.cFileName, entry_full_name);
         get_write_time_file(entry_full_name, &entry->time);
 
-        /* calculates the length of the entry name and uses
-        it to create the memory space for the entry name and then
-        copies the contents into it */
-        entry_name_length = strlen(find_data.cFileName);
-        entry->name = (unsigned char *) MALLOC(entry_name_length + 1);
-        memcpy(entry->name, find_data.cFileName, entry_name_length + 1);
+        /* converts the system oriented entry name into a wide
+        char representation and uses a "virtual" conversion to utf8
+        to measure the amount of bytes required in the final convertion
+        into the viriatum (utf8) representation of the entry name */
+        MultiByteToWideChar(
+            CP_ACP,
+            (DWORD) NULL,
+            find_data.cFileName,
+            -1,
+            name_u,
+            VIRIATUM_MAX_PATH_SIZE
+        );
+        name_size = WideCharToMultiByte(
+            CP_UTF8,
+            (DWORD) NULL,
+            name_u,
+            -1,
+            NULL,
+            0,
+            NULL,
+            NULL
+        );
+
+        /* allocates the required space for the anme of the entry
+        and then runs the conversion from the wide char into the
+        default utf8 encoding for viriatum proper handling */
+        entry->name = (unsigned char *) MALLOC(name_size);
+        WideCharToMultiByte(
+            CP_UTF8,
+            (DWORD) NULL,
+            name_u,
+            -1,
+            entry->name,
+            name_size,
+            NULL,
+            NULL
+        );
 
         /* adds the entry to the list of entries for
         the current directory (path) */
