@@ -236,6 +236,14 @@ ERROR_CODE message_begin_callback_handler_file(struct http_parser_t *http_parser
 }
 
 ERROR_CODE url_callback_handler_file(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+    /* allocates memory for the variable that will hold the
+    size of the decoded file path */
+    size_t decoded_size;
+
+    /* the complete size of the string that contains the file
+    path "calculated" from the url */
+    size_t file_path_size;
+
     /* retrieves the handler file context from the http parser */
     struct handler_file_context_t *handler_file_context = (struct handler_file_context_t *) http_parser->context;
 
@@ -255,13 +263,29 @@ ERROR_CODE url_callback_handler_file(struct http_parser_t *http_parser, const un
 
     /* creates the file path using the base viriatum path
     this should be the complete absolute path */
-    SPRINTF(
+    file_path_size = SPRINTF(
         (char *) handler_file_context->file_path,
         VIRIATUM_MAX_PATH_SIZE,
         "%s%s%s",
         VIRIATUM_CONTENTS_PATH,
         VIRIATUM_BASE_PATH,
         handler_file_context->url
+    );
+
+    /* decodes the url and file path for the percent encoding, this method
+    uses constant (pre-allocated) memory for fast performance the resulting
+    value is stored as a simple string in utf-8 encoding */
+    decode_percent(
+        handler_file_context->url,
+        path_size,
+        handler_file_context->url_d,
+        &decoded_size
+    );
+    decode_percent(
+        handler_file_context->file_path,
+        file_path_size,
+        handler_file_context->file_path_d,
+        &decoded_size
     );
 
     /* raise no error */
@@ -403,7 +427,7 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
     http_connection->acquire(http_connection);
 
     /* checks if the path being request is in fact a directory */
-    is_directory_file((char *) handler_file_context->file_path, &is_directory);
+    is_directory_file((char *) handler_file_context->file_path_d, &is_directory);
 
     /* in case the file path being request referes a directory
     it must be checked and the entries retrieved to be rendered */
@@ -440,14 +464,14 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
 
             /* lists the directory file into the directory
             entries linked list and then converts them into maps */
-            list_directory_file((char *) handler_file_context->file_path, directory_entries);
+            list_directory_file((char *) handler_file_context->file_path_d, directory_entries);
             entries_to_map_file(directory_entries, &directory_entries_map);
 
             /* retrieves the current size of the url and copies into
             the folder path the appropriate part of it, this strategy
             takes into account the size of the url */
-            url_size = strlen((char *) handler_file_context->url);
-            if(url_size > 2) { memcpy(folder_path, &handler_file_context->url[1], url_size - 2); }
+            url_size = strlen((char *) handler_file_context->url_d);
+            if(url_size > 2) { memcpy(folder_path, &handler_file_context->url_d[1], url_size - 2); }
             if(url_size > 2) { folder_path[url_size - 2] = '\0'; }
             else { folder_path[0] = '\0'; }
 
@@ -456,12 +480,24 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
 
             /* assigns the name of the current folder being listed to
             the template handler (to be set on the template) */
-            assign_string_template_handler(template_handler, (unsigned char *) "folder_path", folder_path);
+            assign_string_template_handler(
+                template_handler,
+                (unsigned char *) "folder_path",
+                folder_path
+            );
 
             /* assigns the directory entries to the template handler,
             this variable will be exposed to the template */
-            assign_list_template_handler(template_handler, (unsigned char *) "entries", directory_entries_map);
-            assign_integer_template_handler(template_handler, (unsigned char *) "items", (int) directory_entries_map->size);
+            assign_list_template_handler(
+                template_handler,
+                (unsigned char *) "entries",
+                directory_entries_map
+            );
+            assign_integer_template_handler(
+                template_handler,
+                (unsigned char *) "items",
+                (int) directory_entries_map->size
+            );
 
             /* processes the file as a template handler */
             process_template_handler(template_handler, template_path);
@@ -485,8 +521,13 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
     /* otherwise the file path must refered a "normal" file path and
     it must be checked */
     else {
-        /* counts the total size (in bytes) of the contents in the file path */
-        error_code = count_file((char *) handler_file_context->file_path, &file_size);
+        /* counts the total size (in bytes) of the contents
+        in the file path, this also the call used for checking
+        the existence of the file */
+        error_code = count_file(
+            (char *) handler_file_context->file_path_d,
+            &file_size
+        );
 
         /* in case there is no error count the file size, avoids
         extra problems while computing the etag */
@@ -496,7 +537,7 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
             memset(&time, 0, sizeof(struct date_time_t));
 
             /* retrieve the time of the last write in the file path */
-            get_write_time_file((char *) handler_file_context->file_path, &time);
+            get_write_time_file((char *) handler_file_context->file_path_d, &time);
 
             /* creates the date time string for the file entry */
             SPRINTF(
@@ -521,18 +562,19 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
     /* sets the (http) flags in the handler file context */
     handler_file_context->flags = http_parser->flags;
 
-    /* tests the error code for error */
+    /* tests the error code for error, in case there's an error
+    the file is considered to be not found (normal error) */
     if(IS_ERROR_CODE(error_code)) {
         /* prints the error */
         V_DEBUG_F("%s\n", get_last_error_message_safe());
 
-        /* creats the error description string from the error message and then
+        /* creates the error description string from the error message and then
         sends the error to the connection (with the current format) */
         SPRINTF(
             error_description,
             VIRIATUM_MAX_PATH_SIZE,
             "File not found (%s)",
-            handler_file_context->file_path
+            handler_file_context->file_path_d
         );
         write_http_error(
             connection,
@@ -644,7 +686,7 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
         it to try to retrieve the mime type string for it in case it's
         successfull "puts" the content type in the headers buffer, then
         puts the etag value in the file */
-        extension = extension_path((char *) handler_file_context->file_path);
+        extension = extension_path((char *) handler_file_context->file_path_d);
         mime_type = connection->service->get_mime_type(connection->service, extension);
         if(mime_type != NULL) {
             count += SPRINTF(
@@ -676,6 +718,14 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
 }
 
 ERROR_CODE path_callback_handler_file(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+    /* allocates memory for the variable that will hold the
+    size of the decoded file path */
+    size_t decoded_size;
+
+    /* the complete size of the string that contains the file
+    path "calculated" from the url */
+    size_t file_path_size;
+
     /* retrieves the handler file context from the http parser
     and uses it to retrieve the reference to the base path in context */
     struct handler_file_context_t *handler_file_context = (struct handler_file_context_t *) http_parser->context;
@@ -695,7 +745,7 @@ ERROR_CODE path_callback_handler_file(struct http_parser_t *http_parser, const u
     if(base_path == NULL) {
         /* creates the file path using the base viriatum path
         this should be the complete absolute path */
-        SPRINTF(
+        file_path_size = SPRINTF(
             (char *) handler_file_context->file_path,
             VIRIATUM_MAX_PATH_SIZE,
             "%s%s%s",
@@ -709,7 +759,7 @@ ERROR_CODE path_callback_handler_file(struct http_parser_t *http_parser, const u
     else {
         /* creates the file path using the base viriatum path
         this should be the complete absolute path */
-        SPRINTF(
+        file_path_size = SPRINTF(
             (char *) handler_file_context->file_path,
             VIRIATUM_MAX_PATH_SIZE,
             "%s%s",
@@ -718,11 +768,35 @@ ERROR_CODE path_callback_handler_file(struct http_parser_t *http_parser, const u
         );
     }
 
+    /* decodes the url and file path for the percent encoding, this method
+    uses constant (pre-allocated) memory for fast performance the resulting
+    value is stored as a simple string in utf-8 encoding */
+    decode_percent(
+        handler_file_context->url,
+        data_size,
+        handler_file_context->url_d,
+        &decoded_size
+    );
+    decode_percent(
+        handler_file_context->file_path,
+        file_path_size,
+        handler_file_context->file_path_d,
+        &decoded_size
+    );
+
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
 ERROR_CODE location_callback_handler_file(struct http_parser_t *http_parser, size_t index, size_t offset) {
+    /* allocates memory for the variable that will hold the
+    size of the decoded file path */
+    size_t decoded_size;
+
+    /* the complete size of the string that contains the file
+    path "calculated" from the url */
+    size_t file_path_size;
+
     /* allocates space for the partial url, resulting from the
     remaining part from the matching of the location */
     unsigned char *partial_url;
@@ -755,12 +829,21 @@ ERROR_CODE location_callback_handler_file(struct http_parser_t *http_parser, siz
     /* creates the file path using the base viriatum path
     this should be the complete absolute path, note that
     only the partial url is used (offset from location) */
-    SPRINTF(
+    file_path_size = SPRINTF(
         (char *) handler_file_context->file_path,
         VIRIATUM_MAX_PATH_SIZE,
         "%s%s",
         location->base_path,
         partial_url
+    );
+
+    /* decodes the file path for the percent encoding, this method
+    uses constant (pre-allocated) memory for fast performance */
+    decode_percent(
+        handler_file_context->file_path,
+        file_path_size,
+        handler_file_context->file_path_d,
+        &decoded_size
     );
 
     /* raise no error */
@@ -894,7 +977,7 @@ ERROR_CODE _send_chunk_handler_file(struct connection_t *connection, struct data
     struct handler_file_context_t *handler_file_context = (struct handler_file_context_t *) parameters;
 
     /* retrieves the file path from the handler file context */
-    unsigned char *file_path = handler_file_context->file_path;
+    unsigned char *file_path = handler_file_context->file_path_d;
 
     /* retrieves the file from the handler file context */
     FILE *file = handler_file_context->file;

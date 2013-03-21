@@ -88,10 +88,22 @@ typedef struct handler_file_context_t {
     unsigned char url[VIRIATUM_MAX_URL_SIZE];
 
     /**
+     * The url (percent) decoded verson of the url
+     * to be used for the retrieval of the file.
+     */
+    unsigned char url_d[VIRIATUM_MAX_URL_SIZE];
+
+    /**
      * The path to the file to be handled by
      * the current file request.
      */
     unsigned char file_path[VIRIATUM_MAX_PATH_SIZE];
+
+    /**
+     * The url (percent) decoded version of the path
+     * to the file to be handled by the current request.
+     */
+    unsigned char file_path_d[VIRIATUM_MAX_PATH_SIZE];
 
     /**
      * The base path of the directory to be used for
