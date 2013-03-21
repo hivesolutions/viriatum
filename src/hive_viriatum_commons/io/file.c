@@ -29,6 +29,33 @@
 
 #include "file.h"
 
+ERROR_CODE open_file(char *file_path, FILE *file) {
+    /* allocates space for the file pointer to be used
+    in the open operation */
+    FILE *file;
+
+    /* ensures that the file path is correctly converted
+    into the proper system path, through encoding conversion */
+    SYSTEM_PATH(file_path);
+
+    /* opens the file for reading the contents from it
+    this file pointer will be used throught various chunks */
+    FOPEN(&file, (char *) file_path, "rb");
+
+    /* in case the file is not found, must raise an error
+    indicating that there was a problem loading the file */
+    if(file == NULL) {
+        RAISE_ERROR_M(
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Problem loading file"
+        );
+    }
+
+    /* updates the file pointer value to point to the currently
+    used file structure */
+    *file_pointer = file;
+}
+
 ERROR_CODE read_file(char *file_path, unsigned char **buffer_pointer, size_t *file_size_pointer) {
     /* allocates space for the file */
     FILE *file;

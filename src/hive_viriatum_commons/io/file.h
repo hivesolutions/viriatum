@@ -85,6 +85,17 @@ typedef struct file_t {
 } file;
 
 /**
+ * Opens the file specified by the provided file path
+ * converting the file path into the apropriate system
+ * wide representation (secure open).
+ *
+ * @param file_path The path to the file to be open.
+ * @param file_pointer The pointer to the file structure
+ * to be set with the result of the open operation.
+ */
+VIRIATUM_EXPORT_PREFIX ERROR_CODE open_file(char *file_path, FILE **file_pointer);
+
+/**
  * Reads the file at the given file path to a generated
  * buffer and retrieves the size of the file.
  *

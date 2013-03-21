@@ -987,24 +987,11 @@ ERROR_CODE _send_chunk_handler_file(struct connection_t *connection, struct data
     equal to the buffer size) */
     unsigned char *file_buffer = MALLOC(FILE_BUFFER_SIZE_HANDLER_FILE);
 
-    /* ensures that the file path is correctly converted
-    into the proper system path, through encoding conversion */
-    SYSTEM_PATH(file_path);
-
     /* in case the file is not defined (should be opened) */
     if(file == NULL) {
-        /* opens the file for reading the contents from it
-        this file pointer will be used throught various chunks */
-        FOPEN(&file, (char *) file_path, "rb");
-
-        /* in case the file is not found, must raise an error
-        indicating that there was a problem loading the file */
-        if(file == NULL) {
-            RAISE_ERROR_M(
-                RUNTIME_EXCEPTION_ERROR_CODE,
-                (unsigned char *) "Problem loading file"
-            );
-        }
+        /* opens the file in the most secure manner making sure
+        that the proper encoding is set for the path */
+        open_file(file_path, &file);
 
         /* sets the file in the handler file context, this is
         the pointer that will be used for the sending of the
@@ -1015,11 +1002,14 @@ ERROR_CODE _send_chunk_handler_file(struct connection_t *connection, struct data
     /* reads the file contents, should read either the size
     of a chunk or the size of the complete file in case it's
     shorter than the chunk size */
-    number_bytes = fread(file_buffer, 1, FILE_BUFFER_SIZE_HANDLER_FILE, file);
+    number_bytes = fread(
+        file_buffer, 1, FILE_BUFFER_SIZE_HANDLER_FILE, file
+    );
 
     /* in case the number of read bytes is valid */
     if(number_bytes > 0) {
-        /* writes both the file buffer to the connection */
+        /* writes the complete set of contents in the file
+        buffer to the current connection (send operation) */
         write_connection(
             connection,
             file_buffer,
@@ -1028,7 +1018,8 @@ ERROR_CODE _send_chunk_handler_file(struct connection_t *connection, struct data
             handler_file_context
         );
     }
-    /* otherwise the file "transfer" is complete */
+    /* otherwise the file "transfer" is complete and the control
+    flow should proceed to the cleanup operations */
     else {
         /* unsets the file from the handler file context */
         handler_file_context->file = NULL;
@@ -1036,10 +1027,9 @@ ERROR_CODE _send_chunk_handler_file(struct connection_t *connection, struct data
         /* runs the cleanup handler file (releases internal structures) */
         _cleanup_handler_file(connection, data, parameters);
 
-        /* closes the file */
+        /* closes the file and the releases the currently allocated
+        file buffer (avoids memory leaking) */
         fclose(file);
-
-        /* releases the current file buffer */
         FREE(file_buffer);
     }
 
