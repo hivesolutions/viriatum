@@ -224,7 +224,10 @@ ERROR_CODE data_handler_stream_http(struct io_connection_t *io_connection, unsig
         size_offset = http_connection->buffer_offset + buffer_size;
         size_length = http_connection->buffer_size + content_length;
         http_connection->buffer_size = size_length > size_offset ? size_length : size_offset;
-        http_connection->buffer = REALLOC((void *) http_connection->buffer, http_connection->buffer_size);
+        http_connection->buffer = REALLOC(
+            (void *) http_connection->buffer,
+            http_connection->buffer_size
+        );
     }
 
     /* retrieves the pointer reference to the current position in the
