@@ -29,8 +29,8 @@
 
 #include "../debug/debug.h"
 
-VIRIATUM_EXPORT_PREFIX ERROR_CODE encode_percent(unsigned char *buffer, size_t length, unsigned char **buffer_pointer, size_t *length_pointer);
-VIRIATUM_EXPORT_PREFIX ERROR_CODE decode_percent(unsigned char *buffer, size_t length, unsigned char **buffer_pointer,  size_t *length_pointer);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE encode_percent(unsigned char *buffer, size_t length, unsigned char *_buffer, size_t *length_pointer);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE decode_percent(unsigned char *buffer, size_t length, unsigned char *_buffer,  size_t *length_pointer);
 VIRIATUM_EXPORT_PREFIX ERROR_CODE url_encode(unsigned char *buffer, size_t length, unsigned char **buffer_pointer, size_t *length_pointer);
 VIRIATUM_EXPORT_PREFIX ERROR_CODE url_decode(unsigned char *buffer, size_t length, unsigned char **buffer_pointer, size_t *length_pointer);
 

@@ -29,17 +29,16 @@
 
 #include "percent.h"
 
-ERROR_CODE encode_percent(unsigned char *buffer, size_t length, unsigned char **buffer_pointer, size_t *length_pointer) {
+ERROR_CODE encode_percent(unsigned char *buffer, size_t length, unsigned char *_buffer, size_t *length_pointer) {
     /* allocates space for the byte value to be read in
     each iteration and allocates space for the index accumulator
     value for the iteration process */
     unsigned char byte;
     size_t index;
 
-    /* allocates space for the buffer to hold the encoded
-    string (assumes worst case for size calculation) and
-    then sets this buffer as the current buffer pointer */
-    unsigned char *_buffer = MALLOC(length * 3 + 1);
+    /* creates a "backup" of the original buffer position
+    provided by the call to be used in the final calculus
+    of the size of the buffer */
     unsigned char *__buffer = _buffer;
 
     /* iterates over the range of the provided buffer length
@@ -75,25 +74,24 @@ ERROR_CODE encode_percent(unsigned char *buffer, size_t length, unsigned char **
     /* closes the encoded buffer with the null value */
     *__buffer = '\0';
 
-    /* sets the current encoded buffer in the buffer pointer value
-    and sets the apropriate length inthe length pointer value */
-    *buffer_pointer = _buffer;
+    /* calculates the length of the "populated" output buffer
+    using the diference between the "original" buffer pointer
+    and the current pointer */
     *length_pointer = __buffer - _buffer;
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE decode_percent(unsigned char *buffer, size_t length, unsigned char **buffer_pointer,  size_t *length_pointer) {
+ERROR_CODE decode_percent(unsigned char *buffer, size_t length, unsigned char *_buffer,  size_t *length_pointer) {
     /* allocates the pointer to be used durring the iteration
     process for the url decoding */
     unsigned char *pointer;
 
-    /* allocates space for the buffer to hold the encoded
-    string (assumes worst case for size calculation) and
-    then sets this buffer as the current buffer pointer */
-    unsigned char *_bufffer = MALLOC(length + 1);
-    unsigned char *__buffer = _bufffer;
+    /* creates a "backup" of the original buffer position
+    provided by the call to be used in the final calculus
+    of the size of the buffer */
+    unsigned char *__buffer = _buffer;
 
     /* iterates over the range of the provided buffer length
     in order to decode the string parts */
@@ -130,20 +128,23 @@ ERROR_CODE decode_percent(unsigned char *buffer, size_t length, unsigned char **
     /* closes the decoded buffer with the null value */
     *__buffer = '\0';
 
-    /* sets the current encoded buffer in the buffer pointer value
-    and sets the apropriate length inthe length pointer value */
-    *buffer_pointer = _bufffer;
-    *length_pointer = __buffer - _bufffer;
+    /* calculates the length of the "populated" output buffer
+    using the diference between the "original" buffer pointer
+    and the current pointer */
+    *length_pointer = __buffer - _buffer;
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-
 ERROR_CODE url_encode(unsigned char *buffer, size_t length, unsigned char **buffer_pointer, size_t *length_pointer) {
-    return encode_percent(buffer, length, buffer_pointer, length_pointer);
+    unsigned char *_buffer = MALLOC(length * 3 + 1);
+    *buffer_pointer = _buffer;
+    return encode_percent(buffer, length, _buffer, length_pointer);
 }
 
 ERROR_CODE url_decode(unsigned char *buffer, size_t length, unsigned char **buffer_pointer, size_t *length_pointer) {
-    return decode_percent(buffer, length, buffer_pointer, length_pointer);
+    unsigned char *_buffer = MALLOC(length + 1);
+    *buffer_pointer = _buffer;
+    return decode_percent(buffer, length, _buffer, length_pointer);
 }
