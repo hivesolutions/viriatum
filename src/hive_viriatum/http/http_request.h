@@ -36,6 +36,7 @@
 #define CONTENT_TYPE_H "Content-Type"
 #define CACHE_CONTROL_H "Cache-Control"
 #define CONTENT_LENGTH_H "Content-Length"
+#define WWW_AUTHENTICATE_H "WWW-Authenticate"
 
 /**
  * Enumeration defining the various possible
