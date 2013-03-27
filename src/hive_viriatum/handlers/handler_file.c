@@ -374,6 +374,12 @@ ERROR_CODE header_value_callback_handler_file(struct http_parser_t *http_parser,
             handler_file_context->authorization[data_size] = '\0';
             handler_file_context->authorization_status = 2;
             break;
+
+		case UNDEFINED_HEADER:
+		case CONTENT_TYPE:
+		case COOKIE:
+		case HOST:
+			break;
     }
 
     /* sets the next heder value to the "default" undefined
@@ -472,8 +478,8 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
     the current authorization value */
     if(handler_file_context->auth_basic != NULL) {
         auth_http(
-            handler_file_context->auth_file,
-            handler_file_context->authorization,
+            (char *) handler_file_context->auth_file,
+            (char *) handler_file_context->authorization,
             &auth_result
         );
     }
@@ -652,7 +658,7 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
             401,
             "Not Authorized",
             "Invalid password or user not found",
-            handler_file_context->auth_basic,
+            (char *) handler_file_context->auth_basic,
             _cleanup_handler_file,
             handler_file_context
         );
