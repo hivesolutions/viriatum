@@ -385,3 +385,20 @@ ERROR_CODE log_http_request(char *host, char *identity, char *user, char *method
     /* raises no error */
     RAISE_NO_ERROR;
 }
+
+ERROR_CODE auth_http(char *auth_file, char *authorization, unsigned char *result) {
+	unsigned char is_default = strcmp(auth_file, "$default") == 0 ? TRUE : FALSE;
+	if(is_default) { auth_default_http(auth_file, authorization, result); }
+	else { auth_file_http(auth_file, authorization, result); }
+	RAISE_NO_ERROR;
+}
+
+ERROR_CODE auth_default_http(char *auth_file, char *authorization, unsigned char *result) {
+	size_t is_valid = strcmp(authorization, DEFAULT_AUTH_HTTP);
+	*result = is_valid == 0 ? TRUE : FALSE;
+	RAISE_NO_ERROR;
+}
+
+ERROR_CODE auth_file_http(char *auth_file, char *authorization, unsigned char *result) {
+	RAISE_NO_ERROR;
+}

@@ -465,7 +465,7 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
 	context must proceed with the authentication process for
 	the current authorization value */
 	if(handler_file_context->auth_basic != NULL) {
-		authenticate_http(
+		auth_http(
 		    handler_file_context->auth_file,
 			handler_file_context->authorization,
 			&auth_result

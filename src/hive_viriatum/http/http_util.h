@@ -38,6 +38,12 @@ struct connection_t;
 typedef ERROR_CODE (*connection_data_callback_hu) (struct connection_t *, struct data_t *, void *);
 
 /**
+ * The default authentication string to be used
+ * when the default http mode is requested.
+ */
+#define DEFAULT_AUTH_HTTP "Basic cm9vdDpyb290"
+
+/**
  * The string representations for the various
  * versions of the http protocol.
  * These values are useful for usage in the
@@ -157,6 +163,9 @@ ERROR_CODE write_http_message(struct connection_t *connection, char *buffer, siz
 ERROR_CODE write_http_error(struct connection_t *connection, char *buffer, size_t size, enum http_version_e version, int error_code, char *error_message, char *error_description, connection_data_callback_hu callback, void *callback_parameters);
 ERROR_CODE write_http_error_a(struct connection_t *connection, char *buffer, size_t size, enum http_version_e version, int error_code, char *error_message, char *error_description, char *realm, connection_data_callback_hu callback, void *callback_parameters);
 ERROR_CODE log_http_request(char *host, char *identity, char *user, char *method, char *uri, enum http_version_e version, int error_code, size_t content_length);
+ERROR_CODE auth_http(char *auth_file, char *authorization, unsigned char *result);
+ERROR_CODE auth_default_http(char *auth_file, char *authorization, unsigned char *result);
+ERROR_CODE auth_file_http(char *auth_file, char *authorization, unsigned char *result);
 
 __inline static const char *_get_http_version_code(size_t index) {
     return http_version_codes[index];
