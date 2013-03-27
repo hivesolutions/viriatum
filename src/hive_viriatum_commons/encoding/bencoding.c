@@ -162,7 +162,12 @@ ERROR_CODE decode_bencoding_file(char *file_path, struct type_t **type_pointer) 
     and then tests the error code for error, in case there is an
     error prints it to the error stream output */
     return_value = read_file(file_path, &file_buffer, &file_size);
-    if(IS_ERROR_CODE(return_value)) { RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem reading file"); }
+    if(IS_ERROR_CODE(return_value)) {
+		RAISE_ERROR_M(
+			RUNTIME_EXCEPTION_ERROR_CODE,
+			(unsigned char *) "Problem reading file"
+		);
+	}
 
     /* starts the bencoding engine, starting all of its internal
     structures and then runs an engine tick parsing the complete
