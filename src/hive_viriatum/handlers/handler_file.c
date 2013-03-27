@@ -361,7 +361,6 @@ ERROR_CODE header_value_callback_handler_file(struct http_parser_t *http_parser,
             memcpy(handler_file_context->etag, data, 10);
             handler_file_context->etag[10] = '\0';
             handler_file_context->etag_status = 2;
-
             break;
 
         case CACHE_CONTROL:
