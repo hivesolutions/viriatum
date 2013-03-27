@@ -653,7 +653,7 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
             VIRIATUM_HTTP_SIZE,
             HTTP11,
             401,
-            "Not Authorized",
+            "Unauthorized",
             "Invalid password or user not found",
             (char *) handler_file_context->auth_basic,
             _cleanup_handler_file,
