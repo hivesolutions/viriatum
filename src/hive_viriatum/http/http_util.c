@@ -82,6 +82,37 @@ size_t write_http_headers_c(struct connection_t *connection, char *buffer, size_
     return count;
 }
 
+size_t write_http_headers_a(struct connection_t *connection, char *buffer, size_t size, enum http_version_e version, int status_code, char *status_message, enum http_keep_alive_e keep_alive, size_t content_length, enum http_cache_e cache, char *realm, int close) {
+    /* writes the header information into the buffer using the basic
+    function then uses the count offset to determine the buffer position
+    to write the remaining headers for the complete write */
+    size_t count = write_http_headers(
+        connection,
+        buffer,
+        size,
+        version,
+        status_code,
+        status_message,
+        keep_alive,
+        FALSE
+    );
+    count += SPRINTF(
+        &buffer[count],
+        size - count,
+        CONTENT_LENGTH_H ": %lu\r\n"
+        CACHE_CONTROL_H ": %s\r\n"
+		WWW_AUTHENTICATE_H ": Basic realm=\"%s\"\r\n"
+        "%s",
+        (long unsigned int) content_length,
+        cache_codes[cache - 1],
+		realm,
+        close_codes[close]
+    );
+
+    /* returns the number of bytes written into the buffer */
+    return count;
+}
+
 size_t write_http_headers_m(struct connection_t *connection, char *buffer, size_t size, enum http_version_e version, int status_code, char *status_message, enum http_keep_alive_e keep_alive, size_t content_length, enum http_cache_e cache, char *message) {
     /* writes the complete set of buffer using the appropriate function and then
     uses the count offset to copy the contents part of the message into the final
@@ -139,6 +170,21 @@ ERROR_CODE write_http_message(struct connection_t *connection, char *buffer, siz
 }
 
 ERROR_CODE write_http_error(struct connection_t *connection, char *buffer, size_t size, enum http_version_e version, int error_code, char *error_message, char *error_description, connection_data_callback_hu callback, void *callback_parameters) {
+	return write_http_error_a(
+		connection,
+		buffer,
+		size,
+		version,
+		error_code,
+		error_message,
+		error_description,
+		NULL,
+		callback,
+		callback_parameters
+	);
+}
+
+ERROR_CODE write_http_error_a(struct connection_t *connection, char *buffer, size_t size, enum http_version_e version, int error_code, char *error_message, char *error_description, char *realm, connection_data_callback_hu callback, void *callback_parameters) {
     /* allocates space for the result buffer related
     variables (for both the buffer pointer and size) */
     size_t result_length;
@@ -204,9 +250,12 @@ ERROR_CODE write_http_error(struct connection_t *connection, char *buffer, size_
         }
 
         /* processes the file as a template handler, at this point
-        the output buffer of the template engine should be populated */
+        the output buffer of the template engine should be populated
+		with the complete header information, the apropriate header
+		writing method is chosen based on the existence or not of
+		the realm authorization field */
         process_template_handler(template_handler, template_path);
-        write_http_headers_c(
+        realm == NULL ? write_http_headers_c(
             connection,
             headers_buffer,
             size,
@@ -217,7 +266,19 @@ ERROR_CODE write_http_error(struct connection_t *connection, char *buffer, size_
             strlen((char *) template_handler->string_value),
             NO_CACHE,
             TRUE
-        );
+		) : write_http_headers_a(
+            connection,
+            headers_buffer,
+            size,
+            version,
+            error_code,
+            error_message,
+            KEEP_ALIVE,
+            strlen((char *) template_handler->string_value),
+            NO_CACHE,
+			realm,
+            TRUE
+		);
 
         /* creates a new string buffer to hold the complete set of contents
         to be sent to the client then first writes the buffer containing
