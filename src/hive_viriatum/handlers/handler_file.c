@@ -375,10 +375,7 @@ ERROR_CODE header_value_callback_handler_file(struct http_parser_t *http_parser,
             handler_file_context->authorization_status = 2;
             break;
 
-		case UNDEFINED_HEADER:
-		case CONTENT_TYPE:
-		case COOKIE:
-		case HOST:
+		default:
 			break;
     }
 
