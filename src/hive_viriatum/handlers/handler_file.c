@@ -1077,7 +1077,7 @@ ERROR_CODE _send_chunk_handler_file(struct connection_t *connection, struct data
     if(file == NULL) {
         /* opens the file in the most secure manner making sure
         that the proper encoding is set for the path */
-        open_file(file_path, "rb", &file);
+        open_file((char *) file_path, "rb", &file);
 
         /* seeks to the end of the file and then to the
         beginig in order to correctly retrieve the size
