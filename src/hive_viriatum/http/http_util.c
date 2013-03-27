@@ -399,6 +399,99 @@ ERROR_CODE auth_default_http(char *auth_file, char *authorization, unsigned char
     RAISE_NO_ERROR;
 }
 
+
+
+
+
+#define USER 1
+#define PASSWORD 2
+#define COMMENT 3
+
 ERROR_CODE auth_file_http(char *auth_file, char *authorization, unsigned char *result) {
+	size_t size;
+	size_t index;
+	size_t length;
+	ERROR_CODE return_value;
+	unsigned char current;
+
+	unsigned char state;
+
+	unsigned char *mark;
+	unsigned char *buffer;
+	unsigned char *pointer;
+
+	char name[128];
+	char *value;
+
+    struct hash_map_t *passwd_map;
+    
+	create_hash_map(&passwd_map, 0);
+
+	return_value = read_file(auth_file, &buffer, &size);
+    if(IS_ERROR_CODE(return_value)) {
+		RAISE_ERROR_M(
+		    RUNTIME_EXCEPTION_ERROR_CODE,
+			(unsigned char *) "Problem reading file"
+		);
+	}
+
+	mark = buffer;
+	state = USER;
+
+	for(index = 0; index < size; index++) {
+		current = buffer[index];
+		pointer = &buffer[index];
+
+		switch(state) {
+			case USER:
+				switch(current) {
+					case ':':
+					case '\n':
+						length = pointer - mark;
+						memcpy(name, mark, length);
+						name[length] = '\0';
+						mark = pointer + 1;
+						state = current == ':' ? PASSWORD : USER;
+						break;
+				}
+
+				break;
+
+			case PASSWORD:
+				switch(current) {
+					case ':':
+					case '\n':
+						length = pointer - mark;
+						value = (char *) MALLOC(length);
+						memcpy(value, mark, length);
+						value[length] = '\0';
+						mark = pointer + 1;
+						set_value_string_hash_map(passwd_map, name, value);
+						state = current == ':' ? COMMENT : USER;
+						break;
+				}
+
+				break;
+
+			case COMMENT:
+				switch(current) {
+					case '\n':
+						state = USER;
+						mark = pointer + 1;
+						break;
+				}
+
+				break;
+		}
+	}
+
+	FREE(buffer);
+
+	// todo: ainda preciso de sacar a string de base64 e
+    // depois ainda tenho de fazer split de ambas as partes
+	// pointer = strchr(authorization, ' ');
+	// ter cuidado com possiveis null pointers
+
+
     RAISE_NO_ERROR;
 }
