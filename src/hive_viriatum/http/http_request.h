@@ -48,7 +48,10 @@ typedef enum http_header_e {
     CONTENT_TYPE,
     CONTENT_LENGTH,
     COOKIE,
-    HOST
+    HOST,
+    ETAG,
+    CACHE_CONTROL,
+    AUTHORIZATION
 } http_header;
 
 /**

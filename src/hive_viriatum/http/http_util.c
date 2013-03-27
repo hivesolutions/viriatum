@@ -101,11 +101,11 @@ size_t write_http_headers_a(struct connection_t *connection, char *buffer, size_
         size - count,
         CONTENT_LENGTH_H ": %lu\r\n"
         CACHE_CONTROL_H ": %s\r\n"
-		WWW_AUTHENTICATE_H ": Basic realm=\"%s\"\r\n"
+        WWW_AUTHENTICATE_H ": Basic realm=\"%s\"\r\n"
         "%s",
         (long unsigned int) content_length,
         cache_codes[cache - 1],
-		realm,
+        realm,
         close_codes[close]
     );
 
@@ -170,18 +170,18 @@ ERROR_CODE write_http_message(struct connection_t *connection, char *buffer, siz
 }
 
 ERROR_CODE write_http_error(struct connection_t *connection, char *buffer, size_t size, enum http_version_e version, int error_code, char *error_message, char *error_description, connection_data_callback_hu callback, void *callback_parameters) {
-	return write_http_error_a(
-		connection,
-		buffer,
-		size,
-		version,
-		error_code,
-		error_message,
-		error_description,
-		NULL,
-		callback,
-		callback_parameters
-	);
+    return write_http_error_a(
+        connection,
+        buffer,
+        size,
+        version,
+        error_code,
+        error_message,
+        error_description,
+        NULL,
+        callback,
+        callback_parameters
+    );
 }
 
 ERROR_CODE write_http_error_a(struct connection_t *connection, char *buffer, size_t size, enum http_version_e version, int error_code, char *error_message, char *error_description, char *realm, connection_data_callback_hu callback, void *callback_parameters) {
@@ -251,9 +251,9 @@ ERROR_CODE write_http_error_a(struct connection_t *connection, char *buffer, siz
 
         /* processes the file as a template handler, at this point
         the output buffer of the template engine should be populated
-		with the complete header information, the apropriate header
-		writing method is chosen based on the existence or not of
-		the realm authorization field */
+        with the complete header information, the apropriate header
+        writing method is chosen based on the existence or not of
+        the realm authorization field */
         process_template_handler(template_handler, template_path);
         realm == NULL ? write_http_headers_c(
             connection,
@@ -266,7 +266,7 @@ ERROR_CODE write_http_error_a(struct connection_t *connection, char *buffer, siz
             strlen((char *) template_handler->string_value),
             NO_CACHE,
             TRUE
-		) : write_http_headers_a(
+        ) : write_http_headers_a(
             connection,
             headers_buffer,
             size,
@@ -276,9 +276,9 @@ ERROR_CODE write_http_error_a(struct connection_t *connection, char *buffer, siz
             KEEP_ALIVE,
             strlen((char *) template_handler->string_value),
             NO_CACHE,
-			realm,
+            realm,
             TRUE
-		);
+        );
 
         /* creates a new string buffer to hold the complete set of contents
         to be sent to the client then first writes the buffer containing
@@ -387,18 +387,18 @@ ERROR_CODE log_http_request(char *host, char *identity, char *user, char *method
 }
 
 ERROR_CODE auth_http(char *auth_file, char *authorization, unsigned char *result) {
-	unsigned char is_default = strcmp(auth_file, "$default") == 0 ? TRUE : FALSE;
-	if(is_default) { auth_default_http(auth_file, authorization, result); }
-	else { auth_file_http(auth_file, authorization, result); }
-	RAISE_NO_ERROR;
+    unsigned char is_default = strcmp(auth_file, "$default") == 0 ? TRUE : FALSE;
+    if(is_default) { auth_default_http(auth_file, authorization, result); }
+    else { auth_file_http(auth_file, authorization, result); }
+    RAISE_NO_ERROR;
 }
 
 ERROR_CODE auth_default_http(char *auth_file, char *authorization, unsigned char *result) {
-	size_t is_valid = strcmp(authorization, DEFAULT_AUTH_HTTP);
-	*result = is_valid == 0 ? TRUE : FALSE;
-	RAISE_NO_ERROR;
+    size_t is_valid = strcmp(authorization, DEFAULT_AUTH_HTTP);
+    *result = is_valid == 0 ? TRUE : FALSE;
+    RAISE_NO_ERROR;
 }
 
 ERROR_CODE auth_file_http(char *auth_file, char *authorization, unsigned char *result) {
-	RAISE_NO_ERROR;
+    RAISE_NO_ERROR;
 }

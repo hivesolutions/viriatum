@@ -56,20 +56,20 @@ typedef struct file_location_t {
      */
     unsigned char *base_path;
 
-	/**
-	 * The name of the realm to be used in a
-	 * basic authentication for the location.
-	 * In case the value is not set no basic
-	 * authentication is used for location.
-	 */
-	unsigned char *auth_basic;
+    /**
+     * The name of the realm to be used in a
+     * basic authentication for the location.
+     * In case the value is not set no basic
+     * authentication is used for location.
+     */
+    unsigned char *auth_basic;
 
-	/**
-	 * The path to the passwd file to be used for
-	 * the basic authentication process, must
-	 * confirm with the defined standard.
-	 */
-	unsigned char *auth_file;
+    /**
+     * The path to the passwd file to be used for
+     * the basic authentication process, must
+     * confirm with the defined standard.
+     */
+    unsigned char *auth_file;
 } file_location_t;
 
 /**
@@ -130,21 +130,21 @@ typedef struct handler_file_context_t {
      */
     unsigned char *base_path;
 
-	/**
-	 * The string describing the realm for which the
-	 * basic authentication procedure will be used.
-	 * In case this value is not set no basic
-	 * authentication is used for the context.
-	 */
-	unsigned char *auth_basic;
+    /**
+     * The string describing the realm for which the
+     * basic authentication procedure will be used.
+     * In case this value is not set no basic
+     * authentication is used for the context.
+     */
+    unsigned char *auth_basic;
 
-	/**
-	 * The path to the authentication file to be used
-	 * in a basic authentication request.
-	 * This file must conform with the standard for
-	 * the passwd file.
-	 */
-	unsigned char *auth_file;
+    /**
+     * The path to the authentication file to be used
+     * in a basic authentication request.
+     * This file must conform with the standard for
+     * the passwd file.
+     */
+    unsigned char *auth_file;
 
     /**
      * The reference to the file stream to be
@@ -165,6 +165,12 @@ typedef struct handler_file_context_t {
      * handling process.
      */
     unsigned char flags;
+
+    /**
+     * The "internal" next header value that controls the
+     * next value that is going to be parsed as header.
+     */
+    enum http_header_e next_header;
 
     /**
      * The template handler to be used for requests

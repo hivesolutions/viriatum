@@ -71,11 +71,12 @@ ERROR_CODE create_handler_file_context(struct handler_file_context_t **handler_f
 
     /* sets the handler file default values */
     handler_file_context->base_path = NULL;
-	handler_file_context->auth_basic = NULL;
-	handler_file_context->auth_file = NULL;
+    handler_file_context->auth_basic = NULL;
+    handler_file_context->auth_file = NULL;
     handler_file_context->file = NULL;
     handler_file_context->file_size = 0;
     handler_file_context->flags = 0;
+    handler_file_context->next_header = UNDEFINED_HEADER;
     handler_file_context->template_handler = NULL;
     handler_file_context->cache_control_status = 0;
     handler_file_context->etag_status = 0;
@@ -165,8 +166,8 @@ ERROR_CODE register_handler_file(struct service_t *service) {
         default values in it */
         _location = &file_handler->locations[index];
         _location->base_path = NULL;
-		_location->auth_basic = NULL;
-		_location->auth_file = NULL;
+        _location->auth_basic = NULL;
+        _location->auth_file = NULL;
 
         /* tries ro retrieve the base path from the file configuration and in
         case it exists sets it in the location (attribute reference change) */
@@ -176,7 +177,7 @@ ERROR_CODE register_handler_file(struct service_t *service) {
         /* tries ro retrieve the auth basic from the file configuration and in
         case it exists sets it in the location (attribute reference change) */
         get_value_string_sort_map(configuration, (unsigned char *) "auth_basic", &value);
-		if(value != NULL) { _location->auth_basic = (unsigned char *) value; }
+        if(value != NULL) { _location->auth_basic = (unsigned char *) value; }
 
         /* tries ro retrieve the auth file from the file configuration and in
         case it exists sets it in the location (attribute reference change) */
@@ -312,33 +313,36 @@ ERROR_CODE header_field_callback_handler_file(struct http_parser_t *http_parser,
     struct handler_file_context_t *handler_file_context = (struct handler_file_context_t *) http_parser->context;
 
     /* switches over the size of the header name (field)
-	that was provided (used for faster parsing) */
+    that was provided (used for faster parsing) */
     switch(data_size) {
         case 13:
             if(data[0] == 'I' && data[1] == 'f' && data[2] == '-' && data[3] == 'N') {
                 /* updates the etag status value, it's the next
-				value to be parsed and put in context */
+                value to be parsed and put in context */
                 handler_file_context->etag_status = 1;
+                handler_file_context->next_header = ETAG;
                 break;
             }
 
             if(data[0] == 'C' && data[1] == 'a' && data[2] == 'c' && data[3] == 'h') {
-				/* updates the cache control status value, it's the next
-				value to be parsed and put in context */
+                /* updates the cache control status value, it's the next
+                value to be parsed and put in context */
                 handler_file_context->cache_control_status = 1;
+                handler_file_context->next_header = CACHE_CONTROL;
                 break;
             }
 
-			if(data[0] == 'A' && data[1] == 'u' && data[2] == 't' && data[3] == 'h') {
-				/* updates the authorization status value, it's the next
-				value to be parsed and put in context */
+            if(data[0] == 'A' && data[1] == 'u' && data[2] == 't' && data[3] == 'h') {
+                /* updates the authorization status value, it's the next
+                value to be parsed and put in context */
                 handler_file_context->authorization_status = 1;
-				break;
-			}
+                handler_file_context->next_header = AUTHORIZATION;
+                break;
+            }
 
-			/* breaks the switch, this is the
-			fallback in case no match exists */
-			break;
+            /* breaks the switch, this is the
+            fallback in case no match exists */
+            break;
     }
 
     /* raise no error */
@@ -349,30 +353,33 @@ ERROR_CODE header_value_callback_handler_file(struct http_parser_t *http_parser,
     /* retrieves the handler file context from the http parser */
     struct handler_file_context_t *handler_file_context = (struct handler_file_context_t *) http_parser->context;
 
-    /* TODO: THIS SHOULD BE A SWITCH to provide faster performance */
-    if(handler_file_context->etag_status == 1) {
-        memcpy(handler_file_context->etag, data, 10);
-        handler_file_context->etag[10] = '\0';
-        handler_file_context->etag_status = 2;
+    /* switches over the kind of next header to be
+    processed, note that in case the value is set
+    to undefined no parsing will exist */
+    switch(handler_file_context->next_header) {
+        case ETAG:
+            memcpy(handler_file_context->etag, data, 10);
+            handler_file_context->etag[10] = '\0';
+            handler_file_context->etag_status = 2;
 
-        RAISE_NO_ERROR;
+            break;
+
+        case CACHE_CONTROL:
+            memcpy(handler_file_context->cache_control, data, data_size);
+            handler_file_context->cache_control[data_size] = '\0';
+            handler_file_context->cache_control_status = 2;
+            break;
+
+        case AUTHORIZATION:
+            memcpy(handler_file_context->authorization, data, data_size);
+            handler_file_context->authorization[data_size] = '\0';
+            handler_file_context->authorization_status = 2;
+            break;
     }
 
-    if(handler_file_context->cache_control_status == 1) {
-        memcpy(handler_file_context->cache_control, data, data_size);
-        handler_file_context->cache_control[data_size] = '\0';
-        handler_file_context->cache_control_status = 2;
-
-        RAISE_NO_ERROR;
-    }
-
-    if(handler_file_context->authorization_status == 1) {
-        memcpy(handler_file_context->authorization, data, data_size);
-        handler_file_context->authorization[data_size] = '\0';
-        handler_file_context->authorization_status = 2;
-
-        RAISE_NO_ERROR;
-    }
+    /* sets the next heder value to the "default" undefined
+    value so that no extra processing occurs on next header value */
+    handler_file_context->next_header = UNDEFINED_HEADER;
 
     /* raise no error */
     RAISE_NO_ERROR;
@@ -435,9 +442,9 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
     error code (valid by default) */
     ERROR_CODE error_code = 0;
 
-	/* allocates the space required for the authentication result
-	boolean value to be used by the basic authentication system */
-	unsigned char auth_result = TRUE;
+    /* allocates the space required for the authentication result
+    boolean value to be used by the basic authentication system */
+    unsigned char auth_result = TRUE;
 
     /* allocates the headers buffer (it will be releases automatically by the writter)
     it need to be allocated in the heap so it gets throught the request cycle */
@@ -461,16 +468,16 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
     /* checks if the path being request is in fact a directory */
     is_directory_file((char *) handler_file_context->file_path_d, &is_directory);
 
-	/* in case the auth basic value is set in the current file
-	context must proceed with the authentication process for
-	the current authorization value */
-	if(handler_file_context->auth_basic != NULL) {
-		auth_http(
-		    handler_file_context->auth_file,
-			handler_file_context->authorization,
-			&auth_result
-		);
-	}
+    /* in case the auth basic value is set in the current file
+    context must proceed with the authentication process for
+    the current authorization value */
+    if(handler_file_context->auth_basic != NULL) {
+        auth_http(
+            handler_file_context->auth_file,
+            handler_file_context->authorization,
+            &auth_result
+        );
+    }
 
     /* in case the file path being request referes a directory
     it must be checked and the entries retrieved to be rendered */
@@ -632,12 +639,12 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
         );
     } else if(!auth_result) {
         /* prints some debug information about the problem in
-		the authentication of the request */
+        the authentication of the request */
         V_DEBUG("Request not authorized\n");
 
         /* sends the message containing the error definition for
-		the authorization failed operation, note that the realm
-		is also passed as an argument (required for extra header) */
+        the authorization failed operation, note that the realm
+        is also passed as an argument (required for extra header) */
         write_http_error_a(
             connection,
             headers_buffer,
@@ -646,11 +653,11 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
             401,
             "Not Authorized",
             "Invalid password or user not found",
-			handler_file_context->auth_basic,
+            handler_file_context->auth_basic,
             _cleanup_handler_file,
             handler_file_context
         );
-	} else if(is_redirect) {
+    } else if(is_redirect) {
         /* writes the http static headers to the response */
         count = write_http_headers(
             connection,
@@ -715,7 +722,7 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
             "Not Modified",
             KEEP_ALIVE,
             0,
-			NO_CACHE,
+            NO_CACHE,
             TRUE
         );
 
@@ -877,17 +884,17 @@ ERROR_CODE location_callback_handler_file(struct http_parser_t *http_parser, siz
         (struct file_handler_t *) http_connection->http_handler->lower;
 
     /* retrieves the current location from the locations buffer
-	to be used to update the current context information */
+    to be used to update the current context information */
     struct file_location_t *location = &file_handler->locations[index];
 
-	/* updates the various references in the current context, this
+    /* updates the various references in the current context, this
     should reflect the one present in the location */
     handler_file_context->base_path = location->base_path;
-	handler_file_context->auth_basic = location->auth_basic;
-	handler_file_context->auth_file = location->auth_file;
+    handler_file_context->auth_basic = location->auth_basic;
+    handler_file_context->auth_file = location->auth_file;
 
-	/* verifies if the location's base path is defined in case it's
-	not returns immediately as no file path changing is required */
+    /* verifies if the location's base path is defined in case it's
+    not returns immediately as no file path changing is required */
     if(location->base_path == NULL) { RAISE_NO_ERROR; }
 
     /* retrieves the partial url match by "removing" the initial part
@@ -956,14 +963,14 @@ ERROR_CODE _reset_http_parser_handler_file(struct http_parser_t *http_parser) {
     handler_file_context->file = NULL;
 
     /* unsets the handler file context flags, setting
-	the value of them to zerified value */
+    the value of them to zerified value */
     handler_file_context->flags = 0;
 
     /* resets the various flag based variables that are
-	going to be used to control the parsing of headers */
+    going to be used to control the parsing of headers */
     handler_file_context->etag_status = 0;
     handler_file_context->cache_control_status = 0;
-	handler_file_context->authorization_status = 0;
+    handler_file_context->authorization_status = 0;
 
     /* raises no error */
     RAISE_NO_ERROR;
