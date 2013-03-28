@@ -27,7 +27,6 @@
 
 #pragma once
 
-#include "client.h"
-#include "environment.h"
-#include "service.h"
-#include "torrent.h"
+#include "../stream/stream.h"
+
+ERROR_CODE _create_client_connection(struct connection_t **connection_pointer, struct service_t *service, char *hostname, unsigned int port);

@@ -446,150 +446,6 @@ ERROR_CODE join_workers(struct service_t *service) {
 }
 #endif
 
-
-
-
-
-
-
-
-
-ERROR_CODE _create_client_connection(struct connection_t **connection_pointer, struct service_t *service, char *hostname, unsigned int port) {
-    /* allocates the socket handle */
-    SOCKET_HANDLE socket_handle;
-    SOCKET_ADDRESS_INTERNET serv_addr;
-    SOCKET_HOSTENT *server;
-    SOCKET_ERROR_CODE error;
-
-    /* allocates the (client) connection, this is the
-    structure representing the connection */
-    struct connection_t *connection;
-
-    /* allocates the option value and sets it to one (valid) */
-    SOCKET_OPTION option_value = 1;
-
-    /* sets the flags to be used in socket */
-    SOCKET_FLAGS flags = 1;
-
-    socket_handle = SOCKET_CREATE(SOCKET_INTERNET_TYPE, SOCKET_PACKET_TYPE, SOCKET_PROTOCOL_TCP);
-
-    if(SOCKET_TEST_ERROR(socket_handle)) { fprintf(stderr, "ERROR opening socket"); }
-
-    server = SOCKET_GET_HOST_BY_NAME(hostname);
-
-    if(server == NULL) { fprintf(stderr, "ERROR, no such host\n"); }
-
-    memset(&serv_addr, 0, sizeof(SOCKET_ADDRESS_INTERNET));
-    serv_addr.sin_family = AF_INET;
-    memcpy(&serv_addr.sin_addr.s_addr, server->h_addr, server->h_length);
-    serv_addr.sin_port = htons(port);
-
-    error = SOCKET_CONNECT_SIZE(socket_handle, serv_addr, sizeof(SOCKET_ADDRESS_INTERNET));
-    if(SOCKET_TEST_ERROR(error)) { fprintf(stderr, "ERROR connecting host\n"); }
-
-    /* in case viriatum is set to non blocking, changes the current
-    socket behavior to non blocking mode then sets the socket to the
-    non push mode in case it's required by configuration this implies
-    also checking for the no (tcp) wait variable */
-    if(VIRIATUM_NON_BLOCKING) { SOCKET_SET_NON_BLOCKING(socket_handle, flags); }
-    if(VIRIATUM_NO_WAIT) { SOCKET_SET_NO_WAIT(socket_handle, option_value); }
-    if(VIRIATUM_NO_PUSH) { SOCKET_SET_NO_PUSH(socket_handle, option_value); }
-
-    /* creates the (client) connection */
-    create_connection(&connection, socket_handle);
-
-    /* sets the socket address in the (client) connection
-    this is going to be very usefull for later connection
-    identification (address, port, etc.) */
-    /*connection->socket_address = (SOCKET_ADDRESS) serv_addr;*/
-
-    /* sets the service select service as the service in the (client)  connection */
-    connection->service = service;
-
-    /* sets the base hanlding functions in the client connection */
-    connection->open_connection = open_connection;
-    connection->close_connection = close_connection;
-    connection->write_connection = write_connection;
-    connection->register_write = register_write_connection;
-    connection->unregister_write = unregister_write_connection;
-
-    /* sets the various stream io connection callbacks
-    in the client connection */
-    connection->on_read = read_handler_stream_io;
-    connection->on_write = write_handler_stream_io;
-    connection->on_error = error_handler_stream_io;
-    connection->on_handshake = handshake_handler_stream_io;
-    connection->on_open = open_handler_stream_io;
-    connection->on_close = close_handler_stream_io;
-
-    /* updats the connection pointer with the refernce
-    to the connection structure */
-    *connection_pointer = connection;
-
-    /* raises no error */
-    RAISE_NO_ERROR;
-}
-
-ERROR_CODE _create_tracker_connection(struct connection_t **connection_pointer, struct service_t *service, char *hostname, unsigned int port) {
-    /* allocates space for the connection reference */
-    struct connection_t *connection;
-
-    /* alocates dynamic space for the parameters to the
-    http stream (http client) this structure will be able
-    to guide the stream of http client */
-    struct http_client_parameters_t *parameters = (struct http_client_parameters_t *) MALLOC(sizeof(struct http_client_parameters_t));
-
-    /* populates the parameters structure with the
-    required values for the http client request */
-    parameters->url = "/ptorrent/announce.php";
-
-    /* creates a general client conneciton structure containing
-    all the general attributes for a connection, then sets the
-    "local" connection reference from the pointer */
-    _create_client_connection(connection_pointer, service, hostname, port);
-    connection = *connection_pointer;
-
-    /* sets the http client protocol as the protocol to be
-    "respected" for this client connection, this should
-    be able to set the apropriate handlers in io then sets
-    the parameters structure in the connection so that the
-    lower layers "know" what to do */
-    connection->protocol = HTTP_CLIENT_PROTOCOL;
-    connection->parameters = (void *) parameters;
-
-    /* opens the connection */
-    connection->open_connection(connection);
-
-    /* raises no error */
-    RAISE_NO_ERROR;
-}
-
-ERROR_CODE _create_torrent_connection(struct connection_t **connection_pointer, struct service_t *service, char *hostname, unsigned int port) {
-    /* allocates space for the connection reference */
-    struct connection_t *connection;
-
-    /* creates a general client conneciton structure containing
-    all the general attributes for a connection, then sets the
-    "local" connection reference from the pointer */
-    _create_client_connection(connection_pointer, service, hostname, port);
-    connection = *connection_pointer;
-
-    /* sets the torrent protocol as the protocol to be
-    "respected" for this client connection, this should
-    be able to set the apropriate handlers in io */
-    connection->protocol = TORRENT_PROTOCOL;
-
-    /* opens the connection */
-    connection->open_connection(connection);
-
-    /* raises no error */
-    RAISE_NO_ERROR;
-}
-
-
-
-
-
 ERROR_CODE start_service(struct service_t *service) {
 #ifdef VIRIATUM_IP6
     /* allocates the socket address structure for the ip6
@@ -1164,8 +1020,8 @@ ERROR_CODE start_service(struct service_t *service) {
 
 
 
-/*  _create_tracker_connection(&tracker_connection, service, "localhost", 9090);
-    _create_torrent_connection(&torrent_connection, service, "localhost", 32967);*/
+    _create_tracker_connection(&tracker_connection, service, "localhost", 9090);
+    _create_torrent_connection(&torrent_connection, service, "localhost", 32967);
 
 
 
@@ -1443,10 +1299,9 @@ ERROR_CODE add_connection_service(struct service_t *service, struct connection_t
     /* retrieves the polling (provider) */
     struct polling_t *polling = service->polling;
 
-    /* adds the connection to the connections list */
+    /* adds the connection to the connections list and then
+    registes the connection in the polling (provider) */
     append_value_linked_list(service->connections_list, connection);
-
-    /* registes the connection in the polling (provider) */
     polling->register_connection(polling, connection);
 
     /* raises no error */
@@ -1457,10 +1312,9 @@ ERROR_CODE remove_connection_service(struct service_t *service, struct connectio
     /* retrieves the polling (provider) */
     struct polling_t *polling = service->polling;
 
-    /* unregisters the connection from the polling (provider) */
+    /* unregisters the connection from the polling (provider)
+    and then removes the connection from the connections list */
     polling->unregister_connection(polling, connection);
-
-    /* removes the connection from the connections list */
     remove_value_linked_list(service->connections_list, connection, 1);
 
     /* raises no error */

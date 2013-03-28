@@ -62,7 +62,9 @@ stream/stream_httpc.c \
 stream/stream_io.c \
 stream/stream_torrent.c \
 system/environment.c \
+system/client.c \
 system/service.c \
+system/torrent.c \
 test/simple_test.c
 
 libviriatum_http_la_SOURCES = stdafx.c \
@@ -85,5 +87,7 @@ stream/stream_httpc.c \
 stream/stream_io.c \
 stream/stream_torrent.c \
 system/environment.c \
+system/client.c \
 system/service.c \
+system/torrent.c \
 test/simple_test.c

@@ -955,6 +955,32 @@ ERROR_CODE calculate_options_service(struct service_t *service);
 ERROR_CODE calculate_locations_service(struct service_t *service);
 
 /**
+ * Creates a series of worker processes that are going to
+ * be used to handle new connections.
+ *
+ * These processes inherit all the memory footprint from
+ * the master process, because they were crated with fork.
+ *
+ * @param service The service to be use as reference for
+ * the forking (creation) of the various worker processes.
+ * @return The resulting error code.
+ */
+ERROR_CODE create_workers(struct service_t *service);
+
+/**
+ * Joins the various worker processes associated with the
+ * service (waiting for their exit).
+ *
+ * This is a blocking call and as such should be used with
+ * care to avoid any stalling.
+ *
+ * @param service The service to be use as reference for
+ * the joining of the various worker processes.
+ * @return The resulting error code.
+ */
+ERROR_CODE join_workers(struct service_t *service);
+
+/**
  * Starts the given service, initializing the
  * internal structures and the main loop.
  *

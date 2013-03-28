@@ -527,11 +527,19 @@
                 Name="System"
                 >
                 <File
+                    RelativePath="..\..\src\hive_viriatum\system\client.c"
+                    >
+                </File>
+                <File
                     RelativePath="..\..\src\hive_viriatum\system\environment.c"
                     >
                 </File>
                 <File
                     RelativePath="..\..\src\hive_viriatum\system\service.c"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\hive_viriatum\system\torrent.c"
                     >
                 </File>
             </Filter>
@@ -681,6 +689,10 @@
                 Name="System"
                 >
                 <File
+                    RelativePath="..\..\src\hive_viriatum\system\client.h"
+                    >
+                </File>
+                <File
                     RelativePath="..\..\src\hive_viriatum\system\environment.h"
                     >
                 </File>
@@ -690,6 +702,10 @@
                 </File>
                 <File
                     RelativePath="..\..\src\hive_viriatum\system\system.h"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\hive_viriatum\system\torrent.h"
                     >
                 </File>
             </Filter>
