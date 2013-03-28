@@ -415,7 +415,7 @@ ERROR_CODE auth_file_http(char *auth_file, char *authorization, unsigned char *r
     char *authorization_d;
     char *password_pointer;
 
-    /* allocates space fot the buffers to be used for the username
+    /* allocates space for the buffers to be used for the username
     and password values extracted from the authorization token */
     char username[128];
     char password[128];
@@ -443,9 +443,9 @@ ERROR_CODE auth_file_http(char *auth_file, char *authorization, unsigned char *r
     text value in case the decoding fails, re-raises the error to
     the upper levels for caller information */
     return_value = decode_base64(
-        authorization_b64,
+        (unsigned char *) authorization_b64,
         strlen(authorization_b64),
-        &authorization_d,
+        (unsigned char **) &authorization_d,
         &authorization_size
     );
     if(IS_ERROR_CODE(return_value)) {
@@ -488,7 +488,9 @@ ERROR_CODE auth_file_http(char *auth_file, char *authorization, unsigned char *r
     /* retrieves the password verification value for the
     retrieved username and in case it's valid compares it
     and sets the result value accordingly */
-    get_value_string_hash_map(passwd, username, &password_v);
+    get_value_string_hash_map(
+	    passwd, (unsigned char *) username, (void **) &password_v
+	);
     if(password_v != NULL && strcmp(password, password_v) == 0) {
         *result = TRUE;
     } else { *result = FALSE; }
