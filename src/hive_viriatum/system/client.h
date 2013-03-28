@@ -31,10 +31,7 @@
 #include "../stream/stream.h"
 
 /* forward references (avoids loop) */
-struct data_t;
-struct polling_t;
-struct location_t;
 struct connection_t;
-
+struct service_t;
 
 ERROR_CODE _create_client_connection(struct connection_t **connection_pointer, struct service_t *service, char *hostname, unsigned int port);
