@@ -112,7 +112,7 @@ void delete_values_hash_map(struct hash_map_t *hash_map) {
     by the various values in the hash map */
     while(1) {
         /* retrieves the element structure from the iterator
-        so that it's possible to release the value memory */
+        so that it's possible to release the value from memory */
         get_next_iterator(iterator, (void **) &element);
 
         /* in case the current module is null (end of iterator)
