@@ -219,8 +219,6 @@ ERROR_CODE generate_parameters(struct hash_map_t *hash_map, unsigned char **buff
     RAISE_NO_ERROR;
 }
 
-
-
 ERROR_CODE open_handler_stream_http_client(struct io_connection_t *io_connection) {
     /* allocates space for the temporary error variable to
     be used to detect errors in calls */
@@ -248,8 +246,15 @@ ERROR_CODE open_handler_stream_http_client(struct io_connection_t *io_connection
     random_buffer(random, 12);
     memcpy(peer_id + 8, random, 12);
 
+	/* tries to decode the bencoded torrent file an in case
+	thre's an error propagates it to the calling function */
     error = decode_bencoding_file("C:/verysleepy_0_82.exe.torrent", &type);
-    if(error) { RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem reading torrent file"); }
+    if(error) { 
+		RAISE_ERROR_M(
+		    RUNTIME_EXCEPTION_ERROR_CODE,
+		    (unsigned char *) "Problem reading torrent file"
+		);
+	}
 
     get_value_string_sort_map(type->value.value_sort_map, (unsigned char *) "info", (void **) &_type);
     encode_bencoding(_type, &_buffer, &_buffer_size);
@@ -319,10 +324,10 @@ ERROR_CODE open_handler_stream_http_client(struct io_connection_t *io_connection
 }
 
 ERROR_CODE close_handler_stream_http_client(struct io_connection_t *io_connection) {
-    /* retrieves the http client connection */
-    struct http_client_connection_t *http_client_connection = (struct http_client_connection_t *) io_connection->lower;
-
-    /* deletes the http client connection */
+    /* retrieves the http client connection and deletes it
+	releasig all of its memory (avoiding memory leaks) */
+    struct http_client_connection_t *http_client_connection =\
+		(struct http_client_connection_t *) io_connection->lower;
     delete_http_client_connection(http_client_connection);
 
     /* raises no error */
