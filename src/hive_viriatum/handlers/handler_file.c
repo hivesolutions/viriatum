@@ -375,8 +375,8 @@ ERROR_CODE header_value_callback_handler_file(struct http_parser_t *http_parser,
             handler_file_context->authorization_status = 2;
             break;
 
-		default:
-			break;
+        default:
+            break;
     }
 
     /* sets the next heder value to the "default" undefined
@@ -474,17 +474,17 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
     context must proceed with the authentication process for
     the current authorization value */
     if(handler_file_context->auth_basic != NULL) {
-		/* in case the authorization status is defined as set
-		must proceed with the authorization, otherwise invalidates
-		the authorization result immediately (no information has
-		been provided from the client side) */
-		if(handler_file_context->authorization_status == 2) {
-			auth_http(
+        /* in case the authorization status is defined as set
+        must proceed with the authorization, otherwise invalidates
+        the authorization result immediately (no information has
+        been provided from the client side) */
+        if(handler_file_context->authorization_status == 2) {
+            auth_http(
                 (char *) handler_file_context->auth_file,
                 (char *) handler_file_context->authorization,
                 &auth_result
-			);
-		} else { auth_result = FALSE; }
+            );
+        } else { auth_result = FALSE; }
     }
 
     /* in case the file path being request referes a directory
