@@ -35,17 +35,17 @@ ERROR_CODE encode_base64(unsigned char *buffer, size_t buffer_length, unsigned c
     /* allocates the encoded buffer, and assigns the encoded buffer length */
     _allocate_encoded_buffer(
         buffer_length,
-		encoded_buffer_pointer,
-		encoded_buffer_length_pointer
-	);
+        encoded_buffer_pointer,
+        encoded_buffer_length_pointer
+    );
 
     /* encodes the buffer into base 64 */
     _encode_base64(
-	    buffer,
-		buffer_length,
-		*encoded_buffer_pointer,
-		*encoded_buffer_length_pointer
-	);
+        buffer,
+        buffer_length,
+        *encoded_buffer_pointer,
+        *encoded_buffer_length_pointer
+    );
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -56,22 +56,22 @@ ERROR_CODE decode_base64(unsigned char *encoded_buffer, size_t encoded_buffer_le
     unsigned int padding_count = _get_padding_count(encoded_buffer, encoded_buffer_length);
 
     /* allocates the decoded buffer according to the pre-defined
-	rules and then assigns the decoded buffer length */
+    rules and then assigns the decoded buffer length */
     _allocate_decoded_buffer(
-	    encoded_buffer_length,
-		decoded_buffer_pointer,
-		decoded_buffer_length_pointer,
-		padding_count
-	);
+        encoded_buffer_length,
+        decoded_buffer_pointer,
+        decoded_buffer_length_pointer,
+        padding_count
+    );
 
     /* decodes the buffer from base 64 */
     _decode_base64(
-	    encoded_buffer,
-		encoded_buffer_length,
-		*decoded_buffer_pointer,
-		*decoded_buffer_length_pointer,
-		padding_count
-	);
+        encoded_buffer,
+        encoded_buffer_length,
+        *decoded_buffer_pointer,
+        *decoded_buffer_length_pointer,
+        padding_count
+    );
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -85,7 +85,7 @@ size_t calculate_encoded_buffer_length_base64(size_t buffer_length) {
     size_t padding_count;
 
     /* calculates the padding count and uses it to
-	calculate the "final" encoded buffer length */
+    calculate the "final" encoded buffer length */
     padding_count = (buffer_length % 3) ? 3 - (buffer_length % 3) : 0;
     encoded_buffer_length = ((buffer_length + padding_count) * 4 / 3);
 
@@ -124,7 +124,7 @@ ERROR_CODE _encode_base64(unsigned char *buffer, size_t buffer_length, unsigned 
     encoded_buffer_index = 0;
 
     /* increment over the length of the buffer, reading
-	three characters at a time */
+    three characters at a time */
     for(index = 0; index < buffer_length; index += 3) {
         /* starts creating the number with the first byte */
         number = buffer[index] << 16;
@@ -191,15 +191,15 @@ ERROR_CODE _decode_base64(unsigned char *encoded_buffer, size_t encoded_buffer_l
     unsigned char number0, number1, number2;
 
     /* calculates the valid buffer length, defaulting to
-	zero in case the value "becomes" negative */
-	size_t valid_buffer_length = buffer_length > padding_count ?\
-		buffer_length - padding_count : 0;
+    zero in case the value "becomes" negative */
+    size_t valid_buffer_length = buffer_length > padding_count ?\
+        buffer_length - padding_count : 0;
 
     /* starts the buffer index */
     buffer_index = 0;
 
     /* increments over the length of the encoded buffer,
-	should read four characters at a time */
+    should read four characters at a time */
     for(index = 0; index < encoded_buffer_length; index += 4) {
         /* retrieves the number resulting from the concatenation of the 24 bits */
         number = (_lookup_fast_base64(encoded_buffer[index]) << 18) + (_lookup_fast_base64(encoded_buffer[index + 1]) << 12) +
@@ -214,13 +214,13 @@ ERROR_CODE _decode_base64(unsigned char *encoded_buffer, size_t encoded_buffer_l
         buffer[buffer_index++] = number0;
 
         /* in case the buffer index is still valid, must write
-		the second byte in the buffer */
+        the second byte in the buffer */
         if(buffer_index <= valid_buffer_length) {
             buffer[buffer_index++] = number1;
         }
 
         /* in case the buffer index is still valid, must write
-		the third byte in the buffer */
+        the third byte in the buffer */
         if(buffer_index <= valid_buffer_length) {
             buffer[buffer_index++] = number2;
         }
@@ -244,9 +244,9 @@ ERROR_CODE _allocate_encoded_buffer(size_t buffer_length, unsigned char **encode
 ERROR_CODE _allocate_decoded_buffer(size_t encoded_buffer_length, unsigned char **decoded_buffer_pointer, size_t *decoded_buffer_length_pointer, size_t padding_count) {
     /* allocates the decoded buffer length */
     *decoded_buffer_length_pointer = calculate_decoded_buffer_length_base64(
-	     encoded_buffer_length,
-		 padding_count
-	);
+         encoded_buffer_length,
+         padding_count
+    );
 
     /* allocates the decoded buffer */
     *decoded_buffer_pointer = (unsigned char *) MALLOC(*decoded_buffer_length_pointer);

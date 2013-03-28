@@ -17,7 +17,7 @@
  You should have received a copy of the GNU General Public License
  along with Hive Viriatum Commons. If not, see <http://www.gnu.org/licenses/>.
 
- __author__    = Jo„o Magalh„es <joamag@hive.pt>
+ __author__    = Jo√£o Magalh√£es <joamag@hive.pt>
  __version__   = 1.0.0
  __revision__  = $LastChangedRevision$
  __date__      = $LastChangedDate$
@@ -30,90 +30,114 @@
 #include "passwd.h"
 
 ERROR_CODE process_passwd_file(char *file_path, struct hash_map_t **passwd_pointer) {
-	size_t size;
-	size_t index;
-	size_t length;
-	ERROR_CODE return_value;
-	unsigned char current;
+    /* allocates space for th variable used to store the
+    error code result from the various calls */
+    ERROR_CODE return_value;
 
-	unsigned char state;
+    /* allocates the space for the various size related
+    variables for dimensions of arrays */
+    size_t size;
+    size_t index;
+    size_t length;
 
-	unsigned char *mark;
-	unsigned char *buffer;
-	unsigned char *pointer;
+    /* allocates space for the current (byte) value in
+    iteration (for parsing loop) and for the current state */
+    unsigned char current;
+    enum passwd_state_e state;
 
-	char name[128];
-	char *value;
+    /* allocates space for the various pointers to be used
+    durring the parsing of the passwd file */
+    unsigned char *mark;
+    unsigned char *buffer;
+    unsigned char *pointer;
 
+    /* allocates the space for the username and for the password
+    to be parsed, note that the username is allocated in stack
+    (static memory) as it's not going to be stored in map */
+    char username[128];
+    char *password;
+
+    /* creates the "final" hash map that is going to be used to
+    associated a username with a password and then allocates the
+    internal structures for it (no pre-defined size) */
     struct hash_map_t *passwd;
-    
-	create_hash_map(&passwd, 0);
+    create_hash_map(&passwd, 0);
 
-	return_value = read_file(file_path, &buffer, &size);
+    /* reads the complete set of contents from the file with the
+    provided path an in case an error occurs re-raises it */
+    return_value = read_file(file_path, &buffer, &size);
     if(IS_ERROR_CODE(return_value)) {
-		RAISE_ERROR_M(
-		    RUNTIME_EXCEPTION_ERROR_CODE,
-			(unsigned char *) "Problem reading file"
-		);
-	}
+        RAISE_ERROR_M(
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Problem reading file"
+        );
+    }
 
-	mark = buffer;
-	state = PASSWD_USER;
+    /* sets the initial values for the mark pointer and for the
+    state control flag, these represent the start of the loop */
+    mark = buffer;
+    state = PASSWD_USER;
 
-	for(index = 0; index < size; index++) {
-		current = buffer[index];
-		pointer = &buffer[index];
+    /* iterates over the buffer contents in its range to parse
+    it and populate the passwd hash map structure */
+    for(index = 0; index < size; index++) {
+        /* retrieves the current byte in iteration and the pointer
+        address to the current buffer position */
+        current = buffer[index];
+        pointer = &buffer[index];
 
-		switch(state) {
-			case PASSWD_USER:
-				switch(current) {
-					case ':':
-					case '\n':
-						length = pointer - mark;
-						memcpy(name, mark, length);
-						name[length] = '\0';
-						mark = pointer + 1;
-						state = current == ':' ? PASSWD_PASSWORD : PASSWD_USER;
-						break;
-				}
+        /* switches over the current state to operate over the current
+        buffer using the proper operation */
+        switch(state) {
+            case PASSWD_USER:
+                switch(current) {
+                    case ':':
+                    case '\n':
+                        length = pointer - mark;
+                        memcpy(username, mark, length);
+                        username[length] = '\0';
+                        mark = pointer + 1;
+                        state = current == ':' ? PASSWD_PASSWORD : PASSWD_USER;
+                        break;
+                }
 
-				break;
+                break;
 
-			case PASSWD_PASSWORD:
-				switch(current) {
-					case ':':
-					case '\n':
-						length = pointer - mark;
-						value = (char *) MALLOC(length + 1);
-						memcpy(value, mark, length);
-						value[length] = '\0';
-						mark = pointer + 1;
-						set_value_string_hash_map(passwd, name, value);
-						state = current == ':' ? PASSWD_COMMENT : PASSWD_USER;
-						break;
-				}
+            case PASSWD_PASSWORD:
+                switch(current) {
+                    case ':':
+                    case '\n':
+                        length = pointer - mark;
+                        password = (char *) MALLOC(length + 1);
+                        memcpy(password, mark, length);
+                        password[length] = '\0';
+                        mark = pointer + 1;
+                        set_value_string_hash_map(passwd, username, password);
+                        state = current == ':' ? PASSWD_COMMENT : PASSWD_USER;
+                        break;
+                }
 
-				break;
+                break;
 
-			case PASSWD_COMMENT:
-				switch(current) {
-					case '\n':
-						state = PASSWD_USER;
-						mark = pointer + 1;
-						break;
-				}
+            case PASSWD_COMMENT:
+                switch(current) {
+                    case '\n':
+                        state = PASSWD_USER;
+                        mark = pointer + 1;
+                        break;
+                }
 
-				break;
-		}
-	}
+                break;
+        }
+    }
 
-	/* releases the buffer with the file contents used during
-	the parsing of the passwd file (avoids memory leaks) */
-	FREE(buffer);
+    /* releases the buffer with the file contents used during
+    the parsing of the passwd file (avoids memory leaks) */
+    FREE(buffer);
 
-	/* updates the passwd structure pointer with the currently
-	used hash map structure containing the various username to
-	password association, that may be used for verification */
-	*passwd_pointer = passwd;
-	RAISE_NO_ERROR;
+    /* updates the passwd structure pointer with the currently
+    used hash map structure containing the various username to
+    password association, that may be used for verification */
+    *passwd_pointer = passwd;
+    RAISE_NO_ERROR;
 }

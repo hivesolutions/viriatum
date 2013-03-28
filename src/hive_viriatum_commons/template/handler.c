@@ -168,7 +168,7 @@ void delete_template_node(struct template_node_t *template_node) {
             pop_value_linked_list(template_node->parameters, (void **) &parameter, 1);
 
             /* in case the value is invalid (empty list)
-			must break the current loop end of iteration */
+            must break the current loop end of iteration */
             if(parameter == NULL) { break; }
 
             /* deletes the template parameter */

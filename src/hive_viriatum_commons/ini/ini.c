@@ -95,11 +95,11 @@ ERROR_CODE process_ini_file(char *file_path, struct sort_map_t **configuration_p
     error prints it to the error stream output */
     return_value = read_file(file_path, &file_buffer, &file_size);
     if(IS_ERROR_CODE(return_value)) {
-		RAISE_ERROR_M(
-		    RUNTIME_EXCEPTION_ERROR_CODE,
-			(unsigned char *) "Problem reading file"
-		);
-	}
+        RAISE_ERROR_M(
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Problem reading file"
+        );
+    }
 
     /* sets the initial state for the parsing process this
     is considered to be the "general loop" state */
