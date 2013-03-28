@@ -89,8 +89,14 @@ ERROR_CODE delete_arguments(struct hash_map_t *arguments) {
         must break the current loop */
         if(element == NULL) { break; }
 
-        /* retrievs the hash map value for the key */
-        get_value_hash_map(arguments, element->key, element->key_string, (void **) &argument);
+        /* retrieves the hash map value for the key, in order to
+		be used in the releasing of the memory */
+        get_value_hash_map(
+			arguments,
+			element->key,
+			element->key_string,
+			(void **) &argument
+		);
 
         /* releases the argument memory */
         FREE(argument);
@@ -133,7 +139,12 @@ ERROR_CODE print_arguments(struct hash_map_t *arguments) {
         }
 
         /* retrievs the hash map value for the key */
-        get_value_hash_map(arguments, element->key, element->key_string, (void **) &argument);
+        get_value_hash_map(
+		    arguments,
+			element->key,
+			element->key_string,
+			(void **) &argument
+		);
 
         /* in case the argument is of type value */
         if(argument->type == VALUE_ARGUMENT) {
