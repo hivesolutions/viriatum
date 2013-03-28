@@ -489,7 +489,9 @@ ERROR_CODE auth_file_http(char *auth_file, char *authorization, unsigned char *r
     retrieved username and in case it's valid compares it
     and sets the result value accordingly */
     get_value_string_hash_map(
-	    passwd, (unsigned char *) username, (void **) &password_v
+	    passwd,
+		(unsigned char *) username,
+		(void **) &password_v
 	);
     if(password_v != NULL && strcmp(password, password_v) == 0) {
         *result = TRUE;
