@@ -95,6 +95,24 @@
 #define FOPEN(file_pointer, file_name, mode) *file_pointer = fopen(file_name, mode)
 #endif
 
+#ifdef VIRIATUM_PLATFORM_LINUX
+#ifdef VIRIATUM_PLATFORM_ANDROID
+#define SET_PROC_NAME(name)
+#else
+#ifdef PR_SET_NAME
+#define SET_PROC_NAME(name) prctl(PR_SET_NAME, name)
+#endif
+#endif
+#endif
+
+#ifdef VIRIATUM_PLATFORM_BSD
+#define SET_PROC_NAME(name) setproctitle(name)
+#endif
+
+#ifndef SET_PROC_NAME
+#define SET_PROC_NAME(name)
+#endif
+
 #define CLOCK() clock()
 
 #ifdef VIRIATUM_PLATFORM_MSC
