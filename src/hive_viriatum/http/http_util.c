@@ -463,7 +463,7 @@ ERROR_CODE process_passwd_file(char *file_path, struct hash_map_t **passwd_point
 					case ':':
 					case '\n':
 						length = pointer - mark;
-						value = (char *) MALLOC(length);
+						value = (char *) MALLOC(length + 1);
 						memcpy(value, mark, length);
 						value[length] = '\0';
 						mark = pointer + 1;
@@ -491,7 +491,6 @@ ERROR_CODE process_passwd_file(char *file_path, struct hash_map_t **passwd_point
 	*passwd_pointer = passwd;
 	RAISE_NO_ERROR;
 }
-
 
 ERROR_CODE auth_file_http(char *auth_file, char *authorization, unsigned char *result) {
 	ERROR_CODE return_value;
@@ -558,6 +557,12 @@ ERROR_CODE auth_file_http(char *auth_file, char *authorization, unsigned char *r
 		*result = FALSE;
 	}
 
+	/* releases the memory associated with the complete set
+	of values in the passwd structure and then releases the
+	memory from the hash map structure itself, then releases
+	the memory associated with the authorization decoded string */
+	delete_values_hash_map(passwd);
+	delete_hash_map(passwd);
 	FREE(authorization_d);
 
     RAISE_NO_ERROR;
