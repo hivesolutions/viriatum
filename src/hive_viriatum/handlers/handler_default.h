@@ -33,6 +33,7 @@
 /* forward references (avoids loop) */
 struct data_t;
 struct connection_t;
+struct http_handler_t;
 struct http_connection_t;
 
 ERROR_CODE register_handler_default(struct service_t *service);
