@@ -60,12 +60,12 @@ void create_service(struct service_t **service_pointer, unsigned char *name, uns
 #endif
 
     /* creates the service options that are going to be
-	used to store the various options loaded from the
-	various sources (eg: command line, config file, etc.)*/
+    used to store the various options loaded from the
+    various sources (eg: command line, config file, etc.)*/
     create_service_options(&service->options);
 
     /* creates the various structures that are going to
-	be used for the internal working of the service */
+    be used for the internal working of the service */
     create_polling(&service->polling);
     create_linked_list(&service->connections_list);
     create_linked_list(&service->modules_list);
@@ -77,19 +77,19 @@ void create_service(struct service_t **service_pointer, unsigned char *name, uns
 
 void delete_service(struct service_t *service) {
     /* in case the service socket handle is defined and set
-	must close the it using the safe approach (gracefully) */
+    must close the it using the safe approach (gracefully) */
     if(service->service_socket_handle) {
         SOCKET_CLOSE(service->service_socket_handle);
     }
 
     /* in case the service configuration is defined and set
-	must close the it using the safe approach (gracefully) */
+    must close the it using the safe approach (gracefully) */
     if(service->configuration) {
         delete_configuration(service->configuration, 1);
     }
 
-	/* deletes the various internal structures associated
-	with the service avoiding any memory leak */
+    /* deletes the various internal structures associated
+    with the service avoiding any memory leak */
     delete_hash_map(service->http_handlers_map);
     delete_linked_list(service->modules_list);
     delete_linked_list(service->connections_list);
@@ -127,7 +127,7 @@ void create_service_options(struct service_options_t **service_options_pointer) 
     memset(service_options->index, 0, sizeof(service_options->index));
 
     /* creates the hash map for both the mime types
-	and the virtual hosts information */
+    and the virtual hosts information */
     create_hash_map(&service_options->mime_types, 64);
     create_hash_map(&service_options->virtual_hosts, 0);
 
@@ -137,7 +137,7 @@ void create_service_options(struct service_options_t **service_options_pointer) 
 
 void delete_service_options(struct service_options_t *service_options) {
     /* deletes the internal structures used for the
-	service (configuration) options */
+    service (configuration) options */
     delete_hash_map(service_options->mime_types);
     delete_hash_map(service_options->virtual_hosts);
 
@@ -630,7 +630,7 @@ ERROR_CODE start_service(struct service_t *service) {
     struct connection_t *service_connection;
 
     /* allocates the socket result that will be used
-	to test the socket related call for error */
+    to test the socket related call for error */
     SOCKET_ERROR_CODE socket_result;
 
 
@@ -1214,9 +1214,9 @@ ERROR_CODE start_service(struct service_t *service) {
     }
 #endif
 
-	/* in case the current os supports the forking of the processes
-	must join them back together waiting for their finish before exiting
-	the main (coordinator) process */
+    /* in case the current os supports the forking of the processes
+    must join them back together waiting for their finish before exiting
+    the main (coordinator) process */
     join_workers(service);
 
     /* raises no error */
@@ -1247,11 +1247,11 @@ ERROR_CODE close_connections_service(struct service_t *service) {
         pop_value_linked_list(connections_list, (void **) &current_connection, 1);
 
         /* in case the current connection is null the end
-		of iteration has been reached and breaks the loop */
+        of iteration has been reached and breaks the loop */
         if(current_connection == NULL) { break; }
 
         /* closes the current connection (gracefully) and
-		then deletes the current connection */
+        then deletes the current connection */
         current_connection->close_connection(current_connection);
         delete_connection(current_connection);
 

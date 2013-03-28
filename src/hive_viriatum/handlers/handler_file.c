@@ -89,17 +89,16 @@ ERROR_CODE create_handler_file_context(struct handler_file_context_t **handler_f
 }
 
 ERROR_CODE delete_handler_file_context(struct handler_file_context_t *handler_file_context) {
-    /* in case there is a file defined in
-    the handler file context */
+    /* in case there is a file defined in the handler
+    file context closes it (avoiding a memory leak) */
     if(handler_file_context->file != NULL) {
-        /* closes the file */
         fclose(handler_file_context->file);
     }
 
     /* in case there is a template handler defined
-    in the handler file context */
+    in the handler file context, deletes it relasing
+    all of its currently allocated resources */
     if(handler_file_context->template_handler) {
-        /* deletes the template handler (releases memory) */
         delete_template_handler(handler_file_context->template_handler);
     }
 
