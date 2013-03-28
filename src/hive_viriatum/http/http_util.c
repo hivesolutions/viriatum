@@ -400,14 +400,15 @@ ERROR_CODE auth_default_http(char *auth_file, char *authorization, unsigned char
 }
 
 
+typedef enum passwd_state_e {
+	PASSWD_USER = 1,
+	PASSWD_PASSWORD,
+	PASSWD_COMMENT
+} passwd_state;
 
 
 
-#define USER 1
-#define PASSWORD 2
-#define COMMENT 3
-
-ERROR_CODE auth_file_http(char *auth_file, char *authorization, unsigned char *result) {
+ERROR_CODE process_passwd_file(char *file_path, struct hash_map_t **passwd_pointer) {
 	size_t size;
 	size_t index;
 	size_t length;
@@ -423,11 +424,11 @@ ERROR_CODE auth_file_http(char *auth_file, char *authorization, unsigned char *r
 	char name[128];
 	char *value;
 
-    struct hash_map_t *passwd_map;
+    struct hash_map_t *passwd;
     
-	create_hash_map(&passwd_map, 0);
+	create_hash_map(&passwd, 0);
 
-	return_value = read_file(auth_file, &buffer, &size);
+	return_value = read_file(file_path, &buffer, &size);
     if(IS_ERROR_CODE(return_value)) {
 		RAISE_ERROR_M(
 		    RUNTIME_EXCEPTION_ERROR_CODE,
@@ -436,14 +437,14 @@ ERROR_CODE auth_file_http(char *auth_file, char *authorization, unsigned char *r
 	}
 
 	mark = buffer;
-	state = USER;
+	state = PASSWD_USER;
 
 	for(index = 0; index < size; index++) {
 		current = buffer[index];
 		pointer = &buffer[index];
 
 		switch(state) {
-			case USER:
+			case PASSWD_USER:
 				switch(current) {
 					case ':':
 					case '\n':
@@ -451,13 +452,13 @@ ERROR_CODE auth_file_http(char *auth_file, char *authorization, unsigned char *r
 						memcpy(name, mark, length);
 						name[length] = '\0';
 						mark = pointer + 1;
-						state = current == ':' ? PASSWORD : USER;
+						state = current == ':' ? PASSWD_PASSWORD : PASSWD_USER;
 						break;
 				}
 
 				break;
 
-			case PASSWORD:
+			case PASSWD_PASSWORD:
 				switch(current) {
 					case ':':
 					case '\n':
@@ -466,17 +467,17 @@ ERROR_CODE auth_file_http(char *auth_file, char *authorization, unsigned char *r
 						memcpy(value, mark, length);
 						value[length] = '\0';
 						mark = pointer + 1;
-						set_value_string_hash_map(passwd_map, name, value);
-						state = current == ':' ? COMMENT : USER;
+						set_value_string_hash_map(passwd, name, value);
+						state = current == ':' ? PASSWD_COMMENT : PASSWD_USER;
 						break;
 				}
 
 				break;
 
-			case COMMENT:
+			case PASSWD_COMMENT:
 				switch(current) {
 					case '\n':
-						state = USER;
+						state = PASSWD_USER;
 						mark = pointer + 1;
 						break;
 				}
@@ -487,11 +488,77 @@ ERROR_CODE auth_file_http(char *auth_file, char *authorization, unsigned char *r
 
 	FREE(buffer);
 
-	// todo: ainda preciso de sacar a string de base64 e
-    // depois ainda tenho de fazer split de ambas as partes
-	// pointer = strchr(authorization, ' ');
-	// ter cuidado com possiveis null pointers
+	*passwd_pointer = passwd;
+	RAISE_NO_ERROR;
+}
 
+
+ERROR_CODE auth_file_http(char *auth_file, char *authorization, unsigned char *result) {
+	ERROR_CODE return_value;
+	struct hash_map_t *passwd;
+
+	char *pointer;
+	char *authorization_b64;
+	char *authorization_d;
+	char *password_pointer;
+	char username[128];
+	char password[128];
+	char *password_v;
+	size_t authorization_size;
+	size_t username_size;
+	size_t password_size;
+
+	process_passwd_file(auth_file, &passwd);
+
+	pointer = strchr(authorization, ' ');
+	if(pointer == NULL) {
+        RAISE_ERROR_M(
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Authorization value not valid"
+        );
+    }
+	authorization_b64 = pointer + 1;
+
+	return_value = decode_base64(
+	    authorization_b64,
+		strlen(authorization_b64),
+		&authorization_d,
+		&authorization_size
+	);
+	if(IS_ERROR_CODE(return_value)) {
+		RAISE_ERROR_M(
+		    RUNTIME_EXCEPTION_ERROR_CODE,
+			(unsigned char *) "Problem decoding base 64 authorization"
+		);
+	}
+
+	pointer = memchr(authorization_d, ':', authorization_size);
+	if(pointer == NULL) {
+		FREE(authorization_d);
+		RAISE_ERROR_M(
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "No password separator found in authorization"
+        );
+	}
+	password_pointer = pointer + 1;
+
+	username_size = password_pointer - authorization_d - 1;
+	password_size = authorization_d + authorization_size - password_pointer;
+
+	memcpy(username, authorization_d, username_size);
+	username[username_size] = '\0';
+
+	memcpy(password, password_pointer, password_size);
+	password[password_size] = '\0';
+
+	get_value_string_hash_map(passwd, username, &password_v);
+	if(password_v != NULL && strcmp(password, password_v) == 0) {
+		*result = TRUE;
+	} else {
+		*result = FALSE;
+	}
+
+	FREE(authorization_d);
 
     RAISE_NO_ERROR;
 }
