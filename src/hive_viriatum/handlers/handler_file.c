@@ -80,6 +80,7 @@ ERROR_CODE create_handler_file_context(struct handler_file_context_t **handler_f
     handler_file_context->template_handler = NULL;
     handler_file_context->cache_control_status = 0;
     handler_file_context->etag_status = 0;
+    handler_file_context->authorization_status = 0;
 
     /* sets the handler file context in the  pointer */
     *handler_file_context_pointer = handler_file_context;
