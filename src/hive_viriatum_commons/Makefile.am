@@ -48,6 +48,7 @@ debug/logging.c \
 encoding/base_64.c \
 encoding/bencoding.c \
 encoding/percent.c \
+formats/passwd.c \
 ini/ini.c \
 io/file.c \
 jni/info.c \
@@ -84,6 +85,7 @@ debug/logging.c \
 encoding/base_64.c \
 encoding/bencoding.c \
 encoding/percent.c \
+formats/passwd.c \
 ini/ini.c \
 io/file.c \
 jni/info.c \
