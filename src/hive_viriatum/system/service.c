@@ -738,9 +738,9 @@ ERROR_CODE start_service(struct service_t *service) {
         SOCKET_ERROR_CODE creating_error_code = SOCKET_GET_ERROR_CODE(socket_result);
         V_ERROR_F("Problem creating socket: %d\n", creating_error_code);
         RAISE_ERROR_M(
-			RUNTIME_EXCEPTION_ERROR_CODE,
-			(unsigned char *) "Problem creating socket"
-		);
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Problem creating socket"
+        );
     }
 
     /* in case viriatum is set to non blocking, changes the current
@@ -768,9 +768,9 @@ ERROR_CODE start_service(struct service_t *service) {
         V_ERROR_F("Problem setting socket option: %d\n", option_error_code);
         SOCKET_CLOSE(service->service_socket_handle);
         RAISE_ERROR_M(
-		    RUNTIME_EXCEPTION_ERROR_CODE,
-			(unsigned char *) "Problem setting socket option"
-		);
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Problem setting socket option"
+        );
     }
 
 #ifdef VIRIATUM_IP6
@@ -800,9 +800,9 @@ ERROR_CODE start_service(struct service_t *service) {
             SOCKET_ERROR_CODE error_code = SOCKET_GET_ERROR_CODE(socket_result);
             V_ERROR_F("Problem getting ip6 address information: %d\n", error_code);
             RAISE_ERROR_M(
-				RUNTIME_EXCEPTION_ERROR_CODE,
-				(unsigned char *) "Problem getting ip6 address information"
-			);
+                RUNTIME_EXCEPTION_ERROR_CODE,
+                (unsigned char *) "Problem getting ip6 address information"
+            );
         }
 #endif
 
@@ -830,9 +830,9 @@ ERROR_CODE start_service(struct service_t *service) {
             SOCKET_ERROR_CODE error_code = SOCKET_GET_ERROR_CODE(socket_result);
             V_ERROR_F("Problem getting ip6 address information: %d\n", error_code);
             RAISE_ERROR_M(
-			    RUNTIME_EXCEPTION_ERROR_CODE,
-				(unsigned char *) "Problem getting ip6 address information"
-			);
+                RUNTIME_EXCEPTION_ERROR_CODE,
+                (unsigned char *) "Problem getting ip6 address information"
+            );
         }
 #endif
 
@@ -848,9 +848,9 @@ ERROR_CODE start_service(struct service_t *service) {
             SOCKET_ERROR_CODE creating_error_code = SOCKET_GET_ERROR_CODE(socket_result);
             V_ERROR_F("Problem creating ip6 socket: %d\n", creating_error_code);
             RAISE_ERROR_M(
-				RUNTIME_EXCEPTION_ERROR_CODE,
-				(unsigned char *) "Problem creating ip6 socket"
-			);
+                RUNTIME_EXCEPTION_ERROR_CODE,
+                (unsigned char *) "Problem creating ip6 socket"
+            );
         }
 
         /* in case viriatum is set to non blocking, changes the current
@@ -881,9 +881,9 @@ ERROR_CODE start_service(struct service_t *service) {
             V_ERROR_F("Problem setting ip6 socket option: %d\n", option_error_code);
             SOCKET_CLOSE(service->service_socket6_handle);
             RAISE_ERROR_M(
-				RUNTIME_EXCEPTION_ERROR_CODE,
-				(unsigned char *) "Problem setting ip6 socket option"
-			);
+                RUNTIME_EXCEPTION_ERROR_CODE,
+                (unsigned char *) "Problem setting ip6 socket option"
+            );
 #endif
         }
 
@@ -904,9 +904,9 @@ ERROR_CODE start_service(struct service_t *service) {
             V_ERROR_F("Problem setting ip6 socket option: %d\n", option_error_code);
             SOCKET_CLOSE(service->service_socket6_handle);
             RAISE_ERROR_M(
-			    RUNTIME_EXCEPTION_ERROR_CODE,
-				(unsigned char *) "Problem setting ip6 socket option"
-			);
+                RUNTIME_EXCEPTION_ERROR_CODE,
+                (unsigned char *) "Problem setting ip6 socket option"
+            );
         }
     }
 #endif
@@ -943,9 +943,9 @@ ERROR_CODE start_service(struct service_t *service) {
             SOCKET_CLOSE(service->service_socket_handle);
             V_ERROR("Problem loading the ssl certificate file (*.crt)\n");
             RAISE_ERROR_M(
-				RUNTIME_EXCEPTION_ERROR_CODE,
-				(unsigned char *) "Problem loading ssl certificate"
-			);
+                RUNTIME_EXCEPTION_ERROR_CODE,
+                (unsigned char *) "Problem loading ssl certificate"
+            );
         }
 
         /* resolves the configuration file from the ssl key defaulting to
@@ -966,9 +966,9 @@ ERROR_CODE start_service(struct service_t *service) {
             SOCKET_CLOSE(service->service_socket_handle);
             V_ERROR("Problem loading the ssl key file (*.key)\n");
             RAISE_ERROR_M(
-				RUNTIME_EXCEPTION_ERROR_CODE,
-				(unsigned char *) "Problem loading ssl key"
-			);
+                RUNTIME_EXCEPTION_ERROR_CODE,
+                (unsigned char *) "Problem loading ssl key"
+            );
         }
     }
 #endif
@@ -979,17 +979,17 @@ ERROR_CODE start_service(struct service_t *service) {
     /* in case there was an error binding the socket */
     if(SOCKET_TEST_ERROR(socket_result)) {
         /* retrieves the binding error code and
-		prints a description about it in log */
+        prints a description about it in log */
         SOCKET_ERROR_CODE binding_error_code = SOCKET_GET_ERROR_CODE(socket_result);
         V_ERROR_F("Problem binding socket: %d\n", binding_error_code);
 
         /* closes the service socket and raises an error indicating
-		the problem binding the socket */
+        the problem binding the socket */
         SOCKET_CLOSE(service->service_socket_handle);
         RAISE_ERROR_M(
-		    RUNTIME_EXCEPTION_ERROR_CODE,
-			(unsigned char *) "Problem binding socket"
-		);
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Problem binding socket"
+        );
     }
 
     /* listens for a service socket change */
@@ -998,17 +998,17 @@ ERROR_CODE start_service(struct service_t *service) {
     /* in case there was an error listening the socket */
     if(SOCKET_TEST_ERROR(socket_result)) {
         /* retrieves the listening error code and
-		prints a description about it in log */
+        prints a description about it in log */
         SOCKET_ERROR_CODE binding_error_code = SOCKET_GET_ERROR_CODE(socket_result);
         V_ERROR_F("Problem listening socket: %d\n", binding_error_code);
 
         /* closes the service socket and raises an error indicating
-		the problem listening the socket */
+        the problem listening the socket */
         SOCKET_CLOSE(service->service_socket_handle);
         RAISE_ERROR_M(
-			RUNTIME_EXCEPTION_ERROR_CODE,
-			(unsigned char *) "Problem listening socket"
-		);
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Problem listening socket"
+        );
     }
 
 #ifdef VIRIATUM_IP6
@@ -1027,18 +1027,18 @@ ERROR_CODE start_service(struct service_t *service) {
 
         /* in case there was an error binding the socket */
         if(SOCKET_TEST_ERROR(socket_result)) {
-			/* retrieves the listening error code and
-			prints a description about it in log */
+            /* retrieves the listening error code and
+            prints a description about it in log */
             SOCKET_ERROR_CODE binding_error_code = SOCKET_GET_ERROR_CODE(socket_result);
             V_ERROR_F("Problem binding ip6 socket: %d\n", binding_error_code);
 
-			/* closes the service socket and raises an error indicating
-			the problem listening the socket */
+            /* closes the service socket and raises an error indicating
+            the problem listening the socket */
             SOCKET_CLOSE(service->service_socket_handle);
             RAISE_ERROR_M(
-				RUNTIME_EXCEPTION_ERROR_CODE,
-				(unsigned char *) "Problem binding socket"
-			);
+                RUNTIME_EXCEPTION_ERROR_CODE,
+                (unsigned char *) "Problem binding socket"
+            );
         }
 
         /* listens for a service socket change */
@@ -1046,18 +1046,18 @@ ERROR_CODE start_service(struct service_t *service) {
 
         /* in case there was an error listening the socket */
         if(SOCKET_TEST_ERROR(socket_result)) {
-			/* retrieves the listening error code and
-			prints a description about it in log */
+            /* retrieves the listening error code and
+            prints a description about it in log */
             SOCKET_ERROR_CODE binding_error_code = SOCKET_GET_ERROR_CODE(socket_result);
             V_ERROR_F("Problem listening ip6 socket: %d\n", binding_error_code);
 
-			/* closes the service socket and raises an error indicating
-			the problem listening the socket */
+            /* closes the service socket and raises an error indicating
+            the problem listening the socket */
             SOCKET_CLOSE(service->service_socket_handle);
             RAISE_ERROR_M(
-				RUNTIME_EXCEPTION_ERROR_CODE,
-				(unsigned char *) "Problem listening socket"
-			);
+                RUNTIME_EXCEPTION_ERROR_CODE,
+                (unsigned char *) "Problem listening socket"
+            );
         }
     }
 #endif
@@ -1213,13 +1213,13 @@ ERROR_CODE start_service(struct service_t *service) {
         V_DEBUG_F("Memory status: [%ld objects] [%ld KBytes]\n", (long int) ALLOCATIONS, (long int) memory_usage / 1024);
 
         /* polls the connections using the polling (provider)
-		and calls the callbacks for the connection (events)
+        and calls the callbacks for the connection (events)
         using the polling (provider) */
         polling->poll(polling);
         polling->call(polling);
     }
 
-    /* closes (all) the service connections and then 
+    /* closes (all) the service connections and then
     closes the polling (provider of data) */
     close_connections_service(service);
     polling->close(polling);

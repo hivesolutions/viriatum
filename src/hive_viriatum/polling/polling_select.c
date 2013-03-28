@@ -156,12 +156,12 @@ ERROR_CODE register_write_polling_select(struct polling_t *polling, struct conne
     struct polling_select_t *polling_select = (struct polling_select_t *) polling->lower;
 
     /* in case the connection is write registered must
-	raise an error indicating the problem */
+    raise an error indicating the problem */
     if(connection->write_registered == 1) {
         RAISE_ERROR_M(
-			RUNTIME_EXCEPTION_ERROR_CODE,
-			(unsigned char *) "Connection already registered"
-		);
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Connection already registered"
+        );
     }
 
     /* register the socket handle from the sockets write set */
@@ -176,12 +176,12 @@ ERROR_CODE unregister_write_polling_select(struct polling_t *polling, struct con
     struct polling_select_t *polling_select = (struct polling_select_t *) polling->lower;
 
     /* in case the connection is not write registered must
-	raise an error indicating the problem */
+    raise an error indicating the problem */
     if(connection->write_registered == 0) {
         RAISE_ERROR_M(
-			RUNTIME_EXCEPTION_ERROR_CODE,
-			(unsigned char *) "Connection already unregistered"
-		);
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Connection already unregistered"
+        );
     }
 
     /* unregister the socket handle from the sockets write set */
@@ -303,9 +303,9 @@ ERROR_CODE _poll_polling_select(struct polling_select_t *polling_select, struct 
 
         /* raises an error */
         RAISE_ERROR_M(
-			RUNTIME_EXCEPTION_ERROR_CODE,
-			(unsigned char *) "Problem running select"
-		);
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Problem running select"
+        );
     }
 
     /* iterates continuously */
