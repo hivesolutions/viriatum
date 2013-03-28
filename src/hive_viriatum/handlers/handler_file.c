@@ -474,11 +474,17 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
     context must proceed with the authentication process for
     the current authorization value */
     if(handler_file_context->auth_basic != NULL) {
-        auth_http(
-            (char *) handler_file_context->auth_file,
-            (char *) handler_file_context->authorization,
-            &auth_result
-        );
+		/* in case the authorization status is defined as set
+		must proceed with the authorization, otherwise invalidates
+		the authorization result immediately (no information has
+		been provided from the client side) */
+		if(handler_file_context->authorization_status == 2) {
+			auth_http(
+                (char *) handler_file_context->auth_file,
+                (char *) handler_file_context->authorization,
+                &auth_result
+			);
+		} else { auth_result = FALSE; }
     }
 
     /* in case the file path being request referes a directory
