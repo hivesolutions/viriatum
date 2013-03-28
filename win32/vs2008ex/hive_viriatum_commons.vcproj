@@ -695,6 +695,14 @@
                     >
                 </File>
             </Filter>
+            <Filter
+                Name="Formats"
+                >
+                <File
+                    RelativePath="..\..\src\hive_viriatum_commons\formats\passwd.c"
+                    >
+                </File>
+            </Filter>
         </Filter>
         <Filter
             Name="Header Files"
@@ -1054,6 +1062,18 @@
                 </File>
                 <File
                     RelativePath="..\..\src\hive_viriatum_commons\crypto\rc4.h"
+                    >
+                </File>
+            </Filter>
+            <Filter
+                Name="Formats"
+                >
+                <File
+                    RelativePath="..\..\src\hive_viriatum_commons\formats\formats.h"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\hive_viriatum_commons\formats\passwd.h"
                     >
                 </File>
             </Filter>
