@@ -274,22 +274,22 @@ void test_base64() {
 
     /* encodes the value into base64 */
     encode_base64(
-	    (unsigned char *) buffer,
-		strlen(buffer),
-		&encoded_buffer,
-		&encoded_buffer_length
-	);
+        (unsigned char *) buffer,
+        strlen(buffer),
+        &encoded_buffer,
+        &encoded_buffer_length
+    );
 
     /* decodes the value from base64 */
     decode_base64(
-	    encoded_buffer,
-		encoded_buffer_length,
-		&decoded_buffer,
-		&decoded_buffer_length
-	);
+        encoded_buffer,
+        encoded_buffer_length,
+        &decoded_buffer,
+        &decoded_buffer_length
+    );
 
     /* releases both the encoded and the decoded buffer
-	to avoid any memory leak */
+    to avoid any memory leak */
     FREE(encoded_buffer);
     FREE(decoded_buffer);
 }
