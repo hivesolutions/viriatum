@@ -31,5 +31,8 @@
 #include "service.h"
 #include "../stream/stream.h"
 
+/* forward references (avoids loop) */
+struct connection_t;
+
 ERROR_CODE _create_tracker_connection(struct connection_t **connection_pointer, struct service_t *service, char *hostname, unsigned int port);
 ERROR_CODE _create_torrent_connection(struct connection_t **connection_pointer, struct service_t *service, char *hostname, unsigned int port);
