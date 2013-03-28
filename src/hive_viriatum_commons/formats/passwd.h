@@ -36,4 +36,4 @@ typedef enum passwd_state_e {
     PASSWD_COMMENT
 } passwd_state;
 
-ERROR_CODE process_passwd_file(char *file_path, struct hash_map_t **passwd_pointer);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE process_passwd_file(char *file_path, struct hash_map_t **passwd_pointer);
