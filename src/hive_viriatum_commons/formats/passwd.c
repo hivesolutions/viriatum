@@ -113,10 +113,10 @@ ERROR_CODE process_passwd_file(char *file_path, struct hash_map_t **passwd_point
                         password[length] = '\0';
                         mark = pointer + 1;
                         set_value_string_hash_map(
-						    passwd,
-							(unsigned char *) username,
-							password
-						);
+                            passwd,
+                            (unsigned char *) username,
+                            password
+                        );
                         state = current == ':' ? PASSWD_COMMENT : PASSWD_USER;
                         break;
                 }
