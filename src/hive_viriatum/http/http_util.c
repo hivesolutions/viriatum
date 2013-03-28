@@ -399,171 +399,109 @@ ERROR_CODE auth_default_http(char *auth_file, char *authorization, unsigned char
     RAISE_NO_ERROR;
 }
 
-
-typedef enum passwd_state_e {
-	PASSWD_USER = 1,
-	PASSWD_PASSWORD,
-	PASSWD_COMMENT
-} passwd_state;
-
-
-
-ERROR_CODE process_passwd_file(char *file_path, struct hash_map_t **passwd_pointer) {
-	size_t size;
-	size_t index;
-	size_t length;
-	ERROR_CODE return_value;
-	unsigned char current;
-
-	unsigned char state;
-
-	unsigned char *mark;
-	unsigned char *buffer;
-	unsigned char *pointer;
-
-	char name[128];
-	char *value;
-
-    struct hash_map_t *passwd;
-    
-	create_hash_map(&passwd, 0);
-
-	return_value = read_file(file_path, &buffer, &size);
-    if(IS_ERROR_CODE(return_value)) {
-		RAISE_ERROR_M(
-		    RUNTIME_EXCEPTION_ERROR_CODE,
-			(unsigned char *) "Problem reading file"
-		);
-	}
-
-	mark = buffer;
-	state = PASSWD_USER;
-
-	for(index = 0; index < size; index++) {
-		current = buffer[index];
-		pointer = &buffer[index];
-
-		switch(state) {
-			case PASSWD_USER:
-				switch(current) {
-					case ':':
-					case '\n':
-						length = pointer - mark;
-						memcpy(name, mark, length);
-						name[length] = '\0';
-						mark = pointer + 1;
-						state = current == ':' ? PASSWD_PASSWORD : PASSWD_USER;
-						break;
-				}
-
-				break;
-
-			case PASSWD_PASSWORD:
-				switch(current) {
-					case ':':
-					case '\n':
-						length = pointer - mark;
-						value = (char *) MALLOC(length + 1);
-						memcpy(value, mark, length);
-						value[length] = '\0';
-						mark = pointer + 1;
-						set_value_string_hash_map(passwd, name, value);
-						state = current == ':' ? PASSWD_COMMENT : PASSWD_USER;
-						break;
-				}
-
-				break;
-
-			case PASSWD_COMMENT:
-				switch(current) {
-					case '\n':
-						state = PASSWD_USER;
-						mark = pointer + 1;
-						break;
-				}
-
-				break;
-		}
-	}
-
-	FREE(buffer);
-
-	*passwd_pointer = passwd;
-	RAISE_NO_ERROR;
-}
-
 ERROR_CODE auth_file_http(char *auth_file, char *authorization, unsigned char *result) {
-	ERROR_CODE return_value;
-	struct hash_map_t *passwd;
+    /* allocates space for the error return value to be
+    used in error checking for function calls */
+    ERROR_CODE return_value;
 
-	char *pointer;
-	char *authorization_b64;
-	char *authorization_d;
-	char *password_pointer;
-	char username[128];
-	char password[128];
-	char *password_v;
-	size_t authorization_size;
-	size_t username_size;
-	size_t password_size;
+    /* allocates space for the pointer to the passwd key
+    value structure to be created by parsing the auth file */
+    struct hash_map_t *passwd;
 
-	process_passwd_file(auth_file, &passwd);
+    /* allocates space to the various pointer values to be
+    used for the separation and treatment of the auth value */
+    char *pointer;
+    char *authorization_b64;
+    char *authorization_d;
+    char *password_pointer;
 
-	pointer = strchr(authorization, ' ');
-	if(pointer == NULL) {
+    /* allocates space fot the buffers to be used for the username
+    and password values extracted from the authorization token */
+    char username[128];
+    char password[128];
+    char *password_v;
+
+    /* allocates the various size relates values for the buffer
+    variables creation */
+    size_t authorization_size;
+    size_t username_size;
+    size_t password_size;
+
+    /* tries to find the token that separates the authentication
+    type from the authorization base 64 value in case the value
+    is not found raises an error indicating the problem */
+    pointer = strchr(authorization, ' ');
+    if(pointer == NULL) {
         RAISE_ERROR_M(
             RUNTIME_EXCEPTION_ERROR_CODE,
             (unsigned char *) "Authorization value not valid"
         );
     }
-	authorization_b64 = pointer + 1;
+    authorization_b64 = pointer + 1;
 
-	return_value = decode_base64(
-	    authorization_b64,
-		strlen(authorization_b64),
-		&authorization_d,
-		&authorization_size
-	);
-	if(IS_ERROR_CODE(return_value)) {
-		RAISE_ERROR_M(
-		    RUNTIME_EXCEPTION_ERROR_CODE,
-			(unsigned char *) "Problem decoding base 64 authorization"
-		);
-	}
+    /* tries to decode the authorization base 64 value into a plain
+    text value in case the decoding fails, re-raises the error to
+    the upper levels for caller information */
+    return_value = decode_base64(
+        authorization_b64,
+        strlen(authorization_b64),
+        &authorization_d,
+        &authorization_size
+    );
+    if(IS_ERROR_CODE(return_value)) {
+        RAISE_ERROR_M(
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Problem decoding base 64 authorization"
+        );
+    }
 
-	pointer = memchr(authorization_d, ':', authorization_size);
-	if(pointer == NULL) {
-		FREE(authorization_d);
-		RAISE_ERROR_M(
+    /* tries to find the token that separates the username part of the
+    authorization from the password part in case the value is not found
+    raises an error to the upper levels */
+    pointer = memchr(authorization_d, ':', authorization_size);
+    if(pointer == NULL) {
+        FREE(authorization_d);
+        RAISE_ERROR_M(
             RUNTIME_EXCEPTION_ERROR_CODE,
             (unsigned char *) "No password separator found in authorization"
         );
-	}
-	password_pointer = pointer + 1;
+    }
+    password_pointer = pointer + 1;
 
-	username_size = password_pointer - authorization_d - 1;
-	password_size = authorization_d + authorization_size - password_pointer;
+    /* calculates the size of both the username and the password
+    from the diference between the various pointers */
+    username_size = password_pointer - authorization_d - 1;
+    password_size = authorization_d + authorization_size - password_pointer;
 
-	memcpy(username, authorization_d, username_size);
-	username[username_size] = '\0';
+    /* copies both the username and the password values to
+    the apropriate internal buffers (to be used in comparision) */
+    memcpy(username, authorization_d, username_size);
+    username[username_size] = '\0';
+    memcpy(password, password_pointer, password_size);
+    password[password_size] = '\0';
 
-	memcpy(password, password_pointer, password_size);
-	password[password_size] = '\0';
+    /* processes the passwd file using the provided file path
+    for it, this is an expensive io driven operation, and must
+    be used wth care */
+    process_passwd_file(auth_file, &passwd);
 
-	get_value_string_hash_map(passwd, username, &password_v);
-	if(password_v != NULL && strcmp(password, password_v) == 0) {
-		*result = TRUE;
-	} else {
-		*result = FALSE;
-	}
+    /* retrieves the password verification value for the
+    retrieved username and in case it's valid compares it
+    and sets the result value accordingly */
+    get_value_string_hash_map(passwd, username, &password_v);
+    if(password_v != NULL && strcmp(password, password_v) == 0) {
+        *result = TRUE;
+    } else { *result = FALSE; }
 
-	/* releases the memory associated with the complete set
-	of values in the passwd structure and then releases the
-	memory from the hash map structure itself, then releases
-	the memory associated with the authorization decoded string */
-	delete_values_hash_map(passwd);
-	delete_hash_map(passwd);
-	FREE(authorization_d);
+    /* releases the memory associated with the complete set
+    of values in the passwd structure and then releases the
+    memory from the hash map structure itself, then releases
+    the memory associated with the authorization decoded string */
+    delete_values_hash_map(passwd);
+    delete_hash_map(passwd);
+    FREE(authorization_d);
 
+    /* raises no error, as everything has been done as possible
+    with no problems created in the processing */
     RAISE_NO_ERROR;
 }
