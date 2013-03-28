@@ -59,19 +59,16 @@ void create_service(struct service_t **service_pointer, unsigned char *name, uns
     service->ssl_context = NULL;
 #endif
 
-    /* creates the service options */
+    /* creates the service options that are going to be
+	used to store the various options loaded from the
+	various sources (eg: command line, config file, etc.)*/
     create_service_options(&service->options);
 
-    /* creates the polling (provider) */
+    /* creates the various structures that are going to
+	be used for the internal working of the service */
     create_polling(&service->polling);
-
-    /* creates the connections list */
     create_linked_list(&service->connections_list);
-
-    /* creates the http modules list */
     create_linked_list(&service->modules_list);
-
-    /* creates the http handlers map */
     create_hash_map(&service->http_handlers_map, 0);
 
     /* sets the service in the service pointer */
@@ -79,31 +76,24 @@ void create_service(struct service_t **service_pointer, unsigned char *name, uns
 }
 
 void delete_service(struct service_t *service) {
-    /* in case the service socket handle is defined */
+    /* in case the service socket handle is defined and set
+	must close the it using the safe approach (gracefully) */
     if(service->service_socket_handle) {
-        /* closes the service socket (secure closing) */
         SOCKET_CLOSE(service->service_socket_handle);
     }
 
-    /* in case the service configuration is defined */
+    /* in case the service configuration is defined and set
+	must close the it using the safe approach (gracefully) */
     if(service->configuration) {
-        /* deletes the service configuration */
         delete_configuration(service->configuration, 1);
     }
 
-    /* deletes the http handlers map */
+	/* deletes the various internal structures associated
+	with the service avoiding any memory leak */
     delete_hash_map(service->http_handlers_map);
-
-    /* deletes the http modules list */
     delete_linked_list(service->modules_list);
-
-    /* deletes the connections list */
     delete_linked_list(service->connections_list);
-
-    /* deletes the polling (provider) */
     delete_polling(service->polling);
-
-    /* deletes the service options */
     delete_service_options(service->options);
 
     /* releases the service */
@@ -136,10 +126,9 @@ void create_service_options(struct service_options_t **service_options_pointer) 
     that no index is considered before configuration */
     memset(service_options->index, 0, sizeof(service_options->index));
 
-    /* creates the hash map for the mime types */
+    /* creates the hash map for both the mime types
+	and the virtual hosts information */
     create_hash_map(&service_options->mime_types, 64);
-
-    /* creates the hash map for the virtual hosts */
     create_hash_map(&service_options->virtual_hosts, 0);
 
     /* sets the service options in the service options pointer */
@@ -147,10 +136,9 @@ void create_service_options(struct service_options_t **service_options_pointer) 
 }
 
 void delete_service_options(struct service_options_t *service_options) {
-    /* deletes the hash map for the mime types */
+    /* deletes the internal structures used for the
+	service (configuration) options */
     delete_hash_map(service_options->mime_types);
-
-    /* deletes the hash map for the virtual hosts */
     delete_hash_map(service_options->virtual_hosts);
 
     /* releases the service options */
@@ -346,29 +334,9 @@ ERROR_CODE calculate_locations_service(struct service_t *service) {
     RAISE_NO_ERROR;
 }
 
-
-
-
-
-
-
-
-#ifdef VIRIATUM_PLATFORM_LINUX
-#ifdef VIRIATUM_PLATFORM_ANDROID
-#define SET_PROC_NAME(name)
-#else
-#ifdef PR_SET_NAME
-#define SET_PROC_NAME(name) prctl(PR_SET_NAME, name)
-#endif
-#endif
-#endif
-
-#ifdef VIRIATUM_PLATFORM_BSD
-#define SET_PROC_NAME(name) setproctitle(name)
-#endif
-
-#ifndef SET_PROC_NAME
-#define SET_PROC_NAME(name)
+#ifdef VIRIATUM_PLATFORM_WIN32
+ERROR_CODE create_workers(struct service_t *service) { RAISE_NO_ERROR; }
+ERROR_CODE join_workers(struct service_t *service) { RAISE_NO_ERROR; }
 #endif
 
 #ifdef VIRIATUM_PLATFORM_UNIX
@@ -661,10 +629,14 @@ ERROR_CODE start_service(struct service_t *service) {
     SOCKET_HANDLE service_socket_handle;
     struct connection_t *service_connection;
 
-    /* allocates the socket result */
+    /* allocates the socket result that will be used
+	to test the socket related call for error */
     SOCKET_ERROR_CODE socket_result;
 
-    /* allocates the misc connections references */
+
+
+
+    /* allocates the various misc connections references */
     struct connection_t *tracker_connection;
     struct connection_t *torrent_connection;
 
@@ -1080,12 +1052,10 @@ ERROR_CODE start_service(struct service_t *service) {
     }
 #endif
 
-#ifdef VIRIATUM_PLATFORM_UNIX
     /* in case the current os is compatible with the forking of process
     creates the worker processes to handle more connections at a time,
     this operation creates a much more flexible and scalable solution */
     create_workers(service);
-#endif
 
     /* sets the service in the polling */
     polling->service = service;
@@ -1244,9 +1214,10 @@ ERROR_CODE start_service(struct service_t *service) {
     }
 #endif
 
-#ifdef VIRIATUM_PLATFORM_UNIX
+	/* in case the current os supports the forking of the processes
+	must join them back together waiting for their finish before exiting
+	the main (coordinator) process */
     join_workers(service);
-#endif
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -1275,16 +1246,13 @@ ERROR_CODE close_connections_service(struct service_t *service) {
         /* pops a value from the connections list (and deletes the node) */
         pop_value_linked_list(connections_list, (void **) &current_connection, 1);
 
-        /* in case the current connection is null (connections list is empty) */
-        if(current_connection == NULL) {
-            /* breaks the loop */
-            break;
-        }
+        /* in case the current connection is null the end
+		of iteration has been reached and breaks the loop */
+        if(current_connection == NULL) { break; }
 
-        /* closes the current connection */
+        /* closes the current connection (gracefully) and
+		then deletes the current connection */
         current_connection->close_connection(current_connection);
-
-        /* deletes the current connection */
         delete_connection(current_connection);
 
 #ifdef VIRIATUM_SSL
