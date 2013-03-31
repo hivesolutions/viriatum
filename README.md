@@ -49,12 +49,12 @@ In order to provide a correct (system wide) configuration path use:
 
 Building viriatum for android involves cross compilation and the android ndk toolkit must be used.
 
-Check the instructions for downloading the android ndk from the [official website](http://developer.android.com/sdk/ndk/)
-Unpack the android-ndk package file
+Check the instructions for downloading the android ndk from the [official website](http://developer.android.com/sdk/ndk/),
+then unpack the android-ndk package file into the current directory.
 
     tar -xvf android-ndk-r[x]-linux-x86.tar.bz2
 
-Create the standalone toolchain 
+Create the standalone toolchain using the script for that purpose.
 
     android-ndk-r[x]/build/tools/make-standalone-toolchain.sh --system=linux-x86_64\
         --platform=android-4 --install-dir=/opt/android-toolchain
