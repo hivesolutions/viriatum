@@ -36,6 +36,12 @@
 #include "_config_win32.h"
 #endif
 
+#ifdef __ANDROID__
+#ifndef HAVE_DEFAULTS
+#define HAVE_DEFAULTS
+#endif
+#endif
+
 #ifdef WITH_CONFIG_ROOT
 #ifndef HAVE_DEFAULTS
 #define VIRIATUM_CONFIG_PATH WITH_CONFIG_ROOT
