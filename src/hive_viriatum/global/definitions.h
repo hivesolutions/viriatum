@@ -129,8 +129,8 @@ static __inline char *get_config_path() {
 #define VIRIATUM_LISTING_PATH "/templates/listing.html.tpl"
 #define VIRIATUM_ERROR_PATH "/templates/error.html.tpl"
 #define VIRIATUM_CONTENTS_PATH "/sdcard/viriatum/www"
-#define VIRIATUM_LOG_PATH "/sdcard/viriatum/log/viriatum.log"
-#define VIRIATUM_LOG_E_PATH "/sdcard/viriatum/log/viriatum.err"
+#define VIRIATUM_LOG_PATH "/sdcard/viriatum/viriatum.log"
+#define VIRIATUM_LOG_E_PATH "/sdcard/viriatum/viriatum.err"
 #else
 #ifndef VIRIATUM_MODULES_PATH
 #define VIRIATUM_MODULES_PATH "/usr/lib/viriatum/modules"
