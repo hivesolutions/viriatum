@@ -56,7 +56,8 @@ Unpack the android-ndk package file
 
 Create the standalone toolchain 
 
-    android-ndk-r[x]/build/tools/make-standalone-toolchain.sh --system=linux-x86_64 --platform=android-4 --install-dir=/opt/android-toolchain
+    android-ndk-r[x]/build/tools/make-standalone-toolchain.sh --system=linux-x86_64\
+        --platform=android-4 --install-dir=/opt/android-toolchain
 
 And then you may use the "just" created toolchain to build Viriatum with:
 
