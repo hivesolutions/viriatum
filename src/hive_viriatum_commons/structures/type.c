@@ -36,8 +36,10 @@ void create_type(struct type_t **type_pointer, enum type_e _type) {
     /* allocates space for the type */
     struct type_t *type = (struct type_t *) MALLOC(type_size);
 
-    /* sets the type in the type */
+    /* sets the type in the type and then sets
+    the initial size value to zero (unset) */
     type->type = _type;
+    type->size = 0;
 
     /* sets the type in the type pointer */
     *type_pointer = type;
@@ -303,6 +305,7 @@ struct type_t integer_type(int value) {
     /* sets the type's type and value */
     type.type = INTEGER_TYPE;
     type.value.value_int = value;
+    type.size = 0;
 
     /* returns the type */
     return type;
@@ -315,6 +318,7 @@ struct type_t float_type(float value) {
     /* sets the type's type and value */
     type.type = FLOAT_TYPE;
     type.value.value_float = value;
+    type.size = 0;
 
     /* returns the type */
     return type;
@@ -324,9 +328,24 @@ struct type_t string_type(char *value) {
     /* allocates space for the type */
     struct type_t type;
 
-    /* sets the type's type and value */
+    /* sets the type's type, value and then
+    calculates and sets the size of the string */
     type.type = STRING_TYPE;
     type.value.value_string = value;
+    type.size = strlen(value);
+
+    return type;
+}
+
+struct type_t buffer_type(char *value, size_t size) {
+    /* allocates space for the type */
+    struct type_t type;
+
+    /* sets the type's type, value and the provided
+    buffer size (not calculated) */
+    type.type = STRING_TYPE;
+    type.value.value_string = value;
+    type.size = size;
 
     return type;
 }
@@ -338,6 +357,7 @@ struct type_t map_type(struct hash_map_t *value) {
     /* sets the type's type and value */
     type.type = MAP_TYPE;
     type.value.value_map = value;
+    type.size = 0;
 
     /* returns the type */
     return type;
@@ -350,6 +370,7 @@ struct type_t sort_map_type(struct sort_map_t *value) {
     /* sets the type's type and value */
     type.type = SORT_MAP_TYPE;
     type.value.value_sort_map = value;
+    type.size = 0;
 
     /* returns the type */
     return type;
@@ -362,6 +383,7 @@ struct type_t list_type(struct linked_list_t *value) {
     /* sets the type's type and value */
     type.type = LIST_TYPE;
     type.value.value_list = value;
+    type.size = 0;
 
     /* returns the type */
     return type;
