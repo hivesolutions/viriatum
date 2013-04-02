@@ -56,11 +56,15 @@ ERROR_CODE _create_client_connection(struct connection_t **connection_pointer, s
     server = SOCKET_GET_HOST_BY_NAME(hostname);
     if(server == NULL) { fprintf(stderr, "ERROR, no such host\n"); }
 
+	/* resets the server address structure, nullifies the values
+	and then sets the "just" resolved address in it */
     memset(&serv_addr, 0, sizeof(SOCKET_ADDRESS_INTERNET));
     serv_addr.sin_family = AF_INET;
     memcpy(&serv_addr.sin_addr.s_addr, server->h_addr, server->h_length);
     serv_addr.sin_port = htons(port);
 
+	/* tries to connect to the remote host an in case there's
+	a problem in the connection attempt, raises an error */
     error = SOCKET_CONNECT_SIZE(socket_handle, serv_addr, sizeof(SOCKET_ADDRESS_INTERNET));
     if(SOCKET_TEST_ERROR(error)) { fprintf(stderr, "ERROR connecting host\n"); }
 
@@ -72,13 +76,14 @@ ERROR_CODE _create_client_connection(struct connection_t **connection_pointer, s
     if(VIRIATUM_NO_WAIT) { SOCKET_SET_NO_WAIT(socket_handle, option_value); }
     if(VIRIATUM_NO_PUSH) { SOCKET_SET_NO_PUSH(socket_handle, option_value); }
 
-    /* creates the (client) connection */
+    /* creates the (client) connection object populating all of its 
+	internal fields with the appropriate information */
     create_connection(&connection, socket_handle);
 
     /* sets the socket address in the (client) connection
     this is going to be very usefull for later connection
     identification (address, port, etc.) */
-    /*connection->socket_address = (SOCKET_ADDRESS) serv_addr;*/
+    /*connection->socket_address = (SOCKET_ADDRESS) serv_addr;*/ /* TODO: fix this latter on */
 
     /* sets the service select service as the service in the (client)  connection */
     connection->service = service;
@@ -100,7 +105,7 @@ ERROR_CODE _create_client_connection(struct connection_t **connection_pointer, s
     connection->on_open = open_handler_stream_io;
     connection->on_close = close_handler_stream_io;
 
-    /* updats the connection pointer with the refernce
+    /* updates the connection pointer with the refernce
     to the connection structure */
     *connection_pointer = connection;
 
