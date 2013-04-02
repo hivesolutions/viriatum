@@ -30,22 +30,36 @@
 #include "url.h"
 
 ERROR_CODE parse_url(char *url, size_t url_size, struct url_t *url_s) {
+    /* allocates space for the index and length counters to be
+    used on the parse of the provided url */
     size_t index;
     size_t length;
 
+    /* sets space for the variables to be set with the current
+    (byte) in parsing and for the current state of the parse */
     unsigned char current;
     enum url_parse_state_e state;
 
+    /* allocates space for the internal markers and pointers to
+    be used durring the parsin main loop */
     unsigned char *mark;
     unsigned char *pointer;
 
+    /* creates space for a "local" buffer that is going to
+    be used as temporary for some of the conversion operations */
     unsigned char buffer[128];
 
+    /* resets the url structure by setting all of its contents
+    to the default zero (reset) value */
+    memset(url_s, 0, sizeof(struct url_t));
+
+    /* sets the url pointer as the initial mark value and also
+    sets the initial state of the parsing as the scheme state */
     mark = (unsigned char *) url;
     state = SCHEME_STATE;
 
-    memset(url_s, 0, sizeof(struct url_t));
-
+    /* iterate over the complete url buffer to try to gather
+    the range of the various parts of the url */
     for(index = 0; index < url_size; index++) {
         /* retrieves the current byte in iteration and the pointer
         address to the current buffer position */
@@ -179,6 +193,8 @@ ERROR_CODE parse_url(char *url, size_t url_size, struct url_t *url_s) {
     }
     pointer++;
 
+    /* runs the final swith operation to clone the still
+    opened parse step (the final step) */
     switch(state) {
         case PATH_STATE:
             length = pointer - mark;
@@ -251,6 +267,8 @@ ERROR_CODE parse_url_static(char *url, size_t url_size, struct url_static_t *url
     be used to detect errors in calls */
     ERROR_CODE error;
 
+    /* allocates the space for the temporary (dynamic) url structure
+    to be used as basis for the construction of the static one */
     struct url_t _url_s;
 
     error = parse_url(url, url_size, &_url_s);
