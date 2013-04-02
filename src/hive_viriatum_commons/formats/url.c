@@ -234,7 +234,7 @@ ERROR_CODE parse_url(char *url, size_t url_size, struct url_t *url_s) {
         memcpy(buffer, url_s->port_s.buffer, url_s->port_s.length);
         buffer[url_s->port_s.length] = '\0';
 
-        url_s->port = atoi(buffer);
+        url_s->port = atoi((char *) buffer);
     }
 
     RAISE_NO_ERROR;
@@ -244,7 +244,7 @@ error:
         RUNTIME_EXCEPTION_ERROR_CODE,
         (unsigned char *) "Problem parsing url string"
     );
-};
+}
 
 ERROR_CODE parse_url_static(char *url, size_t url_size, struct url_static_t *url_s) {
     /* allocates space for the temporary error variable to
