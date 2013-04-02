@@ -35,5 +35,5 @@
 struct connection_t;
 struct service_t;
 
-ERROR_CODE _create_tracker_connection(struct connection_t **connection_pointer, struct service_t *service, char *hostname, unsigned int port);
+ERROR_CODE _create_tracker_connection(struct connection_t **connection_pointer, struct service_t *service, char *hostname, unsigned int port, char *file_path);
 ERROR_CODE _create_torrent_connection(struct connection_t **connection_pointer, struct service_t *service, char *hostname, unsigned int port);
