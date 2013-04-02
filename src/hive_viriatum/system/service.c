@@ -1023,8 +1023,7 @@ ERROR_CODE start_service(struct service_t *service) {
     _create_tracker_connection(
         &tracker_connection,
         service,
-        "hole1.hive",
-        9090,
+        "http://hole1.hive:9090/ptorrent/announce.php",
         "C:/Users/joamag/Downloads/scudum.iso.torrent"
     );
 
