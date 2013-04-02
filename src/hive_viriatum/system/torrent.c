@@ -37,7 +37,7 @@ ERROR_CODE _create_tracker_connection(struct connection_t **connection_pointer, 
     http stream (http client) this structure will be able
     to guide the stream of http client */
     struct http_client_parameters_t *parameters =\
-		(struct http_client_parameters_t *) MALLOC(sizeof(struct http_client_parameters_t));
+        (struct http_client_parameters_t *) MALLOC(sizeof(struct http_client_parameters_t));
 
     /* populates the parameters structure with the
     required values for the http client request */

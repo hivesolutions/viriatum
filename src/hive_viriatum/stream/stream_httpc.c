@@ -103,18 +103,18 @@ ERROR_CODE data_handler_stream_http_client(struct io_connection_t *io_connection
     int processed_size;
 
     /* retrieves the http client connection as the lower
-	part (payload) of the io connection */
+    part (payload) of the io connection */
     struct http_client_connection_t *http_client_connection = (struct http_client_connection_t *) io_connection->lower;
 
     /* process the http data for the http parser, this should be
     a partial processing and some data may remain unprocessed (in
     case there are multiple http requests) */
     processed_size = process_data_http_parser(
-	    http_client_connection->http_parser,
-		http_client_connection->http_settings,
-		buffer,
-		buffer_size
-	);
+        http_client_connection->http_parser,
+        http_client_connection->http_settings,
+        buffer,
+        buffer_size
+    );
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -232,7 +232,7 @@ ERROR_CODE open_handler_stream_http_client(struct io_connection_t *io_connection
 
     /* allocates the http client connection and retrieves the
     "upper" connection (for parameters retrieval) */
-	struct http_client_connection_t *http_client_connection;
+    struct http_client_connection_t *http_client_connection;
     struct connection_t *connection = (struct connection_t *) io_connection->connection;
     struct http_client_parameters_t *parameters = (struct http_client_parameters_t *) connection->parameters;
     struct type_t *type;
@@ -248,43 +248,43 @@ ERROR_CODE open_handler_stream_http_client(struct io_connection_t *io_connection
     struct string_t strings[9];
     char *buffer = MALLOC(VIRIATUM_HTTP_SIZE);
 
-	/* creates the peer id from the current client version information
-	plus a random number represnting the unique "visit" as defined by
-	the bittorrent specification */
+    /* creates the peer id from the current client version information
+    plus a random number represnting the unique "visit" as defined by
+    the bittorrent specification */
     SPRINTF(
-		(char *) peer_id,
-		20,
-		"-%s%d%d%d0-",
-		VIRIATUM_PREFIX,
-		VIRIATUM_MAJOR,
-		VIRIATUM_MINOR,
-		VIRIATUM_MICRO
-	);
+        (char *) peer_id,
+        20,
+        "-%s%d%d%d0-",
+        VIRIATUM_PREFIX,
+        VIRIATUM_MAJOR,
+        VIRIATUM_MINOR,
+        VIRIATUM_MICRO
+    );
     random_buffer(random, 12);
     memcpy(peer_id + 8, random, 12);
 
-	/* tries to decode the bencoded torrent file an in case
-	thre's an error propagates it to the calling function */
+    /* tries to decode the bencoded torrent file an in case
+    thre's an error propagates it to the calling function */
     error = decode_bencoding_file("C:/Users/joamag/Downloads/scudum.iso.torrent", &type);
-    if(error) { 
-		RAISE_ERROR_M(
-		    RUNTIME_EXCEPTION_ERROR_CODE,
-		    (unsigned char *) "Problem reading torrent file"
-		);
-	}
+    if(error) {
+        RAISE_ERROR_M(
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Problem reading torrent file"
+        );
+    }
 
-	/* retries the info part of the torrent description, this
-	value contains "valuable" information describing the file
-	and may be used to generate the info hash */
+    /* retries the info part of the torrent description, this
+    value contains "valuable" information describing the file
+    and may be used to generate the info hash */
     get_value_string_sort_map(
-		type->value.value_sort_map,
-		(unsigned char *) "info",
-		(void **) &_type
-	);
+        type->value.value_sort_map,
+        (unsigned char *) "info",
+        (void **) &_type
+    );
 
-	/* encodes the info dictionary into bencoding and calculates
-	the sha1 value of the encoded value as the info hash value
-	that uniquely identifies the file over the grid */
+    /* encodes the info dictionary into bencoding and calculates
+    the sha1 value of the encoded value as the info hash value
+    that uniquely identifies the file over the grid */
     encode_bencoding(_type, &_buffer, &_buffer_size);
     sha1(_buffer, (unsigned int) _buffer_size, info_hash);
     print_type(type);
@@ -336,11 +336,11 @@ ERROR_CODE open_handler_stream_http_client(struct io_connection_t *io_connection
 
     FREE(get_string);
 
-	/* creates the http client connection object populating
-	all of its internal element for future usage */
+    /* creates the http client connection object populating
+    all of its internal element for future usage */
     create_http_client_connection(&http_client_connection, io_connection);
 
-	write_connection(
+    write_connection(
         io_connection->connection,
         (unsigned char *) buffer,
         (unsigned int) strlen(buffer),
@@ -354,9 +354,9 @@ ERROR_CODE open_handler_stream_http_client(struct io_connection_t *io_connection
 
 ERROR_CODE close_handler_stream_http_client(struct io_connection_t *io_connection) {
     /* retrieves the http client connection and deletes it
-	releasig all of its memory (avoiding memory leaks) */
+    releasig all of its memory (avoiding memory leaks) */
     struct http_client_connection_t *http_client_connection =\
-		(struct http_client_connection_t *) io_connection->lower;
+        (struct http_client_connection_t *) io_connection->lower;
     delete_http_client_connection(http_client_connection);
 
     /* raises no error */
