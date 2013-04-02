@@ -55,7 +55,9 @@ typedef struct http_client_connection_t {
 
     /**
      * Structure containig the settings to be
-     * used by the http parser.
+     * used by the http parser, it must have
+     * the complete configuration for the client
+     * including url, type and callbacks,
      */
     struct http_settings_t *http_settings;
 
@@ -66,12 +68,29 @@ typedef struct http_client_connection_t {
     struct http_parser_t *http_parser;
 } http_client_connection;
 
+typedef enum http_client_type_t {
+    GET_TYPE = 1,
+    POST_TYPE,
+    PUT_TYPE,
+    DELETE_TYPE
+} http_client_type;
+
 typedef struct http_client_parameters_t {
-    char *url;
+    char url[VIRIATUM_MAX_URL_SIZE];
+    size_t url_size;
+    char params[VIRIATUM_MAX_URL_SIZE];
+    size_t params_size;
+    enum http_client_type_t type;
+
+   /*parameters->on_open = NULL !!!!*/
+    /*parameters->on_data */
+    /*parameters->on_close */
 } http_client_parameters;
 
 ERROR_CODE create_http_client_connection(struct http_client_connection_t **http_client_connection_pointer, struct io_connection_t *io_connection);
 ERROR_CODE delete_http_client_connection(struct http_client_connection_t *http_client_connection);
+ERROR_CODE create_http_client_parameters(struct http_client_parameters_t **http_client_parameters_pointer);
+ERROR_CODE delete_http_client_parameters(struct http_client_parameters_t *http_client_parameters);
 ERROR_CODE data_handler_stream_http_client(struct io_connection_t *io_connection, unsigned char *buffer, size_t buffer_size);
 ERROR_CODE open_handler_stream_http_client(struct io_connection_t *io_connection);
 ERROR_CODE close_handler_stream_http_client(struct io_connection_t *io_connection);
