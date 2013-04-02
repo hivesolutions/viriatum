@@ -27,4 +27,5 @@
 
 #pragma once
 
+#define CALL_F(callback) if(callback != NULL) { callback(); }
 #define CALL_V(callback, ...) if(callback != NULL) { callback(__VA_ARGS__); }
