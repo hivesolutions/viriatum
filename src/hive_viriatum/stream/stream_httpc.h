@@ -68,19 +68,17 @@ typedef struct http_client_connection_t {
     struct http_parser_t *http_parser;
 } http_client_connection;
 
-typedef enum http_client_type_t {
-    GET_TYPE = 1,
-    POST_TYPE,
-    PUT_TYPE,
-    DELETE_TYPE
-} http_client_type;
-
 typedef struct http_client_parameters_t {
     char url[VIRIATUM_MAX_URL_SIZE];
-    size_t url_size;
-    char params[VIRIATUM_MAX_URL_SIZE];
-    size_t params_size;
-    enum http_client_type_t type;
+    
+	size_t url_size;
+    
+	char params[VIRIATUM_MAX_URL_SIZE];
+    
+	size_t params_size;
+
+    enum http_method_e method;
+	enum http_version_e version;
 
    /*parameters->on_open = NULL !!!!*/
     /*parameters->on_data */
