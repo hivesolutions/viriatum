@@ -70,15 +70,15 @@ typedef struct http_client_connection_t {
 
 typedef struct http_client_parameters_t {
     char url[VIRIATUM_MAX_URL_SIZE];
-    
-	size_t url_size;
-    
-	char params[VIRIATUM_MAX_URL_SIZE];
-    
-	size_t params_size;
+
+    size_t url_size;
+
+    char params[VIRIATUM_MAX_URL_SIZE];
+
+    size_t params_size;
 
     enum http_method_e method;
-	enum http_version_e version;
+    enum http_version_e version;
 
    /*parameters->on_open = NULL !!!!*/
     /*parameters->on_data */

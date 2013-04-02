@@ -123,7 +123,7 @@ ERROR_CODE create_http_client_parameters(struct http_client_parameters_t **http_
     /* sets the various default values in the client paramenters
     structure and then updates the pointer reference */
     http_client_parameters->method = HTTP_GET;
-	http_client_parameters->version = HTTP11;
+    http_client_parameters->version = HTTP11;
     *http_client_parameters_pointer = http_client_parameters;
 
     /* raises no error as the creation of the client parameraters
@@ -182,10 +182,10 @@ ERROR_CODE open_handler_stream_http_client(struct io_connection_t *io_connection
         "%s %s?%s %s\r\n"
         "User-Agent: %s\r\n"
         "Connection: Keep-Alive\r\n\r\n",
-		http_method_strings[parameters->method - 1],
+        http_method_strings[parameters->method - 1],
         parameters->url,
         parameters->params,
-		http_version_strings[parameters->version - 1],
+        http_version_strings[parameters->version - 1],
         VIRIATUM_AGENT
     );
 
