@@ -287,7 +287,6 @@ ERROR_CODE open_handler_stream_http_client(struct io_connection_t *io_connection
     that uniquely identifies the file over the grid */
     encode_bencoding(_type, &_buffer, &_buffer_size);
     sha1(_buffer, (unsigned int) _buffer_size, info_hash);
-    print_type(type);
     free_type(type);
     FREE(_buffer);
 
