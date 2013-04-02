@@ -60,7 +60,7 @@ ERROR_CODE _create_tracker_connection(struct connection_t **connection_pointer, 
 
     /* populates the parameters structure with the
     required values for the http client request */
-    parameters->type = GET_TYPE;
+    parameters->method = HTTP_GET;
 
     memcpy(parameters->url, "/ptorrent/announce.php", 23);
 
