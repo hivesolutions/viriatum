@@ -543,7 +543,7 @@ ERROR_CODE start_service(struct service_t *service) {
     /* registers the signal handler for the service, this must
     be done at this stage so that no module creates problems and
     overrides the default signal handlers */
-    CALL_V(service->register_signals);
+    CALL_F(service->register_signals);
 
     /* sets the current http handler accoring to the current options
     in the service, the http handler must be loaded in the handlers map */
