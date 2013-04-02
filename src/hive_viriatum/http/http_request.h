@@ -39,6 +39,17 @@
 #define WWW_AUTHENTICATE_H "WWW-Authenticate"
 
 /**
+ * The array defining the various strings indicating
+ * the respective http protocol version according to
+ * the pre-defined enumeration.
+ */
+static const char *http_version_strings[3] = {
+    "HTTP/0.9",
+    "HTTP/1.0",
+    "HTTP/1.1"
+};
+
+/**
  * Enumeration defining the various possible
  * and "recognizable" http header types, this
  * may be used to provided static reference.
