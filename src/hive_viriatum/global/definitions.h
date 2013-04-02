@@ -160,7 +160,7 @@ static __inline char *get_config_path() {
 
 #define VIRIATUM_NAME "viriatum"
 #define VIRIATUM_VERSION TOSTRING(VIRIATUM_MAJOR) "." TOSTRING(VIRIATUM_MINOR) "." TOSTRING(VIRIATUM_MICRO) VIRIATUM_STAGE
-#define VIRIATUM_AGENT VIRIATUM_NAME "/" ## VIRIATUM_VERSION
+#define VIRIATUM_AGENT VIRIATUM_NAME ## "/" ## VIRIATUM_VERSION
 #define VIRIATUM_DESCRIPTION "Viriatum"
 #define VIRIATUM_OBSERVATIONS "Viriatum HTTP Server"
 #define VIRIATUM_COPYRIGHT "Copyright (c) 2010 Hive Solutions Lda. All rights reserved."
