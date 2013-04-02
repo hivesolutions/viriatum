@@ -29,7 +29,7 @@
 
 #include "torrent.h"
 
-ERROR_CODE _create_tracker_connection(struct connection_t **connection_pointer, struct service_t *service, char *hostname, unsigned int port, char *file_path) {
+ERROR_CODE _create_tracker_connection(struct connection_t **connection_pointer, struct service_t *service, char *url, char *file_path) {
     /* allocates space for the connection reference */
     struct connection_t *connection;
 
@@ -52,17 +52,26 @@ ERROR_CODE _create_tracker_connection(struct connection_t **connection_pointer, 
     char *params_buffer;
     size_t params_size;
 
+    struct url_static_t url_static;
+
     /* alocates dynamic space for the parameters to the
     http stream (http client) this structure will be able
     to guide the stream of http client */
     struct http_client_parameters_t *parameters;
     create_http_client_parameters(&parameters);
 
+    /* parses the provided url populating a structure with
+    the details of such url */
+    parse_url_static(url, strlen(url), &url_static);
+
     /* populates the parameters structure with the
     required values for the http client request */
     parameters->method = HTTP_GET;
 
-    memcpy(parameters->url, "/ptorrent/announce.php", 23);
+    /* copies the "parsed url from the static url structure
+    into the parameters structure, this is the url that will
+    be used for the client connection */
+    memcpy(parameters->url, url_static.path, strlen(url_static.path) + 1);
 
     /* creates the peer id from the current client version information
     plus a random number represnting the unique "visit" as defined by
@@ -146,7 +155,12 @@ ERROR_CODE _create_tracker_connection(struct connection_t **connection_pointer, 
     /* creates a general http client connection structure containing
     all the general attributes for a connection, then sets the
     "local" connection reference from the pointer */
-    _create_client_connection(connection_pointer, service, hostname, port);
+    _create_client_connection(
+        connection_pointer,
+        service,
+        url_static.host,
+        url_static.port
+    );
     connection = *connection_pointer;
 
     /* sets the http client protocol as the protocol to be
