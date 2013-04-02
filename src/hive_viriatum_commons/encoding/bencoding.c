@@ -85,10 +85,11 @@ void delete_bencoding_handler(struct bencoding_handler_t *bencoding_handler) {
 }
 
 ERROR_CODE encode_bencoding(struct type_t *type, unsigned char **encoded_puffer_pointer, size_t *encoded_buffer_length_pointer) {
-    /* allocates space for the encoded buffer reference and
-    for the string buffer reference */
+    /* allocates space for the encoded buffer reference,
+    for the string buffer reference and for its length */
     unsigned char *encoded_buffer;
     struct string_buffer_t *string_buffer;
+    size_t string_length;
 
     /* creates the string buffer an then uses it to support
     the encoding of the provided type (top level type) then
@@ -97,12 +98,13 @@ ERROR_CODE encode_bencoding(struct type_t *type, unsigned char **encoded_puffer_
     create_string_buffer(&string_buffer);
     _encode_type(type, string_buffer);
     join_string_buffer(string_buffer, &encoded_buffer);
+    string_length = string_buffer->string_length;
     delete_string_buffer(string_buffer);
 
     /* updates the references to the encoded buffer pointer and
     the reference to the encoded buffer length (from string length) */
     *encoded_puffer_pointer = encoded_buffer;
-    *encoded_buffer_length_pointer = strlen((char *) encoded_buffer);
+    *encoded_buffer_length_pointer = string_length;
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -212,11 +214,15 @@ ERROR_CODE _encode_type(struct type_t *type, struct string_buffer_t *string_buff
 
         case STRING_TYPE:
             buffer = MALLOC(16);
-            SPRINTF(buffer, 16, "%lu", (long unsigned int) strlen(type->value.value_string));
+            SPRINTF(buffer, 16, "%lu", (long unsigned int) type->size);
 
             _append_string_buffer(string_buffer, (unsigned char *) buffer);
             append_string_buffer(string_buffer, (unsigned char *) ":");
-            append_string_buffer(string_buffer, (unsigned char *) type->value.value_string);
+            append_string_l_buffer(
+                string_buffer,
+                (unsigned char *) type->value.value_string,
+                type->size
+            );
 
             break;
 
@@ -548,14 +554,17 @@ ERROR_CODE _bencoding_string_end_callback(struct bencoding_engine_t *bencoding_e
         /* creates a new type structure for the string
         and sets it with the correct string value */
         create_type(&type, STRING_TYPE);
-        *type = string_type(string);
+        *type = buffer_type(string, size);
 
         /* switches over the type of current sequence to
         execute the proper operations */
         switch(bencoding_handler->sequence->type) {
             case LIST_TYPE:
                 /* adds the current type to the list sequence */
-                append_value_linked_list(bencoding_handler->sequence->value.value_list, (void *) type);
+                append_value_linked_list(
+                    bencoding_handler->sequence->value.value_list,
+                    (void *) type
+                );
 
                 /* breaks the switch */
                 break;
@@ -563,7 +572,11 @@ ERROR_CODE _bencoding_string_end_callback(struct bencoding_engine_t *bencoding_e
             case MAP_TYPE:
                 /* sets the value in the map for the current key and sets the next key
                 flag so that the next string is saved as a key */
-                set_value_string_hash_map(bencoding_handler->sequence->value.value_map, bencoding_handler->key, (void *) type);
+                set_value_string_hash_map(
+                    bencoding_handler->sequence->value.value_map,
+                    bencoding_handler->key,
+                    (void *) type
+                );
                 bencoding_handler->next_key = 1;
 
                 /* breaks the switch */
@@ -572,7 +585,11 @@ ERROR_CODE _bencoding_string_end_callback(struct bencoding_engine_t *bencoding_e
             case SORT_MAP_TYPE:
                 /* sets the value in the map for the current key and sets the next key
                 flag so that the next string is saved as a key */
-                set_value_string_sort_map(bencoding_handler->sequence->value.value_sort_map, bencoding_handler->key, (void *) type);
+                set_value_string_sort_map(
+                    bencoding_handler->sequence->value.value_sort_map,
+                    bencoding_handler->key,
+                    (void *) type
+                );
                 bencoding_handler->next_key = 1;
 
                 /* breaks the switch */
