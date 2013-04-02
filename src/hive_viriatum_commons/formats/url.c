@@ -36,12 +36,12 @@ ERROR_CODE parse_url(char *url, size_t url_size, struct url_t *url_s) {
     unsigned char current;
     enum url_parse_state_e state;
 
-    char *mark;
-    char *pointer;
+    unsigned char *mark;
+    unsigned char *pointer;
 
-    char buffer[128];
+    unsigned char buffer[128];
 
-    mark = url;
+    mark = (unsigned char *) url;
     state = SCHEME_STATE;
 
     memset(url_s, 0, sizeof(struct url_t));
@@ -49,8 +49,8 @@ ERROR_CODE parse_url(char *url, size_t url_size, struct url_t *url_s) {
     for(index = 0; index < url_size; index++) {
         /* retrieves the current byte in iteration and the pointer
         address to the current buffer position */
-        current = url[index];
-        pointer = &url[index];
+        current = (unsigned char) url[index];
+        pointer = (unsigned char *) &url[index];
 
         switch(state) {
             case SCHEME_STATE:
