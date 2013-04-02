@@ -1020,8 +1020,8 @@ ERROR_CODE start_service(struct service_t *service) {
 
 
 
-    /*_create_tracker_connection(&tracker_connection, service, "localhost", 9090);
-    _create_torrent_connection(&torrent_connection, service, "localhost", 32967);*/
+    _create_tracker_connection(&tracker_connection, service, "hole1.hive", 9090);
+    _create_torrent_connection(&torrent_connection, service, "localhost", 32967);
 
 
 
