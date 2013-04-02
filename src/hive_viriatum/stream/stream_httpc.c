@@ -142,11 +142,6 @@ ERROR_CODE delete_http_client_parameters(struct http_client_parameters_t *http_c
 }
 
 ERROR_CODE data_handler_stream_http_client(struct io_connection_t *io_connection, unsigned char *buffer, size_t buffer_size) {
-    /* allocates space for the temporary variable to
-    hold the ammount of bytes processed in a given http
-    data parsing iteration */
-    int processed_size;
-
     /* retrieves the http client connection as the lower
     part (payload) of the io connection */
     struct http_client_connection_t *http_client_connection =\
@@ -155,7 +150,7 @@ ERROR_CODE data_handler_stream_http_client(struct io_connection_t *io_connection
     /* process the http data for the http parser, this should be
     a partial processing and some data may remain unprocessed (in
     case there are multiple http requests) */
-    processed_size = process_data_http_parser(
+    process_data_http_parser(
         http_client_connection->http_parser,
         http_client_connection->http_settings,
         buffer,
