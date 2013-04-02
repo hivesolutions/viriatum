@@ -132,3 +132,16 @@ void create_http_request(struct http_request_t **http_request_pointer);
  * @param http_request The http request to be destroyed.
  */
 void delete_http_request(struct http_request_t *http_request);
+
+/**
+ * Retrieves the string representing the http version for
+ * the given http version integer represented in the
+ * enumeration.
+ *
+ * @param http_method The http version integer to be "converted"
+ * into string representation.
+ * @return The string representation of the http version.
+ */
+static __inline const char *get_http_version_string(enum http_version_e http_version) {
+    return http_version_strings[http_version - 1];
+}
