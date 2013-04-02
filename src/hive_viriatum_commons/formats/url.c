@@ -36,10 +36,10 @@ ERROR_CODE parse_url(char *url, size_t url_size, struct url_t *url_s) {
     unsigned char current;
     enum url_parse_state_e state;
 
-    unsigned char *mark;
-    unsigned char *pointer;
+    char *mark;
+    char *pointer;
 
-    unsigned char buffer[128];
+    char buffer[128];
 
     mark = url;
     state = SCHEME_STATE;

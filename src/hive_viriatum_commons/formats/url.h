@@ -66,5 +66,5 @@ typedef enum url_parse_state_e {
     FRAGMENT_STATE
 } url_parse_state;
 
-ERROR_CODE parse_url(char *url, size_t url_size, struct url_t *url_s);
-ERROR_CODE parse_url_static(char *url, size_t url_size, struct url_static_t *url_s);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE parse_url(char *url, size_t url_size, struct url_t *url_s);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE parse_url_static(char *url, size_t url_size, struct url_static_t *url_s);
