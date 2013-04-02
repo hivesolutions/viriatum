@@ -509,3 +509,82 @@ ERROR_CODE auth_file_http(char *auth_file, char *authorization, unsigned char *r
     with no problems created in the processing */
     RAISE_NO_ERROR;
 }
+
+ERROR_CODE parameters_http(struct hash_map_t *hash_map, unsigned char **buffer_pointer, size_t *buffer_length_pointer) {
+    /* allocates space for an iterator object for an hash map element
+    and for the string buffer to be used to collect all the partial
+    strings that compose the complete url parameters string */
+    struct iterator_t *iterator;
+    struct hash_map_element_t *element;
+    struct string_buffer_t *string_buffer;
+
+    /* allocates space for the string structure to hold the value of
+    the element for the string value reference for the joined string,
+    for the buffer string from the element and for the corresponding
+    string lengths for both cases */
+    struct string_t *string;
+    unsigned char *string_value;
+    unsigned char *_buffer;
+    size_t string_length;
+    size_t _length;
+
+    /* allocates and sets the initial value on the flag that controls
+    if the iteratio to generate key values is the first one */
+    char is_first = 1;
+
+    /* creates a new string buffer and a new hash map
+    iterator, these structures are going to be used to
+    handle the string from the hash map and to iterate
+    over the hash map elements */
+    create_string_buffer(&string_buffer);
+    create_element_iterator_hash_map(hash_map, &iterator);
+
+    /* iterates continuously arround the hash map element
+    the iterator is going to stop the iteration */
+    while(1) {
+        /* retrieves the next element from the iterator
+        and in case such element is invalid breaks the loop */
+        get_next_iterator(iterator, (void **) &element);
+        if(element == NULL) { break; }
+
+        /* checks if this is the first loop in the iteration
+        in it's not emits the and character */
+        if(is_first) { is_first = 0; }
+        else { append_string_buffer(string_buffer, (unsigned char *) "&"); }
+
+        /* retrieves the current element value as a string structure
+        then encodes that value using the url encoding (percent encoding)
+        and resets the string reference to contain the new buffer as it'
+        own contents (avoids extra memory usage) */
+        string = (struct string_t *) element->value;
+        url_encode(string->buffer, string->length, &_buffer, &_length);
+        string->buffer = _buffer;
+        string->length = _length;
+
+        /* adds the various elements for the value to the string buffer
+        first the key the the attribution operator and then the value */
+        append_string_buffer(string_buffer, (unsigned char *) element->key_string);
+        append_string_l_buffer(string_buffer, (unsigned char *) "=", sizeof("=") - 1);
+        _append_string_t_buffer(string_buffer, string);
+    }
+
+    /* "joins" the string buffer values into a single
+    value (from the internal string list) and then
+    retrieves the length of the string buffer */
+    join_string_buffer(string_buffer, &string_value);
+    string_length = string_buffer->string_length;
+
+    /* deletes the hash map iterator and string buffer
+    structures, to avoid memory leak */
+    delete_iterator_hash_map(hash_map, iterator);
+    delete_string_buffer(string_buffer);
+
+    /* updates the buffer pointer reference and the
+    buffer length pointer reference with the string
+    value and the string length values */
+    *buffer_pointer = string_value;
+    *buffer_length_pointer = string_length;
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}

@@ -166,6 +166,7 @@ ERROR_CODE log_http_request(char *host, char *identity, char *user, char *method
 ERROR_CODE auth_http(char *auth_file, char *authorization, unsigned char *result);
 ERROR_CODE auth_default_http(char *auth_file, char *authorization, unsigned char *result);
 ERROR_CODE auth_file_http(char *auth_file, char *authorization, unsigned char *result);
+ERROR_CODE parameters_http(struct hash_map_t *hash_map, unsigned char **buffer_pointer, size_t *buffer_length_pointer);
 
 __inline static const char *_get_http_version_code(size_t index) {
     return http_version_codes[index];
