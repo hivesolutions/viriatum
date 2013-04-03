@@ -588,3 +588,122 @@ ERROR_CODE parameters_http(struct hash_map_t *hash_map, unsigned char **buffer_p
     /* raises no error */
     RAISE_NO_ERROR;
 }
+
+ERROR_CODE parameters_http_c(char *buffer, size_t size, size_t count, ...) {
+    /* allocates space for the variable list of arguments
+    provided as arguments to this function and tha should
+    contain sequences of key, value and length */
+    va_list arguments;
+
+    /* allocates space for the various indexes to be
+    used in the iteration including the sequence offset
+    and the global index counter */
+    size_t index;
+    size_t index_g;
+    size_t offset;
+
+    /* allocates space for the three components of the
+    parameter the key, the value and the length of the
+    provided value buffer (it's not null terminated) */
+    char *key;
+    char *buffer;
+    size_t length;
+
+    /* allocates space for the pointer to the buffer that
+    will hold the created parameters string */
+    char *params_buffer;
+    size_t params_size;
+
+    /* creates space for the pointer to the map that will
+    contain all the arranjed sequence of keys and values
+    representing the various parameters */
+    struct hash_map_t *parameters_map;
+
+    /* statically allocates space in the heap for the various
+    value strings representing the parameter values */
+    struct string_t strings[256];
+
+    /* in case the number of tuples provided as arguments is
+    more that the space available for the value strings must
+    fail with an error otherwise a buffer overflow occurs */
+    if(count > 256) {
+        RAISE_ERROR_M(
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Problem creating parameters"
+        );
+    }
+
+    /* multiplies the count by three as it must contain
+    the real number of arguments and not just the number
+    of tuples of three in it */
+    count *= 3;
+
+    /* creates the hash map that is going to be used to
+    temporarly store the various key value associations */
+    create_hash_map(&parameters_map, 0);
+
+    /* iteterates over the sequence of dynamic arguments
+    provided to the function to retrieve them as sequences
+    of key, value and length, then sets them in the map
+    representing the various parameters */
+    va_start(arguments, count);
+    for(index = 0; index < count; index++) {
+        offset = index % 3;
+        index_g = index / 3;
+
+        switch(offset) {
+            case 0:
+                key = va_arg(arguments, char *);
+                break;
+
+            case 1:
+                buffer = va_arg(arguments, char *);
+                strings[index_g].buffer = (unsigned char *) buffer;
+                break;
+
+            case 2:
+                length = va_arg(arguments, size_t);
+                strings[index_g].length = length;
+
+                set_value_string_hash_map(
+                    parameters_map, key, (void *) &strings[index_g]
+                );
+
+                break;
+        }
+    }
+    va_end(arguments);
+
+    /* generates the (get) parameters for an http request
+    from the provided hash map of key values, the returned
+    buffer is owned by the caller and must be released */
+    parameters_http(
+        parameters_map,
+        (unsigned char **) &params_buffer,
+        &params_size
+    );
+    delete_hash_map(parameters_map);
+
+    /* in case the amount of bytes to be copied from the
+    dynamically created params buffer to the buffer is
+    greater than the size provided raises an error */
+    if(params_size > size - 1) {
+        FREE(params_buffer);
+        RAISE_ERROR_M(
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Problem creating parameters"
+        );
+    }
+
+    /* copies the generated params buffer into the final
+    buffer defined in the parameters structure, then closes
+    the string with the final character and releases the
+    temporary buffer (params buffer) */
+    memcpy(buffer, params_buffer, params_size);
+    parameters[params_size] = '\0';
+    FREE(params_buffer);
+
+    /* raises no error as the creation of the parameters
+    buffer has completed with success */
+    RAISE_NO_ERROR;
+}

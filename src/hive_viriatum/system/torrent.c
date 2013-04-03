@@ -46,12 +46,9 @@ ERROR_CODE _create_tracker_connection(struct connection_t **connection_pointer, 
     unsigned char info_hash[SHA1_DIGEST_SIZE + 1];
     unsigned char random[12];
     unsigned char peer_id[21];
-    struct string_t strings[9];
-    struct hash_map_t *parameters_map;
 
-    char *params_buffer;
-    size_t params_size;
-
+    /* sets space for the static structure tht will hold the
+    various url components parsed from the url string */
     struct url_static_t url_static;
 
     /* alocates dynamic space for the parameters to the
@@ -115,42 +112,22 @@ ERROR_CODE _create_tracker_connection(struct connection_t **connection_pointer, 
     free_type(type);
     FREE(_buffer);
 
-    /* tenho de fazer gerador de get parameters !!!! */
-    /* pega nas chaves e nos valores do hash map e gera a get string para um string buffer */
-    create_hash_map(&parameters_map, 0);
-    strings[0].buffer = info_hash;
-    strings[0].length = 20;
-    strings[1].buffer = peer_id;
-    strings[1].length = 20;
-    strings[2].buffer = (unsigned char *) "9090";
-    strings[2].length = sizeof("9090") - 1;
-    strings[3].buffer = (unsigned char *) "0";
-    strings[3].length = sizeof("0") - 1;
-    strings[4].buffer = (unsigned char *) "0";
-    strings[4].length = sizeof("0") - 1;
-    strings[5].buffer = (unsigned char *) "222904320"; /* must calculate this value */
-    strings[5].length = sizeof("222904320") - 1; /* must calculate this value */
-    strings[6].buffer = (unsigned char *) "0";
-    strings[6].length = sizeof("0") - 1;
-    strings[7].buffer = (unsigned char *) "0";
-    strings[7].length = sizeof("0") - 1;
-    strings[8].buffer = (unsigned char *) "started";
-    strings[8].length = sizeof("started") - 1;
-    set_value_string_hash_map(parameters_map, (unsigned char *) "info_hash", (void *) &strings[0]);
-    set_value_string_hash_map(parameters_map, (unsigned char *) "peer_id", (void *) &strings[1]);
-    set_value_string_hash_map(parameters_map, (unsigned char *) "port", (void *) &strings[2]);
-    set_value_string_hash_map(parameters_map, (unsigned char *) "uploaded", (void *) &strings[3]);
-    set_value_string_hash_map(parameters_map, (unsigned char *) "downloaded", (void *) &strings[4]);
-    set_value_string_hash_map(parameters_map, (unsigned char *) "left", (void *) &strings[5]);
-    set_value_string_hash_map(parameters_map, (unsigned char *) "compact", (void *) &strings[6]);
-    set_value_string_hash_map(parameters_map, (unsigned char *) "no_peer_id", (void *) &strings[7]);
-    set_value_string_hash_map(parameters_map, (unsigned char *) "event", (void *) &strings[8]);
-    parameters_http(parameters_map, (unsigned char **) &params_buffer, &params_size);
-    delete_hash_map(parameters_map);
-
-    memcpy(parameters->params, params_buffer, params_size);
-    parameters->params[params_size] = '\0';
-    FREE(params_buffer);
+    /* creates the params (paramters) string from the provided
+    sequence of key values, this is an automator utility function
+    for the creation of the string and the provided buffer should
+    have been previously allocated with enough space */
+    parameters_http_c(
+        parameters->params, VIRIATUM_MAX_URL_SIZE, 9,
+        "info_hash", info_hash, 20,
+        "peer_id", peer_id, 20,
+        "port", "9090", sizeof("9090") - 1,
+        "uploaded", "0", sizeof("0") - 1,
+        "downloaded", "0", sizeof("0") - 1,
+        "left", "222904320", sizeof("222904320") - 1,
+        "compact", "0", sizeof("0") - 1,
+        "no_peer_id", "0", sizeof("0") - 1,
+        "event", "started", sizeof("started") - 1
+    );
 
     /* creates a general http client connection structure containing
     all the general attributes for a connection, then sets the
