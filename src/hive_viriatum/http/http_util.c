@@ -605,9 +605,9 @@ ERROR_CODE parameters_http_c(char *buffer, size_t size, size_t count, ...) {
     /* allocates space for the three components of the
     parameter the key, the value and the length of the
     provided value buffer (it's not null terminated) */
-    char *key;
-    char *buffer;
-    size_t length;
+    char *key_s;
+    char *buffer_s;
+    size_t length_s;
 
     /* allocates space for the pointer to the buffer that
     will hold the created parameters string */
@@ -653,20 +653,20 @@ ERROR_CODE parameters_http_c(char *buffer, size_t size, size_t count, ...) {
 
         switch(offset) {
             case 0:
-                key = va_arg(arguments, char *);
+                key_s = va_arg(arguments, char *);
                 break;
 
             case 1:
-                buffer = va_arg(arguments, char *);
-                strings[index_g].buffer = (unsigned char *) buffer;
+                buffer_s = va_arg(arguments, char *);
+                strings[index_g].buffer = (unsigned char *) buffer_s;
                 break;
 
             case 2:
-                length = va_arg(arguments, size_t);
-                strings[index_g].length = length;
+                length_s = va_arg(arguments, size_t);
+                strings[index_g].length = length_s;
 
                 set_value_string_hash_map(
-                    parameters_map, key, (void *) &strings[index_g]
+                    parameters_map, key_s, (void *) &strings[index_g]
                 );
 
                 break;
@@ -700,7 +700,7 @@ ERROR_CODE parameters_http_c(char *buffer, size_t size, size_t count, ...) {
     the string with the final character and releases the
     temporary buffer (params buffer) */
     memcpy(buffer, params_buffer, params_size);
-    parameters[params_size] = '\0';
+    buffer[params_size] = '\0';
     FREE(params_buffer);
 
     /* raises no error as the creation of the parameters
