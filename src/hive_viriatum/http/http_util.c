@@ -619,7 +619,7 @@ ERROR_CODE parameters_http_c(char *buffer, size_t size, size_t count, ...) {
     representing the various parameters */
     struct hash_map_t *parameters_map;
 
-    /* statically allocates space in the heap for the various
+    /* statically allocates space in the stack for the various
     value strings representing the parameter values */
     struct string_t strings[256];
 
