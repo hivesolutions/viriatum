@@ -36,10 +36,12 @@ void create_linked_list(struct linked_list_t **linked_list_pointer) {
     /* allocates space for the linked list */
     struct linked_list_t *linked_list = (struct linked_list_t *) MALLOC(linked_list_size);
 
-    /* initializes the linked list size */
+    /* initializes the linked list size to the initial
+	zero value (starts as empty) */
     linked_list->size = 0;
 
-    /* sets the first and last elements of the linked list to null */
+    /* sets the first and last elements of the linked
+	list to null (no values in the list) */
     linked_list->first = NULL;
     linked_list->last = NULL;
 
@@ -48,28 +50,28 @@ void create_linked_list(struct linked_list_t **linked_list_pointer) {
 }
 
 void delete_linked_list(struct linked_list_t *linked_list) {
-    /* allocates space for the index */
+    /* allocates space for the index and for the
+	temporary next node variable */
     unsigned int index;
-
-    /* allocates space for the next node */
     struct linked_list_node_t *next_node;
 
-    /* sets the initial iteration node */
+    /* sets the initial iteration node as
+	the first element from the linked list */
     struct linked_list_node_t *current_node = linked_list->first;
 
-    /* iterates over the index value */
+    /* iterates over the complete set of nodes in
+	the linked list (list range) to delete them */
     for(index = 0; index < linked_list->size; index++) {
-        /* retrieves the next node */
+        /* retrieves the next node and deletes the current one
+		then sets the next node as the current one in order
+		to be able to continue the iteration */
         next_node = current_node->next;
-
-        /* deletes the linked list node */
         delete_linked_list_node(current_node);
-
-        /* sets the current node as the next node */
         current_node = next_node;
     }
 
-    /* releases the linked list */
+    /* releases the linked list avoiding ny memory
+	leak from the internal structure */
     FREE(linked_list);
 }
 
@@ -78,16 +80,20 @@ void create_linked_list_node(struct linked_list_node_t **linked_list_node_pointe
     size_t linked_list_node_size = sizeof(struct linked_list_node_t);
 
     /* allocates space for the linked list node */
-    struct linked_list_node_t *linked_list_node = (struct linked_list_node_t *) MALLOC(linked_list_node_size);
+    struct linked_list_node_t *linked_list_node =\
+		(struct linked_list_node_t *) MALLOC(linked_list_node_size);
 
-    /* initializes the linked list node value */
+    /* initializes the linked list node value to an unset
+	value (there's no value currently set) */
     linked_list_node->value = NULL;
 
-    /* sets the next and previous elements of the linked list node to null */
+    /* sets the next and previous elements of the node
+	to null as there is no reference for where it is located */
     linked_list_node->next = NULL;
     linked_list_node->previous = NULL;
 
-    /* sets the linked list node in the linked list node pointer */
+    /* sets the linked list node in the linked list
+	node pointer, "returning" it to the caller function */
     *linked_list_node_pointer = linked_list_node;
 }
 
@@ -97,28 +103,28 @@ void delete_linked_list_node(struct linked_list_node_t *linked_list_node) {
 }
 
 void clear_linked_list(struct linked_list_t *linked_list) {
-    /* allocates space for the index */
+    /* allocates space for the index and for the
+	temporary next node variable */
     unsigned int index;
-
-    /* allocates space for the next node */
     struct linked_list_node_t *next_node;
 
-    /* sets the initial iteration node */
+    /* sets the initial iteration node as
+	the first element from the linked list */
     struct linked_list_node_t *current_node = linked_list->first;
 
-    /* iterates over the index value */
+    /* iterates over the complete set of nodes in
+	the linked list (list range) to delete them */
     for(index = 0; index < linked_list->size; index++) {
-        /* retrieves the next node */
+        /* retrieves the next node and deletes the current one
+		then sets the next node as the current one in order
+		to be able to continue the iteration */
         next_node = current_node->next;
-
-        /* deletes the linked list node */
         delete_linked_list_node(current_node);
-
-        /* sets the current node as the next node */
         current_node = next_node;
     }
 
-    /* resets the linked list size */
+    /* resets the linked list size to the original
+	empty value of zero */
     linked_list->size = 0;
 }
 
@@ -201,16 +207,12 @@ void remove_linked_list(struct linked_list_t *linked_list, struct linked_list_no
     /* allocates space for the next node */
     struct linked_list_node_t *next_node;
 
-    /* in case the linked list node is invalid */
-    if(linked_list_node == NULL) {
-        /* returns immediately */
-        return;
-    }
+    /* in case the linked list node is invalid
+	must return immediately to avoid problems */
+    if(linked_list_node == NULL) { return; }
 
-    /* retrieves the previous node */
+    /* retrieves both the previous and the next nodes */
     previous_node = linked_list_node->previous;
-
-    /* retrieves the next node */
     next_node = linked_list_node->next;
 
     /* in case the previous node is valid */
