@@ -335,7 +335,7 @@ ERROR_CODE url_callback_handler_dispatch(struct http_parser_t *http_parser, cons
 			    http_connection->http_settings->on_location,
 				http_parser,
 				index,
-				match_size
+				virtual_url_offset
 			);
             CALL_V(
 				http_connection->http_settings->on_virtual_url,
