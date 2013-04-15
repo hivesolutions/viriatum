@@ -184,6 +184,7 @@ ERROR_CODE url_callback_handler_dispatch(struct http_parser_t *http_parser, cons
     size_t index;
     size_t _index;
     size_t match_size;
+	size_t virtual_url_offset;
     int offsets[3] = { 0, 0, 0 };
     char regex_match = 0;
 #endif
@@ -324,8 +325,24 @@ ERROR_CODE url_callback_handler_dispatch(struct http_parser_t *http_parser, cons
         both the index of the location in the service locations and the
         offset in the matched path of the url for virtual path resolution */
         if(regex_match) {
-            CALL_V(http_connection->http_settings->on_location, http_parser, index, match_size);
-            CALL_V(http_connection->http_settings->on_virtual_url, http_parser, data + match_size, data_size - match_size);
+			/* calculates the offset to the virtual url taking into account
+			if the matched value starts with a slash value for such cases the
+			offset to the virtual url must be reduced otherwise abnormal values
+			to the url would be considered (creating additional path problems) */
+			virtual_url_offset = match_size > 0 && data[match_size - 1] == '/' ?\
+			    match_size - 1 : match_size;
+            CALL_V(
+			    http_connection->http_settings->on_location,
+				http_parser,
+				index,
+				match_size
+			);
+            CALL_V(
+				http_connection->http_settings->on_virtual_url,
+				http_parser,
+				data + virtual_url_offset,
+				data_size - virtual_url_offset
+			);
         }
 #endif
     } else {
