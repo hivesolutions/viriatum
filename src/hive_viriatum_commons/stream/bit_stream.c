@@ -29,7 +29,7 @@
 
 #include "bit_stream.h"
 
-VIRIATUM_EXPORT_PREFIX void create_bit_stream(struct bit_stream_t **bit_stream_pointer, struct stream_t *stream) {
+void create_bit_stream(struct bit_stream_t **bit_stream_pointer, struct stream_t *stream) {
     /* retrieves the bit stream size */
     size_t bit_stream_size = sizeof(struct bit_stream_t);
 
@@ -57,12 +57,12 @@ VIRIATUM_EXPORT_PREFIX void create_bit_stream(struct bit_stream_t **bit_stream_p
     *bit_stream_pointer = bit_stream;
 }
 
-VIRIATUM_EXPORT_PREFIX void delete_bit_stream(struct bit_stream_t *bit_stream) {
+void delete_bit_stream(struct bit_stream_t *bit_stream) {
     /* releases the bit stream */
     FREE(bit_stream);
 }
 
-VIRIATUM_EXPORT_PREFIX void open_bit_stream(struct bit_stream_t *bit_stream) {
+void open_bit_stream(struct bit_stream_t *bit_stream) {
     /* retrieves the (inner) stream from the bit stream */
     struct stream_t *stream = bit_stream->stream;
 
@@ -70,7 +70,7 @@ VIRIATUM_EXPORT_PREFIX void open_bit_stream(struct bit_stream_t *bit_stream) {
     stream->open(stream);
 }
 
-VIRIATUM_EXPORT_PREFIX void close_bit_stream(struct bit_stream_t *bit_stream) {
+void close_bit_stream(struct bit_stream_t *bit_stream) {
     /* retrieves the (inner) stream from the bit stream */
     struct stream_t *stream = bit_stream->stream;
 
@@ -81,13 +81,13 @@ VIRIATUM_EXPORT_PREFIX void close_bit_stream(struct bit_stream_t *bit_stream) {
     stream->close(stream);
 }
 
-VIRIATUM_EXPORT_PREFIX void read_bit_stream(struct bit_stream_t *bit_stream, unsigned char *buffer, size_t count, size_t *read_count) {
+void read_bit_stream(struct bit_stream_t *bit_stream, unsigned char *buffer, size_t count, size_t *read_count) {
 }
 
-VIRIATUM_EXPORT_PREFIX void write_bit_stream(struct bit_stream_t *bit_stream, unsigned char *buffer, size_t size) {
+void write_bit_stream(struct bit_stream_t *bit_stream, unsigned char *buffer, size_t size) {
 }
 
-VIRIATUM_EXPORT_PREFIX void write_byte_bit_stream(struct bit_stream_t *bit_stream, unsigned char byte, unsigned char size) {
+void write_byte_bit_stream(struct bit_stream_t *bit_stream, unsigned char byte, unsigned char size) {
     /* calculates the number of available bits (count) and
     then used it to calculate the number of extra bits */
     unsigned char available_bits_count = BIT_STREAM_ITEM_SIZE - bit_stream->current_byte_offset_write;
@@ -119,11 +119,9 @@ VIRIATUM_EXPORT_PREFIX void write_byte_bit_stream(struct bit_stream_t *bit_strea
     /* checks the stream for the need to write (flush) */
     flush_write_bit_stream(bit_stream);
 
-    /* in case there are no extra bits to be written */
-    if(extra_bits_count == 0) {
-        /* returns immediately */
-        return;
-    }
+    /* in case there are no extra bits to be written
+	must return immediately */
+    if(extra_bits_count == 0) { return; }
 
     /* sets the current byte as the extra bits value creates
     a mask to mask the byte and "show" only the extra bits */
@@ -134,16 +132,16 @@ VIRIATUM_EXPORT_PREFIX void write_byte_bit_stream(struct bit_stream_t *bit_strea
     bit_stream->current_byte_offset_write += extra_bits_count;
 }
 
-VIRIATUM_EXPORT_PREFIX void flush_write_bit_stream(struct bit_stream_t *bit_stream) {
+void flush_write_bit_stream(struct bit_stream_t *bit_stream) {
     /* in case the bit counter (for write) hasn't reached
-    the limit no flush is required (no complete byte available) */
+    the limit no flush is required (no complete byte available)
+	and so must return immediately */
     if(bit_stream->current_byte_offset_write != BIT_STREAM_ITEM_SIZE) {
-        /* returns immediately */
         return;
     }
 
     /* sets the buffer stream value */
-    bit_stream->buffer[bit_stream->byte_counter_write]= bit_stream->current_byte_write;
+    bit_stream->buffer[bit_stream->byte_counter_write] = bit_stream->current_byte_write;
 
     /* resets the various bit stream write
     byte oriented structures */
@@ -158,14 +156,15 @@ VIRIATUM_EXPORT_PREFIX void flush_write_bit_stream(struct bit_stream_t *bit_stre
     }
 }
 
-VIRIATUM_EXPORT_PREFIX void flush_bit_stream(struct bit_stream_t *bit_stream) {
+void flush_bit_stream(struct bit_stream_t *bit_stream) {
     /* retrieves the (inner) stream from the bit stream */
     struct stream_t *stream = bit_stream->stream;
 
     /* in case there is a (partial) byte waiting to be writen */
     if(bit_stream->current_byte_offset_write > 0) {
-        // sets the write buffer value
-        bit_stream->buffer[bit_stream->byte_counter_write] = bit_stream->current_byte_write << (BIT_STREAM_ITEM_SIZE - bit_stream->current_byte_offset_write);
+        /* sets the write buffer value */
+        bit_stream->buffer[bit_stream->byte_counter_write] =\
+			bit_stream->current_byte_write << (BIT_STREAM_ITEM_SIZE - bit_stream->current_byte_offset_write);
 
         /* resets the various bit stream write
         byte oriented structures */

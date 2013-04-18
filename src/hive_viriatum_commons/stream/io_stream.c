@@ -29,7 +29,7 @@
 
 #include "io_stream.h"
 
-VIRIATUM_EXPORT_PREFIX void create_stream(struct stream_t **stream_pointer) {
+void create_stream(struct stream_t **stream_pointer) {
     /* retrieves the stream size */
     size_t stream_size = sizeof(struct stream_t);
 
@@ -40,7 +40,7 @@ VIRIATUM_EXPORT_PREFIX void create_stream(struct stream_t **stream_pointer) {
     *stream_pointer = stream;
 }
 
-VIRIATUM_EXPORT_PREFIX void delete_stream(struct stream_t *stream) {
+void delete_stream(struct stream_t *stream) {
     /* releases the stream */
     FREE(stream);
 }

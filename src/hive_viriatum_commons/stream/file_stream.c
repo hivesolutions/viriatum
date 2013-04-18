@@ -29,7 +29,7 @@
 
 #include "file_stream.h"
 
-VIRIATUM_EXPORT_PREFIX void create_file_stream(struct file_stream_t **file_stream_pointer, unsigned char *file_path, unsigned char *mode) {
+void create_file_stream(struct file_stream_t **file_stream_pointer, unsigned char *file_path, unsigned char *mode) {
     /* retrieves the file stream size */
     size_t file_stream_size = sizeof(struct file_stream_t);
 
@@ -56,7 +56,7 @@ VIRIATUM_EXPORT_PREFIX void create_file_stream(struct file_stream_t **file_strea
     *file_stream_pointer = file_stream;
 }
 
-VIRIATUM_EXPORT_PREFIX void delete_file_stream(struct file_stream_t *file_stream) {
+void delete_file_stream(struct file_stream_t *file_stream) {
     /* closes the file reference */
     fclose(file_stream->file);
 
@@ -67,11 +67,11 @@ VIRIATUM_EXPORT_PREFIX void delete_file_stream(struct file_stream_t *file_stream
     FREE(file_stream);
 }
 
-VIRIATUM_EXPORT_PREFIX struct stream_t *get_stream_file_stream(struct file_stream_t *file_stream) {
+struct stream_t *get_stream_file_stream(struct file_stream_t *file_stream) {
     return file_stream->stream;
 }
 
-VIRIATUM_EXPORT_PREFIX void open_file_stream(struct stream_t *stream) {
+void open_file_stream(struct stream_t *stream) {
     /* retrieves the file stream from the stream (as the lowe substrate) */
     struct file_stream_t *file_stream = (struct file_stream_t *) stream->lower;
 
@@ -79,7 +79,7 @@ VIRIATUM_EXPORT_PREFIX void open_file_stream(struct stream_t *stream) {
     FOPEN(&file_stream->file, (char *) file_stream->file_path, (char *) file_stream->mode);
 }
 
-VIRIATUM_EXPORT_PREFIX void close_file_stream(struct stream_t *stream) {
+void close_file_stream(struct stream_t *stream) {
     /* retrieves the file stream from the stream (as the lowe substrate) */
     struct file_stream_t *file_stream = (struct file_stream_t *) stream->lower;
 
@@ -87,7 +87,7 @@ VIRIATUM_EXPORT_PREFIX void close_file_stream(struct stream_t *stream) {
     fclose(file_stream->file);
 }
 
-VIRIATUM_EXPORT_PREFIX size_t read_file_stream(struct stream_t *stream, unsigned char *buffer, size_t size) {
+size_t read_file_stream(struct stream_t *stream, unsigned char *buffer, size_t size) {
     /* retrieves the file stream from the stream (as the lowe substrate) */
     struct file_stream_t *file_stream = (struct file_stream_t *) stream->lower;
 
@@ -95,7 +95,7 @@ VIRIATUM_EXPORT_PREFIX size_t read_file_stream(struct stream_t *stream, unsigned
     return fread(buffer, sizeof(unsigned char), size, file_stream->file);
 }
 
-VIRIATUM_EXPORT_PREFIX size_t write_file_stream(struct stream_t *stream, unsigned char *buffer, size_t size) {
+size_t write_file_stream(struct stream_t *stream, unsigned char *buffer, size_t size) {
     /* retrieves the file stream from the stream (as the lowe substrate) */
     struct file_stream_t *file_stream = (struct file_stream_t *) stream->lower;
 
@@ -103,7 +103,7 @@ VIRIATUM_EXPORT_PREFIX size_t write_file_stream(struct stream_t *stream, unsigne
     return fwrite(buffer, sizeof(unsigned char), size, file_stream->file);
 }
 
-VIRIATUM_EXPORT_PREFIX void flush_file_stream(struct stream_t *stream) {
+void flush_file_stream(struct stream_t *stream) {
     /* retrieves the file stream from the stream (as the lowe substrate) */
     struct file_stream_t *file_stream = (struct file_stream_t *) stream->lower;
 
