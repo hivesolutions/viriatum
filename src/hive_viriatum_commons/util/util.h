@@ -30,4 +30,5 @@
 #include "arguments_util.h"
 #include "dump_util.h"
 #include "function_util.h"
+#include "random_util.h"
 #include "string_util.h"

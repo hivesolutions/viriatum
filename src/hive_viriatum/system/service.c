@@ -543,7 +543,7 @@ ERROR_CODE start_service(struct service_t *service) {
     /* registers the signal handler for the service, this must
     be done at this stage so that no module creates problems and
     overrides the default signal handlers */
-    CALL_V(service->register_signals);
+    CALL_F(service->register_signals);
 
     /* sets the current http handler accoring to the current options
     in the service, the http handler must be loaded in the handlers map */
@@ -1020,8 +1020,19 @@ ERROR_CODE start_service(struct service_t *service) {
 
 
 
-    /*_create_tracker_connection(&tracker_connection, service, "localhost", 9090);
-    _create_torrent_connection(&torrent_connection, service, "localhost", 32967);*/
+    _create_tracker_connection(
+        &tracker_connection,
+        service,
+        "http://hole1.hive:9090/ptorrent/announce.php",
+        "C:/Users/joamag/Downloads/scudum.iso.torrent"
+    );
+
+    _create_torrent_connection(
+        &torrent_connection,
+        service,
+        "localhost",
+        32967
+    );
 
 
 

@@ -509,3 +509,201 @@ ERROR_CODE auth_file_http(char *auth_file, char *authorization, unsigned char *r
     with no problems created in the processing */
     RAISE_NO_ERROR;
 }
+
+ERROR_CODE parameters_http(struct hash_map_t *hash_map, unsigned char **buffer_pointer, size_t *buffer_length_pointer) {
+    /* allocates space for an iterator object for an hash map element
+    and for the string buffer to be used to collect all the partial
+    strings that compose the complete url parameters string */
+    struct iterator_t *iterator;
+    struct hash_map_element_t *element;
+    struct string_buffer_t *string_buffer;
+
+    /* allocates space for the string structure to hold the value of
+    the element for the string value reference for the joined string,
+    for the buffer string from the element and for the corresponding
+    string lengths for both cases */
+    struct string_t *string;
+    unsigned char *string_value;
+    unsigned char *_buffer;
+    size_t string_length;
+    size_t _length;
+
+    /* allocates and sets the initial value on the flag that controls
+    if the iteratio to generate key values is the first one */
+    char is_first = 1;
+
+    /* creates a new string buffer and a new hash map
+    iterator, these structures are going to be used to
+    handle the string from the hash map and to iterate
+    over the hash map elements */
+    create_string_buffer(&string_buffer);
+    create_element_iterator_hash_map(hash_map, &iterator);
+
+    /* iterates continuously arround the hash map element
+    the iterator is going to stop the iteration */
+    while(1) {
+        /* retrieves the next element from the iterator
+        and in case such element is invalid breaks the loop */
+        get_next_iterator(iterator, (void **) &element);
+        if(element == NULL) { break; }
+
+        /* checks if this is the first loop in the iteration
+        in it's not emits the and character */
+        if(is_first) { is_first = 0; }
+        else { append_string_buffer(string_buffer, (unsigned char *) "&"); }
+
+        /* retrieves the current element value as a string structure
+        then encodes that value using the url encoding (percent encoding)
+        and resets the string reference to contain the new buffer as it'
+        own contents (avoids extra memory usage) */
+        string = (struct string_t *) element->value;
+        url_encode(string->buffer, string->length, &_buffer, &_length);
+        string->buffer = _buffer;
+        string->length = _length;
+
+        /* adds the various elements for the value to the string buffer
+        first the key the the attribution operator and then the value */
+        append_string_buffer(string_buffer, (unsigned char *) element->key_string);
+        append_string_l_buffer(string_buffer, (unsigned char *) "=", sizeof("=") - 1);
+        _append_string_t_buffer(string_buffer, string);
+    }
+
+    /* "joins" the string buffer values into a single
+    value (from the internal string list) and then
+    retrieves the length of the string buffer */
+    join_string_buffer(string_buffer, &string_value);
+    string_length = string_buffer->string_length;
+
+    /* deletes the hash map iterator and string buffer
+    structures, to avoid memory leak */
+    delete_iterator_hash_map(hash_map, iterator);
+    delete_string_buffer(string_buffer);
+
+    /* updates the buffer pointer reference and the
+    buffer length pointer reference with the string
+    value and the string length values */
+    *buffer_pointer = string_value;
+    *buffer_length_pointer = string_length;
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE parameters_http_c(char *buffer, size_t size, size_t count, ...) {
+    /* allocates space for the variable list of arguments
+    provided as arguments to this function and tha should
+    contain sequences of key, value and length */
+    va_list arguments;
+
+    /* allocates space for the various indexes to be
+    used in the iteration including the sequence offset
+    and the global index counter */
+    size_t index;
+    size_t index_g;
+    size_t offset;
+
+    /* allocates space for the three components of the
+    parameter the key, the value and the length of the
+    provided value buffer (it's not null terminated) */
+    char *key_s;
+    char *buffer_s;
+    size_t length_s;
+
+    /* allocates space for the pointer to the buffer that
+    will hold the created parameters string */
+    char *params_buffer;
+    size_t params_size;
+
+    /* creates space for the pointer to the map that will
+    contain all the arranjed sequence of keys and values
+    representing the various parameters */
+    struct hash_map_t *parameters_map;
+
+    /* statically allocates space in the stack for the various
+    value strings representing the parameter values */
+    struct string_t strings[256];
+
+    /* in case the number of tuples provided as arguments is
+    more that the space available for the value strings must
+    fail with an error otherwise a buffer overflow occurs */
+    if(count > 256) {
+        RAISE_ERROR_M(
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Problem creating parameters"
+        );
+    }
+
+    /* multiplies the count by three as it must contain
+    the real number of arguments and not just the number
+    of tuples of three in it */
+    count *= 3;
+
+    /* creates the hash map that is going to be used to
+    temporarly store the various key value associations */
+    create_hash_map(&parameters_map, 0);
+
+    /* iteterates over the sequence of dynamic arguments
+    provided to the function to retrieve them as sequences
+    of key, value and length, then sets them in the map
+    representing the various parameters */
+    va_start(arguments, count);
+    for(index = 0; index < count; index++) {
+        offset = index % 3;
+        index_g = index / 3;
+
+        switch(offset) {
+            case 0:
+                key_s = va_arg(arguments, char *);
+                break;
+
+            case 1:
+                buffer_s = va_arg(arguments, char *);
+                strings[index_g].buffer = (unsigned char *) buffer_s;
+                break;
+
+            case 2:
+                length_s = va_arg(arguments, size_t);
+                strings[index_g].length = length_s;
+
+                set_value_string_hash_map(
+                    parameters_map, key_s, (void *) &strings[index_g]
+                );
+
+                break;
+        }
+    }
+    va_end(arguments);
+
+    /* generates the (get) parameters for an http request
+    from the provided hash map of key values, the returned
+    buffer is owned by the caller and must be released */
+    parameters_http(
+        parameters_map,
+        (unsigned char **) &params_buffer,
+        &params_size
+    );
+    delete_hash_map(parameters_map);
+
+    /* in case the amount of bytes to be copied from the
+    dynamically created params buffer to the buffer is
+    greater than the size provided raises an error */
+    if(params_size > size - 1) {
+        FREE(params_buffer);
+        RAISE_ERROR_M(
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Problem creating parameters"
+        );
+    }
+
+    /* copies the generated params buffer into the final
+    buffer defined in the parameters structure, then closes
+    the string with the final character and releases the
+    temporary buffer (params buffer) */
+    memcpy(buffer, params_buffer, params_size);
+    buffer[params_size] = '\0';
+    FREE(params_buffer);
+
+    /* raises no error as the creation of the parameters
+    buffer has completed with success */
+    RAISE_NO_ERROR;
+}

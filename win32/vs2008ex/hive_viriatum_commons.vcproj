@@ -702,6 +702,10 @@
                     RelativePath="..\..\src\hive_viriatum_commons\formats\passwd.c"
                     >
                 </File>
+                <File
+                    RelativePath="..\..\src\hive_viriatum_commons\formats\url.c"
+                    >
+                </File>
             </Filter>
         </Filter>
         <Filter
@@ -913,6 +917,10 @@
                     >
                 </File>
                 <File
+                    RelativePath="..\..\src\hive_viriatum_commons\util\random_util.h"
+                    >
+                </File>
+                <File
                     RelativePath="..\..\src\hive_viriatum_commons\util\string_util.h"
                     >
                 </File>
@@ -1074,6 +1082,10 @@
                 </File>
                 <File
                     RelativePath="..\..\src\hive_viriatum_commons\formats\passwd.h"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\hive_viriatum_commons\formats\url.h"
                     >
                 </File>
             </Filter>

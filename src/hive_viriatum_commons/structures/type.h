@@ -122,13 +122,20 @@ typedef struct type_t {
     enum type_e type;
 
     /**
-     * The value or a pointer to the
-     * value of the current type.
+     * The value or a pointer to the value
+     * of the current type.
      * It's important to interpret the type
      * value before acessing the correct
      * value in the union.
      */
     union type_value_t value;
+
+    /**
+     * The size of the value, this value is
+     * only required to be set for certain data
+     * types (eg: string buffers).
+     */
+    size_t size;
 } type;
 
 VIRIATUM_EXPORT_PREFIX void create_type(struct type_t **type_pointer, enum type_e _type);
@@ -139,6 +146,7 @@ VIRIATUM_EXPORT_PREFIX ERROR_CODE print_type(struct type_t *type);
 VIRIATUM_EXPORT_PREFIX struct type_t integer_type(int value);
 VIRIATUM_EXPORT_PREFIX struct type_t float_type(float value);
 VIRIATUM_EXPORT_PREFIX struct type_t string_type(char *value);
+VIRIATUM_EXPORT_PREFIX struct type_t buffer_type(char *value, size_t size);
 VIRIATUM_EXPORT_PREFIX struct type_t map_type(struct hash_map_t *value);
 VIRIATUM_EXPORT_PREFIX struct type_t sort_map_type(struct sort_map_t *value);
 VIRIATUM_EXPORT_PREFIX struct type_t list_type(struct linked_list_t *value);

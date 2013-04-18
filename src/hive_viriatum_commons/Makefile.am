@@ -49,6 +49,7 @@ encoding/base_64.c \
 encoding/bencoding.c \
 encoding/percent.c \
 formats/passwd.c \
+formats/url.c \
 ini/ini.c \
 io/file.c \
 jni/info.c \
@@ -86,6 +87,7 @@ encoding/base_64.c \
 encoding/bencoding.c \
 encoding/percent.c \
 formats/passwd.c \
+formats/url.c \
 ini/ini.c \
 io/file.c \
 jni/info.c \

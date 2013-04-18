@@ -29,6 +29,11 @@
 
 #include "stream_httpc.h"
 
+
+/* THESE ARE TEMPORARY !!!!! */
+
+/* ----------------------------------------- */
+
 ERROR_CODE body_callback_handler_client(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
     struct type_t *type;
 
@@ -45,7 +50,7 @@ ERROR_CODE message_complete_callback_handler_client(struct http_parser_t *http_p
     RAISE_NO_ERROR;
 }
 
-
+/* ------------------------------------------- */
 
 
 ERROR_CODE create_http_client_connection(struct http_client_connection_t **http_client_connection_pointer, struct io_connection_t *io_connection) {
@@ -58,10 +63,9 @@ ERROR_CODE create_http_client_connection(struct http_client_connection_t **http_
     /* sets the http handler attributes (default) values */
     http_client_connection->io_connection = io_connection;
 
-    /* creates the http settings */
+    /* creates the http settings and the http parser
+    (for a response) these are goint be used in the message */
     create_http_settings(&http_client_connection->http_settings);
-
-    /* creates the http parser (for a response) */
     create_http_parser(&http_client_connection->http_parser, 0);
 
     /* sets the default callback functions in the http settings
@@ -83,234 +87,109 @@ ERROR_CODE create_http_client_connection(struct http_client_connection_t **http_
 }
 
 ERROR_CODE delete_http_client_connection(struct http_client_connection_t *http_client_connection) {
-    /* deletes the http parser */
-    delete_http_parser(http_client_connection->http_parser);
+    /* retrieves the various upper layers of the connection in order
+    to retrieve the parameters for the connection */
+    struct io_connection_t *io_connection = http_client_connection->io_connection;
+    struct connection_t *connection = (struct connection_t *) io_connection->connection;
 
-    /* deletes the http settings */
+    /* in case the parameters are set they must be released
+    with the proper destructor function and then set to invalid
+    so that no extra delete operations occur */
+    if(connection->parameters != NULL) {
+        delete_http_client_parameters(connection->parameters);
+        connection->parameters = NULL;
+    }
+
+    /* deletes the http parser and the http settings
+    structures (avoids memory leaks )*/
+    delete_http_parser(http_client_connection->http_parser);
     delete_http_settings(http_client_connection->http_settings);
 
-    /* releases the http client connection */
+    /* releases the memory associated with the client connection
+    in order to avoid any memory leaks */
     FREE(http_client_connection);
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE data_handler_stream_http_client(struct io_connection_t *io_connection, unsigned char *buffer, size_t buffer_size) {
-    /* allocates space for the temporary variable to
-    hold the ammount of bytes processed in a given http
-    data parsing iteration */
-    int processed_size;
+ERROR_CODE create_http_client_parameters(struct http_client_parameters_t **http_client_parameters_pointer) {
+    /* retrieves the http client connection size and uses
+    it to allocate the required memory for the structure */
+    size_t http_client_parameters_size = sizeof(struct http_client_parameters_t);
+    struct http_client_parameters_t *http_client_parameters =\
+        (struct http_client_parameters_t *) MALLOC(http_client_parameters_size);
 
-    /* retrieves the http client connection */
-    struct http_client_connection_t *http_client_connection = (struct http_client_connection_t *) io_connection->lower;
+    /* sets the various default values in the client paramenters
+    structure and then updates the pointer reference */
+    http_client_parameters->method = HTTP_GET;
+    http_client_parameters->version = HTTP11;
+    *http_client_parameters_pointer = http_client_parameters;
+
+    /* raises no error as the creation of the client parameraters
+    structure as successful */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE delete_http_client_parameters(struct http_client_parameters_t *http_client_parameters) {
+    /* releases the memory associated with the client
+    parameters structure */
+    FREE(http_client_parameters);
+
+    /* raises no error as the removal of the client parameraters
+    structure as successful */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE data_handler_stream_http_client(struct io_connection_t *io_connection, unsigned char *buffer, size_t buffer_size) {
+    /* retrieves the http client connection as the lower
+    part (payload) of the io connection */
+    struct http_client_connection_t *http_client_connection =\
+        (struct http_client_connection_t *) io_connection->lower;
 
     /* process the http data for the http parser, this should be
     a partial processing and some data may remain unprocessed (in
     case there are multiple http requests) */
-    processed_size = process_data_http_parser(http_client_connection->http_parser, http_client_connection->http_settings, buffer, buffer_size);
-
-    /* raises no error */
-    RAISE_NO_ERROR;
-}
-
-
-
-
-
-
-
-
-ERROR_CODE random_buffer(unsigned char *buffer, size_t buffer_size) {
-    size_t index;
-    time_t seconds;
-    int random;
-    unsigned char byte;
-
-    time(&seconds);
-    srand((unsigned int) seconds);
-
-    for(index = 0; index < buffer_size; index++) {
-        random = rand();
-        byte = (unsigned char) (random % 94);
-        buffer[index] = byte + 34;
-    }
-
-    /* raises no error */
-    RAISE_NO_ERROR;
-}
-
-ERROR_CODE generate_parameters(struct hash_map_t *hash_map, unsigned char **buffer_pointer, size_t *buffer_length_pointer) {
-    /* allocates space for an iterator object for an hash map element
-    and for the string buffer to be used to collect all the partial
-    strings that compose the complete url parameters string */
-    struct iterator_t *iterator;
-    struct hash_map_element_t *element;
-    struct string_buffer_t *string_buffer;
-
-    /* allocates space for the string structure to hold the value of
-    the element for the string value reference for the joined string,
-    for the buffer string from the element and for the corresponding
-    string lengths for both cases */
-    struct string_t *string;
-    unsigned char *string_value;
-    unsigned char *_buffer;
-    size_t string_length;
-    size_t _length;
-
-    /* allocates and sets the initial value on the flag that controls
-    if the iteratio to generate key values is the first one */
-    char is_first = 1;
-
-    /* creates a new string buffer and a new hash map
-    iterator, these structures are going to be used to
-    handle the string from the hash map and to iterate
-    over the hash map elements */
-    create_string_buffer(&string_buffer);
-    create_element_iterator_hash_map(hash_map, &iterator);
-
-    /* iterates continuously arround the hash map element
-    the iterator is going to stop the iteration */
-    while(1) {
-        /* retrieves the next element from the iterator
-        and in case such element is invalid breaks the loop */
-        get_next_iterator(iterator, (void **) &element);
-        if(element == NULL) { break; }
-
-        /* checks if this is the first loop in the iteration
-        in it's not emits the and character */
-        if(is_first) { is_first = 0; }
-        else { append_string_buffer(string_buffer, (unsigned char *) "&"); }
-
-        /* retrieves the current element value as a string structure
-        then encodes that value using the url encoding (percent encoding)
-        and resets the string reference to contain the new buffer as it'
-        own contents (avoids extra memory usage) */
-        string = (struct string_t *) element->value;
-        url_encode(string->buffer, string->length, &_buffer, &_length);
-        string->buffer = _buffer;
-        string->length = _length;
-
-        /* adds the various elements for the value to the string buffer
-        first the key the the attribution operator and then the value */
-        append_string_buffer(string_buffer, (unsigned char *) element->key_string);
-        append_string_l_buffer(string_buffer, (unsigned char *) "=", sizeof("=") - 1);
-        _append_string_t_buffer(string_buffer, string);
-    }
-
-    /* "joins" the string buffer values into a single
-    value (from the internal string list) and then
-    retrieves the length of the string buffer */
-    join_string_buffer(string_buffer, &string_value);
-    string_length = string_buffer->string_length;
-
-    /* deletes the hash map iterator and string buffer
-    structures, to avoid memory leak */
-    delete_iterator_hash_map(hash_map, iterator);
-    delete_string_buffer(string_buffer);
-
-    /* updates the buffer pointer reference and the
-    buffer length pointer reference with the string
-    value and the string length values */
-    *buffer_pointer = string_value;
-    *buffer_length_pointer = string_length;
+    process_data_http_parser(
+        http_client_connection->http_parser,
+        http_client_connection->http_settings,
+        buffer,
+        buffer_size
+    );
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
 ERROR_CODE open_handler_stream_http_client(struct io_connection_t *io_connection) {
-    /* allocates space for the temporary error variable to
-    be used to detect errors in calls */
-    ERROR_CODE error;
-
     /* allocates the http client connection and retrieves the
     "upper" connection (for parameters retrieval) */
     struct http_client_connection_t *http_client_connection;
     struct connection_t *connection = (struct connection_t *) io_connection->connection;
     struct http_client_parameters_t *parameters = (struct http_client_parameters_t *) connection->parameters;
-    struct type_t *type;
-    struct type_t *_type;
-    unsigned char *_buffer;
-    size_t _buffer_size;
-    unsigned char info_hash[SHA1_DIGEST_SIZE + 1];
-    unsigned char random[12];
-    unsigned char peer_id[21];
-    struct hash_map_t *parameters_map;
-    unsigned char *get_string;
-    size_t get_string_size;
-    struct string_t strings[9];
     char *buffer = MALLOC(VIRIATUM_HTTP_SIZE);
 
-    SPRINTF((char *) peer_id, 20, "-%s%d%d%d0-", VIRIATUM_PREFIX, VIRIATUM_MAJOR, VIRIATUM_MINOR, VIRIATUM_MICRO);
-    random_buffer(random, 12);
-    memcpy(peer_id + 8, random, 12);
-
-	/* tries to decode the bencoded torrent file an in case
-	thre's an error propagates it to the calling function */
-    error = decode_bencoding_file("C:/verysleepy_0_82.exe.torrent", &type);
-    if(error) { 
-		RAISE_ERROR_M(
-		    RUNTIME_EXCEPTION_ERROR_CODE,
-		    (unsigned char *) "Problem reading torrent file"
-		);
-	}
-
-    get_value_string_sort_map(type->value.value_sort_map, (unsigned char *) "info", (void **) &_type);
-    encode_bencoding(_type, &_buffer, &_buffer_size);
-    sha1(_buffer, (unsigned int) _buffer_size, info_hash);
-    print_type(type);
-    free_type(type);
-    FREE(_buffer);
-
-    /* tenho de fazer gerador de get parameters !!!! */
-    /* pega nas chaves e nos valores do hash map e gera a get string para um string buffer */
-    create_hash_map(&parameters_map, 0);
-    strings[0].buffer = info_hash;
-    strings[0].length = 20;
-    strings[1].buffer = peer_id;
-    strings[1].length = 20;
-    strings[2].buffer = (unsigned char *) "8080";
-    strings[2].length = sizeof("8080") - 1;
-    strings[3].buffer = (unsigned char *) "0";
-    strings[3].length = sizeof("0") - 1;
-    strings[4].buffer = (unsigned char *) "0";
-    strings[4].length = sizeof("0") - 1;
-    strings[5].buffer = (unsigned char *) "3213210"; /* must calculate this value */
-    strings[5].length = sizeof("3213210") - 1; /* must calculate this value */
-    strings[6].buffer = (unsigned char *) "0";
-    strings[6].length = sizeof("0") - 1;
-    strings[7].buffer = (unsigned char *) "0";
-    strings[7].length = sizeof("0") - 1;
-    strings[8].buffer = (unsigned char *) "started";
-    strings[8].length = sizeof("started") - 1;
-    set_value_string_hash_map(parameters_map, (unsigned char *) "info_hash", (void *) &strings[0]);
-    set_value_string_hash_map(parameters_map, (unsigned char *) "peer_id", (void *) &strings[1]);
-    set_value_string_hash_map(parameters_map, (unsigned char *) "port", (void *) &strings[2]);
-    set_value_string_hash_map(parameters_map, (unsigned char *) "uploaded", (void *) &strings[3]);
-    set_value_string_hash_map(parameters_map, (unsigned char *) "downloaded", (void *) &strings[4]);
-    set_value_string_hash_map(parameters_map, (unsigned char *) "left", (void *) &strings[5]);
-    set_value_string_hash_map(parameters_map, (unsigned char *) "compact", (void *) &strings[6]);
-    set_value_string_hash_map(parameters_map, (unsigned char *) "no_peer_id", (void *) &strings[7]);
-    set_value_string_hash_map(parameters_map, (unsigned char *) "event", (void *) &strings[8]);
-    generate_parameters(parameters_map, &get_string, &get_string_size);
-    delete_hash_map(parameters_map);
-
+    /* creates the http message header from the provided
+    information, note that the parmeters are allways set*/
     SPRINTF(
         buffer,
         VIRIATUM_HTTP_SIZE,
-        "GET %s?%s HTTP/1.1\r\n"
-        "User-Agent: viriatum/0.2.0 (linux - intel x64)\r\n"
+        "%s %s?%s %s\r\n"
+        "User-Agent: %s\r\n"
         "Connection: Keep-Alive\r\n\r\n",
+        http_method_strings[parameters->method - 1],
         parameters->url,
-        get_string
+        parameters->params,
+        http_version_strings[parameters->version - 1],
+        VIRIATUM_AGENT
     );
 
-    FREE(get_string);
-
-    /* creates the http client connection */
+    /* creates the http client connection object populating
+    all of its internal element for future usage */
     create_http_client_connection(&http_client_connection, io_connection);
 
+    /* writes the created header buffer to the connection
+    and waits for the response from the server side */
     write_connection(
         io_connection->connection,
         (unsigned char *) buffer,
@@ -325,9 +204,9 @@ ERROR_CODE open_handler_stream_http_client(struct io_connection_t *io_connection
 
 ERROR_CODE close_handler_stream_http_client(struct io_connection_t *io_connection) {
     /* retrieves the http client connection and deletes it
-	releasig all of its memory (avoiding memory leaks) */
+    releasig all of its memory (avoiding memory leaks) */
     struct http_client_connection_t *http_client_connection =\
-		(struct http_client_connection_t *) io_connection->lower;
+        (struct http_client_connection_t *) io_connection->lower;
     delete_http_client_connection(http_client_connection);
 
     /* raises no error */
