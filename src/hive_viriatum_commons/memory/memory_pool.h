@@ -179,10 +179,10 @@ static __inline void alloc_memory_pool(struct memory_pool_t *pool, size_t chunk_
     pool->chunk_max_size = chunk_max_size;
     pool->items_max_size = pool->chunk_max_size * CHUNK_SIZE;
 
-    pool->chunks = malloc(
+    pool->chunks = MALLOC(
         sizeof(struct memory_chunk_t *) * pool->chunk_max_size
     );
-    pool->buffer_item_map = malloc(
+    pool->buffer_item_map = MALLOC(
         sizeof(struct memory_chunk_t *) * pool->items_max_size
     );
 
@@ -193,8 +193,8 @@ static __inline void alloc_memory_pool(struct memory_pool_t *pool, size_t chunk_
 }
 
 static __inline void release_memory_pool(struct memory_pool_t *pool) {
-    free(pool->chunks);
-    free(pool->buffer_item_map);
+    FREE(pool->chunks);
+    FREE(pool->buffer_item_map);
 
     pool->free = 0;
     pool->chunk_count = 0;
@@ -205,7 +205,7 @@ static __inline void release_memory_pool(struct memory_pool_t *pool) {
 static __inline void create_chunk(struct memory_chunk_t **chunk_pointer, size_t size, size_t index_pool) {
     size_t index;
     struct memory_item_t *item;
-    struct memory_chunk_t *chunk = malloc(sizeof(struct memory_chunk_t));
+    struct memory_chunk_t *chunk = MALLOC(sizeof(struct memory_chunk_t));
 
     memset(chunk->bitmap, 0, sizeof(char) * CHUNK_SIZE);
     chunk->index = index_pool;
@@ -213,7 +213,7 @@ static __inline void create_chunk(struct memory_chunk_t **chunk_pointer, size_t 
     chunk->free = 0;
     chunk->item_size = size;
     chunk->chunk_size = size * CHUNK_SIZE;
-    chunk->buffer = malloc(chunk->chunk_size);
+    chunk->buffer = MALLOC(chunk->chunk_size);
     for(index = 0; index < CHUNK_SIZE; index++) {
         item = &chunk->items[index];
         item->index = index;
@@ -229,8 +229,8 @@ static __inline void delete_chunk(struct memory_chunk_t *chunk) {
     chunk->is_full = FALSE;
     chunk->free = 0;
 
-    free(chunk->buffer);
-    free(chunk);
+    FREE(chunk->buffer);
+    FREE(chunk);
 }
 
 static __inline void *palloc(struct memory_pool_t *pool, size_t size) {
