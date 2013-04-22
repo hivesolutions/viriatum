@@ -120,7 +120,7 @@ void write_byte_bit_stream(struct bit_stream_t *bit_stream, unsigned char byte, 
     flush_write_bit_stream(bit_stream);
 
     /* in case there are no extra bits to be written
-	must return immediately */
+    must return immediately */
     if(extra_bits_count == 0) { return; }
 
     /* sets the current byte as the extra bits value creates
@@ -135,7 +135,7 @@ void write_byte_bit_stream(struct bit_stream_t *bit_stream, unsigned char byte, 
 void flush_write_bit_stream(struct bit_stream_t *bit_stream) {
     /* in case the bit counter (for write) hasn't reached
     the limit no flush is required (no complete byte available)
-	and so must return immediately */
+    and so must return immediately */
     if(bit_stream->current_byte_offset_write != BIT_STREAM_ITEM_SIZE) {
         return;
     }
@@ -164,7 +164,7 @@ void flush_bit_stream(struct bit_stream_t *bit_stream) {
     if(bit_stream->current_byte_offset_write > 0) {
         /* sets the write buffer value */
         bit_stream->buffer[bit_stream->byte_counter_write] =\
-			bit_stream->current_byte_write << (BIT_STREAM_ITEM_SIZE - bit_stream->current_byte_offset_write);
+            bit_stream->current_byte_write << (BIT_STREAM_ITEM_SIZE - bit_stream->current_byte_offset_write);
 
         /* resets the various bit stream write
         byte oriented structures */
