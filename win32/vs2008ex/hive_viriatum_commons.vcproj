@@ -925,6 +925,10 @@
                     >
                 </File>
                 <File
+                    RelativePath="..\..\src\hive_viriatum_commons\util\string_util_s.h"
+                    >
+                </File>
+                <File
                     RelativePath="..\..\src\hive_viriatum_commons\util\util.h"
                     >
                 </File>
