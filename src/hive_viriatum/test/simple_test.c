@@ -30,7 +30,7 @@
 #include "simple_test.h"
 
 #ifndef VIRIATUM_NO_THREADS
-
+#ifdef VIRIATUM_THREAD_SAFE
 int thread_pool_start_function_test(void *arguments) {
     /* retrieves the current thread identifier */
     THREAD_IDENTIFIER thread_id = THREAD_GET_IDENTIFIER();
@@ -53,7 +53,8 @@ void test_thread_pool() {
     struct thread_pool_t *thread_pool;
 
     /* allocates space for the thread pool task */
-    struct thread_pool_task_t *thread_pool_task = (struct thread_pool_task_t *) MALLOC(sizeof(struct thread_pool_task_t));
+    struct thread_pool_task_t *thread_pool_task =\
+        (struct thread_pool_task_t *) MALLOC(sizeof(struct thread_pool_task_t));
 
     /* sets the start function */
     thread_pool_task->start_function = thread_pool_start_function_test;
@@ -73,11 +74,35 @@ void test_thread_pool() {
         insert_task_thread_pool(thread_pool, thread_pool_task);
     }
 }
-
+#endif
 #endif
 
+void test_linked_list_stress() {
+	/* allocates space for the index to be used in the iteration
+	for the temporary value pointer variable and for the pointer
+	that is going to be used for the linked list */
+    size_t index;
+    void *value;
+    struct linked_list_t *linked_list;
+
+	/* creates the linked list structure and starts the long
+	iteration that is going to append and then pop elements from
+	the linked list (stressing the creation of nodes) */
+    create_linked_list(&linked_list);
+    for(index = 0; index < 100000000; index++) {
+        append_value_linked_list(linked_list, (void *) 1);
+        append_value_linked_list(linked_list, (void *) 2);
+        append_value_linked_list(linked_list, (void *) 3);
+        pop_value_linked_list(linked_list, (void **) &value, TRUE);
+        pop_value_linked_list(linked_list, (void **) &value, TRUE);
+        pop_value_linked_list(linked_list, (void **) &value, TRUE);
+    }
+    delete_linked_list(linked_list);
+}
+
 void test_linked_list() {
-    /* allocates space for the value */
+    /* allocates space for the value that's going
+    to be used for temporary storage */
     void *value;
 
     /* allocates space for the linked list */
@@ -100,10 +125,8 @@ void test_linked_list() {
     /* removes an element from the linked list */
     remove_index_linked_list(linked_list, 1, TRUE);
 
-    /* pops a value from the linked list */
+    /* pops two values from the linked list */
     pop_value_linked_list(linked_list, (void **) &value, TRUE);
-
-    /* pops a value from the linked list */
     pop_value_linked_list(linked_list, (void **) &value, TRUE);
 
     /* appends vome elements to the front of the linked list,
@@ -535,13 +558,17 @@ int _compare(void *first, void *second) {
 }
 
 void run_simple_tests() {
-    #ifndef VIRIATUM_NO_THREADS
+#ifndef VIRIATUM_NO_THREADS
+#ifdef VIRIATUM_THREAD_SAFE
     /* tests the thread pool */
     test_thread_pool();
-    #endif
+#endif
+#endif
 
-    /* tests the linked list */
+    /* tests the linked list using the default
+    and the stress approach */
     test_linked_list();
+    test_linked_list_stress();
 
     /* tests the array list */
     test_array_list();
