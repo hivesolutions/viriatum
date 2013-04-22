@@ -78,16 +78,16 @@ void test_thread_pool() {
 #endif
 
 void test_linked_list_stress() {
-	/* allocates space for the index to be used in the iteration
-	for the temporary value pointer variable and for the pointer
-	that is going to be used for the linked list */
+    /* allocates space for the index to be used in the iteration
+    for the temporary value pointer variable and for the pointer
+    that is going to be used for the linked list */
     size_t index;
     void *value;
     struct linked_list_t *linked_list;
 
-	/* creates the linked list structure and starts the long
-	iteration that is going to append and then pop elements from
-	the linked list (stressing the creation of nodes) */
+    /* creates the linked list structure and starts the long
+    iteration that is going to append and then pop elements from
+    the linked list (stressing the creation of nodes) */
     create_linked_list(&linked_list);
     for(index = 0; index < 100000000; index++) {
         append_value_linked_list(linked_list, (void *) 1);
