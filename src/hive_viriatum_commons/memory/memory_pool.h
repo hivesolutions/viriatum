@@ -235,6 +235,9 @@ static __inline void delete_chunk(struct memory_chunk_t *chunk) {
 
 static __inline void *palloc(struct memory_pool_t *pool, size_t size) {
 #ifdef VIRIATUM_MEMORY_POOL
+	/* allocates space for the various index and counter pointes
+	and then allocates the pointers to the buffer and to the various
+	structures that are going to be created and/or used */
     size_t free;
     size_t index;
     size_t index_m;
