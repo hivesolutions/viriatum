@@ -349,7 +349,9 @@ int main(int argc, char *argv[]) {
     process_arguments(argc, argv, &arguments);
     execute_arguments(arguments);
 
-    /* runs the service, with the given arguments */
+    /* runs the service, with the given arguments, this call
+	should blobk the program control flow until an event
+	stop the running of the main loop */
     return_value = run_service(program_name, arguments);
 
     /* tests the error code for error in case it exists
