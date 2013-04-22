@@ -44,32 +44,30 @@ static const char *atob_strings[4] = {
 };
 
 static __inline unsigned char *base_string_value(unsigned char *string_value) {
-    /* allocates the index counter */
+    /* allicates the index counter the value that is going
+	to store the current item in iteration and the length
+	of the string from which the base name will be retrieved */
     unsigned int index;
-
-    /* allocates the current character value */
     unsigned int current_character;
-
-    /* retrieves the string value length */
     unsigned int string_value_length = (unsigned int) strlen((char *) string_value);
 
-    /* iterates from back throught the string value */
+    /* iterates from back throught the string value to try to find
+	the first slash separator inside the string */
     for(index = string_value_length; index > 0; index--) {
-        /* retrieves the current character */
+        /* retrieves the current character and in cas the value
+		is either a slash or a back slash breaks the loop (target found) */
         current_character = string_value[index];
-
-        /* in case the current character is a slash or a back-slash */
         if(current_character == '\\' || current_character == '/') {
             /* increments the index in order to set the apropriate
-            pointer value (need to point to the next chracter after the slash) */
+            pointer value (need to point to the next chracter after
+			the slash) and then breaks the loop */
             index += 1;
-
-            /* breaks the loop */
             break;
         }
     }
 
-    /* returns the "new" string value pointer */
+    /* returns the "new" string value pointer, that should be
+	pointing to the base string value */
     return string_value + index;
 }
 
