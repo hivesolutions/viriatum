@@ -32,3 +32,4 @@
 #include "function_util.h"
 #include "random_util.h"
 #include "string_util.h"
+#include "string_util_s.h"
