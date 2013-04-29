@@ -241,7 +241,7 @@ ERROR_CODE _poll_polling_epoll(struct polling_epoll_t *polling_epoll, struct con
     /* runs the wait process in the epoll, this is the main call
     of the epoll loop as it si the on responsible for the polling
     operation and generation of the events */
-#ifdef VIRIATUM_ANDROID
+#ifdef VIRIATUM_PLATFORM_ANDROID
     event_count = epoll_wait(
 		polling_epoll->epoll_fd,
 		events,
