@@ -27,8 +27,7 @@
 
 #pragma once
 
-/* forward references (avoids loop) */
-struct service_t;
+#include "../system/system.h"
 
 /**
  * Starts the process of running the service, registering the
