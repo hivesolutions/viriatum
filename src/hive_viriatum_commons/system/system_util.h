@@ -53,6 +53,7 @@
 #define FILE_EXISTS(file_path) GetFileAttributes(file_path) != 0xffffffff
 #define ACCESS(path, mode) _access(path, mode)
 #define ROUND(value) (value + 0.5f)
+#define SIGN(pid)
 #endif
 
 #ifdef VIRIATUM_PLATFORM_UNIX
@@ -75,6 +76,7 @@
 #define FILE_EXISTS(file_path) access(file_path, F_OK) == 0
 #define ACCESS(path, mode) access(path, mode)
 #define ROUND(value) (value + 0.5f)
+#define SIGN(pid) kill(pid, SIGUSR1)
 #endif
 
 #ifdef VIRIATUM_PLATFORM_MSC
