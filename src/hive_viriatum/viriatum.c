@@ -135,7 +135,7 @@ void kill_handler(int signal_number) {
     signal(signal_number, SIG_DFL);
 
     /* runs the "ran" service */
-    ran_service();
+//    ran_service();
 }
 
 void register_signals() {
@@ -346,7 +346,12 @@ int main(int argc, char *argv[]) {
     of the process (program) to be executed */
     program_name = argv[0];
 
-	/* processes the various arguments into a map and then
+
+  //  run_simple_tests();
+
+
+
+    /* processes the various arguments into a map and then
     executes the corresponding (initial) actions */
     process_arguments(argc, argv, &arguments);
     execute_arguments(arguments);
