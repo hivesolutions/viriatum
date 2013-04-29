@@ -135,7 +135,7 @@ void kill_handler(int signal_number) {
     signal(signal_number, SIG_DFL);
 
     /* runs the "ran" service */
-//    ran_service();
+    ran_service();
 }
 
 void register_signals() {
