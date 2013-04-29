@@ -83,4 +83,24 @@ jstring Java_pt_hive_viriatum_http_Service_ran(JNIEnv *env, jclass cls) {
     return (*env)->NewStringUTF(env, buffer);
 }
 
+jint Java_pt_hive_viriatum_http_Service_port(JNIEnv *env, jclass cls) {
+	/* allocates space for the global service instance
+	to be retrieved */
+    struct service *service;
+
+	/* tries to retrieve the reference to the global service
+	instance, in order to get the port from it */
+    return_value = pointer_service(*service);
+    if(IS_ERROR_CODE(return_value)) {
+        /* prints an error message and copies it to the return
+        value string buffer to be returned to java vm */
+        V_ERROR_F("Problem getting service (%s)\n", (char *) GET_ERROR());
+        SPRINTF(buffer, 1024, "Problem getting service (%s)\n", (char *) GET_ERROR());
+    }
+
+	/* returns the currently set port for the service instance
+	to the caller method (java) */
+    return service->port;
+}
+
 #endif
