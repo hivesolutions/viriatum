@@ -39,7 +39,8 @@ jstring Java_pt_hive_viriatum_http_Service_run(JNIEnv *env, jclass cls) {
     the arguments for the service execution */
     struct hash_map_t *arguments;
 
-    /* allocates space for the result string buffer */
+    /* allocates space for the result string buffer,
+	going to be used to return a possible error message */
     char buffer[1024] = "";
 
 	PRINTF("VAI COMEÇAR!!!!!");
@@ -68,10 +69,15 @@ jstring Java_pt_hive_viriatum_http_Service_ran(JNIEnv *env, jclass cls) {
     /* allocates the return value */
     ERROR_CODE return_value;
 
-    /* allocates space for the result string buffer */
+    /* allocates space for the result string buffer,
+	going to be used to return a possible error message */
     char buffer[1024] = "";
 
-    /* "rans" the service */
+	/* "kills" the current process using the custom
+	user signal (to unblock some poll calls) and then
+	runs the ran service call in order to start the
+	unloading of the service */
+	kill(pid, SIGUSR1);
     return_value = ran_service();
 
 
