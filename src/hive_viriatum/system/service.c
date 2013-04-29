@@ -1051,13 +1051,15 @@ ERROR_CODE start_service(struct service_t *service) {
         V_DEBUG_F("Memory status: [%ld objects] [%ld KBytes]\n", (long int) ALLOCATIONS, (long int) memory_usage / 1024);
 
 
-		PRINTF("CLICLO WHILE!!!\n");
+		PRINTF("INICIO POLL !!!\n");
 
         /* polls the connections using the polling (provider)
         and calls the callbacks for the connection (events)
         using the polling (provider) */
         polling->poll(polling);
         polling->call(polling);
+
+		PRINTF("FINAL POLL !!!\n");
     }
 
 
