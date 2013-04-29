@@ -130,6 +130,11 @@ ERROR_CODE ran_service() {
     RAISE_NO_ERROR;
 }
 
+ERROR_CODE pointer_service(struct service_t **service_pointer) {
+	*service_pointer = service;
+    RAISE_NO_ERROR;
+}
+
 void kill_handler(int signal_number) {
     /* defaults the signal handler (only one handling) */
     signal(signal_number, SIG_DFL);
@@ -350,7 +355,7 @@ int main(int argc, char *argv[]) {
     program_name = argv[0];
 
 
-  //  run_simple_tests();
+   /* run_simple_tests();*/
 
 
 
