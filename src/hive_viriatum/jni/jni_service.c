@@ -242,6 +242,116 @@ jstring Java_pt_hive_viriatum_http_Service_compiler(JNIEnv *env, jclass cls) {
     return (*env)->NewStringUTF(env, (char *) service->compiler);
 }
 
+jstring Java_pt_hive_viriatum_http_Service_compilerVersion(JNIEnv *env, jclass cls) {
+	/* allocates the return value */
+    ERROR_CODE return_value;
+
+	/* allocates space for the global service instance
+	to be retrieved */
+    struct service_t *service;
+
+	/* tries to retrieve the reference to the global service
+	instance, in order to get the port from it */
+    return_value = pointer_service(&service);
+	if(IS_ERROR_CODE(return_value)) { return NULL; }
+
+	/* in case the service structure is not currently
+	set returns an error value */
+	if(service == NULL) { return NULL; }
+
+	/* returns the currently set compiler version for the service instance
+	to the caller method (java) */
+    return (*env)->NewStringUTF(env, (char *) service->compiler_version);
+}
+
+jstring Java_pt_hive_viriatum_http_Service_compilationDate(JNIEnv *env, jclass cls) {
+	/* allocates the return value */
+    ERROR_CODE return_value;
+
+	/* allocates space for the global service instance
+	to be retrieved */
+    struct service_t *service;
+
+	/* tries to retrieve the reference to the global service
+	instance, in order to get the port from it */
+    return_value = pointer_service(&service);
+	if(IS_ERROR_CODE(return_value)) { return NULL; }
+
+	/* in case the service structure is not currently
+	set returns an error value */
+	if(service == NULL) { return NULL; }
+
+	/* returns the currently set compilation date for the service instance
+	to the caller method (java) */
+    return (*env)->NewStringUTF(env, (char *) service->compilation_date);
+}
+
+jstring Java_pt_hive_viriatum_http_Service_compilationTime(JNIEnv *env, jclass cls) {
+	/* allocates the return value */
+    ERROR_CODE return_value;
+
+	/* allocates space for the global service instance
+	to be retrieved */
+    struct service_t *service;
+
+	/* tries to retrieve the reference to the global service
+	instance, in order to get the port from it */
+    return_value = pointer_service(&service);
+	if(IS_ERROR_CODE(return_value)) { return NULL; }
+
+	/* in case the service structure is not currently
+	set returns an error value */
+	if(service == NULL) { return NULL; }
+
+	/* returns the currently set compilation time for the service instance
+	to the caller method (java) */
+    return (*env)->NewStringUTF(env, (char *) service->compilation_time);
+}
+
+jstring Java_pt_hive_viriatum_http_Service_modules(JNIEnv *env, jclass cls) {
+	/* allocates the return value */
+    ERROR_CODE return_value;
+
+	/* allocates space for the global service instance
+	to be retrieved */
+    struct service_t *service;
+
+	/* tries to retrieve the reference to the global service
+	instance, in order to get the port from it */
+    return_value = pointer_service(&service);
+	if(IS_ERROR_CODE(return_value)) { return NULL; }
+
+	/* in case the service structure is not currently
+	set returns an error value */
+	if(service == NULL) { return NULL; }
+
+	/* returns the currently set modules for the service instance
+	to the caller method (java) */
+    return (*env)->NewStringUTF(env, (char *) service->modules);
+}
+
+jstring Java_pt_hive_viriatum_http_Service_description(JNIEnv *env, jclass cls) {
+	/* allocates the return value */
+    ERROR_CODE return_value;
+
+	/* allocates space for the global service instance
+	to be retrieved */
+    struct service_t *service;
+
+	/* tries to retrieve the reference to the global service
+	instance, in order to get the port from it */
+    return_value = pointer_service(&service);
+	if(IS_ERROR_CODE(return_value)) { return NULL; }
+
+	/* in case the service structure is not currently
+	set returns an error value */
+	if(service == NULL) { return NULL; }
+
+	/* returns the currently set description for the service instance
+	to the caller method (java) */
+    return (*env)->NewStringUTF(env, (char *) service->description);
+}
+
 jint Java_pt_hive_viriatum_http_Service_status(JNIEnv *env, jclass cls) {
     /* allocates the return value */
     ERROR_CODE return_value;
