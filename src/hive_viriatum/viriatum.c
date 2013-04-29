@@ -108,7 +108,9 @@ ERROR_CODE ran_service() {
         /* prints a warning message */
         V_DEBUG("Stopping service\n");
 
-        /* stops the service */
+        /* stops the service, this call should make the
+		required changes in the service structure so that
+		it's stopped as soon as possible */
         return_value = stop_service(service);
 
         /* tests the error code for error */
@@ -344,14 +346,14 @@ int main(int argc, char *argv[]) {
     of the process (program) to be executed */
     program_name = argv[0];
 
-    /* processes the various arguments into a map and then
+	/* processes the various arguments into a map and then
     executes the corresponding (initial) actions */
     process_arguments(argc, argv, &arguments);
     execute_arguments(arguments);
 
     /* runs the service, with the given arguments, this call
-	should blobk the program control flow until an event
-	stop the running of the main loop */
+    should blobk the program control flow until an event
+    stop the running of the main loop */
     return_value = run_service(program_name, arguments);
 
     /* tests the error code for error in case it exists
