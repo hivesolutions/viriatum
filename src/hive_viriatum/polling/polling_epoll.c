@@ -106,7 +106,12 @@ ERROR_CODE register_connection_polling_epoll(struct polling_t *polling, struct c
     and then inserts the event request into the epoll fd */
     _event.events = EPOLLIN | EPOLLOUT | EPOLLET;
     _event.data.ptr = (void *) connection;
-    result_code = epoll_ctl(polling_epoll->epoll_fd, EPOLL_CTL_ADD, connection->socket_handle, &_event);
+    result_code = epoll_ctl(
+	    polling_epoll->epoll_fd,
+		EPOLL_CTL_ADD,
+		connection->socket_handle,
+		&_event
+	);
 
     /* in case there was an error in epoll need to correctly
     handle it and propagate it to the caller */
@@ -241,9 +246,7 @@ ERROR_CODE _poll_polling_epoll(struct polling_epoll_t *polling_epoll, struct con
     /* prints a debug message */
     V_DEBUG_F("Exiting epoll statement with value: %d\n", event_count);
 
-	PRINTF_F("Exiting epoll statement with value: %d\n", event_count);
-
-    /* in case there was an error in epoll, in case there was this is
+	/* in case there was an error in epoll, in case there was this is
     considered to be a critical error */
     if(SOCKET_TEST_ERROR(event_count)) {
         /* retrieves the epoll error code */
