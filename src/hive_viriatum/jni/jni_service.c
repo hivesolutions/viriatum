@@ -84,6 +84,9 @@ jstring Java_pt_hive_viriatum_http_Service_ran(JNIEnv *env, jclass cls) {
 }
 
 jint Java_pt_hive_viriatum_http_Service_port(JNIEnv *env, jclass cls) {
+    /* allocates the return value */
+    ERROR_CODE return_value;
+
 	/* allocates space for the global service instance
 	to be retrieved */
     struct service *service;
