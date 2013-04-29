@@ -334,12 +334,7 @@ ERROR_CODE calculate_locations_service(struct service_t *service) {
     RAISE_NO_ERROR;
 }
 
-#ifdef VIRIATUM_PLATFORM_WIN32
-ERROR_CODE create_workers(struct service_t *service) { RAISE_NO_ERROR; }
-ERROR_CODE join_workers(struct service_t *service) { RAISE_NO_ERROR; }
-#endif
-
-#ifdef VIRIATUM_PLATFORM_UNIX
+#ifdef VIRIATUM_PREFORK
 ERROR_CODE create_workers(struct service_t *service) {
     /* creates the variables to hold the current pid value and
     the variable to hold the number of fork occurring */
@@ -444,6 +439,9 @@ ERROR_CODE join_workers(struct service_t *service) {
     /* raises no error */
     RAISE_NO_ERROR;
 }
+#else
+ERROR_CODE create_workers(struct service_t *service) { RAISE_NO_ERROR; }
+ERROR_CODE join_workers(struct service_t *service) { RAISE_NO_ERROR; }
 #endif
 
 ERROR_CODE start_service(struct service_t *service) {
