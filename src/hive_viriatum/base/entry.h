@@ -27,6 +27,8 @@
 
 #pragma once
 
+#include "../system/system.h"
+
 /**
  * Starts the process of running the service, registering the
  * appropriate handlers.
