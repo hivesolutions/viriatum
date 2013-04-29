@@ -105,9 +105,13 @@ jint Java_pt_hive_viriatum_http_Service_port(JNIEnv *env, jclass cls) {
         SPRINTF(buffer, 1024, "Problem getting service (%s)\n", (char *) GET_ERROR());
     }
 
+	/* in case the service options or the service is
+	not set returns an error value */
+	if(service == NULL || service->options == NULL) { return -1; }
+
 	/* returns the currently set port for the service instance
 	to the caller method (java) */
-    return service->port;
+    return service->options->port;
 }
 
 #endif
