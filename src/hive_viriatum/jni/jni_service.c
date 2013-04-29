@@ -143,11 +143,11 @@ jstring Java_pt_hive_viriatum_http_Service_name(JNIEnv *env, jclass cls) {
 	/* tries to retrieve the reference to the global service
 	instance, in order to get the port from it */
     return_value = pointer_service(&service);
-	if(IS_ERROR_CODE(return_value)) { return -1; }
+	if(IS_ERROR_CODE(return_value)) { return NULL; }
 
 	/* in case the service structure is not currently
 	set returns an error value */
-	if(service == NULL) { return -1; }
+	if(service == NULL) { return NULL; }
 
 	/* returns the currently set name for the service instance
 	to the caller method (java) */
@@ -165,11 +165,11 @@ jstring Java_pt_hive_viriatum_http_Service_version(JNIEnv *env, jclass cls) {
 	/* tries to retrieve the reference to the global service
 	instance, in order to get the port from it */
     return_value = pointer_service(&service);
-	if(IS_ERROR_CODE(return_value)) { return -1; }
+	if(IS_ERROR_CODE(return_value)) { return NULL; }
 
 	/* in case the service structure is not currently
 	set returns an error value */
-	if(service == NULL) { return -1; }
+	if(service == NULL) { return NULL; }
 
 	/* returns the currently set version for the service instance
 	to the caller method (java) */
@@ -187,11 +187,11 @@ jstring Java_pt_hive_viriatum_http_Service_platform(JNIEnv *env, jclass cls) {
 	/* tries to retrieve the reference to the global service
 	instance, in order to get the port from it */
     return_value = pointer_service(&service);
-	if(IS_ERROR_CODE(return_value)) { return -1; }
+	if(IS_ERROR_CODE(return_value)) { return NULL; }
 
 	/* in case the service structure is not currently
 	set returns an error value */
-	if(service == NULL) { return -1; }
+	if(service == NULL) { return NULL; }
 
 	/* returns the currently set platform for the service instance
 	to the caller method (java) */
@@ -209,11 +209,11 @@ jstring Java_pt_hive_viriatum_http_Service_flags(JNIEnv *env, jclass cls) {
 	/* tries to retrieve the reference to the global service
 	instance, in order to get the port from it */
     return_value = pointer_service(&service);
-	if(IS_ERROR_CODE(return_value)) { return -1; }
+	if(IS_ERROR_CODE(return_value)) { return NULL; }
 
 	/* in case the service structure is not currently
 	set returns an error value */
-	if(service == NULL) { return -1; }
+	if(service == NULL) { return NULL; }
 
 	/* returns the currently set flags for the service instance
 	to the caller method (java) */
