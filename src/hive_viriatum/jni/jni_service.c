@@ -151,7 +151,7 @@ jstring Java_pt_hive_viriatum_http_Service_name(JNIEnv *env, jclass cls) {
 
 	/* returns the currently set name for the service instance
 	to the caller method (java) */
-    return (*env)->NewStringUTF(env, service->name);
+    return (*env)->NewStringUTF(env, (char *) service->name);
 }
 
 jstring Java_pt_hive_viriatum_http_Service_version(JNIEnv *env, jclass cls) {
@@ -173,7 +173,7 @@ jstring Java_pt_hive_viriatum_http_Service_version(JNIEnv *env, jclass cls) {
 
 	/* returns the currently set version for the service instance
 	to the caller method (java) */
-    return (*env)->NewStringUTF(env, service->version);
+    return (*env)->NewStringUTF(env, (char *) service->version);
 }
 
 jstring Java_pt_hive_viriatum_http_Service_platform(JNIEnv *env, jclass cls) {
@@ -195,7 +195,7 @@ jstring Java_pt_hive_viriatum_http_Service_platform(JNIEnv *env, jclass cls) {
 
 	/* returns the currently set platform for the service instance
 	to the caller method (java) */
-    return (*env)->NewStringUTF(env, service->platform);
+    return (*env)->NewStringUTF(env, (char *) service->platform);
 }
 
 jstring Java_pt_hive_viriatum_http_Service_flags(JNIEnv *env, jclass cls) {
@@ -217,7 +217,7 @@ jstring Java_pt_hive_viriatum_http_Service_flags(JNIEnv *env, jclass cls) {
 
 	/* returns the currently set flags for the service instance
 	to the caller method (java) */
-    return (*env)->NewStringUTF(env, service->flags);
+    return (*env)->NewStringUTF(env, (char *) service->flags);
 }
 
 jint Java_pt_hive_viriatum_http_Service_status(JNIEnv *env, jclass cls) {
