@@ -43,8 +43,6 @@ jstring Java_pt_hive_viriatum_http_Service_run(JNIEnv *env, jclass cls) {
 	going to be used to return a possible error message */
     char buffer[1024] = "";
 
-	PRINTF("VAI COMEÇAR!!!!!");
-
     /* runs the service, with the given arguments, they are
     crated on the fly as an empty map and deleted after*/
     create_hash_map(&arguments, 0);
@@ -58,9 +56,6 @@ jstring Java_pt_hive_viriatum_http_Service_run(JNIEnv *env, jclass cls) {
         V_ERROR_F("Problem running service (%s)\n", (char *) GET_ERROR());
         SPRINTF(buffer, 1024, "Problem running service (%s)\n", (char *) GET_ERROR());
     }
-
-	PRINTF("VAI COMEÇAR (END) !!!!!");
-
 
     return (*env)->NewStringUTF(env, buffer);
 }
@@ -77,10 +72,6 @@ jstring Java_pt_hive_viriatum_http_Service_ran(JNIEnv *env, jclass cls) {
 	unloading of the service */
     return_value = ran_service();
 
-
-	PRINTF("VAI COMEÇAR A PARAR !!!!\n");
-
-
     /* tests the error code for error */
     if(IS_ERROR_CODE(return_value)) {
         /* prints an error message and copies it to the return
@@ -88,8 +79,6 @@ jstring Java_pt_hive_viriatum_http_Service_ran(JNIEnv *env, jclass cls) {
         V_ERROR_F("Problem ranning service (%s)\n", (char *) GET_ERROR());
         SPRINTF(buffer, 1024, "Problem ranning service (%s)\n", (char *) GET_ERROR());
     }
-
-	PRINTF("ACABOU DE PARAR O SERVICO !!!!\n");
 
     return (*env)->NewStringUTF(env, buffer);
 }
