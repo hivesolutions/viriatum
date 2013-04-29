@@ -104,6 +104,8 @@ jint Java_pt_hive_viriatum_http_Service_port(JNIEnv *env, jclass cls) {
 	not set returns an error value */
 	if(service == NULL || service->options == NULL) { return -1; }
 
+	PRINTF("Service port %d!!!!\n" %  service->options->port);
+
 	/* returns the currently set port for the service instance
 	to the caller method (java) */
     return service->options->port;
