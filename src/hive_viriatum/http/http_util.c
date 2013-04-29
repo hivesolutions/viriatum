@@ -633,6 +633,10 @@ ERROR_CODE parameters_http_c(char *buffer, size_t size, size_t count, ...) {
         );
     }
 
+	/* sets the inial key string value as null so that the
+	value is started initialized, required for safe execution */
+	key_s = NULL;
+
     /* multiplies the count by three as it must contain
     the real number of arguments and not just the number
     of tuples of three in it */
@@ -642,7 +646,7 @@ ERROR_CODE parameters_http_c(char *buffer, size_t size, size_t count, ...) {
     temporarly store the various key value associations */
     create_hash_map(&parameters_map, 0);
 
-    /* iteterates over the sequence of dynamic arguments
+    /* iterates over the sequence of dynamic arguments
     provided to the function to retrieve them as sequences
     of key, value and length, then sets them in the map
     representing the various parameters */
