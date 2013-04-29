@@ -100,8 +100,6 @@ jint Java_pt_hive_viriatum_http_Service_status(JNIEnv *env, jclass cls) {
 	not set returns an error value */
 	if(service == NULL) { return -1; }
 
-	PRINTF_F("Service status %d!!!!\n", service->status);
-
 	/* returns the currently set status for the service instance
 	to the caller method (java) */
     return service->status;
@@ -123,8 +121,6 @@ jint Java_pt_hive_viriatum_http_Service_port(JNIEnv *env, jclass cls) {
 	/* in case the service options or the service is
 	not set returns an error value */
 	if(service == NULL || service->options == NULL) { return -1; }
-
-	PRINTF_F("Service port %d!!!!\n", service->options->port);
 
 	/* returns the currently set port for the service instance
 	to the caller method (java) */
