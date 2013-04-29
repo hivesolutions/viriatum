@@ -97,7 +97,7 @@ jint Java_pt_hive_viriatum_http_Service_port(JNIEnv *env, jclass cls) {
 
 	/* tries to retrieve the reference to the global service
 	instance, in order to get the port from it */
-    return_value = pointer_service(*service);
+    return_value = pointer_service(&service);
     if(IS_ERROR_CODE(return_value)) {
         /* prints an error message and copies it to the return
         value string buffer to be returned to java vm */
