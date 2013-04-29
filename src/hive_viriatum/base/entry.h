@@ -56,6 +56,15 @@ ERROR_CODE ran_service();
 void kill_handler(int signal_number);
 
 /**
+ * Handler callback for the ignore signal.
+ * This is just a placeholder callback.
+ *
+ * @param signal_number The signal number (context) for
+ * which this event is being generated.
+ */
+void ignore_handler(int signal_number);
+
+/**
  * Registers the various signal handlers for the default
  * events, this must be done so that the proper action
  * occur for such events.
