@@ -239,8 +239,10 @@ ERROR_CODE _poll_polling_epoll(struct polling_epoll_t *polling_epoll, struct con
     V_DEBUG_F("Entering epoll statement (%lu)\n", polling_epoll->poll_count);
 
     /* runs the wait process in the epoll, this is the main call
-    of the epoll loop as it si the on responsible for the polling
-    operation and generation of the events */
+    of the epoll loop as it is the one responsible for the polling
+    operation and generation of the events, note that the android
+	version of the call is managed by a timeout so that the event
+	loop does not block (the normal version is unblocked by signals) */
 #ifdef VIRIATUM_PLATFORM_ANDROID
     event_count = epoll_wait(
 		polling_epoll->epoll_fd,
