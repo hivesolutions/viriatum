@@ -670,7 +670,9 @@ ERROR_CODE parameters_http_c(char *buffer, size_t size, size_t count, ...) {
                 strings[index_g].length = length_s;
 
                 set_value_string_hash_map(
-                    parameters_map, key_s, (void *) &strings[index_g]
+                    parameters_map,
+					(unsigned char *) key_s,
+					(void *) &strings[index_g]
                 );
 
                 break;
