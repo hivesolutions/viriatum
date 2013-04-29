@@ -91,10 +91,6 @@ jint Java_pt_hive_viriatum_http_Service_port(JNIEnv *env, jclass cls) {
 	to be retrieved */
     struct service_t *service;
 
-    /* allocates space for the result string buffer,
-	going to be used to return a possible error message */
-    char buffer[1024] = "";
-
 	/* tries to retrieve the reference to the global service
 	instance, in order to get the port from it */
     return_value = pointer_service(&service);
