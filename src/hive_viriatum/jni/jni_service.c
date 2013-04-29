@@ -73,11 +73,8 @@ jstring Java_pt_hive_viriatum_http_Service_ran(JNIEnv *env, jclass cls) {
 	going to be used to return a possible error message */
     char buffer[1024] = "";
 
-	/* "kills" the current process using the custom
-	user signal (to unblock some poll calls) and then
-	runs the ran service call in order to start the
+	/* runs the ran service call in order to start the
 	unloading of the service */
-	kill(pid, SIGUSR1);
     return_value = ran_service();
 
 
