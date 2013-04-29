@@ -241,7 +241,21 @@ ERROR_CODE _poll_polling_epoll(struct polling_epoll_t *polling_epoll, struct con
     /* runs the wait process in the epoll, this is the main call
     of the epoll loop as it si the on responsible for the polling
     operation and generation of the events */
-    event_count = epoll_wait(polling_epoll->epoll_fd, events, VIRIATUM_MAX_EVENTS, -1);
+#ifdef VIRIATUM_ANDROID
+    event_count = epoll_wait(
+		polling_epoll->epoll_fd,
+		events,
+		VIRIATUM_MAX_EVENTS,
+		VIRIATUM_SELECT_TIMEOUT
+	);
+#else
+	event_count = epoll_wait(
+		polling_epoll->epoll_fd,
+		events,
+		VIRIATUM_MAX_EVENTS,
+		-1
+	);
+#endif
 
     /* prints a debug message */
     V_DEBUG_F("Exiting epoll statement with value: %d\n", event_count);
