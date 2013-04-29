@@ -115,7 +115,7 @@ jstring Java_pt_hive_viriatum_http_Service_uptime(JNIEnv *env, jclass cls) {
 
     /* allocates space for the result uptime buffer,
 	this value should be a global constant */
-    char *uptime;
+    const char *uptime;
 
 	/* tries to retrieve the reference to the global service
 	instance, in order to get the port from it */
