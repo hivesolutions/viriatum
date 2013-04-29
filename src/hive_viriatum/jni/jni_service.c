@@ -42,7 +42,7 @@ jstring Java_pt_hive_viriatum_http_Service_run(JNIEnv *env, jclass cls) {
     /* allocates space for the result string buffer */
     char buffer[1024] = "";
 
-	printf("VAI COMEÇAR!!!!!");
+	PRINTF("VAI COMEÇAR!!!!!");
 
     /* runs the service, with the given arguments, they are
     crated on the fly as an empty map and deleted after*/
@@ -58,7 +58,7 @@ jstring Java_pt_hive_viriatum_http_Service_run(JNIEnv *env, jclass cls) {
         SPRINTF(buffer, 1024, "Problem running service (%s)\n", (char *) GET_ERROR());
     }
 
-	printf("VAI COMEÇAR (END) !!!!!");
+	PRINTF("VAI COMEÇAR (END) !!!!!");
 
 
     return (*env)->NewStringUTF(env, buffer);
@@ -75,7 +75,7 @@ jstring Java_pt_hive_viriatum_http_Service_ran(JNIEnv *env, jclass cls) {
     return_value = ran_service();
 
 
-	printf("VAI COMEÇAR A PARAR !!!!\n");
+	PRINTF("VAI COMEÇAR A PARAR !!!!\n");
 
 
     /* tests the error code for error */
@@ -86,7 +86,7 @@ jstring Java_pt_hive_viriatum_http_Service_ran(JNIEnv *env, jclass cls) {
         SPRINTF(buffer, 1024, "Problem ranning service (%s)\n", (char *) GET_ERROR());
     }
 
-	printf("ACABOU DE PARAR O SERVICO !!!!\n");
+	PRINTF("ACABOU DE PARAR O SERVICO !!!!\n");
 
     return (*env)->NewStringUTF(env, buffer);
 }
