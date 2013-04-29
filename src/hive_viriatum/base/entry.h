@@ -47,6 +47,15 @@ ERROR_CODE run_service(char *program_name, struct hash_map_t *parameters);
 ERROR_CODE ran_service();
 
 /**
+ * Retrieves the pointer to the global service instance
+ * so that it may be used to recover information from it
+ *
+ * @param service_pointer The pointer to the service structure
+ * to be set with the current service instance.
+ */
+ERROR_CODE pointer_service(struct service_t **service_pointer);
+
+/**
  * Handler callback for the kill signal.
  * This callback stops the current service instance.
  *
