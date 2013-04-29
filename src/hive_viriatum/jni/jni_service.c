@@ -83,6 +83,55 @@ jstring Java_pt_hive_viriatum_http_Service_ran(JNIEnv *env, jclass cls) {
     return (*env)->NewStringUTF(env, buffer);
 }
 
+jint Java_pt_hive_viriatum_http_Service_connections(JNIEnv *env, jclass cls) {
+    /* allocates the return value */
+    ERROR_CODE return_value;
+
+	/* allocates space for the global service instance
+	to be retrieved */
+    struct service_t *service;
+
+	/* tries to retrieve the reference to the global service
+	instance, in order to get the port from it */
+    return_value = pointer_service(&service);
+	if(IS_ERROR_CODE(return_value)) { return -1; }
+
+	/* in case the service structure or the connections
+	list in it are not currently set returns an error value */
+	if(service == NULL || service->connections_list == NULL) { return -1; }
+
+	/* returns the currently set number connections for the
+	service instance to the caller method (java) */
+    return service->connections_list->size;
+}
+
+jstring Java_pt_hive_viriatum_http_Service_uptime(JNIEnv *env, jclass cls) {
+    /* allocates the return value */
+    ERROR_CODE return_value;
+
+	/* allocates space for the global service instance
+	to be retrieved */
+    struct service_t *service;
+
+    /* allocates space for the result uptime buffer,
+	this value should be a global constant */
+    char *uptime;
+
+	/* tries to retrieve the reference to the global service
+	instance, in order to get the port from it */
+    return_value = pointer_service(&service);
+	if(IS_ERROR_CODE(return_value)) { return NULL; }
+	
+	/* in case the service structure is not currently
+	set returns an error value */
+	if(service == NULL) { return NULL; }
+
+	/* retrieves the uptime from the service as a two
+	value string and then returns it to the caller method */
+	uptime = service->get_uptime(service, 2);
+    return (*env)->NewStringUTF(env, uptime);
+}
+
 jint Java_pt_hive_viriatum_http_Service_status(JNIEnv *env, jclass cls) {
     /* allocates the return value */
     ERROR_CODE return_value;
@@ -97,7 +146,7 @@ jint Java_pt_hive_viriatum_http_Service_status(JNIEnv *env, jclass cls) {
 	if(IS_ERROR_CODE(return_value)) { return -1; }
 
 	/* in case the service structure is not currently
-	not set returns an error value */
+	set returns an error value */
 	if(service == NULL) { return -1; }
 
 	/* returns the currently set status for the service instance
