@@ -1017,7 +1017,7 @@ ERROR_CODE start_service(struct service_t *service) {
 #endif
 
 
-
+/*
     _create_tracker_connection(
         &tracker_connection,
         service,
@@ -1030,7 +1030,10 @@ ERROR_CODE start_service(struct service_t *service) {
         service,
         "localhost",
         32967
-    );
+    );*/
+
+
+	PRINTF("ENTROU DO CLICLO WHILE!!!\n");
 
 
 
@@ -1047,12 +1050,19 @@ ERROR_CODE start_service(struct service_t *service) {
         /* prints a debug message */
         V_DEBUG_F("Memory status: [%ld objects] [%ld KBytes]\n", (long int) ALLOCATIONS, (long int) memory_usage / 1024);
 
+
+		PRINTF("CLICLO WHILE!!!\n");
+
         /* polls the connections using the polling (provider)
         and calls the callbacks for the connection (events)
         using the polling (provider) */
         polling->poll(polling);
         polling->call(polling);
     }
+
+
+	PRINTF("SAIUI DO CLICLO WHILE!!!\n");
+
 
     /* closes (all) the service connections and then
     closes the polling (provider of data) */
