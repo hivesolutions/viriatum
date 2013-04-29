@@ -1033,10 +1033,6 @@ ERROR_CODE start_service(struct service_t *service) {
     );*/
 
 
-	PRINTF("ENTROU DO CLICLO WHILE!!!\n");
-
-
-
     /* iterates continuously, while the service is open (this
     is the main loop triggering all the actions) */
     while(service->status == STATUS_OPEN) {
@@ -1047,24 +1043,20 @@ ERROR_CODE start_service(struct service_t *service) {
         memory_usage = GET_MEMORY_USAGE(memory_information);
         CLOSE_PROCESS(process);
 
-        /* prints a debug message */
-        V_DEBUG_F("Memory status: [%ld objects] [%ld KBytes]\n", (long int) ALLOCATIONS, (long int) memory_usage / 1024);
-
-
-		PRINTF("INICIO POLL !!!\n");
+        /* prints a debug message about the current memory
+		usage, usefull for extreme debugging */
+        V_DEBUG_F(
+	        "Memory status: [%ld objects] [%ld KBytes]\n",
+		    (long int) ALLOCATIONS,
+		    (long int) memory_usage / 1024
+	    );
 
         /* polls the connections using the polling (provider)
         and calls the callbacks for the connection (events)
         using the polling (provider) */
         polling->poll(polling);
         polling->call(polling);
-
-		PRINTF("FINAL POLL !!!\n");
     }
-
-
-	PRINTF("SAIUI DO CLICLO WHILE!!!\n");
-
 
     /* closes (all) the service connections and then
     closes the polling (provider of data) */
