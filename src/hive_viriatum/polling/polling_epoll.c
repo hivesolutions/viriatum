@@ -246,7 +246,7 @@ ERROR_CODE _poll_polling_epoll(struct polling_epoll_t *polling_epoll, struct con
 		polling_epoll->epoll_fd,
 		events,
 		VIRIATUM_MAX_EVENTS,
-		VIRIATUM_SELECT_TIMEOUT
+		VIRIATUM_SELECT_TIMEOUT * 1000
 	);
 #else
 	event_count = epoll_wait(
