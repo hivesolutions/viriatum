@@ -241,6 +241,8 @@ ERROR_CODE _poll_polling_epoll(struct polling_epoll_t *polling_epoll, struct con
     /* prints a debug message */
     V_DEBUG_F("Exiting epoll statement with value: %d\n", event_count);
 
+	PRINTF_F("Exiting epoll statement with value: %d\n", event_count);
+
     /* in case there was an error in epoll, in case there was this is
     considered to be a critical error */
     if(SOCKET_TEST_ERROR(event_count)) {
@@ -301,7 +303,7 @@ ERROR_CODE _poll_polling_epoll(struct polling_epoll_t *polling_epoll, struct con
     }
 
     /* updates the various operation counters for the three
-    operation to be "polled" (this is done by reference) */
+    operations to be "polled" (this is done by reference) */
     *read_connections_size = read_index;
     *write_connections_size = write_index;
     *error_connections_size = error_index;
