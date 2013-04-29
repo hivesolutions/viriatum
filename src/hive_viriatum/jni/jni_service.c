@@ -220,6 +220,28 @@ jstring Java_pt_hive_viriatum_http_Service_flags(JNIEnv *env, jclass cls) {
     return (*env)->NewStringUTF(env, (char *) service->flags);
 }
 
+jstring Java_pt_hive_viriatum_http_Service_compiler(JNIEnv *env, jclass cls) {
+    /* allocates the return value */
+    ERROR_CODE return_value;
+
+	/* allocates space for the global service instance
+	to be retrieved */
+    struct service_t *service;
+
+	/* tries to retrieve the reference to the global service
+	instance, in order to get the port from it */
+    return_value = pointer_service(&service);
+	if(IS_ERROR_CODE(return_value)) { return NULL; }
+
+	/* in case the service structure is not currently
+	set returns an error value */
+	if(service == NULL) { return NULL; }
+
+	/* returns the currently set compiler for the service instance
+	to the caller method (java) */
+    return (*env)->NewStringUTF(env, (char *) service->compiler);
+}
+
 jint Java_pt_hive_viriatum_http_Service_status(JNIEnv *env, jclass cls) {
     /* allocates the return value */
     ERROR_CODE return_value;

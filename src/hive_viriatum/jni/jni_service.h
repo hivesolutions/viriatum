@@ -42,6 +42,7 @@ VIRIATUM_EXPORT_PREFIX jstring Java_pt_hive_viriatum_http_Service_name(JNIEnv *e
 VIRIATUM_EXPORT_PREFIX jstring Java_pt_hive_viriatum_http_Service_version(JNIEnv *env, jclass cls);
 VIRIATUM_EXPORT_PREFIX jstring Java_pt_hive_viriatum_http_Service_platform(JNIEnv *env, jclass cls);
 VIRIATUM_EXPORT_PREFIX jstring Java_pt_hive_viriatum_http_Service_flags(JNIEnv *env, jclass cls);
+VIRIATUM_EXPORT_PREFIX jstring Java_pt_hive_viriatum_http_Service_compiler(JNIEnv *env, jclass cls);
 VIRIATUM_EXPORT_PREFIX jint Java_pt_hive_viriatum_http_Service_status(JNIEnv *env, jclass cls);
 VIRIATUM_EXPORT_PREFIX jint Java_pt_hive_viriatum_http_Service_port(JNIEnv *env, jclass cls);
 
