@@ -1101,8 +1101,18 @@ ERROR_CODE start_service(struct service_t *service) {
 }
 
 ERROR_CODE stop_service(struct service_t *service) {
-    /* sets the service status as closed */
+	/* retrieves the process identifier for the current
+	process, to be used in the killing process */
+	PID_TYPE pid = GET_PID();
+
+    /* sets the service status as closed, this should
+	trigger the unloading of the service in the next
+	poll iteration to be executed */
     service->status = STATUS_CLOSED;
+
+	/* "signs" the current process using the custom
+	user signal (to unblock some poll calls) */
+	SIGN(pid);
 
     /* raises no error */
     RAISE_NO_ERROR;
