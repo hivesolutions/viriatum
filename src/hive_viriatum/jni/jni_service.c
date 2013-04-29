@@ -69,6 +69,10 @@ jstring Java_pt_hive_viriatum_http_Service_ran(JNIEnv *env, jclass cls) {
     /* "rans" the service */
     return_value = ran_service();
 
+
+	printf("VAI COMEÇAR A PARAR !!!!\n");
+
+
     /* tests the error code for error */
     if(IS_ERROR_CODE(return_value)) {
         /* prints an error message and copies it to the return
@@ -76,6 +80,8 @@ jstring Java_pt_hive_viriatum_http_Service_ran(JNIEnv *env, jclass cls) {
         V_ERROR_F("Problem ranning service (%s)\n", (char *) GET_ERROR());
         SPRINTF(buffer, 1024, "Problem ranning service (%s)\n", (char *) GET_ERROR());
     }
+
+	printf("ACABOU DE PARAR O SERVICO !!!!\n");
 
     return (*env)->NewStringUTF(env, buffer);
 }
