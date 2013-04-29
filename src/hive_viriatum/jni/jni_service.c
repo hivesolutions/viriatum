@@ -132,6 +132,94 @@ jstring Java_pt_hive_viriatum_http_Service_uptime(JNIEnv *env, jclass cls) {
     return (*env)->NewStringUTF(env, uptime);
 }
 
+jstring Java_pt_hive_viriatum_http_Service_name(JNIEnv *env, jclass cls) {
+    /* allocates the return value */
+    ERROR_CODE return_value;
+
+	/* allocates space for the global service instance
+	to be retrieved */
+    struct service_t *service;
+
+	/* tries to retrieve the reference to the global service
+	instance, in order to get the port from it */
+    return_value = pointer_service(&service);
+	if(IS_ERROR_CODE(return_value)) { return -1; }
+
+	/* in case the service structure is not currently
+	set returns an error value */
+	if(service == NULL) { return -1; }
+
+	/* returns the currently set name for the service instance
+	to the caller method (java) */
+    return (*env)->NewStringUTF(env, service->name);
+}
+
+jstring Java_pt_hive_viriatum_http_Service_version(JNIEnv *env, jclass cls) {
+    /* allocates the return value */
+    ERROR_CODE return_value;
+
+	/* allocates space for the global service instance
+	to be retrieved */
+    struct service_t *service;
+
+	/* tries to retrieve the reference to the global service
+	instance, in order to get the port from it */
+    return_value = pointer_service(&service);
+	if(IS_ERROR_CODE(return_value)) { return -1; }
+
+	/* in case the service structure is not currently
+	set returns an error value */
+	if(service == NULL) { return -1; }
+
+	/* returns the currently set version for the service instance
+	to the caller method (java) */
+    return (*env)->NewStringUTF(env, service->version);
+}
+
+jstring Java_pt_hive_viriatum_http_Service_platform(JNIEnv *env, jclass cls) {
+    /* allocates the return value */
+    ERROR_CODE return_value;
+
+	/* allocates space for the global service instance
+	to be retrieved */
+    struct service_t *service;
+
+	/* tries to retrieve the reference to the global service
+	instance, in order to get the port from it */
+    return_value = pointer_service(&service);
+	if(IS_ERROR_CODE(return_value)) { return -1; }
+
+	/* in case the service structure is not currently
+	set returns an error value */
+	if(service == NULL) { return -1; }
+
+	/* returns the currently set platform for the service instance
+	to the caller method (java) */
+    return (*env)->NewStringUTF(env, service->platform);
+}
+
+jstring Java_pt_hive_viriatum_http_Service_flags(JNIEnv *env, jclass cls) {
+    /* allocates the return value */
+    ERROR_CODE return_value;
+
+	/* allocates space for the global service instance
+	to be retrieved */
+    struct service_t *service;
+
+	/* tries to retrieve the reference to the global service
+	instance, in order to get the port from it */
+    return_value = pointer_service(&service);
+	if(IS_ERROR_CODE(return_value)) { return -1; }
+
+	/* in case the service structure is not currently
+	set returns an error value */
+	if(service == NULL) { return -1; }
+
+	/* returns the currently set flags for the service instance
+	to the caller method (java) */
+    return (*env)->NewStringUTF(env, service->flags);
+}
+
 jint Java_pt_hive_viriatum_http_Service_status(JNIEnv *env, jclass cls) {
     /* allocates the return value */
     ERROR_CODE return_value;
