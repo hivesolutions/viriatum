@@ -89,7 +89,7 @@ jint Java_pt_hive_viriatum_http_Service_port(JNIEnv *env, jclass cls) {
 
 	/* allocates space for the global service instance
 	to be retrieved */
-    struct service *service;
+    struct service_t *service;
 
     /* allocates space for the result string buffer,
 	going to be used to return a possible error message */
