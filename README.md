@@ -62,7 +62,7 @@ Create the standalone toolchain using the script for that purpose.
 And then you may use the "just" created toolchain to build Viriatum with:
 
     export PATH=/opt/android-toolchain/bin:$PATH
-    ./configure --host=arm-linux-androideabi --target=arm-linux-androideabi --prefix=/opt/android-root
+    ./configure --host=arm-linux-androideabi --build=arm --prefix=/opt/android-root
     make && make install
 
 ### Windows
