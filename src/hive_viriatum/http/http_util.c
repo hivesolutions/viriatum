@@ -633,9 +633,9 @@ ERROR_CODE parameters_http_c(char *buffer, size_t size, size_t count, ...) {
         );
     }
 
-	/* sets the inial key string value as null so that the
-	value is started initialized, required for safe execution */
-	key_s = NULL;
+    /* sets the inial key string value as null so that the
+    value is started initialized, required for safe execution */
+    key_s = NULL;
 
     /* multiplies the count by three as it must contain
     the real number of arguments and not just the number
@@ -671,8 +671,8 @@ ERROR_CODE parameters_http_c(char *buffer, size_t size, size_t count, ...) {
 
                 set_value_string_hash_map(
                     parameters_map,
-					(unsigned char *) key_s,
-					(void *) &strings[index_g]
+                    (unsigned char *) key_s,
+                    (void *) &strings[index_g]
                 );
 
                 break;

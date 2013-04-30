@@ -109,8 +109,8 @@ ERROR_CODE ran_service() {
         V_DEBUG("Stopping service\n");
 
         /* stops the service, this call should make the
-		required changes in the service structure so that
-		it's stopped as soon as possible */
+        required changes in the service structure so that
+        it's stopped as soon as possible */
         return_value = stop_service(service);
 
         /* tests the error code for error */
@@ -131,7 +131,7 @@ ERROR_CODE ran_service() {
 }
 
 ERROR_CODE pointer_service(struct service_t **service_pointer) {
-	*service_pointer = service;
+    *service_pointer = service;
     RAISE_NO_ERROR;
 }
 
