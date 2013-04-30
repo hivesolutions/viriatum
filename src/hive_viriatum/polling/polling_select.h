@@ -132,8 +132,8 @@ typedef struct polling_select_t {
 
     /**
      * The temporary select timeout value, that
-	 * is used in the select operation in order
-	 * to avoid complete blocking in the operation.
+     * is used in the select operation in order
+     * to avoid complete blocking in the operation.
      */
     struct timeval select_timeout_temporary;
 } polling_select;
