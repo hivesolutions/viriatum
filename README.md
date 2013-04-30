@@ -62,6 +62,7 @@ Create the standalone toolchain using the script for that purpose.
 And then you may use the "just" created toolchain to build Viriatum with:
 
     export PATH=/opt/android-toolchain/bin:$PATH
+    export CFLAGS="-L/opt/android-toolchain/lib -I/opt/android-toolchain/include"
     ./configure --host=arm-linux-androideabi --build=arm --prefix=/opt/android-root
     make && make install
 
