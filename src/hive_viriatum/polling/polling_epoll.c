@@ -240,10 +240,10 @@ ERROR_CODE _poll_polling_epoll(struct polling_epoll_t *polling_epoll, struct con
 
     /* runs the wait process in the epoll, this is the main call
     of the epoll loop as it is the one responsible for the polling
-    operation and generation of the events, note that the android
+    operation and generation of the events, note that the embed
 	version of the call is managed by a timeout so that the event
 	loop does not block (the normal version is unblocked by signals) */
-#ifdef VIRIATUM_PLATFORM_ANDROID
+#ifdef VIRIATUM_EMBED
     event_count = epoll_wait(
 		polling_epoll->epoll_fd,
 		events,

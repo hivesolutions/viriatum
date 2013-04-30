@@ -132,7 +132,9 @@ static __inline char *get_config_path() {
 #define VIRIATUM_LOG_PATH "/sdcard/viriatum/viriatum.log"
 #define VIRIATUM_LOG_E_PATH "/sdcard/viriatum/viriatum.err"
 #else
-#define VIRIATUM_PREFORK
+#ifndef VIRIATUM_EMBED
+#define VIRIATUM_EMBED
+#endif
 #ifndef VIRIATUM_MODULES_PATH
 #define VIRIATUM_MODULES_PATH "/usr/lib/viriatum/modules"
 #endif
