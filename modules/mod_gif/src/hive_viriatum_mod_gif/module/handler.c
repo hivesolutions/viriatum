@@ -40,117 +40,23 @@ unsigned char _empty_gif[] = {
 unsigned int _empty_gif_size = 43;
 
 ERROR_CODE set_handler_gif(struct http_connection_t *http_connection) {
-    /* sets both the http parser values and the settings
-    and then returns normally to the caller function */
-    _set_http_parser_handler_gif(http_connection->http_parser);
-    _set_http_settings_handler_gif(http_connection->http_settings);
+    /* sets the http setting values (callback handlers) and then returns
+	normally to the caller function */
+	http_connection->http_settings->on_message_complete = message_complete_callback_handler_gif;
     RAISE_NO_ERROR;
 }
 
 ERROR_CODE unset_handler_gif(struct http_connection_t *http_connection) {
-    /* unsets both the http parser values and the settings
-    and then returns normally to the caller function */
-    _unset_http_parser_handler_gif(http_connection->http_parser);
-    _unset_http_settings_handler_gif(http_connection->http_settings);
-    RAISE_NO_ERROR;
-}
-
-ERROR_CODE message_begin_callback_handler_module(struct http_parser_t *http_parser) {
-    /* raise no error */
-    RAISE_NO_ERROR;
-}
-
-ERROR_CODE url_callback_handler_gif(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
-    /* raise no error */
-    RAISE_NO_ERROR;
-}
-
-ERROR_CODE header_field_callback_handler_gif(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
-    /* raise no error */
-    RAISE_NO_ERROR;
-}
-
-ERROR_CODE header_value_callback_handler_gif(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
-    /* raise no error */
-    RAISE_NO_ERROR;
-}
-
-ERROR_CODE headers_complete_callback_handler_gif(struct http_parser_t *http_parser) {
-    /* raise no error */
-    RAISE_NO_ERROR;
-}
-
-ERROR_CODE body_callback_handler_gif(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
-    /* raise no error */
+    /* unsets the http setting values (callback handlers) and then returns
+	normally to the caller function */
+    http_connection->http_settings->on_message_complete = NULL;
     RAISE_NO_ERROR;
 }
 
 ERROR_CODE message_complete_callback_handler_gif(struct http_parser_t *http_parser) {
-    /* sends (and creates) the reponse */
+    /* sends (and creates) the reponse from the currently parsed
+	messages and then returns with no error the caller function */
     _send_response_handler_gif(http_parser);
-
-    /* raise no error */
-    RAISE_NO_ERROR;
-}
-
-ERROR_CODE path_callback_handler_gif(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
-    /* raise no error */
-    RAISE_NO_ERROR;
-}
-
-ERROR_CODE location_callback_handler_gif(struct http_parser_t *http_parser, size_t index, size_t offset) {
-    /* raise no error */
-    RAISE_NO_ERROR;
-}
-
-ERROR_CODE virtual_url_callback_handler_gif(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
-    /* raise no error */
-    RAISE_NO_ERROR;
-}
-
-ERROR_CODE _set_http_parser_handler_gif(struct http_parser_t *http_parser) {
-    /* raises no error */
-    RAISE_NO_ERROR;
-}
-
-ERROR_CODE _unset_http_parser_handler_gif(struct http_parser_t *http_parser) {
-    /* raises no error */
-    RAISE_NO_ERROR;
-}
-
-ERROR_CODE _set_http_settings_handler_gif(struct http_settings_t *http_settings) {
-    /* sets the various callback functions in the http settings
-    structure, these callbacks are going to be used in the runtime
-    processing of http parser (runtime execution) */
-    http_settings->on_message_begin = message_begin_callback_handler_module;
-    http_settings->on_url = url_callback_handler_gif;
-    http_settings->on_header_field = header_field_callback_handler_gif;
-    http_settings->on_header_value = header_value_callback_handler_gif;
-    http_settings->on_headers_complete = headers_complete_callback_handler_gif;
-    http_settings->on_body = body_callback_handler_gif;
-    http_settings->on_message_complete = message_complete_callback_handler_gif;
-    http_settings->on_path = path_callback_handler_gif;
-    http_settings->on_location = location_callback_handler_gif;
-    http_settings->on_virtual_url = virtual_url_callback_handler_gif;
-
-    /* raises no error */
-    RAISE_NO_ERROR;
-}
-
-ERROR_CODE _unset_http_settings_handler_gif(struct http_settings_t *http_settings) {
-    /* unsets the various callback functions from the http settings */
-    http_settings->on_message_begin = NULL;
-    http_settings->on_url = NULL;
-    http_settings->on_header_field = NULL;
-    http_settings->on_header_value = NULL;
-    http_settings->on_headers_complete = NULL;
-    http_settings->on_body = NULL;
-    http_settings->on_message_complete = NULL;
-    http_settings->on_path = NULL;
-    http_settings->on_location = NULL;
-    http_settings->on_virtual_url = NULL;
-
-    /* raises no error */
     RAISE_NO_ERROR;
 }
 
@@ -191,12 +97,8 @@ ERROR_CODE _send_response_handler_gif(struct http_parser_t *http_parser) {
         NO_CACHE,
         TRUE
     );
-    count += SPRINTF(
-        &buffer[count],
-        VIRIATUM_HTTP_SIZE - count,
-        "%s",
-        _empty_gif
-    );
+	memcpy(&buffer[count], _empty_gif, _empty_gif_size);
+	count += _empty_gif_size;
 
     /* writes the response to the connection, this will write the
     complete message to the connection, upon finishing the sent operation

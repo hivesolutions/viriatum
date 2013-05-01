@@ -31,20 +31,6 @@
 
 ERROR_CODE set_handler_gif(struct http_connection_t *http_connection);
 ERROR_CODE unset_handler_gif(struct http_connection_t *http_connection);
-ERROR_CODE url_callback_handler_gif(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size);
-ERROR_CODE header_field_callback_handler_gif(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size);
-ERROR_CODE header_value_callback_handler_gif(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size);
-ERROR_CODE headers_complete_callback_handler_gif(struct http_parser_t *http_parser);
-ERROR_CODE body_callback_handler_gif(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size);
 ERROR_CODE message_complete_callback_handler_gif(struct http_parser_t *http_parser);
-ERROR_CODE path_callback_handler_gif(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size);
-ERROR_CODE location_callback_handler_gif(struct http_parser_t *http_parser, size_t index, size_t offset);
-ERROR_CODE virtual_url_callback_handler_gif(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size);
-ERROR_CODE _set_http_parser_handler_gif(struct http_parser_t *http_parser);
-ERROR_CODE _unset_http_parser_handler_gif(struct http_parser_t *http_parser);
-ERROR_CODE _set_http_settings_handler_gif(struct http_settings_t *http_settings);
-ERROR_CODE _unset_http_settings_handler_gif(struct http_settings_t *http_settings);
-ERROR_CODE _message_begin_callback_handler_gif(struct http_parser_t *http_parser);
 ERROR_CODE _send_response_handler_gif(struct http_parser_t *http_parser);
 ERROR_CODE _send_response_callback_handler_gif(struct connection_t *connection, struct data_t *data, void *parameters);
-ERROR_CODE _write_error_connection_gif(struct http_parser_t *http_parser, char *message);
