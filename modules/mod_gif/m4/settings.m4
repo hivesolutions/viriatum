@@ -24,8 +24,8 @@
 # __license__   = GNU General Public License (GPL), Version 3
 
 # defines the version values
-m4_define([mod_lua_major_version], [1])
-m4_define([mod_lua_minor_version], [0])
-m4_define([mod_lua_micro_version], [0])
-m4_define([mod_lua_version], m4_format(%s.%s.%s, mod_lua_major_version, mod_lua_minor_version, mod_lua_micro_version))
-m4_define([mod_lua_makefiles], [Makefile m4/Makefile src/Makefile src/hive_viriatum_mod_lua/Makefile])
+m4_define([mod_gif_major_version], [1])
+m4_define([mod_gif_minor_version], [0])
+m4_define([mod_gif_micro_version], [0])
+m4_define([mod_gif_version], m4_format(%s.%s.%s, mod_gif_major_version, mod_gif_minor_version, mod_gif_micro_version))
+m4_define([mod_gif_makefiles], [Makefile m4/Makefile src/Makefile src/hive_viriatum_mod_gif/Makefile])

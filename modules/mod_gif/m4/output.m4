@@ -24,4 +24,4 @@
 # __license__   = GNU General Public License (GPL), Version 3
 
 # sets the entry point make files to be used by automake
-AC_OUTPUT(mod_lua_makefiles)
+AC_OUTPUT(mod_gif_makefiles)
