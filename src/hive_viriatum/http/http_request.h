@@ -99,7 +99,8 @@ typedef enum http_keep_alive_e {
  * http cache control strategies.
  */
 typedef enum http_cache_e {
-    NO_CACHE = 1
+    NO_CACHE = 1,
+	MAX_AGE
 } http_cache;
 
 typedef struct http_header_value_t {

@@ -68,8 +68,9 @@ static const char *keep_alive_codes[2] = {
  * The various values for the cache control
  * system values.
  */
-static const char *cache_codes[1] = {
-    "no-cache, must-revalidate"
+static const char *cache_codes[2] = {
+    "no-cache, must-revalidate",
+	"max-age=604800"
 };
 
 /**

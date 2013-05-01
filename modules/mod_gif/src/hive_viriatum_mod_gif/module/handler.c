@@ -94,7 +94,7 @@ ERROR_CODE _send_response_handler_gif(struct http_parser_t *http_parser) {
         "OK",
         KEEP_ALIVE,
         _empty_gif_size,
-        NO_CACHE,
+        MAX_AGE,
         FALSE
     );
     count += SPRINTF(
