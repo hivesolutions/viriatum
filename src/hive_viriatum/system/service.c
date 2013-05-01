@@ -1204,7 +1204,8 @@ ERROR_CODE load_modules_service(struct service_t *service) {
         pointer = strstr((char *) entry->name, "viriatum_");
         if(pointer != (char *) entry->name && pointer != (char *) entry->name + 3) { continue; }
 
-        /* loads the module, retrieving a possible error code */
+        /* loads the module, retrieving a possible error code in case
+        there was a problem in the middle of the module load */
         error_code = load_module(service, module_path);
 
         /* tests the error code for error, and in case there's an

@@ -127,18 +127,18 @@ ERROR_CODE load_module(struct service_t *service, unsigned char *module_path) {
         /* retrieves the library error message */
         const char *error_message = GET_LIBRARY_ERROR_MESSAGE();
 
-        /* in case no error message is found, must
-        set the default errro message */
-        if(error_message == NULL) {
-            /* sets the default assumed error message */
-            error_message = "File not found";
-        }
-
-        /* prints a warning message */
+        /* in case no error message is found, must set the
+        default errro message in the proper variable and then
+        print a warning message to the output */
+        if(error_message == NULL) { error_message = "File not found"; }
         V_WARNING_F("Error loading library (%s)\n", error_message);
 
-        /* raises an error */
-        RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Error loading library");
+        /* raises an error indicating the problem with the loading
+        of the module's library */
+        RAISE_ERROR_M(
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Error loading library"
+        );
     } else {
         /* prints a debug message */
         V_DEBUG("Loaded library\n");
@@ -169,10 +169,9 @@ ERROR_CODE load_module(struct service_t *service, unsigned char *module_path) {
         V_DEBUG_F("Found symbol '%s' in library\n", info_module_name);
     }
 
-    /* creates the environment */
+    /* creates the environment and then creates the
+    module structures */
     create_environment(&environment);
-
-    /* creates the module */
     create_module(&module);
 
     /* sets the module attributes */
