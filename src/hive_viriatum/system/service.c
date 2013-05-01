@@ -1044,12 +1044,12 @@ ERROR_CODE start_service(struct service_t *service) {
         CLOSE_PROCESS(process);
 
         /* prints a debug message about the current memory
-		usage, usefull for extreme debugging */
+        usage, usefull for extreme debugging */
         V_DEBUG_F(
-	        "Memory status: [%ld objects] [%ld KBytes]\n",
-		    (long int) ALLOCATIONS,
-		    (long int) memory_usage / 1024
-	    );
+            "Memory status: [%ld objects] [%ld KBytes]\n",
+            (long int) ALLOCATIONS,
+            (long int) memory_usage / 1024
+        );
 
         /* polls the connections using the polling (provider)
         and calls the callbacks for the connection (events)
@@ -1094,8 +1094,8 @@ ERROR_CODE start_service(struct service_t *service) {
 
 ERROR_CODE stop_service(struct service_t *service) {
     /* sets the service status as closed, this should
-	trigger the unloading of the service in the next
-	poll iteration to be executed */
+    trigger the unloading of the service in the next
+    poll iteration to be executed */
     service->status = STATUS_CLOSED;
 
     /* raises no error */
