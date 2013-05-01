@@ -41,21 +41,21 @@ unsigned int _empty_gif_size = 43;
 
 ERROR_CODE set_handler_gif(struct http_connection_t *http_connection) {
     /* sets the http setting values (callback handlers) and then returns
-	normally to the caller function */
-	http_connection->http_settings->on_message_complete = message_complete_callback_handler_gif;
+    normally to the caller function */
+    http_connection->http_settings->on_message_complete = message_complete_callback_handler_gif;
     RAISE_NO_ERROR;
 }
 
 ERROR_CODE unset_handler_gif(struct http_connection_t *http_connection) {
     /* unsets the http setting values (callback handlers) and then returns
-	normally to the caller function */
+    normally to the caller function */
     http_connection->http_settings->on_message_complete = NULL;
     RAISE_NO_ERROR;
 }
 
 ERROR_CODE message_complete_callback_handler_gif(struct http_parser_t *http_parser) {
     /* sends (and creates) the reponse from the currently parsed
-	messages and then returns with no error the caller function */
+    messages and then returns with no error the caller function */
     _send_response_handler_gif(http_parser);
     RAISE_NO_ERROR;
 }
@@ -95,10 +95,16 @@ ERROR_CODE _send_response_handler_gif(struct http_parser_t *http_parser) {
         KEEP_ALIVE,
         _empty_gif_size,
         NO_CACHE,
-        TRUE
+        FALSE
     );
-	memcpy(&buffer[count], _empty_gif, _empty_gif_size);
-	count += _empty_gif_size;
+    count += SPRINTF(
+        &buffer[count],
+        VIRIATUM_HTTP_SIZE - count,
+        CONTENT_TYPE_H ": %s\r\n\r\n",
+        "image/gif"
+    );
+    memcpy(&buffer[count], _empty_gif, _empty_gif_size);
+    count += _empty_gif_size;
 
     /* writes the response to the connection, this will write the
     complete message to the connection, upon finishing the sent operation
