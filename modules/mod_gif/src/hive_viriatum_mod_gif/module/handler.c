@@ -70,10 +70,10 @@ ERROR_CODE _send_response_handler_gif(struct http_parser_t *http_parser) {
     /* retrieves the connection from the http parser parameters */
     struct connection_t *connection = (struct connection_t *) http_parser->parameters;
 
-    /* retrieves the http connection from the io connection and uses it to retrieve
-    the correct (mod gif) handler to operate around it */
-    struct http_connection_t *http_connection = (struct http_connection_t *) ((struct io_connection_t *) connection->lower)->lower;
-    struct mod_gif_http_handler_t *mod_gif_http_handler = (struct mod_gif_http_handler_t *) http_connection->http_handler->lower;
+    /* retrieves the http connection from the io connection to be used
+    for the http level operation to be done */
+    struct http_connection_t *http_connection =\
+        (struct http_connection_t *) ((struct io_connection_t *) connection->lower)->lower;
 
     /* allocates the buffer to be used to send the empty gif data, it must
     be allocated inside the viriatum memory area so that the deallocation of

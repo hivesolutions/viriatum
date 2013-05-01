@@ -128,8 +128,11 @@ ERROR_CODE stop_module_gif(struct environment_t *environment, struct module_t *m
     V_DEBUG_F("Stopping the module '%s' (%s) v%s\n", name, description, version);
 
     /* removes the http handler from the service, it can no longer
-    be used to handle any request from this point on */
+    be used to handle any request from this point on, then deletes
+    both the http handler and the mod gif module (to avoid memory leaks) */
     service->remove_http_handler(service, http_handler);
+    if(http_handler != NULL) { service->delete_http_handler(service, http_handler); }
+    delete_mod_gif_module(mod_gif_module);
 
     /* raises no error */
     RAISE_NO_ERROR;
