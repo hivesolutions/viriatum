@@ -59,7 +59,7 @@ typedef size_t (*http_connection_headers) (struct connection_t *, char *, size_t
  * This functions uses a more complete approach to the fill
  * of the http headers.
  */
-typedef size_t (*http_connection_headers_c) (struct connection_t *, char *, size_t, enum http_version_e, int, char *, enum http_keep_alive_e, size_t, enum http_cache_e, int );
+typedef size_t (*http_connection_headers_c) (struct connection_t *, char *, size_t, enum http_version_e, int, char *, enum http_keep_alive_e, size_t, enum http_cache_e, int);
 
 /**
  * Function used to populate a provided buffer with http
