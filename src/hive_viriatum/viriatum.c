@@ -78,13 +78,13 @@ ERROR_CODE destroy_service() {
 }
 
 ERROR_CODE run_service() {
-    /* allocates the return value */
+    /* allocates the return value to be used to gather
+	the error result from the service calls */
     ERROR_CODE return_value;
 
-    /* allocates the socket data */
+    /* allocates the socket data and then initializes
+	the socket infrastructure (global structures) */
     SOCKET_DATA socket_data;
-
-    /* initializes the socket infrastructure */
     SOCKET_INITIALIZE(&socket_data);
 
     /* updates the registers signals handler so that the service
