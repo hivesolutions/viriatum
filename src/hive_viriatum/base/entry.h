@@ -29,8 +29,32 @@
 
 #include "../system/system.h"
 
+/**
+ * Initializes the service structure populating it's values
+ * and loading the arguments and configuration from the command
+ * line and configuration files.
+ *
+ * @param program_name The name (path) to the current program
+ * (process) in execution for the service context.
+ * @param parameters The map containing the various parameters
+ * to be used while running the service.
+ */
 ERROR_CODE init_service(char *program_name, struct hash_map_t *arguments);
+
+/**
+ * Destroys the service structure, so that the running of it is
+ * not possible anymore.
+ * If one wants to run a service after this call the init service
+ * function must be called first.
+ */
 ERROR_CODE destroy_service();
+
+/**
+ * Start the process of running a service by looping for connection
+ * changes for the context of execution.
+ * Note that the modules are only loaded after this call.
+ * To unblock this call the ran service function should be called.
+ */
 ERROR_CODE run_service();
 
 /**
