@@ -32,7 +32,10 @@
 #ifdef VIRIATUM_JNI
 
 jboolean Java_pt_hive_viriatum_http_Service_exists(JNIEnv *env, jclass cls) {
-	struct service_t *service = get_service();
+    ERROR_CODE return_value;
+	struct service_t *service;
+	return_value = pointer_service(service);
+	if(IS_ERROR_CODE(return_value)) { return FALSE; }
 	if(service == NULL) { return FALSE; }
 	else { return TRUE; }
 }

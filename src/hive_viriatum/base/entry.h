@@ -29,7 +29,6 @@
 
 #include "../system/system.h"
 
-struct service_t *get_service();
 ERROR_CODE init_service(char *program_name, struct hash_map_t *arguments);
 ERROR_CODE destroy_service();
 ERROR_CODE run_service();
@@ -42,12 +41,15 @@ ERROR_CODE run_service();
  * At the end of the execution the global service object is then
  * destroyed an no other execution is possible from it.
  *
+ * This function is considered safe because the service is forced
+ * to be initialized before the run/start of it.
+ *
  * @param program_name The name (path) to the current program
  * (process) in execution for the service context.
  * @param parameters The map containing the various parameters
  * to be used while running the service.
  */
-ERROR_CODE run_service_c(char *program_name, struct hash_map_t *parameters);
+ERROR_CODE run_service_s(char *program_name, struct hash_map_t *parameters);
 
 /**
  * Stops the process of a running the service.

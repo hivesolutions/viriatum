@@ -48,8 +48,6 @@ START_MEMORY;
 unsigned char local = 0;
 static struct service_t *service = NULL;
 
-struct service_t *get_service() { return service; }
-
 ERROR_CODE init_service(char *program_name, struct hash_map_t *arguments) {
     /* creates the service and loads the options
     taking into account the arguments */
@@ -69,8 +67,10 @@ ERROR_CODE init_service(char *program_name, struct hash_map_t *arguments) {
 
 ERROR_CODE destroy_service() {
     /* deletes the service, disallowing any further
-    access to the service instance */
+    access to the service instance, and then sets its
+	reference back to the original (unset sate) */
     delete_service(service);
+	service = NULL;
 
     /* raises no error to the caller method, normal
     exit operation (should provide no problem) */
@@ -116,7 +116,7 @@ ERROR_CODE run_service() {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE run_service_c(char *program_name, struct hash_map_t *arguments) {
+ERROR_CODE run_service_s(char *program_name, struct hash_map_t *arguments) {
     /* allocates space for the error value that will be used
     to check for an error in the call */
     ERROR_CODE return_value;
@@ -411,7 +411,7 @@ int main(int argc, char *argv[]) {
     /* runs the service, with the given arguments, this call
     should blobk the program control flow until an event
     stop the running of the main loop */
-    return_value = run_service_c(program_name, arguments);
+    return_value = run_service_s(program_name, arguments);
 
     /* tests the error code for error in case it exists
     prints a message indicating the problem that occurred */
