@@ -64,10 +64,6 @@ jstring Java_pt_hive_viriatum_http_Service_destroy(JNIEnv *env, jclass cls) {
     /* allocates the return value */
     ERROR_CODE return_value;
 
-    /* allocates space for the hash map that will hold
-    the arguments for the service execution */
-    struct hash_map_t *arguments;
-
     /* allocates space for the result string buffer,
     going to be used to return a possible error message */
     char buffer[1024] = "";
@@ -88,10 +84,6 @@ jstring Java_pt_hive_viriatum_http_Service_destroy(JNIEnv *env, jclass cls) {
 jstring Java_pt_hive_viriatum_http_Service_run(JNIEnv *env, jclass cls) {
     /* allocates the return value */
     ERROR_CODE return_value;
-
-    /* allocates space for the hash map that will hold
-    the arguments for the service execution */
-    struct hash_map_t *arguments;
 
     /* allocates space for the result string buffer,
     going to be used to return a possible error message */
