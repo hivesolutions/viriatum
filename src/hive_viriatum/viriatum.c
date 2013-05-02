@@ -409,7 +409,7 @@ int main(int argc, char *argv[]) {
     execute_arguments(arguments);
 
     /* runs the service, with the given arguments, this call
-    should blobk the program control flow until an event
+    should block the program control flow until an event
     stop the running of the main loop */
     return_value = run_service_s(program_name, arguments);
 
@@ -426,6 +426,10 @@ int main(int argc, char *argv[]) {
 
     /* deletes the processed arguments */
     delete_arguments(arguments);
+
+	/* cleans up the pool based memorty allocation system
+	releasing all of its memory before the exit (no leaks) */
+	cleanup_palloc();
 
     /* prints a debug message */
     V_DEBUG("Finishing process\n");

@@ -171,36 +171,8 @@ typedef struct memory_pool_t {
     size_t items_max_size;
 } memory_pool;
 
-static __inline void alloc_memory_pool(struct memory_pool_t *pool, size_t chunk_max_size) {
-    chunk_max_size = chunk_max_size > 0 ? chunk_max_size : 6;
-
-    pool->free = 0;
-    pool->chunk_count = 0;
-    pool->chunk_max_size = chunk_max_size;
-    pool->items_max_size = pool->chunk_max_size * CHUNK_SIZE;
-
-    pool->chunks = MALLOC(
-        sizeof(struct memory_chunk_t *) * pool->chunk_max_size
-    );
-    pool->buffer_item_map = MALLOC(
-        sizeof(struct memory_chunk_t *) * pool->items_max_size
-    );
-
-    memset(
-        pool->buffer_item_map, 0,
-        sizeof(struct memory_chunk_t *) * pool->items_max_size
-    );
-}
-
-static __inline void release_memory_pool(struct memory_pool_t *pool) {
-    FREE(pool->chunks);
-    FREE(pool->buffer_item_map);
-
-    pool->free = 0;
-    pool->chunk_count = 0;
-    pool->chunk_max_size = 0;
-    pool->items_max_size = 0;
-}
+VIRIATUM_EXPORT_PREFIX void cleanup_palloc();
+VIRIATUM_EXPORT_PREFIX void add_palloc(struct memory_pool_t *pool);
 
 static __inline void create_chunk(struct memory_chunk_t **chunk_pointer, size_t size, size_t index_pool) {
     size_t index;
@@ -231,6 +203,47 @@ static __inline void delete_chunk(struct memory_chunk_t *chunk) {
 
     FREE(chunk->buffer);
     FREE(chunk);
+}
+
+static __inline void alloc_memory_pool(struct memory_pool_t *pool, size_t chunk_max_size) {
+    chunk_max_size = chunk_max_size > 0 ? chunk_max_size : 6;
+
+    pool->free = 0;
+    pool->chunk_count = 0;
+    pool->chunk_max_size = chunk_max_size;
+    pool->items_max_size = pool->chunk_max_size * CHUNK_SIZE;
+
+    pool->chunks = MALLOC(
+        sizeof(struct memory_chunk_t *) * pool->chunk_max_size
+    );
+    pool->buffer_item_map = MALLOC(
+        sizeof(struct memory_chunk_t *) * pool->items_max_size
+    );
+
+    memset(
+        pool->buffer_item_map, 0,
+        sizeof(struct memory_chunk_t *) * pool->items_max_size
+    );
+
+	add_palloc(pool);
+}
+
+static __inline void release_memory_pool(struct memory_pool_t *pool) {
+	size_t index;
+	struct memory_chunk_t *chunk;
+
+	for(index = 0; index < pool->chunk_count; index++) {
+		chunk = pool->chunks[index];
+		delete_chunk(chunk);
+	}
+
+    FREE(pool->chunks);
+    FREE(pool->buffer_item_map);
+
+    pool->free = 0;
+    pool->chunk_count = 0;
+    pool->chunk_max_size = 0;
+    pool->items_max_size = 0;
 }
 
 static __inline void *palloc(struct memory_pool_t *pool, size_t size) {

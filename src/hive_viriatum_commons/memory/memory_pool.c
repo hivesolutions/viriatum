@@ -28,3 +28,21 @@
 #include "stdafx.h"
 
 #include "memory_pool.h"
+
+static struct memory_pool_t *pools[256];
+static size_t pool_counter = 0;
+
+void cleanup_palloc() {
+	size_t index;
+	struct memory_pool_t *pool;
+
+	for(index = 0; index < pool_counter; index++) {
+		pool = pools[index];
+		release_memory_pool(pool);
+	}
+}
+
+void add_palloc(struct memory_pool_t *pool) {
+	pools[pool_counter] = pool;
+	pool_counter++;
+}
