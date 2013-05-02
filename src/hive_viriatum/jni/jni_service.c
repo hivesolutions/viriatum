@@ -31,6 +31,12 @@
 
 #ifdef VIRIATUM_JNI
 
+jboolean Java_pt_hive_viriatum_http_Service_exists(JNIEnv *env, jclass cls) {
+	struct service_t *service = get_service();
+	if(service == NULL) { return FALSE; }
+	else { return TRUE; }
+}
+
 jstring Java_pt_hive_viriatum_http_Service_init(JNIEnv *env, jclass cls) {
     /* allocates the return value */
     ERROR_CODE return_value;
@@ -53,8 +59,16 @@ jstring Java_pt_hive_viriatum_http_Service_init(JNIEnv *env, jclass cls) {
     if(IS_ERROR_CODE(return_value)) {
         /* prints an error message and copies it to the return
         value string buffer */
-        V_ERROR_F("Problem initializing service (%s)\n", (char *) GET_ERROR());
-        SPRINTF(buffer, 1024, "Problem initializing service (%s)\n", (char *) GET_ERROR());
+        V_ERROR_F(
+		    "Problem initializing service (%s)\n",
+			(char *) GET_ERROR()
+		);
+        SPRINTF(
+			buffer,
+			1024,
+			"Problem initializing service (%s)\n",
+			(char *) GET_ERROR()
+		);
     }
 
     return (*env)->NewStringUTF(env, buffer);
