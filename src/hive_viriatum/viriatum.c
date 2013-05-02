@@ -83,7 +83,7 @@ ERROR_CODE run_service() {
     ERROR_CODE return_value;
 
     /* allocates the socket data and then initializes
-	the socket infrastructure (global structures) */
+	the socket infrastructure (global structures) with it */
     SOCKET_DATA socket_data;
     SOCKET_INITIALIZE(&socket_data);
 
