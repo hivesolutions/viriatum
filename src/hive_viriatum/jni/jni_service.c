@@ -68,7 +68,7 @@ jstring Java_pt_hive_viriatum_http_Service_destroy(JNIEnv *env, jclass cls) {
     going to be used to return a possible error message */
     char buffer[1024] = "";
 
-    return_value = destroy_service("jni", arguments);
+    return_value = destroy_service();
 
     /* tests the error code for error */
     if(IS_ERROR_CODE(return_value)) {
