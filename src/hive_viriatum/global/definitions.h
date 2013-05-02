@@ -122,15 +122,16 @@ static __inline char *get_config_path() {
 
 #ifdef VIRIATUM_PLATFORM_UNIX
 #ifdef VIRIATUM_PLATFORM_ANDROID
-#define VIRIATUM_MODULES_PATH "/sdcard/viriatum/modules"
-#define VIRIATUM_RESOURCES_PATH "/sdcard/viriatum/www"
-#define VIRIATUM_CONFIG_PATH "/sdcard/viriatum/config"
+#define VIRIATUM_DATA_PATH "/data/data/pt.hive.viriatum/files"
+#define VIRIATUM_MODULES_PATH VIRIATUM_DATA_PATH "/viriatum/modules"
+#define VIRIATUM_RESOURCES_PATH VIRIATUM_DATA_PATH "/viriatum/www"
+#define VIRIATUM_CONFIG_PATH VIRIATUM_DATA_PATH "/viriatum/config"
 #define VIRIATUM_BASE_PATH ""
 #define VIRIATUM_LISTING_PATH "/templates/listing.html.tpl"
 #define VIRIATUM_ERROR_PATH "/templates/error.html.tpl"
-#define VIRIATUM_CONTENTS_PATH "/sdcard/viriatum/www"
-#define VIRIATUM_LOG_PATH "/sdcard/viriatum/viriatum.log"
-#define VIRIATUM_LOG_E_PATH "/sdcard/viriatum/viriatum.err"
+#define VIRIATUM_CONTENTS_PATH VIRIATUM_DATA_PATH "/viriatum/www"
+#define VIRIATUM_LOG_PATH VIRIATUM_DATA_PATH "/viriatum/viriatum.log"
+#define VIRIATUM_LOG_E_PATH VIRIATUM_DATA_PATH "/viriatum/viriatum.err"
 #else
 #ifndef VIRIATUM_EMBED
 #define VIRIATUM_EMBED
