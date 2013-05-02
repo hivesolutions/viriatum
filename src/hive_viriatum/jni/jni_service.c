@@ -31,7 +31,7 @@
 
 #ifdef VIRIATUM_JNI
 
-jstring Java_pt_hive_viriatum_http_Service_run(JNIEnv *env, jclass cls) {
+jstring Java_pt_hive_viriatum_http_Service_init(JNIEnv *env, jclass cls) {
     /* allocates the return value */
     ERROR_CODE return_value;
 
@@ -44,10 +44,62 @@ jstring Java_pt_hive_viriatum_http_Service_run(JNIEnv *env, jclass cls) {
     char buffer[1024] = "";
 
     /* runs the service, with the given arguments, they are
-    crated on the fly as an empty map and deleted after*/
+    crated on the fly as an empty map and deleted after */
     create_hash_map(&arguments, 0);
-    return_value = run_service("jni", arguments);
+    return_value = init_service("jni", arguments);
     delete_hash_map(arguments);
+
+    /* tests the error code for error */
+    if(IS_ERROR_CODE(return_value)) {
+        /* prints an error message and copies it to the return
+        value string buffer */
+        V_ERROR_F("Problem initializing service (%s)\n", (char *) GET_ERROR());
+        SPRINTF(buffer, 1024, "Problem initializing service (%s)\n", (char *) GET_ERROR());
+    }
+
+    return (*env)->NewStringUTF(env, buffer);
+}
+
+jstring Java_pt_hive_viriatum_http_Service_destroy(JNIEnv *env, jclass cls) {
+    /* allocates the return value */
+    ERROR_CODE return_value;
+
+    /* allocates space for the hash map that will hold
+    the arguments for the service execution */
+    struct hash_map_t *arguments;
+
+    /* allocates space for the result string buffer,
+    going to be used to return a possible error message */
+    char buffer[1024] = "";
+
+    return_value = destroy_service("jni", arguments);
+
+    /* tests the error code for error */
+    if(IS_ERROR_CODE(return_value)) {
+        /* prints an error message and copies it to the return
+        value string buffer */
+        V_ERROR_F("Problem destroying service (%s)\n", (char *) GET_ERROR());
+        SPRINTF(buffer, 1024, "Problem destroying service (%s)\n", (char *) GET_ERROR());
+    }
+
+    return (*env)->NewStringUTF(env, buffer);
+}
+
+jstring Java_pt_hive_viriatum_http_Service_run(JNIEnv *env, jclass cls) {
+    /* allocates the return value */
+    ERROR_CODE return_value;
+
+    /* allocates space for the hash map that will hold
+    the arguments for the service execution */
+    struct hash_map_t *arguments;
+
+    /* allocates space for the result string buffer,
+    going to be used to return a possible error message */
+    char buffer[1024] = "";
+
+    /* runs the service, from the current global service
+    structure, this structure must already be initialized */
+    return_value = run_service();
 
     /* tests the error code for error */
     if(IS_ERROR_CODE(return_value)) {
