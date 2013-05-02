@@ -424,11 +424,10 @@ int main(int argc, char *argv[]) {
     invalid or erroneous state */
     cleanup(arguments);
 
-    /* deletes the processed arguments */
+    /* deletes the processed arguments and then cleans up
+	the pool based memory allocation system releasing all
+	of its memory before the exit (no leaks) */
     delete_arguments(arguments);
-
-	/* cleans up the pool based memorty allocation system
-	releasing all of its memory before the exit (no leaks) */
 	cleanup_palloc();
 
     /* prints a debug message */
