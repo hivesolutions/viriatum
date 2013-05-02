@@ -57,8 +57,8 @@ ERROR_CODE _send_response_handler_diag(struct http_parser_t *http_parser) {
     char *buffer;
     size_t count;
 
-	/* reserves space for the json based info string for its
-	size and for the complete size of the resulting message */
+    /* reserves space for the json based info string for its
+    size and for the complete size of the resulting message */
     char info[10240];
     size_t info_size;
     size_t message_size;
