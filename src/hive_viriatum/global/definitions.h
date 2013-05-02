@@ -132,10 +132,10 @@ static __inline char *get_config_path() {
 #define VIRIATUM_CONTENTS_PATH VIRIATUM_DATA_PATH "/viriatum/www"
 #define VIRIATUM_LOG_PATH VIRIATUM_DATA_PATH "/viriatum/viriatum.log"
 #define VIRIATUM_LOG_E_PATH VIRIATUM_DATA_PATH "/viriatum/viriatum.err"
-#else
 #ifndef VIRIATUM_EMBED
 #define VIRIATUM_EMBED
 #endif
+#else
 #ifndef VIRIATUM_MODULES_PATH
 #define VIRIATUM_MODULES_PATH "/usr/lib/viriatum/modules"
 #endif
