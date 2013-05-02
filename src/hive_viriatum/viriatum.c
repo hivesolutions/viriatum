@@ -60,6 +60,14 @@ ERROR_CODE init_service(char *program_name, struct hash_map_t *arguments) {
     load_options_service(service, arguments);
     calculate_options_service(service);
 
+    /* updates the registers signals handler so that the service
+    may be able to register the handlers at the proper timing */
+    service->register_signals = register_signals;
+
+    /* calculates the locations structure for the service based
+    on the currently loaded configuration, this a complex operation */
+    calculate_locations_service(service);
+
     /* raises no error to the caller method, normal
     exit operation (should provide no problem) */
     RAISE_NO_ERROR;
@@ -87,14 +95,6 @@ ERROR_CODE run_service() {
     SOCKET_DATA socket_data;
     SOCKET_INITIALIZE(&socket_data);
 
-    /* updates the registers signals handler so that the service
-    may be able to register the handlers at the proper timing */
-    service->register_signals = register_signals;
-
-    /* calculates the locations structure for the service based
-    on the currently loaded configuration, this a complex operation */
-    calculate_locations_service(service);
-
     /* starts the service, this call should be able to bootstrap
     all the required structures and initialize the main loop, this
     should block the control flow fduring the run of the service */
@@ -109,7 +109,8 @@ ERROR_CODE run_service() {
         RAISE_AGAIN(return_value);
     }
 
-    /* runs the socket finish */
+    /* runs the socket finish releasing any pending memory information
+	regarding the socket infra-structure */
     SOCKET_FINISH();
 
     /* raises no error */
