@@ -225,17 +225,17 @@ static __inline void alloc_memory_pool(struct memory_pool_t *pool, size_t chunk_
         sizeof(struct memory_chunk_t *) * pool->items_max_size
     );
 
-	add_palloc(pool);
+    add_palloc(pool);
 }
 
 static __inline void release_memory_pool(struct memory_pool_t *pool) {
-	size_t index;
-	struct memory_chunk_t *chunk;
+    size_t index;
+    struct memory_chunk_t *chunk;
 
-	for(index = 0; index < pool->chunk_count; index++) {
-		chunk = pool->chunks[index];
-		delete_chunk(chunk);
-	}
+    for(index = 0; index < pool->chunk_count; index++) {
+        chunk = pool->chunks[index];
+        delete_chunk(chunk);
+    }
 
     FREE(pool->chunks);
     FREE(pool->buffer_item_map);

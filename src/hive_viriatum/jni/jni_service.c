@@ -33,11 +33,11 @@
 
 jboolean Java_pt_hive_viriatum_http_Service_exists(JNIEnv *env, jclass cls) {
     ERROR_CODE return_value;
-	struct service_t *service;
-	return_value = pointer_service(&service);
-	if(IS_ERROR_CODE(return_value)) { return FALSE; }
-	if(service == NULL) { return FALSE; }
-	else { return TRUE; }
+    struct service_t *service;
+    return_value = pointer_service(&service);
+    if(IS_ERROR_CODE(return_value)) { return FALSE; }
+    if(service == NULL) { return FALSE; }
+    else { return TRUE; }
 }
 
 jstring Java_pt_hive_viriatum_http_Service_init(JNIEnv *env, jclass cls) {
@@ -63,15 +63,15 @@ jstring Java_pt_hive_viriatum_http_Service_init(JNIEnv *env, jclass cls) {
         /* prints an error message and copies it to the return
         value string buffer */
         V_ERROR_F(
-		    "Problem initializing service (%s)\n",
-			(char *) GET_ERROR()
-		);
+            "Problem initializing service (%s)\n",
+            (char *) GET_ERROR()
+        );
         SPRINTF(
-			buffer,
-			1024,
-			"Problem initializing service (%s)\n",
-			(char *) GET_ERROR()
-		);
+            buffer,
+            1024,
+            "Problem initializing service (%s)\n",
+            (char *) GET_ERROR()
+        );
     }
 
     return (*env)->NewStringUTF(env, buffer);
@@ -85,8 +85,8 @@ jstring Java_pt_hive_viriatum_http_Service_destroy(JNIEnv *env, jclass cls) {
     going to be used to return a possible error message */
     char buffer[1024] = "";
 
-	/* destroys the service structure, releasing all of
-	its structure memory and disabling the run of it */
+    /* destroys the service structure, releasing all of
+    its structure memory and disabling the run of it */
     return_value = destroy_service();
 
     /* tests the error code for error */
@@ -94,15 +94,15 @@ jstring Java_pt_hive_viriatum_http_Service_destroy(JNIEnv *env, jclass cls) {
         /* prints an error message and copies it to the return
         value string buffer */
         V_ERROR_F(
-		    "Problem destroying service (%s)\n",
-			(char *) GET_ERROR()
-		);
+            "Problem destroying service (%s)\n",
+            (char *) GET_ERROR()
+        );
         SPRINTF(
-		    buffer,
-			1024,
-			"Problem destroying service (%s)\n",
-			(char *) GET_ERROR()
-		);
+            buffer,
+            1024,
+            "Problem destroying service (%s)\n",
+            (char *) GET_ERROR()
+        );
     }
 
     return (*env)->NewStringUTF(env, buffer);
@@ -125,15 +125,15 @@ jstring Java_pt_hive_viriatum_http_Service_run(JNIEnv *env, jclass cls) {
         /* prints an error message and copies it to the return
         value string buffer */
         V_ERROR_F(
-		    "Problem running service (%s)\n",
-			(char *) GET_ERROR()
-		);
+            "Problem running service (%s)\n",
+            (char *) GET_ERROR()
+        );
         SPRINTF(
-		    buffer,
-			1024,
-			"Problem running service (%s)\n",
-			(char *) GET_ERROR()
-		);
+            buffer,
+            1024,
+            "Problem running service (%s)\n",
+            (char *) GET_ERROR()
+        );
     }
 
     return (*env)->NewStringUTF(env, buffer);
@@ -156,15 +156,15 @@ jstring Java_pt_hive_viriatum_http_Service_ran(JNIEnv *env, jclass cls) {
         /* prints an error message and copies it to the return
         value string buffer */
         V_ERROR_F(
-		    "Problem ranning service (%s)\n",
-			(char *) GET_ERROR()
-		);
+            "Problem ranning service (%s)\n",
+            (char *) GET_ERROR()
+        );
         SPRINTF(
-			buffer,
-			1024,
-			"Problem ranning service (%s)\n",
-			(char *) GET_ERROR()
-		);
+            buffer,
+            1024,
+            "Problem ranning service (%s)\n",
+            (char *) GET_ERROR()
+        );
     }
 
     return (*env)->NewStringUTF(env, buffer);

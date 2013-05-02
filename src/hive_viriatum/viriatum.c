@@ -76,9 +76,9 @@ ERROR_CODE init_service(char *program_name, struct hash_map_t *arguments) {
 ERROR_CODE destroy_service() {
     /* deletes the service, disallowing any further
     access to the service instance, and then sets its
-	reference back to the original (unset sate) */
+    reference back to the original (unset sate) */
     delete_service(service);
-	service = NULL;
+    service = NULL;
 
     /* raises no error to the caller method, normal
     exit operation (should provide no problem) */
@@ -87,11 +87,11 @@ ERROR_CODE destroy_service() {
 
 ERROR_CODE run_service() {
     /* allocates the return value to be used to gather
-	the error result from the service calls */
+    the error result from the service calls */
     ERROR_CODE return_value;
 
     /* allocates the socket data and then initializes
-	the socket infrastructure (global structures) with it */
+    the socket infrastructure (global structures) with it */
     SOCKET_DATA socket_data;
     SOCKET_INITIALIZE(&socket_data);
 
@@ -110,7 +110,7 @@ ERROR_CODE run_service() {
     }
 
     /* runs the socket finish releasing any pending memory information
-	regarding the socket infra-structure */
+    regarding the socket infra-structure */
     SOCKET_FINISH();
 
     /* raises no error */
@@ -426,10 +426,10 @@ int main(int argc, char *argv[]) {
     cleanup(arguments);
 
     /* deletes the processed arguments and then cleans up
-	the pool based memory allocation system releasing all
-	of its memory before the exit (no leaks) */
+    the pool based memory allocation system releasing all
+    of its memory before the exit (no leaks) */
     delete_arguments(arguments);
-	cleanup_palloc();
+    cleanup_palloc();
 
     /* prints a debug message */
     V_DEBUG("Finishing process\n");
