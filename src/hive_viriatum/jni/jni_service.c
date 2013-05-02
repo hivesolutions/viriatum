@@ -85,14 +85,24 @@ jstring Java_pt_hive_viriatum_http_Service_destroy(JNIEnv *env, jclass cls) {
     going to be used to return a possible error message */
     char buffer[1024] = "";
 
+	/* destroys the service structure, releasing all of
+	its structure memory and disabling the run of it */
     return_value = destroy_service();
 
     /* tests the error code for error */
     if(IS_ERROR_CODE(return_value)) {
         /* prints an error message and copies it to the return
         value string buffer */
-        V_ERROR_F("Problem destroying service (%s)\n", (char *) GET_ERROR());
-        SPRINTF(buffer, 1024, "Problem destroying service (%s)\n", (char *) GET_ERROR());
+        V_ERROR_F(
+		    "Problem destroying service (%s)\n",
+			(char *) GET_ERROR()
+		);
+        SPRINTF(
+		    buffer,
+			1024,
+			"Problem destroying service (%s)\n",
+			(char *) GET_ERROR()
+		);
     }
 
     return (*env)->NewStringUTF(env, buffer);
@@ -114,8 +124,16 @@ jstring Java_pt_hive_viriatum_http_Service_run(JNIEnv *env, jclass cls) {
     if(IS_ERROR_CODE(return_value)) {
         /* prints an error message and copies it to the return
         value string buffer */
-        V_ERROR_F("Problem running service (%s)\n", (char *) GET_ERROR());
-        SPRINTF(buffer, 1024, "Problem running service (%s)\n", (char *) GET_ERROR());
+        V_ERROR_F(
+		    "Problem running service (%s)\n",
+			(char *) GET_ERROR()
+		);
+        SPRINTF(
+		    buffer,
+			1024,
+			"Problem running service (%s)\n",
+			(char *) GET_ERROR()
+		);
     }
 
     return (*env)->NewStringUTF(env, buffer);
@@ -137,8 +155,16 @@ jstring Java_pt_hive_viriatum_http_Service_ran(JNIEnv *env, jclass cls) {
     if(IS_ERROR_CODE(return_value)) {
         /* prints an error message and copies it to the return
         value string buffer */
-        V_ERROR_F("Problem ranning service (%s)\n", (char *) GET_ERROR());
-        SPRINTF(buffer, 1024, "Problem ranning service (%s)\n", (char *) GET_ERROR());
+        V_ERROR_F(
+		    "Problem ranning service (%s)\n",
+			(char *) GET_ERROR()
+		);
+        SPRINTF(
+			buffer,
+			1024,
+			"Problem ranning service (%s)\n",
+			(char *) GET_ERROR()
+		);
     }
 
     return (*env)->NewStringUTF(env, buffer);
