@@ -48,7 +48,34 @@ START_MEMORY;
 unsigned char local = 0;
 static struct service_t *service;
 
-ERROR_CODE run_service(char *program_name, struct hash_map_t *arguments) {
+ERROR_CODE init_service(char *program_name, struct hash_map_t *arguments) {
+    /* creates the service and loads the options
+    taking into account the arguments */
+    create_service(
+        &service,
+        (unsigned char *) VIRIATUM_NAME,
+        (unsigned char *) program_name
+    );
+    load_specifications(service);
+    load_options_service(service, arguments);
+    calculate_options_service(service);
+
+    /* raises no error to the caller method, normal
+    exit operation (should provide no problem) */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE destroy_service() {
+    /* deletes the service, disallowing any further
+    access to the service instance */
+    delete_service(service);
+
+    /* raises no error to the caller method, normal
+    exit operation (should provide no problem) */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE run_service() {
     /* allocates the return value */
     ERROR_CODE return_value;
 
@@ -57,13 +84,6 @@ ERROR_CODE run_service(char *program_name, struct hash_map_t *arguments) {
 
     /* initializes the socket infrastructure */
     SOCKET_INITIALIZE(&socket_data);
-
-    /* creates the service and loads the options
-    taking into account the arguments */
-    create_service(&service, (unsigned char *) VIRIATUM_NAME, (unsigned char *) program_name);
-    load_specifications(service);
-    load_options_service(service, arguments);
-    calculate_options_service(service);
 
     /* updates the registers signals handler so that the service
     may be able to register the handlers at the proper timing */
@@ -74,25 +94,48 @@ ERROR_CODE run_service(char *program_name, struct hash_map_t *arguments) {
     calculate_locations_service(service);
 
     /* starts the service, this call should be able to bootstrap
-    all the required structures and initialize the main loop */
+    all the required structures and initialize the main loop, this
+    should block the control flow fduring the run of the service */
     return_value = start_service(service);
 
-    /* tests the error code for error */
+    /* tests the error code value for error and in case there's
+    one runs the appropriate measures */
     if(IS_ERROR_CODE(return_value)) {
-         /* runs the socket finish */
+        /* runs the socket finish so that the proper cleanup
+        operations are performed and then re-raises the error*/
         SOCKET_FINISH();
-
-        /* raises the error again */
         RAISE_AGAIN(return_value);
     }
-
-    /* deletes the service */
-    delete_service(service);
 
     /* runs the socket finish */
     SOCKET_FINISH();
 
     /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE run_service_c(char *program_name, struct hash_map_t *arguments) {
+    /* allocates space for the error value that will be used
+    to check for an error in the call */
+    ERROR_CODE return_value;
+
+    /* initializes the service creating the structures and starting
+    the values for the configuration of it */
+    return_value = init_service(program_name, arguments);
+    if(IS_ERROR_CODE(return_value)) { RAISE_AGAIN(return_value); }
+
+    /* run the service, blocking the call until the service is
+    finished, the retrives the return value from it */
+    return_value = run_service();
+    if(IS_ERROR_CODE(return_value)) { RAISE_AGAIN(return_value); }
+
+    /* destroys the service eliminating any structures that have
+    been created in the service life-time */
+    return_value = destroy_service();
+    if(IS_ERROR_CODE(return_value)) { RAISE_AGAIN(return_value); }
+
+    /* raises no error as the execution of the service went normally
+    and no problems have been issued */
     RAISE_NO_ERROR;
 }
 
@@ -115,10 +158,9 @@ ERROR_CODE ran_service() {
 
         /* tests the error code for error */
         if(IS_ERROR_CODE(return_value)) {
-            /* runs the socket finish */
+            /* runs the socket finish so that the proper cleanup
+            operations are performed and then re-raises the error*/
             SOCKET_FINISH();
-
-            /* raises the error again */
             RAISE_AGAIN(return_value);
         }
 
@@ -367,7 +409,7 @@ int main(int argc, char *argv[]) {
     /* runs the service, with the given arguments, this call
     should blobk the program control flow until an event
     stop the running of the main loop */
-    return_value = run_service(program_name, arguments);
+    return_value = run_service_c(program_name, arguments);
 
     /* tests the error code for error in case it exists
     prints a message indicating the problem that occurred */
