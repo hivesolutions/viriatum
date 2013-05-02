@@ -29,6 +29,7 @@
 
 #include "../system/system.h"
 
+struct service_t *get_service();
 ERROR_CODE init_service(char *program_name, struct hash_map_t *arguments);
 ERROR_CODE destroy_service();
 ERROR_CODE run_service();
