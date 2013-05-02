@@ -24,8 +24,8 @@
 # __license__   = GNU General Public License (GPL), Version 3
 
 # defines the version values
-m4_define([mod_gif_major_version], [1])
-m4_define([mod_gif_minor_version], [0])
-m4_define([mod_gif_micro_version], [0])
-m4_define([mod_gif_version], m4_format(%s.%s.%s, mod_gif_major_version, mod_gif_minor_version, mod_gif_micro_version))
-m4_define([mod_gif_makefiles], [Makefile m4/Makefile src/Makefile src/hive_viriatum_mod_gif/Makefile])
+m4_define([mod_diag_major_version], [1])
+m4_define([mod_diag_minor_version], [0])
+m4_define([mod_diag_micro_version], [0])
+m4_define([mod_diag_version], m4_format(%s.%s.%s, mod_diag_major_version, mod_diag_minor_version, mod_diag_micro_version))
+m4_define([mod_diag_makefiles], [Makefile m4/Makefile src/Makefile src/hive_viriatum_mod_diag/Makefile])

@@ -25,4 +25,4 @@
 
 include $(top_srcdir)/Common.am
 
-SUBDIRS = hive_viriatum_mod_gif
+SUBDIRS = hive_viriatum_mod_diag

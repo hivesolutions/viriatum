@@ -25,22 +25,22 @@
 
 include $(top_srcdir)/Common.am
 
-lib_LIBRARIES = libviriatum_mod_gif.a
+lib_LIBRARIES = libviriatum_mod_diag.a
 
-lib_LTLIBRARIES = libviriatum_mod_gif.la
+lib_LTLIBRARIES = libviriatum_mod_diag.la
 
-libviriatum_mod_gif_a_CFLAGS = $(AM_CFLAGS)
-libviriatum_mod_gif_a_CXXFLAGS = $(AM_CXXFLAGS)
+libviriatum_mod_diag_a_CFLAGS = $(AM_CFLAGS)
+libviriatum_mod_diag_a_CXXFLAGS = $(AM_CXXFLAGS)
 
-libviriatum_mod_gif_la_CFLAGS = $(AM_CFLAGS)
-libviriatum_mod_gif_la_CXXFLAGS = $(AM_CXXFLAGS)
+libviriatum_mod_diag_la_CFLAGS = $(AM_CFLAGS)
+libviriatum_mod_diag_la_CXXFLAGS = $(AM_CXXFLAGS)
 
-libviriatum_mod_gif_la_LDFLAGS = -version-info $(MOD_GIF_MAJOR_VERSION):$(MOD_GIF_MINOR_VERSION):$(MOD_GIF_MICRO_VERSION)
+libviriatum_mod_diag_la_LDFLAGS = -version-info $(MOD_DIAG_MAJOR_VERSION):$(MOD_DIAG_MINOR_VERSION):$(MOD_DIAG_MICRO_VERSION)
 
-libviriatum_mod_gif_a_SOURCES = stdafx.c \
+libviriatum_mod_diag_a_SOURCES = stdafx.c \
 module/entry.c \
 module/handler.c
 
-libviriatum_mod_gif_la_SOURCES = stdafx.c \
+libviriatum_mod_diag_la_SOURCES = stdafx.c \
 module/entry.c \
 module/handler.c
