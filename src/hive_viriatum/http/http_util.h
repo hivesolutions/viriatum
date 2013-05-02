@@ -70,7 +70,7 @@ static const char *keep_alive_codes[2] = {
  */
 static const char *cache_codes[2] = {
     "no-cache, must-revalidate",
-	"max-age=604800"
+    "max-age=604800"
 };
 
 /**
