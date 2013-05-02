@@ -108,7 +108,7 @@ ERROR_CODE _send_response_handler_diag(struct http_parser_t *http_parser) {
         service->status,
         service->options->port,
         service->get_uptime(service, 2),
-        service->connections_list->size
+        (long long) service->connections_list->size
     );
     message_size = VIRIATUM_HTTP_MAX_SIZE + info_size;
 
