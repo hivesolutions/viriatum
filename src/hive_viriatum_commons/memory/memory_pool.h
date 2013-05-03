@@ -28,6 +28,7 @@
 #pragma once
 
 #include "../global/memory.h"
+#include "../system/system_util.h"
 
 /**
  * The size of each chunk (in number of items), should
@@ -325,8 +326,10 @@ static __inline size_t pavailable(struct memory_pool_t *pool) {
     return available;
 }
 
-static __inline void pdiag(struct memory_pool_t *pool) {
-    printf(
+static __inline void pdiag(struct memory_pool_t *pool, char *string, size_t size) {
+    SPRINTF(
+        string,
+        size,
         "Available: %d, "
         "Max Items: %d, "
         "Max Chunks: %d, "
