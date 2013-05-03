@@ -399,11 +399,6 @@ int main(int argc, char *argv[]) {
     of the process (program) to be executed */
     program_name = argv[0];
 
-
-   /* run_simple_tests();*/
-
-
-
     /* processes the various arguments into a map and then
     executes the corresponding (initial) actions */
     process_arguments(argc, argv, &arguments);
