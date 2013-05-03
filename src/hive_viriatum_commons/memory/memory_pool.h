@@ -261,7 +261,6 @@ static __inline void release_memory_pool(struct memory_pool_t *pool) {
 static __inline void resize_memory_pool(struct memory_pool_t *pool, size_t chunk_max_size) {
     size_t index;
     size_t index_m;
-    size_t old_chunk_max_size = pool->chunk_max_size;
     size_t old_items_max_size = pool->items_max_size;
     struct memory_chunk_t **old_chunks = pool->chunks;
     struct memory_item_t **old_buffer_item_map = pool->buffer_item_map;
