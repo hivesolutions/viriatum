@@ -206,25 +206,36 @@ static __inline void delete_chunk(struct memory_chunk_t *chunk) {
 }
 
 static __inline void alloc_memory_pool(struct memory_pool_t *pool, size_t chunk_max_size) {
-    chunk_max_size = chunk_max_size > 0 ? chunk_max_size : 6;
+    /* in case the chunk (initial) maximum size is not defined
+    sets it with the default value */
+    chunk_max_size = chunk_max_size > 0 ? chunk_max_size : 4;
 
+    /* populates the pool structure with the initial values and
+    calculates the various calculated attributes in it */
     pool->free = 0;
     pool->chunk_count = 0;
     pool->chunk_max_size = chunk_max_size;
     pool->items_max_size = pool->chunk_max_size * CHUNK_SIZE;
 
+    /* allocates the buffer of chunks for the memory pool and then
+    allocates the map that associates a hashed buffer pointer with
+    the item that it contains */
     pool->chunks = MALLOC(
         sizeof(struct memory_chunk_t *) * pool->chunk_max_size
     );
     pool->buffer_item_map = MALLOC(
-        sizeof(struct memory_chunk_t *) * pool->items_max_size
+        sizeof(struct memory_item_t *) * pool->items_max_size
     );
 
+    /* resets the buffer item map to the initial zerified value so
+    that no problems happen for initial searching */
     memset(
         pool->buffer_item_map, 0,
-        sizeof(struct memory_chunk_t *) * pool->items_max_size
+        sizeof(struct memory_item_t *) * pool->items_max_size
     );
 
+    /* adds the newly allocated pool to the global pool structures
+    so that it may be relased with the global pools release operation */
     add_palloc(pool);
 }
 
@@ -246,6 +257,89 @@ static __inline void release_memory_pool(struct memory_pool_t *pool) {
     pool->items_max_size = 0;
 }
 
+static __inline void resize_memory_pool(struct memory_pool_t *pool, size_t chunk_max_size) {
+    size_t index;
+    size_t index_m;
+    size_t old_chunk_max_size = pool->chunk_max_size;
+    size_t old_items_max_size = pool->items_max_size;
+    struct memory_chunk_t **old_chunks = pool->chunks;
+    struct memory_item_t **old_buffer_item_map = pool->buffer_item_map;
+
+    struct memory_item_t *item;
+    struct memory_item_t *_item;
+
+    pool->chunk_max_size = chunk_max_size;
+    pool->items_max_size = pool->chunk_max_size * CHUNK_SIZE;
+
+    pool->chunks = MALLOC(
+        sizeof(struct memory_chunk_t *) * pool->chunk_max_size
+    );
+
+    pool->buffer_item_map = MALLOC(
+        sizeof(struct memory_item_t *) * pool->items_max_size
+    );
+    memset(
+        pool->buffer_item_map, 0,
+        sizeof(struct memory_item_t *) * pool->items_max_size
+    );
+
+    for(index = 0; index < pool->chunk_count; index++) {
+         pool->chunks[index] = old_chunks[index];
+    }
+
+    for(index = 0; index < old_items_max_size; index++) {
+        item = old_buffer_item_map[index];
+        if(item == NULL || item->buffer == NULL) { continue; }
+
+        index_m = (size_t) item->buffer % pool->items_max_size;
+        while(TRUE) {
+            /* retrieves the item for the current index in the map
+            and in case the item is undefined sets it */
+            _item = pool->buffer_item_map[index_m];
+            if(_item == NULL) {
+                pool->buffer_item_map[index_m] = item;
+                break;
+            }
+
+            /* in case the current index has reached the limit
+            resets it to the zero value, otherwise increments it */
+            if(index_m + 1 == pool->items_max_size) { index_m = 0; }
+            else { index_m++; }
+        }
+    }
+
+    FREE(old_chunks);
+    FREE(old_buffer_item_map);
+}
+
+static __inline size_t pavailable(struct memory_pool_t *pool) {
+    size_t index;
+    size_t available = 0;
+    struct memory_item_t *item = NULL;
+
+    for(index = 0; index < pool->items_max_size; index++) {
+        item = pool->buffer_item_map[index];
+        if(item == NULL) { available++; }
+    }
+
+    return available;
+}
+
+static __inline void pdiag(struct memory_pool_t *pool) {
+    printf(
+        "Available: %d, "
+        "Max Items: %d, "
+        "Max Chunks: %d, "
+        "Used Chunks: %d, "
+        "Free Chunks: %d\n",
+        pavailable(pool),
+        pool->items_max_size,
+        pool->chunk_max_size,
+        pool->chunk_count,
+        pool->chunk_count - pool->free
+    );
+}
+
 static __inline void *palloc(struct memory_pool_t *pool, size_t size) {
 #ifdef VIRIATUM_MEMORY_POOL
     /* allocates space for the various index and counter pointes
@@ -255,8 +349,10 @@ static __inline void *palloc(struct memory_pool_t *pool, size_t size) {
     size_t index;
     size_t index_m;
     size_t increment;
+    size_t chunk_count;
     void *buffer;
     struct memory_chunk_t *chunk;
+    struct memory_chunk_t *_chunk;
     struct memory_item_t *item;
     struct memory_item_t *_item;
 
@@ -268,11 +364,19 @@ static __inline void *palloc(struct memory_pool_t *pool, size_t size) {
     free is the same as the number of chunks the pool is considered
     to be full and so must be extended with new chunk(s) */
     if(pool->free == pool->chunk_count) {
-        /* calaculates the new chunk count increment based on the
+        /* calculates the new chunk count increment based on the
         current size in case it's the initial allocation only one
         chunk is allocated otherwise the increments is the current
         chunk count (duplicates the size) */
         increment = pool->chunk_count > 0 ? pool->chunk_count : 1;
+
+        /* calculates the new chunk count for the pool and in case that
+        value is larger than the current maximum chunk storage available
+        in the memory pool must resize the memory pool */
+        chunk_count = pool->chunk_count + increment;
+        if(chunk_count > pool->chunk_max_size) {
+            resize_memory_pool(pool, chunk_count);
+        }
 
         /* iterates over the range of the increment to create the
         associated chunks and set them in the chunk buffer */
@@ -314,10 +418,27 @@ static __inline void *palloc(struct memory_pool_t *pool, size_t size) {
     /* in case the lowest free item index in the chunk
     remains the same as before then the chunk is considered
     as full (all items are set as used) then the flag in the
-    chunk is set and the pool free index is incremented */
+    chunk is set and the pool free index is updated with the
+    first free chunk found in the chunk sequence */
     if(chunk->free == free) {
+        /* sets the full flag in the chunk so that it is
+        correctly identified for any code using the pool */
         chunk->is_full = TRUE;
-        pool->free++;
+
+        /* because the current chunk is full a new one must
+        be found in the chunk sequence, the available (if any)
+        chunks should be found after the current chunk */
+        for(index = pool->free + 1; index < pool->chunk_count; index++) {
+            _chunk = pool->chunks[index];
+            if(_chunk->is_full) { continue; }
+            pool->free = index;
+            break;
+        }
+
+        /* in case the index (after iteration) is the same as the
+        chunk count index then the next free chunk is not available,
+        pool chunks are going to be allocated in next alloc operation */
+        if(index == pool->chunk_count) { pool->free = pool->chunk_count; }
     }
 
     /* retrieves the reference to the buffer that is allocated
@@ -325,7 +446,7 @@ static __inline void *palloc(struct memory_pool_t *pool, size_t size) {
     the index in the map associating the buffer with the item it's
     going to be using open addressing with linear probing */
     buffer = item->buffer;
-    index_m = (size_t) buffer % (pool->chunk_max_size * CHUNK_SIZE);
+    index_m = (size_t) buffer % pool->items_max_size;
     while(TRUE) {
         /* retrieves the item for the current index in the map
         and in case the item is undefined sets it */
@@ -362,7 +483,7 @@ static __inline void pfree(struct memory_pool_t *pool, void *buffer) {
     /* calculates the "initial" guess for the the map index
     assoicated with the buffer to be released, the releasing
     of the set wull be using an open addressing approach */
-    index = (size_t) buffer % (pool->chunk_max_size * CHUNK_SIZE);
+    index = (size_t) buffer % pool->items_max_size;
     while(TRUE) {
         /* retrieves the current item and in case there's
         a valid value set and the buffer is equivalent breaks
