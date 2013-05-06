@@ -554,6 +554,10 @@
                     RelativePath="..\..\src\hive_viriatum\test\simple_test.c"
                     >
                 </File>
+                <File
+                    RelativePath="..\..\src\hive_viriatum\test\speed_test.c"
+                    >
+                </File>
             </Filter>
             <Filter
                 Name="Module"
@@ -714,6 +718,10 @@
                 >
                 <File
                     RelativePath="..\..\src\hive_viriatum\test\simple_test.h"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\hive_viriatum\test\speed_test.h"
                     >
                 </File>
                 <File
