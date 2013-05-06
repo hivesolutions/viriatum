@@ -36,6 +36,17 @@
  */
 #define CHUNK_SIZE 10240
 
+/**
+ * The factor to be used in the calculus of the size of
+ * the map associating the buffer of the item with the item
+ * instance, the map buffer must be bigger that the required
+ * size to avoid a high level of collisions in the open 
+ * addressing algorithm (would slow down the process).
+ */
+#define CHUNK_FACTOR 1.4
+
+#define CHUNK_MARGIN(value) (size_t) ((float) value * CHUNK_FACTOR)
+
 struct memory_chunk_t;
 
 typedef struct memory_item_t {
@@ -216,7 +227,7 @@ static __inline void alloc_memory_pool(struct memory_pool_t *pool, size_t chunk_
     pool->free = 0;
     pool->chunk_count = 0;
     pool->chunk_max_size = chunk_max_size;
-    pool->items_max_size = pool->chunk_max_size * CHUNK_SIZE;
+    pool->items_max_size = pool->chunk_max_size * CHUNK_MARGIN(CHUNK_SIZE);
 
     /* allocates the buffer of chunks for the memory pool and then
     allocates the map that associates a hashed buffer pointer with
@@ -274,9 +285,9 @@ static __inline void resize_memory_pool(struct memory_pool_t *pool, size_t chunk
     struct memory_item_t *_item;
 
     /* updates both the chunk maximum size value and the "calculated"
-    items maximu size values (based on chunk size) */
+    items maximu, size values (based on chunk size) */
     pool->chunk_max_size = chunk_max_size;
-    pool->items_max_size = pool->chunk_max_size * CHUNK_SIZE;
+    pool->items_max_size = pool->chunk_max_size * CHUNK_MARGIN(CHUNK_SIZE);
 
     /* allocates the new memory buffers for the chunks and for the map
     that associated the buffer pointer with the associated memory item */
