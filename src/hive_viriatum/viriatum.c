@@ -232,6 +232,8 @@ ERROR_CODE print_information() {
 
 void help() { V_PRINT(HELP_STRING); }
 void version() { V_PRINT_F("%s - %s (%s, %s)\n", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_COMPILATION_DATE, VIRIATUM_COMPILATION_TIME); }
+void test() { run_simple_tests(); }
+void speed() { run_speed_tests(); }
 
 #ifdef VIRIATUM_PLATFORM_WIN32
 void daemonize() { }
@@ -321,22 +323,44 @@ void localize() { local = 1; }
 void localize() { }
 #endif
 
-void execute_arguments(struct hash_map_t *arguments) {
+void execute_arguments(char *program_name, struct hash_map_t *arguments) {
     /* allocates space for the possible argument
     to be executed from the arguments map */
     void *value;
+
+    /* allocates the value to be used to verify the
+    exitence of error from the function */
+    ERROR_CODE return_value;
+
+    /* sets space for the flag that will control if
+    the service should be run or not, this is used
+    for certain situations (mostyle test) where the
+    service is not meant to be run */
+    char run_service = TRUE;
 
     /* tries to retrieve the help argument from the arguments
     map in case the value exists prints the help value and then
     exits the current system */
     get_value_string_hash_map(arguments, (unsigned char *) "help", &value);
-    if(value != NULL) { help(); exit(0); }
+    if(value != NULL) { help(); return; }
 
     /* tries to retrieve the version argument from the arguments
     map in case the value exists prints the version value and then
     exits the current system */
     get_value_string_hash_map(arguments, (unsigned char *) "version", &value);
-    if(value != NULL) { version(); exit(0); }
+    if(value != NULL) { version(); return; }
+
+    /* retrieves the test argument value from the arguments map
+    and in case it's set starts the test process runing a series
+    of test functions in sequence */
+    get_value_string_hash_map(arguments, (unsigned char *) "test", &value);
+    if(value != NULL) { test(); return; }
+
+    /* retrieves the speed argument value from the arguments map
+    and in case it's set starts the speed measuring and disables
+    the runnig of the service */
+    get_value_string_hash_map(arguments, (unsigned char *) "speed", &value);
+    if(value != NULL) { speed(); return; }
 
     /* tries to retrieve the daemon argument from the
     arguments map in case the value is set daemonizes
@@ -353,6 +377,22 @@ void execute_arguments(struct hash_map_t *arguments) {
     so that any file read is read from the current directory */
     get_value_string_hash_map(arguments, (unsigned char *) "local", &value);
     if(value != NULL) { localize(); }
+
+    /* in cas the flag that control if the service must be run is
+    unset the control flow must be returned immediately (avoids
+    running service) */
+    if(run_service == FALSE) { return; }
+
+    /* runs the service, with the given arguments, this call
+    should block the program control flow until an event
+    stop the running of the main loop */
+    return_value = run_service_s(program_name, arguments);
+
+    /* tests the error code for error in case it exists
+    prints a message indicating the problem that occurred */
+    if(IS_ERROR_CODE(return_value)) {
+        V_ERROR_F("Problem running service (%s)\n", (char *) GET_ERROR());
+    }
 }
 
 void cleanup(struct hash_map_t *arguments) {
@@ -381,9 +421,6 @@ int main(int argc, char *argv[]) {
     (process) to be executed */
     char *program_name;
 
-    /* allocates the return value */
-    ERROR_CODE return_value;
-
     /* allocates the map that will contain the various
     processed arguments, indexed by name */
     struct hash_map_t *arguments;
@@ -402,18 +439,7 @@ int main(int argc, char *argv[]) {
     /* processes the various arguments into a map and then
     executes the corresponding (initial) actions */
     process_arguments(argc, argv, &arguments);
-    execute_arguments(arguments);
-
-    /* runs the service, with the given arguments, this call
-    should block the program control flow until an event
-    stop the running of the main loop */
-    return_value = run_service_s(program_name, arguments);
-
-    /* tests the error code for error in case it exists
-    prints a message indicating the problem that occurred */
-    if(IS_ERROR_CODE(return_value)) {
-        V_ERROR_F("Problem running service (%s)\n", (char *) GET_ERROR());
-    }
+    execute_arguments(program_name, arguments);
 
     /* cleans the current process information so that
     no remaining structure or resource is left in an
