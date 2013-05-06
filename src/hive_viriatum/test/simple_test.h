@@ -107,9 +107,9 @@ void test_bit_stream();
 void test_file_stream();
 
 /**
- * Tests the template engine.
+ * Tests the template handler.
  */
-void test_template_engine();
+void test_template_handler();
 
 /**
  * Tests the quicksort (algorithm).

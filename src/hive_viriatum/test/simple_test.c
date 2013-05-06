@@ -481,13 +481,11 @@ void test_template_handler() {
     /* allocates space for the template handler */
     struct template_handler_t *template_handler;
 
-    /* creates the template handler */
+    /* creates the template handler then uses it to process
+	the test template file and then deletes the template
+	handler removing any memory resources */
     create_template_handler(&template_handler);
-
-    /* processes the file as a template handler */
     process_template_handler(template_handler, (unsigned char *) "test.tpl");
-
-    /* deletes the template handler */
     delete_template_handler(template_handler);
 }
 
@@ -495,7 +493,8 @@ void test_quicksort() {
     /* allocates space for the template handler */
     size_t list[10] = { 2, 4, 1, 2, 3, 5, 5, 3, 4, 1 };
 
-    /* sorts the sequence according to the compare function */
+    /* sorts the sequence according to the compare function
+	the algorithm to be used in the sorting is the quicksort */
     sort_quicksort((void **) &list, 0, 10, _compare);
 }
 

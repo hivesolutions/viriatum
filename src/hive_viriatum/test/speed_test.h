@@ -44,8 +44,11 @@ typedef void (*test_function) ();
  * and measured for time.
  * @param function Pointer to the function to be executed
  * and have its execution time meassured.
+ * @param iterations The number of iterations to be executed
+ * in the performance test in case this value is not provided
+ * the value defaults to one.
  */
-void run_speed_test(char *name, test_function function);
+void run_speed_test(char *name, test_function function, size_t iterations);
 
 /**
  * Starts the various test that measure performance

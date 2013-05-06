@@ -29,7 +29,7 @@
 
 #include "speed_test.h"
 
-void run_speed_test(char *name, test_function function) {
+void run_speed_test(char *name, test_function function, size_t iterations) {
     /* allocates the variables (long variables) that are going to be
     used to stores the values for the speed measuring and the float
     value to be used at the final type conversion */
@@ -38,9 +38,13 @@ void run_speed_test(char *name, test_function function) {
     long elapsed;
     float elapsed_f;
 
+	/* defaults the iterations count value to the one value
+	in case no valid has been provided */
+	iterations = iterations == 0 ? 1 : iterations;
+
     /* prints a debug message at the beginning of the speed function
     execution process indicating the name of the function */
-    PRINTF_F("Running '%s' ...\n", name);
+    PRINTF_F("Running '%s' for %d times ...\n", name, iterations);
 
     /* retrieves the initial clock value for the execution of the
     function, it's going to be used to measure time at the end */
@@ -63,5 +67,5 @@ void run_speed_test(char *name, test_function function) {
 }
 
 void run_speed_tests() {
-    run_speed_test("test_linked_list_stress", test_linked_list_stress);
+    run_speed_test("test_linked_list_stress", test_linked_list_stress, 1);
 }
