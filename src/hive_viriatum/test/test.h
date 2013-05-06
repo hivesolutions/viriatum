@@ -28,3 +28,4 @@
 #pragma once
 
 #include "simple_test.h"
+#include "speed_test.h"
