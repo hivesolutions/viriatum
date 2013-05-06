@@ -81,7 +81,7 @@ void delete_template_handler(struct template_handler_t *template_handler) {
     if(template_handler->nodes) {
         /* iterates continuously for nodes list
         cleanup (removal of all nodes) */
-        while(1) {
+        while(TRUE) {
             /* pops a node from the nodes list */
             pop_value_linked_list(template_handler->nodes, (void **) &node, 1);
 
@@ -101,7 +101,7 @@ void delete_template_handler(struct template_handler_t *template_handler) {
 
     /* iterates continuously for release list
     cleanup (type memory release) */
-    while(1) {
+    while(TRUE) {
         /* pops a node from the release list */
         pop_value_linked_list(template_handler->release_list, (void **) &type, 1);
 
@@ -163,7 +163,7 @@ void delete_template_node(struct template_node_t *template_node) {
     if(template_node->parameters) {
         /* iterates continuously for parameters list
         cleanup (removal of all parameters) */
-        while(1) {
+        while(TRUE) {
             /* pops a parameter from the parameters list */
             pop_value_linked_list(template_node->parameters, (void **) &parameter, 1);
 
@@ -346,7 +346,7 @@ void get_template_handler(struct template_handler_t *template_handler, unsigned 
     name_token = (unsigned char *) STRTOK((char *) _name, ".", context);
 
     /* iterates continuously */
-    while(1) {
+    while(TRUE) {
         /* in case the name token is invalid
         (no more tokens available) */
         if(name_token == NULL) {
@@ -414,7 +414,7 @@ void traverse_node_debug(struct template_handler_t *template_handler, struct tem
     create_iterator_linked_list(node->children, &child_iterator);
 
     /* iterates continuously for children percolation */
-    while(1) {
+    while(TRUE) {
         /* retrieves the child element from the child iterator */
         get_next_iterator(child_iterator, (void **) &child);
 
@@ -491,7 +491,7 @@ void traverse_nodes_buffer(struct template_handler_t *template_handler, struct t
     create_iterator_linked_list(node->children, &child_iterator);
 
     /* iterates continuously for children percolation */
-    while(1) {
+    while(TRUE) {
         /* retrieves the child element from the child iterator */
         get_next_iterator(child_iterator, (void **) &child);
 
@@ -609,7 +609,7 @@ void _traverse_for_each_buffer(struct template_handler_t *template_handler, stru
 
     /* iterates over all the available elements in the
     iterator element */
-    while(1) {
+    while(TRUE) {
         /* retrieves the next (current) value from the iterator */
         get_next_iterator(iterator, (void **) &_current_value);
 

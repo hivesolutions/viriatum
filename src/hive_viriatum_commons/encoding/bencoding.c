@@ -231,7 +231,7 @@ ERROR_CODE _encode_type(struct type_t *type, struct string_buffer_t *string_buff
 
             create_iterator_linked_list(type->value.value_list, &iterator);
 
-            while(1) {
+            while(TRUE) {
                 get_next_iterator(iterator, (void **) &current);
                 if(current == NULL) { break; }
                 _encode_type(current, string_buffer);
@@ -248,7 +248,7 @@ ERROR_CODE _encode_type(struct type_t *type, struct string_buffer_t *string_buff
 
             create_element_iterator_hash_map(type->value.value_map, &iterator);
 
-            while(1) {
+            while(TRUE) {
                 get_next_iterator(iterator, (void **) &element);
                 if(element == NULL) { break; }
                 key = string_type((char *) element->key_string);
@@ -267,7 +267,7 @@ ERROR_CODE _encode_type(struct type_t *type, struct string_buffer_t *string_buff
 
             create_element_iterator_sort_map(type->value.value_sort_map, &iterator);
 
-            while(1) {
+            while(TRUE) {
                 get_next_iterator(iterator, (void **) &element);
                 if(element == NULL) { break; }
                 key = string_type((char *) element->key_string);

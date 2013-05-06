@@ -110,7 +110,7 @@ void delete_values_hash_map(struct hash_map_t *hash_map) {
 
     /* iterates continuously to release the memory used
     by the various values in the hash map */
-    while(1) {
+    while(TRUE) {
         /* retrieves the element structure from the iterator
         so that it's possible to release the value from memory */
         get_next_iterator(iterator, (void **) &element);
@@ -153,7 +153,7 @@ void get_hash_map(struct hash_map_t *hash_map, size_t key, unsigned char *key_st
     /* iterates continously (to retrieve the appropriate
     element in the hash map), this conforms with the open
     addressing strategy for hash maps */
-    while(1) {
+    while(TRUE) {
         /* retrieves the base address value */
         element = &hash_map->elements_buffer[index];
 
@@ -274,7 +274,7 @@ void get_next_iterator_hash_map(struct iterator_t *iterator, void **next_pointer
     void *next;
 
     /* iterates continuously */
-    while(1) {
+    while(TRUE) {
         /* in case the current index excedes the elements
         buffer size (it's the end of iteration) */
         if(current_index >= hash_map->elements_buffer_size) {
@@ -325,7 +325,7 @@ void get_next_element_iterator_hash_map(struct iterator_t *iterator, void **next
     void *next;
 
     /* iterates continuously */
-    while(1) {
+    while(TRUE) {
         /* in case the current index excedes the elements
         buffer size (it's the end of iteration) */
         if(current_index >= hash_map->elements_buffer_size) {
@@ -386,7 +386,7 @@ void _set_value_hash_map(struct hash_map_t *hash_map, size_t key, unsigned char 
     /* iterates continously (to get an empty space
     in the hash map), this conforms with the open
     addressing strategy for hash maps */
-    while(1) {
+    while(TRUE) {
         /* retrieves the base address value */
         element = &hash_map->elements_buffer[index];
 
@@ -518,7 +518,7 @@ size_t _calculate_string_hash_map(unsigned char *key_string) {
     index++;
 
     /* iterates continuously for (integer) key calculation */
-    while(1) {
+    while(TRUE) {
         /* retrievs the current character from the
         the key string value */
         current = key_string[index];

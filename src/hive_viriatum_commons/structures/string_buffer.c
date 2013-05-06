@@ -61,7 +61,7 @@ void delete_string_buffer(struct string_buffer_t *string_buffer) {
 
     /* iterates continuously for release list
     cleanup (string value memory release) */
-    while(1) {
+    while(TRUE) {
         /* pops a node from the release list */
         pop_value_linked_list(string_buffer->release_list, (void **) &string_value, 1);
 
@@ -138,7 +138,7 @@ void join_string_buffer(struct string_buffer_t *string_buffer, unsigned char **s
 
     /* iterates continuously to process to "join" the
     various "partial" string values into a single buffer */
-    while(1) {
+    while(TRUE) {
         /* retrieves the next value from the string iterator
         as the partial value */
         get_next_iterator(string_iterator, (void **) &partial_value);

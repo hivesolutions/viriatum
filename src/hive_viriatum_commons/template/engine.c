@@ -145,7 +145,7 @@ ERROR_CODE process_template_engine(struct template_engine_t *template_engine, st
 
     /* iterates continuously too run the parser
     over the complete set of file contents */
-    while(1) {
+    while(TRUE) {
         /* in case the look ahead mode is set, should
         read from the look ahead instead of the normal
         file reading */

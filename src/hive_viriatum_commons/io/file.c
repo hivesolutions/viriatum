@@ -181,7 +181,7 @@ ERROR_CODE delete_directory_entries_file(struct linked_list_t *entries) {
 
     /* iterates continuously for entries list
     cleanup (removal of all nodes) */
-    while(1) {
+    while(TRUE) {
         /* pops an entry from the entries list */
         pop_value_linked_list(entries, (void **) &entry, 1);
 
@@ -209,7 +209,7 @@ ERROR_CODE delete_directory_entries_map_file(struct linked_list_t *map) {
 
     /* iterates continuously for entries list
     cleanup (removal of all nodes) */
-    while(1) {
+    while(TRUE) {
         /* pops an entry from the entries (type) list */
         pop_value_linked_list(map, (void **) &entry_type, 1);
 
@@ -270,7 +270,7 @@ ERROR_CODE entries_to_map_file(struct linked_list_t *entries, struct linked_list
     create_iterator_linked_list(entries, &entries_iterator);
 
     /* iterates continuously */
-    while(1) {
+    while(TRUE) {
         /* retrieves the next entry from the entries iterator */
         get_next_iterator(entries_iterator, (void **) &entry);
 
@@ -752,7 +752,7 @@ ERROR_CODE list_directory_file(char *file_path, struct linked_list_t *entries) {
     }
 
     /* print all the files and directories within directory */
-    while(1) {
+    while(TRUE) {
         /* retrieves the entity by reading it from the directory */
         entity = readdir(directory);
 

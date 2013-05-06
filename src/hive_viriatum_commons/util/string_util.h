@@ -142,7 +142,7 @@ static __inline char atob(char *string_value) {
     const char *_string_value;
     size_t index = 0;
 
-    while(1) {
+    while(TRUE) {
         _string_value = atob_strings[index];
         if(_string_value == NULL) { break; }
         if(strcmp(_string_value, string_value) == 0) { return TRUE; }
@@ -158,7 +158,7 @@ static __inline size_t atoa(char *string_value, char *buffer, size_t elements, s
     size_t index = 0;
     char *_base_value = string_value;
 
-    while(1) {
+    while(TRUE) {
         switch(*string_value) {
             case ' ':
             case '\0':
@@ -191,7 +191,7 @@ static __inline size_t trailing_size(char *buffer, size_t size) {
     char byte;
     char *_pointer = buffer + size - 1;
 
-    while(1) {
+    while(TRUE) {
         byte = *_pointer;
         if(byte != ' ') { break; }
         _pointer--;
@@ -207,7 +207,7 @@ static __inline size_t leading_offset(char *buffer, size_t size) {
     size_t _size = 0;
     char *_pointer = buffer;
 
-    while(1) {
+    while(TRUE) {
         byte = *_pointer;
         if(byte != ' ') { break; }
         _pointer++;
@@ -232,7 +232,7 @@ static __inline size_t split(char *string_value, char *buffer, size_t size_e, ch
 
     /* iterates continuousuly over the string value to correctly
     parse the string value and split it */
-    while(1) {
+    while(TRUE) {
         /* retrieves the current token character to be evaluated
         for conditional expression execution */
         _token = string_value[index];

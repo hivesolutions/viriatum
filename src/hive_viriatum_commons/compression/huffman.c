@@ -71,7 +71,7 @@ void generate_table_huffman(struct huffman_t *huffman, struct stream_t *stream) 
     huffman->stream = stream;
 /*
     // iterates continuously
-    while(1) {
+    while(TRUE) {
         // reads the buffer
         this->file_stream->read(file_buffer, HUFFMAN_FILE_BUFFER_SIZE);
 
@@ -124,7 +124,7 @@ void generate_table_huffman(struct huffman_t *huffman, struct stream_t *stream) 
     }
 
     // iterates continuously
-    while(1) {
+    while(TRUE) {
         // the lowest value node
         lowest_huffman_node = code_table.top();
 

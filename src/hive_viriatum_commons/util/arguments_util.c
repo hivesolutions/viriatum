@@ -85,7 +85,7 @@ ERROR_CODE delete_arguments(struct hash_map_t *arguments) {
     create_element_iterator_hash_map(arguments, &arguments_iterator);
 
     /* iterates continuously */
-    while(1) {
+    while(TRUE) {
         /* retrieves the next value from the arguments iterator */
         get_next_iterator(arguments_iterator, (void **) &element);
 
@@ -132,7 +132,7 @@ ERROR_CODE print_arguments(struct hash_map_t *arguments) {
     PRINTF("Arguments\n");
 
     /* iterates continuously */
-    while(1) {
+    while(TRUE) {
         /* retrieves the next value from the arguments iterator */
         get_next_iterator(arguments_iterator, (void **) &element);
 

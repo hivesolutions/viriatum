@@ -77,7 +77,7 @@ ERROR_CODE free_type(struct type_t *type) {
         case LIST_TYPE:
             create_iterator_linked_list(type->value.value_list, &iterator);
 
-            while(1) {
+            while(TRUE) {
                 get_next_iterator(iterator, (void **) &current);
                 if(current == NULL) { break; }
                 free_type(current);
@@ -92,7 +92,7 @@ ERROR_CODE free_type(struct type_t *type) {
         case MAP_TYPE:
             create_element_iterator_hash_map(type->value.value_map, &iterator);
 
-            while(1) {
+            while(TRUE) {
                 get_next_iterator(iterator, (void **) &element);
                 if(element == NULL) { break; }
                 free_type((struct type_t *) element->value);
@@ -107,7 +107,7 @@ ERROR_CODE free_type(struct type_t *type) {
         case SORT_MAP_TYPE:
             create_element_iterator_sort_map(type->value.value_sort_map, &iterator);
 
-            while(1) {
+            while(TRUE) {
                 get_next_iterator(iterator, (void **) &element);
                 if(element == NULL) { break; }
                 free_type((struct type_t *) element->value);
@@ -225,7 +225,7 @@ ERROR_CODE print_type(struct type_t *type) {
 
             create_iterator_linked_list(type->value.value_list, &iterator);
 
-            while(1) {
+            while(TRUE) {
                 get_next_iterator(iterator, (void **) &current);
                 if(current == NULL) { break; }
                 if(is_first == 0) { PRINTF(", "); };
@@ -245,7 +245,7 @@ ERROR_CODE print_type(struct type_t *type) {
 
             create_element_iterator_hash_map(type->value.value_map, &iterator);
 
-            while(1) {
+            while(TRUE) {
                 get_next_iterator(iterator, (void **) &element);
                 if(element == NULL) { break; }
                 if(is_first == 0) { PRINTF(", "); };
@@ -268,7 +268,7 @@ ERROR_CODE print_type(struct type_t *type) {
 
             create_element_iterator_sort_map(type->value.value_sort_map, &iterator);
 
-            while(1) {
+            while(TRUE) {
                 get_next_iterator(iterator, (void **) &element);
                 if(element == NULL) { break; }
                 if(is_first == 0) { PRINTF(", "); };

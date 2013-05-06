@@ -135,7 +135,7 @@ THREAD_RETURN pool_runner_thread(THREAD_ARGUMENTS parameters) {
     struct thread_pool_t *thread_pool = (struct thread_pool_t *) parameters;
 
     /* ierates continuously */
-    while(1) {
+    while(TRUE) {
         /* locks the task condition lock */
         CONDITION_LOCK(thread_pool->task_condition, thread_pool->task_condition_lock);
 

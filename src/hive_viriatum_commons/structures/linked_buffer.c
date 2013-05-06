@@ -57,7 +57,7 @@ void delete_linked_buffer(struct linked_buffer_t *linked_buffer) {
 
     /* iterates continuously for release list
     cleanup (buffer pointer memory release) */
-    while(1) {
+    while(TRUE) {
         /* pops a node from the release list */
         pop_value_linked_list(linked_buffer->release_list, (void **) &buffer, 1);
 
@@ -71,7 +71,7 @@ void delete_linked_buffer(struct linked_buffer_t *linked_buffer) {
 
     /* iterates continuously for release list
     cleanup (buffer value memory release) */
-    while(1) {
+    while(TRUE) {
         /* pops a node from the buffer list */
         pop_value_linked_list(linked_buffer->buffer_list, (void **) &buffer, 1);
 
@@ -138,7 +138,7 @@ void join_linked_buffer(struct linked_buffer_t *linked_buffer, unsigned char **b
 
     /* iterates continuously to process to "join" the
     various "partial" string values into a single buffer */
-    while(1) {
+    while(TRUE) {
         /* retrieves the next value from the buffer iterator
         as the partial value */
         get_next_iterator(buffer_iterator, (void **) &partial_value);
