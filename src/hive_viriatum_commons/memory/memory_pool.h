@@ -259,38 +259,59 @@ static __inline void release_memory_pool(struct memory_pool_t *pool) {
 }
 
 static __inline void resize_memory_pool(struct memory_pool_t *pool, size_t chunk_max_size) {
+	/* allocates space for the index values and gor the various
+	storage attributes that will hold the old values of the pool
+	(before the resize operation) */
     size_t index;
     size_t index_m;
     size_t old_items_max_size = pool->items_max_size;
     struct memory_chunk_t **old_chunks = pool->chunks;
     struct memory_item_t **old_buffer_item_map = pool->buffer_item_map;
 
+	/* allocates space for the two temporary item iteration values
+	to be used in each of the iteration steps */
     struct memory_item_t *item;
     struct memory_item_t *_item;
 
+	/* updates both the chunk maximum size value and the "calculated"
+	items maximu size values (based on chunk size) */
     pool->chunk_max_size = chunk_max_size;
     pool->items_max_size = pool->chunk_max_size * CHUNK_SIZE;
 
+	/* allocates the new memory buffers for the chunks and for the map
+	that associated the buffer pointer with the associated memory item */
     pool->chunks = MALLOC(
         sizeof(struct memory_chunk_t *) * pool->chunk_max_size
     );
-
     pool->buffer_item_map = MALLOC(
         sizeof(struct memory_item_t *) * pool->items_max_size
     );
+
+	/* "resets" the memory buffer for the map with zero values so that
+	no problems occur when the map is accessed */
     memset(
         pool->buffer_item_map, 0,
         sizeof(struct memory_item_t *) * pool->items_max_size
     );
 
+	/* iterates over the current set of chunks to copy the existing chunks
+	to the new chunks buffer (copy operation) */
     for(index = 0; index < pool->chunk_count; index++) {
          pool->chunks[index] = old_chunks[index];
     }
 
+	/* runs the iteration around the old map to move the old items into the
+	new map (new hash must be made) this an extremly slow operation */
     for(index = 0; index < old_items_max_size; index++) {
+		/* retrieves the current item in iteration in case it's null
+		or the buffer is not defined consideres the item as invalid 
+		and skips the current loop iteration */
         item = old_buffer_item_map[index];
         if(item == NULL || item->buffer == NULL) { continue; }
 
+		/* retrieves the first attempt map index for the buffer based
+		on the modulus operation on it and then starts the iteration 
+		to try to find the best fit for it base on open addressing */
         index_m = (size_t) item->buffer % pool->items_max_size;
         while(TRUE) {
             /* retrieves the item for the current index in the map
@@ -308,6 +329,8 @@ static __inline void resize_memory_pool(struct memory_pool_t *pool, size_t chunk
         }
     }
 
+	/* releases the memory from the old chunks buffer and from the
+	old map that associated the buffer to the item (avoids memory leak */
     FREE(old_chunks);
     FREE(old_buffer_item_map);
 }
