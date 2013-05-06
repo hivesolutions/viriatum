@@ -65,7 +65,7 @@ system/environment.c \
 system/client.c \
 system/service.c \
 system/torrent.c \
-test/simple_test.c
+test/simple_test.c \
 test/speed_test.c
 
 libviriatum_http_la_SOURCES = stdafx.c \
@@ -91,5 +91,5 @@ system/environment.c \
 system/client.c \
 system/service.c \
 system/torrent.c \
-test/simple_test.c
+test/simple_test.c \
 test/speed_test.c
