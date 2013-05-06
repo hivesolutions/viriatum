@@ -358,16 +358,16 @@ static __inline void pdiag(struct memory_pool_t *pool, char *string, size_t size
     SPRINTF(
         string,
         size,
-        "Available: %d, "
-        "Max Items: %d, "
-        "Max Chunks: %d, "
-        "Used Chunks: %d, "
-        "Free Chunks: %d\n",
-        pavailable(pool),
-        pool->items_max_size,
-        pool->chunk_max_size,
-        pool->chunk_count,
-        pool->chunk_count - pool->free
+        "Available: %ld, "
+        "Max Items: %ld, "
+        "Max Chunks: %ld, "
+        "Used Chunks: %ld, "
+        "Free Chunks: %ld\n",
+        (long int) pavailable(pool),
+        (long int) pool->items_max_size,
+        (long int) pool->chunk_max_size,
+        (long int) pool->chunk_count,
+        (long int) pool->chunk_count - pool->free
     );
 }
 
