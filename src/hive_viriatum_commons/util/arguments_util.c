@@ -57,7 +57,11 @@ ERROR_CODE process_arguments(int argc, char *argv[], struct hash_map_t **argumen
         the arguments map */
         current_argument = argv[index];
         _process_argument(current_argument, argument);
-        set_value_string_hash_map(arguments, (unsigned char *) argument->key, (void *) argument);
+        set_value_string_hash_map(
+            arguments,
+            (unsigned char *) argument->key,
+            (void *) argument
+        );
     }
 
     /* sets the hash map of arguments as the value pointed
