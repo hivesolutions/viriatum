@@ -546,9 +546,7 @@ static __inline void pfree(struct memory_pool_t *pool, void *buffer) {
     /* in case the index of the current chunk (that is
     not full now) is lower than the current lowest free one,
     then updates the value */
-    if(chunk->index < pool->free) {
-        pool->free = chunk->index;
-    }
+    if(chunk->index < pool->free) { pool->free = chunk->index; }
 
     /* verifies if the index of the "just" released item
     is lower than the current (lowest) free index in case
