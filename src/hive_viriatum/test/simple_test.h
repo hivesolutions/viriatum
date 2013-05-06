@@ -52,6 +52,12 @@ void test_thread_pool();
 void test_linked_list();
 
 /**
+ * Runs a series of stress test in the linked
+ * list structured (used mainly for performance).
+ */
+void test_linked_list_stress();
+
+/**
  * Tests the array list structure.
  */
 void test_array_list();
