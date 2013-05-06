@@ -309,7 +309,7 @@ ERROR_CODE _poll_polling_select(struct polling_select_t *polling_select, struct 
     }
 
     /* iterates continuously */
-    while(1) {
+    while(TRUE) {
         /* in case the select count is zero, time to break the
         current loop of iteration */
         if(select_count == 0) { break; }

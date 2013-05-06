@@ -90,7 +90,7 @@ ERROR_CODE accept_handler_stream_io(struct connection_t *connection) {
 #endif
 
     /* iterates continuously */
-    while(1) {
+    while(TRUE) {
         /* accepts the socket, retrieving the socket handle */
         socket_handle = SOCKET_ACCEPT(connection->socket_handle, &socket_address, client_socket_address_size);
 
@@ -236,7 +236,7 @@ ERROR_CODE read_handler_stream_io(struct connection_t *connection) {
     struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
 
     /* iterates continuously */
-    while(1) {
+    while(TRUE) {
         /* in case the buffer size is so big that may
         overflow the current allocated buffer, must
         flush the current buffer avoid corruption */
@@ -398,7 +398,7 @@ ERROR_CODE write_handler_stream_io(struct connection_t *connection) {
     ERROR_CODE error = 0;
 
     /* iterates continuously */
-    while(1) {
+    while(TRUE) {
         /* prints a debug message */
         V_DEBUG("Peeking value from write queue\n");
 

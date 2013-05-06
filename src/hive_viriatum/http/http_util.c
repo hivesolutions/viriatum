@@ -541,7 +541,7 @@ ERROR_CODE parameters_http(struct hash_map_t *hash_map, unsigned char **buffer_p
 
     /* iterates continuously arround the hash map element
     the iterator is going to stop the iteration */
-    while(1) {
+    while(TRUE) {
         /* retrieves the next element from the iterator
         and in case such element is invalid breaks the loop */
         get_next_iterator(iterator, (void **) &element);

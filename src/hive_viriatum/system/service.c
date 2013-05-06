@@ -212,7 +212,7 @@ void delete_configuration(struct sort_map_t *configuration, int is_top) {
     create_element_iterator_sort_map(configuration, &configuration_iterator);
 
     /* iterates continuously */
-    while(1) {
+    while(TRUE) {
         /* retrieves the next value from the configuration iterator */
         get_next_iterator(configuration_iterator, (void **) &element);
 
@@ -302,7 +302,7 @@ ERROR_CODE calculate_locations_service(struct service_t *service) {
     struct sort_map_t *configuration = service->configuration;
     create_element_iterator_sort_map(configuration, &iterator);
 
-    while(1) {
+    while(TRUE) {
         get_next_iterator(iterator, (void **) &element);
         if(element == NULL) { break; }
 
@@ -349,7 +349,7 @@ ERROR_CODE create_workers(struct service_t *service) {
 
     /* iterates continuously for the forking of the
     current process (worker creation) */
-    while(1) {
+    while(TRUE) {
         /* in case the number of forks is the same
         as the worker count, breaks the loop no more
         forking remaining */
@@ -415,7 +415,7 @@ ERROR_CODE join_workers(struct service_t *service) {
 
     /* iterates continuously for the joining of the
     current process (worker creation) */
-    while(1) {
+    while(TRUE) {
         /* in case the number of joins is the same
         as the worker count, breaks the loop no more
         joining remaining */
@@ -1113,7 +1113,7 @@ ERROR_CODE close_connections_service(struct service_t *service) {
     V_DEBUG("Closing the service connections\n");
 
     /* iterates continuously */
-    while(1) {
+    while(TRUE) {
         /* pops a value from the connections list (and deletes the node) */
         pop_value_linked_list(connections_list, (void **) &current_connection, 1);
 
@@ -1174,7 +1174,7 @@ ERROR_CODE load_modules_service(struct service_t *service) {
     create_iterator_linked_list(entries, &entries_iterator);
 
     /* iterates continuously over all the module entries */
-    while(1) {
+    while(TRUE) {
         /* retrieves the next value from the iterator */
         get_next_iterator(entries_iterator, (void **) &entry);
 
@@ -1245,7 +1245,7 @@ ERROR_CODE unload_modules_service(struct service_t *service) {
     create_iterator_linked_list(service->modules_list, &modules_list_iterator);
 
     /* iterates continuously */
-    while(1) {
+    while(TRUE) {
         /* retrieves the next value from the iterator and
         in case the current module is null (end of iterator)
         must break the current loop */
@@ -1277,7 +1277,7 @@ ERROR_CODE create_modules_label(struct service_t *service) {
 
     /* iterates continuously over the list of modules
     to create the modules label */
-    while(1) {
+    while(TRUE) {
         /* retrieves the next value from the iterator and
         in case the current module is null (end of iterator)
         must break the current loop */
@@ -1388,7 +1388,7 @@ ERROR_CODE delete_connection(struct connection_t *connection) {
     struct data_t *data;
 
     /* iterates continuously */
-    while(1) {
+    while(TRUE) {
         /* pops a value (data) from the linked list (write queue) */
         pop_value_linked_list(connection->write_queue, (void **) &data, 1);
 

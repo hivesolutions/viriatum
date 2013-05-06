@@ -240,7 +240,7 @@ ERROR_CODE data_handler_stream_http(struct io_connection_t *io_connection, unsig
     /* iterates continuously, this allows the stream handler
     to split the stream into possible multiple messages, usefull
     for http pipelining (multiple sequenced requests) */
-    while(1) {
+    while(TRUE) {
         /* retrieves the pointer to the read position as the connection buffer
         added to the read offset and then retrieves the current size for reading
         by removing the read offset from the buffer offset (must deduct the already
