@@ -336,15 +336,21 @@ static __inline void resize_memory_pool(struct memory_pool_t *pool, size_t chunk
 }
 
 static __inline size_t pavailable(struct memory_pool_t *pool) {
+	/* allocates the space for the temporary index counter,
+	for the available counter and for the temporary item */
     size_t index;
     size_t available = 0;
     struct memory_item_t *item = NULL;
 
+	/* iterates over the pool set of items to count the number
+	of avialble "spots" in the memory pool (increments available) */
     for(index = 0; index < pool->items_max_size; index++) {
         item = pool->buffer_item_map[index];
         if(item == NULL) { available++; }
     }
 
+	/* returns the "counted" number of available "spots" in the
+	provided memory pool object */
     return available;
 }
 
