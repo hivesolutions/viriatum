@@ -41,7 +41,7 @@
 #endif
 
 #ifdef HAVE_MPOOL
-#define VIRIATUM_MEMORY_POOL
+#define VIRIATUM_MPOOL
 #endif
 
 #ifdef HAVE_IP6

@@ -520,7 +520,7 @@ static __inline void pdiag(struct memory_pool_t *pool, char *string, size_t size
 }
 
 static __inline void *palloc(struct memory_pool_t *pool, size_t size) {
-#ifdef VIRIATUM_MEMORY_POOL
+#ifdef VIRIATUM_MPOOL
     /* allocates space for the various index and counter pointes
     and then allocates the pointers to the buffer and to the various
     structures that are going to be created and/or used */
@@ -656,7 +656,7 @@ static __inline void *palloc(struct memory_pool_t *pool, size_t size) {
 }
 
 static __inline void pfree(struct memory_pool_t *pool, void *buffer) {
-#ifdef VIRIATUM_MEMORY_POOL
+#ifdef VIRIATUM_MPOOL
     /* allocates space for both the current index counter and
     the index for the chunk, the allocates memory for the item
     and chunk pointers */

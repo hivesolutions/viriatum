@@ -104,5 +104,5 @@
 #endif
 
 #ifdef VIRIATUM_THREAD_SAFE
-#undef VIRIATUM_MEMORY_POOL
+#undef VIRIATUM_MPOOL
 #endif
