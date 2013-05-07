@@ -108,7 +108,9 @@ typedef struct memory_chunk_t {
     /**
      * The (bitmap) array index indicating the
      * first element in the array that is considered
-     * to be in a free state.
+     * to be in a free state. This value may be used
+	 * to gather information for the bes possible item
+	 * allocation for the chunk.
      */
     size_t free;
 
@@ -117,6 +119,15 @@ typedef struct memory_chunk_t {
      * that is used for the items in the chunk.
      */
     void *buffer;
+
+	/**
+	 * The number of items that are considered "used" in
+	 * terms of being allocated to a certain context. When
+	 * this value is equals to the static chunk size the
+	 * chunk is considered to be full, when this values is
+	 * equals to zero the cunk is considered empty.
+	 */
+	size_t item_alloc;
 
     /**
      * The size in bytes for each of the item's value.
@@ -197,6 +208,7 @@ static __inline void create_chunk(struct memory_chunk_t **chunk_pointer, size_t 
     chunk->index = index_pool;
     chunk->is_full = FALSE;
     chunk->free = 0;
+	chunk->item_alloc = 0;
     chunk->item_size = size;
     chunk->chunk_size = size * CHUNK_SIZE;
     chunk->buffer = MALLOC(chunk->chunk_size);
@@ -454,10 +466,12 @@ static __inline void *palloc(struct memory_pool_t *pool, size_t size) {
 
     /* retrieves the index of the lowest free (available) item
     and then uses it to both retrieve the item structure and set
-    it's index in the bitmap as not available (used) */
+    it's index in the bitmap as not available (used), then
+	increments the current item alloc in the chunk */
     free = chunk->free;
     item = &chunk->items[free];
     chunk->bitmap[free] = 1;
+	chunk->item_alloc++;
 
     /* iterates over all the items from the currently
     allocated one to try to find a new one free in order
@@ -564,8 +578,11 @@ static __inline void pfree(struct memory_pool_t *pool, void *buffer) {
     chunk->bitmap[index_c] = 0;
 
     /* ensures that the is full flag of the chunk is set
-    to false as there's at least one item avaialble */
+    to false as there's at least one item avaialble for
+	alloication, then decrement the current item alloc
+	for the chunk (one less element) */
     chunk->is_full = FALSE;
+	chunk->item_alloc--;
 
     /* in case the index of the current chunk (that is
     not full now) is lower than the current lowest free one,
