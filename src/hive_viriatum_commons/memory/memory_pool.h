@@ -392,6 +392,10 @@ static __inline void resize_memory_pool(struct memory_pool_t *pool, size_t chunk
                 pool->free = index_c;
             }
 
+			/* updates the chunk index position relative to the pool
+			buffer so that it matched its new position */
+			chunk->index = index_c;
+
             /* copies the chunk reference into the new chunks buffer and
             increments the index counter for the chunks buffer */
             pool->chunks[index_c] = chunk;
@@ -416,6 +420,10 @@ static __inline void resize_memory_pool(struct memory_pool_t *pool, size_t chunk
                 delete_chunk(chunk);
                 continue;
             }
+
+			/* updates the chunk index position relative to the pool
+			buffer so that it matched its new position */
+			chunk->index = index_c;
 
             /* sets the invalid (no items allocated) chunk in the current
             chunks buffer and then increments the chunk index counter */
