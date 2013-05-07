@@ -27,6 +27,6 @@
 
 #pragma once
 
-#define HAVE_MEMORY_POOL
+#define HAVE_MPOOL
 #define HAVE_IP6
 #define HAVE_LIBPTHREAD

@@ -40,7 +40,7 @@
 #define VIRIATUM_DEBUG
 #endif
 
-#ifdef HAVE_MEMORY_POOL
+#ifdef HAVE_MPOOL
 #define VIRIATUM_MEMORY_POOL
 #endif
 
