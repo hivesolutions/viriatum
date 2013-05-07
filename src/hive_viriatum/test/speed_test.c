@@ -45,7 +45,7 @@ void run_speed_test(char *name, test_function function, size_t iterations) {
 
     /* prints a debug message at the beginning of the speed function
     execution process indicating the name of the function */
-    PRINTF_F("Running '%s' for %d times ...\n", name, iterations);
+    PRINTF_F("Running '%s' for %ld times ...\n", name, (long int) iterations);
 
     /* retrieves the initial clock value for the execution of the
     function, it's going to be used to measure time at the end */
