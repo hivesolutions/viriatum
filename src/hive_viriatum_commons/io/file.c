@@ -487,8 +487,10 @@ ERROR_CODE get_write_time_file(char *file_path, struct date_time_t *date_time) {
     }
 
     /* retrieve the file's various times for the file
-    and in case there's an error raises it */
+    and in case there's an error raises it, but first
+	closes the file handle to avoid any leaks */
     if(!GetFileTime(file_handle, &time_create, &time_access, &time_write)) {
+		CloseHandle(file_handle);
         RAISE_ERROR_M(
             RUNTIME_EXCEPTION_ERROR_CODE,
             (unsigned char *) "Problem retrieving file time"
