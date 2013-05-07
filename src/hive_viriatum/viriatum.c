@@ -452,7 +452,9 @@ int main(int argc, char *argv[]) {
     delete_arguments(arguments);
     cleanup_palloc();
 
-    /* prints a debug message */
+    /* prints a debug message about the ending of the sytem
+	for the execution of the service and then returns the
+	normal return code (success status) to the caller process */
     V_DEBUG("Finishing process\n");
 
     /* returns zero (valid) */
