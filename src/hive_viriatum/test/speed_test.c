@@ -33,6 +33,7 @@ void run_speed_test(char *name, test_function function, size_t iterations) {
     /* allocates the variables (long variables) that are going to be
     used to stores the values for the speed measuring and the float
     value to be used at the final type conversion */
+	size_t index;
     long start_time;
     long end_time;
     long elapsed;
@@ -50,15 +51,15 @@ void run_speed_test(char *name, test_function function, size_t iterations) {
     function, it's going to be used to measure time at the end */
     start_time = clock();
 
-    /* esecutes the function, the control flow may only be returned
+    /* executes the function, the control flow may only be returned
     after a couple of seconds or more (assume worst case) */
-    function();
+	for(index = 0; index < iterations; index++) { function(); }
 
     /* retrieves the final clock for the program execution and ten
     calculates the elapsed time with the difference between the start
     time and the current time */
     end_time = clock();
-    elapsed = (end_time - start_time) / CLOCKS_PER_SEC * 1000;
+    elapsed = (float) (end_time - start_time) / CLOCKS_PER_SEC * 1000;
 
     /* calculates the elapsed time as a float value and then prints
     a message regarding the amount of time it took to execute */
@@ -67,6 +68,7 @@ void run_speed_test(char *name, test_function function, size_t iterations) {
 }
 
 void run_speed_tests() {
-	run_speed_test("test_linked_list", test_linked_list, 10);
+	run_speed_test("test_linked_list", test_linked_list, 1000000);
     run_speed_test("test_linked_list_stress", test_linked_list_stress, 1);
+	run_speed_test("test_linked_list_big", test_linked_list_big, 1);
 }

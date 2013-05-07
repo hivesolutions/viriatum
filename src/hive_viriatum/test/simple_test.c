@@ -140,6 +140,31 @@ void test_linked_list_stress() {
     delete_linked_list(linked_list);
 }
 
+void test_linked_list_big() {
+    /* allocates space for the index to be used in the iteration
+    for the temporary value pointer variable and for the pointer
+    that is going to be used for the linked list */
+    size_t index;
+    void *value;
+    struct linked_list_t *linked_list;
+
+    /* creates the linked list structure and starts the long
+    iterations that are going to append and then pop elements from
+    the linked list (stressing the creation of nodes) */
+    create_linked_list(&linked_list);
+    for(index = 0; index < 1000000; index++) {
+        append_value_linked_list(linked_list, (void *) 1);
+        append_value_linked_list(linked_list, (void *) 2);
+        append_value_linked_list(linked_list, (void *) 3);
+    }
+	for(index = 0; index < 1000000; index++) {
+		pop_value_linked_list(linked_list, (void **) &value, TRUE);
+        pop_value_linked_list(linked_list, (void **) &value, TRUE);
+        pop_value_linked_list(linked_list, (void **) &value, TRUE);
+	}
+    delete_linked_list(linked_list);
+}
+
 void test_array_list() {
     /* allocates space for the element */
     unsigned int element = 1;
@@ -568,6 +593,7 @@ void run_simple_tests() {
     and the stress approach */
     test_linked_list();
     test_linked_list_stress();
+	test_linked_list_big();
 
     /* tests the array list */
     test_array_list();
