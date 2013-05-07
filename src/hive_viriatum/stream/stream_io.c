@@ -124,7 +124,7 @@ ERROR_CODE accept_handler_stream_io(struct connection_t *connection) {
             /* sets the service select service as the service in the (client)  connection */
             client_connection->service = connection->service;
 
-            /* sets the base hanlding functions in the client connection */
+            /* sets the base handling functions in the client connection */
             client_connection->open_connection = open_connection;
             client_connection->close_connection = close_connection;
             client_connection->write_connection = write_connection;
