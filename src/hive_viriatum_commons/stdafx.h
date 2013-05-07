@@ -40,6 +40,10 @@
 #define VIRIATUM_DEBUG
 #endif
 
+#ifdef HAVE_MEMORY_POOL
+#define VIRIATUM_MEMORY_POOL
+#endif
+
 #ifdef HAVE_IP6
 #define VIRIATUM_IP6
 #endif
