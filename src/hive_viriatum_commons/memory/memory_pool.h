@@ -117,6 +117,9 @@ typedef struct memory_chunk_t {
     /**
      * The pointer to the begining of the memory buffer
      * that is used for the items in the chunk.
+     * The buffer should be allocated at runtime with
+     * a multiple of the size of the first element to be
+     * allocated for the pool.
      */
     void *buffer;
 
@@ -207,10 +210,17 @@ VIRIATUM_EXPORT_PREFIX void cleanup_palloc();
 VIRIATUM_EXPORT_PREFIX void add_palloc(struct memory_pool_t *pool);
 
 static __inline void create_chunk(struct memory_chunk_t **chunk_pointer, size_t size, size_t index_pool) {
+    /* reserves space for the index counter for the pointer to
+    a temporary item and then allocates the chunk structure */
     size_t index;
     struct memory_item_t *item;
     struct memory_chunk_t *chunk = MALLOC(sizeof(struct memory_chunk_t));
 
+    /* resets the chunk bitmap so that all of its values are set
+    to the zero value and then resets the complete set of contents
+    of the chunk structure, noting that all the items are also set
+    to their default initial value and with the apropriate part of
+    the chunk buffer associated */
     memset(chunk->bitmap, 0, sizeof(char) * CHUNK_SIZE);
     chunk->index = index_pool;
     chunk->is_full = FALSE;
@@ -226,15 +236,21 @@ static __inline void create_chunk(struct memory_chunk_t **chunk_pointer, size_t 
         item->buffer = (char *) chunk->buffer + (chunk->item_size * index);
     }
 
+    /* returns the allocated chunk using the provided pointer to it
+    as the returning value (indirect returning) */
     *chunk_pointer = chunk;
 }
 
 static __inline void delete_chunk(struct memory_chunk_t *chunk) {
+    /* resets all the chunk data to the original values so that
+    no side effect is created with mutiple re-usage of the chunk */
     chunk->index = 0;
     chunk->is_full = FALSE;
     chunk->free = 0;
     chunk->item_alloc = 0;
 
+    /* releases both the chunk buffer (used for the item contents)
+    and the chunk structure itself (avoiding any memory leak) */
     FREE(chunk->buffer);
     FREE(chunk);
 }
