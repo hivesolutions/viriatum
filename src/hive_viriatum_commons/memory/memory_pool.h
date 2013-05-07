@@ -40,7 +40,7 @@
  * The factor to be used in the calculus of the size of
  * the map associating the buffer of the item with the item
  * instance, the map buffer must be bigger that the required
- * size to avoid a high level of collisions in the open 
+ * size to avoid a high level of collisions in the open
  * addressing algorithm (would slow down the process).
  */
 #define CHUNK_FACTOR 1.4
@@ -100,8 +100,8 @@ typedef struct memory_chunk_t {
     /**
      * Boolean flag that indicates if the chunk is full,
      * so that all of its items are set to an used state.
-	 * This flag is used to accelerate operations that
-	 * require verification of the state.
+     * This flag is used to accelerate operations that
+     * require verification of the state.
      */
     char is_full;
 
@@ -109,8 +109,8 @@ typedef struct memory_chunk_t {
      * The (bitmap) array index indicating the
      * first element in the array that is considered
      * to be in a free state. This value may be used
-	 * to gather information for the bes possible item
-	 * allocation for the chunk.
+     * to gather information for the bes possible item
+     * allocation for the chunk.
      */
     size_t free;
 
@@ -120,14 +120,14 @@ typedef struct memory_chunk_t {
      */
     void *buffer;
 
-	/**
-	 * The number of items that are considered "used" in
-	 * terms of being allocated to a certain context. When
-	 * this value is equals to the static chunk size the
-	 * chunk is considered to be full, when this values is
-	 * equals to zero the cunk is considered empty.
-	 */
-	size_t item_alloc;
+    /**
+     * The number of items that are considered "used" in
+     * terms of being allocated to a certain context. When
+     * this value is equals to the static chunk size the
+     * chunk is considered to be full, when this values is
+     * equals to zero the cunk is considered empty.
+     */
+    size_t item_alloc;
 
     /**
      * The size in bytes for each of the item's value.
@@ -174,6 +174,13 @@ typedef struct memory_pool_t {
     size_t free;
 
     /**
+     * Counter that measures the ammount of chunks that currently
+     * have at least one item considered allocated. This value is
+     * used for the shrink operation of the pool.
+     */
+    size_t chunk_alloc;
+
+    /**
      * The number of chunks that are currently defined
      * under the memory pool, this value must be zero at
      * the begining of a memory pool.
@@ -208,7 +215,7 @@ static __inline void create_chunk(struct memory_chunk_t **chunk_pointer, size_t 
     chunk->index = index_pool;
     chunk->is_full = FALSE;
     chunk->free = 0;
-	chunk->item_alloc = 0;
+    chunk->item_alloc = 0;
     chunk->item_size = size;
     chunk->chunk_size = size * CHUNK_SIZE;
     chunk->buffer = MALLOC(chunk->chunk_size);
@@ -239,6 +246,7 @@ static __inline void alloc_memory_pool(struct memory_pool_t *pool, size_t chunk_
     /* populates the pool structure with the initial values and
     calculates the various calculated attributes in it */
     pool->free = 0;
+    pool->chunk_alloc = 0;
     pool->chunk_count = 0;
     pool->chunk_max_size = chunk_max_size;
     pool->items_max_size = pool->chunk_max_size * CHUNK_MARGIN(CHUNK_SIZE);
@@ -266,28 +274,28 @@ static __inline void alloc_memory_pool(struct memory_pool_t *pool, size_t chunk_
 }
 
 static __inline void release_memory_pool(struct memory_pool_t *pool) {
-	/* allocates space for the temporary variables that
-	will hold both the index counter for iteration and
-	the pointer to the chunk holder */
+    /* allocates space for the temporary variables that
+    will hold both the index counter for iteration and
+    the pointer to the chunk holder */
     size_t index;
     struct memory_chunk_t *chunk;
 
-	/* iterates over the complete set of chunks present
-	in the pool to release their memory (avoid leaks) */
+    /* iterates over the complete set of chunks present
+    in the pool to release their memory (avoid leaks) */
     for(index = 0; index < pool->chunk_count; index++) {
         chunk = pool->chunks[index];
         delete_chunk(chunk);
     }
 
-	/* releases the buffer containing the chunk structure
-	references and the buffer for the map associating the
-	buffer pointers with the item structures */
+    /* releases the buffer containing the chunk structure
+    references and the buffer for the map associating the
+    buffer pointers with the item structures */
     FREE(pool->chunks);
     FREE(pool->buffer_item_map);
 
-	/* resets all of the pool values to their original
-	values in order to avoid any duplicated initialization
-	problems that might occur */
+    /* resets all of the pool values to their original
+    values in order to avoid any duplicated initialization
+    problems that might occur */
     pool->free = 0;
     pool->chunk_count = 0;
     pool->chunk_max_size = 0;
@@ -295,24 +303,46 @@ static __inline void release_memory_pool(struct memory_pool_t *pool) {
 }
 
 static __inline void resize_memory_pool(struct memory_pool_t *pool, size_t chunk_max_size) {
-    /* allocates space for the index values and gor the various
+    /* allocates space for the index values and for the various
     storage attributes that will hold the old values of the pool
     (before the resize operation) */
+    char is_grow;
     size_t index;
+    size_t index_c;
     size_t index_m;
+    size_t old_chunk_count = pool->chunk_count;
     size_t old_items_max_size = pool->items_max_size;
     struct memory_chunk_t **old_chunks = pool->chunks;
     struct memory_item_t **old_buffer_item_map = pool->buffer_item_map;
+
+    /* allocates space for the temporary reference to the chunk
+    structure to be used for local operations */
+    struct memory_chunk_t *chunk;
 
     /* allocates space for the two temporary item iteration values
     to be used in each of the iteration steps */
     struct memory_item_t *item;
     struct memory_item_t *_item;
 
+    /* in case there's no (real) resize operation because the target
+    pool size is the same as the one already defined, must return the
+    control to the caller function immediately (nothing to be done) */
+    if(chunk_max_size == pool->chunk_max_size) { return; }
+
+    /* verifies if the resize operation in the memory pool is a grow
+    operation or a shrink operation (based on the curren chunk max size) */
+    is_grow = chunk_max_size > pool->chunk_max_size;
+
     /* updates both the chunk maximum size value and the "calculated"
     items maximu, size values (based on chunk size) */
     pool->chunk_max_size = chunk_max_size;
     pool->items_max_size = pool->chunk_max_size * CHUNK_MARGIN(CHUNK_SIZE);
+
+    /* set the possible "new" chunk count value taking into account
+    that if the chunk max size value is lower than the current chunk
+    count the chunk count must be updated to that value */
+    pool->chunk_count = pool->chunk_count < chunk_max_size ?\
+        pool->chunk_count : chunk_max_size;
 
     /* allocates the new memory buffers for the chunks and for the map
     that associated the buffer pointer with the associated memory item */
@@ -330,10 +360,60 @@ static __inline void resize_memory_pool(struct memory_pool_t *pool, size_t chunk
         sizeof(struct memory_item_t *) * pool->items_max_size
     );
 
-    /* iterates over the current set of chunks to copy the existing chunks
-    to the new chunks buffer (copy operation) */
-    for(index = 0; index < pool->chunk_count; index++) {
-         pool->chunks[index] = old_chunks[index];
+    /* verifies if the current resize operation is of type grow or if
+    it is a shrink operation, if the operation is grow all the chunks
+    are copied to the "new" pool otherwise only the valid ones are copied
+    and then the empty ones are copied to fill the "new" smaller pool */
+    if(is_grow) {
+        /* iterates over the current set of chunks to copy the existing
+        chunks to the new chunks buffer (copy operation) */
+        for(index = 0; index < old_chunk_count; index++) {
+            pool->chunks[index] = old_chunks[index];
+        }
+    } else {
+        /* starts the index value to be used in the chunk buffer filling
+        operation */
+        index_c = 0;
+
+        /* iterates over the various chunks present in the pool to filter
+        the onnes that are valid (have items allocated) and then copies
+        tose chunks into the "new" pool chunks buffer */
+        for(index = 0; index < old_chunk_count; index++) {
+            /* retrieves the current chunk an in case it has no items
+            allocated continues the loop (ignores the chunk) */
+            chunk = old_chunks[index];
+            if(chunk->item_alloc == 0) { continue; }
+
+            /* copies the chunk reference into the new chunks buffer and
+            increments the index counter for the chunks buffer */
+            pool->chunks[index_c] = chunk;
+            index_c++;
+        }
+
+        /* updates the lowest free chunk index in the pool to the current
+        index, (the index of the last allocated chunk) */
+        pool->free = index_c;
+
+        /* iterates over the various chnks present in the pool to be able
+        to fill the new chunks buffer with unallocated chunks (to avoid)
+        extra memory allocations (expensive operations) for the extra chunks
+        there should be a delete operation */
+        for(index = 0; index < old_chunk_count; index++) {
+            /* retrieves the current chunk an in case it's a valid chunk
+            ignores it (continues the loop) otherwise in case the filling
+            operation has finished deletes the chunk */
+            chunk = old_chunks[index];
+            if(chunk->item_alloc != 0) { continue; }
+            if(index_c == chunk_max_size) {
+                delete_chunk(chunk);
+                continue;
+            }
+
+            /* sets the invalid (no items allocated) chunk in the current
+            chunks buffer and then increments the chunk index counter */
+            pool->chunks[index_c] = chunk;
+            index_c++;
+        }
     }
 
     /* runs the iteration around the old map to move the old items into the
@@ -464,14 +544,18 @@ static __inline void *palloc(struct memory_pool_t *pool, size_t size) {
     in the memory pool (the one to be used) */
     chunk = pool->chunks[pool->free];
 
+    /* in case this is the first item allocation for the chunk
+    the chunk is sets as allocated in the pool */
+    if(chunk->item_alloc == 0) { pool->chunk_alloc++; }
+
     /* retrieves the index of the lowest free (available) item
     and then uses it to both retrieve the item structure and set
     it's index in the bitmap as not available (used), then
-	increments the current item alloc in the chunk */
+    increments the current item alloc in the chunk */
     free = chunk->free;
     item = &chunk->items[free];
     chunk->bitmap[free] = 1;
-	chunk->item_alloc++;
+    chunk->item_alloc++;
 
     /* iterates over all the items from the currently
     allocated one to try to find a new one free in order
@@ -579,10 +663,10 @@ static __inline void pfree(struct memory_pool_t *pool, void *buffer) {
 
     /* ensures that the is full flag of the chunk is set
     to false as there's at least one item avaialble for
-	alloication, then decrement the current item alloc
-	for the chunk (one less element) */
+    alloication, then decrement the current item alloc
+    for the chunk (one less element) */
     chunk->is_full = FALSE;
-	chunk->item_alloc--;
+    chunk->item_alloc--;
 
     /* in case the index of the current chunk (that is
     not full now) is lower than the current lowest free one,
@@ -593,6 +677,19 @@ static __inline void pfree(struct memory_pool_t *pool, void *buffer) {
     is lower than the current (lowest) free index in case
     it's updates the free index to the released one */
     if(index_c < chunk->free) { chunk->free = index_c; }
+
+    /* in case the number of allocated items in the chunk
+    has reached the zero value then the chunk is considered
+    empty and is set as free to be released */
+    if(chunk->item_alloc == 0) {
+        /* decrements the number of allocated chunks in the pool
+        and then verifies if the number of chunks in it has reached
+        a level for which it must be shrinked */
+        pool->chunk_alloc--;
+        if(pool->chunk_alloc == pool->chunk_max_size / 3) {
+            resize_memory_pool(pool, pool->chunk_max_size / 2);
+        }
+    }
 #else
     FREE(buffer);
 #endif
