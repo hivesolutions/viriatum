@@ -67,5 +67,6 @@ void run_speed_test(char *name, test_function function, size_t iterations) {
 }
 
 void run_speed_tests() {
+	run_speed_test("test_linked_list", test_linked_list, 10);
     run_speed_test("test_linked_list_stress", test_linked_list_stress, 1);
 }
