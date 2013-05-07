@@ -205,7 +205,7 @@ void create_template_parameter(struct template_parameter_t **template_parameter_
     /* sets the default values in the template parameter */
     template_parameter->type = 0;
     template_parameter->int_value = 0;
-    template_parameter->float_value = 0.0;
+    template_parameter->float_value = 0.0f;
 
     /* sets the template engine in the template parameter pointer */
     *template_parameter_pointer = template_parameter;
