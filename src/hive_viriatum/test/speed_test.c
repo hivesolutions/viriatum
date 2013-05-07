@@ -36,7 +36,7 @@ void run_speed_test(char *name, test_function function, size_t iterations) {
 	size_t index;
     long start_time;
     long end_time;
-    long elapsed;
+    float elapsed;
     float elapsed_f;
 
 	/* defaults the iterations count value to the one value
@@ -59,7 +59,7 @@ void run_speed_test(char *name, test_function function, size_t iterations) {
     calculates the elapsed time with the difference between the start
     time and the current time */
     end_time = clock();
-    elapsed = (float) (end_time - start_time) / CLOCKS_PER_SEC * 1000;
+    elapsed = (float) (end_time - start_time) / CLOCKS_PER_SEC * 1000.0f;
 
     /* calculates the elapsed time as a float value and then prints
     a message regarding the amount of time it took to execute */
