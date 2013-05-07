@@ -478,25 +478,25 @@ ERROR_CODE get_write_time_file(char *file_path, struct date_time_t *date_time) {
     );
 
     /* in case the created file handle is not valid must raise
-	an error indicating that no file exists */
+    an error indicating that no file exists */
     if(file_handle == INVALID_HANDLE_VALUE) {
         RAISE_ERROR_M(
-		    RUNTIME_EXCEPTION_ERROR_CODE,
-			(unsigned char *) "Could not create file"
-		);
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Could not create file"
+        );
     }
 
     /* retrieve the file's various times for the file
-	and in case there's an error raises it */
+    and in case there's an error raises it */
     if(!GetFileTime(file_handle, &time_create, &time_access, &time_write)) {
         RAISE_ERROR_M(
-			RUNTIME_EXCEPTION_ERROR_CODE,
-			(unsigned char *) "Problem retrieving file time"
-		);
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Problem retrieving file time"
+        );
     }
 
     /* convert the last write time to "local" time using the
-	default time to system time conversion function */
+    default time to system time conversion function */
     FileTimeToSystemTime(&time_write, &time_write_local);
 
     /* populates the date time structure with the information
@@ -509,7 +509,7 @@ ERROR_CODE get_write_time_file(char *file_path, struct date_time_t *date_time) {
     date_time->second = time_write_local.wSecond;
 
     /* closes the file handle to avoid a handle or memory leak
-	in the the current system */
+    in the the current system */
     CloseHandle(file_handle);
 
     /* raise no error */

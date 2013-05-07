@@ -157,11 +157,11 @@ void test_linked_list_big() {
         append_value_linked_list(linked_list, (void *) 2);
         append_value_linked_list(linked_list, (void *) 3);
     }
-	for(index = 0; index < 1000000; index++) {
-		pop_value_linked_list(linked_list, (void **) &value, TRUE);
+    for(index = 0; index < 1000000; index++) {
         pop_value_linked_list(linked_list, (void **) &value, TRUE);
         pop_value_linked_list(linked_list, (void **) &value, TRUE);
-	}
+        pop_value_linked_list(linked_list, (void **) &value, TRUE);
+    }
     delete_linked_list(linked_list);
 }
 
@@ -507,8 +507,8 @@ void test_template_handler() {
     struct template_handler_t *template_handler;
 
     /* creates the template handler then uses it to process
-	the test template file and then deletes the template
-	handler removing any memory resources */
+    the test template file and then deletes the template
+    handler removing any memory resources */
     create_template_handler(&template_handler);
     process_template_handler(template_handler, (unsigned char *) "test.tpl");
     delete_template_handler(template_handler);
@@ -519,7 +519,7 @@ void test_quicksort() {
     size_t list[10] = { 2, 4, 1, 2, 3, 5, 5, 3, 4, 1 };
 
     /* sorts the sequence according to the compare function
-	the algorithm to be used in the sorting is the quicksort */
+    the algorithm to be used in the sorting is the quicksort */
     sort_quicksort((void **) &list, 0, 10, _compare);
 }
 
@@ -593,7 +593,7 @@ void run_simple_tests() {
     and the stress approach */
     test_linked_list();
     test_linked_list_stress();
-	test_linked_list_big();
+    test_linked_list_big();
 
     /* tests the array list */
     test_array_list();

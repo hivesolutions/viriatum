@@ -410,12 +410,12 @@ ERROR_CODE write_handler_stream_io(struct connection_t *connection) {
         if(data == NULL) { break; }
 
         /* prints a debug message about the data that is going
-		to be sent through the socket */
+        to be sent through the socket */
         V_DEBUG_F(
-		    "Sending %ld bytes through socket: %d\n", 
-			(long int) data->size,
-			connection->socket_handle
-		);
+            "Sending %ld bytes through socket: %d\n",
+            (long int) data->size,
+            connection->socket_handle
+        );
 
         /* sends the value into the connection socket (takes into account the type
         of socket in use) should be able to take care of secure connections */
