@@ -233,6 +233,7 @@ static __inline void delete_chunk(struct memory_chunk_t *chunk) {
     chunk->index = 0;
     chunk->is_full = FALSE;
     chunk->free = 0;
+    chunk->item_alloc = 0;
 
     FREE(chunk->buffer);
     FREE(chunk);
@@ -307,6 +308,7 @@ static __inline void resize_memory_pool(struct memory_pool_t *pool, size_t chunk
     storage attributes that will hold the old values of the pool
     (before the resize operation) */
     char is_grow;
+    char is_set;
     size_t index;
     size_t index_c;
     size_t index_m;
@@ -372,8 +374,10 @@ static __inline void resize_memory_pool(struct memory_pool_t *pool, size_t chunk
         }
     } else {
         /* starts the index value to be used in the chunk buffer filling
-        operation */
+        operation and also start the is set flag that control the setting
+        of the base free index in the pool */
         index_c = 0;
+        is_set = FALSE;
 
         /* iterates over the various chunks present in the pool to filter
         the onnes that are valid (have items allocated) and then copies
@@ -383,6 +387,10 @@ static __inline void resize_memory_pool(struct memory_pool_t *pool, size_t chunk
             allocated continues the loop (ignores the chunk) */
             chunk = old_chunks[index];
             if(chunk->item_alloc == 0) { continue; }
+            if(is_set == FALSE && chunk->is_full == FALSE) {
+                is_set = TRUE;
+                pool->free = index_c;
+            }
 
             /* copies the chunk reference into the new chunks buffer and
             increments the index counter for the chunks buffer */
@@ -392,7 +400,7 @@ static __inline void resize_memory_pool(struct memory_pool_t *pool, size_t chunk
 
         /* updates the lowest free chunk index in the pool to the current
         index, (the index of the last allocated chunk) */
-        pool->free = index_c;
+        if(is_set == FALSE) { pool->free = index_c; }
 
         /* iterates over the various chnks present in the pool to be able
         to fill the new chunks buffer with unallocated chunks (to avoid)
