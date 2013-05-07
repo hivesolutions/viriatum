@@ -100,6 +100,8 @@ typedef struct memory_chunk_t {
     /**
      * Boolean flag that indicates if the chunk is full,
      * so that all of its items are set to an used state.
+	 * This flag is used to accelerate operations that
+	 * require verification of the state.
      */
     char is_full;
 
@@ -252,17 +254,28 @@ static __inline void alloc_memory_pool(struct memory_pool_t *pool, size_t chunk_
 }
 
 static __inline void release_memory_pool(struct memory_pool_t *pool) {
+	/* allocates space for the temporary variables that
+	will hold both the index counter for iteration and
+	the pointer to the chunk holder */
     size_t index;
     struct memory_chunk_t *chunk;
 
+	/* iterates over the complete set of chunks present
+	in the pool to release their memory (avoid leaks) */
     for(index = 0; index < pool->chunk_count; index++) {
         chunk = pool->chunks[index];
         delete_chunk(chunk);
     }
 
+	/* releases the buffer containing the chunk structure
+	references and the buffer for the map associating the
+	buffer pointers with the item structures */
     FREE(pool->chunks);
     FREE(pool->buffer_item_map);
 
+	/* resets all of the pool values to their original
+	values in order to avoid any duplicated initialization
+	problems that might occur */
     pool->free = 0;
     pool->chunk_count = 0;
     pool->chunk_max_size = 0;
