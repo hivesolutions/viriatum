@@ -183,8 +183,8 @@ ERROR_CODE stop_module_php(struct environment_t *environment, struct module_t *m
 
     /* cleans up the pool based memory allocation system releasing all
     of its memory before the exit (no leaks) then returns the control
-	flow to the caller function with success state */
-	cleanup_palloc();
+    flow to the caller function with success state */
+    cleanup_palloc();
     RAISE_NO_ERROR;
 }
 
@@ -324,11 +324,11 @@ void _log_php_state(char *message) {
 }
 
 void _error_php_state(int type, const char *message, ...) {
-    /* check if the kind of error is of type critical in such case 
-	the control flow must be returned immediately */
+    /* check if the kind of error is of type critical in such case
+    the control flow must be returned immediately */
     if (type != E_ERROR && type != E_USER_ERROR &&\
-		type != E_CORE_ERROR && type != E_PARSE &&\
-		type != E_COMPILE_ERROR) {
+        type != E_CORE_ERROR && type != E_PARSE &&\
+        type != E_COMPILE_ERROR) {
         return;
     }
 

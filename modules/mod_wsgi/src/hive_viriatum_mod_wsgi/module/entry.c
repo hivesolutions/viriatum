@@ -183,8 +183,8 @@ ERROR_CODE stop_module_wsgi(struct environment_t *environment, struct module_t *
 
     /* cleans up the pool based memory allocation system releasing all
     of its memory before the exit (no leaks) then returns the control
-	flow to the caller function with success state */
-	cleanup_palloc();
+    flow to the caller function with success state */
+    cleanup_palloc();
     RAISE_NO_ERROR;
 }
 
