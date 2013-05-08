@@ -805,10 +805,10 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
         SPRINTF(
             &headers_buffer[count],
             VIRIATUM_HTTP_SIZE - count,
-            CONTENT_RANGE_H ": bytes %d-%d/%d\r\n\r\n",
-            handler_file_context->initial_byte,
-            handler_file_context->final_byte,
-            file_size
+            CONTENT_RANGE_H ": bytes %ld-%ld/%ld\r\n\r\n",
+            (long int) handler_file_context->initial_byte,
+            (long int) handler_file_context->final_byte,
+            (long int) file_size
         );
 
         /* writes both the headers to the connection, registers for the
