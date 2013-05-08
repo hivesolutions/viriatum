@@ -75,6 +75,8 @@ ERROR_CODE create_handler_file_context(struct handler_file_context_t **handler_f
     handler_file_context->auth_file = NULL;
     handler_file_context->file = NULL;
     handler_file_context->file_size = 0;
+	handler_file_context->initial_byte = 0;
+	handler_file_context->final_byte = 0;
     handler_file_context->flags = 0;
     handler_file_context->next_header = UNDEFINED_HEADER;
     handler_file_context->template_handler = NULL;
@@ -82,11 +84,6 @@ ERROR_CODE create_handler_file_context(struct handler_file_context_t **handler_f
     handler_file_context->etag_status = 0;
     handler_file_context->authorization_status = 0;
 	handler_file_context->range_status = 0;
-
-	/* resets the various range associated values to their
-	original zerified values (by default all file is returned) */
-	handler_file_context->initial_byte = 0;
-	handler_file_context->final_byte = 0;
 
     /* sets the handler file context in the  pointer */
     *handler_file_context_pointer = handler_file_context;
@@ -1062,6 +1059,13 @@ ERROR_CODE _reset_http_parser_handler_file(struct http_parser_t *http_parser) {
     /* unsets the handler file context file */
     handler_file_context->file = NULL;
 
+	/* resets the file size to be processed and the various
+	range associated values so that the new file may be
+	retrieved without any size related side problem */
+	handler_file_context->file_size = 0;
+	handler_file_context->initial_byte = 0;
+	handler_file_context->final_byte = 0;
+
     /* unsets the handler file context flags, setting
     the value of them to zerified value */
     handler_file_context->flags = 0;
@@ -1072,11 +1076,6 @@ ERROR_CODE _reset_http_parser_handler_file(struct http_parser_t *http_parser) {
     handler_file_context->cache_control_status = 0;
     handler_file_context->authorization_status = 0;
 	handler_file_context->range_status = 0;
-
-	/* resets the various range associated values so that
-	the new file may be retrieved without any side problem */
-	handler_file_context->initial_byte = 0;
-	handler_file_context->final_byte = 0;
 
     /* raises no error */
     RAISE_NO_ERROR;
