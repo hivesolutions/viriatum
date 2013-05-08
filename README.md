@@ -171,6 +171,12 @@ For more information regarding benchmarking please check the list of [todo](doc/
 
 * For windows debugging use [Visual Leak Detector](http://vld.codeplex.com) using the `#include <vld.h>` statement
 
+## Profiling
+
+* On windows systems the tool to uses is the [Very Sleepy](http://www.codersnotes.com/sleepy)
+* For linux/unix machines the best approach is to go with either [Sysprof](http://sysprof.com/) or the more expensive
+[Zoom](http://www.rotateright.com) from rotate right
+
 ## License
 
 Viriatum is an open-source project licensed under the [GNU General Public License Version 3](http://www.gnu.org/licenses/gpl.html).
