@@ -81,6 +81,12 @@ ERROR_CODE create_handler_file_context(struct handler_file_context_t **handler_f
     handler_file_context->cache_control_status = 0;
     handler_file_context->etag_status = 0;
     handler_file_context->authorization_status = 0;
+	handler_file_context->range_status = 0;
+
+	/* resets the various range associated values to their
+	original zerified values (by default all file is returned) */
+	handler_file_context->initial_byte = 0;
+	handler_file_context->final_byte = 0;
 
     /* sets the handler file context in the  pointer */
     *handler_file_context_pointer = handler_file_context;
@@ -315,6 +321,19 @@ ERROR_CODE header_field_callback_handler_file(struct http_parser_t *http_parser,
     /* switches over the size of the header name (field)
     that was provided (used for faster parsing) */
     switch(data_size) {
+		case 5:
+            if(data[0] == 'R' && data[1] == 'a' && data[2] == 'n' && data[3] == 'g') {
+                /* updates the range status value, it's the next
+                value to be parsed and put in context */
+                handler_file_context->range_status = 1;
+                handler_file_context->next_header = RANGE;
+                break;
+            }
+
+            /* breaks the switch, this is the
+            fallback in case no match exists */
+            break;
+
         case 13:
             if(data[0] == 'I' && data[1] == 'f' && data[2] == '-' && data[3] == 'N') {
                 /* updates the etag status value, it's the next
@@ -373,6 +392,12 @@ ERROR_CODE header_value_callback_handler_file(struct http_parser_t *http_parser,
             memcpy(handler_file_context->authorization, data, data_size);
             handler_file_context->authorization[data_size] = '\0';
             handler_file_context->authorization_status = 2;
+            break;
+
+        case RANGE:
+            memcpy(handler_file_context->range, data, data_size);
+            handler_file_context->range[data_size] = '\0';
+            handler_file_context->range_status = 2;
             break;
 
         default:
@@ -685,7 +710,8 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
             location
         );
 
-        /* writes both the headers to the connection, registers for the appropriate callbacks */
+        /* writes both the headers to the connection, registers
+		for the appropriate callbacks */
         write_connection(
             connection,
             (unsigned char *) headers_buffer,
@@ -710,7 +736,8 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
             TRUE
         );
 
-        /* writes both the headers to the connection, registers for the appropriate callbacks */
+        /* writes both the headers to the connection, register
+		for the appropriate callbacks */
         write_connection(
             connection,
             (unsigned char *) headers_buffer,
@@ -719,7 +746,11 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
             handler_file_context
         );
     }
-    else if(handler_file_context->etag_status == 2 && strcmp(etag, (char *) handler_file_context->etag) == 0) {
+	/* in case there's an etag value defined and the values matched
+	the one defined for the file, time to return a not modified value
+	to the client indicating that cache should be used */
+    else if(handler_file_context->etag_status == 2 &&\
+		strcmp(etag, (char *) handler_file_context->etag) == 0) {
         /* writes the http static headers to the response */
         write_http_headers_c(
             connection,
@@ -734,7 +765,8 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
             TRUE
         );
 
-        /* writes both the headers to the connection, registers for the appropriate callbacks */
+        /* writes both the headers to the connection, registers for
+		the appropriate callbacks */
         write_connection(
             connection,
             (unsigned char *) headers_buffer,
@@ -743,10 +775,67 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
             handler_file_context
         );
     }
+	/* in case the range value is set for the current file request
+	must calculate the range and retrive the associated file chunk */
+	else if(handler_file_context->range_status == 2) {
+		/* retrieves the initial and final bytes for the requested
+		range, the final range is set in accordance with the file
+		size that is provided */
+		get_http_range_limits(
+			handler_file_context->range,
+			&handler_file_context->initial_byte,
+			&handler_file_context->final_byte,
+			file_size
+		);
+
+        /* writes the http static headers to the response indicating
+		that only a part of the file is going to be retrieved, then
+		writes also the content range header indicating which bytes
+		are going to be retrieved */
+        count = write_http_headers_c(
+            connection,
+            headers_buffer,
+            VIRIATUM_HTTP_SIZE,
+            HTTP11,
+            206,
+            "Partial content",
+            KEEP_ALIVE,
+            handler_file_context->final_byte -\
+			handler_file_context->initial_byte + 1,
+            NO_CACHE,
+            FALSE
+        );
+        SPRINTF(
+            &headers_buffer[count],
+            VIRIATUM_HTTP_SIZE - count,
+			CONTENT_RANGE_H ": bytes %d-%d/%d\r\n\r\n",
+			handler_file_context->initial_byte,
+			handler_file_context->final_byte,
+            file_size
+        );
+
+        /* writes both the headers to the connection, registers for the
+		appropriate callbacks, this is going to trigger the chain of write
+		to callback behavior expected for the file sending */
+        write_connection(
+            connection,
+            (unsigned char *) headers_buffer,
+            (unsigned int) strlen(headers_buffer),
+            _send_chunk_handler_file,
+            handler_file_context
+        );
+	}
     /* otherwise there was no error in the file and it's a simple
     file situation (no directory) */
     else {
-        /* writes the http static headers to the response */
+		/* sets the default (complete file) values for the reading
+		of the file, these are not required for a complete file
+		reading but only for partial (ranged) contents */
+		handler_file_context->initial_byte = 0;
+		handler_file_context->final_byte = file_size - 1;
+
+        /* writes the http static headers to the response indicating
+		that the file is going to be served normally */
         count = write_http_headers_c(
             connection,
             headers_buffer,
@@ -777,11 +866,14 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
         SPRINTF(
             &headers_buffer[count],
             VIRIATUM_HTTP_SIZE - count,
+			ACCEPT_RANGES_H ": bytes\r\n"
             ETAG_H ": %s\r\n\r\n",
             etag
         );
 
-        /* writes both the headers to the connection, registers for the appropriate callbacks */
+        /* writes both the headers to the connection, registers for the
+		appropriate callbacks, this is going to trigger the chain of write
+		to callback behavior expected for the file sending */
         write_connection(
             connection,
             (unsigned char *) headers_buffer,
@@ -979,6 +1071,12 @@ ERROR_CODE _reset_http_parser_handler_file(struct http_parser_t *http_parser) {
     handler_file_context->etag_status = 0;
     handler_file_context->cache_control_status = 0;
     handler_file_context->authorization_status = 0;
+	handler_file_context->range_status = 0;
+
+	/* resets the various range associated values so that
+	the new file may be retrieved without any side problem */
+	handler_file_context->initial_byte = 0;
+	handler_file_context->final_byte = 0;
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -1090,7 +1188,7 @@ ERROR_CODE _send_chunk_handler_file(struct connection_t *connection, struct data
         of the current file for reading */
         fseek(file, 0, SEEK_END);
         handler_file_context->file_size = ftell(file);
-        fseek(file, 0, SEEK_SET);
+        fseek(file, handler_file_context->initial_byte, SEEK_SET);
 
         /* sets the file in the handler file context, this is
         the pointer that will be used for the sending of the
@@ -1104,7 +1202,7 @@ ERROR_CODE _send_chunk_handler_file(struct connection_t *connection, struct data
     between the (maximum) file buffer size and the remaining number
     of bytes to be read from the file (optimal buffer sizing) */
     offset = ftell(file);
-    remaining = handler_file_context->file_size - offset;
+    remaining = handler_file_context->final_byte - offset + 1;
     buffer_size = remaining < FILE_BUFFER_SIZE_HANDLER_FILE ?\
         remaining : FILE_BUFFER_SIZE_HANDLER_FILE;
     file_buffer = MALLOC(buffer_size);
