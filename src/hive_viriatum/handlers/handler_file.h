@@ -161,19 +161,19 @@ typedef struct handler_file_context_t {
      */
     size_t file_size;
 
-	/**
-	 * The initial byte value to be used for the retrieval of the
-	 * file, a complete file request should have this value set to
-	 * a zero value (initial byte).
-	 */
-	size_t initial_byte;
+    /**
+     * The initial byte value to be used for the retrieval of the
+     * file, a complete file request should have this value set to
+     * a zero value (initial byte).
+     */
+    size_t initial_byte;
 
-	/**
-	 * The final byte value to be used for the finish of the retrieval
-	 * of the file, a normal (and complete) file request should have
-	 * this value set to the size of the file request minus one.
-	 */
-	size_t final_byte;
+    /**
+     * The final byte value to be used for the finish of the retrieval
+     * of the file, a normal (and complete) file request should have
+     * this value set to the size of the file request minus one.
+     */
+    size_t final_byte;
 
     /**
      * The flags to be used during the file
@@ -244,12 +244,12 @@ typedef struct handler_file_context_t {
      */
     unsigned char range_status;
 
-	/**
-	 * The string based field for the range value, this is meant
-	 * to be parsed latter in order to set the initial and final
-	 * byte values (as integers).
-	 */
-	unsigned char range[128];
+    /**
+     * The string based field for the range value, this is meant
+     * to be parsed latter in order to set the initial and final
+     * byte values (as integers).
+     */
+    unsigned char range[128];
 } handler_file_context;
 
 ERROR_CODE create_file_handler(struct file_handler_t **file_handler_pointer, struct http_handler_t *http_handler);

@@ -66,7 +66,7 @@ typedef enum http_header_e {
     ETAG,
     CACHE_CONTROL,
     AUTHORIZATION,
-	RANGE
+    RANGE
 } http_header;
 
 /**
