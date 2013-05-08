@@ -32,8 +32,11 @@
 #define COOKIE_H "Cookie"
 #define SERVER_H "Server"
 #define LOCATION_H "Location"
+#define LOCATION_H "Location"
 #define CONNECTION_H "Connection"
 #define CONTENT_TYPE_H "Content-Type"
+#define ACCEPT_RANGES_H "Accept-Ranges"
+#define CONTENT_RANGE_H "Content-Range"
 #define CACHE_CONTROL_H "Cache-Control"
 #define CONTENT_LENGTH_H "Content-Length"
 #define WWW_AUTHENTICATE_H "WWW-Authenticate"
@@ -62,7 +65,8 @@ typedef enum http_header_e {
     HOST,
     ETAG,
     CACHE_CONTROL,
-    AUTHORIZATION
+    AUTHORIZATION,
+	RANGE
 } http_header;
 
 /**
