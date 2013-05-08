@@ -324,10 +324,11 @@ void _log_php_state(char *message) {
 }
 
 void _error_php_state(int type, const char *message, ...) {
-    /* check if the kind of error is of type critical in such case it should
-    return immediately */
-    if (type != E_ERROR && type != E_USER_ERROR && type != E_CORE_ERROR && type != E_PARSE && type != E_COMPILE_ERROR) {
-        /* returns immediately no need to continue */
+    /* check if the kind of error is of type critical in such case 
+	the control flow must be returned immediately */
+    if (type != E_ERROR && type != E_USER_ERROR &&\
+		type != E_CORE_ERROR && type != E_PARSE &&\
+		type != E_COMPILE_ERROR) {
         return;
     }
 
