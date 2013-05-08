@@ -364,7 +364,7 @@ ERROR_CODE get_http_range_limits(unsigned char *range, size_t *initial_byte, siz
 
     /* retrieves the size of the range string using the normal
     length if a string function */
-    size_t range_s = strlen(range);
+    size_t range_s = strlen((char *) range);
 
     /* iterates over the range string character values to try to
     find the various key values in it from the byte */
@@ -381,7 +381,7 @@ ERROR_CODE get_http_range_limits(unsigned char *range, size_t *initial_byte, siz
                 if(index == 0) { initial_byte_v = 0; }
                 else {
                     range[index] = '\0';
-                    initial_byte_v = atoi(&range[mark]);
+                    initial_byte_v = atoi((char *) &range[mark]);
                 }
                 mark = index + 1;
                 break;
@@ -391,7 +391,7 @@ ERROR_CODE get_http_range_limits(unsigned char *range, size_t *initial_byte, siz
                 if(index == mark) { final_byte_v = size - 1; }
                 else {
                     range[index] = '\0';
-                    final_byte_v = atoi(&range[mark]);
+                    final_byte_v = atoi((char *) &range[mark]);
                 }
                 break;
         }
@@ -403,7 +403,7 @@ ERROR_CODE get_http_range_limits(unsigned char *range, size_t *initial_byte, siz
         if(index == mark) { final_byte_v = size - 1; }
         else {
             range[index] = '\0';
-            final_byte_v = atoi(&range[mark]);
+            final_byte_v = atoi((char *) &range[mark]);
         }
     }
 
