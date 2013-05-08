@@ -366,6 +366,10 @@ ERROR_CODE get_http_range_limits(unsigned char *range, size_t *initial_byte, siz
     length if a string function */
     size_t range_s = strlen((char *) range);
 
+	/* initializes the mark value with a zero indicating that the
+	equals separator may not be found (avoids critical problems) */
+	mark = 0;
+
     /* iterates over the range string character values to try to
     find the various key values in it from the byte */
     for(index = 0; index < range_s; index++) {
