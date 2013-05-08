@@ -366,9 +366,9 @@ ERROR_CODE get_http_range_limits(unsigned char *range, size_t *initial_byte, siz
     length if a string function */
     size_t range_s = strlen((char *) range);
 
-	/* initializes the mark value with a zero indicating that the
-	equals separator may not be found (avoids critical problems) */
-	mark = 0;
+    /* initializes the mark value with a zero indicating that the
+    equals separator may not be found (avoids critical problems) */
+    mark = 0;
 
     /* iterates over the range string character values to try to
     find the various key values in it from the byte */
@@ -386,6 +386,7 @@ ERROR_CODE get_http_range_limits(unsigned char *range, size_t *initial_byte, siz
                 else {
                     range[index] = '\0';
                     initial_byte_v = atoi((char *) &range[mark]);
+                    range[index] = byte;
                 }
                 mark = index + 1;
                 break;
@@ -396,6 +397,7 @@ ERROR_CODE get_http_range_limits(unsigned char *range, size_t *initial_byte, siz
                 else {
                     range[index] = '\0';
                     final_byte_v = atoi((char *) &range[mark]);
+                    range[index] = byte;
                 }
                 break;
         }
@@ -408,6 +410,7 @@ ERROR_CODE get_http_range_limits(unsigned char *range, size_t *initial_byte, siz
         else {
             range[index] = '\0';
             final_byte_v = atoi((char *) &range[mark]);
+            range[index] = byte;
         }
     }
 
@@ -435,7 +438,12 @@ ERROR_CODE log_http_request(char *host, char *identity, char *user, char *method
 
     /* checks if the converted local time is invalid and in case it
     is raises the apropriate runtime error to be caught */
-    if(_local_time == NULL) { RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem retrieving local time"); }
+    if(_local_time == NULL) {
+        RAISE_ERROR_M(
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Problem retrieving local time"
+        );
+    }
 
     /* formats the local time into the data buffer and then uses it and
     the other (sent) variables to format the output buffer */
