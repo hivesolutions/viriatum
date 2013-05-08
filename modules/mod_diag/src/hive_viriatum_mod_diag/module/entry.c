@@ -134,7 +134,10 @@ ERROR_CODE stop_module_diag(struct environment_t *environment, struct module_t *
     if(http_handler != NULL) { service->delete_http_handler(service, http_handler); }
     delete_mod_diag_module(mod_diag_module);
 
-    /* raises no error */
+    /* cleans up the pool based memory allocation system releasing all
+    of its memory before the exit (no leaks) then returns the control
+	flow to the caller function with success state */
+	cleanup_palloc();
     RAISE_NO_ERROR;
 }
 

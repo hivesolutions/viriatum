@@ -182,7 +182,10 @@ ERROR_CODE stop_module_lua(struct environment_t *environment, struct module_t *m
     /* deletes the mod lua module */
     delete_mod_lua_module(mod_lua_module);
 
-    /* raises no error */
+    /* cleans up the pool based memory allocation system releasing all
+    of its memory before the exit (no leaks) then returns the control
+	flow to the caller function with success state */
+	cleanup_palloc();
     RAISE_NO_ERROR;
 }
 
