@@ -350,6 +350,73 @@ ERROR_CODE write_http_error_a(struct connection_t *connection, char *buffer, siz
     RAISE_NO_ERROR;
 }
 
+ERROR_CODE get_http_range_limits(unsigned char *range, size_t *initial_byte, size_t *final_byte, size_t size) {
+	/* allocates space for the byte to be used in the iteration,
+	for the mark value and fot the iteration index counter */
+	char byte;
+	size_t mark;
+	size_t index;
+
+	/* creates the inital and final local values and starts them
+	at the invalid (unset) values (intial state) */
+	int initial_byte_v = -1;
+	int final_byte_v = -1;
+
+	/* retrieves the size of the range string using the normal
+	length if a string function */
+	size_t range_s = strlen(range);
+
+	/* iterates over the range string character values to try to
+	find the various key values in it from the byte */
+	for(index = 0; index < range_s; index++) {
+		/* retrieves the current byte in iteration and runs the
+		switch testing against it */
+		byte = range[index];
+		switch(byte) {
+			case '=':
+				mark = index + 1;
+				break;
+
+			case '-':
+				if(index == 0) { initial_byte_v = 0; }
+				else {
+					range[index] = '\0';
+					initial_byte_v = atoi(&range[mark]);
+				}
+				mark = index + 1;
+				break;
+
+			case '\0':
+			case ',':
+				if(index == mark) { final_byte_v = size - 1; }
+				else {
+					range[index] = '\0';
+					final_byte_v = atoi(&range[mark]);
+				}
+				break;
+		}
+	}
+
+	/* in case the final byte value hasn't been already
+	set time to update its value with the final byte */
+	if(final_byte_v == -1) { 
+		if(index == mark) { final_byte_v = size - 1; }
+		else {
+			range[index] = '\0';
+			final_byte_v = atoi(&range[mark]);
+		}
+	}
+
+	/* updates both the initial and the final byte pointer
+	references with the appropriate values */
+	*initial_byte = initial_byte_v;
+	*final_byte = final_byte_v;
+
+	/* raises no error as both the initial and the final
+	byte values have been computed with success */
+	RAISE_NO_ERROR;
+}
+
 ERROR_CODE log_http_request(char *host, char *identity, char *user, char *method, char *uri, enum http_version_e version, int error_code, size_t content_length) {
     /* allocates space for the buffer to hild the date and time
     information to be logged */
