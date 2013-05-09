@@ -718,7 +718,7 @@ ERROR_CODE _send_response_handler_wsgi(struct http_parser_t *http_parser) {
         *handler_wsgi_context->module_pointer = handler_wsgi_context->module;
     }
 
-    /* imports the wsgi module containing the util methos to be used by the
+    /* imports the wsgi module containing the util methods to be used by the
     application to access viriatum wsgi functions */
     wsgi_module = PyImport_ImportModule("viriatum_wsgi");
     if(wsgi_module == NULL) {
