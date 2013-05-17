@@ -1,6 +1,6 @@
 {
     "name" : "viriatum",
-    "version" : "0.3.0a3",
+    "version" : "0.3.0b1",
     "description" : "Viriatum HTTP Server",
     "author" : "Hive Solutions <development@hive.pt>",
     "repo" : "git://github.com/hivesolutions/viriatum.git",
