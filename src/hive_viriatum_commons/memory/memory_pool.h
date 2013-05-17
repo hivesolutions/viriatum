@@ -210,8 +210,8 @@ typedef struct memory_pool_t {
 VIRIATUM_EXPORT_PREFIX void cleanup_palloc();
 VIRIATUM_EXPORT_PREFIX void add_palloc(struct memory_pool_t *pool);
 #else
-__inline cleanup_palloc() {}
-__inline add_palloc(struct memory_pool_t *pool) {}
+__inline void cleanup_palloc() {}
+__inline void add_palloc(struct memory_pool_t *pool) {}
 #endif
 
 static __inline void create_chunk(struct memory_chunk_t **chunk_pointer, size_t size, size_t index_pool) {
