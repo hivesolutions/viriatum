@@ -209,7 +209,9 @@ typedef struct memory_pool_t {
 #ifdef VIRIATUM_MPOOL
 VIRIATUM_EXPORT_PREFIX void cleanup_palloc();
 VIRIATUM_EXPORT_PREFIX void add_palloc(struct memory_pool_t *pool);
-#else
+#endif
+
+#ifndef VIRIATUM_MPOOL
 __inline void cleanup_palloc() {}
 __inline void add_palloc(struct memory_pool_t *pool) {}
 #endif
