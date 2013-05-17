@@ -206,8 +206,13 @@ typedef struct memory_pool_t {
     size_t items_max_size;
 } memory_pool;
 
+#ifdef VIRIATUM_MPOOL
 VIRIATUM_EXPORT_PREFIX void cleanup_palloc();
 VIRIATUM_EXPORT_PREFIX void add_palloc(struct memory_pool_t *pool);
+#else
+__inline cleanup_palloc() {}
+__inline add_palloc(struct memory_pool_t *pool) {}
+#endif
 
 static __inline void create_chunk(struct memory_chunk_t **chunk_pointer, size_t size, size_t index_pool) {
     /* reserves space for the index counter for the pointer to
