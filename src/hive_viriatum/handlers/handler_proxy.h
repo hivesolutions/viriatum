@@ -26,3 +26,41 @@
 */
 
 #pragma once
+
+#include "../http/http.h"
+#include "../system/system.h"
+
+/**
+ * The structure that holds the internal
+ * structure to support the proxy handler
+ * should contain configuration info.
+ */
+typedef struct proxy_handler_t {
+    /**
+     * The various locations loaded from the configuration
+     * they refer the cofiruation attributes associated
+     * with the proxy structures.
+     */
+    struct proxy_location_t *locations;
+
+    /**
+     * The number of locations currently loaded in the handler
+     * this value is used for iteration arround the locations
+     * buffer.
+     */
+    size_t locations_count;
+} proxy_handler;
+
+/**
+ * The context structure to be used allong
+ * the interpretation of the request for
+ * the peoxy handler.
+ */
+typedef struct handler_proxy_context_t {
+    char *name;  /* this is dummy */
+} handler_proxy_context;
+
+ERROR_CODE create_proxy_handler(struct proxy_handler_t **proxy_handler_pointer, struct http_handler_t *http_handler);
+ERROR_CODE delete_proxy_handler(struct proxy_handler_t *proxy_handler);
+ERROR_CODE create_handler_proxy_context(struct handler_proxy_context_t **handler_proxy_context_pointer);
+ERROR_CODE delete_handler_proxy_context(struct handler_proxy_context_t *handler_proxy_context);
