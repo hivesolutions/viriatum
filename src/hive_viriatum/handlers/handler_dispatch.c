@@ -98,7 +98,7 @@ ERROR_CODE register_handler_dispatch(struct service_t *service) {
     create_dispatch_handler(&dispatch_handler, http_handler);
 
     /* sets the http handler attributes */
-    http_handler->resolve_index = 0;
+    http_handler->resolve_index = FALSE;
     http_handler->set = set_handler_dispatch;
     http_handler->unset = unset_handler_dispatch;
     http_handler->reset = NULL;

@@ -140,7 +140,7 @@ ERROR_CODE register_handler_file(struct service_t *service) {
     create_file_handler(&file_handler, http_handler);
 
     /* sets the http handler attributes */
-    http_handler->resolve_index = 1;
+    http_handler->resolve_index = TRUE;
     http_handler->set = set_handler_file;
     http_handler->unset = unset_handler_file;
     http_handler->reset = reset_handler_file;

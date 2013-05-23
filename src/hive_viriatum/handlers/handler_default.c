@@ -37,7 +37,7 @@ ERROR_CODE register_handler_default(struct service_t *service) {
     service->create_http_handler(service, &http_handler, (unsigned char *) "default");
 
     /* sets the http handler attributes */
-    http_handler->resolve_index = 0;
+    http_handler->resolve_index = FALSE;
     http_handler->set = set_handler_default;
     http_handler->unset = unset_handler_default;
     http_handler->reset = NULL;
