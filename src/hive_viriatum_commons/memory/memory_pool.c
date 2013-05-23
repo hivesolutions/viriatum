@@ -29,10 +29,10 @@
 
 #include "memory_pool.h"
 
+#ifdef VIRIATUM_MPOOL
 static struct memory_pool_t *pools[256];
 static size_t pool_counter = 0;
 
-#ifdef VIRIATUM_MPOOL
 void cleanup_palloc() {
     size_t index;
     struct memory_pool_t *pool;
