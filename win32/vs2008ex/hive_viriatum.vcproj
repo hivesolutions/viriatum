@@ -598,6 +598,10 @@
                     RelativePath="..\..\src\hive_viriatum\handlers\handler_file.c"
                     >
                 </File>
+                <File
+                    RelativePath="..\..\src\hive_viriatum\handlers\handler_proxy.c"
+                    >
+                </File>
             </Filter>
             <Filter
                 Name="Stream"
@@ -774,6 +778,10 @@
                 </File>
                 <File
                     RelativePath="..\..\src\hive_viriatum\handlers\handler_file.h"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\hive_viriatum\handlers\handler_proxy.h"
                     >
                 </File>
                 <File
