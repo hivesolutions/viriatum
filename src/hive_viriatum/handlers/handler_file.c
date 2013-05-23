@@ -220,10 +220,9 @@ ERROR_CODE unregister_handler_file(struct service_t *service) {
 }
 
 ERROR_CODE set_handler_file(struct http_connection_t *http_connection) {
-    /* sets the http parser values */
+    /* sets both the http parser values and the http
+	settings handler for the current file handler */
     _set_http_parser_handler_file(http_connection->http_parser);
-
-    /* sets the http settings values */
     _set_http_settings_handler_file(http_connection->http_settings);
 
     /* raises no error */
@@ -231,10 +230,9 @@ ERROR_CODE set_handler_file(struct http_connection_t *http_connection) {
 }
 
 ERROR_CODE unset_handler_file(struct http_connection_t *http_connection) {
-    /* unsets the http parser values */
+    /* unsets both the http parser values and the http
+	settings handler from the current file handler */
     _unset_http_parser_handler_file(http_connection->http_parser);
-
-    /* unsets the http settings values */
     _unset_http_settings_handler_file(http_connection->http_settings);
 
     /* raises no error */
