@@ -533,6 +533,7 @@ ERROR_CODE start_service(struct service_t *service) {
     register_handler_dispatch(service);
     register_handler_default(service);
     register_handler_file(service);
+	register_handler_proxy(service);
 
     /* loads (all) the currently available modules, this operation may
     affect a series of internal structures including signal handlers */
@@ -1068,6 +1069,7 @@ ERROR_CODE start_service(struct service_t *service) {
 
     /* unregisters the various "local" handlers
     from the service, for structure destruction */
+	unregister_handler_proxy(service);
     unregister_handler_file(service);
     unregister_handler_default(service);
     unregister_handler_dispatch(service);
