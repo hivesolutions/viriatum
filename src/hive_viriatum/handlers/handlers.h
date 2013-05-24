@@ -30,3 +30,4 @@
 #include "handler_default.h"
 #include "handler_dispatch.h"
 #include "handler_file.h"
+#include "handler_proxy.h"
