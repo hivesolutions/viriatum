@@ -544,11 +544,16 @@ ERROR_CODE start_service(struct service_t *service) {
     overrides the default signal handlers */
     CALL_F(service->register_signals);
 
-    /* sets the current http handler accoring to the current options
+    /* sets the current http handler according to the current options
     in the service, the http handler must be loaded in the handlers map */
-    get_value_string_hash_map(service->http_handlers_map, service_options->handler_name, (void **) &service->http_handler);
+    get_value_string_hash_map(
+	    service->http_handlers_map,
+		service_options->handler_name,
+		(void **) &service->http_handler
+	);
 
-    /* sets the socket address attributes */
+    /* sets the socket address attributes in the socket address
+	structure so that the connection is properly defined */
     socket_address.sin_family = SOCKET_INTERNET_TYPE;
     socket_address.sin_addr.s_addr = inet_addr((char *) service_options->address);
     socket_address.sin_port = htons(service_options->port);
