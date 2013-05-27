@@ -117,7 +117,7 @@ ERROR_CODE _send_response_handler_diag(struct http_parser_t *http_parser) {
     it is handled by the main engine */
     connection->alloc_data(connection, message_size, (void **) &buffer);
 
-    /* acquires the lock on the http connection, this will avoids further
+    /* acquires the lock on the http connection, this will avoid further
     messages to be processed, no parallel request handling problems, then
     writes the message into the current http connection, the message should
     be composed of an empty diag */
