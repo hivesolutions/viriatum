@@ -334,7 +334,7 @@ ERROR_CODE message_complete_callback_handler_proxy(struct http_parser_t *http_pa
 
     write_connection_c(
         handler_proxy_context->connection_c,
-        handler_proxy_context->buffer,
+        (unsigned char *) handler_proxy_context->buffer,
         handler_proxy_context->buffer_size,
         NULL,
         NULL,
@@ -603,7 +603,7 @@ ERROR_CODE headers_complete_callback_backend(struct http_parser_t *http_parser) 
     write_proxy_out_buffer(handler_proxy_context, "\r\n", 2);
     write_connection_c(
         connection,
-        handler_proxy_context->out_buffer,
+        (unsigned char *) handler_proxy_context->out_buffer,
         handler_proxy_context->out_buffer_size,
         NULL,
         NULL,
@@ -641,7 +641,7 @@ ERROR_CODE message_complete_callback_backend(struct http_parser_t *http_parser) 
 
     write_connection_c(
         connection,
-        "",
+        (unsigned char *) "",
         0,
         _cleanup_handler_proxy,
         (void *) (size_t) http_parser->flags,
