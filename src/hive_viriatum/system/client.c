@@ -44,9 +44,12 @@ ERROR_CODE _create_client_connection(struct connection_t **connection_pointer, s
     /* allocates the option value and sets it to one (valid) */
     SOCKET_OPTION option_value = 1;
 
-    /* sets the flags to be used in socket */
+    /* sets the flags to be used in socket, this should contain
+    the (default) set value in the simplest form */
     SOCKET_FLAGS flags = 1;
 
+    /* creates the scoket handle structure object for the default attributes
+    (iternet type) and no encrypted connection */
     socket_handle = SOCKET_CREATE(SOCKET_INTERNET_TYPE, SOCKET_PACKET_TYPE, SOCKET_PROTOCOL_TCP);
     if(SOCKET_TEST_ERROR(socket_handle)) { fprintf(stderr, "ERROR opening socket"); }
 
@@ -85,7 +88,8 @@ ERROR_CODE _create_client_connection(struct connection_t **connection_pointer, s
     identification (address, port, etc.) */
     /*connection->socket_address = (SOCKET_ADDRESS) serv_addr;*/ /* TODO: fix this latter on */
 
-    /* sets the service select service as the service in the (client)  connection */
+    /* sets the service select service as the service in the (client) connection
+    this should provide a way for the connection to access the top layer */
     connection->service = service;
 
     /* sets the base handling functions in the client connection,
