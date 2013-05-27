@@ -492,13 +492,6 @@ ERROR_CODE data_backend_handler(struct io_connection_t *io_connection, unsigned 
         (struct custom_parameters_t *) connection->parameters;
     struct handler_proxy_context_t *handler_proxy_context =\
         (struct handler_proxy_context_t *) custom_parameters->parameters;
-    struct connection_t *connection_s =\
-        (struct connection_t *) handler_proxy_context->connection;
-    struct io_connection_t *io_connection_s =\
-        (struct io_connection_t *) connection_s->lower;
-    struct http_connection_t *http_connection_s =\
-        (struct http_connection_t *) io_connection_s->lower;
-    struct http_parser_t *http_parser_s = http_connection_s->http_parser;
 
     printf("DATA\n");
 
