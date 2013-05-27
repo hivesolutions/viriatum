@@ -467,6 +467,7 @@ typedef struct http_parser_t {
 typedef struct http_settings_t {
     http_callback on_message_begin;
     http_data_callback on_url;
+    http_callback on_line;
     http_data_callback on_header_field;
     http_data_callback on_header_value;
     http_callback on_headers_complete;

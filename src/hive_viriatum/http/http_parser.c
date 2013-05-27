@@ -96,6 +96,7 @@ void create_http_settings(struct http_settings_t **http_settings_pointer) {
     the default settings (unset) */
     http_settings->on_message_begin = NULL;
     http_settings->on_url = NULL;
+    http_settings->on_line = NULL;
     http_settings->on_header_field = NULL;
     http_settings->on_header_value = NULL;
     http_settings->on_headers_complete = NULL;
@@ -131,10 +132,10 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
     unsigned char *header_value_mark = http_parser->header_value_mark;
     unsigned char *url_mark = http_parser->url_mark;
 
-	/* the counter that controls the number of successful parses
-	that have occurred during the current process operator, this is
-	usefullto limit the parses for the provided data */
-	size_t parse_count = 0;
+    /* the counter that controls the number of successful parses
+    that have occurred during the current process operator, this is
+    usefullto limit the parses for the provided data */
+    size_t parse_count = 0;
 
     /* in case the received data size is empty */
     if(data_size == 0) {
@@ -166,17 +167,17 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
     execution cycle and from the inner switch operation */
     for(pointer = data, pointer_end = data + data_size; pointer != pointer_end; pointer++) {
         /* retrieves the current iteration byte, this is
-		the value that is going to be used for most of the
-		comparison operation in this step */
+        the value that is going to be used for most of the
+        comparison operation in this step */
         byte = *pointer;
 
         /* in case the current number of successfull parses for
-		the provided data is larger than zero the current loop
-		must be break so that no more that one parse is done */
+        the provided data is larger than zero the current loop
+        must be break so that no more that one parse is done */
         if(parse_count > 0) { break; }
 
         /* switch over the current state in order to trigger
-		the correct parsing logic for the current state */
+        the correct parsing logic for the current state */
         switch(state) {
             case STATE_START_REQ_OR_RES:
                 /* in case the current byte is a
@@ -370,6 +371,7 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                             state = STATE_RES_LINE_ALMOST_DONE;
                             break;
                         case LF:
+                            HTTP_CALLBACK(line);
                             state = STATE_HEADER_FIELD_START;
                             break;
                         default:
@@ -403,6 +405,7 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                 }
 
                 if(byte == LF) {
+                    HTTP_CALLBACK(line);
                     state = STATE_HEADER_FIELD_START;
 
                     /* breaks the switch */
@@ -414,6 +417,8 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
 
             case STATE_RES_LINE_ALMOST_DONE:
                 STRICT_CHECK(byte != LF);
+
+                HTTP_CALLBACK(line);
                 state = STATE_HEADER_FIELD_START;
 
                 /* breaks the switch */
@@ -673,6 +678,7 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                         HTTP_CALLBACK_DATA(url);
                         http_parser->http_major = 0;
                         http_parser->http_minor = 9;
+                        HTTP_CALLBACK(line);
                         state = STATE_HEADER_FIELD_START;
 
                         /* breaks the switch */
@@ -729,6 +735,7 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                         HTTP_CALLBACK_DATA(url);
                         http_parser->http_major = 0;
                         http_parser->http_minor = 9;
+                        HTTP_CALLBACK(line);
                         state = STATE_HEADER_FIELD_START;
 
                         /* breaks the switch */
@@ -780,6 +787,7 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                         HTTP_CALLBACK_DATA(url);
                         http_parser->http_major = 0;
                         http_parser->http_minor = 9;
+                        HTTP_CALLBACK(line);
                         state = STATE_HEADER_FIELD_START;
 
                         /* breaks the switch */
@@ -828,6 +836,7 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                         HTTP_CALLBACK_DATA(url);
                         http_parser->http_major = 0;
                         http_parser->http_minor = 9;
+                        HTTP_CALLBACK(line);
                         state = STATE_HEADER_FIELD_START;
 
                         /* breaks the switch */
@@ -878,6 +887,7 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                         HTTP_CALLBACK_DATA(url);
                         http_parser->http_major = 0;
                         http_parser->http_minor = 9;
+                        HTTP_CALLBACK(line);
                         state = STATE_HEADER_FIELD_START;
 
                         /* breaks the switch */
@@ -1001,6 +1011,7 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                 }
 
                 if(byte == LF) {
+                    HTTP_CALLBACK(line);
                     state = STATE_HEADER_FIELD_START;
 
                     /* breaks the switch */
@@ -1029,6 +1040,7 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                     goto error;
                 }
 
+                HTTP_CALLBACK(line);
                 state = STATE_HEADER_FIELD_START;
 
                 /* breaks the switch */
@@ -1493,7 +1505,7 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                         /* End of a chunked request */
                         HTTP_CALLBACK(message_complete);
                         state = NEW_MESSAGE();
-						parse_count++;
+                        parse_count++;
                         break;
                     }
 
@@ -1534,7 +1546,7 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                     if(http_parser->flags & FLAG_SKIPBODY) {
                         HTTP_CALLBACK(message_complete);
                         state = NEW_MESSAGE();
-						parse_count++;
+                        parse_count++;
                     } else if(http_parser->flags & FLAG_CHUNKED) {
                         /* chunked encoding - ignore Content-Length header */
                         state = STATE_CHUNK_SIZE_START;
@@ -1543,7 +1555,7 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                             /* Content-Length header given but zero: Content-Length: 0\r\n */
                             HTTP_CALLBACK(message_complete);
                             state = NEW_MESSAGE();
-							parse_count++;
+                            parse_count++;
                         } else if(http_parser->content_length > 0) {
                             /* Content-Length header given and non-zero */
                             state = STATE_BODY_IDENTITY;
@@ -1556,7 +1568,7 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                                 /* assumes content-length 0 - read the next */
                                 HTTP_CALLBACK(message_complete);
                                 state = NEW_MESSAGE();
-								parse_count++;
+                                parse_count++;
                             } else {
                                 /* reads body until the enf of file is reached */
                                 state = STATE_BODY_IDENTITY_EOF;
@@ -1587,7 +1599,7 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                     if(http_parser->content_length == 0) {
                         HTTP_CALLBACK(message_complete);
                         state = NEW_MESSAGE();
-						parse_count++;
+                        parse_count++;
                     }
                 }
 
@@ -1676,6 +1688,7 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
 
                 if(http_parser->content_length == 0) {
                     http_parser->flags |= FLAG_TRAILING;
+                    HTTP_CALLBACK(line);
                     state = STATE_HEADER_FIELD_START;
                 } else {
                     state = STATE_CHUNK_DATA;
@@ -1730,7 +1743,7 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
     if(state == STATE_BODY_IDENTITY_EOF) {
         HTTP_CALLBACK(message_complete);
         state = NEW_MESSAGE();
-		parse_count++;
+        parse_count++;
     }
 
     http_parser->state = state;
