@@ -262,7 +262,8 @@ ERROR_CODE url_callback_handler_file(struct http_parser_t *http_parser, const un
     size_t file_path_size;
 
     /* retrieves the handler file context from the http parser */
-    struct handler_file_context_t *handler_file_context = (struct handler_file_context_t *) http_parser->context;
+    struct handler_file_context_t *handler_file_context =\
+        (struct handler_file_context_t *) http_parser->context;
 
     /* checks the position of the get parameters divisor position
     and then uses it to calculate the size of the (base) path */
@@ -475,7 +476,9 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
     /* retrieves the handler file context from the http parser */
     struct handler_file_context_t *handler_file_context = (struct handler_file_context_t *) http_parser->context;
 
-    /* retrieves the connection from the http parser parameters */
+    /* retrieves the connection from the http parser parameters,
+    the connection object is going to be used for the input and
+    outpu operations associated with the file handling */
     struct connection_t *connection = (struct connection_t *) http_parser->parameters;
 
     /* retrieves the underlying connection references in order to be
@@ -1029,10 +1032,9 @@ ERROR_CODE _set_http_parser_handler_file(struct http_parser_t *http_parser) {
     /* allocates space for the handler file context */
     struct handler_file_context_t *handler_file_context;
 
-    /* creates the handler file context */
+    /* creates the handler file context and then sets the handler
+    file context as the context for the http parser */
     create_handler_file_context(&handler_file_context);
-
-    /* sets the handler file context as the context for the http parser */
     http_parser->context = handler_file_context;
 
     /* raises no error */
