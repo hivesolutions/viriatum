@@ -38,6 +38,38 @@ typedef ERROR_CODE (*data_io_connection_callback) (struct io_connection_t *, uns
 typedef ERROR_CODE (*io_connection_callback) (struct io_connection_t *);
 
 /**
+ * Structure to be used for the parameters to be
+ * sent for custom based protocol (want their own
+ * handling implementation).
+ */
+typedef struct custom_parameters_t {
+    /**
+     * The callback function to be used when new data
+     * is available in the current connection.
+     */
+    data_io_connection_callback on_data;
+
+    /**
+     * Reference to the callback function to be called
+     * once when the connection is considered as open.
+     */
+    io_connection_callback on_open;
+
+    /**
+     * Reference to the callback function to be called
+     * once when the connection is considered as closed.
+     */
+    io_connection_callback on_close;
+
+    /**
+     * The reference to the "type transparent" value to
+     * be used as parameter (erxtra one) to the current
+     * parameters structure.
+     */
+    void *parameters;
+} custom_parameters;
+
+/**
  * Structure defining a logical
  * io connection.
  */

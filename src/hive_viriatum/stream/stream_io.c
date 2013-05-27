@@ -621,15 +621,26 @@ ERROR_CODE error_handler_stream_io(struct connection_t *connection) {
 }
 
 ERROR_CODE open_handler_stream_io(struct connection_t *connection) {
-    /* allocates the io connection */
+    /* allocates the io connection and for the parameters
+    structure reference that may be used for custom protocols */
     struct io_connection_t *io_connection;
+    struct custom_parameters_t *parameters;
 
-    /* creates the io connection */
+    /* creates the io connection from the provided connection
+    object, this should apply the proper handlers in case they
+    are set as part of the parameters */
     create_io_connection(&io_connection, connection);
 
     /* switches over the connection "desired" protocol to
     set the appropriate connection handlers */
     switch(connection->protocol) {
+        case CUSTOM_PROTOCOL:
+            parameters = connection->parameters;
+            io_connection->on_data = parameters->on_data;
+            io_connection->on_open = parameters->on_open;
+            io_connection->on_close = parameters->on_close;
+            break;
+
         case HTTP_PROTOCOL:
             io_connection->on_data = data_handler_stream_http;
             io_connection->on_open = open_handler_stream_http;
@@ -655,15 +666,14 @@ ERROR_CODE open_handler_stream_io(struct connection_t *connection) {
             break;
     }
 
-    /* in case the on open handler is defined */
+    /* in case the on open handler (function) is defined it must be
+    called to notify the lower layers about the opening of the connection */
     if(io_connection->on_open != NULL) {
-        /* prints a debug message */
+        /* prints a series of debug messages about the opening
+        of the connection and call the proper open handler for
+        the io connection */
         V_DEBUG("Calling on open handler\n");
-
-        /* calls the on open handler */
         io_connection->on_open(io_connection);
-
-        /* prints a debug message */
         V_DEBUG("Finished calling on open handler\n");
     }
 
