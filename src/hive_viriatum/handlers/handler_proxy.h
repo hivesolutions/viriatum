@@ -29,6 +29,7 @@
 
 #include "../http/http.h"
 #include "../system/system.h"
+#include "../stream/stream.h"
 
 /**
  * Structure describing the internal parameters
