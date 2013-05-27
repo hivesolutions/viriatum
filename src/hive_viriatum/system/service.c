@@ -1125,7 +1125,7 @@ ERROR_CODE close_connections_service(struct service_t *service) {
     /* iterates continuously */
     while(TRUE) {
         /* pops a value from the connections list (and deletes the node) */
-        pop_value_linked_list(connections_list, (void **) &current_connection, 1);
+        pop_value_linked_list(connections_list, (void **) &current_connection, TRUE);
 
         /* in case the current connection is null the end
         of iteration has been reached and breaks the loop */
@@ -1399,7 +1399,7 @@ ERROR_CODE delete_connection(struct connection_t *connection) {
     /* iterates continuously */
     while(TRUE) {
         /* pops a value (data) from the linked list (write queue) */
-        pop_value_linked_list(connection->write_queue, (void **) &data, 1);
+        pop_value_linked_list(connection->write_queue, (void **) &data, TRUE);
 
         /* in case the data is invalid (list is empty) */
         if(data == NULL) {
