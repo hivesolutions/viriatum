@@ -164,8 +164,9 @@ void create_data(struct data_t **data_pointer) {
 }
 
 void delete_data(struct data_t *data) {
-    /* releases the data */
-    FREE(data->data_base);
+    /* releases the data buffer in case the proper
+    release flag is set (release required) */
+    if(data->release) { FREE(data->data_base); }
 
     /* releases the data */
     FREE(data);
@@ -533,7 +534,7 @@ ERROR_CODE start_service(struct service_t *service) {
     register_handler_dispatch(service);
     register_handler_default(service);
     register_handler_file(service);
-	register_handler_proxy(service);
+    register_handler_proxy(service);
 
     /* loads (all) the currently available modules, this operation may
     affect a series of internal structures including signal handlers */
@@ -547,13 +548,13 @@ ERROR_CODE start_service(struct service_t *service) {
     /* sets the current http handler according to the current options
     in the service, the http handler must be loaded in the handlers map */
     get_value_string_hash_map(
-	    service->http_handlers_map,
-		service_options->handler_name,
-		(void **) &service->http_handler
-	);
+        service->http_handlers_map,
+        service_options->handler_name,
+        (void **) &service->http_handler
+    );
 
     /* sets the socket address attributes in the socket address
-	structure so that the connection is properly defined */
+    structure so that the connection is properly defined */
     socket_address.sin_family = SOCKET_INTERNET_TYPE;
     socket_address.sin_addr.s_addr = inet_addr((char *) service_options->address);
     socket_address.sin_port = htons(service_options->port);
@@ -1023,14 +1024,16 @@ ERROR_CODE start_service(struct service_t *service) {
 #endif
 
 
-/*
+    /*
     _create_tracker_connection(
         &tracker_connection,
         service,
         "http://hole1.hive:9090/ptorrent/announce.php",
         "C:/Users/joamag/Downloads/scudum.iso.torrent"
     );
+*/
 
+    /*
     _create_torrent_connection(
         &torrent_connection,
         service,
@@ -1074,7 +1077,7 @@ ERROR_CODE start_service(struct service_t *service) {
 
     /* unregisters the various "local" handlers
     from the service, for structure destruction */
-	unregister_handler_proxy(service);
+    unregister_handler_proxy(service);
     unregister_handler_file(service);
     unregister_handler_default(service);
     unregister_handler_dispatch(service);
@@ -1377,10 +1380,9 @@ ERROR_CODE create_connection(struct connection_t **connection_pointer, SOCKET_HA
     connection->ssl_context = NULL;
 #endif
 
-    /* creates the read queue linked list */
+    /* creates both the read and the write queue linked lists that
+    will be used as buffers for the data based operations */
     create_linked_list(&connection->read_queue);
-
-    /* creates the write queue linked list */
     create_linked_list(&connection->write_queue);
 
     /* sets the connection in the connection pointer */
@@ -1416,10 +1418,9 @@ ERROR_CODE delete_connection(struct connection_t *connection) {
     memory must be relased (assumes a contiguous allocation) */
     if(connection->parameters) { FREE(connection->parameters); }
 
-    /* deletes the read queue linked list */
+    /* deletes both the read and the write queue linked lists to
+    avoid any more memory leak for these buffered lists */
     delete_linked_list(connection->read_queue);
-
-    /* deletes the write queue linked list */
     delete_linked_list(connection->write_queue);
 
     /* releases the connection */
@@ -1430,23 +1431,29 @@ ERROR_CODE delete_connection(struct connection_t *connection) {
 }
 
 ERROR_CODE write_connection(struct connection_t *connection, unsigned char *data, unsigned int size, connection_data_callback callback, void *callback_parameters) {
+    return write_connection_c(connection, data, size, callback, callback_parameters, TRUE);
+}
+
+ERROR_CODE write_connection_c(struct connection_t *connection, unsigned char *data, unsigned int size, connection_data_callback callback, void *callback_parameters, char release) {
     /* allocates the data */
     struct data_t *_data;
 
-    /* creates the data */
+    /* creates the data structure that will be used to store metada
+    information on the chunk of data that is going to be written */
     create_data(&_data);
 
-    /* sets the data contents */
+    /* sets the data contents in the data structure, configuring the
+    data write operation accordingly */
     _data->data = data;
     _data->data_base = data;
     _data->size = size;
+    _data->release = release;
     _data->callback = callback;
     _data->callback_parameters = callback_parameters;
 
-    /* adds the file buffer to the write queue */
+    /* adds the file buffer to the write queue and then
+    registers the connection for write in the next loop */
     append_value_linked_list(connection->write_queue, (void *) _data);
-
-    /* registers the connection for write */
     connection->register_write(connection);
 
     /* raises no error */

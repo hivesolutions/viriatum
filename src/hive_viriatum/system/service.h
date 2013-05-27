@@ -615,6 +615,7 @@ typedef struct service_options_t {
 typedef enum connection_protocol_e {
     UNDEFINED_PROTOCOL = 1,
     UNKNOWN_PROTOCOL,
+    CUSTOM_PROTOCOL,
     HTTP_PROTOCOL,
     HTTP_CLIENT_PROTOCOL,
     TORRENT_PROTOCOL,
@@ -821,6 +822,7 @@ typedef struct data_t {
     unsigned char *data;
     unsigned char *data_base;
     size_t size;
+    char release;
     connection_data_callback callback;
     void *callback_parameters;
 } data_;
@@ -1079,10 +1081,12 @@ ERROR_CODE create_connection(struct connection_t **connection_pointer, SOCKET_HA
 ERROR_CODE delete_connection(struct connection_t *connection);
 
 /**
- * Writes the given data to the connection.
- * A callback may be provided and if provided
+ * Writes the given data to the connection, the write operation
+ * will only be performed in the next loop iteration.
+ * The data buffer will be release after the write.
+ * A callback may be provided and if it is provided
  * it will be called after the data has been successfully
- * sent through the connection
+ * sent through the connection.
  *
  * @param connection The connection to be used to
  * send the data.
@@ -1090,11 +1094,36 @@ ERROR_CODE delete_connection(struct connection_t *connection);
  * @param size The size of the data to be sent.
  * @param callback The callback to be called after the
  * successful write of data.
- * @parm callback_parameters The parameters to be sent
+ * @param callback_parameters The parameters to be sent
  * back to the callback.
  * @return The resulting error code.
  */
 ERROR_CODE write_connection(struct connection_t *connection, unsigned char *data, unsigned int size, connection_data_callback callback, void *callback_parameters);
+
+/**
+ * Writes the given data to the connection, the write operation
+ * will only be performed in the next loop iteration.
+ * The data buffer will be release after the write.
+ * A callback may be provided and if it is provided
+ * it will be called after the data has been successfully
+ * sent through the connection.
+ *
+ * The release or not of the data buffer may be controlled using
+ * the proper flag in the arguments.
+ *
+ * @param connection The connection to be used to
+ * send the data.
+ * @param data The data to be send throught the connection.
+ * @param size The size of the data to be sent.
+ * @param callback The callback to be called after the
+ * successful write of data.
+ * @param callback_parameters The parameters to be sent
+ * back to the callback.
+ * @param release If the data buffer should be released after
+ * the write operation has been completed.
+ * @return The resulting error code.
+ */
+ERROR_CODE write_connection_c(struct connection_t *connection, unsigned char *data, unsigned int size, connection_data_callback callback, void *callback_parameters, char release);
 
 /**
  * Opens the given connection, creating (and starting) all
