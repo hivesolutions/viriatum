@@ -896,7 +896,8 @@ ERROR_CODE path_callback_handler_file(struct http_parser_t *http_parser, const u
 
     /* retrieves the handler file context from the http parser
     and uses it to retrieve the reference to the base path in context */
-    struct handler_file_context_t *handler_file_context = (struct handler_file_context_t *) http_parser->context;
+    struct handler_file_context_t *handler_file_context =\
+        (struct handler_file_context_t *) http_parser->context;
     unsigned char *base_path = handler_file_context->base_path;
 
     /* copies the memory from the data to the url and then
@@ -1054,7 +1055,8 @@ ERROR_CODE _unset_http_parser_handler_file(struct http_parser_t *http_parser) {
 
 ERROR_CODE _reset_http_parser_handler_file(struct http_parser_t *http_parser) {
     /* retrieves the handler file context from the http parser */
-    struct handler_file_context_t *handler_file_context = (struct handler_file_context_t *) http_parser->context;
+    struct handler_file_context_t *handler_file_context =\
+        (struct handler_file_context_t *) http_parser->context;
 
     /* unsets the handler file context file */
     handler_file_context->file = NULL;
