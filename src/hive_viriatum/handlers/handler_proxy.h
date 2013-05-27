@@ -31,6 +31,8 @@
 #include "../system/system.h"
 #include "../stream/stream.h"
 
+struct io_connection_t;
+
 /**
  * Structure describing the internal parameters
  * for a location in the proxy context.
