@@ -58,7 +58,8 @@ ERROR_CODE create_http_client_connection(struct http_client_connection_t **http_
     size_t http_client_connection_size = sizeof(struct http_client_connection_t);
 
     /* allocates space for the http client connection */
-    struct http_client_connection_t *http_client_connection = (struct http_client_connection_t *) MALLOC(http_client_connection_size);
+    struct http_client_connection_t *http_client_connection =\
+	    (struct http_client_connection_t *) MALLOC(http_client_connection_size);
 
     /* sets the http handler attributes (default) values */
     http_client_connection->io_connection = io_connection;
