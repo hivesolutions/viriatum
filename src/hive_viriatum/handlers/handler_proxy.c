@@ -203,11 +203,13 @@ ERROR_CODE register_handler_proxy(struct service_t *service) {
 
         /* parses the proxy pass value, unpacking all of its values into a proper
         url describing structure that is allocated statically */
-        _location->proxy_pass != NULL && parse_url_static(
-            _location->proxy_pass,
-            strlen(_location->proxy_pass),
-            &_location->url_s
-        );
+		if(_location->proxy_pass != NULL) {
+			parse_url_static(
+				(char *) _location->proxy_pass,
+				strlen((char *) _location->proxy_pass),
+				&_location->url_s
+			);
+		}
     }
 
     /* adds the http handler to the service */
