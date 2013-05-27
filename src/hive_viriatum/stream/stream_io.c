@@ -486,7 +486,7 @@ ERROR_CODE write_handler_stream_io(struct connection_t *connection) {
         }
 
         /* pops a value (data) from the linked list (write queue) */
-        pop_value_linked_list(connection->write_queue, (void **) &data, 1);
+        pop_value_linked_list(connection->write_queue, (void **) &data, TRUE);
 
         /* in case the data callback is set */
         if(data->callback != NULL) {
