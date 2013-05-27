@@ -150,3 +150,40 @@ void delete_http_request(struct http_request_t *http_request);
 static __inline const char *get_http_version_string(enum http_version_e http_version) {
     return http_version_strings[http_version - 1];
 }
+
+/**
+ * Convers the provided major and minor based version set
+ * of integer values into a more standard representation
+ * of the http version values using enumerations.
+ *
+ * @param http_major The major version value for the http
+ * protocol to be used in the enumeration conversion.
+ * @param http_minor The minor version value for the htto
+ * protocol  to be used in the enumeration conversion.
+ * @return The standard enumeration oriented version of the
+ * http version value converted accordingly.
+ */
+static __inline enum http_version_e get_http_version(unsigned short http_major, unsigned short http_minor) {
+    switch(http_major) {
+        case 0:
+            switch(http_minor) {
+                case 9:
+                    return HTTP09;
+            }
+
+            break;
+
+        case 1:
+            switch(http_minor) {
+                case 0:
+                    return HTTP10;
+
+                case 1:
+                    return HTTP11;
+            }
+
+            break;
+    }
+
+    return HTTP11;
+}
