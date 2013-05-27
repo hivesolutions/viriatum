@@ -86,6 +86,13 @@ typedef struct proxy_handler_t {
  */
 typedef struct handler_proxy_context_t {
     /**
+     * The pass (host) to be used as the base for the
+     * forward operation, this is the base path and the
+     * relative path value will be computed.
+     */
+    unsigned char *proxy_pass;
+
+    /**
      * The description of the url to be used as the proxy pass for the
      * proxy operation that is "inside" the current context.
      */
@@ -112,6 +119,26 @@ typedef struct handler_proxy_context_t {
     size_t buffer_max_size;
 
     /**
+     * The buffer to be used to store the data that will be considered the
+     * output and will be sent back to the client of the proxy.
+     */
+    char *out_buffer;
+
+    /**
+     * Current size of the output buffer, if this value is greater that the
+     * maximum size there must be an error and a proper escape operation
+     * must be performed in order to avoid buffer overflow.
+     */
+    size_t out_buffer_size;
+
+    /**
+     * The maximum possible number of bytes that can be stored in the output
+     * buffer, this value should be changed when the buffer storage grows or
+     * when it shrinks.
+     */
+    size_t out_buffer_max_size;
+
+    /**
      * The current service connection that "communicates" with the client
      * of the proxy service. This connection may be used to return the data
      * from the target proxy server back to the client.
@@ -125,11 +152,16 @@ typedef struct handler_proxy_context_t {
      */
     struct connection_t *connection_c;
 
-    char *out_buffer;
-    size_t out_buffer_size;
-    size_t out_buffer_max_size;
-
+    /**
+     * The current http settings instance to be used for the connection with
+     * the backend server to be able to parse its responses.
+     */
     struct http_settings_t *http_settings;
+
+    /**
+     * Parser instance to be used when parsing the responses provided by the
+     * backend server associated with the current context.
+     */
     struct http_parser_t *http_parser;
 } handler_proxy_context;
 
