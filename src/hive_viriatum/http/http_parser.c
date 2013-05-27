@@ -58,7 +58,7 @@ void create_http_parser(struct http_parser_t **http_parser_pointer, char request
 
     /* sets the http parser attributes, in the original
     definition, this should be able to start a parsing */
-    http_parser->type = 2;
+    http_parser->type = request ? HTTP_REQUEST : HTTP_RESPONSE;
     http_parser->flags = 6;
     http_parser->state = request ? STATE_START_REQ : STATE_START_RES;
     http_parser->header_state = 0;
@@ -131,6 +131,11 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
     unsigned char *header_value_mark = http_parser->header_value_mark;
     unsigned char *url_mark = http_parser->url_mark;
 
+	/* the counter that controls the number of successful parses
+	that have occurred during the current process operator, this is
+	usefullto limit the parses for the provided data */
+	size_t parse_count = 0;
+
     /* in case the received data size is empty */
     if(data_size == 0) {
         /* switches over the state */
@@ -165,12 +170,13 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
 		comparison operation in this step */
         byte = *pointer;
 
-        /* in case the current state is start of response
-        the parsing of the requrest is complete, must break
-        parsing loop */
-        if(state == STATE_START_RES) { break; }
+        /* in case the current number of successfull parses for
+		the provided data is larger than zero the current loop
+		must be break so that no more that one parse is done */
+        if(parse_count > 0) { break; }
 
-        /* switch over the current state */
+        /* switch over the current state in order to trigger
+		the correct parsing logic for the current state */
         switch(state) {
             case STATE_START_REQ_OR_RES:
                 /* in case the current byte is a
@@ -1487,6 +1493,7 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                         /* End of a chunked request */
                         HTTP_CALLBACK(message_complete);
                         state = NEW_MESSAGE();
+						parse_count++;
                         break;
                     }
 
@@ -1527,6 +1534,7 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                     if(http_parser->flags & FLAG_SKIPBODY) {
                         HTTP_CALLBACK(message_complete);
                         state = NEW_MESSAGE();
+						parse_count++;
                     } else if(http_parser->flags & FLAG_CHUNKED) {
                         /* chunked encoding - ignore Content-Length header */
                         state = STATE_CHUNK_SIZE_START;
@@ -1535,6 +1543,7 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                             /* Content-Length header given but zero: Content-Length: 0\r\n */
                             HTTP_CALLBACK(message_complete);
                             state = NEW_MESSAGE();
+							parse_count++;
                         } else if(http_parser->content_length > 0) {
                             /* Content-Length header given and non-zero */
                             state = STATE_BODY_IDENTITY;
@@ -1544,11 +1553,12 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                             http_parser->_content_length = http_parser->content_length;
                         } else {
                             if(http_parser->type == HTTP_REQUEST || http_should_keep_alive(http_parser)) {
-                                /* Assume content-length 0 - read the next */
+                                /* assumes content-length 0 - read the next */
                                 HTTP_CALLBACK(message_complete);
                                 state = NEW_MESSAGE();
+								parse_count++;
                             } else {
-                                /* Read body until EOF */
+                                /* reads body until the enf of file is reached */
                                 state = STATE_BODY_IDENTITY_EOF;
                             }
                         }
@@ -1572,11 +1582,12 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                     pointer += to_read - 1;
                     http_parser->content_length -= to_read;
 
-                    /* in case teh current content length has reached zero the
+                    /* in case the current content length has reached zero the
                     state should be updated to a new message (restart) */
                     if(http_parser->content_length == 0) {
                         HTTP_CALLBACK(message_complete);
                         state = NEW_MESSAGE();
+						parse_count++;
                     }
                 }
 
@@ -1719,6 +1730,7 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
     if(state == STATE_BODY_IDENTITY_EOF) {
         HTTP_CALLBACK(message_complete);
         state = NEW_MESSAGE();
+		parse_count++;
     }
 
     http_parser->state = state;
