@@ -267,10 +267,9 @@ ERROR_CODE read_handler_stream_io(struct connection_t *connection) {
 
         /* in case the number of bytes is zero (connection closed) */
         if(number_bytes == 0) {
-            /* sets the error flag */
+            /* sets the error flag so that the connection is closed
+            and then breaks the current loop */
             error = 1;
-
-            /* breaks the loop */
             break;
         }
 
