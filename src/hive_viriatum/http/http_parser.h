@@ -425,7 +425,7 @@ typedef enum http_flags_e {
  * including state, size contents and control flags.
  */
 typedef struct http_parser_t {
-    unsigned char type;
+    enum http_request_type_e type;
     unsigned char flags;
     enum http_parser_state_e state;
     enum http_header_state_e header_state;
