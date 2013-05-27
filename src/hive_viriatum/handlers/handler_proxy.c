@@ -489,21 +489,38 @@ ERROR_CODE virtual_url_callback_handler_proxy(struct http_parser_t *http_parser,
 }
 
 ERROR_CODE data_backend_handler(struct io_connection_t *io_connection, unsigned char *buffer, size_t buffer_size) {
+	/* allocates space for the proxy context that may be retrieved
+	latter in the function */
+	struct handler_proxy_context_t *handler_proxy_context;
+
+	/* retrieves the top level connection object from the io connection
+	and then uses it to retrieve its parameters */
     struct connection_t *connection = io_connection->connection;
     struct custom_parameters_t *custom_parameters =\
         (struct custom_parameters_t *) connection->parameters;
-    struct handler_proxy_context_t *handler_proxy_context =\
-        (struct handler_proxy_context_t *) custom_parameters->parameters;
+
+	/* in case there're no custom parameters available for the current
+	backend connection, the connection is already disabled (but not closed)
+	and so the data operation should be ignored */
+	if(custom_parameters == NULL) { return; }
+
+	/* retrieves the current proxy context structure from the custom parameters
+	to be used for the processing of the current data received from the backend */
+    handler_proxy_context =\
+		(struct handler_proxy_context_t *) custom_parameters->parameters;
 
     printf("DATA\n");
 
+	/* runs the process operation (parser iteration) using the buffer that contains
+	the data that has been retrieved from the backend server, this should trigger a
+	series of callbacks for the various stages of the parsing, then returns the control
+	flow to the caller function (everything went well) */
     process_data_http_parser(
         handler_proxy_context->http_parser,
         handler_proxy_context->http_settings,
         buffer,
         buffer_size
     );
-
     RAISE_NO_ERROR;
 }
 
