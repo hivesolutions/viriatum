@@ -122,8 +122,8 @@ ERROR_CODE delete_http_connection(struct http_connection_t *http_connection) {
     to be used in this connection */
     struct http_handler_t *http_handler;
 
-    /* retrieves the currently assigned handler and usets the connection
-    from with (unregister connection) */
+    /* retrieves the currently assigned handler and then usets
+    the connection from associated handler (unregister connection) */
     http_handler = http_connection->http_handler;
     if(http_handler) { http_handler->unset(http_connection); }
 

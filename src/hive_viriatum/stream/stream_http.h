@@ -136,7 +136,8 @@ typedef struct http_handler_t {
     /**
      * Callback method called uppon resetting
      * the current handler from the provided
-     * connection object.
+     * connection object. This operation should
+     * be similar to the set and then unset.
      */
     http_connection_update reset;
 
@@ -162,12 +163,12 @@ typedef struct http_handler_t {
 typedef struct http_connection_t {
     /**
      * The (upper) io connection that owns
-     * manages this connection.
+     * and manages this connection.
      */
     struct io_connection_t *io_connection;
 
     /**
-     * Structure containig the settings to be
+     * Structure containing the settings to be
      * used by the http parser.
      */
     struct http_settings_t *http_settings;
