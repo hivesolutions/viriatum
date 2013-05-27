@@ -558,7 +558,6 @@ ERROR_CODE line_callback_backend(struct http_parser_t *http_parser) {
 
     struct handler_proxy_context_t *handler_proxy_context =\
         (struct handler_proxy_context_t *) http_parser->context;
-    struct connection_t *connection = handler_proxy_context->connection;
 
     enum http_version_e version_e = get_http_version(
         http_parser->http_major,
@@ -622,7 +621,7 @@ ERROR_CODE body_callback_backend(struct http_parser_t *http_parser, const unsign
     memcpy(buffer, data, data_size);
     write_connection(
         connection,
-        buffer,
+        (unsigned char *) buffer,
         data_size,
         NULL,
         NULL
