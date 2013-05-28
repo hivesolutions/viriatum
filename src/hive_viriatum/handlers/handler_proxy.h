@@ -83,12 +83,12 @@ typedef struct proxy_handler_t {
      */
     struct hash_map_t *connections_map;
 
-	/**
-	 * Map structure that associates the client connection with
-	 * the on close handler that was previously set in the connection
-	 * before the re-mapping. This is used so that the close handler
-	 * is able to call the old on close handler.
-	 */
+    /**
+     * Map structure that associates the client connection with
+     * the on close handler that was previously set in the connection
+     * before the re-mapping. This is used so that the close handler
+     * is able to call the old on close handler.
+     */
     struct hash_map_t *on_close_map;
 } proxy_handler;
 
@@ -184,6 +184,7 @@ ERROR_CODE create_handler_proxy_context(struct handler_proxy_context_t **handler
 ERROR_CODE delete_handler_proxy_context(struct handler_proxy_context_t *handler_proxy_context);
 ERROR_CODE register_handler_proxy(struct service_t *service);
 ERROR_CODE unregister_handler_proxy(struct service_t *service);
+ERROR_CODE close_proxy_connection(struct io_connection_t *io_connection);
 ERROR_CODE set_handler_proxy(struct http_connection_t *http_connection);
 ERROR_CODE unset_handler_proxy(struct http_connection_t *http_connection);
 ERROR_CODE reset_handler_proxy(struct http_connection_t *http_connection);
