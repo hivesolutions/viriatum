@@ -43,8 +43,16 @@ ERROR_CODE create_proxy_handler(struct proxy_handler_t **proxy_handler_pointer, 
 
     /* creates the hash map that is going to be used for the associations
     between the client connections with the viriatum server (proxy) and the
-    backend connections to the proxy target servers */
+    backend connections to the proxy target servers and then creates the
+    reverved version of the same map associating the backend connection with
+    the proxy client connections */
     create_hash_map(&proxy_handler->connections_map, 0);
+    create_hash_map(&proxy_handler->reverse_map, 0);
+
+    /* creates the internal structures for the map that is going to be used
+    to resolve the proxy connection to the old set on close handler so that
+    it's possible to propagate the on close callback call */
+    create_hash_map(&proxy_handler->on_close_map, 0);
 
     /* sets the proxy handler in the proxy handler pointer and returns
     the control flow to the caller function with no error */
@@ -58,8 +66,15 @@ ERROR_CODE delete_proxy_handler(struct proxy_handler_t *proxy_handler) {
     if(proxy_handler->locations != NULL) { FREE(proxy_handler->locations); }
 
     /* deletes the structure that is used for the mapping operation
-    of the client connections to the proxy to the backend connections */
+    of the client connections to the proxy to the backend connections
+    and the exact oposite of that structure (reverse mapping) */
     delete_hash_map(proxy_handler->connections_map);
+    delete_hash_map(proxy_handler->reverse_map);
+
+    /* removes the hash map structure that associates a client connection
+    with the proxy with the upper on close handler that has been replaced
+    in order to provide the backend connection removal */
+    delete_hash_map(proxy_handler->on_close_map);
 
     /* releases the proxy handler, avoiding any memory leaks
     that may be raised from this main structure and then returns
@@ -203,13 +218,13 @@ ERROR_CODE register_handler_proxy(struct service_t *service) {
 
         /* parses the proxy pass value, unpacking all of its values into a proper
         url describing structure that is allocated statically */
-		if(_location->proxy_pass != NULL) {
-			parse_url_static(
-				(char *) _location->proxy_pass,
-				strlen((char *) _location->proxy_pass),
-				&_location->url_s
-			);
-		}
+        if(_location->proxy_pass != NULL) {
+            parse_url_static(
+                (char *) _location->proxy_pass,
+                strlen((char *) _location->proxy_pass),
+                &_location->url_s
+            );
+        }
     }
 
     /* adds the http handler to the service */
@@ -225,12 +240,6 @@ ERROR_CODE unregister_handler_proxy(struct service_t *service) {
     struct http_handler_t *http_handler;
     struct proxy_handler_t *proxy_handler;
 
-
-    /* @todo: tenho de por aki a libertar  a FAZER CLOSE DE TODAS AS CONEXOES
-    a clientes !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
-
-
-
     /* retrieves the http handler from the service, then retrieves
     the lower substrate as the proxy handler */
     service->get_http_handler(service, &http_handler, (unsigned char *) "proxy");
@@ -243,6 +252,52 @@ ERROR_CODE unregister_handler_proxy(struct service_t *service) {
     that deletes the handler reference */
     service->remove_http_handler(service, http_handler);
     service->delete_http_handler(service, http_handler);
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE close_proxy_connection(struct io_connection_t *io_connection) {
+    struct http_handler_t *http_handler;
+    struct proxy_handler_t *proxy_handler;
+    struct connection_t *connection_c;
+    io_connection_callback on_close;
+
+    struct connection_t *connection = io_connection->connection;
+    struct service_t *service = connection->service;
+    struct http_connection_t *http_connection =\
+        (struct http_connection_t *) io_connection->lower;
+
+    get_value_string_hash_map(
+        service->http_handlers_map,
+        "proxy",
+        (void **) &http_handler
+    );
+    proxy_handler = (struct proxy_handler_t *) http_handler->lower;
+
+    get_value_hash_map(
+        proxy_handler->connections_map,
+        (size_t) connection,
+        NULL,
+        (void **) &connection_c
+    );
+
+    get_value_hash_map(
+        proxy_handler->on_close_map,
+        (size_t) connection,
+        NULL,
+        (void **) &on_close
+    );
+
+    if(on_close != NULL) { on_close(io_connection); }
+    if(connection_c != NULL) {
+        close_connection(connection_c);
+        delete_connection(connection_c);
+    }
+
+    set_value_hash_map(proxy_handler->connections_map, (size_t) connection, NULL, NULL);
+    set_value_hash_map(proxy_handler->reverse_map, (size_t) connection_c, NULL, NULL);
+    set_value_hash_map(proxy_handler->on_close_map, (size_t) connection, NULL, NULL);
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -379,6 +434,8 @@ ERROR_CODE virtual_url_callback_handler_proxy(struct http_parser_t *http_parser,
     char buffer[1024];
     char path[1024];
 
+    io_connection_callback on_close;
+
     enum http_version_e version_e = get_http_version(
         http_parser->http_major,
         http_parser->http_minor
@@ -401,6 +458,8 @@ ERROR_CODE virtual_url_callback_handler_proxy(struct http_parser_t *http_parser,
     memcpy(path, data, data_size);
     path[data_size] = '\0';
 
+    /* writes the initial line of the http message into the temporary buffer
+    and then sends this value to the current buffer for writing */
     size_m = SPRINTF(buffer, 1024, "%s %s %s\r\n", method, path, version);
     write_proxy_buffer(handler_proxy_context, buffer, size_m);
 
@@ -434,6 +493,12 @@ ERROR_CODE virtual_url_callback_handler_proxy(struct http_parser_t *http_parser,
     /* in case the connection client reference structure for the current
     context is not defined a new connection must be created */
     if(handler_proxy_context->connection_c == NULL) {
+        /* saves the currently set on close handler for the io connection
+        in the temporary local variable and then updates the reference to
+        the close handler with the callback function that closes the proxy */
+        on_close = io_connection->on_close;
+        io_connection->on_close = close_proxy_connection;
+
         /* creates a general http client connection structure containing
         all the general attributes for a connection, then sets the
         "local" connection reference from the pointer */
@@ -468,6 +533,22 @@ ERROR_CODE virtual_url_callback_handler_proxy(struct http_parser_t *http_parser,
             NULL,
             handler_proxy_context->connection_c
         );
+
+
+        set_value_hash_map(
+            proxy_handler->reverse_map,
+            (size_t) handler_proxy_context->connection_c,
+            NULL,
+            connection
+        );
+
+
+        set_value_hash_map(
+            proxy_handler->on_close_map,
+            (size_t) connection,
+            NULL,
+            on_close
+        );
     }
     /* otherwise there's a valid connection to the backend connection and
     it may be re-used, so only the parameters object must be set */
@@ -489,32 +570,32 @@ ERROR_CODE virtual_url_callback_handler_proxy(struct http_parser_t *http_parser,
 }
 
 ERROR_CODE data_backend_handler(struct io_connection_t *io_connection, unsigned char *buffer, size_t buffer_size) {
-	/* allocates space for the proxy context that may be retrieved
-	latter in the function */
-	struct handler_proxy_context_t *handler_proxy_context;
+    /* allocates space for the proxy context that may be retrieved
+    latter in the function */
+    struct handler_proxy_context_t *handler_proxy_context;
 
-	/* retrieves the top level connection object from the io connection
-	and then uses it to retrieve its parameters */
+    /* retrieves the top level connection object from the io connection
+    and then uses it to retrieve its parameters */
     struct connection_t *connection = io_connection->connection;
     struct custom_parameters_t *custom_parameters =\
         (struct custom_parameters_t *) connection->parameters;
 
-	/* in case there're no custom parameters available for the current
-	backend connection, the connection is already disabled (but not closed)
-	and so the data operation should be ignored */
-	if(custom_parameters == NULL) { return; }
+    /* in case there're no custom parameters available for the current
+    backend connection, the connection is already disabled (but not closed)
+    and so the data operation should be ignored */
+    if(custom_parameters == NULL) { RAISE_NO_ERROR; }
 
-	/* retrieves the current proxy context structure from the custom parameters
-	to be used for the processing of the current data received from the backend */
+    /* retrieves the current proxy context structure from the custom parameters
+    to be used for the processing of the current data received from the backend */
     handler_proxy_context =\
-		(struct handler_proxy_context_t *) custom_parameters->parameters;
+        (struct handler_proxy_context_t *) custom_parameters->parameters;
 
     printf("DATA\n");
 
-	/* runs the process operation (parser iteration) using the buffer that contains
-	the data that has been retrieved from the backend server, this should trigger a
-	series of callbacks for the various stages of the parsing, then returns the control
-	flow to the caller function (everything went well) */
+    /* runs the process operation (parser iteration) using the buffer that contains
+    the data that has been retrieved from the backend server, this should trigger a
+    series of callbacks for the various stages of the parsing, then returns the control
+    flow to the caller function (everything went well) */
     process_data_http_parser(
         handler_proxy_context->http_parser,
         handler_proxy_context->http_settings,
@@ -537,35 +618,84 @@ ERROR_CODE close_backend_handler(struct io_connection_t *io_connection) {
     struct io_connection_t *io_connection_s;
     struct http_connection_t *http_connection_s;
 
+    /* reserves space for both the top level http handler structure and the
+    concrete proxy handler structure containing the specifics of the proxy and
+    then allocates space for the on close function pointer */
+    struct http_handler_t *http_handler;
+    struct proxy_handler_t *proxy_handler;
+    io_connection_callback on_close;
+
     /* unpacks the connection object to retrieve the custom parameters
-    and check if they exist (no connection) dropped meanwhile, for such
-    cases no connection closing should be done */
+    from it, these parameters are only set if the connection is in the
+    middle of processing a proxy connection */
     struct connection_t *connection = io_connection->connection;
+    struct service_t *service = connection->service;
     struct custom_parameters_t *custom_parameters =\
         (struct custom_parameters_t *) connection->parameters;
-    if(custom_parameters == NULL) { RAISE_NO_ERROR; }
+
+    /* uses the "global" service structure to retrieve the handle to the
+    proper proxy handler structure so that it may be used to retrieve the
+    associated connection related information */
+    get_value_string_hash_map(
+        service->http_handlers_map,
+        "proxy",
+        (void **) &http_handler
+    );
+    proxy_handler = (struct proxy_handler_t *) http_handler->lower;
+
+    /* retrieves the service connection (with the proxy client) from the
+    current backend connection using the reversed map in the proxy handler */
+    get_value_hash_map(
+        proxy_handler->reverse_map,
+        (size_t) connection,
+        NULL,
+        (void **) &connection_s
+    );
+
+    /* uses the service connection to retrieve the currently associated
+    on close function callback in order to restore it */
+    get_value_hash_map(
+        proxy_handler->on_close_map,
+        (size_t) connection_s,
+        NULL,
+        (void **) &on_close
+    );
+
+    /* resolves the service connection (proxy client) into the proper io
+    and http connection and then restores the close handler to them */
+    io_connection_s = (struct io_connection_t *) connection_s->lower;
+    http_connection_s = (struct http_connection_t *) io_connection_s->lower;
+    io_connection_s->on_close = on_close;
+
+    /* unsets the complete set of map asociating the data from the frontend
+    connections to the backend so that no more resolution is possible, this
+    is the expected behavior because no more backend connections are available */
+    set_value_hash_map(proxy_handler->connections_map, (size_t) connection_s, NULL, NULL);
+    set_value_hash_map(proxy_handler->reverse_map, (size_t) connection, NULL, NULL);
+    set_value_hash_map(proxy_handler->on_close_map, (size_t) connection_s, NULL, NULL);
+
+    /* in case the custom parameters are set the connection is talking
+    with the backend server and so the connection must be correctly and
+    gracefully handled */
+    if(custom_parameters != NULL) {
+        /* retrieves the proxy context from the parameters and then
+        unsets the connection with the client so that no more connection
+        processing operation uses it (it's no longer usable) */
+        handler_proxy_context =\
+            (struct handler_proxy_context_t *) custom_parameters->parameters;
+        handler_proxy_context->connection_c = NULL;
+
+        /* releases the lock present in the connection for the service and then
+        closes it releasing all of it's structures, the logic is that if the
+        connection with the proxy target (client) closes the connection with the
+        proxy client should also be closed, then returns the controll flow to the
+        caller function with no error */
+        http_connection_s->release(http_connection_s);
+        connection_s->close_connection(connection_s);
+    }
 
     printf("DISCONNECTED\n");
 
-    /* retrieves the proxy context from the parameters and then uses it
-    to retrieve the parent http connection to the service (proxy client)
-    to be used for closing */
-    handler_proxy_context = (struct handler_proxy_context_t *) custom_parameters->parameters;
-    connection_s = (struct connection_t *) handler_proxy_context->connection;
-    io_connection_s = (struct io_connection_t *) connection_s->lower;
-    http_connection_s = (struct http_connection_t *) io_connection_s->lower;
-
-    /* unsets the connection with the client so that no more connection
-    processing operation use it (it's no longer usable) */
-    handler_proxy_context->connection_c = NULL;
-
-    /* releases the lock present in the connection for the service and then
-    closes it releasing all of it's structures, the logic is that if the
-    connection with the proxy target (client) closes the connection with the
-    proxy client should also be closed, then returns the controll flow to the
-    caller function with no error */
-    http_connection_s->release(http_connection_s);
-    close_connection(connection_s);
     RAISE_NO_ERROR;
 }
 
@@ -598,7 +728,6 @@ ERROR_CODE header_field_callback_backend(struct http_parser_t *http_parser, cons
     struct handler_proxy_context_t *handler_proxy_context =\
         (struct handler_proxy_context_t *) http_parser->context;
     write_proxy_out_buffer(handler_proxy_context, (char *) data, data_size);
-
     RAISE_NO_ERROR;
 }
 
@@ -687,7 +816,8 @@ ERROR_CODE _unset_http_parser_handler_proxy(struct http_parser_t *http_parser) {
         (struct handler_proxy_context_t *) http_parser->context;
 
     /* in case there's a connection with the client defined the parameters
-    of it must be undefined so that no more bottom up operations occur */
+    of it must be undefined so that no more bottom up operations occur,
+    otherwise invalid data would be sent to the proxy client */
     if(handler_proxy_context->connection_c) {
         FREE(handler_proxy_context->connection_c->parameters);
         handler_proxy_context->connection_c->parameters = NULL;
