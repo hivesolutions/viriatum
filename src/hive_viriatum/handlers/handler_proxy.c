@@ -617,7 +617,7 @@ ERROR_CODE data_backend_handler(struct io_connection_t *io_connection, unsigned 
         (struct handler_proxy_context_t *) custom_parameters->parameters;
 
 
-	printf("DATA\n")
+	printf("DATA\n");
 
 
     /* runs the process operation (parser iteration) using the buffer that contains
