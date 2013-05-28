@@ -1564,7 +1564,7 @@ ERROR_CODE unregister_write_connection(struct connection_t *connection) {
     struct service_t *service = connection->service;
     struct polling_t *polling = service->polling;
 
-    /* unregisters the connection for write in the current
+    /* unregisters the connection from write in the current
     polling mechanism and then unsets the flag */
     polling->unregister_write(polling, connection);
     connection->write_registered = FALSE;
