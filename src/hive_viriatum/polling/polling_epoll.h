@@ -149,7 +149,7 @@ ERROR_CODE _call_polling_epoll(
     size_t error_connections_size
 );
 ERROR_CODE _outstanding_polling_epoll(
-    struct polling_select_t *polling_select,
+    struct polling_epoll_t *polling_epoll,
     struct connection_t **write_outstanding,
     size_t write_outstanding_size
 );
