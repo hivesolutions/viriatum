@@ -84,6 +84,12 @@ typedef struct proxy_handler_t {
     struct hash_map_t *connections_map;
 
     /**
+     * Reversed version of the connection map that maps the client
+     * (backend) connections to the associated proxy client connections.
+     */
+    struct hash_map_t *reverse_map;
+
+    /**
      * Map structure that associates the client connection with
      * the on close handler that was previously set in the connection
      * before the re-mapping. This is used so that the close handler
