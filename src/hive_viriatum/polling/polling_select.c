@@ -456,6 +456,11 @@ ERROR_CODE _call_polling_select(struct polling_select_t *polling_select, struct 
         current_connection = write_connections[index];
         V_DEBUG_F("Processing write connection: %d\n", current_connection->socket_handle);
 
+        /* updates the current connection so that it's set as write
+        valid meaning that any write operation in it will be immediately
+        performed, fast operations */
+        current_connection->write_valid = TRUE;
+
         /* in case the current connection is open */
         if(current_connection->status == STATUS_OPEN &&\
             current_connection->on_write != NULL) {

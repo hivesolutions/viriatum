@@ -164,6 +164,22 @@ ERROR_CODE unregister_connection_polling_epoll(struct polling_t *polling, struct
 }
 
 ERROR_CODE register_write_polling_epoll(struct polling_t *polling, struct connection_t *connection) {
+    /* in casde the current state for the connection is not write
+    valid must return immediately with no error */
+    if(connection->write_valid == FALSE) { RAISE_NO_ERROR; }
+
+    /* in case the current connection is not open or the on write
+    callback function is not currently set must return */
+    if(connection->status != STATUS_OPEN || connection->on_write == NULL) {
+        RAISE_NO_ERROR;
+    }
+
+    /* prints a series of debug messages and then calls the
+    correct on write handler for the notification */
+    V_DEBUG("Calling immediate on write handler \n");
+    CALL_V(connection->on_write, connection);
+    V_DEBUG("Finished calling immediate on write handler\n");
+
     /* raises no error */
     RAISE_NO_ERROR;
 }
@@ -286,7 +302,10 @@ ERROR_CODE _poll_polling_epoll(struct polling_epoll_t *polling_epoll, struct con
         SOCKET_CLOSE(service->service_socket_handle);
 
         /* raises an error */
-        RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem running epoll");
+        RAISE_ERROR_M(
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Problem running epoll"
+        );
     }
 
     /* iterates over the range of "generated" events in order
@@ -405,6 +424,11 @@ ERROR_CODE _call_polling_epoll(struct polling_epoll_t *polling_epoll, struct con
         a debu message with the socket handle of the connection */
         current_connection = write_connections[index];
         V_DEBUG_F("Processing write connection: %d\n", current_connection->socket_handle);
+
+        /* updates the current connection so that it's set as write
+        valid meaning that any write operation in it will be immediately
+        performed, fast operations */
+        current_connection->write_valid = TRUE;
 
         /* in case the current connection is open */
         if(current_connection->status == STATUS_OPEN &&\
