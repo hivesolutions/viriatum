@@ -616,6 +616,10 @@ ERROR_CODE data_backend_handler(struct io_connection_t *io_connection, unsigned 
     handler_proxy_context =\
         (struct handler_proxy_context_t *) custom_parameters->parameters;
 
+
+	printf("DATA\n")
+
+
     /* runs the process operation (parser iteration) using the buffer that contains
     the data that has been retrieved from the backend server, this should trigger a
     series of callbacks for the various stages of the parsing, then returns the control
@@ -786,6 +790,8 @@ ERROR_CODE body_callback_backend(struct http_parser_t *http_parser, const unsign
     struct handler_proxy_context_t *handler_proxy_context =\
         (struct handler_proxy_context_t *) http_parser->context;
     struct connection_t *connection = handler_proxy_context->connection;
+
+	printf("body callback\m");
 
     char *buffer = MALLOC(data_size);
     memcpy(buffer, data, data_size);
