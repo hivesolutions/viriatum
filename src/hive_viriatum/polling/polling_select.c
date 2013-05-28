@@ -100,7 +100,11 @@ ERROR_CODE register_connection_polling_select(struct polling_t *polling, struct 
     /* in case the socket error are meant to be processed */
     if(VIRIATUM_SOCKET_ERROR) {
         /* registers the socket handle in the sockets error set */
-        _register_sockets_set_polling_select(polling_select, connection->socket_handle, &polling_select->sockets_read_set);
+        _register_sockets_set_polling_select(
+            polling_select,
+            connection->socket_handle,
+            &polling_select->sockets_read_set
+        );
     }
 
     /* raises no error */
