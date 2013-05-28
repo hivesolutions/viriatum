@@ -444,9 +444,9 @@ ERROR_CODE _call_polling_select(struct polling_select_t *polling_select, struct 
 
     /* prints a debug message */
     V_DEBUG_F(
-		"Processing %lu write connections\n",
-		(long unsigned int) write_connections_size
-	);
+        "Processing %lu write connections\n",
+        (long unsigned int) write_connections_size
+    );
 
     /* iterates over all of the connection that are currently registerd
     for the write operation to correctly call their callbacks */
