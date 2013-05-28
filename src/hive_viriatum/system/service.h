@@ -1187,9 +1187,16 @@ ERROR_CODE register_write_connection(struct connection_t *connection);
  */
 ERROR_CODE unregister_write_connection(struct connection_t *connection);
 
-
+/**
+ * Invalidates the connection for write operation meaning
+ * than any other write operation should be first validated
+ * by the polling mechanism.
+ *
+ * @param connection The connection to be invalidated
+ * for writing "events".
+ * @return The resulting error code.
+ */
 ERROR_CODE invalidate_write_connection(struct connection_t *connection);
-
 
 /**
  * Allocates a chunk of memory for the context of the given
