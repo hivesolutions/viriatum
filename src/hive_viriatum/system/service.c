@@ -1400,19 +1400,20 @@ ERROR_CODE delete_connection(struct connection_t *connection) {
     /* allocates the data */
     struct data_t *data;
 
-    /* iterates continuously */
+    /* iterates continuously to release all the pending
+    memory to be released because the connection was dropped */
     while(TRUE) {
-        /* pops a value (data) from the linked list (write queue) */
+        /* pops a value (data) from the linked list (write queue)
+        in case the data is invalid (list is empty) must break
+        the current loop, this is the end of iteration */
         pop_value_linked_list(connection->write_queue, (void **) &data, TRUE);
-
-        /* in case the data is invalid (list is empty) must
-        break the current loop, this is the end of iteration */
         if(data == NULL) { break; }
 
         /* prints a debug message */
         V_DEBUG("Deleting data (cleanup structures)\n");
 
-        /* deletes the data */
+        /* deletes the data, releasing any pending buffer
+        that is defined in it, to avoid any memory leak */
         delete_data(data);
     }
 
