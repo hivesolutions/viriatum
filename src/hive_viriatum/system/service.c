@@ -1544,14 +1544,13 @@ ERROR_CODE close_connection(struct connection_t *connection) {
 }
 
 ERROR_CODE register_write_connection(struct connection_t *connection) {
-    /* retrieves the (connection) service */
+    /* retrieves the (connection) service and uses it to
+    retrieve the associated polling provider */
     struct service_t *service = connection->service;
-
-    /* retrieves the polling (provider) */
     struct polling_t *polling = service->polling;
 
     /* registers the connection for write in the current
-	polling mechanism and then sets the flag */
+    polling mechanism and then sets the flag */
     polling->register_write(polling, connection);
     connection->write_registered = TRUE;
 
@@ -1560,14 +1559,13 @@ ERROR_CODE register_write_connection(struct connection_t *connection) {
 }
 
 ERROR_CODE unregister_write_connection(struct connection_t *connection) {
-    /* retrieves the (connection) service */
+    /* retrieves the (connection) service and uses it to
+    retrieve the associated polling provider */
     struct service_t *service = connection->service;
-
-    /* retrieves the polling (provider) */
     struct polling_t *polling = service->polling;
 
     /* unregisters the connection for write in the current
-	polling mechanism and then unsets the flag */
+    polling mechanism and then unsets the flag */
     polling->unregister_write(polling, connection);
     connection->write_registered = FALSE;
 
