@@ -1137,6 +1137,7 @@ ERROR_CODE close_connections_service(struct service_t *service) {
         then deletes the current connection */
         current_connection->close_connection(current_connection);
         delete_connection(current_connection);
+    }
 
 #ifdef VIRIATUM_SSL
         /* closes the ssl context for the current serice, this should disable
