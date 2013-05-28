@@ -1746,6 +1746,9 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
         parse_count++;
     }
 
+    /* updates (saves) the vaious parser state values into the
+    proper structure so that they may be used latter in further
+    parsing stages (partial parsing) */
     http_parser->state = state;
     http_parser->header_state = header_state;
     http_parser->index = index;
