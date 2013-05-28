@@ -992,6 +992,7 @@ ERROR_CODE start_service(struct service_t *service) {
     service_connection->write_connection = write_connection;
     service_connection->register_write = register_write_connection;
     service_connection->unregister_write = unregister_write_connection;
+    service_connection->invalidate_write = invalidate_write_connection;
 
     /* sets the fucntion to be called uppon read on the service
     connection (it should be the accept handler stream io, default) */
@@ -1013,6 +1014,7 @@ ERROR_CODE start_service(struct service_t *service) {
         service6_connection->write_connection = write_connection;
         service6_connection->register_write = register_write_connection;
         service6_connection->unregister_write = unregister_write_connection;
+        service6_connection->invalidate_write = invalidate_write_connection;
 
         /* sets the fucntion to be called uppon read on the service
         connection (it should be the accept handler stream io, default) */
@@ -1360,11 +1362,13 @@ ERROR_CODE create_connection(struct connection_t **connection_pointer, SOCKET_HA
     connection->socket_handle = socket_handle;
     connection->service = NULL;
     connection->write_registered = FALSE;
+    connection->write_valid = FALSE;
     connection->open_connection = NULL;
     connection->close_connection = NULL;
     connection->write_connection = NULL;
     connection->register_write = NULL;
     connection->unregister_write = NULL;
+    connection->invalidate_write = NULL;
     connection->alloc_data = alloc_connection;
     connection->on_read = NULL;
     connection->on_write = NULL;
@@ -1528,6 +1532,7 @@ ERROR_CODE close_connection(struct connection_t *connection) {
     connection->close_connection = NULL;
     connection->register_write = NULL;
     connection->unregister_write = NULL;
+    connection->invalidate_write = NULL;
 
 #ifdef VIRIATUM_SSL
     /* in case there is a valid ssl connection set must release
@@ -1578,6 +1583,11 @@ ERROR_CODE unregister_write_connection(struct connection_t *connection) {
     connection->write_registered = FALSE;
 
     /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE invalidate_write_connection(struct connection_t *connection) {
+    connection->write_valid = FALSE;
     RAISE_NO_ERROR;
 }
 
