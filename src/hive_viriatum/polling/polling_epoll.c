@@ -388,7 +388,10 @@ ERROR_CODE _call_polling_epoll(struct polling_epoll_t *polling_epoll, struct con
     }
 
     /* prints a debug message */
-    V_DEBUG_F("Processing %lu write connections\n", (long unsigned int) write_connections_size);
+    V_DEBUG_F(
+		"Processing %lu write connections\n",
+		(long unsigned int) write_connections_size
+	);
 
     /* iterates over all of the connection that are currently registerd
     for the write operation to correctly call their callbacks */
