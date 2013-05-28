@@ -176,14 +176,14 @@ typedef struct http_connection_t {
     /**
      * Parser to be used during the interpretation
      * of the http requests. The state of this parser
-	 * is variable and should not be trusted.
+     * is variable and should not be trusted.
      */
     struct http_parser_t *http_parser;
 
     /**
      * The handler currently being used to handle
      * the connection, may change over the connection
-	 * life-time and should not be trusted as static.
+     * life-time and should not be trusted as static.
      * This handles may be from an external resource.
      * Security issues apply.
      * This is an internal value and must be used
