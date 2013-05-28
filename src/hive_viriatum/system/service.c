@@ -1359,7 +1359,7 @@ ERROR_CODE create_connection(struct connection_t **connection_pointer, SOCKET_HA
     connection->protocol = UNDEFINED_PROTOCOL;
     connection->socket_handle = socket_handle;
     connection->service = NULL;
-    connection->write_registered = 0;
+    connection->write_registered = FALSE;
     connection->open_connection = NULL;
     connection->close_connection = NULL;
     connection->write_connection = NULL;
@@ -1550,11 +1550,10 @@ ERROR_CODE register_write_connection(struct connection_t *connection) {
     /* retrieves the polling (provider) */
     struct polling_t *polling = service->polling;
 
-    /* registers the connection for write */
+    /* registers the connection for write in the current
+	polling mechanism and then sets the flag */
     polling->register_write(polling, connection);
-
-    /* sets the connection as write registered */
-    connection->write_registered = 1;
+    connection->write_registered = TRUE;
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -1567,11 +1566,10 @@ ERROR_CODE unregister_write_connection(struct connection_t *connection) {
     /* retrieves the polling (provider) */
     struct polling_t *polling = service->polling;
 
-    /* unregisters the connection for write */
+    /* unregisters the connection for write in the current
+	polling mechanism and then unsets the flag */
     polling->unregister_write(polling, connection);
-
-    /* sets the connection as not write registered */
-    connection->write_registered = 0;
+    connection->write_registered = FALSE;
 
     /* raises no error */
     RAISE_NO_ERROR;
