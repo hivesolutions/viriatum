@@ -1454,6 +1454,14 @@ ERROR_CODE write_connection_c(struct connection_t *connection, unsigned char *da
     append_value_linked_list(connection->write_queue, (void *) _data);
     connection->register_write(connection);
 
+    /* prints a debug message about the data that is going
+    to be sent through the socket */
+    V_DEBUG_F(
+        "Queued %ld bytes to be sent through socket: %d\n",
+        (long int) size,
+        connection->socket_handle
+    );
+
     /* raises no error */
     RAISE_NO_ERROR;
 }
