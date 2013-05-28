@@ -168,7 +168,7 @@ ERROR_CODE register_write_polling_epoll(struct polling_t *polling, struct connec
     /* retrieves the polling epoll structure as the lower
     structure from the provided polling object */
     struct polling_epoll_t *polling_epoll =\
-        (struct polling_select_t *) polling->lower;
+        (struct polling_epoll_t *) polling->lower;
 
     /* in case the connection is write registered must
     return immediately to aovid double outstanding for connection */
@@ -186,7 +186,7 @@ ERROR_CODE register_write_polling_epoll(struct polling_t *polling, struct connec
 
     /* sets the connection for the current outstanding position and
     then increments the size of the outstanding connection pending */
-    polling_epoll->write_outstanding[polling_select->write_outstanding_size] = connection;
+    polling_epoll->write_outstanding[polling_epoll->write_outstanding_size] = connection;
     polling_epoll->write_outstanding_size++;
 
     /* raises no error */
@@ -207,7 +207,7 @@ ERROR_CODE poll_polling_epoll(struct polling_t *polling) {
     /* triggers the processing of the outstanding connection
     operations (pending operations) that meant to be done before
     the main poll operation blocks the control flow */
-    _outstanding_polling_select(
+    _outstanding_polling_epoll(
         polling_epoll,
         polling_epoll->write_outstanding,
         polling_epoll->write_outstanding_size
@@ -524,7 +524,7 @@ ERROR_CODE _call_polling_epoll(
     }
 
     /* iterates over the set of connections that are meant to
-    be removed from the select list as they are no longer available */
+    be removed from the epoll list as they are no longer available */
     for(index = 0; index < remove_connections_size; index++) {
         /* retrieves the current connection for the iteration
         and then deletes the current connection (house keeping) */
@@ -537,7 +537,7 @@ ERROR_CODE _call_polling_epoll(
 }
 
 ERROR_CODE _outstanding_polling_epoll(
-    struct polling_select_t *polling_select,
+    struct polling_epoll_t *polling_epoll,
     struct connection_t **write_outstanding,
     size_t write_outstanding_size
 ) {
