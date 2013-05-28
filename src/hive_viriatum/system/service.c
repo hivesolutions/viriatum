@@ -1401,11 +1401,9 @@ ERROR_CODE delete_connection(struct connection_t *connection) {
         /* pops a value (data) from the linked list (write queue) */
         pop_value_linked_list(connection->write_queue, (void **) &data, TRUE);
 
-        /* in case the data is invalid (list is empty) */
-        if(data == NULL) {
-            /* breaks the loop */
-            break;
-        }
+        /* in case the data is invalid (list is empty) must
+		break the current loop, this is the end of iteration */
+        if(data == NULL) { break; }
 
         /* prints a debug message */
         V_DEBUG("Deleting data (cleanup structures)\n");
