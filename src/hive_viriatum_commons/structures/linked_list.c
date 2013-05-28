@@ -220,34 +220,34 @@ void remove_linked_list(struct linked_list_t *linked_list, struct linked_list_no
     next_node = linked_list_node->next;
 
     /* in case the previous node is valid sets the
-	next node in the previous node */
+    next node in the previous node */
     if(previous_node != NULL) { previous_node->next = next_node; }
 
     /* in case the next node is valid updates the
-	previous node in the next node to previous node */
+    previous node in the next node to previous node */
     if(next_node != NULL) { next_node->previous = previous_node; }
 
     /* in case the element to be removed is the last
-	(no next node defined) must update the last node
-	reference in the linked list */
-	if(next_node == NULL) { linked_list->last = previous_node; }
-    
+    (no next node defined) must update the last node
+    reference in the linked list */
+    if(next_node == NULL) { linked_list->last = previous_node; }
+
     /* in case the element to be removed is the last minus one
-	must update the last node in the linked list to the next node */
+    must update the last node in the linked list to the next node */
     else if(next_node != NULL && next_node->next == NULL) {
         linked_list->last = next_node;
     }
 
     /* in case the element to be removed is the first (no previous
-	node is defined) must set the next node as the first node */
+    node is defined) must set the next node as the first node */
     if(previous_node == NULL) { linked_list->first = next_node; }
 
     /* decrements the linked list size, because the linked list
-	has shrinked in size by one */
+    has shrinked in size by one */
     linked_list->size--;
 
     /* in case the delete node flag is set, must remote the
-	memory allocated for the linked list node */
+    memory allocated for the linked list node */
     if(delete_node) { delete_linked_list_node(linked_list_node); }
 }
 
@@ -280,7 +280,7 @@ void remove_value_linked_list(struct linked_list_t *linked_list, void *value, ch
     }
 
     /* in case no node is found for the value, must return
-	immediately no need to remove it */
+    immediately no need to remove it */
     if(target_node == NULL) { return; }
 
     /* removes the target node from the linked list */
