@@ -175,7 +175,8 @@ typedef struct http_connection_t {
 
     /**
      * Parser to be used during the interpretation
-     * of the http requests.
+     * of the http requests. The state of this parse
+	 * is variable and should not be trusted.
      */
     struct http_parser_t *http_parser;
 
