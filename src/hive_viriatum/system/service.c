@@ -1397,7 +1397,8 @@ ERROR_CODE create_connection(struct connection_t **connection_pointer, SOCKET_HA
 }
 
 ERROR_CODE delete_connection(struct connection_t *connection) {
-    /* allocates the data */
+    /* allocates the temporary data pointe that will be used
+	in the iteration for the releasing of the pending data */
     struct data_t *data;
 
     /* iterates continuously to release all the pending
@@ -1425,6 +1426,11 @@ ERROR_CODE delete_connection(struct connection_t *connection) {
     avoid any more memory leak for these buffered lists */
     delete_linked_list(connection->read_queue);
     delete_linked_list(connection->write_queue);
+
+	/* invalidates the addresses for both the read and the write
+	queue this simplifies the structure of the connection */
+	connection->read_queue = NULL;
+	connection->write_queue = NULL;
 
     /* releases the connection */
     FREE(connection);
