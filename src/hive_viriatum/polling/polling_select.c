@@ -502,10 +502,10 @@ ERROR_CODE _call_polling_select(struct polling_select_t *polling_select, struct 
     }
 
     /* iterates over the set of connections that are meant to
-	be removed from the select list as they are no longer available */
+    be removed from the select list as they are no longer available */
     for(index = 0; index < remove_connections_size; index++) {
         /* retrieves the current connection for the iteration
-		and then deletes the current connection (house keeping) */
+        and then deletes the current connection (house keeping) */
         current_connection = remove_connections[index];
         delete_connection(current_connection);
     }
