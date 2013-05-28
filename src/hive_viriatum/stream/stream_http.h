@@ -186,7 +186,7 @@ typedef struct http_connection_t {
      * This handles may be from an external resource.
      * Security issues apply.
      * This is an internal value and must be used
-     * with care.
+     * with care or else unexpected behavior may occur.
      */
     struct http_handler_t *http_handler;
 
