@@ -33,6 +33,8 @@
 
 struct io_connection_t;
 
+typedef ERROR_CODE (*io_connection_callback) (struct io_connection_t *);
+
 /**
  * Structure describing the internal parameters
  * for a location in the proxy context.
@@ -80,6 +82,14 @@ typedef struct proxy_handler_t {
      * connection to the viriatum server.
      */
     struct hash_map_t *connections_map;
+
+	/**
+	 * Map structure that associates the client connection with
+	 * the on close handler that was previously set in the connection
+	 * before the re-mapping. This is used so that the close handler
+	 * is able to call the old on close handler.
+	 */
+    struct hash_map_t *on_close_map;
 } proxy_handler;
 
 /**
