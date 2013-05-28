@@ -1472,11 +1472,9 @@ ERROR_CODE write_connection_c(struct connection_t *connection, unsigned char *da
 }
 
 ERROR_CODE open_connection(struct connection_t *connection) {
-    /* in case the connection is (already) open */
-    if(connection->status == STATUS_OPEN) {
-        /* raises no error */
-        RAISE_NO_ERROR;
-    }
+    /* in case the connection is (already) open, must return
+	immediately with no error (duplicated operation) */
+    if(connection->status == STATUS_OPEN) { RAISE_NO_ERROR; }
 
     /* prints a debug message */
     V_DEBUG_F("Opening connection: %d\n", connection->socket_handle);
@@ -1504,11 +1502,9 @@ ERROR_CODE open_connection(struct connection_t *connection) {
 }
 
 ERROR_CODE close_connection(struct connection_t *connection) {
-    /* in case the connection is (already) closed */
-    if(connection->status == STATUS_CLOSED) {
-        /* raises no error */
-        RAISE_NO_ERROR;
-    }
+    /* in case the connection is (already) closed, must return
+	immediately with no error (duplicated operation) */
+    if(connection->status == STATUS_CLOSED) { RAISE_NO_ERROR; }
 
     /* prints a debug message */
     V_DEBUG_F("Closing connection: %d\n", connection->socket_handle);
