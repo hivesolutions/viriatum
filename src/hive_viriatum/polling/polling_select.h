@@ -200,31 +200,32 @@ ERROR_CODE _unregister_sockets_set_polling_select(struct polling_select_t *polli
  * of the remove connections array.
  * @param connection The connection to be removed (deleted).
  */
-static __inline void remove_connection(struct connection_t **remove_connections, unsigned int *remove_connections_size_pointer, struct connection_t *connection) {
-    /* allocates the index */
+static __inline void remove_connection(
+    struct connection_t **remove_connections,
+	unsigned int *remove_connections_size_pointer,
+	struct connection_t *connection
+) {
+    /* allocates the index counter for the interation and
+	the space for the temporary connection pointer */
     unsigned int index;
-
-    /* allocates the current connection */
     struct connection_t *current_connection;
 
     /* retrieves the remove connections size */
     unsigned int remove_connections_size = *remove_connections_size_pointer;
 
-    /* iterates over the remove connections */
+    /* iterates over all the connections to be removed in order
+	to find out if there's a duplicated value */
     for(index = 0; index < remove_connections_size; index++) {
-        /* retrieves the current connection */
-        current_connection = remove_connections[index];
-
-        /* in case the current connection already exists */
-        if(current_connection == connection) {
-            /* returns immediately */
-            return;
-        }
+        /* retrieves the current connection and in case the
+		current connection already exists in the list of
+		connections to be removed must return immediately
+		in to avoid duplicated values (possible problems) */
+		current_connection = remove_connections[index];
+        if(current_connection == connection) { return; }
     }
 
-    /* adds the connection to the remove connections */
+    /* adds the connection to the remove connections and
+	then increments the remove connections size */
     remove_connections[remove_connections_size] = connection;
-
-    /* increments the remove connections size */
     (*remove_connections_size_pointer)++;
 }
