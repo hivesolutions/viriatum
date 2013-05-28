@@ -575,7 +575,7 @@ ERROR_CODE virtual_url_callback_handler_proxy(struct http_parser_t *http_parser,
             proxy_handler->on_close_map,
             (size_t) connection,
             NULL,
-            on_close
+            (void *) on_close
         );
     }
     /* otherwise there's a valid connection to the backend connection and
