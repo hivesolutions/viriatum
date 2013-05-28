@@ -67,6 +67,14 @@ typedef struct polling_epoll_t {
     struct connection_t *write_connections[VIRIATUM_MAX_EVENTS];
 
     /**
+     * The buffer that contains the various
+     * connections that have data pending to
+     * be writen to the socket at the begining
+     * of the next poll operation.
+     */
+    struct connection_t *write_outstanding[VIRIATUM_MAX_EVENTS];
+
+    /**
      * The buffer that holds the connections
      * that are in an erroneous state
      */
@@ -78,6 +86,13 @@ typedef struct polling_epoll_t {
      * of the polling cycle.
      */
     struct connection_t *remove_connections[VIRIATUM_MAX_EVENTS];
+
+    /**
+     * The size as items of the sequence of
+     * connection that are pending to be writen
+     * at he beginning of the poll operation.
+     */
+    size_t write_outstanding_size;
 
     /**
      * The size of the read connections
@@ -114,7 +129,29 @@ ERROR_CODE register_write_polling_epoll(struct polling_t *polling, struct connec
 ERROR_CODE unregister_write_polling_epoll(struct polling_t *polling, struct connection_t *connection);
 ERROR_CODE poll_polling_epoll(struct polling_t *polling);
 ERROR_CODE call_polling_epoll(struct polling_t *polling);
-ERROR_CODE _poll_polling_epoll(struct polling_epoll_t *polling_epoll, struct connection_t **read_connections, struct connection_t **write_connections, struct connection_t **error_connections, size_t *read_connections_size, size_t *write_connections_size, size_t *error_connections_size);
-ERROR_CODE _call_polling_epoll(struct polling_epoll_t *polling_epoll, struct connection_t **read_connections, struct connection_t **write_connections, struct connection_t **error_connections, struct connection_t **remove_connections, size_t read_connections_size, size_t write_connections_size, size_t error_connections_size);
+ERROR_CODE _poll_polling_epoll(
+    struct polling_epoll_t *polling_epoll,
+    struct connection_t **read_connections,
+    struct connection_t **write_connections,
+    struct connection_t **error_connections,
+    size_t *read_connections_size,
+    size_t *write_connections_size,
+    size_t *error_connections_size
+);
+ERROR_CODE _call_polling_epoll(
+    struct polling_epoll_t *polling_epoll,
+    struct connection_t **read_connections,
+    struct connection_t **write_connections,
+    struct connection_t **error_connections,
+    struct connection_t **remove_connections,
+    size_t read_connections_size,
+    size_t write_connections_size,
+    size_t error_connections_size
+);
+ERROR_CODE _outstanding_polling_epoll(
+    struct polling_select_t *polling_select,
+    struct connection_t **write_outstanding,
+    size_t write_outstanding_size
+);
 
 #endif

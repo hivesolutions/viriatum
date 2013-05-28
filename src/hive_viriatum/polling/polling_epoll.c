@@ -41,6 +41,7 @@ void create_polling_epoll(struct polling_epoll_t **polling_epoll_pointer, struct
     /* initializes the polling epoll structure default values
     so that the default setting is used by default */
     polling_epoll->poll_count = 0;
+    polling_epoll->write_outstanding_size = 0;
 
     /* resets the polling in the polling epoll */
     polling_epoll->polling = polling;
@@ -164,6 +165,15 @@ ERROR_CODE unregister_connection_polling_epoll(struct polling_t *polling, struct
 }
 
 ERROR_CODE register_write_polling_epoll(struct polling_t *polling, struct connection_t *connection) {
+    /* retrieves the polling epoll structure as the lower
+    structure from the provided polling object */
+    struct polling_epoll_t *polling_epoll =\
+        (struct polling_select_t *) polling->lower;
+
+    /* in case the connection is write registered must
+    return immediately to aovid double outstanding for connection */
+    if(connection->write_registered == 1) { RAISE_NO_ERROR; }
+
     /* in casde the current state for the connection is not write
     valid must return immediately with no error */
     if(connection->write_valid == FALSE) { RAISE_NO_ERROR; }
@@ -174,11 +184,10 @@ ERROR_CODE register_write_polling_epoll(struct polling_t *polling, struct connec
         RAISE_NO_ERROR;
     }
 
-    /* prints a series of debug messages and then calls the
-    correct on write handler for the notification */
-    V_DEBUG("Calling immediate on write handler \n");
-    CALL_V(connection->on_write, connection);
-    V_DEBUG("Finished calling immediate on write handler\n");
+    /* sets the connection for the current outstanding position and
+    then increments the size of the outstanding connection pending */
+    polling_epoll->write_outstanding[polling_select->write_outstanding_size] = connection;
+    polling_epoll->write_outstanding_size++;
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -192,7 +201,18 @@ ERROR_CODE unregister_write_polling_epoll(struct polling_t *polling, struct conn
 ERROR_CODE poll_polling_epoll(struct polling_t *polling) {
     /* retrieves the polling epoll structure from the upper
     polling control structure */
-    struct polling_epoll_t *polling_epoll = (struct polling_epoll_t *) polling->lower;
+    struct polling_epoll_t *polling_epoll =\
+        (struct polling_epoll_t *) polling->lower;
+
+    /* triggers the processing of the outstanding connection
+    operations (pending operations) that meant to be done before
+    the main poll operation blocks the control flow */
+    _outstanding_polling_select(
+        polling_epoll,
+        polling_epoll->write_outstanding,
+        polling_epoll->write_outstanding_size
+    );
+    polling_epoll->write_outstanding_size = 0;
 
     /* polls the polling epoll */
     _poll_polling_epoll(
@@ -212,7 +232,8 @@ ERROR_CODE poll_polling_epoll(struct polling_t *polling) {
 ERROR_CODE call_polling_epoll(struct polling_t *polling) {
     /* retrieves the polling epoll structure from the upper
     polling control structure */
-    struct polling_epoll_t *polling_epoll = (struct polling_epoll_t *) polling->lower;
+    struct polling_epoll_t *polling_epoll =\
+        (struct polling_epoll_t *) polling->lower;
 
     /* calls the polling epoll */
     _call_polling_epoll(
@@ -230,7 +251,15 @@ ERROR_CODE call_polling_epoll(struct polling_t *polling) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _poll_polling_epoll(struct polling_epoll_t *polling_epoll, struct connection_t **read_connections, struct connection_t **write_connections, struct connection_t **error_connections, size_t *read_connections_size, size_t *write_connections_size, size_t *error_connections_size) {
+ERROR_CODE _poll_polling_epoll(
+    struct polling_epoll_t *polling_epoll,
+    struct connection_t **read_connections,
+    struct connection_t **write_connections,
+    struct connection_t **error_connections,
+    size_t *read_connections_size,
+    size_t *write_connections_size,
+    size_t *error_connections_size
+) {
     /* allocates space for the buffer to hold the various
     events generated from the wait call and for the event
     pointer for the iteration cycle */
@@ -298,7 +327,8 @@ ERROR_CODE _poll_polling_epoll(struct polling_epoll_t *polling_epoll, struct con
         *write_connections_size = 0;
         *error_connections_size = 0;
 
-        /* closes the service socket */
+        /* closes the service socket, this will disable any
+        more interaction with the service socket */
         SOCKET_CLOSE(service->service_socket_handle);
 
         /* raises an error */
@@ -355,9 +385,19 @@ ERROR_CODE _poll_polling_epoll(struct polling_epoll_t *polling_epoll, struct con
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _call_polling_epoll(struct polling_epoll_t *polling_epoll, struct connection_t **read_connections, struct connection_t **write_connections, struct connection_t **error_connections, struct connection_t **remove_connections, size_t read_connections_size, size_t write_connections_size, size_t error_connections_size) {
-    /* allocates the index */
-    unsigned int index;
+ERROR_CODE _call_polling_epoll(
+    struct polling_epoll_t *polling_epoll,
+    struct connection_t **read_connections,
+    struct connection_t **write_connections,
+    struct connection_t **error_connections,
+    struct connection_t **remove_connections,
+    size_t read_connections_size,
+    size_t write_connections_size,
+    size_t error_connections_size
+) {
+    /* allocates the index, to be used during the iterations
+    over the various connection bundles */
+    size_t index;
 
     /* allocates the current connection */
     struct connection_t *current_connection;
@@ -373,7 +413,7 @@ ERROR_CODE _call_polling_epoll(struct polling_epoll_t *polling_epoll, struct con
     or event the close operation (no data received) */
     for(index = 0; index < read_connections_size; index++) {
         /* retrieves the current connection and then prints
-        a debu message with the socket handle of the connection */
+        a debug message with the socket handle of the connection */
         current_connection = read_connections[index];
         V_DEBUG_F("Processing read connection: %d\n", current_connection->socket_handle);
 
@@ -421,7 +461,7 @@ ERROR_CODE _call_polling_epoll(struct polling_epoll_t *polling_epoll, struct con
     for the write operation to correctly call their callbacks */
     for(index = 0; index < write_connections_size; index++) {
         /* retrieves the current connection and then prints
-        a debu message with the socket handle of the connection */
+        a debug message with the socket handle of the connection */
         current_connection = write_connections[index];
         V_DEBUG_F("Processing write connection: %d\n", current_connection->socket_handle);
 
@@ -458,7 +498,7 @@ ERROR_CODE _call_polling_epoll(struct polling_epoll_t *polling_epoll, struct con
     error state to escape from that state (via notification) */
     for(index = 0; index < error_connections_size; index++) {
         /* retrieves the current connection and then prints
-        a debu message with the socket handle of the connection */
+        a debug message with the socket handle of the connection */
         current_connection = error_connections[index];
         V_DEBUG_F("Processing error connection: %d\n", current_connection->socket_handle);
 
@@ -493,6 +533,45 @@ ERROR_CODE _call_polling_epoll(struct polling_epoll_t *polling_epoll, struct con
     }
 
     /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE _outstanding_polling_epoll(
+    struct polling_select_t *polling_select,
+    struct connection_t **write_outstanding,
+    size_t write_outstanding_size
+) {
+    /* allocates the index, to be used during the iterations
+    over the various connection bundles */
+    size_t index;
+
+    /* allocates the current connection, the temporary variable
+    that will hold the unpacked connection on iteration */
+    struct connection_t *current_connection;
+
+    /* iterates over all the connections that have outstanding
+    write operations to be performed and triggers the on write
+    event for each of them, starting the write operations */
+    for(index = 0; index < write_outstanding_size; index++) {
+        /* retrieves the current connection and then prints
+        a debug message with the socket handle of the connection */
+        current_connection = write_outstanding[index];
+        V_DEBUG_F("Processing write connection: %d\n", current_connection->socket_handle);
+
+        /* in case the current connection is open and the on write
+        event handler is set performs the write call */
+        if(current_connection->status == STATUS_OPEN &&\
+            current_connection->on_write != NULL) {
+            /* prints a series of debug messages and then calls the
+            correct on write handler for the notification */
+            V_DEBUG("Calling on write handler\n");
+            CALL_V(current_connection->on_write, current_connection);
+            V_DEBUG("Finished calling on write handler\n");
+        }
+    }
+
+    /* raises no error as the process of the outstanding
+    connection operations has been successfull */
     RAISE_NO_ERROR;
 }
 
