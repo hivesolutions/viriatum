@@ -51,13 +51,23 @@ ERROR_CODE _create_client_connection(struct connection_t **connection_pointer, s
     /* creates the scoket handle structure object for the default attributes
     (iternet type) and no encrypted connection */
     socket_handle = SOCKET_CREATE(SOCKET_INTERNET_TYPE, SOCKET_PACKET_TYPE, SOCKET_PROTOCOL_TCP);
-    if(SOCKET_TEST_ERROR(socket_handle)) { fprintf(stderr, "ERROR opening socket"); }
+    if(SOCKET_TEST_ERROR(socket_handle)) {
+        RAISE_ERROR_M(
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Problem opening socket"
+        );
+    }
 
     /* tries to retrieve the server host value from the provided
     hostname string value in case the "resolution" fails raises
     an error indicating the problem */
     server = SOCKET_GET_HOST_BY_NAME(hostname);
-    if(server == NULL) { fprintf(stderr, "ERROR, no such host\n"); }
+    if(server == NULL) {
+        RAISE_ERROR_M(
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "No such host"
+        );
+    }
 
     /* resets the server address structure, nullifies the values
     and then sets the "just" resolved address in it */
@@ -66,10 +76,15 @@ ERROR_CODE _create_client_connection(struct connection_t **connection_pointer, s
     memcpy(&serv_addr.sin_addr.s_addr, server->h_addr, server->h_length);
     serv_addr.sin_port = htons(port);
 
-    /* tries to connect to the remote host an in case there's
+    /* tries to connect to the remote host and in case there's
     a problem in the connection attempt, raises an error */
     error = SOCKET_CONNECT_SIZE(socket_handle, serv_addr, sizeof(SOCKET_ADDRESS_INTERNET));
-    if(SOCKET_TEST_ERROR(error)) { fprintf(stderr, "ERROR connecting host\n"); }
+    if(SOCKET_TEST_ERROR(error)) {
+        RAISE_ERROR_M(
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Problem connecting to host"
+        );
+    }
 
     /* in case viriatum is set to non blocking, changes the current
     socket behavior to non blocking mode then sets the socket to the
