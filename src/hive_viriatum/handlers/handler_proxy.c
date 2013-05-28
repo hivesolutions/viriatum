@@ -265,8 +265,6 @@ ERROR_CODE close_proxy_connection(struct io_connection_t *io_connection) {
 
     struct connection_t *connection = io_connection->connection;
     struct service_t *service = connection->service;
-    struct http_connection_t *http_connection =\
-        (struct http_connection_t *) io_connection->lower;
 
     get_value_string_hash_map(
         service->http_handlers_map,
