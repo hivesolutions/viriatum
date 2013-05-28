@@ -219,43 +219,36 @@ void remove_linked_list(struct linked_list_t *linked_list, struct linked_list_no
     previous_node = linked_list_node->previous;
     next_node = linked_list_node->next;
 
-    /* in case the previous node is valid */
-    if(previous_node != NULL) {
-        /* sets the next as the next node */
-        previous_node->next = next_node;
-    }
+    /* in case the previous node is valid sets the
+	next node in the previous node */
+    if(previous_node != NULL) { previous_node->next = next_node; }
 
-    /* in case the next node is valid */
-    if(next_node != NULL) {
-        /* sets the previous as the previous node */
-        next_node->previous = previous_node;
-    }
+    /* in case the next node is valid updates the
+	previous node in the next node to previous node */
+    if(next_node != NULL) { next_node->previous = previous_node; }
 
-    /* in case the element to be removed is the last */
-    if(next_node == NULL) {
-        /* sets the last node as the previous node */
-        linked_list->last = previous_node;
-    }
-    /* in case the element to be removed is the last minus one */
+    /* in case the element to be removed is the last
+	(no next node defined) must update the last node
+	reference in the linked list */
+	if(next_node == NULL) { linked_list->last = previous_node; }
+    
+    /* in case the element to be removed is the last minus one
+	must update the last node in the linked list to the next node */
     else if(next_node != NULL && next_node->next == NULL) {
-        /* sets the last node as the next node */
         linked_list->last = next_node;
     }
 
-    /* in case the element to be removed is the first */
-    if(previous_node == NULL) {
-        /* sets the last node as the previous node */
-        linked_list->first = next_node;
-    }
+    /* in case the element to be removed is the first (no previous
+	node is defined) must set the next node as the first node */
+    if(previous_node == NULL) { linked_list->first = next_node; }
 
-    /* decrements the linked list size */
+    /* decrements the linked list size, because the linked list
+	has shrinked in size by one */
     linked_list->size--;
 
-    /* in case the delete node flag is set */
-    if(delete_node) {
-        /* deletes the linked list node */
-        delete_linked_list_node(linked_list_node);
-    }
+    /* in case the delete node flag is set, must remote the
+	memory allocated for the linked list node */
+    if(delete_node) { delete_linked_list_node(linked_list_node); }
 }
 
 void remove_value_linked_list(struct linked_list_t *linked_list, void *value, char delete_node) {
@@ -286,11 +279,9 @@ void remove_value_linked_list(struct linked_list_t *linked_list, void *value, ch
         current_node = current_node->next;
     }
 
-    /* in case no node is found for the value */
-    if(target_node == NULL) {
-        /* returns immediately */
-        return;
-    }
+    /* in case no node is found for the value, must return
+	immediately no need to remove it */
+    if(target_node == NULL) { return; }
 
     /* removes the target node from the linked list */
     remove_linked_list(linked_list, target_node, delete_node);
