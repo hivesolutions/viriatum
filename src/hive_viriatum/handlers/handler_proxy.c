@@ -289,7 +289,10 @@ ERROR_CODE close_proxy_connection(struct io_connection_t *io_connection) {
         (void **) &on_close
     );
 
-    if(on_close != NULL) { on_close(io_connection); }
+    if(on_close != NULL) {
+		io_connection->on_close = on_close;
+		on_close(io_connection);
+	}
     if(connection_c != NULL) {
         close_connection(connection_c);
         delete_connection(connection_c);
@@ -374,6 +377,8 @@ ERROR_CODE body_callback_handler_proxy(struct http_parser_t *http_parser, const 
 }
 
 ERROR_CODE message_complete_callback_handler_proxy(struct http_parser_t *http_parser) {
+    char *buffer;
+
     struct handler_proxy_context_t *handler_proxy_context =\
         (struct handler_proxy_context_t *) http_parser->context;
     struct connection_t *connection =\
@@ -387,14 +392,32 @@ ERROR_CODE message_complete_callback_handler_proxy(struct http_parser_t *http_pa
     the connection, removing any issue arround paralel message handling */
     http_connection->acquire(http_connection);
 
-    write_connection_c(
-        handler_proxy_context->connection_c,
-        (unsigned char *) handler_proxy_context->buffer,
-        handler_proxy_context->buffer_size,
-        NULL,
-        NULL,
-        FALSE
-    );
+    /* checks if the client connection with the backend server is available
+    in case it's not there must have been an error and it must be sent to the
+    proxy client connection (service conneciont) */
+    if(handler_proxy_context->connection_c == NULL) {
+        buffer = MALLOC(VIRIATUM_HTTP_SIZE);
+        write_http_error(
+            connection,
+            buffer,
+            VIRIATUM_HTTP_SIZE,
+            HTTP11,
+            502,
+            "Bad gateway",
+            "Invalid proxy connection",
+            _cleanup_handler_proxy,
+            (void *) (size_t) http_parser->flags
+        );
+    } else {
+        write_connection_c(
+            handler_proxy_context->connection_c,
+            (unsigned char *) handler_proxy_context->buffer,
+            handler_proxy_context->buffer_size,
+            NULL,
+            NULL,
+            FALSE
+        );
+    }
 
     RAISE_NO_ERROR;
 }
@@ -426,6 +449,8 @@ ERROR_CODE location_callback_handler_proxy(struct http_parser_t *http_parser, si
 }
 
 ERROR_CODE virtual_url_callback_handler_proxy(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+    ERROR_CODE return_value;
+
     struct custom_parameters_t *parameters;
     struct connection_t *connection_c;
 
@@ -493,22 +518,27 @@ ERROR_CODE virtual_url_callback_handler_proxy(struct http_parser_t *http_parser,
     /* in case the connection client reference structure for the current
     context is not defined a new connection must be created */
     if(handler_proxy_context->connection_c == NULL) {
-        /* saves the currently set on close handler for the io connection
-        in the temporary local variable and then updates the reference to
-        the close handler with the callback function that closes the proxy */
-        on_close = io_connection->on_close;
-        io_connection->on_close = close_proxy_connection;
-
         /* creates a general http client connection structure containing
         all the general attributes for a connection, then sets the
         "local" connection reference from the pointer */
-        _create_client_connection(
+        return_value = _create_client_connection(
             &handler_proxy_context->connection_c,
             connection->service,
             handler_proxy_context->url_s.host,
             handler_proxy_context->url_s.port ?\
                 handler_proxy_context->url_s.port : 80
         );
+        if(IS_ERROR_CODE(return_value)) {
+            V_ERROR_F("Problem connecting to backend (%s)\n", (char *) GET_ERROR());
+			FREE(parameters);
+            RAISE_NO_ERROR;
+        }
+
+        /* saves the currently set on close handler for the io connection
+        in the temporary local variable and then updates the reference to
+        the close handler with the callback function that closes the proxy */
+        on_close = io_connection->on_close;
+        io_connection->on_close = close_proxy_connection;
 
         /* retrieves the reference for the connection object that will be used
         for the connection with the final back-end client */
@@ -534,14 +564,12 @@ ERROR_CODE virtual_url_callback_handler_proxy(struct http_parser_t *http_parser,
             handler_proxy_context->connection_c
         );
 
-
         set_value_hash_map(
             proxy_handler->reverse_map,
             (size_t) handler_proxy_context->connection_c,
             NULL,
             connection
         );
-
 
         set_value_hash_map(
             proxy_handler->on_close_map,
