@@ -33,8 +33,6 @@
 
 struct io_connection_t;
 
-typedef ERROR_CODE (*io_connection_callback) (struct io_connection_t *);
-
 /**
  * Structure describing the internal parameters
  * for a location in the proxy context.
