@@ -140,7 +140,12 @@ ERROR_CODE unregister_connection_polling_epoll(struct polling_t *polling, struct
 
     /* removes the associated socket handle (fd) from the epoll
     structure to avoid any leak */
-    result_code = epoll_ctl(polling_epoll->epoll_fd, EPOLL_CTL_DEL, connection->socket_handle, NULL);
+    result_code = epoll_ctl(
+        polling_epoll->epoll_fd,
+        EPOLL_CTL_DEL,
+        connection->socket_handle,
+        NULL
+    );
 
     /* in case there was an error in epoll need to correctly
     handle it and propagate it to the caller */
@@ -389,9 +394,9 @@ ERROR_CODE _call_polling_epoll(struct polling_epoll_t *polling_epoll, struct con
 
     /* prints a debug message */
     V_DEBUG_F(
-		"Processing %lu write connections\n",
-		(long unsigned int) write_connections_size
-	);
+        "Processing %lu write connections\n",
+        (long unsigned int) write_connections_size
+    );
 
     /* iterates over all of the connection that are currently registerd
     for the write operation to correctly call their callbacks */
