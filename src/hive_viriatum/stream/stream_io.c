@@ -130,6 +130,7 @@ ERROR_CODE accept_handler_stream_io(struct connection_t *connection) {
             client_connection->write_connection = write_connection;
             client_connection->register_write = register_write_connection;
             client_connection->unregister_write = unregister_write_connection;
+			client_connection->invalidate_write = invalidate_write_connection;
 
             /* sets the various stream io connection callbacks
             in the client connection */
