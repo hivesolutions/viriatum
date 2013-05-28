@@ -270,7 +270,7 @@ ERROR_CODE close_proxy_connection(struct io_connection_t *io_connection) {
 
     get_value_string_hash_map(
         service->http_handlers_map,
-        "proxy",
+        (unsigned char *) "proxy",
         (void **) &http_handler
     );
     proxy_handler = (struct proxy_handler_t *) http_handler->lower;
@@ -664,7 +664,7 @@ ERROR_CODE close_backend_handler(struct io_connection_t *io_connection) {
     associated connection related information */
     get_value_string_hash_map(
         service->http_handlers_map,
-        "proxy",
+        (unsigned char *) "proxy",
         (void **) &http_handler
     );
     proxy_handler = (struct proxy_handler_t *) http_handler->lower;
