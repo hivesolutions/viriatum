@@ -290,9 +290,9 @@ ERROR_CODE close_proxy_connection(struct io_connection_t *io_connection) {
     );
 
     if(on_close != NULL) {
-		io_connection->on_close = on_close;
-		on_close(io_connection);
-	}
+        io_connection->on_close = on_close;
+        on_close(io_connection);
+    }
     if(connection_c != NULL) {
         close_connection(connection_c);
         delete_connection(connection_c);
@@ -530,7 +530,7 @@ ERROR_CODE virtual_url_callback_handler_proxy(struct http_parser_t *http_parser,
         );
         if(IS_ERROR_CODE(return_value)) {
             V_ERROR_F("Problem connecting to backend (%s)\n", (char *) GET_ERROR());
-			FREE(parameters);
+            FREE(parameters);
             RAISE_NO_ERROR;
         }
 
