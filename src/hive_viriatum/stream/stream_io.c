@@ -401,11 +401,10 @@ ERROR_CODE write_handler_stream_io(struct connection_t *connection) {
         /* prints a debug message */
         V_DEBUG("Peeking value from write queue\n");
 
-        /* peeks a value (data) from the linked list (write queue) */
+        /* peeks a value (data) from the linked list (write queue) and
+        in case the data is invalid (list is empty) it considered the
+        end of iteration and must break the loop */
         peek_value_linked_list(connection->write_queue, (void **) &data);
-
-        /* in case the data is invalid (list is empty)
-        end of iteration must break the loop */
         if(data == NULL) { break; }
 
         /* prints a debug message about the data that is going
@@ -485,25 +484,24 @@ ERROR_CODE write_handler_stream_io(struct connection_t *connection) {
             break;
         }
 
-        /* pops a value (data) from the linked list (write queue) */
+        /* pops a value (data) from the linked list (write queue)
+        this way the item will not be re-used again */
         pop_value_linked_list(connection->write_queue, (void **) &data, TRUE);
 
         /* in case the data callback is set */
         if(data->callback != NULL) {
-            /* prints a debug message */
+            /* prints some debug information about the calling of the callback
+            associated with the data and then calls the callback associated */
             V_DEBUG("Calling write callback\n");
-
-            /* calls the callback with the callback parameters */
             data->callback(connection, data, data->callback_parameters);
-
-            /* prints a debug message */
             V_DEBUG("Finished calling write callback\n");
         }
 
         /* prints a debug message */
         V_DEBUG("Deleting data (cleanup structures)\n");
 
-        /* deletes the data */
+        /* deletes the data, this should remove the underlying
+        buffer in case the flag for such operation is set */
         delete_data(data);
 
         /* in case the connection has been closed */
@@ -523,7 +521,8 @@ ERROR_CODE write_handler_stream_io(struct connection_t *connection) {
     switch(error) {
         /* in case there's no error */
         case 0:
-            /* unregisters the connection for write */
+            /* unregisters the connection from write as the
+            connection write queue should be empty */
             connection->unregister_write(connection);
 
             /* breaks the switch */
@@ -531,7 +530,8 @@ ERROR_CODE write_handler_stream_io(struct connection_t *connection) {
 
         /* in case it's a fatal error */
         case 1:
-            /* closes the connection */
+            /* closes the connection because that's the proper
+            way to escape from a fatal error */
             connection->close_connection(connection);
 
             /* breaks the switch */
