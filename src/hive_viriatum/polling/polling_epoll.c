@@ -549,6 +549,12 @@ ERROR_CODE _outstanding_polling_epoll(
     that will hold the unpacked connection on iteration */
     struct connection_t *current_connection;
 
+    /* prints a debug message */
+    V_DEBUG_F(
+        "Processing %lu outstanding write connections\n",
+        (long unsigned int) write_outstanding_size
+    );
+
     /* iterates over all the connections that have outstanding
     write operations to be performed and triggers the on write
     event for each of them, starting the write operations */
@@ -556,7 +562,10 @@ ERROR_CODE _outstanding_polling_epoll(
         /* retrieves the current connection and then prints
         a debug message with the socket handle of the connection */
         current_connection = write_outstanding[index];
-        V_DEBUG_F("Processing write connection: %d\n", current_connection->socket_handle);
+        V_DEBUG_F(
+            "Processing outstanding write connection: %d\n",
+            current_connection->socket_handle
+        );
 
         /* in case the current connection is open and the on write
         event handler is set performs the write call */
