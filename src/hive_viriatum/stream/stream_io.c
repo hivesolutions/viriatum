@@ -363,13 +363,11 @@ ERROR_CODE read_handler_stream_io(struct connection_t *connection) {
             /* in case the on data handler is defined and there
             is data to be provided (buffer size available )*/
             if(buffer_size > 0 && io_connection->on_data != NULL) {
-                /* prints a debug message */
+                /* prints some debugging information about the data
+                callback function call and then performs the call on
+                the data callback for the current io connection */
                 V_DEBUG("Calling on data handler\n");
-
-                /* calls the on data handler */
                 io_connection->on_data(io_connection, buffer, buffer_size);
-
-                /* prints a debug message */
                 V_DEBUG("Finished calling on data handler\n");
             }
 
@@ -539,6 +537,12 @@ ERROR_CODE write_handler_stream_io(struct connection_t *connection) {
 
         /* in case it's a non fatal error */
         case 2:
+            /* invalidates the write operation for the current
+            connection meaning that a new "level up" event must
+            be performed before the connection is triggered for
+            the write operation (useful for epoll) */
+            connection->invalidate_write(connection);
+
             /* breaks the switch */
             break;
 
