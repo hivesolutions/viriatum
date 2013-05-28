@@ -1457,7 +1457,7 @@ ERROR_CODE write_connection_c(struct connection_t *connection, unsigned char *da
     /* prints a debug message about the data that is going
     to be sent through the socket */
     V_DEBUG_F(
-        "Queued %ld bytes to be sent through socket: %d\n",
+        "Queued %ld bytes to be sent using socket: %d\n",
         (long int) size,
         connection->socket_handle
     );
