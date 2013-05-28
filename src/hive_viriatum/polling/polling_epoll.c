@@ -344,114 +344,119 @@ ERROR_CODE _call_polling_epoll(struct polling_epoll_t *polling_epoll, struct con
     /* prints a debug message */
     V_DEBUG_F("Processing %lu read connections\n", (long unsigned int) read_connections_size);
 
-    /* iterates over the read connections */
+    /* iterates over the complete set of read connections
+    to run either the read operations on them, the handshake
+    or event the close operation (no data received) */
     for(index = 0; index < read_connections_size; index++) {
-        /* retrieves the current connection */
+        /* retrieves the current connection and then prints
+        a debu message with the socket handle of the connection */
         current_connection = read_connections[index];
-
-        /* prints a debug message */
         V_DEBUG_F("Processing read connection: %d\n", current_connection->socket_handle);
 
         /* in case the current connection is open and the read
         handler is correclty set (must call it) */
-        if(current_connection->status == STATUS_OPEN && current_connection->on_read != NULL) {
-            /* prints a debug message */
+        if(current_connection->status == STATUS_OPEN &&\
+            current_connection->on_read != NULL) {
+            /* prints a series of debug messages and then calls the
+            correct on read handler for the notification */
             V_DEBUG("Calling on read handler\n");
-
-            /* calls the on read handler */
             CALL_V(current_connection->on_read, current_connection);
-
-            /* prints a debug message */
             V_DEBUG("Finished calling on read handler\n");
         }
 
         /* in case the current connection is in the handshake
         section and the handshake handler is correclty set (must
         call it to initialize the connection) */
-        if(current_connection->status == STATUS_HANDSHAKE && current_connection->on_handshake != NULL) {
-            /* prints a debug message */
+        if(current_connection->status == STATUS_HANDSHAKE &&\
+            current_connection->on_handshake != NULL) {
+            /* prints a series of debug messages about the handshake
+            operation in it and then calls the hadhaske handler */
             V_DEBUG("Calling on handshake handler\n");
-
-            /* calls the on read handler */
             CALL_V(current_connection->on_handshake, current_connection);
-
-            /* prints a debug message */
             V_DEBUG("Finished calling on handshake handler\n");
         }
 
-        /* in case the current connection is closed */
+        /* in case the current connection is closed, thne the current
+        connection must be added to the set of connection to be removed */
         if(current_connection->status == STATUS_CLOSED) {
-            /* tries to add the current connection to the remove connections list */
-            remove_connection(remove_connections, &remove_connections_size, current_connection);
+            remove_connection(
+                remove_connections,
+                &remove_connections_size,
+                current_connection
+            );
         }
     }
 
     /* prints a debug message */
     V_DEBUG_F("Processing %lu write connections\n", (long unsigned int) write_connections_size);
 
-    /* iterates over the write connections */
+    /* iterates over all of the connection that are currently registerd
+    for the write operation to correctly call their callbacks */
     for(index = 0; index < write_connections_size; index++) {
-        /* retrieves the current connection */
+        /* retrieves the current connection and then prints
+        a debu message with the socket handle of the connection */
         current_connection = write_connections[index];
-
-        /* prints a debug message */
         V_DEBUG_F("Processing write connection: %d\n", current_connection->socket_handle);
 
         /* in case the current connection is open */
-        if(current_connection->status == STATUS_OPEN && current_connection->on_write != NULL) {
-            /* prints a debug message */
+        if(current_connection->status == STATUS_OPEN &&\
+            current_connection->on_write != NULL) {
+            /* prints a series of debug messages and then calls the
+            correct on write handler for the notification */
             V_DEBUG("Calling on write handler\n");
-
-            /* calls the on write handler */
             CALL_V(current_connection->on_write, current_connection);
-
-            /* prints a debug message */
             V_DEBUG("Finished calling on write handler\n");
         }
 
-        /* in case the current connection is closed */
+        /* in case the current connection is closed, thne the current
+        connection must be added to the set of connection to be removed */
         if(current_connection->status == STATUS_CLOSED) {
-            /* tries to add the current connection to the remove connections list */
-            remove_connection(remove_connections, &remove_connections_size, current_connection);
+            remove_connection(
+                remove_connections,
+                &remove_connections_size,
+                current_connection
+            );
         }
     }
 
     /* prints a debug message */
     V_DEBUG_F("Processing %lu error connections\n", (long unsigned int) error_connections_size);
 
-    /* iterates over the error connections */
+    /* iterates over all the connections that are currently set in an
+    error state to escape from that state (via notification) */
     for(index = 0; index < error_connections_size; index++) {
-        /* retrieves the current connection */
+        /* retrieves the current connection and then prints
+        a debu message with the socket handle of the connection */
         current_connection = error_connections[index];
-
-        /* prints a debug message */
         V_DEBUG_F("Processing error connection: %d\n", current_connection->socket_handle);
 
         /* in case the current connection is open */
-        if(current_connection->status == STATUS_OPEN && current_connection->on_error != NULL) {
-            /* prints a debug message */
+        if(current_connection->status == STATUS_OPEN &&\
+            current_connection->on_error != NULL) {
+            /* prints a series of debug messages and then calls the
+            correct on error handler for the notification */
             V_DEBUG("Calling on error handler\n");
-
-            /* calls the on error handler */
             CALL_V(current_connection->on_error, current_connection);
-
-            /* prints a debug message */
             V_DEBUG("Finished calling on error handler\n");
         }
 
-        /* in case the current connection is closed */
+        /* in case the current connection is closed, thne the current
+        connection must be added to the set of connection to be removed */
         if(current_connection->status == STATUS_CLOSED) {
-            /* tries to add the current connection to the remove connections list */
-            remove_connection(remove_connections, &remove_connections_size, current_connection);
+            remove_connection(
+                remove_connections,
+                &remove_connections_size,
+                current_connection
+            );
         }
     }
 
-    /* iterates over the remove connections */
+    /* iterates over the set of connections that are meant to
+    be removed from the select list as they are no longer available */
     for(index = 0; index < remove_connections_size; index++) {
-        /* retrieves the current connection */
+        /* retrieves the current connection for the iteration
+        and then deletes the current connection (house keeping) */
         current_connection = remove_connections[index];
-
-        /* deletes the current connection (house keeping) */
         delete_connection(current_connection);
     }
 
