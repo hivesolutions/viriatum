@@ -667,9 +667,18 @@ typedef struct connection_t {
      * are currently being monitored in the polling
      * (provider).
      * This flag shall be used carefully as it may
-	 * create unwanted behavior.
+     * create unwanted behavior.
      */
     unsigned char write_registered;
+
+    /**
+     * Boolean flag value that controls if the connection
+     * is currently valid (ready) for writing this should
+     * be set to false if a would block event is raise on
+     * a write operation, and then set back to true if the
+     * the underlying socket is ready for writing.
+     */
+    unsigned char write_valid;
 
     /**
      * Queue containing the set of connections with
@@ -712,6 +721,14 @@ typedef struct connection_t {
      * writing detection in the polling (provider).
      */
     connection_update unregister_write;
+
+    /**
+     * Pointer to the function that invalidates the
+     * current function for writing meaning that if
+     * this function is called the connection needs
+     * to be reset again for writing at a polling level.
+     */
+    connection_update invalidate_write;
 
     /**
      * Function to be used to allocated (in a
@@ -1169,6 +1186,10 @@ ERROR_CODE register_write_connection(struct connection_t *connection);
  * @return The resulting error code.
  */
 ERROR_CODE unregister_write_connection(struct connection_t *connection);
+
+
+ERROR_CODE invalidate_write_connection(struct connection_t *connection);
+
 
 /**
  * Allocates a chunk of memory for the context of the given
