@@ -1402,7 +1402,7 @@ ERROR_CODE delete_connection(struct connection_t *connection) {
         pop_value_linked_list(connection->write_queue, (void **) &data, TRUE);
 
         /* in case the data is invalid (list is empty) must
-		break the current loop, this is the end of iteration */
+        break the current loop, this is the end of iteration */
         if(data == NULL) { break; }
 
         /* prints a debug message */
