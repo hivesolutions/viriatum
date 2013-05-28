@@ -666,7 +666,8 @@ typedef struct connection_t {
      * "Flag" controlling if the write operations
      * are currently being monitored in the polling
      * (provider).
-     * This flag shall be used carefully.
+     * This flag shall be used carefully as it may
+	 * create unwanted behavior.
      */
     unsigned char write_registered;
 
