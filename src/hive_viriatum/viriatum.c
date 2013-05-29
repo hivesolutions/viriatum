@@ -103,6 +103,9 @@ ERROR_CODE run_service() {
     /* tests the error code value for error and in case there's
     one runs the appropriate measures */
     if(IS_ERROR_CODE(return_value)) {
+		printf("TEVE ERRO!!!");
+
+
         /* runs the socket finish so that the proper cleanup
         operations are performed and then re-raises the error*/
         SOCKET_FINISH();
