@@ -1399,7 +1399,7 @@ ERROR_CODE create_connection(struct connection_t **connection_pointer, SOCKET_HA
 
 ERROR_CODE delete_connection(struct connection_t *connection) {
     /* allocates the temporary data pointe that will be used
-	in the iteration for the releasing of the pending data */
+    in the iteration for the releasing of the pending data */
     struct data_t *data;
 
     /* iterates continuously to release all the pending
@@ -1428,10 +1428,10 @@ ERROR_CODE delete_connection(struct connection_t *connection) {
     delete_linked_list(connection->read_queue);
     delete_linked_list(connection->write_queue);
 
-	/* invalidates the addresses for both the read and the write
-	queue this simplifies the structure of the connection */
-	connection->read_queue = NULL;
-	connection->write_queue = NULL;
+    /* invalidates the addresses for both the read and the write
+    queue this simplifies the structure of the connection */
+    connection->read_queue = NULL;
+    connection->write_queue = NULL;
 
     /* releases the connection */
     FREE(connection);
@@ -1480,7 +1480,7 @@ ERROR_CODE write_connection_c(struct connection_t *connection, unsigned char *da
 
 ERROR_CODE open_connection(struct connection_t *connection) {
     /* in case the connection is (already) open, must return
-	immediately with no error (duplicated operation) */
+    immediately with no error (duplicated operation) */
     if(connection->status == STATUS_OPEN) { RAISE_NO_ERROR; }
 
     /* prints a debug message */
@@ -1510,7 +1510,7 @@ ERROR_CODE open_connection(struct connection_t *connection) {
 
 ERROR_CODE close_connection(struct connection_t *connection) {
     /* in case the connection is (already) closed, must return
-	immediately with no error (duplicated operation) */
+    immediately with no error (duplicated operation) */
     if(connection->status == STATUS_CLOSED) { RAISE_NO_ERROR; }
 
     /* prints a debug message */

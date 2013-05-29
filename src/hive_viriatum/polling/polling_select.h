@@ -202,11 +202,11 @@ ERROR_CODE _unregister_sockets_set_polling_select(struct polling_select_t *polli
  */
 static __inline void remove_connection(
     struct connection_t **remove_connections,
-	unsigned int *remove_connections_size_pointer,
-	struct connection_t *connection
+    unsigned int *remove_connections_size_pointer,
+    struct connection_t *connection
 ) {
     /* allocates the index counter for the interation and
-	the space for the temporary connection pointer */
+    the space for the temporary connection pointer */
     unsigned int index;
     struct connection_t *current_connection;
 
@@ -214,18 +214,18 @@ static __inline void remove_connection(
     unsigned int remove_connections_size = *remove_connections_size_pointer;
 
     /* iterates over all the connections to be removed in order
-	to find out if there's a duplicated value */
+    to find out if there's a duplicated value */
     for(index = 0; index < remove_connections_size; index++) {
         /* retrieves the current connection and in case the
-		current connection already exists in the list of
-		connections to be removed must return immediately
-		in to avoid duplicated values (possible problems) */
-		current_connection = remove_connections[index];
+        current connection already exists in the list of
+        connections to be removed must return immediately
+        in to avoid duplicated values (possible problems) */
+        current_connection = remove_connections[index];
         if(current_connection == connection) { return; }
     }
 
     /* adds the connection to the remove connections and
-	then increments the remove connections size */
+    then increments the remove connections size */
     remove_connections[remove_connections_size] = connection;
     (*remove_connections_size_pointer)++;
 }
