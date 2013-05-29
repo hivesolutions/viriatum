@@ -1513,13 +1513,10 @@ ERROR_CODE open_connection(struct connection_t *connection) {
 
     /* in case the on open handler is defined */
     if(connection->on_open != NULL) {
-        /* prints a debug message */
+        /* prints a debug message about the handler to be called
+		and then calls the on open handler with the connection */
         V_DEBUG("Calling on open handler\n");
-
-        /* calls the on open handler */
         connection->on_open(connection);
-
-        /* prints a debug message */
         V_DEBUG("Finished calling on open handler\n");
     }
 
@@ -1539,13 +1536,10 @@ ERROR_CODE close_connection(struct connection_t *connection) {
 
     /* in case the on close handler is defined */
     if(connection->on_close != NULL) {
-        /* prints a debug message */
+        /* prints a debug message about the handler to be called
+		and then calls the on close handler with the connection */
         V_DEBUG("Calling on close handler\n");
-
-        /* calls the on close handler */
         connection->on_close(connection);
-
-        /* prints a debug message */
         V_DEBUG("Finished calling on close handler\n");
     }
 
