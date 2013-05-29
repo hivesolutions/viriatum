@@ -1565,10 +1565,10 @@ ERROR_CODE close_connection(struct connection_t *connection) {
     }
 #endif
 
-    /* closes the socket */
+    /* closes the socket associated with the connection and then
+	updates the connection status to closed in order to notify any
+	logic acessing the connection about its state */
     SOCKET_CLOSE(connection->socket_handle);
-
-    /* sets the connection status as closed */
     connection->status = STATUS_CLOSED;
 
     /* raises no error */

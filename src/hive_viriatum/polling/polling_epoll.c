@@ -177,7 +177,12 @@ ERROR_CODE unregister_connection_polling_epoll(
     handle it and propagate it to the caller */
     if(SOCKET_TEST_ERROR(result_code)) {
         SOCKET_ERROR_CODE epoll_error_code = SOCKET_GET_ERROR_CODE(socket_result);
-        printf("Problem unregistering connection epoll sair %d %d\n", connection, epoll_error_code);
+        printf(
+			"Problem unregistering connection epoll sair %d %d\n",
+			connection,
+			connection->socket_handler,
+			epoll_error_code
+		);
         V_WARNING_F(
             "Problem unregistering connection epoll: %d\n",
             epoll_error_code
