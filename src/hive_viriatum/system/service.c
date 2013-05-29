@@ -566,6 +566,8 @@ ERROR_CODE start_service(struct service_t *service) {
         SOCKET_PROTOCOL_TCP
     );
 
+	printf("SERVICO %d\n", service->service_socket_handle);
+
     /* in case there was an error creating the service socket */
     if(SOCKET_TEST_ERROR(service->service_socket_handle)) {
         SOCKET_ERROR_CODE creating_error_code = SOCKET_GET_ERROR_CODE(socket_result);
