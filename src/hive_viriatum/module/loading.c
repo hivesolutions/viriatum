@@ -219,7 +219,7 @@ ERROR_CODE unload_module(struct service_t *service, struct module_t *module) {
     LIBRARY_REFERENCE library = module->library;
 
     /* removes the module from the list of modlues handlers in the service */
-    remove_value_linked_list(service->modules_list, (void *) module, 1);
+    remove_value_linked_list(service->modules_list, (void *) module, TRUE);
 
     /* calls the stop module function, this sould
     destroy (stop) all the module internal structures  */
