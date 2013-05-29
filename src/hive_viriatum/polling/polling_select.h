@@ -158,7 +158,11 @@ void delete_polling_select(struct polling_select_t *polling_select);
 ERROR_CODE open_polling_select(struct polling_t *polling);
 ERROR_CODE close_polling_select(struct polling_t *polling);
 ERROR_CODE register_connection_polling_select(struct polling_t *polling, struct connection_t *connection);
-ERROR_CODE unregister_connection_polling_select(struct polling_t *polling, struct connection_t *connection);
+ERROR_CODE unregister_connection_polling_select(
+    struct polling_t *polling,
+    struct connection_t *connection,
+    unsigned char remove
+);
 ERROR_CODE register_write_polling_select(struct polling_t *polling, struct connection_t *connection);
 ERROR_CODE unregister_write_polling_select(struct polling_t *polling, struct connection_t *connection);
 ERROR_CODE poll_polling_select(struct polling_t *polling);

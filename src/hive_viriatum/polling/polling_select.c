@@ -111,9 +111,14 @@ ERROR_CODE register_connection_polling_select(struct polling_t *polling, struct 
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE unregister_connection_polling_select(struct polling_t *polling, struct connection_t *connection)  {
+ERROR_CODE unregister_connection_polling_select(
+    struct polling_t *polling,
+    struct connection_t *connection,
+    unsigned char remove_c
+) {
     /* retrieves the polling select */
-    struct polling_select_t *polling_select = (struct polling_select_t *) polling->lower;
+    struct polling_select_t *polling_select =\
+        (struct polling_select_t *) polling->lower;
 
     /* unregister the socket handle from the sockets read set */
     _unregister_sockets_set_polling_select(
@@ -122,9 +127,9 @@ ERROR_CODE unregister_connection_polling_select(struct polling_t *polling, struc
         &polling_select->sockets_read_set
     );
 
-    /* in case the socket error are meant to be processed */
+    /* in case the socket error are meant to be processed, must
+    unregister the socket handle from the sockets error set */
     if(VIRIATUM_SOCKET_ERROR) {
-        /* unregister the socket handle from the sockets error set */
         _unregister_sockets_set_polling_select(
             polling_select,
             connection->socket_handle,
@@ -132,13 +137,25 @@ ERROR_CODE unregister_connection_polling_select(struct polling_t *polling, struc
         );
     }
 
-    /* in case the connection write is registered */
-    if(connection->write_registered == 1) {
-        /* unregister the socket handle from the sockets write set */
+    /* in case the connection write is currently registered, must
+    unregister the socket handle from the sockets write set */
+    if(connection->write_registered == TRUE) {
         _unregister_sockets_set_polling_select(
             polling_select,
             connection->socket_handle,
             &polling_select->sockets_write_set
+        );
+    }
+
+    /* in case the remove connection flag is set the connection
+    is also added to the list of connections to be removed
+    after the io driven logic part is processed (at the end
+    of the logic loop) */
+    if(remove_c == TRUE) {
+        remove_connection(
+            polling_select->remove_connections,
+            &polling_select->remove_connections_size,
+            connection
         );
     }
 
@@ -154,7 +171,7 @@ ERROR_CODE register_write_polling_select(struct polling_t *polling, struct conne
 
     /* in case the connection is write registered must
     raise an error indicating the problem */
-    if(connection->write_registered == 1) {
+    if(connection->write_registered == TRUE) {
         RAISE_ERROR_M(
             RUNTIME_EXCEPTION_ERROR_CODE,
             (unsigned char *) "Connection already registered"
@@ -195,7 +212,7 @@ ERROR_CODE unregister_write_polling_select(struct polling_t *polling, struct con
 
     /* in case the connection is not write registered must
     raise an error indicating the problem */
-    if(connection->write_registered == 0) {
+    if(connection->write_registered == FALSE) {
         RAISE_ERROR_M(
             RUNTIME_EXCEPTION_ERROR_CODE,
             (unsigned char *) "Connection already unregistered"
@@ -216,6 +233,10 @@ ERROR_CODE unregister_write_polling_select(struct polling_t *polling, struct con
 ERROR_CODE poll_polling_select(struct polling_t *polling) {
     /* retrieves the polling select */
     struct polling_select_t *polling_select = (struct polling_select_t *) polling->lower;
+
+    /* resets the remove connections size to the default
+    zero value, no connections are removed by default */
+    polling_select->remove_connections_size = 0;
 
     /* triggers the processing of the outstanding connection
     operations (pending operations) that meant to be done before
@@ -287,13 +308,10 @@ ERROR_CODE _poll_polling_select(
     /* retrieves the service connections list */
     struct linked_list_t *connections_list = service->connections_list;
 
-    /* initializes the read index */
+    /* initializes the various index values for the diferent
+	operations to be polled in the current operation */
     unsigned int read_index = 0;
-
-    /* initializes the write index */
     unsigned int write_index = 0;
-
-    /* initializes the error index */
     unsigned int error_index = 0;
 
     /* copies the socket sets to the socket sets temporary */
@@ -407,10 +425,13 @@ ERROR_CODE _poll_polling_select(
     /* prints a debug message */
     V_DEBUG("Deleted iterator linked list\n");
 
-    /* in case the select count is bigger than zero */
+    /* in case the select count is bigger than zero, prints
+	a debug message indicating the amount of read values */
     if(select_count > 0) {
-        /* prints a debug message */
-        V_DEBUG_F("Extraordinary select file descriptors not found: %d\n", select_count);
+        V_DEBUG_F(
+			"Extraordinary select file descriptors not found: %d\n",
+			select_count
+		);
     }
 
     /* updates the various operation counters for the three
@@ -439,9 +460,6 @@ ERROR_CODE _call_polling_select(
 
     /* allocates the current connection */
     struct connection_t *current_connection;
-
-    /* resets the remove connections size */
-    unsigned int remove_connections_size = 0;
 
     /* prints a debug message */
     V_DEBUG_F("Processing %lu read connections\n", (long unsigned int) read_connections_size);
@@ -477,16 +495,6 @@ ERROR_CODE _call_polling_select(
             CALL_V(current_connection->on_handshake, current_connection);
             V_DEBUG("Finished calling on handshake handler\n");
         }
-
-        /* in case the current connection is closed, thne the current
-        connection must be added to the set of connection to be removed */
-        if(current_connection->status == STATUS_CLOSED) {
-            remove_connection(
-                remove_connections,
-                &remove_connections_size,
-                current_connection
-            );
-        }
     }
 
     /* prints a debug message */
@@ -517,16 +525,6 @@ ERROR_CODE _call_polling_select(
             CALL_V(current_connection->on_write, current_connection);
             V_DEBUG("Finished calling on write handler\n");
         }
-
-        /* in case the current connection is closed, thne the current
-        connection must be added to the set of connection to be removed */
-        if(current_connection->status == STATUS_CLOSED) {
-            remove_connection(
-                remove_connections,
-                &remove_connections_size,
-                current_connection
-            );
-        }
     }
 
     /* prints a debug message */
@@ -549,24 +547,14 @@ ERROR_CODE _call_polling_select(
             CALL_V(current_connection->on_error, current_connection);
             V_DEBUG("Finished calling on error handler\n");
         }
-
-        /* in case the current connection is closed, thne the current
-        connection must be added to the set of connection to be removed */
-        if(current_connection->status == STATUS_CLOSED) {
-            remove_connection(
-                remove_connections,
-                &remove_connections_size,
-                current_connection
-            );
-        }
     }
 
     /* iterates over the set of connections that are meant to
     be removed from the select list as they are no longer available */
-    for(index = 0; index < remove_connections_size; index++) {
+    for(index = 0; index < polling_select->remove_connections_size; index++) {
         /* retrieves the current connection for the iteration
         and then deletes the current connection (house keeping) */
-        current_connection = remove_connections[index];
+        current_connection = polling_select->remove_connections[index];
         delete_connection(current_connection);
     }
 
