@@ -214,6 +214,22 @@
 		C295E185155BCB7800036037 /* string_util.h in Headers */ = {isa = PBXBuildFile; fileRef = C295E0DA155BCB7800036037 /* string_util.h */; };
 		C295E186155BCB7800036037 /* util.h in Headers */ = {isa = PBXBuildFile; fileRef = C295E0DB155BCB7800036037 /* util.h */; };
 		C295E187155BCB7800036037 /* util.h in Headers */ = {isa = PBXBuildFile; fileRef = C295E0DB155BCB7800036037 /* util.h */; };
+		C2B2B783175613FF002F55D1 /* crypto.h in Headers */ = {isa = PBXBuildFile; fileRef = C2B2B780175613FF002F55D1 /* crypto.h */; };
+		C2B2B784175613FF002F55D1 /* rc4.c in Sources */ = {isa = PBXBuildFile; fileRef = C2B2B781175613FF002F55D1 /* rc4.c */; };
+		C2B2B785175613FF002F55D1 /* rc4.h in Headers */ = {isa = PBXBuildFile; fileRef = C2B2B782175613FF002F55D1 /* rc4.h */; };
+		C2B2B78617561408002F55D1 /* crypto.h in Headers */ = {isa = PBXBuildFile; fileRef = C2B2B780175613FF002F55D1 /* crypto.h */; };
+		C2B2B78717561408002F55D1 /* rc4.c in Sources */ = {isa = PBXBuildFile; fileRef = C2B2B781175613FF002F55D1 /* rc4.c */; };
+		C2B2B78817561408002F55D1 /* rc4.h in Headers */ = {isa = PBXBuildFile; fileRef = C2B2B782175613FF002F55D1 /* rc4.h */; };
+		C2B2B78F17561421002F55D1 /* formats.h in Headers */ = {isa = PBXBuildFile; fileRef = C2B2B78A17561421002F55D1 /* formats.h */; };
+		C2B2B79017561421002F55D1 /* passwd.c in Sources */ = {isa = PBXBuildFile; fileRef = C2B2B78B17561421002F55D1 /* passwd.c */; };
+		C2B2B79117561421002F55D1 /* passwd.h in Headers */ = {isa = PBXBuildFile; fileRef = C2B2B78C17561421002F55D1 /* passwd.h */; };
+		C2B2B79217561421002F55D1 /* url.c in Sources */ = {isa = PBXBuildFile; fileRef = C2B2B78D17561421002F55D1 /* url.c */; };
+		C2B2B79317561421002F55D1 /* url.h in Headers */ = {isa = PBXBuildFile; fileRef = C2B2B78E17561421002F55D1 /* url.h */; };
+		C2B2B79417561427002F55D1 /* formats.h in Headers */ = {isa = PBXBuildFile; fileRef = C2B2B78A17561421002F55D1 /* formats.h */; };
+		C2B2B79517561427002F55D1 /* passwd.c in Sources */ = {isa = PBXBuildFile; fileRef = C2B2B78B17561421002F55D1 /* passwd.c */; };
+		C2B2B79617561427002F55D1 /* passwd.h in Headers */ = {isa = PBXBuildFile; fileRef = C2B2B78C17561421002F55D1 /* passwd.h */; };
+		C2B2B79717561427002F55D1 /* url.c in Sources */ = {isa = PBXBuildFile; fileRef = C2B2B78D17561421002F55D1 /* url.c */; };
+		C2B2B79817561427002F55D1 /* url.h in Headers */ = {isa = PBXBuildFile; fileRef = C2B2B78E17561421002F55D1 /* url.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -323,6 +339,14 @@
 		C295E0D9155BCB7800036037 /* dump_util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dump_util.h; sourceTree = "<group>"; };
 		C295E0DA155BCB7800036037 /* string_util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = string_util.h; sourceTree = "<group>"; };
 		C295E0DB155BCB7800036037 /* util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = util.h; sourceTree = "<group>"; };
+		C2B2B780175613FF002F55D1 /* crypto.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = crypto.h; sourceTree = "<group>"; };
+		C2B2B781175613FF002F55D1 /* rc4.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = rc4.c; sourceTree = "<group>"; };
+		C2B2B782175613FF002F55D1 /* rc4.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rc4.h; sourceTree = "<group>"; };
+		C2B2B78A17561421002F55D1 /* formats.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = formats.h; sourceTree = "<group>"; };
+		C2B2B78B17561421002F55D1 /* passwd.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = passwd.c; sourceTree = "<group>"; };
+		C2B2B78C17561421002F55D1 /* passwd.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = passwd.h; sourceTree = "<group>"; };
+		C2B2B78D17561421002F55D1 /* url.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = url.c; sourceTree = "<group>"; };
+		C2B2B78E17561421002F55D1 /* url.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = url.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -365,6 +389,8 @@
 		C20C2C7A1350B6AD001E22FB /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				C2B2B78917561421002F55D1 /* formats */,
+				C2B2B77F175613FF002F55D1 /* crypto */,
 				C2F8700D1350BAE20003A4A5 /* root */,
 				C295E077155BCB7800036037 /* checksum */,
 				C295E07D155BCB7800036037 /* compression */,
@@ -621,6 +647,30 @@
 			path = ../../../src/hive_viriatum_commons/util;
 			sourceTree = "<group>";
 		};
+		C2B2B77F175613FF002F55D1 /* crypto */ = {
+			isa = PBXGroup;
+			children = (
+				C2B2B780175613FF002F55D1 /* crypto.h */,
+				C2B2B781175613FF002F55D1 /* rc4.c */,
+				C2B2B782175613FF002F55D1 /* rc4.h */,
+			);
+			name = crypto;
+			path = ../../../src/hive_viriatum_commons/crypto;
+			sourceTree = "<group>";
+		};
+		C2B2B78917561421002F55D1 /* formats */ = {
+			isa = PBXGroup;
+			children = (
+				C2B2B78A17561421002F55D1 /* formats.h */,
+				C2B2B78B17561421002F55D1 /* passwd.c */,
+				C2B2B78C17561421002F55D1 /* passwd.h */,
+				C2B2B78D17561421002F55D1 /* url.c */,
+				C2B2B78E17561421002F55D1 /* url.h */,
+			);
+			name = formats;
+			path = ../../../src/hive_viriatum_commons/formats;
+			sourceTree = "<group>";
+		};
 		C2F8700D1350BAE20003A4A5 /* root */ = {
 			isa = PBXGroup;
 			children = (
@@ -706,6 +756,11 @@
 				C24EF49515820FB400FAE3A0 /* bencoding.h in Headers */,
 				C24EF49915820FB400FAE3A0 /* percent.h in Headers */,
 				C24EF49F15820FC800FAE3A0 /* sha1.h in Headers */,
+				C2B2B783175613FF002F55D1 /* crypto.h in Headers */,
+				C2B2B785175613FF002F55D1 /* rc4.h in Headers */,
+				C2B2B78F17561421002F55D1 /* formats.h in Headers */,
+				C2B2B79117561421002F55D1 /* passwd.h in Headers */,
+				C2B2B79317561421002F55D1 /* url.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -780,6 +835,11 @@
 				C24EF4A1158211C000FAE3A0 /* stdafx.h in Headers */,
 				C24EF4A2158211C500FAE3A0 /* viriatum_commons.h in Headers */,
 				C24EF4A3158211C700FAE3A0 /* _config_win32.h in Headers */,
+				C2B2B78617561408002F55D1 /* crypto.h in Headers */,
+				C2B2B78817561408002F55D1 /* rc4.h in Headers */,
+				C2B2B79417561427002F55D1 /* formats.h in Headers */,
+				C2B2B79617561427002F55D1 /* passwd.h in Headers */,
+				C2B2B79817561427002F55D1 /* url.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -884,6 +944,9 @@
 				C24EF49315820FB400FAE3A0 /* bencoding.c in Sources */,
 				C24EF49715820FB400FAE3A0 /* percent.c in Sources */,
 				C24EF49D15820FC800FAE3A0 /* sha1.c in Sources */,
+				C2B2B784175613FF002F55D1 /* rc4.c in Sources */,
+				C2B2B79017561421002F55D1 /* passwd.c in Sources */,
+				C2B2B79217561421002F55D1 /* url.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -927,6 +990,9 @@
 				C24EF49415820FB400FAE3A0 /* bencoding.c in Sources */,
 				C24EF49815820FB400FAE3A0 /* percent.c in Sources */,
 				C24EF49E15820FC800FAE3A0 /* sha1.c in Sources */,
+				C2B2B78717561408002F55D1 /* rc4.c in Sources */,
+				C2B2B79517561427002F55D1 /* passwd.c in Sources */,
+				C2B2B79717561427002F55D1 /* url.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -63,6 +63,14 @@
 		C2AF3C48149CC7E300D28507 /* hive_viriatum_mobileAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = C2AF3C40149CC7E300D28507 /* hive_viriatum_mobileAppDelegate.m */; };
 		C2AF3C49149CC7E300D28507 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = C2AF3C41149CC7E300D28507 /* main.m */; };
 		C2AF3C4A149CC7E300D28507 /* RootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C2AF3C43149CC7E300D28507 /* RootViewController.m */; };
+		C2B2B76E17561397002F55D1 /* speed_test.c in Sources */ = {isa = PBXBuildFile; fileRef = C2B2B76C17561397002F55D1 /* speed_test.c */; };
+		C2B2B773175613B9002F55D1 /* handler_proxy.c in Sources */ = {isa = PBXBuildFile; fileRef = C2B2B771175613B9002F55D1 /* handler_proxy.c */; };
+		C2B2B774175613C4002F55D1 /* handler_proxy.c in Sources */ = {isa = PBXBuildFile; fileRef = C2B2B771175613B9002F55D1 /* handler_proxy.c */; };
+		C2B2B775175613C8002F55D1 /* speed_test.c in Sources */ = {isa = PBXBuildFile; fileRef = C2B2B76C17561397002F55D1 /* speed_test.c */; };
+		C2B2B77B175613E4002F55D1 /* client.c in Sources */ = {isa = PBXBuildFile; fileRef = C2B2B777175613E4002F55D1 /* client.c */; };
+		C2B2B77C175613E4002F55D1 /* client.c in Sources */ = {isa = PBXBuildFile; fileRef = C2B2B777175613E4002F55D1 /* client.c */; };
+		C2B2B77D175613E4002F55D1 /* torrent.c in Sources */ = {isa = PBXBuildFile; fileRef = C2B2B779175613E4002F55D1 /* torrent.c */; };
+		C2B2B77E175613E4002F55D1 /* torrent.c in Sources */ = {isa = PBXBuildFile; fileRef = C2B2B779175613E4002F55D1 /* torrent.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -170,6 +178,15 @@
 		C2AF3C41149CC7E300D28507 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		C2AF3C42149CC7E300D28507 /* RootViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RootViewController.h; sourceTree = "<group>"; };
 		C2AF3C43149CC7E300D28507 /* RootViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RootViewController.m; sourceTree = "<group>"; };
+		C2B2B76C17561397002F55D1 /* speed_test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = speed_test.c; sourceTree = "<group>"; };
+		C2B2B76D17561397002F55D1 /* speed_test.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = speed_test.h; sourceTree = "<group>"; };
+		C2B2B771175613B9002F55D1 /* handler_proxy.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = handler_proxy.c; sourceTree = "<group>"; };
+		C2B2B772175613B9002F55D1 /* handler_proxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = handler_proxy.h; sourceTree = "<group>"; };
+		C2B2B776175613CE002F55D1 /* common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = common.h; sourceTree = "<group>"; };
+		C2B2B777175613E4002F55D1 /* client.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = client.c; sourceTree = "<group>"; };
+		C2B2B778175613E4002F55D1 /* client.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = client.h; sourceTree = "<group>"; };
+		C2B2B779175613E4002F55D1 /* torrent.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = torrent.c; sourceTree = "<group>"; };
+		C2B2B77A175613E4002F55D1 /* torrent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = torrent.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -278,6 +295,7 @@
 		C295DF62155BCAD600036037 /* global */ = {
 			isa = PBXGroup;
 			children = (
+				C2B2B776175613CE002F55D1 /* common.h */,
 				C295DF63155BCAD600036037 /* definitions.h */,
 				C295DF64155BCAD600036037 /* resource.h */,
 				C295DF65155BCAD600036037 /* targetver.h */,
@@ -289,6 +307,8 @@
 		C295DF66155BCAD600036037 /* handlers */ = {
 			isa = PBXGroup;
 			children = (
+				C2B2B771175613B9002F55D1 /* handler_proxy.c */,
+				C2B2B772175613B9002F55D1 /* handler_proxy.h */,
 				C295DF67155BCAD600036037 /* handler_default.c */,
 				C295DF68155BCAD600036037 /* handler_default.h */,
 				C295DF69155BCAD600036037 /* handler_dispatch.c */,
@@ -377,6 +397,10 @@
 		C295DF92155BCAD600036037 /* system */ = {
 			isa = PBXGroup;
 			children = (
+				C2B2B777175613E4002F55D1 /* client.c */,
+				C2B2B778175613E4002F55D1 /* client.h */,
+				C2B2B779175613E4002F55D1 /* torrent.c */,
+				C2B2B77A175613E4002F55D1 /* torrent.h */,
 				C295DF93155BCAD600036037 /* environment.c */,
 				C295DF94155BCAD600036037 /* environment.h */,
 				C295DF95155BCAD600036037 /* service.c */,
@@ -390,6 +414,8 @@
 		C295DF98155BCAD600036037 /* test */ = {
 			isa = PBXGroup;
 			children = (
+				C2B2B76C17561397002F55D1 /* speed_test.c */,
+				C2B2B76D17561397002F55D1 /* speed_test.h */,
 				C295DF99155BCAD600036037 /* simple_test.c */,
 				C295DF9A155BCAD600036037 /* simple_test.h */,
 				C295DF9B155BCAD600036037 /* test.h */,
@@ -540,6 +566,10 @@
 				C24EF47F15820F7400FAE3A0 /* stream_httpc.c in Sources */,
 				C24EF48115820F7400FAE3A0 /* stream_torrent.c in Sources */,
 				C2282ED61609324200048F70 /* http_util.c in Sources */,
+				C2B2B76E17561397002F55D1 /* speed_test.c in Sources */,
+				C2B2B773175613B9002F55D1 /* handler_proxy.c in Sources */,
+				C2B2B77B175613E4002F55D1 /* client.c in Sources */,
+				C2B2B77D175613E4002F55D1 /* torrent.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -572,6 +602,10 @@
 				C24EF48015820F7400FAE3A0 /* stream_httpc.c in Sources */,
 				C24EF48215820F7400FAE3A0 /* stream_torrent.c in Sources */,
 				C2282ED71609324200048F70 /* http_util.c in Sources */,
+				C2B2B774175613C4002F55D1 /* handler_proxy.c in Sources */,
+				C2B2B775175613C8002F55D1 /* speed_test.c in Sources */,
+				C2B2B77C175613E4002F55D1 /* client.c in Sources */,
+				C2B2B77E175613E4002F55D1 /* torrent.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
