@@ -231,7 +231,7 @@ ERROR_CODE read_handler_stream_io(struct connection_t *connection) {
     struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
 
     /* iterates continuously to read the data that is currently
-	available in the connection for reading */
+    available in the connection for reading */
     while(TRUE) {
         /* in case the buffer size is so big that may
         overflow the current allocated buffer, must
@@ -241,8 +241,8 @@ ERROR_CODE read_handler_stream_io(struct connection_t *connection) {
             the handler to flush the buffer */
             if(io_connection->on_data != NULL) {
                 /* prints some debugging information about the calling
-				of the data handler for the partial buffered data and
-				then runs the call for the data handler */
+                of the data handler for the partial buffered data and
+                then runs the call for the data handler */
                 V_DEBUG("Calling on data handler\n");
                 io_connection->on_data(io_connection, buffer, buffer_size);
                 V_DEBUG("Finished calling on data handler\n");
@@ -257,7 +257,12 @@ ERROR_CODE read_handler_stream_io(struct connection_t *connection) {
 
         /* receives from the connection socket (takes into account the type
         of socket in use) should be able to take care of secure connections */
-        number_bytes = CONNECTION_RECEIVE(connection, (char *) buffer_pointer, VIRIATUM_READ_SIZE, 0);
+        number_bytes = CONNECTION_RECEIVE(
+            connection,
+            (char *) buffer_pointer,
+            VIRIATUM_READ_SIZE,
+            0
+        );
 
         /* in case the number of bytes is zero (connection closed) */
         if(number_bytes == 0) {
@@ -271,9 +276,9 @@ ERROR_CODE read_handler_stream_io(struct connection_t *connection) {
         if(SOCKET_TEST_ERROR(number_bytes)) {
             /* retrieves the (receving) error code */
             SOCKET_ERROR_CODE error_code = CONNECTION_GET_ERROR_CODE(
-				connection,
-				number_bytes
-			);
+                connection,
+                number_bytes
+            );
 
             /* switches over the receiving error code */
             switch(error_code) {
@@ -314,14 +319,13 @@ ERROR_CODE read_handler_stream_io(struct connection_t *connection) {
             break;
         }
 
-        /* increments the buffer position */
+        /* increments the buffer position and then increments
+        the buffer size with the number of bytes */
         buffer_pointer += number_bytes;
-
-        /* increments the buffer size with the number of bytes */
         buffer_size += number_bytes;
 
         /* in case the viriatum is set to blocking must break
-		the loop, no more that one read operarion is allowed */
+        the loop, no more that one read operarion is allowed */
         if(!VIRIATUM_NON_BLOCKING) { break; }
     }
 
@@ -333,9 +337,9 @@ ERROR_CODE read_handler_stream_io(struct connection_t *connection) {
             is data to be provided (buffer size available )*/
             if(buffer_size > 0 && io_connection->on_data != NULL) {
                 /* prints a set of debugging information abour the
-				calling of the handler for the data and then calls the
-				data handler, this should be one of the main areas in
-				the event loop and should block for a while */
+                calling of the handler for the data and then calls the
+                data handler, this should be one of the main areas in
+                the event loop and should block for a while */
                 V_DEBUG("Calling on data handler\n");
                 io_connection->on_data(io_connection, buffer, buffer_size);
                 V_DEBUG("Finished calling on data handler\n");
