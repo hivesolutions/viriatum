@@ -455,7 +455,7 @@ int main(int argc, char *argv[]) {
     /* prints a debug message about the ending of the sytem
     for the execution of the service and then returns the
     normal return code (success status) to the caller process */
-    V_DEBUG("Finishing process\n");
+    V_DEBUG_F("Finishing process [%ld]\n", (long int) ALLOCATIONS);
     return 0;
 }
 #endif
