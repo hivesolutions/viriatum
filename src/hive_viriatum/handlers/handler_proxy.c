@@ -292,8 +292,7 @@ ERROR_CODE close_proxy_connection(struct io_connection_t *io_connection) {
         on_close(io_connection);
     }
     if(connection_c != NULL) {
-        close_connection(connection_c);
-        delete_connection(connection_c);
+        connection_c->close_connection(connection_c);
     }
 
     set_value_hash_map(proxy_handler->connections_map, (size_t) connection, NULL, NULL);
