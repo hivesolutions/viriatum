@@ -1006,7 +1006,9 @@ ERROR_CODE start_service(struct service_t *service) {
     connection (it should be the accept handler stream io, default) */
     service_connection->on_read = accept_handler_stream_io;
 
-    /* opens the (service) connection */
+    /* opens the (service) connection, this operation should trigger
+	the normal event handling operations and then add this connection
+	to the list of connections that are part of the service */
     service_connection->open_connection(service_connection);
 
 #ifdef VIRIATUM_IP6
