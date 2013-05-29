@@ -1417,6 +1417,8 @@ ERROR_CODE delete_connection(struct connection_t *connection) {
     in the iteration for the releasing of the pending data */
     struct data_t *data;
 
+	printf("vai apagar %d\n", connection->socket_handle);
+
     /* iterates continuously to release all the pending
     memory to be released because the connection was dropped */
     while(TRUE) {
@@ -1501,6 +1503,8 @@ ERROR_CODE open_connection(struct connection_t *connection) {
     /* prints a debug message */
     V_DEBUG_F("Opening connection: %d\n", connection->socket_handle);
 
+	printf("aberto: %d\n", connection->socket_handle);
+
     /* sets the connection status as open */
     connection->status = STATUS_OPEN;
 
@@ -1527,6 +1531,8 @@ ERROR_CODE close_connection(struct connection_t *connection) {
     /* in case the connection is (already) closed, must return
     immediately with no error (duplicated operation) */
     if(connection->status == STATUS_CLOSED) { RAISE_NO_ERROR; }
+
+	printf("fechado: %d\n", connection->socket_handle);
 
     /* prints a debug message */
     V_DEBUG_F("Closing connection: %d\n", connection->socket_handle);
