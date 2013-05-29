@@ -851,19 +851,19 @@ ERROR_CODE start_service(struct service_t *service) {
 #ifdef VIRIATUM_PLATFORM_WIN32
         /* binds the ip6 service socket */
         socket_result = SOCKET_BIND_EX(
-		    service->service_socket6_handle,
-			socket6_address->ai_addr,
-			socket6_address->ai_addrlen
-		);
+            service->service_socket6_handle,
+            socket6_address->ai_addr,
+            socket6_address->ai_addrlen
+        );
 #endif
 
 #ifdef VIRIATUM_PLATFORM_UNIX
         /* binds the ip6 service socket */
         socket_result = SOCKET_BIND_EX(
-			service->service_socket6_handle,
-			_socket6_address,
-			sizeof(_socket6_address)
-		);
+            service->service_socket6_handle,
+            _socket6_address,
+            sizeof(_socket6_address)
+        );
 #endif
 
         /* in case there was an error binding the socket */
@@ -1007,8 +1007,8 @@ ERROR_CODE start_service(struct service_t *service) {
     service_connection->on_read = accept_handler_stream_io;
 
     /* opens the (service) connection, this operation should trigger
-	the normal event handling operations and then add this connection
-	to the list of connections that are part of the service */
+    the normal event handling operations and then add this connection
+    to the list of connections that are part of the service */
     service_connection->open_connection(service_connection);
 
 #ifdef VIRIATUM_IP6
@@ -1417,7 +1417,7 @@ ERROR_CODE delete_connection(struct connection_t *connection) {
     in the iteration for the releasing of the pending data */
     struct data_t *data;
 
-	printf("apagado %d %d\n", connection->socket_handle, connection);
+    printf("apagado %d %d\n", connection->socket_handle, connection);
 
     /* iterates continuously to release all the pending
     memory to be released because the connection was dropped */
@@ -1503,7 +1503,7 @@ ERROR_CODE open_connection(struct connection_t *connection) {
     /* prints a debug message */
     V_DEBUG_F("Opening connection: %d\n", connection->socket_handle);
 
-	printf("aberto: %d %d\n", connection->socket_handle, connection);
+    printf("aberto: %d %d\n", connection->socket_handle, connection);
 
     /* sets the connection status as open */
     connection->status = STATUS_OPEN;
@@ -1514,7 +1514,7 @@ ERROR_CODE open_connection(struct connection_t *connection) {
     /* in case the on open handler is defined */
     if(connection->on_open != NULL) {
         /* prints a debug message about the handler to be called
-		and then calls the on open handler with the connection */
+        and then calls the on open handler with the connection */
         V_DEBUG("Calling on open handler\n");
         connection->on_open(connection);
         V_DEBUG("Finished calling on open handler\n");
@@ -1529,7 +1529,7 @@ ERROR_CODE close_connection(struct connection_t *connection) {
     immediately with no error (duplicated operation) */
     if(connection->status == STATUS_CLOSED) { RAISE_NO_ERROR; }
 
-	printf("fechado: %d %d\n", connection->socket_handle, connection);
+    printf("fechado: %d %d\n", connection->socket_handle, connection);
 
     /* prints a debug message */
     V_DEBUG_F("Closing connection: %d\n", connection->socket_handle);
@@ -1537,7 +1537,7 @@ ERROR_CODE close_connection(struct connection_t *connection) {
     /* in case the on close handler is defined */
     if(connection->on_close != NULL) {
         /* prints a debug message about the handler to be called
-		and then calls the on close handler with the connection */
+        and then calls the on close handler with the connection */
         V_DEBUG("Calling on close handler\n");
         connection->on_close(connection);
         V_DEBUG("Finished calling on close handler\n");

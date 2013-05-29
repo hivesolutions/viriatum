@@ -75,7 +75,7 @@ ERROR_CODE init_service(char *program_name, struct hash_map_t *arguments) {
 
 ERROR_CODE destroy_service() {
     /* prints a debug message about the initial stage
-	of the service structures destruction */
+    of the service structures destruction */
     V_DEBUG("Destroying the service structures\n");
 
     /* deletes the service, disallowing any further
@@ -85,7 +85,7 @@ ERROR_CODE destroy_service() {
     service = NULL;
 
     /* prints a debug message about the final stage
-	of the service structures destruction */
+    of the service structures destruction */
     V_DEBUG("Finished destroying the service structures\n");
 
     /* raises no error to the caller method, normal
