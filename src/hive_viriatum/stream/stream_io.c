@@ -34,21 +34,15 @@ void create_io_connection(struct io_connection_t **io_connection_pointer, struct
     size_t io_connection_size = sizeof(struct io_connection_t);
 
     /* allocates space for the io connection */
-    struct io_connection_t *io_connection = (struct io_connection_t *) MALLOC(io_connection_size);
+    struct io_connection_t *io_connection =\
+        (struct io_connection_t *) MALLOC(io_connection_size);
 
-    /* sets the io connection connection */
+    /* sets the default values for the io connection
+    attributes, this avoids problems in initialization */
     io_connection->connection = connection;
-
-    /* sets the on data to unset */
     io_connection->on_data = NULL;
-
-    /* sets the on open to unset */
     io_connection->on_open = NULL;
-
-    /* sets the on close to unset */
     io_connection->on_close = NULL;
-
-    /* sets the lower to unset */
     io_connection->lower = NULL;
 
     /* sets the io connection in the (upper) connection substrate */
