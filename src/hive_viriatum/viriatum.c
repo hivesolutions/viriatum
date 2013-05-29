@@ -449,14 +449,14 @@ int main(int argc, char *argv[]) {
     /* deletes the processed arguments and then cleans up
     the pool based memory allocation system releasing all
     of its memory before the exit (no leaks) */
-    delete_arguments(arguments);
+    //delete_arguments(arguments);
     cleanup_palloc();
 
     /* prints a debug message about the ending of the sytem
     for the execution of the service and then returns the
     normal return code (success status) to the caller process */
     V_DEBUG_F(
-        "Finishing process [%ld objects pending]\n",
+        "Finishing process [%ld pending]\n",
         (long int) ALLOCATIONS
     );
     return 0;
