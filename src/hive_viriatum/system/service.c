@@ -1137,10 +1137,10 @@ ERROR_CODE close_connections_service(struct service_t *service) {
         );
         if(current_connection == NULL) { break; }
 
-        /* closes the current connection (gracefully) and
-        then deletes the current connection */
+        /* closes the current connection (gracefully), the connection
+        remains in memory (no delete) as the delete operation should
+        be handled by the polling mechanism in the close operation */
         current_connection->close_connection(current_connection);
-        delete_connection(current_connection);
     }
 
 #ifdef VIRIATUM_SSL
@@ -1359,7 +1359,8 @@ ERROR_CODE create_connection(struct connection_t **connection_pointer, SOCKET_HA
     size_t connection_size = sizeof(struct connection_t);
 
     /* allocates space for the connection */
-    struct connection_t *connection = (struct connection_t *) MALLOC(connection_size);
+    struct connection_t *connection =\
+        (struct connection_t *) MALLOC(connection_size);
 
     /* sets the connection attributes (default) values */
     connection->status = STATUS_CLOSED;
