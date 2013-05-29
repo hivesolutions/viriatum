@@ -850,12 +850,20 @@ ERROR_CODE start_service(struct service_t *service) {
     if(service_options->ip6) {
 #ifdef VIRIATUM_PLATFORM_WIN32
         /* binds the ip6 service socket */
-        socket_result = SOCKET_BIND_EX(service->service_socket6_handle, socket6_address->ai_addr, socket6_address->ai_addrlen);
+        socket_result = SOCKET_BIND_EX(
+		    service->service_socket6_handle,
+			socket6_address->ai_addr,
+			socket6_address->ai_addrlen
+		);
 #endif
 
 #ifdef VIRIATUM_PLATFORM_UNIX
         /* binds the ip6 service socket */
-        socket_result = SOCKET_BIND_EX(service->service_socket6_handle, _socket6_address, sizeof(_socket6_address));
+        socket_result = SOCKET_BIND_EX(
+			service->service_socket6_handle,
+			_socket6_address,
+			sizeof(_socket6_address)
+		);
 #endif
 
         /* in case there was an error binding the socket */
