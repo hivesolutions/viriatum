@@ -211,7 +211,7 @@ static __inline void remove_connection(
 ) {
     /* allocates the index counter for the interation and
     the space for the temporary connection pointer */
-    unsigned int index;
+    size_t index;
     struct connection_t *current_connection;
 
     /* retrieves the remove connections size */
