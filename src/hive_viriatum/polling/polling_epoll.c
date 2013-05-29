@@ -135,8 +135,6 @@ ERROR_CODE register_connection_polling_epoll(struct polling_t *polling, struct c
         &_event
     );
 
-    printf("vai registar %d\n", connection->socket_handle);
-
     /* in case there was an error in epoll need to correctly
     handle it and propagate it to the caller */
     if(SOCKET_TEST_ERROR(result_code)) {
@@ -144,8 +142,6 @@ ERROR_CODE register_connection_polling_epoll(struct polling_t *polling, struct c
         V_WARNING_F("Problem registering connection epoll: %d\n", epoll_error_code);
         RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem registering connection epoll");
     }
-
-    printf("registou %d\n", connection->socket_handle);
 
     /* increments the counter that controls the number of events
     currently in the polling state in the epoll */
@@ -181,12 +177,6 @@ ERROR_CODE unregister_connection_polling_epoll(
     handle it and propagate it to the caller */
     if(SOCKET_TEST_ERROR(result_code)) {
         SOCKET_ERROR_CODE epoll_error_code = SOCKET_GET_ERROR_CODE(socket_result);
-        printf(
-            "Problem unregistering connection epoll sair %d %d %d\n",
-            connection,
-            connection->socket_handle,
-            epoll_error_code
-        );
         V_WARNING_F(
             "Problem unregistering connection epoll: %d\n",
             epoll_error_code

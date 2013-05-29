@@ -566,8 +566,6 @@ ERROR_CODE start_service(struct service_t *service) {
         SOCKET_PROTOCOL_TCP
     );
 
-    printf("SERVICO %d\n", service->service_socket_handle);
-
     /* in case there was an error creating the service socket */
     if(SOCKET_TEST_ERROR(service->service_socket_handle)) {
         SOCKET_ERROR_CODE creating_error_code = SOCKET_GET_ERROR_CODE(socket_result);
@@ -1419,8 +1417,6 @@ ERROR_CODE delete_connection(struct connection_t *connection) {
     in the iteration for the releasing of the pending data */
     struct data_t *data;
 
-    printf("apagado %d %d\n", connection->socket_handle, connection);
-
     /* iterates continuously to release all the pending
     memory to be released because the connection was dropped */
     while(TRUE) {
@@ -1505,8 +1501,6 @@ ERROR_CODE open_connection(struct connection_t *connection) {
     /* prints a debug message */
     V_DEBUG_F("Opening connection: %d\n", connection->socket_handle);
 
-    printf("aberto: %d %d\n", connection->socket_handle, connection);
-
     /* sets the connection status as open */
     connection->status = STATUS_OPEN;
 
@@ -1530,8 +1524,6 @@ ERROR_CODE close_connection(struct connection_t *connection) {
     /* in case the connection is (already) closed, must return
     immediately with no error (duplicated operation) */
     if(connection->status == STATUS_CLOSED) { RAISE_NO_ERROR; }
-
-    printf("fechado: %d %d\n", connection->socket_handle, connection);
 
     /* prints a debug message */
     V_DEBUG_F("Closing connection: %d\n", connection->socket_handle);
