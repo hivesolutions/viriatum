@@ -180,7 +180,7 @@ ERROR_CODE unregister_connection_polling_epoll(
         printf(
 			"Problem unregistering connection epoll sair %d %d\n",
 			connection,
-			connection->socket_handler,
+			connection->socket_handle,
 			epoll_error_code
 		);
         V_WARNING_F(
