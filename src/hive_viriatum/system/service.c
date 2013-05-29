@@ -1124,13 +1124,17 @@ ERROR_CODE close_connections_service(struct service_t *service) {
     /* prints a debug message */
     V_DEBUG("Closing the service connections\n");
 
-    /* iterates continuously */
+    /* iterates continuously in order to iterate over all the
+    connection and delete them */
     while(TRUE) {
-        /* pops a value from the connections list (and deletes the node) */
-        pop_value_linked_list(connections_list, (void **) &current_connection, TRUE);
-
-        /* in case the current connection is null the end
-        of iteration has been reached and breaks the loop */
+        /* pops a value from the connections list in order to be
+        able to close and delete it, in case the retrieved value
+        is invalid this is the end of iteration (must tbreak loop) */
+        pop_value_linked_list(
+            connections_list,
+            (void **) &current_connection,
+            TRUE
+        );
         if(current_connection == NULL) { break; }
 
         /* closes the current connection (gracefully) and
@@ -1140,14 +1144,13 @@ ERROR_CODE close_connections_service(struct service_t *service) {
     }
 
 #ifdef VIRIATUM_SSL
-        /* closes the ssl context for the current serice, this should disable
-        all the metadata access to the ssl */
-        if(service->ssl_context != NULL) {
-            SSL_CTX_free(service->ssl_context);
-            service->ssl_context = NULL;
-        }
-#endif
+    /* closes the ssl context for the current serice, this should disable
+    all the metadata access to the ssl */
+    if(service->ssl_context != NULL) {
+        SSL_CTX_free(service->ssl_context);
+        service->ssl_context = NULL;
     }
+#endif
 
     /* prints a debug message */
     V_DEBUG("Finished closing the service connections\n");
@@ -1342,8 +1345,9 @@ ERROR_CODE remove_connection_service(struct service_t *service, struct connectio
     struct polling_t *polling = service->polling;
 
     /* unregisters the connection from the polling (provider)
-    and then removes the connection from the connections list */
-    polling->unregister_connection(polling, connection);
+    and then removes the connection from the connections list
+    note that the connection will be removed at the loop end */
+    polling->unregister_connection(polling, connection, TRUE);
     remove_value_linked_list(service->connections_list, connection, 1);
 
     /* raises no error */

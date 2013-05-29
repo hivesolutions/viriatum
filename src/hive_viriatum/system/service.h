@@ -132,6 +132,14 @@ typedef ERROR_CODE (*polling_update) (struct polling_t *);
 typedef ERROR_CODE (*polling_connection_update) (struct polling_t *, struct connection_t *);
 
 /**
+ * The function used to unregister state in the polling
+ * using the given connection as reference. An extra
+ * parameter is provided so that one can remove the
+ * connection from the polling mechanism.
+ */
+typedef ERROR_CODE (*polling_connection_unregister) (struct polling_t *, struct connection_t *, unsigned char);
+
+/**
  * Structure describing a location to be
  * used by the service in the resolution
  * process.
@@ -221,7 +229,7 @@ typedef struct polling_t {
      * Function used to unregister a connection
      * from the polling (provider).
      */
-    polling_connection_update unregister_connection;
+    polling_connection_unregister unregister_connection;
 
     /**
      * Function used to the start "listening"
