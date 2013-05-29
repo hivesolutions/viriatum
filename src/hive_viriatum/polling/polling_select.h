@@ -214,8 +214,11 @@ static __inline void remove_connection(
     size_t index;
     struct connection_t *current_connection;
 
-    /* retrieves the remove connections size */
+    /* retrieves the remove connections size value from the
+	providade pointer value (indirect value) */
     unsigned int remove_connections_size = *remove_connections_size_pointer;
+
+	printf("vai tentar remover %d\n", current_connection->socket_handle)
 
     /* iterates over all the connections to be removed in order
     to find out if there's a duplicated value */
@@ -225,7 +228,10 @@ static __inline void remove_connection(
         connections to be removed must return immediately
         in to avoid duplicated values (possible problems) */
         current_connection = remove_connections[index];
-        if(current_connection == connection) { return; }
+        if(current_connection == connection) {
+			printf("JA EXISTE %d !!!!\n", connection->socket_handle)
+			return;
+		}
     }
 
     /* adds the connection to the remove connections and
