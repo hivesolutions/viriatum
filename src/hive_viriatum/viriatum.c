@@ -449,7 +449,7 @@ int main(int argc, char *argv[]) {
     /* deletes the processed arguments and then cleans up
     the pool based memory allocation system releasing all
     of its memory before the exit (no leaks) */
-    //delete_arguments(arguments);
+    delete_arguments(arguments);
     cleanup_palloc();
 
     /* prints a debug message about the ending of the sytem
