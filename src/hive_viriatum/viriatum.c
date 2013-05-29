@@ -74,11 +74,19 @@ ERROR_CODE init_service(char *program_name, struct hash_map_t *arguments) {
 }
 
 ERROR_CODE destroy_service() {
+    /* prints a debug message about the initial stage
+	of the service structures destruction */
+    V_DEBUG("Destroying the service structures\n");
+
     /* deletes the service, disallowing any further
     access to the service instance, and then sets its
     reference back to the original (unset sate) */
     delete_service(service);
     service = NULL;
+
+    /* prints a debug message about the final stage
+	of the service structures destruction */
+    V_DEBUG("Finished destroying the service structures\n");
 
     /* raises no error to the caller method, normal
     exit operation (should provide no problem) */
@@ -103,9 +111,6 @@ ERROR_CODE run_service() {
     /* tests the error code value for error and in case there's
     one runs the appropriate measures */
     if(IS_ERROR_CODE(return_value)) {
-		printf("TEVE ERRO!!!");
-
-
         /* runs the socket finish so that the proper cleanup
         operations are performed and then re-raises the error*/
         SOCKET_FINISH();
@@ -151,10 +156,10 @@ ERROR_CODE ran_service() {
 
     /* in case the service status is open */
     if(service->status == STATUS_CLOSED) {
-        /* prints a warning message */
+        /* prints a debug message */
         V_DEBUG("No service to be stopped\n");
     } else {
-        /* prints a warning message */
+        /* prints a debug message */
         V_DEBUG("Stopping service\n");
 
         /* stops the service, this call should make the
@@ -170,7 +175,7 @@ ERROR_CODE ran_service() {
             RAISE_AGAIN(return_value);
         }
 
-        /* prints a warning message */
+        /* prints a debug message */
         V_DEBUG("Finished stopping service\n");
     }
 
