@@ -180,6 +180,14 @@ typedef struct handler_proxy_context_t {
      * backend server associated with the current context.
      */
     struct http_parser_t *http_parser;
+
+    /**
+     * If there's a message pending to be processed (request sent) and the
+     * reply message hasn't been completely processed. This flag can be used
+     * to control if the the proxy communication is considered to be in the
+     * middle between both end-points.
+     */
+    char pending;
 } handler_proxy_context;
 
 ERROR_CODE create_proxy_handler(struct proxy_handler_t **proxy_handler_pointer, struct http_handler_t *http_handler);

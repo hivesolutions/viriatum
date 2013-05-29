@@ -101,6 +101,7 @@ ERROR_CODE create_handler_proxy_context(struct handler_proxy_context_t **handler
     handler_proxy_context->out_buffer_max_size = 1024;
     handler_proxy_context->connection = NULL;
     handler_proxy_context->connection_c = NULL;
+    handler_proxy_context->pending = FALSE;
 
     /* creates a new set of http settings and parser for the new
     context that is being created, these are going to be used in
@@ -512,6 +513,12 @@ ERROR_CODE virtual_url_callback_handler_proxy(struct http_parser_t *http_parser,
     parameters->on_close = close_backend_handler;
     parameters->parameters = (void *) handler_proxy_context;
 
+    /* updates the current proxy context so that the pending flag is set
+    this means that the message to be sent to the proxy client is in the
+    middle of the processing, any connection dropped in this state should
+    also drop the connection to the proxy client */
+    handler_proxy_context->pending = TRUE;
+
     /* in case the connection client reference structure for the current
     context is not defined a new connection must be created */
     if(handler_proxy_context->connection_c == NULL) {
@@ -615,6 +622,10 @@ ERROR_CODE data_backend_handler(struct io_connection_t *io_connection, unsigned 
     handler_proxy_context =\
         (struct handler_proxy_context_t *) custom_parameters->parameters;
 
+
+    printf("DATA\n");
+
+
     /* runs the process operation (parser iteration) using the buffer that contains
     the data that has been retrieved from the backend server, this should trigger a
     series of callbacks for the various stages of the parsing, then returns the control
@@ -711,10 +722,12 @@ ERROR_CODE close_backend_handler(struct io_connection_t *io_connection) {
         /* releases the lock present in the connection for the service and then
         closes it releasing all of it's structures, the logic is that if the
         connection with the proxy target (client) closes the connection with the
-        proxy client should also be closed, then returns the controll flow to the
+        proxy client should also be closed, then returns the control flow to the
         caller function with no error */
         http_connection_s->release(http_connection_s);
-        connection_s->close_connection(connection_s);
+        if(handler_proxy_context->pending) {
+            connection_s->close_connection(connection_s);
+        }
     }
 
     printf("DISCONNECTED\n");
@@ -816,6 +829,8 @@ ERROR_CODE message_complete_callback_backend(struct http_parser_t *http_parser) 
         FALSE
     );
 
+    handler_proxy_context->pending = FALSE;
+
     /* raise no error */
     RAISE_NO_ERROR;
 }
@@ -863,6 +878,7 @@ ERROR_CODE _reset_http_parser_handler_proxy(struct http_parser_t *http_parser) {
     should discard the values in the buffer */
     handler_proxy_context->buffer_size = 0;
     handler_proxy_context->out_buffer_size = 0;
+    handler_proxy_context->pending = FALSE;
 
     /* raises no error */
     RAISE_NO_ERROR;
