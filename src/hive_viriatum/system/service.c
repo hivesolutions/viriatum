@@ -1461,7 +1461,7 @@ ERROR_CODE write_connection(struct connection_t *connection, unsigned char *data
 
 ERROR_CODE write_connection_c(struct connection_t *connection, unsigned char *data, unsigned int size, connection_data_callback callback, void *callback_parameters, char release) {
     /* allocates the data structure that is going to be used as
-	the deplyment chunk for the connection */
+    the deplyment chunk for the connection */
     struct data_t *_data;
 
     /* creates the data structure that will be used to store metada
