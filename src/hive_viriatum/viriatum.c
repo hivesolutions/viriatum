@@ -239,7 +239,15 @@ ERROR_CODE print_information() {
 }
 
 void help() { V_PRINT(HELP_STRING); }
-void version() { V_PRINT_F("%s - %s (%s, %s)\n", VIRIATUM_NAME, VIRIATUM_VERSION, VIRIATUM_COMPILATION_DATE, VIRIATUM_COMPILATION_TIME); }
+void version() {
+    V_PRINT_F(
+        "%s - %s (%s, %s)\n",
+        VIRIATUM_NAME,
+        VIRIATUM_VERSION,
+        VIRIATUM_COMPILATION_DATE,
+        VIRIATUM_COMPILATION_TIME
+    );
+}
 void test() { run_simple_tests(); }
 void speed() { run_speed_tests(); }
 
