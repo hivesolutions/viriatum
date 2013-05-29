@@ -206,7 +206,7 @@ ERROR_CODE _unregister_sockets_set_polling_select(struct polling_select_t *polli
  */
 static __inline void remove_connection(
     struct connection_t **remove_connections,
-    unsigned int *remove_connections_size_pointer,
+    size_t *remove_connections_size_pointer,
     struct connection_t *connection
 ) {
     /* allocates the index counter for the interation and
