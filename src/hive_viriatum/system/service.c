@@ -1358,7 +1358,7 @@ ERROR_CODE remove_connection_service(struct service_t *service, struct connectio
     and then removes the connection from the connections list
     note that the connection will be removed at the loop end */
     polling->unregister_connection(polling, connection, TRUE);
-    remove_value_linked_list(service->connections_list, connection, 1);
+    remove_value_linked_list(service->connections_list, connection, TRUE);
 
     /* raises no error */
     RAISE_NO_ERROR;
