@@ -566,7 +566,7 @@ ERROR_CODE start_service(struct service_t *service) {
         SOCKET_PROTOCOL_TCP
     );
 
-	printf("SERVICO %d\n", service->service_socket_handle);
+    printf("SERVICO %d\n", service->service_socket_handle);
 
     /* in case there was an error creating the service socket */
     if(SOCKET_TEST_ERROR(service->service_socket_handle)) {
@@ -1568,8 +1568,8 @@ ERROR_CODE close_connection(struct connection_t *connection) {
 #endif
 
     /* closes the socket associated with the connection and then
-	updates the connection status to closed in order to notify any
-	logic acessing the connection about its state */
+    updates the connection status to closed in order to notify any
+    logic acessing the connection about its state */
     SOCKET_CLOSE(connection->socket_handle);
     connection->status = STATUS_CLOSED;
 

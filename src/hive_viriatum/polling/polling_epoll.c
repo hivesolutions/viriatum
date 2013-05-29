@@ -135,7 +135,7 @@ ERROR_CODE register_connection_polling_epoll(struct polling_t *polling, struct c
         &_event
     );
 
-	printf("vai registar %d\n", connection->socket_handle);
+    printf("vai registar %d\n", connection->socket_handle);
 
     /* in case there was an error in epoll need to correctly
     handle it and propagate it to the caller */
@@ -145,7 +145,7 @@ ERROR_CODE register_connection_polling_epoll(struct polling_t *polling, struct c
         RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem registering connection epoll");
     }
 
-	printf("registou %d\n", connection->socket_handle);
+    printf("registou %d\n", connection->socket_handle);
 
     /* increments the counter that controls the number of events
     currently in the polling state in the epoll */
@@ -182,11 +182,11 @@ ERROR_CODE unregister_connection_polling_epoll(
     if(SOCKET_TEST_ERROR(result_code)) {
         SOCKET_ERROR_CODE epoll_error_code = SOCKET_GET_ERROR_CODE(socket_result);
         printf(
-			"Problem unregistering connection epoll sair %d %d %d\n",
-			connection,
-			connection->socket_handle,
-			epoll_error_code
-		);
+            "Problem unregistering connection epoll sair %d %d %d\n",
+            connection,
+            connection->socket_handle,
+            epoll_error_code
+        );
         V_WARNING_F(
             "Problem unregistering connection epoll: %d\n",
             epoll_error_code
@@ -373,13 +373,20 @@ ERROR_CODE _poll_polling_epoll(
         /* prints an info message */
         V_INFO_F("Problem running epoll: %d\n", epoll_error_code);
 
-		printf("error -> %d", epoll_error_code);
-
         /* resets the values for the various read values,
         this avoid possible problems in next actions */
         *read_connections_size = 0;
         *write_connections_size = 0;
         *error_connections_size = 0;
+
+        /* in case the interupt error code has been received the
+        system should fail gracefully to unblock the call */
+        if(epoll_error_code == EINTR) {
+            RAISE_ERROR_M(
+                RUNTIME_EXCEPTION_ERROR_CODE,
+                (unsigned char *) "Interrupted system call in epoll"
+            );
+        }
 
         /* closes the service socket, this will disable any
         more interaction with the service socket */
