@@ -181,7 +181,6 @@ ERROR_CODE _call_polling_select(
     struct connection_t **read_connections,
     struct connection_t **write_connections,
     struct connection_t **error_connections,
-    struct connection_t **remove_connections,
     size_t read_connections_size,
     size_t write_connections_size,
     size_t error_connections_size
@@ -195,7 +194,8 @@ ERROR_CODE _register_sockets_set_polling_select(struct polling_select_t *polling
 ERROR_CODE _unregister_sockets_set_polling_select(struct polling_select_t *polling_select, SOCKET_HANDLE socket_handle, SOCKET_SET *sockets_set);
 
 /**
- * Removes a connection from the remove connections array.
+ * Removes a connection and insert it into the remove connections
+ * array, in order for it to be removed in next main loop.
  * This method checks for duplicates and in case they exist, no
  * connection is added.
  *

@@ -124,7 +124,11 @@ void delete_polling_epoll(struct polling_epoll_t *polling_epoll);
 ERROR_CODE open_polling_epoll(struct polling_t *polling);
 ERROR_CODE close_polling_epoll(struct polling_t *polling);
 ERROR_CODE register_connection_polling_epoll(struct polling_t *polling, struct connection_t *connection);
-ERROR_CODE unregister_connection_polling_epoll(struct polling_t *polling, struct connection_t *connection);
+ERROR_CODE unregister_connection_polling_epoll(
+    struct polling_t *polling,
+    struct connection_t *connection,
+    unsigned char remove
+);
 ERROR_CODE register_write_polling_epoll(struct polling_t *polling, struct connection_t *connection);
 ERROR_CODE unregister_write_polling_epoll(struct polling_t *polling, struct connection_t *connection);
 ERROR_CODE poll_polling_epoll(struct polling_t *polling);
@@ -143,7 +147,6 @@ ERROR_CODE _call_polling_epoll(
     struct connection_t **read_connections,
     struct connection_t **write_connections,
     struct connection_t **error_connections,
-    struct connection_t **remove_connections,
     size_t read_connections_size,
     size_t write_connections_size,
     size_t error_connections_size

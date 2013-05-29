@@ -40,6 +40,10 @@ void create_polling_select(struct polling_select_t **polling_select_pointer, str
     that are going to be used in the polling */
     polling_select->polling = polling;
     polling_select->sockets_set_highest = 0;
+    polling_select->read_connections_size = 0;
+    polling_select->write_connections_size = 0;
+    polling_select->error_connections_size = 0;
+    polling_select->remove_connections_size = 0;
     polling_select->write_outstanding_size = 0;
 
     /* zerifies the variuous socket sets that are going
@@ -80,10 +84,27 @@ ERROR_CODE open_polling_select(struct polling_t *polling) {
 }
 
 ERROR_CODE close_polling_select(struct polling_t *polling) {
-    /* retrieves the polling select */
-    struct polling_select_t *polling_select = (struct polling_select_t *) polling->lower;
+    /* allocates space for the temporary variable that will
+    store the various index values in iteration */
+    size_t index;
+    struct connection_t *current_connection;
 
-    /* deletes the polling select */
+    /* retrieves the polling select structure as the concrete
+    underlying substrate of the polling structure */
+    struct polling_select_t *polling_select =\
+        (struct polling_select_t *) polling->lower;
+
+    /* iterates over the set of connections that are meant to
+    be removed from the select list as they are no longer available */
+    for(index = 0; index < polling_select->remove_connections_size; index++) {
+        /* retrieves the current connection for the iteration
+        and then deletes the current connection (house keeping) */
+        current_connection = polling_select->remove_connections[index];
+        delete_connection(current_connection);
+    }
+
+    /* deletes the polling select, avoiding any memory leaks
+    occuring from the select structures */
     delete_polling_select(polling_select);
 
     /* raises no error */
@@ -234,10 +255,6 @@ ERROR_CODE poll_polling_select(struct polling_t *polling) {
     /* retrieves the polling select */
     struct polling_select_t *polling_select = (struct polling_select_t *) polling->lower;
 
-    /* resets the remove connections size to the default
-    zero value, no connections are removed by default */
-    polling_select->remove_connections_size = 0;
-
     /* triggers the processing of the outstanding connection
     operations (pending operations) that meant to be done before
     the main poll operation blocks the control flow */
@@ -274,7 +291,6 @@ ERROR_CODE call_polling_select(struct polling_t *polling) {
         polling_select->read_connections,
         polling_select->write_connections,
         polling_select->error_connections,
-        polling_select->remove_connections,
         polling_select->read_connections_size,
         polling_select->write_connections_size,
         polling_select->error_connections_size
@@ -309,7 +325,7 @@ ERROR_CODE _poll_polling_select(
     struct linked_list_t *connections_list = service->connections_list;
 
     /* initializes the various index values for the diferent
-	operations to be polled in the current operation */
+    operations to be polled in the current operation */
     unsigned int read_index = 0;
     unsigned int write_index = 0;
     unsigned int error_index = 0;
@@ -426,12 +442,12 @@ ERROR_CODE _poll_polling_select(
     V_DEBUG("Deleted iterator linked list\n");
 
     /* in case the select count is bigger than zero, prints
-	a debug message indicating the amount of read values */
+    a debug message indicating the amount of read values */
     if(select_count > 0) {
         V_DEBUG_F(
-			"Extraordinary select file descriptors not found: %d\n",
-			select_count
-		);
+            "Extraordinary select file descriptors not found: %d\n",
+            select_count
+        );
     }
 
     /* updates the various operation counters for the three
@@ -449,7 +465,6 @@ ERROR_CODE _call_polling_select(
     struct connection_t **read_connections,
     struct connection_t **write_connections,
     struct connection_t **error_connections,
-    struct connection_t **remove_connections,
     size_t read_connections_size,
     size_t write_connections_size,
     size_t error_connections_size
@@ -557,6 +572,10 @@ ERROR_CODE _call_polling_select(
         current_connection = polling_select->remove_connections[index];
         delete_connection(current_connection);
     }
+
+    /* resets the remove connections size to the default
+    zero value, no connections are removed by default */
+    polling_select->remove_connections_size = 0;
 
     /* raises no error */
     RAISE_NO_ERROR;

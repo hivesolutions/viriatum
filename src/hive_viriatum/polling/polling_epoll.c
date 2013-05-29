@@ -41,6 +41,10 @@ void create_polling_epoll(struct polling_epoll_t **polling_epoll_pointer, struct
     /* initializes the polling epoll structure default values
     so that the default setting is used by default */
     polling_epoll->poll_count = 0;
+    polling_epoll->read_connections_size = 0;
+    polling_epoll->write_connections_size = 0;
+    polling_epoll->error_connections_size = 0;
+    polling_epoll->remove_connections_size = 0;
     polling_epoll->write_outstanding_size = 0;
 
     /* resets the polling in the polling epoll */
@@ -79,10 +83,27 @@ ERROR_CODE open_polling_epoll(struct polling_t *polling) {
 }
 
 ERROR_CODE close_polling_epoll(struct polling_t *polling) {
-    /* retrieves the polling epoll */
-    struct polling_epoll_t *polling_epoll = (struct polling_epoll_t *) polling->lower;
+    /* allocates space for the temporary variable that will
+    store the various index values in iteration */
+    size_t index;
+    struct connection_t *current_connection;
 
-    /* deletes the polling epoll */
+    /* retrieves the polling epoll in order to be used locally
+    for the removal of the connections */
+    struct polling_epoll_t *polling_epoll =\
+        (struct polling_epoll_t *) polling->lower;
+
+    /* iterates over the set of connections that are meant to
+    be removed from the epoll list as they are no longer available */
+    for(index = 0; index < polling_epoll->remove_connections_size; index++) {
+        /* retrieves the current connection for the iteration
+        and then deletes the current connection (house keeping) */
+        current_connection = polling_epoll->remove_connections[index];
+        delete_connection(current_connection);
+    }
+
+    /* deletes the polling epoll in order to avoid any extra memory
+    leak from the epoll structures */
     delete_polling_epoll(polling_epoll);
 
     /* raises no error */
@@ -130,7 +151,11 @@ ERROR_CODE register_connection_polling_epoll(struct polling_t *polling, struct c
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE unregister_connection_polling_epoll(struct polling_t *polling, struct connection_t *connection)  {
+ERROR_CODE unregister_connection_polling_epoll(
+    struct polling_t *polling,
+    struct connection_t *connection,
+    unsigned char remove_c
+) {
     /* allocates space for the result of the poll call
     to add a new element to the poll structure */
     SOCKET_ERROR_CODE result_code;
@@ -154,6 +179,18 @@ ERROR_CODE unregister_connection_polling_epoll(struct polling_t *polling, struct
         SOCKET_ERROR_CODE epoll_error_code = SOCKET_GET_ERROR_CODE(socket_result);
         V_INFO_F("Problem unregistering connection epoll: %d\n", epoll_error_code);
         RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem unregistering connection epoll");
+    }
+
+    /* in case the remove connection flag is set the connection
+    is also added to the list of connections to be removed
+    after the io driven logic part is processed (at the end
+    of the logic loop) */
+    if(remove_c == TRUE) {
+        remove_connection(
+            polling_epoll->remove_connections,
+            &polling_epoll->remove_connections_size,
+            connection
+        );
     }
 
     /* decrements the counter that controls the number of events
@@ -241,7 +278,6 @@ ERROR_CODE call_polling_epoll(struct polling_t *polling) {
         polling_epoll->read_connections,
         polling_epoll->write_connections,
         polling_epoll->error_connections,
-        polling_epoll->remove_connections,
         polling_epoll->read_connections_size,
         polling_epoll->write_connections_size,
         polling_epoll->error_connections_size
@@ -390,7 +426,6 @@ ERROR_CODE _call_polling_epoll(
     struct connection_t **read_connections,
     struct connection_t **write_connections,
     struct connection_t **error_connections,
-    struct connection_t **remove_connections,
     size_t read_connections_size,
     size_t write_connections_size,
     size_t error_connections_size
@@ -401,9 +436,6 @@ ERROR_CODE _call_polling_epoll(
 
     /* allocates the current connection */
     struct connection_t *current_connection;
-
-    /* resets the remove connections size */
-    unsigned int remove_connections_size = 0;
 
     /* prints a debug message */
     V_DEBUG_F("Processing %lu read connections\n", (long unsigned int) read_connections_size);
@@ -439,16 +471,6 @@ ERROR_CODE _call_polling_epoll(
             CALL_V(current_connection->on_handshake, current_connection);
             V_DEBUG("Finished calling on handshake handler\n");
         }
-
-        /* in case the current connection is closed, thne the current
-        connection must be added to the set of connection to be removed */
-        if(current_connection->status == STATUS_CLOSED) {
-            remove_connection(
-                remove_connections,
-                &remove_connections_size,
-                current_connection
-            );
-        }
     }
 
     /* prints a debug message */
@@ -479,16 +501,6 @@ ERROR_CODE _call_polling_epoll(
             CALL_V(current_connection->on_write, current_connection);
             V_DEBUG("Finished calling on write handler\n");
         }
-
-        /* in case the current connection is closed, thne the current
-        connection must be added to the set of connection to be removed */
-        if(current_connection->status == STATUS_CLOSED) {
-            remove_connection(
-                remove_connections,
-                &remove_connections_size,
-                current_connection
-            );
-        }
     }
 
     /* prints a debug message */
@@ -511,26 +523,20 @@ ERROR_CODE _call_polling_epoll(
             CALL_V(current_connection->on_error, current_connection);
             V_DEBUG("Finished calling on error handler\n");
         }
-
-        /* in case the current connection is closed, thne the current
-        connection must be added to the set of connection to be removed */
-        if(current_connection->status == STATUS_CLOSED) {
-            remove_connection(
-                remove_connections,
-                &remove_connections_size,
-                current_connection
-            );
-        }
     }
 
     /* iterates over the set of connections that are meant to
     be removed from the epoll list as they are no longer available */
-    for(index = 0; index < remove_connections_size; index++) {
+    for(index = 0; index < polling_epoll->remove_connections_size; index++) {
         /* retrieves the current connection for the iteration
         and then deletes the current connection (house keeping) */
-        current_connection = remove_connections[index];
+        current_connection = polling_epoll->remove_connections[index];
         delete_connection(current_connection);
     }
+
+    /* resets the remove connections size to the default
+    zero value, no connections are removed by default */
+    polling_epoll->remove_connections_size = 0;
 
     /* raises no error */
     RAISE_NO_ERROR;
