@@ -350,7 +350,17 @@ ERROR_CODE read_handler_stream_io(struct connection_t *connection) {
 
         /* in case it's a fatal error */
         case 1:
-            /* closes the connection */
+            /* in case there's data pending to be processed must flush
+            it even though there was a fatal error the data must be
+            correctly processed by the underlying layer */
+            if(buffer_size > 0) {
+                V_DEBUG("Calling on data handler\n");
+                io_connection->on_data(io_connection, buffer, buffer_size);
+                V_DEBUG("Finished calling on data handler\n");
+            }
+
+            /* closes the connection as the error was falat this is the
+            best escape approach to solve the issue */
             connection->close_connection(connection);
 
             /* breaks the switch */
@@ -500,14 +510,9 @@ ERROR_CODE write_handler_stream_io(struct connection_t *connection) {
         buffer in case the flag for such operation is set */
         delete_data(data);
 
-        /* in case the connection has been closed */
-        if(connection->status == STATUS_CLOSED) {
-            /* sets the error flag (non fatal) */
-            error = 2;
-
-            /* breaks the loop */
-            break;
-        }
+        /* in case the connection has been closed sets the
+        error flag to non fatal and then breaks the loop */
+        if(connection->status == STATUS_CLOSED) { error = 2; break; }
     }
 
     /* prints a debug message */
@@ -539,7 +544,7 @@ ERROR_CODE write_handler_stream_io(struct connection_t *connection) {
             connection meaning that a new "level up" event must
             be performed before the connection is triggered for
             the write operation (useful for epoll) */
-            connection->invalidate_write(connection);
+            CALL_V(connection->invalidate_write, connection);
 
             /* breaks the switch */
             break;
