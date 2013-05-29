@@ -371,7 +371,7 @@ ERROR_CODE _poll_polling_select(
 
         /* in case the interupt error code has been received the
         system should fail gracefully to unblock the call */
-        if(epoll_error_code == EINTR) {
+        if(select_error_code == EINTR) {
             RAISE_ERROR_M(
                 RUNTIME_EXCEPTION_ERROR_CODE,
                 (unsigned char *) "Interrupted system call in select"
