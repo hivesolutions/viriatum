@@ -373,7 +373,7 @@ ERROR_CODE _poll_polling_epoll(
         /* prints an info message */
         V_INFO_F("Problem running epoll: %d\n", epoll_error_code);
 
-		printf("error -> %d", epoll_error_code)
+		printf("error -> %d", epoll_error_code);
 
         /* resets the values for the various read values,
         this avoid possible problems in next actions */
