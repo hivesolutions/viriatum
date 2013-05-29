@@ -164,8 +164,6 @@ ERROR_CODE unregister_connection_polling_epoll(
     polling control structure */
     struct polling_epoll_t *polling_epoll = (struct polling_epoll_t *) polling->lower;
 
-	printf("entrou aki %d\n", connection);
-
     /* removes the associated socket handle (fd) from the epoll
     structure to avoid any leak */
     result_code = epoll_ctl(
@@ -179,9 +177,15 @@ ERROR_CODE unregister_connection_polling_epoll(
     handle it and propagate it to the caller */
     if(SOCKET_TEST_ERROR(result_code)) {
         SOCKET_ERROR_CODE epoll_error_code = SOCKET_GET_ERROR_CODE(socket_result);
-		printf("Problem unregistering connection epoll sair %d %d\n", connection, epoll_error_code);
-        V_INFO_F("Problem unregistering connection epoll: %d\n", epoll_error_code);
-        RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem unregistering connection epoll");
+        printf("Problem unregistering connection epoll sair %d %d\n", connection, epoll_error_code);
+        V_WARNING_F(
+            "Problem unregistering connection epoll: %d\n",
+            epoll_error_code
+        );
+        RAISE_ERROR_M(
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Problem unregistering connection epoll"
+        );
     }
 
     /* in case the remove connection flag is set the connection
