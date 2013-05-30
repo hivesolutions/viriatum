@@ -86,7 +86,11 @@ ERROR_CODE accept_handler_stream_io(struct connection_t *connection) {
     /* iterates continuously */
     while(TRUE) {
         /* accepts the socket, retrieving the socket handle */
-        socket_handle = SOCKET_ACCEPT(connection->socket_handle, &socket_address, client_socket_address_size);
+        socket_handle = SOCKET_ACCEPT(
+			connection->socket_handle,
+			&socket_address,
+			client_socket_address_size
+		);
 
         /* in case there was an error accepting the socket */
         if(SOCKET_TEST_ERROR(socket_handle)) {
