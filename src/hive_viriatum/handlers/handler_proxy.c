@@ -448,18 +448,31 @@ ERROR_CODE location_callback_handler_proxy(struct http_parser_t *http_parser, si
 }
 
 ERROR_CODE virtual_url_callback_handler_proxy(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+    /* reserves space for a return error code to be used in various
+    operation in the current function call */
     ERROR_CODE return_value;
 
+    /* allocates space for the pointers to both the parameters and the
+    client connection (to the backend) structures to be used/created*/
     struct custom_parameters_t *parameters;
     struct connection_t *connection_c;
 
+    /* sets space for the resulting size of the buffer that will hold
+    the status line to be sent to the backend connection */
     size_t size_m;
 
+    /* allocates two buffers for temporary and local operations to
+    in the current callback function */
     char buffer[1024];
     char path[1024];
 
+    /* allocates space fot the temporary variable that will store the
+    on close handler that will be set in the associative map */
     io_connection_callback on_close;
 
+    /* retrieves the enumeration representation of the version and then
+    uses it to retrieve the string value out of it, then retrieves the
+    proper http method used in the current call */
     enum http_version_e version_e = get_http_version(
         http_parser->http_major,
         http_parser->http_minor
@@ -467,6 +480,10 @@ ERROR_CODE virtual_url_callback_handler_proxy(struct http_parser_t *http_parser,
     const char *version = get_http_version_string(version_e);
     const char *method = http_method_strings[http_parser->method - 1];
 
+    /* retrieves the connection from the parser parameters and then uses
+    it to retrieve its lower connection layers (substrates) then uses the
+    http connection to retrieve the handler and the handler to retrieve the
+    current proxy context structure */
     struct connection_t *connection =\
         (struct connection_t *) http_parser->parameters;
     struct io_connection_t *io_connection =\
@@ -479,6 +496,8 @@ ERROR_CODE virtual_url_callback_handler_proxy(struct http_parser_t *http_parser,
     struct handler_proxy_context_t *handler_proxy_context =\
         (struct handler_proxy_context_t *) http_parser->context;
 
+    /* copies the virtual url value into the local path buffer and then
+    closes it as a null terminated string */
     memcpy(path, data, data_size);
     path[data_size] = '\0';
 
@@ -574,6 +593,9 @@ ERROR_CODE virtual_url_callback_handler_proxy(struct http_parser_t *http_parser,
             handler_proxy_context->connection_c
         );
 
+        /* sets the reverse connection map, associating the client
+        (backend) connection with its own client proxy to be used
+        in the backend operation callbacks */
         set_value_hash_map(
             proxy_handler->reverse_map,
             (size_t) handler_proxy_context->connection_c,
@@ -581,6 +603,10 @@ ERROR_CODE virtual_url_callback_handler_proxy(struct http_parser_t *http_parser,
             connection
         );
 
+        /* updates the on close map that associates the client connection
+        with the previous (old) on close handler function with the respective
+        on cloese function for the current connection, to be used in callback
+        propagation and in the unregistration of the handler */
         set_value_hash_map(
             proxy_handler->on_close_map,
             (size_t) connection,
