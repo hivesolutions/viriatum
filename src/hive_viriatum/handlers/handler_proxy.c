@@ -737,20 +737,31 @@ ERROR_CODE close_backend_handler(struct io_connection_t *io_connection) {
 }
 
 ERROR_CODE line_callback_backend(struct http_parser_t *http_parser) {
+    /* allocates space for both the size of the message and
+    for the buffer to be used in the status line construction */
     size_t size_m;
     char buffer[1024];
 
+    /* retrieves the current parser's context as the proxy context
+    structure to be used for buffer handling */
     struct handler_proxy_context_t *handler_proxy_context =\
         (struct handler_proxy_context_t *) http_parser->context;
 
+    /* retrieves the enumeration representation of the version
+    value in order to be used in the string retrieval */
     enum http_version_e version_e = get_http_version(
         http_parser->http_major,
         http_parser->http_minor
     );
+
+    /* retrieves the string value of the version, the status code
+    and the equivalent status message from the pre-defined ones */
     const char *version = get_http_version_string(version_e);
     unsigned short status_code = http_parser->status_code;
     const char *status_message = GET_HTTP_STATUS(status_code);
 
+    /* writes the status line (should mimic the received one) into a local
+    buffer and then writes this buffer into the output buffer */
     size_m = SPRINTF(buffer, 1024, "%s %d %s\r\n", version, status_code, status_message);
     write_proxy_out_buffer(handler_proxy_context, buffer, size_m);
 
