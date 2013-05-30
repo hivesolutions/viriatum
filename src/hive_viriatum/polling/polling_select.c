@@ -207,29 +207,6 @@ ERROR_CODE register_read_polling_select(struct polling_t *polling, struct connec
         &polling_select->sockets_read_set
     );
 
-    /* in case the current state for the connection is not read
-    valid must return immediately with no error */
-    if(connection->read_valid == FALSE) { RAISE_NO_ERROR; }
-
-    /* in case the current connection is not open or the on read
-    callback function is not currently set must return */
-    if(connection->status != STATUS_OPEN || connection->on_read == NULL) {
-        RAISE_NO_ERROR;
-    }
-
-    /* in case the connection is already in the outstanding state
-    no need to add it again to the set of outstanding values */
-    if(connection->is_outstanding == TRUE) { RAISE_NO_ERROR; }
-
-    /* sets the connection for the current outstanding position and
-    then increments the size of the outstanding connection pending */
-    polling_select->read_outstanding[polling_select->read_outstanding_size] = connection;
-    polling_select->read_outstanding_size++;
-
-    /* sets the connection as outstanding as the connection has just
-    been registered in the select polling mechanism for extra reads */
-    connection->is_outstanding = TRUE;
-
     /* raises no error */
     RAISE_NO_ERROR;
 }
