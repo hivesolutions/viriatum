@@ -731,8 +731,8 @@ ERROR_CODE close_backend_handler(struct io_connection_t *io_connection) {
         }
     }
 
-	/* raises no error as the processing of the close opearion
-	in the backend connection has been done correctly */
+    /* raises no error as the processing of the close opearion
+    in the backend connection has been done correctly */
     RAISE_NO_ERROR;
 }
 
@@ -802,7 +802,7 @@ ERROR_CODE headers_complete_callback_backend(struct http_parser_t *http_parser) 
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE body_callback_backend(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size)
+ERROR_CODE body_callback_backend(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
     /* retrieves the proxy context object from the parser and then
     uses it to retrieve both the (proxy client) connection and the
     client connection (backend connection) */
