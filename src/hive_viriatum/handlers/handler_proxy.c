@@ -619,7 +619,7 @@ ERROR_CODE data_backend_handler(struct io_connection_t *io_connection, unsigned 
     and so the data operation should be ignored */
     if(custom_parameters == NULL) { RAISE_NO_ERROR; }
 
-	printf("DATA");
+	printf("DATA\n");
 
     /* retrieves the current proxy context structure from the custom parameters
     to be used for the processing of the current data received from the backend */
