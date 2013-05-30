@@ -357,18 +357,15 @@ ERROR_CODE poll_polling_select(struct polling_t *polling) {
     /* triggers the processing of the outstanding connection
     operations (pending operations) that meant to be done before
     the main poll operation blocks the control flow */
-    while(polling_select->read_outstanding_size > 0 ||
-        polling_select->write_outstanding_size > 0) {
-        _outstanding_polling_select(
-            polling_select,
-            polling_select->read_outstanding,
-            polling_select->write_outstanding,
-            polling_select->_read_outstanding,
-            polling_select->_write_outstanding,
-            polling_select->read_outstanding_size,
-            polling_select->write_outstanding_size
-        );
-    }
+    _outstanding_polling_select(
+        polling_select,
+        polling_select->read_outstanding,
+        polling_select->write_outstanding,
+        polling_select->_read_outstanding,
+        polling_select->_write_outstanding,
+        polling_select->read_outstanding_size,
+        polling_select->write_outstanding_size
+    );
 
     /* polls the polling select, this call should block until
     either a timeout occurs or data is received */
