@@ -199,7 +199,7 @@ static __inline char *get_config_path() {
 #define VIRIATUM_READB_SIZE 16384
 #define VIRIATUM_READ_SIZE 4096
 #define VIRIATUM_MAX_READ 1048576
-#define VIRIATUM_TRE_READ 524288
+#define VIRIATUM_TRE_READ 262144
 #define VIRIATUM_MAX_EVENTS 1024
 #endif
 
@@ -218,7 +218,7 @@ static __inline char *get_config_path() {
 #define VIRIATUM_READB_SIZE 16384
 #define VIRIATUM_READ_SIZE 4096
 #define VIRIATUM_MAX_READ 1048576
-#define VIRIATUM_TRE_READ 524288
+#define VIRIATUM_TRE_READ 262144
 #define VIRIATUM_MAX_EVENTS 1024
 #endif
 
