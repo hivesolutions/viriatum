@@ -628,7 +628,7 @@ ERROR_CODE _call_polling_epoll(
 }
 
 ERROR_CODE _outstanding_polling_epoll(
-    struct polling_select_t *polling_select,
+    struct polling_epoll_t *polling_epoll,
     struct connection_t **read_outstanding,
     struct connection_t **write_outstanding,
     struct connection_t **_read_outstanding,
@@ -647,8 +647,8 @@ ERROR_CODE _outstanding_polling_epoll(
     /* resets the current sizes associated with the outstanding
     events any new values coming from the event triggering will
     be set in a "fresh" set of outstanding buffers */
-    polling_select->read_outstanding_size = 0;
-    polling_select->write_outstanding_size = 0;
+    polling_epoll->read_outstanding_size = 0;
+    polling_epoll->write_outstanding_size = 0;
 
     /* runs the initial backup operation of the read outstanding
     operations to the extra buffer so that the outstanding operations
