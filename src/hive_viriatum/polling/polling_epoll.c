@@ -250,11 +250,11 @@ ERROR_CODE register_read_polling_epoll(struct polling_t *polling, struct connect
     /* sets the connection for the current outstanding position and
     then increments the size of the outstanding connection pending */
 /*    polling_epoll->read_outstanding[polling_epoll->read_outstanding_size] = connection;
-    polling_epoll->read_outstanding_size++;
+    polling_epoll->read_outstanding_size++;*/
 
     /* sets the connection as outstanding as the connection has just
     been registered in the epoll polling mechanism for extra reads */
-    connection->is_outstanding = TRUE;*/
+    /*connection->is_outstanding = TRUE;*/
 
     /* raises no error */
     RAISE_NO_ERROR;
