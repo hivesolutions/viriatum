@@ -651,14 +651,9 @@ ERROR_CODE _rabeton(struct connection_t *connection, struct data_t *data, void *
     struct connection_t *connection_c = handler_proxy_context->connection_c;
     handler_proxy_context->pending_write -= data->size_base;
 
-	if(connection_c->read_registered == FALSE) {
-		printf("%d\n", handler_proxy_context->pending_write);
-	}
-
     if(connection_c->read_registered == FALSE &&\
         handler_proxy_context->pending_write < VIRIATUM_TRE_READ) {
-        connection_c->register_read(connection_c);
-		printf("registou\n");
+        connection_c->register_read(connection_c)
     }
 
     RAISE_NO_ERROR;
@@ -817,7 +812,6 @@ ERROR_CODE headers_complete_callback_backend(struct http_parser_t *http_parser) 
     if(connection_c->read_registered == TRUE &&\
         handler_proxy_context->pending_write >= VIRIATUM_MAX_READ) {
         connection_c->unregister_read(connection_c);
-		printf("desregistou -> %d\n", handler_proxy_context->pending_write);
     }
 
     RAISE_NO_ERROR;
@@ -843,7 +837,6 @@ ERROR_CODE body_callback_backend(struct http_parser_t *http_parser, const unsign
     if(connection_c->read_registered == TRUE &&\
         handler_proxy_context->pending_write >= VIRIATUM_MAX_READ) {
         connection_c->unregister_read(connection_c);
-		printf("desregistou -> %d\n", handler_proxy_context->pending_write);
     }
 
     /* raise no error */
