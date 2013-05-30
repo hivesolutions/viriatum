@@ -87,10 +87,10 @@ ERROR_CODE accept_handler_stream_io(struct connection_t *connection) {
     while(TRUE) {
         /* accepts the socket, retrieving the socket handle */
         socket_handle = SOCKET_ACCEPT(
-			connection->socket_handle,
-			&socket_address,
-			client_socket_address_size
-		);
+            connection->socket_handle,
+            &socket_address,
+            client_socket_address_size
+        );
 
         /* in case there was an error accepting the socket */
         if(SOCKET_TEST_ERROR(socket_handle)) {
@@ -126,8 +126,11 @@ ERROR_CODE accept_handler_stream_io(struct connection_t *connection) {
             client_connection->open_connection = open_connection;
             client_connection->close_connection = close_connection;
             client_connection->write_connection = write_connection;
+            client_connection->register_read = register_read_connection;
+            client_connection->unregister_read = unregister_read_connection;
             client_connection->register_write = register_write_connection;
             client_connection->unregister_write = unregister_write_connection;
+            client_connection->invalidate_read = invalidate_read_connection;
             client_connection->invalidate_write = invalidate_write_connection;
             client_connection->add_outstanding = add_outstanding_connection;
 
@@ -235,12 +238,33 @@ ERROR_CODE read_handler_stream_io(struct connection_t *connection) {
     /* flag and value controlling the state of the read */
     ERROR_CODE error = 0;
 
-    /* retrieves the io connection */
-    struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
+    /* retrieves the io connection as the lower substrate of the
+    current connection object, in order to be used */
+    struct io_connection_t *io_connection =\
+        (struct io_connection_t *) connection->lower;
 
     /* iterates continuously to read the data that is currently
     available in the connection for reading */
     while(TRUE) {
+        /* in case the current total number of bytes read during
+        this read operation is greater than the expected maximum
+        the read operation should be delayed so that the write
+        doesn't starve (only read operations and no writing) */
+        if(total_bytes > VIRIATUM_MAX_READ) {
+            connection->add_outstanding(connection);
+            break;
+        }
+
+        /* if the read control is active for the connection and
+        the ammount of bytes pending to be read has reached zero
+        the connection must be unregistered for thre read operation
+        (until further notice) and the loop must be break */
+        if(connection->read_control == TRUE &&\
+            connection->pending_read == 0) {
+            connection->unregister_read(connection);
+            break;
+        }
+
         /* in case the buffer size is so big that may
         overflow the current allocated buffer, must
         flush the current buffer avoid corruption */
@@ -334,13 +358,13 @@ ERROR_CODE read_handler_stream_io(struct connection_t *connection) {
         buffer_size += number_bytes;
         total_bytes += number_bytes;
 
-        /* in case the current total number of bytes read during
-        this read operation is greater than the expected maximum
-        the read operation should be delayed so that the write
-        doesn't starve (only read operations) */
-        if(total_bytes > VIRIATUM_MAX_READ) {
-            connection->add_outstanding(connection);
-            break;
+        /* in case the read control is currently active for
+        the connection the number if bytes pending to be
+        processed must be updated by decrementing the number
+        of bytes that have just been processed */
+        if(connection->read_control == TRUE) {
+            connection->pending_read = connection->pending_read > number_bytes ?\
+                connection->pending_read - number_bytes : 0;
         }
 
         /* in case the viriatum is set to blocking must break
@@ -397,6 +421,12 @@ ERROR_CODE read_handler_stream_io(struct connection_t *connection) {
                 io_connection->on_data(io_connection, buffer, buffer_size);
                 V_DEBUG("Finished calling on data handler\n");
             }
+
+            /* invalidates the read operation for the current
+            connection meaning that a new "level up" event must
+            be performed before the connection is triggered for
+            the read operation (useful for epoll) */
+            CALL_V(connection->invalidate_read, connection);
 
             /* breaks the switch */
             break;
