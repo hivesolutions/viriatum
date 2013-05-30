@@ -653,13 +653,15 @@ ERROR_CODE _rabeton(struct connection_t *connection, struct data_t *data, void *
     struct connection_t *connection_c = handler_proxy_context->connection_c;
     connection_c->pending_read += data->size;
 
-    if(connection_c->read_registered == FALSE &&\
-		(connection_c->pending_read >= VIRIATUM_TRI_READ ||\
-		connection_c->write_queue->size == 0)) {
+    if(connection_c->read_registered == TRUE) { RAISE_NO_ERROR; }
+
+    if(connection_c->pending_read >= VIRIATUM_TRE_READ ||\
+        connection_c->pending_read >= VIRIATUM_TRE_READ) {
+        connection_c->pending_read = VIRIATUM_MAX_READ;
         connection_c->register_read(connection_c);
     }
 
-	RAISE_NO_ERROR;
+    RAISE_NO_ERROR;
 }
 
 
