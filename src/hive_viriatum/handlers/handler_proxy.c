@@ -778,11 +778,17 @@ ERROR_CODE header_value_callback_backend(struct http_parser_t *http_parser, cons
 }
 
 ERROR_CODE headers_complete_callback_backend(struct http_parser_t *http_parser) {
+    /* retrieves the parser's context as the proxy context and then uses
+    it to retrieve both the proxy client connection and the backend client
+    connection to be used in the processing of the header's final */
     struct handler_proxy_context_t *handler_proxy_context =\
         (struct handler_proxy_context_t *) http_parser->context;
     struct connection_t *connection = handler_proxy_context->connection;
     struct connection_t *connection_c = handler_proxy_context->connection_c;
 
+    /* writes the final header to body separator in the current output
+    buffer of the proxy and then flushes (writes) the output buffer to
+    the proxy client connection (propagation) */
     write_proxy_out_buffer(handler_proxy_context, "\r\n", 2);
     write_connection_c(
         connection,
@@ -793,12 +799,17 @@ ERROR_CODE headers_complete_callback_backend(struct http_parser_t *http_parser) 
         FALSE
     );
 
+    /* adds the size of the current data to the counter of bytes
+    that are in the write buffer and then in case this values exceeds
+    the maximum allowed and the read enabled in the client connection
+    disables the read operations in the backend connection (avoids flooding) */
     handler_proxy_context->pending_write += handler_proxy_context->out_buffer_size;
     if(connection_c->read_registered == TRUE &&\
         handler_proxy_context->pending_write >= VIRIATUM_MAX_READ) {
         connection_c->unregister_read(connection_c);
     }
 
+    /* raises no error */
     RAISE_NO_ERROR;
 }
 
