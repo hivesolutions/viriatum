@@ -651,8 +651,6 @@ ERROR_CODE _rabeton(struct connection_t *connection, struct data_t *data, void *
     struct connection_t *connection_c = handler_proxy_context->connection_c;
     handler_proxy_context->pending_write -= data->size;
 
-	printf("cenas %d\n", handler_proxy_context->pending_write);
-
     if(connection_c->read_registered == FALSE &&\
         handler_proxy_context->pending_write < VIRIATUM_TRE_READ) {
         connection_c->register_read(connection_c);
@@ -911,7 +909,7 @@ ERROR_CODE _reset_http_parser_handler_proxy(struct http_parser_t *http_parser) {
     handler_proxy_context->buffer_size = 0;
     handler_proxy_context->out_buffer_size = 0;
     handler_proxy_context->pending = FALSE;
-	handler_proxy_context->pending_write = 0;
+    handler_proxy_context->pending_write = 0;
 
     /* raises no error */
     RAISE_NO_ERROR;
