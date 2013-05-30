@@ -67,14 +67,6 @@ typedef struct polling_epoll_t {
     struct connection_t *write_connections[VIRIATUM_MAX_EVENTS];
 
     /**
-     * The buffer that contains the various
-     * connections that have data pending to
-     * be writen to the socket at the begining
-     * of the next poll operation.
-     */
-    struct connection_t *write_outstanding[VIRIATUM_MAX_EVENTS];
-
-    /**
      * The buffer that holds the connections
      * that are in an erroneous state
      */
@@ -88,11 +80,32 @@ typedef struct polling_epoll_t {
     struct connection_t *remove_connections[VIRIATUM_MAX_EVENTS];
 
     /**
-     * The size as items of the sequence of
-     * connection that are pending to be writen
-     * at he beginning of the poll operation.
+     * The buffer that contains the various
+     * connections that have data pending to
+     * be read from the socket at the begining
+     * of the next poll operation.
      */
-    size_t write_outstanding_size;
+    struct connection_t *read_outstanding[VIRIATUM_MAX_EVENTS];
+
+    /**
+     * The buffer that contains the various
+     * connections that have data pending to
+     * be writen to the socket at the begining
+     * of the next poll operation.
+     */
+    struct connection_t *write_outstanding[VIRIATUM_MAX_EVENTS];
+
+    /**
+     * Auxiliary buffer to be used in the performing
+     * of the outstaind read operations.
+     */
+    struct connection_t *_read_outstanding[VIRIATUM_MAX_EVENTS];
+
+    /**
+     * Auxiliary buffer to be used in the performing
+     * of the outstaind write operations.
+     */
+    struct connection_t *_write_outstanding[VIRIATUM_MAX_EVENTS];
 
     /**
      * The size of the read connections
@@ -117,6 +130,20 @@ typedef struct polling_epoll_t {
      * buffer.
      */
     size_t remove_connections_size;
+
+   /**
+     * The size as items of the sequence of
+     * connections that are pending to be read
+     * at he beginning of the poll operation.
+     */
+    size_t read_outstanding_size;
+
+    /**
+     * The size as items of the sequence of
+     * connection that are pending to be writen
+     * at he beginning of the poll operation.
+     */
+    size_t write_outstanding_size;
 } polling_epoll;
 
 void create_polling_epoll(struct polling_epoll_t **polling_epoll_pointer, struct polling_t *polling);
@@ -129,8 +156,11 @@ ERROR_CODE unregister_connection_polling_epoll(
     struct connection_t *connection,
     unsigned char remove
 );
+ERROR_CODE register_read_polling_epoll(struct polling_t *polling, struct connection_t *connection);
+ERROR_CODE unregister_read_polling_epoll(struct polling_t *polling, struct connection_t *connection);
 ERROR_CODE register_write_polling_epoll(struct polling_t *polling, struct connection_t *connection);
 ERROR_CODE unregister_write_polling_epoll(struct polling_t *polling, struct connection_t *connection);
+ERROR_CODE add_outstanding_polling_epoll(struct polling_t *polling, struct connection_t *connection);
 ERROR_CODE poll_polling_epoll(struct polling_t *polling);
 ERROR_CODE call_polling_epoll(struct polling_t *polling);
 ERROR_CODE _poll_polling_epoll(
@@ -153,7 +183,11 @@ ERROR_CODE _call_polling_epoll(
 );
 ERROR_CODE _outstanding_polling_epoll(
     struct polling_epoll_t *polling_epoll,
+    struct connection_t **read_outstanding,
     struct connection_t **write_outstanding,
+    struct connection_t **_read_outstanding,
+    struct connection_t **_write_outstanding,
+    size_t read_outstanding_size,
     size_t write_outstanding_size
 );
 

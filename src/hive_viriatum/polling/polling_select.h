@@ -103,10 +103,30 @@ typedef struct polling_select_t {
     /**
      * The buffer that contains the various
      * connections that have data pending to
+     * be read from the socket at the begining
+     * of the next poll operation.
+     */
+    struct connection_t *read_outstanding[VIRIATUM_MAX_EVENTS];
+
+    /**
+     * The buffer that contains the various
+     * connections that have data pending to
      * be writen to the socket at the begining
      * of the next poll operation.
      */
     struct connection_t *write_outstanding[VIRIATUM_MAX_EVENTS];
+
+    /**
+     * Auxiliary buffer to be used in the performing
+     * of the outstaind read operations.
+     */
+    struct connection_t *_read_outstanding[VIRIATUM_MAX_EVENTS];
+
+    /**
+     * Auxiliary buffer to be used in the performing
+     * of the outstaind write operations.
+     */
+    struct connection_t *_write_outstanding[VIRIATUM_MAX_EVENTS];
 
     /**
      * The size of the read connections
@@ -134,7 +154,14 @@ typedef struct polling_select_t {
 
     /**
      * The size as items of the sequence of
-     * connection that are pending to be writen
+     * connections that are pending to be read
+     * at he beginning of the poll operation.
+     */
+    size_t read_outstanding_size;
+
+    /**
+     * The size as items of the sequence of
+     * connections that are pending to be writen
      * at he beginning of the poll operation.
      */
     size_t write_outstanding_size;
@@ -163,8 +190,11 @@ ERROR_CODE unregister_connection_polling_select(
     struct connection_t *connection,
     unsigned char remove
 );
+ERROR_CODE register_read_polling_select(struct polling_t *polling, struct connection_t *connection);
+ERROR_CODE unregister_read_polling_select(struct polling_t *polling, struct connection_t *connection);
 ERROR_CODE register_write_polling_select(struct polling_t *polling, struct connection_t *connection);
 ERROR_CODE unregister_write_polling_select(struct polling_t *polling, struct connection_t *connection);
+ERROR_CODE add_outstanding_polling_select(struct polling_t *polling, struct connection_t *connection);
 ERROR_CODE poll_polling_select(struct polling_t *polling);
 ERROR_CODE call_polling_select(struct polling_t *polling);
 ERROR_CODE _poll_polling_select(
@@ -187,7 +217,11 @@ ERROR_CODE _call_polling_select(
 );
 ERROR_CODE _outstanding_polling_select(
     struct polling_select_t *polling_select,
+    struct connection_t **read_outstanding,
     struct connection_t **write_outstanding,
+    struct connection_t **_read_outstanding,
+    struct connection_t **_write_outstanding,
+    size_t read_outstanding_size,
     size_t write_outstanding_size
 );
 ERROR_CODE _register_sockets_set_polling_select(struct polling_select_t *polling_select, SOCKET_HANDLE socket_handle, SOCKET_SET *sockets_set);

@@ -44,6 +44,7 @@ void create_polling_select(struct polling_select_t **polling_select_pointer, str
     polling_select->write_connections_size = 0;
     polling_select->error_connections_size = 0;
     polling_select->remove_connections_size = 0;
+    polling_select->read_outstanding_size = 0;
     polling_select->write_outstanding_size = 0;
 
     /* zerifies the variuous socket sets that are going
@@ -184,6 +185,81 @@ ERROR_CODE unregister_connection_polling_select(
     RAISE_NO_ERROR;
 }
 
+ERROR_CODE register_read_polling_select(struct polling_t *polling, struct connection_t *connection) {
+    /* retrieves the polling select structure as the lower
+    structure from the provided polling object */
+    struct polling_select_t *polling_select =\
+        (struct polling_select_t *) polling->lower;
+
+    /* in case the connection is read registered must
+    raise an error indicating the problem */
+    if(connection->read_registered == TRUE) {
+        RAISE_ERROR_M(
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Connection already registered"
+        );
+    }
+
+    /* register the socket handle from the sockets read set */
+    _register_sockets_set_polling_select(
+        polling_select,
+        connection->socket_handle,
+        &polling_select->sockets_read_set
+    );
+
+    /* in case the current state for the connection is not read
+    valid must return immediately with no error */
+    if(connection->read_valid == FALSE) { RAISE_NO_ERROR; }
+
+    /* in case the current connection is not open or the on read
+    callback function is not currently set must return */
+    if(connection->status != STATUS_OPEN || connection->on_read == NULL) {
+        RAISE_NO_ERROR;
+    }
+
+    /* in case the connection is already in the outstanding state
+    no need to add it again to the set of outstanding values */
+    if(connection->is_outstanding == TRUE) { RAISE_NO_ERROR; }
+
+    /* sets the connection for the current outstanding position and
+    then increments the size of the outstanding connection pending */
+    polling_select->read_outstanding[polling_select->read_outstanding_size] = connection;
+    polling_select->read_outstanding_size++;
+
+    /* sets the connection as outstanding as the connection has just
+    been registered in the select polling mechanism for extra reads */
+    connection->is_outstanding = TRUE;
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE unregister_read_polling_select(struct polling_t *polling, struct connection_t *connection) {
+    /* retrieves the polling select structure as the lower
+    structure from the provided polling object */
+    struct polling_select_t *polling_select =\
+        (struct polling_select_t *) polling->lower;
+
+    /* in case the connection is not read registered must
+    raise an error indicating the problem */
+    if(connection->read_registered == FALSE) {
+        RAISE_ERROR_M(
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Connection already unregistered"
+        );
+    }
+
+    /* unregister the socket handle from the sockets read set */
+    _unregister_sockets_set_polling_select(
+        polling_select,
+        connection->socket_handle,
+        &polling_select->sockets_read_set
+    );
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
 ERROR_CODE register_write_polling_select(struct polling_t *polling, struct connection_t *connection) {
     /* retrieves the polling select structure as the lower
     structure from the provided polling object */
@@ -206,7 +282,7 @@ ERROR_CODE register_write_polling_select(struct polling_t *polling, struct conne
         &polling_select->sockets_write_set
     );
 
-    /* in casde the current state for the connection is not write
+    /* in case the current state for the connection is not write
     valid must return immediately with no error */
     if(connection->write_valid == FALSE) { RAISE_NO_ERROR; }
 
@@ -251,6 +327,29 @@ ERROR_CODE unregister_write_polling_select(struct polling_t *polling, struct con
     RAISE_NO_ERROR;
 }
 
+ERROR_CODE add_outstanding_polling_select(struct polling_t *polling, struct connection_t *connection) {
+    /* retrieves the polling select structure as the lower
+    structure from the provided polling object */
+    struct polling_select_t *polling_select =\
+        (struct polling_select_t *) polling->lower;
+
+    /* in case the connection is already registered for outstanding
+    read operations this request must be ignored */
+    if(connection->is_outstanding == TRUE) { RAISE_NO_ERROR; }
+
+    /* sets the connection for the current outstanding position and
+    then increments the size of the outstanding connection pending */
+    polling_select->read_outstanding[polling_select->read_outstanding_size] = connection;
+    polling_select->read_outstanding_size++;
+
+    /* sets the connection as outstanding as the connection has just
+    been registered in the select polling mechanism for extra reads */
+    connection->is_outstanding = TRUE;
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
 ERROR_CODE poll_polling_select(struct polling_t *polling) {
     /* retrieves the polling select */
     struct polling_select_t *polling_select = (struct polling_select_t *) polling->lower;
@@ -260,10 +359,13 @@ ERROR_CODE poll_polling_select(struct polling_t *polling) {
     the main poll operation blocks the control flow */
     _outstanding_polling_select(
         polling_select,
+        polling_select->read_outstanding,
         polling_select->write_outstanding,
+        polling_select->_read_outstanding,
+        polling_select->_write_outstanding,
+        polling_select->read_outstanding_size,
         polling_select->write_outstanding_size
     );
-    polling_select->write_outstanding_size = 0;
 
     /* polls the polling select, this call should block until
     either a timeout occurs or data is received */
@@ -406,7 +508,10 @@ ERROR_CODE _poll_polling_select(
 
         /* in case the current connection socket handle is set in
         the sockets read ready set */
-        if(SOCKET_SET_IS_SET(current_connection->socket_handle, &polling_select->sockets_read_set_temporary) > 0)  {
+        if(SOCKET_SET_IS_SET(
+            current_connection->socket_handle,
+            &polling_select->sockets_read_set_temporary
+        ) > 0)  {
             /* sets the current connection in the read connections */
             read_connections[read_index] = current_connection;
 
@@ -418,7 +523,10 @@ ERROR_CODE _poll_polling_select(
 
         /* in case the current connection socket handle is set in
         the sockets write ready set */
-        if(SOCKET_SET_IS_SET(current_connection->socket_handle, &polling_select->sockets_write_set_temporary) > 0)  {
+        if(SOCKET_SET_IS_SET(
+            current_connection->socket_handle,
+            &polling_select->sockets_write_set_temporary
+        ) > 0)  {
             /* sets the current connection in the write connections */
             write_connections[write_index] = current_connection;
 
@@ -430,7 +538,10 @@ ERROR_CODE _poll_polling_select(
 
         /* in case the current connection socket handle is set in
         the sockets error ready set */
-        if(SOCKET_SET_IS_SET(current_connection->socket_handle, &polling_select->sockets_error_set_temporary) > 0)  {
+        if(SOCKET_SET_IS_SET(
+            current_connection->socket_handle,
+            &polling_select->sockets_error_set_temporary
+        ) > 0)  {
             /* sets the current connection in the error connections */
             error_connections[error_index] = current_connection;
 
@@ -496,6 +607,11 @@ ERROR_CODE _call_polling_select(
         a debug message with the socket handle of the connection */
         current_connection = read_connections[index];
         V_DEBUG_F("Processing read connection: %d\n", current_connection->socket_handle);
+
+        /* updates the current connection so that it's set as read
+        valid meaning that any read operation in it will be immediately
+        performed, fast operations */
+        current_connection->read_valid = TRUE;
 
         /* in case the current connection is open and the read
         handler is correclty set (must call it) */
@@ -592,7 +708,11 @@ ERROR_CODE _call_polling_select(
 
 ERROR_CODE _outstanding_polling_select(
     struct polling_select_t *polling_select,
+    struct connection_t **read_outstanding,
     struct connection_t **write_outstanding,
+    struct connection_t **_read_outstanding,
+    struct connection_t **_write_outstanding,
+    size_t read_outstanding_size,
     size_t write_outstanding_size
 ) {
     /* allocates the index, to be used during the iterations
@@ -602,6 +722,59 @@ ERROR_CODE _outstanding_polling_select(
     /* allocates the current connection, the temporary variable
     that will hold the unpacked connection on iteration */
     struct connection_t *current_connection;
+
+    /* resets the current sizes associated with the outstanding
+    events any new values coming from the event triggering will
+    be set in a "fresh" set of outstanding buffers */
+    polling_select->read_outstanding_size = 0;
+    polling_select->write_outstanding_size = 0;
+
+    /* runs the initial backup operation of the read outstanding
+    operations to the extra buffer so that the outstanding operations
+    may themselves change the read outstanding buffers */
+    for(index = 0; index < read_outstanding_size; index++) {
+        current_connection = read_outstanding[index];
+        current_connection->is_outstanding = FALSE;
+        _read_outstanding[index] = current_connection;
+    }
+
+    /* runs the initial backup operation of the write outstanding
+    operations to the extra buffer so that the outstanding operation
+    may themselves change the write outstanding buffers */
+    for(index = 0; index < write_outstanding_size; index++) {
+        current_connection = write_outstanding[index];
+        _write_outstanding[index] = current_connection;
+    }
+
+    /* prints a debug message */
+    V_DEBUG_F(
+        "Processing %lu outstanding read connections\n",
+        (long unsigned int) read_outstanding_size
+    );
+
+    /* iterates over all the connections that have outstanding
+    read operations to be performed and triggers the on data
+    event for each of them, starting the read operations */
+    for(index = 0; index < read_outstanding_size; index++) {
+        /* retrieves the current connection and then prints
+        a debug message with the socket handle of the connection */
+        current_connection = _read_outstanding[index];
+        V_DEBUG_F(
+            "Processing outstanding read connection: %d\n",
+            current_connection->socket_handle
+        );
+
+        /* in case the current connection is open and the on read
+        event handler is set performs the read call */
+        if(current_connection->status == STATUS_OPEN &&\
+            current_connection->on_read != NULL) {
+            /* prints a series of debug messages and then calls the
+            correct on read handler for the notification */
+            V_DEBUG("Calling on read handler\n");
+            CALL_V(current_connection->on_read, current_connection);
+            V_DEBUG("Finished calling on read handler\n");
+        }
+    }
 
     /* prints a debug message */
     V_DEBUG_F(
