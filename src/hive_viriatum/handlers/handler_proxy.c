@@ -811,7 +811,7 @@ ERROR_CODE headers_complete_callback_backend(struct http_parser_t *http_parser) 
     handler_proxy_context->pending_write += handler_proxy_context->out_buffer_size;
     if(connection_c->read_registered == TRUE &&\
         handler_proxy_context->pending_write >= VIRIATUM_MAX_READ) {
-        connection_c->unregister_read(connection_c);
+        //connection_c->unregister_read(connection_c);
     }
 
     RAISE_NO_ERROR;
@@ -836,7 +836,7 @@ ERROR_CODE body_callback_backend(struct http_parser_t *http_parser, const unsign
     handler_proxy_context->pending_write += data_size;
     if(connection_c->read_registered == TRUE &&\
         handler_proxy_context->pending_write >= VIRIATUM_MAX_READ) {
-        connection_c->unregister_read(connection_c);
+        //connection_c->unregister_read(connection_c);
     }
 
     /* raise no error */
