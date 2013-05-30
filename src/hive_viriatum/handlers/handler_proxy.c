@@ -652,7 +652,7 @@ ERROR_CODE _rabeton(struct connection_t *connection, struct data_t *data, void *
     handler_proxy_context->pending_write -= data->size;
 
 	if(connection_c->read_registered == FALSE && 
-		handler_proxy_context->pending_write < VIRIATUM_TRE_READ + 2000) {
+		handler_proxy_context->pending_write < VIRIATUM_TRE_READ + 12000) {
 		printf("%d\n", handler_proxy_context->pending_write);
 	}
 
