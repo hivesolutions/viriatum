@@ -519,6 +519,10 @@ ERROR_CODE virtual_url_callback_handler_proxy(struct http_parser_t *http_parser,
     middle of the processing, any connection dropped in this state should
     also drop the connection to the proxy client */
     handler_proxy_context->pending = TRUE;
+
+	/* sets the initial values for the number of bytes pending in the write
+	buffer to be writen this value will be used to control the read stream
+	of the backend server, in order to avoid flooding */
     handler_proxy_context->pending_write = 0;
 
     /* in case the connection client reference structure for the current
