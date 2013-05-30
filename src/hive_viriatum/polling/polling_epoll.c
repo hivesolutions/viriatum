@@ -27,7 +27,7 @@
 
 #include "stdafx.h"
 
-#ifdef VIRIATUM_EPOLL
+//#ifdef VIRIATUM_EPOLL
 
 #include "polling_epoll.h"
 
@@ -233,7 +233,7 @@ ERROR_CODE register_read_polling_epoll(struct polling_t *polling, struct connect
         &_event
     );
 
-	printf("fez registo\n")
+	printf("fez registo\n");
 
 
     /* in case the current state for the connection is not read
@@ -778,4 +778,4 @@ ERROR_CODE _outstanding_polling_epoll(
     RAISE_NO_ERROR;
 }
 
-#endif
+//#endif
