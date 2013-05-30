@@ -803,12 +803,18 @@ ERROR_CODE headers_complete_callback_backend(struct http_parser_t *http_parser) 
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE body_callback_backend(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE body_callback_backend(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size)
+    /* retrieves the proxy context object from the parser and then
+    uses it to retrieve both the (proxy client) connection and the
+    client connection (backend connection) */
     struct handler_proxy_context_t *handler_proxy_context =\
         (struct handler_proxy_context_t *) http_parser->context;
     struct connection_t *connection = handler_proxy_context->connection;
     struct connection_t *connection_c = handler_proxy_context->connection_c;
 
+    /* allocates a buffer of the same size of the received body
+    data and then copies the data into this new buffer, then
+    writes the buffer into the current (proxy client) connection */
     char *buffer = MALLOC(data_size);
     memcpy(buffer, data, data_size);
     write_connection(
@@ -819,6 +825,10 @@ ERROR_CODE body_callback_backend(struct http_parser_t *http_parser, const unsign
         (void *) handler_proxy_context
     );
 
+    /* adds the size of the current data to the counter of bytes
+    that are in the write buffer and then in case this values exceeds
+    the maximum allowed and the read enabled in the client connection
+    disables the read operations in the backend connection (avoids flooding) */
     handler_proxy_context->pending_write += data_size;
     if(connection_c->read_registered == TRUE &&\
         handler_proxy_context->pending_write >= VIRIATUM_MAX_READ) {
@@ -836,6 +846,9 @@ ERROR_CODE message_complete_callback_backend(struct http_parser_t *http_parser) 
         (struct handler_proxy_context_t *) http_parser->context;
     struct connection_t *connection = handler_proxy_context->connection;
 
+    /* writes the final (empty value) to the connection stream so that
+    the cleanup handler callback is called at the end of all the pending
+    write operations, this is a required "empty" operation */
     write_connection_c(
         connection,
         (unsigned char *) "",
@@ -845,6 +858,10 @@ ERROR_CODE message_complete_callback_backend(struct http_parser_t *http_parser) 
         FALSE
     );
 
+    /* unsets the pending flag in the current context meaning that
+    the message has been completely sent to the proxy client, any
+    disconnect operation from the backend connection comming after
+    will not afect the client of the proxy */
     handler_proxy_context->pending = FALSE;
 
     /* raise no error */
