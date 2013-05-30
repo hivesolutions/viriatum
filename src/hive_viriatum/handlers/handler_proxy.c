@@ -407,6 +407,10 @@ ERROR_CODE message_complete_callback_handler_proxy(struct http_parser_t *http_pa
             (void *) (size_t) http_parser->flags
         );
     } else {
+
+        handler_proxy_context->connection_c->read_control = TRUE;
+        handler_proxy_context->connection_c->pending_read = VIRIATUM_MAX_READ;
+
         write_connection_c(
             handler_proxy_context->connection_c,
             (unsigned char *) handler_proxy_context->buffer,
@@ -640,6 +644,22 @@ ERROR_CODE open_backend_handler(struct io_connection_t *io_connection) {
     RAISE_NO_ERROR;
 }
 
+
+
+
+ERROR_CODE _rabeton(struct connection_t *connection, struct data_t *data, void *parameters) {
+    struct handler_proxy_context_t *handler_proxy_context =\
+        (struct handler_proxy_context_t *) parameters;
+    struct connection_t *connection_c = handler_proxy_context->connection_c;
+    connection_c->pending_read += data->size;
+
+    if(connection_c->read_registered == FALSE &&\
+        connection_c->pending_read > VIRIATUM_MAX_READ) {
+        connection_c->register_read(connection_c);
+    }
+}
+
+
 ERROR_CODE close_backend_handler(struct io_connection_t *io_connection) {
     /* allocates the space for the various temporary structures that
     are going to be used for the closing operation of the backend connection */
@@ -782,8 +802,8 @@ ERROR_CODE headers_complete_callback_backend(struct http_parser_t *http_parser) 
         connection,
         (unsigned char *) handler_proxy_context->out_buffer,
         handler_proxy_context->out_buffer_size,
-        NULL,
-        NULL,
+        _rabeton,
+        (void *) handler_proxy_context,
         FALSE
     );
 
@@ -801,8 +821,8 @@ ERROR_CODE body_callback_backend(struct http_parser_t *http_parser, const unsign
         connection,
         (unsigned char *) buffer,
         data_size,
-        NULL,
-        NULL
+        _rabeton,
+        (void *) handler_proxy_context
     );
 
     /* raise no error */
