@@ -805,6 +805,13 @@ ERROR_CODE headers_complete_callback_backend(struct http_parser_t *http_parser) 
     struct connection_t *connection_c = handler_proxy_context->connection_c;
 
     write_proxy_out_buffer(handler_proxy_context, "\r\n", 2);
+    handler_proxy_context->pending_write += handler_proxy_context->out_buffer_size;
+    if(connection_c->read_registered == TRUE &&\
+        handler_proxy_context->pending_write >= VIRIATUM_MAX_READ) {
+        connection_c->unregister_read(connection_c);
+		printf("desregistou\n");
+    }
+
     write_connection_c(
         connection,
         (unsigned char *) handler_proxy_context->out_buffer,
@@ -813,13 +820,6 @@ ERROR_CODE headers_complete_callback_backend(struct http_parser_t *http_parser) 
         (void *) handler_proxy_context,
         FALSE
     );
-
-    handler_proxy_context->pending_write += handler_proxy_context->out_buffer_size;
-    if(connection_c->read_registered == TRUE &&\
-        handler_proxy_context->pending_write >= VIRIATUM_MAX_READ) {
-        connection_c->unregister_read(connection_c);
-		printf("desregistou\n");
-    }
 
     RAISE_NO_ERROR;
 }
@@ -832,6 +832,14 @@ ERROR_CODE body_callback_backend(struct http_parser_t *http_parser, const unsign
 
     char *buffer = MALLOC(data_size);
     memcpy(buffer, data, data_size);
+
+	handler_proxy_context->pending_write += data_size;
+    if(connection_c->read_registered == TRUE &&\
+        handler_proxy_context->pending_write >= VIRIATUM_MAX_READ) {
+        connection_c->unregister_read(connection_c);
+		printf("desregistou\n");
+    }
+
     write_connection(
         connection,
         (unsigned char *) buffer,
@@ -840,12 +848,6 @@ ERROR_CODE body_callback_backend(struct http_parser_t *http_parser, const unsign
         (void *) handler_proxy_context
     );
 
-    handler_proxy_context->pending_write += data_size;
-    if(connection_c->read_registered == TRUE &&\
-        handler_proxy_context->pending_write >= VIRIATUM_MAX_READ) {
-        connection_c->unregister_read(connection_c);
-		printf("desregistou\n");
-    }
 
     /* raise no error */
     RAISE_NO_ERROR;
