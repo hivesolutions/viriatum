@@ -125,6 +125,7 @@ ERROR_CODE accept_handler_stream_io(struct connection_t *connection) {
             client_connection->register_write = register_write_connection;
             client_connection->unregister_write = unregister_write_connection;
             client_connection->invalidate_write = invalidate_write_connection;
+            client_connection->add_outstanding = add_outstanding_connection;
 
             /* sets the various stream io connection callbacks
             in the client connection */
@@ -212,17 +213,20 @@ ERROR_CODE accept_handler_stream_io(struct connection_t *connection) {
 }
 
 ERROR_CODE read_handler_stream_io(struct connection_t *connection) {
-    /* allocates the number of bytes */
+    /* allocates the variable that will hold number of bytes
+    that have been read in the current read operation */
     SOCKET_ERROR_CODE number_bytes;
 
-    /* allocates the "simple" buffer */
+    /* allocates the "simple" buffer and sets the pointer value
+    of it with its current defined address */
     unsigned char buffer[VIRIATUM_READB_SIZE];
-
-    /* retrieves the buffer pointer */
     unsigned char *buffer_pointer = (unsigned char *) buffer;
 
-    /* allocates the buffer size */
+    /* reserves space for the counters for the size of the
+    current buffer and for the total bytes that have been
+    read in the current io operation */
     size_t buffer_size = 0;
+    size_t total_bytes = 0;
 
     /* flag and value controlling the state of the read */
     ERROR_CODE error = 0;
@@ -319,10 +323,21 @@ ERROR_CODE read_handler_stream_io(struct connection_t *connection) {
             break;
         }
 
-        /* increments the buffer position and then increments
-        the buffer size with the number of bytes */
+        /* increments the buffer position, then increments
+        the buffer size with the number of bytes and then
+        increments the total ammount of bytes */
         buffer_pointer += number_bytes;
         buffer_size += number_bytes;
+        total_bytes += number_bytes;
+
+        /* in case the current total number of bytes read during
+        this read operation is greater than the expected maximum
+        the read operation should be delayed so that the write
+        doesn't starve (only read operations) */
+        if(total_bytes > VIRIATUM_MAX_READ) {
+            connection->add_outstanding(connection);
+            break;
+        }
 
         /* in case the viriatum is set to blocking must break
         the loop, no more that one read operarion is allowed */
