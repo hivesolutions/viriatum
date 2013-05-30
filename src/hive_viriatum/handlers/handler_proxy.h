@@ -188,6 +188,14 @@ typedef struct handler_proxy_context_t {
      * middle between both end-points.
      */
     char pending;
+
+    /**
+     * The amount of bytes that are currently pending to be writen in the
+     * client proxy from data comming from the backend server. This value
+     * is used to keep control of the internal proxy buffers and thus avoids
+     * the continuous growth of them.
+     */
+    size_t pending_write;
 } handler_proxy_context;
 
 ERROR_CODE create_proxy_handler(struct proxy_handler_t **proxy_handler_pointer, struct http_handler_t *http_handler);

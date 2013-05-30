@@ -102,6 +102,7 @@ ERROR_CODE create_handler_proxy_context(struct handler_proxy_context_t **handler
     handler_proxy_context->connection = NULL;
     handler_proxy_context->connection_c = NULL;
     handler_proxy_context->pending = FALSE;
+    handler_proxy_context->pending_write = 0;
 
     /* creates a new set of http settings and parser for the new
     context that is being created, these are going to be used in
@@ -407,10 +408,6 @@ ERROR_CODE message_complete_callback_handler_proxy(struct http_parser_t *http_pa
             (void *) (size_t) http_parser->flags
         );
     } else {
-
-        handler_proxy_context->connection_c->read_control = TRUE;
-        handler_proxy_context->connection_c->pending_read = VIRIATUM_MAX_READ;
-
         write_connection_c(
             handler_proxy_context->connection_c,
             (unsigned char *) handler_proxy_context->buffer,
@@ -522,6 +519,7 @@ ERROR_CODE virtual_url_callback_handler_proxy(struct http_parser_t *http_parser,
     middle of the processing, any connection dropped in this state should
     also drop the connection to the proxy client */
     handler_proxy_context->pending = TRUE;
+    handler_proxy_context->pending_write = 0;
 
     /* in case the connection client reference structure for the current
     context is not defined a new connection must be created */
@@ -651,14 +649,10 @@ ERROR_CODE _rabeton(struct connection_t *connection, struct data_t *data, void *
     struct handler_proxy_context_t *handler_proxy_context =\
         (struct handler_proxy_context_t *) parameters;
     struct connection_t *connection_c = handler_proxy_context->connection_c;
-    connection_c->pending_read += data->size;
+    handler_proxy_context->pending_write -= data->size;
 
-    if(connection_c->read_registered == TRUE) { RAISE_NO_ERROR; }
-
-    if(connection_c->pending_read >= VIRIATUM_TRE_READ) {
-        connection_c->register_read(connection_c);
-    } else if(connection->write_queue->size == 0) {
-        connection_c->pending_read = VIRIATUM_MAX_READ;
+    if(connection_c->read_registered == FALSE &&\
+        handler_proxy_context->pending_write < VIRIATUM_TRE_READ) {
         connection_c->register_read(connection_c);
     }
 
@@ -802,6 +796,7 @@ ERROR_CODE headers_complete_callback_backend(struct http_parser_t *http_parser) 
     struct handler_proxy_context_t *handler_proxy_context =\
         (struct handler_proxy_context_t *) http_parser->context;
     struct connection_t *connection = handler_proxy_context->connection;
+    struct connection_t *connection_c = handler_proxy_context->connection_c;
 
     write_proxy_out_buffer(handler_proxy_context, "\r\n", 2);
     write_connection_c(
@@ -813,6 +808,12 @@ ERROR_CODE headers_complete_callback_backend(struct http_parser_t *http_parser) 
         FALSE
     );
 
+    handler_proxy_context->pending_write += handler_proxy_context->out_buffer_size;
+    if(connection_c->read_registered == TRUE &&\
+        handler_proxy_context->pending_write >= VIRIATUM_MAX_READ) {
+        connection_c->unregister_read(connection_c);
+    }
+
     RAISE_NO_ERROR;
 }
 
@@ -820,8 +821,9 @@ ERROR_CODE body_callback_backend(struct http_parser_t *http_parser, const unsign
     struct handler_proxy_context_t *handler_proxy_context =\
         (struct handler_proxy_context_t *) http_parser->context;
     struct connection_t *connection = handler_proxy_context->connection;
+    struct connection_t *connection_c = handler_proxy_context->connection_c;
 
-	char *buffer = MALLOC(data_size);
+    char *buffer = MALLOC(data_size);
     memcpy(buffer, data, data_size);
     write_connection(
         connection,
@@ -830,6 +832,12 @@ ERROR_CODE body_callback_backend(struct http_parser_t *http_parser, const unsign
         _rabeton,
         (void *) handler_proxy_context
     );
+
+    handler_proxy_context->pending_write += data_size;
+    if(connection_c->read_registered == TRUE &&\
+        handler_proxy_context->pending_write >= VIRIATUM_MAX_READ) {
+        connection_c->unregister_read(connection_c);
+    }
 
     /* raise no error */
     RAISE_NO_ERROR;
@@ -841,13 +849,7 @@ ERROR_CODE message_complete_callback_backend(struct http_parser_t *http_parser) 
     struct handler_proxy_context_t *handler_proxy_context =\
         (struct handler_proxy_context_t *) http_parser->context;
     struct connection_t *connection = handler_proxy_context->connection;
-	struct connection_t *connection_c = handler_proxy_context->connection;
-
-	connection_c->read_control = FALSE;
-	connection_c->pending_read = 0;
-	if(connection_c->read_registered == FALSE) {
-        connection_c->register_read(connection_c);
-    }
+    struct connection_t *connection_c = handler_proxy_context->connection;
 
     write_connection_c(
         connection,
