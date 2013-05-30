@@ -27,7 +27,7 @@
 
 #include "stdafx.h"
 
-//#ifdef VIRIATUM_EPOLL
+#ifdef VIRIATUM_EPOLL
 
 #include "polling_epoll.h"
 
@@ -223,7 +223,9 @@ ERROR_CODE register_read_polling_epoll(struct polling_t *polling, struct connect
     to add a new element to the poll structure */
     SOCKET_ERROR_CODE result_code;
 
-
+	/* populates the event structure with the appropriate
+    structures in order to register for the right events
+    and then inserts the event request into the epoll fd */
     _event.events = EPOLLIN | EPOLLOUT | EPOLLET;
     _event.data.ptr = (void *) connection;
     result_code = epoll_ctl(
@@ -233,40 +235,48 @@ ERROR_CODE register_read_polling_epoll(struct polling_t *polling, struct connect
         &_event
     );
 
-	printf("fez registo\n");
-
+    /* in case there was an error in epoll need to correctly
+    handle it and propagate it to the caller */
+    if(SOCKET_TEST_ERROR(result_code)) {
+        SOCKET_ERROR_CODE epoll_error_code = SOCKET_GET_ERROR_CODE(socket_result);
+        V_WARNING_F(
+            "Problem registering connection epoll for read: %d\n",
+            epoll_error_code
+        );
+        RAISE_ERROR_M(
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Problem registering connection epoll for read"
+        );
+    }
 
     /* in case the current state for the connection is not read
     valid must return immediately with no error */
-    /*if(connection->read_valid == FALSE) { RAISE_NO_ERROR; }*/
+    if(connection->read_valid == FALSE) { RAISE_NO_ERROR; }
 
     /* in case the current connection is not open or the on read
     callback function is not currently set must return */
-   /* if(connection->status != STATUS_OPEN || connection->on_read == NULL) {
+    if(connection->status != STATUS_OPEN || connection->on_read == NULL) {
         RAISE_NO_ERROR;
-    }*/
-
+    }
 
     /* in case the connection is already in the outstanding state
     no need to add it again to the set of outstanding values */
-    /*if(connection->is_outstanding == TRUE) { RAISE_NO_ERROR; }*/
-
+    if(connection->is_outstanding == TRUE) { RAISE_NO_ERROR; }
 
     /* sets the connection for the current outstanding position and
     then increments the size of the outstanding connection pending */
-/*    polling_epoll->read_outstanding[polling_epoll->read_outstanding_size] = connection;
-    polling_epoll->read_outstanding_size++;*/
+    polling_epoll->read_outstanding[polling_epoll->read_outstanding_size] = connection;
+    polling_epoll->read_outstanding_size++;
 
     /* sets the connection as outstanding as the connection has just
     been registered in the epoll polling mechanism for extra reads */
-    /*connection->is_outstanding = TRUE;*/
+    connection->is_outstanding = TRUE;
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
 ERROR_CODE unregister_read_polling_epoll(struct polling_t *polling, struct connection_t *connection) {
-
     /* allocates space for the result of the poll call
     to add a new element to the poll structure */
     SOCKET_ERROR_CODE result_code;
@@ -279,6 +289,9 @@ ERROR_CODE unregister_read_polling_epoll(struct polling_t *polling, struct conne
     the epoll polling system (this is an internal kernel structure) */
     struct epoll_event _event;
 
+	/* populates the event structure with the appropriate
+    structures in order to register for the right events
+    and then inserts the event request into the epoll fd */
     _event.events = EPOLLOUT | EPOLLET;
     _event.data.ptr = (void *) connection;
     result_code = epoll_ctl(
@@ -287,6 +300,20 @@ ERROR_CODE unregister_read_polling_epoll(struct polling_t *polling, struct conne
         connection->socket_handle,
         &_event
     );
+
+    /* in case there was an error in epoll need to correctly
+    handle it and propagate it to the caller */
+    if(SOCKET_TEST_ERROR(result_code)) {
+        SOCKET_ERROR_CODE epoll_error_code = SOCKET_GET_ERROR_CODE(socket_result);
+        V_WARNING_F(
+            "Problem unregistering connection epoll for read: %d\n",
+            epoll_error_code
+        );
+        RAISE_ERROR_M(
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Problem unregistering connection epoll for read"
+        );
+    }
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -778,4 +805,4 @@ ERROR_CODE _outstanding_polling_epoll(
     RAISE_NO_ERROR;
 }
 
-//#endif
+#endif
