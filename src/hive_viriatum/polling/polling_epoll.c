@@ -218,15 +218,6 @@ ERROR_CODE register_read_polling_epoll(struct polling_t *polling, struct connect
     struct polling_epoll_t *polling_epoll =\
         (struct polling_epoll_t *) polling->lower;
 
-    /* in case the current state for the connection is not read
-    valid must return immediately with no error */
-    if(connection->read_valid == FALSE) { RAISE_NO_ERROR; }
-
-    /* in case the current connection is not open or the on read
-    callback function is not currently set must return */
-    if(connection->status != STATUS_OPEN || connection->on_read == NULL) {
-        RAISE_NO_ERROR;
-    }
 
     /* allocates space for the result of the poll call
     to add a new element to the poll structure */
@@ -243,6 +234,22 @@ ERROR_CODE register_read_polling_epoll(struct polling_t *polling, struct connect
     );
 
 	printf("fez registo\n")
+
+
+    /* in case the current state for the connection is not read
+    valid must return immediately with no error */
+    /*if(connection->read_valid == FALSE) { RAISE_NO_ERROR; }*/
+
+    /* in case the current connection is not open or the on read
+    callback function is not currently set must return */
+   /* if(connection->status != STATUS_OPEN || connection->on_read == NULL) {
+        RAISE_NO_ERROR;
+    }*/
+
+
+    /* in case the connection is already in the outstanding state
+    no need to add it again to the set of outstanding values */
+    /*if(connection->is_outstanding == TRUE) { RAISE_NO_ERROR; }*/
 
 
     /* sets the connection for the current outstanding position and
