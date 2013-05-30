@@ -209,6 +209,10 @@ ERROR_CODE unregister_connection_polling_epoll(
 }
 
 ERROR_CODE register_read_polling_epoll(struct polling_t *polling, struct connection_t *connection) {
+    /* allocates space for the new event to be inserted into
+    the epoll polling system (this is an internal kernel structure) */
+    struct epoll_event _event;
+
     /* retrieves the polling epoll structure as the lower
     structure from the provided polling object */
     struct polling_epoll_t *polling_epoll =\
@@ -228,20 +232,51 @@ ERROR_CODE register_read_polling_epoll(struct polling_t *polling, struct connect
     no need to add it again to the set of outstanding values */
     if(connection->is_outstanding == TRUE) { RAISE_NO_ERROR; }
 
-    /* sets the connection for the current outstanding position and
-    then increments the size of the outstanding connection pending */
-    polling_epoll->read_outstanding[polling_epoll->read_outstanding_size] = connection;
-    polling_epoll->read_outstanding_size++;
+    /* allocates space for the result of the poll call
+    to add a new element to the poll structure */
+    SOCKET_ERROR_CODE result_code;
+
+
+    _event.events = EPOLLIN | EPOLLOUT | EPOLLET;
+    _event.data.ptr = (void *) connection;
+    result_code = epoll_ctl(
+        polling_epoll->epoll_fd,
+        EPOLL_CTL_MOD,
+        connection->socket_handle,
+        &_event
+    );
 
     /* sets the connection as outstanding as the connection has just
     been registered in the epoll polling mechanism for extra reads */
-    connection->is_outstanding = TRUE;
+    connection->is_outstanding = TRUE;*/
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
 ERROR_CODE unregister_read_polling_epoll(struct polling_t *polling, struct connection_t *connection) {
+
+    /* allocates space for the result of the poll call
+    to add a new element to the poll structure */
+    SOCKET_ERROR_CODE result_code;
+
+    /* retrieves the polling epoll structure from the upper
+    polling control structure */
+    struct polling_epoll_t *polling_epoll = (struct polling_epoll_t *) polling->lower;
+
+    /* allocates space for the new event to be inserted into
+    the epoll polling system (this is an internal kernel structure) */
+    struct epoll_event _event;
+
+    _event.events = EPOLLOUT | EPOLLET;
+    _event.data.ptr = (void *) connection;
+    result_code = epoll_ctl(
+        polling_epoll->epoll_fd,
+        EPOLL_CTL_MOD,
+        connection->socket_handle,
+        &_event
+    );
+
     /* raises no error */
     RAISE_NO_ERROR;
 }
