@@ -924,6 +924,7 @@ typedef struct data_t {
     unsigned char *data;
     unsigned char *data_base;
     size_t size;
+	size_t size_base;
     char release;
     connection_data_callback callback;
     void *callback_parameters;

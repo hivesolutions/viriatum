@@ -156,6 +156,7 @@ void create_data(struct data_t **data_pointer) {
     data->data = NULL;
     data->data_base = NULL;
     data->size = 0;
+	data->size_base = 0;
     data->callback = NULL;
     data->callback_parameters = NULL;
 
@@ -1497,6 +1498,7 @@ ERROR_CODE write_connection_c(struct connection_t *connection, unsigned char *da
     _data->data = data;
     _data->data_base = data;
     _data->size = size;
+	_data->size_base = size;
     _data->release = release;
     _data->callback = callback;
     _data->callback_parameters = callback_parameters;
