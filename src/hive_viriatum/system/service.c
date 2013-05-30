@@ -187,6 +187,7 @@ void create_polling(struct polling_t **polling_pointer) {
     polling->unregister_connection = NULL;
     polling->register_write = NULL;
     polling->unregister_write = NULL;
+    polling->add_outstanding = NULL;
     polling->poll = NULL;
     polling->call = NULL;
     polling->lower = NULL;
@@ -938,6 +939,7 @@ ERROR_CODE start_service(struct service_t *service) {
     polling->unregister_connection = unregister_connection_polling_epoll;
     polling->register_write = register_write_polling_epoll;
     polling->unregister_write = unregister_write_polling_epoll;
+    polling->add_outstanding = add_outstanding_polling_epoll;
     polling->poll = poll_polling_epoll;
     polling->call = call_polling_epoll;
 #else
@@ -949,6 +951,7 @@ ERROR_CODE start_service(struct service_t *service) {
     polling->unregister_connection = unregister_connection_polling_select;
     polling->register_write = register_write_polling_select;
     polling->unregister_write = unregister_write_polling_select;
+    polling->add_outstanding = add_outstanding_polling_select;
     polling->poll = poll_polling_select;
     polling->call = call_polling_select;
 #endif
@@ -1001,6 +1004,7 @@ ERROR_CODE start_service(struct service_t *service) {
     service_connection->register_write = register_write_connection;
     service_connection->unregister_write = unregister_write_connection;
     service_connection->invalidate_write = invalidate_write_connection;
+    service_connection->add_outstanding = add_outstanding_connection;
 
     /* sets the fucntion to be called uppon read on the service
     connection (it should be the accept handler stream io, default) */
@@ -1025,6 +1029,7 @@ ERROR_CODE start_service(struct service_t *service) {
         service6_connection->register_write = register_write_connection;
         service6_connection->unregister_write = unregister_write_connection;
         service6_connection->invalidate_write = invalidate_write_connection;
+        service6_connection->add_outstanding = add_outstanding_connection;
 
         /* sets the fucntion to be called uppon read on the service
         connection (it should be the accept handler stream io, default) */
@@ -1385,6 +1390,7 @@ ERROR_CODE create_connection(struct connection_t **connection_pointer, SOCKET_HA
     connection->register_write = NULL;
     connection->unregister_write = NULL;
     connection->invalidate_write = NULL;
+    connection->add_outstanding = NULL;
     connection->alloc_data = alloc_connection;
     connection->on_read = NULL;
     connection->on_write = NULL;
@@ -1547,6 +1553,7 @@ ERROR_CODE close_connection(struct connection_t *connection) {
     connection->register_write = NULL;
     connection->unregister_write = NULL;
     connection->invalidate_write = NULL;
+    connection->add_outstanding = NULL;
 
 #ifdef VIRIATUM_SSL
     /* in case there is a valid ssl connection set must release
@@ -1602,6 +1609,13 @@ ERROR_CODE unregister_write_connection(struct connection_t *connection) {
 
 ERROR_CODE invalidate_write_connection(struct connection_t *connection) {
     connection->write_valid = FALSE;
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE add_outstanding_connection(struct connection_t *connection) {
+    struct service_t *service = connection->service;
+    struct polling_t *polling = service->polling;
+    polling->add_outstanding(polling, connection);
     RAISE_NO_ERROR;
 }
 

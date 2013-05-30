@@ -244,6 +244,14 @@ typedef struct polling_t {
     polling_connection_update unregister_write;
 
     /**
+     * Reference to the function that is going to
+     * set the provided connection as outstanding
+     * mening that in the next event loop it will
+     * be verified for read operations.
+     */
+    polling_connection_update add_outstanding;
+
+    /**
      * Function used to poll the connections
      * checking if new "events" are available.
      * This function should not block for a long
@@ -739,6 +747,14 @@ typedef struct connection_t {
     connection_update invalidate_write;
 
     /**
+     * Adds the provided connection as outstanding
+     * meaning that it will be verified for read
+     * operations in the next event loop (this will
+     * create a defered reading).
+     */
+    connection_update add_outstanding;
+
+    /**
      * Function to be used to allocated (in a
      * safe away) message data that may be
      * later released safely
@@ -1205,6 +1221,17 @@ ERROR_CODE unregister_write_connection(struct connection_t *connection);
  * @return The resulting error code.
  */
 ERROR_CODE invalidate_write_connection(struct connection_t *connection);
+
+/**
+ * Adds the current connection as outstanding meaning that
+ * outstanding read operations are pending and should be
+ * performed at the begining of the next loop.
+ *
+ * @param connection The connection to be set as having
+ * outstanding (read) opertions.
+ * @return The resulting error code.
+ */
+ERROR_CODE add_outstanding_connection(struct connection_t *connection);
 
 /**
  * Allocates a chunk of memory for the context of the given
