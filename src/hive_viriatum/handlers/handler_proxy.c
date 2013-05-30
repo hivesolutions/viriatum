@@ -822,12 +822,6 @@ ERROR_CODE body_callback_backend(struct http_parser_t *http_parser, const unsign
     struct connection_t *connection = handler_proxy_context->connection;
 	struct connection_t *connection_c = handler_proxy_context->connection;
 
-	connection_c->read_registered = FALSE;
-	connection_c->pending_read = 0;
-	if(connection_c->write_registered == FALSE) {
-        connection_c->register_read(connection_c);
-    }
-
 	char *buffer = MALLOC(data_size);
     memcpy(buffer, data, data_size);
     write_connection(
@@ -848,6 +842,12 @@ ERROR_CODE message_complete_callback_backend(struct http_parser_t *http_parser) 
     struct handler_proxy_context_t *handler_proxy_context =\
         (struct handler_proxy_context_t *) http_parser->context;
     struct connection_t *connection = handler_proxy_context->connection;
+
+	connection_c->read_control = FALSE;
+	connection_c->pending_read = 0;
+	if(connection_c->read_registered == FALSE) {
+        connection_c->register_read(connection_c);
+    }
 
     write_connection_c(
         connection,
