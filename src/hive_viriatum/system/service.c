@@ -1384,6 +1384,7 @@ ERROR_CODE create_connection(struct connection_t **connection_pointer, SOCKET_HA
     connection->service = NULL;
     connection->write_registered = FALSE;
     connection->write_valid = FALSE;
+    connection->is_outstanding = FALSE;
     connection->open_connection = NULL;
     connection->close_connection = NULL;
     connection->write_connection = NULL;

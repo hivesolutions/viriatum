@@ -690,11 +690,19 @@ typedef struct connection_t {
     /**
      * Boolean flag value that controls if the connection
      * is currently valid (ready) for writing this should
-     * be set to false if a would block event is raise on
+     * be set to false if a would block event is raised on
      * a write operation, and then set back to true if the
      * the underlying socket is ready for writing.
      */
     unsigned char write_valid;
+
+    /**
+     * Flag that controls if the current connection has
+     * outstanding operations pending to be performed.
+     * In case this flag is set the connection should be
+     * pooled in the next loop for read operations.
+     */
+    unsigned char is_outstanding;
 
     /**
      * Queue containing the set of connections with
