@@ -208,11 +208,9 @@ ERROR_CODE accept_handler_stream_io(struct connection_t *connection) {
 #endif
         }
 
-        /* in case viriatum is set to blocking */
-        if(!VIRIATUM_NON_BLOCKING) {
-            /* breaks the loop (avoid blocking) */
-            break;
-        }
+        /* in case the viriatum is set to blocking must break
+        the loop, no more that one read operation is allowed */
+        if(!VIRIATUM_NON_BLOCKING) { break; }
     }
 
     /* raise no error */
@@ -353,7 +351,7 @@ ERROR_CODE read_handler_stream_io(struct connection_t *connection) {
         total_bytes += number_bytes;
 
         /* in case the viriatum is set to blocking must break
-        the loop, no more that one read operarion is allowed */
+        the loop, no more that one read operation is allowed */
         if(!VIRIATUM_NON_BLOCKING) { break; }
     }
 
