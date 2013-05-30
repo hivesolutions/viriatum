@@ -223,7 +223,7 @@ ERROR_CODE register_read_polling_epoll(struct polling_t *polling, struct connect
     to add a new element to the poll structure */
     SOCKET_ERROR_CODE result_code;
 
-	/* populates the event structure with the appropriate
+    /* populates the event structure with the appropriate
     structures in order to register for the right events
     and then inserts the event request into the epoll fd */
     _event.events = EPOLLIN | EPOLLOUT | EPOLLET;
@@ -289,7 +289,7 @@ ERROR_CODE unregister_read_polling_epoll(struct polling_t *polling, struct conne
     the epoll polling system (this is an internal kernel structure) */
     struct epoll_event _event;
 
-	/* populates the event structure with the appropriate
+    /* populates the event structure with the appropriate
     structures in order to register for the right events
     and then inserts the event request into the epoll fd */
     _event.events = EPOLLOUT | EPOLLET;

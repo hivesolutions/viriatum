@@ -619,8 +619,6 @@ ERROR_CODE data_backend_handler(struct io_connection_t *io_connection, unsigned 
     and so the data operation should be ignored */
     if(custom_parameters == NULL) { RAISE_NO_ERROR; }
 
-	printf("DATA\n");
-
     /* retrieves the current proxy context structure from the custom parameters
     to be used for the processing of the current data received from the backend */
     handler_proxy_context =\
@@ -653,14 +651,9 @@ ERROR_CODE _rabeton(struct connection_t *connection, struct data_t *data, void *
     struct connection_t *connection_c = handler_proxy_context->connection_c;
     handler_proxy_context->pending_write -= data->size;
 
-	if(connection_c->read_registered == FALSE) {
-		printf("%d\n", handler_proxy_context->pending_write);
-	}
-
     if(connection_c->read_registered == FALSE &&\
         handler_proxy_context->pending_write < VIRIATUM_TRE_READ) {
         connection_c->register_read(connection_c);
-		printf("registou\n");
     }
 
     RAISE_NO_ERROR;
@@ -819,7 +812,6 @@ ERROR_CODE headers_complete_callback_backend(struct http_parser_t *http_parser) 
     if(connection_c->read_registered == TRUE &&\
         handler_proxy_context->pending_write >= VIRIATUM_MAX_READ) {
         connection_c->unregister_read(connection_c);
-		printf("desregistou\n");
     }
 
     RAISE_NO_ERROR;
@@ -845,7 +837,6 @@ ERROR_CODE body_callback_backend(struct http_parser_t *http_parser, const unsign
     if(connection_c->read_registered == TRUE &&\
         handler_proxy_context->pending_write >= VIRIATUM_MAX_READ) {
         connection_c->unregister_read(connection_c);
-		printf("desregistou\n");
     }
 
     /* raise no error */
