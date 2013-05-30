@@ -820,7 +820,6 @@ ERROR_CODE body_callback_backend(struct http_parser_t *http_parser, const unsign
     struct handler_proxy_context_t *handler_proxy_context =\
         (struct handler_proxy_context_t *) http_parser->context;
     struct connection_t *connection = handler_proxy_context->connection;
-	struct connection_t *connection_c = handler_proxy_context->connection;
 
 	char *buffer = MALLOC(data_size);
     memcpy(buffer, data, data_size);
@@ -842,6 +841,7 @@ ERROR_CODE message_complete_callback_backend(struct http_parser_t *http_parser) 
     struct handler_proxy_context_t *handler_proxy_context =\
         (struct handler_proxy_context_t *) http_parser->context;
     struct connection_t *connection = handler_proxy_context->connection;
+	struct connection_t *connection_c = handler_proxy_context->connection;
 
 	connection_c->read_control = FALSE;
 	connection_c->pending_read = 0;
