@@ -233,6 +233,18 @@ typedef struct polling_t {
 
     /**
      * Function used to the start "listening"
+     * to the read events in the connection.
+     */
+    polling_connection_update register_read;
+
+    /**
+     * Function used to the stop "listening"
+     * to the read events in the connection.
+     */
+    polling_connection_update unregister_read;
+
+    /**
+     * Function used to the start "listening"
      * to the write events in the connection.
      */
     polling_connection_update register_write;
@@ -679,6 +691,15 @@ typedef struct connection_t {
     struct service_t *service;
 
     /**
+     * Value that controls if the read operation
+     * are currently being monitored in the polling
+     * (provider).
+     * This flag shall be used carefully as it may
+     * create unwanted behavior.
+     */
+    unsigned char read_registered;
+
+    /**
      * "Flag" controlling if the write operations
      * are currently being monitored in the polling
      * (provider).
@@ -689,9 +710,18 @@ typedef struct connection_t {
 
     /**
      * Boolean flag value that controls if the connection
+     * is currently valid (ready) for reading this should
+     * be set to false if a would block event is raised on
+     * a read operation, and then set back to valid if the
+     * the underlying socket is ready for reading.
+     */
+    unsigned char read_valid;
+
+    /**
+     * Boolean flag value that controls if the connection
      * is currently valid (ready) for writing this should
      * be set to false if a would block event is raised on
-     * a write operation, and then set back to true if the
+     * a write operation, and then set back to valid if the
      * the underlying socket is ready for writing.
      */
     unsigned char write_valid;
@@ -703,6 +733,25 @@ typedef struct connection_t {
      * pooled in the next loop for read operations.
      */
     unsigned char is_outstanding;
+
+    /**
+     * Controls if the read control mode is active meaning
+     * that the flow of read operations will be controlled
+     * by the pending read value and no more bytes that those
+     * set in the pending read will be read.
+     * When the pending read value reaches zero the connection
+     * will be unregistered from read operations in the poll.
+     */
+    unsigned char read_control;
+
+    /**
+     * The amount of bytes to be read from the connection
+     * before it's unregistered for read operations.
+     * This value is only used when the read control mode
+     * is active, and provides a way of controlling the
+     * flow in the read stream.
+     */
+    size_t pending_read;
 
     /**
      * Queue containing the set of connections with
@@ -736,6 +785,18 @@ typedef struct connection_t {
 
     /**
      * Function to be used for registering
+     * reading detection in the polling (provider).
+     */
+    connection_update register_read;
+
+    /**
+     * Function to be used for uregistering
+     * reading detection in the polling (provider).
+     */
+    connection_update unregister_read;
+
+    /**
+     * Function to be used for registering
      * writing detection in the polling (provider).
      */
     connection_update register_write;
@@ -748,9 +809,19 @@ typedef struct connection_t {
 
     /**
      * Pointer to the function that invalidates the
+     * current function for reading meaning that if
+     * this function is called the connection needs
+     * to be reset (level up) again for reading at
+     * the polling level.
+     */
+    connection_update invalidate_read;
+
+    /**
+     * Pointer to the function that invalidates the
      * current function for writing meaning that if
      * this function is called the connection needs
-     * to be reset again for writing at a polling level.
+     * to be reset (level up) again for writing at
+     * the polling level.
      */
     connection_update invalidate_write;
 
@@ -1196,6 +1267,30 @@ ERROR_CODE open_connection(struct connection_t *connection);
 ERROR_CODE close_connection(struct connection_t *connection);
 
 /**
+ * Registers the given connection for read events.
+ * This registration is done according to the polling
+ * provider specification.
+ * This method should be always called indirectly.
+ *
+ * @param connection The connection to be registered
+ * for reading "events".
+ * @return The resulting error code.
+ */
+ERROR_CODE register_read_connection(struct connection_t *connection);
+
+/**
+ * Unregisters the given connection for read events.
+ * This unregistration is done according to the polling
+ * provider specification.
+ * This method should be always called indirectly.
+ *
+ * @param connection The connection to be unregistered
+ * for reading "events".
+ * @return The resulting error code.
+ */
+ERROR_CODE unregister_read_connection(struct connection_t *connection);
+
+/**
  * Registers the given connection for write events.
  * This registration is done according to the polling
  * provider specification.
@@ -1218,6 +1313,17 @@ ERROR_CODE register_write_connection(struct connection_t *connection);
  * @return The resulting error code.
  */
 ERROR_CODE unregister_write_connection(struct connection_t *connection);
+
+/**
+ * Invalidates the connection for read operation meaning
+ * than any other read operation should be first validated
+ * by the polling mechanism.
+ *
+ * @param connection The connection to be invalidated
+ * for reading "events".
+ * @return The resulting error code.
+ */
+ERROR_CODE invalidate_read_connection(struct connection_t *connection);
 
 /**
  * Invalidates the connection for write operation meaning
