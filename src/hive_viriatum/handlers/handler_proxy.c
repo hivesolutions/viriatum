@@ -654,7 +654,7 @@ ERROR_CODE _rabeton(struct connection_t *connection, struct data_t *data, void *
     connection_c->pending_read += data->size;
 
     if(connection_c->read_registered == FALSE &&\
-        connection_c->pending_read >= 10) {
+        connection_c->pending_read >= VIRIATUM_MAX_READ) {
         connection_c->register_read(connection_c);
     }
 
