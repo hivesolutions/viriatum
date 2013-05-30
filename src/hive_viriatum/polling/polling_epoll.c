@@ -312,18 +312,18 @@ ERROR_CODE poll_polling_epoll(struct polling_t *polling) {
     /* triggers the processing of the outstanding connection
     operations (pending operations) that meant to be done before
     the main poll operation blocks the control flow */
-	while(polling_epoll->read_outstanding_size > 0 ||
-		polling_epoll->write_outstanding_size > 0) {
-		_outstanding_polling_epoll(
-			polling_epoll,
-			polling_epoll->read_outstanding,
-			polling_epoll->write_outstanding,
-			polling_epoll->_read_outstanding,
-			polling_epoll->_write_outstanding,
-			polling_epoll->read_outstanding_size,
-			polling_epoll->write_outstanding_size
-		);
-	}
+    while(polling_epoll->read_outstanding_size > 0 ||
+        polling_epoll->write_outstanding_size > 0) {
+        _outstanding_polling_epoll(
+            polling_epoll,
+            polling_epoll->read_outstanding,
+            polling_epoll->write_outstanding,
+            polling_epoll->_read_outstanding,
+            polling_epoll->_write_outstanding,
+            polling_epoll->read_outstanding_size,
+            polling_epoll->write_outstanding_size
+        );
+    }
 
     /* polls the polling epoll */
     _poll_polling_epoll(
