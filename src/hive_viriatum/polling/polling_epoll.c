@@ -313,13 +313,13 @@ ERROR_CODE poll_polling_epoll(struct polling_t *polling) {
     operations (pending operations) that meant to be done before
     the main poll operation blocks the control flow */
     _outstanding_polling_epoll(
-        polling_select,
-        polling_select->read_outstanding,
-        polling_select->write_outstanding,
-        polling_select->_read_outstanding,
-        polling_select->_write_outstanding,
-        polling_select->read_outstanding_size,
-        polling_select->write_outstanding_size
+        polling_epoll,
+        polling_epoll->read_outstanding,
+        polling_epoll->write_outstanding,
+        polling_epoll->_read_outstanding,
+        polling_epoll->_write_outstanding,
+        polling_epoll->read_outstanding_size,
+        polling_epoll->write_outstanding_size
     );
 
     /* polls the polling epoll */
