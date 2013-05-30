@@ -465,7 +465,7 @@ ERROR_CODE _poll_polling_epoll(
 
         /* checks if the event is of type input (read) must be
         added to the read operations queue */
-        if(_event->events & EPOLLIN) {
+        if(_event->events & EPOLLIN && connection->read_registered) {
             /* sets the current connection in the read connections
             and then increments the read index counter */
             read_connections[read_index] = connection;
@@ -474,7 +474,7 @@ ERROR_CODE _poll_polling_epoll(
 
         /* checks if the event is of type output (write) must be
         added to the write operations queue */
-        if(_event->events & EPOLLOUT) {
+        if(_event->events & EPOLLOUT && connection->write_registered) {
             /* sets the current connection in the write connections
             and then increments the write index counter */
             write_connections[write_index] = connection;
