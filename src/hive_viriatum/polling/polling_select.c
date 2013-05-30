@@ -791,7 +791,7 @@ ERROR_CODE _outstanding_polling_select(
     for(index = 0; index < write_outstanding_size; index++) {
         /* retrieves the current connection and then prints
         a debug message with the socket handle of the connection */
-        current_connection = write_outstanding[index];
+        current_connection = _write_outstanding[index];
         V_DEBUG_F(
             "Processing outstanding write connection: %d\n",
             current_connection->socket_handle
