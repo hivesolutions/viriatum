@@ -909,6 +909,7 @@ ERROR_CODE _reset_http_parser_handler_proxy(struct http_parser_t *http_parser) {
     handler_proxy_context->buffer_size = 0;
     handler_proxy_context->out_buffer_size = 0;
     handler_proxy_context->pending = FALSE;
+	handler_proxy_context->pending_write = 0;
 
     /* raises no error */
     RAISE_NO_ERROR;
