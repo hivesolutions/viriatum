@@ -849,7 +849,6 @@ ERROR_CODE message_complete_callback_backend(struct http_parser_t *http_parser) 
     struct handler_proxy_context_t *handler_proxy_context =\
         (struct handler_proxy_context_t *) http_parser->context;
     struct connection_t *connection = handler_proxy_context->connection;
-    struct connection_t *connection_c = handler_proxy_context->connection;
 
     write_connection_c(
         connection,
