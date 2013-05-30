@@ -657,6 +657,8 @@ ERROR_CODE _rabeton(struct connection_t *connection, struct data_t *data, void *
         connection_c->pending_read > VIRIATUM_MAX_READ) {
         connection_c->register_read(connection_c);
     }
+
+	RAISE_NO_ERROR;
 }
 
 
