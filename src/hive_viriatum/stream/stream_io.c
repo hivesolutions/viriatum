@@ -259,16 +259,6 @@ ERROR_CODE read_handler_stream_io(struct connection_t *connection) {
             break;
         }
 
-        /* if the read control is active for the connection and
-        the ammount of bytes pending to be read has reached zero
-        the connection must be unregistered for thre read operation
-        (until further notice) and the loop must be break */
-        if(connection->read_control == TRUE &&\
-            connection->pending_read == 0) {
-            connection->unregister_read(connection);
-            break;
-        }
-
         /* in case the buffer size is so big that may
         overflow the current allocated buffer, must
         flush the current buffer avoid corruption */
@@ -361,15 +351,6 @@ ERROR_CODE read_handler_stream_io(struct connection_t *connection) {
         buffer_pointer += number_bytes;
         buffer_size += number_bytes;
         total_bytes += number_bytes;
-
-        /* in case the read control is currently active for
-        the connection the number if bytes pending to be
-        processed must be updated by decrementing the number
-        of bytes that have just been processed */
-        if(connection->read_control == TRUE) {
-            connection->pending_read = connection->pending_read > number_bytes ?\
-                connection->pending_read - number_bytes : 0;
-        }
 
         /* in case the viriatum is set to blocking must break
         the loop, no more that one read operarion is allowed */

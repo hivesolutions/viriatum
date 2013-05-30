@@ -735,25 +735,6 @@ typedef struct connection_t {
     unsigned char is_outstanding;
 
     /**
-     * Controls if the read control mode is active meaning
-     * that the flow of read operations will be controlled
-     * by the pending read value and no more bytes that those
-     * set in the pending read will be read.
-     * When the pending read value reaches zero the connection
-     * will be unregistered from read operations in the poll.
-     */
-    unsigned char read_control;
-
-    /**
-     * The amount of bytes to be read from the connection
-     * before it's unregistered for read operations.
-     * This value is only used when the read control mode
-     * is active, and provides a way of controlling the
-     * flow in the read stream.
-     */
-    size_t pending_read;
-
-    /**
      * Queue containing the set of connections with
      * data pending to be read.
      */

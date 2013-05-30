@@ -1399,8 +1399,6 @@ ERROR_CODE create_connection(struct connection_t **connection_pointer, SOCKET_HA
     connection->read_valid = FALSE;
     connection->write_valid = FALSE;
     connection->is_outstanding = FALSE;
-    connection->read_control = FALSE;
-    connection->pending_read = 0;
     connection->open_connection = NULL;
     connection->close_connection = NULL;
     connection->write_connection = NULL;
