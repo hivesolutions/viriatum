@@ -112,8 +112,11 @@ ERROR_CODE _create_client_connection(struct connection_t **connection_pointer, s
     connection->open_connection = open_connection;
     connection->close_connection = close_connection;
     connection->write_connection = write_connection;
+    connection->register_read = register_read_connection;
+    connection->unregister_read = unregister_read_connection;
     connection->register_write = register_write_connection;
     connection->unregister_write = unregister_write_connection;
+    connection->invalidate_read = invalidate_read_connection;
     connection->invalidate_write = invalidate_write_connection;
     connection->add_outstanding = add_outstanding_connection;
 
