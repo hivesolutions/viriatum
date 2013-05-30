@@ -606,7 +606,7 @@ ERROR_CODE virtual_url_callback_handler_proxy(struct http_parser_t *http_parser,
         /* updates the on close map that associates the client connection
         with the previous (old) on close handler function with the respective
         on cloese function for the current connection, to be used in callback
-        propagation and in the unregistration of the handler */
+        propagation and in the closing of the backend connection */
         set_value_hash_map(
             proxy_handler->on_close_map,
             (size_t) connection,
