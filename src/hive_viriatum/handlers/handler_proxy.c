@@ -260,14 +260,20 @@ ERROR_CODE unregister_handler_proxy(struct service_t *service) {
 }
 
 ERROR_CODE close_proxy_connection(struct io_connection_t *io_connection) {
+    /* allocates space for the various structures that are going
+    to be used as temporary variables in the close operation */
     struct http_handler_t *http_handler;
     struct proxy_handler_t *proxy_handler;
     struct connection_t *connection_c;
     io_connection_callback on_close;
 
+    /* retrieves the uper abstract connection object from the
+    io connection and then uses it to retrieve the service reference */
     struct connection_t *connection = io_connection->connection;
     struct service_t *service = connection->service;
 
+    /* retrieves the reference to the http handler from the service
+    using the handler map and then  retrieves the lower proxy handler */
     get_value_string_hash_map(
         service->http_handlers_map,
         (unsigned char *) "proxy",
@@ -275,6 +281,9 @@ ERROR_CODE close_proxy_connection(struct io_connection_t *io_connection) {
     );
     proxy_handler = (struct proxy_handler_t *) http_handler->lower;
 
+    /* retrieves the client (backend) connection associated with the
+    current proxy client connection to be used for closing, if the
+    client closes the backend connection must also be closed */
     get_value_hash_map(
         proxy_handler->connections_map,
         (size_t) connection,
@@ -282,6 +291,8 @@ ERROR_CODE close_proxy_connection(struct io_connection_t *io_connection) {
         (void **) &connection_c
     );
 
+    /* retrieves the top level on close handler to be called in order
+    to propagate the closing operation to the upper layers */
     get_value_hash_map(
         proxy_handler->on_close_map,
         (size_t) connection,
