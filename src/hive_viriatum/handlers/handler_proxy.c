@@ -642,7 +642,6 @@ ERROR_CODE data_backend_handler(struct io_connection_t *io_connection, unsigned 
 }
 
 ERROR_CODE open_backend_handler(struct io_connection_t *io_connection) {
-    printf("CONNECTED\n");
     RAISE_NO_ERROR;
 }
 
@@ -732,8 +731,8 @@ ERROR_CODE close_backend_handler(struct io_connection_t *io_connection) {
         }
     }
 
-    printf("DISCONNECTED\n");
-
+	/* raises no error as the processing of the close opearion
+	in the backend connection has been done correctly */
     RAISE_NO_ERROR;
 }
 
