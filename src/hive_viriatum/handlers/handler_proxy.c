@@ -376,8 +376,13 @@ ERROR_CODE body_callback_handler_proxy(struct http_parser_t *http_parser, const 
 }
 
 ERROR_CODE message_complete_callback_handler_proxy(struct http_parser_t *http_parser) {
+    /* reserves space fot the pointer to the buffer that may
+    be created in case there's a problem in the gateway */
     char *buffer;
 
+    /* retrieves the parser's context as the proxy context and then
+    uses it's parameters to retrieve the connection and then retrieves
+    it's underlying layers of the connection */
     struct handler_proxy_context_t *handler_proxy_context =\
         (struct handler_proxy_context_t *) http_parser->context;
     struct connection_t *connection =\
@@ -418,6 +423,8 @@ ERROR_CODE message_complete_callback_handler_proxy(struct http_parser_t *http_pa
         );
     }
 
+    /* raises no error as no problem has arised from the
+    final handling of the proxy message */
     RAISE_NO_ERROR;
 }
 
