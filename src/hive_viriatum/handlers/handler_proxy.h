@@ -231,6 +231,7 @@ ERROR_CODE _unset_http_parser_handler_proxy(struct http_parser_t *http_parser);
 ERROR_CODE _reset_http_parser_handler_proxy(struct http_parser_t *http_parser);
 ERROR_CODE _set_http_settings_handler_proxy(struct http_settings_t *http_settings);
 ERROR_CODE _unset_http_settings_handler_proxy(struct http_settings_t *http_settings);
+ERROR_CODE _pending_handler_proxy(struct connection_t *connection, struct data_t *data, void *parameters);
 ERROR_CODE _cleanup_handler_proxy(struct connection_t *connection, struct data_t *data, void *parameters);
 
 static __inline void write_proxy_out_buffer(struct handler_proxy_context_t *context, char *data, size_t size) {

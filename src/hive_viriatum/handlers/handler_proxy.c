@@ -642,24 +642,6 @@ ERROR_CODE open_backend_handler(struct io_connection_t *io_connection) {
     RAISE_NO_ERROR;
 }
 
-
-
-
-ERROR_CODE _rabeton(struct connection_t *connection, struct data_t *data, void *parameters) {
-    struct handler_proxy_context_t *handler_proxy_context =\
-        (struct handler_proxy_context_t *) parameters;
-    struct connection_t *connection_c = handler_proxy_context->connection_c;
-    handler_proxy_context->pending_write -= data->size_base;
-
-    if(connection_c->read_registered == FALSE &&\
-        handler_proxy_context->pending_write < VIRIATUM_TRE_READ) {
-        connection_c->register_read(connection_c)
-    }
-
-    RAISE_NO_ERROR;
-}
-
-
 ERROR_CODE close_backend_handler(struct io_connection_t *io_connection) {
     /* allocates the space for the various temporary structures that
     are going to be used for the closing operation of the backend connection */
@@ -803,7 +785,7 @@ ERROR_CODE headers_complete_callback_backend(struct http_parser_t *http_parser) 
         connection,
         (unsigned char *) handler_proxy_context->out_buffer,
         handler_proxy_context->out_buffer_size,
-        _rabeton,
+        _pending_handler_proxy,
         (void *) handler_proxy_context,
         FALSE
     );
@@ -829,7 +811,7 @@ ERROR_CODE body_callback_backend(struct http_parser_t *http_parser, const unsign
         connection,
         (unsigned char *) buffer,
         data_size,
-        _rabeton,
+        _pending_handler_proxy,
         (void *) handler_proxy_context
     );
 
@@ -946,6 +928,27 @@ ERROR_CODE _unset_http_settings_handler_proxy(struct http_settings_t *http_setti
     http_settings->on_virtual_url = NULL;
 
     /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE _pending_handler_proxy(struct connection_t *connection, struct data_t *data, void *parameters) {
+    /* loads the parameters pointer as the proxy context structure and then
+    retrieves the client connection from it to be used for its state update */
+    struct handler_proxy_context_t *handler_proxy_context =\
+        (struct handler_proxy_context_t *) parameters;
+    struct connection_t *connection_c = handler_proxy_context->connection_c;
+
+    /* updates the amount of byts pending in the write buffer and then in
+    case the client connection is not registered for writing and the amount
+    of bytes pending has reached a resonable level re-enabled thre reading */
+    handler_proxy_context->pending_write -= data->size_base;
+    if(connection_c->read_registered == FALSE &&\
+        handler_proxy_context->pending_write < VIRIATUM_TRE_READ) {
+        connection_c->register_read(connection_c);
+    }
+
+    /* returns with no error as the processing of the data write callback
+    has been a success, no problem arised */
     RAISE_NO_ERROR;
 }
 
