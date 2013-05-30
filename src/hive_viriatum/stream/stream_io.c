@@ -243,6 +243,10 @@ ERROR_CODE read_handler_stream_io(struct connection_t *connection) {
     struct io_connection_t *io_connection =\
         (struct io_connection_t *) connection->lower;
 
+	/* in case the current connection is not read registered there's
+	no need to continue with the read stream processing */
+	if(connection->read_registered == FALSE) { RAISE_NO_ERROR; }
+
     /* iterates continuously to read the data that is currently
     available in the connection for reading */
     while(TRUE) {
@@ -450,6 +454,10 @@ ERROR_CODE write_handler_stream_io(struct connection_t *connection) {
 
     /* flag and value controlling the state of the write */
     ERROR_CODE error = 0;
+
+	/* in case the current connection is not write registered there's
+	no need to continue with the write stream processing */
+	if(connection->write_registered == FALSE) { RAISE_NO_ERROR; }
 
     /* iterates continuously */
     while(TRUE) {
