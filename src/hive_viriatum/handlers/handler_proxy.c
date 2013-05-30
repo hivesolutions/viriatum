@@ -649,7 +649,7 @@ ERROR_CODE _rabeton(struct connection_t *connection, struct data_t *data, void *
     struct handler_proxy_context_t *handler_proxy_context =\
         (struct handler_proxy_context_t *) parameters;
     struct connection_t *connection_c = handler_proxy_context->connection_c;
-    handler_proxy_context->pending_write -= data->size;
+    handler_proxy_context->pending_write -= data->size_base;
 
 	if(connection_c->read_registered == FALSE) {
 		printf("%d\n", handler_proxy_context->pending_write);
