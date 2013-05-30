@@ -115,6 +115,7 @@ ERROR_CODE _create_client_connection(struct connection_t **connection_pointer, s
     connection->register_write = register_write_connection;
     connection->unregister_write = unregister_write_connection;
     connection->invalidate_write = invalidate_write_connection;
+    connection->add_outstanding = add_outstanding_connection;
 
     /* sets the various stream io connection callbacks
     in the client connection */
