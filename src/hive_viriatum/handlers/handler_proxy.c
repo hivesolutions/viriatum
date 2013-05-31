@@ -300,14 +300,22 @@ ERROR_CODE close_proxy_connection(struct io_connection_t *io_connection) {
         (void **) &on_close
     );
 
+    /* in case an on close handler is define in the associative map must
+    restore it and then call the top layer for the close event propagation */
     if(on_close != NULL) {
         io_connection->on_close = on_close;
         on_close(io_connection);
     }
+
+    /* in case the client (backend) connection is defined must close it also
+    because no backend connection should be defined for a non existing proxy
+    client connection, it's the default strategy */
     if(connection_c != NULL) {
         connection_c->close_connection(connection_c);
     }
 
+    /* undefines the complete set of values associated both with the proxy client
+    connection and with the backend connection, no longer required */
     set_value_hash_map(proxy_handler->connections_map, (size_t) connection, NULL, NULL);
     set_value_hash_map(proxy_handler->reverse_map, (size_t) connection_c, NULL, NULL);
     set_value_hash_map(proxy_handler->on_close_map, (size_t) connection, NULL, NULL);
