@@ -465,7 +465,7 @@ ERROR_CODE _poll_polling_select(
     }
 
     /* creates the iterator for the connections list that wil be used
-	to iterate arround all the connections for the ready testing */
+    to iterate arround all the connections for the is set testing */
     create_iterator_linked_list(connections_list, &connections_list_iterator);
 
     /* iterates continuously */
@@ -474,8 +474,12 @@ ERROR_CODE _poll_polling_select(
         current loop of iteration */
         if(select_count == 0) { break; }
 
-        /* retrieves the next value from the iterator */
-        get_next_iterator(connections_list_iterator, (void **) &current_connection);
+        /* retrieves the next value from the iterator, this will
+        provide the pointer to the next connection to be tested */
+        get_next_iterator(
+            connections_list_iterator,
+            (void **) &current_connection
+        );
 
         /* in case the current connection is null (end of iterator)
         should break the loop */
