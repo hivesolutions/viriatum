@@ -416,9 +416,6 @@ ERROR_CODE _poll_polling_select(
     /* copies the select timeout to the select timeout temporary */
     polling_select->select_timeout_temporary = polling_select->select_timeout;
 
-    /* creates the iterator for the linked list */
-    create_iterator_linked_list(connections_list, &connections_list_iterator);
-
     /* prints a debug message */
     V_DEBUG("Entering select statement\n");
 
@@ -466,6 +463,10 @@ ERROR_CODE _poll_polling_select(
             (unsigned char *) "Problem running select"
         );
     }
+
+    /* creates the iterator for the connections list that wil be used
+	to iterate arround all the connections for the ready testing */
+    create_iterator_linked_list(connections_list, &connections_list_iterator);
 
     /* iterates continuously */
     while(TRUE) {
