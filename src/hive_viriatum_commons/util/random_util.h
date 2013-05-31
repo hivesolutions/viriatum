@@ -1,4 +1,4 @@
-﻿/*
+/*
  Hive Viriatum Commons
  Copyright (C) 2008-2012 Hive Solutions Lda.
 
