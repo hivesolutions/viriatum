@@ -170,7 +170,7 @@ For more information regarding benchmarking please check the list of [todo](doc/
 ## Debugging
 
 * For windows debugging use [Visual Leak Detector](http://vld.codeplex.com) using the `#include <vld.h>` statement
-* In linux/unix environments use [Valgrind|http://valgrind.org] with `valgrind --tool=memcheck --leak-check=full viriatum`
+* In linux/unix environments use [Valgrind](http://valgrind.org) with `valgrind --tool=memcheck --leak-check=full viriatum`
 
 ## Profiling
 
