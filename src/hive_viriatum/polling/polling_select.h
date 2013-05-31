@@ -224,8 +224,16 @@ ERROR_CODE _outstanding_polling_select(
     size_t read_outstanding_size,
     size_t write_outstanding_size
 );
-ERROR_CODE _register_sockets_set_polling_select(struct polling_select_t *polling_select, SOCKET_HANDLE socket_handle, SOCKET_SET *sockets_set);
-ERROR_CODE _unregister_sockets_set_polling_select(struct polling_select_t *polling_select, SOCKET_HANDLE socket_handle, SOCKET_SET *sockets_set);
+ERROR_CODE _register_sockets_set_polling_select(
+    struct polling_select_t *polling_select,
+    SOCKET_HANDLE socket_handle,
+    SOCKET_SET *sockets_set
+);
+ERROR_CODE _unregister_sockets_set_polling_select(
+    struct polling_select_t *polling_select,
+    SOCKET_HANDLE socket_handle,
+    SOCKET_SET *sockets_set
+);
 
 /**
  * Removes a connection and insert it into the remove connections

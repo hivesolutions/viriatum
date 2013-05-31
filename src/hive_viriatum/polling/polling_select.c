@@ -117,7 +117,11 @@ ERROR_CODE register_connection_polling_select(struct polling_t *polling, struct 
     struct polling_select_t *polling_select = (struct polling_select_t *) polling->lower;
 
     /* registers the socket handle in the sockets read set */
-    _register_sockets_set_polling_select(polling_select, connection->socket_handle, &polling_select->sockets_read_set);
+    _register_sockets_set_polling_select(
+        polling_select,
+        connection->socket_handle,
+        &polling_select->sockets_read_set
+    );
 
     /* in case the socket error are meant to be processed */
     if(VIRIATUM_SOCKET_ERROR) {
@@ -793,7 +797,11 @@ ERROR_CODE _outstanding_polling_select(
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _register_sockets_set_polling_select(struct polling_select_t *polling_select, SOCKET_HANDLE socket_handle, SOCKET_SET *sockets_set) {
+ERROR_CODE _register_sockets_set_polling_select(
+    struct polling_select_t *polling_select,
+    SOCKET_HANDLE socket_handle,
+    SOCKET_SET *sockets_set
+) {
     /* in case the current socket handle is bigger than the polling
     select sockets set highest value */
     if(socket_handle > polling_select->sockets_set_highest) {
@@ -808,7 +816,11 @@ ERROR_CODE _register_sockets_set_polling_select(struct polling_select_t *polling
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _unregister_sockets_set_polling_select(struct polling_select_t *polling_select, SOCKET_HANDLE socket_handle, SOCKET_SET *sockets_set) {
+ERROR_CODE _unregister_sockets_set_polling_select(
+    struct polling_select_t *polling_select,
+    SOCKET_HANDLE socket_handle,
+    SOCKET_SET *sockets_set
+) {
     /* removes the socket handle from the sockets set */
     SOCKET_SET_CLEAR(socket_handle, sockets_set);
 
