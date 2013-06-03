@@ -639,7 +639,7 @@ ERROR_CODE _send_response_handler_php(struct http_parser_t *http_parser) {
         HTTP11,
         status_code,
         status_message,
-        KEEP_ALIVE,
+        handler_php_context->flags & FLAG_CONNECTION_KEEP_ALIVE ? KEEP_ALIVE : KEEP_CLOSE,
         FALSE
     );
     count += SPRINTF(

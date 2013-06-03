@@ -129,7 +129,7 @@ ERROR_CODE _send_response_handler_diag(struct http_parser_t *http_parser) {
         HTTP11,
         200,
         "OK",
-        KEEP_ALIVE,
+        http_parser->flags & FLAG_CONNECTION_KEEP_ALIVE ? KEEP_ALIVE : KEEP_CLOSE,
         info_size,
         NO_CACHE,
         FALSE
