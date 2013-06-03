@@ -412,8 +412,8 @@ typedef enum http_header_state_e {
 
 typedef enum http_flags_e {
     FLAG_CHUNKED = 1 << 0,
-    FLAG_CONNECTION_KEEP_ALIVE = 1 << 1,
-    FLAG_CONNECTION_CLOSE = 1 << 2,
+    FLAG_KEEP_ALIVE = 1 << 1,
+    FLAG_CLOSE = 1 << 2,
     FLAG_TRAILING = 1 << 3,
     FLAG_UPGRADE = 1 << 4,
     FLAG_SKIPBODY = 1 << 5

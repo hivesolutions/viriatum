@@ -33,7 +33,7 @@
 int http_should_keep_alive(struct http_parser_t *http_parser) {
     /* in case the request is of type http 1.1 */
     if(http_parser->http_major > 0 && http_parser->http_minor > 0) {
-        if(http_parser->flags & FLAG_CONNECTION_CLOSE) {
+        if(http_parser->flags & FLAG_CLOSE) {
             return 0;
         } else {
             return 1;
@@ -41,7 +41,7 @@ int http_should_keep_alive(struct http_parser_t *http_parser) {
     }
     /* in case the request is of type http 1.0 or earlier */
     else {
-        if(http_parser->flags & FLAG_CONNECTION_KEEP_ALIVE) {
+        if(http_parser->flags & FLAG_KEEP_ALIVE) {
             return 1;
         } else {
             return 0;
@@ -1461,13 +1461,13 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
 
                     switch(header_state) {
                         case HEADER_STATE_CONNECTION_KEEP_ALIVE:
-                            http_parser->flags |= FLAG_CONNECTION_KEEP_ALIVE;
+                            http_parser->flags |= FLAG_KEEP_ALIVE;
 
                             /* breaks the switch */
                             break;
 
                         case HEADER_STATE_CONNECTION_CLOSE:
-                            http_parser->flags |= FLAG_CONNECTION_CLOSE;
+                            http_parser->flags |= FLAG_CLOSE;
 
                             /* breaks the switch */
                             break;
