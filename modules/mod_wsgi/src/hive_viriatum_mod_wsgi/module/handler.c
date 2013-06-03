@@ -831,7 +831,7 @@ ERROR_CODE _send_response_handler_wsgi(struct http_parser_t *http_parser) {
             default:
                 /* removes the connection keep alive from the flags to be
                 used, this action will force the connection to be closed */
-                handler_wsgi_context->flags &= ~FLAG_CONNECTION_KEEP_ALIVE;
+                handler_wsgi_context->flags &= ~FLAG_KEEP_ALIVE;
 
                 break;
         }
@@ -847,7 +847,7 @@ ERROR_CODE _send_response_handler_wsgi(struct http_parser_t *http_parser) {
         HTTP11,
         _wsgi_request.status_code,
         _wsgi_request.status_message,
-        handler_wsgi_context->flags & FLAG_CONNECTION_KEEP_ALIVE ? KEEP_ALIVE : KEEP_CLOSE,
+        handler_wsgi_context->flags & FLAG_KEEP_ALIVE ? KEEP_ALIVE : KEEP_CLOSE,
         FALSE
     );
 
@@ -931,7 +931,7 @@ ERROR_CODE _send_response_callback_handler_wsgi(struct connection_t *connection,
     /* checks if the current connection should be kept alive, this must
     be done prior to the unseting of the connection as the current wsgi
     context structrue will be destroyed there */
-    unsigned char keep_alive = handler_wsgi_context->flags & FLAG_CONNECTION_KEEP_ALIVE;
+    unsigned char keep_alive = handler_wsgi_context->flags & FLAG_KEEP_ALIVE;
 
     /* in case there is an http handler in the current connection must
     unset it (remove temporary information) */
@@ -978,6 +978,7 @@ ERROR_CODE _write_error_connection_wsgi(struct http_parser_t *http_parser, char 
         500,
         "Internal Server Error",
         message,
+        http_parser->flags & FLAG_KEEP_ALIVE ? KEEP_ALIVE : KEEP_CLOSE,
         _send_response_callback_handler_wsgi,
         (void *) handler_wsgi_context
     );

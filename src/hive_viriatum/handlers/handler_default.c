@@ -279,6 +279,7 @@ ERROR_CODE _send_response_handler_default(struct http_parser_t *http_parser) {
         200,
         "OK",
         "Hello Viriatum",
+        http_parser->flags & FLAG_KEEP_ALIVE ? KEEP_ALIVE : KEEP_CLOSE,
         _send_response_callback_handler_default,
         (void *) (size_t) http_parser->flags
     );
@@ -306,7 +307,7 @@ ERROR_CODE _send_response_callback_handler_default(struct connection_t *connecti
     }
 
     /* in case the connection is not meant to be kept alive */
-    if(!(flags & FLAG_CONNECTION_KEEP_ALIVE)) {
+    if(!(flags & FLAG_KEEP_ALIVE)) {
         /* closes the connection */
         connection->close_connection(connection);
     } else {

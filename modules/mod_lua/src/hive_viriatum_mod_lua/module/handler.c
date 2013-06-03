@@ -281,7 +281,7 @@ ERROR_CODE _send_response_callback_handler_lua(struct connection_t *connection, 
     }
 
     /* in case the connection is not meant to be kept alive */
-    if(!(flags & FLAG_CONNECTION_KEEP_ALIVE)) {
+    if(!(flags & FLAG_KEEP_ALIVE)) {
         /* closes the connection */
         connection->close_connection(connection);
     } else {
@@ -318,6 +318,7 @@ ERROR_CODE _write_error_connection_lua(struct http_parser_t *http_parser, char *
         500,
         "Internal Server Error",
         message,
+        http_parser->flags & FLAG_KEEP_ALIVE ? KEEP_ALIVE : KEEP_CLOSE,
         _send_response_callback_handler_lua,
         (void *) (size_t) http_parser->flags
     );

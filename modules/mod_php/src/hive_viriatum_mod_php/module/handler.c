@@ -639,7 +639,7 @@ ERROR_CODE _send_response_handler_php(struct http_parser_t *http_parser) {
         HTTP11,
         status_code,
         status_message,
-        handler_php_context->flags & FLAG_CONNECTION_KEEP_ALIVE ? KEEP_ALIVE : KEEP_CLOSE,
+        handler_php_context->flags & FLAG_KEEP_ALIVE ? KEEP_ALIVE : KEEP_CLOSE,
         FALSE
     );
     count += SPRINTF(
@@ -693,7 +693,7 @@ ERROR_CODE _send_response_callback_handler_php(struct connection_t *connection, 
     /* checks if the current connection should be kept alive, this must
     be done prior to the unseting of the connection as the current php
     context structrue will be destroyed there */
-    unsigned char keep_alive = handler_php_context->flags & FLAG_CONNECTION_KEEP_ALIVE;
+    unsigned char keep_alive = handler_php_context->flags & FLAG_KEEP_ALIVE;
 
     /* in case there is an http handler in the current connection must
     unset it (remove temporary information) */

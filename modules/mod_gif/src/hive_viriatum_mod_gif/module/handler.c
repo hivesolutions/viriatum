@@ -92,7 +92,7 @@ ERROR_CODE _send_response_handler_gif(struct http_parser_t *http_parser) {
         HTTP11,
         200,
         "OK",
-        http_parser->flags & FLAG_CONNECTION_KEEP_ALIVE ? KEEP_ALIVE : KEEP_CLOSE,
+        http_parser->flags & FLAG_KEEP_ALIVE ? KEEP_ALIVE : KEEP_CLOSE,
         _empty_gif_size,
         MAX_AGE,
         FALSE
@@ -134,7 +134,7 @@ ERROR_CODE _send_response_callback_handler_gif(struct connection_t *connection, 
     /* checks if the current connection should be kept alive, this must
     be done prior to the unseting of the connection as the current gif
     context structrue will be destroyed there */
-    unsigned char keep_alive = flags & FLAG_CONNECTION_KEEP_ALIVE;
+    unsigned char keep_alive = flags & FLAG_KEEP_ALIVE;
 
     /* in case there is an http handler in the current connection must
     unset it (remove temporary information) */
