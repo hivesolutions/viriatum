@@ -38,6 +38,10 @@ In order to provide a correct (system wide) configuration path use:
 
     ./configure --sysconfdir=/etc
 
+In order to get the most performance out of viriatum set the CFLAGS variable for optimization:
+
+    CFLAGS="-O3" ./configure
+
 ### Unix 32bit from 64bit
 
     apt-get libc6-dev-i386
