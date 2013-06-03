@@ -772,14 +772,18 @@ ERROR_CODE close_backend_handler(struct io_connection_t *io_connection) {
             (struct handler_proxy_context_t *) custom_parameters->parameters;
         handler_proxy_context->connection_c = NULL;
 
-        /* releases the lock present in the connection for the service and then
-        closes it releasing all of it's structures, the logic is that if the
-        connection with the proxy target (client) closes the connection with the
-        proxy client should also be closed, then returns the control flow to the
-        caller function with no error */
-        http_connection_s->release(http_connection_s);
+        /* in case there's data currently pending then the final connection cleanup
+        operation has not been yet scheduled, so one must be scheduled to close
+        the service (proxy client) connection */
         if(handler_proxy_context->pending) {
-            connection_s->close_connection(connection_s);
+            write_connection_c(
+                connection,
+                (unsigned char *) "",
+                0,
+                _cleanup_handler_proxy,
+                NULL,
+                FALSE
+            );
         }
     }
 
@@ -867,7 +871,7 @@ ERROR_CODE headers_complete_callback_backend(struct http_parser_t *http_parser) 
     the maximum allowed and the read enabled in the client connection
     disables the read operations in the backend connection (avoids flooding) */
     handler_proxy_context->pending_write += handler_proxy_context->out_buffer_size;
-    if(connection_c->read_registered == TRUE &&\
+    if(connection_c != NULL && connection_c->read_registered == TRUE &&\
         handler_proxy_context->pending_write >= VIRIATUM_MAX_READ) {
         connection_c->unregister_read(connection_c);
     }
@@ -1036,7 +1040,7 @@ ERROR_CODE _pending_handler_proxy(struct connection_t *connection, struct data_t
     case the client connection is not registered for writing and the amount
     of bytes pending has reached a resonable level re-enabled thre reading */
     handler_proxy_context->pending_write -= data->size_base;
-    if(connection_c->read_registered == FALSE &&\
+    if(connection_c != NULL && connection_c->read_registered == FALSE &&\
         handler_proxy_context->pending_write < VIRIATUM_TRE_READ) {
         connection_c->register_read(connection_c);
     }
