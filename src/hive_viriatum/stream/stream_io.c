@@ -722,7 +722,7 @@ ERROR_CODE close_handler_stream_io(struct connection_t *connection) {
     /* in case the on close handler is defined */
     if(io_connection->on_close != NULL) {
         /* prints some debugging information about the handler function
-		that is going to be called and the runs the call */
+        that is going to be called and the runs the call */
         V_DEBUG("Calling on close handler\n");
         io_connection->on_close(io_connection);
         V_DEBUG("Finished calling on close handler\n");
