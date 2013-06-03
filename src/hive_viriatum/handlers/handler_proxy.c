@@ -428,6 +428,7 @@ ERROR_CODE message_complete_callback_handler_proxy(struct http_parser_t *http_pa
             502,
             "Bad gateway",
             "Invalid proxy connection",
+            http_parser->flags & FLAG_KEEP_ALIVE ? KEEP_ALIVE : KEEP_CLOSE,
             _cleanup_handler_proxy,
             (void *) (size_t) http_parser->flags
         );
@@ -1063,7 +1064,7 @@ ERROR_CODE _cleanup_handler_proxy(struct connection_t *connection, struct data_t
     /* checks if the current connection should be kept alive, this must
     be done prior to the unseting of the connection as the current gif
     context structrue will be destroyed there */
-    unsigned char keep_alive = flags & FLAG_CONNECTION_KEEP_ALIVE;
+    unsigned char keep_alive = flags & FLAG_KEEP_ALIVE;
 
     /* in case there is an http handler in the current connection must
     unset it (remove temporary information) */

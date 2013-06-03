@@ -497,7 +497,7 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
     /* verifies if the currently set flag grant "permission" to keep
     the connection alive at the end of the http message processing,
     this values is going to be used for headers generation */
-    keep_alive = flags & FLAG_CONNECTION_KEEP_ALIVE;
+    keep_alive = flags & FLAG_KEEP_ALIVE;
 
     /* acquires the lock on the http connection, this will avoids further
     messages to be processed, no parallel request handling problems */
@@ -678,6 +678,7 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
             404,
             "Not Found",
             error_description,
+            keep_alive ? KEEP_ALIVE : KEEP_CLOSE,
             _cleanup_handler_file,
             handler_file_context
         );
@@ -698,6 +699,7 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
             "Unauthorized",
             "Invalid password or user not found",
             (char *) handler_file_context->auth_basic,
+            keep_alive ? KEEP_ALIVE : KEEP_CLOSE,
             _cleanup_handler_file,
             handler_file_context
         );
@@ -1153,7 +1155,7 @@ ERROR_CODE _cleanup_handler_file(struct connection_t *connection, struct data_t 
     }
 
     /* in case the connection is not meant to be kept alive */
-    if(!(flags & FLAG_CONNECTION_KEEP_ALIVE)) {
+    if(!(flags & FLAG_KEEP_ALIVE)) {
         /* closes the connection, no need to continue keeping
         it open as there's no intention to keep it open from
         the client side (active closing) */
