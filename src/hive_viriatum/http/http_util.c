@@ -336,7 +336,8 @@ ERROR_CODE write_http_error_a(struct connection_t *connection, char *buffer, siz
             _error_description
         );
 
-        /* writes both the headers to the connection, registers for the appropriate callbacks */
+        /* writes both the headers to the connection, an then
+        registers for the appropriate callbacks */
         write_connection(
             connection,
             (unsigned char *) headers_buffer,
