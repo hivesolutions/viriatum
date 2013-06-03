@@ -29,7 +29,15 @@
 
 #include "http_util.h"
 
-size_t write_http_headers(struct connection_t *connection, char *buffer, size_t size, enum http_version_e version, int status_code, char *status_message, enum http_keep_alive_e keep_alive, char close) {
+size_t write_http_headers(
+    struct connection_t *connection,
+    char *buffer, size_t size,
+    enum http_version_e version,
+    int status_code,
+    char *status_message,
+    enum http_keep_alive_e keep_alive,
+    char close
+) {
     /* writes the header information into the provided buffer, the writing
     into this buffer uses the most of static structures possible in order
     to accelerate the writing speed at the end of the writing the number
@@ -53,7 +61,17 @@ size_t write_http_headers(struct connection_t *connection, char *buffer, size_t 
     return count;
 }
 
-size_t write_http_headers_c(struct connection_t *connection, char *buffer, size_t size, enum http_version_e version, int status_code, char *status_message, enum http_keep_alive_e keep_alive, size_t content_length, enum http_cache_e cache, int close) {
+size_t write_http_headers_c(
+    struct connection_t *connection,
+    char *buffer, size_t size,
+    enum http_version_e version,
+    int status_code,
+    char *status_message,
+    enum http_keep_alive_e keep_alive,
+    size_t content_length,
+    enum http_cache_e cache,
+    int close
+) {
     /* writes the header information into the buffer using the basic
     function then uses the count offset to determine the buffer position
     to write the remaining headers for the complete write */
@@ -82,7 +100,19 @@ size_t write_http_headers_c(struct connection_t *connection, char *buffer, size_
     return count;
 }
 
-size_t write_http_headers_a(struct connection_t *connection, char *buffer, size_t size, enum http_version_e version, int status_code, char *status_message, enum http_keep_alive_e keep_alive, size_t content_length, enum http_cache_e cache, char *realm, int close) {
+size_t write_http_headers_a(
+    struct connection_t *connection,
+    char *buffer,
+    size_t size,
+    enum http_version_e version,
+    int status_code,
+    char *status_message,
+    enum http_keep_alive_e keep_alive,
+    size_t content_length,
+    enum http_cache_e cache,
+    char *realm,
+    int close
+) {
     /* writes the header information into the buffer using the basic
     function then uses the count offset to determine the buffer position
     to write the remaining headers for the complete write */
@@ -113,7 +143,18 @@ size_t write_http_headers_a(struct connection_t *connection, char *buffer, size_
     return count;
 }
 
-size_t write_http_headers_m(struct connection_t *connection, char *buffer, size_t size, enum http_version_e version, int status_code, char *status_message, enum http_keep_alive_e keep_alive, size_t content_length, enum http_cache_e cache, char *message) {
+size_t write_http_headers_m(
+    struct connection_t *connection,
+    char *buffer,
+    size_t size,
+    enum http_version_e version,
+    int status_code,
+    char *status_message,
+    enum http_keep_alive_e keep_alive,
+    size_t content_length,
+    enum http_cache_e cache,
+    char *message
+) {
     /* writes the complete set of buffer using the appropriate function and then
     uses the count offset to copy the contents part of the message into the final
     part of the buffer (message writing) */
@@ -135,7 +176,17 @@ size_t write_http_headers_m(struct connection_t *connection, char *buffer, size_
     return count;
 }
 
-ERROR_CODE write_http_message(struct connection_t *connection, char *buffer, size_t size, enum http_version_e version, int status_code, char *status_message, char *message, connection_data_callback_hu callback, void *callback_parameters) {
+ERROR_CODE write_http_message(
+    struct connection_t *connection,
+    char *buffer, size_t size,
+    enum http_version_e version,
+    int status_code,
+    char *status_message,
+    char *message,
+    enum http_keep_alive_e keep_alive,
+    connection_data_callback_hu callback,
+    void *callback_parameters
+) {
     /* allocates the headers buffer (it will be releases automatically by the writter)
     it need to be allocated in the heap so it gets throught the request cycle */
     char *headers_buffer = buffer == NULL ? MALLOC(VIRIATUM_HTTP_SIZE) : buffer;
@@ -150,7 +201,7 @@ ERROR_CODE write_http_message(struct connection_t *connection, char *buffer, siz
         version,
         status_code,
         status_message,
-        KEEP_ALIVE,
+        keep_alive,
         strlen(message),
         NO_CACHE,
         message
@@ -169,7 +220,18 @@ ERROR_CODE write_http_message(struct connection_t *connection, char *buffer, siz
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE write_http_error(struct connection_t *connection, char *buffer, size_t size, enum http_version_e version, int error_code, char *error_message, char *error_description, connection_data_callback_hu callback, void *callback_parameters) {
+ERROR_CODE write_http_error(
+    struct connection_t *connection,
+    char *buffer,
+    size_t size,
+    enum http_version_e version,
+    int error_code,
+    char *error_message,
+    char *error_description,
+    enum http_keep_alive_e keep_alive,
+    connection_data_callback_hu callback,
+    void *callback_parameters
+) {
     return write_http_error_a(
         connection,
         buffer,
@@ -179,12 +241,25 @@ ERROR_CODE write_http_error(struct connection_t *connection, char *buffer, size_
         error_message,
         error_description,
         NULL,
+        keep_alive,
         callback,
         callback_parameters
     );
 }
 
-ERROR_CODE write_http_error_a(struct connection_t *connection, char *buffer, size_t size, enum http_version_e version, int error_code, char *error_message, char *error_description, char *realm, connection_data_callback_hu callback, void *callback_parameters) {
+ERROR_CODE write_http_error_a(
+    struct connection_t *connection,
+    char *buffer,
+    size_t size,
+    enum http_version_e version,
+    int error_code,
+    char *error_message,
+    char *error_description,
+    char *realm,
+    enum http_keep_alive_e keep_alive,
+    connection_data_callback_hu callback,
+    void *callback_parameters
+) {
     /* allocates space for the result buffer related
     variables (for both the buffer pointer and size) */
     size_t result_length;
@@ -262,7 +337,7 @@ ERROR_CODE write_http_error_a(struct connection_t *connection, char *buffer, siz
             version,
             error_code,
             error_message,
-            KEEP_ALIVE,
+            keep_alive,
             strlen((char *) template_handler->string_value),
             NO_CACHE,
             TRUE
@@ -273,7 +348,7 @@ ERROR_CODE write_http_error_a(struct connection_t *connection, char *buffer, siz
             version,
             error_code,
             error_message,
-            KEEP_ALIVE,
+            keep_alive,
             strlen((char *) template_handler->string_value),
             NO_CACHE,
             realm,
@@ -330,7 +405,7 @@ ERROR_CODE write_http_error_a(struct connection_t *connection, char *buffer, siz
             version,
             error_code,
             error_message,
-            KEEP_ALIVE,
+            keep_alive,
             strlen(_error_description),
             NO_CACHE,
             _error_description
