@@ -847,7 +847,7 @@ ERROR_CODE _send_response_handler_wsgi(struct http_parser_t *http_parser) {
         HTTP11,
         _wsgi_request.status_code,
         _wsgi_request.status_message,
-        handler_wsgi_context->flags & FLAG_KEEP_ALIVE ? KEEP_ALIVE : KEEP_CLOSE,
+        http_parser->flags & FLAG_KEEP_ALIVE ? KEEP_ALIVE : KEEP_CLOSE,
         FALSE
     );
 
