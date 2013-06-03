@@ -451,6 +451,11 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
     char *extension;
     const char *mime_type;
 
+    /* allocates space for the variable that will be set in case
+    the connection is meant to be kep alive at the end of the
+    http message processing or not */
+    unsigned char keep_alive;
+
     /* allocates space for the size of the url string to
     be calculates and for the folder path variable */
     size_t url_size;
@@ -473,8 +478,11 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
     it need to be allocated in the heap so it gets throught the request cycle */
     char *headers_buffer = MALLOC(VIRIATUM_HTTP_SIZE);
 
-    /* retrieves the handler file context from the http parser */
-    struct handler_file_context_t *handler_file_context = (struct handler_file_context_t *) http_parser->context;
+    /* retrieves the handler file context from the http parser and uses
+    it to retrieve the respective flags value */
+    struct handler_file_context_t *handler_file_context =\
+        (struct handler_file_context_t *) http_parser->context;
+    unsigned char flags = http_parser->flags;
 
     /* retrieves the connection from the http parser parameters,
     the connection object is going to be used for the input and
@@ -485,6 +493,11 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
     able to operate over them, for register */
     struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
     struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
+
+    /* verifies if the currently set flag grant "permission" to keep
+    the connection alive at the end of the http message processing,
+    this values is going to be used for headers generation */
+    keep_alive = flags & FLAG_CONNECTION_KEEP_ALIVE;
 
     /* acquires the lock on the http connection, this will avoids further
     messages to be processed, no parallel request handling problems */
@@ -697,7 +710,7 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
             HTTP11,
             307,
             "Temporary Redirect",
-            KEEP_ALIVE,
+            keep_alive ? KEEP_ALIVE : KEEP_CLOSE,
             FALSE
         );
         SPRINTF(
@@ -728,7 +741,7 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
             HTTP11,
             200,
             "OK",
-            KEEP_ALIVE,
+            keep_alive ? KEEP_ALIVE : KEEP_CLOSE,
             strlen((char *) handler_file_context->template_handler->string_value),
             NO_CACHE,
             TRUE
@@ -757,7 +770,7 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
             HTTP11,
             304,
             "Not Modified",
-            KEEP_ALIVE,
+            keep_alive ? KEEP_ALIVE : KEEP_CLOSE,
             0,
             NO_CACHE,
             TRUE
@@ -797,7 +810,7 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
             HTTP11,
             206,
             "Partial content",
-            KEEP_ALIVE,
+            keep_alive ? KEEP_ALIVE : KEEP_CLOSE,
             handler_file_context->final_byte -\
             handler_file_context->initial_byte + 1,
             NO_CACHE,
@@ -841,7 +854,7 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
             HTTP11,
             200,
             "OK",
-            KEEP_ALIVE,
+            keep_alive ? KEEP_ALIVE : KEEP_CLOSE,
             file_size,
             NO_CACHE,
             FALSE
@@ -1141,7 +1154,9 @@ ERROR_CODE _cleanup_handler_file(struct connection_t *connection, struct data_t 
 
     /* in case the connection is not meant to be kept alive */
     if(!(flags & FLAG_CONNECTION_KEEP_ALIVE)) {
-        /* closes the connection */
+        /* closes the connection, no need to continue keeping
+        it open as there's no intention to keep it open from
+        the client side (active closing) */
         connection->close_connection(connection);
     } else {
         /* releases the lock on the http connection, this will allow further
