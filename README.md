@@ -1,6 +1,6 @@
 # [Viriatum Web Server](http://viriatum.com)
 
-The Viriatum Web Server is simple and lightweight web server aimed at providing a simple yet powerfull solution
+The Viriatum Web Server is simple and lightweight web server aimed at providing a simple yet powerful solution
 for static file serving, reverse proxy serving and dynamic language handling.
 
 The current implementation support both x86/x64 and ARM architectures.
