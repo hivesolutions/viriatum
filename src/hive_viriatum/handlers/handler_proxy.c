@@ -704,7 +704,6 @@ ERROR_CODE close_backend_handler(struct io_connection_t *io_connection) {
     struct handler_proxy_context_t *handler_proxy_context;
     struct connection_t *connection_s;
     struct io_connection_t *io_connection_s;
-    struct http_connection_t *http_connection_s;
 
     /* reserves space for both the top level http handler structure and the
     concrete proxy handler structure containing the specifics of the proxy and
@@ -752,7 +751,6 @@ ERROR_CODE close_backend_handler(struct io_connection_t *io_connection) {
     /* resolves the service connection (proxy client) into the proper io
     and http connection and then restores the close handler to them */
     io_connection_s = (struct io_connection_t *) connection_s->lower;
-    http_connection_s = (struct http_connection_t *) io_connection_s->lower;
     io_connection_s->on_close = on_close;
 
     /* unsets the complete set of map asociating the data from the frontend
