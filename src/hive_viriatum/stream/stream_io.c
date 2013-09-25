@@ -134,6 +134,9 @@ ERROR_CODE accept_handler_stream_io(struct connection_t *connection) {
                     ((SOCKET_ADDRESS_INTERNET *) &socket_address)->sin_addr
                 );
                 memcpy(connection->host, host, strlen((char *) host) + 1);
+                connection->port = ntohs(
+                    ((SOCKET_ADDRESS_INTERNET *) &socket_address)->sin_port
+                );
             }
 
             /* sets the socket address in the (client) connection

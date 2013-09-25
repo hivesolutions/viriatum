@@ -690,7 +690,7 @@ typedef struct connection_t {
      * this value may be an ipv4 or ipv6 or even
      * an dns based hostname resolution.
      */
-    unsigned char host[32];
+    unsigned char host[64];
 
     /**
      * The tcp based port of the other end of the
