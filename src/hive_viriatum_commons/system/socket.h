@@ -43,6 +43,8 @@
 #define SOCKET_DATA WSADATA
 #define SOCKET_INFO ADDRINFO
 #define SOCKET_HANDLE SOCKET
+#define SOCKET_FAMILY unsigned short
+#define SOCKET_ADDRESS_BASE SOCKADDR
 #define SOCKET_ADDRESS_SIZE int
 #define SOCKET_ADDRESS_INTERNET SOCKADDR_IN
 #define SOCKET_HOSTENT HOSTENT
@@ -111,6 +113,8 @@
 #define SOCKET_CONNECTIONS 256
 #define SOCKET_DATA void *
 #define SOCKET_HANDLE int
+#define SOCKET_FAMILY unsigned short
+#define SOCKET_ADDRESS_BASE struct sockaddr
 #define SOCKET_ADDRESS_SIZE socklen_t
 #define SOCKET_ADDRESS struct sockaddr_in6
 #define SOCKET_ADDRESS_INTERNET struct sockaddr_in
