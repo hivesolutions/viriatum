@@ -684,13 +684,13 @@ typedef struct connection_t {
      */
     SOCKET_ADDRESS socket_address;
 
-	/**
-	 * The null terminated string containing the
-	 * best host description for the connection,
-	 * this value may be an ipv4 or ipv6 or even
+    /**
+     * The null terminated string containing the
+     * best host description for the connection,
+     * this value may be an ipv4 or ipv6 or even
      * an dns based hostname resolution.
-	 */
-	unsigned char host[32];
+     */
+    unsigned char host[32];
 
     /**
      * The reference to the service controlling
