@@ -1394,6 +1394,7 @@ ERROR_CODE create_connection(struct connection_t **connection_pointer, SOCKET_HA
     connection->status = STATUS_CLOSED;
     connection->protocol = UNDEFINED_PROTOCOL;
     connection->socket_handle = socket_handle;
+    connection->port = 0;
     connection->service = NULL;
     connection->read_registered = TRUE;
     connection->write_registered = FALSE;
@@ -1429,6 +1430,11 @@ ERROR_CODE create_connection(struct connection_t **connection_pointer, SOCKET_HA
     will be used as buffers for the data based operations */
     create_linked_list(&connection->read_queue);
     create_linked_list(&connection->write_queue);
+
+    /* sets the first character of the host string to end of string
+    so that the default value for it is an empty string, avoilding
+    possible buffer overflows latter one */
+    connection->host[0] = '\0';
 
     /* sets the connection in the connection pointer */
     *connection_pointer = connection;

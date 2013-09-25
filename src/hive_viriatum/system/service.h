@@ -693,6 +693,13 @@ typedef struct connection_t {
     unsigned char host[32];
 
     /**
+     * The tcp based port of the other end of the
+     * connection, this value is not guaranteed to
+     * be populated at any time.
+     */
+    size_t port;
+
+    /**
      * The reference to the service controlling
      * (managing) this connection (owner).
      */
