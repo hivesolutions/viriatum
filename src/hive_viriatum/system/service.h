@@ -671,7 +671,7 @@ typedef struct connection_t {
     /**
      * The socket handle associated with
      * the connection.
-     * Typically this represent a file
+     * Typically this represents a file
      * descriptor.
      */
     SOCKET_HANDLE socket_handle;
