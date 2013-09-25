@@ -136,6 +136,8 @@ ERROR_CODE accept_handler_stream_io(struct connection_t *connection) {
 				memcpy(connection->host, host, strlen((char *) host) + 1);
 			}
 
+			printf("%s\n", connection->host);
+
             /* sets the socket address in the (client) connection
             this is going to be very usefull for later connection
             identification (address, port, etc.) */
