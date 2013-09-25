@@ -130,10 +130,10 @@ ERROR_CODE accept_handler_stream_io(struct connection_t *connection) {
 			and established is internet (ipv4) then the host may be created
 			using the simple string conversion */
 			if(family == SOCKET_INTERNET_TYPE) {
-				host = inet_ntoa(
+				host = (unsigned char *) inet_ntoa(
 				    ((SOCKET_ADDRESS_INTERNET *) &socket_address)->sin_addr
 				);
-				memcpy(connection->host, host, strlen(host) + 1);
+				memcpy(connection->host, host, strlen((char *) host) + 1);
 			}
 
             /* sets the socket address in the (client) connection
