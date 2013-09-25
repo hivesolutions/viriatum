@@ -64,6 +64,14 @@ ERROR_CODE accept_handler_stream_io(struct connection_t *connection) {
     /* allocates the socket address */
     SOCKET_ADDRESS socket_address;
 
+	/* allocates the temporary variable used to store
+	the family of connection that is going to be accepted */
+	SOCKET_FAMILY family;
+
+	/* allocates the reference to the host value that is
+	going to be returned uppon host resolution (ip address) */
+	unsigned char *host;
+
     /* allocates the (client) connection */
     struct connection_t *client_connection;
 
@@ -113,6 +121,20 @@ ERROR_CODE accept_handler_stream_io(struct connection_t *connection) {
 
             /* creates the (client) connection */
             create_connection(&client_connection, socket_handle);
+
+			/* retrieves the reference to the family of the socket
+			in order to be able to check if it's ipv6 or ipv4 */
+			family = ((SOCKET_ADDRESS_BASE *) &socket_address)->sa_family;
+
+			/* in case the family of the connection that has been created
+			and established is internet (ipv4) then the host may be created
+			using the simple string conversion */
+			if(family == SOCKET_INTERNET_TYPE) {
+				host = inet_ntoa(
+				    ((SOCKET_ADDRESS_INTERNET *) &socket_address)->sin_addr
+				);
+				memcpy(connection->host, host, strlen(host) + 1);
+			}
 
             /* sets the socket address in the (client) connection
             this is going to be very usefull for later connection
