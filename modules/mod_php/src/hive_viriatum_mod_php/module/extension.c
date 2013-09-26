@@ -30,6 +30,7 @@
 #include "extension.h"
 
 zend_function_entry viriatum_functions[] = {
+    PHP_FE(viriatum_connections_l, NULL)
     PHP_FE(viriatum_connections, NULL)
     PHP_FE(viriatum_uptime, NULL)
     PHP_FE(viriatum_name, NULL)
@@ -242,6 +243,54 @@ ZEND_MINFO_FUNCTION(viriatum_information) {
     php_info_print_table_row(2, "Resources", VIRIATUM_RESOURCES_PATH);
     php_info_print_table_row(2, "Configuration", VIRIATUM_CONFIG_PATH);
     php_info_print_table_end();
+}
+
+PHP_FUNCTION(viriatum_connections_l) {
+    /* allocates space for the local variables that are
+    going to be used in the construction of the connections */
+    size_t index;
+    char is_empty;
+    struct iterator_t *iterator;
+    struct connection_t *connection;
+
+    /* intializes the return value of the function as an
+    associative array to be used y the zend system */
+    array_init(return_value);
+
+    /* creates an iterator object for the current list of connection
+    available in the viriatum engine */
+    create_iterator_linked_list(_service->connections_list, &iterator);
+
+    /* starts the index counter value that is going to be
+    used in the appending of the values to the array */
+    index = 0;
+
+    /* iterates continyously over the complete set of connection
+    in the viriatum running instance */
+    while(TRUE) {
+        /* retrieves the next connection value from the iterator
+        and verifies if its value is defined in case it's not this
+        is the end of iteration and so the cycle must be break */
+        get_next_iterator(iterator, (void **) &connection);
+        if(connection == NULL) { break; }
+
+        /* verifies if the current host is empty, this is a special
+        case where no resolution of the value was possible */
+        is_empty = connection->host[0] == '\0';
+
+        /* creates the array entry using the connection host value
+        and it's attributes so that there's information on the connection */
+        if(is_empty) { add_index_string(return_value, index, "N/A", 1); }
+        else { add_index_string(return_value, index, connection->host, 1); }
+
+        /* increments the index value as the iteration cycle has
+        been completed and a new index must be used (next one) */
+        index++;
+    }
+
+    /* deletes the iterator for the connections list in order to
+    avoid any memory leak that could arise  from this */
+    delete_iterator_linked_list(_service->connections_list, iterator);
 }
 
 PHP_FUNCTION(viriatum_connections) {
