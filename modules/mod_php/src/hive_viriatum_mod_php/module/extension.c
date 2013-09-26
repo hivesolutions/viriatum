@@ -252,6 +252,9 @@ PHP_FUNCTION(viriatum_connections_l) {
     char is_empty;
     struct iterator_t *iterator;
     struct connection_t *connection;
+    zval *connection_array;
+    unsigned long long delta;
+    char uptime[128];
 
     /* intializes the return value of the function as an
     associative array to be used y the zend system */
@@ -274,14 +277,31 @@ PHP_FUNCTION(viriatum_connections_l) {
         get_next_iterator(iterator, (void **) &connection);
         if(connection == NULL) { break; }
 
+        /* retrieves the delta value by calculating the diference between
+        the current time and the creation time then uses it to calculate
+        the uptime for the connection as a string description */
+        delta = (unsigned long long) time(NULL) - connection->creation;
+        format_delta(uptime, sizeof(uptime), delta, 2);
+
+        /* creates the zend value for the connection array and then uses
+        the value to be initialized as an array */
+        MAKE_STD_ZVAL(connection_array);
+        array_init(connection_array);
+
         /* verifies if the current host is empty, this is a special
         case where no resolution of the value was possible */
         is_empty = connection->host[0] == '\0';
 
-        /* creates the array entry using the connection host value
-        and it's attributes so that there's information on the connection */
-        if(is_empty) { add_index_string(return_value, index, "N/A", 1); }
-        else { add_index_string(return_value, index, connection->host, 1); }
+        /* populates the connection array with the complete set of attributes
+        that describe the connection, for latter usage by the api client */
+        if(is_empty) { add_assoc_string(connection_array, "host", "N/A", 1); }
+        else { add_assoc_string(connection_array, "host", connection->host, 1); }
+        add_assoc_string(connection_array, "uptime", uptime, 1);
+
+        /* adds the connection array as the current value for the index in
+        iteration, this will allow a correct iteration over the connections
+        list that is going to be returned in this function */
+        add_index_zval(return_value, index, connection_array);
 
         /* increments the index value as the iteration cycle has
         been completed and a new index must be used (next one) */
