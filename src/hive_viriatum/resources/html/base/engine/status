@@ -22,12 +22,14 @@
             <table class="table status" cellpadding="0" cellspacing="0">
                 <tbody>
                     <tr>
-                        <td class="right label" width="50%">uptime</td>
-                        <td class="left value" width="50%"><?php echo(viriatum_uptime()) ?></td>
+                        <td class="right label">load</td>
+                        <td class="left value">
+                            <a href="connections"><?php echo(viriatum_connections()) ?> connections</a>
+                        </td>
                     </tr>
                     <tr>
-                        <td class="right label">load</td>
-                        <td class="left value"><?php echo(viriatum_connections()) ?> connections</td>
+                        <td class="right label" width="50%">uptime</td>
+                        <td class="left value" width="50%"><?php echo(viriatum_uptime()) ?></td>
                     </tr>
                     <tr>
                         <td class="right label">version</td>
