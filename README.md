@@ -187,7 +187,7 @@ For more information regarding benchmarking please check the list of [todo](doc/
 The current version numbering in viriatum follows the following structure `$MAJOR.$MINOR.$MICRO$STAGE$STAGE_PART` and
 in order to change any of these values the `definitions.h`  and the `build.json` files must be changed.
 
-In case either one of the version number or the stage changes a new tag must be created in the gir repository.
+In case either one of the version number or the stage changes a new tag must be created in the git repository.
 
 ## License
 
