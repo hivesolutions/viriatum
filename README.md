@@ -185,7 +185,7 @@ For more information regarding benchmarking please check the list of [todo](doc/
 ## Version Numbering
 
 The current version numbering in viriatum follows the following wildcard based structure
-`${MAJOR}.${MINOR}.${MICRO}${STAGE}${STAGE_PART}` and in order to change any of these values the
+`${MAJ}.${MIN}.${MIC}${STA}${STA_VER}` and in order to change any of these values the
 `definitions.h`  and the `build.json` files must be changed.
 
 In case any one of the version numbers or the stage value changes a new tag must be created in the
