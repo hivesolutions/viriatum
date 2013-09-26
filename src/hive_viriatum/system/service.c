@@ -1392,6 +1392,7 @@ ERROR_CODE create_connection(struct connection_t **connection_pointer, SOCKET_HA
 
     /* sets the connection attributes (default) values */
     connection->status = STATUS_CLOSED;
+    connection->creation = time(NULL);
     connection->protocol = UNDEFINED_PROTOCOL;
     connection->socket_handle = socket_handle;
     connection->port = 0;

@@ -664,6 +664,14 @@ typedef struct connection_t {
     unsigned char status;
 
     /**
+     * The timestamp value for the time of the
+     * creation of the connection. Note that at
+     * the time of connection creation the socket
+     * may not have been opened.
+     */
+    unsigned long long creation;
+
+    /**
      * The type of the connection to
      */
     enum connection_protocol_e protocol;
