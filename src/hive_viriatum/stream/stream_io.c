@@ -91,7 +91,8 @@ ERROR_CODE accept_handler_stream_io(struct connection_t *connection) {
     SOCKET_ERROR_CODE socket_result;
 #endif
 
-    /* iterates continuously */
+    /* iterates continuously to try to accept as most
+    connections as possible from the service socket */
     while(TRUE) {
         /* accepts the socket, retrieving the socket handle */
         socket_handle = SOCKET_ACCEPT(
@@ -119,7 +120,8 @@ ERROR_CODE accept_handler_stream_io(struct connection_t *connection) {
             /* prints a debug message */
             V_DEBUG_F("Accepted connection: %d\n", socket_handle);
 
-            /* creates the (client) connection */
+            /* creates the (client) connection using the provided
+            socket handle as the reference socket */
             create_connection(&client_connection, socket_handle);
 
             /* retrieves the reference to the family of the socket
@@ -133,8 +135,8 @@ ERROR_CODE accept_handler_stream_io(struct connection_t *connection) {
                 host = (unsigned char *) inet_ntoa(
                     ((SOCKET_ADDRESS_INTERNET *) &socket_address)->sin_addr
                 );
-                memcpy(connection->host, host, strlen((char *) host) + 1);
-                connection->port = ntohs(
+                memcpy(client_connection->host, host, strlen((char *) host) + 1);
+                client_connection->port = ntohs(
                     ((SOCKET_ADDRESS_INTERNET *) &socket_address)->sin_port
                 );
             }
