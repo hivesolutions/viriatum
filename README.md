@@ -182,6 +182,13 @@ For more information regarding benchmarking please check the list of [todo](doc/
 * For linux/unix machines the best approach is to go with either [Sysprof](http://sysprof.com/) or the more expensive
 [Zoom](http://www.rotateright.com) from rotate right
 
+## Version Numbering
+
+The current version numbering in viriatum follows the following structure `$MAJOR.$MINOR.$MICRO$STAGE$STAGE_PART` and
+in order to change any of these values the `definitions.h`  and the `build.json` files must be changed.
+
+In case either one of the version number or the stage changes a new tag must be created in the gir repository.
+
 ## License
 
 Viriatum is an open-source project licensed under the [GNU General Public License Version 3](http://www.gnu.org/licenses/gpl.html).
