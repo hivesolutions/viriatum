@@ -188,7 +188,8 @@ The current version numbering in viriatum follows the following wildcard based s
 `${MAJOR}.${MINOR}.${MICRO}${STAGE}${STAGE_PART}` and in order to change any of these values the
 `definitions.h`  and the `build.json` files must be changed.
 
-In case either one of the version number or the stage changes a new tag must be created in the git repository.
+In case any one of the version numbers or the stage value changes a new tag must be created in the
+git repository, so that the version is correctly identified for the repository contributors.
 
 ## License
 
