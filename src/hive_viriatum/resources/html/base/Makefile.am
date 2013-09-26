@@ -27,6 +27,7 @@ include $(top_srcdir)/Common.am
 
 nobase_dist_wwwroot_DATA = index.html \
 engine/about \
+engine/connections \
 engine/status \
 resources/css/layout.css \
 resources/images/arrow-left.png \
