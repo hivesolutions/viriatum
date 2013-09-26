@@ -182,7 +182,7 @@ For more information regarding benchmarking please check the list of [todo](doc/
 * For linux/unix machines the best approach is to go with either [Sysprof](http://sysprof.com/) or the more expensive
 [Zoom](http://www.rotateright.com) from rotate right
 
-## Version Numbering
+## Versioning
 
 The current version numbering in viriatum follows the following wildcard based structure
 `${MAJ}.${MIN}.${MIC}${STA}${STA_VER}` and in order to change any of these values the
