@@ -96,6 +96,10 @@ a:hover {
     color: #000000;
 }
 
+.table a.large {
+    font-size: 12pt;
+}
+
 .separator-horizontal {
     background: transparent url(../images/separator-horizontal.png) no-repeat center center;
     height: 10px;

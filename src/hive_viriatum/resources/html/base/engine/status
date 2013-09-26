@@ -24,7 +24,7 @@
                     <tr>
                         <td class="right label">load</td>
                         <td class="left value">
-                            <a href="connections"><?php echo(viriatum_connections()) ?> connections</a>
+                            <a href="connections" class="large"><?php echo(viriatum_connections()) ?> connections</a>
                         </td>
                     </tr>
                     <tr>
