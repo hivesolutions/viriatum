@@ -295,7 +295,7 @@ PHP_FUNCTION(viriatum_connections_l) {
         /* populates the connection array with the complete set of attributes
         that describe the connection, for latter usage by the api client */
         if(is_empty) { add_assoc_string(connection_array, "host", "N/A", 1); }
-        else { add_assoc_string(connection_array, "host", connection->host, 1); }
+        else { add_assoc_string(connection_array, "host", (char *) connection->host, 1); }
         add_assoc_string(connection_array, "uptime", uptime, 1);
 
         /* adds the connection array as the current value for the index in
