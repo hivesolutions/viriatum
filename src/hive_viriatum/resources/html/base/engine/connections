@@ -23,8 +23,8 @@
                 <tbody>
                     <?php foreach(viriatum_connections_l() as $index => $connection) { ?>
                         <tr>
-                            <td class="right label" width="50%"><?php echo($connection) ?></td>
-                            <td class="left value" width="50%">12 seconds</td>
+                            <td class="right label" width="50%"><?php echo($connection["host"]) ?></td>
+                            <td class="left value" width="50%"><?php echo($connection["uptime"]) ?></td>
                         </tr>
                     <?php } ?>
                 </tbody>
