@@ -310,6 +310,7 @@ ERROR_CODE read_handler_stream_io(struct connection_t *connection) {
             VIRIATUM_READ_SIZE,
             0
         );
+        connection->received += number_bytes;
 
         /* in case the number of bytes is zero (connection closed) */
         if(number_bytes == 0) {
@@ -478,7 +479,13 @@ ERROR_CODE write_handler_stream_io(struct connection_t *connection) {
 
         /* sends the value into the connection socket (takes into account the type
         of socket in use) should be able to take care of secure connections */
-        number_bytes = CONNECTION_SEND(connection, (char *) data->data, data->size, 0);
+        number_bytes = CONNECTION_SEND(
+            connection,
+            (char *) data->data,
+            data->size,
+            0
+        );
+        connection->sent += number_bytes;
 
         /* in case there was an error receiving from the socket */
         if(SOCKET_TEST_ERROR(number_bytes)) {
