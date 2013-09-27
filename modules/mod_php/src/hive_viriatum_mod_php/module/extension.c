@@ -31,6 +31,7 @@
 
 zend_function_entry viriatum_functions[] = {
     PHP_FE(viriatum_connections_l, NULL)
+    PHP_FE(viriatum_connection_info, NULL)
     PHP_FE(viriatum_connections, NULL)
     PHP_FE(viriatum_uptime, NULL)
     PHP_FE(viriatum_name, NULL)
@@ -296,6 +297,7 @@ PHP_FUNCTION(viriatum_connections_l) {
         that describe the connection, for latter usage by the api client */
         if(is_empty) { add_assoc_string(connection_array, "host", "N/A", 1); }
         else { add_assoc_string(connection_array, "host", (char *) connection->host, 1); }
+        add_assoc_long(connection_array, "id", (long) connection->id);
         add_assoc_string(connection_array, "uptime", uptime, 1);
 
         /* adds the connection array as the current value for the index in
@@ -306,6 +308,81 @@ PHP_FUNCTION(viriatum_connections_l) {
         /* increments the index value as the iteration cycle has
         been completed and a new index must be used (next one) */
         index++;
+    }
+
+    /* deletes the iterator for the connections list in order to
+    avoid any memory leak that could arise  from this */
+    delete_iterator_linked_list(_service->connections_list, iterator);
+}
+
+PHP_FUNCTION(viriatum_connection_info) {
+    /* allocates space for the local variables that are
+    going to be used in the construction of the connection info */
+    long id;
+    char is_empty;
+    struct iterator_t *iterator;
+    struct connection_t *connection;
+    unsigned long long delta;
+    char uptime[128];
+    char received[64];
+    char sent[64];
+
+    /* verifies if the number of arguments received is the expected
+    one in case it's not fails with the proper error */
+    if(ZEND_NUM_ARGS() != 1) { WRONG_PARAM_COUNT; }
+
+    /* parses the arguments that were provided to the function as
+    expected by the php c api infra-structure */
+    zend_parse_parameters(1, "l", &id);
+
+    /* intializes the return value of the function as an
+    associative array to be used y the zend system */
+    array_init(return_value);
+
+    /* creates an iterator object for the current list of connection
+    available in the viriatum engine */
+    create_iterator_linked_list(_service->connections_list, &iterator);
+
+    /* iterates continyously over the complete set of connection
+    in the viriatum running instance */
+    while(TRUE) {
+        /* retrieves the next connection value from the iterator
+        and verifies if its value is defined in case it's not this
+        is the end of iteration and so the cycle must be break */
+        get_next_iterator(iterator, (void **) &connection);
+        if(connection == NULL) { break; }
+
+        /* in case the id of the connection currently in iteration is
+        not the smae as the one we're trying to find continues the loop */
+        if((long) connection->id != id) { continue; }
+
+        /* retrieves the delta value by calculating the diference between
+        the current time and the creation time then uses it to calculate
+        the uptime for the connection as a string description */
+        delta = (unsigned long long) time(NULL) - connection->creation;
+        format_delta(uptime, sizeof(uptime), delta, 2);
+
+        /* formats both the ammount of bytes that have been sent and the
+        the ammount that has been received as "readable" strings */
+        format_bytes(sent, sizeof(sent), connection->sent);
+        format_bytes(received, sizeof(received), connection->received);
+
+        /* verifies if the current host is empty, this is a special
+        case where no resolution of the value was possible */
+        is_empty = connection->host[0] == '\0';
+
+        /* populates the connection array with the complete set of attributes
+        that describe the connection, for latter usage by the api client */
+        if(is_empty) { add_assoc_string(return_value, "host", "N/A", 1); }
+        else { add_assoc_string(return_value, "host", (char *) connection->host, 1); }
+        add_assoc_long(return_value, "id", (long) connection->id);
+        add_assoc_string(return_value, "uptime", uptime, 1);
+        add_assoc_string(return_value, "sent", sent, 1);
+        add_assoc_string(return_value, "received", received, 1);
+
+        /* breaks the loop as the proper connection has been found and the
+        return value array has been correctly populated */
+        break;
     }
 
     /* deletes the iterator for the connections list in order to

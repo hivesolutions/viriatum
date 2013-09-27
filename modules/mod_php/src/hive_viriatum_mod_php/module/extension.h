@@ -29,7 +29,7 @@
 
 #include "entry.h"
 
-zend_function_entry viriatum_functions[14];
+zend_function_entry viriatum_functions[15];
 zend_module_entry viriatum_module;
 sapi_module_struct viriatum_sapi_module;
 
@@ -47,6 +47,7 @@ void _module_log(char *message TSRMLS_DC);
 double _module_request_time(TSRMLS_D);
 ZEND_MINFO_FUNCTION(viriatum_information);
 PHP_FUNCTION(viriatum_connections_l);
+PHP_FUNCTION(viriatum_connection_info);
 PHP_FUNCTION(viriatum_connections);
 PHP_FUNCTION(viriatum_uptime);
 PHP_FUNCTION(viriatum_name);
