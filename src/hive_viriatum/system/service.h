@@ -649,11 +649,7 @@ typedef enum connection_family_e {
  * Arrays with the text based descriptions for the
  * various family names of the connection types.
  */
-static const char *connection_family_strings[3] = {
-    "undefined",
-    "ipv4",
-    "ipv6"
-};
+extern const char *connection_family_strings[3];
 
 /**
  * Enumeration defining the various types
@@ -675,14 +671,7 @@ typedef enum connection_protocol_e {
  * This values may be used for enumeration to
  * string resolution.
  */
-static const char *connection_protocol_strings[6] = {
-    "undefined",
-    "unknown",
-    "custom",
-    "http",
-    "http client",
-    "torrent"
-};
+extern const char *connection_protocol_strings[6];
 
 /**
  * Structure defining a connection
