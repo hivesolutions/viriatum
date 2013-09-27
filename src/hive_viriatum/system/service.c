@@ -1536,7 +1536,7 @@ ERROR_CODE resolve_connection(struct connection_t *connection, SOCKET_ADDRESS so
 			inet_ntop(
 				family,
 				&(((SOCKET_ADDRESS_INTERNET6 *) socket_address)->sin6_addr),
-				connection->host,
+				(char *) connection->host,
 				sizeof(connection->host)
 			)
 #endif
