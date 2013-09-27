@@ -326,6 +326,8 @@ PHP_FUNCTION(viriatum_connection_info) {
     char uptime[128];
     char received[64];
     char sent[64];
+    char *family;
+    char *protocol;
 
     /* verifies if the number of arguments received is the expected
     one in case it's not fails with the proper error */
@@ -367,6 +369,14 @@ PHP_FUNCTION(viriatum_connection_info) {
         format_bytes(sent, sizeof(sent), connection->sent);
         format_bytes(received, sizeof(received), connection->received);
 
+        /* retrieves the string that identifies the family for the
+        connection from the provided family enumeration value */
+        family = (char *) connection_family_strings[connection->family - 1];
+
+        /* retrieves the string that identifies the protocol for the
+        connection from the provided protocol enumeration value */
+        protocol = (char *) connection_protocol_strings[connection->protocol - 1];
+
         /* verifies if the current host is empty, this is a special
         case where no resolution of the value was possible */
         is_empty = connection->host[0] == '\0';
@@ -375,7 +385,10 @@ PHP_FUNCTION(viriatum_connection_info) {
         that describe the connection, for latter usage by the api client */
         if(is_empty) { add_assoc_string(return_value, "host", "N/A", 1); }
         else { add_assoc_string(return_value, "host", (char *) connection->host, 1); }
+        add_assoc_long(return_value, "port", (long) connection->port);
         add_assoc_long(return_value, "id", (long) connection->id);
+        add_assoc_string(return_value, "family", family, 1);
+        add_assoc_string(return_value, "protocol", protocol, 1);
         add_assoc_string(return_value, "uptime", uptime, 1);
         add_assoc_string(return_value, "sent", sent, 1);
         add_assoc_string(return_value, "received", received, 1);
