@@ -35,6 +35,13 @@
                         <td class="left value" width="50%"><?php echo($connection["protocol"]) ?></td>
                     </tr>
                     <tr>
+                        <td class="right label" width="50%">uptime</td>
+                        <td class="left value" width="50%"><?php echo($connection["uptime"]) ?></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                    </tr>
+                    <tr>
                         <td class="right label" width="50%">host</td>
                         <td class="left value" width="50%"><?php echo($connection["host"]) ?></td>
                     </tr>
@@ -43,8 +50,11 @@
                         <td class="left value" width="50%"><?php echo($connection["port"]) ?></td>
                     </tr>
                     <tr>
-                        <td class="right label" width="50%">uptime</td>
-                        <td class="left value" width="50%"><?php echo($connection["uptime"]) ?></td>
+                        <td class="right label" width="50%">secure</td>
+                        <td class="left value" width="50%"><?php echo($connection["secure"] ? "true" : "false") ?></td>
+                    </tr>
+                    <tr>
+                        <td></td>
                     </tr>
                     <tr>
                         <td class="right label" width="50%">sent</td>
@@ -53,10 +63,6 @@
                     <tr>
                         <td class="right label" width="50%">received</td>
                         <td class="left value" width="50%"><?php echo($connection["received"]) ?></td>
-                    </tr>
-                    <tr>
-                        <td class="right label" width="50%">secure</td>
-                        <td class="left value" width="50%"><?php echo($connection["secure"] ? "true" : "false") ?></td>
                     </tr>
                 </tbody>
             </table>
