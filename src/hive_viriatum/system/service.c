@@ -1538,7 +1538,7 @@ ERROR_CODE resolve_connection(struct connection_t *connection, SOCKET_ADDRESS so
 				&(((SOCKET_ADDRESS_INTERNET6 *) socket_address)->sin6_addr),
 				(char *) connection->host,
 				sizeof(connection->host)
-			)
+			);
 #endif
 			connection->port = ntohs(
                 ((SOCKET_ADDRESS_INTERNET *) &socket_address)->sin_port
