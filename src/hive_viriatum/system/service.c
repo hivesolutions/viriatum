@@ -30,19 +30,6 @@
 #include "service.h"
 
 static unsigned long long connection_id = 0;
-static const char *connection_family_strings[3] = {
-    "undefined",
-    "ipv4",
-    "ipv6"
-};
-static const char *connection_protocol_strings[6] = {
-    "undefined",
-    "unknown",
-    "custom",
-    "http",
-    "http client",
-    "torrent"
-};
 
 void create_service(struct service_t **service_pointer, unsigned char *name, unsigned char *program_name) {
     /* retrieves the service size */
