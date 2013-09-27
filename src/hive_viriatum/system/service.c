@@ -30,12 +30,12 @@
 #include "service.h"
 
 static unsigned long long connection_id = 0;
-static char *connection_family_strings[3] = {
+static const char *connection_family_strings[3] = {
     "undefined",
     "ipv4",
     "ipv6"
 };
-static char *connection_protocol_strings[6] = {
+static const char *connection_protocol_strings[6] = {
     "undefined",
     "unknown",
     "custom",

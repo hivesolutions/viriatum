@@ -649,7 +649,7 @@ typedef enum connection_family_e {
  * Arrays with the text based descriptions for the
  * various family names of the connection types.
  */
-extern char *connection_family_strings[];
+const char *connection_family_strings[];
 
 /**
  * Enumeration defining the various types
@@ -671,7 +671,7 @@ typedef enum connection_protocol_e {
  * This values may be used for enumeration to
  * string resolution.
  */
-extern char *connection_protocol_strings[];
+const char *connection_protocol_strings[];
 
 /**
  * Structure defining a connection
