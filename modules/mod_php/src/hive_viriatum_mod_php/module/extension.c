@@ -392,6 +392,7 @@ PHP_FUNCTION(viriatum_connection_info) {
         add_assoc_string(return_value, "uptime", uptime, 1);
         add_assoc_string(return_value, "sent", sent, 1);
         add_assoc_string(return_value, "received", received, 1);
+        add_assoc_bool(return_value, "secure", (int) connection->is_secure);
 
         /* breaks the loop as the proper connection has been found and the
         return value array has been correctly populated */

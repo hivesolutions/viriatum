@@ -54,6 +54,10 @@
                         <td class="right label" width="50%">received</td>
                         <td class="left value" width="50%"><?php echo($connection["received"]) ?></td>
                     </tr>
+                    <tr>
+                        <td class="right label" width="50%">secure</td>
+                        <td class="left value" width="50%"><?php echo($connection["secure"] ? "true" : "false") ?></td>
+                    </tr>
                 </tbody>
             </table>
         </div>
