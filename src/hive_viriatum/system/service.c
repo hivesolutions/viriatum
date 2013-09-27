@@ -980,7 +980,7 @@ ERROR_CODE start_service(struct service_t *service) {
         /* creates the (service) connection for the ip6 based
         connection (for upper compatibility) */
         create_connection(&service6_connection, service_socket6_handle);
-        resolve_connection(service6_connection, *(SOCKET_ADDRESS *) &socket6_address);
+        resolve_connection(service6_connection, *(SOCKET_ADDRESS *) &_socket6_address);
     }
 #endif
 
