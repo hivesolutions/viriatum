@@ -1535,7 +1535,7 @@ ERROR_CODE resolve_connection(struct connection_t *connection, SOCKET_ADDRESS so
 #ifdef VIRIATUM_PLATFORM_UNIX
 			inet_ntop(
 				family,
-				((SOCKET_ADDRESS_INTERNET6 *) &socket_address)->sin6_addr,
+				&(((SOCKET_ADDRESS_INTERNET6 *) socket_address)->sin6_addr),
 				connection->host,
 				sizeof(connection->host)
 			)
