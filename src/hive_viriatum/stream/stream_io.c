@@ -116,7 +116,7 @@ ERROR_CODE accept_handler_stream_io(struct connection_t *connection) {
             socket handle as the reference socket and then resolves
             it so that the proper host and port fields are populated */
             create_connection(&client_connection, socket_handle);
-            resolve_connection(client_connection, socket_address);
+            resolve_connection(client_connection, &socket_address);
 
             /* sets the socket address in the (client) connection
             this is going to be very usefull for later connection

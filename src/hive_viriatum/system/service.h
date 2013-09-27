@@ -1315,7 +1315,7 @@ ERROR_CODE write_connection(
  * used to guide the resolution operation.
  * @return The resulting error code.
  */
-ERROR_CODE resolve_connection(struct connection_t *connection, SOCKET_ADDRESS socket_address);
+ERROR_CODE resolve_connection(struct connection_t *connection, SOCKET_ADDRESS *socket_address);
 
 /**
  * Writes the given data to the connection, the write operation

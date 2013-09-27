@@ -971,7 +971,7 @@ ERROR_CODE start_service(struct service_t *service) {
     /* creates the (service) connection and then resolves it so
     that all of is "resolved" elements are correctly populated */
     create_connection(&service_connection, service_socket_handle);
-    resolve_connection(service_connection, *(SOCKET_ADDRESS *) &socket_address);
+    resolve_connection(service_connection, (SOCKET_ADDRESS *) &socket_address);
 
 #ifdef VIRIATUM_IP6
     /* in case the ip6 connection flag is set the ip6 connection
@@ -980,7 +980,12 @@ ERROR_CODE start_service(struct service_t *service) {
         /* creates the (service) connection for the ip6 based
         connection (for upper compatibility) */
         create_connection(&service6_connection, service_socket6_handle);
-        resolve_connection(service6_connection, *(SOCKET_ADDRESS *) &_socket6_address);
+#ifdef VIRIATUM_PLATFORM_WIN32
+        resolve_connection(service6_connection, (SOCKET_ADDRESS *) socket6_address->ai_addr);
+#endif
+#ifdef VIRIATUM_PLATFORM_UNIX
+        resolve_connection(service6_connection, (SOCKET_ADDRESS *) &_socket6_address);
+#endif
     }
 #endif
 
@@ -1500,7 +1505,7 @@ ERROR_CODE delete_connection(struct connection_t *connection) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE resolve_connection(struct connection_t *connection, SOCKET_ADDRESS socket_address) {
+ERROR_CODE resolve_connection(struct connection_t *connection, SOCKET_ADDRESS *socket_address) {
     /* allocates the temporary variable used to store
     the family of connection that is going to be accepted */
     SOCKET_FAMILY family;
@@ -1521,7 +1526,7 @@ ERROR_CODE resolve_connection(struct connection_t *connection, SOCKET_ADDRESS so
     /* retrieves the reference to the family of the socket
     in order to be able to check if it's ipv6 or ipv4 and then
     switched over it to correctly populate the resolved attributes */
-    family = ((SOCKET_ADDRESS_BASE *) &socket_address)->sa_family;
+    family = ((SOCKET_ADDRESS_BASE *) socket_address)->sa_family;
     switch(family) {
         /* in case the family of the connection that has been created
         and established is internet (ipv4) then the host may be created
@@ -1529,11 +1534,11 @@ ERROR_CODE resolve_connection(struct connection_t *connection, SOCKET_ADDRESS so
         case SOCKET_INTERNET_TYPE:
             connection->family = IP_V4_FAMILY;
             host = (unsigned char *) inet_ntoa(
-                ((SOCKET_ADDRESS_INTERNET *) &socket_address)->sin_addr
+                ((SOCKET_ADDRESS_INTERNET *) socket_address)->sin_addr
             );
             memcpy(connection->host, host, strlen((char *) host) + 1);
             connection->port = ntohs(
-                ((SOCKET_ADDRESS_INTERNET *) &socket_address)->sin_port
+                ((SOCKET_ADDRESS_INTERNET *) socket_address)->sin_port
             );
 
             break;
@@ -1545,7 +1550,7 @@ ERROR_CODE resolve_connection(struct connection_t *connection, SOCKET_ADDRESS so
 #ifdef VIRIATUM_PLATFORM_WIN32
             buffer_size = sizeof(buffer);
             WSAAddressToString(
-                (LPSOCKADDR) &socket_address,
+                (LPSOCKADDR) socket_address,
                 sizeof(struct sockaddr_in6),
                 NULL,
                 buffer,
@@ -1565,13 +1570,13 @@ ERROR_CODE resolve_connection(struct connection_t *connection, SOCKET_ADDRESS so
 #ifdef VIRIATUM_PLATFORM_UNIX
             inet_ntop(
                 family,
-                &(((SOCKET_ADDRESS_INTERNET6 *) &socket_address)->sin6_addr),
+                &(((SOCKET_ADDRESS_INTERNET6 *) socket_address)->sin6_addr),
                 (char *) connection->host,
                 sizeof(connection->host)
             );
 #endif
             connection->port = ntohs(
-                ((SOCKET_ADDRESS_INTERNET *) &socket_address)->sin_port
+                ((SOCKET_ADDRESS_INTERNET *) socket_address)->sin_port
             );
             break;
 #endif
