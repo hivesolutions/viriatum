@@ -27,8 +27,20 @@
                         <td class="left value" width="50%"><?php echo($connection["id"]) ?></td>
                     </tr>
                     <tr>
+                        <td class="right label" width="50%">family</td>
+                        <td class="left value" width="50%"><?php echo($connection["family"]) ?></td>
+                    </tr>
+                    <tr>
+                        <td class="right label" width="50%">protocol</td>
+                        <td class="left value" width="50%"><?php echo($connection["protocol"]) ?></td>
+                    </tr>
+                    <tr>
                         <td class="right label" width="50%">host</td>
                         <td class="left value" width="50%"><?php echo($connection["host"]) ?></td>
+                    </tr>
+                    <tr>
+                        <td class="right label" width="50%">port</td>
+                        <td class="left value" width="50%"><?php echo($connection["port"]) ?></td>
                     </tr>
                     <tr>
                         <td class="right label" width="50%">uptime</td>
