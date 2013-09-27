@@ -67,6 +67,55 @@ typedef enum process_type_e {
 } process_type;
 
 /**
+ * Enumration definit the various types of socket
+ * families available for the connections.
+ */
+typedef enum connection_family_e {
+    UNDEFINED_FAMILY = 1,
+    IP_V4_FAMILY,
+    IP_V6_FAMILY
+} connection_family;
+
+/**
+ * Arrays with the text based descriptions for the
+ * various family names of the connection types.
+ */
+static const char *connection_family_strings[3] = {
+    "undefined",
+    "ipv4",
+    "ipv6"
+};
+
+/**
+ * Enumeration defining the various types
+ * of possible protocols, this is an open
+ * enumeration and registration is required.
+ */
+typedef enum connection_protocol_e {
+    UNDEFINED_PROTOCOL = 1,
+    UNKNOWN_PROTOCOL,
+    CUSTOM_PROTOCOL,
+    HTTP_PROTOCOL,
+    HTTP_CLIENT_PROTOCOL,
+    TORRENT_PROTOCOL,
+} connection_protocol;
+
+/**
+ * Sequence containing the various string based
+ * representation of the various protocol types.
+ * This values may be used for enumeration to
+ * string resolution.
+ */
+static const char *connection_protocol_strings[6] = {
+    "undefined",
+    "unknown",
+    "custom",
+    "http",
+    "http client",
+    "torrent"
+};
+
+/**
  * The function used to retrieve a string in english representing
  * the uptime of the service refered.
  */
@@ -634,55 +683,6 @@ typedef struct service_options_t {
      */
     struct hash_map_t *virtual_hosts;
 } service_options;
-
-/**
- * Enumration definit the various types of socket
- * families available for the connections.
- */
-typedef enum connection_family_e {
-    UNDEFINED_FAMILY = 1,
-    IP_V4_FAMILY,
-    IP_V6_FAMILY
-} connection_family;
-
-/**
- * Arrays with the text based descriptions for the
- * various family names of the connection types.
- */
-static const char *connection_family_strings[3] = {
-    "undefined",
-    "ipv4",
-    "ipv6"
-};
-
-/**
- * Enumeration defining the various types
- * of possible protocols, this is an open
- * enumeration and registration is required.
- */
-typedef enum connection_protocol_e {
-    UNDEFINED_PROTOCOL = 1,
-    UNKNOWN_PROTOCOL,
-    CUSTOM_PROTOCOL,
-    HTTP_PROTOCOL,
-    HTTP_CLIENT_PROTOCOL,
-    TORRENT_PROTOCOL,
-} connection_protocol;
-
-/**
- * Sequence containing the various string based
- * representation of the various protocol types.
- * This values may be used for enumeration to
- * string resolution.
- */
-static const char *connection_protocol_strings[6] = {
-    "undefined",
-    "unknown",
-    "custom",
-    "http",
-    "http client",
-    "torrent"
-};
 
 /**
  * Structure defining a connection
