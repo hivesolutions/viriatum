@@ -1509,6 +1509,15 @@ ERROR_CODE resolve_connection(struct connection_t *connection, SOCKET_ADDRESS so
     going to be returned uppon host resolution (ip address) */
     unsigned char *host;
 
+#ifdef VIRIATUM_PLATFORM_WIN32
+    /* allocates the space for the various temporary variables
+    that are going to be used in the "custom" parsing of the
+    ipv6 addresses under the windows platform */
+    size_t index;
+    size_t buffer_size;
+    unsigned char buffer[64];
+#endif
+
     /* retrieves the reference to the family of the socket
     in order to be able to check if it's ipv6 or ipv4 and then
     switched over it to correctly populate the resolved attributes */
@@ -1532,15 +1541,36 @@ ERROR_CODE resolve_connection(struct connection_t *connection, SOCKET_ADDRESS so
 #ifdef VIRIATUM_IP6
         case SOCKET_INTERNET6_TYPE:
             connection->family = IP_V6_FAMILY;
-#ifdef VIRIATUM_PLATFORM_UNIX
-			inet_ntop(
-				family,
-				&(((SOCKET_ADDRESS_INTERNET6 *) &socket_address)->sin6_addr),
-				(char *) connection->host,
-				sizeof(connection->host)
-			);
+
+#ifdef VIRIATUM_PLATFORM_WIN32
+            buffer_size = sizeof(buffer);
+            WSAAddressToString(
+                (LPSOCKADDR) &socket_address,
+                sizeof(struct sockaddr_in6),
+                NULL,
+                buffer,
+                &buffer_size
+            );
+            for(index = buffer_size - 1; index > 0; index--) {
+                if(buffer[index] != ':') { continue; }
+                break;
+            }
+            if(index == 0) { memcpy(connection->host, buffer, buffer_size); }
+            else {
+                memcpy(connection->host, buffer + 1, index - 2);
+                connection->host[index - 2] = '\0';
+            }
 #endif
-			connection->port = ntohs(
+
+#ifdef VIRIATUM_PLATFORM_UNIX
+            inet_ntop(
+                family,
+                &(((SOCKET_ADDRESS_INTERNET6 *) &socket_address)->sin6_addr),
+                (char *) connection->host,
+                sizeof(connection->host)
+            );
+#endif
+            connection->port = ntohs(
                 ((SOCKET_ADDRESS_INTERNET *) &socket_address)->sin_port
             );
             break;
