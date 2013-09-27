@@ -163,6 +163,7 @@ ERROR_CODE accept_handler_stream_io(struct connection_t *connection) {
 
                 /* updates boths the ssl context and ssl handle reference in the
                 client connection structure reference */
+                client_connection->is_secure = TRUE;
                 client_connection->ssl_context = connection->ssl_context;
                 client_connection->ssl_handle = ssl_handle;
 
