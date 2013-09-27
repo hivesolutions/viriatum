@@ -658,6 +658,13 @@ typedef enum connection_protocol_e {
  */
 typedef struct connection_t {
     /**
+     * Identifier value for the current connection
+     * this value should be as most unique as possible
+     * so that the connection is correclty identified.
+     */
+    unsigned long long id;
+
+    /**
      * The current status of the connection.
      * Used for connection control.
      */
@@ -670,6 +677,24 @@ typedef struct connection_t {
      * may not have been opened.
      */
     unsigned long long creation;
+
+    /**
+     * The ammount of bytes that have been sent by
+     * this connection. Please keep in mind that the
+     * data type for this value is limited by the
+     * current architecture and so overflows must be
+     * taken into account (not reliable).
+     */
+    size_t sent;
+
+    /**
+     * The ammount of bytes that have been received by
+     * this connection. Please keep in mind that the
+     * data type for this value is limited by the
+     * current architecture and so overflows must be
+     * taken into account (not reliable).
+     */
+    size_t received;
 
     /**
      * The type of the connection to

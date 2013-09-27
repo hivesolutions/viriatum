@@ -29,6 +29,8 @@
 
 #include "service.h"
 
+static unsigned long long connection_id = 0;
+
 void create_service(struct service_t **service_pointer, unsigned char *name, unsigned char *program_name) {
     /* retrieves the service size */
     size_t service_size = sizeof(struct service_t);
@@ -1391,8 +1393,11 @@ ERROR_CODE create_connection(struct connection_t **connection_pointer, SOCKET_HA
         (struct connection_t *) MALLOC(connection_size);
 
     /* sets the connection attributes (default) values */
+    connection->id = connection_id + 1;
     connection->status = STATUS_CLOSED;
     connection->creation = time(NULL);
+    connection->sent = 0;
+    connection->received = 0;
     connection->protocol = UNDEFINED_PROTOCOL;
     connection->socket_handle = socket_handle;
     connection->port = 0;
@@ -1436,6 +1441,10 @@ ERROR_CODE create_connection(struct connection_t **connection_pointer, SOCKET_HA
     so that the default value for it is an empty string, avoilding
     possible buffer overflows latter one */
     connection->host[0] = '\0';
+
+    /* increments the current identifier for the connection so that
+    the next connection to be created already has a new identifier */
+    connection_id++;
 
     /* sets the connection in the connection pointer */
     *connection_pointer = connection;
