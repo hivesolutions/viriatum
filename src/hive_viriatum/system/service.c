@@ -1532,6 +1532,17 @@ ERROR_CODE resolve_connection(struct connection_t *connection, SOCKET_ADDRESS so
 #ifdef VIRIATUM_IP6
         case SOCKET_INTERNET6_TYPE:
             connection->family = IP_V6_FAMILY;
+#ifdef VIRIATUM_PLATFORM_UNIX
+			inet_ntop(
+				family,
+				((SOCKET_ADDRESS_INTERNET6 *) &socket_address)->sin6_addr,
+				connection->host,
+				sizeof(connection->host)
+			)
+#endif
+			connection->port = ntohs(
+                ((SOCKET_ADDRESS_INTERNET *) &socket_address)->sin_port
+            );
             break;
 #endif
 
