@@ -995,6 +995,7 @@ ERROR_CODE start_service(struct service_t *service) {
     if(service_options->ssl) {
         /* updates the ssl context and handle in the service connection
         so that it's possible to access the ssl connection */
+        service_connection->is_secure = TRUE;
         service_connection->ssl_context = service->ssl_context;
         service_connection->ssl_handle = service->ssl_handle;
 
@@ -1004,6 +1005,7 @@ ERROR_CODE start_service(struct service_t *service) {
         if(service_options->ip6) {
             /* updates the ssl context and handle in the service connection
             so that it's possible to access the ssl connection */
+            service6_connection->is_secure = TRUE;
             service6_connection->ssl_context = service->ssl_context;
             service6_connection->ssl_handle = service->ssl_handle;
         }
@@ -1410,6 +1412,7 @@ ERROR_CODE create_connection(struct connection_t **connection_pointer, SOCKET_HA
     connection->protocol = UNDEFINED_PROTOCOL;
     connection->socket_handle = socket_handle;
     connection->port = 0;
+    connection->is_secure = FALSE;
     connection->service = NULL;
     connection->read_registered = TRUE;
     connection->write_registered = FALSE;

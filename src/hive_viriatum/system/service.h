@@ -777,6 +777,13 @@ typedef struct connection_t {
     size_t port;
 
     /**
+     * Flag that is set in case the current connection
+     * is secured using any kind of encryption mechanism.
+     * Typically this flag is set if ssl is used.
+     */
+    char is_secure;
+
+    /**
      * The reference to the service controlling
      * (managing) this connection (owner).
      */
