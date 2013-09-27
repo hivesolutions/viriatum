@@ -636,6 +636,26 @@ typedef struct service_options_t {
 } service_options;
 
 /**
+ * Enumration definit the various types of socket
+ * families available for the connections.
+ */
+typedef enum connection_family_e {
+    UNDEFINED_FAMILY = 1,
+    IP_V4_FAMILY,
+    IP_V6_FAMILY
+} connection_family;
+
+/**
+ * Arrays with the text based descriptions for the
+ * various family names of the connection types.
+ */
+static const char *connection_family_strings[3] = {
+    "undefined",
+    "ipv4",
+    "ipv6"
+};
+
+/**
  * Enumeration defining the various types
  * of possible protocols, this is an open
  * enumeration and registration is required.
@@ -648,6 +668,21 @@ typedef enum connection_protocol_e {
     HTTP_CLIENT_PROTOCOL,
     TORRENT_PROTOCOL,
 } connection_protocol;
+
+/**
+ * Sequence containing the various string based
+ * representation of the various protocol types.
+ * This values may be used for enumeration to
+ * string resolution.
+ */
+static const char *connection_protocol_strings[6] = {
+    "undefined",
+    "unknown",
+    "custom",
+    "http",
+    "http client",
+    "torrent"
+};
 
 /**
  * Structure defining a connection
@@ -697,7 +732,16 @@ typedef struct connection_t {
     size_t received;
 
     /**
-     * The type of the connection to
+     * The socket/connection family for the current connection
+     * should be an actual value (eg: ipv4, ipv6, etc).
+     * This value may be latter translated into a string value
+     * using the typical enumeration to array conversion.
+     */
+    enum connection_family_e family;
+
+    /**
+     * The type of the connection that is used as a label
+     * and guides the connection underlying workflow.
      */
     enum connection_protocol_e protocol;
 
@@ -1249,7 +1293,29 @@ ERROR_CODE delete_connection(struct connection_t *connection);
  * back to the callback.
  * @return The resulting error code.
  */
-ERROR_CODE write_connection(struct connection_t *connection, unsigned char *data, unsigned int size, connection_data_callback callback, void *callback_parameters);
+ERROR_CODE write_connection(
+    struct connection_t *connection,
+    unsigned char *data,
+    unsigned int size,
+    connection_data_callback
+    callback,
+    void *callback_parameters
+);
+
+/**
+ * Resolves the various resolution dependent fields in the connection
+ * using the provided socket address as the base for such resolution.
+ *
+ * This may be an expensive operationn (at least for fast execution)
+ * and any execution of this function should be done with care.
+ *
+ * @param connection The connection to be used in the resolution operation
+ * that is going to be performed.
+ * @param socket_address The socket address structure that is going to be
+ * used to guide the resolution operation.
+ * @return The resulting error code.
+ */
+ERROR_CODE resolve_connection(struct connection_t *connection, SOCKET_ADDRESS socket_address);
 
 /**
  * Writes the given data to the connection, the write operation
@@ -1274,7 +1340,14 @@ ERROR_CODE write_connection(struct connection_t *connection, unsigned char *data
  * the write operation has been completed.
  * @return The resulting error code.
  */
-ERROR_CODE write_connection_c(struct connection_t *connection, unsigned char *data, unsigned int size, connection_data_callback callback, void *callback_parameters, char release);
+ERROR_CODE write_connection_c(
+    struct connection_t *connection,
+    unsigned char *data,
+    unsigned int size,
+    connection_data_callback callback,
+    void *callback_parameters,
+    char release
+);
 
 /**
  * Opens the given connection, creating (and starting) all

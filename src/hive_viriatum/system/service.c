@@ -968,8 +968,10 @@ ERROR_CODE start_service(struct service_t *service) {
     /* opens the polling (provider) */
     polling->open(polling);
 
-    /* creates the (service) connection */
+    /* creates the (service) connection and then resolves it so
+    that all of is "resolved" elements are correctly populated */
     create_connection(&service_connection, service_socket_handle);
+    resolve_connection(service_connection, *(SOCKET_ADDRESS *) &socket_address);
 
 #ifdef VIRIATUM_IP6
     /* in case the ip6 connection flag is set the ip6 connection
@@ -978,6 +980,7 @@ ERROR_CODE start_service(struct service_t *service) {
         /* creates the (service) connection for the ip6 based
         connection (for upper compatibility) */
         create_connection(&service6_connection, service_socket6_handle);
+        resolve_connection(service6_connection, *(SOCKET_ADDRESS *) &socket6_address);
     }
 #endif
 
@@ -1398,6 +1401,7 @@ ERROR_CODE create_connection(struct connection_t **connection_pointer, SOCKET_HA
     connection->creation = time(NULL);
     connection->sent = 0;
     connection->received = 0;
+    connection->family = UNDEFINED_FAMILY;
     connection->protocol = UNDEFINED_PROTOCOL;
     connection->socket_handle = socket_handle;
     connection->port = 0;
@@ -1496,11 +1500,75 @@ ERROR_CODE delete_connection(struct connection_t *connection) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE write_connection(struct connection_t *connection, unsigned char *data, unsigned int size, connection_data_callback callback, void *callback_parameters) {
-    return write_connection_c(connection, data, size, callback, callback_parameters, TRUE);
+ERROR_CODE resolve_connection(struct connection_t *connection, SOCKET_ADDRESS socket_address) {
+    /* allocates the temporary variable used to store
+    the family of connection that is going to be accepted */
+    SOCKET_FAMILY family;
+
+    /* allocates the reference to the host value that is
+    going to be returned uppon host resolution (ip address) */
+    unsigned char *host;
+
+    /* retrieves the reference to the family of the socket
+    in order to be able to check if it's ipv6 or ipv4 and then
+    switched over it to correctly populate the resolved attributes */
+    family = ((SOCKET_ADDRESS_BASE *) &socket_address)->sa_family;
+    switch(family) {
+        /* in case the family of the connection that has been created
+        and established is internet (ipv4) then the host may be created
+        using the simple string conversion */
+        case SOCKET_INTERNET_TYPE:
+            connection->family = IP_V4_FAMILY;
+            host = (unsigned char *) inet_ntoa(
+                ((SOCKET_ADDRESS_INTERNET *) &socket_address)->sin_addr
+            );
+            memcpy(connection->host, host, strlen((char *) host) + 1);
+            connection->port = ntohs(
+                ((SOCKET_ADDRESS_INTERNET *) &socket_address)->sin_port
+            );
+
+            break;
+
+#ifdef VIRIATUM_IP6
+        case SOCKET_INTERNET6_TYPE:
+            connection->family = IP_V6_FAMILY;
+            break;
+#endif
+
+        default:
+            break;
+    }
+
+    /* raises no error */
+    RAISE_NO_ERROR;
 }
 
-ERROR_CODE write_connection_c(struct connection_t *connection, unsigned char *data, unsigned int size, connection_data_callback callback, void *callback_parameters, char release) {
+ERROR_CODE write_connection(
+    struct connection_t *connection,
+    unsigned char *data,
+    unsigned int size,
+    connection_data_callback
+    callback,
+    void *callback_parameters
+) {
+    return write_connection_c(
+        connection,
+        data,
+        size,
+        callback,
+        callback_parameters,
+        TRUE
+    );
+}
+
+ERROR_CODE write_connection_c(
+    struct connection_t *connection,
+    unsigned char *data,
+    unsigned int size,
+    connection_data_callback callback,
+    void *callback_parameters,
+    char release
+) {
     /* allocates the data structure that is going to be used as
     the deplyment chunk for the connection */
     struct data_t *_data;
