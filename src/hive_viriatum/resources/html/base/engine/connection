@@ -27,6 +27,10 @@
                         <td class="left value" width="50%"><?php echo($connection["id"]) ?></td>
                     </tr>
                     <tr>
+                        <td class="right label" width="50%">status</td>
+                        <td class="left value" width="50%"><?php echo($connection["status"]) ?></td>
+                    </tr>
+                    <tr>
                         <td class="right label" width="50%">family</td>
                         <td class="left value" width="50%"><?php echo($connection["family"]) ?></td>
                     </tr>
