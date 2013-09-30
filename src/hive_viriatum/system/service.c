@@ -587,9 +587,9 @@ ERROR_CODE start_service(struct service_t *service) {
     non push mode in case it's required by configuration this implies
     also checking for the no (tcp) wait variable */
     if(VIRIATUM_NON_BLOCKING) { SOCKET_SET_NON_BLOCKING(service->service_socket_handle, flags); }
+    if(VIRIATUM_KEEPALIVE) { SOCKET_SET_KEEPALIVE(service->service_socket_handle, option_value); }
     if(VIRIATUM_NO_WAIT) { SOCKET_SET_NO_WAIT(service->service_socket_handle, option_value); }
     if(VIRIATUM_NO_PUSH) { SOCKET_SET_NO_PUSH(service->service_socket_handle, option_value); }
-    SOCKET_SET_KEEPALIVE(service->service_socket_handle, option_value);
 
     /* sets the socket reuse address option in the socket, this should
     be done by first setting the option value to the original set value */
@@ -698,9 +698,9 @@ ERROR_CODE start_service(struct service_t *service) {
         non push mode in case it's required by configuration this implies
         also checking for the no (tcp) wait variable */
         if(VIRIATUM_NON_BLOCKING) { SOCKET_SET_NON_BLOCKING(service->service_socket6_handle, flags); }
+        if(VIRIATUM_KEEPALIVE) { SOCKET_SET_KEEPALIVE(service->service_socket6_handle, option_value); }
         if(VIRIATUM_NO_WAIT) { SOCKET_SET_NO_WAIT(service->service_socket6_handle, option_value); }
         if(VIRIATUM_NO_PUSH) { SOCKET_SET_NO_PUSH(service->service_socket6_handle, option_value); }
-        SOCKET_SET_KEEPALIVE(service->service_socket6_handle, option_value);
 
         /* sets the socket ip6 only address option in the socket, this should
         be done by first setting the option value to the original set value */

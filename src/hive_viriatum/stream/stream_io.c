@@ -106,9 +106,9 @@ ERROR_CODE accept_handler_stream_io(struct connection_t *connection) {
             non push mode in case it's required by configuration this implies
             also checking for the no (tcp) wait variable */
             if(VIRIATUM_NON_BLOCKING) { SOCKET_SET_NON_BLOCKING(socket_handle, flags); }
+            if(VIRIATUM_KEEPALIVE) { SOCKET_SET_KEEPALIVE(socket_handle, option_value); }
             if(VIRIATUM_NO_WAIT) { SOCKET_SET_NO_WAIT(socket_handle, option_value); }
             if(VIRIATUM_NO_PUSH) { SOCKET_SET_NO_PUSH(socket_handle, option_value); }
-            SOCKET_SET_KEEPALIVE(socket_handle, option_value);
 
             /* prints a debug message */
             V_DEBUG_F("Accepted connection: %d\n", socket_handle);
