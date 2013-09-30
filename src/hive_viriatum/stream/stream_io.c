@@ -309,35 +309,26 @@ ERROR_CODE read_handler_stream_io(struct connection_t *connection) {
             /* switches over the receiving error code */
             switch(error_code) {
                 case SOCKET_WOULDBLOCK:
-                    /* prints a debug message */
+                    /* prints a debug message, sets the error flag (non fatal)
+                    and then breaks the current switch statement */
                     V_DEBUG("Read structures not ready: WOULDBLOCK\n");
-
-                    /* sets the error flag (non fatal) */
                     error = 2;
-
-                    /* breaks the switch */
                     break;
 
 #ifdef VIRIATUM_SSL
                 case SSL_ERROR_WANT_READ:
-                    /* prints a debug message */
+                    /* prints a debug message, sets the error flag (non fatal)
+                    and then breaks the current switch statement */
                     V_DEBUG("Read structures not ready: SSL_ERROR_WANT_READ\n");
-
-                    /* sets the error flag (non fatal) */
                     error = 2;
-
-                    /* breaks the switch */
                     break;
 #endif
 
                 default:
-                    /* prints the error */
+                    /* prints a debug message, sets the error flag
+                    and then breaks the current switch statement */
                     V_DEBUG_F("Problem receiving from socket: %d\n", error_code);
-
-                    /* sets the error flag */
                     error = 1;
-
-                    /* breaks the switch */
                     break;
             }
 
