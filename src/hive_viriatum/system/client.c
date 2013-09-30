@@ -93,6 +93,7 @@ ERROR_CODE _create_client_connection(struct connection_t **connection_pointer, s
     if(VIRIATUM_NON_BLOCKING) { SOCKET_SET_NON_BLOCKING(socket_handle, flags); }
     if(VIRIATUM_NO_WAIT) { SOCKET_SET_NO_WAIT(socket_handle, option_value); }
     if(VIRIATUM_NO_PUSH) { SOCKET_SET_NO_PUSH(socket_handle, option_value); }
+    SOCKET_SET_KEEPALIVE(socket_handle, option_value);
 
     /* creates the (client) connection object populating all of its
     internal fields with the appropriate information */

@@ -64,6 +64,7 @@
 #define SOCKET_OPTIONS_LEVEL_SOCKET SOL_SOCKET
 #define SOCKET_OPTIONS_IP6_SOCKET IPPROTO_IPV6
 #define SOCKET_OPTIONS_REUSE_ADDRESS_SOCKET SO_REUSEADDR
+#define SOCKET_OPTIONS_KEEPALIVE_SOCKET SO_KEEPALIVE
 #define SOCKET_OPTIONS_IP6_ONLY_SOCKET IPV6_V6ONLY
 #define SOCKET_SET fd_set
 #define SOCKET_INITIALIZE(socket_data) WSAStartup(MAKEWORD(2, 0), socket_data)
@@ -94,7 +95,10 @@
 #define SOCKET_SET_CLEAR(socket_handle, sockets_set) FD_CLR(socket_handle, sockets_set)
 #define SOCKET_SET_IS_SET(socket_handle, sockets_set) FD_ISSET(socket_handle, sockets_set)
 #define SOCKET_SET_NON_BLOCKING(socket_handle, flags) SOCKET_IOCTL(socket_handle, FIONBIO, &flags)
-#define SOCKET_SET_NO_WAIT(socket_handle, option_value) option_value = 1; SOCKET_SET_OPTIONS(socket_handle, SOCKET_PROTOCOL_TCP, TCP_NODELAY, option_value)
+#define SOCKET_SET_NO_WAIT(socket_handle, option_value) option_value = 1;\
+    SOCKET_SET_OPTIONS(socket_handle, SOCKET_PROTOCOL_TCP, TCP_NODELAY, option_value)
+#define SOCKET_SET_KEEPALIVE(socket_handle, option_value) option_value = 1;\
+    SOCKET_SET_OPTIONS(socket_handle, SOCKET_OPTIONS_LEVEL_SOCKET, SO_KEEPALIVE, option_value)
 #define SOCKET_SET_NO_PUSH(socket_handle, option_value)
 #endif
 
@@ -135,6 +139,7 @@
 #define SOCKET_OPTIONS_LEVEL_SOCKET SOL_SOCKET
 #define SOCKET_OPTIONS_IP6_SOCKET IPPROTO_IPV6
 #define SOCKET_OPTIONS_REUSE_ADDRESS_SOCKET SO_REUSEADDR
+#define SOCKET_OPTIONS_KEEPALIVE_SOCKET SO_KEEPALIVE
 #define SOCKET_OPTIONS_IP6_ONLY_SOCKET IPV6_V6ONLY
 #define SOCKET_SET fd_set
 #define SOCKET_INITIALIZE(socket_data) dump((void *) socket_data)
@@ -166,12 +171,16 @@
 #define SOCKET_SET_IS_SET(socket_handle, sockets_set) FD_ISSET(socket_handle, sockets_set)
 #define SOCKET_SET_NON_BLOCKING(socket_handle, flags) if((flags = SOCKET_FCNTL(socket_handle, F_GETFL, 0) == -1)) { flags = 0; }\
     SOCKET_FCNTL(socket_handle, F_SETFL, flags | O_NONBLOCK)
-#define SOCKET_SET_NO_WAIT(socket_handle, option_value) option_value = 1; SOCKET_SET_OPTIONS(socket_handle, SOCKET_PROTOCOL_TCP, TCP_NODELAY, option_value)
+#define SOCKET_SET_NO_WAIT(socket_handle, option_value) option_value = 1;\
+    SOCKET_SET_OPTIONS(socket_handle, SOCKET_PROTOCOL_TCP, TCP_NODELAY, option_value)
+#define SOCKET_SET_KEEPALIVE(socket_handle, option_value) option_value = 1;\
+    SOCKET_SET_OPTIONS(socket_handle, SOCKET_OPTIONS_LEVEL_SOCKET, SO_KEEPALIVE, option_value)
 #ifdef TCP_CORK
 #define TCP_NOPUSH TCP_CORK
 #endif
 #ifdef TCP_NOPUSH
-#define SOCKET_SET_NO_PUSH(socket_handle, option_value) option_value = 0; SOCKET_SET_OPTIONS(socket_handle, SOCKET_PROTOCOL_TCP, TCP_NOPUSH, option_value)
+#define SOCKET_SET_NO_PUSH(socket_handle, option_value) option_value = 0;\
+    SOCKET_SET_OPTIONS(socket_handle, SOCKET_PROTOCOL_TCP, TCP_NOPUSH, option_value)
 #else
 #define SOCKET_SET_NO_PUSH(socket_handle, option_value)
 #endif
