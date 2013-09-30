@@ -387,7 +387,7 @@ ERROR_CODE read_handler_stream_io(struct connection_t *connection) {
                 V_DEBUG("Finished calling on data handler\n");
             }
 
-            /* closes the connection as the error was falat this is the
+            /* closes the connection as the error was fatal, so this is the
             best escape approach to solve the issue */
             connection->close_connection(connection);
 
