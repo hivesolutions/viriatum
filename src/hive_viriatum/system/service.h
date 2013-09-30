@@ -1029,6 +1029,17 @@ typedef struct data_t {
     void *callback_parameters;
 } data_;
 
+/**
+ * The strings that describe the various status
+ * that are possible to exist for the description
+ * of various items (eg: connection, service, etc.).
+ */
+static const char *status_strings[3] = {
+    "open",
+    "closed",
+    "handshake"
+};
+
 #ifdef VIRIATUM_SSL
 /**
  * The buffer containing the various possible

@@ -1697,7 +1697,9 @@ ERROR_CODE close_connection(struct connection_t *connection) {
         V_DEBUG("Finished calling on close handler\n");
     }
 
-    /* removes the connection from the service select */
+    /* removes the connection from the service, this should remove
+    the connection element from all the structures that handle it
+    "inside" the service structure (avoids leaking) */
     remove_connection_service(connection->service, connection);
 
     /* unsets the base hanlding functions from the connection */
