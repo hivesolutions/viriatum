@@ -326,6 +326,7 @@ PHP_FUNCTION(viriatum_connection_info) {
     char uptime[128];
     char received[64];
     char sent[64];
+    char *status;
     char *family;
     char *protocol;
 
@@ -369,6 +370,10 @@ PHP_FUNCTION(viriatum_connection_info) {
         format_bytes(sent, sizeof(sent), connection->sent);
         format_bytes(received, sizeof(received), connection->received);
 
+        /* resolves the current status in the connection to a proper string
+        based value that describes it in an human readable way */
+        status = (char *) status_strings[connection->status - 1];
+
         /* retrieves the string that identifies the family for the
         connection from the provided family enumeration value */
         family = (char *) connection_family_strings[connection->family - 1];
@@ -387,6 +392,7 @@ PHP_FUNCTION(viriatum_connection_info) {
         else { add_assoc_string(return_value, "host", (char *) connection->host, 1); }
         add_assoc_long(return_value, "port", (long) connection->port);
         add_assoc_long(return_value, "id", (long) connection->id);
+        add_assoc_string(return_value, "status", status, 1);
         add_assoc_string(return_value, "family", family, 1);
         add_assoc_string(return_value, "protocol", protocol, 1);
         add_assoc_string(return_value, "uptime", uptime, 1);
