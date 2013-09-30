@@ -372,15 +372,15 @@ PHP_FUNCTION(viriatum_connection_info) {
 
         /* resolves the current status in the connection to a proper string
         based value that describes it in an human readable way */
-        status = (char *) status_strings[connection->status - 1];
+        status = (char *) get_status_string(connection->status);
 
         /* retrieves the string that identifies the family for the
         connection from the provided family enumeration value */
-        family = (char *) connection_family_strings[connection->family - 1];
+        family = (char *) get_family_string(connection->family);
 
         /* retrieves the string that identifies the protocol for the
         connection from the provided protocol enumeration value */
-        protocol = (char *) connection_protocol_strings[connection->protocol - 1];
+        protocol = (char *) get_protocol_string(connection->protocol);
 
         /* verifies if the current host is empty, this is a special
         case where no resolution of the value was possible */

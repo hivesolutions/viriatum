@@ -1500,6 +1500,10 @@ static __inline const char *get_protocol_string(enum connection_protocol_e proto
     return connection_protocol_strings[protocol - 1];
 }
 
+static __inline const char *get_status_string(enum status_e status) {
+    return status_strings[status - 1];
+}
+
 #ifdef VIRIATUM_SSL
 __inline static const char *_get_ssl_error_code(size_t index) {
     return ssl_error_codes[index];
