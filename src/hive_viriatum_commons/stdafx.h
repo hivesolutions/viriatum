@@ -44,6 +44,10 @@
 #define VIRIATUM_MPOOL
 #endif
 
+#ifdef HAVE_PREFORK
+#define VIRIATUM_PREFORK
+#endif
+
 #ifdef HAVE_IP6
 #define VIRIATUM_IP6
 #endif

@@ -39,10 +39,12 @@ with_configroot=$target_prefix/etc/viriatum
 have_debug=false
 have_defaults=false
 have_mpool=false
+have_prefork=false
 
 AC_ARG_ENABLE([debug], [AS_HELP_STRING([--enable-debug], [enable debug features])], [have_debug=true], [])
 AC_ARG_ENABLE([defaults], [AS_HELP_STRING([--enable-defaults], [enable default path features])], [have_defaults=true], [])
 AC_ARG_ENABLE([mpool], [AS_HELP_STRING([--enable-mpool], [enable memory pool])], [have_mpool=true], [])
+AC_ARG_ENABLE([prefork], [AS_HELP_STRING([--enable-prefork], [enable prefork support])], [have_prefork=true], [])
 AC_ARG_WITH([moduleroot], [AS_HELP_STRING([--with-moduleroot], [set the default modules directory])], [], [with_moduleroot=$with_libroot/modules])
 AC_ARG_WITH([wwwroot], [AS_HELP_STRING([--with-wwwroot], [set the default data directory])], [], [with_wwwroot=$with_resourceroot/www])
 
@@ -60,6 +62,10 @@ fi
 
 if test "$have_mpool" = true; then
     AC_DEFINE(HAVE_MPOOL, 1, [Define to 1 if memory pool is enabled])
+fi
+
+if test "$have_prefork" = true; then
+    AC_DEFINE(HAVE_PREFORK, 1, [Define to 1 if prefork is enabled])
 fi
 
 AC_DEFINE_UNQUOTED(WITH_PREFIX, "$target_prefix", [Define to a value if prefix is set])
