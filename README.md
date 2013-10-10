@@ -105,6 +105,7 @@ There are a lot of possible building features to enable
 * `--enable-debug` - Enables the extra debugging capabilities in viriatum
 * `--enable-defaults` - Enables the default paths in the viriatum server, ignoring wwwroot and moduleroot at runtime
 * `--disable-ipv6` - Disables the support for the ipv6 protocol stack
+* `--enable-mpool`- Enables the memory pool support (optimized for windows only)
 * `--enable-prefork` - Enables the prefork support so that viriatum can create workers
 
 ## Modules
