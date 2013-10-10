@@ -31,14 +31,16 @@
 
 #define HELP_STRING "\
 usage: viriatum [--version] [--port[=<port>] [--host[=<hostname>]]\n\
-                [--daemon] [--help]\n\
+                [handler[=<name>]] [workers[=<count>]] [--daemon] [--help]\n\
 \n\
 The most commonly used viriatum commands are:\n\
    --version  Prints the current version\n\
    --port     Sets the tcp port to be used as primary\n\
    --host     Sets the tcp host to bind\n\
-   --host     Runs the service as daemon (background)\n\
-   --host     Prints this (help) message\n\
+   --handler  Name of the handler to be used as default\n\
+   --workers  Defines the ammount of worker to be used\n\
+   --daemon   Runs the service as daemon (background)\n\
+   --help     Prints this (help) message\n\
 \n\
 See 'viriatum --help[=<command>]' for more information on a specific command.\n"
 
