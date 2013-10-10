@@ -352,9 +352,8 @@ ERROR_CODE create_workers(struct service_t *service) {
     of the provided service if this value is invalid returns immeditely */
     struct service_options_t *service_options = service->options;
     unsigned char worker_count = service_options->workers;
+	printf("vai criar workers %d\n", worker_count);
     if(worker_count == 0) { RAISE_NO_ERROR; }
-
-	printf("vai criar workers\n");
 
     /* iterates continuously for the forking of the
     current process (worker creation) */
@@ -409,7 +408,7 @@ ERROR_CODE join_workers(struct service_t *service) {
     PID_TYPE pid = 0;
 
     /* allocates space for the variable that will hold the
-    status of the process aftwer the wait call */
+    status of the process after the wait call */
     int status;
 
     /* retrives the number of worker to be "destroyed" from the options
@@ -451,7 +450,7 @@ ERROR_CODE join_workers(struct service_t *service) {
 #endif
 
 #ifndef VIRIATUM_PREFORK
-ERROR_CODE create_workers(struct service_t *service) { RAISE_NO_ERROR; }
+ERROR_CODE create_workers(struct service_t *service) { printf("nao vai criar workers\n"); RAISE_NO_ERROR; }
 ERROR_CODE join_workers(struct service_t *service) { RAISE_NO_ERROR; }
 #endif
 
