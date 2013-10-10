@@ -354,6 +354,8 @@ ERROR_CODE create_workers(struct service_t *service) {
     unsigned char worker_count = service_options->workers;
     if(worker_count == 0) { RAISE_NO_ERROR; }
 
+	printf("vai criar workers\n");
+
     /* iterates continuously for the forking of the
     current process (worker creation) */
     while(TRUE) {
