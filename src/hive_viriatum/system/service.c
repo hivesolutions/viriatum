@@ -352,7 +352,6 @@ ERROR_CODE create_workers(struct service_t *service) {
     of the provided service if this value is invalid returns immeditely */
     struct service_options_t *service_options = service->options;
     unsigned char worker_count = service_options->workers;
-	printf("vai criar workers %d\n", worker_count);
     if(worker_count == 0) { RAISE_NO_ERROR; }
 
     /* iterates continuously for the forking of the
