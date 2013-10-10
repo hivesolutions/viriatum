@@ -33,7 +33,7 @@
 usage: viriatum [--version] [--port[=<port>] [--host[=<hostname>]]\n\
                 [--daemon] [--help]\n\
 \n\
-The most commonly used git commands are:\n\
+The most commonly used viriatum commands are:\n\
    --version  Prints the current version\n\
    --port     Sets the tcp port to be used as primary\n\
    --host     Sets the tcp host to bind\n\
