@@ -242,6 +242,12 @@ static __inline char *get_config_path() {
 #define VIRIATUM_MPOOL_S ""
 #endif
 
+#ifdef VIRIATUM_PREFORK
+#define VIRIATUM_PREFORK_S " pfork"
+#else
+#define VIRIATUM_PREFORK_S ""
+#endif
+
 #ifdef VIRIATUM_EPOLL
 #define VIRIATUM_EPOLL_S " epoll"
 #else
@@ -267,5 +273,5 @@ static __inline char *get_config_path() {
 #endif
 
 #define _VIRIATUM_FLAGS VIRIATUM_DEBUG_S VIRIATUM_THREAD_SAFE_S VIRIATUM_MPOOL_S\
-    VIRIATUM_EPOLL_S VIRIATUM_IP6_S VIRIATUM_SSL_S VIRIATUM_PCRE_S
+    VIRIATUM_PREFORK_S VIRIATUM_EPOLL_S VIRIATUM_IP6_S VIRIATUM_SSL_S VIRIATUM_PCRE_S
 #define VIRIATUM_FLAGS TRIM_STRING(_VIRIATUM_FLAGS)
