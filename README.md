@@ -88,7 +88,7 @@ For building using the mingw-w64 toolchain for 64 and 32 bit options.
 
 #### Notes
 
-* In order to compile to WINVER <= 0x0500 (Windows 2000 or older) disable IPv6 support (#undef VIRIATUM_IP6)
+* In order to compile to `WINVER <= 0x0500` (Windows 2000 or older) disable IPv6 support (`#undef VIRIATUM_IP6`)
  
 ### FreeBSD
 
