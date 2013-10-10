@@ -448,7 +448,9 @@ ERROR_CODE join_workers(struct service_t *service) {
     /* raises no error */
     RAISE_NO_ERROR;
 }
-#else
+#endif
+
+#ifndef VIRIATUM_PREFORK
 ERROR_CODE create_workers(struct service_t *service) { RAISE_NO_ERROR; }
 ERROR_CODE join_workers(struct service_t *service) { RAISE_NO_ERROR; }
 #endif
