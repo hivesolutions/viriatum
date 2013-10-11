@@ -112,7 +112,8 @@ ERROR_CODE accept_handler_stream_io(struct connection_t *connection) {
             if(VIRIATUM_NO_WAIT) { SOCKET_SET_NO_WAIT(socket_handle, option_value); }
             if(VIRIATUM_NO_PUSH) { SOCKET_SET_NO_PUSH(socket_handle, option_value); }
 
-            /* prints a debug message */
+            /* prints a debug message about the accepting of the new 
+			connection with the value of the socket handle */
             V_DEBUG_F("Accepted connection: %d\n", socket_handle);
 
             /* creates the (client) connection using the provided
@@ -163,6 +164,10 @@ ERROR_CODE accept_handler_stream_io(struct connection_t *connection) {
                 ssl conext and sets the correct socked file descriptor in it */
                 ssl_handle = SSL_new(connection->ssl_context);
                 SSL_set_fd(ssl_handle, socket_handle);
+
+				/* prints a debug message about the creation of the new ssl handle
+				to be able to trace it on latter connections */
+				V_DEBUG_F("Created new SSL handle: %d\n", ssl_handle);
 
                 /* updates boths the ssl context and ssl handle reference in the
                 client connection structure reference */
@@ -624,6 +629,10 @@ ERROR_CODE handshake_handler_stream_io(struct connection_t *connection) {
     descriptive message of the ssl error to be "raised" */
     unsigned long ssl_code;
     char ssl_message[VIRIATUM_MAX_SSL_SIZE];
+
+    /* prints a debug message about the retry of the handshake for the
+	provided socket handle in the ssl context */
+    V_DEBUG_F("Trying handshake for SSL handle: %d\n", connection->ssl_handle));
 
     /* runs the accept operation in the ssl handle, this is possible to
     break as this operation involves the handshake operation non blocking
