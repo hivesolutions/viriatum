@@ -768,12 +768,14 @@ ERROR_CODE start_service(struct service_t *service) {
         SSL_CTX_set_options(service->ssl_context, SSL_OP_SINGLE_DH_USE);
 
         /* resolves the configuration file from the ssl certificate defaulting to
-        the predefined "server" certificate file */
+        the predefined "server" certificate file, then in case the returnin value
+		is invalid (no reslotion present) forces the default value */
         _config_path = VIRIATUM_RESOLVE_PATH(
             (char *) service_options->ssl_csr,
             "cert/server.crt",
             config_path
         );
+		_config_path = config_path == NULL ? "cert/server.crt" : config_path;
 
         /* loads the certificate file into the ssl context so that the
         context is correctly validated */
@@ -796,12 +798,14 @@ ERROR_CODE start_service(struct service_t *service) {
         }
 
         /* resolves the configuration file from the ssl key defaulting to
-        the predefined "server" key file */
+        the predefined "server" key file, then in case the returnin value
+		is invalid (no reslotion present) forces the default value */
         _config_path = VIRIATUM_RESOLVE_PATH(
             (char *) service_options->ssl_key,
             "cert/server.key",
             config_path
         );
+		_config_path = config_path == NULL ? "cert/server.key" : config_path;
 
         /* loads the private key file into the ssl context so that the
         context is correctly validated */
