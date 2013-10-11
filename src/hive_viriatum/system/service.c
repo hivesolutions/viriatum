@@ -760,6 +760,7 @@ ERROR_CODE start_service(struct service_t *service) {
         should be enought to get the ssl sub system running */
         SSL_load_error_strings();
         SSL_library_init();
+        OpenSSL_add_all_algorithms();
 
         /* creates the new ssl context and updates the context with the
         correct certificate file and (private) key file */

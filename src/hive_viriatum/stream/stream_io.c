@@ -81,6 +81,8 @@ ERROR_CODE accept_handler_stream_io(struct connection_t *connection) {
     for the socket result for the ssl operations */
     SSL *ssl_handle;
     SOCKET_ERROR_CODE socket_result;
+    unsigned long ssl_code;
+    char ssl_message[VIRIATUM_MAX_SSL_SIZE];
 #endif
 
     /* iterates continuously to try to accept as most
@@ -200,9 +202,16 @@ ERROR_CODE accept_handler_stream_io(struct connection_t *connection) {
                             break;
 
                         default:
+                            /* retrieves the last ssl error code and then converts
+                            it into a readable error string so that it's possible to
+                            print it in a proper manner */
+                            ssl_code = ERR_get_error();
+                            ERR_error_string_n(ssl_code, ssl_message, VIRIATUM_MAX_SSL_SIZE);
+
                             /* prints a warning message about the closing of
                             the ssl connection (due to a connection problem) */
                             V_WARNING_F("Failed to accept SSL connection (%s)\n", ssl_error_codes[socket_result]);
+                            V_WARNING_F("%s\n", ssl_message);
 
                             /* closes the (client) connection, the ssl connection has been
                             closed from the other side (client side) */
@@ -597,6 +606,12 @@ ERROR_CODE handshake_handler_stream_io(struct connection_t *connection) {
     the operation, to take the appropriate measures */
     SOCKET_ERROR_CODE result;
 
+    /* allocates space for both the integer that will hold the error code
+    for the ssl specifi purposes and for the buffer that will hold the
+    descriptive message of the ssl error to be "raised" */
+    unsigned long ssl_code;
+    char ssl_message[VIRIATUM_MAX_SSL_SIZE];
+
     /* runs the accept operation in the ssl handle, this is possible to
     break as this operation involves the handshake operation non blocking
     sockets may block on this */
@@ -609,10 +624,17 @@ ERROR_CODE handshake_handler_stream_io(struct connection_t *connection) {
         so that any further data is correctly handled by read */
         connection->status = STATUS_OPEN;
     } else if(result == 0) {
+        /* retrieves the last ssl error code and then converts
+        it into a readable error string so that it's possible to
+        print it in a proper manner */
+        ssl_code = ERR_get_error();
+        ERR_error_string_n(ssl_code, ssl_message, VIRIATUM_MAX_SSL_SIZE);
+
         /* retrieves the current ssl error description, to be displayed
         as a warning message */
         result = SSL_get_error(connection->ssl_handle, result);
         V_WARNING_F("Closing the SSL connection (%s)\n", ssl_error_codes[result]);
+        V_WARNING_F("%s\n", ssl_message);
 
         /* closes the connection, the ssl connection has been closed
         from the other side */
@@ -634,9 +656,16 @@ ERROR_CODE handshake_handler_stream_io(struct connection_t *connection) {
                 break;
 
             default:
+                /* retrieves the last ssl error code and then converts
+                it into a readable error string so that it's possible to
+                print it in a proper manner */
+                ssl_code = ERR_get_error();
+                ERR_error_string_n(ssl_code, ssl_message, VIRIATUM_MAX_SSL_SIZE);
+
                 /* prints a warning message about the closing of
                 the ssl connection (due to a connection problem) */
                 V_WARNING_F("Closing the SSL connection (%s)\n", ssl_error_codes[result]);
+                V_WARNING_F("%s\n", ssl_message);
 
                 /* closes the connection, the ssl connection it has been
                 closed from the other side (client side) */
