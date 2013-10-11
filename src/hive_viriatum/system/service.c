@@ -753,7 +753,7 @@ ERROR_CODE start_service(struct service_t *service) {
 #endif
 
 #ifdef VIRIATUM_SSL
-	printf("%d", service_options->ssl);
+	printf("%d\n", service_options->ssl);
 
 
     /* in case the ssl encryption flag is set the ssl sub system
