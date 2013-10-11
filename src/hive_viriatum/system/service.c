@@ -775,7 +775,7 @@ ERROR_CODE start_service(struct service_t *service) {
             "cert/server.crt",
             config_path
         );
-		_config_path = config_path == NULL ? "cert/server.crt" : config_path;
+		_config_path = _config_path == NULL ? "cert/server.crt" : _config_path;
 
         /* loads the certificate file into the ssl context so that the
         context is correctly validated */
@@ -805,7 +805,7 @@ ERROR_CODE start_service(struct service_t *service) {
             "cert/server.key",
             config_path
         );
-		_config_path = config_path == NULL ? "cert/server.key" : config_path;
+		_config_path = _config_path == NULL ? "cert/server.key" : _config_path;
 
         /* loads the private key file into the ssl context so that the
         context is correctly validated */
