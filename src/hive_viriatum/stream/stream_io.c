@@ -167,7 +167,7 @@ ERROR_CODE accept_handler_stream_io(struct connection_t *connection) {
 
 				/* prints a debug message about the creation of the new ssl handle
 				to be able to trace it on latter connections */
-				V_DEBUG_F("Created new SSL handle");
+				V_DEBUG("Created new SSL handle");
 
                 /* updates boths the ssl context and ssl handle reference in the
                 client connection structure reference */
