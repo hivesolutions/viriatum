@@ -112,8 +112,8 @@ ERROR_CODE accept_handler_stream_io(struct connection_t *connection) {
             if(VIRIATUM_NO_WAIT) { SOCKET_SET_NO_WAIT(socket_handle, option_value); }
             if(VIRIATUM_NO_PUSH) { SOCKET_SET_NO_PUSH(socket_handle, option_value); }
 
-            /* prints a debug message about the accepting of the new 
-			connection with the value of the socket handle */
+            /* prints a debug message about the accepting of the new
+            connection with the value of the socket handle */
             V_DEBUG_F("Accepted connection: %d\n", socket_handle);
 
             /* creates the (client) connection using the provided
@@ -165,9 +165,9 @@ ERROR_CODE accept_handler_stream_io(struct connection_t *connection) {
                 ssl_handle = SSL_new(connection->ssl_context);
                 SSL_set_fd(ssl_handle, socket_handle);
 
-				/* prints a debug message about the creation of the new ssl handle
-				to be able to trace it on latter connections */
-				V_DEBUG("Created new SSL handle");
+                /* prints a debug message about the creation of the new ssl handle
+                to be able to trace it on latter connections */
+                V_DEBUG("Created new SSL handle\n");
 
                 /* updates boths the ssl context and ssl handle reference in the
                 client connection structure reference */
@@ -183,17 +183,17 @@ ERROR_CODE accept_handler_stream_io(struct connection_t *connection) {
                 /* in case the socket result is zero the connection has been closed
                 from the other side must close it from here also */
                 if(socket_result == 0) {
-					/* retrieves the last ssl error code and then converts
-					it into a readable error string so that it's possible to
-					print it in a proper manner */
-					ssl_code = ERR_get_error();
-					ERR_error_string_n(ssl_code, ssl_message, VIRIATUM_MAX_SSL_SIZE);
+                    /* retrieves the last ssl error code and then converts
+                    it into a readable error string so that it's possible to
+                    print it in a proper manner */
+                    ssl_code = ERR_get_error();
+                    ERR_error_string_n(ssl_code, ssl_message, VIRIATUM_MAX_SSL_SIZE);
 
-					/* retrieves the current ssl error description, to be displayed
-					as a warning message */
-					socket_result = SSL_get_error(connection->ssl_handle, socket_result);
-					V_WARNING_F("Closing the SSL connection (%s)\n", ssl_error_codes[socket_result]);
-					V_WARNING_F("%s\n", ssl_message);
+                    /* retrieves the current ssl error description, to be displayed
+                    as a warning message */
+                    socket_result = SSL_get_error(connection->ssl_handle, socket_result);
+                    V_WARNING_F("Closing the SSL connection (%s)\n", ssl_error_codes[socket_result]);
+                    V_WARNING_F("%s\n", ssl_message);
 
                     /* closes the (client) connection, the ssl connection has been
                     closed from the other side (client side) */
@@ -209,8 +209,12 @@ ERROR_CODE accept_handler_stream_io(struct connection_t *connection) {
                     /* switches over the result of the error checking
                     in order to properly handle it */
                     switch(socket_result) {
-						case SSL_ERROR_WANT_READ:
-						case SSL_ERROR_WANT_WRITE:
+                        case SSL_ERROR_WANT_READ:
+                        case SSL_ERROR_WANT_WRITE:
+                            /* prints a debug message about the skip of the process
+                            of handshaking for the current connection*/
+                            V_DEBUG_F("Skipping SSL handshake (%s)\n", ssl_error_codes[socket_result]);
+
                             /* updates the client connection status to handshake
                             status so that the complete handshake may be resumed */
                             client_connection->status = STATUS_HANDSHAKE;
@@ -631,8 +635,8 @@ ERROR_CODE handshake_handler_stream_io(struct connection_t *connection) {
     char ssl_message[VIRIATUM_MAX_SSL_SIZE];
 
     /* prints a debug message about the retry of the handshake for the
-	provided socket handle in the ssl context */
-    V_DEBUG("Trying handshake for SSL handle");
+    provided socket handle in the ssl context */
+    V_DEBUG("Trying handshake for SSL handle\n");
 
     /* runs the accept operation in the ssl handle, this is possible to
     break as this operation involves the handshake operation non blocking
@@ -642,6 +646,10 @@ ERROR_CODE handshake_handler_stream_io(struct connection_t *connection) {
     /* in case the result of the accept operation in the ssl handle is not
     the expected (error) must handle it gracefully (normal) */
     if(result == 1) {
+        /* prints a debug message about the success in the ssl handshake
+        operation so that it may be used for debugging purposes */
+        V_DEBUG("SSL handshake successful\n");
+
         /* udpates the status of the (client) connection to open
         so that any further data is correctly handled by read */
         connection->status = STATUS_OPEN;
@@ -673,7 +681,11 @@ ERROR_CODE handshake_handler_stream_io(struct connection_t *connection) {
         in order to properly handle it */
         switch(result) {
             case SSL_ERROR_WANT_READ:
-			case SSL_ERROR_WANT_WRITE:
+            case SSL_ERROR_WANT_WRITE:
+                /* prints a debug message about the skip of the process
+                of handshaking for the current connection*/
+                V_DEBUG_F("Skipping SSL handshake (%s)\n", ssl_error_codes[result]);
+
                 /* breaks the switch must try to accept
                 the connection again in a different loop */
                 break;
