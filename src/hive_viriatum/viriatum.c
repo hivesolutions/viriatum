@@ -30,7 +30,7 @@
 #include "viriatum.h"
 
 #define HELP_STRING "\
-usage: viriatum [--version] [--port[=<port>] [--host[=<hostname>]]\n\
+usage: viriatum [--version] [--port[=<port>] [--host[=<hostname>]] [-ip6]\n\
                 [handler[=<name>]] [workers[=<count>]] [--local] [--ssl]\n\
                 [--daemon] [--help]\n\
 \n\
@@ -38,6 +38,7 @@ The most commonly used viriatum commands are:\n\
    --version  Prints the current version\n\
    --port     Sets the tcp port to be used as primary\n\
    --host     Sets the tcp host to bind\n\
+   --ip6      Runs the service with support for ipv6\n\
    --handler  Name of the handler to be used as default\n\
    --workers  Defines the ammount of worker to be used\n\
    --local    Runs the service in local mode no internet support\n\

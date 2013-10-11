@@ -2214,6 +2214,11 @@ ERROR_CODE _comand_line_options_service(struct service_t *service, struct hash_m
     get_value_string_hash_map(arguments, (unsigned char *) "host", &value);
     if(value != NULL) { service_options->address = (unsigned char *) ((struct argument_t *) value)->value; }
 
+    /* tries to retrieve the ip6 argument from the arguments map, then
+    in case the (ip6) value is set, sets the service with ip6 support  */
+    get_value_string_hash_map(arguments, (unsigned char *) "ip6", &value);
+    if(value != NULL) { service_options->ip6 = 1; }
+
     /* tries to retrieve the handler argument from the arguments map, then
     in case the (handler) value is set, sets the handler name value
     in the service options */
