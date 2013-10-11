@@ -769,7 +769,7 @@ ERROR_CODE start_service(struct service_t *service) {
 
         /* resolves the configuration file from the ssl certificate defaulting to
         the predefined "server" certificate file, then in case the returnin value
-        is invalid (no reslotion present) forces the default value */
+        is invalid (no resolution present) forces the default value */
         _config_path = VIRIATUM_RESOLVE_PATH(
             (char *) service_options->ssl_csr,
             "cert/server.crt",
@@ -799,7 +799,7 @@ ERROR_CODE start_service(struct service_t *service) {
 
         /* resolves the configuration file from the ssl key defaulting to
         the predefined "server" key file, then in case the returnin value
-        is invalid (no reslotion present) forces the default value */
+        is invalid (no resolution present) forces the default value */
         _config_path = VIRIATUM_RESOLVE_PATH(
             (char *) service_options->ssl_key,
             "cert/server.key",
