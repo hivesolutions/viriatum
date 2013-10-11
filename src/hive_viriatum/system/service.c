@@ -777,13 +777,18 @@ ERROR_CODE start_service(struct service_t *service) {
 
         /* loads the certificate file into the ssl context so that the
         context is correctly validated */
-        socket_result = SSL_CTX_use_certificate_file(service->ssl_context, _config_path, SSL_FILETYPE_PEM);
+        socket_result = SSL_CTX_use_certificate_file(
+	        service->ssl_context,
+			_config_path,
+			SSL_FILETYPE_PEM
+		);
 
         /* tests if there was an error loading the certificate file and
         if it did closes the socket and returns in error (major problem) */
         if(SOCKET_EX_TEST_ERROR(socket_result)) {
             SOCKET_CLOSE(service->service_socket_handle);
             V_ERROR("Problem loading the ssl certificate file (*.crt)\n");
+			V_WARNING_F("Using certificate file path (%s)\n", _config_path);
             RAISE_ERROR_M(
                 RUNTIME_EXCEPTION_ERROR_CODE,
                 (unsigned char *) "Problem loading ssl certificate"
@@ -800,13 +805,18 @@ ERROR_CODE start_service(struct service_t *service) {
 
         /* loads the private key file into the ssl context so that the
         context is correctly validated */
-        socket_result = SSL_CTX_use_PrivateKey_file(service->ssl_context, _config_path, SSL_FILETYPE_PEM);
+        socket_result = SSL_CTX_use_PrivateKey_file(
+		    service->ssl_context,
+			_config_path,
+			SSL_FILETYPE_PEM
+		);
 
         /* tests if there was an error loading private key file and
         if it did closes the socket and returns in error (major problem) */
         if(SOCKET_EX_TEST_ERROR(socket_result)) {
             SOCKET_CLOSE(service->service_socket_handle);
             V_ERROR("Problem loading the ssl key file (*.key)\n");
+			V_WARNING_F("Using key file path (%s)\n", _config_path);
             RAISE_ERROR_M(
                 RUNTIME_EXCEPTION_ERROR_CODE,
                 (unsigned char *) "Problem loading ssl key"
