@@ -2211,6 +2211,11 @@ ERROR_CODE _comand_line_options_service(struct service_t *service, struct hash_m
     get_value_string_hash_map(arguments, (unsigned char *) "local", &value);
     if(value != NULL) { service_options->local = 1; }
 
+    /* tries to retrieve the ssl argument from the arguments map, then
+    in case the (ssl) value is set, sets the service with ssl support  */
+    get_value_string_hash_map(arguments, (unsigned char *) "ssl", &value);
+    if(value != NULL) { service_options->ssl = 1; }
+
     /* tries to retrieve the workers argument from the arguments map, then
     sets the workers (count) value for the service */
     get_value_string_hash_map(arguments, (unsigned char *) "workers", &value);
