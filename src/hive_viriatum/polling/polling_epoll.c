@@ -604,6 +604,7 @@ ERROR_CODE _call_polling_epoll(
             operation in it and then calls the hadhaske handler */
             V_DEBUG("Calling on handshake handler\n");
             CALL_V(current_connection->on_handshake, current_connection);
+			CALL_V(current_connection->on_read, current_connection);
             V_DEBUG("Finished calling on handshake handler\n");
         }
     }
