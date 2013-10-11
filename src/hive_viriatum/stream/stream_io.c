@@ -178,6 +178,18 @@ ERROR_CODE accept_handler_stream_io(struct connection_t *connection) {
                 /* in case the socket result is zero the connection has been closed
                 from the other side must close it from here also */
                 if(socket_result == 0) {
+					/* retrieves the last ssl error code and then converts
+					it into a readable error string so that it's possible to
+					print it in a proper manner */
+					ssl_code = ERR_get_error();
+					ERR_error_string_n(ssl_code, ssl_message, VIRIATUM_MAX_SSL_SIZE);
+
+					/* retrieves the current ssl error description, to be displayed
+					as a warning message */
+					socket_result = SSL_get_error(connection->ssl_handle, socket_result);
+					V_WARNING_F("Closing the SSL connection (%s)\n", ssl_error_codes[socket_result]);
+					V_WARNING_F("%s\n", ssl_message);
+
                     /* closes the (client) connection, the ssl connection has been
                     closed from the other side (client side) */
                     client_connection->close_connection(client_connection);
