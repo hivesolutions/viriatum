@@ -599,17 +599,6 @@ ERROR_CODE _call_polling_select(
         performed, fast operations */
         current_connection->read_valid = TRUE;
 
-        /* in case the current connection is open and the read
-        handler is correclty set (must call it) */
-        if(current_connection->status == STATUS_OPEN &&\
-            current_connection->on_read != NULL) {
-            /* prints a series of debug messages and then calls the
-            correct on read handler for the notification */
-            V_DEBUG("Calling on read handler\n");
-            CALL_V(current_connection->on_read, current_connection);
-            V_DEBUG("Finished calling on read handler\n");
-        }
-
         /* in case the current connection is in the handshake
         section and the handshake handler is correclty set (must
         call it to initialize the connection) */
@@ -620,6 +609,17 @@ ERROR_CODE _call_polling_select(
             V_DEBUG("Calling on handshake handler\n");
             CALL_V(current_connection->on_handshake, current_connection);
             V_DEBUG("Finished calling on handshake handler\n");
+        }
+
+        /* in case the current connection is open and the read
+        handler is correclty set (must call it) */
+        if(current_connection->status == STATUS_OPEN &&\
+            current_connection->on_read != NULL) {
+            /* prints a series of debug messages and then calls the
+            correct on read handler for the notification */
+            V_DEBUG("Calling on read handler\n");
+            CALL_V(current_connection->on_read, current_connection);
+            V_DEBUG("Finished calling on read handler\n");
         }
     }
 
