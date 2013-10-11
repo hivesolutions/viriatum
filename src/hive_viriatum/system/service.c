@@ -447,7 +447,7 @@ ERROR_CODE join_workers(struct service_t *service) {
     RAISE_NO_ERROR;
 }
 #else
-ERROR_CODE create_workers(struct service_t *service) { printf("nao vai criar workers\n"); RAISE_NO_ERROR; }
+ERROR_CODE create_workers(struct service_t *service) { RAISE_NO_ERROR; }
 ERROR_CODE join_workers(struct service_t *service) { RAISE_NO_ERROR; }
 #endif
 
