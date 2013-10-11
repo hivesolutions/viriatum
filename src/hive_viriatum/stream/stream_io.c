@@ -167,7 +167,7 @@ ERROR_CODE accept_handler_stream_io(struct connection_t *connection) {
 
 				/* prints a debug message about the creation of the new ssl handle
 				to be able to trace it on latter connections */
-				V_DEBUG_F("Created new SSL handle: %d\n", ssl_handle);
+				V_DEBUG_F("Created new SSL handle");
 
                 /* updates boths the ssl context and ssl handle reference in the
                 client connection structure reference */
@@ -632,7 +632,7 @@ ERROR_CODE handshake_handler_stream_io(struct connection_t *connection) {
 
     /* prints a debug message about the retry of the handshake for the
 	provided socket handle in the ssl context */
-    V_DEBUG_F("Trying handshake for SSL handle: %d\n", connection->ssl_handle));
+    V_DEBUG("Trying handshake for SSL handle");
 
     /* runs the accept operation in the ssl handle, this is possible to
     break as this operation involves the handshake operation non blocking
