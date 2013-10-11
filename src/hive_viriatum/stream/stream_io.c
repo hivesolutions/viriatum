@@ -204,7 +204,8 @@ ERROR_CODE accept_handler_stream_io(struct connection_t *connection) {
                     /* switches over the result of the error checking
                     in order to properly handle it */
                     switch(socket_result) {
-                        case SSL_ERROR_WANT_READ:
+						case SSL_ERROR_WANT_READ:
+						case SSL_ERROR_WANT_WRITE:
                             /* updates the client connection status to handshake
                             status so that the complete handshake may be resumed */
                             client_connection->status = STATUS_HANDSHAKE;
@@ -663,6 +664,7 @@ ERROR_CODE handshake_handler_stream_io(struct connection_t *connection) {
         in order to properly handle it */
         switch(result) {
             case SSL_ERROR_WANT_READ:
+			case SSL_ERROR_WANT_WRITE:
                 /* breaks the switch must try to accept
                 the connection again in a different loop */
                 break;
