@@ -191,7 +191,7 @@ ERROR_CODE accept_handler_stream_io(struct connection_t *connection) {
 
                     /* retrieves the current ssl error description, to be displayed
                     as a warning message */
-                    socket_result = SSL_get_error(connection->ssl_handle, socket_result);
+                    socket_result = SSL_get_error(ssl_handle, socket_result);
                     V_WARNING_F("Closing the SSL connection (%s)\n", ssl_error_codes[socket_result]);
                     V_WARNING_F("%s\n", ssl_message);
 
