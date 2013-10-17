@@ -764,7 +764,7 @@ ERROR_CODE start_service(struct service_t *service) {
 
         /* creates the new ssl context and updates the context with the
         correct certificate file and (private) key file */
-        service->ssl_context = SSL_CTX_new(TLSv1_server_method());
+        service->ssl_context = SSL_CTX_new(SSLv23_client_method());
         SSL_CTX_set_options(service->ssl_context, SSL_OP_SINGLE_DH_USE);
 
         /* resolves the configuration file from the ssl certificate defaulting to
