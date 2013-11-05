@@ -705,9 +705,9 @@ ERROR_CODE get_write_time_file(char *file_path, struct date_time_t *date_time) {
     date_time->year = time.tm_year + 1900;
     date_time->month = time.tm_mon + 1;
     date_time->day = time.tm_mday;
-    date_time->hour = time.tm_hour + 1;
-    date_time->minute = time.tm_min + 1;
-    date_time->second = time.tm_sec + 1;
+    date_time->hour = time.tm_hour;
+    date_time->minute = time.tm_min;
+    date_time->second = time.tm_sec;
 
     /* raise no error */
     RAISE_NO_ERROR;
