@@ -435,8 +435,8 @@ ERROR_CODE get_http_range_limits(unsigned char *range, size_t *initial_byte, siz
 
     /* creates the inital and final local values and starts them
     at the invalid (unset) values (intial state) */
-    int initial_byte_v = -1;
-    int final_byte_v = -1;
+    long long initial_byte_v = -1;
+    long long final_byte_v = -1;
 
     /* retrieves the size of the range string using the normal
     length if a string function */
@@ -492,8 +492,8 @@ ERROR_CODE get_http_range_limits(unsigned char *range, size_t *initial_byte, siz
 
     /* updates both the initial and the final byte pointer
     references with the appropriate values */
-    *initial_byte = initial_byte_v;
-    *final_byte = final_byte_v;
+	*initial_byte = initial_byte_v > 0 : initial_byte_v ? 0;
+    *final_byte = final_byte_v > 0 : final_byte_v ? 0;
 
     /* raises no error as both the initial and the final
     byte values have been computed with success */
