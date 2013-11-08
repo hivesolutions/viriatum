@@ -90,6 +90,7 @@ a:hover {
 .table a {
     color: #595959;
     font-size: 11pt;
+    word-break: break-word;
 }
 
 .table a:hover {

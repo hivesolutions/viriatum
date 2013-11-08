@@ -430,8 +430,8 @@ ERROR_CODE get_http_range_limits(unsigned char *range, size_t *initial_byte, siz
     /* allocates space for the byte to be used in the iteration,
     for the mark value and for the iteration index counter */
     char byte;
-	char *start;
-	char *end;
+    char *start;
+    char *end;
     size_t mark;
     size_t index;
 
@@ -462,8 +462,8 @@ ERROR_CODE get_http_range_limits(unsigned char *range, size_t *initial_byte, siz
             case '-':
                 if(index == 0) { initial_byte_v = 0; }
                 else {
-					start = (char *) &range[mark];
-					end = (char *) &range[index - 1];
+                    start = (char *) &range[mark];
+                    end = (char *) &range[index - 1];
                     initial_byte_v = (long long) STROULL(start, &end, 10);
                 }
                 mark = index + 1;
@@ -474,7 +474,7 @@ ERROR_CODE get_http_range_limits(unsigned char *range, size_t *initial_byte, siz
                 if(index == mark) { final_byte_v = size - 1; }
                 else {
                     start = (char *) &range[mark];
-					end = (char *) &range[index - 1];
+                    end = (char *) &range[index - 1];
                     initial_byte_v = (long long) STROULL(start, &end, 10);
                 }
                 break;
@@ -487,15 +487,15 @@ ERROR_CODE get_http_range_limits(unsigned char *range, size_t *initial_byte, siz
         if(index == mark) { final_byte_v = size - 1; }
         else {
             start = (char *) &range[mark];
-			end = (char *) &range[index - 1];
+            end = (char *) &range[index - 1];
             final_byte_v = (long long) STROULL(start, &end, 10);
         }
     }
 
     /* updates both the initial and the final byte pointer
     references with the appropriate values */
-	*initial_byte = initial_byte_v > 0 ? (size_t) initial_byte_v : 0;
-	*final_byte = final_byte_v > 0 ? (size_t) final_byte_v : 0;
+    *initial_byte = initial_byte_v > 0 ? (size_t) initial_byte_v : 0;
+    *final_byte = final_byte_v > 0 ? (size_t) final_byte_v : 0;
 
     /* raises no error as both the initial and the final
     byte values have been computed with success */
