@@ -428,15 +428,17 @@ ERROR_CODE write_http_error_a(
 
 ERROR_CODE get_http_range_limits(unsigned char *range, size_t *initial_byte, size_t *final_byte, size_t size) {
     /* allocates space for the byte to be used in the iteration,
-    for the mark value and fot the iteration index counter */
+    for the mark value and for the iteration index counter */
     char byte;
+	char *start;
+	char *end;
     size_t mark;
     size_t index;
 
     /* creates the inital and final local values and starts them
     at the invalid (unset) values (intial state) */
-    long long initial_byte_v = -1;
-    long long final_byte_v = -1;
+    unsigned long long initial_byte_v = -1;
+    unsigned long long final_byte_v = -1;
 
     /* retrieves the size of the range string using the normal
     length if a string function */
@@ -460,9 +462,9 @@ ERROR_CODE get_http_range_limits(unsigned char *range, size_t *initial_byte, siz
             case '-':
                 if(index == 0) { initial_byte_v = 0; }
                 else {
-                    range[index] = '\0';
-                    initial_byte_v = atoi((char *) &range[mark]);
-                    range[index] = byte;
+					start = (char *) range[mark];
+					end = (char *) range[mark + index - 1];
+                    initial_byte_v = STROULL(start, &end, 10);
                 }
                 mark = index + 1;
                 break;
@@ -471,9 +473,9 @@ ERROR_CODE get_http_range_limits(unsigned char *range, size_t *initial_byte, siz
             case ',':
                 if(index == mark) { final_byte_v = size - 1; }
                 else {
-                    range[index] = '\0';
-                    final_byte_v = atoi((char *) &range[mark]);
-                    range[index] = byte;
+                    start = (char *) range[mark];
+					end = (char *) range[mark + index - 1];
+                    initial_byte_v = STROULL(start, &end, 10);
                 }
                 break;
         }
@@ -492,8 +494,8 @@ ERROR_CODE get_http_range_limits(unsigned char *range, size_t *initial_byte, siz
 
     /* updates both the initial and the final byte pointer
     references with the appropriate values */
-	*initial_byte = initial_byte_v > 0 ? initial_byte_v : 0;
-	*final_byte = final_byte_v > 0 ? final_byte_v : 0;
+	*initial_byte = initial_byte_v > 0 ? (size_t) initial_byte_v : 0;
+	*final_byte = final_byte_v > 0 ? (size_t) final_byte_v : 0;
 
     /* raises no error as both the initial and the final
     byte values have been computed with success */
