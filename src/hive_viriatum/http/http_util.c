@@ -492,8 +492,8 @@ ERROR_CODE get_http_range_limits(unsigned char *range, size_t *initial_byte, siz
 
     /* updates both the initial and the final byte pointer
     references with the appropriate values */
-	*initial_byte = initial_byte_v > 0 : initial_byte_v ? 0;
-    *final_byte = final_byte_v > 0 : final_byte_v ? 0;
+	*initial_byte = initial_byte_v > 0 ? initial_byte_v : 0;
+	*final_byte = final_byte_v > 0 ? final_byte_v : 0;
 
     /* raises no error as both the initial and the final
     byte values have been computed with success */
