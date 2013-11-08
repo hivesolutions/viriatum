@@ -437,8 +437,8 @@ ERROR_CODE get_http_range_limits(unsigned char *range, size_t *initial_byte, siz
 
     /* creates the inital and final local values and starts them
     at the invalid (unset) values (intial state) */
-    unsigned long long initial_byte_v = -1;
-    unsigned long long final_byte_v = -1;
+    long long initial_byte_v = -1;
+    long long final_byte_v = -1;
 
     /* retrieves the size of the range string using the normal
     length if a string function */
@@ -463,8 +463,8 @@ ERROR_CODE get_http_range_limits(unsigned char *range, size_t *initial_byte, siz
                 if(index == 0) { initial_byte_v = 0; }
                 else {
 					start = (char *) range[mark];
-					end = (char *) range[mark + index - 1];
-                    initial_byte_v = STROULL(start, &end, 10);
+					end = (char *) range[index - 1];
+                    initial_byte_v = (long long) STROULL(start, &end, 10);
                 }
                 mark = index + 1;
                 break;
@@ -474,8 +474,8 @@ ERROR_CODE get_http_range_limits(unsigned char *range, size_t *initial_byte, siz
                 if(index == mark) { final_byte_v = size - 1; }
                 else {
                     start = (char *) range[mark];
-					end = (char *) range[mark + index - 1];
-                    initial_byte_v = STROULL(start, &end, 10);
+					end = (char *) range[index - 1];
+                    initial_byte_v = (long long) STROULL(start, &end, 10);
                 }
                 break;
         }
@@ -486,9 +486,9 @@ ERROR_CODE get_http_range_limits(unsigned char *range, size_t *initial_byte, siz
     if(final_byte_v == -1) {
         if(index == mark) { final_byte_v = size - 1; }
         else {
-            range[index] = '\0';
-            final_byte_v = atoi((char *) &range[mark]);
-            range[index] = byte;
+            start = (char *) range[mark];
+			end = (char *) range[index - 1];
+            final_byte_v = (long long) STROULL(start, &end, 10);
         }
     }
 
