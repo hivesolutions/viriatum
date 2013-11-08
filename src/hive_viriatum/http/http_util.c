@@ -486,8 +486,8 @@ ERROR_CODE get_http_range_limits(unsigned char *range, size_t *initial_byte, siz
     if(final_byte_v == -1) {
         if(index == mark) { final_byte_v = size - 1; }
         else {
-            start = (char *) range[mark];
-			end = (char *) range[index - 1];
+            start = (char *) &range[mark];
+			end = (char *) &range[index - 1];
             final_byte_v = (long long) STROULL(start, &end, 10);
         }
     }
