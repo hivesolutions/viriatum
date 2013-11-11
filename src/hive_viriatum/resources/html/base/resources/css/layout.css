@@ -250,10 +250,10 @@ a:hover {
 }
 
 .table.file-listing td.icon {
-    max-width: 16px;
-    min-width: 16px;
-    padding: 0px 10px 0px 10px;
-    width: 16px;
+    max-width: 17px;
+    min-width: 17px;
+    padding: 0px 5px 0px 5px;
+    width: 17px;
 }
 
 .table.file-listing tfoot tr td {
