@@ -1988,6 +1988,7 @@ ERROR_CODE _default_options_service(struct service_t *service, struct hash_map_t
     set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".movie", "video/x-sgi-movie");
     set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".mp2", "video/mpeg");
     set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".mp3", "audio/mpeg");
+    set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".mp4", "video/mp4");
     set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".mpa", "video/mpeg");
     set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".mpe", "video/mpeg");
     set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".mpeg", "video/mpeg");

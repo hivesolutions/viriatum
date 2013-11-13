@@ -40,6 +40,10 @@
  */
 #define HUFFMAN_BUFFER_SIZE 4096
 
+/**
+ * Structure that hold the information for the
+ * creation of huffman based dictionary/tables.
+ */
 typedef struct huffman_t {
     struct stream_t *stream;
     size_t size;

@@ -420,19 +420,19 @@ void test_bit_stream() {
     struct bit_stream_t *bit_stream;
 
     /* creates the file stream that is going to be used
-	as the underlying stream for the bit stream */
+    as the underlying stream for the bit stream */
     create_file_stream(
-		&file_stream,
-		(unsigned char *) "bit_stream.bin",
-		(unsigned char *) "wb"
-	);
+        &file_stream,
+        (unsigned char *) "bit_stream.bin",
+        (unsigned char *) "wb"
+    );
 
     /* creates the bit stream using the file stream as the
-	underlying stream structure to be used*/
+    underlying stream structure to be used*/
     create_bit_stream(&bit_stream, file_stream->stream);
 
     /* opens the bit stream so that operations may start
-	to be triggered for the bit stream */
+    to be triggered for the bit stream */
     open_bit_stream(bit_stream);
 
     /* writes the 0100 bit set to the bit stream
@@ -444,28 +444,28 @@ void test_bit_stream() {
     01000001 (0x41) the correct value */
     assert(bit_stream->buffer[0] == 0x41);
 
-    /* writes a the 1000 bit set to the bit stream 
-	and then writes the 0010 bit set creating a new
-	byte value in the bit stream */
+    /* writes a the 1000 bit set to the bit stream
+    and then writes the 0010 bit set creating a new
+    byte value in the bit stream */
     write_byte_bit_stream(bit_stream, 0x08, 4);
-	write_byte_bit_stream(bit_stream, 0x02, 4);
+    write_byte_bit_stream(bit_stream, 0x02, 4);
 
-	/* verifies if the expected 10000010 (0x82)
-	value is current set in the output buffer */
+    /* verifies if the expected 10000010 (0x82)
+    value is current set in the output buffer */
     assert(bit_stream->buffer[1] == 0x82);
 
-	/* writes a partial stream of bit values that
-	would create an extra (pending) bits situation
-	and then verifies that the values are the expected
-	ones in a series of assertions */
+    /* writes a partial stream of bit values that
+    would create an extra (pending) bits situation
+    and then verifies that the values are the expected
+    ones in a series of assertions */
     write_byte_bit_stream(bit_stream, 0x08, 6);
-	write_byte_bit_stream(bit_stream, 0x02, 6);
-	write_byte_bit_stream(bit_stream, 0x02, 4);
-	assert(bit_stream->buffer[2] == 0x20);
-	assert(bit_stream->buffer[3] == 0x22);
+    write_byte_bit_stream(bit_stream, 0x02, 6);
+    write_byte_bit_stream(bit_stream, 0x02, 4);
+    assert(bit_stream->buffer[2] == 0x20);
+    assert(bit_stream->buffer[3] == 0x22);
 
     /* closes the bit stream and then deletes the references
-	to both the but and the file stream */
+    to both the but and the file stream */
     close_bit_stream(bit_stream);
     delete_bit_stream(bit_stream);
     delete_file_stream(file_stream);
@@ -611,9 +611,9 @@ void run_simple_tests() {
 #endif
 
     /* runs the complete suite of tests for the
-	commons infra-structure this a long running
-	blocking operation and so it may take some
-	time for the complete execution */
+    commons infra-structure this a long running
+    blocking operation and so it may take some
+    time for the complete execution */
    /* test_linked_list();
     test_linked_list_stress();
     test_linked_list_big();*/
