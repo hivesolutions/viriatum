@@ -125,8 +125,21 @@ VIRIATUM_EXPORT_PREFIX void create_bit_stream(struct bit_stream_t **bit_stream_p
 VIRIATUM_EXPORT_PREFIX void delete_bit_stream(struct bit_stream_t *bit_stream);
 VIRIATUM_EXPORT_PREFIX void open_bit_stream(struct bit_stream_t *bit_stream);
 VIRIATUM_EXPORT_PREFIX void close_bit_stream(struct bit_stream_t *bit_stream);
-VIRIATUM_EXPORT_PREFIX void read_bit_stream(struct bit_stream_t *bit_stream, unsigned char *buffer, size_t count, size_t *read_count);
-VIRIATUM_EXPORT_PREFIX void write_bit_stream(struct bit_stream_t *bit_stream, unsigned char *buffer, size_t size);
-VIRIATUM_EXPORT_PREFIX void write_byte_bit_stream(struct bit_stream_t *bit_stream, unsigned char byte, unsigned char size);
+void read_bit_stream(
+    struct bit_stream_t *bit_stream,
+	unsigned char *buffer,
+	size_t count,
+	size_t *read_count
+);
+VIRIATUM_EXPORT_PREFIX void write_bit_stream(
+    struct bit_stream_t *bit_stream,
+    unsigned char *buffer,
+	size_t size
+);
+VIRIATUM_EXPORT_PREFIX void write_byte_bit_stream(
+    struct bit_stream_t *bit_stream,
+    unsigned char byte,
+	unsigned char size
+);
 VIRIATUM_EXPORT_PREFIX void flush_write_bit_stream(struct bit_stream_t *bit_stream);
 VIRIATUM_EXPORT_PREFIX void flush_bit_stream(struct bit_stream_t *bit_stream);
