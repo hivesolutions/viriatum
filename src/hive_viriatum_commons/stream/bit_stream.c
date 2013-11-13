@@ -31,18 +31,18 @@
 
 void create_bit_stream(struct bit_stream_t **bit_stream_pointer, struct stream_t *stream) {
     /* retrieves the bit stream size and uses it to
-	allocate the "new" bit stream structure */
+    allocate the "new" bit stream structure */
     size_t bit_stream_size = sizeof(struct bit_stream_t);
     struct bit_stream_t *bit_stream = (struct bit_stream_t *) MALLOC(bit_stream_size);
 
     /* calculates the buffer size using the pre-defined
-	default value and then uses the value to allocate the
-	buffer that is going to be used */
+    default value and then uses the value to allocate the
+    buffer that is going to be used */
     size_t buffer_size = BIT_STREAM_BUFFER_SIZE * sizeof(unsigned char *);
     bit_stream->buffer = (unsigned char *) MALLOC(buffer_size);
 
     /* sets the (inner) stream reference, this is the refernece
-	is going to be used in the flushing and writing of data */
+    is going to be used in the flushing and writing of data */
     bit_stream->stream = stream;
 
     /* sets the various internal structure values of the bit stream */
@@ -83,23 +83,23 @@ void close_bit_stream(struct bit_stream_t *bit_stream) {
 
 void read_bit_stream(
     struct bit_stream_t *bit_stream,
-	unsigned char *buffer,
-	size_t count,
-	size_t *read_count
+    unsigned char *buffer,
+    size_t count,
+    size_t *read_count
 ) {
 }
 
 void write_bit_stream(
     struct bit_stream_t *bit_stream,
-	unsigned char *buffer,
-	size_t size
+    unsigned char *buffer,
+    size_t size
 ) {
 }
 
 void write_byte_bit_stream(
     struct bit_stream_t *bit_stream,
-	unsigned char byte,
-	unsigned char size
+    unsigned char byte,
+    unsigned char size
 ) {
     /* calculates the number of available bits (count) and
     then used it to calculate the number of extra bits */
@@ -163,8 +163,8 @@ void flush_write_bit_stream(struct bit_stream_t *bit_stream) {
     bit_stream->current_byte_write = 0;
 
     /* in case the stream (buffer) is full, need
-	to flush the bit stream writing it to the
-	underlying stream element */
+    to flush the bit stream writing it to the
+    underlying stream element */
     if(bit_stream->byte_counter_write == BIT_STREAM_BUFFER_SIZE) {
         flush_bit_stream(bit_stream);
     }
@@ -179,7 +179,7 @@ void flush_bit_stream(struct bit_stream_t *bit_stream) {
         /* sets the write buffer value */
         bit_stream->buffer[bit_stream->byte_counter_write] =\
             bit_stream->current_byte_write <<\
-			(BIT_STREAM_ITEM_SIZE - bit_stream->current_byte_offset_write);
+            (BIT_STREAM_ITEM_SIZE - bit_stream->current_byte_offset_write);
 
         /* resets the various bit stream write
         byte oriented structures */
@@ -189,12 +189,12 @@ void flush_bit_stream(struct bit_stream_t *bit_stream) {
     }
 
     /* flushes the bit stream in the (internal) stream
-	so that the contents get written in the stream */
+    so that the contents get written in the stream */
     stream->write(
-		stream,
-		bit_stream->buffer, 
-		bit_stream->byte_counter_write
-	);
+        stream,
+        bit_stream->buffer,
+        bit_stream->byte_counter_write
+    );
 
     /* resets the byte counter write (the write buffer
     is also reset by interface) */
