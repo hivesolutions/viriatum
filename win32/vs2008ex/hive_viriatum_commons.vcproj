@@ -567,6 +567,10 @@
                     >
                 </File>
                 <File
+                    RelativePath="..\..\src\hive_viriatum_commons\structures\priority_queue.c"
+                    >
+                </File>
+                <File
                     RelativePath="..\..\src\hive_viriatum_commons\structures\sort_map.c"
                     >
                 </File>
@@ -838,6 +842,10 @@
                 </File>
                 <File
                     RelativePath="..\..\src\hive_viriatum_commons\structures\linked_list.h"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\hive_viriatum_commons\structures\priority_queue.h"
                     >
                 </File>
                 <File
