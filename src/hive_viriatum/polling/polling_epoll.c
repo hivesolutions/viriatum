@@ -429,7 +429,7 @@ ERROR_CODE _poll_polling_epoll(
     int event_count;
 
     /* allocates space for the reference to the connection
-    to eb used in the iteration cycle (temporary object) */
+    to be used in the iteration cycle (temporary object) */
     struct connection_t *connection;
 
     /* starts the various temporary index counters for
