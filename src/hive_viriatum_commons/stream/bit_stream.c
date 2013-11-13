@@ -63,21 +63,20 @@ void delete_bit_stream(struct bit_stream_t *bit_stream) {
 }
 
 void open_bit_stream(struct bit_stream_t *bit_stream) {
-    /* retrieves the (inner) stream from the bit stream */
+    /* retrieves the (inner) stream from the bit stream
+	and opens it because it's going to be used in the
+	operation for both read and write */
     struct stream_t *stream = bit_stream->stream;
-
-    /* opens the (inner) stream */
     stream->open(stream);
 }
 
 void close_bit_stream(struct bit_stream_t *bit_stream) {
-    /* retrieves the (inner) stream from the bit stream */
+    /* retrieves the (inner) stream from the bit stream
+	and then flushes the bit stream so that there's no
+	more pending data and closes the stream to avoid any
+	extra operation to be performed in the stream */
     struct stream_t *stream = bit_stream->stream;
-
-    /* flushes the bit stream */
     flush_bit_stream(bit_stream);
-
-    /* closes the (inner) stream */
     stream->close(stream);
 }
 
@@ -103,7 +102,8 @@ void write_byte_bit_stream(
 ) {
     /* calculates the number of available bits (count) and
     then used it to calculate the number of extra bits */
-    unsigned char available_bits_count = BIT_STREAM_ITEM_SIZE - bit_stream->current_byte_offset_write;
+    unsigned char available_bits_count = BIT_STREAM_ITEM_SIZE -\
+		bit_stream->current_byte_offset_write;
     unsigned char extra_bits_count = size - available_bits_count;
 
     /* in case the number of extra bits is set the number
