@@ -61,7 +61,7 @@ void calc_freqs_huffman(struct huffman_t *huffman, struct stream_t *stream) {
     /* resets the current frequency table to the default zero
     value and then start iterating over the stream values to count
     them so that frquencies are possible to be calculated */
-    memset(freqs, 0, 256 * sizeof(size_t));
+    memset(freqs, 0, HUFFMAN_SYMBOL_SIZE * sizeof(size_t));
     while(TRUE) {
         /* reads the default amount of data from the stream into
         the buffer an incase the value is zero the end of file has
@@ -84,7 +84,18 @@ void calc_freqs_huffman(struct huffman_t *huffman, struct stream_t *stream) {
 }
 
 void generate_table_huffman(struct huffman_t *huffman, struct stream_t *stream) {
+    size_t count;
+    size_t index;
+
     stream->open(stream);
     calc_freqs_huffman(huffman, stream);
+
+    for(index = 0; index < HUFFMAN_SYMBOL_SIZE; index++) {
+        count = huffman->freqs[index];
+        if(count == 0) { continue; }
+
+        printf("%c\n", index);
+    }
+
     stream->close(stream);
 }

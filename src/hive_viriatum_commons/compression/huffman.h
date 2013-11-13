@@ -30,23 +30,34 @@
 #include "../stream/stream.h"
 
 /**
- * The default size for an huffman symbol.
- */
-#define HUFFMAN_SYMBOL_SIZE 8
-
-/**
  * The size to be used in the huffman interna
  * buffer storage.
  */
 #define HUFFMAN_BUFFER_SIZE 4096
 
 /**
+ * The maximum number of symbols that are considered
+ * for a default huffman table, this value should be
+ * the same as the maximum number of symbols represented
+ * by an eight bit based byte.
+ */
+#define HUFFMAN_SYMBOL_SIZE 256
+
+/**
  * Structure that hold the information for the
  * creation of huffman based dictionary/tables.
  */
 typedef struct huffman_t {
-    size_t freqs[256];
+    size_t freqs[HUFFMAN_SYMBOL_SIZE];
 } huffman;
+
+typedef struct huffman_node_t {
+    struct huffman_node_t *left;
+    struct huffman_node_t *right;
+    unsigned char symbol;
+    unsigned char byte;
+    unsigned char bit_count;
+} huffman_node;
 
 VIRIATUM_EXPORT_PREFIX void create_huffman(struct huffman_t **huffman_pointer);
 VIRIATUM_EXPORT_PREFIX void delete_huffman(struct huffman_t *huffman);
