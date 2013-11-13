@@ -251,11 +251,38 @@ void test_sort_map() {
 }
 
 void test_priority_queue() {
+	/* allocates the space for the temporary value pointer
+	and for the the priority queue structure */
+	void *value;
     struct priority_queue_t *priority_queue;
 
-    create_priority_queue(&priority_queue);
+	/* creates the priority queue and pushes the various
+	values that are meant to be sorted to the queue so that
+	these values are placed in the correct positions, the
+	comparator that is going to be used is the default one */
+    create_priority_queue(&priority_queue, _compare);
+    push_priority_queue(priority_queue, (void *) 3);
+    push_priority_queue(priority_queue, (void *) 2);
+    push_priority_queue(priority_queue, (void *) 4);
+	push_priority_queue(priority_queue, (void *) 1);
+	push_priority_queue(priority_queue, (void *) 3);
 
-	delete_priority_queue(priority_queue);
+	/* pops the various values from the queue and verifies that
+	they are now sorted in the correct order */
+	pop_priority_queue(priority_queue, &value);
+    assert((size_t) value == 1);
+    pop_priority_queue(priority_queue, &value);
+    assert((size_t) value == 2);
+    pop_priority_queue(priority_queue, &value);
+    assert((size_t) value == 3);
+	pop_priority_queue(priority_queue, &value);
+    assert((size_t) value == 3);
+    pop_priority_queue(priority_queue, &value);
+    assert((size_t) value == 4);
+
+	/* deletes the priority queue structure as its no longer going
+	to be used for the storage (avoids memory leaking) */
+    delete_priority_queue(priority_queue);
 }
 
 void test_string_buffer() {
@@ -610,17 +637,14 @@ void test_sha1() {
 
 int _compare(void *first, void *second) {
     /* in case the first element is smaller
-    than the second element */
-    if(first < second) {
-        /* returns negative value */
-        return -1;
-    }
+    than the second element returns a negative
+    value indicating the smaller than */
+    if(first < second) { return -1; }
+
     /* in case the first value is larger
-    than the second element */
-    else if(first > second) {
-        /* returns positive value */
-        return 1;
-    }
+    than the second element a positive value
+    is return indicating the larger than */
+    else if(first > second) { return 1; }
 
     /* returns zero value (equals) */
     return 0;
@@ -644,7 +668,7 @@ void run_simple_tests() {
     test_array_list();
     test_hash_map();
     test_sort_map();
-	test_priority_queue();
+    test_priority_queue();
     test_string_buffer();
     test_linked_buffer();
     test_base64();
