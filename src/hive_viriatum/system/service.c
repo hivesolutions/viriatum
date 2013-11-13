@@ -1983,6 +1983,7 @@ ERROR_CODE _default_options_service(struct service_t *service, struct hash_map_t
     set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".mht", "message/rfc822");
     set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".mhtml", "message/rfc822");
     set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".mid", "audio/mid");
+    set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".mka", "audio/x-matroska");
     set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".mkv", "video/x-matroska");
     set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".mny", "application/x-msmoney");
     set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".mov", "video/quicktime");
@@ -2077,6 +2078,7 @@ ERROR_CODE _default_options_service(struct service_t *service, struct hash_map_t
     set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".wav", "audio/x-wav");
     set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".wcm", "application/vnd.ms-works");
     set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".wdb", "application/vnd.ms-works");
+    set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".weba", "audio/webm");
     set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".webm", "video/webm");
     set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".wks", "application/vnd.ms-works");
     set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".wmf", "application/x-msmetafile");
