@@ -399,24 +399,34 @@ void test_bencoding() {
 }
 
 void test_huffman() {
-    /* allocates space for the huffman */
+    /* allocates space for both the file stream that is
+    going to be used in the reading process and for the
+    huffman structure to be used in the test */
+    struct file_stream_t *file_stream;
     struct huffman_t *huffman;
 
-    /* creates the huffman (encoder) */
+    create_file_stream(
+        &file_stream,
+        (unsigned char *) "C:/hello.txt",
+        (unsigned char *) "rb"
+    );
+
+    /* creates the huffman (encoder) and then runs the
+    generation of the huffman table in it */
     create_huffman(&huffman);
+    generate_table_huffman(huffman, file_stream->stream);
 
-    /* generates the huffman table */
-    generate_table_huffman(huffman, NULL);
-
-    /* deletes the huffman (encoder) */
+    /* deletes both the huffman encoder and the file stream
+    references to avoid any memory leak */
     delete_huffman(huffman);
+    delete_file_stream(file_stream);
 }
 
 void test_bit_stream() {
-    /* allocates space for the file stream */
+    /* allocates space for both the file and the
+    bit based streams, that are going to be used
+    for the test of the bit stream infra-structure */
     struct file_stream_t *file_stream;
-
-    /* allocates space for the bit stream */
     struct bit_stream_t *bit_stream;
 
     /* creates the file stream that is going to be used
@@ -482,7 +492,11 @@ void test_file_stream() {
     unsigned char buffer[128];
 
     /* creates the file stream */
-    create_file_stream(&file_stream, (unsigned char *) "hello.txt", (unsigned char *) "wb");
+    create_file_stream(
+        &file_stream,
+        (unsigned char *) "hello.txt",
+        (unsigned char *) "wb"
+    );
 
     /* retrieves the stream from the file stream, in order
     to be able to use the "normal" stream functions */

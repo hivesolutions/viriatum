@@ -44,5 +44,47 @@ void delete_huffman(struct huffman_t *huffman) {
     FREE(huffman);
 }
 
+void calc_freqs_huffman(struct huffman_t *huffman, struct stream_t *stream) {
+    /* reserves space for the index the counter for the read
+    operation and for the temporary byte variable to be used
+    in the buffer read iteration loop */
+    size_t index;
+    size_t count;
+    unsigned char byte;
+
+    /* allocates space for the buffer that is going to be used
+    in the read operation of the file and then retrieves the
+    reference to the frequecies sequence from the huffman */
+    unsigned char buffer[HUFFMAN_BUFFER_SIZE];
+    size_t *freqs = huffman->freqs;
+
+    /* resets the current frequency table to the default zero
+    value and then start iterating over the stream values to count
+    them so that frquencies are possible to be calculated */
+    memset(freqs, 0, 256 * sizeof(size_t));
+    while(TRUE) {
+        /* reads the default amount of data from the stream into
+        the buffer an incase the value is zero the end of file has
+        been reached and so the iteration must be stopped */
+        count = stream->read(stream, buffer, HUFFMAN_BUFFER_SIZE);
+        if(count == 0) { break; }
+
+        /* iterates over the complete set of bytes in the buffer
+        and for each of its values in the array increments the value
+        so that the importance of it is increased */
+        for(index = 0; index < count; index++) {
+            byte = buffer[index];
+            freqs[byte]++;
+        }
+    }
+
+    /* restores the stream back to the original position so that
+    additional operations may be performed correctly */
+    stream->seek(stream, 0);
+}
+
 void generate_table_huffman(struct huffman_t *huffman, struct stream_t *stream) {
+    stream->open(stream);
+    calc_freqs_huffman(huffman, stream);
+    stream->close(stream);
 }

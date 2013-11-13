@@ -51,6 +51,7 @@ void create_file_stream(struct file_stream_t **file_stream_pointer, unsigned cha
     file_stream->stream->read = read_file_stream;
     file_stream->stream->write = write_file_stream;
     file_stream->stream->flush = flush_file_stream;
+    file_stream->stream->seek = seek_file_stream;
 
     /* sets the file stream in the file stream pointer */
     *file_stream_pointer = file_stream;
@@ -102,8 +103,15 @@ size_t write_file_stream(struct stream_t *stream, unsigned char *buffer, size_t 
 }
 
 void flush_file_stream(struct stream_t *stream) {
-    /* retrieves the file stream from the stream (as the lowe rsubstrate)
+    /* retrieves the file stream from the stream (as the lower substrate)
     and flushes the current contents to the underlying file object */
     struct file_stream_t *file_stream = (struct file_stream_t *) stream->lower;
     fflush(file_stream->file);
+}
+
+void seek_file_stream(struct stream_t *stream, size_t target) {
+    /* retrieves the file stream from the stream (as the lower substrate)
+    and then seeks the target object into the desired position */
+    struct file_stream_t *file_stream = (struct file_stream_t *) stream->lower;
+    fseek(file_stream->file, target, 0);
 }

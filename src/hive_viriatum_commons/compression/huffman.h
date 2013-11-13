@@ -45,8 +45,7 @@
  * creation of huffman based dictionary/tables.
  */
 typedef struct huffman_t {
-    struct stream_t *stream;
-    size_t size;
+    size_t freqs[256];
 } huffman;
 
 VIRIATUM_EXPORT_PREFIX void create_huffman(struct huffman_t **huffman_pointer);
