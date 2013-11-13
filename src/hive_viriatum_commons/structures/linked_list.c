@@ -500,34 +500,34 @@ void reset_iterator_linked_list(struct linked_list_t *linked_list, struct iterat
 }
 
 void get_next_iterator_linked_list(struct iterator_t *iterator, void **next_pointer) {
-    /* retrieves the current node from the iterator parameters */
-    struct linked_list_node_t *current_node = (struct linked_list_node_t *) iterator->parameters;
+    /* retrieves the current node from the iterator parameters
+    this value should represent the base value for the current
+    next operation to be performed */
+    struct linked_list_node_t *current_node =\
+        (struct linked_list_node_t *) iterator->parameters;
 
-    /* allocates the next node */
+    /* allocates space for both the next node reference and for
+    the pointer to the next value */
     struct linked_list_node_t *next_node;
-
-    /* allocates the next */
     void *next;
 
-    /* in case the current node is null */
+    /* in case the current node is null must set both
+    the next node and the next value as null*/
     if(current_node == NULL) {
-        /* sets the next node as null */
         next_node = NULL;
-
-        /* sets the next as null */
         next = NULL;
-    } else {
-        /* retrieves the next node from the current node */
+    }
+    /* otherwise retrieves the next node from the current one
+    and uses the the current node's value as the next value */
+    else {
         next_node = current_node->next;
-
-        /* sets the next as the current node value */
         next = current_node->value;
     }
 
-    /* sets the next node in the iterator parameters */
+    /* sets the next node in the iterator parameters and updates
+    the next pointer value with the next value so that the value
+    is actually returned as the next value */
     iterator->parameters = (void *) next_node;
-
-    /* sets the next in the next pointer */
     *next_pointer = next;
 }
 
