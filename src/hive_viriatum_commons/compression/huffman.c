@@ -35,6 +35,7 @@ void create_huffman(struct huffman_t **huffman_pointer) {
     allocated value to the caller function */
     size_t huffman_size = sizeof(struct huffman_t);
     struct huffman_t *huffman = (struct huffman_t *) MALLOC(huffman_size);
+    huffman->bit_count = 0;
     huffman->root = NULL;
     *huffman_pointer = huffman;
 }
@@ -79,6 +80,8 @@ void encode_huffman(struct huffman_t *huffman, struct stream_t *in, struct bit_s
     in->open(in);
     open_bit_stream(out);
 
+    huffman->bit_count = 0;
+
     while(TRUE) {
         count = in->read(in, buffer, HUFFMAN_BUFFER_SIZE);
         if(count == 0) { break; }
@@ -86,11 +89,77 @@ void encode_huffman(struct huffman_t *huffman, struct stream_t *in, struct bit_s
         for(index = 0; index < count; index++) {
             byte = buffer[index];
             node = huffman->nodes[byte];
+
+            huffman->bit_count += node->bit_count;
             write_byte_bit_stream(out, node->code, node->bit_count);
         }
     }
 
     close_bit_stream(out);
+    in->close(in);
+}
+
+void decode_huffman(struct huffman_t *huffman, struct stream_t *in, struct stream_t *out) {
+    size_t index;
+    size_t count;
+    size_t out_count;
+    unsigned char bit;
+    unsigned char code;
+    unsigned char is_leaf;
+    unsigned char bit_count;
+    unsigned char in_buffer[HUFFMAN_BUFFER_SIZE];
+    unsigned char out_buffer[HUFFMAN_BUFFER_SIZE];
+    long long total_count = 0;
+
+    size_t major_count = 0;
+
+    struct huffman_node_t *node = huffman->root;
+
+    in->open(in);
+    out->open(out);
+
+    while(TRUE) {
+        count = in->read(in, in_buffer, HUFFMAN_BUFFER_SIZE);
+        if(count == 0) { break; }
+
+        out_count = 0;
+
+        for(index = 0; index < count; index++) {
+            code = in_buffer[index];
+            bit_count = 0;
+
+            while(TRUE) {
+                if(bit_count == 8) { break; }
+                if(total_count == huffman->bit_count) { break; }
+
+                bit_count++;
+                total_count++;
+
+                bit = code >> (8 - bit_count);
+                if(bit & 1) { node = node->right; }
+                else { node = node->left; }
+
+                is_leaf = node->left == NULL && node->right == NULL;
+                if(is_leaf == FALSE) { continue; }
+
+                out_buffer[out_count] = node->symbol;
+                out_count++;
+                if(out_count == HUFFMAN_BUFFER_SIZE) {
+                    out->write(out, out_buffer, out_count);
+                    out_count = 0;
+                }
+
+                node = huffman->root;
+                major_count++;
+            }
+        }
+
+        if(out_count > 0) {
+            out->write(out, out_buffer, out_count);
+        }
+    }
+
+    out->close(out);
     in->close(in);
 }
 

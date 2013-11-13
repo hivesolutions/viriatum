@@ -63,6 +63,7 @@ typedef struct huffman_node_t {
  * creation of huffman based dictionary/tables.
  */
 typedef struct huffman_t {
+    long long bit_count;
     struct huffman_node_t *root;
     struct huffman_node_t *nodes[HUFFMAN_SYMBOL_SIZE];
     size_t freqs[HUFFMAN_SYMBOL_SIZE];
@@ -74,7 +75,7 @@ VIRIATUM_EXPORT_PREFIX void create_huffman_node(struct huffman_node_t **huffman_
 VIRIATUM_EXPORT_PREFIX void delete_huffman_node(struct huffman_node_t *huffman_node);
 VIRIATUM_EXPORT_PREFIX void delete_tree_huffman(struct huffman_node_t *node);
 VIRIATUM_EXPORT_PREFIX void encode_huffman(struct huffman_t *huffman, struct stream_t *in, struct bit_stream_t *out);
-VIRIATUM_EXPORT_PREFIX void decode_huffman(struct huffman_t *huffman, struct bit_stream_t *in, struct stream_t *out);
+VIRIATUM_EXPORT_PREFIX void decode_huffman(struct huffman_t *huffman, struct stream_t *in, struct stream_t *out);
 VIRIATUM_EXPORT_PREFIX void generate_table_huffman(struct huffman_t *huffman, struct stream_t *stream);
 VIRIATUM_EXPORT_PREFIX void calc_freqs_huffman(struct huffman_t *huffman, struct stream_t *stream);
 VIRIATUM_EXPORT_PREFIX void allocate_tree_huffman(
