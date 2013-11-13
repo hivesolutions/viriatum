@@ -2077,6 +2077,7 @@ ERROR_CODE _default_options_service(struct service_t *service, struct hash_map_t
     set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".wav", "audio/x-wav");
     set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".wcm", "application/vnd.ms-works");
     set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".wdb", "application/vnd.ms-works");
+	set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".webm", "video/webm");
     set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".wks", "application/vnd.ms-works");
     set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".wmf", "application/x-msmetafile");
     set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".wps", "application/vnd.ms-works");
