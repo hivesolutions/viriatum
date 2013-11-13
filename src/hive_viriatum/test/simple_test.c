@@ -423,7 +423,7 @@ void test_bit_stream() {
 	as the underlying stream for the bit stream */
     create_file_stream(
 		&file_stream,
-		(unsigned char *) "bit_stream.txt",
+		(unsigned char *) "bit_stream.bin",
 		(unsigned char *) "wb"
 	);
 
@@ -444,16 +444,20 @@ void test_bit_stream() {
     01000001 (0x41) the correct value */
     assert(bit_stream->buffer[0] == 0x41);
 
-    /* writes a the 0100 bit set to the bit stream */
-    write_byte_bit_stream(bit_stream, 0x04, 4);
+    /* writes a the 1000 bit set to the bit stream 
+	and then writes the 0010 bit set creating a new
+	byte value in the bit stream */
+    write_byte_bit_stream(bit_stream, 0x08, 4);
+	write_byte_bit_stream(bit_stream, 0x02, 4);
 
-    /* closes the bit stream */
+	/* verifies if the expected 10000010 (0x82)
+	value is current set in the output buffer */
+    assert(bit_stream->buffer[1] == 0x82);
+
+    /* closes the bit stream and then deletes the references
+	to both the but and the file stream */
     close_bit_stream(bit_stream);
-
-    /* deletes the bit stream */
     delete_bit_stream(bit_stream);
-
-    /* deletes the file stream */
     delete_file_stream(file_stream);
 }
 
@@ -600,9 +604,9 @@ void run_simple_tests() {
 	commons infra-structure this a long running
 	blocking operation and so it may take some
 	time for the complete execution */
-    test_linked_list();
+   /* test_linked_list();
     test_linked_list_stress();
-    test_linked_list_big();
+    test_linked_list_big();*/
     test_array_list();
     test_hash_map();
     test_sort_map();

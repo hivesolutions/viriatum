@@ -106,17 +106,16 @@ void write_byte_bit_stream(
 		bit_stream->current_byte_offset_write;
     unsigned char extra_bits_count = size - available_bits_count;
 
-    /* in case the number of extra bits is set the number
-    of bits to be writen is the same as the available bits */
+    /* in case the number of bits to be written is greater
+	thatn the available number of bits for the current byte
+	need to append some extra bits */
     if(size > available_bits_count) {
-        /* sets the size as the available bits count */
-        size = available_bits_count;
+		size = available_bits_count;
+		extra_bits_count = size - available_bits_count;
     }
-    /* otherwise the number of extra bits is zero */
-    else {
-        /* resets the extra bits count */
-        extra_bits_count = 0;
-    }
+    /* otherwise the number of extra bits is zero, the value
+	must then be reset to the invalid (zero value) */
+    else { extra_bits_count = 0; }
 
     /* shifts the current byte value (by the write size) */
     bit_stream->current_byte_write <<= size;
@@ -125,7 +124,8 @@ void write_byte_bit_stream(
     to the current byte (shifts the byte the number of extra bits) */
     bit_stream->current_byte_write |= byte >> extra_bits_count;
 
-    /* increments the bit counter and offset by the size */
+    /* increments the global bit counter and the current byte offset by
+	the size of the currently written bits */
     bit_stream->bit_counter_write += size;
     bit_stream->current_byte_offset_write += size;
 
