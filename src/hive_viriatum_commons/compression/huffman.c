@@ -62,6 +62,31 @@ void delete_huffman_node(struct huffman_node_t *huffman_node) {
     FREE(huffman_node);
 }
 
+void encode_huffman(struct huffman_t *huffman, struct stream_t *in, struct bit_stream_t *out) {
+    size_t count;
+    size_t index;
+    unsigned char byte;
+    struct huffman_node_t *node;
+    unsigned char buffer[HUFFMAN_BUFFER_SIZE];
+
+    in->open(in);
+    open_bit_stream(out);
+
+    while(TRUE) {
+        count = in->read(in, buffer, HUFFMAN_BUFFER_SIZE);
+        if(count == 0) { break; }
+
+        for(index = 0; index < count; index++) {
+            byte = buffer[index];
+            node = huffman->nodes[byte];
+            write_byte_bit_stream(out, node->code, node->bit_count);
+        }
+    }
+
+    close_bit_stream(out);
+    in->close(in);
+}
+
 void generate_table_huffman(struct huffman_t *huffman, struct stream_t *stream) {
     size_t count;
     size_t index;
@@ -84,6 +109,7 @@ void generate_table_huffman(struct huffman_t *huffman, struct stream_t *stream) 
         node->value = count;
         node->symbol = (unsigned char) index;
 
+        huffman->nodes[index] = node;
         push_priority_queue(queue, (void *) node);
     }
 
