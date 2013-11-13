@@ -34,6 +34,8 @@ void create_priority_queue(struct priority_queue_t **priority_queue_pointer, com
     struct priority_queue_t *priority_queue = (struct priority_queue_t *) MALLOC(priority_queue_size);
 
     priority_queue->cmp = cmp;
+    priority_queue->size = 0;
+
     create_linked_list(&priority_queue->list);
 
     *priority_queue_pointer = priority_queue;
@@ -63,8 +65,11 @@ void push_priority_queue(struct priority_queue_t *priority_queue, void *value) {
 
     delete_iterator_linked_list(priority_queue->list, iterator);
     append_index_value_linked_list(priority_queue->list, value, index);
+
+    priority_queue->size++;
 }
 
 void pop_priority_queue(struct priority_queue_t *priority_queue, void **value_pointer) {
     pop_value_linked_list(priority_queue->list, value_pointer, TRUE);
+    priority_queue->size--;
 }

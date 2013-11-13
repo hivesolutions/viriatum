@@ -31,9 +31,9 @@
 #include "linked_list.h"
 
 typedef struct priority_queue_t {
-    size_t size;
     struct linked_list_t *list;
     comparator cmp;
+    size_t size;
 } priority_queue;
 
 typedef struct queue_node_t {
