@@ -250,6 +250,14 @@ void test_sort_map() {
     delete_sort_map(sort_map);
 }
 
+void test_priority_queue() {
+    struct priority_queue_t *priority_queue;
+
+    create_priority_queue(&priority_queue);
+
+	delete_priority_queue(priority_queue);
+}
+
 void test_string_buffer() {
     /* allocates space for the string buffer */
     struct string_buffer_t *string_buffer;
@@ -630,12 +638,13 @@ void run_simple_tests() {
     commons infra-structure this a long running
     blocking operation and so it may take some
     time for the complete execution */
-   /* test_linked_list();
+    test_linked_list();
     test_linked_list_stress();
-    test_linked_list_big();*/
+    test_linked_list_big();
     test_array_list();
     test_hash_map();
     test_sort_map();
+	test_priority_queue();
     test_string_buffer();
     test_linked_buffer();
     test_base64();

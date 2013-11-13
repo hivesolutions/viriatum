@@ -79,6 +79,11 @@ void test_hash_map();
 void test_sort_map();
 
 /**
+ * Tests the priority queue structure.
+ */
+void test_priority_queue();
+
+/**
  * Tests the string buffer, used
  * to buffer string in memory for
  * fast writing.
