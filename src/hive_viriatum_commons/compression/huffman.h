@@ -54,7 +54,7 @@ typedef struct huffman_node_t {
     struct huffman_node_t *right;
     size_t value;
     unsigned char symbol;
-    unsigned char code;
+    unsigned short code;
     unsigned char bit_count;
 } huffman_node;
 
@@ -81,7 +81,7 @@ VIRIATUM_EXPORT_PREFIX void calc_freqs_huffman(struct huffman_t *huffman, struct
 VIRIATUM_EXPORT_PREFIX void allocate_tree_huffman(
     struct huffman_t *huffman,
     struct huffman_node_t *node,
-    unsigned char code,
+    unsigned short code,
     unsigned char bit_count
 );
 VIRIATUM_EXPORT_PREFIX int _compare_huffman(void *first, void *second);

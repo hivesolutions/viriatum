@@ -94,7 +94,7 @@ void encode_huffman(struct huffman_t *huffman, struct stream_t *in, struct strea
             node = huffman->nodes[byte];
 
             huffman->bit_count += node->bit_count;
-            write_byte_bit_stream(bit_stream, node->code, node->bit_count);
+            write_word_bit_stream(bit_stream, node->code, node->bit_count);
         }
     }
 
@@ -256,7 +256,7 @@ void calc_freqs_huffman(struct huffman_t *huffman, struct stream_t *stream) {
 void allocate_tree_huffman(
     struct huffman_t *huffman,
     struct huffman_node_t *node,
-    unsigned char code,
+    unsigned short code,
     unsigned char bit_count
 ) {
     unsigned char is_leaf = node->left == NULL && node->right == NULL;
