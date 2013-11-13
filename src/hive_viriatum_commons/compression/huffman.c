@@ -94,7 +94,11 @@ void encode_huffman(struct huffman_t *huffman, struct stream_t *in, struct strea
             node = huffman->nodes[byte];
 
             huffman->bit_count += node->bit_count;
-            write_word_bit_stream(bit_stream, node->code, node->bit_count);
+            write_word_bit_stream(
+			    bit_stream,
+				node->code,
+				node->bit_count
+			);
         }
     }
 
@@ -109,9 +113,9 @@ void decode_huffman(struct huffman_t *huffman, struct stream_t *in, struct strea
     size_t count;
     size_t out_count;
     unsigned char bit;
-    unsigned char code;
     unsigned char is_leaf;
     unsigned char bit_count;
+	register unsigned char code;
     unsigned char in_buffer[HUFFMAN_BUFFER_SIZE];
     unsigned char out_buffer[HUFFMAN_BUFFER_SIZE];
     long long total_count = 0;
