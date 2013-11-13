@@ -405,6 +405,8 @@ void test_huffman() {
     struct file_stream_t *file_stream;
     struct huffman_t *huffman;
 
+    /* creates the file stream that is going to be used for
+    the testing of the huffman infra-structure */
     create_file_stream(
         &file_stream,
         (unsigned char *) "C:/hello.txt",
