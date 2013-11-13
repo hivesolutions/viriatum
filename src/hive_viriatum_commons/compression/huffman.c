@@ -70,15 +70,18 @@ void delete_tree_huffman(struct huffman_node_t *node) {
     delete_huffman_node(node);
 }
 
-void encode_huffman(struct huffman_t *huffman, struct stream_t *in, struct bit_stream_t *out) {
+void encode_huffman(struct huffman_t *huffman, struct stream_t *in, struct stream_t *out) {
     size_t count;
     size_t index;
     unsigned char byte;
     struct huffman_node_t *node;
     unsigned char buffer[HUFFMAN_BUFFER_SIZE];
+    struct bit_stream_t *bit_stream;
+
+    create_bit_stream(&bit_stream, out);
 
     in->open(in);
-    open_bit_stream(out);
+    open_bit_stream(bit_stream);
 
     huffman->bit_count = 0;
 
@@ -91,12 +94,14 @@ void encode_huffman(struct huffman_t *huffman, struct stream_t *in, struct bit_s
             node = huffman->nodes[byte];
 
             huffman->bit_count += node->bit_count;
-            write_byte_bit_stream(out, node->code, node->bit_count);
+            write_byte_bit_stream(bit_stream, node->code, node->bit_count);
         }
     }
 
-    close_bit_stream(out);
+    close_bit_stream(bit_stream);
     in->close(in);
+
+    delete_bit_stream(bit_stream);
 }
 
 void decode_huffman(struct huffman_t *huffman, struct stream_t *in, struct stream_t *out) {

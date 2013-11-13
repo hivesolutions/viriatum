@@ -74,7 +74,7 @@ VIRIATUM_EXPORT_PREFIX void delete_huffman(struct huffman_t *huffman);
 VIRIATUM_EXPORT_PREFIX void create_huffman_node(struct huffman_node_t **huffman_node_pointer);
 VIRIATUM_EXPORT_PREFIX void delete_huffman_node(struct huffman_node_t *huffman_node);
 VIRIATUM_EXPORT_PREFIX void delete_tree_huffman(struct huffman_node_t *node);
-VIRIATUM_EXPORT_PREFIX void encode_huffman(struct huffman_t *huffman, struct stream_t *in, struct bit_stream_t *out);
+VIRIATUM_EXPORT_PREFIX void encode_huffman(struct huffman_t *huffman, struct stream_t *in, struct stream_t *out);
 VIRIATUM_EXPORT_PREFIX void decode_huffman(struct huffman_t *huffman, struct stream_t *in, struct stream_t *out);
 VIRIATUM_EXPORT_PREFIX void generate_table_huffman(struct huffman_t *huffman, struct stream_t *stream);
 VIRIATUM_EXPORT_PREFIX void calc_freqs_huffman(struct huffman_t *huffman, struct stream_t *stream);
