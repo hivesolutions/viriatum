@@ -419,13 +419,20 @@ void test_bit_stream() {
     /* allocates space for the bit stream */
     struct bit_stream_t *bit_stream;
 
-    /* creates the file stream */
-    create_file_stream(&file_stream, (unsigned char *) "bit_stream.txt", (unsigned char *) "wb");
+    /* creates the file stream that is going to be used
+	as the underlying stream for the bit stream */
+    create_file_stream(
+		&file_stream,
+		(unsigned char *) "bit_stream.txt",
+		(unsigned char *) "wb"
+	);
 
-    /* creates the bit stream */
+    /* creates the bit stream using the file stream as the
+	underlying stream structure to be used*/
     create_bit_stream(&bit_stream, file_stream->stream);
 
-    /* opens the bit stream */
+    /* opens the bit stream so that operations may start
+	to be triggered for the bit stream */
     open_bit_stream(bit_stream);
 
     /* writes the 0100 bit set to the bit stream
@@ -589,55 +596,27 @@ void run_simple_tests() {
 #endif
 #endif
 
-    /* tests the linked list using the default
-    and the stress approach */
+    /* runs the complete suite of tests for the
+	commons infra-structure this a long running
+	blocking operation and so it may take some
+	time for the complete execution */
     test_linked_list();
     test_linked_list_stress();
     test_linked_list_big();
-
-    /* tests the array list */
     test_array_list();
-
-    /* tests the hash map */
     test_hash_map();
-
-    /* tests the sort map */
     test_sort_map();
-
-    /* tests the string buffer */
     test_string_buffer();
-
-    /* tests the linked buffer */
     test_linked_buffer();
-
-    /* tests the base 64 encoder */
     test_base64();
-
-    /* tests the bencoding encoder */
     test_bencoding();
-
-    /* tests the huffman encoder */
     test_huffman();
-
-    /* tests the bit stream */
     test_bit_stream();
-
-    /* tests the file stream */
     test_file_stream();
-
-    /* tests the template handler */
     test_template_handler();
-
-    /* tests the quick sort algorithm */
     test_quicksort();
     test_quicksort_linked_list();
-
-    /* tests the crc32 hash function */
     test_crc_32();
-
-    /* tests the md5 hash function */
     test_md5();
-
-    /* tests the sha1 hash function */
     test_sha1();
 }
