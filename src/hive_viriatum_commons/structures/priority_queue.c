@@ -45,21 +45,26 @@ void delete_priority_queue(struct priority_queue_t *priority_queue) {
 }
 
 void push_priority_queue(struct priority_queue_t *priority_queue, void *value) {
-	struct iterator_t *iterator;
-	void *entry;
-	int result;
+    struct iterator_t *iterator;
+    void *entry;
+    int result;
+    size_t index = 0;
 
-	create_iterator_linked_list(priority_queue->list, &iterator);
+    create_iterator_linked_list(priority_queue->list, &iterator);
     while(TRUE) {
         get_next_iterator(iterator, (void **) &entry);
-        if(entry == NULL) {  break; }
+        if(entry == NULL) { break; }
 
-		result = priority_queue->cmp(value, entry);
-		printf("%d\n", result);
-	}
+        result = priority_queue->cmp(value, entry);
+        if(result < 0) { break; }
 
-	delete_iterator_linked_list(priority_queue->list, iterator);
+        index++;
+    }
+
+    delete_iterator_linked_list(priority_queue->list, iterator);
+    append_index_value_linked_list(priority_queue->list, value, index);
 }
 
 void pop_priority_queue(struct priority_queue_t *priority_queue, void **value_pointer) {
+    pop_value_linked_list(priority_queue->list, value_pointer, TRUE);
 }
