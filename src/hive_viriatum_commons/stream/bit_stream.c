@@ -95,6 +95,20 @@ void write_bit_stream(
 ) {
 }
 
+void write_word_bit_stream(
+    struct bit_stream_t *bit_stream,
+    unsigned short word,
+    unsigned char size
+) {
+    short upper_s = size - 8;
+    short lower_s = size > 8 ? 8 : size;
+    unsigned char upper = (unsigned char) (word >> 8);
+    unsigned char lower = (unsigned char) (word & 0x00ff);
+
+    if(upper_s > 0) { write_byte_bit_stream(bit_stream, upper, (unsigned char) upper_s); }
+    if(lower_s > 0) { write_byte_bit_stream(bit_stream, lower, (unsigned char) lower_s); }
+}
+
 void write_byte_bit_stream(
     struct bit_stream_t *bit_stream,
     unsigned char byte,

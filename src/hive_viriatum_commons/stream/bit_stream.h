@@ -136,6 +136,11 @@ VIRIATUM_EXPORT_PREFIX void write_bit_stream(
     unsigned char *buffer,
     size_t size
 );
+VIRIATUM_EXPORT_PREFIX void write_word_bit_stream(
+    struct bit_stream_t *bit_stream,
+    unsigned short word,
+    unsigned char size
+);
 VIRIATUM_EXPORT_PREFIX void write_byte_bit_stream(
     struct bit_stream_t *bit_stream,
     unsigned char byte,
