@@ -1945,7 +1945,7 @@ ERROR_CODE _default_options_service(struct service_t *service, struct hash_map_t
     set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".evy", "application/envoy");
     set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".exe", "application/octet-stream");
     set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".fif", "application/fractals");
-	set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".flac", "audio/x-flac");
+    set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".flac", "audio/x-flac");
     set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".flr", "x-world/x-vrml");
     set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".gif", "image/gif");
     set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".gtar", "application/x-gtar");
@@ -1978,6 +1978,7 @@ ERROR_CODE _default_options_service(struct service_t *service, struct hash_map_t
     set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".m13", "application/x-msmediaview");
     set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".m14", "application/x-msmediaview");
     set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".m3u", "audio/x-mpegurl");
+    set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".m4a", "audio/mp4");
     set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".man", "application/x-troff-man");
     set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".mdb", "application/x-msaccess");
     set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".me", "application/x-troff-me");
