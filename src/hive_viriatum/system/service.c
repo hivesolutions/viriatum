@@ -1945,6 +1945,7 @@ ERROR_CODE _default_options_service(struct service_t *service, struct hash_map_t
     set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".evy", "application/envoy");
     set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".exe", "application/octet-stream");
     set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".fif", "application/fractals");
+	set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".flac", "audio/x-flac");
     set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".flr", "x-world/x-vrml");
     set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".gif", "image/gif");
     set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".gtar", "application/x-gtar");
@@ -2004,6 +2005,7 @@ ERROR_CODE _default_options_service(struct service_t *service, struct hash_map_t
     set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".nws", "message/rfc822");
     set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".oda", "application/oda");
     set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".odf", "font/opentype");
+    set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".ogg", "audio/ogg");
     set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".p10", "application/pkcs10");
     set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".p12", "application/x-pkcs12");
     set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".p7b", "application/x-pkcs7-certificates");
