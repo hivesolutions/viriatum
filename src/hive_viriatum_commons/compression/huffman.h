@@ -28,6 +28,7 @@
 #pragma once
 
 #include "../stream/stream.h"
+#include "../structures/structures.h"
 
 /**
  * The size to be used in the huffman interna
@@ -48,17 +49,29 @@
  * creation of huffman based dictionary/tables.
  */
 typedef struct huffman_t {
+    struct huffman_node_t *root;
     size_t freqs[HUFFMAN_SYMBOL_SIZE];
 } huffman;
 
 typedef struct huffman_node_t {
     struct huffman_node_t *left;
     struct huffman_node_t *right;
+    size_t value;
     unsigned char symbol;
-    unsigned char byte;
+    unsigned char code;
     unsigned char bit_count;
 } huffman_node;
 
 VIRIATUM_EXPORT_PREFIX void create_huffman(struct huffman_t **huffman_pointer);
 VIRIATUM_EXPORT_PREFIX void delete_huffman(struct huffman_t *huffman);
+VIRIATUM_EXPORT_PREFIX void create_huffman_node(struct huffman_node_t **huffman_node_pointer);
+VIRIATUM_EXPORT_PREFIX void delete_huffman_node(struct huffman_node_t *huffman_node);
 VIRIATUM_EXPORT_PREFIX void generate_table_huffman(struct huffman_t *huffman, struct stream_t *stream);
+VIRIATUM_EXPORT_PREFIX void calc_freqs_huffman(struct huffman_t *huffman, struct stream_t *stream);
+VIRIATUM_EXPORT_PREFIX void allocate_tree_huffman(
+    struct huffman_t *huffman,
+    struct huffman_node_t *node,
+    unsigned char code,
+    unsigned char bit_count
+);
+VIRIATUM_EXPORT_PREFIX int _compare_huffman(void *first, void *second);

@@ -35,6 +35,7 @@ void create_huffman(struct huffman_t **huffman_pointer) {
     allocated value to the caller function */
     size_t huffman_size = sizeof(struct huffman_t);
     struct huffman_t *huffman = (struct huffman_t *) MALLOC(huffman_size);
+    huffman->root = NULL;
     *huffman_pointer = huffman;
 }
 
@@ -42,6 +43,66 @@ void delete_huffman(struct huffman_t *huffman) {
     /* releases the huffman structure avoiding any kind
     of memory leak (could create problems )*/
     FREE(huffman);
+}
+
+void create_huffman_node(struct huffman_node_t **huffman_node_pointer) {
+    size_t huffman_node_size = sizeof(struct huffman_node_t);
+    struct huffman_node_t *huffman_node =\
+        (struct huffman_node_t *) MALLOC(huffman_node_size);
+    huffman_node->left = NULL;
+    huffman_node->right = NULL;
+    huffman_node->value = 0;
+    huffman_node->symbol = 0;
+    huffman_node->code = 0;
+    huffman_node->bit_count = 0;
+    *huffman_node_pointer = huffman_node;
+}
+
+void delete_huffman_node(struct huffman_node_t *huffman_node) {
+    FREE(huffman_node);
+}
+
+void generate_table_huffman(struct huffman_t *huffman, struct stream_t *stream) {
+    size_t count;
+    size_t index;
+    struct huffman_node_t *node;
+    struct huffman_node_t *left;
+    struct huffman_node_t *right;
+    struct priority_queue_t *queue;
+
+    create_priority_queue(&queue, _compare_huffman);
+
+    stream->open(stream);
+    calc_freqs_huffman(huffman, stream);
+    stream->close(stream);
+
+    for(index = 0; index < HUFFMAN_SYMBOL_SIZE; index++) {
+        count = huffman->freqs[index];
+        if(count == 0) { continue; }
+
+        create_huffman_node(&node);
+        node->value = count;
+        node->symbol = (unsigned char) index;
+
+        push_priority_queue(queue, (void *) node);
+    }
+
+    while(TRUE) {
+        if(queue->size <= 1) { break; }
+
+        pop_priority_queue(queue, (void **) &left);
+        pop_priority_queue(queue, (void **) &right);
+
+        create_huffman_node(&node);
+        node->left = left;
+        node->right = right;
+        node->value = left->value + right->value;
+
+        push_priority_queue(queue, (void *) node);
+    }
+
+    pop_priority_queue(queue, (void **) &huffman->root);
+    allocate_tree_huffman(huffman, huffman->root, 0, 0);
 }
 
 void calc_freqs_huffman(struct huffman_t *huffman, struct stream_t *stream) {
@@ -83,19 +144,34 @@ void calc_freqs_huffman(struct huffman_t *huffman, struct stream_t *stream) {
     stream->seek(stream, 0);
 }
 
-void generate_table_huffman(struct huffman_t *huffman, struct stream_t *stream) {
-    size_t count;
-    size_t index;
-
-    stream->open(stream);
-    calc_freqs_huffman(huffman, stream);
-
-    for(index = 0; index < HUFFMAN_SYMBOL_SIZE; index++) {
-        count = huffman->freqs[index];
-        if(count == 0) { continue; }
-
-        printf("%c\n", index);
+void allocate_tree_huffman(
+    struct huffman_t *huffman,
+    struct huffman_node_t *node,
+    unsigned char code,
+    unsigned char bit_count
+) {
+    unsigned char is_leaf = node->left == NULL && node->right == NULL;
+    if(is_leaf) {
+        node->code = code;
+        node->bit_count = bit_count;
+    } else {
+        allocate_tree_huffman(
+            huffman,
+            node->left,
+            (code << 1) | 0,
+            bit_count + 1
+        );
+        allocate_tree_huffman(
+            huffman,
+            node->right,
+            (code << 1) | 1,
+            bit_count + 1
+        );
     }
+}
 
-    stream->close(stream);
+int _compare_huffman(void *first, void *second) {
+    struct huffman_node_t *_first = (struct huffman_node_t *) first;
+    struct huffman_node_t *_second = (struct huffman_node_t *) second;
+    return _first->value - _second->value;
 }
