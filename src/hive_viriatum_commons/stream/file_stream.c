@@ -57,13 +57,11 @@ void create_file_stream(struct file_stream_t **file_stream_pointer, unsigned cha
 }
 
 void delete_file_stream(struct file_stream_t *file_stream) {
-    /* closes the file reference */
+    /* closes the file reference in case the file is
+	currently open then deletes the underlying stream reference
+	and then releases the current structure */
     fclose(file_stream->file);
-
-    /* deletes the stream (structure) */
     delete_stream(file_stream->stream);
-
-    /* releases the file stream */
     FREE(file_stream);
 }
 
