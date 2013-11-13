@@ -454,6 +454,16 @@ void test_bit_stream() {
 	value is current set in the output buffer */
     assert(bit_stream->buffer[1] == 0x82);
 
+	/* writes a partial stream of bit values that
+	would create an extra (pending) bits situation
+	and then verifies that the values are the expected
+	ones in a series of assertions */
+    write_byte_bit_stream(bit_stream, 0x08, 6);
+	write_byte_bit_stream(bit_stream, 0x02, 6);
+	write_byte_bit_stream(bit_stream, 0x02, 4);
+	assert(bit_stream->buffer[2] == 0x20);
+	assert(bit_stream->buffer[3] == 0x22);
+
     /* closes the bit stream and then deletes the references
 	to both the but and the file stream */
     close_bit_stream(bit_stream);

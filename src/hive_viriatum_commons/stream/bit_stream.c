@@ -109,10 +109,7 @@ void write_byte_bit_stream(
     /* in case the number of bits to be written is greater
 	thatn the available number of bits for the current byte
 	need to append some extra bits */
-    if(size > available_bits_count) {
-		size = available_bits_count;
-		extra_bits_count = size - available_bits_count;
-    }
+    if(size > available_bits_count) { size = available_bits_count; }
     /* otherwise the number of extra bits is zero, the value
 	must then be reset to the invalid (zero value) */
     else { extra_bits_count = 0; }
