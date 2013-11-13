@@ -60,7 +60,7 @@ void delete_file_stream(struct file_stream_t *file_stream) {
     /* closes the file reference */
     fclose(file_stream->file);
 
-    /* deltes the stream (structure) */
+    /* deletes the stream (structure) */
     delete_stream(file_stream->stream);
 
     /* releases the file stream */
@@ -72,41 +72,40 @@ struct stream_t *get_stream_file_stream(struct file_stream_t *file_stream) {
 }
 
 void open_file_stream(struct stream_t *stream) {
-    /* retrieves the file stream from the stream (as the lowe substrate) */
+    /* retrieves the file stream from the stream (as the lower substrate) and
+	then uses the structure to open the associated file object */
     struct file_stream_t *file_stream = (struct file_stream_t *) stream->lower;
-
-    /* opens the file reference using the file path and the mode */
-    FOPEN(&file_stream->file, (char *) file_stream->file_path, (char *) file_stream->mode);
+    FOPEN(
+		&file_stream->file,
+		(char *) file_stream->file_path,
+		(char *) file_stream->mode
+	);
 }
 
 void close_file_stream(struct stream_t *stream) {
-    /* retrieves the file stream from the stream (as the lowe substrate) */
+    /* retrieves the file stream from the stream (as the lower substrate)
+	and uses the structure reference to close the currently opened file */
     struct file_stream_t *file_stream = (struct file_stream_t *) stream->lower;
-
-    /* closes the file reference */
     fclose(file_stream->file);
 }
 
 size_t read_file_stream(struct stream_t *stream, unsigned char *buffer, size_t size) {
-    /* retrieves the file stream from the stream (as the lowe substrate) */
+    /* retrieves the file stream from the stream (as the lowee substrate)
+	and reads the amount of data requested from the currently open file */
     struct file_stream_t *file_stream = (struct file_stream_t *) stream->lower;
-
-    /* reads the given size of bytes into the buffer */
     return fread(buffer, sizeof(unsigned char), size, file_stream->file);
 }
 
 size_t write_file_stream(struct stream_t *stream, unsigned char *buffer, size_t size) {
-    /* retrieves the file stream from the stream (as the lowe substrate) */
+    /* retrieves the file stream from the stream (as the lower substrate)
+	and then writes the provided data to the underlying file reference */
     struct file_stream_t *file_stream = (struct file_stream_t *) stream->lower;
-
-    /* writes the given buffer into the file reference */
     return fwrite(buffer, sizeof(unsigned char), size, file_stream->file);
 }
 
 void flush_file_stream(struct stream_t *stream) {
-    /* retrieves the file stream from the stream (as the lowe substrate) */
+    /* retrieves the file stream from the stream (as the lowe rsubstrate)
+	and flushes the current contents to the underlying file object */
     struct file_stream_t *file_stream = (struct file_stream_t *) stream->lower;
-
-    /* flushes the file reference */
     fflush(file_stream->file);
 }
