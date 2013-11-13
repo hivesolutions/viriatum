@@ -181,50 +181,50 @@ void append_index_linked_list(
     struct linked_list_node_t *linked_list_node,
     size_t index
 ) {
-	/* allocates the space for the temporary index counter value
-	and for the pointers to the previous and next nodes from which
-	the new node will be inserted in between */
+    /* allocates the space for the temporary index counter value
+    and for the pointers to the previous and next nodes from which
+    the new node will be inserted in between */
     size_t _index;
-	struct linked_list_node_t *previous = NULL;
+    struct linked_list_node_t *previous = NULL;
     struct linked_list_node_t *next = linked_list->first;
 
-	/* in case the provided index is greater that the current linked
-	list size it's an invalid operation and so must return immediately */
+    /* in case the provided index is greater that the current linked
+    list size it's an invalid operation and so must return immediately */
     if(index > linked_list->size) { return; }
 
-	/* in case the current index is the current size a normal append
-	operation must be done as this is a special case and the general
-	logic must be performed instead of the index one */
+    /* in case the current index is the current size a normal append
+    operation must be done as this is a special case and the general
+    logic must be performed instead of the index one */
     if(index == linked_list->size) {
         append_linked_list(linked_list, linked_list_node);
         return;
     }
 
-	/* iterates over the range of index to gather the next and previous
-	pointers to the required slot for insertion, these are the nodes that
-	are going to be updated for the insertion operation */
-	for(_index = 0; _index < index; _index++) {
-		next = next->next;
-		previous = next->previous;
-	}
+    /* iterates over the range of index to gather the next and previous
+    pointers to the required slot for insertion, these are the nodes that
+    are going to be updated for the insertion operation */
+    for(_index = 0; _index < index; _index++) {
+        next = next->next;
+        previous = next->previous;
+    }
 
-	/* in case either the current index is the first one or the last one
-	the first and last pointer references must be updated in the linked list */
+    /* in case either the current index is the first one or the last one
+    the first and last pointer references must be updated in the linked list */
     if(index == 0) { linked_list->first = linked_list_node; }
     if(index == linked_list->size) { linked_list->last = linked_list_node; }
 
-	/* updates the next and and previous references in the linked list node
-	to be inserted to point to the gathered values */
+    /* updates the next and and previous references in the linked list node
+    to be inserted to point to the gathered values */
     linked_list_node->next = next;
     linked_list_node->previous = previous;
 
-	/* updates the next and previous node references so that they are aware
-	of the new node that is going to be inserted in the middle of them */
-	if(next) { next->previous = linked_list_node; }
-	if(previous) { previous->next = linked_list_node; }
+    /* updates the next and previous node references so that they are aware
+    of the new node that is going to be inserted in the middle of them */
+    if(next) { next->previous = linked_list_node; }
+    if(previous) { previous->next = linked_list_node; }
 
-	/* increments the current linked list size indicating that a new node
-	has been inserted in the current linked list */
+    /* increments the current linked list size indicating that a new node
+    has been inserted in the current linked list */
     linked_list->size++;
 }
 
@@ -261,10 +261,10 @@ void append_index_value_linked_list(
     void *value,
     size_t index
 ) {
-	/* allocates space for a new linked list node and created it
-	allocating its memory and starting its structures, then updates
-	the value in it and adds the node at the requested index to the
-	linked list that was passed as argument */
+    /* allocates space for a new linked list node and created it
+    allocating its memory and starting its structures, then updates
+    the value in it and adds the node at the requested index to the
+    linked list that was passed as argument */
     struct linked_list_node_t *linked_list_node;
     create_linked_list_node(&linked_list_node);
     linked_list_node->value = value;
