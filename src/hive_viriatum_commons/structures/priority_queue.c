@@ -30,18 +30,30 @@
 #include "priority_queue.h"
 
 void create_priority_queue(struct priority_queue_t **priority_queue_pointer, comparator cmp) {
+    /* retrieves the size in byte that are required for the priority
+    queue and then uses this value to allocate the queue */
     size_t priority_queue_size = sizeof(struct priority_queue_t);
-    struct priority_queue_t *priority_queue = (struct priority_queue_t *) MALLOC(priority_queue_size);
+    struct priority_queue_t *priority_queue =\
+        (struct priority_queue_t *) MALLOC(priority_queue_size);
 
+    /* sets the default values (including the comparator) in the
+    priority queue, note that the size is started at zero */
     priority_queue->cmp = cmp;
     priority_queue->size = 0;
 
+    /* creates the underlying list that is going to be used as the
+    backend for the queue as all the operations are going to use it */
     create_linked_list(&priority_queue->list);
 
+    /* sets the priority queue in the provided priority queue pointer
+    returning the created queue to the caller function */
     *priority_queue_pointer = priority_queue;
 }
 
 void delete_priority_queue(struct priority_queue_t *priority_queue) {
+    /* deletes the linked list associated with the queue to avoid
+    any king of memory leak and then releases the memory associated
+    with the priority queue itself */
     delete_linked_list(priority_queue->list);
     FREE(priority_queue);
 }
