@@ -42,6 +42,7 @@ void create_huffman(struct huffman_t **huffman_pointer) {
 void delete_huffman(struct huffman_t *huffman) {
     /* releases the huffman structure avoiding any kind
     of memory leak (could create problems )*/
+    if(huffman->root) { delete_tree_huffman(huffman->root); }
     FREE(huffman);
 }
 
@@ -60,6 +61,12 @@ void create_huffman_node(struct huffman_node_t **huffman_node_pointer) {
 
 void delete_huffman_node(struct huffman_node_t *huffman_node) {
     FREE(huffman_node);
+}
+
+void delete_tree_huffman(struct huffman_node_t *node) {
+    if(node->left != NULL) { delete_tree_huffman(node->left); }
+    if(node->right != NULL) { delete_tree_huffman(node->right); }
+    delete_huffman_node(node);
 }
 
 void encode_huffman(struct huffman_t *huffman, struct stream_t *in, struct bit_stream_t *out) {
@@ -128,6 +135,8 @@ void generate_table_huffman(struct huffman_t *huffman, struct stream_t *stream) 
     }
 
     pop_priority_queue(queue, (void **) &huffman->root);
+    delete_priority_queue(queue);
+
     allocate_tree_huffman(huffman, huffman->root, 0, 0);
 }
 
