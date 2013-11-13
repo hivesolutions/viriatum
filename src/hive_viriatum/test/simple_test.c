@@ -251,37 +251,37 @@ void test_sort_map() {
 }
 
 void test_priority_queue() {
-	/* allocates the space for the temporary value pointer
-	and for the the priority queue structure */
-	void *value;
+    /* allocates the space for the temporary value pointer
+    and for the the priority queue structure */
+    void *value;
     struct priority_queue_t *priority_queue;
 
-	/* creates the priority queue and pushes the various
-	values that are meant to be sorted to the queue so that
-	these values are placed in the correct positions, the
-	comparator that is going to be used is the default one */
+    /* creates the priority queue and pushes the various
+    values that are meant to be sorted to the queue so that
+    these values are placed in the correct positions, the
+    comparator that is going to be used is the default one */
     create_priority_queue(&priority_queue, _compare);
     push_priority_queue(priority_queue, (void *) 3);
     push_priority_queue(priority_queue, (void *) 2);
     push_priority_queue(priority_queue, (void *) 4);
-	push_priority_queue(priority_queue, (void *) 1);
-	push_priority_queue(priority_queue, (void *) 3);
+    push_priority_queue(priority_queue, (void *) 1);
+    push_priority_queue(priority_queue, (void *) 3);
 
-	/* pops the various values from the queue and verifies that
-	they are now sorted in the correct order */
-	pop_priority_queue(priority_queue, &value);
+    /* pops the various values from the queue and verifies that
+    they are now sorted in the correct order */
+    pop_priority_queue(priority_queue, &value);
     assert((size_t) value == 1);
     pop_priority_queue(priority_queue, &value);
     assert((size_t) value == 2);
     pop_priority_queue(priority_queue, &value);
     assert((size_t) value == 3);
-	pop_priority_queue(priority_queue, &value);
+    pop_priority_queue(priority_queue, &value);
     assert((size_t) value == 3);
     pop_priority_queue(priority_queue, &value);
     assert((size_t) value == 4);
 
-	/* deletes the priority queue structure as its no longer going
-	to be used for the storage (avoids memory leaking) */
+    /* deletes the priority queue structure as its no longer going
+    to be used for the storage (avoids memory leaking) */
     delete_priority_queue(priority_queue);
 }
 
