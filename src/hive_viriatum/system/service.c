@@ -1983,6 +1983,7 @@ ERROR_CODE _default_options_service(struct service_t *service, struct hash_map_t
     set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".mht", "message/rfc822");
     set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".mhtml", "message/rfc822");
     set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".mid", "audio/mid");
+	set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".mkv", "video/x-matroska");
     set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".mny", "application/x-msmoney");
     set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".mov", "video/quicktime");
     set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".movie", "video/x-sgi-movie");
