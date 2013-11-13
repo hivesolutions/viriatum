@@ -30,13 +30,11 @@
 #include "io_stream.h"
 
 void create_stream(struct stream_t **stream_pointer) {
-    /* retrieves the stream size */
+    /* retrieves the stream size and uses the value in the
+    allocation of the stream structure and then returns the
+    value to the caller function through pointer */
     size_t stream_size = sizeof(struct stream_t);
-
-    /* allocates space for the stream */
     struct stream_t *stream = (struct stream_t *) MALLOC(stream_size);
-
-    /* sets the stream in the stream pointer */
     *stream_pointer = stream;
 }
 
