@@ -45,14 +45,10 @@
 #define HUFFMAN_SYMBOL_SIZE 256
 
 /**
- * Structure that hold the information for the
- * creation of huffman based dictionary/tables.
+ * Structure that describes an element (node) that
+ * is going to be used in the construction of the
+ * huffman tree used in the encoding and decoding.
  */
-typedef struct huffman_t {
-    struct huffman_node_t *root;
-    size_t freqs[HUFFMAN_SYMBOL_SIZE];
-} huffman;
-
 typedef struct huffman_node_t {
     struct huffman_node_t *left;
     struct huffman_node_t *right;
@@ -62,10 +58,22 @@ typedef struct huffman_node_t {
     unsigned char bit_count;
 } huffman_node;
 
+/**
+ * Structure that hold the information for the
+ * creation of huffman based dictionary/tables.
+ */
+typedef struct huffman_t {
+    struct huffman_node_t *root;
+    struct huffman_node_t *nodes[HUFFMAN_SYMBOL_SIZE];
+    size_t freqs[HUFFMAN_SYMBOL_SIZE];
+} huffman;
+
 VIRIATUM_EXPORT_PREFIX void create_huffman(struct huffman_t **huffman_pointer);
 VIRIATUM_EXPORT_PREFIX void delete_huffman(struct huffman_t *huffman);
 VIRIATUM_EXPORT_PREFIX void create_huffman_node(struct huffman_node_t **huffman_node_pointer);
 VIRIATUM_EXPORT_PREFIX void delete_huffman_node(struct huffman_node_t *huffman_node);
+VIRIATUM_EXPORT_PREFIX void encode_huffman(struct huffman_t *huffman, struct stream_t *in, struct bit_stream_t *out);
+VIRIATUM_EXPORT_PREFIX void decode_huffman(struct huffman_t *huffman, struct bit_stream_t *in, struct stream_t *out);
 VIRIATUM_EXPORT_PREFIX void generate_table_huffman(struct huffman_t *huffman, struct stream_t *stream);
 VIRIATUM_EXPORT_PREFIX void calc_freqs_huffman(struct huffman_t *huffman, struct stream_t *stream);
 VIRIATUM_EXPORT_PREFIX void allocate_tree_huffman(
