@@ -179,8 +179,10 @@ void decode_huffman(struct huffman_t *huffman, struct stream_t *in, struct strea
 
 void generate_prefix_huffman(struct huffman_t *huffman) {
     size_t prefix_range = 1 << huffman->prefix_size;
-    huffman->prefix_code = (unsigned char *) MALLOC(prefix_range * sizeof(unsigned char));
-    huffman->prefix_extra = (unsigned char *) MALLOC(prefix_range * sizeof(unsigned char));
+    huffman->prefix_code =\
+		(unsigned char *) MALLOC(prefix_range * sizeof(unsigned char));
+    huffman->prefix_extra =\
+		(unsigned char *) MALLOC(prefix_range * sizeof(unsigned char));
 }
 
 void generate_table_huffman(struct huffman_t *huffman, struct stream_t *stream) {
