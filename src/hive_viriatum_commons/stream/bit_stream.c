@@ -104,6 +104,10 @@ void seek_bit_stream(
     struct bit_stream_t *bit_stream,
     long long size
 ) {
+    size_t position;
+    size_t diff_read;
+    struct stream_t *stream;
+
     unsigned char need_read;
     unsigned char offset_first;
     long long byte_count;
@@ -147,10 +151,27 @@ void seek_bit_stream(
         the stream, this is required when the ammount of bytes to be
         skipped back is greater than the ammount of bytes that have been
         already read from the current read buffer */
-        need_read = byte_count > bit_stream->byte_current_read;
+        need_read = byte_count >= bit_stream->byte_current_read;
 
         if(need_read) {
+            diff_read = (size_t) byte_count - bit_stream->byte_current_read + 1;
 
+            stream = bit_stream->stream;
+            position = stream->tell(stream);
+            position -= bit_stream->byte_current_read + diff_read;
+            stream->seek(stream, position);
+
+            bit_stream->byte_counter_read = stream->read(
+                stream,
+                bit_stream->buffer,
+                BIT_STREAM_BUFFER_SIZE
+            );
+            bit_stream->byte_current_read = 0;
+            bit_stream->current_byte_offset_read = offset_first;
+
+            bit_stream->current_byte_read = bit_stream->buffer[bit_stream->byte_current_read];
+            bit_stream->byte_counter_read--;
+            bit_stream->byte_current_read++;
         } else {
             bit_stream->byte_current_read -= (unsigned char) byte_count;
             bit_stream->byte_counter_read += (unsigned char) byte_count;
