@@ -343,6 +343,12 @@ typedef struct service_t {
      */
     unsigned char *compilation_time;
 
+	/**
+	 * The complete set of flags used by the compiler
+	 * on the compilation process.
+	 */
+	unsigned char *compilation_flags;
+
     /**
      * The string that described the currently loaded
      * modules, this string is created from the modules
