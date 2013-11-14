@@ -157,7 +157,7 @@ void decode_table_huffman(struct huffman_t *huffman, struct stream_t *in, struct
             out_count = 0;
         }
 
-        total_count += (prefix_size - extra);
+        total_count += prefix_size - extra;
     }
 
     if(out_count > 0) { out->write(out, out_buffer, out_count); }
@@ -252,13 +252,6 @@ void generate_prefix_huffman(struct huffman_t *huffman) {
         extra = huffman->prefix_size - node->bit_count;
 
         _fill_prefix_huffman(huffman, symbol, code, extra, extra);
-    }
-
-    for(index = 0; index < prefix_range; index++) {
-        symbol = huffman->prefix_code[index];
-        extra = huffman->prefix_extra[index];
-        printf("%d -> '%c'\n", index, symbol);
-        printf("%d -> %d\n", index, extra);
     }
 }
 
