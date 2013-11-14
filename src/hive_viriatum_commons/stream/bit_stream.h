@@ -160,6 +160,11 @@ VIRIATUM_EXPORT_PREFIX void seek_bit_stream(
     struct bit_stream_t *bit_stream,
     long long size
 );
+VIRIATUM_EXPORT_PREFIX void read_word_bit_stream(
+    struct bit_stream_t *bit_stream,
+    unsigned short *word,
+    unsigned char size
+);
 VIRIATUM_EXPORT_PREFIX void read_byte_bit_stream(
     struct bit_stream_t *bit_stream,
     unsigned char *byte,

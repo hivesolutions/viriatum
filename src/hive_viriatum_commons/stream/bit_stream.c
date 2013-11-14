@@ -29,6 +29,18 @@
 
 #include "bit_stream.h"
 
+static unsigned char masks[9] = {
+    0x00,
+    0x01,
+    0x03,
+    0x07,
+    0x0f,
+    0x1f,
+    0x3f,
+    0x7f,
+    0xff
+};
+
 void create_bit_stream(struct bit_stream_t **bit_stream_pointer, struct stream_t *stream) {
     /* retrieves the bit stream size and uses it to
     allocate the "new" bit stream structure */
@@ -104,10 +116,14 @@ void seek_bit_stream(
     struct bit_stream_t *bit_stream,
     long long size
 ) {
+    /* allocates space for the varioables that are going to be
+    used in case a stream seek operation is required */
     size_t position;
     size_t diff_read;
     struct stream_t *stream;
 
+    /* allocates space for temporary variables that are going to be
+    uses in the computation of the byte counting and updateing flags */
     unsigned char need_read;
     unsigned char offset_first;
     long long byte_count;
@@ -117,6 +133,10 @@ void seek_bit_stream(
     of bits outside the current byte in the seek */
     long long available = BIT_STREAM_ITEM_SIZE - bit_stream->current_byte_offset_read;
     long long remaining = size - available;
+
+    /* in case the ammount of bits to be seek is zero returns immediately
+    as there's nothing to be seeked for that situation */
+    if(size == 0) { return; }
 
     /* in case the size is smaller or the same as the number
     of bits alredy read the situation is simple as the same
@@ -183,18 +203,36 @@ void seek_bit_stream(
     }
 }
 
+void read_word_bit_stream(
+    struct bit_stream_t *bit_stream,
+    unsigned short *word,
+    unsigned char size
+) {
+    unsigned char upper = 0;
+    unsigned char lower = 0;
+    short upper_s = size - BIT_STREAM_ITEM_SIZE;
+    short lower_s = size > BIT_STREAM_ITEM_SIZE ? BIT_STREAM_ITEM_SIZE : size;
+
+    if(lower_s > 0) { read_byte_bit_stream(bit_stream, &lower, (unsigned char) lower_s); };
+    if(upper_s > 0) { read_byte_bit_stream(bit_stream, &upper, (unsigned char) upper_s); };
+
+    *word = lower + (upper << BIT_STREAM_ITEM_SIZE);
+}
+
 void read_byte_bit_stream(
     struct bit_stream_t *bit_stream,
     unsigned char *byte,
     unsigned char size
 ) {
     register unsigned char shift_v;
-    register unsigned char shift_m;
 
     unsigned char available_bits_count;
     unsigned char extra_bits_count;
 
-
+    /* in case the requested size is zero this is a special case
+    and so the byte is set to zero and the control flow is returned
+    immediately to the caller function */
+    if(size == 0) { *byte = 0; return; }
 
     flush_read_bit_stream(bit_stream);
 
@@ -214,8 +252,7 @@ void read_byte_bit_stream(
 
 
     shift_v = bit_stream->current_byte_offset_read - size;
-    shift_m = BIT_STREAM_ITEM_SIZE - bit_stream->current_byte_offset_read;
-    *byte = (bit_stream->current_byte_read >> shift_v) & (0xff >> shift_m);
+    *byte = (bit_stream->current_byte_read >> shift_v) & masks[size];
 
 
 
@@ -271,6 +308,10 @@ void write_byte_bit_stream(
     unsigned char available_bits_count = BIT_STREAM_ITEM_SIZE -\
         bit_stream->current_byte_offset_write;
     unsigned char extra_bits_count = size - available_bits_count;
+
+    /* in case the requested size is zero this is a special case
+    and the control flow is immediately returned to the caller */
+    if(size == 0) { return; }
 
     /* in case the number of bits to be written is greater
     than the available number of bits for the current byte
