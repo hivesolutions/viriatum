@@ -55,6 +55,7 @@ void create_file_stream(struct file_stream_t **file_stream_pointer, unsigned cha
     file_stream->stream->flush = flush_file_stream;
     file_stream->stream->seek = seek_file_stream;
     file_stream->stream->size = size_file_stream;
+    file_stream->stream->tell = tell_file_stream;
 
     /* sets the file stream in the file stream pointer */
     *file_stream_pointer = file_stream;
@@ -120,7 +121,11 @@ void seek_file_stream(struct stream_t *stream, size_t target) {
     fseek(file_stream->file, target, SEEK_SET);
 }
 
-void size_file_stream(struct stream_t *stream, size_t *size) {
+size_t size_file_stream(struct stream_t *stream) {
+    /* allocates the space for the variable that is going
+    to be used to store the final size value */
+    size_t size;
+
     /* retrieves the current index position so that it's
     possible to restore it after the measure of the file
     size, this is required otherwise corruption would occur */
@@ -129,8 +134,17 @@ void size_file_stream(struct stream_t *stream, size_t *size) {
 
     /* seeks the file to the end of the tream and measures
     the current position as the size of it, then restores the
-    current position back to the file pointer */
+    current position back to the file pointer and returns the
+    size value to the caller function (result value) */
     fseek(file_stream->file, 0, SEEK_END);
-    *size = (size_t) ftell(file_stream->file);
+    size = (size_t) ftell(file_stream->file);
     fseek(file_stream->file, current, SEEK_SET);
+    return size;
+}
+
+size_t tell_file_stream(struct stream_t *stream) {
+    /* retrieves the file stream from the stream (as the lower substrate)
+    and then suses it to "tell" the current byte position in the stream */
+    struct file_stream_t *file_stream = (struct file_stream_t *) stream->lower;
+    return (size_t) ftell(file_stream->file);
 }

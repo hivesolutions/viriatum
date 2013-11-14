@@ -64,4 +64,5 @@ VIRIATUM_EXPORT_PREFIX size_t read_file_stream(struct stream_t *stream, unsigned
 VIRIATUM_EXPORT_PREFIX size_t write_file_stream(struct stream_t *stream, unsigned char *buffer, size_t size);
 VIRIATUM_EXPORT_PREFIX void flush_file_stream(struct stream_t *stream);
 VIRIATUM_EXPORT_PREFIX void seek_file_stream(struct stream_t *stream, size_t target);
-VIRIATUM_EXPORT_PREFIX void size_file_stream(struct stream_t *stream, size_t *size);
+VIRIATUM_EXPORT_PREFIX size_t size_file_stream(struct stream_t *stream);
+VIRIATUM_EXPORT_PREFIX size_t tell_file_stream(struct stream_t *stream);

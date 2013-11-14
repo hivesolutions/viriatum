@@ -31,7 +31,7 @@ struct stream_t;
 
 typedef void (*stream_update) (struct stream_t *stream);
 typedef void (*stream_seek) (struct stream_t *stream, size_t target);
-typedef void (*stream_size) (struct stream_t *stream, size_t *size);
+typedef size_t (*stream_size) (struct stream_t *stream);
 typedef size_t (*stream_read) (struct stream_t *stream, unsigned char *buffer, size_t size);
 typedef size_t (*stream_write) (struct stream_t *stream, unsigned char *buffer, size_t size);
 
@@ -43,6 +43,7 @@ typedef struct stream_t {
     stream_update flush;
     stream_seek seek;
     stream_size size;
+    stream_size tell;
 
     /**
      * Reference to the lower level
