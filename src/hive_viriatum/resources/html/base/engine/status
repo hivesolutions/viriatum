@@ -58,6 +58,10 @@
                         <td class="right label">compilation date</td>
                         <td class="left value"><?php echo(viriatum_compilation_date()) ?> @ <?php echo(viriatum_compilation_time()) ?></td>
                     </tr>
+                    <tr>
+                        <td class="right label">compilation flags</td>
+                        <td class="left value"><?php echo(viriatum_compilation_flags()) ?></td>
+                    </tr>
                 </tbody>
             </table>
         </div>
