@@ -520,7 +520,7 @@ void test_bit_stream() {
     );
 
     /* creates the bit stream using the file stream as the
-    underlying stream structure to be used*/
+    underlying stream structure to be used */
     create_bit_stream(&bit_stream, file_stream->stream);
 
     /* opens the bit stream so that operations may start
@@ -562,36 +562,135 @@ void test_bit_stream() {
     delete_bit_stream(bit_stream);
     delete_file_stream(file_stream);
 
+    /* re-creates the previous file stream in read mode so that
+    it may be used in the testing of the read opertions in the
+    bit stream (these operations will include seek) */
     create_file_stream(
         &file_stream,
         (unsigned char *) "bit_stream.bin",
         (unsigned char *) "rb"
     );
 
+    /* creates the bit stream using the file stream as the
+    underlying stream structure to be used */
     create_bit_stream(&bit_stream, file_stream->stream);
     open_bit_stream(bit_stream);
 
+    /* reads a partial byte from the bit stream and verifies
+    that the value is the expected one (according to spec) */
     read_byte_bit_stream(bit_stream, &byte, 4);
     assert(byte == 0x04);
 
+    /* reads a partial byte from the bit stream and verifies
+    that the value is the expected one (according to spec) */
     read_byte_bit_stream(bit_stream, &byte, 4);
     assert(byte == 0x01);
 
+    /* seeks back the stream a bit so that the values may be
+    tested again for coherence (complex operation) */
+    seek_bit_stream(bit_stream, 8);
+
+    /* reads a partial byte from the bit stream and verifies
+    that the value is the expected one (according to spec) */
+    read_byte_bit_stream(bit_stream, &byte, 4);
+    assert(byte == 0x04);
+
+    /* reads a partial byte from the bit stream and verifies
+    that the value is the expected one (according to spec) */
+    read_byte_bit_stream(bit_stream, &byte, 4);
+    assert(byte == 0x01);
+
+    /* seeks back the stream a bit so that the values may be
+    tested again for coherence (complex operation) */
+    seek_bit_stream(bit_stream, 2);
+
+    /* reads a partial byte from the bit stream and verifies
+    that the value is the expected one (according to spec) */
+    read_byte_bit_stream(bit_stream, &byte, 2);
+    assert(byte == 0x01);
+
+    /* reads a partial byte from the bit stream and verifies
+    that the value is the expected one (according to spec) */
     read_byte_bit_stream(bit_stream, &byte, 4);
     assert(byte == 0x08);
 
+    /* reads a partial byte from the bit stream and verifies
+    that the value is the expected one (according to spec) */
     read_byte_bit_stream(bit_stream, &byte, 4);
     assert(byte == 0x02);
 
+    /* reads a partial byte from the bit stream and verifies
+    that the value is the expected one (according to spec) */
     read_byte_bit_stream(bit_stream, &byte, 6);
     assert(byte == 0x08);
 
+    /* seeks back the stream a bit so that the values may be
+    tested again for coherence (complex operation) */
+    seek_bit_stream(bit_stream, 6);
+
+    /* reads a partial byte from the bit stream and verifies
+    that the value is the expected one (according to spec) */
+    read_byte_bit_stream(bit_stream, &byte, 6);
+    assert(byte == 0x08);
+
+    /* reads a partial byte from the bit stream and verifies
+    that the value is the expected one (according to spec) */
     read_byte_bit_stream(bit_stream, &byte, 6);
     assert(byte == 0x02);
 
+    /* seeks back the stream a bit so that the values may be
+    tested again for coherence (complex operation) */
+    seek_bit_stream(bit_stream, 6);
+
+    /* reads a partial byte from the bit stream and verifies
+    that the value is the expected one (according to spec) */
+    read_byte_bit_stream(bit_stream, &byte, 6);
+    assert(byte == 0x02);
+
+    /* seeks back the stream a bit so that the values may be
+    tested again for coherence (complex operation) */
+    seek_bit_stream(bit_stream, 12);
+
+    /* reads a partial byte from the bit stream and verifies
+    that the value is the expected one (according to spec) */
+    read_byte_bit_stream(bit_stream, &byte, 6);
+    assert(byte == 0x08);
+
+    /* reads a partial byte from the bit stream and verifies
+    that the value is the expected one (according to spec) */
+    read_byte_bit_stream(bit_stream, &byte, 6);
+    assert(byte == 0x02);
+
+    /* reads a partial byte from the bit stream and verifies
+    that the value is the expected one (according to spec) */
     read_byte_bit_stream(bit_stream, &byte, 4);
     assert(byte == 0x02);
 
+    /* seeks back the stream a bit so that the values may be
+    tested again for coherence (complex operation) */
+    seek_bit_stream(bit_stream, 3);
+
+    /* reads a partial byte from the bit stream and verifies
+    that the value is the expected one (according to spec) */
+    read_byte_bit_stream(bit_stream, &byte, 3);
+    assert(byte == 0x02);
+
+    /* seeks back the stream a bit so that the values may be
+    tested again for coherence (complex operation) */
+    seek_bit_stream(bit_stream, 32);
+
+    /* reads a partial byte from the bit stream and verifies
+    that the value is the expected one (according to spec) */
+    read_byte_bit_stream(bit_stream, &byte, 3);
+    assert(byte == 0x04);
+
+    /* reads a partial byte from the bit stream and verifies
+    that the value is the expected one (according to spec) */
+    read_byte_bit_stream(bit_stream, &byte, 4);
+    assert(byte == 0x01);
+
+    /* closes the bit stream and then deletes the references
+    to both the but and the file stream */
     close_bit_stream(bit_stream);
     delete_bit_stream(bit_stream);
     delete_file_stream(file_stream);
