@@ -31,6 +31,13 @@
 #include "../structures/structures.h"
 
 /**
+ * The size of a byte unit as defined for the current
+ * huffman implementation, remember that this value is
+ * not the same for all the architectures.
+ */
+#define HUFFMAN_BYTE_SIZE 8
+
+/**
  * The range of code values that are allowed for
  * an huffman structure, this value should match
  * a basic size of a data type (eg: 8 bits, 16 bits).
@@ -77,6 +84,13 @@ typedef struct huffman_t {
      * structure, in case there's one.
      */
     long long bit_count;
+
+    /**
+     * The number of valid symbols that are going to
+     * be used in the current huffman context. A symbol
+     * may or may not be an ascii based 8 bit value.
+     */
+    unsigned char symbol_count;
 
     /**
      * The size in bits of the maximum sized prefix
@@ -132,6 +146,8 @@ VIRIATUM_EXPORT_PREFIX void delete_huffman_node(struct huffman_node_t *huffman_n
 VIRIATUM_EXPORT_PREFIX void delete_tree_huffman(struct huffman_node_t *node);
 VIRIATUM_EXPORT_PREFIX void encode_huffman(struct huffman_t *huffman, struct stream_t *in, struct stream_t *out);
 VIRIATUM_EXPORT_PREFIX void decode_huffman(struct huffman_t *huffman, struct stream_t *in, struct stream_t *out);
+VIRIATUM_EXPORT_PREFIX void decode_table_huffman(struct huffman_t *huffman, struct stream_t *in, struct stream_t *out);
+VIRIATUM_EXPORT_PREFIX void decode_tree_huffman(struct huffman_t *huffman, struct stream_t *in, struct stream_t *out);
 VIRIATUM_EXPORT_PREFIX void generate_prefix_huffman(struct huffman_t *huffman);
 VIRIATUM_EXPORT_PREFIX void generate_table_huffman(struct huffman_t *huffman, struct stream_t *stream);
 VIRIATUM_EXPORT_PREFIX void calc_freqs_huffman(struct huffman_t *huffman, struct stream_t *stream);
@@ -140,5 +156,11 @@ VIRIATUM_EXPORT_PREFIX void allocate_tree_huffman(
     struct huffman_node_t *node,
     unsigned short code,
     unsigned char bit_count
+);
+VIRIATUM_EXPORT_PREFIX void _fill_prefix_huffman(
+    struct huffman_t *huffman,
+    unsigned char symbol,
+    unsigned short code,
+    unsigned char extra
 );
 VIRIATUM_EXPORT_PREFIX int _compare_huffman(void *first, void *second);
