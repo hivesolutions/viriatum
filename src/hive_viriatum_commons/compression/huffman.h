@@ -161,6 +161,7 @@ VIRIATUM_EXPORT_PREFIX void _fill_prefix_huffman(
     struct huffman_t *huffman,
     unsigned char symbol,
     unsigned short code,
-    unsigned char extra
+    unsigned char extra,
+    unsigned char _extra
 );
 VIRIATUM_EXPORT_PREFIX int _compare_huffman(void *first, void *second);

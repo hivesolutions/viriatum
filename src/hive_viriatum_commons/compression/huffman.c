@@ -117,64 +117,60 @@ void encode_huffman(struct huffman_t *huffman, struct stream_t *in, struct strea
 }
 
 void decode_huffman(struct huffman_t *huffman, struct stream_t *in, struct stream_t *out) {
-    decode_table_huffman(huffman, in, out);
+    if(huffman->prefix_code && huffman->prefix_extra) {
+        decode_table_huffman(huffman, in, out);
+    } else {
+        decode_tree_huffman(huffman, in, out);
+    }
 }
 
 void decode_table_huffman(struct huffman_t *huffman, struct stream_t *in, struct stream_t *out) {
-   /* size_t index;
-    size_t count;
-    size_t out_count;
-
-
-
-    unsigned char bit;
-    unsigned char is_leaf;
-    unsigned char bit_count;
-    register unsigned char code;
-    unsigned char in_buffer[HUFFMAN_BUFFER_SIZE];
+    unsigned char code;
+    unsigned char extra;
+    unsigned short word;
+    struct bit_stream_t *bit_stream;
     unsigned char out_buffer[HUFFMAN_BUFFER_SIZE];
+    unsigned char prefix_size = huffman->prefix_size;
     long long total_count = 0;
 
-    size_t major_count = 0;
+    size_t out_count = 0;
 
-    unsigned short prefix;
+    create_bit_stream(&bit_stream, in);
 
-
-    unsigned char prefix_size = huffman->prefix_size;
-
-
-    in->open(in);
+    open_bit_stream(bit_stream);
     out->open(out);
 
     while(TRUE) {
-        count = in->read(in, in_buffer, HUFFMAN_BUFFER_SIZE);
-        if(count == 0) { break; }
+        if(total_count == huffman->bit_count) { break; }
 
-        bit_count = count * HUFFMAN_BYTE_SIZE;
-        bit_offset = 0;
+        read_word_bit_stream(bit_stream, &word, prefix_size);
 
-        while(TRUE) {
+        code = huffman->prefix_code[word];
+        extra = huffman->prefix_extra[word];
 
-            reamining_count =
-        }*/
+        if(extra > 0) { seek_bit_stream(bit_stream, extra); }
 
+        out_buffer[out_count] = code;
+        out_count++;
+        if(out_count == HUFFMAN_BUFFER_SIZE) {
+            out->write(out, out_buffer, out_count);
+            out_count = 0;
+        }
 
-        /* tenho de sacar prefix_size do buffer */
-        /* deveria ser uma funcao inline TLX */
-        /*prefix = read_prefix(in, );
-
-
-
+        total_count += (prefix_size - extra);
     }
 
-    out->close(out);
-    in->close(in);*/
+    if(out_count > 0) { out->write(out, out_buffer, out_count); }
+
+    in->close(out);
+    close_bit_stream(bit_stream);
+
+    delete_bit_stream(bit_stream);
 }
 
 void decode_tree_huffman(struct huffman_t *huffman, struct stream_t *in, struct stream_t *out) {
     size_t index;
     size_t count;
-    size_t out_count;
     unsigned char bit;
     unsigned char is_leaf;
     unsigned char bit_count;
@@ -183,6 +179,7 @@ void decode_tree_huffman(struct huffman_t *huffman, struct stream_t *in, struct 
     unsigned char out_buffer[HUFFMAN_BUFFER_SIZE];
     long long total_count = 0;
 
+    size_t out_count = 0;
     size_t major_count = 0;
 
     struct huffman_node_t *node = huffman->root;
@@ -193,8 +190,6 @@ void decode_tree_huffman(struct huffman_t *huffman, struct stream_t *in, struct 
     while(TRUE) {
         count = in->read(in, in_buffer, HUFFMAN_BUFFER_SIZE);
         if(count == 0) { break; }
-
-        out_count = 0;
 
         for(index = 0; index < count; index++) {
             code = in_buffer[index];
@@ -225,11 +220,11 @@ void decode_tree_huffman(struct huffman_t *huffman, struct stream_t *in, struct 
                 major_count++;
             }
         }
-
-        if(out_count > 0) {
-            out->write(out, out_buffer, out_count);
-        }
     }
+
+    /* in case there are pending bytes to be writen to the output
+    stream flushes them by writing them to the output stream */
+    if(out_count > 0) { out->write(out, out_buffer, out_count); }
 
     out->close(out);
     in->close(in);
@@ -255,15 +250,15 @@ void generate_prefix_huffman(struct huffman_t *huffman) {
         symbol = node->symbol;
         code = node->code;
         extra = huffman->prefix_size - node->bit_count;
-        huffman->prefix_code[code] = symbol;
-        huffman->prefix_extra[code] = extra;
 
-        _fill_prefix_huffman(huffman, symbol, code, extra);
+        _fill_prefix_huffman(huffman, symbol, code, extra, extra);
     }
 
     for(index = 0; index < prefix_range; index++) {
         symbol = huffman->prefix_code[index];
+        extra = huffman->prefix_extra[index];
         printf("%d -> '%c'\n", index, symbol);
+        printf("%d -> %d\n", index, extra);
     }
 }
 
@@ -386,27 +381,20 @@ void _fill_prefix_huffman(
     struct huffman_t *huffman,
     unsigned char symbol,
     unsigned short code,
-    unsigned char extra
+    unsigned char extra,
+    unsigned char _extra
 ) {
-    register unsigned short _code;
-    register unsigned short _code_l;
-    register unsigned short _code_r;
-    register unsigned char _extra;
+    register unsigned short code_s;
 
-    if(extra == 0) { return; }
+    if(_extra == 0) {
+        huffman->prefix_code[code] = symbol;
+        huffman->prefix_extra[code] = extra;
+        return;
+    }
 
-    _code = code << 1;
-    _code_l = _code | 1;
-    _code_r = _code;
-    _extra = extra - 1;
-
-    huffman->prefix_code[_code_l] = symbol;
-    huffman->prefix_extra[_code_l] = _extra;
-    _fill_prefix_huffman(huffman, symbol, _code_l, _extra);
-
-    huffman->prefix_code[_code_r] = symbol;
-    huffman->prefix_extra[_code_r] = _extra;
-    _fill_prefix_huffman(huffman, symbol, _code, _extra);
+    code_s = code << 1;
+    _fill_prefix_huffman(huffman, symbol, code_s | 1, extra, _extra - 1);
+    _fill_prefix_huffman(huffman, symbol, code_s, extra, _extra - 1);
 }
 
 int _compare_huffman(void *first, void *second) {
