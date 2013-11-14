@@ -41,7 +41,9 @@ void create_file_stream(struct file_stream_t **file_stream_pointer, unsigned cha
     create_stream(&file_stream->stream);
     file_stream->stream->lower = (void *) file_stream;
 
-    /* sets the file parameters in the file stream */
+    /* sets the file parameters in the file stream including
+    the initialization of the file object with invalid value */
+    file_stream->file = NULL;
     file_stream->file_path = file_path;
     file_stream->mode = mode;
 
@@ -61,7 +63,7 @@ void delete_file_stream(struct file_stream_t *file_stream) {
     /* closes the file reference in case the file is
     currently open then deletes the underlying stream reference
     and then releases the current structure */
-    fclose(file_stream->file);
+    if(file_stream->file) { fclose(file_stream->file); }
     delete_stream(file_stream->stream);
     FREE(file_stream);
 }
@@ -86,6 +88,7 @@ void close_file_stream(struct stream_t *stream) {
     and uses the structure reference to close the currently opened file */
     struct file_stream_t *file_stream = (struct file_stream_t *) stream->lower;
     fclose(file_stream->file);
+    file_stream->file = NULL;
 }
 
 size_t read_file_stream(struct stream_t *stream, unsigned char *buffer, size_t size) {
