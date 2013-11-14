@@ -48,9 +48,14 @@ void create_bit_stream(struct bit_stream_t **bit_stream_pointer, struct stream_t
     /* sets the various internal structure values of the bit stream */
     bit_stream->size = 0;
     bit_stream->position = 0;
+    bit_stream->current_byte_read = 0;
     bit_stream->current_byte_write = 0;
+    bit_stream->current_byte_offset_read = 0;
     bit_stream->current_byte_offset_write = 0;
+    bit_stream->bit_counter_read = 0;
     bit_stream->bit_counter_write = 0;
+    bit_stream->byte_counter_read = 0;
+    bit_stream->byte_current_read = 0;
     bit_stream->byte_counter_write = 0;
 
     /* sets the bit stream in the bit stream pointer */
@@ -76,7 +81,7 @@ void close_bit_stream(struct bit_stream_t *bit_stream) {
     more pending data and closes the stream to avoid any
     extra operation to be performed in the stream */
     struct stream_t *stream = bit_stream->stream;
-    flush_bit_stream(bit_stream);
+    _write_bit_stream(bit_stream);
     stream->close(stream);
 }
 
@@ -95,13 +100,117 @@ void write_bit_stream(
 ) {
 }
 
+
+
+void seek_bit_stream(
+    struct bit_stream_t *bit_stream,
+    long long size
+) {
+    unsigned char need_read;
+    unsigned char offset_end;
+    long long byte_count;
+
+    unsigned char byte_bit_read = BIT_STREAM_ITEM_SIZE -\
+        bit_stream->current_byte_offset_read;
+    long long remaining = size - byte_bit_read;
+
+    /* in case the size is smaller or the same as the number
+    of bit alredy read the situation is simple as the same
+    byte is going to be used and only the offset is required
+    to be changed (for the current byte) */
+    if(remaining <= 0) {
+        bit_stream->current_byte_offset_read += size;
+    } else {
+        offset_first = remaining % 8;
+        byte_count = remaining / 8;
+        if(offset_first > 0) { byte_count++; }
+
+        need_read = byte_count > bit_stream->byte_current_read;
+
+        if(need_read) {
+            /* tenho de implementar a logica de read */
+        } else {
+            /* TENHO DE VERIFICAR se esta condcao de fronteira esta boa */
+
+            bit_stream->byte_current_read -= byte_count;
+            bit_stream->byte_counter_read += byte_count;
+
+            bit_stream->current_byte_offset_read = offset_first;
+        }
+    }
+}
+
+void read_byte_bit_stream(
+    struct bit_stream_t *bit_stream,
+    unsigned char *byte,
+    unsigned char size
+) {
+    register unsigned char shift_v;
+    register unsigned char shift_m;
+
+    unsigned char available_bits_count;
+    unsigned char extra_bits_count;
+
+
+
+    flush_read_bit_stream(bit_stream);
+
+
+    available_bits_count = bit_stream->current_byte_offset_read;
+    extra_bits_count = size - available_bits_count;
+
+    /* in case the number of bits to be read is greater
+    than the available number of bits for the current byte
+    need to append some extra bits */
+    if(size > available_bits_count) { size = available_bits_count; }
+
+    /* otherwise the number of extra bits is zero, the value
+    must then be reset to the invalid (zero value) */
+    else { extra_bits_count = 0; }
+
+
+
+    shift_v = bit_stream->current_byte_offset_read - size;
+    shift_m = BIT_STREAM_ITEM_SIZE - bit_stream->current_byte_offset_read;
+    *byte = (bit_stream->current_byte_read >> shift_v) & (0xff >> shift_m);
+
+
+
+    /* increments the global bit counter and the current byte offset by
+    the size of the currently written bits */
+    bit_stream->bit_counter_read += size;
+    bit_stream->current_byte_offset_read -= size;
+
+    /* in case there are no extra bits to be read must
+    return immediately nothing remaining to be done */
+    if(extra_bits_count == 0) { return; }
+
+    /* runs the read flush operation as it may be required to read a new
+    byte from the pseudo-read stream in order to be able to process the
+    extra bits that are going to be read */
+    flush_read_bit_stream(bit_stream);
+
+    /* calculates the shift that is going to be done in the byte and
+    then shifts the current byte by the already read bits and adds the
+    extra bits to it using the "just" calculated shift ammount (value) */
+    shift_v = bit_stream->current_byte_offset_read - extra_bits_count;
+    *byte <<= extra_bits_count;
+    *byte |= (bit_stream->current_byte_read >> shift_v);
+
+    /* increments the bit counter and offset by the number of extra bits
+    that have just been read from the new byte and then dcrements the offset
+    in the current byte by the same ammount (extra read bits) */
+    bit_stream->bit_counter_read += extra_bits_count;
+    bit_stream->current_byte_offset_read -= extra_bits_count;
+}
+
 void write_word_bit_stream(
     struct bit_stream_t *bit_stream,
     unsigned short word,
     unsigned char size
 ) {
-    short upper_s = size - 8;
-    short lower_s = size > 8 ? 8 : size;
+    short upper_s = size - BIT_STREAM_ITEM_SIZE;
+    short lower_s = size > BIT_STREAM_ITEM_SIZE ? BIT_STREAM_ITEM_SIZE : size;
     unsigned char upper = (unsigned char) (word >> 8);
     unsigned char lower = (unsigned char) (word & 0x00ff);
 
@@ -115,15 +224,16 @@ void write_byte_bit_stream(
     unsigned char size
 ) {
     /* calculates the number of available bits (count) and
-    then used it to calculate the number of extra bits */
+    then uses it to calculate the number of extra bits */
     unsigned char available_bits_count = BIT_STREAM_ITEM_SIZE -\
         bit_stream->current_byte_offset_write;
     unsigned char extra_bits_count = size - available_bits_count;
 
     /* in case the number of bits to be written is greater
-    thatn the available number of bits for the current byte
+    than the available number of bits for the current byte
     need to append some extra bits */
     if(size > available_bits_count) { size = available_bits_count; }
+
     /* otherwise the number of extra bits is zero, the value
     must then be reset to the invalid (zero value) */
     else { extra_bits_count = 0; }
@@ -156,6 +266,36 @@ void write_byte_bit_stream(
     bit_stream->current_byte_offset_write += extra_bits_count;
 }
 
+void flush_read_bit_stream(struct bit_stream_t *bit_stream) {
+    /* in case the bit counter (for read) hasn't reached
+    the limit no flush is required (no complete byte available)
+    and so must return immediately */
+    if(bit_stream->current_byte_offset_read != 0) {
+        return;
+    }
+
+    /* in case the stream (buffer) is empty, need to read from
+    the bit stream so that the buffer gets filled again */
+    if(bit_stream->byte_counter_read == 0) {
+        _read_bit_stream(bit_stream);
+    }
+
+    /* retrieves the current byte to be read from the buffer
+    associated with the underlying bit stream (read operation) */
+    bit_stream->current_byte_read = bit_stream->buffer[bit_stream->byte_current_read];
+
+    /* runs the update operations on the byte counter (number
+    of bytes pending in the buffer) and the current byte index
+    that is going to be used in the reading from the buffer */
+    bit_stream->byte_counter_read--;
+    bit_stream->byte_current_read++;
+
+    /* resets the value of the current byte offset to the default
+    value, keep in mind that this value is inverted for performance
+    reasons and so it starts in the highest value (from the right) */
+    bit_stream->current_byte_offset_read = BIT_STREAM_ITEM_SIZE;
+}
+
 void flush_write_bit_stream(struct bit_stream_t *bit_stream) {
     /* in case the bit counter (for write) hasn't reached
     the limit no flush is required (no complete byte available)
@@ -177,11 +317,26 @@ void flush_write_bit_stream(struct bit_stream_t *bit_stream) {
     to flush the bit stream writing it to the
     underlying stream element */
     if(bit_stream->byte_counter_write == BIT_STREAM_BUFFER_SIZE) {
-        flush_bit_stream(bit_stream);
+        _write_bit_stream(bit_stream);
     }
 }
 
-void flush_bit_stream(struct bit_stream_t *bit_stream) {
+void _read_bit_stream(struct bit_stream_t *bit_stream) {
+    /* retrieves the (inner) stream from the bit stream
+    to be used in the proper read operation */
+    struct stream_t *stream = bit_stream->stream;
+
+    /* flushes the bit stream in the (internal) stream
+    so that the contents get read from the stream */
+    bit_stream->byte_counter_read = stream->read(
+        stream,
+        bit_stream->buffer,
+        BIT_STREAM_BUFFER_SIZE
+    );
+    bit_stream->byte_current_read = 0;
+}
+
+void _write_bit_stream(struct bit_stream_t *bit_stream) {
     /* retrieves the (inner) stream from the bit stream */
     struct stream_t *stream = bit_stream->stream;
 

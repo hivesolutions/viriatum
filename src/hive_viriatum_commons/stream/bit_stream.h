@@ -75,11 +75,24 @@ typedef struct bit_stream_t {
      */
     size_t position;
 
+    unsigned char current_byte_read;
+
     /**
      * The current byte used in the writting
      * procedure.
      */
     unsigned char current_byte_write;
+
+    /**
+     * The position of the cursor inside the current
+     * byte for the read operation. Note that in oder
+     * to provide better performance this cursor is
+     * defined in the oposite order to expected one
+     * so it starts from the highest value and dicreases
+     * until the lower value is reached.
+     * This value is used only for the read operations.
+     */
+    unsigned char current_byte_offset_read;
 
     /**
      * The position of the "cursor" in the
@@ -88,11 +101,18 @@ typedef struct bit_stream_t {
      */
     unsigned char current_byte_offset_write;
 
+
+    size_t bit_counter_read;
+
     /**
      * The counter (of bits) used for the writting
      * procedure in the current bit stream.
      */
     size_t bit_counter_write;
+
+    size_t byte_counter_read;
+
+    size_t byte_current_read;
 
     /**
      * The counter (of bytes) used for the writting
@@ -136,6 +156,15 @@ VIRIATUM_EXPORT_PREFIX void write_bit_stream(
     unsigned char *buffer,
     size_t size
 );
+VIRIATUM_EXPORT_PREFIX void seek_bit_stream(
+    struct bit_stream_t *bit_stream,
+    long long size
+);
+VIRIATUM_EXPORT_PREFIX void read_byte_bit_stream(
+    struct bit_stream_t *bit_stream,
+    unsigned char *byte,
+    unsigned char size
+);
 VIRIATUM_EXPORT_PREFIX void write_word_bit_stream(
     struct bit_stream_t *bit_stream,
     unsigned short word,
@@ -146,5 +175,8 @@ VIRIATUM_EXPORT_PREFIX void write_byte_bit_stream(
     unsigned char byte,
     unsigned char size
 );
+VIRIATUM_EXPORT_PREFIX void ensure_read_bit_stream(struct bit_stream_t *bit_stream);
+VIRIATUM_EXPORT_PREFIX void flush_read_bit_stream(struct bit_stream_t *bit_stream);
 VIRIATUM_EXPORT_PREFIX void flush_write_bit_stream(struct bit_stream_t *bit_stream);
-VIRIATUM_EXPORT_PREFIX void flush_bit_stream(struct bit_stream_t *bit_stream);
+VIRIATUM_EXPORT_PREFIX void _read_bit_stream(struct bit_stream_t *bit_stream);
+VIRIATUM_EXPORT_PREFIX void _write_bit_stream(struct bit_stream_t *bit_stream);
