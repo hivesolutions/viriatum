@@ -28,11 +28,20 @@
 #pragma once
 
 /**
- * The compilation date.
+ * The date as year, month and day for the
+ * start of the compilation process.
  */
 #define VIRIATUM_COMPILATION_DATE __DATE__
 
 /**
- * The compilation time.
+ * The time as a string containing hour
+ * minute and second for the start of the
+ * compilation process.
  */
 #define VIRIATUM_COMPILATION_TIME __TIME__
+
+/**
+ * The string containing the description
+ * of the flags used in the compilation.
+ */
+#define VIRIATUM_COMPILATION_FLAGS CFLAGS
