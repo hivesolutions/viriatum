@@ -120,6 +120,7 @@ void seek_bit_stream(
     used in case a stream seek operation is required */
     size_t position;
     size_t diff_read;
+    size_t total_read;
     struct stream_t *stream;
 
     /* allocates space for temporary variables that are going to be
@@ -174,11 +175,12 @@ void seek_bit_stream(
         need_read = byte_count >= bit_stream->byte_current_read;
 
         if(need_read) {
-            diff_read = (size_t) byte_count - bit_stream->byte_current_read + 1;
+            total_read = bit_stream->byte_current_read + bit_stream->byte_counter_read;
+            diff_read = bit_stream->byte_current_read - (size_t) byte_count + 1;
 
             stream = bit_stream->stream;
             position = stream->tell(stream);
-            position -= bit_stream->byte_current_read + diff_read;
+            position -= total_read + diff_read;
             stream->seek(stream, position);
 
             bit_stream->byte_counter_read = stream->read(
@@ -213,8 +215,8 @@ void read_word_bit_stream(
     short upper_s = size - BIT_STREAM_ITEM_SIZE;
     short lower_s = size > BIT_STREAM_ITEM_SIZE ? BIT_STREAM_ITEM_SIZE : size;
 
-    if(lower_s > 0) { read_byte_bit_stream(bit_stream, &lower, (unsigned char) lower_s); };
     if(upper_s > 0) { read_byte_bit_stream(bit_stream, &upper, (unsigned char) upper_s); };
+    if(lower_s > 0) { read_byte_bit_stream(bit_stream, &lower, (unsigned char) lower_s); };
 
     *word = lower + (upper << BIT_STREAM_ITEM_SIZE);
 }
