@@ -30,3 +30,6 @@
 #define HAVE_MPOOL
 #define HAVE_IP6
 #define HAVE_LIBPTHREAD
+
+#define HOST_OS "win32"
+#define CFLAGS ""

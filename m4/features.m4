@@ -72,3 +72,6 @@ AC_DEFINE_UNQUOTED(WITH_PREFIX, "$target_prefix", [Define to a value if prefix i
 AC_DEFINE_UNQUOTED(WITH_CONFIG_ROOT, "$with_configroot", [Define to a value if config root is set])
 AC_DEFINE_UNQUOTED(WITH_MODULE_ROOT, "$with_moduleroot", [Define to a value if module root is set])
 AC_DEFINE_UNQUOTED(WITH_WWW_ROOT, "$with_wwwroot", [Define to a value if www root is set])
+
+AC_DEFINE_UNQUOTED(HOST_OS, "$host_os", [Define to the value that describes the host os])
+AC_DEFINE_UNQUOTED(CFLAGS, "$CFLAGS", [Define to the value of the compilation flags])
