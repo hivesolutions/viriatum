@@ -100,40 +100,58 @@ void write_bit_stream(
 ) {
 }
 
-
-
 void seek_bit_stream(
     struct bit_stream_t *bit_stream,
     long long size
 ) {
     unsigned char need_read;
-    unsigned char offset_end;
+    unsigned char offset_first;
     long long byte_count;
 
-    unsigned char byte_bit_read = BIT_STREAM_ITEM_SIZE -\
-        bit_stream->current_byte_offset_read;
-    long long remaining = size - byte_bit_read;
+    /* calculates the ammount of available bits in the current
+    byte and then uses the value to calculate the remaining ammoutn
+    of bits outside the current byte in the seek */
+    long long available = BIT_STREAM_ITEM_SIZE - bit_stream->current_byte_offset_read;
+    long long remaining = size - available;
 
     /* in case the size is smaller or the same as the number
     of bit alredy read the situation is simple as the same
     byte is going to be used and only the offset is required
     to be changed (for the current byte) */
-    if(remaining <= 0) {
-        bit_stream->current_byte_offset_read += size;
+    if(remaining < 0) {
+        bit_stream->current_byte_offset_read += (unsigned char) size;
     } else {
-        offset_first = remaining % 8;
-        byte_count = remaining / 8;
-        if(offset_first > 0) { byte_count++; }
+        /* calulates the offset to the firt byte (target byte) with
+        the modulus of the remaining bts and the size of the item */
+        offset_first = remaining % BIT_STREAM_ITEM_SIZE;
 
+        /* calculates the ammount of bytes that are required by
+        deviding the remaining value by eight (done using shifts)
+        and adding one extra byte (the one currently in iteration) */
+        byte_count = (remaining >> 3) + 1;
+
+        /* in case the offset in the first byte is zero an extra
+        shifting operation is required as the byte count is reduced
+        and the offset in the first byte is repositioned at the begining
+        of the byte as the carret is positioned at the begining */
+        if(offset_first == 0) {
+            byte_count--;
+            offset_first = BIT_STREAM_ITEM_SIZE;
+        }
+
+        /* verifies if the current seek operation required reading from
+        the stream, this is required when the ammount of bytes to be
+        skipped back is greater than the ammount of bytes that have been
+        already read from the current read buffer */
         need_read = byte_count > bit_stream->byte_current_read;
 
         if(need_read) {
             /* tenho de implementar a logica de read */
         } else {
-            /* TENHO DE VERIFICAR se esta condcao de fronteira esta boa */
+            bit_stream->byte_current_read -= (unsigned char) byte_count;
+            bit_stream->byte_counter_read += (unsigned char) byte_count;
 
-            bit_stream->byte_current_read -= byte_count;
-            bit_stream->byte_counter_read += byte_count;
+            bit_stream->current_byte_read = bit_stream->buffer[bit_stream->byte_current_read - 1];
 
             bit_stream->current_byte_offset_read = offset_first;
         }
