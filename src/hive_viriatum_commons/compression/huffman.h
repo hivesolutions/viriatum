@@ -31,8 +31,16 @@
 #include "../structures/structures.h"
 
 /**
- * The size to be used in the huffman interna
- * buffer storage.
+ * The range of code values that are allowed for
+ * an huffman structure, this value should match
+ * a basic size of a data type (eg: 8 bits, 16 bits).
+ */
+#define HUFFMAN_CODE_RANGE 65536
+
+/**
+ * The size to be used in the huffman internal
+ * buffer storage, all the buffer to be allocated
+ * under the huffman infra-structure use this size.
  */
 #define HUFFMAN_BUFFER_SIZE 4096
 
@@ -63,10 +71,58 @@ typedef struct huffman_node_t {
  * creation of huffman based dictionary/tables.
  */
 typedef struct huffman_t {
+	/**
+	 * The number of bits contained in the encoded
+	 * buffer resulting from the current huffman
+	 * structure, in case there's one.
+	 */
     long long bit_count;
+
+	/**
+	 * The size in bits of the maximum sized prefix
+	 * value for the current huffman structure. This
+	 * value may be used when constructing the prefix
+	 * tables to know the number of bits to be used.
+	 */
+	unsigned char prefix_size;
+
+	/**
+	 * The reference to the root node of the huffman
+	 * table for the current state, this may be used
+	 * when percolating the tree.
+	 */
     struct huffman_node_t *root;
+
+	/**
+	 * Array that associates a code (symbol) to the
+	 * appropriate node in the huffman tree, this may
+	 * be used as an alternative method of accessing
+	 * a node in the huffman tree.
+	 */
     struct huffman_node_t *nodes[HUFFMAN_SYMBOL_SIZE];
+
+	/**
+	 * The array that associates a code (symbol) index
+	 * to the ammount of times it occurred in the target
+	 * data file, this is going to be used in the
+	 * contruction of the huffman tree.
+	 */
     size_t freqs[HUFFMAN_SYMBOL_SIZE];
+
+	/**
+	 * Table containing the association between the various
+	 * prefixes and the code that they represent, this table
+	 * together with the prefix extra table may be used to
+	 * provide a much faster decoder performance.
+	 */
+	unsigned char *prefix_code;
+
+	/**
+	 * Table that associates the prefix code with the number
+	 * of extra bits contained in it, so that it's possible
+	 * to discard some extra bits contained in it.
+	 */
+	unsigned char *prefix_extra;
 } huffman;
 
 VIRIATUM_EXPORT_PREFIX void create_huffman(struct huffman_t **huffman_pointer);
@@ -76,6 +132,7 @@ VIRIATUM_EXPORT_PREFIX void delete_huffman_node(struct huffman_node_t *huffman_n
 VIRIATUM_EXPORT_PREFIX void delete_tree_huffman(struct huffman_node_t *node);
 VIRIATUM_EXPORT_PREFIX void encode_huffman(struct huffman_t *huffman, struct stream_t *in, struct stream_t *out);
 VIRIATUM_EXPORT_PREFIX void decode_huffman(struct huffman_t *huffman, struct stream_t *in, struct stream_t *out);
+VIRIATUM_EXPORT_PREFIX void generate_prefix_huffman(struct huffman_t *huffman);
 VIRIATUM_EXPORT_PREFIX void generate_table_huffman(struct huffman_t *huffman, struct stream_t *stream);
 VIRIATUM_EXPORT_PREFIX void calc_freqs_huffman(struct huffman_t *huffman, struct stream_t *stream);
 VIRIATUM_EXPORT_PREFIX void allocate_tree_huffman(

@@ -36,7 +36,10 @@ void create_huffman(struct huffman_t **huffman_pointer) {
     size_t huffman_size = sizeof(struct huffman_t);
     struct huffman_t *huffman = (struct huffman_t *) MALLOC(huffman_size);
     huffman->bit_count = 0;
+	huffman->prefix_size = 0;
     huffman->root = NULL;
+    huffman->prefix_code = NULL;
+    huffman->prefix_extra = NULL;
     *huffman_pointer = huffman;
 }
 
@@ -44,6 +47,8 @@ void delete_huffman(struct huffman_t *huffman) {
     /* releases the huffman structure avoiding any kind
     of memory leak (could create problems )*/
     if(huffman->root) { delete_tree_huffman(huffman->root); }
+	if(huffman->prefix_code) { FREE(huffman->prefix_code); }
+	if(huffman->prefix_extra) { FREE(huffman->prefix_extra); }
     FREE(huffman);
 }
 
@@ -95,10 +100,10 @@ void encode_huffman(struct huffman_t *huffman, struct stream_t *in, struct strea
 
             huffman->bit_count += node->bit_count;
             write_word_bit_stream(
-			    bit_stream,
-				node->code,
-				node->bit_count
-			);
+                bit_stream,
+                node->code,
+                node->bit_count
+            );
         }
     }
 
@@ -115,7 +120,7 @@ void decode_huffman(struct huffman_t *huffman, struct stream_t *in, struct strea
     unsigned char bit;
     unsigned char is_leaf;
     unsigned char bit_count;
-	register unsigned char code;
+    register unsigned char code;
     unsigned char in_buffer[HUFFMAN_BUFFER_SIZE];
     unsigned char out_buffer[HUFFMAN_BUFFER_SIZE];
     long long total_count = 0;
@@ -170,6 +175,12 @@ void decode_huffman(struct huffman_t *huffman, struct stream_t *in, struct strea
 
     out->close(out);
     in->close(in);
+}
+
+void generate_prefix_huffman(struct huffman_t *huffman) {
+	size_t prefix_range = 1 << huffman->prefix_size;
+	huffman->prefix_code = (unsigned char *) MALLOC(prefix_range * sizeof(unsigned char));
+	huffman->prefix_extra = (unsigned char *) MALLOC(prefix_range * sizeof(unsigned char));
 }
 
 void generate_table_huffman(struct huffman_t *huffman, struct stream_t *stream) {
@@ -263,10 +274,13 @@ void allocate_tree_huffman(
     unsigned short code,
     unsigned char bit_count
 ) {
+	unsigned char is_larger;
     unsigned char is_leaf = node->left == NULL && node->right == NULL;
     if(is_leaf) {
         node->code = code;
         node->bit_count = bit_count;
+		is_larger = bit_count > huffman->prefix_size;
+		if(is_larger) {	huffman->prefix_size = bit_count; }
     } else {
         allocate_tree_huffman(
             huffman,
