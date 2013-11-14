@@ -32,4 +32,12 @@
 #define HAVE_LIBPTHREAD
 
 #define HOST_OS "win32"
-#define CFLAGS ""
+
+#ifdef _DEBUG
+#define CFLAGS_DEBUG_S " /debug"
+#else
+#define CFLAGS_DEBUG_S " /release"
+#endif
+
+#define _CFLAGS CFLAGS_DEBUG_S
+#define CFLAGS TRIM_STRING(_CFLAGS)
