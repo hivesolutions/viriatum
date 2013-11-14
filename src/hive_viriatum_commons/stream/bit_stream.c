@@ -115,12 +115,16 @@ void seek_bit_stream(
     long long remaining = size - available;
 
     /* in case the size is smaller or the same as the number
-    of bit alredy read the situation is simple as the same
+    of bits alredy read the situation is simple as the same
     byte is going to be used and only the offset is required
     to be changed (for the current byte) */
     if(remaining < 0) {
         bit_stream->current_byte_offset_read += (unsigned char) size;
-    } else {
+    }
+    /* otherwise the oepration is complex as it spans multiple
+    bytes, it may or may not require reading from the underlying
+    stream but it will always require changing the current byte */
+    else {
         /* calulates the offset to the firt byte (target byte) with
         the modulus of the remaining bts and the size of the item */
         offset_first = remaining % BIT_STREAM_ITEM_SIZE;
@@ -146,7 +150,7 @@ void seek_bit_stream(
         need_read = byte_count > bit_stream->byte_current_read;
 
         if(need_read) {
-            /* tenho de implementar a logica de read */
+
         } else {
             bit_stream->byte_current_read -= (unsigned char) byte_count;
             bit_stream->byte_counter_read += (unsigned char) byte_count;
