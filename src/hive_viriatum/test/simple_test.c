@@ -440,6 +440,8 @@ void test_huffman() {
     struct file_stream_t *in_stream;
     struct file_stream_t *out_stream;
     struct huffman_t *huffman;
+    clock_t initial;
+    clock_t delta;
 
     /* creates the file stream that is going to be used for
     the testing of the huffman infra-structure */
@@ -458,13 +460,19 @@ void test_huffman() {
     /* creates the huffman (encoder) and then runs the
     generation of the huffman table in it */
     create_huffman(&huffman);
+    initial = clock();
     generate_table_huffman(huffman, in_stream->stream);
+    generate_prefix_huffman(huffman);
+    delta = clock() - initial;
+    printf("generate: %d\n", delta);
 
     /* runs the huffman encoder creating the bit stream
     with the compressed contents provided by the input stream
     that was just loaded as the input */
+    initial = clock();
     encode_huffman(huffman, in_stream->stream, out_stream->stream);
-
+    delta = clock() - initial;
+    printf("encode: %d\n", delta);
 
     delete_file_stream(out_stream);
     delete_file_stream(in_stream);
@@ -481,7 +489,10 @@ void test_huffman() {
         (unsigned char *) "wb"
     );
 
+    initial = clock();
     decode_huffman(huffman, in_stream->stream, out_stream->stream);
+    delta = clock() - initial;
+    printf("decode: %d\n", delta);
 
     delete_file_stream(out_stream);
     delete_file_stream(in_stream);
@@ -490,6 +501,10 @@ void test_huffman() {
 }
 
 void test_bit_stream() {
+    /* allocates space for the byte value that is going
+    to be used in the read based tezt of the bit stream */
+    unsigned char byte;
+
     /* allocates space for both the file and the
     bit based streams, that are going to be used
     for the test of the bit stream infra-structure */
@@ -543,6 +558,40 @@ void test_bit_stream() {
 
     /* closes the bit stream and then deletes the references
     to both the but and the file stream */
+    close_bit_stream(bit_stream);
+    delete_bit_stream(bit_stream);
+    delete_file_stream(file_stream);
+
+    create_file_stream(
+        &file_stream,
+        (unsigned char *) "bit_stream.bin",
+        (unsigned char *) "rb"
+    );
+
+    create_bit_stream(&bit_stream, file_stream->stream);
+    open_bit_stream(bit_stream);
+
+    read_byte_bit_stream(bit_stream, &byte, 4);
+    assert(byte == 0x04);
+
+    read_byte_bit_stream(bit_stream, &byte, 4);
+    assert(byte == 0x01);
+
+    read_byte_bit_stream(bit_stream, &byte, 4);
+    assert(byte == 0x08);
+
+    read_byte_bit_stream(bit_stream, &byte, 4);
+    assert(byte == 0x02);
+
+    read_byte_bit_stream(bit_stream, &byte, 6);
+    assert(byte == 0x08);
+
+    read_byte_bit_stream(bit_stream, &byte, 6);
+    assert(byte == 0x02);
+
+    read_byte_bit_stream(bit_stream, &byte, 4);
+    assert(byte == 0x02);
+
     close_bit_stream(bit_stream);
     delete_bit_stream(bit_stream);
     delete_file_stream(file_stream);
