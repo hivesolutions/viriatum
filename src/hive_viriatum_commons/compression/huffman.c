@@ -120,12 +120,6 @@ void decode_huffman(struct huffman_t *huffman, struct stream_t *in, struct strea
     decode_table_huffman(huffman, in, out);
 }
 
-
-short read_prefix(struct stream_t *stream, unsigned char *buffer, size_t count) {
-
-}
-
-
 void decode_table_huffman(struct huffman_t *huffman, struct stream_t *in, struct stream_t *out) {
    /* size_t index;
     size_t count;
