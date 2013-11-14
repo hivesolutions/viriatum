@@ -447,13 +447,13 @@ void test_huffman() {
     the testing of the huffman infra-structure */
     create_file_stream(
         &in_stream,
-        (unsigned char *) "C:/hello.txt",
+        (unsigned char *) "C:/tobias.txt",
         (unsigned char *) "rb"
     );
 
     create_file_stream(
         &out_stream,
-        (unsigned char *) "c:/hello.txt.huffman",
+        (unsigned char *) "c:/tobias.txt.huffman",
         (unsigned char *) "wb"
     );
 
@@ -479,13 +479,13 @@ void test_huffman() {
 
     create_file_stream(
         &in_stream,
-        (unsigned char *) "C:/hello.txt.huffman",
+        (unsigned char *) "C:/tobias.txt.huffman",
         (unsigned char *) "rb"
     );
 
     create_file_stream(
         &out_stream,
-        (unsigned char *) "c:/hello.txt.decoded",
+        (unsigned char *) "c:/tobias.txt.decoded",
         (unsigned char *) "wb"
     );
 
@@ -682,11 +682,11 @@ void test_bit_stream() {
     /* reads a partial byte from the bit stream and verifies
     that the value is the expected one (according to spec) */
     read_byte_bit_stream(bit_stream, &byte, 3);
-    assert(byte == 0x04);
+    assert(byte == 0x02);
 
     /* reads a partial byte from the bit stream and verifies
     that the value is the expected one (according to spec) */
-    read_byte_bit_stream(bit_stream, &byte, 4);
+    read_byte_bit_stream(bit_stream, &byte, 5);
     assert(byte == 0x01);
 
     /* closes the bit stream and then deletes the references
