@@ -29,7 +29,7 @@
 
 #include "entry.h"
 
-zend_function_entry viriatum_functions[15];
+zend_function_entry viriatum_functions[16];
 zend_module_entry viriatum_module;
 sapi_module_struct viriatum_sapi_module;
 
@@ -58,5 +58,6 @@ PHP_FUNCTION(viriatum_compiler);
 PHP_FUNCTION(viriatum_compiler_version);
 PHP_FUNCTION(viriatum_compilation_date);
 PHP_FUNCTION(viriatum_compilation_time);
+PHP_FUNCTION(viriatum_compilation_flags);
 PHP_FUNCTION(viriatum_modules);
 PHP_FUNCTION(viriatum_description);
