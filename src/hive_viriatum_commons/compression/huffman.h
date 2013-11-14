@@ -71,58 +71,58 @@ typedef struct huffman_node_t {
  * creation of huffman based dictionary/tables.
  */
 typedef struct huffman_t {
-	/**
-	 * The number of bits contained in the encoded
-	 * buffer resulting from the current huffman
-	 * structure, in case there's one.
-	 */
+    /**
+     * The number of bits contained in the encoded
+     * buffer resulting from the current huffman
+     * structure, in case there's one.
+     */
     long long bit_count;
 
-	/**
-	 * The size in bits of the maximum sized prefix
-	 * value for the current huffman structure. This
-	 * value may be used when constructing the prefix
-	 * tables to know the number of bits to be used.
-	 */
-	unsigned char prefix_size;
+    /**
+     * The size in bits of the maximum sized prefix
+     * value for the current huffman structure. This
+     * value may be used when constructing the prefix
+     * tables to know the number of bits to be used.
+     */
+    unsigned char prefix_size;
 
-	/**
-	 * The reference to the root node of the huffman
-	 * table for the current state, this may be used
-	 * when percolating the tree.
-	 */
+    /**
+     * The reference to the root node of the huffman
+     * table for the current state, this may be used
+     * when percolating the tree.
+     */
     struct huffman_node_t *root;
 
-	/**
-	 * Array that associates a code (symbol) to the
-	 * appropriate node in the huffman tree, this may
-	 * be used as an alternative method of accessing
-	 * a node in the huffman tree.
-	 */
+    /**
+     * Array that associates a code (symbol) to the
+     * appropriate node in the huffman tree, this may
+     * be used as an alternative method of accessing
+     * a node in the huffman tree.
+     */
     struct huffman_node_t *nodes[HUFFMAN_SYMBOL_SIZE];
 
-	/**
-	 * The array that associates a code (symbol) index
-	 * to the ammount of times it occurred in the target
-	 * data file, this is going to be used in the
-	 * contruction of the huffman tree.
-	 */
+    /**
+     * The array that associates a code (symbol) index
+     * to the ammount of times it occurred in the target
+     * data file, this is going to be used in the
+     * contruction of the huffman tree.
+     */
     size_t freqs[HUFFMAN_SYMBOL_SIZE];
 
-	/**
-	 * Table containing the association between the various
-	 * prefixes and the code that they represent, this table
-	 * together with the prefix extra table may be used to
-	 * provide a much faster decoder performance.
-	 */
-	unsigned char *prefix_code;
+    /**
+     * Table containing the association between the various
+     * prefixes and the code that they represent, this table
+     * together with the prefix extra table may be used to
+     * provide a much faster decoder performance.
+     */
+    unsigned char *prefix_code;
 
-	/**
-	 * Table that associates the prefix code with the number
-	 * of extra bits contained in it, so that it's possible
-	 * to discard some extra bits contained in it.
-	 */
-	unsigned char *prefix_extra;
+    /**
+     * Table that associates the prefix code with the number
+     * of extra bits contained in it, so that it's possible
+     * to discard some extra bits contained in it.
+     */
+    unsigned char *prefix_extra;
 } huffman;
 
 VIRIATUM_EXPORT_PREFIX void create_huffman(struct huffman_t **huffman_pointer);
