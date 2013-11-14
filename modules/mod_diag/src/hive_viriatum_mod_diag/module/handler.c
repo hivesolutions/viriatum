@@ -88,6 +88,7 @@ ERROR_CODE _send_response_handler_diag(struct http_parser_t *http_parser) {
             "\"compiler_version\":\"%s\","
             "\"compilation_date\":\"%s\","
             "\"compilation_time\":\"%s\","
+			"\"compilation_flags\":\"%s\","
             "\"modules\":\"%s\","
             "\"description\":\"%s\","
             "\"status\":%d,"
@@ -103,6 +104,7 @@ ERROR_CODE _send_response_handler_diag(struct http_parser_t *http_parser) {
         service->compiler_version,
         service->compilation_date,
         service->compilation_time,
+		service->compilation_flags,
         service->modules,
         service->description,
         service->status,
