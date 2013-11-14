@@ -54,6 +54,7 @@ void create_file_stream(struct file_stream_t **file_stream_pointer, unsigned cha
     file_stream->stream->write = write_file_stream;
     file_stream->stream->flush = flush_file_stream;
     file_stream->stream->seek = seek_file_stream;
+    file_stream->stream->size = size_file_stream;
 
     /* sets the file stream in the file stream pointer */
     *file_stream_pointer = file_stream;
@@ -116,5 +117,20 @@ void seek_file_stream(struct stream_t *stream, size_t target) {
     /* retrieves the file stream from the stream (as the lower substrate)
     and then seeks the target object into the desired position */
     struct file_stream_t *file_stream = (struct file_stream_t *) stream->lower;
-    fseek(file_stream->file, target, 0);
+    fseek(file_stream->file, target, SEEK_SET);
+}
+
+void size_file_stream(struct stream_t *stream, size_t *size) {
+    /* retrieves the current index position so that it's
+    possible to restore it after the measure of the file
+    size, this is required otherwise corruption would occur */
+    struct file_stream_t *file_stream = (struct file_stream_t *) stream->lower;
+    size_t current = (size_t) ftell(file_stream->file);
+
+    /* seeks the file to the end of the tream and measures
+    the current position as the size of it, then restores the
+    current position back to the file pointer */
+    fseek(file_stream->file, 0, SEEK_END);
+    *size = (size_t) ftell(file_stream->file);
+    fseek(file_stream->file, current, SEEK_SET);
 }
