@@ -27,7 +27,7 @@ include $(top_srcdir)/Common.am
 
 SUBDIRS = viriatum_commons viriatum
 
-include_HEADERS = viriatum/stdafx.h \
+nobase_include_HEADERS = viriatum/stdafx.h \
 viriatum/viriatum.h \
 viriatum/base/base.h \
 viriatum/base/entry.h \
