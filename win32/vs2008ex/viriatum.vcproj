@@ -41,7 +41,7 @@
             <Tool
                 Name="VCCLCompilerTool"
                 Optimization="0"
-                PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;VIRIATUM_DEBUG;VIRIATUM_SSL;VIRIATUM_PCRE"
+                PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;VIRIATUM_SSL;VIRIATUM_PCRE"
                 MinimalRebuild="true"
                 BasicRuntimeChecks="3"
                 RuntimeLibrary="1"
@@ -194,7 +194,7 @@
             <Tool
                 Name="VCCLCompilerTool"
                 Optimization="0"
-                PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;VIRIATUM_DEBUG;VIRIATUM_SSL;VIRIATUM_PCRE"
+                PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;VIRIATUM_SSL;VIRIATUM_PCRE"
                 MinimalRebuild="true"
                 BasicRuntimeChecks="3"
                 RuntimeLibrary="1"

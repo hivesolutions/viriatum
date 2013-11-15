@@ -166,6 +166,9 @@ void decode_huffman(struct huffman_t *huffman, struct stream_t *in, struct strea
 }
 
 void decode_table_huffman(struct huffman_t *huffman, struct stream_t *in, struct stream_t *out) {
+    /* allocates space for the various variable that are required
+    for the decoding of an huffman based stream using the prefix
+    table based approach, note that the output buffer is included */
     unsigned char code;
     unsigned char extra;
     unsigned short word;
@@ -173,24 +176,44 @@ void decode_table_huffman(struct huffman_t *huffman, struct stream_t *in, struct
     unsigned char out_buffer[HUFFMAN_BUFFER_SIZE];
     unsigned char prefix_size = huffman->prefix_size;
     long long total_count = 0;
-
     size_t out_count = 0;
 
+    /* creates the bit stream that is going to be used to read sets
+    of bits from the input stream this is required for the prefix
+    based decoding as the tables are read from bit ranges */
     create_bit_stream(&bit_stream, in);
 
+    /* opens the input bit stream for reading and the (normal) output
+    stream in writing mode, these are the stream that are going to be
+    used for the decoding operation */
     open_bit_stream(bit_stream);
     out->open(out);
 
+    /* iterates continuously reading bits from the input stream until
+    the ammount of bits reach the value defined in the bit counter */
     while(TRUE) {
+        /* in case the total amount of bits read from the bit stream
+        has reached the pre-defined value (the end has been reached)
+        and so the current loop must break */
         if(total_count == huffman->bit_count) { break; }
 
+        /* reads the maximum prefix size of bits from the bit stream
+        to the word value, this is the value that is going to be used
+        for prefix value matching in the tables */
         read_word_bit_stream(bit_stream, &word, prefix_size);
 
+        /* retrieves the code and the extra bits from the word that was
+        just read from the bit stream */
         code = huffman->prefix_code[word];
         extra = huffman->prefix_extra[word];
 
+        /* in case the're are extra bits for the current work seek back
+        the current bit stream (required) */
         if(extra > 0) { seek_bit_stream(bit_stream, extra); }
 
+        /* "writes" the resolved code to the output buffer and increments
+        the associated counter, in case the value has reached the buffer
+        limit flushed the data to the underlying stream by writing it */
         out_buffer[out_count] = code;
         out_count++;
         if(out_count == HUFFMAN_BUFFER_SIZE) {
@@ -198,14 +221,22 @@ void decode_table_huffman(struct huffman_t *huffman, struct stream_t *in, struct
             out_count = 0;
         }
 
+        /* increments the total (bit) counter byt the "real" amount of bits
+        that were read from the input stream */
         total_count += prefix_size - extra;
     }
 
+    /* in case the're pending bytes to be written to the output
+    stream writes them (flush operation) */
     if(out_count > 0) { out->write(out, out_buffer, out_count); }
 
+    /* closes the output stream flusing all of it's data and then
+    closes the input bit based stream also*/
     in->close(out);
     close_bit_stream(bit_stream);
 
+    /* deletes the bit stream structure, avoiding the leak of any
+    memory resulting from that structure */
     delete_bit_stream(bit_stream);
 }
 
