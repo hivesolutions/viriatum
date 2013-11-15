@@ -34,6 +34,7 @@
 #define HOST_OS "win32"
 
 #ifdef _DEBUG
+#define HAVE_DEBUG
 #define CFLAGS_DEBUG_S " /debug"
 #else
 #define CFLAGS_DEBUG_S " /release"
