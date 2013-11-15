@@ -246,19 +246,25 @@ void read_byte_bit_stream(
     unsigned char *byte,
     unsigned char size
 ) {
-    register unsigned char shift_v;
-
+    /* allocates space for the various variable that are going to
+	be used for the reading of the byte operations */
     unsigned char available_bits_count;
     unsigned char extra_bits_count;
+	register unsigned char shift_v;
 
     /* in case the requested size is zero this is a special case
     and so the byte is set to zero and the control flow is returned
     immediately to the caller function */
     if(size == 0) { *byte = 0; return; }
 
+	/* runs the initial read flush operation in the bit stream, because
+	there may be some pending read operations pending from previous
+	operations (without this data corruption may occur) */
     flush_read_bit_stream(bit_stream);
 
-
+	/* sets the amount of available bits inside the current byte
+	as the current offset (counts from the right) and then calculates
+	the amount of extra bits outsie the current byte using the value */
     available_bits_count = bit_stream->current_byte_offset_read;
     extra_bits_count = size - available_bits_count;
 
@@ -271,12 +277,12 @@ void read_byte_bit_stream(
     must then be reset to the invalid (zero value) */
     else { extra_bits_count = 0; }
 
-
-
+	/* calculates the amount of bits that are going to be used in
+	the shift operation of the current byte and then uses it to move
+	the byte to the right and masks the left part of it using a pre-defined
+	set of masks selected according to the current bit size */
     shift_v = bit_stream->current_byte_offset_read - size;
     *byte = (bit_stream->current_byte_read >> shift_v) & masks[size];
-
-
 
     /* increments the global bit counter and the current byte offset by
     the size of the currently written bits */
