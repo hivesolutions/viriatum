@@ -101,7 +101,12 @@ typedef struct bit_stream_t {
      */
     unsigned char current_byte_offset_write;
 
-
+	/**
+	 * The counter that controls the number of bits
+	 * that have been read from the source bit stream.
+	 * This value may go back in case the seek operation
+	 * is performed in the stream.
+	 */
     size_t bit_counter_read;
 
     /**
@@ -110,8 +115,20 @@ typedef struct bit_stream_t {
      */
     size_t bit_counter_write;
 
+	/**
+	 * The counter of bytes that are pending to be read
+	 * from the current read buffer. Every time there's
+	 * a read operation in the underlying stream this value
+	 * is set with the ammount of bytes read from it.
+	 */
     size_t byte_counter_read;
 
+	/**
+	 * The current index value to next byte to be read from
+	 * the internal buffer (under read operations). The sum
+	 * of this value with the counter should provide the total
+	 * size of the read buffer.
+	 */
     size_t byte_current_read;
 
     /**

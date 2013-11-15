@@ -139,6 +139,10 @@ void seek_bit_stream(
     as there's nothing to be seeked for that situation */
     if(size == 0) { return; }
 
+	/* decrements the current vounter for bits that were read
+	by the ammount of bits that are going to be "seeked" */
+	bit_stream->bit_counter_read -= size;
+
     /* in case the size is smaller or the same as the number
     of bits alredy read the situation is simple as the same
     byte is going to be used and only the offset is required
