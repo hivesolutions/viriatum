@@ -117,6 +117,7 @@ def build(file = None, build_m = True, cflags = None, cross = None):
     # deb associated directories and the resulting binaries into the
     # temporary folder associated with the project
     atm.copy(result_f + "/lib", deb_f + "/usr/lib")
+    atm.copy(result_f + "/includes", deb_f + "/usr/includes")
     atm.copy(result_f + "/bin/viriatum", deb_f + "/usr/sbin")
     atm.copy(result_f + "/etc/viriatum", deb_f + "/etc/viriatum")
     atm.copy(result_f + "/etc/init.d/viriatum", deb_f + "/etc/init.d")
