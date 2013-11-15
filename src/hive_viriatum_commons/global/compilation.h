@@ -44,4 +44,8 @@
  * The string containing the description
  * of the flags used in the compilation.
  */
+#ifdef CFLAGS
 #define VIRIATUM_COMPILATION_FLAGS CFLAGS
+#else
+#define VIRIATUM_COMPILATION_FLAGS ""
+#endif
