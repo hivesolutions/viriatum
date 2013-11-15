@@ -141,7 +141,7 @@ void seek_bit_stream(
 
 	/* decrements the current vounter for bits that were read
 	by the ammount of bits that are going to be "seeked" */
-	bit_stream->bit_counter_read -= size;
+	bit_stream->bit_counter_read -= (size_t) size;
 
     /* in case the size is smaller or the same as the number
     of bits alredy read the situation is simple as the same
@@ -178,34 +178,50 @@ void seek_bit_stream(
         already read from the current read buffer */
         need_read = byte_count >= bit_stream->byte_current_read;
 
+		/* in case there's a need to read from the underlying stram the
+		operation should reset and move the buffer and reset the counters */
         if(need_read) {
+			/* calculates the size of the current read buffer by adding the
+			current byte (index) to the counter and then calculates the diff
+			to the initial position of the stream by calculating the diference
+			between the current index position and the number of bytes to be
+			set back plus one (this is the distance to the initial byte in
+			the last read operation) */
             total_read = bit_stream->byte_current_read + bit_stream->byte_counter_read;
             diff_read = bit_stream->byte_current_read - (size_t) byte_count + 1;
 
+			/* retrieves the reference to the underlying stream and uses it to
+			gather its current position and recalculates the new position using
+			the calculated diff then uses this value to update the stream position */
             stream = bit_stream->stream;
             position = stream->tell(stream);
             position -= total_read + diff_read;
             stream->seek(stream, position);
 
+			/* reads the default (pre-defined) value of bytes from the stream and updated
+			the counter and the current index values accordingly taking already into account
+			that a new value is going to be read from the buffer */
             bit_stream->byte_counter_read = stream->read(
                 stream,
                 bit_stream->buffer,
                 BIT_STREAM_BUFFER_SIZE
-            );
-            bit_stream->byte_current_read = 0;
-            bit_stream->current_byte_offset_read = offset_first;
-
-            bit_stream->current_byte_read = bit_stream->buffer[bit_stream->byte_current_read];
-            bit_stream->byte_counter_read--;
-            bit_stream->byte_current_read++;
-        } else {
+            ) - 1;
+            bit_stream->byte_current_read = 1;
+        }
+		/* otherwise the only the read buffer is moved back without having to
+		perform a (slow) read operation in the stream */
+		else {
+			/* decrements the current byte for read by the number of bytes
+			and increments the counter by the same ammount (buffer move) */
             bit_stream->byte_current_read -= (unsigned char) byte_count;
             bit_stream->byte_counter_read += (unsigned char) byte_count;
-
-            bit_stream->current_byte_read = bit_stream->buffer[bit_stream->byte_current_read - 1];
-
-            bit_stream->current_byte_offset_read = offset_first;
         }
+
+		/* reads the new current byte value from the buffer with the current
+		index minus one (previous byte) and then updates the offset inside the
+		current byte by the calculated offset in the first byte of the seek */
+        bit_stream->current_byte_read = bit_stream->buffer[bit_stream->byte_current_read - 1];
+        bit_stream->current_byte_offset_read = offset_first;
     }
 }
 
