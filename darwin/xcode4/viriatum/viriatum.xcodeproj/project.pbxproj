@@ -20,7 +20,6 @@
 		C2565FCB149C56C300722EFA /* libviriatum_commons_mobile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C2565FCA149C56C300722EFA /* libviriatum_commons_mobile.a */; };
 		C2565FD3149C56E900722EFA /* viriatum.c in Sources */ = {isa = PBXBuildFile; fileRef = C27406C51350BE2B0050EEAF /* viriatum.c */; };
 		C2565FD4149C56E900722EFA /* stdafx.c in Sources */ = {isa = PBXBuildFile; fileRef = C27406B91350BE2B0050EEAF /* stdafx.c */; };
-		C256798718365FF100B8AB66 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = C256798618365FF100B8AB66 /* Default-568h@2x.png */; };
 		C27406CA1350BE2B0050EEAF /* stdafx.c in Sources */ = {isa = PBXBuildFile; fileRef = C27406B91350BE2B0050EEAF /* stdafx.c */; };
 		C27406CE1350BE2B0050EEAF /* viriatum.c in Sources */ = {isa = PBXBuildFile; fileRef = C27406C51350BE2B0050EEAF /* viriatum.c */; };
 		C295DF9C155BCAD600036037 /* handler_default.c in Sources */ = {isa = PBXBuildFile; fileRef = C295DF67155BCAD600036037 /* handler_default.c */; };
@@ -60,7 +59,7 @@
 		C2AF3C44149CC7E300D28507 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = C2AF3C37149CC7E300D28507 /* InfoPlist.strings */; };
 		C2AF3C45149CC7E300D28507 /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = C2AF3C39149CC7E300D28507 /* MainWindow.xib */; };
 		C2AF3C46149CC7E300D28507 /* RootViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = C2AF3C3B149CC7E300D28507 /* RootViewController.xib */; };
-		C2AF3C48149CC7E300D28507 /* viriatum_mobileAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = C2AF3C40149CC7E300D28507 /* viriatum_mobileAppDelegate.m */; };
+		C2AF3C48149CC7E300D28507 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = C2AF3C40149CC7E300D28507 /* AppDelegate.m */; };
 		C2AF3C49149CC7E300D28507 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = C2AF3C41149CC7E300D28507 /* main.m */; };
 		C2AF3C4A149CC7E300D28507 /* RootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C2AF3C43149CC7E300D28507 /* RootViewController.m */; };
 		C2B2B76E17561397002F55D1 /* speed_test.c in Sources */ = {isa = PBXBuildFile; fileRef = C2B2B76C17561397002F55D1 /* speed_test.c */; };
@@ -116,7 +115,6 @@
 		C2565F7D149C556900722EFA /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
 		C2565F7F149C556A00722EFA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		C2565F81149C556A00722EFA /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = Library/Frameworks/CoreGraphics.framework; sourceTree = DEVELOPER_DIR; };
-		C256798618365FF100B8AB66 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		C27406B91350BE2B0050EEAF /* stdafx.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = stdafx.c; path = ../../../src/viriatum/stdafx.c; sourceTree = "<group>"; };
 		C27406BA1350BE2B0050EEAF /* stdafx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = stdafx.h; path = ../../../src/viriatum/stdafx.h; sourceTree = "<group>"; };
 		C27406C51350BE2B0050EEAF /* viriatum.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = viriatum.c; path = ../../../src/viriatum/viriatum.c; sourceTree = "<group>"; };
@@ -174,8 +172,8 @@
 		C2AF3C3C149CC7E300D28507 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/RootViewController.xib; sourceTree = "<group>"; };
 		C2AF3C3D149CC7E300D28507 /* viriatum_mobile-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "viriatum_mobile-Info.plist"; sourceTree = "<group>"; };
 		C2AF3C3E149CC7E300D28507 /* viriatum_mobile-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "viriatum_mobile-Prefix.pch"; sourceTree = "<group>"; };
-		C2AF3C3F149CC7E300D28507 /* viriatum_mobileAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = viriatum_mobileAppDelegate.h; sourceTree = "<group>"; };
-		C2AF3C40149CC7E300D28507 /* viriatum_mobileAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = viriatum_mobileAppDelegate.m; sourceTree = "<group>"; };
+		C2AF3C3F149CC7E300D28507 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		C2AF3C40149CC7E300D28507 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		C2AF3C41149CC7E300D28507 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		C2AF3C42149CC7E300D28507 /* RootViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RootViewController.h; sourceTree = "<group>"; };
 		C2AF3C43149CC7E300D28507 /* RootViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RootViewController.m; sourceTree = "<group>"; };
@@ -216,7 +214,6 @@
 		C20C2BB41350B5D5001E22FB = {
 			isa = PBXGroup;
 			children = (
-				C256798618365FF100B8AB66 /* Default-568h@2x.png */,
 				C20C2C741350B6A9001E22FB /* viriatum_commons.xcodeproj */,
 				C27406A41350BDF10050EEAF /* Classes */,
 				C20C2BC01350B5D7001E22FB /* Products */,
@@ -434,8 +431,8 @@
 				C2AF3C3B149CC7E300D28507 /* RootViewController.xib */,
 				C2AF3C3D149CC7E300D28507 /* viriatum_mobile-Info.plist */,
 				C2AF3C3E149CC7E300D28507 /* viriatum_mobile-Prefix.pch */,
-				C2AF3C3F149CC7E300D28507 /* viriatum_mobileAppDelegate.h */,
-				C2AF3C40149CC7E300D28507 /* viriatum_mobileAppDelegate.m */,
+				C2AF3C3F149CC7E300D28507 /* AppDelegate.h */,
+				C2AF3C40149CC7E300D28507 /* AppDelegate.m */,
 				C2AF3C41149CC7E300D28507 /* main.m */,
 				C2AF3C42149CC7E300D28507 /* RootViewController.h */,
 				C2AF3C43149CC7E300D28507 /* RootViewController.m */,
@@ -536,7 +533,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				C2AF3C44149CC7E300D28507 /* InfoPlist.strings in Resources */,
-				C256798718365FF100B8AB66 /* Default-568h@2x.png in Resources */,
 				C2AF3C45149CC7E300D28507 /* MainWindow.xib in Resources */,
 				C2AF3C46149CC7E300D28507 /* RootViewController.xib in Resources */,
 			);
@@ -584,7 +580,7 @@
 			files = (
 				C2565FD3149C56E900722EFA /* viriatum.c in Sources */,
 				C2565FD4149C56E900722EFA /* stdafx.c in Sources */,
-				C2AF3C48149CC7E300D28507 /* viriatum_mobileAppDelegate.m in Sources */,
+				C2AF3C48149CC7E300D28507 /* AppDelegate.m in Sources */,
 				C2AF3C49149CC7E300D28507 /* main.m in Sources */,
 				C2AF3C4A149CC7E300D28507 /* RootViewController.m in Sources */,
 				C295DF9D155BCAD600036037 /* handler_default.c in Sources */,
