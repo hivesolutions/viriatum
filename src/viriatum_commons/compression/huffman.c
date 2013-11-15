@@ -342,31 +342,53 @@ void decode_tree_huffman(struct huffman_t *huffman, struct stream_t *in, struct 
 }
 
 void generate_prefix_huffman(struct huffman_t *huffman) {
+    /* allocates space for the vairous local variables
+    to be used in the generation of the prefix tables */
     size_t index;
     register unsigned char symbol;
     register unsigned short code;
     unsigned char extra;
     struct huffman_node_t *node;
 
+    /* calculates the range of prefix using the prefix size
+    then calculates the size of each of the prefix tables */
     size_t prefix_range = 1 << huffman->prefix_size;
     size_t prefix_size = prefix_range * sizeof(unsigned char);
 
+    /* allocates space for each of the prefix tables, one for
+    the prefix to code association and other for the prefix to
+    extra bits association, the allocation is dynamic using the
+    prefix size as the reference */
     huffman->prefix_code = (unsigned char *) MALLOC(prefix_size);
     huffman->prefix_extra = (unsigned char *) MALLOC(prefix_size);
 
+    /* iterates over the complete set of symbols for huffman
+    (ascii symbols) in order to populate both prefix tables */
     for(index = 0; index < HUFFMAN_SYMBOL_SIZE; index++) {
+        /* retrieves the node associated with the current symbol
+        in case the value is null (not valid value) skyps the
+        current iterateion (not required) */
         node = huffman->nodes[index];
         if(node == NULL) { continue; }
 
+        /* unpacks the symbol and the code from the current symbol's
+        node and then calculates the extra number of bits for the
+        current symbol's huffman code as the (maximum) prefix size
+        minus the current's huffman code bit count */
         symbol = node->symbol;
         code = node->code;
         extra = huffman->prefix_size - node->bit_count;
 
+        /* runs the recursive based filling operation of the prefix
+        tables that fills the tables with all the prefix size based
+        combinations that represent this huffman code */
         _fill_prefix_huffman(huffman, symbol, code, extra, extra);
     }
 }
 
 void generate_table_huffman(struct huffman_t *huffman, struct stream_t *stream) {
+    /* allocates the various temporary variables that are
+    required for the generation of the huffman table/tree */
     size_t count;
     size_t index;
     struct huffman_node_t *node;
@@ -374,42 +396,77 @@ void generate_table_huffman(struct huffman_t *huffman, struct stream_t *stream) 
     struct huffman_node_t *right;
     struct priority_queue_t *queue;
 
+    /* creates a new priority queue and sets the default
+    comparision algorithm to the compare huffman one */
     create_priority_queue(&queue, _compare_huffman);
 
-    stream->open(stream);
+    /* runs the calculus of the frequencies for the provided
+    stream, at the end of the operation a table of frequencies
+    for each of the ascii symbols is created, please no that
+    this may be an expensive operation */
     calc_freqs_huffman(huffman, stream);
-    stream->close(stream);
 
+    /* iterates over the range of symbols of the default huffman
+    tree implementation to create and insert a new node for each
+    of the symbols that are considered value (more that one occurence) */
     for(index = 0; index < HUFFMAN_SYMBOL_SIZE; index++) {
+        /* retrieves the count for the current symbol and
+        in case there are no counts for it ignores it and
+        continues the loop skipping one step */
         count = huffman->freqs[index];
         if(count == 0) { continue; }
 
+        /* create a new huffman node and updates it with the
+        count for the current symbol and with the symbol itself */
         create_huffman_node(&node);
         node->value = count;
         node->symbol = (unsigned char) index;
 
+        /* increments the symbol counter (valid symbols counter)
+        and sets the node in the symbol to node array map then
+        "pushes" the new node into the priority queue */
         huffman->symbol_count++;
         huffman->nodes[index] = node;
         push_priority_queue(queue, (void *) node);
     }
 
+    /* iterates continuously creating the huffman tree using
+    the pre-defined algorithm of frequecies */
     while(TRUE) {
+        /* in case the size has reached the value of one
+        only one (master root node) is present the algorithm
+        is considered complete and the loop must break */
         if(queue->size <= 1) { break; }
 
+        /* retrieves two nodes from the priority queue that
+        are going to be set as the left and right childs of
+        the new master node to be created */
         pop_priority_queue(queue, (void **) &left);
         pop_priority_queue(queue, (void **) &right);
 
+        /* creates the new "master" node and sets the references
+        to the just retrieved left and right nodes, the new (frequency)
+        value for the master node is going to be the sum of both
+        values as the node represents both of them */
         create_huffman_node(&node);
         node->left = left;
         node->right = right;
         node->value = left->value + right->value;
 
+        /* pushes the new node into the priority queue so that
+        it may be also grouped again if required */
         push_priority_queue(queue, (void *) node);
     }
 
+    /* pops the current and only element of the queue as the
+    root node of the huffman tree and then deletes the priority
+    queue structure as it's not longer required */
     pop_priority_queue(queue, (void **) &huffman->root);
     delete_priority_queue(queue);
 
+    /* runs the allocation algorithm in the huffman tree so that
+    each of the nodes is represented by a binary number that is
+    inversely big as its size (huffman strategy) */
     allocate_tree_huffman(huffman, huffman->root, 0, 0);
 }
 
@@ -426,6 +483,10 @@ void calc_freqs_huffman(struct huffman_t *huffman, struct stream_t *stream) {
     reference to the frequecies sequence from the huffman */
     unsigned char buffer[HUFFMAN_BUFFER_SIZE];
     size_t *freqs = huffman->freqs;
+
+    /* opens the stream that is going to be used for the calculus
+    of the frequencies for each of the symbols (read mode) */
+    stream->open(stream);
 
     /* resets the current frequency table to the default zero
     value and then start iterating over the stream values to count
@@ -447,9 +508,9 @@ void calc_freqs_huffman(struct huffman_t *huffman, struct stream_t *stream) {
         }
     }
 
-    /* restores the stream back to the original position so that
-    additional operations may be performed correctly */
-    stream->seek(stream, 0);
+    /* runs the close operation on the stream so that no more operations
+    occur in the current stream without a new open call */
+    stream->close(stream);
 }
 
 void allocate_tree_huffman(
