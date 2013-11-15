@@ -56,23 +56,36 @@ void delete_huffman(struct huffman_t *huffman) {
 }
 
 void create_huffman_node(struct huffman_node_t **huffman_node_pointer) {
+	/* calculates the size of an huffman node structure and then
+	uses the value for the allocation of the appropriate memory */
     size_t huffman_node_size = sizeof(struct huffman_node_t);
     struct huffman_node_t *huffman_node =\
         (struct huffman_node_t *) MALLOC(huffman_node_size);
+
+	/* initializes the complete set of attribute of an huffman
+	node to the default values of each of them */
     huffman_node->left = NULL;
     huffman_node->right = NULL;
     huffman_node->value = 0;
     huffman_node->symbol = 0;
     huffman_node->code = 0;
     huffman_node->bit_count = 0;
+
+	/* returns the huffman node to the caller method by setting
+	the reference of the allocated structure in the parameter */
     *huffman_node_pointer = huffman_node;
 }
 
 void delete_huffman_node(struct huffman_node_t *huffman_node) {
+	/* releases the memory associated with the huffman node in
+	order to avoid any memory leak (could corrupt data) */
     FREE(huffman_node);
 }
 
 void delete_tree_huffman(struct huffman_node_t *node) {
+	/* deletes the huffman tree structure taking a recursive approach
+	and traversing the complete set of nodes in the tree, in order to
+	have the complete tree removed the root node should be passed */
     if(node->left != NULL) { delete_tree_huffman(node->left); }
     if(node->right != NULL) { delete_tree_huffman(node->right); }
     delete_huffman_node(node);
