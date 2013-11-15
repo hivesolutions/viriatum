@@ -27,7 +27,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface viriatum_mobileAppDelegate : NSObject <UIApplicationDelegate>
+@interface AppDelegate : NSObject <UIApplicationDelegate>
 
 @property (nonatomic, retain) IBOutlet UIWindow *window;
 

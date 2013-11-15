@@ -29,7 +29,7 @@
 
 #import "AppDelegate.h"
 
-@implementation viriatum_mobileAppDelegate
+@implementation AppDelegate
 
 @synthesize window = _window;
 @synthesize navigationController = _navigationController;
@@ -37,7 +37,7 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // allocates space for the command line arguments
     // these are going to be used in the starting of the service
-    struct HashMap_t *arguments;
+    struct hash_map_t *arguments;
 
     // creates the hashmap used to represent the arguments
     // from the command line (started as empty)
