@@ -233,10 +233,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		C20C2C6D1350B6A5001E22FB /* libhive_viriatum_commons.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libhive_viriatum_commons.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		C20C2C971350B6BB001E22FB /* stdafx.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = stdafx.c; path = ../../../src/hive_viriatum_commons/stdafx.c; sourceTree = "<group>"; };
-		C20C2C981350B6BB001E22FB /* stdafx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = stdafx.h; path = ../../../src/hive_viriatum_commons/stdafx.h; sourceTree = "<group>"; };
-		C20C2CB41350B6BB001E22FB /* viriatum_commons.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = viriatum_commons.h; path = ../../../src/hive_viriatum_commons/viriatum_commons.h; sourceTree = "<group>"; };
+		C20C2C6D1350B6A5001E22FB /* libviriatum_commons.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libviriatum_commons.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		C20C2C971350B6BB001E22FB /* stdafx.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = stdafx.c; path = ../../../src/viriatum_commons/stdafx.c; sourceTree = "<group>"; };
+		C20C2C981350B6BB001E22FB /* stdafx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = stdafx.h; path = ../../../src/viriatum_commons/stdafx.h; sourceTree = "<group>"; };
+		C20C2CB41350B6BB001E22FB /* viriatum_commons.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = viriatum_commons.h; path = ../../../src/viriatum_commons/viriatum_commons.h; sourceTree = "<group>"; };
 		C24EF47115820F4C00FAE3A0 /* file.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = file.c; sourceTree = "<group>"; };
 		C24EF47215820F4C00FAE3A0 /* file.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = file.h; sourceTree = "<group>"; };
 		C24EF47315820F4C00FAE3A0 /* io.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = io.h; sourceTree = "<group>"; };
@@ -250,9 +250,9 @@
 		C24EF49215820FB400FAE3A0 /* percent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = percent.h; sourceTree = "<group>"; };
 		C24EF49B15820FC800FAE3A0 /* sha1.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sha1.c; sourceTree = "<group>"; };
 		C24EF49C15820FC800FAE3A0 /* sha1.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sha1.h; sourceTree = "<group>"; };
-		C2565FA1149C55F300722EFA /* libhive_viriatum_commons_mobile.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libhive_viriatum_commons_mobile.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		C2565FA1149C55F300722EFA /* libviriatum_commons_mobile.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libviriatum_commons_mobile.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		C2565FA3149C55F300722EFA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		C295E075155BCB6200036037 /* _config_win32.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = _config_win32.h; path = ../../../src/hive_viriatum_commons/_config_win32.h; sourceTree = "<group>"; };
+		C295E075155BCB6200036037 /* _config_win32.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = _config_win32.h; path = ../../../src/viriatum_commons/_config_win32.h; sourceTree = "<group>"; };
 		C295E078155BCB7800036037 /* checksum.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = checksum.h; sourceTree = "<group>"; };
 		C295E079155BCB7800036037 /* crc_32.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = crc_32.c; sourceTree = "<group>"; };
 		C295E07A155BCB7800036037 /* crc_32.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = crc_32.h; sourceTree = "<group>"; };
@@ -380,8 +380,8 @@
 		C20C2C6E1350B6A5001E22FB /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				C20C2C6D1350B6A5001E22FB /* libhive_viriatum_commons.a */,
-				C2565FA1149C55F300722EFA /* libhive_viriatum_commons_mobile.a */,
+				C20C2C6D1350B6A5001E22FB /* libviriatum_commons.a */,
+				C2565FA1149C55F300722EFA /* libviriatum_commons_mobile.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -420,7 +420,7 @@
 				C24EF47315820F4C00FAE3A0 /* io.h */,
 			);
 			name = io;
-			path = ../../../src/hive_viriatum_commons/io;
+			path = ../../../src/viriatum_commons/io;
 			sourceTree = "<group>";
 		};
 		C2565FA2149C55F300722EFA /* Frameworks */ = {
@@ -443,7 +443,7 @@
 				C295E07C155BCB7800036037 /* md5.h */,
 			);
 			name = checksum;
-			path = ../../../src/hive_viriatum_commons/checksum;
+			path = ../../../src/viriatum_commons/checksum;
 			sourceTree = "<group>";
 		};
 		C295E07D155BCB7800036037 /* compression */ = {
@@ -454,7 +454,7 @@
 				C295E080155BCB7800036037 /* huffman.h */,
 			);
 			name = compression;
-			path = ../../../src/hive_viriatum_commons/compression;
+			path = ../../../src/viriatum_commons/compression;
 			sourceTree = "<group>";
 		};
 		C295E081155BCB7800036037 /* debug */ = {
@@ -467,7 +467,7 @@
 				C295E086155BCB7800036037 /* logging.h */,
 			);
 			name = debug;
-			path = ../../../src/hive_viriatum_commons/debug;
+			path = ../../../src/viriatum_commons/debug;
 			sourceTree = "<group>";
 		};
 		C295E087155BCB7800036037 /* encoding */ = {
@@ -482,7 +482,7 @@
 				C295E08A155BCB7800036037 /* encoding.h */,
 			);
 			name = encoding;
-			path = ../../../src/hive_viriatum_commons/encoding;
+			path = ../../../src/viriatum_commons/encoding;
 			sourceTree = "<group>";
 		};
 		C295E08B155BCB7800036037 /* global */ = {
@@ -498,7 +498,7 @@
 				C295E093155BCB7800036037 /* targetver.h */,
 			);
 			name = global;
-			path = ../../../src/hive_viriatum_commons/global;
+			path = ../../../src/viriatum_commons/global;
 			sourceTree = "<group>";
 		};
 		C295E094155BCB7800036037 /* ini */ = {
@@ -508,7 +508,7 @@
 				C295E096155BCB7800036037 /* ini.h */,
 			);
 			name = ini;
-			path = ../../../src/hive_viriatum_commons/ini;
+			path = ../../../src/viriatum_commons/ini;
 			sourceTree = "<group>";
 		};
 		C295E097155BCB7800036037 /* jni */ = {
@@ -521,7 +521,7 @@
 				C295E09C155BCB7800036037 /* start.h */,
 			);
 			name = jni;
-			path = ../../../src/hive_viriatum_commons/jni;
+			path = ../../../src/viriatum_commons/jni;
 			sourceTree = "<group>";
 		};
 		C295E09D155BCB7800036037 /* memory */ = {
@@ -532,7 +532,7 @@
 				C295E0A0155BCB7800036037 /* memory_pool.h */,
 			);
 			name = memory;
-			path = ../../../src/hive_viriatum_commons/memory;
+			path = ../../../src/viriatum_commons/memory;
 			sourceTree = "<group>";
 		};
 		C295E0A1155BCB7800036037 /* sorting */ = {
@@ -544,7 +544,7 @@
 				C295E0A5155BCB7800036037 /* sorting.h */,
 			);
 			name = sorting;
-			path = ../../../src/hive_viriatum_commons/sorting;
+			path = ../../../src/viriatum_commons/sorting;
 			sourceTree = "<group>";
 		};
 		C295E0A6155BCB7800036037 /* stream */ = {
@@ -561,7 +561,7 @@
 				C295E0AF155BCB7800036037 /* stream.h */,
 			);
 			name = stream;
-			path = ../../../src/hive_viriatum_commons/stream;
+			path = ../../../src/viriatum_commons/stream;
 			sourceTree = "<group>";
 		};
 		C295E0B0155BCB7800036037 /* structures */ = {
@@ -592,7 +592,7 @@
 				C295E0C3155BCB7800036037 /* type.h */,
 			);
 			name = structures;
-			path = ../../../src/hive_viriatum_commons/structures;
+			path = ../../../src/viriatum_commons/structures;
 			sourceTree = "<group>";
 		};
 		C295E0C4155BCB7800036037 /* system */ = {
@@ -607,7 +607,7 @@
 				C295E0CB155BCB7800036037 /* thread.h */,
 			);
 			name = system;
-			path = ../../../src/hive_viriatum_commons/system;
+			path = ../../../src/viriatum_commons/system;
 			sourceTree = "<group>";
 		};
 		C295E0CC155BCB7800036037 /* template */ = {
@@ -620,7 +620,7 @@
 				C295E0D1155BCB7800036037 /* template.h */,
 			);
 			name = template;
-			path = ../../../src/hive_viriatum_commons/template;
+			path = ../../../src/viriatum_commons/template;
 			sourceTree = "<group>";
 		};
 		C295E0D2155BCB7800036037 /* thread */ = {
@@ -631,7 +631,7 @@
 				C295E0D5155BCB7800036037 /* thread_pool.h */,
 			);
 			name = thread;
-			path = ../../../src/hive_viriatum_commons/thread;
+			path = ../../../src/viriatum_commons/thread;
 			sourceTree = "<group>";
 		};
 		C295E0D6155BCB7800036037 /* util */ = {
@@ -644,7 +644,7 @@
 				C295E0DB155BCB7800036037 /* util.h */,
 			);
 			name = util;
-			path = ../../../src/hive_viriatum_commons/util;
+			path = ../../../src/viriatum_commons/util;
 			sourceTree = "<group>";
 		};
 		C2B2B77F175613FF002F55D1 /* crypto */ = {
@@ -655,7 +655,7 @@
 				C2B2B782175613FF002F55D1 /* rc4.h */,
 			);
 			name = crypto;
-			path = ../../../src/hive_viriatum_commons/crypto;
+			path = ../../../src/viriatum_commons/crypto;
 			sourceTree = "<group>";
 		};
 		C2B2B78917561421002F55D1 /* formats */ = {
@@ -668,7 +668,7 @@
 				C2B2B78E17561421002F55D1 /* url.h */,
 			);
 			name = formats;
-			path = ../../../src/hive_viriatum_commons/formats;
+			path = ../../../src/viriatum_commons/formats;
 			sourceTree = "<group>";
 		};
 		C2F8700D1350BAE20003A4A5 /* root */ = {
@@ -846,9 +846,9 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		C20C2C6C1350B6A5001E22FB /* hive_viriatum_commons */ = {
+		C20C2C6C1350B6A5001E22FB /* viriatum_commons */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = C20C2C711350B6A5001E22FB /* Build configuration list for PBXNativeTarget "hive_viriatum_commons" */;
+			buildConfigurationList = C20C2C711350B6A5001E22FB /* Build configuration list for PBXNativeTarget "viriatum_commons" */;
 			buildPhases = (
 				C20C2C691350B6A5001E22FB /* Sources */,
 				C20C2C6A1350B6A5001E22FB /* Frameworks */,
@@ -858,14 +858,14 @@
 			);
 			dependencies = (
 			);
-			name = hive_viriatum_commons;
-			productName = hive_viriatum_commons;
-			productReference = C20C2C6D1350B6A5001E22FB /* libhive_viriatum_commons.a */;
+			name = viriatum_commons;
+			productName = viriatum_commons;
+			productReference = C20C2C6D1350B6A5001E22FB /* libviriatum_commons.a */;
 			productType = "com.apple.product-type.library.static";
 		};
-		C2565FA0149C55F300722EFA /* hive_viriatum_commons_mobile */ = {
+		C2565FA0149C55F300722EFA /* viriatum_commons_mobile */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = C2565FAD149C55F300722EFA /* Build configuration list for PBXNativeTarget "hive_viriatum_commons_mobile" */;
+			buildConfigurationList = C2565FAD149C55F300722EFA /* Build configuration list for PBXNativeTarget "viriatum_commons_mobile" */;
 			buildPhases = (
 				C2565F9D149C55F300722EFA /* Sources */,
 				C2565F9E149C55F300722EFA /* Frameworks */,
@@ -875,9 +875,9 @@
 			);
 			dependencies = (
 			);
-			name = hive_viriatum_commons_mobile;
-			productName = hive_viriatum_commons_mobile;
-			productReference = C2565FA1149C55F300722EFA /* libhive_viriatum_commons_mobile.a */;
+			name = viriatum_commons_mobile;
+			productName = viriatum_commons_mobile;
+			productReference = C2565FA1149C55F300722EFA /* libviriatum_commons_mobile.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 /* End PBXNativeTarget section */
@@ -885,7 +885,7 @@
 /* Begin PBXProject section */
 		C20C2C641350B6A5001E22FB /* Project object */ = {
 			isa = PBXProject;
-			buildConfigurationList = C20C2C671350B6A5001E22FB /* Build configuration list for PBXProject "hive_viriatum_commons" */;
+			buildConfigurationList = C20C2C671350B6A5001E22FB /* Build configuration list for PBXProject "viriatum_commons" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -897,8 +897,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				C20C2C6C1350B6A5001E22FB /* hive_viriatum_commons */,
-				C2565FA0149C55F300722EFA /* hive_viriatum_commons_mobile */,
+				C20C2C6C1350B6A5001E22FB /* viriatum_commons */,
+				C2565FA0149C55F300722EFA /* viriatum_commons_mobile */,
 			);
 		};
 /* End PBXProject section */
@@ -1061,7 +1061,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				COPY_PHASE_STRIP = NO;
-				DSTROOT = /tmp/hive_viriatum_commons_mobile.dst;
+				DSTROOT = /tmp/viriatum_commons_mobile.dst;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
@@ -1085,7 +1085,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				COPY_PHASE_STRIP = YES;
-				DSTROOT = /tmp/hive_viriatum_commons_mobile.dst;
+				DSTROOT = /tmp/viriatum_commons_mobile.dst;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
@@ -1102,7 +1102,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		C20C2C671350B6A5001E22FB /* Build configuration list for PBXProject "hive_viriatum_commons" */ = {
+		C20C2C671350B6A5001E22FB /* Build configuration list for PBXProject "viriatum_commons" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C20C2C6F1350B6A5001E22FB /* Debug */,
@@ -1111,7 +1111,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		C20C2C711350B6A5001E22FB /* Build configuration list for PBXNativeTarget "hive_viriatum_commons" */ = {
+		C20C2C711350B6A5001E22FB /* Build configuration list for PBXNativeTarget "viriatum_commons" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C20C2C721350B6A5001E22FB /* Debug */,
@@ -1120,7 +1120,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		C2565FAD149C55F300722EFA /* Build configuration list for PBXNativeTarget "hive_viriatum_commons_mobile" */ = {
+		C2565FAD149C55F300722EFA /* Build configuration list for PBXNativeTarget "viriatum_commons_mobile" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C2565FAB149C55F300722EFA /* Debug */,
