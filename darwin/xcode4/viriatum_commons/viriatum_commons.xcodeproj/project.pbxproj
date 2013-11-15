@@ -41,6 +41,10 @@
 		C24EF4A3158211C700FAE3A0 /* _config_win32.h in Headers */ = {isa = PBXBuildFile; fileRef = C295E075155BCB6200036037 /* _config_win32.h */; };
 		C2565FA4149C55F300722EFA /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C2565FA3149C55F300722EFA /* Foundation.framework */; };
 		C2565FB7149C565A00722EFA /* stdafx.c in Sources */ = {isa = PBXBuildFile; fileRef = C20C2C971350B6BB001E22FB /* stdafx.c */; };
+		C256798218365FD300B8AB66 /* priority_queue.c in Sources */ = {isa = PBXBuildFile; fileRef = C256798018365FD300B8AB66 /* priority_queue.c */; };
+		C256798318365FD300B8AB66 /* priority_queue.h in Headers */ = {isa = PBXBuildFile; fileRef = C256798118365FD300B8AB66 /* priority_queue.h */; };
+		C256798418365FD800B8AB66 /* priority_queue.h in Headers */ = {isa = PBXBuildFile; fileRef = C256798118365FD300B8AB66 /* priority_queue.h */; };
+		C256798518365FDF00B8AB66 /* priority_queue.c in Sources */ = {isa = PBXBuildFile; fileRef = C256798018365FD300B8AB66 /* priority_queue.c */; };
 		C295E076155BCB6200036037 /* _config_win32.h in Headers */ = {isa = PBXBuildFile; fileRef = C295E075155BCB6200036037 /* _config_win32.h */; };
 		C295E0DC155BCB7800036037 /* checksum.h in Headers */ = {isa = PBXBuildFile; fileRef = C295E078155BCB7800036037 /* checksum.h */; };
 		C295E0DD155BCB7800036037 /* checksum.h in Headers */ = {isa = PBXBuildFile; fileRef = C295E078155BCB7800036037 /* checksum.h */; };
@@ -252,6 +256,8 @@
 		C24EF49C15820FC800FAE3A0 /* sha1.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sha1.h; sourceTree = "<group>"; };
 		C2565FA1149C55F300722EFA /* libviriatum_commons_mobile.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libviriatum_commons_mobile.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		C2565FA3149C55F300722EFA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		C256798018365FD300B8AB66 /* priority_queue.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = priority_queue.c; sourceTree = "<group>"; };
+		C256798118365FD300B8AB66 /* priority_queue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = priority_queue.h; sourceTree = "<group>"; };
 		C295E075155BCB6200036037 /* _config_win32.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = _config_win32.h; path = ../../../src/viriatum_commons/_config_win32.h; sourceTree = "<group>"; };
 		C295E078155BCB7800036037 /* checksum.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = checksum.h; sourceTree = "<group>"; };
 		C295E079155BCB7800036037 /* crc_32.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = crc_32.c; sourceTree = "<group>"; };
@@ -567,6 +573,8 @@
 		C295E0B0155BCB7800036037 /* structures */ = {
 			isa = PBXGroup;
 			children = (
+				C256798018365FD300B8AB66 /* priority_queue.c */,
+				C256798118365FD300B8AB66 /* priority_queue.h */,
 				C24EF48315820F9B00FAE3A0 /* sort_map.c */,
 				C24EF48415820F9B00FAE3A0 /* sort_map.h */,
 				C24EF48515820F9B00FAE3A0 /* string.c */,
@@ -740,6 +748,7 @@
 				C295E168155BCB7800036037 /* system.h in Headers */,
 				C295E16A155BCB7800036037 /* system_util.h in Headers */,
 				C295E16C155BCB7800036037 /* thread.h in Headers */,
+				C256798318365FD300B8AB66 /* priority_queue.h in Headers */,
 				C295E170155BCB7800036037 /* engine.h in Headers */,
 				C295E174155BCB7800036037 /* handler.h in Headers */,
 				C295E176155BCB7800036037 /* template.h in Headers */,
@@ -819,6 +828,7 @@
 				C295E171155BCB7800036037 /* engine.h in Headers */,
 				C295E175155BCB7800036037 /* handler.h in Headers */,
 				C295E177155BCB7800036037 /* template.h in Headers */,
+				C256798418365FD800B8AB66 /* priority_queue.h in Headers */,
 				C295E179155BCB7800036037 /* thread.h in Headers */,
 				C295E17D155BCB7800036037 /* thread_pool.h in Headers */,
 				C295E181155BCB7800036037 /* arguments_util.h in Headers */,
@@ -885,6 +895,8 @@
 /* Begin PBXProject section */
 		C20C2C641350B6A5001E22FB /* Project object */ = {
 			isa = PBXProject;
+			attributes = {
+			};
 			buildConfigurationList = C20C2C671350B6A5001E22FB /* Build configuration list for PBXProject "viriatum_commons" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
@@ -947,6 +959,7 @@
 				C2B2B784175613FF002F55D1 /* rc4.c in Sources */,
 				C2B2B79017561421002F55D1 /* passwd.c in Sources */,
 				C2B2B79217561421002F55D1 /* url.c in Sources */,
+				C256798218365FD300B8AB66 /* priority_queue.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -993,6 +1006,7 @@
 				C2B2B78717561408002F55D1 /* rc4.c in Sources */,
 				C2B2B79517561427002F55D1 /* passwd.c in Sources */,
 				C2B2B79717561427002F55D1 /* url.c in Sources */,
+				C256798518365FDF00B8AB66 /* priority_queue.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
