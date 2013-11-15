@@ -44,7 +44,7 @@ zend_function_entry viriatum_functions[] = {
     PHP_FE(viriatum_compiler_version, NULL)
     PHP_FE(viriatum_compilation_date, NULL)
     PHP_FE(viriatum_compilation_time, NULL)
-	PHP_FE(viriatum_compilation_flags, NULL)
+    PHP_FE(viriatum_compilation_flags, NULL)
     { NULL, NULL, NULL }
 };
 
@@ -237,7 +237,7 @@ ZEND_MINFO_FUNCTION(viriatum_information) {
     php_info_print_table_row(2, "Compiler Version", _service->compiler_version);
     php_info_print_table_row(2, "Compilation Date", _service->compilation_date);
     php_info_print_table_row(2, "Compilation Time", _service->compilation_time);
-	php_info_print_table_row(2, "Compilation Flags", _service->compilation_flags);
+    php_info_print_table_row(2, "Compilation Flags", _service->compilation_flags);
     php_info_print_table_end();
     php_info_print_table_start();
     php_info_print_table_header(2, "Name", "Path");
