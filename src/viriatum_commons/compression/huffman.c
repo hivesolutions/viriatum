@@ -241,46 +241,82 @@ void decode_table_huffman(struct huffman_t *huffman, struct stream_t *in, struct
 }
 
 void decode_tree_huffman(struct huffman_t *huffman, struct stream_t *in, struct stream_t *out) {
+    /* allocates space for the various local and temporary values
+    that are going to be used in the decoding operation for the
+    huffman infra-structure */
     size_t index;
     size_t count;
     unsigned char bit;
     unsigned char is_leaf;
-    unsigned char bit_count;
+    register unsigned char bit_count;
     register unsigned char code;
+    struct huffman_node_t *node;
     unsigned char in_buffer[HUFFMAN_BUFFER_SIZE];
     unsigned char out_buffer[HUFFMAN_BUFFER_SIZE];
     long long total_count = 0;
-
     size_t out_count = 0;
-    size_t major_count = 0;
 
-    struct huffman_node_t *node = huffman->root;
-
+    /* opens both the input and the ouput streams so that they
+    become ready to received and provide information */
     in->open(in);
     out->open(out);
 
+    /* sets the initial node for the iterative approach as
+    the root node, as this is the start of the iterative process */
+    node = huffman->root;
+
+    /* iterates continuously, reading data from the input buffer
+    in a one byte size approach and the using all of it's bit to
+    percolate over the huffman tree */
     while(TRUE) {
+        /* reads a set of data from the input buffer in case the
+        returned amount of bytes read is zero the end of stream
+        has been reached and so the loop must break */
         count = in->read(in, in_buffer, HUFFMAN_BUFFER_SIZE);
         if(count == 0) { break; }
 
+        /* iterates over the range of bytes that have just been
+        read from the input stream, to use all of its bits in the
+        percolation of the huffman tree */
         for(index = 0; index < count; index++) {
+            /* retrieves the current byte (code) and resets the bit
+            counter to the initial zero value */
             code = in_buffer[index];
             bit_count = 0;
 
+            /* iterates continuously until either the complete set of
+            bits in the code have been processed or the complete set
+            of huffman bits "inside" the file have been read */
             while(TRUE) {
+                /* in case the the complete set of bits in the code
+                have been processed or the end of huffman stream has
+                been reached the current loop is break */
                 if(bit_count == HUFFMAN_BYTE_SIZE) { break; }
                 if(total_count == huffman->bit_count) { break; }
 
+                /* increments both the internal byte counter of bits
+                and the global bit counter for the file */
                 bit_count++;
                 total_count++;
 
+                /* shifts the code by the rquired amount of bits for
+                the current iteration step and then verifies if the
+                bit is odd or even and selects the apropriate next
+                node value (tree percolation step) */
                 bit = code >> (HUFFMAN_BYTE_SIZE - bit_count);
                 if(bit & 1) { node = node->right; }
                 else { node = node->left; }
 
+                /* verifies if the current selected node is a leaf
+                node (no child) and in case it's not continus the loop
+                immediately as there's nothing to be done */
                 is_leaf = node->left == NULL && node->right == NULL;
                 if(is_leaf == FALSE) { continue; }
 
+                /* "writes" the current node's symbol in the output
+                buffer and increments the counter for the output buffer
+                in case this value has reached the buffer limit flushes
+                the data to the stream (writing it) */
                 out_buffer[out_count] = node->symbol;
                 out_count++;
                 if(out_count == HUFFMAN_BUFFER_SIZE) {
@@ -288,8 +324,9 @@ void decode_tree_huffman(struct huffman_t *huffman, struct stream_t *in, struct 
                     out_count = 0;
                 }
 
+                /* updates the current node in teiration with the huffman's
+                root node as a new tree traversal will begin */
                 node = huffman->root;
-                major_count++;
             }
         }
     }
@@ -298,6 +335,8 @@ void decode_tree_huffman(struct huffman_t *huffman, struct stream_t *in, struct 
     stream flushes them by writing them to the output stream */
     if(out_count > 0) { out->write(out, out_buffer, out_count); }
 
+    /* closes both the output stream and the input one so that
+    no more that is going to be writen or read from them */
     out->close(out);
     in->close(in);
 }
