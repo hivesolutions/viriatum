@@ -143,4 +143,4 @@ viriatum_commons/util/function_util.h \
 viriatum_commons/util/random_util.h \
 viriatum_commons/util/string_util.h \
 viriatum_commons/util/string_util_s.h \
-viriatum_commons/util/util.h 
+viriatum_commons/util/util.h
