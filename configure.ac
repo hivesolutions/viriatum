@@ -30,7 +30,7 @@ m4_include([m4/settings.m4])
 AC_PREREQ(2.61)
 
 # defines the general values
-AC_INIT(hive_viriatum, viriatum_version, development@hive.pt)
+AC_INIT(viriatum, viriatum_version, development@hive.pt)
 AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([src])
 AC_CONFIG_HEADERS([src/config.h])

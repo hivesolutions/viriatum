@@ -13,6 +13,6 @@
 /scripts/build/win32/build/
 /scripts/build/win32/base/
 /scripts/build/win32/modules/
-/darwin/xcode4/hive_viriatum.xcworkspace/xcuserdata/
-/darwin/xcode4/hive_viriatum/hive_viriatum.xcodeproj/xcuserdata/
-/darwin/xcode4/hive_viriatum_commons/hive_viriatum_commons.xcodeproj/xcuserdata/
+/darwin/xcode4/viriatum.xcworkspace/xcuserdata/
+/darwin/xcode4/viriatum/viriatum.xcodeproj/xcuserdata/
+/darwin/xcode4/viriatum_commons/viriatum_commons.xcodeproj/xcuserdata/

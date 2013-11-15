@@ -37,12 +37,12 @@
  * The name of the environment variable used to build
  * the viriatum path.
  */
-#define HIVE_VIRIATUM_ENVIRONMENT_PATH "VIRIATUM_PATH"
+#define VIRIATUM_ENVIRONMENT_PATH "VIRIATUM_PATH"
 
 /**
  * The root path being used.
  */
-#define HIVE_VIRIATUM_ROOT_PATH "."
+#define VIRIATUM_ROOT_PATH "."
 
 #ifdef VIRIATUM_PLATFORM_WIN32
 #define VIRIATUM_ENVIRONMENT_SEPARATOR ";"
