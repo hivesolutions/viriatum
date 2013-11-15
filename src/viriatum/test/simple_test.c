@@ -433,73 +433,6 @@ void test_bencoding() {
     FREE(encoded_buffer);
 }
 
-void test_huffman() {
-    /* allocates space for both the file stream that is
-    going to be used in the reading process and for the
-    huffman structure to be used in the test */
-    struct file_stream_t *in_stream;
-    struct file_stream_t *out_stream;
-    struct huffman_t *huffman;
-    clock_t initial;
-    clock_t delta;
-
-    /* creates the file stream that is going to be used for
-    the testing of the huffman infra-structure */
-    create_file_stream(
-        &in_stream,
-        (unsigned char *) "C:/tobias.txt",
-        (unsigned char *) "rb"
-    );
-
-    create_file_stream(
-        &out_stream,
-        (unsigned char *) "c:/tobias.txt.huffman",
-        (unsigned char *) "wb"
-    );
-
-    /* creates the huffman (encoder) and then runs the
-    generation of the huffman table in it */
-    create_huffman(&huffman);
-    initial = clock();
-    generate_table_huffman(huffman, in_stream->stream);
-    generate_prefix_huffman(huffman);
-    delta = clock() - initial;
-    printf("generate: %d\n", delta);
-
-    /* runs the huffman encoder creating the bit stream
-    with the compressed contents provided by the input stream
-    that was just loaded as the input */
-    initial = clock();
-    encode_huffman(huffman, in_stream->stream, out_stream->stream);
-    delta = clock() - initial;
-    printf("encode: %d\n", delta);
-
-    delete_file_stream(out_stream);
-    delete_file_stream(in_stream);
-
-    create_file_stream(
-        &in_stream,
-        (unsigned char *) "C:/tobias.txt.huffman",
-        (unsigned char *) "rb"
-    );
-
-    create_file_stream(
-        &out_stream,
-        (unsigned char *) "c:/tobias.txt.decoded",
-        (unsigned char *) "wb"
-    );
-
-    initial = clock();
-    decode_huffman(huffman, in_stream->stream, out_stream->stream);
-    delta = clock() - initial;
-    printf("decode: %d\n", delta);
-
-    delete_file_stream(out_stream);
-    delete_file_stream(in_stream);
-
-    delete_huffman(huffman);
-}
-
 void test_bit_stream() {
     /* allocates space for the byte value that is going
     to be used in the read based tezt of the bit stream */
@@ -752,6 +685,77 @@ void test_file_stream() {
     delete_file_stream(file_stream);
 }
 
+void test_huffman() {
+    /* allocates space for both the file stream that is
+    going to be used in the reading process and for the
+    huffman structure to be used in the test */
+    struct file_stream_t *in_stream;
+    struct file_stream_t *out_stream;
+    struct huffman_t *huffman;
+
+    /* creates the file stream that is going to be used for
+    the testing of the huffman infra-structure, this is the
+    input stream from which the data will be read (source) */
+    create_file_stream(
+        &in_stream,
+        (unsigned char *) "bit_stream.bin",
+        (unsigned char *) "rb"
+    );
+
+    /* creates the file that is going to be used to output the
+    huffman encoded file, opening under the write mode */
+    create_file_stream(
+        &out_stream,
+        (unsigned char *) "bit_stream.bin.huffman",
+        (unsigned char *) "wb"
+    );
+
+    /* creates the huffman (encoder) and then runs the
+    generation of the huffman table in it, after the generation
+    of the table runs the generation of the prefix tables */
+    create_huffman(&huffman);
+    generate_table_huffman(huffman, in_stream->stream);
+    generate_prefix_huffman(huffman);
+
+    /* runs the huffman encoder creating the bit stream
+    with the compressed contents provided by the input stream
+    that was just loaded as the input */
+    encode_huffman(huffman, in_stream->stream, out_stream->stream);
+
+    /* deletes both the output and the input huffman file streams
+    to avoid any memory leak (would create problems) */
+    delete_file_stream(out_stream);
+    delete_file_stream(in_stream);
+
+    /* creates the file stream that is going to be used as the input
+    for the decoding process this stream should contain an huffman
+    encoded file to be decompressed */
+    create_file_stream(
+        &in_stream,
+        (unsigned char *) "bit_stream.bin.huffman",
+        (unsigned char *) "rb"
+    );
+
+    /* creates and opens the file that is going to be used as the output
+    for the decoding process in the huffman infra-structure */
+    create_file_stream(
+        &out_stream,
+        (unsigned char *) "bit_stream.bin.decoded",
+        (unsigned char *) "wb"
+    );
+
+    /* runs the decoding process using the provided input and output
+    streams, this is a very long operation that may consume a lot of
+    resouces and take some time to complete */
+    decode_huffman(huffman, in_stream->stream, out_stream->stream);
+
+    /* deletes both the output and the input streams and then removes
+    the current huffman structure as it's not goign to be required anymore */
+    delete_file_stream(out_stream);
+    delete_file_stream(in_stream);
+    delete_huffman(huffman);
+}
+
 void test_template_handler() {
     /* allocates space for the template handler */
     struct template_handler_t *template_handler;
@@ -851,9 +855,9 @@ void run_simple_tests() {
     test_linked_buffer();
     test_base64();
     test_bencoding();
-    test_huffman();
     test_bit_stream();
     test_file_stream();
+    test_huffman();
     test_template_handler();
     test_quicksort();
     test_quicksort_linked_list();
