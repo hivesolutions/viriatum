@@ -92,28 +92,50 @@ void delete_tree_huffman(struct huffman_node_t *node) {
 }
 
 void encode_huffman(struct huffman_t *huffman, struct stream_t *in, struct stream_t *out) {
+	/* allocates space in the stack for the various temporary
+	variables that are going to be used in the encoding operation
+	of the stream using the current huffman state */
     size_t count;
     size_t index;
     unsigned char byte;
     struct huffman_node_t *node;
+	struct bit_stream_t *bit_stream;
     unsigned char buffer[HUFFMAN_BUFFER_SIZE];
-    struct bit_stream_t *bit_stream;
 
+	/* creates the but stream that is going to be used as
+	the encoded output (bit stream is required for huffman) */
     create_bit_stream(&bit_stream, out);
 
+	/* opens the input stream and the just created bit stream
+	that is going to be used as the output */
     in->open(in);
     open_bit_stream(bit_stream);
 
+	/* initializes the bit counter of the huffman structure to
+	zero, this value will count the total amount of bits of the
+	huffman encoded strema (to be used in decoding) */
     huffman->bit_count = 0;
 
+	/* iterates continuously to read new data from the input
+	stream and then run the encoder using the current nodes map */
     while(TRUE) {
+		/* reads some data from the input stream in case the returned
+		count of bytes is zero the end of stream is found, and so it
+		must break the current loop (all bytes encoded) */
         count = in->read(in, buffer, HUFFMAN_BUFFER_SIZE);
         if(count == 0) { break; }
 
+		/* iterates over the range of bytes that have just been read
+		to encode them using the loaded nodes array */
         for(index = 0; index < count; index++) {
+			/* retrieves the current byte in iteration from the buffer
+			and resolves it into the proper node from the nodes array */
             byte = buffer[index];
             node = huffman->nodes[byte];
 
+			/* increments the bit counter by the amount of bits or the
+			node and then writes into the bit stream the code representing
+			the current byte using the current huffman tree */
             huffman->bit_count += node->bit_count;
             write_word_bit_stream(
                 bit_stream,
@@ -123,18 +145,24 @@ void encode_huffman(struct huffman_t *huffman, struct stream_t *in, struct strea
         }
     }
 
+	/* closes the current bit stream, flushing any pending data to
+	the underlying stream and then closes the input stream */
     close_bit_stream(bit_stream);
     in->close(in);
 
+	/* deletes the (temporary) bit stream in order to avoid any kind
+	of memory leaks (could create corrupted data) */
     delete_bit_stream(bit_stream);
 }
 
 void decode_huffman(struct huffman_t *huffman, struct stream_t *in, struct stream_t *out) {
-    if(huffman->prefix_code && huffman->prefix_extra) {
-        decode_table_huffman(huffman, in, out);
-    } else {
-        decode_tree_huffman(huffman, in, out);
-    }
+	/* verifies if the conditions are met to use the (prefix)
+	table decoder in case their not use the tree based decoder
+	note that there's a significant performance issue with the
+	tree based decoder as it need to percolate the tree */
+	unsigned char is_table = huffman->prefix_code && huffman->prefix_extra;
+    if(is_table) { decode_table_huffman(huffman, in, out); }
+	else { decode_tree_huffman(huffman, in, out); }
 }
 
 void decode_table_huffman(struct huffman_t *huffman, struct stream_t *in, struct stream_t *out) {
