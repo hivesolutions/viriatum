@@ -40,8 +40,16 @@ __license__ = "GNU General Public License (GPL), Version 3"
 import os.path
 import re
 
-SOURCE_FILE_EXTENSIONS = ["cpp", "c", "mm"]
-SOURCE_DIRS = ["modules/mod_lua/src/viriatum_mod_lua", "src/viriatum_commons", "src/viriatum"]
+SOURCE_FILE_EXTENSIONS = ("cpp", "c", "mm")
+SOURCE_DIRS = (
+    "modules/mod_diag/src/viriatum_mod_diag",
+    "modules/mod_gif/src/viriatum_mod_gif",
+    "modules/mod_lua/src/viriatum_mod_lua",
+    "modules/mod_php/src/viriatum_mod_php",
+    "modules/mod_wsgi/src/viriatum_mod_wsgi",
+    "src/viriatum_commons",
+    "src/viriatum"
+)
 base_path = "none"
 
 path_names = []
