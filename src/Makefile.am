@@ -52,7 +52,7 @@ viriatum/module/loading.h \
 viriatum/module/module.h \
 viriatum/polling/polling.h \
 viriatum/polling/polling_epoll.h \
-vpolling/polling_kqueue.h \
+viriatum/polling/polling_kqueue.h \
 viriatum/polling/polling_select.h \
 viriatum/stream/stream.h \
 viriatum/stream/stream_http.h \
