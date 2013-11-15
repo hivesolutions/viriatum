@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Viriatum / Status</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+        <!-- css inclusion -->
+        <link rel="stylesheet" href="/resources/css/layout.css" type="text/css" />
+
+        <!-- favicon inclusion -->
+        <link rel="shortcut icon" href="/resources/images/favicon.ico" />
+    </head>
+    <body>
+        <div id="header-wrapper">
+            <div class="header-body">
+                <div class="branding simple">
+                    <a href="/"></a>
+                </div>
+            </div>
+        </div>
+        <div id="content-wrapper">
+            <table class="table status" cellpadding="0" cellspacing="0">
+                <tbody>
+                    <tr>
+                        <td class="right label">load</td>
+                        <td class="left value">
+                            <a href="connections" class="large"><?php echo(viriatum_connections()) ?> connections</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="right label" width="50%">uptime</td>
+                        <td class="left value" width="50%"><?php echo(viriatum_uptime()) ?></td>
+                    </tr>
+                    <tr>
+                        <td class="right label">version</td>
+                        <td class="left value"><?php echo(viriatum_version()) ?></td>
+                    </tr>
+                    <tr>
+                        <td class="right label">flags</td>
+                        <td class="left value"><?php echo(viriatum_flags()) ?></td>
+                    </tr>
+                    <tr>
+                        <td class="right label">modules</td>
+                        <td class="left value"><?php echo(viriatum_modules()) ?></td>
+                    </tr>
+                    <tr>
+                        <td class="right label">environment</td>
+                        <td class="left value"><?php echo(viriatum_platform()) ?></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td class="right label">compiler</td>
+                        <td class="left value"><?php echo(viriatum_compiler()) ?> / <?php echo(viriatum_compiler_version()) ?></td>
+                    </tr>
+                    <tr>
+                        <td class="right label">compilation date</td>
+                        <td class="left value"><?php echo(viriatum_compilation_date()) ?> @ <?php echo(viriatum_compilation_time()) ?></td>
+                    </tr>
+                    <tr>
+                        <td class="right label">compilation flags</td>
+                        <td class="left value"><?php echo(viriatum_compilation_flags()) ?></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div id="footer-wrapper">
+            <div class="footer-body">
+                <div class="separator-horizontal"></div>
+                <ul class="footer-list">
+                    <img class="footer-logo" src="/resources/images/logo/steamfire-logo.png" />
+                </ul>
+            </div>
+        </div>
+    </body>
+</html>
