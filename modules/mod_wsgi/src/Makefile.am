@@ -25,4 +25,4 @@
 
 include $(top_srcdir)/Common.am
 
-SUBDIRS = hive_viriatum_mod_wsgi
+SUBDIRS = viriatum_mod_wsgi

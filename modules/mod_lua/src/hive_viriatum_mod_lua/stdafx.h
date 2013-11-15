@@ -32,7 +32,7 @@
 #include <config.h>
 #endif
 
-#include "../../../../src/hive_viriatum/viriatum.h"
+#include "../../../../src/viriatum/viriatum.h"
 
 unsigned char *name_viriatum_mod_lua();
 unsigned char *name_s_viriatum_mod_lua();

@@ -32,48 +32,9 @@
 #include <config.h>
 #endif
 
-#define PYTHON_26
-#define PYTHON_THREADS
-
-unsigned char *name_viriatum_mod_wsgi();
-unsigned char *name_s_viriatum_mod_wsgi();
-unsigned char *version_viriatum_mod_wsgi();
-unsigned char *description_viriatum_mod_wsgi();
-
-#include "undef.h"
-#include <Python.h>
-#include <node.h>
 #include "../../../../src/viriatum/viriatum.h"
-#include "undef.h"
 
-#ifdef VIRIATUM_PLATFORM_MSC
-#ifdef PYTHON_CUSTOM
-#ifdef PYTHON_25
-#ifdef VIRIATUM_DEBUG
-#pragma comment(lib, "python25_d.lib")
-#else
-#pragma comment(lib, "python25.lib")
-#endif
-#endif
-#ifdef PYTHON_26
-#ifdef VIRIATUM_DEBUG
-#pragma comment(lib, "python26_d.lib")
-#else
-#pragma comment(lib, "python26.lib")
-#endif
-#endif
-#ifdef PYTHON_27
-#ifdef VIRIATUM_DEBUG
-#pragma comment(lib, "python27_d.lib")
-#else
-#pragma comment(lib, "python27.lib")
-#endif
-#endif
-#else
-#ifdef VIRIATUM_DEBUG
-#pragma comment(lib, "python25_d.lib")
-#else
-#pragma comment(lib, "python25.lib")
-#endif
-#endif
-#endif
+unsigned char *name_viriatum_mod_diag();
+unsigned char *name_s_viriatum_mod_diag();
+unsigned char *version_viriatum_mod_diag();
+unsigned char *description_viriatum_mod_diag();

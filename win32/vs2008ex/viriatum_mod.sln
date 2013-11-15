@@ -1,15 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual C++ Express 2008
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hive_viriatum_mod_lua", "hive_viriatum_mod_lua.vcproj", "{163E6FE0-BBD8-49AA-9E4C-C88856322601}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "viriatum_mod_lua", "viriatum_mod_lua.vcproj", "{163E6FE0-BBD8-49AA-9E4C-C88856322601}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hive_viriatum_mod_php", "hive_viriatum_mod_php.vcproj", "{CA1DE8E0-8EB7-4C5A-811E-DF6511BB9996}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "viriatum_mod_php", "viriatum_mod_php.vcproj", "{CA1DE8E0-8EB7-4C5A-811E-DF6511BB9996}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hive_viriatum_mod_wsgi", "hive_viriatum_mod_wsgi.vcproj", "{7A3601AD-A7C1-49C8-A218-3CC4D0D6F44F}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "viriatum_mod_wsgi", "viriatum_mod_wsgi.vcproj", "{7A3601AD-A7C1-49C8-A218-3CC4D0D6F44F}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hive_viriatum_mod_gif", "hive_viriatum_mod_gif.vcproj", "{AD527577-164D-40EF-9BFF-F6176FFA55D0}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "viriatum_mod_gif", "viriatum_mod_gif.vcproj", "{AD527577-164D-40EF-9BFF-F6176FFA55D0}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hive_viriatum_mod_diag", "hive_viriatum_mod_diag.vcproj", "{C823D945-FB98-4A62-A350-C684D2DDE5EE}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "viriatum_mod_diag", "viriatum_mod_diag.vcproj", "{C823D945-FB98-4A62-A350-C684D2DDE5EE}"
 EndProject
 Global
     GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -2,9 +2,9 @@
 <VisualStudioProject
     ProjectType="Visual C++"
     Version="9,00"
-    Name="hive_viriatum_mod_diag"
+    Name="viriatum_mod_diag"
     ProjectGUID="{C823D945-FB98-4A62-A350-C684D2DDE5EE}"
-    RootNamespace="hive_viriatum_mod_diag"
+    RootNamespace="viriatum_mod_diag"
     Keyword="Win32Proj"
     TargetFrameworkVersion="196613"
     >
@@ -89,7 +89,7 @@
             />
             <Tool
                 Name="VCPostBuildEventTool"
-                CommandLine="xcopy /e /y &quot;$(OutDir)\$(TargetFileName)&quot; &quot;$(SolutionDir)\..\..\bin\hive_viriatum\i386\win32\$(ConfigurationName)\modules\&quot;"
+                CommandLine="xcopy /e /y &quot;$(OutDir)\$(TargetFileName)&quot; &quot;$(SolutionDir)\..\..\bin\viriatum\i386\win32\$(ConfigurationName)\modules\&quot;"
             />
         </Configuration>
         <Configuration
@@ -168,7 +168,7 @@
             />
             <Tool
                 Name="VCPostBuildEventTool"
-                CommandLine="xcopy /e /y &quot;$(OutDir)\$(TargetFileName)&quot; &quot;$(SolutionDir)\..\..\bin\hive_viriatum\i386\win32\$(ConfigurationName)\modules\&quot;"
+                CommandLine="xcopy /e /y &quot;$(OutDir)\$(TargetFileName)&quot; &quot;$(SolutionDir)\..\..\bin\viriatum\i386\win32\$(ConfigurationName)\modules\&quot;"
             />
         </Configuration>
     </Configurations>
@@ -181,7 +181,7 @@
             UniqueIdentifier="{4FC736F1-C7A5-4376-A166-2A31D762A2FF}"
             >
             <File
-                RelativePath="..\..\modules\mod_diag\src\hive_viriatum_mod_diag\stdafx.c"
+                RelativePath="..\..\modules\mod_diag\src\viriatum_mod_diag\stdafx.c"
                 >
                 <FileConfiguration
                     Name="Debug|Win32"
@@ -204,11 +204,11 @@
                 Name="Module"
                 >
                 <File
-                    RelativePath="..\..\modules\mod_diag\src\hive_viriatum_mod_diag\module\entry.c"
+                    RelativePath="..\..\modules\mod_diag\src\viriatum_mod_diag\module\entry.c"
                     >
                 </File>
                 <File
-                    RelativePath="..\..\modules\mod_diag\src\hive_viriatum_mod_diag\module\handler.c"
+                    RelativePath="..\..\modules\mod_diag\src\viriatum_mod_diag\module\handler.c"
                     >
                 </File>
             </Filter>
@@ -219,26 +219,26 @@
             UniqueIdentifier="{93935380-88BD-4B04-88DB-625FBE22EBFB}"
             >
             <File
-                RelativePath="..\..\modules\mod_diag\src\hive_viriatum_mod_diag\stdafx.h"
+                RelativePath="..\..\modules\mod_diag\src\viriatum_mod_diag\stdafx.h"
                 >
             </File>
             <File
-                RelativePath="..\..\modules\mod_diag\src\hive_viriatum_mod_diag\viriatum_mod_diag.h"
+                RelativePath="..\..\modules\mod_diag\src\viriatum_mod_diag\viriatum_mod_diag.h"
                 >
             </File>
             <Filter
                 Name="Module"
                 >
                 <File
-                    RelativePath="..\..\modules\mod_diag\src\hive_viriatum_mod_diag\module\entry.h"
+                    RelativePath="..\..\modules\mod_diag\src\viriatum_mod_diag\module\entry.h"
                     >
                 </File>
                 <File
-                    RelativePath="..\..\modules\mod_diag\src\hive_viriatum_mod_diag\module\handler.h"
+                    RelativePath="..\..\modules\mod_diag\src\viriatum_mod_diag\module\handler.h"
                     >
                 </File>
                 <File
-                    RelativePath="..\..\modules\mod_diag\src\hive_viriatum_mod_diag\module\module.h"
+                    RelativePath="..\..\modules\mod_diag\src\viriatum_mod_diag\module\module.h"
                     >
                 </File>
             </Filter>
@@ -250,7 +250,7 @@
             >
         </Filter>
         <File
-            RelativePath="..\..\modules\mod_diag\src\hive_viriatum_mod_diag\ReadMe.txt"
+            RelativePath="..\..\modules\mod_diag\src\viriatum_mod_diag\ReadMe.txt"
             >
         </File>
     </Files>

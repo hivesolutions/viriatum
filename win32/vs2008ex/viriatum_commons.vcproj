@@ -2,9 +2,9 @@
 <VisualStudioProject
     ProjectType="Visual C++"
     Version="9,00"
-    Name="hive_viriatum"
-    ProjectGUID="{39D9BE30-4876-4DAE-94BC-0F0E84AE5BA3}"
-    RootNamespace="hive_viriatum"
+    Name="viriatum_commons"
+    ProjectGUID="{E24C2D58-2F86-4C49-BD2E-F017C5FF2E0E}"
+    RootNamespace="viriatum_commons"
     Keyword="Win32Proj"
     TargetFrameworkVersion="196613"
     >
@@ -20,7 +20,7 @@
             Name="Debug|Win32"
             OutputDirectory="$(SolutionDir)..\..\bin\$(ProjectName)\i386\win32\$(ConfigurationName)"
             IntermediateDirectory="$(ProjectName)\$(ConfigurationName)"
-            ConfigurationType="1"
+            ConfigurationType="4"
             CharacterSet="0"
             >
             <Tool
@@ -41,7 +41,7 @@
             <Tool
                 Name="VCCLCompilerTool"
                 Optimization="0"
-                PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;VIRIATUM_DEBUG;VIRIATUM_SSL;VIRIATUM_PCRE"
+                PreprocessorDefinitions="WIN32;_DEBUG;_LIB;VIRIATUM_DEBUG"
                 MinimalRebuild="true"
                 BasicRuntimeChecks="3"
                 RuntimeLibrary="1"
@@ -61,18 +61,11 @@
                 Name="VCPreLinkEventTool"
             />
             <Tool
-                Name="VCLinkerTool"
-                OutputFile="$(OutDir)\viriatum_d.exe"
-                LinkIncremental="2"
-                GenerateDebugInformation="true"
-                SubSystem="1"
-                TargetMachine="1"
+                Name="VCLibrarianTool"
+                OutputFile="$(OutDir)\viriatum_commons_d.lib"
             />
             <Tool
                 Name="VCALinkTool"
-            />
-            <Tool
-                Name="VCManifestTool"
             />
             <Tool
                 Name="VCXDCMakeTool"
@@ -84,18 +77,14 @@
                 Name="VCFxCopTool"
             />
             <Tool
-                Name="VCAppVerifierTool"
-            />
-            <Tool
                 Name="VCPostBuildEventTool"
-                CommandLine="xcopy /e /y &quot;$(SolutionDir)..\..\src\$(ProjectName)\resources\html\base&quot; &quot;$(OutDir)\htdocs\&quot; &amp;&amp; del &quot;$(OutDir)\htdocs\Makefile.am&quot;&#x0D;&#x0A;xcopy /e /y &quot;$(SolutionDir)..\..\src\$(ProjectName)\resources\config\viriatum&quot; &quot;$(OutDir)\config\&quot;&#x0D;&#x0A;"
             />
         </Configuration>
         <Configuration
             Name="Release|Win32"
             OutputDirectory="$(SolutionDir)..\..\bin\$(ProjectName)\i386\win32\$(ConfigurationName)"
             IntermediateDirectory="$(ProjectName)\$(ConfigurationName)"
-            ConfigurationType="1"
+            ConfigurationType="4"
             CharacterSet="0"
             WholeProgramOptimization="1"
             >
@@ -118,7 +107,7 @@
                 Name="VCCLCompilerTool"
                 Optimization="2"
                 EnableIntrinsicFunctions="true"
-                PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;VIRIATUM_SSL;VIRIATUM_PCRE"
+                PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
                 RuntimeLibrary="0"
                 EnableFunctionLevelLinking="true"
                 UsePrecompiledHeader="2"
@@ -137,20 +126,11 @@
                 Name="VCPreLinkEventTool"
             />
             <Tool
-                Name="VCLinkerTool"
-                OutputFile="$(OutDir)\viriatum.exe"
-                LinkIncremental="1"
-                GenerateDebugInformation="true"
-                SubSystem="1"
-                OptimizeReferences="2"
-                EnableCOMDATFolding="2"
-                TargetMachine="1"
+                Name="VCLibrarianTool"
+                OutputFile="$(OutDir)\viriatum_commons.lib"
             />
             <Tool
                 Name="VCALinkTool"
-            />
-            <Tool
-                Name="VCManifestTool"
             />
             <Tool
                 Name="VCXDCMakeTool"
@@ -162,18 +142,14 @@
                 Name="VCFxCopTool"
             />
             <Tool
-                Name="VCAppVerifierTool"
-            />
-            <Tool
                 Name="VCPostBuildEventTool"
-                CommandLine="xcopy /e /y &quot;$(SolutionDir)..\..\src\$(ProjectName)\resources\html\base&quot; &quot;$(OutDir)\htdocs\&quot; &amp;&amp; del &quot;$(OutDir)\htdocs\Makefile.am&quot;&#x0D;&#x0A;xcopy /e /y &quot;$(SolutionDir)..\..\src\$(ProjectName)\resources\config\viriatum&quot; &quot;$(OutDir)\config\&quot;&#x0D;&#x0A;"
             />
         </Configuration>
         <Configuration
             Name="Debug (Dynamic)|Win32"
             OutputDirectory="$(SolutionDir)..\..\bin\$(ProjectName)\i386\win32\$(ConfigurationName)"
             IntermediateDirectory="$(ProjectName)\$(ConfigurationName)"
-            ConfigurationType="1"
+            ConfigurationType="2"
             CharacterSet="0"
             >
             <Tool
@@ -194,14 +170,14 @@
             <Tool
                 Name="VCCLCompilerTool"
                 Optimization="0"
-                PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;VIRIATUM_DEBUG;VIRIATUM_SSL;VIRIATUM_PCRE"
+                PreprocessorDefinitions="WIN32;_DEBUG;_LIB;VIRIATUM_DEBUG"
                 MinimalRebuild="true"
                 BasicRuntimeChecks="3"
                 RuntimeLibrary="1"
                 UsePrecompiledHeader="2"
                 ProgramDataBaseFileName="$(TargetDir)$(TargetName).pdb"
                 WarningLevel="3"
-                DebugInformationFormat="4"
+                DebugInformationFormat="3"
                 CompileAs="1"
             />
             <Tool
@@ -215,11 +191,7 @@
             />
             <Tool
                 Name="VCLinkerTool"
-                OutputFile="$(OutDir)\viriatum_d.exe"
-                LinkIncremental="2"
-                GenerateDebugInformation="true"
-                SubSystem="1"
-                TargetMachine="1"
+                OutputFile="$(OutDir)\viriatum_commons_d.dll"
             />
             <Tool
                 Name="VCALinkTool"
@@ -241,14 +213,13 @@
             />
             <Tool
                 Name="VCPostBuildEventTool"
-                CommandLine="xcopy /e /y &quot;$(SolutionDir)..\..\src\$(ProjectName)\resources\html\base&quot; &quot;$(OutDir)\htdocs\&quot; &amp;&amp; del &quot;$(OutDir)\htdocs\Makefile.am&quot;&#x0D;&#x0A;xcopy /e /y &quot;$(SolutionDir)..\..\src\$(ProjectName)\resources\config\viriatum&quot; &quot;$(OutDir)\config\&quot;&#x0D;&#x0A;"
             />
         </Configuration>
         <Configuration
             Name="Release (Dynamic)|Win32"
             OutputDirectory="$(SolutionDir)..\..\bin\$(ProjectName)\i386\win32\$(ConfigurationName)"
             IntermediateDirectory="$(ProjectName)\$(ConfigurationName)"
-            ConfigurationType="1"
+            ConfigurationType="2"
             CharacterSet="0"
             WholeProgramOptimization="1"
             >
@@ -271,7 +242,7 @@
                 Name="VCCLCompilerTool"
                 Optimization="2"
                 EnableIntrinsicFunctions="true"
-                PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;VIRIATUM_SSL;VIRIATUM_PCRE"
+                PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
                 RuntimeLibrary="0"
                 EnableFunctionLevelLinking="true"
                 UsePrecompiledHeader="2"
@@ -291,13 +262,7 @@
             />
             <Tool
                 Name="VCLinkerTool"
-                OutputFile="$(OutDir)\viriatum.exe"
-                LinkIncremental="1"
-                GenerateDebugInformation="true"
-                SubSystem="1"
-                OptimizeReferences="2"
-                EnableCOMDATFolding="2"
-                TargetMachine="1"
+                OutputFile="$(OutDir)\viriatum_commons.dll"
             />
             <Tool
                 Name="VCALinkTool"
@@ -319,7 +284,6 @@
             />
             <Tool
                 Name="VCPostBuildEventTool"
-                CommandLine="xcopy /e /y &quot;$(SolutionDir)..\..\src\$(ProjectName)\resources\html\base&quot; &quot;$(OutDir)\htdocs\&quot; &amp;&amp; del &quot;$(OutDir)\htdocs\Makefile.am&quot;&#x0D;&#x0A;xcopy /e /y &quot;$(SolutionDir)..\..\src\$(ProjectName)\resources\config\viriatum&quot; &quot;$(OutDir)\config\&quot;&#x0D;&#x0A;"
             />
         </Configuration>
         <Configuration
@@ -349,7 +313,7 @@
                 Name="VCCLCompilerTool"
                 Optimization="2"
                 EnableIntrinsicFunctions="true"
-                PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;VIRIATUM_SSL;VIRIATUM_PCRE"
+                PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
                 RuntimeLibrary="0"
                 EnableFunctionLevelLinking="true"
                 UsePrecompiledHeader="2"
@@ -369,7 +333,7 @@
             />
             <Tool
                 Name="VCLibrarianTool"
-                OutputFile="$(OutDir)\viriatum.lib"
+                OutputFile="$(OutDir)\viriatum_commons.lib"
             />
             <Tool
                 Name="VCALinkTool"
@@ -385,14 +349,13 @@
             />
             <Tool
                 Name="VCPostBuildEventTool"
-                CommandLine="xcopy /e /y &quot;$(SolutionDir)..\..\src\$(ProjectName)\resources\html\base&quot; &quot;$(OutDir)\htdocs\&quot; &amp;&amp; del &quot;$(OutDir)\htdocs\Makefile.am&quot;&#x0D;&#x0A;xcopy /e /y &quot;$(SolutionDir)..\..\src\$(ProjectName)\resources\config\viriatum&quot; &quot;$(OutDir)\config\&quot;&#x0D;&#x0A;"
             />
         </Configuration>
         <Configuration
             Name="Library (Dynamic)|Win32"
             OutputDirectory="$(SolutionDir)..\..\bin\$(ProjectName)\i386\win32\$(ConfigurationName)"
             IntermediateDirectory="$(ProjectName)\$(ConfigurationName)"
-            ConfigurationType="4"
+            ConfigurationType="2"
             CharacterSet="0"
             WholeProgramOptimization="1"
             >
@@ -415,7 +378,7 @@
                 Name="VCCLCompilerTool"
                 Optimization="2"
                 EnableIntrinsicFunctions="true"
-                PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;VIRIATUM_SSL;VIRIATUM_PCRE"
+                PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
                 RuntimeLibrary="0"
                 EnableFunctionLevelLinking="true"
                 UsePrecompiledHeader="2"
@@ -434,11 +397,14 @@
                 Name="VCPreLinkEventTool"
             />
             <Tool
-                Name="VCLibrarianTool"
-                OutputFile="$(OutDir)\viriatum.lib"
+                Name="VCLinkerTool"
+                OutputFile="$(OutDir)\viriatum_commons.dll"
             />
             <Tool
                 Name="VCALinkTool"
+            />
+            <Tool
+                Name="VCManifestTool"
             />
             <Tool
                 Name="VCXDCMakeTool"
@@ -450,16 +416,14 @@
                 Name="VCFxCopTool"
             />
             <Tool
+                Name="VCAppVerifierTool"
+            />
+            <Tool
                 Name="VCPostBuildEventTool"
-                CommandLine="xcopy /e /y &quot;$(SolutionDir)..\..\src\$(ProjectName)\resources\html\base&quot; &quot;$(OutDir)\htdocs\&quot; &amp;&amp; del &quot;$(OutDir)\htdocs\Makefile.am&quot;&#x0D;&#x0A;xcopy /e /y &quot;$(SolutionDir)..\..\src\$(ProjectName)\resources\config\viriatum&quot; &quot;$(OutDir)\config\&quot;&#x0D;&#x0A;"
             />
         </Configuration>
     </Configurations>
     <References>
-        <ProjectReference
-            ReferencedProjectIdentifier="{E24C2D58-2F86-4C49-BD2E-F017C5FF2E0E}"
-            RelativePathToProject=".\hive_viriatum_commons.vcproj"
-        />
     </References>
     <Files>
         <Filter
@@ -468,7 +432,7 @@
             UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
             >
             <File
-                RelativePath="..\..\src\hive_viriatum\stdafx.c"
+                RelativePath="..\..\src\viriatum_commons\stdafx.c"
                 >
                 <FileConfiguration
                     Name="Debug|Win32"
@@ -519,27 +483,35 @@
                     />
                 </FileConfiguration>
             </File>
-            <File
-                RelativePath="..\..\src\hive_viriatum\viriatum.c"
-                >
-            </File>
             <Filter
-                Name="System"
+                Name="Checksum"
                 >
                 <File
-                    RelativePath="..\..\src\hive_viriatum\system\client.c"
+                    RelativePath="..\..\src\viriatum_commons\checksum\crc_32.c"
                     >
                 </File>
                 <File
-                    RelativePath="..\..\src\hive_viriatum\system\environment.c"
+                    RelativePath="..\..\src\viriatum_commons\checksum\md5.c"
                     >
                 </File>
                 <File
-                    RelativePath="..\..\src\hive_viriatum\system\service.c"
+                    RelativePath="..\..\src\viriatum_commons\checksum\sha1.c"
+                    >
+                </File>
+            </Filter>
+            <Filter
+                Name="Encoding"
+                >
+                <File
+                    RelativePath="..\..\src\viriatum_commons\encoding\base_64.c"
                     >
                 </File>
                 <File
-                    RelativePath="..\..\src\hive_viriatum\system\torrent.c"
+                    RelativePath="..\..\src\viriatum_commons\encoding\bencoding.c"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\viriatum_commons\encoding\percent.c"
                     >
                 </File>
             </Filter>
@@ -548,58 +520,106 @@
                 >
             </Filter>
             <Filter
-                Name="Test"
+                Name="Thread"
                 >
                 <File
-                    RelativePath="..\..\src\hive_viriatum\test\simple_test.c"
-                    >
-                </File>
-                <File
-                    RelativePath="..\..\src\hive_viriatum\test\speed_test.c"
+                    RelativePath="..\..\src\viriatum_commons\thread\thread_pool.c"
                     >
                 </File>
             </Filter>
             <Filter
-                Name="Module"
+                Name="System"
                 >
                 <File
-                    RelativePath="..\..\src\hive_viriatum\module\loading.c"
+                    RelativePath="..\..\src\viriatum_commons\system\_thread_win32.c"
                     >
                 </File>
             </Filter>
             <Filter
-                Name="Http"
+                Name="Structures"
                 >
                 <File
-                    RelativePath="..\..\src\hive_viriatum\http\http_parser.c"
+                    RelativePath="..\..\src\viriatum_commons\structures\array_list.c"
                     >
                 </File>
                 <File
-                    RelativePath="..\..\src\hive_viriatum\http\http_request.c"
+                    RelativePath="..\..\src\viriatum_commons\structures\buffer.c"
                     >
                 </File>
                 <File
-                    RelativePath="..\..\src\hive_viriatum\http\http_util.c"
+                    RelativePath="..\..\src\viriatum_commons\structures\date_time.c"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\viriatum_commons\structures\hash_map.c"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\viriatum_commons\structures\iterator.c"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\viriatum_commons\structures\linked_buffer.c"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\viriatum_commons\structures\linked_list.c"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\viriatum_commons\structures\priority_queue.c"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\viriatum_commons\structures\sort_map.c"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\viriatum_commons\structures\string.c"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\viriatum_commons\structures\string_buffer.c"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\viriatum_commons\structures\type.c"
                     >
                 </File>
             </Filter>
             <Filter
-                Name="Handlers"
+                Name="Util"
                 >
                 <File
-                    RelativePath="..\..\src\hive_viriatum\handlers\handler_default.c"
+                    RelativePath="..\..\src\viriatum_commons\util\arguments_util.c"
+                    >
+                </File>
+            </Filter>
+            <Filter
+                Name="Debug"
+                >
+                <File
+                    RelativePath="..\..\src\viriatum_commons\debug\error.c"
                     >
                 </File>
                 <File
-                    RelativePath="..\..\src\hive_viriatum\handlers\handler_dispatch.c"
+                    RelativePath="..\..\src\viriatum_commons\debug\logging.c"
                     >
                 </File>
+            </Filter>
+            <Filter
+                Name="Memory"
+                >
                 <File
-                    RelativePath="..\..\src\hive_viriatum\handlers\handler_file.c"
+                    RelativePath="..\..\src\viriatum_commons\memory\memory_pool.c"
                     >
                 </File>
+            </Filter>
+            <Filter
+                Name="Compression"
+                >
                 <File
-                    RelativePath="..\..\src\hive_viriatum\handlers\handler_proxy.c"
+                    RelativePath="..\..\src\viriatum_commons\compression\huffman.c"
                     >
                 </File>
             </Filter>
@@ -607,35 +627,39 @@
                 Name="Stream"
                 >
                 <File
-                    RelativePath="..\..\src\hive_viriatum\stream\stream_http.c"
+                    RelativePath="..\..\src\viriatum_commons\stream\bit_stream.c"
                     >
                 </File>
                 <File
-                    RelativePath="..\..\src\hive_viriatum\stream\stream_httpc.c"
+                    RelativePath="..\..\src\viriatum_commons\stream\file_stream.c"
                     >
                 </File>
                 <File
-                    RelativePath="..\..\src\hive_viriatum\stream\stream_io.c"
+                    RelativePath="..\..\src\viriatum_commons\stream\io_stream.c"
                     >
                 </File>
                 <File
-                    RelativePath="..\..\src\hive_viriatum\stream\stream_torrent.c"
+                    RelativePath="..\..\src\viriatum_commons\stream\memory_stream.c"
                     >
                 </File>
             </Filter>
             <Filter
-                Name="Polling"
+                Name="Template"
                 >
                 <File
-                    RelativePath="..\..\src\hive_viriatum\polling\polling_epoll.c"
+                    RelativePath="..\..\src\viriatum_commons\template\engine.c"
                     >
                 </File>
                 <File
-                    RelativePath="..\..\src\hive_viriatum\polling\polling_kqueue.c"
+                    RelativePath="..\..\src\viriatum_commons\template\handler.c"
                     >
                 </File>
+            </Filter>
+            <Filter
+                Name="Sorting"
+                >
                 <File
-                    RelativePath="..\..\src\hive_viriatum\polling\polling_select.c"
+                    RelativePath="..\..\src\viriatum_commons\sorting\quicksort.c"
                     >
                 </File>
             </Filter>
@@ -643,15 +667,47 @@
                 Name="Jni"
                 >
                 <File
-                    RelativePath="..\..\src\hive_viriatum\jni\info.c"
+                    RelativePath="..\..\src\viriatum_commons\jni\info.c"
                     >
                 </File>
                 <File
-                    RelativePath="..\..\src\hive_viriatum\jni\jni_service.c"
+                    RelativePath="..\..\src\viriatum_commons\jni\start.c"
+                    >
+                </File>
+            </Filter>
+            <Filter
+                Name="Ini"
+                >
+                <File
+                    RelativePath="..\..\src\viriatum_commons\ini\ini.c"
+                    >
+                </File>
+            </Filter>
+            <Filter
+                Name="Io"
+                >
+                <File
+                    RelativePath="..\..\src\viriatum_commons\io\file.c"
+                    >
+                </File>
+            </Filter>
+            <Filter
+                Name="Crypto"
+                >
+                <File
+                    RelativePath="..\..\src\viriatum_commons\crypto\rc4.c"
+                    >
+                </File>
+            </Filter>
+            <Filter
+                Name="Formats"
+                >
+                <File
+                    RelativePath="..\..\src\viriatum_commons\formats\passwd.c"
                     >
                 </File>
                 <File
-                    RelativePath="..\..\src\hive_viriatum\jni\start.c"
+                    RelativePath="..\..\src\viriatum_commons\formats\url.c"
                     >
                 </File>
             </Filter>
@@ -662,34 +718,154 @@
             UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
             >
             <File
-                RelativePath="..\..\src\hive_viriatum\_config_win32.h"
+                RelativePath="..\..\src\viriatum_commons\_config_win32.h"
                 >
             </File>
             <File
-                RelativePath="..\..\src\hive_viriatum\stdafx.h"
+                RelativePath="..\..\src\viriatum_commons\stdafx.h"
                 >
             </File>
             <File
-                RelativePath="..\..\src\hive_viriatum\viriatum.h"
+                RelativePath="..\..\src\viriatum_commons\viriatum_commons.h"
                 >
             </File>
+            <Filter
+                Name="Checksum"
+                >
+                <File
+                    RelativePath="..\..\src\viriatum_commons\checksum\checksum.h"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\viriatum_commons\checksum\crc_32.h"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\viriatum_commons\checksum\md5.h"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\viriatum_commons\checksum\sha1.h"
+                    >
+                </File>
+            </Filter>
+            <Filter
+                Name="Encoding"
+                >
+                <File
+                    RelativePath="..\..\src\viriatum_commons\encoding\base_64.h"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\viriatum_commons\encoding\bencoding.h"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\viriatum_commons\encoding\encoding.h"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\viriatum_commons\encoding\percent.h"
+                    >
+                </File>
+            </Filter>
             <Filter
                 Name="Global"
                 >
                 <File
-                    RelativePath="..\..\src\hive_viriatum\global\common.h"
+                    RelativePath="..\..\src\viriatum_commons\global\common.h"
                     >
                 </File>
                 <File
-                    RelativePath="..\..\src\hive_viriatum\global\definitions.h"
+                    RelativePath="..\..\src\viriatum_commons\global\compilation.h"
                     >
                 </File>
                 <File
-                    RelativePath="..\..\src\hive_viriatum\global\resource.h"
+                    RelativePath="..\..\src\viriatum_commons\global\compiler.h"
                     >
                 </File>
                 <File
-                    RelativePath="..\..\src\hive_viriatum\global\targetver.h"
+                    RelativePath="..\..\src\viriatum_commons\global\cpu.h"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\viriatum_commons\global\definitions.h"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\viriatum_commons\global\memory.h"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\viriatum_commons\global\platforms.h"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\viriatum_commons\global\resource.h"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\viriatum_commons\global\targetver.h"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\viriatum_commons\global\types.h"
+                    >
+                </File>
+            </Filter>
+            <Filter
+                Name="Structures"
+                >
+                <File
+                    RelativePath="..\..\src\viriatum_commons\structures\array_list.h"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\viriatum_commons\structures\buffer.h"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\viriatum_commons\structures\date_time.h"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\viriatum_commons\structures\hash_map.h"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\viriatum_commons\structures\iterator.h"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\viriatum_commons\structures\linked_buffer.h"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\viriatum_commons\structures\linked_list.h"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\viriatum_commons\structures\priority_queue.h"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\viriatum_commons\structures\sort_map.h"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\viriatum_commons\structures\string.h"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\viriatum_commons\structures\string_buffer.h"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\viriatum_commons\structures\structures.h"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\viriatum_commons\structures\type.h"
                     >
                 </File>
             </Filter>
@@ -697,95 +873,111 @@
                 Name="System"
                 >
                 <File
-                    RelativePath="..\..\src\hive_viriatum\system\client.h"
+                    RelativePath="..\..\src\viriatum_commons\system\_thread_win32.h"
                     >
                 </File>
                 <File
-                    RelativePath="..\..\src\hive_viriatum\system\environment.h"
+                    RelativePath="..\..\src\viriatum_commons\system\dynamic.h"
                     >
                 </File>
                 <File
-                    RelativePath="..\..\src\hive_viriatum\system\service.h"
+                    RelativePath="..\..\src\viriatum_commons\system\socket.h"
                     >
                 </File>
                 <File
-                    RelativePath="..\..\src\hive_viriatum\system\system.h"
+                    RelativePath="..\..\src\viriatum_commons\system\system.h"
                     >
                 </File>
                 <File
-                    RelativePath="..\..\src\hive_viriatum\system\torrent.h"
-                    >
-                </File>
-            </Filter>
-            <Filter
-                Name="Test"
-                >
-                <File
-                    RelativePath="..\..\src\hive_viriatum\test\simple_test.h"
+                    RelativePath="..\..\src\viriatum_commons\system\system_util.h"
                     >
                 </File>
                 <File
-                    RelativePath="..\..\src\hive_viriatum\test\speed_test.h"
-                    >
-                </File>
-                <File
-                    RelativePath="..\..\src\hive_viriatum\test\test.h"
+                    RelativePath="..\..\src\viriatum_commons\system\thread.h"
                     >
                 </File>
             </Filter>
             <Filter
-                Name="Module"
+                Name="Thread"
                 >
                 <File
-                    RelativePath="..\..\src\hive_viriatum\module\loading.h"
+                    RelativePath="..\..\src\viriatum_commons\thread\thread.h"
                     >
                 </File>
                 <File
-                    RelativePath="..\..\src\hive_viriatum\module\module.h"
+                    RelativePath="..\..\src\viriatum_commons\thread\thread_pool.h"
                     >
                 </File>
             </Filter>
             <Filter
-                Name="Http"
+                Name="Util"
                 >
                 <File
-                    RelativePath="..\..\src\hive_viriatum\http\http.h"
+                    RelativePath="..\..\src\viriatum_commons\util\arguments_util.h"
                     >
                 </File>
                 <File
-                    RelativePath="..\..\src\hive_viriatum\http\http_parser.h"
+                    RelativePath="..\..\src\viriatum_commons\util\dump_util.h"
                     >
                 </File>
                 <File
-                    RelativePath="..\..\src\hive_viriatum\http\http_request.h"
+                    RelativePath="..\..\src\viriatum_commons\util\function_util.h"
                     >
                 </File>
                 <File
-                    RelativePath="..\..\src\hive_viriatum\http\http_util.h"
+                    RelativePath="..\..\src\viriatum_commons\util\random_util.h"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\viriatum_commons\util\string_util.h"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\viriatum_commons\util\string_util_s.h"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\viriatum_commons\util\util.h"
                     >
                 </File>
             </Filter>
             <Filter
-                Name="Handlers"
+                Name="Debug"
                 >
                 <File
-                    RelativePath="..\..\src\hive_viriatum\handlers\handler_default.h"
+                    RelativePath="..\..\src\viriatum_commons\debug\debug.h"
                     >
                 </File>
                 <File
-                    RelativePath="..\..\src\hive_viriatum\handlers\handler_dispatch.h"
+                    RelativePath="..\..\src\viriatum_commons\debug\error.h"
                     >
                 </File>
                 <File
-                    RelativePath="..\..\src\hive_viriatum\handlers\handler_file.h"
+                    RelativePath="..\..\src\viriatum_commons\debug\logging.h"
+                    >
+                </File>
+            </Filter>
+            <Filter
+                Name="Memory"
+                >
+                <File
+                    RelativePath="..\..\src\viriatum_commons\memory\memory.h"
                     >
                 </File>
                 <File
-                    RelativePath="..\..\src\hive_viriatum\handlers\handler_proxy.h"
+                    RelativePath="..\..\src\viriatum_commons\memory\memory_pool.h"
+                    >
+                </File>
+            </Filter>
+            <Filter
+                Name="Compression"
+                >
+                <File
+                    RelativePath="..\..\src\viriatum_commons\compression\compression.h"
                     >
                 </File>
                 <File
-                    RelativePath="..\..\src\hive_viriatum\handlers\handlers.h"
+                    RelativePath="..\..\src\viriatum_commons\compression\huffman.h"
                     >
                 </File>
             </Filter>
@@ -793,43 +985,55 @@
                 Name="Stream"
                 >
                 <File
-                    RelativePath="..\..\src\hive_viriatum\stream\stream.h"
+                    RelativePath="..\..\src\viriatum_commons\stream\bit_stream.h"
                     >
                 </File>
                 <File
-                    RelativePath="..\..\src\hive_viriatum\stream\stream_http.h"
+                    RelativePath="..\..\src\viriatum_commons\stream\file_stream.h"
                     >
                 </File>
                 <File
-                    RelativePath="..\..\src\hive_viriatum\stream\stream_httpc.h"
+                    RelativePath="..\..\src\viriatum_commons\stream\io_stream.h"
                     >
                 </File>
                 <File
-                    RelativePath="..\..\src\hive_viriatum\stream\stream_io.h"
+                    RelativePath="..\..\src\viriatum_commons\stream\memory_stream.h"
                     >
                 </File>
                 <File
-                    RelativePath="..\..\src\hive_viriatum\stream\stream_torrent.h"
+                    RelativePath="..\..\src\viriatum_commons\stream\stream.h"
                     >
                 </File>
             </Filter>
             <Filter
-                Name="Polling"
+                Name="Template"
                 >
                 <File
-                    RelativePath="..\..\src\hive_viriatum\polling\polling.h"
+                    RelativePath="..\..\src\viriatum_commons\template\engine.h"
                     >
                 </File>
                 <File
-                    RelativePath="..\..\src\hive_viriatum\polling\polling_epoll.h"
+                    RelativePath="..\..\src\viriatum_commons\template\handler.h"
                     >
                 </File>
                 <File
-                    RelativePath="..\..\src\hive_viriatum\polling\polling_kqueue.h"
+                    RelativePath="..\..\src\viriatum_commons\template\template.h"
+                    >
+                </File>
+            </Filter>
+            <Filter
+                Name="Sorting"
+                >
+                <File
+                    RelativePath="..\..\src\viriatum_commons\sorting\base.h"
                     >
                 </File>
                 <File
-                    RelativePath="..\..\src\hive_viriatum\polling\polling_select.h"
+                    RelativePath="..\..\src\viriatum_commons\sorting\quicksort.h"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\viriatum_commons\sorting\sorting.h"
                     >
                 </File>
             </Filter>
@@ -837,31 +1041,63 @@
                 Name="Jni"
                 >
                 <File
-                    RelativePath="..\..\src\hive_viriatum\jni\info.h"
+                    RelativePath="..\..\src\viriatum_commons\jni\info.h"
                     >
                 </File>
                 <File
-                    RelativePath="..\..\src\hive_viriatum\jni\jni.h"
+                    RelativePath="..\..\src\viriatum_commons\jni\jni.h"
                     >
                 </File>
                 <File
-                    RelativePath="..\..\src\hive_viriatum\jni\jni_service.h"
-                    >
-                </File>
-                <File
-                    RelativePath="..\..\src\hive_viriatum\jni\start.h"
+                    RelativePath="..\..\src\viriatum_commons\jni\start.h"
                     >
                 </File>
             </Filter>
             <Filter
-                Name="Base"
+                Name="Ini"
                 >
                 <File
-                    RelativePath="..\..\src\hive_viriatum\base\base.h"
+                    RelativePath="..\..\src\viriatum_commons\ini\ini.h"
+                    >
+                </File>
+            </Filter>
+            <Filter
+                Name="Io"
+                >
+                <File
+                    RelativePath="..\..\src\viriatum_commons\io\file.h"
                     >
                 </File>
                 <File
-                    RelativePath="..\..\src\hive_viriatum\base\entry.h"
+                    RelativePath="..\..\src\viriatum_commons\io\io.h"
+                    >
+                </File>
+            </Filter>
+            <Filter
+                Name="Crypto"
+                >
+                <File
+                    RelativePath="..\..\src\viriatum_commons\crypto\crypto.h"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\viriatum_commons\crypto\rc4.h"
+                    >
+                </File>
+            </Filter>
+            <Filter
+                Name="Formats"
+                >
+                <File
+                    RelativePath="..\..\src\viriatum_commons\formats\formats.h"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\viriatum_commons\formats\passwd.h"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\viriatum_commons\formats\url.h"
                     >
                 </File>
             </Filter>
@@ -871,17 +1107,9 @@
             Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
             UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
             >
-            <File
-                RelativePath="..\..\src\hive_viriatum\resources\win32\vs2008ex\viriatum.exe.manifest"
-                >
-            </File>
-            <File
-                RelativePath="..\..\src\hive_viriatum\resources\win32\vs2008ex\viriatum.rc"
-                >
-            </File>
         </Filter>
         <File
-            RelativePath="..\..\src\hive_viriatum\ReadMe.txt"
+            RelativePath="..\..\src\viriatum_commons\ReadMe.txt"
             >
         </File>
     </Files>

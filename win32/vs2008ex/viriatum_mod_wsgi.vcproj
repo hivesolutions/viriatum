@@ -2,9 +2,9 @@
 <VisualStudioProject
     ProjectType="Visual C++"
     Version="9,00"
-    Name="hive_viriatum_mod_wsgi"
+    Name="viriatum_mod_wsgi"
     ProjectGUID="{7A3601AD-A7C1-49C8-A218-3CC4D0D6F44F}"
-    RootNamespace="hive_viriatum_mod_wsgi"
+    RootNamespace="viriatum_mod_wsgi"
     Keyword="Win32Proj"
     TargetFrameworkVersion="196613"
     >
@@ -87,7 +87,7 @@
             />
             <Tool
                 Name="VCPostBuildEventTool"
-                CommandLine="xcopy /e /y &quot;$(OutDir)\$(TargetFileName)&quot; &quot;$(SolutionDir)\..\..\bin\hive_viriatum\i386\win32\$(ConfigurationName)\modules\&quot;"
+                CommandLine="xcopy /e /y &quot;$(OutDir)\$(TargetFileName)&quot; &quot;$(SolutionDir)\..\..\bin\viriatum\i386\win32\$(ConfigurationName)\modules\&quot;"
             />
         </Configuration>
         <Configuration
@@ -164,7 +164,7 @@
             />
             <Tool
                 Name="VCPostBuildEventTool"
-                CommandLine="xcopy /e /y &quot;$(OutDir)\$(TargetFileName)&quot; &quot;$(SolutionDir)\..\..\bin\hive_viriatum\i386\win32\$(ConfigurationName)\modules\&quot;"
+                CommandLine="xcopy /e /y &quot;$(OutDir)\$(TargetFileName)&quot; &quot;$(SolutionDir)\..\..\bin\viriatum\i386\win32\$(ConfigurationName)\modules\&quot;"
             />
         </Configuration>
     </Configurations>
@@ -177,7 +177,7 @@
             UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
             >
             <File
-                RelativePath="..\..\modules\mod_wsgi\src\hive_viriatum_mod_wsgi\stdafx.c"
+                RelativePath="..\..\modules\mod_wsgi\src\viriatum_mod_wsgi\stdafx.c"
                 >
                 <FileConfiguration
                     Name="Debug|Win32"
@@ -200,15 +200,15 @@
                 Name="Module"
                 >
                 <File
-                    RelativePath="..\..\modules\mod_wsgi\src\hive_viriatum_mod_wsgi\module\entry.c"
+                    RelativePath="..\..\modules\mod_wsgi\src\viriatum_mod_wsgi\module\entry.c"
                     >
                 </File>
                 <File
-                    RelativePath="..\..\modules\mod_wsgi\src\hive_viriatum_mod_wsgi\module\extension.c"
+                    RelativePath="..\..\modules\mod_wsgi\src\viriatum_mod_wsgi\module\extension.c"
                     >
                 </File>
                 <File
-                    RelativePath="..\..\modules\mod_wsgi\src\hive_viriatum_mod_wsgi\module\handler.c"
+                    RelativePath="..\..\modules\mod_wsgi\src\viriatum_mod_wsgi\module\handler.c"
                     >
                 </File>
             </Filter>
@@ -219,34 +219,34 @@
             UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
             >
             <File
-                RelativePath="..\..\modules\mod_wsgi\src\hive_viriatum_mod_wsgi\stdafx.h"
+                RelativePath="..\..\modules\mod_wsgi\src\viriatum_mod_wsgi\stdafx.h"
                 >
             </File>
             <File
-                RelativePath="..\..\modules\mod_wsgi\src\hive_viriatum_mod_wsgi\undef.h"
+                RelativePath="..\..\modules\mod_wsgi\src\viriatum_mod_wsgi\undef.h"
                 >
             </File>
             <File
-                RelativePath="..\..\modules\mod_wsgi\src\hive_viriatum_mod_wsgi\viriatum_mod_wsgi.h"
+                RelativePath="..\..\modules\mod_wsgi\src\viriatum_mod_wsgi\viriatum_mod_wsgi.h"
                 >
             </File>
             <Filter
                 Name="Module"
                 >
                 <File
-                    RelativePath="..\..\modules\mod_wsgi\src\hive_viriatum_mod_wsgi\module\entry.h"
+                    RelativePath="..\..\modules\mod_wsgi\src\viriatum_mod_wsgi\module\entry.h"
                     >
                 </File>
                 <File
-                    RelativePath="..\..\modules\mod_wsgi\src\hive_viriatum_mod_wsgi\module\extension.h"
+                    RelativePath="..\..\modules\mod_wsgi\src\viriatum_mod_wsgi\module\extension.h"
                     >
                 </File>
                 <File
-                    RelativePath="..\..\modules\mod_wsgi\src\hive_viriatum_mod_wsgi\module\handler.h"
+                    RelativePath="..\..\modules\mod_wsgi\src\viriatum_mod_wsgi\module\handler.h"
                     >
                 </File>
                 <File
-                    RelativePath="..\..\modules\mod_wsgi\src\hive_viriatum_mod_wsgi\module\module.h"
+                    RelativePath="..\..\modules\mod_wsgi\src\viriatum_mod_wsgi\module\module.h"
                     >
                 </File>
             </Filter>
@@ -257,12 +257,12 @@
             UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
             >
             <File
-                RelativePath="..\..\modules\mod_wsgi\src\hive_viriatum_mod_wsgi\resources\win32\vs2008ex\viriatum_mod_wsgi.dll.manifest"
+                RelativePath="..\..\modules\mod_wsgi\src\viriatum_mod_wsgi\resources\win32\vs2008ex\viriatum_mod_wsgi.dll.manifest"
                 >
             </File>
         </Filter>
         <File
-            RelativePath="..\..\modules\mod_wsgi\src\hive_viriatum_mod_wsgi\ReadMe.txt"
+            RelativePath="..\..\modules\mod_wsgi\src\viriatum_mod_wsgi\ReadMe.txt"
             >
         </File>
     </Files>

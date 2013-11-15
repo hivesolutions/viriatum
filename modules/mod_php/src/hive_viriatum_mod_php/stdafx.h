@@ -38,7 +38,7 @@
 #include "undef.h"
 #include <sapi/embed/php_embed.h>
 #include <ext/standard/php_standard.h>
-#include "../../../../src/hive_viriatum/viriatum.h"
+#include "../../../../src/viriatum/viriatum.h"
 #include "undef.h"
 #ifdef _MSC_VER
 #pragma warning(default:4005)

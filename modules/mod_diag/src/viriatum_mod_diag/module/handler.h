@@ -27,14 +27,10 @@
 
 #pragma once
 
-#ifdef HAVE_CONFIG_H
-#undef HAVE_CONFIG_H
-#include <config.h>
-#endif
+#include "entry.h"
 
-#include "../../../../src/hive_viriatum/viriatum.h"
-
-unsigned char *name_viriatum_mod_diag();
-unsigned char *name_s_viriatum_mod_diag();
-unsigned char *version_viriatum_mod_diag();
-unsigned char *description_viriatum_mod_diag();
+ERROR_CODE set_handler_diag(struct http_connection_t *http_connection);
+ERROR_CODE unset_handler_diag(struct http_connection_t *http_connection);
+ERROR_CODE message_complete_callback_handler_diag(struct http_parser_t *http_parser);
+ERROR_CODE _send_response_handler_diag(struct http_parser_t *http_parser);
+ERROR_CODE _send_response_callback_handler_diag(struct connection_t *connection, struct data_t *data, void *parameters);

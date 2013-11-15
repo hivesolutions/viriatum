@@ -27,53 +27,24 @@
 
 #pragma once
 
-#ifdef HAVE_CONFIG_H
-#undef HAVE_CONFIG_H
-#include <config.h>
-#endif
+#include "handler.h"
 
-#define PYTHON_26
-#define PYTHON_THREADS
+/**
+ * Structure describing the internal
+ * structures and information for the
+ * mod diag module.
+ */
+typedef struct mod_diag_module_t {
+    /**
+     * The http handler associated with the
+     * module (upper layer).
+     */
+    struct http_handler_t *http_handler;
+} mod_diag_module;
 
-unsigned char *name_viriatum_mod_wsgi();
-unsigned char *name_s_viriatum_mod_wsgi();
-unsigned char *version_viriatum_mod_wsgi();
-unsigned char *description_viriatum_mod_wsgi();
-
-#include "undef.h"
-#include <Python.h>
-#include <node.h>
-#include "../../../../src/viriatum/viriatum.h"
-#include "undef.h"
-
-#ifdef VIRIATUM_PLATFORM_MSC
-#ifdef PYTHON_CUSTOM
-#ifdef PYTHON_25
-#ifdef VIRIATUM_DEBUG
-#pragma comment(lib, "python25_d.lib")
-#else
-#pragma comment(lib, "python25.lib")
-#endif
-#endif
-#ifdef PYTHON_26
-#ifdef VIRIATUM_DEBUG
-#pragma comment(lib, "python26_d.lib")
-#else
-#pragma comment(lib, "python26.lib")
-#endif
-#endif
-#ifdef PYTHON_27
-#ifdef VIRIATUM_DEBUG
-#pragma comment(lib, "python27_d.lib")
-#else
-#pragma comment(lib, "python27.lib")
-#endif
-#endif
-#else
-#ifdef VIRIATUM_DEBUG
-#pragma comment(lib, "python25_d.lib")
-#else
-#pragma comment(lib, "python25.lib")
-#endif
-#endif
-#endif
+VIRIATUM_EXPORT_PREFIX ERROR_CODE create_mod_diag_module(struct mod_diag_module_t **mod_diag_module_pointer, struct module_t *module);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE delete_mod_diag_module(struct mod_diag_module_t *mod_diag_module);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE start_module_diag(struct environment_t *environment, struct module_t *module);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE stop_module_diag(struct environment_t *environment, struct module_t *module);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE info_module_diag(struct module_t *module);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE error_module_diag(unsigned char **message_pointer);
