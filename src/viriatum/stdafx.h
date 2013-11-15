@@ -82,7 +82,7 @@
 #include "global/resource.h"
 #endif
 
-#include "../hive_viriatum_commons/viriatum_commons.h"
+#include "../viriatum_commons/viriatum_commons.h"
 
 #include "global/definitions.h"
 #include "global/common.h"

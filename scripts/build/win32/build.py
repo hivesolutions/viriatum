@@ -56,7 +56,7 @@ def build(file = None, build_m = True, arch = "win32", mode = "Release"):
     dist_f = atm.path("dist")
     build_f = atm.path("build")
     base_f = repo_f
-    bin_f = os.path.join(base_f, "bin/hive_viriatum/i386/win32/%s" % mode)
+    bin_f = os.path.join(base_f, "bin/viriatum/i386/win32/%s" % mode)
     solution_f = os.path.join(base_f, "win32/vs2008ex")
     modules_f = os.path.join(repo_f, "modules")
 
@@ -78,7 +78,7 @@ def build(file = None, build_m = True, arch = "win32", mode = "Release"):
 
     # constructs the path to the solution file and uses it for
     # the msbuild command to build the project
-    sln_path = os.path.join(solution_f, "hive_viriatum.sln")
+    sln_path = os.path.join(solution_f, "viriatum.sln")
     atm.msbuild(sln_path)
 
     # changes to the binary directory and copies the built files
@@ -90,7 +90,7 @@ def build(file = None, build_m = True, arch = "win32", mode = "Release"):
 
     # constructs the path to the solution file and uses it for
     # the msbuild command to build the project
-    mod_sln_path = os.path.join(solution_f, "hive_viriatum_mod.sln")
+    mod_sln_path = os.path.join(solution_f, "viriatum_mod.sln")
     build_m and atm.msbuild(mod_sln_path, includes = INCLUDES)
 
     # iterates over all the modules to copy their resulting files
@@ -98,7 +98,7 @@ def build(file = None, build_m = True, arch = "win32", mode = "Release"):
     for module in modules:
         module_bin_f = os.path.join(
             base_f,
-            "bin/hive_viriatum_%s/i386/win32/%s" % (module, mode)
+            "bin/viriatum_%s/i386/win32/%s" % (module, mode)
         )
         os.chdir(module_bin_f)
         atm.copy(
