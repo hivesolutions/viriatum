@@ -727,7 +727,6 @@
 					"DEBUG=1",
 					"$(inherited)",
 				);
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				INFOPLIST_FILE = "../../src/viriatum_mobile/viriatum_mobile-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
@@ -749,7 +748,6 @@
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "../../src/viriatum_mobile/viriatum_mobile-Prefix.pch";
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				INFOPLIST_FILE = "../../src/viriatum_mobile/viriatum_mobile-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
