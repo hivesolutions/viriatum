@@ -27,7 +27,7 @@
 
 #include "stdafx.h"
 
-#import "viriatum_mobileAppDelegate.h"
+#import "AppDelegate.h"
 
 @implementation viriatum_mobileAppDelegate
 
