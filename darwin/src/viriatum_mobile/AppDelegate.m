@@ -48,7 +48,7 @@
     self.window.rootViewController = self.navigationController;
 
     // start running the service (blocking call)
-    run_service(arguments);
+    run_service_s("ios", arguments);
 
     // deletes the arguments hash map (release memory)
     delete_hash_map(arguments);
