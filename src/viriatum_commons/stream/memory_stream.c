@@ -113,6 +113,8 @@ size_t write_memory_stream(struct stream_t *stream, unsigned char *buffer, size_
         REALLOC(memory_stream->buffer, memory_stream->buffer_size);
     }
 
+	memcpy(memory_stream->buffer, buffer, size);
+
     memory_stream->position += size;
     memory_stream->size += size;
 
