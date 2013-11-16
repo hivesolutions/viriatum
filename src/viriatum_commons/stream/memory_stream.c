@@ -28,3 +28,114 @@
 #include "stdafx.h"
 
 #include "memory_stream.h"
+
+void create_memory_stream(struct memory_stream_t **memory_stream_pointer) {
+    /* calculates the size of the memory stream structure and
+    then uses this value to allocate  */
+    size_t memory_stream_size = sizeof(struct memory_stream_t);
+    struct memory_stream_t *memory_stream =\
+        (struct memory_stream_t *) MALLOC(memory_stream_size);
+
+    /* creates the stream (structure) and sets the
+    current memory stream as the lower substrate */
+    create_stream(&memory_stream->stream);
+    memory_stream->stream->lower = (void *) memory_stream;
+
+    /* sets the memory parameters in the memory stream, the values
+    are set with the original (unset) values */
+    memory_stream->buffer = NULL;
+    memory_stream->buffer_size = 0;
+    memory_stream->size = 0;
+    memory_stream->position = 0;
+
+    /* sets the various functions of the stream */
+    memory_stream->stream->open = open_memory_stream;
+    memory_stream->stream->close = close_memory_stream;
+    memory_stream->stream->read = read_memory_stream;
+    memory_stream->stream->write = write_memory_stream;
+    memory_stream->stream->flush = flush_memory_stream;
+    memory_stream->stream->seek = seek_memory_stream;
+    memory_stream->stream->size = size_memory_stream;
+    memory_stream->stream->tell = tell_memory_stream;
+
+    /* sets the memory stream in the memory stream pointer */
+    *memory_stream_pointer = memory_stream;
+}
+
+void delete_memory_stream(struct memory_stream_t *memory_stream) {
+    if(memory_stream->buffer) { FREE(memory_stream->buffer); }
+    FREE(memory_stream);
+}
+
+struct stream_t *get_stream_memory_stream(struct memory_stream_t *memory_stream) {
+    return memory_stream->stream;
+}
+
+void open_memory_stream(struct stream_t *stream) {
+    struct memory_stream_t *memory_stream =\
+        (struct memory_stream_t *) stream->lower;
+    size_t buffer_size = SIZE_MEMORY_STREAM * sizeof(unsigned char);
+    memory_stream->buffer = (unsigned char *) MALLOC(buffer_size);
+    memory_stream->buffer_size = SIZE_MEMORY_STREAM;
+    memory_stream->size = 0;
+    memory_stream->position = 0;
+}
+
+void close_memory_stream(struct stream_t *stream) {
+    struct memory_stream_t *memory_stream =\
+        (struct memory_stream_t *) stream->lower;
+    if(memory_stream->buffer) { FREE(memory_stream->buffer); }
+    memory_stream->buffer_size = 0;
+    memory_stream->size = 0;
+    memory_stream->position = 0;
+}
+
+size_t read_memory_stream(struct stream_t *stream, unsigned char *buffer, size_t size) {
+    struct memory_stream_t *memory_stream =\
+        (struct memory_stream_t *) stream->lower;
+    size_t remaining = memory_stream->size - memory_stream->position;
+    size_t count = size > remaining ? remaining : size;
+    unsigned char *pointer = &memory_stream->buffer[memory_stream->position];
+
+    memcpy(buffer, pointer, count);
+    memory_stream->position += count;
+
+    return count;
+}
+
+size_t write_memory_stream(struct stream_t *stream, unsigned char *buffer, size_t size) {
+    struct memory_stream_t *memory_stream =\
+        (struct memory_stream_t *) stream->lower;
+    size_t remaining = memory_stream->buffer_size - memory_stream->position;
+
+    if(size > remaining) {
+        memory_stream->buffer_size += SIZE_MEMORY_STREAM;
+        REALLOC(memory_stream->buffer, memory_stream->buffer_size);
+    }
+
+    memory_stream->position += size;
+    memory_stream->size += size;
+
+    return size;
+}
+
+void flush_memory_stream(struct stream_t *stream) {
+}
+
+void seek_memory_stream(struct stream_t *stream, size_t target) {
+    struct memory_stream_t *memory_stream =\
+        (struct memory_stream_t *) stream->lower;
+    memory_stream->position = target;
+}
+
+size_t size_memory_stream(struct stream_t *stream) {
+    struct memory_stream_t *memory_stream =\
+        (struct memory_stream_t *) stream->lower;
+    return memory_stream->size;
+}
+
+size_t tell_memory_stream(struct stream_t *stream) {
+    struct memory_stream_t *memory_stream =\
+        (struct memory_stream_t *) stream->lower;
+    return memory_stream->position;
+}
