@@ -88,6 +88,7 @@ void close_memory_stream(struct stream_t *stream) {
     struct memory_stream_t *memory_stream =\
         (struct memory_stream_t *) stream->lower;
     if(memory_stream->buffer) { FREE(memory_stream->buffer); }
+	memory_stream->buffer = NULL;
     memory_stream->buffer_size = 0;
     memory_stream->size = 0;
     memory_stream->position = 0;
