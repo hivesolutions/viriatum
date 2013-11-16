@@ -12,7 +12,7 @@ def run():
     # pre-defined values in case they do not exist
     arguments = atm.parse_args()
     _file = arguments.get("file", None)
-    _version = arguments.get("version", None)
+    _version = arguments.get("previous", None)
 
     try:
         # starts the build process with the configuration file
