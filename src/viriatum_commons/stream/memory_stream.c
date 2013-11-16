@@ -104,17 +104,21 @@ size_t read_memory_stream(struct stream_t *stream, unsigned char *buffer, size_t
 }
 
 size_t write_memory_stream(struct stream_t *stream, unsigned char *buffer, size_t size) {
-    struct memory_stream_t *memory_stream =\
+    unsigned char *pointer;
+	struct memory_stream_t *memory_stream =\
         (struct memory_stream_t *) stream->lower;
     size_t remaining = memory_stream->buffer_size - memory_stream->position;
 
     if(size > remaining) {
         memory_stream->buffer_size += SIZE_MEMORY_STREAM;
-        REALLOC(memory_stream->buffer, memory_stream->buffer_size);
+        memory_stream->buffer =	REALLOC(
+		    memory_stream->buffer,
+			memory_stream->buffer_size
+		);
     }
 
-	memcpy(memory_stream->buffer, buffer, size);
-
+	pointer = &memory_stream->buffer[memory_stream->position];
+	memcpy(pointer, buffer, size);
     memory_stream->position += size;
     memory_stream->size += size;
 
