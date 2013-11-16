@@ -29,7 +29,11 @@
 
 #include "file_stream.h"
 
-void create_file_stream(struct file_stream_t **file_stream_pointer, unsigned char *file_path, unsigned char *mode) {
+void create_file_stream(
+    struct file_stream_t **file_stream_pointer,
+	unsigned char *file_path,
+	unsigned char *mode
+) {
     /* retrieves the file stream size */
     size_t file_stream_size = sizeof(struct file_stream_t);
 
@@ -61,7 +65,9 @@ void create_file_stream(struct file_stream_t **file_stream_pointer, unsigned cha
     *file_stream_pointer = file_stream;
 }
 
-void delete_file_stream(struct file_stream_t *file_stream) {
+void delete_file_stream(
+    struct file_stream_t *file_stream
+) {
     /* closes the file reference in case the file is
     currently open then deletes the underlying stream reference
     and then releases the current structure */

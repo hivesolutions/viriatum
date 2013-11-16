@@ -55,8 +55,14 @@ typedef struct file_stream_t {
     struct stream_t *stream;
 } file_stream;
 
-VIRIATUM_EXPORT_PREFIX void create_file_stream(struct file_stream_t **file_stream_pointer, unsigned char *file_path, unsigned char *mode);
-VIRIATUM_EXPORT_PREFIX void delete_file_stream(struct file_stream_t *file_stream);
+VIRIATUM_EXPORT_PREFIX void create_file_stream(
+    struct file_stream_t **file_stream_pointer,
+	unsigned char *file_path,
+	unsigned char *mode
+);
+VIRIATUM_EXPORT_PREFIX void delete_file_stream(
+    struct file_stream_t *file_stream
+);
 VIRIATUM_EXPORT_PREFIX struct stream_t *get_stream_file_stream(struct file_stream_t *file_stream);
 VIRIATUM_EXPORT_PREFIX void open_file_stream(struct stream_t *stream);
 VIRIATUM_EXPORT_PREFIX void close_file_stream(struct stream_t *stream);
