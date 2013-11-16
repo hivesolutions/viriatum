@@ -23,7 +23,7 @@ def run():
         version = atm.git_v(_version)
     except:
         sys.exit(0)
-        
+
     # prints a log message about the two versions that are going
     # to be compared to verify if there's a change
     print("Comparing '%s' against '%s' ..." % (version, _version))
