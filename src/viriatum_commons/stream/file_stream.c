@@ -31,8 +31,8 @@
 
 void create_file_stream(
     struct file_stream_t **file_stream_pointer,
-	unsigned char *file_path,
-	unsigned char *mode
+    unsigned char *file_path,
+    unsigned char *mode
 ) {
     /* retrieves the file stream size */
     size_t file_stream_size = sizeof(struct file_stream_t);
