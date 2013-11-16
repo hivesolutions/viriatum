@@ -685,6 +685,25 @@ void test_file_stream() {
     delete_file_stream(file_stream);
 }
 
+void test_memory_stream() {
+    struct stream_t *stream;
+    struct memory_stream_t *memory_stream;
+    unsigned char buffer[256];
+
+    create_memory_stream(&memory_stream);
+
+    stream = memory_stream->stream;
+    stream->open(stream);
+
+    stream->write(stream, "hello world", 11);
+    stream->seek(stream, 0);
+    stream->read(stream, buffer, 11);
+
+    stream->close(stream);
+
+    delete_memory_stream(memory_stream);
+}
+
 void test_huffman() {
     /* allocates space for both the file stream that is
     going to be used in the reading process and for the
@@ -845,8 +864,8 @@ void run_simple_tests() {
     blocking operation and so it may take some
     time for the complete execution */
     test_linked_list();
-    test_linked_list_stress();
-    test_linked_list_big();
+    /*test_linked_list_stress();
+    test_linked_list_big();*/
     test_array_list();
     test_hash_map();
     test_sort_map();
@@ -857,6 +876,7 @@ void run_simple_tests() {
     test_bencoding();
     test_bit_stream();
     test_file_stream();
+    test_memory_stream();
     test_huffman();
     test_template_handler();
     test_quicksort();
