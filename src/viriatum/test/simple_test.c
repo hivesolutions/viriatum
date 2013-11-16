@@ -686,21 +686,33 @@ void test_file_stream() {
 }
 
 void test_memory_stream() {
+    /* allocates the space for the local stream
+    pointers and for the buffer that is going to
+    be used for the testing (strings) */
     struct stream_t *stream;
     struct memory_stream_t *memory_stream;
     unsigned char buffer[256];
 
+    /* creates the memory stream structure starting
+    the values contained in it */
     create_memory_stream(&memory_stream);
 
+    /* extracts the inner stream structure from the
+    memory stream and uses it to open stream (reference
+    based operations) */
     stream = memory_stream->stream;
     stream->open(stream);
 
+    /* writes a simple string into the stream and then
+    seeks back the stream to the original position and
+    then tries to read the same string from the stream */
     stream->write(stream, "hello world", 11);
     stream->seek(stream, 0);
     stream->read(stream, buffer, 11);
 
+    /* cloes the stream avoiding any extra operation in it
+    and deletes the memory stream (avoiding any memory leaks) */
     stream->close(stream);
-
     delete_memory_stream(memory_stream);
 }
 

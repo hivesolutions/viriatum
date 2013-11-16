@@ -118,6 +118,11 @@ void test_bit_stream();
 void test_file_stream();
 
 /**
+ * Tests the (in-)memory stream.
+ */
+void test_memory_stream();
+
+/**
  * Tests the template handler.
  */
 void test_template_handler();
