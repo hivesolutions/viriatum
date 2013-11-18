@@ -2,6 +2,8 @@
 *.ncb
 *.user
 *.suo
+*.xccheckout
+
 .DS_Store
 
 /bin/
