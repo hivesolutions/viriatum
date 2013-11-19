@@ -51,7 +51,7 @@ void create_rc4(char *key, struct rc4_t **rc4_pointer) {
     /* iterates over the range of the box to populate
     it with the initial index value and then computes
     the initial box values according to specification */
-    for(i = 0; i < 256; i++) { rc4->box[i] = i;    }
+    for(i = 0; i < 256; i++) { rc4->box[i] = i; }
     for(i = 0; i < 256; i++) {
         x = (x + rc4->box[i] + key[i % key_length]) % 256;
         _x = rc4->box[x];
