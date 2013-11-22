@@ -168,6 +168,15 @@ Must compile viriatum with special environment variables set to point to the cor
     export CFLAGS="-I/usr/include/python2.7"
     export CFLAGS="-I/System/Library/Frameworks/Python.framework/Headers"
 
+## Docker
+
+It's possible to run viriatum inside a docker container and pre-built images 
+have been created under the public repository.
+
+To use viriatum using these pre-built images use the following command:
+
+    docker run -d joamag/devel /usr/sbin/viriatum
+
 ## Benchmarking
 
 * Most of the information presented in [gwan benchmark](http://gwan.ch/en_apachebench_httperf.html) is applicable for benchmarking Viriatum
