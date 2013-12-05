@@ -75,12 +75,12 @@ typedef struct bit_stream_t {
      */
     size_t position;
 
-	/**
-	 * The current byte as a value that is being
-	 * used for the writing procedure. This value
-	 * changes by reading a new byte from the lower
-	 * part stream structure.
-	 */
+    /**
+     * The current byte as a value that is being
+     * used for the writing procedure. This value
+     * changes by reading a new byte from the lower
+     * part stream structure.
+     */
     unsigned char current_byte_read;
 
     /**
