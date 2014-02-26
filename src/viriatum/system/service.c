@@ -2277,7 +2277,7 @@ const char *_get_mime_type_service(struct service_t *service, char *extension) {
     lowercase(extension_l);
     get_value_string_hash_map(
         service_options->mime_types,
-        (unsigned char *) extension,
+        (unsigned char *) extension_l,
         (void **) &mime_type
     );
     return mime_type;
