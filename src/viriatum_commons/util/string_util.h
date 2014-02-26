@@ -117,6 +117,14 @@ static __inline unsigned char *untrim(unsigned char *string_value, char last) {
     return string_value - 1;
 }
 
+static __inline void lowercase(char *string_value) {
+    while(*string_value != '\0') {
+        if(*string_value == '_') { *string_value = '-'; }
+        else { *string_value = tolower((unsigned char) *string_value); }
+        string_value++;
+    }
+}
+
 static __inline void uppercase(char *string_value) {
     while(*string_value != '\0') {
         if(*string_value == '-') { *string_value = '_'; }

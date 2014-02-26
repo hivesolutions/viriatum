@@ -2266,9 +2266,15 @@ const char *_get_mime_type_service(struct service_t *service, char *extension) {
     /* allocates space for the buffer reference that will hold the mime type
     then unpacks the service options from the service and uses it to access
     the mime types hash map and retrieve the mime type string from the provided
-    extension string value and returns it to the caller function */
+    extension string value and returns it to the caller function, note that a
+    conversion to lowercase representation of the extension is done so that no
+    problems occur with uppercased values (lowercase only representation) */
     char *mime_type;
+    char extension_l[VIRIATUM_MAX_EXTENSION_SIZE];
+    size_t extension_s = strlen(extension);
     struct service_options_t *service_options = service->options;
+    memcpy(extension_l, extension, extension_s);
+    lowercase(extension_l);
     get_value_string_hash_map(
         service_options->mime_types,
         (unsigned char *) extension,
