@@ -2274,6 +2274,7 @@ const char *_get_mime_type_service(struct service_t *service, char *extension) {
     size_t extension_s = strlen(extension);
     struct service_options_t *service_options = service->options;
     memcpy(extension_l, extension, extension_s);
+    extension_l[extension_s] = '\0';
     lowercase(extension_l);
     get_value_string_hash_map(
         service_options->mime_types,
