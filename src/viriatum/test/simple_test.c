@@ -706,7 +706,7 @@ void test_memory_stream() {
     /* writes a simple string into the stream and then
     seeks back the stream to the original position and
     then tries to read the same string from the stream */
-    stream->write(stream, "hello world", 11);
+    stream->write(stream, (unsigned char *) "hello world", 11);
     stream->seek(stream, 0);
     stream->read(stream, buffer, 11);
 
