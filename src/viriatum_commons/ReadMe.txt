@@ -1,5 +1,5 @@
 // Hive Viriatum Commons
-// Copyright (C) 2008-2012 Hive Solutions Lda.
+// Copyright (C) 2008-2014 Hive Solutions Lda.
 //
 // This file is part of Hive Viriatum Commons.
 //
@@ -20,5 +20,5 @@
 // __version__   = 1.0.0
 // __revision__  = $LastChangedRevision$
 // __date__      = $LastChangedDate$
-// __copyright__ = Copyright (c) 2008-2012 Hive Solutions Lda.
+// __copyright__ = Copyright (c) 2008-2014 Hive Solutions Lda.
 // __license__   = GNU General Public License (GPL), Version 3
