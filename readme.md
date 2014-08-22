@@ -56,9 +56,9 @@ Building viriatum for android involves cross compilation and the android ndk too
 Check the instructions for downloading the android ndk from the [official website](http://developer.android.com/sdk/ndk/),
 then unpack the android-ndk package file into the current directory.
 
-The recommended NDK version is `r10` as compatibility is ensured for that version. Newer versions are
+The recommended NDK version is `r8e` as compatibility is ensured for that version. Newer versions are
 known to have problems compiling some of the packages (including PHP). To download that version of
-the NDK for Linux use this [link](http://dl.google.com/android/ndk/android-ndk-r10-linux-x86_64.tar.bz2).
+the NDK for Linux use this [link](http://dl.google.com/android/ndk/android-ndk-r8e-linux-x86_64.tar.bz2).
 
     tar -xvf android-ndk-r[x]-linux-[arch].tar.bz2
 
