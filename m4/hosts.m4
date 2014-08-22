@@ -24,12 +24,12 @@
 # __license__   = GNU General Public License (GPL), Version 3
 
 case $host_os in
-  linux-android*)
-    library_names_spec='$libname${shared_ext}'
-    soname_spec='${libname}${shared_ext}'
-  ;;
-  *)
-    library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}$major $libname${shared_ext}'
-    soname_spec='${libname}${release}${shared_ext}$major'
-  ;;
+    linux-android*|android-linux*)
+        library_names_spec='$libname${shared_ext}'
+        soname_spec='${libname}${shared_ext}'
+    ;;
+    *)
+        library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}$major $libname${shared_ext}'
+        soname_spec='${libname}${release}${shared_ext}$major'
+    ;;
 esac
