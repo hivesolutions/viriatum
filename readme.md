@@ -59,6 +59,8 @@ then unpack the android-ndk package file into the current directory.
 The recommended NDK version is `r6` as compatibility is ensured for that version. Newer versions are
 known to have problems compiling some of the packages (including PHP). To download that version of
 the NDK for Linux use this [link](http://dl.google.com/android/ndk/android-ndk-r6-linux-x86.tar.bz2).
+The `r6` version of the NDK is meant to be run only under x86 machines and should be used with care
+under x86-64 based machines.
 
     tar -xvf android-ndk-r[x]-linux-[arch].tar.bz2
 
