@@ -24,7 +24,7 @@
 # __license__   = GNU General Public License (GPL), Version 3
 
 case $host_os in
-    linux-android*|linux-gnuebi*)
+    linux-android*|linux-gnueabi*)
         library_names_spec='$libname${shared_ext}'
         soname_spec='${libname}${shared_ext}'
     ;;
