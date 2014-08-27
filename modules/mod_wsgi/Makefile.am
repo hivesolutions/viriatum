@@ -25,6 +25,6 @@
 
 include $(top_srcdir)/Common.am
 
-AUTOMAKE_OPTIONS = foreign
+AUTOMAKE_OPTIONS = foreign subdir-objects
 ACLOCAL_AMFLAGS = -I m4
 SUBDIRS = m4 src
