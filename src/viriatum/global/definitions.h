@@ -167,7 +167,7 @@ static __inline char *get_config_path() {
 #define VIRIATUM_AGENT VIRIATUM_NAME "/" VIRIATUM_VERSION
 #define VIRIATUM_DESCRIPTION "Viriatum"
 #define VIRIATUM_OBSERVATIONS "Viriatum HTTP Server"
-#define VIRIATUM_COPYRIGHT "Copyright (c) 2010-2013 Hive Solutions Lda. All rights reserved."
+#define VIRIATUM_COPYRIGHT "Copyright (c) 2010-2014 Hive Solutions Lda. All rights reserved."
 #define VIRIATUM_PREFIX "VR"
 #define VIRIATUM_STAGE_ALPHA "a"
 #define VIRIATUM_STAGE_BETA "b"
