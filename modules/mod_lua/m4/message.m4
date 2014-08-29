@@ -30,6 +30,7 @@ echo
 echo " + Host                  $host_os"
 echo " + Install prefix        $prefix"
 echo " + Modules directory     $prefix/lib/viriatum/modules"
+echo " + CC                    $CC"
 echo " + CFLAGS                $CFLAGS"
 echo " + DEBUG                 $have_debug"
 echo " + Lua                   $have_lua"
