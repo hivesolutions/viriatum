@@ -27,20 +27,20 @@ set -e
 case "$1" in
     start)
         log_daemon_msg "Starting $DESC" viriatum
-        start_daemon -f -p /var/run/$NAME.pid $DAEMON || true
+        start_daemon -f -p /var/run/$NAME.pid $DAEMON --daemon || true
         log_end_msg 0
         ;;
 
     stop)
         log_daemon_msg "Stopping $DESC" viriatum
-        killproc -p /var/run/$NAME.pid || true
+        killproc -p /var/run/$NAME.pid $DAEMON || true
         log_end_msg 0
         ;;
 
     restart|force-reload)
         log_daemon_msg "Restarting $DESC" viriatum
-        killproc -p /var/run/$NAME.pid || true
-        start_daemon -f -p /var/run/$NAME.pid $DAEMON || true
+        killproc -p /var/run/$NAME.pid $DAEMON || true
+        start_daemon -f -p /var/run/$NAME.pid $DAEMON --daemon || true
         log_end_msg 0
         ;;
 
