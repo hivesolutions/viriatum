@@ -1,4 +1,4 @@
-# [Viriatum Web Server](http://viriatum.hive.pt)
+# [![Viriatum Web Server](res/logo.png)](http://viriatum.hive.pt)
 
 The Viriatum Web Server is simple and lightweight web server aimed at providing a simple yet powerful solution
 for static file serving, reverse proxy serving and dynamic language handling.
