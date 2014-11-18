@@ -34,11 +34,11 @@
 	const char *message;\
 	if(echo == TRUE) { V_PRINT_F("%s ... ", #test); }\
     message = test(); tests_run++;\
-	if(message) { return message; }\
 	if(echo == TRUE) {\
 		if(message) { V_PRINT("not ok\n"); }\
 		else { V_PRINT("ok\n"); }\
 	}\
+	if(message) { return message; }\
 } while (0)
 
 /*extern int tests_run;*/
