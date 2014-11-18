@@ -30,13 +30,6 @@
 #include "simple_test.h"
 
 /**
- * General function used for testing purposes, this is the
- * simplest definition for a test function. This kind of
- * functions should return a description of the result.
- */
-typedef const char *(*test_function) ();
-
-/**
  * Runs a single speed test and prints a series of messages
  * to the standard output according to the provided name for
  * the speed fucntion.

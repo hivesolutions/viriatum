@@ -55,6 +55,20 @@ typedef struct test_case_t {
     unsigned int failure;
 } test_case;
 
+/**
+ * General function used for testing purposes, this is the
+ * simplest definition for a test function. This kind of
+ * functions should return a description of the result.
+ */
+typedef const char *(*test_function) ();
+
+/**
+ * Definition of the general entry point for a function that
+ * is resposible for a test case execution.
+ * 
+ * This function should run the various test associated with
+ * the test case and then populate the test case structure.
+ */
 typedef void (*test_case_function) (struct test_case_t *test_case);
 
 ERROR_CODE run_test_case(test_case_function function, const char *name);
