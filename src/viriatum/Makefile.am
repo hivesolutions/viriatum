@@ -29,6 +29,8 @@ SUBDIRS = resources
 
 bin_PROGRAMS = viriatum
 
+TESTS += viriatum --test
+
 lib_LTLIBRARIES = libviriatum_http.la
 
 viriatum_CFLAGS = $(AM_CFLAGS)

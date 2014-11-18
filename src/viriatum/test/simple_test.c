@@ -78,6 +78,10 @@ void test_thread_pool() {
 #endif
 
 void test_linked_list() {
+    /* prints a simple a message about the test that
+    is currently going to be performed */
+    PRINT_F("test_linked_list");
+
     /* allocates space for the value that's going
     to be used for temporary storage */
     void *value;
