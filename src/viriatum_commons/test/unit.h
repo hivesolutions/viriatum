@@ -27,6 +27,8 @@
 
 #pragma once
 
+#include "../debug/debug.h"
+
 #define V_ASSERT(test, message) do { if(!(test)) { return message; } } while (0)
 #define V_RUN_TEST(test, test_case, echo) do {\
     const char *message;\
