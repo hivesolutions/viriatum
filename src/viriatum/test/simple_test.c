@@ -114,7 +114,7 @@ const char *test_linked_list() {
 
     /* pops two values from the linked list */
     pop_value_linked_list(linked_list, (void **) &value, TRUE);
-	V_ASSERT(value == (void *) 1, "value != 1");
+	V_ASSERT(value == (void *) 2, "value != 2");
     pop_value_linked_list(linked_list, (void **) &value, TRUE);
 	V_ASSERT(value == NULL, "value != NULL");
 
