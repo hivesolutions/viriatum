@@ -30,16 +30,15 @@
 #include "simple_test.h"
 
 #define V_ASSERT(test, message) do { if(!(test)) { return message; } } while (0)
-#define V_RUN_TEST(test) do {\
-    const char *message = test(); tests_run++;\
-	if(message) { return message; }\
-} while (0)
-#define V_RUN_TEST_M(test) do {\
+#define V_RUN_TEST(test, echo) do {\
 	const char *message;\
-	V_PRINT_F("%s ... ", #test);\
-    message = V_RUN_TEST(test);\
-	if(message) { V_PRINT("not ok\n"); }\
-	else { V_PRINT("ok\n"); }\
+	if(echo == TRUE) { V_PRINT_F("%s ... ", #test); }\
+    message = test(); tests_run++;\
+	if(message) { return message; }\
+	if(echo == TRUE) {\
+		if(message) { V_PRINT("not ok\n"); }\
+		else { V_PRINT("ok\n"); }\
+	}\
 } while (0)
 
 /*extern int tests_run;*/
@@ -910,9 +909,9 @@ const char *exec_simple_tests() {
     commons infra-structure this a long running
     blocking operation and so it may take some
     time for the complete execution */
-    V_RUN_TEST(test_linked_list);
-    V_RUN_TEST(test_linked_list_stress);
-    V_RUN_TEST(test_linked_list_big);
+    V_RUN_TEST(test_linked_list, TRUE);
+    V_RUN_TEST(test_linked_list_stress, TRUE);
+    V_RUN_TEST(test_linked_list_big, TRUE);
     /*test_array_list();
     test_hash_map();
     test_sort_map();
