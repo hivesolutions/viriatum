@@ -29,7 +29,7 @@
 
 #include "simple_test.h"
 
-#define V_ASSERT(message, test) do { if (!(test)) return message; } while (0)
+#define V_ASSERT(test, message) do { if (!(test)) return message; } while (0)
 #define V_RUN_TEST(test) do { const char *message = test(); tests_run++;\
 	if (message) return message; } while (0)
 
@@ -104,7 +104,7 @@ const char *test_linked_list() {
     /* retrieves a value from the linked list and
 	verifies that it contains the expected value */
     get_value_linked_list(linked_list, 1, &value);
-	V_ASSERT(value, (void *) 2);
+	V_ASSERT(value == (void *) 2, "value != 2");
 
     /* removes a value from the linked list */
     remove_value_linked_list(linked_list, (void *) 1, TRUE);
@@ -114,6 +114,7 @@ const char *test_linked_list() {
 
     /* pops two values from the linked list */
     pop_value_linked_list(linked_list, (void **) &value, TRUE);
+	V_ASSERT(value == (void *) 3, "value != 3");
     pop_value_linked_list(linked_list, (void **) &value, TRUE);
 
     /* appends vome elements to the front of the linked list,
