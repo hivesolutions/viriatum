@@ -32,7 +32,7 @@
 #define HELP_STRING "\
 usage: viriatum [--version] [--port[=<port>] [--host[=<hostname>]] [-ip6]\n\
                 [handler[=<name>]] [workers[=<count>]] [--local] [--ssl]\n\
-                [--daemon] [--help]\n\
+                [--daemon] [--test] [--help]\n\
 \n\
 The most commonly used viriatum commands are:\n\
    --version  Prints the current version\n\
@@ -44,6 +44,7 @@ The most commonly used viriatum commands are:\n\
    --local    Runs the service in local mode no internet support\n\
    --ssl      Listens to the sockets using ssl encryption\n\
    --daemon   Runs the service as daemon (background)\n\
+   --test     Runs a series of test for viriatum\n\
    --help     Prints this (help) message\n\
 \n\
 See 'viriatum --help[=<command>]' for more information on a specific command.\n"
