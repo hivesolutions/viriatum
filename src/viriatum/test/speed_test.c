@@ -71,5 +71,5 @@ ERROR_CODE run_speed_tests() {
     run_speed_test("test_linked_list", test_linked_list, 1000000);
     run_speed_test("test_linked_list_stress", test_linked_list_stress, 1);
     run_speed_test("test_linked_list_big", test_linked_list_big, 1);
-	RAISE_NO_ERROR;
+    RAISE_NO_ERROR;
 }

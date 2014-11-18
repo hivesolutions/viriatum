@@ -27,31 +27,32 @@
 
 #pragma once
 
-#include "stdafx.h"
+#define V_ASSERT(test, message) do { if(!(test)) { return message; } } while (0)
+#define V_RUN_TEST(test, test_case, echo) do {\
+    const char *message;\
+    if(echo == TRUE) { V_PRINT_F("%s ... ", #test); }\
+    message = test();\
+    test_case->total++;\
+    if(message == NULL) {\
+        if(echo == TRUE) {\
+            V_PRINT("ok\n");\
+        }\
+        test_case->success++;\
+    } else {\
+        if(echo == TRUE) {\
+            V_PRINT("not ok\n");\
+            V_PRINT_F("%s\n", message);\
+        }\
+        test_case->failure++;\
+    }\
+} while (0)
 
-#include "checksum/checksum.h"
-#include "compression/compression.h"
-#include "crypto/crypto.h"
-#include "debug/debug.h"
-#include "encoding/encoding.h"
-#include "formats/formats.h"
-#include "jni/jni.h"
-#include "memory/memory.h"
-#include "ini/ini.h"
-#include "io/io.h"
-#include "sorting/sorting.h"
-#include "stream/stream.h"
-#include "structures/structures.h"
-#include "system/system.h"
-#include "test/test.h"
-#include "template/template.h"
-#include "thread/thread.h"
-#include "util/util.h"
+typedef struct test_case_t {
+    unsigned int total;
+    unsigned int success;
+    unsigned int failure;
+} test_case;
 
-#ifdef VIRIATUM_PLATFORM_MSC
-#ifdef VIRIATUM_DEBUG
-#pragma comment(lib, "viriatum_commons_d.lib")
-#else
-#pragma comment(lib, "viriatum_commons.lib")
-#endif
-#endif
+typedef void (*test_case_function) (struct test_case_t *test_case);
+
+ERROR_CODE run_test_case(test_case_function function, const char *name);

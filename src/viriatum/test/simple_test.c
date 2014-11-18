@@ -29,32 +29,6 @@
 
 #include "simple_test.h"
 
-typedef struct test_case_t {
-	unsigned int total;
-	unsigned int success;
-	unsigned int failure;
-} test_case;
-
-#define V_ASSERT(test, message) do { if(!(test)) { return message; } } while (0)
-#define V_RUN_TEST(test, test_case, echo) do {\
-	const char *message;\
-	if(echo == TRUE) { V_PRINT_F("%s ... ", #test); }\
-    message = test();\
-	test_case->total++;\
-	if(message == NULL) {\
-		if(echo == TRUE) {\
-			V_PRINT("ok\n");\
-		}\
-		test_case->success++;\
-	} else {\
-		if(echo == TRUE) {\
-			V_PRINT("not ok\n");\
-			V_PRINT_F("%s\n", message);\
-		}\
-		test_case->failure++;\
-	}\
-} while (0)
-
 #ifndef VIRIATUM_NO_THREADS
 #ifdef VIRIATUM_THREAD_SAFE
 int thread_pool_start_function_test(void *arguments) {
@@ -120,9 +94,9 @@ const char *test_linked_list() {
     append_value_linked_list(linked_list, (void *) 3);
 
     /* retrieves a value from the linked list and
-	verifies that it contains the expected value */
+    verifies that it contains the expected value */
     get_value_linked_list(linked_list, 1, &value);
-	V_ASSERT(value == (void *) 2, "value != 2");
+    V_ASSERT(value == (void *) 2, "value != 2");
 
     /* removes a value from the linked list */
     remove_value_linked_list(linked_list, (void *) 1, TRUE);
@@ -132,25 +106,25 @@ const char *test_linked_list() {
 
     /* pops two values from the linked list */
     pop_value_linked_list(linked_list, (void **) &value, TRUE);
-	V_ASSERT(value == (void *) 2, "value != 2");
+    V_ASSERT(value == (void *) 2, "value != 2");
     pop_value_linked_list(linked_list, (void **) &value, TRUE);
-	V_ASSERT(value == NULL, "value != NULL");
+    V_ASSERT(value == NULL, "value != NULL");
 
     /* appends vome elements to the front of the linked list,
     then pops them out again */
     append_front_value_linked_list(linked_list, (void *) 4);
     append_front_value_linked_list(linked_list, (void *) 5);
     pop_value_linked_list(linked_list, (void **) &value, TRUE);
-	V_ASSERT(value == (void *) 5, "value != 5");
+    V_ASSERT(value == (void *) 5, "value != 5");
     pop_value_linked_list(linked_list, (void **) &value, TRUE);
-	V_ASSERT(value == (void *) 4, "value != 4");
+    V_ASSERT(value == (void *) 4, "value != 4");
 
     /* deletes the linked list */
     delete_linked_list(linked_list);
 
-	/* returns the default value, nothing happened so there's
-	nothing to report for this execution */
-	return NULL;
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
 }
 
 const char *test_linked_list_stress() {
@@ -175,9 +149,9 @@ const char *test_linked_list_stress() {
     }
     delete_linked_list(linked_list);
 
-	/* returns the default value, nothing happened so there's
-	nothing to report for this execution */
-	return NULL;
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
 }
 
 const char *test_linked_list_big() {
@@ -204,9 +178,9 @@ const char *test_linked_list_big() {
     }
     delete_linked_list(linked_list);
 
-	/* returns the default value, nothing happened so there's
-	nothing to report for this execution */
-	return NULL;
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
 }
 
 void test_array_list() {
@@ -942,23 +916,7 @@ void exec_simple_tests(struct test_case_t *test_case) {
     test_sha1();*/
 }
 
-typedef void (*test_case_function) (struct test_case_t *test_case);
-
-ERROR_CODE run_test_case(test_case_function function, const char *name) {
-	struct test_case_t test_case;
-	test_case.total = 0;
-	test_case.success = 0;
-	test_case.failure = 0;
-	V_PRINT_F("Executing %s ...\n", name);
-	function(&test_case);
-	V_PRINT_F(
-		"Ran %d tests (%d success, %d failure)\n",
-		test_case.total, test_case.success, test_case.failure
-	);
-	RAISE_ERROR_S(test_case.failure > 0 ? 1 : 0);
-}
-
 ERROR_CODE run_simple_tests() {
-	ERROR_CODE return_value = run_test_case(exec_simple_tests, "simple_tests");
-	RAISE_AGAIN(return_value);
+    ERROR_CODE return_value = run_test_case(exec_simple_tests, "simple_tests");
+    RAISE_AGAIN(return_value);
 }

@@ -27,31 +27,4 @@
 
 #pragma once
 
-#include "stdafx.h"
-
-#include "checksum/checksum.h"
-#include "compression/compression.h"
-#include "crypto/crypto.h"
-#include "debug/debug.h"
-#include "encoding/encoding.h"
-#include "formats/formats.h"
-#include "jni/jni.h"
-#include "memory/memory.h"
-#include "ini/ini.h"
-#include "io/io.h"
-#include "sorting/sorting.h"
-#include "stream/stream.h"
-#include "structures/structures.h"
-#include "system/system.h"
-#include "test/test.h"
-#include "template/template.h"
-#include "thread/thread.h"
-#include "util/util.h"
-
-#ifdef VIRIATUM_PLATFORM_MSC
-#ifdef VIRIATUM_DEBUG
-#pragma comment(lib, "viriatum_commons_d.lib")
-#else
-#pragma comment(lib, "viriatum_commons.lib")
-#endif
-#endif
+#include "unit.h"

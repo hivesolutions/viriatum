@@ -415,12 +415,12 @@ int execute_arguments(char *program_name, struct hash_map_t *arguments) {
     prints a message indicating the problem that occurred */
     if(IS_ERROR_CODE(return_value)) {
         V_ERROR_F("Problem running service (%s)\n", (char *) GET_ERROR());
-		RAISE_AGAIN(return_value);
+        RAISE_AGAIN(return_value);
     }
 
-	/* returns the normal result value as no problems has
-	occured during the execution of the command */
-	RAISE_NO_ERROR;
+    /* returns the normal result value as no problems has
+    occured during the execution of the command */
+    RAISE_NO_ERROR;
 }
 
 void cleanup(struct hash_map_t *arguments) {
@@ -445,12 +445,12 @@ void cleanup(struct hash_map_t *arguments) {
 
 #ifndef VIRIATUM_PLATFORM_IPHONE
 int main(int argc, char *argv[]) {
-	/* allocates the space for the "final" result code
-	that is going to be returned as part of the normal
-	command execution, a positive or negative values
-	should idicate an error, a zero value indicates that
-	a normal execution has just finished */
-	ERROR_CODE return_value;
+    /* allocates the space for the "final" result code
+    that is going to be returned as part of the normal
+    command execution, a positive or negative values
+    should idicate an error, a zero value indicates that
+    a normal execution has just finished */
+    ERROR_CODE return_value;
 
     /* allocates space for the name of the program
     (process) to be executed */
@@ -465,7 +465,7 @@ int main(int argc, char *argv[]) {
 
     /* in case the number of arguments is less than one
     (exception case) returns in error */
-	if(argc < 1) { cleanup(NULL); RAISE_ERROR_S(1); }
+    if(argc < 1) { cleanup(NULL); RAISE_ERROR_S(1); }
 
     /* retrieves the first argument value as the name
     of the process (program) to be executed */
@@ -494,6 +494,6 @@ int main(int argc, char *argv[]) {
         "Finishing process [%ld pending]\n",
         (long int) ALLOCATIONS
     );
-	RAISE_AGAIN(return_value);
+    RAISE_AGAIN(return_value);
 }
 #endif

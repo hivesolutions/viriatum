@@ -711,6 +711,14 @@
                     >
                 </File>
             </Filter>
+            <Filter
+                Name="Test"
+                >
+                <File
+                    RelativePath="..\..\src\viriatum_commons\test\unit.c"
+                    >
+                </File>
+            </Filter>
         </Filter>
         <Filter
             Name="Header Files"
@@ -1098,6 +1106,18 @@
                 </File>
                 <File
                     RelativePath="..\..\src\viriatum_commons\formats\url.h"
+                    >
+                </File>
+            </Filter>
+            <Filter
+                Name="Test"
+                >
+                <File
+                    RelativePath="..\..\src\viriatum_commons\test\test.h"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\viriatum_commons\test\unit.h"
                     >
                 </File>
             </Filter>
