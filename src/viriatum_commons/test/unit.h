@@ -51,6 +51,8 @@
 } while (0)
 #define V_RUN_SPEED(test, count, test_case) do {\
 	run_speed_test(#test, test, count);\
+	test_case->total++;\
+	test_case->success++;\
 } while (0)
 
 typedef struct test_case_t {
