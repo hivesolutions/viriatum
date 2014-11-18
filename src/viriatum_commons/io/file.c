@@ -221,16 +221,36 @@ ERROR_CODE delete_directory_entries_map_file(struct linked_list_t *map) {
 
         /* deletes the various values (types) from the hash map
         (first retrieves them and the excludes them)*/
-        get_value_string_hash_map(entry_type->value.value_map, (unsigned char *) "type", (void **) &entry_value_type);
+        get_value_string_hash_map(
+           entry_type->value.value_map,
+           (unsigned char *) "type",
+           (void **) &entry_value_type
+        );
         delete_type(entry_value_type);
-        get_value_string_hash_map(entry_type->value.value_map, (unsigned char *) "name", (void **) &entry_value_type);
+        get_value_string_hash_map
+            (entry_type->value.value_map,
+            (unsigned char *) "name",
+            (void **) &entry_value_type
+        );
         delete_type(entry_value_type);
-        get_value_string_hash_map(entry_type->value.value_map, (unsigned char *) "size", (void **) &entry_value_type);
+        get_value_string_hash_map(
+            entry_type->value.value_map,
+            (unsigned char *) "size",
+            (void **) &entry_value_type
+        );
         delete_type(entry_value_type);
-        get_value_string_hash_map(entry_type->value.value_map, (unsigned char *) "time", (void **) &entry_value_type);
+        get_value_string_hash_map(
+            entry_type->value.value_map,
+            (unsigned char *) "time",
+            (void **) &entry_value_type
+        );
         FREE(entry_value_type->value.value_string);
         delete_type(entry_value_type);
-        get_value_string_hash_map(entry_type->value.value_map, (unsigned char *) "size_string", (void **) &entry_value_type);
+        get_value_string_hash_map(
+            entry_type->value.value_map,
+            (unsigned char *) "size_string",
+            (void **) &entry_value_type
+        );
         FREE(entry_value_type->value.value_string);
         delete_type(entry_value_type);
 
@@ -758,7 +778,10 @@ ERROR_CODE list_directory_file(char *file_path, struct linked_list_t *entries) {
     /* in case the directory reference is not valid */
     if(directory == NULL) {
         /* raises an error */
-        RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem listing directory");
+        RAISE_ERROR_M(
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Problem listing directory"
+        );
     }
 
     /* print all the files and directories within directory */
