@@ -2,4 +2,4 @@ language: c
 compiler:
   - clang
   - gcc
-script: ./autogen.sh && ./configure && make && "./src/viriatum/viriatum --test"
+script: ./autogen.sh && ./configure && make && ./src/viriatum/viriatum --test

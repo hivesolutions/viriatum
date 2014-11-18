@@ -87,7 +87,7 @@ void test_linked_list() {
 
     /* prints a simple a message about the test that
     is currently going to be performed */
-    V_PRINT("test_linked_list");
+    V_PRINT("test_linked_list\n");
 
     /* creates the linked list */
     create_linked_list(&linked_list);
@@ -128,6 +128,8 @@ void test_linked_list_stress() {
     size_t index;
     void *value;
     struct linked_list_t *linked_list;
+
+	V_PRINT("test_linked_list_stress\n");
 
     /* creates the linked list structure and starts the long
     iteration that is going to append and then pop elements from
