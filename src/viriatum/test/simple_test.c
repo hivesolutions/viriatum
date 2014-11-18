@@ -431,7 +431,7 @@ void test_bencoding() {
 
     /* prints the type structure into the standard output and then
     releases its memory recursively */
-    print_type(type);
+    print_type(type); V_PRINT("\n");
     free_type(type);
 
     /* releases the memory from the encoded buffer, this was

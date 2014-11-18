@@ -286,7 +286,6 @@ ERROR_CODE print_type(struct type_t *type) {
             /* breaks the switch */
             break;
 
-
         default:
             PRINTF("undefined");
 
