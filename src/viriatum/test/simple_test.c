@@ -78,16 +78,16 @@ void test_thread_pool() {
 #endif
 
 void test_linked_list() {
-    /* prints a simple a message about the test that
-    is currently going to be performed */
-    PRINT_F("test_linked_list");
-
     /* allocates space for the value that's going
     to be used for temporary storage */
     void *value;
 
     /* allocates space for the linked list */
     struct linked_list_t *linked_list;
+
+    /* prints a simple a message about the test that
+    is currently going to be performed */
+    V_PRINT("test_linked_list");
 
     /* creates the linked list */
     create_linked_list(&linked_list);
