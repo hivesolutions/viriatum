@@ -96,7 +96,7 @@ const char *test_linked_list() {
     /* retrieves a value from the linked list and
     verifies that it contains the expected value */
     get_value_linked_list(linked_list, 1, &value);
-    V_ASSERT(value == (void *) 2, "value != 2");
+    V_ASSERT(value == (void *) 2);
 
     /* removes a value from the linked list */
     remove_value_linked_list(linked_list, (void *) 1, TRUE);
@@ -106,18 +106,18 @@ const char *test_linked_list() {
 
     /* pops two values from the linked list */
     pop_value_linked_list(linked_list, (void **) &value, TRUE);
-    V_ASSERT(value == (void *) 2, "value != 2");
+    V_ASSERT(value == (void *) 2);
     pop_value_linked_list(linked_list, (void **) &value, TRUE);
-    V_ASSERT(value == NULL, "value != NULL");
+    V_ASSERT(value == NULL);
 
     /* appends vome elements to the front of the linked list,
     then pops them out again */
     append_front_value_linked_list(linked_list, (void *) 4);
     append_front_value_linked_list(linked_list, (void *) 5);
     pop_value_linked_list(linked_list, (void **) &value, TRUE);
-    V_ASSERT(value == (void *) 5, "value != 5");
+    V_ASSERT(value == (void *) 5);
     pop_value_linked_list(linked_list, (void **) &value, TRUE);
-    V_ASSERT(value == (void *) 4, "value != 4");
+    V_ASSERT(value == (void *) 4);
 
     /* deletes the linked list */
     delete_linked_list(linked_list);
@@ -300,15 +300,15 @@ const char *test_priority_queue() {
     /* pops the various values from the queue and verifies that
     they are now sorted in the correct order */
     pop_priority_queue(priority_queue, &value);
-    assert((size_t) value == 1);
+	V_ASSERT(value == (void *) 1);
     pop_priority_queue(priority_queue, &value);
-    assert((size_t) value == 2);
+    V_ASSERT(value == (void *) 2);
     pop_priority_queue(priority_queue, &value);
-    assert((size_t) value == 3);
+    V_ASSERT(value == (void *) 3);
     pop_priority_queue(priority_queue, &value);
-    assert((size_t) value == 3);
+    V_ASSERT(value == (void *) 3);
     pop_priority_queue(priority_queue, &value);
-    assert((size_t) value == 4);
+    V_ASSERT(value == (void *) 4);
 
     /* deletes the priority queue structure as its no longer going
     to be used for the storage (avoids memory leaking) */
@@ -517,7 +517,7 @@ const char *test_bit_stream() {
 
     /* checks if the written 8 bits are
     01000001 (0x41) the correct value */
-    assert(bit_stream->buffer[0] == 0x41);
+	V_ASSERT(bit_stream->buffer[0] == 0x41);
 
     /* writes a the 1000 bit set to the bit stream
     and then writes the 0010 bit set creating a new
@@ -527,7 +527,7 @@ const char *test_bit_stream() {
 
     /* verifies if the expected 10000010 (0x82)
     value is current set in the output buffer */
-    assert(bit_stream->buffer[1] == 0x82);
+	V_ASSERT(bit_stream->buffer[1] == 0x82);
 
     /* writes a partial stream of bit values that
     would create an extra (pending) bits situation
