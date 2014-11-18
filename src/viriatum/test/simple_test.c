@@ -536,8 +536,8 @@ const char *test_bit_stream() {
     write_byte_bit_stream(bit_stream, 0x08, 6);
     write_byte_bit_stream(bit_stream, 0x02, 6);
     write_byte_bit_stream(bit_stream, 0x02, 4);
-    assert(bit_stream->buffer[2] == 0x20);
-    assert(bit_stream->buffer[3] == 0x22);
+    V_ASSERT(bit_stream->buffer[2] == 0x20);
+    V_ASSERT(bit_stream->buffer[3] == 0x22);
 
     /* closes the bit stream and then deletes the references
     to both the but and the file stream */
@@ -562,12 +562,12 @@ const char *test_bit_stream() {
     /* reads a partial byte from the bit stream and verifies
     that the value is the expected one (according to spec) */
     read_byte_bit_stream(bit_stream, &byte, 4);
-    assert(byte == 0x04);
+    V_ASSERT(byte == 0x04);
 
     /* reads a partial byte from the bit stream and verifies
     that the value is the expected one (according to spec) */
     read_byte_bit_stream(bit_stream, &byte, 4);
-    assert(byte == 0x01);
+    V_ASSERT(byte == 0x01);
 
     /* seeks back the stream a bit so that the values may be
     tested again for coherence (complex operation) */
@@ -576,12 +576,12 @@ const char *test_bit_stream() {
     /* reads a partial byte from the bit stream and verifies
     that the value is the expected one (according to spec) */
     read_byte_bit_stream(bit_stream, &byte, 4);
-    assert(byte == 0x04);
+    V_ASSERT(byte == 0x04);
 
     /* reads a partial byte from the bit stream and verifies
     that the value is the expected one (according to spec) */
     read_byte_bit_stream(bit_stream, &byte, 4);
-    assert(byte == 0x01);
+    V_ASSERT(byte == 0x01);
 
     /* seeks back the stream a bit so that the values may be
     tested again for coherence (complex operation) */
@@ -590,22 +590,22 @@ const char *test_bit_stream() {
     /* reads a partial byte from the bit stream and verifies
     that the value is the expected one (according to spec) */
     read_byte_bit_stream(bit_stream, &byte, 2);
-    assert(byte == 0x01);
+    V_ASSERT(byte == 0x01);
 
     /* reads a partial byte from the bit stream and verifies
     that the value is the expected one (according to spec) */
     read_byte_bit_stream(bit_stream, &byte, 4);
-    assert(byte == 0x08);
+    V_ASSERT(byte == 0x08);
 
     /* reads a partial byte from the bit stream and verifies
     that the value is the expected one (according to spec) */
     read_byte_bit_stream(bit_stream, &byte, 4);
-    assert(byte == 0x02);
+    V_ASSERT(byte == 0x02);
 
     /* reads a partial byte from the bit stream and verifies
     that the value is the expected one (according to spec) */
     read_byte_bit_stream(bit_stream, &byte, 6);
-    assert(byte == 0x08);
+    V_ASSERT(byte == 0x08);
 
     /* seeks back the stream a bit so that the values may be
     tested again for coherence (complex operation) */
@@ -614,12 +614,12 @@ const char *test_bit_stream() {
     /* reads a partial byte from the bit stream and verifies
     that the value is the expected one (according to spec) */
     read_byte_bit_stream(bit_stream, &byte, 6);
-    assert(byte == 0x08);
+    V_ASSERT(byte == 0x08);
 
     /* reads a partial byte from the bit stream and verifies
     that the value is the expected one (according to spec) */
     read_byte_bit_stream(bit_stream, &byte, 6);
-    assert(byte == 0x02);
+    V_ASSERT(byte == 0x02);
 
     /* seeks back the stream a bit so that the values may be
     tested again for coherence (complex operation) */
@@ -628,7 +628,7 @@ const char *test_bit_stream() {
     /* reads a partial byte from the bit stream and verifies
     that the value is the expected one (according to spec) */
     read_byte_bit_stream(bit_stream, &byte, 6);
-    assert(byte == 0x02);
+    V_ASSERT(byte == 0x02);
 
     /* seeks back the stream a bit so that the values may be
     tested again for coherence (complex operation) */
@@ -637,17 +637,17 @@ const char *test_bit_stream() {
     /* reads a partial byte from the bit stream and verifies
     that the value is the expected one (according to spec) */
     read_byte_bit_stream(bit_stream, &byte, 6);
-    assert(byte == 0x08);
+    V_ASSERT(byte == 0x08);
 
     /* reads a partial byte from the bit stream and verifies
     that the value is the expected one (according to spec) */
     read_byte_bit_stream(bit_stream, &byte, 6);
-    assert(byte == 0x02);
+    V_ASSERT(byte == 0x02);
 
     /* reads a partial byte from the bit stream and verifies
     that the value is the expected one (according to spec) */
     read_byte_bit_stream(bit_stream, &byte, 4);
-    assert(byte == 0x02);
+    V_ASSERT(byte == 0x02);
 
     /* seeks back the stream a bit so that the values may be
     tested again for coherence (complex operation) */
@@ -656,7 +656,7 @@ const char *test_bit_stream() {
     /* reads a partial byte from the bit stream and verifies
     that the value is the expected one (according to spec) */
     read_byte_bit_stream(bit_stream, &byte, 3);
-    assert(byte == 0x02);
+    V_ASSERT(byte == 0x02);
 
     /* seeks back the stream a bit so that the values may be
     tested again for coherence (complex operation) */
@@ -665,12 +665,12 @@ const char *test_bit_stream() {
     /* reads a partial byte from the bit stream and verifies
     that the value is the expected one (according to spec) */
     read_byte_bit_stream(bit_stream, &byte, 3);
-    assert(byte == 0x02);
+    V_ASSERT(byte == 0x02);
 
     /* reads a partial byte from the bit stream and verifies
     that the value is the expected one (according to spec) */
     read_byte_bit_stream(bit_stream, &byte, 5);
-    assert(byte == 0x01);
+    V_ASSERT(byte == 0x01);
 
     /* closes the bit stream and then deletes the references
     to both the but and the file stream */
@@ -733,7 +733,7 @@ const char *test_file_stream() {
     stream->close(stream);
 
     /* compares the read string */
-    assert(strcmp((char *) "hello world", (char *) buffer) == 0);
+    V_ASSERT(strcmp((char *) "hello world", (char *) buffer) == 0);
 
     /* deletes the file stream */
     delete_file_stream(file_stream);
