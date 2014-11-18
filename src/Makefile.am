@@ -135,6 +135,8 @@ viriatum_commons/system/thread.h \
 viriatum_commons/template/engine.h \
 viriatum_commons/template/handler.h \
 viriatum_commons/template/template.h \
+viriatum_commons/test/test.h \
+viriatum_commons/test/unit.h \
 viriatum_commons/thread/thread.h \
 viriatum_commons/thread/thread_pool.h \
 viriatum_commons/util/arguments_util.h \
