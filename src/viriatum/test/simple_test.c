@@ -927,5 +927,5 @@ const char *exec_simple_tests() {
 ERROR_CODE run_simple_tests() {
 	const char *message = exec_simple_tests();
 	if(message == NULL) { RAISE_NO_ERROR; }
-	else { V_PRINT(message); RAISE_ERROR_S(1); }
+	else { V_PRINT_F("%s\n", message); RAISE_ERROR_S(1); }
 }
