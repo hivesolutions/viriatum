@@ -33,7 +33,7 @@ typedef struct test_case_t {
 	unsigned int total;
 	unsigned int success;
 	unsigned int failure;
-} test_case_s;
+} test_case;
 
 #define V_ASSERT(test, message) do { if(!(test)) { return message; } } while (0)
 #define V_RUN_TEST(test, test_case, echo) do {\
