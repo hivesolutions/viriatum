@@ -65,7 +65,7 @@ typedef const char *(*test_function) ();
 /**
  * Definition of the general entry point for a function that
  * is resposible for a test case execution.
- * 
+ *
  * This function should run the various test associated with
  * the test case and then populate the test case structure.
  */

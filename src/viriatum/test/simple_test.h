@@ -74,96 +74,147 @@ const char *test_linked_list_big();
 
 /**
  * Tests the array list structure.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
  */
-void test_array_list();
+const char *est_array_list();
 
 /**
  * Tests the hash map structure.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
  */
-void test_hash_map();
+const char *test_hash_map();
 
 /**
  * Tests the sort map structure.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
  */
-void test_sort_map();
+const char *test_sort_map();
 
 /**
  * Tests the priority queue structure.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
  */
-void test_priority_queue();
+const char *test_priority_queue();
 
 /**
  * Tests the string buffer, used
  * to buffer string in memory for
  * fast writing.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
  */
-void test_string_buffer();
+const char *test_string_buffer();
 
 /**
  * Tests the linked buffer, used
  * to buffer a series of buffers
  * in memory for fast writing.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
  */
-void test_linked_buffer();
+const char *test_linked_buffer();
 
 /**
  * Tests the base 64 encoding.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
  */
-void test_base64();
+const char *test_base64();
 
 /**
  * Tests the huffman encoding.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
  */
-void test_huffman();
+const char *test_huffman();
 
 /**
  * Tests the bit stream.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
  */
-void test_bit_stream();
+const char *test_bit_stream();
 
 /**
  * Tests the file stream.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
  */
-void test_file_stream();
+const char *test_file_stream();
 
 /**
  * Tests the (in-)memory stream.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
  */
-void test_memory_stream();
+const char *test_memory_stream();
 
 /**
  * Tests the template handler.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
  */
-void test_template_handler();
+const char *test_template_handler();
 
 /**
  * Tests the quicksort (algorithm).
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
  */
-void test_quicksort();
+const char *test_quicksort();
 
 /**
  * Tests the quicksort (algorithm),
  * for the linked list implementation.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
  */
-void test_quicksort_linked_list();
+const char *test_quicksort_linked_list();
 
 /**
  * Tests the md5 hash implementation
  * calculation.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
  */
-void test_md5();
+const char *test_md5();
 
 /**
  * Tests the sha1 hash implementation
  * calculation.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
  */
-void test_sha1();
+const char *test_sha1();
 
 /**
  * Tests the crc32 hash implementation
  * calculation.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
  */
-void test_crc_32();
+const char *test_crc_32();
 
 /**
  * Compars an element with another, usefull

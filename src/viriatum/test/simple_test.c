@@ -183,7 +183,7 @@ const char *test_linked_list_big() {
     return NULL;
 }
 
-void test_array_list() {
+const char *test_array_list() {
     /* allocates space for the element */
     unsigned int element = 1;
 
@@ -202,9 +202,13 @@ void test_array_list() {
 
     /* deletes the array list */
     delete_array_list(array_list);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
 }
 
-void test_hash_map() {
+const char *test_hash_map() {
     /* allocates space for the element */
     void *element;
 
@@ -234,9 +238,13 @@ void test_hash_map() {
 
     /* deletes the hash map */
     delete_hash_map(hash_map);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
 }
 
-void test_sort_map() {
+const char *test_sort_map() {
     /* allocates space for the element */
     void *element;
 
@@ -266,9 +274,13 @@ void test_sort_map() {
 
     /* deletes the sort map */
     delete_sort_map(sort_map);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
 }
 
-void test_priority_queue() {
+const char *test_priority_queue() {
     /* allocates the space for the temporary value pointer
     and for the the priority queue structure */
     void *value;
@@ -301,9 +313,13 @@ void test_priority_queue() {
     /* deletes the priority queue structure as its no longer going
     to be used for the storage (avoids memory leaking) */
     delete_priority_queue(priority_queue);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
 }
 
-void test_string_buffer() {
+const char *test_string_buffer() {
     /* allocates space for the string buffer */
     struct string_buffer_t *string_buffer;
 
@@ -328,9 +344,13 @@ void test_string_buffer() {
 
     /* deletes the string buffer */
     delete_string_buffer(string_buffer);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
 }
 
-void test_linked_buffer() {
+const char *test_linked_buffer() {
     /* allocates space for the linked buffer */
     struct linked_buffer_t *linked_buffer;
 
@@ -355,9 +375,13 @@ void test_linked_buffer() {
 
     /* deletes the linked buffer */
     delete_linked_buffer(linked_buffer);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
 }
 
-void test_base64() {
+const char *test_base64() {
     /* allocates space for the buffer */
     char buffer[] = "hello world";
 
@@ -393,9 +417,13 @@ void test_base64() {
     to avoid any memory leak */
     FREE(encoded_buffer);
     FREE(decoded_buffer);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
 }
 
-void test_bencoding() {
+const char *test_bencoding() {
     /* allocates space for the various type references
     and values and also dor the sequence structures */
     struct type_t *type;
@@ -449,9 +477,13 @@ void test_bencoding() {
     /* releases the memory from the encoded buffer, this was
     created during the encoding using bencoding */
     FREE(encoded_buffer);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
 }
 
-void test_bit_stream() {
+const char *test_bit_stream() {
     /* allocates space for the byte value that is going
     to be used in the read based tezt of the bit stream */
     unsigned char byte;
@@ -645,9 +677,13 @@ void test_bit_stream() {
     close_bit_stream(bit_stream);
     delete_bit_stream(bit_stream);
     delete_file_stream(file_stream);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
 }
 
-void test_file_stream() {
+const char *test_file_stream() {
     /* allocates space for the file stream */
     struct file_stream_t *file_stream;
 
@@ -701,9 +737,13 @@ void test_file_stream() {
 
     /* deletes the file stream */
     delete_file_stream(file_stream);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
 }
 
-void test_memory_stream() {
+const char *test_memory_stream() {
     /* allocates the space for the local stream
     pointers and for the buffer that is going to
     be used for the testing (strings) */
@@ -732,9 +772,13 @@ void test_memory_stream() {
     and deletes the memory stream (avoiding any memory leaks) */
     stream->close(stream);
     delete_memory_stream(memory_stream);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
 }
 
-void test_huffman() {
+const char *test_huffman() {
     /* allocates space for both the file stream that is
     going to be used in the reading process and for the
     huffman structure to be used in the test */
@@ -803,9 +847,13 @@ void test_huffman() {
     delete_file_stream(out_stream);
     delete_file_stream(in_stream);
     delete_huffman(huffman);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
 }
 
-void test_template_handler() {
+const char *test_template_handler() {
     /* allocates space for the template handler */
     struct template_handler_t *template_handler;
 
@@ -815,18 +863,26 @@ void test_template_handler() {
     create_template_handler(&template_handler);
     process_template_handler(template_handler, (unsigned char *) "test.tpl");
     delete_template_handler(template_handler);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
 }
 
-void test_quicksort() {
+const char *test_quicksort() {
     /* allocates space for the template handler */
     size_t list[10] = { 2, 4, 1, 2, 3, 5, 5, 3, 4, 1 };
 
     /* sorts the sequence according to the compare function
     the algorithm to be used in the sorting is the quicksort */
     sort_quicksort((void **) &list, 0, 10, _compare);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
 }
 
-void test_quicksort_linked_list() {
+const char *test_quicksort_linked_list() {
     /* allocates space for the linked list */
     struct linked_list_t *linked_list;
 
@@ -843,27 +899,43 @@ void test_quicksort_linked_list() {
 
     /* deletes the linked list */
     delete_linked_list(linked_list);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
 }
 
-void test_crc_32() {
+const char *test_crc_32() {
     /* calculates the crc32 hash value and returns it */
     crc_32((unsigned char *) "Hello World", 11);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
 }
 
-void test_md5() {
+const char *test_md5() {
     /* allocates space for the md5 result */
     unsigned char result[MD5_DIGEST_SIZE];
 
     /* calculates the md5 hash value into the result */
     md5((unsigned char *) "Hello World", 11, result);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
 }
 
-void test_sha1() {
+const char *test_sha1() {
     /* allocates space for the sha1 result */
     unsigned char result[SHA1_DIGEST_SIZE];
 
     /* calculates the sha1 hash value into the result */
     sha1((unsigned char *) "Hello World", 11, result);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
 }
 
 int _compare(void *first, void *second) {
@@ -896,24 +968,24 @@ void exec_simple_tests(struct test_case_t *test_case) {
     V_RUN_TEST(test_linked_list, test_case, TRUE);
     V_RUN_TEST(test_linked_list_stress, test_case, TRUE);
     V_RUN_TEST(test_linked_list_big, test_case, TRUE);
-    /*test_array_list();
-    test_hash_map();
-    test_sort_map();
-    test_priority_queue();
-    test_string_buffer();
-    test_linked_buffer();
-    test_base64();
-    test_bencoding();
-    test_bit_stream();
-    test_file_stream();
-    test_memory_stream();
-    test_huffman();
-    test_template_handler();
-    test_quicksort();
-    test_quicksort_linked_list();
-    test_crc_32();
-    test_md5();
-    test_sha1();*/
+    V_RUN_TEST(test_array_list, test_case, TRUE);
+    V_RUN_TEST(test_hash_map, test_case, TRUE);
+    V_RUN_TEST(test_sort_map, test_case, TRUE);
+    V_RUN_TEST(test_priority_queue, test_case, TRUE);
+    V_RUN_TEST(test_string_buffer, test_case, TRUE);
+    V_RUN_TEST(test_linked_buffer, test_case, TRUE);
+    V_RUN_TEST(test_base64, test_case, TRUE);
+    V_RUN_TEST(test_bencoding, test_case, TRUE);
+    V_RUN_TEST(test_bit_stream, test_case, TRUE);
+    V_RUN_TEST(test_file_stream, test_case, TRUE);
+    V_RUN_TEST(test_memory_stream, test_case, TRUE);
+    V_RUN_TEST(test_huffman, test_case, TRUE);
+    V_RUN_TEST(test_template_handler, test_case, TRUE);
+    V_RUN_TEST(test_quicksort, test_case, TRUE);
+    V_RUN_TEST(test_quicksort_linked_list, test_case, TRUE);
+    V_RUN_TEST(test_crc_32, test_case, TRUE);
+    V_RUN_TEST(test_md5, test_case, TRUE);
+    V_RUN_TEST(test_sha1, test_case, TRUE);
 }
 
 ERROR_CODE run_simple_tests() {
