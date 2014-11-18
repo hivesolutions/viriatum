@@ -957,7 +957,7 @@ void exec_simple_tests(struct test_case_t *test_case) {
 #ifndef VIRIATUM_NO_THREADS
 #ifdef VIRIATUM_THREAD_SAFE
     /* tests the thread pool */
-    V_RUN_TEST(test_thread_pool, TRUE);
+    V_RUN_TEST(test_thread_pool);
 #endif
 #endif
 
@@ -965,27 +965,27 @@ void exec_simple_tests(struct test_case_t *test_case) {
     commons infra-structure this a long running
     blocking operation and so it may take some
     time for the complete execution */
-    V_RUN_TEST(test_linked_list, test_case, TRUE);
-    V_RUN_TEST(test_linked_list_stress, test_case, TRUE);
-    V_RUN_TEST(test_linked_list_big, test_case, TRUE);
-    V_RUN_TEST(test_array_list, test_case, TRUE);
-    V_RUN_TEST(test_hash_map, test_case, TRUE);
-    V_RUN_TEST(test_sort_map, test_case, TRUE);
-    V_RUN_TEST(test_priority_queue, test_case, TRUE);
-    V_RUN_TEST(test_string_buffer, test_case, TRUE);
-    V_RUN_TEST(test_linked_buffer, test_case, TRUE);
-    V_RUN_TEST(test_base64, test_case, TRUE);
-    V_RUN_TEST(test_bencoding, test_case, TRUE);
-    V_RUN_TEST(test_bit_stream, test_case, TRUE);
-    V_RUN_TEST(test_file_stream, test_case, TRUE);
-    V_RUN_TEST(test_memory_stream, test_case, TRUE);
-    V_RUN_TEST(test_huffman, test_case, TRUE);
-    V_RUN_TEST(test_template_handler, test_case, TRUE);
-    V_RUN_TEST(test_quicksort, test_case, TRUE);
-    V_RUN_TEST(test_quicksort_linked_list, test_case, TRUE);
-    V_RUN_TEST(test_crc_32, test_case, TRUE);
-    V_RUN_TEST(test_md5, test_case, TRUE);
-    V_RUN_TEST(test_sha1, test_case, TRUE);
+    V_RUN_TEST(test_linked_list, test_case);
+    V_RUN_TEST(test_linked_list_stress, test_case);
+    V_RUN_TEST(test_linked_list_big, test_case);
+    V_RUN_TEST(test_array_list, test_case);
+    V_RUN_TEST(test_hash_map, test_case);
+    V_RUN_TEST(test_sort_map, test_case);
+    V_RUN_TEST(test_priority_queue, test_case);
+    V_RUN_TEST(test_string_buffer, test_case);
+    V_RUN_TEST(test_linked_buffer, test_case);
+    V_RUN_TEST(test_base64, test_case);
+    V_RUN_TEST(test_bencoding, test_case);
+    V_RUN_TEST(test_bit_stream, test_case);
+    V_RUN_TEST(test_file_stream, test_case);
+    V_RUN_TEST(test_memory_stream, test_case);
+    V_RUN_TEST(test_huffman, test_case);
+    V_RUN_TEST(test_template_handler, test_case);
+    V_RUN_TEST(test_quicksort, test_case);
+    V_RUN_TEST(test_quicksort_linked_list, test_case);
+    V_RUN_TEST(test_crc_32, test_case);
+    V_RUN_TEST(test_md5, test_case);
+    V_RUN_TEST(test_sha1, test_case);
 }
 
 ERROR_CODE run_simple_tests() {

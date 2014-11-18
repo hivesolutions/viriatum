@@ -31,18 +31,18 @@
 
 #define V_ASSERT(test) V_ASSERT_M(test, #test)
 #define V_ASSERT_M(test, message) do { if(!(test)) { return message; } } while (0)
-#define V_RUN_TEST(test, test_case, echo) do {\
+#define V_RUN_TEST(test, test_case) do {\
     const char *message;\
-    if(echo == TRUE) { V_PRINT_F("%s ... ", #test); PRINT_FLUSH(); }\
+    if(test_case->echo == TRUE) { V_PRINT_F("%s ... ", #test); PRINT_FLUSH(); }\
     message = test();\
     test_case->total++;\
     if(message == NULL) {\
-        if(echo == TRUE) {\
+        if(test_case->echo == TRUE) {\
             V_PRINT("ok\n");\
         }\
         test_case->success++;\
     } else {\
-        if(echo == TRUE) {\
+        if(test_case->echo == TRUE) {\
             V_PRINT("not ok\n");\
 			V_PRINT_F("[%s:%d] %s\n", base_string_value((unsigned char *) __FILE__), __LINE__, message);\
         }\
@@ -54,6 +54,7 @@ typedef struct test_case_t {
     unsigned int total;
     unsigned int success;
     unsigned int failure;
+	unsigned char echo;
 } test_case;
 
 /**
@@ -87,4 +88,16 @@ typedef void (*test_case_function) (struct test_case_t *test_case);
  */
 ERROR_CODE run_speed_test(char *name, test_function function, size_t iterations);
 
+/**
+ * Runs the test case defined by the provided function and
+ * described throught the provided name.
+ *
+ * The test case execution will be verbose meaning that a
+ * message output will be performed.
+ * 
+ * @param function The function that is responsible for the
+ * the execution of the various test functions.
+ * @param name The name of the test case that is going to be
+ * for some debug output.
+ */
 ERROR_CODE run_test_case(test_case_function function, const char *name);
