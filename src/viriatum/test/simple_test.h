@@ -240,8 +240,5 @@ void exec_simple_tests(struct test_case_t *test_case);
  * Runs the set of simple tests in the current
  * test case. This is the main entry point for the
  * simple test case.
- *
- * @return The final execution result this should
- * be considered the final exit code of the process.
  */
 ERROR_CODE run_simple_tests();
