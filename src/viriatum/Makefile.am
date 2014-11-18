@@ -29,7 +29,7 @@ SUBDIRS = resources
 
 bin_PROGRAMS = viriatum
 
-TESTS += viriatum --test
+TESTS = viriatum --test
 
 lib_LTLIBRARIES = libviriatum_http.la
 
