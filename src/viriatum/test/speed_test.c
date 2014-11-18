@@ -30,7 +30,7 @@
 #include "speed_test.h"
 
 void exec_speed_tests(struct test_case_t *test_case) {
-	V_RUN_SPEED(test_linked_list, 1000000, test_case);
+    V_RUN_SPEED(test_linked_list, 1000000, test_case);
     V_RUN_SPEED(test_linked_list_stress, 1, test_case);
     V_RUN_SPEED(test_linked_list_big, 1, test_case);
 }

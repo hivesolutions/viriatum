@@ -300,7 +300,7 @@ const char *test_priority_queue() {
     /* pops the various values from the queue and verifies that
     they are now sorted in the correct order */
     pop_priority_queue(priority_queue, &value);
-	V_ASSERT(value == (void *) 1);
+    V_ASSERT(value == (void *) 1);
     pop_priority_queue(priority_queue, &value);
     V_ASSERT(value == (void *) 2);
     pop_priority_queue(priority_queue, &value);
@@ -517,7 +517,7 @@ const char *test_bit_stream() {
 
     /* checks if the written 8 bits are
     01000001 (0x41) the correct value */
-	V_ASSERT(bit_stream->buffer[0] == 0x41);
+    V_ASSERT(bit_stream->buffer[0] == 0x41);
 
     /* writes a the 1000 bit set to the bit stream
     and then writes the 0010 bit set creating a new
@@ -527,7 +527,7 @@ const char *test_bit_stream() {
 
     /* verifies if the expected 10000010 (0x82)
     value is current set in the output buffer */
-	V_ASSERT(bit_stream->buffer[1] == 0x82);
+    V_ASSERT(bit_stream->buffer[1] == 0x82);
 
     /* writes a partial stream of bit values that
     would create an extra (pending) bits situation

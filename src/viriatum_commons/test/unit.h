@@ -44,22 +44,22 @@
     } else {\
         if(test_case->echo == TRUE) {\
             V_PRINT("not ok\n");\
-			V_PRINT_F("[%s:%d] %s\n", base_string_value((unsigned char *) __FILE__), __LINE__, message);\
+            V_PRINT_F("[%s:%d] %s\n", base_string_value((unsigned char *) __FILE__), __LINE__, message);\
         }\
         test_case->failure++;\
     }\
 } while (0)
 #define V_RUN_SPEED(test, count, test_case) do {\
-	run_speed_test(#test, test, count);\
-	test_case->total++;\
-	test_case->success++;\
+    run_speed_test(#test, test, count);\
+    test_case->total++;\
+    test_case->success++;\
 } while (0)
 
 typedef struct test_case_t {
     unsigned int total;
     unsigned int success;
     unsigned int failure;
-	unsigned char echo;
+    unsigned char echo;
 } test_case;
 
 /**
@@ -99,7 +99,7 @@ ERROR_CODE run_speed_test(char *name, test_function function, size_t iterations)
  *
  * The test case execution will be verbose meaning that a
  * message output will be performed.
- * 
+ *
  * @param function The function that is responsible for the
  * the execution of the various test functions.
  * @param name The name of the test case that is going to be

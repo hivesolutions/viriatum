@@ -66,13 +66,13 @@ ERROR_CODE run_speed_test(char *name, test_function function, size_t iterations)
     elapsed_f = (float) elapsed / 1000.0f;
     PRINTF_F("Executed '%s' in %.2f seconds\n", name, elapsed_f);
 
-	/* returns a no error value indicating that nothing outside
-	the normal values has occurred */
-	RAISE_NO_ERROR;
+    /* returns a no error value indicating that nothing outside
+    the normal values has occurred */
+    RAISE_NO_ERROR;
 }
 
 ERROR_CODE run_test_case(test_case_function function, const char *name) {
-	long start_time;
+    long start_time;
     long end_time;
     float elapsed;
     float elapsed_f;
@@ -80,13 +80,13 @@ ERROR_CODE run_test_case(test_case_function function, const char *name) {
     test_case.total = 0;
     test_case.success = 0;
     test_case.failure = 0;
-	test_case.echo = TRUE;
+    test_case.echo = TRUE;
     V_PRINT_F("Running %s test case ...\n", name);
-	start_time = clock();
+    start_time = clock();
     function(&test_case);
-	end_time = clock();
+    end_time = clock();
     elapsed = (float) (end_time - start_time) / CLOCKS_PER_SEC * 1000.0f;
-	elapsed_f = (float) elapsed / 1000.0f;
+    elapsed_f = (float) elapsed / 1000.0f;
     V_PRINT_F(
         "Ran %d tests in %.2f seconds (%d ok, %d not ok)\n",
         test_case.total, elapsed_f, test_case.success, test_case.failure
