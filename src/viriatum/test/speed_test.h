@@ -30,26 +30,8 @@
 #include "simple_test.h"
 
 /**
- * Runs a single speed test and prints a series of messages
- * to the standard output according to the provided name for
- * the speed fucntion.
- *
- * @param name The name of the test function to be executed
- * and measured for time.
- * @param function Pointer to the function to be executed
- * and have its execution time meassured.
- * @param iterations The number of iterations to be executed
- * in the performance test in case this value is not provided
- * the value defaults to one.
- */
-void run_speed_test(char *name, test_function function, size_t iterations);
-
-/**
  * Starts the various test that measure performance
  * for the current viriatum infra-structure, the results
  * are printed in the current standard output file.
- *
- * @return The resulting error code from the runnin of the
- * various speed tests of the system.
  */
 ERROR_CODE run_speed_tests();

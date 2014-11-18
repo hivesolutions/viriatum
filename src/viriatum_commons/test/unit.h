@@ -71,4 +71,19 @@ typedef const char *(*test_function) ();
  */
 typedef void (*test_case_function) (struct test_case_t *test_case);
 
+/**
+ * Runs a single speed test and prints a series of messages
+ * to the standard output according to the provided name for
+ * the speed fucntion.
+ *
+ * @param name The name of the test function to be executed
+ * and measured for time.
+ * @param function Pointer to the function to be executed
+ * and have its execution time meassured.
+ * @param iterations The number of iterations to be executed
+ * in the performance test in case this value is not provided
+ * the value defaults to one.
+ */
+ERROR_CODE run_speed_test(char *name, test_function function, size_t iterations);
+
 ERROR_CODE run_test_case(test_case_function function, const char *name);
