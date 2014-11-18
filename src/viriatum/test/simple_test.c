@@ -123,7 +123,9 @@ const char *test_linked_list() {
     append_front_value_linked_list(linked_list, (void *) 4);
     append_front_value_linked_list(linked_list, (void *) 5);
     pop_value_linked_list(linked_list, (void **) &value, TRUE);
+	V_ASSERT(value == (void *) 4, "value != 4");
     pop_value_linked_list(linked_list, (void **) &value, TRUE);
+	V_ASSERT(value == (void *) 5, "value != 5");
 
     /* deletes the linked list */
     delete_linked_list(linked_list);
