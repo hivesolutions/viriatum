@@ -33,7 +33,7 @@
 #define V_ASSERT_M(test, message) do { if(!(test)) { return message; } } while (0)
 #define V_RUN_TEST(test, test_case, echo) do {\
     const char *message;\
-    if(echo == TRUE) { V_PRINT_F("%s ... ", #test); }\
+    if(echo == TRUE) { V_PRINT_F("%s ... ", #test); PRINT_FLUSH(); }\
     message = test();\
     test_case->total++;\
     if(message == NULL) {\
