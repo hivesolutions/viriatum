@@ -31,6 +31,8 @@ bin_PROGRAMS = viriatum
 
 lib_LTLIBRARIES = libviriatum_http.la
 
+TESTS = viriatum --test
+
 viriatum_CFLAGS = $(AM_CFLAGS)
 viriatum_CXXFLAGS = $(AM_CXXFLAGS)
 
