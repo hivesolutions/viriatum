@@ -179,10 +179,11 @@ int _compare(void *first, void *second);
  * Executes the set of simple tests in the current
  * test case.
  *
- * @return The message that describes a possible error
- * occurred/raised during the execution of the tests.
+ * @param test_case The test case context for which
+ * the simple tests will be executed, should be able
+ * to store some context information about the execution.
  */
-const char *exec_simple_tests();
+void exec_simple_tests(struct test_case_t *test_case);
 
 /**
  * Runs the set of simple tests in the current

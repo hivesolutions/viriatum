@@ -29,21 +29,31 @@
 
 #include "simple_test.h"
 
+typedef struct test_case_t {
+	size_t total;
+	size_t success;
+	size_t failure;
+} test_case_s;
+
 #define V_ASSERT(test, message) do { if(!(test)) { return message; } } while (0)
-#define V_RUN_TEST(test, echo) do {\
+#define V_RUN_TEST(test, test_case, echo) do {\
 	const char *message;\
 	if(echo == TRUE) { V_PRINT_F("%s ... ", #test); }\
-    message = test(); tests_run++;\
-	if(echo == TRUE) {\
-		if(message) { V_PRINT("not ok\n"); }\
-		else { V_PRINT("ok\n"); }\
+    message = test();\
+	test_case->total++;\
+	if(message == NULL) {\
+		if(echo == TRUE) {\
+			V_PRINT("ok\n");\
+		}\
+		test_case->success++;\
+	} else {\
+		if(echo == TRUE) {\
+			V_PRINT("not ok\n");\
+			V_PRINT_F("%s\n", message);\
+		}\
+		test_case->failure++;\
 	}\
-	if(message) { return message; }\
 } while (0)
-
-/*extern int tests_run;*/
-
-int tests_run;
 
 #ifndef VIRIATUM_NO_THREADS
 #ifdef VIRIATUM_THREAD_SAFE
@@ -897,11 +907,11 @@ int _compare(void *first, void *second) {
     return 0;
 }
 
-const char *exec_simple_tests() {
+void exec_simple_tests(struct test_case_t *test_case) {
 #ifndef VIRIATUM_NO_THREADS
 #ifdef VIRIATUM_THREAD_SAFE
     /* tests the thread pool */
-    test_thread_pool();
+    V_RUN_TEST(test_thread_pool, TRUE);
 #endif
 #endif
 
@@ -909,9 +919,9 @@ const char *exec_simple_tests() {
     commons infra-structure this a long running
     blocking operation and so it may take some
     time for the complete execution */
-    V_RUN_TEST(test_linked_list, TRUE);
-    V_RUN_TEST(test_linked_list_stress, TRUE);
-    V_RUN_TEST(test_linked_list_big, TRUE);
+    V_RUN_TEST(test_linked_list, test_case, TRUE);
+    V_RUN_TEST(test_linked_list_stress, test_case, TRUE);
+    V_RUN_TEST(test_linked_list_big, test_case, TRUE);
     /*test_array_list();
     test_hash_map();
     test_sort_map();
@@ -930,16 +940,25 @@ const char *exec_simple_tests() {
     test_crc_32();
     test_md5();
     test_sha1();*/
+}
 
-	/* returns the default value meaning that all
-	of the test execution went without problems */
-	return NULL;
+typedef void (*test_case_function) (struct test_case_t *test_case);
+
+ERROR_CODE run_test_case(test_case_function function, const char *name) {
+	struct test_case_t test_case;
+	test_case.total = 0;
+	test_case.success = 0;
+	test_case.failure = 0;
+	V_PRINT_F("Executing %s ...\n", name);
+	function(&test_case);
+	V_PRINT_F(
+		"Ran %d tests (%d success, %d failure)\n",
+		test_case.total, test_case.success, test_case.failure
+	);
+	RAISE_ERROR_S(test_case.failure > 0 ? 1 : 0);
 }
 
 ERROR_CODE run_simple_tests() {
-	const char *message;
-	V_PRINT("Executing simple_tests ...\n");
-	message = exec_simple_tests();
-	if(message == NULL) { RAISE_NO_ERROR; }
-	else { V_PRINT_F("%s\n", message); RAISE_ERROR_S(1); }
+	ERROR_CODE return_value = run_test_case(exec_simple_tests, "simple_tests");
+	RAISE_AGAIN(return_value);
 }

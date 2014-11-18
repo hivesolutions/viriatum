@@ -34,7 +34,7 @@
  * simplest definition for a test function. This kind of
  * functions should return a description of the result.
  */
-typedef const char * (*test_function) ();
+typedef const char *(*test_function) ();
 
 /**
  * Runs a single speed test and prints a series of messages
