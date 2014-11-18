@@ -80,7 +80,7 @@ ERROR_CODE run_test_case(test_case_function function, const char *name) {
     test_case.total = 0;
     test_case.success = 0;
     test_case.failure = 0;
-    V_PRINT_F("Executing %s ...\n", name);
+    V_PRINT_F("Running %s test case ...\n", name);
 	start_time = clock();
     function(&test_case);
 	end_time = clock();
