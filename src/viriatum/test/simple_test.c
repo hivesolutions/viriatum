@@ -29,9 +29,18 @@
 
 #include "simple_test.h"
 
-#define V_ASSERT(test, message) do { if (!(test)) return message; } while (0)
-#define V_RUN_TEST(test) do { const char *message = test(); tests_run++;\
-	if (message) return message; } while (0)
+#define V_ASSERT(test, message) do { if(!(test)) { return message; } } while (0)
+#define V_RUN_TEST(test) do {\
+    const char *message = test(); tests_run++;\
+	if(message) { return message; }\
+} while (0)
+#define V_RUN_TEST_M(test) do {\
+	const char *message;\
+	V_PRINT_F("%s ... ", #test);\
+    message = V_RUN_TEST(test);\
+	if(message) { V_PRINT("not ok\n"); }\
+	else { V_PRINT("ok\n"); }\
+} while (0)
 
 /*extern int tests_run;*/
 
@@ -929,7 +938,9 @@ const char *exec_simple_tests() {
 }
 
 ERROR_CODE run_simple_tests() {
-	const char *message = exec_simple_tests();
+	const char *message;
+	V_PRINT("Executing simple_tests ...\n");
+	message = exec_simple_tests();
 	if(message == NULL) { RAISE_NO_ERROR; }
 	else { V_PRINT_F("%s\n", message); RAISE_ERROR_S(1); }
 }
