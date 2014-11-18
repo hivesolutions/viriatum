@@ -898,9 +898,9 @@ const char *exec_simple_tests() {
     blocking operation and so it may take some
     time for the complete execution */
     V_RUN_TEST(test_linked_list);
-   /* test_linked_list_stress();
-    test_linked_list_big();
-    test_array_list();
+    V_RUN_TEST(test_linked_list_stress);
+    V_RUN_TEST(test_linked_list_big);
+    /*test_array_list();
     test_hash_map();
     test_sort_map();
     test_priority_queue();
