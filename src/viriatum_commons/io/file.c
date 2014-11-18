@@ -329,19 +329,39 @@ ERROR_CODE entries_to_map_file(struct linked_list_t *entries, struct linked_list
         and sets them in the entry map for reference */
         create_type(&entry_value_type, INTEGER_TYPE);
         entry_value_type->value.value_int = entry->type;
-        set_value_string_hash_map(entry_map, (unsigned char *) "type", (void *) entry_value_type);
+        set_value_string_hash_map(
+            entry_map,
+            (unsigned char *) "type",
+            (void *) entry_value_type
+        );
         create_type(&entry_value_type, STRING_TYPE);
         entry_value_type->value.value_string = (char *) entry->name;
-        set_value_string_hash_map(entry_map, (unsigned char *) "name", (void *) entry_value_type);
+        set_value_string_hash_map(
+            entry_map,
+            (unsigned char *) "name",
+            (void *) entry_value_type
+        );
         create_type(&entry_value_type, INTEGER_TYPE);
         entry_value_type->value.value_int = (int) entry->size;
-        set_value_string_hash_map(entry_map, (unsigned char *) "size", (void *) entry_value_type);
+        set_value_string_hash_map(
+            entry_map,
+            (unsigned char *) "size",
+            (void *) entry_value_type
+        );
         create_type(&entry_value_type, STRING_TYPE);
         entry_value_type->value.value_string = date_time_string;
-        set_value_string_hash_map(entry_map, (unsigned char *) "time", (void *) entry_value_type);
+        set_value_string_hash_map(
+            entry_map,
+            (unsigned char *) "time",
+            (void *) entry_value_type
+        );
         create_type(&entry_value_type, STRING_TYPE);
         entry_value_type->value.value_string = size_string;
-        set_value_string_hash_map(entry_map, (unsigned char *) "size_string", (void *) entry_value_type);
+        set_value_string_hash_map(
+            entry_map,
+            (unsigned char *) "size_string",
+            (void *) entry_value_type
+        );
 
         /* creates the entry type (for the map) and sets the
         entry map on it */
