@@ -733,7 +733,7 @@ const char *test_file_stream() {
     stream->close(stream);
 
     /* compares the read string */
-    V_ASSERT(strcmp((char *) "hello world", (char *) buffer) == 0);
+    V_ASSERT(strcmp((char *) "hello worldd", (char *) buffer) == 0);
 
     /* deletes the file stream */
     delete_file_stream(file_stream);
