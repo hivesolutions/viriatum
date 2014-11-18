@@ -3,7 +3,5 @@
 
 DIR=$(dirname $(readlink -f ${BASH_SOURCE[0]}))
 
-echo "Starting ..."
-
-$DIR/viriatum --help
+$DIR/viriatum --test
 exit $?
