@@ -43,7 +43,7 @@
         test_case->success++;\
     } else {\
         if(echo == TRUE) {\
-            V_PRINT("not ok\n");\
+            V_PRINT("not ok\n\n");\
 			V_PRINT_F("ERROR: %s\n", #test);\
 			V_PRINT_F("[%s:%d] %s\n\n", base_string_value((unsigned char *) __FILE__), __LINE__, message);\
         }\
