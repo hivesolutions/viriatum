@@ -527,7 +527,7 @@ const char *test_bit_stream() {
 
     /* verifies if the expected 10000010 (0x82)
     value is current set in the output buffer */
-	V_ASSERT(bit_stream->buffer[1] == 0x83);
+	V_ASSERT(bit_stream->buffer[1] == 0x82);
 
     /* writes a partial stream of bit values that
     would create an extra (pending) bits situation
