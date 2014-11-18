@@ -52,7 +52,7 @@ void test_thread_pool();
  * @return A message describing the execution of
  * the unit test should describe possible errors.
  */
-const char * test_linked_list();
+const char *test_linked_list();
 
 /**
  * Runs a series of stress tests in the linked
@@ -61,7 +61,7 @@ const char * test_linked_list();
  * @return A message describing the execution of
  * the unit test should describe possible errors.
  */
-const char * test_linked_list_stress();
+const char *test_linked_list_stress();
 
 /**
  * Runs a series of big tests in the linked
@@ -70,7 +70,7 @@ const char * test_linked_list_stress();
  * @return A message describing the execution of
  * the unit test should describe possible errors.
  */
-const char * test_linked_list_big();
+const char *test_linked_list_big();
 
 /**
  * Tests the array list structure.
@@ -176,7 +176,20 @@ void test_crc_32();
 int _compare(void *first, void *second);
 
 /**
- * Runs the set of simple tests in the current
+ * Executes the set of simple tests in the current
  * test case.
+ *
+ * @return The message that describes a possible error
+ * occurred/raised during the execution of the tests.
  */
-void run_simple_tests();
+const char *exec_simple_tests();
+
+/**
+ * Runs the set of simple tests in the current
+ * test case. This is the main entry point for the
+ * simple test case.
+ *
+ * @return The final execution result this should
+ * be considered the final exit code of the process.
+ */
+ERROR_CODE run_simple_tests();

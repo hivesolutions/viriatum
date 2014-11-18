@@ -55,5 +55,8 @@ void run_speed_test(char *name, test_function function, size_t iterations);
  * Starts the various test that measure performance
  * for the current viriatum infra-structure, the results
  * are printed in the current standard output file.
+ *
+ * @return The resulting error code from the runnin of the
+ * various speed tests of the system.
  */
-void run_speed_tests();
+ERROR_CODE run_speed_tests();

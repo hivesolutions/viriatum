@@ -29,11 +29,13 @@
 
 #include "simple_test.h"
 
-#define v_assert(message, test) do { if (!(test)) return message; } while (0)
-#define v_run_test(test) do { char *message = test(); tests_run++;\
+#define V_ASSERT(message, test) do { if (!(test)) return message; } while (0)
+#define V_RUN_TEST(test) do { const char *message = test(); tests_run++;\
 	if (message) return message; } while (0)
 
-extern int tests_run;
+/*extern int tests_run;*/
+
+int tests_run;
 
 #ifndef VIRIATUM_NO_THREADS
 #ifdef VIRIATUM_THREAD_SAFE
@@ -83,7 +85,7 @@ void test_thread_pool() {
 #endif
 #endif
 
-const char * test_linked_list() {
+const char *test_linked_list() {
     /* allocates space for the value that's going
     to be used for temporary storage */
     void *value;
@@ -102,7 +104,7 @@ const char * test_linked_list() {
     /* retrieves a value from the linked list and
 	verifies that it contains the expected value */
     get_value_linked_list(linked_list, 1, &value);
-	v_assert(value, (void *) 2);
+	V_ASSERT(value, (void *) 2);
 
     /* removes a value from the linked list */
     remove_value_linked_list(linked_list, (void *) 1, TRUE);
@@ -129,7 +131,7 @@ const char * test_linked_list() {
 	return NULL;
 }
 
-const char * test_linked_list_stress() {
+const char *test_linked_list_stress() {
     /* allocates space for the index to be used in the iteration
     for the temporary value pointer variable and for the pointer
     that is going to be used for the linked list */
@@ -156,7 +158,7 @@ const char * test_linked_list_stress() {
 	return NULL;
 }
 
-const char * test_linked_list_big() {
+const char *test_linked_list_big() {
     /* allocates space for the index to be used in the iteration
     for the temporary value pointer variable and for the pointer
     that is going to be used for the linked list */
@@ -883,7 +885,7 @@ int _compare(void *first, void *second) {
     return 0;
 }
 
-void run_simple_tests() {
+const char *exec_simple_tests() {
 #ifndef VIRIATUM_NO_THREADS
 #ifdef VIRIATUM_THREAD_SAFE
     /* tests the thread pool */
@@ -895,7 +897,7 @@ void run_simple_tests() {
     commons infra-structure this a long running
     blocking operation and so it may take some
     time for the complete execution */
-    test_linked_list();
+    V_RUN_TEST(test_linked_list);
    /* test_linked_list_stress();
     test_linked_list_big();
     test_array_list();
@@ -916,4 +918,14 @@ void run_simple_tests() {
     test_crc_32();
     test_md5();
     test_sha1();*/
+
+	/* returns the default value meaning that all
+	of the test execution went without problems */
+	return NULL;
+}
+
+ERROR_CODE run_simple_tests() {
+	const char *message = exec_simple_tests();
+	if(message == NULL) { RAISE_NO_ERROR; }
+	else { V_PRINT(message); RAISE_ERROR_S(1); }
 }

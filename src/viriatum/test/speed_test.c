@@ -67,8 +67,9 @@ void run_speed_test(char *name, test_function function, size_t iterations) {
     PRINTF_F("Executed '%s' in %.2f seconds\n", name, elapsed_f);
 }
 
-void run_speed_tests() {
+ERROR_CODE run_speed_tests() {
     run_speed_test("test_linked_list", test_linked_list, 1000000);
     run_speed_test("test_linked_list_stress", test_linked_list_stress, 1);
     run_speed_test("test_linked_list_big", test_linked_list_big, 1);
+	RAISE_NO_ERROR;
 }

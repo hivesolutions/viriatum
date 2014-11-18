@@ -245,18 +245,18 @@ ERROR_CODE print_information() {
     RAISE_NO_ERROR;
 }
 
-void help() { V_PRINT(HELP_STRING); }
-void version() {
+ERROR_CODE help() { V_PRINT(HELP_STRING); RAISE_NO_ERROR; }
+ERROR_CODE version() {
     V_PRINT_F(
         "%s - %s (%s, %s)\n",
         VIRIATUM_NAME,
         VIRIATUM_VERSION,
         VIRIATUM_COMPILATION_DATE,
         VIRIATUM_COMPILATION_TIME
-    );
+    ); RAISE_NO_ERROR;
 }
-void test() { run_simple_tests(); }
-void speed() { run_speed_tests(); }
+ERROR_CODE test() { return run_simple_tests(); }
+ERROR_CODE speed() { return run_speed_tests(); }
 
 #ifdef VIRIATUM_PLATFORM_WIN32
 void daemonize() { }
@@ -346,7 +346,7 @@ void localize() { local = 1; }
 void localize() { }
 #endif
 
-void execute_arguments(char *program_name, struct hash_map_t *arguments) {
+int execute_arguments(char *program_name, struct hash_map_t *arguments) {
     /* allocates space for the possible argument
     to be executed from the arguments map */
     void *value;
@@ -365,25 +365,25 @@ void execute_arguments(char *program_name, struct hash_map_t *arguments) {
     map in case the value exists prints the help value and then
     exits the current system */
     get_value_string_hash_map(arguments, (unsigned char *) "help", &value);
-    if(value != NULL) { help(); return; }
+    if(value != NULL) { return help(); }
 
     /* tries to retrieve the version argument from the arguments
     map in case the value exists prints the version value and then
     exits the current system */
     get_value_string_hash_map(arguments, (unsigned char *) "version", &value);
-    if(value != NULL) { version(); return; }
+    if(value != NULL) { return version(); }
 
     /* retrieves the test argument value from the arguments map
     and in case it's set starts the test process runing a series
     of test functions in sequence */
     get_value_string_hash_map(arguments, (unsigned char *) "test", &value);
-    if(value != NULL) { test(); return; }
+    if(value != NULL) { return test(); }
 
     /* retrieves the speed argument value from the arguments map
     and in case it's set starts the speed measuring and disables
     the runnig of the service */
     get_value_string_hash_map(arguments, (unsigned char *) "speed", &value);
-    if(value != NULL) { speed(); return; }
+    if(value != NULL) { return speed(); }
 
     /* tries to retrieve the daemon argument from the
     arguments map in case the value is set daemonizes
@@ -404,7 +404,7 @@ void execute_arguments(char *program_name, struct hash_map_t *arguments) {
     /* in cas the flag that control if the service must be run is
     unset the control flow must be returned immediately (avoids
     running service) */
-    if(run_service == FALSE) { return; }
+    if(run_service == FALSE) { RAISE_NO_ERROR; }
 
     /* runs the service, with the given arguments, this call
     should block the program control flow until an event
@@ -415,7 +415,12 @@ void execute_arguments(char *program_name, struct hash_map_t *arguments) {
     prints a message indicating the problem that occurred */
     if(IS_ERROR_CODE(return_value)) {
         V_ERROR_F("Problem running service (%s)\n", (char *) GET_ERROR());
+		RAISE_AGAIN(return_value);
     }
+
+	/* returns the normal result value as no problems has
+	occured during the execution of the command */
+	RAISE_NO_ERROR;
 }
 
 void cleanup(struct hash_map_t *arguments) {
@@ -440,6 +445,13 @@ void cleanup(struct hash_map_t *arguments) {
 
 #ifndef VIRIATUM_PLATFORM_IPHONE
 int main(int argc, char *argv[]) {
+	/* allocates the space for the "final" result code
+	that is going to be returned as part of the normal
+	command execution, a positive or negative values
+	should idicate an error, a zero value indicates that
+	a normal execution has just finished */
+	ERROR_CODE return_value;
+
     /* allocates space for the name of the program
     (process) to be executed */
     char *program_name;
@@ -453,7 +465,7 @@ int main(int argc, char *argv[]) {
 
     /* in case the number of arguments is less than one
     (exception case) returns in error */
-    if(argc < 1) { cleanup(NULL); return -1; }
+	if(argc < 1) { cleanup(NULL); RAISE_ERROR_S(1); }
 
     /* retrieves the first argument value as the name
     of the process (program) to be executed */
@@ -462,7 +474,7 @@ int main(int argc, char *argv[]) {
     /* processes the various arguments into a map and then
     executes the corresponding (initial) actions */
     process_arguments(argc, argv, &arguments);
-    execute_arguments(program_name, arguments);
+    return_value = execute_arguments(program_name, arguments);
 
     /* cleans the current process information so that
     no remaining structure or resource is left in an
@@ -482,6 +494,6 @@ int main(int argc, char *argv[]) {
         "Finishing process [%ld pending]\n",
         (long int) ALLOCATIONS
     );
-    return 0;
+	RAISE_AGAIN(return_value);
 }
 #endif
