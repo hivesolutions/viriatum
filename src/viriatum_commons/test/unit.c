@@ -87,7 +87,7 @@ ERROR_CODE run_test_case(test_case_function function, const char *name) {
     elapsed = (float) (end_time - start_time) / CLOCKS_PER_SEC * 1000.0f;
 	elapsed_f = (float) elapsed / 1000.0f;
     V_PRINT_F(
-        "Ran %d tests in %.2f seconds (%d success, %d failure)\n",
+        "Ran %d tests in %.2f seconds (%d ok, %d not ok)\n",
         test_case.total, elapsed_f, test_case.success, test_case.failure
     );
     RAISE_ERROR_S(test_case.failure > 0 ? 1 : 0);
