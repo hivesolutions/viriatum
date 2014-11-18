@@ -30,6 +30,16 @@
 #include "simple_test.h"
 
 /**
+ * Executes the set of speed tests in the current
+ * test case.
+ *
+ * @param test_case The test case context for which
+ * the speed tests will be executed, should be able
+ * to store some context information about the execution.
+ */
+void exec_speed_tests(struct test_case_t *test_case);
+
+/**
  * Starts the various test that measure performance
  * for the current viriatum infra-structure, the results
  * are printed in the current standard output file.

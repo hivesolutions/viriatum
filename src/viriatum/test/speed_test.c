@@ -29,9 +29,13 @@
 
 #include "speed_test.h"
 
+void exec_speed_tests(struct test_case_t *test_case) {
+	V_RUN_SPEED(test_linked_list, 1000000, test_case);
+    V_RUN_SPEED(test_linked_list_stress, 1, test_case);
+    V_RUN_SPEED(test_linked_list_big, 1, test_case);
+}
+
 ERROR_CODE run_speed_tests() {
-    run_speed_test("test_linked_list", test_linked_list, 1000000);
-    run_speed_test("test_linked_list_stress", test_linked_list_stress, 1);
-    run_speed_test("test_linked_list_big", test_linked_list_big, 1);
-    RAISE_NO_ERROR;
+    ERROR_CODE return_value = run_test_case(exec_speed_tests, "speed_tests");
+    RAISE_AGAIN(return_value);
 }
