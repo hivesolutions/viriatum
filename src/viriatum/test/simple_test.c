@@ -29,6 +29,12 @@
 
 #include "simple_test.h"
 
+#define v_assert(message, test) do { if (!(test)) return message; } while (0)
+#define v_run_test(test) do { char *message = test(); tests_run++;\
+	if (message) return message; } while (0)
+
+extern int tests_run;
+
 #ifndef VIRIATUM_NO_THREADS
 #ifdef VIRIATUM_THREAD_SAFE
 int thread_pool_start_function_test(void *arguments) {
@@ -77,17 +83,13 @@ void test_thread_pool() {
 #endif
 #endif
 
-void test_linked_list() {
+const char * test_linked_list() {
     /* allocates space for the value that's going
     to be used for temporary storage */
     void *value;
 
     /* allocates space for the linked list */
     struct linked_list_t *linked_list;
-
-    /* prints a simple a message about the test that
-    is currently going to be performed */
-    V_PRINT("test_linked_list\n");
 
     /* creates the linked list */
     create_linked_list(&linked_list);
@@ -97,8 +99,10 @@ void test_linked_list() {
     append_value_linked_list(linked_list, (void *) 2);
     append_value_linked_list(linked_list, (void *) 3);
 
-    /* retrieves a value from the linked list */
+    /* retrieves a value from the linked list and
+	verifies that it contains the expected value */
     get_value_linked_list(linked_list, 1, &value);
+	v_assert(value, (void *) 2);
 
     /* removes a value from the linked list */
     remove_value_linked_list(linked_list, (void *) 1, TRUE);
@@ -119,17 +123,19 @@ void test_linked_list() {
 
     /* deletes the linked list */
     delete_linked_list(linked_list);
+
+	/* returns the default value, nothing happened so there's
+	nothing to report for this execution */
+	return NULL;
 }
 
-void test_linked_list_stress() {
+const char * test_linked_list_stress() {
     /* allocates space for the index to be used in the iteration
     for the temporary value pointer variable and for the pointer
     that is going to be used for the linked list */
     size_t index;
     void *value;
     struct linked_list_t *linked_list;
-
-	V_PRINT("test_linked_list_stress\n");
 
     /* creates the linked list structure and starts the long
     iteration that is going to append and then pop elements from
@@ -144,9 +150,13 @@ void test_linked_list_stress() {
         pop_value_linked_list(linked_list, (void **) &value, TRUE);
     }
     delete_linked_list(linked_list);
+
+	/* returns the default value, nothing happened so there's
+	nothing to report for this execution */
+	return NULL;
 }
 
-void test_linked_list_big() {
+const char * test_linked_list_big() {
     /* allocates space for the index to be used in the iteration
     for the temporary value pointer variable and for the pointer
     that is going to be used for the linked list */
@@ -169,6 +179,10 @@ void test_linked_list_big() {
         pop_value_linked_list(linked_list, (void **) &value, TRUE);
     }
     delete_linked_list(linked_list);
+
+	/* returns the default value, nothing happened so there's
+	nothing to report for this execution */
+	return NULL;
 }
 
 void test_array_list() {
@@ -882,7 +896,7 @@ void run_simple_tests() {
     blocking operation and so it may take some
     time for the complete execution */
     test_linked_list();
-    test_linked_list_stress();
+   /* test_linked_list_stress();
     test_linked_list_big();
     test_array_list();
     test_hash_map();
@@ -901,5 +915,5 @@ void run_simple_tests() {
     test_quicksort_linked_list();
     test_crc_32();
     test_md5();
-    test_sha1();
+    test_sha1();*/
 }

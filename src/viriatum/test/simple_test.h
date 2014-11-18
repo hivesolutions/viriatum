@@ -48,20 +48,29 @@ void test_thread_pool();
 
 /**
  * Tests the linked list structure.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
  */
-void test_linked_list();
+const char * test_linked_list();
 
 /**
  * Runs a series of stress tests in the linked
  * list structured (used mainly for performance).
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
  */
-void test_linked_list_stress();
+const char * test_linked_list_stress();
 
 /**
  * Runs a series of big tests in the linked
  * list structured (used mainly for performance).
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
  */
-void test_linked_list_big();
+const char * test_linked_list_big();
 
 /**
  * Tests the array list structure.
