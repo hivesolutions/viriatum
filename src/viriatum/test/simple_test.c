@@ -30,9 +30,9 @@
 #include "simple_test.h"
 
 typedef struct test_case_t {
-	size_t total;
-	size_t success;
-	size_t failure;
+	unsigned int total;
+	unsigned int success;
+	unsigned int failure;
 } test_case_s;
 
 #define V_ASSERT(test, message) do { if(!(test)) { return message; } } while (0)
