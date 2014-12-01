@@ -60,6 +60,7 @@ typedef ERROR_CODE (*torrent_connection_update) (struct torrent_connection_t *to
  *
  * @see: http://www.bittorrent.org/beps/bep_0003.html
  */
+#pragma pack(1)
 typedef struct torrent_handshake_t {
     unsigned char torrent_size;
     char torrent_string[TORRENT_PROTOCOL_SIZE];
