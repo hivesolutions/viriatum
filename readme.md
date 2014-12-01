@@ -12,11 +12,11 @@ The current implementation support both x86/x64 and ARM architectures.
 Building viriatum using automium is quite simple even for complex builds like cross compilation.
 Just use the apropriate 'build.json' located under 'scripts/build' and under such directory execute:
 
-    atm.sh
+    atm
 
 For cross compilation (eg: arm-rasp-linux) use the following command:
 
-    atm.sh --cflags=-O3 --cross=arm-rasp-linux-gnueabi
+    atm --cflags=-O3 --cross=arm-rasp-linux-gnueabi
 
 If you want to know more about cross compilation please refer to the [Cross Compilation](doc/cross.md) document.
 
