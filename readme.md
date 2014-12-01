@@ -13,7 +13,7 @@ Building viriatum using automium is quite simple even for complex builds like cr
 Just use the apropriate 'build.json' located under 'scripts/build' and under such directory execute:
 
     atm
-    
+
 For production purposes one should use the proper optimization flags:
 
     atm --cflags=-O3
@@ -100,13 +100,13 @@ For building using the mingw-w64 toolchain for 64 and 32 bit options.
 #### Notes
 
 * In order to compile to `WINVER <= 0x0500` (Windows 2000 or older) disable IPv6 support (`#undef VIRIATUM_IP6`)
- 
+
 ### FreeBSD
 
 FreeBSD ignores the /usr/local directory by default so it must be included in order to conform with dependencies.
 
     setenv CFLAGS "-L/usr/local/lib -I/usr/local/include"
-    
+
 ## Features
 
 There are a lot of possible building features to enable
@@ -181,7 +181,7 @@ Must compile viriatum with special environment variables set to point to the cor
 
 ## Docker
 
-It's possible to run viriatum inside a docker container and pre-built images 
+It's possible to run viriatum inside a docker container and pre-built images
 have been created under the public repository.
 
 To use viriatum using these pre-built images use the following command:

@@ -51,7 +51,7 @@ The configuration for the raspberry toolchain is the following.
         --disable-xmlreader --disable-xmlwriter --disable-phar --without-pear --without-iconv\
         --with-config-file-path=/usr/lib
     make && make install
- 
+
 ### Python
 
     ./configure
@@ -59,19 +59,19 @@ The configuration for the raspberry toolchain is the following.
     mv python hostpython
     mv Parser/pgen Parser/hostpgen
     make distclean
-    
+
     wget https://raw.github.com/hivesolutions/patches/master/python/Python-2.7.3-xcompile.patch
     patch -p1 < Python-2.7.3-xcompile.patch
-    
+
     export PATH=/opt/arm-rasp-linux-gnueabi/bin:$PATH
-    
+
     CC=arm-rasp-linux-gnueabi-gcc CXX=arm-rasp-linux-gnueabi-g++\
         AR=arm-rasp-linux-gnueabi-ar RANLIB=arm-rasp-linux-gnueabi-ranlib\
-        ./configure --host=arm-rasp-linux-gnueabi --build=arm --prefix=/opt/arm-rasp-linux-gnueabi --enable-shared 
-    
+        ./configure --host=arm-rasp-linux-gnueabi --build=arm --prefix=/opt/arm-rasp-linux-gnueabi --enable-shared
+
     make HOSTPYTHON=./hostpython HOSTPGEN=./Parser/hostpgen BLDSHARED="arm-rasp-linux-gnueabi-gcc -shared"\
         CROSS_COMPILE=arm-rasp-linux-gnueabi- CROSS_COMPILE_TARGET=yes HOSTARCH=arm-rasp-linux-gnueabi BUILDARCH=arm
-    
+
     make install HOSTPYTHON=./hostpython BLDSHARED="arm-rasp-linux-gcc -shared"\
         CROSS_COMPILE=arm-rasp-linux-gnueabi- CROSS_COMPILE_TARGET=yes prefix=/opt/arm-rasp-linux-gnueabi
 
@@ -79,8 +79,8 @@ The configuration for the raspberry toolchain is the following.
 
     wget https://raw.github.com/hivesolutions/patches/master/lua/lua-5.1.5-xcompile.patch
     patch -p1 < lua-5.1.5-xcompile.patch
-    
-    export PATH=/opt/arm-rasp-linux-gnueabi/bin:$PATH 
+
+    export PATH=/opt/arm-rasp-linux-gnueabi/bin:$PATH
     make linux CC="arm-rasp-linux-gnueabi-gcc" AR="arm-rasp-linux-gnueabi-ar rcu"\
         RANLIB="arm-rasp-linux-gnueabi-ranlib" CFLAGS="-I/opt/arm-rasp-linux-gnueabi/include\
         -L/opt/arm-rasp-linux-gnueabi/lib -R/opt/arm-rasp-linux-gnueabi/lib"
