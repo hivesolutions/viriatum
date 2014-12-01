@@ -6,15 +6,15 @@
 
 .DS_Store
 
-/bin/
-/build/
-/dist/
+/bin
+/build
+/dist
 /win32/vs2008ex/*/*
-/scripts/build/tmp/
-/scripts/build/builds/
-/scripts/build/win32/build/
-/scripts/build/win32/base/
-/scripts/build/win32/modules/
-/darwin/xcode4/viriatum.xcworkspace/xcuserdata/
-/darwin/xcode4/viriatum/viriatum.xcodeproj/xcuserdata/
-/darwin/xcode4/viriatum_commons/viriatum_commons.xcodeproj/xcuserdata/
+/scripts/build/tmp
+/scripts/build/builds
+/scripts/build/win32/build
+/scripts/build/win32/base
+/scripts/build/win32/modules
+/darwin/xcode4/viriatum.xcworkspace/xcuserdata
+/darwin/xcode4/viriatum/viriatum.xcodeproj/xcuserdata
+/darwin/xcode4/viriatum_commons/viriatum_commons.xcodeproj/xcuserdata
