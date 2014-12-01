@@ -13,6 +13,10 @@ Building viriatum using automium is quite simple even for complex builds like cr
 Just use the apropriate 'build.json' located under 'scripts/build' and under such directory execute:
 
     atm
+    
+For production purposes one should use the proper optimization flags:
+
+    atm --cflags=-O3
 
 For cross compilation (eg: arm-rasp-linux) use the following command:
 
