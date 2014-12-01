@@ -109,7 +109,8 @@ ERROR_CODE open_handler_stream_torrent(struct io_connection_t *io_connection) {
     memcpy(response_buffer->peer_id, "-AZ4702-UCJhrsVNImUy", 20);
 
 
-    /* writes the response to the connection, registers for the appropriate callbacks */
+    /* writes the response to the connection, registers for the appropriate
+	callbacks, to be able to response to the finish of the sending */
     write_connection(
         io_connection->connection,
         (unsigned char *) response_buffer,
