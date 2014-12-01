@@ -499,7 +499,7 @@ ERROR_CODE start_service(struct service_t *service) {
 
 
     /* allocates the various misc connections references */
-	/* @todo must uncomment to continue with the connections */
+    /* @todo must uncomment to continue with the connections */
     /*struct connection_t *tracker_connection;
     struct connection_t *torrent_connection;*/
 

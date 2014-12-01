@@ -81,8 +81,8 @@ ERROR_CODE open_handler_stream_torrent(struct io_connection_t *io_connection) {
     struct torrent_handshake_t *response_buffer = (struct torrent_handshake_t *) MALLOC(sizeof(struct torrent_handshake_t));
 
 
-	/** @todo: must create the proper structures for torrent
-	* so that it's possible to use it properly
+    /** @todo: must create the proper structures for torrent
+    * so that it's possible to use it properly
     FILE *file = fopen("C:/info_hash.txt", "rb");
     if(file == NULL) {
         RAISE_ERROR_M(
@@ -92,7 +92,7 @@ ERROR_CODE open_handler_stream_torrent(struct io_connection_t *io_connection) {
     }
     fread(response_buffer->info_hash, 1, 20, file);
     fclose(file);
-	*/
+    */
 
 
     /* creates the torrent connection for the currently used
@@ -110,7 +110,7 @@ ERROR_CODE open_handler_stream_torrent(struct io_connection_t *io_connection) {
 
 
     /* writes the response to the connection, registers for the appropriate
-	callbacks, to be able to response to the finish of the sending */
+    callbacks, to be able to response to the finish of the sending */
     write_connection(
         io_connection->connection,
         (unsigned char *) response_buffer,
