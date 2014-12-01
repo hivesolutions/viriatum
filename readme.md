@@ -60,18 +60,21 @@ Building viriatum for android involves cross compilation and the android ndk too
 Check the instructions for downloading the android ndk from the [official website](http://developer.android.com/sdk/ndk/),
 then unpack the android-ndk package file into the current directory.
 
-The recommended NDK version is `r6` as compatibility is ensured for that version. Newer versions are
-known to have problems compiling some of the packages (including PHP). To download that version of
-the NDK for Linux use this [link](http://dl.google.com/android/ndk/android-ndk-r6-linux-x86.tar.bz2).
+The recommended NDK version is `r8e` as compatibility is ensured for that version. NDK is currently
+known to have problems compiling some of the packages (including PHP, Python and Lua). To download that
+version of the NDK for Linux use this [link](http://dl.google.com/android/ndk/android-ndk-r8e-linux-x86_64.tar.bz2).
 
-The `r6` version of the NDK is meant to be run only under x86 machines and should be used with care
-under x86-64 based machines.
+Because of problems building the static versions of PHP, Python, Lua, etc. some of the modules are
+currently not compatible with Android.
+
+The `r8d` or preivous versions of the NDK are meant to be run only under x86 machines and should
+be used with care unnder x86-64 based machines.
 
     tar -xvf android-ndk-r[x]-linux-[arch].tar.bz2
 
 Create the standalone toolchain using the script for that purpose.
 
-    android-ndk-r[x]/build/tools/make-standalone-toolchain.sh --system=linux-x86\
+    android-ndk-r[x]/build/tools/make-standalone-toolchain.sh --system=linux-x86_64\
         --platform=android-4 --install-dir=/opt/android-toolchain
 
 And then you may use the "just" created toolchain to build Viriatum with:
