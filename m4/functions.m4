@@ -1,5 +1,5 @@
 # Hive Viriatum Web Server
-# Copyright (C) 2008-2014 Hive Solutions Lda.
+# Copyright (C) 2008-2015 Hive Solutions Lda.
 #
 # This file is part of Hive Viriatum Web Server.
 #
@@ -20,7 +20,7 @@
 # __version__   = 1.0.0
 # __revision__  = $LastChangedRevision$
 # __date__      = $LastChangedDate$
-# __copyright__ = Copyright (c) 2008-2014 Hive Solutions Lda.
+# __copyright__ = Copyright (c) 2008-2015 Hive Solutions Lda.
 # __license__   = GNU General Public License (GPL), Version 3
 
 # checks for library functions
