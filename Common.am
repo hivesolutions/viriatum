@@ -24,7 +24,7 @@
 # __license__   = GNU General Public License (GPL), Version 3
 
 if CLANG
-EXTRA_FLAGS = 
+EXTRA_FLAGS =
 else
 EXTRA_FLAGS = -finline-functions
 endif
