@@ -31,6 +31,10 @@ AC_TYPE_SIZE_T
 # sets the silent rules for compilation
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
+# verifies if the current compiler to be used is clang
+# if that's the case exposed it as an automake variable
+AM_CONDITIONAL(CLANG, [[ $CC == *"clang"* ]])
+
 # changes the library names spec to a non versioned
 # setting (avoid possible import problems)
 library_names_spec='$libname${shared_ext}'

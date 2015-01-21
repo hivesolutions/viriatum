@@ -23,7 +23,13 @@
 # __copyright__ = Copyright (c) 2008-2015 Hive Solutions Lda.
 # __license__   = GNU General Public License (GPL), Version 3
 
-AM_CFLAGS = -pedantic -finline-functions -Wall -Wno-long-long -Wno-variadic-macros -Wno-strict-aliasing -DHAVE_CONFIG_H
-AM_CXXFLAGS = -pedantic -finline-functions -Wall -Wno-long-long -Wno-variadic-macros -Wno-strict-aliasing -DHAVE_CONFIG_H
+if CLANG
+EXTRA_FLAGS = 
+else
+EXTRA_FLAGS = -finline-functions
+endif
+
+AM_CFLAGS = -pedantic -Wall -Wno-long-long -Wno-variadic-macros -Wno-strict-aliasing -DHAVE_CONFIG_H $(EXTRA_FLAGS)
+AM_CXXFLAGS = -pedantic -Wall -Wno-long-long -Wno-variadic-macros -Wno-strict-aliasing -DHAVE_CONFIG_H  $(EXTRA_FLAGS)
 
 libdir = $(exec_prefix)/lib/viriatum/modules
