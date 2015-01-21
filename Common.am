@@ -23,7 +23,7 @@
 # __copyright__ = Copyright (c) 2008-2015 Hive Solutions Lda.
 # __license__   = GNU General Public License (GPL), Version 3
 
-if CLANG_TOBIAS
+if CLANG
 EXTRA_FLAGS =
 else
 EXTRA_FLAGS = -finline-functions
