@@ -30,6 +30,6 @@ EXTRA_FLAGS = -finline-functions
 endif
 
 AM_CFLAGS = -pedantic -Wall -Wno-long-long -Wno-variadic-macros -Wno-strict-aliasing -DHAVE_CONFIG_H $(EXTRA_FLAGS)
-AM_CXXFLAGS = -pedantic -Wall -Wno-long-long -Wno-variadic-macros -Wno-strict-aliasing -DHAVE_CONFIG_H  $(EXTRA_FLAGS)
+AM_CXXFLAGS = -pedantic -Wall -Wno-long-long -Wno-variadic-macros -Wno-strict-aliasing -DHAVE_CONFIG_H $(EXTRA_FLAGS)
 
 libdir = $(exec_prefix)/lib/viriatum/modules
