@@ -47,6 +47,10 @@ value may be a dns name or an ip address """
 PORT = 9090
 """ The target tcp port for the connection """
 
+PATH = "/index.html"
+""" The path of the file that is going to be
+retrieved from the target server """
+
 SIZE = 10024
 """ The size of the buffer to be used in the
 reading of the response value """
@@ -56,45 +60,45 @@ WRITE_SLEEP = 0.25
 operations (this should ensure message separation) """
 
 SIMPLE = [
-    "GET /index.html HTTP/1.1\r\n"
-    "Host: 127.0.0.1\r\n"
+    "GET %s HTTP/1.1\r\n"
+    "Host: %s\r\n"
     "Connection: keep-alive\r\n"
-    "\r\n"
+    "\r\n" % (PATH, HOST)
 ]
 """ The simple example sequence of data
 string (to be used for simple testing) """
 
 COMPLEX = [
-    "GET /index.html HTTP/1.1\r\n"
-    "Host: 127.0.0.1\r\n"
+    "GET %s HTTP/1.1\r\n"
+    "Host: %s\r\n"
     "Connection: keep-alive\r\n"
-    "\r\n",
-    "GET /index.html HTTP/1.1\r\n"
+    "\r\n" % (PATH, HOST),
+    "GET %s HTTP/1.1\r\n"
     "Connection: keep-alive\r\n"
-    "Hos",
-    "t: 127.0.0.1\r\n"
+    "Hos" % PATH,
+    "t: %s\r\n"
     "\r\n"
-    "GET /index.html HTTP/1.1\r\n"
-    "Host: 127.0.0.1\r\n"
+    "GET %s HTTP/1.1\r\n"
+    "Host: %s\r\n"
     "Connection: keep-alive\r\n"
-    "\r\n"
+    "\r\n" % (HOST, PATH, HOST)
 ]
 """ The complex example sequence of data
 string (to be used for cutted string testing) """
 
 PIPELINING = [
-    "GET /index.html HTTP/1.1\r\n"
-    "Host: 127.0.0.1\r\n"
+    "GET %s HTTP/1.1\r\n"
+    "Host: %s\r\n"
     "Connection: keep-alive\r\n"
     "\r\n"
-    "GET /index.html HTTP/1.1\r\n"
-    "Host: 127.0.0.1\r\n"
+    "GET %s HTTP/1.1\r\n"
+    "Host: %s\r\n"
     "Connection: keep-alive\r\n"
     "\r\n"
-    "GET /index.html HTTP/1.1\r\n"
-    "Host: 127.0.0.1\r\n"
+    "GET %s HTTP/1.1\r\n"
+    "Host: %s\r\n"
     "Connection: keep-alive\r\n"
-    "\r\n"
+    "\r\n" % (PATH, HOST, PATH, HOST, PATH, HOST)
 ]
 """ The pipelining example sequence of data
 string (to be used for long pipellined string
