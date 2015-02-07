@@ -18,7 +18,7 @@ are the following.
 
 The configuration for the raspberry toolchain is the following.
 
-    Crosstool-NG version: 1.19.0
+    Crosstool-NG version: 1.20.0
     CPU Architecture: ARM
     Operative System: Linux
     Toolchain Path: /opt/${CT_TARGET}
