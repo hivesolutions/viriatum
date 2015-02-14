@@ -81,7 +81,7 @@ The configuration for the raspberry toolchain is the following.
     patch -p1 < lua-5.1.5-xcompile.patch
 
     export PATH=/opt/arm-rasp-linux-gnueabi/bin:$PATH
-    make linux CC="arm-rasp-linux-gnueabi-gcc" AR="arm-rasp-linux-gnueabi-ar rcu"\
+    make linux CC="arm-rasp-linux-gnueabi-gcc" AR="arm-rasp-linux-gnueabi-ar"\
         RANLIB="arm-rasp-linux-gnueabi-ranlib" CFLAGS="-I/opt/arm-rasp-linux-gnueabi/include\
         -L/opt/arm-rasp-linux-gnueabi/lib -R/opt/arm-rasp-linux-gnueabi/lib"
     make install INSTALL_TOP=/opt/arm-rasp-linux-gnueabi
