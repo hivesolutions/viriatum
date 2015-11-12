@@ -29,6 +29,7 @@ echo "========================"
 echo
 echo " + Host                  $host_os"
 echo " + Install prefix        $prefix"
+echo " + Install bin           $bindir"
 echo " + Install sysconfig     $sysconfdir"
 echo " + Config directory      $with_configroot"
 echo " + Data directory        $with_wwwroot"
