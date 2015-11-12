@@ -29,6 +29,8 @@
 target_prefix=$prefix
 test "x$prefix" = xNONE && target_prefix=$ac_default_prefix
 
+# runs the evaluation process in the system configuration
+# directory so that it's possible to properly retrieve it
 eval "eval target_sysconfdir=$sysconfdir"
 
 # sets the default path to the viriatum paths
