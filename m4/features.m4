@@ -32,7 +32,7 @@ test "x$prefix" = xNONE && target_prefix=$ac_default_prefix
 # sets the default path to the viriatum paths
 with_resourceroot=/var/viriatum
 with_libroot=$target_prefix/lib/viriatum
-with_configroot=$sysconfdir/viriatum
+with_configroot=$@sysconfdir@/viriatum
 
 # sets the default values for the various feature
 # control variables
