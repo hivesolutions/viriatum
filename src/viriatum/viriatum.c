@@ -57,6 +57,10 @@ unsigned char local = 0;
 static struct service_t *service = NULL;
 
 ERROR_CODE init_service(char *program_name, struct hash_map_t *arguments) {
+    /* allocates the return value to be used to gather
+    the error result from the service calls */
+    ERROR_CODE return_value;
+
     /* creates the service and loads the options
     taking into account the arguments */
     create_service(
@@ -64,9 +68,12 @@ ERROR_CODE init_service(char *program_name, struct hash_map_t *arguments) {
         (unsigned char *) VIRIATUM_NAME,
         (unsigned char *) program_name
     );
-    load_specifications(service);
-    load_options_service(service, arguments);
-    calculate_options_service(service);
+    return_value = load_specifications(service);
+    if(IS_ERROR_CODE(return_value)) { RAISE_AGAIN(return_value); }
+    return_value = load_options_service(service, arguments);
+    if(IS_ERROR_CODE(return_value)) { RAISE_AGAIN(return_value); }
+    return_value = calculate_options_service(service);
+    if(IS_ERROR_CODE(return_value)) { RAISE_AGAIN(return_value); }
 
     /* updates the registers signals handler so that the service
     may be able to register the handlers at the proper timing */

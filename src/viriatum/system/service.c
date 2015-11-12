@@ -273,12 +273,19 @@ ERROR_CODE load_specifications(struct service_t *service) {
 }
 
 ERROR_CODE load_options_service(struct service_t *service, struct hash_map_t *arguments) {
+    /* allocates the variable that is going to be used
+    for the error validation in the loading process */
+    ERROR_CODE return_value;
+
     /* loads the options from the various sources, note
     that the loading order is important because the last
     loading takes priority over the previous ones */
-    _default_options_service(service, arguments);
-    _file_options_service(service, arguments);
-    _comand_line_options_service(service, arguments);
+    return_value = _default_options_service(service, arguments);
+    if(IS_ERROR_CODE(return_value)) { RAISE_AGAIN(return_value); }
+    return_value = _file_options_service(service, arguments);
+    if(IS_ERROR_CODE(return_value)) { RAISE_AGAIN(return_value); }
+    return_value = _comand_line_options_service(service, arguments);
+    if(IS_ERROR_CODE(return_value)) { RAISE_AGAIN(return_value); }
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -2114,6 +2121,7 @@ ERROR_CODE _file_options_service(struct service_t *service, struct hash_map_t *a
     /* allocates the value reference to be used
     during the arguments retrieval */
     void *value;
+    ERROR_CODE return_value;
 
     /* allocates space for the path to the proper configuration
     file (the ini base file) */
@@ -2130,12 +2138,13 @@ ERROR_CODE _file_options_service(struct service_t *service, struct hash_map_t *a
     /* creates the configuration file path using the defined viriatum
     path to the configuration directory and then loads it as an ini file,
     this should retrieve the configuration as a set of maps */
-    SPRINTF(config_path, VIRIATUM_MAX_PATH_SIZE, "%s/viriatum.ini", VIRIATUM_CONFIG_PATH);
-    process_ini_file(config_path, &configuration);
+    SPRINTF(config_path, VIRIATUM_MAX_PATH_SIZE, "%s/viriatdum.ini", VIRIATUM_CONFIG_PATH);
+    return_value = process_ini_file(config_path, &configuration);
+    if(IS_ERROR_CODE(return_value)) { RAISE_AGAIN(return_value); }
     service->configuration = configuration;
 
     /* prints a debug message about the loading of the configuration
-	ini file so that the user knows that the new file is used */
+    ini file so that the user knows that the new file is used */
     V_DEBUG_F("Loaded configuration (%s)\n", config_path);
 
     /* tries to retrieve the general section configuration from the configuration
