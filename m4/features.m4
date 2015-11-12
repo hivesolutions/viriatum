@@ -31,7 +31,7 @@ test "x$prefix" = xNONE && target_prefix=$ac_default_prefix
 
 # runs the evaluation process in the system configuration
 # directory so that it's possible to properly retrieve it
-eval "prefix=$target_prefix eval target_sysconfdir=$sysconfdir"
+eval "prefix=$target_prefix && eval target_sysconfdir=$sysconfdir"
 
 # sets the default path to the viriatum paths
 with_resourceroot=/var/viriatum
