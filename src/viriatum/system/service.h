@@ -1176,6 +1176,17 @@ ERROR_CODE calculate_options_service(struct service_t *service);
 ERROR_CODE calculate_locations_service(struct service_t *service);
 
 /**
+ * Prints a series of information value about the service that
+ * has just been passed, the information should be sent to the
+ * defined debug output.
+ * 
+ * @param service The service to have it's internal status debugged
+ * to the default output.
+ * @return The resulting error code.
+ */
+ERROR_CODE print_options_service(struct service_t *service);
+
+/**
  * Creates a series of worker processes that are going to
  * be used to handle new connections.
  *
