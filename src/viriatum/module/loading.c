@@ -159,13 +159,13 @@ ERROR_CODE load_module(struct service_t *service, unsigned char *module_path) {
 
     /* in case the start module function was not found */
     if(info_module_function == NULL) {
-        /* prints a warning message */
+        /* prints a warning message, and then raises
+		an error indicating the problem loading the library */
         V_WARNING_F("No such symbol '%s' in library\n", info_module_name);
-
-        /* raises an error */
         RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem finding symbol");
     } else {
-        /* prints a debug message */
+        /* prints a debug message about the finding of
+		the requested symbol in the library */
         V_DEBUG_F("Found symbol '%s' in library\n", info_module_name);
     }
 
