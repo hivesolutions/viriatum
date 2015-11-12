@@ -27,7 +27,7 @@
 # must do this because the makefiles have not been generated
 # so the prefix value is not final
 target_prefix=$prefix
-test "x$prefix" = xNONE && target_prefix=$ac_default_prefix
+#test "x$prefix" = xNONE && target_prefix=$ac_default_prefix
 
 # sets the default path to the viriatum paths
 with_resourceroot=/var/viriatum
