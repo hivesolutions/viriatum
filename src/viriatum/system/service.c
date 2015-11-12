@@ -2139,13 +2139,14 @@ ERROR_CODE _file_options_service(struct service_t *service, struct hash_map_t *a
     path to the configuration directory and then loads it as an ini file,
     this should retrieve the configuration as a set of maps */
     SPRINTF(config_path, VIRIATUM_MAX_PATH_SIZE, "%s/viriatdum.ini", VIRIATUM_CONFIG_PATH);
+	V_DEBUG_F("Loading configuration file (%s)\n", config_path);
     return_value = process_ini_file(config_path, &configuration);
     if(IS_ERROR_CODE(return_value)) { RAISE_AGAIN(return_value); }
     service->configuration = configuration;
 
     /* prints a debug message about the loading of the configuration
     ini file so that the user knows that the new file is used */
-    V_DEBUG_F("Loaded configuration (%s)\n", config_path);
+    V_DEBUG_F("Loaded configuration file (%s)\n", config_path);
 
     /* tries to retrieve the general section configuration from the configuration
     map in case none is found returns immediately no need to process anything more */
