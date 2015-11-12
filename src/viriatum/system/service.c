@@ -2134,6 +2134,10 @@ ERROR_CODE _file_options_service(struct service_t *service, struct hash_map_t *a
     process_ini_file(config_path, &configuration);
     service->configuration = configuration;
 
+    /* prints a debug message about the loading of the configuration
+	ini file so that the user knows that the new file is used */
+    V_DEBUG_F("Loaded configuration (%s)\n", config_path);
+
     /* tries to retrieve the general section configuration from the configuration
     map in case none is found returns immediately no need to process anything more */
     get_value_string_sort_map(configuration, (unsigned char *) "general", (void **) &general);
