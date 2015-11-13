@@ -256,6 +256,10 @@ ERROR_CODE url_callback_handler_dispatch(struct http_parser_t *http_parser, cons
     V_DEBUG_F("Handler '%s' selected from regex match\n", handler_name);
 #endif
 
+    /* prints a debug message about the handler that is going to be
+    used in the handling of the request (concrete usage) */
+    V_DEBUG_F("Going to use '%s' handler for handling\n", handler_name);
+
     /* sets the current http handler accoring to the current options
     in the service, the http handler must be loaded in the handlers map
     in case the handler is not currently available an error is printed */
