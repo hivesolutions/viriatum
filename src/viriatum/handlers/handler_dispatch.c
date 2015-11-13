@@ -237,7 +237,10 @@ ERROR_CODE url_callback_handler_dispatch(struct http_parser_t *http_parser, cons
     for(index = 0; index < dispatch_handler->regex_count; index++) {
         /* tries to match the current path against the registered
         regular expression in case it fails continues the loop */
-        matching = pcre_exec(dispatch_handler->regex[index], NULL, (char *) path, path_size, 0, 0, offsets, 3);
+        matching = pcre_exec(
+            dispatch_handler->regex[index], NULL, (char *) path,
+            path_size, 0, 0, offsets, 3
+        );
         if(matching < 0) { continue; }
 
         /* sets the name of the handler as the name in the current index
@@ -247,6 +250,10 @@ ERROR_CODE url_callback_handler_dispatch(struct http_parser_t *http_parser, cons
         match_size = (size_t) offsets[1];
         break;
     }
+
+    /* prints a debug message about the selection of the handler
+    using the current regular expression engine */
+    V_DEBUG_F("Handler '%s' selected from regex match\n", handler_name);
 #endif
 
     /* sets the current http handler accoring to the current options
