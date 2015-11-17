@@ -1179,7 +1179,7 @@ ERROR_CODE calculate_locations_service(struct service_t *service);
  * Prints a series of information value about the service that
  * has just been passed, the information should be sent to the
  * defined debug output.
- * 
+ *
  * @param service The service to have it's internal status debugged
  * to the default output.
  * @return The resulting error code.

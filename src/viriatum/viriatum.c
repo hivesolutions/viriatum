@@ -83,9 +83,9 @@ ERROR_CODE init_service(char *program_name, struct hash_map_t *arguments) {
     on the currently loaded configuration, this a complex operation */
     calculate_locations_service(service);
 
-	/* runs the printing operation on the service, this should
-	output the information to the standar output */
-	print_options_service(service);
+    /* runs the printing operation on the service, this should
+    output the information to the standar output */
+    print_options_service(service);
 
     /* raises no error to the caller method, normal
     exit operation (should provide no problem) */

@@ -350,11 +350,11 @@ ERROR_CODE calculate_locations_service(struct service_t *service) {
 }
 
 ERROR_CODE print_options_service(struct service_t *service) {
-	/* prints a series of debug information on the service that
-	has just been loaded (helping the debug process) */
-	V_DEBUG_F("Port    := %d\n", service->options->_port);
-	V_DEBUG_F("Address := %s\n", service->options->address);
-	V_DEBUG_F("Handler := %s\n", service->options->handler_name);
+    /* prints a series of debug information on the service that
+    has just been loaded (helping the debug process) */
+    V_DEBUG_F("Port    := %d\n", service->options->_port);
+    V_DEBUG_F("Address := %s\n", service->options->address);
+    V_DEBUG_F("Handler := %s\n", service->options->handler_name);
 
     /* raises no error */
     RAISE_NO_ERROR;
