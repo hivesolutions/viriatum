@@ -6,6 +6,7 @@ EXPOSE 9090
 ADD . /viriatum
 
 RUN apt-get update && apt-get install -y -q make autoconf automake libtool libpcre3-dev
-RUN cd /viriatum && (./autogen.sh && make && make install)
+RUN cd /viriatum && ./autogen.sh
+RUN cd /viriatum && make && make install
 
 CMD viriatum
