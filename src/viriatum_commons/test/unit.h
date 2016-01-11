@@ -91,7 +91,7 @@ typedef void (*test_case_function) (struct test_case_t *test_case);
  * in the performance test in case this value is not provided
  * the value defaults to one.
  */
-ERROR_CODE run_speed_test(char *name, test_function function, size_t iterations);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE run_speed_test(char *name, test_function function, size_t iterations);
 
 /**
  * Runs the test case defined by the provided function and
@@ -105,4 +105,4 @@ ERROR_CODE run_speed_test(char *name, test_function function, size_t iterations)
  * @param name The name of the test case that is going to be
  * for some debug output.
  */
-ERROR_CODE run_test_case(test_case_function function, const char *name);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE run_test_case(test_case_function function, const char *name);
