@@ -98,6 +98,7 @@
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(ProjectDir)..\..\src\viriatum;$(INCLUDE);$(IncludePath)</IncludePath>
     <LibraryPath>$(LIB);$(LibraryPath)</LibraryPath>
+    <TargetName>$(ProjectName)_d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)..\..\bin\$(ProjectName)\i386\win32\$(Configuration)\</OutDir>
@@ -112,6 +113,7 @@
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(ProjectDir)..\..\src\viriatum;$(INCLUDE);$(IncludePath)</IncludePath>
     <LibraryPath>$(LIB);$(LibraryPath)</LibraryPath>
+    <TargetName>$(ProjectName)_d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release (Dynamic)|Win32'">
     <OutDir>$(SolutionDir)..\..\bin\$(ProjectName)\i386\win32\$(Configuration)\</OutDir>
