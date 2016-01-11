@@ -1751,7 +1751,7 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
     parsing stages (partial parsing) */
     http_parser->state = state;
     http_parser->header_state = header_state;
-    http_parser->index = index;
+    http_parser->index = (unsigned char) index;
     http_parser->read_count = read_count;
     http_parser->header_field_mark = header_field_mark;
     http_parser->header_value_mark = header_value_mark;
