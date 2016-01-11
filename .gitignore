@@ -2,6 +2,8 @@
 *.ncb
 *.user
 *.suo
+*.sdf
+*.opendb
 *.xccheckout
 
 .DS_Store
