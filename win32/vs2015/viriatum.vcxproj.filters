@@ -1,0 +1,292 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Source Files\System">
+      <UniqueIdentifier>{12adb8a8-6923-4ef7-8df6-c6c8b1739099}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Global">
+      <UniqueIdentifier>{d7b8672c-402e-48a4-9be8-47cb61b49366}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Test">
+      <UniqueIdentifier>{12752413-cccc-4162-b843-4f91f0f136ba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Module">
+      <UniqueIdentifier>{3c1e26f7-1ab5-4387-ba39-9c74fff042f5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Http">
+      <UniqueIdentifier>{089636ac-b577-4cd9-a5cf-048eb2d1f9e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Handlers">
+      <UniqueIdentifier>{d552753a-c4d6-4146-8931-4c4f206d4041}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Stream">
+      <UniqueIdentifier>{f0dd47ac-6a42-4f1b-8bb5-1906e1e186d4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Polling">
+      <UniqueIdentifier>{077f1448-9e5a-4537-80d9-8c943ee1020b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Jni">
+      <UniqueIdentifier>{dc86ab0d-5e41-4ffa-9e89-fafce2bbebb2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Header Files\Global">
+      <UniqueIdentifier>{9e74f87b-5f73-4e50-b034-e2545ec7cd2b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\System">
+      <UniqueIdentifier>{cff5e103-c3a8-40f4-9f24-fb710b334e8d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Test">
+      <UniqueIdentifier>{ee1538a7-2a83-46ef-98fd-ad47b7123c56}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Module">
+      <UniqueIdentifier>{a7284174-2854-4f5a-ba82-45be87f5b33f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Http">
+      <UniqueIdentifier>{70d41811-fd69-4d2c-902d-000248a71d7a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Handlers">
+      <UniqueIdentifier>{24461397-f517-4557-a3d0-3b1faff30ff9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Stream">
+      <UniqueIdentifier>{640cd91a-08d2-4110-86da-7ce5c40648a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Polling">
+      <UniqueIdentifier>{7853ed69-194c-4227-81d9-7724b2988d2e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Jni">
+      <UniqueIdentifier>{90a4e825-cb37-4068-a78c-7a784a27a2ab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Base">
+      <UniqueIdentifier>{8a597e1e-5c14-41e1-9356-a1440e88fd5e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\viriatum\stdafx.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum\viriatum.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum\system\client.c">
+      <Filter>Source Files\System</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum\system\environment.c">
+      <Filter>Source Files\System</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum\system\service.c">
+      <Filter>Source Files\System</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum\system\torrent.c">
+      <Filter>Source Files\System</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum\test\simple_test.c">
+      <Filter>Source Files\Test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum\test\speed_test.c">
+      <Filter>Source Files\Test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum\module\loading.c">
+      <Filter>Source Files\Module</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum\http\http_parser.c">
+      <Filter>Source Files\Http</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum\http\http_request.c">
+      <Filter>Source Files\Http</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum\http\http_util.c">
+      <Filter>Source Files\Http</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum\handlers\handler_default.c">
+      <Filter>Source Files\Handlers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum\handlers\handler_dispatch.c">
+      <Filter>Source Files\Handlers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum\handlers\handler_file.c">
+      <Filter>Source Files\Handlers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum\handlers\handler_proxy.c">
+      <Filter>Source Files\Handlers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum\stream\stream_http.c">
+      <Filter>Source Files\Stream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum\stream\stream_httpc.c">
+      <Filter>Source Files\Stream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum\stream\stream_io.c">
+      <Filter>Source Files\Stream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum\stream\stream_torrent.c">
+      <Filter>Source Files\Stream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum\polling\polling_epoll.c">
+      <Filter>Source Files\Polling</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum\polling\polling_kqueue.c">
+      <Filter>Source Files\Polling</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum\polling\polling_select.c">
+      <Filter>Source Files\Polling</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum\jni\info.c">
+      <Filter>Source Files\Jni</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum\jni\jni_service.c">
+      <Filter>Source Files\Jni</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum\jni\start.c">
+      <Filter>Source Files\Jni</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\src\viriatum\_config_win32.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum\stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum\viriatum.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum\global\common.h">
+      <Filter>Header Files\Global</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum\global\definitions.h">
+      <Filter>Header Files\Global</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum\global\resource.h">
+      <Filter>Header Files\Global</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum\global\targetver.h">
+      <Filter>Header Files\Global</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum\system\client.h">
+      <Filter>Header Files\System</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum\system\environment.h">
+      <Filter>Header Files\System</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum\system\service.h">
+      <Filter>Header Files\System</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum\system\system.h">
+      <Filter>Header Files\System</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum\system\torrent.h">
+      <Filter>Header Files\System</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum\test\simple_test.h">
+      <Filter>Header Files\Test</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum\test\speed_test.h">
+      <Filter>Header Files\Test</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum\test\test.h">
+      <Filter>Header Files\Test</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum\module\loading.h">
+      <Filter>Header Files\Module</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum\module\module.h">
+      <Filter>Header Files\Module</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum\http\http.h">
+      <Filter>Header Files\Http</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum\http\http_parser.h">
+      <Filter>Header Files\Http</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum\http\http_request.h">
+      <Filter>Header Files\Http</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum\http\http_util.h">
+      <Filter>Header Files\Http</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum\handlers\handler_default.h">
+      <Filter>Header Files\Handlers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum\handlers\handler_dispatch.h">
+      <Filter>Header Files\Handlers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum\handlers\handler_file.h">
+      <Filter>Header Files\Handlers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum\handlers\handler_proxy.h">
+      <Filter>Header Files\Handlers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum\handlers\handlers.h">
+      <Filter>Header Files\Handlers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum\stream\stream.h">
+      <Filter>Header Files\Stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum\stream\stream_http.h">
+      <Filter>Header Files\Stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum\stream\stream_httpc.h">
+      <Filter>Header Files\Stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum\stream\stream_io.h">
+      <Filter>Header Files\Stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum\stream\stream_torrent.h">
+      <Filter>Header Files\Stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum\polling\polling.h">
+      <Filter>Header Files\Polling</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum\polling\polling_epoll.h">
+      <Filter>Header Files\Polling</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum\polling\polling_kqueue.h">
+      <Filter>Header Files\Polling</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum\polling\polling_select.h">
+      <Filter>Header Files\Polling</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum\jni\info.h">
+      <Filter>Header Files\Jni</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum\jni\jni.h">
+      <Filter>Header Files\Jni</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum\jni\jni_service.h">
+      <Filter>Header Files\Jni</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum\jni\start.h">
+      <Filter>Header Files\Jni</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum\base\base.h">
+      <Filter>Header Files\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum\base\entry.h">
+      <Filter>Header Files\Base</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="..\..\src\viriatum\resources\win32\vs2008ex\viriatum.exe.manifest">
+      <Filter>Resource Files</Filter>
+    </Manifest>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\src\viriatum\resources\win32\vs2008ex\viriatum.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\..\src\viriatum\ReadMe.txt" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,371 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug (Dynamic)|Win32">
+      <Configuration>Debug (Dynamic)</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Library (Dynamic)|Win32">
+      <Configuration>Library (Dynamic)</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Library|Win32">
+      <Configuration>Library</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release (Dynamic)|Win32">
+      <Configuration>Release (Dynamic)</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{E24C2D58-2F86-4C49-BD2E-F017C5FF2E0E}</ProjectGuid>
+    <RootNamespace>viriatum_commons</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Library (Dynamic)|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v100</PlatformToolset>
+    <CharacterSet>NotSet</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Library|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v100</PlatformToolset>
+    <CharacterSet>NotSet</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release (Dynamic)|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v100</PlatformToolset>
+    <CharacterSet>NotSet</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug (Dynamic)|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v100</PlatformToolset>
+    <CharacterSet>NotSet</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v100</PlatformToolset>
+    <CharacterSet>NotSet</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v100</PlatformToolset>
+    <CharacterSet>NotSet</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Library (Dynamic)|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Library|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release (Dynamic)|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug (Dynamic)|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>14.0.24720.0</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)..\..\bin\$(ProjectName)\i386\win32\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectName)\$(Configuration)\</IntDir>
+    <IncludePath>$(ProjectDir)..\..\src\viriatum_commons;$(INCLUDE);$(IncludePath)</IncludePath>
+    <LibraryPath>$(LIB);$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)..\..\bin\$(ProjectName)\i386\win32\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectName)\$(Configuration)\</IntDir>
+    <IncludePath>$(ProjectDir)..\..\src\viriatum_commons;$(INCLUDE);$(IncludePath)</IncludePath>
+    <LibraryPath>$(LIB);$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug (Dynamic)|Win32'">
+    <OutDir>$(SolutionDir)..\..\bin\$(ProjectName)\i386\win32\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectName)\$(Configuration)\</IntDir>
+    <IncludePath>$(ProjectDir)..\..\src\viriatum_commons;$(INCLUDE);$(IncludePath)</IncludePath>
+    <LibraryPath>$(LIB);$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release (Dynamic)|Win32'">
+    <OutDir>$(SolutionDir)..\..\bin\$(ProjectName)\i386\win32\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectName)\$(Configuration)\</IntDir>
+    <IncludePath>$(ProjectDir)..\..\src\viriatum_commons;$(INCLUDE);$(IncludePath)</IncludePath>
+    <LibraryPath>$(LIB);$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Library|Win32'">
+    <OutDir>$(SolutionDir)..\..\bin\$(ProjectName)\i386\win32\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectName)\$(Configuration)\</IntDir>
+    <IncludePath>$(ProjectDir)..\..\src\viriatum_commons;$(INCLUDE);$(IncludePath)</IncludePath>
+    <LibraryPath>$(LIB);$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Library (Dynamic)|Win32'">
+    <OutDir>$(SolutionDir)..\..\bin\$(ProjectName)\i386\win32\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectName)\$(Configuration)\</IntDir>
+    <IncludePath>$(ProjectDir)..\..\src\viriatum_commons;$(INCLUDE);$(IncludePath)</IncludePath>
+    <LibraryPath>$(LIB);$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <ProgramDataBaseFileName>$(TargetDir)$(TargetName).pdb</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <CompileAs>CompileAsC</CompileAs>
+    </ClCompile>
+    <Lib>
+      <OutputFile>$(OutDir)viriatum_commons_d.lib</OutputFile>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <ProgramDataBaseFileName>$(TargetDir)$(TargetName).pdb</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAs>CompileAsC</CompileAs>
+    </ClCompile>
+    <Lib>
+      <OutputFile>$(OutDir)viriatum_commons.lib</OutputFile>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug (Dynamic)|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <ProgramDataBaseFileName>$(TargetDir)$(TargetName).pdb</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAs>CompileAsC</CompileAs>
+    </ClCompile>
+    <Link>
+      <OutputFile>$(OutDir)viriatum_commons_d.dll</OutputFile>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release (Dynamic)|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <ProgramDataBaseFileName>$(TargetDir)$(TargetName).pdb</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAs>CompileAsC</CompileAs>
+    </ClCompile>
+    <Link>
+      <OutputFile>$(OutDir)viriatum_commons.dll</OutputFile>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Library|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <ProgramDataBaseFileName>$(TargetDir)$(TargetName).pdb</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAs>CompileAsC</CompileAs>
+    </ClCompile>
+    <Lib>
+      <OutputFile>$(OutDir)viriatum_commons.lib</OutputFile>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Library (Dynamic)|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <ProgramDataBaseFileName>$(TargetDir)$(TargetName).pdb</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAs>CompileAsC</CompileAs>
+    </ClCompile>
+    <Link>
+      <OutputFile>$(OutDir)viriatum_commons.dll</OutputFile>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\viriatum_commons\checksum\crc_32.c" />
+    <ClCompile Include="..\..\src\viriatum_commons\checksum\md5.c" />
+    <ClCompile Include="..\..\src\viriatum_commons\checksum\sha1.c" />
+    <ClCompile Include="..\..\src\viriatum_commons\compression\huffman.c" />
+    <ClCompile Include="..\..\src\viriatum_commons\crypto\rc4.c" />
+    <ClCompile Include="..\..\src\viriatum_commons\debug\error.c" />
+    <ClCompile Include="..\..\src\viriatum_commons\debug\logging.c" />
+    <ClCompile Include="..\..\src\viriatum_commons\encoding\base_64.c" />
+    <ClCompile Include="..\..\src\viriatum_commons\encoding\bencoding.c" />
+    <ClCompile Include="..\..\src\viriatum_commons\encoding\percent.c" />
+    <ClCompile Include="..\..\src\viriatum_commons\formats\passwd.c" />
+    <ClCompile Include="..\..\src\viriatum_commons\formats\url.c" />
+    <ClCompile Include="..\..\src\viriatum_commons\ini\ini.c" />
+    <ClCompile Include="..\..\src\viriatum_commons\io\file.c" />
+    <ClCompile Include="..\..\src\viriatum_commons\jni\info.c" />
+    <ClCompile Include="..\..\src\viriatum_commons\jni\start.c" />
+    <ClCompile Include="..\..\src\viriatum_commons\memory\memory_pool.c" />
+    <ClCompile Include="..\..\src\viriatum_commons\sorting\quicksort.c" />
+    <ClCompile Include="..\..\src\viriatum_commons\stdafx.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug (Dynamic)|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Library (Dynamic)|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Library|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release (Dynamic)|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum_commons\stream\bit_stream.c" />
+    <ClCompile Include="..\..\src\viriatum_commons\stream\file_stream.c" />
+    <ClCompile Include="..\..\src\viriatum_commons\stream\io_stream.c" />
+    <ClCompile Include="..\..\src\viriatum_commons\stream\memory_stream.c" />
+    <ClCompile Include="..\..\src\viriatum_commons\structures\array_list.c" />
+    <ClCompile Include="..\..\src\viriatum_commons\structures\buffer.c" />
+    <ClCompile Include="..\..\src\viriatum_commons\structures\date_time.c" />
+    <ClCompile Include="..\..\src\viriatum_commons\structures\hash_map.c" />
+    <ClCompile Include="..\..\src\viriatum_commons\structures\iterator.c" />
+    <ClCompile Include="..\..\src\viriatum_commons\structures\linked_buffer.c" />
+    <ClCompile Include="..\..\src\viriatum_commons\structures\linked_list.c" />
+    <ClCompile Include="..\..\src\viriatum_commons\structures\priority_queue.c" />
+    <ClCompile Include="..\..\src\viriatum_commons\structures\sort_map.c" />
+    <ClCompile Include="..\..\src\viriatum_commons\structures\string.c" />
+    <ClCompile Include="..\..\src\viriatum_commons\structures\string_buffer.c" />
+    <ClCompile Include="..\..\src\viriatum_commons\structures\type.c" />
+    <ClCompile Include="..\..\src\viriatum_commons\system\_thread_win32.c" />
+    <ClCompile Include="..\..\src\viriatum_commons\template\engine.c" />
+    <ClCompile Include="..\..\src\viriatum_commons\template\handler.c" />
+    <ClCompile Include="..\..\src\viriatum_commons\test\unit.c" />
+    <ClCompile Include="..\..\src\viriatum_commons\thread\thread_pool.c" />
+    <ClCompile Include="..\..\src\viriatum_commons\util\arguments_util.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\src\viriatum_commons\checksum\checksum.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\checksum\crc_32.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\checksum\md5.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\checksum\sha1.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\compression\compression.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\compression\huffman.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\crypto\crypto.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\crypto\rc4.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\debug\debug.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\debug\error.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\debug\logging.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\encoding\base_64.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\encoding\bencoding.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\encoding\encoding.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\encoding\percent.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\formats\formats.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\formats\passwd.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\formats\url.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\global\common.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\global\compilation.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\global\compiler.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\global\cpu.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\global\definitions.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\global\memory.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\global\platforms.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\global\resource.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\global\targetver.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\global\types.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\ini\ini.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\io\file.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\io\io.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\jni\info.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\jni\jni.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\jni\start.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\memory\memory.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\memory\memory_pool.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\sorting\base.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\sorting\quicksort.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\sorting\sorting.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\stdafx.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\stream\bit_stream.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\stream\file_stream.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\stream\io_stream.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\stream\memory_stream.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\stream\stream.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\structures\array_list.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\structures\buffer.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\structures\date_time.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\structures\hash_map.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\structures\iterator.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\structures\linked_buffer.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\structures\linked_list.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\structures\priority_queue.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\structures\sort_map.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\structures\string.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\structures\string_buffer.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\structures\structures.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\structures\type.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\system\dynamic.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\system\socket.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\system\system.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\system\system_util.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\system\thread.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\system\_thread_win32.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\template\engine.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\template\handler.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\template\template.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\test\test.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\test\unit.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\thread\thread.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\thread\thread_pool.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\util\arguments_util.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\util\dump_util.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\util\function_util.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\util\random_util.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\util\string_util.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\util\string_util_s.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\util\util.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\viriatum_commons.h" />
+    <ClInclude Include="..\..\src\viriatum_commons\_config_win32.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\..\src\viriatum_commons\ReadMe.txt" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

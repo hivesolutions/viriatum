@@ -9,6 +9,7 @@
 /bin
 /build
 /dist
+/win32/vs2015/*/*
 /win32/vs2008ex/*/*
 /scripts/build/tmp
 /scripts/build/builds

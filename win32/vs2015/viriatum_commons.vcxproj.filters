@@ -1,0 +1,501 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Source Files\Checksum">
+      <UniqueIdentifier>{a2316a75-512c-4fac-8b34-3c13ff2bf46b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Encoding">
+      <UniqueIdentifier>{cead6b0f-240c-4ae6-abf1-a4f3f6de952b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Global">
+      <UniqueIdentifier>{2f6ac3ee-55e9-4a54-914c-182e81064c7d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Thread">
+      <UniqueIdentifier>{da7e99b4-fb70-4c59-9533-dc91fde7a410}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\System">
+      <UniqueIdentifier>{cd8fd324-1775-4d18-9cc9-b8dce2cd3bac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Structures">
+      <UniqueIdentifier>{6177d1ab-6edd-49c3-b8fa-9ae677a7ccaf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Util">
+      <UniqueIdentifier>{2a020ae2-d033-49e9-bff4-9c8f2f21c711}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Debug">
+      <UniqueIdentifier>{7093afe8-d2d2-4746-b7fe-32b288be2392}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Memory">
+      <UniqueIdentifier>{40c17337-0309-412a-8769-d5589793222a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Compression">
+      <UniqueIdentifier>{2ca3cfe9-06c6-4c96-bfa3-72cfa00dba9d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Stream">
+      <UniqueIdentifier>{c05f9494-c39d-4b0e-a558-6109fea1932f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Template">
+      <UniqueIdentifier>{88bcc47f-47f6-4b92-81c8-6f9df65b9ed8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Sorting">
+      <UniqueIdentifier>{3d32d75d-9f11-443f-8e7b-12e04d74706f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Jni">
+      <UniqueIdentifier>{2a146486-d989-486a-9006-830bfe99f2b3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Ini">
+      <UniqueIdentifier>{694036a7-2691-4ab7-9e64-584ba342738d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Io">
+      <UniqueIdentifier>{beb3eccc-7746-4cee-9088-6139deccf27e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Crypto">
+      <UniqueIdentifier>{6e472a9b-1867-4ab0-b544-cedbc4d5733d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Formats">
+      <UniqueIdentifier>{6e828e10-f283-4afd-8a34-396a2113da36}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Test">
+      <UniqueIdentifier>{9997a011-c379-4dec-ba46-34dd57d1ce2b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Header Files\Checksum">
+      <UniqueIdentifier>{642348b7-f824-4ade-a093-c83b0fab74af}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Encoding">
+      <UniqueIdentifier>{7553829f-c1e7-4365-89f9-7c8f3bb97a16}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Global">
+      <UniqueIdentifier>{c8ee8b4a-adc8-494e-afc4-922c93139314}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Structures">
+      <UniqueIdentifier>{cb92b18b-3c48-463b-8d17-225973d924c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\System">
+      <UniqueIdentifier>{70819758-ed05-4a84-9185-2c14fe5a7e27}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Thread">
+      <UniqueIdentifier>{6dd0f945-1f98-401a-8519-034c2fd4becd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Util">
+      <UniqueIdentifier>{6c68f1fe-f50a-49ec-bbc5-928200dc63ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Debug">
+      <UniqueIdentifier>{71baad7e-699a-48c3-affb-8cd181914fd2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Memory">
+      <UniqueIdentifier>{ea36e75d-271c-4422-a539-f18f444cbd27}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Compression">
+      <UniqueIdentifier>{4b2a064c-41e2-4bca-ba71-66a6eeafa082}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Stream">
+      <UniqueIdentifier>{a66ba077-5bfb-410d-9c73-a364f321ccef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Template">
+      <UniqueIdentifier>{96219223-f80c-4331-ac0b-7cb6e7e99518}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Sorting">
+      <UniqueIdentifier>{09d4d2da-fe3c-4f67-bf0a-2da73ba177e3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Jni">
+      <UniqueIdentifier>{faf4d4b9-ddd9-4dd1-abb0-1f768f328de1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Ini">
+      <UniqueIdentifier>{624d9731-695f-46e8-9dde-667486e6fcac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Io">
+      <UniqueIdentifier>{91f729a8-c84b-4b4b-9d7b-cfc4714d7328}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Crypto">
+      <UniqueIdentifier>{25110b03-b8ae-40b8-9c01-19687140420f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Formats">
+      <UniqueIdentifier>{3373eb81-8993-4bc1-8e35-01c0d025f9f8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Test">
+      <UniqueIdentifier>{b769d45d-0c71-4eb8-b39e-58c8aba5addb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\viriatum_commons\stdafx.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum_commons\checksum\crc_32.c">
+      <Filter>Source Files\Checksum</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum_commons\checksum\md5.c">
+      <Filter>Source Files\Checksum</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum_commons\checksum\sha1.c">
+      <Filter>Source Files\Checksum</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum_commons\encoding\base_64.c">
+      <Filter>Source Files\Encoding</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum_commons\encoding\bencoding.c">
+      <Filter>Source Files\Encoding</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum_commons\encoding\percent.c">
+      <Filter>Source Files\Encoding</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum_commons\thread\thread_pool.c">
+      <Filter>Source Files\Thread</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum_commons\system\_thread_win32.c">
+      <Filter>Source Files\System</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum_commons\structures\array_list.c">
+      <Filter>Source Files\Structures</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum_commons\structures\buffer.c">
+      <Filter>Source Files\Structures</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum_commons\structures\date_time.c">
+      <Filter>Source Files\Structures</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum_commons\structures\hash_map.c">
+      <Filter>Source Files\Structures</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum_commons\structures\iterator.c">
+      <Filter>Source Files\Structures</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum_commons\structures\linked_buffer.c">
+      <Filter>Source Files\Structures</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum_commons\structures\linked_list.c">
+      <Filter>Source Files\Structures</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum_commons\structures\priority_queue.c">
+      <Filter>Source Files\Structures</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum_commons\structures\sort_map.c">
+      <Filter>Source Files\Structures</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum_commons\structures\string.c">
+      <Filter>Source Files\Structures</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum_commons\structures\string_buffer.c">
+      <Filter>Source Files\Structures</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum_commons\structures\type.c">
+      <Filter>Source Files\Structures</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum_commons\util\arguments_util.c">
+      <Filter>Source Files\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum_commons\debug\error.c">
+      <Filter>Source Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum_commons\debug\logging.c">
+      <Filter>Source Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum_commons\memory\memory_pool.c">
+      <Filter>Source Files\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum_commons\compression\huffman.c">
+      <Filter>Source Files\Compression</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum_commons\stream\bit_stream.c">
+      <Filter>Source Files\Stream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum_commons\stream\file_stream.c">
+      <Filter>Source Files\Stream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum_commons\stream\io_stream.c">
+      <Filter>Source Files\Stream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum_commons\stream\memory_stream.c">
+      <Filter>Source Files\Stream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum_commons\template\engine.c">
+      <Filter>Source Files\Template</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum_commons\template\handler.c">
+      <Filter>Source Files\Template</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum_commons\sorting\quicksort.c">
+      <Filter>Source Files\Sorting</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum_commons\jni\info.c">
+      <Filter>Source Files\Jni</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum_commons\jni\start.c">
+      <Filter>Source Files\Jni</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum_commons\ini\ini.c">
+      <Filter>Source Files\Ini</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum_commons\io\file.c">
+      <Filter>Source Files\Io</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum_commons\crypto\rc4.c">
+      <Filter>Source Files\Crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum_commons\formats\passwd.c">
+      <Filter>Source Files\Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum_commons\formats\url.c">
+      <Filter>Source Files\Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum_commons\test\unit.c">
+      <Filter>Source Files\Test</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\src\viriatum_commons\_config_win32.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\viriatum_commons.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\checksum\checksum.h">
+      <Filter>Header Files\Checksum</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\checksum\crc_32.h">
+      <Filter>Header Files\Checksum</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\checksum\md5.h">
+      <Filter>Header Files\Checksum</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\checksum\sha1.h">
+      <Filter>Header Files\Checksum</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\encoding\base_64.h">
+      <Filter>Header Files\Encoding</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\encoding\bencoding.h">
+      <Filter>Header Files\Encoding</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\encoding\encoding.h">
+      <Filter>Header Files\Encoding</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\encoding\percent.h">
+      <Filter>Header Files\Encoding</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\global\common.h">
+      <Filter>Header Files\Global</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\global\compilation.h">
+      <Filter>Header Files\Global</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\global\compiler.h">
+      <Filter>Header Files\Global</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\global\cpu.h">
+      <Filter>Header Files\Global</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\global\definitions.h">
+      <Filter>Header Files\Global</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\global\memory.h">
+      <Filter>Header Files\Global</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\global\platforms.h">
+      <Filter>Header Files\Global</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\global\resource.h">
+      <Filter>Header Files\Global</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\global\targetver.h">
+      <Filter>Header Files\Global</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\global\types.h">
+      <Filter>Header Files\Global</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\structures\array_list.h">
+      <Filter>Header Files\Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\structures\buffer.h">
+      <Filter>Header Files\Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\structures\date_time.h">
+      <Filter>Header Files\Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\structures\hash_map.h">
+      <Filter>Header Files\Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\structures\iterator.h">
+      <Filter>Header Files\Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\structures\linked_buffer.h">
+      <Filter>Header Files\Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\structures\linked_list.h">
+      <Filter>Header Files\Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\structures\priority_queue.h">
+      <Filter>Header Files\Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\structures\sort_map.h">
+      <Filter>Header Files\Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\structures\string.h">
+      <Filter>Header Files\Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\structures\string_buffer.h">
+      <Filter>Header Files\Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\structures\structures.h">
+      <Filter>Header Files\Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\structures\type.h">
+      <Filter>Header Files\Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\system\_thread_win32.h">
+      <Filter>Header Files\System</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\system\dynamic.h">
+      <Filter>Header Files\System</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\system\socket.h">
+      <Filter>Header Files\System</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\system\system.h">
+      <Filter>Header Files\System</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\system\system_util.h">
+      <Filter>Header Files\System</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\system\thread.h">
+      <Filter>Header Files\System</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\thread\thread.h">
+      <Filter>Header Files\Thread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\thread\thread_pool.h">
+      <Filter>Header Files\Thread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\util\arguments_util.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\util\dump_util.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\util\function_util.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\util\random_util.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\util\string_util.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\util\string_util_s.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\util\util.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\debug\debug.h">
+      <Filter>Header Files\Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\debug\error.h">
+      <Filter>Header Files\Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\debug\logging.h">
+      <Filter>Header Files\Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\memory\memory.h">
+      <Filter>Header Files\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\memory\memory_pool.h">
+      <Filter>Header Files\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\compression\compression.h">
+      <Filter>Header Files\Compression</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\compression\huffman.h">
+      <Filter>Header Files\Compression</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\stream\bit_stream.h">
+      <Filter>Header Files\Stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\stream\file_stream.h">
+      <Filter>Header Files\Stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\stream\io_stream.h">
+      <Filter>Header Files\Stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\stream\memory_stream.h">
+      <Filter>Header Files\Stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\stream\stream.h">
+      <Filter>Header Files\Stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\template\engine.h">
+      <Filter>Header Files\Template</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\template\handler.h">
+      <Filter>Header Files\Template</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\template\template.h">
+      <Filter>Header Files\Template</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\sorting\base.h">
+      <Filter>Header Files\Sorting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\sorting\quicksort.h">
+      <Filter>Header Files\Sorting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\sorting\sorting.h">
+      <Filter>Header Files\Sorting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\jni\info.h">
+      <Filter>Header Files\Jni</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\jni\jni.h">
+      <Filter>Header Files\Jni</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\jni\start.h">
+      <Filter>Header Files\Jni</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\ini\ini.h">
+      <Filter>Header Files\Ini</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\io\file.h">
+      <Filter>Header Files\Io</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\io\io.h">
+      <Filter>Header Files\Io</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\crypto\crypto.h">
+      <Filter>Header Files\Crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\crypto\rc4.h">
+      <Filter>Header Files\Crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\formats\formats.h">
+      <Filter>Header Files\Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\formats\passwd.h">
+      <Filter>Header Files\Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\formats\url.h">
+      <Filter>Header Files\Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\test\test.h">
+      <Filter>Header Files\Test</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum_commons\test\unit.h">
+      <Filter>Header Files\Test</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\..\src\viriatum_commons\ReadMe.txt" />
+  </ItemGroup>
+</Project>
