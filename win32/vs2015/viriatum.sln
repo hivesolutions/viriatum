@@ -8,41 +8,41 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "viriatum_commons", "viriatum_commons.vcxproj", "{E24C2D58-2F86-4C49-BD2E-F017C5FF2E0E}"
 EndProject
 Global
-	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug (Dynamic)|x86 = Debug (Dynamic)|x86
-		Debug|x86 = Debug|x86
-		Library (Dynamic)|x86 = Library (Dynamic)|x86
-		Library|x86 = Library|x86
-		Release (Dynamic)|x86 = Release (Dynamic)|x86
-		Release|x86 = Release|x86
-	EndGlobalSection
-	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{39D9BE30-4876-4DAE-94BC-0F0E84AE5BA3}.Debug (Dynamic)|x86.ActiveCfg = Debug (Dynamic)|Win32
-		{39D9BE30-4876-4DAE-94BC-0F0E84AE5BA3}.Debug (Dynamic)|x86.Build.0 = Debug (Dynamic)|Win32
-		{39D9BE30-4876-4DAE-94BC-0F0E84AE5BA3}.Debug|x86.ActiveCfg = Debug|Win32
-		{39D9BE30-4876-4DAE-94BC-0F0E84AE5BA3}.Debug|x86.Build.0 = Debug|Win32
-		{39D9BE30-4876-4DAE-94BC-0F0E84AE5BA3}.Library (Dynamic)|x86.ActiveCfg = Library (Dynamic)|Win32
-		{39D9BE30-4876-4DAE-94BC-0F0E84AE5BA3}.Library (Dynamic)|x86.Build.0 = Library (Dynamic)|Win32
-		{39D9BE30-4876-4DAE-94BC-0F0E84AE5BA3}.Library|x86.ActiveCfg = Library|Win32
-		{39D9BE30-4876-4DAE-94BC-0F0E84AE5BA3}.Library|x86.Build.0 = Library|Win32
-		{39D9BE30-4876-4DAE-94BC-0F0E84AE5BA3}.Release (Dynamic)|x86.ActiveCfg = Release (Dynamic)|Win32
-		{39D9BE30-4876-4DAE-94BC-0F0E84AE5BA3}.Release (Dynamic)|x86.Build.0 = Release (Dynamic)|Win32
-		{39D9BE30-4876-4DAE-94BC-0F0E84AE5BA3}.Release|x86.ActiveCfg = Release|Win32
-		{39D9BE30-4876-4DAE-94BC-0F0E84AE5BA3}.Release|x86.Build.0 = Release|Win32
-		{E24C2D58-2F86-4C49-BD2E-F017C5FF2E0E}.Debug (Dynamic)|x86.ActiveCfg = Debug (Dynamic)|Win32
-		{E24C2D58-2F86-4C49-BD2E-F017C5FF2E0E}.Debug (Dynamic)|x86.Build.0 = Debug (Dynamic)|Win32
-		{E24C2D58-2F86-4C49-BD2E-F017C5FF2E0E}.Debug|x86.ActiveCfg = Debug|Win32
-		{E24C2D58-2F86-4C49-BD2E-F017C5FF2E0E}.Debug|x86.Build.0 = Debug|Win32
-		{E24C2D58-2F86-4C49-BD2E-F017C5FF2E0E}.Library (Dynamic)|x86.ActiveCfg = Library (Dynamic)|Win32
-		{E24C2D58-2F86-4C49-BD2E-F017C5FF2E0E}.Library (Dynamic)|x86.Build.0 = Library (Dynamic)|Win32
-		{E24C2D58-2F86-4C49-BD2E-F017C5FF2E0E}.Library|x86.ActiveCfg = Library|Win32
-		{E24C2D58-2F86-4C49-BD2E-F017C5FF2E0E}.Library|x86.Build.0 = Library|Win32
-		{E24C2D58-2F86-4C49-BD2E-F017C5FF2E0E}.Release (Dynamic)|x86.ActiveCfg = Release (Dynamic)|Win32
-		{E24C2D58-2F86-4C49-BD2E-F017C5FF2E0E}.Release (Dynamic)|x86.Build.0 = Release (Dynamic)|Win32
-		{E24C2D58-2F86-4C49-BD2E-F017C5FF2E0E}.Release|x86.ActiveCfg = Release|Win32
-		{E24C2D58-2F86-4C49-BD2E-F017C5FF2E0E}.Release|x86.Build.0 = Release|Win32
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
-	EndGlobalSection
+    GlobalSection(SolutionConfigurationPlatforms) = preSolution
+        Debug (Dynamic)|x86 = Debug (Dynamic)|x86
+        Debug|x86 = Debug|x86
+        Library (Dynamic)|x86 = Library (Dynamic)|x86
+        Library|x86 = Library|x86
+        Release (Dynamic)|x86 = Release (Dynamic)|x86
+        Release|x86 = Release|x86
+    EndGlobalSection
+    GlobalSection(ProjectConfigurationPlatforms) = postSolution
+        {39D9BE30-4876-4DAE-94BC-0F0E84AE5BA3}.Debug (Dynamic)|x86.ActiveCfg = Debug (Dynamic)|Win32
+        {39D9BE30-4876-4DAE-94BC-0F0E84AE5BA3}.Debug (Dynamic)|x86.Build.0 = Debug (Dynamic)|Win32
+        {39D9BE30-4876-4DAE-94BC-0F0E84AE5BA3}.Debug|x86.ActiveCfg = Debug|Win32
+        {39D9BE30-4876-4DAE-94BC-0F0E84AE5BA3}.Debug|x86.Build.0 = Debug|Win32
+        {39D9BE30-4876-4DAE-94BC-0F0E84AE5BA3}.Library (Dynamic)|x86.ActiveCfg = Library (Dynamic)|Win32
+        {39D9BE30-4876-4DAE-94BC-0F0E84AE5BA3}.Library (Dynamic)|x86.Build.0 = Library (Dynamic)|Win32
+        {39D9BE30-4876-4DAE-94BC-0F0E84AE5BA3}.Library|x86.ActiveCfg = Library|Win32
+        {39D9BE30-4876-4DAE-94BC-0F0E84AE5BA3}.Library|x86.Build.0 = Library|Win32
+        {39D9BE30-4876-4DAE-94BC-0F0E84AE5BA3}.Release (Dynamic)|x86.ActiveCfg = Release (Dynamic)|Win32
+        {39D9BE30-4876-4DAE-94BC-0F0E84AE5BA3}.Release (Dynamic)|x86.Build.0 = Release (Dynamic)|Win32
+        {39D9BE30-4876-4DAE-94BC-0F0E84AE5BA3}.Release|x86.ActiveCfg = Release|Win32
+        {39D9BE30-4876-4DAE-94BC-0F0E84AE5BA3}.Release|x86.Build.0 = Release|Win32
+        {E24C2D58-2F86-4C49-BD2E-F017C5FF2E0E}.Debug (Dynamic)|x86.ActiveCfg = Debug (Dynamic)|Win32
+        {E24C2D58-2F86-4C49-BD2E-F017C5FF2E0E}.Debug (Dynamic)|x86.Build.0 = Debug (Dynamic)|Win32
+        {E24C2D58-2F86-4C49-BD2E-F017C5FF2E0E}.Debug|x86.ActiveCfg = Debug|Win32
+        {E24C2D58-2F86-4C49-BD2E-F017C5FF2E0E}.Debug|x86.Build.0 = Debug|Win32
+        {E24C2D58-2F86-4C49-BD2E-F017C5FF2E0E}.Library (Dynamic)|x86.ActiveCfg = Library (Dynamic)|Win32
+        {E24C2D58-2F86-4C49-BD2E-F017C5FF2E0E}.Library (Dynamic)|x86.Build.0 = Library (Dynamic)|Win32
+        {E24C2D58-2F86-4C49-BD2E-F017C5FF2E0E}.Library|x86.ActiveCfg = Library|Win32
+        {E24C2D58-2F86-4C49-BD2E-F017C5FF2E0E}.Library|x86.Build.0 = Library|Win32
+        {E24C2D58-2F86-4C49-BD2E-F017C5FF2E0E}.Release (Dynamic)|x86.ActiveCfg = Release (Dynamic)|Win32
+        {E24C2D58-2F86-4C49-BD2E-F017C5FF2E0E}.Release (Dynamic)|x86.Build.0 = Release (Dynamic)|Win32
+        {E24C2D58-2F86-4C49-BD2E-F017C5FF2E0E}.Release|x86.ActiveCfg = Release|Win32
+        {E24C2D58-2F86-4C49-BD2E-F017C5FF2E0E}.Release|x86.Build.0 = Release|Win32
+    EndGlobalSection
+    GlobalSection(SolutionProperties) = preSolution
+        HideSolutionNode = FALSE
+    EndGlobalSection
 EndGlobal
