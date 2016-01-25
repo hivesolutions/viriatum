@@ -1,15 +1,15 @@
 {
-    "name" : "viriatum",
-    "version" : "0.3.0b3",
-    "description" : "Viriatum HTTP Server",
-    "author" : "Hive Solutions <development@hive.pt>",
-    "repo" : "git://github.com/hivesolutions/viriatum.git",
-    "scripts" : {
-        "win32" : "win32/build.py",
-        "unix" : "unix/build.py"
+    "name": "viriatum",
+    "version": "0.3.0b3",
+    "description": "Viriatum HTTP Server",
+    "author": "Hive Solutions <development@hive.pt>",
+    "repo": "git://github.com/hivesolutions/viriatum.git",
+    "scripts": {
+        "win32": "win32/build.py",
+        "unix": "unix/build.py"
     },
-    "verify" : {
-        "*" : "all/verify.py"
+    "verify": {
+        "*": "all/verify.py"
     },
-    "recursion" : [0, 0, 1, 0, 0]
+    "recursion": [0, 0, 1, 0, 0]
 }
