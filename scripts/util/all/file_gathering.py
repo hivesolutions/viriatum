@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # Hive Viriatum Web Server
-# Copyright (C) 2008-2015 Hive Solutions Lda.
+# Copyright (C) 2008-2016 Hive Solutions Lda.
 #
 # This file is part of Hive Viriatum Web Server.
 #
@@ -31,7 +31,7 @@ __revision__ = "$LastChangedRevision: 421 $"
 __date__ = "$LastChangedDate: 2008-11-20 15:16:53 +0000 (Qui, 20 Nov 2008) $"
 """ The last change date of the module """
 
-__copyright__ = "Copyright (c) 2008-2015 Hive Solutions Lda."
+__copyright__ = "Copyright (c) 2008-2016 Hive Solutions Lda."
 """ The copyright for the module """
 
 __license__ = "GNU General Public License (GPL), Version 3"
