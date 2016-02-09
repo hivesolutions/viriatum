@@ -219,4 +219,4 @@ git repository, so that the version is correctly identified for the repository c
 
 ## License
 
-Viriatum is an open-source project licensed under the [GNU General Public License Version 3](http://www.gnu.org/licenses/gpl.html).
+Viriatum is currently licensed under the [Apache License, Version 2.0](http://www.apache.org/licenses/).
