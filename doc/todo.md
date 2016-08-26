@@ -1,7 +1,7 @@
 ## New features
 
 * Support for a bittorrent variant of the viriatum server
-* Ass support for a directory on ini files (configuration.d) so that all files there are read in sequence (usefull for modules configuration)
+* Ass support for a directory on ini files (configuration.d) so that all files there are read in sequence (useful for modules configuration)
 * Support for OpenSSL with non blocking sockets (http://stackoverflow.com/questions/5397788/confused-about-openssl-non-blocking-i-o https://groups.google.com/forum/?fromgroups#!topic/mailing.openssl.users/nJRF_JVnPkc)
 * Support for the SPDY protocol (http://dev.chromium.org/spdy)
 * Support for async file reading (http://linux.die.net/man/3/aio_read http://msdn.microsoft.com/en-us/library/windows/desktop/aa365747(v=vs.85).aspx http://lxr.evanmiller.org/http/source/os/unix/ngx_aio_read.c http://www.ibm.com/developerworks/linux/library/l-async/)
@@ -26,12 +26,12 @@
 * [SSL Labs SSL test](https://www.ssllabs.com/ssltest/) is a service that provides extensive
 SSL testing for a certain domain (universally acclaimed)
 * [securityheaders.io](https://securityheaders.io/) provides a web service that verifies a
-series of HTTP headers trying to find if they ensure a proparly secured web page
+series of HTTP headers trying to find if they ensure a properly secured web page
 
 ## Design decisions
 
-* Create a structure similiar to the asynchronous model defined in the colony service implementations
-* Separate the concept of service from the handler of the select (select_service does not make sensess)
+* Create a structure similar to the asynchronous model defined in the colony service implementations
+* Separate the concept of service from the handler of the select (select_service does not make sense)
 
 ## Performance refactor
 
@@ -39,7 +39,7 @@ series of HTTP headers trying to find if they ensure a proparly secured web page
 
 ## Worker processes
 
-* Spawn for working processes occurs for complete cpu usage (nginx reference - http://wiki.nginx.org/CoreModule#worker_processes)
+* Spawn for working processes occurs for complete CPU usage (nginx reference - http://wiki.nginx.org/CoreModule#worker_processes)
 * Control of the working processed described here (http://nginx.org/en/docs/control.html)
 * Some general information about nginx architecture (includes worker process) http://www.slideshare.net/joshzhu/nginx-internals
 * Forking a process inherits the hability to handle connections, so thats how nginx works this out (http://stackoverflow.com/questions/670891/is-there-a-way-for-multiple-processes-to-share-a-listening-socket)
