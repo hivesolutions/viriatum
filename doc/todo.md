@@ -20,9 +20,13 @@
 * Compile all the regular expression into a single one like nginx (http://nginx.sourcearchive.com/documentation/1.1.4-2/ngx__regex_8c_source.html)
 * Implement and refactor win32 conditions (_thread_win32.c) use this link http://thbecker.net/free_software_utilities/fair_monitor_for_win32/start_page.html
 
-## Fuzzy Testing
+## Testing
 
 * [pathoc](http://pathod.net) (a perverse HTTP client) is a nice tool for testing [simple examples](http://corte.si/posts/code/pathod/pythonservers/index.html)
+* [SSL Labs SSL test](https://www.ssllabs.com/ssltest/) is a service that provides extensive
+SSL testing for a certain domain (universally acclaimed)
+* [securityheaders.io](https://securityheaders.io/) provides a web service that verifies a
+series of HTTP headers trying to find if they ensure a proparly secured web page
 
 ## Design decisions
 
