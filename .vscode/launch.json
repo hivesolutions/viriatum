@@ -5,12 +5,12 @@
             "name": "C++ Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "enter program name, for example ${workspaceRoot}/a.out",
+            "preLaunchTask": "make",
+            "program": "${workspaceRoot}/src/viriatum/viriatum",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceRoot}",
             "environment": [],
-            "externalConsole": true,
             "linux": {
                 "MIMode": "gdb"
             },
