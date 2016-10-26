@@ -27,6 +27,8 @@
 
 #pragma once
 
+#include "../system/system_util.h"
+
 #ifdef VIRIATUM_PLATFORM_WIN32
 #define DEBUGGER __debugreak();
 #else
@@ -43,13 +45,16 @@
 #define RAISE_AGAIN(error_code) return error_code
 #define RAISE_ERROR(error_code) set_last_error_message(NULL); return error_code
 #define RAISE_ERROR_M(error_code, error_message) set_last_error_message(error_message); return error_code
+#define RAISE_ERROR_F(error_code, error_message, ...) set_last_error_message_f(error_message, __VA_ARGS__); return error_code
 #define RAISE_ERROR_S(error_code) return error_code
 #define RAISE_NO_ERROR return 0
+#define RESET_ERROR unset_last_error_message()
 #define IS_ERROR_CODE(error_code) (error_code != 0)
 #define GET_ERROR get_last_error_message_safe
 
 VIRIATUM_EXTERNAL_PREFIX unsigned int last_error_code;
 VIRIATUM_EXTERNAL_PREFIX unsigned char *last_error_message;
+VIRIATUM_EXTERNAL_PREFIX unsigned char last_error_message_b[4098];
 
 /**
  * Retrieves the last (current) error code available.
@@ -84,5 +89,27 @@ static __inline unsigned char *get_last_error_message_safe() {
 }
 
 static __inline void set_last_error_message(unsigned char *error_message) {
-    last_error_message = error_message;
+    memcpy(
+        (char *) last_error_message_b,
+        (char *) error_message,
+        strlen((char *) error_message) + 1
+    );
+    last_error_message = last_error_message_b;
+}
+
+static __inline void set_last_error_message_f(unsigned char *error_message, ...) {
+    va_list args;
+    va_start(args, error_message);
+    VSPRINTF(
+        (char *) last_error_message_b,
+        strlen((char *) error_message) + 1,
+        (char *) error_message,
+        args
+    );
+    va_end(args);
+    last_error_message = last_error_message_b;
+}
+
+static __inline void unset_last_error_message() {
+    last_error_message = NULL;
 }

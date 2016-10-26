@@ -95,9 +95,10 @@ ERROR_CODE process_ini_file(char *file_path, struct sort_map_t **configuration_p
     error prints it to the error stream output */
     return_value = read_file(file_path, &file_buffer, &file_size);
     if(IS_ERROR_CODE(return_value)) {
-        RAISE_ERROR_M(
+        RAISE_ERROR_F(
             RUNTIME_EXCEPTION_ERROR_CODE,
-            (unsigned char *) "Problem reading file"
+            (unsigned char *) "Problem reading file %s",
+            file_path
         );
     }
 
@@ -178,7 +179,7 @@ ERROR_CODE process_ini_file(char *file_path, struct sort_map_t **configuration_p
     }
 
     /* releases the buffer used durring the parsing of
-    the configuration file */
+    the configuration file (avoids leaks) */
     FREE(file_buffer);
 
     /* raises no error */

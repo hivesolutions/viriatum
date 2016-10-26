@@ -1,25 +1,23 @@
 {
     "version": "0.2.0",
-    "configurations": [
-        {
-            "name": "C++ Launch",
-            "type": "cppdbg",
-            "request": "launch",
-            "preLaunchTask": "make",
-            "program": "${workspaceRoot}/src/viriatum/viriatum",
-            "args": [],
-            "stopAtEntry": false,
-            "cwd": "${workspaceRoot}",
-            "environment": [],
-            "linux": {
-                "MIMode": "gdb"
-            },
-            "osx": {
-                "MIMode": "lldb"
-            },
-            "windows": {
-                "MIMode": "gdb"
-            }
+    "configurations": [{
+        "name": "C++ Launch",
+        "type": "cppdbg",
+        "request": "launch",
+        "preLaunchTask": "make",
+        "program": "${workspaceRoot}/src/viriatum/viriatum",
+        "args": [],
+        "stopAtEntry": false,
+        "cwd": "${workspaceRoot}/src",
+        "environment": [],
+        "linux": {
+            "MIMode": "gdb"
+        },
+        "osx": {
+            "MIMode": "lldb"
+        },
+        "windows": {
+            "MIMode": "gdb"
         }
-    ]
+    }]
 }

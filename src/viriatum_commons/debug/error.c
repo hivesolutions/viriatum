@@ -31,3 +31,4 @@
 
 unsigned int last_error_code = 0;
 unsigned char *last_error_message = NULL;
+unsigned char last_error_message_b[4098] = "";
