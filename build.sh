@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # -*- coding: utf-8 -*-
 
 # Hive Viriatum Web Server
@@ -26,4 +26,32 @@
 # __copyright__ = Copyright (c) 2008-2016 Hive Solutions Lda.
 # __license__   = Apache License, Version 2.0
 
-make -f Makefile-gen all
+DARWIN=${DARWIN-0}
+RUN_GEN=${RUN_CONFIGURE-1}
+RUN_CONFIGURE=${RUN_CONFIGURE-0}
+RUN_MAKE=${RUN_MAKE-0}
+RUN_TEST=${RUN_TEST-0}
+
+if [ "$RUN_GEN" == "1" ]; then
+    if [ ! -e "configure" ]; then
+        if [ "$DARWIN" == "1" ]; then
+            make -f Makefile-gen mac-darwin
+        else
+            make -f Makefile-gen all
+        fi
+    fi
+fi
+
+if [ "$RUN_CONFIGURE" == "1" ]; then
+    if [ ! -e "Makefile" ]; then
+        ./configure
+    fi
+fi
+
+if [ "$RUN_MAKE" == "1" ]; then
+    make
+fi
+
+if [ "$RUN_TEST" == "1" ] || [ "$1" == "test" ]; then
+    src/viriatum/viriatum --test
+fi

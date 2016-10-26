@@ -1,7 +1,7 @@
 {
     "version": "0.1.0",
     "linux": {
-        "command": "${workspaceRoot}/autogen.sh",
+        "command": "${workspaceRoot}/build.sh",
         "isShellCommand": true,
         "args": [],
         "showOutput": "always",
@@ -12,11 +12,11 @@
             }
         },
         "tasks": [{
-            "taskName": "autogen",
+            "taskName": "build",
             "isBuildCommand": true,
             "suppressTaskName": true
         }, {
-            "taskName": "autogen-test",
+            "taskName": "build-test",
             "args": [
                 "test"
             ],
@@ -25,7 +25,7 @@
         }]
     },
     "osx": {
-        "command": "${workspaceRoot}/autogen.sh",
+        "command": "${workspaceRoot}/build.sh",
         "isShellCommand": true,
         "args": [],
         "showOutput": "always",
@@ -38,11 +38,11 @@
             }
         },
         "tasks": [{
-            "taskName": "autogen",
+            "taskName": "build",
             "isBuildCommand": true,
             "suppressTaskName": true
         }, {
-            "taskName": "autogen-test",
+            "taskName": "build-test",
             "args": [
                 "test"
             ],
