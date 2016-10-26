@@ -83,7 +83,7 @@ static __inline unsigned char *get_last_error_message() {
 static __inline unsigned char *get_last_error_message_safe() {
     /* in case the last error message is not set
     returns the empty error message */
-    if(last_error_message == NULL) {    
+    if(last_error_message == NULL) {
         return (unsigned char *) EMPTY_ERROR_MESSAGE;
     }
     /* otherwise (normal behaviour, returns the last

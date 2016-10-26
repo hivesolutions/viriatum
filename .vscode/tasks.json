@@ -1,7 +1,30 @@
 {
     "version": "0.1.0",
-    "command": "make",
-    "isShellCommand": true,
-    "args": [],
-    "showOutput": "always"
+    "command": "autogen",
+    "linux": {
+        "command": "${workspaceRoot}/autogen.sh",
+        "isShellCommand": true,
+        "args": [],
+        "options": {
+            "env": {
+                "RUN_CONFIGURE": "1",
+                "RUN_MAKE": "1"
+            }
+        },
+        "showOutput": "always"
+    },
+    "osx": {
+        "command": "${workspaceRoot}/autogen.sh",
+        "isShellCommand": true,
+        "args": [],
+        "options": {
+            "env": {
+                "DARWIN": "1",
+                "RUN_CONFIGURE": "1",
+                "RUN_MAKE": "1",
+                "CC": "clang"
+            }
+        },
+        "showOutput": "always"
+    }
 }
