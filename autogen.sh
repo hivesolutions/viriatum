@@ -26,4 +26,9 @@
 # __copyright__ = Copyright (c) 2008-2016 Hive Solutions Lda.
 # __license__   = Apache License, Version 2.0
 
-make -f Makefile-gen all
+if [ "$DARWIN" == 1 ]; then
+    make -f Makefile-gen mac-darwin
+else
+    make -f Makefile-gen all
+fi
+
