@@ -45,7 +45,7 @@
 
 #define ERROR_CODE unsigned int
 #define RAISE_AGAIN(error_code) return error_code
-#define RAISE_ERROR(error_code) set_last_error_message(NULL); return error_code
+#define RAISE_ERROR(error_code) unset_last_error_message(); return error_code
 #define RAISE_ERROR_M(error_code, error_message) set_last_error_message(error_message); return error_code
 #define RAISE_ERROR_F(error_code, error_message, ...) set_last_error_message_f(error_message, __VA_ARGS__); return error_code
 #define RAISE_ERROR_S(error_code) return error_code
@@ -90,15 +90,7 @@ static __inline unsigned char *get_last_error_message_safe() {
     }
 }
 
-static __inline void unset_last_error_message() {
-    last_error_message = NULL;
-}
-
 static __inline void set_last_error_message(unsigned char *error_message) {
-    if(error_message == NULL) {
-        unset_last_error_message();
-        return;
-    }
     memcpy(
         (char *) last_error_message_b,
         (char *) error_message,
@@ -118,4 +110,8 @@ static __inline void set_last_error_message_f(unsigned char *error_message, ...)
     );
     va_end(args);
     last_error_message = last_error_message_b;
+}
+
+static __inline void unset_last_error_message() {
+    last_error_message = NULL;
 }
