@@ -13,11 +13,18 @@
         },
         "tasks": [{
             "taskName": "autogen",
+            "isBuildCommand": true,
+            "suppressTaskName": true
+        }, {
+            "taskName": "autogen-test",
+            "args": [
+                "test"
+            ],
+            "isTestCommand": true,
             "suppressTaskName": true
         }]
     },
     "osx": {
-        "taskName": "autogen",
         "command": "${workspaceRoot}/autogen.sh",
         "isShellCommand": true,
         "args": [],
@@ -32,6 +39,14 @@
         },
         "tasks": [{
             "taskName": "autogen",
+            "isBuildCommand": true,
+            "suppressTaskName": true
+        }, {
+            "taskName": "autogen-test",
+            "args": [
+                "test"
+            ],
+            "isTestCommand": true,
             "suppressTaskName": true
         }]
     }

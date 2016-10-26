@@ -30,6 +30,7 @@ DARWIN=${DARWIN-0}
 RUN_GEN=${RUN_CONFIGURE-1}
 RUN_CONFIGURE=${RUN_CONFIGURE-0}
 RUN_MAKE=${RUN_MAKE-0}
+RUN_TEST=${RUN_TEST-0}
 
 if [ "$RUN_GEN" == "1" ]; then
     if [ ! -e "configure" ]; then
@@ -49,4 +50,8 @@ fi
 
 if [ "$RUN_MAKE" == "1" ]; then
     make
+fi
+
+if [ "$RUN_TEST" == "1" ] || [ "$1" == "test" ]; then
+    src/viriatum/viriatum --test
 fi
