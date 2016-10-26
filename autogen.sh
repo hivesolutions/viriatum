@@ -30,14 +30,18 @@ DARWIN=${DARWIN-0}
 RUN_CONFIGURE=${RUN_CONFIGURE-0}
 RUN_MAKE=${RUN_MAKE-0}
 
-if [ "$DARWIN" == "1" ]; then
-    make -f Makefile-gen mac-darwin
-else
-    make -f Makefile-gen all
+if [ ! -e "configure" ]; then
+    if [ "$DARWIN" == "1" ]; then
+        make -f Makefile-gen mac-darwin
+    else
+        make -f Makefile-gen all
+    fi
 fi
 
 if [ "$RUN_CONFIGURE" == "1" ]; then
-    ./configure
+    if [ ! -e "Makefile" ]; then
+        ./configure
+    fi
 fi
 
 if [ "$RUN_MAKE" == "1" ]; then
