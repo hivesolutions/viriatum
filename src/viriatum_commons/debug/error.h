@@ -45,7 +45,7 @@
 #define RAISE_ERROR_M(error_code, error_message) set_last_error_message(error_message); return error_code
 #define RAISE_ERROR_S(error_code) return error_code
 #define RAISE_NO_ERROR return 0
-#define IS_ERROR_CODE(error_code) error_code != 0
+#define IS_ERROR_CODE(error_code) (error_code != 0)
 #define GET_ERROR get_last_error_message_safe
 
 VIRIATUM_EXTERNAL_PREFIX unsigned int last_error_code;
