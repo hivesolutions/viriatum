@@ -2152,7 +2152,10 @@ ERROR_CODE _file_options_service(struct service_t *service, struct hash_map_t *a
     SPRINTF(config_path, VIRIATUM_MAX_PATH_SIZE, "%s/viriatum.ini", VIRIATUM_CONFIG_PATH);
     V_DEBUG_F("Loading configuration file (%s)\n", config_path);
     return_value = process_ini_file(config_path, &configuration);
-    if(IS_ERROR_CODE(return_value)) { RAISE_AGAIN(return_value); }
+    if(IS_ERROR_CODE(return_value)) { CATCH_ERROR; }
+
+    /* sets the configuraation structure under the service structure
+    so that it may be latter used for operations */
     service->configuration = configuration;
 
     /* prints a debug message about the loading of the configuration

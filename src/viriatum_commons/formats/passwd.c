@@ -67,9 +67,10 @@ ERROR_CODE process_passwd_file(char *file_path, struct hash_map_t **passwd_point
     provided path an in case an error occurs re-raises it */
     return_value = read_file(file_path, &buffer, &size);
     if(IS_ERROR_CODE(return_value)) {
-        RAISE_ERROR_M(
+        RAISE_ERROR_F(
             RUNTIME_EXCEPTION_ERROR_CODE,
-            (unsigned char *) "Problem reading file"
+            (unsigned char *) "Problem reading file %s",
+            file_path
         );
     }
 

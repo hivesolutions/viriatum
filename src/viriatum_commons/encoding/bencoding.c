@@ -165,9 +165,10 @@ ERROR_CODE decode_bencoding_file(char *file_path, struct type_t **type_pointer) 
     error prints it to the error stream output */
     return_value = read_file(file_path, &file_buffer, &file_size);
     if(IS_ERROR_CODE(return_value)) {
-        RAISE_ERROR_M(
+        RAISE_ERROR_F(
             RUNTIME_EXCEPTION_ERROR_CODE,
-            (unsigned char *) "Problem reading file"
+            (unsigned char *) "Problem reading file %s",
+            file_path
         );
     }
 

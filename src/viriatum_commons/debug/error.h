@@ -28,6 +28,7 @@
 #pragma once
 
 #include "../system/system_util.h"
+#include "logging.h"
 
 #ifdef VIRIATUM_PLATFORM_WIN32
 #define DEBUGGER __debugreak();
@@ -50,6 +51,8 @@
 #define RAISE_ERROR_F(error_code, error_message, ...) set_last_error_message_f(error_message, __VA_ARGS__); return error_code
 #define RAISE_ERROR_S(error_code) return error_code
 #define RAISE_NO_ERROR return 0
+#define CATCH_ERROR V_WARNING_F("%s\n", get_last_error_message_safe()); unset_last_error_message()
+#define CATCH_ERROR_R CATCH_ERROR; return 0
 #define RESET_ERROR unset_last_error_message()
 #define IS_ERROR_CODE(error_code) (error_code != 0)
 #define GET_ERROR get_last_error_message_safe
@@ -78,14 +81,14 @@ static __inline unsigned char *get_last_error_message() {
 }
 
 static __inline unsigned char *get_last_error_message_safe() {
-    /* in case the last error message is not set */
-    if(last_error_message == NULL) {
-        /* returns the empty error message */
+    /* in case the last error message is not set
+    returns the empty error message */
+    if(last_error_message == NULL) {    
         return (unsigned char *) EMPTY_ERROR_MESSAGE;
     }
-    /* otherwise (normal behaviour */
+    /* otherwise (normal behaviour, returns the last
+    error message value as a string */
     else {
-        /* returns the last error message */
         return last_error_message;
     }
 }
