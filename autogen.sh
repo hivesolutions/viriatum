@@ -27,14 +27,17 @@
 # __license__   = Apache License, Version 2.0
 
 DARWIN=${DARWIN-0}
+RUN_GEN=${RUN_CONFIGURE-1}
 RUN_CONFIGURE=${RUN_CONFIGURE-0}
 RUN_MAKE=${RUN_MAKE-0}
 
-if [ ! -e "configure" ]; then
-    if [ "$DARWIN" == "1" ]; then
-        make -f Makefile-gen mac-darwin
-    else
-        make -f Makefile-gen all
+if [ "$RUN_GEN" == "1" ]; then
+    if [ ! -e "configure" ]; then
+        if [ "$DARWIN" == "1" ]; then
+            make -f Makefile-gen mac-darwin
+        else
+            make -f Makefile-gen all
+        fi
     fi
 fi
 
