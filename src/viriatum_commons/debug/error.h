@@ -109,10 +109,6 @@ static __inline void set_last_error_message(unsigned char *error_message) {
 
 static __inline void set_last_error_message_f(unsigned char *error_message, ...) {
     va_list args;
-    if(error_message == NULL) {
-        unset_last_error_message();
-        return;
-    }
     va_start(args, error_message);
     VSPRINTF(
         (char *) last_error_message_b,
