@@ -90,32 +90,36 @@ static __inline unsigned char *get_last_error_message_safe() {
     }
 }
 
+static __inline void unset_last_error_message() {
+    last_error_message = NULL;
+}
+
 static __inline void set_last_error_message(unsigned char *error_message) {
-	if(error_message != NULL) {
-		memcpy(
-			(char *) last_error_message_b,
-			(char *) error_message,
-			strlen((char *) error_message) + 1
-		);
-	}
+    if(error_message == NULL) {
+        unset_last_error_message();
+        return;
+    }
+    memcpy(
+        (char *) last_error_message_b,
+        (char *) error_message,
+        strlen((char *) error_message) + 1
+    );
     last_error_message = last_error_message_b;
 }
 
 static __inline void set_last_error_message_f(unsigned char *error_message, ...) {
     va_list args;
+    if(error_message == NULL) {
+        unset_last_error_message();
+        return;
+    }
     va_start(args, error_message);
-	if(error_message != NULL) {
-		VSPRINTF(
-			(char *) last_error_message_b,
-			ERROR_BUFFER_SIZE,
-			(char *) error_message,
-			args
-		);
-	}
+    VSPRINTF(
+        (char *) last_error_message_b,
+        ERROR_BUFFER_SIZE,
+        (char *) error_message,
+        args
+    );
     va_end(args);
     last_error_message = last_error_message_b;
-}
-
-static __inline void unset_last_error_message() {
-    last_error_message = NULL;
 }
