@@ -1,24 +1,27 @@
 {
     "version": "0.1.0",
-    "command": "autogen",
     "linux": {
-        "taskName": "autogen",
         "command": "${workspaceRoot}/autogen.sh",
         "isShellCommand": true,
         "args": [],
+        "showOutput": "always",
         "options": {
             "env": {
                 "RUN_CONFIGURE": "1",
                 "RUN_MAKE": "1"
             }
         },
-        "showOutput": "always"
+        "tasks": [{
+            "taskName": "autogen",
+            "suppressTaskName": true
+        }]
     },
     "osx": {
         "taskName": "autogen",
         "command": "${workspaceRoot}/autogen.sh",
         "isShellCommand": true,
         "args": [],
+        "showOutput": "always",
         "options": {
             "env": {
                 "DARWIN": "1",
@@ -27,6 +30,9 @@
                 "CC": "clang"
             }
         },
-        "showOutput": "always"
+        "tasks": [{
+            "taskName": "autogen",
+            "suppressTaskName": true
+        }]
     }
 }
