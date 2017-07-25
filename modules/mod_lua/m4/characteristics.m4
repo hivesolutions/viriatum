@@ -28,12 +28,20 @@ AC_HEADER_STDBOOL
 AC_C_INLINE
 AC_TYPE_SIZE_T
 
+# retrieves the version of the compiler that is being used, this
+# is going to be used for some definitions
+CC_VERSION=$($CC -dumpversion)
+
 # sets the silent rules for compilation
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 # verifies if the current compiler to be used is clang
 # if that's the case exposes it as an automake variable
 AM_CONDITIONAL(CLANG, [ test ${CC:0:5} = "clang" ])
+
+# verifies if the current compiler to be used is clang
+# if that's the case exposed it as an automake variable
+AM_CONDITIONAL(CNEO, [ test "${CC_VERSION:0:1}" -ge 7 ])
 
 # changes the library names spec to a non versioned
 # setting (avoid possible import problems)

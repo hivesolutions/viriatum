@@ -32,6 +32,7 @@ echo " + Install prefix        $prefix"
 echo " + Modules directory     $prefix/lib/viriatum/modules"
 echo " + CC                    $CC"
 echo " + CFLAGS                $CFLAGS"
+echo " + CC_VERSION            $CC_VERSION"
 echo " + DEBUG                 $have_debug"
 echo
 echo Instructions
