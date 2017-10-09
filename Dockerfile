@@ -1,5 +1,6 @@
 FROM hivesolutions/alpine_dev:latest
-MAINTAINER Hive Solutions
+
+LABEL maintainer="Hive Solutions <development@hive.pt>"
 
 EXPOSE 9090
 
