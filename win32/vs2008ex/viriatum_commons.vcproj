@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
     ProjectType="Visual C++"
-    Version="9,00"
+    Version="9.00"
     Name="viriatum_commons"
     ProjectGUID="{E24C2D58-2F86-4C49-BD2E-F017C5FF2E0E}"
     RootNamespace="viriatum_commons"
