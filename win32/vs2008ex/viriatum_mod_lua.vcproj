@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
     ProjectType="Visual C++"
-    Version="9,00"
+    Version="9.00"
     Name="viriatum_mod_lua"
     ProjectGUID="{163E6FE0-BBD8-49AA-9E4C-C88856322601}"
     RootNamespace="viriatum_mod_lua"
@@ -41,7 +41,7 @@
             <Tool
                 Name="VCCLCompilerTool"
                 Optimization="0"
-                PreprocessorDefinitions="WIN32;_DEBUG;_LIB;VIRIATUM_DEBUG;VIRIATUM_MEMORY_DEBUG"
+                PreprocessorDefinitions="WIN32;_DEBUG;_LIB;VIRIATUM_MEMORY_DEBUG"
                 MinimalRebuild="true"
                 BasicRuntimeChecks="3"
                 RuntimeLibrary="1"

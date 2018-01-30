@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
     ProjectType="Visual C++"
-    Version="9,00"
+    Version="9.00"
     Name="viriatum_mod_gif"
     ProjectGUID="{AD527577-164D-40EF-9BFF-F6176FFA55D0}"
     RootNamespace="viriatum_mod_gif"
@@ -41,7 +41,7 @@
             <Tool
                 Name="VCCLCompilerTool"
                 Optimization="0"
-                PreprocessorDefinitions="WIN32;_DEBUG;_LIB;VIRIATUM_DEBUG;VIRIATUM_MEMORY_DEBUG"
+                PreprocessorDefinitions="WIN32;_DEBUG;_LIB;VIRIATUM_MEMORY_DEBUG"
                 MinimalRebuild="true"
                 BasicRuntimeChecks="3"
                 RuntimeLibrary="1"
