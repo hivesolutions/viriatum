@@ -40,6 +40,11 @@ h1 {
     margin: 10px 0px 10px 0px;
     text-align: center;
     text-shadow: 1px 1px 1px #ffffff;
+    -o-text-shadow: 1px 1px 1px #ffffff;
+    -ms-text-shadow: 1px 1px 1px #ffffff;
+    -moz-text-shadow: 1px 1px 1px #ffffff;
+    -khtml-text-shadow: 1px 1px 1px #ffffff;
+    -webkit-text-shadow: 1px 1px 1px #ffffff;
     text-transform: uppercase;
 }
 
@@ -50,6 +55,11 @@ p {
     margin: 10px 0px 10px 0px;
     text-align: center;
     text-shadow: 1px 1px 1px #ffffff;
+    -o-text-shadow: 1px 1px 1px #ffffff;
+    -ms-text-shadow: 1px 1px 1px #ffffff;
+    -moz-text-shadow: 1px 1px 1px #ffffff;
+    -khtml-text-shadow: 1px 1px 1px #ffffff;
+    -webkit-text-shadow: 1px 1px 1px #ffffff;
 }
 
 a {
@@ -57,6 +67,11 @@ a {
     font-size: 8pt;
     text-decoration: none;
     text-shadow: 1px 1px 1px #ffffff;
+    -o-text-shadow: 1px 1px 1px #ffffff;
+    -ms-text-shadow: 1px 1px 1px #ffffff;
+    -moz-text-shadow: 1px 1px 1px #ffffff;
+    -khtml-text-shadow: 1px 1px 1px #ffffff;
+    -webkit-text-shadow: 1px 1px 1px #ffffff;
 }
 
 a:hover {
@@ -265,6 +280,11 @@ a:hover {
 span.separator {
     color: #aaaaaa;
     text-shadow: 2px 1px 1px #ffffff;
+    -o-text-shadow: 2px 1px 1px #ffffff;
+    -ms-text-shadow: 2px 1px 1px #ffffff;
+    -moz-text-shadow: 2px 1px 1px #ffffff;
+    -khtml-text-shadow: 2px 1px 1px #ffffff;
+    -webkit-text-shadow: 2px 1px 1px #ffffff;
 }
 
 .icon.arrow-left span {
@@ -333,6 +353,11 @@ span.separator {
     height: 50px;
     text-align: center;
     text-shadow: 1px 1px 1px #ffffff;
+    -o-text-shadow: 1px 1px 1px #ffffff;
+    -ms-text-shadow: 1px 1px 1px #ffffff;
+    -moz-text-shadow: 1px 1px 1px #ffffff;
+    -khtml-text-shadow: 1px 1px 1px #ffffff;
+    -webkit-text-shadow: 1px 1px 1px #ffffff;
     width: 100%;
 }
 
