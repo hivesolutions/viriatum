@@ -100,7 +100,7 @@ ERROR_CODE url_callback_handler_default(struct http_parser_t *http_parser, const
     /* copies the memory from the data to the url */
     memcpy(url, data, data_size);
 
-    /* puts the end of strng in the url */
+    /* puts the end of string in the url */
     url[data_size] = '\0';
 
     /* prints the url */
