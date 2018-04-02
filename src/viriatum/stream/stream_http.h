@@ -37,36 +37,36 @@ struct http_connection_t;
 typedef ERROR_CODE (*connection_data_callback_sh) (struct connection_t *, struct data_t *, void *);
 
 /**
- * Function used to update the given http connection
+ * Function used to update the given HTTP connection
  * with new information.
  *
- * @param http_connection The http connection to be
+ * @param http_connection The HTTP connection to be
  * update with new information.
  */
 typedef ERROR_CODE (*http_connection_update) (struct http_connection_t *http_connection);
 
 /**
- * Function used to populate a provided buffer with http
+ * Function used to populate a provided buffer with HTTP
  * headers information using the context of the provided
  * connection.
  */
 typedef size_t (*http_connection_headers) (struct connection_t *, char *, size_t, enum http_version_e, int, char *, enum http_keep_alive_e, char);
 
 /**
- * Function used to populate a provided buffer with http
+ * Function used to populate a provided buffer with HTTP
  * headers information using the context of the provided
  * connection.
  * This functions uses a more complete approach to the fill
- * of the http headers.
+ * of the HTTP headers.
  */
 typedef size_t (*http_connection_headers_c) (struct connection_t *, char *, size_t, enum http_version_e, int, char *, enum http_keep_alive_e, size_t, enum http_cache_e, int);
 
 /**
- * Function used to populate a provided buffer with http
+ * Function used to populate a provided buffer with HTTP
  * headers information using the context of the provided
  * connection.
  * This functions also populates the buffer with the message
- * part (contents) of the http message.
+ * part (contents) of the HTTP message.
  */
 typedef size_t (*http_connection_headers_m) (struct connection_t *, char *, size_t, enum http_version_e, int, char *, enum http_keep_alive_e, size_t, enum http_cache_e, char *);
 
@@ -86,9 +86,9 @@ typedef ERROR_CODE (*http_connection_message) (struct connection_t *, char *, si
  * the current request (eg: file, dispatch, default, etc).
  * @param user The user that is logging the current, request
  * in case it's an automated script the name should be used.
- * @param method The uppercased name of the http method used.
+ * @param method The uppercased name of the HTTP method used.
  * @param uri The path to the resource refered by the url.
- * @param version The version of the http protocol used in
+ * @param version The version of the HTTP protocol used in
  * the request to be loggerd.
  * @param error_code The error (status) code to be sent back to
  * the client in the associated response.
@@ -100,12 +100,12 @@ typedef ERROR_CODE (*http_connection_log) (char *host, char *identity, char *use
 /**
  * The structure that describes the structure
  * of an handler capable of interpreting an
- * http request and construct a response based
+ * HTTP request and construct a response based
  * on it.
  */
 typedef struct http_handler_t {
     /**
-     * The name that describes the http
+     * The name that describes the HTTP
      * handler.
      * This is going to be used as id and
      * so it hsould be unique to the system.
@@ -158,7 +158,7 @@ typedef struct http_handler_t {
 
 /**
  * Structure defining a logical
- * http connection.
+ * HTTP connection.
  */
 typedef struct http_connection_t {
     /**
@@ -169,13 +169,13 @@ typedef struct http_connection_t {
 
     /**
      * Structure containing the settings to be
-     * used by the http parser.
+     * used by the HTTP parser.
      */
     struct http_settings_t *http_settings;
 
     /**
      * Parser to be used during the interpretation
-     * of the http requests. The state of this parser
+     * of the HTTP requests. The state of this parser
      * is variable and should not be trusted.
      */
     struct http_parser_t *http_parser;
@@ -200,12 +200,12 @@ typedef struct http_connection_t {
 
     /**
      * The current contiguous buffer for the complete
-     * http stream in processing.
+     * HTTP stream in processing.
      */
     unsigned char *buffer;
 
     /**
-     * The current size of the buffer containing the http
+     * The current size of the buffer containing the HTTP
      * data in processing.
      * This value is used to retrieve the current position
      * to be written into the buffer.
@@ -213,7 +213,7 @@ typedef struct http_connection_t {
     size_t buffer_size;
 
     /**
-     * The current offset of the buffer containing the http
+     * The current offset of the buffer containing the HTTP
      * data in processing. This value may be used to determine
      * the final (valid part) of the current buffer that contains
      * data (the rest would be empty buffer).
@@ -230,7 +230,7 @@ typedef struct http_connection_t {
     /**
      * The lock flag that controls the data stream flood, this
      * way only one message is processed at a given time, even
-     * using http pipeling.
+     * using HTTP pipeling.
      */
     unsigned char lock;
 

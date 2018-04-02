@@ -41,7 +41,7 @@ typedef struct globals_t {
     struct service_t *service;
 
     /**
-     * The list of http handlers available
+     * The list of HTTP handlers available
      * for the global environment.
      */
     struct linked_list_t *http_handlers_list;

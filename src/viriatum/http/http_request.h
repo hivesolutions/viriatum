@@ -43,7 +43,7 @@
 
 /**
  * The array defining the various strings indicating
- * the respective http protocol version according to
+ * the respective HTTP protocol version according to
  * the pre-defined enumeration.
  */
 static const char *http_version_strings[3] = {
@@ -54,7 +54,7 @@ static const char *http_version_strings[3] = {
 
 /**
  * Enumeration defining the various possible
- * and "recognizable" http header types, this
+ * and "recognizable" HTTP header types, this
  * may be used to provided static reference.
  */
 typedef enum http_header_e {
@@ -72,7 +72,7 @@ typedef enum http_header_e {
 /**
  * Enumeration defining the various possible
  * and "recognizable" protocol versions for
- * the http protocol.
+ * the HTTP protocol.
  */
 typedef enum http_version_e {
     HTTP09 = 1,
@@ -82,7 +82,7 @@ typedef enum http_version_e {
 
 /**
  * Enumeration defining the various possible
- * methods for an http request.
+ * methods for an HTTP request.
  */
 typedef enum http_request_method_e {
     GET_REQUEST_METHOD = 1,
@@ -100,7 +100,7 @@ typedef enum http_keep_alive_e {
 
 /**
  * Enumeration defining the various possible
- * http cache control strategies.
+ * HTTP cache control strategies.
  */
 typedef enum http_cache_e {
     NO_CACHE = 1,
@@ -125,27 +125,27 @@ typedef struct http_request_t {
 } http_request;
 
 /**
- * Constructor of the http request.
+ * Constructor of the HTTP request.
  *
- * @param http_request_pointer The pointer to the http request to be constructed.
+ * @param http_request_pointer The pointer to the HTTP request to be constructed.
  */
 void create_http_request(struct http_request_t **http_request_pointer);
 
 /**
- * Destructor of the http request.
+ * Destructor of the HTTP request.
  *
- * @param http_request The http request to be destroyed.
+ * @param http_request The HTTP request to be destroyed.
  */
 void delete_http_request(struct http_request_t *http_request);
 
 /**
- * Retrieves the string representing the http version for
- * the given http version integer represented in the
+ * Retrieves the string representing the HTTP version for
+ * the given HTTP version integer represented in the
  * enumeration.
  *
- * @param http_method The http version integer to be "converted"
+ * @param http_method The HTTP version integer to be "converted"
  * into string representation.
- * @return The string representation of the http version.
+ * @return The string representation of the HTTP version.
  */
 static __inline const char *get_http_version_string(enum http_version_e http_version) {
     return http_version_strings[http_version - 1];
@@ -154,14 +154,14 @@ static __inline const char *get_http_version_string(enum http_version_e http_ver
 /**
  * Convers the provided major and minor based version set
  * of integer values into a more standard representation
- * of the http version values using enumerations.
+ * of the HTTP version values using enumerations.
  *
- * @param http_major The major version value for the http
+ * @param http_major The major version value for the HTTP
  * protocol to be used in the enumeration conversion.
  * @param http_minor The minor version value for the htto
  * protocol  to be used in the enumeration conversion.
  * @return The standard enumeration oriented version of the
- * http version value converted accordingly.
+ * HTTP version value converted accordingly.
  */
 static __inline enum http_version_e get_http_version(unsigned short http_major, unsigned short http_minor) {
     switch(http_major) {

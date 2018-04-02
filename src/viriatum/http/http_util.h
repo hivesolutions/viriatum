@@ -39,15 +39,15 @@ typedef ERROR_CODE (*connection_data_callback_hu) (struct connection_t *, struct
 
 /**
  * The default authentication string to be used
- * when the default http mode is requested.
+ * when the default HTTP mode is requested.
  */
 #define DEFAULT_AUTH_HTTP "Basic cm9vdDpyb290"
 
 /**
  * The string representations for the various
- * versions of the http protocol.
+ * versions of the HTTP protocol.
  * These values are useful for usage in the
- * status line printing part of the http message.
+ * status line printing part of the HTTP message.
  */
 static const char *http_version_codes[3] = {
     "HTTP/0.9",
@@ -86,7 +86,7 @@ static const char *close_codes[2] = {
 
 /**
  * The buffer containing sequences of the
- * descriptions to the various http error
+ * descriptions to the various HTTP error
  * codes orderes by major and minor parts
  * of the error code.
  */

@@ -34,17 +34,17 @@
 struct http_client_connection_t;
 
 /**
- * Function used to update the given http client connection
+ * Function used to update the given HTTP client connection
  * with new information.
  *
- * @param http_client_connection The http client connection to be
+ * @param http_client_connection The HTTP client connection to be
  * update with new information.
  */
 typedef ERROR_CODE (*http_client_cConnection_update) (struct http_client_connection_t *http_client_connection);
 
 /**
  * Structure defining a logical
- * http client connection.
+ * HTTP client connection.
  */
 typedef struct http_client_connection_t {
     /**
@@ -55,7 +55,7 @@ typedef struct http_client_connection_t {
 
     /**
      * Structure containig the settings to be
-     * used by the http parser, it must have
+     * used by the HTTP parser, it must have
      * the complete configuration for the client
      * including url, type and callbacks,
      */
@@ -63,7 +63,7 @@ typedef struct http_client_connection_t {
 
     /**
      * Parser to be used during the interpretation
-     * of the http requests.
+     * of the HTTP requests.
      */
     struct http_parser_t *http_parser;
 } http_client_connection;

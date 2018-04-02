@@ -396,7 +396,7 @@ ERROR_CODE write_http_error_a(
             error_description
         );
 
-        /* writes the http static headers to the response and
+        /* writes the HTTP static headers to the response and
         then writes the error description itself */
         write_http_headers_m(
             connection,
@@ -837,7 +837,7 @@ ERROR_CODE parameters_http_c(char *buffer, size_t size, size_t count, ...) {
     }
     va_end(arguments);
 
-    /* generates the (get) parameters for an http request
+    /* generates the (get) parameters for an HTTP request
     from the provided hash map of key values, the returned
     buffer is owned by the caller and must be released */
     parameters_http(

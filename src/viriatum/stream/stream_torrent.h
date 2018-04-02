@@ -48,7 +48,7 @@ struct torrent_connection_t;
  * Function used to update the given torrent connection
  * with new information.
  *
- * @param http_connection The http connection to be
+ * @param http_connection The HTTP connection to be
  * update with new information.
  */
 typedef ERROR_CODE (*torrent_connection_update) (struct torrent_connection_t *torrent_connection);

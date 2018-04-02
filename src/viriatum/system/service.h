@@ -437,8 +437,8 @@ typedef struct service_t {
     SOCKET_HANDLE service_socket6_handle;
 
     /**
-     * The http handler currently in use.
-     * Only one http (parser) handler can
+     * The HTTP handler currently in use.
+     * Only one HTTP (parser) handler can
      * be used at one given time.
      */
     struct http_handler_t *http_handler;
@@ -465,7 +465,7 @@ typedef struct service_t {
     struct linked_list_t *modules_list;
 
     /**
-     * The map of http handlers available
+     * The map of HTTP handlers available
      * for the service.
      * The map associates the name of the handler
      * with the handler instance.
