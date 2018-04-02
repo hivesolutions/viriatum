@@ -116,9 +116,9 @@ There are a lot of possible building features to enable
 
 * `--with-moduleroot=path` - Sets the path to be used to load the modules
 * `--with-wwwroot=path` - Sets the path to be used to install and serve the default content
-* `--enable-debug` - Enables the extra debugging capabilities in viriatum
+* `--enable-debug` - Enables the extra debugging capabilities in Viriatum
 * `--enable-defaults` - Enables the default paths in the viriatum server, ignoring wwwroot and moduleroot at runtime
-* `--disable-ipv6` - Disables the support for the ipv6 protocol stack
+* `--disable-ipv6` - Disables the support for the IPv6 protocol stack
 * `--disable-epoll` - Disables the support for the epoll mechanism
 * `--enable-mpool`- Enables the memory pool support (optimized for windows only)
 * `--enable-prefork` - Enables the prefork support so that viriatum can create workers
@@ -135,7 +135,7 @@ Current modules include:
 
 ### Lua Module
 
-For an ubuntu linux environment the lua 5.1 development packages must be included using:
+For an Ubuntu Linux environment the Lua 5.1 development packages must be included using:
 
     apt-get install liblua5.1-0-dev
 
