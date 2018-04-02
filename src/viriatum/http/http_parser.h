@@ -100,42 +100,42 @@
     } while(0)
 
 /**
- * The http proxy connection string value.
+ * The HTTP proxy connection string value.
  */
 #define HTTP_PROXY_CONNECTION "proxy-connection"
 
 /**
- * The http connection string value.
+ * The HTTP connection string value.
  */
 #define HTTP_CONNECTION "connection"
 
 /**
- * The http content length string value.
+ * The HTTP content length string value.
  */
 #define HTTP_CONTENT_LENGTH "content-length"
 
 /**
- * The http transfer encoding string value.
+ * The HTTP transfer encoding string value.
  */
 #define HTTP_TRANSFER_ENCODING "transfer-encoding"
 
 /**
- * The http upgrade string value.
+ * The HTTP upgrade string value.
  */
 #define HTTP_UPGRADE "upgrade"
 
 /**
- * The http chunked string value.
+ * The HTTP chunked string value.
  */
 #define HTTP_CHUNKED "chunked"
 
 /**
- * The http keep alive string value.
+ * The HTTP keep alive string value.
  */
 #define HTTP_KEEP_ALIVE "keep-alive"
 
 /**
- * The http close string value.
+ * The HTTP close string value.
  */
 #define HTTP_CLOSE "close"
 
@@ -229,10 +229,10 @@ static const unsigned char normal_url_char[256] = {
 };
 
 /**
- * List of strings defining the various http method
+ * List of strings defining the various HTTP method
  * names.
  * This names may be used together with an enumeration
- * defining a sequence of http methods.
+ * defining a sequence of HTTP methods.
  */
 static const char *http_method_strings[24] = {
     "DELETE",
@@ -280,7 +280,7 @@ typedef ERROR_CODE (*http_data_callback) (struct http_parser_t *, const unsigned
 typedef ERROR_CODE (*http_index_callback) (struct http_parser_t *, size_t, size_t);
 
 /**
- * Defines the various types of http request.
+ * Defines the various types of HTTP request.
  */
 typedef enum http_request_type_e {
     HTTP_REQUEST = 1,
@@ -289,7 +289,7 @@ typedef enum http_request_type_e {
 } http_request_type;
 
 /**
- * Defines the various http request mehtods.
+ * Defines the various HTTP request mehtods.
  * The methods are defined in a random order.
  */
 typedef enum http_method_e {
@@ -420,7 +420,7 @@ typedef enum http_flags_e {
 } http_flags;
 
 /**
- * Structure representing an http parser
+ * Structure representing an HTTP parser
  * it contains information about parsing
  * including state, size contents and control flags.
  */
@@ -462,7 +462,7 @@ typedef struct http_parser_t {
 
 /**
  * Structure representing the various settings
- * to be used for parsing the http message.
+ * to be used for parsing the HTTP message.
  */
 typedef struct http_settings_t {
     http_callback on_message_begin;
@@ -479,43 +479,43 @@ typedef struct http_settings_t {
 } http_settings;
 
 /**
- * Constructor of the http parser.
+ * Constructor of the HTTP parser.
  *
- * @param http_parser_pointer The pointer to the http parser to be constructed.
+ * @param http_parser_pointer The pointer to the HTTP parser to be constructed.
  * @param request If the parser is meant to be created for a request if not
  * set the parser assumes it's a response.
  */
 void create_http_parser(struct http_parser_t **http_parser_pointer, char request);
 
 /**
- * Destructor of the http parser.
+ * Destructor of the HTTP parser.
  *
- * @param http_parser The http parser to be destroyed.
+ * @param http_parser The HTTP parser to be destroyed.
  */
 void delete_http_parser(struct http_parser_t *http_parser);
 
 /**
- * Constructor of the http settings.
+ * Constructor of the HTTP settings.
  *
- * @param http_settings_pointer The pointer to the http settings to be constructed.
+ * @param http_settings_pointer The pointer to the HTTP settings to be constructed.
  */
 void create_http_settings(struct http_settings_t **http_settings_pointer);
 
 /**
- * Destructor of the http settings.
+ * Destructor of the HTTP settings.
  *
- * @param http_settings The http settings to be destroyed.
+ * @param http_settings The HTTP settings to be destroyed.
  */
 void delete_http_settings(struct http_settings_t *http_settings);
 
 /**
  * Called to process a new data chunk in the context
- * of an http parsing structure.
+ * of an HTTP parsing structure.
  * This function should be called whenever a new data
  * chunk is received.
  *
- * @param http_parser The http parser object.
- * @param http_settings The http settings for the processing.
+ * @param http_parser The HTTP parser object.
+ * @param http_settings The HTTP settings for the processing.
  * @param data The data to be parsed.
  * @param data_size The size of the data to be parsed.
  * @return The number of bytes used during the processing.
@@ -523,13 +523,13 @@ void delete_http_settings(struct http_settings_t *http_settings);
 int process_data_http_parser(struct http_parser_t *http_parser, struct http_settings_t *http_settings, unsigned char *data, size_t data_size);
 
 /**
- * Retrieves the string representing the http method for
- * the given http method integer represented in the
+ * Retrieves the string representing the HTTP method for
+ * the given HTTP method integer represented in the
  * enumeration.
  *
- * @param http_method The http method integer to be "converted"
+ * @param http_method The HTTP method integer to be "converted"
  * into string representation.
- * @return The string representation of the http method.
+ * @return The string representation of the HTTP method.
  */
 static __inline const char *get_http_method_string(enum http_method_e http_method) {
     return http_method_strings[http_method - 1];

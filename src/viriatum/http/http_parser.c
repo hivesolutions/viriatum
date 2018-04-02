@@ -55,7 +55,7 @@ void create_http_parser(struct http_parser_t **http_parser_pointer, char request
     /* allocates space for the HTTP parser */
     struct http_parser_t *http_parser = (struct http_parser_t *) MALLOC(http_parser_size);
 
-    /* sets the http parser attributes, in the original
+    /* sets the HTTP parser attributes, in the original
     definition, this should be able to start a parsing */
     http_parser->type = request ? HTTP_REQUEST : HTTP_RESPONSE;
     http_parser->flags = 6;
@@ -75,7 +75,7 @@ void create_http_parser(struct http_parser_t **http_parser_pointer, char request
     http_parser->header_value_mark = 0;
     http_parser->url_mark = 0;
 
-    /* sets the HTTP parser in the http parser pointer */
+    /* sets the HTTP parser in the HTTP parser pointer */
     *http_parser_pointer = http_parser;
 }
 
@@ -91,7 +91,7 @@ void create_http_settings(struct http_settings_t **http_settings_pointer) {
     /* allocates space for the HTTP settings */
     struct http_settings_t *http_settings = (struct http_settings_t *) MALLOC(http_settings_size);
 
-    /* sets the http settings callback values to
+    /* sets the HTTP settings callback values to
     the default settings (unset) */
     http_settings->on_message_begin = NULL;
     http_settings->on_url = NULL;
@@ -105,7 +105,7 @@ void create_http_settings(struct http_settings_t **http_settings_pointer) {
     http_settings->on_location = NULL;
     http_settings->on_virtual_url = NULL;
 
-    /* sets the HTTP settings in the http settings pointer */
+    /* sets the HTTP settings in the HTTP settings pointer */
     *http_settings_pointer = http_settings;
 }
 

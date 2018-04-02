@@ -30,19 +30,19 @@
 #include "handler_default.h"
 
 ERROR_CODE register_handler_default(struct service_t *service) {
-    /* allocates the http handler */
+    /* allocates the HTTP handler */
     struct http_handler_t *http_handler;
 
-    /* creates the http handler */
+    /* creates the HTTP handler */
     service->create_http_handler(service, &http_handler, (unsigned char *) "default");
 
-    /* sets the http handler attributes */
+    /* sets the HTTP handler attributes */
     http_handler->resolve_index = FALSE;
     http_handler->set = set_handler_default;
     http_handler->unset = unset_handler_default;
     http_handler->reset = NULL;
 
-    /* adds the http handler to the service */
+    /* adds the HTTP handler to the service */
     service->add_http_handler(service, http_handler);
 
     /* raises no error */
@@ -50,10 +50,10 @@ ERROR_CODE register_handler_default(struct service_t *service) {
 }
 
 ERROR_CODE unregister_handler_default(struct service_t *service) {
-    /* allocates the http handler */
+    /* allocates the HTTP handler */
     struct http_handler_t *http_handler;
 
-    /* retrieves the http handler from the service, then
+    /* retrieves the HTTP handler from the service, then
     remove it from the service after that delete the handler */
     service->get_http_handler(service, &http_handler, (unsigned char *) "default");
     service->remove_http_handler(service, http_handler);
@@ -64,10 +64,10 @@ ERROR_CODE unregister_handler_default(struct service_t *service) {
 }
 
 ERROR_CODE set_handler_default(struct http_connection_t *http_connection) {
-    /* sets the http parser values */
+    /* sets the HTTP parser values */
     _set_http_parser_handler_default(http_connection->http_parser);
 
-    /* sets the http settings values */
+    /* sets the HTTP settings values */
     _set_http_settings_handler_default(http_connection->http_settings);
 
     /* raises no error */
@@ -75,10 +75,10 @@ ERROR_CODE set_handler_default(struct http_connection_t *http_connection) {
 }
 
 ERROR_CODE unset_handler_default(struct http_connection_t *http_connection) {
-    /* unsets the http parser values */
+    /* unsets the HTTP parser values */
     _unset_http_parser_handler_default(http_connection->http_parser);
 
-    /* unsets the http settings values */
+    /* unsets the HTTP settings values */
     _unset_http_settings_handler_default(http_connection->http_settings);
 
     /* raises no error */
@@ -87,7 +87,7 @@ ERROR_CODE unset_handler_default(struct http_connection_t *http_connection) {
 
 ERROR_CODE message_begin_callback_handler_default(struct http_parser_t *http_parser) {
     /* prints an information */
-    V_DEBUG("http request received\n");
+    V_DEBUG("HTTP request received\n");
 
     /* raise no error */
     RAISE_NO_ERROR;
@@ -155,7 +155,7 @@ ERROR_CODE header_value_callback_handler_default(struct http_parser_t *http_pars
 
 ERROR_CODE headers_complete_callback_handler_default(struct http_parser_t *http_parser) {
     /* prints an information */
-    V_DEBUG("http headers parsed\n");
+    V_DEBUG("HTTP headers parsed\n");
 
     /* raise no error */
     RAISE_NO_ERROR;
@@ -183,7 +183,7 @@ ERROR_CODE body_callback_handler_default(struct http_parser_t *http_parser, cons
 
 ERROR_CODE message_complete_callback_handler_default(struct http_parser_t *http_parser) {
     /* prints an information */
-    V_DEBUG("http request parsed\n");
+    V_DEBUG("HTTP request parsed\n");
 
     /* sends (and creates) the reponse */
     _send_response_handler_default(http_parser);
@@ -218,9 +218,9 @@ ERROR_CODE _unset_http_parser_handler_default(struct http_parser_t *http_parser)
 }
 
 ERROR_CODE _set_http_settings_handler_default(struct http_settings_t *http_settings) {
-    /* sets the various callback functions in the http settings
+    /* sets the various callback functions in the HTTP settings
     structure, these callbacks are going to be used in the runtime
-    processing of http parser (runtime execution) */
+    processing of HTTP parser (runtime execution) */
     http_settings->on_message_begin = message_begin_callback_handler_default;
     http_settings->on_url = url_callback_handler_default;
     http_settings->on_header_field = header_field_callback_handler_default;
@@ -237,7 +237,7 @@ ERROR_CODE _set_http_settings_handler_default(struct http_settings_t *http_setti
 }
 
 ERROR_CODE _unset_http_settings_handler_default(struct http_settings_t *http_settings) {
-    /* unsets the various callback functions from the http settings */
+    /* unsets the various callback functions from the HTTP settings */
     http_settings->on_message_begin = NULL;
     http_settings->on_url = NULL;
     http_settings->on_header_field = NULL;
@@ -257,7 +257,7 @@ ERROR_CODE _send_response_handler_default(struct http_parser_t *http_parser) {
     /* allocates the response buffer */
     char *response_buffer = MALLOC(256);
 
-    /* retrieves the connection from the http parser parameters */
+    /* retrieves the connection from the HTTP parser parameters */
     struct connection_t *connection = (struct connection_t *) http_parser->parameters;
 
     /* retrieves the underlying connection references in order to be
@@ -265,11 +265,11 @@ ERROR_CODE _send_response_handler_default(struct http_parser_t *http_parser) {
     struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
     struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
 
-    /* acquires the lock on the http connection, this will avoids further
+    /* acquires the lock on the HTTP connection, this will avoids further
     messages to be processed, no parallel request handling problems */
     http_connection->acquire(http_connection);
 
-    /* writes the http static headers (and message) as the response and
+    /* writes the HTTP static headers (and message) as the response and
     registers for the appropriate callbacks (for cleanup) */
     write_http_message(
         connection,
@@ -289,7 +289,7 @@ ERROR_CODE _send_response_handler_default(struct http_parser_t *http_parser) {
 }
 
 ERROR_CODE _send_response_callback_handler_default(struct connection_t *connection, struct data_t *data, void *parameters) {
-    /* retrieves the current http flags */
+    /* retrieves the current HTTP flags */
     unsigned char flags = (unsigned char) (size_t) parameters;
 
     /* retrieves the underlying connection references in order to be
@@ -297,11 +297,11 @@ ERROR_CODE _send_response_callback_handler_default(struct connection_t *connecti
     struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
     struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
 
-    /* in case there is an http handler in the current connection must
+    /* in case there is an HTTP handler in the current connection must
     unset it (remove temporary information) */
     if(http_connection->http_handler) {
-        /* unsets the current http connection and then sets the reference
-        to it in the http connection as unset */
+        /* unsets the current HTTP connection and then sets the reference
+        to it in the HTTP connection as unset */
         http_connection->http_handler->unset(http_connection);
         http_connection->http_handler = NULL;
     }
@@ -311,7 +311,7 @@ ERROR_CODE _send_response_callback_handler_default(struct connection_t *connecti
         /* closes the connection */
         connection->close_connection(connection);
     } else {
-        /* releases the lock on the http connection, this will allow further
+        /* releases the lock on the HTTP connection, this will allow further
         messages to be processed, an update event should raised following this
         lock releasing call */
         http_connection->release(http_connection);

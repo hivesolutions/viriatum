@@ -104,13 +104,13 @@ ERROR_CODE create_handler_proxy_context(struct handler_proxy_context_t **handler
     handler_proxy_context->pending = FALSE;
     handler_proxy_context->pending_write = 0;
 
-    /* creates a new set of http settings and parser for the new
+    /* creates a new set of HTTP settings and parser for the new
     context that is being created, these are going to be used in
     the backend connection to be able to process its data */
     create_http_settings(&handler_proxy_context->http_settings);
     create_http_parser(&handler_proxy_context->http_parser, 0);
 
-    /* sets the default callback functions in the http settings
+    /* sets the default callback functions in the HTTP settings
     these function are going to be called by the parser */
     handler_proxy_context->http_settings->on_line = line_callback_backend;
     handler_proxy_context->http_settings->on_header_field = header_field_callback_backend;
@@ -138,7 +138,7 @@ ERROR_CODE delete_handler_proxy_context(struct handler_proxy_context_t *handler_
     defined it must be properly released to avoid memory leaks */
     if(handler_proxy_context->out_buffer) { FREE(handler_proxy_context->out_buffer); }
 
-    /* in case the http settings structure is defined for the current
+    /* in case the HTTP settings structure is defined for the current
     context it must be release in order to avoid any leaks */
     if(handler_proxy_context->http_settings) {
         delete_http_settings(handler_proxy_context->http_settings);
@@ -171,18 +171,18 @@ ERROR_CODE register_handler_proxy(struct service_t *service) {
     reference to be used to resolve the request */
     struct proxy_location_t *_location;
 
-    /* allocates the http handler */
+    /* allocates the HTTP handler */
     struct http_handler_t *http_handler;
 
     /* allocates space for the proxy handler */
     struct proxy_handler_t *proxy_handler;
 
-    /* creates the http handler and then uses it to create
+    /* creates the HTTP handler and then uses it to create
     the proxy handler (lower substrate) */
     service->create_http_handler(service, &http_handler, (unsigned char *) "proxy");
     create_proxy_handler(&proxy_handler, http_handler);
 
-    /* sets the http handler attributes */
+    /* sets the HTTP handler attributes */
     http_handler->resolve_index = FALSE;
     http_handler->set = set_handler_proxy;
     http_handler->unset = unset_handler_proxy;
@@ -229,7 +229,7 @@ ERROR_CODE register_handler_proxy(struct service_t *service) {
         }
     }
 
-    /* adds the http handler to the service */
+    /* adds the HTTP handler to the service */
     service->add_http_handler(service, http_handler);
 
     /* raises no error */
@@ -237,12 +237,12 @@ ERROR_CODE register_handler_proxy(struct service_t *service) {
 }
 
 ERROR_CODE unregister_handler_proxy(struct service_t *service) {
-    /* allocates the http handler and then for the proxy
+    /* allocates the HTTP handler and then for the proxy
     handler objects to be released from the current structure */
     struct http_handler_t *http_handler;
     struct proxy_handler_t *proxy_handler;
 
-    /* retrieves the http handler from the service, then retrieves
+    /* retrieves the HTTP handler from the service, then retrieves
     the lower substrate as the proxy handler */
     service->get_http_handler(service, &http_handler, (unsigned char *) "proxy");
     proxy_handler = (struct proxy_handler_t *) http_handler->lower;
@@ -250,7 +250,7 @@ ERROR_CODE unregister_handler_proxy(struct service_t *service) {
     /* deletes the proxy handler reference */
     delete_proxy_handler(proxy_handler);
 
-    /* remove the http handler from the service after
+    /* remove the HTTP handler from the service after
     that deletes the handler reference */
     service->remove_http_handler(service, http_handler);
     service->delete_http_handler(service, http_handler);
@@ -272,7 +272,7 @@ ERROR_CODE close_proxy_connection(struct io_connection_t *io_connection) {
     struct connection_t *connection = io_connection->connection;
     struct service_t *service = connection->service;
 
-    /* retrieves the reference to the http handler from the service
+    /* retrieves the reference to the HTTP handler from the service
     using the handler map and then  retrieves the lower proxy handler */
     get_value_string_hash_map(
         service->http_handlers_map,
@@ -325,7 +325,7 @@ ERROR_CODE close_proxy_connection(struct io_connection_t *io_connection) {
 }
 
 ERROR_CODE set_handler_proxy(struct http_connection_t *http_connection) {
-    /* sets both the http parser values and the http
+    /* sets both the HTTP parser values and the HTTP
     settings handler for the current proxy handler */
     _set_http_parser_handler_proxy(http_connection->http_parser);
     _set_http_settings_handler_proxy(http_connection->http_settings);
@@ -335,7 +335,7 @@ ERROR_CODE set_handler_proxy(struct http_connection_t *http_connection) {
 }
 
 ERROR_CODE unset_handler_proxy(struct http_connection_t *http_connection) {
-    /* unsets both the http parser values and the http
+    /* unsets both the HTTP parser values and the HTTP
     settings handler from the current proxy handler */
     _unset_http_parser_handler_proxy(http_connection->http_parser);
     _unset_http_settings_handler_proxy(http_connection->http_settings);
@@ -345,7 +345,7 @@ ERROR_CODE unset_handler_proxy(struct http_connection_t *http_connection) {
 }
 
 ERROR_CODE reset_handler_proxy(struct http_connection_t *http_connection) {
-    /* resets the http parser values */
+    /* resets the HTTP parser values */
     _reset_http_parser_handler_proxy(http_connection->http_parser);
 
     /* raises no error */
@@ -411,7 +411,7 @@ ERROR_CODE message_complete_callback_handler_proxy(struct http_parser_t *http_pa
     struct http_connection_t *http_connection =\
         (struct http_connection_t *) io_connection->lower;
 
-    /* acquires the current http connection this avoids the parallel usage of
+    /* acquires the current HTTP connection this avoids the parallel usage of
     the connection, removing any issue arround paralel message handling */
     http_connection->acquire(http_connection);
 
@@ -449,12 +449,12 @@ ERROR_CODE message_complete_callback_handler_proxy(struct http_parser_t *http_pa
 }
 
 ERROR_CODE location_callback_handler_proxy(struct http_parser_t *http_parser, size_t index, size_t offset) {
-    /* retrieves the handler proxy context from the http parser */
+    /* retrieves the handler proxy context from the HTTP parser */
     struct handler_proxy_context_t *handler_proxy_context =
         (struct handler_proxy_context_t *) http_parser->context;
 
     /* retrieves the connection from the parser and then uses it to  the
-    the correct proxy handler reference from the http connection */
+    the correct proxy handler reference from the HTTP connection */
     struct connection_t *connection = (struct connection_t *) http_parser->parameters;
     struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
     struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
@@ -499,7 +499,7 @@ ERROR_CODE virtual_url_callback_handler_proxy(struct http_parser_t *http_parser,
 
     /* retrieves the enumeration representation of the version and then
     uses it to retrieve the string value out of it, then retrieves the
-    proper http method used in the current call */
+    proper HTTP method used in the current call */
     enum http_version_e version_e = get_http_version(
         http_parser->http_major,
         http_parser->http_minor
@@ -509,7 +509,7 @@ ERROR_CODE virtual_url_callback_handler_proxy(struct http_parser_t *http_parser,
 
     /* retrieves the connection from the parser parameters and then uses
     it to retrieve its lower connection layers (substrates) then uses the
-    http connection to retrieve the handler and the handler to retrieve the
+    HTTP connection to retrieve the handler and the handler to retrieve the
     current proxy context structure */
     struct connection_t *connection =\
         (struct connection_t *) http_parser->parameters;
@@ -528,7 +528,7 @@ ERROR_CODE virtual_url_callback_handler_proxy(struct http_parser_t *http_parser,
     memcpy(path, data, data_size);
     path[data_size] = '\0';
 
-    /* writes the initial line of the http message into the temporary buffer
+    /* writes the initial line of the HTTP message into the temporary buffer
     and then sends this value to the current buffer for writing */
     size_m = SPRINTF(buffer, 1024, "%s %s %s\r\n", method, path, version);
     write_proxy_buffer(handler_proxy_context, buffer, size_m);
@@ -574,7 +574,7 @@ ERROR_CODE virtual_url_callback_handler_proxy(struct http_parser_t *http_parser,
     /* in case the connection client reference structure for the current
     context is not defined a new connection must be created */
     if(handler_proxy_context->connection_c == NULL) {
-        /* creates a general http client connection structure containing
+        /* creates a general HTTP client connection structure containing
         all the general attributes for a connection, then sets the
         "local" connection reference from the pointer */
         return_value = _create_client_connection(
@@ -602,7 +602,7 @@ ERROR_CODE virtual_url_callback_handler_proxy(struct http_parser_t *http_parser,
 
         /* sets the protocol for the "client" connection as custom and sets
         the "custom" parameters structure in it so that the callback functions
-        may be controlled for the http proxy behaviour */
+        may be controlled for the HTTP proxy behaviour */
         connection_c->protocol = CUSTOM_PROTOCOL;
         connection_c->parameters = (void *) parameters;
 
@@ -650,7 +650,7 @@ ERROR_CODE virtual_url_callback_handler_proxy(struct http_parser_t *http_parser,
 
         /* sets the protocol for the "client" connection as custom and sets
         the "custom" parameters structure in it so that the callback functions
-        may be controlled for the http proxy behaviour */
+        may be controlled for the HTTP proxy behaviour */
         connection_c->protocol = CUSTOM_PROTOCOL;
         connection_c->parameters = (void *) parameters;
     }
@@ -705,7 +705,7 @@ ERROR_CODE close_backend_handler(struct io_connection_t *io_connection) {
     struct connection_t *connection_s;
     struct io_connection_t *io_connection_s;
 
-    /* reserves space for both the top level http handler structure and the
+    /* reserves space for both the top level HTTP handler structure and the
     concrete proxy handler structure containing the specifics of the proxy and
     then allocates space for the on close function pointer */
     struct http_handler_t *http_handler;
@@ -749,7 +749,7 @@ ERROR_CODE close_backend_handler(struct io_connection_t *io_connection) {
     );
 
     /* resolves the service connection (proxy client) into the proper io
-    and http connection and then restores the close handler to them */
+    and HTTP connection and then restores the close handler to them */
     io_connection_s = (struct io_connection_t *) connection_s->lower;
     io_connection_s->on_close = on_close;
 
@@ -949,7 +949,7 @@ ERROR_CODE _set_http_parser_handler_proxy(struct http_parser_t *http_parser) {
     struct handler_proxy_context_t *handler_proxy_context;
 
     /* creates the handler proxy context and then sets the handler
-    proxy context as the context for the http parser */
+    proxy context as the context for the HTTP parser */
     create_handler_proxy_context(&handler_proxy_context);
     http_parser->context = handler_proxy_context;
 
@@ -958,7 +958,7 @@ ERROR_CODE _set_http_parser_handler_proxy(struct http_parser_t *http_parser) {
 }
 
 ERROR_CODE _unset_http_parser_handler_proxy(struct http_parser_t *http_parser) {
-    /* retrieves the handler proxy context from the http parser */
+    /* retrieves the handler proxy context from the HTTP parser */
     struct handler_proxy_context_t *handler_proxy_context =\
         (struct handler_proxy_context_t *) http_parser->context;
 
@@ -979,7 +979,7 @@ ERROR_CODE _unset_http_parser_handler_proxy(struct http_parser_t *http_parser) {
 }
 
 ERROR_CODE _reset_http_parser_handler_proxy(struct http_parser_t *http_parser) {
-    /* retrieves the handler proxy context from the http parser */
+    /* retrieves the handler proxy context from the HTTP parser */
     struct handler_proxy_context_t *handler_proxy_context =\
         (struct handler_proxy_context_t *) http_parser->context;
 
@@ -995,9 +995,9 @@ ERROR_CODE _reset_http_parser_handler_proxy(struct http_parser_t *http_parser) {
 }
 
 ERROR_CODE _set_http_settings_handler_proxy(struct http_settings_t *http_settings) {
-    /* sets the various callback functions in the http settings
+    /* sets the various callback functions in the HTTP settings
     structure, these callbacks are going to be used in the runtime
-    processing of http parser (runtime execution) */
+    processing of HTTP parser (runtime execution) */
     http_settings->on_message_begin = message_begin_callback_handler_proxy;
     http_settings->on_url = url_callback_handler_proxy;
     http_settings->on_header_field = header_field_callback_handler_proxy;
@@ -1013,7 +1013,7 @@ ERROR_CODE _set_http_settings_handler_proxy(struct http_settings_t *http_setting
 }
 
 ERROR_CODE _unset_http_settings_handler_proxy(struct http_settings_t *http_settings) {
-    /* unsets the various callback functions from the http settings */
+    /* unsets the various callback functions from the HTTP settings */
     http_settings->on_message_begin = NULL;
     http_settings->on_url = NULL;
     http_settings->on_header_field = NULL;
@@ -1050,7 +1050,7 @@ ERROR_CODE _pending_handler_proxy(struct connection_t *connection, struct data_t
 }
 
 ERROR_CODE _cleanup_handler_proxy(struct connection_t *connection, struct data_t *data, void *parameters) {
-    /* retrieves the current http flags as the provided parameters
+    /* retrieves the current HTTP flags as the provided parameters
     these flags are going to be used for conditional execution */
     unsigned char flags = (unsigned char) (size_t) parameters;
 
@@ -1064,18 +1064,18 @@ ERROR_CODE _cleanup_handler_proxy(struct connection_t *connection, struct data_t
     context structrue will be destroyed there */
     unsigned char keep_alive = flags & FLAG_KEEP_ALIVE;
 
-    /* in case there is an http handler in the current connection must
+    /* in case there is an HTTP handler in the current connection must
     unset it (remove temporary information) */
     if(http_connection->http_handler) {
-        /* unsets the current http connection and then sets the reference
-        to it in the http connection as unset */
+        /* unsets the current HTTP connection and then sets the reference
+        to it in the HTTP connection as unset */
         http_connection->http_handler->unset(http_connection);
         http_connection->http_handler = NULL;
     }
 
     /* in case the connection is not meant to be kept alive must be closed
     in the normal manner (using the close connection function) otherwise
-    releases the lock on the http connection, this will allow further
+    releases the lock on the HTTP connection, this will allow further
     messages to be processed, an update event should raised following this
     lock releasing call */
     if(!keep_alive) { connection->close_connection(connection); }

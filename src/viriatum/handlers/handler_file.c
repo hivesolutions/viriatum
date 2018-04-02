@@ -40,7 +40,7 @@ ERROR_CODE create_file_handler(struct file_handler_t **file_handler_pointer, str
     file_handler->locations = NULL;
     file_handler->locations_count = 0;
 
-    /* sets the file handler in the upper http handler substrate */
+    /* sets the file handler in the upper HTTP handler substrate */
     http_handler->lower = (void *) file_handler;
 
     /* sets the file handler in the file handler pointer */
@@ -128,18 +128,18 @@ ERROR_CODE register_handler_file(struct service_t *service) {
     reference to be used to resolve the request */
     struct file_location_t *_location;
 
-    /* allocates the http handler */
+    /* allocates the HTTP handler */
     struct http_handler_t *http_handler;
 
     /* allocates space for the file handler */
     struct file_handler_t *file_handler;
 
-    /* creates the http handler and then uses it to create
+    /* creates the HTTP handler and then uses it to create
     the file handler (lower substrate) */
     service->create_http_handler(service, &http_handler, (unsigned char *) "file");
     create_file_handler(&file_handler, http_handler);
 
-    /* sets the http handler attributes */
+    /* sets the HTTP handler attributes */
     http_handler->resolve_index = TRUE;
     http_handler->set = set_handler_file;
     http_handler->unset = unset_handler_file;
@@ -188,7 +188,7 @@ ERROR_CODE register_handler_file(struct service_t *service) {
         if(value != NULL) { _location->auth_file = (unsigned char *) value; }
     }
 
-    /* adds the http handler to the service */
+    /* adds the HTTP handler to the service */
     service->add_http_handler(service, http_handler);
 
     /* raises no error */
@@ -196,13 +196,13 @@ ERROR_CODE register_handler_file(struct service_t *service) {
 }
 
 ERROR_CODE unregister_handler_file(struct service_t *service) {
-    /* allocates the http handler */
+    /* allocates the HTTP handler */
     struct http_handler_t *http_handler;
 
     /* allocates space for the file handler */
     struct file_handler_t *file_handler;
 
-    /* retrieves the http handler from the service, then retrieves
+    /* retrieves the HTTP handler from the service, then retrieves
     the lower substrate as the file handler */
     service->get_http_handler(service, &http_handler, (unsigned char *) "file");
     file_handler = (struct file_handler_t *) http_handler->lower;
@@ -210,7 +210,7 @@ ERROR_CODE unregister_handler_file(struct service_t *service) {
     /* deletes the file handler reference */
     delete_file_handler(file_handler);
 
-    /* remove the http handler from the service after
+    /* remove the HTTP handler from the service after
     that deletes the handler reference */
     service->remove_http_handler(service, http_handler);
     service->delete_http_handler(service, http_handler);
@@ -220,7 +220,7 @@ ERROR_CODE unregister_handler_file(struct service_t *service) {
 }
 
 ERROR_CODE set_handler_file(struct http_connection_t *http_connection) {
-    /* sets both the http parser values and the http
+    /* sets both the HTTP parser values and the HTTP
     settings handler for the current file handler */
     _set_http_parser_handler_file(http_connection->http_parser);
     _set_http_settings_handler_file(http_connection->http_settings);
@@ -230,7 +230,7 @@ ERROR_CODE set_handler_file(struct http_connection_t *http_connection) {
 }
 
 ERROR_CODE unset_handler_file(struct http_connection_t *http_connection) {
-    /* unsets both the http parser values and the http
+    /* unsets both the HTTP parser values and the HTTP
     settings handler from the current file handler */
     _unset_http_parser_handler_file(http_connection->http_parser);
     _unset_http_settings_handler_file(http_connection->http_settings);
@@ -240,7 +240,7 @@ ERROR_CODE unset_handler_file(struct http_connection_t *http_connection) {
 }
 
 ERROR_CODE reset_handler_file(struct http_connection_t *http_connection) {
-    /* resets the http parser values */
+    /* resets the HTTP parser values */
     _reset_http_parser_handler_file(http_connection->http_parser);
 
     /* raises no error */
@@ -261,7 +261,7 @@ ERROR_CODE url_callback_handler_file(struct http_parser_t *http_parser, const un
     path "calculated" from the url */
     size_t file_path_size;
 
-    /* retrieves the handler file context from the http parser */
+    /* retrieves the handler file context from the HTTP parser */
     struct handler_file_context_t *handler_file_context =\
         (struct handler_file_context_t *) http_parser->context;
 
@@ -311,7 +311,7 @@ ERROR_CODE url_callback_handler_file(struct http_parser_t *http_parser, const un
 }
 
 ERROR_CODE header_field_callback_handler_file(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
-    /* retrieves the handler file context from the http parser */
+    /* retrieves the handler file context from the HTTP parser */
     struct handler_file_context_t *handler_file_context = (struct handler_file_context_t *) http_parser->context;
 
     /* switches over the size of the header name (field)
@@ -365,7 +365,7 @@ ERROR_CODE header_field_callback_handler_file(struct http_parser_t *http_parser,
 }
 
 ERROR_CODE header_value_callback_handler_file(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
-    /* retrieves the handler file context from the http parser */
+    /* retrieves the handler file context from the HTTP parser */
     struct handler_file_context_t *handler_file_context = (struct handler_file_context_t *) http_parser->context;
 
     /* switches over the kind of next header to be
@@ -453,7 +453,7 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
 
     /* allocates space for the variable that will be set in case
     the connection is meant to be kep alive at the end of the
-    http message processing or not */
+    HTTP message processing or not */
     unsigned char keep_alive;
 
     /* allocates space for the size of the url string to
@@ -478,13 +478,13 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
     it need to be allocated in the heap so it gets throught the request cycle */
     char *headers_buffer = MALLOC(VIRIATUM_HTTP_SIZE);
 
-    /* retrieves the handler file context from the http parser and uses
+    /* retrieves the handler file context from the HTTP parser and uses
     it to retrieve the respective flags value */
     struct handler_file_context_t *handler_file_context =\
         (struct handler_file_context_t *) http_parser->context;
     unsigned char flags = http_parser->flags;
 
-    /* retrieves the connection from the http parser parameters,
+    /* retrieves the connection from the HTTP parser parameters,
     the connection object is going to be used for the input and
     outpu operations associated with the file handling */
     struct connection_t *connection = (struct connection_t *) http_parser->parameters;
@@ -495,11 +495,11 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
     struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
 
     /* verifies if the currently set flag grant "permission" to keep
-    the connection alive at the end of the http message processing,
+    the connection alive at the end of the HTTP message processing,
     this values is going to be used for headers generation */
     keep_alive = flags & FLAG_KEEP_ALIVE;
 
-    /* acquires the lock on the http connection, this will avoids further
+    /* acquires the lock on the HTTP connection, this will avoids further
     messages to be processed, no parallel request handling problems */
     http_connection->acquire(http_connection);
 
@@ -653,7 +653,7 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
         }
     }
 
-    /* sets the (http) flags in the handler file context */
+    /* sets the (HTTP) flags in the handler file context */
     handler_file_context->flags = http_parser->flags;
 
     /* tests the error code for error, in case there's an error
@@ -704,7 +704,7 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
             handler_file_context
         );
     } else if(is_redirect) {
-        /* writes the http static headers to the response */
+        /* writes the HTTP static headers to the response */
         count = write_http_headers(
             connection,
             headers_buffer,
@@ -735,7 +735,7 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
     }
     /* in case the current situation is a directory list */
     else if(is_directory) {
-        /* writes the http static headers to the response */
+        /* writes the HTTP static headers to the response */
         write_http_headers_c(
             connection,
             headers_buffer,
@@ -764,7 +764,7 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
     to the client indicating that cache should be used */
     else if(handler_file_context->etag_status == 2 &&\
         strcmp(etag, (char *) handler_file_context->etag) == 0) {
-        /* writes the http static headers to the response */
+        /* writes the HTTP static headers to the response */
         write_http_headers_c(
             connection,
             headers_buffer,
@@ -801,7 +801,7 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
             file_size
         );
 
-        /* writes the http static headers to the response indicating
+        /* writes the HTTP static headers to the response indicating
         that only a part of the file is going to be retrieved, then
         writes also the content range header indicating which bytes
         are going to be retrieved */
@@ -847,7 +847,7 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
         handler_file_context->initial_byte = 0;
         handler_file_context->final_byte = file_size - 1;
 
-        /* writes the http static headers to the response indicating
+        /* writes the HTTP static headers to the response indicating
         that the file is going to be served normally */
         count = write_http_headers_c(
             connection,
@@ -909,7 +909,7 @@ ERROR_CODE path_callback_handler_file(struct http_parser_t *http_parser, const u
     path "calculated" from the url */
     size_t file_path_size;
 
-    /* retrieves the handler file context from the http parser
+    /* retrieves the handler file context from the HTTP parser
     and uses it to retrieve the reference to the base path in context */
     struct handler_file_context_t *handler_file_context =\
         (struct handler_file_context_t *) http_parser->context;
@@ -985,12 +985,12 @@ ERROR_CODE location_callback_handler_file(struct http_parser_t *http_parser, siz
     remaining part from the matching of the location */
     unsigned char *partial_url;
 
-    /* retrieves the handler file context from the http parser */
+    /* retrieves the handler file context from the HTTP parser */
     struct handler_file_context_t *handler_file_context =
         (struct handler_file_context_t *) http_parser->context;
 
     /* retrieves the connection from the parser and then uses it to  the
-    the correct file handler reference from the http connection */
+    the correct file handler reference from the HTTP connection */
     struct connection_t *connection = (struct connection_t *) http_parser->parameters;
     struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
     struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
@@ -1049,7 +1049,7 @@ ERROR_CODE _set_http_parser_handler_file(struct http_parser_t *http_parser) {
     struct handler_file_context_t *handler_file_context;
 
     /* creates the handler file context and then sets the handler
-    file context as the context for the http parser */
+    file context as the context for the HTTP parser */
     create_handler_file_context(&handler_file_context);
     http_parser->context = handler_file_context;
 
@@ -1058,7 +1058,7 @@ ERROR_CODE _set_http_parser_handler_file(struct http_parser_t *http_parser) {
 }
 
 ERROR_CODE _unset_http_parser_handler_file(struct http_parser_t *http_parser) {
-    /* retrieves the handler file context from the http parser */
+    /* retrieves the handler file context from the HTTP parser */
     struct handler_file_context_t *handler_file_context = (struct handler_file_context_t *) http_parser->context;
 
     /* deletes the handler file context */
@@ -1069,7 +1069,7 @@ ERROR_CODE _unset_http_parser_handler_file(struct http_parser_t *http_parser) {
 }
 
 ERROR_CODE _reset_http_parser_handler_file(struct http_parser_t *http_parser) {
-    /* retrieves the handler file context from the http parser */
+    /* retrieves the handler file context from the HTTP parser */
     struct handler_file_context_t *handler_file_context =\
         (struct handler_file_context_t *) http_parser->context;
 
@@ -1099,9 +1099,9 @@ ERROR_CODE _reset_http_parser_handler_file(struct http_parser_t *http_parser) {
 }
 
 ERROR_CODE _set_http_settings_handler_file(struct http_settings_t *http_settings) {
-    /* sets the various callback functions in the http settings
+    /* sets the various callback functions in the HTTP settings
     structure, these callbacks are going to be used in the runtime
-    processing of http parser (runtime execution) */
+    processing of HTTP parser (runtime execution) */
     http_settings->on_message_begin = message_begin_callback_handler_file;
     http_settings->on_url = url_callback_handler_file;
     http_settings->on_header_field = header_field_callback_handler_file;
@@ -1118,7 +1118,7 @@ ERROR_CODE _set_http_settings_handler_file(struct http_settings_t *http_settings
 }
 
 ERROR_CODE _unset_http_settings_handler_file(struct http_settings_t *http_settings) {
-    /* unsets the various callback functions from the http settings */
+    /* unsets the various callback functions from the HTTP settings */
     http_settings->on_message_begin = NULL;
     http_settings->on_url = NULL;
     http_settings->on_header_field = NULL;
@@ -1145,11 +1145,11 @@ ERROR_CODE _cleanup_handler_file(struct connection_t *connection, struct data_t 
     struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
     struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
 
-    /* in case there is an http handler in the current connection must
+    /* in case there is an HTTP handler in the current connection must
     unset it (remove temporary information) */
     if(http_connection->http_handler) {
-        /* unsets the current http connection and then sets the reference
-        to it in the http connection as unset */
+        /* unsets the current HTTP connection and then sets the reference
+        to it in the HTTP connection as unset */
         http_connection->http_handler->unset(http_connection);
         http_connection->http_handler = NULL;
     }
@@ -1161,7 +1161,7 @@ ERROR_CODE _cleanup_handler_file(struct connection_t *connection, struct data_t 
         the client side (active closing) */
         connection->close_connection(connection);
     } else {
-        /* releases the lock on the http connection, this will allow further
+        /* releases the lock on the HTTP connection, this will allow further
         messages to be processed, an update event should raised following this
         lock releasing call */
         http_connection->release(http_connection);

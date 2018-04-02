@@ -170,7 +170,7 @@ typedef struct handler_proxy_context_t {
     struct connection_t *connection_c;
 
     /**
-     * The current http settings instance to be used for the connection with
+     * The current HTTP settings instance to be used for the connection with
      * the backend server to be able to parse its responses.
      */
     struct http_settings_t *http_settings;

@@ -43,10 +43,10 @@ ERROR_CODE create_dispatch_handler(struct dispatch_handler_t **dispatch_handler_
     dispatch_handler->names = NULL;
     dispatch_handler->regex_count = 0;
 
-    /* sets the dispatch handler in the upper http handler substrate */
+    /* sets the dispatch handler in the upper HTTP handler substrate */
     http_handler->lower = (void *) dispatch_handler;
 
-    /* sets the dispatch handler in the mod lua http handler pointer */
+    /* sets the dispatch handler in the mod lua HTTP handler pointer */
     *dispatch_handler_pointer = dispatch_handler;
 
     /* raises no error */
@@ -77,7 +77,7 @@ ERROR_CODE delete_dispatch_handler(struct dispatch_handler_t *dispatch_handler) 
 }
 
 ERROR_CODE register_handler_dispatch(struct service_t *service) {
-    /* allocates the http handler */
+    /* allocates the HTTP handler */
     struct http_handler_t *http_handler;
 
     /* allocates space for the dispatch handler */
@@ -92,12 +92,12 @@ ERROR_CODE register_handler_dispatch(struct service_t *service) {
     struct location_t *location;
 #endif
 
-    /* creates the http handler and then uses it to create
+    /* creates the HTTP handler and then uses it to create
     the dispatch handler (lower substrate) */
     service->create_http_handler(service, &http_handler, (unsigned char *) "dispatch");
     create_dispatch_handler(&dispatch_handler, http_handler);
 
-    /* sets the http handler attributes */
+    /* sets the HTTP handler attributes */
     http_handler->resolve_index = FALSE;
     http_handler->set = set_handler_dispatch;
     http_handler->unset = unset_handler_dispatch;
@@ -120,7 +120,7 @@ ERROR_CODE register_handler_dispatch(struct service_t *service) {
     }
 #endif
 
-    /* adds the http handler to the service */
+    /* adds the HTTP handler to the service */
     service->add_http_handler(service, http_handler);
 
     /* raises no error */
@@ -128,13 +128,13 @@ ERROR_CODE register_handler_dispatch(struct service_t *service) {
 }
 
 ERROR_CODE unregister_handler_dispatch(struct service_t *service) {
-    /* allocates the http handler */
+    /* allocates the HTTP handler */
     struct http_handler_t *http_handler;
 
     /* allocates space for the dispatch handler */
     struct dispatch_handler_t *dispatch_handler;
 
-    /* retrieves the http handler from the service, then retrieves
+    /* retrieves the HTTP handler from the service, then retrieves
     the lower substrate as the dispatch handler */
     service->get_http_handler(service, &http_handler, (unsigned char *) "dispatch");
     dispatch_handler = (struct dispatch_handler_t *) http_handler->lower;
@@ -142,7 +142,7 @@ ERROR_CODE unregister_handler_dispatch(struct service_t *service) {
     /* deletes the dispatch handler reference */
     delete_dispatch_handler(dispatch_handler);
 
-    /* remove the http handler from the service after
+    /* remove the HTTP handler from the service after
     that deletes the handler reference */
     service->remove_http_handler(service, http_handler);
     service->delete_http_handler(service, http_handler);
@@ -152,10 +152,10 @@ ERROR_CODE unregister_handler_dispatch(struct service_t *service) {
 }
 
 ERROR_CODE set_handler_dispatch(struct http_connection_t *http_connection) {
-    /* sets the http parser values */
+    /* sets the HTTP parser values */
     _set_http_parser_handler_dispatch(http_connection->http_parser);
 
-    /* sets the http settings values */
+    /* sets the HTTP settings values */
     _set_http_settings_handler_dispatch(http_connection->http_settings);
 
     /* raises no error */
@@ -163,10 +163,10 @@ ERROR_CODE set_handler_dispatch(struct http_connection_t *http_connection) {
 }
 
 ERROR_CODE unset_handler_dispatch(struct http_connection_t *http_connection) {
-    /* unsets the http parser values */
+    /* unsets the HTTP parser values */
     _unset_http_parser_handler_dispatch(http_connection->http_parser);
 
-    /* unsets the http settings values */
+    /* unsets the HTTP settings values */
     _unset_http_settings_handler_dispatch(http_connection->http_settings);
 
     /* raises no error */
@@ -260,8 +260,8 @@ ERROR_CODE url_callback_handler_dispatch(struct http_parser_t *http_parser, cons
     used in the handling of the request (concrete usage) */
     V_DEBUG_F("Using handler %s for handling\n", handler_name);
 
-    /* sets the current http handler accoring to the current options
-    in the service, the http handler must be loaded in the handlers map
+    /* sets the current HTTP handler accoring to the current options
+    in the service, the HTTP handler must be loaded in the handlers map
     in case the handler is not currently available an error is printed */
     get_value_string_hash_map(service->http_handlers_map, handler_name, (void **) &handler);
     if(handler) {
@@ -314,7 +314,7 @@ ERROR_CODE url_callback_handler_dispatch(struct http_parser_t *http_parser, cons
                 }
 
                 /* in case the matching index has changed a new handler reference
-                must be retrieved from the map containing the http handlers */
+                must be retrieved from the map containing the HTTP handlers */
                 if(index != _index) { get_value_string_hash_map(service->http_handlers_map, handler_name, (void **) &handler); }
 #endif
             }
@@ -419,9 +419,9 @@ ERROR_CODE _unset_http_parser_handler_dispatch(struct http_parser_t *http_parser
 }
 
 ERROR_CODE _set_http_settings_handler_dispatch(struct http_settings_t *http_settings) {
-    /* sets the various callback functions in the http settings
+    /* sets the various callback functions in the HTTP settings
     structure, these callbacks are going to be used in the runtime
-    processing of http parser (runtime execution) */
+    processing of HTTP parser (runtime execution) */
     http_settings->on_message_begin = message_begin_callback_handler_dispatch;
     http_settings->on_url = url_callback_handler_dispatch;
     http_settings->on_header_field = header_field_callback_handler_dispatch;
@@ -438,7 +438,7 @@ ERROR_CODE _set_http_settings_handler_dispatch(struct http_settings_t *http_sett
 }
 
 ERROR_CODE _unset_http_settings_handler_dispatch(struct http_settings_t *http_settings) {
-    /* unsets the various callback functions from the http settings */
+    /* unsets the various callback functions from the HTTP settings */
     http_settings->on_message_begin = NULL;
     http_settings->on_url = NULL;
     http_settings->on_header_field = NULL;
@@ -458,7 +458,7 @@ ERROR_CODE _send_response_handler_dispatch(struct http_parser_t *http_parser) {
     /* allocates the response buffer */
     char *response_buffer = MALLOC(VIRIATUM_HTTP_SIZE);
 
-    /* retrieves the connection from the http parser parameters */
+    /* retrieves the connection from the HTTP parser parameters */
     struct connection_t *connection = (struct connection_t *) http_parser->parameters;
 
     /* retrieves the underlying connection references in order to be
@@ -466,12 +466,12 @@ ERROR_CODE _send_response_handler_dispatch(struct http_parser_t *http_parser) {
     struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
     struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
 
-    /* acquires the lock on the http connection, this will avoids further
+    /* acquires the lock on the HTTP connection, this will avoids further
     messages to be processed, no parallel request handling problems */
     http_connection->acquire(http_connection);
 
     /* writes the response to the connection, registers for the appropriate callbacks
-    this method uses the http error util to correctly format the error message */
+    this method uses the HTTP error util to correctly format the error message */
     write_http_error(
         connection,
         response_buffer,
@@ -490,7 +490,7 @@ ERROR_CODE _send_response_handler_dispatch(struct http_parser_t *http_parser) {
 }
 
 ERROR_CODE _send_response_callback_handler_dispatch(struct connection_t *connection, struct data_t *data, void *parameters) {
-    /* retrieves the current http flags */
+    /* retrieves the current HTTP flags */
     unsigned char flags = (unsigned char) (size_t) parameters;
 
     /* retrieves the underlying connection references in order to be
@@ -498,11 +498,11 @@ ERROR_CODE _send_response_callback_handler_dispatch(struct connection_t *connect
     struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
     struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
 
-    /* in case there is an http handler in the current connection must
+    /* in case there is an HTTP handler in the current connection must
     unset it (remove temporary information) */
     if(http_connection->http_handler) {
-        /* unsets the current http connection and then sets the reference
-        to it in the http connection as unset */
+        /* unsets the current HTTP connection and then sets the reference
+        to it in the HTTP connection as unset */
         http_connection->http_handler->unset(http_connection);
         http_connection->http_handler = NULL;
     }
@@ -512,7 +512,7 @@ ERROR_CODE _send_response_callback_handler_dispatch(struct connection_t *connect
         /* closes the connection */
         connection->close_connection(connection);
     } else {
-        /* releases the lock on the http connection, this will allow further
+        /* releases the lock on the HTTP connection, this will allow further
         messages to be processed, an update event should raised following this
         lock releasing call */
         http_connection->release(http_connection);

@@ -42,7 +42,7 @@ ERROR_CODE _create_tracker_connection(
     be used to detect errors in calls */
     ERROR_CODE error;
 
-    /* allocates the http client connection and retrieves the
+    /* allocates the HTTP client connection and retrieves the
     "upper" connection (for parameters retrieval) */
     struct type_t *type;
     struct type_t *_type;
@@ -57,8 +57,8 @@ ERROR_CODE _create_tracker_connection(
     struct url_static_t url_static;
 
     /* alocates dynamic space for the parameters to the
-    http stream (http client) this structure will be able
-    to guide the stream of http client */
+    HTTP stream (HTTP client) this structure will be able
+    to guide the stream of HTTP client */
     struct http_client_parameters_t *parameters;
     create_http_client_parameters(&parameters);
 
@@ -67,7 +67,7 @@ ERROR_CODE _create_tracker_connection(
     parse_url_static(url, strlen(url), &url_static);
 
     /* populates the parameters structure with the
-    required values for the http client request */
+    required values for the HTTP client request */
     parameters->method = HTTP_GET;
 
     /* copies the "parsed url from the static url structure
@@ -134,7 +134,7 @@ ERROR_CODE _create_tracker_connection(
         "event", "started", sizeof("started") - 1
     );
 
-    /* creates a general http client connection structure containing
+    /* creates a general HTTP client connection structure containing
     all the general attributes for a connection, then sets the
     "local" connection reference from the pointer */
     _create_client_connection(
@@ -145,7 +145,7 @@ ERROR_CODE _create_tracker_connection(
     );
     connection = *connection_pointer;
 
-    /* sets the http client protocol as the protocol to be
+    /* sets the HTTP client protocol as the protocol to be
     "respected" for this client connection, this should
     be able to set the apropriate handlers in io then sets
     the parameters structure in the connection so that the

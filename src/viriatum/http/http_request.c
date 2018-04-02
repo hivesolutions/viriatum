@@ -30,21 +30,21 @@
 #include "http_request.h"
 
 void create_http_request(struct http_request_t **http_request_pointer) {
-    /* retrieves the http request size */
+    /* retrieves the HTTP request size */
     size_t http_request_size = sizeof(struct http_request_t);
 
-    /* allocates space for the http request */
+    /* allocates space for the HTTP request */
     struct http_request_t *http_request = (struct http_request_t *) MALLOC(http_request_size);
 
-    /* sets the http request default attributes */
+    /* sets the HTTP request default attributes */
     http_request->method = GET_REQUEST_METHOD;
     http_request->data = NULL;
 
-    /* sets the http request in the http request pointer */
+    /* sets the HTTP request in the HTTP request pointer */
     *http_request_pointer = http_request;
 }
 
 void delete_http_request(struct http_request_t *http_request) {
-    /* releases the http request */
+    /* releases the HTTP request */
     FREE(http_request);
 }
