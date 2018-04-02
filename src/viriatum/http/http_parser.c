@@ -30,7 +30,7 @@
 #include "http_parser.h"
 
 int http_should_keep_alive(struct http_parser_t *http_parser) {
-    /* in case the request is of type http 1.1 */
+    /* in case the request is of type HTTP 1.1 */
     if(http_parser->http_major > 0 && http_parser->http_minor > 0) {
         if(http_parser->flags & FLAG_CLOSE) {
             return 0;
@@ -38,7 +38,7 @@ int http_should_keep_alive(struct http_parser_t *http_parser) {
             return 1;
         }
     }
-    /* in case the request is of type http 1.0 or earlier */
+    /* in case the request is of type HTTP 1.0 or earlier */
     else {
         if(http_parser->flags & FLAG_KEEP_ALIVE) {
             return 1;
@@ -49,10 +49,10 @@ int http_should_keep_alive(struct http_parser_t *http_parser) {
 }
 
 void create_http_parser(struct http_parser_t **http_parser_pointer, char request) {
-    /* retrieves the http parser size */
+    /* retrieves the HTTP parser size */
     size_t http_parser_size = sizeof(struct http_parser_t);
 
-    /* allocates space for the http parser */
+    /* allocates space for the HTTP parser */
     struct http_parser_t *http_parser = (struct http_parser_t *) MALLOC(http_parser_size);
 
     /* sets the http parser attributes, in the original
@@ -75,20 +75,20 @@ void create_http_parser(struct http_parser_t **http_parser_pointer, char request
     http_parser->header_value_mark = 0;
     http_parser->url_mark = 0;
 
-    /* sets the http parser in the http parser pointer */
+    /* sets the HTTP parser in the http parser pointer */
     *http_parser_pointer = http_parser;
 }
 
 void delete_http_parser(struct http_parser_t *http_parser) {
-    /* releases the http parser */
+    /* releases the HTTP parser */
     FREE(http_parser);
 }
 
 void create_http_settings(struct http_settings_t **http_settings_pointer) {
-    /* retrieves the http settings size */
+    /* retrieves the HTTP settings size */
     size_t http_settings_size = sizeof(struct http_settings_t);
 
-    /* allocates space for the http settings */
+    /* allocates space for the HTTP settings */
     struct http_settings_t *http_settings = (struct http_settings_t *) MALLOC(http_settings_size);
 
     /* sets the http settings callback values to
@@ -105,12 +105,12 @@ void create_http_settings(struct http_settings_t **http_settings_pointer) {
     http_settings->on_location = NULL;
     http_settings->on_virtual_url = NULL;
 
-    /* sets the http settings in the http settings pointer */
+    /* sets the HTTP settings in the http settings pointer */
     *http_settings_pointer = http_settings;
 }
 
 void delete_http_settings(struct http_settings_t *http_settings) {
-    /* releases the http settings */
+    /* releases the HTTP settings */
     FREE(http_settings);
 }
 
@@ -190,6 +190,8 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                 http_parser->flags = 0;
                 http_parser->content_length = -1;
 
+				/* calls the message begin callback indicating
+				that a new message parsing as just begin */
                 HTTP_CALLBACK(message_begin);
 
                 if(byte == 'H') {
