@@ -65,24 +65,24 @@
 /**
  * Structure describing the internal
  * structures and information for the
- * mod wsgi module.
+ * mod WSGI module.
  */
 typedef struct mod_wsgi_module_t {
     /**
-     * The http handler associated with the
+     * The HTTP handler associated with the
      * module (upper layer).
      */
     struct http_handler_t *http_handler;
 
     /**
-     * The mod wsgi http handler associated
+     * The mod WSGI HTTP handler associated
      * with the module.
      */
     struct mod_wsgi_http_handler_t *mod_wsgi_http_handler;
 } mod_wsgi_module;
 
 /**
- * Structure representing a wsgi request
+ * Structure representing a WSGI request
  * for rendering of a page.
  * This structure contains a series of
  * values useful for request flush.
@@ -92,7 +92,7 @@ typedef struct wsgi_request_t {
      * The integer code describing the status
      * of the response assocaited with this
      * request, this information is provided
-     * by the wsgi application.
+     * by the WSGI application.
      */
     int status_code;
 
@@ -100,32 +100,32 @@ typedef struct wsgi_request_t {
      * The message string describing the status
      * of the response assocaited with this
      * request, this information is provided
-     * by the wsgi application.
+     * by the WSGI application.
      */
     char status_message[256];
 
     /**
      * The matrix buffer containing the maximum
      * possible count for various headers for the
-     * wsgi interpreter.
+     * WSGI interpreter.
      */
     char headers[VIRIATUM_MAX_HEADER_COUNT][VIRIATUM_MAX_HEADER_C_SIZE];
 
     /**
      * The number of headers currently present in
-     * the current wsgi request.
+     * the current WSGI request.
      */
     size_t header_count;
 
     /**
-     * Flag that controls if the current wsgi resquest
+     * Flag that controls if the current WSGI resquest
      * contains the content length header, and so the
      * length is specified.
      */
     char has_length;
 
     /**
-     * The reference to the current wsgi context
+     * The reference to the current WSGI context
      * structure in use.
      */
     struct handler_wsgi_context_t *wsgi_context;
@@ -155,7 +155,7 @@ VIRIATUM_EXTERNAL_PREFIX struct connection_t *_connection;
 VIRIATUM_EXTERNAL_PREFIX struct http_headers_t _headers;
 
 /**
- * The global structure to be used to "pass" wsgi
+ * The global structure to be used to "pass" WSGI
  * information from the virtual machine into the
  * appropriate viriatum request handler.
  */

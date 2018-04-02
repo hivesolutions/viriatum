@@ -30,22 +30,22 @@
 #include "handler.h"
 
 ERROR_CODE create_mod_lua_http_handler(struct mod_lua_http_handler_t **mod_lua_http_handler_pointer, struct http_handler_t *http_handler) {
-    /* retrieves the mod lua http handler size */
+    /* retrieves the mod Lua HTTP handler size */
     size_t mod_lua_http_handler_size = sizeof(struct mod_lua_http_handler_t);
 
-    /* allocates space for the mod lua http handler */
+    /* allocates space for the mod Lua HTTP handler */
     struct mod_lua_http_handler_t *mod_lua_http_handler =
         (struct mod_lua_http_handler_t *) MALLOC(mod_lua_http_handler_size);
 
-    /* sets the mod lua http handler attributes (default) values */
+    /* sets the mod Lua HTTP handler attributes (default) values */
     mod_lua_http_handler->lua_state = NULL;
     mod_lua_http_handler->file_path = NULL;
     mod_lua_http_handler->file_dirty = 0;
 
-    /* sets the mod lua http handler in the upper http handler substrate */
+    /* sets the mod Lua HTTP handler in the upper HTTP handler substrate */
     http_handler->lower = (void *) mod_lua_http_handler;
 
-    /* sets the mod lua http handler in the mod lua http handler pointer */
+    /* sets the mod Lua HTTP handler in the mod Lua HTTP handler pointer */
     *mod_lua_http_handler_pointer = mod_lua_http_handler;
 
     /* raises no error */
@@ -53,7 +53,7 @@ ERROR_CODE create_mod_lua_http_handler(struct mod_lua_http_handler_t **mod_lua_h
 }
 
 ERROR_CODE delete_mod_lua_http_handler(struct mod_lua_http_handler_t *mod_lua_http_handler) {
-    /* releases the mod lua http handler */
+    /* releases the mod Lua HTTP handler */
     FREE(mod_lua_http_handler);
 
     /* raises no error */
@@ -61,10 +61,10 @@ ERROR_CODE delete_mod_lua_http_handler(struct mod_lua_http_handler_t *mod_lua_ht
 }
 
 ERROR_CODE set_handler_lua(struct http_connection_t *http_connection) {
-    /* sets the http parser values */
+    /* sets the HTTP parser values */
     _set_http_parser_handler_lua(http_connection->http_parser);
 
-    /* sets the http settings values */
+    /* sets the HTTP settings values */
     _set_http_settings_handler_lua(http_connection->http_settings);
 
     /* raises no error */
@@ -72,10 +72,10 @@ ERROR_CODE set_handler_lua(struct http_connection_t *http_connection) {
 }
 
 ERROR_CODE unset_handler_lua(struct http_connection_t *http_connection) {
-    /* unsets the http parser values */
+    /* unsets the HTTP parser values */
     _unset_http_parser_handler_lua(http_connection->http_parser);
 
-    /* unsets the http settings values */
+    /* unsets the HTTP settings values */
     _unset_http_settings_handler_lua(http_connection->http_settings);
 
     /* raises no error */
@@ -146,9 +146,9 @@ ERROR_CODE _unset_http_parser_handler_lua(struct http_parser_t *http_parser) {
 }
 
 ERROR_CODE _set_http_settings_handler_lua(struct http_settings_t *http_settings) {
-    /* sets the various callback functions in the http settings
+    /* sets the various callback functions in the HTTP settings
     structure, these callbacks are going to be used in the runtime
-    processing of http parser (runtime execution) */
+    processing of HTTP parser (runtime execution) */
     http_settings->on_message_begin = message_begin_callback_handler_module;
     http_settings->on_url = url_callback_handler_lua;
     http_settings->on_header_field = header_field_callback_handler_lua;
@@ -165,7 +165,7 @@ ERROR_CODE _set_http_settings_handler_lua(struct http_settings_t *http_settings)
 }
 
 ERROR_CODE _unset_http_settings_handler_lua(struct http_settings_t *http_settings) {
-    /* unsets the various callback functions from the http settings */
+    /* unsets the various callback functions from the HTTP settings */
     http_settings->on_message_begin = NULL;
     http_settings->on_url = NULL;
     http_settings->on_header_field = NULL;
@@ -182,35 +182,35 @@ ERROR_CODE _unset_http_settings_handler_lua(struct http_settings_t *http_setting
 }
 
 ERROR_CODE _send_response_handler_lua(struct http_parser_t *http_parser) {
-    /* retrieves the connection from the http parser parameters */
+    /* retrieves the connection from the HTTP parser parameters */
     struct connection_t *connection = (struct connection_t *) http_parser->parameters;
 
-    /* retrieves the http connection from the io connection and uses it to retrieve
-    the correct (mod lua) handler to operate around it */
+    /* retrieves the HTTP connection from the io connection and uses it to retrieve
+    the correct (mod Lua) handler to operate around it */
     struct http_connection_t *http_connection = (struct http_connection_t *) ((struct io_connection_t *) connection->lower)->lower;
     struct mod_lua_http_handler_t *mod_lua_http_handler = (struct mod_lua_http_handler_t *) http_connection->http_handler->lower;
 
     /* allocates space for the result code */
     ERROR_CODE result_code;
 
-    /* acquires the lock on the http connection, this will avoids further
+    /* acquires the lock on the HTTP connection, this will avoids further
     messages to be processed, no parallel request handling problems */
     http_connection->acquire(http_connection);
 
-    /* in case the lua state is not started an error must
+    /* in case the Lua state is not started an error must
     have occured so need to return immediately in error */
     if(mod_lua_http_handler->lua_state == NULL) {
         /* writes the error to the connection and then returns
         in error to the caller function */
-        _write_error_connection_lua(http_parser, "no lua state available");
-        RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem accessing lua state");
+        _write_error_connection_lua(http_parser, "no Lua state available");
+        RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem accessing Lua state");
     }
 
-    /* registers the current connection in lua */
+    /* registers the current connection in Lua */
     lua_pushlightuserdata(mod_lua_http_handler->lua_state, (void *) http_parser);
     lua_setglobal(mod_lua_http_handler->lua_state, "connection");
 
-    /* registers the write connection function in lua */
+    /* registers the write connection function in Lua */
     lua_register(mod_lua_http_handler->lua_state, "write_connection", _lua_write_connection);
 
     /* runs the script in case the current file is considered to be
@@ -218,7 +218,7 @@ ERROR_CODE _send_response_handler_lua(struct http_parser_t *http_parser) {
     if(mod_lua_http_handler->file_dirty) { result_code = luaL_dofile(mod_lua_http_handler->lua_state, mod_lua_http_handler->file_path); mod_lua_http_handler->file_dirty = 0; }
     else { result_code = 0; }
 
-    /* in case there was an error in lua */
+    /* in case there was an error in Lua */
     if(LUA_ERROR(result_code)) {
         /* retrieves the error message and then writes it to the connection
         so that the end user may be able to respond to it */
@@ -226,11 +226,11 @@ ERROR_CODE _send_response_handler_lua(struct http_parser_t *http_parser) {
         _write_error_connection_lua(http_parser, error_message);
 
         /* sets the file as dirty (forces reload) and then reloads the curernt
-        internal lua state, virtual machine reset (to avoid corruption) */
+        internal Lua state, virtual machine reset (to avoid corruption) */
         mod_lua_http_handler->file_dirty = 1;
         _reload_lua_state(&mod_lua_http_handler->lua_state);
 
-        /* prints a warning message, closes the lua interpreter and then
+        /* prints a warning message, closes the Lua interpreter and then
         raises the error to the upper levels */
         V_WARNING_F("There was a problem executing: %s\n", mod_lua_http_handler->file_path);
         RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem executing script file");
@@ -241,7 +241,7 @@ ERROR_CODE _send_response_handler_lua(struct http_parser_t *http_parser) {
     lua_getfield(mod_lua_http_handler->lua_state, LUA_GLOBALSINDEX, "handle");
     result_code = lua_pcall(mod_lua_http_handler->lua_state, 0, 0, 0);
 
-    /* in case there was an error in lua */
+    /* in case there was an error in Lua */
     if(LUA_ERROR(result_code)) {
         /* retrieves the error message and then writes it to the connection
         so that the end user may be able to respond to it */
@@ -252,7 +252,7 @@ ERROR_CODE _send_response_handler_lua(struct http_parser_t *http_parser) {
         to be reload on next request */
         mod_lua_http_handler->file_dirty = 1;
 
-        /* prints a warning message, closes the lua interpreter and then
+        /* prints a warning message, closes the Lua interpreter and then
         raises the error to the upper levels */
         V_WARNING_F("There was a problem running call on file: %s\n", mod_lua_http_handler->file_path);
         RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem calling the handle method");
@@ -263,7 +263,7 @@ ERROR_CODE _send_response_handler_lua(struct http_parser_t *http_parser) {
 }
 
 ERROR_CODE _send_response_callback_handler_lua(struct connection_t *connection, struct data_t *data, void *parameters) {
-    /* retrieves the current http flags */
+    /* retrieves the current HTTP flags */
     unsigned char flags = (unsigned char) (size_t) parameters;
 
     /* retrieves the underlying connection references in order to be
@@ -271,11 +271,11 @@ ERROR_CODE _send_response_callback_handler_lua(struct connection_t *connection, 
     struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
     struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
 
-    /* in case there is an http handler in the current connection must
+    /* in case there is an HTTP handler in the current connection must
     unset it (remove temporary information) */
     if(http_connection->http_handler) {
-        /* unsets the current http connection and then sets the reference
-        to it in the http connection as unset */
+        /* unsets the current HTTP connection and then sets the reference
+        to it in the HTTP connection as unset */
         http_connection->http_handler->unset(http_connection);
         http_connection->http_handler = NULL;
     }
@@ -285,7 +285,7 @@ ERROR_CODE _send_response_callback_handler_lua(struct connection_t *connection, 
         /* closes the connection */
         connection->close_connection(connection);
     } else {
-        /* releases the lock on the http connection, this will allow further
+        /* releases the lock on the HTTP connection, this will allow further
         messages to be processed, an update event should raised following this
         lock releasing call */
         http_connection->release(http_connection);
@@ -299,7 +299,7 @@ ERROR_CODE _write_error_connection_lua(struct http_parser_t *http_parser, char *
     /* allocates space for the buffer to be used in the message */
     unsigned char *buffer;
 
-    /* retrieves the connection from the http parser parameters */
+    /* retrieves the connection from the HTTP parser parameters */
     struct connection_t *connection = (struct connection_t *) http_parser->parameters;
 
     /* retrieves the underlying connection references in order to be
@@ -308,7 +308,7 @@ ERROR_CODE _write_error_connection_lua(struct http_parser_t *http_parser, char *
     struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
 
     /* allocates the data buffer (in a safe maner) then
-    writes the http static headers to the response */
+    writes the HTTP static headers to the response */
     connection->alloc_data(connection, VIRIATUM_HTTP_SIZE, (void **) &buffer);
     http_connection->write_error(
         connection,
@@ -337,7 +337,7 @@ int _lua_write_connection(lua_State *lua_state) {
     /* allocates the data size */
     unsigned int data_size;
 
-    /* allocates the http parser */
+    /* allocates the HTTP parser */
     struct http_parser_t *http_parser;
 
     /* allocates the connection */
@@ -351,7 +351,7 @@ int _lua_write_connection(lua_State *lua_state) {
         /* prints a warning message */
         V_WARNING("Invalid number of arguments\n");
 
-        /* pushes an error message to lua */
+        /* pushes an error message to Lua */
         lua_pushstring(lua_state, "Invalid number of arguments");
         lua_error(lua_state);
     }
@@ -360,7 +360,7 @@ int _lua_write_connection(lua_State *lua_state) {
         /* prints a warning message */
         V_WARNING("Incorrect argument 'expected number'\n");
 
-        /* pushes an error message to lua */
+        /* pushes an error message to Lua */
         lua_pushstring(lua_state, "Incorrect argument to 'expected number'");
         lua_error(lua_state);
     }
@@ -369,7 +369,7 @@ int _lua_write_connection(lua_State *lua_state) {
         /* prints a warning message */
         V_WARNING("Incorrect argument 'expected string'\n");
 
-        /* pushes an error message to lua */
+        /* pushes an error message to Lua */
         lua_pushstring(lua_state, "Incorrect argument to 'expected string'");
         lua_error(lua_state);
     }
@@ -378,7 +378,7 @@ int _lua_write_connection(lua_State *lua_state) {
         /* prints a warning message */
         V_WARNING("Incorrect argument 'expected lightuserdata'\n");
 
-        /* pushes an error message to lua */
+        /* pushes an error message to Lua */
         lua_pushstring(lua_state, "Incorrect argument 'expected lightuserdata'");
         lua_error(lua_state);
     }
@@ -389,14 +389,14 @@ int _lua_write_connection(lua_State *lua_state) {
     /* converts the second argument into a string */
     data = lua_tostring(lua_state, -2);
 
-    /* converts the first argument into http parser structure */
+    /* converts the first argument into HTTP parser structure */
     http_parser = (struct http_parser_t *) lua_touserdata(lua_state, -3);
 
-    /* retrieves the connection from the http parser parameters */
+    /* retrieves the connection from the HTTP parser parameters */
     connection = (struct connection_t *) http_parser->parameters;
 
     /* allocates the data buffer (in a safe maner) then
-    copies the data (from lua) into the buffer */
+    copies the data (from Lua) into the buffer */
     connection->alloc_data(connection, data_size * sizeof(unsigned char), (void **) &buffer);
     memcpy(buffer, data, data_size);
 

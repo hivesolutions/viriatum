@@ -30,14 +30,14 @@
 #include "handler.h"
 
 ERROR_CODE set_handler_diag(struct http_connection_t *http_connection) {
-    /* sets the http setting values (callback handlers) and then returns
+    /* sets the HTTP setting values (callback handlers) and then returns
     normally to the caller function */
     http_connection->http_settings->on_message_complete = message_complete_callback_handler_diag;
     RAISE_NO_ERROR;
 }
 
 ERROR_CODE unset_handler_diag(struct http_connection_t *http_connection) {
-    /* unsets the http setting values (callback handlers) and then returns
+    /* unsets the HTTP setting values (callback handlers) and then returns
     normally to the caller function */
     http_connection->http_settings->on_message_complete = NULL;
     RAISE_NO_ERROR;
@@ -63,13 +63,13 @@ ERROR_CODE _send_response_handler_diag(struct http_parser_t *http_parser) {
     size_t info_size;
     size_t message_size;
 
-    /* retrieves the connection from the http parser parameters and
+    /* retrieves the connection from the HTTP parser parameters and
     uses it to retrieve the associated service instance */
     struct connection_t *connection = (struct connection_t *) http_parser->parameters;
     struct service_t *service = (struct service_t *) connection->service;
 
-    /* retrieves the http connection from the io connection to be used
-    for the http level operation to be done */
+    /* retrieves the HTTP connection from the io connection to be used
+    for the HTTP level operation to be done */
     struct http_connection_t *http_connection =\
         (struct http_connection_t *) ((struct io_connection_t *) connection->lower)->lower;
 
@@ -119,9 +119,9 @@ ERROR_CODE _send_response_handler_diag(struct http_parser_t *http_parser) {
     it is handled by the main engine */
     connection->alloc_data(connection, message_size, (void **) &buffer);
 
-    /* acquires the lock on the http connection, this will avoid further
+    /* acquires the lock on the HTTP connection, this will avoid further
     messages to be processed, no parallel request handling problems, then
-    writes the message into the current http connection, the message should
+    writes the message into the current HTTP connection, the message should
     be composed of an empty diag */
     http_connection->acquire(http_connection);
     count = http_connection->write_headers_c(
@@ -161,7 +161,7 @@ ERROR_CODE _send_response_handler_diag(struct http_parser_t *http_parser) {
 }
 
 ERROR_CODE _send_response_callback_handler_diag(struct connection_t *connection, struct data_t *data, void *parameters) {
-    /* retrieves the current http flags as the provided parameters
+    /* retrieves the current HTTP flags as the provided parameters
     these flags are going to be used for conditional execution */
     unsigned char flags = (unsigned char) (size_t) parameters;
 
@@ -175,18 +175,18 @@ ERROR_CODE _send_response_callback_handler_diag(struct connection_t *connection,
     context structrue will be destroyed there */
     unsigned char keep_alive = flags & FLAG_KEEP_ALIVE;
 
-    /* in case there is an http handler in the current connection must
+    /* in case there is an HTTP handler in the current connection must
     unset it (remove temporary information) */
     if(http_connection->http_handler) {
-        /* unsets the current http connection and then sets the reference
-        to it in the http connection as unset */
+        /* unsets the current HTTP connection and then sets the reference
+        to it in the HTTP connection as unset */
         http_connection->http_handler->unset(http_connection);
         http_connection->http_handler = NULL;
     }
 
     /* in case the connection is not meant to be kept alive must be closed
     in the normal manner (using the close connection function) otherwise
-    releases the lock on the http connection, this will allow further
+    releases the lock on the HTTP connection, this will allow further
     messages to be processed, an update event should raised following this
     lock releasing call */
     if(!keep_alive) { connection->close_connection(connection); }

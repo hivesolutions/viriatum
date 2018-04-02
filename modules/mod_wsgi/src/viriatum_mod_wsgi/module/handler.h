@@ -31,13 +31,13 @@
 
 /**
  * The maximum size of the name of the module
- * to be used in the wsgi module.
+ * to be used in the WSGI module.
  */
 #define VIRIATUM_WSGI_MODULE_SIZE 128
 
 /**
  * Structure describing the internal parameters
- * for a location in the wsgi context.
+ * for a location in the WSGI context.
  */
 typedef struct mod_wsgi_location_t {
     /**
@@ -73,7 +73,7 @@ typedef struct mod_wsgi_location_t {
 /**
  * The structure that holds the internal
  * structure to support the context
- * of the wsgi module.
+ * of the WSGI module.
  */
 typedef struct mod_wsgi_http_handler_t {
     /**
@@ -116,7 +116,7 @@ typedef struct mod_wsgi_http_handler_t {
     /**
      * The various locations loaded from the configuration
      * they refer the cofiruation attributes associated
-     * with the wsgi structures.
+     * with the WSGI structures.
      */
     struct mod_wsgi_location_t *locations;
 
@@ -147,14 +147,14 @@ typedef struct handler_wsgi_context_t {
 
     /**
      * The name to be considered the preffix in the
-     * internal wsgi structure for internal guide.
+     * internal WSGI structure for internal guide.
      * This value is used for "virtual" location guide.
      */
     unsigned char prefix_name[VIRIATUM_MAX_PATH_SIZE];
 
     /**
      * The path to the file to be handled by
-     * the current php request.
+     * the current PHP request.
      */
     unsigned char file_path[VIRIATUM_MAX_PATH_SIZE];
 
@@ -200,13 +200,13 @@ typedef struct handler_wsgi_context_t {
      * The list of headers parsed for the current request
      * this value changes over the parsing of the request.
      * The name of the header is not reliable as it changes
-     * after exposing it to the php interpreter.
+     * after exposing it to the PHP interpreter.
      */
     struct http_headers_t *headers;
 
     /**
      * The current value for the flags describing
-     * the status of the current http request.
+     * the status of the current HTTP request.
      */
     unsigned char flags;
 
@@ -240,7 +240,7 @@ typedef struct handler_wsgi_context_t {
     /**
      * Enumeration value that controls the type
      * of the next header to be read from the
-     * http input buffer.
+     * HTTP input buffer.
      */
     enum http_header_e _next_header;
 
@@ -306,7 +306,7 @@ typedef struct handler_wsgi_context_t {
 
     /**
      * The reference to the buffer iterator
-     * to be used to retrive data from the wsgi
+     * to be used to retrive data from the WSGI
      * application sequence of data, and to use
      * it to print to the output buffer.
      */

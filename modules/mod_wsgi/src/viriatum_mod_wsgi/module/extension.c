@@ -51,7 +51,7 @@ PyMethodDef wsgi_methods[3] = {
 };
 
 PyObject *wsgi_start_response(PyObject *self, PyObject *args) {
-    /* allocates space for the wsgi (utils) module and from the write
+    /* allocates space for the WSGI (utils) module and from the write
     function reference contained in it */
     PyObject *wsgi_module;
     PyObject *write_function;
@@ -126,7 +126,7 @@ PyObject *wsgi_start_response(PyObject *self, PyObject *args) {
             TRUE : _wsgi_request.has_length;
 
         /* formats the header into the "normal" format and sets
-        it under the headers buffer in the wsgi request */
+        it under the headers buffer in the WSGI request */
         SPRINTF(
             _wsgi_request.headers[_wsgi_request.header_count],
             VIRIATUM_MAX_HEADER_C_SIZE,
@@ -147,12 +147,12 @@ PyObject *wsgi_start_response(PyObject *self, PyObject *args) {
     count (avoids memory leak) */
     Py_DECREF(iterator);
 
-    /* imports the wsgi module containing the util methos to be used by the
-    application to access viriatum wsgi functions */
+    /* imports the WSGI module containing the util methos to be used by the
+    application to access viriatum WSGI functions */
     wsgi_module = PyImport_ImportModule("viriatum_wsgi");
     if(wsgi_module == NULL) { return NULL; }
 
-    /* retrieves the reference to the write function from the wsgi module
+    /* retrieves the reference to the write function from the WSGI module
     and then verifies that it's a valid python function */
     write_function = PyObject_GetAttrString(wsgi_module, "write");
     if(!write_function || !PyCallable_Check(write_function)) { return NULL; }

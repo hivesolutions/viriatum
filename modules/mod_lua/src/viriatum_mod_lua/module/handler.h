@@ -34,12 +34,12 @@
 /**
  * The structure that holds the internal
  * structure to support the context
- * of the lua module.
+ * of the Lua module.
  */
 typedef struct mod_lua_http_handler_t {
     /**
-     * The global lua state used over
-     * all the operations in lua.
+     * The global Lua state used over
+     * all the operations in Lua.
      */
     lua_State *lua_state;
 

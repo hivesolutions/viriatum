@@ -36,7 +36,7 @@
  */
 typedef struct mod_diag_module_t {
     /**
-     * The http handler associated with the
+     * The HTTP handler associated with the
      * module (upper layer).
      */
     struct http_handler_t *http_handler;

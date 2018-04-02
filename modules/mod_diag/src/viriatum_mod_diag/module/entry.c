@@ -57,8 +57,8 @@ ERROR_CODE delete_mod_diag_module(struct mod_diag_module_t *mod_diag_module) {
 }
 
 ERROR_CODE start_module_diag(struct environment_t *environment, struct module_t *module) {
-    /* allocates the http handler pointer value to be used
-    in the creation of the "new" http handler */
+    /* allocates the HTTP handler pointer value to be used
+    in the creation of the "new" HTTP handler */
     struct http_handler_t *http_handler;
 
     /* allocates the memory for the referece to mod gid module
@@ -85,11 +85,11 @@ ERROR_CODE start_module_diag(struct environment_t *environment, struct module_t 
     create_mod_diag_module(&mod_diag_module, module);
     info_module_diag(module);
 
-    /* creates a new http handler for the diag module, this
+    /* creates a new HTTP handler for the diag module, this
     is the handler structure to be used in the request */
     service->create_http_handler(service, &http_handler, (unsigned char *) "diag");
 
-    /* sets the http handler attributes */
+    /* sets the HTTP handler attributes */
     http_handler->resolve_index = 0;
     http_handler->set = set_handler_diag;
     http_handler->unset = unset_handler_diag;
@@ -98,7 +98,7 @@ ERROR_CODE start_module_diag(struct environment_t *environment, struct module_t 
     /* sets the mod diag module attributes */
     mod_diag_module->http_handler = http_handler;
 
-    /* adds the http handler to the service, this operation
+    /* adds the HTTP handler to the service, this operation
     should enable the handling of request using the (empty) diag
     based handler, in case they are correclty routed */
     service->add_http_handler(service, http_handler);
@@ -119,7 +119,7 @@ ERROR_CODE stop_module_diag(struct environment_t *environment, struct module_t *
     struct service_t *service = environment->service;
 
     /* retrieves the mod diag module (from the module) and uses
-    it to retrieve the create http handler */
+    it to retrieve the create HTTP handler */
     struct mod_diag_module_t *mod_diag_module = (struct  mod_diag_module_t *) module->lower;
     struct http_handler_t *http_handler = mod_diag_module->http_handler;
 
@@ -127,9 +127,9 @@ ERROR_CODE stop_module_diag(struct environment_t *environment, struct module_t *
     module, for debugging purposes */
     V_DEBUG_F("Stopping the module '%s' (%s) v%s\n", name, description, version);
 
-    /* removes the http handler from the service, it can no longer
+    /* removes the HTTP handler from the service, it can no longer
     be used to handle any request from this point on, then deletes
-    both the http handler and the mod diag module (to avoid memory leaks) */
+    both the HTTP handler and the mod diag module (to avoid memory leaks) */
     service->remove_http_handler(service, http_handler);
     if(http_handler != NULL) { service->delete_http_handler(service, http_handler); }
     delete_mod_diag_module(mod_diag_module);

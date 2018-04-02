@@ -48,51 +48,51 @@
 /**
  * Structure describing the internal
  * structures and information for the
- * mod php module.
+ * mod PHP module.
  */
 typedef struct mod_php_module_t {
     /**
-     * The http handler associated with the
+     * The HTTP handler associated with the
      * module (upper layer).
      */
     struct http_handler_t *http_handler;
 
     /**
-     * The mod php http handler associated
+     * The mod PHP HTTP handler associated
      * with the module.
      */
     struct mod_php_http_handler_t *mod_php_http_handler;
 } mod_php_module;
 
 /**
- * Structure representing a php request
+ * Structure representing a PHP request
  * for rendering of a page.
  * This structure contains a series of
  * values useful for request flush.
  */
 typedef struct php_request_t {
     /**
-     * The mime type value for the current php
+     * The mime type value for the current PHP
      * request, this header value is treated as
-     * a special case by the php interpreter.
+     * a special case by the PHP interpreter.
      */
     char mime_type[VIRIATUM_MAX_HEADER_V_SIZE];
 
     /**
      * The matrix buffer containing the maximum
      * possible count for various headers for the
-     * php interpreter.
+     * PHP interpreter.
      */
     char headers[VIRIATUM_MAX_HEADER_COUNT][VIRIATUM_MAX_HEADER_C_SIZE];
 
     /**
      * The number of headers currently present in
-     * the current php request.
+     * the current PHP request.
      */
     size_t header_count;
 
     /**
-     * The reference to the current php context
+     * The reference to the current PHP context
      * structure in use.
      */
     struct handler_php_context_t *php_context;
@@ -115,12 +115,12 @@ VIRIATUM_EXTERNAL_PREFIX struct connection_t *_connection;
 /**
  * The global reference to the linked buffer to
  * be used to hold the various strings resulting
- * from the php default execution output.
+ * from the PHP default execution output.
  */
 VIRIATUM_EXTERNAL_PREFIX struct linked_buffer_t *_output_buffer;
 
 /**
- * The global structure to be used to "pass" php
+ * The global structure to be used to "pass" PHP
  * information from the virtual machine into the
  * appropriate viriatum request handler.
  */

@@ -30,20 +30,20 @@
 #include "handler.h"
 
 ERROR_CODE create_mod_php_http_handler(struct mod_php_http_handler_t **mod_php_http_handler_pointer, struct http_handler_t *http_handler) {
-    /* retrieves the mod php http handler size */
+    /* retrieves the mod PHP HTTP handler size */
     size_t mod_php_http_handler_size = sizeof(struct mod_php_http_handler_t);
 
-    /* allocates space for the mod php http handler */
+    /* allocates space for the mod PHP HTTP handler */
     struct mod_php_http_handler_t *mod_php_http_handler =
         (struct mod_php_http_handler_t *) MALLOC(mod_php_http_handler_size);
 
-    /* sets the mod php http handler attributes (default) values */
+    /* sets the mod PHP HTTP handler attributes (default) values */
     mod_php_http_handler->base_path = NULL;
 
-    /* sets the mod php http handler in the upper http handler substrate */
+    /* sets the mod PHP HTTP handler in the upper HTTP handler substrate */
     http_handler->lower = (void *) mod_php_http_handler;
 
-    /* sets the mod php http handler in the mod php http handler pointer */
+    /* sets the mod PHP HTTP handler in the mod PHP HTTP handler pointer */
     *mod_php_http_handler_pointer = mod_php_http_handler;
 
     /* raises no error */
@@ -51,7 +51,7 @@ ERROR_CODE create_mod_php_http_handler(struct mod_php_http_handler_t **mod_php_h
 }
 
 ERROR_CODE delete_mod_php_http_handler(struct mod_php_http_handler_t *mod_php_http_handler) {
-    /* releases the mod php http handler */
+    /* releases the mod PHP HTTP handler */
     FREE(mod_php_http_handler);
 
     /* raises no error */
@@ -59,13 +59,13 @@ ERROR_CODE delete_mod_php_http_handler(struct mod_php_http_handler_t *mod_php_ht
 }
 
 ERROR_CODE create_handler_php_context(struct handler_php_context_t **handler_php_context_pointer) {
-    /* retrieves the handler php context size */
+    /* retrieves the handler PHP context size */
     size_t handler_php_context_size = sizeof(struct handler_php_context_t);
 
-    /* allocates space for the handler php context */
+    /* allocates space for the handler PHP context */
     struct handler_php_context_t *handler_php_context = (struct handler_php_context_t *) MALLOC(handler_php_context_size);
 
-    /* sets the handler php default values */
+    /* sets the handler PHP default values */
     handler_php_context->method = NULL;
     handler_php_context->post_data = NULL;
     handler_php_context->flags = 0;
@@ -86,7 +86,7 @@ ERROR_CODE create_handler_php_context(struct handler_php_context_t **handler_php
     header values to be persisted */
     create_linked_list(&handler_php_context->headers);
 
-    /* sets the handler php context in the  pointer */
+    /* sets the handler PHP context in the  pointer */
     *handler_php_context_pointer = handler_php_context;
 
     /* raises no error */
@@ -100,7 +100,7 @@ ERROR_CODE delete_handler_php_context(struct handler_php_context_t *handler_php_
     struct header_value_t *header;
 
     /* in case there is a valid output buffer defined in the current
-    handler php context it must be removed (linked buffer removal)
+    handler PHP context it must be removed (linked buffer removal)
     this way serious memory leaks are avoided */
     if(handler_php_context->output_buffer) { delete_linked_buffer(handler_php_context->output_buffer); }
 
@@ -125,7 +125,7 @@ ERROR_CODE delete_handler_php_context(struct handler_php_context_t *handler_php_
         delete_linked_list(handler_php_context->headers);
     }
 
-    /* releases the handler php context memory */
+    /* releases the handler PHP context memory */
     FREE(handler_php_context);
 
     /* raises no error */
@@ -133,10 +133,10 @@ ERROR_CODE delete_handler_php_context(struct handler_php_context_t *handler_php_
 }
 
 ERROR_CODE set_handler_php(struct http_connection_t *http_connection) {
-    /* sets the http parser values */
+    /* sets the HTTP parser values */
     _set_http_parser_handler_php(http_connection->http_parser);
 
-    /* sets the http settings values */
+    /* sets the HTTP settings values */
     _set_http_settings_handler_php(http_connection->http_settings);
 
     /* raises no error */
@@ -144,10 +144,10 @@ ERROR_CODE set_handler_php(struct http_connection_t *http_connection) {
 }
 
 ERROR_CODE unset_handler_php(struct http_connection_t *http_connection) {
-    /* unsets the http parser values */
+    /* unsets the HTTP parser values */
     _unset_http_parser_handler_php(http_connection->http_parser);
 
-    /* unsets the http settings values */
+    /* unsets the HTTP settings values */
     _unset_http_settings_handler_php(http_connection->http_settings);
 
     /* raises no error */
@@ -155,9 +155,9 @@ ERROR_CODE unset_handler_php(struct http_connection_t *http_connection) {
 }
 
 ERROR_CODE message_begin_callback_handler_module(struct http_parser_t *http_parser) {
-    /* retrieves the handler php context from the http parser
+    /* retrieves the handler PHP context from the HTTP parser
     in order tu use it to update the content type to the default
-    empty value (avoids possible problems in php interpreter)*/
+    empty value (avoids possible problems in PHP interpreter)*/
     struct handler_php_context_t *handler_php_context = (struct handler_php_context_t *) http_parser->context;
     handler_php_context->content_type[0] = '\0';
 
@@ -171,7 +171,7 @@ ERROR_CODE message_begin_callback_handler_module(struct http_parser_t *http_pars
 }
 
 ERROR_CODE url_callback_handler_php(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
-    /* retrieves the handler php context from the http parser */
+    /* retrieves the handler PHP context from the HTTP parser */
     struct handler_php_context_t *handler_php_context = (struct handler_php_context_t *) http_parser->context;
 
     /* checks the position of the get parameters divisor position
@@ -218,7 +218,7 @@ ERROR_CODE url_callback_handler_php(struct http_parser_t *http_parser, const uns
 }
 
 ERROR_CODE header_field_callback_handler_php(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
-    /* retrieves the handler php context from the http parser */
+    /* retrieves the handler PHP context from the HTTP parser */
     struct handler_php_context_t *handler_php_context = (struct handler_php_context_t *) http_parser->context;
 
     /* copies the current header name into the appropriate structure
@@ -242,7 +242,7 @@ ERROR_CODE header_field_callback_handler_php(struct http_parser_t *http_parser, 
 }
 
 ERROR_CODE header_value_callback_handler_php(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
-    /* retrieves the handler php context from the http parser */
+    /* retrieves the handler PHP context from the HTTP parser */
     struct handler_php_context_t *handler_php_context = (struct handler_php_context_t *) http_parser->context;
 
     /* allocates space for the pointer to be used for partial
@@ -266,7 +266,7 @@ ERROR_CODE header_value_callback_handler_php(struct http_parser_t *http_parser, 
     switch(handler_php_context->_next_header) {
         case CONTENT_TYPE:
             /* copies the content type header value into the
-            appropriate buffer in the php context */
+            appropriate buffer in the PHP context */
             memcpy(handler_php_context->content_type, data, data_size);
             handler_php_context->content_type[data_size] = '\0';
 
@@ -279,7 +279,7 @@ ERROR_CODE header_value_callback_handler_php(struct http_parser_t *http_parser, 
 
         case CONTENT_LENGTH:
             /* copies the content length header value into the
-            appropriate buffer in the php context */
+            appropriate buffer in the PHP context */
             memcpy(handler_php_context->content_length_, data, data_size);
             handler_php_context->content_length_[data_size] = '\0';
 
@@ -292,7 +292,7 @@ ERROR_CODE header_value_callback_handler_php(struct http_parser_t *http_parser, 
 
         case COOKIE:
             /* copies the cookie header value into the
-            appropriate buffer in the php context */
+            appropriate buffer in the PHP context */
             memcpy(handler_php_context->cookie, data, data_size);
             handler_php_context->cookie[data_size] = '\0';
 
@@ -305,7 +305,7 @@ ERROR_CODE header_value_callback_handler_php(struct http_parser_t *http_parser, 
 
         case HOST:
             /* copies the host header value into the
-            appropriate buffer in the php context */
+            appropriate buffer in the PHP context */
             memcpy(handler_php_context->host, data, data_size);
             handler_php_context->host[data_size] = '\0';
 
@@ -316,7 +316,7 @@ ERROR_CODE header_value_callback_handler_php(struct http_parser_t *http_parser, 
             else { _data_size = pointer - (char *) handler_php_context->host; }
 
             /* copies the server name header value into the
-            appropriate buffer in the php context */
+            appropriate buffer in the PHP context */
             memcpy(handler_php_context->server_name, data, _data_size);
             handler_php_context->server_name[_data_size] = '\0';
 
@@ -356,7 +356,7 @@ ERROR_CODE message_complete_callback_handler_php(struct http_parser_t *http_pars
 }
 
 ERROR_CODE path_callback_handler_php(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
-    /* retrieves the handler php context from the http parser */
+    /* retrieves the handler PHP context from the HTTP parser */
     struct handler_php_context_t *handler_php_context = (struct handler_php_context_t *) http_parser->context;
 
     /* copies the part of the data buffer relative to the file name
@@ -397,10 +397,10 @@ ERROR_CODE virtual_url_callback_handler_php(struct http_parser_t *http_parser, c
 }
 
 ERROR_CODE _set_http_parser_handler_php(struct http_parser_t *http_parser) {
-    /* allocates space for the handler php context and
+    /* allocates space for the handler PHP context and
     then creates and populates the instance after that
     sets the handler file context as the context for
-    the http parser*/
+    the HTTP parser*/
     struct handler_php_context_t *handler_php_context;
     create_handler_php_context(&handler_php_context);
     http_parser->context = handler_php_context;
@@ -410,7 +410,7 @@ ERROR_CODE _set_http_parser_handler_php(struct http_parser_t *http_parser) {
 }
 
 ERROR_CODE _unset_http_parser_handler_php(struct http_parser_t *http_parser) {
-    /* retrieves the handler php context from the http parser
+    /* retrieves the handler PHP context from the HTTP parser
     and then deletes (releases memory) */
     struct handler_php_context_t *handler_php_context = (struct handler_php_context_t *) http_parser->context;
     delete_handler_php_context(handler_php_context);
@@ -420,9 +420,9 @@ ERROR_CODE _unset_http_parser_handler_php(struct http_parser_t *http_parser) {
 }
 
 ERROR_CODE _set_http_settings_handler_php(struct http_settings_t *http_settings) {
-    /* sets the various callback functions in the http settings
+    /* sets the various callback functions in the HTTP settings
     structure, these callbacks are going to be used in the runtime
-    processing of http parser (runtime execution) */
+    processing of HTTP parser (runtime execution) */
     http_settings->on_message_begin = message_begin_callback_handler_module;
     http_settings->on_url = url_callback_handler_php;
     http_settings->on_header_field = header_field_callback_handler_php;
@@ -439,7 +439,7 @@ ERROR_CODE _set_http_settings_handler_php(struct http_settings_t *http_settings)
 }
 
 ERROR_CODE _unset_http_settings_handler_php(struct http_settings_t *http_settings) {
-    /* unsets the various callback functions from the http settings */
+    /* unsets the various callback functions from the HTTP settings */
     http_settings->on_message_begin = NULL;
     http_settings->on_url = NULL;
     http_settings->on_header_field = NULL;
@@ -462,7 +462,7 @@ ERROR_CODE _send_data_callback_php(struct connection_t *connection, struct data_
     char *buffer;
     char *output_data;
 
-    /* retrieves the current php context and then uses it to retrieve
+    /* retrieves the current PHP context and then uses it to retrieve
     the proper output buffer for the current connection (the context) */
     struct handler_php_context_t *handler_php_context = (struct handler_php_context_t *) parameters;
     struct linked_buffer_t *output_buffer = handler_php_context->output_buffer;
@@ -513,7 +513,7 @@ ERROR_CODE _send_response_handler_php(struct http_parser_t *http_parser) {
     size_t count;
 
     /* allocates space for the variables to hold information on the
-    status of the php request to be processed */
+    status of the PHP request to be processed */
     int status_code;
     char *status_message;
 
@@ -529,21 +529,21 @@ ERROR_CODE _send_response_handler_php(struct http_parser_t *http_parser) {
     SOCKET_ADDRESS address;
 
     /* allocates space for the linked buffer to be used for the
-    standard ouput resulting from the php interpreter execution */
+    standard ouput resulting from the PHP interpreter execution */
     struct linked_buffer_t *output_buffer = NULL;
 
-    /* retrieves the connection from the http parser parameters
-    and then retrieves the handler php context*/
+    /* retrieves the connection from the HTTP parser parameters
+    and then retrieves the handler PHP context*/
     struct connection_t *connection = (struct connection_t *) http_parser->parameters;
     struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
     struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
     struct handler_php_context_t *handler_php_context = (struct handler_php_context_t *) http_parser->context;
 
-    /* retrieves the http method string value accessing the array of
+    /* retrieves the HTTP method string value accessing the array of
     static string values */
     char *method = (char *) http_method_strings[http_parser->method - 1];
 
-    /* acquires the lock on the http connection, this will avoids further
+    /* acquires the lock on the HTTP connection, this will avoids further
     messages to be processed, no parallel request handling problems */
     http_connection->acquire(http_connection);
 
@@ -553,18 +553,18 @@ ERROR_CODE _send_response_handler_php(struct http_parser_t *http_parser) {
     } else { post_data = NULL; }
 
     /* sets the global reference to the connection currently being
-    used for the php interpreter this is the reference that is going
+    used for the PHP interpreter this is the reference that is going
     to be used while accessing global server values */
     _connection = connection;
 
     /* creates the linked buffer to be used to store
-    the complete output of the php interpreter */
+    the complete output of the PHP interpreter */
     create_linked_buffer(&output_buffer);
 
     /* sets the output buffer reference in the global output buffer
-    variable so that the php write handler is able to store the
+    variable so that the PHP write handler is able to store the
     current output stream values, then sets the output buffer also
-    in the current http parser structure reference */
+    in the current HTTP parser structure reference */
     _output_buffer = output_buffer;
     handler_php_context->method = method;
     handler_php_context->post_data = post_data;
@@ -572,15 +572,15 @@ ERROR_CODE _send_response_handler_php(struct http_parser_t *http_parser) {
     handler_php_context->content_length = http_parser->_content_length;
     handler_php_context->output_buffer = output_buffer;
 
-    /* resets the number of headers for the current php request
-    to be processed (this is a new php request) */
+    /* resets the number of headers for the current PHP request
+    to be processed (this is a new PHP request) */
     _php_request.header_count = 0;
 
-    /* sets the php context in the php request for global reference
+    /* sets the PHP context in the PHP request for global reference
     this should be able to allow global access from the handler methods */
     _php_request.php_context = handler_php_context;
 
-    /* updates the current global php reqest information
+    /* updates the current global PHP reqest information
     this is the main interface for the sapi modules */
     _update_request_php(handler_php_context);
 
@@ -616,7 +616,7 @@ ERROR_CODE _send_response_handler_php(struct http_parser_t *http_parser) {
     address_string = inet_ntoa(((SOCKET_ADDRESS_INTERNET *) &address)->sin_addr);
 
     /* logs the current request using the available functions at the
-    http connection level, this will put the log into the currently
+    HTTP connection level, this will put the log into the currently
     defined output stream */
     http_connection->log_request(
         address_string,
@@ -649,10 +649,10 @@ ERROR_CODE _send_response_handler_php(struct http_parser_t *http_parser) {
         (long unsigned int) output_buffer->buffer_length
     );
 
-    /* iterates over all the headers present in the current php request to copy
+    /* iterates over all the headers present in the current PHP request to copy
     their content into the current headers buffer */
     for(index = 0; index < _php_request.header_count; index++) {
-        /* copies the current php header into the current position of the headers
+        /* copies the current PHP header into the current position of the headers
         buffer (header copy), note that the trailing newlines are count in size */
         count += SPRINTF(
             &headers_buffer[count],
@@ -682,7 +682,7 @@ ERROR_CODE _send_response_handler_php(struct http_parser_t *http_parser) {
 }
 
 ERROR_CODE _send_response_callback_handler_php(struct connection_t *connection, struct data_t *data, void *parameters) {
-    /* retrieves the current php context for the parameters */
+    /* retrieves the current PHP context for the parameters */
     struct handler_php_context_t *handler_php_context = (struct handler_php_context_t *) parameters;
 
     /* retrieves the underlying connection references in order to be
@@ -691,22 +691,22 @@ ERROR_CODE _send_response_callback_handler_php(struct connection_t *connection, 
     struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
 
     /* checks if the current connection should be kept alive, this must
-    be done prior to the unseting of the connection as the current php
+    be done prior to the unseting of the connection as the current PHP
     context structrue will be destroyed there */
     unsigned char keep_alive = handler_php_context->flags & FLAG_KEEP_ALIVE;
 
-    /* in case there is an http handler in the current connection must
+    /* in case there is an HTTP handler in the current connection must
     unset it (remove temporary information) */
     if(http_connection->http_handler) {
-        /* unsets the current http connection and then sets the reference
-        to it in the http connection as unset */
+        /* unsets the current HTTP connection and then sets the reference
+        to it in the HTTP connection as unset */
         http_connection->http_handler->unset(http_connection);
         http_connection->http_handler = NULL;
     }
 
     /* in case the connection is not meant to be kept alive must be closed
     in the normal manner (using the close connection function) otherwise
-    releases the lock on the http connection, this will allow further
+    releases the lock on the HTTP connection, this will allow further
     messages to be processed, an update event should raised following this
     lock releasing call */
     if(!keep_alive) { connection->close_connection(connection); }
@@ -718,7 +718,7 @@ ERROR_CODE _send_response_callback_handler_php(struct connection_t *connection, 
 
 ERROR_CODE _update_request_php(struct handler_php_context_t *handler_php_context) {
     /* sets the various sapi headers and request info parameters
-    from the current php context object values */
+    from the current PHP context object values */
     SG(sapi_headers).http_response_code = 200;
     SG(sapi_headers).http_status_line = (char *) GET_HTTP_STATUS(200);
     SG(request_info).content_type = (char *) handler_php_context->content_type;
@@ -730,7 +730,7 @@ ERROR_CODE _update_request_php(struct handler_php_context_t *handler_php_context
     SG(request_info).content_length = handler_php_context->content_length;
 
     /* updates the global values with the previously defined (static)
-    values the server context is set as one to allow correct php running */
+    values the server context is set as one to allow correct PHP running */
     SG(global_request_time) = 0;
     SG(read_post_bytes) = 1;
     SG(server_context) = (void *) 1;

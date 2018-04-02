@@ -176,15 +176,15 @@ void _module_register(zval *_array TSRMLS_DC) {
     address_string = inet_ntoa(((SOCKET_ADDRESS_INTERNET *) &address)->sin_addr);
 
     /* creates the iterator to the headers linked list so that it's possible
-    to "go arround" the headers to expose them to the php interpreter */
+    to "go arround" the headers to expose them to the PHP interpreter */
     create_iterator_linked_list(_php_request.php_context->headers, &headers_iterator);
 
     /* iterates continuously over all the headers to export them
-    to the php interpreter */
+    to the PHP interpreter */
     while(1) {
         /* retrieves the next header element and in case it's null
         finishes the iteration otherwise converts the name to uppercase,
-        prepends the prefix value and exposes it to the php interpreter */
+        prepends the prefix value and exposes it to the PHP interpreter */
         get_next_iterator(headers_iterator, (void **) &header);
         if(header == NULL) { break; }
         uppercase(header->name);
@@ -202,7 +202,7 @@ void _module_register(zval *_array TSRMLS_DC) {
     else { php_register_variable_safe("PHP_SELF", "-", 1, _array TSRMLS_CC); }
 
     /* registers a series og global wide variable representing the
-    current interface (critical for correct php interpreter usage) */
+    current interface (critical for correct PHP interpreter usage) */
     php_register_variable_safe("SERVER_SOFTWARE", "viriatum", sizeof("viriatum") - 1, _array TSRMLS_CC);
     php_register_variable_safe("GATEWAY_INTERFACE", "CGI/1.1", sizeof("CGI/1.1") - 1, _array TSRMLS_CC);
     php_register_variable_safe("SERVER_PROTOCOL", "HTTP/1.1", sizeof("HTTP/1.1") - 1, _array TSRMLS_CC);
@@ -337,7 +337,7 @@ PHP_FUNCTION(viriatum_connection_info) {
     if(ZEND_NUM_ARGS() != 1) { WRONG_PARAM_COUNT; }
 
     /* parses the arguments that were provided to the function as
-    expected by the php c api infra-structure */
+    expected by the PHP C API infra-structure */
     zend_parse_parameters(1, "l", &id);
 
     /* intializes the return value of the function as an

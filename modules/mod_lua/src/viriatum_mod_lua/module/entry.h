@@ -38,23 +38,23 @@
 /**
  * Structure describing the internal
  * structures and information for the
- * mod lua module.
+ * mod Lua module.
  */
 typedef struct mod_lua_module_t {
     /**
-     * The global lua state used over
-     * all the operations in lua.
+     * The global Lua state used over
+     * all the operations in Lua.
      */
     lua_State *lua_state;
 
     /**
-     * The http handler associated with the
+     * The HTTP handler associated with the
      * module (upper layer).
      */
     struct http_handler_t *http_handler;
 
     /**
-     * The mod lua http handler associated
+     * The mod Lua HTTP handler associated
      * with the module.
      */
     struct mod_lua_http_handler_t *mod_lua_http_handler;

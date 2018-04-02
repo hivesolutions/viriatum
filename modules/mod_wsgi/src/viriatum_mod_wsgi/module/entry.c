@@ -37,20 +37,20 @@ values will be used accross functions */
 START_GLOBALS;
 
 ERROR_CODE create_mod_wsgi_module(struct mod_wsgi_module_t **mod_wsgi_module_pointer, struct module_t *module) {
-    /* retrieves the mod wsgi module size */
+    /* retrieves the mod WSGI module size */
     size_t mod_wsgi_module_size = sizeof(struct mod_wsgi_module_t);
 
-    /* allocates space for the mod wsgi module */
+    /* allocates space for the mod WSGI module */
     struct mod_wsgi_module_t *mod_wsgi_module = (struct mod_wsgi_module_t *) MALLOC(mod_wsgi_module_size);
 
-    /* sets the mod wsgi module attributes (default) values */
+    /* sets the mod WSGI module attributes (default) values */
     mod_wsgi_module->http_handler = NULL;
     mod_wsgi_module->mod_wsgi_http_handler = NULL;
 
-    /* sets the mod wsgi module in the (upper) module substrate */
+    /* sets the mod WSGI module in the (upper) module substrate */
     module->lower = (void *) mod_wsgi_module;
 
-    /* sets the mod wsgi module in the module pointer */
+    /* sets the mod WSGI module in the module pointer */
     *mod_wsgi_module_pointer = mod_wsgi_module;
 
     /* raises no error */
@@ -58,7 +58,7 @@ ERROR_CODE create_mod_wsgi_module(struct mod_wsgi_module_t **mod_wsgi_module_poi
 }
 
 ERROR_CODE delete_mod_wsgi_module(struct mod_wsgi_module_t *mod_wsgi_module) {
-    /* releases the mod wsgi module */
+    /* releases the mod WSGI module */
     FREE(mod_wsgi_module);
 
     /* raises no error */
@@ -66,13 +66,13 @@ ERROR_CODE delete_mod_wsgi_module(struct mod_wsgi_module_t *mod_wsgi_module) {
 }
 
 ERROR_CODE start_module_wsgi(struct environment_t *environment, struct module_t *module) {
-    /* allocates the mod wsgi module */
+    /* allocates the mod WSGI module */
     struct mod_wsgi_module_t *mod_wsgi_module;
 
-    /* allocates the http handler */
+    /* allocates the HTTP handler */
     struct http_handler_t *http_handler;
 
-    /* allocates the mod wsgi http handler */
+    /* allocates the mod WSGI HTTP handler */
     struct mod_wsgi_http_handler_t *mod_wsgi_http_handler;
 
     /* retrieves the name, version and description of
@@ -91,36 +91,36 @@ ERROR_CODE start_module_wsgi(struct environment_t *environment, struct module_t 
     externalized function for the interpreter */
     _service = service;
 
-    /* creates the mod wsgi module */
+    /* creates the mod WSGI module */
     create_mod_wsgi_module(&mod_wsgi_module, module);
 
     /* populates the module structure */
     info_module_wsgi(module);
 
-    /* loads the wsgi state populating all the required values
+    /* loads the WSGI state populating all the required values
     for state initialization */
     _load_wsgi_state();
 
-    /* creates the http handler */
+    /* creates the HTTP handler */
     service->create_http_handler(service, &http_handler, (unsigned char *) "wsgi");
 
-    /* creates the mod wsgi http handler */
+    /* creates the mod WSGI HTTP handler */
     create_mod_wsgi_http_handler(&mod_wsgi_http_handler, http_handler);
 
-    /* sets the http handler attributes */
+    /* sets the HTTP handler attributes */
     http_handler->resolve_index = 0;
     http_handler->set = set_handler_wsgi;
     http_handler->unset = unset_handler_wsgi;
     http_handler->reset = NULL;
 
-    /* sets the mod wsgi module attributes */
+    /* sets the mod WSGI module attributes */
     mod_wsgi_module->http_handler = http_handler;
     mod_wsgi_module->mod_wsgi_http_handler = mod_wsgi_http_handler;
 
-    /* adds the http handler to the service */
+    /* adds the HTTP handler to the service */
     service->add_http_handler(service, http_handler);
 
-    /* loads the service configuration for the http handler
+    /* loads the service configuration for the HTTP handler
     this should change some of it's behavior then loads the
     locations (configurations) associated with the current
     service environment */
@@ -141,40 +141,40 @@ ERROR_CODE stop_module_wsgi(struct environment_t *environment, struct module_t *
     /* retrieves the (environment) service */
     struct service_t *service = environment->service;
 
-    /* retrieves the mod wsgi module (from the module) */
+    /* retrieves the mod WSGI module (from the module) */
     struct mod_wsgi_module_t *mod_wsgi_module = (struct  mod_wsgi_module_t *) module->lower;
 
-    /* retrieves the http handler from the mod wsgi module */
+    /* retrieves the HTTP handler from the mod WSGI module */
     struct http_handler_t *http_handler = mod_wsgi_module->http_handler;
 
-    /* retrieves the mod wsgi http handler from the mod wsgi module */
+    /* retrieves the mod WSGI HTTP handler from the mod WSGI module */
     struct mod_wsgi_http_handler_t *mod_wsgi_http_handler = mod_wsgi_module->mod_wsgi_http_handler;
 
     /* prints a debug message */
     V_DEBUG_F("Stopping the module '%s' (%s) v%s\n", name, description, version);
 
-    /* removes the http handler from the service */
+    /* removes the HTTP handler from the service */
     service->remove_http_handler(service, http_handler);
 
-    /* in case the mod wsgi http handler is valid and
+    /* in case the mod WSGI HTTP handler is valid and
     initialized (correct state) */
     if(mod_wsgi_http_handler != NULL) {
-        /* deletes the mod wsgi http handler */
+        /* deletes the mod WSGI HTTP handler */
         delete_mod_wsgi_http_handler(mod_wsgi_http_handler);
     }
 
-    /* in case the http handler is valid and
+    /* in case the HTTP handler is valid and
     initialized (correct state) */
     if(http_handler != NULL) {
-        /* deletes the http handler */
+        /* deletes the HTTP handler */
         service->delete_http_handler(service, http_handler);
     }
 
-    /* unloads the wsgi state destroying all the required values
+    /* unloads the WSGI state destroying all the required values
     for state destroyed */
     _unload_wsgi_state();
 
-    /* deletes the mod wsgi module */
+    /* deletes the mod WSGI module */
     delete_mod_wsgi_module(mod_wsgi_module);
 
     /* sets the global service reference this is no longer necessary
@@ -227,13 +227,13 @@ ERROR_CODE _load_configuration_wsgi(struct service_t *service, struct mod_wsgi_h
     must return immediately (not possible to load it) */
     if(service->configuration == NULL) { RAISE_NO_ERROR; }
 
-    /* tries to retrieve the mod wsgi section configuration from the configuration
+    /* tries to retrieve the mod WSGI section configuration from the configuration
     map in case none is found returns immediately no need to process anything more */
     get_value_string_sort_map(service->configuration, (unsigned char *) "mod_wsgi", (void **) &configuration);
     if(configuration == NULL) { RAISE_NO_ERROR; }
 
-    /* tries ro retrieve the script path from the wsgi configuration and in
-    case it exists sets it in the mod wsgi handler (attribute reference change) */
+    /* tries ro retrieve the script path from the WSGI configuration and in
+    case it exists sets it in the mod WSGI handler (attribute reference change) */
     get_value_string_sort_map(configuration, (unsigned char *) "script_path", &value);
     if(value != NULL) { mod_wsgi_http_handler->file_path = (char *) value; }
 
@@ -257,18 +257,18 @@ ERROR_CODE _load_locations_wsgi(struct service_t *service, struct mod_wsgi_http_
     struct location_t *location;
     struct sort_map_t *configuration;
 
-    /* allocates space for the mod wsgi location structure
+    /* allocates space for the mod WSGI location structure
     reference to be used to resolve the request */
     struct mod_wsgi_location_t *_location;
 
     /* allocates space for the various location structures
-    that will be used to resolve the wsgi request */
+    that will be used to resolve the WSGI request */
     mod_wsgi_http_handler->locations = (struct mod_wsgi_location_t *)
         MALLOC(service->locations.count * sizeof(struct mod_wsgi_location_t));
     memset(mod_wsgi_http_handler->locations, 0,
         service->locations.count * sizeof(struct mod_wsgi_location_t));
 
-    /* updates the locations count variable in the wsgi handler so
+    /* updates the locations count variable in the WSGI handler so
     that it's possible to iterate over the locations */
     mod_wsgi_http_handler->locations_count = service->locations.count;
 
@@ -280,13 +280,13 @@ ERROR_CODE _load_locations_wsgi(struct service_t *service, struct mod_wsgi_http_
         location = &service->locations.values[index];
         configuration = location->configuration;
 
-        /* retrieves the current mod wsgi configuration reference from
+        /* retrieves the current mod WSGI configuration reference from
         the location buffer, this is going ot be populated and sets the
         default values in it */
         _location = &mod_wsgi_http_handler->locations[index];
         _location->reload = UNSET;
 
-        /* tries ro retrieve the script path from the wsgi configuration and in
+        /* tries ro retrieve the script path from the WSGI configuration and in
         case it exists sets it in the location (attribute reference change) */
         get_value_string_sort_map(configuration, (unsigned char *) "script_path", &value);
         if(value != NULL) { _location->file_path = (char *) value; }
@@ -316,7 +316,7 @@ ERROR_CODE _load_wsgi_state() {
     PyEval_ReleaseLock();
 #endif
 
-    /* starts the wsgi state updating the major global value in
+    /* starts the WSGI state updating the major global value in
     the current interpreter state */
     _start_wsgi_state();
 
@@ -355,7 +355,7 @@ ERROR_CODE _reload_wsgi_state() {
 
 ERROR_CODE _start_wsgi_state() {
     /* allocates space for the reference to the to be created
-    wsgi module and the type to be exported */
+    WSGI module and the type to be exported */
     PyObject *wsgi_module;
     PyTypeObject *type;
 
@@ -366,8 +366,8 @@ ERROR_CODE _start_wsgi_state() {
     PyList_Insert(path, 0, current_path);
     Py_DECREF(current_path);
 
-    /* registers the viriatum wsgi module in the python interpreter
-    this module may be used to provide wsgi functions */
+    /* registers the viriatum WSGI module in the python interpreter
+    this module may be used to provide WSGI functions */
     wsgi_module = Py_InitModule("viriatum_wsgi", wsgi_methods);
     PyModule_AddStringConstant(wsgi_module, "NAME", (char *) _service->name);
     PyModule_AddStringConstant(wsgi_module, "VERSION", (char *) _service->version);

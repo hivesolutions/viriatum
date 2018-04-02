@@ -32,7 +32,7 @@
 /**
  * The structure that holds the internal
  * structure to support the context
- * of the php module.
+ * of the PHP module.
  */
 typedef struct mod_php_http_handler_t {
     /**
@@ -45,7 +45,7 @@ typedef struct mod_php_http_handler_t {
 /**
  * The context structure to be used allong
  * the interpretation of the request for
- * the php handler, must be used to control
+ * the PHP handler, must be used to control
  * the url and file resolution.
  */
 typedef struct handler_php_context_t {
@@ -68,7 +68,7 @@ typedef struct handler_php_context_t {
 
     /**
      * The path to the file to be handled by
-     * the current php request.
+     * the current PHP request.
      */
     unsigned char file_path[VIRIATUM_MAX_PATH_SIZE];
 
@@ -114,12 +114,12 @@ typedef struct handler_php_context_t {
      * The list of headers parsed for the current request
      * this value changes over the parsing of the request.
      * The name of the header is not reliable as it changes
-     * after exposing it to the php interpreter.
+     * after exposing it to the PHP interpreter.
      */
     struct linked_list_t *headers;
 
     /**
-     * The string representing the http method
+     * The string representing the HTTP method
      * currently being used.
      */
     char *method;
@@ -132,7 +132,7 @@ typedef struct handler_php_context_t {
 
     /**
      * The current value for the flags describing
-     * the status of the current http request.
+     * the status of the current HTTP request.
      */
     unsigned char flags;
 
@@ -151,7 +151,7 @@ typedef struct handler_php_context_t {
     /**
      * Enumeration value that controls the type
      * of the next header to be read from the
-     * http input buffer.
+     * HTTP input buffer.
      */
     enum http_header_e _next_header;
 
