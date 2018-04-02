@@ -32,7 +32,7 @@
 /**
  * Structure describing the internal
  * structures and information for the
- * mod gif module.
+ * mod GIF module.
  */
 typedef struct mod_gif_module_t {
     /**

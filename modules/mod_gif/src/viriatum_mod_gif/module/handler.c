@@ -75,7 +75,7 @@ ERROR_CODE _send_response_handler_gif(struct http_parser_t *http_parser) {
     struct http_connection_t *http_connection =\
         (struct http_connection_t *) ((struct io_connection_t *) connection->lower)->lower;
 
-    /* allocates the buffer to be used to send the empty gif data, it must
+    /* allocates the buffer to be used to send the empty GIF data, it must
     be allocated inside the viriatum memory area so that the deallocation of
     it is handled by the main engine */
     connection->alloc_data(connection, VIRIATUM_HTTP_MAX_SIZE, (void **) &buffer);
@@ -83,7 +83,7 @@ ERROR_CODE _send_response_handler_gif(struct http_parser_t *http_parser) {
     /* acquires the lock on the HTTP connection, this will avoids further
     messages to be processed, no parallel request handling problems, then
     writes the message into the current HTTP connection, the message should
-    be composed of an empty gif */
+    be composed of an empty GIF */
     http_connection->acquire(http_connection);
     count = http_connection->write_headers_c(
         connection,
@@ -132,7 +132,7 @@ ERROR_CODE _send_response_callback_handler_gif(struct connection_t *connection, 
     struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
 
     /* checks if the current connection should be kept alive, this must
-    be done prior to the unseting of the connection as the current gif
+    be done prior to the unseting of the connection as the current GIF
     context structrue will be destroyed there */
     unsigned char keep_alive = flags & FLAG_KEEP_ALIVE;
 
