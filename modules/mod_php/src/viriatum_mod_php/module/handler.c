@@ -192,7 +192,7 @@ ERROR_CODE url_callback_handler_php(struct http_parser_t *http_parser, const uns
     if(pointer) { memcpy(handler_php_context->query, pointer + 1, query_size); }
     handler_php_context->query[query_size] = '\0';
 
-    /* copies the url to the url reference in the handler file context then
+    /* copies the URL to the URL reference in the handler file context then
     creates the file path using the base viriatum path */
     memcpy(handler_php_context->url, data, data_size);
     handler_php_context->url[data_size] = '\0';

@@ -130,7 +130,7 @@ typedef struct mod_wsgi_http_handler_t {
 
 typedef struct handler_wsgi_context_t {
     /**
-     * The url to be used for retrieving the file.
+     * The URL to be used for retrieving the file.
      */
     unsigned char url[VIRIATUM_MAX_URL_SIZE];
 
@@ -245,7 +245,7 @@ typedef struct handler_wsgi_context_t {
     enum http_header_e _next_header;
 
     /**
-     * String reference to the url buffer, usefull
+     * String reference to the URL buffer, usefull
      * for fast attribute calculation (eg: size).
      */
     struct string_t _url_string;

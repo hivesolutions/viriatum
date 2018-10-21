@@ -48,7 +48,7 @@ ERROR_CODE encode_percent(unsigned char *buffer, size_t length, unsigned char *_
         this is the byte to be encoded */
         byte = buffer[index];
 
-        /* in case the current byte is valid url value (no need
+        /* in case the current byte is valid URL value (no need
         to encode it) sets the byte "directly" */
         if(isalphanum(byte) || byte == '-' || byte == '_' || byte == '.' || byte == '~') {
             /* sets the current byte (directly) in the buffer pointer */
@@ -85,7 +85,7 @@ ERROR_CODE encode_percent(unsigned char *buffer, size_t length, unsigned char *_
 
 ERROR_CODE decode_percent(unsigned char *buffer, size_t length, unsigned char *_buffer,  size_t *length_pointer) {
     /* allocates the pointer to be used durring the iteration
-    process for the url decoding */
+    process for the URL decoding */
     unsigned char *pointer;
 
     /* creates a "backup" of the original buffer position
@@ -107,7 +107,7 @@ ERROR_CODE decode_percent(unsigned char *buffer, size_t length, unsigned char *_
                 pointer += 2;
             } else {
                 /* raises an error */
-                RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem decoding url string");
+                RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem decoding URL string");
             }
         }
         /* in case the current pointer value refers the plus

@@ -46,17 +46,17 @@ typedef struct mod_php_http_handler_t {
  * The context structure to be used allong
  * the interpretation of the request for
  * the PHP handler, must be used to control
- * the url and file resolution.
+ * the URL and file resolution.
  */
 typedef struct handler_php_context_t {
     /**
-     * The url to be used for retrieving the file.
+     * The URL to be used for retrieving the file.
      */
     unsigned char url[VIRIATUM_MAX_URL_SIZE];
 
     /**
      * The file name to be used for retrieving the file,
-     * it should represent the final url path to be resolved.
+     * it should represent the final URL path to be resolved.
      */
     unsigned char file_name[VIRIATUM_MAX_URL_SIZE];
 
@@ -156,7 +156,7 @@ typedef struct handler_php_context_t {
     enum http_header_e _next_header;
 
     /**
-     * String reference to the url buffer, usefull
+     * String reference to the URL buffer, usefull
      * for fast attribute calculation (eg: size).
      */
     struct string_t _url_string;

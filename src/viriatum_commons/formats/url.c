@@ -31,7 +31,7 @@
 
 ERROR_CODE parse_url(char *url, size_t url_size, struct url_t *url_s) {
     /* allocates space for the index and length counters to be
-    used on the parse of the provided url */
+    used on the parse of the provided URL */
     size_t index;
     size_t length;
 
@@ -49,17 +49,17 @@ ERROR_CODE parse_url(char *url, size_t url_size, struct url_t *url_s) {
     be used as temporary for some of the conversion operations */
     unsigned char buffer[128];
 
-    /* resets the url structure by setting all of its contents
+    /* resets the URL structure by setting all of its contents
     to the default zero (reset) value */
     memset(url_s, 0, sizeof(struct url_t));
 
-    /* sets the url pointer as the initial mark value and also
+    /* sets the URL pointer as the initial mark value and also
     sets the initial state of the parsing as the scheme state */
     mark = (unsigned char *) url;
     state = SCHEME_STATE;
 
-    /* iterate over the complete url buffer to try to gather
-    the range of the various parts of the url */
+    /* iterate over the complete URL buffer to try to gather
+    the range of the various parts of the uURLrl */
     for(index = 0; index < url_size; index++) {
         /* retrieves the current byte in iteration and the pointer
         address to the current buffer position */
@@ -258,7 +258,7 @@ ERROR_CODE parse_url(char *url, size_t url_size, struct url_t *url_s) {
 error:
     RAISE_ERROR_M(
         RUNTIME_EXCEPTION_ERROR_CODE,
-        (unsigned char *) "Problem parsing url string"
+        (unsigned char *) "Problem parsing URL string"
     );
 }
 
@@ -267,7 +267,7 @@ ERROR_CODE parse_url_static(char *url, size_t url_size, struct url_static_t *url
     be used to detect errors in calls */
     ERROR_CODE error;
 
-    /* allocates the space for the temporary (dynamic) url structure
+    /* allocates the space for the temporary (dynamic) URL structure
     to be used as basis for the construction of the static one */
     struct url_t _url_s;
 

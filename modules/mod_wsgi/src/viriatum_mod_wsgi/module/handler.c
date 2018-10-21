@@ -196,13 +196,13 @@ ERROR_CODE url_callback_handler_wsgi(struct http_parser_t *http_parser, const un
     if(pointer) { memcpy(handler_wsgi_context->query, pointer + 1, query_size); }
     handler_wsgi_context->query[query_size] = '\0';
 
-    /* copies the url to the url reference in the handler file context to
+    /* copies the URL to the URL reference in the handler file context to
     be used in the message handler */
     memcpy(handler_wsgi_context->url, data, data_size);
     handler_wsgi_context->url[data_size] = '\0';
 
     /* sets the prefix name as non existent this is the default behaviour
-    to be overriden by the virtual url handler */
+    to be overriden by the virtual URL handler */
     handler_wsgi_context->prefix_name[0] = '\0';
 
     /* populates the various generated strings, avoids possible recalculation
@@ -415,7 +415,7 @@ ERROR_CODE location_callback_handler_wsgi(struct http_parser_t *http_parser, siz
 
 ERROR_CODE virtual_url_callback_handler_wsgi(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
     /* allocates space for the variable that will hold the new size
-    of the preffix path to be used, be removing the new virtual url
+    of the preffix path to be used, be removing the new virtual URL
     from the previously set file name (path) */
     size_t prefix_size;
 
@@ -434,7 +434,7 @@ ERROR_CODE virtual_url_callback_handler_wsgi(struct http_parser_t *http_parser, 
     prefix_size = _path_size - path_size;
 
     /* sets the prefix name as non existent this is the default behaviour
-    to be overriden by the virtual url handler */
+    to be overriden by the virtual URL handler */
     memcpy(handler_wsgi_context->prefix_name, handler_wsgi_context->file_name, prefix_size);
     handler_wsgi_context->prefix_name[prefix_size] = '\0';
 
@@ -449,7 +449,7 @@ ERROR_CODE virtual_url_callback_handler_wsgi(struct http_parser_t *http_parser, 
     if(pointer) { memcpy(handler_wsgi_context->query, pointer + 1, query_size); }
     handler_wsgi_context->query[query_size] = '\0';
 
-    /* copies the url to the url reference in the handler file context to
+    /* copies the URL to the URL reference in the handler file context to
     be used in the message handler */
     memcpy(handler_wsgi_context->url, data, data_size);
     handler_wsgi_context->url[data_size] = '\0';
