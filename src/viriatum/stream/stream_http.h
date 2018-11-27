@@ -41,7 +41,7 @@ typedef ERROR_CODE (*connection_data_callback_sh) (struct connection_t *, struct
  * with new information.
  *
  * @param http_connection The HTTP connection to be
- * update with new information.
+ * updated with new information.
  */
 typedef ERROR_CODE (*http_connection_update) (struct http_connection_t *http_connection);
 
