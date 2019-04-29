@@ -190,8 +190,8 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                 http_parser->flags = 0;
                 http_parser->content_length = -1;
 
-				/* calls the message begin callback indicating
-				that a new message parsing as just begin */
+                /* calls the message begin callback indicating
+                that a new message parsing as just begin */
                 HTTP_CALLBACK(message_begin);
 
                 if(byte == 'H') {

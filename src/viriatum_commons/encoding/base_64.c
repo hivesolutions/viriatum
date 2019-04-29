@@ -31,7 +31,12 @@
 
 const char base64_characters[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
-ERROR_CODE encode_base64(unsigned char *buffer, size_t buffer_length, unsigned char **encoded_buffer_pointer, size_t *encoded_buffer_length_pointer) {
+ERROR_CODE encode_base64(
+    unsigned char *buffer,
+    size_t buffer_length,
+    unsigned char **encoded_buffer_pointer,
+    size_t *encoded_buffer_length_pointer
+) {
     /* allocates the encoded buffer, and assigns the encoded buffer length */
     _allocate_encoded_buffer(
         buffer_length,
@@ -51,7 +56,12 @@ ERROR_CODE encode_base64(unsigned char *buffer, size_t buffer_length, unsigned c
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE decode_base64(unsigned char *encoded_buffer, size_t encoded_buffer_length, unsigned char **decoded_buffer_pointer, size_t *decoded_buffer_length_pointer) {
+ERROR_CODE decode_base64(
+    unsigned char *encoded_buffer,
+    size_t encoded_buffer_length,
+    unsigned char **decoded_buffer_pointer,
+    size_t *decoded_buffer_length_pointer
+) {
     /* retrieves the padding count from the encoded buffer */
     unsigned int padding_count = _get_padding_count(encoded_buffer, encoded_buffer_length);
 
@@ -104,7 +114,12 @@ size_t calculate_decoded_buffer_length_base64(size_t encoded_buffer_length, size
     return decoded_buffer_length;
 }
 
-ERROR_CODE _encode_base64(unsigned char *buffer, size_t buffer_length, unsigned char *encoded_buffer, size_t encoded_buffer_length) {
+ERROR_CODE _encode_base64(
+    unsigned char *buffer,
+    size_t buffer_length,
+    unsigned char *encoded_buffer,
+    size_t encoded_buffer_length
+) {
     /* allocates space for the the encoded buffer index */
     size_t encoded_buffer_index;
 
@@ -177,7 +192,13 @@ ERROR_CODE _encode_base64(unsigned char *buffer, size_t buffer_length, unsigned 
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _decode_base64(unsigned char *encoded_buffer, size_t encoded_buffer_length, unsigned char *buffer, size_t buffer_length, size_t padding_count) {
+ERROR_CODE _decode_base64(
+    unsigned char *encoded_buffer,
+    size_t encoded_buffer_length,
+    unsigned char *buffer,
+    size_t buffer_length,
+    size_t padding_count
+) {
     /* allocates space for the the buffer index */
     size_t buffer_index;
 
@@ -230,7 +251,11 @@ ERROR_CODE _decode_base64(unsigned char *encoded_buffer, size_t encoded_buffer_l
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _allocate_encoded_buffer(size_t buffer_length, unsigned char **encoded_buffer_pointer, size_t *encoded_buffer_length_pointer) {
+ERROR_CODE _allocate_encoded_buffer(
+    size_t buffer_length,
+    unsigned char **encoded_buffer_pointer,
+    size_t *encoded_buffer_length_pointer
+) {
     /* allocates the encoded buffer length */
     *encoded_buffer_length_pointer = calculate_encoded_buffer_length_base64(buffer_length);
 
@@ -241,7 +266,12 @@ ERROR_CODE _allocate_encoded_buffer(size_t buffer_length, unsigned char **encode
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _allocate_decoded_buffer(size_t encoded_buffer_length, unsigned char **decoded_buffer_pointer, size_t *decoded_buffer_length_pointer, size_t padding_count) {
+ERROR_CODE _allocate_decoded_buffer(
+    size_t encoded_buffer_length,
+    unsigned char **decoded_buffer_pointer,
+    size_t *decoded_buffer_length_pointer,
+    size_t padding_count
+) {
     /* allocates the decoded buffer length */
     *decoded_buffer_length_pointer = calculate_decoded_buffer_length_base64(
          encoded_buffer_length,
