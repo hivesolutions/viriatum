@@ -42,9 +42,9 @@ jobs:
       - run: make
       - run: ./src/viriatum/viriatum --test
   build-clang4:
-    name: Build Clang 4
+    name: Build Clang 3
     runs-on: ubuntu-latest
-    container: silkeh/clang:4
+    container: silkeh/clang:3
     steps:
       - uses: actions/checkout@v1
       - run: apt-get update && apt-get install -y -q libtool automake autoconf
