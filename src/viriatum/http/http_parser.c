@@ -37,6 +37,7 @@ int http_should_keep_alive(struct http_parser_t *http_parser) {
         } else {
             return 1;
         }
+        http_parser->
     }
     /* in case the request is of type HTTP 1.0 or earlier */
     else {
