@@ -87,7 +87,7 @@ static const char *close_codes[2] = {
 /**
  * The buffer containing sequences of the
  * descriptions to the various HTTP error
- * codes orderes by major and minor parts
+ * codes ordered by major and minor parts
  * of the error code.
  */
 static const char *http_status_codes[5][64] = {
