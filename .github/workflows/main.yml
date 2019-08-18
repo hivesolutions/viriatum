@@ -1,0 +1,23 @@
+name: Main Workflow
+on: [push]
+jobs:
+  build-gcc9:
+    name: Build GCC 9
+    runs-on: ubuntu-latest
+    container: gcc:9
+    steps:
+      - uses: actions/checkout@v1
+      - run: ./autogen.sh &&  &&
+      - run: ./configure
+      - run: make
+      - run: ./src/viriatum/viriatum --test
+  build-gcc9:
+    name: Build GCC 8
+    runs-on: ubuntu-latest
+    container: gcc:8
+    steps:
+      - uses: actions/checkout@v1
+      - run: ./autogen.sh &&  &&
+      - run: ./configure
+      - run: make
+      - run: ./src/viriatum/viriatum --test
