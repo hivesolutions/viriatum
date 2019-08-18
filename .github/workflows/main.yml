@@ -41,3 +41,23 @@ jobs:
       - run: ./configure
       - run: make
       - run: ./src/viriatum/viriatum --test
+  build-clang3:
+    name: Build Clang 3
+    runs-on: ubuntu-latest
+    container: silkeh/clang:3
+    steps:
+      - uses: actions/checkout@v1
+      - run: ./autogen.sh
+      - run: ./configure
+      - run: make
+      - run: ./src/viriatum/viriatum --test
+  build-clang7:
+    name: Build Clang 7
+    runs-on: ubuntu-latest
+    container: silkeh/clang:7
+    steps:
+      - uses: actions/checkout@v1
+      - run: ./autogen.sh
+      - run: ./configure
+      - run: make
+      - run: ./src/viriatum/viriatum --test
