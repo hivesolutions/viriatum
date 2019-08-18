@@ -11,7 +11,7 @@ jobs:
       - run: ./configure
       - run: make
       - run: ./src/viriatum/viriatum --test
-  build-gcc9:
+  build-gcc8:
     name: Build GCC 8
     runs-on: ubuntu-latest
     container: gcc:8
