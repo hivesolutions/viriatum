@@ -1,10 +1,20 @@
 name: Main Workflow
 on: [push]
 jobs:
-  build-gcc9:
-    name: Build GCC 9
+  build-gcc6:
+    name: Build GCC 6
     runs-on: ubuntu-latest
-    container: gcc:9
+    container: gcc:6
+    steps:
+      - uses: actions/checkout@v1
+      - run: ./autogen.sh
+      - run: ./configure
+      - run: make
+      - run: ./src/viriatum/viriatum --test
+  build-gcc7:
+    name: Build GCC 7
+    runs-on: ubuntu-latest
+    container: gcc:7
     steps:
       - uses: actions/checkout@v1
       - run: ./autogen.sh
@@ -15,6 +25,16 @@ jobs:
     name: Build GCC 8
     runs-on: ubuntu-latest
     container: gcc:8
+    steps:
+      - uses: actions/checkout@v1
+      - run: ./autogen.sh
+      - run: ./configure
+      - run: make
+      - run: ./src/viriatum/viriatum --test
+  build-gcc9:
+    name: Build GCC 9
+    runs-on: ubuntu-latest
+    container: gcc:9
     steps:
       - uses: actions/checkout@v1
       - run: ./autogen.sh
