@@ -443,8 +443,8 @@ typedef struct http_parser_t {
     unsigned char *url_mark;
 
     /**
-     * Unstructed reference to a pointer, this may
-     * be used to maintain references to uper objects.
+     * Unstructured reference to a pointer, this may
+     * be used to maintain references to upper objects.
      * Example usage would include reference to the
      * connection objects.
      */
