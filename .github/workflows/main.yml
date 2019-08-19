@@ -1,61 +1,26 @@
 name: Main Workflow
 on: [push]
 jobs:
-  build-gcc6:
-    name: Build GCC 6
+  build-gcc:
+    name: Build GCC
+    strategy:
+      matrix:
+        gcc-version: [6, 7, 8, 9]
     runs-on: ubuntu-latest
-    container: gcc:6
+    container: gcc:{{ matrix.gcc-version }}
     steps:
       - uses: actions/checkout@v1
       - run: ./autogen.sh
       - run: ./configure
       - run: make
       - run: ./src/viriatum/viriatum --test
-  build-gcc7:
-    name: Build GCC 7
+  build-clang:
+    name: Build Clang
+    strategy:
+      matrix:
+        clang-version: [3, 4, 5, 6, 7]
     runs-on: ubuntu-latest
-    container: gcc:7
-    steps:
-      - uses: actions/checkout@v1
-      - run: ./autogen.sh
-      - run: ./configure
-      - run: make
-      - run: ./src/viriatum/viriatum --test
-  build-gcc8:
-    name: Build GCC 8
-    runs-on: ubuntu-latest
-    container: gcc:8
-    steps:
-      - uses: actions/checkout@v1
-      - run: ./autogen.sh
-      - run: ./configure
-      - run: make
-      - run: ./src/viriatum/viriatum --test
-  build-gcc9:
-    name: Build GCC 9
-    runs-on: ubuntu-latest
-    container: gcc:9
-    steps:
-      - uses: actions/checkout@v1
-      - run: ./autogen.sh
-      - run: ./configure
-      - run: make
-      - run: ./src/viriatum/viriatum --test
-  build-clang4:
-    name: Build Clang 3
-    runs-on: ubuntu-latest
-    container: silkeh/clang:3
-    steps:
-      - uses: actions/checkout@v1
-      - run: apt-get update && apt-get install -y -q libtool automake autoconf
-      - run: ./autogen.sh
-      - run: CC=clang ./configure
-      - run: make
-      - run: ./src/viriatum/viriatum --test
-  build-clang7:
-    name: Build Clang 7
-    runs-on: ubuntu-latest
-    container: silkeh/clang:7
+    container: silkeh/clang:{{ matrix.clang-version }}
     steps:
       - uses: actions/checkout@v1
       - run: apt-get update && apt-get install -y -q libtool automake autoconf
