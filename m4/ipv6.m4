@@ -1,5 +1,5 @@
 # Hive Viriatum Web Server
-# Copyright (c) 2008-2019 Hive Solutions Lda.
+# Copyright (c) 2008-2020 Hive Solutions Lda.
 #
 # This file is part of Hive Viriatum Web Server.
 #
@@ -20,7 +20,7 @@
 # __version__   = 1.0.0
 # __revision__  = $LastChangedRevision$
 # __date__      = $LastChangedDate$
-# __copyright__ = Copyright (c) 2008-2019 Hive Solutions Lda.
+# __copyright__ = Copyright (c) 2008-2020 Hive Solutions Lda.
 # __license__   = Apache License, Version 2.0
 
 AC_ARG_ENABLE(ipv6, AC_HELP_STRING([--disable-ipv6], [Disable IPv6 support]), disabled_ip6=1, disabled_ip6=0)

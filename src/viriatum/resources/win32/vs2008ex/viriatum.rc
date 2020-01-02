@@ -115,7 +115,7 @@ BEGIN
             VALUE "FileDescription", "Viriatum"
             VALUE "FileVersion", "1.0.0"
             VALUE "InternalName", "viriatum"
-            VALUE "LegalCopyright", "Copyright (C) 2008-2019"
+            VALUE "LegalCopyright", "Copyright (C) 2008-2020"
             VALUE "OriginalFilename", "viriatum.exe"
             VALUE "ProductName", "Viriatum"
             VALUE "ProductVersion", "1.0.0"
