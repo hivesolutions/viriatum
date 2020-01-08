@@ -7,6 +7,7 @@ EXPOSE 9090
 
 ADD . /viriatum
 
+RUN rm -rf /viriatum/.git
 RUN apk update && apk add make autoconf automake libtool pcre-dev
 RUN cd /viriatum && ./autogen.sh && ./configure --prefix=/usr --sysconfdir=/etc && make && make install
 
