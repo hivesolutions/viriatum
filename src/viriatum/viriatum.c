@@ -460,7 +460,7 @@ int main(int argc, char *argv[]) {
     /* allocates the space for the "final" result code
     that is going to be returned as part of the normal
     command execution, a positive or negative values
-    should idicate an error, a zero value indicates that
+    should indicate an error, a zero value indicates that
     a normal execution has just finished */
     ERROR_CODE return_value;
 
