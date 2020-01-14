@@ -364,12 +364,12 @@ int execute_arguments(char *program_name, struct hash_map_t *arguments) {
     void *value;
 
     /* allocates the value to be used to verify the
-    exitence of error from the function */
+    existence of error from the function */
     ERROR_CODE return_value;
 
     /* sets space for the flag that will control if
     the service should be run or not, this is used
-    for certain situations (mostyle test) where the
+    for certain situations (mostly test) where the
     service is not meant to be run */
     char run_service = TRUE;
 
