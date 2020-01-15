@@ -40,7 +40,7 @@ The most commonly used viriatum commands are:\n\
    --host     Sets the tcp host to bind\n\
    --ip6      Runs the service with support for ipv6\n\
    --handler  Name of the handler to be used as default\n\
-   --workers  Defines the ammount of worker to be used\n\
+   --workers  Defines the amount of worker to be used\n\
    --local    Runs the service in local mode no internet support\n\
    --ssl      Listens to the sockets using ssl encryption\n\
    --daemon   Runs the service as daemon (background)\n\
@@ -124,7 +124,7 @@ ERROR_CODE run_service() {
 
     /* starts the service, this call should be able to bootstrap
     all the required structures and initialize the main loop, this
-    should block the control flow fduring the run of the service */
+    should block the control flow during the run of the service */
     return_value = start_service(service);
 
     /* tests the error code value for error and in case there's
@@ -393,7 +393,7 @@ int execute_arguments(char *program_name, struct hash_map_t *arguments) {
 
     /* retrieves the speed argument value from the arguments map
     and in case it's set starts the speed measuring and disables
-    the runnig of the service */
+    the running of the service */
     get_value_string_hash_map(arguments, (unsigned char *) "speed", &value);
     if(value != NULL) { return speed(); }
 
@@ -431,7 +431,7 @@ int execute_arguments(char *program_name, struct hash_map_t *arguments) {
     }
 
     /* returns the normal result value as no problems has
-    occured during the execution of the command */
+    occurred during the execution of the command */
     RAISE_NO_ERROR;
 }
 
