@@ -227,7 +227,7 @@ void delete_configuration(struct sort_map_t *configuration, int is_top) {
         must break the loop immediately */
         if(element == NULL) { break; }
 
-        /* retrievs the sort map value for the key pointer */
+        /* retrieves the sort map value for the key pointer */
         get_value_sort_map(configuration, element->key, element->key_string, (void **) &option);
 
         /* in case the current iteration is of type top must delete the

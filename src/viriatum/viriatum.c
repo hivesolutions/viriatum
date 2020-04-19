@@ -398,7 +398,7 @@ int execute_arguments(char *program_name, struct hash_map_t *arguments) {
     if(value != NULL) { return speed(); }
 
     /* tries to retrieve the daemon argument from the
-    arguments map in case the value is set daemonizes
+    arguments map in case the value is set "daemonizes"
     the current process so that it remains in background
     and returns to the caller process immediately, otherwise
     prints the viriatum information into the standard
