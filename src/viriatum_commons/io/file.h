@@ -138,7 +138,7 @@ VIRIATUM_EXPORT_PREFIX ERROR_CODE count_file(char *file_path, size_t *file_size_
 VIRIATUM_EXPORT_PREFIX ERROR_CODE get_write_time_file(char *file_path, struct date_time_t *date_time);
 
 /**
- * Checks if the given file path referes a directory path.
+ * Checks if the given file path refers a directory path.
  * The result is set to the given integer pointer.
  *
  * @param file_path The path to be verified to be a directory.
@@ -148,7 +148,7 @@ VIRIATUM_EXPORT_PREFIX ERROR_CODE is_directory_file(char *file_path, unsigned in
 
 /**
  * Lists the various (copies them) directory entries for the
- * given file (dirctory) path.
+ * given file (directory) path.
  * The "new" entries are copied to the given linked list of entries.
  *
  * @param file_path The path to the directory to be listed.
