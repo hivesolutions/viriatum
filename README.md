@@ -10,7 +10,7 @@ The current implementation support both x86/x64 and ARM architectures.
 ### Automium
 
 Building viriatum using automium is quite simple even for complex builds like cross compilation.
-Just use the apropriate 'build.json' located under 'scripts/build' and under such directory execute:
+Just use the appropriate 'build.json' located under 'scripts/build' and under such directory execute:
 
     atm
 
