@@ -10,10 +10,14 @@ jobs:
     container: gcc:${{ matrix.gcc-version }}
     steps:
       - uses: actions/checkout@v1
-      - run: ./autogen.sh
-      - run: ./configure
-      - run: make
-      - run: ./src/viriatum/viriatum --test
+      - name: Build Viriatum
+        run: |
+          ./autogen.sh
+          ./configure
+          make
+      - name: Test Viriatum
+        run: |
+          ./src/viriatum/viriatum --test
   build-clang:
     name: Build Clang
     strategy:
@@ -23,8 +27,12 @@ jobs:
     container: silkeh/clang:${{ matrix.clang-version }}
     steps:
       - uses: actions/checkout@v1
-      - run: apt-get update && apt-get install -y -q libtool automake autoconf
-      - run: ./autogen.sh
-      - run: CC=clang ./configure
-      - run: make
-      - run: ./src/viriatum/viriatum --test
+      - name: Build Viriatum
+        run: |
+          apt-get update && apt-get install -y -q libtool automake autoconf
+          ./autogen.sh
+          CC=clang ./configure
+          make
+      - name: Test Viriatum
+        run: |
+          ./src/viriatum/viriatum --test
