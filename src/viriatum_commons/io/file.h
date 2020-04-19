@@ -86,7 +86,7 @@ typedef struct file_t {
 
 /**
  * Opens the file specified by the provided file path
- * converting the file path into the apropriate system
+ * converting the file path into the appropriate system
  * wide representation (secure open).
  *
  * @param file_path The path to the file to be open.
@@ -189,7 +189,7 @@ VIRIATUM_EXPORT_PREFIX ERROR_CODE entries_to_map_file(struct linked_list_t *entr
  * The joining of the path uses the default system separator.
  *
  * @param base_path The base path for the joined path.
- * @param name The name to be used as sufix in the path joining.
+ * @param name The name to be used as suffix in the path joining.
  * @param joined_path The joined path buffer to receive the final result.
  */
 VIRIATUM_EXPORT_PREFIX ERROR_CODE join_path_file(char *base_path, char *name, char *joined_path);
