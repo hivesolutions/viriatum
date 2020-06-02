@@ -303,7 +303,7 @@ ERROR_CODE register_write_polling_epoll(struct polling_t *polling, struct connec
         (struct polling_epoll_t *) polling->lower;
 
     /* in case the connection is write registered must
-    return immediately to aovid double outstanding for connection */
+    return immediately to avoid double outstanding for connection */
     if(connection->write_registered == TRUE) { RAISE_NO_ERROR; }
 
     /* in case the current state for the connection is not write
