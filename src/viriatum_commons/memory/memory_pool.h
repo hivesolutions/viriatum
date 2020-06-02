@@ -542,9 +542,10 @@ static __inline void *palloc(struct memory_pool_t *pool, size_t size) {
     struct memory_item_t *item;
     struct memory_item_t *_item;
 
-    /* in case the number of chunks in the memory pool is
-    zero the pool is considered not initialized, must create it */
-    if(pool->chunk_count == 0) { alloc_memory_pool(pool, 0); }
+    /* in case the chinks buffer is unset and the number of chunks in
+    the memory pool is  zero the pool is considered not initialized,
+    and it must be created in order to be used */
+    if(pool->chunks == NULL && pool->chunk_count == 0) { alloc_memory_pool(pool, 0); }
 
     /* in case the index of the first chunk to be considered
     free is the same as the number of chunks the pool is considered
