@@ -464,7 +464,7 @@ const char *test_bencoding() {
     encode_bencoding(&_map_type, &encoded_buffer, &encoded_buffer_length);
     decode_bencoding(encoded_buffer, encoded_buffer_length, &type);
 
-    /* deletes the hash map structure and the list strucuture
+    /* deletes the hash map structure and the list structure
     to avoid any memory leaking */
     delete_hash_map(map);
     delete_linked_list(list);
@@ -768,7 +768,7 @@ const char *test_memory_stream() {
     stream->seek(stream, 0);
     stream->read(stream, buffer, 11);
 
-    /* cloes the stream avoiding any extra operation in it
+    /* closes the stream avoiding any extra operation in it
     and deletes the memory stream (avoiding any memory leaks) */
     stream->close(stream);
     delete_memory_stream(memory_stream);
