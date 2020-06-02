@@ -117,7 +117,7 @@ typedef struct huffman_t {
 
     /**
      * The array that associates a code (symbol) index
-     * to the ammount of times it occurred in the target
+     * to the amount of times it occurred in the target
      * data file, this is going to be used in the
      * contruction of the huffman tree.
      */

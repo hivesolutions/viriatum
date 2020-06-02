@@ -190,7 +190,7 @@ void decode_table_huffman(struct huffman_t *huffman, struct stream_t *in, struct
     out->open(out);
 
     /* iterates continuously reading bits from the input stream until
-    the ammount of bits reach the value defined in the bit counter */
+    the amount of bits reach the value defined in the bit counter */
     while(TRUE) {
         /* in case the total amount of bits read from the bit stream
         has reached the pre-defined value (the end has been reached)

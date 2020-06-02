@@ -125,7 +125,7 @@ typedef struct bit_stream_t {
      * The counter of bytes that are pending to be read
      * from the current read buffer. Every time there's
      * a read operation in the underlying stream this value
-     * is set with the ammount of bytes read from it.
+     * is set with the amount of bytes read from it.
      */
     size_t byte_counter_read;
 

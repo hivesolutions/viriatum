@@ -43,7 +43,7 @@ void create_rc4(char *key, struct rc4_t **rc4_pointer) {
     struct rc4_t *rc4 = (struct rc4_t *) MALLOC(rc4_size);
 
     /* sets the base element for the rc4 structure
-    including the x and y referneces and the key */
+    including the x and y references and the key */
     rc4->x = 0;
     rc4->y = 0;
     rc4->key = key;
@@ -59,7 +59,7 @@ void create_rc4(char *key, struct rc4_t **rc4_pointer) {
         rc4->box[i] = _x;
     }
 
-    /* updates the rc4 pointer value with the creted
+    /* updates the rc4 pointer value with the created
     structure (value return) */
     *rc4_pointer = rc4;
 }
@@ -71,7 +71,7 @@ void delete_rc4(struct rc4_t *rc4) {
 }
 
 void cipher_rc4(struct rc4_t *rc4, char *data, size_t size, char *data_c) {
-    /* allocates the sapce for the various variables
+    /* allocates the space for the various variables
     to be used in this encoding "round" */
     size_t i;
     unsigned char _x;

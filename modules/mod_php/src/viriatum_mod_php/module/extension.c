@@ -358,17 +358,17 @@ PHP_FUNCTION(viriatum_connection_info) {
         if(connection == NULL) { break; }
 
         /* in case the id of the connection currently in iteration is
-        not the smae as the one we're trying to find continues the loop */
+        not the same as the one we're trying to find continues the loop */
         if((long) connection->id != id) { continue; }
 
-        /* retrieves the delta value by calculating the diference between
+        /* retrieves the delta value by calculating the difference between
         the current time and the creation time then uses it to calculate
         the uptime for the connection as a string description */
         delta = (unsigned long long) time(NULL) - connection->creation;
         format_delta(uptime, sizeof(uptime), delta, 2);
 
-        /* formats both the ammount of bytes that have been sent and the
-        the ammount that has been received as "readable" strings */
+        /* formats both the amount of bytes that have been sent and the
+        the amount that has been received as "readable" strings */
         format_bytes(sent, sizeof(sent), connection->sent);
         format_bytes(received, sizeof(received), connection->received);
 

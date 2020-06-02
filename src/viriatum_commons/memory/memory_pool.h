@@ -177,7 +177,7 @@ typedef struct memory_pool_t {
     size_t free;
 
     /**
-     * Counter that measures the ammount of chunks that currently
+     * Counter that measures the amount of chunks that currently
      * have at least one item considered allocated. This value is
      * used for the shrink operation of the pool.
      */

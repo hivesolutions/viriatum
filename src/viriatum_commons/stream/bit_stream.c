@@ -129,18 +129,18 @@ void seek_bit_stream(
     unsigned char offset_first;
     long long byte_count;
 
-    /* calculates the ammount of available bits in the current
+    /* calculates the amount of available bits in the current
     byte and then uses the value to calculate the remaining ammoutn
     of bits outside the current byte in the seek */
     long long available = BIT_STREAM_ITEM_SIZE - bit_stream->current_byte_offset_read;
     long long remaining = size - available;
 
-    /* in case the ammount of bits to be seek is zero returns immediately
+    /* in case the amount of bits to be seek is zero returns immediately
     as there's nothing to be seeked for that situation */
     if(size == 0) { return; }
 
     /* decrements the current vounter for bits that were read
-    by the ammount of bits that are going to be "seeked" */
+    by the amount of bits that are going to be "seeked" */
     bit_stream->bit_counter_read -= (size_t) size;
 
     /* in case the size is smaller or the same as the number
@@ -158,7 +158,7 @@ void seek_bit_stream(
         the modulus of the remaining bts and the size of the item */
         offset_first = remaining % BIT_STREAM_ITEM_SIZE;
 
-        /* calculates the ammount of bytes that are required by
+        /* calculates the amount of bytes that are required by
         deviding the remaining value by eight (done using shifts)
         and adding one extra byte (the one currently in iteration) */
         byte_count = (remaining >> 3) + 1;
@@ -173,8 +173,8 @@ void seek_bit_stream(
         }
 
         /* verifies if the current seek operation required reading from
-        the stream, this is required when the ammount of bytes to be
-        skipped back is greater than the ammount of bytes that have been
+        the stream, this is required when the amount of bytes to be
+        skipped back is greater than the amount of bytes that have been
         already read from the current read buffer */
         need_read = byte_count >= bit_stream->byte_current_read;
 
@@ -212,7 +212,7 @@ void seek_bit_stream(
         perform a (slow) read operation in the stream */
         else {
             /* decrements the current byte for read by the number of bytes
-            and increments the counter by the same ammount (buffer move) */
+            and increments the counter by the same amount (buffer move) */
             bit_stream->byte_current_read -= (unsigned char) byte_count;
             bit_stream->byte_counter_read += (unsigned char) byte_count;
         }
@@ -300,14 +300,14 @@ void read_byte_bit_stream(
 
     /* calculates the shift that is going to be done in the byte and
     then shifts the current byte by the already read bits and adds the
-    extra bits to it using the "just" calculated shift ammount (value) */
+    extra bits to it using the "just" calculated shift amount (value) */
     shift_v = bit_stream->current_byte_offset_read - extra_bits_count;
     *byte <<= extra_bits_count;
     *byte |= (bit_stream->current_byte_read >> shift_v);
 
     /* increments the bit counter and offset by the number of extra bits
     that have just been read from the new byte and then dcrements the offset
-    in the current byte by the same ammount (extra read bits) */
+    in the current byte by the same amount (extra read bits) */
     bit_stream->bit_counter_read += extra_bits_count;
     bit_stream->current_byte_offset_read -= extra_bits_count;
 }

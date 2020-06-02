@@ -56,7 +56,7 @@ SIZE = 10024
 reading of the response value """
 
 WRITE_SLEEP = 0.25
-""" The ammount of time to be used between write
+""" The amount of time to be used between write
 operations (this should ensure message separation) """
 
 SIMPLE = [

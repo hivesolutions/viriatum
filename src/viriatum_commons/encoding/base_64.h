@@ -79,7 +79,7 @@ VIRIATUM_EXPORT_PREFIX size_t calculate_encoded_buffer_length_base64(size_t buff
  * given encoded buffer length.
  *
  * @param encoded_buffer_length The length of the encoded buffer.
- * @param padding_count The ammount of padding in the base 64 encoded string.
+ * @param padding_count The amount of padding in the base 64 encoded string.
  * @return The length of the decoded buffer.
  */
 VIRIATUM_EXPORT_PREFIX size_t calculate_decoded_buffer_length_bse64(size_t encoded_buffer_length, size_t padding_count);
@@ -107,7 +107,7 @@ VIRIATUM_NO_EXPORT_PREFIX ERROR_CODE _encode_base64(
  * @param encoded_buffer_length The length of the encoded buffer to be decoded.
  * @param buffer The target buffer.
  * @param buffer_length The target buffer length.
- * @param padding_count The ammount of padding in the base 64 encoded string.
+ * @param padding_count The amount of padding in the base 64 encoded string.
  */
 VIRIATUM_NO_EXPORT_PREFIX ERROR_CODE _decode_base64(
     unsigned char *encoded_buffer,
@@ -138,7 +138,7 @@ VIRIATUM_NO_EXPORT_PREFIX ERROR_CODE _allocate_encoded_buffer(
  * @param encoded_buffer_length The (encoded) buffer to be decoded.
  * @param decoded_buffer_pointer The pointer to the decoded buffer to be created.
  * @param decoded_buffer_length_pointer The length of the decoded buffer to be created.
- * @param padding_count The ammount of padding to be used.
+ * @param padding_count The amount of padding to be used.
  */
 VIRIATUM_NO_EXPORT_PREFIX ERROR_CODE _allocate_decoded_buffer(
     size_t encoded_buffer_length,
