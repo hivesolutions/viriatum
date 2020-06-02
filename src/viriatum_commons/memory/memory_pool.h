@@ -128,7 +128,7 @@ typedef struct memory_chunk_t {
      * terms of being allocated to a certain context. When
      * this value is equals to the static chunk size the
      * chunk is considered to be full, when this values is
-     * equals to zero the cunk is considered empty.
+     * equals to zero the chunk is considered empty.
      */
     size_t item_alloc;
 
@@ -198,8 +198,8 @@ typedef struct memory_pool_t {
     size_t chunk_max_size;
 
     /**
-     * The maximum number of items that may be allocacated for
-     * the complete set of chunks in the mory pool, this value
+     * The maximum number of items that may be allocated for
+     * the complete set of chunks in the memory pool, this value
      * is the result of the simple calculus of chunk max size
      * times the size of the chunk (number of items in chunk).
      */
@@ -226,7 +226,7 @@ static __inline void create_chunk(struct memory_chunk_t **chunk_pointer, size_t 
     /* resets the chunk bitmap so that all of its values are set
     to the zero value and then resets the complete set of contents
     of the chunk structure, noting that all the items are also set
-    to their default initial value and with the apropriate part of
+    to their default initial value and with the appropriate part of
     the chunk buffer associated */
     memset(chunk->bitmap, 0, sizeof(char) * CHUNK_SIZE);
     chunk->index = index_pool;
