@@ -62,3 +62,39 @@ jobs:
       - name: Test Viriatum
         run: |
           ./bin/viriatum --test
+  build-windows-cmake:
+    name: Build Windows CMake
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Build & Install Dependencies
+        run: |
+          curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && python get-pip.py "pip<20"
+          pip install --upgrade "conan<1.25" urllib3
+          conan install . --build
+      - name: Setup msbuild
+        uses: microsoft/setup-msbuild@v1.0.0
+      - name: Build Viriatum
+        run: |
+          cmake . -DCMAKE_CL_64=1 -DCMAKE_GENERATOR_PLATFORM=x64 -Ax64
+          msbuild ALL_BUILD.vcxproj /P:Configuration=Release
+      - name: Test Viriatum
+        run: |
+          bin/viriatum --test
+  build-macos-cmake:
+    name: Build macOS CMake
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Build & Install Dependencies
+        run: |
+          curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && python get-pip.py "pip<20"
+          pip install --upgrade "conan<1.25" urllib3
+          conan install . --build
+      - name: Build P(NG)Convert
+        run: |
+          cmake .
+          make
+      - name: Test Viriatum
+        run: |
+          ./bin/viriatum --test
