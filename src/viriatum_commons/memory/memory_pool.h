@@ -571,7 +571,7 @@ static __inline void *palloc(struct memory_pool_t *pool, size_t size) {
             the allocation (size must be constant across allocations) */
             create_chunk(&chunk, size, pool->chunk_count);
 
-            /* sets the created chunck structure in the appropriate
+            /* sets the created chunk structure in the appropriate
             position inside the buffer and then increments the counter
             that controls the currently created chunks */
             pool->chunks[pool->chunk_count] = chunk;
@@ -673,8 +673,8 @@ static __inline void pfree(struct memory_pool_t *pool, void *buffer) {
     struct memory_chunk_t *chunk;
 
     /* calculates the "initial" guess for the the map index
-    assoicated with the buffer to be released, the releasing
-    of the set wull be using an open addressing approach */
+    associated with the buffer to be released, the releasing
+    of the set will be using an open addressing approach */
     index = (size_t) buffer % pool->items_max_size;
     while(TRUE) {
         /* retrieves the current item and in case there's
@@ -701,8 +701,8 @@ static __inline void pfree(struct memory_pool_t *pool, void *buffer) {
     chunk->bitmap[index_c] = 0;
 
     /* ensures that the is full flag of the chunk is set
-    to false as there's at least one item avaialble for
-    alloication, then decrement the current item alloc
+    to false as there's at least one item available for
+    allocation, then decrement the current item alloc
     for the chunk (one less element) */
     chunk->is_full = FALSE;
     chunk->item_alloc--;
