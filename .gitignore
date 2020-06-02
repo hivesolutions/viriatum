@@ -37,10 +37,25 @@ ltoptions.m4
 ltsugar.m4
 ltversion.m4
 lt~obsolete.m4
+graph_info.json
 
+conan.lock
+conaninfo.txt
+conanbuildinfo.*
+
+CMakeCache.txt
+cmake_install.cmake
+/ALL_BUILD.*
+
+/x64
 /bin
 /build
 /dist
+/CMakeFiles
+/viriatum.dir
+/ALL_BUILD.*
+/ZERO_CHECK.*
+/viriatum.*
 /autom4te.cache
 /win32/vs2015/*/*
 /win32/vs2008ex/*/*
