@@ -7,10 +7,13 @@ conan_basic_setup()
 add_definitions(-DNO_PRAGMA_LIB)
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 
-aux_source_directory(src/viriatum_commons VIRIATUM_COMMON_SOURCES)
+file(GLOB_RECURSE VIRIATUM_COMMON_SOURCES src/viriatum_commons/*.c)
 add_library(viriatum_commons ${VIRIATUM_COMMON_SOURCES})
 
-aux_source_directory(src/viriatum VIRIATUM_SOURCES)
+target_include_directories(viriatum_commons PUBLIC src/viriatum_commons)
+
+file(GLOB_RECURSE VIRIATUM_SOURCES src/viriatum/*.c)
 add_executable(viriatum ${VIRIATUM_SOURCES})
 
-target_link_libraries(viriatum ${CONAN_LIBS} viriatum_commons)
+target_include_directories(viriatum PUBLIC src/viriatum)
+target_link_libraries(viriatum viriatum_commons ${CONAN_LIBS})
