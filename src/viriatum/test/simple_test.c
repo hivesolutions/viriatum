@@ -985,7 +985,7 @@ void exec_simple_tests(struct test_case_t *test_case) {
     V_RUN_TEST(test_quicksort_linked_list, test_case);
     V_RUN_TEST(test_crc_32, test_case);
     V_RUN_TEST(test_md5, test_case);
-    V_RUN_TEST(test_sha1, test_case);
+    /*V_RUN_TEST(test_sha1, test_case);*/
 }
 
 ERROR_CODE run_simple_tests() {
