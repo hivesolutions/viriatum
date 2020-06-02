@@ -49,13 +49,16 @@ cmake_install.cmake
 
 /x64
 /bin
+/lib
 /build
 /dist
 /CMakeFiles
 /viriatum.dir
+/viriatum_commons.dir
 /ALL_BUILD.*
 /ZERO_CHECK.*
 /viriatum.*
+/viriatum_commons.*
 /autom4te.cache
 /win32/vs2015/*/*
 /win32/vs2008ex/*/*
