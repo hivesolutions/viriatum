@@ -60,7 +60,7 @@ typedef struct memory_item_t {
     /**
      * The pointer to the chunk structure that
      * "owns" this item, this is considered a
-     * reverse pointer in the inherachy.
+     * reverse pointer in the herachy.
      */
     struct memory_chunk_t *chunk;
 
@@ -359,7 +359,7 @@ static __inline void resize_memory_pool(struct memory_pool_t *pool, size_t chunk
     is_grow = chunk_max_size > pool->chunk_max_size;
 
     /* updates both the chunk maximum size value and the "calculated"
-    items maximu, size values (based on chunk size) */
+    items maximum, size values (based on chunk size) */
     pool->chunk_max_size = chunk_max_size;
     pool->items_max_size = pool->chunk_max_size * CHUNK_MARGIN(CHUNK_SIZE);
 
@@ -403,8 +403,8 @@ static __inline void resize_memory_pool(struct memory_pool_t *pool, size_t chunk
         is_set = FALSE;
 
         /* iterates over the various chunks present in the pool to filter
-        the onnes that are valid (have items allocated) and then copies
-        tose chunks into the "new" pool chunks buffer */
+        the ones that are valid (have items allocated) and then copies
+        those chunks into the "new" pool chunks buffer */
         for(index = 0; index < old_chunk_count; index++) {
             /* retrieves the current chunk an in case it has no items
             allocated continues the loop (ignores the chunk) */
@@ -429,7 +429,7 @@ static __inline void resize_memory_pool(struct memory_pool_t *pool, size_t chunk
         index, (the index of the last allocated chunk) */
         if(is_set == FALSE) { pool->free = index_c; }
 
-        /* iterates over the various chnks present in the pool to be able
+        /* iterates over the various chunks present in the pool to be able
         to fill the new chunks buffer with unallocated chunks (to avoid)
         extra memory allocations (expensive operations) for the extra chunks
         there should be a delete operation */
@@ -456,7 +456,7 @@ static __inline void resize_memory_pool(struct memory_pool_t *pool, size_t chunk
     }
 
     /* runs the iteration around the old map to move the old items into the
-    new map (new hash must be made) this an extremly slow operation */
+    new map (new hash must be made) this an extremely slow operation */
     for(index = 0; index < old_items_max_size; index++) {
         /* retrieves the current item in iteration in case it's null
         or the buffer is not defined consideres the item as invalid
@@ -498,7 +498,7 @@ static __inline size_t pavailable(struct memory_pool_t *pool) {
     struct memory_item_t *item = NULL;
 
     /* iterates over the pool set of items to count the number
-    of avialble "spots" in the memory pool (increments available) */
+    of available "spots" in the memory pool (increments available) */
     for(index = 0; index < pool->items_max_size; index++) {
         item = pool->buffer_item_map[index];
         if(item == NULL) { available++; }
