@@ -16,4 +16,4 @@ file(GLOB_RECURSE VIRIATUM_SOURCES src/viriatum/*.c)
 add_executable(viriatum ${VIRIATUM_SOURCES})
 
 target_include_directories(viriatum PUBLIC src/viriatum)
-target_link_libraries(viriatum viriatum_commons ${CONAN_LIBS})
+target_link_libraries(viriatum viriatum_commons ${CMAKE_DL_LIBS} ${CONAN_LIBS})
