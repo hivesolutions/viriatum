@@ -36,3 +36,29 @@ jobs:
       - name: Test Viriatum
         run: |
           ./src/viriatum/viriatum --test
+  build-gcc-cmake:
+    name: Build GCC CMake
+    strategy:
+      matrix:
+        gcc-version: [5, 6, 7, 8, 9]
+    runs-on: ubuntu-latest
+    container: gcc:${{ matrix.gcc-version }}
+    steps:
+      - uses: actions/checkout@v1
+      - name: Build & Install CMake
+        run: |
+          apt-get update && apt-get install -y -q wget libssl-dev
+          wget https://github.com/Kitware/CMake/releases/download/v3.16.6/cmake-3.16.6.tar.gz && tar -zxvf cmake-3.16.6.tar.gz && cd cmake-3.16.6 && ./bootstrap && make && make install
+      - name: Build & Install Dependencies
+        run: |
+          apt-get update && apt-get install -y -q python python-pip python-dev libpng-dev
+          curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && python get-pip.py "pip<20"
+          pip install --upgrade "conan<1.25" urllib3
+          conan install . --build
+      - name: Build Viriatum
+        run: |
+          cmake .
+          make
+      - name: Test Viriatum
+        run: |
+          ./bin/viriatum --test
