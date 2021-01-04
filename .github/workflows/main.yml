@@ -87,7 +87,7 @@ jobs:
       - name: Build & Install Dependencies
         run: |
           export PATH=$PATH:/Library/Frameworks/Python.framework/Versions/2.7/bin
-          pip install --upgrade conan urllib3
+          pip install --upgrade "conan<1.24" urllib3
           conan install . --build
       - name: Build Viriatum
         run: |
