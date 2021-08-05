@@ -73,7 +73,7 @@ jobs:
       - uses: actions/checkout@v1
       - name: Build & Install Dependencies
         run: |
-          pip install --upgrade "conan<1.25" urllib3
+          pip3 install --upgrade conan urllib3
           conan install . --build
       - name: Setup msbuild
         uses: microsoft/setup-msbuild@v1.0.2
@@ -93,7 +93,7 @@ jobs:
       - name: Build & Install Dependencies
         run: |
           export PATH=$PATH:/Library/Frameworks/Python.framework/Versions/2.7/bin
-          pip install --upgrade "conan<1.36" "urllib3<1.24"
+          pip3 install --upgrade conan "urllib3<1.24"
           conan install . --build
       - name: Build Viriatum
         run: |
