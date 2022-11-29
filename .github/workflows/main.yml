@@ -45,19 +45,26 @@ jobs:
       matrix:
         gcc-version: [7, 8, 9, 10, 11, 12]
         cmake-version: ["3.25.0"]
+        cmake-type: ["binary"]
     runs-on: ubuntu-latest
     container: gcc:${{ matrix.gcc-version }}
     steps:
       - uses: actions/checkout@v1
+      - name: Install CMake
+        run: |
+          apt-get update && apt-get install -y -q wget libssl-dev
+          wget https://github.com/Kitware/CMake/releases/download/v${{ matrix.cmake-version }}/cmake-${{ matrix.cmake-version }}-linux-x86_64.tar.gz && tar -zxvf cmake-${{ matrix.cmake-version }}-linux-x86_64.tar.gz && cd cmake-${{ matrix.cmake-version }}-linux-x86_64 && ln -s $(pwd)/bin/cmake /usr/local/bin/cmake
+        if: matrix.cmake-type == 'binary'
       - name: Build & Install CMake
         run: |
           apt-get update && apt-get install -y -q wget libssl-dev
           wget https://ftp.osuosl.org/pub/blfs/conglomeration/cmake/cmake-${{ matrix.cmake-version }}.tar.gz && tar -zxvf cmake-${{ matrix.cmake-version }}.tar.gz && cd cmake-${{ matrix.cmake-version }} && ./bootstrap && make && make install
+        if: matrix.cmake-type == 'source'
       - name: Build & Install Dependencies
         run: |
           apt-get update && apt-get install -y -q wget python python-dev
           wget https://bootstrap.pypa.io/pip/2.7/get-pip.py && python get-pip.py
-          pip install --upgrade "conan<1.25" urllib3
+          pip install --upgrade conan urllib3
           conan install . --build
       - name: Build Viriatum
         run: |
