@@ -44,6 +44,7 @@ jobs:
     strategy:
       matrix:
         gcc-version: [5, 6, 7, 8, 9]
+        cmake-version: ["3.16.6"]
     runs-on: ubuntu-latest
     container: gcc:${{ matrix.gcc-version }}
     steps:
@@ -51,7 +52,7 @@ jobs:
       - name: Build & Install CMake
         run: |
           apt-get update && apt-get install -y -q wget libssl-dev
-          wget https://github.com/Kitware/CMake/releases/download/v3.16.6/cmake-3.16.6.tar.gz && tar -zxvf cmake-3.16.6.tar.gz && cd cmake-3.16.6 && ./bootstrap && make && make install
+          wget https://github.com/Kitware/CMake/releases/download/v${{ matrix.cmake-version }}/cmake-${{ matrix.cmake-version }}.tar.gz && tar -zxvf cmake-${{ matrix.cmake-version }}.tar.gz && cd cmake-${{ matrix.cmake-version }} && ./bootstrap && make && make install
       - name: Build & Install Dependencies
         run: |
           apt-get update && apt-get install -y -q wget python python-dev libpng-dev
