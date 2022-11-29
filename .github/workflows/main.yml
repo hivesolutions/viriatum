@@ -43,7 +43,7 @@ jobs:
     timeout-minutes: 30
     strategy:
       matrix:
-        gcc-version: [6, 7, 8, 9, 10, 11, 12]
+        gcc-version: [7, 8, 9, 10, 11, 12]
         cmake-version: ["3.25.0"]
     runs-on: ubuntu-latest
     container: gcc:${{ matrix.gcc-version }}
