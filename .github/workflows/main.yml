@@ -44,7 +44,7 @@ jobs:
     strategy:
       matrix:
         gcc-version: [5, 6, 7, 8, 9]
-        cmake-version: ["3.16.6"]
+        cmake-version: ["3.25.0"]
     runs-on: ubuntu-latest
     container: gcc:${{ matrix.gcc-version }}
     steps:
