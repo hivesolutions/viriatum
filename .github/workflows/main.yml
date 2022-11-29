@@ -84,7 +84,7 @@ jobs:
           pip3 install --upgrade conan urllib3
           conan install . --build
       - name: Setup msbuild
-        uses: microsoft/setup-msbuild@v1.0.2
+        uses: microsoft/setup-msbuild@v1.1
       - name: Build Viriatum
         run: |
           cmake . -DCMAKE_CL_64=1 -DCMAKE_GENERATOR_PLATFORM=x64 -Ax64
