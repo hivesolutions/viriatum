@@ -1,5 +1,7 @@
 name: Main Workflow
-on: [push]
+on:
+  - push
+  - workflow_dispatch
 jobs:
   build-gcc:
     name: Build GCC
