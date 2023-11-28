@@ -26,7 +26,7 @@ jobs:
     timeout-minutes: 30
     strategy:
       matrix:
-        clang-version: [3, 4, 5, 6, 7, 8, 10, 12, 14]
+        clang-version: [4, 5, 6, 7, 8, 10, 12, 14, 15, 16, 17]
     runs-on: ubuntu-latest
     container: silkeh/clang:${{ matrix.clang-version }}
     steps:
@@ -45,7 +45,7 @@ jobs:
     timeout-minutes: 30
     strategy:
       matrix:
-        gcc-version: [7, 8, 9, 10, 11, 12]
+        gcc-version: [7, 8, 9, 10, 11, 12, 13]
         cmake-version: ["3.25.0"]
         cmake-type: ["binary"]
     runs-on: ubuntu-latest
