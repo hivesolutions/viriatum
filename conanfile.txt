@@ -1,3 +1,2 @@
 [generators]
-CMakeDeps
-CMakeToolchain
+cmake
