@@ -75,7 +75,7 @@ jobs:
           make
       - name: Test Viriatum
         run: |
-          ./bin/viriatum --test
+          ./build/viriatum --test
   build-windows-cmake:
     name: Build Windows CMake
     timeout-minutes: 30
@@ -114,4 +114,4 @@ jobs:
           make
       - name: Test Viriatum
         run: |
-          ./bin/viriatum --test
+          ./build/viriatum --test
