@@ -67,7 +67,7 @@ jobs:
           apt-get update && apt-get install -y -q wget python3 python3-dev libpng-dev
           wget https://bootstrap.pypa.io/pip/get-pip.py && python3 get-pip.py
           pip3 install --upgrade conan urllib3
-          conan install . --build=missing
+          conan install . --build="*"
       - name: Build Viriatum
         run: |
           cmake .
@@ -84,7 +84,7 @@ jobs:
       - name: Build & Install Dependencies
         run: |
           pip3 install --upgrade conan urllib3
-          conan install . --build=missing
+          conan install . --build="*"
       - name: Setup msbuild
         uses: microsoft/setup-msbuild@v1.1
       - name: Build Viriatum
@@ -104,7 +104,7 @@ jobs:
         run: |
           export PATH=$PATH:/Library/Frameworks/Python.framework/Versions/2.7/bin
           pip3 install --upgrade "conan>1.50.0" "urllib3<1.27"
-          conan install . --build=missing
+          conan install . --build=*
       - name: Build Viriatum
         run: |
           cmake .
