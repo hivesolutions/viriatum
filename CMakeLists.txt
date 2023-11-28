@@ -1,8 +1,7 @@
 cmake_minimum_required(VERSION 3.0.0)
 project(viriatum)
 
-include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-conan_basic_setup()
+include(${CMAKE_BINARY_DIR}/conan_toolchain.cmake)
 
 add_definitions(-DNO_PRAGMA_LIB)
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)
