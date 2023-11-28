@@ -75,6 +75,7 @@ jobs:
           make
       - name: Test Viriatum
         run: |
+          ls -la
           ./build/viriatum --test
   build-windows-cmake:
     name: Build Windows CMake
