@@ -29,7 +29,7 @@
 
 /* cpu architecture */
 
-#if defined(__arm__) || defined(__thumb__) || defined(_ARM)
+#if defined(__arm__) || defined(__thumb__) || defined(_ARM) || defined(__aarch64__)
 #define VIRIATUM_PLATFORM_CPU "arm"
 #define VIRIATUM_PLATFORM_CPU_ARM true
 #endif
