@@ -65,7 +65,7 @@ jobs:
       - name: Build & Install Dependencies
         run: |
           apt-get update && apt-get install -y -q wget python3 python3-dev libpng-dev
-          wget https://bootstrap.pypa.io/pip/get-pip.py && PIP_BREAK_SYSTEM_PACKAGES=1 python3 get-pip.py
+          wget https://bootstrap.pypa.io/pip/3.7/get-pip.py && PIP_BREAK_SYSTEM_PACKAGES=1 python3 get-pip.py
           pip3 install --break-system-packages --upgrade "conan<2" urllib3
           conan install . --build
       - name: Build Viriatum
