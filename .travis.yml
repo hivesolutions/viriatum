@@ -1,6 +1,0 @@
-dist: trusty
-language: c
-compiler:
-  - clang
-  - gcc
-script: ./autogen.sh && ./configure && make && ./src/viriatum/viriatum --test
