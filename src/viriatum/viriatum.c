@@ -249,7 +249,7 @@ ERROR_CODE print_information() {
         VIRIATUM_FLAGS
     );
 
-    /* prints a message */
+    /* prints a message on the copyright of the system */
     V_PRINT_F("%s\n", VIRIATUM_COPYRIGHT);
 
     /* raises no error */

@@ -188,7 +188,7 @@ ERROR_CODE load_module(struct service_t *service, unsigned char *module_path) {
         V_WARNING_F("%s\n", GET_ERROR_MODULE(module));
     }
 
-    /* calls the start module function, this sould
+    /* calls the start module function, this should
     start all the module internal structures */
     error_code = module->start(environment, module);
 
@@ -198,14 +198,14 @@ ERROR_CODE load_module(struct service_t *service, unsigned char *module_path) {
         V_WARNING_F("%s\n", GET_ERROR_MODULE(module));
     }
 
-    /* adds the module to the list of modlues handlers in the service */
+    /* adds the module to the list of modules handlers in the service */
     append_value_linked_list(service->modules_list, (void *) module);
 
     /* prints a message about the fact that the module
     has just finished the loading process */
     V_DEBUG_F("Finished loading module (%s)\n", module_path);
 
-    /* print a message about the loading of the module, 
+    /* prints a message about the loading of the module, 
     this is always going to be shown */
     V_PRINT_F("Loaded module %s v%s (%s)\n", module->name, module->version, module_path);
 
