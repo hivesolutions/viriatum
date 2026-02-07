@@ -471,6 +471,12 @@ int main(int argc, char *argv[]) {
     processed arguments, indexed by name */
     struct hash_map_t *arguments;
 
+    /* sets stdout and stderr to line-buffered mode so that output
+    is flushed after each newline, this ensures log messages are
+    visible immediately even when output is piped (e.g. Docker) */
+    setvbuf(stdout, NULL, _IOLBF, 0);
+    setvbuf(stderr, NULL, _IOLBF, 0);
+
     /* prints a debug message */
     V_DEBUG_F("Receiving %d argument(s)\n", argc);
 
