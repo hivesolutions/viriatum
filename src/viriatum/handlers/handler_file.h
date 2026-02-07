@@ -122,7 +122,7 @@ typedef struct handler_file_context_t {
 
     /**
      * The base path of the directory to be used for
-     * the contruction of the full path for the file
+     * the construction of the full path for the file
      * this value may be unset and in such case the
      * the default value is used instead.
      */
