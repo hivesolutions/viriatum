@@ -26,7 +26,7 @@ jobs:
     timeout-minutes: 30
     strategy:
       matrix:
-        clang-version: [4, 5, 6, 7, 8, 10, 12, 13, 14, 15, 16, 17]
+        clang-version: [12, 13, 14, 15, 16, 17, 18, 19, 20, 21]
     runs-on: ubuntu-latest
     container: silkeh/clang:${{ matrix.clang-version }}
     steps:

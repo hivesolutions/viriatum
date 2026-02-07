@@ -28,6 +28,7 @@
 #include "stdafx.h"
 
 #include "simple_test.h"
+#include "handler_file_test.h"
 
 #ifndef VIRIATUM_NO_THREADS
 #ifdef VIRIATUM_THREAD_SAFE
@@ -1024,6 +1025,10 @@ void exec_simple_tests(struct test_case_t *test_case) {
     V_RUN_TEST(test_md5, test_case);
     V_RUN_TEST(test_sha1, test_case);
     V_RUN_TEST(test_is_path_safe, test_case);
+    V_RUN_TEST(test_handler_file_context, test_case);
+    V_RUN_TEST(test_handler_file_url, test_case);
+    V_RUN_TEST(test_handler_file_header_field, test_case);
+    V_RUN_TEST(test_handler_file_header_value, test_case);
 }
 
 ERROR_CODE run_simple_tests() {

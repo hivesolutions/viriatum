@@ -551,6 +551,10 @@
                 Name="Test"
                 >
                 <File
+                    RelativePath="..\..\src\viriatum\test\handler_file_test.c"
+                    >
+                </File>
+                <File
                     RelativePath="..\..\src\viriatum\test\simple_test.c"
                     >
                 </File>
@@ -720,6 +724,10 @@
             <Filter
                 Name="Test"
                 >
+                <File
+                    RelativePath="..\..\src\viriatum\test\handler_file_test.h"
+                    >
+                </File>
                 <File
                     RelativePath="..\..\src\viriatum\test\simple_test.h"
                     >

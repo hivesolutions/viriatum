@@ -27,6 +27,38 @@
 
 #pragma once
 
-#include "handler_file_test.h"
-#include "simple_test.h"
-#include "speed_test.h"
+/**
+ * Tests the handler file context creation
+ * and default value initialization.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_handler_file_context();
+
+/**
+ * Tests the handler file url callback including
+ * query string stripping and path traversal rejection.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_handler_file_url();
+
+/**
+ * Tests the handler file header field callback
+ * for correct recognition of known HTTP headers.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_handler_file_header_field();
+
+/**
+ * Tests the handler file header value callback
+ * for correct storage of header values in context.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_handler_file_header_value();
