@@ -5,7 +5,7 @@ ENV PHP_VERSION=5.6.40
 # install build dependencies for viriatum and PHP 5
 RUN apk update && apk add \
     build-base make autoconf automake libtool \
-    pcre-dev wget
+    pcre-dev openssl-dev wget
 
 # download and build PHP 5 with embed SAPI (static)
 RUN wget https://museum.php.net/php5/php-${PHP_VERSION}.tar.gz && \
@@ -50,7 +50,7 @@ LABEL maintainer="Hive Solutions <development@hive.pt>"
 
 EXPOSE 9090
 
-RUN apk add --no-cache pcre
+RUN apk add --no-cache pcre libssl3 libcrypto3
 
 COPY --from=builder /usr/bin/viriatum /usr/bin/viriatum
 COPY --from=builder /usr/lib/libviriatum.so.1.0.0 /usr/lib/libviriatum.so.1.0.0
