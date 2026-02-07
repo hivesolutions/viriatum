@@ -43,33 +43,47 @@
 
 #ifdef VIRIATUM_DEBUG
 #define V_MESSAGE(level) PRINTF_F("[%s] [%s:%d] ", level, base_string_value((unsigned char *) __FILE__), __LINE__)
+#define V_MESSAGE_CONTEXT(level, context) PRINTF_F("[%s] [%s:%d] [%s] ", level, base_string_value((unsigned char *) __FILE__), __LINE__, context)
 #endif
 
 #ifndef VIRIATUM_DEBUG
 #define V_MESSAGE(level) PRINTF_F("[%s] ", level)
+#define V_MESSAGE_CONTEXT(level, context) PRINTF_F("[%s] [%s] ", level, context)
 #endif
 
 #ifdef VIRIATUM_DEBUG
 #define V_DEBUG(format) V_MESSAGE("DEBUG"); PRINTF(format)
 #define V_DEBUG_F(format, ...) V_MESSAGE("DEBUG"); PRINTF_F(format, __VA_ARGS__)
+#define V_DEBUG_CTX(context, format) V_MESSAGE_CONTEXT("DEBUG", context); PRINTF(format)
+#define V_DEBUG_CTX_F(context, format, ...) V_MESSAGE_CONTEXT("DEBUG", context); PRINTF_F(format, __VA_ARGS__)
 
 #define V_INFO(format) V_MESSAGE("INFO"); PRINTF(format)
 #define V_INFO_F(format, ...) V_MESSAGE("INFO"); PRINTF_F(format, __VA_ARGS__)
+#define V_INFO_CTX(context, format) V_MESSAGE_CONTEXT("INFO", context); PRINTF(format)
+#define V_INFO_CTX_F(context, format, ...) V_MESSAGE_CONTEXT("INFO", context); PRINTF_F(format, __VA_ARGS__)
 #endif
 
 #ifndef VIRIATUM_DEBUG
 #define V_DEBUG(format) dump(format)
 #define V_DEBUG_F(format, ...) dump_multiple(format, __VA_ARGS__)
+#define V_DEBUG_CTX(context, format) dump_context(context, format)
+#define V_DEBUG_CTX_F(context, format, ...) dump_context_multiple(context, format, __VA_ARGS__)
 
 #define V_INFO(format) dump(format)
 #define V_INFO_F(format, ...) dump_multiple(format, __VA_ARGS__)
+#define V_INFO_CTX(context, format) dump_context(context, format)
+#define V_INFO_CTX_F(context, format, ...) dump_context_multiple(context, format, __VA_ARGS__)
 #endif
 
 #define V_WARNING(format) V_MESSAGE("WARNING"); PRINTF(format)
 #define V_WARNING_F(format, ...) V_MESSAGE("WARNING"); PRINTF_F(format, __VA_ARGS__)
+#define V_WARNING_CTX(context, format) V_MESSAGE_CONTEXT("WARNING", context); PRINTF(format)
+#define V_WARNING_CTX_F(context, format, ...) V_MESSAGE_CONTEXT("WARNING", context); PRINTF_F(format, __VA_ARGS__)
 
 #define V_ERROR(format) V_MESSAGE("ERROR"); PRINTF(format)
 #define V_ERROR_F(format, ...) V_MESSAGE("ERROR"); PRINTF_F(format, __VA_ARGS__)
+#define V_ERROR_CTX(context, format) V_MESSAGE_CONTEXT("ERROR", context); PRINTF(format)
+#define V_ERROR_CTX_F(context, format, ...) V_MESSAGE_CONTEXT("ERROR", context); PRINTF_F(format, __VA_ARGS__)
 
 #define V_PRINT(format) PRINTF(format)
 #define V_PRINT_F(format, ...) PRINTF_F(format, __VA_ARGS__)

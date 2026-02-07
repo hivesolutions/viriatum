@@ -82,7 +82,7 @@ ERROR_CODE start_module_lua(struct environment_t *environment, struct module_t *
     struct service_t *service = environment->service;
 
     /* prints a debug message */
-    V_DEBUG_F("Starting the module '%s' (%s) v%s\n", name, description, version);
+    V_DEBUG_CTX_F("mod_lua", "Starting the module '%s' (%s) v%s\n", name, description, version);
 
     /* creates the mod Lua module */
     create_mod_lua_module(&mod_lua_module, module);
@@ -120,8 +120,11 @@ ERROR_CODE start_module_lua(struct environment_t *environment, struct module_t *
     service->add_http_handler(service, http_handler);
 
     /* loads the service configuration for the HTTP handler
-    this should change some of it's behavior */
+    this should change some of it's behavior then loads the
+    locations (configurations) associated with the current
+    service environment */
     _load_configuration_lua(service, mod_lua_http_handler);
+    _load_locations_lua(service, mod_lua_http_handler);
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -150,7 +153,7 @@ ERROR_CODE stop_module_lua(struct environment_t *environment, struct module_t *m
     lua_State *lua_state = mod_lua_http_handler->lua_state;
 
     /* prints a debug message */
-    V_DEBUG_F("Stopping the module '%s' (%s) v%s\n", name, description, version);
+    V_DEBUG_CTX_F("mod_lua", "Stopping the module '%s' (%s) v%s\n", name, description, version);
 
     /* removes the HTTP handler from the service */
     service->remove_http_handler(service, http_handler);
@@ -234,6 +237,65 @@ ERROR_CODE _load_configuration_lua(struct service_t *service, struct mod_lua_htt
     case it exists sets it in the mod Lua handler (attribute reference change) */
     get_value_string_sort_map(configuration, (unsigned char *) "script_path", &value);
     if(value != NULL) { mod_lua_http_handler->file_path = (char *) value; }
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE _load_locations_lua(struct service_t *service, struct mod_lua_http_handler_t *mod_lua_http_handler) {
+    /* allocates space for the temporary value object and for
+    the index counter to be used in the iteration of configurations */
+    void *value;
+    size_t index;
+
+    /* allocates space for both the location and the configuration
+    reference stuctures */
+    struct location_t *location;
+    struct sort_map_t *configuration;
+
+    /* allocates space for the mod Lua location structure
+    reference to be used to resolve the request */
+    struct mod_lua_location_t *_location;
+
+    /* allocates space for the various location structures
+    that will be used to resolve the Lua request */
+    mod_lua_http_handler->locations = (struct mod_lua_location_t *)
+        MALLOC(service->locations.count * sizeof(struct mod_lua_location_t));
+    memset(mod_lua_http_handler->locations, 0,
+        service->locations.count * sizeof(struct mod_lua_location_t));
+
+    /* updates the locations count variable in the Lua handler so
+    that it's possible to iterate over the locations */
+    mod_lua_http_handler->locations_count = service->locations.count;
+
+    /* iterates over all the locations in the service to create the
+    proper configuration structures to the module */
+    for(index = 0; index < service->locations.count; index++) {
+        /* retrieves the current (service) location and then uses it
+        to retrieve the configuration sort map */
+        location = &service->locations.values[index];
+        configuration = location->configuration;
+
+        /* retrieves the current mod Lua configuration reference from
+        the location buffer, this is going to be populated and sets the
+        default values in it */
+        _location = &mod_lua_http_handler->locations[index];
+        _location->lua_state = NULL;
+        _location->file_path = NULL;
+        _location->file_dirty = 0;
+
+        /* tries ro retrieve the script path from the Lua configuration and in
+        case it exists sets it in the location (attribute reference change) */
+        get_value_string_sort_map(configuration, (unsigned char *) "script_path", &value);
+        if(value != NULL) {
+            _location->file_path = (char *) value;
+            _location->file_dirty = 1;
+
+            /* loads a new Lua state for this location so that
+            each location has its own isolated interpreter */
+            _load_lua_state(&_location->lua_state);
+        }
+    }
 
     /* raises no error */
     RAISE_NO_ERROR;

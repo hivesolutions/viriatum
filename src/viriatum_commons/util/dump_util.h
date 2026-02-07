@@ -26,3 +26,5 @@
 
 static __inline void dump(void *argument) { }
 static __inline void dump_multiple(void *argument, ...) { }
+static __inline void dump_context(void *context, void *argument) { }
+static __inline void dump_context_multiple(void *context, void *argument, ...) { }

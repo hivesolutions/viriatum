@@ -74,7 +74,7 @@ ERROR_CODE start_module_diag(struct environment_t *environment, struct module_t 
 
     /* prints a debug message about the module that is
     currently being loaded */
-    V_DEBUG_F("Starting the module '%s' (%s) v%s\n", name, description, version);
+    V_DEBUG_CTX_F("mod_diag", "Starting the module '%s' (%s) v%s\n", name, description, version);
 
     /* creates the mo diag module with the provided module reference
     and then initializes the new diag module with the currently
@@ -122,7 +122,7 @@ ERROR_CODE stop_module_diag(struct environment_t *environment, struct module_t *
 
     /* prints a debug message about the unloading of the current
     module, for debugging purposes */
-    V_DEBUG_F("Stopping the module '%s' (%s) v%s\n", name, description, version);
+    V_DEBUG_CTX_F("mod_diag", "Stopping the module '%s' (%s) v%s\n", name, description, version);
 
     /* removes the HTTP handler from the service, it can no longer
     be used to handle any request from this point on, then deletes

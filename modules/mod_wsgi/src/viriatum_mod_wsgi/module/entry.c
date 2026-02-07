@@ -82,7 +82,7 @@ ERROR_CODE start_module_wsgi(struct environment_t *environment, struct module_t 
     struct service_t *service = environment->service;
 
     /* prints a debug message */
-    V_DEBUG_F("Starting the module '%s' (%s) v%s\n", name, description, version);
+    V_DEBUG_CTX_F("mod_wsgi", "Starting the module '%s' (%s) v%s\n", name, description, version);
 
     /* sets the global service reference to be used in the
     externalized function for the interpreter */
@@ -148,7 +148,7 @@ ERROR_CODE stop_module_wsgi(struct environment_t *environment, struct module_t *
     struct mod_wsgi_http_handler_t *mod_wsgi_http_handler = mod_wsgi_module->mod_wsgi_http_handler;
 
     /* prints a debug message */
-    V_DEBUG_F("Stopping the module '%s' (%s) v%s\n", name, description, version);
+    V_DEBUG_CTX_F("mod_wsgi", "Stopping the module '%s' (%s) v%s\n", name, description, version);
 
     /* removes the HTTP handler from the service */
     service->remove_http_handler(service, http_handler);

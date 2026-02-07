@@ -29,6 +29,30 @@
 #define LUA_ERROR(error) error > 0
 
 /**
+ * Structure describing the internal parameters
+ * for a location in the Lua context.
+ */
+typedef struct mod_lua_location_t {
+    /**
+     * The Lua state used for this location's
+     * script execution.
+     */
+    lua_State *lua_state;
+
+    /**
+     * The path to the script file to
+     * be used for this location.
+     */
+    char *file_path;
+
+    /**
+     * Flag that controls if the script file
+     * to be executed is currently dirty.
+     */
+    unsigned int file_dirty;
+} mod_lua_location_t;
+
+/**
  * The structure that holds the internal
  * structure to support the context
  * of the Lua module.
@@ -51,6 +75,28 @@ typedef struct mod_lua_http_handler_t {
      * to be executed is currently dirty.
      */
     unsigned int file_dirty;
+
+    /**
+     * The various locations loaded from the configuration
+     * they refer the configuration attributes associated
+     * with the Lua structures.
+     */
+    struct mod_lua_location_t *locations;
+
+    /**
+     * The number of locations currently loaded in the handler
+     * this value is used for iteration around the locations
+     * buffer.
+     */
+    size_t locations_count;
+
+    /**
+     * Reference to the currently active location for the
+     * request being processed, this is set by the location
+     * callback and used by the response handler to resolve
+     * the correct Lua state and script path.
+     */
+    struct mod_lua_location_t *current_location;
 } mod_lua_http_handler;
 
 ERROR_CODE create_mod_lua_http_handler(struct mod_lua_http_handler_t **mod_lua_http_handler_pointer, struct http_handler_t *http_handler_pointer);

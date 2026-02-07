@@ -216,7 +216,7 @@ void _module_register(zval *_array TSRMLS_DC) {
 }
 
 void _module_log(char *message TSRMLS_DC) {
-    V_DEBUG_F("%s\n", message);
+    V_DEBUG_CTX_F("mod_php", "%s\n", message);
 }
 
 double _module_request_time(TSRMLS_D) {

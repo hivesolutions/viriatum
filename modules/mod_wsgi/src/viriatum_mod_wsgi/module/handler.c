@@ -356,7 +356,7 @@ ERROR_CODE message_complete_callback_handler_wsgi(struct http_parser_t *http_par
         logging, then logs the error at warning level for visibility */
         struct handler_wsgi_context_t *handler_wsgi_context =
             (struct handler_wsgi_context_t *) http_parser->context;
-        V_WARNING_F("WSGI error for %s: %s\n",
+        V_WARNING_CTX_F("mod_wsgi", "WSGI error for %s: %s\n",
             handler_wsgi_context ? (char *) handler_wsgi_context->url : "/",
             (char *) GET_ERROR());
         _write_error_connection_wsgi(http_parser, (char *) GET_ERROR());
@@ -1148,13 +1148,13 @@ ERROR_CODE _load_module_wsgi(PyObject **module_pointer, char *name, char *file_p
 
     /* prints a debug message to notify the system about the loading
     of the WSGI module (provides logging) */
-    V_DEBUG_F("Loading WSGI module '%s'\n", file_path);
+    V_DEBUG_CTX_F("mod_wsgi", "Loading WSGI module '%s'\n", file_path);
 
     /* opens the file for reading (in binary mode) and checks if
     there was a problem opening it, raising an error in such case */
     FOPEN(&file, file_path, "rb");
     if(file == NULL) {
-        V_DEBUG_F("Module file not found '%s'\n", file_path);
+        V_DEBUG_CTX_F("mod_wsgi", "Module file not found '%s'\n", file_path);
         RAISE_NO_ERROR;
     }
 
@@ -1191,7 +1191,7 @@ ERROR_CODE _load_module_wsgi(PyObject **module_pointer, char *name, char *file_p
     /* in case the parsed node is not valid (something wrong occurred
     while parsing the file) raises an error */
     if(node == NULL) {
-        V_DEBUG("Error while parsing module\n");
+        V_DEBUG_CTX("mod_wsgi", "Error while parsing module\n");
         PyErr_Clear(); RAISE_NO_ERROR;
     }
 
@@ -1200,7 +1200,7 @@ ERROR_CODE _load_module_wsgi(PyObject **module_pointer, char *name, char *file_p
     code = (PyObject *) PyNode_Compile(node, file_path);
     PyNode_Free(node);
     if(code == NULL) {
-        V_DEBUG("Error while compiling module\n");
+        V_DEBUG_CTX("mod_wsgi", "Error while compiling module\n");
         PyErr_Clear(); RAISE_NO_ERROR;
     }
 
@@ -1212,7 +1212,7 @@ ERROR_CODE _load_module_wsgi(PyObject **module_pointer, char *name, char *file_p
     /* in case the module was not correctly loaded must clear the error
     pending to be printed from the error buffer */
     if(module == NULL) {
-        V_DEBUG("Error while executing module\n");
+        V_DEBUG_CTX("mod_wsgi", "Error while executing module\n");
         PyErr_Clear();
     }
 

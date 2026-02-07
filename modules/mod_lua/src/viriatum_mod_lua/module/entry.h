@@ -64,6 +64,7 @@ VIRIATUM_EXPORT_PREFIX ERROR_CODE stop_module_lua(struct environment_t *environm
 VIRIATUM_EXPORT_PREFIX ERROR_CODE info_module_lua(struct module_t *module);
 VIRIATUM_EXPORT_PREFIX ERROR_CODE error_module_lua(unsigned char **message_pointer);
 VIRIATUM_EXPORT_PREFIX ERROR_CODE _load_configuration_lua(struct service_t *service, struct mod_lua_http_handler_t *mod_lua_http_handler);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE _load_locations_lua(struct service_t *service, struct mod_lua_http_handler_t *mod_lua_http_handler);
 VIRIATUM_EXPORT_PREFIX ERROR_CODE _load_lua_state(lua_State **lua_state_pointer);
 VIRIATUM_EXPORT_PREFIX ERROR_CODE _unload_lua_state(lua_State **lua_state_pointer);
 VIRIATUM_EXPORT_PREFIX ERROR_CODE _reload_lua_state(lua_State **lua_state_pointer);

@@ -611,7 +611,7 @@ ERROR_CODE _send_response_handler_php(struct http_parser_t *http_parser) {
     /* logs PHP server errors at warning level for console visibility,
     this ensures 5xx responses from PHP are not silently swallowed */
     if(status_code >= 500) {
-        V_WARNING_F("PHP error %d for %s %s\n",
+        V_WARNING_CTX_F("mod_php", "PHP error %d for %s %s\n",
             status_code, handler_php_context->method,
             (char *) handler_php_context->url);
     }

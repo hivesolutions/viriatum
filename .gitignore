@@ -38,6 +38,7 @@ ltoptions.m4
 ltsugar.m4
 ltversion.m4
 lt~obsolete.m4
+autom4te.cache
 graph_info.json
 
 conan.lock
@@ -69,7 +70,6 @@ cmake_install.cmake
 /ZERO_CHECK.*
 /viriatum.*
 /viriatum_commons.*
-/autom4te.cache
 /win32/vs2015/*/*
 /win32/vs2008ex/*/*
 /src/viriatum/viriatum

@@ -82,7 +82,7 @@ ERROR_CODE start_module_php(struct environment_t *environment, struct module_t *
     struct service_t *service = environment->service;
 
     /* prints a debug message */
-    V_DEBUG_F("Starting the module '%s' (%s) v%s\n", name, description, version);
+    V_DEBUG_CTX_F("mod_php", "Starting the module '%s' (%s) v%s\n", name, description, version);
 
     /* sets the global service reference to be used in the
     externalized function for the interpreter */
@@ -148,7 +148,7 @@ ERROR_CODE stop_module_php(struct environment_t *environment, struct module_t *m
     struct mod_php_http_handler_t *mod_php_http_handler = mod_php_module->mod_php_http_handler;
 
     /* prints a debug message */
-    V_DEBUG_F("Stopping the module '%s' (%s) v%s\n", name, description, version);
+    V_DEBUG_CTX_F("mod_php", "Stopping the module '%s' (%s) v%s\n", name, description, version);
 
     /* removes the HTTP handler from the service */
     service->remove_http_handler(service, http_handler);
@@ -317,7 +317,7 @@ int _write_php_state(const char *data, unsigned int data_size TSRMLS_DC) {
 
 void _log_php_state(char *message) {
     /* logs the error message (critical error) */
-    V_ERROR_F("%s\n", message);
+    V_ERROR_CTX_F("mod_php", "%s\n", message);
 }
 
 void _error_php_state(int type, const char *message, ...) {
@@ -330,7 +330,7 @@ void _error_php_state(int type, const char *message, ...) {
     }
 
     /* logs the error message (critical error) */
-    V_ERROR("Critical error in user code\n");
+    V_ERROR_CTX("mod_php", "Critical error in user code\n");
 
     /* exits the current code (code jump) */
     zend_bailout();
