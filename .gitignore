@@ -43,6 +43,14 @@ conan.lock
 conaninfo.txt
 bit_stream.*
 conanbuildinfo.*
+conan_toolchain.cmake
+conanbuild*.sh
+conanrun*.sh
+deactivate_conan*.sh
+cmakedeps_macros.cmake
+conandeps_legacy.cmake
+CMakePresets.json
+CMakeUserPresets.json
 
 CMakeCache.txt
 cmake_install.cmake

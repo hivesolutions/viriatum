@@ -65,12 +65,13 @@ jobs:
       - name: Build & Install Dependencies
         run: |
           apt-get update && apt-get install -y -q wget python3 python3-dev libpng-dev
-          wget https://bootstrap.pypa.io/pip/3.7/get-pip.py && PIP_BREAK_SYSTEM_PACKAGES=1 python3 get-pip.py
-          pip3 install --break-system-packages --upgrade "conan<2" urllib3
-          conan install . --build
+          wget https://bootstrap.pypa.io/get-pip.py && PIP_BREAK_SYSTEM_PACKAGES=1 python3 get-pip.py
+          pip3 install --break-system-packages --upgrade "conan>=2,<3" urllib3
+          conan profile detect --force
+          conan install . --build=missing
       - name: Build Viriatum
         run: |
-          cmake .
+          cmake . -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake
           make
       - name: Test Viriatum
         run: |
@@ -84,13 +85,14 @@ jobs:
       - uses: actions/checkout@v4
       - name: Build & Install Dependencies
         run: |
-          pip3 install --upgrade "conan<2" urllib3
-          conan install . --build
+          pip3 install --upgrade "conan>=2,<3" urllib3
+          conan profile detect --force
+          conan install . --build=missing
       - name: Setup msbuild
         uses: microsoft/setup-msbuild@v1.1
       - name: Build Viriatum
         run: |
-          cmake . -DCMAKE_CL_64=1 -DCMAKE_GENERATOR_PLATFORM=x64 -Ax64
+          cmake . -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_CL_64=1 -DCMAKE_GENERATOR_PLATFORM=x64 -Ax64
           msbuild ALL_BUILD.vcxproj /P:Configuration=Release
       - name: Test Viriatum
         run: |
@@ -98,17 +100,17 @@ jobs:
   build-macos-cmake:
     name: Build macOS CMake
     timeout-minutes: 30
-    runs-on: macos-15-intel
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
       - name: Build & Install Dependencies
         run: |
-          export PATH=$PATH:/Library/Frameworks/Python.framework/Versions/2.7/bin
-          pip3 install --break-system-packages --upgrade "conan>1.50.0, <2" "urllib3<1.27"
-          conan install . --build
+          pip3 install --break-system-packages --upgrade "conan>=2,<3" "urllib3<1.27"
+          conan profile detect --force
+          conan install . --build=missing
       - name: Build Viriatum
         run: |
-          cmake .
+          cmake . -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake
           make
       - name: Test Viriatum
         run: |
