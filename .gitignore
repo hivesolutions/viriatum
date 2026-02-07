@@ -27,6 +27,7 @@ depcomp
 compile
 stamp-h1
 configure
+configure~
 install-sh
 test-driver
 hello.txt

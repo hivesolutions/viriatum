@@ -201,9 +201,9 @@ ERROR_CODE load_module(struct service_t *service, unsigned char *module_path) {
     /* adds the module to the list of modlues handlers in the service */
     append_value_linked_list(service->modules_list, (void *) module);
 
-    /* prints a debug message about the fact that the module
+    /* prints a message about the fact that the module
     has just finished the loading process */
-    V_DEBUG_F("Finished loading module (%s)\n", module_path);
+    V_PRINT_F("Loaded module %s v%s (%s)\n", module->name, module->version, module_path);
 
     /* raise no error */
     RAISE_NO_ERROR;

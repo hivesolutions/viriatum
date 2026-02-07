@@ -433,8 +433,29 @@ typedef struct http_parser_t {
     unsigned short http_minor;
     unsigned short status_code;
     unsigned char method;
+
+    /**
+     * Flag indicating that the connection should be
+     * upgraded to a different protocol. This is set
+     * when the upgrade header flag is present or when
+     * the method is CONNECT. When active the parser
+     * triggers message_complete early and returns, as
+     * the remaining data belongs to the new protocol.
+     */
     char upgrade;
+
+    /**
+     * Reference to the handler specific context
+     * structure, owned by the currently active handler.
+     * Each handler stores its own context type (eg:
+     * file handler stores handler_file_context, proxy
+     * handler stores handler_proxy_context).
+     * This value is set to NULL on parser initialization
+     * and should be managed by the handler during the
+     * request life-cycle.
+     */
     void *context;
+
     unsigned char *header_field_mark;
     unsigned char *header_value_mark;
     unsigned char *url_mark;

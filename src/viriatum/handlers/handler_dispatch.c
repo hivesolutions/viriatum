@@ -356,6 +356,11 @@ ERROR_CODE url_callback_handler_dispatch(struct http_parser_t *http_parser, cons
     } else {
         /* prints an error message to the output */
         V_ERROR_F("Error retrieving '%s' handler reference\n", handler_name);
+
+        /* saves the path in the parser context so it is available
+        for logging in the error response handler */
+        http_parser->context = MALLOC(path_size + 1);
+        memcpy(http_parser->context, path, path_size + 1);
     }
 
     /* raise no error */
@@ -411,6 +416,14 @@ ERROR_CODE _set_http_parser_handler_dispatch(struct http_parser_t *http_parser) 
 }
 
 ERROR_CODE _unset_http_parser_handler_dispatch(struct http_parser_t *http_parser) {
+    /* releases any path stored in the parser context, this
+    may happen if the connection is closed before the request
+    is fully processed (eg: client disconnect) */
+    if(http_parser->context) {
+        FREE(http_parser->context);
+        http_parser->context = NULL;
+    }
+
     /* raises no error */
     RAISE_NO_ERROR;
 }
@@ -470,8 +483,9 @@ ERROR_CODE _send_response_handler_dispatch(struct http_parser_t *http_parser) {
     /* logs the dispatch error at warning level, providing visibility
     when a request cannot be routed to the appropriate handler */
     V_WARNING_F(
-        "Dispatch error, sending 500 for %s request\n",
-        get_http_method_string(http_parser->method)
+        "Dispatch error, sending 500 for %s %s\n",
+        get_http_method_string(http_parser->method),
+        http_parser->context ? (char *) http_parser->context : "/"
     );
 
     /* writes the response to the connection, registers for the appropriate callbacks
