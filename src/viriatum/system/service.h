@@ -698,7 +698,7 @@ typedef struct connection_t {
     /**
      * Identifier value for the current connection
      * this value should be as most unique as possible
-     * so that the connection is correclty identified.
+     * so that the connection is correctly identified.
      */
     unsigned long long id;
 

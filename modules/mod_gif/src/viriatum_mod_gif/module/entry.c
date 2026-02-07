@@ -97,7 +97,7 @@ ERROR_CODE start_module_gif(struct environment_t *environment, struct module_t *
 
     /* adds the HTTP handler to the service, this operation
     should enable the handling of request using the (empty) GIF
-    based handler, in case they are correclty routed */
+    based handler, in case they are correctly routed */
     service->add_http_handler(service, http_handler);
 
     /* raises no error */

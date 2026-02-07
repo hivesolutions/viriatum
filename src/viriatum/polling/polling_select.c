@@ -597,7 +597,7 @@ ERROR_CODE _call_polling_select(
         current_connection->read_valid = TRUE;
 
         /* in case the current connection is in the handshake
-        section and the handshake handler is correclty set (must
+        section and the handshake handler is correctly set (must
         call it to initialize the connection) */
         if(current_connection->status == STATUS_HANDSHAKE &&\
             current_connection->on_handshake != NULL) {
@@ -609,7 +609,7 @@ ERROR_CODE _call_polling_select(
         }
 
         /* in case the current connection is open and the read
-        handler is correclty set (must call it) */
+        handler is correctly set (must call it) */
         if(current_connection->status == STATUS_OPEN &&\
             current_connection->on_read != NULL) {
             /* prints a series of debug messages and then calls the
