@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Module load logging at startup using `V_PRINT_F` showing module name, version and path
 * Multi-stage Docker builds for both `Dockerfile` (11 MB) and `Dockerfile.php` (22 MB)
 * Documentation for `upgrade` and `context` fields in `http_parser_t`
+* Compilation flags shown in startup banner (e.g. `[nts ipv6 pcre]`)
 
 ### Changed
 
@@ -31,3 +32,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Reject URLs containing `..` path traversal sequences in file handler to prevent access outside the web root
 * Fixed leaked `#pragma pack(1)` in `stream_torrent.h` causing struct alignment mismatches across compilation units
 * Fixed potential memory leak of dispatch handler path context on early connection close
+* Fixed IPv6 autodetection failing with GCC 15 (C23) due to `void main` and missing `arpa/inet.h` in m4 network checks
