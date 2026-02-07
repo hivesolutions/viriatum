@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # Hive Viriatum Modules
-# Copyright (c) 2008-2020 Hive Solutions Lda.
+# Copyright (c) 2008-2026 Hive Solutions Lda.
 #
 # This file is part of Hive Viriatum Modules.
 #
@@ -20,7 +20,7 @@
 # Hive Viriatum Modules. If not, see <http://www.apache.org/licenses/>.
 
 # __author__    = João Magalhães <joamag@hive.pt>
-# __copyright__ = Copyright (c) 2008-2020 Hive Solutions Lda.
+# __copyright__ = Copyright (c) 2008-2026 Hive Solutions Lda.
 # __license__   = Apache License, Version 2.0
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
