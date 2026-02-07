@@ -144,7 +144,7 @@ PyObject *wsgi_start_response(PyObject *self, PyObject *args) {
     count (avoids memory leak) */
     Py_DECREF(iterator);
 
-    /* imports the WSGI module containing the util methos to be used by the
+    /* imports the WSGI module containing the util methods to be used by the
     application to access viriatum WSGI functions */
     wsgi_module = PyImport_ImportModule("viriatum_wsgi");
     if(wsgi_module == NULL) { return NULL; }

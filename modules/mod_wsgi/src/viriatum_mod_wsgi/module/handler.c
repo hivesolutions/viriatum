@@ -54,7 +54,7 @@ ERROR_CODE create_mod_wsgi_http_handler(struct mod_wsgi_http_handler_t **mod_wsg
 
 ERROR_CODE delete_mod_wsgi_http_handler(struct mod_wsgi_http_handler_t *mod_wsgi_http_handler) {
     /* allocates space for the index counter to be used to iterate
-    arround the various locations and space for the location in iteration */
+    around the various locations and space for the location in iteration */
     size_t index;
     struct mod_wsgi_location_t *location;
 
@@ -63,7 +63,7 @@ ERROR_CODE delete_mod_wsgi_http_handler(struct mod_wsgi_http_handler_t *mod_wsgi
     VIRIATUM_ACQUIRE_GIL;
 
     /* iterates over all the locations to (possibly) release the
-    various loaded modules in their controll, this is considered
+    various loaded modules in their control, this is considered
     a garbage collection operation */
     for(index = 0; index < mod_wsgi_http_handler->locations_count; index++) {
         location = &mod_wsgi_http_handler->locations[index];
@@ -130,7 +130,7 @@ ERROR_CODE create_handler_wsgi_context(struct handler_wsgi_context_t **handler_w
 ERROR_CODE delete_handler_wsgi_context(struct handler_wsgi_context_t *handler_wsgi_context) {
     /* in case the iterator in the WSGI is not null it must be
     released by decrementing the reference count, note that the
-    reelease of the memory is protected by acquiring the gil */
+    release of the memory is protected by acquiring the gil */
     if(handler_wsgi_context->iterator != NULL) {
         VIRIATUM_ACQUIRE_GIL;
         Py_DECREF(handler_wsgi_context->iterator);
@@ -224,7 +224,7 @@ ERROR_CODE header_field_callback_handler_wsgi(struct http_parser_t *http_parser,
     handler_wsgi_context->header->name[data_size] = '\0';
     handler_wsgi_context->header->name_size = data_size;
 
-    /* checks if the current header is a valid "capturable"
+    /* checks if the current header is a valid "captureble"
     header in such case changes the next header value accordingly
     otherwise sets the undefined header */
     if(memcmp(data, CONTENT_TYPE_H, data_size) == 0) { handler_wsgi_context->_next_header = CONTENT_TYPE; }
@@ -247,7 +247,7 @@ ERROR_CODE header_value_callback_handler_wsgi(struct http_parser_t *http_parser,
     size_t _data_size;
 
     /* copies the current header value into the appropriate structure
-    and alse updates the size of the value string in it */
+    and also updates the size of the value string in it */
     memcpy(handler_wsgi_context->header->value, data, data_size);
     handler_wsgi_context->header->value[data_size] = '\0';
     handler_wsgi_context->header->value_size = data_size;
@@ -256,7 +256,7 @@ ERROR_CODE header_value_callback_handler_wsgi(struct http_parser_t *http_parser,
     by incrementing the current headers counter by one value*/
     handler_wsgi_context->headers->count++;
 
-    /* switchs over the next header possible values to
+    /* switches over the next header possible values to
     copy the current header buffer into the appropriate place */
     switch(handler_wsgi_context->_next_header) {
         case CONTENT_TYPE:
@@ -344,12 +344,12 @@ ERROR_CODE body_callback_handler_wsgi(struct http_parser_t *http_parser, const u
 
 ERROR_CODE message_complete_callback_handler_wsgi(struct http_parser_t *http_parser) {
     /* allocates space for the error return valid from the sending
-    of the response (loaging, execution, etc.) */
+    of the response (loading, execution, etc.) */
     ERROR_CODE return_value;
 
-    /* sends (and creates) the reponse and retreives the (possible)
+    /* sends (and creates) the response and retrieves the (possible)
     error code from in then in such case sends the error code to
-    the connection throught the upstream pipe */
+    the connection through the upstream pipe */
     return_value = _send_response_handler_wsgi(http_parser);
     if(IS_ERROR_CODE(return_value)) {
         _write_error_connection_wsgi(http_parser, (char *) GET_ERROR());
@@ -567,7 +567,7 @@ ERROR_CODE _send_data_callback_wsgi(struct connection_t *connection, struct data
         RAISE_NO_ERROR;
     }
 
-    /* retieves the buffer from the current item and then retrieves the
+    /* retrieves the buffer from the current item and then retrieves the
     size of it (to be used for the allocation of the connection buffer) */
     buffer = PyString_AsString(item);
     buffer_size = PyString_Size(item);
@@ -625,7 +625,7 @@ ERROR_CODE _send_response_handler_wsgi(struct http_parser_t *http_parser) {
     size_t count;
 
     /* allocates space for the length of the sequence returned with
-    the contentns of the message to be sent */
+    the contents of the message to be sent */
     size_t sequence_length;
 
     /* allocates space for the reference to the modules object that
@@ -633,7 +633,7 @@ ERROR_CODE _send_response_handler_wsgi(struct http_parser_t *http_parser) {
     PyObject *modules;
 
     /* allocates space for the temporary item to be used to possible calculate
-    the length of the message to be transfered */
+    the length of the message to be transferred */
     PyObject *item;
     size_t item_size;
     char has_size;
@@ -761,7 +761,7 @@ ERROR_CODE _send_response_handler_wsgi(struct http_parser_t *http_parser) {
     /* resets the number of headers for the current WSGI request
     to be processed (this is a new WSGI request) then sets the
     flag that controls if the WSGI request contains the content
-    length ehader to false (default value) */
+    length header to false (default value) */
     _wsgi_request.header_count = 0;
     _wsgi_request.has_length = FALSE;
 
@@ -804,11 +804,11 @@ ERROR_CODE _send_response_handler_wsgi(struct http_parser_t *http_parser) {
     if(_wsgi_request.has_length == FALSE) {
         /* retrieves the length of the sequence containing
         the message parts to be sent to the client and the
-        swiches over the size to handle the sizes accordingly */
+        switches over the size to handle the sizes accordingly */
         sequence_length = PySequence_Check(result) ? PySequence_Length(result) : 2;
         switch(sequence_length) {
             case 0:
-                /* sets the flag for the content size and upadate
+                /* sets the flag for the content size and update
                 the size of the item with the zero value */
                 has_size = TRUE;
                 item_size = 0;
@@ -836,7 +836,7 @@ ERROR_CODE _send_response_handler_wsgi(struct http_parser_t *http_parser) {
     }
 
     /* allocates space for the header buffer and then writes the default values
-    into it the value is dynamicaly contructed based on the current header values */
+    into it the value is dynamically constructed based on the current header values */
     connection->alloc_data(connection, VIRIATUM_HTTP_MAX_SIZE, (void **) &headers_buffer);
     count = http_connection->write_headers(
         connection,
@@ -883,7 +883,7 @@ ERROR_CODE _send_response_handler_wsgi(struct http_parser_t *http_parser) {
     count += 2;
 
     /* retrieves the iterator associated with the result, that should be a sequence
-    object (iterable) containg the various parts of the message to be returned, then
+    object (iterable) containing the various parts of the message to be returned, then
     sets the iterator in the WSGI context structure to be used in the callback */
     iterator = PyObject_GetIter(result);
     if(iterator == NULL) {
@@ -928,7 +928,7 @@ ERROR_CODE _send_response_callback_handler_wsgi(struct connection_t *connection,
 
     /* checks if the current connection should be kept alive, this must
     be done prior to the unseting of the connection as the current WSGI
-    context structrue will be destroyed there */
+    context structure will be destroyed there */
     unsigned char keep_alive = handler_wsgi_context->flags & FLAG_KEEP_ALIVE;
 
     /* in case there is an HTTP handler in the current connection must
@@ -965,7 +965,7 @@ ERROR_CODE _write_error_connection_wsgi(struct http_parser_t *http_parser, char 
     struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
     struct handler_wsgi_context_t *handler_wsgi_context = (struct handler_wsgi_context_t *) http_parser->context;
 
-    /* allocates the data buffer (in a safe maner) then
+    /* allocates the data buffer (in a safe manner) then
     writes the HTTP static headers to the response */
     connection->alloc_data(connection, VIRIATUM_HTTP_SIZE, (void **) &buffer);
     http_connection->write_error(
@@ -1022,7 +1022,7 @@ ERROR_CODE _start_environ_wsgi(PyObject *environ, struct http_parser_t *http_par
     if(http_parser->_content_length > 0) { post_data = &http_connection->buffer[http_connection->buffer_offset - http_parser->_content_length];
     } else { post_data = NULL; }
 
-    /* iterates over all the heades in order to "export" them
+    /* iterates over all the headers in order to "export" them
     into the environ dictionary to expose them to the application */
     for(index = 0; index < _headers.count; index++) {
         /* retrieves the current header structure for the
@@ -1139,7 +1139,7 @@ ERROR_CODE _load_module_wsgi(PyObject **module_pointer, char *name, char *file_p
     value to provide error detection */
     *module_pointer = NULL;
 
-    /* prints a debug message to notify the system abou the loading
+    /* prints a debug message to notify the system about the loading
     of the WSGI module (provides logging) */
     V_DEBUG_F("Loading WSGI module '%s'\n", file_path);
 
@@ -1166,8 +1166,8 @@ ERROR_CODE _load_module_wsgi(PyObject **module_pointer, char *name, char *file_p
 
     /* iterates over all the bytes in the file buffer to replace
     the carrige return characters by "simple space" characters to
-    provide compatability for old unix system where shuch characters
-    are not allowed and woul break string parsing */
+    provide compatibility for old unix system where such characters
+    are not allowed and would break string parsing */
     for(index = 0; index < number_bytes; index++) {
         /* in case the current character is not a carriage return
         must continue with the loop otherwise executes the change */
@@ -1197,7 +1197,7 @@ ERROR_CODE _load_module_wsgi(PyObject **module_pointer, char *name, char *file_p
         PyErr_Clear(); RAISE_NO_ERROR;
     }
 
-    /* executes the code in the code object provided, retrieveing the
+    /* executes the code in the code object provided, retrieving the
     module and setting it in the module pointer reference */
     module = PyImport_ExecCodeModuleEx(name, code, file_path);
     *module_pointer = module;
