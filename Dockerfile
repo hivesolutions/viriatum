@@ -25,4 +25,8 @@ RUN ln -s libviriatum.so.1.0.0 /usr/lib/libviriatum.so.1 && \
     ln -s libviriatum_http.so.1.0.0 /usr/lib/libviriatum_http.so.1 && \
     ln -s libviriatum_http.so.1.0.0 /usr/lib/libviriatum_http.so
 
+RUN addgroup -S viriatum && adduser -S viriatum -G viriatum && \
+    chown -R viriatum:viriatum /etc/viriatum /var/viriatum
+USER viriatum
+
 CMD ["/usr/bin/viriatum"]
