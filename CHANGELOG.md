@@ -21,6 +21,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Documentation for `upgrade` and `context` fields in `http_parser_t`
 * Compilation flags shown in startup banner (e.g. `[nts ipv6 pcre]`)
 * Regression test for dispatch handler context lifecycle on keep-alive connections
+* Warning-level logging in mod_lua, mod_php, and mod_wsgi for 500 errors with request context
+* Line-buffered stdout/stderr via `setvbuf` to ensure log output is visible when piped (e.g. Docker)
 
 ### Changed
 
@@ -41,3 +43,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * PHP and WSGI module handler unsets now NULL `http_parser->context` after freeing
 * Fixed `REQUEST_URI` length using path size instead of full URL size in mod_php handler
 * Connection info page now shows "not found" message instead of empty fields for closed connections
+* Fixed `setvbuf` crash on Windows/MSVC by using `_IONBF` (unbuffered) instead of `_IOLBF` which rejects size 0

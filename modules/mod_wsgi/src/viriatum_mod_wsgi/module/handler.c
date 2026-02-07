@@ -352,6 +352,13 @@ ERROR_CODE message_complete_callback_handler_wsgi(struct http_parser_t *http_par
     the connection through the upstream pipe */
     return_value = _send_response_handler_wsgi(http_parser);
     if(IS_ERROR_CODE(return_value)) {
+        /* retrieves the handler WSGI context to access the URL for
+        logging, then logs the error at warning level for visibility */
+        struct handler_wsgi_context_t *handler_wsgi_context =
+            (struct handler_wsgi_context_t *) http_parser->context;
+        V_WARNING_F("WSGI error for %s: %s\n",
+            handler_wsgi_context ? (char *) handler_wsgi_context->url : "/",
+            (char *) GET_ERROR());
         _write_error_connection_wsgi(http_parser, (char *) GET_ERROR());
     }
 

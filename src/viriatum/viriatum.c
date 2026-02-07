@@ -473,9 +473,16 @@ int main(int argc, char *argv[]) {
 
     /* sets stdout and stderr to line-buffered mode so that output
     is flushed after each newline, this ensures log messages are
-    visible immediately even when output is piped (e.g. Docker) */
+    visible immediately even when output is piped (e.g. Docker),
+    on Windows MSVC does not support _IOLBF (treats it as _IOFBF)
+    and rejects size 0, so we use unbuffered mode instead */
+#ifdef VIRIATUM_PLATFORM_WIN32
+    setvbuf(stdout, NULL, _IONBF, 0);
+    setvbuf(stderr, NULL, _IONBF, 0);
+#else
     setvbuf(stdout, NULL, _IOLBF, 0);
     setvbuf(stderr, NULL, _IOLBF, 0);
+#endif
 
     /* prints a debug message */
     V_DEBUG_F("Receiving %d argument(s)\n", argc);

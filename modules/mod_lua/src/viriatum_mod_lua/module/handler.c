@@ -195,10 +195,11 @@ ERROR_CODE _send_response_handler_lua(struct http_parser_t *http_parser) {
     http_connection->acquire(http_connection);
 
     /* in case the Lua state is not started an error must
-    have occured so need to return immediately in error */
+    have occurred so need to return immediately in error */
     if(mod_lua_http_handler->lua_state == NULL) {
-        /* writes the error to the connection and then returns
-        in error to the caller function */
+        /* logs the error at warning level for console visibility
+        then writes the error to the connection and returns in error */
+        V_WARNING_F("Lua error, no state available for %s\n", mod_lua_http_handler->file_path);
         _write_error_connection_lua(http_parser, "no Lua state available");
         RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem accessing Lua state");
     }
@@ -217,9 +218,10 @@ ERROR_CODE _send_response_handler_lua(struct http_parser_t *http_parser) {
 
     /* in case there was an error in Lua */
     if(LUA_ERROR(result_code)) {
-        /* retrieves the error message and then writes it to the connection
-        so that the end user may be able to respond to it */
+        /* retrieves the error message and logs it at warning level
+        for console visibility before sending the error response */
         char *error_message = (char *) lua_tostring(mod_lua_http_handler->lua_state, -1);
+        V_WARNING_F("Lua error in %s: %s\n", mod_lua_http_handler->file_path, error_message);
         _write_error_connection_lua(http_parser, error_message);
 
         /* sets the file as dirty (forces reload) and then reloads the curernt
@@ -227,9 +229,7 @@ ERROR_CODE _send_response_handler_lua(struct http_parser_t *http_parser) {
         mod_lua_http_handler->file_dirty = 1;
         _reload_lua_state(&mod_lua_http_handler->lua_state);
 
-        /* prints a warning message, closes the Lua interpreter and then
-        raises the error to the upper levels */
-        V_WARNING_F("There was a problem executing: %s\n", mod_lua_http_handler->file_path);
+        /* raises the error to the upper levels */
         RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem executing script file");
     }
 
@@ -240,18 +240,17 @@ ERROR_CODE _send_response_handler_lua(struct http_parser_t *http_parser) {
 
     /* in case there was an error in Lua */
     if(LUA_ERROR(result_code)) {
-        /* retrieves the error message and then writes it to the connection
-        so that the end user may be able to respond to it */
+        /* retrieves the error message and logs it at warning level
+        for console visibility before sending the error response */
         char *error_message = (char *) lua_tostring(mod_lua_http_handler->lua_state, -1);
+        V_WARNING_F("Lua error in %s: %s\n", mod_lua_http_handler->file_path, error_message);
         _write_error_connection_lua(http_parser, error_message);
 
         /* sets the file reference as dirty, this will force the script file
         to be reload on next request */
         mod_lua_http_handler->file_dirty = 1;
 
-        /* prints a warning message, closes the Lua interpreter and then
-        raises the error to the upper levels */
-        V_WARNING_F("There was a problem running call on file: %s\n", mod_lua_http_handler->file_path);
+        /* raises the error to the upper levels */
         RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem calling the handle method");
     }
 
@@ -304,7 +303,7 @@ ERROR_CODE _write_error_connection_lua(struct http_parser_t *http_parser, char *
     struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
     struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
 
-    /* allocates the data buffer (in a safe maner) then
+    /* allocates the data buffer (in a safe manner) then
     writes the HTTP static headers to the response */
     connection->alloc_data(connection, VIRIATUM_HTTP_SIZE, (void **) &buffer);
     http_connection->write_error(
