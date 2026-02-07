@@ -203,6 +203,10 @@ ERROR_CODE load_module(struct service_t *service, unsigned char *module_path) {
 
     /* prints a message about the fact that the module
     has just finished the loading process */
+    V_DEBUG_F("Finished loading module (%s)\n", module_path);
+
+    /* print a message about the loading of the module, 
+    this is always going to be shown */
     V_PRINT_F("Loaded module %s v%s (%s)\n", module->name, module->version, module_path);
 
     /* raise no error */
