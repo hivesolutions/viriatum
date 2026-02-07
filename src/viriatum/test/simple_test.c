@@ -28,6 +28,7 @@
 #include "stdafx.h"
 
 #include "simple_test.h"
+#include "handler_file_test.h"
 
 #ifndef VIRIATUM_NO_THREADS
 #ifdef VIRIATUM_THREAD_SAFE
@@ -938,6 +939,43 @@ const char *test_sha1() {
     return NULL;
 }
 
+const char *test_is_path_safe() {
+    /* verifies that safe paths are accepted */
+    V_ASSERT(is_path_safe((unsigned char *) "/index.html") == 1);
+    V_ASSERT(is_path_safe((unsigned char *) "/css/style.css") == 1);
+    V_ASSERT(is_path_safe((unsigned char *) "/") == 1);
+    V_ASSERT(is_path_safe((unsigned char *) "") == 1);
+    V_ASSERT(is_path_safe((unsigned char *) "/path/to/file.txt") == 1);
+
+    /* verifies that filenames containing ".." as part of a
+    larger name are not falsely rejected */
+    V_ASSERT(is_path_safe((unsigned char *) "/..hidden") == 1);
+    V_ASSERT(is_path_safe((unsigned char *) "/file..txt") == 1);
+    V_ASSERT(is_path_safe((unsigned char *) "/path/..name/file") == 1);
+    V_ASSERT(is_path_safe((unsigned char *) "/path/name../file") == 1);
+
+    /* verifies that basic path traversal attempts are rejected */
+    V_ASSERT(is_path_safe((unsigned char *) "/../etc/passwd") == 0);
+    V_ASSERT(is_path_safe((unsigned char *) "/path/../secret") == 0);
+    V_ASSERT(is_path_safe((unsigned char *) "/path/to/../../secret") == 0);
+    V_ASSERT(is_path_safe((unsigned char *) "..") == 0);
+    V_ASSERT(is_path_safe((unsigned char *) "../etc/passwd") == 0);
+
+    /* verifies that trailing ".." is rejected */
+    V_ASSERT(is_path_safe((unsigned char *) "/path/..") == 0);
+
+    /* verifies that backslash traversals are rejected */
+    V_ASSERT(is_path_safe((unsigned char *) "/path\\..\\secret") == 0);
+    V_ASSERT(is_path_safe((unsigned char *) "\\..\\etc\\passwd") == 0);
+
+    /* verifies that traversal with query string is rejected */
+    V_ASSERT(is_path_safe((unsigned char *) "/path/..?foo=bar") == 0);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
 int _compare(void *first, void *second) {
     /* in case the first element is smaller
     than the second element returns a negative
@@ -986,6 +1024,11 @@ void exec_simple_tests(struct test_case_t *test_case) {
     V_RUN_TEST(test_crc_32, test_case);
     V_RUN_TEST(test_md5, test_case);
     V_RUN_TEST(test_sha1, test_case);
+    V_RUN_TEST(test_is_path_safe, test_case);
+    V_RUN_TEST(test_handler_file_context, test_case);
+    V_RUN_TEST(test_handler_file_url, test_case);
+    V_RUN_TEST(test_handler_file_header_field, test_case);
+    V_RUN_TEST(test_handler_file_header_value, test_case);
 }
 
 ERROR_CODE run_simple_tests() {

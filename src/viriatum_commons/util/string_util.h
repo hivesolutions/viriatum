@@ -44,22 +44,22 @@ static const char *atob_strings[4] = {
 };
 
 static __inline unsigned char *base_string_value(unsigned char *string_value) {
-    /* allicates the index counter the value that is going
+    /* allocates the index counter the value that is going
     to store the current item in iteration and the length
     of the string from which the base name will be retrieved */
     unsigned int index;
     unsigned int current_character;
     unsigned int string_value_length = (unsigned int) strlen((char *) string_value);
 
-    /* iterates from back throught the string value to try to find
+    /* iterates from back through the string value to try to find
     the first slash separator inside the string */
     for(index = string_value_length; index > 0; index--) {
         /* retrieves the current character and in cas the value
         is either a slash or a back slash breaks the loop (target found) */
         current_character = string_value[index];
         if(current_character == '\\' || current_character == '/') {
-            /* increments the index in order to set the apropriate
-            pointer value (need to point to the next chracter after
+            /* increments the index in order to set the appropriate
+            pointer value (need to point to the next character after
             the slash) and then breaks the loop */
             index += 1;
             break;
@@ -290,6 +290,23 @@ static __inline size_t split(char *string_value, char *buffer, size_t size_e, ch
     /* returns the count value, number of parsed elements
     from the provided string */
     return count;
+}
+
+static __inline unsigned char is_path_safe(const unsigned char *path) {
+    const unsigned char *current = path;
+    while(*current != '\0') {
+        /* checks for a ".." segment that forms a valid path traversal,
+        meaning it's preceded by a separator or at the start of the
+        path and followed by a separator, query delimiter or end */
+        if(current[0] == '.' && current[1] == '.' &&
+           (current == path || *(current - 1) == '/' || *(current - 1) == '\\') &&
+           (current[2] == '\0' || current[2] == '/' ||
+            current[2] == '\\' || current[2] == '?')) {
+            return 0;
+        }
+        current++;
+    }
+    return 1;
 }
 
 static __inline size_t format_delta(char *buffer, size_t size, unsigned long long delta, size_t counts) {

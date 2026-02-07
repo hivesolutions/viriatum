@@ -26,10 +26,10 @@ libtool
 depcomp
 compile
 stamp-h1
-viriatum
 configure
 install-sh
 test-driver
+hello.txt
 ltmain.sh
 aclocal.m4
 libtool.m4
@@ -41,7 +41,16 @@ graph_info.json
 
 conan.lock
 conaninfo.txt
+bit_stream.*
 conanbuildinfo.*
+conan_toolchain.cmake
+conanbuild*.sh
+conanrun*.sh
+deactivate_conan*.sh
+cmakedeps_macros.cmake
+conandeps_legacy.cmake
+CMakePresets.json
+CMakeUserPresets.json
 
 CMakeCache.txt
 cmake_install.cmake
@@ -62,6 +71,7 @@ cmake_install.cmake
 /autom4te.cache
 /win32/vs2015/*/*
 /win32/vs2008ex/*/*
+/src/viriatum/viriatum
 /scripts/build/tmp
 /scripts/build/builds
 /scripts/build/win32/build

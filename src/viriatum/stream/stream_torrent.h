@@ -60,7 +60,7 @@ typedef ERROR_CODE (*torrent_connection_update) (struct torrent_connection_t *to
  *
  * @see: http://www.bittorrent.org/beps/bep_0003.html
  */
-#pragma pack(1)
+#pragma pack(push, 1)
 typedef struct torrent_handshake_t {
     unsigned char torrent_size;
     char torrent_string[TORRENT_PROTOCOL_SIZE];
@@ -68,6 +68,7 @@ typedef struct torrent_handshake_t {
     unsigned char info_hash[20];
     unsigned char peer_id[20];
 } torrent_handshake;
+#pragma pack(pop)
 
 /**
  * Structure defining a logical
