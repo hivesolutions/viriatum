@@ -1088,8 +1088,10 @@ ERROR_CODE _unset_http_parser_handler_file(struct http_parser_t *http_parser) {
     /* retrieves the handler file context from the HTTP parser */
     struct handler_file_context_t *handler_file_context = (struct handler_file_context_t *) http_parser->context;
 
-    /* deletes the handler file context */
+    /* deletes the handler file context and nullifies the
+    reference to avoid dangling pointer on keep-alive reuse */
     delete_handler_file_context(handler_file_context);
+    http_parser->context = NULL;
 
     /* raises no error */
     RAISE_NO_ERROR;

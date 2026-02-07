@@ -320,6 +320,7 @@ xcopy /e /y "$(SolutionDir)..\..\src\$(ProjectName)\resources\config\viriatum" "
     <ClCompile Include="..\..\src\viriatum\system\environment.c" />
     <ClCompile Include="..\..\src\viriatum\system\service.c" />
     <ClCompile Include="..\..\src\viriatum\system\torrent.c" />
+    <ClCompile Include="..\..\src\viriatum\test\handler_dispatch_test.c" />
     <ClCompile Include="..\..\src\viriatum\test\handler_file_test.c" />
     <ClCompile Include="..\..\src\viriatum\test\simple_test.c" />
     <ClCompile Include="..\..\src\viriatum\test\speed_test.c" />
@@ -362,6 +363,7 @@ xcopy /e /y "$(SolutionDir)..\..\src\$(ProjectName)\resources\config\viriatum" "
     <ClInclude Include="..\..\src\viriatum\system\service.h" />
     <ClInclude Include="..\..\src\viriatum\system\system.h" />
     <ClInclude Include="..\..\src\viriatum\system\torrent.h" />
+    <ClInclude Include="..\..\src\viriatum\test\handler_dispatch_test.h" />
     <ClInclude Include="..\..\src\viriatum\test\handler_file_test.h" />
     <ClInclude Include="..\..\src\viriatum\test\simple_test.h" />
     <ClInclude Include="..\..\src\viriatum\test\speed_test.h" />

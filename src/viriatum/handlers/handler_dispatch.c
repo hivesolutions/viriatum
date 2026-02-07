@@ -417,8 +417,8 @@ ERROR_CODE _set_http_parser_handler_dispatch(struct http_parser_t *http_parser) 
 
 ERROR_CODE _unset_http_parser_handler_dispatch(struct http_parser_t *http_parser) {
     /* releases any path stored in the parser context, this
-    may happen if the connection is closed before the request
-    is fully processed (eg: client disconnect) */
+    may happen if the dispatch handler allocated a path copy
+    in url_callback when no handler was found */
     if(http_parser->context) {
         FREE(http_parser->context);
         http_parser->context = NULL;

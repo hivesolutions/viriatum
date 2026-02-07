@@ -65,6 +65,7 @@ system/environment.c \
 system/client.c \
 system/service.c \
 system/torrent.c \
+test/handler_dispatch_test.c \
 test/handler_file_test.c \
 test/simple_test.c \
 test/speed_test.c
@@ -93,6 +94,7 @@ system/environment.c \
 system/client.c \
 system/service.c \
 system/torrent.c \
+test/handler_dispatch_test.c \
 test/handler_file_test.c \
 test/simple_test.c \
 test/speed_test.c

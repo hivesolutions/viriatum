@@ -967,9 +967,10 @@ ERROR_CODE _unset_http_parser_handler_proxy(struct http_parser_t *http_parser) {
         handler_proxy_context->connection_c->parameters = NULL;
     }
 
-    /* deletes the handler proxy context, it's not going to be possible
-    to re-use the context anymore for this session */
+    /* deletes the handler proxy context and nullifies the
+    reference to avoid dangling pointer on keep-alive reuse */
     delete_handler_proxy_context(handler_proxy_context);
+    http_parser->context = NULL;
 
     /* raises no error */
     RAISE_NO_ERROR;

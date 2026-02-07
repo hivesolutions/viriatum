@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Multi-stage Docker builds for both `Dockerfile` (11 MB) and `Dockerfile.php` (22 MB)
 * Documentation for `upgrade` and `context` fields in `http_parser_t`
 * Compilation flags shown in startup banner (e.g. `[nts ipv6 pcre]`)
+* Regression test for dispatch handler context lifecycle on keep-alive connections
 
 ### Changed
 
@@ -33,3 +34,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Fixed leaked `#pragma pack(1)` in `stream_torrent.h` causing struct alignment mismatches across compilation units
 * Fixed potential memory leak of dispatch handler path context on early connection close
 * Fixed IPv6 autodetection failing with GCC 15 (C23) due to `void main` and missing `arpa/inet.h` in m4 network checks
+* Fixed double-free of `http_parser->context` in dispatch handler unset causing server hang on keep-alive connections
+* File and proxy handler unsets now NULL `http_parser->context` after freeing to prevent dangling pointers

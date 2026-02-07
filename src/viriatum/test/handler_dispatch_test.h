@@ -24,7 +24,12 @@
 
 #pragma once
 
-#include "handler_dispatch_test.h"
-#include "handler_file_test.h"
-#include "simple_test.h"
-#include "speed_test.h"
+/**
+ * Tests that the dispatch handler unset does not
+ * free http_parser->context when it was set by
+ * another handler (simulates keep-alive re-dispatch).
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_dispatch_handler_context_keepalive();
