@@ -207,7 +207,7 @@ ERROR_CODE url_callback_handler_php(struct http_parser_t *http_parser, const uns
     of the lengths of the string */
     string_populate(&handler_php_context->_file_name_string, handler_php_context->file_name, path_size, 0);
     string_populate(&handler_php_context->_query_string, handler_php_context->query, query_size, 0);
-    string_populate(&handler_php_context->_url_string, handler_php_context->url, path_size, 0);
+    string_populate(&handler_php_context->_url_string, handler_php_context->url, data_size, 0);
     string_populate(&handler_php_context->_file_path_string, handler_php_context->file_path, 0, 1);
 
     /* raise no error */

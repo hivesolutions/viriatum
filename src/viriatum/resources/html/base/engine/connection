@@ -19,9 +19,10 @@
             </div>
         </div>
         <div id="content-wrapper">
+            <?php $connection = viriatum_connection_info($_GET["id"]) ?>
+            <?php if(isset($connection["id"])): ?>
             <table class="table status" cellpadding="0" cellspacing="0">
                 <tbody>
-                    <?php $connection = viriatum_connection_info($_GET["id"]) ?>
                     <tr>
                         <td class="right label" width="50%">id</td>
                         <td class="left value" width="50%"><?php echo($connection["id"]) ?></td>
@@ -70,6 +71,9 @@
                     </tr>
                 </tbody>
             </table>
+            <?php else: ?>
+            <p class="info">Connection #<?php echo(htmlspecialchars($_GET["id"])) ?> not found (already closed).</p>
+            <?php endif ?>
         </div>
         <div id="footer-wrapper">
             <div class="footer-body">
