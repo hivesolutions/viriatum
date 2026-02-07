@@ -470,6 +470,13 @@ ERROR_CODE _send_response_handler_dispatch(struct http_parser_t *http_parser) {
     messages to be processed, no parallel request handling problems */
     http_connection->acquire(http_connection);
 
+    /* logs the dispatch error at warning level, providing visibility
+    when a request cannot be routed to the appropriate handler */
+    V_WARNING_F(
+        "Dispatch error, sending 500 for %s request\n",
+        get_http_method_string(http_parser->method)
+    );
+
     /* writes the response to the connection, registers for the appropriate callbacks
     this method uses the HTTP error util to correctly format the error message */
     write_http_error(

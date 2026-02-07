@@ -288,6 +288,10 @@ ERROR_CODE write_http_error_a(
     char *headers_buffer = buffer == NULL ? MALLOC(VIRIATUM_HTTP_SIZE) : buffer;
     size = size == 0 ? VIRIATUM_HTTP_SIZE : size;
 
+    /* logs the HTTP error being sent to the client, using the warning
+    level to ensure visibility in both debug and release builds */
+    V_WARNING_F("HTTP error %d %s\n", error_code, error_message);
+
 #ifndef VIRIATUM_DEBUG
     /* sets the error description as null in order to avoid any
     display of the (internal) message, otherwise a possible
