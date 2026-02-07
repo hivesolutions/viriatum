@@ -45,7 +45,7 @@ jobs:
     timeout-minutes: 30
     strategy:
       matrix:
-        gcc-version: [7, 8, 9, 10, 11, 12, 13]
+        gcc-version: [11, 12, 13, 14, 15]
         cmake-version: ["3.25.0"]
         cmake-type: ["binary"]
     runs-on: ubuntu-latest
@@ -92,7 +92,7 @@ jobs:
         uses: microsoft/setup-msbuild@v1.1
       - name: Build Viriatum
         run: |
-          cmake . -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_CL_64=1 -DCMAKE_GENERATOR_PLATFORM=x64 -Ax64
+          cmake . "-DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake" -DCMAKE_CL_64=1 -DCMAKE_GENERATOR_PLATFORM=x64 -Ax64
           msbuild ALL_BUILD.vcxproj /P:Configuration=Release
       - name: Test Viriatum
         run: |
