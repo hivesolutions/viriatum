@@ -16,6 +16,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Request path included in dispatch error log messages for easier debugging
 * Module load logging at startup using `V_PRINT_F` showing module name, version and path
 * Multi-stage Docker builds for both `Dockerfile` (11 MB) and `Dockerfile.php` (22 MB)
+* `Dockerfile.all` with all 5 modules (diag, gif, lua, php, wsgi) using 4-stage multi-stage build (112 MB)
+* SSL support enabled in `Dockerfile` and `Dockerfile.php` builds
 * Documentation for `upgrade` and `context` fields in `http_parser_t`
 * Compilation flags shown in startup banner (e.g. `[nts ipv6 pcre]`)
 * Regression test for dispatch handler context lifecycle on keep-alive connections
@@ -36,3 +38,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Fixed IPv6 autodetection failing with GCC 15 (C23) due to `void main` and missing `arpa/inet.h` in m4 network checks
 * Fixed double-free of `http_parser->context` in dispatch handler unset causing server hang on keep-alive connections
 * File and proxy handler unsets now NULL `http_parser->context` after freeing to prevent dangling pointers
+* PHP and WSGI module handler unsets now NULL `http_parser->context` after freeing
+* Fixed `REQUEST_URI` length using path size instead of full URL size in mod_php handler
+* Connection info page now shows "not found" message instead of empty fields for closed connections

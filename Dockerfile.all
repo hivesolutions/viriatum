@@ -53,9 +53,14 @@ RUN apk update && apk add \
     build-base make autoconf automake libtool \
     pcre-dev openssl-dev lua5.1-dev
 
-# Alpine names the Lua library liblua.so, but mod_lua expects liblua5.1.so
+# Alpine names the Lua library liblua.so and headers at /usr/include/lua.h,
+# but mod_lua expects liblua5.1.so and #include <lua5.1/lua.h>
 RUN ln -s liblua.so /usr/lib/liblua5.1.so && \
-    ln -s liblua.a /usr/lib/liblua5.1.a
+    ln -s liblua.a /usr/lib/liblua5.1.a && \
+    mkdir -p /usr/include/lua5.1 && \
+    for h in /usr/include/lua*.h /usr/include/lauxlib.h /usr/include/lualib.h; do \
+        [ -f "$h" ] && ln -sf "$h" /usr/include/lua5.1/; \
+    done
 
 # copy Python 2.7 build artifacts (headers, shared lib, stdlib)
 COPY --from=python-builder /usr/local/include/python2.7 /usr/local/include/python2.7
@@ -147,5 +152,9 @@ RUN ln -s libviriatum.so.1.0.0 /usr/lib/libviriatum.so.1 && \
 # create symlinks for Python 2.7 shared library and set up library path
 RUN ln -s libpython2.7.so.1.0 /usr/local/lib/libpython2.7.so && \
     echo "/lib:/usr/local/lib:/usr/lib" > /etc/ld-musl-x86_64.path
+
+RUN addgroup -S viriatum && adduser -S viriatum -G viriatum && \
+    chown -R viriatum:viriatum /etc/viriatum /var/viriatum
+USER viriatum
 
 CMD ["/usr/bin/viriatum"]
