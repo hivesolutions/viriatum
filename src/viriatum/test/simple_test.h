@@ -217,6 +217,15 @@ const char *test_sha1();
 const char *test_crc_32();
 
 /**
+ * Tests the is_path_safe utility function
+ * for path traversal detection.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_is_path_safe();
+
+/**
  * Compars an element with another, usefull
  * for the sorting tests.
  *

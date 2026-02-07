@@ -306,6 +306,16 @@ ERROR_CODE url_callback_handler_file(struct http_parser_t *http_parser, const un
         &decoded_size
     );
 
+    /* validates the decoded url for path traversal attempts,
+    rejects requests containing ".." sequences that could escape
+    the web root directory */
+    if(!is_path_safe(handler_file_context->url_d)) {
+        RAISE_ERROR_M(
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Path traversal detected in URL"
+        );
+    }
+
     /* raise no error */
     RAISE_NO_ERROR;
 }
@@ -968,6 +978,16 @@ ERROR_CODE path_callback_handler_file(struct http_parser_t *http_parser, const u
         &decoded_size
     );
 
+    /* validates the decoded url for path traversal attempts,
+    rejects requests containing ".." sequences that could escape
+    the web root directory */
+    if(!is_path_safe(handler_file_context->url_d)) {
+        RAISE_ERROR_M(
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Path traversal detected in URL"
+        );
+    }
+
     /* raise no error */
     RAISE_NO_ERROR;
 }
@@ -1034,6 +1054,16 @@ ERROR_CODE location_callback_handler_file(struct http_parser_t *http_parser, siz
         handler_file_context->file_path_d,
         &decoded_size
     );
+
+    /* validates the decoded file path for path traversal attempts,
+    rejects requests containing ".." sequences that could escape
+    the web root directory */
+    if(!is_path_safe(handler_file_context->file_path_d)) {
+        RAISE_ERROR_M(
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Path traversal detected in URL"
+        );
+    }
 
     /* raise no error */
     RAISE_NO_ERROR;
