@@ -233,9 +233,10 @@ ERROR_CODE print_information() {
     unsigned char *version = version_viriatum();
     unsigned char *description = description_viriatum();
 
-    /* prints a message */
+    /* prints the banner message including the version, compiler
+    information, platform and the active compilation flags */
     V_PRINT_F(
-        "%s %s (%s, %s) [%s %s %d bit (%s)] %s\n",
+        "%s %s (%s, %s) [%s %s %d bit (%s)] %s [%s]\n",
         description,
         version,
         VIRIATUM_COMPILATION_DATE,
@@ -244,7 +245,8 @@ ERROR_CODE print_information() {
         VIRIATUM_COMPILER_VERSION_STRING,
         (int) VIRIATUM_PLATFORM_CPU_BITS,
         VIRIATUM_PLATFORM_CPU,
-        VIRIATUM_PLATFORM_STRING
+        VIRIATUM_PLATFORM_STRING,
+        VIRIATUM_FLAGS
     );
 
     /* prints a message */
