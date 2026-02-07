@@ -92,7 +92,7 @@ jobs:
         uses: microsoft/setup-msbuild@v1.1
       - name: Build Viriatum
         run: |
-          cmake . "-DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake" -DCMAKE_BUILD_TYPE=Release -DCMAKE_CL_64=1 -DCMAKE_GENERATOR_PLATFORM=x64 -Ax64
+          cmake . "-DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake" -DCMAKE_CL_64=1 -DCMAKE_GENERATOR_PLATFORM=x64 -Ax64
           msbuild ALL_BUILD.vcxproj /P:Configuration=Release
       - name: Test Viriatum
         run: |
