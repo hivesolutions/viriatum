@@ -23,6 +23,8 @@
 include $(top_srcdir)/Common.am
 
 nobase_dist_wwwroot_DATA = index.html \
+handler.lua \
+handler.wsgi \
 engine/about \
 engine/connection \
 engine/connections \
