@@ -480,6 +480,7 @@ ERROR_CODE _unset_http_parser_handler_wsgi(struct http_parser_t *http_parser) {
     and then deletes (releases memory) */
     struct handler_wsgi_context_t *handler_wsgi_context = (struct handler_wsgi_context_t *) http_parser->context;
     delete_handler_wsgi_context(handler_wsgi_context);
+    http_parser->context = NULL;
 
     /* raises no error */
     RAISE_NO_ERROR;

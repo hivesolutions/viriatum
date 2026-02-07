@@ -411,6 +411,7 @@ ERROR_CODE _unset_http_parser_handler_php(struct http_parser_t *http_parser) {
     and then deletes (releases memory) */
     struct handler_php_context_t *handler_php_context = (struct handler_php_context_t *) http_parser->context;
     delete_handler_php_context(handler_php_context);
+    http_parser->context = NULL;
 
     /* raises no error */
     RAISE_NO_ERROR;
