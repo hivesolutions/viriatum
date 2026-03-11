@@ -884,9 +884,9 @@ ERROR_CODE start_service(struct service_t *service) {
         );
     }
 
-    /* prints an info message indicating that the service is now
+    /* prints a message indicating that the service is now
     listening on the configured address and port */
-    V_INFO_F(
+    V_WARNING_F(
         "Listening on %s:%d\n",
         service_options->address,
         (int) service_options->port
@@ -949,9 +949,9 @@ ERROR_CODE start_service(struct service_t *service) {
             );
         }
 
-        /* prints an info message indicating that the service is now
+        /* prints a message indicating that the service is now
         listening on the configured ip6 address and port */
-        V_INFO_F(
+        V_WARNING_F(
             "Listening on [%s]:%d (ip6)\n",
             service_options->address6,
             (int) service_options->port
