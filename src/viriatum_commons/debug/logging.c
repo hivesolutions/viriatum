@@ -45,6 +45,28 @@ int logging_use_color(void) {
     return 0;
 }
 
+void logging_print_date(void) {
+    /* allocates the time value and the broken-down local time
+    structure used to format the current date and time */
+    time_t time_value;
+    struct tm *local_time_value;
+    char date_buffer[20];
+
+    /* retrieves the current time and converts it to local
+    time so that it can be formatted as a date string */
+    time(&time_value);
+    local_time_value = localtime(&time_value);
+    strftime(date_buffer, sizeof(date_buffer), "%Y-%m-%d %H:%M:%S", local_time_value);
+
+    /* prints the date string surrounded by colour escapes when the
+    terminal supports it, or as plain text otherwise */
+    if(logging_use_color()) {
+        printf(V_COLOR_DATE "%s" V_COLOR_RESET " ", date_buffer);
+    } else {
+        printf("%s ", date_buffer);
+    }
+}
+
 void debug(const char *format, ...) {
     /* allocates the arguments list */
     va_list arguments_list;

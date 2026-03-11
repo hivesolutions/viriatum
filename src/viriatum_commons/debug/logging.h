@@ -42,8 +42,9 @@
 #endif
 
 /* ANSI colour escape sequences used to decorate log level labels
-when the terminal supports colour output */
+and the date prefix when the terminal supports colour output */
 #define V_COLOR_RESET   "\x1b[0m"
+#define V_COLOR_DATE    "\x1b[37m"
 #define V_COLOR_DEBUG   "\x1b[36m"
 #define V_COLOR_INFO    "\x1b[32m"
 #define V_COLOR_WARNING "\x1b[33m"
@@ -57,13 +58,13 @@ terminal supports it, or as plain text otherwise */
         PRINTF_F("%s", level)
 
 #ifdef VIRIATUM_DEBUG
-#define V_MESSAGE(level, color) V_LEVEL(color, level); PRINTF_F(" [%s:%d] ", base_string_value((unsigned char *) __FILE__), __LINE__)
-#define V_MESSAGE_CONTEXT(level, color, context) V_LEVEL(color, level); PRINTF_F(" [%s:%d] [%s] ", base_string_value((unsigned char *) __FILE__), __LINE__, context)
+#define V_MESSAGE(level, color) logging_print_date(); V_LEVEL(color, level); PRINTF_F(" [%s:%d] ", base_string_value((unsigned char *) __FILE__), __LINE__)
+#define V_MESSAGE_CONTEXT(level, color, context) logging_print_date(); V_LEVEL(color, level); PRINTF_F(" [%s:%d] [%s] ", base_string_value((unsigned char *) __FILE__), __LINE__, context)
 #endif
 
 #ifndef VIRIATUM_DEBUG
-#define V_MESSAGE(level, color) V_LEVEL(color, level); PRINTF_F("%s", " ")
-#define V_MESSAGE_CONTEXT(level, color, context) V_LEVEL(color, level); PRINTF_F(" [%s] ", context)
+#define V_MESSAGE(level, color) logging_print_date(); V_LEVEL(color, level); PRINTF_F("%s", " ")
+#define V_MESSAGE_CONTEXT(level, color, context) logging_print_date(); V_LEVEL(color, level); PRINTF_F(" [%s] ", context)
 #endif
 
 #ifdef VIRIATUM_DEBUG
@@ -104,4 +105,5 @@ terminal supports it, or as plain text otherwise */
 #define V_PRINT_F(format, ...) PRINTF_F(format, __VA_ARGS__)
 
 VIRIATUM_EXPORT_PREFIX int logging_use_color(void);
+VIRIATUM_EXPORT_PREFIX void logging_print_date(void);
 VIRIATUM_EXPORT_PREFIX void debug(const char *format, ...);
