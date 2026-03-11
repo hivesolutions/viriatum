@@ -884,6 +884,14 @@ ERROR_CODE start_service(struct service_t *service) {
         );
     }
 
+    /* prints an info message indicating that the service is now
+    listening on the configured address and port */
+    V_INFO_F(
+        "Listening on %s:%d\n",
+        service_options->address,
+        (int) service_options->port
+    );
+
 #ifdef VIRIATUM_IP6
     /* in case the ip6 connection flag is set the ip6 connection
     must be bound to the current context (bind operation) */
@@ -940,6 +948,14 @@ ERROR_CODE start_service(struct service_t *service) {
                 (unsigned char *) "Problem listening socket"
             );
         }
+
+        /* prints an info message indicating that the service is now
+        listening on the configured ip6 address and port */
+        V_INFO_F(
+            "Listening on [%s]:%d (ip6)\n",
+            service_options->address6,
+            (int) service_options->port
+        );
     }
 #endif
 
