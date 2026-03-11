@@ -26,6 +26,25 @@
 
 #include "logging.h"
 
+int logging_use_color(void) {
+#ifdef VIRIATUM_PLATFORM_WIN32
+    /* on Windows, checks whether the virtual terminal processing mode
+    is enabled, which is required for ANSI escape sequences to work */
+    HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
+    DWORD mode = 0;
+    if(handle == INVALID_HANDLE_VALUE) { return 0; }
+    if(!GetConsoleMode(handle, &mode)) { return 0; }
+    return (mode & ENABLE_VIRTUAL_TERMINAL_PROCESSING) ? 1 : 0;
+#endif
+
+#ifdef VIRIATUM_PLATFORM_UNIX
+    /* on Unix, checks whether stdout is connected to a terminal */
+    return isatty(fileno(stdout)) ? 1 : 0;
+#endif
+
+    return 0;
+}
+
 void debug(const char *format, ...) {
     /* allocates the arguments list */
     va_list arguments_list;
