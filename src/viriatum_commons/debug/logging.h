@@ -84,10 +84,10 @@ terminal supports it, or as plain text otherwise */
 #define V_DEBUG_CTX(context, format) dump_context(context, format)
 #define V_DEBUG_CTX_F(context, format, ...) dump_context_multiple(context, format, __VA_ARGS__)
 
-#define V_INFO(format) dump(format)
-#define V_INFO_F(format, ...) dump_multiple(format, __VA_ARGS__)
-#define V_INFO_CTX(context, format) dump_context(context, format)
-#define V_INFO_CTX_F(context, format, ...) dump_context_multiple(context, format, __VA_ARGS__)
+#define V_INFO(format) V_MESSAGE("[INFO]", V_COLOR_INFO); PRINTF(format)
+#define V_INFO_F(format, ...) V_MESSAGE("[INFO]", V_COLOR_INFO); PRINTF_F(format, __VA_ARGS__)
+#define V_INFO_CTX(context, format) V_MESSAGE_CONTEXT("[INFO]", V_COLOR_INFO, context); PRINTF(format)
+#define V_INFO_CTX_F(context, format, ...) V_MESSAGE_CONTEXT("[INFO]", V_COLOR_INFO, context); PRINTF_F(format, __VA_ARGS__)
 #endif
 
 #define V_WARNING(format) V_MESSAGE("[WARNING]", V_COLOR_WARNING); PRINTF(format)
