@@ -115,6 +115,6 @@
 #endif
 #endif
 
-unsigned char *name_viriatum();
-unsigned char *version_viriatum();
-unsigned char *description_viriatum();
+unsigned char *name_viriatum(void);
+unsigned char *version_viriatum(void);
+unsigned char *description_viriatum(void);
