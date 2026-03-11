@@ -89,7 +89,7 @@ ERROR_CODE init_service(char *program_name, struct hash_map_t *arguments) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE destroy_service() {
+ERROR_CODE destroy_service(void) {
     /* prints a debug message about the initial stage
     of the service structures destruction */
     V_DEBUG("Destroying the service structures\n");
@@ -109,7 +109,7 @@ ERROR_CODE destroy_service() {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE run_service() {
+ERROR_CODE run_service(void) {
     /* allocates the return value to be used to gather
     the error result from the service calls */
     ERROR_CODE return_value;
@@ -166,7 +166,7 @@ ERROR_CODE run_service_s(char *program_name, struct hash_map_t *arguments) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE ran_service() {
+ERROR_CODE ran_service(void) {
     /* allocates the return value */
     ERROR_CODE return_value;
 
@@ -215,7 +215,7 @@ void kill_handler(int signal_number) {
 void ignore_handler(int signal_number) {
 }
 
-void register_signals() {
+void register_signals(void) {
     /* registers the kill handler for the various signals
     associated with the "destroy" operation */
     signal(SIGHUP, kill_handler);
@@ -228,7 +228,7 @@ void register_signals() {
     signal(SIGPIPE, SIG_IGN);
 }
 
-ERROR_CODE print_information() {
+ERROR_CODE print_information(void) {
     /* retrieves the viriatum version and description */
     unsigned char *version = version_viriatum();
     unsigned char *description = description_viriatum();
@@ -256,8 +256,8 @@ ERROR_CODE print_information() {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE help() { V_PRINT(HELP_STRING); RAISE_NO_ERROR; }
-ERROR_CODE version() {
+ERROR_CODE help(void) { V_PRINT(HELP_STRING); RAISE_NO_ERROR; }
+ERROR_CODE version(void) {
     V_PRINT_F(
         "%s - %s (%s, %s)\n",
         VIRIATUM_NAME,
@@ -266,16 +266,16 @@ ERROR_CODE version() {
         VIRIATUM_COMPILATION_TIME
     ); RAISE_NO_ERROR;
 }
-ERROR_CODE test() { return run_simple_tests(); }
-ERROR_CODE speed() { return run_speed_tests(); }
+ERROR_CODE test(void) { return run_simple_tests(); }
+ERROR_CODE speed(void) { return run_speed_tests(); }
 
 #ifdef VIRIATUM_PLATFORM_WIN32
-void daemonize() { }
-void daemonclean() { }
+void daemonize(void) { }
+void daemonclean(void) { }
 #endif
 
 #ifdef VIRIATUM_PLATFORM_UNIX
-void daemonize() {
+void daemonize(void) {
     /* allocates space for the various dameon
     related variables */
     PID_TYPE pid;
@@ -341,7 +341,7 @@ void daemonize() {
     daemon process (not going to output them) */
     close(STDIN_FILENO);
 }
-void daemonclean() {
+void daemonclean(void) {
     /* removes the viriatum pid path, so that the daemon
     watching tool are notified that the process is no
     longer running in the current environment */
@@ -350,11 +350,11 @@ void daemonclean() {
 #endif
 
 #ifdef VIRIATUM_PLATFORM_WIN32
-void localize() { local = 1; }
+void localize(void) { local = 1; }
 #endif
 
 #ifdef VIRIATUM_PLATFORM_UNIX
-void localize() { }
+void localize(void) { }
 #endif
 
 int execute_arguments(char *program_name, struct hash_map_t *arguments) {

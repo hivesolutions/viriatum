@@ -121,7 +121,7 @@ const char *test_handler_file_url(void) {
     return NULL;
 }
 
-const char *test_handler_file_header_field() {
+const char *test_handler_file_header_field(void) {
     /* allocates space for the HTTP parser and the
     handler file context structures */
     struct http_parser_t *http_parser;
@@ -204,7 +204,7 @@ const char *test_handler_file_header_field() {
     return NULL;
 }
 
-const char *test_handler_file_header_value() {
+const char *test_handler_file_header_value(void) {
     /* allocates space for the HTTP parser and the
     handler file context structures */
     struct http_parser_t *http_parser;
@@ -267,4 +267,5 @@ const char *test_handler_file_header_value() {
 
     /* returns the default value, nothing happened so there's
     nothing to report for this execution */
-    return NULL;
+    return NULL;
+}

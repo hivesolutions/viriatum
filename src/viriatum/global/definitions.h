@@ -33,7 +33,7 @@ static char resources_path[VIRIATUM_MAX_PATH_SIZE] = { '\0' };
 static char modules_path[VIRIATUM_MAX_PATH_SIZE] = { '\0' };
 static char config_path[VIRIATUM_MAX_PATH_SIZE] = { '\0' };
 
-static __inline char *get_base_path() {
+static __inline char *get_base_path(void) {
     size_t base_path_length;
     size_t index;
 
@@ -53,7 +53,7 @@ static __inline char *get_base_path() {
     return base_path;
 }
 
-static __inline char *get_contents_path() {
+static __inline char *get_contents_path(void) {
     const char *base_path;
 
     if(resources_path[0] != '\0') { return resources_path; }
@@ -65,7 +65,7 @@ static __inline char *get_contents_path() {
     return resources_path;
 }
 
-static __inline char *get_resources_path() {
+static __inline char *get_resources_path(void) {
     const char *base_path;
 
     if(resources_path[0] != '\0') { return resources_path; }
@@ -76,7 +76,7 @@ static __inline char *get_resources_path() {
     return resources_path;
 }
 
-static __inline char *get_modules_path() {
+static __inline char *get_modules_path(void) {
     const char *base_path;
 
     if(modules_path[0] != '\0') { return modules_path; }
@@ -87,7 +87,7 @@ static __inline char *get_modules_path() {
     return modules_path;
 }
 
-static __inline char *get_config_path() {
+static __inline char *get_config_path(void) {
     const char *base_path;
 
     if(config_path[0] != '\0') { return config_path; }

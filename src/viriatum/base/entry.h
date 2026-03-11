@@ -44,7 +44,7 @@ ERROR_CODE init_service(char *program_name, struct hash_map_t *arguments);
  * If one wants to run a service after this call the init service
  * function must be called first.
  */
-ERROR_CODE destroy_service();
+ERROR_CODE destroy_service(void);
 
 /**
  * Start the process of running a service by looping for connection
@@ -52,7 +52,7 @@ ERROR_CODE destroy_service();
  * Note that the modules are only loaded after this call.
  * To unblock this call the ran service function should be called.
  */
-ERROR_CODE run_service();
+ERROR_CODE run_service(void);
 
 /**
  * Starts the process of running the service, registering the
@@ -76,7 +76,7 @@ ERROR_CODE run_service_s(char *program_name, struct hash_map_t *parameters);
  * Stops the process of a running the service.
  * This call unblock a previous run service call.
  */
-ERROR_CODE ran_service();
+ERROR_CODE ran_service(void);
 
 /**
  * Retrieves the pointer to the global service instance
@@ -110,4 +110,4 @@ void ignore_handler(int signal_number);
  * events, this must be done so that the proper action
  * occur for such events.
  */
-void register_signals();
+void register_signals(void);

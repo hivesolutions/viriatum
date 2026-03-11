@@ -30,7 +30,7 @@
 static struct memory_pool_t *pools[256];
 static size_t pool_counter = 0;
 
-void cleanup_palloc() {
+void cleanup_palloc(void) {
     size_t index;
     struct memory_pool_t *pool;
 
