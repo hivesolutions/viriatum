@@ -44,7 +44,7 @@ int thread_pool_start_function_test(void *arguments) {
     return 0;
 }
 
-void test_thread_pool() {
+void test_thread_pool(void) {
     /* allocates space for the index */
     unsigned int index;
 
@@ -76,7 +76,7 @@ void test_thread_pool() {
 #endif
 #endif
 
-const char *test_linked_list() {
+const char *test_linked_list(void) {
     /* allocates space for the value that's going
     to be used for temporary storage */
     void *value;
@@ -126,7 +126,7 @@ const char *test_linked_list() {
     return NULL;
 }
 
-const char *test_linked_list_stress() {
+const char *test_linked_list_stress(void) {
     /* allocates space for the index to be used in the iteration
     for the temporary value pointer variable and for the pointer
     that is going to be used for the linked list */
@@ -153,7 +153,7 @@ const char *test_linked_list_stress() {
     return NULL;
 }
 
-const char *test_linked_list_big() {
+const char *test_linked_list_big(void) {
     /* allocates space for the index to be used in the iteration
     for the temporary value pointer variable and for the pointer
     that is going to be used for the linked list */
@@ -182,7 +182,7 @@ const char *test_linked_list_big() {
     return NULL;
 }
 
-const char *test_array_list() {
+const char *test_array_list(void) {
     /* allocates space for the element */
     unsigned int element = 1;
 
@@ -207,7 +207,7 @@ const char *test_array_list() {
     return NULL;
 }
 
-const char *test_hash_map() {
+const char *test_hash_map(void) {
     /* allocates space for the element */
     void *element;
 
@@ -243,7 +243,7 @@ const char *test_hash_map() {
     return NULL;
 }
 
-const char *test_sort_map() {
+const char *test_sort_map(void) {
     /* allocates space for the element */
     void *element;
 
@@ -279,7 +279,7 @@ const char *test_sort_map() {
     return NULL;
 }
 
-const char *test_priority_queue() {
+const char *test_priority_queue(void) {
     /* allocates the space for the temporary value pointer
     and for the the priority queue structure */
     void *value;
@@ -318,7 +318,7 @@ const char *test_priority_queue() {
     return NULL;
 }
 
-const char *test_string_buffer() {
+const char *test_string_buffer(void) {
     /* allocates space for the string buffer */
     struct string_buffer_t *string_buffer;
 
@@ -349,7 +349,7 @@ const char *test_string_buffer() {
     return NULL;
 }
 
-const char *test_linked_buffer() {
+const char *test_linked_buffer(void) {
     /* allocates space for the linked buffer */
     struct linked_buffer_t *linked_buffer;
 
@@ -380,7 +380,7 @@ const char *test_linked_buffer() {
     return NULL;
 }
 
-const char *test_base64() {
+const char *test_base64(void) {
     /* allocates space for the buffer */
     char buffer[] = "hello world";
 
@@ -422,7 +422,7 @@ const char *test_base64() {
     return NULL;
 }
 
-const char *test_bencoding() {
+const char *test_bencoding(void) {
     /* allocates space for the various type references
     and values and also dor the sequence structures */
     struct type_t *type;
@@ -482,7 +482,7 @@ const char *test_bencoding() {
     return NULL;
 }
 
-const char *test_bit_stream() {
+const char *test_bit_stream(void) {
     /* allocates space for the byte value that is going
     to be used in the read based tezt of the bit stream */
     unsigned char byte;
@@ -682,7 +682,7 @@ const char *test_bit_stream() {
     return NULL;
 }
 
-const char *test_file_stream() {
+const char *test_file_stream(void) {
     /* allocates space for the file stream */
     struct file_stream_t *file_stream;
 
@@ -742,7 +742,7 @@ const char *test_file_stream() {
     return NULL;
 }
 
-const char *test_memory_stream() {
+const char *test_memory_stream(void) {
     /* allocates the space for the local stream
     pointers and for the buffer that is going to
     be used for the testing (strings) */
@@ -777,7 +777,7 @@ const char *test_memory_stream() {
     return NULL;
 }
 
-const char *test_huffman() {
+const char *test_huffman(void) {
     /* allocates space for both the file stream that is
     going to be used in the reading process and for the
     huffman structure to be used in the test */
@@ -852,7 +852,7 @@ const char *test_huffman() {
     return NULL;
 }
 
-const char *test_template_handler() {
+const char *test_template_handler(void) {
     /* allocates space for the template handler */
     struct template_handler_t *template_handler;
 
@@ -868,7 +868,7 @@ const char *test_template_handler() {
     return NULL;
 }
 
-const char *test_quicksort() {
+const char *test_quicksort(void) {
     /* allocates space for the template handler */
     size_t list[10] = { 2, 4, 1, 2, 3, 5, 5, 3, 4, 1 };
 
@@ -881,7 +881,7 @@ const char *test_quicksort() {
     return NULL;
 }
 
-const char *test_quicksort_linked_list() {
+const char *test_quicksort_linked_list(void) {
     /* allocates space for the linked list */
     struct linked_list_t *linked_list;
 
@@ -904,7 +904,7 @@ const char *test_quicksort_linked_list() {
     return NULL;
 }
 
-const char *test_crc_32() {
+const char *test_crc_32(void) {
     /* calculates the crc32 hash value and returns it */
     crc_32((unsigned char *) "Hello World", 11);
 
@@ -913,7 +913,7 @@ const char *test_crc_32() {
     return NULL;
 }
 
-const char *test_md5() {
+const char *test_md5(void) {
     /* allocates space for the md5 result */
     unsigned char result[MD5_DIGEST_SIZE];
 
@@ -925,7 +925,7 @@ const char *test_md5() {
     return NULL;
 }
 
-const char *test_sha1() {
+const char *test_sha1(void) {
     /* allocates space for the sha1 result */
     unsigned char result[SHA1_DIGEST_SIZE];
 
@@ -937,7 +937,7 @@ const char *test_sha1() {
     return NULL;
 }
 
-const char *test_is_path_safe() {
+const char *test_is_path_safe(void) {
     /* verifies that safe paths are accepted */
     V_ASSERT(is_path_safe((unsigned char *) "/index.html") == 1);
     V_ASSERT(is_path_safe((unsigned char *) "/css/style.css") == 1);
@@ -1030,7 +1030,7 @@ void exec_simple_tests(struct test_case_t *test_case) {
     V_RUN_TEST(test_dispatch_handler_context_keepalive, test_case);
 }
 
-ERROR_CODE run_simple_tests() {
+ERROR_CODE run_simple_tests(void) {
     ERROR_CODE return_value = run_test_case(exec_simple_tests, "simple_tests");
     RAISE_AGAIN(return_value);
 }

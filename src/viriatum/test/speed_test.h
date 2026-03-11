@@ -41,4 +41,4 @@ void exec_speed_tests(struct test_case_t *test_case);
  * for the current viriatum infra-structure, the results
  * are printed in the current standard output file.
  */
-ERROR_CODE run_speed_tests();
+ERROR_CODE run_speed_tests(void);

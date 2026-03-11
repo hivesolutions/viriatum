@@ -31,7 +31,7 @@
  * @return A message describing the execution of
  * the unit test should describe possible errors.
  */
-const char *test_handler_file_context();
+const char *test_handler_file_context(void);
 
 /**
  * Tests the handler file url callback including
@@ -40,7 +40,7 @@ const char *test_handler_file_context();
  * @return A message describing the execution of
  * the unit test should describe possible errors.
  */
-const char *test_handler_file_url();
+const char *test_handler_file_url(void);
 
 /**
  * Tests the handler file header field callback
@@ -49,7 +49,7 @@ const char *test_handler_file_url();
  * @return A message describing the execution of
  * the unit test should describe possible errors.
  */
-const char *test_handler_file_header_field();
+const char *test_handler_file_header_field(void);
 
 /**
  * Tests the handler file header value callback
@@ -58,4 +58,4 @@ const char *test_handler_file_header_field();
  * @return A message describing the execution of
  * the unit test should describe possible errors.
  */
-const char *test_handler_file_header_value();
+const char *test_handler_file_header_value(void);

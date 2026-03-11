@@ -64,7 +64,7 @@ typedef struct test_case_t {
  * simplest definition for a test function. This kind of
  * functions should return a description of the result.
  */
-typedef const char *(*test_function) ();
+typedef const char *(*test_function) (void);
 
 /**
  * Definition of the general entry point for a function that

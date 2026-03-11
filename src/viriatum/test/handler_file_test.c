@@ -27,7 +27,7 @@
 
 #include "handler_file_test.h"
 
-const char *test_handler_file_context() {
+const char *test_handler_file_context(void) {
     /* allocates space for the handler file context
     structure to be used in the test */
     struct handler_file_context_t *handler_file_context;
@@ -59,7 +59,7 @@ const char *test_handler_file_context() {
     return NULL;
 }
 
-const char *test_handler_file_url() {
+const char *test_handler_file_url(void) {
     /* allocates space for the error code returned by the
     callback and for the HTTP parser and context structures */
     ERROR_CODE error;
@@ -267,5 +267,4 @@ const char *test_handler_file_header_value() {
 
     /* returns the default value, nothing happened so there's
     nothing to report for this execution */
-    return NULL;
-}
+    return NULL;

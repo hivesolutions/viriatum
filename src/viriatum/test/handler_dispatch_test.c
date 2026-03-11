@@ -27,7 +27,7 @@
 
 #include "handler_dispatch_test.h"
 
-const char *test_dispatch_handler_context_keepalive() {
+const char *test_dispatch_handler_context_keepalive(void) {
     /* allocates space for the HTTP parser and for a
     handler file context to simulate keep-alive reuse */
     struct http_parser_t *http_parser;

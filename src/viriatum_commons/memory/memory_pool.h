@@ -209,7 +209,7 @@ VIRIATUM_EXPORT_PREFIX void add_palloc(struct memory_pool_t *pool);
 #endif
 
 #ifndef VIRIATUM_MPOOL
-static __inline void cleanup_palloc() {}
+static __inline void cleanup_palloc(void) {}
 static __inline void add_palloc(struct memory_pool_t *pool) {}
 #endif
 

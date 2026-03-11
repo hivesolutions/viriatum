@@ -65,7 +65,7 @@ VIRIATUM_EXTERNAL_PREFIX unsigned char last_error_message_b[ERROR_BUFFER_SIZE];
  *
  * @return The last (current) error code available.
  */
-static __inline unsigned int get_last_error_code() {
+static __inline unsigned int get_last_error_code(void) {
     return last_error_code;
 }
 
@@ -73,11 +73,11 @@ static __inline void set_last_error_code(ERROR_CODE error_code) {
     last_error_code = error_code;
 }
 
-static __inline unsigned char *get_last_error_message() {
+static __inline unsigned char *get_last_error_message(void) {
     return last_error_message;
 }
 
-static __inline unsigned char *get_last_error_message_safe() {
+static __inline unsigned char *get_last_error_message_safe(void) {
     /* in case the last error message is not set
     returns the empty error message */
     if(last_error_message == NULL) {
@@ -112,6 +112,6 @@ static __inline void set_last_error_message_f(unsigned char *error_message, ...)
     last_error_message = last_error_message_b;
 }
 
-static __inline void unset_last_error_message() {
+static __inline void unset_last_error_message(void) {
     last_error_message = NULL;
 }

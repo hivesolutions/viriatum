@@ -32,4 +32,4 @@
  * @return A message describing the execution of
  * the unit test should describe possible errors.
  */
-const char *test_dispatch_handler_context_keepalive();
+const char *test_dispatch_handler_context_keepalive(void);

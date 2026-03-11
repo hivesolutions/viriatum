@@ -32,7 +32,7 @@ void exec_speed_tests(struct test_case_t *test_case) {
     V_RUN_SPEED(test_linked_list_big, 1, test_case);
 }
 
-ERROR_CODE run_speed_tests() {
+ERROR_CODE run_speed_tests(void) {
     ERROR_CODE return_value = run_test_case(exec_speed_tests, "speed_tests");
     RAISE_AGAIN(return_value);
 }

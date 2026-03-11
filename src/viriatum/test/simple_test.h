@@ -39,7 +39,7 @@ int thread_pool_start_function_test(void *arguments);
 /**
  * Tests the thread pool implementation.
  */
-void test_thread_pool();
+void test_thread_pool(void);
 
 #endif
 
@@ -49,7 +49,7 @@ void test_thread_pool();
  * @return A message describing the execution of
  * the unit test should describe possible errors.
  */
-const char *test_linked_list();
+const char *test_linked_list(void);
 
 /**
  * Runs a series of stress tests in the linked
@@ -58,7 +58,7 @@ const char *test_linked_list();
  * @return A message describing the execution of
  * the unit test should describe possible errors.
  */
-const char *test_linked_list_stress();
+const char *test_linked_list_stress(void);
 
 /**
  * Runs a series of big tests in the linked
@@ -67,7 +67,7 @@ const char *test_linked_list_stress();
  * @return A message describing the execution of
  * the unit test should describe possible errors.
  */
-const char *test_linked_list_big();
+const char *test_linked_list_big(void);
 
 /**
  * Tests the array list structure.
@@ -75,7 +75,7 @@ const char *test_linked_list_big();
  * @return A message describing the execution of
  * the unit test should describe possible errors.
  */
-const char *est_array_list();
+const char *est_array_list(void);
 
 /**
  * Tests the hash map structure.
@@ -83,7 +83,7 @@ const char *est_array_list();
  * @return A message describing the execution of
  * the unit test should describe possible errors.
  */
-const char *test_hash_map();
+const char *test_hash_map(void);
 
 /**
  * Tests the sort map structure.
@@ -91,7 +91,7 @@ const char *test_hash_map();
  * @return A message describing the execution of
  * the unit test should describe possible errors.
  */
-const char *test_sort_map();
+const char *test_sort_map(void);
 
 /**
  * Tests the priority queue structure.
@@ -99,7 +99,7 @@ const char *test_sort_map();
  * @return A message describing the execution of
  * the unit test should describe possible errors.
  */
-const char *test_priority_queue();
+const char *test_priority_queue(void);
 
 /**
  * Tests the string buffer, used
@@ -109,7 +109,7 @@ const char *test_priority_queue();
  * @return A message describing the execution of
  * the unit test should describe possible errors.
  */
-const char *test_string_buffer();
+const char *test_string_buffer(void);
 
 /**
  * Tests the linked buffer, used
@@ -119,7 +119,7 @@ const char *test_string_buffer();
  * @return A message describing the execution of
  * the unit test should describe possible errors.
  */
-const char *test_linked_buffer();
+const char *test_linked_buffer(void);
 
 /**
  * Tests the base 64 encoding.
@@ -127,7 +127,7 @@ const char *test_linked_buffer();
  * @return A message describing the execution of
  * the unit test should describe possible errors.
  */
-const char *test_base64();
+const char *test_base64(void);
 
 /**
  * Tests the huffman encoding.
@@ -135,7 +135,7 @@ const char *test_base64();
  * @return A message describing the execution of
  * the unit test should describe possible errors.
  */
-const char *test_huffman();
+const char *test_huffman(void);
 
 /**
  * Tests the bit stream.
@@ -143,7 +143,7 @@ const char *test_huffman();
  * @return A message describing the execution of
  * the unit test should describe possible errors.
  */
-const char *test_bit_stream();
+const char *test_bit_stream(void);
 
 /**
  * Tests the file stream.
@@ -151,7 +151,7 @@ const char *test_bit_stream();
  * @return A message describing the execution of
  * the unit test should describe possible errors.
  */
-const char *test_file_stream();
+const char *test_file_stream(void);
 
 /**
  * Tests the (in-)memory stream.
@@ -159,7 +159,7 @@ const char *test_file_stream();
  * @return A message describing the execution of
  * the unit test should describe possible errors.
  */
-const char *test_memory_stream();
+const char *test_memory_stream(void);
 
 /**
  * Tests the template handler.
@@ -167,7 +167,7 @@ const char *test_memory_stream();
  * @return A message describing the execution of
  * the unit test should describe possible errors.
  */
-const char *test_template_handler();
+const char *test_template_handler(void);
 
 /**
  * Tests the quicksort (algorithm).
@@ -175,7 +175,7 @@ const char *test_template_handler();
  * @return A message describing the execution of
  * the unit test should describe possible errors.
  */
-const char *test_quicksort();
+const char *test_quicksort(void);
 
 /**
  * Tests the quicksort (algorithm),
@@ -184,7 +184,7 @@ const char *test_quicksort();
  * @return A message describing the execution of
  * the unit test should describe possible errors.
  */
-const char *test_quicksort_linked_list();
+const char *test_quicksort_linked_list(void);
 
 /**
  * Tests the md5 hash implementation
@@ -193,7 +193,7 @@ const char *test_quicksort_linked_list();
  * @return A message describing the execution of
  * the unit test should describe possible errors.
  */
-const char *test_md5();
+const char *test_md5(void);
 
 /**
  * Tests the sha1 hash implementation
@@ -202,7 +202,7 @@ const char *test_md5();
  * @return A message describing the execution of
  * the unit test should describe possible errors.
  */
-const char *test_sha1();
+const char *test_sha1(void);
 
 /**
  * Tests the crc32 hash implementation
@@ -211,7 +211,7 @@ const char *test_sha1();
  * @return A message describing the execution of
  * the unit test should describe possible errors.
  */
-const char *test_crc_32();
+const char *test_crc_32(void);
 
 /**
  * Tests the is_path_safe utility function
@@ -220,7 +220,7 @@ const char *test_crc_32();
  * @return A message describing the execution of
  * the unit test should describe possible errors.
  */
-const char *test_is_path_safe();
+const char *test_is_path_safe(void);
 
 /**
  * Compars an element with another, usefull
@@ -247,4 +247,4 @@ void exec_simple_tests(struct test_case_t *test_case);
  * test case. This is the main entry point for the
  * simple test case.
  */
-ERROR_CODE run_simple_tests();
+ERROR_CODE run_simple_tests(void);

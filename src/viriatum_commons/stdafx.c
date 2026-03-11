@@ -28,6 +28,6 @@ static unsigned char name[] = "viriatum_commons";
 static unsigned char version[] = "1.0.0";
 static unsigned char description[] = "Viriatum Commons";
 
-unsigned char *name_viriatum_commons() { return name; }
-unsigned char *version_viriatum_commons() { return version; }
-unsigned char *description_viriatum_commons() { return description; }
+unsigned char *name_viriatum_commons(void) { return name; }
+unsigned char *version_viriatum_commons(void) { return version; }
+unsigned char *description_viriatum_commons(void) { return description; }

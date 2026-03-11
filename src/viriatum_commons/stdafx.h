@@ -158,6 +158,6 @@ the windows xp operative system, must disable ipv6 */
 
 #include "global/memory.h"
 
-unsigned char *name_viriatum_commons();
-unsigned char *version_viriatum_commons();
-unsigned char *description_viriatum_commons();
+unsigned char *name_viriatum_commons(void);
+unsigned char *version_viriatum_commons(void);
+unsigned char *description_viriatum_commons(void);
