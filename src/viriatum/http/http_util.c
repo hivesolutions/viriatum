@@ -331,7 +331,7 @@ ERROR_CODE write_http_error_a(
 
         /* assigns the various error related variables into the
         template handler to be used, they may be used to display
-        information arround the error, note that the error description
+        information around the error, note that the error description
         value is conditional and may not be set */
         assign_integer_template_handler(template_handler, (unsigned char *) "error_code", error_code);
         assign_string_template_handler(template_handler, (unsigned char *) "error_message", error_message);
@@ -341,10 +341,13 @@ ERROR_CODE write_http_error_a(
 
         /* processes the file as a template handler, at this point
         the output buffer of the template engine should be populated
-        with the complete header information, the apropriate header
+        with the complete header information, the appropriate header
         writing method is chosen based on the existence or not of
         the realm authorization field */
         process_template_handler(template_handler, template_path);
+        if(template_handler->string_value == NULL || template_handler->string_value[0] == '\0') {
+            V_WARNING_F("Template processing failed for '%s'\n", template_path);
+        }
         realm == NULL ? write_http_headers_c(
             connection,
             headers_buffer,
@@ -385,7 +388,7 @@ ERROR_CODE write_http_error_a(
         delete_template_handler(template_handler);
 
         /* releases the contents of the headers buffer, no more need to
-        continue using them (not requried) */
+        continue using them (not required) */
         FREE(headers_buffer);
 
         /* writes the resulting buffer into the connection in order to be sent
@@ -398,7 +401,7 @@ ERROR_CODE write_http_error_a(
             callback_parameters
         );
     } else {
-        /* "stringfies" a possible null error description into a description
+        /* "stringifies" a possible null error description into a description
         string in order to be correctly displayed then formats the error
         message using the code, message and description */
         error_description = error_description == NULL ? (char *) service->description : error_description;
@@ -451,7 +454,7 @@ ERROR_CODE get_http_range_limits(unsigned char *range, size_t *initial_byte, siz
     size_t index;
 
     /* creates the inital and final local values and starts them
-    at the invalid (unset) values (intial state) */
+    at the invalid (unset) values (initial state) */
     long long initial_byte_v = -1;
     long long final_byte_v = -1;
 
