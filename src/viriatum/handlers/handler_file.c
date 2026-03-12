@@ -613,6 +613,18 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
             /* processes the file as a template handler */
             process_template_handler(template_handler, template_path);
 
+            /* warns if the template file was not found or produced no output
+            this will allow proper debugging of the situation */
+            if(template_handler->string_value == NULL || template_handler->string_value[0] == '\0') {
+                V_WARNING_F("Listing template file not found or empty '%s'\n", template_path);
+            } else {
+                V_DEBUG_F(
+                    "Sending listing template contents from '%s' (%lu bytes)\n",
+                    template_path,
+                    (unsigned long) strlen((char *) template_handler->string_value)
+                );
+            }
+
             /* sets the template handler in the handler file context and unsets
             the flushed flag */
             handler_file_context->template_handler = template_handler;
