@@ -89,7 +89,7 @@ ERROR_CODE close_polling_select(struct polling_t *polling) {
 
     /* retrieves the polling select structure as the concrete
     underlying substrate of the polling structure */
-    struct polling_select_t *polling_select =\
+    struct polling_select_t *polling_select =
         (struct polling_select_t *) polling->lower;
 
     /* iterates over the set of connections that are meant to
@@ -140,7 +140,7 @@ ERROR_CODE unregister_connection_polling_select(
     unsigned char remove_c
 ) {
     /* retrieves the polling select */
-    struct polling_select_t *polling_select =\
+    struct polling_select_t *polling_select =
         (struct polling_select_t *) polling->lower;
 
     /* unregister the socket handle from the sockets read set */
@@ -189,7 +189,7 @@ ERROR_CODE unregister_connection_polling_select(
 ERROR_CODE register_read_polling_select(struct polling_t *polling, struct connection_t *connection) {
     /* retrieves the polling select structure as the lower
     structure from the provided polling object */
-    struct polling_select_t *polling_select =\
+    struct polling_select_t *polling_select =
         (struct polling_select_t *) polling->lower;
 
     /* in case the connection is read registered must
@@ -215,7 +215,7 @@ ERROR_CODE register_read_polling_select(struct polling_t *polling, struct connec
 ERROR_CODE unregister_read_polling_select(struct polling_t *polling, struct connection_t *connection) {
     /* retrieves the polling select structure as the lower
     structure from the provided polling object */
-    struct polling_select_t *polling_select =\
+    struct polling_select_t *polling_select =
         (struct polling_select_t *) polling->lower;
 
     /* in case the connection is not read registered must
@@ -241,7 +241,7 @@ ERROR_CODE unregister_read_polling_select(struct polling_t *polling, struct conn
 ERROR_CODE register_write_polling_select(struct polling_t *polling, struct connection_t *connection) {
     /* retrieves the polling select structure as the lower
     structure from the provided polling object */
-    struct polling_select_t *polling_select =\
+    struct polling_select_t *polling_select =
         (struct polling_select_t *) polling->lower;
 
     /* in case the connection is write registered must
@@ -282,7 +282,7 @@ ERROR_CODE register_write_polling_select(struct polling_t *polling, struct conne
 ERROR_CODE unregister_write_polling_select(struct polling_t *polling, struct connection_t *connection) {
     /* retrieves the polling select structure as the lower
     structure from the provided polling object */
-    struct polling_select_t *polling_select =\
+    struct polling_select_t *polling_select =
         (struct polling_select_t *) polling->lower;
 
     /* in case the connection is not write registered must
@@ -308,7 +308,7 @@ ERROR_CODE unregister_write_polling_select(struct polling_t *polling, struct con
 ERROR_CODE add_outstanding_polling_select(struct polling_t *polling, struct connection_t *connection) {
     /* retrieves the polling select structure as the lower
     structure from the provided polling object */
-    struct polling_select_t *polling_select =\
+    struct polling_select_t *polling_select =
         (struct polling_select_t *) polling->lower;
 
     /* in case the connection is already registered for outstanding
@@ -599,7 +599,7 @@ ERROR_CODE _call_polling_select(
         /* in case the current connection is in the handshake
         section and the handshake handler is correctly set (must
         call it to initialize the connection) */
-        if(current_connection->status == STATUS_HANDSHAKE &&\
+        if(current_connection->status == STATUS_HANDSHAKE &&
             current_connection->on_handshake != NULL) {
             /* prints a series of debug messages about the handshake
             operation in it and then calls the hadhaske handler */
@@ -610,7 +610,7 @@ ERROR_CODE _call_polling_select(
 
         /* in case the current connection is open and the read
         handler is correctly set (must call it) */
-        if(current_connection->status == STATUS_OPEN &&\
+        if(current_connection->status == STATUS_OPEN &&
             current_connection->on_read != NULL) {
             /* prints a series of debug messages and then calls the
             correct on read handler for the notification */
@@ -640,7 +640,7 @@ ERROR_CODE _call_polling_select(
         current_connection->write_valid = TRUE;
 
         /* in case the current connection is open */
-        if(current_connection->status == STATUS_OPEN &&\
+        if(current_connection->status == STATUS_OPEN &&
             current_connection->on_write != NULL) {
             /* prints a series of debug messages and then calls the
             correct on write handler for the notification */
@@ -662,7 +662,7 @@ ERROR_CODE _call_polling_select(
         V_DEBUG_F("Processing error connection: %d\n", current_connection->socket_handle);
 
         /* in case the current connection is open */
-        if(current_connection->status == STATUS_OPEN &&\
+        if(current_connection->status == STATUS_OPEN &&
             current_connection->on_error != NULL) {
             /* prints a series of debug messages and then calls the
             correct on error handler for the notification */
@@ -749,7 +749,7 @@ ERROR_CODE _outstanding_polling_select(
 
         /* in case the current connection is open and the on read
         event handler is set performs the read call */
-        if(current_connection->status == STATUS_OPEN &&\
+        if(current_connection->status == STATUS_OPEN &&
             current_connection->on_read != NULL) {
             /* prints a series of debug messages and then calls the
             correct on read handler for the notification */
@@ -779,7 +779,7 @@ ERROR_CODE _outstanding_polling_select(
 
         /* in case the current connection is open and the on write
         event handler is set performs the write call */
-        if(current_connection->status == STATUS_OPEN &&\
+        if(current_connection->status == STATUS_OPEN &&
             current_connection->on_write != NULL) {
             /* prints a series of debug messages and then calls the
             correct on write handler for the notification */

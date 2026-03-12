@@ -69,7 +69,7 @@ ERROR_CODE _send_response_handler_gif(struct http_parser_t *http_parser) {
 
     /* retrieves the HTTP connection from the io connection to be used
     for the HTTP level operation to be done */
-    struct http_connection_t *http_connection =\
+    struct http_connection_t *http_connection =
         (struct http_connection_t *) ((struct io_connection_t *) connection->lower)->lower;
 
     /* allocates the buffer to be used to send the empty GIF data, it must

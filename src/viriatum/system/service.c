@@ -1450,7 +1450,7 @@ ERROR_CODE create_connection(struct connection_t **connection_pointer, SOCKET_HA
     size_t connection_size = sizeof(struct connection_t);
 
     /* allocates space for the connection */
-    struct connection_t *connection =\
+    struct connection_t *connection =
         (struct connection_t *) MALLOC(connection_size);
 
     /* sets the connection attributes (default) values */

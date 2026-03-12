@@ -55,7 +55,7 @@ ERROR_CODE create_http_client_connection(struct http_client_connection_t **http_
     size_t http_client_connection_size = sizeof(struct http_client_connection_t);
 
     /* allocates space for the HTTP client connection */
-    struct http_client_connection_t *http_client_connection =\
+    struct http_client_connection_t *http_client_connection =
         (struct http_client_connection_t *) MALLOC(http_client_connection_size);
 
     /* sets the HTTP handler attributes (default) values */
@@ -115,7 +115,7 @@ ERROR_CODE create_http_client_parameters(struct http_client_parameters_t **http_
     /* retrieves the HTTP client connection size and uses
     it to allocate the required memory for the structure */
     size_t http_client_parameters_size = sizeof(struct http_client_parameters_t);
-    struct http_client_parameters_t *http_client_parameters =\
+    struct http_client_parameters_t *http_client_parameters =
         (struct http_client_parameters_t *) MALLOC(http_client_parameters_size);
 
     /* sets the various default values in the client paramenters
@@ -142,7 +142,7 @@ ERROR_CODE delete_http_client_parameters(struct http_client_parameters_t *http_c
 ERROR_CODE data_handler_stream_http_client(struct io_connection_t *io_connection, unsigned char *buffer, size_t buffer_size) {
     /* retrieves the HTTP client connection as the lower
     part (payload) of the io connection */
-    struct http_client_connection_t *http_client_connection =\
+    struct http_client_connection_t *http_client_connection =
         (struct http_client_connection_t *) io_connection->lower;
 
     /* process the HTTP data for the HTTP parser, this should be
@@ -203,7 +203,7 @@ ERROR_CODE open_handler_stream_http_client(struct io_connection_t *io_connection
 ERROR_CODE close_handler_stream_http_client(struct io_connection_t *io_connection) {
     /* retrieves the HTTP client connection and deletes it
     releasig all of its memory (avoiding memory leaks) */
-    struct http_client_connection_t *http_client_connection =\
+    struct http_client_connection_t *http_client_connection =
         (struct http_client_connection_t *) io_connection->lower;
     delete_http_client_connection(http_client_connection);
 

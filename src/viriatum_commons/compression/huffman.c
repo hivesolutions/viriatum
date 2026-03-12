@@ -56,7 +56,7 @@ void create_huffman_node(struct huffman_node_t **huffman_node_pointer) {
     /* calculates the size of an huffman node structure and then
     uses the value for the allocation of the appropriate memory */
     size_t huffman_node_size = sizeof(struct huffman_node_t);
-    struct huffman_node_t *huffman_node =\
+    struct huffman_node_t *huffman_node =
         (struct huffman_node_t *) MALLOC(huffman_node_size);
 
     /* initializes the complete set of attribute of an huffman

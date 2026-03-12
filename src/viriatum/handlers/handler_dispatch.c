@@ -341,7 +341,7 @@ ERROR_CODE url_callback_handler_dispatch(struct http_parser_t *http_parser, cons
             if the matched value starts with a slash value for such cases the
             offset to the virtual url must be reduced otherwise abnormal values
             to the url would be considered (creating additional path problems) */
-            virtual_url_offset = match_size > 0 && data[match_size - 1] == '/' ?\
+            virtual_url_offset = match_size > 0 && data[match_size - 1] == '/' ?
                 match_size - 1 : match_size;
             CALL_V(
                 http_connection->http_settings->on_location,

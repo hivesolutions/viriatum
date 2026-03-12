@@ -81,7 +81,7 @@ void create_linked_list_node(struct linked_list_node_t **linked_list_node_pointe
     size_t linked_list_node_size = sizeof(struct linked_list_node_t);
 
     /* allocates space for the linked list node */
-    struct linked_list_node_t *linked_list_node =\
+    struct linked_list_node_t *linked_list_node =
         (struct linked_list_node_t *) palloc(&pool, linked_list_node_size);
 
     /* initializes the linked list node value to an unset
@@ -567,7 +567,7 @@ void get_next_iterator_linked_list(struct iterator_t *iterator, void **next_poin
     /* retrieves the current node from the iterator parameters
     this value should represent the base value for the current
     next operation to be performed */
-    struct linked_list_node_t *current_node =\
+    struct linked_list_node_t *current_node =
         (struct linked_list_node_t *) iterator->parameters;
 
     /* allocates space for both the next node reference and for

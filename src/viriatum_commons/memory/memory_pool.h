@@ -363,7 +363,7 @@ static __inline void resize_memory_pool(struct memory_pool_t *pool, size_t chunk
     /* set the possible "new" chunk count value taking into account
     that if the chunk max size value is lower than the current chunk
     count the chunk count must be updated to that value */
-    pool->chunk_count = pool->chunk_count < chunk_max_size ?\
+    pool->chunk_count = pool->chunk_count < chunk_max_size ?
         pool->chunk_count : chunk_max_size;
 
     /* allocates the new memory buffers for the chunks and for the map

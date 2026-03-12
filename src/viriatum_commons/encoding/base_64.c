@@ -210,7 +210,7 @@ ERROR_CODE _decode_base64(
 
     /* calculates the valid buffer length, defaulting to
     zero in case the value "becomes" negative */
-    size_t valid_buffer_length = buffer_length > padding_count ?\
+    size_t valid_buffer_length = buffer_length > padding_count ?
         buffer_length - padding_count : 0;
 
     /* starts the buffer index */

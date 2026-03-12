@@ -259,7 +259,7 @@ ERROR_CODE url_callback_handler_file(struct http_parser_t *http_parser, const un
     size_t file_path_size;
 
     /* retrieves the handler file context from the HTTP parser */
-    struct handler_file_context_t *handler_file_context =\
+    struct handler_file_context_t *handler_file_context =
         (struct handler_file_context_t *) http_parser->context;
 
     /* retrieves the connection from the HTTP parser parameters and
@@ -494,7 +494,7 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
 
     /* retrieves the handler file context from the HTTP parser and uses
     it to retrieve the respective flags value */
-    struct handler_file_context_t *handler_file_context =\
+    struct handler_file_context_t *handler_file_context =
         (struct handler_file_context_t *) http_parser->context;
     unsigned char flags = http_parser->flags;
 
@@ -779,7 +779,7 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
     /* in case there's an etag value defined and the values matched
     the one defined for the file, time to return a not modified value
     to the client indicating that cache should be used */
-    else if(handler_file_context->etag_status == 2 &&\
+    else if(handler_file_context->etag_status == 2 &&
         strcmp(etag, (char *) handler_file_context->etag) == 0) {
         /* writes the HTTP static headers to the response */
         write_http_headers_c(
@@ -830,7 +830,7 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
             206,
             "Partial content",
             keep_alive ? KEEP_ALIVE : KEEP_CLOSE,
-            handler_file_context->final_byte -\
+            handler_file_context->final_byte -
             handler_file_context->initial_byte + 1,
             NO_CACHE,
             FALSE
@@ -928,7 +928,7 @@ ERROR_CODE path_callback_handler_file(struct http_parser_t *http_parser, const u
 
     /* retrieves the handler file context from the HTTP parser
     and uses it to retrieve the reference to the base path in context */
-    struct handler_file_context_t *handler_file_context =\
+    struct handler_file_context_t *handler_file_context =
         (struct handler_file_context_t *) http_parser->context;
     unsigned char *base_path = handler_file_context->base_path;
 
@@ -1116,7 +1116,7 @@ ERROR_CODE _unset_http_parser_handler_file(struct http_parser_t *http_parser) {
 
 ERROR_CODE _reset_http_parser_handler_file(struct http_parser_t *http_parser) {
     /* retrieves the handler file context from the HTTP parser */
-    struct handler_file_context_t *handler_file_context =\
+    struct handler_file_context_t *handler_file_context =
         (struct handler_file_context_t *) http_parser->context;
 
     /* unsets the handler file context file */
@@ -1267,7 +1267,7 @@ ERROR_CODE _send_chunk_handler_file(struct connection_t *connection, struct data
     of bytes to be read from the file (optimal buffer sizing) */
     offset = ftell(file);
     remaining = handler_file_context->final_byte - offset + 1;
-    buffer_size = remaining < FILE_BUFFER_SIZE_HANDLER_FILE ?\
+    buffer_size = remaining < FILE_BUFFER_SIZE_HANDLER_FILE ?
         remaining : FILE_BUFFER_SIZE_HANDLER_FILE;
     file_buffer = MALLOC(buffer_size);
 
