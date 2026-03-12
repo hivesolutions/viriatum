@@ -485,6 +485,7 @@ int main(int argc, char *argv[]) {
 #endif
 
     /* prints a debug message */
+    V_DEBUG("Running in DEBUG mode\n");
     V_DEBUG_F("Receiving %d argument(s)\n", argc);
 
     /* in case the number of arguments is less than one
