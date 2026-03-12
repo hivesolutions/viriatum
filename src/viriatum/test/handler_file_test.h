@@ -24,6 +24,9 @@
 
 #pragma once
 
+#include "../handlers/handler_file.h"
+#include "../http/http_parser.h"
+
 /**
  * Tests the handler file context creation
  * and default value initialization.

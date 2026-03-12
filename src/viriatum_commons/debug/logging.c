@@ -26,6 +26,14 @@
 
 #include "logging.h"
 
+#ifdef VIRIATUM_PLATFORM_WIN32
+/* ENABLE_VIRTUAL_TERMINAL_PROCESSING is only defined in the
+Windows 10 SDK and later, so guard against older SDKs */
+#ifndef ENABLE_VIRTUAL_TERMINAL_PROCESSING
+#define ENABLE_VIRTUAL_TERMINAL_PROCESSING 0x0004
+#endif
+#endif
+
 int logging_use_color(void) {
     /* caches the detection result so that the terminal
     check runs only once during the process lifetime */

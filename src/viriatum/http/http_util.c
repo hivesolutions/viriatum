@@ -275,14 +275,24 @@ ERROR_CODE write_http_error_a(
     be used for template generation */
     unsigned char template_path[VIRIATUM_MAX_PATH_SIZE];
 
+    /* allocates a pointer to the resources path to be used for
+    template loading, resolved after options are retrieved */
+    char *resources_path;
+
+    /* allocates pointers for the service and options structures
+    retrieved from the connection, and for the headers buffer */
+    struct service_t *service;
+    struct service_options_t *options;
+    char *headers_buffer;
+
     /* retrieves the service from the connection structure and
     then uses it to retrieve its options */
-    struct service_t *service = connection->service;
-    struct service_options_t *options = service->options;
+    service = connection->service;
+    options = service->options;
 
-    /* allocates the headers buffer (it will be releases automatically by the writter)
-    it need to be allocated in the heap so it gets throught the request cycle */
-    char *headers_buffer = buffer == NULL ? MALLOC(VIRIATUM_HTTP_SIZE) : buffer;
+    /* allocates the headers buffer (it will be releases automatically by the writer)
+    it need to be allocated in the heap so it gets through the request cycle */
+    headers_buffer = buffer == NULL ? MALLOC(VIRIATUM_HTTP_SIZE) : buffer;
     size = size == 0 ? VIRIATUM_HTTP_SIZE : size;
 
     /* logs the HTTP error being sent to the client, using the warning
@@ -298,7 +308,7 @@ ERROR_CODE write_http_error_a(
 
     /* resolves the resources path to be used for template loading,
     using the www root override if set or the default otherwise */
-    char *_resources_path = options->www_root[0] != '\0' ? (char *) options->www_root : VIRIATUM_RESOURCES_PATH;
+    resources_path = options->www_root[0] != '\0' ? (char *) options->www_root : VIRIATUM_RESOURCES_PATH;
 
     /* in case the use template flag is set the error
     should be displayed using the template */
@@ -308,7 +318,7 @@ ERROR_CODE write_http_error_a(
             (char *) template_path,
             sizeof(template_path),
             "%s%s",
-            _resources_path,
+            resources_path,
             VIRIATUM_ERROR_PATH
         );
 

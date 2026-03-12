@@ -23,7 +23,6 @@
 */
 
 #include "stdafx.h"
-#include "viriatum.h"
 
 #include "handler_dispatch_test.h"
 
