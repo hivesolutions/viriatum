@@ -346,7 +346,37 @@ ERROR_CODE write_http_error_a(
         the realm authorization field */
         process_template_handler(template_handler, template_path);
         if(template_handler->string_value == NULL || template_handler->string_value[0] == '\0') {
-            V_WARNING_F("Template processing failed for '%s'\n", template_path);
+            V_WARNING_F("Template file not found or empty '%s', falling back to text mode\n", template_path);
+            delete_template_handler(template_handler);
+            error_description = error_description == NULL ? (char *) service->description : error_description;
+            SPRINTF(
+                _error_description,
+                sizeof(_error_description),
+                "%d - %s - %s",
+                error_code,
+                error_message,
+                error_description
+            );
+            write_http_headers_m(
+                connection,
+                headers_buffer,
+                size,
+                version,
+                error_code,
+                error_message,
+                keep_alive,
+                strlen(_error_description),
+                NO_CACHE,
+                _error_description
+            );
+            write_connection(
+                connection,
+                (unsigned char *) headers_buffer,
+                (unsigned int) strlen(headers_buffer),
+                (connection_data_callback) callback,
+                callback_parameters
+            );
+            RAISE_NO_ERROR;
         }
         realm == NULL ? write_http_headers_c(
             connection,
