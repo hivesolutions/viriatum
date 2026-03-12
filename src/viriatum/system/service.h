@@ -504,7 +504,7 @@ typedef struct service_t {
 /**
  * Structure defining the set of options/configuration
  * for an associated service.
- * 
+ *
  * Some of the values are computed and not directly accessible
  * via a configuration paradigm.
  */
