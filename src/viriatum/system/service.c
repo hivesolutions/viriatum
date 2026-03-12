@@ -2166,7 +2166,7 @@ ERROR_CODE _file_options_service(struct service_t *service, struct hash_map_t *a
     path relative to the source tree for development convenience */
     {
         const char *candidates[] = {
-            VIRIATUM_CONFIG_PATH "/viriatum.ini",
+            NULL,
             "./viriatum.ini",
             "./src/viriatum/resources/config/viriatum/viriatum.ini"
         };
@@ -2175,7 +2175,11 @@ ERROR_CODE _file_options_service(struct service_t *service, struct hash_map_t *a
 
         return_value = 1;
         for(candidate_index = 0; candidate_index < candidate_count; candidate_index++) {
-            SPRINTF(config_path, VIRIATUM_MAX_PATH_SIZE, "%s", candidates[candidate_index]);
+            if(candidates[candidate_index] == NULL) {
+                SPRINTF(config_path, VIRIATUM_MAX_PATH_SIZE, "%s/viriatum.ini", VIRIATUM_CONFIG_PATH);
+            } else {
+                SPRINTF(config_path, VIRIATUM_MAX_PATH_SIZE, "%s", candidates[candidate_index]);
+            }
             V_DEBUG_F("Trying configuration file (%s)\n", config_path);
             return_value = process_ini_file(config_path, &configuration);
             if(!IS_ERROR_CODE(return_value)) { break; }
