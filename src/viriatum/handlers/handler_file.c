@@ -263,14 +263,11 @@ ERROR_CODE url_callback_handler_file(struct http_parser_t *http_parser, const un
         (struct handler_file_context_t *) http_parser->context;
 
     /* retrieves the connection from the HTTP parser parameters and
-    then uses it to reach the service options for path resolution */
+    resolves the contents path, using www root override if available */
     struct connection_t *connection = (struct connection_t *) http_parser->parameters;
-    struct service_t *service = connection->service;
-    struct service_options_t *options = service->options;
-
-    /* resolves the contents path to be used for file serving,
-    using the www root override if set or the default otherwise */
-    char *contents_path = options->www_root[0] != '\0' ? (char *) options->www_root : VIRIATUM_CONTENTS_PATH;
+    char *contents_path = connection != NULL && connection->service != NULL
+        && connection->service->options->www_root[0] != '\0'
+        ? (char *) connection->service->options->www_root : VIRIATUM_CONTENTS_PATH;
 
     /* checks the position of the get parameters divisor position
     and then uses it to calculate the size of the (base) path */
@@ -936,14 +933,11 @@ ERROR_CODE path_callback_handler_file(struct http_parser_t *http_parser, const u
     unsigned char *base_path = handler_file_context->base_path;
 
     /* retrieves the connection from the HTTP parser parameters and
-    then uses it to reach the service options for path resolution */
+    resolves the contents path, using www root override if available */
     struct connection_t *connection = (struct connection_t *) http_parser->parameters;
-    struct service_t *service = connection->service;
-    struct service_options_t *options = service->options;
-
-    /* resolves the contents path to be used for file serving,
-    using the www root override if set or the default otherwise */
-    char *contents_path = options->www_root[0] != '\0' ? (char *) options->www_root : VIRIATUM_CONTENTS_PATH;
+    char *contents_path = connection != NULL && connection->service != NULL
+        && connection->service->options->www_root[0] != '\0'
+        ? (char *) connection->service->options->www_root : VIRIATUM_CONTENTS_PATH;
 
     /* copies the memory from the data to the url and then
     puts the end of string in the url, note that only the path
