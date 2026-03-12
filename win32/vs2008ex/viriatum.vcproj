@@ -566,6 +566,10 @@
                     RelativePath="..\..\src\viriatum\test\speed_test.c"
                     >
                 </File>
+                <File
+                    RelativePath="..\..\src\viriatum\test\test_support.c"
+                    >
+                </File>
             </Filter>
             <Filter
                 Name="Module"
@@ -746,6 +750,10 @@
                 </File>
                 <File
                     RelativePath="..\..\src\viriatum\test\test.h"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\viriatum\test\test_support.h"
                     >
                 </File>
             </Filter>

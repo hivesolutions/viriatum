@@ -324,6 +324,7 @@ xcopy /e /y "$(SolutionDir)..\..\src\$(ProjectName)\resources\config\viriatum" "
     <ClCompile Include="..\..\src\viriatum\test\handler_file_test.c" />
     <ClCompile Include="..\..\src\viriatum\test\simple_test.c" />
     <ClCompile Include="..\..\src\viriatum\test\speed_test.c" />
+    <ClCompile Include="..\..\src\viriatum\test\test_support.c" />
     <ClCompile Include="..\..\src\viriatum\viriatum.c" />
   </ItemGroup>
   <ItemGroup>
@@ -368,6 +369,7 @@ xcopy /e /y "$(SolutionDir)..\..\src\$(ProjectName)\resources\config\viriatum" "
     <ClInclude Include="..\..\src\viriatum\test\simple_test.h" />
     <ClInclude Include="..\..\src\viriatum\test\speed_test.h" />
     <ClInclude Include="..\..\src\viriatum\test\test.h" />
+    <ClInclude Include="..\..\src\viriatum\test\test_support.h" />
     <ClInclude Include="..\..\src\viriatum\viriatum.h" />
     <ClInclude Include="..\..\src\viriatum\_config_win32.h" />
   </ItemGroup>
