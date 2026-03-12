@@ -58,6 +58,8 @@ CMakeCache.txt
 cmake_install.cmake
 /ALL_BUILD.*
 
+/.venv
+
 /x64
 /bin
 /lib

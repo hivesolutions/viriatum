@@ -296,6 +296,10 @@ ERROR_CODE write_http_error_a(
     error_description = NULL;
 #endif
 
+    /* resolves the resources path to be used for template loading,
+    using the www root override if set or the default otherwise */
+    char *_resources_path = options->www_root[0] != '\0' ? (char *) options->www_root : VIRIATUM_RESOURCES_PATH;
+
     /* in case the use template flag is set the error
     should be displayed using the template */
     if(options->use_template) {
@@ -304,7 +308,7 @@ ERROR_CODE write_http_error_a(
             (char *) template_path,
             sizeof(template_path),
             "%s%s",
-            VIRIATUM_RESOURCES_PATH,
+            _resources_path,
             VIRIATUM_ERROR_PATH
         );
 

@@ -62,6 +62,17 @@
                         <td class="right label">compilation flags</td>
                         <td class="left value"><?php echo(viriatum_compilation_flags()) ?></td>
                     </tr>
+                    <tr>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td class="right label">php version</td>
+                        <td class="left value"><?php echo(phpversion()) ?></td>
+                    </tr>
+                    <tr>
+                        <td class="right label">php info</td>
+                        <td class="left value"><a href="phpinfo">view</a></td>
+                    </tr>
                 </tbody>
             </table>
         </div>

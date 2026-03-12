@@ -202,14 +202,18 @@ ERROR_CODE url_callback_handler_dispatch(struct http_parser_t *http_parser, cons
     unsigned char base_path[VIRIATUM_MAX_URL_SIZE];
 
     /* retrieves the various connection elements and lower substrates
-    fomr the parser parameters and then uses them to retrieves the handler
-    and the dispath handler to be used for dispatching */
+    from the parser parameters and then uses them to retrieves the handler
+    and the dispatch handler to be used for dispatching */
     struct connection_t *connection = (struct connection_t *) http_parser->parameters;
     struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
     struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
     struct service_t *service = connection->service;
     struct service_options_t *options = service->options;
     struct http_handler_t *handler = http_connection->http_handler;
+
+    /* resolves the contents path to be used for file serving,
+    using the www root override if set or the default otherwise */
+    char *contents_path = options->www_root[0] != '\0' ? (char *) options->www_root : VIRIATUM_CONTENTS_PATH;
 #ifdef VIRIATUM_PCRE
     struct dispatch_handler_t *dispatch_handler = (struct dispatch_handler_t *) handler->lower;
 #endif
@@ -257,7 +261,7 @@ ERROR_CODE url_callback_handler_dispatch(struct http_parser_t *http_parser, cons
     used in the handling of the request (concrete usage) */
     V_DEBUG_F("Using handler %s for handling\n", handler_name);
 
-    /* sets the current HTTP handler accoring to the current options
+    /* sets the current HTTP handler according to the current options
     in the service, the HTTP handler must be loaded in the handlers map
     in case the handler is not currently available an error is printed */
     get_value_string_hash_map(service->http_handlers_map, handler_name, (void **) &handler);
@@ -270,10 +274,10 @@ ERROR_CODE url_callback_handler_dispatch(struct http_parser_t *http_parser, cons
             /* creates the base path from the viriatum contents path
             and the current provided path and then runs the file existence
             validation process using the index array provided */
-            SPRINTF((char *) base_path, VIRIATUM_MAX_PATH_SIZE, "%s%s", VIRIATUM_CONTENTS_PATH, path);
+            SPRINTF((char *) base_path, VIRIATUM_MAX_PATH_SIZE, "%s%s", contents_path, path);
             index_ = validate_file((char *) base_path, (char *) options->index, 32, 128);
 
-            /* in case the index file resolution was successfull
+            /* in case the index file resolution was successful
             (a new file was resolved) must match the file path through
             the regular expression pipe, for handler resolution */
             if(index_ != NULL) {
@@ -281,7 +285,7 @@ ERROR_CODE url_callback_handler_dispatch(struct http_parser_t *http_parser, cons
                 it's possible to copy it into the path string */
                 index_size = strlen(index_);
 
-                /* copies the index file name to the reamining part of
+                /* copies the index file name to the remaining part of
                 the path buffer closing the buffer with the end of string
                 character (normal closing) */
                 memcpy(&path[path_size], index_, index_size);

@@ -27,21 +27,33 @@
 #include "logging.h"
 
 int logging_use_color(void) {
+    /* caches the detection result so that the terminal
+    check runs only once during the process lifetime */
+    static int cached = -1;
+    if(cached >= 0) { return cached; }
+
 #ifdef VIRIATUM_PLATFORM_WIN32
-    /* on Windows, checks whether the virtual terminal processing mode
-    is enabled, which is required for ANSI escape sequences to work */
-    HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
-    DWORD mode = 0;
-    if(handle == INVALID_HANDLE_VALUE) { return 0; }
-    if(!GetConsoleMode(handle, &mode)) { return 0; }
-    return (mode & ENABLE_VIRTUAL_TERMINAL_PROCESSING) ? 1 : 0;
+    {
+        HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
+        DWORD mode = 0;
+        if(handle == INVALID_HANDLE_VALUE) { cached = 0; return 0; }
+        if(!GetConsoleMode(handle, &mode)) { cached = 0; return 0; }
+        cached = (mode & ENABLE_VIRTUAL_TERMINAL_PROCESSING) ? 1 : 0;
+        return cached;
+    }
 #endif
 
 #ifdef VIRIATUM_PLATFORM_UNIX
-    /* on Unix, checks whether stdout is connected to a terminal */
-    return isatty(fileno(stdout)) ? 1 : 0;
+    {
+        const char *term = getenv("TERM");
+        if(!isatty(fileno(stdout))) { cached = 0; return 0; }
+        if(term == NULL || strcmp(term, "dumb") == 0) { cached = 0; return 0; }
+        cached = 1;
+        return cached;
+    }
 #endif
 
+    cached = 0;
     return 0;
 }
 

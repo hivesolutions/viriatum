@@ -117,11 +117,12 @@ void create_service_options(struct service_options_t **service_options_pointer) 
     service_options->handler_name = NULL;
     service_options->local = 0;
     service_options->default_index = 0;
+    service_options->www_root[0] = '\0';
     service_options->use_template = 0;
     service_options->default_virtual_host = NULL;
     service_options->index_count = 0;
 
-    /* resets the memry buffer on the index sequence structure so
+    /* resets the memory buffer on the index sequence structure so
     that no index is considered before configuration */
     memset(service_options->index, 0, sizeof(service_options->index));
 
@@ -2159,21 +2160,38 @@ ERROR_CODE _file_options_service(struct service_t *service, struct hash_map_t *a
     /* unpacks the service options from the service */
     struct service_options_t *service_options = service->options;
 
-    /* creates the configuration file path using the defined viriatum
-    path to the configuration directory and then loads it as an ini file,
-    this should retrieve the configuration as a set of maps */
-    SPRINTF(config_path, VIRIATUM_MAX_PATH_SIZE, "%s/viriatum.ini", VIRIATUM_CONFIG_PATH);
-    V_DEBUG_F("Loading configuration file (%s)\n", config_path);
-    return_value = process_ini_file(config_path, &configuration);
-    if(IS_ERROR_CODE(return_value)) { CATCH_ERROR; }
+    /* tries to load the configuration ini file from a series of
+    candidate paths, using the first one that succeeds: the system
+    config directory, the current working directory, and finally a
+    path relative to the source tree for development convenience */
+    {
+        const char *candidates[] = {
+            VIRIATUM_CONFIG_PATH "/viriatum.ini",
+            "./viriatum.ini",
+            "./src/viriatum/resources/config/viriatum/viriatum.ini"
+        };
+        size_t candidate_count = sizeof(candidates) / sizeof(candidates[0]);
+        size_t candidate_index;
 
-    /* sets the configuraation structure under the service structure
+        return_value = 1;
+        for(candidate_index = 0; candidate_index < candidate_count; candidate_index++) {
+            SPRINTF(config_path, VIRIATUM_MAX_PATH_SIZE, "%s", candidates[candidate_index]);
+            V_DEBUG_F("Trying configuration file (%s)\n", config_path);
+            return_value = process_ini_file(config_path, &configuration);
+            if(!IS_ERROR_CODE(return_value)) { break; }
+            CATCH_ERROR;
+        }
+
+        if(IS_ERROR_CODE(return_value)) {
+            V_WARNING("No configuration file found, using defaults\n");
+        } else {
+            V_INFO_F("Loaded configuration file (%s)\n", config_path);
+        }
+    }
+
+    /* sets the configuration structure under the service structure
     so that it may be latter used for operations */
     service->configuration = configuration;
-
-    /* prints a debug message about the loading of the configuration
-    ini file so that the user knows that the new file is used */
-    V_DEBUG_F("Loaded configuration file (%s)\n", config_path);
 
     /* tries to retrieve the general section configuration from the configuration
     map in case none is found returns immediately no need to process anything more */
@@ -2236,8 +2254,16 @@ ERROR_CODE _file_options_service(struct service_t *service, struct hash_map_t *a
     get_value_string_sort_map(general, (unsigned char *) "use_template", &value);
     if(value != NULL) { service_options->use_template = (unsigned char) atob(value); }
 
+    /* tries to retrieve the www root argument from the arguments map, then
+    sets the www root override for the contents path in service options */
+    get_value_string_sort_map(general, (unsigned char *) "www_root", &value);
+    if(value != NULL) {
+        SPRINTF((char *) service_options->www_root, VIRIATUM_MAX_PATH_SIZE, "%s", (char *) value);
+        V_INFO_F("Using www root from configuration (%s)\n", service_options->www_root);
+    }
+
     /* tries to retrieve the index (file) argument from the arguments map, then
-    sets the split value arround the space character in the index value */
+    sets the split value around the space character in the index value */
     get_value_string_sort_map(general, (unsigned char *) "index", &value);
     if(value != NULL) { service_options->index_count = split(value, (char *) service_options->index, 128, ' '); }
 

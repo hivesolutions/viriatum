@@ -39,11 +39,12 @@ SOURCE_DIRS = (
     "modules/mod_php/src/viriatum_mod_php",
     "modules/mod_wsgi/src/viriatum_mod_wsgi",
     "src/viriatum_commons",
-    "src/viriatum"
+    "src/viriatum",
 )
 base_path = "none"
 
 path_names = []
+
 
 def compare(str1, str2):
     str1AtRoot = str1.find("/") == -1
@@ -56,8 +57,13 @@ def compare(str1, str2):
     else:
         return cmp(str1, str2)
 
+
 def visit(arg, dirname, names):
-    valid_names = [valid_name for valid_name in names if valid_name.split(".")[-1] in SOURCE_FILE_EXTENSIONS]
+    valid_names = [
+        valid_name
+        for valid_name in names
+        if valid_name.split(".")[-1] in SOURCE_FILE_EXTENSIONS
+    ]
     for valid_name in valid_names:
         total = dirname + "/" + valid_name
         total = total.replace(base_path + "/", "")
@@ -76,6 +82,7 @@ def visit(arg, dirname, names):
             total = total[1:]
 
         path_names.append(total + " \\")
+
 
 # iterates over all the source directories
 for source_dir in SOURCE_DIRS:

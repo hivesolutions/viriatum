@@ -257,10 +257,15 @@ ERROR_CODE _load_php_state() {
     sapi_startup(&viriatum_sapi_module);
     viriatum_sapi_module.startup(&viriatum_sapi_module);
 
-    /* forrces the logging of the error for the execution in the
+    /* forces the logging of the error for the execution in the
     current PHP environment */
-    zend_alter_ini_entry("display_errors", sizeof("display_errors"), "0", sizeof("0") - 1, PHP_INI_SYSTEM, PHP_INI_STAGE_RUNTIME);
-    zend_alter_ini_entry("log_errors", sizeof("log_errors"), "1", sizeof("1") - 1, PHP_INI_SYSTEM, PHP_INI_STAGE_RUNTIME);
+    zend_string *ini_name;
+    ini_name = zend_string_init("display_errors", sizeof("display_errors") - 1, 0);
+    zend_alter_ini_entry_chars(ini_name, "0", sizeof("0") - 1, PHP_INI_SYSTEM, PHP_INI_STAGE_RUNTIME);
+    zend_string_release(ini_name);
+    ini_name = zend_string_init("log_errors", sizeof("log_errors") - 1, 0);
+    zend_alter_ini_entry_chars(ini_name, "1", sizeof("1") - 1, PHP_INI_SYSTEM, PHP_INI_STAGE_RUNTIME);
+    zend_string_release(ini_name);
 
     /* starts the PHP state updating the major global value in
     the current interpreter state */
@@ -273,7 +278,7 @@ ERROR_CODE _load_php_state() {
 ERROR_CODE _unload_php_state() {
     /* runs the stop block for the PHP interpreter, this should
     be able to stop all the internal structures */
-    php_module_shutdown(TSRMLS_C);
+    php_module_shutdown();
     sapi_shutdown();
 
     /* raises no error */
@@ -299,7 +304,7 @@ ERROR_CODE _start_php_state() {
 #pragma warning(default:4700)
 #endif
 
-int _write_php_state(const char *data, unsigned int data_size TSRMLS_DC) {
+size_t _write_php_state(const char *data, size_t data_size) {
     /* allocates space for the buffer that will hold the write
     data that has just been sent to the write operation */
     char *buffer = MALLOC(data_size + 1);
@@ -315,7 +320,7 @@ int _write_php_state(const char *data, unsigned int data_size TSRMLS_DC) {
     return data_size;
 }
 
-void _log_php_state(char *message) {
+void _log_php_state(const char *message, int syslog_type_int) {
     /* logs the error message (critical error) */
     V_ERROR_CTX_F("mod_php", "%s\n", message);
 }

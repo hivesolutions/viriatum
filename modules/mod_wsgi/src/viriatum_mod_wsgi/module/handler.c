@@ -35,7 +35,7 @@ ERROR_CODE create_mod_wsgi_http_handler(struct mod_wsgi_http_handler_t **mod_wsg
         (struct mod_wsgi_http_handler_t *) MALLOC(mod_wsgi_http_handler_size);
 
     /* sets the mod WSGI HTTP handler attributes (default) values */
-    mod_wsgi_http_handler->file_path = NULL;
+    mod_wsgi_http_handler->file_path[0] = '\0';
     mod_wsgi_http_handler->reload = FALSE;
     mod_wsgi_http_handler->counter = 0;
     mod_wsgi_http_handler->module = NULL;
@@ -391,7 +391,7 @@ ERROR_CODE location_callback_handler_wsgi(struct http_parser_t *http_parser, siz
     /* retrieves the current location from the location buffer and checks if the
     file path value is correctly set */
     struct mod_wsgi_location_t *location = &mod_wsgi_http_handler->locations[index];
-    if(location->file_path == NULL) { RAISE_NO_ERROR; }
+    if(location->file_path[0] == '\0') { RAISE_NO_ERROR; }
 
     /* retrieves the size of the file path associated with the location and copies
     it to the current context file path string then updates the file path string
@@ -574,10 +574,20 @@ ERROR_CODE _send_data_callback_wsgi(struct connection_t *connection, struct data
         RAISE_NO_ERROR;
     }
 
-    /* retrieves the buffer from the current item and then retrieves the
-    size of it (to be used for the allocation of the connection buffer) */
-    buffer = PyString_AsString(item);
-    buffer_size = PyString_Size(item);
+    /* retrieves the buffer from the current item, handling both bytes
+    and str objects (PEP 3333 requires bytes but some apps return str) */
+    if(PyBytes_Check(item)) {
+        buffer = PyBytes_AsString(item);
+        buffer_size = PyBytes_Size(item);
+    } else if(PyUnicode_Check(item)) {
+        Py_ssize_t _size;
+        buffer = (char *) PyUnicode_AsUTF8AndSize(item, &_size);
+        buffer_size = (size_t) _size;
+    } else {
+        Py_DECREF(item);
+        VIRIATUM_RELEASE_GIL;
+        RAISE_ERROR_M(D_ERROR_CODE, (unsigned char *) "WSGI response item must be bytes or str");
+    }
 
     /* allocates data for the current connection and then copies the
     current python buffer data into it (for writing into the connection) */
@@ -697,7 +707,7 @@ ERROR_CODE _send_response_handler_wsgi(struct http_parser_t *http_parser) {
     if(handler_wsgi_context->module == NULL) {
         /* retrieves the correct file path for the module to be loaded
         defaulting to the preddefined path in case none is defined */
-        file_path = mod_wsgi_http_handler->file_path == NULL
+        file_path = mod_wsgi_http_handler->file_path[0] == '\0'
             ? DEFAULT_FILE_PATH : mod_wsgi_http_handler->file_path;
         file_path = handler_wsgi_context->_file_path_string.length > 0 ?
             (char *) handler_wsgi_context->file_path : file_path;
@@ -735,6 +745,8 @@ ERROR_CODE _send_response_handler_wsgi(struct http_parser_t *http_parser) {
     and then verifies that it's a valid python function */
     start_response_function = PyObject_GetAttrString(wsgi_module, "start_response");
     if(!start_response_function || !PyCallable_Check(start_response_function)) {
+        Py_XDECREF(start_response_function);
+        Py_DECREF(wsgi_module);
         PyErr_Clear(); VIRIATUM_RELEASE_GIL;
         RAISE_ERROR_M(D_ERROR_CODE, (unsigned char *) "Problem retrieving (WSGI) function");
     }
@@ -744,6 +756,8 @@ ERROR_CODE _send_response_handler_wsgi(struct http_parser_t *http_parser) {
     reference is invalid raises an error */
     module = handler_wsgi_context->module;
     if(module == NULL) {
+        Py_DECREF(start_response_function);
+        Py_DECREF(wsgi_module);
         VIRIATUM_RELEASE_GIL;
         RAISE_ERROR_M(D_ERROR_CODE, (unsigned char *) "Problem loading module");
     }
@@ -753,6 +767,9 @@ ERROR_CODE _send_response_handler_wsgi(struct http_parser_t *http_parser) {
     if it refers a valid function */
     handler_function = PyObject_GetAttrString(module, "application");
     if(!handler_function || !PyCallable_Check(handler_function)) {
+        Py_XDECREF(handler_function);
+        Py_DECREF(start_response_function);
+        Py_DECREF(wsgi_module);
         PyErr_Clear(); VIRIATUM_RELEASE_GIL;
         RAISE_ERROR_M(D_ERROR_CODE, (unsigned char *) "Problem retrieving application");
     }
@@ -894,6 +911,10 @@ ERROR_CODE _send_response_handler_wsgi(struct http_parser_t *http_parser) {
     sets the iterator in the WSGI context structure to be used in the callback */
     iterator = PyObject_GetIter(result);
     if(iterator == NULL) {
+        Py_DECREF(handler_function);
+        Py_DECREF(args);
+        Py_DECREF(wsgi_module);
+        Py_DECREF(result);
         VIRIATUM_RELEASE_GIL;
         RAISE_ERROR_M(D_ERROR_CODE, (unsigned char *) "Invalid iterator object");
     }
@@ -1041,7 +1062,7 @@ ERROR_CODE _start_environ_wsgi(PyObject *environ, struct http_parser_t *http_par
         the header value into a python string object */
         uppercase(header->name);
         SPRINTF(name, VIRIATUM_MAX_HEADER_SIZE + sizeof("HTTP_"), "HTTP_%s", header->name);
-        _value = PyString_FromString(header->value);
+        _value = PyUnicode_FromString(header->value);
 
         /* sets the value using the provided string name
         and decrements the reference count of the value */
@@ -1050,14 +1071,14 @@ ERROR_CODE _start_environ_wsgi(PyObject *environ, struct http_parser_t *http_par
     }
 
     _value_ = PyTuple_New(2);
-    _value = PyInt_FromLong(1);
+    _value = PyLong_FromLong(1);
     PyTuple_SET_ITEM(_value_, 0, _value);
-    _value = PyInt_FromLong(0);
+    _value = PyLong_FromLong(0);
     PyTuple_SET_ITEM(_value_, 1, _value);
     PyDict_SetItemString(environ, "wsgi.version", _value_);
     Py_DECREF(_value_);
 
-    _value = PyString_FromString("http");
+    _value = PyUnicode_FromString("http");
     PyDict_SetItemString(environ, "wsgi.url_scheme", _value);
     Py_DECREF(_value);
 
@@ -1077,42 +1098,42 @@ ERROR_CODE _start_environ_wsgi(PyObject *environ, struct http_parser_t *http_par
     PyDict_SetItemString(environ, "wsgi.run_once", _value);
     Py_DECREF(_value);
 
-    _value = PyString_FromString(method);
+    _value = PyUnicode_FromString(method);
     PyDict_SetItemString(environ, "REQUEST_METHOD", _value);
     Py_DECREF(_value);
 
-    _value = PyString_FromString((char *) handler_wsgi_context->prefix_name);
+    _value = PyUnicode_FromString((char *) handler_wsgi_context->prefix_name);
     PyDict_SetItemString(environ, "SCRIPT_NAME", _value);
     Py_DECREF(_value);
 
-    _value = PyString_FromString((char *) handler_wsgi_context->file_name);
+    _value = PyUnicode_FromString((char *) handler_wsgi_context->file_name);
     PyDict_SetItemString(environ, "PATH_INFO", _value);
     Py_DECREF(_value);
 
-    _value = PyString_FromString((char *) handler_wsgi_context->query);
+    _value = PyUnicode_FromString((char *) handler_wsgi_context->query);
     PyDict_SetItemString(environ, "QUERY_STRING", _value);
     Py_DECREF(_value);
 
-    _value = PyString_FromString((char *) handler_wsgi_context->server_name);
+    _value = PyUnicode_FromString((char *) handler_wsgi_context->server_name);
     PyDict_SetItemString(environ, "SERVER_NAME", _value);
     Py_DECREF(_value);
 
-    _value = PyString_FromString((char *) port);
+    _value = PyUnicode_FromString((char *) port);
     PyDict_SetItemString(environ, "SERVER_PORT", _value);
     Py_DECREF(_value);
 
-    _value = PyString_FromString("HTTP/1.1");
+    _value = PyUnicode_FromString("HTTP/1.1");
     PyDict_SetItemString(environ, "SERVER_PROTOCOL", _value);
     Py_DECREF(_value);
 
     if(handler_wsgi_context->_content_type_string.length > 0) {
-        _value = PyString_FromString((char *) handler_wsgi_context->content_type);
+        _value = PyUnicode_FromString((char *) handler_wsgi_context->content_type);
         PyDict_SetItemString(environ, "CONTENT_TYPE", _value);
         Py_DECREF(_value);
     }
 
     if(handler_wsgi_context->_content_length_string.length > 0) {
-        _value = PyString_FromString((char *) handler_wsgi_context->content_length_);
+        _value = PyUnicode_FromString((char *) handler_wsgi_context->content_length_);
         PyDict_SetItemString(environ, "CONTENT_LENGTH", _value);
         Py_DECREF(_value);
     }
@@ -1130,9 +1151,7 @@ ERROR_CODE _load_module_wsgi(PyObject **module_pointer, char *name, char *file_p
     used for reading the module file */
     FILE *file;
 
-    /* allocates space for the node to hold the root node of the
-    ast and to the code and module python objects */
-    struct _node *node;
+    /* allocates space for the code and module python objects */
     PyObject *code;
     PyObject *module;
 
@@ -1171,8 +1190,11 @@ ERROR_CODE _load_module_wsgi(PyObject **module_pointer, char *name, char *file_p
     number_bytes = fread(file_buffer, 1, file_size, file);
     file_buffer[number_bytes] = '\0';
 
+    /* closes the file to avoid any file memory leaking */
+    fclose(file);
+
     /* iterates over all the bytes in the file buffer to replace
-    the carrige return characters by "simple space" characters to
+    the carriage return characters by "simple space" characters to
     provide compatibility for old unix system where such characters
     are not allowed and would break string parsing */
     for(index = 0; index < number_bytes; index++) {
@@ -1182,23 +1204,11 @@ ERROR_CODE _load_module_wsgi(PyObject **module_pointer, char *name, char *file_p
         file_buffer[index] = ' ';
     }
 
-    /* parses the "just" read file using the python parser and then
-    closes the file to avoid any file memory leaking (possible problems) */
-    node = PyParser_SimpleParseString(file_buffer, Py_file_input);
-    fclose(file);
+    /* compiles the source string directly into a code object using
+    Py_CompileString (replaces the removed PyParser/PyNode APIs) */
+    code = Py_CompileString(file_buffer, file_path, Py_file_input);
     FREE(file_buffer);
 
-    /* in case the parsed node is not valid (something wrong occurred
-    while parsing the file) raises an error */
-    if(node == NULL) {
-        V_DEBUG_CTX("mod_wsgi", "Error while parsing module\n");
-        PyErr_Clear(); RAISE_NO_ERROR;
-    }
-
-    /* compiles the top level node (ast) into a python code object
-    so that it can be executed */
-    code = (PyObject *) PyNode_Compile(node, file_path);
-    PyNode_Free(node);
     if(code == NULL) {
         V_DEBUG_CTX("mod_wsgi", "Error while compiling module\n");
         PyErr_Clear(); RAISE_NO_ERROR;

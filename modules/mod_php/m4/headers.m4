@@ -23,5 +23,11 @@
 # checks for header files
 AC_CHECK_HEADERS([stdlib.h assert.h])
 
-# checks for specific header files
-AC_CHECK_HEADERS([sapi/embed/php_embed.h], [], [AC_MSG_ERROR([php 5 embed headers are required])])
+# checks for php embed header using a compile test that mirrors
+# the actual build flags (AC_CHECK_HEADERS fails on complex PHP headers)
+AC_MSG_CHECKING([for sapi/embed/php_embed.h])
+AC_COMPILE_IFELSE(
+    [AC_LANG_SOURCE([[#include <sapi/embed/php_embed.h>]])],
+    [AC_MSG_RESULT([yes])],
+    [AC_MSG_RESULT([no])
+     AC_MSG_ERROR([php embed headers are required (install php-dev and php-embed)])])

@@ -171,6 +171,16 @@ ERROR_CODE url_callback_handler_php(struct http_parser_t *http_parser, const uns
     /* retrieves the handler PHP context from the HTTP parser */
     struct handler_php_context_t *handler_php_context = (struct handler_php_context_t *) http_parser->context;
 
+    /* retrieves the connection from the HTTP parser parameters and
+    then uses it to reach the service options for path resolution */
+    struct connection_t *connection = (struct connection_t *) http_parser->parameters;
+    struct service_t *service = connection->service;
+    struct service_options_t *options = service->options;
+
+    /* resolves the contents path to be used for file serving,
+    using the www root override if set or the default otherwise */
+    char *contents_path = options->www_root[0] != '\0' ? (char *) options->www_root : VIRIATUM_CONTENTS_PATH;
+
     /* checks the position of the get parameters divisor position
     and then uses it to calculate the size of the (base) path */
     char *pointer = (char *) memchr((char *) data, '?', data_size);
@@ -197,7 +207,7 @@ ERROR_CODE url_callback_handler_php(struct http_parser_t *http_parser, const uns
         (char *) handler_php_context->file_path,
         VIRIATUM_MAX_PATH_SIZE,
         "%s%s%s",
-        VIRIATUM_CONTENTS_PATH,
+        contents_path,
         VIRIATUM_BASE_PATH,
         handler_php_context->file_name
     );
@@ -345,7 +355,7 @@ ERROR_CODE body_callback_handler_php(struct http_parser_t *http_parser, const un
 }
 
 ERROR_CODE message_complete_callback_handler_php(struct http_parser_t *http_parser) {
-    /* sends (and creates) the reponse */
+    /* sends (and creates) the response */
     _send_response_handler_php(http_parser);
 
     /* raise no error */
@@ -355,6 +365,16 @@ ERROR_CODE message_complete_callback_handler_php(struct http_parser_t *http_pars
 ERROR_CODE path_callback_handler_php(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
     /* retrieves the handler PHP context from the HTTP parser */
     struct handler_php_context_t *handler_php_context = (struct handler_php_context_t *) http_parser->context;
+
+    /* retrieves the connection from the HTTP parser parameters and
+    then uses it to reach the service options for path resolution */
+    struct connection_t *connection = (struct connection_t *) http_parser->parameters;
+    struct service_t *service = connection->service;
+    struct service_options_t *options = service->options;
+
+    /* resolves the contents path to be used for file serving,
+    using the www root override if set or the default otherwise */
+    char *contents_path = options->www_root[0] != '\0' ? (char *) options->www_root : VIRIATUM_CONTENTS_PATH;
 
     /* copies the part of the data buffer relative to the file name
     this avoids copying the query part */
@@ -368,7 +388,7 @@ ERROR_CODE path_callback_handler_php(struct http_parser_t *http_parser, const un
         (char *) handler_php_context->file_path,
         VIRIATUM_MAX_PATH_SIZE,
         "%s%s%s",
-        VIRIATUM_CONTENTS_PATH,
+        contents_path,
         VIRIATUM_BASE_PATH,
         handler_php_context->file_name
     );
@@ -584,24 +604,22 @@ ERROR_CODE _send_response_handler_php(struct http_parser_t *http_parser) {
 
     /* populates the "base" script reference structure
     with the required value for execution */
-    script.type = ZEND_HANDLE_FILENAME;
-    script.filename = (char *) handler_php_context->file_path;
-    script.opened_path = NULL;
-    script.free_filename = 0;
+    zend_stream_init_filename(&script, (char *) handler_php_context->file_path);
 
     zend_try {
         /* tries to start the request handling and in case it
-        succeedes continues with the execution of it */
-        if(php_request_startup(TSRMLS_C) == SUCCESS) {
+        succeeds continues with the execution of it */
+        if(php_request_startup() == SUCCESS) {
             /* executes the script in the current instantiated virtual
             machine, this is a blocking call so it will block the current
             general loop (care is required), then after the execution
             closes the current request information */
-            php_execute_script(&script TSRMLS_CC);
+            php_execute_script(&script);
             php_request_shutdown(NULL);
         }
     } zend_catch {
     } zend_end_try();
+    zend_destroy_file_handle(&script);
 
     /* retrieves the status code from the sapi headers and converts it
     into the proper status message */
@@ -636,7 +654,7 @@ ERROR_CODE _send_response_handler_php(struct http_parser_t *http_parser) {
     );
 
     /* allocates space for the header buffer and then writes the default values
-    into it the value is dynamicaly contructed based on the current header values */
+    into it the value is dynamically constructed based on the current header values */
     connection->alloc_data(connection, VIRIATUM_HTTP_MAX_SIZE, (void **) &headers_buffer);
     count = http_connection->write_headers(
         connection,

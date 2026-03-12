@@ -64,15 +64,13 @@ COMPLEX = [
     "Host: %s\r\n"
     "Connection: keep-alive\r\n"
     "\r\n" % (PATH, HOST),
-    "GET %s HTTP/1.1\r\n"
-    "Connection: keep-alive\r\n"
-    "Hos" % PATH,
+    "GET %s HTTP/1.1\r\n" "Connection: keep-alive\r\n" "Hos" % PATH,
     "t: %s\r\n"
     "\r\n"
     "GET %s HTTP/1.1\r\n"
     "Host: %s\r\n"
     "Connection: keep-alive\r\n"
-    "\r\n" % (HOST, PATH, HOST)
+    "\r\n" % (HOST, PATH, HOST),
 ]
 """ The complex example sequence of data
 string (to be used for cutted string testing) """
@@ -95,6 +93,7 @@ PIPELINING = [
 string (to be used for long pipellined string
 testing) one string containing three messages """
 
+
 def call(messages):
     # creates the socket object and connects it to the
     # target host and port
@@ -107,7 +106,7 @@ def call(messages):
     # that a delay time is used to separate messages
     for message in messages:
         _socket.send(message)
-        print "Sent:", message
+        print("Sent:", message)
         time.sleep(WRITE_SLEEP)
 
     # receives the complete chunk of responses
@@ -115,11 +114,13 @@ def call(messages):
     # the loop on connection closed
     while True:
         data = _socket.recv(SIZE)
-        print "Received:", data
-        if not data: break
+        print("Received:", data)
+        if not data:
+            break
 
     # closes the socket, no more data is transmitted
     _socket.close()
+
 
 if __name__ == "__main__":
     # runs the call operation on the complete set

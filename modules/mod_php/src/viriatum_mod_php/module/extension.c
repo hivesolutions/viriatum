@@ -26,23 +26,32 @@
 
 #include "extension.h"
 
+/* arginfo definitions required by PHP 8 for all exported
+functions, most take no arguments except connection_info */
+ZEND_BEGIN_ARG_INFO(arginfo_viriatum_void, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO(arginfo_viriatum_connection_info, 0)
+    ZEND_ARG_INFO(0, id)
+ZEND_END_ARG_INFO()
+
 zend_function_entry viriatum_functions[] = {
-    PHP_FE(viriatum_connections_l, NULL)
-    PHP_FE(viriatum_connection_info, NULL)
-    PHP_FE(viriatum_connections, NULL)
-    PHP_FE(viriatum_uptime, NULL)
-    PHP_FE(viriatum_name, NULL)
-    PHP_FE(viriatum_version, NULL)
-    PHP_FE(viriatum_platform, NULL)
-    PHP_FE(viriatum_flags, NULL)
-    PHP_FE(viriatum_modules, NULL)
-    PHP_FE(viriatum_description, NULL)
-    PHP_FE(viriatum_compiler, NULL)
-    PHP_FE(viriatum_compiler_version, NULL)
-    PHP_FE(viriatum_compilation_date, NULL)
-    PHP_FE(viriatum_compilation_time, NULL)
-    PHP_FE(viriatum_compilation_flags, NULL)
-    { NULL, NULL, NULL }
+    PHP_FE(viriatum_connections_l, arginfo_viriatum_void)
+    PHP_FE(viriatum_connection_info, arginfo_viriatum_connection_info)
+    PHP_FE(viriatum_connections, arginfo_viriatum_void)
+    PHP_FE(viriatum_uptime, arginfo_viriatum_void)
+    PHP_FE(viriatum_name, arginfo_viriatum_void)
+    PHP_FE(viriatum_version, arginfo_viriatum_void)
+    PHP_FE(viriatum_platform, arginfo_viriatum_void)
+    PHP_FE(viriatum_flags, arginfo_viriatum_void)
+    PHP_FE(viriatum_modules, arginfo_viriatum_void)
+    PHP_FE(viriatum_description, arginfo_viriatum_void)
+    PHP_FE(viriatum_compiler, arginfo_viriatum_void)
+    PHP_FE(viriatum_compiler_version, arginfo_viriatum_void)
+    PHP_FE(viriatum_compilation_date, arginfo_viriatum_void)
+    PHP_FE(viriatum_compilation_time, arginfo_viriatum_void)
+    PHP_FE(viriatum_compilation_flags, arginfo_viriatum_void)
+    PHP_FE_END
 };
 
 zend_module_entry viriatum_module = {
@@ -87,10 +96,10 @@ sapi_module_struct viriatum_sapi_module = {
 };
 
 int _module_startup(sapi_module_struct *module) {
-    return php_module_startup(module, &viriatum_module, 1);
+    return php_module_startup(module, &viriatum_module);
 }
 
-int _module_write(const char *data, uint data_size TSRMLS_DC) {
+size_t _module_write(const char *data, size_t data_size) {
     /* allocates space for the buffer that will hold the write
     data that has just been sent to the write operation */
     char *buffer = MALLOC(data_size + 1);
@@ -109,26 +118,26 @@ int _module_write(const char *data, uint data_size TSRMLS_DC) {
 void _module_flush(void *context) {
 }
 
-struct stat *_module_stat(TSRMLS_D) {
+struct stat *_module_stat(void) {
     return NULL;
 }
 
-char *_module_getenv(char *name, size_t size TSRMLS_DC) {
+char *_module_getenv(const char *name, size_t size) {
     return NULL;
 }
 
-int _module_header(sapi_header_struct *header, sapi_header_op_enum operation, sapi_headers_struct *headers TSRMLS_DC) {
+int _module_header(sapi_header_struct *header, sapi_header_op_enum operation, sapi_headers_struct *headers) {
     STRCPY(_php_request.headers[_php_request.header_count], VIRIATUM_MAX_HEADER_C_SIZE, header->header);
     _php_request.header_count++;
     return 0;
 }
 
-int _module_send_headers(sapi_headers_struct *headers TSRMLS_DC) {
+int _module_send_headers(sapi_headers_struct *headers) {
     STRCPY(_php_request.mime_type, VIRIATUM_MAX_HEADER_V_SIZE, headers->mimetype);
     return SAPI_HEADER_SENT_SUCCESSFULLY;
 }
 
-int _module_read_post(char *buffer, uint size TSRMLS_DC) {
+size_t _module_read_post(char *buffer, size_t size) {
     unsigned char *post_data = _php_request.php_context->post_data;
     size_t content_length = _php_request.php_context->content_length;
     size_t _size = content_length > size ? size : content_length;
@@ -142,18 +151,18 @@ int _module_read_post(char *buffer, uint size TSRMLS_DC) {
     return _size;
 }
 
-char *_module_read_cookies(TSRMLS_D) {
+char *_module_read_cookies(void) {
     return (char *) _php_request.php_context->cookie;
 }
 
-void _module_register(zval *_array TSRMLS_DC) {
+void _module_register(zval *_array) {
     /* allocates space for the iterator to be used to "go around"
     the various header elements and for the header (element) */
     struct iterator_t *headers_iterator;
     struct http_header_value_t *header;
 
     /* allocates space for the "new" name of the header element
-    this anme should be uppercased and (slash) transformed */
+    this anme should be uppercase and (slash) transformed */
     char name[VIRIATUM_MAX_HEADER_SIZE];
 
     /* allocates space for the address string reference
@@ -173,7 +182,7 @@ void _module_register(zval *_array TSRMLS_DC) {
     address_string = inet_ntoa(((SOCKET_ADDRESS_INTERNET *) &address)->sin_addr);
 
     /* creates the iterator to the headers linked list so that it's possible
-    to "go arround" the headers to expose them to the PHP interpreter */
+    to "go around" the headers to expose them to the PHP interpreter */
     create_iterator_linked_list(_php_request.php_context->headers, &headers_iterator);
 
     /* iterates continuously over all the headers to export them
@@ -186,7 +195,7 @@ void _module_register(zval *_array TSRMLS_DC) {
         if(header == NULL) { break; }
         uppercase(header->name);
         SPRINTF(name, 1024, "HTTP_%s", header->name);
-        php_register_variable_safe(name, (char *) header->value, header->value_size, _array TSRMLS_CC);
+        php_register_variable_safe(name, (char *) header->value, header->value_size, _array);
     }
 
     /* deletes the headers iterator (it's no longer required) */
@@ -195,32 +204,33 @@ void _module_register(zval *_array TSRMLS_DC) {
     /* sets the self server variable with the path to the file to be
     executed, this is of major importance for execution (conditional
     usage of this variable is set based on the file name existence) */
-    if(_php_request.php_context->file_name) { php_register_variable_safe("PHP_SELF", (char *) _php_request.php_context->file_name, _php_request.php_context->_file_name_string.length, _array TSRMLS_CC); }
-    else { php_register_variable_safe("PHP_SELF", "-", 1, _array TSRMLS_CC); }
+    if(_php_request.php_context->file_name[0] != '\0') { php_register_variable_safe("PHP_SELF", (char *) _php_request.php_context->file_name, _php_request.php_context->_file_name_string.length, _array); }
+    else { php_register_variable_safe("PHP_SELF", "-", 1, _array); }
 
     /* registers a series og global wide variable representing the
     current interface (critical for correct PHP interpreter usage) */
-    php_register_variable_safe("SERVER_SOFTWARE", "viriatum", sizeof("viriatum") - 1, _array TSRMLS_CC);
-    php_register_variable_safe("GATEWAY_INTERFACE", "CGI/1.1", sizeof("CGI/1.1") - 1, _array TSRMLS_CC);
-    php_register_variable_safe("SERVER_PROTOCOL", "HTTP/1.1", sizeof("HTTP/1.1") - 1, _array TSRMLS_CC);
-    php_register_variable_safe("SERVER_NAME", (char *) _php_request.php_context->server_name, _php_request.php_context->_server_name_string.length, _array TSRMLS_CC);
-    php_register_variable_safe("SERVER_PORT", (char *) port, port_string->length, _array TSRMLS_CC);
-    php_register_variable_safe("REQUEST_URI", (char *) _php_request.php_context->url, _php_request.php_context->_url_string.length, _array TSRMLS_CC);
-    php_register_variable_safe("SCRIPT_NAME", (char *) _php_request.php_context->file_name, _php_request.php_context->_file_name_string.length, _array TSRMLS_CC);
-    php_register_variable_safe("SCRIPT_FILENAME", (char *) _php_request.php_context->file_path, _php_request.php_context->_file_path_string.length, _array TSRMLS_CC);
-    php_register_variable_safe("QUERY_STRING", (char *) _php_request.php_context->query, _php_request.php_context->_query_string.length, _array TSRMLS_CC);
-    php_register_variable_safe("REQUEST_METHOD", (char *) _php_request.php_context->method, strlen(_php_request.php_context->method), _array TSRMLS_CC);
-    php_register_variable_safe("REMOTE_ADDR", address_string, strlen(address_string), _array TSRMLS_CC);
-    if(_php_request.php_context->_content_type_string.length > 0) { php_register_variable_safe("CONTENT_TYPE", (char *)  _php_request.php_context->content_type, _php_request.php_context->_content_type_string.length, _array TSRMLS_CC); }
-    if(_php_request.php_context->_content_length_string.length > 0) { php_register_variable_safe("CONTENT_LENGTH", (char *) _php_request.php_context->content_length_, _php_request.php_context->_content_length_string.length, _array TSRMLS_CC); }
+    php_register_variable_safe("SERVER_SOFTWARE", "viriatum", sizeof("viriatum") - 1, _array);
+    php_register_variable_safe("GATEWAY_INTERFACE", "CGI/1.1", sizeof("CGI/1.1") - 1, _array);
+    php_register_variable_safe("SERVER_PROTOCOL", "HTTP/1.1", sizeof("HTTP/1.1") - 1, _array);
+    php_register_variable_safe("SERVER_NAME", (char *) _php_request.php_context->server_name, _php_request.php_context->_server_name_string.length, _array);
+    php_register_variable_safe("SERVER_PORT", (char *) port, port_string->length, _array);
+    php_register_variable_safe("REQUEST_URI", (char *) _php_request.php_context->url, _php_request.php_context->_url_string.length, _array);
+    php_register_variable_safe("SCRIPT_NAME", (char *) _php_request.php_context->file_name, _php_request.php_context->_file_name_string.length, _array);
+    php_register_variable_safe("SCRIPT_FILENAME", (char *) _php_request.php_context->file_path, _php_request.php_context->_file_path_string.length, _array);
+    php_register_variable_safe("QUERY_STRING", (char *) _php_request.php_context->query, _php_request.php_context->_query_string.length, _array);
+    php_register_variable_safe("REQUEST_METHOD", (char *) _php_request.php_context->method, strlen(_php_request.php_context->method), _array);
+    php_register_variable_safe("REMOTE_ADDR", address_string, strlen(address_string), _array);
+    if(_php_request.php_context->_content_type_string.length > 0) { php_register_variable_safe("CONTENT_TYPE", (char *)  _php_request.php_context->content_type, _php_request.php_context->_content_type_string.length, _array); }
+    if(_php_request.php_context->_content_length_string.length > 0) { php_register_variable_safe("CONTENT_LENGTH", (char *) _php_request.php_context->content_length_, _php_request.php_context->_content_length_string.length, _array); }
 }
 
-void _module_log(char *message TSRMLS_DC) {
+void _module_log(const char *message, int syslog_type_int) {
     V_DEBUG_CTX_F("mod_php", "%s\n", message);
 }
 
-double _module_request_time(TSRMLS_D) {
-    return 0;
+zend_result _module_request_time(double *request_time) {
+    *request_time = 0;
+    return SUCCESS;
 }
 
 ZEND_MINFO_FUNCTION(viriatum_information) {
@@ -252,11 +262,11 @@ PHP_FUNCTION(viriatum_connections_l) {
     char is_empty;
     struct iterator_t *iterator;
     struct connection_t *connection;
-    zval *connection_array;
+    zval connection_array;
     unsigned long long delta;
     char uptime[128];
 
-    /* intializes the return value of the function as an
+    /* initializes the return value of the function as an
     associative array to be used y the zend system */
     array_init(return_value);
 
@@ -268,7 +278,7 @@ PHP_FUNCTION(viriatum_connections_l) {
     used in the appending of the values to the array */
     index = 0;
 
-    /* iterates continyously over the complete set of connection
+    /* iterates continuously over the complete set of connection
     in the viriatum running instance */
     while(TRUE) {
         /* retrieves the next connection value from the iterator
@@ -283,10 +293,9 @@ PHP_FUNCTION(viriatum_connections_l) {
         delta = (unsigned long long) time(NULL) - connection->creation;
         format_delta(uptime, sizeof(uptime), delta, 2);
 
-        /* creates the zend value for the connection array and then uses
-        the value to be initialized as an array */
-        MAKE_STD_ZVAL(connection_array);
-        array_init(connection_array);
+        /* initializes the zval for the connection array on the stack
+        and then uses the value to be initialized as an array */
+        array_init(&connection_array);
 
         /* verifies if the current host is empty, this is a special
         case where no resolution of the value was possible */
@@ -294,15 +303,15 @@ PHP_FUNCTION(viriatum_connections_l) {
 
         /* populates the connection array with the complete set of attributes
         that describe the connection, for latter usage by the api client */
-        if(is_empty) { add_assoc_string(connection_array, "host", "N/A", 1); }
-        else { add_assoc_string(connection_array, "host", (char *) connection->host, 1); }
-        add_assoc_long(connection_array, "id", (long) connection->id);
-        add_assoc_string(connection_array, "uptime", uptime, 1);
+        if(is_empty) { add_assoc_string(&connection_array, "host", "N/A"); }
+        else { add_assoc_string(&connection_array, "host", (char *) connection->host); }
+        add_assoc_long(&connection_array, "id", (long) connection->id);
+        add_assoc_string(&connection_array, "uptime", uptime);
 
         /* adds the connection array as the current value for the index in
         iteration, this will allow a correct iteration over the connections
         list that is going to be returned in this function */
-        add_index_zval(return_value, index, connection_array);
+        add_index_zval(return_value, index, &connection_array);
 
         /* increments the index value as the iteration cycle has
         been completed and a new index must be used (next one) */
@@ -345,7 +354,7 @@ PHP_FUNCTION(viriatum_connection_info) {
     available in the viriatum engine */
     create_iterator_linked_list(_service->connections_list, &iterator);
 
-    /* iterates continyously over the complete set of connection
+    /* iterates continuously over the complete set of connection
     in the viriatum running instance */
     while(TRUE) {
         /* retrieves the next connection value from the iterator
@@ -387,16 +396,16 @@ PHP_FUNCTION(viriatum_connection_info) {
 
         /* populates the connection array with the complete set of attributes
         that describe the connection, for latter usage by the api client */
-        if(is_empty) { add_assoc_string(return_value, "host", "N/A", 1); }
-        else { add_assoc_string(return_value, "host", (char *) connection->host, 1); }
+        if(is_empty) { add_assoc_string(return_value, "host", "N/A"); }
+        else { add_assoc_string(return_value, "host", (char *) connection->host); }
         add_assoc_long(return_value, "port", (long) connection->port);
         add_assoc_long(return_value, "id", (long) connection->id);
-        add_assoc_string(return_value, "status", status, 1);
-        add_assoc_string(return_value, "family", family, 1);
-        add_assoc_string(return_value, "protocol", protocol, 1);
-        add_assoc_string(return_value, "uptime", uptime, 1);
-        add_assoc_string(return_value, "sent", sent, 1);
-        add_assoc_string(return_value, "received", received, 1);
+        add_assoc_string(return_value, "status", status);
+        add_assoc_string(return_value, "family", family);
+        add_assoc_string(return_value, "protocol", protocol);
+        add_assoc_string(return_value, "uptime", uptime);
+        add_assoc_string(return_value, "sent", sent);
+        add_assoc_string(return_value, "received", received);
         add_assoc_bool(return_value, "secure", (int) connection->is_secure);
 
         /* breaks the loop as the proper connection has been found and the
@@ -414,49 +423,49 @@ PHP_FUNCTION(viriatum_connections) {
 }
 
 PHP_FUNCTION(viriatum_uptime) {
-    RETURN_STRING(_service->get_uptime(_service, 2), 1);
+    RETURN_STRING(_service->get_uptime(_service, 2));
 }
 
 PHP_FUNCTION(viriatum_name) {
-    RETURN_STRING((char *) _service->name, 1);
+    RETURN_STRING((char *) _service->name);
 }
 
 PHP_FUNCTION(viriatum_version) {
-    RETURN_STRING((char *) _service->version, 1);
+    RETURN_STRING((char *) _service->version);
 }
 
 PHP_FUNCTION(viriatum_platform) {
-    RETURN_STRING((char *) _service->platform, 1);
+    RETURN_STRING((char *) _service->platform);
 }
 
 PHP_FUNCTION(viriatum_flags) {
-    RETURN_STRING((char *) _service->flags, 1);
+    RETURN_STRING((char *) _service->flags);
 }
 
 PHP_FUNCTION(viriatum_compiler) {
-    RETURN_STRING((char *) _service->compiler, 1);
+    RETURN_STRING((char *) _service->compiler);
 }
 
 PHP_FUNCTION(viriatum_compiler_version) {
-    RETURN_STRING((char *) _service->compiler_version, 1);
+    RETURN_STRING((char *) _service->compiler_version);
 }
 
 PHP_FUNCTION(viriatum_compilation_date) {
-    RETURN_STRING((char *) _service->compilation_date, 1);
+    RETURN_STRING((char *) _service->compilation_date);
 }
 
 PHP_FUNCTION(viriatum_compilation_time) {
-    RETURN_STRING((char *) _service->compilation_time, 1);
+    RETURN_STRING((char *) _service->compilation_time);
 }
 
 PHP_FUNCTION(viriatum_compilation_flags) {
-    RETURN_STRING((char *) _service->compilation_flags, 1);
+    RETURN_STRING((char *) _service->compilation_flags);
 }
 
 PHP_FUNCTION(viriatum_modules) {
-    RETURN_STRING((char *) _service->modules, 1);
+    RETURN_STRING((char *) _service->modules);
 }
 
 PHP_FUNCTION(viriatum_description) {
-    RETURN_STRING((char *) _service->description, 1);
+    RETURN_STRING((char *) _service->description);
 }

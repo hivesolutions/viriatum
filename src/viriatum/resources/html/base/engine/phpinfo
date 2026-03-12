@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Viriatum / PHP Info</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+        <!-- favicon inclusion -->
+        <link rel="shortcut icon" href="/resources/images/favicon.ico" />
+    </head>
+    <body>
+        <pre style="font-family: monospace; margin: 20px auto 20px auto; width: fit-content;">
+            _      _       _
+ __   ___ _(_)_ __(_) __ _| |_ _   _ _ __ ___
+ \ \ / / | '_| | |/ _` | __| | | | '_ ` _ \
+  \ V /| | | | | | (_| | |_| |_| | | | | | |
+   \_/ |_|_| |_|_|\__,_|\__|\__,_|_| |_| |_|
+
+  engine:  viriatum (php handler)
+  version: <?php echo(viriatum_version()) ?>
+
+  php:     <?php echo(phpversion()) ?>
+
+</pre>
+        <hr />
+        <?php phpinfo(); ?>
+    </body>
+</html>

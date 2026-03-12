@@ -41,7 +41,7 @@ typedef struct mod_wsgi_location_t {
      * The path to the default file to
      * be used for the parsing.
      */
-    char *file_path;
+    char file_path[VIRIATUM_MAX_PATH_SIZE];
 
     /**
      * Flag that controls if the script should
@@ -77,7 +77,7 @@ typedef struct mod_wsgi_http_handler_t {
      * The path to the default file to
      * be used for the parsing.
      */
-    char *file_path;
+    char file_path[VIRIATUM_MAX_PATH_SIZE];
 
     /**
      * Flag that controls if the script should

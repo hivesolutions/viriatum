@@ -26,6 +26,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+* Upgraded mod_wsgi from Python 2.7 to Python 3 (PyGILState API, modern embed workflow)
+* Upgraded mod_php from PHP 5.6 to PHP 8.x (libphp.so, updated header paths)
+* `Dockerfile.all` rewritten: uses Alpine system packages (python3-dev, php84-embed, lua5.1-dev) instead of building Python 2.7 and PHP 5.6 from source
+* `Dockerfile.php` updated from PHP 5.6 source build to php84-embed Alpine package
+* Static `file_path` buffers in mod_lua and mod_wsgi handler structs (eliminates MALLOC/FREE for path strings)
+* ASCII art banner and runtime diagnostics in handler.lua, handler.wsgi, and phpinfo page
+* Module documentation in README updated for Python 3, PHP 8, and modern package managers
+* Autoconf m4 macros modernized: mod_php detects `libphp` (PHP 8+), mod_wsgi auto-detects Python 3 via `python3-config`, mod_lua tries multiple library names across distros
+* Header detection in m4 switched from `AC_CHECK_HEADERS` to `AC_COMPILE_IFELSE` for PHP, Python, and Lua (fixes false negatives with complex headers)
+* Added `www_root` configuration option to override the compile-time web root for file serving
 * Migrated from Conan 1 to Conan 2 across all CMake CI jobs (GCC, Windows, macOS)
 * Updated `conanfile.txt` generators from `cmake` to `CMakeToolchain` and `CMakeDeps`
 * Removed Conan 1 specific `conanbuildinfo.cmake` integration from `CMakeLists.txt`
@@ -44,3 +54,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Fixed `REQUEST_URI` length using path size instead of full URL size in mod_php handler
 * Connection info page now shows "not found" message instead of empty fields for closed connections
 * Fixed `setvbuf` crash on Windows/MSVC by using `_IONBF` (unbuffered) instead of `_IOLBF` which rejects size 0
+* Fixed error and directory listing templates not respecting `www_root` config (was using compile-time resources path)
+* Fixed multiple Python C API reference leaks in mod_wsgi on error paths (handler, extension, entry)
+* Fixed missing GIL release on type-error path in mod_wsgi response data callback
+* Fixed `zend_string` memory leak in mod_php INI entry setup (missing `zend_string_release`)

@@ -134,6 +134,6 @@ VIRIATUM_EXPORT_PREFIX ERROR_CODE _load_php_state();
 VIRIATUM_EXPORT_PREFIX ERROR_CODE _unload_php_state();
 VIRIATUM_EXPORT_PREFIX ERROR_CODE _reload_php_state();
 VIRIATUM_EXPORT_PREFIX ERROR_CODE _start_php_state();
-VIRIATUM_EXPORT_PREFIX int _write_php_state(const char *data, unsigned int data_size TSRMLS_DC);
-VIRIATUM_EXPORT_PREFIX void _log_php_state(char *message);
+VIRIATUM_EXPORT_PREFIX size_t _write_php_state(const char *data, size_t data_size);
+VIRIATUM_EXPORT_PREFIX void _log_php_state(const char *message, int syslog_type_int);
 VIRIATUM_EXPORT_PREFIX void _error_php_state(int type, const char *message, ...);

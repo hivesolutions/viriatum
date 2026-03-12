@@ -125,7 +125,7 @@ There are a lot of possible building features to enable
 
 ## Modules
 
-There are a series of modules for the viriatum server that are used to extend functionaly
+There are a series of modules for the viriatum server that are used to extend functionality
 of the base server, in order to compile then some rules apply.
 Current modules include:
 
@@ -135,61 +135,80 @@ Current modules include:
 
 ### Lua Module
 
-For an Ubuntu Linux environment the Lua 5.1 development packages must be included using:
+For an Ubuntu/Debian environment the Lua 5.1 development packages must be included using:
 
     apt-get install liblua5.1-0-dev
 
+On Alpine Linux:
+
+    apk add lua5.1-dev
+
 ### PHP Module
 
-Must compile the PHP interpreter with support for embeding, this should create the library with the propr SAPI
-symbols loaded.
+Requires PHP 8.x compiled with the embed SAPI. On Alpine Linux the simplest approach is to use the
+system packages:
+
+    apk add php84-dev php84-embed
+
+When building PHP from source, compile with embed SAPI support (the library is now named `libphp.so`
+instead of the old `libphp5.so`):
 
     ./configure --enable-embed
 
-For static linking of the PHP library, useful for package distribution the following command may be used so
-that no external library dependencies are created. Note that the `-fPIc` flag must be set to allow the creation
-of static library for position independent code.
+For static linking, useful for package distribution:
 
     export CFLAGS="-fpic"
     ./configure --enable-embed=static --disable-libxml --disable-dom --disable-simplexml\
         --disable-xml --disable-xmlreader --disable-xmlwriter --without-pear --without-iconv
 
-In order to configure the PHP interpreter to locate the php.ini file in the correct location use:
+The PHP module must then be compiled with `CFLAGS` pointing to the PHP include directories.
+The easiest way is to use `php-config`:
 
-    --with-config-file-path=/usr/lib
+    export CFLAGS="$(php-config --includes)"
 
-Additional libraries may be linked and a typical compilation of the PHP distribution would include the following
-flags required by most of the applications.
-
-    --enable-bcmath --with-mysql --with-mysqli --with-gmp --with-openssl
-
-Additional information about the compilation flags may be found [here](http://php.net/manual/en/configure.about.php).
-
-The PHP module must then be compiled with `CFLAGS` environment variable set to point to the proper include directories
-so that the module code is able to compiled against these header files.
+Or manually:
 
     export CFLAGS="-I/usr/local/include/php -I/usr/local/include/php/main\
         -I/usr/local/include/php/TSRM -I/usr/local/include/php/Zend"
 
+Additional information about PHP compilation flags may be found [here](https://www.php.net/manual/en/configure.about.php).
+
 ### WSGI Module
 
-For an ubuntu linux environment the python development packages must be included using:
+Requires Python 3 development headers and shared library. On Ubuntu/Debian:
 
-    apt-get install python2.7-dev
+    apt-get install python3-dev
 
-Must compile viriatum with special environment variables set to point to the correct headers directory.
+On Alpine Linux:
 
-    export CFLAGS="-I/usr/include/python2.7"
-    export CFLAGS="-I/System/Library/Frameworks/Python.framework/Headers"
+    apk add python3-dev
+
+On macOS (Homebrew):
+
+    brew install python3
+
+The module is compiled with flags from `python3-config`:
+
+    export CFLAGS="$(python3-config --includes)"
+    export LDFLAGS="$(python3-config --ldflags --embed)"
 
 ## Docker
 
-It's possible to run viriatum inside a docker container and pre-built images
-have been created under the public repository.
+It's possible to run viriatum inside a Docker container. Three Dockerfiles are provided:
 
-To use viriatum using these pre-built images use the following command:
+* `Dockerfile` - Core server only (~11 MB)
+* `Dockerfile.php` - Core + mod_php with PHP 8.4 (~22 MB)
+* `Dockerfile.all` - All modules: diag, gif, lua, php, wsgi (~112 MB)
 
-    docker run -d joamag/devel /usr/sbin/viriatum
+To build and run:
+
+    docker build -t viriatum .
+    docker run -p 9090:9090 viriatum
+
+To build the full image with all modules:
+
+    docker build -f Dockerfile.all -t viriatum-all .
+    docker run -p 9090:9090 viriatum-all
 
 ## Benchmarking
 

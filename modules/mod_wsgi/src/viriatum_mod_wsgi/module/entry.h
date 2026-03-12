@@ -27,15 +27,8 @@
 #include "handler.h"
 #include "extension.h"
 
-#ifdef PYTHON_THREADS
-#define VIRIATUM_ACQUIRE_GIL PyEval_AcquireLock();\
-    PyThreadState_Swap(_state)
-#define VIRIATUM_RELEASE_GIL PyThreadState_Swap(NULL);\
-    PyEval_ReleaseLock()
-#else
-#define VIRIATUM_ACQUIRE_GIL
-#define VIRIATUM_RELEASE_GIL
-#endif
+#define VIRIATUM_ACQUIRE_GIL PyGILState_STATE _gstate = PyGILState_Ensure()
+#define VIRIATUM_RELEASE_GIL PyGILState_Release(_gstate)
 
 /**
  * The path to the file to be used as default
@@ -56,8 +49,7 @@
 #define START_GLOBALS struct service_t *_service;\
     struct connection_t *_connection;\
     struct http_headers_t _headers;\
-    struct wsgi_request_t _wsgi_request;\
-    PyThreadState *_state
+    struct wsgi_request_t _wsgi_request;
 
 /**
  * Structure describing the internal
@@ -157,13 +149,6 @@ VIRIATUM_EXTERNAL_PREFIX struct http_headers_t _headers;
  * appropriate viriatum request handler.
  */
 VIRIATUM_EXTERNAL_PREFIX struct wsgi_request_t _wsgi_request;
-
-/**
- * The global reference to the state of the main controlling
- * thread so that it's possible to chenge the state to the
- * main thread for processing.
- */
-VIRIATUM_EXTERNAL_PREFIX PyThreadState *_state;
 
 VIRIATUM_EXPORT_PREFIX ERROR_CODE create_mod_wsgi_module(struct mod_wsgi_module_t **mod_wsgi_module_pointer, struct module_t *module);
 VIRIATUM_EXPORT_PREFIX ERROR_CODE delete_mod_wsgi_module(struct mod_wsgi_module_t *mod_wsgi_module);

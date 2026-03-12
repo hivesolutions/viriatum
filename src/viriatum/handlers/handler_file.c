@@ -262,6 +262,16 @@ ERROR_CODE url_callback_handler_file(struct http_parser_t *http_parser, const un
     struct handler_file_context_t *handler_file_context =\
         (struct handler_file_context_t *) http_parser->context;
 
+    /* retrieves the connection from the HTTP parser parameters and
+    then uses it to reach the service options for path resolution */
+    struct connection_t *connection = (struct connection_t *) http_parser->parameters;
+    struct service_t *service = connection->service;
+    struct service_options_t *options = service->options;
+
+    /* resolves the contents path to be used for file serving,
+    using the www root override if set or the default otherwise */
+    char *contents_path = options->www_root[0] != '\0' ? (char *) options->www_root : VIRIATUM_CONTENTS_PATH;
+
     /* checks the position of the get parameters divisor position
     and then uses it to calculate the size of the (base) path */
     char *pointer = (char *) memchr((char *) data, '?', data_size);
@@ -282,7 +292,7 @@ ERROR_CODE url_callback_handler_file(struct http_parser_t *http_parser, const un
         (char *) handler_file_context->file_path,
         VIRIATUM_MAX_PATH_SIZE,
         "%s%s%s",
-        VIRIATUM_CONTENTS_PATH,
+        contents_path,
         VIRIATUM_BASE_PATH,
         handler_file_context->url
     );
@@ -548,12 +558,15 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
         /* otherwise it's the correct directory location and must present the
         listing of the directory to the user agent */
         else {
-            /* creates the complete path to the template file */
+            /* creates the complete path to the template file, using the
+            www root override for the resources path if available */
+            char *_resources_path = connection->service->options->www_root[0] != '\0'
+                ? (char *) connection->service->options->www_root : VIRIATUM_RESOURCES_PATH;
             SPRINTF(
                 (char *) template_path,
                 sizeof(template_path),
                 "%s%s",
-                VIRIATUM_RESOURCES_PATH,
+                _resources_path,
                 VIRIATUM_LISTING_PATH
             );
 
@@ -922,6 +935,16 @@ ERROR_CODE path_callback_handler_file(struct http_parser_t *http_parser, const u
         (struct handler_file_context_t *) http_parser->context;
     unsigned char *base_path = handler_file_context->base_path;
 
+    /* retrieves the connection from the HTTP parser parameters and
+    then uses it to reach the service options for path resolution */
+    struct connection_t *connection = (struct connection_t *) http_parser->parameters;
+    struct service_t *service = connection->service;
+    struct service_options_t *options = service->options;
+
+    /* resolves the contents path to be used for file serving,
+    using the www root override if set or the default otherwise */
+    char *contents_path = options->www_root[0] != '\0' ? (char *) options->www_root : VIRIATUM_CONTENTS_PATH;
+
     /* copies the memory from the data to the url and then
     puts the end of string in the url, note that only the path
     part of the string is used for the url */
@@ -940,7 +963,7 @@ ERROR_CODE path_callback_handler_file(struct http_parser_t *http_parser, const u
             (char *) handler_file_context->file_path,
             VIRIATUM_MAX_PATH_SIZE,
             "%s%s%s",
-            VIRIATUM_CONTENTS_PATH,
+            contents_path,
             VIRIATUM_BASE_PATH,
             handler_file_context->url
         );

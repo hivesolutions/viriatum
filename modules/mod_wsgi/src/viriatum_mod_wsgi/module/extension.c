@@ -72,8 +72,8 @@ PyObject *wsgi_start_response(PyObject *self, PyObject *args) {
     name and value but also for their internal buffers */
     PyObject *header_name;
     PyObject *header_value;
-    char *_header_name;
-    char *_header_value;
+    const char *_header_name;
+    const char *_header_value;
 
     /* allocates space for the result value from the parsing of the
     arguments, in the initial part of the function */
@@ -94,12 +94,12 @@ PyObject *wsgi_start_response(PyObject *self, PyObject *args) {
     SSCANF(error_code, "%d %s", &_wsgi_request.status_code, _wsgi_request.status_message);
 #endif
 
-    /* creates the iterator to be used to percolate arround
+    /* creates the iterator to be used to percolate around
     the various header tuples */
     iterator = PyObject_GetIter(headers);
     if(iterator == NULL) { RAISE_NO_ERROR; }
 
-    /* iterates continuously to percolate arround the various
+    /* iterates continuously to percolate around the various
     header tuples */
     while(1) {
         /* retrieves the next iterator item and breaks the
@@ -113,8 +113,14 @@ PyObject *wsgi_start_response(PyObject *self, PyObject *args) {
 
         /* converts the header name and value into a linear
         string buffer so that is possible to format them */
-        _header_name = PyString_AsString(header_name);
-        _header_value = PyString_AsString(header_value);
+        _header_name = PyUnicode_AsUTF8(header_name);
+        _header_value = PyUnicode_AsUTF8(header_value);
+        if(_header_name == NULL || _header_value == NULL) {
+            Py_XDECREF(header_value);
+            Py_XDECREF(header_name);
+            Py_DECREF(item);
+            continue;
+        }
 
         /* checks if the current header is the content length
         header in such case the length set flag must be set in
@@ -152,7 +158,11 @@ PyObject *wsgi_start_response(PyObject *self, PyObject *args) {
     /* retrieves the reference to the write function from the WSGI module
     and then verifies that it's a valid python function */
     write_function = PyObject_GetAttrString(wsgi_module, "write");
-    if(!write_function || !PyCallable_Check(write_function)) { return NULL; }
+    if(!write_function || !PyCallable_Check(write_function)) {
+        Py_XDECREF(write_function);
+        Py_DECREF(wsgi_module);
+        return NULL;
+    }
 
     /* builds the return value with the write function so
     that the caller function may write directly to the stream */
@@ -207,7 +217,7 @@ PyObject *wsgi_input_read(PyObject *self, PyObject *args) {
     struct wsgi_input_t *_self = (struct wsgi_input_t *) self;
 
     size_t remaining = _self->size - _self->position;
-    PyObject *buffer = PyString_FromStringAndSize((char *) &_self->post_data[_self->position], remaining);
+    PyObject *buffer = PyBytes_FromStringAndSize((char *) &_self->post_data[_self->position], remaining);
     _self->position += remaining;
 
     return buffer;
@@ -255,16 +265,15 @@ PyMethodDef input_methods[5] = {
 };
 
 PyTypeObject input_type = {
-    PyObject_HEAD_INIT(NULL)
-    0,
+    PyVarObject_HEAD_INIT(NULL, 0)
     "viriatum_wsgi.input",                     /* tp_name */
     sizeof(struct wsgi_input_t),               /* tp_basicsize */
     0,                                         /* tp_itemsize*/
     (destructor) dealloc_wsgi_input,           /* tp_dealloc */
-    0,                                         /* tp_print */
+    0,                                         /* tp_vectorcall_offset */
     0,                                         /* tp_getattr */
     0,                                         /* tp_setattr */
-    0,                                         /* tp_compare */
+    0,                                         /* tp_as_async */
     0,                                         /* tp_repr */
     0,                                         /* tp_as_number */
     0,                                         /* tp_as_sequence */
@@ -275,11 +284,7 @@ PyTypeObject input_type = {
     0,                                         /* tp_getattro */
     0,                                         /* tp_setattro */
     0,                                         /* tp_as_buffer */
-#if defined(Py_TPFLAGS_HAVE_ITER)
-    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_HAVE_ITER, /* tp_flags */
-#else
     Py_TPFLAGS_DEFAULT,                        /* tp_flags */
-#endif
     0,                                         /* tp_doc */
     0,                                         /* tp_traverse */
     0,                                         /* tp_clear */

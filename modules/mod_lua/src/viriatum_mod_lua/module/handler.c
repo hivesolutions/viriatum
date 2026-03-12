@@ -36,7 +36,7 @@ ERROR_CODE create_mod_lua_http_handler(struct mod_lua_http_handler_t **mod_lua_h
 
     /* sets the mod Lua HTTP handler attributes (default) values */
     mod_lua_http_handler->lua_state = NULL;
-    mod_lua_http_handler->file_path = NULL;
+    mod_lua_http_handler->file_path[0] = '\0';
     mod_lua_http_handler->file_dirty = 0;
     mod_lua_http_handler->locations = NULL;
     mod_lua_http_handler->locations_count = 0;
@@ -167,7 +167,7 @@ ERROR_CODE location_callback_handler_lua(struct http_parser_t *http_parser, size
     /* retrieves the current location from the location buffer and checks if the
     file path value is correctly set */
     struct mod_lua_location_t *location = &mod_lua_http_handler->locations[index];
-    if(location->file_path == NULL) { RAISE_NO_ERROR; }
+    if(location->file_path[0] == '\0') { RAISE_NO_ERROR; }
 
     /* sets the current location reference in the handler so that the
     response handler uses the location-specific Lua state and script
