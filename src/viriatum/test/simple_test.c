@@ -917,8 +917,45 @@ const char *test_md5(void) {
     /* allocates space for the md5 result */
     unsigned char result[MD5_DIGEST_SIZE];
 
+    /* the expected md5 digest for "Hello World" is
+    b10a8db164e0754105b7a99be72e3fe5 */
+    unsigned char expected[] = {
+        0xb1, 0x0a, 0x8d, 0xb1, 0x64, 0xe0, 0x75, 0x41,
+        0x05, 0xb7, 0xa9, 0x9b, 0xe7, 0x2e, 0x3f, 0xe5
+    };
+
     /* calculates the md5 hash value into the result */
     md5((unsigned char *) "Hello World", 11, result);
+
+    /* verifies that the computed digest matches the
+    expected value byte by byte */
+    V_ASSERT(memcmp(result, expected, MD5_DIGEST_SIZE) == 0);
+
+    /* verifies the md5 digest for an empty string,
+    the expected value is d41d8cd98f00b204e9800998ecf8427e */
+    {
+        unsigned char empty_expected[] = {
+            0xd4, 0x1d, 0x8c, 0xd9, 0x8f, 0x00, 0xb2, 0x04,
+            0xe9, 0x80, 0x09, 0x98, 0xec, 0xf8, 0x42, 0x7e
+        };
+        md5((unsigned char *) "", 0, result);
+        V_ASSERT(memcmp(result, empty_expected, MD5_DIGEST_SIZE) == 0);
+    }
+
+    /* verifies the md5 digest for a longer string to
+    exercise the multi-block code path */
+    {
+        unsigned char long_expected[] = {
+            0x90, 0x01, 0x50, 0x98, 0x3c, 0xd2, 0x4f, 0xb0,
+            0xd6, 0x96, 0x3f, 0x7d, 0x28, 0xe1, 0x7f, 0x72
+        };
+        md5(
+            (unsigned char *) "abc",
+            3,
+            result
+        );
+        V_ASSERT(memcmp(result, long_expected, MD5_DIGEST_SIZE) == 0);
+    }
 
     /* returns the default value, nothing happened so there's
     nothing to report for this execution */
@@ -929,8 +966,44 @@ const char *test_sha1(void) {
     /* allocates space for the sha1 result */
     unsigned char result[SHA1_DIGEST_SIZE];
 
+    /* the expected sha1 digest for "Hello World" is
+    0a4d55a8d778e5022fab701977c5d840bbc486d0 */
+    unsigned char expected[] = {
+        0x0a, 0x4d, 0x55, 0xa8, 0xd7, 0x78, 0xe5, 0x02,
+        0x2f, 0xab, 0x70, 0x19, 0x77, 0xc5, 0xd8, 0x40,
+        0xbb, 0xc4, 0x86, 0xd0
+    };
+
     /* calculates the sha1 hash value into the result */
     sha1((unsigned char *) "Hello World", 11, result);
+
+    /* verifies that the computed digest matches the
+    expected value byte by byte */
+    V_ASSERT(memcmp(result, expected, SHA1_DIGEST_SIZE) == 0);
+
+    /* verifies the sha1 digest for an empty string,
+    the expected value is da39a3ee5e6b4b0d3255bfef95601890afd80709 */
+    {
+        unsigned char empty_expected[] = {
+            0xda, 0x39, 0xa3, 0xee, 0x5e, 0x6b, 0x4b, 0x0d,
+            0x32, 0x55, 0xbf, 0xef, 0x95, 0x60, 0x18, 0x90,
+            0xaf, 0xd8, 0x07, 0x09
+        };
+        sha1((unsigned char *) "", 0, result);
+        V_ASSERT(memcmp(result, empty_expected, SHA1_DIGEST_SIZE) == 0);
+    }
+
+    /* verifies the sha1 digest for "abc" to exercise
+    a different input length */
+    {
+        unsigned char abc_expected[] = {
+            0xa9, 0x99, 0x3e, 0x36, 0x47, 0x06, 0x81, 0x6a,
+            0xba, 0x3e, 0x25, 0x71, 0x78, 0x50, 0xc2, 0x6c,
+            0x9c, 0xd0, 0xd8, 0x9d
+        };
+        sha1((unsigned char *) "abc", 3, result);
+        V_ASSERT(memcmp(result, abc_expected, SHA1_DIGEST_SIZE) == 0);
+    }
 
     /* returns the default value, nothing happened so there's
     nothing to report for this execution */

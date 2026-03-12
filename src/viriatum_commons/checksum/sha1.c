@@ -70,15 +70,11 @@ void update_sha1(struct sha1_context_t *context, const unsigned char *data, cons
 void final_sha1(struct sha1_context_t *context, unsigned char *digest) {
     unsigned int i;
     unsigned char finalcount[8];
-    unsigned char pad[1];
 
     for(i = 0; i < 8; i++) { finalcount[i] = (unsigned char) ((context->count[(i >= 4 ? 0 : 1)] >> ((3-(i & 3)) * 8) ) & 255); }
 
-    pad[0] = 0x80;
-    update_sha1(context, pad, 1);
-    pad[0] = 0x00;
-
-    while((context->count[0] & 504) != 448) { update_sha1(context, pad, 1); }
+    update_sha1(context, (unsigned char *)"\200", 1);
+    while((context->count[0] & 504) != 448) { update_sha1(context, (unsigned char *)"\0", 1); }
     update_sha1(context, finalcount, 8);
     for(i = 0; i < SHA1_DIGEST_SIZE; i++) { digest[i] = (unsigned char) ((context->state[i>>2] >> ((3-(i & 3)) * 8) ) & 255); }
 
@@ -91,7 +87,7 @@ void final_sha1(struct sha1_context_t *context, unsigned char *digest) {
     memset(finalcount, 0, 8);
 }
 
-void _transform_sha1(unsigned int state[5], const unsigned char buffer[64]) {
+void _transform_sha1(unsigned int state[5], const unsigned char *buffer) {
     unsigned int a, b, c, d, e;
     union sha1_block_t *block;
 

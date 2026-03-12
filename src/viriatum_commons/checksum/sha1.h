@@ -62,4 +62,4 @@ VIRIATUM_EXPORT_PREFIX void sha1(unsigned char *buffer, unsigned int buffer_leng
 VIRIATUM_EXPORT_PREFIX void init_sha1(struct sha1_context_t *context);
 VIRIATUM_EXPORT_PREFIX void update_sha1(struct sha1_context_t *context, const unsigned char *data, const size_t size);
 VIRIATUM_EXPORT_PREFIX void final_sha1(struct sha1_context_t *context, unsigned char *digest);
-VIRIATUM_EXPORT_PREFIX void _transform_sha1(unsigned int state[5], const unsigned char buffer[64]);
+VIRIATUM_EXPORT_PREFIX void _transform_sha1(unsigned int state[5], const unsigned char *buffer);
