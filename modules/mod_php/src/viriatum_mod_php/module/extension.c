@@ -287,7 +287,7 @@ PHP_FUNCTION(viriatum_connections_l) {
         get_next_iterator(iterator, (void **) &connection);
         if(connection == NULL) { break; }
 
-        /* retrieves the delta value by calculating the diference between
+        /* retrieves the delta value by calculating the difference between
         the current time and the creation time then uses it to calculate
         the uptime for the connection as a string description */
         delta = (unsigned long long) time(NULL) - connection->creation;

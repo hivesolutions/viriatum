@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+* WSGI module introspection methods: `connections()`, `connections_l()`, `connection_info()`, and `uptime()` for runtime server state inspection
+* WSGI module constants (`NAME`, `VERSION`, `PLATFORM`, `FLAGS`, `MODULES`, `DESCRIPTION`, `COMPILER`, `COMPILER_VERSION`, `COMPILATION_DATE`, `COMPILATION_TIME`, `COMPILATION_FLAGS`) exposed via `viriatum_wsgi` module
+* Enhanced handler.wsgi and handler.lua demo pages with server info (engine, version, platform, compiler, uptime, connections)
 * Path traversal validation (`is_path_safe`) in `viriatum_commons/util/string_util.h`
 * Unit test `test_is_path_safe` covering traversal detection and false positive avoidance
 * Dedicated `handler_file_test.c` with tests for file handler context, URL parsing, header fields, and header values
@@ -44,6 +47,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+* Replaced deprecated `Py_SetProgramName`/`Py_Initialize` with `PyConfig` API in mod_wsgi (fixes Python 3.11+ deprecation warning)
+* Fixed `DESCRIPTION` module constant in mod_wsgi pointing to `compiler` field instead of `description`
+* Fixed Python object reference leaks in `wsgi_connections_l` and `wsgi_connection_info` (missing `Py_DECREF` after `PyDict_SetItemString`)
 * Reject URLs containing `..` path traversal sequences in file handler to prevent access outside the web root
 * Fixed leaked `#pragma pack(1)` in `stream_torrent.h` causing struct alignment mismatches across compilation units
 * Fixed potential memory leak of dispatch handler path context on early connection close

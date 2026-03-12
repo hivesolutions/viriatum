@@ -26,7 +26,7 @@
 
 #include "extension.h"
 
-PyMethodDef wsgi_methods[3] = {
+PyMethodDef wsgi_methods[7] = {
     {
         "start_response",
         wsgi_start_response,
@@ -37,6 +37,30 @@ PyMethodDef wsgi_methods[3] = {
         "write",
         wsgi_write,
         METH_VARARGS,
+        NULL
+    },
+    {
+        "connections",
+        wsgi_connections,
+        METH_NOARGS,
+        NULL
+    },
+    {
+        "connections_l",
+        wsgi_connections_l,
+        METH_NOARGS,
+        NULL
+    },
+    {
+        "connection_info",
+        wsgi_connection_info,
+        METH_VARARGS,
+        NULL
+    },
+    {
+        "uptime",
+        wsgi_uptime,
+        METH_NOARGS,
         NULL
     },
     {
@@ -180,6 +204,141 @@ PyObject *wsgi_start_response(PyObject *self, PyObject *args) {
 
 PyObject *wsgi_write(PyObject *self, PyObject *args) {
     return Py_BuildValue("i", 0);
+}
+
+PyObject *wsgi_connections(PyObject *self, PyObject *args) {
+    return Py_BuildValue("l", (long) _service->connections_list->size);
+}
+
+PyObject *wsgi_connections_l(PyObject *self, PyObject *args) {
+    /* allocates space for the local variables that are
+    going to be used in the construction of the connections */
+    struct iterator_t *iterator;
+    struct connection_t *connection;
+    unsigned long long delta;
+    char uptime[128];
+    char is_empty;
+
+    /* creates a new list to hold the connection dictionaries
+    that will be returned to the python caller */
+    PyObject *list = PyList_New(0);
+
+    /* creates an iterator object for the current list of connections
+    available in the viriatum engine */
+    create_iterator_linked_list(_service->connections_list, &iterator);
+
+    /* iterates continuously over the complete set of connections
+    in the viriatum running instance */
+    while(TRUE) {
+        /* retrieves the next connection value from the iterator
+        and verifies if its value is defined in case it's not this
+        is the end of iteration and so the cycle must be break */
+        get_next_iterator(iterator, (void **) &connection);
+        if(connection == NULL) { break; }
+
+        /* retrieves the delta value by calculating the difference between
+        the current time and the creation time then uses it to calculate
+        the uptime for the connection as a string description */
+        delta = (unsigned long long) time(NULL) - connection->creation;
+        format_delta(uptime, sizeof(uptime), delta, 2);
+
+        /* verifies if the current host is empty, this is a special
+        case where no resolution of the value was possible */
+        is_empty = connection->host[0] == '\0';
+
+        /* creates a dictionary with the connection attributes and
+        appends it to the result list */
+        PyObject *dict = PyDict_New();
+        PyObject *_value;
+
+        _value = PyUnicode_FromString(is_empty ? "N/A" : (char *) connection->host);
+        PyDict_SetItemString(dict, "host", _value);
+        Py_DECREF(_value);
+
+        _value = PyLong_FromLong((long) connection->id);
+        PyDict_SetItemString(dict, "id", _value);
+        Py_DECREF(_value);
+
+        _value = PyUnicode_FromString(uptime);
+        PyDict_SetItemString(dict, "uptime", _value);
+        Py_DECREF(_value);
+
+        PyList_Append(list, dict);
+        Py_DECREF(dict);
+    }
+
+    /* deletes the iterator for the connections list in order to
+    avoid any memory leak that could arise from this */
+    delete_iterator_linked_list(_service->connections_list, iterator);
+
+    return list;
+}
+
+PyObject *wsgi_connection_info(PyObject *self, PyObject *args) {
+    /* allocates space for the local variables that are
+    going to be used in the construction of the connection info */
+    long id;
+    char is_empty;
+    struct iterator_t *iterator;
+    struct connection_t *connection;
+    unsigned long long delta;
+    char uptime[128];
+
+    /* parses the id argument from the python call */
+    if(!PyArg_ParseTuple(args, "l", &id)) { return NULL; }
+
+    /* creates an iterator object for the current list of connections
+    available in the viriatum engine */
+    create_iterator_linked_list(_service->connections_list, &iterator);
+
+    /* iterates continuously over the complete set of connections
+    searching for the one with the matching identifier */
+    while(TRUE) {
+        get_next_iterator(iterator, (void **) &connection);
+        if(connection == NULL) { break; }
+        if((long) connection->id == id) { break; }
+    }
+
+    /* deletes the iterator for the connections list in order to
+    avoid any memory leak that could arise from this */
+    delete_iterator_linked_list(_service->connections_list, iterator);
+
+    /* in case no connection was found returns none to indicate
+    that the requested connection does not exist */
+    if(connection == NULL || (long) connection->id != id) { Py_RETURN_NONE; }
+
+    /* retrieves the delta value by calculating the difference between
+    the current time and the creation time then uses it to calculate
+    the uptime for the connection as a string description */
+    delta = (unsigned long long) time(NULL) - connection->creation;
+    format_delta(uptime, sizeof(uptime), delta, 2);
+
+    /* verifies if the current host is empty, this is a special
+    case where no resolution of the value was possible */
+    is_empty = connection->host[0] == '\0';
+
+    /* creates a dictionary with the connection attributes and
+    returns it to the python caller */
+    PyObject *dict = PyDict_New();
+    PyObject *_value;
+
+    _value = PyUnicode_FromString(is_empty ? "N/A" : (char *) connection->host);
+    PyDict_SetItemString(dict, "host", _value);
+    Py_DECREF(_value);
+
+    _value = PyLong_FromLong((long) connection->id);
+    PyDict_SetItemString(dict, "id", _value);
+    Py_DECREF(_value);
+
+    _value = PyUnicode_FromString(uptime);
+    PyDict_SetItemString(dict, "uptime", _value);
+    Py_DECREF(_value);
+
+    return dict;
+}
+
+PyObject *wsgi_uptime(PyObject *self, PyObject *args) {
+    return PyUnicode_FromString(_service->get_uptime(_service, 2));
 }
 
 PyObject *_new_wsgi_input(unsigned char *post_data, size_t size) {

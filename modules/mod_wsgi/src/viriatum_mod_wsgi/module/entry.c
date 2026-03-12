@@ -325,24 +325,30 @@ ERROR_CODE _load_locations_wsgi(struct service_t *service, struct mod_wsgi_http_
 }
 
 ERROR_CODE _load_wsgi_state() {
-    /* converts the program name to wide char for Python 3 and
-    sets it in the interpreter configuration */
+    /* initializes the python interpreter using the PyConfig API,
+    setting the program name from the service configuration */
+    PyConfig config;
+    PyConfig_InitPythonConfig(&config);
+
+    /* converts the program name to wide char and sets it in
+    the interpreter configuration structure */
     wchar_t *program_name = Py_DecodeLocale(
         (char *) _service->program_name, NULL
     );
-    if(program_name != NULL) { Py_SetProgramName(program_name); }
+    if(program_name != NULL) {
+        PyConfig_SetString(&config, &config.program_name, program_name);
+        PyMem_RawFree(program_name);
+    }
 
     /* starts the python interpreter initializing all the resources
     related with the virtual machine, this is the main entry point
     for the python interpreter (virtual machine) */
-    Py_Initialize();
+    Py_InitializeFromConfig(&config);
+    PyConfig_Clear(&config);
 
     /* starts the WSGI state updating the major global value in
     the current interpreter state */
     _start_wsgi_state();
-
-    /* frees the wide char program name if it was allocated */
-    if(program_name != NULL) { PyMem_RawFree(program_name); }
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -403,12 +409,13 @@ ERROR_CODE _start_wsgi_state() {
     PyModule_AddStringConstant(wsgi_module, "VERSION", (char *) _service->version);
     PyModule_AddStringConstant(wsgi_module, "PLATFORM", (char *) _service->platform);
     PyModule_AddStringConstant(wsgi_module, "FLAGS", (char *) _service->flags);
+    PyModule_AddStringConstant(wsgi_module, "MODULES", (char *) _service->modules);
+    PyModule_AddStringConstant(wsgi_module, "DESCRIPTION", (char *) _service->description);
     PyModule_AddStringConstant(wsgi_module, "COMPILER", (char *) _service->compiler);
     PyModule_AddStringConstant(wsgi_module, "COMPILER_VERSION", (char *) _service->compiler_version);
     PyModule_AddStringConstant(wsgi_module, "COMPILATION_DATE", (char *) _service->compilation_date);
     PyModule_AddStringConstant(wsgi_module, "COMPILATION_TIME", (char *) _service->compilation_time);
     PyModule_AddStringConstant(wsgi_module, "COMPILATION_FLAGS", (char *) _service->compilation_flags);
-    PyModule_AddStringConstant(wsgi_module, "DESCRIPTION", (char *) _service->compiler);
 
     /* checks the input type for readiness and then casts the
     type as a python type and registers it as input */

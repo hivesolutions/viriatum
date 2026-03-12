@@ -4,8 +4,8 @@
 # Example WSGI handler for Viriatum Web Server.
 # Accessible at /wsgi_demo when the wsgi handler is configured.
 
-import sys
 import platform
+import viriatum_wsgi
 
 def application(environ, start_response):
     body = (
@@ -15,16 +15,36 @@ def application(environ, start_response):
         "  \\ V /| | | | | | (_| | |_| |_| | | | | | |\n"
         "   \\_/ |_|_| |_|_|\\__,_|\\__|\\__,_|_| |_| |_|\n"
         "\n"
-        "  engine:   viriatum (wsgi handler)\n"
-        "  runtime:  Python %s\n"
-        "  platform: %s\n"
-        "  method:   %s %s\n"
-        "  status:   ok\n"
+        "  engine:      %s (wsgi handler)\n"
+        "  version:     %s\n"
+        "  platform:    %s\n"
+        "  description: %s\n"
+        "\n"
+        "  uptime:      %s\n"
+        "  connections: %d\n"
+        "  method:      %s %s\n"
+        "\n"
+        "  runtime:     Python %s\n"
+        "  compiler:    %s / %s\n"
+        "  compiled:    %s @ %s\n"
+        "  flags:       %s\n"
+        "  modules:     %s\n"
         % (
-            platform.python_version(),
-            platform.platform(),
+            viriatum_wsgi.NAME,
+            viriatum_wsgi.VERSION,
+            viriatum_wsgi.PLATFORM,
+            viriatum_wsgi.DESCRIPTION,
+            viriatum_wsgi.uptime(),
+            viriatum_wsgi.connections(),
             environ.get("REQUEST_METHOD", "?"),
             environ.get("PATH_INFO", "/"),
+            platform.python_version(),
+            viriatum_wsgi.COMPILER,
+            viriatum_wsgi.COMPILER_VERSION,
+            viriatum_wsgi.COMPILATION_DATE,
+            viriatum_wsgi.COMPILATION_TIME,
+            viriatum_wsgi.COMPILATION_FLAGS,
+            viriatum_wsgi.MODULES,
         )
     )
     body = body.encode("utf-8")
