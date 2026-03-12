@@ -90,10 +90,19 @@
     <ClCompile Include="..\..\src\viriatum\system\torrent.c">
       <Filter>Source Files\System</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\viriatum\test\handler_dispatch_test.c">
+      <Filter>Source Files\Test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum\test\handler_file_test.c">
+      <Filter>Source Files\Test</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\src\viriatum\test\simple_test.c">
       <Filter>Source Files\Test</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\viriatum\test\speed_test.c">
+      <Filter>Source Files\Test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum\test\test_support.c">
       <Filter>Source Files\Test</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\viriatum\module\loading.c">
@@ -188,6 +197,12 @@
     <ClInclude Include="..\..\src\viriatum\system\torrent.h">
       <Filter>Header Files\System</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\viriatum\test\handler_dispatch_test.h">
+      <Filter>Header Files\Test</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum\test\handler_file_test.h">
+      <Filter>Header Files\Test</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\src\viriatum\test\simple_test.h">
       <Filter>Header Files\Test</Filter>
     </ClInclude>
@@ -195,6 +210,9 @@
       <Filter>Header Files\Test</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\viriatum\test\test.h">
+      <Filter>Header Files\Test</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum\test\test_support.h">
       <Filter>Header Files\Test</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\viriatum\module\loading.h">
