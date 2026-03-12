@@ -378,6 +378,13 @@ ERROR_CODE write_http_error_a(
             );
             RAISE_NO_ERROR;
         }
+
+        /* prints a debug message about the template contents being sent */
+        V_DEBUG_F(
+            "Sending template contents from '%s' (%lu bytes)\n",
+            template_path,
+            (unsigned long) strlen((char *) template_handler->string_value)
+        );
         realm == NULL ? write_http_headers_c(
             connection,
             headers_buffer,
