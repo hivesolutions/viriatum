@@ -24,7 +24,32 @@ For cross compilation (eg: arm-rasp-linux) use the following command:
 
 If you want to know more about cross compilation please refer to the [Cross Compilation](doc/cross.md) document.
 
-### Source Control Repository
+### CMake
+
+CMake is the recommended build system for local development and IDE integration.
+
+    cmake -B build
+    cmake --build build
+
+The binary is placed under `build/bin/viriatum`.
+
+For a debug build (enables debug logging with file/line info and `V_DEBUG` output):
+
+    cmake -DCMAKE_BUILD_TYPE=Debug -B build
+    cmake --build build
+
+Debug logging can also be enabled independently of the optimization level:
+
+    cmake -D VIRIATUM_DEBUG=ON -B build
+    cmake --build build
+
+If the project has Conan-managed dependencies, install them first:
+
+    conan install . --output-folder=build --build=missing -s build_type=Debug
+    cmake -B build -DCMAKE_BUILD_TYPE=Debug --toolchain build/conan_toolchain.cmake
+    cmake --build build
+
+### Autoconf / Automake
 
 If you're going to build viriatum using the git repository you first need to generate the configure
 files using autoconf.
