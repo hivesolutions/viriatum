@@ -46,7 +46,7 @@ endif()
 if(PHP_FOUND)
     file(GLOB MOD_PHP_SOURCES src/viriatum_mod_php/*.c src/viriatum_mod_php/module/*.c)
     add_library(viriatum_mod_php MODULE ${MOD_PHP_SOURCES})
-    set_target_properties(viriatum_mod_php PROPERTIES PREFIX "lib" SUFFIX ${MODULE_SUFFIX})
+    set_target_properties(viriatum_mod_php PROPERTIES PREFIX "${MODULE_PREFIX}" SUFFIX ${MODULE_SUFFIX})
     target_include_directories(viriatum_mod_php PRIVATE
         src/viriatum_mod_php
         ${CMAKE_SOURCE_DIR}/src/viriatum

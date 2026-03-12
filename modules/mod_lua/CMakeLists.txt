@@ -12,7 +12,7 @@ endif()
 if(LUA_FOUND)
     file(GLOB MOD_LUA_SOURCES src/viriatum_mod_lua/*.c src/viriatum_mod_lua/module/*.c)
     add_library(viriatum_mod_lua MODULE ${MOD_LUA_SOURCES})
-    set_target_properties(viriatum_mod_lua PROPERTIES PREFIX "lib" SUFFIX ${MODULE_SUFFIX})
+    set_target_properties(viriatum_mod_lua PROPERTIES PREFIX "${MODULE_PREFIX}" SUFFIX ${MODULE_SUFFIX})
     target_include_directories(viriatum_mod_lua PRIVATE
         src/viriatum_mod_lua
         ${CMAKE_SOURCE_DIR}/src/viriatum

@@ -2,14 +2,18 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/modules)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/modules)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/modules)
 
-# determines the platform-specific module suffix, on Windows
-# modules are built as DLLs while on macOS they use dylib and
-# on other Unix systems they use the standard .so extension
+# determines the platform-specific module prefix and suffix,
+# on Windows modules use no prefix (viriatum_mod_*.dll) while
+# on Unix they use the lib prefix (libviriatum_mod_*.so/dylib)
+# matching the VIRIATUM_MODULE_PREFIX constant in definitions.h
 if(WIN32)
+    set(MODULE_PREFIX "")
     set(MODULE_SUFFIX ".dll")
 elseif(APPLE)
+    set(MODULE_PREFIX "lib")
     set(MODULE_SUFFIX ".dylib")
 else()
+    set(MODULE_PREFIX "lib")
     set(MODULE_SUFFIX ".so")
 endif()
 

@@ -21,7 +21,7 @@ endif()
 if(PYTHON3_FOUND)
     file(GLOB MOD_WSGI_SOURCES src/viriatum_mod_wsgi/*.c src/viriatum_mod_wsgi/module/*.c)
     add_library(viriatum_mod_wsgi MODULE ${MOD_WSGI_SOURCES})
-    set_target_properties(viriatum_mod_wsgi PROPERTIES PREFIX "lib" SUFFIX ${MODULE_SUFFIX})
+    set_target_properties(viriatum_mod_wsgi PROPERTIES PREFIX "${MODULE_PREFIX}" SUFFIX ${MODULE_SUFFIX})
     target_include_directories(viriatum_mod_wsgi PRIVATE
         src/viriatum_mod_wsgi
         ${CMAKE_SOURCE_DIR}/src/viriatum
