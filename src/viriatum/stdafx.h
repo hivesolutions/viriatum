@@ -93,6 +93,7 @@
 #include <openssl/ssl.h>
 #include <openssl/rand.h>
 #ifdef VIRIATUM_PLATFORM_MSC
+#ifndef NO_PRAGMA_LIB
 #ifdef VIRIATUM_DEBUG
 #pragma comment(lib, "libeay32_d.lib")
 #pragma comment(lib, "ssleay32_d.lib")
@@ -102,15 +103,18 @@
 #endif
 #endif
 #endif
+#endif
 
 #ifdef VIRIATUM_PCRE
 #define PCRE_STATIC
 #include <pcre.h>
 #ifdef VIRIATUM_PLATFORM_MSC
+#ifndef NO_PRAGMA_LIB
 #ifdef VIRIATUM_DEBUG
 #pragma comment(lib, "pcre_d.lib")
 #else
 #pragma comment(lib, "pcre.lib")
+#endif
 #endif
 #endif
 #endif

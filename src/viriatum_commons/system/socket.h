@@ -184,5 +184,7 @@
 #endif
 
 #ifdef VIRIATUM_PLATFORM_MSC
+#ifndef NO_PRAGMA_LIB
 #pragma comment(lib, "Ws2_32.lib")
+#endif
 #endif

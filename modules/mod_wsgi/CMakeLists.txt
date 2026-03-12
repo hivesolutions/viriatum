@@ -1,0 +1,49 @@
+# detects Python 3 using python3-config for the WSGI module
+find_program(PYTHON3_CONFIG python3-config)
+if(PYTHON3_CONFIG)
+    execute_process(COMMAND ${PYTHON3_CONFIG} --includes OUTPUT_VARIABLE PY3_INCLUDES_RAW OUTPUT_STRIP_TRAILING_WHITESPACE)
+    execute_process(COMMAND ${PYTHON3_CONFIG} --ldflags --embed OUTPUT_VARIABLE PY3_LDFLAGS_RAW OUTPUT_STRIP_TRAILING_WHITESPACE)
+    string(REGEX MATCHALL "-I[^ ]+" PY3_INCLUDE_FLAGS "${PY3_INCLUDES_RAW}")
+    set(PY3_INCLUDE_DIRS "")
+    foreach(FLAG ${PY3_INCLUDE_FLAGS})
+        string(SUBSTRING ${FLAG} 2 -1 DIR)
+        list(APPEND PY3_INCLUDE_DIRS ${DIR})
+    endforeach()
+    string(REGEX MATCHALL "-L[^ ]+" PY3_LIB_FLAGS "${PY3_LDFLAGS_RAW}")
+    set(PY3_LIB_DIRS "")
+    foreach(FLAG ${PY3_LIB_FLAGS})
+        string(SUBSTRING ${FLAG} 2 -1 DIR)
+        list(APPEND PY3_LIB_DIRS ${DIR})
+    endforeach()
+    set(PYTHON3_FOUND TRUE)
+endif()
+
+if(PYTHON3_FOUND)
+    file(GLOB MOD_WSGI_SOURCES src/viriatum_mod_wsgi/*.c src/viriatum_mod_wsgi/module/*.c)
+    add_library(viriatum_mod_wsgi MODULE ${MOD_WSGI_SOURCES})
+    set_target_properties(viriatum_mod_wsgi PROPERTIES PREFIX "lib" SUFFIX ${MODULE_SUFFIX})
+    target_include_directories(viriatum_mod_wsgi PRIVATE
+        src/viriatum_mod_wsgi
+        ${CMAKE_SOURCE_DIR}/src/viriatum
+        ${CMAKE_SOURCE_DIR}/src/viriatum_commons
+        ${PY3_INCLUDE_DIRS}
+    )
+    target_link_directories(viriatum_mod_wsgi PRIVATE ${PY3_LIB_DIRS})
+    target_link_libraries(viriatum_mod_wsgi viriatum_commons python3)
+
+    # finds the actual versioned Python library (e.g. python3.13)
+    # for linking since the unversioned symlink may not exist
+    execute_process(COMMAND ${PYTHON3_CONFIG} --prefix OUTPUT_VARIABLE PY3_PREFIX OUTPUT_STRIP_TRAILING_WHITESPACE)
+    file(GLOB PY3_VERSIONED_LIB "${PY3_PREFIX}/lib/libpython3*.dylib")
+    if(NOT PY3_VERSIONED_LIB)
+        file(GLOB PY3_VERSIONED_LIB "${PY3_PREFIX}/lib/libpython3*.so")
+    endif()
+    if(PY3_VERSIONED_LIB)
+        list(GET PY3_VERSIONED_LIB 0 PY3_LIB)
+        set_target_properties(viriatum_mod_wsgi PROPERTIES LINK_LIBRARIES "")
+        target_link_libraries(viriatum_mod_wsgi viriatum_commons ${PY3_LIB})
+    endif()
+    message(STATUS "Viriatum: mod_wsgi enabled")
+else()
+    message(STATUS "Viriatum: mod_wsgi disabled (Python 3 not found)")
+endif()

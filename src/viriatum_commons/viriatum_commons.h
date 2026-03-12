@@ -46,9 +46,11 @@
 #include "util/util.h"
 
 #ifdef VIRIATUM_PLATFORM_MSC
+#ifndef NO_PRAGMA_LIB
 #ifdef VIRIATUM_DEBUG
 #pragma comment(lib, "viriatum_commons_d.lib")
 #else
 #pragma comment(lib, "viriatum_commons.lib")
+#endif
 #endif
 #endif
