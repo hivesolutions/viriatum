@@ -68,7 +68,8 @@ system/torrent.c \
 test/handler_dispatch_test.c \
 test/handler_file_test.c \
 test/simple_test.c \
-test/speed_test.c
+test/speed_test.c \
+test/test_support.c
 
 libviriatum_http_la_SOURCES = stdafx.c \
 viriatum.c \
@@ -97,4 +98,5 @@ system/torrent.c \
 test/handler_dispatch_test.c \
 test/handler_file_test.c \
 test/simple_test.c \
-test/speed_test.c
+test/speed_test.c \
+test/test_support.c
