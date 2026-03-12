@@ -1573,7 +1573,7 @@ ERROR_CODE resolve_connection(struct connection_t *connection, SOCKET_ADDRESS *s
     that are going to be used in the "custom" parsing of the
     ipv6 addresses under the windows platform */
     size_t index;
-    size_t buffer_size;
+    DWORD buffer_size;
     unsigned char buffer[64];
 #endif
 

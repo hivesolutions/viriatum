@@ -519,7 +519,7 @@ static __inline void pdiag(struct memory_pool_t *pool, char *string, size_t size
         (long int) pool->items_max_size,
         (long int) pool->chunk_max_size,
         (long int) pool->chunk_count,
-        (long int) pool->chunk_count - pool->free
+        (long int) (pool->chunk_count - pool->free)
     );
 }
 
