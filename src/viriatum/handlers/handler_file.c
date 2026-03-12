@@ -557,13 +557,13 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
         else {
             /* creates the complete path to the template file, using the
             www root override for the resources path if available */
-            char *_resources_path = connection->service->options->www_root[0] != '\0'
+            char *resources_path = connection->service->options->www_root[0] != '\0'
                 ? (char *) connection->service->options->www_root : VIRIATUM_RESOURCES_PATH;
             SPRINTF(
                 (char *) template_path,
                 sizeof(template_path),
                 "%s%s",
-                _resources_path,
+                resources_path,
                 VIRIATUM_LISTING_PATH
             );
 
