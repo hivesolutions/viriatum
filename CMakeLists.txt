@@ -17,6 +17,12 @@ if(VIRIATUM_DEBUG OR CMAKE_BUILD_TYPE STREQUAL "Debug")
     message(STATUS "Viriatum: debug mode enabled")
 endif()
 
+set(VIRIATUM_WWW_ROOT "" CACHE STRING "Path to the www root directory (sets WITH_WWW_ROOT)")
+if(VIRIATUM_WWW_ROOT)
+    add_definitions(-DWITH_WWW_ROOT="${VIRIATUM_WWW_ROOT}")
+    message(STATUS "Viriatum: www root set to '${VIRIATUM_WWW_ROOT}'")
+endif()
+
 file(GLOB_RECURSE VIRIATUM_COMMON_SOURCES src/viriatum_commons/*.c)
 add_library(viriatum_commons ${VIRIATUM_COMMON_SOURCES})
 
