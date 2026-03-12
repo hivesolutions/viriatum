@@ -239,10 +239,8 @@ ERROR_CODE _load_configuration_wsgi(struct service_t *service, struct mod_wsgi_h
         unsigned char *script_path = (unsigned char *) value;
         if(script_path[0] != '/') {
             struct service_options_t *options = service->options;
-            unsigned char *contents_path = options->www_root[0] != '\0'
-                ? options->www_root : (unsigned char *) VIRIATUM_CONTENTS_PATH;
             if(script_path[0] == '\\') { script_path++; }
-            SPRINTF(mod_wsgi_http_handler->file_path, VIRIATUM_MAX_PATH_SIZE, "%s/%s", contents_path, script_path);
+            SPRINTF(mod_wsgi_http_handler->file_path, VIRIATUM_MAX_PATH_SIZE, "%s/%s", options->contents_path, script_path);
         } else {
             SPRINTF(mod_wsgi_http_handler->file_path, VIRIATUM_MAX_PATH_SIZE, "%s", script_path);
         }
@@ -305,10 +303,8 @@ ERROR_CODE _load_locations_wsgi(struct service_t *service, struct mod_wsgi_http_
             unsigned char *script_path = (unsigned char *) value;
             if(script_path[0] != '/') {
                 struct service_options_t *options = service->options;
-                unsigned char *contents_path = options->www_root[0] != '\0'
-                    ? options->www_root : (unsigned char *) VIRIATUM_CONTENTS_PATH;
                 if(script_path[0] == '\\') { script_path++; }
-                SPRINTF(_location->file_path, VIRIATUM_MAX_PATH_SIZE, "%s/%s", contents_path, script_path);
+                SPRINTF(_location->file_path, VIRIATUM_MAX_PATH_SIZE, "%s/%s", options->contents_path, script_path);
             } else {
                 SPRINTF(_location->file_path, VIRIATUM_MAX_PATH_SIZE, "%s", script_path);
             }

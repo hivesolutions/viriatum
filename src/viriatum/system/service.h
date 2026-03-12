@@ -504,6 +504,9 @@ typedef struct service_t {
 /**
  * Structure defining the set of options/configuration
  * for an associated service.
+ * 
+ * Some of the values are computed and not directly accessible
+ * via a configuration paradigm.
  */
 typedef struct service_options_t {
     /**
@@ -599,6 +602,24 @@ typedef struct service_options_t {
      * path used for file serving.
      */
     unsigned char www_root[VIRIATUM_MAX_PATH_SIZE];
+
+    /**
+     * The resolved contents path, computed once at startup
+     * from www_root (if set) or VIRIATUM_CONTENTS_PATH.
+     */
+    unsigned char contents_path[VIRIATUM_MAX_PATH_SIZE];
+
+    /**
+     * The resolved resources path, computed once at startup
+     * from www_root (if set) or VIRIATUM_RESOURCES_PATH.
+     */
+    unsigned char resources_path[VIRIATUM_MAX_PATH_SIZE];
+
+    /**
+     * The resolved modules path, computed once at startup
+     * from VIRIATUM_MODULES_PATH.
+     */
+    unsigned char modules_path[VIRIATUM_MAX_PATH_SIZE];
 
     /**
      * If the instance should use templates for error

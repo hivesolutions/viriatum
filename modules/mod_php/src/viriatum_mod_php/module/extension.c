@@ -248,9 +248,9 @@ ZEND_MINFO_FUNCTION(viriatum_information) {
     php_info_print_table_end();
     php_info_print_table_start();
     php_info_print_table_header(2, "Name", "Path");
-    php_info_print_table_row(2, "Modules", VIRIATUM_MODULES_PATH);
-    php_info_print_table_row(2, "Contents", VIRIATUM_CONTENTS_PATH);
-    php_info_print_table_row(2, "Resources", VIRIATUM_RESOURCES_PATH);
+    php_info_print_table_row(2, "Modules", (char *) _service->options->modules_path);
+    php_info_print_table_row(2, "Contents", (char *) _service->options->contents_path);
+    php_info_print_table_row(2, "Resources", (char *) _service->options->resources_path);
     php_info_print_table_row(2, "Configuration", VIRIATUM_CONFIG_PATH);
     php_info_print_table_end();
 }

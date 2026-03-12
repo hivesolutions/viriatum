@@ -172,14 +172,9 @@ ERROR_CODE url_callback_handler_php(struct http_parser_t *http_parser, const uns
     struct handler_php_context_t *handler_php_context = (struct handler_php_context_t *) http_parser->context;
 
     /* retrieves the connection from the HTTP parser parameters and
-    then uses it to reach the service options for path resolution */
+    uses the pre-resolved contents path from service options */
     struct connection_t *connection = (struct connection_t *) http_parser->parameters;
-    struct service_t *service = connection->service;
-    struct service_options_t *options = service->options;
-
-    /* resolves the contents path to be used for file serving,
-    using the www root override if set or the default otherwise */
-    char *contents_path = options->www_root[0] != '\0' ? (char *) options->www_root : VIRIATUM_CONTENTS_PATH;
+    char *contents_path = (char *) connection->service->options->contents_path;
 
     /* checks the position of the get parameters divisor position
     and then uses it to calculate the size of the (base) path */
@@ -235,7 +230,7 @@ ERROR_CODE header_field_callback_handler_php(struct http_parser_t *http_parser, 
     handler_php_context->header->name[data_size] = '\0';
     handler_php_context->header->name_size = data_size;
 
-    /* checks if the current header is a valid "capturable"
+    /* checks if the current header is a valid "captable"
     header in such case changes the next header value accordingly
     otherwise sets the undefined header */
     if(memcmp(data, CONTENT_TYPE_H, data_size) == 0) { handler_php_context->_next_header = CONTENT_TYPE; }
@@ -258,17 +253,17 @@ ERROR_CODE header_value_callback_handler_php(struct http_parser_t *http_parser, 
     size_t _data_size;
 
     /* copies the current header value into the appropriate structure
-    and alse updates the size of the value string in it */
+    and also updates the size of the value string in it */
     memcpy(handler_php_context->header->value, data, data_size);
     handler_php_context->header->value[data_size] = '\0';
     handler_php_context->header->value_size = data_size;
 
     /* adds the current header to the list of headers (push) and then
-    unsets the header structure (avois further usage of the header) */
+    unsets the header structure (avoids further usage of the header) */
     append_value_linked_list(handler_php_context->headers, (void *) handler_php_context->header);
     handler_php_context->header = NULL;
 
-    /* switchs over the next header possible values to
+    /* switches over the next header possible values to
     copy the current header buffer into the appropriate place */
     switch(handler_php_context->_next_header) {
         case CONTENT_TYPE:
@@ -367,14 +362,9 @@ ERROR_CODE path_callback_handler_php(struct http_parser_t *http_parser, const un
     struct handler_php_context_t *handler_php_context = (struct handler_php_context_t *) http_parser->context;
 
     /* retrieves the connection from the HTTP parser parameters and
-    then uses it to reach the service options for path resolution */
+    uses the pre-resolved contents path from service options */
     struct connection_t *connection = (struct connection_t *) http_parser->parameters;
-    struct service_t *service = connection->service;
-    struct service_options_t *options = service->options;
-
-    /* resolves the contents path to be used for file serving,
-    using the www root override if set or the default otherwise */
-    char *contents_path = options->www_root[0] != '\0' ? (char *) options->www_root : VIRIATUM_CONTENTS_PATH;
+    char *contents_path = (char *) connection->service->options->contents_path;
 
     /* copies the part of the data buffer relative to the file name
     this avoids copying the query part */
@@ -476,7 +466,7 @@ ERROR_CODE _unset_http_settings_handler_php(struct http_settings_t *http_setting
 ERROR_CODE _send_data_callback_php(struct connection_t *connection, struct data_t *data, void *parameters) {
     /* allocates the buffer that will hod the message to be sent
     through the connection and then allocates the buffer to hold
-    the joined buffer from the linked buffer rerference */
+    the joined buffer from the linked buffer reference */
     char *buffer;
     char *output_data;
 
@@ -489,7 +479,7 @@ ERROR_CODE _send_data_callback_php(struct connection_t *connection, struct data_
     be used to measure the size of the output stream */
     size_t output_length = output_buffer->buffer_length;
 
-    /* joins the output buffer so that the buffer is set as continguous
+    /* joins the output buffer so that the buffer is set as contiguous
     and then deletes the output buffer (no more need to use it) */
     join_linked_buffer(output_buffer, (unsigned char **) &output_data);
     delete_linked_buffer(output_buffer);
@@ -598,7 +588,7 @@ ERROR_CODE _send_response_handler_php(struct http_parser_t *http_parser) {
     this should be able to allow global access from the handler methods */
     _php_request.php_context = handler_php_context;
 
-    /* updates the current global PHP reqest information
+    /* updates the current global PHP request information
     this is the main interface for the sapi modules */
     _update_request_php(handler_php_context);
 
@@ -716,7 +706,7 @@ ERROR_CODE _send_response_callback_handler_php(struct connection_t *connection, 
 
     /* checks if the current connection should be kept alive, this must
     be done prior to the unseting of the connection as the current PHP
-    context structrue will be destroyed there */
+    context structure will be destroyed there */
     unsigned char keep_alive = handler_php_context->flags & FLAG_KEEP_ALIVE;
 
     /* in case there is an HTTP handler in the current connection must

@@ -263,11 +263,9 @@ ERROR_CODE url_callback_handler_file(struct http_parser_t *http_parser, const un
         (struct handler_file_context_t *) http_parser->context;
 
     /* retrieves the connection from the HTTP parser parameters and
-    resolves the contents path, using www root override if available */
+    uses the pre-resolved contents path from service options */
     struct connection_t *connection = (struct connection_t *) http_parser->parameters;
-    char *contents_path = connection != NULL && connection->service != NULL
-        && connection->service->options->www_root[0] != '\0'
-        ? (char *) connection->service->options->www_root : VIRIATUM_CONTENTS_PATH;
+    char *contents_path = (char *) connection->service->options->contents_path;
 
     /* checks the position of the get parameters divisor position
     and then uses it to calculate the size of the (base) path */
@@ -555,10 +553,9 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
         /* otherwise it's the correct directory location and must present the
         listing of the directory to the user agent */
         else {
-            /* creates the complete path to the template file, using the
-            www root override for the resources path if available */
-            char *resources_path = connection->service->options->www_root[0] != '\0'
-                ? (char *) connection->service->options->www_root : VIRIATUM_RESOURCES_PATH;
+            /* creates the complete path to the template file using
+            the pre-resolved resources path from service options */
+            char *resources_path = (char *) connection->service->options->resources_path;
             SPRINTF(
                 (char *) template_path,
                 sizeof(template_path),
@@ -945,11 +942,9 @@ ERROR_CODE path_callback_handler_file(struct http_parser_t *http_parser, const u
     unsigned char *base_path = handler_file_context->base_path;
 
     /* retrieves the connection from the HTTP parser parameters and
-    resolves the contents path, using www root override if available */
+    uses the pre-resolved contents path from service options */
     struct connection_t *connection = (struct connection_t *) http_parser->parameters;
-    char *contents_path = connection != NULL && connection->service != NULL
-        && connection->service->options->www_root[0] != '\0'
-        ? (char *) connection->service->options->www_root : VIRIATUM_CONTENTS_PATH;
+    char *contents_path = (char *) connection->service->options->contents_path;
 
     /* copies the memory from the data to the url and then
     puts the end of string in the url, note that only the path

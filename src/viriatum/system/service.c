@@ -290,11 +290,35 @@ ERROR_CODE load_options_service(struct service_t *service, struct hash_map_t *ar
 }
 
 ERROR_CODE calculate_options_service(struct service_t *service) {
+    /* allocates a pointer to the resolved www root value,
+    used as base for contents and resources path resolution */
+    char *www_root;
+
     /* converts the service port value into a string value
-    using a base ten encoding and then populates the correspoding
+    using a base ten encoding and then populates the corresponding
     string value to use prefetched values */
     SPRINTF((char *) service->options->_port, 128, "%d", service->options->port);
     string_populate(&service->options->_port_string, service->options->_port, 0, 1);
+
+    /* resolves the contents, resources and modules paths once,
+    taking www_root override into account so all handlers and modules
+    can use the pre-resolved values without repeating this logic */
+    www_root = service->options->www_root[0] != '\0' ? (char *) service->options->www_root : NULL;
+    SPRINTF(
+        (char *) service->options->contents_path,
+        VIRIATUM_MAX_PATH_SIZE, "%s",
+        www_root != NULL ? www_root : VIRIATUM_CONTENTS_PATH
+    );
+    SPRINTF(
+        (char *) service->options->resources_path,
+        VIRIATUM_MAX_PATH_SIZE, "%s",
+        www_root != NULL ? www_root : VIRIATUM_RESOURCES_PATH
+    );
+    SPRINTF(
+        (char *) service->options->modules_path,
+        VIRIATUM_MAX_PATH_SIZE, "%s",
+        VIRIATUM_MODULES_PATH
+    );
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -350,9 +374,12 @@ ERROR_CODE calculate_locations_service(struct service_t *service) {
 ERROR_CODE print_options_service(struct service_t *service) {
     /* prints a series of debug information on the service that
     has just been loaded (helping the debug process) */
-    V_DEBUG_F("Port    := %s\n", service->options->_port);
-    V_DEBUG_F("Address := %s\n", service->options->address);
-    V_DEBUG_F("Handler := %s\n", service->options->handler_name);
+    V_DEBUG_F("Port           := %s\n", service->options->_port);
+    V_DEBUG_F("Address        := %s\n", service->options->address);
+    V_DEBUG_F("Handler        := %s\n", service->options->handler_name);
+    V_DEBUG_F("Contents path  := %s\n", service->options->contents_path);
+    V_DEBUG_F("Resources path := %s\n", service->options->resources_path);
+    V_DEBUG_F("Modules path   := %s\n", service->options->modules_path);
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -1270,12 +1297,12 @@ ERROR_CODE load_modules_service(struct service_t *service) {
     unsigned char module_path[VIRIATUM_MAX_PATH_SIZE];
 
     /* prints a debug message */
-    V_DEBUG_F("Loading modules (%s)\n", VIRIATUM_MODULES_PATH);
+    V_DEBUG_F("Loading modules (%s)\n", service->options->modules_path);
 
     /* creates the linked list for the entries and populates
     it with the entries from the modules path */
     create_linked_list(&entries);
-    list_directory_file(VIRIATUM_MODULES_PATH, entries);
+    list_directory_file((char *) service->options->modules_path, entries);
 
     /* creates the iterator for the entries */
     create_iterator_linked_list(entries, &entries_iterator);
@@ -1301,7 +1328,7 @@ ERROR_CODE load_modules_service(struct service_t *service) {
             (char *) module_path,
             VIRIATUM_MAX_PATH_SIZE,
             "%s/%s",
-            VIRIATUM_MODULES_PATH,
+            service->options->modules_path,
             entry->name
         );
 

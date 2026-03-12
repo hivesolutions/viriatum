@@ -210,10 +210,7 @@ ERROR_CODE url_callback_handler_dispatch(struct http_parser_t *http_parser, cons
     struct service_t *service = connection->service;
     struct service_options_t *options = service->options;
     struct http_handler_t *handler = http_connection->http_handler;
-
-    /* resolves the contents path to be used for file serving,
-    using the www root override if set or the default otherwise */
-    char *contents_path = options->www_root[0] != '\0' ? (char *) options->www_root : VIRIATUM_CONTENTS_PATH;
+    char *contents_path = (char *) options->contents_path;
 #ifdef VIRIATUM_PCRE
     struct dispatch_handler_t *dispatch_handler = (struct dispatch_handler_t *) handler->lower;
 #endif
