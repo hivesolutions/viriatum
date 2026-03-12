@@ -117,11 +117,12 @@ void create_service_options(struct service_options_t **service_options_pointer) 
     service_options->handler_name = NULL;
     service_options->local = 0;
     service_options->default_index = 0;
+    service_options->www_root[0] = '\0';
     service_options->use_template = 0;
     service_options->default_virtual_host = NULL;
     service_options->index_count = 0;
 
-    /* resets the memry buffer on the index sequence structure so
+    /* resets the memory buffer on the index sequence structure so
     that no index is considered before configuration */
     memset(service_options->index, 0, sizeof(service_options->index));
 
@@ -289,11 +290,35 @@ ERROR_CODE load_options_service(struct service_t *service, struct hash_map_t *ar
 }
 
 ERROR_CODE calculate_options_service(struct service_t *service) {
+    /* allocates a pointer to the resolved www root value,
+    used as base for contents and resources path resolution */
+    char *www_root;
+
     /* converts the service port value into a string value
-    using a base ten encoding and then populates the correspoding
+    using a base ten encoding and then populates the corresponding
     string value to use prefetched values */
     SPRINTF((char *) service->options->_port, 128, "%d", service->options->port);
     string_populate(&service->options->_port_string, service->options->_port, 0, 1);
+
+    /* resolves the contents, resources and modules paths once,
+    taking www_root override into account so all handlers and modules
+    can use the pre-resolved values without repeating this logic */
+    www_root = service->options->www_root[0] != '\0' ? (char *) service->options->www_root : NULL;
+    SPRINTF(
+        (char *) service->options->contents_path,
+        VIRIATUM_MAX_PATH_SIZE, "%s",
+        www_root != NULL ? www_root : VIRIATUM_CONTENTS_PATH
+    );
+    SPRINTF(
+        (char *) service->options->resources_path,
+        VIRIATUM_MAX_PATH_SIZE, "%s",
+        www_root != NULL ? www_root : VIRIATUM_RESOURCES_PATH
+    );
+    SPRINTF(
+        (char *) service->options->modules_path,
+        VIRIATUM_MAX_PATH_SIZE, "%s",
+        VIRIATUM_MODULES_PATH
+    );
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -349,9 +374,12 @@ ERROR_CODE calculate_locations_service(struct service_t *service) {
 ERROR_CODE print_options_service(struct service_t *service) {
     /* prints a series of debug information on the service that
     has just been loaded (helping the debug process) */
-    V_DEBUG_F("Port    := %d\n", service->options->_port);
-    V_DEBUG_F("Address := %s\n", service->options->address);
-    V_DEBUG_F("Handler := %s\n", service->options->handler_name);
+    V_DEBUG_F("Port           := %s\n", service->options->_port);
+    V_DEBUG_F("Address        := %s\n", service->options->address);
+    V_DEBUG_F("Handler        := %s\n", service->options->handler_name);
+    V_DEBUG_F("Contents path  := %s\n", service->options->contents_path);
+    V_DEBUG_F("Resources path := %s\n", service->options->resources_path);
+    V_DEBUG_F("Modules path   := %s\n", service->options->modules_path);
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -1269,12 +1297,12 @@ ERROR_CODE load_modules_service(struct service_t *service) {
     unsigned char module_path[VIRIATUM_MAX_PATH_SIZE];
 
     /* prints a debug message */
-    V_DEBUG_F("Loading modules (%s)\n", VIRIATUM_MODULES_PATH);
+    V_DEBUG_F("Loading modules (%s)\n", service->options->modules_path);
 
     /* creates the linked list for the entries and populates
     it with the entries from the modules path */
     create_linked_list(&entries);
-    list_directory_file(VIRIATUM_MODULES_PATH, entries);
+    list_directory_file((char *) service->options->modules_path, entries);
 
     /* creates the iterator for the entries */
     create_iterator_linked_list(entries, &entries_iterator);
@@ -1300,7 +1328,7 @@ ERROR_CODE load_modules_service(struct service_t *service) {
             (char *) module_path,
             VIRIATUM_MAX_PATH_SIZE,
             "%s/%s",
-            VIRIATUM_MODULES_PATH,
+            service->options->modules_path,
             entry->name
         );
 
@@ -1449,7 +1477,7 @@ ERROR_CODE create_connection(struct connection_t **connection_pointer, SOCKET_HA
     size_t connection_size = sizeof(struct connection_t);
 
     /* allocates space for the connection */
-    struct connection_t *connection =\
+    struct connection_t *connection =
         (struct connection_t *) MALLOC(connection_size);
 
     /* sets the connection attributes (default) values */
@@ -1572,7 +1600,7 @@ ERROR_CODE resolve_connection(struct connection_t *connection, SOCKET_ADDRESS *s
     that are going to be used in the "custom" parsing of the
     ipv6 addresses under the windows platform */
     size_t index;
-    size_t buffer_size;
+    DWORD buffer_size;
     unsigned char buffer[64];
 #endif
 
@@ -2159,21 +2187,42 @@ ERROR_CODE _file_options_service(struct service_t *service, struct hash_map_t *a
     /* unpacks the service options from the service */
     struct service_options_t *service_options = service->options;
 
-    /* creates the configuration file path using the defined viriatum
-    path to the configuration directory and then loads it as an ini file,
-    this should retrieve the configuration as a set of maps */
-    SPRINTF(config_path, VIRIATUM_MAX_PATH_SIZE, "%s/viriatum.ini", VIRIATUM_CONFIG_PATH);
-    V_DEBUG_F("Loading configuration file (%s)\n", config_path);
-    return_value = process_ini_file(config_path, &configuration);
-    if(IS_ERROR_CODE(return_value)) { CATCH_ERROR; }
+    /* tries to load the configuration ini file from a series of
+    candidate paths, using the first one that succeeds: the system
+    config directory, the current working directory, and finally a
+    path relative to the source tree for development convenience */
+    {
+        const char *candidates[] = {
+            NULL,
+            "./viriatum.ini",
+            "./src/viriatum/resources/config/viriatum/viriatum.ini"
+        };
+        size_t candidate_count = sizeof(candidates) / sizeof(candidates[0]);
+        size_t candidate_index;
 
-    /* sets the configuraation structure under the service structure
+        return_value = 1;
+        for(candidate_index = 0; candidate_index < candidate_count; candidate_index++) {
+            if(candidates[candidate_index] == NULL) {
+                SPRINTF(config_path, VIRIATUM_MAX_PATH_SIZE, "%s/viriatum.ini", VIRIATUM_CONFIG_PATH);
+            } else {
+                SPRINTF(config_path, VIRIATUM_MAX_PATH_SIZE, "%s", candidates[candidate_index]);
+            }
+            V_DEBUG_F("Trying configuration file (%s)\n", config_path);
+            return_value = process_ini_file(config_path, &configuration);
+            if(!IS_ERROR_CODE(return_value)) { break; }
+            CATCH_ERROR;
+        }
+
+        if(IS_ERROR_CODE(return_value)) {
+            V_WARNING("No configuration file found, using defaults\n");
+        } else {
+            V_INFO_F("Loaded configuration file (%s)\n", config_path);
+        }
+    }
+
+    /* sets the configuration structure under the service structure
     so that it may be latter used for operations */
     service->configuration = configuration;
-
-    /* prints a debug message about the loading of the configuration
-    ini file so that the user knows that the new file is used */
-    V_DEBUG_F("Loaded configuration file (%s)\n", config_path);
 
     /* tries to retrieve the general section configuration from the configuration
     map in case none is found returns immediately no need to process anything more */
@@ -2236,8 +2285,16 @@ ERROR_CODE _file_options_service(struct service_t *service, struct hash_map_t *a
     get_value_string_sort_map(general, (unsigned char *) "use_template", &value);
     if(value != NULL) { service_options->use_template = (unsigned char) atob(value); }
 
+    /* tries to retrieve the www root argument from the arguments map, then
+    sets the www root override for the contents path in service options */
+    get_value_string_sort_map(general, (unsigned char *) "www_root", &value);
+    if(value != NULL) {
+        SPRINTF((char *) service_options->www_root, VIRIATUM_MAX_PATH_SIZE, "%s", (char *) value);
+        V_INFO_F("Using www root from configuration (%s)\n", service_options->www_root);
+    }
+
     /* tries to retrieve the index (file) argument from the arguments map, then
-    sets the split value arround the space character in the index value */
+    sets the split value around the space character in the index value */
     get_value_string_sort_map(general, (unsigned char *) "index", &value);
     if(value != NULL) { service_options->index_count = split(value, (char *) service_options->index, 128, ' '); }
 

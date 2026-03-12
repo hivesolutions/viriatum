@@ -24,6 +24,7 @@
 
 #pragma once
 
+#include "test_support.h"
 #include "handler_dispatch_test.h"
 #include "handler_file_test.h"
 #include "simple_test.h"

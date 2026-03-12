@@ -226,7 +226,7 @@ ERROR_CODE parse_url(char *url, size_t url_size, struct url_t *url_s) {
             url_s->host.length = pointer - url_s->host_c.buffer;
 
             url_s->port_s.buffer = pointer + 1;
-            url_s->port_s.length = url_s->host_c.buffer +\
+            url_s->port_s.length = url_s->host_c.buffer +
                 url_s->host_c.length - (pointer + 1);
         }
     }
@@ -239,7 +239,7 @@ ERROR_CODE parse_url(char *url, size_t url_size, struct url_t *url_s) {
         url_s->username.length = pointer - url_s->auth.buffer;
 
         url_s->password.buffer = pointer + 1;
-        url_s->password.length = url_s->auth.buffer +\
+        url_s->password.length = url_s->auth.buffer +
             url_s->auth.length - (pointer + 1);
     }
 

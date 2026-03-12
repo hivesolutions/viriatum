@@ -35,6 +35,7 @@
 #include "undef.h"
 #include <sapi/embed/php_embed.h>
 #include <ext/standard/php_standard.h>
+#include <ext/standard/info.h>
 #include "../../../../src/viriatum/viriatum.h"
 #include "undef.h"
 #ifdef _MSC_VER
@@ -45,11 +46,3 @@ unsigned char *name_viriatum_mod_php();
 unsigned char *name_s_viriatum_mod_php();
 unsigned char *version_viriatum_mod_php();
 unsigned char *description_viriatum_mod_php();
-
-#ifdef VIRIATUM_PLATFORM_MSC
-#ifdef VIRIATUM_DEBUG
-#pragma comment(lib, "php5embed_d.lib")
-#else
-#pragma comment(lib, "php5embed.lib")
-#endif
-#endif

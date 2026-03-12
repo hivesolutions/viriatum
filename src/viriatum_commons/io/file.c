@@ -440,7 +440,7 @@ size_t path_from_system(char *path_s, char *path) {
     to the standard viriatum (utf8) version of the string */
     MultiByteToWideChar(
         CP_ACP,
-        (DWORD) NULL,
+        0,
         path_s,
         -1,
         path_u,
@@ -448,7 +448,7 @@ size_t path_from_system(char *path_s, char *path) {
     );
     return WideCharToMultiByte(
         CP_UTF8,
-        (DWORD) NULL,
+        0,
         path_u,
         -1,
         path,
@@ -468,7 +468,7 @@ size_t path_to_system(char *path, char *path_s) {
     the value back into the system's encoding */
     MultiByteToWideChar(
         CP_UTF8,
-        (DWORD) NULL,
+        0,
         path,
         -1,
         path_u,
@@ -476,7 +476,7 @@ size_t path_to_system(char *path, char *path_s) {
     );
     return WideCharToMultiByte(
         CP_ACP,
-        (DWORD) NULL,
+        0,
         path_u,
         -1,
         path_s,
@@ -668,7 +668,7 @@ ERROR_CODE list_directory_file(char *file_path, struct linked_list_t *entries) {
         into the viriatum (utf8) representation of the entry name */
         MultiByteToWideChar(
             CP_ACP,
-            (DWORD) NULL,
+            0,
             find_data.cFileName,
             -1,
             name_u,
@@ -676,7 +676,7 @@ ERROR_CODE list_directory_file(char *file_path, struct linked_list_t *entries) {
         );
         name_size = WideCharToMultiByte(
             CP_UTF8,
-            (DWORD) NULL,
+            0,
             name_u,
             -1,
             NULL,
@@ -691,7 +691,7 @@ ERROR_CODE list_directory_file(char *file_path, struct linked_list_t *entries) {
         entry->name = (unsigned char *) MALLOC(name_size);
         WideCharToMultiByte(
             CP_UTF8,
-            (DWORD) NULL,
+            0,
             name_u,
             -1,
             entry->name,

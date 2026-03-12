@@ -30,7 +30,7 @@ void create_priority_queue(struct priority_queue_t **priority_queue_pointer, com
     /* retrieves the size in byte that are required for the priority
     queue and then uses this value to allocate the queue */
     size_t priority_queue_size = sizeof(struct priority_queue_t);
-    struct priority_queue_t *priority_queue =\
+    struct priority_queue_t *priority_queue =
         (struct priority_queue_t *) MALLOC(priority_queue_size);
 
     /* sets the default values (including the comparator) in the

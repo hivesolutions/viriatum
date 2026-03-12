@@ -23,5 +23,11 @@
 # checks for header files
 AC_CHECK_HEADERS([stdlib.h assert.h])
 
-# checks for specific header files
-AC_CHECK_HEADERS([Python.h], [], [AC_MSG_ERROR([python embed headers are required])])
+# checks for python header using a compile test that mirrors
+# the actual build flags (AC_CHECK_HEADERS can fail with complex headers)
+AC_MSG_CHECKING([for Python.h])
+AC_COMPILE_IFELSE(
+    [AC_LANG_SOURCE([[#include <Python.h>]])],
+    [AC_MSG_RESULT([yes])],
+    [AC_MSG_RESULT([no])
+     AC_MSG_ERROR([python 3 embed headers are required (install python3-dev)])])

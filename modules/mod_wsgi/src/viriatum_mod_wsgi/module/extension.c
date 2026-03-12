@@ -26,7 +26,7 @@
 
 #include "extension.h"
 
-PyMethodDef wsgi_methods[3] = {
+PyMethodDef wsgi_methods[7] = {
     {
         "start_response",
         wsgi_start_response,
@@ -37,6 +37,30 @@ PyMethodDef wsgi_methods[3] = {
         "write",
         wsgi_write,
         METH_VARARGS,
+        NULL
+    },
+    {
+        "connections",
+        wsgi_connections,
+        METH_NOARGS,
+        NULL
+    },
+    {
+        "connections_l",
+        wsgi_connections_l,
+        METH_NOARGS,
+        NULL
+    },
+    {
+        "connection_info",
+        wsgi_connection_info,
+        METH_VARARGS,
+        NULL
+    },
+    {
+        "uptime",
+        wsgi_uptime,
+        METH_NOARGS,
         NULL
     },
     {
@@ -72,8 +96,8 @@ PyObject *wsgi_start_response(PyObject *self, PyObject *args) {
     name and value but also for their internal buffers */
     PyObject *header_name;
     PyObject *header_value;
-    char *_header_name;
-    char *_header_value;
+    const char *_header_name;
+    const char *_header_value;
 
     /* allocates space for the result value from the parsing of the
     arguments, in the initial part of the function */
@@ -94,12 +118,12 @@ PyObject *wsgi_start_response(PyObject *self, PyObject *args) {
     SSCANF(error_code, "%d %s", &_wsgi_request.status_code, _wsgi_request.status_message);
 #endif
 
-    /* creates the iterator to be used to percolate arround
+    /* creates the iterator to be used to percolate around
     the various header tuples */
     iterator = PyObject_GetIter(headers);
     if(iterator == NULL) { RAISE_NO_ERROR; }
 
-    /* iterates continuously to percolate arround the various
+    /* iterates continuously to percolate around the various
     header tuples */
     while(1) {
         /* retrieves the next iterator item and breaks the
@@ -113,8 +137,14 @@ PyObject *wsgi_start_response(PyObject *self, PyObject *args) {
 
         /* converts the header name and value into a linear
         string buffer so that is possible to format them */
-        _header_name = PyString_AsString(header_name);
-        _header_value = PyString_AsString(header_value);
+        _header_name = PyUnicode_AsUTF8(header_name);
+        _header_value = PyUnicode_AsUTF8(header_value);
+        if(_header_name == NULL || _header_value == NULL) {
+            Py_XDECREF(header_value);
+            Py_XDECREF(header_name);
+            Py_DECREF(item);
+            continue;
+        }
 
         /* checks if the current header is the content length
         header in such case the length set flag must be set in
@@ -152,7 +182,11 @@ PyObject *wsgi_start_response(PyObject *self, PyObject *args) {
     /* retrieves the reference to the write function from the WSGI module
     and then verifies that it's a valid python function */
     write_function = PyObject_GetAttrString(wsgi_module, "write");
-    if(!write_function || !PyCallable_Check(write_function)) { return NULL; }
+    if(!write_function || !PyCallable_Check(write_function)) {
+        Py_XDECREF(write_function);
+        Py_DECREF(wsgi_module);
+        return NULL;
+    }
 
     /* builds the return value with the write function so
     that the caller function may write directly to the stream */
@@ -170,6 +204,141 @@ PyObject *wsgi_start_response(PyObject *self, PyObject *args) {
 
 PyObject *wsgi_write(PyObject *self, PyObject *args) {
     return Py_BuildValue("i", 0);
+}
+
+PyObject *wsgi_connections(PyObject *self, PyObject *args) {
+    return Py_BuildValue("l", (long) _service->connections_list->size);
+}
+
+PyObject *wsgi_connections_l(PyObject *self, PyObject *args) {
+    /* allocates space for the local variables that are
+    going to be used in the construction of the connections */
+    struct iterator_t *iterator;
+    struct connection_t *connection;
+    unsigned long long delta;
+    char uptime[128];
+    char is_empty;
+
+    /* creates a new list to hold the connection dictionaries
+    that will be returned to the python caller */
+    PyObject *list = PyList_New(0);
+
+    /* creates an iterator object for the current list of connections
+    available in the viriatum engine */
+    create_iterator_linked_list(_service->connections_list, &iterator);
+
+    /* iterates continuously over the complete set of connections
+    in the viriatum running instance */
+    while(TRUE) {
+        /* retrieves the next connection value from the iterator
+        and verifies if its value is defined in case it's not this
+        is the end of iteration and so the cycle must be break */
+        get_next_iterator(iterator, (void **) &connection);
+        if(connection == NULL) { break; }
+
+        /* retrieves the delta value by calculating the difference between
+        the current time and the creation time then uses it to calculate
+        the uptime for the connection as a string description */
+        delta = (unsigned long long) time(NULL) - connection->creation;
+        format_delta(uptime, sizeof(uptime), delta, 2);
+
+        /* verifies if the current host is empty, this is a special
+        case where no resolution of the value was possible */
+        is_empty = connection->host[0] == '\0';
+
+        /* creates a dictionary with the connection attributes and
+        appends it to the result list */
+        PyObject *dict = PyDict_New();
+        PyObject *_value;
+
+        _value = PyUnicode_FromString(is_empty ? "N/A" : (char *) connection->host);
+        PyDict_SetItemString(dict, "host", _value);
+        Py_DECREF(_value);
+
+        _value = PyLong_FromLong((long) connection->id);
+        PyDict_SetItemString(dict, "id", _value);
+        Py_DECREF(_value);
+
+        _value = PyUnicode_FromString(uptime);
+        PyDict_SetItemString(dict, "uptime", _value);
+        Py_DECREF(_value);
+
+        PyList_Append(list, dict);
+        Py_DECREF(dict);
+    }
+
+    /* deletes the iterator for the connections list in order to
+    avoid any memory leak that could arise from this */
+    delete_iterator_linked_list(_service->connections_list, iterator);
+
+    return list;
+}
+
+PyObject *wsgi_connection_info(PyObject *self, PyObject *args) {
+    /* allocates space for the local variables that are
+    going to be used in the construction of the connection info */
+    long id;
+    char is_empty;
+    struct iterator_t *iterator;
+    struct connection_t *connection;
+    unsigned long long delta;
+    char uptime[128];
+
+    /* parses the id argument from the python call */
+    if(!PyArg_ParseTuple(args, "l", &id)) { return NULL; }
+
+    /* creates an iterator object for the current list of connections
+    available in the viriatum engine */
+    create_iterator_linked_list(_service->connections_list, &iterator);
+
+    /* iterates continuously over the complete set of connections
+    searching for the one with the matching identifier */
+    while(TRUE) {
+        get_next_iterator(iterator, (void **) &connection);
+        if(connection == NULL) { break; }
+        if((long) connection->id == id) { break; }
+    }
+
+    /* deletes the iterator for the connections list in order to
+    avoid any memory leak that could arise from this */
+    delete_iterator_linked_list(_service->connections_list, iterator);
+
+    /* in case no connection was found returns none to indicate
+    that the requested connection does not exist */
+    if(connection == NULL || (long) connection->id != id) { Py_RETURN_NONE; }
+
+    /* retrieves the delta value by calculating the difference between
+    the current time and the creation time then uses it to calculate
+    the uptime for the connection as a string description */
+    delta = (unsigned long long) time(NULL) - connection->creation;
+    format_delta(uptime, sizeof(uptime), delta, 2);
+
+    /* verifies if the current host is empty, this is a special
+    case where no resolution of the value was possible */
+    is_empty = connection->host[0] == '\0';
+
+    /* creates a dictionary with the connection attributes and
+    returns it to the python caller */
+    PyObject *dict = PyDict_New();
+    PyObject *_value;
+
+    _value = PyUnicode_FromString(is_empty ? "N/A" : (char *) connection->host);
+    PyDict_SetItemString(dict, "host", _value);
+    Py_DECREF(_value);
+
+    _value = PyLong_FromLong((long) connection->id);
+    PyDict_SetItemString(dict, "id", _value);
+    Py_DECREF(_value);
+
+    _value = PyUnicode_FromString(uptime);
+    PyDict_SetItemString(dict, "uptime", _value);
+    Py_DECREF(_value);
+
+    return dict;
+}
+
+PyObject *wsgi_uptime(PyObject *self, PyObject *args) {
+    return PyUnicode_FromString(_service->get_uptime(_service, 2));
 }
 
 PyObject *_new_wsgi_input(unsigned char *post_data, size_t size) {
@@ -207,7 +376,7 @@ PyObject *wsgi_input_read(PyObject *self, PyObject *args) {
     struct wsgi_input_t *_self = (struct wsgi_input_t *) self;
 
     size_t remaining = _self->size - _self->position;
-    PyObject *buffer = PyString_FromStringAndSize((char *) &_self->post_data[_self->position], remaining);
+    PyObject *buffer = PyBytes_FromStringAndSize((char *) &_self->post_data[_self->position], remaining);
     _self->position += remaining;
 
     return buffer;
@@ -255,16 +424,15 @@ PyMethodDef input_methods[5] = {
 };
 
 PyTypeObject input_type = {
-    PyObject_HEAD_INIT(NULL)
-    0,
+    PyVarObject_HEAD_INIT(NULL, 0)
     "viriatum_wsgi.input",                     /* tp_name */
     sizeof(struct wsgi_input_t),               /* tp_basicsize */
     0,                                         /* tp_itemsize*/
     (destructor) dealloc_wsgi_input,           /* tp_dealloc */
-    0,                                         /* tp_print */
+    0,                                         /* tp_vectorcall_offset */
     0,                                         /* tp_getattr */
     0,                                         /* tp_setattr */
-    0,                                         /* tp_compare */
+    0,                                         /* tp_as_async */
     0,                                         /* tp_repr */
     0,                                         /* tp_as_number */
     0,                                         /* tp_as_sequence */
@@ -275,11 +443,7 @@ PyTypeObject input_type = {
     0,                                         /* tp_getattro */
     0,                                         /* tp_setattro */
     0,                                         /* tp_as_buffer */
-#if defined(Py_TPFLAGS_HAVE_ITER)
-    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_HAVE_ITER, /* tp_flags */
-#else
     Py_TPFLAGS_DEFAULT,                        /* tp_flags */
-#endif
     0,                                         /* tp_doc */
     0,                                         /* tp_traverse */
     0,                                         /* tp_clear */

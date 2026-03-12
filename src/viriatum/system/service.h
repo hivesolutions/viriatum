@@ -471,7 +471,7 @@ typedef struct service_t {
 
     /**
      * Buffer used as static reference to the
-     * value to be returned in the retrieal of
+     * value to be returned in the retrieval of
      * the uptime function.
      */
     char _uptime[128];
@@ -493,7 +493,7 @@ typedef struct service_t {
     SSL *ssl_handle;
 
     /**
-     * The ssl configuration context that is currenly being
+     * The ssl configuration context that is currently being
      * used in the ssl socket handle.
      * This object is used in the construction of the handle.
      */
@@ -504,6 +504,9 @@ typedef struct service_t {
 /**
  * Structure defining the set of options/configuration
  * for an associated service.
+ *
+ * Some of the values are computed and not directly accessible
+ * via a configuration paradigm.
  */
 typedef struct service_options_t {
     /**
@@ -594,6 +597,31 @@ typedef struct service_options_t {
     unsigned char default_index;
 
     /**
+     * The root path for web content (www root), when
+     * set overrides the compile-time default contents
+     * path used for file serving.
+     */
+    unsigned char www_root[VIRIATUM_MAX_PATH_SIZE];
+
+    /**
+     * The resolved contents path, computed once at startup
+     * from www_root (if set) or VIRIATUM_CONTENTS_PATH.
+     */
+    unsigned char contents_path[VIRIATUM_MAX_PATH_SIZE];
+
+    /**
+     * The resolved resources path, computed once at startup
+     * from www_root (if set) or VIRIATUM_RESOURCES_PATH.
+     */
+    unsigned char resources_path[VIRIATUM_MAX_PATH_SIZE];
+
+    /**
+     * The resolved modules path, computed once at startup
+     * from VIRIATUM_MODULES_PATH.
+     */
+    unsigned char modules_path[VIRIATUM_MAX_PATH_SIZE];
+
+    /**
      * If the instance should use templates for error
      * messages providing a better look and feel at the
      * cost of more computer power (may create problems
@@ -608,7 +636,7 @@ typedef struct service_options_t {
     struct virtual_host_t *default_virtual_host;
 
     /**
-     * The string based buffer of file apths to the
+     * The string based buffer of file paths to the
      * index files to be used for root directory listing.
      * This value should be used as the default way to
      * discover the file to be used for directory listing.
@@ -622,7 +650,7 @@ typedef struct service_options_t {
     size_t index_count;
 
     /**
-     * The map (dictionary) containg the relations between
+     * The map (dictionary) containing the relations between
      * the file extension (dot prefixed) and the string based
      * mime type according to IANA.
      */

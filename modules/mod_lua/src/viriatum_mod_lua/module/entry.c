@@ -90,7 +90,7 @@ ERROR_CODE start_module_lua(struct environment_t *environment, struct module_t *
     /* populates the module structure */
     info_module_lua(module);
 
-    /* loads the Lua state populating all the erquired values
+    /* loads the Lua state populating all the required values
     for state initialization */
     _load_lua_state(&lua_state);
 
@@ -108,7 +108,7 @@ ERROR_CODE start_module_lua(struct environment_t *environment, struct module_t *
 
     /* sets the mod Lua handler attributes */
     mod_lua_http_handler->lua_state = lua_state;
-    mod_lua_http_handler->file_path = DEFAULT_FILE_PATH;
+    SPRINTF(mod_lua_http_handler->file_path, VIRIATUM_MAX_PATH_SIZE, "%s", DEFAULT_FILE_PATH);
     mod_lua_http_handler->file_dirty = 1;
 
     /* sets the mod Lua module attributes */
@@ -233,10 +233,19 @@ ERROR_CODE _load_configuration_lua(struct service_t *service, struct mod_lua_htt
     get_value_string_sort_map(service->configuration, (unsigned char *) "mod_lua", (void **) &configuration);
     if(configuration == NULL) { RAISE_NO_ERROR; }
 
-    /* tries ro retrieve the script path from the Lua configuration and in
-    case it exists sets it in the mod Lua handler (attribute reference change) */
+    /* tries to retrieve the script path from the Lua configuration and in
+    case it exists resolves it against the contents path when relative */
     get_value_string_sort_map(configuration, (unsigned char *) "script_path", &value);
-    if(value != NULL) { mod_lua_http_handler->file_path = (char *) value; }
+    if(value != NULL) {
+        unsigned char *script_path = (unsigned char *) value;
+        if(script_path[0] != '/') {
+            struct service_options_t *options = service->options;
+            if(script_path[0] == '\\') { script_path++; }
+            SPRINTF(mod_lua_http_handler->file_path, VIRIATUM_MAX_PATH_SIZE, "%s/%s", options->contents_path, script_path);
+        } else {
+            SPRINTF(mod_lua_http_handler->file_path, VIRIATUM_MAX_PATH_SIZE, "%s", script_path);
+        }
+    }
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -281,14 +290,21 @@ ERROR_CODE _load_locations_lua(struct service_t *service, struct mod_lua_http_ha
         default values in it */
         _location = &mod_lua_http_handler->locations[index];
         _location->lua_state = NULL;
-        _location->file_path = NULL;
+        _location->file_path[0] = '\0';
         _location->file_dirty = 0;
 
-        /* tries ro retrieve the script path from the Lua configuration and in
-        case it exists sets it in the location (attribute reference change) */
+        /* tries to retrieve the script path from the Lua configuration and in
+        case it exists resolves it against the contents path when relative */
         get_value_string_sort_map(configuration, (unsigned char *) "script_path", &value);
         if(value != NULL) {
-            _location->file_path = (char *) value;
+            unsigned char *script_path = (unsigned char *) value;
+            if(script_path[0] != '/') {
+                struct service_options_t *options = service->options;
+                if(script_path[0] == '\\') { script_path++; }
+                SPRINTF(_location->file_path, VIRIATUM_MAX_PATH_SIZE, "%s/%s", options->contents_path, script_path);
+            } else {
+                SPRINTF(_location->file_path, VIRIATUM_MAX_PATH_SIZE, "%s", script_path);
+            }
             _location->file_dirty = 1;
 
             /* loads a new Lua state for this location so that
@@ -305,7 +321,7 @@ ERROR_CODE _load_lua_state(lua_State **lua_state_pointer) {
     /* initializes the Lua interpreter, then loads
     various (default) Lua libraries and then starts
     the global values in the environment (symbol injection) */
-    lua_State *lua_state = lua_open();
+    lua_State *lua_state = luaL_newstate();
     luaL_openlibs(lua_state);
     _start_lua_state(lua_state);
 

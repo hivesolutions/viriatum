@@ -11,6 +11,18 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/lib)
 add_definitions(-DNO_PRAGMA_LIB)
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 
+option(VIRIATUM_DEBUG "Enable debug logging and diagnostics" OFF)
+if(VIRIATUM_DEBUG OR CMAKE_BUILD_TYPE STREQUAL "Debug")
+    add_definitions(-DVIRIATUM_DEBUG)
+    message(STATUS "Viriatum: debug mode enabled")
+endif()
+
+set(VIRIATUM_WWW_ROOT "" CACHE STRING "Path to the www root directory (sets WITH_WWW_ROOT)")
+if(VIRIATUM_WWW_ROOT)
+    add_definitions(-DWITH_WWW_ROOT="${VIRIATUM_WWW_ROOT}")
+    message(STATUS "Viriatum: www root set to '${VIRIATUM_WWW_ROOT}'")
+endif()
+
 file(GLOB_RECURSE VIRIATUM_COMMON_SOURCES src/viriatum_commons/*.c)
 add_library(viriatum_commons ${VIRIATUM_COMMON_SOURCES})
 

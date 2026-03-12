@@ -22,3 +22,12 @@
 
 # checks for header files
 AC_CHECK_HEADERS([stdlib.h assert.h])
+
+# checks for lua header using a compile test that mirrors
+# the actual build flags (headers are at lua5.1/lua.h)
+AC_MSG_CHECKING([for lua5.1/lua.h])
+AC_COMPILE_IFELSE(
+    [AC_LANG_SOURCE([[#include <lua5.1/lua.h>]])],
+    [AC_MSG_RESULT([yes])],
+    [AC_MSG_RESULT([no])
+     AC_MSG_ERROR([lua headers are required (install lua-dev or lua5.1-dev)])])

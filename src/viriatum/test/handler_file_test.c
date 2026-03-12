@@ -23,7 +23,6 @@
 */
 
 #include "stdafx.h"
-#include "viriatum.h"
 
 #include "handler_file_test.h"
 
@@ -61,16 +60,25 @@ const char *test_handler_file_context(void) {
 
 const char *test_handler_file_url(void) {
     /* allocates space for the error code returned by the
-    callback and for the HTTP parser and context structures */
+    callback and for the HTTP parser and context structures,
+    also allocates a test context for the service chain */
     ERROR_CODE error;
     struct http_parser_t *http_parser;
     struct handler_file_context_t *handler_file_context;
+    struct test_context_t *test_context;
+
+    /* creates the test context providing a minimal connection,
+    service and options chain for the handler callbacks */
+    create_test_context(&test_context);
 
     /* creates the HTTP parser and the handler file context
-    then wires them together through the context pointer */
+    then wires them together through the context pointer,
+    also sets the connection as the parser parameters so
+    that callbacks can access the service options */
     create_http_parser(&http_parser, TRUE);
     create_handler_file_context(&handler_file_context);
     http_parser->context = handler_file_context;
+    http_parser->parameters = test_context->connection;
     http_parser->method = HTTP_GET;
 
     /* tests that a normal url is properly parsed
@@ -111,10 +119,11 @@ const char *test_handler_file_url(void) {
     );
     V_ASSERT(IS_ERROR_CODE(error));
 
-    /* deletes both the context and the parser to
-    avoid any memory leak from the test */
+    /* deletes the context, the parser and the test
+    context to avoid any memory leak from the test */
     delete_handler_file_context(handler_file_context);
     delete_http_parser(http_parser);
+    delete_test_context(test_context);
 
     /* returns the default value, nothing happened so there's
     nothing to report for this execution */

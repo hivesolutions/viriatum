@@ -24,6 +24,10 @@
 
 #pragma once
 
+#include "../handlers/handler_dispatch.h"
+#include "../handlers/handler_file.h"
+#include "../http/http_parser.h"
+
 /**
  * Tests that the dispatch handler unset does not
  * free http_parser->context when it was set by

@@ -52,7 +52,7 @@ void test_thread_pool(void) {
     struct thread_pool_t *thread_pool;
 
     /* allocates space for the thread pool task */
-    struct thread_pool_task_t *thread_pool_task =\
+    struct thread_pool_task_t *thread_pool_task =
         (struct thread_pool_task_t *) MALLOC(sizeof(struct thread_pool_task_t));
 
     /* sets the start function */

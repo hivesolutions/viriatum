@@ -43,7 +43,7 @@ typedef struct mod_lua_location_t {
      * The path to the script file to
      * be used for this location.
      */
-    char *file_path;
+    char file_path[VIRIATUM_MAX_PATH_SIZE];
 
     /**
      * Flag that controls if the script file
@@ -68,7 +68,7 @@ typedef struct mod_lua_http_handler_t {
      * The path to the default file to
      * be used for the parsing.
      */
-    char *file_path;
+    char file_path[VIRIATUM_MAX_PATH_SIZE];
 
     /**
      * Flag that controls if the script file

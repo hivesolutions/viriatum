@@ -30,7 +30,7 @@ void create_memory_stream(struct memory_stream_t **memory_stream_pointer) {
     /* calculates the size of the memory stream structure and
     then uses this value to allocate  */
     size_t memory_stream_size = sizeof(struct memory_stream_t);
-    struct memory_stream_t *memory_stream =\
+    struct memory_stream_t *memory_stream =
         (struct memory_stream_t *) MALLOC(memory_stream_size);
 
     /* creates the stream (structure) and sets the
@@ -72,7 +72,7 @@ struct stream_t *get_stream_memory_stream(struct memory_stream_t *memory_stream)
 }
 
 void open_memory_stream(struct stream_t *stream) {
-    struct memory_stream_t *memory_stream =\
+    struct memory_stream_t *memory_stream =
         (struct memory_stream_t *) stream->lower;
     size_t buffer_size = SIZE_MEMORY_STREAM * sizeof(unsigned char);
     memory_stream->buffer = (unsigned char *) MALLOC(buffer_size);
@@ -82,7 +82,7 @@ void open_memory_stream(struct stream_t *stream) {
 }
 
 void close_memory_stream(struct stream_t *stream) {
-    struct memory_stream_t *memory_stream =\
+    struct memory_stream_t *memory_stream =
         (struct memory_stream_t *) stream->lower;
     if(memory_stream->buffer) { FREE(memory_stream->buffer); }
     memory_stream->buffer = NULL;
@@ -92,7 +92,7 @@ void close_memory_stream(struct stream_t *stream) {
 }
 
 size_t read_memory_stream(struct stream_t *stream, unsigned char *buffer, size_t size) {
-    struct memory_stream_t *memory_stream =\
+    struct memory_stream_t *memory_stream =
         (struct memory_stream_t *) stream->lower;
     size_t remaining = memory_stream->size - memory_stream->position;
     size_t count = size > remaining ? remaining : size;
@@ -108,7 +108,7 @@ size_t write_memory_stream(struct stream_t *stream, unsigned char *buffer, size_
     size_t extra;
     size_t allocation;
     unsigned char *pointer;
-    struct memory_stream_t *memory_stream =\
+    struct memory_stream_t *memory_stream =
         (struct memory_stream_t *) stream->lower;
     size_t remaining = memory_stream->buffer_size - memory_stream->position;
 
@@ -134,19 +134,19 @@ void flush_memory_stream(struct stream_t *stream) {
 }
 
 void seek_memory_stream(struct stream_t *stream, size_t target) {
-    struct memory_stream_t *memory_stream =\
+    struct memory_stream_t *memory_stream =
         (struct memory_stream_t *) stream->lower;
     memory_stream->position = target;
 }
 
 size_t size_memory_stream(struct stream_t *stream) {
-    struct memory_stream_t *memory_stream =\
+    struct memory_stream_t *memory_stream =
         (struct memory_stream_t *) stream->lower;
     return memory_stream->size;
 }
 
 size_t tell_memory_stream(struct stream_t *stream) {
-    struct memory_stream_t *memory_stream =\
+    struct memory_stream_t *memory_stream =
         (struct memory_stream_t *) stream->lower;
     return memory_stream->position;
 }

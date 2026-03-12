@@ -29,9 +29,12 @@
 /* starts the memory structures */
 START_MEMORY;
 
-/* initializes the module global variables this
-values will be used accross functions */
-START_GLOBALS;
+/* initializes the module global variables, these
+values will be used across functions */
+struct service_t *_service;
+struct connection_t *_connection;
+struct http_headers_t _headers;
+struct wsgi_request_t _wsgi_request;
 
 ERROR_CODE create_mod_wsgi_module(struct mod_wsgi_module_t **mod_wsgi_module_pointer, struct module_t *module) {
     /* retrieves the mod WSGI module size */
@@ -229,10 +232,19 @@ ERROR_CODE _load_configuration_wsgi(struct service_t *service, struct mod_wsgi_h
     get_value_string_sort_map(service->configuration, (unsigned char *) "mod_wsgi", (void **) &configuration);
     if(configuration == NULL) { RAISE_NO_ERROR; }
 
-    /* tries ro retrieve the script path from the WSGI configuration and in
-    case it exists sets it in the mod WSGI handler (attribute reference change) */
+    /* tries to retrieve the script path from the WSGI configuration and in
+    case it exists resolves it against the contents path when relative */
     get_value_string_sort_map(configuration, (unsigned char *) "script_path", &value);
-    if(value != NULL) { mod_wsgi_http_handler->file_path = (char *) value; }
+    if(value != NULL) {
+        unsigned char *script_path = (unsigned char *) value;
+        if(script_path[0] != '/') {
+            struct service_options_t *options = service->options;
+            if(script_path[0] == '\\') { script_path++; }
+            SPRINTF(mod_wsgi_http_handler->file_path, VIRIATUM_MAX_PATH_SIZE, "%s/%s", options->contents_path, script_path);
+        } else {
+            SPRINTF(mod_wsgi_http_handler->file_path, VIRIATUM_MAX_PATH_SIZE, "%s", script_path);
+        }
+    }
 
     /* tries to retrieve the script argument from the arguments map, then
     sets the reload (boolean) value for the service */
@@ -281,12 +293,22 @@ ERROR_CODE _load_locations_wsgi(struct service_t *service, struct mod_wsgi_http_
         the location buffer, this is going ot be populated and sets the
         default values in it */
         _location = &mod_wsgi_http_handler->locations[index];
+        _location->file_path[0] = '\0';
         _location->reload = UNSET;
 
-        /* tries ro retrieve the script path from the WSGI configuration and in
-        case it exists sets it in the location (attribute reference change) */
+        /* tries to retrieve the script path from the WSGI configuration and in
+        case it exists resolves it against the contents path when relative */
         get_value_string_sort_map(configuration, (unsigned char *) "script_path", &value);
-        if(value != NULL) { _location->file_path = (char *) value; }
+        if(value != NULL) {
+            unsigned char *script_path = (unsigned char *) value;
+            if(script_path[0] != '/') {
+                struct service_options_t *options = service->options;
+                if(script_path[0] == '\\') { script_path++; }
+                SPRINTF(_location->file_path, VIRIATUM_MAX_PATH_SIZE, "%s/%s", options->contents_path, script_path);
+            } else {
+                SPRINTF(_location->file_path, VIRIATUM_MAX_PATH_SIZE, "%s", script_path);
+            }
+        }
 
         /* tries to retrieve the script argument from the arguments map, then
         sets the reload (boolean) value for the location */
@@ -299,19 +321,26 @@ ERROR_CODE _load_locations_wsgi(struct service_t *service, struct mod_wsgi_http_
 }
 
 ERROR_CODE _load_wsgi_state() {
-    /* sets the current program name in the python interpreter
-    the name used is the same as the process running the service */
-    Py_SetProgramName((char *) _service->program_name);
+    /* initializes the python interpreter using the PyConfig API,
+    setting the program name from the service configuration */
+    PyConfig config;
+    PyConfig_InitPythonConfig(&config);
+
+    /* converts the program name to wide char and sets it in
+    the interpreter configuration structure */
+    wchar_t *program_name = Py_DecodeLocale(
+        (char *) _service->program_name, NULL
+    );
+    if(program_name != NULL) {
+        PyConfig_SetString(&config, &config.program_name, program_name);
+        PyMem_RawFree(program_name);
+    }
 
     /* starts the python interpreter initializing all the resources
     related with the virtual machine, this is the main entry point
     for the python interpreter (virtual machine) */
-    Py_Initialize();
-#ifdef PYTHON_THREADS
-    PyEval_InitThreads();
-    _state = PyThreadState_Get();
-    PyEval_ReleaseLock();
-#endif
+    Py_InitializeFromConfig(&config);
+    PyConfig_Clear(&config);
 
     /* starts the WSGI state updating the major global value in
     the current interpreter state */
@@ -322,20 +351,9 @@ ERROR_CODE _load_wsgi_state() {
 }
 
 ERROR_CODE _unload_wsgi_state() {
-    /* allocates space that will hold the reference to the
-    function to notify the modules about the end of the
-    python interpreter execution */
-    PyObject *exit_func;
-
-    /* retrieves the reference to the exit function to be
-    uses to notify the caller modules about the finaliztion
-    process from the interpreter */
-    VIRIATUM_ACQUIRE_GIL;
-    exit_func = PySys_GetObject("exitfunc");
-    if(exit_func != NULL) { PyEval_CallObject(exit_func, (PyObject *) NULL); }
-
-    /* shutsdown the python interpreter, releasing all the resources
-    associated with it (everything is destroyed) */
+    /* shuts down the python interpreter, releasing all the resources
+    associated with it (everything is destroyed), the atexit handlers
+    registered by modules will be called automatically by Py_Finalize */
     Py_Finalize();
 
     /* raises no error */
@@ -350,6 +368,17 @@ ERROR_CODE _reload_wsgi_state() {
     RAISE_NO_ERROR;
 }
 
+static PyObject *_init_wsgi_module(void) {
+    static struct PyModuleDef wsgi_module_def = {
+        PyModuleDef_HEAD_INIT,
+        "viriatum_wsgi",
+        NULL,
+        -1,
+        wsgi_methods
+    };
+    return PyModule_Create(&wsgi_module_def);
+}
+
 ERROR_CODE _start_wsgi_state() {
     /* allocates space for the reference to the to be created
     WSGI module and the type to be exported */
@@ -358,30 +387,42 @@ ERROR_CODE _start_wsgi_state() {
 
     /* retrieves the system path list and then appends (inserts)
     the various relative local paths into it (for relative usage) */
-    PyObject *current_path = PyString_FromString("");
+    PyObject *current_path = PyUnicode_FromString("");
     PyObject *path = PySys_GetObject("path");
     PyList_Insert(path, 0, current_path);
     Py_DECREF(current_path);
 
     /* registers the viriatum WSGI module in the python interpreter
     this module may be used to provide WSGI functions */
-    wsgi_module = Py_InitModule("viriatum_wsgi", wsgi_methods);
+    wsgi_module = _init_wsgi_module();
+    if(wsgi_module == NULL) { RAISE_NO_ERROR; }
+
+    /* adds the module to the interpreter so it can be imported */
+    PyObject *modules = PyImport_GetModuleDict();
+    PyDict_SetItemString(modules, "viriatum_wsgi", wsgi_module);
+
     PyModule_AddStringConstant(wsgi_module, "NAME", (char *) _service->name);
     PyModule_AddStringConstant(wsgi_module, "VERSION", (char *) _service->version);
     PyModule_AddStringConstant(wsgi_module, "PLATFORM", (char *) _service->platform);
     PyModule_AddStringConstant(wsgi_module, "FLAGS", (char *) _service->flags);
+    PyModule_AddStringConstant(wsgi_module, "MODULES", (char *) _service->modules);
+    PyModule_AddStringConstant(wsgi_module, "DESCRIPTION", (char *) _service->description);
     PyModule_AddStringConstant(wsgi_module, "COMPILER", (char *) _service->compiler);
     PyModule_AddStringConstant(wsgi_module, "COMPILER_VERSION", (char *) _service->compiler_version);
     PyModule_AddStringConstant(wsgi_module, "COMPILATION_DATE", (char *) _service->compilation_date);
     PyModule_AddStringConstant(wsgi_module, "COMPILATION_TIME", (char *) _service->compilation_time);
     PyModule_AddStringConstant(wsgi_module, "COMPILATION_FLAGS", (char *) _service->compilation_flags);
-    PyModule_AddStringConstant(wsgi_module, "DESCRIPTION", (char *) _service->compiler);
 
-    /* checks the input type for readyness and then casts the
+    /* checks the input type for readiness and then casts the
     type as a python type and registers it as input */
     PyType_Ready(&input_type);
     type = &input_type;
+    Py_INCREF(type);
     PyModule_AddObject(wsgi_module, "input", (PyObject *) type);
+
+    /* releases the local reference to the module, the interpreter
+    dictionary still holds a reference keeping it alive */
+    Py_DECREF(wsgi_module);
 
     /* raises no error */
     RAISE_NO_ERROR;

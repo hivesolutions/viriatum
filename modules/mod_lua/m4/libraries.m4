@@ -26,7 +26,21 @@ have_lua=true
 
 # checks for libraries
 AC_CHECK_LIB([viriatum], [main], [], [AC_MSG_ERROR([viriatum library is required])])
-AC_CHECK_LIB([lua5.1], [main], [], [AC_MSG_ERROR([lua 5.1 library is required])])
+
+# detects the Lua library, trying common naming conventions across distros
+# (lua5.1, lua-5.1, lua5.4, lua on Alpine, luajit)
+AC_MSG_CHECKING([for lua library])
+LUA_LIB=""
+for lualib in lua5.1 lua-5.1 lua5.4 lua-5.4 lua luajit-5.1; do
+    AC_CHECK_LIB([$lualib], [luaL_newstate], [LUA_LIB="$lualib"; break], [], [])
+done
+if test -n "$LUA_LIB"; then
+    AC_MSG_RESULT([$LUA_LIB])
+    LIBS="-l$LUA_LIB $LIBS"
+else
+    AC_MSG_RESULT([no])
+    AC_MSG_ERROR([lua library is required (install lua-dev or lua5.1-dev)])
+fi
 
 # library variables activation
 AM_CONDITIONAL(LINK_LUA, [test "$have_lua" != "false"])

@@ -259,8 +259,13 @@ ERROR_CODE url_callback_handler_file(struct http_parser_t *http_parser, const un
     size_t file_path_size;
 
     /* retrieves the handler file context from the HTTP parser */
-    struct handler_file_context_t *handler_file_context =\
+    struct handler_file_context_t *handler_file_context =
         (struct handler_file_context_t *) http_parser->context;
+
+    /* retrieves the connection from the HTTP parser parameters and
+    uses the pre-resolved contents path from service options */
+    struct connection_t *connection = (struct connection_t *) http_parser->parameters;
+    char *contents_path = (char *) connection->service->options->contents_path;
 
     /* checks the position of the get parameters divisor position
     and then uses it to calculate the size of the (base) path */
@@ -282,7 +287,7 @@ ERROR_CODE url_callback_handler_file(struct http_parser_t *http_parser, const un
         (char *) handler_file_context->file_path,
         VIRIATUM_MAX_PATH_SIZE,
         "%s%s%s",
-        VIRIATUM_CONTENTS_PATH,
+        contents_path,
         VIRIATUM_BASE_PATH,
         handler_file_context->url
     );
@@ -487,7 +492,7 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
 
     /* retrieves the handler file context from the HTTP parser and uses
     it to retrieve the respective flags value */
-    struct handler_file_context_t *handler_file_context =\
+    struct handler_file_context_t *handler_file_context =
         (struct handler_file_context_t *) http_parser->context;
     unsigned char flags = http_parser->flags;
 
@@ -548,12 +553,14 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
         /* otherwise it's the correct directory location and must present the
         listing of the directory to the user agent */
         else {
-            /* creates the complete path to the template file */
+            /* creates the complete path to the template file using
+            the pre-resolved resources path from service options */
+            char *resources_path = (char *) connection->service->options->resources_path;
             SPRINTF(
                 (char *) template_path,
                 sizeof(template_path),
                 "%s%s",
-                VIRIATUM_RESOURCES_PATH,
+                resources_path,
                 VIRIATUM_LISTING_PATH
             );
 
@@ -602,6 +609,18 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
 
             /* processes the file as a template handler */
             process_template_handler(template_handler, template_path);
+
+            /* warns if the template file was not found or produced no output
+            this will allow proper debugging of the situation */
+            if(template_handler->string_value == NULL || template_handler->string_value[0] == '\0') {
+                V_WARNING_F("Listing template file not found or empty '%s'\n", template_path);
+            } else {
+                V_DEBUG_F(
+                    "Sending listing template contents from '%s' (%lu bytes)\n",
+                    template_path,
+                    (unsigned long) strlen((char *) template_handler->string_value)
+                );
+            }
 
             /* sets the template handler in the handler file context and unsets
             the flushed flag */
@@ -769,7 +788,7 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
     /* in case there's an etag value defined and the values matched
     the one defined for the file, time to return a not modified value
     to the client indicating that cache should be used */
-    else if(handler_file_context->etag_status == 2 &&\
+    else if(handler_file_context->etag_status == 2 &&
         strcmp(etag, (char *) handler_file_context->etag) == 0) {
         /* writes the HTTP static headers to the response */
         write_http_headers_c(
@@ -820,7 +839,7 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
             206,
             "Partial content",
             keep_alive ? KEEP_ALIVE : KEEP_CLOSE,
-            handler_file_context->final_byte -\
+            handler_file_context->final_byte -
             handler_file_context->initial_byte + 1,
             NO_CACHE,
             FALSE
@@ -918,9 +937,14 @@ ERROR_CODE path_callback_handler_file(struct http_parser_t *http_parser, const u
 
     /* retrieves the handler file context from the HTTP parser
     and uses it to retrieve the reference to the base path in context */
-    struct handler_file_context_t *handler_file_context =\
+    struct handler_file_context_t *handler_file_context =
         (struct handler_file_context_t *) http_parser->context;
     unsigned char *base_path = handler_file_context->base_path;
+
+    /* retrieves the connection from the HTTP parser parameters and
+    uses the pre-resolved contents path from service options */
+    struct connection_t *connection = (struct connection_t *) http_parser->parameters;
+    char *contents_path = (char *) connection->service->options->contents_path;
 
     /* copies the memory from the data to the url and then
     puts the end of string in the url, note that only the path
@@ -940,7 +964,7 @@ ERROR_CODE path_callback_handler_file(struct http_parser_t *http_parser, const u
             (char *) handler_file_context->file_path,
             VIRIATUM_MAX_PATH_SIZE,
             "%s%s%s",
-            VIRIATUM_CONTENTS_PATH,
+            contents_path,
             VIRIATUM_BASE_PATH,
             handler_file_context->url
         );
@@ -1099,7 +1123,7 @@ ERROR_CODE _unset_http_parser_handler_file(struct http_parser_t *http_parser) {
 
 ERROR_CODE _reset_http_parser_handler_file(struct http_parser_t *http_parser) {
     /* retrieves the handler file context from the HTTP parser */
-    struct handler_file_context_t *handler_file_context =\
+    struct handler_file_context_t *handler_file_context =
         (struct handler_file_context_t *) http_parser->context;
 
     /* unsets the handler file context file */
@@ -1250,7 +1274,7 @@ ERROR_CODE _send_chunk_handler_file(struct connection_t *connection, struct data
     of bytes to be read from the file (optimal buffer sizing) */
     offset = ftell(file);
     remaining = handler_file_context->final_byte - offset + 1;
-    buffer_size = remaining < FILE_BUFFER_SIZE_HANDLER_FILE ?\
+    buffer_size = remaining < FILE_BUFFER_SIZE_HANDLER_FILE ?
         remaining : FILE_BUFFER_SIZE_HANDLER_FILE;
     file_buffer = MALLOC(buffer_size);
 

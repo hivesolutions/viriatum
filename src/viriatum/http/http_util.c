@@ -275,14 +275,24 @@ ERROR_CODE write_http_error_a(
     be used for template generation */
     unsigned char template_path[VIRIATUM_MAX_PATH_SIZE];
 
+    /* allocates a pointer to the resources path to be used for
+    template loading, resolved after options are retrieved */
+    char *resources_path;
+
+    /* allocates pointers for the service and options structures
+    retrieved from the connection, and for the headers buffer */
+    struct service_t *service;
+    struct service_options_t *options;
+    char *headers_buffer;
+
     /* retrieves the service from the connection structure and
     then uses it to retrieve its options */
-    struct service_t *service = connection->service;
-    struct service_options_t *options = service->options;
+    service = connection->service;
+    options = service->options;
 
-    /* allocates the headers buffer (it will be releases automatically by the writter)
-    it need to be allocated in the heap so it gets throught the request cycle */
-    char *headers_buffer = buffer == NULL ? MALLOC(VIRIATUM_HTTP_SIZE) : buffer;
+    /* allocates the headers buffer (it will be releases automatically by the writer)
+    it need to be allocated in the heap so it gets through the request cycle */
+    headers_buffer = buffer == NULL ? MALLOC(VIRIATUM_HTTP_SIZE) : buffer;
     size = size == 0 ? VIRIATUM_HTTP_SIZE : size;
 
     /* logs the HTTP error being sent to the client, using the warning
@@ -296,6 +306,9 @@ ERROR_CODE write_http_error_a(
     error_description = NULL;
 #endif
 
+    /* uses the pre-resolved resources path from service options */
+    resources_path = (char *) options->resources_path;
+
     /* in case the use template flag is set the error
     should be displayed using the template */
     if(options->use_template) {
@@ -304,7 +317,7 @@ ERROR_CODE write_http_error_a(
             (char *) template_path,
             sizeof(template_path),
             "%s%s",
-            VIRIATUM_RESOURCES_PATH,
+            resources_path,
             VIRIATUM_ERROR_PATH
         );
 
@@ -317,7 +330,7 @@ ERROR_CODE write_http_error_a(
 
         /* assigns the various error related variables into the
         template handler to be used, they may be used to display
-        information arround the error, note that the error description
+        information around the error, note that the error description
         value is conditional and may not be set */
         assign_integer_template_handler(template_handler, (unsigned char *) "error_code", error_code);
         assign_string_template_handler(template_handler, (unsigned char *) "error_message", error_message);
@@ -327,10 +340,50 @@ ERROR_CODE write_http_error_a(
 
         /* processes the file as a template handler, at this point
         the output buffer of the template engine should be populated
-        with the complete header information, the apropriate header
+        with the complete header information, the appropriate header
         writing method is chosen based on the existence or not of
         the realm authorization field */
         process_template_handler(template_handler, template_path);
+        if(template_handler->string_value == NULL || template_handler->string_value[0] == '\0') {
+            V_WARNING_F("Template file not found or empty '%s', falling back to text mode\n", template_path);
+            delete_template_handler(template_handler);
+            error_description = error_description == NULL ? (char *) service->description : error_description;
+            SPRINTF(
+                _error_description,
+                sizeof(_error_description),
+                "%d - %s - %s",
+                error_code,
+                error_message,
+                error_description
+            );
+            write_http_headers_m(
+                connection,
+                headers_buffer,
+                size,
+                version,
+                error_code,
+                error_message,
+                keep_alive,
+                strlen(_error_description),
+                NO_CACHE,
+                _error_description
+            );
+            write_connection(
+                connection,
+                (unsigned char *) headers_buffer,
+                (unsigned int) strlen(headers_buffer),
+                (connection_data_callback) callback,
+                callback_parameters
+            );
+            RAISE_NO_ERROR;
+        }
+
+        /* prints a debug message about the template contents being sent */
+        V_DEBUG_F(
+            "Sending template contents from '%s' (%lu bytes)\n",
+            template_path,
+            (unsigned long) strlen((char *) template_handler->string_value)
+        );
         realm == NULL ? write_http_headers_c(
             connection,
             headers_buffer,
@@ -371,7 +424,7 @@ ERROR_CODE write_http_error_a(
         delete_template_handler(template_handler);
 
         /* releases the contents of the headers buffer, no more need to
-        continue using them (not requried) */
+        continue using them (not required) */
         FREE(headers_buffer);
 
         /* writes the resulting buffer into the connection in order to be sent
@@ -384,7 +437,7 @@ ERROR_CODE write_http_error_a(
             callback_parameters
         );
     } else {
-        /* "stringfies" a possible null error description into a description
+        /* "stringifies" a possible null error description into a description
         string in order to be correctly displayed then formats the error
         message using the code, message and description */
         error_description = error_description == NULL ? (char *) service->description : error_description;
@@ -437,7 +490,7 @@ ERROR_CODE get_http_range_limits(unsigned char *range, size_t *initial_byte, siz
     size_t index;
 
     /* creates the inital and final local values and starts them
-    at the invalid (unset) values (intial state) */
+    at the invalid (unset) values (initial state) */
     long long initial_byte_v = -1;
     long long final_byte_v = -1;
 

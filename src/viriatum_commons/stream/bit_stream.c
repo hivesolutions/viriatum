@@ -333,7 +333,7 @@ void write_byte_bit_stream(
 ) {
     /* calculates the number of available bits (count) and
     then uses it to calculate the number of extra bits */
-    unsigned char available_bits_count = BIT_STREAM_ITEM_SIZE -\
+    unsigned char available_bits_count = BIT_STREAM_ITEM_SIZE -
         bit_stream->current_byte_offset_write;
     unsigned char extra_bits_count = size - available_bits_count;
 
@@ -455,8 +455,8 @@ void _write_bit_stream(struct bit_stream_t *bit_stream) {
     /* in case there is a (partial) byte waiting to be writen */
     if(bit_stream->current_byte_offset_write > 0) {
         /* sets the write buffer value */
-        bit_stream->buffer[bit_stream->byte_counter_write] =\
-            bit_stream->current_byte_write <<\
+        bit_stream->buffer[bit_stream->byte_counter_write] =
+            bit_stream->current_byte_write <<
             (BIT_STREAM_ITEM_SIZE - bit_stream->current_byte_offset_write);
 
         /* resets the various bit stream write

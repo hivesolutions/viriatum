@@ -31,7 +31,7 @@ void create_io_connection(struct io_connection_t **io_connection_pointer, struct
     size_t io_connection_size = sizeof(struct io_connection_t);
 
     /* allocates space for the io connection */
-    struct io_connection_t *io_connection =\
+    struct io_connection_t *io_connection =
         (struct io_connection_t *) MALLOC(io_connection_size);
 
     /* sets the default values for the io connection
@@ -272,7 +272,7 @@ ERROR_CODE read_handler_stream_io(struct connection_t *connection) {
 
     /* retrieves the io connection as the lower substrate of the
     current connection object, in order to be used */
-    struct io_connection_t *io_connection =\
+    struct io_connection_t *io_connection =
         (struct io_connection_t *) connection->lower;
 
     /* iterates continuously to read the data that is currently
