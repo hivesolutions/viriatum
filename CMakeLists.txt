@@ -41,6 +41,7 @@ endif()
 
 file(GLOB_RECURSE VIRIATUM_COMMON_SOURCES src/viriatum_commons/*.c)
 add_library(viriatum_commons ${VIRIATUM_COMMON_SOURCES})
+set_target_properties(viriatum_commons PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 target_include_directories(viriatum_commons PUBLIC src/viriatum_commons)
 
