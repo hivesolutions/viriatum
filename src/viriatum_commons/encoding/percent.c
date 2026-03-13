@@ -81,7 +81,7 @@ ERROR_CODE encode_percent(unsigned char *buffer, size_t length, unsigned char *_
 }
 
 ERROR_CODE decode_percent(unsigned char *buffer, size_t length, unsigned char *_buffer,  size_t *length_pointer) {
-    /* allocates the pointer to be used durring the iteration
+    /* allocates the pointer to be used during the iteration
     process for the URL decoding */
     unsigned char *pointer;
 
@@ -108,9 +108,9 @@ ERROR_CODE decode_percent(unsigned char *buffer, size_t length, unsigned char *_
             }
         }
         /* in case the current pointer value refers the plus
-        value refering a space character */
+        value referring to a space character */
         else if (*pointer == '+') {
-            /* sets the space chracter in the buffer */
+            /* sets the space character in the buffer */
             *__buffer++ = ' ';
         }
         /* otherwise the character is considered to be "normal"

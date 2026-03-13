@@ -35,7 +35,7 @@ struct http_connection_t;
 
 /**
  * The (maximum) size of the file buffer to be used
- * durring a file transfer.
+ * during a file transfer.
  * Increasing this value will allow the transfer
  * of bigger chunks, note that this is just the
  * maximum value for the buffer smaller files will

@@ -207,7 +207,7 @@ void _module_register(zval *_array) {
     if(_php_request.php_context->file_name[0] != '\0') { php_register_variable_safe("PHP_SELF", (char *) _php_request.php_context->file_name, _php_request.php_context->_file_name_string.length, _array); }
     else { php_register_variable_safe("PHP_SELF", "-", 1, _array); }
 
-    /* registers a series og global wide variable representing the
+    /* registers a series of global wide variable representing the
     current interface (critical for correct PHP interpreter usage) */
     php_register_variable_safe("SERVER_SOFTWARE", "viriatum", sizeof("viriatum") - 1, _array);
     php_register_variable_safe("GATEWAY_INTERFACE", "CGI/1.1", sizeof("CGI/1.1") - 1, _array);

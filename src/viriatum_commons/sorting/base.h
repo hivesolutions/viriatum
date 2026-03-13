@@ -26,8 +26,8 @@
 
 /**
  * Function used to compare two elements, returns positive in
- * case the firt element is greater than the second, negative
- * in case the opostie happens and zero in case they are equals.
+ * case the first element is greater than the second, negative
+ * in case the opposite happens and zero in case they are equal.
  */
 typedef int (*comparator) (void *, void *);
 

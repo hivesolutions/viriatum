@@ -57,7 +57,7 @@ typedef struct memory_item_t {
     /**
      * The pointer to the chunk structure that
      * "owns" this item, this is considered a
-     * reverse pointer in the herachy.
+     * reverse pointer in the hierarchy.
      */
     struct memory_chunk_t *chunk;
 
@@ -106,7 +106,7 @@ typedef struct memory_chunk_t {
      * The (bitmap) array index indicating the
      * first element in the array that is considered
      * to be in a free state. This value may be used
-     * to gather information for the bes possible item
+     * to gather information for the best possible item
      * allocation for the chunk.
      */
     size_t free;
@@ -352,7 +352,7 @@ static __inline void resize_memory_pool(struct memory_pool_t *pool, size_t chunk
     if(chunk_max_size == pool->chunk_max_size) { return; }
 
     /* verifies if the resize operation in the memory pool is a grow
-    operation or a shrink operation (based on the curren chunk max size) */
+    operation or a shrink operation (based on the current chunk max size) */
     is_grow = chunk_max_size > pool->chunk_max_size;
 
     /* updates both the chunk maximum size value and the "calculated"

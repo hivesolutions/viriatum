@@ -67,7 +67,7 @@ typedef struct memory_stream_t {
 
     /**
      * The reference to the upper stream
-     * structure, to be used as refernece.
+     * structure, to be used as reference.
      */
     struct stream_t *stream;
 } memory_stream;

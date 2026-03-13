@@ -109,7 +109,7 @@ ERROR_CODE encode_bencoding(struct type_t *type, unsigned char **encoded_puffer_
 
 ERROR_CODE decode_bencoding(unsigned char *encoded_buffer, size_t encoded_buffer_length, struct type_t **type_pointer) {
     /* allocates space for the general (temporary) variables
-    to be used durring the parsing of the buffer */
+    to be used during the parsing of the buffer */
     struct bencoding_engine_t *bencoding_engine;
     struct bencoding_handler_t *bencoding_handler;
 
@@ -150,7 +150,7 @@ ERROR_CODE encode_bencoding_file(char *file_path, struct type_t *type) {
 
 ERROR_CODE decode_bencoding_file(char *file_path, struct type_t **type_pointer) {
     /* allocates space for the general (temporary) variables
-    to be used durring the parsing of the file */
+    to be used during the parsing of the file */
     ERROR_CODE return_value;
     size_t file_size;
     unsigned char *file_buffer;
@@ -184,7 +184,7 @@ ERROR_CODE decode_bencoding_file(char *file_path, struct type_t **type_pointer) 
     structures, the top type is still defined */
     _stop_bencoding_engine(bencoding_engine);
 
-    /* releases the buffer used durring the parsing of
+    /* releases the buffer used during the parsing of
     the configuration file */
     FREE(file_buffer);
 
@@ -333,14 +333,14 @@ ERROR_CODE _stop_bencoding_engine(struct bencoding_engine_t *bencoding_engine) {
 
 ERROR_CODE _run_bencoding_engine(struct bencoding_engine_t *bencoding_engine, unsigned char *buffer, size_t size) {
     /* allocates space for the general (temporary) variables
-    to be used durring the parsing of the buffer */
+    to be used during the parsing of the buffer */
     size_t index;
     size_t string_size;
     unsigned char character;
     enum bencoding_state_e state;
 
     /* allocates the mark variables used to locate
-    the part of context changing durring the parsing */
+    the part of context changing during the parsing */
     unsigned char *pointer = 0;
     unsigned char *integer_end_mark = 0;
     unsigned char *string_end_mark = 0;
@@ -729,11 +729,11 @@ ERROR_CODE _bencoding_sequence_end_callback(struct bencoding_engine_t *bencoding
     }
 
     /* in case there is no sequence defined for the current handler context
-    no need to continue the processing (nothing to be assiciated) this is
+    no need to continue the processing (nothing to be associated) this is
     typical for the top level of parsing */
     if(bencoding_handler->sequence == NULL) { RAISE_NO_ERROR; }
 
-    /* swithces over the sequence type to take the appropriate action of
+    /* switches over the sequence type to take the appropriate action of
     setting the lower (previous) context in the upper (current) context */
     switch(bencoding_handler->sequence->type) {
         case LIST_TYPE:

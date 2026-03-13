@@ -49,7 +49,7 @@ typedef struct linked_buffer_t {
 
     /**
      * The list of buffers to have the memory
-     * released uppon destruction of the linked
+     * released upon destruction of the linked
      * buffer.
      */
     struct linked_list_t *release_list;

@@ -71,7 +71,7 @@ typedef ERROR_CODE (*ini_data_callback) (struct ini_engine_t *, const unsigned c
 
 /**
  * Enumeration describing the various states
- * occuring during the parsing of an ini file.
+ * occurring during the parsing of an ini file.
  */
 typedef enum ini_state_e {
     INI_ENGINE_NORMAL = 1,

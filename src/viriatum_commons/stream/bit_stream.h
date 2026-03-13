@@ -91,10 +91,10 @@ typedef struct bit_stream_t {
 
     /**
      * The position of the cursor inside the current
-     * byte for the read operation. Note that in oder
+     * byte for the read operation. Note that in order
      * to provide better performance this cursor is
-     * defined in the oposite order to expected one
-     * so it starts from the highest value and dicreases
+     * defined in the opposite order to expected one
+     * so it starts from the highest value and decreases
      * until the lower value is reached.
      * This value is used only for the read operations.
      */

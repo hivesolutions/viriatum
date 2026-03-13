@@ -30,7 +30,7 @@
 START_MEMORY;
 
 /* initializes the module global variables this
-values will be used accross functions */
+values will be used across functions */
 START_GLOBALS;
 
 ERROR_CODE create_mod_php_module(struct mod_php_module_t **mod_php_module_pointer, struct module_t *module) {
@@ -229,7 +229,7 @@ ERROR_CODE _load_configuration_php(struct service_t *service, struct mod_php_htt
     get_value_string_sort_map(service->configuration, (unsigned char *) "mod_php", (void **) &configuration);
     if(configuration == NULL) { RAISE_NO_ERROR; }
 
-    /* tries ro retrieve the base path from the PHP configuration and in
+    /* tries to retrieve the base path from the PHP configuration and in
     case it exists sets it in the mod PHP handler (attribute reference change) */
     get_value_string_sort_map(configuration, (unsigned char *) "base_path", &value);
     if(value != NULL) { mod_php_http_handler->base_path = (char *) value; }

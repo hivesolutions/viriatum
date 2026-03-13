@@ -153,7 +153,7 @@ ERROR_CODE unset_handler_php(struct http_connection_t *http_connection) {
 
 ERROR_CODE message_begin_callback_handler_module(struct http_parser_t *http_parser) {
     /* retrieves the handler PHP context from the HTTP parser
-    in order tu use it to update the content type to the default
+    in order to use it to update the content type to the default
     empty value (avoids possible problems in PHP interpreter)*/
     struct handler_php_context_t *handler_php_context = (struct handler_php_context_t *) http_parser->context;
     handler_php_context->content_type[0] = '\0';
@@ -464,7 +464,7 @@ ERROR_CODE _unset_http_settings_handler_php(struct http_settings_t *http_setting
 }
 
 ERROR_CODE _send_data_callback_php(struct connection_t *connection, struct data_t *data, void *parameters) {
-    /* allocates the buffer that will hod the message to be sent
+    /* allocates the buffer that will hold the message to be sent
     through the connection and then allocates the buffer to hold
     the joined buffer from the linked buffer reference */
     char *buffer;

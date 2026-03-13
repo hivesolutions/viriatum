@@ -43,7 +43,7 @@ ERROR_CODE process_passwd_file(char *file_path, struct hash_map_t **passwd_point
     enum passwd_state_e state;
 
     /* allocates space for the various pointers to be used
-    durring the parsing of the passwd file */
+    during the parsing of the passwd file */
     unsigned char *mark;
     unsigned char *buffer;
     unsigned char *pointer;

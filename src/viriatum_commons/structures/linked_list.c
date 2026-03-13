@@ -440,7 +440,7 @@ void pop_value_linked_list(struct linked_list_t *linked_list, void **value_point
 
     /* in case the linked list node is invalid */
     if(linked_list_node == NULL) {
-        /* sets the null valie in the value pointer */
+        /* sets the null value in the value pointer */
         *value_pointer = NULL;
     } else {
         /* sets the linked list node value in the value pointer */
@@ -464,7 +464,7 @@ void pop_top_value_linked_list(struct linked_list_t *linked_list, void **value_p
 
     /* in case the linked list node is invalid */
     if(linked_list_node == NULL) {
-        /* sets the null valie in the value pointer */
+        /* sets the null value in the value pointer */
         *value_pointer = NULL;
     } else {
         /* sets the linked list node value in the value pointer */
@@ -525,7 +525,7 @@ void peek_top_value_linked_list(struct linked_list_t *linked_list, void **value_
 
     /* in case the linked list node is invalid */
     if(linked_list_node == NULL) {
-        /* sets the null valie in the value pointer */
+        /* sets the null value in the value pointer */
         *value_pointer = NULL;
     } else {
         /* sets the linked list node value in the value pointer */
@@ -631,7 +631,7 @@ void to_sequence_linked_list(struct linked_list_t *linked_list, void ***sequence
 
 void sort_linked_list(struct linked_list_t *linked_list, comparator cmp) {
     /* allocats space for the index accumulator to be
-    used durring the sequence iteration */
+    used during the sequence iteration */
     size_t index;
 
     /* allocates space for the linear sequence of values to be

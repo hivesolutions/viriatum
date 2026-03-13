@@ -28,7 +28,7 @@
 
 ERROR_CODE process_ini_file(char *file_path, struct sort_map_t **configuration_pointer) {
     /* allocates space for the general (temporary) variables
-    to be used durring the parsing of the file */
+    to be used during the parsing of the file */
     ERROR_CODE return_value;
     size_t index;
     size_t file_size;
@@ -37,7 +37,7 @@ ERROR_CODE process_ini_file(char *file_path, struct sort_map_t **configuration_p
     enum ini_state_e state;
 
     /* allocates the mark variables used to locate
-    the part of context changing durring the parsing */
+    the part of context changing during the parsing */
     unsigned char *pointer = 0;
     unsigned char *section_end_mark = 0;
     unsigned char *comment_end_mark = 0;
@@ -175,7 +175,7 @@ ERROR_CODE process_ini_file(char *file_path, struct sort_map_t **configuration_p
         }
     }
 
-    /* releases the buffer used durring the parsing of
+    /* releases the buffer used during the parsing of
     the configuration file (avoids leaks) */
     FREE(file_buffer);
 

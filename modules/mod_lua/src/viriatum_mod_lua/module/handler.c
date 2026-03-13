@@ -143,7 +143,7 @@ ERROR_CODE body_callback_handler_lua(struct http_parser_t *http_parser, const un
 }
 
 ERROR_CODE message_complete_callback_handler_lua(struct http_parser_t *http_parser) {
-    /* sends (and creates) the reponse */
+    /* sends (and creates) the response */
     _send_response_handler_lua(http_parser);
 
     /* raise no error */
@@ -459,7 +459,7 @@ int _lua_write_connection(lua_State *lua_state) {
     /* retrieves the connection from the HTTP parser parameters */
     connection = (struct connection_t *) http_parser->parameters;
 
-    /* allocates the data buffer (in a safe maner) then
+    /* allocates the data buffer (in a safe manner) then
     copies the data (from Lua) into the buffer */
     connection->alloc_data(connection, data_size * sizeof(unsigned char), (void **) &buffer);
     memcpy(buffer, data, data_size);

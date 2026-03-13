@@ -389,7 +389,7 @@ ERROR_CODE body_callback_handler_dispatch(struct http_parser_t *http_parser, con
 }
 
 ERROR_CODE message_complete_callback_handler_dispatch(struct http_parser_t *http_parser) {
-    /* sends (and creates) the reponse */
+    /* sends (and creates) the response */
     _send_response_handler_dispatch(http_parser);
 
     /* raise no error */

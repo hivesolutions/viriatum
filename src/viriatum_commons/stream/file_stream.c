@@ -97,7 +97,7 @@ void close_file_stream(struct stream_t *stream) {
 }
 
 size_t read_file_stream(struct stream_t *stream, unsigned char *buffer, size_t size) {
-    /* retrieves the file stream from the stream (as the lowee substrate)
+    /* retrieves the file stream from the stream (as the lower substrate)
     and reads the amount of data requested from the currently open file */
     struct file_stream_t *file_stream = (struct file_stream_t *) stream->lower;
     return fread(buffer, sizeof(unsigned char), size, file_stream->file);

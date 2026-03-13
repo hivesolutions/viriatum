@@ -51,7 +51,7 @@ ERROR_CODE unset_handler_gif(struct http_connection_t *http_connection) {
 }
 
 ERROR_CODE message_complete_callback_handler_gif(struct http_parser_t *http_parser) {
-    /* sends (and creates) the reponse from the currently parsed
+    /* sends (and creates) the response from the currently parsed
     messages and then returns with no error the caller function */
     _send_response_handler_gif(http_parser);
     RAISE_NO_ERROR;
@@ -130,7 +130,7 @@ ERROR_CODE _send_response_callback_handler_gif(struct connection_t *connection, 
 
     /* checks if the current connection should be kept alive, this must
     be done prior to the unseting of the connection as the current GIF
-    context structrue will be destroyed there */
+    context structure will be destroyed there */
     unsigned char keep_alive = flags & FLAG_KEEP_ALIVE;
 
     /* in case there is an HTTP handler in the current connection must

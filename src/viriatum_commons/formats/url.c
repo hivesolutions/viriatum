@@ -38,7 +38,7 @@ ERROR_CODE parse_url(char *url, size_t url_size, struct url_t *url_s) {
     enum url_parse_state_e state;
 
     /* allocates space for the internal markers and pointers to
-    be used durring the parsin main loop */
+    be used during the parsing main loop */
     unsigned char *mark;
     unsigned char *pointer;
 

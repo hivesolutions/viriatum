@@ -392,7 +392,7 @@ ERROR_CODE body_callback_handler_proxy(struct http_parser_t *http_parser, const 
 }
 
 ERROR_CODE message_complete_callback_handler_proxy(struct http_parser_t *http_parser) {
-    /* reserves space fot the pointer to the buffer that may
+    /* reserves space for the pointer to the buffer that may
     be created in case there's a problem in the gateway */
     char *buffer;
 
@@ -490,7 +490,7 @@ ERROR_CODE virtual_url_callback_handler_proxy(struct http_parser_t *http_parser,
     char buffer[1024];
     char path[1024];
 
-    /* allocates space fot the temporary variable that will store the
+    /* allocates space for the temporary variable that will store the
     on close handler that will be set in the associative map */
     io_connection_callback on_close;
 
@@ -653,7 +653,7 @@ ERROR_CODE virtual_url_callback_handler_proxy(struct http_parser_t *http_parser,
     }
 
     /* raises no error to the caller function because no problem
-    has occured while handling the virtual url */
+    has occurred while handling the virtual url */
     RAISE_NO_ERROR;
 }
 

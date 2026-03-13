@@ -117,7 +117,7 @@ ERROR_CODE header_field_callback_handler_default(struct http_parser_t *http_pars
     /* copies the memory from the data to the header field */
     memcpy(header_field, data, data_size);
 
-    /* puts the end of strng in the header field */
+    /* puts the end of string in the header field */
     header_field[data_size] = '\0';
 
     /* prints the header field */
@@ -137,7 +137,7 @@ ERROR_CODE header_value_callback_handler_default(struct http_parser_t *http_pars
     /* copies the memory from the data to the header value */
     memcpy(header_value, data, data_size);
 
-    /* puts the end of strng in the header value */
+    /* puts the end of string in the header value */
     header_value[data_size] = '\0';
 
     /* prints the header value */
@@ -165,7 +165,7 @@ ERROR_CODE body_callback_handler_default(struct http_parser_t *http_parser, cons
     /* copies the memory from the data to the body */
     memcpy(body, data, data_size);
 
-    /* puts the end of strng in the body */
+    /* puts the end of string in the body */
     body[data_size] = '\0';
 
     /* prints the body */
@@ -182,7 +182,7 @@ ERROR_CODE message_complete_callback_handler_default(struct http_parser_t *http_
     /* prints an information */
     V_DEBUG("HTTP request parsed\n");
 
-    /* sends (and creates) the reponse */
+    /* sends (and creates) the response */
     _send_response_handler_default(http_parser);
 
     /* raise no error */

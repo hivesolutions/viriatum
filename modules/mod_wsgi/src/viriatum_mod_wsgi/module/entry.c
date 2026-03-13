@@ -290,7 +290,7 @@ ERROR_CODE _load_locations_wsgi(struct service_t *service, struct mod_wsgi_http_
         configuration = location->configuration;
 
         /* retrieves the current mod WSGI configuration reference from
-        the location buffer, this is going ot be populated and sets the
+        the location buffer, this is going to be populated and sets the
         default values in it */
         _location = &mod_wsgi_http_handler->locations[index];
         _location->file_path[0] = '\0';

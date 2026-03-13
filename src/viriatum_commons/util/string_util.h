@@ -51,7 +51,7 @@ static __inline unsigned char *base_string_value(unsigned char *string_value) {
     /* iterates from back through the string value to try to find
     the first slash separator inside the string */
     for(index = string_value_length; index > 0; index--) {
-        /* retrieves the current character and in cas the value
+        /* retrieves the current character and in case the value
         is either a slash or a back slash breaks the loop (target found) */
         current_character = string_value[index];
         if(current_character == '\\' || current_character == '/') {

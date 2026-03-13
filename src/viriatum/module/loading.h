@@ -297,7 +297,7 @@ static __inline void module_name(unsigned char *module_path, unsigned char *buff
     size_t index = 0;
     unsigned char *module_name = base_string_value(module_path);
 
-    /* "removes" the initial part of the module name refering
+    /* "removes" the initial part of the module name referring
     to the "mandatory" viriatum suffix */
     module_name = &module_name[VIRIATUM_MODULE_PREFIX];
 

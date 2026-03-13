@@ -55,7 +55,7 @@ typedef struct string_buffer_t {
 
     /**
      * The list of strings to have the memory
-     * released uppon destruction of the string
+     * released upon destruction of the string
      * buffer.
      */
     struct linked_list_t *release_list;
@@ -123,7 +123,7 @@ VIRIATUM_EXPORT_PREFIX void join_string_buffer(struct string_buffer_t *string_bu
  * will be appended to the final "joined" string.
  * The length of the provided string is calculated using the "classic"
  * null terminated string.
- * This method releases the memory of the added string value, uppon
+ * This method releases the memory of the added string value, upon
  * releasing the string buffer memory.
  * Use this method carefully it may cause memory corruption.
  *
@@ -136,7 +136,7 @@ VIRIATUM_EXPORT_PREFIX void _append_string_buffer(struct string_buffer_t *string
  * Appends (adds) a string value to the string buffer, this value
  * will be appended to the final "joined" string.
  * The length of the string is provided so no calculation is done.
- * This method releases the memory of the added string value, uppon
+ * This method releases the memory of the added string value, upon
  * releasing the string buffer memory.
  * Use this method carefully it may cause memory corruption.
  *
@@ -151,7 +151,7 @@ VIRIATUM_EXPORT_PREFIX void _append_string_l_buffer(struct string_buffer_t *stri
  * Appends (adds) a string value to the string buffer, this value
  * will be appended to the final "joined" string.
  * The string structure is provided so no length calculation is done.
- * This method releases the memory of the added string value, uppon
+ * This method releases the memory of the added string value, upon
  * releasing the string buffer memory.
  * Use this method carefully it may cause memory corruption.
  *

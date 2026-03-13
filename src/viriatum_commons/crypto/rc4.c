@@ -92,7 +92,7 @@ void cipher_rc4(struct rc4_t *rc4, char *data, size_t size, char *data_c) {
 
         k = rc4->box[(rc4->box[rc4->x] + rc4->box[rc4->y]) % 256];
 
-        /* runs the xor operation fot the current byte and the
+        /* runs the xor operation for the current byte and the
         pseudo randomly generated key byte, then sets the result
         in the associated encrypted data buffer index */
         ciph = byte ^ k;

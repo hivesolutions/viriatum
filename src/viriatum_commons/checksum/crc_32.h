@@ -25,11 +25,11 @@
 #pragma once
 
 /**
- * Calculates a crc32 chesum for the given buffer, the process undertakes
+ * Calculates a crc32 checksum for the given buffer, the process undertakes
  * the typical polynomial approach.
  * The calculated checksum is returned as an unsigned long value.
  *
- * @param buffer The (data) buffer to be used in the checkum calculation.
+ * @param buffer The (data) buffer to be used in the checksum calculation.
  * @param buffer_length The length of the (data) buffer to calculate the checksum.
  * @return The calculated crc32 checksum value.
  */
