@@ -593,45 +593,47 @@ ERROR_CODE _send_response_handler_lua(struct http_parser_t *http_parser) {
 
     /* runs the script in case the current file is considered to be
     dirty, this is the case for the loading of the module and reloading */
-    if(*file_dirty_pointer) { result_code = luaL_dofile(*lua_state_pointer, file_path); *file_dirty_pointer = 0; }
-    else { result_code = 0; }
+    if(*file_dirty_pointer) {
+        result_code = luaL_dofile(*lua_state_pointer, file_path);
+        *file_dirty_pointer = 0;
 
-    /* in case there was an error in Lua */
-    if(LUA_ERROR(result_code)) {
-        /* retrieves the error message and logs it at warning level
-        for console visibility before sending the error response */
-        error_message = (char *) lua_tostring(*lua_state_pointer, -1);
-        V_WARNING_CTX_F(
-            "mod_lua", "Lua error in %s: %s\n",
-            file_path,
-            error_message ? error_message : "(unknown error)"
-        );
+        /* in case there was an error in Lua */
+        if(LUA_ERROR(result_code)) {
+            /* retrieves the error message and logs it at warning level
+            for console visibility before sending the error response */
+            error_message = (char *) lua_tostring(*lua_state_pointer, -1);
+            V_WARNING_CTX_F(
+                "mod_lua", "Lua error in %s: %s\n",
+                file_path,
+                error_message ? error_message : "(unknown error)"
+            );
 
-        /* pops the error message from the Lua stack before reloading
-        the state to avoid leaving orphaned values */
-        lua_pop(*lua_state_pointer, 1);
+            /* pops the error message from the Lua stack before reloading
+            the state to avoid leaving orphaned values */
+            lua_pop(*lua_state_pointer, 1);
 
-        /* sets the file as dirty (forces reload) and then reloads the current
-        internal Lua state, virtual machine reset (to avoid corruption) */
-        *file_dirty_pointer = 1;
-        _reload_lua_state(lua_state_pointer);
+            /* sets the file as dirty (forces reload) and then reloads the current
+            internal Lua state, virtual machine reset (to avoid corruption) */
+            *file_dirty_pointer = 1;
+            _reload_lua_state(lua_state_pointer);
 
-        /* raises the error to the upper levels (the caller
-        writes the error response to the connection) */
-        RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem executing script file");
-    }
+            /* raises the error to the upper levels (the caller
+            writes the error response to the connection) */
+            RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem executing script file");
+        }
 
-    /* if the script returned a table (WSAPI module convention) store
-    it as the _wsapi_app global for subsequent requests */
-    if(lua_istable(*lua_state_pointer, -1)) {
-        lua_setglobal(*lua_state_pointer, "_wsapi_app");
-    } else {
-        lua_pop(*lua_state_pointer, lua_gettop(*lua_state_pointer) > 0 ? 1 : 0);
+        /* if the script returned a table (WSAPI module convention) store
+        it as the _wsapi_app global for subsequent requests */
+        if(lua_istable(*lua_state_pointer, -1)) {
+            lua_setglobal(*lua_state_pointer, "_wsapi_app");
+        } else {
+            lua_pop(*lua_state_pointer, lua_gettop(*lua_state_pointer) > 0 ? 1 : 0);
 
-        /* clears any stale _wsapi_app reference so that a broken
-        reload does not fall back to the previous module table */
-        lua_pushnil(*lua_state_pointer);
-        lua_setglobal(*lua_state_pointer, "_wsapi_app");
+            /* clears any stale _wsapi_app reference so that a broken
+            reload does not fall back to the previous module table */
+            lua_pushnil(*lua_state_pointer);
+            lua_setglobal(*lua_state_pointer, "_wsapi_app");
+        }
     }
 
     /* retrieves the field reference to the run function, first trying
