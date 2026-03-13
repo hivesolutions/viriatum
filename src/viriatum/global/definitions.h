@@ -60,7 +60,7 @@ static __inline char *get_contents_path(void) {
 
     base_path = local ? "." : get_base_path();
     if(local) { SPRINTF(resources_path, VIRIATUM_MAX_PATH_SIZE, "%s", base_path); }
-    else { SPRINTF(resources_path, VIRIATUM_MAX_PATH_SIZE, "%s/htdocs", base_path); }
+    else { SPRINTF(resources_path, VIRIATUM_MAX_PATH_SIZE, "%s" VIRIATUM_PATH_SEPARATOR "htdocs", base_path); }
 
     return resources_path;
 }
@@ -71,7 +71,7 @@ static __inline char *get_resources_path(void) {
     if(resources_path[0] != '\0') { return resources_path; }
 
     base_path = get_base_path();
-    SPRINTF(resources_path, VIRIATUM_MAX_PATH_SIZE, "%s/htdocs", base_path);
+    SPRINTF(resources_path, VIRIATUM_MAX_PATH_SIZE, "%s" VIRIATUM_PATH_SEPARATOR "htdocs", base_path);
 
     return resources_path;
 }
@@ -82,7 +82,7 @@ static __inline char *get_modules_path(void) {
     if(modules_path[0] != '\0') { return modules_path; }
 
     base_path = get_base_path();
-    SPRINTF(modules_path, VIRIATUM_MAX_PATH_SIZE, "%s/modules", base_path);
+    SPRINTF(modules_path, VIRIATUM_MAX_PATH_SIZE, "%s" VIRIATUM_PATH_SEPARATOR "modules", base_path);
 
     return modules_path;
 }
@@ -93,7 +93,7 @@ static __inline char *get_config_path(void) {
     if(config_path[0] != '\0') { return config_path; }
 
     base_path = get_base_path();
-    SPRINTF(config_path, VIRIATUM_MAX_PATH_SIZE, "%s/config", base_path);
+    SPRINTF(config_path, VIRIATUM_MAX_PATH_SIZE, "%s" VIRIATUM_PATH_SEPARATOR "config", base_path);
 
     return config_path;
 }

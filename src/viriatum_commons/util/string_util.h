@@ -132,11 +132,9 @@ static __inline void uppercase(char *string_value) {
 
 static __inline void normalize_path(char *string_value) {
     while(*string_value != '\0') {
-#ifdef VIRIATUM_PLATFORM_WIN32
-        if(*string_value == '/') { *string_value = '\\'; }
-#else
-        if(*string_value == '\\') { *string_value = '/'; }
-#endif
+        if(*string_value == '/' || *string_value == '\\') {
+            *string_value = VIRIATUM_PATH_SEPARATOR_C;
+        }
         string_value++;
     }
 }

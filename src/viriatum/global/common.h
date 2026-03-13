@@ -49,7 +49,7 @@ static __inline char *resolve_config_path(char *file_path, char *default_path, c
         SPRINTF(
             result_path,
             VIRIATUM_MAX_PATH_SIZE,
-            "%s/%s",
+            "%s" VIRIATUM_PATH_SEPARATOR "%s",
             config_path,
             file_path
         );
@@ -71,7 +71,7 @@ static __inline char *resolve_config_path(char *file_path, char *default_path, c
         SPRINTF(
             result_path,
             VIRIATUM_MAX_PATH_SIZE,
-            "%s/%s",
+            "%s" VIRIATUM_PATH_SEPARATOR "%s",
             config_path,
             default_path
         );

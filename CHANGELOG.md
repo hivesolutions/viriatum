@@ -29,6 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * `absolute_path_file` function in `viriatum_commons/io/file.c` for resolving relative paths to absolute (`realpath` on Unix, `_fullpath` on Windows)
 * Pre-resolved `contents_path`, `resources_path` and `modules_path` fields in `service_options_t` computed once at startup
 * Unit tests for `normalize_path`, `join_path_file`, and `absolute_path_file`
+* `VIRIATUM_PATH_SEPARATOR` and `VIRIATUM_PATH_SEPARATOR_C` constants for platform-native path separators
 
 ### Changed
 

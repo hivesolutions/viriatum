@@ -1334,7 +1334,7 @@ ERROR_CODE load_modules_service(struct service_t *service) {
         SPRINTF(
             (char *) module_path,
             VIRIATUM_MAX_PATH_SIZE,
-            "%s/%s",
+            "%s" VIRIATUM_PATH_SEPARATOR "%s",
             service->options->modules_path,
             entry->name
         );
@@ -2210,7 +2210,7 @@ ERROR_CODE _file_options_service(struct service_t *service, struct hash_map_t *a
         return_value = 1;
         for(candidate_index = 0; candidate_index < candidate_count; candidate_index++) {
             if(candidates[candidate_index] == NULL) {
-                SPRINTF(config_path, VIRIATUM_MAX_PATH_SIZE, "%s/viriatum.ini", VIRIATUM_CONFIG_PATH);
+                SPRINTF(config_path, VIRIATUM_MAX_PATH_SIZE, "%s" VIRIATUM_PATH_SEPARATOR "viriatum.ini", VIRIATUM_CONFIG_PATH);
             } else {
                 SPRINTF(config_path, VIRIATUM_MAX_PATH_SIZE, "%s", candidates[candidate_index]);
             }

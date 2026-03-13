@@ -392,11 +392,7 @@ ERROR_CODE join_path_file(char *base_path, char *name, char *joined_path) {
 
     /* in case the base path ends with the separator
     (no need to add the extra separator)*/
-#ifdef VIRIATUM_PLATFORM_WIN32
-    if(base_path[base_path_length - 1] == '\\') {
-#else
-    if(base_path[base_path_length - 1] == '/') {
-#endif
+    if(base_path[base_path_length - 1] == VIRIATUM_PATH_SEPARATOR_C) {
         /* adds the name part to the joined path */
         memcpy(joined_path + base_path_length, name, name_length + 1);
     }
@@ -404,11 +400,7 @@ ERROR_CODE join_path_file(char *base_path, char *name, char *joined_path) {
     else {
         /* adds the separator to the joined path and then adds
         the name to the joined path also */
-#ifdef VIRIATUM_PLATFORM_WIN32
-        memcpy(joined_path + base_path_length, "\\", 1);
-#else
-        memcpy(joined_path + base_path_length, "/", 1);
-#endif
+        memcpy(joined_path + base_path_length, VIRIATUM_PATH_SEPARATOR, 1);
         memcpy(joined_path + base_path_length + 1, name, name_length + 1);
     }
 
