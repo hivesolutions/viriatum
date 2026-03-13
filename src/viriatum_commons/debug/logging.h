@@ -53,18 +53,18 @@ and the date prefix when the terminal supports colour output */
 /* prints the level label surrounded by colour escapes when the
 terminal supports it, or as plain text otherwise */
 #define V_LEVEL(color, level) \
-    logging_use_color() ? \
+    use_color_logging() ? \
         PRINTF_F("%s%s%s", color, level, V_COLOR_RESET) : \
         PRINTF_F("%s", level)
 
 #ifdef VIRIATUM_DEBUG
-#define V_MESSAGE(level, color) logging_print_date(); V_LEVEL(color, level); PRINTF_F(" [%s:%d] ", base_string_value((unsigned char *) __FILE__), __LINE__)
-#define V_MESSAGE_CONTEXT(level, color, context) logging_print_date(); V_LEVEL(color, level); PRINTF_F(" [%s:%d] [%s] ", base_string_value((unsigned char *) __FILE__), __LINE__, context)
+#define V_MESSAGE(level, color) print_date_logging(); V_LEVEL(color, level); PRINTF_F(" [%s:%d] ", base_string_value((unsigned char *) __FILE__), __LINE__)
+#define V_MESSAGE_CONTEXT(level, color, context) print_date_logging(); V_LEVEL(color, level); PRINTF_F(" [%s:%d] [%s] ", base_string_value((unsigned char *) __FILE__), __LINE__, context)
 #endif
 
 #ifndef VIRIATUM_DEBUG
-#define V_MESSAGE(level, color) logging_print_date(); V_LEVEL(color, level); PRINTF_F("%s", " ")
-#define V_MESSAGE_CONTEXT(level, color, context) logging_print_date(); V_LEVEL(color, level); PRINTF_F(" [%s] ", context)
+#define V_MESSAGE(level, color) print_date_logging(); V_LEVEL(color, level); PRINTF_F("%s", " ")
+#define V_MESSAGE_CONTEXT(level, color, context) print_date_logging(); V_LEVEL(color, level); PRINTF_F(" [%s] ", context)
 #endif
 
 #ifdef VIRIATUM_DEBUG
@@ -103,7 +103,11 @@ terminal supports it, or as plain text otherwise */
 
 #define V_PRINT(format) PRINTF(format)
 #define V_PRINT_F(format, ...) PRINTF_F(format, __VA_ARGS__)
+#define V_PRINT_C(color, format) \
+    do { if(use_color_logging()) { PRINTF_F("%s", color); } PRINTF(format); if(use_color_logging()) { PRINTF_F("%s", V_COLOR_RESET); } } while(0)
+#define V_PRINT_CF(color, format, ...) \
+    do { if(use_color_logging()) { PRINTF_F("%s", color); } PRINTF_F(format, __VA_ARGS__); if(use_color_logging()) { PRINTF_F("%s", V_COLOR_RESET); } } while(0)
 
-VIRIATUM_EXPORT_PREFIX int logging_use_color(void);
-VIRIATUM_EXPORT_PREFIX void logging_print_date(void);
+VIRIATUM_EXPORT_PREFIX int use_color_logging(void);
+VIRIATUM_EXPORT_PREFIX void print_date_logging(void);
 VIRIATUM_EXPORT_PREFIX void debug(const char *format, ...);

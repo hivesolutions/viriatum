@@ -31,6 +31,7 @@
 #define V_ASSERT_HEX(actual, expected, size) do {\
     if(memcmp(actual, expected, size) != 0) {\
         size_t _i;\
+        V_PRINT_CF(V_COLOR_ERROR, "  [%s:%d] hex comparison failed\n", base_string_value((unsigned char *) __FILE__), __LINE__);\
         V_PRINT("  expected: ");\
         for(_i = 0; _i < (size_t)(size); _i++) { V_PRINT_F("%02x", ((unsigned char *)(expected))[_i]); }\
         V_PRINT("\n  actual:   ");\
@@ -46,12 +47,12 @@
     test_case->total++;\
     if(message == NULL) {\
         if(test_case->echo == TRUE) {\
-            V_PRINT("ok\n");\
+            V_PRINT_C(V_COLOR_INFO, "ok\n");\
         }\
         test_case->success++;\
     } else {\
         if(test_case->echo == TRUE) {\
-            V_PRINT("not ok\n");\
+            V_PRINT_C(V_COLOR_ERROR, "not ok\n");\
             V_PRINT_F("[%s:%d] %s\n", base_string_value((unsigned char *) __FILE__), __LINE__, message);\
         }\
         test_case->failure++;\
@@ -79,7 +80,7 @@ typedef const char *(*test_function) (void);
 
 /**
  * Definition of the general entry point for a function that
- * is resposible for a test case execution.
+ * is responsible for a test case execution.
  *
  * This function should run the various test associated with
  * the test case and then populate the test case structure.
@@ -89,12 +90,12 @@ typedef void (*test_case_function) (struct test_case_t *test_case);
 /**
  * Runs a single speed test and prints a series of messages
  * to the standard output according to the provided name for
- * the speed fucntion.
+ * the speed function.
  *
  * @param name The name of the test function to be executed
  * and measured for time.
  * @param function Pointer to the function to be executed
- * and have its execution time meassured.
+ * and have its execution time measured.
  * @param iterations The number of iterations to be executed
  * in the performance test in case this value is not provided
  * the value defaults to one.
@@ -103,7 +104,7 @@ VIRIATUM_EXPORT_PREFIX ERROR_CODE run_speed_test(char *name, test_function funct
 
 /**
  * Runs the test case defined by the provided function and
- * described throught the provided name.
+ * described thought the provided name.
  *
  * The test case execution will be verbose meaning that a
  * message output will be performed.

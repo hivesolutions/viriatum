@@ -31,8 +31,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Unit tests for `normalize_path`, `join_path_file`, and `absolute_path_file`
 * `VIRIATUM_PATH_SEPARATOR` and `VIRIATUM_PATH_SEPARATOR_C` constants for platform-native path separators
 * CMake pass-through of effective C flags to `CFLAGS` preprocessor define for runtime banner display
+* `V_PRINT_C` and `V_PRINT_CF` color-aware print macros for optional ANSI color output
+* Colored test output: green for `ok`, red for `not ok` and hex comparison failures, colored summary line
 
 ### Changed
+
+* Renamed `logging_use_color` to `use_color_logging` and `logging_print_date` to `print_date_logging`
 
 * Upgraded mod_wsgi from Python 2.7 to Python 3 (PyGILState API, modern embed workflow)
 * Upgraded mod_php from PHP 5.6 to PHP 8.x (libphp.so, updated header paths)
