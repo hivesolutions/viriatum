@@ -225,7 +225,25 @@ void _module_register(zval *_array) {
 }
 
 void _module_log(const char *message, int syslog_type_int) {
-    V_DEBUG_CTX_F("mod_php", "%s\n", message);
+    switch(syslog_type_int) {
+        case LOG_EMERG:
+        case LOG_ALERT:
+        case LOG_CRIT:
+        case LOG_ERR:
+            V_ERROR_CTX_F("mod_php", "%s\n", message);
+            break;
+        case LOG_WARNING:
+            V_WARNING_CTX_F("mod_php", "%s\n", message);
+            break;
+        case LOG_NOTICE:
+        case LOG_INFO:
+            V_INFO_CTX_F("mod_php", "%s\n", message);
+            break;
+        case LOG_DEBUG:
+        default:
+            V_DEBUG_CTX_F("mod_php", "%s\n", message);
+            break;
+    }
 }
 
 zend_result _module_request_time(double *request_time) {
@@ -346,7 +364,7 @@ PHP_FUNCTION(viriatum_connection_info) {
     expected by the PHP C API infra-structure */
     zend_parse_parameters(1, "l", &id);
 
-    /* intializes the return value of the function as an
+    /* initializes the return value of the function as an
     associative array to be used y the zend system */
     array_init(return_value);
 
