@@ -17,8 +17,6 @@ else()
     set(MODULE_SUFFIX ".so")
 endif()
 
-# standalone modules that have no external dependencies are
-# always built when module support is enabled
 option(VIRIATUM_BUILD_MOD_DIAG "Build the diagnostics module" ON)
 if(VIRIATUM_BUILD_MOD_DIAG)
     add_subdirectory(mod_diag)
@@ -29,8 +27,6 @@ if(VIRIATUM_BUILD_MOD_GIF)
     add_subdirectory(mod_gif)
 endif()
 
-# modules that depend on external libraries are only built
-# when the required dependencies are found on the system
 option(VIRIATUM_BUILD_MOD_PHP "Build the PHP module" ON)
 if(VIRIATUM_BUILD_MOD_PHP)
     add_subdirectory(mod_php)
