@@ -98,19 +98,6 @@ void _transform_sha1(unsigned int state[5], const unsigned char *buffer) {
     memcpy(&block_data, buffer, 64);
     block = &block_data;
 
-#ifndef VIRIATUM_BIG_ENDIAN
-    /* byte-swaps the 16 words from little-endian to big-endian
-    before the rounds, this avoids undefined behavior from the
-    original BLK_0 macro which read and wrote the same word
-    without a sequence point */
-    {
-        unsigned int _idx;
-        for(_idx = 0; _idx < 16; _idx++) {
-            block->l[_idx] = BSWAP32(block->l[_idx]);
-        }
-    }
-#endif
-
     /* copies context state to working vars */
     a = state[0];
     b = state[1];

@@ -32,13 +32,11 @@
 
 #define ROL(value, bits) (((value) << (bits)) | ((value) >> (32 - (bits))))
 
-#define BSWAP32(x) ((((x) >> 24) & 0xffu) | (((x) >> 8) & 0xff00u) \
-    |(((x) << 8) & 0xff0000u) | (((x) << 24) & 0xff000000u))
-
 #ifdef VIRIATUM_BIG_ENDIAN
 #define BLK_0(i) block->l[i]
 #else
-#define BLK_0(i) block->l[i]
+#define BLK_0(i) (block->l[i] = (ROL(block->l[i], 24) & 0xff00ff00) \
+    |(ROL(block->l[i], 8) & 0x00ff00ff))
 #endif
 #define BLK(i) (block->l[i & 15] = ROL(block->l[(i + 13) & 15] ^ block->l[(i + 8) & 15] \
     ^block->l[(i + 2) & 15] ^ block->l[i & 15], 1))
