@@ -86,3 +86,8 @@ cmake_install.cmake
 /darwin/xcode4/viriatum.xcworkspace/xcuserdata
 /darwin/xcode4/viriatum/viriatum.xcodeproj/xcuserdata
 /darwin/xcode4/viriatum_commons/viriatum_commons.xcodeproj/xcuserdata
+
+/modules/mod_*/*.vcxproj
+/modules/mod_*/*.vcxproj.filters
+/modules/mod_*/viriatum_mod_*.dir
+/lua5.1
