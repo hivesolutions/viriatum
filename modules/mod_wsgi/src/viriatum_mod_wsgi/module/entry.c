@@ -405,7 +405,6 @@ ERROR_CODE _start_wsgi_state() {
     PyModule_AddStringConstant(wsgi_module, "VERSION", (char *) _service->version);
     PyModule_AddStringConstant(wsgi_module, "PLATFORM", (char *) _service->platform);
     PyModule_AddStringConstant(wsgi_module, "FLAGS", (char *) _service->flags);
-    PyModule_AddStringConstant(wsgi_module, "MODULES", (char *) _service->modules);
     PyModule_AddStringConstant(wsgi_module, "DESCRIPTION", (char *) _service->description);
     PyModule_AddStringConstant(wsgi_module, "COMPILER", (char *) _service->compiler);
     PyModule_AddStringConstant(wsgi_module, "COMPILER_VERSION", (char *) _service->compiler_version);

@@ -44,7 +44,7 @@ def application(environ, start_response):
             viriatum_wsgi.COMPILATION_DATE,
             viriatum_wsgi.COMPILATION_TIME,
             viriatum_wsgi.COMPILATION_FLAGS,
-            viriatum_wsgi.MODULES,
+            viriatum_wsgi.modules(),
         )
     )
     body = body.encode("utf-8")
