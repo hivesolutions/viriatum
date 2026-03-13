@@ -43,6 +43,7 @@ The most commonly used viriatum commands are:\n\
    --daemon   Runs the service as daemon (background)\n\
    --test     Runs a series of test for viriatum\n\
    --speed    Runs a series of speed relates tests for viriatum\n\
+   --info     Prints the service information\n\
    --help     Prints this (help) message\n\
 \n\
 See 'viriatum --help[=<command>]' for more information on a specific command.\n"
@@ -81,7 +82,7 @@ ERROR_CODE init_service(char *program_name, struct hash_map_t *arguments) {
     calculate_locations_service(service);
 
     /* runs the printing operation on the service, this should
-    output the information to the standar output */
+    output the information to the standard output */
     print_options_service(service);
 
     /* raises no error to the caller method, normal
@@ -152,7 +153,7 @@ ERROR_CODE run_service_s(char *program_name, struct hash_map_t *arguments) {
     if(IS_ERROR_CODE(return_value)) { RAISE_AGAIN(return_value); }
 
     /* run the service, blocking the call until the service is
-    finished, the retrives the return value from it */
+    finished, the retrieves the return value from it */
     return_value = run_service();
     if(IS_ERROR_CODE(return_value)) { RAISE_AGAIN(return_value); }
 
@@ -266,8 +267,9 @@ ERROR_CODE version(void) {
         VIRIATUM_COMPILATION_TIME
     ); RAISE_NO_ERROR;
 }
-ERROR_CODE test(void) { return run_simple_tests(); }
-ERROR_CODE speed(void) { return run_speed_tests(); }
+ERROR_CODE info(void) { return print_information(); }
+ERROR_CODE test(void) { print_information(); return run_simple_tests(); }
+ERROR_CODE speed(void) { print_information(); return run_speed_tests(); }
 
 #ifdef VIRIATUM_PLATFORM_WIN32
 void daemonize(void) { }
@@ -411,6 +413,12 @@ int execute_arguments(char *program_name, struct hash_map_t *arguments) {
     so that any file read is read from the current directory */
     get_value_string_hash_map(arguments, (unsigned char *) "local", &value);
     if(value != NULL) { localize(); }
+
+    /* tries to retrieve the local argument from the arguments
+    map in case the value exists localizes the current service
+    so that any file read is read from the current directory */
+    get_value_string_hash_map(arguments, (unsigned char *) "info", &value);
+    if(value != NULL) { info(); }
 
     /* in cas the flag that control if the service must be run is
     unset the control flow must be returned immediately (avoids
