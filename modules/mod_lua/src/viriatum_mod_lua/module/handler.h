@@ -99,10 +99,167 @@ typedef struct mod_lua_http_handler_t {
     struct mod_lua_location_t *current_location;
 } mod_lua_http_handler;
 
+/**
+ * Structure describing the per-request context
+ * for the Lua handler, used to accumulate request
+ * data during HTTP parsing and to build the WSAPI
+ * environ table.
+ */
+typedef struct handler_lua_context_t {
+    /**
+     * The URL to be used for retrieving the file.
+     */
+    unsigned char url[VIRIATUM_MAX_URL_SIZE];
+
+    /**
+     * The file name to be used for retrieving the file.
+     */
+    unsigned char file_name[VIRIATUM_MAX_URL_SIZE];
+
+    /**
+     * The query string (contents after the '?')
+     * to be used to create the get parameters map.
+     */
+    unsigned char query[VIRIATUM_MAX_URL_SIZE];
+
+    /**
+     * The name to be considered the prefix in the
+     * internal Lua structure for internal guide.
+     * This value is used for "virtual" location guide.
+     */
+    unsigned char prefix_name[VIRIATUM_MAX_PATH_SIZE];
+
+    /**
+     * The path to the file to be handled by
+     * the current Lua request.
+     */
+    unsigned char file_path[VIRIATUM_MAX_PATH_SIZE];
+
+    /**
+     * The content type for the current request being
+     * made this is a header value.
+     */
+    unsigned char content_type[VIRIATUM_MAX_HEADER_SIZE];
+
+    /**
+     * The content length for the current request being
+     * made this is a header value.
+     */
+    unsigned char content_length_[VIRIATUM_MAX_HEADER_SIZE];
+
+    /**
+     * The cookie for the current request being
+     * made this is a header value.
+     */
+    unsigned char cookie[VIRIATUM_MAX_HEADER_SIZE];
+
+    /**
+     * The host for the current request being
+     * made this is a header value.
+     */
+    unsigned char host[VIRIATUM_MAX_HEADER_SIZE];
+
+    /**
+     * The server name for the current request being
+     * made this is a header value.
+     */
+    unsigned char server_name[VIRIATUM_MAX_HEADER_SIZE];
+
+    /**
+     * The current header structure, representing the
+     * header currently being parsed.
+     * In case no value is defined there's no header
+     * "in parsing".
+     */
+    struct http_header_value_t *header;
+
+    /**
+     * The list of headers parsed for the current request
+     * this value changes over the parsing of the request.
+     */
+    struct http_headers_t *headers;
+
+    /**
+     * The current value for the flags describing
+     * the status of the current HTTP request.
+     */
+    unsigned char flags;
+
+    /**
+     * Enumeration value that controls the type
+     * of the next header to be read from the
+     * HTTP input buffer.
+     */
+    enum http_header_e _next_header;
+
+    /**
+     * String reference to the URL buffer, useful
+     * for fast attribute calculation (eg: size).
+     */
+    struct string_t _url_string;
+
+    /**
+     * String reference to the file name buffer, useful
+     * for fast attribute calculation (eg: size).
+     */
+    struct string_t _file_name_string;
+
+    /**
+     * String reference to the query string, useful
+     * for fast attribute calculation (eg: size).
+     */
+    struct string_t _query_string;
+
+    /**
+     * String reference to the prefix name buffer, useful
+     * for fast attribute calculation (eg: size).
+     */
+    struct string_t _prefix_name_string;
+
+    /**
+     * String reference to the file path buffer, useful
+     * for fast attribute calculation (eg: size).
+     */
+    struct string_t _file_path_string;
+
+    /**
+     * String reference to the content type buffer, useful
+     * for fast attribute calculation (eg: size).
+     */
+    struct string_t _content_type_string;
+
+    /**
+     * String reference to the content length buffer, useful
+     * for fast attribute calculation (eg: size).
+     */
+    struct string_t _content_length_string;
+
+    /**
+     * String reference to the cookie buffer, useful
+     * for fast attribute calculation (eg: size).
+     */
+    struct string_t _cookie_string;
+
+    /**
+     * String reference to the host buffer, useful
+     * for fast attribute calculation (eg: size).
+     */
+    struct string_t _host_string;
+
+    /**
+     * String reference to the server name buffer, useful
+     * for fast attribute calculation (eg: size).
+     */
+    struct string_t _server_name_string;
+} handler_lua_context;
+
 ERROR_CODE create_mod_lua_http_handler(struct mod_lua_http_handler_t **mod_lua_http_handler_pointer, struct http_handler_t *http_handler_pointer);
 ERROR_CODE delete_mod_lua_http_handler(struct mod_lua_http_handler_t *mod_lua_http_handler);
+ERROR_CODE create_handler_lua_context(struct handler_lua_context_t **handler_lua_context_pointer);
+ERROR_CODE delete_handler_lua_context(struct handler_lua_context_t *handler_lua_context);
 ERROR_CODE set_handler_lua(struct http_connection_t *http_connection);
 ERROR_CODE unset_handler_lua(struct http_connection_t *http_connection);
+ERROR_CODE message_begin_callback_handler_module(struct http_parser_t *http_parser);
 ERROR_CODE url_callback_handler_lua(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size);
 ERROR_CODE header_field_callback_handler_lua(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size);
 ERROR_CODE header_value_callback_handler_lua(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size);
@@ -116,8 +273,7 @@ ERROR_CODE _set_http_parser_handler_lua(struct http_parser_t *http_parser);
 ERROR_CODE _unset_http_parser_handler_lua(struct http_parser_t *http_parser);
 ERROR_CODE _set_http_settings_handler_lua(struct http_settings_t *http_settings);
 ERROR_CODE _unset_http_settings_handler_lua(struct http_settings_t *http_settings);
-ERROR_CODE _message_begin_callback_handler_lua(struct http_parser_t *http_parser);
 ERROR_CODE _send_response_handler_lua(struct http_parser_t *http_parser);
 ERROR_CODE _send_response_callback_handler_lua(struct connection_t *connection, struct data_t *data, void *parameters);
 ERROR_CODE _write_error_connection_lua(struct http_parser_t *http_parser, char *message);
-int _lua_write_connection(lua_State *lua_state);
+ERROR_CODE _start_environ_lua(lua_State *lua_state, struct http_parser_t *http_parser);
