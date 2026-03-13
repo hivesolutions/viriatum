@@ -317,7 +317,7 @@ ERROR_CODE entries_to_map_file(struct linked_list_t *entries, struct linked_list
         );
 
         /* allocates space for the size string and populates it
-        by formating the size integer accoringly */
+        by formatting the size integer accordingly */
         size_string = MALLOC(128);
         if(entry->type == FILE_TYPE_DIRECTORY) { memcpy(size_string, "-", sizeof("-")); }
         else { format_bytes(size_string, 128, entry->size); }
@@ -649,7 +649,7 @@ ERROR_CODE list_directory_file(char *file_path, struct linked_list_t *entries) {
     wchar_t name_u[VIRIATUM_MAX_PATH_SIZE];
 
     /* allocates the various windows internal structures
-    for the findind of the directory entries */
+    for the finding of the directory entries */
     WIN32_FIND_DATA find_data;
     HANDLE handler_find = INVALID_HANDLE_VALUE;
 
@@ -722,7 +722,7 @@ ERROR_CODE list_directory_file(char *file_path, struct linked_list_t *entries) {
             NULL
         );
 
-        /* allocates the required space for the anme of the entry
+        /* allocates the required space for the name of the entry
         and then runs the conversion from the wide char into the
         default utf8 encoding for viriatum proper handling */
         entry->name = (unsigned char *) MALLOC(name_size);

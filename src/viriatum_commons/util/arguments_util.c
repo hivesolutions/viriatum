@@ -49,7 +49,7 @@ ERROR_CODE process_arguments(int argc, char *argv[], struct hash_map_t **argumen
         /* allocates space for the "new" argument to be parsed */
         argument = (struct argument_t *) MALLOC(sizeof(struct argument_t));
 
-        /* retrievs the current argument, then processes it
+        /* retrieves the current argument, then processes it
         using the default (simple) parser and sets it in
         the arguments map */
         current_argument = argv[index];
@@ -139,7 +139,7 @@ ERROR_CODE print_arguments(struct hash_map_t *arguments) {
             break;
         }
 
-        /* retrievs the hash map value for the key */
+        /* retrieves the hash map value for the key */
         get_value_hash_map(
             arguments,
             element->key,

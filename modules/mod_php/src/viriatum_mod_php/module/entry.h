@@ -28,7 +28,7 @@
 #include "extension.h"
 
 /**
- * The bae path to the directory to be used as default
+ * The base path to the directory to be used as default
  * in case no other definition exists (configuration).
  */
 #define DEFAULT_BASE_PATH "."

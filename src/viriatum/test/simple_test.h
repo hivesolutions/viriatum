@@ -250,7 +250,7 @@ const char *test_join_path_file(void);
 const char *test_absolute_path_file(void);
 
 /**
- * Compares an element with another, usefull
+ * Compares an element with another, useful
  * for the sorting tests.
  *
  * @param first The first value to be compared.

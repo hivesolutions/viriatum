@@ -44,7 +44,7 @@ void create_polling_select(struct polling_select_t **polling_select_pointer, str
     polling_select->read_outstanding_size = 0;
     polling_select->write_outstanding_size = 0;
 
-    /* zerifies the variuous socket sets that are going
+    /* zeros out the various socket sets that are going
     to be used during the select type polling */
     SOCKET_SET_ZERO(&polling_select->sockets_read_set);
     SOCKET_SET_ZERO(&polling_select->sockets_write_set);

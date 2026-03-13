@@ -81,7 +81,7 @@ typedef union type_value_t {
     /**
      * Used to store any other value
      * described as a type.
-     * This value must be casted uppon
+     * This value must be casted upon
      * usage.
      */
     void *value_pointer;

@@ -149,13 +149,13 @@ static __inline const char *get_http_version_string(enum http_version_e http_ver
 }
 
 /**
- * Convers the provided major and minor based version set
+ * Converts the provided major and minor based version set
  * of integer values into a more standard representation
  * of the HTTP version values using enumerations.
  *
  * @param http_major The major version value for the HTTP
  * protocol to be used in the enumeration conversion.
- * @param http_minor The minor version value for the htto
+ * @param http_minor The minor version value for the http
  * protocol  to be used in the enumeration conversion.
  * @return The standard enumeration oriented version of the
  * HTTP version value converted accordingly.

@@ -57,7 +57,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-* Fixed ~50 spelling errors in comments across the codebase (`durring` → `during`, `reponse` → `response`, `strng` → `string`, `uppon` → `upon`, `structrue` → `structure`, etc.)
+* Fixed ~150 spelling errors in comments across the entire codebase (`durring` → `during`, `reponse` → `response`, `usefull` → `useful`, `writen` → `written`, `completly` → `completely`, `ammount` → `amount`, `arround` → `around`, `scoket` → `socket`, etc.)
 * Fixed mod_php failing to load in `Dockerfile.all` due to missing `libphp.so` symlink in the runtime stage
 
 * Fixed SHA1 producing wrong digests on ARM64 (macOS Apple Silicon) due to incorrect big-endian classification of AArch64 in `cpu.h` — ARM64 is little-endian

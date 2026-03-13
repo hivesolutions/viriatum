@@ -78,7 +78,7 @@ typedef struct file_location_t {
 typedef struct file_handler_t {
     /**
      * The various locations loaded from the configuration
-     * they refer the cofiruation attributes associated
+     * they refer the configuration attributes associated
      * with the file structures.
      */
     struct file_location_t *locations;

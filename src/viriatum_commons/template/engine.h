@@ -180,7 +180,7 @@ typedef struct template_settings_t {
 } template_settings;
 
 /**
- * Structure repenting the template engine (parser)
+ * Structure representing the template engine (parser)
  * used to store all the context of the current
  * parsing.
  * Additional options may be used to store context

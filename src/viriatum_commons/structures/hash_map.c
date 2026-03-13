@@ -526,7 +526,7 @@ size_t _calculate_string_hash_map(unsigned char *key_string) {
             break;
         }
 
-        /* re-calculates the key value based uppon the current
+        /* re-calculates the key value based upon the current
         character value in loop */
         key = (1000003 * key) ^ current;
 

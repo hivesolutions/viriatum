@@ -46,7 +46,7 @@ typedef struct mod_wsgi_location_t {
     /**
      * Flag that controls if the script should
      * be reload everytime a request is received.
-     * This options is usefull for debugging purposes,
+     * This options is useful for debugging purposes,
      * and should never be used in production.
      */
     char reload;
@@ -82,7 +82,7 @@ typedef struct mod_wsgi_http_handler_t {
     /**
      * Flag that controls if the script should
      * be reload everytime a request is received.
-     * This options is usefull for debugging purposes,
+     * This options is useful for debugging purposes,
      * and should never be used in production.
      */
     char reload;
@@ -242,7 +242,7 @@ typedef struct handler_wsgi_context_t {
     enum http_header_e _next_header;
 
     /**
-     * String reference to the URL buffer, usefull
+     * String reference to the URL buffer, useful
      * for fast attribute calculation (eg: size).
      */
     struct string_t _url_string;

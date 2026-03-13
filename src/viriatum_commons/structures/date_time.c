@@ -38,6 +38,6 @@ void create_date_time(struct date_time_t **date_time_pointer) {
 }
 
 void delete_date_time(struct date_time_t *date_time) {
-    /* releases the data time */
+    /* releases the date time */
     FREE(date_time);
 }

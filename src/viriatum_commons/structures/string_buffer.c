@@ -45,7 +45,7 @@ void create_string_buffer(struct string_buffer_t **string_buffer_pointer) {
     create_linked_list(&string_buffer->length_list);
 
     /* creates the list to hold the various strings
-    to have the memory released uppon destruction */
+    to have the memory released upon destruction */
     create_linked_list(&string_buffer->release_list);
 
     /* sets the string buffer in the string buffer pointer */
@@ -159,7 +159,7 @@ void join_string_buffer(struct string_buffer_t *string_buffer, unsigned char **s
         pointer += partial_value_length;
     }
 
-    /* "closes" the string value, usefull for usage as a "classic"
+    /* "closes" the string value, useful for usage as a "classic"
     null terminated string */
     string_value[string_buffer->string_length] = '\0';
 
@@ -175,7 +175,7 @@ void join_string_buffer(struct string_buffer_t *string_buffer, unsigned char **s
 
 void _append_string_buffer(struct string_buffer_t *string_buffer, unsigned char *string_value) {
     /* adds the string value to the list of strings to have
-    the memory released uppon string buffer release */
+    the memory released upon string buffer release */
     append_value_linked_list(string_buffer->release_list, string_value);
 
     /* adds the string value to the string buffer */
@@ -184,7 +184,7 @@ void _append_string_buffer(struct string_buffer_t *string_buffer, unsigned char 
 
 void _append_string_l_buffer(struct string_buffer_t *string_buffer, unsigned char *string_value, size_t string_length) {
     /* adds the string value to the list of strings to have
-    the memory released uppon string buffer release */
+    the memory released upon string buffer release */
     append_value_linked_list(string_buffer->release_list, string_value);
 
     /* adds the string (with length) value to the string buffer */

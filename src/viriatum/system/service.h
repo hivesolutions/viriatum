@@ -65,7 +65,7 @@ typedef enum process_type_e {
 
 /**
  * The function used to retrieve a string in english representing
- * the uptime of the service refered.
+ * the uptime of the service referred to.
  */
 typedef const char *(*service_uptime) (struct service_t *, size_t);
 
@@ -112,7 +112,7 @@ typedef ERROR_CODE (*connection_data_callback) (struct connection_t *, struct da
 
 /**
  * Function used to write data into a connection, optional
- * parameters allow a callback uppon the end of writing.
+ * parameters allow a callback upon the end of writing.
  */
 typedef ERROR_CODE (*connection_write) (struct connection_t *connection, unsigned char *, unsigned int, connection_data_callback, void *);
 
@@ -356,7 +356,7 @@ typedef struct service_t {
 
     /**
      * The string describing the current service
-     * and its configuration, usefull for a quick
+     * and its configuration, useful for a quick
      * visual description of the service.
      */
     unsigned char description[1024];
@@ -1502,10 +1502,10 @@ ERROR_CODE invalidate_write_connection(struct connection_t *connection);
 /**
  * Adds the current connection as outstanding meaning that
  * outstanding read operations are pending and should be
- * performed at the begining of the next loop.
+ * performed at the beginning of the next loop.
  *
  * @param connection The connection to be set as having
- * outstanding (read) opertions.
+ * outstanding (read) operations.
  * @return The resulting error code.
  */
 ERROR_CODE add_outstanding_connection(struct connection_t *connection);

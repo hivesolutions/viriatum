@@ -48,7 +48,7 @@ void create_template_handler(struct template_handler_t **template_handler_pointe
     create_string_buffer(&template_handler->string_buffer);
 
     /* creates the list to hold the various types
-    to have the memory released uppon destruction */
+    to have the memory released upon destruction */
     create_linked_list(&template_handler->release_list);
 
     /* sets the template engine in the template handler pointer */
@@ -284,7 +284,7 @@ void assign_integer_template_handler(struct template_handler_t *template_handler
     set_value_string_hash_map(template_handler->names, name, type);
 
     /* adds the type to the list of types to have the
-    memory released uppon template handler destruction (late removal) */
+    memory released upon template handler destruction (late removal) */
     append_value_linked_list(template_handler->release_list, type);
 }
 
@@ -301,7 +301,7 @@ void assign_string_template_handler(struct template_handler_t *template_handler,
     set_value_string_hash_map(template_handler->names, name, type);
 
     /* adds the type to the list of types to have the
-    memory released uppon template handler destruction (late removal) */
+    memory released upon template handler destruction (late removal) */
     append_value_linked_list(template_handler->release_list, type);
 }
 
@@ -318,7 +318,7 @@ void assign_list_template_handler(struct template_handler_t *template_handler, u
     set_value_string_hash_map(template_handler->names, name, type);
 
     /* adds the type to the list of types to have the
-    memory released uppon template handler destruction (late removal) */
+    memory released upon template handler destruction (late removal) */
     append_value_linked_list(template_handler->release_list, type);
 }
 

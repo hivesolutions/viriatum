@@ -41,7 +41,7 @@ ERROR_CODE create_proxy_handler(struct proxy_handler_t **proxy_handler_pointer, 
     /* creates the hash map that is going to be used for the associations
     between the client connections with the viriatum server (proxy) and the
     backend connections to the proxy target servers and then creates the
-    reverved version of the same map associating the backend connection with
+    reversed version of the same map associating the backend connection with
     the proxy client connections */
     create_hash_map(&proxy_handler->connections_map, 0);
     create_hash_map(&proxy_handler->reverse_map, 0);
@@ -64,7 +64,7 @@ ERROR_CODE delete_proxy_handler(struct proxy_handler_t *proxy_handler) {
 
     /* deletes the structure that is used for the mapping operation
     of the client connections to the proxy to the backend connections
-    and the exact oposite of that structure (reverse mapping) */
+    and the exact opposite of that structure (reverse mapping) */
     delete_hash_map(proxy_handler->connections_map);
     delete_hash_map(proxy_handler->reverse_map);
 
@@ -160,7 +160,7 @@ ERROR_CODE register_handler_proxy(struct service_t *service) {
     size_t index;
 
     /* allocates space for both the location and the configuration
-    reference stuctures */
+    reference structures */
     struct location_t *location;
     struct sort_map_t *configuration;
 
@@ -205,12 +205,12 @@ ERROR_CODE register_handler_proxy(struct service_t *service) {
         configuration = location->configuration;
 
         /* retrieves the current mod proxy configuration reference from
-        the location buffer, this is going ot be populated and sets the
+        the location buffer, this is going to be populated and sets the
         default values in it */
         _location = &proxy_handler->locations[index];
         _location->proxy_pass = NULL;
 
-        /* tries ro retrieve the proxy pass from the proxy configuration and in
+        /* tries to retrieve the proxy pass from the proxy configuration and in
         case it exists sets it in the location (attribute reference change) */
         get_value_string_sort_map(configuration, (unsigned char *) "proxy_pass", &value);
         if(value != NULL) { _location->proxy_pass = (unsigned char *) value; }
@@ -564,7 +564,7 @@ ERROR_CODE virtual_url_callback_handler_proxy(struct http_parser_t *http_parser,
     handler_proxy_context->pending = TRUE;
 
     /* sets the initial values for the number of bytes pending in the write
-    buffer to be writen this value will be used to control the read stream
+    buffer to be written this value will be used to control the read stream
     of the backend server, in order to avoid flooding */
     handler_proxy_context->pending_write = 0;
 

@@ -77,7 +77,7 @@ ERROR_CODE _send_response_handler_gif(struct http_parser_t *http_parser) {
     it is handled by the main engine */
     connection->alloc_data(connection, VIRIATUM_HTTP_MAX_SIZE, (void **) &buffer);
 
-    /* acquires the lock on the HTTP connection, this will avoids further
+    /* acquires the lock on the HTTP connection, this will avoid further
     messages to be processed, no parallel request handling problems, then
     writes the message into the current HTTP connection, the message should
     be composed of an empty GIF */

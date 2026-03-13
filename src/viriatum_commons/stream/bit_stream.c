@@ -53,7 +53,7 @@ void create_bit_stream(struct bit_stream_t **bit_stream_pointer, struct stream_t
     size_t buffer_size = BIT_STREAM_BUFFER_SIZE * sizeof(unsigned char *);
     bit_stream->buffer = (unsigned char *) MALLOC(buffer_size);
 
-    /* sets the (inner) stream reference, this is the refernece
+    /* sets the (inner) stream reference, this is the reference
     is going to be used in the flushing and writing of data */
     bit_stream->stream = stream;
 
@@ -116,7 +116,7 @@ void seek_bit_stream(
     struct bit_stream_t *bit_stream,
     long long size
 ) {
-    /* allocates space for the varioables that are going to be
+    /* allocates space for the variables that are going to be
     used in case a stream seek operation is required */
     size_t position;
     size_t diff_read;
@@ -124,13 +124,13 @@ void seek_bit_stream(
     struct stream_t *stream;
 
     /* allocates space for temporary variables that are going to be
-    uses in the computation of the byte counting and updateing flags */
+    used in the computation of the byte counting and updating flags */
     unsigned char need_read;
     unsigned char offset_first;
     long long byte_count;
 
     /* calculates the amount of available bits in the current
-    byte and then uses the value to calculate the remaining ammoutn
+    byte and then uses the value to calculate the remaining amount
     of bits outside the current byte in the seek */
     long long available = BIT_STREAM_ITEM_SIZE - bit_stream->current_byte_offset_read;
     long long remaining = size - available;
@@ -139,34 +139,34 @@ void seek_bit_stream(
     as there's nothing to be seeked for that situation */
     if(size == 0) { return; }
 
-    /* decrements the current vounter for bits that were read
+    /* decrements the current counter for bits that were read
     by the amount of bits that are going to be "seeked" */
     bit_stream->bit_counter_read -= (size_t) size;
 
     /* in case the size is smaller or the same as the number
-    of bits alredy read the situation is simple as the same
+    of bits already read the situation is simple as the same
     byte is going to be used and only the offset is required
     to be changed (for the current byte) */
     if(remaining < 0) {
         bit_stream->current_byte_offset_read += (unsigned char) size;
     }
-    /* otherwise the oepration is complex as it spans multiple
+    /* otherwise the operation is complex as it spans multiple
     bytes, it may or may not require reading from the underlying
     stream but it will always require changing the current byte */
     else {
-        /* calulates the offset to the firt byte (target byte) with
-        the modulus of the remaining bts and the size of the item */
+        /* calculates the offset to the first byte (target byte) with
+        the modulus of the remaining bits and the size of the item */
         offset_first = remaining % BIT_STREAM_ITEM_SIZE;
 
         /* calculates the amount of bytes that are required by
-        deviding the remaining value by eight (done using shifts)
+        dividing the remaining value by eight (done using shifts)
         and adding one extra byte (the one currently in iteration) */
         byte_count = (remaining >> 3) + 1;
 
         /* in case the offset in the first byte is zero an extra
         shifting operation is required as the byte count is reduced
-        and the offset in the first byte is repositioned at the begining
-        of the byte as the carret is positioned at the begining */
+        and the offset in the first byte is repositioned at the beginning
+        of the byte as the carret is positioned at the beginning */
         if(offset_first == 0) {
             byte_count--;
             offset_first = BIT_STREAM_ITEM_SIZE;

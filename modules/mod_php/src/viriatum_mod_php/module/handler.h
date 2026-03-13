@@ -140,7 +140,7 @@ typedef struct handler_php_context_t {
     size_t content_length;
 
     /**
-     * The output nbuffer to be used for the
+     * The output buffer to be used for the
      * "printing" operation in the current context.
      */
     struct linked_buffer_t *output_buffer;
@@ -153,7 +153,7 @@ typedef struct handler_php_context_t {
     enum http_header_e _next_header;
 
     /**
-     * String reference to the URL buffer, usefull
+     * String reference to the URL buffer, useful
      * for fast attribute calculation (eg: size).
      */
     struct string_t _url_string;

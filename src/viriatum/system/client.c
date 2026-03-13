@@ -27,7 +27,7 @@
 #include "client.h"
 
 ERROR_CODE _create_client_connection(struct connection_t **connection_pointer, struct service_t *service, char *hostname, unsigned int port) {
-    /* allocates the various scoket related structures
+    /* allocates the various socket related structures
     to be used to create the client connection */
     SOCKET_HANDLE socket_handle;
     SOCKET_ADDRESS_INTERNET serv_addr;
@@ -45,7 +45,7 @@ ERROR_CODE _create_client_connection(struct connection_t **connection_pointer, s
     the (default) set value in the simplest form */
     SOCKET_FLAGS flags = 1;
 
-    /* creates the scoket handle structure object for the default attributes
+    /* creates the socket handle structure object for the default attributes
     (iternet type) and no encrypted connection */
     socket_handle = SOCKET_CREATE(SOCKET_INTERNET_TYPE, SOCKET_PACKET_TYPE, SOCKET_PROTOCOL_TCP);
     if(SOCKET_TEST_ERROR(socket_handle)) {
@@ -97,7 +97,7 @@ ERROR_CODE _create_client_connection(struct connection_t **connection_pointer, s
     create_connection(&connection, socket_handle);
 
     /* sets the socket address in the (client) connection
-    this is going to be very usefull for later connection
+    this is going to be very useful for later connection
     identification (address, port, etc.) */
     /*connection->socket_address = (SOCKET_ADDRESS) serv_addr;*/ /* TODO: fix this latter on */
 
@@ -127,7 +127,7 @@ ERROR_CODE _create_client_connection(struct connection_t **connection_pointer, s
     connection->on_open = open_handler_stream_io;
     connection->on_close = close_handler_stream_io;
 
-    /* updates the connection pointer with the refernce
+    /* updates the connection pointer with the reference
     to the connection structure */
     *connection_pointer = connection;
 

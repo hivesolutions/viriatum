@@ -126,7 +126,7 @@ typedef struct template_parameter_t {
     unsigned char string_value[128];
 
     /**
-     * The value as a refernce of the parameter.
+     * The value as a reference of the parameter.
      */
     unsigned char reference_value[64];
 

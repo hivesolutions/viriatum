@@ -84,9 +84,9 @@ typedef ERROR_CODE (*http_connection_message) (struct connection_t *, char *, si
  * @param user The user that is logging the current, request
  * in case it's an automated script the name should be used.
  * @param method The uppercased name of the HTTP method used.
- * @param uri The path to the resource refered by the url.
+ * @param uri The path to the resource referred to by the url.
  * @param version The version of the HTTP protocol used in
- * the request to be loggerd.
+ * the request to be logged.
  * @param error_code The error (status) code to be sent back to
  * the client in the associated response.
  * @param content_length The size of the content to be sent back
@@ -105,7 +105,7 @@ typedef struct http_handler_t {
      * The name that describes the HTTP
      * handler.
      * This is going to be used as id and
-     * so it hsould be unique to the system.
+     * so it should be unique to the system.
      */
     unsigned char *name;
 
@@ -117,21 +117,21 @@ typedef struct http_handler_t {
     char resolve_index;
 
     /**
-     * Callback method called uppon setting
+     * Callback method called upon setting
      * the current handler in the provided
      * connection object.
      */
     http_connection_update set;
 
     /**
-     * Callback method called uppon unsetting
+     * Callback method called upon unsetting
      * the current handler from the provided
      * connection object.
      */
     http_connection_update unset;
 
     /**
-     * Callback method called uppon resetting
+     * Callback method called upon resetting
      * the current handler from the provided
      * connection object. This operation should
      * be similar to the set and then unset.
@@ -240,7 +240,7 @@ typedef struct http_connection_t {
     /**
      * Function used to create and write header into a sent
      * buffer of data.
-     * This function writes an extended version of the heders.
+     * This function writes an extended version of the headers.
      */
     http_connection_headers_c write_headers_c;
 
@@ -255,7 +255,7 @@ typedef struct http_connection_t {
     /**
      * Function to be used for writing of message is a simplistic
      * but inefficient way.
-     * This function is usefull for debugging purposes.
+     * This function is useful for debugging purposes.
      */
     http_connection_message write_message;
 

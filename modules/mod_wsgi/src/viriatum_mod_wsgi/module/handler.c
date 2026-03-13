@@ -224,7 +224,7 @@ ERROR_CODE header_field_callback_handler_wsgi(struct http_parser_t *http_parser,
     handler_wsgi_context->header->name[data_size] = '\0';
     handler_wsgi_context->header->name_size = data_size;
 
-    /* checks if the current header is a valid "captureble"
+    /* checks if the current header is a valid "capturable"
     header in such case changes the next header value accordingly
     otherwise sets the undefined header */
     if(memcmp(data, CONTENT_TYPE_H, data_size) == 0) { handler_wsgi_context->_next_header = CONTENT_TYPE; }

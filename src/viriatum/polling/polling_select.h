@@ -91,7 +91,7 @@ typedef struct polling_select_t {
     struct connection_t *error_connections[VIRIATUM_MAX_EVENTS];
 
     /**
-     * The buffer thatn holds the connections
+     * The buffer that holds the connections
      * to be house-kept (removed) at the end
      * of the polling cycle.
      */
@@ -100,7 +100,7 @@ typedef struct polling_select_t {
     /**
      * The buffer that contains the various
      * connections that have data pending to
-     * be read from the socket at the begining
+     * be read from the socket at the beginning
      * of the next poll operation.
      */
     struct connection_t *read_outstanding[VIRIATUM_MAX_EVENTS];
@@ -108,20 +108,20 @@ typedef struct polling_select_t {
     /**
      * The buffer that contains the various
      * connections that have data pending to
-     * be writen to the socket at the begining
+     * be written to the socket at the beginning
      * of the next poll operation.
      */
     struct connection_t *write_outstanding[VIRIATUM_MAX_EVENTS];
 
     /**
      * Auxiliary buffer to be used in the performing
-     * of the outstaind read operations.
+     * of the outstanding read operations.
      */
     struct connection_t *_read_outstanding[VIRIATUM_MAX_EVENTS];
 
     /**
      * Auxiliary buffer to be used in the performing
-     * of the outstaind write operations.
+     * of the outstanding write operations.
      */
     struct connection_t *_write_outstanding[VIRIATUM_MAX_EVENTS];
 
@@ -158,7 +158,7 @@ typedef struct polling_select_t {
 
     /**
      * The size as items of the sequence of
-     * connections that are pending to be writen
+     * connections that are pending to be written
      * at he beginning of the poll operation.
      */
     size_t write_outstanding_size;
@@ -239,7 +239,7 @@ ERROR_CODE _unregister_sockets_set_polling_select(
  * connection is added.
  *
  * @param remove_connections The list of connection for removal.
- * @param remove_connections_size_pointer A pointer to the sisze
+ * @param remove_connections_size_pointer A pointer to the size
  * of the remove connections array.
  * @param connection The connection to be removed (deleted).
  */
@@ -248,13 +248,13 @@ static __inline void remove_connection(
     size_t *remove_connections_size_pointer,
     struct connection_t *connection
 ) {
-    /* allocates the index counter for the interation and
+    /* allocates the index counter for the iteration and
     the space for the temporary connection pointer */
     size_t index;
     struct connection_t *current_connection;
 
     /* retrieves the remove connections size value from the
-    providade pointer value (indirect value) */
+    provided pointer value (indirect value) */
     unsigned int remove_connections_size = *remove_connections_size_pointer;
 
     /* iterates over all the connections to be removed in order

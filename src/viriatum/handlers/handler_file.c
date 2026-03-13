@@ -117,7 +117,7 @@ ERROR_CODE register_handler_file(struct service_t *service) {
     size_t index;
 
     /* allocates space for both the location and the configuration
-    reference stuctures */
+    reference structures */
     struct location_t *location;
     struct sort_map_t *configuration;
 
@@ -162,24 +162,24 @@ ERROR_CODE register_handler_file(struct service_t *service) {
         configuration = location->configuration;
 
         /* retrieves the current mod file configuration reference from
-        the location buffer, this is going ot be populated and sets the
+        the location buffer, this is going to be populated and sets the
         default values in it */
         _location = &file_handler->locations[index];
         _location->base_path = NULL;
         _location->auth_basic = NULL;
         _location->auth_file = NULL;
 
-        /* tries ro retrieve the base path from the file configuration and in
+        /* tries to retrieve the base path from the file configuration and in
         case it exists sets it in the location (attribute reference change) */
         get_value_string_sort_map(configuration, (unsigned char *) "base_path", &value);
         if(value != NULL) { _location->base_path = (unsigned char *) value; }
 
-        /* tries ro retrieve the auth basic from the file configuration and in
+        /* tries to retrieve the auth basic from the file configuration and in
         case it exists sets it in the location (attribute reference change) */
         get_value_string_sort_map(configuration, (unsigned char *) "auth_basic", &value);
         if(value != NULL) { _location->auth_basic = (unsigned char *) value; }
 
-        /* tries ro retrieve the auth file from the file configuration and in
+        /* tries to retrieve the auth file from the file configuration and in
         case it exists sets it in the location (attribute reference change) */
         get_value_string_sort_map(configuration, (unsigned char *) "auth_file", &value);
         if(value != NULL) { _location->auth_file = (unsigned char *) value; }
@@ -638,7 +638,7 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
             delete_linked_list(directory_entries_map);
         }
     }
-    /* otherwise the file path must refered a "normal" file path and
+    /* otherwise the file path must refer to a "normal" file path and
     it must be checked */
     else {
         /* counts the total size (in bytes) of the contents

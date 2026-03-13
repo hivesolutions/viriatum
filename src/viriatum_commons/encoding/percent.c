@@ -114,7 +114,7 @@ ERROR_CODE decode_percent(unsigned char *buffer, size_t length, unsigned char *_
             *__buffer++ = ' ';
         }
         /* otherwise the character is considered to be "normal"
-        and is writen as it is */
+        and is written as it is */
         else {
             /* sets the current pointer value "directly" in the
             buffer (direct value assignment) */

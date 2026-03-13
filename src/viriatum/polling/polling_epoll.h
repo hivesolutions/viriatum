@@ -36,7 +36,7 @@ typedef struct polling_epoll_t {
     struct polling_t *polling;
 
     /**
-     * The file descriptor tp the object
+     * The file descriptor to the object
      * that control the epoll structure.
      * This object is used for each polling
      * operation to be done.
@@ -46,7 +46,7 @@ typedef struct polling_epoll_t {
     /**
      * Counter that controls the number of events
      * currently present in the epoll structure.
-     * This counter is very usefull for debugging
+     * This counter is very useful for debugging
      * purposes and printing information.
      */
     size_t poll_count;
@@ -70,7 +70,7 @@ typedef struct polling_epoll_t {
     struct connection_t *error_connections[VIRIATUM_MAX_EVENTS];
 
     /**
-     * The buffer thatn holds the connections
+     * The buffer that holds the connections
      * to be house-kept (removed) at the end
      * of the polling cycle.
      */
@@ -79,7 +79,7 @@ typedef struct polling_epoll_t {
     /**
      * The buffer that contains the various
      * connections that have data pending to
-     * be read from the socket at the begining
+     * be read from the socket at the beginning
      * of the next poll operation.
      */
     struct connection_t *read_outstanding[VIRIATUM_MAX_EVENTS];
@@ -87,20 +87,20 @@ typedef struct polling_epoll_t {
     /**
      * The buffer that contains the various
      * connections that have data pending to
-     * be writen to the socket at the begining
+     * be written to the socket at the beginning
      * of the next poll operation.
      */
     struct connection_t *write_outstanding[VIRIATUM_MAX_EVENTS];
 
     /**
      * Auxiliary buffer to be used in the performing
-     * of the outstaind read operations.
+     * of the outstanding read operations.
      */
     struct connection_t *_read_outstanding[VIRIATUM_MAX_EVENTS];
 
     /**
      * Auxiliary buffer to be used in the performing
-     * of the outstaind write operations.
+     * of the outstanding write operations.
      */
     struct connection_t *_write_outstanding[VIRIATUM_MAX_EVENTS];
 
@@ -137,7 +137,7 @@ typedef struct polling_epoll_t {
 
     /**
      * The size as items of the sequence of
-     * connection that are pending to be writen
+     * connection that are pending to be written
      * at he beginning of the poll operation.
      */
     size_t write_outstanding_size;

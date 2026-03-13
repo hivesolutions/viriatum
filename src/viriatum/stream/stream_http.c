@@ -119,7 +119,7 @@ ERROR_CODE delete_http_connection(struct http_connection_t *http_connection) {
     to be used in this connection */
     struct http_handler_t *http_handler;
 
-    /* retrieves the currently assigned handler and then usets
+    /* retrieves the currently assigned handler and then unsets
     the connection from associated handler (unregister connection) */
     http_handler = http_connection->http_handler;
     if(http_handler) { http_handler->unset(http_connection); }
@@ -156,9 +156,9 @@ ERROR_CODE release_http_connection(struct http_connection_t *http_connection) {
     connection to be used for event triggering */
     struct io_connection_t *io_connection = http_connection->io_connection;
 
-    /* retieves the current locked state in order to make
+    /* retrieves the current locked state in order to make
     assumptions if pending should be processed again in this
-    event loop, then unsests the lock flag */
+    event loop, then unsets the lock flag */
     unsigned char locked = http_connection->lock;
     http_connection->lock = FALSE;
     if(locked) { CALL_V(http_connection->io_connection->on_data, io_connection, NULL, (size_t) 0); }
@@ -169,12 +169,12 @@ ERROR_CODE release_http_connection(struct http_connection_t *http_connection) {
 
 ERROR_CODE data_handler_stream_http(struct io_connection_t *io_connection, unsigned char *buffer, size_t buffer_size) {
     /* allocates space for the temporary variable to
-    hold the ammount of bytes processed in a given HTTP
+    hold the amount of bytes processed in a given HTTP
     data parsing iteration */
     int processed_size;
 
     /* allocates the space to be used for the the calculus
-    arround the new buffer sizes, both for the offset and the
+    around the new buffer sizes, both for the offset and the
     content length strategies */
     size_t size_offset;
     size_t size_length;
@@ -198,7 +198,7 @@ ERROR_CODE data_handler_stream_http(struct io_connection_t *io_connection, unsig
     struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
 
     /* retrieves the content length value from the parser associated
-    with the current connection, this value is maitained accross multiple
+    with the current connection, this value is maintained across multiple
     parsing loops and is not considered transient, the value remains at the
     initial zero value until the proper header is parsed */
     size_t content_length = http_connection->http_parser->_content_length;
@@ -235,7 +235,7 @@ ERROR_CODE data_handler_stream_http(struct io_connection_t *io_connection, unsig
     http_connection->buffer_offset += buffer_size;
 
     /* iterates continuously, this allows the stream handler
-    to split the stream into possible multiple messages, usefull
+    to split the stream into possible multiple messages, useful
     for HTTP pipelining (multiple sequenced requests) */
     while(TRUE) {
         /* retrieves the pointer to the read position as the connection buffer
@@ -284,7 +284,7 @@ ERROR_CODE data_handler_stream_http(struct io_connection_t *io_connection, unsig
         http_connection->read_offset += processed_size;
 
         /* in case the current state in the HTTP parser is the
-        start state, the message is considered to be completly
+        start state, the message is considered to be completely
         parsed (new message may come after) */
         if(http_connection->http_parser->state == STATE_START_RES) {
             /* resets the HTTP parser state */

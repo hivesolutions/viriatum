@@ -44,7 +44,7 @@ typedef struct proxy_location_t {
 
     /**
      * The result object from the parsing of the url structure
-     * present in the proxy pass value. Should containg the
+     * present in the proxy pass value. Should contain the
      * description of each of the fields in the url.
      */
     struct url_static_t url_s;
@@ -58,21 +58,21 @@ typedef struct proxy_location_t {
 typedef struct proxy_handler_t {
     /**
      * The various locations loaded from the configuration
-     * they refer the cofiruation attributes associated
+     * they refer the configuration attributes associated
      * with the proxy structures.
      */
     struct proxy_location_t *locations;
 
     /**
      * The number of locations currently loaded in the handler
-     * this value is used for iteration arround the locations
+     * this value is used for iteration around the locations
      * buffer.
      */
     size_t locations_count;
 
     /**
      * The map that associates the client connection pointer
-     * with the backend connection pointer. This is usefull for
+     * with the backend connection pointer. This is useful for
      * the re-usage of the various connections along a persistent
      * connection to the viriatum server.
      */
@@ -94,9 +94,9 @@ typedef struct proxy_handler_t {
 } proxy_handler;
 
 /**
- * The context structure to be used allong
+ * The context structure to be used along
  * the interpretation of the request for
- * the peoxy handler.
+ * the proxy handler.
  */
 typedef struct handler_proxy_context_t {
     /**
@@ -187,8 +187,8 @@ typedef struct handler_proxy_context_t {
     char pending;
 
     /**
-     * The amount of bytes that are currently pending to be writen in the
-     * client proxy from data comming from the backend server. This value
+     * The amount of bytes that are currently pending to be written in the
+     * client proxy from data coming from the backend server. This value
      * is used to keep control of the internal proxy buffers and thus avoids
      * the continuous growth of them.
      */

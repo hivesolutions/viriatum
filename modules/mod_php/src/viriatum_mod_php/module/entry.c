@@ -316,7 +316,7 @@ size_t _write_php_state(const char *data, size_t data_size) {
     append_linked_buffer(_output_buffer, buffer, data_size, 1);
 
     /* returns the size of the data that has just been
-    writen into the internal structures */
+    written into the internal structures */
     return data_size;
 }
 

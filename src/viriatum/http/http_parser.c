@@ -130,7 +130,7 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
 
     /* the counter that controls the number of successful parses
     that have occurred during the current process operator, this is
-    usefullto limit the parses for the provided data */
+    useful to limit the parses for the provided data */
     size_t parse_count = 0;
 
     /* in case the received data size is empty */
@@ -147,7 +147,7 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
             case STATE_START_REQ_OR_RES:
             case STATE_START_RES:
             case STATE_START_REQ:
-                /* returs immediately (nothing to process) */
+                /* returns immediately (nothing to process) */
                 return 0;
 
             default:

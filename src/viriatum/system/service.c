@@ -244,7 +244,7 @@ void delete_configuration(struct sort_map_t *configuration, int is_top) {
 
 ERROR_CODE load_specifications(struct service_t *service) {
     /* sets the basic specification values from the global
-    wide contsnt values */
+    wide constant values */
     service->version = (unsigned char *) VIRIATUM_VERSION;
     service->platform = (unsigned char *) VIRIATUM_PLATFORM_COMPLETE;
     service->flags = (unsigned char *) VIRIATUM_FLAGS;
@@ -1101,7 +1101,7 @@ ERROR_CODE start_service(struct service_t *service) {
     /* sets the service select service as the service in the service connection */
     service_connection->service = service;
 
-    /* sets the base hanlding functions in the service connection */
+    /* sets the base handling functions in the service connection */
     service_connection->open_connection = open_connection;
     service_connection->close_connection = close_connection;
     service_connection->write_connection = write_connection;
@@ -1113,7 +1113,7 @@ ERROR_CODE start_service(struct service_t *service) {
     service_connection->invalidate_write = invalidate_write_connection;
     service_connection->add_outstanding = add_outstanding_connection;
 
-    /* sets the fucntion to be called uppon read on the service
+    /* sets the function to be called upon read on the service
     connection (it should be the accept handler stream io, default) */
     service_connection->on_read = accept_handler_stream_io;
 
@@ -1129,7 +1129,7 @@ ERROR_CODE start_service(struct service_t *service) {
         /* sets the service select service as the service in the service connection */
         service6_connection->service = service;
 
-        /* sets the base hanlding functions in the service connection */
+        /* sets the base handling functions in the service connection */
         service6_connection->open_connection = open_connection;
         service6_connection->close_connection = close_connection;
         service6_connection->write_connection = write_connection;
@@ -1141,7 +1141,7 @@ ERROR_CODE start_service(struct service_t *service) {
         service6_connection->invalidate_write = invalidate_write_connection;
         service6_connection->add_outstanding = add_outstanding_connection;
 
-        /* sets the fucntion to be called uppon read on the service
+        /* sets the function to be called upon read on the service
         connection (it should be the accept handler stream io, default) */
         service6_connection->on_read = accept_handler_stream_io;
 
@@ -1180,7 +1180,7 @@ ERROR_CODE start_service(struct service_t *service) {
         CLOSE_PROCESS(process);
 
         /* prints a debug message about the current memory
-        usage, usefull for extreme debugging */
+        usage, useful for extreme debugging */
         V_DEBUG_F(
             "Memory status: [%ld objects] [%ld KBytes]\n",
             (long int) ALLOCATIONS,
@@ -1599,7 +1599,7 @@ ERROR_CODE resolve_connection(struct connection_t *connection, SOCKET_ADDRESS *s
     SOCKET_FAMILY family;
 
     /* allocates the reference to the host value that is
-    going to be returned uppon host resolution (ip address) */
+    going to be returned upon host resolution (ip address) */
     unsigned char *host;
 
 #ifdef VIRIATUM_PLATFORM_WIN32
@@ -1787,7 +1787,7 @@ ERROR_CODE close_connection(struct connection_t *connection) {
     "inside" the service structure (avoids leaking) */
     remove_connection_service(connection->service, connection);
 
-    /* unsets the base hanlding functions from the connection */
+    /* unsets the base handling functions from the connection */
     connection->open_connection = NULL;
     connection->close_connection = NULL;
     connection->register_read = NULL;

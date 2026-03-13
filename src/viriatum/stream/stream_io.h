@@ -60,7 +60,7 @@ typedef struct custom_parameters_t {
 
     /**
      * The reference to the "type transparent" value to
-     * be used as parameter (erxtra one) to the current
+     * be used as parameter (extra one) to the current
      * parameters structure.
      */
     void *parameters;

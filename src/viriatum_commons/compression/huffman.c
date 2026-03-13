@@ -99,7 +99,7 @@ void encode_huffman(struct huffman_t *huffman, struct stream_t *in, struct strea
     struct bit_stream_t *bit_stream;
     unsigned char buffer[HUFFMAN_BUFFER_SIZE];
 
-    /* creates the but stream that is going to be used as
+    /* creates the bit stream that is going to be used as
     the encoded output (bit stream is required for huffman) */
     create_bit_stream(&bit_stream, out);
 
@@ -296,16 +296,16 @@ void decode_tree_huffman(struct huffman_t *huffman, struct stream_t *in, struct 
                 bit_count++;
                 total_count++;
 
-                /* shifts the code by the rquired amount of bits for
+                /* shifts the code by the required amount of bits for
                 the current iteration step and then verifies if the
-                bit is odd or even and selects the apropriate next
+                bit is odd or even and selects the appropriate next
                 node value (tree percolation step) */
                 bit = code >> (HUFFMAN_BYTE_SIZE - bit_count);
                 if(bit & 1) { node = node->right; }
                 else { node = node->left; }
 
                 /* verifies if the current selected node is a leaf
-                node (no child) and in case it's not continus the loop
+                node (no child) and in case it's not continues the loop
                 immediately as there's nothing to be done */
                 is_leaf = node->left == NULL && node->right == NULL;
                 if(is_leaf == FALSE) { continue; }
@@ -321,25 +321,25 @@ void decode_tree_huffman(struct huffman_t *huffman, struct stream_t *in, struct 
                     out_count = 0;
                 }
 
-                /* updates the current node in teiration with the huffman's
+                /* updates the current node in iteration with the huffman's
                 root node as a new tree traversal will begin */
                 node = huffman->root;
             }
         }
     }
 
-    /* in case there are pending bytes to be writen to the output
+    /* in case there are pending bytes to be written to the output
     stream flushes them by writing them to the output stream */
     if(out_count > 0) { out->write(out, out_buffer, out_count); }
 
     /* closes both the output stream and the input one so that
-    no more that is going to be writen or read from them */
+    no more that is going to be written or read from them */
     out->close(out);
     in->close(in);
 }
 
 void generate_prefix_huffman(struct huffman_t *huffman) {
-    /* allocates space for the vairous local variables
+    /* allocates space for the various local variables
     to be used in the generation of the prefix tables */
     size_t index;
     register unsigned char symbol;

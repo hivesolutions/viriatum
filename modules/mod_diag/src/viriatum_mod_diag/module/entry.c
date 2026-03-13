@@ -31,7 +31,7 @@ START_MEMORY;
 
 ERROR_CODE create_mod_diag_module(struct mod_diag_module_t **mod_diag_module_pointer, struct module_t *module) {
     /* retrieves the mod diag module size and uses it
-    to allocate he module structure for it */
+    to allocate the module structure for it */
     size_t mod_diag_module_size = sizeof(struct mod_diag_module_t);
     struct mod_diag_module_t *mod_diag_module = (struct mod_diag_module_t *) MALLOC(mod_diag_module_size);
 

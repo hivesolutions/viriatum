@@ -245,7 +245,7 @@ ERROR_CODE _send_response_handler_lua(struct http_parser_t *http_parser) {
     char *file_path;
     unsigned int *file_dirty_pointer;
 
-    /* acquires the lock on the HTTP connection, this will avoids further
+    /* acquires the lock on the HTTP connection, this will avoid further
     messages to be processed, no parallel request handling problems */
     http_connection->acquire(http_connection);
 

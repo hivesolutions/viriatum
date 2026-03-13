@@ -41,7 +41,7 @@ void create_linked_buffer(struct linked_buffer_t **linked_buffer_pointer) {
     create_linked_list(&linked_buffer->buffer_list);
 
     /* creates the list to hold the various buffers
-    to have the memory released uppon destruction */
+    to have the memory released upon destruction */
     create_linked_list(&linked_buffer->release_list);
 
     /* sets the linked buffer in the linked buffer pointer */
@@ -62,7 +62,7 @@ void delete_linked_buffer(struct linked_buffer_t *linked_buffer) {
         need to break the cycle */
         if(buffer == NULL) { break; }
 
-        /* releases the buffer pointer toi the buffer */
+        /* releases the buffer pointer to the buffer */
         FREE(buffer->pointer);
     }
 

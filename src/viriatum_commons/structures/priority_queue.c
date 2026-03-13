@@ -49,7 +49,7 @@ void create_priority_queue(struct priority_queue_t **priority_queue_pointer, com
 
 void delete_priority_queue(struct priority_queue_t *priority_queue) {
     /* deletes the linked list associated with the queue to avoid
-    any king of memory leak and then releases the memory associated
+    any kind of memory leak and then releases the memory associated
     with the priority queue itself */
     delete_linked_list(priority_queue->list);
     FREE(priority_queue);
@@ -64,7 +64,7 @@ void push_priority_queue(struct priority_queue_t *priority_queue, void *value) {
     struct iterator_t *iterator;
 
     /* creates and starts the index position of the value at zero
-    as this is the fist position in the list (default one) */
+    as this is the first position in the list (default one) */
     size_t index = 0;
 
     /* creates the iterator for the list associated with the priority

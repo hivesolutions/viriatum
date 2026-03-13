@@ -31,7 +31,7 @@ START_MEMORY;
 
 ERROR_CODE create_mod_gif_module(struct mod_gif_module_t **mod_gif_module_pointer, struct module_t *module) {
     /* retrieves the mod GIF module size and uses it
-    to allocate he module structure for it */
+    to allocate the module structure for it */
     size_t mod_gif_module_size = sizeof(struct mod_gif_module_t);
     struct mod_gif_module_t *mod_gif_module = (struct mod_gif_module_t *) MALLOC(mod_gif_module_size);
 
