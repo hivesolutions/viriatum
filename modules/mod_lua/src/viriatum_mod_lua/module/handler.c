@@ -345,7 +345,8 @@ ERROR_CODE message_complete_callback_handler_lua(struct http_parser_t *http_pars
             (struct handler_lua_context_t *) http_parser->context;
         V_WARNING_CTX_F("mod_lua", "Lua error for %s: %s\n",
             handler_lua_context ? (char *) handler_lua_context->url : "/",
-            (char *) GET_ERROR());
+            (char *) GET_ERROR()
+        );
         _write_error_connection_lua(http_parser, (char *) GET_ERROR());
     }
 
