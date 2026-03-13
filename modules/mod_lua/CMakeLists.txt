@@ -9,6 +9,25 @@ if(PKG_CONFIG_FOUND)
     endif()
 endif()
 
+# fallback: try to locate LuaJIT or Lua headers/libs directly when
+# pkg-config is unavailable (common on Windows)
+if(NOT LUA_FOUND)
+    find_path(LUA_INC_DIR lua.h
+        PATH_SUFFIXES luajit-2.1 lua5.1 lua
+        HINTS ENV LUA_DIR $ENV{USERPROFILE}/scoop/apps/luajit/current/include
+    )
+    find_library(LUA_LIB
+        NAMES luajit-5.1 lua51 lua5.1 lua
+        HINTS ENV LUA_DIR $ENV{USERPROFILE}/scoop/apps/luajit/current/lib
+              $ENV{USERPROFILE}/scoop/apps/luajit/current/bin
+    )
+    if(LUA_INC_DIR AND LUA_LIB)
+        set(LUA_FOUND TRUE)
+        set(LUA_INCLUDE_DIRS ${LUA_INC_DIR})
+        set(LUA_LINK_LIBRARIES ${LUA_LIB})
+    endif()
+endif()
+
 if(LUA_FOUND)
     file(GLOB MOD_LUA_SOURCES src/viriatum_mod_lua/*.c src/viriatum_mod_lua/module/*.c)
     add_library(viriatum_mod_lua MODULE ${MOD_LUA_SOURCES})

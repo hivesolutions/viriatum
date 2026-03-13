@@ -29,6 +29,11 @@
 /* starts the memory structures */
 START_MEMORY;
 
+/* initializes the module global variables, these
+values will be used across functions */
+struct service_t *_service;
+struct http_headers_t _headers;
+
 ERROR_CODE create_mod_lua_module(struct mod_lua_module_t **mod_lua_module_pointer, struct module_t *module) {
     /* retrieves the mod Lua module size */
     size_t mod_lua_module_size = sizeof(struct mod_lua_module_t);
@@ -36,7 +41,7 @@ ERROR_CODE create_mod_lua_module(struct mod_lua_module_t **mod_lua_module_pointe
     /* allocates space for the mod Lua module */
     struct mod_lua_module_t *mod_lua_module = (struct mod_lua_module_t *) MALLOC(mod_lua_module_size);
 
-     /* sets the mod Lua module attributes (default) values */
+    /* sets the mod Lua module attributes (default) values */
     mod_lua_module->lua_state = NULL;
     mod_lua_module->http_handler = NULL;
     mod_lua_module->mod_lua_http_handler = NULL;
@@ -84,6 +89,10 @@ ERROR_CODE start_module_lua(struct environment_t *environment, struct module_t *
     /* prints a debug message */
     V_DEBUG_CTX_F("mod_lua", "Starting the module '%s' (%s) v%s\n", name, description, version);
 
+    /* sets the global service reference to be used in the
+    externalized function for the interpreter */
+    _service = service;
+
     /* creates the mod Lua module */
     create_mod_lua_module(&mod_lua_module, module);
 
@@ -120,7 +129,7 @@ ERROR_CODE start_module_lua(struct environment_t *environment, struct module_t *
     service->add_http_handler(service, http_handler);
 
     /* loads the service configuration for the HTTP handler
-    this should change some of it's behavior then loads the
+    this should change some of its behavior then loads the
     locations (configurations) associated with the current
     service environment */
     _load_configuration_lua(service, mod_lua_http_handler);
@@ -181,6 +190,10 @@ ERROR_CODE stop_module_lua(struct environment_t *environment, struct module_t *m
 
     /* deletes the mod Lua module */
     delete_mod_lua_module(mod_lua_module);
+
+    /* sets the global service reference this is no longer necessary
+    because the module has been unloaded */
+    _service = NULL;
 
     /* cleans up the pool based memory allocation system releasing all
     of its memory before the exit (no leaks) then returns the control
@@ -258,7 +271,7 @@ ERROR_CODE _load_locations_lua(struct service_t *service, struct mod_lua_http_ha
     size_t index;
 
     /* allocates space for both the location and the configuration
-    reference stuctures */
+    reference structures */
     struct location_t *location;
     struct sort_map_t *configuration;
 
@@ -351,33 +364,89 @@ ERROR_CODE _reload_lua_state(lua_State **lua_state_pointer) {
 }
 
 ERROR_CODE _start_lua_state(lua_State *lua_state) {
-    /* registers the viriatum name in Lua */
-    lua_pushstring(lua_state, VIRIATUM_NAME);
-    lua_setglobal(lua_state, "VIRIATUM_NAME");
+    /* registers the viriatum module table in Lua, this creates
+    a "viriatum" table with the various API functions accessible
+    as viriatum.connections(), viriatum.uptime(), etc. */
+    luaL_register(lua_state, VIRIATUM_LUA_MODULE_NAME, viriatum_methods);
 
-    /* registers the viriatum version in Lua */
-    lua_pushstring(lua_state, VIRIATUM_VERSION);
-    lua_setglobal(lua_state, "VIRIATUM_VERSION");
+    /* adds the string constants to the viriatum module table,
+    using runtime service fields where available for accuracy */
+    lua_pushstring(lua_state, (char *) _service->name);
+    lua_setfield(lua_state, -2, "NAME");
 
-    /* registers the viriatum description in Lua */
-    lua_pushstring(lua_state, VIRIATUM_DESCRIPTION);
-    lua_setglobal(lua_state, "VIRIATUM_DESCRIPTION");
+    lua_pushstring(lua_state, (char *) _service->version);
+    lua_setfield(lua_state, -2, "VERSION");
 
-    /* registers the viriatum observations in Lua */
+    lua_pushstring(lua_state, (char *) _service->platform);
+    lua_setfield(lua_state, -2, "PLATFORM");
+
+    lua_pushstring(lua_state, (char *) _service->flags);
+    lua_setfield(lua_state, -2, "FLAGS");
+
+    lua_pushstring(lua_state, (char *) _service->description);
+    lua_setfield(lua_state, -2, "DESCRIPTION");
+
+    lua_pushstring(lua_state, (char *) _service->compiler);
+    lua_setfield(lua_state, -2, "COMPILER");
+
+    lua_pushstring(lua_state, (char *) _service->compiler_version);
+    lua_setfield(lua_state, -2, "COMPILER_VERSION");
+
+    lua_pushstring(lua_state, (char *) _service->compilation_date);
+    lua_setfield(lua_state, -2, "COMPILATION_DATE");
+
+    lua_pushstring(lua_state, (char *) _service->compilation_time);
+    lua_setfield(lua_state, -2, "COMPILATION_TIME");
+
+    lua_pushstring(lua_state, (char *) _service->compilation_flags);
+    lua_setfield(lua_state, -2, "COMPILATION_FLAGS");
+
+    /* adds the compile-time constants that are not available
+    as service fields */
     lua_pushstring(lua_state, VIRIATUM_OBSERVATIONS);
-    lua_setglobal(lua_state, "VIRIATUM_OBSERVATIONS");
+    lua_setfield(lua_state, -2, "OBSERVATIONS");
 
-    /* registers the viriatum copyright in Lua */
     lua_pushstring(lua_state, VIRIATUM_COPYRIGHT);
-    lua_setglobal(lua_state, "VIRIATUM_COPYRIGHT");
+    lua_setfield(lua_state, -2, "COPYRIGHT");
 
-    /* registers the viriatum platform string in Lua */
-    lua_pushstring(lua_state, VIRIATUM_PLATFORM_STRING);
-    lua_setglobal(lua_state, "VIRIATUM_PLATFORM_STRING");
-
-    /* registers the viriatum platform cpu in Lua */
     lua_pushstring(lua_state, VIRIATUM_PLATFORM_CPU);
-    lua_setglobal(lua_state, "VIRIATUM_PLATFORM_CPU");
+    lua_setfield(lua_state, -2, "PLATFORM_CPU");
+
+    /* pops the module table from the stack (luaL_register leaves
+    it on the stack after registration) */
+    lua_pop(lua_state, 1);
+
+    /* creates the input metatable used for the WSAPI input
+    userdata type, providing read/close/readline/readlines methods */
+    luaL_newmetatable(lua_state, VIRIATUM_LUA_INPUT_NAME);
+
+    /* sets the __index metamethod to point to the metatable itself
+    so that method lookups on the userdata resolve to the metatable */
+    lua_pushvalue(lua_state, -1);
+    lua_setfield(lua_state, -2, "__index");
+
+    /* registers the input methods in the metatable */
+    lua_pushcfunction(lua_state, lua_input_read);
+    lua_setfield(lua_state, -2, "read");
+
+    lua_pushcfunction(lua_state, lua_input_close);
+    lua_setfield(lua_state, -2, "close");
+
+    lua_pushcfunction(lua_state, lua_input_readline);
+    lua_setfield(lua_state, -2, "readline");
+
+    lua_pushcfunction(lua_state, lua_input_readlines);
+    lua_setfield(lua_state, -2, "readlines");
+
+    /* registers the garbage collection and string metamethods */
+    lua_pushcfunction(lua_state, lua_input_gc);
+    lua_setfield(lua_state, -2, "__gc");
+
+    lua_pushcfunction(lua_state, lua_input_tostring);
+    lua_setfield(lua_state, -2, "__tostring");
+
+    /* pops the metatable from the stack */
+    lua_pop(lua_state, 1);
 
     /* raises no error */
     RAISE_NO_ERROR;

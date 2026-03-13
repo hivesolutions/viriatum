@@ -25,6 +25,7 @@
 #pragma once
 
 #include "handler.h"
+#include "extension.h"
 
 /**
  * The path to the file to be used as default
@@ -56,6 +57,9 @@ typedef struct mod_lua_module_t {
      */
     struct mod_lua_http_handler_t *mod_lua_http_handler;
 } mod_lua_module;
+
+VIRIATUM_EXTERNAL_PREFIX struct service_t *_service;
+VIRIATUM_EXTERNAL_PREFIX struct http_headers_t _headers;
 
 VIRIATUM_EXPORT_PREFIX ERROR_CODE create_mod_lua_module(struct mod_lua_module_t **mod_lua_module_pointer, struct module_t *module);
 VIRIATUM_EXPORT_PREFIX ERROR_CODE delete_mod_lua_module(struct mod_lua_module_t *mod_lua_module);

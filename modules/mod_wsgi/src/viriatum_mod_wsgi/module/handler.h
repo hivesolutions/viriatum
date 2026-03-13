@@ -106,20 +106,20 @@ typedef struct mod_wsgi_http_handler_t {
 
     /**
      * The buffer used to store the "main" module name
-     * so that it may be refered in the python interpreter.
+     * so that it may be referred in the python interpreter.
      */
     char module_name[VIRIATUM_WSGI_MODULE_SIZE];
 
     /**
      * The various locations loaded from the configuration
-     * they refer the cofiruation attributes associated
+     * they refer the configuration attributes associated
      * with the WSGI structures.
      */
     struct mod_wsgi_location_t *locations;
 
     /**
      * The number of locations currently loaded in the handler
-     * this value is used for iteration arround the locations
+     * this value is used for iteration around the locations
      * buffer.
      */
     size_t locations_count;
@@ -186,7 +186,7 @@ typedef struct handler_wsgi_context_t {
     unsigned char server_name[VIRIATUM_MAX_HEADER_SIZE];
 
     /**
-     * The current header structure, represeting the
+     * The current header structure, representing the
      * header currently being parsed.
      * In case no value is defined there's no header
      * "in parsing".
@@ -303,7 +303,7 @@ typedef struct handler_wsgi_context_t {
 
     /**
      * The reference to the buffer iterator
-     * to be used to retrive data from the WSGI
+     * to be used to retrieve data from the WSGI
      * application sequence of data, and to use
      * it to print to the output buffer.
      */
