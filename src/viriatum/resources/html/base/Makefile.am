@@ -28,6 +28,7 @@ handler.wsgi \
 engine/about \
 engine/connection \
 engine/connections \
+engine/phpinfo \
 engine/status \
 resources/css/layout.css \
 resources/images/arrow-left.png \
