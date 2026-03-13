@@ -79,9 +79,20 @@ if(PKG_CONFIG_FOUND)
     pkg_check_modules(PCRE libpcre QUIET)
 endif()
 if(PCRE_FOUND)
-    target_compile_definitions(viriatum PRIVATE VIRIATUM_PCRE HAVE_PCRE_H)
-    target_include_directories(viriatum PRIVATE ${PCRE_INCLUDE_DIRS})
-    target_link_libraries(viriatum ${PCRE_LINK_LIBRARIES})
+    # verifies that the pcre.h header is actually available at the
+    # reported include path before enabling PCRE support, this avoids
+    # build failures when pkg-config metadata exists but headers are
+    # not installed (common on macOS CI runners)
+    set(CMAKE_REQUIRED_INCLUDES ${PCRE_INCLUDE_DIRS})
+    include(CheckIncludeFile)
+    check_include_file("pcre.h" HAVE_PCRE_HEADER)
+    if(HAVE_PCRE_HEADER)
+        target_compile_definitions(viriatum PRIVATE VIRIATUM_PCRE HAVE_PCRE_H)
+        target_include_directories(viriatum PRIVATE ${PCRE_INCLUDE_DIRS})
+        target_link_libraries(viriatum ${PCRE_LINK_LIBRARIES})
+    else()
+        message(STATUS "Viriatum: PCRE pkg-config found but pcre.h not available, disabling")
+    endif()
 endif()
 
 # modules are built as shared libraries loaded at runtime,
