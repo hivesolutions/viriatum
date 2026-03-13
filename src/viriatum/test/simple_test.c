@@ -905,8 +905,41 @@ const char *test_quicksort_linked_list(void) {
 }
 
 const char *test_crc_32(void) {
-    /* calculates the crc32 hash value and returns it */
-    crc_32((unsigned char *) "Hello World", 11);
+    /* allocates space for the crc32 result */
+    unsigned long result;
+
+    /* the expected crc32 for "Hello World" is 4a17b156 */
+    unsigned long expected = 0x4a17b156;
+
+    /* calculates the crc32 hash value */
+    result = crc_32((unsigned char *) "Hello World", 11);
+
+    /* verifies that the computed checksum matches the
+    expected value */
+    V_ASSERT_M(result == expected, "crc32 of 'Hello World' mismatch");
+
+    /* verifies the crc32 for an empty string,
+    the expected value is 00000000 */
+    {
+        unsigned long empty_expected = 0x00000000;
+        result = crc_32((unsigned char *) "", 0);
+        V_ASSERT_M(result == empty_expected, "crc32 of empty string mismatch");
+    }
+
+    /* verifies the crc32 for "abc" to exercise
+    a different input length */
+    {
+        unsigned long abc_expected = 0x352441c2;
+        result = crc_32((unsigned char *) "abc", 3);
+        V_ASSERT_M(result == abc_expected, "crc32 of 'abc' mismatch");
+    }
+
+    /* verifies the crc32 for a single byte input */
+    {
+        unsigned long single_expected = 0xe8b7be43;
+        result = crc_32((unsigned char *) "a", 1);
+        V_ASSERT_M(result == single_expected, "crc32 of 'a' mismatch");
+    }
 
     /* returns the default value, nothing happened so there's
     nothing to report for this execution */

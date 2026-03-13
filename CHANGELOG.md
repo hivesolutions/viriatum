@@ -33,6 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * CMake pass-through of effective C flags to `CFLAGS` preprocessor define for runtime banner display
 * `V_PRINT_C` and `V_PRINT_CF` color-aware print macros for optional ANSI color output
 * Colored test output: green for `ok`, red for `not ok` and hex comparison failures, colored summary line
+* CRC32 unit test with proper assertions for multiple test vectors (`Hello World`, empty string, `abc`, `a`)
 
 ### Changed
 
@@ -57,7 +58,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 * Fixed SHA1 producing wrong digests on ARM64 (macOS Apple Silicon) due to incorrect big-endian classification of AArch64 in `cpu.h` — ARM64 is little-endian
-* Fixed SHA1 undefined behavior in `BLK_0` macro reading and writing the same word without a sequence point; replaced with pre-swap loop
 * Fixed SHA1 strict aliasing violation in `_transform_sha1` by copying buffer into a local union via `memcpy`
 * Replaced deprecated `Py_SetProgramName`/`Py_Initialize` with `PyConfig` API in mod_wsgi (fixes Python 3.11+ deprecation warning)
 * Fixed `DESCRIPTION` module constant in mod_wsgi pointing to `compiler` field instead of `description`
