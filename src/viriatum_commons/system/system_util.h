@@ -40,7 +40,7 @@
 #define PID_TYPE DWORD
 #define PROCESS_TYPE HANDLE
 #define MEMORY_INFORMATION_TYPE PROCESS_MEMORY_COUNTERS
-#define SLEEP(miliseconds) Sleep(miliseconds)
+#define SLEEP(milliseconds) Sleep(milliseconds)
 #define GET_PID() GetCurrentProcessId()
 #define GET_ENV(buffer, buffer_size, variable_name) _dupenv_s(&buffer, &buffer_size, variable_name)
 #define GET_PROCESS() OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, 0, GET_PID())
@@ -57,7 +57,7 @@
 #define PROCESS_TYPE int
 #define MEMORY_INFORMATION_TYPE struct rusage
 #define LOCAL_TIME(local_time_value, time_value) local_time_value = localtime(time_value)
-#define SLEEP(miliseconds) usleep((useconds_t) miliseconds * 1000)
+#define SLEEP(milliseconds) usleep((useconds_t) milliseconds * 1000)
 #define GET_PID() getpid()
 #define SPRINTF(buffer, size, format, ...) sprintf(buffer, format, __VA_ARGS__)
 #define VSPRINTF(buffer, size, format, arg) vsprintf(buffer, format, arg)

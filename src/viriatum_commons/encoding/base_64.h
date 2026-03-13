@@ -79,7 +79,7 @@ VIRIATUM_EXPORT_PREFIX size_t calculate_encoded_buffer_length_base64(size_t buff
  * @param padding_count The amount of padding in the base 64 encoded string.
  * @return The length of the decoded buffer.
  */
-VIRIATUM_EXPORT_PREFIX size_t calculate_decoded_buffer_length_bse64(size_t encoded_buffer_length, size_t padding_count);
+VIRIATUM_EXPORT_PREFIX size_t calculate_decoded_buffer_length_base64(size_t encoded_buffer_length, size_t padding_count);
 
 /**
  * Encodes the given buffer into base64.

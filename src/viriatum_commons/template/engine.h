@@ -74,8 +74,8 @@ typedef ERROR_CODE (*template_callback) (struct template_engine_t *);
 typedef ERROR_CODE (*template_data_callback) (struct template_engine_t *, const unsigned char *, size_t);
 
 /**
- * Enumeration defining all the states occuring
- * durring the template parsing.
+ * Enumeration defining all the states occurring
+ * during the template parsing.
  */
 typedef enum template_engine_state_e {
     /**
@@ -85,9 +85,9 @@ typedef enum template_engine_state_e {
     TEMPLATE_ENGINE_NORMAL = 1,
 
     /**
-     * State where the tempalte engine has just found
+     * State where the template engine has just found
      * a dollar sign and is trying to open a tage with an
-     * open braces chracter.
+     * open braces character.
      */
     TEMPLATE_ENGINE_DOLLAR,
 
@@ -131,7 +131,7 @@ typedef enum template_engine_state_e {
  */
 typedef struct template_settings_t {
     /**
-     * Callabck function called when a new text
+     * Callback function called when a new text
      * sequence is opened.
      */
     template_callback on_text_begin;
@@ -143,7 +143,7 @@ typedef struct template_settings_t {
     template_data_callback on_text_end;
 
     /**
-     * Callabck function called when a new tag
+     * Callback function called when a new tag
      * is opened.
      */
     template_callback on_tag_begin;
@@ -180,7 +180,7 @@ typedef struct template_settings_t {
 } template_settings;
 
 /**
- * Structure repsenting the template engine (parser)
+ * Structure repenting the template engine (parser)
  * used to store all the context of the current
  * parsing.
  * Additional options may be used to store context

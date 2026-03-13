@@ -87,18 +87,18 @@ ERROR_CODE process_template_engine(struct template_engine_t *template_engine, st
     the size of the file to be parsed */
     size_t file_size;
 
-    /* allocates the buffer thath will hold the contents
-    of the read file, this buffer is realeased uppon the
+    /* allocates the buffer that will hold the contents
+    of the read file, this buffer is released upon the
     end of the parsing */
     unsigned char *file_buffer;
 
     /* allocates space for the buffer that will serve as
-    cache for the reading of the tempalte file, this has
+    cache for the reading of the template file, this has
     serious implications on the performance of the file */
     char _file_buffer[ENGINE_BUFFER_SIZE];
 
     /* allocates the mark variables used to locate
-    the part of context changing durring the parsing */
+    the part of context changing during the parsing */
     unsigned char *pointer = 0;
     unsigned char *text_end_mark = 0;
     unsigned char *tag_end_mark = 0;

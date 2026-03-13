@@ -61,9 +61,9 @@ typedef struct date_time_t {
     unsigned short second;
 
     /**
-     * The milisecond component of the time.
+     * The millisecond component of the time.
      */
-    unsigned short milisecond;
+    unsigned short millisecond;
 } date_time;
 
 VIRIATUM_EXPORT_PREFIX void create_date_time(struct date_time_t **date_time_pointer);
