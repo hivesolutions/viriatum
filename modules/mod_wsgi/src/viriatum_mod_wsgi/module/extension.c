@@ -26,7 +26,7 @@
 
 #include "extension.h"
 
-PyMethodDef wsgi_methods[7] = {
+PyMethodDef wsgi_methods[8] = {
     {
         "start_response",
         wsgi_start_response,
@@ -60,6 +60,12 @@ PyMethodDef wsgi_methods[7] = {
     {
         "uptime",
         wsgi_uptime,
+        METH_NOARGS,
+        NULL
+    },
+    {
+        "modules",
+        wsgi_modules,
         METH_NOARGS,
         NULL
     },
@@ -339,6 +345,10 @@ PyObject *wsgi_connection_info(PyObject *self, PyObject *args) {
 
 PyObject *wsgi_uptime(PyObject *self, PyObject *args) {
     return PyUnicode_FromString(_service->get_uptime(_service, 2));
+}
+
+PyObject *wsgi_modules(PyObject *self, PyObject *args) {
+    return PyUnicode_FromString((char *) _service->modules);
 }
 
 PyObject *_new_wsgi_input(unsigned char *post_data, size_t size) {

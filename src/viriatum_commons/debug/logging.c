@@ -34,7 +34,7 @@ Windows 10 SDK and later, so guard against older SDKs */
 #endif
 #endif
 
-int logging_use_color(void) {
+int use_color_logging(void) {
     /* caches the detection result so that the terminal
     check runs only once during the process lifetime */
     static int cached = -1;
@@ -65,7 +65,7 @@ int logging_use_color(void) {
     return 0;
 }
 
-void logging_print_date(void) {
+void print_date_logging(void) {
     /* allocates the time value and the broken-down local time
     structure used to format the current date and time */
     time_t time_value;
@@ -80,7 +80,7 @@ void logging_print_date(void) {
 
     /* prints the date string surrounded by colour escapes when the
     terminal supports it, or as plain text otherwise */
-    if(logging_use_color()) {
+    if(use_color_logging()) {
         printf(V_COLOR_DATE "%s" V_COLOR_RESET " ", date_buffer);
     } else {
         printf("%s ", date_buffer);

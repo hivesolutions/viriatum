@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     container: gcc:${{ matrix.gcc-version }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Build Viriatum
         run: |
           ./autogen.sh
@@ -30,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     container: silkeh/clang:${{ matrix.clang-version }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Build Viriatum
         run: |
           apt-get update && apt-get install -y -q libtool automake autoconf
@@ -51,7 +51,7 @@ jobs:
     runs-on: ubuntu-latest
     container: gcc:${{ matrix.gcc-version }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Install CMake
         run: |
           apt-get update && apt-get install -y -q wget libssl-dev
@@ -81,7 +81,7 @@ jobs:
     timeout-minutes: 30
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Build & Install Dependencies
         run: |
           pip3 install --upgrade "conan>=2,<3" urllib3
@@ -101,7 +101,7 @@ jobs:
     timeout-minutes: 30
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Build & Install Dependencies
         run: |
           pip3 install --break-system-packages --upgrade "conan>=2,<3" "urllib3<1.27"

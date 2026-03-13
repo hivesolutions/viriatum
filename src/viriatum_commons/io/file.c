@@ -392,7 +392,7 @@ ERROR_CODE join_path_file(char *base_path, char *name, char *joined_path) {
 
     /* in case the base path ends with the separator
     (no need to add the extra separator)*/
-    if(base_path[base_path_length - 1] == '/') {
+    if(base_path[base_path_length - 1] == VIRIATUM_PATH_SEPARATOR_C) {
         /* adds the name part to the joined path */
         memcpy(joined_path + base_path_length, name, name_length + 1);
     }
@@ -400,9 +400,46 @@ ERROR_CODE join_path_file(char *base_path, char *name, char *joined_path) {
     else {
         /* adds the separator to the joined path and then adds
         the name to the joined path also */
-        memcpy(joined_path + base_path_length, "/", 1);
+        memcpy(joined_path + base_path_length, VIRIATUM_PATH_SEPARATOR, 1);
         memcpy(joined_path + base_path_length + 1, name, name_length + 1);
     }
+
+    /* raise no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE absolute_path_file(char *path, char normalize) {
+    /* allocates space for the resolved path buffer
+    to be used in the path resolution operation */
+    char resolved[VIRIATUM_MAX_PATH_SIZE];
+
+#ifdef VIRIATUM_PLATFORM_WIN32
+    /* resolves the path using the Windows full path
+    resolution function, returning NULL on error */
+    if(_fullpath(resolved, path, VIRIATUM_MAX_PATH_SIZE) == NULL) {
+        RAISE_ERROR_M(
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Problem resolving absolute path"
+        );
+    }
+#else
+    /* resolves the path using the Unix real path
+    resolution function, returning NULL on error */
+    if(realpath(path, resolved) == NULL) {
+        RAISE_ERROR_M(
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Problem resolving absolute path"
+        );
+    }
+#endif
+
+    /* copies the resolved path back into the original
+    path buffer overriding it in place */
+    SPRINTF(path, VIRIATUM_MAX_PATH_SIZE, "%s", resolved);
+
+    /* in case the normalize flag is set normalizes the
+    path to use forward slashes as separators */
+    if(normalize) { normalize_path(path); }
 
     /* raise no error */
     RAISE_NO_ERROR;

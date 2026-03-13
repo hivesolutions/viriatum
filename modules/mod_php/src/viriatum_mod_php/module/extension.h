@@ -26,9 +26,9 @@
 
 #include "entry.h"
 
-zend_function_entry viriatum_functions[16];
-zend_module_entry viriatum_module;
-sapi_module_struct viriatum_sapi_module;
+extern zend_function_entry viriatum_functions[16];
+extern zend_module_entry viriatum_module;
+extern sapi_module_struct viriatum_sapi_module;
 
 int _module_startup(sapi_module_struct *module);
 size_t _module_write(const char *data, size_t data_size);

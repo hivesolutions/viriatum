@@ -223,7 +223,34 @@ const char *test_crc_32(void);
 const char *test_is_path_safe(void);
 
 /**
- * Compars an element with another, usefull
+ * Tests the normalize_path utility function
+ * for platform specific path normalization.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_normalize_path(void);
+
+/**
+ * Tests the join_path_file utility function
+ * for platform specific path joining.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_join_path_file(void);
+
+/**
+ * Tests the absolute_path_file utility function
+ * for resolving relative paths into absolute paths.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_absolute_path_file(void);
+
+/**
+ * Compares an element with another, usefull
  * for the sorting tests.
  *
  * @param first The first value to be compared.

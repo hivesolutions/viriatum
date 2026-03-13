@@ -905,8 +905,41 @@ const char *test_quicksort_linked_list(void) {
 }
 
 const char *test_crc_32(void) {
-    /* calculates the crc32 hash value and returns it */
-    crc_32((unsigned char *) "Hello World", 11);
+    /* allocates space for the crc32 result */
+    unsigned long result;
+
+    /* the expected crc32 for "Hello World" is 4a17b156 */
+    unsigned long expected = 0x4a17b156;
+
+    /* calculates the crc32 hash value */
+    result = crc_32((unsigned char *) "Hello World", 11);
+
+    /* verifies that the computed checksum matches the
+    expected value */
+    V_ASSERT_M(result == expected, "crc32 of 'Hello World' mismatch");
+
+    /* verifies the crc32 for an empty string,
+    the expected value is 00000000 */
+    {
+        unsigned long empty_expected = 0x00000000;
+        result = crc_32((unsigned char *) "", 0);
+        V_ASSERT_M(result == empty_expected, "crc32 of empty string mismatch");
+    }
+
+    /* verifies the crc32 for "abc" to exercise
+    a different input length */
+    {
+        unsigned long abc_expected = 0x352441c2;
+        result = crc_32((unsigned char *) "abc", 3);
+        V_ASSERT_M(result == abc_expected, "crc32 of 'abc' mismatch");
+    }
+
+    /* verifies the crc32 for a single byte input */
+    {
+        unsigned long single_expected = 0xe8b7be43;
+        result = crc_32((unsigned char *) "a", 1);
+        V_ASSERT_M(result == single_expected, "crc32 of 'a' mismatch");
+    }
 
     /* returns the default value, nothing happened so there's
     nothing to report for this execution */
@@ -917,8 +950,45 @@ const char *test_md5(void) {
     /* allocates space for the md5 result */
     unsigned char result[MD5_DIGEST_SIZE];
 
+    /* the expected md5 digest for "Hello World" is
+    b10a8db164e0754105b7a99be72e3fe5 */
+    unsigned char expected[] = {
+        0xb1, 0x0a, 0x8d, 0xb1, 0x64, 0xe0, 0x75, 0x41,
+        0x05, 0xb7, 0xa9, 0x9b, 0xe7, 0x2e, 0x3f, 0xe5
+    };
+
     /* calculates the md5 hash value into the result */
     md5((unsigned char *) "Hello World", 11, result);
+
+    /* verifies that the computed digest matches the
+    expected value byte by byte */
+    V_ASSERT_HEX(result, expected, MD5_DIGEST_SIZE);
+
+    /* verifies the md5 digest for an empty string,
+    the expected value is d41d8cd98f00b204e9800998ecf8427e */
+    {
+        unsigned char empty_expected[] = {
+            0xd4, 0x1d, 0x8c, 0xd9, 0x8f, 0x00, 0xb2, 0x04,
+            0xe9, 0x80, 0x09, 0x98, 0xec, 0xf8, 0x42, 0x7e
+        };
+        md5((unsigned char *) "", 0, result);
+        V_ASSERT_HEX(result, empty_expected, MD5_DIGEST_SIZE);
+    }
+
+    /* verifies the md5 digest for a longer string to
+    exercise the multi-block code path */
+    {
+        unsigned char long_expected[] = {
+            0x90, 0x01, 0x50, 0x98, 0x3c, 0xd2, 0x4f, 0xb0,
+            0xd6, 0x96, 0x3f, 0x7d, 0x28, 0xe1, 0x7f, 0x72
+        };
+        md5(
+            (unsigned char *) "abc",
+            3,
+            result
+        );
+        V_ASSERT_HEX(result, long_expected, MD5_DIGEST_SIZE);
+    }
 
     /* returns the default value, nothing happened so there's
     nothing to report for this execution */
@@ -929,8 +999,44 @@ const char *test_sha1(void) {
     /* allocates space for the sha1 result */
     unsigned char result[SHA1_DIGEST_SIZE];
 
+    /* the expected sha1 digest for "Hello World" is
+    0a4d55a8d778e5022fab701977c5d840bbc486d0 */
+    unsigned char expected[] = {
+        0x0a, 0x4d, 0x55, 0xa8, 0xd7, 0x78, 0xe5, 0x02,
+        0x2f, 0xab, 0x70, 0x19, 0x77, 0xc5, 0xd8, 0x40,
+        0xbb, 0xc4, 0x86, 0xd0
+    };
+
     /* calculates the sha1 hash value into the result */
     sha1((unsigned char *) "Hello World", 11, result);
+
+    /* verifies that the computed digest matches the
+    expected value byte by byte */
+    V_ASSERT_HEX(result, expected, SHA1_DIGEST_SIZE);
+
+    /* verifies the sha1 digest for an empty string,
+    the expected value is da39a3ee5e6b4b0d3255bfef95601890afd80709 */
+    {
+        unsigned char empty_expected[] = {
+            0xda, 0x39, 0xa3, 0xee, 0x5e, 0x6b, 0x4b, 0x0d,
+            0x32, 0x55, 0xbf, 0xef, 0x95, 0x60, 0x18, 0x90,
+            0xaf, 0xd8, 0x07, 0x09
+        };
+        sha1((unsigned char *) "", 0, result);
+        V_ASSERT_HEX(result, empty_expected, SHA1_DIGEST_SIZE);
+    }
+
+    /* verifies the sha1 digest for "abc" to exercise
+    a different input length */
+    {
+        unsigned char abc_expected[] = {
+            0xa9, 0x99, 0x3e, 0x36, 0x47, 0x06, 0x81, 0x6a,
+            0xba, 0x3e, 0x25, 0x71, 0x78, 0x50, 0xc2, 0x6c,
+            0x9c, 0xd0, 0xd8, 0x9d
+        };
+        sha1((unsigned char *) "abc", 3, result);
+        V_ASSERT_HEX(result, abc_expected, SHA1_DIGEST_SIZE);
+    }
 
     /* returns the default value, nothing happened so there's
     nothing to report for this execution */
@@ -968,6 +1074,126 @@ const char *test_is_path_safe(void) {
 
     /* verifies that traversal with query string is rejected */
     V_ASSERT(is_path_safe((unsigned char *) "/path/..?foo=bar") == 0);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_normalize_path(void) {
+    /* allocates space for the path buffer to be
+    used in the normalize path tests */
+    char path[VIRIATUM_MAX_PATH_SIZE];
+
+    /* verifies that forward slashes are normalized
+    to the platform separator on Unix systems */
+    memcpy(path, "path/to/file", 13);
+    normalize_path(path);
+#ifdef VIRIATUM_PLATFORM_WIN32
+    V_ASSERT(strcmp(path, "path\\to\\file") == 0);
+#else
+    V_ASSERT(strcmp(path, "path/to/file") == 0);
+#endif
+
+    /* verifies that backslashes are normalized
+    to the platform separator */
+    memcpy(path, "path\\to\\file", 13);
+    normalize_path(path);
+#ifdef VIRIATUM_PLATFORM_WIN32
+    V_ASSERT(strcmp(path, "path\\to\\file") == 0);
+#else
+    V_ASSERT(strcmp(path, "path/to/file") == 0);
+#endif
+
+    /* verifies that mixed separators are normalized
+    to the platform separator */
+    memcpy(path, "path/to\\file", 13);
+    normalize_path(path);
+#ifdef VIRIATUM_PLATFORM_WIN32
+    V_ASSERT(strcmp(path, "path\\to\\file") == 0);
+#else
+    V_ASSERT(strcmp(path, "path/to/file") == 0);
+#endif
+
+    /* verifies that an empty path is handled
+    correctly without any modifications */
+    memcpy(path, "", 1);
+    normalize_path(path);
+    V_ASSERT(strcmp(path, "") == 0);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_join_path_file(void) {
+    /* allocates space for the joined path buffer
+    to be used in the join path tests */
+    char joined[VIRIATUM_MAX_PATH_SIZE];
+
+    /* verifies that two path components are joined
+    with the correct platform separator */
+    join_path_file("path", "file", joined);
+#ifdef VIRIATUM_PLATFORM_WIN32
+    V_ASSERT(strcmp(joined, "path\\file") == 0);
+#else
+    V_ASSERT(strcmp(joined, "path/file") == 0);
+#endif
+
+    /* verifies that a trailing separator in the base
+    path does not add a duplicate separator */
+#ifdef VIRIATUM_PLATFORM_WIN32
+    join_path_file("path\\", "file", joined);
+    V_ASSERT(strcmp(joined, "path\\file") == 0);
+#else
+    join_path_file("path/", "file", joined);
+    V_ASSERT(strcmp(joined, "path/file") == 0);
+#endif
+
+    /* verifies that joining with an empty name
+    produces just the base path with separator */
+    join_path_file("path", "", joined);
+#ifdef VIRIATUM_PLATFORM_WIN32
+    V_ASSERT(strcmp(joined, "path\\") == 0);
+#else
+    V_ASSERT(strcmp(joined, "path/") == 0);
+#endif
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_absolute_path_file(void) {
+    /* allocates space for the path buffer to be
+    used in the absolute path resolution tests */
+    char path[VIRIATUM_MAX_PATH_SIZE];
+    ERROR_CODE error;
+
+    /* verifies that a relative path is resolved into
+    an absolute path with normalization enabled */
+    SPRINTF(path, VIRIATUM_MAX_PATH_SIZE, "%s", ".");
+    error = absolute_path_file(path, TRUE);
+    V_ASSERT(error == 0);
+#ifdef VIRIATUM_PLATFORM_WIN32
+    V_ASSERT(path[1] == ':');
+#else
+    V_ASSERT(path[0] == '/');
+#endif
+
+    /* verifies that the resolved path does not contain
+    the relative reference anymore */
+    V_ASSERT(strcmp(path, ".") != 0);
+
+    /* verifies that resolving an invalid path returns
+    an error code indicating failure, note that on Windows
+    _fullpath does not validate existence so this test
+    is only applicable on Unix systems */
+#ifndef VIRIATUM_PLATFORM_WIN32
+    SPRINTF(path, VIRIATUM_MAX_PATH_SIZE, "%s", "/nonexistent_viriatum_test_path_12345");
+    error = absolute_path_file(path, TRUE);
+    V_ASSERT(IS_ERROR_CODE(error));
+#endif
 
     /* returns the default value, nothing happened so there's
     nothing to report for this execution */
@@ -1023,6 +1249,9 @@ void exec_simple_tests(struct test_case_t *test_case) {
     V_RUN_TEST(test_md5, test_case);
     V_RUN_TEST(test_sha1, test_case);
     V_RUN_TEST(test_is_path_safe, test_case);
+    V_RUN_TEST(test_normalize_path, test_case);
+    V_RUN_TEST(test_join_path_file, test_case);
+    V_RUN_TEST(test_absolute_path_file, test_case);
     V_RUN_TEST(test_handler_file_context, test_case);
     V_RUN_TEST(test_handler_file_url, test_case);
     V_RUN_TEST(test_handler_file_header_field, test_case);

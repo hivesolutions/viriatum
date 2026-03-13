@@ -43,6 +43,11 @@ Debug logging can also be enabled independently of the optimization level:
     cmake -D VIRIATUM_DEBUG=ON -B build
     cmake --build build
 
+For a release build with debug symbols (`-O2 -g`):
+
+    cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -B build
+    cmake --build build
+
 To set a custom www root path (equivalent to `--with-wwwroot` in Autoconf):
 
     cmake -D VIRIATUM_WWW_ROOT=/var/viriatum/www -B build

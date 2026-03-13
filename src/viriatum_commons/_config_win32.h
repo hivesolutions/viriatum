@@ -24,14 +24,22 @@
 
 #pragma once
 
+#ifndef HAVE_MPOOL
 #define HAVE_MPOOL
+#endif
+#ifndef HAVE_IP6
 #define HAVE_IP6
+#endif
+#ifndef HAVE_LIBPTHREAD
 #define HAVE_LIBPTHREAD
+#endif
 
 #define HOST_OS "win32"
 
 #ifdef _DEBUG
+#ifndef HAVE_DEBUG
 #define HAVE_DEBUG
+#endif
 #define CFLAGS_DEBUG_S " /debug"
 #else
 #define CFLAGS_DEBUG_S " /release"

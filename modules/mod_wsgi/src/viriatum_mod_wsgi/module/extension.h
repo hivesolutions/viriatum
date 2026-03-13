@@ -26,7 +26,7 @@
 
 #include "entry.h"
 
-VIRIATUM_EXTERNAL_PREFIX PyMethodDef wsgi_methods[7];
+VIRIATUM_EXTERNAL_PREFIX PyMethodDef wsgi_methods[8];
 VIRIATUM_EXTERNAL_PREFIX PyMethodDef input_methods[5];
 
 VIRIATUM_EXTERNAL_PREFIX PyTypeObject input_type;
@@ -45,6 +45,7 @@ PyObject *wsgi_connections(PyObject *self, PyObject *args);
 PyObject *wsgi_connections_l(PyObject *self, PyObject *args);
 PyObject *wsgi_connection_info(PyObject *self, PyObject *args);
 PyObject *wsgi_uptime(PyObject *self, PyObject *args);
+PyObject *wsgi_modules(PyObject *self, PyObject *args);
 
 PyObject *_new_wsgi_input(unsigned char *post_data, size_t size);
 

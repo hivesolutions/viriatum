@@ -84,9 +84,10 @@ ERROR_CODE run_test_case(test_case_function function, const char *name) {
     end_time = clock();
     elapsed = (float) (end_time - start_time) / CLOCKS_PER_SEC * 1000.0f;
     elapsed_f = (float) elapsed / 1000.0f;
-    V_PRINT_F(
-        "Ran %d tests in %.2f seconds (%d ok, %d not ok)\n",
-        test_case.total, elapsed_f, test_case.success, test_case.failure
-    );
+    V_PRINT_F("Ran %d tests in %.2f seconds (", test_case.total, elapsed_f);
+    V_PRINT_CF(V_COLOR_INFO, "%d ok", test_case.success);
+    V_PRINT(", ");
+    V_PRINT_CF(test_case.failure > 0 ? V_COLOR_ERROR : V_COLOR_INFO, "%d not ok", test_case.failure);
+    V_PRINT(")\n");
     RAISE_ERROR_S(test_case.failure > 0 ? 1 : 0);
 }

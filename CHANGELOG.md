@@ -26,8 +26,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Regression test for dispatch handler context lifecycle on keep-alive connections
 * Warning-level logging in mod_lua, mod_php, and mod_wsgi for 500 errors with request context
 * Line-buffered stdout/stderr via `setvbuf` to ensure log output is visible when piped (e.g. Docker)
+* `absolute_path_file` function in `viriatum_commons/io/file.c` for resolving relative paths to absolute (`realpath` on Unix, `_fullpath` on Windows)
+* Pre-resolved `contents_path`, `resources_path` and `modules_path` fields in `service_options_t` computed once at startup
+* Unit tests for `normalize_path`, `join_path_file`, and `absolute_path_file`
+* `VIRIATUM_PATH_SEPARATOR` and `VIRIATUM_PATH_SEPARATOR_C` constants for platform-native path separators
+* CMake pass-through of effective C flags to `CFLAGS` preprocessor define for runtime banner display
+* `V_PRINT_C` and `V_PRINT_CF` color-aware print macros for optional ANSI color output
+* Colored test output: green for `ok`, red for `not ok` and hex comparison failures, colored summary line
+* CRC32 unit test with proper assertions for multiple test vectors (`Hello World`, empty string, `abc`, `a`)
 
 ### Changed
+
+* Renamed `logging_use_color` to `use_color_logging` and `logging_print_date` to `print_date_logging`
 
 * Upgraded mod_wsgi from Python 2.7 to Python 3 (PyGILState API, modern embed workflow)
 * Upgraded mod_php from PHP 5.6 to PHP 8.x (libphp.so, updated header paths)
@@ -47,6 +57,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+* Fixed SHA1 producing wrong digests on ARM64 (macOS Apple Silicon) due to incorrect big-endian classification of AArch64 in `cpu.h` — ARM64 is little-endian
+* Fixed SHA1 strict aliasing violation in `_transform_sha1` by copying buffer into a local union via `memcpy`
 * Replaced deprecated `Py_SetProgramName`/`Py_Initialize` with `PyConfig` API in mod_wsgi (fixes Python 3.11+ deprecation warning)
 * Fixed `DESCRIPTION` module constant in mod_wsgi pointing to `compiler` field instead of `description`
 * Fixed Python object reference leaks in `wsgi_connections_l` and `wsgi_connection_info` (missing `Py_DECREF` after `PyDict_SetItemString`)
@@ -64,3 +76,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Fixed multiple Python C API reference leaks in mod_wsgi on error paths (handler, extension, entry)
 * Fixed missing GIL release on type-error path in mod_wsgi response data callback
 * Fixed `zend_string` memory leak in mod_php INI entry setup (missing `zend_string_release`)
+* Fixed `normalize_path` to use platform-native separators (`\` on Windows, `/` on Unix)
+* Fixed `join_path_file` to use platform-native path separator instead of hardcoded `/`
+* Fixed relative path resolution in service options causing mod_php to fail when working directory differs from server root
+* Fixed mod_php global variable declarations missing `extern` in header (link error with `-fno-common`)

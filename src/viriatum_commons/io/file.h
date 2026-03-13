@@ -24,10 +24,11 @@
 
 #pragma once
 
+#include "../util/util.h"
 #include "../structures/structures.h"
 
 /**
- * Strucrure defining the various
+ * Structure defining the various
  * possible types of files.
  */
 typedef enum file_type_e {
@@ -190,6 +191,18 @@ VIRIATUM_EXPORT_PREFIX ERROR_CODE entries_to_map_file(struct linked_list_t *entr
  * @param joined_path The joined path buffer to receive the final result.
  */
 VIRIATUM_EXPORT_PREFIX ERROR_CODE join_path_file(char *base_path, char *name, char *joined_path);
+
+/**
+ * Resolves a relative path into an absolute path in place,
+ * overriding the contents of the original path buffer.
+ * Optionally normalizes the path to use forward slashes.
+ *
+ * @param path The path buffer to be resolved, must be at
+ * least VIRIATUM_MAX_PATH_SIZE bytes in size.
+ * @param normalize If set to TRUE the path is normalized
+ * to use forward slashes as separators.
+ */
+VIRIATUM_EXPORT_PREFIX ERROR_CODE absolute_path_file(char *path, char normalize);
 
 /**
  * Comparator function to be used to compare two file

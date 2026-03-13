@@ -240,7 +240,7 @@ ERROR_CODE _load_configuration_wsgi(struct service_t *service, struct mod_wsgi_h
         if(script_path[0] != '/') {
             struct service_options_t *options = service->options;
             if(script_path[0] == '\\') { script_path++; }
-            SPRINTF(mod_wsgi_http_handler->file_path, VIRIATUM_MAX_PATH_SIZE, "%s/%s", options->contents_path, script_path);
+            SPRINTF(mod_wsgi_http_handler->file_path, VIRIATUM_MAX_PATH_SIZE, "%s" VIRIATUM_PATH_SEPARATOR "%s", options->contents_path, script_path);
         } else {
             SPRINTF(mod_wsgi_http_handler->file_path, VIRIATUM_MAX_PATH_SIZE, "%s", script_path);
         }
@@ -304,7 +304,7 @@ ERROR_CODE _load_locations_wsgi(struct service_t *service, struct mod_wsgi_http_
             if(script_path[0] != '/') {
                 struct service_options_t *options = service->options;
                 if(script_path[0] == '\\') { script_path++; }
-                SPRINTF(_location->file_path, VIRIATUM_MAX_PATH_SIZE, "%s/%s", options->contents_path, script_path);
+                SPRINTF(_location->file_path, VIRIATUM_MAX_PATH_SIZE, "%s" VIRIATUM_PATH_SEPARATOR "%s", options->contents_path, script_path);
             } else {
                 SPRINTF(_location->file_path, VIRIATUM_MAX_PATH_SIZE, "%s", script_path);
             }
@@ -405,7 +405,6 @@ ERROR_CODE _start_wsgi_state() {
     PyModule_AddStringConstant(wsgi_module, "VERSION", (char *) _service->version);
     PyModule_AddStringConstant(wsgi_module, "PLATFORM", (char *) _service->platform);
     PyModule_AddStringConstant(wsgi_module, "FLAGS", (char *) _service->flags);
-    PyModule_AddStringConstant(wsgi_module, "MODULES", (char *) _service->modules);
     PyModule_AddStringConstant(wsgi_module, "DESCRIPTION", (char *) _service->description);
     PyModule_AddStringConstant(wsgi_module, "COMPILER", (char *) _service->compiler);
     PyModule_AddStringConstant(wsgi_module, "COMPILER_VERSION", (char *) _service->compiler_version);

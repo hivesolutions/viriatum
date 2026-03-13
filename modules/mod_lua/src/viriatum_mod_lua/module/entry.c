@@ -241,7 +241,7 @@ ERROR_CODE _load_configuration_lua(struct service_t *service, struct mod_lua_htt
         if(script_path[0] != '/') {
             struct service_options_t *options = service->options;
             if(script_path[0] == '\\') { script_path++; }
-            SPRINTF(mod_lua_http_handler->file_path, VIRIATUM_MAX_PATH_SIZE, "%s/%s", options->contents_path, script_path);
+            SPRINTF(mod_lua_http_handler->file_path, VIRIATUM_MAX_PATH_SIZE, "%s" VIRIATUM_PATH_SEPARATOR "%s", options->contents_path, script_path);
         } else {
             SPRINTF(mod_lua_http_handler->file_path, VIRIATUM_MAX_PATH_SIZE, "%s", script_path);
         }
@@ -301,7 +301,7 @@ ERROR_CODE _load_locations_lua(struct service_t *service, struct mod_lua_http_ha
             if(script_path[0] != '/') {
                 struct service_options_t *options = service->options;
                 if(script_path[0] == '\\') { script_path++; }
-                SPRINTF(_location->file_path, VIRIATUM_MAX_PATH_SIZE, "%s/%s", options->contents_path, script_path);
+                SPRINTF(_location->file_path, VIRIATUM_MAX_PATH_SIZE, "%s" VIRIATUM_PATH_SEPARATOR "%s", options->contents_path, script_path);
             } else {
                 SPRINTF(_location->file_path, VIRIATUM_MAX_PATH_SIZE, "%s", script_path);
             }

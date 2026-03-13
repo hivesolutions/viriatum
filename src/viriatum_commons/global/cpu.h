@@ -26,7 +26,12 @@
 
 /* cpu architecture */
 
-#if defined(__arm__) || defined(__thumb__) || defined(_ARM) || defined(__aarch64__)
+#if defined(__aarch64__) || defined(_M_ARM64)
+#define VIRIATUM_PLATFORM_CPU "arm64"
+#define VIRIATUM_PLATFORM_CPU_ARM64 true
+#endif
+
+#if (defined(__arm__) || defined(__thumb__) || defined(_ARM)) && !defined(__aarch64__)
 #define VIRIATUM_PLATFORM_CPU "arm"
 #define VIRIATUM_PLATFORM_CPU_ARM true
 #endif
@@ -72,8 +77,10 @@
 
 /* cpu endianess */
 
-#if defined(VIRIATUM_PLATFORM_CPU_ARM) || defined(VIRIATUM_PLATFORM_CPU_SPARC) ||\
-    defined(VIRIATUM_PLATFORM_CPU_HPPA) || defined(VIRIATUM_PLATFORM_CPU_POWERPC) || defined(VIRIATUM_PLATFORM_CPU_MIPS)
+#if defined(VIRIATUM_PLATFORM_CPU_SPARC) ||\
+    defined(VIRIATUM_PLATFORM_CPU_HPPA) ||\
+    defined(VIRIATUM_PLATFORM_CPU_POWERPC) ||\
+    defined(VIRIATUM_PLATFORM_CPU_MIPS)
 #define VIRIATUM_BIG_ENDIAN true
 #else
 #define VIRIATUM_LITTLE_ENDIAN true
