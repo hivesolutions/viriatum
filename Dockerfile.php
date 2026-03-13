@@ -46,7 +46,8 @@ COPY --from=builder /var/viriatum /var/viriatum
 RUN ln -s libviriatum.so.1.0.0 /usr/lib/libviriatum.so.1 && \
     ln -s libviriatum.so.1.0.0 /usr/lib/libviriatum.so && \
     ln -s libviriatum_http.so.1.0.0 /usr/lib/libviriatum_http.so.1 && \
-    ln -s libviriatum_http.so.1.0.0 /usr/lib/libviriatum_http.so
+    ln -s libviriatum_http.so.1.0.0 /usr/lib/libviriatum_http.so && \
+    ln -sf /usr/lib/php84/libphp.so /usr/lib/libphp.so
 
 RUN addgroup -S viriatum && adduser -S viriatum -G viriatum && \
     chown -R viriatum:viriatum /etc/viriatum /var/viriatum
