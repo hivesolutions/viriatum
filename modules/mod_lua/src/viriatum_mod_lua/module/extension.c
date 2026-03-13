@@ -189,6 +189,13 @@ int lua_input_read(lua_State *lua_state) {
     current position in the post data buffer */
     size_t remaining = input->size - input->position;
 
+    /* in case there is no POST data available (eg: GET request)
+    or no remaining bytes pushes an empty string */
+    if(input->post_data == NULL || remaining == 0) {
+        lua_pushlstring(lua_state, "", 0);
+        return 1;
+    }
+
     /* pushes the remaining data as a Lua string and then
     advances the position to the end of the buffer */
     lua_pushlstring(lua_state, (char *) &input->post_data[input->position], remaining);

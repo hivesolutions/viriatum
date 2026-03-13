@@ -86,6 +86,17 @@ ERROR_CODE create_handler_lua_context(struct handler_lua_context_t **handler_lua
 
     /* sets the default value in the handler Lua context
     structure (resets the structure) */
+    handler_lua_context->url[0] = '\0';
+    handler_lua_context->file_name[0] = '\0';
+    handler_lua_context->query[0] = '\0';
+    handler_lua_context->prefix_name[0] = '\0';
+    handler_lua_context->file_path[0] = '\0';
+    handler_lua_context->content_type[0] = '\0';
+    handler_lua_context->content_length_[0] = '\0';
+    handler_lua_context->cookie[0] = '\0';
+    handler_lua_context->host[0] = '\0';
+    handler_lua_context->server_name[0] = '\0';
+    handler_lua_context->header = NULL;
     handler_lua_context->flags = 0;
     handler_lua_context->_next_header = UNDEFINED_HEADER;
     handler_lua_context->_url_string.length = 0;
@@ -333,6 +344,7 @@ ERROR_CODE message_complete_callback_handler_lua(struct http_parser_t *http_pars
     /* allocates space for the error return value from the sending
     of the response (loading, execution, etc.) */
     ERROR_CODE return_value;
+    struct handler_lua_context_t *handler_lua_context;
 
     /* sends (and creates) the response and retrieves the (possible)
     error code from it then in such case sends the error code to
@@ -341,7 +353,7 @@ ERROR_CODE message_complete_callback_handler_lua(struct http_parser_t *http_pars
     if(IS_ERROR_CODE(return_value)) {
         /* retrieves the handler Lua context to access the URL for
         logging, then logs the error at warning level for visibility */
-        struct handler_lua_context_t *handler_lua_context =
+        handler_lua_context =
             (struct handler_lua_context_t *) http_parser->context;
         V_WARNING_CTX_F("mod_lua", "Lua error for %s: %s\n",
             handler_lua_context ? (char *) handler_lua_context->url : "/",
@@ -542,6 +554,12 @@ ERROR_CODE _send_response_handler_lua(struct http_parser_t *http_parser) {
     size_t body_chunk_size;
     size_t body_size;
     char *response_buffer;
+    char has_content_length;
+    char _header_name_lower[VIRIATUM_MAX_HEADER_SIZE];
+    char *error_message;
+    const char *header_name;
+    const char *header_value;
+    luaL_Buffer lua_buffer;
 
     /* acquires the lock on the HTTP connection, this will avoid further
     messages to be processed, no parallel request handling problems */
@@ -564,9 +582,8 @@ ERROR_CODE _send_response_handler_lua(struct http_parser_t *http_parser) {
     have occurred so need to return immediately in error */
     if(*lua_state_pointer == NULL) {
         /* logs the error at warning level for console visibility
-        then writes the error to the connection and returns in error */
+        then returns in error (the caller writes the error response) */
         V_WARNING_CTX_F("mod_lua", "Lua error, no state available for %s\n", file_path);
-        _write_error_connection_lua(http_parser, "no Lua state available");
         RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem accessing Lua state");
     }
 
@@ -583,15 +600,11 @@ ERROR_CODE _send_response_handler_lua(struct http_parser_t *http_parser) {
     if(LUA_ERROR(result_code)) {
         /* retrieves the error message and logs it at warning level
         for console visibility before sending the error response */
-        char *error_message = (char *) lua_tostring(*lua_state_pointer, -1);
+        error_message = (char *) lua_tostring(*lua_state_pointer, -1);
         V_WARNING_CTX_F(
             "mod_lua", "Lua error in %s: %s\n",
             file_path,
             error_message ? error_message : "(unknown error)"
-        );
-        _write_error_connection_lua(
-            http_parser,
-            error_message ? error_message : "Unknown Lua error"
         );
 
         /* pops the error message from the Lua stack before reloading
@@ -603,7 +616,8 @@ ERROR_CODE _send_response_handler_lua(struct http_parser_t *http_parser) {
         *file_dirty_pointer = 1;
         _reload_lua_state(lua_state_pointer);
 
-        /* raises the error to the upper levels */
+        /* raises the error to the upper levels (the caller
+        writes the error response to the connection) */
         RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem executing script file");
     }
 
@@ -613,6 +627,11 @@ ERROR_CODE _send_response_handler_lua(struct http_parser_t *http_parser) {
         lua_setglobal(*lua_state_pointer, "_wsapi_app");
     } else {
         lua_pop(*lua_state_pointer, lua_gettop(*lua_state_pointer) > 0 ? 1 : 0);
+
+        /* clears any stale _wsapi_app reference so that a broken
+        reload does not fall back to the previous module table */
+        lua_pushnil(*lua_state_pointer);
+        lua_setglobal(*lua_state_pointer, "_wsapi_app");
     }
 
     /* retrieves the field reference to the run function, first trying
@@ -636,7 +655,6 @@ ERROR_CODE _send_response_handler_lua(struct http_parser_t *http_parser) {
     if(!lua_isfunction(*lua_state_pointer, -1)) {
         lua_pop(*lua_state_pointer, 1);
         V_WARNING_CTX_F("mod_lua", "Lua error in %s: no 'run' function found\n", file_path);
-        _write_error_connection_lua(http_parser, "no 'run' function found in script");
         *file_dirty_pointer = 1;
         RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "No run function in script");
     }
@@ -652,15 +670,11 @@ ERROR_CODE _send_response_handler_lua(struct http_parser_t *http_parser) {
     if(LUA_ERROR(result_code)) {
         /* retrieves the error message and logs it at warning level
         for console visibility before sending the error response */
-        char *error_message = (char *) lua_tostring(*lua_state_pointer, -1);
+        error_message = (char *) lua_tostring(*lua_state_pointer, -1);
         V_WARNING_CTX_F(
             "mod_lua", "Lua error in %s: %s\n",
             file_path,
             error_message ? error_message : "(unknown error)"
-        );
-        _write_error_connection_lua(
-            http_parser,
-            error_message ? error_message : "Unknown Lua error"
         );
 
         /* pops the error message from the Lua stack to avoid
@@ -671,7 +685,8 @@ ERROR_CODE _send_response_handler_lua(struct http_parser_t *http_parser) {
         to be reloaded on next request */
         *file_dirty_pointer = 1;
 
-        /* raises the error to the upper levels */
+        /* raises the error to the upper levels (the caller
+        writes the error response to the connection) */
         RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem calling the run function");
     }
 
@@ -714,14 +729,18 @@ ERROR_CODE _send_response_handler_lua(struct http_parser_t *http_parser) {
         FALSE
     );
 
+    /* tracks whether the script already provided a Content-Length
+    header so that one can be auto-inserted when missing */
+    has_content_length = FALSE;
+
     /* iterates over all the headers present in the Lua headers table
     (at stack position -2) and copies their content into the headers buffer */
     if(lua_istable(*lua_state_pointer, -2)) {
         lua_pushnil(*lua_state_pointer);
         while(lua_next(*lua_state_pointer, -3) != 0) {
             /* retrieves the header name and value from the table */
-            const char *header_name = lua_tostring(*lua_state_pointer, -2);
-            const char *header_value = lua_tostring(*lua_state_pointer, -1);
+            header_name = lua_tostring(*lua_state_pointer, -2);
+            header_value = lua_tostring(*lua_state_pointer, -1);
 
             /* copies the current header into the current position of the headers
             buffer (header copy), note that the trailing newlines are counted in size */
@@ -733,17 +752,21 @@ ERROR_CODE _send_response_handler_lua(struct http_parser_t *http_parser) {
                     header_name,
                     header_value
                 );
+
+                /* checks if this is a Content-Length header (case-insensitive)
+                to avoid inserting a duplicate one later */
+                strncpy(_header_name_lower, header_name, VIRIATUM_MAX_HEADER_SIZE - 1);
+                _header_name_lower[VIRIATUM_MAX_HEADER_SIZE - 1] = '\0';
+                lowercase(_header_name_lower);
+                if(strcmp(_header_name_lower, "content-length") == 0) {
+                    has_content_length = TRUE;
+                }
             }
 
             /* pops the value but keeps the key for the next iteration */
             lua_pop(*lua_state_pointer, 1);
         }
     }
-
-    /* finishes the current headers sequence with the final carriage return newline
-    character values to close the headers part of the envelope */
-    memcpy(&headers_buffer[count], "\r\n", 2);
-    count += 2;
 
     /* collects the body by calling the iterator function repeatedly until
     it returns nil, concatenating all the chunks into a single buffer */
@@ -752,7 +775,6 @@ ERROR_CODE _send_response_handler_lua(struct http_parser_t *http_parser) {
     if(lua_isfunction(*lua_state_pointer, -1)) {
         /* uses a temporary Lua buffer to collect all the body chunks
         from the iterator, this avoids multiple memory allocations */
-        luaL_Buffer lua_buffer;
         luaL_buffinit(*lua_state_pointer, &lua_buffer);
 
         while(TRUE) {
@@ -784,10 +806,30 @@ ERROR_CODE _send_response_handler_lua(struct http_parser_t *http_parser) {
         luaL_pushresult(&lua_buffer);
     }
 
+    /* in case the script did not provide a Content-Length header
+    auto-inserts one based on the collected body size */
+    if(!has_content_length) {
+        count += SPRINTF(
+            &headers_buffer[count],
+            VIRIATUM_MAX_HEADER_C_SIZE,
+            "Content-Length: %lu\r\n",
+            (unsigned long) body_size
+        );
+    }
+
+    /* finishes the current headers sequence with the final carriage return newline
+    character values to close the headers part of the envelope */
+    memcpy(&headers_buffer[count], "\r\n", 2);
+    count += 2;
+
     /* allocates the final response buffer containing both headers and
     body then copies the headers and body data into it */
     connection->alloc_data(connection, count + body_size, (void **) &response_buffer);
     memcpy(response_buffer, headers_buffer, count);
+
+    /* releases the headers buffer as it has been copied into the
+    response buffer and is no longer needed */
+    FREE(headers_buffer);
 
     /* in case there is body data available copies it into the
     response buffer after the headers */
@@ -923,10 +965,10 @@ ERROR_CODE _start_environ_lua(lua_State *lua_state, struct http_parser_t *http_p
         iteration cycle in course */
         header = &_headers.values[index];
 
-        /* converts the current header name to uppercase
-        and prepends the HTTP_ prefix into it */
-        uppercase(header->name);
+        /* copies the header name into a local buffer and converts
+        it to uppercase, avoiding mutation of the shared headers */
         SPRINTF(name, VIRIATUM_MAX_HEADER_SIZE + sizeof("HTTP_"), "HTTP_%s", header->name);
+        uppercase(&name[sizeof("HTTP_") - 1]);
 
         /* sets the value in the environ table using the
         HTTP_ prefixed header name */
