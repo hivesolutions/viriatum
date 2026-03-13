@@ -28,6 +28,17 @@
 
 #define V_ASSERT(test) V_ASSERT_M(test, #test)
 #define V_ASSERT_M(test, message) do { if(!(test)) { return message; } } while (0)
+#define V_ASSERT_HEX(actual, expected, size) do {\
+    if(memcmp(actual, expected, size) != 0) {\
+        size_t _i;\
+        V_PRINT("  expected: ");\
+        for(_i = 0; _i < (size_t)(size); _i++) { V_PRINT_F("%02x", ((unsigned char *)(expected))[_i]); }\
+        V_PRINT("\n  actual:   ");\
+        for(_i = 0; _i < (size_t)(size); _i++) { V_PRINT_F("%02x", ((unsigned char *)(actual))[_i]); }\
+        V_PRINT("\n");\
+        return "hex comparison failed";\
+    }\
+} while (0)
 #define V_RUN_TEST(test, test_case) do {\
     const char *message;\
     if(test_case->echo == TRUE) { V_PRINT_F("%s ... ", #test); PRINT_FLUSH(); }\

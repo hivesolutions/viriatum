@@ -929,7 +929,7 @@ const char *test_md5(void) {
 
     /* verifies that the computed digest matches the
     expected value byte by byte */
-    V_ASSERT(memcmp(result, expected, MD5_DIGEST_SIZE) == 0);
+    V_ASSERT_HEX(result, expected, MD5_DIGEST_SIZE);
 
     /* verifies the md5 digest for an empty string,
     the expected value is d41d8cd98f00b204e9800998ecf8427e */
@@ -939,7 +939,7 @@ const char *test_md5(void) {
             0xe9, 0x80, 0x09, 0x98, 0xec, 0xf8, 0x42, 0x7e
         };
         md5((unsigned char *) "", 0, result);
-        V_ASSERT(memcmp(result, empty_expected, MD5_DIGEST_SIZE) == 0);
+        V_ASSERT_HEX(result, empty_expected, MD5_DIGEST_SIZE);
     }
 
     /* verifies the md5 digest for a longer string to
@@ -954,7 +954,7 @@ const char *test_md5(void) {
             3,
             result
         );
-        V_ASSERT(memcmp(result, long_expected, MD5_DIGEST_SIZE) == 0);
+        V_ASSERT_HEX(result, long_expected, MD5_DIGEST_SIZE);
     }
 
     /* returns the default value, nothing happened so there's
@@ -979,7 +979,7 @@ const char *test_sha1(void) {
 
     /* verifies that the computed digest matches the
     expected value byte by byte */
-    V_ASSERT(memcmp(result, expected, SHA1_DIGEST_SIZE) == 0);
+    V_ASSERT_HEX(result, expected, SHA1_DIGEST_SIZE);
 
     /* verifies the sha1 digest for an empty string,
     the expected value is da39a3ee5e6b4b0d3255bfef95601890afd80709 */
@@ -990,7 +990,7 @@ const char *test_sha1(void) {
             0xaf, 0xd8, 0x07, 0x09
         };
         sha1((unsigned char *) "", 0, result);
-        V_ASSERT(memcmp(result, empty_expected, SHA1_DIGEST_SIZE) == 0);
+        V_ASSERT_HEX(result, empty_expected, SHA1_DIGEST_SIZE);
     }
 
     /* verifies the sha1 digest for "abc" to exercise
@@ -1002,7 +1002,7 @@ const char *test_sha1(void) {
             0x9c, 0xd0, 0xd8, 0x9d
         };
         sha1((unsigned char *) "abc", 3, result);
-        V_ASSERT(memcmp(result, abc_expected, SHA1_DIGEST_SIZE) == 0);
+        V_ASSERT_HEX(result, abc_expected, SHA1_DIGEST_SIZE);
     }
 
     /* returns the default value, nothing happened so there's

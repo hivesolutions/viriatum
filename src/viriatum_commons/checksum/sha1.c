@@ -89,9 +89,14 @@ void final_sha1(struct sha1_context_t *context, unsigned char *digest) {
 
 void _transform_sha1(unsigned int state[5], const unsigned char *buffer) {
     unsigned int a, b, c, d, e;
+    union sha1_block_t block_data;
     union sha1_block_t *block;
 
-    block = (union sha1_block_t *) buffer;
+    /* copies the buffer into a properly aligned union to
+    avoid strict aliasing violations when accessing the data
+    as unsigned int values through the block pointer */
+    memcpy(&block_data, buffer, 64);
+    block = &block_data;
 
     /* copies context state to working vars */
     a = state[0];
