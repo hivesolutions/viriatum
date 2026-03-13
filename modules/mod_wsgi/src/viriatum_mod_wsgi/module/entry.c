@@ -411,6 +411,9 @@ ERROR_CODE _start_wsgi_state() {
     PyModule_AddStringConstant(wsgi_module, "COMPILATION_DATE", (char *) _service->compilation_date);
     PyModule_AddStringConstant(wsgi_module, "COMPILATION_TIME", (char *) _service->compilation_time);
     PyModule_AddStringConstant(wsgi_module, "COMPILATION_FLAGS", (char *) _service->compilation_flags);
+    PyModule_AddStringConstant(wsgi_module, "OBSERVATIONS", VIRIATUM_OBSERVATIONS);
+    PyModule_AddStringConstant(wsgi_module, "COPYRIGHT", VIRIATUM_COPYRIGHT);
+    PyModule_AddStringConstant(wsgi_module, "PLATFORM_CPU", VIRIATUM_PLATFORM_CPU);
 
     /* checks the input type for readiness and then casts the
     type as a python type and registers it as input */

@@ -29,6 +29,7 @@ def application(environ, start_response):
         "  compiled:    %s @ %s\n"
         "  flags:       %s\n"
         "  modules:     %s\n"
+        "  copyright:   %s\n"
         % (
             viriatum_wsgi.NAME,
             viriatum_wsgi.VERSION,
@@ -45,6 +46,7 @@ def application(environ, start_response):
             viriatum_wsgi.COMPILATION_TIME,
             viriatum_wsgi.COMPILATION_FLAGS,
             viriatum_wsgi.modules(),
+            viriatum_wsgi.COPYRIGHT,
         )
     )
     body = body.encode("utf-8")
