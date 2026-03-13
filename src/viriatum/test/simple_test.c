@@ -1047,6 +1047,126 @@ const char *test_is_path_safe(void) {
     return NULL;
 }
 
+const char *test_normalize_path(void) {
+    /* allocates space for the path buffer to be
+    used in the normalize path tests */
+    char path[VIRIATUM_MAX_PATH_SIZE];
+
+    /* verifies that forward slashes are normalized
+    to the platform separator on Unix systems */
+    memcpy(path, "path/to/file", 13);
+    normalize_path(path);
+#ifdef VIRIATUM_PLATFORM_WIN32
+    V_ASSERT(strcmp(path, "path\\to\\file") == 0);
+#else
+    V_ASSERT(strcmp(path, "path/to/file") == 0);
+#endif
+
+    /* verifies that backslashes are normalized
+    to the platform separator */
+    memcpy(path, "path\\to\\file", 13);
+    normalize_path(path);
+#ifdef VIRIATUM_PLATFORM_WIN32
+    V_ASSERT(strcmp(path, "path\\to\\file") == 0);
+#else
+    V_ASSERT(strcmp(path, "path/to/file") == 0);
+#endif
+
+    /* verifies that mixed separators are normalized
+    to the platform separator */
+    memcpy(path, "path/to\\file", 13);
+    normalize_path(path);
+#ifdef VIRIATUM_PLATFORM_WIN32
+    V_ASSERT(strcmp(path, "path\\to\\file") == 0);
+#else
+    V_ASSERT(strcmp(path, "path/to/file") == 0);
+#endif
+
+    /* verifies that an empty path is handled
+    correctly without any modifications */
+    memcpy(path, "", 1);
+    normalize_path(path);
+    V_ASSERT(strcmp(path, "") == 0);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_join_path_file(void) {
+    /* allocates space for the joined path buffer
+    to be used in the join path tests */
+    char joined[VIRIATUM_MAX_PATH_SIZE];
+
+    /* verifies that two path components are joined
+    with the correct platform separator */
+    join_path_file("path", "file", joined);
+#ifdef VIRIATUM_PLATFORM_WIN32
+    V_ASSERT(strcmp(joined, "path\\file") == 0);
+#else
+    V_ASSERT(strcmp(joined, "path/file") == 0);
+#endif
+
+    /* verifies that a trailing separator in the base
+    path does not add a duplicate separator */
+#ifdef VIRIATUM_PLATFORM_WIN32
+    join_path_file("path\\", "file", joined);
+    V_ASSERT(strcmp(joined, "path\\file") == 0);
+#else
+    join_path_file("path/", "file", joined);
+    V_ASSERT(strcmp(joined, "path/file") == 0);
+#endif
+
+    /* verifies that joining with an empty name
+    produces just the base path with separator */
+    join_path_file("path", "", joined);
+#ifdef VIRIATUM_PLATFORM_WIN32
+    V_ASSERT(strcmp(joined, "path\\") == 0);
+#else
+    V_ASSERT(strcmp(joined, "path/") == 0);
+#endif
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_absolute_path_file(void) {
+    /* allocates space for the path buffer to be
+    used in the absolute path resolution tests */
+    char path[VIRIATUM_MAX_PATH_SIZE];
+    ERROR_CODE error;
+
+    /* verifies that a relative path is resolved into
+    an absolute path with normalization enabled */
+    SPRINTF(path, VIRIATUM_MAX_PATH_SIZE, "%s", ".");
+    error = absolute_path_file(path, TRUE);
+    V_ASSERT(error == 0);
+#ifdef VIRIATUM_PLATFORM_WIN32
+    V_ASSERT(path[1] == ':');
+#else
+    V_ASSERT(path[0] == '/');
+#endif
+
+    /* verifies that the resolved path does not contain
+    the relative reference anymore */
+    V_ASSERT(strcmp(path, ".") != 0);
+
+    /* verifies that resolving an invalid path returns
+    an error code indicating failure, note that on Windows
+    _fullpath does not validate existence so this test
+    is only applicable on Unix systems */
+#ifndef VIRIATUM_PLATFORM_WIN32
+    SPRINTF(path, VIRIATUM_MAX_PATH_SIZE, "%s", "/nonexistent_viriatum_test_path_12345");
+    error = absolute_path_file(path, TRUE);
+    V_ASSERT(IS_ERROR_CODE(error));
+#endif
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
 int _compare(void *first, void *second) {
     /* in case the first element is smaller
     than the second element returns a negative
@@ -1096,6 +1216,9 @@ void exec_simple_tests(struct test_case_t *test_case) {
     V_RUN_TEST(test_md5, test_case);
     V_RUN_TEST(test_sha1, test_case);
     V_RUN_TEST(test_is_path_safe, test_case);
+    V_RUN_TEST(test_normalize_path, test_case);
+    V_RUN_TEST(test_join_path_file, test_case);
+    V_RUN_TEST(test_absolute_path_file, test_case);
     V_RUN_TEST(test_handler_file_context, test_case);
     V_RUN_TEST(test_handler_file_url, test_case);
     V_RUN_TEST(test_handler_file_header_field, test_case);

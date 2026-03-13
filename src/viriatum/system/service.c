@@ -320,6 +320,13 @@ ERROR_CODE calculate_options_service(struct service_t *service) {
         VIRIATUM_MODULES_PATH
     );
 
+    /* resolves the contents, resources and modules paths
+    into absolute paths to avoid issues with relative path
+    resolution in modules that may change working directory */
+    absolute_path_file((char *) service->options->contents_path, TRUE);
+    absolute_path_file((char *) service->options->resources_path, TRUE);
+    absolute_path_file((char *) service->options->modules_path, TRUE);
+
     /* raises no error */
     RAISE_NO_ERROR;
 }

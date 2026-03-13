@@ -26,6 +26,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Regression test for dispatch handler context lifecycle on keep-alive connections
 * Warning-level logging in mod_lua, mod_php, and mod_wsgi for 500 errors with request context
 * Line-buffered stdout/stderr via `setvbuf` to ensure log output is visible when piped (e.g. Docker)
+* `absolute_path_file` function in `viriatum_commons/io/file.c` for resolving relative paths to absolute (`realpath` on Unix, `_fullpath` on Windows)
+* Pre-resolved `contents_path`, `resources_path` and `modules_path` fields in `service_options_t` computed once at startup
+* Unit tests for `normalize_path`, `join_path_file`, and `absolute_path_file`
 
 ### Changed
 
@@ -64,3 +67,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Fixed multiple Python C API reference leaks in mod_wsgi on error paths (handler, extension, entry)
 * Fixed missing GIL release on type-error path in mod_wsgi response data callback
 * Fixed `zend_string` memory leak in mod_php INI entry setup (missing `zend_string_release`)
+* Fixed `normalize_path` to use platform-native separators (`\` on Windows, `/` on Unix)
+* Fixed `join_path_file` to use platform-native path separator instead of hardcoded `/`
+* Fixed relative path resolution in service options causing mod_php to fail when working directory differs from server root
+* Fixed mod_php global variable declarations missing `extern` in header (link error with `-fno-common`)

@@ -132,7 +132,11 @@ static __inline void uppercase(char *string_value) {
 
 static __inline void normalize_path(char *string_value) {
     while(*string_value != '\0') {
+#ifdef VIRIATUM_PLATFORM_WIN32
+        if(*string_value == '/') { *string_value = '\\'; }
+#else
         if(*string_value == '\\') { *string_value = '/'; }
+#endif
         string_value++;
     }
 }
@@ -235,7 +239,7 @@ static __inline size_t split(char *string_value, char *buffer, size_t size_e, ch
     size_t _index = 0;
     size_t count = 0;
 
-    /* iterates continuousuly over the string value to correctly
+    /* iterates continuously over the string value to correctly
     parse the string value and split it */
     while(TRUE) {
         /* retrieves the current token character to be evaluated
@@ -258,10 +262,10 @@ static __inline size_t split(char *string_value, char *buffer, size_t size_e, ch
             _index = index + 1;
 
             /* increments the count (number of parsed elements)
-            because one more split occured */
+            because one more split occurred */
             count++;
         }
-        /* otherwise in case the current token isthe end of string
+        /* otherwise in case the current token is the end of string
         the current string must be copied as the last trunk */
         else if(_token == '\0') {
             /* calculates the size of the string from the difference
@@ -272,7 +276,7 @@ static __inline size_t split(char *string_value, char *buffer, size_t size_e, ch
             buffer[size] = '\0';
 
             /* increments the count (number of parsed elements)
-            because one more split occured (final split) */
+            because one more split occurred (final split) */
             count++;
 
             /* breaks the current loop (no more tokens to be split) */
