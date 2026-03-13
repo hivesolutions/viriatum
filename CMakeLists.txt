@@ -39,6 +39,16 @@ if(NOT WIN32)
     endif()
 endif()
 
+# passes the effective C flags as a preprocessor define so the
+# compilation flags banner can display them at runtime
+if(CMAKE_BUILD_TYPE)
+    string(TOUPPER "${CMAKE_BUILD_TYPE}" CMAKE_BUILD_TYPE_UPPER)
+    string(STRIP "${CMAKE_C_FLAGS} ${CMAKE_C_FLAGS_${CMAKE_BUILD_TYPE_UPPER}}" VIRIATUM_CFLAGS)
+else()
+    string(STRIP "${CMAKE_C_FLAGS}" VIRIATUM_CFLAGS)
+endif()
+add_definitions(-DCFLAGS="${VIRIATUM_CFLAGS}")
+
 file(GLOB_RECURSE VIRIATUM_COMMON_SOURCES src/viriatum_commons/*.c)
 add_library(viriatum_commons ${VIRIATUM_COMMON_SOURCES})
 set_target_properties(viriatum_commons PROPERTIES POSITION_INDEPENDENT_CODE ON)
