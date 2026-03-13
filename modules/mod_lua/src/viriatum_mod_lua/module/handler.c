@@ -584,8 +584,19 @@ ERROR_CODE _send_response_handler_lua(struct http_parser_t *http_parser) {
         /* retrieves the error message and logs it at warning level
         for console visibility before sending the error response */
         char *error_message = (char *) lua_tostring(*lua_state_pointer, -1);
-        V_WARNING_CTX_F("mod_lua", "Lua error in %s: %s\n", file_path, error_message);
-        _write_error_connection_lua(http_parser, error_message);
+        V_WARNING_CTX_F(
+            "mod_lua", "Lua error in %s: %s\n",
+            file_path,
+            error_message ? error_message : "(unknown error)"
+        );
+        _write_error_connection_lua(
+            http_parser,
+            error_message ? error_message : "Unknown Lua error"
+        );
+
+        /* pops the error message from the Lua stack before reloading
+        the state to avoid leaving orphaned values */
+        lua_pop(*lua_state_pointer, 1);
 
         /* sets the file as dirty (forces reload) and then reloads the current
         internal Lua state, virtual machine reset (to avoid corruption) */
@@ -642,8 +653,19 @@ ERROR_CODE _send_response_handler_lua(struct http_parser_t *http_parser) {
         /* retrieves the error message and logs it at warning level
         for console visibility before sending the error response */
         char *error_message = (char *) lua_tostring(*lua_state_pointer, -1);
-        V_WARNING_CTX_F("mod_lua", "Lua error in %s: %s\n", file_path, error_message);
-        _write_error_connection_lua(http_parser, error_message);
+        V_WARNING_CTX_F(
+            "mod_lua", "Lua error in %s: %s\n",
+            file_path,
+            error_message ? error_message : "(unknown error)"
+        );
+        _write_error_connection_lua(
+            http_parser,
+            error_message ? error_message : "Unknown Lua error"
+        );
+
+        /* pops the error message from the Lua stack to avoid
+        leaving orphaned values on the stack */
+        lua_pop(*lua_state_pointer, 1);
 
         /* sets the file reference as dirty, this will force the script file
         to be reloaded on next request */

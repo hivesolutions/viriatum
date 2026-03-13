@@ -44,7 +44,7 @@ int lua_viriatum_connections_l(lua_State *lua_state) {
     /* allocates space for the local variables that are
     going to be used in the construction of the connections */
     struct iterator_t *iterator;
-    struct connection_t *connection;
+    struct connection_t *connection = NULL;
     unsigned long long delta;
     char uptime[128];
     char is_empty;
@@ -108,7 +108,7 @@ int lua_viriatum_connection_info(lua_State *lua_state) {
     long id;
     char is_empty;
     struct iterator_t *iterator;
-    struct connection_t *connection;
+    struct connection_t *connection = NULL;
     unsigned long long delta;
     char uptime[128];
 
