@@ -52,6 +52,40 @@ if(LUA_FOUND)
         endif()
     endforeach()
     message(STATUS "Viriatum: mod_lua enabled")
+
+    # test executable: compiles the module sources together with
+    # the test files into a standalone binary that can be invoked
+    # to run the mod_lua test suite
+    file(GLOB MOD_LUA_TEST_SOURCES src/viriatum_mod_lua/test/*.c)
+    add_executable(viriatum_mod_lua_test
+        ${MOD_LUA_SOURCES}
+        ${MOD_LUA_TEST_SOURCES}
+        ${CMAKE_SOURCE_DIR}/src/viriatum/http/http_parser.c
+    )
+    set_target_properties(viriatum_mod_lua_test PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
+        RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/bin
+        RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/bin
+    )
+    target_include_directories(viriatum_mod_lua_test PRIVATE
+        src/viriatum_mod_lua
+        ${CMAKE_SOURCE_DIR}/src/viriatum
+        ${CMAKE_SOURCE_DIR}/src/viriatum_commons
+        ${LUA_INCLUDE_DIRS}
+    )
+    target_link_libraries(viriatum_mod_lua_test viriatum_commons ${LUA_LINK_LIBRARIES})
+    target_compile_options(viriatum_mod_lua_test PRIVATE ${LUA_CFLAGS_OTHER})
+    target_compile_definitions(viriatum_mod_lua_test PRIVATE
+        VIRIATUM_TEST_SCRIPT_PATH="${CMAKE_SOURCE_DIR}/modules/mod_lua/resources/test/test_handler.lua"
+    )
+
+    # reuses the lua5.1 compatibility symlink for the test target
+    foreach(LUA_INC_DIR ${LUA_INCLUDE_DIRS})
+        get_filename_component(LUA_INC_NAME ${LUA_INC_DIR} NAME)
+        if(NOT LUA_INC_NAME STREQUAL "lua5.1")
+            target_include_directories(viriatum_mod_lua_test PRIVATE ${CMAKE_BINARY_DIR})
+        endif()
+    endforeach()
 else()
     message(STATUS "Viriatum: mod_lua disabled (Lua not found)")
 endif()
