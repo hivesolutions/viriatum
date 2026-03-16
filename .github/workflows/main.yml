@@ -76,7 +76,7 @@ jobs:
       - name: Test Viriatum
         run: |
           ./bin/viriatum --test
-      - name: Test mod_lua
+      - name: Test Viriatum Mod Lua
         run: |
           ./bin/viriatum_mod_lua_test
   build-windows-cmake:
@@ -118,6 +118,6 @@ jobs:
       - name: Test Viriatum
         run: |
           ./bin/viriatum --test
-      - name: Test mod_lua
+      - name: Test Viriatum Mod Lua
         run: |
           ./bin/viriatum_mod_lua_test
