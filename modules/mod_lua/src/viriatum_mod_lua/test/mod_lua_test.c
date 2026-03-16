@@ -51,6 +51,7 @@ const char *test_handler_lua_context(void) {
     V_ASSERT(handler_lua_context->_url_string.length == 0);
     V_ASSERT(handler_lua_context->_file_name_string.length == 0);
     V_ASSERT(handler_lua_context->_query_string.length == 0);
+    V_ASSERT(handler_lua_context->_prefix_name_string.length == 0);
 
     /* deletes the handler Lua context */
     delete_handler_lua_context(handler_lua_context);

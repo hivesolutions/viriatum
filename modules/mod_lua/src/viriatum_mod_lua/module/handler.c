@@ -108,6 +108,7 @@ ERROR_CODE create_handler_lua_context(struct handler_lua_context_t **handler_lua
     handler_lua_context->_cookie_string.length = 0;
     handler_lua_context->_host_string.length = 0;
     handler_lua_context->_server_name_string.length = 0;
+    handler_lua_context->_prefix_name_string.length = 0;
 
     /* sets the correct headers global reference in the Lua
     context and then resets the number of count to zero */
@@ -225,10 +226,10 @@ ERROR_CODE header_field_callback_handler_lua(struct http_parser_t *http_parser, 
     /* checks if the current header is a valid "capturable"
     header in such case changes the next header value accordingly
     otherwise sets the undefined header */
-    if(memcmp(data, CONTENT_TYPE_H, data_size) == 0) { handler_lua_context->_next_header = CONTENT_TYPE; }
-    else if(memcmp(data, CONTENT_LENGTH_H, data_size) == 0) { handler_lua_context->_next_header = CONTENT_LENGTH; }
-    else if(memcmp(data, COOKIE_H, data_size) == 0) { handler_lua_context->_next_header = COOKIE; }
-    else if(memcmp(data, HOST_H, data_size) == 0) { handler_lua_context->_next_header = HOST; }
+    if(data_size == 12 && memcmp(data, CONTENT_TYPE_H, data_size) == 0) { handler_lua_context->_next_header = CONTENT_TYPE; }
+    else if(data_size == 14 && memcmp(data, CONTENT_LENGTH_H, data_size) == 0) { handler_lua_context->_next_header = CONTENT_LENGTH; }
+    else if(data_size == 6 && memcmp(data, COOKIE_H, data_size) == 0) { handler_lua_context->_next_header = COOKIE; }
+    else if(data_size == 4 && memcmp(data, HOST_H, data_size) == 0) { handler_lua_context->_next_header = HOST; }
     else { handler_lua_context->_next_header = UNDEFINED_HEADER; }
 
     /* raise no error */

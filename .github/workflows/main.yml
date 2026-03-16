@@ -78,11 +78,7 @@ jobs:
           ./bin/viriatum --test
       - name: Test mod_lua
         run: |
-          if [ -x ./bin/viriatum_mod_lua_test ]; then
-              ./bin/viriatum_mod_lua_test
-          else
-              echo "mod_lua tests skipped (binary not available)"
-          fi
+          ./bin/viriatum_mod_lua_test
   build-windows-cmake:
     name: Build Windows CMake
     timeout-minutes: 30
@@ -124,8 +120,4 @@ jobs:
           ./bin/viriatum --test
       - name: Test mod_lua
         run: |
-          if [ -x ./bin/viriatum_mod_lua_test ]; then
-              ./bin/viriatum_mod_lua_test
-          else
-              echo "mod_lua tests skipped (binary not available)"
-          fi
+          ./bin/viriatum_mod_lua_test
