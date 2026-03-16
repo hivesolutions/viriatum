@@ -76,7 +76,7 @@ if(LUA_FOUND)
     target_link_libraries(viriatum_mod_lua_test viriatum_commons ${LUA_LINK_LIBRARIES})
     target_compile_options(viriatum_mod_lua_test PRIVATE ${LUA_CFLAGS_OTHER})
     target_compile_definitions(viriatum_mod_lua_test PRIVATE
-        VIRIATUM_TEST_SCRIPT_PATH="${CMAKE_SOURCE_DIR}/src/viriatum/resources/html/base/test_handler.lua"
+        VIRIATUM_TEST_SCRIPT_PATH="${CMAKE_SOURCE_DIR}/modules/mod_lua/resources/test_handler.lua"
     )
 
     # reuses the lua5.1 compatibility symlink for the test target
