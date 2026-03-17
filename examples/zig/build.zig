@@ -7,10 +7,13 @@ pub fn build(b: *std.Build) void {
     // root of the viriatum source tree relative to this build file
     const viriatum_root = b.path("../../");
 
+    // common flags for all platforms, __DATE__ and __TIME__ are
+    // overridden with fixed values so that release builds (which
+    // enforce reproducibility) do not fail
     const c_flags: []const []const u8 = if (target.result.os.tag == .windows)
-        &.{ "-DNO_PRAGMA_LIB", "-DCFLAGS=\"\"", "-D_CRT_SECURE_NO_WARNINGS", "-DEINTR=4", "-fcommon" }
+        &.{ "-DNO_PRAGMA_LIB", "-DCFLAGS=\"\"", "-D_CRT_SECURE_NO_WARNINGS", "-DEINTR=4", "-fcommon", "-Wno-builtin-macro-redefined", "-D__DATE__=\"unknown\"", "-D__TIME__=\"unknown\"" }
     else
-        &.{ "-DNO_PRAGMA_LIB", "-DCFLAGS=\"\"" };
+        &.{ "-DNO_PRAGMA_LIB", "-DCFLAGS=\"\"", "-Wno-builtin-macro-redefined", "-D__DATE__=\"unknown\"", "-D__TIME__=\"unknown\"" };
 
     // --- viriatum_commons (static library) ---
 
