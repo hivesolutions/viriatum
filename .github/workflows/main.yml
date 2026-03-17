@@ -121,3 +121,19 @@ jobs:
       - name: Test Viriatum Mod Lua
         run: |
           ./bin/viriatum_mod_lua_test
+  build-zig:
+    name: Build Zig
+    timeout-minutes: 30
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: mlugg/setup-zig@v2
+        with:
+          version: 0.15.2
+      - name: Build Zig Example
+        run: |
+          cd examples/zig
+          zig build -Doptimize=ReleaseFast
