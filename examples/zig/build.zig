@@ -102,6 +102,38 @@ pub fn build(b: *std.Build) void {
 
     const run_step = b.step("run", "Run the embedded viriatum server");
     run_step.dependOn(&run_cmd.step);
+
+    // --- viriatum full executable (with main, for --test) ---
+
+    const viriatum_exe_mod = b.createModule(.{
+        .target = target,
+        .optimize = optimize,
+        .link_libc = true,
+    });
+    viriatum_exe_mod.addIncludePath(viriatum_root.path(b, "src/viriatum"));
+    viriatum_exe_mod.addIncludePath(viriatum_root.path(b, "src/viriatum_commons"));
+    viriatum_exe_mod.addCSourceFiles(.{
+        .root = viriatum_root.path(b, "src/viriatum"),
+        .files = &viriatum_sources ++ .{"viriatum.c"},
+        .flags = c_flags,
+    });
+    if (target.result.os.tag != .windows) {
+        viriatum_exe_mod.linkSystemLibrary("dl", .{});
+    }
+
+    const viriatum_exe = b.addExecutable(.{
+        .name = "viriatum",
+        .root_module = viriatum_exe_mod,
+    });
+    viriatum_exe.linkLibrary(commons);
+
+    b.installArtifact(viriatum_exe);
+
+    const test_cmd = b.addRunArtifact(viriatum_exe);
+    test_cmd.addArg("--test");
+
+    const test_step = b.step("test", "Run the viriatum unit tests");
+    test_step.dependOn(&test_cmd.step);
 }
 
 // viriatum_commons source files (relative to src/viriatum_commons)
@@ -169,6 +201,7 @@ const viriatum_sources = [_][]const u8{
     "system/service.c",
     "system/torrent.c",
     "test/simple_test.c",
+    "test/speed_test.c",
     "test/handler_file_test.c",
     "test/handler_dispatch_test.c",
     "test/test_support.c",
