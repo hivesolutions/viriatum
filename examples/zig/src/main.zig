@@ -23,7 +23,15 @@ extern fn create_hash_map(hash_map_pointer: **hash_map_t, initial_size: usize) v
 extern fn delete_hash_map(hash_map: *hash_map_t) void;
 
 pub fn main() void {
-    print("viriatum/zig - embedded server example\n\n", .{});
+    const builtin = @import("builtin");
+    const zig_version = builtin.zig_version;
+    const os_tag = @tagName(builtin.os.tag);
+    print("viriatum/zig - embedded server example (zig {d}.{d}.{d}, {s})\n\n", .{
+        zig_version.major,
+        zig_version.minor,
+        zig_version.patch,
+        os_tag,
+    });
 
     // create an empty arguments map (uses all defaults)
     var arguments: *hash_map_t = undefined;
