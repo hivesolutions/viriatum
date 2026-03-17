@@ -2360,8 +2360,8 @@ ERROR_CODE _comand_line_options_service(struct service_t *service, struct hash_m
 }
 
 const char *_get_uptime_service(struct service_t *service, size_t count) {
-    /* calculates the delata time (in seconds) and uses it to format
-    the delta using the provied count value (number of parts), the
+    /* calculates the delta time (in seconds) and uses it to format
+    the delta using the provided count value (number of parts), the
     uptime string is store in the service constant and then returned */
     unsigned long long delta = (unsigned long long) time(NULL) - service->start_time;
     format_delta(service->_uptime, sizeof(service->_uptime), delta, count);
@@ -2369,12 +2369,12 @@ const char *_get_uptime_service(struct service_t *service, size_t count) {
 }
 
 const char *_get_mime_type_service(struct service_t *service, char *extension) {
-    /* allocates space for the buffer reference that will hold the mime type
+    /* allocates space for the buffer reference that will hold the MIME type
     then unpacks the service options from the service and uses it to access
-    the mime types hash map and retrieve the mime type string from the provided
+    the MIME types hash map and retrieve the MIME type string from the provided
     extension string value and returns it to the caller function, note that a
     conversion to lowercase representation of the extension is done so that no
-    problems occur with uppercased values (lowercase only representation) */
+    problems occur with uppercase values (lowercase only representation) */
     char *mime_type;
     char extension_l[VIRIATUM_MAX_EXTENSION_SIZE];
     size_t extension_s = strlen(extension);
