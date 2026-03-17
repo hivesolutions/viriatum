@@ -121,6 +121,11 @@ pub fn build(b: *std.Build) void {
         viriatum_exe_mod.linkSystemLibrary("dl", .{});
     }
 
+    // embed the application icon into the executable (Windows only)
+    viriatum_exe_mod.addWin32ResourceFile(.{
+        .file = b.path("src/viriatum.rc"),
+    });
+
     const viriatum_exe = b.addExecutable(.{
         .name = "viriatum",
         .root_module = viriatum_exe_mod,
