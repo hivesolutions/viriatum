@@ -1,0 +1,6 @@
+.{
+    .name = .viriatum_zig,
+    .version = "0.0.1",
+    .fingerprint = 0xa8d8568fbeded60,
+    .paths = .{ "build.zig", "build.zig.zon", "src" },
+}
