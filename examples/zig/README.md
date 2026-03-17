@@ -18,6 +18,22 @@ zig build run
 The server starts on the default port (9090) using the dispatch handler.
 Press `Ctrl+C` to stop.
 
+## Tests
+
+Run the full viriatum unit test suite (30 tests):
+
+```bash
+zig build test
+```
+
+## Release Builds
+
+```bash
+zig build -Doptimize=ReleaseFast    # optimized for speed
+zig build -Doptimize=ReleaseSmall   # optimized for binary size (~125KB)
+zig build -Doptimize=ReleaseSafe    # optimized with safety checks
+```
+
 ## How It Works
 
 The build system compiles viriatum's C sources into two static libraries
@@ -26,10 +42,4 @@ The build system compiles viriatum's C sources into two static libraries
 The `viriatum.c` file is excluded from the library because it contains
 `main()`. Instead, `src/viriatum_shim.c` provides the globals that
 `viriatum.c` normally defines, and `src/main.zig` calls the service
-lifecycle functions directly:
-
-```
-create_service → load_specifications → load_options_service
-→ calculate_options_service → calculate_locations_service
-→ start_service (blocks) → delete_service
-```
+lifecycle functions directly.
