@@ -80,6 +80,11 @@ pub fn build(b: *std.Build) void {
         .flags = c_flags,
     });
 
+    // embed the application icon into the executable (Windows only)
+    exe_mod.addWin32ResourceFile(.{
+        .file = b.path("src/viriatum.rc"),
+    });
+
     const exe = b.addExecutable(.{
         .name = "viriatum_zig",
         .root_module = exe_mod,
