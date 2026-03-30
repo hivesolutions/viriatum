@@ -1,34 +1,42 @@
 {
     "version": "2.0.0",
-    "linux": {
-        "command": "${workspaceRoot}/build.sh",
-        "isShellCommand": true,
-        "args": [],
-        "showOutput": "always",
-        "options": {
-            "env": {
-                "RUN_CONFIGURE": "1",
-                "RUN_MAKE": "1"
-            }
+    "tasks": [{
+        "label": "cmake-configure",
+        "type": "shell",
+        "command": "cmake",
+        "args": [
+            "-S",
+            ".",
+            "-B",
+            "build",
+            "-DCMAKE_BUILD_TYPE=Debug"
+        ],
+        "group": "build",
+        "presentation": {
+            "reveal": "always"
         },
-        "tasks": [{
-            "taskName": "build",
-            "isBuildCommand": true,
-            "suppressTaskName": true
-        }, {
-            "taskName": "build-test",
-            "args": [
-                "test"
-            ],
-            "isTestCommand": true,
-            "suppressTaskName": true
-        }]
-    },
-    "osx": {
-        "command": "${workspaceRoot}/build.sh",
-        "isShellCommand": true,
-        "args": [],
-        "showOutput": "always",
+        "problemMatcher": []
+    }, {
+        "label": "cmake-build",
+        "type": "shell",
+        "command": "cmake",
+        "args": [
+            "--build",
+            "build"
+        ],
+        "group": {
+            "kind": "build",
+            "isDefault": true
+        },
+        "dependsOn": "cmake-configure",
+        "presentation": {
+            "reveal": "always"
+        },
+        "problemMatcher": "$gcc"
+    }, {
+        "label": "build",
+        "type": "shell",
+        "command": "${workspaceFolder}/build.sh",
         "options": {
             "env": {
                 "DARWIN": "1",
@@ -37,18 +45,51 @@
                 "CC": "clang"
             }
         },
-        "tasks": [{
-            "taskName": "build",
-            "isBuildCommand": true,
-            "suppressTaskName": true
-        }, {
-            "taskName": "build-test",
-            "args": [
-                "test"
-            ],
-            "isTestCommand": true,
-            "suppressTaskName": true
-        }]
-    },
-    "tasks": []
+        "group": "build",
+        "presentation": {
+            "reveal": "always"
+        },
+        "problemMatcher": "$gcc",
+        "linux": {
+            "options": {
+                "env": {
+                    "DARWIN": "0",
+                    "RUN_CONFIGURE": "1",
+                    "RUN_MAKE": "1"
+                }
+            }
+        }
+    }, {
+        "label": "build-test",
+        "type": "shell",
+        "command": "${workspaceFolder}/build.sh",
+        "args": [
+            "test"
+        ],
+        "options": {
+            "env": {
+                "DARWIN": "1",
+                "RUN_CONFIGURE": "1",
+                "RUN_MAKE": "1",
+                "CC": "clang"
+            }
+        },
+        "group": {
+            "kind": "test",
+            "isDefault": true
+        },
+        "presentation": {
+            "reveal": "always"
+        },
+        "problemMatcher": "$gcc",
+        "linux": {
+            "options": {
+                "env": {
+                    "DARWIN": "0",
+                    "RUN_CONFIGURE": "1",
+                    "RUN_MAKE": "1"
+                }
+            }
+        }
+    }]
 }

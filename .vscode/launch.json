@@ -1,14 +1,33 @@
 {
     "version": "0.2.0",
     "configurations": [{
-        "name": "C++ Launch",
+        "name": "Launch (CMake)",
+        "type": "cppdbg",
+        "request": "launch",
+        "preLaunchTask": "cmake-build",
+        "program": "${workspaceFolder}/build/bin/viriatum",
+        "args": [],
+        "stopAtEntry": false,
+        "cwd": "${workspaceFolder}",
+        "environment": [],
+        "linux": {
+            "MIMode": "gdb"
+        },
+        "osx": {
+            "MIMode": "lldb"
+        },
+        "windows": {
+            "MIMode": "gdb"
+        }
+    }, {
+        "name": "Launch (Legacy)",
         "type": "cppdbg",
         "request": "launch",
         "preLaunchTask": "build",
-        "program": "${workspaceRoot}/src/viriatum/viriatum",
+        "program": "${workspaceFolder}/src/viriatum/viriatum",
         "args": [],
         "stopAtEntry": false,
-        "cwd": "${workspaceRoot}/src",
+        "cwd": "${workspaceFolder}/src",
         "environment": [],
         "linux": {
             "MIMode": "gdb"
