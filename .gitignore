@@ -91,3 +91,5 @@ cmake_install.cmake
 /modules/mod_*/*.vcxproj
 /modules/mod_*/*.vcxproj.filters
 /modules/mod_*/viriatum_mod_*.dir
+
+/**/CMakeFiles
