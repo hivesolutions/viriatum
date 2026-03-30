@@ -68,6 +68,7 @@ cmake_install.cmake
 /build
 /build-*
 /dist
+/lua
 /lua5.*
 /CMakeFiles
 /viriatum.dir
