@@ -278,7 +278,7 @@ void daemonclean(void) { }
 
 #ifdef VIRIATUM_PLATFORM_UNIX
 void daemonize(void) {
-    /* allocates space for the various dameon
+    /* allocates space for the various daemon
     related variables */
     PID_TYPE pid;
     PID_TYPE sid;
@@ -306,7 +306,7 @@ void daemonize(void) {
     umask(0);
 
     /* create a new sid for the child process and then
-    verifies if it has been successfull */
+    verifies if it has been successful */
     sid = setsid();
     if(sid < 0) { exit(EXIT_FAILURE); }
 
