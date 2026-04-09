@@ -112,7 +112,7 @@ typedef struct memory_chunk_t {
     size_t free;
 
     /**
-     * The pointer to the begining of the memory buffer
+     * The pointer to the beginning of the memory buffer
      * that is used for the items in the chunk.
      * The buffer should be allocated at runtime with
      * a multiple of the size of the first element to be
@@ -183,7 +183,7 @@ typedef struct memory_pool_t {
     /**
      * The number of chunks that are currently defined
      * under the memory pool, this value must be zero at
-     * the begining of a memory pool.
+     * the beginning of a memory pool.
      */
     size_t chunk_count;
 

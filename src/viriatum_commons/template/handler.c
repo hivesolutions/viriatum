@@ -730,7 +730,7 @@ ERROR_CODE _text_end_callback(struct template_engine_t *template_engine, const u
     }
 
     /* adds the temporary node to the current list of nodes
-    in the template handler and to the chilren list of the current node */
+    in the template handler and to the children list of the current node */
     append_value_linked_list(template_handler->nodes, template_node);
     append_value_linked_list(current_node->children, template_node);
 
@@ -828,7 +828,7 @@ ERROR_CODE _tag_end_callback(struct template_engine_t *template_engine, const un
     }
 
     /* adds the temporary node to the current list of nodes
-    in the template handler and to the chilren list of the temporary node */
+    in the template handler and to the children list of the temporary node */
     append_value_linked_list(current_node->children, temporary_node);
     append_value_linked_list(template_handler->nodes, temporary_node);
 

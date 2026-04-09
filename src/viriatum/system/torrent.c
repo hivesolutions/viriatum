@@ -53,7 +53,7 @@ ERROR_CODE _create_tracker_connection(
     various url components parsed from the url string */
     struct url_static_t url_static;
 
-    /* alocates dynamic space for the parameters to the
+    /* allocates dynamic space for the parameters to the
     HTTP stream (HTTP client) this structure will be able
     to guide the stream of HTTP client */
     struct http_client_parameters_t *parameters;
@@ -114,7 +114,7 @@ ERROR_CODE _create_tracker_connection(
     free_type(type);
     FREE(_buffer);
 
-    /* creates the params (paramters) string from the provided
+    /* creates the params (parameters) string from the provided
     sequence of key values, this is an automator utility function
     for the creation of the string and the provided buffer should
     have been previously allocated with enough space */

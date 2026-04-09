@@ -122,13 +122,13 @@ void delete_values_hash_map(struct hash_map_t *hash_map) {
     }
 
     /* deletes the iterator for the element of the hash map
-    the values have been completly released */
+    the values have been completely released */
     delete_iterator_hash_map(hash_map, iterator);
 }
 
 void set_value_hash_map(struct hash_map_t *hash_map, size_t key, unsigned char *key_string, void *value) {
-    /* calls the underlying (privte) set value function with the
-    copy flag set so that if the key string is set it is copyied
+    /* calls the underlying (private) set value function with the
+    copy flag set so that if the key string is set it is copied
     as a new string into memory (key copy operation) */
     _set_value_hash_map(hash_map, key, key_string, value, TRUE);
 }

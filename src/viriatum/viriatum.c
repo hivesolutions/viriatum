@@ -397,7 +397,7 @@ int execute_arguments(char *program_name, struct hash_map_t *arguments) {
     if(value != NULL) { return version(); }
 
     /* retrieves the test argument value from the arguments map
-    and in case it's set starts the test process runing a series
+    and in case it's set starts the test process running a series
     of test functions in sequence */
     get_value_string_hash_map(arguments, (unsigned char *) "test", &value);
     if(value != NULL) { return test(); }

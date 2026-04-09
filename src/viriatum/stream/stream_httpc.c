@@ -116,13 +116,13 @@ ERROR_CODE create_http_client_parameters(struct http_client_parameters_t **http_
     struct http_client_parameters_t *http_client_parameters =
         (struct http_client_parameters_t *) MALLOC(http_client_parameters_size);
 
-    /* sets the various default values in the client paramenters
+    /* sets the various default values in the client parameters
     structure and then updates the pointer reference */
     http_client_parameters->method = HTTP_GET;
     http_client_parameters->version = HTTP11;
     *http_client_parameters_pointer = http_client_parameters;
 
-    /* raises no error as the creation of the client parameraters
+    /* raises no error as the creation of the client parameters
     structure as successful */
     RAISE_NO_ERROR;
 }
@@ -132,7 +132,7 @@ ERROR_CODE delete_http_client_parameters(struct http_client_parameters_t *http_c
     parameters structure */
     FREE(http_client_parameters);
 
-    /* raises no error as the removal of the client parameraters
+    /* raises no error as the removal of the client parameters
     structure as successful */
     RAISE_NO_ERROR;
 }

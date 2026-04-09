@@ -1780,12 +1780,12 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
     http_parser->url_mark = url_mark;
 
     /* calculates the final processed size by subtracting
-    the data pointer (original position) ot the (current)
+    the data pointer (original position) to the (current)
     pointer (current position) */
     processed_size = pointer - data;
 
     /* returns the data size (processed data size) to the
-    caller function to indicate the ammount of bytes
+    caller function to indicate the amount of bytes
     processed by the parser */
     return (int) processed_size;
 

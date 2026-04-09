@@ -58,7 +58,7 @@ void sort_quicksort(void **sequence, size_t beginning, size_t end, comparator cm
     /* swaps the left value with the beginning value */
     _swap_quicksort(&sequence[--left], &sequence[beginning]);
 
-    /* runs the quicksort from the begining to the left
+    /* runs the quicksort from the beginning to the left
     and from the right to the end (bi-section) */
     sort_quicksort(sequence, beginning, left, cmp);
     sort_quicksort(sequence, right, end, cmp);

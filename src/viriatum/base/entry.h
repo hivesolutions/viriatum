@@ -58,7 +58,7 @@ ERROR_CODE run_service(void);
  * Starts the process of running the service, registering the
  * appropriate handlers and creating all the service structures.
  * This call blocks until the service is correctly stopped
- * from a diferent flow control.
+ * from a different flow control.
  * At the end of the execution the global service object is then
  * destroyed an no other execution is possible from it.
  *

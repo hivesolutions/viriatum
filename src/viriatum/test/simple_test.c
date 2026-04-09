@@ -546,7 +546,7 @@ const char *test_bit_stream(void) {
     delete_file_stream(file_stream);
 
     /* re-creates the previous file stream in read mode so that
-    it may be used in the testing of the read opertions in the
+    it may be used in the testing of the read operations in the
     bit stream (these operations will include seek) */
     create_file_stream(
         &file_stream,

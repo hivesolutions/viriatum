@@ -387,7 +387,7 @@ ERROR_CODE location_callback_handler_wsgi(struct http_parser_t *http_parser, siz
     struct handler_wsgi_context_t *handler_wsgi_context =
         (struct handler_wsgi_context_t *) http_parser->context;
 
-    /* retrieves the connection from the parser and then used it to retreives the
+    /* retrieves the connection from the parser and then used it to retrieve the
     the correct WSGI HTTP handler reference from the HTTP connection */
     struct connection_t *connection = (struct connection_t *) http_parser->parameters;
     struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
@@ -715,7 +715,7 @@ ERROR_CODE _send_response_handler_wsgi(struct http_parser_t *http_parser) {
                         : mod_wsgi_http_handler->file_path;
         file_path = handler_wsgi_context->_file_path_string.length > 0 ? (char *) handler_wsgi_context->file_path : file_path;
 
-        /* creates hte "new" module name for the current module to be
+        /* creates the "new" module name for the current module to be
         loaded with the current counter value as the suffix and updates
         the counter value (increments the value by one) */
         SPRINTF(

@@ -244,7 +244,7 @@ ERROR_CODE process_template_engine(struct template_engine_t *template_engine, st
                     TEMPLATE_CALLBACK_DATA_BACK(tag_name);
 
                     /* changes the state of the template engine
-                    to parametrs (parameters finding) */
+                    to parameters (parameters finding) */
                     state = TEMPLATE_ENGINE_PARAMETERS;
                 }
 

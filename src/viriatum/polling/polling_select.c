@@ -404,7 +404,7 @@ ERROR_CODE _poll_polling_select(
     /* retrieves the service connections list */
     struct linked_list_t *connections_list = service->connections_list;
 
-    /* initializes the various index values for the diferent
+    /* initializes the various index values for the different
     operations to be polled in the current operation */
     unsigned int read_index = 0;
     unsigned int write_index = 0;

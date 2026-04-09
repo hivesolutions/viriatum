@@ -535,7 +535,7 @@ ERROR_CODE start_service(struct service_t *service) {
 #endif
 
 #ifdef VIRIATUM_SSL
-    /* alocates space for the various configuration file paths
+    /* allocates space for the various configuration file paths
     to be loaded for the start of the service, this is a local
     temporary variable to work with configuration paths */
     char config_path[VIRIATUM_MAX_PATH_SIZE];
