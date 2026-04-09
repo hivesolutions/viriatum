@@ -146,8 +146,7 @@ ERROR_CODE register_handler_file(struct service_t *service) {
     that will be used to resolve the file request */
     file_handler->locations = (struct file_location_t *)
         MALLOC(service->locations.count * sizeof(struct file_location_t));
-    memset(file_handler->locations, 0,
-        service->locations.count * sizeof(struct file_location_t));
+    memset(file_handler->locations, 0, service->locations.count * sizeof(struct file_location_t));
 
     /* updates the locations count variable in the file handler so
     that it's possible to iterate over the locations */
@@ -532,7 +531,9 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
                 (char *) handler_file_context->authorization,
                 &auth_result
             );
-        } else { auth_result = FALSE; }
+        } else {
+            auth_result = FALSE;
+        }
     }
 
     /* in case the file path being request referes a directory
@@ -580,8 +581,11 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
             takes into account the size of the url */
             url_size = strlen((char *) handler_file_context->url_d);
             if(url_size > 2) { memcpy(folder_path, &handler_file_context->url_d[1], url_size - 2); }
-            if(url_size > 2) { folder_path[url_size - 2] = '\0'; }
-            else { folder_path[0] = '\0'; }
+            if(url_size > 2) {
+                folder_path[url_size - 2] = '\0';
+            } else {
+                folder_path[0] = '\0';
+            }
 
             /* creates the template handler */
             create_template_handler(&template_handler);
@@ -744,8 +748,7 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
         SPRINTF(
             &headers_buffer[count],
             VIRIATUM_HTTP_SIZE - count,
-            CONTENT_LENGTH_H ": 0\r\n"
-            LOCATION_H ": %s\r\n\r\n",
+            CONTENT_LENGTH_H ": 0\r\n" LOCATION_H ": %s\r\n\r\n",
             location
         );
 
@@ -788,8 +791,7 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
     /* in case there's an etag value defined and the values matched
     the one defined for the file, time to return a not modified value
     to the client indicating that cache should be used */
-    else if(handler_file_context->etag_status == 2 &&
-        strcmp(etag, (char *) handler_file_context->etag) == 0) {
+    else if(handler_file_context->etag_status == 2 && strcmp(etag, (char *) handler_file_context->etag) == 0) {
         /* writes the HTTP static headers to the response */
         write_http_headers_c(
             connection,
@@ -840,7 +842,7 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
             "Partial content",
             keep_alive ? KEEP_ALIVE : KEEP_CLOSE,
             handler_file_context->final_byte -
-            handler_file_context->initial_byte + 1,
+                handler_file_context->initial_byte + 1,
             NO_CACHE,
             FALSE
         );
@@ -905,8 +907,7 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
         SPRINTF(
             &headers_buffer[count],
             VIRIATUM_HTTP_SIZE - count,
-            ACCEPT_RANGES_H ": bytes\r\n"
-            ETAG_H ": %s\r\n\r\n",
+            ACCEPT_RANGES_H ": bytes\r\n" ETAG_H ": %s\r\n\r\n",
             etag
         );
 
@@ -1274,8 +1275,7 @@ ERROR_CODE _send_chunk_handler_file(struct connection_t *connection, struct data
     of bytes to be read from the file (optimal buffer sizing) */
     offset = ftell(file);
     remaining = handler_file_context->final_byte - offset + 1;
-    buffer_size = remaining < FILE_BUFFER_SIZE_HANDLER_FILE ?
-        remaining : FILE_BUFFER_SIZE_HANDLER_FILE;
+    buffer_size = remaining < FILE_BUFFER_SIZE_HANDLER_FILE ? remaining : FILE_BUFFER_SIZE_HANDLER_FILE;
     file_buffer = MALLOC(buffer_size);
 
     /* reads the file contents, should read either the size

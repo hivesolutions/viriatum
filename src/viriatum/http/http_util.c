@@ -42,9 +42,7 @@ size_t write_http_headers(
     size_t count = SPRINTF(
         buffer,
         size,
-        "%s %d %s\r\n"
-        CONNECTION_H ": %s\r\n"
-        SERVER_H ": %s\r\n"
+        "%s %d %s\r\n" CONNECTION_H ": %s\r\n" SERVER_H ": %s\r\n"
         "%s",
         http_version_codes[version - 1],
         status_code,
@@ -85,9 +83,8 @@ size_t write_http_headers_c(
     count += SPRINTF(
         &buffer[count],
         size - count,
-        CONTENT_LENGTH_H ": %lu\r\n"
-        CACHE_CONTROL_H ": %s\r\n"
-        "%s",
+        CONTENT_LENGTH_H ": %lu\r\n" CACHE_CONTROL_H ": %s\r\n"
+                         "%s",
         (long unsigned int) content_length,
         cache_codes[cache - 1],
         close_codes[close]
@@ -126,10 +123,8 @@ size_t write_http_headers_a(
     count += SPRINTF(
         &buffer[count],
         size - count,
-        CONTENT_LENGTH_H ": %lu\r\n"
-        CACHE_CONTROL_H ": %s\r\n"
-        WWW_AUTHENTICATE_H ": Basic realm=\"%s\"\r\n"
-        "%s",
+        CONTENT_LENGTH_H ": %lu\r\n" CACHE_CONTROL_H ": %s\r\n" WWW_AUTHENTICATE_H ": Basic realm=\"%s\"\r\n"
+                         "%s",
         (long unsigned int) content_length,
         cache_codes[cache - 1],
         realm,
@@ -385,29 +380,30 @@ ERROR_CODE write_http_error_a(
             (unsigned long) strlen((char *) template_handler->string_value)
         );
         realm == NULL ? write_http_headers_c(
-            connection,
-            headers_buffer,
-            size,
-            version,
-            error_code,
-            error_message,
-            keep_alive,
-            strlen((char *) template_handler->string_value),
-            NO_CACHE,
-            TRUE
-        ) : write_http_headers_a(
-            connection,
-            headers_buffer,
-            size,
-            version,
-            error_code,
-            error_message,
-            keep_alive,
-            strlen((char *) template_handler->string_value),
-            NO_CACHE,
-            realm,
-            TRUE
-        );
+                            connection,
+                            headers_buffer,
+                            size,
+                            version,
+                            error_code,
+                            error_message,
+                            keep_alive,
+                            strlen((char *) template_handler->string_value),
+                            NO_CACHE,
+                            TRUE
+                        )
+                      : write_http_headers_a(
+                            connection,
+                            headers_buffer,
+                            size,
+                            version,
+                            error_code,
+                            error_message,
+                            keep_alive,
+                            strlen((char *) template_handler->string_value),
+                            NO_CACHE,
+                            realm,
+                            TRUE
+                        );
 
         /* creates a new string buffer to hold the complete set of contents
         to be sent to the client then first writes the buffer containing
@@ -514,8 +510,9 @@ ERROR_CODE get_http_range_limits(unsigned char *range, size_t *initial_byte, siz
                 break;
 
             case '-':
-                if(index == 0) { initial_byte_v = 0; }
-                else {
+                if(index == 0) {
+                    initial_byte_v = 0;
+                } else {
                     start = (char *) &range[mark];
                     end = (char *) &range[index - 1];
                     initial_byte_v = (long long) STROULL(start, &end, 10);
@@ -525,8 +522,9 @@ ERROR_CODE get_http_range_limits(unsigned char *range, size_t *initial_byte, siz
 
             case '\0':
             case ',':
-                if(index == mark) { final_byte_v = size - 1; }
-                else {
+                if(index == mark) {
+                    final_byte_v = size - 1;
+                } else {
                     start = (char *) &range[mark];
                     end = (char *) &range[index - 1];
                     initial_byte_v = (long long) STROULL(start, &end, 10);
@@ -538,8 +536,9 @@ ERROR_CODE get_http_range_limits(unsigned char *range, size_t *initial_byte, siz
     /* in case the final byte value hasn't been already
     set time to update its value with the final byte */
     if(final_byte_v == -1) {
-        if(index == mark) { final_byte_v = size - 1; }
-        else {
+        if(index == mark) {
+            final_byte_v = size - 1;
+        } else {
             start = (char *) &range[mark];
             end = (char *) &range[index - 1];
             final_byte_v = (long long) STROULL(start, &end, 10);
@@ -599,8 +598,11 @@ ERROR_CODE log_http_request(char *host, char *identity, char *user, char *method
 
 ERROR_CODE auth_http(char *auth_file, char *authorization, unsigned char *result) {
     unsigned char is_default = strcmp(auth_file, "$default") == 0 ? TRUE : FALSE;
-    if(is_default) { auth_default_http(auth_file, authorization, result); }
-    else { auth_file_http(auth_file, authorization, result); }
+    if(is_default) {
+        auth_default_http(auth_file, authorization, result);
+    } else {
+        auth_file_http(auth_file, authorization, result);
+    }
     RAISE_NO_ERROR;
 }
 
@@ -706,7 +708,9 @@ ERROR_CODE auth_file_http(char *auth_file, char *authorization, unsigned char *r
     );
     if(password_v != NULL && strcmp(password, password_v) == 0) {
         *result = TRUE;
-    } else { *result = FALSE; }
+    } else {
+        *result = FALSE;
+    }
 
     /* releases the memory associated with the complete set
     of values in the passwd structure and then releases the
@@ -760,8 +764,11 @@ ERROR_CODE parameters_http(struct hash_map_t *hash_map, unsigned char **buffer_p
 
         /* checks if this is the first loop in the iteration
         in it's not emits the and character */
-        if(is_first) { is_first = 0; }
-        else { append_string_buffer(string_buffer, (unsigned char *) "&"); }
+        if(is_first) {
+            is_first = 0;
+        } else {
+            append_string_buffer(string_buffer, (unsigned char *) "&");
+        }
 
         /* retrieves the current element value as a string structure
         then encodes that value using the url encoding (percent encoding)

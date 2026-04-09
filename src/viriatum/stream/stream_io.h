@@ -31,8 +31,8 @@
 
 struct io_connection_t;
 
-typedef ERROR_CODE (*data_io_connection_callback) (struct io_connection_t *, unsigned char *, size_t);
-typedef ERROR_CODE (*io_connection_callback) (struct io_connection_t *);
+typedef ERROR_CODE (*data_io_connection_callback)(struct io_connection_t *, unsigned char *, size_t);
+typedef ERROR_CODE (*io_connection_callback)(struct io_connection_t *);
 
 /**
  * Structure to be used for the parameters to be

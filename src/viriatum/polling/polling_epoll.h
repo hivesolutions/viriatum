@@ -128,7 +128,7 @@ typedef struct polling_epoll_t {
      */
     size_t remove_connections_size;
 
-   /**
+    /**
      * The size as items of the sequence of
      * connections that are pending to be read
      * at he beginning of the poll operation.

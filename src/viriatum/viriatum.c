@@ -257,7 +257,10 @@ ERROR_CODE print_information(void) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE help(void) { V_PRINT(HELP_STRING); RAISE_NO_ERROR; }
+ERROR_CODE help(void) {
+    V_PRINT(HELP_STRING);
+    RAISE_NO_ERROR;
+}
 ERROR_CODE version(void) {
     V_PRINT_F(
         "%s - %s (%s, %s)\n",
@@ -265,15 +268,22 @@ ERROR_CODE version(void) {
         VIRIATUM_VERSION,
         VIRIATUM_COMPILATION_DATE,
         VIRIATUM_COMPILATION_TIME
-    ); RAISE_NO_ERROR;
+    );
+    RAISE_NO_ERROR;
 }
 ERROR_CODE info(void) { return print_information(); }
-ERROR_CODE test(void) { print_information(); return run_simple_tests(); }
-ERROR_CODE speed(void) { print_information(); return run_speed_tests(); }
+ERROR_CODE test(void) {
+    print_information();
+    return run_simple_tests();
+}
+ERROR_CODE speed(void) {
+    print_information();
+    return run_speed_tests();
+}
 
 #ifdef VIRIATUM_PLATFORM_WIN32
-void daemonize(void) { }
-void daemonclean(void) { }
+void daemonize(void) {}
+void daemonclean(void) {}
 #endif
 
 #ifdef VIRIATUM_PLATFORM_UNIX
@@ -356,7 +366,7 @@ void localize(void) { local = 1; }
 #endif
 
 #ifdef VIRIATUM_PLATFORM_UNIX
-void localize(void) { }
+void localize(void) {}
 #endif
 
 int execute_arguments(char *program_name, struct hash_map_t *arguments) {
@@ -405,8 +415,11 @@ int execute_arguments(char *program_name, struct hash_map_t *arguments) {
     prints the viriatum information into the standard
     output "file", the label should be standard */
     get_value_string_hash_map(arguments, (unsigned char *) "daemon", &value);
-    if(value != NULL) { daemonize(); }
-    else { print_information(); }
+    if(value != NULL) {
+        daemonize();
+    } else {
+        print_information();
+    }
 
     /* tries to retrieve the local argument from the arguments
     map in case the value exists localizes the current service
@@ -498,7 +511,10 @@ int main(int argc, char *argv[]) {
 
     /* in case the number of arguments is less than one
     (exception case) returns in error */
-    if(argc < 1) { cleanup(NULL); RAISE_ERROR_S(1); }
+    if(argc < 1) {
+        cleanup(NULL);
+        RAISE_ERROR_S(1);
+    }
 
     /* retrieves the first argument value as the name
     of the process (program) to be executed */

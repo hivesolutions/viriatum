@@ -36,38 +36,38 @@
 
 #define INI_MARK(FOR) INI_MARK_N(FOR, 0)
 #define INI_MARK_BACK(FOR) INI_MARK_N(FOR, 1)
-#define INI_MARK_N(FOR, N)\
-    do {\
-        FOR##_mark = pointer - N;\
+#define INI_MARK_N(FOR, N)        \
+    do {                          \
+        FOR##_mark = pointer - N; \
     } while(0)
 
-#define INI_CALLBACK(FOR)\
-    do {\
-        if(ini_settings->on_##FOR) {\
-            if(ini_settings->on_##FOR(ini_engine) != 0) {\
+#define INI_CALLBACK(FOR)                                                                                   \
+    do {                                                                                                    \
+        if(ini_settings->on_##FOR) {                                                                        \
+            if(ini_settings->on_##FOR(ini_engine) != 0) {                                                   \
                 RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem handling callback"); \
-            }\
-        }\
+            }                                                                                               \
+        }                                                                                                   \
     } while(0)
 
 #define INI_CALLBACK_DATA(FOR) INI_CALLBACK_DATA_N(FOR, 0)
 #define INI_CALLBACK_DATA_BACK(FOR) INI_CALLBACK_DATA_N(FOR, 1)
-#define INI_CALLBACK_DATA_N(FOR, N)\
-    do {\
-        if(FOR##_mark) {\
-            if(ini_settings->on_##FOR) {\
-                if(ini_settings->on_##FOR(ini_engine, FOR##_mark, pointer - FOR##_mark - N) != 0) {\
+#define INI_CALLBACK_DATA_N(FOR, N)                                                                             \
+    do {                                                                                                        \
+        if(FOR##_mark) {                                                                                        \
+            if(ini_settings->on_##FOR) {                                                                        \
+                if(ini_settings->on_##FOR(ini_engine, FOR##_mark, pointer - FOR##_mark - N) != 0) {             \
                     RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem handling callback"); \
-                }\
-            }\
-            FOR##_mark = NULL;\
-        }\
+                }                                                                                               \
+            }                                                                                                   \
+            FOR##_mark = NULL;                                                                                  \
+        }                                                                                                       \
     } while(0)
 
 struct ini_engine_t;
 
-typedef ERROR_CODE (*ini_callback) (struct ini_engine_t *);
-typedef ERROR_CODE (*ini_data_callback) (struct ini_engine_t *, const unsigned char *, size_t);
+typedef ERROR_CODE (*ini_callback)(struct ini_engine_t *);
+typedef ERROR_CODE (*ini_data_callback)(struct ini_engine_t *, const unsigned char *, size_t);
 
 /**
  * Enumeration describing the various states

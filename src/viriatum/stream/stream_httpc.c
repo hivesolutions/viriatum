@@ -26,7 +26,6 @@
 
 #include "stream_httpc.h"
 
-
 /* THESE ARE TEMPORARY !!!!! */
 
 /* ----------------------------------------- */
@@ -48,7 +47,6 @@ ERROR_CODE message_complete_callback_handler_client(struct http_parser_t *http_p
 }
 
 /* ------------------------------------------- */
-
 
 ERROR_CODE create_http_client_connection(struct http_client_connection_t **http_client_connection_pointer, struct io_connection_t *io_connection) {
     /* retrieves the HTTP client connection size */

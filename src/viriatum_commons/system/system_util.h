@@ -62,7 +62,9 @@
 #define SPRINTF(buffer, size, format, ...) sprintf(buffer, format, __VA_ARGS__)
 #define VSPRINTF(buffer, size, format, arg) vsprintf(buffer, format, arg)
 #define SSCANF(buffer, format, ...) sscanf(buffer, format, __VA_ARGS__)
-#define STRTOK(string, delimiter, context) strtok(string, delimiter); dump((void *) &context)
+#define STRTOK(string, delimiter, context) \
+    strtok(string, delimiter);             \
+    dump((void *) &context)
 #define STRCPY(destination, size, source) strcpy(destination, source)
 #define FOPEN(file_pointer, file_name, mode) *file_pointer = fopen(file_name, mode)
 #define STROULL(start, end, base) strtoull(start, end, base)
@@ -77,7 +79,10 @@
 #endif
 
 #ifdef VIRIATUM_PLATFORM_MSC
-#define LOCAL_TIME(local_time_value, time_value) struct tm local_time_value_value; local_time_value = &local_time_value_value; localtime_s(local_time_value, time_value)
+#define LOCAL_TIME(local_time_value, time_value) \
+    struct tm local_time_value_value;            \
+    local_time_value = &local_time_value_value;  \
+    localtime_s(local_time_value, time_value)
 #define SPRINTF(buffer, size, format, ...) sprintf_s(buffer, size, format, __VA_ARGS__)
 #define VSPRINTF(buffer, size, format, arg) vsprintf_s(buffer, size, format, arg)
 #define SSCANF(buffer, format, ...) sscanf_s(buffer, format, __VA_ARGS__)
@@ -92,7 +97,9 @@
 #define SPRINTF(buffer, size, format, ...) sprintf(buffer, format, __VA_ARGS__)
 #define VSPRINTF(buffer, size, format, arg) vsprintf(buffer, format, arg)
 #define SSCANF(buffer, format, ...) sscanf(buffer, format, __VA_ARGS__)
-#define STRTOK(string, delimiter, context) strtok(string, delimiter); dump((void *) &context)
+#define STRTOK(string, delimiter, context) \
+    strtok(string, delimiter);             \
+    dump((void *) &context)
 #define STRCPY(destination, size, source) strcpy(destination, source)
 #define FOPEN(file_pointer, file_name, mode) *file_pointer = fopen(file_name, mode)
 #define STROULL(start, end, base) _strtoui64(start, end, base)

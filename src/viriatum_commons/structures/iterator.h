@@ -27,7 +27,7 @@
 typedef struct iterator_t {
     void *structure;
     void *parameters;
-    void (*get_next_function) (struct iterator_t *iterator, void **next);
+    void (*get_next_function)(struct iterator_t *iterator, void **next);
 } iterator;
 
 VIRIATUM_EXPORT_PREFIX void create_iterator(struct iterator_t **iterator_pointer);

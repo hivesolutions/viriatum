@@ -30,7 +30,7 @@
 #endif
 
 #ifdef _MSC_VER
-#pragma warning(disable:4005)
+#pragma warning(disable : 4005)
 #endif
 #include "undef.h"
 #include <sapi/embed/php_embed.h>
@@ -39,7 +39,7 @@
 #include "../../../../src/viriatum/viriatum.h"
 #include "undef.h"
 #ifdef _MSC_VER
-#pragma warning(default:4005)
+#pragma warning(default : 4005)
 #endif
 
 unsigned char *name_viriatum_mod_php();

@@ -363,8 +363,7 @@ static __inline void resize_memory_pool(struct memory_pool_t *pool, size_t chunk
     /* set the possible "new" chunk count value taking into account
     that if the chunk max size value is lower than the current chunk
     count the chunk count must be updated to that value */
-    pool->chunk_count = pool->chunk_count < chunk_max_size ?
-        pool->chunk_count : chunk_max_size;
+    pool->chunk_count = pool->chunk_count < chunk_max_size ? pool->chunk_count : chunk_max_size;
 
     /* allocates the new memory buffers for the chunks and for the map
     that associated the buffer pointer with the associated memory item */
@@ -476,8 +475,11 @@ static __inline void resize_memory_pool(struct memory_pool_t *pool, size_t chunk
 
             /* in case the current index has reached the limit
             resets it to the zero value, otherwise increments it */
-            if(index_m + 1 == pool->items_max_size) { index_m = 0; }
-            else { index_m++; }
+            if(index_m + 1 == pool->items_max_size) {
+                index_m = 0;
+            } else {
+                index_m++;
+            }
         }
     }
 
@@ -564,7 +566,7 @@ static __inline void *palloc(struct memory_pool_t *pool, size_t size) {
 
         /* iterates over the range of the increment to create the
         associated chunks and set them in the chunk buffer */
-        for(index = 0; index < increment; index ++) {
+        for(index = 0; index < increment; index++) {
             /* creates the chunk according to the size requested for
             the allocation (size must be constant across allocations) */
             create_chunk(&chunk, size, pool->chunk_count);
@@ -648,8 +650,11 @@ static __inline void *palloc(struct memory_pool_t *pool, size_t size) {
 
         /* in case the current index has reached the limit
         resets it to the zero value, otherwise increments it */
-        if(index_m + 1 == pool->items_max_size) { index_m = 0; }
-        else { index_m++; }
+        if(index_m + 1 == pool->items_max_size) {
+            index_m = 0;
+        } else {
+            index_m++;
+        }
     }
 
     /* returns the buffer that was just allocated to the
@@ -683,8 +688,11 @@ static __inline void pfree(struct memory_pool_t *pool, void *buffer) {
 
         /* in case the final index value has been reached resets
         the index value otherwise keeps incrementing the value */
-        if(index + 1 == pool->items_max_size) { index = 0; }
-        else { index++; }
+        if(index + 1 == pool->items_max_size) {
+            index = 0;
+        } else {
+            index++;
+        }
     }
 
     /* removes the buffer item association in the map by

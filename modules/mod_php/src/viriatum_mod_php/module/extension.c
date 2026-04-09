@@ -32,26 +32,26 @@ ZEND_BEGIN_ARG_INFO(arginfo_viriatum_void, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO(arginfo_viriatum_connection_info, 0)
-    ZEND_ARG_INFO(0, id)
+ZEND_ARG_INFO(0, id)
 ZEND_END_ARG_INFO()
 
 zend_function_entry viriatum_functions[] = {
     PHP_FE(viriatum_connections_l, arginfo_viriatum_void)
-    PHP_FE(viriatum_connection_info, arginfo_viriatum_connection_info)
-    PHP_FE(viriatum_connections, arginfo_viriatum_void)
-    PHP_FE(viriatum_uptime, arginfo_viriatum_void)
-    PHP_FE(viriatum_name, arginfo_viriatum_void)
-    PHP_FE(viriatum_version, arginfo_viriatum_void)
-    PHP_FE(viriatum_platform, arginfo_viriatum_void)
-    PHP_FE(viriatum_flags, arginfo_viriatum_void)
-    PHP_FE(viriatum_modules, arginfo_viriatum_void)
-    PHP_FE(viriatum_description, arginfo_viriatum_void)
-    PHP_FE(viriatum_compiler, arginfo_viriatum_void)
-    PHP_FE(viriatum_compiler_version, arginfo_viriatum_void)
-    PHP_FE(viriatum_compilation_date, arginfo_viriatum_void)
-    PHP_FE(viriatum_compilation_time, arginfo_viriatum_void)
-    PHP_FE(viriatum_compilation_flags, arginfo_viriatum_void)
-    PHP_FE_END
+        PHP_FE(viriatum_connection_info, arginfo_viriatum_connection_info)
+            PHP_FE(viriatum_connections, arginfo_viriatum_void)
+                PHP_FE(viriatum_uptime, arginfo_viriatum_void)
+                    PHP_FE(viriatum_name, arginfo_viriatum_void)
+                        PHP_FE(viriatum_version, arginfo_viriatum_void)
+                            PHP_FE(viriatum_platform, arginfo_viriatum_void)
+                                PHP_FE(viriatum_flags, arginfo_viriatum_void)
+                                    PHP_FE(viriatum_modules, arginfo_viriatum_void)
+                                        PHP_FE(viriatum_description, arginfo_viriatum_void)
+                                            PHP_FE(viriatum_compiler, arginfo_viriatum_void)
+                                                PHP_FE(viriatum_compiler_version, arginfo_viriatum_void)
+                                                    PHP_FE(viriatum_compilation_date, arginfo_viriatum_void)
+                                                        PHP_FE(viriatum_compilation_time, arginfo_viriatum_void)
+                                                            PHP_FE(viriatum_compilation_flags, arginfo_viriatum_void)
+                                                                PHP_FE_END
 };
 
 zend_module_entry viriatum_module = {
@@ -204,8 +204,11 @@ void _module_register(zval *_array) {
     /* sets the self server variable with the path to the file to be
     executed, this is of major importance for execution (conditional
     usage of this variable is set based on the file name existence) */
-    if(_php_request.php_context->file_name[0] != '\0') { php_register_variable_safe("PHP_SELF", (char *) _php_request.php_context->file_name, _php_request.php_context->_file_name_string.length, _array); }
-    else { php_register_variable_safe("PHP_SELF", "-", 1, _array); }
+    if(_php_request.php_context->file_name[0] != '\0') {
+        php_register_variable_safe("PHP_SELF", (char *) _php_request.php_context->file_name, _php_request.php_context->_file_name_string.length, _array);
+    } else {
+        php_register_variable_safe("PHP_SELF", "-", 1, _array);
+    }
 
     /* registers a series of global wide variable representing the
     current interface (critical for correct PHP interpreter usage) */
@@ -220,7 +223,7 @@ void _module_register(zval *_array) {
     php_register_variable_safe("QUERY_STRING", (char *) _php_request.php_context->query, _php_request.php_context->_query_string.length, _array);
     php_register_variable_safe("REQUEST_METHOD", (char *) _php_request.php_context->method, strlen(_php_request.php_context->method), _array);
     php_register_variable_safe("REMOTE_ADDR", address_string, strlen(address_string), _array);
-    if(_php_request.php_context->_content_type_string.length > 0) { php_register_variable_safe("CONTENT_TYPE", (char *)  _php_request.php_context->content_type, _php_request.php_context->_content_type_string.length, _array); }
+    if(_php_request.php_context->_content_type_string.length > 0) { php_register_variable_safe("CONTENT_TYPE", (char *) _php_request.php_context->content_type, _php_request.php_context->_content_type_string.length, _array); }
     if(_php_request.php_context->_content_length_string.length > 0) { php_register_variable_safe("CONTENT_LENGTH", (char *) _php_request.php_context->content_length_, _php_request.php_context->_content_length_string.length, _array); }
 }
 
@@ -321,8 +324,11 @@ PHP_FUNCTION(viriatum_connections_l) {
 
         /* populates the connection array with the complete set of attributes
         that describe the connection, for latter usage by the api client */
-        if(is_empty) { add_assoc_string(&connection_array, "host", "N/A"); }
-        else { add_assoc_string(&connection_array, "host", (char *) connection->host); }
+        if(is_empty) {
+            add_assoc_string(&connection_array, "host", "N/A");
+        } else {
+            add_assoc_string(&connection_array, "host", (char *) connection->host);
+        }
         add_assoc_long(&connection_array, "id", (long) connection->id);
         add_assoc_string(&connection_array, "uptime", uptime);
 
@@ -414,8 +420,11 @@ PHP_FUNCTION(viriatum_connection_info) {
 
         /* populates the connection array with the complete set of attributes
         that describe the connection, for latter usage by the api client */
-        if(is_empty) { add_assoc_string(return_value, "host", "N/A"); }
-        else { add_assoc_string(return_value, "host", (char *) connection->host); }
+        if(is_empty) {
+            add_assoc_string(return_value, "host", "N/A");
+        } else {
+            add_assoc_string(return_value, "host", (char *) connection->host);
+        }
         add_assoc_long(return_value, "port", (long) connection->port);
         add_assoc_long(return_value, "id", (long) connection->id);
         add_assoc_string(return_value, "status", status);

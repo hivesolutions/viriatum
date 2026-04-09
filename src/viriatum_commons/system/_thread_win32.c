@@ -122,8 +122,8 @@ void wait_condition(struct condition_t *condition) {
     /* waits for the event to become signalled */
     wait_result = WaitForSingleObjectEx(wait_event, INFINITE, 0);
 
-  // If the wait failed, store the last error because it will get
-  // overwritten when acquiring the lock.
+    // If the wait failed, store the last error because it will get
+    // overwritten when acquiring the lock.
     /* DWORD dw_last_error;
      if( WAIT_FAILED == dw_wait_result )
         dw_last_error = ::GetLastError();*/
@@ -144,7 +144,7 @@ void wait_condition(struct condition_t *condition) {
         return;
     }
 
-  /*if( WAIT_FAILED == dw_wait_result )
+    /*if( WAIT_FAILED == dw_wait_result )
     ::SetLastError(dw_last_error);*/
 
     /*return dw_wait_result;*/

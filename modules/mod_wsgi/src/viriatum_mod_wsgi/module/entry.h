@@ -46,9 +46,10 @@
  * Starts (initializes) the global variables defined
  * as external in the header definition.
  */
-#define START_GLOBALS struct service_t *_service;\
-    struct connection_t *_connection;\
-    struct http_headers_t _headers;\
+#define START_GLOBALS                 \
+    struct service_t *_service;       \
+    struct connection_t *_connection; \
+    struct http_headers_t _headers;   \
     struct wsgi_request_t _wsgi_request;
 
 /**

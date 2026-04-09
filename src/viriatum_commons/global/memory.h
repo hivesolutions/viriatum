@@ -35,14 +35,35 @@ VIRIATUM_EXTERNAL_PREFIX size_t allocations;
 #define REALLOC(pointer, size) realloc(pointer, size)
 #define FREE(pointer) free_debug(pointer, (char *) base_string_value_s((unsigned char *) __FILE__), __LINE__)
 #ifdef VIRIATUM_MEMORY_DEBUG
-static __inline void *malloc_debug(size_t size, char *file, int line) { allocations++; printf("[MEMORY] [%s: %d] malloc() called [%d bytes] [%d objects]\n", file, line, size, allocations); return malloc(size); }
-static __inline void *calloc_debug(size_t count, size_t size, char *file, int line) { allocations++; printf("[MEMORY] [%s: %d] calloc() called [%d count %d bytes] [%d objects]\n", file, line, count, size, allocations); return calloc(count, size); }
-static __inline void free_debug(void *pointer, char *file, int line) { allocations--; printf("[MEMORY] [%s: %d] free() called [%d objects]\n", file, line, allocations); free(pointer); }
+static __inline void *malloc_debug(size_t size, char *file, int line) {
+    allocations++;
+    printf("[MEMORY] [%s: %d] malloc() called [%d bytes] [%d objects]\n", file, line, size, allocations);
+    return malloc(size);
+}
+static __inline void *calloc_debug(size_t count, size_t size, char *file, int line) {
+    allocations++;
+    printf("[MEMORY] [%s: %d] calloc() called [%d count %d bytes] [%d objects]\n", file, line, count, size, allocations);
+    return calloc(count, size);
+}
+static __inline void free_debug(void *pointer, char *file, int line) {
+    allocations--;
+    printf("[MEMORY] [%s: %d] free() called [%d objects]\n", file, line, allocations);
+    free(pointer);
+}
 #endif
 #ifndef VIRIATUM_MEMORY_DEBUG
-static __inline void *malloc_debug(size_t size, char *file, int line) { allocations++; return malloc(size); }
-static __inline void *calloc_debug(size_t count, size_t size, char *file, int line) { allocations++; return calloc(count, size); }
-static __inline void free_debug(void *pointer, char *file, int line) { allocations--; free(pointer); }
+static __inline void *malloc_debug(size_t size, char *file, int line) {
+    allocations++;
+    return malloc(size);
+}
+static __inline void *calloc_debug(size_t count, size_t size, char *file, int line) {
+    allocations++;
+    return calloc(count, size);
+}
+static __inline void free_debug(void *pointer, char *file, int line) {
+    allocations--;
+    free(pointer);
+}
 #endif
 #endif
 

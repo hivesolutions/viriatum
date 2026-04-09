@@ -512,8 +512,11 @@ void peek_value_linked_list(struct linked_list_t *linked_list, void **value_poin
     /* in case the linked list node is invalid sets
     the invalid value in the value pointer, otherwise
     sets the current top level value (first value) */
-    if(linked_list_node == NULL) { *value_pointer = NULL; }
-    else { *value_pointer = linked_list_node->value; }
+    if(linked_list_node == NULL) {
+        *value_pointer = NULL;
+    } else {
+        *value_pointer = linked_list_node->value;
+    }
 }
 
 void peek_top_value_linked_list(struct linked_list_t *linked_list, void **value_pointer) {

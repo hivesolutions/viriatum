@@ -34,6 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * `V_PRINT_C` and `V_PRINT_CF` color-aware print macros for optional ANSI color output
 * Colored test output: green for `ok`, red for `not ok` and hex comparison failures, colored summary line
 * CRC32 unit test with proper assertions for multiple test vectors (`Hello World`, empty string, `abc`, `a`)
+* `.clang-format` configuration for consistent C code formatting across the codebase
 
 ### Changed
 
@@ -54,6 +55,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Removed Conan 1 specific `conanbuildinfo.cmake` integration from `CMakeLists.txt`
 * Bumped `cmake_minimum_required` from 3.0.0 to 3.5.0
 * Enabled `CMAKE_BUILD_TYPE=Release` for Linux and macOS CMake CI builds
+* Applied `clang-format` across all C source and header files for consistent code style
 
 ### Fixed
 

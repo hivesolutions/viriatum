@@ -116,7 +116,7 @@ size_t write_memory_stream(struct stream_t *stream, unsigned char *buffer, size_
         extra = size - remaining;
         allocation = extra > SIZE_MEMORY_STREAM ? extra : SIZE_MEMORY_STREAM;
         memory_stream->buffer_size += allocation;
-        memory_stream->buffer =    REALLOC(
+        memory_stream->buffer = REALLOC(
             memory_stream->buffer,
             memory_stream->buffer_size
         );

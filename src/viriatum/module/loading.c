@@ -58,7 +58,7 @@ ERROR_CODE create_module(struct module_t **module_pointer) {
     /* allocates space for the module */
     struct module_t *module = (struct module_t *) MALLOC(module_size);
 
-     /* sets the module attributes (default) values */
+    /* sets the module attributes (default) values */
     module->name = NULL;
     module->version = NULL;
     module->type = 0;
@@ -104,10 +104,10 @@ ERROR_CODE load_module(struct service_t *service, unsigned char *module_path) {
     viriatum_info_module info_module_function;
 
     /* allocates space for both the name of the module (base name)
-    and for the name of the information fnction to be called for
+    and for the name of the information function to be called for
     the population of the module structure */
     unsigned char _module_name[VIRIATUM_MAX_PATH_SIZE];
-    char info_module_name[VIRIATUM_MAX_PATH_SIZE];;
+    char info_module_name[VIRIATUM_MAX_PATH_SIZE];
 
     /* retrieves the base name for the module to be loaded, this is
     retrieved from the name of the module */
@@ -152,7 +152,7 @@ ERROR_CODE load_module(struct service_t *service, unsigned char *module_path) {
     symbol = GET_LIBRARY_SYMBOL(library, info_module_name);
 
     /* retrieves the info module function reference */
-    info_module_function = *((viriatum_info_module *)(&symbol));
+    info_module_function = *((viriatum_info_module *) (&symbol));
 
     /* in case the start module function was not found */
     if(info_module_function == NULL) {

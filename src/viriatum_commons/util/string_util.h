@@ -116,16 +116,22 @@ static __inline unsigned char *untrim(unsigned char *string_value, char last) {
 
 static __inline void lowercase(char *string_value) {
     while(*string_value != '\0') {
-        if(*string_value == '_') { *string_value = '-'; }
-        else { *string_value = tolower((unsigned char) *string_value); }
+        if(*string_value == '_') {
+            *string_value = '-';
+        } else {
+            *string_value = tolower((unsigned char) *string_value);
+        }
         string_value++;
     }
 }
 
 static __inline void uppercase(char *string_value) {
     while(*string_value != '\0') {
-        if(*string_value == '-') { *string_value = '_'; }
-        else { *string_value = toupper((unsigned char) *string_value); }
+        if(*string_value == '-') {
+            *string_value = '_';
+        } else {
+            *string_value = toupper((unsigned char) *string_value);
+        }
         string_value++;
     }
 }
@@ -317,8 +323,11 @@ static __inline size_t format_delta(char *buffer, size_t size, unsigned long lon
 
     value = delta / 86400;
     if(value > 0) {
-        if(value == 1) { format = "%d day "; }
-        else { format = "%d days "; }
+        if(value == 1) {
+            format = "%d day ";
+        } else {
+            format = "%d days ";
+        }
 
         count += SPRINTF(
             &buffer[count],
@@ -337,8 +346,11 @@ static __inline size_t format_delta(char *buffer, size_t size, unsigned long lon
 
     value = (delta % 86400) / 3600;
     if(valid || value > 0) {
-        if(value == 1) { format = "%d hour "; }
-        else { format = "%d hours "; }
+        if(value == 1) {
+            format = "%d hour ";
+        } else {
+            format = "%d hours ";
+        }
 
         count += SPRINTF(
             &buffer[count],
@@ -357,8 +369,11 @@ static __inline size_t format_delta(char *buffer, size_t size, unsigned long lon
 
     value = (delta % 3600) / 60;
     if(valid || value > 0) {
-        if(value == 1) { format = "%d minute "; }
-        else { format = "%d minutes "; }
+        if(value == 1) {
+            format = "%d minute ";
+        } else {
+            format = "%d minutes ";
+        }
 
         count += SPRINTF(
             &buffer[count],
@@ -378,8 +393,11 @@ static __inline size_t format_delta(char *buffer, size_t size, unsigned long lon
     valid = TRUE;
     value = delta % 60;
     if(valid) {
-        if(value == 1) { format = "%d second "; }
-        else { format = "%d seconds "; }
+        if(value == 1) {
+            format = "%d second ";
+        } else {
+            format = "%d seconds ";
+        }
 
         count += SPRINTF(
             &buffer[count],
@@ -405,9 +423,14 @@ static __inline size_t format_bytes(char *buffer, size_t size, size_t bytes) {
 
     value = (size_t) ROUND((double) bytes / 1073741824.0f);
     if(value > 0) {
-        if(value == 1) { format = "%.1f GByte"; }
-        else if(value < 10) { format = "%.1f GBytes"; }
-        else { format = "%d GBytes"; is_float = FALSE; }
+        if(value == 1) {
+            format = "%.1f GByte";
+        } else if(value < 10) {
+            format = "%.1f GBytes";
+        } else {
+            format = "%d GBytes";
+            is_float = FALSE;
+        }
 
         value_i = value;
         if(is_float) { value_f = (double) bytes / 1073741824.0f; }
@@ -416,9 +439,14 @@ static __inline size_t format_bytes(char *buffer, size_t size, size_t bytes) {
 
     value = (size_t) ROUND((double) bytes / 1048576.0f);
     if(!valid && value > 0) {
-        if(value == 1) { format = "%.1f MByte"; }
-        else if(value < 10) { format = "%.1f MBytes"; }
-        else { format = "%d MBytes"; is_float = FALSE; }
+        if(value == 1) {
+            format = "%.1f MByte";
+        } else if(value < 10) {
+            format = "%.1f MBytes";
+        } else {
+            format = "%d MBytes";
+            is_float = FALSE;
+        }
 
         value_i = value;
         if(is_float) { value_f = (double) bytes / 1048576.0f; }
@@ -427,9 +455,14 @@ static __inline size_t format_bytes(char *buffer, size_t size, size_t bytes) {
 
     value = (size_t) ROUND((double) bytes / 1024.0f);
     if(!valid && value > 0) {
-        if(value == 1) { format = "%.1f KByte"; }
-        else if(value < 10) { format = "%.1f KBytes"; }
-        else { format = "%d KBytes"; is_float = FALSE; }
+        if(value == 1) {
+            format = "%.1f KByte";
+        } else if(value < 10) {
+            format = "%.1f KBytes";
+        } else {
+            format = "%d KBytes";
+            is_float = FALSE;
+        }
 
         value_i = value;
         if(is_float) { value_f = (double) bytes / 1024.0f; }
@@ -438,9 +471,14 @@ static __inline size_t format_bytes(char *buffer, size_t size, size_t bytes) {
 
     value = bytes;
     if(!valid) {
-        if(value == 1) { format = "%.1f Byte"; }
-        else if(value < 10) { format = "%.1f Bytes"; }
-        else { format = "%d Bytes"; is_float = FALSE; }
+        if(value == 1) {
+            format = "%.1f Byte";
+        } else if(value < 10) {
+            format = "%.1f Bytes";
+        } else {
+            format = "%d Bytes";
+            is_float = FALSE;
+        }
 
         value_i = value;
         if(is_float) { value_f = (double) bytes; }

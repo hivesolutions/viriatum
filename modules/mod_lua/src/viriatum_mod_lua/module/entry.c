@@ -150,7 +150,7 @@ ERROR_CODE stop_module_lua(struct environment_t *environment, struct module_t *m
     struct service_t *service = environment->service;
 
     /* retrieves the mod Lua module (from the module) */
-    struct mod_lua_module_t *mod_lua_module = (struct  mod_lua_module_t *) module->lower;
+    struct mod_lua_module_t *mod_lua_module = (struct mod_lua_module_t *) module->lower;
 
     /* retrieves the HTTP handler from the mod Lua module */
     struct http_handler_t *http_handler = mod_lua_module->http_handler;
@@ -283,8 +283,7 @@ ERROR_CODE _load_locations_lua(struct service_t *service, struct mod_lua_http_ha
     that will be used to resolve the Lua request */
     mod_lua_http_handler->locations = (struct mod_lua_location_t *)
         MALLOC(service->locations.count * sizeof(struct mod_lua_location_t));
-    memset(mod_lua_http_handler->locations, 0,
-        service->locations.count * sizeof(struct mod_lua_location_t));
+    memset(mod_lua_http_handler->locations, 0, service->locations.count * sizeof(struct mod_lua_location_t));
 
     /* updates the locations count variable in the Lua handler so
     that it's possible to iterate over the locations */

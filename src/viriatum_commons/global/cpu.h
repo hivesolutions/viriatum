@@ -77,9 +77,9 @@
 
 /* cpu endianess */
 
-#if defined(VIRIATUM_PLATFORM_CPU_SPARC) ||\
-    defined(VIRIATUM_PLATFORM_CPU_HPPA) ||\
-    defined(VIRIATUM_PLATFORM_CPU_POWERPC) ||\
+#if defined(VIRIATUM_PLATFORM_CPU_SPARC) ||   \
+    defined(VIRIATUM_PLATFORM_CPU_HPPA) ||    \
+    defined(VIRIATUM_PLATFORM_CPU_POWERPC) || \
     defined(VIRIATUM_PLATFORM_CPU_MIPS)
 #define VIRIATUM_BIG_ENDIAN true
 #else

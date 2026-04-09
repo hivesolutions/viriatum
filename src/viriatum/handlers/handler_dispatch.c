@@ -57,7 +57,7 @@ ERROR_CODE delete_dispatch_handler(struct dispatch_handler_t *dispatch_handler) 
 
     /* iterates over all the regular expressions to release their
     internal memory contents */
-    for(index = 0; index < dispatch_handler->regex_count; index++ ) {  pcre_free(dispatch_handler->regex[index]); }
+    for(index = 0; index < dispatch_handler->regex_count; index++) { pcre_free(dispatch_handler->regex[index]); }
 
     /* in case the names buffer is defined releases it */
     if(dispatch_handler->names != NULL) { FREE(dispatch_handler->names); }
@@ -182,7 +182,7 @@ ERROR_CODE url_callback_handler_dispatch(struct http_parser_t *http_parser, cons
     size_t _index;
     size_t match_size;
     size_t virtual_url_offset;
-    int offsets[3] = { 0, 0, 0 };
+    int offsets[3] = {0, 0, 0};
     char regex_match = 0;
 #endif
 
@@ -266,8 +266,7 @@ ERROR_CODE url_callback_handler_dispatch(struct http_parser_t *http_parser, cons
         /* in case the string refers the base path (default handler must be used)
         the selection of the index file as default is conditioned by the default
         index configuration option */
-        if(handler->resolve_index && options->default_index
-            && (path_size == 0 || path[path_size - 1] == '/')) {
+        if(handler->resolve_index && options->default_index && (path_size == 0 || path[path_size - 1] == '/')) {
             /* creates the base path from the viriatum contents path
             and the current provided path and then runs the file existence
             validation process using the index array provided */
@@ -338,8 +337,7 @@ ERROR_CODE url_callback_handler_dispatch(struct http_parser_t *http_parser, cons
             if the matched value starts with a slash value for such cases the
             offset to the virtual url must be reduced otherwise abnormal values
             to the url would be considered (creating additional path problems) */
-            virtual_url_offset = match_size > 0 && data[match_size - 1] == '/' ?
-                match_size - 1 : match_size;
+            virtual_url_offset = match_size > 0 && data[match_size - 1] == '/' ? match_size - 1 : match_size;
             CALL_V(
                 http_connection->http_settings->on_location,
                 http_parser,

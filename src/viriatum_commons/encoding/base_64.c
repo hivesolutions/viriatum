@@ -210,8 +210,7 @@ ERROR_CODE _decode_base64(
 
     /* calculates the valid buffer length, defaulting to
     zero in case the value "becomes" negative */
-    size_t valid_buffer_length = buffer_length > padding_count ?
-        buffer_length - padding_count : 0;
+    size_t valid_buffer_length = buffer_length > padding_count ? buffer_length - padding_count : 0;
 
     /* starts the buffer index */
     buffer_index = 0;
@@ -271,8 +270,8 @@ ERROR_CODE _allocate_decoded_buffer(
 ) {
     /* allocates the decoded buffer length */
     *decoded_buffer_length_pointer = calculate_decoded_buffer_length_base64(
-         encoded_buffer_length,
-         padding_count
+        encoded_buffer_length,
+        padding_count
     );
 
     /* allocates the decoded buffer */
@@ -293,7 +292,7 @@ unsigned int _get_padding_count(unsigned char *encoded_buffer, size_t encoded_bu
     int padding_count = 0;
 
     /* iterates over the encoded buffer */
-    for(index = (unsigned int) encoded_buffer_length - 1; index > 0 ; index--) {
+    for(index = (unsigned int) encoded_buffer_length - 1; index > 0; index--) {
         /* retireve the current value */
         current_value = encoded_buffer[index];
 

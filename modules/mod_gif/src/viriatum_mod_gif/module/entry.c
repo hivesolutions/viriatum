@@ -117,7 +117,7 @@ ERROR_CODE stop_module_gif(struct environment_t *environment, struct module_t *m
 
     /* retrieves the mod GIF module (from the module) and uses
     it to retrieve the create HTTP handler */
-    struct mod_gif_module_t *mod_gif_module = (struct  mod_gif_module_t *) module->lower;
+    struct mod_gif_module_t *mod_gif_module = (struct mod_gif_module_t *) module->lower;
     struct http_handler_t *http_handler = mod_gif_module->http_handler;
 
     /* prints a debug message about the unloading of the current

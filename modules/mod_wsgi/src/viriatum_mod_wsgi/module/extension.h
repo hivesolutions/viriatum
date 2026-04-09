@@ -32,8 +32,7 @@ VIRIATUM_EXTERNAL_PREFIX PyMethodDef input_methods[5];
 VIRIATUM_EXTERNAL_PREFIX PyTypeObject input_type;
 
 typedef struct wsgi_input_t {
-    PyObject_HEAD
-    unsigned char *post_data;
+    PyObject_HEAD unsigned char *post_data;
     size_t position;
     size_t size;
 } wsgi_intput;

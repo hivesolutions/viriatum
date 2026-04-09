@@ -147,8 +147,11 @@ ERROR_CODE _send_response_callback_handler_gif(struct connection_t *connection, 
     releases the lock on the HTTP connection, this will allow further
     messages to be processed, an update event should raised following this
     lock releasing call */
-    if(!keep_alive) { connection->close_connection(connection); }
-    else { http_connection->release(http_connection); }
+    if(!keep_alive) {
+        connection->close_connection(connection);
+    } else {
+        http_connection->release(http_connection);
+    }
 
     /* raise no error */
     RAISE_NO_ERROR;

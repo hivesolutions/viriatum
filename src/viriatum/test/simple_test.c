@@ -65,7 +65,7 @@ void test_thread_pool(void) {
     create_thread_pool(&thread_pool, 15, 1, 30);
 
     /* iterates over the range of the index */
-    for(index = 0; index < 100; index ++) {
+    for(index = 0; index < 100; index++) {
         /* prints a debug message */
         V_DEBUG("Inserting task in thread pool\n");
 
@@ -470,7 +470,8 @@ const char *test_bencoding(void) {
 
     /* prints the type structure into the standard output and then
     releases its memory recursively */
-    print_type(type); V_PRINT("\n");
+    print_type(type);
+    V_PRINT("\n");
     free_type(type);
 
     /* releases the memory from the encoded buffer, this was
@@ -870,7 +871,7 @@ const char *test_template_handler(void) {
 
 const char *test_quicksort(void) {
     /* allocates space for the template handler */
-    size_t list[10] = { 2, 4, 1, 2, 3, 5, 5, 3, 4, 1 };
+    size_t list[10] = {2, 4, 1, 2, 3, 5, 5, 3, 4, 1};
 
     /* sorts the sequence according to the compare function
     the algorithm to be used in the sorting is the quicksort */
@@ -1209,7 +1210,9 @@ int _compare(void *first, void *second) {
     /* in case the first value is larger
     than the second element a positive value
     is return indicating the larger than */
-    else if(first > second) { return 1; }
+    else if(first > second) {
+        return 1;
+    }
 
     /* returns zero value (equals) */
     return 0;

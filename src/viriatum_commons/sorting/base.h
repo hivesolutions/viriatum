@@ -29,7 +29,7 @@
  * case the first element is greater than the second, negative
  * in case the opposite happens and zero in case they are equal.
  */
-typedef int (*comparator) (void *, void *);
+typedef int (*comparator)(void *, void *);
 
 /**
  * Structure defining the elements

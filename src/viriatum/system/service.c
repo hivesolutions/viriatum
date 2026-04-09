@@ -231,8 +231,11 @@ void delete_configuration(struct sort_map_t *configuration, int is_top) {
         /* in case the current iteration is of type top must delete the
         inner configuration because this is "just" a section, otherwise
         releases the memory space occupied by the value */
-        if(is_top) { delete_configuration((struct sort_map_t *) option, 0); }
-        else { FREE(option); }
+        if(is_top) {
+            delete_configuration((struct sort_map_t *) option, 0);
+        } else {
+            FREE(option);
+        }
     }
 
     /* deletes the iterator for the configuration sort map */
@@ -438,14 +441,20 @@ ERROR_CODE create_workers(struct service_t *service) {
     /* checks if the current process is a worker (zero based
     pid value) or the master process and sets the service
     process type accortin to this value */
-    if(pid == 0) { service->process_type = WORKER_PROCESS; }
-    else { service->process_type = MASTER_PROCESS; }
+    if(pid == 0) {
+        service->process_type = WORKER_PROCESS;
+    } else {
+        service->process_type = MASTER_PROCESS;
+    }
 
     /* checks if the current process is a worker (zero based
     pid value) or the master process and sets the process title
     according to this value */
-    if(pid == 0) { SET_PROC_NAME("viriatum/w"); }
-    else { SET_PROC_NAME("viriatum/m"); }
+    if(pid == 0) {
+        SET_PROC_NAME("viriatum/w");
+    } else {
+        SET_PROC_NAME("viriatum/m");
+    }
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -545,16 +554,10 @@ ERROR_CODE start_service(struct service_t *service) {
     to test the socket related call for error */
     SOCKET_ERROR_CODE socket_result;
 
-
-
-
     /* allocates the various misc connections references */
     /* @todo must uncomment to continue with the connections */
     /*struct connection_t *tracker_connection;
     struct connection_t *torrent_connection;*/
-
-
-
 
     /* allocates the polling (provider) */
     struct polling_t *polling;
@@ -1150,7 +1153,6 @@ ERROR_CODE start_service(struct service_t *service) {
     }
 #endif
 
-
     /*
     _create_tracker_connection(
         &tracker_connection,
@@ -1167,7 +1169,6 @@ ERROR_CODE start_service(struct service_t *service) {
         "localhost",
         32967
     );*/
-
 
     /* iterates continuously, while the service is open (this
     is the main loop triggering all the actions) */
@@ -1321,7 +1322,7 @@ ERROR_CODE load_modules_service(struct service_t *service) {
 
         /* in case the current module is null (end of iterator)
         must break the current loop */
-        if(entry == NULL) {  break; }
+        if(entry == NULL) { break; }
 
         /* in case the entry name does not ends with the shared object extension
         it must not be a module to be loaded, skips the current iteration */
@@ -1648,8 +1649,9 @@ ERROR_CODE resolve_connection(struct connection_t *connection, SOCKET_ADDRESS *s
                 if(buffer[index] != ':') { continue; }
                 break;
             }
-            if(index == 0) { memcpy(connection->host, buffer, buffer_size); }
-            else {
+            if(index == 0) {
+                memcpy(connection->host, buffer, buffer_size);
+            } else {
                 memcpy(connection->host, buffer + 1, index - 2);
                 connection->host[index - 2] = '\0';
             }
@@ -1682,7 +1684,7 @@ ERROR_CODE write_connection(
     unsigned char *data,
     unsigned int size,
     connection_data_callback
-    callback,
+        callback,
     void *callback_parameters
 ) {
     return write_connection_c(
@@ -2265,12 +2267,12 @@ ERROR_CODE _file_options_service(struct service_t *service, struct hash_map_t *a
     /* tries to retrieve the ssl certificate from the arguments map and
     in case the (ssl csr) value is set, sets it in the service options */
     get_value_string_sort_map(general, (unsigned char *) "ssl_csr", &value);
-    if(value != NULL) { service_options->ssl_csr = (unsigned char *) value;  }
+    if(value != NULL) { service_options->ssl_csr = (unsigned char *) value; }
 
     /* tries to retrieve the ssl (private) key from the arguments map and
     in case the (ssl key) value is set, sets it in the service options */
     get_value_string_sort_map(general, (unsigned char *) "ssl_key", &value);
-    if(value != NULL) { service_options->ssl_key = (unsigned char *) value;  }
+    if(value != NULL) { service_options->ssl_key = (unsigned char *) value; }
 
     /* tries to retrieve the handler argument from the arguments map and
     in case the (handler) value is set, sets it in the service options */

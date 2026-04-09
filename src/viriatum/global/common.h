@@ -24,7 +24,7 @@
 
 #pragma once
 
-#define VIRIATUM_RESOLVE_PATH(file_path, default_path, result_path)\
+#define VIRIATUM_RESOLVE_PATH(file_path, default_path, result_path) \
     resolve_config_path(file_path, default_path, result_path)
 
 static __inline char *resolve_config_path(char *file_path, char *default_path, char *result_path) {

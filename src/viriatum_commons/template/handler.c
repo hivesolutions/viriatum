@@ -214,7 +214,7 @@ void delete_template_parameter(struct template_parameter_t *template_parameter) 
 }
 
 void process_template_handler(struct template_handler_t *template_handler, unsigned char *file_path) {
-     /* allocates space for the template engine */
+    /* allocates space for the template engine */
     struct template_engine_t *template_engine;
 
     /* allocates space for the template settings */

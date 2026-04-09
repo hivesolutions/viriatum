@@ -215,16 +215,16 @@ VIRIATUM_EXPORT_PREFIX ERROR_CODE absolute_path_file(char *path, char normalize)
 VIRIATUM_EXPORT_PREFIX int _entry_compare_file(void *first, void *second);
 
 #ifdef VIRIATUM_PLATFORM_WIN32
-#define SYSTEM_PATH(PATH)\
-    size_t PATH ## _s_size;\
-    char PATH ## _s[VIRIATUM_MAX_PATH_SIZE];\
-    PATH ## _s_size = path_to_system(PATH, PATH ## _s);\
-    if(PATH ## _s_size > 0) PATH = PATH ## _s
+#define SYSTEM_PATH(PATH)                           \
+    size_t PATH##_s_size;                           \
+    char PATH##_s[VIRIATUM_MAX_PATH_SIZE];          \
+    PATH##_s_size = path_to_system(PATH, PATH##_s); \
+    if(PATH##_s_size > 0) PATH = PATH##_s
 
-#define UTF8_PATH(PATH)\
-    char PATH ## _u[VIRIATUM_MAX_PATH_SIZE];\
-    PATH ## _u_size = path_from_system(PATH, PATH ## _u);\
-    if(PATH ## _u_size > 0) PATH = PATH ## _u
+#define UTF8_PATH(PATH)                               \
+    char PATH##_u[VIRIATUM_MAX_PATH_SIZE];            \
+    PATH##_u_size = path_from_system(PATH, PATH##_u); \
+    if(PATH##_u_size > 0) PATH = PATH##_u
 
 VIRIATUM_EXPORT_PREFIX size_t path_from_system(char *path_s, char *path);
 VIRIATUM_EXPORT_PREFIX size_t path_to_system(char *path, char *path_s);

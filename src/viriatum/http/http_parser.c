@@ -202,11 +202,11 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                 break;
 
             case STATE_RES_OR_RESP_H:
-                if (byte == 'T') {
+                if(byte == 'T') {
                     http_parser->type = HTTP_RESPONSE;
                     state = STATE_RES_HT;
                 } else {
-                    if (byte != 'E') {
+                    if(byte != 'E') {
                         /*SET_ERRNO(HPE_INVALID_CONSTANT); */
                         goto error;
                     }
@@ -274,7 +274,7 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                 break;
 
             case STATE_RES_FIRST_HTTP_MAJOR:
-                if(byte < '1' || byte  > '9') {
+                if(byte < '1' || byte > '9') {
                     /*SET_ERRNO(HPE_INVALID_VERSION); */
                     goto error;
                 }
@@ -285,7 +285,7 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                 /* breaks the switch */
                 break;
 
-             case STATE_RES_HTTP_MAJOR:
+            case STATE_RES_HTTP_MAJOR:
                 if(byte == '.') {
                     state = STATE_RES_FIRST_HTTP_MINOR;
                     break;
@@ -308,7 +308,7 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                 break;
 
             case STATE_RES_FIRST_HTTP_MINOR:
-                if (!IS_NUM(byte)) {
+                if(!IS_NUM(byte)) {
                     /*SET_ERRNO(HPE_INVALID_VERSION); */
                     goto error;
                 }
@@ -344,8 +344,8 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                 break;
 
             case STATE_RES_FIRST_STATUS_CODE:
-                if (!IS_NUM(byte)) {
-                    if (byte == ' ') {
+                if(!IS_NUM(byte)) {
+                    if(byte == ' ') {
                         break;
                     }
 
@@ -437,38 +437,64 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                     goto error;
                 }
 
-                start_req_method_assign:
-                    http_parser->method = (unsigned char) 0;
-                    index = 1;
+            start_req_method_assign:
+                http_parser->method = (unsigned char) 0;
+                index = 1;
 
-                    switch(byte) {
-                        case 'C': http_parser->method = HTTP_CONNECT; /* or COPY, CHECKOUT */ break;
-                        case 'D': http_parser->method = HTTP_DELETE; break;
-                        case 'G': http_parser->method = HTTP_GET; break;
-                        case 'H': http_parser->method = HTTP_HEAD; break;
-                        case 'L': http_parser->method = HTTP_LOCK; break;
-                        case 'M': http_parser->method = HTTP_MKCOL; /* or MOVE, MKACTIVITY, MERGE, M-SEARCH */ break;
-                        case 'N': http_parser->method = HTTP_NOTIFY; break;
-                        case 'O': http_parser->method = HTTP_OPTIONS; break;
-                        case 'P': http_parser->method = HTTP_POST; /* or PROPFIND or PROPPATCH or PUT or PATCH */ break;
-                        case 'R': http_parser->method = HTTP_REPORT; break;
-                        case 'S': http_parser->method = HTTP_SUBSCRIBE; break;
-                        case 'T': http_parser->method = HTTP_TRACE; break;
-                        case 'U': http_parser->method = HTTP_UNLOCK; /* or UNSUBSCRIBE */ break;
-                        default:
-                            /*SET_ERRNO(HPE_INVALID_METHOD);*/
-                            goto error;
-                    }
+                switch(byte) {
+                    case 'C':
+                        http_parser->method = HTTP_CONNECT; /* or COPY, CHECKOUT */
+                        break;
+                    case 'D':
+                        http_parser->method = HTTP_DELETE;
+                        break;
+                    case 'G':
+                        http_parser->method = HTTP_GET;
+                        break;
+                    case 'H':
+                        http_parser->method = HTTP_HEAD;
+                        break;
+                    case 'L':
+                        http_parser->method = HTTP_LOCK;
+                        break;
+                    case 'M':
+                        http_parser->method = HTTP_MKCOL; /* or MOVE, MKACTIVITY, MERGE, M-SEARCH */
+                        break;
+                    case 'N':
+                        http_parser->method = HTTP_NOTIFY;
+                        break;
+                    case 'O':
+                        http_parser->method = HTTP_OPTIONS;
+                        break;
+                    case 'P':
+                        http_parser->method = HTTP_POST; /* or PROPFIND or PROPPATCH or PUT or PATCH */
+                        break;
+                    case 'R':
+                        http_parser->method = HTTP_REPORT;
+                        break;
+                    case 'S':
+                        http_parser->method = HTTP_SUBSCRIBE;
+                        break;
+                    case 'T':
+                        http_parser->method = HTTP_TRACE;
+                        break;
+                    case 'U':
+                        http_parser->method = HTTP_UNLOCK; /* or UNSUBSCRIBE */
+                        break;
+                    default:
+                        /*SET_ERRNO(HPE_INVALID_METHOD);*/
+                        goto error;
+                }
 
-                    state = STATE_REQ_METHOD;
+                state = STATE_REQ_METHOD;
 
-                    /* breaks the switch */
-                    break;
+                /* breaks the switch */
+                break;
 
             case STATE_REQ_METHOD:
                 if(byte == '\0') {
-                     /*SET_ERRNO(HPE_INVALID_METHOD);*/
-                     goto error;
+                    /*SET_ERRNO(HPE_INVALID_METHOD);*/
+                    goto error;
                 }
 
                 matcher = http_method_strings[http_parser->method - 1];
@@ -479,7 +505,7 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                 } else if(http_parser->method == HTTP_CONNECT) {
                     if(index == 1 && byte == 'H') {
                         http_parser->method = HTTP_CHECKOUT;
-                    } else if(index == 2  && byte == 'P') {
+                    } else if(index == 2 && byte == 'P') {
                         http_parser->method = HTTP_COPY;
                     } else {
                         goto error;
@@ -504,7 +530,7 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                     } else if(byte == 'A') {
                         http_parser->method = HTTP_PATCH;
                     } else {
-                       goto error;
+                        goto error;
                     }
                 } else if(index == 2 && http_parser->method == HTTP_UNLOCK && byte == 'S') {
                     http_parser->method = HTTP_UNSUBSCRIBE;
@@ -713,7 +739,7 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                         /* breaks the switch */
                         break;
 
-                     case ' ':
+                    case ' ':
                         HTTP_CALLBACK_DATA(url);
                         state = STATE_REQ_HTTP_START;
 
@@ -752,7 +778,6 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
 
                 /* breaks the switch */
                 break;
-
 
             case STATE_REQ_QUERY_STRING:
                 if(IS_URL_CHAR(byte)) {
@@ -872,7 +897,7 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                         /* breaks the switch */
                         break;
 
-                  case CR:
+                    case CR:
                         HTTP_CALLBACK_DATA(url);
                         http_parser->http_major = 0;
                         http_parser->http_minor = 9;
@@ -881,7 +906,7 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                         /* breaks the switch */
                         break;
 
-                  case LF:
+                    case LF:
                         HTTP_CALLBACK_DATA(url);
                         http_parser->http_major = 0;
                         http_parser->http_minor = 9;
@@ -891,12 +916,12 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                         /* breaks the switch */
                         break;
 
-                  case '?':
-                  case '#':
+                    case '?':
+                    case '#':
                         /* breaks the switch */
                         break;
 
-                  default:
+                    default:
                         /*SET_ERRNO(HPE_INVALID_FRAGMENT);*/
                         goto error;
                 }
@@ -1024,7 +1049,7 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                 http_parser->http_minor *= 10;
                 http_parser->http_minor += byte - '0';
 
-                if (http_parser->http_minor > 999) {
+                if(http_parser->http_minor > 999) {
                     /*SET_ERRNO(HPE_INVALID_VERSION);*/
                     goto error;
                 }
@@ -1045,68 +1070,68 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                 break;
 
             case STATE_HEADER_FIELD_START:
-                header_field_start:
-                    if(byte == CR) {
-                        state = STATE_HEADERS_ALMOST_DONE;
-
-                        /* breaks the switch */
-                        break;
-                    }
-
-                    if(byte == LF) {
-                        /* they might be just sending \n instead of \r\n so this would be
-                        * the second \n to denote the end of headers*/
-                        state = STATE_HEADERS_ALMOST_DONE;
-
-                        goto headers_almost_done;
-                    }
-
-                    byte_token = TOKEN(byte);
-
-                    if (!byte_token) {
-                        /*SET_ERRNO(HPE_INVALID_HEADER_TOKEN);*/
-                        goto error;
-                    }
-
-                    HTTP_MARK(header_field);
-
-                    index = 0;
-                    state = STATE_HEADER_FIELD;
-
-                    switch(byte_token) {
-                        case 'c':
-                            header_state = HEADER_STATE_C;
-
-                            /* breaks the switch */
-                            break;
-
-                        case 'p':
-                            header_state = HEADER_STATE_MATCHING_PROXY_CONNECTION;
-
-                            /* breaks the switch */
-                            break;
-
-                        case 't':
-                            header_state = HEADER_STATE_MATCHING_TRANSFER_ENCODING;
-
-                            /* breaks the switch */
-                            break;
-
-                        case 'u':
-                            header_state = HEADER_STATE_MATCHING_UPGRADE;
-
-                            /* breaks the switch */
-                            break;
-
-                        default:
-                            header_state = HEADER_STATE_GENERAL;
-
-                            /* breaks the switch */
-                            break;
-                    }
+            header_field_start:
+                if(byte == CR) {
+                    state = STATE_HEADERS_ALMOST_DONE;
 
                     /* breaks the switch */
                     break;
+                }
+
+                if(byte == LF) {
+                    /* they might be just sending \n instead of \r\n so this would be
+                        * the second \n to denote the end of headers*/
+                    state = STATE_HEADERS_ALMOST_DONE;
+
+                    goto headers_almost_done;
+                }
+
+                byte_token = TOKEN(byte);
+
+                if(!byte_token) {
+                    /*SET_ERRNO(HPE_INVALID_HEADER_TOKEN);*/
+                    goto error;
+                }
+
+                HTTP_MARK(header_field);
+
+                index = 0;
+                state = STATE_HEADER_FIELD;
+
+                switch(byte_token) {
+                    case 'c':
+                        header_state = HEADER_STATE_C;
+
+                        /* breaks the switch */
+                        break;
+
+                    case 'p':
+                        header_state = HEADER_STATE_MATCHING_PROXY_CONNECTION;
+
+                        /* breaks the switch */
+                        break;
+
+                    case 't':
+                        header_state = HEADER_STATE_MATCHING_TRANSFER_ENCODING;
+
+                        /* breaks the switch */
+                        break;
+
+                    case 'u':
+                        header_state = HEADER_STATE_MATCHING_UPGRADE;
+
+                        /* breaks the switch */
+                        break;
+
+                    default:
+                        header_state = HEADER_STATE_GENERAL;
+
+                        /* breaks the switch */
+                        break;
+                }
+
+                /* breaks the switch */
+                break;
 
             case STATE_HEADER_FIELD:
                 byte_token = TOKEN(byte);
@@ -1329,7 +1354,7 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                         /* looking for 'Connection: keep-alive' */
                         if(byte_token == 'k') {
                             header_state = HEADER_STATE_MATCHING_CONNECTION_KEEP_ALIVE;
-                        /* looking for 'Connection: close' */
+                            /* looking for 'Connection: close' */
                         } else if(byte_token == 'c') {
                             header_state = HEADER_STATE_MATCHING_CONNECTION_CLOSE;
                         } else {
@@ -1450,39 +1475,38 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                 /* breaks the switch */
                 break;
 
-
             case STATE_HEADER_ALMOST_DONE:
-                header_almost_done:
-                    STRICT_CHECK(byte != LF);
+            header_almost_done:
+                STRICT_CHECK(byte != LF);
 
-                    state = STATE_HEADER_VALUE_LWS;
+                state = STATE_HEADER_VALUE_LWS;
 
-                    switch(header_state) {
-                        case HEADER_STATE_CONNECTION_KEEP_ALIVE:
-                            http_parser->flags |= FLAG_KEEP_ALIVE;
+                switch(header_state) {
+                    case HEADER_STATE_CONNECTION_KEEP_ALIVE:
+                        http_parser->flags |= FLAG_KEEP_ALIVE;
 
-                            /* breaks the switch */
-                            break;
+                        /* breaks the switch */
+                        break;
 
-                        case HEADER_STATE_CONNECTION_CLOSE:
-                            http_parser->flags |= FLAG_CLOSE;
+                    case HEADER_STATE_CONNECTION_CLOSE:
+                        http_parser->flags |= FLAG_CLOSE;
 
-                            /* breaks the switch */
-                            break;
+                        /* breaks the switch */
+                        break;
 
-                        case HEADER_STATE_TRANSFER_ENCODING_CHUNKED:
-                            http_parser->flags |= FLAG_CHUNKED;
+                    case HEADER_STATE_TRANSFER_ENCODING_CHUNKED:
+                        http_parser->flags |= FLAG_CHUNKED;
 
-                            /* breaks the switch */
-                            break;
+                        /* breaks the switch */
+                        break;
 
-                        default:
-                            /* breaks the switch */
-                            break;
-                    }
+                    default:
+                        /* breaks the switch */
+                        break;
+                }
 
-                    /* breaks the switch */
-                    break;
+                /* breaks the switch */
+                break;
 
             case STATE_HEADER_VALUE_LWS:
                 if(byte == ' ' || byte == '\t') {
@@ -1496,86 +1520,86 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                 break;
 
             case STATE_HEADERS_ALMOST_DONE:
-                headers_almost_done:
-                    STRICT_CHECK(byte != LF);
+            headers_almost_done:
+                STRICT_CHECK(byte != LF);
 
-                    if(http_parser->flags & FLAG_TRAILING) {
-                        /* End of a chunked request */
-                        HTTP_CALLBACK(message_complete);
-                        state = NEW_MESSAGE();
-                        parse_count++;
-                        break;
-                    }
+                if(http_parser->flags & FLAG_TRAILING) {
+                    /* End of a chunked request */
+                    HTTP_CALLBACK(message_complete);
+                    state = NEW_MESSAGE();
+                    parse_count++;
+                    break;
+                }
 
-                    read_count = 0;
+                read_count = 0;
 
-                    if(http_parser->flags & FLAG_UPGRADE || http_parser->method == HTTP_CONNECT) {
-                        http_parser->upgrade = 1;
-                    }
+                if(http_parser->flags & FLAG_UPGRADE || http_parser->method == HTTP_CONNECT) {
+                    http_parser->upgrade = 1;
+                }
 
-                    /* here we call the headers_complete callback, this is somewhat
+                /* here we call the headers_complete callback, this is somewhat
                     * different than other callbacks because if the user returns 1, we
                     * will interpret that as saying that this message has no body. This
                     * is needed for the annoying case of recieving a response to a HEAD
                     * request */
-                    if(http_settings->on_headers_complete) {
-                        switch(http_settings->on_headers_complete(http_parser)) {
-                            case 0:
-                                break;
+                if(http_settings->on_headers_complete) {
+                    switch(http_settings->on_headers_complete(http_parser)) {
+                        case 0:
+                            break;
 
-                            case 1:
-                                http_parser->flags |= FLAG_SKIPBODY;
-                                break;
+                        case 1:
+                            http_parser->flags |= FLAG_SKIPBODY;
+                            break;
 
-                            default:
-                                http_parser->state = state;
-                                /*SET_ERRNO(HPE_CB_headers_complete);*/
-                                return (int) (pointer - data); /* Error */
-                        }
+                        default:
+                            http_parser->state = state;
+                            /*SET_ERRNO(HPE_CB_headers_complete);*/
+                            return (int) (pointer - data); /* Error */
                     }
+                }
 
-                    /* Exit, the rest of the connect is in a different protocol. */
-                    if(http_parser->upgrade) {
-                        HTTP_CALLBACK(message_complete);
+                /* Exit, the rest of the connect is in a different protocol. */
+                if(http_parser->upgrade) {
+                    HTTP_CALLBACK(message_complete);
 
-                        return (int) (pointer - data) + 1;
-                    }
+                    return (int) (pointer - data) + 1;
+                }
 
-                    if(http_parser->flags & FLAG_SKIPBODY) {
+                if(http_parser->flags & FLAG_SKIPBODY) {
+                    HTTP_CALLBACK(message_complete);
+                    state = NEW_MESSAGE();
+                    parse_count++;
+                } else if(http_parser->flags & FLAG_CHUNKED) {
+                    /* chunked encoding - ignore Content-Length header */
+                    state = STATE_CHUNK_SIZE_START;
+                } else {
+                    if(http_parser->content_length == 0) {
+                        /* Content-Length header given but zero: Content-Length: 0\r\n */
                         HTTP_CALLBACK(message_complete);
                         state = NEW_MESSAGE();
                         parse_count++;
-                    } else if(http_parser->flags & FLAG_CHUNKED) {
-                        /* chunked encoding - ignore Content-Length header */
-                        state = STATE_CHUNK_SIZE_START;
+                    } else if(http_parser->content_length > 0) {
+                        /* Content-Length header given and non-zero */
+                        state = STATE_BODY_IDENTITY;
+
+                        /* saves the content length value in the private
+                            value so that it can be used later */
+                        http_parser->_content_length = http_parser->content_length;
                     } else {
-                        if(http_parser->content_length == 0) {
-                            /* Content-Length header given but zero: Content-Length: 0\r\n */
+                        if(http_parser->type == HTTP_REQUEST || http_should_keep_alive(http_parser)) {
+                            /* assumes content-length 0 - read the next */
                             HTTP_CALLBACK(message_complete);
                             state = NEW_MESSAGE();
                             parse_count++;
-                        } else if(http_parser->content_length > 0) {
-                            /* Content-Length header given and non-zero */
-                            state = STATE_BODY_IDENTITY;
-
-                            /* saves the content length value in the private
-                            value so that it can be used later */
-                            http_parser->_content_length = http_parser->content_length;
                         } else {
-                            if(http_parser->type == HTTP_REQUEST || http_should_keep_alive(http_parser)) {
-                                /* assumes content-length 0 - read the next */
-                                HTTP_CALLBACK(message_complete);
-                                state = NEW_MESSAGE();
-                                parse_count++;
-                            } else {
-                                /* reads body until the enf of file is reached */
-                                state = STATE_BODY_IDENTITY_EOF;
-                            }
+                            /* reads body until the enf of file is reached */
+                            state = STATE_BODY_IDENTITY_EOF;
                         }
                     }
+                }
 
-                    /* breaks the switch */
-                    break;
+                /* breaks the switch */
+                break;
 
             case STATE_BODY_IDENTITY:
                 to_read = MIN(pointer_end - pointer, (long long) http_parser->content_length);

@@ -37,9 +37,10 @@
  * Starts (initializes) the global variables defined
  * as external in the header definition.
  */
-#define START_GLOBALS struct service_t *_service;\
-    struct connection_t *_connection;\
-    struct linked_buffer_t *_output_buffer;\
+#define START_GLOBALS                       \
+    struct service_t *_service;             \
+    struct connection_t *_connection;       \
+    struct linked_buffer_t *_output_buffer; \
     struct php_request_t _php_request
 
 /**

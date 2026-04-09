@@ -31,7 +31,7 @@
 
 /* forward references (avoids loop) */
 struct http_connection_t;
-typedef ERROR_CODE (*connection_data_callback_sh) (struct connection_t *, struct data_t *, void *);
+typedef ERROR_CODE (*connection_data_callback_sh)(struct connection_t *, struct data_t *, void *);
 
 /**
  * Function used to update the given HTTP connection
@@ -40,14 +40,14 @@ typedef ERROR_CODE (*connection_data_callback_sh) (struct connection_t *, struct
  * @param http_connection The HTTP connection to be
  * updated with new information.
  */
-typedef ERROR_CODE (*http_connection_update) (struct http_connection_t *http_connection);
+typedef ERROR_CODE (*http_connection_update)(struct http_connection_t *http_connection);
 
 /**
  * Function used to populate a provided buffer with HTTP
  * headers information using the context of the provided
  * connection.
  */
-typedef size_t (*http_connection_headers) (struct connection_t *, char *, size_t, enum http_version_e, int, char *, enum http_keep_alive_e, char);
+typedef size_t (*http_connection_headers)(struct connection_t *, char *, size_t, enum http_version_e, int, char *, enum http_keep_alive_e, char);
 
 /**
  * Function used to populate a provided buffer with HTTP
@@ -56,7 +56,7 @@ typedef size_t (*http_connection_headers) (struct connection_t *, char *, size_t
  * This functions uses a more complete approach to the fill
  * of the HTTP headers.
  */
-typedef size_t (*http_connection_headers_c) (struct connection_t *, char *, size_t, enum http_version_e, int, char *, enum http_keep_alive_e, size_t, enum http_cache_e, int);
+typedef size_t (*http_connection_headers_c)(struct connection_t *, char *, size_t, enum http_version_e, int, char *, enum http_keep_alive_e, size_t, enum http_cache_e, int);
 
 /**
  * Function used to populate a provided buffer with HTTP
@@ -65,13 +65,13 @@ typedef size_t (*http_connection_headers_c) (struct connection_t *, char *, size
  * This functions also populates the buffer with the message
  * part (contents) of the HTTP message.
  */
-typedef size_t (*http_connection_headers_m) (struct connection_t *, char *, size_t, enum http_version_e, int, char *, enum http_keep_alive_e, size_t, enum http_cache_e, char *);
+typedef size_t (*http_connection_headers_m)(struct connection_t *, char *, size_t, enum http_version_e, int, char *, enum http_keep_alive_e, size_t, enum http_cache_e, char *);
 
 /**
  * Function used to send a message through the provided connection
  * using the predefined structured pipes.
  */
-typedef ERROR_CODE (*http_connection_message) (struct connection_t *, char *, size_t, enum http_version_e, int, char *, char *, enum http_keep_alive_e, connection_data_callback_sh, void *);
+typedef ERROR_CODE (*http_connection_message)(struct connection_t *, char *, size_t, enum http_version_e, int, char *, char *, enum http_keep_alive_e, connection_data_callback_sh, void *);
 
 /**
  * Function used to log request information in the common
@@ -92,7 +92,7 @@ typedef ERROR_CODE (*http_connection_message) (struct connection_t *, char *, si
  * @param content_length The size of the content to be sent back
  * as the response.
  */
-typedef ERROR_CODE (*http_connection_log) (char *host, char *identity, char *user, char *method, char *uri, enum http_version_e version, int error_code, size_t content_length);
+typedef ERROR_CODE (*http_connection_log)(char *host, char *identity, char *user, char *method, char *uri, enum http_version_e version, int error_code, size_t content_length);
 
 /**
  * The structure that describes the structure

@@ -219,16 +219,12 @@ ERROR_CODE delete_directory_entries_map_file(struct linked_list_t *map) {
         /* deletes the various values (types) from the hash map
         (first retrieves them and the excludes them)*/
         get_value_string_hash_map(
-           entry_type->value.value_map,
-           (unsigned char *) "type",
-           (void **) &entry_value_type
-        );
-        delete_type(entry_value_type);
-        get_value_string_hash_map
-            (entry_type->value.value_map,
-            (unsigned char *) "name",
+            entry_type->value.value_map,
+            (unsigned char *) "type",
             (void **) &entry_value_type
         );
+        delete_type(entry_value_type);
+        get_value_string_hash_map(entry_type->value.value_map, (unsigned char *) "name", (void **) &entry_value_type);
         delete_type(entry_value_type);
         get_value_string_hash_map(
             entry_type->value.value_map,
@@ -319,8 +315,11 @@ ERROR_CODE entries_to_map_file(struct linked_list_t *entries, struct linked_list
         /* allocates space for the size string and populates it
         by formatting the size integer accordingly */
         size_string = MALLOC(128);
-        if(entry->type == FILE_TYPE_DIRECTORY) { memcpy(size_string, "-", sizeof("-")); }
-        else { format_bytes(size_string, 128, entry->size); }
+        if(entry->type == FILE_TYPE_DIRECTORY) {
+            memcpy(size_string, "-", sizeof("-"));
+        } else {
+            format_bytes(size_string, 128, entry->size);
+        }
 
         /* creates the various types for the various entry values
         and sets them in the entry map for reference */
@@ -694,7 +693,9 @@ ERROR_CODE list_directory_file(char *file_path, struct linked_list_t *entries) {
         is of type regular (simplified file system) */
         if(find_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
             entry->type = FILE_TYPE_DIRECTORY;
-        } else { entry->type = FILE_TYPE_REGULAR; }
+        } else {
+            entry->type = FILE_TYPE_REGULAR;
+        }
 
         /* sets the entry size from the find data information */
         entry->size = find_data.nFileSizeLow;

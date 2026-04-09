@@ -59,7 +59,7 @@ ERROR_CODE encode_percent(unsigned char *buffer, size_t length, unsigned char *_
         }
         /* otherwise it's a special character and must be encoded in
         the hexadecimal form */
-        else  {
+        else {
             /* sets the current buffer values with the hexadecimal
             encoded characters */
             *__buffer++ = '%';
@@ -80,7 +80,7 @@ ERROR_CODE encode_percent(unsigned char *buffer, size_t length, unsigned char *_
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE decode_percent(unsigned char *buffer, size_t length, unsigned char *_buffer,  size_t *length_pointer) {
+ERROR_CODE decode_percent(unsigned char *buffer, size_t length, unsigned char *_buffer, size_t *length_pointer) {
     /* allocates the pointer to be used during the iteration
     process for the URL decoding */
     unsigned char *pointer;
@@ -109,7 +109,7 @@ ERROR_CODE decode_percent(unsigned char *buffer, size_t length, unsigned char *_
         }
         /* in case the current pointer value refers the plus
         value referring to a space character */
-        else if (*pointer == '+') {
+        else if(*pointer == '+') {
             /* sets the space character in the buffer */
             *__buffer++ = ' ';
         }

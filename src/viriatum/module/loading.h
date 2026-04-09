@@ -44,7 +44,7 @@ struct environment_t;
  * @param module The module structure to be
  * populated by the module.
  */
-typedef ERROR_CODE (*viriatum_start_module) (struct environment_t *environment, struct module_t *module);
+typedef ERROR_CODE (*viriatum_start_module)(struct environment_t *environment, struct module_t *module);
 
 /**
  * Function used for stopping a module.
@@ -57,7 +57,7 @@ typedef ERROR_CODE (*viriatum_start_module) (struct environment_t *environment, 
  * @param The model structure to be used in
  * the stoping of the module.
  */
-typedef ERROR_CODE (*viriatum_stop_module) (struct environment_t *environment, struct module_t *module);
+typedef ERROR_CODE (*viriatum_stop_module)(struct environment_t *environment, struct module_t *module);
 
 /**
  * Function used to retrieve information
@@ -68,7 +68,7 @@ typedef ERROR_CODE (*viriatum_stop_module) (struct environment_t *environment, s
  * @param module The module structure to be
  * populated by the module.
  */
-typedef ERROR_CODE (*viriatum_info_module) (struct module_t *module);
+typedef ERROR_CODE (*viriatum_info_module)(struct module_t *module);
 
 /**
  * Function used to retrieve information
@@ -306,9 +306,7 @@ static __inline void module_name(unsigned char *module_path, unsigned char *buff
     while(TRUE) {
         /* in case the underscore element or the end of string element
         is found the name final index is found (must break) */
-        if(module_name[index] == '_'
-            || module_name[index] == '.'
-            || module_name[index] == '\0') { break ;}
+        if(module_name[index] == '_' || module_name[index] == '.' || module_name[index] == '\0') { break; }
         index++;
     }
 

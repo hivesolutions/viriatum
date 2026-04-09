@@ -77,21 +77,21 @@ ERROR_CODE _send_response_handler_diag(struct http_parser_t *http_parser) {
         info,
         10240,
         "{"
-            "\"name\":\"%s\","
-            "\"version\":\"%s\","
-            "\"platform\":\"%s\","
-            "\"flags\":\"%s\","
-            "\"compiler\":\"%s\","
-            "\"compiler_version\":\"%s\","
-            "\"compilation_date\":\"%s\","
-            "\"compilation_time\":\"%s\","
-            "\"compilation_flags\":\"%s\","
-            "\"modules\":\"%s\","
-            "\"description\":\"%s\","
-            "\"status\":%d,"
-            "\"port\":%d,"
-            "\"uptime\":\"%s\","
-            "\"connections\":%ld"
+        "\"name\":\"%s\","
+        "\"version\":\"%s\","
+        "\"platform\":\"%s\","
+        "\"flags\":\"%s\","
+        "\"compiler\":\"%s\","
+        "\"compiler_version\":\"%s\","
+        "\"compilation_date\":\"%s\","
+        "\"compilation_time\":\"%s\","
+        "\"compilation_flags\":\"%s\","
+        "\"modules\":\"%s\","
+        "\"description\":\"%s\","
+        "\"status\":%d,"
+        "\"port\":%d,"
+        "\"uptime\":\"%s\","
+        "\"connections\":%ld"
         "}",
         service->name,
         service->version,
@@ -186,8 +186,11 @@ ERROR_CODE _send_response_callback_handler_diag(struct connection_t *connection,
     releases the lock on the HTTP connection, this will allow further
     messages to be processed, an update event should raised following this
     lock releasing call */
-    if(!keep_alive) { connection->close_connection(connection); }
-    else { http_connection->release(http_connection); }
+    if(!keep_alive) {
+        connection->close_connection(connection);
+    } else {
+        http_connection->release(http_connection);
+    }
 
     /* raise no error */
     RAISE_NO_ERROR;

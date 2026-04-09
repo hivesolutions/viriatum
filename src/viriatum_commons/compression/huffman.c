@@ -158,8 +158,11 @@ void decode_huffman(struct huffman_t *huffman, struct stream_t *in, struct strea
     note that there's a significant performance issue with the
     tree based decoder as it need to percolate the tree */
     unsigned char is_table = huffman->prefix_code && huffman->prefix_extra;
-    if(is_table) { decode_table_huffman(huffman, in, out); }
-    else { decode_tree_huffman(huffman, in, out); }
+    if(is_table) {
+        decode_table_huffman(huffman, in, out);
+    } else {
+        decode_tree_huffman(huffman, in, out);
+    }
 }
 
 void decode_table_huffman(struct huffman_t *huffman, struct stream_t *in, struct stream_t *out) {
@@ -301,8 +304,11 @@ void decode_tree_huffman(struct huffman_t *huffman, struct stream_t *in, struct 
                 bit is odd or even and selects the appropriate next
                 node value (tree percolation step) */
                 bit = code >> (HUFFMAN_BYTE_SIZE - bit_count);
-                if(bit & 1) { node = node->right; }
-                else { node = node->left; }
+                if(bit & 1) {
+                    node = node->right;
+                } else {
+                    node = node->left;
+                }
 
                 /* verifies if the current selected node is a leaf
                 node (no child) and in case it's not continues the loop

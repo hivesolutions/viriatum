@@ -37,15 +37,9 @@ struct virtual_host_t;
 struct http_handler_t;
 
 #ifdef VIRIATUM_SSL
-#define CONNECTION_SEND(connection, buffer, length, flags) connection->ssl_handle == NULL ? \
-    SOCKET_SEND(connection->socket_handle, buffer, length, flags) :\
-    SSL_write(connection->ssl_handle, buffer, length)
-#define CONNECTION_RECEIVE(connection, buffer, length, flags) connection->ssl_handle == NULL ? \
-    SOCKET_RECEIVE(connection->socket_handle, buffer, length, flags) :\
-    SSL_read(connection->ssl_handle, buffer, length)
-#define CONNECTION_GET_ERROR_CODE(connection, error_code) connection->ssl_handle == NULL ? \
-    SOCKET_GET_ERROR_CODE(error_code) :\
-    SSL_get_error(connection->ssl_handle, error_code)
+#define CONNECTION_SEND(connection, buffer, length, flags) connection->ssl_handle == NULL ? SOCKET_SEND(connection->socket_handle, buffer, length, flags) : SSL_write(connection->ssl_handle, buffer, length)
+#define CONNECTION_RECEIVE(connection, buffer, length, flags) connection->ssl_handle == NULL ? SOCKET_RECEIVE(connection->socket_handle, buffer, length, flags) : SSL_read(connection->ssl_handle, buffer, length)
+#define CONNECTION_GET_ERROR_CODE(connection, error_code) connection->ssl_handle == NULL ? SOCKET_GET_ERROR_CODE(error_code) : SSL_get_error(connection->ssl_handle, error_code)
 #else
 #define CONNECTION_SEND(connection, buffer, length, flags) \
     SOCKET_SEND(connection->socket_handle, buffer, length, flags)
@@ -67,66 +61,66 @@ typedef enum process_type_e {
  * The function used to retrieve a string in english representing
  * the uptime of the service referred to.
  */
-typedef const char *(*service_uptime) (struct service_t *, size_t);
+typedef const char *(*service_uptime)(struct service_t *, size_t);
 
 /**
  * The function used to resolve a provided file extension (dot
  * prefixed) into the appropriate mime type.
  */
-typedef const char *(*service_mime) (struct service_t *, char *);
+typedef const char *(*service_mime)(struct service_t *, char *);
 
 /**
  * The function used to create a new handler instance
  * with a name and for the service context.
  */
-typedef ERROR_CODE (*service_http_handler_access) (struct service_t *, struct http_handler_t **, unsigned char *name);
+typedef ERROR_CODE (*service_http_handler_access)(struct service_t *, struct http_handler_t **, unsigned char *name);
 
 /**
  * The function used to update an handler state or value.
  */
-typedef ERROR_CODE (*service_http_handler_update) (struct service_t *, struct http_handler_t *);
+typedef ERROR_CODE (*service_http_handler_update)(struct service_t *, struct http_handler_t *);
 
 /**
  * The "default" function used to update a state in the connection
  * for the given service context.
  */
-typedef ERROR_CODE (*connection_update) (struct connection_t *);
+typedef ERROR_CODE (*connection_update)(struct connection_t *);
 
 /**
  * The function used to allocate data in the context
  * of a connection (for safe usage).
  */
-typedef ERROR_CODE (*connection_alloc) (struct connection_t *, size_t size, void **data_pointer);
+typedef ERROR_CODE (*connection_alloc)(struct connection_t *, size_t size, void **data_pointer);
 
 /**
  * The function to be used for callbacks associated with the
  * connection status updates.
  */
-typedef ERROR_CODE (*connection_callback) (struct connection_t *);
+typedef ERROR_CODE (*connection_callback)(struct connection_t *);
 
 /**
  * The function to be used for callbacks associated with the
  * connection data updates.
  */
-typedef ERROR_CODE (*connection_data_callback) (struct connection_t *, struct data_t *, void *);
+typedef ERROR_CODE (*connection_data_callback)(struct connection_t *, struct data_t *, void *);
 
 /**
  * Function used to write data into a connection, optional
  * parameters allow a callback upon the end of writing.
  */
-typedef ERROR_CODE (*connection_write) (struct connection_t *connection, unsigned char *, unsigned int, connection_data_callback, void *);
+typedef ERROR_CODE (*connection_write)(struct connection_t *connection, unsigned char *, unsigned int, connection_data_callback, void *);
 
 /**
  * The "default" function used to update a state in the polling
  * for the given service context.
  */
-typedef ERROR_CODE (*polling_update) (struct polling_t *);
+typedef ERROR_CODE (*polling_update)(struct polling_t *);
 
 /**
  * The function used to update a state in the polling
  * using the given connection as reference.
  */
-typedef ERROR_CODE (*polling_connection_update) (struct polling_t *, struct connection_t *);
+typedef ERROR_CODE (*polling_connection_update)(struct polling_t *, struct connection_t *);
 
 /**
  * The function used to unregister state in the polling
@@ -134,7 +128,7 @@ typedef ERROR_CODE (*polling_connection_update) (struct polling_t *, struct conn
  * parameter is provided so that one can remove the
  * connection from the polling mechanism.
  */
-typedef ERROR_CODE (*polling_connection_unregister) (struct polling_t *, struct connection_t *, unsigned char);
+typedef ERROR_CODE (*polling_connection_unregister)(struct polling_t *, struct connection_t *, unsigned char);
 
 /**
  * Structure describing a location to be
@@ -1358,7 +1352,7 @@ ERROR_CODE write_connection(
     unsigned char *data,
     unsigned int size,
     connection_data_callback
-    callback,
+        callback,
     void *callback_parameters
 );
 

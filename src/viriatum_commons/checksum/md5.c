@@ -75,8 +75,8 @@ void update_md5(struct md5_context_t *context, void *data, unsigned long size) {
         _body_md5(context, context->buffer, 64);
     }
 
-    if (size >= 64) {
-        data = _body_md5(context, data, size & ~ (unsigned long) 0x3f);
+    if(size >= 64) {
+        data = _body_md5(context, data, size & ~(unsigned long) 0x3f);
         size &= 0x3f;
     }
 

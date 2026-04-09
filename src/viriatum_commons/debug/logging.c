@@ -44,8 +44,14 @@ int use_color_logging(void) {
     {
         HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
         DWORD mode = 0;
-        if(handle == INVALID_HANDLE_VALUE) { cached = 0; return 0; }
-        if(!GetConsoleMode(handle, &mode)) { cached = 0; return 0; }
+        if(handle == INVALID_HANDLE_VALUE) {
+            cached = 0;
+            return 0;
+        }
+        if(!GetConsoleMode(handle, &mode)) {
+            cached = 0;
+            return 0;
+        }
         cached = (mode & ENABLE_VIRTUAL_TERMINAL_PROCESSING) ? 1 : 0;
         return cached;
     }
@@ -54,8 +60,14 @@ int use_color_logging(void) {
 #ifdef VIRIATUM_PLATFORM_UNIX
     {
         const char *term = getenv("TERM");
-        if(!isatty(fileno(stdout))) { cached = 0; return 0; }
-        if(term == NULL || strcmp(term, "dumb") == 0) { cached = 0; return 0; }
+        if(!isatty(fileno(stdout))) {
+            cached = 0;
+            return 0;
+        }
+        if(term == NULL || strcmp(term, "dumb") == 0) {
+            cached = 0;
+            return 0;
+        }
         cached = 1;
         return cached;
     }

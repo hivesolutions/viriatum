@@ -233,11 +233,17 @@ ERROR_CODE header_field_callback_handler_php(struct http_parser_t *http_parser, 
     /* checks if the current header is a valid "captable"
     header in such case changes the next header value accordingly
     otherwise sets the undefined header */
-    if(memcmp(data, CONTENT_TYPE_H, data_size) == 0) { handler_php_context->_next_header = CONTENT_TYPE; }
-    else if(memcmp(data, CONTENT_LENGTH_H, data_size) == 0) { handler_php_context->_next_header = CONTENT_LENGTH; }
-    else if(memcmp(data, COOKIE_H, data_size) == 0) { handler_php_context->_next_header = COOKIE; }
-    else if(memcmp(data, HOST_H, data_size) == 0) { handler_php_context->_next_header = HOST; }
-    else { handler_php_context->_next_header = UNDEFINED_HEADER; }
+    if(memcmp(data, CONTENT_TYPE_H, data_size) == 0) {
+        handler_php_context->_next_header = CONTENT_TYPE;
+    } else if(memcmp(data, CONTENT_LENGTH_H, data_size) == 0) {
+        handler_php_context->_next_header = CONTENT_LENGTH;
+    } else if(memcmp(data, COOKIE_H, data_size) == 0) {
+        handler_php_context->_next_header = COOKIE;
+    } else if(memcmp(data, HOST_H, data_size) == 0) {
+        handler_php_context->_next_header = HOST;
+    } else {
+        handler_php_context->_next_header = UNDEFINED_HEADER;
+    }
 
     /* raise no error */
     RAISE_NO_ERROR;
@@ -314,8 +320,11 @@ ERROR_CODE header_value_callback_handler_php(struct http_parser_t *http_parser, 
             /* tries to find the port part of the host in case
             it's possible sets the base data size for the server name */
             pointer = strchr((char *) handler_php_context->host, ':');
-            if(pointer == NULL) { _data_size = data_size; }
-            else { _data_size = pointer - (char *) handler_php_context->host; }
+            if(pointer == NULL) {
+                _data_size = data_size;
+            } else {
+                _data_size = pointer - (char *) handler_php_context->host;
+            }
 
             /* copies the server name header value into the
             appropriate buffer in the PHP context */
@@ -557,8 +566,11 @@ ERROR_CODE _send_response_handler_php(struct http_parser_t *http_parser) {
 
     /* in case there is contents to be read retrieves the appropriate
     reference to the start of the post data in the connection buffer */
-    if(http_parser->_content_length > 0) { post_data = &http_connection->buffer[http_connection->buffer_offset - http_parser->_content_length];
-    } else { post_data = NULL; }
+    if(http_parser->_content_length > 0) {
+        post_data = &http_connection->buffer[http_connection->buffer_offset - http_parser->_content_length];
+    } else {
+        post_data = NULL;
+    }
 
     /* sets the global reference to the connection currently being
     used for the PHP interpreter this is the reference that is going
@@ -607,8 +619,10 @@ ERROR_CODE _send_response_handler_php(struct http_parser_t *http_parser) {
             php_execute_script(&script);
             php_request_shutdown(NULL);
         }
-    } zend_catch {
-    } zend_end_try();
+    }
+    zend_catch {
+    }
+    zend_end_try();
     zend_destroy_file_handle(&script);
 
     /* retrieves the status code from the sapi headers and converts it
@@ -619,9 +633,7 @@ ERROR_CODE _send_response_handler_php(struct http_parser_t *http_parser) {
     /* logs PHP server errors at warning level for console visibility,
     this ensures 5xx responses from PHP are not silently swallowed */
     if(status_code >= 500) {
-        V_WARNING_CTX_F("mod_php", "PHP error %d for %s %s\n",
-            status_code, handler_php_context->method,
-            (char *) handler_php_context->url);
+        V_WARNING_CTX_F("mod_php", "PHP error %d for %s %s\n", status_code, handler_php_context->method, (char *) handler_php_context->url);
     }
 
     /* converts the address of the socket into the representing
@@ -723,8 +735,11 @@ ERROR_CODE _send_response_callback_handler_php(struct connection_t *connection, 
     releases the lock on the HTTP connection, this will allow further
     messages to be processed, an update event should raised following this
     lock releasing call */
-    if(!keep_alive) { connection->close_connection(connection); }
-    else { http_connection->release(http_connection); }
+    if(!keep_alive) {
+        connection->close_connection(connection);
+    } else {
+        http_connection->release(http_connection);
+    }
 
     /* raise no error */
     RAISE_NO_ERROR;

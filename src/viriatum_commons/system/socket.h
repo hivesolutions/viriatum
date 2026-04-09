@@ -67,17 +67,22 @@
 #define SOCKET_INITIALIZE(socket_data) WSAStartup(MAKEWORD(2, 0), socket_data)
 #define SOCKET_FINISH() WSACleanup()
 #define SOCKET_CREATE(type, stream_type, protocol_type) socket(type, stream_type, protocol_type)
-#define SOCKET_BIND(socket_handle, socket_address) bind(socket_handle, (LPSOCKADDR) &socket_address, sizeof(SOCKET_ADDRESS_INTERNET))
+#define SOCKET_BIND(socket_handle, socket_address) bind(socket_handle, (LPSOCKADDR) & socket_address, sizeof(SOCKET_ADDRESS_INTERNET))
 #define SOCKET_BIND_EX(socket_handle, socket_address, socket_address_size) bind(socket_handle, (LPSOCKADDR) socket_address, socket_address_size)
 #define SOCKET_LISTEN(socket_handle) listen(socket_handle, SOCKET_CONNECTIONS)
-#define SOCKET_CONNECT(socket_handle, socket_address) connect(socket_handle, (LPSOCKADDR) &socket_address, sizeof(SOCKET_ADDRESS))
-#define SOCKET_CONNECT_SIZE(socket_handle, socket_address, socket_address_size) connect(socket_handle, (LPSOCKADDR) &socket_address, socket_address_size)
+#define SOCKET_CONNECT(socket_handle, socket_address) connect(socket_handle, (LPSOCKADDR) & socket_address, sizeof(SOCKET_ADDRESS))
+#define SOCKET_CONNECT_SIZE(socket_handle, socket_address, socket_address_size) connect(socket_handle, (LPSOCKADDR) & socket_address, socket_address_size)
 #define SOCKET_ACCEPT(socket_handle, socket_address, socket_address_size) accept(socket_handle, (LPSOCKADDR) socket_address, &socket_address_size)
 #define SOCKET_CLOSE(socket_handle) closesocket(socket_handle)
-#define SOCKET_ADDRESS_CREATE(socket_address, type, address, port) memset(&socket_address, 0, sizeof(SOCKET_ADDRESS));\
-    socket_address.sin_family = type;\
-    socket_address.sin_port = htons(port);\
-    if(address == NULL) { socket_address.sin_addr.s_addr = INADDR_ANY; } else { socket_address.sin_addr.s_addr = inet_addr(address); }
+#define SOCKET_ADDRESS_CREATE(socket_address, type, address, port) \
+    memset(&socket_address, 0, sizeof(SOCKET_ADDRESS));            \
+    socket_address.sin_family = type;                              \
+    socket_address.sin_port = htons(port);                         \
+    if(address == NULL) {                                          \
+        socket_address.sin_addr.s_addr = INADDR_ANY;               \
+    } else {                                                       \
+        socket_address.sin_addr.s_addr = inet_addr(address);       \
+    }
 #define SOCKET_GET_HOST_BY_NAME(hostname) gethostbyname(hostname)
 #define SOCKET_TEST_SOCKET(socket_handle) socket_handle == INVALID_SOCKET
 #define SOCKET_TEST_ERROR(result) result == SOCKET_ERROR
@@ -92,9 +97,11 @@
 #define SOCKET_SET_CLEAR(socket_handle, sockets_set) FD_CLR(socket_handle, sockets_set)
 #define SOCKET_SET_IS_SET(socket_handle, sockets_set) FD_ISSET(socket_handle, sockets_set)
 #define SOCKET_SET_NON_BLOCKING(socket_handle, flags) SOCKET_IOCTL(socket_handle, FIONBIO, &flags)
-#define SOCKET_SET_NO_WAIT(socket_handle, option_value) option_value = 1;\
+#define SOCKET_SET_NO_WAIT(socket_handle, option_value) \
+    option_value = 1;                                   \
     SOCKET_SET_OPTIONS(socket_handle, SOCKET_PROTOCOL_TCP, TCP_NODELAY, option_value)
-#define SOCKET_SET_KEEPALIVE(socket_handle, option_value) option_value = 1;\
+#define SOCKET_SET_KEEPALIVE(socket_handle, option_value) \
+    option_value = 1;                                     \
     SOCKET_SET_OPTIONS(socket_handle, SOCKET_OPTIONS_LEVEL_SOCKET, SO_KEEPALIVE, option_value)
 #define SOCKET_SET_NO_PUSH(socket_handle, option_value)
 #endif
@@ -149,10 +156,15 @@
 #define SOCKET_CONNECT_SIZE(socket_handle, socket_address, socket_address_size) connect(socket_handle, (struct sockaddr *) &socket_address, socket_address_size)
 #define SOCKET_ACCEPT(socket_handle, socket_address, socket_address_size) accept(socket_handle, (struct sockaddr *) socket_address, &socket_address_size)
 #define SOCKET_CLOSE(socket_handle) close(socket_handle)
-#define SOCKET_ADDRESS_CREATE(socket_address, type, address, port) memset(&socket_address, 0, sizeof(SOCKET_ADDRESS));\
-    socket_address.sin_family = type;\
-    socket_address.sin_port = htons(port);\
-    if(address == NULL) { socket_address.sin_addr.s_addr = INADDR_ANY; } else { socket_address.sin_addr.s_addr = inet_addr(address); }
+#define SOCKET_ADDRESS_CREATE(socket_address, type, address, port) \
+    memset(&socket_address, 0, sizeof(SOCKET_ADDRESS));            \
+    socket_address.sin_family = type;                              \
+    socket_address.sin_port = htons(port);                         \
+    if(address == NULL) {                                          \
+        socket_address.sin_addr.s_addr = INADDR_ANY;               \
+    } else {                                                       \
+        socket_address.sin_addr.s_addr = inet_addr(address);       \
+    }
 #define SOCKET_GET_HOST_BY_NAME(hostname) gethostbyname(hostname)
 #define SOCKET_TEST_SOCKET(socket_handle) socket_handle < 0
 #define SOCKET_TEST_ERROR(result) result < 0
@@ -166,17 +178,21 @@
 #define SOCKET_SET_SET(socket_handle, sockets_set) FD_SET(socket_handle, sockets_set)
 #define SOCKET_SET_CLEAR(socket_handle, sockets_set) FD_CLR(socket_handle, sockets_set)
 #define SOCKET_SET_IS_SET(socket_handle, sockets_set) FD_ISSET(socket_handle, sockets_set)
-#define SOCKET_SET_NON_BLOCKING(socket_handle, flags) if((flags = SOCKET_FCNTL(socket_handle, F_GETFL, 0) == -1)) { flags = 0; }\
+#define SOCKET_SET_NON_BLOCKING(socket_handle, flags)                          \
+    if((flags = SOCKET_FCNTL(socket_handle, F_GETFL, 0) == -1)) { flags = 0; } \
     SOCKET_FCNTL(socket_handle, F_SETFL, flags | O_NONBLOCK)
-#define SOCKET_SET_NO_WAIT(socket_handle, option_value) option_value = 1;\
+#define SOCKET_SET_NO_WAIT(socket_handle, option_value) \
+    option_value = 1;                                   \
     SOCKET_SET_OPTIONS(socket_handle, SOCKET_PROTOCOL_TCP, TCP_NODELAY, option_value)
-#define SOCKET_SET_KEEPALIVE(socket_handle, option_value) option_value = 1;\
+#define SOCKET_SET_KEEPALIVE(socket_handle, option_value) \
+    option_value = 1;                                     \
     SOCKET_SET_OPTIONS(socket_handle, SOCKET_OPTIONS_LEVEL_SOCKET, SO_KEEPALIVE, option_value)
 #ifdef TCP_CORK
 #define TCP_NOPUSH TCP_CORK
 #endif
 #ifdef TCP_NOPUSH
-#define SOCKET_SET_NO_PUSH(socket_handle, option_value) option_value = 0;\
+#define SOCKET_SET_NO_PUSH(socket_handle, option_value) \
+    option_value = 0;                                   \
     SOCKET_SET_OPTIONS(socket_handle, SOCKET_PROTOCOL_TCP, TCP_NOPUSH, option_value)
 #else
 #define SOCKET_SET_NO_PUSH(socket_handle, option_value)

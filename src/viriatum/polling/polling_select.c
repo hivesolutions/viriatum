@@ -492,9 +492,9 @@ ERROR_CODE _poll_polling_select(
         /* in case the current connection socket handle is set in
         the sockets read ready set */
         if(SOCKET_SET_IS_SET(
-            current_connection->socket_handle,
-            &polling_select->sockets_read_set_temporary
-        ) > 0)  {
+               current_connection->socket_handle,
+               &polling_select->sockets_read_set_temporary
+           ) > 0) {
             /* sets the current connection in the read connections */
             read_connections[read_index] = current_connection;
 
@@ -507,9 +507,9 @@ ERROR_CODE _poll_polling_select(
         /* in case the current connection socket handle is set in
         the sockets write ready set */
         if(SOCKET_SET_IS_SET(
-            current_connection->socket_handle,
-            &polling_select->sockets_write_set_temporary
-        ) > 0)  {
+               current_connection->socket_handle,
+               &polling_select->sockets_write_set_temporary
+           ) > 0) {
             /* sets the current connection in the write connections */
             write_connections[write_index] = current_connection;
 
@@ -522,9 +522,9 @@ ERROR_CODE _poll_polling_select(
         /* in case the current connection socket handle is set in
         the sockets error ready set */
         if(SOCKET_SET_IS_SET(
-            current_connection->socket_handle,
-            &polling_select->sockets_error_set_temporary
-        ) > 0)  {
+               current_connection->socket_handle,
+               &polling_select->sockets_error_set_temporary
+           ) > 0) {
             /* sets the current connection in the error connections */
             error_connections[error_index] = current_connection;
 
@@ -600,7 +600,7 @@ ERROR_CODE _call_polling_select(
         section and the handshake handler is correctly set (must
         call it to initialize the connection) */
         if(current_connection->status == STATUS_HANDSHAKE &&
-            current_connection->on_handshake != NULL) {
+           current_connection->on_handshake != NULL) {
             /* prints a series of debug messages about the handshake
             operation in it and then calls the hadhaske handler */
             V_DEBUG("Calling on handshake handler\n");
@@ -611,7 +611,7 @@ ERROR_CODE _call_polling_select(
         /* in case the current connection is open and the read
         handler is correctly set (must call it) */
         if(current_connection->status == STATUS_OPEN &&
-            current_connection->on_read != NULL) {
+           current_connection->on_read != NULL) {
             /* prints a series of debug messages and then calls the
             correct on read handler for the notification */
             V_DEBUG("Calling on read handler\n");
@@ -641,7 +641,7 @@ ERROR_CODE _call_polling_select(
 
         /* in case the current connection is open */
         if(current_connection->status == STATUS_OPEN &&
-            current_connection->on_write != NULL) {
+           current_connection->on_write != NULL) {
             /* prints a series of debug messages and then calls the
             correct on write handler for the notification */
             V_DEBUG("Calling on write handler\n");
@@ -663,7 +663,7 @@ ERROR_CODE _call_polling_select(
 
         /* in case the current connection is open */
         if(current_connection->status == STATUS_OPEN &&
-            current_connection->on_error != NULL) {
+           current_connection->on_error != NULL) {
             /* prints a series of debug messages and then calls the
             correct on error handler for the notification */
             V_DEBUG("Calling on error handler\n");
@@ -750,7 +750,7 @@ ERROR_CODE _outstanding_polling_select(
         /* in case the current connection is open and the on read
         event handler is set performs the read call */
         if(current_connection->status == STATUS_OPEN &&
-            current_connection->on_read != NULL) {
+           current_connection->on_read != NULL) {
             /* prints a series of debug messages and then calls the
             correct on read handler for the notification */
             V_DEBUG("Calling on read handler\n");
@@ -780,7 +780,7 @@ ERROR_CODE _outstanding_polling_select(
         /* in case the current connection is open and the on write
         event handler is set performs the write call */
         if(current_connection->status == STATUS_OPEN &&
-            current_connection->on_write != NULL) {
+           current_connection->on_write != NULL) {
             /* prints a series of debug messages and then calls the
             correct on write handler for the notification */
             V_DEBUG("Calling on write handler\n");

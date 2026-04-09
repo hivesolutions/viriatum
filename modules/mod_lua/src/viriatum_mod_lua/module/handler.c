@@ -226,11 +226,17 @@ ERROR_CODE header_field_callback_handler_lua(struct http_parser_t *http_parser, 
     /* checks if the current header is a valid "capturable"
     header in such case changes the next header value accordingly
     otherwise sets the undefined header */
-    if(data_size == 12 && memcmp(data, CONTENT_TYPE_H, data_size) == 0) { handler_lua_context->_next_header = CONTENT_TYPE; }
-    else if(data_size == 14 && memcmp(data, CONTENT_LENGTH_H, data_size) == 0) { handler_lua_context->_next_header = CONTENT_LENGTH; }
-    else if(data_size == 6 && memcmp(data, COOKIE_H, data_size) == 0) { handler_lua_context->_next_header = COOKIE; }
-    else if(data_size == 4 && memcmp(data, HOST_H, data_size) == 0) { handler_lua_context->_next_header = HOST; }
-    else { handler_lua_context->_next_header = UNDEFINED_HEADER; }
+    if(data_size == 12 && memcmp(data, CONTENT_TYPE_H, data_size) == 0) {
+        handler_lua_context->_next_header = CONTENT_TYPE;
+    } else if(data_size == 14 && memcmp(data, CONTENT_LENGTH_H, data_size) == 0) {
+        handler_lua_context->_next_header = CONTENT_LENGTH;
+    } else if(data_size == 6 && memcmp(data, COOKIE_H, data_size) == 0) {
+        handler_lua_context->_next_header = COOKIE;
+    } else if(data_size == 4 && memcmp(data, HOST_H, data_size) == 0) {
+        handler_lua_context->_next_header = HOST;
+    } else {
+        handler_lua_context->_next_header = UNDEFINED_HEADER;
+    }
 
     /* raise no error */
     RAISE_NO_ERROR;
@@ -306,8 +312,11 @@ ERROR_CODE header_value_callback_handler_lua(struct http_parser_t *http_parser, 
             /* tries to find the port part of the host in case
             it's possible sets the base data size for the server name */
             pointer = strchr((char *) handler_lua_context->host, ':');
-            if(pointer == NULL) { _data_size = data_size; }
-            else { _data_size = pointer - (char *) handler_lua_context->host; }
+            if(pointer == NULL) {
+                _data_size = data_size;
+            } else {
+                _data_size = pointer - (char *) handler_lua_context->host;
+            }
 
             /* copies the server name header value into the
             appropriate buffer in the Lua context */
@@ -356,10 +365,7 @@ ERROR_CODE message_complete_callback_handler_lua(struct http_parser_t *http_pars
         logging, then logs the error at warning level for visibility */
         handler_lua_context =
             (struct handler_lua_context_t *) http_parser->context;
-        V_WARNING_CTX_F("mod_lua", "Lua error for %s: %s\n",
-            handler_lua_context ? (char *) handler_lua_context->url : "/",
-            (char *) GET_ERROR()
-        );
+        V_WARNING_CTX_F("mod_lua", "Lua error for %s: %s\n", handler_lua_context ? (char *) handler_lua_context->url : "/", (char *) GET_ERROR());
         _write_error_connection_lua(http_parser, (char *) GET_ERROR());
     }
 
@@ -701,21 +707,51 @@ ERROR_CODE _send_response_handler_lua(struct http_parser_t *http_parser) {
 
     /* determines the status message based on the status code */
     switch(status_code) {
-        case 200: status_message = "OK"; break;
-        case 201: status_message = "Created"; break;
-        case 204: status_message = "No Content"; break;
-        case 301: status_message = "Moved Permanently"; break;
-        case 302: status_message = "Found"; break;
-        case 304: status_message = "Not Modified"; break;
-        case 400: status_message = "Bad Request"; break;
-        case 401: status_message = "Unauthorized"; break;
-        case 403: status_message = "Forbidden"; break;
-        case 404: status_message = "Not Found"; break;
-        case 405: status_message = "Method Not Allowed"; break;
-        case 500: status_message = "Internal Server Error"; break;
-        case 502: status_message = "Bad Gateway"; break;
-        case 503: status_message = "Service Unavailable"; break;
-        default: status_message = "Unknown"; break;
+        case 200:
+            status_message = "OK";
+            break;
+        case 201:
+            status_message = "Created";
+            break;
+        case 204:
+            status_message = "No Content";
+            break;
+        case 301:
+            status_message = "Moved Permanently";
+            break;
+        case 302:
+            status_message = "Found";
+            break;
+        case 304:
+            status_message = "Not Modified";
+            break;
+        case 400:
+            status_message = "Bad Request";
+            break;
+        case 401:
+            status_message = "Unauthorized";
+            break;
+        case 403:
+            status_message = "Forbidden";
+            break;
+        case 404:
+            status_message = "Not Found";
+            break;
+        case 405:
+            status_message = "Method Not Allowed";
+            break;
+        case 500:
+            status_message = "Internal Server Error";
+            break;
+        case 502:
+            status_message = "Bad Gateway";
+            break;
+        case 503:
+            status_message = "Service Unavailable";
+            break;
+        default:
+            status_message = "Unknown";
+            break;
     }
 
     /* allocates space for the header buffer and then writes the default values
@@ -787,11 +823,17 @@ ERROR_CODE _send_response_handler_lua(struct http_parser_t *http_parser) {
             result_code = lua_pcall(*lua_state_pointer, 0, 1, 0);
 
             /* in case of error breaks the iteration cycle */
-            if(LUA_ERROR(result_code)) { lua_pop(*lua_state_pointer, 1); break; }
+            if(LUA_ERROR(result_code)) {
+                lua_pop(*lua_state_pointer, 1);
+                break;
+            }
 
             /* in case the result is nil this is the end of the
             iteration cycle and so the loop must be broken */
-            if(lua_isnil(*lua_state_pointer, -1)) { lua_pop(*lua_state_pointer, 1); break; }
+            if(lua_isnil(*lua_state_pointer, -1)) {
+                lua_pop(*lua_state_pointer, 1);
+                break;
+            }
 
             /* retrieves the current chunk as a string and adds
             it to the Lua buffer for later concatenation */
@@ -955,8 +997,11 @@ ERROR_CODE _start_environ_lua(lua_State *lua_state, struct http_parser_t *http_p
 
     /* in case there is contents to be read retrieves the appropriate
     reference to the start of the post data in the connection buffer */
-    if(http_parser->_content_length > 0) { post_data = &http_connection->buffer[http_connection->buffer_offset - http_parser->_content_length];
-    } else { post_data = NULL; }
+    if(http_parser->_content_length > 0) {
+        post_data = &http_connection->buffer[http_connection->buffer_offset - http_parser->_content_length];
+    } else {
+        post_data = NULL;
+    }
 
     /* creates a new table to hold the WSAPI environ dictionary */
     lua_newtable(lua_state);

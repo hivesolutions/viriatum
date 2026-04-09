@@ -31,32 +31,32 @@
 
 #define TEMPLATE_MARK(FOR) TEMPLATE_MARK_N(FOR, 0)
 #define TEMPLATE_MARK_BACK(FOR) TEMPLATE_MARK_N(FOR, 1)
-#define TEMPLATE_MARK_N(FOR, N)\
-    do {\
-        FOR##_mark = pointer - N;\
+#define TEMPLATE_MARK_N(FOR, N)   \
+    do {                          \
+        FOR##_mark = pointer - N; \
     } while(0)
 
-#define TEMPLATE_CALLBACK(FOR)\
-    do {\
-        if(template_settings->on_##FOR) {\
-            if(template_settings->on_##FOR(template_engine) != 0) {\
+#define TEMPLATE_CALLBACK(FOR)                                                                              \
+    do {                                                                                                    \
+        if(template_settings->on_##FOR) {                                                                   \
+            if(template_settings->on_##FOR(template_engine) != 0) {                                         \
                 RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem handling callback"); \
-            }\
-        }\
+            }                                                                                               \
+        }                                                                                                   \
     } while(0)
 
 #define TEMPLATE_CALLBACK_DATA(FOR) TEMPLATE_CALLBACK_DATA_N(FOR, 0)
 #define TEMPLATE_CALLBACK_DATA_BACK(FOR) TEMPLATE_CALLBACK_DATA_N(FOR, 1)
-#define TEMPLATE_CALLBACK_DATA_N(FOR, N)\
-    do {\
-        if(FOR##_mark) {\
-            if(template_settings->on_##FOR) {\
-                if(template_settings->on_##FOR(template_engine, FOR##_mark, pointer - FOR##_mark - N) != 0) {\
+#define TEMPLATE_CALLBACK_DATA_N(FOR, N)                                                                        \
+    do {                                                                                                        \
+        if(FOR##_mark) {                                                                                        \
+            if(template_settings->on_##FOR) {                                                                   \
+                if(template_settings->on_##FOR(template_engine, FOR##_mark, pointer - FOR##_mark - N) != 0) {   \
                     RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem handling callback"); \
-                }\
-            }\
-            FOR##_mark = NULL;\
-        }\
+                }                                                                                               \
+            }                                                                                                   \
+            FOR##_mark = NULL;                                                                                  \
+        }                                                                                                       \
     } while(0)
 
 struct template_engine_t;
@@ -65,13 +65,13 @@ struct template_engine_t;
  * The "default" callback function to be used, without
  * any extra arguments.
  */
-typedef ERROR_CODE (*template_callback) (struct template_engine_t *);
+typedef ERROR_CODE (*template_callback)(struct template_engine_t *);
 
 /**
  * Callback function type used for callbacks that require
  * "extra" data to be send as argument.
  */
-typedef ERROR_CODE (*template_data_callback) (struct template_engine_t *, const unsigned char *, size_t);
+typedef ERROR_CODE (*template_data_callback)(struct template_engine_t *, const unsigned char *, size_t);
 
 /**
  * Enumeration defining all the states occurring

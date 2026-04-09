@@ -142,7 +142,7 @@ ERROR_CODE stop_module_wsgi(struct environment_t *environment, struct module_t *
     struct service_t *service = environment->service;
 
     /* retrieves the mod WSGI module (from the module) */
-    struct mod_wsgi_module_t *mod_wsgi_module = (struct  mod_wsgi_module_t *) module->lower;
+    struct mod_wsgi_module_t *mod_wsgi_module = (struct mod_wsgi_module_t *) module->lower;
 
     /* retrieves the HTTP handler from the mod WSGI module */
     struct http_handler_t *http_handler = mod_wsgi_module->http_handler;
@@ -274,8 +274,7 @@ ERROR_CODE _load_locations_wsgi(struct service_t *service, struct mod_wsgi_http_
     that will be used to resolve the WSGI request */
     mod_wsgi_http_handler->locations = (struct mod_wsgi_location_t *)
         MALLOC(service->locations.count * sizeof(struct mod_wsgi_location_t));
-    memset(mod_wsgi_http_handler->locations, 0,
-        service->locations.count * sizeof(struct mod_wsgi_location_t));
+    memset(mod_wsgi_http_handler->locations, 0, service->locations.count * sizeof(struct mod_wsgi_location_t));
 
     /* updates the locations count variable in the WSGI handler so
     that it's possible to iterate over the locations */

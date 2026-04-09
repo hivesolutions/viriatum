@@ -189,8 +189,7 @@ ERROR_CODE register_handler_proxy(struct service_t *service) {
     that will be used to resolve the proxy request */
     proxy_handler->locations = (struct proxy_location_t *)
         MALLOC(service->locations.count * sizeof(struct proxy_location_t));
-    memset(proxy_handler->locations, 0,
-        service->locations.count * sizeof(struct proxy_location_t));
+    memset(proxy_handler->locations, 0, service->locations.count * sizeof(struct proxy_location_t));
 
     /* updates the locations count variable in the proxy handler so
     that it's possible to iterate over the locations */
@@ -578,8 +577,7 @@ ERROR_CODE virtual_url_callback_handler_proxy(struct http_parser_t *http_parser,
             &handler_proxy_context->connection_c,
             connection->service,
             handler_proxy_context->url_s.host,
-            handler_proxy_context->url_s.port ?
-                handler_proxy_context->url_s.port : 80
+            handler_proxy_context->url_s.port ? handler_proxy_context->url_s.port : 80
         );
         if(IS_ERROR_CODE(return_value)) {
             V_ERROR_F("Problem connecting to backend (%s)\n", (char *) GET_ERROR());
@@ -868,7 +866,7 @@ ERROR_CODE headers_complete_callback_backend(struct http_parser_t *http_parser) 
     disables the read operations in the backend connection (avoids flooding) */
     handler_proxy_context->pending_write += handler_proxy_context->out_buffer_size;
     if(connection_c != NULL && connection_c->read_registered == TRUE &&
-        handler_proxy_context->pending_write >= VIRIATUM_MAX_READ) {
+       handler_proxy_context->pending_write >= VIRIATUM_MAX_READ) {
         connection_c->unregister_read(connection_c);
     }
 
@@ -904,7 +902,7 @@ ERROR_CODE body_callback_backend(struct http_parser_t *http_parser, const unsign
     disables the read operations in the backend connection (avoids flooding) */
     handler_proxy_context->pending_write += data_size;
     if(connection_c->read_registered == TRUE &&
-        handler_proxy_context->pending_write >= VIRIATUM_MAX_READ) {
+       handler_proxy_context->pending_write >= VIRIATUM_MAX_READ) {
         connection_c->unregister_read(connection_c);
     }
 
@@ -1038,7 +1036,7 @@ ERROR_CODE _pending_handler_proxy(struct connection_t *connection, struct data_t
     of bytes pending has reached a resonable level re-enabled thre reading */
     handler_proxy_context->pending_write -= data->size_base;
     if(connection_c != NULL && connection_c->read_registered == FALSE &&
-        handler_proxy_context->pending_write < VIRIATUM_TRE_READ) {
+       handler_proxy_context->pending_write < VIRIATUM_TRE_READ) {
         connection_c->register_read(connection_c);
     }
 
@@ -1076,8 +1074,11 @@ ERROR_CODE _cleanup_handler_proxy(struct connection_t *connection, struct data_t
     releases the lock on the HTTP connection, this will allow further
     messages to be processed, an update event should raised following this
     lock releasing call */
-    if(!keep_alive) { connection->close_connection(connection); }
-    else { http_connection->release(http_connection); }
+    if(!keep_alive) {
+        connection->close_connection(connection);
+    } else {
+        http_connection->release(http_connection);
+    }
 
     /* raise no error */
     RAISE_NO_ERROR;

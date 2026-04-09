@@ -31,4 +31,4 @@
  * The basic global function used when providing no arguments
  * and not returning any value.
  */
-typedef void (*base_void) (void);
+typedef void (*base_void)(void);

@@ -117,7 +117,7 @@ ERROR_CODE stop_module_diag(struct environment_t *environment, struct module_t *
 
     /* retrieves the mod diag module (from the module) and uses
     it to retrieve the create HTTP handler */
-    struct mod_diag_module_t *mod_diag_module = (struct  mod_diag_module_t *) module->lower;
+    struct mod_diag_module_t *mod_diag_module = (struct mod_diag_module_t *) module->lower;
     struct http_handler_t *http_handler = mod_diag_module->http_handler;
 
     /* prints a debug message about the unloading of the current

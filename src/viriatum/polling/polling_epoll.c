@@ -215,7 +215,6 @@ ERROR_CODE register_read_polling_epoll(struct polling_t *polling, struct connect
     struct polling_epoll_t *polling_epoll =
         (struct polling_epoll_t *) polling->lower;
 
-
     /* allocates space for the result of the poll call
     to add a new element to the poll structure */
     SOCKET_ERROR_CODE result_code;
@@ -322,7 +321,7 @@ ERROR_CODE register_write_polling_epoll(struct polling_t *polling, struct connec
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE unregister_write_polling_epoll(struct polling_t *polling, struct connection_t *connection)  {
+ERROR_CODE unregister_write_polling_epoll(struct polling_t *polling, struct connection_t *connection) {
     /* raises no error */
     RAISE_NO_ERROR;
 }
@@ -585,7 +584,7 @@ ERROR_CODE _call_polling_epoll(
         section and the handshake handler is correctly set (must
         call it to initialize the connection) */
         if(current_connection->status == STATUS_HANDSHAKE &&
-            current_connection->on_handshake != NULL) {
+           current_connection->on_handshake != NULL) {
             /* prints a series of debug messages about the handshake
             operation in it and then calls the hadhaske handler */
             V_DEBUG("Calling on handshake handler\n");
@@ -596,7 +595,7 @@ ERROR_CODE _call_polling_epoll(
         /* in case the current connection is open and the read
         handler is correctly set (must call it) */
         if(current_connection->status == STATUS_OPEN &&
-            current_connection->on_read != NULL) {
+           current_connection->on_read != NULL) {
             /* prints a series of debug messages and then calls the
             correct on read handler for the notification */
             V_DEBUG("Calling on read handler\n");
@@ -626,7 +625,7 @@ ERROR_CODE _call_polling_epoll(
 
         /* in case the current connection is open */
         if(current_connection->status == STATUS_OPEN &&
-            current_connection->on_write != NULL) {
+           current_connection->on_write != NULL) {
             /* prints a series of debug messages and then calls the
             correct on write handler for the notification */
             V_DEBUG("Calling on write handler\n");
@@ -648,7 +647,7 @@ ERROR_CODE _call_polling_epoll(
 
         /* in case the current connection is open */
         if(current_connection->status == STATUS_OPEN &&
-            current_connection->on_error != NULL) {
+           current_connection->on_error != NULL) {
             /* prints a series of debug messages and then calls the
             correct on error handler for the notification */
             V_DEBUG("Calling on error handler\n");
@@ -735,7 +734,7 @@ ERROR_CODE _outstanding_polling_epoll(
         /* in case the current connection is open and the on read
         event handler is set performs the read call */
         if(current_connection->status == STATUS_OPEN &&
-            current_connection->on_read != NULL) {
+           current_connection->on_read != NULL) {
             /* prints a series of debug messages and then calls the
             correct on read handler for the notification */
             V_DEBUG("Calling on read handler\n");
@@ -765,7 +764,7 @@ ERROR_CODE _outstanding_polling_epoll(
         /* in case the current connection is open and the on write
         event handler is set performs the write call */
         if(current_connection->status == STATUS_OPEN &&
-            current_connection->on_write != NULL) {
+           current_connection->on_write != NULL) {
             /* prints a series of debug messages and then calls the
             correct on write handler for the notification */
             V_DEBUG("Calling on write handler\n");

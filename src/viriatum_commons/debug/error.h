@@ -43,13 +43,23 @@
 
 #define ERROR_CODE unsigned int
 #define RAISE_AGAIN(error_code) return error_code
-#define RAISE_ERROR(error_code) unset_last_error_message(); return error_code
-#define RAISE_ERROR_M(error_code, error_message) set_last_error_message(error_message); return error_code
-#define RAISE_ERROR_F(error_code, error_message, ...) set_last_error_message_f(error_message, __VA_ARGS__); return error_code
+#define RAISE_ERROR(error_code) \
+    unset_last_error_message(); \
+    return error_code
+#define RAISE_ERROR_M(error_code, error_message) \
+    set_last_error_message(error_message);       \
+    return error_code
+#define RAISE_ERROR_F(error_code, error_message, ...)     \
+    set_last_error_message_f(error_message, __VA_ARGS__); \
+    return error_code
 #define RAISE_ERROR_S(error_code) return error_code
 #define RAISE_NO_ERROR return 0
-#define CATCH_ERROR V_WARNING_F("%s\n", get_last_error_message_safe()); unset_last_error_message()
-#define CATCH_ERROR_R CATCH_ERROR; return 0
+#define CATCH_ERROR                                     \
+    V_WARNING_F("%s\n", get_last_error_message_safe()); \
+    unset_last_error_message()
+#define CATCH_ERROR_R \
+    CATCH_ERROR;      \
+    return 0
 #define RESET_ERROR unset_last_error_message()
 #define IS_ERROR_CODE(error_code) (error_code != 0)
 #define GET_ERROR get_last_error_message_safe

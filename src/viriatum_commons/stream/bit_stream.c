@@ -202,10 +202,11 @@ void seek_bit_stream(
             the counter and the current index values accordingly taking already into account
             that a new value is going to be read from the buffer */
             bit_stream->byte_counter_read = stream->read(
-                stream,
-                bit_stream->buffer,
-                BIT_STREAM_BUFFER_SIZE
-            ) - 1;
+                                                stream,
+                                                bit_stream->buffer,
+                                                BIT_STREAM_BUFFER_SIZE
+                                            ) -
+                                            1;
             bit_stream->byte_current_read = 1;
         }
         /* otherwise the only the read buffer is moved back without having to
@@ -255,7 +256,10 @@ void read_byte_bit_stream(
     /* in case the requested size is zero this is a special case
     and so the byte is set to zero and the control flow is returned
     immediately to the caller function */
-    if(size == 0) { *byte = 0; return; }
+    if(size == 0) {
+        *byte = 0;
+        return;
+    }
 
     /* runs the initial read flush operation in the bit stream, because
     there may be some pending read operations pending from previous
@@ -275,7 +279,9 @@ void read_byte_bit_stream(
 
     /* otherwise the number of extra bits is zero, the value
     must then be reset to the invalid (zero value) */
-    else { extra_bits_count = 0; }
+    else {
+        extra_bits_count = 0;
+    }
 
     /* calculates the amount of bits that are going to be used in
     the shift operation of the current byte and then uses it to move
@@ -334,7 +340,7 @@ void write_byte_bit_stream(
     /* calculates the number of available bits (count) and
     then uses it to calculate the number of extra bits */
     unsigned char available_bits_count = BIT_STREAM_ITEM_SIZE -
-        bit_stream->current_byte_offset_write;
+                                         bit_stream->current_byte_offset_write;
     unsigned char extra_bits_count = size - available_bits_count;
 
     /* in case the requested size is zero this is a special case
@@ -348,7 +354,9 @@ void write_byte_bit_stream(
 
     /* otherwise the number of extra bits is zero, the value
     must then be reset to the invalid (zero value) */
-    else { extra_bits_count = 0; }
+    else {
+        extra_bits_count = 0;
+    }
 
     /* shifts the current byte value (by the write size) */
     bit_stream->current_byte_write <<= size;
@@ -456,8 +464,7 @@ void _write_bit_stream(struct bit_stream_t *bit_stream) {
     if(bit_stream->current_byte_offset_write > 0) {
         /* sets the write buffer value */
         bit_stream->buffer[bit_stream->byte_counter_write] =
-            bit_stream->current_byte_write <<
-            (BIT_STREAM_ITEM_SIZE - bit_stream->current_byte_offset_write);
+            bit_stream->current_byte_write << (BIT_STREAM_ITEM_SIZE - bit_stream->current_byte_offset_write);
 
         /* resets the various bit stream write
         byte oriented structures */

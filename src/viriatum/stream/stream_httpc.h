@@ -37,7 +37,7 @@ struct http_client_connection_t;
  * @param http_client_connection The HTTP client connection to be
  * update with new information.
  */
-typedef ERROR_CODE (*http_client_connection_update) (struct http_client_connection_t *http_client_connection);
+typedef ERROR_CODE (*http_client_connection_update)(struct http_client_connection_t *http_client_connection);
 
 /**
  * Structure defining a logical
@@ -77,7 +77,7 @@ typedef struct http_client_parameters_t {
     enum http_method_e method;
     enum http_version_e version;
 
-   /*parameters->on_open = NULL !!!!*/
+    /*parameters->on_open = NULL !!!!*/
     /*parameters->on_data */
     /*parameters->on_close */
 } http_client_parameters;

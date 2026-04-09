@@ -62,6 +62,5 @@ VIRIATUM_EXPORT_PREFIX void delete_buffer(struct buffer_t *buffer);
 VIRIATUM_EXPORT_PREFIX char *to_string_buffer(struct buffer_t *buffer);
 
 static __inline char equals_buffer(struct buffer_t *buffer, struct buffer_t *target) {
-    return buffer->size == target->size
-        && memcmp(buffer->pointer, target->pointer, buffer->size) == 0;
+    return buffer->size == target->size && memcmp(buffer->pointer, target->pointer, buffer->size) == 0;
 }

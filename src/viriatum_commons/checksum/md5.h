@@ -35,12 +35,12 @@
 #define H(x, y, z) ((x) ^ (y) ^ (z))
 #define I(x, y, z) ((y) ^ ((x) | ~(z)))
 
-#define STEP(f, a, b, c, d, x, t, s)\
-    (a) += f((b), (c), (d)) + (x) + (t);\
-    (a) = (((a) << (s)) | (((a) & 0xffffffff) >> (32 - (s))));\
+#define STEP(f, a, b, c, d, x, t, s)                           \
+    (a) += f((b), (c), (d)) + (x) + (t);                       \
+    (a) = (((a) << (s)) | (((a) & 0xffffffff) >> (32 - (s)))); \
     (a) += (b);
 
-#define SET(n) (*(unsigned int *)&pointer[(n) * 4])
+#define SET(n) (*(unsigned int *) &pointer[(n) * 4])
 #define GET(n) SET(n)
 
 /**

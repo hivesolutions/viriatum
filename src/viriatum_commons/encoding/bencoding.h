@@ -30,38 +30,38 @@
 
 #define BENCODING_MARK(FOR) BENCODING_MARK_N(FOR, 0)
 #define BENCODING_MARK_BACK(FOR) BENCODING_MARK_N(FOR, 1)
-#define BENCODING_MARK_N(FOR, N)\
-    do {\
-        FOR##_mark = pointer - N;\
+#define BENCODING_MARK_N(FOR, N)  \
+    do {                          \
+        FOR##_mark = pointer - N; \
     } while(0)
 
-#define BENCODING_CALLBACK(FOR)\
-    do {\
-        if(bencoding_engine->settings.on_##FOR) {\
-            if(bencoding_engine->settings.on_##FOR(bencoding_engine) != 0) {\
+#define BENCODING_CALLBACK(FOR)                                                                             \
+    do {                                                                                                    \
+        if(bencoding_engine->settings.on_##FOR) {                                                           \
+            if(bencoding_engine->settings.on_##FOR(bencoding_engine) != 0) {                                \
                 RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem handling callback"); \
-            }\
-        }\
+            }                                                                                               \
+        }                                                                                                   \
     } while(0)
 
 #define BENCODING_CALLBACK_DATA(FOR) BENCODING_CALLBACK_DATA_N(FOR, 0)
 #define BENCODING_CALLBACK_DATA_BACK(FOR) BENCODING_CALLBACK_DATA_N(FOR, 1)
-#define BENCODING_CALLBACK_DATA_N(FOR, N)\
-    do {\
-        if(FOR##_mark) {\
-            if(bencoding_engine->settings.on_##FOR) {\
-                if(bencoding_engine->settings.on_##FOR(bencoding_engine, FOR##_mark, pointer - FOR##_mark - N) != 0) {\
-                    RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem handling callback"); \
-                }\
-            }\
-            FOR##_mark = NULL;\
-        }\
+#define BENCODING_CALLBACK_DATA_N(FOR, N)                                                                              \
+    do {                                                                                                               \
+        if(FOR##_mark) {                                                                                               \
+            if(bencoding_engine->settings.on_##FOR) {                                                                  \
+                if(bencoding_engine->settings.on_##FOR(bencoding_engine, FOR##_mark, pointer - FOR##_mark - N) != 0) { \
+                    RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem handling callback");        \
+                }                                                                                                      \
+            }                                                                                                          \
+            FOR##_mark = NULL;                                                                                         \
+        }                                                                                                              \
     } while(0)
 
 struct bencoding_engine_t;
 
-typedef ERROR_CODE (*bencoding_callback) (struct bencoding_engine_t *);
-typedef ERROR_CODE (*bencoding_data_callback) (struct bencoding_engine_t *, const unsigned char *, size_t);
+typedef ERROR_CODE (*bencoding_callback)(struct bencoding_engine_t *);
+typedef ERROR_CODE (*bencoding_data_callback)(struct bencoding_engine_t *, const unsigned char *, size_t);
 
 typedef enum bencoding_state_e {
     BENCODING_ENGINE_NORMAL = 1,

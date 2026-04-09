@@ -572,7 +572,10 @@ ERROR_CODE write_handler_stream_io(struct connection_t *connection) {
 
         /* in case the connection has been closed sets the
         error flag to non fatal and then breaks the loop */
-        if(connection->status == STATUS_CLOSED) { error = 2; break; }
+        if(connection->status == STATUS_CLOSED) {
+            error = 2;
+            break;
+        }
     }
 
     /* prints a debug message */

@@ -139,7 +139,7 @@ ERROR_CODE stop_module_php(struct environment_t *environment, struct module_t *m
     struct service_t *service = environment->service;
 
     /* retrieves the mod PHP module (from the module) */
-    struct mod_php_module_t *mod_php_module = (struct  mod_php_module_t *) module->lower;
+    struct mod_php_module_t *mod_php_module = (struct mod_php_module_t *) module->lower;
 
     /* retrieves the HTTP handler from the mod PHP module */
     struct http_handler_t *http_handler = mod_php_module->http_handler;
@@ -294,14 +294,14 @@ ERROR_CODE _reload_php_state() {
 }
 
 #ifdef _MSC_VER
-#pragma warning(disable:4700)
+#pragma warning(disable : 4700)
 #endif
 ERROR_CODE _start_php_state() {
     /* raises no error */
     RAISE_NO_ERROR;
 }
 #ifdef _MSC_VER
-#pragma warning(default:4700)
+#pragma warning(default : 4700)
 #endif
 
 size_t _write_php_state(const char *data, size_t data_size) {
@@ -328,9 +328,9 @@ void _log_php_state(const char *message, int syslog_type_int) {
 void _error_php_state(int type, const char *message, ...) {
     /* check if the kind of error is of type critical in such case
     the control flow must be returned immediately */
-    if (type != E_ERROR && type != E_USER_ERROR &&
-        type != E_CORE_ERROR && type != E_PARSE &&
-        type != E_COMPILE_ERROR) {
+    if(type != E_ERROR && type != E_USER_ERROR &&
+       type != E_CORE_ERROR && type != E_PARSE &&
+       type != E_COMPILE_ERROR) {
         return;
     }
 

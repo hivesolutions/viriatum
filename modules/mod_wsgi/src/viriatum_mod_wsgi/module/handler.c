@@ -227,11 +227,17 @@ ERROR_CODE header_field_callback_handler_wsgi(struct http_parser_t *http_parser,
     /* checks if the current header is a valid "capturable"
     header in such case changes the next header value accordingly
     otherwise sets the undefined header */
-    if(memcmp(data, CONTENT_TYPE_H, data_size) == 0) { handler_wsgi_context->_next_header = CONTENT_TYPE; }
-    else if(memcmp(data, CONTENT_LENGTH_H, data_size) == 0) { handler_wsgi_context->_next_header = CONTENT_LENGTH; }
-    else if(memcmp(data, COOKIE_H, data_size) == 0) { handler_wsgi_context->_next_header = COOKIE; }
-    else if(memcmp(data, HOST_H, data_size) == 0) { handler_wsgi_context->_next_header = HOST; }
-    else { handler_wsgi_context->_next_header = UNDEFINED_HEADER; }
+    if(memcmp(data, CONTENT_TYPE_H, data_size) == 0) {
+        handler_wsgi_context->_next_header = CONTENT_TYPE;
+    } else if(memcmp(data, CONTENT_LENGTH_H, data_size) == 0) {
+        handler_wsgi_context->_next_header = CONTENT_LENGTH;
+    } else if(memcmp(data, COOKIE_H, data_size) == 0) {
+        handler_wsgi_context->_next_header = COOKIE;
+    } else if(memcmp(data, HOST_H, data_size) == 0) {
+        handler_wsgi_context->_next_header = HOST;
+    } else {
+        handler_wsgi_context->_next_header = UNDEFINED_HEADER;
+    }
 
     /* raise no error */
     RAISE_NO_ERROR;
@@ -307,8 +313,11 @@ ERROR_CODE header_value_callback_handler_wsgi(struct http_parser_t *http_parser,
             /* tries to find the port part of the host in case
             it's possible sets the base data size for the server name */
             pointer = strchr((char *) handler_wsgi_context->host, ':');
-            if(pointer == NULL) { _data_size = data_size; }
-            else { _data_size = pointer - (char *) handler_wsgi_context->host; }
+            if(pointer == NULL) {
+                _data_size = data_size;
+            } else {
+                _data_size = pointer - (char *) handler_wsgi_context->host;
+            }
 
             /* copies the server name header value into the
             appropriate buffer in the WSGI context */
@@ -356,9 +365,7 @@ ERROR_CODE message_complete_callback_handler_wsgi(struct http_parser_t *http_par
         logging, then logs the error at warning level for visibility */
         struct handler_wsgi_context_t *handler_wsgi_context =
             (struct handler_wsgi_context_t *) http_parser->context;
-        V_WARNING_CTX_F("mod_wsgi", "WSGI error for %s: %s\n",
-            handler_wsgi_context ? (char *) handler_wsgi_context->url : "/",
-            (char *) GET_ERROR());
+        V_WARNING_CTX_F("mod_wsgi", "WSGI error for %s: %s\n", handler_wsgi_context ? (char *) handler_wsgi_context->url : "/", (char *) GET_ERROR());
         _write_error_connection_wsgi(http_parser, (char *) GET_ERROR());
     }
 
@@ -682,14 +689,10 @@ ERROR_CODE _send_response_handler_wsgi(struct http_parser_t *http_parser) {
     /* calculates the various context value according to their various default
     values and the current set values, this allows the handler to work under
     default values for the current execution (fallback values )*/
-    handler_wsgi_context->reload = handler_wsgi_context->reload == UNSET ?
-        mod_wsgi_http_handler->reload : handler_wsgi_context->reload;
-    handler_wsgi_context->module = handler_wsgi_context->module_pointer == NULL ?
-        mod_wsgi_http_handler->module : handler_wsgi_context->module;
-    handler_wsgi_context->module_pointer = handler_wsgi_context->module_pointer == NULL ?
-        &mod_wsgi_http_handler->module : handler_wsgi_context->module_pointer;
-    handler_wsgi_context->module_name = handler_wsgi_context->module_name == NULL ?
-        mod_wsgi_http_handler->module_name : handler_wsgi_context->module_name;
+    handler_wsgi_context->reload = handler_wsgi_context->reload == UNSET ? mod_wsgi_http_handler->reload : handler_wsgi_context->reload;
+    handler_wsgi_context->module = handler_wsgi_context->module_pointer == NULL ? mod_wsgi_http_handler->module : handler_wsgi_context->module;
+    handler_wsgi_context->module_pointer = handler_wsgi_context->module_pointer == NULL ? &mod_wsgi_http_handler->module : handler_wsgi_context->module_pointer;
+    handler_wsgi_context->module_name = handler_wsgi_context->module_name == NULL ? mod_wsgi_http_handler->module_name : handler_wsgi_context->module_name;
 
     /* in case the reload flag is set and the module is already loaded must
     release its memory and unset it from the handler then removes the module
@@ -708,9 +711,9 @@ ERROR_CODE _send_response_handler_wsgi(struct http_parser_t *http_parser) {
         /* retrieves the correct file path for the module to be loaded
         defaulting to the preddefined path in case none is defined */
         file_path = mod_wsgi_http_handler->file_path[0] == '\0'
-            ? DEFAULT_FILE_PATH : mod_wsgi_http_handler->file_path;
-        file_path = handler_wsgi_context->_file_path_string.length > 0 ?
-            (char *) handler_wsgi_context->file_path : file_path;
+                        ? DEFAULT_FILE_PATH
+                        : mod_wsgi_http_handler->file_path;
+        file_path = handler_wsgi_context->_file_path_string.length > 0 ? (char *) handler_wsgi_context->file_path : file_path;
 
         /* creates hte "new" module name for the current module to be
         loaded with the current counter value as the suffix and updates
@@ -737,7 +740,8 @@ ERROR_CODE _send_response_handler_wsgi(struct http_parser_t *http_parser) {
     application to access viriatum WSGI functions */
     wsgi_module = PyImport_ImportModule("viriatum_wsgi");
     if(wsgi_module == NULL) {
-        PyErr_Clear(); VIRIATUM_RELEASE_GIL;
+        PyErr_Clear();
+        VIRIATUM_RELEASE_GIL;
         RAISE_ERROR_M(D_ERROR_CODE, (unsigned char *) "Problem loading (WSGI) module");
     }
 
@@ -747,7 +751,8 @@ ERROR_CODE _send_response_handler_wsgi(struct http_parser_t *http_parser) {
     if(!start_response_function || !PyCallable_Check(start_response_function)) {
         Py_XDECREF(start_response_function);
         Py_DECREF(wsgi_module);
-        PyErr_Clear(); VIRIATUM_RELEASE_GIL;
+        PyErr_Clear();
+        VIRIATUM_RELEASE_GIL;
         RAISE_ERROR_M(D_ERROR_CODE, (unsigned char *) "Problem retrieving (WSGI) function");
     }
 
@@ -770,7 +775,8 @@ ERROR_CODE _send_response_handler_wsgi(struct http_parser_t *http_parser) {
         Py_XDECREF(handler_function);
         Py_DECREF(start_response_function);
         Py_DECREF(wsgi_module);
-        PyErr_Clear(); VIRIATUM_RELEASE_GIL;
+        PyErr_Clear();
+        VIRIATUM_RELEASE_GIL;
         RAISE_ERROR_M(D_ERROR_CODE, (unsigned char *) "Problem retrieving application");
     }
 
@@ -973,8 +979,11 @@ ERROR_CODE _send_response_callback_handler_wsgi(struct connection_t *connection,
     releases the lock on the HTTP connection, this will allow further
     messages to be processed, an update event should raised following this
     lock releasing call */
-    if(!keep_alive) { connection->close_connection(connection); }
-    else { http_connection->release(http_connection); }
+    if(!keep_alive) {
+        connection->close_connection(connection);
+    } else {
+        http_connection->release(http_connection);
+    }
 
     /* raise no error */
     RAISE_NO_ERROR;
@@ -1047,8 +1056,11 @@ ERROR_CODE _start_environ_wsgi(PyObject *environ, struct http_parser_t *http_par
 
     /* in case there is contents to be read retrieves the appropriate
     reference to the start of the post data in the connection buffer */
-    if(http_parser->_content_length > 0) { post_data = &http_connection->buffer[http_connection->buffer_offset - http_parser->_content_length];
-    } else { post_data = NULL; }
+    if(http_parser->_content_length > 0) {
+        post_data = &http_connection->buffer[http_connection->buffer_offset - http_parser->_content_length];
+    } else {
+        post_data = NULL;
+    }
 
     /* iterates over all the headers in order to "export" them
     into the environ dictionary to expose them to the application */
@@ -1211,7 +1223,8 @@ ERROR_CODE _load_module_wsgi(PyObject **module_pointer, char *name, char *file_p
 
     if(code == NULL) {
         V_DEBUG_CTX("mod_wsgi", "Error while compiling module\n");
-        PyErr_Clear(); RAISE_NO_ERROR;
+        PyErr_Clear();
+        RAISE_NO_ERROR;
     }
 
     /* executes the code in the code object provided, retrieving the

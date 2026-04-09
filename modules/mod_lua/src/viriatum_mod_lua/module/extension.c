@@ -27,12 +27,12 @@
 #include "extension.h"
 
 luaL_Reg viriatum_methods[6] = {
-    { "connections", lua_viriatum_connections },
-    { "connections_l", lua_viriatum_connections_l },
-    { "connection_info", lua_viriatum_connection_info },
-    { "uptime", lua_viriatum_uptime },
-    { "modules", lua_viriatum_modules },
-    { NULL, NULL }
+    {"connections", lua_viriatum_connections},
+    {"connections_l", lua_viriatum_connections_l},
+    {"connection_info", lua_viriatum_connection_info},
+    {"uptime", lua_viriatum_uptime},
+    {"modules", lua_viriatum_modules},
+    {NULL, NULL}
 };
 
 int lua_viriatum_connections(lua_State *lua_state) {
