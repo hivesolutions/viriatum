@@ -661,7 +661,7 @@ typedef struct service_options_t {
 } service_options;
 
 /**
- * Enumration definit the various types of socket
+ * Enumeration defining the various types of socket
  * families available for the connections.
  */
 typedef enum connection_family_e {
@@ -1204,6 +1204,20 @@ ERROR_CODE calculate_locations_service(struct service_t *service);
  * @return The resulting error code.
  */
 ERROR_CODE print_options_service(struct service_t *service);
+
+/**
+ * Prints every global configuration value contained in the
+ * service options structure, one value per line at debug level,
+ * intended as a debugging aid after the default, file and
+ * command line option layers have all been applied.
+ *
+ * Output is only produced in debug builds.
+ *
+ * @param service The service whose full options dump should
+ * be written to the default output.
+ * @return The resulting error code.
+ */
+ERROR_CODE debug_options_service(struct service_t *service);
 
 /**
  * Creates a series of worker processes that are going to

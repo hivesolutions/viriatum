@@ -84,6 +84,7 @@ ERROR_CODE init_service(char *program_name, struct hash_map_t *arguments) {
     /* runs the printing operation on the service, this should
     output the information to the standard output */
     print_options_service(service);
+    debug_options_service(service);
 
     /* raises no error to the caller method, normal
     exit operation (should provide no problem) */
