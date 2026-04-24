@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Request path included in dispatch error log messages for easier debugging
 * Module load logging at startup using `V_PRINT_F` showing module name, version and path
 * `debug_options_service` function dumping every `service_options_t` field, one per line, at debug level to show which value won across the default, file and command-line option layers
+* `--wwwroot=<path>` command-line option overriding the root directory from which static files are served, taking precedence over the compile-time default and the `[general] www_root` configuration entry
 * Multi-stage Docker builds for both `Dockerfile` (11 MB) and `Dockerfile.php` (22 MB)
 * `Dockerfile.all` with all 5 modules (diag, gif, lua, php, wsgi) using 4-stage multi-stage build (112 MB)
 * SSL support enabled in `Dockerfile` and `Dockerfile.php` builds

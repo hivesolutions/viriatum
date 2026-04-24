@@ -1999,7 +1999,7 @@ ERROR_CODE _default_options_service(struct service_t *service, struct hash_map_t
     /* unpacks the service options from the service */
     struct service_options_t *service_options = service->options;
 
-    /* sets the varius default service options */
+    /* sets the various default service options */
     service_options->port = VIRIATUM_DEFAULT_PORT;
     service_options->address = (unsigned char *) VIRIATUM_DEFAULT_HOST;
     service_options->address6 = (unsigned char *) VIRIATUM_DEFAULT_HOST6;
@@ -2007,7 +2007,18 @@ ERROR_CODE _default_options_service(struct service_t *service, struct hash_map_t
     service_options->default_index = VIRIATUM_DEFAULT_INDEX;
     service_options->use_template = VIRIATUM_DEFAULT_USE_TEMPLATE;
 
-    /* sets the default and staticaly defined mime type values
+    /* sets the default www root directory from the statically defined values
+    and converts the value to an absolute path */
+    if(VIRIATUM_WWW_ROOT[0] != '\0') {
+        SPRINTF(
+            (char *) service->options->www_root,
+            VIRIATUM_MAX_PATH_SIZE, "%s",
+            VIRIATUM_WWW_ROOT
+        );
+        absolute_path_file((char *) service->options->www_root, TRUE);
+    }
+
+    /* sets the default and statically defined mime type values
     for the evaluation of the basic file extensions */
     set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".323", "text/h323");
     set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".*", "application/octet-stream");
@@ -2399,6 +2410,11 @@ ERROR_CODE _comand_line_options_service(struct service_t *service, struct hash_m
     sets the workers (count) value for the service */
     get_value_string_hash_map(arguments, (unsigned char *) "workers", &value);
     if(value != NULL) { service_options->workers = (unsigned char) atoi(((struct argument_t *) value)->value); }
+
+    /* tries to retrieve the www root argument from the arguments map, then
+    sets the www root override for the contents path in service options */
+    get_value_string_hash_map(arguments, (unsigned char *) "wwwroot", &value);
+    if(value != NULL) { SPRINTF((char *) service_options->www_root, VIRIATUM_MAX_PATH_SIZE, "%s", ((struct argument_t *) value)->value); }
 
     /* raises no error */
     RAISE_NO_ERROR;

@@ -28,23 +28,24 @@
 
 #define HELP_STRING "\
 usage: viriatum [--version] [--port[=<port>] [--host[=<hostname>]] [-ip6]\n\
-                [handler[=<name>]] [workers[=<count>]] [--local] [--ssl]\n\
-                [--daemon] [--test] [--speed] [--help]\n\
+                [handler[=<name>]] [workers[=<count>]] [wwwroot[=<path>]]\n\
+                [--local] [--ssl] [--daemon] [--test] [--speed] [--help]\n\
 \n\
 The most commonly used viriatum commands are:\n\
-   --version  Prints the current version\n\
-   --port     Sets the tcp port to be used as primary\n\
-   --host     Sets the tcp host to bind\n\
-   --ip6      Runs the service with support for ipv6\n\
-   --handler  Name of the handler to be used as default\n\
-   --workers  Defines the amount of worker to be used\n\
-   --local    Runs the service in local mode no internet support\n\
-   --ssl      Listens to the sockets using ssl encryption\n\
-   --daemon   Runs the service as daemon (background)\n\
-   --test     Runs a series of test for viriatum\n\
-   --speed    Runs a series of speed relates tests for viriatum\n\
-   --info     Prints the service information\n\
-   --help     Prints this (help) message\n\
+   --version   Prints the current version\n\
+   --port      Sets the tcp port to be used as primary\n\
+   --host      Sets the tcp host to bind\n\
+   --ip6       Runs the service with support for ipv6\n\
+   --handler   Name of the handler to be used as default\n\
+   --workers   Defines the amount of worker to be used\n\
+   --wwwroot   Sets the root directory from which static files are served\n\
+   --local     Runs the service in local mode no internet support\n\
+   --ssl       Listens to the sockets using ssl encryption\n\
+   --daemon    Runs the service as daemon (background)\n\
+   --test      Runs a series of test for viriatum\n\
+   --speed     Runs a series of speed relates tests for viriatum\n\
+   --info      Prints the service information\n\
+   --help      Prints this (help) message\n\
 \n\
 See 'viriatum --help[=<command>]' for more information on a specific command.\n"
 
