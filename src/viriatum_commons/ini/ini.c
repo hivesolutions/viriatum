@@ -78,20 +78,24 @@ ERROR_CODE process_ini_file(char *file_path, struct sort_map_t **configuration_p
     ini_settings_s.on_value_end = _ini_value_end_callback;
 
     /* sets the configuration reference in the ini handler
-    so that it may be updatd and then sets the handler in
+    so that it may be updated and then sets the handler in
     the ini engine instance to be used for parsing */
     ini_handler_s.configuration = configuration;
     ini_engine_s.context = ini_handler;
 
     /* sets the flag that controls if the trailing space
-    characters should be removesd from key and values */
+    characters should be removes from key and values */
     ini_handler_s.remove_spaces = 1;
 
     /* reads the file contained in the provided file path
     and then tests the error code for error, in case there is an
-    error prints it to the error stream output */
+    error releases the already allocated configuration sort map
+    and clears the output pointer so the caller does not observe
+    a dangling allocation, then re-raises the error */
     return_value = read_file(file_path, &file_buffer, &file_size);
     if(IS_ERROR_CODE(return_value)) {
+        delete_sort_map(configuration);
+        *configuration_pointer = NULL;
         RAISE_ERROR_F(
             RUNTIME_EXCEPTION_ERROR_CODE,
             (unsigned char *) "Problem reading file %s",
