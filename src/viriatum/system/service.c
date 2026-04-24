@@ -409,30 +409,30 @@ ERROR_CODE debug_options_service(struct service_t *service) {
     line, intended for post-load debugging so it is clear
     which value ended up winning across the default, file
     and command line option layers */
-    V_INFO("Service options\n");
-    V_INFO_F("  port                 := %u\n", (unsigned int) options->port);
-    V_INFO_F("  address              := %s\n", options->address != NULL ? (char *) options->address : "(null)");
-    V_INFO_F("  ip6                  := %s\n", options->ip6 ? "on" : "off");
-    V_INFO_F("  address6             := %s\n", options->address6 != NULL ? (char *) options->address6 : "(null)");
-    V_INFO_F("  ssl                  := %s\n", options->ssl ? "on" : "off");
-    V_INFO_F("  ssl_csr              := %s\n", options->ssl_csr != NULL ? (char *) options->ssl_csr : "(null)");
-    V_INFO_F("  ssl_key              := %s\n", options->ssl_key != NULL ? (char *) options->ssl_key : "(null)");
-    V_INFO_F("  handler_name         := %s\n", options->handler_name != NULL ? (char *) options->handler_name : "(null)");
-    V_INFO_F("  local                := %s\n", options->local ? "on" : "off");
-    V_INFO_F("  workers              := %u\n", (unsigned int) options->workers);
-    V_INFO_F("  default_index        := %s\n", options->default_index ? "on" : "off");
-    V_INFO_F("  www_root             := %s\n", options->www_root[0] != '\0' ? (char *) options->www_root : "(unset)");
-    V_INFO_F("  contents_path        := %s\n", options->contents_path);
-    V_INFO_F("  resources_path       := %s\n", options->resources_path);
-    V_INFO_F("  modules_path         := %s\n", options->modules_path);
-    V_INFO_F("  use_template         := %s\n", options->use_template ? "on" : "off");
-    V_INFO_F("  default_virtual_host := %s\n", options->default_virtual_host != NULL ? "(set)" : "(null)");
-    V_INFO_F("  index_count          := %lu\n", (unsigned long) options->index_count);
+    V_DEBUG("Service options\n");
+    V_DEBUG_F("  port                 := %u\n", (unsigned int) options->port);
+    V_DEBUG_F("  address              := %s\n", options->address != NULL ? (char *) options->address : "(null)");
+    V_DEBUG_F("  ip6                  := %s\n", options->ip6 ? "on" : "off");
+    V_DEBUG_F("  address6             := %s\n", options->address6 != NULL ? (char *) options->address6 : "(null)");
+    V_DEBUG_F("  ssl                  := %s\n", options->ssl ? "on" : "off");
+    V_DEBUG_F("  ssl_csr              := %s\n", options->ssl_csr != NULL ? (char *) options->ssl_csr : "(null)");
+    V_DEBUG_F("  ssl_key              := %s\n", options->ssl_key != NULL ? (char *) options->ssl_key : "(null)");
+    V_DEBUG_F("  handler_name         := %s\n", options->handler_name != NULL ? (char *) options->handler_name : "(null)");
+    V_DEBUG_F("  local                := %s\n", options->local ? "on" : "off");
+    V_DEBUG_F("  workers              := %u\n", (unsigned int) options->workers);
+    V_DEBUG_F("  default_index        := %s\n", options->default_index ? "on" : "off");
+    V_DEBUG_F("  www_root             := %s\n", options->www_root[0] != '\0' ? (char *) options->www_root : "(unset)");
+    V_DEBUG_F("  contents_path        := %s\n", options->contents_path);
+    V_DEBUG_F("  resources_path       := %s\n", options->resources_path);
+    V_DEBUG_F("  modules_path         := %s\n", options->modules_path);
+    V_DEBUG_F("  use_template         := %s\n", options->use_template ? "on" : "off");
+    V_DEBUG_F("  default_virtual_host := %s\n", options->default_virtual_host != NULL ? "(set)" : "(null)");
+    V_DEBUG_F("  index_count          := %lu\n", (unsigned long) options->index_count);
     for(index = 0; index < options->index_count; index++) {
-        V_INFO_F("  index[%lu]             := %s\n", (unsigned long) index, (char *) options->index[index]);
+        V_DEBUG_F("  index[%lu]             := %s\n", (unsigned long) index, (char *) options->index[index]);
     }
-    V_INFO_F("  mime_types           := %lu entries\n", options->mime_types != NULL ? (unsigned long) options->mime_types->size : 0UL);
-    V_INFO_F("  virtual_hosts        := %lu entries\n", options->virtual_hosts != NULL ? (unsigned long) options->virtual_hosts->size : 0UL);
+    V_DEBUG_F("  mime_types           := %lu entries\n", options->mime_types != NULL ? (unsigned long) options->mime_types->size : 0UL);
+    V_DEBUG_F("  virtual_hosts        := %lu entries\n", options->virtual_hosts != NULL ? (unsigned long) options->virtual_hosts->size : 0UL);
 
     /* raises no error */
     RAISE_NO_ERROR;
