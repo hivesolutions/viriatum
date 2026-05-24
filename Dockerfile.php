@@ -31,6 +31,12 @@ FROM --platform=linux/amd64 alpine:latest
 
 LABEL version="1.0"
 LABEL maintainer="Hive Solutions <development@hive.pt>"
+LABEL org.opencontainers.image.title="viriatum-php"
+LABEL org.opencontainers.image.description="Hive Viriatum with mod_php (PHP 8 embed SAPI)"
+LABEL org.opencontainers.image.source="https://github.com/hivesolutions/viriatum"
+LABEL org.opencontainers.image.url="https://github.com/hivesolutions/viriatum"
+LABEL org.opencontainers.image.vendor="Hive Solutions"
+LABEL org.opencontainers.image.licenses="Apache-2.0"
 
 EXPOSE 9090
 

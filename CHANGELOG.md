@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * `debug_options_service` function dumping every `service_options_t` field, one per line, at debug level to show which value won across the default, file and command-line option layers
 * `--wwwroot=<path>` command-line option overriding the root directory from which static files are served, taking precedence over the compile-time default and the `[general] www_root` configuration entry
 * GitHub Actions workflows (`.github/workflows/dockerx.yml` and `dockerx-build.yml`) building and pushing `hivesolutions/viriatum` images for `Dockerfile`, `Dockerfile.php` and `Dockerfile.all` to Docker Hub, with multi-arch (386, amd64, armv7, arm64) on the core image and amd64-only on the php/all variants
+* OCI image labels (`org.opencontainers.image.{title,description,source,url,vendor,licenses}`) in all three Dockerfiles, linking the published images back to the GitHub repo and declaring Apache-2.0 licensing for Docker Hub / Docker Scout metadata
 * Multi-stage Docker builds for both `Dockerfile` (11 MB) and `Dockerfile.php` (22 MB)
 * `Dockerfile.all` with all 5 modules (diag, gif, lua, php, wsgi) using 4-stage multi-stage build (112 MB)
 * SSL support enabled in `Dockerfile` and `Dockerfile.php` builds
