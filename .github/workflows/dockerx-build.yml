@@ -1,0 +1,70 @@
+name: DockerX Build (reusable)
+on:
+  workflow_call:
+    inputs:
+      dockerfile:
+        description: "Path to the Dockerfile to build"
+        required: true
+        type: string
+      platforms:
+        description: "Comma-separated list of target platforms"
+        required: true
+        type: string
+      tag_suffix:
+        description: "Suffix appended to the computed base tag (e.g. \"-php\", \"-amd64\")"
+        required: false
+        type: string
+        default: ""
+    secrets:
+      DOCKERHUB_USERNAME:
+        required: true
+      DOCKERHUB_TOKEN:
+        required: true
+jobs:
+  build:
+    name: Build
+    timeout-minutes: 180
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          submodules: true
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Set tag name based on branch
+        id: set_tag
+        run: |
+          if [[ "${{ github.ref_name }}" == "master" ]]; then
+            base_tag="latest"
+          else
+            ref_name=${{ github.ref_name }}
+            base_tag=${ref_name//\//_}
+          fi
+          suffix="${{ inputs.tag_suffix }}"
+          # On master, collapse "latest-php[...]" / "latest-all[...]" down to
+          # "php[...]" / "all[...]" so the legacy variant tags stay consistent
+          if [[ "$base_tag" == "latest" && ( "$suffix" == -php* || "$suffix" == -all* ) ]]; then
+            echo "tag=${suffix#-}" >> $GITHUB_OUTPUT
+          else
+            echo "tag=${base_tag}${suffix}" >> $GITHUB_OUTPUT
+          fi
+      - name: Configure Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ${{ inputs.dockerfile }}
+          platforms: ${{ inputs.platforms }}
+          push: true
+          tags: hivesolutions/viriatum:${{ steps.set_tag.outputs.tag }}
+          provenance: mode=max
+          sbom: true

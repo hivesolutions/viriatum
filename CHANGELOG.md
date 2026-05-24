@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Module load logging at startup using `V_PRINT_F` showing module name, version and path
 * `debug_options_service` function dumping every `service_options_t` field, one per line, at debug level to show which value won across the default, file and command-line option layers
 * `--wwwroot=<path>` command-line option overriding the root directory from which static files are served, taking precedence over the compile-time default and the `[general] www_root` configuration entry
+* GitHub Actions workflows (`.github/workflows/dockerx.yml` and `dockerx-build.yml`) building and pushing `hivesolutions/viriatum` images for `Dockerfile`, `Dockerfile.php` and `Dockerfile.all` to Docker Hub, with multi-arch (386, amd64, armv7, arm64) on the core image and amd64-only on the php/all variants
 * Multi-stage Docker builds for both `Dockerfile` (11 MB) and `Dockerfile.php` (22 MB)
 * `Dockerfile.all` with all 5 modules (diag, gif, lua, php, wsgi) using 4-stage multi-stage build (112 MB)
 * SSL support enabled in `Dockerfile` and `Dockerfile.php` builds

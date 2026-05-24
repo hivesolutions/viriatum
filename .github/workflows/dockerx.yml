@@ -1,0 +1,43 @@
+name: DockerX Workflow
+on:
+  push:
+    tags:
+      - "*"
+    branches-ignore:
+      - none
+  workflow_dispatch:
+jobs:
+  fast:
+    name: Fast (${{ matrix.config.dockerfile }})
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - { dockerfile: "Dockerfile", tag_suffix: "-amd64" }
+          - { dockerfile: "Dockerfile.php", tag_suffix: "-php-amd64" }
+          - { dockerfile: "Dockerfile.all", tag_suffix: "-all-amd64" }
+    uses: ./.github/workflows/dockerx-build.yml
+    with:
+      dockerfile: ${{ matrix.config.dockerfile }}
+      platforms: "linux/amd64"
+      tag_suffix: ${{ matrix.config.tag_suffix }}
+    secrets:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+  full:
+    name: Full (${{ matrix.config.dockerfile }})
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - { dockerfile: "Dockerfile", tag_suffix: "", platforms: "linux/386,linux/amd64,linux/arm/v7,linux/arm64/v8" }
+          - { dockerfile: "Dockerfile.php", tag_suffix: "-php", platforms: "linux/amd64" }
+          - { dockerfile: "Dockerfile.all", tag_suffix: "-all", platforms: "linux/amd64" }
+    uses: ./.github/workflows/dockerx-build.yml
+    with:
+      dockerfile: ${{ matrix.config.dockerfile }}
+      platforms: ${{ matrix.config.platforms }}
+      tag_suffix: ${{ matrix.config.tag_suffix }}
+    secrets:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
