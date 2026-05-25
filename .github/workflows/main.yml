@@ -78,6 +78,9 @@ jobs:
       - name: Test Viriatum
         run: |
           ./bin/viriatum --test
+      - name: Test Viriatum Mod WSGI
+        run: |
+          ./bin/viriatum_mod_wsgi_test
       - name: Test Viriatum Mod Lua
         run: |
           ./bin/viriatum_mod_lua_test
@@ -120,6 +123,9 @@ jobs:
       - name: Test Viriatum
         run: |
           ./bin/viriatum --test
+      - name: Test Viriatum Mod WSGI
+        run: |
+          ./bin/viriatum_mod_wsgi_test
       - name: Test Viriatum Mod Lua
         run: |
           ./bin/viriatum_mod_lua_test

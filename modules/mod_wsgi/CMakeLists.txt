@@ -38,6 +38,32 @@ if(PYTHON3_FOUND)
     target_link_directories(viriatum_mod_wsgi PRIVATE ${PY3_LIB_DIRS})
     target_link_libraries(viriatum_mod_wsgi viriatum_commons ${PY3_LIBRARIES})
     message(STATUS "Viriatum: mod_wsgi enabled")
+
+    # test executable: compiles the module sources together with
+    # the test files into a standalone binary that can be invoked
+    # to run the mod_wsgi test suite
+    file(GLOB MOD_WSGI_TEST_SOURCES src/viriatum_mod_wsgi/test/*.c)
+    add_executable(viriatum_mod_wsgi_test
+        ${MOD_WSGI_SOURCES}
+        ${MOD_WSGI_TEST_SOURCES}
+        ${CMAKE_SOURCE_DIR}/src/viriatum/http/http_parser.c
+    )
+    set_target_properties(viriatum_mod_wsgi_test PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
+        RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/bin
+        RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/bin
+    )
+    target_include_directories(viriatum_mod_wsgi_test PRIVATE
+        src/viriatum_mod_wsgi
+        ${CMAKE_SOURCE_DIR}/src/viriatum
+        ${CMAKE_SOURCE_DIR}/src/viriatum_commons
+        ${PY3_INCLUDE_DIRS}
+    )
+    target_link_directories(viriatum_mod_wsgi_test PRIVATE ${PY3_LIB_DIRS})
+    target_link_libraries(viriatum_mod_wsgi_test viriatum_commons ${PY3_LIBRARIES})
+    target_compile_definitions(viriatum_mod_wsgi_test PRIVATE
+        VIRIATUM_TEST_SCRIPT_PATH="${CMAKE_SOURCE_DIR}/modules/mod_wsgi/resources/test/test_handler.py"
+    )
 else()
     message(STATUS "Viriatum: mod_wsgi disabled (Python 3 not found)")
 endif()
