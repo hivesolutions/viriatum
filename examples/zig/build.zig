@@ -74,7 +74,7 @@ pub fn build(b: *std.Build) void {
     exe_mod.addIncludePath(viriatum_root.path(b, "src/viriatum_commons"));
 
     // shim providing START_MEMORY and other globals normally
-    // defined in viriatum.c (which we exclude to avoid main)
+    // defined in viriatum.c (which we exclude from the core library)
     exe_mod.addCSourceFile(.{
         .file = b.path("src/viriatum_shim.c"),
         .flags = c_flags,
@@ -114,7 +114,7 @@ pub fn build(b: *std.Build) void {
     viriatum_exe_mod.addIncludePath(viriatum_root.path(b, "src/viriatum_commons"));
     viriatum_exe_mod.addCSourceFiles(.{
         .root = viriatum_root.path(b, "src/viriatum"),
-        .files = &viriatum_sources ++ .{"viriatum.c"},
+        .files = &viriatum_sources ++ .{ "viriatum.c", "main.c" },
         .flags = c_flags,
     });
     if (target.result.os.tag != .windows) {
@@ -184,8 +184,10 @@ const commons_sources = [_][]const u8{
 };
 
 // viriatum core source files (relative to src/viriatum)
-// note: viriatum.c is excluded because it contains main(),
-// we call create_service/start_service/etc. from service.c directly
+// note: viriatum.c is excluded because it defines the allocations
+// global (via START_MEMORY) that the shim supplies instead, and
+// main.c is excluded because it contains main(), we call
+// create_service/start_service/etc. from service.c directly
 const viriatum_sources = [_][]const u8{
     "stdafx.c",
     "handlers/handler_default.c",

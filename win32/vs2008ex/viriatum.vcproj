@@ -523,6 +523,10 @@
                 RelativePath="..\..\src\viriatum\viriatum.c"
                 >
             </File>
+            <File
+                RelativePath="..\..\src\viriatum\main.c"
+                >
+            </File>
             <Filter
                 Name="System"
                 >

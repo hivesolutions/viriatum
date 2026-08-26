@@ -78,6 +78,9 @@
     <ClCompile Include="..\..\src\viriatum\viriatum.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\viriatum\main.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\src\viriatum\system\client.c">
       <Filter>Source Files\System</Filter>
     </ClCompile>
