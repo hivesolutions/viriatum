@@ -409,18 +409,17 @@ class ServerLifecycleTest(unittest.TestCase):
         server = viriatum.Server(self._application, port=PORT + 5, www_root=".")
         server.stop()
 
-    def test_busy_port(self):
-        # opening a service on a port that is already taken must raise
-        # instead of leaving the server in a half opened state
-        holder = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        holder.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        holder.bind(("127.0.0.1", PORT + 6))
-        holder.listen(1)
-        try:
-            server = viriatum.Server(self._application, host="127.0.0.1", port=PORT + 6)
-            self.assertRaises(RuntimeError, server.serve_forever)
-        finally:
-            holder.close()
+    def test_failed_open(self):
+        # an opening that fails must raise instead of leaving the server
+        # in a half opened state, the address is taken from the range
+        # reserved for documentation so that no interface carries it and
+        # the binding fails on every platform
+        server = viriatum.Server(self._application, host="192.0.2.1", port=PORT + 6)
+        self.assertRaises(RuntimeError, server.serve_forever)
+
+        # a second attempt must fail in the very same way, which shows
+        # that the first failure left no state behind
+        self.assertRaises(RuntimeError, server.serve_forever)
 
     def test_repeated_initialization(self):
         # a second initialization must be rejected as it would leak

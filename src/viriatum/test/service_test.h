@@ -35,6 +35,13 @@
 #define VIRIATUM_TEST_PORT 19399
 
 /**
+ * The address used by the failed opening test, taken from the
+ * range reserved for documentation so that it is assigned to
+ * no interface and the binding to it always fails.
+ */
+#define VIRIATUM_TEST_ADDRESS "192.0.2.1"
+
+/**
  * Tests that the service deletion tolerates an
  * unset (null) service reference.
  *

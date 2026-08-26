@@ -161,15 +161,14 @@ const char *test_open_close_service(void) {
 }
 
 const char *test_open_service_busy(void) {
-    /* allocates space for the error codes and for both the service that
-    holds the port and the one that fails to open on it */
+    /* allocates space for the error code and for the service that is
+    going to fail the opening operation */
     ERROR_CODE error;
     struct service_t *service;
-    struct service_t *_service;
     struct hash_map_t *arguments;
 
-    /* creates the first service and opens it, taking hold of the port
-    that the second one is going to try to bind */
+    /* creates the service and loads both the specifications and the
+    default options into it */
     create_service(
         &service,
         (unsigned char *) "test",
@@ -179,45 +178,26 @@ const char *test_open_service_busy(void) {
     create_hash_map(&arguments, 0);
     _default_options_service(service, arguments);
     delete_hash_map(arguments);
+
+    /* points the service at an address that is assigned to no interface
+    so that the binding of the socket is guaranteed to fail */
     service->options->port = VIRIATUM_TEST_PORT;
+    service->options->address = (unsigned char *) VIRIATUM_TEST_ADDRESS;
     service->options->load_modules = 0;
     service->options->workers = 0;
     service->options->ip6 = 0;
     calculate_options_service(service);
     calculate_locations_service(service);
-    error = open_service(service);
-    V_ASSERT(!IS_ERROR_CODE(error));
-
-    /* creates the second service targeting the very same port, the
-    opening of it is expected to fail as the port is taken */
-    create_service(
-        &_service,
-        (unsigned char *) "test",
-        (unsigned char *) "test"
-    );
-    load_specifications(_service);
-    create_hash_map(&arguments, 0);
-    _default_options_service(_service, arguments);
-    delete_hash_map(arguments);
-    _service->options->port = VIRIATUM_TEST_PORT;
-    _service->options->load_modules = 0;
-    _service->options->workers = 0;
-    _service->options->ip6 = 0;
-    calculate_options_service(_service);
-    calculate_locations_service(_service);
 
     /* verifies that the opening failed and that the service has been
     left in the closed state with no socket handle set, otherwise the
     deletion of it would close a descriptor it no longer owns */
-    error = open_service(_service);
+    error = open_service(service);
     V_ASSERT(IS_ERROR_CODE(error));
-    V_ASSERT(_service->status == STATUS_CLOSED);
-    V_ASSERT(_service->service_socket_handle == 0);
-    delete_service(_service);
+    V_ASSERT(service->status == STATUS_CLOSED);
+    V_ASSERT(service->service_socket_handle == 0);
 
-    /* closes and deletes the service that held the port */
-    stop_service(service);
-    close_service(service);
+    /* deletes the service releasing every internal structure */
     delete_service(service);
 
     /* returns the default value, nothing happened so there's
