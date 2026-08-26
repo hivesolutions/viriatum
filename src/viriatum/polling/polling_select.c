@@ -415,7 +415,17 @@ ERROR_CODE _poll_polling_select(
     polling_select->sockets_write_set_temporary = polling_select->sockets_write_set;
 
     /* copies the select timeout to the select timeout temporary */
-    polling_select->select_timeout_temporary = polling_select->select_timeout;
+    /* copies the configured timeout into the temporary structure, in case
+    an explicit timeout is set in the polling it takes precedence over the
+    compile time default (select changes the structure in place) */
+    if(polling_select->polling->timeout < 0) {
+        polling_select->select_timeout_temporary = polling_select->select_timeout;
+    } else {
+        polling_select->select_timeout_temporary.tv_sec =
+            polling_select->polling->timeout / 1000;
+        polling_select->select_timeout_temporary.tv_usec =
+            (polling_select->polling->timeout % 1000) * 1000;
+    }
 
     /* prints a debug message */
     V_DEBUG("Entering select statement\n");

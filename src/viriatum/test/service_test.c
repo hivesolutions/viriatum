@@ -100,6 +100,111 @@ const char *test_calculate_locations_service(void) {
     return NULL;
 }
 
+const char *test_open_close_service(void) {
+    /* allocates space for the error codes returned by the various
+    lifecycle calls and for the service and arguments structures */
+    ERROR_CODE error;
+    struct service_t *service;
+    struct hash_map_t *arguments;
+
+    /* creates the service and loads both the specifications and the
+    default options into it, no configuration file is involved */
+    create_service(
+        &service,
+        (unsigned char *) "test",
+        (unsigned char *) "test"
+    );
+    load_specifications(service);
+    create_hash_map(&arguments, 0);
+    _default_options_service(service, arguments);
+    delete_hash_map(arguments);
+
+    /* sets the options so that an unlikely port is bound and neither
+    the modules nor the worker processes are involved */
+    service->options->port = VIRIATUM_TEST_PORT;
+    service->options->load_modules = 0;
+    service->options->workers = 0;
+    service->options->ip6 = 0;
+    calculate_options_service(service);
+    calculate_locations_service(service);
+
+    /* opens the service, this should bind the socket and leave the
+    service in the open state without entering any loop */
+    error = open_service(service);
+    V_ASSERT(!IS_ERROR_CODE(error));
+    V_ASSERT(service->status == STATUS_OPEN);
+
+    /* runs a single iteration of the loop with a non blocking timeout,
+    without it the epoll based provider would wait indefinitely as no
+    connection is ever established during the test */
+    service->polling->timeout = 0;
+    error = poll_service(service);
+    V_ASSERT(!IS_ERROR_CODE(error));
+    error = call_service(service);
+    V_ASSERT(!IS_ERROR_CODE(error));
+
+    /* stops the service and verifies that the status has been
+    changed, which is what breaks the main loop */
+    error = stop_service(service);
+    V_ASSERT(!IS_ERROR_CODE(error));
+    V_ASSERT(service->status == STATUS_CLOSED);
+
+    /* closes the service releasing every structure created during
+    the opening and then deletes the service itself */
+    error = close_service(service);
+    V_ASSERT(!IS_ERROR_CODE(error));
+    delete_service(service);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_open_service_busy(void) {
+    /* allocates space for the error code and for the service that is
+    going to fail the opening operation */
+    ERROR_CODE error;
+    struct service_t *service;
+    struct hash_map_t *arguments;
+
+    /* creates the service and loads both the specifications and the
+    default options into it */
+    create_service(
+        &service,
+        (unsigned char *) "test",
+        (unsigned char *) "test"
+    );
+    load_specifications(service);
+    create_hash_map(&arguments, 0);
+    _default_options_service(service, arguments);
+    delete_hash_map(arguments);
+
+    /* points the service at an address that is assigned to no interface
+    so that the binding of the socket is guaranteed to fail */
+    service->options->port = VIRIATUM_TEST_PORT;
+    service->options->address = (unsigned char *) VIRIATUM_TEST_ADDRESS;
+    service->options->load_modules = 0;
+    service->options->workers = 0;
+    service->options->ip6 = 0;
+    calculate_options_service(service);
+    calculate_locations_service(service);
+
+    /* verifies that the opening failed and that the service has been
+    left in the closed state with no socket handle set, otherwise the
+    deletion of it would close a descriptor it no longer owns */
+    error = open_service(service);
+    V_ASSERT(IS_ERROR_CODE(error));
+    V_ASSERT(service->status == STATUS_CLOSED);
+    V_ASSERT(service->service_socket_handle == 0);
+
+    /* deletes the service releasing every internal structure */
+    delete_service(service);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
 const char *test_file_options_service(void) {
     /* allocates space for the error codes returned by both the
     options loading and the locations calculation, together with

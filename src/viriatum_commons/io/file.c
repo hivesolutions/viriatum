@@ -412,6 +412,12 @@ ERROR_CODE absolute_path_file(char *path, char normalize) {
     to be used in the path resolution operation */
     char resolved[VIRIATUM_MAX_PATH_SIZE];
 
+#ifndef VIRIATUM_PLATFORM_WIN32
+    /* allocates space for the reference to the dynamically resolved
+    path, released as soon as its value has been copied */
+    char *_resolved;
+#endif
+
 #ifdef VIRIATUM_PLATFORM_WIN32
     /* resolves the path using the Windows full path
     resolution function, returning NULL on error */
@@ -422,14 +428,34 @@ ERROR_CODE absolute_path_file(char *path, char normalize) {
         );
     }
 #else
-    /* resolves the path using the Unix real path
-    resolution function, returning NULL on error */
-    if(realpath(path, resolved) == NULL) {
+    /* resolves the path using the Unix real path resolution function,
+    note that the null based variant is used so that the buffer is
+    allocated with the proper size, the in place variant requires a
+    buffer of at least PATH_MAX bytes and the runtime aborts the
+    process whenever a smaller one is provided */
+    _resolved = realpath(path, NULL);
+    if(_resolved == NULL) {
         RAISE_ERROR_M(
             RUNTIME_EXCEPTION_ERROR_CODE,
             (unsigned char *) "Problem resolving absolute path"
         );
     }
+
+    /* in case the resolved path does not fit the local buffer releases
+    the resolved value and raises an error, avoiding a truncated path */
+    if(strlen(_resolved) >= VIRIATUM_MAX_PATH_SIZE) {
+        free(_resolved);
+        RAISE_ERROR_M(
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Resolved absolute path is too long"
+        );
+    }
+
+    /* copies the resolved value into the local buffer and then releases
+    the dynamically allocated one, note that the plain free is used as
+    the buffer was allocated by the runtime and not by the memory macros */
+    SPRINTF(resolved, VIRIATUM_MAX_PATH_SIZE, "%s", _resolved);
+    free(_resolved);
 #endif
 
     /* copies the resolved path back into the original

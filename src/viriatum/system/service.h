@@ -271,6 +271,13 @@ typedef struct polling_t {
     polling_update call;
 
     /**
+     * The timeout (in milliseconds) to be used while waiting
+     * for events in the polling operation, a negative value
+     * keeps the default behaviour of the provider.
+     */
+    int timeout;
+
+    /**
      * Reference to the lower level
      * connection substrate (child).
      */
@@ -582,6 +589,13 @@ typedef struct service_options_t {
      * approximate to the number of cpus).
      */
     unsigned char workers;
+
+    /**
+     * If the modules available under the modules path
+     * should be loaded during the opening of the service
+     * (should be unset when running inside a host process).
+     */
+    unsigned char load_modules;
 
     /**
      * If the default index file should be used in case
@@ -1246,6 +1260,43 @@ ERROR_CODE create_workers(struct service_t *service);
 ERROR_CODE join_workers(struct service_t *service);
 
 /**
+ * Opens the given service, initializing the internal
+ * structures without entering the main loop.
+ *
+ * @param service The service to be opened.
+ * @return The resulting error code.
+ */
+ERROR_CODE open_service(struct service_t *service);
+
+/**
+ * Polls the connections of the given service, waiting
+ * for new events to become available.
+ * This method must be followed by a call operation.
+ *
+ * @param service The service to be polled.
+ * @return The resulting error code.
+ */
+ERROR_CODE poll_service(struct service_t *service);
+
+/**
+ * Calls the callbacks associated with the events that
+ * have been gathered by the previous polling.
+ *
+ * @param service The service to have the callbacks called.
+ * @return The resulting error code.
+ */
+ERROR_CODE call_service(struct service_t *service);
+
+/**
+ * Closes the given service, cleaning all the internal
+ * structures created during the opening of it.
+ *
+ * @param service The service to be closed.
+ * @return The resulting error code.
+ */
+ERROR_CODE close_service(struct service_t *service);
+
+/**
  * Starts the given service, initializing the
  * internal structures and the main loop.
  *
@@ -1536,6 +1587,7 @@ ERROR_CODE delete_http_handler_service(struct service_t *service, struct http_ha
 ERROR_CODE add_http_handler_service(struct service_t *service, struct http_handler_t *http_handler);
 ERROR_CODE remove_http_handler_service(struct service_t *service, struct http_handler_t *http_handler);
 ERROR_CODE get_http_handler_service(struct service_t *service, struct http_handler_t **http_handler_pointer, unsigned char *name);
+ERROR_CODE _open_service(struct service_t *service);
 ERROR_CODE _default_options_service(struct service_t *service, struct hash_map_t *arguments);
 ERROR_CODE _file_options_service(struct service_t *service, struct hash_map_t *arguments);
 ERROR_CODE _comand_line_options_service(struct service_t *service, struct hash_map_t *arguments);

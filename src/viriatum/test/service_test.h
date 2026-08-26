@@ -29,6 +29,19 @@
 #include "test_support.h"
 
 /**
+ * The port to be bound by the service lifecycle test, an
+ * unlikely value so that no conflict arises.
+ */
+#define VIRIATUM_TEST_PORT 19399
+
+/**
+ * The address used by the failed opening test, taken from the
+ * range reserved for documentation so that it is assigned to
+ * no interface and the binding to it always fails.
+ */
+#define VIRIATUM_TEST_ADDRESS "192.0.2.1"
+
+/**
  * Tests that the service deletion tolerates an
  * unset (null) service reference.
  *
@@ -54,6 +67,24 @@ const char *test_create_service_options(void);
  * the unit test should describe possible errors.
  */
 const char *test_calculate_locations_service(void);
+
+/**
+ * Tests the opening, polling and closing of a service
+ * through the step based lifecycle functions.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_open_close_service(void);
+
+/**
+ * Tests that a failed opening of a service leaves it in
+ * a properly closed state.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_open_service_busy(void);
 
 /**
  * Tests the file based options loading from a directory

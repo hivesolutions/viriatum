@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+* Server can now be imported from Python to serve a WSGI application on its own event loop - [#39](https://github.com/hivesolutions/viriatum/issues/39)
+* Continuous integration job building and testing the Python package on Linux, macOS and Windows - [#39](https://github.com/hivesolutions/viriatum/issues/39)
 * Core server can now be built as a shared or static library, so it can be embedded in another program - [#39](https://github.com/hivesolutions/viriatum/issues/39)
 * WSGI module introspection methods: `connections()`, `connections_l()`, `connection_info()`, and `uptime()` for runtime server state inspection
 * WSGI module constants (`NAME`, `VERSION`, `PLATFORM`, `FLAGS`, `MODULES`, `DESCRIPTION`, `COMPILER`, `COMPILER_VERSION`, `COMPILATION_DATE`, `COMPILATION_TIME`, `COMPILATION_FLAGS`) exposed via `viriatum_wsgi` module
@@ -65,6 +67,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+* Absolute path resolution no longer aborts the process on optimized Linux builds - [#39](https://github.com/hivesolutions/viriatum/issues/39)
 * Server no longer crashes on startup when no configuration file is present - [#39](https://github.com/hivesolutions/viriatum/issues/39)
 * Stopping or releasing a server that was never started is now safe - [#39](https://github.com/hivesolutions/viriatum/issues/39)
 * Worker count is no longer read from an unset value and is capped to the supported maximum - [#39](https://github.com/hivesolutions/viriatum/issues/39)

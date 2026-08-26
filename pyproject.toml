@@ -1,0 +1,32 @@
+[build-system]
+requires = ["scikit-build-core>=0.11"]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "viriatum"
+version = "0.3.0b3"
+description = "Viriatum Web Server bindings for the Python interpreter"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "Apache-2.0"
+authors = [{ name = "João Magalhães", email = "joamag@hive.pt" }]
+keywords = ["viriatum", "wsgi", "server", "http"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: C",
+    "Programming Language :: Python :: 3",
+    "Topic :: Internet :: WWW/HTTP :: WSGI :: Server",
+]
+
+[project.urls]
+Homepage = "http://viriatum.hive.pt"
+Repository = "https://github.com/hivesolutions/viriatum"
+
+[tool.scikit-build]
+cmake.version = ">=3.15"
+cmake.define.VIRIATUM_BUILD_MODULES = "OFF"
+cmake.define.VIRIATUM_BUILD_PYTHON = "ON"
+wheel.packages = ["src/viriatum_python/viriatum"]
+sdist.include = ["src", "CMakeLists.txt"]

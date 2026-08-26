@@ -451,14 +451,15 @@ ERROR_CODE _poll_polling_epoll(
         polling_epoll->epoll_fd,
         events,
         VIRIATUM_MAX_EVENTS,
-        VIRIATUM_SELECT_TIMEOUT * 1000
+        polling_epoll->polling->timeout < 0 ?
+            VIRIATUM_SELECT_TIMEOUT * 1000 : polling_epoll->polling->timeout
     );
 #else
     event_count = epoll_wait(
         polling_epoll->epoll_fd,
         events,
         VIRIATUM_MAX_EVENTS,
-        -1
+        polling_epoll->polling->timeout < 0 ? -1 : polling_epoll->polling->timeout
     );
 #endif
 
