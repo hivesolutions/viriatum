@@ -134,8 +134,10 @@ const char *test_open_close_service(void) {
     V_ASSERT(!IS_ERROR_CODE(error));
     V_ASSERT(service->status == STATUS_OPEN);
 
-    /* runs a single iteration of the loop, as no connection is
-    pending the polling returns once its timeout is reached */
+    /* runs a single iteration of the loop with a non blocking timeout,
+    without it the epoll based provider would wait indefinitely as no
+    connection is ever established during the test */
+    service->polling->timeout = 0;
     error = poll_service(service);
     V_ASSERT(!IS_ERROR_CODE(error));
     error = call_service(service);

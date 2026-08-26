@@ -188,6 +188,7 @@ void create_polling(struct polling_t **polling_pointer) {
 
     /* sets the polling attributes (default) values */
     polling->service = NULL;
+    polling->timeout = -1;
     polling->open = NULL;
     polling->close = NULL;
     polling->register_connection = NULL;

@@ -139,6 +139,11 @@ static PyObject *_serve_forever_server_python(PyObject *self, PyObject *args) {
             return NULL;
         }
         server_python->opened = TRUE;
+
+        /* bounds the polling timeout so that the loop comes back on a
+        regular basis, this is what allows both the signal checking and
+        the stopping of the service to be noticed in a timely manner */
+        service->polling->timeout = VIRIATUM_SELECT_TIMEOUT * 1000;
     }
 
     /* iterates continuously while the service is open, the polling

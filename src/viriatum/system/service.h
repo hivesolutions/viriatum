@@ -271,6 +271,13 @@ typedef struct polling_t {
     polling_update call;
 
     /**
+     * The timeout (in milliseconds) to be used while waiting
+     * for events in the polling operation, a negative value
+     * keeps the default behaviour of the provider.
+     */
+    int timeout;
+
+    /**
      * Reference to the lower level
      * connection substrate (child).
      */
