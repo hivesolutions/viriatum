@@ -126,6 +126,22 @@ if(PCRE_FOUND)
     endif()
 endif()
 
+# the python extension module is built as a separate target, it is
+# deliberately kept outside of the modules subtree so that it does not
+# inherit the module naming rules, that would corrupt the file name that
+# the interpreter expects for an importable extension
+option(VIRIATUM_BUILD_PYTHON "Build the viriatum python extension" OFF)
+if(VIRIATUM_BUILD_PYTHON)
+    find_package(Python COMPONENTS Interpreter Development.Module REQUIRED)
+    file(GLOB_RECURSE VIRIATUM_PYTHON_SOURCES src/viriatum_python/*.c)
+    Python_add_library(viriatum_python MODULE WITH_SOABI ${VIRIATUM_PYTHON_SOURCES})
+    set_target_properties(viriatum_python PROPERTIES OUTPUT_NAME _viriatum)
+    target_include_directories(viriatum_python PRIVATE src/viriatum_python)
+    target_link_libraries(viriatum_python PRIVATE viriatum_static)
+    install(TARGETS viriatum_python LIBRARY DESTINATION viriatum)
+    message(STATUS "Viriatum: python extension enabled")
+endif()
+
 # modules are built as shared libraries loaded at runtime,
 # the VIRIATUM_BUILD_MODULES option controls whether any
 # modules are built and individual options allow fine-grained
