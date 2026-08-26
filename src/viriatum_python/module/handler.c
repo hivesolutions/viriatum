@@ -76,6 +76,13 @@ ERROR_CODE delete_handler_python_context(struct handler_python_context_t *handle
         FREE(handler_python_context->header_values[index]);
     }
 
+    /* releases the field of an incomplete header pair, one that has
+    never been closed by the corresponding value callback */
+    if(handler_python_context->header_count < VIRIATUM_PYTHON_MAX_HEADERS &&
+        handler_python_context->header_fields[handler_python_context->header_count] != NULL) {
+        FREE(handler_python_context->header_fields[handler_python_context->header_count]);
+    }
+
     /* releases the various response headers that have been
     set by the application */
     for(index = 0; index < handler_python_context->response_header_count; index++) {
@@ -199,6 +206,12 @@ ERROR_CODE header_field_callback_handler_python(struct http_parser_t *http_parse
         (struct handler_python_context_t *) http_parser->context;
     if(handler_python_context->header_count >= VIRIATUM_PYTHON_MAX_HEADERS) { RAISE_NO_ERROR; }
 
+    /* releases any field that is still pending, this happens when a
+    header line carries no value and would otherwise be leaked */
+    if(handler_python_context->header_fields[handler_python_context->header_count] != NULL) {
+        FREE(handler_python_context->header_fields[handler_python_context->header_count]);
+    }
+
     /* allocates space for the header field and copies the received
     data into it, the value is set on the following callback */
     handler_python_context->header_fields[handler_python_context->header_count] =
@@ -221,6 +234,13 @@ ERROR_CODE header_value_callback_handler_python(struct http_parser_t *http_parse
     struct handler_python_context_t *handler_python_context =
         (struct handler_python_context_t *) http_parser->context;
     if(handler_python_context->header_count >= VIRIATUM_PYTHON_MAX_HEADERS) { RAISE_NO_ERROR; }
+
+    /* in case no field is currently pending the value belongs to a folded
+    header line, as the field may not be determined the value is ignored
+    instead of closing a pair with an unset field name */
+    if(handler_python_context->header_fields[handler_python_context->header_count] == NULL) {
+        RAISE_NO_ERROR;
+    }
 
     /* allocates space for the header value and copies the received
     data into it, then closes the current header pair */
@@ -349,17 +369,17 @@ ERROR_CODE _unset_http_settings_handler_python(struct http_settings_t *http_sett
     RAISE_NO_ERROR;
 }
 
-static void _set_environ_handler_python(PyObject *environ, const char *key, const char *value) {
+static void _set_environ_handler_python(PyObject *environ_map, const char *key, const char *value) {
     /* creates the unicode object from the provided value using the latin 1
     codec, as mandated by the WSGI specification for the native strings, and
-    then sets it in the environ releasing the local reference afterwards */
+    then sets it in the environ_map releasing the local reference afterwards */
     PyObject *object = PyUnicode_DecodeLatin1(value, strlen(value), "replace");
     if(object == NULL) { PyErr_Clear(); return; }
-    PyDict_SetItemString(environ, key, object);
+    PyDict_SetItemString(environ_map, key, object);
     Py_DECREF(object);
 }
 
-static void _set_environ_header_handler_python(PyObject *environ, const char *field, const char *value) {
+static void _set_environ_header_handler_python(PyObject *environ_map, const char *field, const char *value) {
     /* allocates space for the name of the header to be created and for
     the index to be used in the iteration over the field characters */
     char name[VIRIATUM_MAX_HEADER_SIZE];
@@ -379,15 +399,15 @@ static void _set_environ_header_handler_python(PyObject *environ, const char *fi
     if(offset > 0) { memcpy(name, "HTTP_", 5); }
 
     /* converts the header name into the upper case underscore separated
-    form that is used by the WSGI environ keys */
+    form that is used by the WSGI environ_map keys */
     for(index = 0; index < field_size; index++) {
         name[offset + index] = field[index] == '-' ?
             '_' : (char) toupper((unsigned char) field[index]);
     }
     name[offset + field_size] = '\0';
 
-    /* sets the resulting header value in the environ map */
-    _set_environ_handler_python(environ, name, value);
+    /* sets the resulting header value in the environ_map map */
+    _set_environ_handler_python(environ_map, name, value);
 }
 
 static PyObject *_build_environ_handler_python(
@@ -396,8 +416,8 @@ static PyObject *_build_environ_handler_python(
     struct connection_t *connection
 ) {
     /* allocates space for the various objects that are going to be
-    created as part of the environ construction */
-    PyObject *environ;
+    created as part of the environ_map construction */
+    PyObject *environ_map;
     PyObject *object;
     PyObject *io_module;
     size_t index;
@@ -410,14 +430,14 @@ static PyObject *_build_environ_handler_python(
     size_t path_size;
 
     /* unpacks the service and the associated options from the connection
-    as they are required for some of the environ values */
+    as they are required for some of the environ_map values */
     struct service_t *service = connection->service;
     struct service_options_t *service_options = service->options;
 
-    /* creates the environ map that is going to be populated with the
+    /* creates the environ_map map that is going to be populated with the
     complete set of values describing the current request */
-    environ = PyDict_New();
-    if(environ == NULL) { return NULL; }
+    environ_map = PyDict_New();
+    if(environ_map == NULL) { return NULL; }
 
     /* splits the url around the get parameters divisor, the first part
     is the path and the remaining one the query string */
@@ -430,25 +450,26 @@ static PyObject *_build_environ_handler_python(
     if(path_size > 0) { memcpy(path, handler_python_context->url, path_size); }
     path[path_size] = '\0';
 
-    /* sets the various request oriented values in the environ, note that
+    /* sets the various request oriented values in the environ_map, note that
     the script name is always empty as the application owns the routing */
-    _set_environ_handler_python(environ, "REQUEST_METHOD", get_http_method_string(http_parser->method));
-    _set_environ_handler_python(environ, "SCRIPT_NAME", "");
-    _set_environ_handler_python(environ, "PATH_INFO", path);
-    _set_environ_handler_python(environ, "QUERY_STRING", pointer == NULL ? "" : pointer + 1);
-    _set_environ_handler_python(environ, "SERVER_PROTOCOL", "HTTP/1.1");
-    _set_environ_handler_python(environ, "SERVER_SOFTWARE", VIRIATUM_AGENT);
-    _set_environ_handler_python(environ, "SERVER_NAME", (char *) service_options->address);
-    _set_environ_handler_python(environ, "REMOTE_ADDR", (char *) connection->host);
+    _set_environ_handler_python(environ_map, "REQUEST_METHOD", get_http_method_string(http_parser->method));
+    _set_environ_handler_python(environ_map, "SCRIPT_NAME", "");
+    _set_environ_handler_python(environ_map, "PATH_INFO", path);
+    _set_environ_handler_python(environ_map, "QUERY_STRING", pointer == NULL ? "" : pointer + 1);
+    _set_environ_handler_python(environ_map, "SERVER_PROTOCOL", "HTTP/1.1");
+    _set_environ_handler_python(environ_map, "SERVER_SOFTWARE", VIRIATUM_AGENT);
+    _set_environ_handler_python(environ_map, "SERVER_NAME", (char *) service_options->address);
+    _set_environ_handler_python(environ_map, "REMOTE_ADDR", (char *) connection->host);
     SPRINTF(port, 64, "%d", (int) service_options->port);
-    _set_environ_handler_python(environ, "SERVER_PORT", port);
+    _set_environ_handler_python(environ_map, "SERVER_PORT", port);
 
-    /* sets the various headers gathered from the request in the environ
+    /* sets the various headers gathered from the request in the environ_map
     using the prefixed and upper cased name form */
     for(index = 0; index < handler_python_context->header_count; index++) {
+        if(handler_python_context->header_fields[index] == NULL) { continue; }
         if(handler_python_context->header_values[index] == NULL) { continue; }
         _set_environ_header_handler_python(
-            environ,
+            environ_map,
             (char *) handler_python_context->header_fields[index],
             (char *) handler_python_context->header_values[index]
         );
@@ -457,17 +478,17 @@ static PyObject *_build_environ_handler_python(
     /* sets the WSGI specific values, the url scheme takes the ssl flag
     of the service into account so that it reflects the real channel */
     object = Py_BuildValue("(ii)", 1, 0);
-    PyDict_SetItemString(environ, "wsgi.version", object);
+    PyDict_SetItemString(environ_map, "wsgi.version", object);
     Py_DECREF(object);
-    _set_environ_handler_python(environ, "wsgi.url_scheme", service_options->ssl ? "https" : "http");
-    PyDict_SetItemString(environ, "wsgi.multithread", Py_False);
-    PyDict_SetItemString(environ, "wsgi.multiprocess", Py_False);
-    PyDict_SetItemString(environ, "wsgi.run_once", Py_False);
+    _set_environ_handler_python(environ_map, "wsgi.url_scheme", service_options->ssl ? "https" : "http");
+    PyDict_SetItemString(environ_map, "wsgi.multithread", Py_False);
+    PyDict_SetItemString(environ_map, "wsgi.multiprocess", Py_False);
+    PyDict_SetItemString(environ_map, "wsgi.run_once", Py_False);
 
     /* creates the input stream from the payload of the request using a
     bytes io object, this provides the complete file like interface */
     io_module = PyImport_ImportModule("io");
-    if(io_module == NULL) { Py_DECREF(environ); return NULL; }
+    if(io_module == NULL) { Py_DECREF(environ_map); return NULL; }
     object = PyObject_CallMethod(
         io_module,
         "BytesIO",
@@ -476,17 +497,17 @@ static PyObject *_build_environ_handler_python(
         (Py_ssize_t) handler_python_context->body_size
     );
     Py_DECREF(io_module);
-    if(object == NULL) { Py_DECREF(environ); return NULL; }
-    PyDict_SetItemString(environ, "wsgi.input", object);
+    if(object == NULL) { Py_DECREF(environ_map); return NULL; }
+    PyDict_SetItemString(environ_map, "wsgi.input", object);
     Py_DECREF(object);
 
     /* sets the error stream as the standard error of the interpreter so
     that the application may report its problems in the usual way */
     object = PySys_GetObject("stderr");
-    if(object != NULL) { PyDict_SetItemString(environ, "wsgi.errors", object); }
+    if(object != NULL) { PyDict_SetItemString(environ_map, "wsgi.errors", object); }
 
-    /* returns the newly created environ map */
-    return environ;
+    /* returns the newly created environ_map map */
+    return environ_map;
 }
 
 static PyObject *_start_response_handler_python(PyObject *self, PyObject *args) {
@@ -613,7 +634,7 @@ static PyObject *_start_response_handler_python(PyObject *self, PyObject *args) 
 ERROR_CODE _send_response_handler_python(struct http_parser_t *http_parser) {
     /* allocates space for the various python objects used during the
     calling of the application and the gathering of its response */
-    PyObject *environ;
+    PyObject *environ_map;
     PyObject *capsule;
     PyObject *start_response;
     PyObject *result;
@@ -629,6 +650,7 @@ ERROR_CODE _send_response_handler_python(struct http_parser_t *http_parser) {
     Py_ssize_t body_size = 0;
     size_t count;
     size_t index;
+    size_t headers_size;
 
     /* retrieves the connection from the HTTP parser parameters and then
     the underlying connection references in order to operate over them */
@@ -651,10 +673,10 @@ ERROR_CODE _send_response_handler_python(struct http_parser_t *http_parser) {
     failure in the application is properly reported */
     handler_python_context->status_code = 500;
 
-    /* builds the environ map for the request and creates the start
+    /* builds the environ_map map for the request and creates the start
     response callable carrying the context of the request */
-    environ = _build_environ_handler_python(handler_python_context, http_parser, connection);
-    if(environ == NULL) {
+    environ_map = _build_environ_handler_python(handler_python_context, http_parser, connection);
+    if(environ_map == NULL) {
         PyErr_Print();
         result = NULL;
     } else {
@@ -662,13 +684,13 @@ ERROR_CODE _send_response_handler_python(struct http_parser_t *http_parser) {
         start_response = PyCFunction_New(&start_response_method, capsule);
         result = PyObject_CallFunctionObjArgs(
             handler_python->application,
-            environ,
+            environ_map,
             start_response,
             NULL
         );
         Py_XDECREF(start_response);
         Py_XDECREF(capsule);
-        Py_DECREF(environ);
+        Py_DECREF(environ_map);
     }
 
     /* in case the application raised an exception prints it into the
@@ -707,11 +729,21 @@ ERROR_CODE _send_response_handler_python(struct http_parser_t *http_parser) {
         Py_DECREF(result);
     }
 
-    /* allocates space for the complete response, the headers part is
-    bounded by the maximum HTTP size and the body takes the remaining */
+    /* calculates the amount of space taken by the status message and by
+    the headers set by the application, these are unbounded in size and
+    so they must be accounted for in the allocation of the buffer */
+    headers_size = handler_python_context->status_message == NULL ?
+        0 : strlen((char *) handler_python_context->status_message);
+    for(index = 0; index < handler_python_context->response_header_count; index++) {
+        headers_size += strlen((char *) handler_python_context->response_headers[index]) + 2;
+    }
+
+    /* allocates space for the complete response, the default headers are
+    bounded by the maximum HTTP size and both the application headers and
+    the body take the remaining part of the buffer */
     connection->alloc_data(
         connection,
-        VIRIATUM_HTTP_MAX_SIZE + (size_t) body_size,
+        VIRIATUM_HTTP_MAX_SIZE + headers_size + (size_t) body_size,
         (void **) &buffer
     );
 

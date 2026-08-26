@@ -40,6 +40,12 @@ typedef struct server_python_t {
     struct service_t *service;
 
     /**
+     * The host to which the underlying service is bound, kept
+     * here as the service only retains a reference to it.
+     */
+    unsigned char host[VIRIATUM_MAX_HEADER_SIZE];
+
+    /**
      * Flag controlling if the underlying service has been
      * opened and so requires a proper closing.
      */

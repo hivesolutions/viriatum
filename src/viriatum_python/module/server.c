@@ -78,7 +78,8 @@ static int _init_server_python(PyObject *self, PyObject *args, PyObject *kwargs)
     the modules are not loaded as they would re initialize the
     interpreter that is currently hosting the server */
     service->options->port = (unsigned short) port;
-    service->options->address = (unsigned char *) VIRIATUM_DEFAULT_HOST;
+    SPRINTF((char *) server_python->host, VIRIATUM_MAX_HEADER_SIZE, "%s", host);
+    service->options->address = server_python->host;
     service->options->handler_name = VIRIATUM_PYTHON_HANDLER_NAME;
     service->options->load_modules = 0;
     service->options->workers = 0;
@@ -107,8 +108,10 @@ static int _init_server_python(PyObject *self, PyObject *args, PyObject *kwargs)
 }
 
 static void _dealloc_server_python(PyObject *self) {
-    /* retrieves the reference to the server object and in case there
-    is a service set unregisters the handler and releases it */
+    /* retrieves both the type of the object, required for the releasing
+    of the reference that every instance holds on it, and the reference
+    to the server object itself */
+    PyTypeObject *type = Py_TYPE(self);
     struct server_python_t *server_python = (struct server_python_t *) self;
     if(server_python->service != NULL) {
         unregister_handler_python(server_python->service);
@@ -116,8 +119,10 @@ static void _dealloc_server_python(PyObject *self) {
         server_python->service = NULL;
     }
 
-    /* releases the object itself using the type of it */
-    Py_TYPE(self)->tp_free(self);
+    /* releases the object itself and then the reference that it was
+    holding on its own (heap allocated) type */
+    type->tp_free(self);
+    Py_DECREF(type);
 }
 
 static PyObject *_serve_forever_server_python(PyObject *self, PyObject *args) {

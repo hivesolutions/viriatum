@@ -580,6 +580,11 @@ ERROR_CODE join_workers(struct service_t *service) { RAISE_NO_ERROR; }
 #endif
 
 ERROR_CODE open_service(struct service_t *service) {
+    /* allocates the socket data and then initializes the socket
+    infrastructure with it, this is a no operation under unix and
+    reference counted under windows (balanced in close_service) */
+    SOCKET_DATA socket_data;
+
 #ifdef VIRIATUM_IP6
     /* allocates the socket address structure for the ip6
     connection elements */
@@ -640,6 +645,10 @@ ERROR_CODE open_service(struct service_t *service) {
 
     /* unpacks the service options from the service structure */
     struct service_options_t *service_options = service->options;
+
+    /* starts the socket infrastructure so that the sockets created
+    below are valid, under windows this is mandatory */
+    SOCKET_INITIALIZE(&socket_data);
 
     /* sets the service status as open, this should mark the
     service loop as iterable (breaks on stop) */
@@ -1266,6 +1275,14 @@ ERROR_CODE close_service(struct service_t *service) {
     close_connections_service(service);
     polling->close(polling);
 
+    /* unsets the service socket handles as the associated connections
+    have just been closed, this avoids a second close of a descriptor
+    that may in the meantime have been reused by the host process */
+    service->service_socket_handle = 0;
+#ifdef VIRIATUM_IP6
+    service->service_socket6_handle = 0;
+#endif
+
     /* unloads the modules for the service */
     unload_modules_service(service);
 
@@ -1291,6 +1308,10 @@ ERROR_CODE close_service(struct service_t *service) {
     must join them back together waiting for their finish before exiting
     the main (coordinator) process */
     join_workers(service);
+
+    /* releases the socket infrastructure, balancing the initialization
+    that has been run as part of the opening of the service */
+    SOCKET_FINISH();
 
     /* raises no error */
     RAISE_NO_ERROR;
