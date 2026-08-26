@@ -150,8 +150,9 @@ ERROR_CODE ran_service(void) {
     /* allocates the return value */
     ERROR_CODE return_value;
 
-    /* in case the service status is open */
-    if(service->status == STATUS_CLOSED) {
+    /* in case there's no service set or the service has already been
+    closed there's nothing to be stopped (graceful return) */
+    if(service == NULL || service->status == STATUS_CLOSED) {
         /* prints a debug message */
         V_DEBUG("No service to be stopped\n");
     } else {

@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+* Core server can now be built as a shared or static library, so it can be embedded in another program - [#39](https://github.com/hivesolutions/viriatum/issues/39)
 * WSGI module introspection methods: `connections()`, `connections_l()`, `connection_info()`, and `uptime()` for runtime server state inspection
 * WSGI module constants (`NAME`, `VERSION`, `PLATFORM`, `FLAGS`, `MODULES`, `DESCRIPTION`, `COMPILER`, `COMPILER_VERSION`, `COMPILATION_DATE`, `COMPILATION_TIME`, `COMPILATION_FLAGS`) exposed via `viriatum_wsgi` module
 * Enhanced handler.wsgi and handler.lua demo pages with server info (engine, version, platform, compiler, uptime, connections)
@@ -63,6 +64,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+* Server no longer crashes on startup when no configuration file is present - [#39](https://github.com/hivesolutions/viriatum/issues/39)
+* Stopping or releasing a server that was never started is now safe - [#39](https://github.com/hivesolutions/viriatum/issues/39)
+* Worker count is no longer read from an unset value and is capped to the supported maximum - [#39](https://github.com/hivesolutions/viriatum/issues/39)
 * Fixed ~150 spelling errors in comments across the entire codebase (`durring` → `during`, `reponse` → `response`, `usefull` → `useful`, `writen` → `written`, `completly` → `completely`, `ammount` → `amount`, `arround` → `around`, `scoket` → `socket`, etc.)
 * Fixed mod_php failing to load in `Dockerfile.all` due to missing `libphp.so` symlink in the runtime stage
 
