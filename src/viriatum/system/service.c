@@ -464,7 +464,9 @@ ERROR_CODE create_workers(struct service_t *service) {
     /* in case the requested number of workers exceeds the maximum
     allowed value clamps it, avoiding an overflow of the worker pids
     buffer that keeps track of the created processes */
-    if(worker_count > VIRIATUM_MAX_WORKERS) { worker_count = VIRIATUM_MAX_WORKERS; }
+    if(worker_count > VIRIATUM_MAX_WORKERS) {
+        worker_count = VIRIATUM_MAX_WORKERS;
+    }
 
     /* iterates continuously for the forking of the
     current process (worker creation) */
@@ -537,7 +539,9 @@ ERROR_CODE join_workers(struct service_t *service) {
     /* in case the requested number of workers exceeds the maximum
     allowed value clamps it, avoiding an overflow of the worker pids
     buffer that keeps track of the created processes */
-    if(worker_count > VIRIATUM_MAX_WORKERS) { worker_count = VIRIATUM_MAX_WORKERS; }
+    if(worker_count > VIRIATUM_MAX_WORKERS) {
+        worker_count = VIRIATUM_MAX_WORKERS;
+    }
 
     /* in case the current process type for the service is not master
     no need to join (and kill) the workers, it's not the responsible */
