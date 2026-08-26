@@ -24,6 +24,11 @@ extern fn start_service(service: *service_t) c_uint;
 extern fn create_hash_map(hash_map_pointer: **hash_map_t, initial_size: usize) void;
 extern fn delete_hash_map(hash_map: *hash_map_t) void;
 
+// winsock startup and cleanup, declared here as they are no longer
+// part of the zig standard library, only referenced under windows
+extern "ws2_32" fn WSAStartup(version: u16, data: *anyopaque) callconv(.winapi) c_int;
+extern "ws2_32" fn WSACleanup() callconv(.winapi) c_int;
+
 pub fn main() void {
     const zig_version = builtin.zig_version;
     const os_tag = @tagName(builtin.os.tag);
@@ -77,13 +82,15 @@ pub fn main() void {
     // initialize platform sockets (required on Windows,
     // no-op on Unix where sockets work out of the box)
     if (comptime builtin.os.tag == .windows) {
-        const ws2 = std.os.windows.ws2_32;
-        var wsa_data: ws2.WSADATA = undefined;
-        _ = ws2.WSAStartup(0x0202, &wsa_data);
+        // the WSADATA layout differs between 32 and 64 bit windows and
+        // its contents are unused here, so an opaque buffer large enough
+        // for both variants is passed as the output argument
+        var wsa_data: [512]u8 = undefined;
+        _ = WSAStartup(0x0202, &wsa_data);
     }
     defer {
         if (comptime builtin.os.tag == .windows) {
-            _ = std.os.windows.ws2_32.WSACleanup();
+            _ = WSACleanup();
         }
     }
 
