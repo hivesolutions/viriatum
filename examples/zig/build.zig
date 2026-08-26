@@ -60,7 +60,7 @@ pub fn build(b: *std.Build) void {
         .name = "viriatum",
         .root_module = viriatum_mod,
     });
-    viriatum.linkLibrary(commons);
+    viriatum_mod.linkLibrary(commons);
 
     // --- example executable ---
 
@@ -89,8 +89,8 @@ pub fn build(b: *std.Build) void {
         .name = "viriatum_zig",
         .root_module = exe_mod,
     });
-    exe.linkLibrary(viriatum);
-    exe.linkLibrary(commons);
+    exe_mod.linkLibrary(viriatum);
+    exe_mod.linkLibrary(commons);
 
     b.installArtifact(exe);
 
@@ -130,7 +130,7 @@ pub fn build(b: *std.Build) void {
         .name = "viriatum",
         .root_module = viriatum_exe_mod,
     });
-    viriatum_exe.linkLibrary(commons);
+    viriatum_exe_mod.linkLibrary(commons);
 
     b.installArtifact(viriatum_exe);
 
