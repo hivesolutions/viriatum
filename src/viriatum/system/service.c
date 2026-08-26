@@ -121,6 +121,7 @@ void create_service_options(struct service_options_t **service_options_pointer) 
     service_options->handler_name = NULL;
     service_options->local = 0;
     service_options->workers = 0;
+    service_options->load_modules = 1;
     service_options->default_index = 0;
     service_options->www_root[0] = '\0';
     service_options->use_template = 0;
@@ -578,7 +579,7 @@ ERROR_CODE create_workers(struct service_t *service) { RAISE_NO_ERROR; }
 ERROR_CODE join_workers(struct service_t *service) { RAISE_NO_ERROR; }
 #endif
 
-ERROR_CODE start_service(struct service_t *service) {
+ERROR_CODE open_service(struct service_t *service) {
 #ifdef VIRIATUM_IP6
     /* allocates the socket address structure for the ip6
     connection elements */
@@ -629,15 +630,6 @@ ERROR_CODE start_service(struct service_t *service) {
     /* allocates the polling (provider) */
     struct polling_t *polling;
 
-    /* allocates the process */
-    PROCESS_TYPE process;
-
-    /* allocates the memory information */
-    MEMORY_INFORMATION_TYPE memory_information;
-
-    /* allocates the memory ussage */
-    size_t memory_usage;
-
     /* allocates the option value and sets it to one (valid)
     not that a larger value is also created */
     SOCKET_OPTION option_value = 1;
@@ -666,7 +658,7 @@ ERROR_CODE start_service(struct service_t *service) {
 
     /* loads (all) the currently available modules, this operation may
     affect a series of internal structures including signal handlers */
-    load_modules_service(service);
+    if(service_options->load_modules) { load_modules_service(service); }
 
     /* registers the signal handler for the service, this must
     be done at this stage so that no module creates problems and
@@ -1237,30 +1229,37 @@ ERROR_CODE start_service(struct service_t *service) {
         32967
     );*/
 
-    /* iterates continuously, while the service is open (this
-    is the main loop triggering all the actions) */
-    while(service->status == STATUS_OPEN) {
-        /* retrieves the (current) process, to be used
-        to retrieves some memory information, and then closes it*/
-        process = GET_PROCESS();
-        GET_MEMORY_INFORMATION(process, memory_information);
-        memory_usage = GET_MEMORY_USAGE(memory_information);
-        CLOSE_PROCESS(process);
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
 
-        /* prints a debug message about the current memory
-        usage, useful for extreme debugging */
-        V_DEBUG_F(
-            "Memory status: [%ld objects] [%ld KBytes]\n",
-            (long int) ALLOCATIONS,
-            (long int) memory_usage / 1024
-        );
+ERROR_CODE poll_service(struct service_t *service) {
+    /* retrieves the polling (provider) from the service and uses it
+    to poll the connections, checking if new "events" are available,
+    this call may block while waiting for such events */
+    struct polling_t *polling = service->polling;
+    polling->poll(polling);
 
-        /* polls the connections using the polling (provider)
-        and calls the callbacks for the connection (events)
-        using the polling (provider) */
-        polling->poll(polling);
-        polling->call(polling);
-    }
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE call_service(struct service_t *service) {
+    /* retrieves the polling (provider) from the service and uses it
+    to call the callbacks associated with the current "events", this
+    call must be run right after a polling operation */
+    struct polling_t *polling = service->polling;
+    polling->call(polling);
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE close_service(struct service_t *service) {
+    /* retrieves both the polling (provider) and the options from the
+    service structure as they are required for the unloading */
+    struct polling_t *polling = service->polling;
+    struct service_options_t *service_options = service->options;
 
     /* closes (all) the service connections and then
     closes the polling (provider of data) */
@@ -1292,6 +1291,59 @@ ERROR_CODE start_service(struct service_t *service) {
     must join them back together waiting for their finish before exiting
     the main (coordinator) process */
     join_workers(service);
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE start_service(struct service_t *service) {
+    /* allocates the return value to be used to gather the
+    error result from the service calls */
+    ERROR_CODE return_value;
+
+    /* allocates the process */
+    PROCESS_TYPE process;
+
+    /* allocates the memory information */
+    MEMORY_INFORMATION_TYPE memory_information;
+
+    /* allocates the memory ussage */
+    size_t memory_usage;
+
+    /* opens the service, this call should create the sockets and
+    bootstrap every structure required by the main loop */
+    return_value = open_service(service);
+    if(IS_ERROR_CODE(return_value)) { RAISE_AGAIN(return_value); }
+
+    /* iterates continuously, while the service is open (this
+    is the main loop triggering all the actions) */
+    while(service->status == STATUS_OPEN) {
+        /* retrieves the (current) process, to be used
+        to retrieves some memory information, and then closes it*/
+        process = GET_PROCESS();
+        GET_MEMORY_INFORMATION(process, memory_information);
+        memory_usage = GET_MEMORY_USAGE(memory_information);
+        CLOSE_PROCESS(process);
+
+        /* prints a debug message about the current memory
+        usage, useful for extreme debugging */
+        V_DEBUG_F(
+            "Memory status: [%ld objects] [%ld KBytes]\n",
+            (long int) ALLOCATIONS,
+            (long int) memory_usage / 1024
+        );
+
+        /* polls the connections using the polling (provider)
+        and calls the callbacks for the connection (events)
+        using the polling (provider) */
+        poll_service(service);
+        call_service(service);
+    }
+
+    /* closes the service, releasing every structure that has
+    been created during the opening of it */
+    return_value = close_service(service);
+    if(IS_ERROR_CODE(return_value)) { RAISE_AGAIN(return_value); }
 
     /* raises no error */
     RAISE_NO_ERROR;

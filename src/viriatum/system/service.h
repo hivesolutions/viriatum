@@ -584,6 +584,13 @@ typedef struct service_options_t {
     unsigned char workers;
 
     /**
+     * If the modules available under the modules path
+     * should be loaded during the opening of the service
+     * (should be unset when running inside a host process).
+     */
+    unsigned char load_modules;
+
+    /**
      * If the default index file should be used in case
      * the root path file is requested (index.html is
      * the default file to be served).
@@ -1244,6 +1251,43 @@ ERROR_CODE create_workers(struct service_t *service);
  * @return The resulting error code.
  */
 ERROR_CODE join_workers(struct service_t *service);
+
+/**
+ * Opens the given service, initializing the internal
+ * structures without entering the main loop.
+ *
+ * @param service The service to be opened.
+ * @return The resulting error code.
+ */
+ERROR_CODE open_service(struct service_t *service);
+
+/**
+ * Polls the connections of the given service, waiting
+ * for new events to become available.
+ * This method must be followed by a call operation.
+ *
+ * @param service The service to be polled.
+ * @return The resulting error code.
+ */
+ERROR_CODE poll_service(struct service_t *service);
+
+/**
+ * Calls the callbacks associated with the events that
+ * have been gathered by the previous polling.
+ *
+ * @param service The service to have the callbacks called.
+ * @return The resulting error code.
+ */
+ERROR_CODE call_service(struct service_t *service);
+
+/**
+ * Closes the given service, cleaning all the internal
+ * structures created during the opening of it.
+ *
+ * @param service The service to be closed.
+ * @return The resulting error code.
+ */
+ERROR_CODE close_service(struct service_t *service);
 
 /**
  * Starts the given service, initializing the
