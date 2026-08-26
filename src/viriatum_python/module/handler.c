@@ -372,7 +372,7 @@ ERROR_CODE _unset_http_settings_handler_python(struct http_settings_t *http_sett
 static void _set_environ_handler_python(PyObject *environ_map, const char *key, const char *value) {
     /* creates the unicode object from the provided value using the latin 1
     codec, as mandated by the WSGI specification for the native strings, and
-    then sets it in the environ_map releasing the local reference afterwards */
+    then sets it in the environ releasing the local reference afterwards */
     PyObject *object = PyUnicode_DecodeLatin1(value, strlen(value), "replace");
     if(object == NULL) { PyErr_Clear(); return; }
     PyDict_SetItemString(environ_map, key, object);
@@ -380,34 +380,39 @@ static void _set_environ_handler_python(PyObject *environ_map, const char *key, 
 }
 
 static void _set_environ_header_handler_python(PyObject *environ_map, const char *field, const char *value) {
-    /* allocates space for the name of the header to be created and for
-    the index to be used in the iteration over the field characters */
+    /* allocates space for both the normalized name of the header and for
+    the prefixed variant of it, together with the iteration index */
     char name[VIRIATUM_MAX_HEADER_SIZE];
+    char prefixed[VIRIATUM_MAX_HEADER_SIZE];
     size_t index;
-    size_t offset;
     size_t field_size = strlen(field);
 
-    /* the content type and the content length headers are the only ones
-    that are not prefixed, as required by the WSGI specification */
-    char is_content = strcasecmp(field, "Content-Type") == 0 ||
-                      strcasecmp(field, "Content-Length") == 0;
-
-    /* in case the resulting name does not fit the buffer the header must
-    be discarded, avoiding an overflow of the name buffer */
-    offset = is_content ? 0 : 5;
-    if(field_size + offset + 1 > VIRIATUM_MAX_HEADER_SIZE) { return; }
-    if(offset > 0) { memcpy(name, "HTTP_", 5); }
+    /* in case the resulting name does not fit the buffers the header must
+    be discarded, avoiding an overflow of either of them */
+    if(field_size + sizeof("HTTP_") > VIRIATUM_MAX_HEADER_SIZE) { return; }
 
     /* converts the header name into the upper case underscore separated
-    form that is used by the WSGI environ_map keys */
+    form that is used by the WSGI environ keys */
     for(index = 0; index < field_size; index++) {
-        name[offset + index] = field[index] == '-' ?
+        name[index] = field[index] == '-' ?
             '_' : (char) toupper((unsigned char) field[index]);
     }
-    name[offset + field_size] = '\0';
+    name[field_size] = '\0';
 
-    /* sets the resulting header value in the environ_map map */
-    _set_environ_handler_python(environ_map, name, value);
+    /* the content type and the content length headers are the only ones
+    that are not prefixed, as required by the WSGI specification, the
+    comparison runs over the already normalized name so that no case
+    insensitive comparison function is required */
+    if(strcmp(name, "CONTENT_TYPE") == 0 || strcmp(name, "CONTENT_LENGTH") == 0) {
+        _set_environ_handler_python(environ_map, name, value);
+        return;
+    }
+
+    /* prefixes the normalized name and sets the resulting header value
+    in the environ map under the prefixed key */
+    memcpy(prefixed, "HTTP_", sizeof("HTTP_") - 1);
+    memcpy(&prefixed[sizeof("HTTP_") - 1], name, field_size + 1);
+    _set_environ_handler_python(environ_map, prefixed, value);
 }
 
 static PyObject *_build_environ_handler_python(
@@ -416,7 +421,7 @@ static PyObject *_build_environ_handler_python(
     struct connection_t *connection
 ) {
     /* allocates space for the various objects that are going to be
-    created as part of the environ_map construction */
+    created as part of the environ construction */
     PyObject *environ_map;
     PyObject *object;
     PyObject *io_module;
@@ -430,11 +435,11 @@ static PyObject *_build_environ_handler_python(
     size_t path_size;
 
     /* unpacks the service and the associated options from the connection
-    as they are required for some of the environ_map values */
+    as they are required for some of the environ values */
     struct service_t *service = connection->service;
     struct service_options_t *service_options = service->options;
 
-    /* creates the environ_map map that is going to be populated with the
+    /* creates the environ map that is going to be populated with the
     complete set of values describing the current request */
     environ_map = PyDict_New();
     if(environ_map == NULL) { return NULL; }
@@ -450,7 +455,7 @@ static PyObject *_build_environ_handler_python(
     if(path_size > 0) { memcpy(path, handler_python_context->url, path_size); }
     path[path_size] = '\0';
 
-    /* sets the various request oriented values in the environ_map, note that
+    /* sets the various request oriented values in the environ, note that
     the script name is always empty as the application owns the routing */
     _set_environ_handler_python(environ_map, "REQUEST_METHOD", get_http_method_string(http_parser->method));
     _set_environ_handler_python(environ_map, "SCRIPT_NAME", "");
@@ -463,7 +468,7 @@ static PyObject *_build_environ_handler_python(
     SPRINTF(port, 64, "%d", (int) service_options->port);
     _set_environ_handler_python(environ_map, "SERVER_PORT", port);
 
-    /* sets the various headers gathered from the request in the environ_map
+    /* sets the various headers gathered from the request in the environ
     using the prefixed and upper cased name form */
     for(index = 0; index < handler_python_context->header_count; index++) {
         if(handler_python_context->header_fields[index] == NULL) { continue; }
@@ -506,7 +511,7 @@ static PyObject *_build_environ_handler_python(
     object = PySys_GetObject("stderr");
     if(object != NULL) { PyDict_SetItemString(environ_map, "wsgi.errors", object); }
 
-    /* returns the newly created environ_map map */
+    /* returns the newly created environ map */
     return environ_map;
 }
 
@@ -673,7 +678,7 @@ ERROR_CODE _send_response_handler_python(struct http_parser_t *http_parser) {
     failure in the application is properly reported */
     handler_python_context->status_code = 500;
 
-    /* builds the environ_map map for the request and creates the start
+    /* builds the environ map for the request and creates the start
     response callable carrying the context of the request */
     environ_map = _build_environ_handler_python(handler_python_context, http_parser, connection);
     if(environ_map == NULL) {
