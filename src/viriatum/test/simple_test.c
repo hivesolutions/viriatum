@@ -27,6 +27,7 @@
 #include "simple_test.h"
 #include "handler_dispatch_test.h"
 #include "handler_file_test.h"
+#include "service_test.h"
 
 #ifndef VIRIATUM_NO_THREADS
 #ifdef VIRIATUM_THREAD_SAFE
@@ -1260,6 +1261,11 @@ void exec_simple_tests(struct test_case_t *test_case) {
     V_RUN_TEST(test_handler_file_header_field, test_case);
     V_RUN_TEST(test_handler_file_header_value, test_case);
     V_RUN_TEST(test_dispatch_handler_context_keepalive, test_case);
+    V_RUN_TEST(test_delete_service, test_case);
+    V_RUN_TEST(test_create_service_options, test_case);
+    V_RUN_TEST(test_calculate_locations_service, test_case);
+    V_RUN_TEST(test_file_options_service, test_case);
+    V_RUN_TEST(test_ran_service, test_case);
 }
 
 ERROR_CODE run_simple_tests(void) {

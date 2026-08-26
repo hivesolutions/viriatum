@@ -7,6 +7,9 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/lib)
 
 add_definitions(-DNO_PRAGMA_LIB)
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)
@@ -62,16 +65,44 @@ if(WIN32)
     target_link_libraries(viriatum_commons ws2_32 psapi)
 endif()
 
+# the core sources are compiled once into an object library so that the
+# executable and both library flavours may share them, the main.c file is
+# deliberately excluded as it holds the main() entry point and a library
+# carrying it may not be linked into a host process (eg: a Python module)
 file(GLOB_RECURSE VIRIATUM_SOURCES src/viriatum/*.c)
-add_executable(viriatum ${VIRIATUM_SOURCES})
+list(REMOVE_ITEM VIRIATUM_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/viriatum/main.c)
+add_library(viriatum_objects OBJECT ${VIRIATUM_SOURCES})
+set_target_properties(viriatum_objects PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
-target_include_directories(viriatum PUBLIC src/viriatum)
-target_compile_definitions(viriatum PRIVATE WITH_MODULE_ROOT="${CMAKE_BINARY_DIR}/modules")
-target_link_libraries(viriatum viriatum_commons)
+target_include_directories(viriatum_objects PUBLIC src/viriatum)
+target_compile_definitions(viriatum_objects PRIVATE WITH_MODULE_ROOT="${CMAKE_BINARY_DIR}/modules")
+target_link_libraries(viriatum_objects PUBLIC viriatum_commons)
+
+# the static and shared flavours of the core library, both named after the
+# autotools libviriatum_http target so that the produced artifacts match,
+# under windows the static library and the import library of the shared one
+# are both archive artifacts, so the static flavour takes a distinct name to
+# avoid the two overwriting each other in the archive output directory
+add_library(viriatum_static STATIC $<TARGET_OBJECTS:viriatum_objects>)
+if(WIN32)
+    set_target_properties(viriatum_static PROPERTIES OUTPUT_NAME viriatum_http_static)
+else()
+    set_target_properties(viriatum_static PROPERTIES OUTPUT_NAME viriatum_http)
+endif()
+target_link_libraries(viriatum_static PUBLIC viriatum_objects)
+
+add_library(viriatum_shared SHARED $<TARGET_OBJECTS:viriatum_objects>)
+set_target_properties(viriatum_shared PROPERTIES
+    OUTPUT_NAME viriatum_http
+    WINDOWS_EXPORT_ALL_SYMBOLS ON)
+target_link_libraries(viriatum_shared PUBLIC viriatum_objects)
+
+add_executable(viriatum src/viriatum/main.c)
+target_link_libraries(viriatum viriatum_static)
 
 # links the dynamic loader on Unix systems
 if(NOT WIN32)
-    target_link_libraries(viriatum ${CMAKE_DL_LIBS})
+    target_link_libraries(viriatum_objects PUBLIC ${CMAKE_DL_LIBS})
 endif()
 
 find_package(PkgConfig QUIET)
@@ -87,9 +118,9 @@ if(PCRE_FOUND)
     include(CheckIncludeFile)
     check_include_file("pcre.h" HAVE_PCRE_HEADER)
     if(HAVE_PCRE_HEADER)
-        target_compile_definitions(viriatum PRIVATE VIRIATUM_PCRE HAVE_PCRE_H)
-        target_include_directories(viriatum PRIVATE ${PCRE_INCLUDE_DIRS})
-        target_link_libraries(viriatum ${PCRE_LINK_LIBRARIES})
+        target_compile_definitions(viriatum_objects PRIVATE VIRIATUM_PCRE HAVE_PCRE_H)
+        target_include_directories(viriatum_objects PRIVATE ${PCRE_INCLUDE_DIRS})
+        target_link_libraries(viriatum_objects PUBLIC ${PCRE_LINK_LIBRARIES})
     else()
         message(STATUS "Viriatum: PCRE pkg-config found but pcre.h not available, disabling")
     endif()

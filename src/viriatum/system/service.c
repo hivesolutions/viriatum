@@ -75,6 +75,10 @@ void create_service(struct service_t **service_pointer, unsigned char *name, uns
 }
 
 void delete_service(struct service_t *service) {
+    /* in case no service is provided there's nothing to be
+    released, returns immediately (avoids invalid access) */
+    if(service == NULL) { return; }
+
     /* in case the service socket handle is defined and set
     must close the it using the safe approach (gracefully) */
     if(service->service_socket_handle) {
@@ -116,6 +120,7 @@ void create_service_options(struct service_options_t **service_options_pointer) 
     service_options->ssl_key = NULL;
     service_options->handler_name = NULL;
     service_options->local = 0;
+    service_options->workers = 0;
     service_options->default_index = 0;
     service_options->www_root[0] = '\0';
     service_options->use_template = 0;
@@ -347,6 +352,11 @@ ERROR_CODE calculate_locations_service(struct service_t *service) {
     int is_equal;
 
     struct sort_map_t *configuration = service->configuration;
+
+    /* in case no configuration is currently loaded there are no locations
+    to be calculated, returns immediately leaving the locations unset */
+    if(configuration == NULL) { RAISE_NO_ERROR; }
+
     create_element_iterator_sort_map(configuration, &iterator);
 
     while(TRUE) {
@@ -451,6 +461,13 @@ ERROR_CODE create_workers(struct service_t *service) {
     unsigned char worker_count = service_options->workers;
     if(worker_count == 0) { RAISE_NO_ERROR; }
 
+    /* in case the requested number of workers exceeds the maximum
+    allowed value clamps it, avoiding an overflow of the worker pids
+    buffer that keeps track of the created processes */
+    if(worker_count > VIRIATUM_MAX_WORKERS) {
+        worker_count = VIRIATUM_MAX_WORKERS;
+    }
+
     /* iterates continuously for the forking of the
     current process (worker creation) */
     while(TRUE) {
@@ -518,6 +535,13 @@ ERROR_CODE join_workers(struct service_t *service) {
     struct service_options_t *service_options = service->options;
     unsigned char worker_count = service_options->workers;
     if(worker_count == 0) { RAISE_NO_ERROR; }
+
+    /* in case the requested number of workers exceeds the maximum
+    allowed value clamps it, avoiding an overflow of the worker pids
+    buffer that keeps track of the created processes */
+    if(worker_count > VIRIATUM_MAX_WORKERS) {
+        worker_count = VIRIATUM_MAX_WORKERS;
+    }
 
     /* in case the current process type for the service is not master
     no need to join (and kill) the workers, it's not the responsible */
@@ -2286,6 +2310,11 @@ ERROR_CODE _file_options_service(struct service_t *service, struct hash_map_t *a
     /* sets the configuration structure under the service structure
     so that it may be latter used for operations */
     service->configuration = configuration;
+
+    /* in case no configuration file was loaded there's no configuration
+    map to be processed, returns immediately so that the service is kept
+    with the values that have been set by the default options loader */
+    if(configuration == NULL) { RAISE_NO_ERROR; }
 
     /* tries to retrieve the general section configuration from the configuration
     map in case none is found returns immediately no need to process anything more */

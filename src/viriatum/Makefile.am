@@ -43,6 +43,7 @@ libviriatum_http_la_LDFLAGS = -version-info $(VIRIATUM_MAJOR_VERSION):$(VIRIATUM
 
 viriatum_SOURCES = stdafx.c \
 viriatum.c \
+main.c \
 handlers/handler_default.c \
 handlers/handler_dispatch.c \
 handlers/handler_file.c \
@@ -67,6 +68,7 @@ system/service.c \
 system/torrent.c \
 test/handler_dispatch_test.c \
 test/handler_file_test.c \
+test/service_test.c \
 test/simple_test.c \
 test/speed_test.c \
 test/test_support.c
@@ -97,6 +99,7 @@ system/service.c \
 system/torrent.c \
 test/handler_dispatch_test.c \
 test/handler_file_test.c \
+test/service_test.c \
 test/simple_test.c \
 test/speed_test.c \
 test/test_support.c

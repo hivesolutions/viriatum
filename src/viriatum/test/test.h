@@ -27,5 +27,6 @@
 #include "test_support.h"
 #include "handler_dispatch_test.h"
 #include "handler_file_test.h"
+#include "service_test.h"
 #include "simple_test.h"
 #include "speed_test.h"

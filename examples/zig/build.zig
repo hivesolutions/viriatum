@@ -60,7 +60,7 @@ pub fn build(b: *std.Build) void {
         .name = "viriatum",
         .root_module = viriatum_mod,
     });
-    viriatum.linkLibrary(commons);
+    viriatum_mod.linkLibrary(commons);
 
     // --- example executable ---
 
@@ -74,7 +74,7 @@ pub fn build(b: *std.Build) void {
     exe_mod.addIncludePath(viriatum_root.path(b, "src/viriatum_commons"));
 
     // shim providing START_MEMORY and other globals normally
-    // defined in viriatum.c (which we exclude to avoid main)
+    // defined in viriatum.c (which we exclude from the core library)
     exe_mod.addCSourceFile(.{
         .file = b.path("src/viriatum_shim.c"),
         .flags = c_flags,
@@ -89,8 +89,8 @@ pub fn build(b: *std.Build) void {
         .name = "viriatum_zig",
         .root_module = exe_mod,
     });
-    exe.linkLibrary(viriatum);
-    exe.linkLibrary(commons);
+    exe_mod.linkLibrary(viriatum);
+    exe_mod.linkLibrary(commons);
 
     b.installArtifact(exe);
 
@@ -114,7 +114,7 @@ pub fn build(b: *std.Build) void {
     viriatum_exe_mod.addIncludePath(viriatum_root.path(b, "src/viriatum_commons"));
     viriatum_exe_mod.addCSourceFiles(.{
         .root = viriatum_root.path(b, "src/viriatum"),
-        .files = &viriatum_sources ++ .{"viriatum.c"},
+        .files = &viriatum_sources ++ .{ "viriatum.c", "main.c" },
         .flags = c_flags,
     });
     if (target.result.os.tag != .windows) {
@@ -130,7 +130,7 @@ pub fn build(b: *std.Build) void {
         .name = "viriatum",
         .root_module = viriatum_exe_mod,
     });
-    viriatum_exe.linkLibrary(commons);
+    viriatum_exe_mod.linkLibrary(commons);
 
     b.installArtifact(viriatum_exe);
 
@@ -184,8 +184,10 @@ const commons_sources = [_][]const u8{
 };
 
 // viriatum core source files (relative to src/viriatum)
-// note: viriatum.c is excluded because it contains main(),
-// we call create_service/start_service/etc. from service.c directly
+// note: viriatum.c is excluded because it defines the allocations
+// global (via START_MEMORY) that the shim supplies instead, and
+// main.c is excluded because it contains main(), we call
+// create_service/start_service/etc. from service.c directly
 const viriatum_sources = [_][]const u8{
     "stdafx.c",
     "handlers/handler_default.c",
@@ -209,5 +211,6 @@ const viriatum_sources = [_][]const u8{
     "test/speed_test.c",
     "test/handler_file_test.c",
     "test/handler_dispatch_test.c",
+    "test/service_test.c",
     "test/test_support.c",
 };
