@@ -63,6 +63,7 @@ viriatum/system/system.h \
 viriatum/system/torrent.h \
 viriatum/test/handler_dispatch_test.h \
 viriatum/test/handler_file_test.h \
+viriatum/test/service_test.h \
 viriatum/test/simple_test.h \
 viriatum/test/speed_test.h \
 viriatum/test/test.h \

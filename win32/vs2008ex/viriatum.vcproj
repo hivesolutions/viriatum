@@ -563,6 +563,10 @@
                     >
                 </File>
                 <File
+                    RelativePath="..\..\src\viriatum\test\service_test.c"
+                    >
+                </File>
+                <File
                     RelativePath="..\..\src\viriatum\test\simple_test.c"
                     >
                 </File>
@@ -742,6 +746,10 @@
                 </File>
                 <File
                     RelativePath="..\..\src\viriatum\test\handler_file_test.h"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\viriatum\test\service_test.h"
                     >
                 </File>
                 <File

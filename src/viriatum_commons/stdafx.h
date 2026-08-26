@@ -123,6 +123,7 @@ the windows xp operative system, must disable ipv6 */
 #include <windows.h>
 #include <psapi.h>
 #include <io.h>
+#include <direct.h>
 #endif
 
 #ifdef VIRIATUM_PLATFORM_UNIX
