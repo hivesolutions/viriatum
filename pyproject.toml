@@ -7,7 +7,7 @@ name = "viriatum"
 version = "0.3.0b3"
 description = "Viriatum Web Server bindings for the Python interpreter"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 license = "Apache-2.0"
 authors = [{ name = "João Magalhães", email = "joamag@hive.pt" }]
 keywords = ["viriatum", "wsgi", "server", "http"]
