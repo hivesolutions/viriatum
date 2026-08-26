@@ -39,6 +39,18 @@
 #define VIRIATUM_PYTHON_MAX_HEADERS 64
 
 /**
+ * The maximum size of the payload of a request, anything
+ * beyond this value is discarded.
+ */
+#define VIRIATUM_PYTHON_MAX_BODY 16777216
+
+/**
+ * The initial capacity of the buffer that accumulates the
+ * payload of a request, grown geometrically from it.
+ */
+#define VIRIATUM_PYTHON_BODY_CAPACITY 4096
+
+/**
  * Structure holding the state of a single request being
  * handled, one of these exists per connection so that no
  * global state is required (contrary to mod_wsgi).
@@ -69,6 +81,7 @@ typedef struct handler_python_context_t {
      */
     unsigned char *body;
     size_t body_size;
+    size_t body_capacity;
 
     /**
      * The status code and message set by the application
@@ -89,6 +102,19 @@ typedef struct handler_python_context_t {
      * already been called for the current request.
      */
     char started;
+
+    /**
+     * The payload written through the write callable that is
+     * returned by the start response one.
+     */
+    unsigned char *written;
+    size_t written_size;
+
+    /**
+     * The capsule carrying the context to both the start response
+     * and the write callables, invalidated on destruction.
+     */
+    PyObject *capsule;
 
     /**
      * The reference to the handler that owns the current

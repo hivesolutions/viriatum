@@ -580,7 +580,7 @@ ERROR_CODE create_workers(struct service_t *service) { RAISE_NO_ERROR; }
 ERROR_CODE join_workers(struct service_t *service) { RAISE_NO_ERROR; }
 #endif
 
-ERROR_CODE open_service(struct service_t *service) {
+ERROR_CODE _open_service(struct service_t *service) {
     /* allocates the socket data and then initializes the socket
     infrastructure with it, this is a no operation under unix and
     reference counted under windows (balanced in close_service) */
@@ -1238,6 +1238,29 @@ ERROR_CODE open_service(struct service_t *service) {
         "localhost",
         32967
     );*/
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE open_service(struct service_t *service) {
+    /* runs the concrete opening of the service, gathering the error
+    result so that a partial initialization may be undone */
+    ERROR_CODE return_value = _open_service(service);
+
+    /* in case the opening failed the service must be restored to the
+    closed state, the socket handles are unset as they have already been
+    closed and the socket infrastructure is released, balancing the
+    initialization that has been run at the start of the opening */
+    if(IS_ERROR_CODE(return_value)) {
+        service->service_socket_handle = 0;
+#ifdef VIRIATUM_IP6
+        service->service_socket6_handle = 0;
+#endif
+        service->status = STATUS_CLOSED;
+        SOCKET_FINISH();
+        RAISE_AGAIN(return_value);
+    }
 
     /* raises no error */
     RAISE_NO_ERROR;

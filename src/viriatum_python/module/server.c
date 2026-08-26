@@ -51,13 +51,39 @@ static int _init_server_python(PyObject *self, PyObject *args, PyObject *kwargs)
     /* parses the arguments provided to the constructor according to
     the keywords sequence defined above */
     if(!PyArg_ParseTupleAndKeywords(
-        args, kwargs, "O|sis", keywords, &application, &host, &port, &www_root
+        args, kwargs, "O|siz", keywords, &application, &host, &port, &www_root
     )) { return -1; }
+
+    /* in case the server has already been initialized rejects the new
+    initialization, otherwise the previously created service and the
+    reference to its application would be leaked */
+    if(server_python->service != NULL) {
+        PyErr_SetString(PyExc_RuntimeError, "server is already initialized");
+        return -1;
+    }
 
     /* verifies that the provided application is a callable object as
     required by the WSGI specification */
     if(!PyCallable_Check(application)) {
         PyErr_SetString(PyExc_TypeError, "application must be callable");
+        return -1;
+    }
+
+    /* verifies that the port is contained in the range that may be
+    represented by the underlying value, as it is narrowed below */
+    if(port < 0 || port > 65535) {
+        PyErr_SetString(PyExc_ValueError, "port must be between 0 and 65535");
+        return -1;
+    }
+
+    /* verifies that both the host and the www root fit the buffers that
+    are going to receive them, avoiding an overflow of either of them */
+    if(strlen(host) >= VIRIATUM_MAX_HEADER_SIZE) {
+        PyErr_SetString(PyExc_ValueError, "host is too long");
+        return -1;
+    }
+    if(www_root != NULL && strlen(www_root) >= VIRIATUM_MAX_PATH_SIZE) {
+        PyErr_SetString(PyExc_ValueError, "www_root is too long");
         return -1;
     }
 
@@ -114,6 +140,10 @@ static void _dealloc_server_python(PyObject *self) {
     PyTypeObject *type = Py_TYPE(self);
     struct server_python_t *server_python = (struct server_python_t *) self;
     if(server_python->service != NULL) {
+        if(server_python->opened == TRUE) {
+            close_service(server_python->service);
+            server_python->opened = FALSE;
+        }
         unregister_handler_python(server_python->service);
         delete_service(server_python->service);
         server_python->service = NULL;
@@ -143,7 +173,7 @@ static PyObject *_serve_forever_server_python(PyObject *self, PyObject *args) {
         /* bounds the polling timeout so that the loop comes back on a
         regular basis, this is what allows both the signal checking and
         the stopping of the service to be noticed in a timely manner */
-        service->polling->timeout = VIRIATUM_SELECT_TIMEOUT * 1000;
+        service->polling->timeout = VIRIATUM_PYTHON_POLL_TIMEOUT;
     }
 
     /* iterates continuously while the service is open, the polling

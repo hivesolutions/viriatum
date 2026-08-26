@@ -71,6 +71,15 @@ const char *test_calculate_locations_service(void);
 const char *test_open_close_service(void);
 
 /**
+ * Tests that a failed opening of a service leaves it in
+ * a properly closed state.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_open_service_busy(void);
+
+/**
  * Tests the file based options loading from a directory
  * where no configuration file may be reached.
  *

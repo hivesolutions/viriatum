@@ -1265,6 +1265,7 @@ void exec_simple_tests(struct test_case_t *test_case) {
     V_RUN_TEST(test_create_service_options, test_case);
     V_RUN_TEST(test_calculate_locations_service, test_case);
     V_RUN_TEST(test_open_close_service, test_case);
+    V_RUN_TEST(test_open_service_busy, test_case);
     V_RUN_TEST(test_file_options_service, test_case);
     V_RUN_TEST(test_ran_service, test_case);
 }

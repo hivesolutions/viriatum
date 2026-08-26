@@ -27,6 +27,13 @@
 #include "../stdafx.h"
 
 /**
+ * The timeout (in milliseconds) used while polling the
+ * service, it bounds how long a stop request or a signal
+ * may take to be noticed by the serving loop.
+ */
+#define VIRIATUM_PYTHON_POLL_TIMEOUT 250
+
+/**
  * Structure describing a server object, wrapping a viriatum
  * service so that it may be driven from the interpreter.
  */

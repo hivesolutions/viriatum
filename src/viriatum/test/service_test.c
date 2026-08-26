@@ -160,6 +160,71 @@ const char *test_open_close_service(void) {
     return NULL;
 }
 
+const char *test_open_service_busy(void) {
+    /* allocates space for the error codes and for both the service that
+    holds the port and the one that fails to open on it */
+    ERROR_CODE error;
+    struct service_t *service;
+    struct service_t *_service;
+    struct hash_map_t *arguments;
+
+    /* creates the first service and opens it, taking hold of the port
+    that the second one is going to try to bind */
+    create_service(
+        &service,
+        (unsigned char *) "test",
+        (unsigned char *) "test"
+    );
+    load_specifications(service);
+    create_hash_map(&arguments, 0);
+    _default_options_service(service, arguments);
+    delete_hash_map(arguments);
+    service->options->port = VIRIATUM_TEST_PORT;
+    service->options->load_modules = 0;
+    service->options->workers = 0;
+    service->options->ip6 = 0;
+    calculate_options_service(service);
+    calculate_locations_service(service);
+    error = open_service(service);
+    V_ASSERT(!IS_ERROR_CODE(error));
+
+    /* creates the second service targeting the very same port, the
+    opening of it is expected to fail as the port is taken */
+    create_service(
+        &_service,
+        (unsigned char *) "test",
+        (unsigned char *) "test"
+    );
+    load_specifications(_service);
+    create_hash_map(&arguments, 0);
+    _default_options_service(_service, arguments);
+    delete_hash_map(arguments);
+    _service->options->port = VIRIATUM_TEST_PORT;
+    _service->options->load_modules = 0;
+    _service->options->workers = 0;
+    _service->options->ip6 = 0;
+    calculate_options_service(_service);
+    calculate_locations_service(_service);
+
+    /* verifies that the opening failed and that the service has been
+    left in the closed state with no socket handle set, otherwise the
+    deletion of it would close a descriptor it no longer owns */
+    error = open_service(_service);
+    V_ASSERT(IS_ERROR_CODE(error));
+    V_ASSERT(_service->status == STATUS_CLOSED);
+    V_ASSERT(_service->service_socket_handle == 0);
+    delete_service(_service);
+
+    /* closes and deletes the service that held the port */
+    stop_service(service);
+    close_service(service);
+    delete_service(service);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
 const char *test_file_options_service(void) {
     /* allocates space for the error codes returned by both the
     options loading and the locations calculation, together with

@@ -28,11 +28,136 @@
 
 static PyObject *_start_response_handler_python(PyObject *self, PyObject *args);
 
+static void _report_handler_python(void) {
+    /* in case the pending exception is a system exit it must not be
+    printed, as that would terminate the process that is hosting the
+    server, it is cleared and reported as a plain error instead */
+    if(PyErr_ExceptionMatches(PyExc_SystemExit)) {
+        PyErr_Clear();
+        V_WARNING("Application requested a system exit, ignoring\n");
+        return;
+    }
+
+    /* in case the pending exception is a keyboard interrupt it is re
+    armed so that the serving loop is able to notice it */
+    if(PyErr_ExceptionMatches(PyExc_KeyboardInterrupt)) {
+        PyErr_Clear();
+        PyErr_SetInterrupt();
+        return;
+    }
+
+    /* prints the pending exception into the standard error, this is the
+    usual reporting for an application level problem */
+    PyErr_Print();
+}
+
+static void _decode_handler_python(char *value) {
+    /* allocates space for both the read and the write indexes, the
+    decoding is run in place as it may only shrink the value */
+    size_t read = 0;
+    size_t write = 0;
+    char first;
+    char second;
+
+    /* iterates over the complete set of characters looking for the
+    percent escapes, any other character is copied unchanged */
+    while(value[read] != '\0') {
+        if(value[read] == '%' && isxdigit((unsigned char) value[read + 1]) &&
+            isxdigit((unsigned char) value[read + 2])) {
+            first = value[read + 1];
+            second = value[read + 2];
+            value[write] = (char) (
+                (isdigit((unsigned char) first) ? first - '0' : (toupper(first) - 'A') + 10) * 16 +
+                (isdigit((unsigned char) second) ? second - '0' : (toupper(second) - 'A') + 10)
+            );
+            read += 3;
+        } else {
+            value[write] = value[read];
+            read++;
+        }
+        write++;
+    }
+
+    /* closes the resulting value with the end of string character */
+    value[write] = '\0';
+}
+
+static char _is_length_handler_python(const char *header) {
+    /* compares the name part of the header line, the one that precedes
+    the separator, against the content length one in a case insensitive
+    manner as the header names are not case sensitive */
+    size_t index;
+    const char *name = CONTENT_LENGTH_H;
+    for(index = 0; name[index] != '\0'; index++) {
+        if(toupper((unsigned char) header[index]) != toupper((unsigned char) name[index])) {
+            return FALSE;
+        }
+    }
+    return header[index] == ':' ? TRUE : FALSE;
+}
+
+static char _is_valid_handler_python(const char *value) {
+    /* iterates over the complete set of characters of the value looking
+    for a control one, their presence in a status or in a header would
+    allow the response envelope to be split by the application */
+    size_t index;
+    size_t size = strlen(value);
+    for(index = 0; index < size; index++) {
+        if((unsigned char) value[index] < 32 || value[index] == 127) { return FALSE; }
+    }
+    return TRUE;
+}
+
 /**
  * The method definition for the start response callable that
  * is handed to the application, the context of the request is
  * carried in the self argument through a capsule.
  */
+static PyObject *_write_handler_python(PyObject *self, PyObject *args) {
+    /* allocates space for the payload to be written together with its
+    size and for the buffer that is going to receive it */
+    char *data;
+    Py_ssize_t data_size;
+    unsigned char *written;
+
+    /* retrieves the context of the request from the capsule that has
+    been set as the self value of the callable */
+    struct handler_python_context_t *handler_python_context =
+        (struct handler_python_context_t *) PyCapsule_GetPointer(self, NULL);
+    if(handler_python_context == NULL) { return NULL; }
+
+    /* parses the single bytes argument of the call, the specification
+    defines it as the payload to be written */
+    if(!PyArg_ParseTuple(args, "y#", &data, &data_size)) { return NULL; }
+
+    /* grows the written buffer so that the newly provided payload fits
+    it and then copies the payload into its tail */
+    written = (unsigned char *) MALLOC(handler_python_context->written_size + (size_t) data_size);
+    if(handler_python_context->written != NULL) {
+        memcpy(written, handler_python_context->written, handler_python_context->written_size);
+        FREE(handler_python_context->written);
+    }
+    memcpy(&written[handler_python_context->written_size], data, (size_t) data_size);
+    handler_python_context->written = written;
+    handler_python_context->written_size += (size_t) data_size;
+
+    /* returns the none value as the writing operation provides no
+    meaningful result to the application */
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+/**
+ * The method definition for the write callable that is returned by the
+ * start response one, it shares the capsule carrying the context.
+ */
+static PyMethodDef write_method = {
+    "write",
+    (PyCFunction) _write_handler_python,
+    METH_VARARGS,
+    NULL
+};
+
 static PyMethodDef start_response_method = {
     "start_response",
     (PyCFunction) _start_response_handler_python,
@@ -65,6 +190,16 @@ ERROR_CODE delete_handler_python_context(struct handler_python_context_t *handle
     have been set during the parsing of the request */
     if(handler_python_context->url != NULL) { FREE(handler_python_context->url); }
     if(handler_python_context->body != NULL) { FREE(handler_python_context->body); }
+    if(handler_python_context->written != NULL) { FREE(handler_python_context->written); }
+
+    /* invalidates the capsule by renaming it and then releases the
+    reference held on it, a callable retained by the application then
+    fails the name check instead of reaching this released context */
+    if(handler_python_context->capsule != NULL) {
+        PyCapsule_SetName(handler_python_context->capsule, "invalid");
+        Py_DECREF(handler_python_context->capsule);
+        handler_python_context->capsule = NULL;
+    }
     if(handler_python_context->status_message != NULL) {
         FREE(handler_python_context->status_message);
     }
@@ -270,13 +405,35 @@ ERROR_CODE body_callback_handler_python(struct http_parser_t *http_parser, const
     multiple times for a single request */
     struct handler_python_context_t *handler_python_context =
         (struct handler_python_context_t *) http_parser->context;
-    unsigned char *body = (unsigned char *) MALLOC(handler_python_context->body_size + data_size);
-    if(handler_python_context->body != NULL) {
-        memcpy(body, handler_python_context->body, handler_python_context->body_size);
-        FREE(handler_python_context->body);
+    unsigned char *body;
+    size_t body_capacity;
+
+    /* in case the payload would exceed the maximum allowed size the
+    remaining data is discarded, avoiding an unbounded growth driven
+    by the client */
+    if(handler_python_context->body_size + data_size > VIRIATUM_PYTHON_MAX_BODY) {
+        RAISE_NO_ERROR;
     }
-    memcpy(&body[handler_python_context->body_size], data, data_size);
-    handler_python_context->body = body;
+
+    /* grows the buffer geometrically whenever the payload no longer fits
+    it, this keeps the accumulation linear over the various callbacks */
+    if(handler_python_context->body_size + data_size > handler_python_context->body_capacity) {
+        body_capacity = handler_python_context->body_capacity == 0 ?
+            VIRIATUM_PYTHON_BODY_CAPACITY : handler_python_context->body_capacity;
+        while(body_capacity < handler_python_context->body_size + data_size) {
+            body_capacity *= 2;
+        }
+        body = (unsigned char *) MALLOC(body_capacity);
+        if(handler_python_context->body != NULL) {
+            memcpy(body, handler_python_context->body, handler_python_context->body_size);
+            FREE(handler_python_context->body);
+        }
+        handler_python_context->body = body;
+        handler_python_context->body_capacity = body_capacity;
+    }
+
+    /* copies the newly received payload into the tail of the buffer */
+    memcpy(&handler_python_context->body[handler_python_context->body_size], data, data_size);
     handler_python_context->body_size += data_size;
 
     /* raise no error */
@@ -370,11 +527,30 @@ ERROR_CODE _unset_http_settings_handler_python(struct http_settings_t *http_sett
 }
 
 static void _set_environ_handler_python(PyObject *environ_map, const char *key, const char *value) {
+    /* allocates space for the object holding the value and for the one
+    that may already be present under the same key */
+    PyObject *object;
+    PyObject *current;
+    PyObject *joined;
+
     /* creates the unicode object from the provided value using the latin 1
-    codec, as mandated by the WSGI specification for the native strings, and
-    then sets it in the environ releasing the local reference afterwards */
-    PyObject *object = PyUnicode_DecodeLatin1(value, strlen(value), "replace");
+    codec, as mandated by the WSGI specification for the native strings */
+    object = PyUnicode_DecodeLatin1(value, strlen(value), "replace");
     if(object == NULL) { PyErr_Clear(); return; }
+
+    /* in case a value is already set under the key the two are joined with
+    a comma, as required for the repeated headers of a request, otherwise
+    the newly created object replaces the (unset) value */
+    current = PyDict_GetItemString(environ_map, key);
+    if(current != NULL) {
+        joined = PyUnicode_FromFormat("%U, %U", current, object);
+        Py_DECREF(object);
+        if(joined == NULL) { PyErr_Clear(); return; }
+        object = joined;
+    }
+
+    /* sets the resulting value in the environ releasing the local
+    reference to it afterwards */
     PyDict_SetItemString(environ_map, key, object);
     Py_DECREF(object);
 }
@@ -455,6 +631,11 @@ static PyObject *_build_environ_handler_python(
     if(path_size > 0) { memcpy(path, handler_python_context->url, path_size); }
     path[path_size] = '\0';
 
+    /* decodes the percent escapes of the path in place, the operation is
+    run after the query string split so that an encoded separator is not
+    able to forge one */
+    _decode_handler_python(path);
+
     /* sets the various request oriented values in the environ, note that
     the script name is always empty as the application owns the routing */
     _set_environ_handler_python(environ_map, "REQUEST_METHOD", get_http_method_string(http_parser->method));
@@ -528,6 +709,8 @@ static PyObject *_start_response_handler_python(PyObject *self, PyObject *args) 
     const char *name_value;
     const char *value_value;
     char *pointer;
+    char *end;
+    long status_code;
     size_t index;
     size_t count;
     size_t header_size;
@@ -568,7 +751,20 @@ static PyObject *_start_response_handler_python(PyObject *self, PyObject *args) 
     one the complete (possibly multi word) status message */
     status_value = PyUnicode_AsUTF8(status);
     if(status_value == NULL) { return NULL; }
-    handler_python_context->status_code = atoi(status_value);
+    if(_is_valid_handler_python(status_value) == FALSE) {
+        PyErr_SetString(PyExc_ValueError, "status carries a control character");
+        return NULL;
+    }
+
+    /* parses the code of the status verifying that it falls inside the
+    range of the valid HTTP status codes, a malformed value would
+    otherwise reach the wire as a zero code */
+    status_code = strtol(status_value, &end, 10);
+    if(end == status_value || status_code < 100 || status_code > 599) {
+        PyErr_SetString(PyExc_ValueError, "status must start with a valid code");
+        return NULL;
+    }
+    handler_python_context->status_code = (int) status_code;
     pointer = strchr(status_value, ' ');
     if(handler_python_context->status_message != NULL) {
         FREE(handler_python_context->status_message);
@@ -608,6 +804,17 @@ static PyObject *_start_response_handler_python(PyObject *self, PyObject *args) 
             return NULL;
         }
 
+        /* rejects any control character in either the name or the value
+        of the header, as they would allow the response to be split by
+        an application that reflects data received from the client */
+        if(_is_valid_handler_python(name_value) == FALSE ||
+            _is_valid_handler_python(value_value) == FALSE) {
+            Py_DECREF(name);
+            Py_DECREF(value);
+            PyErr_SetString(PyExc_ValueError, "header carries a control character");
+            return NULL;
+        }
+
         /* allocates space for the complete header line and formats it
         into the newly allocated buffer (name and value pair) */
         header_size = strlen(name_value) + strlen(value_value) + 3;
@@ -630,10 +837,10 @@ static PyObject *_start_response_handler_python(PyObject *self, PyObject *args) 
     exception information is able to detect it */
     handler_python_context->started = TRUE;
 
-    /* returns the write callable, that is unsupported and so returns
-    the none value, applications should use the iterable instead */
-    Py_INCREF(Py_None);
-    return Py_None;
+    /* returns the write callable bound to the same context, as required
+    by the specification, note that the written payload is buffered and
+    prepended to the one returned by the application */
+    return PyCFunction_New(&write_method, self);
 }
 
 ERROR_CODE _send_response_handler_python(struct http_parser_t *http_parser) {
@@ -656,6 +863,8 @@ ERROR_CODE _send_response_handler_python(struct http_parser_t *http_parser) {
     size_t count;
     size_t index;
     size_t headers_size;
+    size_t body_total;
+    char has_length;
 
     /* retrieves the connection from the HTTP parser parameters and then
     the underlying connection references in order to operate over them */
@@ -682,10 +891,12 @@ ERROR_CODE _send_response_handler_python(struct http_parser_t *http_parser) {
     response callable carrying the context of the request */
     environ_map = _build_environ_handler_python(handler_python_context, http_parser, connection);
     if(environ_map == NULL) {
-        PyErr_Print();
+        _report_handler_python();
         result = NULL;
     } else {
         capsule = PyCapsule_New((void *) handler_python_context, NULL, NULL);
+        Py_XINCREF(capsule);
+        handler_python_context->capsule = capsule;
         start_response = PyCFunction_New(&start_response_method, capsule);
         result = PyObject_CallFunctionObjArgs(
             handler_python->application,
@@ -701,7 +912,9 @@ ERROR_CODE _send_response_handler_python(struct http_parser_t *http_parser) {
     /* in case the application raised an exception prints it into the
     standard error and keeps the internal error status */
     if(result == NULL) {
-        PyErr_Print();
+        _report_handler_python();
+        handler_python_context->status_code = 500;
+        handler_python_context->response_header_count = 0;
         V_WARNING_F(
             "Problem handling request %s\n",
             handler_python_context->url == NULL ?
@@ -719,10 +932,13 @@ ERROR_CODE _send_response_handler_python(struct http_parser_t *http_parser) {
             Py_DECREF(list);
         }
         if(body_object == NULL) {
-            PyErr_Print();
+            _report_handler_python();
             handler_python_context->status_code = 500;
-        } else {
-            PyBytes_AsStringAndSize(body_object, &body_data, &body_size);
+        } else if(PyBytes_AsStringAndSize(body_object, &body_data, &body_size) < 0) {
+            _report_handler_python();
+            handler_python_context->status_code = 500;
+            body_data = NULL;
+            body_size = 0;
         }
 
         /* closes the iterable in case it provides the close method, as
@@ -737,6 +953,7 @@ ERROR_CODE _send_response_handler_python(struct http_parser_t *http_parser) {
     /* calculates the amount of space taken by the status message and by
     the headers set by the application, these are unbounded in size and
     so they must be accounted for in the allocation of the buffer */
+    body_total = handler_python_context->written_size + (size_t) body_size;
     headers_size = handler_python_context->status_message == NULL ?
         0 : strlen((char *) handler_python_context->status_message);
     for(index = 0; index < handler_python_context->response_header_count; index++) {
@@ -748,7 +965,7 @@ ERROR_CODE _send_response_handler_python(struct http_parser_t *http_parser) {
     the body take the remaining part of the buffer */
     connection->alloc_data(
         connection,
-        VIRIATUM_HTTP_MAX_SIZE + headers_size + (size_t) body_size,
+        VIRIATUM_HTTP_MAX_SIZE + headers_size + body_total,
         (void **) &buffer
     );
 
@@ -766,15 +983,28 @@ ERROR_CODE _send_response_handler_python(struct http_parser_t *http_parser) {
         FALSE
     );
 
+    /* verifies if the application has set a content length of its own,
+    in which case the one of the server is not written, as two of them
+    on the wire would desynchronize a client keeping the connection */
+    has_length = FALSE;
+    for(index = 0; index < handler_python_context->response_header_count; index++) {
+        if(_is_length_handler_python((char *) handler_python_context->response_headers[index])) {
+            has_length = TRUE;
+            break;
+        }
+    }
+
     /* writes the content length header with the size of the payload
     that has been gathered from the application response */
-    count += SPRINTF(
-        &buffer[count],
-        VIRIATUM_MAX_HEADER_C_SIZE,
-        "%s: %lu\r\n",
-        CONTENT_LENGTH_H,
-        (long unsigned int) body_size
-    );
+    if(has_length == FALSE) {
+        count += SPRINTF(
+            &buffer[count],
+            VIRIATUM_MAX_HEADER_C_SIZE,
+            "%s: %lu\r\n",
+            CONTENT_LENGTH_H,
+            (long unsigned int) body_total
+        );
+    }
 
     /* iterates over the complete set of headers set by the application
     copying each one of them into the headers buffer */
@@ -791,6 +1021,14 @@ ERROR_CODE _send_response_handler_python(struct http_parser_t *http_parser) {
     complete payload into the remaining part of the buffer */
     memcpy(&buffer[count], "\r\n", 2);
     count += 2;
+    if(handler_python_context->written_size > 0) {
+        memcpy(
+            &buffer[count],
+            handler_python_context->written,
+            handler_python_context->written_size
+        );
+        count += handler_python_context->written_size;
+    }
     if(body_size > 0) { memcpy(&buffer[count], body_data, (size_t) body_size); }
     count += (size_t) body_size;
 
