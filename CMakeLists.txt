@@ -79,9 +79,16 @@ target_compile_definitions(viriatum_objects PRIVATE WITH_MODULE_ROOT="${CMAKE_BI
 target_link_libraries(viriatum_objects PUBLIC viriatum_commons)
 
 # the static and shared flavours of the core library, both named after the
-# autotools libviriatum_http target so that the produced artifacts match
+# autotools libviriatum_http target so that the produced artifacts match,
+# under windows the static library and the import library of the shared one
+# are both archive artifacts, so the static flavour takes a distinct name to
+# avoid the two overwriting each other in the archive output directory
 add_library(viriatum_static STATIC $<TARGET_OBJECTS:viriatum_objects>)
-set_target_properties(viriatum_static PROPERTIES OUTPUT_NAME viriatum_http)
+if(WIN32)
+    set_target_properties(viriatum_static PROPERTIES OUTPUT_NAME viriatum_http_static)
+else()
+    set_target_properties(viriatum_static PROPERTIES OUTPUT_NAME viriatum_http)
+endif()
 target_link_libraries(viriatum_static PUBLIC viriatum_objects)
 
 add_library(viriatum_shared SHARED $<TARGET_OBJECTS:viriatum_objects>)
