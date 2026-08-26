@@ -327,7 +327,10 @@ xcopy /e /y "$(SolutionDir)..\..\src\$(ProjectName)\resources\config\viriatum" "
     <ClCompile Include="..\..\src\viriatum\test\speed_test.c" />
     <ClCompile Include="..\..\src\viriatum\test\test_support.c" />
     <ClCompile Include="..\..\src\viriatum\viriatum.c" />
-    <ClCompile Include="..\..\src\viriatum\main.c" />
+    <ClCompile Include="..\..\src\viriatum\main.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Library|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Library (Dynamic)|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\viriatum\base\base.h" />
