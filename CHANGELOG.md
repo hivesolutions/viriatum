@@ -65,6 +65,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+* Absolute path resolution no longer aborts the process on optimized Linux builds - [#39](https://github.com/hivesolutions/viriatum/issues/39)
 * Server no longer crashes on startup when no configuration file is present - [#39](https://github.com/hivesolutions/viriatum/issues/39)
 * Stopping or releasing a server that was never started is now safe - [#39](https://github.com/hivesolutions/viriatum/issues/39)
 * Worker count is no longer read from an unset value and is capped to the supported maximum - [#39](https://github.com/hivesolutions/viriatum/issues/39)
