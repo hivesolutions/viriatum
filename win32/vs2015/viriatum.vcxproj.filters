@@ -99,6 +99,9 @@
     <ClCompile Include="..\..\src\viriatum\test\handler_file_test.c">
       <Filter>Source Files\Test</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\viriatum\test\websocket_test.c">
+      <Filter>Source Files\Test</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\src\viriatum\test\service_test.c">
       <Filter>Source Files\Test</Filter>
     </ClCompile>
@@ -121,6 +124,9 @@
       <Filter>Source Files\Http</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\viriatum\http\http_util.c">
+      <Filter>Source Files\Http</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\viriatum\http\websocket.c">
       <Filter>Source Files\Http</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\viriatum\handlers\handler_default.c">
@@ -209,6 +215,9 @@
     <ClInclude Include="..\..\src\viriatum\test\handler_file_test.h">
       <Filter>Header Files\Test</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\viriatum\test\websocket_test.h">
+      <Filter>Header Files\Test</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\src\viriatum\test\service_test.h">
       <Filter>Header Files\Test</Filter>
     </ClInclude>
@@ -240,6 +249,9 @@
       <Filter>Header Files\Http</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\viriatum\http\http_util.h">
+      <Filter>Header Files\Http</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum\http\websocket.h">
       <Filter>Header Files\Http</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\viriatum\handlers\handler_default.h">

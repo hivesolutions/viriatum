@@ -51,6 +51,7 @@ handlers/handler_proxy.c \
 http/http_parser.c \
 http/http_request.c \
 http/http_util.c \
+http/websocket.c \
 jni/info.c \
 jni/jni_service.c \
 jni/start.c \
@@ -71,6 +72,7 @@ test/handler_file_test.c \
 test/service_test.c \
 test/simple_test.c \
 test/speed_test.c \
+test/websocket_test.c \
 test/test_support.c
 
 libviriatum_http_la_SOURCES = stdafx.c \
@@ -82,6 +84,7 @@ handlers/handler_proxy.c \
 http/http_parser.c \
 http/http_request.c \
 http/http_util.c \
+http/websocket.c \
 jni/info.c \
 jni/jni_service.c \
 jni/start.c \
@@ -102,4 +105,5 @@ test/handler_file_test.c \
 test/service_test.c \
 test/simple_test.c \
 test/speed_test.c \
+test/websocket_test.c \
 test/test_support.c

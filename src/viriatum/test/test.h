@@ -30,3 +30,4 @@
 #include "service_test.h"
 #include "simple_test.h"
 #include "speed_test.h"
+#include "websocket_test.h"

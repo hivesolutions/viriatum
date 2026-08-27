@@ -158,6 +158,36 @@ There are a lot of possible building features to enable
 * `--enable-mpool`- Enables the memory pool support (optimized for windows only)
 * `--enable-prefork` - Enables the prefork support so that viriatum can create workers
 
+## Python Package
+
+Viriatum may be imported from the Python interpreter and used to serve either a WSGI or an ASGI application on its own event loop, no separate server process is required:
+
+    pip install .
+
+A WSGI application is served by passing it to the server, the interface is detected from the shape of the application:
+
+    import viriatum
+
+    def application(environ, start_response):
+        start_response("200 OK", [("Content-Type", "text/plain")])
+        return [b"Hello World"]
+
+    viriatum.serve(application, port=8080)
+
+An ASGI application is served in exactly the same way, a coroutine function is recognised as such and driven on the asyncio loop that the server advances once per iteration of its own:
+
+    import viriatum
+
+    async def application(scope, receive, send):
+        await receive()
+        await send({"type": "http.response.start", "status": 200,
+                    "headers": [(b"content-type", b"text/plain")]})
+        await send({"type": "http.response.body", "body": b"Hello World"})
+
+    viriatum.serve(application, port=8080)
+
+The `http`, `lifespan` and `websocket` scopes are all supported, response bodies are streamed as each chunk is sent. The interface may also be forced with `interface="wsgi"` or `interface="asgi"` when the detection is not appropriate.
+
 ## Modules
 
 There are a series of modules for the viriatum server that are used to extend functionality

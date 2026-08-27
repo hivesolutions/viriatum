@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+* Server can now be imported from Python to serve an ASGI application, covering the HTTP, lifespan and WebSocket scopes - [#42](https://github.com/hivesolutions/viriatum/issues/42)
+* Response bodies of ASGI applications are streamed as they are produced instead of being held in memory - [#42](https://github.com/hivesolutions/viriatum/issues/42)
+* WebSocket support in the core server, including the handshake and the framing of messages - [#42](https://github.com/hivesolutions/viriatum/issues/42)
+* Coverage script and continuous integration job reporting the coverage of the test suites - [#42](https://github.com/hivesolutions/viriatum/issues/42)
 * Server can now be imported from Python to serve a WSGI application on its own event loop - [#39](https://github.com/hivesolutions/viriatum/issues/39)
 * Continuous integration job building and testing the Python package on Linux, macOS and Windows - [#39](https://github.com/hivesolutions/viriatum/issues/39)
 * Core server can now be built as a shared or static library, so it can be embedded in another program - [#39](https://github.com/hivesolutions/viriatum/issues/39)

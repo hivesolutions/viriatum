@@ -41,6 +41,7 @@ viriatum/http/http.h \
 viriatum/http/http_parser.h \
 viriatum/http/http_request.h \
 viriatum/http/http_util.h \
+viriatum/http/websocket.h \
 viriatum/jni/info.h \
 viriatum/jni/jni.h \
 viriatum/jni/jni_service.h \
@@ -67,6 +68,7 @@ viriatum/test/service_test.h \
 viriatum/test/simple_test.h \
 viriatum/test/speed_test.h \
 viriatum/test/test.h \
+viriatum/test/websocket_test.h \
 viriatum_commons/stdafx.h \
 viriatum_commons/viriatum_commons.h \
 viriatum_commons/checksum/checksum.h \

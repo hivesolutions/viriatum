@@ -67,6 +67,10 @@ cmake_install.cmake
 /lib
 /build
 /build-*
+/build.*
+/coverage
+/src/viriatum_python/viriatum/_viriatum*.so
+/src/viriatum_python/viriatum/_viriatum*.pyd
 /dist
 /lua
 /lua5.*

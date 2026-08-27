@@ -37,6 +37,7 @@
 #define CACHE_CONTROL_H "Cache-Control"
 #define CONTENT_LENGTH_H "Content-Length"
 #define WWW_AUTHENTICATE_H "WWW-Authenticate"
+#define TRANSFER_ENCODING_H "Transfer-Encoding"
 
 /**
  * The array defining the various strings indicating

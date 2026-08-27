@@ -20,6 +20,22 @@ if(VIRIATUM_DEBUG OR CMAKE_BUILD_TYPE STREQUAL "Debug")
     message(STATUS "Viriatum: debug mode enabled")
 endif()
 
+# instruments every target with the coverage counters of the current
+# compiler, the resulting profiles are gathered by scripts/coverage.sh
+option(VIRIATUM_COVERAGE "Build with coverage instrumentation" OFF)
+if(VIRIATUM_COVERAGE)
+    if(CMAKE_C_COMPILER_ID MATCHES "Clang")
+        add_compile_options(-fprofile-instr-generate -fcoverage-mapping)
+        add_link_options(-fprofile-instr-generate -fcoverage-mapping)
+    elseif(CMAKE_C_COMPILER_ID STREQUAL "GNU")
+        add_compile_options(--coverage)
+        add_link_options(--coverage)
+    else()
+        message(FATAL_ERROR "Viriatum: coverage is not supported for ${CMAKE_C_COMPILER_ID}")
+    endif()
+    message(STATUS "Viriatum: coverage instrumentation enabled")
+endif()
+
 set(VIRIATUM_WWW_ROOT "" CACHE STRING "Path to the www root directory (sets WITH_WWW_ROOT)")
 if(VIRIATUM_WWW_ROOT)
     add_definitions(-DWITH_WWW_ROOT="${VIRIATUM_WWW_ROOT}")
