@@ -1190,6 +1190,33 @@ class LifespanTest(unittest.TestCase):
         self.assertEqual(events, ["startup", "shutdown"])
         self.assertTrue(time.time() - initial >= 0.3, "startup was not waited for")
 
+    def test_lifespan_loop_failure(self):
+        # verifies that a loop that is unable to advance does not hang
+        # the opening of the service, the wait gives up and the
+        # requests are served without any lifespan handling
+        events = []
+
+        async def application(scope, receive, send):
+            if scope["type"] != "lifespan":
+                await self._plain(receive, send)
+                return
+            while True:
+                message = await receive()
+                events.append(message["type"])
+                if message["type"] == "lifespan.startup":
+                    await send({"type": "lifespan.startup.complete"})
+
+        def sleep(*args, **kwargs):
+            raise RuntimeError("intentional failure")
+
+        original = asyncio.sleep
+        asyncio.sleep = sleep
+        try:
+            self._serve(application, PORT + 8)
+        finally:
+            asyncio.sleep = original
+        self.assertEqual(events, [])
+
     def test_lifespan_unsupported(self):
         # verifies that an application that refuses the lifespan
         # scope is served anyway, as the specification requires
