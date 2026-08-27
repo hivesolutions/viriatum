@@ -49,6 +49,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+* Applied `black` across all Python sources and the examples in the documentation
 * Zig example is now built with a newer Zig release, restoring the macOS build - [#39](https://github.com/hivesolutions/viriatum/issues/39)
 * Renamed `logging_use_color` to `use_color_logging` and `logging_print_date` to `print_date_logging`
 

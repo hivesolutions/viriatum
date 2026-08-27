@@ -73,14 +73,24 @@ class ServerTest(unittest.TestCase):
             start_response("200 OK", [("Content-Type", "text/plain")])
             return [str(len(data)).encode("utf-8")]
         if path == "/generator":
+
             def generator():
                 yield b"first-"
                 yield b"second"
+
             start_response("200 OK", [("Content-Type", "text/plain")])
             return generator()
         if path == "/environ":
-            keys = ("REQUEST_METHOD", "SCRIPT_NAME", "PATH_INFO", "QUERY_STRING",
-                    "SERVER_PROTOCOL", "SERVER_SOFTWARE", "SERVER_PORT", "REMOTE_ADDR")
+            keys = (
+                "REQUEST_METHOD",
+                "SCRIPT_NAME",
+                "PATH_INFO",
+                "QUERY_STRING",
+                "SERVER_PROTOCOL",
+                "SERVER_SOFTWARE",
+                "SERVER_PORT",
+                "REMOTE_ADDR",
+            )
             body = "|".join("%s=%s" % (key, environ[key]) for key in keys)
             start_response("200 OK", [("Content-Type", "text/plain")])
             return [body.encode("utf-8")]
@@ -100,7 +110,9 @@ class ServerTest(unittest.TestCase):
             start_response("200 OK", [("X-First", "one"), ("X-Second", "two")])
             return [b""]
         if path == "/raise-after":
-            start_response("200 OK", [("Content-Type", "text/plain"), ("X-Stale", "yes")])
+            start_response(
+                "200 OK", [("Content-Type", "text/plain"), ("X-Stale", "yes")]
+            )
             raise RuntimeError("intentional failure after start response")
         if path == "/exit":
             start_response("200 OK", [])
@@ -112,10 +124,13 @@ class ServerTest(unittest.TestCase):
             return [b"returned"]
         if path == "/own-length":
             body = b"exact"
-            start_response("200 OK", [
-                ("Content-Type", "text/plain"),
-                ("Content-Length", str(len(body))),
-            ])
+            start_response(
+                "200 OK",
+                [
+                    ("Content-Type", "text/plain"),
+                    ("Content-Length", str(len(body))),
+                ],
+            )
             return [body]
         if path == "/bad-header":
             try:
@@ -386,9 +401,7 @@ class ServerLifecycleTest(unittest.TestCase):
         # a port outside of the representable range must be rejected
         # instead of being silently narrowed into another one
         for port in (-1, 65536, 70000):
-            self.assertRaises(
-                ValueError, viriatum.Server, self._application, port=port
-            )
+            self.assertRaises(ValueError, viriatum.Server, self._application, port=port)
 
     def test_invalid_host(self):
         # a host that does not fit the buffer receiving it must be
@@ -440,7 +453,9 @@ class ServerLifecycleTest(unittest.TestCase):
         thread.start()
         for _ in range(100):
             try:
-                urllib.request.urlopen("http://127.0.0.1:%d/" % (PORT + 2), timeout=1).read()
+                urllib.request.urlopen(
+                    "http://127.0.0.1:%d/" % (PORT + 2), timeout=1
+                ).read()
                 break
             except Exception:
                 time.sleep(0.1)

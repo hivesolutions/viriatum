@@ -168,9 +168,11 @@ A WSGI application is served by passing it to the server, the interface is detec
 
     import viriatum
 
+
     def application(environ, start_response):
         start_response("200 OK", [("Content-Type", "text/plain")])
         return [b"Hello World"]
+
 
     viriatum.serve(application, port=8080)
 
@@ -178,11 +180,18 @@ An ASGI application is served in exactly the same way, a coroutine function is r
 
     import viriatum
 
+
     async def application(scope, receive, send):
         await receive()
-        await send({"type": "http.response.start", "status": 200,
-                    "headers": [(b"content-type", b"text/plain")]})
+        await send(
+            {
+                "type": "http.response.start",
+                "status": 200,
+                "headers": [(b"content-type", b"text/plain")],
+            }
+        )
         await send({"type": "http.response.body", "body": b"Hello World"})
+
 
     viriatum.serve(application, port=8080)
 

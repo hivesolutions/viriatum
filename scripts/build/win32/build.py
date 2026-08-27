@@ -15,30 +15,22 @@ INCLUDES = (
     DEV_HOME + "\include\php",
     DEV_HOME + "\include\php\main",
     DEV_HOME + "\include\php\TSRM",
-    DEV_HOME + "\include\php\Zend"
+    DEV_HOME + "\include\php\Zend",
 )
 """ The list of extra include directories
 for the build process """
 
-FILES = (
-    "viriatum.exe",
-    "config",
-    "htdocs"
-)
+FILES = ("viriatum.exe", "config", "htdocs")
 """ The list of files and directories to
 be used for the creation of the package """
 
-FILES_M = (
-    "viriatum.exe",
-    "config",
-    "htdocs",
-    "modules"
-)
+FILES_M = ("viriatum.exe", "config", "htdocs", "modules")
 """ The list of files and directories to
 be used for the creation of the package
 it includes the modules directory """
 
-def build(file = None, build_m = True, arch = "win32", mode = "Release"):
+
+def build(file=None, build_m=True, arch="win32", mode="Release"):
     # runs the initial assertion for the various commands
     # that are mandatory for execution, this should avoid
     # errors in the middle of the build
@@ -46,7 +38,7 @@ def build(file = None, build_m = True, arch = "win32", mode = "Release"):
 
     # starts the build process with the configuration file
     # that was provided to the configuration script
-    atm.build(file, arch = arch)
+    atm.build(file, arch=arch)
 
     # creates the various paths to the folders to be used
     # for the build operation, from the ones already loaded
@@ -68,7 +60,7 @@ def build(file = None, build_m = True, arch = "win32", mode = "Release"):
 
     # clones the current repository using the git command and then
     # copies the resulting directory to the temporary directory
-    atm.git(clean = True)
+    atm.git(clean=True)
     atm.copy(repo_f, os.path.join(tmp_f, name_src))
 
     # lists the modules directory so that all the modules are
@@ -91,20 +83,17 @@ def build(file = None, build_m = True, arch = "win32", mode = "Release"):
     # constructs the path to the solution file and uses it for
     # the msbuild command to build the project
     mod_sln_path = os.path.join(solution_f, "viriatum_mod.sln")
-    build_m and atm.msbuild(mod_sln_path, includes = INCLUDES)
+    build_m and atm.msbuild(mod_sln_path, includes=INCLUDES)
 
     # iterates over all the modules to copy their resulting files
     # into the appropriate modules directory
     for module in modules:
         module_bin_f = os.path.join(
-            base_f,
-            "bin/viriatum_%s/i386/win32/%s" % (module, mode)
+            base_f, "bin/viriatum_%s/i386/win32/%s" % (module, mode)
         )
         os.chdir(module_bin_f)
         atm.copy(
-            "viriatum_%s.dll" % module,
-            os.path.join(result_f, "modules"),
-            replace = False
+            "viriatum_%s.dll" % module, os.path.join(result_f, "modules"), replace=False
         )
 
     # copies the resulting files to the temporary directory with
@@ -122,26 +111,26 @@ def build(file = None, build_m = True, arch = "win32", mode = "Release"):
     # context that is currently defined
     os.chdir(build_f)
     atm.capsule(
-        os.path.join(dist_f, name_arc + ".exe"),
-        os.path.join(dist_f, name_raw + ".tar")
+        os.path.join(dist_f, name_arc + ".exe"), os.path.join(dist_f, name_raw + ".tar")
     )
 
     # creates the various compressed files for both the archive and
     # source directories (distribution files)
     os.chdir(tmp_f)
-    atm.compress(name_arc, target = dist_f)
-    atm.compress(name_src, target = dist_f)
+    atm.compress(name_arc, target=dist_f)
+    atm.compress(name_src, target=dist_f)
 
     # creates the various hash files for the complete set of files in
     # the distribution directory
     os.chdir(dist_f)
     atm.hash_d()
 
+
 def run():
     # parses the various arguments provided by the
     # command line and retrieves it defaulting to
     # pre-defined values in case they do not exist
-    arguments = atm.parse_args(names = ("no-modules", "arch=", "mode="))
+    arguments = atm.parse_args(names=("no-modules", "arch=", "mode="))
     file = arguments.get("file", None)
     build_m = not arguments.get("no-modules", False)
     arch = arguments.get("arch", "win32")
@@ -149,16 +138,15 @@ def run():
 
     # starts the build process with the parameters
     # retrieved from the current environment
-    build(
-        file = file,
-        build_m = build_m,
-        arch = arch,
-        mode = mode
-    )
+    build(file=file, build_m=build_m, arch=arch, mode=mode)
+
 
 def cleanup():
     atm.cleanup()
 
+
 if __name__ == "__main__":
-    try: run()
-    finally: cleanup()
+    try:
+        run()
+    finally:
+        cleanup()

@@ -203,10 +203,20 @@ class ServerCase(unittest.TestCase):
             return
         if path == "/ws-scope":
             await send({"type": "websocket.accept"})
-            await send({"type": "websocket.send", "text": repr((
-                scope["type"], scope["scheme"], scope["path"],
-                scope["query_string"], scope["subprotocols"],
-            ))})
+            await send(
+                {
+                    "type": "websocket.send",
+                    "text": repr(
+                        (
+                            scope["type"],
+                            scope["scheme"],
+                            scope["path"],
+                            scope["query_string"],
+                            scope["subprotocols"],
+                        )
+                    ),
+                }
+            )
         elif path == "/ws-protocol":
             await send({"type": "websocket.accept", "subprotocol": "chat"})
         else:
@@ -219,9 +229,13 @@ class ServerCase(unittest.TestCase):
                 await send({"type": "websocket.close", "code": 4001, "reason": "done"})
                 return
             if message.get("text") is not None:
-                await send({"type": "websocket.send", "text": "echo:" + message["text"]})
+                await send(
+                    {"type": "websocket.send", "text": "echo:" + message["text"]}
+                )
             else:
-                await send({"type": "websocket.send", "bytes": b"bin:" + message["bytes"]})
+                await send(
+                    {"type": "websocket.send", "bytes": b"bin:" + message["bytes"]}
+                )
 
     @staticmethod
     async def _application(scope, receive, send):
@@ -234,49 +248,97 @@ class ServerCase(unittest.TestCase):
             raise RuntimeError("intentional failure")
         if path == "/echo":
             message = await receive()
-            await send({"type": "http.response.start", "status": 201,
-                        "headers": [(b"content-type", b"text/plain")]})
-            await send({"type": "http.response.body", "body": b"got:" + message["body"]})
+            await send(
+                {
+                    "type": "http.response.start",
+                    "status": 201,
+                    "headers": [(b"content-type", b"text/plain")],
+                }
+            )
+            await send(
+                {"type": "http.response.body", "body": b"got:" + message["body"]}
+            )
             return
         if path == "/size":
             message = await receive()
             await send({"type": "http.response.start", "status": 200, "headers": []})
-            await send({"type": "http.response.body",
-                        "body": str(len(message["body"])).encode("utf-8")})
+            await send(
+                {
+                    "type": "http.response.body",
+                    "body": str(len(message["body"])).encode("utf-8"),
+                }
+            )
             return
         if path == "/stream":
-            await send({"type": "http.response.start", "status": 200,
-                        "headers": [(b"content-type", b"text/plain")]})
+            await send(
+                {
+                    "type": "http.response.start",
+                    "status": 200,
+                    "headers": [(b"content-type", b"text/plain")],
+                }
+            )
             for index in range(3):
-                await send({"type": "http.response.body",
-                            "body": ("chunk%d-" % index).encode("utf-8"),
-                            "more_body": True})
+                await send(
+                    {
+                        "type": "http.response.body",
+                        "body": ("chunk%d-" % index).encode("utf-8"),
+                        "more_body": True,
+                    }
+                )
             await send({"type": "http.response.body", "body": b"end"})
             return
         if path == "/scope":
             await send({"type": "http.response.start", "status": 200, "headers": []})
-            await send({"type": "http.response.body", "body": repr((
-                scope["type"], scope["asgi"], scope["http_version"], scope["method"],
-                scope["scheme"], scope["path"], scope["raw_path"],
-                scope["query_string"], scope["root_path"], scope["client"][0],
-                scope["server"][1],
-            )).encode("utf-8")})
+            await send(
+                {
+                    "type": "http.response.body",
+                    "body": repr(
+                        (
+                            scope["type"],
+                            scope["asgi"],
+                            scope["http_version"],
+                            scope["method"],
+                            scope["scheme"],
+                            scope["path"],
+                            scope["raw_path"],
+                            scope["query_string"],
+                            scope["root_path"],
+                            scope["client"][0],
+                            scope["server"][1],
+                        )
+                    ).encode("utf-8"),
+                }
+            )
             return
         if path == "/headers-in":
             await send({"type": "http.response.start", "status": 200, "headers": []})
             values = [pair for pair in scope["headers"] if pair[0] == b"x-custom-value"]
-            await send({"type": "http.response.body", "body": repr(values).encode("utf-8")})
+            await send(
+                {"type": "http.response.body", "body": repr(values).encode("utf-8")}
+            )
             return
         if path == "/headers-out":
-            await send({"type": "http.response.start", "status": 200, "headers": [
-                (b"x-first", b"one"), (b"x-second", b"two")]})
+            await send(
+                {
+                    "type": "http.response.start",
+                    "status": 200,
+                    "headers": [(b"x-first", b"one"), (b"x-second", b"two")],
+                }
+            )
             await send({"type": "http.response.body", "body": b""})
             return
         if path == "/own-length":
             body = b"exact"
-            await send({"type": "http.response.start", "status": 200, "headers": [
-                (b"content-type", b"text/plain"),
-                (b"content-length", str(len(body)).encode("utf-8"))]})
+            await send(
+                {
+                    "type": "http.response.start",
+                    "status": 200,
+                    "headers": [
+                        (b"content-type", b"text/plain"),
+                        (b"content-length", str(len(body)).encode("utf-8")),
+                    ],
+                }
+            )
             await send({"type": "http.response.body", "body": body})
             return
         if path == "/no-content":
@@ -284,13 +346,22 @@ class ServerCase(unittest.TestCase):
             await send({"type": "http.response.body", "body": b"ignored"})
             return
         if path == "/raise-after":
-            await send({"type": "http.response.start", "status": 200,
-                        "headers": [(b"content-type", b"text/plain")]})
-            await send({"type": "http.response.body", "body": b"partial", "more_body": True})
+            await send(
+                {
+                    "type": "http.response.start",
+                    "status": 200,
+                    "headers": [(b"content-type", b"text/plain")],
+                }
+            )
+            await send(
+                {"type": "http.response.body", "body": b"partial", "more_body": True}
+            )
             raise RuntimeError("intentional failure after start")
         if path == "/never-close":
             await send({"type": "http.response.start", "status": 200, "headers": []})
-            await send({"type": "http.response.body", "body": b"open", "more_body": True})
+            await send(
+                {"type": "http.response.body", "body": b"open", "more_body": True}
+            )
             return
         if path == "/exit":
             raise SystemExit(3)
@@ -298,22 +369,33 @@ class ServerCase(unittest.TestCase):
             try:
                 await send("nonsense")
             except TypeError:
-                await send({"type": "http.response.start", "status": 200, "headers": []})
+                await send(
+                    {"type": "http.response.start", "status": 200, "headers": []}
+                )
                 await send({"type": "http.response.body", "body": b"rejected"})
             return
         if path == "/send-no-type":
             try:
                 await send({"nothing": True})
             except ValueError:
-                await send({"type": "http.response.start", "status": 200, "headers": []})
+                await send(
+                    {"type": "http.response.start", "status": 200, "headers": []}
+                )
                 await send({"type": "http.response.body", "body": b"rejected"})
             return
         if path == "/header-not-bytes":
             try:
-                await send({"type": "http.response.start", "status": 200,
-                            "headers": [("x-text", "value")]})
+                await send(
+                    {
+                        "type": "http.response.start",
+                        "status": 200,
+                        "headers": [("x-text", "value")],
+                    }
+                )
             except TypeError:
-                await send({"type": "http.response.start", "status": 200, "headers": []})
+                await send(
+                    {"type": "http.response.start", "status": 200, "headers": []}
+                )
                 await send({"type": "http.response.body", "body": b"rejected"})
             return
         if path == "/body-not-bytes":
@@ -325,43 +407,68 @@ class ServerCase(unittest.TestCase):
             return
         if path == "/short-header":
             try:
-                await send({"type": "http.response.start", "status": 200,
-                            "headers": [(b"only-one",)]})
+                await send(
+                    {
+                        "type": "http.response.start",
+                        "status": 200,
+                        "headers": [(b"only-one",)],
+                    }
+                )
             except IndexError:
-                await send({"type": "http.response.start", "status": 200, "headers": []})
+                await send(
+                    {"type": "http.response.start", "status": 200, "headers": []}
+                )
                 await send({"type": "http.response.body", "body": b"rejected"})
             return
         if path == "/similar-header":
-            await send({"type": "http.response.start", "status": 200, "headers": [
-                (b"x-content-type", b"one")]})
+            await send(
+                {
+                    "type": "http.response.start",
+                    "status": 200,
+                    "headers": [(b"x-content-type", b"one")],
+                }
+            )
             await send({"type": "http.response.body", "body": b"similar"})
             return
         if path == "/bad-header":
             try:
-                await send({"type": "http.response.start", "status": 200,
-                            "headers": [(b"x-bad", b"a\r\nInjected: 1")]})
+                await send(
+                    {
+                        "type": "http.response.start",
+                        "status": 200,
+                        "headers": [(b"x-bad", b"a\r\nInjected: 1")],
+                    }
+                )
             except ValueError:
-                await send({"type": "http.response.start", "status": 200, "headers": []})
+                await send(
+                    {"type": "http.response.start", "status": 200, "headers": []}
+                )
                 await send({"type": "http.response.body", "body": b"rejected"})
             return
         if path == "/bad-status":
             try:
                 await send({"type": "http.response.start", "status": 99, "headers": []})
             except ValueError:
-                await send({"type": "http.response.start", "status": 200, "headers": []})
+                await send(
+                    {"type": "http.response.start", "status": 200, "headers": []}
+                )
                 await send({"type": "http.response.body", "body": b"rejected"})
             return
         if path == "/body-first":
             try:
                 await send({"type": "http.response.body", "body": b"early"})
             except RuntimeError:
-                await send({"type": "http.response.start", "status": 200, "headers": []})
+                await send(
+                    {"type": "http.response.start", "status": 200, "headers": []}
+                )
                 await send({"type": "http.response.body", "body": b"rejected"})
             return
         if path == "/double-start":
             await send({"type": "http.response.start", "status": 200, "headers": []})
             try:
-                await send({"type": "http.response.start", "status": 200, "headers": []})
+                await send(
+                    {"type": "http.response.start", "status": 200, "headers": []}
+                )
             except RuntimeError:
                 await send({"type": "http.response.body", "body": b"rejected"})
             return
@@ -377,7 +484,9 @@ class ServerCase(unittest.TestCase):
             try:
                 await send({"type": "http.nonsense"})
             except ValueError:
-                await send({"type": "http.response.start", "status": 200, "headers": []})
+                await send(
+                    {"type": "http.response.start", "status": 200, "headers": []}
+                )
                 await send({"type": "http.response.body", "body": b"rejected"})
             return
         if path == "/exhausted":
@@ -394,8 +503,13 @@ class ServerCase(unittest.TestCase):
             await send({"type": "http.response.start", "status": 200, "headers": []})
             try:
                 for _ in range(20):
-                    await send({"type": "http.response.body",
-                                "body": b"z" * 100000, "more_body": True})
+                    await send(
+                        {
+                            "type": "http.response.body",
+                            "body": b"z" * 100000,
+                            "more_body": True,
+                        }
+                    )
                 await send({"type": "http.response.body", "body": b""})
             except BaseException:
                 pass
@@ -413,8 +527,13 @@ class ServerCase(unittest.TestCase):
             await send({"type": "http.response.start", "status": 404, "headers": []})
             await send({"type": "http.response.body", "body": b"nope"})
             return
-        await send({"type": "http.response.start", "status": 200,
-                    "headers": [(b"content-type", b"text/plain")]})
+        await send(
+            {
+                "type": "http.response.start",
+                "status": 200,
+                "headers": [(b"content-type", b"text/plain")],
+            }
+        )
         await send({"type": "http.response.body", "body": b"plain"})
 
 
@@ -470,7 +589,7 @@ class AsgiTest(ServerCase):
             viriatum.Server,
             application,
             port=self.port + 95,
-            interface="nonsense"
+            interface="nonsense",
         )
 
     def test_loop_creation_failure(self):
@@ -486,10 +605,7 @@ class AsgiTest(ServerCase):
         asyncio.new_event_loop = new_event_loop
         try:
             self.assertRaises(
-                RuntimeError,
-                viriatum.Server,
-                application,
-                port=self.port + 96
+                RuntimeError, viriatum.Server, application, port=self.port + 96
             )
         finally:
             asyncio.new_event_loop = original
@@ -535,8 +651,7 @@ class AsgiTest(ServerCase):
         )
         result = urllib.request.urlopen(request, timeout=5)
         self.assertEqual(
-            ast.literal_eval(result.read().decode()),
-            [(b"x-custom-value", b"custom")]
+            ast.literal_eval(result.read().decode()), [(b"x-custom-value", b"custom")]
         )
 
     def test_response_headers(self):
@@ -691,8 +806,9 @@ class AsgiTest(ServerCase):
         result = connection.getresponse()
         self.assertEqual(result.read(), b"plain")
         self.assertEqual(result.headers.get("Connection"), "keep-alive")
-        connection.request("GET", "/echo", body=b"again",
-                           headers={"Connection": "keep-alive"})
+        connection.request(
+            "GET", "/echo", body=b"again", headers={"Connection": "keep-alive"}
+        )
         self.assertEqual(connection.getresponse().read(), b"got:again")
         connection.close()
 
@@ -759,11 +875,12 @@ class AsgiTest(ServerCase):
         # verifies that a request header carrying an empty value does
         # not leave the name of it pending in the context
         connection = http.client.HTTPConnection("127.0.0.1", self.port, timeout=5)
-        connection.request("GET", "/headers-in", headers={"X-Empty": "", "X-Custom-Value": "custom"})
+        connection.request(
+            "GET", "/headers-in", headers={"X-Empty": "", "X-Custom-Value": "custom"}
+        )
         result = connection.getresponse()
         self.assertEqual(
-            ast.literal_eval(result.read().decode()),
-            [(b"x-custom-value", b"custom")]
+            ast.literal_eval(result.read().decode()), [(b"x-custom-value", b"custom")]
         )
         connection.close()
 
@@ -773,20 +890,22 @@ class AsgiTest(ServerCase):
         # never handed back through the callback of the connection
         def drop(count):
             for _ in range(count):
-                connection = socket.create_connection(("127.0.0.1", self.port), timeout=5)
+                connection = socket.create_connection(
+                    ("127.0.0.1", self.port), timeout=5
+                )
                 connection.sendall(b"GET /flood HTTP/1.1\r\nHost: 127.0.0.1\r\n\r\n")
                 time.sleep(0.02)
                 connection.setsockopt(
-                    socket.SOL_SOCKET,
-                    socket.SO_LINGER,
-                    struct.pack("ii", 1, 0)
+                    socket.SOL_SOCKET, socket.SO_LINGER, struct.pack("ii", 1, 0)
                 )
                 connection.close()
                 time.sleep(0.02)
 
         def futures():
             gc.collect()
-            return sum(1 for item in gc.get_objects() if type(item).__name__ == "Future")
+            return sum(
+                1 for item in gc.get_objects() if type(item).__name__ == "Future"
+            )
 
         drop(5)
         time.sleep(0.5)
@@ -796,7 +915,7 @@ class AsgiTest(ServerCase):
         retained = futures() - initial
         self.assertTrue(
             retained < 10,
-            "retained %d futures across 30 dropped connections" % retained
+            "retained %d futures across 30 dropped connections" % retained,
         )
 
     def test_serve_helper(self):
@@ -819,7 +938,7 @@ class AsgiTest(ServerCase):
                 target=viriatum.serve,
                 args=(self._application,),
                 kwargs=dict(port=self.port + 20, interface="asgi"),
-                daemon=True
+                daemon=True,
             )
             thread.start()
             url = "http://127.0.0.1:%d/plain" % (self.port + 20)
@@ -897,9 +1016,7 @@ class LifespanTest(unittest.TestCase):
                     return
 
         self._serve(application, PORT + 1)
-        self.assertEqual(
-            events, ["lifespan.startup", "lifespan.shutdown"]
-        )
+        self.assertEqual(events, ["lifespan.startup", "lifespan.shutdown"])
 
     def test_lifespan_slow_startup(self):
         # verifies that a startup that awaits real work is waited for
@@ -926,10 +1043,7 @@ class LifespanTest(unittest.TestCase):
         initial = time.time()
         self._serve(application, PORT + 7)
         self.assertEqual(events, ["startup", "shutdown"])
-        self.assertTrue(
-            time.time() - initial >= 0.3,
-            "startup was not waited for"
-        )
+        self.assertTrue(time.time() - initial >= 0.3, "startup was not waited for")
 
     def test_lifespan_unsupported(self):
         # verifies that an application that refuses the lifespan
@@ -948,10 +1062,9 @@ class LifespanTest(unittest.TestCase):
             if scope["type"] != "lifespan":
                 return
             await receive()
-            await send({
-                "type": "lifespan.startup.failed",
-                "message": "intentional failure"
-            })
+            await send(
+                {"type": "lifespan.startup.failed", "message": "intentional failure"}
+            )
             while True:
                 await receive()
 
@@ -1021,8 +1134,12 @@ class LifespanTest(unittest.TestCase):
                 if message["type"] == "lifespan.startup":
                     await send({"type": "lifespan.startup.complete"})
                 elif message["type"] == "lifespan.shutdown":
-                    await send({"type": "lifespan.shutdown.failed",
-                                "message": "intentional failure"})
+                    await send(
+                        {
+                            "type": "lifespan.shutdown.failed",
+                            "message": "intentional failure",
+                        }
+                    )
                     return
 
         self._serve(application, PORT + 4)
@@ -1042,7 +1159,9 @@ class LifespanTest(unittest.TestCase):
         url = "http://127.0.0.1:%d/plain" % port
         for _ in range(100):
             try:
-                self.assertEqual(urllib.request.urlopen(url, timeout=1).read(), b"plain")
+                self.assertEqual(
+                    urllib.request.urlopen(url, timeout=1).read(), b"plain"
+                )
                 break
             except AssertionError:
                 raise
@@ -1076,12 +1195,14 @@ class WebsocketTest(ServerCase):
     def test_scope(self):
         # verifies that the scope of an upgraded connection carries
         # both the websocket type and the proposed subprotocols
-        client = WebSocketClient(self.port, path="/ws-scope?a=1", protocols="chat, json")
+        client = WebSocketClient(
+            self.port, path="/ws-scope?a=1", protocols="chat, json"
+        )
         opcode, payload = client.receive()
         self.assertEqual(opcode, 0x1)
         self.assertEqual(
             ast.literal_eval(payload.decode("utf-8")),
-            ("websocket", "ws", "/ws-scope", b"a=1", ["chat", "json"])
+            ("websocket", "ws", "/ws-scope", b"a=1", ["chat", "json"]),
         )
         client.close()
 
@@ -1137,14 +1258,16 @@ class WebsocketTest(ServerCase):
         mask = b"\x01\x02\x03\x04"
         first = "one".encode("utf-8")
         second = "two".encode("utf-8")
-        frame = bytes([0x81, 0x83]) + mask + bytes(
-            first[index] ^ mask[index % 4] for index in range(3)
+        frame = (
+            bytes([0x81, 0x83])
+            + mask
+            + bytes(first[index] ^ mask[index % 4] for index in range(3))
         )
         client.send_raw(frame + bytes([0x81, 0x83]) + mask[:2])
         self.assertEqual(client.receive(), (0x1, b"echo:one"))
-        client.send_raw(mask[2:] + bytes(
-            second[index] ^ mask[index % 4] for index in range(3)
-        ))
+        client.send_raw(
+            mask[2:] + bytes(second[index] ^ mask[index % 4] for index in range(3))
+        )
         self.assertEqual(client.receive(), (0x1, b"echo:two"))
         client.close()
 
@@ -1154,10 +1277,13 @@ class WebsocketTest(ServerCase):
         client = WebSocketClient(self.port, path="/ws-refused")
         opcode, payload = client.receive()
         self.assertEqual(opcode, 0x1)
-        self.assertEqual(payload, (
-            b"send-before-accept,unknown-message,control-subprotocol,"
-            b"long-subprotocol,double-accept"
-        ))
+        self.assertEqual(
+            payload,
+            (
+                b"send-before-accept,unknown-message,control-subprotocol,"
+                b"long-subprotocol,double-accept"
+            ),
+        )
         client.close()
 
     def test_application_returns_unaccepted(self):

@@ -35,11 +35,7 @@ def serve(application, host="0.0.0.0", port=8080, www_root=None, interface="auto
     """
 
     server = Server(
-        application,
-        host=host,
-        port=port,
-        www_root=www_root,
-        interface=interface
+        application, host=host, port=port, www_root=www_root, interface=interface
     )
     server.serve_forever()
     return server
