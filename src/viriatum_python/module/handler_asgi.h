@@ -60,13 +60,13 @@
 #define VIRIATUM_ASGI_BODY_CAPACITY 4096
 
 /**
- * The number of iterations that the lifespan operations may
- * take before being abandoned, together with the amount of
- * time (in seconds) that each of them may block for. Their
- * product bounds the complete duration of the operation.
+ * The amount of time (in seconds) that the lifespan operations
+ * may take before being abandoned, together with the duration
+ * of each of the slices that the wait is broken into.
  */
-#define VIRIATUM_ASGI_LIFESPAN_ITERATIONS 2000
+#define VIRIATUM_ASGI_LIFESPAN_TIMEOUT 30.0
 #define VIRIATUM_ASGI_LIFESPAN_SLICE 0.005
+#define VIRIATUM_ASGI_LIFESPAN_ITERATIONS 20000
 
 /**
  * The maximum size of the subprotocol that may be selected

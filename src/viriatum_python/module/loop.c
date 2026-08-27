@@ -128,31 +128,49 @@ ERROR_CODE attach_loop_python(struct loop_python_t *loop_python) {
 }
 
 ERROR_CODE run_slice_loop_python(struct loop_python_t *loop_python, double timeout) {
-    /* allocates space for both the bound stop method of the loop and
-    for the handle of the timer that is scheduled with it */
-    PyObject *stop;
-    PyObject *handle;
+    /* allocates space for both the coroutine that bounds the slice
+    and for the result of the running of the loop */
+    PyObject *sleep;
+    PyObject *result;
 
-    /* schedules the stopping of the loop for the end of the slice, so
-    that the loop is free to block on its own selector until then,
-    this is what allows the timers of the application to come due */
-    stop = PyObject_GetAttrString(loop_python->loop, "stop");
-    if(stop == NULL) { PyErr_Clear(); RAISE_NO_ERROR; }
-    handle = PyObject_CallMethod(loop_python->loop, "call_later", "dO", timeout, stop);
-    Py_DECREF(stop);
-    if(handle == NULL) { PyErr_Clear(); RAISE_NO_ERROR; }
-
-    /* runs the loop until either the slice is exhausted or something
-    else stops it, cancelling the timer afterwards so that no stray
-    stopping is left scheduled in the loop */
-    Py_XDECREF(PyObject_CallMethod(loop_python->loop, "run_forever", NULL));
-    PyErr_Clear();
-    Py_XDECREF(PyObject_CallMethod(handle, "cancel", NULL));
-    PyErr_Clear();
-    Py_DECREF(handle);
+    /* creates the coroutine that sleeps for the duration of the slice
+    and runs the loop until it completes, every other task pending in
+    the loop is advanced meanwhile, this is the portable way of
+    letting real time pass as the various loop implementations differ
+    in how they behave around a plain stopping callback */
+    sleep = PyObject_CallMethod(loop_python->module, "sleep", "d", timeout);
+    if(sleep == NULL) {
+        PyErr_Clear();
+        RAISE_ERROR_M(
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Problem creating the sleep coroutine"
+        );
+    }
+    result = PyObject_CallMethod(loop_python->loop, "run_until_complete", "O", sleep);
+    Py_DECREF(sleep);
+    if(result == NULL) {
+        PyErr_Clear();
+        RAISE_ERROR_M(
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Problem running the event loop"
+        );
+    }
+    Py_DECREF(result);
 
     /* raises no error */
     RAISE_NO_ERROR;
+}
+
+double time_loop_python(struct loop_python_t *loop_python) {
+    /* retrieves the monotonic clock of the loop, it is the one that
+    the timers scheduled in it are measured against */
+    PyObject *result = PyObject_CallMethod(loop_python->loop, "time", NULL);
+    double value;
+    if(result == NULL) { PyErr_Clear(); return 0.0; }
+    value = PyFloat_AsDouble(result);
+    Py_DECREF(result);
+    if(PyErr_Occurred()) { PyErr_Clear(); return 0.0; }
+    return value;
 }
 
 ERROR_CODE run_once_loop_python(struct loop_python_t *loop_python) {

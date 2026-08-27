@@ -788,25 +788,50 @@ static PyObject *_build_lifespan_scope_handler_asgi(void) {
 }
 
 static ERROR_CODE _wait_lifespan_handler_asgi(struct handler_asgi_t *handler_asgi, char *state) {
-    /* allocates space for the counter of the iterations of the loop
-    and for the flag controlling if the task is already done */
-    size_t index;
+    /* allocates space for the flag controlling if the task is already
+    done and for the deadline of the complete operation, the latter is
+    measured against the clock of the loop so that a slice that fails
+    to let time pass is never mistaken for a completed wait */
     PyObject *done;
     int is_done = 0;
+    size_t index;
+    double initial = time_loop_python(handler_asgi->loop_python);
+    double elapsed = 0.0;
 
     /* advances the loop until the application reports the completion
-    of the event, the task dies or the iterations are exhausted, each
-    of them blocks for a slice so that the timers scheduled by the
-    application are given the chance to come due */
+    of the event, the task dies or the deadline is reached, each of
+    the slices blocks so that the timers scheduled by the application
+    are given the chance to come due, the iteration count bounds the
+    wait as well so that a clock that never advances is not able to
+    keep the loop running forever */
     for(index = 0; index < VIRIATUM_ASGI_LIFESPAN_ITERATIONS; index++) {
+        elapsed = time_loop_python(handler_asgi->loop_python) - initial;
+        if(elapsed >= VIRIATUM_ASGI_LIFESPAN_TIMEOUT) { break; }
         if(*state != 0) { RAISE_NO_ERROR; }
-        run_slice_loop_python(handler_asgi->loop_python, VIRIATUM_ASGI_LIFESPAN_SLICE);
+        if(IS_ERROR_CODE(run_slice_loop_python(
+            handler_asgi->loop_python,
+            VIRIATUM_ASGI_LIFESPAN_SLICE
+        ))) {
+            V_WARNING_F("Problem advancing the loop: %s\n", (char *) GET_ERROR());
+            RAISE_NO_ERROR;
+        }
         if(*state != 0) { RAISE_NO_ERROR; }
         done = PyObject_CallMethod(handler_asgi->lifespan_context->task, "done", NULL);
         if(done == NULL) { PyErr_Clear(); break; }
         is_done = PyObject_IsTrue(done);
         Py_DECREF(done);
         if(is_done != 0) { break; }
+    }
+
+    /* reports the giving up on a task that is still alive, this is
+    what tells apart an application that never answers from a loop
+    that is unable to let any time pass at all */
+    if(*state == 0 && is_done == 0) {
+        V_WARNING_F(
+            "Lifespan gave up after %d iterations and %.3f seconds\n",
+            (int) index,
+            elapsed
+        );
     }
 
     /* raises no error, the caller is the one that interprets both the

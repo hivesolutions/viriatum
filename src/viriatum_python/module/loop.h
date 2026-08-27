@@ -55,6 +55,7 @@ ERROR_CODE create_loop_python(struct loop_python_t **loop_python_pointer);
 ERROR_CODE delete_loop_python(struct loop_python_t *loop_python);
 ERROR_CODE run_once_loop_python(struct loop_python_t *loop_python);
 ERROR_CODE run_slice_loop_python(struct loop_python_t *loop_python, double timeout);
+double time_loop_python(struct loop_python_t *loop_python);
 ERROR_CODE attach_loop_python(struct loop_python_t *loop_python);
 size_t pending_loop_python(struct loop_python_t *loop_python);
 PyObject *create_task_loop_python(struct loop_python_t *loop_python, PyObject *coroutine);
