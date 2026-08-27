@@ -1,0 +1,71 @@
+name: Deploy Workflow
+on:
+  push:
+    tags:
+      - "*"
+jobs:
+  build-wheels:
+    name: Build Wheels
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Build wheels
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install cibuildwheel
+          python -m cibuildwheel --output-dir wheelhouse
+      - uses: actions/upload-artifact@v7
+        with:
+          name: wheels-${{ matrix.os }}
+          path: wheelhouse/*.whl
+  build-sdist:
+    name: Build Source Distribution
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Check code formatting with black
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install black
+          black . --check
+      - name: Build source distribution
+        run: |
+          python -m pip install build
+          python -m build --sdist
+      - uses: actions/upload-artifact@v7
+        with:
+          name: sdist
+          path: dist/*.tar.gz
+  publish:
+    name: Publish to PyPI
+    timeout-minutes: 30
+    needs: [build-wheels, build-sdist]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - uses: actions/download-artifact@v7
+        with:
+          path: dist
+          merge-multiple: true
+      - name: Publish package to PyPI
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install twine
+          python -m twine upload -u ${PYPI_USERNAME} -p ${PYPI_PASSWORD} dist/*
+        env:
+          PYPI_USERNAME: ${{ secrets.PYPI_USERNAME }}
+          PYPI_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
