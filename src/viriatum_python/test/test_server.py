@@ -2,12 +2,13 @@
 # -*- coding: utf-8 -*-
 
 import ast
-import http.client
 import socket
 import sys
 import threading
 import time
 import unittest
+
+import http.client
 import urllib.error
 import urllib.request
 
