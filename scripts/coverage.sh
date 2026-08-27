@@ -66,6 +66,20 @@ $COV show "$MODULE" -object "$BUILD/bin/viriatum" \
     -instr-profile="$OUTPUT/viriatum.profdata" -format=text $SOURCES \
     > "$OUTPUT/lines.txt"
 
+# exports the same numbers in a machine readable form, they are the
+# ones used for the building of the markdown table below
+$COV export "$MODULE" -object "$BUILD/bin/viriatum" \
+    -instr-profile="$OUTPUT/viriatum.profdata" -summary-only $SOURCES \
+    > "$OUTPUT/native.json"
+"$PYTHON" -m coverage json --data-file "$OUTPUT/.coverage" \
+    -o "$OUTPUT/python.json" -q || true
+
+# builds the markdown table of the coverage, it is written to the step
+# summary of the workflow so that the numbers show up on the run page
+"$PYTHON" "$ROOT/scripts/coverage_table.py" "$OUTPUT" "$THRESHOLD" \
+    > "$OUTPUT/summary.md"
+cat "$OUTPUT/summary.md"
+
 # reports the coverage of the pure python surface of the package, the
 # threshold applies to it as it does to the sources of the extension
 "$PYTHON" -m coverage report --data-file "$OUTPUT/.coverage" \
