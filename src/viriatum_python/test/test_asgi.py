@@ -4,6 +4,7 @@
 import ast
 import asyncio
 import base64
+import gc
 import hashlib
 import os
 import socket
@@ -389,6 +390,16 @@ class ServerCase(unittest.TestCase):
             await send({"type": "http.response.start", "status": 200, "headers": []})
             await send({"type": "http.response.body", "body": result})
             return
+        if path == "/flood":
+            await send({"type": "http.response.start", "status": 200, "headers": []})
+            try:
+                for _ in range(20):
+                    await send({"type": "http.response.body",
+                                "body": b"z" * 100000, "more_body": True})
+                await send({"type": "http.response.body", "body": b""})
+            except BaseException:
+                pass
+            return
         if path == "/slow":
             await asyncio.sleep(0.4)
             await send({"type": "http.response.start", "status": 200, "headers": []})
@@ -756,6 +767,38 @@ class AsgiTest(ServerCase):
         )
         connection.close()
 
+    def test_pending_writes_released(self):
+        # verifies that the payloads queued in a connection that is
+        # dropped before they reach the wire are released, they are
+        # never handed back through the callback of the connection
+        def drop(count):
+            for _ in range(count):
+                connection = socket.create_connection(("127.0.0.1", self.port), timeout=5)
+                connection.sendall(b"GET /flood HTTP/1.1\r\nHost: 127.0.0.1\r\n\r\n")
+                time.sleep(0.02)
+                connection.setsockopt(
+                    socket.SOL_SOCKET,
+                    socket.SO_LINGER,
+                    struct.pack("ii", 1, 0)
+                )
+                connection.close()
+                time.sleep(0.02)
+
+        def futures():
+            gc.collect()
+            return sum(1 for item in gc.get_objects() if type(item).__name__ == "Future")
+
+        drop(5)
+        time.sleep(0.5)
+        initial = futures()
+        drop(30)
+        time.sleep(1.0)
+        retained = futures() - initial
+        self.assertTrue(
+            retained < 10,
+            "retained %d futures across 30 dropped connections" % retained
+        )
+
     def test_serve_helper(self):
         # verifies that the helper builds a server with the provided
         # arguments and runs its loop until it is stopped
@@ -856,6 +899,36 @@ class LifespanTest(unittest.TestCase):
         self._serve(application, PORT + 1)
         self.assertEqual(
             events, ["lifespan.startup", "lifespan.shutdown"]
+        )
+
+    def test_lifespan_slow_startup(self):
+        # verifies that a startup that awaits real work is waited for
+        # rather than being abandoned, an application that connects to
+        # a database on startup depends on it
+        events = []
+
+        async def application(scope, receive, send):
+            if scope["type"] != "lifespan":
+                await self._plain(receive, send)
+                return
+            while True:
+                message = await receive()
+                if message["type"] == "lifespan.startup":
+                    await asyncio.sleep(0.3)
+                    events.append("startup")
+                    await send({"type": "lifespan.startup.complete"})
+                elif message["type"] == "lifespan.shutdown":
+                    await asyncio.sleep(0.1)
+                    events.append("shutdown")
+                    await send({"type": "lifespan.shutdown.complete"})
+                    return
+
+        initial = time.time()
+        self._serve(application, PORT + 7)
+        self.assertEqual(events, ["startup", "shutdown"])
+        self.assertTrue(
+            time.time() - initial >= 0.3,
+            "startup was not waited for"
         )
 
     def test_lifespan_unsupported(self):

@@ -260,6 +260,13 @@ static PyObject *_serve_forever_server_python(PyObject *self, PyObject *args) {
         the stopping of the service to be noticed in a timely manner */
         service->polling->timeout = VIRIATUM_PYTHON_POLL_TIMEOUT;
 
+        /* attaches the loop to the current thread, the one that is
+        going to advance it, so that the accessors of the asyncio
+        module resolve to it for the application code */
+        if(server_python->loop_python != NULL) {
+            attach_loop_python(server_python->loop_python);
+        }
+
         /* runs the startup event of the lifespan protocol, a failure of
         it aborts the serving as the application refused to boot */
         if(server_python->loop_python != NULL &&

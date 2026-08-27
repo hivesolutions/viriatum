@@ -60,10 +60,13 @@
 #define VIRIATUM_ASGI_BODY_CAPACITY 4096
 
 /**
- * The number of iterations of the serving loop that the
- * lifespan operations may take before being abandoned.
+ * The number of iterations that the lifespan operations may
+ * take before being abandoned, together with the amount of
+ * time (in seconds) that each of them may block for. Their
+ * product bounds the complete duration of the operation.
  */
-#define VIRIATUM_ASGI_LIFESPAN_ITERATIONS 1000
+#define VIRIATUM_ASGI_LIFESPAN_ITERATIONS 2000
+#define VIRIATUM_ASGI_LIFESPAN_SLICE 0.005
 
 /**
  * The maximum size of the subprotocol that may be selected
@@ -102,6 +105,20 @@ typedef enum asgi_websocket_e {
     ASGI_WEBSOCKET_CONNECTED,
     ASGI_WEBSOCKET_CLOSED
 } asgi_websocket;
+
+/**
+ * Structure carrying the state that is required by the callback
+ * that is raised once a part of the response has been written,
+ * they are chained so that the context may release the ones that
+ * never reach the wire (a dropped connection releases the queued
+ * data without ever raising the associated callbacks).
+ */
+typedef struct write_asgi_t {
+    struct handler_asgi_context_t *handler_asgi_context;
+    struct write_asgi_t *next;
+    PyObject *future;
+    char last;
+} write_asgi;
 
 /**
  * Structure holding the state of a single request being
@@ -222,6 +239,13 @@ typedef struct handler_asgi_context_t {
      * and the send callables, invalidated on destruction.
      */
     PyObject *capsule;
+
+    /**
+     * The writes that have been queued in the connection and are
+     * still pending, released with the context in case they never
+     * reach the wire (avoids leaking both them and their futures).
+     */
+    struct write_asgi_t *writes;
 
     /**
      * The connection that originated the request, required

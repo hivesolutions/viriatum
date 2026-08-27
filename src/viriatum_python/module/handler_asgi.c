@@ -26,16 +26,6 @@
 
 #include "handler_asgi.h"
 
-/**
- * Structure carrying the state that is required by the callback
- * that is raised once a part of the response has been written.
- */
-typedef struct write_asgi_t {
-    struct handler_asgi_context_t *handler_asgi_context;
-    PyObject *future;
-    char last;
-} write_asgi;
-
 static void _report_handler_asgi(void) {
     /* in case the pending exception is a system exit it must not be
     printed, as that would terminate the process that is hosting the
@@ -140,6 +130,7 @@ static void _push_event_handler_asgi(struct handler_asgi_context_t *handler_asgi
         handler_asgi_context->future = NULL;
         return;
     }
+    if(handler_asgi_context->events == NULL) { return; }
     if(PyList_Append(handler_asgi_context->events, event) < 0) { PyErr_Clear(); }
 }
 
@@ -162,7 +153,8 @@ static PyObject *_receive_handler_asgi(PyObject *self, PyObject *args) {
 
     /* in case an event is already queued it is used to resolve the
     future immediately, no suspension of the application happens */
-    if(PyList_Size(handler_asgi_context->events) > 0) {
+    if(handler_asgi_context->events != NULL &&
+        PyList_Size(handler_asgi_context->events) > 0) {
         event = PyList_GetItem(handler_asgi_context->events, 0);
         Py_INCREF(event);
         if(PySequence_DelItem(handler_asgi_context->events, 0) < 0) { PyErr_Clear(); }
@@ -229,6 +221,8 @@ static ERROR_CODE _write_handler_asgi(struct handler_asgi_context_t *handler_asg
     write_asgi->handler_asgi_context = handler_asgi_context;
     write_asgi->last = last;
     write_asgi->future = future;
+    write_asgi->next = handler_asgi_context->writes;
+    handler_asgi_context->writes = write_asgi;
     Py_XINCREF(future);
 
     /* writes the payload into the connection, registering the callback
@@ -618,6 +612,7 @@ ERROR_CODE delete_handler_asgi_context(struct handler_asgi_context_t *handler_as
     /* allocates space for the index to be used in the
     iteration over the various header sequences */
     size_t index;
+    struct write_asgi_t *write_asgi;
     PyGILState_STATE gil_state;
 
     /* acquires the global interpreter lock as the releasing of the
@@ -647,6 +642,16 @@ ERROR_CODE delete_handler_asgi_context(struct handler_asgi_context_t *handler_as
     future of a receive call that is still pending */
     Py_CLEAR(handler_asgi_context->events);
     Py_CLEAR(handler_asgi_context->future);
+
+    /* releases the writes that have been queued in the connection but
+    never reached the wire, a dropped connection releases the queued
+    data without ever raising the callbacks associated with it */
+    while(handler_asgi_context->writes != NULL) {
+        write_asgi = handler_asgi_context->writes;
+        handler_asgi_context->writes = write_asgi->next;
+        Py_XDECREF(write_asgi->future);
+        FREE(write_asgi);
+    }
 
     /* releases the global interpreter lock, no more interpreter usage
     happens for the remaining of the destruction */
@@ -790,10 +795,12 @@ static ERROR_CODE _wait_lifespan_handler_asgi(struct handler_asgi_t *handler_asg
     int is_done = 0;
 
     /* advances the loop until the application reports the completion
-    of the event, the task dies or the iterations are exhausted */
+    of the event, the task dies or the iterations are exhausted, each
+    of them blocks for a slice so that the timers scheduled by the
+    application are given the chance to come due */
     for(index = 0; index < VIRIATUM_ASGI_LIFESPAN_ITERATIONS; index++) {
         if(*state != 0) { RAISE_NO_ERROR; }
-        run_once_loop_python(handler_asgi->loop_python);
+        run_slice_loop_python(handler_asgi->loop_python, VIRIATUM_ASGI_LIFESPAN_SLICE);
         if(*state != 0) { RAISE_NO_ERROR; }
         done = PyObject_CallMethod(handler_asgi->lifespan_context->task, "done", NULL);
         if(done == NULL) { PyErr_Clear(); break; }
@@ -1708,6 +1715,7 @@ ERROR_CODE _send_response_callback_handler_asgi(struct connection_t *connection,
     /* retrieves the state of the write that has just been completed
     and unpacks the various values from it */
     struct write_asgi_t *write_asgi = (struct write_asgi_t *) parameters;
+    struct write_asgi_t **current;
     struct handler_asgi_context_t *handler_asgi_context = write_asgi->handler_asgi_context;
     unsigned char flags = handler_asgi_context->flags;
     char last = write_asgi->last;
@@ -1717,6 +1725,14 @@ ERROR_CODE _send_response_callback_handler_asgi(struct connection_t *connection,
     able to operate over them, for unregister */
     struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
     struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
+
+    /* unlinks the state from the context, from this point on it is
+    no longer released by the destruction of the latter */
+    current = &handler_asgi_context->writes;
+    while(*current != NULL) {
+        if(*current == write_asgi) { *current = write_asgi->next; break; }
+        current = &(*current)->next;
+    }
 
     /* resolves the future of the send call that produced the payload,
     this is what applies the back pressure to the application */

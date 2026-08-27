@@ -58,13 +58,6 @@ ERROR_CODE create_loop_python(struct loop_python_t **loop_python_pointer) {
             (unsigned char *) "Problem creating the asyncio event loop"
         );
     }
-    Py_XDECREF(PyObject_CallMethod(
-        loop_python->module,
-        "set_event_loop",
-        "O",
-        loop_python->loop
-    ));
-
     /* sets the structure in the provided pointer */
     *loop_python_pointer = loop_python;
 
@@ -112,6 +105,51 @@ ERROR_CODE delete_loop_python(struct loop_python_t *loop_python) {
         loop_python->module = NULL;
     }
     FREE(loop_python);
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE attach_loop_python(struct loop_python_t *loop_python) {
+    /* sets the loop as the current one of the calling thread, this is
+    what makes the accessors of the asyncio module resolve to it for
+    the application code that runs outside of a coroutine, note that
+    it must be called from the thread that advances the loop */
+    Py_XDECREF(PyObject_CallMethod(
+        loop_python->module,
+        "set_event_loop",
+        "O",
+        loop_python->loop
+    ));
+    PyErr_Clear();
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE run_slice_loop_python(struct loop_python_t *loop_python, double timeout) {
+    /* allocates space for both the bound stop method of the loop and
+    for the handle of the timer that is scheduled with it */
+    PyObject *stop;
+    PyObject *handle;
+
+    /* schedules the stopping of the loop for the end of the slice, so
+    that the loop is free to block on its own selector until then,
+    this is what allows the timers of the application to come due */
+    stop = PyObject_GetAttrString(loop_python->loop, "stop");
+    if(stop == NULL) { PyErr_Clear(); RAISE_NO_ERROR; }
+    handle = PyObject_CallMethod(loop_python->loop, "call_later", "dO", timeout, stop);
+    Py_DECREF(stop);
+    if(handle == NULL) { PyErr_Clear(); RAISE_NO_ERROR; }
+
+    /* runs the loop until either the slice is exhausted or something
+    else stops it, cancelling the timer afterwards so that no stray
+    stopping is left scheduled in the loop */
+    Py_XDECREF(PyObject_CallMethod(loop_python->loop, "run_forever", NULL));
+    PyErr_Clear();
+    Py_XDECREF(PyObject_CallMethod(handle, "cancel", NULL));
+    PyErr_Clear();
+    Py_DECREF(handle);
 
     /* raises no error */
     RAISE_NO_ERROR;
