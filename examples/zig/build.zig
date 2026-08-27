@@ -197,6 +197,7 @@ const viriatum_sources = [_][]const u8{
     "http/http_parser.c",
     "http/http_request.c",
     "http/http_util.c",
+    "http/websocket.c",
     "module/loading.c",
     "polling/polling_select.c",
     "stream/stream_http.c",
@@ -212,5 +213,6 @@ const viriatum_sources = [_][]const u8{
     "test/handler_file_test.c",
     "test/handler_dispatch_test.c",
     "test/service_test.c",
+    "test/websocket_test.c",
     "test/test_support.c",
 };
