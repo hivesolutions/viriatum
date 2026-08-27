@@ -35,10 +35,12 @@
 #define VIRIATUM_ASGI_HANDLER_NAME ((unsigned char *) "asgi")
 
 /**
- * The version of both the asgi specification and of the
- * application interface that are implemented.
+ * The versions of the application interface that may be used
+ * for the calling of an application, the legacy one takes the
+ * scope apart from the callables (double callable).
  */
 #define VIRIATUM_ASGI_VERSION "3.0"
+#define VIRIATUM_ASGI_VERSION_LEGACY "2.0"
 #define VIRIATUM_ASGI_SPEC_VERSION "2.3"
 
 /**
@@ -278,6 +280,14 @@ typedef struct handler_asgi_t {
     struct loop_python_t *loop_python;
 
     /**
+     * Flag controlling if the application is a double callable
+     * one, the shape defined by the second version of the
+     * specification, in which case it is first called with the
+     * scope and only then with the pair of callables.
+     */
+    char double_callable;
+
+    /**
      * The context of the lifespan protocol, it lives for the
      * complete duration of the serving operation.
      */
@@ -293,7 +303,7 @@ typedef struct handler_asgi_t {
 
 ERROR_CODE create_handler_asgi_context(struct handler_asgi_context_t **handler_asgi_context_pointer);
 ERROR_CODE delete_handler_asgi_context(struct handler_asgi_context_t *handler_asgi_context);
-ERROR_CODE register_handler_asgi(struct service_t *service, PyObject *application, struct loop_python_t *loop_python);
+ERROR_CODE register_handler_asgi(struct service_t *service, PyObject *application, struct loop_python_t *loop_python, char double_callable);
 ERROR_CODE unregister_handler_asgi(struct service_t *service);
 ERROR_CODE startup_handler_asgi(struct service_t *service);
 ERROR_CODE shutdown_handler_asgi(struct service_t *service);

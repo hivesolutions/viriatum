@@ -72,6 +72,71 @@ static char _is_asgi_server_python(PyObject *application) {
     return is_coroutine != 0 ? TRUE : FALSE;
 }
 
+static char _is_double_callable_server_python(PyObject *application) {
+    /* allocates space for the various objects used during the
+    inspection of the application that has been provided */
+    PyObject *module;
+    PyObject *result;
+    PyObject *call;
+    PyObject *marker;
+    int is_double = 0;
+    int is_class = 0;
+
+    /* the markers set by the adaptation helpers of asgiref take
+    precedence over any inspection of the application */
+    marker = PyObject_GetAttrString(application, "_asgi_single_callable");
+    if(marker != NULL) {
+        is_double = PyObject_IsTrue(marker);
+        Py_DECREF(marker);
+        if(is_double != 0) { return FALSE; }
+    } else { PyErr_Clear(); }
+    marker = PyObject_GetAttrString(application, "_asgi_double_callable");
+    if(marker != NULL) {
+        is_double = PyObject_IsTrue(marker);
+        Py_DECREF(marker);
+        if(is_double != 0) { return TRUE; }
+    } else { PyErr_Clear(); }
+
+    /* imports the inspect module, it provides both the detection of
+    the classes and the one of the coroutine functions */
+    module = PyImport_ImportModule("inspect");
+    if(module == NULL) { PyErr_Clear(); return FALSE; }
+
+    /* a class that has not been instantiated is a double callable one,
+    the instance of it is what takes the pair of callables */
+    result = PyObject_CallMethod(module, "isclass", "O", application);
+    if(result == NULL) { PyErr_Clear(); }
+    else {
+        is_class = PyObject_IsTrue(result);
+        Py_DECREF(result);
+    }
+    if(is_class != 0) { Py_DECREF(module); return TRUE; }
+
+    /* an instance whose call method is a coroutine one is a single
+    callable application, the shape of the third version */
+    call = PyObject_GetAttrString(application, "__call__");
+    if(call == NULL) { PyErr_Clear(); }
+    else {
+        result = PyObject_CallMethod(module, "iscoroutinefunction", "O", call);
+        Py_DECREF(call);
+        if(result == NULL) { PyErr_Clear(); }
+        else {
+            is_double = PyObject_IsTrue(result);
+            Py_DECREF(result);
+            if(is_double != 0) { Py_DECREF(module); return FALSE; }
+        }
+    }
+
+    /* everything that is not a coroutine function of its own is taken
+    as a double callable application (the legacy shape) */
+    result = PyObject_CallMethod(module, "iscoroutinefunction", "O", application);
+    Py_DECREF(module);
+    if(result == NULL) { PyErr_Clear(); return TRUE; }
+    is_double = PyObject_IsTrue(result);
+    Py_DECREF(result);
+    return is_double != 0 ? FALSE : TRUE;
+}
+
 static int _init_server_python(PyObject *self, PyObject *args, PyObject *kwargs) {
     /* allocates space for the various arguments that may be provided
     for the construction of the server object */
@@ -120,15 +185,30 @@ static int _init_server_python(PyObject *self, PyObject *args, PyObject *kwargs)
     }
 
     /* resolves the interface that is going to be used for the calling
-    of the application, the automatic one inspects it */
+    of the application, the automatic one only tells the single
+    callable applications apart from the wsgi ones, as a double
+    callable one is indistinguishable from a wsgi callable */
     if(strcmp(interface, VIRIATUM_PYTHON_INTERFACE_AUTO) == 0) {
         asgi = _is_asgi_server_python(application);
+        server_python->double_callable = asgi == TRUE ?
+            _is_double_callable_server_python(application) : FALSE;
     } else if(strcmp(interface, VIRIATUM_PYTHON_INTERFACE_ASGI) == 0) {
         asgi = TRUE;
+        server_python->double_callable = _is_double_callable_server_python(application);
+    } else if(strcmp(interface, VIRIATUM_PYTHON_INTERFACE_ASGI3) == 0) {
+        asgi = TRUE;
+        server_python->double_callable = FALSE;
+    } else if(strcmp(interface, VIRIATUM_PYTHON_INTERFACE_ASGI2) == 0) {
+        asgi = TRUE;
+        server_python->double_callable = TRUE;
     } else if(strcmp(interface, VIRIATUM_PYTHON_INTERFACE_WSGI) == 0) {
         asgi = FALSE;
+        server_python->double_callable = FALSE;
     } else {
-        PyErr_SetString(PyExc_ValueError, "interface must be auto, wsgi or asgi");
+        PyErr_SetString(
+            PyExc_ValueError,
+            "interface must be auto, wsgi, asgi, asgi2 or asgi3"
+        );
         return -1;
     }
 
@@ -192,7 +272,12 @@ static int _init_server_python(PyObject *self, PyObject *args, PyObject *kwargs)
             PyErr_SetString(PyExc_RuntimeError, (char *) GET_ERROR());
             return -1;
         }
-        register_handler_asgi(service, application, server_python->loop_python);
+        register_handler_asgi(
+            service,
+            application,
+            server_python->loop_python,
+            server_python->double_callable
+        );
     } else {
         register_handler_python(service, application);
     }
@@ -347,6 +432,13 @@ static PyObject *_asgi_server_python(PyObject *self, void *closure) {
     return PyBool_FromLong(server_python->loop_python == NULL ? 0 : 1);
 }
 
+static PyObject *_double_callable_server_python(PyObject *self, void *closure) {
+    /* retrieves the reference to the server object, the flag is only
+    ever set for the applications of the legacy interface */
+    struct server_python_t *server_python = (struct server_python_t *) self;
+    return PyBool_FromLong(server_python->double_callable == TRUE ? 1 : 0);
+}
+
 static PyObject *_uptime_server_python(PyObject *self, void *closure) {
     /* retrieves the reference to the server object and uses the
     service to retrieve the textual uptime representation */
@@ -363,6 +455,7 @@ static PyMethodDef server_methods[] = {
 
 static PyGetSetDef server_getset[] = {
     {"asgi", _asgi_server_python, NULL, "If the application is served through the asgi interface.", NULL},
+    {"double_callable", _double_callable_server_python, NULL, "If the application is called through the legacy asgi interface.", NULL},
     {"connections", _connections_server_python, NULL, "The number of currently open connections.", NULL},
     {"uptime", _uptime_server_python, NULL, "The uptime of the server as a string.", NULL},
     {NULL, NULL, NULL, NULL, NULL}

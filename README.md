@@ -195,7 +195,25 @@ An ASGI application is served in exactly the same way, a coroutine function is r
 
     viriatum.serve(application, port=8080)
 
-The `http`, `lifespan` and `websocket` scopes are all supported, response bodies are streamed as each chunk is sent. The interface may also be forced with `interface="wsgi"` or `interface="asgi"` when the detection is not appropriate.
+The `http`, `lifespan` and `websocket` scopes are all supported, response bodies are streamed as each chunk is sent.
+
+Both versions of the ASGI interface are supported. The single callable shape above is the third version, while the second one hands the scope to an outer callable and the pair of callables to the awaitable it returns:
+
+    import viriatum
+
+
+    def application(scope):
+        async def handle(receive, send):
+            await receive()
+            await send({"type": "http.response.start", "status": 200, "headers": []})
+            await send({"type": "http.response.body", "body": b"Hello World"})
+
+        return handle
+
+
+    viriatum.serve(application, port=8080, interface="asgi")
+
+The version is detected from the shape of the application, honouring the `_asgi_single_callable` and `_asgi_double_callable` markers when present. The interface may also be forced with `interface` set to `wsgi`, `asgi2` or `asgi3`. Note that `auto` only tells a single callable ASGI application apart from a WSGI one, as a double callable application is indistinguishable from a WSGI callable, so a second version application needs `asgi`, `asgi2` or one of the markers.
 
 ## Modules
 

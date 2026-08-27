@@ -698,7 +698,41 @@ ERROR_CODE delete_handler_asgi_context(struct handler_asgi_context_t *handler_as
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE register_handler_asgi(struct service_t *service, PyObject *application, struct loop_python_t *loop_python) {
+static PyObject *_invoke_handler_asgi(struct handler_asgi_t *handler_asgi, PyObject *scope, PyObject *receive, PyObject *send) {
+    /* allocates space for both the instance of the application and
+    for the coroutine that is returned by it */
+    PyObject *instance;
+    PyObject *coroutine;
+
+    /* the single callable applications, the ones of the third version
+    of the specification, take everything in a single call */
+    if(handler_asgi->double_callable == FALSE) {
+        return PyObject_CallFunctionObjArgs(
+            handler_asgi->application,
+            scope,
+            receive,
+            send,
+            NULL
+        );
+    }
+
+    /* the double callable ones are first called with the scope and the
+    resulting instance is the one that takes the pair of callables */
+    instance = PyObject_CallFunctionObjArgs(handler_asgi->application, scope, NULL);
+    if(instance == NULL) { return NULL; }
+    coroutine = PyObject_CallFunctionObjArgs(instance, receive, send, NULL);
+    Py_DECREF(instance);
+    return coroutine;
+}
+
+static const char *_version_handler_asgi(struct handler_asgi_t *handler_asgi) {
+    /* the version reported in the scope is the one of the interface
+    that is being used for the calling of the application */
+    return handler_asgi->double_callable == TRUE ?
+        VIRIATUM_ASGI_VERSION_LEGACY : VIRIATUM_ASGI_VERSION;
+}
+
+ERROR_CODE register_handler_asgi(struct service_t *service, PyObject *application, struct loop_python_t *loop_python, char double_callable) {
     /* allocates the HTTP handler and the asgi handler that is
     going to be kept as the lower substrate of it */
     struct http_handler_t *http_handler;
@@ -712,6 +746,7 @@ ERROR_CODE register_handler_asgi(struct service_t *service, PyObject *applicatio
     Py_INCREF(application);
     handler_asgi->application = application;
     handler_asgi->loop_python = loop_python;
+    handler_asgi->double_callable = double_callable;
 
     /* creates the HTTP handler and sets its attributes, note that
     no index resolution is performed as the application is the one
@@ -768,7 +803,7 @@ static struct handler_asgi_t *_get_handler_asgi(struct service_t *service) {
     return (struct handler_asgi_t *) http_handler->lower;
 }
 
-static PyObject *_build_lifespan_scope_handler_asgi(void) {
+static PyObject *_build_lifespan_scope_handler_asgi(const char *version) {
     /* creates the scope of the lifespan protocol, it carries only the
     versions as no request is associated with it */
     PyObject *scope = PyDict_New();
@@ -777,7 +812,7 @@ static PyObject *_build_lifespan_scope_handler_asgi(void) {
     PyDict_SetItemString(scope, "type", PyUnicode_FromString("lifespan"));
     object = Py_BuildValue(
         "{s:s,s:s}",
-        "version", VIRIATUM_ASGI_VERSION,
+        "version", version,
         "spec_version", VIRIATUM_ASGI_SPEC_VERSION
     );
     if(object != NULL) {
@@ -865,7 +900,7 @@ ERROR_CODE startup_handler_asgi(struct service_t *service) {
 
     /* builds the scope of the protocol and the callables that are
     handed to the application, both carrying the context */
-    scope = _build_lifespan_scope_handler_asgi();
+    scope = _build_lifespan_scope_handler_asgi(_version_handler_asgi(handler_asgi));
     handler_asgi_context->capsule = PyCapsule_New((void *) handler_asgi_context, NULL, NULL);
     receive = PyCFunction_New(&receive_method, handler_asgi_context->capsule);
     send = PyCFunction_New(&send_method, handler_asgi_context->capsule);
@@ -881,7 +916,7 @@ ERROR_CODE startup_handler_asgi(struct service_t *service) {
     /* calls the application with the lifespan scope, the resulting
     coroutine is wrapped in a task driven by the serving loop */
     coroutine = scope == NULL || receive == NULL || send == NULL ? NULL :
-        PyObject_CallFunctionObjArgs(handler_asgi->application, scope, receive, send, NULL);
+        _invoke_handler_asgi(handler_asgi, scope, receive, send);
     Py_XDECREF(scope);
     Py_XDECREF(receive);
     Py_XDECREF(send);
@@ -1498,7 +1533,7 @@ static PyObject *_build_scope_handler_asgi(
     if(object != NULL) { PyDict_SetItemString(scope, "type", object); Py_DECREF(object); }
     object = Py_BuildValue(
         "{s:s,s:s}",
-        "version", VIRIATUM_ASGI_VERSION,
+        "version", _version_handler_asgi(handler_asgi_context->handler),
         "spec_version", VIRIATUM_ASGI_SPEC_VERSION
     );
     if(object != NULL) { PyDict_SetItemString(scope, "asgi", object); Py_DECREF(object); }
@@ -1689,7 +1724,7 @@ ERROR_CODE _call_application_handler_asgi(struct http_parser_t *http_parser) {
     /* calls the application with the scope that has just been built,
     the resulting coroutine is wrapped in a task */
     coroutine = scope == NULL || receive == NULL || send == NULL ? NULL :
-        PyObject_CallFunctionObjArgs(handler_asgi->application, scope, receive, send, NULL);
+        _invoke_handler_asgi(handler_asgi, scope, receive, send);
     Py_XDECREF(scope);
     Py_XDECREF(receive);
     Py_XDECREF(send);

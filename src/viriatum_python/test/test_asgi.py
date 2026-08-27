@@ -578,6 +578,62 @@ class AsgiTest(ServerCase):
         server = viriatum.Server(wsgi, port=self.port + 94, interface="wsgi")
         self.assertFalse(server.asgi)
 
+    def test_interface_version(self):
+        # verifies that the shape of the application selects the
+        # version of the interface used for the calling of it
+        def legacy(scope):
+            async def application(receive, send):
+                pass
+
+            return application
+
+        class LegacyClass(object):
+            def __init__(self, scope):
+                self.scope = scope
+
+            async def __call__(self, receive, send):
+                pass
+
+        async def modern(scope, receive, send):
+            pass
+
+        server = viriatum.Server(legacy, port=self.port + 80, interface="asgi")
+        self.assertTrue(server.double_callable)
+        server = viriatum.Server(LegacyClass, port=self.port + 81, interface="asgi")
+        self.assertTrue(server.double_callable)
+        server = viriatum.Server(modern, port=self.port + 82, interface="asgi")
+        self.assertFalse(server.double_callable)
+
+    def test_interface_version_forced(self):
+        # verifies that the version of the interface may be forced
+        # regardless of the shape of the application
+        async def application(scope, receive, send):
+            pass
+
+        server = viriatum.Server(application, port=self.port + 83, interface="asgi2")
+        self.assertTrue(server.asgi)
+        self.assertTrue(server.double_callable)
+        server = viriatum.Server(application, port=self.port + 84, interface="asgi3")
+        self.assertTrue(server.asgi)
+        self.assertFalse(server.double_callable)
+
+    def test_interface_markers(self):
+        # verifies that the markers set by the adaptation helpers take
+        # precedence over the inspection of the application
+        async def single(scope, receive, send):
+            pass
+
+        def double(scope):
+            pass
+
+        single._asgi_double_callable = True
+        double._asgi_single_callable = True
+
+        server = viriatum.Server(single, port=self.port + 85, interface="asgi")
+        self.assertTrue(server.double_callable)
+        server = viriatum.Server(double, port=self.port + 86, interface="asgi")
+        self.assertFalse(server.double_callable)
+
     def test_interface_invalid(self):
         # verifies that an unknown interface is rejected at the
         # construction of the server object
@@ -989,6 +1045,95 @@ class AsgiTest(ServerCase):
             return urllib.request.urlopen(self._url(path), timeout=5)
         except urllib.error.HTTPError as error:
             return error
+
+
+class LegacyTest(unittest.TestCase):
+    """
+    Test suite for the second version of the interface, the one
+    where the application is a double callable.
+    """
+
+    OFFSET = 20
+
+    @classmethod
+    def setUpClass(cls):
+        # creates the server for the legacy application defined below
+        # and runs its loop in a separate thread
+        cls.port = PORT + cls.OFFSET
+        cls.server = viriatum.Server(cls._application, port=cls.port, interface="asgi")
+        cls.thread = threading.Thread(target=cls.server.serve_forever, daemon=True)
+        cls.thread.start()
+        for _ in range(100):
+            try:
+                urllib.request.urlopen(cls._url("/plain"), timeout=1).read()
+                return
+            except Exception:
+                time.sleep(0.1)
+        raise AssertionError("server did not become ready")
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.server.stop()
+        cls.thread.join(timeout=10)
+
+    @classmethod
+    def _url(cls, path):
+        return "http://127.0.0.1:%d%s" % (cls.port, path)
+
+    @staticmethod
+    def _application(scope):
+        # the scope is taken by the outer callable and only then are
+        # the two callables provided, the double callable shape
+        async def application(receive, send):
+            if scope["type"] == "lifespan":
+                while True:
+                    message = await receive()
+                    if message["type"] == "lifespan.startup":
+                        await send({"type": "lifespan.startup.complete"})
+                    elif message["type"] == "lifespan.shutdown":
+                        await send({"type": "lifespan.shutdown.complete"})
+                        return
+            message = await receive()
+            if scope["path"] == "/scope":
+                body = repr(
+                    (scope["type"], scope["asgi"]["version"], scope["method"])
+                ).encode("utf-8")
+            elif scope["path"] == "/echo":
+                body = b"got:" + message["body"]
+            else:
+                body = b"plain"
+            await send(
+                {
+                    "type": "http.response.start",
+                    "status": 200,
+                    "headers": [(b"content-type", b"text/plain")],
+                }
+            )
+            await send({"type": "http.response.body", "body": body})
+
+        return application
+
+    def test_simple_request(self):
+        result = urllib.request.urlopen(self._url("/plain"), timeout=5)
+        self.assertEqual(result.status, 200)
+        self.assertEqual(result.read(), b"plain")
+
+    def test_scope_version(self):
+        # verifies that the scope reports the version of the interface
+        # that is being used for the calling of the application
+        result = urllib.request.urlopen(self._url("/scope"), timeout=5)
+        self.assertEqual(
+            ast.literal_eval(result.read().decode()), ("http", "2.0", "GET")
+        )
+
+    def test_receive_body(self):
+        result = urllib.request.urlopen(self._url("/echo"), data=b"payload", timeout=5)
+        self.assertEqual(result.read(), b"got:payload")
+
+    def test_lifespan(self):
+        # verifies that the lifespan protocol is driven through the
+        # double callable shape as well, the server is already up
+        self.assertTrue(self.thread.is_alive())
 
 
 class LifespanTest(unittest.TestCase):

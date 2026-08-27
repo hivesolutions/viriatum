@@ -29,7 +29,9 @@ def serve(application, host="0.0.0.0", port=8080, www_root=None, interface="auto
     :param www_root: The root directory for static file serving.
     :type interface: String
     :param interface: The interface to be used for the calling of
-    the application, either auto, wsgi or asgi.
+    the application, one of auto, wsgi, asgi, asgi2 or asgi3, the
+    automatic one only tells a single callable asgi application
+    apart from a wsgi one.
     :rtype: Server
     :return: The server that has just finished its serving.
     """

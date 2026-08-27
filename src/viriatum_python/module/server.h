@@ -43,6 +43,8 @@
 #define VIRIATUM_PYTHON_INTERFACE_AUTO "auto"
 #define VIRIATUM_PYTHON_INTERFACE_WSGI "wsgi"
 #define VIRIATUM_PYTHON_INTERFACE_ASGI "asgi"
+#define VIRIATUM_PYTHON_INTERFACE_ASGI2 "asgi2"
+#define VIRIATUM_PYTHON_INTERFACE_ASGI3 "asgi3"
 
 /**
  * Structure describing a server object, wrapping a viriatum
@@ -68,6 +70,13 @@ typedef struct server_python_t {
      * loop, only set for the asgi applications.
      */
     struct loop_python_t *loop_python;
+
+    /**
+     * Flag controlling if the application is called through the
+     * double callable shape of the second version of the asgi
+     * specification, unset for the single callable one.
+     */
+    char double_callable;
 
     /**
      * Flag controlling if the underlying service has been
