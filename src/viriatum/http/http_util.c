@@ -26,6 +26,103 @@
 
 #include "http_util.h"
 
+size_t write_status_http(
+    struct connection_t *connection,
+    char *buffer,
+    size_t size,
+    enum http_version_e version,
+    int status_code,
+    char *status_message,
+    enum http_keep_alive_e keep_alive
+) {
+    /* writes the status line together with the fields that every
+    response of this version of the protocol carries, the section is
+    left open so that the handler appends its own fields */
+    return write_http_headers(
+        connection,
+        buffer,
+        size,
+        version,
+        status_code,
+        status_message,
+        keep_alive,
+        FALSE
+    );
+}
+
+size_t write_field_http(
+    struct connection_t *connection,
+    char *buffer,
+    size_t size,
+    size_t offset,
+    const char *name,
+    const char *value
+) {
+    /* appends the field in the plain form of a name, a colon and a
+    value, closed by the sequence that separates the lines */
+    return offset + SPRINTF(&buffer[offset], size - offset, "%s: %s\r\n", name, value);
+}
+
+size_t write_end_http(
+    struct connection_t *connection,
+    char *buffer,
+    size_t size,
+    size_t offset,
+    char last
+) {
+    /* closes the section with the empty line that separates it from
+    the payload that may follow it, the sequence is written directly
+    as it carries no value at all to be formatted */
+    if(offset + 3 > size) { return offset; }
+    buffer[offset] = '\r';
+    buffer[offset + 1] = '\n';
+    buffer[offset + 2] = '\0';
+    return offset + 2;
+}
+
+ERROR_CODE write_chunk_http(
+    struct connection_t *connection,
+    unsigned char *data,
+    size_t size,
+    char last,
+    connection_data_callback_hu callback,
+    void *parameters
+) {
+    /* under this version of the protocol the payload travels with
+    nothing framing it, so it is written as it stands */
+    write_connection(
+        connection,
+        data,
+        (unsigned int) size,
+        (connection_data_callback) callback,
+        parameters
+    );
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE write_flush_http(
+    struct connection_t *connection,
+    unsigned char *data,
+    size_t size,
+    connection_data_callback_hu callback,
+    void *parameters
+) {
+    /* under this version of the protocol the response travels in the
+    very shape it has been built in */
+    write_connection(
+        connection,
+        data,
+        (unsigned int) size,
+        (connection_data_callback) callback,
+        parameters
+    );
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
 size_t write_http_headers(
     struct connection_t *connection,
     char *buffer, size_t size,

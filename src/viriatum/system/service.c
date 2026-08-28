@@ -114,6 +114,7 @@ void create_service_options(struct service_options_t **service_options_pointer) 
     service_options->port = 0;
     service_options->address = NULL;
     service_options->ip6 = 0;
+    service_options->http2 = VIRIATUM_DEFAULT_HTTP2;
     service_options->address6 = NULL;
     service_options->ssl = 0;
     service_options->ssl_csr = NULL;
@@ -2434,6 +2435,11 @@ ERROR_CODE _file_options_service(struct service_t *service, struct hash_map_t *a
     get_value_string_sort_map(general, (unsigned char *) "ip6", &value);
     if(value != NULL) { service_options->ip6 = (unsigned char) atob(value); }
 
+    /* tries to retrieve the http2 argument from the arguments map and
+    in case the (http2) value is set, sets it in the service options */
+    get_value_string_sort_map(general, (unsigned char *) "http2", &value);
+    if(value != NULL) { service_options->http2 = (unsigned char) atob(value); }
+
     /* tries to retrieve the ip6 host argument from the arguments map and
     in case the (host) value is set, sets it in the service options */
     get_value_string_sort_map(general, (unsigned char *) "ip6_host", &value);
@@ -2515,6 +2521,11 @@ ERROR_CODE _comand_line_options_service(struct service_t *service, struct hash_m
     in case the (ip6) value is set, sets the service with ip6 support  */
     get_value_string_hash_map(arguments, (unsigned char *) "ip6", &value);
     if(value != NULL) { service_options->ip6 = 1; }
+
+    /* tries to retrieve the no http2 argument from the arguments map,
+    its presence turns the cleartext form of HTTP/2 off */
+    get_value_string_hash_map(arguments, (unsigned char *) "no-http2", &value);
+    if(value != NULL) { service_options->http2 = 0; }
 
     /* tries to retrieve the handler argument from the arguments map, then
     in case the (handler) value is set, sets the handler name value

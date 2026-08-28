@@ -25,6 +25,7 @@
 #include "stdafx.h"
 
 #include "stream_http.h"
+#include "stream_http2.h"
 
 ERROR_CODE create_http_handler(struct http_handler_t **http_handler_pointer, unsigned char *name) {
     /* retrieves the HTTP handler size */
@@ -86,6 +87,11 @@ ERROR_CODE create_http_connection(struct http_connection_t **http_connection_poi
     http_connection->write_headers_m = write_http_headers_m;
     http_connection->write_message = write_http_message;
     http_connection->write_error = write_http_error;
+    http_connection->write_status = write_status_http;
+    http_connection->write_field = write_field_http;
+    http_connection->write_end = write_end_http;
+    http_connection->write_chunk = write_chunk_http;
+    http_connection->write_flush = write_flush_http;
     http_connection->log_request = log_http_request;
     http_connection->acquire = acquire_http_connection;
     http_connection->release = release_http_connection;
@@ -101,6 +107,7 @@ ERROR_CODE create_http_connection(struct http_connection_t **http_connection_poi
     time and so this reference never changes */
     http_connection->request = http_connection->http_parser->request;
     http_connection->http2_connection = NULL;
+    http_connection->detect = service->options->http2;
 
     /* sets the connection as the message parameter(s), this is the
     reference that allows an handler to reach the upper objects */
@@ -134,6 +141,15 @@ ERROR_CODE delete_http_connection(struct http_connection_t *http_connection) {
     /* allocates space for the HTTP handler reference
     to be used in this connection */
     struct http_handler_t *http_handler;
+
+    /* in case the connection has been taken over by a session of
+    HTTP/2 the session is released first, it owns the streams and
+    the handlers that were serving them, and it restores the
+    structures that the connection itself owns */
+    if(http_connection->http2_connection != NULL) {
+        delete_http2_connection(http_connection->http2_connection);
+        http_connection->http2_connection = NULL;
+    }
 
     /* retrieves the currently assigned handler and then unsets
     the connection from associated handler (unregister connection) */
@@ -249,6 +265,33 @@ ERROR_CODE data_handler_stream_http(struct io_connection_t *io_connection, unsig
     _buffer = http_connection->buffer + http_connection->buffer_offset;
     memcpy(_buffer, buffer, buffer_size);
     http_connection->buffer_offset += buffer_size;
+
+    /* the connection may be opening with the preface of HTTP/2
+    instead of a message of HTTP/1.1, the two are told apart by the
+    very first bytes and the decision is taken only once */
+    if(http_connection->detect == TRUE) {
+        size_offset = http_connection->buffer_offset;
+        size_length = size_offset < HTTP2_PREFACE_SIZE ? size_offset : HTTP2_PREFACE_SIZE;
+
+        /* the bytes differ from the preface, so the connection is
+        carrying a message of HTTP/1.1 and nothing else has to be
+        looked at from this point on */
+        if(memcmp(http_connection->buffer, HTTP2_PREFACE, size_length) != 0) {
+            http_connection->detect = FALSE;
+        }
+        /* the complete preface has arrived, so the session of HTTP/2
+        takes the connection over together with what is buffered */
+        else if(size_offset >= HTTP2_PREFACE_SIZE) {
+            http_connection->detect = FALSE;
+            upgrade_handler_stream_http2(io_connection);
+            RAISE_AGAIN(data_handler_stream_http2(io_connection, NULL, 0));
+        }
+        /* only a part of the preface has arrived and it matches, so
+        the decision waits for the bytes that are still missing */
+        else {
+            RAISE_NO_ERROR;
+        }
+    }
 
     /* iterates continuously, this allows the stream handler
     to split the stream into possible multiple messages, useful

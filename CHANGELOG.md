@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * Header compression for HTTP/2, built from scratch with no new dependency
 * Framing, streams and flow control for HTTP/2
+* Serving of requests over HTTP/2 in cleartext, without any negotiation
+* Setting that turns the cleartext form of HTTP/2 off
 * Continuous integration now builds with clang 22 and gcc 16
 * Scalable vector versions of the web illustrations, logos and UI assets
 

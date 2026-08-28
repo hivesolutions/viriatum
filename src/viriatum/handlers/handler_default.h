@@ -51,5 +51,11 @@ ERROR_CODE _set_http_request_handler_default(struct http_request_t *http_request
 ERROR_CODE _unset_http_request_handler_default(struct http_request_t *http_request);
 ERROR_CODE _set_http_settings_handler_default(struct http_settings_t *http_settings);
 ERROR_CODE _unset_http_settings_handler_default(struct http_settings_t *http_settings);
+/**
+ * The message that the default handler responds with, it is the
+ * simplest response that the server is able to produce.
+ */
+#define HANDLER_DEFAULT_MESSAGE "Hello Viriatum"
+
 ERROR_CODE _send_response_handler_default(struct http_request_t *http_request);
 ERROR_CODE _send_response_callback_handler_default(struct connection_t *connection, struct data_t *data, void *parameters);

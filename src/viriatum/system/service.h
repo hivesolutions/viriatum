@@ -543,6 +543,13 @@ typedef struct service_options_t {
     unsigned char ip6;
 
     /**
+     * Flag that controls if the service accepts a connection
+     * that opens with the preface of HTTP/2, which is the form
+     * of the protocol that requires no negotiation at all.
+     */
+    unsigned char http2;
+
+    /**
      * The "default" address to bind the service
      * associated with these options.
      * This is the address to be used in the ipv6

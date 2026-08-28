@@ -75,6 +75,44 @@ typedef size_t (*http_connection_headers_m)(struct connection_t *, char *, size_
 typedef ERROR_CODE (*http_connection_message)(struct connection_t *, char *, size_t, enum http_version_e, int, char *, char *, enum http_keep_alive_e, connection_data_callback_sh, void *);
 
 /**
+ * Function used to open a response in the provided buffer,
+ * writing the status of it in the encoding of the protocol that
+ * is serving the connection.
+ * The number of bytes that the buffer holds once the status has
+ * been written is returned, so that the fields that follow it
+ * are appended at the proper position.
+ */
+typedef size_t (*http_connection_status)(struct connection_t *, char *, size_t, enum http_version_e, int, char *, enum http_keep_alive_e);
+
+/**
+ * Function used to append a single header field to a response
+ * that is being built in the provided buffer, the offset is the
+ * position the field is written at and the new one is returned.
+ */
+typedef size_t (*http_connection_field)(struct connection_t *, char *, size_t, size_t, const char *, const char *);
+
+/**
+ * Function used to close the header section of a response that
+ * is being built in the provided buffer, the flag tells whether
+ * the response carries a payload after the headers.
+ */
+typedef size_t (*http_connection_end)(struct connection_t *, char *, size_t, size_t, char);
+
+/**
+ * Function used to write a fragment of the payload of a response
+ * through the connection, the flag tells whether the fragment is
+ * the last one of the message.
+ */
+typedef ERROR_CODE (*http_connection_chunk)(struct connection_t *, unsigned char *, size_t, char, connection_data_callback_sh, void *);
+
+/**
+ * Function used to write the buffer that a response has been built
+ * in through the connection, the buffer is already encoded in the
+ * protocol in use and travels as it stands.
+ */
+typedef ERROR_CODE (*http_connection_flush)(struct connection_t *, unsigned char *, size_t, connection_data_callback_sh, void *);
+
+/**
  * Function used to log request information in the common
  * log format into the current output stream.
  *
@@ -199,6 +237,13 @@ typedef struct http_connection_t {
     struct http2_connection_t *http2_connection;
 
     /**
+     * Flag controlling if the protocol of the connection is still
+     * to be decided, it is unset as soon as the first bytes tell
+     * the two versions apart.
+     */
+    char detect;
+
+    /**
      * The handler currently being used to handle
      * the connection, may change over the connection
      * life-time and should not be trusted as static.
@@ -285,6 +330,36 @@ typedef struct http_connection_t {
      * in the connection context using the "normal" pipe.
      */
     http_connection_message write_error;
+
+    /**
+     * Function used to open a response, it writes the status of it
+     * in the encoding of the protocol serving the connection.
+     */
+    http_connection_status write_status;
+
+    /**
+     * Function used to append a single header field to a response
+     * that is being built.
+     */
+    http_connection_field write_field;
+
+    /**
+     * Function used to close the header section of a response that
+     * is being built.
+     */
+    http_connection_end write_end;
+
+    /**
+     * Function used to write a fragment of the payload of a
+     * response through the connection.
+     */
+    http_connection_chunk write_chunk;
+
+    /**
+     * Function used to write the buffer that a response has been
+     * built in through the connection.
+     */
+    http_connection_flush write_flush;
 
     /**
      * Function to be used for logging a connection into the

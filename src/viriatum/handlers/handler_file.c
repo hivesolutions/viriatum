@@ -429,6 +429,62 @@ ERROR_CODE body_callback_handler_file(struct http_request_t *http_request, const
     RAISE_NO_ERROR;
 }
 
+/**
+ * Writes the status and the fields that every response of the file
+ * handler carries, through the operations of the connection so that
+ * the encoding of them follows the protocol in use.
+ *
+ * @param http_connection The connection the response belongs to.
+ * @param connection The connection the response is written on.
+ * @param buffer The buffer the response is built in.
+ * @param size The size in bytes of the provided buffer.
+ * @param version The version of the protocol in use.
+ * @param status_code The status code of the response.
+ * @param status_message The message that describes the status.
+ * @param keep_alive The mode the connection is left in.
+ * @param content_length The size in bytes of the payload.
+ * @return The number of bytes the buffer holds.
+ */
+static size_t _write_headers_handler_file(
+    struct http_connection_t *http_connection,
+    struct connection_t *connection,
+    char *buffer,
+    size_t size,
+    enum http_version_e version,
+    int status_code,
+    char *status_message,
+    enum http_keep_alive_e keep_alive,
+    size_t content_length
+) {
+    /* allocates space for the position in the buffer and for the
+    text of the length of the payload */
+    size_t count;
+    char length[32];
+
+    count = http_connection->write_status(
+        connection,
+        buffer,
+        size,
+        version,
+        status_code,
+        status_message,
+        keep_alive
+    );
+    SPRINTF(length, sizeof(length), "%lu", (long unsigned int) content_length);
+    count = http_connection->write_field(connection, buffer, size, count, CONTENT_LENGTH_H, length);
+    count = http_connection->write_field(
+        connection,
+        buffer,
+        size,
+        count,
+        CACHE_CONTROL_H,
+        cache_codes[NO_CACHE - 1]
+    );
+
+    /* returns the number of bytes that the buffer holds */
+    return count;
+}
+
 ERROR_CODE message_complete_callback_handler_file(struct http_request_t *http_request) {
     /* allocates the file size and for the temporary count
     variable used to count the written bytes */
@@ -504,6 +560,10 @@ ERROR_CODE message_complete_callback_handler_file(struct http_request_t *http_re
     able to operate over them, for register */
     struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
     struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
+
+    /* allocates space for the value of the range of the contents, it
+    is written as a field of its own */
+    char range_value[64];
 
     /* verifies if the currently set flag grant "permission" to keep
     the connection alive at the end of the HTTP message processing,
@@ -735,29 +795,45 @@ ERROR_CODE message_complete_callback_handler_file(struct http_request_t *http_re
         );
     } else if(is_redirect) {
         /* writes the HTTP static headers to the response */
-        count = write_http_headers(
+        count = http_connection->write_status(
             connection,
             headers_buffer,
             VIRIATUM_HTTP_SIZE,
-            HTTP11,
+            http_request->version,
             307,
             "Temporary Redirect",
-            keep_alive ? KEEP_ALIVE : KEEP_CLOSE,
-            FALSE
+            keep_alive ? KEEP_ALIVE : KEEP_CLOSE
         );
-        SPRINTF(
-            &headers_buffer[count],
-            VIRIATUM_HTTP_SIZE - count,
-            CONTENT_LENGTH_H ": 0\r\n" LOCATION_H ": %s\r\n\r\n",
-            location
+        count = http_connection->write_field(
+            connection,
+            headers_buffer,
+            VIRIATUM_HTTP_SIZE,
+            count,
+            CONTENT_LENGTH_H,
+            "0"
+        );
+        count = http_connection->write_field(
+            connection,
+            headers_buffer,
+            VIRIATUM_HTTP_SIZE,
+            count,
+            LOCATION_H,
+            (const char *) location
+        );
+        count = http_connection->write_end(
+            connection,
+            headers_buffer,
+            VIRIATUM_HTTP_SIZE,
+            count,
+            TRUE
         );
 
         /* writes both the headers to the connection, registers
         for the appropriate callbacks */
-        write_connection(
+        http_connection->write_flush(
             connection,
             (unsigned char *) headers_buffer,
-            (unsigned int) strlen(headers_buffer),
+            count,
             _cleanup_handler_file,
             handler_file_context
         );
@@ -765,25 +841,31 @@ ERROR_CODE message_complete_callback_handler_file(struct http_request_t *http_re
     /* in case the current situation is a directory list */
     else if(is_directory) {
         /* writes the HTTP static headers to the response */
-        write_http_headers_c(
+        count = _write_headers_handler_file(
+            http_connection,
             connection,
             headers_buffer,
             VIRIATUM_HTTP_SIZE,
-            HTTP11,
+            http_request->version,
             200,
             "OK",
             keep_alive ? KEEP_ALIVE : KEEP_CLOSE,
-            strlen((char *) handler_file_context->template_handler->string_value),
-            NO_CACHE,
-            TRUE
+            strlen((char *) handler_file_context->template_handler->string_value)
+        );
+        count = http_connection->write_end(
+            connection,
+            headers_buffer,
+            VIRIATUM_HTTP_SIZE,
+            count,
+            FALSE
         );
 
         /* writes both the headers to the connection, register
         for the appropriate callbacks */
-        write_connection(
+        http_connection->write_flush(
             connection,
             (unsigned char *) headers_buffer,
-            (unsigned int) strlen(headers_buffer),
+            count,
             _send_data_handler_file,
             handler_file_context
         );
@@ -793,25 +875,31 @@ ERROR_CODE message_complete_callback_handler_file(struct http_request_t *http_re
     to the client indicating that cache should be used */
     else if(handler_file_context->etag_status == 2 && strcmp(etag, (char *) handler_file_context->etag) == 0) {
         /* writes the HTTP static headers to the response */
-        write_http_headers_c(
+        count = _write_headers_handler_file(
+            http_connection,
             connection,
             headers_buffer,
             VIRIATUM_HTTP_SIZE,
-            HTTP11,
+            http_request->version,
             304,
             "Not Modified",
             keep_alive ? KEEP_ALIVE : KEEP_CLOSE,
-            0,
-            NO_CACHE,
+            0
+        );
+        count = http_connection->write_end(
+            connection,
+            headers_buffer,
+            VIRIATUM_HTTP_SIZE,
+            count,
             TRUE
         );
 
         /* writes both the headers to the connection, registers for
         the appropriate callbacks */
-        write_connection(
+        http_connection->write_flush(
             connection,
             (unsigned char *) headers_buffer,
-            (unsigned int) strlen(headers_buffer),
+            count,
             _cleanup_handler_file,
             handler_file_context
         );
@@ -833,35 +921,49 @@ ERROR_CODE message_complete_callback_handler_file(struct http_request_t *http_re
         that only a part of the file is going to be retrieved, then
         writes also the content range header indicating which bytes
         are going to be retrieved */
-        count = write_http_headers_c(
+        count = _write_headers_handler_file(
+            http_connection,
             connection,
             headers_buffer,
             VIRIATUM_HTTP_SIZE,
-            HTTP11,
+            http_request->version,
             206,
             "Partial content",
             keep_alive ? KEEP_ALIVE : KEEP_CLOSE,
             handler_file_context->final_byte -
-                handler_file_context->initial_byte + 1,
-            NO_CACHE,
-            FALSE
+                handler_file_context->initial_byte + 1
         );
         SPRINTF(
-            &headers_buffer[count],
-            VIRIATUM_HTTP_SIZE - count,
-            CONTENT_RANGE_H ": bytes %ld-%ld/%ld\r\n\r\n",
+            range_value,
+            sizeof(range_value),
+            "bytes %ld-%ld/%ld",
             (long int) handler_file_context->initial_byte,
             (long int) handler_file_context->final_byte,
             (long int) file_size
+        );
+        count = http_connection->write_field(
+            connection,
+            headers_buffer,
+            VIRIATUM_HTTP_SIZE,
+            count,
+            CONTENT_RANGE_H,
+            range_value
+        );
+        count = http_connection->write_end(
+            connection,
+            headers_buffer,
+            VIRIATUM_HTTP_SIZE,
+            count,
+            FALSE
         );
 
         /* writes both the headers to the connection, registers for the
         appropriate callbacks, this is going to trigger the chain of write
         to callback behavior expected for the file sending */
-        write_connection(
+        http_connection->write_flush(
             connection,
             (unsigned char *) headers_buffer,
-            (unsigned int) strlen(headers_buffer),
+            count,
             _send_chunk_handler_file,
             handler_file_context
         );
@@ -877,17 +979,16 @@ ERROR_CODE message_complete_callback_handler_file(struct http_request_t *http_re
 
         /* writes the HTTP static headers to the response indicating
         that the file is going to be served normally */
-        count = write_http_headers_c(
+        count = _write_headers_handler_file(
+            http_connection,
             connection,
             headers_buffer,
             VIRIATUM_HTTP_SIZE,
-            HTTP11,
+            http_request->version,
             200,
             "OK",
             keep_alive ? KEEP_ALIVE : KEEP_CLOSE,
-            file_size,
-            NO_CACHE,
-            FALSE
+            file_size
         );
 
         /* retrieves the extension part of the file path and then uses
@@ -897,27 +998,46 @@ ERROR_CODE message_complete_callback_handler_file(struct http_request_t *http_re
         extension = extension_path((char *) handler_file_context->file_path_d);
         mime_type = connection->service->get_mime_type(connection->service, extension);
         if(mime_type != NULL) {
-            count += SPRINTF(
-                &headers_buffer[count],
-                VIRIATUM_HTTP_SIZE - count,
-                CONTENT_TYPE_H ": %s\r\n",
+            count = http_connection->write_field(
+                connection,
+                headers_buffer,
+                VIRIATUM_HTTP_SIZE,
+                count,
+                CONTENT_TYPE_H,
                 mime_type
             );
         }
-        SPRINTF(
-            &headers_buffer[count],
-            VIRIATUM_HTTP_SIZE - count,
-            ACCEPT_RANGES_H ": bytes\r\n" ETAG_H ": %s\r\n\r\n",
+        count = http_connection->write_field(
+            connection,
+            headers_buffer,
+            VIRIATUM_HTTP_SIZE,
+            count,
+            ACCEPT_RANGES_H,
+            "bytes"
+        );
+        count = http_connection->write_field(
+            connection,
+            headers_buffer,
+            VIRIATUM_HTTP_SIZE,
+            count,
+            ETAG_H,
             etag
+        );
+        count = http_connection->write_end(
+            connection,
+            headers_buffer,
+            VIRIATUM_HTTP_SIZE,
+            count,
+            FALSE
         );
 
         /* writes both the headers to the connection, registers for the
         appropriate callbacks, this is going to trigger the chain of write
         to callback behavior expected for the file sending */
-        write_connection(
+        http_connection->write_flush(
             connection,
             (unsigned char *) headers_buffer,
-            (unsigned int) strlen(headers_buffer),
+            count,
             _send_chunk_handler_file,
             handler_file_context
         );
@@ -1246,6 +1366,11 @@ ERROR_CODE _send_chunk_handler_file(struct connection_t *connection, struct data
     struct handler_file_context_t *handler_file_context = (struct handler_file_context_t *) parameters;
     unsigned char *file_path = handler_file_context->file_path_d;
 
+    /* retrieves the underlying connection references in order to be
+    able to write the payload through the protocol in use */
+    struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
+    struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
+
     /* retrieves the file from the handler file context */
     FILE *file = handler_file_context->file;
 
@@ -1286,12 +1411,14 @@ ERROR_CODE _send_chunk_handler_file(struct connection_t *connection, struct data
     /* in case the number of read bytes is valid, there's
     data to be sent to the client side */
     if(number_bytes > 0) {
-        /* writes the complete set of contents in the file
-        buffer to the current connection (send operation) */
-        write_connection(
+        /* writes the complete set of contents in the file buffer to
+        the current connection, the fragment that exhausts the range
+        is the one that closes the message */
+        http_connection->write_chunk(
             connection,
             file_buffer,
-            (unsigned int) number_bytes,
+            number_bytes,
+            number_bytes == remaining ? TRUE : FALSE,
             _send_chunk_handler_file,
             handler_file_context
         );
@@ -1321,6 +1448,11 @@ ERROR_CODE _send_data_handler_file(struct connection_t *connection, struct data_
     struct handler_file_context_t *handler_file_context = (struct handler_file_context_t *) parameters;
     struct template_handler_t *template_handler = handler_file_context->template_handler;
 
+    /* retrieves the underlying connection references in order to be
+    able to write the payload through the protocol in use */
+    struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
+    struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
+
     /* in case the handler file context is already flushed
     time to clenaup pending structures */
     if(handler_file_context->flushed) {
@@ -1335,11 +1467,13 @@ ERROR_CODE _send_data_handler_file(struct connection_t *connection, struct data_
     /* otherwise the "normal" write connection applies */
     else {
         /* writes the (file) data to the connection and sets the handler
-        file context as flushed */
-        write_connection(
+        file context as flushed, the data is the complete payload of the
+        response and so it closes the message */
+        http_connection->write_chunk(
             connection,
             template_handler->string_value,
-            (unsigned int) strlen((char *) template_handler->string_value),
+            strlen((char *) template_handler->string_value),
+            TRUE,
             _send_data_handler_file,
             handler_file_context
         );

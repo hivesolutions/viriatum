@@ -28,6 +28,19 @@
 #include "../system/system.h"
 #include "stream_http.h"
 
+/* forward references (avoids loop) */
+struct connection_t;
+struct data_t;
+struct io_connection_t;
+struct http_connection_t;
+
+/**
+ * Callback of the completion of the write of a fragment of a
+ * response, it is declared here as the inclusion of the headers
+ * of the stream layer loops back into this one.
+ */
+typedef ERROR_CODE (*connection_data_callback_h2)(struct connection_t *, struct data_t *, void *);
+
 /**
  * The number of slots of the table that holds the streams of a
  * connection, it is the number of streams that a peer is allowed
@@ -134,7 +147,79 @@ typedef struct http2_stream_t {
      * completely received and handed to the handler.
      */
     char headers_complete;
+
+    /**
+     * Flag controlling if the response of the stream has already
+     * been written in full, at which point the stream is closed as
+     * soon as the handler is done with it.
+     */
+    char complete;
+
+    /**
+     * The size of the payload that the message has announced, only
+     * meaningful when it has actually announced one.
+     */
+    size_t content_length;
+
+    /**
+     * Flag controlling if the message has announced the size of its
+     * payload, which is then verified against the one received.
+     */
+    char announced;
+
+    /**
+     * The size of the payload that has been received so far, it is
+     * compared against the announced one when the stream closes.
+     */
+    size_t received;
+
+    /**
+     * The fragments of the payload of the response that the window
+     * of the stream or of the connection has not allowed to be sent
+     * yet, they are flushed as the peer widens either of them.
+     */
+    struct linked_list_t *pending;
 } http2_stream;
+
+/**
+ * Structure describing a fragment of the payload of a response
+ * that is waiting for the window to widen, it owns the buffer of
+ * the fragment and the callback that the handler is waiting on.
+ */
+typedef struct http2_pending_t {
+    /**
+     * The buffer of the fragment, it is owned by this structure
+     * until it reaches the connection.
+     */
+    unsigned char *data;
+
+    /**
+     * The size in bytes of the fragment that is still pending.
+     */
+    size_t size;
+
+    /**
+     * The position of the fragment that has already been sent, the
+     * window may have allowed only a part of it through.
+     */
+    size_t offset;
+
+    /**
+     * Flag controlling if the fragment closes the message.
+     */
+    char last;
+
+    /**
+     * The callback of the handler, driven once the complete
+     * fragment has reached the connection.
+     */
+    connection_data_callback_h2 callback;
+
+    /**
+     * The value handed to the callback of the handler.
+     */
+    void *parameters;
+} http2_pending;
 
 /**
  * Structure describing the session of a connection that speaks
@@ -241,6 +326,14 @@ typedef struct http2_connection_t {
      * continuation frames currently being assembled.
      */
     unsigned char continuation_flags;
+
+    /**
+     * The structures that carry a stream through the completion of
+     * a write and that have not been driven yet, they are released
+     * together with the session so that a connection that is torn
+     * down with writes still queued leaves nothing behind.
+     */
+    struct linked_list_t *callbacks;
 
     /**
      * The buffer that assembles a header block spread over a
@@ -369,6 +462,80 @@ ERROR_CODE write_value_http2_connection(struct http2_connection_t *http2_connect
  * @return The resulting error code.
  */
 ERROR_CODE write_goaway_http2_connection(struct http2_connection_t *http2_connection, unsigned int error);
+
+/**
+ * Writes the buffer that a response has been built in through the
+ * connection under HTTP/2, restoring the stream it belongs to once
+ * the write of it completes.
+ *
+ * @param connection The connection the response belongs to.
+ * @param data The buffer of the response.
+ * @param size The size in bytes of the buffer.
+ * @param callback The callback of the completion of the write.
+ * @param parameters The value handed to the callback.
+ * @return The resulting error code.
+ */
+ERROR_CODE write_flush_http2(struct connection_t *connection, unsigned char *data, size_t size, connection_data_callback_h2 callback, void *parameters);
+
+/**
+ * Opens a response in the provided buffer under HTTP/2, the block
+ * of the headers is opened after the space that the header of the
+ * frame is going to take.
+ *
+ * @param connection The connection the response belongs to.
+ * @param buffer The buffer the response is built in.
+ * @param size The size in bytes of the provided buffer.
+ * @param version The version of the protocol in use.
+ * @param status_code The status code of the response.
+ * @param status_message The message that describes the status.
+ * @param keep_alive The mode the connection is left in.
+ * @return The number of bytes the buffer holds.
+ */
+size_t write_status_http2(struct connection_t *connection, char *buffer, size_t size, enum http_version_e version, int status_code, char *status_message, enum http_keep_alive_e keep_alive);
+
+/**
+ * Appends a single header field to a response being built under
+ * HTTP/2, the name is lowered as the protocol requires and the
+ * fields that carry no meaning in it are dropped.
+ *
+ * @param connection The connection the response belongs to.
+ * @param buffer The buffer the response is built in.
+ * @param size The size in bytes of the provided buffer.
+ * @param offset The position the field is written at.
+ * @param name The name of the field.
+ * @param value The value of the field.
+ * @return The number of bytes the buffer holds.
+ */
+size_t write_field_http2(struct connection_t *connection, char *buffer, size_t size, size_t offset, const char *name, const char *value);
+
+/**
+ * Closes the header section of a response being built under
+ * HTTP/2, writing the header of the frame into the space that has
+ * been reserved for it.
+ *
+ * @param connection The connection the response belongs to.
+ * @param buffer The buffer the response is built in.
+ * @param size The size in bytes of the provided buffer.
+ * @param offset The position the section is closed at.
+ * @param last The value one when no payload follows.
+ * @return The number of bytes the buffer holds.
+ */
+size_t write_end_http2(struct connection_t *connection, char *buffer, size_t size, size_t offset, char last);
+
+/**
+ * Writes a fragment of the payload of a response under HTTP/2,
+ * framing it and holding back whatever the windows do not allow
+ * through yet.
+ *
+ * @param connection The connection the response belongs to.
+ * @param data The fragment to be written.
+ * @param size The size in bytes of the fragment.
+ * @param last The value one when the fragment is the last one.
+ * @param callback The callback of the completion of the write.
+ * @param parameters The value handed to the callback.
+ * @return The resulting error code.
+ */
+ERROR_CODE write_chunk_http2(struct connection_t *connection, unsigned char *data, size_t size, char last, connection_data_callback_h2 callback, void *parameters);
 
 /**
  * Processes the data that has arrived on a connection that speaks

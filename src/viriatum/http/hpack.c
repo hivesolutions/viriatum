@@ -824,6 +824,7 @@ ERROR_CODE decode_hpack(struct hpack_table_t *hpack_table, const unsigned char *
     unsigned char byte;
     unsigned char prefix;
     char indexing;
+    char field = FALSE;
     ERROR_CODE return_value;
 
     /* allocates space for the field being decoded and for the one
@@ -852,6 +853,14 @@ ERROR_CODE decode_hpack(struct hpack_table_t *hpack_table, const unsigned char *
         /* the dynamic table size update, it carries no field at all
         and only changes the maximum size of the table */
         else if((byte & 0xe0) == 0x20) {
+            /* a size update is only allowed at the very start of a
+            block, one that follows a field is a decoding error */
+            if(field == TRUE) {
+                RAISE_ERROR_M(
+                    RUNTIME_EXCEPTION_ERROR_CODE,
+                    (unsigned char *) "Dynamic table size update after a field"
+                );
+            }
             return_value = decode_integer_hpack(data, data_size, &offset, 5, &max_size);
             if(IS_ERROR_CODE(return_value)) { RAISE_AGAIN(return_value); }
             return_value = resize_hpack_table(hpack_table, max_size);
@@ -902,6 +911,10 @@ ERROR_CODE decode_hpack(struct hpack_table_t *hpack_table, const unsigned char *
                 if(IS_ERROR_CODE(return_value)) { RAISE_AGAIN(return_value); }
             }
         }
+
+        /* marks that a field has been decoded, from this point on a
+        size update is no longer allowed in the block */
+        field = TRUE;
 
         /* accounts the field against the maximum size of the header
         list, this is the guard against the expansion of a small block

@@ -25,6 +25,7 @@
 #pragma once
 
 #include "../stream/stream_http2.h"
+#include "hpack_test.h"
 #include "test_support.h"
 
 /**
@@ -170,3 +171,42 @@ const char *test_http2_connection_read(void);
  * the unit test should describe possible errors.
  */
 const char *test_http2_connection_preface(void);
+
+/**
+ * Tests the writing of a complete response, verifying that the
+ * frames it produces carry the status, the fields and the payload
+ * that the handler has written.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_http2_connection_response(void);
+
+/**
+ * Tests that the payload of a response is held back while the
+ * window does not allow it through and goes out as soon as the
+ * peer widens it.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_http2_connection_flow(void);
+
+/**
+ * Tests that a payload larger than the window is split over
+ * several frames, the parts of it being copied out of the buffer
+ * that the handler owns.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_http2_connection_split(void);
+
+/**
+ * Tests the size that a message announces for its payload, both
+ * the one that matches what arrives and the ones that are refused.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_http2_connection_length(void);
