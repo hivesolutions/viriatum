@@ -96,7 +96,10 @@ ERROR_CODE create_handler_proxy_context(struct handler_proxy_context_t **handler
     handler_proxy_context->out_buffer = MALLOC(1024);
     handler_proxy_context->out_buffer_size = 0;
     handler_proxy_context->out_buffer_max_size = 1024;
+    handler_proxy_context->field_size = 0;
+    handler_proxy_context->value_size = 0;
     handler_proxy_context->connection = NULL;
+    handler_proxy_context->http_request = NULL;
     handler_proxy_context->connection_c = NULL;
     handler_proxy_context->pending = FALSE;
     handler_proxy_context->pending_write = 0;
@@ -534,6 +537,11 @@ ERROR_CODE virtual_url_callback_handler_proxy(struct http_request_t *http_reques
     with the proxy client to send the data back */
     handler_proxy_context->connection = connection;
 
+    /* keeps the message of the client so that the response is written
+    on the very stream it came in on, the upstream answers on a clock
+    of its own and by then the connection is likely serving another */
+    handler_proxy_context->http_request = http_request;
+
     /* tries to retrieve a possible backend (client) connection for the current
     proxy client connection, in case it exists it's going to be used (fast solution) */
     get_value_hash_map(
@@ -783,6 +791,50 @@ ERROR_CODE close_backend_handler(struct io_connection_t *io_connection) {
     RAISE_NO_ERROR;
 }
 
+/**
+ * Writes the header field of the upstream that has been gathered
+ * into the response of the client, dropping the ones that only
+ * carry meaning between two ends of a single connection.
+ *
+ * @param handler_proxy_context The context holding the field.
+ */
+static void _flush_field_handler_proxy(struct handler_proxy_context_t *handler_proxy_context) {
+    /* retrieves the connection of the client together with the
+    substrates that carry the writing operations */
+    struct connection_t *connection = handler_proxy_context->connection;
+    struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
+    struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
+
+    /* makes the message of this exchange the current one so that the
+    response is written on the stream it came in on */
+    http_connection->request = handler_proxy_context->http_request;
+
+    /* closes both of the gathered parts so that they may be handled
+    as the strings that the writing operations expect */
+    handler_proxy_context->field[handler_proxy_context->field_size] = '\0';
+    handler_proxy_context->value[handler_proxy_context->value_size] = '\0';
+
+    /* makes sure that the buffer is able to take the field before it
+    is written, the operations write into a buffer of a fixed size */
+    reserve_proxy_out_buffer(
+        handler_proxy_context,
+        handler_proxy_context->field_size + handler_proxy_context->value_size + VIRIATUM_MAX_HEADER_P_SIZE + 4
+    );
+    handler_proxy_context->out_buffer_size = http_connection->write_field(
+        connection,
+        handler_proxy_context->out_buffer,
+        handler_proxy_context->out_buffer_max_size,
+        handler_proxy_context->out_buffer_size,
+        handler_proxy_context->field,
+        handler_proxy_context->value
+    );
+
+    /* forgets both of the parts so that the field that follows this
+    one is gathered from nothing */
+    handler_proxy_context->field_size = 0;
+    handler_proxy_context->value_size = 0;
+}
+
 ERROR_CODE line_callback_backend(struct http_request_t *http_request) {
     /* allocates space for both the size of the message and
     for the buffer to be used in the status line construction */
@@ -796,21 +848,42 @@ ERROR_CODE line_callback_backend(struct http_request_t *http_request) {
 
     /* retrieves the enumeration representation of the version
     value in order to be used in the string retrieval */
-    enum http_version_e version_e = http_request->version;
-
-    /* retrieves the string value of the version, the status code
-    and the equivalent status message from the pre-defined ones */
-    const char *version = get_http_version_string(version_e);
     unsigned short status_code = http_request->status_code;
     const char *status_message = GET_HTTP_STATUS(status_code);
 
-    /* writes the status line (should mimic the received one) into a local
-    buffer and then writes this buffer into the output buffer */
-    size_m = SPRINTF(buffer, 1024, "%s %d %s\r\n", version, status_code, status_message);
-    write_proxy_out_buffer(handler_proxy_context, buffer, size_m);
+    /* retrieves the connection of the client together with the
+    substrates that carry the writing operations, then makes the
+    message of this exchange the current one so that the response is
+    written on the stream it came in on */
+    struct connection_t *connection = handler_proxy_context->connection;
+    struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
+    struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
+    http_connection->request = handler_proxy_context->http_request;
 
-    /*@todo: can put here the extra headers to be sent to the backend */
-    write_proxy_out_buffer(handler_proxy_context, "X-Viriatum-Proxy:1\r\n", 20);
+    /* opens the response of the client through the operations of its
+    connection, so that the status is encoded in the protocol that is
+    serving it rather than in the one of the upstream */
+    reserve_proxy_out_buffer(handler_proxy_context, VIRIATUM_HTTP_SIZE);
+    handler_proxy_context->out_buffer_size = http_connection->write_status(
+        connection,
+        handler_proxy_context->out_buffer,
+        handler_proxy_context->out_buffer_max_size,
+        handler_proxy_context->http_request->version,
+        status_code,
+        (char *) status_message,
+        KEEP_ALIVE
+    );
+
+    /* announces that the message has travelled through this proxy,
+    which is the one field this end adds of its own */
+    handler_proxy_context->out_buffer_size = http_connection->write_field(
+        connection,
+        handler_proxy_context->out_buffer,
+        handler_proxy_context->out_buffer_max_size,
+        handler_proxy_context->out_buffer_size,
+        "X-Viriatum-Proxy",
+        "1"
+    );
 
     /* raise no error */
     RAISE_NO_ERROR;
@@ -819,16 +892,32 @@ ERROR_CODE line_callback_backend(struct http_request_t *http_request) {
 ERROR_CODE header_field_callback_backend(struct http_request_t *http_request, const unsigned char *data, size_t data_size) {
     struct handler_proxy_context_t *handler_proxy_context =
         (struct handler_proxy_context_t *) http_request->context;
-    write_proxy_out_buffer(handler_proxy_context, (char *) data, data_size);
+
+    /* the arrival of a name closes the field that came before it, so
+    that one is written before this one starts being gathered */
+    if(handler_proxy_context->value_size > 0) { _flush_field_handler_proxy(handler_proxy_context); }
+
+    /* gathers the fragment of the name, a field reaches this end in as
+    many pieces as the reads that carried it */
+    if(handler_proxy_context->field_size + data_size < sizeof(handler_proxy_context->field)) {
+        memcpy(&handler_proxy_context->field[handler_proxy_context->field_size], data, data_size);
+        handler_proxy_context->field_size += data_size;
+    }
+
     RAISE_NO_ERROR;
 }
 
 ERROR_CODE header_value_callback_backend(struct http_request_t *http_request, const unsigned char *data, size_t data_size) {
     struct handler_proxy_context_t *handler_proxy_context =
         (struct handler_proxy_context_t *) http_request->context;
-    write_proxy_out_buffer(handler_proxy_context, ": ", 2);
-    write_proxy_out_buffer(handler_proxy_context, (char *) data, data_size);
-    write_proxy_out_buffer(handler_proxy_context, "\r\n", 2);
+
+    /* gathers the fragment of the value, the pair is only written once
+    the name of the next field arrives or the section closes */
+    if(handler_proxy_context->value_size + data_size < sizeof(handler_proxy_context->value)) {
+        memcpy(&handler_proxy_context->value[handler_proxy_context->value_size], data, data_size);
+        handler_proxy_context->value_size += data_size;
+    }
+
     RAISE_NO_ERROR;
 }
 
@@ -841,10 +930,28 @@ ERROR_CODE headers_complete_callback_backend(struct http_request_t *http_request
     struct connection_t *connection = handler_proxy_context->connection;
     struct connection_t *connection_c = handler_proxy_context->connection_c;
 
-    /* writes the final header to body separator in the current output
-    buffer of the proxy and then flushes (writes) the output buffer to
-    the proxy client connection (propagation) */
-    write_proxy_out_buffer(handler_proxy_context, "\r\n", 2);
+    /* retrieves the substrates that carry the writing operations and
+    makes the message of this exchange the current one */
+    struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
+    struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
+
+    /* writes the field that was still being gathered and then closes
+    the section of the headers in the encoding of the protocol that is
+    serving the client of the proxy */
+    if(handler_proxy_context->value_size > 0) { _flush_field_handler_proxy(handler_proxy_context); }
+    http_connection->request = handler_proxy_context->http_request;
+    reserve_proxy_out_buffer(handler_proxy_context, VIRIATUM_MAX_HEADER_C_SIZE);
+    handler_proxy_context->out_buffer_size = http_connection->write_end(
+        connection,
+        handler_proxy_context->out_buffer,
+        handler_proxy_context->out_buffer_max_size,
+        handler_proxy_context->out_buffer_size,
+        FALSE
+    );
+
+    /* flushes the output buffer to the proxy client connection, the
+    buffer belongs to the context and so it is never released by the
+    connection that carries it */
     write_connection_c(
         connection,
         (unsigned char *) handler_proxy_context->out_buffer,
@@ -877,15 +984,22 @@ ERROR_CODE body_callback_backend(struct http_request_t *http_request, const unsi
     struct connection_t *connection = handler_proxy_context->connection;
     struct connection_t *connection_c = handler_proxy_context->connection_c;
 
+    /* retrieves the substrates that carry the writing operations and
+    makes the message of this exchange the current one */
+    struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
+    struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
+
     /* allocates a buffer of the same size of the received body
     data and then copies the data into this new buffer, then
     writes the buffer into the current (proxy client) connection */
     char *buffer = MALLOC(data_size);
     memcpy(buffer, data, data_size);
-    write_connection(
+    http_connection->request = handler_proxy_context->http_request;
+    http_connection->write_chunk(
         connection,
         (unsigned char *) buffer,
         data_size,
+        FALSE,
         _pending_handler_proxy,
         (void *) handler_proxy_context
     );
@@ -911,16 +1025,27 @@ ERROR_CODE message_complete_callback_backend(struct http_request_t *http_request
         (struct handler_proxy_context_t *) http_request->context;
     struct connection_t *connection = handler_proxy_context->connection;
 
+    /* retrieves the substrates that carry the writing operations and
+    makes the message of this exchange the current one */
+    struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
+    struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
+
+    /* allocates the buffer that carries nothing, the fragment that
+    closes the message is the one that marks the end of it and the
+    upstream only tells that it is done once the body is over */
+    unsigned char *buffer = (unsigned char *) MALLOC(1);
+
     /* writes the final (empty value) to the connection stream so that
     the cleanup handler callback is called at the end of all the pending
     write operations, this is a required "empty" operation */
-    write_connection_c(
+    http_connection->request = handler_proxy_context->http_request;
+    http_connection->write_chunk(
         connection,
-        (unsigned char *) "",
+        buffer,
         0,
+        TRUE,
         _cleanup_handler_proxy,
-        (void *) (size_t) http_request->flags,
-        FALSE
+        (void *) (size_t) http_request->flags
     );
 
     /* unsets the pending flag in the current context meaning that
