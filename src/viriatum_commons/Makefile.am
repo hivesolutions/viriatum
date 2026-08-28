@@ -71,6 +71,7 @@ structures/type.c \
 system/_thread_win32.c \
 template/engine.c \
 template/handler.c \
+test/report.c \
 test/unit.c \
 thread/thread_pool.c \
 util/arguments_util.c
@@ -111,6 +112,7 @@ structures/type.c \
 system/_thread_win32.c \
 template/engine.c \
 template/handler.c \
+test/report.c \
 test/unit.c \
 thread/thread_pool.c \
 util/arguments_util.c

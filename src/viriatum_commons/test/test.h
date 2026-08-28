@@ -25,3 +25,4 @@
 #pragma once
 
 #include "unit.h"
+#include "report.h"

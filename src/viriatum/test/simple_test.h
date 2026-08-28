@@ -38,8 +38,11 @@ int thread_pool_start_function_test(void *arguments);
 
 /**
  * Tests the thread pool implementation.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
  */
-void test_thread_pool(void);
+const char *test_thread_pool(void);
 
 #endif
 
@@ -260,18 +263,22 @@ const char *test_absolute_path_file(void);
 int _compare(void *first, void *second);
 
 /**
- * Executes the set of simple tests in the current
- * test case.
+ * Populates the provided suite with the table of entries
+ * that describe the set of simple tests.
  *
- * @param test_case The test case context for which
- * the simple tests will be executed, should be able
- * to store some context information about the execution.
+ * @param suite The suite to be populated with the entries
+ * of the simple tests and with their name.
  */
-void exec_simple_tests(struct test_case_t *test_case);
+void create_simple_suite(struct test_suite_t *suite);
 
 /**
  * Runs the set of simple tests in the current
  * test case. This is the main entry point for the
  * simple test case.
+ *
+ * @param options The options that control the selection of
+ * the tests to be run and the reporting of the results, a
+ * null value runs every one of them reporting to the
+ * standard output alone.
  */
-ERROR_CODE run_simple_tests(void);
+ERROR_CODE run_simple_tests(struct test_options_t *options);

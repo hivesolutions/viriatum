@@ -10,15 +10,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 * AI-upscaled 2x variants of the legacy web illustrations and UI assets
+* Tests can now be listed, filtered by name and selected by tag from the command line - [#45](https://github.com/hivesolutions/viriatum/issues/45)
+* Test results can now be reported as TAP, JUnit XML or a Markdown summary - [#45](https://github.com/hivesolutions/viriatum/issues/45)
+* Tests can now declare setup and teardown fixtures and run over a table of cases - [#45](https://github.com/hivesolutions/viriatum/issues/45)
+* Tests can now be marked as skipped or as expected failures - [#45](https://github.com/hivesolutions/viriatum/issues/45)
+* Assertions now report the values that took part in the comparison that failed - [#45](https://github.com/hivesolutions/viriatum/issues/45)
+* Test runs now list the tests that took the longest to complete - [#45](https://github.com/hivesolutions/viriatum/issues/45)
+* Coverage reports can now be produced with gcc in addition to clang - [#45](https://github.com/hivesolutions/viriatum/issues/45)
 
 ### Changed
 
 * Improved the rendering of the legacy 2x Steamfire logo
 * Web pages now select 2x image assets on high-density displays
+* Coverage now measures the whole codebase, modules included, instead of a small part of it - [#45](https://github.com/hivesolutions/viriatum/issues/45)
 
 ### Fixed
 
 * Keyboard interrupt now stops a server that is running an ASGI application
+* Coverage runs no longer pass silently when the result is below the required threshold - [#45](https://github.com/hivesolutions/viriatum/issues/45)
+* Test structures are no longer leaked when a test fails before reaching its cleanup - [#45](https://github.com/hivesolutions/viriatum/issues/45)
 
 ## [0.4.0] - 2026-08-28
 

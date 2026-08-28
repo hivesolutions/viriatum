@@ -58,28 +58,55 @@ const char *test_handler_file_context(void) {
     return NULL;
 }
 
-const char *test_handler_file_url(void) {
-    /* allocates space for the error code returned by the
-    callback and for the HTTP parser and context structures,
-    also allocates a test context for the service chain */
-    ERROR_CODE error;
-    struct http_parser_t *http_parser;
-    struct handler_file_context_t *handler_file_context;
-    struct test_context_t *test_context;
+void *setup_handler_file_test(void) {
+    /* allocates space for the fixture that is going to carry
+    the complete chain of structures required by the callbacks */
+    struct handler_file_fixture_t *fixture =
+        (struct handler_file_fixture_t *) MALLOC(sizeof(struct handler_file_fixture_t));
 
     /* creates the test context providing a minimal connection,
     service and options chain for the handler callbacks */
-    create_test_context(&test_context);
+    create_test_context(&fixture->test_context);
 
     /* creates the HTTP parser and the handler file context
     then wires them together through the context pointer,
     also sets the connection as the parser parameters so
     that callbacks can access the service options */
-    create_http_parser(&http_parser, TRUE);
-    create_handler_file_context(&handler_file_context);
-    http_parser->context = handler_file_context;
-    http_parser->parameters = test_context->connection;
-    http_parser->method = HTTP_GET;
+    create_http_parser(&fixture->http_parser, TRUE);
+    create_handler_file_context(&fixture->handler_file_context);
+    fixture->http_parser->context = fixture->handler_file_context;
+    fixture->http_parser->parameters = fixture->test_context->connection;
+    fixture->http_parser->method = HTTP_GET;
+
+    /* returns the fixture as the opaque context that is going
+    to be handed over to the test function */
+    return (void *) fixture;
+}
+
+void cleanup_handler_file_test(void *context) {
+    /* casts the opaque context back into the fixture so that
+    every one of the structures it carries may be destroyed */
+    struct handler_file_fixture_t *fixture = (struct handler_file_fixture_t *) context;
+
+    /* deletes the context, the parser and the test
+    context to avoid any memory leak from the test */
+    delete_handler_file_context(fixture->handler_file_context);
+    delete_http_parser(fixture->http_parser);
+    delete_test_context(fixture->test_context);
+
+    /* releases the fixture itself, it has been allocated by
+    the setup that created the chain of structures */
+    FREE(fixture);
+}
+
+const char *test_handler_file_url(void *context) {
+    /* allocates space for the error code returned by the
+    callback and retrieves both the parser and the context of
+    the handler from the fixture created by the setup */
+    ERROR_CODE error;
+    struct handler_file_fixture_t *fixture = (struct handler_file_fixture_t *) context;
+    struct http_parser_t *http_parser = fixture->http_parser;
+    struct handler_file_context_t *handler_file_context = fixture->handler_file_context;
 
     /* tests that a normal url is properly parsed
     and stored in the handler file context */
@@ -119,14 +146,9 @@ const char *test_handler_file_url(void) {
     );
     V_ASSERT(IS_ERROR_CODE(error));
 
-    /* deletes the context, the parser and the test
-    context to avoid any memory leak from the test */
-    delete_handler_file_context(handler_file_context);
-    delete_http_parser(http_parser);
-    delete_test_context(test_context);
-
     /* returns the default value, nothing happened so there's
-    nothing to report for this execution */
+    nothing to report for this execution, the structures are
+    destroyed by the teardown of the fixture */
     return NULL;
 }
 

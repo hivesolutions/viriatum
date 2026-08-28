@@ -77,13 +77,18 @@ jobs:
           make
       - name: Test Viriatum
         run: |
-          ./bin/viriatum --test
+          ./bin/viriatum --test --test-format=junit --test-output=test-results.xml
       - name: Test Viriatum Mod WSGI
         run: |
           ./bin/viriatum_mod_wsgi_test
       - name: Test Viriatum Mod Lua
         run: |
           ./bin/viriatum_mod_lua_test
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: test-results-gcc-${{ matrix.gcc-version }}
+          path: test-results.xml
   build-windows-cmake:
     name: Build Windows CMake
     timeout-minutes: 30
@@ -103,7 +108,12 @@ jobs:
           msbuild ALL_BUILD.vcxproj /P:Configuration=Release
       - name: Test Viriatum
         run: |
-          bin/viriatum --test
+          bin/viriatum --test --test-format=junit --test-output=test-results.xml
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: test-results-windows
+          path: test-results.xml
   build-macos-cmake:
     name: Build macOS CMake
     timeout-minutes: 30
@@ -123,13 +133,18 @@ jobs:
           make
       - name: Test Viriatum
         run: |
-          ./bin/viriatum --test
+          ./bin/viriatum --test --test-format=junit --test-output=test-results.xml
       - name: Test Viriatum Mod WSGI
         run: |
           ./bin/viriatum_mod_wsgi_test
       - name: Test Viriatum Mod Lua
         run: |
           ./bin/viriatum_mod_lua_test
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: test-results-macos
+          path: test-results.xml
   build-zig:
     name: Build Zig
     timeout-minutes: 30
@@ -184,7 +199,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y clang llvm
+          sudo apt-get install -y clang llvm libluajit-5.1-dev python3-dev
           echo "$(dirname $(readlink -f $(which clang)))" >> $GITHUB_PATH
           python -m pip install --upgrade pip
           python -m pip install coverage
@@ -197,6 +212,7 @@ jobs:
         if: always()
         run: |
           cat coverage/summary.md >> $GITHUB_STEP_SUMMARY
+          cat coverage/tests.md >> $GITHUB_STEP_SUMMARY
       - uses: actions/upload-artifact@v7
         if: always()
         with:
@@ -204,4 +220,5 @@ jobs:
           path: |
             coverage/summary.txt
             coverage/summary.md
+            coverage/tests.md
             coverage/lines.txt

@@ -27,6 +27,7 @@
 #include "simple_test.h"
 #include "handler_dispatch_test.h"
 #include "handler_file_test.h"
+#include "runner_test.h"
 #include "service_test.h"
 #include "websocket_test.h"
 
@@ -46,7 +47,7 @@ int thread_pool_start_function_test(void *arguments) {
     return 0;
 }
 
-void test_thread_pool(void) {
+const char *test_thread_pool(void) {
     /* allocates space for the index */
     unsigned int index;
 
@@ -74,6 +75,16 @@ void test_thread_pool(void) {
         /* inserts the task in the thread pool */
         insert_task_thread_pool(thread_pool, thread_pool_task);
     }
+
+    /* both the pool and the task are deliberately leaked, the
+    delete operation of the pool neither signals nor joins the
+    worker threads and so releasing them here would leave the
+    running workers waiting on a closed condition and calling a
+    start function that has already been released */
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
 }
 #endif
 #endif
@@ -1220,64 +1231,89 @@ int _compare(void *first, void *second) {
     return 0;
 }
 
-void exec_simple_tests(struct test_case_t *test_case) {
+/* the table that describes the complete suite of tests for the
+commons infra-structure and for the server itself, the tags group
+the entries so that a part of the suite may be selected without
+every one of the names having to be provided to the runner */
+static struct test_entry_t _simple_entries[] = {
 #ifndef VIRIATUM_NO_THREADS
 #ifdef VIRIATUM_THREAD_SAFE
-    /* tests the thread pool */
-    V_RUN_TEST(test_thread_pool);
+    V_TEST_T(test_thread_pool, "thread"),
 #endif
 #endif
+    V_TEST_T(test_runner_format_message, "runner"),
+    V_TEST_T(test_runner_assert_values, "runner"),
+    V_TEST_T(test_runner_match_name, "runner"),
+    V_TEST_T(test_runner_match_tags, "runner"),
+    V_TEST_T(test_runner_match_entry, "runner"),
+    V_TEST_T(test_runner_options, "runner"),
+    V_TEST_T(test_runner_run_suite, "runner"),
+    V_TEST_T(test_runner_run_kinds, "runner"),
+    V_TEST_T(test_runner_list_suite, "runner"),
+    V_TEST_T(test_runner_status_label, "runner"),
+    V_TEST_T(test_runner_escape_xml, "runner"),
+    V_TEST_T(test_runner_write_text, "runner"),
+    V_TEST_T(test_runner_write_tap, "runner"),
+    V_TEST_T(test_runner_write_junit, "runner"),
+    V_TEST_T(test_runner_write_markdown, "runner"),
+    V_TEST_T(test_runner_write_report, "runner"),
+    V_TEST_T(test_linked_list, "structures"),
+    V_TEST_T(test_linked_list_stress, "structures"),
+    V_TEST_T(test_linked_list_big, "structures"),
+    V_TEST_T(test_array_list, "structures"),
+    V_TEST_T(test_hash_map, "structures"),
+    V_TEST_T(test_sort_map, "structures"),
+    V_TEST_T(test_priority_queue, "structures"),
+    V_TEST_T(test_string_buffer, "structures"),
+    V_TEST_T(test_linked_buffer, "structures"),
+    V_TEST_T(test_base64, "encoding"),
+    V_TEST_T(test_bencoding, "encoding"),
+    V_TEST_T(test_bit_stream, "stream"),
+    V_TEST_T(test_file_stream, "stream"),
+    V_TEST_T(test_memory_stream, "stream"),
+    V_TEST_T(test_huffman, "compression"),
+    V_TEST_T(test_template_handler, "template"),
+    V_TEST_T(test_quicksort, "sorting"),
+    V_TEST_T(test_quicksort_linked_list, "sorting"),
+    V_TEST_T(test_crc_32, "checksum"),
+    V_TEST_T(test_md5, "checksum"),
+    V_TEST_T(test_sha1, "checksum"),
+    V_TEST_T(test_is_path_safe, "path"),
+    V_TEST_T(test_normalize_path, "path"),
+    V_TEST_T(test_join_path_file, "path"),
+    V_TEST_T(test_absolute_path_file, "path"),
+    V_TEST_T(test_handler_file_context, "handler"),
+    V_TEST_C(test_handler_file_url, "handler", setup_handler_file_test, cleanup_handler_file_test),
+    V_TEST_T(test_handler_file_header_field, "handler"),
+    V_TEST_T(test_handler_file_header_value, "handler"),
+    V_TEST_T(test_websocket_accept_key, "websocket"),
+    V_TEST_T(test_websocket_parse_frame, "websocket"),
+    V_TEST_T(test_websocket_build_frame, "websocket"),
+    V_TEST_T(test_websocket_build_close, "websocket"),
+    V_TEST_T(test_websocket_is_control, "websocket"),
+    V_TEST_T(test_websocket_close_code, "websocket"),
+    V_TEST_T(test_dispatch_handler_context_keepalive, "handler"),
+    V_TEST_T(test_delete_service, "service"),
+    V_TEST_T(test_create_service_options, "service"),
+    V_TEST_T(test_calculate_locations_service, "service"),
+    V_TEST_T(test_open_close_service, "service"),
+    V_TEST_T(test_open_service_busy, "service"),
+    V_TEST_T(test_file_options_service, "service"),
+    V_TEST_T(test_ran_service, "service")
+};
 
-    /* runs the complete suite of tests for the
-    commons infra-structure this a long running
-    blocking operation and so it may take some
-    time for the complete execution */
-    V_RUN_TEST(test_linked_list, test_case);
-    V_RUN_TEST(test_linked_list_stress, test_case);
-    V_RUN_TEST(test_linked_list_big, test_case);
-    V_RUN_TEST(test_array_list, test_case);
-    V_RUN_TEST(test_hash_map, test_case);
-    V_RUN_TEST(test_sort_map, test_case);
-    V_RUN_TEST(test_priority_queue, test_case);
-    V_RUN_TEST(test_string_buffer, test_case);
-    V_RUN_TEST(test_linked_buffer, test_case);
-    V_RUN_TEST(test_base64, test_case);
-    V_RUN_TEST(test_bencoding, test_case);
-    V_RUN_TEST(test_bit_stream, test_case);
-    V_RUN_TEST(test_file_stream, test_case);
-    V_RUN_TEST(test_memory_stream, test_case);
-    V_RUN_TEST(test_huffman, test_case);
-    V_RUN_TEST(test_template_handler, test_case);
-    V_RUN_TEST(test_quicksort, test_case);
-    V_RUN_TEST(test_quicksort_linked_list, test_case);
-    V_RUN_TEST(test_crc_32, test_case);
-    V_RUN_TEST(test_md5, test_case);
-    V_RUN_TEST(test_sha1, test_case);
-    V_RUN_TEST(test_is_path_safe, test_case);
-    V_RUN_TEST(test_normalize_path, test_case);
-    V_RUN_TEST(test_join_path_file, test_case);
-    V_RUN_TEST(test_absolute_path_file, test_case);
-    V_RUN_TEST(test_handler_file_context, test_case);
-    V_RUN_TEST(test_handler_file_url, test_case);
-    V_RUN_TEST(test_handler_file_header_field, test_case);
-    V_RUN_TEST(test_handler_file_header_value, test_case);
-    V_RUN_TEST(test_websocket_accept_key, test_case);
-    V_RUN_TEST(test_websocket_parse_frame, test_case);
-    V_RUN_TEST(test_websocket_build_frame, test_case);
-    V_RUN_TEST(test_websocket_build_close, test_case);
-    V_RUN_TEST(test_websocket_is_control, test_case);
-    V_RUN_TEST(test_websocket_close_code, test_case);
-    V_RUN_TEST(test_dispatch_handler_context_keepalive, test_case);
-    V_RUN_TEST(test_delete_service, test_case);
-    V_RUN_TEST(test_create_service_options, test_case);
-    V_RUN_TEST(test_calculate_locations_service, test_case);
-    V_RUN_TEST(test_open_close_service, test_case);
-    V_RUN_TEST(test_open_service_busy, test_case);
-    V_RUN_TEST(test_file_options_service, test_case);
-    V_RUN_TEST(test_ran_service, test_case);
+void create_simple_suite(struct test_suite_t *suite) {
+    suite->name = "simple_tests";
+    suite->entries = _simple_entries;
+    suite->count = V_TEST_COUNT(_simple_entries);
+    suite->setup = NULL;
+    suite->teardown = NULL;
 }
 
-ERROR_CODE run_simple_tests(void) {
-    ERROR_CODE return_value = run_test_case(exec_simple_tests, "simple_tests");
+ERROR_CODE run_simple_tests(struct test_options_t *options) {
+    struct test_suite_t suite;
+    ERROR_CODE return_value;
+    create_simple_suite(&suite);
+    return_value = run_test_suite(&suite, options);
     RAISE_AGAIN(return_value);
 }
