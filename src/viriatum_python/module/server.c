@@ -339,6 +339,12 @@ static void _dealloc_server_python(PyObject *self) {
 }
 
 static PyObject *_serve_forever_server_python(PyObject *self, PyObject *args) {
+    /* allocates space for the exception raised by a signal, it must
+    be saved while the shutdown of the lifespan is running */
+    PyObject *type;
+    PyObject *value;
+    PyObject *traceback;
+
     /* retrieves the reference to the server object and the service
     that is going to be driven by the current loop */
     struct server_python_t *server_python = (struct server_python_t *) self;
@@ -400,7 +406,16 @@ static PyObject *_serve_forever_server_python(PyObject *self, PyObject *args) {
         is what makes the keyboard interrupt work as expected */
         if(PyErr_CheckSignals() != 0) {
             stop_service(service);
-            if(server_python->loop_python != NULL) { shutdown_handler_asgi(service); }
+
+            /* saves the exception raised by the signal so that the
+            shutdown of the lifespan runs over a clean error state,
+            the interpreter refuses most of the calls while one is
+            pending, restoring it once the shutdown is complete */
+            if(server_python->loop_python != NULL) {
+                PyErr_Fetch(&type, &value, &traceback);
+                shutdown_handler_asgi(service);
+                PyErr_Restore(type, value, traceback);
+            }
             close_service(service);
             server_python->opened = FALSE;
             return NULL;

@@ -17,7 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-*
+* Keyboard interrupt now stops a server that is running an ASGI application
 
 ## [0.4.0] - 2026-08-28
 

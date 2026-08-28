@@ -78,7 +78,7 @@ ERROR_CODE delete_loop_python(struct loop_python_t *loop_python) {
     of them is ever going to be advanced once the loop is closed */
     if(loop_python->loop != NULL) {
         tasks = PyObject_CallMethod(loop_python->module, "all_tasks", "O", loop_python->loop);
-        if(tasks == NULL) { PyErr_Clear(); }
+        if(tasks == NULL) { _clear_loop_python(); }
         else {
             /* the set of tasks is not a sequence and so it must be
             converted into one before being iterated, both references
@@ -91,7 +91,7 @@ ERROR_CODE delete_loop_python(struct loop_python_t *loop_python) {
             }
             Py_XDECREF(sequence);
             Py_DECREF(tasks);
-            PyErr_Clear();
+            _clear_loop_python();
         }
 
         /* advances the loop until every cancelled task is done, a task
@@ -102,7 +102,7 @@ ERROR_CODE delete_loop_python(struct loop_python_t *loop_python) {
             run_once_loop_python(loop_python);
         }
         Py_XDECREF(PyObject_CallMethod(loop_python->loop, "close", NULL));
-        PyErr_Clear();
+        _clear_loop_python();
         Py_DECREF(loop_python->loop);
         loop_python->loop = NULL;
     }
@@ -130,7 +130,7 @@ ERROR_CODE attach_loop_python(struct loop_python_t *loop_python) {
         "O",
         loop_python->loop
     ));
-    PyErr_Clear();
+    _clear_loop_python();
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -149,7 +149,7 @@ ERROR_CODE run_slice_loop_python(struct loop_python_t *loop_python, double timeo
     in how they behave around a plain stopping callback */
     sleep = PyObject_CallMethod(loop_python->module, "sleep", "d", timeout);
     if(sleep == NULL) {
-        PyErr_Clear();
+        _clear_loop_python();
         RAISE_ERROR_M(
             RUNTIME_EXCEPTION_ERROR_CODE,
             (unsigned char *) "Problem creating the sleep coroutine"
@@ -158,7 +158,7 @@ ERROR_CODE run_slice_loop_python(struct loop_python_t *loop_python, double timeo
     result = PyObject_CallMethod(loop_python->loop, "run_until_complete", "O", sleep);
     Py_DECREF(sleep);
     if(result == NULL) {
-        PyErr_Clear();
+        _clear_loop_python();
         RAISE_ERROR_M(
             RUNTIME_EXCEPTION_ERROR_CODE,
             (unsigned char *) "Problem running the event loop"
@@ -175,10 +175,10 @@ double time_loop_python(struct loop_python_t *loop_python) {
     the timers scheduled in it are measured against */
     PyObject *result = PyObject_CallMethod(loop_python->loop, "time", NULL);
     double value;
-    if(result == NULL) { PyErr_Clear(); return 0.0; }
+    if(result == NULL) { _clear_loop_python(); return 0.0; }
     value = PyFloat_AsDouble(result);
     Py_DECREF(result);
-    if(PyErr_Occurred()) { PyErr_Clear(); return 0.0; }
+    if(PyErr_Occurred()) { _clear_loop_python(); return 0.0; }
     return value;
 }
 
@@ -192,16 +192,16 @@ ERROR_CODE run_once_loop_python(struct loop_python_t *loop_python) {
     callbacks, this is what makes the run below advance the loop by
     exactly one iteration instead of blocking on its own selector */
     stop = PyObject_GetAttrString(loop_python->loop, "stop");
-    if(stop == NULL) { PyErr_Clear(); RAISE_NO_ERROR; }
+    if(stop == NULL) { _clear_loop_python(); RAISE_NO_ERROR; }
     result = PyObject_CallMethod(loop_python->loop, "call_soon", "O", stop);
     Py_DECREF(stop);
-    if(result == NULL) { PyErr_Clear(); RAISE_NO_ERROR; }
+    if(result == NULL) { _clear_loop_python(); RAISE_NO_ERROR; }
     Py_DECREF(result);
 
     /* runs the loop until the stopping callback above is reached, no
     blocking happens as the ready queue is never empty */
     result = PyObject_CallMethod(loop_python->loop, "run_forever", NULL);
-    if(result == NULL) { PyErr_Clear(); } else { Py_DECREF(result); }
+    if(result == NULL) { _clear_loop_python(); } else { Py_DECREF(result); }
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -216,10 +216,10 @@ size_t pending_loop_python(struct loop_python_t *loop_python) {
     /* retrieves the complete set of tasks that are still pending in
     the loop, the done ones are never part of the resulting set */
     tasks = PyObject_CallMethod(loop_python->module, "all_tasks", "O", loop_python->loop);
-    if(tasks == NULL) { PyErr_Clear(); return 0; }
+    if(tasks == NULL) { _clear_loop_python(); return 0; }
     count = PyObject_Length(tasks);
     Py_DECREF(tasks);
-    if(count < 0) { PyErr_Clear(); return 0; }
+    if(count < 0) { _clear_loop_python(); return 0; }
 
     /* returns the number of tasks that are still pending */
     return (size_t) count;
@@ -248,7 +248,7 @@ ERROR_CODE resolve_future_loop_python(PyObject *future, PyObject *result) {
     the associated task has been cancelled in the meantime, nothing
     may be set on it (that would raise an invalid state error) */
     done = PyObject_CallMethod(future, "done", NULL);
-    if(done == NULL) { PyErr_Clear(); RAISE_NO_ERROR; }
+    if(done == NULL) { _clear_loop_python(); RAISE_NO_ERROR; }
     is_done = PyObject_IsTrue(done);
     Py_DECREF(done);
     if(is_done != 0) { RAISE_NO_ERROR; }
@@ -256,8 +256,24 @@ ERROR_CODE resolve_future_loop_python(PyObject *future, PyObject *result) {
     /* resolves the future with the provided result, waking up the task
     that is waiting on it on the next iteration of the loop */
     resolved = PyObject_CallMethod(future, "set_result", "O", result);
-    if(resolved == NULL) { PyErr_Clear(); } else { Py_DECREF(resolved); }
+    if(resolved == NULL) { _clear_loop_python(); } else { Py_DECREF(resolved); }
 
     /* raises no error */
     RAISE_NO_ERROR;
+}
+
+void _clear_loop_python(void) {
+    /* in case the pending exception is a keyboard interrupt it is re
+    armed instead of being discarded, the serving loop verifies the
+    signals right after advancing the loop and would otherwise never
+    notice the one that reached the interpreter while it was running */
+    if(PyErr_ExceptionMatches(PyExc_KeyboardInterrupt)) {
+        PyErr_Clear();
+        PyErr_SetInterrupt();
+        return;
+    }
+
+    /* discards the pending exception, the various helpers of the loop
+    report their problems through the error code they return */
+    PyErr_Clear();
 }
