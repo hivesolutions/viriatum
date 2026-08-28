@@ -124,6 +124,13 @@ endif()
 # the transport security is optional, the server binds a plain socket
 # when it is absent, its presence is what also brings the negotiation
 # of the protocol through alpn along with it
+#
+# on Windows the libraries of it are linked statically, a module that
+# is loaded into a host process there carries no way of finding the
+# dynamic ones at load time and would fail to load altogether
+if(WIN32)
+    set(OPENSSL_USE_STATIC_LIBS TRUE)
+endif()
 find_package(OpenSSL QUIET)
 if(OPENSSL_FOUND)
     # the definitions travel to everything that links against the

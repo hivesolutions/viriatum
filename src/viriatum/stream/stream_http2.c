@@ -402,7 +402,10 @@ ERROR_CODE update_window_http2_connection(struct http2_connection_t *http2_conne
     /* an increment that applies to the connection as a whole widens
     the window that bounds every one of the streams together */
     if(stream_id == 0) {
-        if(http2_connection->send_window + (long) increment > HTTP2_MAX_WINDOW_SIZE) {
+        /* the room that is left is what the increment is compared
+        against, the sum of the two would go beyond the type that
+        carries a window on the platforms where it is of four bytes */
+        if(http2_connection->send_window > (long) HTTP2_MAX_WINDOW_SIZE - (long) increment) {
             RAISE_ERROR_S(HTTP2_FLOW_CONTROL_ERROR);
         }
         http2_connection->send_window += (long) increment;
@@ -420,7 +423,7 @@ ERROR_CODE update_window_http2_connection(struct http2_connection_t *http2_conne
         RAISE_NO_ERROR;
     }
 
-    if(http2_stream->send_window + (long) increment > HTTP2_MAX_WINDOW_SIZE) {
+    if(http2_stream->send_window > (long) HTTP2_MAX_WINDOW_SIZE - (long) increment) {
         RAISE_ERROR_S(HTTP2_FLOW_CONTROL_ERROR);
     }
     http2_stream->send_window += (long) increment;
@@ -451,7 +454,9 @@ ERROR_CODE apply_settings_http2_connection(struct http2_connection_t *http2_conn
             /* a window that would go beyond the largest value the
             protocol represents is a flow control error, one that
             goes below zero is valid and stalls the stream */
-            if(http2_connection->streams[index].send_window + difference > HTTP2_MAX_WINDOW_SIZE) {
+            if(difference > 0 &&
+               http2_connection->streams[index].send_window >
+                   (long) HTTP2_MAX_WINDOW_SIZE - difference) {
                 RAISE_ERROR_S(HTTP2_FLOW_CONTROL_ERROR);
             }
             http2_connection->streams[index].send_window += difference;

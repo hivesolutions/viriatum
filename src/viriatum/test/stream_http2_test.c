@@ -275,7 +275,7 @@ const char *test_http2_connection(void) {
     /* gathers the number of allocations that are outstanding before
     anything is built, so that the release of everything may be
     verified against it once the session is gone */
-    size_t allocations = ALLOCATIONS;
+    size_t allocated = ALLOCATIONS;
 
     /* builds the connection together with the session, the session
     starts at the values that the specification defines */
@@ -302,7 +302,7 @@ const char *test_http2_connection(void) {
     /* every one of the structures that has been built is gone, so
     the number of outstanding allocations is the one it was before
     the session existed at all */
-    V_ASSERT_EQ_U(ALLOCATIONS, allocations);
+    V_ASSERT_EQ_U(ALLOCATIONS, allocated);
 
     /* returns the default value, nothing happened so there's
     nothing to report for this execution */
@@ -469,6 +469,20 @@ const char *test_http2_connection_settings(void) {
     error = apply_settings_http2_connection(http2_connection, payload, HTTP2_SETTING_SIZE);
     V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
     V_ASSERT_EQ_U(http2_stream->send_window, 0);
+
+    /* a change that would take the window of a stream beyond the
+    largest value the protocol represents is a flow control error,
+    the sum of the two is never computed as such */
+    http2_stream->send_window = HTTP2_MAX_WINDOW_SIZE;
+    encode_number_http2(&payload[2], (unsigned int) HTTP2_MAX_WINDOW_SIZE);
+    error = apply_settings_http2_connection(http2_connection, payload, HTTP2_SETTING_SIZE);
+    V_ASSERT_EQ_U(error, HTTP2_FLOW_CONTROL_ERROR);
+
+    /* a window above the largest one that the protocol represents is
+    refused before it ever reaches a stream */
+    encode_number_http2(&payload[2], (unsigned int) HTTP2_MAX_WINDOW_SIZE + 1);
+    error = apply_settings_http2_connection(http2_connection, payload, HTTP2_SETTING_SIZE);
+    V_ASSERT_EQ_U(error, HTTP2_FLOW_CONTROL_ERROR);
 
     /* a table smaller than the one of this end shrinks the encoder,
     it is never allowed to index beyond what the peer holds */
@@ -674,7 +688,7 @@ const char *test_http2_connection_continuation(void) {
     /* gathers the number of allocations that are outstanding so that
     the assembling of a block over several frames may be verified to
     release every one of the buffers it takes */
-    size_t allocations = ALLOCATIONS;
+    size_t allocated = ALLOCATIONS;
 
     _create_http2_test(&context, &http2_connection);
     block_size = _request_http2_test(block, sizeof(block), "/split");
@@ -730,7 +744,7 @@ const char *test_http2_connection_continuation(void) {
 
     /* the buffer that assembled the block is gone together with the
     session, nothing at all is left behind */
-    V_ASSERT_EQ_U(ALLOCATIONS, allocations);
+    V_ASSERT_EQ_U(ALLOCATIONS, allocated);
 
     /* returns the default value, nothing happened so there's
     nothing to report for this execution */
@@ -1046,7 +1060,7 @@ const char *test_http2_connection_response(void) {
     /* gathers the number of allocations that are outstanding so that
     the complete cycle of a response may be verified to release
     every one of the buffers it takes */
-    size_t allocations = ALLOCATIONS;
+    size_t allocated = ALLOCATIONS;
 
     _create_http2_test(&context, &http2_connection);
     _responder = TRUE;
@@ -1119,7 +1133,7 @@ const char *test_http2_connection_response(void) {
 
     /* every one of the buffers that the response has taken is gone
     together with the connection that carried them */
-    V_ASSERT_EQ_U(ALLOCATIONS, allocations);
+    V_ASSERT_EQ_U(ALLOCATIONS, allocated);
 
     /* returns the default value, nothing happened so there's
     nothing to report for this execution */
@@ -1199,7 +1213,7 @@ const char *test_http2_connection_split(void) {
 
     /* gathers the number of allocations that are outstanding so that
     the splitting may be verified to release every buffer it copies */
-    size_t allocations = ALLOCATIONS;
+    size_t allocated = ALLOCATIONS;
 
     _create_http2_test(&context, &http2_connection);
     _responder = TRUE;
@@ -1245,7 +1259,7 @@ const char *test_http2_connection_split(void) {
 
     /* the buffers of both of the parts are gone, the one of the
     handler and the copies that the splitting has taken */
-    V_ASSERT_EQ_U(ALLOCATIONS, allocations);
+    V_ASSERT_EQ_U(ALLOCATIONS, allocated);
 
     /* returns the default value, nothing happened so there's
     nothing to report for this execution */
