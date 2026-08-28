@@ -1266,6 +1266,25 @@ ERROR_CODE create_workers(struct service_t *service);
  */
 ERROR_CODE join_workers(struct service_t *service);
 
+#ifdef VIRIATUM_ALPN
+/**
+ * Selects the protocol of a connection out of the ones that the
+ * peer has announced, the order of the peer is the one that is
+ * honoured so that a client decides what it prefers.
+ *
+ * @param ssl The handle of the connection being negotiated.
+ * @param out The variable to be set with the protocol selected.
+ * @param out_size The variable to be set with the size of the name
+ * of the protocol selected.
+ * @param in The list of the protocols the peer announces.
+ * @param in_size The size in bytes of the list of the peer.
+ * @param arguments The value handed over at registration.
+ * @return The value that tells whether a protocol has been
+ * selected at all.
+ */
+int alpn_handler_service(SSL *ssl, const unsigned char **out, unsigned char *out_size, const unsigned char *in, unsigned int in_size, void *arguments);
+#endif
+
 /**
  * Opens the given service, initializing the internal
  * structures without entering the main loop.

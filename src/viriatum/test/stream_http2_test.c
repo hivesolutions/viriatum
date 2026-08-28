@@ -1360,3 +1360,84 @@ const char *test_http2_connection_length(void) {
     nothing to report for this execution */
     return NULL;
 }
+
+const char *test_http2_alpn(void) {
+#ifdef VIRIATUM_ALPN
+    /* allocates space for the list of the protocols that a peer
+    announces and for the selection that comes out of it */
+    unsigned char list[32];
+    const unsigned char *selected;
+    unsigned char selected_size;
+    size_t offset;
+    int result;
+
+    /* a peer that announces the two protocols in the order that a
+    browser uses gets the most recent of them */
+    offset = 0;
+    list[offset] = sizeof(HTTP2_ALPN) - 1;
+    memcpy(&list[offset + 1], HTTP2_ALPN, sizeof(HTTP2_ALPN) - 1);
+    offset += sizeof(HTTP2_ALPN);
+    list[offset] = sizeof(HTTP11_ALPN) - 1;
+    memcpy(&list[offset + 1], HTTP11_ALPN, sizeof(HTTP11_ALPN) - 1);
+    offset += sizeof(HTTP11_ALPN);
+
+    result = alpn_handler_service(NULL, &selected, &selected_size, list, (unsigned int) offset, NULL);
+    V_ASSERT_EQ_I(result, SSL_TLSEXT_ERR_OK);
+    V_ASSERT_EQ_U(selected_size, sizeof(HTTP2_ALPN) - 1);
+    V_ASSERT_MEM(selected, HTTP2_ALPN, sizeof(HTTP2_ALPN) - 1);
+
+    /* the order of the peer is the one that is honoured, so a peer
+    that puts the older protocol first gets that one */
+    offset = 0;
+    list[offset] = sizeof(HTTP11_ALPN) - 1;
+    memcpy(&list[offset + 1], HTTP11_ALPN, sizeof(HTTP11_ALPN) - 1);
+    offset += sizeof(HTTP11_ALPN);
+    list[offset] = sizeof(HTTP2_ALPN) - 1;
+    memcpy(&list[offset + 1], HTTP2_ALPN, sizeof(HTTP2_ALPN) - 1);
+    offset += sizeof(HTTP2_ALPN);
+
+    result = alpn_handler_service(NULL, &selected, &selected_size, list, (unsigned int) offset, NULL);
+    V_ASSERT_EQ_I(result, SSL_TLSEXT_ERR_OK);
+    V_ASSERT_EQ_U(selected_size, sizeof(HTTP11_ALPN) - 1);
+    V_ASSERT_MEM(selected, HTTP11_ALPN, sizeof(HTTP11_ALPN) - 1);
+
+    /* a name that this end does not speak is walked past, the one
+    that follows it is the one selected */
+    offset = 0;
+    list[offset] = 4;
+    memcpy(&list[offset + 1], "spdy", 4);
+    offset += 5;
+    list[offset] = sizeof(HTTP2_ALPN) - 1;
+    memcpy(&list[offset + 1], HTTP2_ALPN, sizeof(HTTP2_ALPN) - 1);
+    offset += sizeof(HTTP2_ALPN);
+
+    result = alpn_handler_service(NULL, &selected, &selected_size, list, (unsigned int) offset, NULL);
+    V_ASSERT_EQ_I(result, SSL_TLSEXT_ERR_OK);
+    V_ASSERT_MEM(selected, HTTP2_ALPN, sizeof(HTTP2_ALPN) - 1);
+
+    /* a peer that announces nothing this end speaks negotiates
+    nothing at all, the connection falls back on its own */
+    offset = 0;
+    list[offset] = 4;
+    memcpy(&list[offset + 1], "spdy", 4);
+    offset += 5;
+
+    result = alpn_handler_service(NULL, &selected, &selected_size, list, (unsigned int) offset, NULL);
+    V_ASSERT_EQ_I(result, SSL_TLSEXT_ERR_NOACK);
+
+    /* an empty list carries no name at all to be selected */
+    result = alpn_handler_service(NULL, &selected, &selected_size, list, 0, NULL);
+    V_ASSERT_EQ_I(result, SSL_TLSEXT_ERR_NOACK);
+
+    /* a length that goes past the end of the list is malformed, the
+    walk stops instead of reading past the buffer */
+    list[0] = 32;
+    list[1] = 'h';
+    result = alpn_handler_service(NULL, &selected, &selected_size, list, 2, NULL);
+    V_ASSERT_EQ_I(result, SSL_TLSEXT_ERR_NOACK);
+#endif
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}

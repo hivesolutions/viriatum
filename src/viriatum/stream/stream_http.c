@@ -224,6 +224,13 @@ ERROR_CODE data_handler_stream_http(struct io_connection_t *io_connection, unsig
     to be used in this connection */
     struct http_handler_t *http_handler;
 
+#ifdef VIRIATUM_ALPN
+    /* allocates space for the name of the protocol that has been
+    negotiated through the transport, if any at all */
+    const unsigned char *protocol;
+    unsigned int protocol_size;
+#endif
+
     /* retrieves the references to both the connection (upper)
     and the HTTP connection (lower) data structures */
     struct connection_t *connection = io_connection->connection;
@@ -270,6 +277,22 @@ ERROR_CODE data_handler_stream_http(struct io_connection_t *io_connection, unsig
     instead of a message of HTTP/1.1, the two are told apart by the
     very first bytes and the decision is taken only once */
     if(http_connection->detect == TRUE) {
+#ifdef VIRIATUM_ALPN
+        /* a connection that runs over the transport carries no
+        ambiguity at all, whatever has been negotiated is what it
+        speaks and the bytes are never looked at */
+        if(connection->ssl_handle != NULL) {
+            SSL_get0_alpn_selected(connection->ssl_handle, &protocol, &protocol_size);
+            http_connection->detect = FALSE;
+
+            if(protocol_size == sizeof(HTTP2_ALPN) - 1 &&
+               memcmp(protocol, HTTP2_ALPN, protocol_size) == 0) {
+                upgrade_handler_stream_http2(io_connection);
+                RAISE_AGAIN(data_handler_stream_http2(io_connection, NULL, 0));
+            }
+        }
+#endif
+
         size_offset = http_connection->buffer_offset;
         size_length = size_offset < HTTP2_PREFACE_SIZE ? size_offset : HTTP2_PREFACE_SIZE;
 

@@ -210,3 +210,13 @@ const char *test_http2_connection_split(void);
  * the unit test should describe possible errors.
  */
 const char *test_http2_connection_length(void);
+
+/**
+ * Tests the selection of the protocol out of the list that a peer
+ * announces through the transport, including the order that is
+ * honoured and the list that is malformed.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_http2_alpn(void);

@@ -95,6 +95,13 @@
 #include <openssl/err.h>
 #include <openssl/ssl.h>
 #include <openssl/rand.h>
+
+/* the negotiation of the protocol through the transport is only
+available from a certain version of the library onwards, without it
+the encrypted form of HTTP/2 cannot be reached at all */
+#if OPENSSL_VERSION_NUMBER >= 0x10002000L
+#define VIRIATUM_ALPN
+#endif
 #ifdef VIRIATUM_PLATFORM_MSC
 #ifndef NO_PRAGMA_LIB
 #ifdef VIRIATUM_DEBUG

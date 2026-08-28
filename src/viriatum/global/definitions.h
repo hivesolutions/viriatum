@@ -262,6 +262,13 @@ static __inline char *get_config_path(void) {
 #define VIRIATUM_IP6_S ""
 #endif
 
+/**
+ * The set of cipher suites that the service offers, every one of
+ * them provides both forward secrecy and authenticated encryption
+ * so that none of the ones that HTTP/2 refuses is ever negotiated.
+ */
+#define VIRIATUM_SSL_CIPHERS "ECDHE+AESGCM:ECDHE+CHACHA20:DHE+AESGCM:!aNULL:!eNULL:!MD5:!RC4:!3DES:!DSS"
+
 #ifdef VIRIATUM_SSL
 #define VIRIATUM_SSL_S " ssl"
 #else

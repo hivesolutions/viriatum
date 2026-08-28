@@ -121,6 +121,21 @@ if(NOT WIN32)
     target_link_libraries(viriatum_objects PUBLIC ${CMAKE_DL_LIBS})
 endif()
 
+# the transport security is optional, the server binds a plain socket
+# when it is absent, its presence is what also brings the negotiation
+# of the protocol through alpn along with it
+find_package(OpenSSL QUIET)
+if(OPENSSL_FOUND)
+    # the definitions travel to everything that links against the
+    # objects, they decide the shape of the connection structure and
+    # so a translation unit that misses them would disagree on it
+    target_compile_definitions(viriatum_objects PUBLIC HAVE_LIBSSL HAVE_OPENSSL_SSL_H)
+    target_include_directories(viriatum_objects PUBLIC ${OPENSSL_INCLUDE_DIR})
+    target_link_libraries(viriatum_objects PUBLIC OpenSSL::SSL OpenSSL::Crypto)
+else()
+    message(STATUS "Viriatum: OpenSSL not available, disabling ssl and alpn")
+endif()
+
 find_package(PkgConfig QUIET)
 if(PKG_CONFIG_FOUND)
     pkg_check_modules(PCRE libpcre QUIET)

@@ -28,6 +28,43 @@
 
 static unsigned long long connection_id = 0;
 
+#ifdef VIRIATUM_ALPN
+int alpn_handler_service(SSL *ssl, const unsigned char **out, unsigned char *out_size, const unsigned char *in, unsigned int in_size, void *arguments) {
+    /* allocates space for the position in the list of the peer and
+    for the size of the name being visited */
+    unsigned int index = 0;
+    unsigned char size;
+
+    /* walks the list in the very order the peer has sent it, the
+    first name that this end speaks is the one selected, so that the
+    preference honoured is the one of the client */
+    while(index < in_size) {
+        size = in[index];
+        index++;
+        if(index + size > in_size) { break; }
+
+        if(size == sizeof(HTTP2_ALPN) - 1 && memcmp(&in[index], HTTP2_ALPN, size) == 0) {
+            *out = &in[index];
+            *out_size = size;
+            return SSL_TLSEXT_ERR_OK;
+        }
+
+        if(size == sizeof(HTTP11_ALPN) - 1 && memcmp(&in[index], HTTP11_ALPN, size) == 0) {
+            *out = &in[index];
+            *out_size = size;
+            return SSL_TLSEXT_ERR_OK;
+        }
+
+        index += size;
+    }
+
+    /* none of the names the peer announces is one that this end
+    speaks, so nothing at all is negotiated and the connection falls
+    back to the version that requires no negotiation */
+    return SSL_TLSEXT_ERR_NOACK;
+}
+#endif
+
 void create_service(struct service_t **service_pointer, unsigned char *name, unsigned char *program_name) {
     /* retrieves the service size */
     size_t service_size = sizeof(struct service_t);
@@ -888,9 +925,36 @@ ERROR_CODE _open_service(struct service_t *service) {
         OpenSSL_add_all_algorithms();
 
         /* creates the new ssl context and updates the context with the
-        correct certificate file and (private) key file */
+        correct certificate file and (private) key file, the method is
+        the one that negotiates the most recent version that both of
+        the ends are able to speak */
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L
+        service->ssl_context = SSL_CTX_new(TLS_server_method());
+#else
         service->ssl_context = SSL_CTX_new(SSLv23_server_method());
+#endif
         SSL_CTX_set_options(service->ssl_context, SSL_OP_SINGLE_DH_USE);
+
+        /* refuses every version below the one that HTTP/2 requires,
+        together with the cipher suites that it refuses, so that a
+        connection is never negotiated into something it then has to
+        be torn down for */
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L
+        SSL_CTX_set_min_proto_version(service->ssl_context, TLS1_2_VERSION);
+#else
+        SSL_CTX_set_options(
+            service->ssl_context,
+            SSL_OP_NO_SSLv2 | SSL_OP_NO_SSLv3 | SSL_OP_NO_TLSv1 | SSL_OP_NO_TLSv1_1
+        );
+#endif
+        SSL_CTX_set_cipher_list(service->ssl_context, VIRIATUM_SSL_CIPHERS);
+
+        /* announces the protocols that this end speaks so that a peer
+        able to speak HTTP/2 negotiates it through the transport,
+        which is the only form a browser ever uses */
+#ifdef VIRIATUM_ALPN
+        SSL_CTX_set_alpn_select_cb(service->ssl_context, alpn_handler_service, NULL);
+#endif
 
         /* resolves the configuration file from the ssl certificate defaulting to
         the predefined "server" certificate file, then in case the returnin value

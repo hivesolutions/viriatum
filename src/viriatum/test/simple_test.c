@@ -1327,6 +1327,7 @@ static struct test_entry_t _simple_entries[] = {
     V_TEST_T(test_http2_connection_flow, "http2"),
     V_TEST_T(test_http2_connection_split, "http2"),
     V_TEST_T(test_http2_connection_length, "http2"),
+    V_TEST_T(test_http2_alpn, "http2"),
     V_TEST_T(test_websocket_accept_key, "websocket"),
     V_TEST_T(test_websocket_parse_frame, "websocket"),
     V_TEST_T(test_websocket_build_frame, "websocket"),
