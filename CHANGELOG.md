@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+* Header compression for HTTP/2, built from scratch with no new dependency
 * Continuous integration now builds with clang 22 and gcc 16
 * Scalable vector versions of the web illustrations, logos and UI assets
 

@@ -566,8 +566,8 @@ ERROR_CODE _send_response_handler_php(struct http_request_t *http_request) {
 
     /* in case there is contents to be read retrieves the appropriate
     reference to the start of the post data in the connection buffer */
-    if(http_request->_content_length > 0) {
-        post_data = &http_connection->buffer[http_connection->buffer_offset - http_request->_content_length];
+    if(http_request->content_length > 0) {
+        post_data = &http_connection->buffer[http_connection->buffer_offset - http_request->content_length];
     } else {
         post_data = NULL;
     }
@@ -589,7 +589,7 @@ ERROR_CODE _send_response_handler_php(struct http_request_t *http_request) {
     handler_php_context->method = method;
     handler_php_context->post_data = post_data;
     handler_php_context->flags = http_request->flags;
-    handler_php_context->content_length = http_request->_content_length;
+    handler_php_context->content_length = http_request->content_length;
     handler_php_context->output_buffer = output_buffer;
 
     /* resets the number of headers for the current PHP request

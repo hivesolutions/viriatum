@@ -997,8 +997,8 @@ ERROR_CODE _start_environ_lua(lua_State *lua_state, struct http_request_t *http_
 
     /* in case there is contents to be read retrieves the appropriate
     reference to the start of the post data in the connection buffer */
-    if(http_request->_content_length > 0) {
-        post_data = &http_connection->buffer[http_connection->buffer_offset - http_request->_content_length];
+    if(http_request->content_length > 0) {
+        post_data = &http_connection->buffer[http_connection->buffer_offset - http_request->content_length];
     } else {
         post_data = NULL;
     }
@@ -1068,7 +1068,7 @@ ERROR_CODE _start_environ_lua(lua_State *lua_state, struct http_request_t *http_
 
     /* creates and pushes the input userdata object that provides
     a read() method for accessing the request body (WSAPI input) */
-    lua_input_push(lua_state, post_data, http_request->_content_length);
+    lua_input_push(lua_state, post_data, http_request->content_length);
     lua_setfield(lua_state, -2, "input");
 
     /* creates a simple table with a write() method that logs to the

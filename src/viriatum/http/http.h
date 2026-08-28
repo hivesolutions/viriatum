@@ -24,6 +24,7 @@
 
 #pragma once
 
+#include "hpack.h"
 #include "http_parser.h"
 #include "http_request.h"
 #include "http_util.h"

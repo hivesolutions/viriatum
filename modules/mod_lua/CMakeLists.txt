@@ -61,6 +61,7 @@ if(LUA_FOUND)
         ${MOD_LUA_SOURCES}
         ${MOD_LUA_TEST_SOURCES}
         ${CMAKE_SOURCE_DIR}/src/viriatum/http/http_parser.c
+        ${CMAKE_SOURCE_DIR}/src/viriatum/http/http_request.c
     )
     set_target_properties(viriatum_mod_lua_test PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin

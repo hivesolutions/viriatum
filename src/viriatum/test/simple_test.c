@@ -27,6 +27,7 @@
 #include "simple_test.h"
 #include "handler_dispatch_test.h"
 #include "handler_file_test.h"
+#include "hpack_test.h"
 #include "runner_test.h"
 #include "service_test.h"
 #include "websocket_test.h"
@@ -1286,6 +1287,20 @@ static struct test_entry_t _simple_entries[] = {
     V_TEST_C(test_handler_file_url, "handler", setup_handler_file_test, cleanup_handler_file_test),
     V_TEST_T(test_handler_file_header_field, "handler"),
     V_TEST_T(test_handler_file_header_value, "handler"),
+    V_TEST_T(test_hpack_table, "hpack"),
+    V_TEST_T(test_hpack_table_resize, "hpack"),
+    V_TEST_T(test_hpack_table_insert, "hpack"),
+    V_TEST_T(test_hpack_table_find, "hpack"),
+    V_TEST_T(test_hpack_integer, "hpack"),
+    V_TEST_T(test_hpack_string, "hpack"),
+    V_TEST_T(test_hpack_decode_request, "hpack"),
+    V_TEST_T(test_hpack_decode_request_huffman, "hpack"),
+    V_TEST_T(test_hpack_decode_response, "hpack"),
+    V_TEST_T(test_hpack_decode_errors, "hpack"),
+    V_TEST_T(test_hpack_decode_limits, "hpack"),
+    V_TEST_T(test_hpack_encode, "hpack"),
+    V_TEST_T(test_hpack_huffman, "hpack"),
+    V_TEST_T(test_hpack_huffman_errors, "hpack"),
     V_TEST_T(test_websocket_accept_key, "websocket"),
     V_TEST_T(test_websocket_parse_frame, "websocket"),
     V_TEST_T(test_websocket_build_frame, "websocket"),

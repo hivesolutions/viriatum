@@ -1070,8 +1070,8 @@ ERROR_CODE _start_environ_wsgi(PyObject *environ, struct http_request_t *http_re
 
     /* in case there is contents to be read retrieves the appropriate
     reference to the start of the post data in the connection buffer */
-    if(http_request->_content_length > 0) {
-        post_data = &http_connection->buffer[http_connection->buffer_offset - http_request->_content_length];
+    if(http_request->content_length > 0) {
+        post_data = &http_connection->buffer[http_connection->buffer_offset - http_request->content_length];
     } else {
         post_data = NULL;
     }
@@ -1108,7 +1108,7 @@ ERROR_CODE _start_environ_wsgi(PyObject *environ, struct http_request_t *http_re
     PyDict_SetItemString(environ, "wsgi.url_scheme", _value);
     Py_DECREF(_value);
 
-    _value = _new_wsgi_input(post_data, http_request->_content_length);
+    _value = _new_wsgi_input(post_data, http_request->content_length);
     PyDict_SetItemString(environ, "wsgi.input", _value);
     Py_DECREF(_value);
 

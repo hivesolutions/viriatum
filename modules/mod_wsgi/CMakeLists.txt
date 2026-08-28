@@ -47,6 +47,7 @@ if(PYTHON3_FOUND)
         ${MOD_WSGI_SOURCES}
         ${MOD_WSGI_TEST_SOURCES}
         ${CMAKE_SOURCE_DIR}/src/viriatum/http/http_parser.c
+        ${CMAKE_SOURCE_DIR}/src/viriatum/http/http_request.c
     )
     set_target_properties(viriatum_mod_wsgi_test PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin

@@ -117,6 +117,9 @@
     <ClCompile Include="..\..\src\viriatum\module\loading.c">
       <Filter>Source Files\Module</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\viriatum\http\hpack.c">
+      <Filter>Source Files\Http</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\src\viriatum\http\http_parser.c">
       <Filter>Source Files\Http</Filter>
     </ClCompile>
@@ -240,6 +243,9 @@
       <Filter>Header Files\Module</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\viriatum\http\http.h">
+      <Filter>Header Files\Http</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum\http\hpack.h">
       <Filter>Header Files\Http</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\viriatum\http\http_parser.h">
