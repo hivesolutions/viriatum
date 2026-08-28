@@ -15,7 +15,7 @@ def application(environ, start_response):
     headers = [
         ("Content-Type", "text/plain"),
         ("Content-Length", str(len(body))),
-        ("X-Test", "viriatum")
+        ("X-Test", "viriatum"),
     ]
 
     start_response("200 OK", headers)

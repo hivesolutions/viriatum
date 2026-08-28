@@ -6,6 +6,7 @@ import sys
 
 import atm
 
+
 def run():
     # parses the various arguments provided by the
     # command line and retrieves it defaulting to
@@ -32,8 +33,11 @@ def run():
     # as the base for comparison in case it's returns in error
     # otherwise returns the resulting (and value) of the various
     # calls (should be success by default)
-    if version == _version: sys.exit(1)
-    else: sys.exit(0)
+    if version == _version:
+        sys.exit(1)
+    else:
+        sys.exit(0)
+
 
 if __name__ == "__main__":
     run()

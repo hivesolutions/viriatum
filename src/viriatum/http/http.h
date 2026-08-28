@@ -27,3 +27,4 @@
 #include "http_parser.h"
 #include "http_request.h"
 #include "http_util.h"
+#include "websocket.h"

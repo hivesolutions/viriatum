@@ -26,12 +26,25 @@
 
 #include "../stdafx.h"
 
+#include "loop.h"
+
 /**
  * The timeout (in milliseconds) used while polling the
  * service, it bounds how long a stop request or a signal
  * may take to be noticed by the serving loop.
  */
 #define VIRIATUM_PYTHON_POLL_TIMEOUT 250
+
+/**
+ * The complete set of interfaces that may be requested for
+ * the calling of the application, the automatic one resolves
+ * to either of the other two by inspecting it.
+ */
+#define VIRIATUM_PYTHON_INTERFACE_AUTO "auto"
+#define VIRIATUM_PYTHON_INTERFACE_WSGI "wsgi"
+#define VIRIATUM_PYTHON_INTERFACE_ASGI "asgi"
+#define VIRIATUM_PYTHON_INTERFACE_ASGI2 "asgi2"
+#define VIRIATUM_PYTHON_INTERFACE_ASGI3 "asgi3"
 
 /**
  * Structure describing a server object, wrapping a viriatum
@@ -51,6 +64,19 @@ typedef struct server_python_t {
      * here as the service only retains a reference to it.
      */
     unsigned char host[VIRIATUM_MAX_HEADER_SIZE];
+
+    /**
+     * The asyncio event loop that is driven by the serving
+     * loop, only set for the asgi applications.
+     */
+    struct loop_python_t *loop_python;
+
+    /**
+     * Flag controlling if the application is called through the
+     * double callable shape of the second version of the asgi
+     * specification, unset for the single callable one.
+     */
+    char double_callable;
 
     /**
      * Flag controlling if the underlying service has been

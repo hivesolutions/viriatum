@@ -559,6 +559,10 @@
                     >
                 </File>
                 <File
+                    RelativePath="..\..\src\viriatum\test\websocket_test.c"
+                    >
+                </File>
+                <File
                     RelativePath="..\..\src\viriatum\test\simple_test.c"
                     >
                 </File>
@@ -592,6 +596,10 @@
                 </File>
                 <File
                     RelativePath="..\..\src\viriatum\http\http_util.c"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\viriatum\http\websocket.c"
                     >
                 </File>
             </Filter>
@@ -741,6 +749,10 @@
                     >
                 </File>
                 <File
+                    RelativePath="..\..\src\viriatum\test\websocket_test.h"
+                    >
+                </File>
+                <File
                     RelativePath="..\..\src\viriatum\test\simple_test.h"
                     >
                 </File>
@@ -786,6 +798,10 @@
                 </File>
                 <File
                     RelativePath="..\..\src\viriatum\http\http_util.h"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\viriatum\http\websocket.h"
                     >
                 </File>
             </Filter>

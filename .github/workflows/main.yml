@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     container: gcc:${{ matrix.gcc-version }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Build Viriatum
         run: |
           ./autogen.sh
@@ -30,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     container: silkeh/clang:${{ matrix.clang-version }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Build Viriatum
         run: |
           apt-get update && apt-get install -y -q libtool automake autoconf
@@ -51,7 +51,7 @@ jobs:
     runs-on: ubuntu-latest
     container: gcc:${{ matrix.gcc-version }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Install CMake
         run: |
           apt-get update && apt-get install -y -q wget libssl-dev
@@ -89,7 +89,7 @@ jobs:
     timeout-minutes: 30
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Build & Install Dependencies
         run: |
           pip3 install --upgrade "conan>=2,<3" urllib3
@@ -109,9 +109,10 @@ jobs:
     timeout-minutes: 30
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Build & Install Dependencies
         run: |
+          brew untap aws/tap || true
           brew install luajit
           pip3 install --break-system-packages --upgrade "conan>=2,<3" "urllib3<1.27"
           conan profile detect --force
@@ -138,7 +139,7 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: mlugg/setup-zig@v2
         with:
           version: 0.16.0
@@ -157,10 +158,10 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        python-version: ["3.10", "3.12", "3.14"]
+        python-version: ["3.10", "3.11", "3.12", "3.14"]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
@@ -171,3 +172,36 @@ jobs:
       - name: Test Viriatum (Python)
         run: |
           python -m unittest discover -s src/viriatum_python/test -v
+  build-coverage:
+    name: Build Coverage
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang llvm
+          echo "$(dirname $(readlink -f $(which clang)))" >> $GITHUB_PATH
+          python -m pip install --upgrade pip
+          python -m pip install coverage
+      - name: Run coverage
+        env:
+          CC: clang
+        run: |
+          ./scripts/coverage.sh
+      - name: Report coverage
+        if: always()
+        run: |
+          cat coverage/summary.md >> $GITHUB_STEP_SUMMARY
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: coverage
+          path: |
+            coverage/summary.txt
+            coverage/summary.md
+            coverage/lines.txt

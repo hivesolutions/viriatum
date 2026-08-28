@@ -412,6 +412,7 @@ ERROR_CODE body_callback_handler_python(struct http_parser_t *http_parser, const
     remaining data is discarded, avoiding an unbounded growth driven
     by the client */
     if(handler_python_context->body_size + data_size > VIRIATUM_PYTHON_MAX_BODY) {
+        handler_python_context->overflow = TRUE;
         RAISE_NO_ERROR;
     }
 
@@ -862,6 +863,7 @@ ERROR_CODE _send_response_handler_python(struct http_parser_t *http_parser) {
     Py_ssize_t body_size = 0;
     size_t count;
     size_t index;
+    size_t buffer_size;
     size_t headers_size;
     size_t body_total;
     char has_length;
@@ -887,10 +889,28 @@ ERROR_CODE _send_response_handler_python(struct http_parser_t *http_parser) {
     failure in the application is properly reported */
     handler_python_context->status_code = 500;
 
+    /* in case the payload exceeded the maximum allowed size it may not
+    be handed to the application, as it would be a truncated one, the
+    request is refused instead (payload too large) */
+    if(handler_python_context->overflow == TRUE) {
+        handler_python_context->status_code = 413;
+        handler_python_context->status_message =
+            (unsigned char *) MALLOC(sizeof(VIRIATUM_PYTHON_LARGE_STATUS));
+        STRCPY(
+            (char *) handler_python_context->status_message,
+            sizeof(VIRIATUM_PYTHON_LARGE_STATUS),
+            VIRIATUM_PYTHON_LARGE_STATUS
+        );
+    }
+
     /* builds the environ map for the request and creates the start
-    response callable carrying the context of the request */
-    environ_map = _build_environ_handler_python(handler_python_context, http_parser, connection);
-    if(environ_map == NULL) {
+    response callable carrying the context of the request, the
+    application is not called for a refused request */
+    environ_map = handler_python_context->overflow == TRUE ?
+        NULL : _build_environ_handler_python(handler_python_context, http_parser, connection);
+    if(handler_python_context->overflow == TRUE) {
+        result = NULL;
+    } else if(environ_map == NULL) {
         _report_handler_python();
         result = NULL;
     } else {
@@ -911,7 +931,13 @@ ERROR_CODE _send_response_handler_python(struct http_parser_t *http_parser) {
 
     /* in case the application raised an exception prints it into the
     standard error and keeps the internal error status */
-    if(result == NULL) {
+    if(result == NULL && handler_python_context->overflow == TRUE) {
+        V_WARNING_F(
+            "Refused oversized request %s\n",
+            handler_python_context->url == NULL ?
+                (unsigned char *) "" : handler_python_context->url
+        );
+    } else if(result == NULL) {
         _report_handler_python();
         handler_python_context->status_code = 500;
         handler_python_context->response_header_count = 0;
@@ -963,11 +989,8 @@ ERROR_CODE _send_response_handler_python(struct http_parser_t *http_parser) {
     /* allocates space for the complete response, the default headers are
     bounded by the maximum HTTP size and both the application headers and
     the body take the remaining part of the buffer */
-    connection->alloc_data(
-        connection,
-        VIRIATUM_HTTP_MAX_SIZE + headers_size + body_total,
-        (void **) &buffer
-    );
+    buffer_size = VIRIATUM_HTTP_MAX_SIZE + headers_size + body_total;
+    connection->alloc_data(connection, buffer_size, (void **) &buffer);
 
     /* writes the default set of headers into the buffer, the connection
     is kept alive according to the flags of the current request */
@@ -999,7 +1022,7 @@ ERROR_CODE _send_response_handler_python(struct http_parser_t *http_parser) {
     if(has_length == FALSE) {
         count += SPRINTF(
             &buffer[count],
-            VIRIATUM_MAX_HEADER_C_SIZE,
+            buffer_size - count,
             "%s: %lu\r\n",
             CONTENT_LENGTH_H,
             (long unsigned int) body_total
@@ -1011,7 +1034,7 @@ ERROR_CODE _send_response_handler_python(struct http_parser_t *http_parser) {
     for(index = 0; index < handler_python_context->response_header_count; index++) {
         count += SPRINTF(
             &buffer[count],
-            VIRIATUM_MAX_HEADER_C_SIZE,
+            buffer_size - count,
             "%s\r\n",
             handler_python_context->response_headers[index]
         );

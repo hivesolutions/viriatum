@@ -10,9 +10,10 @@ readme = "README.md"
 requires-python = ">=3.10"
 license = "Apache-2.0"
 authors = [{ name = "João Magalhães", email = "joamag@hive.pt" }]
-keywords = ["viriatum", "wsgi", "server", "http"]
+keywords = ["viriatum", "wsgi", "asgi", "server", "http"]
 classifiers = [
     "Development Status :: 4 - Beta",
+    "Framework :: AsyncIO",
     "Intended Audience :: Developers",
     "Operating System :: OS Independent",
     "Programming Language :: C",
@@ -23,6 +24,18 @@ classifiers = [
 [project.urls]
 Homepage = "http://viriatum.hive.pt"
 Repository = "https://github.com/hivesolutions/viriatum"
+
+[tool.cibuildwheel]
+build = "cp310-* cp311-* cp312-* cp313-* cp314-*"
+skip = "*_i686 *_ppc64le *_s390x pp*"
+test-command = "python -c \"import viriatum; assert viriatum.Server and viriatum.serve\""
+
+[tool.black]
+target-version = ["py310"]
+# the default exclusion of black skips every directory named build,
+# which would leave the scripts under scripts/build unchecked, the
+# build outputs of the project are already ignored through git
+exclude = "/(\\.direnv|\\.eggs|\\.git|\\.hg|\\.mypy_cache|\\.nox|\\.tox|\\.venv|\\.svn|\\.ipynb_checkpoints|_build|buck-out|dist|__pycache__)/"
 
 [tool.scikit-build]
 cmake.version = ">=3.15"

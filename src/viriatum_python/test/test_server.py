@@ -2,12 +2,13 @@
 # -*- coding: utf-8 -*-
 
 import ast
-import http.client
 import socket
 import sys
 import threading
 import time
 import unittest
+
+import http.client
 import urllib.error
 import urllib.request
 
@@ -72,14 +73,24 @@ class ServerTest(unittest.TestCase):
             start_response("200 OK", [("Content-Type", "text/plain")])
             return [str(len(data)).encode("utf-8")]
         if path == "/generator":
+
             def generator():
                 yield b"first-"
                 yield b"second"
+
             start_response("200 OK", [("Content-Type", "text/plain")])
             return generator()
         if path == "/environ":
-            keys = ("REQUEST_METHOD", "SCRIPT_NAME", "PATH_INFO", "QUERY_STRING",
-                    "SERVER_PROTOCOL", "SERVER_SOFTWARE", "SERVER_PORT", "REMOTE_ADDR")
+            keys = (
+                "REQUEST_METHOD",
+                "SCRIPT_NAME",
+                "PATH_INFO",
+                "QUERY_STRING",
+                "SERVER_PROTOCOL",
+                "SERVER_SOFTWARE",
+                "SERVER_PORT",
+                "REMOTE_ADDR",
+            )
             body = "|".join("%s=%s" % (key, environ[key]) for key in keys)
             start_response("200 OK", [("Content-Type", "text/plain")])
             return [body.encode("utf-8")]
@@ -99,7 +110,9 @@ class ServerTest(unittest.TestCase):
             start_response("200 OK", [("X-First", "one"), ("X-Second", "two")])
             return [b""]
         if path == "/raise-after":
-            start_response("200 OK", [("Content-Type", "text/plain"), ("X-Stale", "yes")])
+            start_response(
+                "200 OK", [("Content-Type", "text/plain"), ("X-Stale", "yes")]
+            )
             raise RuntimeError("intentional failure after start response")
         if path == "/exit":
             start_response("200 OK", [])
@@ -109,12 +122,18 @@ class ServerTest(unittest.TestCase):
             write(b"written-")
             write(b"twice-")
             return [b"returned"]
+        if path == "/long-header":
+            start_response("200 OK", [("X-Long", "v" * 4000)])
+            return [b"long"]
         if path == "/own-length":
             body = b"exact"
-            start_response("200 OK", [
-                ("Content-Type", "text/plain"),
-                ("Content-Length", str(len(body))),
-            ])
+            start_response(
+                "200 OK",
+                [
+                    ("Content-Type", "text/plain"),
+                    ("Content-Length", str(len(body))),
+                ],
+            )
             return [body]
         if path == "/bad-header":
             try:
@@ -284,6 +303,27 @@ class ServerTest(unittest.TestCase):
         result = urllib.request.urlopen(self._url("/write"), timeout=5)
         self.assertEqual(result.read(), b"written-twice-returned")
 
+    def test_long_response_header(self):
+        # verifies that a header longer than the maximum size of a
+        # single one reaches the wire, the formatting of the envelope
+        # is bounded by the remaining capacity of its buffer
+        result = urllib.request.urlopen(self._url("/long-header"), timeout=5)
+        self.assertEqual(result.read(), b"long")
+        self.assertEqual(result.headers.get("X-Long"), "v" * 4000)
+
+    def test_oversized_body(self):
+        # verifies that a payload beyond the maximum allowed size is
+        # refused, handing a truncated one to the application would
+        # have it processed as valid but incomplete data
+        payload = b"o" * (17 * 1024 * 1024)
+        try:
+            result = urllib.request.urlopen(
+                self._url("/size"), data=payload, timeout=30
+            )
+        except urllib.error.HTTPError as error:
+            result = error
+        self.assertEqual(result.status, 413)
+
     def test_application_content_length(self):
         # a content length set by the application must be the only one
         # present, two of them would desynchronize the client
@@ -385,9 +425,7 @@ class ServerLifecycleTest(unittest.TestCase):
         # a port outside of the representable range must be rejected
         # instead of being silently narrowed into another one
         for port in (-1, 65536, 70000):
-            self.assertRaises(
-                ValueError, viriatum.Server, self._application, port=port
-            )
+            self.assertRaises(ValueError, viriatum.Server, self._application, port=port)
 
     def test_invalid_host(self):
         # a host that does not fit the buffer receiving it must be
@@ -439,7 +477,9 @@ class ServerLifecycleTest(unittest.TestCase):
         thread.start()
         for _ in range(100):
             try:
-                urllib.request.urlopen("http://127.0.0.1:%d/" % (PORT + 2), timeout=1).read()
+                urllib.request.urlopen(
+                    "http://127.0.0.1:%d/" % (PORT + 2), timeout=1
+                ).read()
                 break
             except Exception:
                 time.sleep(0.1)

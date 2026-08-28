@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+* Server can now be imported from Python to serve an ASGI application, covering the HTTP, lifespan and WebSocket scopes - [#42](https://github.com/hivesolutions/viriatum/issues/42)
+* Support for both versions of the ASGI interface, the version is detected from the shape of the application - [#42](https://github.com/hivesolutions/viriatum/issues/42)
+* Continuous integration workflow publishing the Python package to PyPI, with wheels for Linux, macOS and Windows
+* Response bodies of ASGI applications are streamed as they are produced instead of being held in memory - [#42](https://github.com/hivesolutions/viriatum/issues/42)
+* WebSocket support in the core server, including the handshake and the framing of messages - [#42](https://github.com/hivesolutions/viriatum/issues/42)
+* Coverage script and continuous integration job reporting the coverage of the test suites - [#42](https://github.com/hivesolutions/viriatum/issues/42)
 * Server can now be imported from Python to serve a WSGI application on its own event loop - [#39](https://github.com/hivesolutions/viriatum/issues/39)
 * Continuous integration job building and testing the Python package on Linux, macOS and Windows - [#39](https://github.com/hivesolutions/viriatum/issues/39)
 * Core server can now be built as a shared or static library, so it can be embedded in another program - [#39](https://github.com/hivesolutions/viriatum/issues/39)
@@ -45,6 +51,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+* Applied `black` across all Python sources and the examples in the documentation
 * Zig example is now built with a newer Zig release, restoring the macOS build - [#39](https://github.com/hivesolutions/viriatum/issues/39)
 * Renamed `logging_use_color` to `use_color_logging` and `logging_print_date` to `print_date_logging`
 
@@ -66,6 +73,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Applied `clang-format` across all C source and header files for consistent code style
 
 ### Fixed
+
+* Requests whose payload exceeds the maximum allowed size are refused instead of being handed over truncated
+* Responses that carry no payload are no longer sent without their envelope
 
 * Absolute path resolution no longer aborts the process on optimized Linux builds - [#39](https://github.com/hivesolutions/viriatum/issues/39)
 * Server no longer crashes on startup when no configuration file is present - [#39](https://github.com/hivesolutions/viriatum/issues/39)

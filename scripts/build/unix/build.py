@@ -11,7 +11,7 @@ INCLUDES = (
     "/usr/local/include/php/main",
     "/usr/local/include/php/TSRM",
     "/usr/local/include/php/Zend",
-    "/usr/include/python2.7"
+    "/usr/include/python2.7",
 )
 """ The list of extra include directories
 for the build process """
@@ -21,14 +21,15 @@ INCLUDES_CROSS = (
     "/opt/%s/include/php/main",
     "/opt/%s/include/php/TSRM",
     "/opt/%s/include/php/Zend",
-    "/opt/%s/include/python2.7"
+    "/opt/%s/include/python2.7",
 )
 """ The list of extra include directories
 for the build process, these values are just
 templates that should be completed with the
 cross compilation host value """
 
-def build(file = None, build_m = True, cflags = None, cross = None):
+
+def build(file=None, build_m=True, cflags=None, cross=None):
     # runs the initial assertion for the various commands
     # that are mandatory for execution, this should avoid
     # errors in the middle of the build
@@ -36,7 +37,7 @@ def build(file = None, build_m = True, cflags = None, cross = None):
 
     # starts the build process with the configuration file
     # that was provided to the configuration script
-    atm.build(file, cross = cross)
+    atm.build(file, cross=cross)
 
     # retrieves the various values from the global configuration
     # that are going to be used around the configuration
@@ -60,7 +61,7 @@ def build(file = None, build_m = True, cflags = None, cross = None):
 
     # clones the current repository using the git command this
     # should retrieve all the source data from the server
-    atm.git(clean = True)
+    atm.git(clean=True)
 
     # lists the modules directory so that all the modules are
     # discovered (module folder names) this will be used to
@@ -71,14 +72,14 @@ def build(file = None, build_m = True, cflags = None, cross = None):
     # runs the auto generation process for the creation of the
     # configuration files
     os.chdir(repo_f)
-    atm.autogen(clean = True)
+    atm.autogen(clean=True)
 
     # iterates over all the modules to prepare their source code
     # for compilation distribution
     for module in modules:
         module_f = os.path.join(modules_f, module)
         os.chdir(module_f)
-        atm.autogen(clean = True)
+        atm.autogen(clean=True)
 
     # changes the current directory to the repository one and
     # copies the contents of it into the temporary folder named
@@ -87,13 +88,13 @@ def build(file = None, build_m = True, cflags = None, cross = None):
     os.chdir(repo_f)
     atm.copy(repo_f, os.path.join(tmp_f, name_src))
     atm.configure(
-        args = (
+        args=(
             "--prefix=" + result_f,
             "--with-wwwroot=" + result_f + "/var/viriatum/www",
-            "--enable-defaults"
+            "--enable-defaults",
         ),
-        cflags = cflags,
-        cross = cross
+        cflags=cflags,
+        cross=cross,
     )
     atm.make()
 
@@ -103,13 +104,11 @@ def build(file = None, build_m = True, cflags = None, cross = None):
         module_f = os.path.join(modules_f, module)
         os.chdir(module_f)
         atm.configure(
-            args = (
-                "--prefix=" + result_f,
-            ),
-            includes = cross and INCLUDES_CROSS or INCLUDES,
-            libraries = (result_f + "/lib",),
-            cflags = cflags,
-            cross = cross
+            args=("--prefix=" + result_f,),
+            includes=cross and INCLUDES_CROSS or INCLUDES,
+            libraries=(result_f + "/lib",),
+            cflags=cflags,
+            cross=cross,
         )
         atm.make()
 
@@ -130,11 +129,7 @@ def build(file = None, build_m = True, cflags = None, cross = None):
     # folder and then moves the resulting deb file to the distribution
     # based directory
     os.chdir(deb_f)
-    atm.deb(
-        section = "httpd",
-        depends = "libc6",
-        size = "1024"
-    )
+    atm.deb(section="httpd", depends="libc6", size="1024")
     atm.move(os.path.join(deb_base_f, name_deb + ".deb"), dist_f)
 
     # changes the current directory to the resulting folder and
@@ -147,19 +142,20 @@ def build(file = None, build_m = True, cflags = None, cross = None):
     # creates the various compressed files for both the archive and
     # source directories (distribution files)
     os.chdir(tmp_f)
-    atm.compress(name_arc, target = dist_f)
-    atm.compress(name_src, target = dist_f)
+    atm.compress(name_arc, target=dist_f)
+    atm.compress(name_src, target=dist_f)
 
     # creates the various hash files for the complete set of files in
     # the distribution directory
     os.chdir(dist_f)
     atm.hash_d()
 
+
 def run():
     # parses the various arguments provided by the
     # command line and retrieves it defaulting to
     # pre-defined values in case they do not exist
-    arguments = atm.parse_args(names = ("no-modules", "cflags=", "cross="))
+    arguments = atm.parse_args(names=("no-modules", "cflags=", "cross="))
     file = arguments.get("file", None)
     build_m = not arguments.get("no-modules", False)
     cflags = arguments.get("cflags", None)
@@ -167,16 +163,15 @@ def run():
 
     # starts the build process with the parameters
     # retrieved from the current environment
-    build(
-        file = file,
-        build_m = build_m,
-        cflags = cflags,
-        cross = cross
-    )
+    build(file=file, build_m=build_m, cflags=cflags, cross=cross)
+
 
 def cleanup():
     atm.cleanup()
 
+
 if __name__ == "__main__":
-    try: run()
-    finally: cleanup()
+    try:
+        run()
+    finally:
+        cleanup()

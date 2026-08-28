@@ -158,6 +158,63 @@ There are a lot of possible building features to enable
 * `--enable-mpool`- Enables the memory pool support (optimized for windows only)
 * `--enable-prefork` - Enables the prefork support so that viriatum can create workers
 
+## Python Package
+
+Viriatum may be imported from the Python interpreter and used to serve either a WSGI or an ASGI application on its own event loop, no separate server process is required:
+
+    pip install .
+
+A WSGI application is served by passing it to the server, the interface is detected from the shape of the application:
+
+    import viriatum
+
+
+    def application(environ, start_response):
+        start_response("200 OK", [("Content-Type", "text/plain")])
+        return [b"Hello World"]
+
+
+    viriatum.serve(application, port=8080)
+
+An ASGI application is served in exactly the same way, a coroutine function is recognised as such and driven on the asyncio loop that the server advances once per iteration of its own:
+
+    import viriatum
+
+
+    async def application(scope, receive, send):
+        await receive()
+        await send(
+            {
+                "type": "http.response.start",
+                "status": 200,
+                "headers": [(b"content-type", b"text/plain")],
+            }
+        )
+        await send({"type": "http.response.body", "body": b"Hello World"})
+
+
+    viriatum.serve(application, port=8080)
+
+The `http`, `lifespan` and `websocket` scopes are all supported, response bodies are streamed as each chunk is sent.
+
+Both versions of the ASGI interface are supported. The single callable shape above is the third version, while the second one hands the scope to an outer callable and the pair of callables to the awaitable it returns:
+
+    import viriatum
+
+
+    def application(scope):
+        async def handle(receive, send):
+            await receive()
+            await send({"type": "http.response.start", "status": 200, "headers": []})
+            await send({"type": "http.response.body", "body": b"Hello World"})
+
+        return handle
+
+
+    viriatum.serve(application, port=8080, interface="asgi")
+
+The version is detected from the shape of the application, honouring the `_asgi_single_callable` and `_asgi_double_callable` markers when present. The interface may also be forced with `interface` set to `wsgi`, `asgi2` or `asgi3`. Note that `auto` only tells a single callable ASGI application apart from a WSGI one, as a double callable application is indistinguishable from a WSGI callable, so a second version application needs `asgi`, `asgi2` or one of the markers.
+
 ## Modules
 
 There are a series of modules for the viriatum server that are used to extend functionality
@@ -279,4 +336,5 @@ Viriatum is currently licensed under the [Apache License, Version 2.0](http://ww
 
 [![Build Status](https://app.travis-ci.com/hivesolutions/viriatum.svg?branch=master)](https://travis-ci.com/github/hivesolutions/viriatum)
 [![Build Status GitHub](https://github.com/hivesolutions/viriatum/workflows/Main%20Workflow/badge.svg)](https://github.com/hivesolutions/viriatum/actions)
+[![PyPi Status](https://img.shields.io/pypi/v/viriatum.svg)](https://pypi.python.org/pypi/viriatum)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://www.apache.org/licenses/)
