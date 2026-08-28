@@ -120,8 +120,7 @@ a:hover {
 
 .separator-horizontal {
     background: transparent url(../images/separator-horizontal.png) no-repeat center center;
-    background-image: -webkit-image-set(url(../images/separator-horizontal.png) 1x, url(../images/separator-horizontal-2x.png) 2x);
-    background-image: image-set(url(../images/separator-horizontal.png) 1x, url(../images/separator-horizontal-2x.png) 2x);
+    background-image: url(../images/separator-horizontal.svg);
     background-size: contain;
     height: 10px;
     margin: 20px auto 6px auto;
@@ -139,8 +138,7 @@ a:hover {
 
 .main-illustration {
     background: transparent url(../images/illustration/main-illustration.png) no-repeat center center;
-    background-image: -webkit-image-set(url(../images/illustration/main-illustration.png) 1x, url(../images/illustration/main-illustration-2x.png) 2x);
-    background-image: image-set(url(../images/illustration/main-illustration.png) 1x, url(../images/illustration/main-illustration-2x.png) 2x);
+    background-image: url(../images/illustration/main-illustration.svg);
     background-size: contain;
     height: 290px;
     max-width: 960px;
@@ -152,8 +150,7 @@ a:hover {
 
 .branding a {
     background: transparent url(../images/logo/viriatum-logo.png) no-repeat center center;
-    background-image: -webkit-image-set(url(../images/logo/viriatum-logo.png) 1x, url(../images/logo/viriatum-logo-2x.png) 2x);
-    background-image: image-set(url(../images/logo/viriatum-logo.png) 1x, url(../images/logo/viriatum-logo-2x.png) 2x);
+    background-image: url(../images/logo/viriatum-logo.svg);
     background-size: contain;
     display: block;
     height: 48px;
@@ -301,8 +298,7 @@ span.separator {
 
 .icon.arrow-left span {
     background: transparent url(../images/arrow-left.png) top center no-repeat;
-    background-image: -webkit-image-set(url(../images/arrow-left.png) 1x, url(../images/arrow-left-2x.png) 2x);
-    background-image: image-set(url(../images/arrow-left.png) 1x, url(../images/arrow-left-2x.png) 2x);
+    background-image: url(../images/arrow-left.svg);
     display: block;
     height: 16px;
     width: 100%;
@@ -360,8 +356,7 @@ span.separator {
 
 .error-illustration {
     background: transparent url(../images/illustration/error-illustration.png) no-repeat center center;
-    background-image: -webkit-image-set(url(../images/illustration/error-illustration.png) 1x, url(../images/illustration/error-illustration-2x.png) 2x);
-    background-image: image-set(url(../images/illustration/error-illustration.png) 1x, url(../images/illustration/error-illustration-2x.png) 2x);
+    background-image: url(../images/illustration/error-illustration.svg);
     float: left;
     height: 280px;
     width: 200px;

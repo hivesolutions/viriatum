@@ -82,7 +82,7 @@
             <div class="footer-body">
                 <div class="separator-horizontal"></div>
                 <ul class="footer-list">
-                    <img class="footer-logo" src="/resources/images/logo/steamfire-logo.png" srcset="/resources/images/logo/steamfire-logo-2x.png 2x" />
+                    <img class="footer-logo" src="/resources/images/logo/steamfire-logo.svg" />
                 </ul>
             </div>
         </div>
