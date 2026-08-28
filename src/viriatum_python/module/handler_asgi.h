@@ -209,6 +209,12 @@ typedef struct handler_asgi_context_t {
     unsigned char flags;
 
     /**
+     * The version of the protocol that has delivered the request,
+     * it decides the encoding of the response.
+     */
+    enum http_version_e version;
+
+    /**
      * The state of the websocket connection, set to the none
      * value for the plain http requests.
      */

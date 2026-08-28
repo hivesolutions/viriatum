@@ -82,6 +82,51 @@ static void _decode_handler_python(char *value) {
     value[write] = '\0';
 }
 
+/**
+ * Writes a header field of the application into the response being
+ * built, the application produces them as complete lines and so the
+ * name and the value have to be told apart before they are handed
+ * to the operations of the connection.
+ *
+ * @param http_connection The connection the response belongs to.
+ * @param connection The connection the response is written on.
+ * @param buffer The buffer the response is built in.
+ * @param size The size in bytes of the provided buffer.
+ * @param offset The position the field is written at.
+ * @param header The complete line of the field.
+ * @return The number of bytes the buffer holds.
+ */
+static size_t _write_field_handler_python(
+    struct http_connection_t *http_connection,
+    struct connection_t *connection,
+    char *buffer,
+    size_t size,
+    size_t offset,
+    char *header
+) {
+    /* allocates space for the name of the field and for the position
+    of the separator that closes it */
+    char name[VIRIATUM_MAX_HEADER_SIZE];
+    char *separator = strchr(header, ':');
+    size_t name_size;
+
+    /* a line that carries no separator at all is not a field and so
+    it is left out of the response */
+    if(separator == NULL) { return offset; }
+
+    name_size = (size_t) (separator - header);
+    if(name_size >= sizeof(name)) { return offset; }
+    memcpy(name, header, name_size);
+    name[name_size] = '\0';
+
+    /* moves past the separator and the space that usually follows it,
+    what remains is the value of the field */
+    separator++;
+    while(*separator == ' ') { separator++; }
+
+    return http_connection->write_field(connection, buffer, size, offset, name, separator);
+}
+
 static char _is_length_handler_python(const char *header) {
     /* compares the name part of the header line, the one that precedes
     the separator, against the content length one in a case insensitive
@@ -870,6 +915,7 @@ ERROR_CODE _send_response_handler_python(struct http_request_t *http_request) {
     /* allocates space for the buffer holding the complete response and
     for the counter of the bytes already written into it */
     char *buffer;
+    char *body_buffer;
     char *body_data = NULL;
     Py_ssize_t body_size = 0;
     size_t count;
@@ -877,6 +923,7 @@ ERROR_CODE _send_response_handler_python(struct http_request_t *http_request) {
     size_t buffer_size;
     size_t headers_size;
     size_t body_total;
+    char length[32];
     char has_length;
 
     /* retrieves the connection from the HTTP parser parameters and then
@@ -1002,19 +1049,19 @@ ERROR_CODE _send_response_handler_python(struct http_request_t *http_request) {
     the body take the remaining part of the buffer */
     buffer_size = VIRIATUM_HTTP_MAX_SIZE + headers_size + body_total;
     connection->alloc_data(connection, buffer_size, (void **) &buffer);
+    body_buffer = NULL;
 
     /* writes the default set of headers into the buffer, the connection
     is kept alive according to the flags of the current request */
-    count = http_connection->write_headers(
+    count = http_connection->write_status(
         connection,
         buffer,
-        VIRIATUM_HTTP_SIZE,
-        HTTP11,
+        buffer_size,
+        http_request->version,
         handler_python_context->status_code,
         handler_python_context->status_message == NULL ?
             "Internal Server Error" : (char *) handler_python_context->status_message,
-        http_request->flags & FLAG_KEEP_ALIVE ? KEEP_ALIVE : KEEP_CLOSE,
-        FALSE
+        http_request->flags & FLAG_KEEP_ALIVE ? KEEP_ALIVE : KEEP_CLOSE
     );
 
     /* verifies if the application has set a content length of its own,
@@ -1031,40 +1078,51 @@ ERROR_CODE _send_response_handler_python(struct http_request_t *http_request) {
     /* writes the content length header with the size of the payload
     that has been gathered from the application response */
     if(has_length == FALSE) {
-        count += SPRINTF(
-            &buffer[count],
-            buffer_size - count,
-            "%s: %lu\r\n",
+        SPRINTF(length, sizeof(length), "%lu", (long unsigned int) body_total);
+        count = http_connection->write_field(
+            connection,
+            buffer,
+            buffer_size,
+            count,
             CONTENT_LENGTH_H,
-            (long unsigned int) body_total
+            length
         );
     }
 
     /* iterates over the complete set of headers set by the application
-    copying each one of them into the headers buffer */
+    writing each one of them into the headers buffer */
     for(index = 0; index < handler_python_context->response_header_count; index++) {
-        count += SPRINTF(
-            &buffer[count],
-            buffer_size - count,
-            "%s\r\n",
-            handler_python_context->response_headers[index]
+        count = _write_field_handler_python(
+            http_connection,
+            connection,
+            buffer,
+            buffer_size,
+            count,
+            (char *) handler_python_context->response_headers[index]
         );
     }
 
-    /* closes the headers part of the envelope and then copies the
-    complete payload into the remaining part of the buffer */
-    memcpy(&buffer[count], "\r\n", 2);
-    count += 2;
+    /* closes the headers part of the envelope, the payload travels as
+    a write of its own so that the protocol is able to frame it */
+    count = http_connection->write_end(connection, buffer, buffer_size, count, FALSE);
+
+    /* gathers the complete payload into a buffer of its own, it is the
+    one that closes the message */
+    connection->alloc_data(connection, body_total > 0 ? body_total : 1, (void **) &body_buffer);
     if(handler_python_context->written_size > 0) {
         memcpy(
-            &buffer[count],
+            body_buffer,
             handler_python_context->written,
             handler_python_context->written_size
         );
-        count += handler_python_context->written_size;
     }
-    if(body_size > 0) { memcpy(&buffer[count], body_data, (size_t) body_size); }
-    count += (size_t) body_size;
+    if(body_size > 0) {
+        memcpy(
+            &body_buffer[handler_python_context->written_size],
+            body_data,
+            (size_t) body_size
+        );
+    }
 
     /* releases the reference to the payload object and then releases
     the global interpreter lock, no more interpreter usage */
@@ -1075,12 +1133,14 @@ ERROR_CODE _send_response_handler_python(struct http_request_t *http_request) {
     messages to be processed, no parallel request handling problems */
     http_connection->acquire(http_connection);
 
-    /* writes the complete response into the connection, registering the
-    appropriate callback for the cleanup of the connection */
-    connection->write_connection(
+    /* writes the headers and then the payload into the connection,
+    registering the appropriate callback for the cleanup */
+    http_connection->write_flush(connection, (unsigned char *) buffer, count, NULL, NULL);
+    http_connection->write_chunk(
         connection,
-        (unsigned char *) buffer,
-        (unsigned int) count,
+        (unsigned char *) body_buffer,
+        body_total,
+        TRUE,
         _send_response_callback_handler_python,
         (void *) (size_t) http_request->flags
     );

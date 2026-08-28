@@ -171,6 +171,51 @@ static PyObject *_receive_handler_asgi(PyObject *self, PyObject *args) {
     return future;
 }
 
+/**
+ * Writes a header field of the application into the response being
+ * built, the application produces them as complete lines and so the
+ * name and the value have to be told apart before they are handed
+ * to the operations of the connection.
+ *
+ * @param http_connection The connection the response belongs to.
+ * @param connection The connection the response is written on.
+ * @param buffer The buffer the response is built in.
+ * @param size The size in bytes of the provided buffer.
+ * @param offset The position the field is written at.
+ * @param header The complete line of the field.
+ * @return The number of bytes the buffer holds.
+ */
+static size_t _write_field_handler_asgi(
+    struct http_connection_t *http_connection,
+    struct connection_t *connection,
+    char *buffer,
+    size_t size,
+    size_t offset,
+    char *header
+) {
+    /* allocates space for the name of the field and for the position
+    of the separator that closes it */
+    char name[VIRIATUM_MAX_HEADER_SIZE];
+    char *separator = strchr(header, ':');
+    size_t name_size;
+
+    /* a line that carries no separator at all is not a field and so
+    it is left out of the response */
+    if(separator == NULL) { return offset; }
+
+    name_size = (size_t) (separator - header);
+    if(name_size >= sizeof(name)) { return offset; }
+    memcpy(name, header, name_size);
+    name[name_size] = '\0';
+
+    /* moves past the separator and the space that usually follows it,
+    what remains is the value of the field */
+    separator++;
+    while(*separator == ' ') { separator++; }
+
+    return http_connection->write_field(connection, buffer, size, offset, name, separator);
+}
+
 static ERROR_CODE _write_handler_asgi(struct handler_asgi_context_t *handler_asgi_context, const char *data, size_t data_size, char last, PyObject *future) {
     /* allocates space for the buffer receiving the payload together
     with the counter of the bytes already written into it */
@@ -180,11 +225,22 @@ static ERROR_CODE _write_handler_asgi(struct handler_asgi_context_t *handler_asg
     struct write_asgi_t *write_asgi;
     struct connection_t *connection = handler_asgi_context->connection;
 
+    /* retrieves the substrates of the connection so that the writing
+    of the payload goes through the protocol that is serving it */
+    struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
+    struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
+
+    /* the framing of a payload of unknown size is the business of the
+    protocol, under HTTP/2 the frames carry it and so the chunked form
+    of HTTP/1.1 is never written */
+    char chunked = handler_asgi_context->has_length == FALSE &&
+                   http_connection->http2_connection == NULL;
+
     /* calculates the size of the buffer that is required for the
     payload, the chunked framing takes both a prefix carrying the
     size of the chunk and the terminator of the stream */
     buffer_size = data_size;
-    if(handler_asgi_context->has_length == FALSE) {
+    if(chunked == TRUE) {
         if(data_size > 0) { buffer_size += VIRIATUM_MAX_HEADER_C_SIZE + 2; }
         if(last == TRUE) { buffer_size += 5; }
     }
@@ -192,7 +248,7 @@ static ERROR_CODE _write_handler_asgi(struct handler_asgi_context_t *handler_asg
     /* allocates the buffer for the complete payload and writes both
     the chunk and the terminator of the stream into it */
     connection->alloc_data(connection, buffer_size + 1, (void **) &buffer);
-    if(handler_asgi_context->has_length == FALSE) {
+    if(chunked == TRUE) {
         if(data_size > 0) {
             count = SPRINTF(
                 buffer,
@@ -227,10 +283,11 @@ static ERROR_CODE _write_handler_asgi(struct handler_asgi_context_t *handler_asg
 
     /* writes the payload into the connection, registering the callback
     that resolves the future and tears the request down */
-    connection->write_connection(
+    http_connection->write_chunk(
         connection,
         (unsigned char *) buffer,
-        (unsigned int) count,
+        count,
+        last,
         _send_response_callback_handler_asgi,
         (void *) write_asgi
     );
@@ -269,48 +326,51 @@ static ERROR_CODE _send_headers_handler_asgi(struct handler_asgi_context_t *hand
 
     /* writes the default set of headers into the buffer, the connection
     is kept alive according to the flags of the current request */
-    count = http_connection->write_headers(
+    count = http_connection->write_status(
         connection,
         buffer,
-        VIRIATUM_HTTP_SIZE,
-        HTTP11,
+        buffer_size,
+        handler_asgi_context->version,
         handler_asgi_context->status_code,
         (char *) _status_handler_asgi(handler_asgi_context->status_code),
-        handler_asgi_context->flags & FLAG_KEEP_ALIVE ? KEEP_ALIVE : KEEP_CLOSE,
-        FALSE
+        handler_asgi_context->flags & FLAG_KEEP_ALIVE ? KEEP_ALIVE : KEEP_CLOSE
     );
 
     /* in case the application has set no content length of its own the
     payload is framed using the chunked transfer encoding, as its size
-    is only known once the last of the chunks is received */
-    if(handler_asgi_context->has_length == FALSE) {
-        count += SPRINTF(
-            &buffer[count],
-            buffer_size - count,
-            "%s: chunked\r\n",
-            TRANSFER_ENCODING_H
+    is only known once the last of the chunks is received, under HTTP/2
+    the frames carry the framing and so nothing is announced */
+    if(handler_asgi_context->has_length == FALSE && http_connection->http2_connection == NULL) {
+        count = http_connection->write_field(
+            connection,
+            buffer,
+            buffer_size,
+            count,
+            TRANSFER_ENCODING_H,
+            "chunked"
         );
     }
 
     /* iterates over the complete set of headers set by the application
-    copying each one of them into the headers buffer */
+    writing each one of them into the headers buffer */
     for(index = 0; index < handler_asgi_context->response_header_count; index++) {
-        count += SPRINTF(
-            &buffer[count],
-            buffer_size - count,
-            "%s\r\n",
-            handler_asgi_context->response_headers[index]
+        count = _write_field_handler_asgi(
+            http_connection,
+            connection,
+            buffer,
+            buffer_size,
+            count,
+            (char *) handler_asgi_context->response_headers[index]
         );
     }
 
     /* closes the headers part of the envelope and writes it into the
     connection, no callback is required as it is never the last part */
-    memcpy(&buffer[count], "\r\n", 2);
-    count += 2;
-    connection->write_connection(
+    count = http_connection->write_end(connection, buffer, buffer_size, count, FALSE);
+    http_connection->write_flush(
         connection,
         (unsigned char *) buffer,
-        (unsigned int) count,
+        count,
         NULL,
         NULL
     );
@@ -1691,6 +1751,7 @@ ERROR_CODE _call_application_handler_asgi(struct http_request_t *http_request) {
     handler_asgi_context->connection = connection;
     handler_asgi_context->handler = handler_asgi;
     handler_asgi_context->flags = (unsigned char) http_request->flags;
+    handler_asgi_context->version = http_request->version;
 
     /* the head requests carry no payload in their response, only the
     envelope of it is ever written into the connection */
