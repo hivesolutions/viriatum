@@ -68,7 +68,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Applied `black` across all Python sources and the examples in the documentation
 * Zig example is now built with a newer Zig release, restoring the macOS build - [#39](https://github.com/hivesolutions/viriatum/issues/39)
 * Renamed `logging_use_color` to `use_color_logging` and `logging_print_date` to `print_date_logging`
-
 * Upgraded mod_wsgi from Python 2.7 to Python 3 (PyGILState API, modern embed workflow)
 * Upgraded mod_php from PHP 5.6 to PHP 8.x (libphp.so, updated header paths)
 * `Dockerfile.all` rewritten: uses Alpine system packages (python3-dev, php84-embed, lua5.1-dev) instead of building Python 2.7 and PHP 5.6 from source
