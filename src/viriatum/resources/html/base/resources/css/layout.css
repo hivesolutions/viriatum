@@ -31,6 +31,8 @@ __license__   = Apache License, Version 2.0
 
 body {
     background: #e8e8e8 url(../images/background.png) repeat;
+    background-image: -webkit-image-set(url(../images/background.png) 1x, url(../images/background-2x.png) 2x);
+    background-image: image-set(url(../images/background.png) 1x, url(../images/background-2x.png) 2x);
     font-family: Georgia, Times;
 }
 
@@ -118,6 +120,8 @@ a:hover {
 
 .separator-horizontal {
     background: transparent url(../images/separator-horizontal.png) no-repeat center center;
+    background-image: -webkit-image-set(url(../images/separator-horizontal.png) 1x, url(../images/separator-horizontal-2x.png) 2x);
+    background-image: image-set(url(../images/separator-horizontal.png) 1x, url(../images/separator-horizontal-2x.png) 2x);
     height: 10px;
     margin: 20px auto 6px auto;
     width: 260px;
@@ -134,6 +138,8 @@ a:hover {
 
 .main-illustration {
     background: transparent url(../images/illustration/main-illustration.png) no-repeat center center;
+    background-image: -webkit-image-set(url(../images/illustration/main-illustration.png) 1x, url(../images/illustration/main-illustration-2x.png) 2x);
+    background-image: image-set(url(../images/illustration/main-illustration.png) 1x, url(../images/illustration/main-illustration-2x.png) 2x);
     height: 290px;
     width: 960px;
 }
@@ -144,6 +150,8 @@ a:hover {
 
 .branding a {
     background: transparent url(../images/logo/viriatum-logo.png) no-repeat center center;
+    background-image: -webkit-image-set(url(../images/logo/viriatum-logo.png) 1x, url(../images/logo/viriatum-logo-2x.png) 2x);
+    background-image: image-set(url(../images/logo/viriatum-logo.png) 1x, url(../images/logo/viriatum-logo-2x.png) 2x);
     display: block;
     height: 48px;
     margin: 10px auto 20px auto;
@@ -289,6 +297,8 @@ span.separator {
 
 .icon.arrow-left span {
     background: transparent url(../images/arrow-left.png) top center no-repeat;
+    background-image: -webkit-image-set(url(../images/arrow-left.png) 1x, url(../images/arrow-left-2x.png) 2x);
+    background-image: image-set(url(../images/arrow-left.png) 1x, url(../images/arrow-left-2x.png) 2x);
     display: block;
     height: 16px;
     width: 100%;
@@ -300,22 +310,32 @@ span.separator {
 
 .icon.folder {
     background: transparent url(../images/mime/icon-folder.png) center center no-repeat;
+    background-image: -webkit-image-set(url(../images/mime/icon-folder.png) 1x, url(../images/mime/icon-folder-2x.png) 2x);
+    background-image: image-set(url(../images/mime/icon-folder.png) 1x, url(../images/mime/icon-folder-2x.png) 2x);
 }
 
 .icon.image {
     background: transparent url(../images/mime/icon-image.png) center center no-repeat;
+    background-image: -webkit-image-set(url(../images/mime/icon-image.png) 1x, url(../images/mime/icon-image-2x.png) 2x);
+    background-image: image-set(url(../images/mime/icon-image.png) 1x, url(../images/mime/icon-image-2x.png) 2x);
 }
 
 .icon.text {
     background: transparent url(../images/mime/icon-text.png) center center no-repeat;
+    background-image: -webkit-image-set(url(../images/mime/icon-text.png) 1x, url(../images/mime/icon-text-2x.png) 2x);
+    background-image: image-set(url(../images/mime/icon-text.png) 1x, url(../images/mime/icon-text-2x.png) 2x);
 }
 
 .icon.html {
     background: transparent url(../images/mime/icon-html.png) center center no-repeat;
+    background-image: -webkit-image-set(url(../images/mime/icon-html.png) 1x, url(../images/mime/icon-html-2x.png) 2x);
+    background-image: image-set(url(../images/mime/icon-html.png) 1x, url(../images/mime/icon-html-2x.png) 2x);
 }
 
 .icon.link {
     background: transparent url(../images/mime/icon-link.png) center center no-repeat;
+    background-image: -webkit-image-set(url(../images/mime/icon-link.png) 1x, url(../images/mime/icon-link-2x.png) 2x);
+    background-image: image-set(url(../images/mime/icon-link.png) 1x, url(../images/mime/icon-link-2x.png) 2x);
 }
 
 .table.status {
@@ -335,6 +355,8 @@ span.separator {
 
 .error-illustration {
     background: transparent url(../images/illustration/error-illustration.png) no-repeat center center;
+    background-image: -webkit-image-set(url(../images/illustration/error-illustration.png) 1x, url(../images/illustration/error-illustration-2x.png) 2x);
+    background-image: image-set(url(../images/illustration/error-illustration.png) 1x, url(../images/illustration/error-illustration-2x.png) 2x);
     float: left;
     height: 280px;
     width: 200px;

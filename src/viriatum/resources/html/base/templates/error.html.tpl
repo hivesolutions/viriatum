@@ -9,6 +9,7 @@
 
         <!-- favicon inclusion -->
         <link rel="shortcut icon" href="/resources/images/favicon.ico" />
+        <link rel="icon" href="/resources/images/favicon-2x.png" sizes="32x32" type="image/png" />
     </head>
     <body>
         <div id="content-wrapper">

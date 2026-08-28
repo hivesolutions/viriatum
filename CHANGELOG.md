@@ -9,11 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-*
+* High-resolution 2x variants of the legacy web illustrations and UI assets
 
 ### Changed
 
-*
+* Web pages now select 2x image assets on high-density displays
 
 ### Fixed
 
