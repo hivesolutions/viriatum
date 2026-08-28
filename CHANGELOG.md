@@ -9,6 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+*
+
+### Changed
+
+*
+
+### Fixed
+
+*
+
+## [0.4.0] - 2026-08-28
+
+### Added
+
 * Server can now be imported from Python to serve an ASGI application, covering the HTTP, lifespan and WebSocket scopes - [#42](https://github.com/hivesolutions/viriatum/issues/42)
 * Support for both versions of the ASGI interface, the version is detected from the shape of the application - [#42](https://github.com/hivesolutions/viriatum/issues/42)
 * Continuous integration workflow publishing the Python package to PyPI, with wheels for Linux, macOS and Windows
