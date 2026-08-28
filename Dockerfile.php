@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 alpine:latest AS builder
+FROM alpine:latest AS builder
 
 # install build dependencies for viriatum and PHP 8
 RUN apk update && apk add \
@@ -27,7 +27,7 @@ RUN cd /viriatum/modules/mod_php && \
     ./configure --prefix=/usr && \
     make && make install
 
-FROM --platform=linux/amd64 alpine:latest
+FROM alpine:latest
 
 LABEL version="1.0"
 LABEL maintainer="Hive Solutions <development@hive.pt>"

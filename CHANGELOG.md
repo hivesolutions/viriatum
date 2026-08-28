@@ -17,7 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-*
+* Docker images of the PHP and full variants now build for the architecture of the machine instead of always amd64
 
 ## [0.5.0] - 2026-08-28
 
