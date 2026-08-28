@@ -26,13 +26,27 @@
 
 #include "speed_test.h"
 
-void exec_speed_tests(struct test_case_t *test_case) {
-    V_RUN_SPEED(test_linked_list, 1000000, test_case);
-    V_RUN_SPEED(test_linked_list_stress, 1, test_case);
-    V_RUN_SPEED(test_linked_list_big, 1, test_case);
+/* the table that describes the speed tests, every one of the
+entries carries the amount of iterations that is going to be
+performed for it during the measurement */
+static struct test_entry_t _speed_entries[] = {
+    V_TEST_S(test_linked_list, "structures", 1000000),
+    V_TEST_S(test_linked_list_stress, "structures", 1),
+    V_TEST_S(test_linked_list_big, "structures", 1)
+};
+
+void create_speed_suite(struct test_suite_t *suite) {
+    suite->name = "speed_tests";
+    suite->entries = _speed_entries;
+    suite->count = V_TEST_COUNT(_speed_entries);
+    suite->setup = NULL;
+    suite->teardown = NULL;
 }
 
-ERROR_CODE run_speed_tests(void) {
-    ERROR_CODE return_value = run_test_case(exec_speed_tests, "speed_tests");
+ERROR_CODE run_speed_tests(struct test_options_t *options) {
+    struct test_suite_t suite;
+    ERROR_CODE return_value;
+    create_speed_suite(&suite);
+    return_value = run_test_suite(&suite, options);
     RAISE_AGAIN(return_value);
 }

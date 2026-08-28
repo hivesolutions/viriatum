@@ -27,18 +27,22 @@
 #include "simple_test.h"
 
 /**
- * Executes the set of speed tests in the current
- * test case.
+ * Populates the provided suite with the table of entries
+ * that describe the set of speed tests.
  *
- * @param test_case The test case context for which
- * the speed tests will be executed, should be able
- * to store some context information about the execution.
+ * @param suite The suite to be populated with the entries
+ * of the speed tests and with their name.
  */
-void exec_speed_tests(struct test_case_t *test_case);
+void create_speed_suite(struct test_suite_t *suite);
 
 /**
  * Starts the various test that measure performance
  * for the current viriatum infra-structure, the results
  * are printed in the current standard output file.
+ *
+ * @param options The options that control the selection of
+ * the tests to be run and the reporting of the results, a
+ * null value runs every one of them reporting to the
+ * standard output alone.
  */
-ERROR_CODE run_speed_tests(void);
+ERROR_CODE run_speed_tests(struct test_options_t *options);

@@ -47,6 +47,13 @@ The most commonly used viriatum commands are:\n\
    --info      Prints the service information\n\
    --help      Prints this (help) message\n\
 \n\
+The tests may be selected and reported using:\n\
+   --test-list      Lists the selected tests instead of running them\n\
+   --test-filter    Runs only the tests whose name matches the pattern\n\
+   --test-tags      Runs only the tests carrying one of the tags\n\
+   --test-format    Format of the report (text, tap, junit or markdown)\n\
+   --test-output    Path of the file the report is written to\n\
+\n\
 See 'viriatum --help[=<command>]' for more information on a specific command.\n"
 
 ERROR_CODE print_information(void) {
@@ -92,13 +99,66 @@ ERROR_CODE version(void) {
     RAISE_NO_ERROR;
 }
 ERROR_CODE info(void) { return print_information(); }
-ERROR_CODE test(void) {
-    print_information();
-    return run_simple_tests();
+
+void load_test_options(struct test_options_t *options, struct hash_map_t *arguments) {
+    /* allocates the value reference to be used
+    during the arguments retrieval */
+    void *value;
+
+    /* starts the options with the default values, every one of
+    the tests is run and no report file is produced */
+    create_test_options(options);
+
+    /* retrieves the pattern that the name of a test must match
+    for it to be selected for the run */
+    get_value_string_hash_map(arguments, (unsigned char *) "test-filter", &value);
+    if(value != NULL && ((struct argument_t *) value)->type == VALUE_ARGUMENT) {
+        options->filter = ((struct argument_t *) value)->value;
+    }
+
+    /* retrieves the tags that a test must carry at least one of
+    for it to be selected for the run */
+    get_value_string_hash_map(arguments, (unsigned char *) "test-tags", &value);
+    if(value != NULL && ((struct argument_t *) value)->type == VALUE_ARGUMENT) {
+        options->tags = ((struct argument_t *) value)->value;
+    }
+
+    /* retrieves the format under which the results of the run
+    are going to be reported */
+    get_value_string_hash_map(arguments, (unsigned char *) "test-format", &value);
+    if(value != NULL && ((struct argument_t *) value)->type == VALUE_ARGUMENT) {
+        options->format = ((struct argument_t *) value)->value;
+    }
+
+    /* retrieves the path of the file to which the report is to
+    be written, the standard output is used when it is not set */
+    get_value_string_hash_map(arguments, (unsigned char *) "test-output", &value);
+    if(value != NULL && ((struct argument_t *) value)->type == VALUE_ARGUMENT) {
+        options->path = ((struct argument_t *) value)->value;
+    }
+
+    /* verifies if the tests are meant to be listed instead of
+    run, no value is expected for such an argument */
+    get_value_string_hash_map(arguments, (unsigned char *) "test-list", &value);
+    if(value != NULL) { options->list = TRUE; }
+
+    /* a machine readable report written to the standard output
+    turns the echoing of the progress off, otherwise the stream
+    handed to the consumer of the report would be polluted */
+    if(options->format != NULL && options->path == NULL) { options->echo = FALSE; }
 }
-ERROR_CODE speed(void) {
-    print_information();
-    return run_speed_tests();
+
+ERROR_CODE test(struct hash_map_t *arguments) {
+    struct test_options_t options;
+    load_test_options(&options, arguments);
+    if(options.echo == TRUE && options.list == FALSE) { print_information(); }
+    return run_simple_tests(&options);
+}
+ERROR_CODE speed(struct hash_map_t *arguments) {
+    struct test_options_t options;
+    load_test_options(&options, arguments);
+    if(options.echo == TRUE && options.list == FALSE) { print_information(); }
+    return run_speed_tests(&options);
 }
 
 #ifdef VIRIATUM_PLATFORM_WIN32
@@ -220,13 +280,13 @@ int execute_arguments(char *program_name, struct hash_map_t *arguments) {
     and in case it's set starts the test process running a series
     of test functions in sequence */
     get_value_string_hash_map(arguments, (unsigned char *) "test", &value);
-    if(value != NULL) { return test(); }
+    if(value != NULL) { return test(arguments); }
 
     /* retrieves the speed argument value from the arguments map
     and in case it's set starts the speed measuring and disables
     the running of the service */
     get_value_string_hash_map(arguments, (unsigned char *) "speed", &value);
-    if(value != NULL) { return speed(); }
+    if(value != NULL) { return speed(arguments); }
 
     /* tries to retrieve the daemon argument from the
     arguments map in case the value is set "daemonizes"

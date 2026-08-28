@@ -31,6 +31,7 @@ configure~
 install-sh
 test-driver
 hello.txt
+runner_test.tmp
 ltmain.sh
 aclocal.m4
 libtool.m4

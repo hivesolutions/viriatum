@@ -23,13 +23,22 @@ def load(path):
 
 
 def rows_native(data, root):
-    # gathers one row per source file of the native extension, the
-    # names are relative so that the table stays readable
+    # gathers one row per source file of the native tree, the export
+    # of llvm carries the files under a data element while the one of
+    # gcovr carries them at the top level, both are understood so that
+    # the table is the same one for either of the toolchains
     rows = []
-    for item in data["data"][0].get("files", []):
-        summary = item["summary"]["lines"]
-        name = os.path.relpath(item["filename"], root)
-        rows.append((name, summary["count"], summary["count"] - summary["covered"]))
+    if "data" in data:
+        for item in data["data"][0].get("files", []):
+            summary = item["summary"]["lines"]
+            name = os.path.relpath(item["filename"], root)
+            rows.append((name, summary["count"], summary["count"] - summary["covered"]))
+    else:
+        for item in data.get("files", []):
+            name = os.path.relpath(os.path.join(root, item["filename"]), root)
+            rows.append(
+                (name, item["line_total"], item["line_total"] - item["line_covered"])
+            )
     return sorted(rows)
 
 
@@ -49,11 +58,23 @@ def rows_python(data, root):
     return rows
 
 
+def group(rows):
+    # collapses the rows into one per directory, the complete tree
+    # carries a few hundred sources and a row for each of them would
+    # not be readable, the per file detail stays in the artifact
+    groups = {}
+    for name, count, absent in rows:
+        directory = os.path.dirname(name)
+        total, missed = groups.get(directory, (0, 0))
+        groups[directory] = (total + count, missed + absent)
+    return [(name, groups[name][0], groups[name][1]) for name in sorted(groups)]
+
+
 def table(rows, threshold):
-    # formats the rows as a markdown table, the files that fall below
-    # the threshold are marked so that they stand out
+    # formats the rows as a markdown table, the directories that fall
+    # below the threshold are marked so that they stand out
     lines = [
-        "| File | Lines | Missed | Cover | |",
+        "| Directory | Lines | Missed | Cover | |",
         "| --- | ---: | ---: | ---: | :-: |",
     ]
     total = missed = 0
@@ -88,16 +109,16 @@ def main():
 
     if not rows:
         print("## Coverage\n\nNo coverage data was produced.")
-        return 0
+        return 1
 
-    lines, cover = table(rows, threshold)
+    lines, cover = table(group(rows), threshold)
     print("## Coverage\n")
     print("\n".join(lines))
     print(
         "\nThreshold is %.0f%%, the overall coverage of the measured sources is %.2f%%."
         % (threshold, cover)
     )
-    return 0
+    return 0 if cover >= threshold else 1
 
 
 if __name__ == "__main__":

@@ -38,13 +38,58 @@
 const char *test_handler_file_context(void);
 
 /**
+ * Holds the complete chain of structures required by
+ * the callbacks of the file handler, it is built by the
+ * setup of the fixture and destroyed by its teardown so
+ * that nothing is leaked when a test fails midway.
+ */
+typedef struct handler_file_fixture_t {
+
+    /**
+     * The minimal connection, service and options chain
+     * assigned to the parameters of the parser.
+     */
+    struct test_context_t *test_context;
+
+    /**
+     * The HTTP parser wired to the handler file context.
+     */
+    struct http_parser_t *http_parser;
+
+    /**
+     * The context of the file handler under test.
+     */
+    struct handler_file_context_t *handler_file_context;
+
+} handler_file_fixture;
+
+/**
+ * Creates the fixture with the complete chain of structures
+ * the callbacks of the file handler require, already wired
+ * together and ready for a request to be parsed.
+ *
+ * @return The created fixture as an opaque context.
+ */
+void *setup_handler_file_test(void);
+
+/**
+ * Destroys the fixture created by the setup, including every
+ * one of the structures that it carries.
+ *
+ * @param context The fixture to be destroyed.
+ */
+void cleanup_handler_file_test(void *context);
+
+/**
  * Tests the handler file url callback including
  * query string stripping and path traversal rejection.
  *
+ * @param context The fixture carrying the parser and the
+ * context of the handler under test.
  * @return A message describing the execution of
  * the unit test should describe possible errors.
  */
-const char *test_handler_file_url(void);
+const char *test_handler_file_url(void *context);
 
 /**
  * Tests the handler file header field callback

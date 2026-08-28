@@ -36,6 +36,35 @@ Run the core test suite and module tests before committing:
 
 The mod_lua test binary is only built when LuaJIT is available on the system.
 
+Tests are described as data, one row per test in a registry table, so that they may be listed, filtered and reported without any of them having to be named in an execution sequence. The table of the core suite lives in `src/viriatum/test/simple_test.c` and a test is added to it by writing the function, declaring it in the matching `*_test.h` and adding a row:
+
+```c
+V_TEST_T(test_my_feature, "handler"),
+```
+
+The available row constructors are `V_TEST` (no tags), `V_TEST_T` (tagged), `V_TEST_M` (tagged plus the `TEST_FLAG_SKIP` or `TEST_FLAG_XFAIL` marker), `V_TEST_C` (with a setup and a teardown fixture), `V_TEST_P` (one execution per parameter case) and `V_TEST_S` (a speed test with a count of iterations). A fixture is preferred over building the structures inside the test body, its teardown also runs when an assertion fails midway.
+
+The runner is driven through the following options:
+
+```bash
+./bin/viriatum --test --test-list
+./bin/viriatum --test --test-filter=websocket
+./bin/viriatum --test --test-tags=structures,path
+./bin/viriatum --test --test-format=junit --test-output=test-results.xml
+```
+
+The formats of the report are `text`, `tap`, `junit` and `markdown`. A format given without an output path turns the echoing of the progress off, so that the stream handed to the consumer of the report stays clean. The assertions that report both of the values (`V_ASSERT_EQ_I`, `V_ASSERT_EQ_U`, `V_ASSERT_EQ_S`, `V_ASSERT_EQ_P`, `V_ASSERT_NULL`, `V_ASSERT_NOT_NULL` and `V_ASSERT_MEM`) are preferred over the plain `V_ASSERT` wherever a comparison is involved.
+
+## Coverage
+
+Measure the coverage of the C tree and of the python package with:
+
+```bash
+./scripts/coverage.sh
+```
+
+The script builds every target with instrumentation, runs the core, the module and the python suites and writes the reports under `coverage/`. Both clang, through llvm-cov, and gcc, through gcovr, are supported and produce the same set of reports. The threshold of the C tree is set through `THRESHOLD` and the one of the python surface through `PYTHON_THRESHOLD`, raise them as the coverage improves rather than lowering them to make a run pass.
+
 ## Style Guide
 
 - C source files use 4-space indentation, no tabs.

@@ -69,6 +69,7 @@ system/service.c \
 system/torrent.c \
 test/handler_dispatch_test.c \
 test/handler_file_test.c \
+test/runner_test.c \
 test/service_test.c \
 test/simple_test.c \
 test/speed_test.c \
@@ -102,6 +103,7 @@ system/service.c \
 system/torrent.c \
 test/handler_dispatch_test.c \
 test/handler_file_test.c \
+test/runner_test.c \
 test/service_test.c \
 test/simple_test.c \
 test/speed_test.c \
