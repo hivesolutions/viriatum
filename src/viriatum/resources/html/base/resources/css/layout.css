@@ -400,11 +400,6 @@ span.separator {
     text-transform: uppercase;
 }
 
-/*
-The rules that adapt the layout to the small viewport of a phone,
-the fluid widths above already handle the intermediate sizes so only
-the elements that cannot shrink any further are adjusted here.
-*/
 @media screen and (max-width: 640px) {
     body {
         padding: 0px 12px 0px 12px;
@@ -412,6 +407,10 @@ the elements that cannot shrink any further are adjusted here.
 
     a {
         font-size: 10pt;
+    }
+
+    .table a {
+        font-size: 12pt;
     }
 
     .main-illustration {
@@ -426,10 +425,6 @@ the elements that cannot shrink any further are adjusted here.
         margin: 30px auto 20px auto;
     }
 
-    .table a {
-        font-size: 12pt;
-    }
-
     .table.file-listing {
         margin: 30px auto 20px auto;
     }
@@ -438,12 +433,20 @@ the elements that cannot shrink any further are adjusted here.
         padding: 5px 0px 5px 8px;
     }
 
-    .table.file-listing td.date,
     .table.file-listing th.date {
         display: none;
     }
 
-    .table.file-listing td.name,
+    .table.file-listing td.name {
+        max-width: none;
+        min-width: 0px;
+        width: auto;
+    }
+
+    .table.file-listing td.date {
+        display: none;
+    }
+
     .table.file-listing td.size {
         max-width: none;
         min-width: 0px;
@@ -466,15 +469,16 @@ the elements that cannot shrink any further are adjusted here.
         margin: 40px auto 40px auto;
     }
 
-    .error-illustration,
+    .error-illustration {
+        background-size: contain;
+        float: none;
+        height: 200px;
+        margin: 0px auto 0px auto;
+        width: 100%;
+    }
+
     .error-content {
         float: none;
         margin: 0px auto 0px auto;
-    }
-
-    .error-illustration {
-        background-size: contain;
-        height: 200px;
-        width: 100%;
     }
 }
