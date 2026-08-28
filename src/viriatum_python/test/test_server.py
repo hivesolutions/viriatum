@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import ast
+import signal
 import socket
 import sys
 import threading
@@ -522,6 +523,48 @@ class ServerLifecycleTest(unittest.TestCase):
         server.stop()
         thread.join(timeout=10)
         self.assertFalse(thread.is_alive())
+
+    def test_keyboard_interrupt(self):
+        # verifies that an interrupt stops the serving loop, the
+        # signals are only handled in the main thread and so it is the
+        # one that runs the loop while another raises the interrupt
+        state = {"raised": False, "expired": False}
+        finished = threading.Event()
+
+        def application(environ, start_response):
+            start_response("200 OK", [("Content-Type", "text/plain")])
+            return [b"plain"]
+
+        server = viriatum.Server(application, port=PORT + 30, interface="wsgi")
+
+        def interrupt():
+            # waits for the service to be listening before raising the
+            # interrupt, so that it never reaches the opening of it
+            for _ in range(200):
+                try:
+                    connection = socket.create_connection(
+                        ("127.0.0.1", PORT + 30), timeout=1
+                    )
+                    connection.close()
+                    break
+                except Exception:
+                    time.sleep(0.05)
+            state["raised"] = True
+            signal.raise_signal(signal.SIGINT)
+
+            # stops the server in case the interrupt is ignored, so
+            # that the test fails instead of hanging forever
+            if not finished.wait(timeout=10.0):
+                state["expired"] = True
+                server.stop()
+
+        threading.Thread(target=interrupt, daemon=True).start()
+        try:
+            self.assertRaises(KeyboardInterrupt, server.serve_forever)
+        finally:
+            finished.set()
+        self.assertTrue(state["raised"])
+        self.assertFalse(state["expired"], "the interrupt was ignored")
 
     def test_serve_helper(self):
         # verifies that the serve helper is exposed and callable

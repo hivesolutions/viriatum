@@ -7,8 +7,10 @@ import base64
 import gc
 import hashlib
 import os
+import signal
 import socket
 import struct
+import sys
 import threading
 import time
 import unittest
@@ -1094,6 +1096,68 @@ class AsgiTest(ServerCase):
             "retained %d futures across 30 dropped connections" % retained,
         )
 
+    def test_keyboard_interrupt(self):
+        # verifies that an interrupt stops the serving loop, the
+        # signals are only handled in the main thread and so it is the
+        # one that runs the loop while another raises the interrupt
+        state = {"raised": False, "expired": False}
+        finished = threading.Event()
+
+        async def application(scope, receive, send):
+            # refuses the lifespan scope so that the opening of the
+            # service is immediate, the interrupt has to reach the
+            # serving loop rather than the wait of the protocol
+            if scope["type"] != "http":
+                raise NotImplementedError(scope["type"])
+            await receive()
+            await asyncio.sleep(2.0)
+            await send({"type": "http.response.start", "status": 200, "headers": []})
+            await send({"type": "http.response.body", "body": b"plain"})
+
+        server = viriatum.Server(application, port=self.port + 30, interface="asgi")
+
+        def request():
+            # keeps a request in flight so that a task stays pending
+            # and the loop is advancing the interpreter, which is the
+            # window where the interrupt used to be discarded
+            try:
+                urllib.request.urlopen(
+                    "http://127.0.0.1:%d/" % (self.port + 30), timeout=10
+                )
+            except Exception:
+                pass
+
+        def interrupt():
+            # waits for the service to be listening before raising the
+            # interrupt, so that it never reaches the opening of it
+            for _ in range(200):
+                try:
+                    connection = socket.create_connection(
+                        ("127.0.0.1", self.port + 30), timeout=1
+                    )
+                    connection.close()
+                    break
+                except Exception:
+                    time.sleep(0.05)
+            threading.Thread(target=request, daemon=True).start()
+            time.sleep(0.5)
+            state["raised"] = True
+            signal.raise_signal(signal.SIGINT)
+
+            # stops the server in case the interrupt is ignored, so
+            # that the test fails instead of hanging forever
+            if not finished.wait(timeout=10.0):
+                state["expired"] = True
+                server.stop()
+
+        threading.Thread(target=interrupt, daemon=True).start()
+        try:
+            self.assertRaises(KeyboardInterrupt, server.serve_forever)
+        finally:
+            finished.set()
+        self.assertTrue(state["raised"])
+        self.assertFalse(state["expired"], "the interrupt was ignored")
+
     def test_serve_helper(self):
         # verifies that the helper builds a server with the provided
         # arguments and runs its loop until it is stopped
@@ -1344,6 +1408,52 @@ class LifespanTest(unittest.TestCase):
         finally:
             asyncio.sleep = original
         self.assertEqual(events, [])
+
+    def test_lifespan_shutdown_on_interrupt(self):
+        # verifies that the shutdown of the lifespan is run when the
+        # serving is ended by an interrupt, the exception raised by
+        # the signal has to be saved while it takes place
+        events = []
+        state = {"expired": False}
+        finished = threading.Event()
+
+        async def application(scope, receive, send):
+            if scope["type"] != "lifespan":
+                await self._plain(receive, send)
+                return
+            while True:
+                message = await receive()
+                events.append(message["type"])
+                if message["type"] == "lifespan.startup":
+                    await send({"type": "lifespan.startup.complete"})
+                elif message["type"] == "lifespan.shutdown":
+                    await send({"type": "lifespan.shutdown.complete"})
+                    return
+
+        server = viriatum.Server(application, port=PORT + 9, interface="asgi")
+
+        def interrupt():
+            for _ in range(200):
+                try:
+                    connection = socket.create_connection(
+                        ("127.0.0.1", PORT + 9), timeout=1
+                    )
+                    connection.close()
+                    break
+                except Exception:
+                    time.sleep(0.05)
+            signal.raise_signal(signal.SIGINT)
+            if not finished.wait(timeout=10.0):
+                state["expired"] = True
+                server.stop()
+
+        threading.Thread(target=interrupt, daemon=True).start()
+        try:
+            self.assertRaises(KeyboardInterrupt, server.serve_forever)
+        finally:
+            finished.set()
+        self.assertFalse(state["expired"], "the interrupt was ignored")
+        self.assertEqual(events, ["lifespan.startup", "lifespan.shutdown"])
 
     def test_lifespan_unsupported(self):
         # verifies that an application that refuses the lifespan

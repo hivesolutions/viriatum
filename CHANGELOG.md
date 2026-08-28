@@ -13,11 +13,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+* Improved the rendering of the legacy 2x Steamfire logo
 * Web pages now select 2x image assets on high-density displays
 
 ### Fixed
 
-*
+* Keyboard interrupt now stops a server that is running an ASGI application
 
 ## [0.4.0] - 2026-08-28
 
