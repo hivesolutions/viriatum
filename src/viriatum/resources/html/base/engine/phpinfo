@@ -8,6 +8,7 @@
         <!-- favicon inclusion -->
         <link rel="shortcut icon" href="/resources/images/favicon.ico" />
         <link rel="icon" href="/resources/images/favicon-2x.png" sizes="32x32" type="image/png" />
+        <link rel="icon" href="/resources/images/favicon.svg" type="image/svg+xml" />
     </head>
     <body>
         <pre style="font-family: monospace; margin: 20px auto 20px auto; width: fit-content;">
