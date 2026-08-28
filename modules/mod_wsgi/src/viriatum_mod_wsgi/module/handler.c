@@ -553,6 +553,11 @@ ERROR_CODE _send_data_callback_wsgi(struct connection_t *connection, struct data
     struct handler_wsgi_context_t *handler_wsgi_context = (struct handler_wsgi_context_t *) parameters;
     PyObject *iterator = handler_wsgi_context->iterator;
 
+    /* retrieves the substrates of the connection so that the writing
+    of the payload goes through the protocol that is serving it */
+    struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
+    struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
+
     /* acquires the global interpreter state an changes the
     current state to the base thread state */
     VIRIATUM_ACQUIRE_GIL;
@@ -573,9 +578,19 @@ ERROR_CODE _send_data_callback_wsgi(struct connection_t *connection, struct data
         lock on the global interpreter state */
         VIRIATUM_RELEASE_GIL;
 
-        /* redirect the handling to the send response callback handler module
-        so that the proper cleanup is done (eg: closing connection check) */
-        _send_response_callback_handler_wsgi(connection, data, parameters);
+        /* closes the message with a fragment that carries nothing, the
+        iterator only tells that it is done once it has been asked for
+        one item too many and so no earlier fragment is able to carry
+        the mark of the end of it */
+        connection->alloc_data(connection, 1, (void **) &_buffer);
+        http_connection->write_chunk(
+            connection,
+            (unsigned char *) _buffer,
+            0,
+            TRUE,
+            _send_response_callback_handler_wsgi,
+            parameters
+        );
 
         /* raises no error */
         RAISE_NO_ERROR;
@@ -612,10 +627,11 @@ ERROR_CODE _send_data_callback_wsgi(struct connection_t *connection, struct data
     /* writes the buffer to the connection, this will write another
     chunk of data into the connection and return to this same callback
     function to try to write more data */
-    connection->write_connection(
+    http_connection->write_chunk(
         connection,
         (unsigned char *) _buffer,
         buffer_size,
+        FALSE,
         _send_data_callback_wsgi,
         parameters
     );
@@ -652,6 +668,7 @@ ERROR_CODE _send_response_handler_wsgi(struct http_request_t *http_request) {
     the envelope and for the one taken by the headers of it */
     size_t buffer_size;
     size_t headers_size;
+    char _length[32];
 
     /* allocates space for the length of the sequence returned with
     the contents of the message to be sent */
@@ -882,49 +899,48 @@ ERROR_CODE _send_response_handler_wsgi(struct http_request_t *http_request) {
     into it the value is dynamically constructed based on the current header values */
     buffer_size = VIRIATUM_HTTP_MAX_SIZE + headers_size;
     connection->alloc_data(connection, buffer_size, (void **) &headers_buffer);
-    count = http_connection->write_headers(
+    count = http_connection->write_status(
         connection,
         headers_buffer,
-        VIRIATUM_HTTP_SIZE,
-        HTTP11,
+        buffer_size,
+        http_request->version,
         _wsgi_request.status_code,
         _wsgi_request.status_message,
-        http_request->flags & FLAG_KEEP_ALIVE ? KEEP_ALIVE : KEEP_CLOSE,
-        FALSE
+        http_request->flags & FLAG_KEEP_ALIVE ? KEEP_ALIVE : KEEP_CLOSE
     );
 
     /* in case the current message is meant to have the content length
     header controlled by the WSGI module it must be set in the headers */
     if(has_size == TRUE) {
-        /* copies the content length header into the headers
+        /* writes the content length header into the headers
         with the size value associated so that the client is
         notified about the length of the message */
-        count += SPRINTF(
-            &headers_buffer[count],
-            buffer_size - count,
-            "%s: %lu\r\n",
+        SPRINTF(_length, sizeof(_length), "%lu", item_size);
+        count = http_connection->write_field(
+            connection,
+            headers_buffer,
+            buffer_size,
+            count,
             CONTENT_LENGTH_H,
-            item_size
+            _length
         );
     }
 
-    /* iterates over all the headers present in the current WSGI request to copy
+    /* iterates over all the headers present in the current WSGI request to write
     their content into the current headers buffer */
     for(index = 0; index < _wsgi_request.header_count; index++) {
-        /* copies the current WSGI header into the current position of the headers
-        buffer (header copy), note that the trailing newlines are count in size */
-        count += SPRINTF(
-            &headers_buffer[count],
-            buffer_size - count,
-            "%s\r\n",
+        count = http_connection->write_line(
+            connection,
+            headers_buffer,
+            buffer_size,
+            count,
             _wsgi_request.headers[index]
         );
     }
 
-    /* finishes the current headers sequence with the final carriage return newline
-    character values to closes the headers part of the envelope */
-    memcpy(&headers_buffer[count], "\r\n", 2);
-    count += 2;
+    /* finishes the current headers sequence, closing the headers part
+    of the envelope in the encoding of the protocol in use */
+    count = http_connection->write_end(connection, headers_buffer, buffer_size, count, FALSE);
 
     /* retrieves the iterator associated with the result, that should be a sequence
     object (iterable) containing the various parts of the message to be returned, then
@@ -942,10 +958,10 @@ ERROR_CODE _send_response_handler_wsgi(struct http_request_t *http_request) {
 
     /* writes the response to the connection, this will only write
     the headers the remaining message will be sent on the callback */
-    connection->write_connection(
+    http_connection->write_flush(
         connection,
         (unsigned char *) headers_buffer,
-        (unsigned int) count,
+        count,
         _send_data_callback_wsgi,
         (void *) handler_wsgi_context
     );

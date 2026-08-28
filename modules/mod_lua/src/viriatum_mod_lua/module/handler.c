@@ -563,6 +563,7 @@ ERROR_CODE _send_response_handler_lua(struct http_request_t *http_request) {
     char *response_buffer;
     char has_content_length;
     char _header_name_lower[VIRIATUM_MAX_HEADER_SIZE];
+    char _length[32];
     char *error_message;
     const char *header_name;
     const char *header_value;
@@ -757,15 +758,14 @@ ERROR_CODE _send_response_handler_lua(struct http_request_t *http_request) {
     /* allocates space for the header buffer and then writes the default values
     into it the value is dynamically constructed based on the current header values */
     connection->alloc_data(connection, VIRIATUM_HTTP_MAX_SIZE, (void **) &headers_buffer);
-    count = http_connection->write_headers(
+    count = http_connection->write_status(
         connection,
         headers_buffer,
-        VIRIATUM_HTTP_SIZE,
-        HTTP11,
+        VIRIATUM_HTTP_MAX_SIZE,
+        http_request->version,
         status_code,
         (char *) status_message,
-        http_request->flags & FLAG_KEEP_ALIVE ? KEEP_ALIVE : KEEP_CLOSE,
-        FALSE
+        http_request->flags & FLAG_KEEP_ALIVE ? KEEP_ALIVE : KEEP_CLOSE
     );
 
     /* tracks whether the script already provided a Content-Length
@@ -784,10 +784,11 @@ ERROR_CODE _send_response_handler_lua(struct http_request_t *http_request) {
             /* copies the current header into the current position of the headers
             buffer (header copy), note that the trailing newlines are counted in size */
             if(header_name != NULL && header_value != NULL) {
-                count += SPRINTF(
-                    &headers_buffer[count],
-                    VIRIATUM_MAX_HEADER_C_SIZE,
-                    "%s: %s\r\n",
+                count = http_connection->write_field(
+                    connection,
+                    headers_buffer,
+                    VIRIATUM_HTTP_MAX_SIZE,
+                    count,
                     header_name,
                     header_value
                 );
@@ -854,33 +855,27 @@ ERROR_CODE _send_response_handler_lua(struct http_request_t *http_request) {
     /* in case the script did not provide a Content-Length header
     auto-inserts one based on the collected body size */
     if(!has_content_length) {
-        count += SPRINTF(
-            &headers_buffer[count],
-            VIRIATUM_MAX_HEADER_C_SIZE,
-            "Content-Length: %lu\r\n",
-            (unsigned long) body_size
+        SPRINTF(_length, sizeof(_length), "%lu", (unsigned long) body_size);
+        count = http_connection->write_field(
+            connection,
+            headers_buffer,
+            VIRIATUM_HTTP_MAX_SIZE,
+            count,
+            CONTENT_LENGTH_H,
+            _length
         );
     }
 
-    /* finishes the current headers sequence with the final carriage return newline
-    character values to close the headers part of the envelope */
-    memcpy(&headers_buffer[count], "\r\n", 2);
-    count += 2;
+    /* finishes the current headers sequence, closing the headers part
+    of the envelope in the encoding of the protocol in use */
+    count = http_connection->write_end(connection, headers_buffer, VIRIATUM_HTTP_MAX_SIZE, count, FALSE);
 
-    /* allocates the final response buffer containing both headers and
-    body then copies the headers and body data into it */
-    connection->alloc_data(connection, count + body_size, (void **) &response_buffer);
-    memcpy(response_buffer, headers_buffer, count);
-
-    /* releases the headers buffer as it has been copied into the
-    response buffer and is no longer needed */
-    FREE(headers_buffer);
-
-    /* in case there is body data available copies it into the
-    response buffer after the headers */
+    /* gathers the payload into a buffer of its own, the protocol is
+    the one framing it and so it travels as a write of its own */
+    connection->alloc_data(connection, body_size > 0 ? body_size : 1, (void **) &response_buffer);
     if(body_size > 0) {
         body_chunk = lua_tolstring(*lua_state_pointer, -1, &body_chunk_size);
-        if(body_chunk != NULL) { memcpy(&response_buffer[count], body_chunk, body_size); }
+        if(body_chunk != NULL) { memcpy(response_buffer, body_chunk, body_size); }
         lua_pop(*lua_state_pointer, 1);
     }
 
@@ -888,11 +883,14 @@ ERROR_CODE _send_response_handler_lua(struct http_request_t *http_request) {
     (status, headers, iterator) */
     lua_pop(*lua_state_pointer, 3);
 
-    /* writes the complete response (headers + body) to the connection */
-    connection->write_connection(
+    /* writes the headers and then the payload to the connection, the
+    buffer of the headers is released by the connection itself */
+    http_connection->write_flush(connection, (unsigned char *) headers_buffer, count, NULL, NULL);
+    http_connection->write_chunk(
         connection,
         (unsigned char *) response_buffer,
-        (unsigned int) (count + body_size),
+        body_size,
+        TRUE,
         _send_response_callback_handler_lua,
         (void *) (size_t) http_request->flags
     );

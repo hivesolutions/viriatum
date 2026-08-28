@@ -89,6 +89,7 @@ ERROR_CODE create_http_connection(struct http_connection_t **http_connection_poi
     http_connection->write_error = write_http_error;
     http_connection->write_status = write_status_http;
     http_connection->write_field = write_field_http;
+    http_connection->write_line = write_line_http;
     http_connection->write_end = write_end_http;
     http_connection->write_chunk = write_chunk_http;
     http_connection->write_flush = write_flush_http;

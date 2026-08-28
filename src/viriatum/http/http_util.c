@@ -102,6 +102,42 @@ ERROR_CODE write_chunk_http(
     RAISE_NO_ERROR;
 }
 
+size_t write_line_http(
+    struct connection_t *connection,
+    char *buffer,
+    size_t size,
+    size_t offset,
+    const char *line
+) {
+    /* allocates space for the name of the field, for the position of
+    the separator that closes it and for the substrates of the
+    connection that carry the writing operations */
+    char name[VIRIATUM_MAX_HEADER_SIZE];
+    const char *separator = strchr(line, ':');
+    size_t name_size;
+    struct io_connection_t *io_connection;
+    struct http_connection_t *http_connection;
+
+    /* a line that carries no separator at all is not a field and so
+    it is left out of the response */
+    if(separator == NULL) { return offset; }
+
+    name_size = (size_t) (separator - line);
+    if(name_size >= sizeof(name)) { return offset; }
+    memcpy(name, line, name_size);
+    name[name_size] = '\0';
+
+    /* moves past the separator and the space that usually follows it,
+    what remains is the value of the field */
+    separator++;
+    while(*separator == ' ') { separator++; }
+
+    io_connection = (struct io_connection_t *) connection->lower;
+    http_connection = (struct http_connection_t *) io_connection->lower;
+
+    return http_connection->write_field(connection, buffer, size, offset, name, separator);
+}
+
 ERROR_CODE write_flush_http(
     struct connection_t *connection,
     unsigned char *data,

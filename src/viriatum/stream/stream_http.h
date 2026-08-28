@@ -92,6 +92,14 @@ typedef size_t (*http_connection_status)(struct connection_t *, char *, size_t, 
 typedef size_t (*http_connection_field)(struct connection_t *, char *, size_t, size_t, const char *, const char *);
 
 /**
+ * Function used to append a header field that is given as a
+ * complete line to a response that is being built, the surfaces
+ * that let an application set its own fields produce them in that
+ * shape, which is the one of the wire of HTTP/1.1.
+ */
+typedef size_t (*http_connection_line)(struct connection_t *, char *, size_t, size_t, const char *);
+
+/**
  * Function used to close the header section of a response that
  * is being built in the provided buffer, the flag tells whether
  * the response carries a payload after the headers.
@@ -342,6 +350,12 @@ typedef struct http_connection_t {
      * that is being built.
      */
     http_connection_field write_field;
+
+    /**
+     * Function used to append a header field that is given as a
+     * complete line to a response that is being built.
+     */
+    http_connection_line write_line;
 
     /**
      * Function used to close the header section of a response that

@@ -171,51 +171,6 @@ static PyObject *_receive_handler_asgi(PyObject *self, PyObject *args) {
     return future;
 }
 
-/**
- * Writes a header field of the application into the response being
- * built, the application produces them as complete lines and so the
- * name and the value have to be told apart before they are handed
- * to the operations of the connection.
- *
- * @param http_connection The connection the response belongs to.
- * @param connection The connection the response is written on.
- * @param buffer The buffer the response is built in.
- * @param size The size in bytes of the provided buffer.
- * @param offset The position the field is written at.
- * @param header The complete line of the field.
- * @return The number of bytes the buffer holds.
- */
-static size_t _write_field_handler_asgi(
-    struct http_connection_t *http_connection,
-    struct connection_t *connection,
-    char *buffer,
-    size_t size,
-    size_t offset,
-    char *header
-) {
-    /* allocates space for the name of the field and for the position
-    of the separator that closes it */
-    char name[VIRIATUM_MAX_HEADER_SIZE];
-    char *separator = strchr(header, ':');
-    size_t name_size;
-
-    /* a line that carries no separator at all is not a field and so
-    it is left out of the response */
-    if(separator == NULL) { return offset; }
-
-    name_size = (size_t) (separator - header);
-    if(name_size >= sizeof(name)) { return offset; }
-    memcpy(name, header, name_size);
-    name[name_size] = '\0';
-
-    /* moves past the separator and the space that usually follows it,
-    what remains is the value of the field */
-    separator++;
-    while(*separator == ' ') { separator++; }
-
-    return http_connection->write_field(connection, buffer, size, offset, name, separator);
-}
-
 static ERROR_CODE _write_handler_asgi(struct handler_asgi_context_t *handler_asgi_context, const char *data, size_t data_size, char last, PyObject *future) {
     /* allocates space for the buffer receiving the payload together
     with the counter of the bytes already written into it */
@@ -354,8 +309,7 @@ static ERROR_CODE _send_headers_handler_asgi(struct handler_asgi_context_t *hand
     /* iterates over the complete set of headers set by the application
     writing each one of them into the headers buffer */
     for(index = 0; index < handler_asgi_context->response_header_count; index++) {
-        count = _write_field_handler_asgi(
-            http_connection,
+        count = http_connection->write_line(
             connection,
             buffer,
             buffer_size,

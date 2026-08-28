@@ -249,6 +249,28 @@ ERROR_CODE write_flush_http(
     void *parameters
 );
 
+/**
+ * Writes a header field that is given as a complete line into the
+ * response being built, telling the name and the value apart before
+ * handing them to the operations of the connection.
+ * The surfaces that let an application set its own fields produce
+ * them in this shape, which is the one of the wire of HTTP/1.1.
+ *
+ * @param connection The connection the response belongs to.
+ * @param buffer The buffer the response is built in.
+ * @param size The size in bytes of the provided buffer.
+ * @param offset The position the field is written at.
+ * @param line The complete line of the field.
+ * @return The number of bytes the buffer holds.
+ */
+size_t write_line_http(
+    struct connection_t *connection,
+    char *buffer,
+    size_t size,
+    size_t offset,
+    const char *line
+);
+
 size_t write_http_headers(
     struct connection_t *connection,
     char *buffer,

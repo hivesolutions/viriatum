@@ -62,7 +62,9 @@ ERROR_CODE _send_response_handler_gif(struct http_request_t *http_request) {
     send the data to the client side and for the counter
     that stores the size of the buffer to be sent*/
     char *buffer;
+    char *body;
     size_t count;
+    char length[32];
 
     /* retrieves the connection from the HTTP parser parameters */
     struct connection_t *connection = (struct connection_t *) http_request->parameters;
@@ -82,34 +84,56 @@ ERROR_CODE _send_response_handler_gif(struct http_request_t *http_request) {
     writes the message into the current HTTP connection, the message should
     be composed of an empty GIF */
     http_connection->acquire(http_connection);
-    count = http_connection->write_headers_c(
+    count = http_connection->write_status(
         connection,
         buffer,
-        VIRIATUM_HTTP_SIZE,
-        HTTP11,
+        VIRIATUM_HTTP_MAX_SIZE,
+        http_request->version,
         200,
         "OK",
-        http_request->flags & FLAG_KEEP_ALIVE ? KEEP_ALIVE : KEEP_CLOSE,
-        _empty_gif_size,
-        MAX_AGE,
-        FALSE
+        http_request->flags & FLAG_KEEP_ALIVE ? KEEP_ALIVE : KEEP_CLOSE
     );
-    count += SPRINTF(
-        &buffer[count],
-        VIRIATUM_HTTP_SIZE - count,
-        CONTENT_TYPE_H ": %s\r\n\r\n",
+    SPRINTF(length, sizeof(length), "%lu", (long unsigned int) _empty_gif_size);
+    count = http_connection->write_field(
+        connection,
+        buffer,
+        VIRIATUM_HTTP_MAX_SIZE,
+        count,
+        CONTENT_LENGTH_H,
+        length
+    );
+    count = http_connection->write_field(
+        connection,
+        buffer,
+        VIRIATUM_HTTP_MAX_SIZE,
+        count,
+        CACHE_CONTROL_H,
+        cache_codes[MAX_AGE - 1]
+    );
+    count = http_connection->write_field(
+        connection,
+        buffer,
+        VIRIATUM_HTTP_MAX_SIZE,
+        count,
+        CONTENT_TYPE_H,
         "image/gif"
     );
-    memcpy(&buffer[count], _empty_gif, _empty_gif_size);
-    count += _empty_gif_size;
+    count = http_connection->write_end(connection, buffer, VIRIATUM_HTTP_MAX_SIZE, count, FALSE);
+
+    /* gathers the payload into a buffer of its own, the protocol is
+    the one framing it and so it travels as a write of its own */
+    connection->alloc_data(connection, _empty_gif_size, (void **) &body);
+    memcpy(body, _empty_gif, _empty_gif_size);
 
     /* writes the response to the connection, this will write the
     complete message to the connection, upon finishing the sent operation
     the callback will be called for finish operations */
-    connection->write_connection(
+    http_connection->write_flush(connection, (unsigned char *) buffer, count, NULL, NULL);
+    http_connection->write_chunk(
         connection,
-        (unsigned char *) buffer,
-        (unsigned int) count,
+        (unsigned char *) body,
+        _empty_gif_size,
+        TRUE,
         _send_response_callback_handler_gif,
         (void *) (size_t) http_request->flags
     );
