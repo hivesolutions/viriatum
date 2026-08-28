@@ -25,8 +25,10 @@
 #include "stdafx.h"
 
 #include "simple_test.h"
+#include "handler_default_test.h"
 #include "handler_dispatch_test.h"
 #include "handler_file_test.h"
+#include "handler_proxy_test.h"
 #include "hpack_test.h"
 #include "http2_test.h"
 #include "runner_test.h"
@@ -1289,6 +1291,22 @@ static struct test_entry_t _simple_entries[] = {
     V_TEST_C(test_handler_file_url, "handler", setup_handler_file_test, cleanup_handler_file_test),
     V_TEST_T(test_handler_file_header_field, "handler"),
     V_TEST_T(test_handler_file_header_value, "handler"),
+    V_TEST_T(test_handler_file_response, "handler"),
+    V_TEST_T(test_handler_file_range, "handler"),
+    V_TEST_T(test_handler_file_missing, "handler"),
+    V_TEST_T(test_handler_file_directory, "handler"),
+    V_TEST_T(test_handler_file_path, "handler"),
+    V_TEST_T(test_handler_file_location, "handler"),
+    V_TEST_T(test_handler_file_handler, "handler"),
+    V_TEST_T(test_handler_file_push, "handler"),
+    V_TEST_T(test_handler_default_response, "handler"),
+    V_TEST_T(test_handler_default_close, "handler"),
+    V_TEST_T(test_handler_default_stream, "handler"),
+    V_TEST_T(test_handler_proxy_request, "handler"),
+    V_TEST_T(test_handler_proxy_response, "handler"),
+    V_TEST_T(test_handler_proxy_gateway, "handler"),
+    V_TEST_T(test_handler_proxy_upstream, "handler"),
+    V_TEST_T(test_handler_proxy_handler, "handler"),
     V_TEST_T(test_hpack_table, "hpack"),
     V_TEST_T(test_hpack_table_resize, "hpack"),
     V_TEST_T(test_hpack_table_insert, "hpack"),
@@ -1322,10 +1340,13 @@ static struct test_entry_t _simple_entries[] = {
     V_TEST_T(test_http2_connection_headers, "http2"),
     V_TEST_T(test_http2_connection_fields, "http2"),
     V_TEST_T(test_http2_connection_continuation, "http2"),
+    V_TEST_T(test_http2_connection_trailers, "http2"),
+    V_TEST_T(test_http2_connection_closed, "http2"),
     V_TEST_T(test_http2_connection_data, "http2"),
     V_TEST_T(test_http2_connection_errors, "http2"),
     V_TEST_T(test_http2_connection_read, "http2"),
     V_TEST_T(test_http2_connection_preface, "http2"),
+    V_TEST_T(test_http2_connection_detect, "http2"),
     V_TEST_T(test_http2_connection_response, "http2"),
     V_TEST_T(test_http2_connection_complete, "http2"),
     V_TEST_T(test_http2_connection_error, "http2"),
@@ -1341,12 +1362,14 @@ static struct test_entry_t _simple_entries[] = {
     V_TEST_T(test_websocket_is_control, "websocket"),
     V_TEST_T(test_websocket_close_code, "websocket"),
     V_TEST_T(test_dispatch_handler_context_keepalive, "handler"),
+    V_TEST_T(test_dispatch_handler_response, "handler"),
     V_TEST_T(test_delete_service, "service"),
     V_TEST_T(test_create_service_options, "service"),
     V_TEST_T(test_calculate_locations_service, "service"),
     V_TEST_T(test_open_close_service, "service"),
     V_TEST_T(test_open_service_busy, "service"),
     V_TEST_T(test_file_options_service, "service"),
+    V_TEST_T(test_arguments_options_service, "service"),
     V_TEST_T(test_ran_service, "service")
 };
 

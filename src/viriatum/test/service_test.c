@@ -290,3 +290,51 @@ const char *test_ran_service(void) {
     nothing to report for this execution */
     return NULL;
 }
+const char *test_arguments_options_service(void) {
+    /* allocates space for the service, for the map of the arguments
+    that the command line produces and for one of them */
+    ERROR_CODE error;
+    struct service_t *service;
+    struct hash_map_t *arguments;
+    struct argument_t argument;
+
+    /* creates the service together with the empty map of the
+    arguments, the options of it start at the default values */
+    create_service(
+        &service,
+        (unsigned char *) "test",
+        (unsigned char *) "test"
+    );
+    create_hash_map(&arguments, 0);
+
+    /* the cleartext form of the most recent version of the protocol
+    is served by default, no argument is required for it */
+    V_ASSERT_EQ_U(service->options->http2, VIRIATUM_DEFAULT_HTTP2);
+
+    /* an empty map leaves every one of the options at the value it
+    already carries, nothing at all is overridden */
+    error = _comand_line_options_service(service, arguments);
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT_EQ_U(service->options->http2, VIRIATUM_DEFAULT_HTTP2);
+
+    /* the presence of the argument is what turns the serving of the
+    cleartext form off, the value of it carries no meaning */
+    argument.type = VALUE_ARGUMENT;
+    SPRINTF(argument.key, sizeof(argument.key), "%s", "no-http2");
+    argument.value[0] = '\0';
+    set_value_string_hash_map(arguments, (unsigned char *) "no-http2", (void *) &argument);
+
+    error = _comand_line_options_service(service, arguments);
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT_EQ_U(service->options->http2, 0);
+
+    /* deletes the map of the arguments and the service, the options
+    of it are released together with it */
+    delete_hash_map(arguments);
+    delete_service(service);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+

@@ -26,6 +26,20 @@
 
 #include "hpack_test.h"
 
+/**
+ * Counts the fields that reach it and gathers nothing at all, so
+ * that a test of the limits of the decoding is bounded by those
+ * rather than by the room of the collector.
+ *
+ * @param parameters The counter to be incremented.
+ * @param hpack_header The header field that has been decoded.
+ * @return The resulting error code.
+ */
+static ERROR_CODE _count_hpack_test(void *parameters, struct hpack_header_t *hpack_header) {
+    (*(size_t *) parameters)++;
+    RAISE_NO_ERROR;
+}
+
 ERROR_CODE collect_hpack_test(void *parameters, struct hpack_header_t *hpack_header) {
     /* retrieves the collector out of the opaque parameters and then
     verifies that there's still room for one more field */
@@ -383,6 +397,12 @@ const char *test_hpack_integer(void) {
     than being written past its end */
     offset = 0;
     error = encode_integer_hpack(buffer, 1, &offset, 5, 0x00, 1337);
+    V_ASSERT(IS_ERROR_CODE(error));
+
+    /* a buffer that takes the continuation but not the byte that
+    closes the value is refused just the same */
+    offset = 0;
+    error = encode_integer_hpack(buffer, 2, &offset, 5, 0x00, 1337);
     V_ASSERT(IS_ERROR_CODE(error));
 
     offset = 0;
@@ -795,6 +815,7 @@ const char *test_hpack_decode_limits(void) {
     unsigned char block[HPACK_MAX_HEADER_LIST_SIZE / HPACK_ENTRY_OVERHEAD];
     unsigned char name[HPACK_MAX_NAME_SIZE + 16];
     size_t index;
+    size_t count;
     ERROR_CODE error;
 
     /* creates the dynamic table, the blocks that follow are decoded
@@ -803,11 +824,13 @@ const char *test_hpack_decode_limits(void) {
 
     /* a block made only of indexed representations expands into a
     header list far larger than the block itself, which is the
-    compression bomb that the limit of the list guards against */
+    compression bomb that the limit of the list guards against, the
+    fields are only counted so that nothing else bounds the block */
     for(index = 0; index < sizeof(block); index++) { block[index] = 0x82; }
-    collector.count = 0;
-    error = decode_hpack(hpack_table, block, sizeof(block), collect_hpack_test, (void *) &collector);
+    count = 0;
+    error = decode_hpack(hpack_table, block, sizeof(block), _count_hpack_test, (void *) &count);
     V_ASSERT(IS_ERROR_CODE(error));
+    V_ASSERT(count > HPACK_TEST_MAX_HEADERS);
 
     /* an entry whose name is larger than the buffer that receives it
     is refused when a representation refers to it, the name has to be
@@ -825,6 +848,25 @@ const char *test_hpack_decode_limits(void) {
     collector.count = 0;
     error = decode_hpack(hpack_table, block, 2, collect_hpack_test, (void *) &collector);
     V_ASSERT(IS_ERROR_CODE(error));
+
+    /* a size update is only ever allowed at the very start of a
+    block, the one that follows a field is a decoding error */
+    block[0] = 0x82;
+    block[1] = 0x20;
+    count = 0;
+    error = decode_hpack(hpack_table, block, 2, _count_hpack_test, (void *) &count);
+    V_ASSERT(IS_ERROR_CODE(error));
+    V_ASSERT_EQ_U(count, 1);
+
+    /* the very same update at the start of the block is accepted, it
+    is the place the specification puts it at */
+    block[0] = 0x20;
+    block[1] = 0x82;
+    count = 0;
+    error = decode_hpack(hpack_table, block, 2, _count_hpack_test, (void *) &count);
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT_EQ_U(count, 1);
+    V_ASSERT_EQ_U(hpack_table->max_size, 0);
 
     /* deletes the dynamic table */
     delete_hpack_table(hpack_table);

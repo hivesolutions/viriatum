@@ -128,9 +128,12 @@ ERROR_CODE register_write_test_connection(struct connection_t *connection);
  * write has actually left this end.
  *
  * @param context The test context holding the connection.
- * @return The number of the writes that have been completed.
+ * @param buffer The buffer to gather what has been written into,
+ * it may be left unset when the contents are of no interest.
+ * @param buffer_size The size in bytes of the provided buffer.
+ * @return The number of the bytes that have been gathered.
  */
-size_t flush_test_connection(struct test_context_t *context);
+size_t flush_test_connection(struct test_context_t *context, unsigned char *buffer, size_t buffer_size);
 
 /**
  * Builds the io and the HTTP connection layers on top of

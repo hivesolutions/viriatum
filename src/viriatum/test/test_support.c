@@ -108,26 +108,30 @@ ERROR_CODE register_write_test_connection(struct connection_t *connection) {
     RAISE_NO_ERROR;
 }
 
-size_t flush_test_connection(struct test_context_t *context) {
+size_t flush_test_connection(struct test_context_t *context, unsigned char *buffer, size_t buffer_size) {
     /* allocates space for the data being taken out of the queue and
-    for the number of the writes that have been completed */
+    for the position that the gathering of it reaches */
     struct data_t *data;
-    size_t count = 0;
+    size_t offset = 0;
 
     /* completes every one of the writes that are queued, in the very
-    same sequence the io layer of a connection would */
+    same sequence the io layer of a connection would, the completion
+    of one of them may well queue the part that follows it */
     while(context->connection->write_queue->size > 0) {
         pop_value_linked_list(context->connection->write_queue, (void **) &data, TRUE);
         if(data == NULL) { break; }
+        if(buffer != NULL && offset + data->size <= buffer_size) {
+            memcpy(&buffer[offset], data->data, data->size);
+            offset += data->size;
+        }
         if(data->callback != NULL) {
             data->callback(context->connection, data, data->callback_parameters);
         }
         delete_data(data);
-        count++;
     }
 
-    /* returns the number of the writes that have been completed */
-    return count;
+    /* returns the number of the bytes that have been gathered */
+    return offset;
 }
 
 void create_test_connection(struct test_context_t *context) {

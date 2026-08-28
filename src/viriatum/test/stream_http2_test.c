@@ -168,6 +168,24 @@ static ERROR_CODE _unset_http2_test(struct http_connection_t *http_connection) {
 }
 
 /**
+ * Installs the handler that records the pipeline as the one a new
+ * message of the provided connection is served by, forgetting
+ * whatever the test that ran before this one has produced.
+ *
+ * @param context The test context to install the handler on.
+ */
+static void _install_http2_test(struct test_context_t *context) {
+    _handler.name = (unsigned char *) "record";
+    _handler.resolve_index = FALSE;
+    _handler.set = _set_http2_test;
+    _handler.unset = _unset_http2_test;
+    _handler.reset = NULL;
+    context->http_connection->base_handler = &_handler;
+
+    memset(&_record, 0, sizeof(_record));
+}
+
+/**
  * Builds the chain of a connection together with the session that
  * drives the protocol over it, installing the handler that the
  * tests observe as the one a new message is served by.
@@ -182,19 +200,7 @@ static void _create_http2_test(struct test_context_t **context_pointer, struct h
 
     create_test_context(&context);
     create_test_connection(context);
-
-    /* installs the handler that records the pipeline as the one a
-    new message is served by */
-    _handler.name = (unsigned char *) "record";
-    _handler.resolve_index = FALSE;
-    _handler.set = _set_http2_test;
-    _handler.unset = _unset_http2_test;
-    _handler.reset = NULL;
-    context->http_connection->base_handler = &_handler;
-
-    /* resets the record so that a test never observes what the one
-    that ran before it has produced */
-    memset(&_record, 0, sizeof(_record));
+    _install_http2_test(context);
 
     create_http2_connection(http2_connection_pointer, context->http_connection);
     *context_pointer = context;
@@ -1146,6 +1152,185 @@ const char *test_http2_connection_continuation(void) {
     return NULL;
 }
 
+const char *test_http2_connection_trailers(void) {
+    /* allocates space for the chain of the connection, for the
+    session and for the blocks that the streams carry */
+    struct test_context_t *context;
+    struct http2_connection_t *http2_connection;
+    struct http2_stream_t *http2_stream;
+    struct http2_frame_t http2_frame;
+    struct hpack_table_t *encoder;
+    struct hpack_header_t hpack_header;
+    unsigned char block[256];
+    unsigned char payload[8];
+    size_t offset;
+    size_t index;
+    ERROR_CODE error;
+
+    _create_http2_test(&context, &http2_connection);
+
+    /* opens a stream with a message that carries a payload, so that
+    the section of the trailers is allowed to follow it */
+    http2_frame.type = HTTP2_HEADERS;
+    http2_frame.flags = HTTP2_FLAG_END_HEADERS;
+    http2_frame.stream_id = 1;
+    http2_frame.length = _request_http2_test(block, sizeof(block), "/trailers");
+    http2_frame.payload = block;
+    error = handle_frame_http2_connection(http2_connection, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+    V_ASSERT_EQ_U(_record.headers, 1);
+
+    /* the section of the trailers is a second block on the very same
+    stream and it is required to close it */
+    create_hpack_table(&encoder);
+    offset = 0;
+    hpack_header.name = (unsigned char *) "x-checksum";
+    hpack_header.name_size = 10;
+    hpack_header.value = (unsigned char *) "1234";
+    hpack_header.value_size = 4;
+    encode_hpack(encoder, block, sizeof(block), &offset, &hpack_header, FALSE);
+    delete_hpack_table(encoder);
+
+    http2_frame.flags = HTTP2_FLAG_END_HEADERS;
+    http2_frame.length = offset;
+    error = handle_frame_http2_connection(http2_connection, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_PROTOCOL_ERROR);
+
+    http2_frame.flags = HTTP2_FLAG_END_HEADERS | HTTP2_FLAG_END_STREAM;
+    error = handle_frame_http2_connection(http2_connection, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+
+    http2_stream = find_stream_http2_connection(http2_connection, 1);
+    V_ASSERT_NOT_NULL(http2_stream);
+    V_ASSERT(http2_stream->request->trailers == TRUE);
+    V_ASSERT_EQ_S(_record.name, "x-checksum");
+    V_ASSERT_EQ_S(_record.header, "1234");
+    V_ASSERT_EQ_U(_record.complete, 1);
+
+    _delete_http2_test(context, http2_connection);
+
+    /* a peer that opens more streams than this end has announced is
+    refused the excess rather than taken down */
+    _create_http2_test(&context, &http2_connection);
+    http2_connection->settings.max_concurrent_streams = 1;
+
+    http2_frame.type = HTTP2_HEADERS;
+    http2_frame.flags = HTTP2_FLAG_END_HEADERS | HTTP2_FLAG_END_STREAM;
+    http2_frame.payload = block;
+
+    for(index = 0; index < 2; index++) {
+        http2_frame.stream_id = (unsigned int) (index * 2 + 1);
+        http2_frame.length = _request_http2_test(block, sizeof(block), "/many");
+        error = handle_frame_http2_connection(http2_connection, &http2_frame);
+        V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+    }
+
+    V_ASSERT_EQ_U(http2_connection->count, 1);
+    V_ASSERT_NULL(find_stream_http2_connection(http2_connection, 3));
+
+    /* the stream that has been refused is told so through a frame of
+    its own, the connection carries on serving the other one */
+    V_ASSERT(context->connection->write_queue->size > 0);
+    V_ASSERT_EQ_U(get_closed_test_connection(), 0);
+
+    /* an increment that overflows the window of a stream takes only
+    that stream down, the connection is left alone */
+    http2_stream = find_stream_http2_connection(http2_connection, 1);
+    http2_stream->send_window = HTTP2_MAX_WINDOW_SIZE;
+    http2_frame.type = HTTP2_WINDOW_UPDATE;
+    http2_frame.flags = 0x00;
+    http2_frame.stream_id = 1;
+    http2_frame.length = 4;
+    encode_number_http2(payload, (unsigned int) HTTP2_MAX_WINDOW_SIZE);
+    http2_frame.payload = payload;
+    error = handle_frame_http2_connection(http2_connection, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+    V_ASSERT_EQ_U(get_closed_test_connection(), 0);
+
+    _delete_http2_test(context, http2_connection);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_http2_connection_closed(void) {
+    /* allocates space for the chain of the connection, for the
+    session and for the buffers that are written on it */
+    struct test_context_t *context;
+    struct http2_connection_t *http2_connection;
+    struct http2_stream_t *http2_stream;
+    struct http2_frame_t http2_frame;
+    unsigned char block[256];
+    char *headers;
+    unsigned char *message;
+    size_t count;
+    ERROR_CODE error;
+
+    /* gathers the number of allocations that are outstanding so that
+    a write that is discarded may be verified to release its buffer */
+    size_t allocated = ALLOCATIONS;
+
+    _create_http2_test(&context, &http2_connection);
+
+    /* opens a stream, answers nothing at all and closes it, the
+    handler of a message is free to answer it later than that */
+    http2_frame.type = HTTP2_HEADERS;
+    http2_frame.flags = HTTP2_FLAG_END_HEADERS | HTTP2_FLAG_END_STREAM;
+    http2_frame.stream_id = 1;
+    http2_frame.length = _request_http2_test(block, sizeof(block), "/gone");
+    http2_frame.payload = block;
+    error = handle_frame_http2_connection(http2_connection, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+
+    /* the message of the stream stays the current one, the writing
+    operations resolve the stream out of it */
+    http2_stream = find_stream_http2_connection(http2_connection, 1);
+    V_ASSERT_NOT_NULL(http2_stream);
+    context->http_connection->request = http2_stream->request;
+
+    /* a response that closes the message together with the block of
+    the headers carries the flag that marks the end of the stream */
+    headers = (char *) MALLOC(VIRIATUM_HTTP_SIZE);
+    count = write_status_http2(
+        context->connection,
+        headers,
+        VIRIATUM_HTTP_SIZE,
+        HTTP20,
+        204,
+        "No Content",
+        KEEP_ALIVE
+    );
+    count = write_end_http2(context->connection, headers, VIRIATUM_HTTP_SIZE, count, TRUE);
+    V_ASSERT(http2_stream->complete == TRUE);
+    error = write_flush_http2(context->connection, (unsigned char *) headers, count, NULL, NULL);
+    V_ASSERT_EQ_U(error, 0);
+
+    /* closes the stream and then writes for it, both of the writes
+    are discarded and the buffers of them released */
+    http2_stream = find_stream_http2_connection(http2_connection, 1);
+    close_stream_http2_connection(http2_connection, http2_stream);
+    V_ASSERT_NULL(context->http_connection->request);
+
+    headers = (char *) MALLOC(VIRIATUM_HTTP_SIZE);
+    error = write_flush_http2(context->connection, (unsigned char *) headers, 16, NULL, NULL);
+    V_ASSERT_EQ_U(error, 0);
+
+    message = (unsigned char *) MALLOC(16);
+    error = write_chunk_http2(context->connection, message, 16, TRUE, NULL, NULL);
+    V_ASSERT_EQ_U(error, 0);
+
+    _delete_http2_test(context, http2_connection);
+
+    /* the buffers of the writes that have been discarded are gone
+    together with the ones the response has taken */
+    V_ASSERT_EQ_U(ALLOCATIONS, allocated);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
 const char *test_http2_connection_data(void) {
     /* allocates space for the chain of the connection, for the
     session and for the frames being handled */
@@ -1377,7 +1562,7 @@ const char *test_http2_connection_read(void) {
 
     /* the completion of the write of that frame is what takes the
     connection down, the peer learns the reason first */
-    flush_test_connection(context);
+    flush_test_connection(context, NULL, 0);
     V_ASSERT_EQ_U(get_closed_test_connection(), 1);
 
     delete_http2_connection(http2_connection);
@@ -1441,6 +1626,70 @@ static size_t _written_http2_test(struct test_context_t *context, unsigned char 
     }
 
     return offset;
+}
+
+const char *test_http2_connection_detect(void) {
+    /* allocates space for the chain of the connection and for the
+    bytes that tell the two versions of the protocol apart */
+    struct test_context_t *context;
+    unsigned char preface[HTTP2_PREFACE_SIZE];
+    size_t split = HTTP2_PREFACE_SIZE / 2;
+    ERROR_CODE error;
+
+    /* a connection that starts with a message of HTTP/1.1 is never
+    taken over, the decision is taken once and only once */
+    create_test_context(&context);
+    create_test_connection(context);
+    _install_http2_test(context);
+    V_ASSERT(context->http_connection->detect == TRUE);
+
+    error = data_handler_stream_http(
+        context->io_connection,
+        (unsigned char *) "GET / HT",
+        8
+    );
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT(context->http_connection->detect == FALSE);
+    V_ASSERT_NULL(context->http_connection->http2_connection);
+
+    delete_test_connection(context);
+    delete_test_context(context);
+
+    /* a connection that starts with the preface is taken over by a
+    session, the bytes of it arriving over as many reads as the peer
+    happens to have used */
+    create_test_context(&context);
+    create_test_connection(context);
+    _install_http2_test(context);
+    memcpy(preface, HTTP2_PREFACE, HTTP2_PREFACE_SIZE);
+
+    error = data_handler_stream_http(context->io_connection, preface, split);
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT(context->http_connection->detect == TRUE);
+    V_ASSERT_NULL(context->http_connection->http2_connection);
+
+    error = data_handler_stream_http(
+        context->io_connection,
+        &preface[split],
+        HTTP2_PREFACE_SIZE - split
+    );
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT(context->http_connection->detect == FALSE);
+    V_ASSERT_NOT_NULL(context->http_connection->http2_connection);
+    V_ASSERT(context->http_connection->http2_connection->preface == TRUE);
+
+    /* the settings of this end have gone out as soon as the session
+    has taken the connection over, which is what the peer waits for */
+    V_ASSERT(context->connection->write_queue->size > 0);
+
+    /* the session is released together with the connection that was
+    being driven by it, nothing else holds it */
+    delete_test_connection(context);
+    delete_test_context(context);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
 }
 
 const char *test_http2_connection_response(void) {
@@ -1547,7 +1796,8 @@ const char *test_http2_connection_complete(void) {
     struct http2_connection_t *http2_connection;
     struct http2_frame_t http2_frame;
     unsigned char block[256];
-    size_t count;
+    unsigned char written[1024];
+    size_t size;
     ERROR_CODE error;
 
     /* gathers the number of allocations that are outstanding so that
@@ -1582,8 +1832,8 @@ const char *test_http2_connection_complete(void) {
 
     /* completes the writes, a stream only closes once the payload
     that closes the message of it has actually left this end */
-    count = flush_test_connection(context);
-    V_ASSERT(count > 0);
+    size = flush_test_connection(context, written, sizeof(written));
+    V_ASSERT(size > HTTP2_HEADER_SIZE);
     V_ASSERT_EQ_U(http2_connection->count, 0);
     V_ASSERT_EQ_U(http2_connection->callbacks->size, 0);
     V_ASSERT_NULL(find_stream_http2_connection(http2_connection, 1));

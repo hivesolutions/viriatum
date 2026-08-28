@@ -300,3 +300,542 @@ const char *test_handler_file_header_value(void) {
     nothing to report for this execution */
     return NULL;
 }
+/**
+ * The name of the file that the tests of the response serve, it is
+ * written into the directory the process is running from and taken
+ * out of it once the test that uses it is done.
+ */
+#define HANDLER_FILE_TEST_NAME "viriatum_handler_file_test.txt"
+
+/**
+ * The path of that very same file, both of the values are kept
+ * apart as the url of a request carries the leading slash.
+ */
+#define HANDLER_FILE_TEST_PATH "./" HANDLER_FILE_TEST_NAME
+
+/**
+ * The contents that the file carries, the response of a request
+ * for it is verified against them.
+ */
+#define HANDLER_FILE_TEST_CONTENTS "hello"
+
+/**
+ * The handler that stands in for the one a message is served by, it
+ * is only ever required so that the release of a message reaches
+ * something, it installs no callback of its own.
+ */
+static struct http_handler_t _handler;
+
+static ERROR_CODE _set_handler_file_test(struct http_connection_t *http_connection) {
+    RAISE_NO_ERROR;
+}
+
+static ERROR_CODE _unset_handler_file_test(struct http_connection_t *http_connection) {
+    RAISE_NO_ERROR;
+}
+
+/**
+ * Builds the complete chain of a connection together with the
+ * message and the context that a request for a file is served
+ * through, so that the response of it may be observed.
+ * The contents that are served are written to the file system as
+ * the handler reads the resource out of it.
+ *
+ * @param context_pointer The pointer to the test context that has
+ * been built.
+ * @param http_request_pointer The pointer to the message that is
+ * going to be served.
+ * @param handler_file_context_pointer The pointer to the context
+ * that the handler carries along the message.
+ */
+static void _create_handler_file_test(
+    struct test_context_t **context_pointer,
+    struct http_request_t **http_request_pointer,
+    struct handler_file_context_t **handler_file_context_pointer
+) {
+    struct test_context_t *context;
+    struct http_request_t *http_request;
+    struct handler_file_context_t *handler_file_context;
+
+    /* writes the file that is going to be served, the directory of
+    the process is the one the handler resolves the url against */
+    write_file(
+        (char *) HANDLER_FILE_TEST_PATH,
+        (unsigned char *) HANDLER_FILE_TEST_CONTENTS,
+        sizeof(HANDLER_FILE_TEST_CONTENTS) - 1
+    );
+
+    create_test_context(&context);
+    create_test_connection(context);
+
+    /* points the contents of the service at the directory of the
+    process, which is where the file has just been written */
+    SPRINTF((char *) context->options->contents_path, VIRIATUM_MAX_PATH_SIZE, "%s", ".");
+
+    /* sets the type of the extension of the file being served, the
+    response of it announces the one that matches */
+    set_value_string_hash_map(
+        context->options->mime_types,
+        (unsigned char *) ".txt",
+        "text/plain"
+    );
+
+    /* installs the handler that stands in for the one a message is
+    served by, the release of a message reaches it */
+    _handler.name = (unsigned char *) "file";
+    _handler.resolve_index = FALSE;
+    _handler.set = _set_handler_file_test;
+    _handler.unset = _unset_handler_file_test;
+    _handler.reset = NULL;
+    context->http_connection->base_handler = &_handler;
+    context->http_connection->http_handler = &_handler;
+
+    create_http_request(&http_request);
+    create_handler_file_context(&handler_file_context);
+    http_request->context = handler_file_context;
+    http_request->parameters = context->connection;
+    http_request->method = HTTP_GET;
+    http_request->version = HTTP11;
+    http_request->flags = FLAG_KEEP_ALIVE;
+
+    *context_pointer = context;
+    *http_request_pointer = http_request;
+    *handler_file_context_pointer = handler_file_context;
+}
+
+/**
+ * Releases the chain of a connection together with the message and
+ * the context that were being served over it, taking the file that
+ * has been served out of the file system.
+ *
+ * @param context The test context to be released.
+ * @param http_request The message to be released.
+ * @param handler_file_context The context to be released.
+ */
+static void _delete_handler_file_test(
+    struct test_context_t *context,
+    struct http_request_t *http_request,
+    struct handler_file_context_t *handler_file_context
+) {
+    delete_handler_file_context(handler_file_context);
+    delete_http_request(http_request);
+    delete_test_connection(context);
+    delete_test_context(context);
+    remove(HANDLER_FILE_TEST_PATH);
+}
+
+const char *test_handler_file_response(void) {
+    /* allocates space for the chain of the connection, for the
+    message being served and for the response it produces */
+    struct test_context_t *context;
+    struct http_request_t *http_request;
+    struct handler_file_context_t *handler_file_context;
+    unsigned char written[2048];
+    size_t size;
+    ERROR_CODE error;
+
+    _create_handler_file_test(&context, &http_request, &handler_file_context);
+
+    /* drives the message through the callbacks of the handler, the
+    very same sequence that the parser of a connection produces */
+    error = url_callback_handler_file(
+        http_request,
+        (unsigned char *) "/" HANDLER_FILE_TEST_NAME,
+        sizeof(HANDLER_FILE_TEST_NAME)
+    );
+    V_ASSERT(error == 0);
+    error = message_complete_callback_handler_file(http_request);
+    V_ASSERT(error == 0);
+
+    /* completes the writes, the payload of the file is queued by the
+    completion of the write that carries the headers */
+    size = flush_test_connection(context, written, sizeof(written));
+    V_ASSERT(size > 0 && size < sizeof(written));
+    written[size] = '\0';
+
+    /* the response carries the line of the status, the size of the
+    payload and the fields that describe the resource */
+    V_ASSERT(strstr((char *) written, "HTTP/1.1 200 OK\r\n") == (char *) written);
+    V_ASSERT_NOT_NULL(strstr((char *) written, "Content-Length: 5\r\n"));
+    V_ASSERT_NOT_NULL(strstr((char *) written, "Accept-Ranges: bytes\r\n"));
+    V_ASSERT_NOT_NULL(strstr((char *) written, "Content-Type: text/plain\r\n"));
+    V_ASSERT_NOT_NULL(strstr((char *) written, "ETag: \""));
+
+    /* the payload of the file follows the headers, the empty line is
+    what separates the two of them */
+    V_ASSERT_NOT_NULL(strstr((char *) written, "\r\n\r\n" HANDLER_FILE_TEST_CONTENTS));
+
+    /* the message is meant to be kept alive, so the completion of the
+    last of the writes does not take the connection down */
+    V_ASSERT_EQ_U(get_closed_test_connection(), 0);
+
+    _delete_handler_file_test(context, http_request, handler_file_context);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_handler_file_range(void) {
+    /* allocates space for the chain of the connection, for the
+    message being served and for the response it produces */
+    struct test_context_t *context;
+    struct http_request_t *http_request;
+    struct handler_file_context_t *handler_file_context;
+    unsigned char written[2048];
+    size_t size;
+    ERROR_CODE error;
+
+    _create_handler_file_test(&context, &http_request, &handler_file_context);
+
+    /* asks for a part of the resource rather than the complete one,
+    the field is the one that announces the range being asked for */
+    error = url_callback_handler_file(
+        http_request,
+        (unsigned char *) "/" HANDLER_FILE_TEST_NAME,
+        sizeof(HANDLER_FILE_TEST_NAME)
+    );
+    V_ASSERT(error == 0);
+    header_field_callback_handler_file(http_request, (unsigned char *) "Range", 5);
+    header_value_callback_handler_file(http_request, (unsigned char *) "bytes=1-3", 9);
+    V_ASSERT(handler_file_context->range_status == 2);
+
+    error = message_complete_callback_handler_file(http_request);
+    V_ASSERT(error == 0);
+
+    size = flush_test_connection(context, written, sizeof(written));
+    V_ASSERT(size > 0 && size < sizeof(written));
+    written[size] = '\0';
+
+    /* only the part that has been asked for is served, the status of
+    the response and the field of the range describe it */
+    V_ASSERT(strstr((char *) written, "HTTP/1.1 206 Partial content\r\n") == (char *) written);
+    V_ASSERT_NOT_NULL(strstr((char *) written, "Content-Length: 3\r\n"));
+    V_ASSERT_NOT_NULL(strstr((char *) written, "Content-Range: bytes 1-3/5\r\n"));
+    V_ASSERT_NOT_NULL(strstr((char *) written, "\r\n\r\nell"));
+
+    _delete_handler_file_test(context, http_request, handler_file_context);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_handler_file_missing(void) {
+    /* allocates space for the chain of the connection, for the
+    message being served and for the response it produces */
+    struct test_context_t *context;
+    struct http_request_t *http_request;
+    struct handler_file_context_t *handler_file_context;
+    unsigned char written[2048];
+    size_t size;
+    ERROR_CODE error;
+
+    _create_handler_file_test(&context, &http_request, &handler_file_context);
+
+    /* asks for a resource that does not exist at all, the handler
+    answers it with the error that describes the absence of it */
+    error = url_callback_handler_file(http_request, (unsigned char *) "/absent.txt", 11);
+    V_ASSERT(error == 0);
+    error = message_complete_callback_handler_file(http_request);
+    V_ASSERT(error == 0);
+
+    size = flush_test_connection(context, written, sizeof(written));
+    V_ASSERT(size > 0 && size < sizeof(written));
+    written[size] = '\0';
+
+    V_ASSERT(strstr((char *) written, "HTTP/1.1 404 Not Found\r\n") == (char *) written);
+    V_ASSERT_NOT_NULL(strstr((char *) written, "\r\n\r\n404 - Not Found - "));
+    V_ASSERT_EQ_U(get_closed_test_connection(), 0);
+
+    _delete_handler_file_test(context, http_request, handler_file_context);
+
+    /* a message that is not meant to be kept alive takes the
+    connection down once the response of it has gone out */
+    _create_handler_file_test(&context, &http_request, &handler_file_context);
+    http_request->flags = 0;
+    url_callback_handler_file(http_request, (unsigned char *) "/absent.txt", 11);
+    message_complete_callback_handler_file(http_request);
+    V_ASSERT_EQ_U(get_closed_test_connection(), 0);
+    flush_test_connection(context, NULL, 0);
+    V_ASSERT_EQ_U(get_closed_test_connection(), 1);
+
+    _delete_handler_file_test(context, http_request, handler_file_context);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_handler_file_push(void) {
+    /* allocates space for the chain of the connection, for the
+    session and for the promises that the location produces */
+    struct test_context_t *context;
+    struct http2_connection_t *http2_connection;
+    struct http2_stream_t *http2_stream;
+    struct http_request_t *http_request;
+    struct handler_file_context_t *handler_file_context;
+    struct http2_frame_t http2_frame;
+    struct data_t *data;
+    size_t queued;
+    ERROR_CODE error;
+
+    _create_handler_file_test(&context, &http_request, &handler_file_context);
+
+    /* the promising of a resource only exists under HTTP/2, so the
+    connection is driven by a session of it */
+    create_http2_connection(&http2_connection, context->http_connection);
+    open_stream_http2_connection(http2_connection, 1, &http2_stream);
+
+    /* the message of the stream is the one that is served, the one
+    that was built for HTTP/1.1 is released right away */
+    delete_http_request(http_request);
+    http_request = http2_stream->request;
+    http_request->context = handler_file_context;
+    http_request->method = HTTP_GET;
+    http_request->scheme = HTTP_SCHEME;
+    http2_stream->http_handler = &_handler;
+    context->http_connection->request = http_request;
+
+    /* the location of the request lists the resources that travel
+    together with it, they are separated by spaces */
+    handler_file_context->push = (unsigned char *) "/first.css /second.js";
+
+    error = url_callback_handler_file(
+        http_request,
+        (unsigned char *) "/" HANDLER_FILE_TEST_NAME,
+        sizeof(HANDLER_FILE_TEST_NAME)
+    );
+    V_ASSERT(error == 0);
+
+    queued = context->connection->write_queue->size;
+    error = message_complete_callback_handler_file(http_request);
+    V_ASSERT(error == 0);
+
+    /* every one of the resources of the list has reserved a stream
+    of its own, the identifiers of them are the even ones */
+    V_ASSERT_EQ_U(http2_connection->push_stream_id, 4);
+    V_ASSERT_NOT_NULL(find_stream_http2_connection(http2_connection, 2));
+    V_ASSERT_NOT_NULL(find_stream_http2_connection(http2_connection, 4));
+
+    /* the first of the frames that have gone out is the promise of
+    the first of the resources, it travels on the stream that has
+    asked for the one referring to them */
+    get_value_linked_list(context->connection->write_queue, queued, (void **) &data);
+    V_ASSERT_NOT_NULL(data);
+    error = decode_frame_http2(data->data, data->size, &http2_frame);
+    V_ASSERT(error == 0);
+    V_ASSERT(http2_frame.type == HTTP2_PUSH_PROMISE);
+    V_ASSERT(http2_frame.stream_id == 1);
+    V_ASSERT(decode_number_http2(http2_frame.payload) == 2);
+
+    /* the promise of the second of them follows the first and it
+    reserves the identifier that comes next */
+    get_value_linked_list(context->connection->write_queue, queued + 1, (void **) &data);
+    V_ASSERT_NOT_NULL(data);
+    error = decode_frame_http2(data->data, data->size, &http2_frame);
+    V_ASSERT(error == 0);
+    V_ASSERT(http2_frame.type == HTTP2_PUSH_PROMISE);
+    V_ASSERT(decode_number_http2(http2_frame.payload) == 4);
+
+    /* the response of the request has been written on the stream it
+    belongs to, so that one closes once every write of it completes
+    and the ones the promises reserved stay open */
+    flush_test_connection(context, NULL, 0);
+    V_ASSERT_NULL(find_stream_http2_connection(http2_connection, 1));
+    V_ASSERT_NOT_NULL(find_stream_http2_connection(http2_connection, 2));
+
+    delete_http2_connection(http2_connection);
+    delete_handler_file_context(handler_file_context);
+    delete_test_connection(context);
+    delete_test_context(context);
+    remove(HANDLER_FILE_TEST_PATH);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+const char *test_handler_file_directory(void) {
+    /* allocates space for the chain of the connection, for the
+    message being served and for the response it produces */
+    struct test_context_t *context;
+    struct http_request_t *http_request;
+    struct handler_file_context_t *handler_file_context;
+    unsigned char written[2048];
+    size_t size;
+    ERROR_CODE error;
+
+    _create_handler_file_test(&context, &http_request, &handler_file_context);
+
+    /* asks for a directory without the trailing slash, which is the
+    form that carries the confusion between a file and a directory */
+    error = url_callback_handler_file(http_request, (unsigned char *) "/.", 2);
+    V_ASSERT(error == 0);
+    error = message_complete_callback_handler_file(http_request);
+    V_ASSERT(error == 0);
+
+    size = flush_test_connection(context, written, sizeof(written));
+    V_ASSERT(size > 0 && size < sizeof(written));
+    written[size] = '\0';
+
+    /* the peer is sent to the very same place with the slash added,
+    so that the resources below it resolve against it */
+    V_ASSERT(strstr((char *) written, "HTTP/1.1 307 Temporary Redirect\r\n") == (char *) written);
+    V_ASSERT_NOT_NULL(strstr((char *) written, "Content-Length: 0\r\n"));
+    V_ASSERT_NOT_NULL(strstr((char *) written, "Location: /./\r\n"));
+
+    _delete_handler_file_test(context, http_request, handler_file_context);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_handler_file_path(void) {
+    /* allocates space for the chain of the connection, for the
+    message being served and for the context of the handler */
+    struct test_context_t *context;
+    struct http_request_t *http_request;
+    struct handler_file_context_t *handler_file_context;
+    ERROR_CODE error;
+
+    _create_handler_file_test(&context, &http_request, &handler_file_context);
+
+    /* a message that carries no base path at all resolves against
+    the contents of the service */
+    error = path_callback_handler_file(http_request, (unsigned char *) "/plain.txt", 10);
+    V_ASSERT(error == 0);
+    V_ASSERT_EQ_S((char *) handler_file_context->url, "/plain.txt");
+    V_ASSERT_EQ_S((char *) handler_file_context->file_path_d, "./plain.txt");
+
+    /* a base path takes the place of the contents of the service,
+    which is what a location of its own produces */
+    handler_file_context->base_path = (unsigned char *) "./base";
+    error = path_callback_handler_file(http_request, (unsigned char *) "/other.txt", 10);
+    V_ASSERT(error == 0);
+    V_ASSERT_EQ_S((char *) handler_file_context->file_path_d, "./base/other.txt");
+
+    /* the virtual url is the part of the url that is left once the
+    location has taken its own out of it */
+    error = virtual_url_callback_handler_file(http_request, (unsigned char *) "/virtual", 8);
+    V_ASSERT(error == 0);
+
+    _delete_handler_file_test(context, http_request, handler_file_context);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_handler_file_location(void) {
+    /* allocates space for the chain of the connection, for the
+    handler of the files and for the location it carries */
+    struct test_context_t *context;
+    struct http_request_t *http_request;
+    struct handler_file_context_t *handler_file_context;
+    struct file_handler_t *file_handler;
+    struct http_handler_t http_handler;
+    struct file_location_t location;
+    ERROR_CODE error;
+
+    _create_handler_file_test(&context, &http_request, &handler_file_context);
+
+    /* gathers the url of the message first, the matching of a
+    location happens over the one that has already been gathered */
+    error = url_callback_handler_file(http_request, (unsigned char *) "/located/one.txt", 16);
+    V_ASSERT(error == 0);
+
+    /* builds the handler of the files together with the single
+    location that the message is going to be matched against */
+    create_file_handler(&file_handler, &http_handler);
+    location.base_path = (unsigned char *) "./located";
+    location.auth_basic = (unsigned char *) "realm";
+    location.auth_file = (unsigned char *) "./passwords";
+    location.push = (unsigned char *) "/promised.css";
+    file_handler->locations = &location;
+    file_handler->locations_count = 1;
+
+    http_handler.name = (unsigned char *) "file";
+    context->http_connection->http_handler = &http_handler;
+
+    /* the matching of a location carries the settings of it into the
+    context, the resources to be promised among them, and the path of
+    the resource is resolved against the base path of it */
+    error = location_callback_handler_file(http_request, 0, 8);
+    V_ASSERT(error == 0);
+    V_ASSERT_EQ_S((char *) handler_file_context->file_path_d, "./located/one.txt");
+    V_ASSERT_EQ_P(handler_file_context->base_path, location.base_path);
+    V_ASSERT_EQ_P(handler_file_context->push, location.push);
+    V_ASSERT_EQ_P(handler_file_context->auth_basic, location.auth_basic);
+    V_ASSERT_EQ_P(handler_file_context->auth_file, location.auth_file);
+
+    /* the buffer of the locations belongs to the test rather than to
+    the handler, so it is forgotten before the release of it */
+    file_handler->locations = NULL;
+    file_handler->locations_count = 0;
+    delete_file_handler(file_handler);
+    context->http_connection->http_handler = NULL;
+
+    _delete_handler_file_test(context, http_request, handler_file_context);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_handler_file_handler(void) {
+    /* allocates space for the chain of the connection and for the
+    context that the setting of the handler builds */
+    struct test_context_t *context;
+    struct http_request_t *http_request;
+    struct handler_file_context_t *handler_file_context;
+    struct http_settings_t *http_settings;
+
+    _create_handler_file_test(&context, &http_request, &handler_file_context);
+
+    /* the context that the fixture carries is released here, the
+    setting of the handler builds one of its own */
+    delete_handler_file_context(handler_file_context);
+    http_request->context = NULL;
+    context->http_connection->request = http_request;
+    http_settings = context->http_connection->http_settings;
+
+    /* the setting of the handler builds the context of the message
+    and installs the complete pipeline of it */
+    set_handler_file(context->http_connection);
+    V_ASSERT_NOT_NULL(http_request->context);
+    V_ASSERT_NOT_NULL(http_settings->on_message_begin);
+    V_ASSERT_NOT_NULL(http_settings->on_url);
+    V_ASSERT_NOT_NULL(http_settings->on_location);
+    V_ASSERT_NOT_NULL(http_settings->on_message_complete);
+
+    /* a message that follows another one on the same connection
+    resets the values of the context rather than building it again */
+    handler_file_context = (struct handler_file_context_t *) http_request->context;
+    handler_file_context->file_size = 1024;
+    handler_file_context->etag_status = 2;
+    handler_file_context->range_status = 2;
+    reset_handler_file(context->http_connection);
+    V_ASSERT_EQ_U(handler_file_context->file_size, 0);
+    V_ASSERT_EQ_U(handler_file_context->etag_status, 0);
+    V_ASSERT_EQ_U(handler_file_context->range_status, 0);
+    V_ASSERT_NULL(handler_file_context->file);
+
+    /* the unsetting releases the context and takes the pipeline
+    down, so that another handler may take the connection */
+    unset_handler_file(context->http_connection);
+    V_ASSERT_NULL(http_request->context);
+    V_ASSERT_NULL(http_settings->on_message_begin);
+    V_ASSERT_NULL(http_settings->on_message_complete);
+
+    context->http_connection->request = NULL;
+    delete_http_request(http_request);
+    delete_test_connection(context);
+    delete_test_context(context);
+    remove(HANDLER_FILE_TEST_PATH);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+

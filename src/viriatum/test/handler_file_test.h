@@ -26,6 +26,7 @@
 
 #include "../handlers/handler_file.h"
 #include "../http/http_parser.h"
+#include "../stream/stream_http2.h"
 #include "test_support.h"
 
 /**
@@ -108,3 +109,76 @@ const char *test_handler_file_header_field(void);
  * the unit test should describe possible errors.
  */
 const char *test_handler_file_header_value(void);
+/**
+ * Tests the serving of a complete file, verifying that the response
+ * of it carries the status, the fields that describe the resource
+ * and the payload that the file holds.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_handler_file_response(void);
+
+/**
+ * Tests the serving of a part of a file, the one that the range of
+ * the request asks for rather than the complete resource.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_handler_file_range(void);
+
+/**
+ * Tests the serving of a resource that does not exist, including
+ * the closing of a connection that is not meant to be kept alive.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_handler_file_missing(void);
+
+/**
+ * Tests the promising of the resources that the location of a
+ * request lists, each one of them reserving a stream of its own.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_handler_file_push(void);
+/**
+ * Tests the serving of a directory that is asked for without the
+ * trailing slash, the peer is sent to the very same place with it.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_handler_file_directory(void);
+
+/**
+ * Tests the resolution of the path of a resource, both against the
+ * contents of the service and against the base path of a location.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_handler_file_path(void);
+
+/**
+ * Tests that the matching of a location carries the settings of it
+ * into the context, the resources to be promised among them.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_handler_file_location(void);
+
+/**
+ * Tests the setting, the resetting and the unsetting of the
+ * handler, the operations that build and release the context that
+ * travels with a message.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_handler_file_handler(void);
+

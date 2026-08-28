@@ -292,7 +292,7 @@ static __inline void write_proxy_out_buffer(struct handler_proxy_context_t *cont
 static __inline void write_proxy_buffer(struct handler_proxy_context_t *context, char *data, size_t size) {
     if(context->buffer_size + size > context->buffer_max_size) {
         context->buffer_max_size = (context->buffer_size + size) * 2;
-        context->out_buffer = REALLOC(context->buffer, context->buffer_max_size);
+        context->buffer = REALLOC(context->buffer, context->buffer_max_size);
     }
 
     memcpy(&context->buffer[context->buffer_size], data, size);

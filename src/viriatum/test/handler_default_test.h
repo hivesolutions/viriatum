@@ -24,26 +24,35 @@
 
 #pragma once
 
-#include "../handlers/handler_dispatch.h"
-#include "../handlers/handler_file.h"
+#include "../handlers/handler_default.h"
 #include "../http/http_parser.h"
+#include "../stream/stream_http.h"
 #include "test_support.h"
 
 /**
- * Tests that the dispatch handler unset does not
- * free http_request->context when it was set by
- * another handler (simulates keep-alive re-dispatch).
+ * Tests the complete pipeline of the default handler, verifying
+ * that the message reaches it and that the response of it carries
+ * the status, the size of the payload and the payload itself.
  *
  * @return A message describing the execution of
  * the unit test should describe possible errors.
  */
-const char *test_dispatch_handler_context_keepalive(void);
+const char *test_handler_default_response(void);
 
 /**
- * Tests the complete pipeline of the dispatch handler, including
- * the response of a message that has reached no handler at all.
+ * Tests that a message which is not meant to be kept alive takes
+ * the connection down once the response of it has gone out.
  *
  * @return A message describing the execution of
  * the unit test should describe possible errors.
  */
-const char *test_dispatch_handler_response(void);
+const char *test_handler_default_close(void);
+
+/**
+ * Tests the serving of the messages of a connection as they travel
+ * on the wire, one after the other over the very same connection.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_handler_default_stream(void);

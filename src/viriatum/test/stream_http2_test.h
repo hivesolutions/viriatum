@@ -166,6 +166,25 @@ const char *test_http2_connection_fields(void);
 const char *test_http2_connection_continuation(void);
 
 /**
+ * Tests the section of the trailers that follows the payload of a
+ * message, together with the streams that are refused because the
+ * peer holds as many of them open as this end has announced.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_http2_connection_trailers(void);
+
+/**
+ * Tests the writing of a response for a stream that is no longer
+ * open, the buffers of it are released rather than queued.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_http2_connection_closed(void);
+
+/**
  * Tests the payload of a stream, both the accounting of it
  * against the windows and the delivery of it to the handler.
  *
@@ -201,6 +220,16 @@ const char *test_http2_connection_read(void);
  * the unit test should describe possible errors.
  */
 const char *test_http2_connection_preface(void);
+
+/**
+ * Tests the telling apart of the two versions of the protocol at
+ * the very start of a connection, both the one that carries a
+ * message of the older one and the one that carries the preface.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_http2_connection_detect(void);
 
 /**
  * Tests the writing of a complete response, verifying that the

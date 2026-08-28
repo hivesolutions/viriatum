@@ -70,8 +70,10 @@ system/environment.c \
 system/client.c \
 system/service.c \
 system/torrent.c \
+test/handler_default_test.c \
 test/handler_dispatch_test.c \
 test/handler_file_test.c \
+test/handler_proxy_test.c \
 test/hpack_test.c \
 test/http2_test.c \
 test/stream_http2_test.c \
@@ -110,8 +112,10 @@ system/environment.c \
 system/client.c \
 system/service.c \
 system/torrent.c \
+test/handler_default_test.c \
 test/handler_dispatch_test.c \
 test/handler_file_test.c \
+test/handler_proxy_test.c \
 test/hpack_test.c \
 test/http2_test.c \
 test/stream_http2_test.c \
