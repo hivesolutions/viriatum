@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-*
+* Web pages now adapt to the small screen of a phone, the file listing included
 
 ### Fixed
 

@@ -122,9 +122,10 @@ a:hover {
     background: transparent url(../images/separator-horizontal.png) no-repeat center center;
     background-image: -webkit-image-set(url(../images/separator-horizontal.png) 1x, url(../images/separator-horizontal-2x.png) 2x);
     background-image: image-set(url(../images/separator-horizontal.png) 1x, url(../images/separator-horizontal-2x.png) 2x);
+    background-size: contain;
     height: 10px;
     margin: 20px auto 6px auto;
-    width: 260px;
+    max-width: 260px;
 }
 
 #header-wrapper {
@@ -133,15 +134,16 @@ a:hover {
 
 #header-wrapper .header-body {
     margin: 0px auto 0px auto;
-    width: 960px;
+    max-width: 960px;
 }
 
 .main-illustration {
     background: transparent url(../images/illustration/main-illustration.png) no-repeat center center;
     background-image: -webkit-image-set(url(../images/illustration/main-illustration.png) 1x, url(../images/illustration/main-illustration-2x.png) 2x);
     background-image: image-set(url(../images/illustration/main-illustration.png) 1x, url(../images/illustration/main-illustration-2x.png) 2x);
+    background-size: contain;
     height: 290px;
-    width: 960px;
+    max-width: 960px;
 }
 
 .branding.simple {
@@ -152,30 +154,31 @@ a:hover {
     background: transparent url(../images/logo/viriatum-logo.png) no-repeat center center;
     background-image: -webkit-image-set(url(../images/logo/viriatum-logo.png) 1x, url(../images/logo/viriatum-logo-2x.png) 2x);
     background-image: image-set(url(../images/logo/viriatum-logo.png) 1x, url(../images/logo/viriatum-logo-2x.png) 2x);
+    background-size: contain;
     display: block;
     height: 48px;
     margin: 10px auto 20px auto;
-    width: 340px;
+    max-width: 340px;
 }
 
 #content-wrapper {
     margin: 0px auto 0px auto;
-    width: 960px;
+    max-width: 960px;
 }
 
 .content-header {
     margin: 0px auto 0px auto;
-    width: 340px;
+    max-width: 340px;
 }
 
 .content-body {
     margin: 0px auto 0px auto;
-    width: 340px;
+    max-width: 340px;
 }
 
 .description-body {
     margin: 60px auto 40px auto;
-    width: 480px;
+    max-width: 480px;
 }
 
 .description-body > p {
@@ -184,13 +187,13 @@ a:hover {
 
 #footer-wrapper {
     margin: 0px auto 0px auto;
-    width: 960px;
+    max-width: 960px;
 }
 
 .footer-body {
     margin: 0px auto 0px auto;
+    max-width: 260px;
     text-align: center;
-    width: 260px;
 }
 
 .footer-body a {
@@ -216,7 +219,8 @@ a:hover {
 .table.file-listing {
     color: #595959;
     margin: 80px auto 40px auto;
-    width: 860px;
+    max-width: 860px;
+    width: 100%;
 }
 
 .table.file-listing a {
@@ -341,7 +345,8 @@ span.separator {
 .table.status {
     color: #595959;
     margin: 60px auto 40px auto;
-    width: 960px;
+    max-width: 960px;
+    width: 100%;
 }
 
 .table.status td {
@@ -350,7 +355,7 @@ span.separator {
 
 .content-header.error {
     margin: 80px auto 80px auto;
-    width: 400px;
+    max-width: 400px;
 }
 
 .error-illustration {
@@ -393,4 +398,83 @@ span.separator {
     font-size: 8pt;
     font-weight: normal;
     text-transform: uppercase;
+}
+
+/*
+The rules that adapt the layout to the small viewport of a phone,
+the fluid widths above already handle the intermediate sizes so only
+the elements that cannot shrink any further are adjusted here.
+*/
+@media screen and (max-width: 640px) {
+    body {
+        padding: 0px 12px 0px 12px;
+    }
+
+    a {
+        font-size: 10pt;
+    }
+
+    .main-illustration {
+        height: 180px;
+    }
+
+    .branding.simple {
+        margin-top: 20px;
+    }
+
+    .description-body {
+        margin: 30px auto 20px auto;
+    }
+
+    .table a {
+        font-size: 12pt;
+    }
+
+    .table.file-listing {
+        margin: 30px auto 20px auto;
+    }
+
+    .table.file-listing th {
+        padding: 5px 0px 5px 8px;
+    }
+
+    .table.file-listing td.date,
+    .table.file-listing th.date {
+        display: none;
+    }
+
+    .table.file-listing td.name,
+    .table.file-listing td.size {
+        max-width: none;
+        min-width: 0px;
+        width: auto;
+    }
+
+    .table.file-listing tfoot tr td {
+        height: 40px;
+    }
+
+    .table.status {
+        margin: 30px auto 20px auto;
+    }
+
+    .table.status td {
+        padding: 8px 8px 8px 8px;
+    }
+
+    .content-header.error {
+        margin: 40px auto 40px auto;
+    }
+
+    .error-illustration,
+    .error-content {
+        float: none;
+        margin: 0px auto 0px auto;
+    }
+
+    .error-illustration {
+        background-size: contain;
+        height: 200px;
+        width: 100%;
+    }
 }

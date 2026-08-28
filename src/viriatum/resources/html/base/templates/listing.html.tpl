@@ -3,6 +3,7 @@
     <head>
         <title>Viriatum / Listing</title>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
 
         <!-- css inclusion -->
         <link rel="stylesheet" href="/resources/css/layout.css" type="text/css" />
@@ -22,9 +23,9 @@
         <div id="content-wrapper">
             <table class="table file-listing" cellpadding="0" cellspacing="0">
                 <thead>
-                    <th class="label left" colspan="2">Name</th>
-                    <th class="label right">Last Modified</th>
-                    <th class="label right">Size</th>
+                    <th class="label left name" colspan="2">Name</th>
+                    <th class="label right date">Last Modified</th>
+                    <th class="label right size">Size</th>
                 </thead>
                 <tbody>
                     <tr class="current-folder">
