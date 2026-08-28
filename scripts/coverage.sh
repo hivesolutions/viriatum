@@ -26,13 +26,24 @@ else
     exit 1
 fi
 
+# rejects a compiler that is not clang, the reports are produced from
+# the native profiles of llvm and gcc writes the gcov ones instead
+COMPILER=${CC:-clang}
+case $(basename "$COMPILER") in
+    *clang*) ;;
+    *)
+        echo "coverage requires clang, '$COMPILER' produces gcov data" >&2
+        exit 1
+        ;;
+esac
+
 rm -rf "$BUILD" "$OUTPUT"
 mkdir -p "$OUTPUT"
 
 # builds every target with the counters of the compiler enabled, the
 # python extension included so that its handler is measured as well
 cmake -S "$ROOT" -B "$BUILD" \
-    -DCMAKE_C_COMPILER="${CC:-clang}" \
+    -DCMAKE_C_COMPILER="$COMPILER" \
     -DVIRIATUM_COVERAGE=ON \
     -DVIRIATUM_BUILD_MODULES=OFF \
     -DVIRIATUM_BUILD_PYTHON=ON \
