@@ -65,6 +65,7 @@ cmake_install.cmake
 /x64
 /bin
 /lib
+/.claude
 /build
 /build-*
 /build.*
