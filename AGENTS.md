@@ -117,6 +117,7 @@ To create a new release follow the following steps:
 - Increment (look at `CHANGELOG.md` for semver changes) the version in the following files:
   - `src/viriatum/global/definitions.h` — update `VIRIATUM_MAJOR`, `VIRIATUM_MINOR`, `VIRIATUM_MICRO`, `VIRIATUM_STAGE_NAME`, and `VIRIATUM_STAGE_INDEX`
   - `scripts/build/build.json` — update the `"version"` field
+  - `pyproject.toml` — update the `version` field, it is the one published to PyPI
   - `m4/settings.m4` — update `viriatum_major_version`, `viriatum_minor_version`, `viriatum_micro_version`
   - `src/viriatum_commons/stdafx.c` — update the `version[]` string
   - Each module's `m4/settings.m4` and `stdafx.c` version string (under `modules/mod_diag/`, `modules/mod_gif/`, `modules/mod_lua/`, `modules/mod_php/`, `modules/mod_wsgi/`)
