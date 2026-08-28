@@ -173,7 +173,7 @@ static __inline char *get_config_path(void) {
 #define VIRIATUM_STAGE_BETA "b"
 #define VIRIATUM_STAGE_FINAL ""
 #define VIRIATUM_MAJOR 0
-#define VIRIATUM_MINOR 4
+#define VIRIATUM_MINOR 5
 #define VIRIATUM_MICRO 0
 #define VIRIATUM_STAGE_NAME VIRIATUM_STAGE_FINAL
 #define VIRIATUM_STAGE_INDEX 0

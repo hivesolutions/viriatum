@@ -9,6 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+*
+
+### Changed
+
+*
+
+### Fixed
+
+*
+
+## [0.5.0] - 2026-08-28
+
+### Added
+
 * AI-upscaled 2x variants of the legacy web illustrations and UI assets
 * Tests can now be listed, filtered by name and selected by tag from the command line - [#45](https://github.com/hivesolutions/viriatum/issues/45)
 * Test results can now be reported as TAP, JUnit XML or a Markdown summary - [#45](https://github.com/hivesolutions/viriatum/issues/45)

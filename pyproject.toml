@@ -4,7 +4,7 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "viriatum"
-version = "0.4.0"
+version = "0.5.0"
 description = "Viriatum Web Server bindings for the Python interpreter"
 readme = "README.md"
 requires-python = ">=3.10"
