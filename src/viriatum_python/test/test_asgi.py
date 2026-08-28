@@ -173,6 +173,26 @@ class ServerCase(unittest.TestCase):
             except TypeError:
                 await send({"type": "websocket.send", "text": "rejected"})
             return
+        if path == "/ws-headers":
+            await send(
+                {
+                    "type": "websocket.accept",
+                    "headers": [(b"set-cookie", b"session=1"), (b"x-extra", b"yes")],
+                }
+            )
+            return
+        if path == "/ws-bad-header":
+            try:
+                await send(
+                    {
+                        "type": "websocket.accept",
+                        "headers": [(b"x-bad", b"a\r\nInjected: 1")],
+                    }
+                )
+            except ValueError:
+                await send({"type": "websocket.accept"})
+                await send({"type": "websocket.send", "text": "rejected"})
+            return
         if path == "/ws-return":
             await send({"type": "websocket.accept"})
             return
@@ -340,6 +360,25 @@ class ServerCase(unittest.TestCase):
                 }
             )
             await send({"type": "http.response.body", "body": body})
+            return
+        if path == "/start-only":
+            await send(
+                {
+                    "type": "http.response.start",
+                    "status": 200,
+                    "headers": [(b"x-marker", b"present")],
+                }
+            )
+            return
+        if path == "/long-header":
+            await send(
+                {
+                    "type": "http.response.start",
+                    "status": 200,
+                    "headers": [(b"x-long", b"v" * 4000)],
+                }
+            )
+            await send({"type": "http.response.body", "body": b"long"})
             return
         if path == "/no-content":
             await send({"type": "http.response.start", "status": 204, "headers": []})
@@ -634,6 +673,25 @@ class AsgiTest(ServerCase):
         server = viriatum.Server(double, port=self.port + 86, interface="asgi")
         self.assertFalse(server.double_callable)
 
+    def test_interface_markers_auto(self):
+        # verifies that the markers are honoured by the automatic
+        # interface as well, a wsgi application never carries them
+        def double(scope):
+            pass
+
+        async def single(scope, receive, send):
+            pass
+
+        double._asgi_double_callable = True
+        single._asgi_single_callable = True
+
+        server = viriatum.Server(double, port=self.port + 87)
+        self.assertTrue(server.asgi)
+        self.assertTrue(server.double_callable)
+        server = viriatum.Server(single, port=self.port + 88)
+        self.assertTrue(server.asgi)
+        self.assertFalse(server.double_callable)
+
     def test_interface_invalid(self):
         # verifies that an unknown interface is rejected at the
         # construction of the server object
@@ -778,6 +836,32 @@ class AsgiTest(ServerCase):
         self.assertEqual(result.status, 200)
         self.assertEqual(result.read(), b"")
         self.assertEqual(result.headers.get("Transfer-Encoding"), None)
+
+    def test_start_only_response(self):
+        # verifies that an application that starts the response and
+        # returns without any payload still produces a complete
+        # envelope, the client would otherwise receive no status line
+        result = urllib.request.urlopen(self._url("/start-only"), timeout=5)
+        self.assertEqual(result.status, 200)
+        self.assertEqual(result.read(), b"")
+        self.assertEqual(result.headers.get("X-Marker"), "present")
+
+    def test_long_response_header(self):
+        # verifies that a header longer than the maximum size of a
+        # single one reaches the wire, the formatting of the envelope
+        # is bounded by the remaining capacity of its buffer
+        result = urllib.request.urlopen(self._url("/long-header"), timeout=5)
+        self.assertEqual(result.read(), b"long")
+        self.assertEqual(result.headers.get("X-Long"), "v" * 4000)
+
+    def test_oversized_body(self):
+        # verifies that a payload beyond the maximum allowed size is
+        # refused, handing a truncated one to the application would
+        # have it processed as valid but incomplete data
+        payload = b"o" * (17 * 1024 * 1024)
+        result = self._request_data("/size", payload)
+        self.assertEqual(result.status, 413)
+        self.assertEqual(result.read(), b"Payload Too Large")
 
     def test_no_content(self):
         # verifies that a status that carries no payload discards the
@@ -1037,6 +1121,14 @@ class AsgiTest(ServerCase):
 
         self.assertEqual(results, [b"slow", b"slow"])
         self.assertTrue(elapsed < 0.7, "requests took %.2f seconds" % elapsed)
+
+    def _request_data(self, path, data):
+        # issues a request carrying a payload returning the response
+        # even when the status of it is one of the error ones
+        try:
+            return urllib.request.urlopen(self._url(path), data=data, timeout=30)
+        except urllib.error.HTTPError as error:
+            return error
 
     def _request(self, path):
         # issues a request returning the response even when the status
@@ -1376,6 +1468,40 @@ class WebsocketTest(ServerCase):
             ast.literal_eval(payload.decode("utf-8")),
             ("websocket", "ws", "/ws-scope", b"a=1", ["chat", "json"]),
         )
+        client.close()
+
+    def test_partial_upgrade(self):
+        # verifies that an upgrade value that merely resembles the
+        # websocket one is not handled as such, it would otherwise
+        # receive a handshake response for an unrelated protocol
+        connection = http.client.HTTPConnection("127.0.0.1", self.port, timeout=5)
+        connection.putrequest("GET", "/plain", skip_accept_encoding=True)
+        connection.putheader("Upgrade", "w1234567t")
+        connection.putheader("Connection", "Upgrade")
+        connection.putheader("Sec-WebSocket-Key", "dGhlIHNhbXBsZSBub25jZQ==")
+        connection.putheader("Sec-WebSocket-Version", "13")
+        connection.endheaders()
+        result = connection.getresponse()
+        self.assertEqual(result.status, 200)
+        connection.close()
+
+    def test_accept_headers(self):
+        # verifies that the headers set by the application are part of
+        # the response of the handshake, a framework depends on them
+        # for the setting of the cookies of the connection
+        client = WebSocketClient(self.port, path="/ws-headers")
+        self.assertEqual(client.status, 101)
+        self.assertEqual(client.header("Set-Cookie"), "session=1")
+        self.assertEqual(client.header("X-Extra"), "yes")
+        client.close()
+
+    def test_accept_bad_header(self):
+        # verifies that a header carrying a control character is
+        # rejected, avoiding the splitting of the handshake response
+        client = WebSocketClient(self.port, path="/ws-bad-header")
+        self.assertEqual(client.status, 101)
+        self.assertEqual(client.receive(), (0x1, b"rejected"))
+        self.assertEqual(client.header("Injected"), None)
         client.close()
 
     def test_subprotocol(self):

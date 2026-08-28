@@ -122,6 +122,9 @@ class ServerTest(unittest.TestCase):
             write(b"written-")
             write(b"twice-")
             return [b"returned"]
+        if path == "/long-header":
+            start_response("200 OK", [("X-Long", "v" * 4000)])
+            return [b"long"]
         if path == "/own-length":
             body = b"exact"
             start_response(
@@ -299,6 +302,27 @@ class ServerTest(unittest.TestCase):
         # payload preceding the one returned by the application
         result = urllib.request.urlopen(self._url("/write"), timeout=5)
         self.assertEqual(result.read(), b"written-twice-returned")
+
+    def test_long_response_header(self):
+        # verifies that a header longer than the maximum size of a
+        # single one reaches the wire, the formatting of the envelope
+        # is bounded by the remaining capacity of its buffer
+        result = urllib.request.urlopen(self._url("/long-header"), timeout=5)
+        self.assertEqual(result.read(), b"long")
+        self.assertEqual(result.headers.get("X-Long"), "v" * 4000)
+
+    def test_oversized_body(self):
+        # verifies that a payload beyond the maximum allowed size is
+        # refused, handing a truncated one to the application would
+        # have it processed as valid but incomplete data
+        payload = b"o" * (17 * 1024 * 1024)
+        try:
+            result = urllib.request.urlopen(
+                self._url("/size"), data=payload, timeout=30
+            )
+        except urllib.error.HTTPError as error:
+            result = error
+        self.assertEqual(result.status, 413)
 
     def test_application_content_length(self):
         # a content length set by the application must be the only one

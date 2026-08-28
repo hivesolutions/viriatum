@@ -245,6 +245,7 @@ static ERROR_CODE _send_headers_handler_asgi(struct handler_asgi_context_t *hand
     char *buffer;
     size_t count;
     size_t index;
+    size_t buffer_size;
     size_t headers_size = 0;
 
     /* retrieves the underlying connection references in order to be
@@ -263,11 +264,8 @@ static ERROR_CODE _send_headers_handler_asgi(struct handler_asgi_context_t *hand
     /* allocates space for the complete envelope, the default headers
     are bounded by the maximum HTTP size and the application ones
     take the remaining part of the buffer */
-    connection->alloc_data(
-        connection,
-        VIRIATUM_HTTP_MAX_SIZE + headers_size,
-        (void **) &buffer
-    );
+    buffer_size = VIRIATUM_HTTP_MAX_SIZE + headers_size;
+    connection->alloc_data(connection, buffer_size, (void **) &buffer);
 
     /* writes the default set of headers into the buffer, the connection
     is kept alive according to the flags of the current request */
@@ -288,7 +286,7 @@ static ERROR_CODE _send_headers_handler_asgi(struct handler_asgi_context_t *hand
     if(handler_asgi_context->has_length == FALSE) {
         count += SPRINTF(
             &buffer[count],
-            VIRIATUM_MAX_HEADER_C_SIZE,
+            buffer_size - count,
             "%s: chunked\r\n",
             TRANSFER_ENCODING_H
         );
@@ -299,7 +297,7 @@ static ERROR_CODE _send_headers_handler_asgi(struct handler_asgi_context_t *hand
     for(index = 0; index < handler_asgi_context->response_header_count; index++) {
         count += SPRINTF(
             &buffer[count],
-            VIRIATUM_MAX_HEADER_C_SIZE,
+            buffer_size - count,
             "%s\r\n",
             handler_asgi_context->response_headers[index]
         );
@@ -1048,12 +1046,19 @@ static PyObject *_send_lifespan_handler_asgi(struct handler_asgi_context_t *hand
     return future;
 }
 
-static ERROR_CODE _send_error_handler_asgi(struct handler_asgi_context_t *handler_asgi_context) {
-    /* allocates space for the index used in the iteration over the
-    headers that have already been set by the application */
+static ERROR_CODE _send_status_handler_asgi(struct handler_asgi_context_t *handler_asgi_context, int status_code, const char *body) {
+    /* allocates space for both the index used in the iteration over
+    the headers already set by the application and for the header
+    carrying the length of the payload of the response */
     size_t index;
-    const char *body = "Internal Server Error";
-    const char *header = CONTENT_LENGTH_H ": 21";
+    char header[VIRIATUM_MAX_HEADER_C_SIZE];
+    SPRINTF(
+        header,
+        VIRIATUM_MAX_HEADER_C_SIZE,
+        "%s: %lu",
+        CONTENT_LENGTH_H,
+        (long unsigned int) strlen(body)
+    );
 
     /* discards the complete set of headers that have been set by the
     application, none of them describes the error response */
@@ -1062,9 +1067,9 @@ static ERROR_CODE _send_error_handler_asgi(struct handler_asgi_context_t *handle
     }
     handler_asgi_context->response_header_count = 0;
 
-    /* sets the error status together with the length of the payload,
+    /* sets the provided status together with the length of the payload,
     no chunked framing is required for a response of a known size */
-    handler_asgi_context->status_code = 500;
+    handler_asgi_context->status_code = status_code;
     handler_asgi_context->has_length = TRUE;
     handler_asgi_context->has_body = TRUE;
     handler_asgi_context->response_headers[0] =
@@ -1084,6 +1089,16 @@ static ERROR_CODE _send_error_handler_asgi(struct handler_asgi_context_t *handle
 
     /* raises no error */
     RAISE_NO_ERROR;
+}
+
+static ERROR_CODE _send_error_handler_asgi(struct handler_asgi_context_t *handler_asgi_context) {
+    /* produces the internal error response, the one used whenever the
+    application is unable to produce a response of its own */
+    return _send_status_handler_asgi(
+        handler_asgi_context,
+        500,
+        VIRIATUM_ASGI_ERROR_BODY
+    );
 }
 
 static PyObject *_done_handler_asgi(PyObject *self, PyObject *args) {
@@ -1177,7 +1192,11 @@ static PyObject *_done_handler_asgi(PyObject *self, PyObject *args) {
         _send_error_handler_asgi(handler_asgi_context);
     } else if(handler_asgi_context->state != ASGI_STATE_COMPLETE) {
         /* in case the response has been started but never closed the
-        stream is terminated so that the client is released */
+        stream is terminated so that the client is released, the
+        envelope is written first when no payload ever reached it */
+        if(handler_asgi_context->state == ASGI_STATE_STARTED) {
+            _send_headers_handler_asgi(handler_asgi_context);
+        }
         handler_asgi_context->state = ASGI_STATE_COMPLETE;
         _write_handler_asgi(handler_asgi_context, NULL, 0, TRUE, NULL);
     }
@@ -1321,6 +1340,7 @@ ERROR_CODE body_callback_handler_asgi(struct http_parser_t *http_parser, const u
     remaining data is discarded, avoiding an unbounded growth driven
     by the client */
     if(handler_asgi_context->body_size + data_size > VIRIATUM_ASGI_MAX_BODY) {
+        handler_asgi_context->overflow = TRUE;
         RAISE_NO_ERROR;
     }
 
@@ -1463,10 +1483,15 @@ static char _is_upgrade_handler_asgi(struct handler_asgi_context_t *handler_asgi
     upgrade from any other one that may be requested */
     const char *upgrade = _find_header_handler_asgi(handler_asgi_context, "Upgrade");
     const char *key = _find_header_handler_asgi(handler_asgi_context, "Sec-WebSocket-Key");
+    size_t index;
+    const char *reference = VIRIATUM_ASGI_WEBSOCKET;
     if(upgrade == NULL || key == NULL) { return FALSE; }
-    if(strlen(upgrade) != 9) { return FALSE; }
-    return toupper((unsigned char) upgrade[0]) == 'W' &&
-        toupper((unsigned char) upgrade[8]) == 'T' ? TRUE : FALSE;
+    if(strlen(upgrade) != strlen(reference)) { return FALSE; }
+    for(index = 0; reference[index] != '\0'; index++) {
+        if(toupper((unsigned char) upgrade[index]) !=
+            toupper((unsigned char) reference[index])) { return FALSE; }
+    }
+    return TRUE;
 }
 
 static PyObject *_build_scope_handler_asgi(
@@ -1740,6 +1765,19 @@ ERROR_CODE _call_application_handler_asgi(struct http_parser_t *http_parser) {
     messages to be processed, no parallel request handling problems */
     http_connection->acquire(http_connection);
 
+    /* in case the payload exceeded the maximum allowed size it may not
+    be handed to the application, as it would be a truncated one, the
+    request is refused instead (payload too large) */
+    if(handler_asgi_context->overflow == TRUE) {
+        _send_status_handler_asgi(
+            handler_asgi_context,
+            413,
+            VIRIATUM_ASGI_LARGE_BODY
+        );
+        PyGILState_Release(gil_state);
+        RAISE_NO_ERROR;
+    }
+
     /* in case the application refused the request altogether the error
     response is produced for it, nothing else may be done */
     if(handler_asgi_context->task == NULL) {
@@ -1901,7 +1939,7 @@ static ERROR_CODE _close_websocket_handler_asgi(struct handler_asgi_context_t *h
     RAISE_NO_ERROR;
 }
 
-static ERROR_CODE _accept_websocket_handler_asgi(struct handler_asgi_context_t *handler_asgi_context, const char *subprotocol) {
+static ERROR_CODE _accept_websocket_handler_asgi(struct handler_asgi_context_t *handler_asgi_context, const char *subprotocol, const char *headers) {
     /* allocates space for both the accept value of the handshake and
     for the buffer receiving the response to be written */
     unsigned char accept_key[VIRIATUM_WEBSOCKET_ACCEPT_SIZE];
@@ -1941,9 +1979,20 @@ static ERROR_CODE _accept_websocket_handler_asgi(struct handler_asgi_context_t *
     if(subprotocol != NULL) {
         count += SPRINTF(
             (char *) &buffer[count],
-            VIRIATUM_ASGI_MAX_PROTOCOL,
+            VIRIATUM_HTTP_SIZE - count,
             "Sec-WebSocket-Protocol: %s\r\n",
             subprotocol
+        );
+    }
+
+    /* copies the headers that have been set by the application, they
+    are already formatted as complete lines by the caller */
+    if(headers != NULL) {
+        count += SPRINTF(
+            (char *) &buffer[count],
+            VIRIATUM_HTTP_SIZE - count,
+            "%s",
+            headers
         );
     }
     memcpy(&buffer[count], "\r\n", 2);
@@ -1963,13 +2012,23 @@ static PyObject *_send_websocket_handler_asgi(struct handler_asgi_context_t *han
     of the message provided by the application */
     PyObject *future;
     PyObject *object;
+    PyObject *headers;
+    PyObject *header;
+    PyObject *name;
+    PyObject *value;
     PyObject *encoded = NULL;
     unsigned char *frame;
     size_t frame_size;
     char *data = NULL;
+    char *value_data = NULL;
     Py_ssize_t data_size = 0;
+    Py_ssize_t value_size = 0;
+    Py_ssize_t index;
+    Py_ssize_t count;
     const char *subprotocol = NULL;
     const char *reason = NULL;
+    char accept_headers[VIRIATUM_HTTP_SIZE];
+    size_t accept_size = 0;
     unsigned char opcode = WEBSOCKET_OPCODE_BINARY;
     long code = WEBSOCKET_CLOSE_NORMAL;
 
@@ -2001,7 +2060,67 @@ static PyObject *_send_websocket_handler_asgi(struct handler_asgi_context_t *han
                 return NULL;
             }
         }
-        if(IS_ERROR_CODE(_accept_websocket_handler_asgi(handler_asgi_context, subprotocol))) {
+        /* gathers the headers that the application wants to be part of
+        the response of the handshake, they are optional and defined
+        as a sequence of pairs of byte strings */
+        headers = PyDict_GetItemString(message, "headers");
+        count = headers == NULL ? 0 : PySequence_Length(headers);
+        if(count < 0) { PyErr_Clear(); count = 0; }
+        for(index = 0; index < count; index++) {
+            header = PySequence_GetItem(headers, index);
+            if(header == NULL) { Py_DECREF(future); return NULL; }
+            name = PySequence_GetItem(header, 0);
+            value = PySequence_GetItem(header, 1);
+            Py_DECREF(header);
+            if(name == NULL || value == NULL) {
+                Py_XDECREF(name);
+                Py_XDECREF(value);
+                Py_DECREF(future);
+                return NULL;
+            }
+            if(PyBytes_AsStringAndSize(name, &data, &data_size) < 0 ||
+                PyBytes_AsStringAndSize(value, &value_data, &value_size) < 0) {
+                Py_DECREF(name);
+                Py_DECREF(value);
+                Py_DECREF(future);
+                return NULL;
+            }
+
+            /* rejects any control character, as it would allow the
+            response of the handshake to be split by the application */
+            if(_is_valid_handler_asgi(data, (size_t) data_size) == FALSE ||
+                _is_valid_handler_asgi(value_data, (size_t) value_size) == FALSE) {
+                Py_DECREF(name);
+                Py_DECREF(value);
+                Py_DECREF(future);
+                PyErr_SetString(PyExc_ValueError, "header carries a control character");
+                return NULL;
+            }
+
+            /* formats the header line into the buffer, the ones that no
+            longer fit it are discarded (avoids an overflow) */
+            if(accept_size + (size_t) data_size + (size_t) value_size + 4 <
+                VIRIATUM_HTTP_SIZE) {
+                accept_size += SPRINTF(
+                    &accept_headers[accept_size],
+                    VIRIATUM_HTTP_SIZE - accept_size,
+                    "%.*s: %.*s\r\n",
+                    (int) data_size,
+                    data,
+                    (int) value_size,
+                    value_data
+                );
+            }
+            Py_DECREF(name);
+            Py_DECREF(value);
+        }
+        accept_headers[accept_size] = '\0';
+
+        if(IS_ERROR_CODE(_accept_websocket_handler_asgi(
+            handler_asgi_context,
+            subprotocol,
+            accept_size > 0 ? accept_headers : NULL
+        ))) {
             Py_DECREF(future);
             PyErr_SetString(PyExc_RuntimeError, (char *) GET_ERROR());
             return NULL;

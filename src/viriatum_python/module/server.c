@@ -28,6 +28,17 @@
 #include "handler.h"
 #include "handler_asgi.h"
 
+static char _has_marker_server_python(PyObject *application, const char *name) {
+    /* verifies if the application carries the provided marker, they
+    are the ones set by the adaptation helpers of asgiref */
+    PyObject *marker = PyObject_GetAttrString(application, name);
+    int is_set;
+    if(marker == NULL) { PyErr_Clear(); return FALSE; }
+    is_set = PyObject_IsTrue(marker);
+    Py_DECREF(marker);
+    return is_set != 0 ? TRUE : FALSE;
+}
+
 static char _is_asgi_server_python(PyObject *application) {
     /* allocates space for the various objects used during the
     inspection of the application that has been provided */
@@ -35,6 +46,15 @@ static char _is_asgi_server_python(PyObject *application) {
     PyObject *result;
     PyObject *call;
     int is_coroutine = 0;
+
+    /* an application that carries either of the markers is an asgi one
+    regardless of its shape, a wsgi one never carries them */
+    if(_has_marker_server_python(application, "_asgi_single_callable") == TRUE) {
+        return TRUE;
+    }
+    if(_has_marker_server_python(application, "_asgi_double_callable") == TRUE) {
+        return TRUE;
+    }
 
     /* imports the inspect module, it provides the detection of the
     coroutine functions that is required for the interface */
@@ -78,24 +98,17 @@ static char _is_double_callable_server_python(PyObject *application) {
     PyObject *module;
     PyObject *result;
     PyObject *call;
-    PyObject *marker;
     int is_double = 0;
     int is_class = 0;
 
     /* the markers set by the adaptation helpers of asgiref take
     precedence over any inspection of the application */
-    marker = PyObject_GetAttrString(application, "_asgi_single_callable");
-    if(marker != NULL) {
-        is_double = PyObject_IsTrue(marker);
-        Py_DECREF(marker);
-        if(is_double != 0) { return FALSE; }
-    } else { PyErr_Clear(); }
-    marker = PyObject_GetAttrString(application, "_asgi_double_callable");
-    if(marker != NULL) {
-        is_double = PyObject_IsTrue(marker);
-        Py_DECREF(marker);
-        if(is_double != 0) { return TRUE; }
-    } else { PyErr_Clear(); }
+    if(_has_marker_server_python(application, "_asgi_single_callable") == TRUE) {
+        return FALSE;
+    }
+    if(_has_marker_server_python(application, "_asgi_double_callable") == TRUE) {
+        return TRUE;
+    }
 
     /* imports the inspect module, it provides both the detection of
     the classes and the one of the coroutine functions */

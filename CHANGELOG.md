@@ -74,6 +74,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+* Requests whose payload exceeds the maximum allowed size are refused instead of being handed over truncated
+* Responses that carry no payload are no longer sent without their envelope
+
 * Absolute path resolution no longer aborts the process on optimized Linux builds - [#39](https://github.com/hivesolutions/viriatum/issues/39)
 * Server no longer crashes on startup when no configuration file is present - [#39](https://github.com/hivesolutions/viriatum/issues/39)
 * Stopping or releasing a server that was never started is now safe - [#39](https://github.com/hivesolutions/viriatum/issues/39)

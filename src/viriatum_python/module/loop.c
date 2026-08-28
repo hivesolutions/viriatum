@@ -69,6 +69,7 @@ ERROR_CODE delete_loop_python(struct loop_python_t *loop_python) {
     /* allocates space for the sequence of tasks that are still
     pending and for the index used in the iteration over it */
     PyObject *tasks;
+    PyObject *sequence;
     PyObject *task;
     Py_ssize_t index;
     Py_ssize_t count;
@@ -79,19 +80,27 @@ ERROR_CODE delete_loop_python(struct loop_python_t *loop_python) {
         tasks = PyObject_CallMethod(loop_python->module, "all_tasks", "O", loop_python->loop);
         if(tasks == NULL) { PyErr_Clear(); }
         else {
-            tasks = PySequence_Fast(tasks, "tasks must be a sequence");
-            count = tasks == NULL ? 0 : PySequence_Fast_GET_SIZE(tasks);
+            /* the set of tasks is not a sequence and so it must be
+            converted into one before being iterated, both references
+            are released as the fast variant creates a new object */
+            sequence = PySequence_Fast(tasks, "tasks must be a sequence");
+            count = sequence == NULL ? 0 : PySequence_Fast_GET_SIZE(sequence);
             for(index = 0; index < count; index++) {
-                task = PySequence_Fast_GET_ITEM(tasks, index);
+                task = PySequence_Fast_GET_ITEM(sequence, index);
                 Py_XDECREF(PyObject_CallMethod(task, "cancel", NULL));
             }
-            Py_XDECREF(tasks);
+            Py_XDECREF(sequence);
+            Py_DECREF(tasks);
             PyErr_Clear();
         }
 
-        /* advances the loop one last time so that the cancellation of
-        the various tasks is properly propagated to them */
-        run_once_loop_python(loop_python);
+        /* advances the loop until every cancelled task is done, a task
+        that awaits during its cleanup takes more than one iteration to
+        reach the final state (bounded so that it never hangs) */
+        for(index = 0; index < VIRIATUM_ASGI_DRAIN_ITERATIONS; index++) {
+            if(pending_loop_python(loop_python) == 0) { break; }
+            run_once_loop_python(loop_python);
+        }
         Py_XDECREF(PyObject_CallMethod(loop_python->loop, "close", NULL));
         PyErr_Clear();
         Py_DECREF(loop_python->loop);

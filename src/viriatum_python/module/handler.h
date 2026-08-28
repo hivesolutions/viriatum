@@ -45,6 +45,12 @@
 #define VIRIATUM_PYTHON_MAX_BODY 16777216
 
 /**
+ * The status message of the response produced for a request
+ * whose payload exceeded the maximum allowed size.
+ */
+#define VIRIATUM_PYTHON_LARGE_STATUS "Payload Too Large"
+
+/**
  * The initial capacity of the buffer that accumulates the
  * payload of a request, grown geometrically from it.
  */
@@ -109,6 +115,13 @@ typedef struct handler_python_context_t {
      */
     unsigned char *written;
     size_t written_size;
+
+    /**
+     * Flag controlling if the payload of the request exceeded the
+     * maximum allowed size, in which case it may not be handed to
+     * the application as it would be a truncated one.
+     */
+    char overflow;
 
     /**
      * The capsule carrying the context to both the start response

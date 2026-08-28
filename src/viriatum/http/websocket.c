@@ -137,6 +137,12 @@ ERROR_CODE parse_frame_websocket(unsigned char *buffer, size_t buffer_size, stru
         payload_size = ((unsigned long long) buffer[2] << 8) |
             (unsigned long long) buffer[3];
         offset += 2;
+        if(payload_size < 126) {
+            RAISE_ERROR_M(
+                RUNTIME_EXCEPTION_ERROR_CODE,
+                (unsigned char *) "Length is not minimally encoded"
+            );
+        }
     } else if(payload_size == 127) {
         if(buffer_size < offset + 8) { RAISE_NO_ERROR; }
         payload_size = 0;
@@ -145,6 +151,12 @@ ERROR_CODE parse_frame_websocket(unsigned char *buffer, size_t buffer_size, stru
                 (unsigned long long) buffer[offset + index];
         }
         offset += 8;
+        if(payload_size <= 65535) {
+            RAISE_ERROR_M(
+                RUNTIME_EXCEPTION_ERROR_CODE,
+                (unsigned char *) "Length is not minimally encoded"
+            );
+        }
     }
 
     /* verifies that the payload does not exceed the maximum allowed
@@ -262,6 +274,14 @@ ERROR_CODE build_close_websocket(unsigned short code, const char *reason, unsign
     of a control frame, the code takes the first two bytes of it */
     if(reason_size > VIRIATUM_WEBSOCKET_MAX_CONTROL - 2) {
         reason_size = VIRIATUM_WEBSOCKET_MAX_CONTROL - 2;
+
+        /* walks back over the continuation bytes so that the reason is
+        never cut in the middle of a code point, the specification
+        requires it to be a valid utf-8 sequence */
+        while(reason_size > 0 &&
+            ((unsigned char) reason[reason_size] & 0xc0) == 0x80) {
+            reason_size--;
+        }
     }
 
     /* writes the close code in network order and copies the reason

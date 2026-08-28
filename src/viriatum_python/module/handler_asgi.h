@@ -35,6 +35,12 @@
 #define VIRIATUM_ASGI_HANDLER_NAME ((unsigned char *) "asgi")
 
 /**
+ * The value that the upgrade header must carry for a request
+ * to be handled as a websocket one.
+ */
+#define VIRIATUM_ASGI_WEBSOCKET "websocket"
+
+/**
  * The versions of the application interface that may be used
  * for the calling of an application, the legacy one takes the
  * scope apart from the callables (double callable).
@@ -54,6 +60,14 @@
  * beyond this value is discarded.
  */
 #define VIRIATUM_ASGI_MAX_BODY 16777216
+
+/**
+ * The payloads of the responses that are produced by the server
+ * itself, either for a failure of the application or for a
+ * request whose payload exceeded the maximum allowed size.
+ */
+#define VIRIATUM_ASGI_ERROR_BODY "Internal Server Error"
+#define VIRIATUM_ASGI_LARGE_BODY "Payload Too Large"
 
 /**
  * The initial capacity of the buffer that accumulates the
@@ -254,6 +268,13 @@ typedef struct handler_asgi_context_t {
      * for the writing of the various parts of the response.
      */
     struct connection_t *connection;
+
+    /**
+     * Flag controlling if the payload of the request exceeded the
+     * maximum allowed size, in which case it may not be handed to
+     * the application as it would be a truncated one.
+     */
+    char overflow;
 
     /**
      * Flag controlling if the current context is the one of the

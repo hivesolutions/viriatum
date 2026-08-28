@@ -34,6 +34,12 @@
 #define VIRIATUM_ASGI_POLL_TIMEOUT 5
 
 /**
+ * The number of iterations that the draining of the cancelled
+ * tasks may take before the loop is closed anyway.
+ */
+#define VIRIATUM_ASGI_DRAIN_ITERATIONS 64
+
+/**
  * Structure wrapping the asyncio event loop that is driven by
  * the serving loop, one of these exists per server.
  */

@@ -181,6 +181,24 @@ const char *test_websocket_parse_frame(void) {
     V_ASSERT(websocket_frame.payload[0] == 0x40);
     V_ASSERT(websocket_frame.payload[129] == 0x40);
 
+    /* tests that a two byte length that would fit the base variant is
+    rejected, the specification mandates the minimal encoding */
+    extended[0] = 0x82;
+    extended[1] = 0xfe;
+    extended[2] = 0x00;
+    extended[3] = 0x01;
+    error = parse_frame_websocket(extended, 12, &websocket_frame);
+    V_ASSERT(IS_ERROR_CODE(error));
+
+    /* tests that an eight byte length that would fit the two byte
+    variant is rejected for the very same reason */
+    extended[0] = 0x82;
+    extended[1] = 0xff;
+    for(index = 0; index < 8; index++) { extended[2 + index] = 0x00; }
+    extended[9] = 0xff;
+    error = parse_frame_websocket(extended, 20, &websocket_frame);
+    V_ASSERT(IS_ERROR_CODE(error));
+
     /* tests that a frame whose eight byte length is not completely
     available is reported as an incomplete one */
     extended[0] = 0x82;
@@ -354,6 +372,29 @@ const char *test_websocket_build_close(void) {
     V_ASSERT(error == 0);
     V_ASSERT(buffer_size == VIRIATUM_WEBSOCKET_MAX_CONTROL + 2);
     V_ASSERT(buffer[1] == VIRIATUM_WEBSOCKET_MAX_CONTROL);
+    FREE(buffer);
+
+    /* tests that an oversized reason is never cut in the middle of a
+    code point, the single character before the sequences makes the
+    truncation fall inside one of them, so it is dropped as a whole
+    and the resulting payload is two bytes shorter than the maximum */
+    reason[0] = 'a';
+    for(index = 1; index < sizeof(reason) - 3; index += 3) {
+        reason[index] = (char) 0xe6;
+        reason[index + 1] = (char) 0x97;
+        reason[index + 2] = (char) 0xa5;
+    }
+    reason[sizeof(reason) - 1] = '\0';
+    error = build_close_websocket(
+        WEBSOCKET_CLOSE_PROTOCOL,
+        reason,
+        &buffer,
+        &buffer_size
+    );
+    V_ASSERT(error == 0);
+    V_ASSERT(buffer_size == VIRIATUM_WEBSOCKET_MAX_CONTROL);
+    V_ASSERT(buffer[1] == VIRIATUM_WEBSOCKET_MAX_CONTROL - 2);
+    V_ASSERT(((unsigned char) buffer[buffer_size - 1] & 0xc0) == 0x80);
     FREE(buffer);
 
     /* returns the default value, nothing happened so there's
