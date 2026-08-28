@@ -10,10 +10,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 * Continuous integration now builds with clang 22 and gcc 16
+* Scalable vector versions of the web illustrations, logos and UI assets
 
 ### Changed
 
 * Web pages now adapt to the small screen of a phone, the file listing included
+* Pages now use the scalable favicon whenever the browser supports it
+* Illustrations, logos and the listing arrow are now served as vectors
 
 ### Fixed
 

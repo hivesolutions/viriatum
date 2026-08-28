@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:ns1="http://www.inkscape.org/namespaces/inkscape" version="1.1" width="16" height="32" viewBox="0 0 16 32">
+<defs>
+<clipPath id="clip_1">
+<path transform="matrix(1,0,0,-1,-10,1070)" d="M10 1038H26V1070H10Z" clip-rule="evenodd" />
+</clipPath>
+</defs>
+<g>
+<g clip-path="url(#clip_1)">
+<g ns1:groupmode="layer" ns1:label="Icons">
+<path transform="matrix(1,0,0,-1,11.001499,27.46582)" d="M0 0-6.003 3.466 0 6.932Z" />
+<path transform="matrix(1,0,0,-1,11.001499,11.46582)" d="M0 0-6.003 3.466 0 6.932Z" fill="#595959" />
+</g>
+</g>
+</g>
+</svg>
