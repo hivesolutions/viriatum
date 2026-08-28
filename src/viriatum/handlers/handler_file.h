@@ -68,6 +68,15 @@ typedef struct file_location_t {
      * confirm with the defined standard.
      */
     unsigned char *auth_file;
+
+    /**
+     * The resources that are promised to a peer together with a
+     * request that matches this location, given as a list of paths
+     * separated by spaces.
+     * Only ever acted upon under HTTP/2, the older version of the
+     * protocol carries no way of promising anything.
+     */
+    unsigned char *push;
 } file_location_t;
 
 /**
@@ -143,6 +152,13 @@ typedef struct handler_file_context_t {
      * the passwd file.
      */
     unsigned char *auth_file;
+
+    /**
+     * The resources that are promised to a peer together with the
+     * response of this request, taken from the location that has
+     * matched it.
+     */
+    unsigned char *push;
 
     /**
      * The reference to the file stream to be

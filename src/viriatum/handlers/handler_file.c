@@ -70,6 +70,7 @@ ERROR_CODE create_handler_file_context(struct handler_file_context_t **handler_f
     handler_file_context->base_path = NULL;
     handler_file_context->auth_basic = NULL;
     handler_file_context->auth_file = NULL;
+    handler_file_context->push = NULL;
     handler_file_context->file = NULL;
     handler_file_context->file_size = 0;
     handler_file_context->initial_byte = 0;
@@ -167,6 +168,7 @@ ERROR_CODE register_handler_file(struct service_t *service) {
         _location->base_path = NULL;
         _location->auth_basic = NULL;
         _location->auth_file = NULL;
+        _location->push = NULL;
 
         /* tries to retrieve the base path from the file configuration and in
         case it exists sets it in the location (attribute reference change) */
@@ -182,6 +184,11 @@ ERROR_CODE register_handler_file(struct service_t *service) {
         case it exists sets it in the location (attribute reference change) */
         get_value_string_sort_map(configuration, (unsigned char *) "auth_file", &value);
         if(value != NULL) { _location->auth_file = (unsigned char *) value; }
+
+        /* tries to retrieve the resources to be promised from the file
+        configuration and in case they exist sets them in the location */
+        get_value_string_sort_map(configuration, (unsigned char *) "push", &value);
+        if(value != NULL) { _location->push = (unsigned char *) value; }
     }
 
     /* adds the HTTP handler to the service */
@@ -485,6 +492,66 @@ static size_t _write_headers_handler_file(
     return count;
 }
 
+/**
+ * Promises the resources that the location of the request lists to
+ * the peer, each one of them opening a stream of its own that is
+ * served as though the peer had asked for it.
+ * Nothing at all happens under HTTP/1.1, which carries no way of
+ * promising a resource.
+ *
+ * @param http_connection The connection the request belongs to.
+ * @param http_request The message being served.
+ * @param push The list of the paths to be promised.
+ */
+static void _push_handler_file(struct http_connection_t *http_connection, struct http_request_t *http_request, unsigned char *push) {
+    /* allocates space for the path being taken out of the list and
+    for the walk over the list itself */
+    char path[VIRIATUM_MAX_URL_SIZE];
+    size_t size = 0;
+    unsigned char *pointer = push;
+    struct http2_stream_t *http2_stream;
+
+    /* the promising of a resource only exists under HTTP/2, so under
+    anything else there's nothing at all to be done */
+    if(http_connection->http2_connection == NULL) { return; }
+    if(push == NULL) { return; }
+
+    /* retrieves the stream of the request, it is the one the promises
+    are made on and the one they are going to hang from */
+    http2_stream = find_stream_http2_connection(
+        http_connection->http2_connection,
+        http_request->stream_id
+    );
+    if(http2_stream == NULL) { return; }
+
+    /* walks the list, every sequence of characters that is not a space
+    is one of the paths that gets promised */
+    while(TRUE) {
+        if(*pointer != ' ' && *pointer != '\0') {
+            if(size < sizeof(path) - 1) { path[size++] = (char) *pointer; }
+            pointer++;
+            continue;
+        }
+
+        if(size > 0) {
+            path[size] = '\0';
+            push_stream_http2_connection(http_connection->http2_connection, http2_stream, path);
+            size = 0;
+
+            /* the promising of a resource may have moved the streams
+            inside the table, so the one of the request is taken again */
+            http2_stream = find_stream_http2_connection(
+                http_connection->http2_connection,
+                http_request->stream_id
+            );
+            if(http2_stream == NULL) { return; }
+        }
+
+        if(*pointer == '\0') { break; }
+        pointer++;
+    }
+}
+
 ERROR_CODE message_complete_callback_handler_file(struct http_request_t *http_request) {
     /* allocates the file size and for the temporary count
     variable used to count the written bytes */
@@ -573,6 +640,11 @@ ERROR_CODE message_complete_callback_handler_file(struct http_request_t *http_re
     /* acquires the lock on the HTTP connection, this will avoids further
     messages to be processed, no parallel request handling problems */
     http_connection->acquire(http_connection);
+
+    /* promises the resources that the location of the request lists,
+    this happens before the response so that the peer learns of them
+    before it has a chance to ask for them itself */
+    _push_handler_file(http_connection, http_request, handler_file_context->push);
 
     /* checks if the path being request is in fact a directory */
     is_directory_file((char *) handler_file_context->file_path_d, &is_directory);
@@ -1166,6 +1238,7 @@ ERROR_CODE location_callback_handler_file(struct http_request_t *http_request, s
     /* updates the various references in the current context, this
     should reflect the one present in the location */
     handler_file_context->base_path = location->base_path;
+    handler_file_context->push = location->push;
     handler_file_context->auth_basic = location->auth_basic;
     handler_file_context->auth_file = location->auth_file;
 

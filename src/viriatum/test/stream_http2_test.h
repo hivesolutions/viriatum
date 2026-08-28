@@ -87,6 +87,26 @@ const char *test_http2_connection(void);
 const char *test_http2_connection_streams(void);
 
 /**
+ * Tests the tree of the priorities, including the exclusive
+ * dependency that takes over the siblings, the one that would
+ * close a cycle and the inheritance of the closing of a stream.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_http2_connection_priority(void);
+
+/**
+ * Tests the promising of a resource, including the frame that
+ * carries it, the stream it reserves and the settings of the peer
+ * that keep the promise from being made at all.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_http2_connection_push(void);
+
+/**
  * Tests the flow control windows of both the connection and the
  * streams, including the increment that takes one of them beyond
  * the largest value the protocol represents.
@@ -124,6 +144,16 @@ const char *test_http2_connection_frames(void);
  * the unit test should describe possible errors.
  */
 const char *test_http2_connection_headers(void);
+
+/**
+ * Tests the rules that the fields of a header block are bound by,
+ * both the pseudo headers of a request and the regular ones that
+ * carry no meaning at all under this protocol.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_http2_connection_fields(void);
 
 /**
  * Tests a header block that is spread over a sequence of
@@ -183,6 +213,26 @@ const char *test_http2_connection_preface(void);
 const char *test_http2_connection_response(void);
 
 /**
+ * Tests the completion of the writes of a response, verifying that
+ * a stream only closes once the payload that closes the message of
+ * it has actually left this end.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_http2_connection_complete(void);
+
+/**
+ * Tests the writing of an error over a session, verifying that it
+ * reaches the peer as the frames of this protocol rather than as
+ * the text of the older version of it.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_http2_connection_error(void);
+
+/**
  * Tests that the payload of a response is held back while the
  * window does not allow it through and goes out as soon as the
  * peer widens it.
@@ -201,6 +251,16 @@ const char *test_http2_connection_flow(void);
  * the unit test should describe possible errors.
  */
 const char *test_http2_connection_split(void);
+
+/**
+ * Tests the order in which the streams that are holding payload
+ * back write it, the ones that sit above going first and the
+ * heavier of the siblings going before the lighter ones.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_http2_connection_schedule(void);
 
 /**
  * Tests the size that a message announces for its payload, both

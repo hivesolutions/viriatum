@@ -121,6 +121,18 @@ size_t get_closed_test_connection(void);
 ERROR_CODE register_write_test_connection(struct connection_t *connection);
 
 /**
+ * Completes the writes that are queued on the connection of the
+ * provided context, driving the callbacks of them in the very same
+ * sequence that the io layer of a connection would.
+ * A test uses it to reach the operations that only ever run once a
+ * write has actually left this end.
+ *
+ * @param context The test context holding the connection.
+ * @return The number of the writes that have been completed.
+ */
+size_t flush_test_connection(struct test_context_t *context);
+
+/**
  * Builds the io and the HTTP connection layers on top of
  * the connection of the provided context, the handler that a
  * message is served by is left unset so that a test installs

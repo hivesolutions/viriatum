@@ -96,6 +96,17 @@ typedef struct http2_block_t {
 static ERROR_CODE _flush_http2_connection(struct http2_connection_t *http2_connection, struct http2_stream_t *http2_stream);
 
 /**
+ * Writes the payload that the streams of the connection are holding
+ * back in the order that the tree of the priorities describes,
+ * declared ahead of its definition as the handling of a frame drives
+ * it just as the queueing of a fragment does.
+ *
+ * @param http2_connection The session to be flushed.
+ * @return The resulting error code.
+ */
+static ERROR_CODE _schedule_http2_connection(struct http2_connection_t *http2_connection);
+
+/**
  * Retrieves the method of a request out of the value of the
  * method pseudo header, the comparison walks the very same table
  * the HTTP/1.1 parser reports its own values from.
@@ -233,7 +244,8 @@ ERROR_CODE close_stream_http2_connection(struct http2_connection_t *http2_connec
     the one that holds the last of the open streams and for the
     fragments that are still being held back */
     struct http2_pending_t *http2_pending;
-    size_t index = (size_t) (http2_stream - http2_connection->streams);
+    size_t index;
+    size_t slot = (size_t) (http2_stream - http2_connection->streams);
     size_t last = http2_connection->count - 1;
 
     /* unsets the handler that has been serving the stream, this is
@@ -269,9 +281,17 @@ ERROR_CODE close_stream_http2_connection(struct http2_connection_t *http2_connec
     delete_http_request(http2_stream->request);
     delete_http_settings(http2_stream->http_settings);
 
+    /* the streams that hung from this one come to hang from the one
+    it hung from, so that the tree keeps its shape once the stream is
+    gone, which is what the specification requires */
+    for(index = 0; index < http2_connection->count; index++) {
+        if(http2_connection->streams[index].priority.dependency != http2_stream->stream_id) { continue; }
+        http2_connection->streams[index].priority.dependency = http2_stream->priority.dependency;
+    }
+
     /* moves the last of the open streams into the slot that has just
     been freed, keeping the table compact */
-    if(index != last) { http2_connection->streams[index] = http2_connection->streams[last]; }
+    if(slot != last) { http2_connection->streams[slot] = http2_connection->streams[last]; }
     http2_connection->streams[last].stream_id = 0;
     http2_connection->count--;
 
@@ -385,6 +405,73 @@ ERROR_CODE delete_http2_connection(struct http2_connection_t *http2_connection) 
 
     /* releases the session */
     FREE(http2_connection);
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+/**
+ * Verifies whether the stream carrying the first identifier sits
+ * below the one carrying the second, walking the dependencies up
+ * from it towards the root of the tree.
+ *
+ * @param http2_connection The session holding the streams.
+ * @param stream_id The stream the walk starts at.
+ * @param ancestor_id The stream being looked for above it.
+ * @return The value one when the second is above the first.
+ */
+static char _descends_http2_connection(struct http2_connection_t *http2_connection, unsigned int stream_id, unsigned int ancestor_id) {
+    /* allocates space for the stream being visited along the walk and
+    for the bound that keeps a broken tree from looping forever */
+    struct http2_stream_t *http2_stream;
+    size_t index;
+
+    for(index = 0; index < http2_connection->count; index++) {
+        if(stream_id == 0) { return FALSE; }
+        if(stream_id == ancestor_id) { return TRUE; }
+
+        /* a stream that is no longer open is not part of the tree, so
+        the walk ends at the root as far as this end is concerned */
+        http2_stream = find_stream_http2_connection(http2_connection, stream_id);
+        if(http2_stream == NULL) { return FALSE; }
+        stream_id = http2_stream->priority.dependency;
+    }
+
+    return FALSE;
+}
+
+ERROR_CODE prioritise_stream_http2_connection(struct http2_connection_t *http2_connection, struct http2_stream_t *http2_stream, struct http2_priority_t *http2_priority) {
+    /* allocates space for the iteration over the streams that are
+    going to be moved along with this one */
+    struct http2_stream_t *parent;
+    size_t index;
+
+    /* a stream is never allowed to depend on itself, it would make the
+    tree carry a cycle that no walk of it would ever leave */
+    if(http2_priority->dependency == http2_stream->stream_id) {
+        RAISE_ERROR_S(HTTP2_PROTOCOL_ERROR);
+    }
+
+    /* in case the new parent sits below this stream the tree would
+    close a cycle, so the parent takes the place this stream held
+    before the move, which is what the specification requires */
+    if(_descends_http2_connection(http2_connection, http2_priority->dependency, http2_stream->stream_id)) {
+        parent = find_stream_http2_connection(http2_connection, http2_priority->dependency);
+        if(parent != NULL) { parent->priority.dependency = http2_stream->priority.dependency; }
+    }
+
+    /* an exclusive dependency takes over the siblings, every stream
+    that hung from the new parent comes to hang from this one */
+    if(http2_priority->exclusive == TRUE) {
+        for(index = 0; index < http2_connection->count; index++) {
+            if(http2_connection->streams[index].stream_id == http2_stream->stream_id) { continue; }
+            if(http2_connection->streams[index].priority.dependency != http2_priority->dependency) { continue; }
+            http2_connection->streams[index].priority.dependency = http2_stream->stream_id;
+        }
+    }
+
+    /* places the stream at the position that has been described */
+    http2_stream->priority = *http2_priority;
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -671,16 +758,6 @@ static ERROR_CODE _write_ping_http2_connection(struct http2_connection_t *http2_
 }
 
 /**
- * Gathers a single field of a header block into the message of the
- * stream, the pseudo headers populate it directly and the regular
- * ones are handed to the handler as they would be under HTTP/1.1.
- *
- * @param parameters The block structure carrying both the session
- * and the stream the field belongs to.
- * @param hpack_header The field that has been decoded.
- * @return The resulting error code.
- */
-/**
  * Hands the pseudo headers of a block to the handler, in the very
  * same shape that the request line and the host header of HTTP/1.1
  * would have reached it.
@@ -738,6 +815,16 @@ static ERROR_CODE _pseudo_http2_connection(struct http2_block_t *http2_block) {
     RAISE_NO_ERROR;
 }
 
+/**
+ * Gathers a single field of a header block into the message of the
+ * stream, the pseudo headers populate it directly and the regular
+ * ones are handed to the handler as they would be under HTTP/1.1.
+ *
+ * @param parameters The block structure carrying both the session
+ * and the stream the field belongs to.
+ * @param hpack_header The field that has been decoded.
+ * @return The resulting error code.
+ */
 static ERROR_CODE _header_http2_connection(void *parameters, struct hpack_header_t *hpack_header) {
     /* retrieves the block structure and out of it both the stream
     and the message that the field is going to populate */
@@ -957,6 +1044,154 @@ static ERROR_CODE _block_http2_connection(struct http2_connection_t *http2_conne
     RAISE_NO_ERROR;
 }
 
+ERROR_CODE push_stream_http2_connection(struct http2_connection_t *http2_connection, struct http2_stream_t *http2_stream, const char *path) {
+    /* allocates space for the stream that the promise reserves, for
+    the frame that carries it and for the field being encoded */
+    struct http2_stream_t *promised;
+    struct hpack_header_t hpack_header;
+    unsigned char *buffer;
+    size_t offset = HTTP2_HEADER_SIZE + 4;
+    size_t size;
+    unsigned int stream_id;
+    ERROR_CODE return_value;
+
+    /* a peer that has turned the pushing off gets nothing at all, the
+    setting is the only say it has on the matter */
+    if(http2_connection->remote.enable_push == FALSE) { RAISE_NO_ERROR; }
+
+    /* a promise opens a stream of this end, so it is bound by the
+    limit that the peer has announced rather than by the one that
+    bounds the streams the peer itself opens */
+    if(http2_connection->count >= http2_connection->remote.max_concurrent_streams ||
+       http2_connection->count >= HTTP2_STREAM_SLOTS) {
+        RAISE_NO_ERROR;
+    }
+
+    /* reserves the next of the identifiers of this end, a server only
+    ever opens the even numbered ones */
+    http2_connection->push_stream_id += 2;
+    stream_id = http2_connection->push_stream_id;
+    if(stream_id > (unsigned int) HTTP2_MAX_STREAM_ID) { RAISE_NO_ERROR; }
+
+    /* builds the block of the request that is being promised, the
+    pseudo headers of it describe the resource the peer is going to
+    receive without having asked for it */
+    buffer = (unsigned char *) MALLOC(HTTP2_HEADER_SIZE + 4 + VIRIATUM_HTTP_SIZE);
+    size = HTTP2_HEADER_SIZE + 4 + VIRIATUM_HTTP_SIZE;
+
+    hpack_header.name = (unsigned char *) ":method";
+    hpack_header.name_size = 7;
+    hpack_header.value = (unsigned char *) "GET";
+    hpack_header.value_size = 3;
+    encode_hpack(http2_connection->encoder, buffer, size, &offset, &hpack_header, FALSE);
+
+    hpack_header.name = (unsigned char *) ":scheme";
+    hpack_header.name_size = 7;
+    hpack_header.value = (unsigned char *) http2_stream->request->scheme;
+    hpack_header.value_size = strlen(http2_stream->request->scheme);
+    encode_hpack(http2_connection->encoder, buffer, size, &offset, &hpack_header, FALSE);
+
+    hpack_header.name = (unsigned char *) ":path";
+    hpack_header.name_size = 5;
+    hpack_header.value = (unsigned char *) path;
+    hpack_header.value_size = strlen(path);
+    encode_hpack(http2_connection->encoder, buffer, size, &offset, &hpack_header, FALSE);
+
+    if(http2_stream->request->authority[0] != '\0') {
+        hpack_header.name = (unsigned char *) ":authority";
+        hpack_header.name_size = 10;
+        hpack_header.value = http2_stream->request->authority;
+        hpack_header.value_size = strlen((char *) http2_stream->request->authority);
+        encode_hpack(http2_connection->encoder, buffer, size, &offset, &hpack_header, FALSE);
+    }
+
+    /* writes the header of the frame together with the identifier of
+    the stream that the promise reserves, the promise itself travels
+    on the stream that has asked for the resource that refers to it */
+    return_value = encode_frame_http2(
+        buffer,
+        size,
+        offset - HTTP2_HEADER_SIZE,
+        HTTP2_PUSH_PROMISE,
+        HTTP2_FLAG_END_HEADERS,
+        http2_stream->stream_id
+    );
+    if(IS_ERROR_CODE(return_value)) {
+        FREE(buffer);
+        RAISE_AGAIN(return_value);
+    }
+    encode_number_http2(&buffer[HTTP2_HEADER_SIZE], stream_id);
+
+    return_value = _write_http2_connection(http2_connection, buffer, offset);
+    if(IS_ERROR_CODE(return_value)) { RAISE_AGAIN(return_value); }
+
+    /* opens the stream that the promise has reserved, it is the one
+    the response of the resource is going to be written on */
+    promised = &http2_connection->streams[http2_connection->count];
+    promised->stream_id = stream_id;
+    promised->state = HTTP2_STATE_RESERVED_LOCAL;
+    promised->send_window = (long) http2_connection->remote.initial_window_size;
+    promised->receive_window = (long) http2_connection->settings.initial_window_size;
+    promised->priority.dependency = http2_stream->stream_id;
+    promised->priority.weight = HTTP2_DEFAULT_WEIGHT;
+    promised->priority.exclusive = FALSE;
+    promised->http_handler = NULL;
+    promised->end_stream = TRUE;
+    promised->headers_complete = TRUE;
+    promised->complete = FALSE;
+    promised->content_length = 0;
+    promised->announced = FALSE;
+    promised->received = 0;
+
+    create_http_request(&promised->request);
+    create_http_settings(&promised->http_settings);
+    create_linked_list(&promised->pending);
+
+    promised->request->version = HTTP20;
+    promised->request->stream_id = stream_id;
+    promised->request->parameters = http2_connection->http_connection->io_connection->connection;
+    promised->request->flags = FLAG_KEEP_ALIVE;
+    promised->request->method = HTTP_GET;
+    promised->request->scheme = http2_stream->request->scheme;
+    append_path_http_request(promised->request, (const unsigned char *) path, strlen(path));
+    memcpy(promised->request->authority, http2_stream->request->authority, VIRIATUM_MAX_PATH_SIZE);
+
+    http2_connection->count++;
+
+    /* hands the promised request to the handler, which answers it as
+    though the peer had asked for it in the first place */
+    promised->http_handler = http2_connection->http_connection->base_handler;
+    _activate_http2_connection(http2_connection, promised);
+    promised->http_handler->set(http2_connection->http_connection);
+    promised->http_handler = http2_connection->http_connection->http_handler;
+    _activate_http2_connection(http2_connection, promised);
+
+    if(promised->http_settings->on_message_begin) {
+        promised->http_settings->on_message_begin(promised->request);
+    }
+    if(promised->http_settings->on_url) {
+        promised->http_settings->on_url(
+            promised->request,
+            promised->request->path,
+            promised->request->path_size
+        );
+    }
+    if(promised->http_settings->on_headers_complete) {
+        promised->http_settings->on_headers_complete(promised->request);
+    }
+    if(promised->http_settings->on_message_complete) {
+        promised->http_settings->on_message_complete(promised->request);
+    }
+
+    /* makes the stream that has promised the resource the current one
+    again, the handler of it is still writing the response that has
+    referred to the resource being promised */
+    _activate_http2_connection(http2_connection, http2_stream);
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
 /**
  * Gathers a fragment of a header block into the buffer that
  * assembles it, bounding the block so that a peer is not able to
@@ -1139,12 +1374,15 @@ ERROR_CODE handle_frame_http2_connection(struct http2_connection_t *http2_connec
                 return_value = decode_priority_http2(payload, HTTP2_PRIORITY_SIZE, &http2_priority);
                 if(IS_ERROR_CODE(return_value)) { RAISE_AGAIN(return_value); }
 
-                /* a stream is never allowed to depend on itself, it
-                would make the tree carry a cycle */
-                if(http2_priority.dependency == http2_frame->stream_id) {
-                    RAISE_ERROR_S(HTTP2_PROTOCOL_ERROR);
-                }
-                http2_stream->priority = http2_priority;
+                /* places the stream at the position of the tree that
+                the frame describes, a dependency on itself is refused
+                by the placing as it would close a cycle */
+                return_value = prioritise_stream_http2_connection(
+                    http2_connection,
+                    http2_stream,
+                    &http2_priority
+                );
+                if(IS_ERROR_CODE(return_value)) { RAISE_AGAIN(return_value); }
                 payload += HTTP2_PRIORITY_SIZE;
                 payload_size -= HTTP2_PRIORITY_SIZE;
             }
@@ -1223,7 +1461,14 @@ ERROR_CODE handle_frame_http2_connection(struct http2_connection_t *http2_connec
             /* the priority of a stream that is not open is simply
             discarded, the tree of this end holds only open ones */
             http2_stream = find_stream_http2_connection(http2_connection, http2_frame->stream_id);
-            if(http2_stream != NULL) { http2_stream->priority = http2_priority; }
+            if(http2_stream != NULL) {
+                return_value = prioritise_stream_http2_connection(
+                    http2_connection,
+                    http2_stream,
+                    &http2_priority
+                );
+                if(IS_ERROR_CODE(return_value)) { RAISE_AGAIN(return_value); }
+            }
 
             /* breaks the switch */
             break;
@@ -1305,16 +1550,9 @@ ERROR_CODE handle_frame_http2_connection(struct http2_connection_t *http2_connec
             if(IS_ERROR_CODE(return_value)) { RAISE_AGAIN(return_value); }
 
             /* the widening of a window may let through the payload
-            that a stream has been holding back, an increment on the
-            connection releases every one of them at once */
-            if(http2_frame->stream_id == 0) {
-                for(offset = 0; offset < http2_connection->count; offset++) {
-                    _flush_http2_connection(http2_connection, &http2_connection->streams[offset]);
-                }
-            } else {
-                http2_stream = find_stream_http2_connection(http2_connection, http2_frame->stream_id);
-                if(http2_stream != NULL) { _flush_http2_connection(http2_connection, http2_stream); }
-            }
+            that the streams have been holding back, the order they
+            write in is the one the tree of the priorities describes */
+            _schedule_http2_connection(http2_connection);
 
             /* breaks the switch */
             break;
@@ -1728,6 +1966,101 @@ static ERROR_CODE _flush_http2_connection(struct http2_connection_t *http2_conne
     RAISE_NO_ERROR;
 }
 
+/**
+ * Verifies whether the provided stream is kept from writing by one
+ * of the streams it depends on, which is the case as soon as any of
+ * them still holds payload of its own.
+ *
+ * @param http2_connection The session holding the streams.
+ * @param http2_stream The stream being verified.
+ * @return The value one when a stream above it still has payload.
+ */
+static char _blocked_http2_connection(struct http2_connection_t *http2_connection, struct http2_stream_t *http2_stream) {
+    /* allocates space for the stream being visited along the walk and
+    for the bound that keeps a broken tree from looping forever */
+    struct http2_stream_t *parent;
+    unsigned int stream_id = http2_stream->priority.dependency;
+    size_t index;
+
+    for(index = 0; index < http2_connection->count; index++) {
+        /* the walk has reached the root of the tree, so nothing above
+        this stream is holding anything back */
+        if(stream_id == 0) { return FALSE; }
+
+        /* a stream that is no longer open holds nothing at all, so the
+        walk carries on towards the root */
+        parent = find_stream_http2_connection(http2_connection, stream_id);
+        if(parent == NULL) { return FALSE; }
+
+        /* the stream above still has payload of its own and a window
+        that lets it through, so this one waits for it */
+        if(parent->pending->size > 0 && parent->send_window > 0) { return TRUE; }
+
+        stream_id = parent->priority.dependency;
+    }
+
+    return FALSE;
+}
+
+/**
+ * Writes the payload that the streams of the connection are holding
+ * back, in the order that the tree of the priorities describes.
+ * A stream only writes once every one of the streams it depends on
+ * has nothing left to write, and among the ones that are able to
+ * write the heavier goes first, which is the ordering the tree of
+ * the specification asks for.
+ *
+ * @param http2_connection The session to be flushed.
+ * @return The resulting error code.
+ */
+static ERROR_CODE _schedule_http2_connection(struct http2_connection_t *http2_connection) {
+    /* allocates space for the iteration over the streams and for the
+    one that is chosen to write on each of the rounds */
+    struct http2_stream_t *http2_stream;
+    struct http2_stream_t *chosen;
+    size_t index;
+    size_t rounds;
+    size_t pending;
+
+    /* every round writes at most one of the streams, so the bound of
+    the rounds is the number of streams that hold something */
+    for(rounds = 0; rounds < HTTP2_STREAM_SLOTS; rounds++) {
+        chosen = NULL;
+
+        for(index = 0; index < http2_connection->count; index++) {
+            http2_stream = &http2_connection->streams[index];
+            if(http2_stream->pending->size == 0) { continue; }
+
+            /* a stream whose window is closed is not able to write, so
+            it never keeps the ones below it from doing so */
+            if(http2_stream->send_window <= 0) { continue; }
+
+            /* a stream only writes once the ones it depends on have
+            nothing left, which is what the tree describes */
+            if(_blocked_http2_connection(http2_connection, http2_stream)) { continue; }
+
+            /* among the ones that are able to write the heavier goes
+            first, the weight is what orders the siblings */
+            if(chosen == NULL || http2_stream->priority.weight > chosen->priority.weight) {
+                chosen = http2_stream;
+            }
+        }
+
+        /* nothing is able to write, either because nothing is being
+        held or because the windows do not allow any of it through */
+        if(chosen == NULL) { break; }
+
+        /* remembers what the stream was holding so that a round that
+        writes nothing at all does not spin forever */
+        pending = chosen->pending->size;
+        _flush_http2_connection(http2_connection, chosen);
+        if(chosen->pending->size == pending) { break; }
+    }
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
 ERROR_CODE write_chunk_http2(struct connection_t *connection, unsigned char *data, size_t size, char last, connection_data_callback_h2 callback, void *parameters) {
     /* allocates space for the session, for the stream the payload
     belongs to and for the fragment being queued */
@@ -1753,8 +2086,9 @@ ERROR_CODE write_chunk_http2(struct connection_t *connection, unsigned char *dat
     http2_pending->parameters = parameters;
     append_value_linked_list(http2_stream->pending, (void *) http2_pending);
 
-    /* raises again the result of the flushing of the stream */
-    RAISE_AGAIN(_flush_http2_connection(http2_connection, http2_stream));
+    /* hands the writing over to the scheduling, which is the one that
+    decides the order the streams write in */
+    RAISE_AGAIN(_schedule_http2_connection(http2_connection));
 }
 
 ERROR_CODE data_handler_stream_http2(struct io_connection_t *io_connection, unsigned char *buffer, size_t buffer_size) {

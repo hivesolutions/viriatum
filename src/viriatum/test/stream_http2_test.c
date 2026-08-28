@@ -380,6 +380,249 @@ const char *test_http2_connection_streams(void) {
     return NULL;
 }
 
+const char *test_http2_connection_priority(void) {
+    /* allocates space for the chain of the connection, for the
+    session and for the streams that make up the tree */
+    struct test_context_t *context;
+    struct http2_connection_t *http2_connection;
+    struct http2_stream_t *first;
+    struct http2_stream_t *second;
+    struct http2_stream_t *third;
+    struct http2_priority_t http2_priority;
+    struct http2_frame_t http2_frame;
+    unsigned char payload[256];
+    size_t offset;
+    ERROR_CODE error;
+
+    _create_http2_test(&context, &http2_connection);
+
+    /* opens three streams, every one of them hanging from the root
+    of the tree, which is where a stream starts its life */
+    open_stream_http2_connection(http2_connection, 1, &first);
+    open_stream_http2_connection(http2_connection, 3, &second);
+    open_stream_http2_connection(http2_connection, 5, &third);
+    V_ASSERT_EQ_U(first->priority.dependency, 0);
+    V_ASSERT_EQ_U(first->priority.weight, HTTP2_DEFAULT_WEIGHT);
+
+    /* places the second stream below the first, which is the plain
+    form of a dependency and the one a browser uses the most */
+    http2_priority.dependency = 1;
+    http2_priority.weight = 32;
+    http2_priority.exclusive = FALSE;
+    error = prioritise_stream_http2_connection(http2_connection, second, &http2_priority);
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+    V_ASSERT_EQ_U(second->priority.dependency, 1);
+    V_ASSERT_EQ_U(second->priority.weight, 32);
+
+    /* an exclusive dependency takes over the siblings, so the third
+    stream takes the place the second held below the first and the
+    second comes to hang from the third */
+    http2_priority.dependency = 1;
+    http2_priority.weight = 64;
+    http2_priority.exclusive = TRUE;
+    error = prioritise_stream_http2_connection(http2_connection, third, &http2_priority);
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+    V_ASSERT_EQ_U(third->priority.dependency, 1);
+    V_ASSERT_EQ_U(second->priority.dependency, 5);
+
+    /* a dependency on a stream that sits below moves that one out of
+    the way first, so that the tree never closes a cycle */
+    http2_priority.dependency = 5;
+    http2_priority.weight = 16;
+    http2_priority.exclusive = FALSE;
+    error = prioritise_stream_http2_connection(http2_connection, first, &http2_priority);
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+    V_ASSERT_EQ_U(first->priority.dependency, 5);
+    V_ASSERT_EQ_U(third->priority.dependency, 0);
+
+    /* a stream is never allowed to depend on itself, the tree would
+    carry a cycle that no walk of it would ever leave */
+    http2_priority.dependency = 1;
+    error = prioritise_stream_http2_connection(http2_connection, first, &http2_priority);
+    V_ASSERT_EQ_U(error, HTTP2_PROTOCOL_ERROR);
+
+    /* a block of headers that carries the priority places the stream
+    it opens right away, so that the first frame of it is enough for
+    the peer to describe where it belongs */
+    payload[0] = 0x80;
+    payload[1] = 0x00;
+    payload[2] = 0x00;
+    payload[3] = 0x03;
+    payload[4] = 31;
+    offset = _request_http2_test(&payload[HTTP2_PRIORITY_SIZE], sizeof(payload) - HTTP2_PRIORITY_SIZE, "/placed");
+
+    http2_frame.type = HTTP2_HEADERS;
+    http2_frame.flags = HTTP2_FLAG_END_HEADERS | HTTP2_FLAG_END_STREAM | HTTP2_FLAG_PRIORITY;
+    http2_frame.stream_id = 7;
+    http2_frame.length = HTTP2_PRIORITY_SIZE + offset;
+    http2_frame.payload = payload;
+    error = handle_frame_http2_connection(http2_connection, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+
+    /* the weight travels deducted of a unit and the most significant
+    bit of the dependency is the exclusive flag */
+    second = find_stream_http2_connection(http2_connection, 7);
+    V_ASSERT_NOT_NULL(second);
+    V_ASSERT_EQ_U(second->priority.dependency, 3);
+    V_ASSERT_EQ_U(second->priority.weight, 32);
+    V_ASSERT(second->priority.exclusive == TRUE);
+
+    /* a block that announces the priority and carries less than the
+    five bytes of it is malformed */
+    http2_frame.stream_id = 9;
+    http2_frame.length = HTTP2_PRIORITY_SIZE - 1;
+    error = handle_frame_http2_connection(http2_connection, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_FRAME_SIZE_ERROR);
+
+    /* the streams that hang from one that closes come to hang from
+    the one it hung from, so the tree keeps its shape */
+    third = find_stream_http2_connection(http2_connection, 5);
+    close_stream_http2_connection(http2_connection, third);
+    first = find_stream_http2_connection(http2_connection, 1);
+    second = find_stream_http2_connection(http2_connection, 3);
+    V_ASSERT_NOT_NULL(first);
+    V_ASSERT_NOT_NULL(second);
+    V_ASSERT_EQ_U(first->priority.dependency, 0);
+    V_ASSERT_EQ_U(second->priority.dependency, 0);
+
+    _delete_http2_test(context, http2_connection);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_http2_connection_push(void) {
+    /* allocates space for the chain of the connection, for the
+    session and for the frame that the promise produces */
+    struct test_context_t *context;
+    struct http2_connection_t *http2_connection;
+    struct http2_stream_t *http2_stream;
+    struct http2_stream_t *promised;
+    struct http2_frame_t http2_frame;
+    struct hpack_table_t *decoder;
+    struct hpack_collector_t collector;
+    struct data_t *data;
+    unsigned char block[256];
+    size_t queued;
+    ERROR_CODE error;
+
+    /* gathers the number of allocations that are outstanding so that
+    the promising may be verified to release every buffer it takes */
+    size_t allocated = ALLOCATIONS;
+
+    _create_http2_test(&context, &http2_connection);
+    _responder = TRUE;
+
+    /* hands a complete request over, the promise is made on the
+    stream that has asked for the resource referring to it */
+    http2_frame.type = HTTP2_HEADERS;
+    http2_frame.flags = HTTP2_FLAG_END_HEADERS | HTTP2_FLAG_END_STREAM;
+    http2_frame.stream_id = 1;
+    http2_frame.length = _request_http2_test(block, sizeof(block), "/index.html");
+    http2_frame.payload = block;
+    error = handle_frame_http2_connection(http2_connection, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+    V_ASSERT_EQ_U(_record.complete, 1);
+
+    http2_stream = find_stream_http2_connection(http2_connection, 1);
+    V_ASSERT_NOT_NULL(http2_stream);
+    queued = context->connection->write_queue->size;
+
+    error = push_stream_http2_connection(http2_connection, http2_stream, "/style.css");
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+
+    /* the stream that the promise reserves carries an even numbered
+    identifier, the odd ones belong to the peer, and it hangs from
+    the stream that has made the promise */
+    V_ASSERT_EQ_U(http2_connection->push_stream_id, 2);
+    promised = find_stream_http2_connection(http2_connection, 2);
+    V_ASSERT_NOT_NULL(promised);
+    V_ASSERT_EQ_U(promised->state, HTTP2_STATE_RESERVED_LOCAL);
+    V_ASSERT_EQ_U(promised->priority.dependency, 1);
+    V_ASSERT_EQ_U(http2_connection->count, 2);
+
+    /* the stream that has asked is the current one again, the
+    handler of it is still writing the response of the request */
+    V_ASSERT_EQ_P(context->http_connection->request, http2_stream->request);
+
+    /* the frame of the promise travels on the stream that has asked
+    and carries the identifier of the one it reserves */
+    get_value_linked_list(context->connection->write_queue, queued, (void **) &data);
+    V_ASSERT_NOT_NULL(data);
+    error = decode_frame_http2(data->data, data->size, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+    V_ASSERT_EQ_U(http2_frame.type, HTTP2_PUSH_PROMISE);
+    V_ASSERT_EQ_U(http2_frame.stream_id, 1);
+    V_ASSERT(http2_frame.flags & HTTP2_FLAG_END_HEADERS);
+    V_ASSERT_EQ_U(decode_number_http2(http2_frame.payload), 2);
+
+    /* the block of the promise describes the request of the resource
+    that the peer receives without ever having asked for it */
+    create_hpack_table(&decoder);
+    collector.count = 0;
+    error = decode_hpack(
+        decoder,
+        &http2_frame.payload[4],
+        http2_frame.length - 4,
+        collect_hpack_test,
+        (void *) &collector
+    );
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT_EQ_U(collector.count, 4);
+    V_ASSERT_EQ_S(collector.names[0], ":method");
+    V_ASSERT_EQ_S(collector.values[0], "GET");
+    V_ASSERT_EQ_S(collector.names[1], ":scheme");
+    V_ASSERT_EQ_S(collector.values[1], "http");
+    V_ASSERT_EQ_S(collector.names[2], ":path");
+    V_ASSERT_EQ_S(collector.values[2], "/style.css");
+    V_ASSERT_EQ_S(collector.names[3], ":authority");
+    V_ASSERT_EQ_S(collector.values[3], "localhost");
+    delete_hpack_table(decoder);
+
+    /* the handler has been driven for the promised resource in the
+    very same shape a request of the peer would have produced */
+    V_ASSERT_EQ_U(_record.begin, 2);
+    V_ASSERT_EQ_U(_record.url, 2);
+    V_ASSERT_EQ_S(_record.path, "/style.css");
+    V_ASSERT_EQ_U(_record.headers, 2);
+    V_ASSERT_EQ_U(_record.complete, 2);
+
+    /* the response of the promised resource has gone out on the
+    stream that the promise has reserved */
+    V_ASSERT(promised->complete == TRUE);
+
+    /* a peer that has turned the pushing off gets nothing at all, no
+    stream is reserved and no frame is written */
+    http2_connection->remote.enable_push = FALSE;
+    queued = context->connection->write_queue->size;
+    error = push_stream_http2_connection(http2_connection, http2_stream, "/script.js");
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+    V_ASSERT_EQ_U(http2_connection->push_stream_id, 2);
+    V_ASSERT_EQ_U(http2_connection->count, 2);
+    V_ASSERT_EQ_U(context->connection->write_queue->size, queued);
+
+    /* a peer that holds as many streams open as it allows gets
+    nothing either, a promise opens one of them */
+    http2_connection->remote.enable_push = TRUE;
+    http2_connection->remote.max_concurrent_streams = 2;
+    error = push_stream_http2_connection(http2_connection, http2_stream, "/script.js");
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+    V_ASSERT_EQ_U(http2_connection->count, 2);
+    V_ASSERT_EQ_U(context->connection->write_queue->size, queued);
+
+    _responder = FALSE;
+    _delete_http2_test(context, http2_connection);
+
+    /* every one of the buffers that the promise has taken is gone
+    together with the connection that carried them */
+    V_ASSERT_EQ_U(ALLOCATIONS, allocated);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
 const char *test_http2_connection_window(void) {
     /* allocates space for the chain of the connection, for the
     session and for the stream the windows apply to */
@@ -666,6 +909,158 @@ const char *test_http2_connection_headers(void) {
     V_ASSERT(http2_stream->end_stream == TRUE);
     V_ASSERT(http2_stream->headers_complete == TRUE);
     V_ASSERT_EQ_U(http2_stream->state, HTTP2_STATE_HALF_CLOSED_REMOTE);
+
+    _delete_http2_test(context, http2_connection);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+/**
+ * Writes a header block carrying the provided sequence of fields
+ * into the buffer, the sequence is a flat one of names and values
+ * that ends at an unset name.
+ *
+ * @param buffer The buffer to write the block into.
+ * @param buffer_size The size in bytes of the provided buffer.
+ * @param fields The names and the values of the fields, one after
+ * the other and ending at an unset value.
+ * @return The size in bytes of the block that has been written.
+ */
+static size_t _fields_http2_test(unsigned char *buffer, size_t buffer_size, const char **fields) {
+    struct hpack_table_t *encoder;
+    struct hpack_header_t hpack_header;
+    size_t offset = 0;
+    size_t index;
+
+    create_hpack_table(&encoder);
+
+    for(index = 0; fields[index] != NULL; index += 2) {
+        hpack_header.name = (unsigned char *) fields[index];
+        hpack_header.name_size = strlen(fields[index]);
+        hpack_header.value = (unsigned char *) fields[index + 1];
+        hpack_header.value_size = strlen(fields[index + 1]);
+        encode_hpack(encoder, buffer, buffer_size, &offset, &hpack_header, FALSE);
+    }
+
+    delete_hpack_table(encoder);
+
+    return offset;
+}
+
+/**
+ * Hands the provided sequence of fields to a session of its own as
+ * a complete request, a block that is refused leaves the decoder
+ * out of step and so it is never reused.
+ *
+ * @param fields The names and the values of the fields, one after
+ * the other and ending at an unset value.
+ * @return The resulting error code.
+ */
+static ERROR_CODE _deliver_http2_test(const char **fields) {
+    struct test_context_t *context;
+    struct http2_connection_t *http2_connection;
+    struct http2_frame_t http2_frame;
+    unsigned char block[256];
+    ERROR_CODE return_value;
+
+    _create_http2_test(&context, &http2_connection);
+
+    http2_frame.type = HTTP2_HEADERS;
+    http2_frame.flags = HTTP2_FLAG_END_HEADERS | HTTP2_FLAG_END_STREAM;
+    http2_frame.stream_id = 1;
+    http2_frame.length = _fields_http2_test(block, sizeof(block), fields);
+    http2_frame.payload = block;
+    return_value = handle_frame_http2_connection(http2_connection, &http2_frame);
+
+    _delete_http2_test(context, http2_connection);
+
+    return return_value;
+}
+
+const char *test_http2_connection_fields(void) {
+    /* allocates space for the chain of the connection, for the
+    session and for the block of the request */
+    struct test_context_t *context;
+    struct http2_connection_t *http2_connection;
+    struct http2_stream_t *http2_stream;
+    struct http2_frame_t http2_frame;
+    unsigned char block[256];
+    size_t index;
+    ERROR_CODE error;
+
+    /* the blocks that a peer is not allowed to send, every one of
+    them carrying a single violation of the rules of a request */
+    static const char *invalid[][12] = {
+        { ":method", "BREW", ":scheme", "http", ":path", "/", NULL },
+        { ":method", "GET", ":scheme", "ftp", ":path", "/", NULL },
+        { ":method", "GET", ":scheme", "http", ":path", "", NULL },
+        { ":method", "GET", ":method", "POST", ":scheme", "http", ":path", "/", NULL },
+        { ":method", "GET", ":scheme", "http", ":scheme", "http", ":path", "/", NULL },
+        { ":method", "GET", ":scheme", "http", ":path", "/", ":path", "/", NULL },
+        { ":method", "GET", ":scheme", "http", ":path", "/", ":authority", "a", ":authority", "b", NULL },
+        { ":method", "GET", ":scheme", "http", ":path", "/", ":status", "200", NULL },
+        { ":method", "GET", ":scheme", "http", ":path", "/", "accept", "*/*", ":authority", "a", NULL },
+        { ":method", "GET", ":scheme", "http", ":path", "/", "Accept", "*/*", NULL },
+        { ":method", "GET", ":scheme", "http", ":path", "/", "connection", "close", NULL },
+        { ":method", "GET", ":scheme", "http", ":path", "/", "keep-alive", "1", NULL },
+        { ":method", "GET", ":scheme", "http", ":path", "/", "upgrade", "h2c", NULL },
+        { ":method", "GET", ":scheme", "http", ":path", "/", "transfer-encoding", "chunked", NULL },
+        { ":method", "GET", ":scheme", "http", ":path", "/", "te", "gzip", NULL }
+    };
+
+    /* the block that leaves out the path, it is the only one of the
+    malformed ones that survives the decoding of the block */
+    static const char *partial[] = {
+        ":method", "GET", ":scheme", "http", NULL
+    };
+
+    /* the fields that a peer is allowed to send, the secure scheme
+    and the only value the trailer announcement carries */
+    static const char *valid[] = {
+        ":method", "POST", ":scheme", "https", ":path", "/secure", "te", "trailers", NULL
+    };
+
+    /* every one of the malformed blocks is refused, the decoding of
+    it is aborted half way and so the table of the connection is out
+    of step with the one of the peer from that point on */
+    for(index = 0; index < sizeof(invalid) / sizeof(invalid[0]); index++) {
+        error = _deliver_http2_test(invalid[index]);
+        V_ASSERT_EQ_U(error, HTTP2_COMPRESSION_ERROR);
+    }
+
+    /* a block that leaves out one of the required pseudo headers is
+    verified once the complete set of them has been gathered, which
+    happens after the decoding of it has run to the end */
+    error = _deliver_http2_test(partial);
+    V_ASSERT_EQ_U(error, HTTP2_PROTOCOL_ERROR);
+
+    /* the block that carries the secure scheme and the announcement
+    of the trailers is served as any other one is */
+    _create_http2_test(&context, &http2_connection);
+
+    http2_frame.type = HTTP2_HEADERS;
+    http2_frame.flags = HTTP2_FLAG_END_HEADERS | HTTP2_FLAG_END_STREAM;
+    http2_frame.stream_id = 1;
+    http2_frame.length = _fields_http2_test(block, sizeof(block), valid);
+    http2_frame.payload = block;
+    error = handle_frame_http2_connection(http2_connection, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+    V_ASSERT_EQ_U(_record.complete, 1);
+
+    /* the scheme is kept as one of the static strings, so nothing at
+    all has to be released together with the message */
+    http2_stream = find_stream_http2_connection(http2_connection, 1);
+    V_ASSERT_NOT_NULL(http2_stream);
+    V_ASSERT_EQ_U(http2_stream->request->method, HTTP_POST);
+    V_ASSERT_EQ_S(http2_stream->request->scheme, HTTPS_SCHEME);
+    V_ASSERT_EQ_S((char *) http2_stream->request->path, "/secure");
+
+    /* the message carries no authority at all, so nothing has been
+    handed over as the host header of it */
+    V_ASSERT_EQ_U(_record.field, 1);
+    V_ASSERT_EQ_S(_record.name, "te");
 
     _delete_http2_test(context, http2_connection);
 
@@ -980,6 +1375,11 @@ const char *test_http2_connection_read(void) {
     V_ASSERT_EQ_U(get_closed_test_connection(), 0);
     V_ASSERT(context->connection->write_queue->size > 0);
 
+    /* the completion of the write of that frame is what takes the
+    connection down, the peer learns the reason first */
+    flush_test_connection(context);
+    V_ASSERT_EQ_U(get_closed_test_connection(), 1);
+
     delete_http2_connection(http2_connection);
     delete_test_connection(context);
     delete_test_context(context);
@@ -1140,6 +1540,273 @@ const char *test_http2_connection_response(void) {
     return NULL;
 }
 
+const char *test_http2_connection_complete(void) {
+    /* allocates space for the chain of the connection, for the
+    session and for the streams that are answered */
+    struct test_context_t *context;
+    struct http2_connection_t *http2_connection;
+    struct http2_frame_t http2_frame;
+    unsigned char block[256];
+    size_t count;
+    ERROR_CODE error;
+
+    /* gathers the number of allocations that are outstanding so that
+    the completion of a write may be verified to release both the
+    buffers and the structures that carry a stream through it */
+    size_t allocated = ALLOCATIONS;
+
+    _create_http2_test(&context, &http2_connection);
+    _responder = TRUE;
+
+    /* hands two complete requests over, the handler answers both of
+    them and the responses are queued on the connection */
+    http2_frame.type = HTTP2_HEADERS;
+    http2_frame.flags = HTTP2_FLAG_END_HEADERS | HTTP2_FLAG_END_STREAM;
+    http2_frame.payload = block;
+
+    http2_frame.stream_id = 1;
+    http2_frame.length = _request_http2_test(block, sizeof(block), "/first");
+    error = handle_frame_http2_connection(http2_connection, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+
+    http2_frame.stream_id = 3;
+    http2_frame.length = _request_http2_test(block, sizeof(block), "/second");
+    error = handle_frame_http2_connection(http2_connection, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+
+    /* every one of the writes carries a structure that restores the
+    stream once it completes, the block of the headers and the
+    payload of the response for each of the streams */
+    V_ASSERT_EQ_U(http2_connection->count, 2);
+    V_ASSERT_EQ_U(http2_connection->callbacks->size, 4);
+
+    /* completes the writes, a stream only closes once the payload
+    that closes the message of it has actually left this end */
+    count = flush_test_connection(context);
+    V_ASSERT(count > 0);
+    V_ASSERT_EQ_U(http2_connection->count, 0);
+    V_ASSERT_EQ_U(http2_connection->callbacks->size, 0);
+    V_ASSERT_NULL(find_stream_http2_connection(http2_connection, 1));
+    V_ASSERT_NULL(find_stream_http2_connection(http2_connection, 3));
+
+    /* the connection is left pointing at no message at all, the ones
+    it was pointing at have gone together with the streams */
+    V_ASSERT_NULL(context->http_connection->request);
+
+    /* the closing of the streams does not take the connection down,
+    a session serves one message after the other over it */
+    V_ASSERT_EQ_U(get_closed_test_connection(), 0);
+
+    _responder = FALSE;
+    _delete_http2_test(context, http2_connection);
+
+    /* both the buffers of the responses and the structures that were
+    carrying the streams through the writes are gone */
+    V_ASSERT_EQ_U(ALLOCATIONS, allocated);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_http2_connection_error(void) {
+    /* allocates space for the chain of the connection, for the
+    session and for the frames that the error produces */
+    struct test_context_t *context;
+    struct http2_connection_t *http2_connection;
+    struct http2_frame_t http2_frame;
+    struct hpack_table_t *decoder;
+    struct hpack_collector_t collector;
+    unsigned char block[256];
+    unsigned char written[1024];
+    size_t size;
+    ERROR_CODE error;
+
+    /* gathers the number of allocations that are outstanding so that
+    the writing of an error may be verified to release the buffers
+    that it takes, the payload of it is copied */
+    size_t allocated = ALLOCATIONS;
+
+    _create_http2_test(&context, &http2_connection);
+
+    /* opens a stream through a complete request, the error is the
+    response of the message that it carries */
+    http2_frame.type = HTTP2_HEADERS;
+    http2_frame.flags = HTTP2_FLAG_END_HEADERS | HTTP2_FLAG_END_STREAM;
+    http2_frame.stream_id = 1;
+    http2_frame.length = _request_http2_test(block, sizeof(block), "/missing");
+    http2_frame.payload = block;
+    error = handle_frame_http2_connection(http2_connection, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+
+    /* writes an error for the message, it reaches the peer as the
+    frames of this protocol rather than as the text of HTTP/1.1 */
+    error = write_http_error(
+        context->connection,
+        NULL,
+        0,
+        HTTP20,
+        404,
+        "Not Found",
+        NULL,
+        KEEP_ALIVE,
+        NULL,
+        NULL
+    );
+    V_ASSERT_EQ_U(error, 0);
+
+    /* the first of the frames carries the block of the headers and
+    it does not close the stream by itself */
+    size = _written_http2_test(context, written, sizeof(written));
+    error = decode_frame_http2(written, size, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+    V_ASSERT_EQ_U(http2_frame.type, HTTP2_HEADERS);
+    V_ASSERT_EQ_U(http2_frame.stream_id, 1);
+    V_ASSERT(http2_frame.flags & HTTP2_FLAG_END_HEADERS);
+
+    /* the block carries the status of the error together with the
+    fields that describe the payload of it */
+    create_hpack_table(&decoder);
+    collector.count = 0;
+    error = decode_hpack(
+        decoder,
+        http2_frame.payload,
+        http2_frame.length,
+        collect_hpack_test,
+        (void *) &collector
+    );
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT_EQ_U(collector.count, 4);
+    V_ASSERT_EQ_S(collector.names[0], ":status");
+    V_ASSERT_EQ_S(collector.values[0], "404");
+    V_ASSERT_EQ_S(collector.names[1], "server");
+    V_ASSERT_EQ_S(collector.names[2], "content-length");
+    V_ASSERT_EQ_S(collector.names[3], "cache-control");
+    delete_hpack_table(decoder);
+
+    /* the payload follows the block and it is the frame that closes
+    the stream, the text of it describes the error */
+    error = decode_frame_http2(
+        &written[HTTP2_HEADER_SIZE + http2_frame.length],
+        size - HTTP2_HEADER_SIZE - http2_frame.length,
+        &http2_frame
+    );
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+    V_ASSERT_EQ_U(http2_frame.type, HTTP2_DATA);
+    V_ASSERT_EQ_U(http2_frame.stream_id, 1);
+    V_ASSERT(http2_frame.flags & HTTP2_FLAG_END_STREAM);
+    V_ASSERT_MEM(http2_frame.payload, "404 - Not Found - ", 18);
+
+    _delete_http2_test(context, http2_connection);
+
+    /* an error that carries a realm announces the authentication the
+    peer is expected to provide as one more field of the block */
+    _create_http2_test(&context, &http2_connection);
+
+    http2_frame.type = HTTP2_HEADERS;
+    http2_frame.flags = HTTP2_FLAG_END_HEADERS | HTTP2_FLAG_END_STREAM;
+    http2_frame.stream_id = 1;
+    http2_frame.length = _request_http2_test(block, sizeof(block), "/private");
+    http2_frame.payload = block;
+    error = handle_frame_http2_connection(http2_connection, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+
+    error = write_http_error_a(
+        context->connection,
+        NULL,
+        0,
+        HTTP20,
+        401,
+        "Unauthorized",
+        NULL,
+        "viriatum",
+        KEEP_ALIVE,
+        NULL,
+        NULL
+    );
+    V_ASSERT_EQ_U(error, 0);
+
+    size = _written_http2_test(context, written, sizeof(written));
+    error = decode_frame_http2(written, size, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+
+    create_hpack_table(&decoder);
+    collector.count = 0;
+    error = decode_hpack(
+        decoder,
+        http2_frame.payload,
+        http2_frame.length,
+        collect_hpack_test,
+        (void *) &collector
+    );
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT_EQ_U(collector.count, 5);
+    V_ASSERT_EQ_S(collector.values[0], "401");
+    V_ASSERT_EQ_S(collector.names[4], "www-authenticate");
+    V_ASSERT_EQ_S(collector.values[4], "Basic realm=\"viriatum\"");
+    delete_hpack_table(decoder);
+
+    _delete_http2_test(context, http2_connection);
+
+    /* an installation that asks for the errors to be built from a
+    template and carries no such file falls back on the text of it,
+    which reaches the peer through the very same frames */
+    _create_http2_test(&context, &http2_connection);
+    context->options->use_template = 1;
+    SPRINTF(
+        (char *) context->options->resources_path,
+        VIRIATUM_MAX_PATH_SIZE, "%s",
+        "/missing"
+    );
+
+    http2_frame.type = HTTP2_HEADERS;
+    http2_frame.flags = HTTP2_FLAG_END_HEADERS | HTTP2_FLAG_END_STREAM;
+    http2_frame.stream_id = 1;
+    http2_frame.length = _request_http2_test(block, sizeof(block), "/template");
+    http2_frame.payload = block;
+    error = handle_frame_http2_connection(http2_connection, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+
+    error = write_http_error(
+        context->connection,
+        NULL,
+        0,
+        HTTP20,
+        404,
+        "Not Found",
+        NULL,
+        KEEP_ALIVE,
+        NULL,
+        NULL
+    );
+    V_ASSERT_EQ_U(error, 0);
+
+    size = _written_http2_test(context, written, sizeof(written));
+    error = decode_frame_http2(written, size, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+    V_ASSERT_EQ_U(http2_frame.type, HTTP2_HEADERS);
+
+    error = decode_frame_http2(
+        &written[HTTP2_HEADER_SIZE + http2_frame.length],
+        size - HTTP2_HEADER_SIZE - http2_frame.length,
+        &http2_frame
+    );
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+    V_ASSERT_EQ_U(http2_frame.type, HTTP2_DATA);
+    V_ASSERT(http2_frame.flags & HTTP2_FLAG_END_STREAM);
+    V_ASSERT_MEM(http2_frame.payload, "404 - Not Found - ", 18);
+
+    _delete_http2_test(context, http2_connection);
+
+    /* the buffer of the headers and the copy of the payload are both
+    gone together with the connection that carried them */
+    V_ASSERT_EQ_U(ALLOCATIONS, allocated);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
 const char *test_http2_connection_flow(void) {
     /* allocates space for the chain of the connection, for the
     session and for the stream the payload is held back on */
@@ -1260,6 +1927,151 @@ const char *test_http2_connection_split(void) {
     /* the buffers of both of the parts are gone, the one of the
     handler and the copies that the splitting has taken */
     V_ASSERT_EQ_U(ALLOCATIONS, allocated);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_http2_connection_schedule(void) {
+    /* allocates space for the chain of the connection, for the
+    session and for the streams that hold the payload back */
+    struct test_context_t *context;
+    struct http2_connection_t *http2_connection;
+    struct http2_stream_t *first;
+    struct http2_stream_t *second;
+    struct http2_stream_t *third;
+    struct http2_frame_t http2_frame;
+    struct http2_priority_t http2_priority;
+    struct data_t *data;
+    unsigned char block[256];
+    unsigned char payload[8];
+    size_t queued;
+    ERROR_CODE error;
+
+    _create_http2_test(&context, &http2_connection);
+    _responder = TRUE;
+
+    /* closes the window of the connection so that every one of the
+    streams ends up holding the payload of its response back */
+    http2_connection->send_window = 0;
+
+    http2_frame.type = HTTP2_HEADERS;
+    http2_frame.flags = HTTP2_FLAG_END_HEADERS | HTTP2_FLAG_END_STREAM;
+    http2_frame.payload = block;
+
+    http2_frame.stream_id = 1;
+    http2_frame.length = _request_http2_test(block, sizeof(block), "/first");
+    error = handle_frame_http2_connection(http2_connection, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+
+    http2_frame.stream_id = 3;
+    http2_frame.length = _request_http2_test(block, sizeof(block), "/second");
+    error = handle_frame_http2_connection(http2_connection, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+
+    http2_frame.stream_id = 5;
+    http2_frame.length = _request_http2_test(block, sizeof(block), "/third");
+    error = handle_frame_http2_connection(http2_connection, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+
+    first = find_stream_http2_connection(http2_connection, 1);
+    second = find_stream_http2_connection(http2_connection, 3);
+    third = find_stream_http2_connection(http2_connection, 5);
+    V_ASSERT_EQ_U(first->pending->size, 1);
+    V_ASSERT_EQ_U(second->pending->size, 1);
+    V_ASSERT_EQ_U(third->pending->size, 1);
+
+    /* places the second stream below the first and leaves the third
+    at the root carrying the heavier of the weights */
+    http2_priority.dependency = 1;
+    http2_priority.weight = HTTP2_DEFAULT_WEIGHT;
+    http2_priority.exclusive = FALSE;
+    prioritise_stream_http2_connection(http2_connection, second, &http2_priority);
+
+    http2_priority.dependency = 0;
+    http2_priority.weight = 64;
+    http2_priority.exclusive = FALSE;
+    prioritise_stream_http2_connection(http2_connection, third, &http2_priority);
+
+    /* widens the window of the connection by exactly one payload, so
+    that only one of the streams is able to write */
+    http2_frame.type = HTTP2_WINDOW_UPDATE;
+    http2_frame.flags = 0x00;
+    http2_frame.stream_id = 0;
+    http2_frame.length = 4;
+    http2_frame.payload = payload;
+
+    queued = context->connection->write_queue->size;
+    encode_number_http2(payload, 2);
+    error = handle_frame_http2_connection(http2_connection, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+
+    /* among the streams that are able to write the heavier one goes
+    first, so the third is the one that has written */
+    first = find_stream_http2_connection(http2_connection, 1);
+    second = find_stream_http2_connection(http2_connection, 3);
+    third = find_stream_http2_connection(http2_connection, 5);
+    V_ASSERT_EQ_U(third->pending->size, 0);
+    V_ASSERT_EQ_U(first->pending->size, 1);
+    V_ASSERT_EQ_U(second->pending->size, 1);
+
+    get_value_linked_list(context->connection->write_queue, queued, (void **) &data);
+    V_ASSERT_NOT_NULL(data);
+    error = decode_frame_http2(data->data, data->size, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+    V_ASSERT_EQ_U(http2_frame.type, HTTP2_DATA);
+    V_ASSERT_EQ_U(http2_frame.stream_id, 5);
+    V_ASSERT_EQ_U(http2_frame.length, 2);
+
+    /* the room that follows goes to the first stream, the second one
+    hangs from it and so it waits for it to be done */
+    http2_frame.type = HTTP2_WINDOW_UPDATE;
+    http2_frame.flags = 0x00;
+    http2_frame.stream_id = 0;
+    http2_frame.length = 4;
+    http2_frame.payload = payload;
+
+    queued = context->connection->write_queue->size;
+    error = handle_frame_http2_connection(http2_connection, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+
+    first = find_stream_http2_connection(http2_connection, 1);
+    second = find_stream_http2_connection(http2_connection, 3);
+    V_ASSERT_EQ_U(first->pending->size, 0);
+    V_ASSERT_EQ_U(second->pending->size, 1);
+
+    get_value_linked_list(context->connection->write_queue, queued, (void **) &data);
+    V_ASSERT_NOT_NULL(data);
+    error = decode_frame_http2(data->data, data->size, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+    V_ASSERT_EQ_U(http2_frame.type, HTTP2_DATA);
+    V_ASSERT_EQ_U(http2_frame.stream_id, 1);
+
+    /* with nothing above it holding anything back the stream that
+    sits below finally writes the payload it was holding */
+    http2_frame.type = HTTP2_WINDOW_UPDATE;
+    http2_frame.flags = 0x00;
+    http2_frame.stream_id = 0;
+    http2_frame.length = 4;
+    http2_frame.payload = payload;
+
+    queued = context->connection->write_queue->size;
+    error = handle_frame_http2_connection(http2_connection, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+
+    second = find_stream_http2_connection(http2_connection, 3);
+    V_ASSERT_EQ_U(second->pending->size, 0);
+
+    get_value_linked_list(context->connection->write_queue, queued, (void **) &data);
+    V_ASSERT_NOT_NULL(data);
+    error = decode_frame_http2(data->data, data->size, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+    V_ASSERT_EQ_U(http2_frame.type, HTTP2_DATA);
+    V_ASSERT_EQ_U(http2_frame.stream_id, 3);
+
+    _responder = FALSE;
+    _delete_http2_test(context, http2_connection);
 
     /* returns the default value, nothing happened so there's
     nothing to report for this execution */

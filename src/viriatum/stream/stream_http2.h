@@ -406,6 +406,32 @@ ERROR_CODE open_stream_http2_connection(struct http2_connection_t *http2_connect
 ERROR_CODE close_stream_http2_connection(struct http2_connection_t *http2_connection, struct http2_stream_t *http2_stream);
 
 /**
+ * Places the provided stream at the position of the tree that the
+ * given priority describes, moving the parent out of the way when
+ * the dependency would otherwise close a cycle and taking over the
+ * siblings when the dependency is an exclusive one.
+ *
+ * @param http2_connection The session holding the stream.
+ * @param http2_stream The stream to be placed.
+ * @param http2_priority The priority describing the position.
+ * @return The resulting error code.
+ */
+ERROR_CODE prioritise_stream_http2_connection(struct http2_connection_t *http2_connection, struct http2_stream_t *http2_stream, struct http2_priority_t *http2_priority);
+
+/**
+ * Promises a resource to the peer on the provided stream, which
+ * reserves a stream of its own for the response and hands the
+ * request of it to the handler as though the peer had asked.
+ * A peer that has turned the pushing off gets nothing at all.
+ *
+ * @param http2_connection The session making the promise.
+ * @param http2_stream The stream the promise is made on.
+ * @param path The path of the resource being promised.
+ * @return The resulting error code.
+ */
+ERROR_CODE push_stream_http2_connection(struct http2_connection_t *http2_connection, struct http2_stream_t *http2_stream, const char *path);
+
+/**
  * Applies a window increment over both the connection and the
  * streams, an increment that takes a window beyond the largest
  * value the protocol represents is refused.
