@@ -40,14 +40,14 @@ ERROR_CODE unset_handler_diag(struct http_connection_t *http_connection) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE message_complete_callback_handler_diag(struct http_parser_t *http_parser) {
+ERROR_CODE message_complete_callback_handler_diag(struct http_request_t *http_request) {
     /* sends (and creates) the response from the currently parsed
     messages and then returns with no error the caller function */
-    _send_response_handler_diag(http_parser);
+    _send_response_handler_diag(http_request);
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _send_response_handler_diag(struct http_parser_t *http_parser) {
+ERROR_CODE _send_response_handler_diag(struct http_request_t *http_request) {
     /* allocates the space for the buffer to be used to
     send the data to the client side and for the counter
     that stores the size of the buffer to be sent*/
@@ -62,7 +62,7 @@ ERROR_CODE _send_response_handler_diag(struct http_parser_t *http_parser) {
 
     /* retrieves the connection from the HTTP parser parameters and
     uses it to retrieve the associated service instance */
-    struct connection_t *connection = (struct connection_t *) http_parser->parameters;
+    struct connection_t *connection = (struct connection_t *) http_request->parameters;
     struct service_t *service = (struct service_t *) connection->service;
 
     /* retrieves the HTTP connection from the io connection to be used
@@ -128,7 +128,7 @@ ERROR_CODE _send_response_handler_diag(struct http_parser_t *http_parser) {
         HTTP11,
         200,
         "OK",
-        http_parser->flags & FLAG_KEEP_ALIVE ? KEEP_ALIVE : KEEP_CLOSE,
+        http_request->flags & FLAG_KEEP_ALIVE ? KEEP_ALIVE : KEEP_CLOSE,
         info_size,
         NO_CACHE,
         FALSE
@@ -150,7 +150,7 @@ ERROR_CODE _send_response_handler_diag(struct http_parser_t *http_parser) {
         (unsigned char *) buffer,
         (unsigned int) count,
         _send_response_callback_handler_diag,
-        (void *) (size_t) http_parser->flags
+        (void *) (size_t) http_request->flags
     );
 
     /* raise no error */

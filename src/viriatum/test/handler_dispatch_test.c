@@ -27,40 +27,40 @@
 #include "handler_dispatch_test.h"
 
 const char *test_dispatch_handler_context_keepalive(void) {
-    /* allocates space for the HTTP parser and for a
+    /* allocates space for the HTTP request and for a
     handler file context to simulate keep-alive reuse */
-    struct http_parser_t *http_parser;
+    struct http_request_t *http_request;
     struct handler_file_context_t *handler_file_context;
 
-    /* creates the HTTP parser and the handler file context,
+    /* creates the HTTP request and the handler file context,
     wiring them together through the context pointer to
     simulate a file handler that has just processed a request */
-    create_http_parser(&http_parser, TRUE);
+    create_http_request(&http_request);
     create_handler_file_context(&handler_file_context);
-    http_parser->context = handler_file_context;
+    http_request->context = handler_file_context;
 
     /* simulates the file handler unset which deletes the
     context structure and nullifies the pointer, matching
-    the corrected behavior of _unset_http_parser_handler_file */
+    the corrected behavior of _unset_http_request_handler_file */
     delete_handler_file_context(handler_file_context);
-    http_parser->context = NULL;
+    http_request->context = NULL;
 
     /* simulates the dispatch handler being re-set for the
     next keep-alive request, context should be NULL at this
     point because the file handler properly cleaned up */
-    _set_http_parser_handler_dispatch(http_parser);
+    _set_http_request_handler_dispatch(http_request);
 
     /* calls the dispatch handler unset, which is triggered
     when the dispatch handler finds a target handler and
     switches to it, context is NULL so no free should occur */
-    _unset_http_parser_handler_dispatch(http_parser);
+    _unset_http_request_handler_dispatch(http_request);
 
     /* verifies that the context pointer remains NULL after
     the dispatch handler unset (no corruption occurred) */
-    V_ASSERT(http_parser->context == NULL);
+    V_ASSERT(http_request->context == NULL);
 
-    /* cleans up the parser */
-    delete_http_parser(http_parser);
+    /* cleans up the request */
+    delete_http_request(http_request);
 
     /* returns the default value, nothing happened so there's
     nothing to report for this execution */

@@ -174,8 +174,22 @@ typedef struct http_connection_t {
      * Parser to be used during the interpretation
      * of the HTTP requests. The state of this parser
      * is variable and should not be trusted.
+     * Only set for an HTTP/1.1 connection, an HTTP/2
+     * one is driven by a session instead.
      */
     struct http_parser_t *http_parser;
+
+    /**
+     * The message that is currently being handled in
+     * the connection, this is the protocol agnostic
+     * structure that the handlers interact with.
+     * Under HTTP/1.1 this is the one owned by the parser
+     * and it lives for the complete life-time of the
+     * connection, under HTTP/2 it is the one of the
+     * stream that is being served and so it changes
+     * along the life-time of the connection.
+     */
+    struct http_request_t *request;
 
     /**
      * The handler currently being used to handle

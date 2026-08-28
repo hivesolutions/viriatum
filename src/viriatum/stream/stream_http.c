@@ -96,8 +96,23 @@ ERROR_CODE create_http_connection(struct http_connection_t **http_connection_poi
     /* creates the HTTP parser (for a request) */
     create_http_parser(&http_connection->http_parser, 1);
 
-    /* sets the connection as the parser parameter(s) */
-    http_connection->http_parser->parameters = io_connection->connection;
+    /* sets the message owned by the parser as the one currently being
+    handled, under HTTP/1.1 only one message is in transit at a given
+    time and so this reference never changes */
+    http_connection->request = http_connection->http_parser->request;
+
+    /* sets the connection as the message parameter(s), this is the
+    reference that allows an handler to reach the upper objects */
+    http_connection->http_parser->request->parameters = io_connection->connection;
+
+    /* sets the scheme of the message according to the transport that
+    is carrying the connection, this value stays for the complete
+    life-time of the connection as it never changes on it */
+#ifdef VIRIATUM_SSL
+    if(io_connection->connection->ssl_handle != NULL) {
+        http_connection->http_parser->request->scheme = HTTPS_SCHEME;
+    }
+#endif
 
     /* sets the HTTP connection in the (upper) io connection substrate */
     io_connection->lower = http_connection;
@@ -305,6 +320,11 @@ ERROR_CODE data_handler_stream_http(struct io_connection_t *io_connection, unsig
             http_connection->http_parser->header_field_mark = 0;
             http_connection->http_parser->header_value_mark = 0;
             http_connection->http_parser->url_mark = 0;
+
+            /* resets the message structure so that none of the values
+            of the message that has just been handled leaks into the
+            next one of the same connection */
+            reset_http_request(http_connection->http_parser->request);
 
             /* in case the current HTTP connection read offset has reached
             the buffer size it's time to reset the buffer (no more data to

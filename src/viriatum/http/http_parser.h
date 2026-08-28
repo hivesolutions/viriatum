@@ -24,6 +24,8 @@
 
 #pragma once
 
+#include "http_request.h"
+
 /**
  * The carriage return character.
  */
@@ -73,27 +75,44 @@
         FOR##_mark = pointer; \
     } while(0)
 
-#define HTTP_CALLBACK(FOR)                                  \
-    do {                                                    \
-        if(http_settings->on_##FOR) {                       \
-            if(http_settings->on_##FOR(http_parser) != 0) { \
-                /*SET_ERRNO(HPE_CB_##FOR);*/                \
-                /*return (pointer - data);*/                \
-            }                                               \
-        }                                                   \
+#define HTTP_CALLBACK(FOR)                                           \
+    do {                                                             \
+        if(http_settings->on_##FOR) {                                \
+            update_request_http_parser(http_parser);                 \
+            if(http_settings->on_##FOR(http_parser->request) != 0) { \
+                /*SET_ERRNO(HPE_CB_##FOR);*/                         \
+                /*return (pointer - data);*/                         \
+            }                                                        \
+        }                                                            \
     } while(0)
 
-#define HTTP_CALLBACK_DATA(FOR)                                                                   \
-    do {                                                                                          \
-        if(FOR##_mark) {                                                                          \
-            if(http_settings->on_##FOR) {                                                         \
-                if(http_settings->on_##FOR(http_parser, FOR##_mark, pointer - FOR##_mark) != 0) { \
-                    /*    SET_ERRNO(HPE_CB_##FOR);*/                                              \
-                    /*return (p - data);*/                                                        \
-                }                                                                                 \
-            }                                                                                     \
-            FOR##_mark = NULL;                                                                    \
-        }                                                                                         \
+#define HTTP_CALLBACK_DATA(FOR)                                                                            \
+    do {                                                                                                   \
+        if(FOR##_mark) {                                                                                   \
+            if(http_settings->on_##FOR) {                                                                  \
+                update_request_http_parser(http_parser);                                                   \
+                if(http_settings->on_##FOR(http_parser->request, FOR##_mark, pointer - FOR##_mark) != 0) { \
+                    /*    SET_ERRNO(HPE_CB_##FOR);*/                                                       \
+                    /*return (p - data);*/                                                                 \
+                }                                                                                          \
+            }                                                                                              \
+            FOR##_mark = NULL;                                                                             \
+        }                                                                                                  \
+    } while(0)
+
+/**
+ * Variant of the data callback that also accumulates the
+ * fragment into the path of the request, the path is the only
+ * one of the pseudo headers that the HTTP/1.1 parser is able
+ * to populate on its own, as the remaining ones are either
+ * implicit in the connection or carried by an header.
+ */
+#define HTTP_CALLBACK_URL()                                                             \
+    do {                                                                                \
+        if(url_mark) {                                                                  \
+            append_path_http_request(http_parser->request, url_mark, pointer - url_mark); \
+        }                                                                               \
+        HTTP_CALLBACK_DATA(url);                                                        \
     } while(0)
 
 /**
@@ -262,19 +281,19 @@ static const char *http_method_strings[24] = {
  * The "default" callback function to be used, without
  * any extra arguments.
  */
-typedef ERROR_CODE (*http_callback)(struct http_parser_t *);
+typedef ERROR_CODE (*http_callback)(struct http_request_t *);
 
 /**
  * Callback function type used for callbacks that require
  * "extra" data to be send as argument.
  */
-typedef ERROR_CODE (*http_data_callback)(struct http_parser_t *, const unsigned char *, size_t);
+typedef ERROR_CODE (*http_data_callback)(struct http_request_t *, const unsigned char *, size_t);
 
 /**
  * Callback function type used for callbacks that require
  * "extra" indexes to be send as argument.
  */
-typedef ERROR_CODE (*http_index_callback)(struct http_parser_t *, size_t, size_t);
+typedef ERROR_CODE (*http_index_callback)(struct http_request_t *, size_t, size_t);
 
 /**
  * Defines the various types of HTTP request.
@@ -445,28 +464,18 @@ typedef struct http_parser_t {
     char upgrade;
 
     /**
-     * Reference to the handler specific context
-     * structure, owned by the currently active handler.
-     * Each handler stores its own context type (eg:
-     * file handler stores handler_file_context, proxy
-     * handler stores handler_proxy_context).
-     * This value is set to NULL on parser initialization
-     * and should be managed by the handler during the
-     * request life-cycle.
+     * Reference to the protocol agnostic message structure
+     * that is populated by this parser and then handed to
+     * the handlers, this structure is owned by the parser
+     * and released together with it.
+     * The handler specific context and the reference to the
+     * upper objects, like the connection, live in it.
      */
-    void *context;
+    struct http_request_t *request;
 
     unsigned char *header_field_mark;
     unsigned char *header_value_mark;
     unsigned char *url_mark;
-
-    /**
-     * Unstructured reference to a pointer, this may
-     * be used to maintain references to upper objects.
-     * Example usage would include reference to the
-     * connection objects.
-     */
-    void *parameters;
 
     /**
      * The original content length value, this
@@ -525,6 +534,17 @@ void create_http_settings(struct http_settings_t **http_settings_pointer);
  * @param http_settings The HTTP settings to be destroyed.
  */
 void delete_http_settings(struct http_settings_t *http_settings);
+
+/**
+ * Updates the message structure owned by the provided parser
+ * with the values that the parsing has produced so far, this
+ * is called immediately before each one of the callbacks so
+ * that an handler always observes a coherent message.
+ *
+ * @param http_parser The HTTP parser whose message structure
+ * is going to be updated with the current parsing values.
+ */
+void update_request_http_parser(struct http_parser_t *http_parser);
 
 /**
  * Called to process a new data chunk in the context

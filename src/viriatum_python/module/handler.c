@@ -303,7 +303,7 @@ ERROR_CODE unregister_handler_python(struct service_t *service) {
 
 ERROR_CODE set_handler_python(struct http_connection_t *http_connection) {
     /* sets the HTTP parser values */
-    _set_http_parser_handler_python(http_connection->http_parser);
+    _set_http_request_handler_python(http_connection->request);
 
     /* sets the HTTP settings values */
     _set_http_settings_handler_python(http_connection->http_settings);
@@ -314,7 +314,7 @@ ERROR_CODE set_handler_python(struct http_connection_t *http_connection) {
 
 ERROR_CODE unset_handler_python(struct http_connection_t *http_connection) {
     /* unsets the HTTP parser values */
-    _unset_http_parser_handler_python(http_connection->http_parser);
+    _unset_http_request_handler_python(http_connection->request);
 
     /* unsets the HTTP settings values */
     _unset_http_settings_handler_python(http_connection->http_settings);
@@ -323,7 +323,7 @@ ERROR_CODE unset_handler_python(struct http_connection_t *http_connection) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE message_begin_callback_handler_python(struct http_parser_t *http_parser) {
+ERROR_CODE message_begin_callback_handler_python(struct http_request_t *http_request) {
     /* prints a debug message about the request reception */
     V_DEBUG("HTTP request received\n");
 
@@ -331,11 +331,11 @@ ERROR_CODE message_begin_callback_handler_python(struct http_parser_t *http_pars
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE url_callback_handler_python(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE url_callback_handler_python(struct http_request_t *http_request, const unsigned char *data, size_t data_size) {
     /* retrieves the context from the parser and then allocates
     space for the url copying the received data into it */
     struct handler_python_context_t *handler_python_context =
-        (struct handler_python_context_t *) http_parser->context;
+        (struct handler_python_context_t *) http_request->context;
     if(handler_python_context->url != NULL) { FREE(handler_python_context->url); }
     handler_python_context->url = (unsigned char *) MALLOC(data_size + 1);
     memcpy(handler_python_context->url, data, data_size);
@@ -345,11 +345,11 @@ ERROR_CODE url_callback_handler_python(struct http_parser_t *http_parser, const 
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE header_field_callback_handler_python(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE header_field_callback_handler_python(struct http_request_t *http_request, const unsigned char *data, size_t data_size) {
     /* retrieves the context from the parser and in case the maximum
     number of headers has been reached ignores the current one */
     struct handler_python_context_t *handler_python_context =
-        (struct handler_python_context_t *) http_parser->context;
+        (struct handler_python_context_t *) http_request->context;
     if(handler_python_context->header_count >= VIRIATUM_PYTHON_MAX_HEADERS) { RAISE_NO_ERROR; }
 
     /* releases any field that is still pending, this happens when a
@@ -374,11 +374,11 @@ ERROR_CODE header_field_callback_handler_python(struct http_parser_t *http_parse
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE header_value_callback_handler_python(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE header_value_callback_handler_python(struct http_request_t *http_request, const unsigned char *data, size_t data_size) {
     /* retrieves the context from the parser and in case the maximum
     number of headers has been reached ignores the current one */
     struct handler_python_context_t *handler_python_context =
-        (struct handler_python_context_t *) http_parser->context;
+        (struct handler_python_context_t *) http_request->context;
     if(handler_python_context->header_count >= VIRIATUM_PYTHON_MAX_HEADERS) { RAISE_NO_ERROR; }
 
     /* in case no field is currently pending the value belongs to a folded
@@ -404,18 +404,18 @@ ERROR_CODE header_value_callback_handler_python(struct http_parser_t *http_parse
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE headers_complete_callback_handler_python(struct http_parser_t *http_parser) {
+ERROR_CODE headers_complete_callback_handler_python(struct http_request_t *http_request) {
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE body_callback_handler_python(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE body_callback_handler_python(struct http_request_t *http_request, const unsigned char *data, size_t data_size) {
     /* retrieves the context from the parser and then grows the body
     buffer so that the newly received payload fits into it, note that
     the body is accumulated as the parser may raise this callback
     multiple times for a single request */
     struct handler_python_context_t *handler_python_context =
-        (struct handler_python_context_t *) http_parser->context;
+        (struct handler_python_context_t *) http_request->context;
     unsigned char *body;
     size_t body_capacity;
 
@@ -452,50 +452,50 @@ ERROR_CODE body_callback_handler_python(struct http_parser_t *http_parser, const
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE message_complete_callback_handler_python(struct http_parser_t *http_parser) {
+ERROR_CODE message_complete_callback_handler_python(struct http_request_t *http_request) {
     /* prints a debug message about the request parsing and then
     sends (and creates) the response for it */
     V_DEBUG("HTTP request parsed\n");
-    _send_response_handler_python(http_parser);
+    _send_response_handler_python(http_request);
 
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE path_callback_handler_python(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE path_callback_handler_python(struct http_request_t *http_request, const unsigned char *data, size_t data_size) {
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE location_callback_handler_python(struct http_parser_t *http_parser, size_t index, size_t offset) {
+ERROR_CODE location_callback_handler_python(struct http_request_t *http_request, size_t index, size_t offset) {
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE virtual_url_callback_handler_python(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE virtual_url_callback_handler_python(struct http_request_t *http_request, const unsigned char *data, size_t data_size) {
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _set_http_parser_handler_python(struct http_parser_t *http_parser) {
+ERROR_CODE _set_http_request_handler_python(struct http_request_t *http_request) {
     /* allocates space for the context to be used during the
     handling of the request and sets it in the parser */
     struct handler_python_context_t *handler_python_context;
     create_handler_python_context(&handler_python_context);
-    http_parser->context = (void *) handler_python_context;
+    http_request->context = (void *) handler_python_context;
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _unset_http_parser_handler_python(struct http_parser_t *http_parser) {
+ERROR_CODE _unset_http_request_handler_python(struct http_request_t *http_request) {
     /* retrieves the context from the parser and in case it's set
     releases it, unsetting the reference afterwards */
     struct handler_python_context_t *handler_python_context =
-        (struct handler_python_context_t *) http_parser->context;
+        (struct handler_python_context_t *) http_request->context;
     if(handler_python_context != NULL) {
         delete_handler_python_context(handler_python_context);
-        http_parser->context = NULL;
+        http_request->context = NULL;
     }
 
     /* raises no error */
@@ -605,7 +605,7 @@ static void _set_environ_header_handler_python(PyObject *environ_map, const char
 
 static PyObject *_build_environ_handler_python(
     struct handler_python_context_t *handler_python_context,
-    struct http_parser_t *http_parser,
+    struct http_request_t *http_request,
     struct connection_t *connection
 ) {
     /* allocates space for the various objects that are going to be
@@ -650,7 +650,7 @@ static PyObject *_build_environ_handler_python(
 
     /* sets the various request oriented values in the environ, note that
     the script name is always empty as the application owns the routing */
-    _set_environ_handler_python(environ_map, "REQUEST_METHOD", get_http_method_string(http_parser->method));
+    _set_environ_handler_python(environ_map, "REQUEST_METHOD", get_http_method_string(http_request->method));
     _set_environ_handler_python(environ_map, "SCRIPT_NAME", "");
     _set_environ_handler_python(environ_map, "PATH_INFO", path);
     _set_environ_handler_python(environ_map, "QUERY_STRING", pointer == NULL ? "" : pointer + 1);
@@ -855,7 +855,7 @@ static PyObject *_start_response_handler_python(PyObject *self, PyObject *args) 
     return PyCFunction_New(&write_method, self);
 }
 
-ERROR_CODE _send_response_handler_python(struct http_parser_t *http_parser) {
+ERROR_CODE _send_response_handler_python(struct http_request_t *http_request) {
     /* allocates space for the various python objects used during the
     calling of the application and the gathering of its response */
     PyObject *environ_map;
@@ -881,14 +881,14 @@ ERROR_CODE _send_response_handler_python(struct http_parser_t *http_parser) {
 
     /* retrieves the connection from the HTTP parser parameters and then
     the underlying connection references in order to operate over them */
-    struct connection_t *connection = (struct connection_t *) http_parser->parameters;
+    struct connection_t *connection = (struct connection_t *) http_request->parameters;
     struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
     struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
 
     /* retrieves both the context of the request and the handler that owns
     it, the handler carries the application to be called */
     struct handler_python_context_t *handler_python_context =
-        (struct handler_python_context_t *) http_parser->context;
+        (struct handler_python_context_t *) http_request->context;
     struct handler_python_t *handler_python =
         (struct handler_python_t *) http_connection->http_handler->lower;
 
@@ -918,7 +918,7 @@ ERROR_CODE _send_response_handler_python(struct http_parser_t *http_parser) {
     response callable carrying the context of the request, the
     application is not called for a refused request */
     environ_map = handler_python_context->overflow == TRUE ?
-        NULL : _build_environ_handler_python(handler_python_context, http_parser, connection);
+        NULL : _build_environ_handler_python(handler_python_context, http_request, connection);
     if(handler_python_context->overflow == TRUE) {
         result = NULL;
     } else if(environ_map == NULL) {
@@ -1013,7 +1013,7 @@ ERROR_CODE _send_response_handler_python(struct http_parser_t *http_parser) {
         handler_python_context->status_code,
         handler_python_context->status_message == NULL ?
             "Internal Server Error" : (char *) handler_python_context->status_message,
-        http_parser->flags & FLAG_KEEP_ALIVE ? KEEP_ALIVE : KEEP_CLOSE,
+        http_request->flags & FLAG_KEEP_ALIVE ? KEEP_ALIVE : KEEP_CLOSE,
         FALSE
     );
 
@@ -1082,7 +1082,7 @@ ERROR_CODE _send_response_handler_python(struct http_parser_t *http_parser) {
         (unsigned char *) buffer,
         (unsigned int) count,
         _send_response_callback_handler_python,
-        (void *) (size_t) http_parser->flags
+        (void *) (size_t) http_request->flags
     );
 
     /* raise no error */

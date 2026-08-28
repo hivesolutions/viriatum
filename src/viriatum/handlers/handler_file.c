@@ -218,7 +218,7 @@ ERROR_CODE unregister_handler_file(struct service_t *service) {
 ERROR_CODE set_handler_file(struct http_connection_t *http_connection) {
     /* sets both the HTTP parser values and the HTTP
     settings handler for the current file handler */
-    _set_http_parser_handler_file(http_connection->http_parser);
+    _set_http_request_handler_file(http_connection->request);
     _set_http_settings_handler_file(http_connection->http_settings);
 
     /* raises no error */
@@ -228,7 +228,7 @@ ERROR_CODE set_handler_file(struct http_connection_t *http_connection) {
 ERROR_CODE unset_handler_file(struct http_connection_t *http_connection) {
     /* unsets both the HTTP parser values and the HTTP
     settings handler from the current file handler */
-    _unset_http_parser_handler_file(http_connection->http_parser);
+    _unset_http_request_handler_file(http_connection->request);
     _unset_http_settings_handler_file(http_connection->http_settings);
 
     /* raises no error */
@@ -237,18 +237,18 @@ ERROR_CODE unset_handler_file(struct http_connection_t *http_connection) {
 
 ERROR_CODE reset_handler_file(struct http_connection_t *http_connection) {
     /* resets the HTTP parser values */
-    _reset_http_parser_handler_file(http_connection->http_parser);
+    _reset_http_request_handler_file(http_connection->request);
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE message_begin_callback_handler_file(struct http_parser_t *http_parser) {
+ERROR_CODE message_begin_callback_handler_file(struct http_request_t *http_request) {
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE url_callback_handler_file(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE url_callback_handler_file(struct http_request_t *http_request, const unsigned char *data, size_t data_size) {
     /* allocates memory for the variable that will hold the
     size of the decoded file path */
     size_t decoded_size;
@@ -259,11 +259,11 @@ ERROR_CODE url_callback_handler_file(struct http_parser_t *http_parser, const un
 
     /* retrieves the handler file context from the HTTP parser */
     struct handler_file_context_t *handler_file_context =
-        (struct handler_file_context_t *) http_parser->context;
+        (struct handler_file_context_t *) http_request->context;
 
     /* retrieves the connection from the HTTP parser parameters and
     uses the pre-resolved contents path from service options */
-    struct connection_t *connection = (struct connection_t *) http_parser->parameters;
+    struct connection_t *connection = (struct connection_t *) http_request->parameters;
     char *contents_path = (char *) connection->service->options->contents_path;
 
     /* checks the position of the get parameters divisor position
@@ -278,7 +278,7 @@ ERROR_CODE url_callback_handler_file(struct http_parser_t *http_parser, const un
     handler_file_context->url[path_size] = '\0';
 
     /* prints a debug message */
-    V_INFO_F("%s %s\n", get_http_method_string(http_parser->method), handler_file_context->url);
+    V_INFO_F("%s %s\n", get_http_method_string(http_request->method), handler_file_context->url);
 
     /* creates the file path using the base viriatum path
     this should be the complete absolute path */
@@ -321,9 +321,9 @@ ERROR_CODE url_callback_handler_file(struct http_parser_t *http_parser, const un
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE header_field_callback_handler_file(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE header_field_callback_handler_file(struct http_request_t *http_request, const unsigned char *data, size_t data_size) {
     /* retrieves the handler file context from the HTTP parser */
-    struct handler_file_context_t *handler_file_context = (struct handler_file_context_t *) http_parser->context;
+    struct handler_file_context_t *handler_file_context = (struct handler_file_context_t *) http_request->context;
 
     /* switches over the size of the header name (field)
     that was provided (used for faster parsing) */
@@ -375,9 +375,9 @@ ERROR_CODE header_field_callback_handler_file(struct http_parser_t *http_parser,
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE header_value_callback_handler_file(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE header_value_callback_handler_file(struct http_request_t *http_request, const unsigned char *data, size_t data_size) {
     /* retrieves the handler file context from the HTTP parser */
-    struct handler_file_context_t *handler_file_context = (struct handler_file_context_t *) http_parser->context;
+    struct handler_file_context_t *handler_file_context = (struct handler_file_context_t *) http_request->context;
 
     /* switches over the kind of next header to be
     processed, note that in case the value is set
@@ -419,17 +419,17 @@ ERROR_CODE header_value_callback_handler_file(struct http_parser_t *http_parser,
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE headers_complete_callback_handler_file(struct http_parser_t *http_parser) {
+ERROR_CODE headers_complete_callback_handler_file(struct http_request_t *http_request) {
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE body_callback_handler_file(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE body_callback_handler_file(struct http_request_t *http_request, const unsigned char *data, size_t data_size) {
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_parser) {
+ERROR_CODE message_complete_callback_handler_file(struct http_request_t *http_request) {
     /* allocates the file size and for the temporary count
     variable used to count the written bytes */
     size_t file_size;
@@ -492,13 +492,13 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
     /* retrieves the handler file context from the HTTP parser and uses
     it to retrieve the respective flags value */
     struct handler_file_context_t *handler_file_context =
-        (struct handler_file_context_t *) http_parser->context;
-    unsigned char flags = http_parser->flags;
+        (struct handler_file_context_t *) http_request->context;
+    unsigned char flags = http_request->flags;
 
     /* retrieves the connection from the HTTP parser parameters,
     the connection object is going to be used for the input and
     outpu operations associated with the file handling */
-    struct connection_t *connection = (struct connection_t *) http_parser->parameters;
+    struct connection_t *connection = (struct connection_t *) http_request->parameters;
 
     /* retrieves the underlying connection references in order to be
     able to operate over them, for register */
@@ -684,7 +684,7 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
     }
 
     /* sets the (HTTP) flags in the handler file context */
-    handler_file_context->flags = http_parser->flags;
+    handler_file_context->flags = http_request->flags;
 
     /* tests the error code for error, in case there's an error
     the file is considered to be not found (normal error) */
@@ -927,7 +927,7 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE path_callback_handler_file(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE path_callback_handler_file(struct http_request_t *http_request, const unsigned char *data, size_t data_size) {
     /* allocates memory for the variable that will hold the
     size of the decoded file path */
     size_t decoded_size;
@@ -939,12 +939,12 @@ ERROR_CODE path_callback_handler_file(struct http_parser_t *http_parser, const u
     /* retrieves the handler file context from the HTTP parser
     and uses it to retrieve the reference to the base path in context */
     struct handler_file_context_t *handler_file_context =
-        (struct handler_file_context_t *) http_parser->context;
+        (struct handler_file_context_t *) http_request->context;
     unsigned char *base_path = handler_file_context->base_path;
 
     /* retrieves the connection from the HTTP parser parameters and
     uses the pre-resolved contents path from service options */
-    struct connection_t *connection = (struct connection_t *) http_parser->parameters;
+    struct connection_t *connection = (struct connection_t *) http_request->parameters;
     char *contents_path = (char *) connection->service->options->contents_path;
 
     /* copies the memory from the data to the url and then
@@ -954,7 +954,7 @@ ERROR_CODE path_callback_handler_file(struct http_parser_t *http_parser, const u
     handler_file_context->url[data_size] = '\0';
 
     /* prints a debug message */
-    V_INFO_F("%s %s\n", get_http_method_string(http_parser->method), handler_file_context->url);
+    V_INFO_F("%s %s\n", get_http_method_string(http_request->method), handler_file_context->url);
 
     /* in case a base path is not defined the contant values
     for the contents and base path must be used */
@@ -1014,7 +1014,7 @@ ERROR_CODE path_callback_handler_file(struct http_parser_t *http_parser, const u
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE location_callback_handler_file(struct http_parser_t *http_parser, size_t index, size_t offset) {
+ERROR_CODE location_callback_handler_file(struct http_request_t *http_request, size_t index, size_t offset) {
     /* allocates memory for the variable that will hold the
     size of the decoded file path */
     size_t decoded_size;
@@ -1029,11 +1029,11 @@ ERROR_CODE location_callback_handler_file(struct http_parser_t *http_parser, siz
 
     /* retrieves the handler file context from the HTTP parser */
     struct handler_file_context_t *handler_file_context =
-        (struct handler_file_context_t *) http_parser->context;
+        (struct handler_file_context_t *) http_request->context;
 
     /* retrieves the connection from the parser and then uses it to  the
     the correct file handler reference from the HTTP connection */
-    struct connection_t *connection = (struct connection_t *) http_parser->parameters;
+    struct connection_t *connection = (struct connection_t *) http_request->parameters;
     struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
     struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
     struct file_handler_t *file_handler =
@@ -1091,41 +1091,41 @@ ERROR_CODE location_callback_handler_file(struct http_parser_t *http_parser, siz
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE virtual_url_callback_handler_file(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE virtual_url_callback_handler_file(struct http_request_t *http_request, const unsigned char *data, size_t data_size) {
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _set_http_parser_handler_file(struct http_parser_t *http_parser) {
+ERROR_CODE _set_http_request_handler_file(struct http_request_t *http_request) {
     /* allocates space for the handler file context */
     struct handler_file_context_t *handler_file_context;
 
     /* creates the handler file context and then sets the handler
     file context as the context for the HTTP parser */
     create_handler_file_context(&handler_file_context);
-    http_parser->context = handler_file_context;
+    http_request->context = handler_file_context;
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _unset_http_parser_handler_file(struct http_parser_t *http_parser) {
+ERROR_CODE _unset_http_request_handler_file(struct http_request_t *http_request) {
     /* retrieves the handler file context from the HTTP parser */
-    struct handler_file_context_t *handler_file_context = (struct handler_file_context_t *) http_parser->context;
+    struct handler_file_context_t *handler_file_context = (struct handler_file_context_t *) http_request->context;
 
     /* deletes the handler file context and nullifies the
     reference to avoid dangling pointer on keep-alive reuse */
     delete_handler_file_context(handler_file_context);
-    http_parser->context = NULL;
+    http_request->context = NULL;
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _reset_http_parser_handler_file(struct http_parser_t *http_parser) {
+ERROR_CODE _reset_http_request_handler_file(struct http_request_t *http_request) {
     /* retrieves the handler file context from the HTTP parser */
     struct handler_file_context_t *handler_file_context =
-        (struct handler_file_context_t *) http_parser->context;
+        (struct handler_file_context_t *) http_request->context;
 
     /* unsets the handler file context file */
     handler_file_context->file = NULL;

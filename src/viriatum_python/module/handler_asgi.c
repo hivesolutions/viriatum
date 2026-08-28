@@ -1220,7 +1220,7 @@ static PyMethodDef done_method = {
 
 ERROR_CODE set_handler_asgi(struct http_connection_t *http_connection) {
     /* sets the HTTP parser values */
-    _set_http_parser_handler_asgi(http_connection->http_parser);
+    _set_http_request_handler_asgi(http_connection->request);
 
     /* sets the HTTP settings values */
     _set_http_settings_handler_asgi(http_connection->http_settings);
@@ -1231,7 +1231,7 @@ ERROR_CODE set_handler_asgi(struct http_connection_t *http_connection) {
 
 ERROR_CODE unset_handler_asgi(struct http_connection_t *http_connection) {
     /* unsets the HTTP parser values */
-    _unset_http_parser_handler_asgi(http_connection->http_parser);
+    _unset_http_request_handler_asgi(http_connection->request);
 
     /* unsets the HTTP settings values */
     _unset_http_settings_handler_asgi(http_connection->http_settings);
@@ -1240,7 +1240,7 @@ ERROR_CODE unset_handler_asgi(struct http_connection_t *http_connection) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE message_begin_callback_handler_asgi(struct http_parser_t *http_parser) {
+ERROR_CODE message_begin_callback_handler_asgi(struct http_request_t *http_request) {
     /* prints a debug message about the request reception */
     V_DEBUG("HTTP request received\n");
 
@@ -1248,11 +1248,11 @@ ERROR_CODE message_begin_callback_handler_asgi(struct http_parser_t *http_parser
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE url_callback_handler_asgi(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE url_callback_handler_asgi(struct http_request_t *http_request, const unsigned char *data, size_t data_size) {
     /* retrieves the context from the parser and then allocates
     space for the url copying the received data into it */
     struct handler_asgi_context_t *handler_asgi_context =
-        (struct handler_asgi_context_t *) http_parser->context;
+        (struct handler_asgi_context_t *) http_request->context;
     if(handler_asgi_context->url != NULL) { FREE(handler_asgi_context->url); }
     handler_asgi_context->url = (unsigned char *) MALLOC(data_size + 1);
     memcpy(handler_asgi_context->url, data, data_size);
@@ -1262,11 +1262,11 @@ ERROR_CODE url_callback_handler_asgi(struct http_parser_t *http_parser, const un
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE header_field_callback_handler_asgi(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE header_field_callback_handler_asgi(struct http_request_t *http_request, const unsigned char *data, size_t data_size) {
     /* retrieves the context from the parser and in case the maximum
     number of headers has been reached ignores the current one */
     struct handler_asgi_context_t *handler_asgi_context =
-        (struct handler_asgi_context_t *) http_parser->context;
+        (struct handler_asgi_context_t *) http_request->context;
     if(handler_asgi_context->header_count >= VIRIATUM_ASGI_MAX_HEADERS) { RAISE_NO_ERROR; }
 
     /* releases any field that is still pending, this happens when a
@@ -1291,11 +1291,11 @@ ERROR_CODE header_field_callback_handler_asgi(struct http_parser_t *http_parser,
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE header_value_callback_handler_asgi(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE header_value_callback_handler_asgi(struct http_request_t *http_request, const unsigned char *data, size_t data_size) {
     /* retrieves the context from the parser and in case the maximum
     number of headers has been reached ignores the current one */
     struct handler_asgi_context_t *handler_asgi_context =
-        (struct handler_asgi_context_t *) http_parser->context;
+        (struct handler_asgi_context_t *) http_request->context;
     if(handler_asgi_context->header_count >= VIRIATUM_ASGI_MAX_HEADERS) { RAISE_NO_ERROR; }
 
     /* in case no field is currently pending the value belongs to a folded
@@ -1321,18 +1321,18 @@ ERROR_CODE header_value_callback_handler_asgi(struct http_parser_t *http_parser,
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE headers_complete_callback_handler_asgi(struct http_parser_t *http_parser) {
+ERROR_CODE headers_complete_callback_handler_asgi(struct http_request_t *http_request) {
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE body_callback_handler_asgi(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE body_callback_handler_asgi(struct http_request_t *http_request, const unsigned char *data, size_t data_size) {
     /* retrieves the context from the parser and then grows the body
     buffer so that the newly received payload fits into it, note that
     the body is accumulated as the parser may raise this callback
     multiple times for a single request */
     struct handler_asgi_context_t *handler_asgi_context =
-        (struct handler_asgi_context_t *) http_parser->context;
+        (struct handler_asgi_context_t *) http_request->context;
     unsigned char *body;
     size_t body_capacity;
 
@@ -1369,50 +1369,50 @@ ERROR_CODE body_callback_handler_asgi(struct http_parser_t *http_parser, const u
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE message_complete_callback_handler_asgi(struct http_parser_t *http_parser) {
+ERROR_CODE message_complete_callback_handler_asgi(struct http_request_t *http_request) {
     /* prints a debug message about the request parsing and then
     schedules the application that is going to answer it */
     V_DEBUG("HTTP request parsed\n");
-    _call_application_handler_asgi(http_parser);
+    _call_application_handler_asgi(http_request);
 
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE path_callback_handler_asgi(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE path_callback_handler_asgi(struct http_request_t *http_request, const unsigned char *data, size_t data_size) {
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE location_callback_handler_asgi(struct http_parser_t *http_parser, size_t index, size_t offset) {
+ERROR_CODE location_callback_handler_asgi(struct http_request_t *http_request, size_t index, size_t offset) {
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE virtual_url_callback_handler_asgi(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE virtual_url_callback_handler_asgi(struct http_request_t *http_request, const unsigned char *data, size_t data_size) {
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _set_http_parser_handler_asgi(struct http_parser_t *http_parser) {
+ERROR_CODE _set_http_request_handler_asgi(struct http_request_t *http_request) {
     /* allocates space for the context to be used during the
     handling of the request and sets it in the parser */
     struct handler_asgi_context_t *handler_asgi_context;
     create_handler_asgi_context(&handler_asgi_context);
-    http_parser->context = (void *) handler_asgi_context;
+    http_request->context = (void *) handler_asgi_context;
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _unset_http_parser_handler_asgi(struct http_parser_t *http_parser) {
+ERROR_CODE _unset_http_request_handler_asgi(struct http_request_t *http_request) {
     /* retrieves the context from the parser and in case it's set
     releases it, unsetting the reference afterwards */
     struct handler_asgi_context_t *handler_asgi_context =
-        (struct handler_asgi_context_t *) http_parser->context;
+        (struct handler_asgi_context_t *) http_request->context;
     if(handler_asgi_context != NULL) {
         delete_handler_asgi_context(handler_asgi_context);
-        http_parser->context = NULL;
+        http_request->context = NULL;
     }
 
     /* raises no error */
@@ -1496,7 +1496,7 @@ static char _is_upgrade_handler_asgi(struct handler_asgi_context_t *handler_asgi
 
 static PyObject *_build_scope_handler_asgi(
     struct handler_asgi_context_t *handler_asgi_context,
-    struct http_parser_t *http_parser,
+    struct http_request_t *http_request,
     struct connection_t *connection,
     char websocket
 ) {
@@ -1513,7 +1513,6 @@ static PyObject *_build_scope_handler_asgi(
     path and the query string parts of it */
     char path[VIRIATUM_MAX_URL_SIZE];
     char name[VIRIATUM_MAX_HEADER_SIZE];
-    char version[16];
     char *pointer;
     size_t path_size;
     size_t name_size;
@@ -1563,16 +1562,9 @@ static PyObject *_build_scope_handler_asgi(
     );
     if(object != NULL) { PyDict_SetItemString(scope, "asgi", object); Py_DECREF(object); }
 
-    /* sets the version of the protocol as gathered from the request
-    line, it is the one that framed the current request */
-    SPRINTF(
-        version,
-        sizeof(version),
-        "%d.%d",
-        (int) http_parser->http_major,
-        (int) http_parser->http_minor
-    );
-    object = PyUnicode_FromString(version);
+    /* sets the version of the protocol as gathered from the message,
+    it is the one that framed the current request */
+    object = PyUnicode_FromString(get_http_version_number(http_request->version));
     if(object != NULL) { PyDict_SetItemString(scope, "http_version", object); Py_DECREF(object); }
 
     /* sets the various request oriented values in the scope, note that
@@ -1587,7 +1579,7 @@ static PyObject *_build_scope_handler_asgi(
     /* the method is only part of the scope of the http requests, the
     websocket ones are always the result of a get */
     if(websocket == FALSE) {
-        object = PyUnicode_FromString(get_http_method_string(http_parser->method));
+        object = PyUnicode_FromString(get_http_method_string(http_request->method));
         if(object != NULL) { PyDict_SetItemString(scope, "method", object); Py_DECREF(object); }
     }
 
@@ -1669,7 +1661,7 @@ static PyObject *_build_scope_handler_asgi(
     return scope;
 }
 
-ERROR_CODE _call_application_handler_asgi(struct http_parser_t *http_parser) {
+ERROR_CODE _call_application_handler_asgi(struct http_request_t *http_request) {
     /* allocates space for the various python objects used during the
     scheduling of the application for the current request */
     PyObject *scope;
@@ -1683,14 +1675,14 @@ ERROR_CODE _call_application_handler_asgi(struct http_parser_t *http_parser) {
 
     /* retrieves the connection from the HTTP parser parameters and then
     the underlying connection references in order to operate over them */
-    struct connection_t *connection = (struct connection_t *) http_parser->parameters;
+    struct connection_t *connection = (struct connection_t *) http_request->parameters;
     struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
     struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
 
     /* retrieves both the context of the request and the handler that owns
     it, the handler carries the application to be called */
     struct handler_asgi_context_t *handler_asgi_context =
-        (struct handler_asgi_context_t *) http_parser->context;
+        (struct handler_asgi_context_t *) http_request->context;
     struct handler_asgi_t *handler_asgi =
         (struct handler_asgi_t *) http_connection->http_handler->lower;
 
@@ -1698,11 +1690,11 @@ ERROR_CODE _call_application_handler_asgi(struct http_parser_t *http_parser) {
     response, they are reached from the callables of the application */
     handler_asgi_context->connection = connection;
     handler_asgi_context->handler = handler_asgi;
-    handler_asgi_context->flags = (unsigned char) http_parser->flags;
+    handler_asgi_context->flags = (unsigned char) http_request->flags;
 
     /* the head requests carry no payload in their response, only the
     envelope of it is ever written into the connection */
-    if(http_parser->method == HTTP_HEAD) { handler_asgi_context->has_body = FALSE; }
+    if(http_request->method == HTTP_HEAD) { handler_asgi_context->has_body = FALSE; }
 
     /* acquires the global interpreter lock as the complete set of
     operations that follow interact with the interpreter */
@@ -1719,7 +1711,7 @@ ERROR_CODE _call_application_handler_asgi(struct http_parser_t *http_parser) {
     the send callables, all of them carrying the context */
     scope = _build_scope_handler_asgi(
         handler_asgi_context,
-        http_parser,
+        http_request,
         connection,
         websocket
     );
@@ -2418,9 +2410,9 @@ ERROR_CODE data_handler_websocket_asgi(struct io_connection_t *io_connection, un
     /* retrieves the context of the connection from the parser, it is
     the one that survives the upgrade of the connection */
     struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
-    if(http_connection == NULL || http_connection->http_parser == NULL) { RAISE_NO_ERROR; }
+    if(http_connection == NULL || http_connection->request == NULL) { RAISE_NO_ERROR; }
     handler_asgi_context =
-        (struct handler_asgi_context_t *) http_connection->http_parser->context;
+        (struct handler_asgi_context_t *) http_connection->request->context;
     if(handler_asgi_context == NULL) { RAISE_NO_ERROR; }
     if(buffer == NULL || buffer_size == 0) { RAISE_NO_ERROR; }
 

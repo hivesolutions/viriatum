@@ -62,7 +62,7 @@ ERROR_CODE unregister_handler_default(struct service_t *service) {
 
 ERROR_CODE set_handler_default(struct http_connection_t *http_connection) {
     /* sets the HTTP parser values */
-    _set_http_parser_handler_default(http_connection->http_parser);
+    _set_http_request_handler_default(http_connection->request);
 
     /* sets the HTTP settings values */
     _set_http_settings_handler_default(http_connection->http_settings);
@@ -73,7 +73,7 @@ ERROR_CODE set_handler_default(struct http_connection_t *http_connection) {
 
 ERROR_CODE unset_handler_default(struct http_connection_t *http_connection) {
     /* unsets the HTTP parser values */
-    _unset_http_parser_handler_default(http_connection->http_parser);
+    _unset_http_request_handler_default(http_connection->request);
 
     /* unsets the HTTP settings values */
     _unset_http_settings_handler_default(http_connection->http_settings);
@@ -82,7 +82,7 @@ ERROR_CODE unset_handler_default(struct http_connection_t *http_connection) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE message_begin_callback_handler_default(struct http_parser_t *http_parser) {
+ERROR_CODE message_begin_callback_handler_default(struct http_request_t *http_request) {
     /* prints an information */
     V_DEBUG("HTTP request received\n");
 
@@ -90,7 +90,7 @@ ERROR_CODE message_begin_callback_handler_default(struct http_parser_t *http_par
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE url_callback_handler_default(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE url_callback_handler_default(struct http_request_t *http_request, const unsigned char *data, size_t data_size) {
     /* allocates the required space for the url */
     unsigned char *url = (unsigned char *) MALLOC(data_size + 1);
 
@@ -110,7 +110,7 @@ ERROR_CODE url_callback_handler_default(struct http_parser_t *http_parser, const
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE header_field_callback_handler_default(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE header_field_callback_handler_default(struct http_request_t *http_request, const unsigned char *data, size_t data_size) {
     /* allocates the required space for the header field */
     unsigned char *header_field = (unsigned char *) MALLOC(data_size + 1);
 
@@ -130,7 +130,7 @@ ERROR_CODE header_field_callback_handler_default(struct http_parser_t *http_pars
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE header_value_callback_handler_default(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE header_value_callback_handler_default(struct http_request_t *http_request, const unsigned char *data, size_t data_size) {
     /* allocates the required space for the header value */
     unsigned char *header_value = (unsigned char *) MALLOC(data_size + 1);
 
@@ -150,7 +150,7 @@ ERROR_CODE header_value_callback_handler_default(struct http_parser_t *http_pars
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE headers_complete_callback_handler_default(struct http_parser_t *http_parser) {
+ERROR_CODE headers_complete_callback_handler_default(struct http_request_t *http_request) {
     /* prints an information */
     V_DEBUG("HTTP headers parsed\n");
 
@@ -158,7 +158,7 @@ ERROR_CODE headers_complete_callback_handler_default(struct http_parser_t *http_
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE body_callback_handler_default(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE body_callback_handler_default(struct http_request_t *http_request, const unsigned char *data, size_t data_size) {
     /* allocates the required space for the body */
     unsigned char *body = (unsigned char *) MALLOC(data_size + 1);
 
@@ -178,38 +178,38 @@ ERROR_CODE body_callback_handler_default(struct http_parser_t *http_parser, cons
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE message_complete_callback_handler_default(struct http_parser_t *http_parser) {
+ERROR_CODE message_complete_callback_handler_default(struct http_request_t *http_request) {
     /* prints an information */
     V_DEBUG("HTTP request parsed\n");
 
     /* sends (and creates) the response */
-    _send_response_handler_default(http_parser);
+    _send_response_handler_default(http_request);
 
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE path_callback_handler_default(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE path_callback_handler_default(struct http_request_t *http_request, const unsigned char *data, size_t data_size) {
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE location_callback_handler_default(struct http_parser_t *http_parser, size_t index, size_t offset) {
+ERROR_CODE location_callback_handler_default(struct http_request_t *http_request, size_t index, size_t offset) {
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE virtual_url_callback_handler_default(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE virtual_url_callback_handler_default(struct http_request_t *http_request, const unsigned char *data, size_t data_size) {
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _set_http_parser_handler_default(struct http_parser_t *http_parser) {
+ERROR_CODE _set_http_request_handler_default(struct http_request_t *http_request) {
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _unset_http_parser_handler_default(struct http_parser_t *http_parser) {
+ERROR_CODE _unset_http_request_handler_default(struct http_request_t *http_request) {
     /* raises no error */
     RAISE_NO_ERROR;
 }
@@ -250,12 +250,12 @@ ERROR_CODE _unset_http_settings_handler_default(struct http_settings_t *http_set
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _send_response_handler_default(struct http_parser_t *http_parser) {
+ERROR_CODE _send_response_handler_default(struct http_request_t *http_request) {
     /* allocates the response buffer */
     char *response_buffer = MALLOC(256);
 
     /* retrieves the connection from the HTTP parser parameters */
-    struct connection_t *connection = (struct connection_t *) http_parser->parameters;
+    struct connection_t *connection = (struct connection_t *) http_request->parameters;
 
     /* retrieves the underlying connection references in order to be
     able to operate over them, for register */
@@ -276,9 +276,9 @@ ERROR_CODE _send_response_handler_default(struct http_parser_t *http_parser) {
         200,
         "OK",
         "Hello Viriatum",
-        http_parser->flags & FLAG_KEEP_ALIVE ? KEEP_ALIVE : KEEP_CLOSE,
+        http_request->flags & FLAG_KEEP_ALIVE ? KEEP_ALIVE : KEEP_CLOSE,
         _send_response_callback_handler_default,
-        (void *) (size_t) http_parser->flags
+        (void *) (size_t) http_request->flags
     );
 
     /* raise no error */

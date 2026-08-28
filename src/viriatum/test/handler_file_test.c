@@ -68,15 +68,15 @@ void *setup_handler_file_test(void) {
     service and options chain for the handler callbacks */
     create_test_context(&fixture->test_context);
 
-    /* creates the HTTP parser and the handler file context
+    /* creates the HTTP request and the handler file context
     then wires them together through the context pointer,
-    also sets the connection as the parser parameters so
+    also sets the connection as the request parameters so
     that callbacks can access the service options */
-    create_http_parser(&fixture->http_parser, TRUE);
+    create_http_request(&fixture->http_request);
     create_handler_file_context(&fixture->handler_file_context);
-    fixture->http_parser->context = fixture->handler_file_context;
-    fixture->http_parser->parameters = fixture->test_context->connection;
-    fixture->http_parser->method = HTTP_GET;
+    fixture->http_request->context = fixture->handler_file_context;
+    fixture->http_request->parameters = fixture->test_context->connection;
+    fixture->http_request->method = HTTP_GET;
 
     /* returns the fixture as the opaque context that is going
     to be handed over to the test function */
@@ -88,10 +88,10 @@ void cleanup_handler_file_test(void *context) {
     every one of the structures it carries may be destroyed */
     struct handler_file_fixture_t *fixture = (struct handler_file_fixture_t *) context;
 
-    /* deletes the context, the parser and the test
+    /* deletes the context, the request and the test
     context to avoid any memory leak from the test */
     delete_handler_file_context(fixture->handler_file_context);
-    delete_http_parser(fixture->http_parser);
+    delete_http_request(fixture->http_request);
     delete_test_context(fixture->test_context);
 
     /* releases the fixture itself, it has been allocated by
@@ -101,17 +101,17 @@ void cleanup_handler_file_test(void *context) {
 
 const char *test_handler_file_url(void *context) {
     /* allocates space for the error code returned by the
-    callback and retrieves both the parser and the context of
+    callback and retrieves both the request and the context of
     the handler from the fixture created by the setup */
     ERROR_CODE error;
     struct handler_file_fixture_t *fixture = (struct handler_file_fixture_t *) context;
-    struct http_parser_t *http_parser = fixture->http_parser;
+    struct http_request_t *http_request = fixture->http_request;
     struct handler_file_context_t *handler_file_context = fixture->handler_file_context;
 
     /* tests that a normal url is properly parsed
     and stored in the handler file context */
     error = url_callback_handler_file(
-        http_parser,
+        http_request,
         (unsigned char *) "/index.html",
         11
     );
@@ -121,7 +121,7 @@ const char *test_handler_file_url(void *context) {
     /* tests that a url with query string has
     the query parameters stripped from the path */
     error = url_callback_handler_file(
-        http_parser,
+        http_request,
         (unsigned char *) "/page?id=1",
         10
     );
@@ -131,7 +131,7 @@ const char *test_handler_file_url(void *context) {
     /* tests that a path traversal url is rejected
     by the url callback returning an error code */
     error = url_callback_handler_file(
-        http_parser,
+        http_request,
         (unsigned char *) "/../etc/passwd",
         14
     );
@@ -140,7 +140,7 @@ const char *test_handler_file_url(void *context) {
     /* tests that a percent-encoded path traversal is
     also rejected after decoding takes place */
     error = url_callback_handler_file(
-        http_parser,
+        http_request,
         (unsigned char *) "/%2e%2e/etc/passwd",
         18
     );
@@ -153,21 +153,21 @@ const char *test_handler_file_url(void *context) {
 }
 
 const char *test_handler_file_header_field(void) {
-    /* allocates space for the HTTP parser and the
+    /* allocates space for the HTTP request and the
     handler file context structures */
-    struct http_parser_t *http_parser;
+    struct http_request_t *http_request;
     struct handler_file_context_t *handler_file_context;
 
-    /* creates the HTTP parser and the handler file context
+    /* creates the HTTP request and the handler file context
     then wires them together through the context pointer */
-    create_http_parser(&http_parser, TRUE);
+    create_http_request(&http_request);
     create_handler_file_context(&handler_file_context);
-    http_parser->context = handler_file_context;
+    http_request->context = handler_file_context;
 
     /* tests that the "Range" header (5 chars) is correctly
     identified and sets the appropriate next header state */
     header_field_callback_handler_file(
-        http_parser,
+        http_request,
         (unsigned char *) "Range",
         5
     );
@@ -181,7 +181,7 @@ const char *test_handler_file_header_field(void) {
     /* tests that the "Cache-Control" header (13 chars) is
     correctly identified as cache control type */
     header_field_callback_handler_file(
-        http_parser,
+        http_request,
         (unsigned char *) "Cache-Control",
         13
     );
@@ -194,7 +194,7 @@ const char *test_handler_file_header_field(void) {
     /* tests that the "Authorization" header (13 chars) is
     correctly identified as authorization type */
     header_field_callback_handler_file(
-        http_parser,
+        http_request,
         (unsigned char *) "Authorization",
         13
     );
@@ -207,7 +207,7 @@ const char *test_handler_file_header_field(void) {
     /* tests that the "If-None-Match" header (13 chars) is
     correctly identified as etag type */
     header_field_callback_handler_file(
-        http_parser,
+        http_request,
         (unsigned char *) "If-None-Match",
         13
     );
@@ -220,15 +220,15 @@ const char *test_handler_file_header_field(void) {
     /* tests that an unknown header does not change
     the next header state from undefined */
     header_field_callback_handler_file(
-        http_parser,
+        http_request,
         (unsigned char *) "X-Custom",
         8
     );
     V_ASSERT(handler_file_context->next_header == UNDEFINED_HEADER);
 
-    /* deletes both the context and the parser */
+    /* deletes both the context and the request */
     delete_handler_file_context(handler_file_context);
-    delete_http_parser(http_parser);
+    delete_http_request(http_request);
 
     /* returns the default value, nothing happened so there's
     nothing to report for this execution */
@@ -236,22 +236,22 @@ const char *test_handler_file_header_field(void) {
 }
 
 const char *test_handler_file_header_value(void) {
-    /* allocates space for the HTTP parser and the
+    /* allocates space for the HTTP request and the
     handler file context structures */
-    struct http_parser_t *http_parser;
+    struct http_request_t *http_request;
     struct handler_file_context_t *handler_file_context;
 
-    /* creates the HTTP parser and the handler file context
+    /* creates the HTTP request and the handler file context
     then wires them together through the context pointer */
-    create_http_parser(&http_parser, TRUE);
+    create_http_request(&http_request);
     create_handler_file_context(&handler_file_context);
-    http_parser->context = handler_file_context;
+    http_request->context = handler_file_context;
 
     /* simulates parsing a "Range" header by setting the
     next header state and then calling the value callback */
     handler_file_context->next_header = RANGE;
     header_value_callback_handler_file(
-        http_parser,
+        http_request,
         (unsigned char *) "bytes=0-499",
         11
     );
@@ -262,7 +262,7 @@ const char *test_handler_file_header_value(void) {
     /* simulates parsing a "Cache-Control" header value */
     handler_file_context->next_header = CACHE_CONTROL;
     header_value_callback_handler_file(
-        http_parser,
+        http_request,
         (unsigned char *) "no-cache",
         8
     );
@@ -273,7 +273,7 @@ const char *test_handler_file_header_value(void) {
     /* simulates parsing an "Authorization" header value */
     handler_file_context->next_header = AUTHORIZATION;
     header_value_callback_handler_file(
-        http_parser,
+        http_request,
         (unsigned char *) "Basic dGVzdA==",
         14
     );
@@ -286,15 +286,15 @@ const char *test_handler_file_header_value(void) {
     handler_file_context->next_header = UNDEFINED_HEADER;
     memset(handler_file_context->range, 0, 128);
     header_value_callback_handler_file(
-        http_parser,
+        http_request,
         (unsigned char *) "some-value",
         10
     );
     V_ASSERT(handler_file_context->range[0] == '\0');
 
-    /* deletes both the context and the parser */
+    /* deletes both the context and the request */
     delete_handler_file_context(handler_file_context);
-    delete_http_parser(http_parser);
+    delete_http_request(http_request);
 
     /* returns the default value, nothing happened so there's
     nothing to report for this execution */

@@ -150,7 +150,7 @@ ERROR_CODE unregister_handler_dispatch(struct service_t *service) {
 
 ERROR_CODE set_handler_dispatch(struct http_connection_t *http_connection) {
     /* sets the HTTP parser values */
-    _set_http_parser_handler_dispatch(http_connection->http_parser);
+    _set_http_request_handler_dispatch(http_connection->request);
 
     /* sets the HTTP settings values */
     _set_http_settings_handler_dispatch(http_connection->http_settings);
@@ -161,7 +161,7 @@ ERROR_CODE set_handler_dispatch(struct http_connection_t *http_connection) {
 
 ERROR_CODE unset_handler_dispatch(struct http_connection_t *http_connection) {
     /* unsets the HTTP parser values */
-    _unset_http_parser_handler_dispatch(http_connection->http_parser);
+    _unset_http_request_handler_dispatch(http_connection->request);
 
     /* unsets the HTTP settings values */
     _unset_http_settings_handler_dispatch(http_connection->http_settings);
@@ -170,12 +170,12 @@ ERROR_CODE unset_handler_dispatch(struct http_connection_t *http_connection) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE message_begin_callback_handler_dispatch(struct http_parser_t *http_parser) {
+ERROR_CODE message_begin_callback_handler_dispatch(struct http_request_t *http_request) {
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE url_callback_handler_dispatch(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE url_callback_handler_dispatch(struct http_request_t *http_request, const unsigned char *data, size_t data_size) {
 #ifdef VIRIATUM_PCRE
     int matching;
     size_t index;
@@ -204,7 +204,7 @@ ERROR_CODE url_callback_handler_dispatch(struct http_parser_t *http_parser, cons
     /* retrieves the various connection elements and lower substrates
     from the parser parameters and then uses them to retrieves the handler
     and the dispatch handler to be used for dispatching */
-    struct connection_t *connection = (struct connection_t *) http_parser->parameters;
+    struct connection_t *connection = (struct connection_t *) http_request->parameters;
     struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
     struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
     struct service_t *service = connection->service;
@@ -323,9 +323,9 @@ ERROR_CODE url_callback_handler_dispatch(struct http_parser_t *http_parser, cons
         http_connection->http_handler->unset(http_connection);
         handler->set(http_connection);
         http_connection->http_handler = handler;
-        CALL_V(http_connection->http_settings->on_message_begin, http_parser);
-        CALL_V(http_connection->http_settings->on_url, http_parser, data, data_size);
-        CALL_V(http_connection->http_settings->on_path, http_parser, path, path_size);
+        CALL_V(http_connection->http_settings->on_message_begin, http_request);
+        CALL_V(http_connection->http_settings->on_url, http_request, data, data_size);
+        CALL_V(http_connection->http_settings->on_path, http_request, path, path_size);
 
 #ifdef VIRIATUM_PCRE
         /* in case there was a regex (location) match the dispatcher
@@ -340,13 +340,13 @@ ERROR_CODE url_callback_handler_dispatch(struct http_parser_t *http_parser, cons
             virtual_url_offset = match_size > 0 && data[match_size - 1] == '/' ? match_size - 1 : match_size;
             CALL_V(
                 http_connection->http_settings->on_location,
-                http_parser,
+                http_request,
                 index,
                 virtual_url_offset
             );
             CALL_V(
                 http_connection->http_settings->on_virtual_url,
-                http_parser,
+                http_request,
                 data + virtual_url_offset,
                 data_size - virtual_url_offset
             );
@@ -358,69 +358,69 @@ ERROR_CODE url_callback_handler_dispatch(struct http_parser_t *http_parser, cons
 
         /* saves the path in the parser context so it is available
         for logging in the error response handler */
-        http_parser->context = MALLOC(path_size + 1);
-        memcpy(http_parser->context, path, path_size + 1);
+        http_request->context = MALLOC(path_size + 1);
+        memcpy(http_request->context, path, path_size + 1);
     }
 
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE header_field_callback_handler_dispatch(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE header_field_callback_handler_dispatch(struct http_request_t *http_request, const unsigned char *data, size_t data_size) {
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE header_value_callback_handler_dispatch(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE header_value_callback_handler_dispatch(struct http_request_t *http_request, const unsigned char *data, size_t data_size) {
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE headers_complete_callback_handler_dispatch(struct http_parser_t *http_parser) {
+ERROR_CODE headers_complete_callback_handler_dispatch(struct http_request_t *http_request) {
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE body_callback_handler_dispatch(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE body_callback_handler_dispatch(struct http_request_t *http_request, const unsigned char *data, size_t data_size) {
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE message_complete_callback_handler_dispatch(struct http_parser_t *http_parser) {
+ERROR_CODE message_complete_callback_handler_dispatch(struct http_request_t *http_request) {
     /* sends (and creates) the response */
-    _send_response_handler_dispatch(http_parser);
+    _send_response_handler_dispatch(http_request);
 
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE path_callback_handler_dispatch(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE path_callback_handler_dispatch(struct http_request_t *http_request, const unsigned char *data, size_t data_size) {
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE location_callback_handler_dispatch(struct http_parser_t *http_parser, size_t index, size_t offset) {
+ERROR_CODE location_callback_handler_dispatch(struct http_request_t *http_request, size_t index, size_t offset) {
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE virtual_url_callback_handler_dispatch(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE virtual_url_callback_handler_dispatch(struct http_request_t *http_request, const unsigned char *data, size_t data_size) {
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _set_http_parser_handler_dispatch(struct http_parser_t *http_parser) {
+ERROR_CODE _set_http_request_handler_dispatch(struct http_request_t *http_request) {
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _unset_http_parser_handler_dispatch(struct http_parser_t *http_parser) {
+ERROR_CODE _unset_http_request_handler_dispatch(struct http_request_t *http_request) {
     /* releases any path stored in the parser context, this
     may happen if the dispatch handler allocated a path copy
     in url_callback when no handler was found */
-    if(http_parser->context) {
-        FREE(http_parser->context);
-        http_parser->context = NULL;
+    if(http_request->context) {
+        FREE(http_request->context);
+        http_request->context = NULL;
     }
 
     /* raises no error */
@@ -463,12 +463,12 @@ ERROR_CODE _unset_http_settings_handler_dispatch(struct http_settings_t *http_se
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _send_response_handler_dispatch(struct http_parser_t *http_parser) {
+ERROR_CODE _send_response_handler_dispatch(struct http_request_t *http_request) {
     /* allocates the response buffer */
     char *response_buffer = MALLOC(VIRIATUM_HTTP_SIZE);
 
     /* retrieves the connection from the HTTP parser parameters */
-    struct connection_t *connection = (struct connection_t *) http_parser->parameters;
+    struct connection_t *connection = (struct connection_t *) http_request->parameters;
 
     /* retrieves the underlying connection references in order to be
     able to operate over them, for register */
@@ -483,8 +483,8 @@ ERROR_CODE _send_response_handler_dispatch(struct http_parser_t *http_parser) {
     when a request cannot be routed to the appropriate handler */
     V_WARNING_F(
         "Dispatch error, sending 500 for %s %s\n",
-        get_http_method_string(http_parser->method),
-        http_parser->context ? (char *) http_parser->context : "/"
+        get_http_method_string(http_request->method),
+        http_request->context ? (char *) http_request->context : "/"
     );
 
     /* writes the response to the connection, registers for the appropriate callbacks
@@ -497,9 +497,9 @@ ERROR_CODE _send_response_handler_dispatch(struct http_parser_t *http_parser) {
         500,
         "Internal Server Error",
         DISPATCH_ERROR_MESSAGE,
-        http_parser->flags & FLAG_KEEP_ALIVE ? KEEP_ALIVE : KEEP_CLOSE,
+        http_request->flags & FLAG_KEEP_ALIVE ? KEEP_ALIVE : KEEP_CLOSE,
         _send_response_callback_handler_dispatch,
-        (void *) (size_t) http_parser->flags
+        (void *) (size_t) http_request->flags
     );
 
     /* raise no error */

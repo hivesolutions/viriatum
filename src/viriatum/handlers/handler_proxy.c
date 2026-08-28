@@ -118,7 +118,7 @@ ERROR_CODE create_handler_proxy_context(struct handler_proxy_context_t **handler
 
     /* updates the currently associated parser context with the context
     that is currentl being created to be able to access it from the callbacks */
-    handler_proxy_context->http_parser->context = (void *) handler_proxy_context;
+    handler_proxy_context->http_parser->request->context = (void *) handler_proxy_context;
 
     /* sets the handler proxy context in the  pointer and then returns
     the control flow to the caller method with no error */
@@ -323,7 +323,7 @@ ERROR_CODE close_proxy_connection(struct io_connection_t *io_connection) {
 ERROR_CODE set_handler_proxy(struct http_connection_t *http_connection) {
     /* sets both the HTTP parser values and the HTTP
     settings handler for the current proxy handler */
-    _set_http_parser_handler_proxy(http_connection->http_parser);
+    _set_http_request_handler_proxy(http_connection->request);
     _set_http_settings_handler_proxy(http_connection->http_settings);
 
     /* raises no error */
@@ -333,7 +333,7 @@ ERROR_CODE set_handler_proxy(struct http_connection_t *http_connection) {
 ERROR_CODE unset_handler_proxy(struct http_connection_t *http_connection) {
     /* unsets both the HTTP parser values and the HTTP
     settings handler from the current proxy handler */
-    _unset_http_parser_handler_proxy(http_connection->http_parser);
+    _unset_http_request_handler_proxy(http_connection->request);
     _unset_http_settings_handler_proxy(http_connection->http_settings);
 
     /* raises no error */
@@ -342,55 +342,55 @@ ERROR_CODE unset_handler_proxy(struct http_connection_t *http_connection) {
 
 ERROR_CODE reset_handler_proxy(struct http_connection_t *http_connection) {
     /* resets the HTTP parser values */
-    _reset_http_parser_handler_proxy(http_connection->http_parser);
+    _reset_http_request_handler_proxy(http_connection->request);
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE message_begin_callback_handler_proxy(struct http_parser_t *http_parser) {
+ERROR_CODE message_begin_callback_handler_proxy(struct http_request_t *http_request) {
     struct handler_proxy_context_t *handler_proxy_context =
-        (struct handler_proxy_context_t *) http_parser->context;
+        (struct handler_proxy_context_t *) http_request->context;
     handler_proxy_context->buffer_size = 0;
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE url_callback_handler_proxy(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE url_callback_handler_proxy(struct http_request_t *http_request, const unsigned char *data, size_t data_size) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE header_field_callback_handler_proxy(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE header_field_callback_handler_proxy(struct http_request_t *http_request, const unsigned char *data, size_t data_size) {
     struct handler_proxy_context_t *handler_proxy_context =
-        (struct handler_proxy_context_t *) http_parser->context;
+        (struct handler_proxy_context_t *) http_request->context;
     write_proxy_buffer(handler_proxy_context, (char *) data, data_size);
 
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE header_value_callback_handler_proxy(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE header_value_callback_handler_proxy(struct http_request_t *http_request, const unsigned char *data, size_t data_size) {
     struct handler_proxy_context_t *handler_proxy_context =
-        (struct handler_proxy_context_t *) http_parser->context;
+        (struct handler_proxy_context_t *) http_request->context;
     write_proxy_buffer(handler_proxy_context, ": ", 2);
     write_proxy_buffer(handler_proxy_context, (char *) data, data_size);
     write_proxy_buffer(handler_proxy_context, "\r\n", 2);
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE headers_complete_callback_handler_proxy(struct http_parser_t *http_parser) {
+ERROR_CODE headers_complete_callback_handler_proxy(struct http_request_t *http_request) {
     struct handler_proxy_context_t *handler_proxy_context =
-        (struct handler_proxy_context_t *) http_parser->context;
+        (struct handler_proxy_context_t *) http_request->context;
     write_proxy_buffer(handler_proxy_context, "\r\n", 2);
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE body_callback_handler_proxy(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE body_callback_handler_proxy(struct http_request_t *http_request, const unsigned char *data, size_t data_size) {
     struct handler_proxy_context_t *handler_proxy_context =
-        (struct handler_proxy_context_t *) http_parser->context;
+        (struct handler_proxy_context_t *) http_request->context;
     write_proxy_buffer(handler_proxy_context, (char *) data, data_size);
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE message_complete_callback_handler_proxy(struct http_parser_t *http_parser) {
+ERROR_CODE message_complete_callback_handler_proxy(struct http_request_t *http_request) {
     /* reserves space for the pointer to the buffer that may
     be created in case there's a problem in the gateway */
     char *buffer;
@@ -399,9 +399,9 @@ ERROR_CODE message_complete_callback_handler_proxy(struct http_parser_t *http_pa
     uses it's parameters to retrieve the connection and then retrieves
     it's underlying layers of the connection */
     struct handler_proxy_context_t *handler_proxy_context =
-        (struct handler_proxy_context_t *) http_parser->context;
+        (struct handler_proxy_context_t *) http_request->context;
     struct connection_t *connection =
-        (struct connection_t *) http_parser->parameters;
+        (struct connection_t *) http_request->parameters;
     struct io_connection_t *io_connection =
         (struct io_connection_t *) connection->lower;
     struct http_connection_t *http_connection =
@@ -424,9 +424,9 @@ ERROR_CODE message_complete_callback_handler_proxy(struct http_parser_t *http_pa
             502,
             "Bad gateway",
             "Invalid proxy connection",
-            http_parser->flags & FLAG_KEEP_ALIVE ? KEEP_ALIVE : KEEP_CLOSE,
+            http_request->flags & FLAG_KEEP_ALIVE ? KEEP_ALIVE : KEEP_CLOSE,
             _cleanup_handler_proxy,
-            (void *) (size_t) http_parser->flags
+            (void *) (size_t) http_request->flags
         );
     } else {
         write_connection_c(
@@ -444,14 +444,14 @@ ERROR_CODE message_complete_callback_handler_proxy(struct http_parser_t *http_pa
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE location_callback_handler_proxy(struct http_parser_t *http_parser, size_t index, size_t offset) {
+ERROR_CODE location_callback_handler_proxy(struct http_request_t *http_request, size_t index, size_t offset) {
     /* retrieves the handler proxy context from the HTTP parser */
     struct handler_proxy_context_t *handler_proxy_context =
-        (struct handler_proxy_context_t *) http_parser->context;
+        (struct handler_proxy_context_t *) http_request->context;
 
     /* retrieves the connection from the parser and then uses it to  the
     the correct proxy handler reference from the HTTP connection */
-    struct connection_t *connection = (struct connection_t *) http_parser->parameters;
+    struct connection_t *connection = (struct connection_t *) http_request->parameters;
     struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
     struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
     struct proxy_handler_t *proxy_handler =
@@ -470,7 +470,7 @@ ERROR_CODE location_callback_handler_proxy(struct http_parser_t *http_parser, si
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE virtual_url_callback_handler_proxy(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE virtual_url_callback_handler_proxy(struct http_request_t *http_request, const unsigned char *data, size_t data_size) {
     /* reserves space for a return error code to be used in various
     operation in the current function call */
     ERROR_CODE return_value;
@@ -496,19 +496,16 @@ ERROR_CODE virtual_url_callback_handler_proxy(struct http_parser_t *http_parser,
     /* retrieves the enumeration representation of the version and then
     uses it to retrieve the string value out of it, then retrieves the
     proper HTTP method used in the current call */
-    enum http_version_e version_e = get_http_version(
-        http_parser->http_major,
-        http_parser->http_minor
-    );
+    enum http_version_e version_e = http_request->version;
     const char *version = get_http_version_string(version_e);
-    const char *method = http_method_strings[http_parser->method - 1];
+    const char *method = http_method_strings[http_request->method - 1];
 
     /* retrieves the connection from the parser parameters and then uses
     it to retrieve its lower connection layers (substrates) then uses the
     HTTP connection to retrieve the handler and the handler to retrieve the
     current proxy context structure */
     struct connection_t *connection =
-        (struct connection_t *) http_parser->parameters;
+        (struct connection_t *) http_request->parameters;
     struct io_connection_t *io_connection =
         (struct io_connection_t *) connection->lower;
     struct http_connection_t *http_connection =
@@ -517,7 +514,7 @@ ERROR_CODE virtual_url_callback_handler_proxy(struct http_parser_t *http_parser,
     struct proxy_handler_t *proxy_handler =
         (struct proxy_handler_t *) http_handler->lower;
     struct handler_proxy_context_t *handler_proxy_context =
-        (struct handler_proxy_context_t *) http_parser->context;
+        (struct handler_proxy_context_t *) http_request->context;
 
     /* copies the virtual url value into the local path buffer and then
     closes it as a null terminated string */
@@ -786,7 +783,7 @@ ERROR_CODE close_backend_handler(struct io_connection_t *io_connection) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE line_callback_backend(struct http_parser_t *http_parser) {
+ERROR_CODE line_callback_backend(struct http_request_t *http_request) {
     /* allocates space for both the size of the message and
     for the buffer to be used in the status line construction */
     size_t size_m;
@@ -795,19 +792,16 @@ ERROR_CODE line_callback_backend(struct http_parser_t *http_parser) {
     /* retrieves the current parser's context as the proxy context
     structure to be used for buffer handling */
     struct handler_proxy_context_t *handler_proxy_context =
-        (struct handler_proxy_context_t *) http_parser->context;
+        (struct handler_proxy_context_t *) http_request->context;
 
     /* retrieves the enumeration representation of the version
     value in order to be used in the string retrieval */
-    enum http_version_e version_e = get_http_version(
-        http_parser->http_major,
-        http_parser->http_minor
-    );
+    enum http_version_e version_e = http_request->version;
 
     /* retrieves the string value of the version, the status code
     and the equivalent status message from the pre-defined ones */
     const char *version = get_http_version_string(version_e);
-    unsigned short status_code = http_parser->status_code;
+    unsigned short status_code = http_request->status_code;
     const char *status_message = GET_HTTP_STATUS(status_code);
 
     /* writes the status line (should mimic the received one) into a local
@@ -822,28 +816,28 @@ ERROR_CODE line_callback_backend(struct http_parser_t *http_parser) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE header_field_callback_backend(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE header_field_callback_backend(struct http_request_t *http_request, const unsigned char *data, size_t data_size) {
     struct handler_proxy_context_t *handler_proxy_context =
-        (struct handler_proxy_context_t *) http_parser->context;
+        (struct handler_proxy_context_t *) http_request->context;
     write_proxy_out_buffer(handler_proxy_context, (char *) data, data_size);
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE header_value_callback_backend(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE header_value_callback_backend(struct http_request_t *http_request, const unsigned char *data, size_t data_size) {
     struct handler_proxy_context_t *handler_proxy_context =
-        (struct handler_proxy_context_t *) http_parser->context;
+        (struct handler_proxy_context_t *) http_request->context;
     write_proxy_out_buffer(handler_proxy_context, ": ", 2);
     write_proxy_out_buffer(handler_proxy_context, (char *) data, data_size);
     write_proxy_out_buffer(handler_proxy_context, "\r\n", 2);
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE headers_complete_callback_backend(struct http_parser_t *http_parser) {
+ERROR_CODE headers_complete_callback_backend(struct http_request_t *http_request) {
     /* retrieves the parser's context as the proxy context and then uses
     it to retrieve both the proxy client connection and the backend client
     connection to be used in the processing of the header's final */
     struct handler_proxy_context_t *handler_proxy_context =
-        (struct handler_proxy_context_t *) http_parser->context;
+        (struct handler_proxy_context_t *) http_request->context;
     struct connection_t *connection = handler_proxy_context->connection;
     struct connection_t *connection_c = handler_proxy_context->connection_c;
 
@@ -874,12 +868,12 @@ ERROR_CODE headers_complete_callback_backend(struct http_parser_t *http_parser) 
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE body_callback_backend(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE body_callback_backend(struct http_request_t *http_request, const unsigned char *data, size_t data_size) {
     /* retrieves the proxy context object from the parser and then
     uses it to retrieve both the (proxy client) connection and the
     client connection (backend connection) */
     struct handler_proxy_context_t *handler_proxy_context =
-        (struct handler_proxy_context_t *) http_parser->context;
+        (struct handler_proxy_context_t *) http_request->context;
     struct connection_t *connection = handler_proxy_context->connection;
     struct connection_t *connection_c = handler_proxy_context->connection_c;
 
@@ -910,11 +904,11 @@ ERROR_CODE body_callback_backend(struct http_parser_t *http_parser, const unsign
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE message_complete_callback_backend(struct http_parser_t *http_parser) {
+ERROR_CODE message_complete_callback_backend(struct http_request_t *http_request) {
     /* retrieves the current proxy context reference from the parser object
     and uses it to retrieve the connection object to be used in the write operation */
     struct handler_proxy_context_t *handler_proxy_context =
-        (struct handler_proxy_context_t *) http_parser->context;
+        (struct handler_proxy_context_t *) http_request->context;
     struct connection_t *connection = handler_proxy_context->connection;
 
     /* writes the final (empty value) to the connection stream so that
@@ -925,7 +919,7 @@ ERROR_CODE message_complete_callback_backend(struct http_parser_t *http_parser) 
         (unsigned char *) "",
         0,
         _cleanup_handler_proxy,
-        (void *) (size_t) http_parser->flags,
+        (void *) (size_t) http_request->flags,
         FALSE
     );
 
@@ -939,23 +933,23 @@ ERROR_CODE message_complete_callback_backend(struct http_parser_t *http_parser) 
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _set_http_parser_handler_proxy(struct http_parser_t *http_parser) {
+ERROR_CODE _set_http_request_handler_proxy(struct http_request_t *http_request) {
     /* allocates space for the handler proxy context */
     struct handler_proxy_context_t *handler_proxy_context;
 
     /* creates the handler proxy context and then sets the handler
     proxy context as the context for the HTTP parser */
     create_handler_proxy_context(&handler_proxy_context);
-    http_parser->context = handler_proxy_context;
+    http_request->context = handler_proxy_context;
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _unset_http_parser_handler_proxy(struct http_parser_t *http_parser) {
+ERROR_CODE _unset_http_request_handler_proxy(struct http_request_t *http_request) {
     /* retrieves the handler proxy context from the HTTP parser */
     struct handler_proxy_context_t *handler_proxy_context =
-        (struct handler_proxy_context_t *) http_parser->context;
+        (struct handler_proxy_context_t *) http_request->context;
 
     /* in case there's a connection with the client defined the parameters
     of it must be undefined so that no more bottom up operations occur,
@@ -968,16 +962,16 @@ ERROR_CODE _unset_http_parser_handler_proxy(struct http_parser_t *http_parser) {
     /* deletes the handler proxy context and nullifies the
     reference to avoid dangling pointer on keep-alive reuse */
     delete_handler_proxy_context(handler_proxy_context);
-    http_parser->context = NULL;
+    http_request->context = NULL;
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _reset_http_parser_handler_proxy(struct http_parser_t *http_parser) {
+ERROR_CODE _reset_http_request_handler_proxy(struct http_request_t *http_request) {
     /* retrieves the handler proxy context from the HTTP parser */
     struct handler_proxy_context_t *handler_proxy_context =
-        (struct handler_proxy_context_t *) http_parser->context;
+        (struct handler_proxy_context_t *) http_request->context;
 
     /* restores the buffer size back to the original value, this
     should discard the values in the buffer */

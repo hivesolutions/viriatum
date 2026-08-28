@@ -30,7 +30,7 @@
 
 /**
  * Tests that the dispatch handler unset does not
- * free http_parser->context when it was set by
+ * free http_request->context when it was set by
  * another handler (simulates keep-alive re-dispatch).
  *
  * @return A message describing the execution of

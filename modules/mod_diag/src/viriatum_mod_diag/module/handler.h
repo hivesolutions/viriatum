@@ -28,6 +28,6 @@
 
 ERROR_CODE set_handler_diag(struct http_connection_t *http_connection);
 ERROR_CODE unset_handler_diag(struct http_connection_t *http_connection);
-ERROR_CODE message_complete_callback_handler_diag(struct http_parser_t *http_parser);
-ERROR_CODE _send_response_handler_diag(struct http_parser_t *http_parser);
+ERROR_CODE message_complete_callback_handler_diag(struct http_request_t *http_request);
+ERROR_CODE _send_response_handler_diag(struct http_request_t *http_request);
 ERROR_CODE _send_response_callback_handler_diag(struct connection_t *connection, struct data_t *data, void *parameters);

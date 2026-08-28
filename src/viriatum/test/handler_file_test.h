@@ -47,14 +47,14 @@ typedef struct handler_file_fixture_t {
 
     /**
      * The minimal connection, service and options chain
-     * assigned to the parameters of the parser.
+     * assigned to the parameters of the request.
      */
     struct test_context_t *test_context;
 
     /**
-     * The HTTP parser wired to the handler file context.
+     * The HTTP request wired to the handler file context.
      */
-    struct http_parser_t *http_parser;
+    struct http_request_t *http_request;
 
     /**
      * The context of the file handler under test.
