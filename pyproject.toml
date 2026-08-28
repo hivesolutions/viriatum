@@ -10,9 +10,10 @@ readme = "README.md"
 requires-python = ">=3.10"
 license = "Apache-2.0"
 authors = [{ name = "João Magalhães", email = "joamag@hive.pt" }]
-keywords = ["viriatum", "wsgi", "server", "http"]
+keywords = ["viriatum", "wsgi", "asgi", "server", "http"]
 classifiers = [
     "Development Status :: 4 - Beta",
+    "Framework :: AsyncIO",
     "Intended Audience :: Developers",
     "Operating System :: OS Independent",
     "Programming Language :: C",
