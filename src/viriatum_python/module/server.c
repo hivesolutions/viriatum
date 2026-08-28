@@ -407,16 +407,16 @@ static PyObject *_serve_forever_server_python(PyObject *self, PyObject *args) {
         if(PyErr_CheckSignals() != 0) {
             stop_service(service);
 
-            /* saves the exception raised by the signal so that the
-            shutdown of the lifespan runs over a clean error state,
-            the interpreter refuses most of the calls while one is
-            pending, restoring it once the shutdown is complete */
-            if(server_python->loop_python != NULL) {
-                PyErr_Fetch(&type, &value, &traceback);
-                shutdown_handler_asgi(service);
-                PyErr_Restore(type, value, traceback);
-            }
+            /* saves the exception raised by the signal so that both
+            the shutdown of the lifespan and the closing of the
+            service run over a clean error state, the interpreter
+            refuses most of the calls while one is pending and the
+            closing of the connections reaches it through the
+            destruction of their contexts */
+            PyErr_Fetch(&type, &value, &traceback);
+            if(server_python->loop_python != NULL) { shutdown_handler_asgi(service); }
             close_service(service);
+            PyErr_Restore(type, value, traceback);
             server_python->opened = FALSE;
             return NULL;
         }

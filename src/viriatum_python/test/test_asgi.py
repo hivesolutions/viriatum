@@ -1103,11 +1103,28 @@ class AsgiTest(ServerCase):
         finished = threading.Event()
 
         async def application(scope, receive, send):
+            # refuses the lifespan scope so that the opening of the
+            # service is immediate, the interrupt has to reach the
+            # serving loop rather than the wait of the protocol
+            if scope["type"] != "http":
+                raise NotImplementedError(scope["type"])
             await receive()
+            await asyncio.sleep(2.0)
             await send({"type": "http.response.start", "status": 200, "headers": []})
             await send({"type": "http.response.body", "body": b"plain"})
 
         server = viriatum.Server(application, port=self.port + 30, interface="asgi")
+
+        def request():
+            # keeps a request in flight so that a task stays pending
+            # and the loop is advancing the interpreter, which is the
+            # window where the interrupt used to be discarded
+            try:
+                urllib.request.urlopen(
+                    "http://127.0.0.1:%d/" % (self.port + 30), timeout=10
+                )
+            except Exception:
+                pass
 
         def interrupt():
             # waits for the service to be listening before raising the
@@ -1121,6 +1138,8 @@ class AsgiTest(ServerCase):
                     break
                 except Exception:
                     time.sleep(0.05)
+            threading.Thread(target=request, daemon=True).start()
+            time.sleep(0.5)
             state["raised"] = True
             os.kill(os.getpid(), signal.SIGINT)
 
