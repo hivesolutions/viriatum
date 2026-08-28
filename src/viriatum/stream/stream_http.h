@@ -31,6 +31,7 @@
 
 /* forward references (avoids loop) */
 struct http_connection_t;
+struct http2_connection_t;
 typedef ERROR_CODE (*connection_data_callback_sh)(struct connection_t *, struct data_t *, void *);
 
 /**
@@ -190,6 +191,12 @@ typedef struct http_connection_t {
      * along the life-time of the connection.
      */
     struct http_request_t *request;
+
+    /**
+     * The session that drives the connection when it speaks
+     * HTTP/2, it is unset for an HTTP/1.1 one.
+     */
+    struct http2_connection_t *http2_connection;
 
     /**
      * The handler currently being used to handle

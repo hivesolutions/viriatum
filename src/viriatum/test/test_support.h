@@ -48,9 +48,21 @@ typedef struct test_context_t {
 
     /**
      * The connection that is wired to the service
-     * and can be assigned to http_parser->parameters.
+     * and can be assigned to http_request->parameters.
      */
     struct connection_t *connection;
+
+    /**
+     * The io connection layer, only built by the tests
+     * that require the complete chain of a connection.
+     */
+    struct io_connection_t *io_connection;
+
+    /**
+     * The HTTP connection layer, only built by the tests
+     * that require the complete chain of a connection.
+     */
+    struct http_connection_t *http_connection;
 
 } test_context_t;
 
@@ -74,3 +86,56 @@ void create_test_context(struct test_context_t **context_pointer);
  * @param context The test context to destroy.
  */
 void delete_test_context(struct test_context_t *context);
+
+/**
+ * Stands in for the closing of a connection that holds no socket,
+ * only the request itself is recorded.
+ *
+ * @param connection The connection being closed.
+ * @return The resulting error code.
+ */
+ERROR_CODE close_test_connection(struct connection_t *connection);
+
+/**
+ * Forgets the closings that have been requested so far, a test
+ * calls it before driving a connection.
+ */
+void reset_closed_test_connection(void);
+
+/**
+ * Retrieves the number of closings that have been requested on
+ * the connections of the tests.
+ *
+ * @return The number of closings that have been requested.
+ */
+size_t get_closed_test_connection(void);
+
+/**
+ * Stands in for the registration of the writing of a connection
+ * that is not attached to a polling, the data that has been
+ * queued stays in the queue for the test to observe.
+ *
+ * @param connection The connection being registered.
+ * @return The resulting error code.
+ */
+ERROR_CODE register_write_test_connection(struct connection_t *connection);
+
+/**
+ * Builds the io and the HTTP connection layers on top of
+ * the connection of the provided context, the handler that a
+ * message is served by is left unset so that a test installs
+ * the one it wants to observe.
+ * This is only required by the tests that drive a complete
+ * connection rather than a single callback.
+ *
+ * @param context The test context to be completed.
+ */
+void create_test_connection(struct test_context_t *context);
+
+/**
+ * Destroys the io and the HTTP connection layers that have
+ * been built on top of the connection of the context.
+ *
+ * @param context The test context to be reduced.
+ */
+void delete_test_connection(struct test_context_t *context);

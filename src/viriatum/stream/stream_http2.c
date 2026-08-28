@@ -1,0 +1,1143 @@
+/*
+ Hive Viriatum Web Server
+ Copyright (c) 2008-2026 Hive Solutions Lda.
+
+ This file is part of Hive Viriatum Web Server.
+
+ Hive Viriatum Web Server is free software: you can redistribute it and/or modify
+ it under the terms of the Apache License as published by the Apache
+ Foundation, either version 2.0 of the License, or (at your option) any
+ later version.
+
+ Hive Viriatum Web Server is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ Apache License for more details.
+
+ You should have received a copy of the Apache License along with
+ Hive Viriatum Web Server. If not, see <http://www.apache.org/licenses/>.
+
+ __author__    = João Magalhães <joamag@hive.pt>
+ __copyright__ = Copyright (c) 2008-2026 Hive Solutions Lda.
+ __license__   = Apache License, Version 2.0
+*/
+
+#include "stdafx.h"
+
+#include "stream_http2.h"
+
+/**
+ * Structure handed to the decoding of a header block so that
+ * each one of the fields it produces reaches both the message of
+ * the stream and the handler that is serving it.
+ */
+typedef struct http2_block_t {
+    /**
+     * The session the block belongs to.
+     */
+    struct http2_connection_t *http2_connection;
+
+    /**
+     * The stream the block belongs to.
+     */
+    struct http2_stream_t *http2_stream;
+
+    /**
+     * Flag controlling if a regular field has already been seen,
+     * a pseudo header is not allowed to follow one.
+     */
+    char regular;
+} http2_block;
+
+/**
+ * Retrieves the method of a request out of the value of the
+ * method pseudo header, the comparison walks the very same table
+ * the HTTP/1.1 parser reports its own values from.
+ *
+ * @param data The buffer holding the name of the method.
+ * @param data_size The size in bytes of the name.
+ * @return The value of the method enumeration or zero in case the
+ * name is not one of the known methods.
+ */
+static unsigned char _method_http2_connection(const unsigned char *data, size_t data_size) {
+    /* allocates space for the iteration over the known methods */
+    size_t index;
+    const char *method;
+
+    /* walks the table of the methods, the size is compared before
+    the contents as it discards almost every candidate */
+    for(index = 0; index < 24; index++) {
+        method = http_method_strings[index];
+        if(strlen(method) != data_size) { continue; }
+        if(memcmp(method, data, data_size) != 0) { continue; }
+        return (unsigned char) (index + 1);
+    }
+
+    /* returns the value that marks an unknown method, the caller is
+    the one deciding what to do about it */
+    return 0;
+}
+
+/**
+ * Swaps the message, the settings and the handler of the provided
+ * stream into the HTTP connection, so that a handler observes the
+ * stream it is being driven for.
+ *
+ * @param http2_connection The session holding the stream.
+ * @param http2_stream The stream to be made the current one.
+ */
+static void _activate_http2_connection(struct http2_connection_t *http2_connection, struct http2_stream_t *http2_stream) {
+    /* retrieves the HTTP connection, it is the structure that the
+    handlers reach through the message they are handed */
+    struct http_connection_t *http_connection = http2_connection->http_connection;
+
+    /* points the connection at the structures of the stream, under
+    HTTP/2 they change from one stream to the next */
+    http_connection->request = http2_stream->request;
+    http_connection->http_settings = http2_stream->http_settings;
+    http_connection->http_handler = http2_stream->http_handler;
+}
+
+struct http2_stream_t *find_stream_http2_connection(struct http2_connection_t *http2_connection, unsigned int stream_id) {
+    /* allocates space for the iteration over the streams that the
+    connection currently holds open */
+    size_t index;
+
+    /* walks only the slots that are in use, the table is kept
+    compact so the ones above the count are never live */
+    for(index = 0; index < http2_connection->count; index++) {
+        if(http2_connection->streams[index].stream_id == stream_id) {
+            return &http2_connection->streams[index];
+        }
+    }
+
+    /* returns an unset value as the connection holds no stream
+    carrying the provided identifier */
+    return NULL;
+}
+
+ERROR_CODE open_stream_http2_connection(struct http2_connection_t *http2_connection, unsigned int stream_id, struct http2_stream_t **http2_stream_pointer) {
+    /* allocates space for the stream that is going to be taken out
+    of the table of the connection */
+    struct http2_stream_t *http2_stream;
+
+    /* a stream opened by a client carries an odd identifier, an even
+    one is reserved for the pushes of the server */
+    if(stream_id % 2 == 0) { RAISE_ERROR_S(HTTP2_PROTOCOL_ERROR); }
+
+    /* the identifiers of the streams a peer opens are required to be
+    strictly increasing, a lower one refers to a stream that has
+    already been closed and is never reopened */
+    if(stream_id <= http2_connection->last_stream_id) { RAISE_ERROR_S(HTTP2_PROTOCOL_ERROR); }
+
+    /* refuses the stream when the peer already holds as many of them
+    open as this end has announced, the excess is refused rather than
+    served so that the memory of a connection stays bounded */
+    if(http2_connection->count >= http2_connection->settings.max_concurrent_streams ||
+       http2_connection->count >= HTTP2_STREAM_SLOTS) {
+        RAISE_ERROR_S(HTTP2_REFUSED_STREAM);
+    }
+
+    /* takes the slot that follows the ones in use and sets the
+    values the stream starts its life with */
+    http2_stream = &http2_connection->streams[http2_connection->count];
+    http2_stream->stream_id = stream_id;
+    http2_stream->state = HTTP2_STATE_OPEN;
+    http2_stream->send_window = (long) http2_connection->remote.initial_window_size;
+    http2_stream->receive_window = (long) http2_connection->settings.initial_window_size;
+    http2_stream->priority.dependency = 0;
+    http2_stream->priority.weight = HTTP2_DEFAULT_WEIGHT;
+    http2_stream->priority.exclusive = FALSE;
+    http2_stream->http_handler = NULL;
+    http2_stream->end_stream = FALSE;
+    http2_stream->headers_complete = FALSE;
+
+    /* creates both the message that the handlers observe and the
+    settings that carry the callbacks of the handler, they are owned
+    by the stream as several of them are live at the same time */
+    create_http_request(&http2_stream->request);
+    create_http_settings(&http2_stream->http_settings);
+
+    /* populates the part of the message that comes from the
+    connection rather than from the header block */
+    http2_stream->request->version = HTTP20;
+    http2_stream->request->stream_id = stream_id;
+    http2_stream->request->parameters = http2_connection->http_connection->io_connection->connection;
+    http2_stream->request->flags = FLAG_KEEP_ALIVE;
+
+    /* accounts the stream in both the number of open ones and the
+    last identifier that the peer has used */
+    http2_connection->count++;
+    http2_connection->last_stream_id = stream_id;
+
+    /* sets the stream in the stream pointer */
+    *http2_stream_pointer = http2_stream;
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE close_stream_http2_connection(struct http2_connection_t *http2_connection, struct http2_stream_t *http2_stream) {
+    /* allocates space for the slot of the stream being closed and
+    for the one that holds the last of the open streams */
+    size_t index = (size_t) (http2_stream - http2_connection->streams);
+    size_t last = http2_connection->count - 1;
+
+    /* unsets the handler that has been serving the stream, this is
+    what releases the context that the handler owns */
+    if(http2_stream->http_handler != NULL) {
+        _activate_http2_connection(http2_connection, http2_stream);
+        http2_stream->http_handler->unset(http2_connection->http_connection);
+        http2_stream->http_handler = NULL;
+    }
+
+    /* releases both the message and the settings, they are owned by
+    the stream and nothing else references them */
+    delete_http_request(http2_stream->request);
+    delete_http_settings(http2_stream->http_settings);
+
+    /* moves the last of the open streams into the slot that has just
+    been freed, keeping the table compact */
+    if(index != last) { http2_connection->streams[index] = http2_connection->streams[last]; }
+    http2_connection->streams[last].stream_id = 0;
+    http2_connection->count--;
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE create_http2_connection(struct http2_connection_t **http2_connection_pointer, struct http_connection_t *http_connection) {
+    /* retrieves the session size */
+    size_t http2_connection_size = sizeof(struct http2_connection_t);
+
+    /* allocates space for the session */
+    struct http2_connection_t *http2_connection =
+        (struct http2_connection_t *) MALLOC(http2_connection_size);
+
+    /* sets the session attributes, the settings of both ends start
+    at the values that the specification defines */
+    http2_connection->http_connection = http_connection;
+    create_settings_http2(&http2_connection->settings);
+    create_settings_http2(&http2_connection->remote);
+    http2_connection->count = 0;
+    http2_connection->last_stream_id = 0;
+    http2_connection->push_stream_id = 0;
+    http2_connection->send_window = HTTP2_DEFAULT_WINDOW_SIZE;
+    http2_connection->receive_window = HTTP2_DEFAULT_WINDOW_SIZE;
+    http2_connection->preface = FALSE;
+    http2_connection->goaway = FALSE;
+    http2_connection->continuation = 0;
+    http2_connection->continuation_flags = 0;
+    http2_connection->block = NULL;
+    http2_connection->block_size = 0;
+
+    /* creates the dynamic tables of both directions, each one of
+    them follows the opposite one on the peer */
+    create_hpack_table(&http2_connection->decoder);
+    create_hpack_table(&http2_connection->encoder);
+
+    /* keeps the settings that the connection carried before the
+    session took over, they are restored on release */
+    http2_connection->base_settings = http_connection->http_settings;
+
+    /* sets the session in the HTTP connection so that the reading of
+    the connection is able to reach it */
+    http_connection->http2_connection = http2_connection;
+
+    /* sets the session in the session pointer */
+    *http2_connection_pointer = http2_connection;
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE delete_http2_connection(struct http2_connection_t *http2_connection) {
+    /* closes every one of the streams that are still open, the
+    closing of one of them moves another into its slot and so the
+    first of them is closed over and over */
+    while(http2_connection->count > 0) {
+        close_stream_http2_connection(http2_connection, &http2_connection->streams[0]);
+    }
+
+    /* restores the settings that the connection carried before the
+    session took over, they are the ones it owns */
+    http2_connection->http_connection->http_settings = http2_connection->base_settings;
+    http2_connection->http_connection->request = NULL;
+    http2_connection->http_connection->http_handler = NULL;
+
+    /* releases the buffer that assembles a header block spread over
+    a sequence of continuation frames */
+    if(http2_connection->block != NULL) { FREE(http2_connection->block); }
+
+    /* deletes the dynamic tables of both of the directions */
+    delete_hpack_table(http2_connection->decoder);
+    delete_hpack_table(http2_connection->encoder);
+
+    /* releases the session */
+    FREE(http2_connection);
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE update_window_http2_connection(struct http2_connection_t *http2_connection, unsigned int stream_id, unsigned int increment) {
+    /* allocates space for the stream the increment applies to, it is
+    unset when the increment applies to the connection */
+    struct http2_stream_t *http2_stream;
+
+    /* an increment of nothing at all carries no meaning and is an
+    error, either of the connection or of the stream */
+    if(increment == 0) { RAISE_ERROR_S(HTTP2_PROTOCOL_ERROR); }
+
+    /* an increment that applies to the connection as a whole widens
+    the window that bounds every one of the streams together */
+    if(stream_id == 0) {
+        if(http2_connection->send_window + (long) increment > HTTP2_MAX_WINDOW_SIZE) {
+            RAISE_ERROR_S(HTTP2_FLOW_CONTROL_ERROR);
+        }
+        http2_connection->send_window += (long) increment;
+        RAISE_NO_ERROR;
+    }
+
+    /* an increment for a stream that is no longer open is discarded,
+    the peer is allowed to send one that crosses the closing */
+    http2_stream = find_stream_http2_connection(http2_connection, stream_id);
+    if(http2_stream == NULL) { RAISE_NO_ERROR; }
+
+    if(http2_stream->send_window + (long) increment > HTTP2_MAX_WINDOW_SIZE) {
+        RAISE_ERROR_S(HTTP2_FLOW_CONTROL_ERROR);
+    }
+    http2_stream->send_window += (long) increment;
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE apply_settings_http2_connection(struct http2_connection_t *http2_connection, const unsigned char *data, size_t data_size) {
+    /* allocates space for the iteration over the open streams and
+    for the difference of the initial window */
+    size_t index;
+    long difference;
+    size_t previous = http2_connection->remote.initial_window_size;
+    ERROR_CODE return_value;
+
+    /* applies the payload over the settings of the peer, an entry
+    that is not recognised is ignored rather than refused */
+    return_value = decode_settings_http2(data, data_size, &http2_connection->remote);
+    if(IS_ERROR_CODE(return_value)) { RAISE_AGAIN(return_value); }
+
+    /* a change of the initial window is carried over to the streams
+    that are already open, which is the part of the negotiation that
+    is most commonly left out of an implementation */
+    difference = (long) http2_connection->remote.initial_window_size - (long) previous;
+    if(difference != 0) {
+        for(index = 0; index < http2_connection->count; index++) {
+            /* a window that would go beyond the largest value the
+            protocol represents is a flow control error, one that
+            goes below zero is valid and stalls the stream */
+            if(http2_connection->streams[index].send_window + difference > HTTP2_MAX_WINDOW_SIZE) {
+                RAISE_ERROR_S(HTTP2_FLOW_CONTROL_ERROR);
+            }
+            http2_connection->streams[index].send_window += difference;
+        }
+    }
+
+    /* resizes the table of the encoder so that it never indexes
+    beyond what the decoder of the peer is able to hold */
+    if(http2_connection->remote.header_table_size < HPACK_TABLE_SIZE) {
+        return_value = resize_hpack_table(
+            http2_connection->encoder,
+            http2_connection->remote.header_table_size
+        );
+        if(IS_ERROR_CODE(return_value)) { RAISE_ERROR_S(HTTP2_COMPRESSION_ERROR); }
+    }
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+/**
+ * Writes the provided frame into the connection, the buffer is
+ * handed over to the io layer which is the one releasing it once
+ * the write completes.
+ *
+ * @param http2_connection The session writing the frame.
+ * @param buffer The buffer holding the complete frame.
+ * @param size The size in bytes of the frame.
+ * @return The resulting error code.
+ */
+static ERROR_CODE _write_http2_connection(struct http2_connection_t *http2_connection, unsigned char *buffer, size_t size) {
+    /* retrieves the connection out of the session, it is the one
+    that owns the write queue */
+    struct connection_t *connection =
+        http2_connection->http_connection->io_connection->connection;
+
+    /* hands the buffer over to the connection, the release of it is
+    the responsibility of the io layer from this point on */
+    write_connection(connection, buffer, (unsigned int) size, NULL, NULL);
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE write_value_http2_connection(struct http2_connection_t *http2_connection, unsigned char type, unsigned int stream_id, unsigned int value) {
+    /* allocates the buffer of the frame, it is released by the io
+    layer once the write of it completes */
+    unsigned char *buffer = (unsigned char *) MALLOC(HTTP2_HEADER_SIZE + 4);
+    size_t size;
+    ERROR_CODE return_value;
+
+    return_value = encode_value_http2(buffer, HTTP2_HEADER_SIZE + 4, type, stream_id, value, &size);
+    if(IS_ERROR_CODE(return_value)) {
+        FREE(buffer);
+        RAISE_AGAIN(return_value);
+    }
+
+    /* raises again the result of the write of the frame */
+    return_value = _write_http2_connection(http2_connection, buffer, size);
+    RAISE_AGAIN(return_value);
+}
+
+ERROR_CODE write_goaway_http2_connection(struct http2_connection_t *http2_connection, unsigned int error) {
+    /* allocates the buffer of the frame, it is released by the io
+    layer once the write of it completes */
+    unsigned char *buffer;
+    size_t size;
+    ERROR_CODE return_value;
+
+    /* the connection is told to go away exactly once, a second
+    frame would carry a last stream that has already been passed */
+    if(http2_connection->goaway == TRUE) { RAISE_NO_ERROR; }
+    http2_connection->goaway = TRUE;
+
+    buffer = (unsigned char *) MALLOC(HTTP2_HEADER_SIZE + 8);
+    return_value = encode_goaway_http2(
+        buffer,
+        HTTP2_HEADER_SIZE + 8,
+        http2_connection->last_stream_id,
+        error,
+        &size
+    );
+    if(IS_ERROR_CODE(return_value)) {
+        FREE(buffer);
+        RAISE_AGAIN(return_value);
+    }
+
+    /* raises again the result of the write of the frame */
+    return_value = _write_http2_connection(http2_connection, buffer, size);
+    RAISE_AGAIN(return_value);
+}
+
+/**
+ * Writes a settings frame carrying the values of this end, which
+ * is what opens the connection, or the acknowledgement of the ones
+ * that the peer has sent.
+ *
+ * @param http2_connection The session writing the frame.
+ * @param ack The value one to write the acknowledgement and the
+ * value zero to write the settings themselves.
+ * @return The resulting error code.
+ */
+static ERROR_CODE _write_settings_http2_connection(struct http2_connection_t *http2_connection, char ack) {
+    /* allocates the buffer of the frame, it is released by the io
+    layer once the write of it completes */
+    unsigned char *buffer;
+    size_t size;
+    ERROR_CODE return_value;
+
+    /* the acknowledgement carries no payload at all, so only the
+    header of the frame has to be written */
+    if(ack == TRUE) {
+        buffer = (unsigned char *) MALLOC(HTTP2_HEADER_SIZE);
+        return_value = encode_frame_http2(
+            buffer,
+            HTTP2_HEADER_SIZE,
+            0,
+            HTTP2_SETTINGS,
+            HTTP2_FLAG_ACK,
+            0
+        );
+        size = HTTP2_HEADER_SIZE;
+    } else {
+        buffer = (unsigned char *) MALLOC(HTTP2_HEADER_SIZE + HTTP2_SETTING_SIZE * 3);
+        return_value = encode_settings_http2(
+            buffer,
+            HTTP2_HEADER_SIZE + HTTP2_SETTING_SIZE * 3,
+            &http2_connection->settings,
+            &size
+        );
+    }
+
+    if(IS_ERROR_CODE(return_value)) {
+        FREE(buffer);
+        RAISE_AGAIN(return_value);
+    }
+
+    /* raises again the result of the write of the frame */
+    return_value = _write_http2_connection(http2_connection, buffer, size);
+    RAISE_AGAIN(return_value);
+}
+
+/**
+ * Writes the acknowledgement of a ping, it carries back the very
+ * same payload that the peer has sent.
+ *
+ * @param http2_connection The session writing the frame.
+ * @param data The payload of the ping being acknowledged.
+ * @return The resulting error code.
+ */
+static ERROR_CODE _write_ping_http2_connection(struct http2_connection_t *http2_connection, const unsigned char *data) {
+    /* allocates the buffer of the frame, it is released by the io
+    layer once the write of it completes */
+    unsigned char *buffer = (unsigned char *) MALLOC(HTTP2_HEADER_SIZE + HTTP2_PING_SIZE);
+    ERROR_CODE return_value;
+
+    return_value = encode_frame_http2(
+        buffer,
+        HTTP2_HEADER_SIZE + HTTP2_PING_SIZE,
+        HTTP2_PING_SIZE,
+        HTTP2_PING,
+        HTTP2_FLAG_ACK,
+        0
+    );
+    if(IS_ERROR_CODE(return_value)) {
+        FREE(buffer);
+        RAISE_AGAIN(return_value);
+    }
+
+    memcpy(&buffer[HTTP2_HEADER_SIZE], data, HTTP2_PING_SIZE);
+
+    /* raises again the result of the write of the frame */
+    return_value = _write_http2_connection(
+        http2_connection,
+        buffer,
+        HTTP2_HEADER_SIZE + HTTP2_PING_SIZE
+    );
+    RAISE_AGAIN(return_value);
+}
+
+/**
+ * Gathers a single field of a header block into the message of the
+ * stream, the pseudo headers populate it directly and the regular
+ * ones are handed to the handler as they would be under HTTP/1.1.
+ *
+ * @param parameters The block structure carrying both the session
+ * and the stream the field belongs to.
+ * @param hpack_header The field that has been decoded.
+ * @return The resulting error code.
+ */
+static ERROR_CODE _header_http2_connection(void *parameters, struct hpack_header_t *hpack_header) {
+    /* retrieves the block structure and out of it both the stream
+    and the message that the field is going to populate */
+    struct http2_block_t *http2_block = (struct http2_block_t *) parameters;
+    struct http2_stream_t *http2_stream = http2_block->http2_stream;
+    struct http_request_t *http_request = http2_stream->request;
+    struct http_settings_t *http_settings = http2_stream->http_settings;
+
+    /* a field whose name starts with a colon is a pseudo header,
+    they carry the parts of the request line of HTTP/1.1 */
+    if(hpack_header->name_size > 0 && hpack_header->name[0] == ':') {
+        /* the pseudo headers are required to come before any of the
+        regular ones, a peer that mixes them is in error */
+        if(http2_block->regular == TRUE) { RAISE_ERROR_S(HTTP2_PROTOCOL_ERROR); }
+
+        if(hpack_header->name_size == 7 && memcmp(hpack_header->name, ":method", 7) == 0) {
+            http_request->method = _method_http2_connection(hpack_header->value, hpack_header->value_size);
+            if(http_request->method == 0) { RAISE_ERROR_S(HTTP2_PROTOCOL_ERROR); }
+            RAISE_NO_ERROR;
+        }
+
+        if(hpack_header->name_size == 7 && memcmp(hpack_header->name, ":scheme", 7) == 0) {
+            /* the scheme is kept as one of the two static strings so
+            that nothing has to be released together with it */
+            if(hpack_header->value_size == 5 && memcmp(hpack_header->value, HTTPS_SCHEME, 5) == 0) {
+                http_request->scheme = HTTPS_SCHEME;
+            } else if(hpack_header->value_size == 4 && memcmp(hpack_header->value, HTTP_SCHEME, 4) == 0) {
+                http_request->scheme = HTTP_SCHEME;
+            } else {
+                RAISE_ERROR_S(HTTP2_PROTOCOL_ERROR);
+            }
+            RAISE_NO_ERROR;
+        }
+
+        if(hpack_header->name_size == 5 && memcmp(hpack_header->name, ":path", 5) == 0) {
+            /* an empty path never refers to a resource, the origin
+            form of a request always carries at least a slash */
+            if(hpack_header->value_size == 0) { RAISE_ERROR_S(HTTP2_PROTOCOL_ERROR); }
+
+            /* gathers the path into the message and then hands it to
+            the handler, the pseudo headers are required to come
+            first and so the handler sees it before any header */
+            append_path_http_request(http_request, hpack_header->value, hpack_header->value_size);
+            if(http_settings->on_url) {
+                http_settings->on_url(http_request, http_request->path, http_request->path_size);
+            }
+            RAISE_NO_ERROR;
+        }
+
+        if(hpack_header->name_size == 10 && memcmp(hpack_header->name, ":authority", 10) == 0) {
+            if(hpack_header->value_size >= VIRIATUM_MAX_PATH_SIZE) { RAISE_ERROR_S(HTTP2_PROTOCOL_ERROR); }
+            memcpy(http_request->authority, hpack_header->value, hpack_header->value_size);
+            http_request->authority[hpack_header->value_size] = '\0';
+
+            /* hands the authority to the handler as the host header,
+            which is where an handler looks for it */
+            if(http_settings->on_header_field) {
+                http_settings->on_header_field(http_request, (unsigned char *) HOST_H, strlen(HOST_H));
+            }
+            if(http_settings->on_header_value) {
+                http_settings->on_header_value(http_request, hpack_header->value, hpack_header->value_size);
+            }
+            RAISE_NO_ERROR;
+        }
+
+        /* a pseudo header that is not one of the four of a request
+        is not allowed, the status one belongs to a response */
+        RAISE_ERROR_S(HTTP2_PROTOCOL_ERROR);
+    }
+
+    /* from this point on only the regular fields are accepted, the
+    flag closes the section of the pseudo headers */
+    http2_block->regular = TRUE;
+
+    /* the connection specific fields carry no meaning under HTTP/2
+    and their presence is an error of the peer */
+    if(hpack_header->name_size == 10 && memcmp(hpack_header->name, "connection", 10) == 0) {
+        RAISE_ERROR_S(HTTP2_PROTOCOL_ERROR);
+    }
+
+    /* hands the field to the handler in the very same shape that the
+    HTTP/1.1 parser would have handed it */
+    if(http_settings->on_header_field) {
+        http_settings->on_header_field(http_request, hpack_header->name, hpack_header->name_size);
+    }
+    if(http_settings->on_header_value) {
+        http_settings->on_header_value(http_request, hpack_header->value, hpack_header->value_size);
+    }
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+/**
+ * Handles the header block that has been assembled for a stream,
+ * decoding it and driving the handler through the very same
+ * sequence of callbacks that the HTTP/1.1 parser produces.
+ *
+ * @param http2_connection The session holding the stream.
+ * @param http2_stream The stream the block belongs to.
+ * @param data The assembled header block.
+ * @param data_size The size in bytes of the block.
+ * @return The resulting error code.
+ */
+static ERROR_CODE _block_http2_connection(struct http2_connection_t *http2_connection, struct http2_stream_t *http2_stream, const unsigned char *data, size_t data_size) {
+    /* allocates the structure that carries the stream through the
+    decoding of the block */
+    struct http2_block_t http2_block;
+    struct http_handler_t *http_handler;
+    ERROR_CODE return_value;
+
+    http2_block.http2_connection = http2_connection;
+    http2_block.http2_stream = http2_stream;
+    http2_block.regular = FALSE;
+
+    /* takes the base handler of the connection and sets it on the
+    stream, every stream is served from the very same entry point */
+    if(http2_stream->http_handler == NULL) {
+        http_handler = http2_connection->http_connection->base_handler;
+        http2_stream->http_handler = http_handler;
+        _activate_http2_connection(http2_connection, http2_stream);
+        http_handler->set(http2_connection->http_connection);
+        http2_stream->http_handler = http2_connection->http_connection->http_handler;
+    }
+
+    /* makes the stream the current one so that the callbacks reach
+    the structures that belong to it */
+    _activate_http2_connection(http2_connection, http2_stream);
+
+    /* tells the handler that a new message begins, this is the very
+    same sequence the HTTP/1.1 parser produces */
+    if(http2_stream->http_settings->on_message_begin) {
+        http2_stream->http_settings->on_message_begin(http2_stream->request);
+    }
+
+    /* decodes the block, a failure of it corrupts the dynamic table
+    of the connection and so it is never a stream error */
+    return_value = decode_hpack(
+        http2_connection->decoder,
+        data,
+        data_size,
+        _header_http2_connection,
+        (void *) &http2_block
+    );
+    if(IS_ERROR_CODE(return_value)) { RAISE_ERROR_S(HTTP2_COMPRESSION_ERROR); }
+
+    /* a request that carries no method or no path is not a complete
+    one, the pseudo headers of a request are all required */
+    if(http2_stream->request->method == 0 || http2_stream->request->path_size == 0) {
+        RAISE_ERROR_S(HTTP2_PROTOCOL_ERROR);
+    }
+
+    http2_stream->headers_complete = TRUE;
+    if(http2_stream->http_settings->on_headers_complete) {
+        http2_stream->http_settings->on_headers_complete(http2_stream->request);
+    }
+
+    /* a block that closes the stream carries the complete message,
+    so the handler is told that it is complete right away */
+    if(http2_stream->end_stream == TRUE) {
+        if(http2_stream->http_settings->on_message_complete) {
+            http2_stream->http_settings->on_message_complete(http2_stream->request);
+        }
+    }
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+/**
+ * Gathers a fragment of a header block into the buffer that
+ * assembles it, bounding the block so that a peer is not able to
+ * make it grow without any limit.
+ *
+ * @param http2_connection The session assembling the block.
+ * @param data The fragment to be gathered.
+ * @param data_size The size in bytes of the fragment.
+ * @return The resulting error code.
+ */
+static ERROR_CODE _gather_http2_connection(struct http2_connection_t *http2_connection, const unsigned char *data, size_t data_size) {
+    /* a block that grows beyond the accepted size is refused, a peer
+    is otherwise able to stream continuation frames forever */
+    if(http2_connection->block_size + data_size > HTTP2_MAX_BLOCK) {
+        RAISE_ERROR_S(HTTP2_ENHANCE_YOUR_CALM);
+    }
+
+    /* grows the buffer of the block and gathers the fragment at the
+    end of what has been assembled so far */
+    http2_connection->block = (unsigned char *) REALLOC(
+        (void *) http2_connection->block,
+        http2_connection->block_size + data_size
+    );
+    memcpy(&http2_connection->block[http2_connection->block_size], data, data_size);
+    http2_connection->block_size += data_size;
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+/**
+ * Releases the buffer that assembles a header block and closes the
+ * sequence of continuation frames that was open.
+ *
+ * @param http2_connection The session to be reset.
+ */
+static void _reset_block_http2_connection(struct http2_connection_t *http2_connection) {
+    if(http2_connection->block != NULL) { FREE(http2_connection->block); }
+    http2_connection->block = NULL;
+    http2_connection->block_size = 0;
+    http2_connection->continuation = 0;
+    http2_connection->continuation_flags = 0;
+}
+
+ERROR_CODE handle_frame_http2_connection(struct http2_connection_t *http2_connection, struct http2_frame_t *http2_frame) {
+    /* allocates space for the stream the frame belongs to and for
+    the payload once the padding has been removed from it */
+    struct http2_stream_t *http2_stream;
+    struct http2_priority_t http2_priority;
+    unsigned char *payload;
+    size_t payload_size;
+    size_t offset;
+    ERROR_CODE return_value;
+
+    /* verifies that the frame is a coherent one for its type before
+    anything at all is done with it */
+    return_value = verify_frame_http2(http2_frame, &http2_connection->settings);
+    if(IS_ERROR_CODE(return_value)) { RAISE_AGAIN(return_value); }
+
+    /* while a header block is being assembled the only frame that
+    the peer is allowed to send is the continuation of it, on the
+    very same stream, anything else breaks the block apart */
+    if(http2_connection->continuation != 0) {
+        if(http2_frame->type != HTTP2_CONTINUATION ||
+           http2_frame->stream_id != http2_connection->continuation) {
+            RAISE_ERROR_S(HTTP2_PROTOCOL_ERROR);
+        }
+    }
+
+    switch(http2_frame->type) {
+        case HTTP2_DATA:
+            http2_stream = find_stream_http2_connection(http2_connection, http2_frame->stream_id);
+
+            /* the payload of a stream that is no longer open is
+            still accounted against the window of the connection,
+            the peer has already sent it either way */
+            http2_connection->receive_window -= (long) http2_frame->length;
+            if(http2_connection->receive_window < 0) { RAISE_ERROR_S(HTTP2_FLOW_CONTROL_ERROR); }
+
+            if(http2_stream == NULL) { RAISE_ERROR_S(HTTP2_STREAM_CLOSED); }
+            if(http2_stream->end_stream == TRUE) { RAISE_ERROR_S(HTTP2_STREAM_CLOSED); }
+
+            http2_stream->receive_window -= (long) http2_frame->length;
+            if(http2_stream->receive_window < 0) { RAISE_ERROR_S(HTTP2_FLOW_CONTROL_ERROR); }
+
+            return_value = strip_padding_http2(http2_frame, &payload, &payload_size);
+            if(IS_ERROR_CODE(return_value)) { RAISE_AGAIN(return_value); }
+
+            _activate_http2_connection(http2_connection, http2_stream);
+            if(payload_size > 0 && http2_stream->http_settings->on_body) {
+                http2_stream->http_settings->on_body(http2_stream->request, payload, payload_size);
+            }
+
+            /* widens the windows of both the connection and the
+            stream by what has just been consumed, this end has no
+            reason to hold the peer back */
+            if(http2_frame->length > 0) {
+                write_value_http2_connection(
+                    http2_connection,
+                    HTTP2_WINDOW_UPDATE,
+                    0,
+                    (unsigned int) http2_frame->length
+                );
+                http2_connection->receive_window += (long) http2_frame->length;
+                write_value_http2_connection(
+                    http2_connection,
+                    HTTP2_WINDOW_UPDATE,
+                    http2_frame->stream_id,
+                    (unsigned int) http2_frame->length
+                );
+                http2_stream->receive_window += (long) http2_frame->length;
+            }
+
+            if(http2_frame->flags & HTTP2_FLAG_END_STREAM) {
+                http2_stream->end_stream = TRUE;
+                http2_stream->state = HTTP2_STATE_HALF_CLOSED_REMOTE;
+                if(http2_stream->http_settings->on_message_complete) {
+                    http2_stream->http_settings->on_message_complete(http2_stream->request);
+                }
+            }
+
+            /* breaks the switch */
+            break;
+
+        case HTTP2_HEADERS:
+            /* a header block that arrives for a stream that is
+            already open is a trailer section, anything else opens
+            a new stream */
+            http2_stream = find_stream_http2_connection(http2_connection, http2_frame->stream_id);
+            if(http2_stream == NULL) {
+                return_value = open_stream_http2_connection(
+                    http2_connection,
+                    http2_frame->stream_id,
+                    &http2_stream
+                );
+                if(return_value == HTTP2_REFUSED_STREAM) {
+                    write_value_http2_connection(
+                        http2_connection,
+                        HTTP2_RST_STREAM,
+                        http2_frame->stream_id,
+                        HTTP2_REFUSED_STREAM
+                    );
+                    RAISE_NO_ERROR;
+                }
+                if(IS_ERROR_CODE(return_value)) { RAISE_AGAIN(return_value); }
+            } else if(http2_stream->headers_complete == TRUE) {
+                http2_stream->request->trailers = TRUE;
+            }
+
+            return_value = strip_padding_http2(http2_frame, &payload, &payload_size);
+            if(IS_ERROR_CODE(return_value)) { RAISE_AGAIN(return_value); }
+
+            /* the priority information sits between the padding and
+            the block itself when the flag announces it */
+            if(http2_frame->flags & HTTP2_FLAG_PRIORITY) {
+                if(payload_size < HTTP2_PRIORITY_SIZE) { RAISE_ERROR_S(HTTP2_FRAME_SIZE_ERROR); }
+                return_value = decode_priority_http2(payload, HTTP2_PRIORITY_SIZE, &http2_priority);
+                if(IS_ERROR_CODE(return_value)) { RAISE_AGAIN(return_value); }
+
+                /* a stream is never allowed to depend on itself, it
+                would make the tree carry a cycle */
+                if(http2_priority.dependency == http2_frame->stream_id) {
+                    RAISE_ERROR_S(HTTP2_PROTOCOL_ERROR);
+                }
+                http2_stream->priority = http2_priority;
+                payload += HTTP2_PRIORITY_SIZE;
+                payload_size -= HTTP2_PRIORITY_SIZE;
+            }
+
+            if(http2_frame->flags & HTTP2_FLAG_END_STREAM) {
+                http2_stream->end_stream = TRUE;
+                http2_stream->state = HTTP2_STATE_HALF_CLOSED_REMOTE;
+            }
+
+            return_value = _gather_http2_connection(http2_connection, payload, payload_size);
+            if(IS_ERROR_CODE(return_value)) { RAISE_AGAIN(return_value); }
+
+            /* a block that is not closed by this frame continues in
+            the frames that follow it, nothing else may come between */
+            if(!(http2_frame->flags & HTTP2_FLAG_END_HEADERS)) {
+                http2_connection->continuation = http2_frame->stream_id;
+                http2_connection->continuation_flags = http2_frame->flags;
+                RAISE_NO_ERROR;
+            }
+
+            return_value = _block_http2_connection(
+                http2_connection,
+                http2_stream,
+                http2_connection->block,
+                http2_connection->block_size
+            );
+            _reset_block_http2_connection(http2_connection);
+            if(IS_ERROR_CODE(return_value)) { RAISE_AGAIN(return_value); }
+
+            /* breaks the switch */
+            break;
+
+        case HTTP2_CONTINUATION:
+            /* a continuation that does not follow a block is not
+            expected at all, the sequence has to be open */
+            if(http2_connection->continuation == 0) { RAISE_ERROR_S(HTTP2_PROTOCOL_ERROR); }
+
+            return_value = _gather_http2_connection(
+                http2_connection,
+                http2_frame->payload,
+                http2_frame->length
+            );
+            if(IS_ERROR_CODE(return_value)) { RAISE_AGAIN(return_value); }
+
+            if(!(http2_frame->flags & HTTP2_FLAG_END_HEADERS)) { RAISE_NO_ERROR; }
+
+            http2_stream = find_stream_http2_connection(http2_connection, http2_connection->continuation);
+            if(http2_stream == NULL) { RAISE_ERROR_S(HTTP2_PROTOCOL_ERROR); }
+
+            return_value = _block_http2_connection(
+                http2_connection,
+                http2_stream,
+                http2_connection->block,
+                http2_connection->block_size
+            );
+            _reset_block_http2_connection(http2_connection);
+            if(IS_ERROR_CODE(return_value)) { RAISE_AGAIN(return_value); }
+
+            /* breaks the switch */
+            break;
+
+        case HTTP2_PRIORITY:
+            return_value = decode_priority_http2(
+                http2_frame->payload,
+                http2_frame->length,
+                &http2_priority
+            );
+            if(IS_ERROR_CODE(return_value)) { RAISE_AGAIN(return_value); }
+
+            /* a stream that depends on itself would make the tree
+            carry a cycle and so it is refused */
+            if(http2_priority.dependency == http2_frame->stream_id) {
+                RAISE_ERROR_S(HTTP2_PROTOCOL_ERROR);
+            }
+
+            /* the priority of a stream that is not open is simply
+            discarded, the tree of this end holds only open ones */
+            http2_stream = find_stream_http2_connection(http2_connection, http2_frame->stream_id);
+            if(http2_stream != NULL) { http2_stream->priority = http2_priority; }
+
+            /* breaks the switch */
+            break;
+
+        case HTTP2_RST_STREAM:
+            /* the reset of a stream that was never open refers to
+            an idle one, which the peer is not allowed to reset */
+            http2_stream = find_stream_http2_connection(http2_connection, http2_frame->stream_id);
+            if(http2_stream == NULL) {
+                if(http2_frame->stream_id > http2_connection->last_stream_id) {
+                    RAISE_ERROR_S(HTTP2_PROTOCOL_ERROR);
+                }
+                RAISE_NO_ERROR;
+            }
+
+            close_stream_http2_connection(http2_connection, http2_stream);
+
+            /* breaks the switch */
+            break;
+
+        case HTTP2_SETTINGS:
+            /* the acknowledgement of the settings of this end
+            carries nothing that has to be applied */
+            if(http2_frame->flags & HTTP2_FLAG_ACK) { RAISE_NO_ERROR; }
+
+            return_value = apply_settings_http2_connection(
+                http2_connection,
+                http2_frame->payload,
+                http2_frame->length
+            );
+            if(IS_ERROR_CODE(return_value)) { RAISE_AGAIN(return_value); }
+
+            /* the settings of the peer are acknowledged as soon as
+            they have been applied */
+            return_value = _write_settings_http2_connection(http2_connection, TRUE);
+            if(IS_ERROR_CODE(return_value)) { RAISE_AGAIN(return_value); }
+
+            /* breaks the switch */
+            break;
+
+        case HTTP2_PING:
+            /* the acknowledgement of a ping of this end is not
+            answered, only the ping of the peer is */
+            if(http2_frame->flags & HTTP2_FLAG_ACK) { RAISE_NO_ERROR; }
+
+            return_value = _write_ping_http2_connection(http2_connection, http2_frame->payload);
+            if(IS_ERROR_CODE(return_value)) { RAISE_AGAIN(return_value); }
+
+            /* breaks the switch */
+            break;
+
+        case HTTP2_GOAWAY:
+            /* the peer is closing the connection, no new stream is
+            accepted from this point on */
+            http2_connection->goaway = TRUE;
+
+            /* breaks the switch */
+            break;
+
+        case HTTP2_WINDOW_UPDATE:
+            offset = decode_number_http2(http2_frame->payload) & (unsigned int) HTTP2_MAX_WINDOW_SIZE;
+            return_value = update_window_http2_connection(
+                http2_connection,
+                http2_frame->stream_id,
+                (unsigned int) offset
+            );
+
+            /* an increment that overflows the window of a stream is
+            an error of that stream alone and not of the connection */
+            if(return_value == HTTP2_FLOW_CONTROL_ERROR && http2_frame->stream_id != 0) {
+                write_value_http2_connection(
+                    http2_connection,
+                    HTTP2_RST_STREAM,
+                    http2_frame->stream_id,
+                    HTTP2_FLOW_CONTROL_ERROR
+                );
+                RAISE_NO_ERROR;
+            }
+            if(IS_ERROR_CODE(return_value)) { RAISE_AGAIN(return_value); }
+
+            /* breaks the switch */
+            break;
+
+        case HTTP2_PUSH_PROMISE:
+            /* a server never receives a promise, only a client does,
+            so its presence is an error of the peer */
+            RAISE_ERROR_S(HTTP2_PROTOCOL_ERROR);
+
+        default:
+            /* a frame of an unknown type is ignored, this is what
+            allows the protocol to be extended */
+            break;
+    }
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE data_handler_stream_http2(struct io_connection_t *io_connection, unsigned char *buffer, size_t buffer_size) {
+    /* allocates space for the frame being handled and for the
+    positions in the buffer of the connection */
+    struct http2_frame_t http2_frame;
+    unsigned char *_read;
+    size_t _read_size;
+    size_t pending;
+    ERROR_CODE return_value;
+
+    /* retrieves the references to both the connection layers and to
+    the session that drives the protocol */
+    struct connection_t *connection = io_connection->connection;
+    struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
+    struct http2_connection_t *http2_connection = http_connection->http2_connection;
+
+    /* gathers the data that has arrived at the end of the buffer of
+    the connection, growing it when it does not fit */
+    if(buffer_size > 0) {
+        if(http_connection->buffer_offset + buffer_size > http_connection->buffer_size) {
+            http_connection->buffer_size = http_connection->buffer_offset + buffer_size;
+            http_connection->buffer = (unsigned char *) REALLOC(
+                (void *) http_connection->buffer,
+                http_connection->buffer_size
+            );
+        }
+        memcpy(&http_connection->buffer[http_connection->buffer_offset], buffer, buffer_size);
+        http_connection->buffer_offset += buffer_size;
+    }
+
+    /* consumes the preface, no frame at all is accepted before it
+    and the connection is closed when it does not match */
+    if(http2_connection->preface == FALSE) {
+        if(http_connection->buffer_offset - http_connection->read_offset < HTTP2_PREFACE_SIZE) {
+            RAISE_NO_ERROR;
+        }
+        if(memcmp(&http_connection->buffer[http_connection->read_offset], HTTP2_PREFACE, HTTP2_PREFACE_SIZE) != 0) {
+            V_DEBUG("Invalid HTTP/2 connection preface\n");
+            connection->close_connection(connection);
+            RAISE_NO_ERROR;
+        }
+        http_connection->read_offset += HTTP2_PREFACE_SIZE;
+        http2_connection->preface = TRUE;
+
+        /* announces the settings of this end, which is what the
+        specification requires as the first frame of a connection */
+        _write_settings_http2_connection(http2_connection, FALSE);
+    }
+
+    /* handles one frame at a time until the buffer no longer holds a
+    complete one, at which point more data has to be gathered */
+    while(TRUE) {
+        _read = &http_connection->buffer[http_connection->read_offset];
+        _read_size = http_connection->buffer_offset - http_connection->read_offset;
+
+        if(_read_size < HTTP2_HEADER_SIZE) { break; }
+
+        return_value = decode_frame_http2(_read, _read_size, &http2_frame);
+        if(IS_ERROR_CODE(return_value)) { break; }
+        if(http2_frame.payload == NULL) { break; }
+
+        http_connection->read_offset += HTTP2_HEADER_SIZE + http2_frame.length;
+
+        return_value = handle_frame_http2_connection(http2_connection, &http2_frame);
+        if(IS_ERROR_CODE(return_value)) {
+            /* a frame that this end is unable to handle takes the
+            complete connection down, the peer is told the reason */
+            V_DEBUG_F("HTTP/2 connection error: %d\n", (int) return_value);
+            write_goaway_http2_connection(http2_connection, (unsigned int) return_value);
+            connection->close_connection(connection);
+            RAISE_NO_ERROR;
+        }
+    }
+
+    /* moves the part of the buffer that has not been handled yet
+    back to its start, a connection is long lived and the buffer
+    would otherwise grow with every frame that arrives on it */
+    pending = http_connection->buffer_offset - http_connection->read_offset;
+    if(http_connection->read_offset > 0) {
+        if(pending > 0) { memmove(http_connection->buffer, _read, pending); }
+        http_connection->buffer_offset = pending;
+        http_connection->read_offset = 0;
+    }
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE upgrade_handler_stream_http2(struct io_connection_t *io_connection) {
+    /* allocates space for the session that is going to take over
+    the reading of the connection */
+    struct http2_connection_t *http2_connection;
+
+    /* retrieves the HTTP connection, it is the one the session
+    hangs from and the one the handlers keep reaching */
+    struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
+
+    /* creates the session and points the reading of the connection
+    at the handler that drives the frames */
+    create_http2_connection(&http2_connection, http_connection);
+    io_connection->on_data = data_handler_stream_http2;
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}

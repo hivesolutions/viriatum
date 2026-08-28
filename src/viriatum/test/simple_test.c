@@ -31,6 +31,7 @@
 #include "http2_test.h"
 #include "runner_test.h"
 #include "service_test.h"
+#include "stream_http2_test.h"
 #include "websocket_test.h"
 
 #ifndef VIRIATUM_NO_THREADS
@@ -1311,6 +1312,17 @@ static struct test_entry_t _simple_entries[] = {
     V_TEST_T(test_http2_decode_settings, "http2"),
     V_TEST_T(test_http2_encode_frames, "http2"),
     V_TEST_T(test_http2_verify_frame, "http2"),
+    V_TEST_T(test_http2_connection, "http2"),
+    V_TEST_T(test_http2_connection_streams, "http2"),
+    V_TEST_T(test_http2_connection_window, "http2"),
+    V_TEST_T(test_http2_connection_settings, "http2"),
+    V_TEST_T(test_http2_connection_frames, "http2"),
+    V_TEST_T(test_http2_connection_headers, "http2"),
+    V_TEST_T(test_http2_connection_continuation, "http2"),
+    V_TEST_T(test_http2_connection_data, "http2"),
+    V_TEST_T(test_http2_connection_errors, "http2"),
+    V_TEST_T(test_http2_connection_read, "http2"),
+    V_TEST_T(test_http2_connection_preface, "http2"),
     V_TEST_T(test_websocket_accept_key, "websocket"),
     V_TEST_T(test_websocket_parse_frame, "websocket"),
     V_TEST_T(test_websocket_build_frame, "websocket"),

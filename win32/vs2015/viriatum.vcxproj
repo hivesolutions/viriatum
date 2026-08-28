@@ -316,6 +316,7 @@ xcopy /e /y "$(SolutionDir)..\..\src\$(ProjectName)\resources\config\viriatum" "
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\..\src\viriatum\stream\stream_http.c" />
+    <ClCompile Include="..\..\src\viriatum\stream\stream_http2.c" />
     <ClCompile Include="..\..\src\viriatum\stream\stream_httpc.c" />
     <ClCompile Include="..\..\src\viriatum\stream\stream_io.c" />
     <ClCompile Include="..\..\src\viriatum\stream\stream_torrent.c" />
@@ -369,6 +370,7 @@ xcopy /e /y "$(SolutionDir)..\..\src\$(ProjectName)\resources\config\viriatum" "
     <ClInclude Include="..\..\src\viriatum\stdafx.h" />
     <ClInclude Include="..\..\src\viriatum\stream\stream.h" />
     <ClInclude Include="..\..\src\viriatum\stream\stream_http.h" />
+    <ClInclude Include="..\..\src\viriatum\stream\stream_http2.h" />
     <ClInclude Include="..\..\src\viriatum\stream\stream_httpc.h" />
     <ClInclude Include="..\..\src\viriatum\stream\stream_io.h" />
     <ClInclude Include="..\..\src\viriatum\stream\stream_torrent.h" />

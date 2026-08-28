@@ -100,6 +100,7 @@ ERROR_CODE create_http_connection(struct http_connection_t **http_connection_poi
     handled, under HTTP/1.1 only one message is in transit at a given
     time and so this reference never changes */
     http_connection->request = http_connection->http_parser->request;
+    http_connection->http2_connection = NULL;
 
     /* sets the connection as the message parameter(s), this is the
     reference that allows an handler to reach the upper objects */

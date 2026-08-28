@@ -150,6 +150,9 @@
     <ClCompile Include="..\..\src\viriatum\stream\stream_http.c">
       <Filter>Source Files\Stream</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\viriatum\stream\stream_http2.c">
+      <Filter>Source Files\Stream</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\src\viriatum\stream\stream_httpc.c">
       <Filter>Source Files\Stream</Filter>
     </ClCompile>
@@ -285,6 +288,9 @@
       <Filter>Header Files\Stream</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\viriatum\stream\stream_http.h">
+      <Filter>Header Files\Stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum\stream\stream_http2.h">
       <Filter>Header Files\Stream</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\viriatum\stream\stream_httpc.h">

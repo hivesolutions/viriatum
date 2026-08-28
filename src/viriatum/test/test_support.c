@@ -70,8 +70,67 @@ void create_test_context(struct test_context_t **context_pointer) {
     create_connection(&context->connection, 0);
     context->connection->service = context->service;
 
+    /* unsets the upper layers of the connection, only the
+    tests that drive a complete connection build them */
+    context->io_connection = NULL;
+    context->http_connection = NULL;
+
     /* sets the context in the context pointer */
     *context_pointer = context;
+}
+
+/**
+ * The number of times the closing of a test connection has been
+ * requested, it is the way a test observes that a failure has
+ * taken the connection down.
+ */
+static size_t _closed_test_connection = 0;
+
+ERROR_CODE close_test_connection(struct connection_t *connection) {
+    /* the connection of a test holds no socket at all, so only the
+    request itself is recorded */
+    _closed_test_connection++;
+    RAISE_NO_ERROR;
+}
+
+void reset_closed_test_connection(void) {
+    _closed_test_connection = 0;
+}
+
+size_t get_closed_test_connection(void) {
+    return _closed_test_connection;
+}
+
+ERROR_CODE register_write_test_connection(struct connection_t *connection) {
+    /* the connection of a test is not attached to a polling, so
+    there's nothing at all to be registered, the data that has
+    been queued stays in the queue for the test to observe */
+    RAISE_NO_ERROR;
+}
+
+void create_test_connection(struct test_context_t *context) {
+    /* builds both of the layers that sit on top of the
+    connection, the HTTP one is the substrate of the io one,
+    the handler a message is served by is left unset so that
+    a test installs the one it wants to observe */
+    create_io_connection(&context->io_connection, context->connection);
+    create_http_connection(&context->http_connection, context->io_connection);
+
+    /* points the registration of the writing at a stub, the queue of
+    the connection is otherwise never reachable in a test */
+    context->connection->register_write = register_write_test_connection;
+    context->connection->unregister_write = register_write_test_connection;
+    context->connection->close_connection = close_test_connection;
+    reset_closed_test_connection();
+}
+
+void delete_test_connection(struct test_context_t *context) {
+    /* deletes the layers in the reverse order they were built,
+    the HTTP one holds the parser and the settings */
+    delete_http_connection(context->http_connection);
+    delete_io_connection(context->io_connection);
+    context->http_connection = NULL;
+    context->io_connection = NULL;
 }
 
 void delete_test_context(struct test_context_t *context) {

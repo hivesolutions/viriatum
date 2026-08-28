@@ -62,6 +62,7 @@ polling/polling_epoll.c\
 polling/polling_kqueue.c\
 polling/polling_select.c\
 stream/stream_http.c \
+stream/stream_http2.c \
 stream/stream_httpc.c \
 stream/stream_io.c \
 stream/stream_torrent.c \
@@ -73,6 +74,7 @@ test/handler_dispatch_test.c \
 test/handler_file_test.c \
 test/hpack_test.c \
 test/http2_test.c \
+test/stream_http2_test.c \
 test/runner_test.c \
 test/service_test.c \
 test/simple_test.c \
@@ -100,6 +102,7 @@ polling/polling_epoll.c\
 polling/polling_kqueue.c\
 polling/polling_select.c\
 stream/stream_http.c \
+stream/stream_http2.c \
 stream/stream_httpc.c \
 stream/stream_io.c \
 stream/stream_torrent.c \
@@ -111,6 +114,7 @@ test/handler_dispatch_test.c \
 test/handler_file_test.c \
 test/hpack_test.c \
 test/http2_test.c \
+test/stream_http2_test.c \
 test/runner_test.c \
 test/service_test.c \
 test/simple_test.c \
