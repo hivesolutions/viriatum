@@ -76,10 +76,11 @@ const char *test_thread_pool(void) {
         insert_task_thread_pool(thread_pool, thread_pool_task);
     }
 
-    /* deletes the thread pool and releases the task that has
-    been scheduled into it, avoiding a leak from the test */
-    delete_thread_pool(thread_pool);
-    FREE(thread_pool_task);
+    /* both the pool and the task are deliberately leaked, the
+    delete operation of the pool neither signals nor joins the
+    worker threads and so releasing them here would leave the
+    running workers waiting on a closed condition and calling a
+    start function that has already been released */
 
     /* returns the default value, nothing happened so there's
     nothing to report for this execution */
@@ -1247,7 +1248,7 @@ static struct test_entry_t _simple_entries[] = {
     V_TEST_T(test_runner_match_entry, "runner"),
     V_TEST_T(test_runner_options, "runner"),
     V_TEST_T(test_runner_run_suite, "runner"),
-    V_TEST_T(test_runner_run_defaults, "runner"),
+    V_TEST_T(test_runner_run_kinds, "runner"),
     V_TEST_T(test_runner_list_suite, "runner"),
     V_TEST_T(test_runner_status_label, "runner"),
     V_TEST_T(test_runner_escape_xml, "runner"),

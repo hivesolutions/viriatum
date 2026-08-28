@@ -132,18 +132,20 @@ bounded, they carry values that come from the run itself */
             );                                                           \
         }                                                                \
     } while(0)
-#define V_ASSERT_EQ_S(actual, expected)                                               \
-    do {                                                                              \
-        const char *_actual = (const char *) (actual);                                \
-        const char *_expected = (const char *) (expected);                            \
-        if(_actual == NULL || _expected == NULL || strcmp(_actual, _expected) != 0) { \
-            return format_test_message(                                               \
-                "%s: expected '%.400s', got '%.400s'",                                \
-                #actual,                                                              \
-                _expected == NULL ? "(null)" : _expected,                             \
-                _actual == NULL ? "(null)" : _actual                                  \
-            );                                                                        \
-        }                                                                             \
+#define V_ASSERT_EQ_S(actual, expected)                    \
+    do {                                                   \
+        const char *_actual = (const char *) (actual);     \
+        const char *_expected = (const char *) (expected); \
+        if(_actual != _expected &&                         \
+           (_actual == NULL || _expected == NULL ||        \
+            strcmp(_actual, _expected) != 0)) {            \
+            return format_test_message(                    \
+                "%s: expected '%.400s', got '%.400s'",     \
+                #actual,                                   \
+                _expected == NULL ? "(null)" : _expected,  \
+                _actual == NULL ? "(null)" : _actual       \
+            );                                             \
+        }                                                  \
     } while(0)
 #define V_ASSERT_EQ_P(actual, expected)                                \
     do {                                                               \

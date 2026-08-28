@@ -388,6 +388,7 @@ ERROR_CODE run_test_suite(struct test_suite_t *suite, struct test_options_t *opt
     long end_time;
     void *context = NULL;
     const void *params;
+    ERROR_CODE return_value;
     struct test_entry_t *entry;
     struct test_result_t *result;
     struct test_report_t report;
@@ -497,11 +498,17 @@ ERROR_CODE run_test_suite(struct test_suite_t *suite, struct test_options_t *opt
         _print_slowest_test(&report);
     }
 
-    write_test_report(&report, options);
+    return_value = write_test_report(&report, options);
 
     if(report.results != NULL) { FREE(report.results); }
 
-    RAISE_ERROR_S(test_case.failure > 0 ? 1 : 0);
+    /* the failure of a test takes precedence over the one of the
+    report, the error of the writing is only raised afterwards so
+    that a run whose report was never produced is not reported as
+    a successful one to whoever asked for it */
+    if(test_case.failure > 0) { RAISE_ERROR_S(1); }
+
+    RAISE_AGAIN(return_value);
 }
 
 ERROR_CODE list_test_suite(struct test_suite_t *suite, struct test_options_t *options) {

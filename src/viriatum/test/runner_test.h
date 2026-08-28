@@ -89,14 +89,13 @@ const char *test_runner_options(void);
 const char *test_runner_run_suite(void);
 
 /**
- * Tests the running of a suite with the default options
- * and the kinds of entry that the synthetic suite does
- * not carry, the speed and the empty ones.
+ * Tests the kinds of entry that the synthetic suite does
+ * not carry, the untagged, the empty and the speed ones.
  *
  * @return A message describing the execution of
  * the unit test should describe possible errors.
  */
-const char *test_runner_run_defaults(void);
+const char *test_runner_run_kinds(void);
 
 /**
  * Tests the listing of a suite, no function of any of

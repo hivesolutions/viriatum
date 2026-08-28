@@ -53,7 +53,7 @@ The runner is driven through the following options:
 ./bin/viriatum --test --test-format=junit --test-output=test-results.xml
 ```
 
-The formats of the report are `text`, `tap`, `junit` and `markdown`. A format given without an output path turns the echoing of the progress off, so that the stream handed to the consumer of the report stays clean. The assertions that report both of the values (`V_ASSERT_EQ_I`, `V_ASSERT_EQ_U`, `V_ASSERT_EQ_S`, `V_ASSERT_EQ_P`, `V_ASSERT_NULL`, `V_ASSERT_NOT_NULL` and `V_ASSERT_MEM`) are preferred over the plain `V_ASSERT` wherever a comparison is involved.
+The formats of the report are `text`, `tap`, `junit` and `markdown`. A format given without an output path turns the echoing of the progress off, but the tests themselves still write to the standard output, so a report that is meant to be parsed should always be directed to a file through `--test-output`. The assertions that report both of the values (`V_ASSERT_EQ_I`, `V_ASSERT_EQ_U`, `V_ASSERT_EQ_S`, `V_ASSERT_EQ_P`, `V_ASSERT_NULL`, `V_ASSERT_NOT_NULL` and `V_ASSERT_MEM`) are preferred over the plain `V_ASSERT` wherever a comparison is involved.
 
 ## Coverage
 

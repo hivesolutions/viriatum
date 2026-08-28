@@ -70,6 +70,14 @@ def group(rows):
     return [(name, groups[name][0], groups[name][1]) for name in sorted(groups)]
 
 
+def coverage(rows):
+    # calculates the overall coverage of the provided rows, an
+    # empty set of rows is considered to be fully covered
+    total = sum(count for _name, count, _absent in rows)
+    missed = sum(absent for _name, _count, absent in rows)
+    return 100.0 if total == 0 else (total - missed) * 100.0 / total
+
+
 def table(rows, threshold):
     # formats the rows as a markdown table, the directories that fall
     # below the threshold are marked so that they stand out
@@ -99,10 +107,12 @@ def main():
     threshold = float(sys.argv[2]) if len(sys.argv) > 2 else 90.0
     root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
-    rows = []
+    native_rows = []
     native = load(os.path.join(output, "native.json"))
     if native:
-        rows += rows_native(native, root)
+        native_rows = rows_native(native, root)
+
+    rows = list(native_rows)
     python = load(os.path.join(output, "python.json"))
     if python:
         rows += rows_python(python, root)
@@ -118,7 +128,14 @@ def main():
         "\nThreshold is %.0f%%, the overall coverage of the measured sources is %.2f%%."
         % (threshold, cover)
     )
-    return 0 if cover >= threshold else 1
+
+    # the threshold is only applied to the native rows, the coverage
+    # script validates the python surface on its own and against a
+    # threshold of its own, a well covered package may not make up
+    # for a native tree that falls below the required value
+    if not native_rows:
+        return 1
+    return 0 if coverage(native_rows) >= threshold else 1
 
 
 if __name__ == "__main__":

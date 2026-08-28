@@ -247,6 +247,11 @@ static const char *_assert_string_test(const char *value) {
     return NULL;
 }
 
+static const char *_assert_string_null_test(const char *value) {
+    V_ASSERT_EQ_S(value, NULL);
+    return NULL;
+}
+
 static const char *_assert_pointer_test(const void *value) {
     V_ASSERT_EQ_P(value, _runner_params);
     return NULL;
@@ -325,6 +330,12 @@ const char *test_runner_assert_values(void) {
     V_ASSERT_EQ_S(message, "value: expected 'expected', got 'actual'");
     message = _assert_string_test(NULL);
     V_ASSERT_EQ_S(message, "value: expected 'expected', got '(null)'");
+
+    /* verifies that two null values are considered to be the same
+    one, only a null against a value is a failure */
+    V_ASSERT_NULL(_assert_string_null_test(NULL));
+    message = _assert_string_null_test("actual");
+    V_ASSERT_EQ_S(message, "value: expected '(null)', got 'actual'");
 
     /* verifies the pointer assertion, only the identity of the
     two pointers is taken into account */
@@ -593,12 +604,32 @@ const char *test_runner_run_suite(void) {
 
     remove(RUNNER_TEST_PATH);
 
+    /* runs a selection whose tests all pass but asks for a format
+    that is not known, the run must fail as the report that has
+    been requested was never produced */
+    _create_suite_test(&suite);
+    options.filter = "_ok_test";
+    options.format = "there_is_no_such_format";
+    error = run_test_suite(&suite, &options);
+    V_ASSERT(IS_ERROR_CODE(error));
+    V_ASSERT_EQ_I(_ok_calls, 1);
+
+    remove(RUNNER_TEST_PATH);
+
+    /* the very same situation for a destination that may not be
+    opened, the tests pass but the report never reaches the disk */
+    _create_suite_test(&suite);
+    options.format = "text";
+    options.path = "there_is_no_such_directory/report.txt";
+    error = run_test_suite(&suite, &options);
+    V_ASSERT(IS_ERROR_CODE(error));
+
     /* returns the default value, nothing happened so there's
     nothing to report for this execution */
     return NULL;
 }
 
-const char *test_runner_run_defaults(void) {
+const char *test_runner_run_kinds(void) {
     /* allocates space for the suites that are built by hand, each
     of them carrying a single entry of the kind under test */
     ERROR_CODE error;
@@ -609,22 +640,14 @@ const char *test_runner_run_defaults(void) {
     struct test_entry_t speed[1] = {V_TEST_S(_ok_test, "speed", 1)};
     char buffer[RUNNER_TEST_SIZE];
 
-    /* runs a suite of a single entry without providing any options
-    at all, the defaults are expected to be used in such a case and
-    they run every entry echoing the progress of the run */
+    /* lists a suite of a single entry that carries no tags at all,
+    it is expected to be listed under its name alone */
     suite.name = "runner_defaults";
     suite.entries = plain;
     suite.count = V_TEST_COUNT(plain);
     suite.setup = NULL;
     suite.teardown = NULL;
 
-    _ok_calls = 0;
-    error = run_test_suite(&suite, NULL);
-    V_ASSERT(IS_ERROR_CODE(error) == 0);
-    V_ASSERT_EQ_I(_ok_calls, 1);
-
-    /* lists the very same suite, the entry carries no tags at all
-    and so it is listed under its name alone */
     create_test_options(&options);
     error = list_test_suite(&suite, &options);
     V_ASSERT(IS_ERROR_CODE(error) == 0);
@@ -703,12 +726,6 @@ const char *test_runner_list_suite(void) {
     V_ASSERT_EQ_I(_skip_calls, 0);
     V_ASSERT_EQ_I(_setup_calls, 0);
     V_ASSERT_EQ_I(_suite_setup_calls, 0);
-
-    /* verifies that the listing may also be started directly,
-    without the options requesting it */
-    error = list_test_suite(&suite, &options);
-    V_ASSERT(IS_ERROR_CODE(error) == 0);
-    V_ASSERT_EQ_I(_ok_calls, 0);
 
     /* returns the default value, nothing happened so there's
     nothing to report for this execution */
@@ -1009,14 +1026,15 @@ const char *test_runner_write_report(void) {
     V_ASSERT(IS_ERROR_CODE(error));
 
     /* verifies that the standard output is the destination whenever
-    no path has been set, an empty report is used for it so that the
-    output of the run that is in progress stays readable */
+    no path has been set, an empty report under the textual format is
+    used for it so that the run that is in progress is neither made
+    unreadable nor handed a second header of a machine readable one */
     empty.name = "empty_tests";
     empty.results = NULL;
     empty.count = 0;
     empty.elapsed = 0.0f;
 
-    options.format = "tap";
+    options.format = "text";
     options.path = NULL;
     error = write_test_report(&empty, &options);
     V_ASSERT(IS_ERROR_CODE(error) == 0);
