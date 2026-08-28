@@ -61,11 +61,11 @@ cmake_install.cmake
 /ALL_BUILD.*
 
 /.venv
+/.claude
 
 /x64
 /bin
 /lib
-/.claude
 /build
 /build-*
 /build.*
