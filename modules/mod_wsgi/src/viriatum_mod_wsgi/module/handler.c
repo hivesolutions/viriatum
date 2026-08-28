@@ -648,6 +648,11 @@ ERROR_CODE _send_response_handler_wsgi(struct http_parser_t *http_parser) {
     size_t index;
     size_t count;
 
+    /* allocates space for both the size of the buffer that receives
+    the envelope and for the one taken by the headers of it */
+    size_t buffer_size;
+    size_t headers_size;
+
     /* allocates space for the length of the sequence returned with
     the contents of the message to be sent */
     size_t sequence_length;
@@ -865,9 +870,18 @@ ERROR_CODE _send_response_handler_wsgi(struct http_parser_t *http_parser) {
         }
     }
 
+    /* calculates the amount of space taken by the headers set by the
+    application, these are unbounded in size and so they must be
+    accounted for in the allocation of the buffer */
+    headers_size = 0;
+    for(index = 0; index < _wsgi_request.header_count; index++) {
+        headers_size += strlen(_wsgi_request.headers[index]) + 2;
+    }
+
     /* allocates space for the header buffer and then writes the default values
     into it the value is dynamically constructed based on the current header values */
-    connection->alloc_data(connection, VIRIATUM_HTTP_MAX_SIZE, (void **) &headers_buffer);
+    buffer_size = VIRIATUM_HTTP_MAX_SIZE + headers_size;
+    connection->alloc_data(connection, buffer_size, (void **) &headers_buffer);
     count = http_connection->write_headers(
         connection,
         headers_buffer,
@@ -887,7 +901,7 @@ ERROR_CODE _send_response_handler_wsgi(struct http_parser_t *http_parser) {
         notified about the length of the message */
         count += SPRINTF(
             &headers_buffer[count],
-            VIRIATUM_MAX_HEADER_C_SIZE,
+            buffer_size - count,
             "%s: %lu\r\n",
             CONTENT_LENGTH_H,
             item_size
@@ -901,7 +915,7 @@ ERROR_CODE _send_response_handler_wsgi(struct http_parser_t *http_parser) {
         buffer (header copy), note that the trailing newlines are count in size */
         count += SPRINTF(
             &headers_buffer[count],
-            VIRIATUM_MAX_HEADER_C_SIZE,
+            buffer_size - count,
             "%s\r\n",
             _wsgi_request.headers[index]
         );

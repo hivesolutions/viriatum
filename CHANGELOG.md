@@ -74,6 +74,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+* Server no longer crashes when responses complete while the connection is being polled
+* Response envelope is no longer truncated when the application sets a large number of headers
+
 * Requests whose payload exceeds the maximum allowed size are refused instead of being handed over truncated
 * Responses that carry no payload are no longer sent without their envelope
 

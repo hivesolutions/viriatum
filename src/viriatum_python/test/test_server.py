@@ -395,6 +395,42 @@ class ServerTest(unittest.TestCase):
         finally:
             connection.close()
 
+    def test_concurrent_keep_alive(self):
+        # drives a series of requests over several connections that are
+        # kept alive, so that the writing of the responses completes
+        # from the polling of the service rather than from the calling
+        # of it, the tearing down of the context runs with the global
+        # interpreter lock released in that path
+        failures = []
+
+        def hammer(count):
+            connection = http.client.HTTPConnection("127.0.0.1", self.port, timeout=15)
+            connection.auto_open = 0
+            try:
+                connection.connect()
+                for _ in range(count):
+                    connection.request(
+                        "GET", "/plain", headers={"Connection": "keep-alive"}
+                    )
+                    response = connection.getresponse()
+                    if response.read() != b"plain":
+                        failures.append("unexpected payload")
+            except Exception as exception:
+                failures.append(repr(exception))
+            finally:
+                connection.close()
+
+        threads = [threading.Thread(target=hammer, args=(30,)) for _ in range(4)]
+        for thread in threads:
+            thread.start()
+        for thread in threads:
+            thread.join(timeout=30)
+
+        self.assertEqual(failures, [])
+        self.assertEqual([thread.is_alive() for thread in threads], [False] * 4)
+        result = urllib.request.urlopen(self._url("/plain"), timeout=5)
+        self.assertEqual(result.read(), b"plain")
+
     def test_connections(self):
         self.assertTrue(isinstance(self.server.connections, int))
         self.assertTrue(self.server.connections >= 0)
