@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import ast
-import os
 import signal
 import socket
 import sys
@@ -551,7 +550,7 @@ class ServerLifecycleTest(unittest.TestCase):
                 except Exception:
                     time.sleep(0.05)
             state["raised"] = True
-            os.kill(os.getpid(), signal.SIGINT)
+            signal.raise_signal(signal.SIGINT)
 
             # stops the server in case the interrupt is ignored, so
             # that the test fails instead of hanging forever

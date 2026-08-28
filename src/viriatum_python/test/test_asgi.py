@@ -10,6 +10,7 @@ import os
 import signal
 import socket
 import struct
+import sys
 import threading
 import time
 import unittest
@@ -1141,7 +1142,7 @@ class AsgiTest(ServerCase):
             threading.Thread(target=request, daemon=True).start()
             time.sleep(0.5)
             state["raised"] = True
-            os.kill(os.getpid(), signal.SIGINT)
+            signal.raise_signal(signal.SIGINT)
 
             # stops the server in case the interrupt is ignored, so
             # that the test fails instead of hanging forever
@@ -1441,7 +1442,7 @@ class LifespanTest(unittest.TestCase):
                     break
                 except Exception:
                     time.sleep(0.05)
-            os.kill(os.getpid(), signal.SIGINT)
+            signal.raise_signal(signal.SIGINT)
             if not finished.wait(timeout=10.0):
                 state["expired"] = True
                 server.stop()
