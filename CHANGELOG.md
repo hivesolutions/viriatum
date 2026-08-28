@@ -74,16 +74,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+* Server no longer crashes when responses complete while the connection is being polled
+* Response envelope is no longer truncated when the application sets a large number of headers
 * Requests whose payload exceeds the maximum allowed size are refused instead of being handed over truncated
 * Responses that carry no payload are no longer sent without their envelope
-
 * Absolute path resolution no longer aborts the process on optimized Linux builds - [#39](https://github.com/hivesolutions/viriatum/issues/39)
 * Server no longer crashes on startup when no configuration file is present - [#39](https://github.com/hivesolutions/viriatum/issues/39)
 * Stopping or releasing a server that was never started is now safe - [#39](https://github.com/hivesolutions/viriatum/issues/39)
 * Worker count is no longer read from an unset value and is capped to the supported maximum - [#39](https://github.com/hivesolutions/viriatum/issues/39)
 * Fixed ~150 spelling errors in comments across the entire codebase (`durring` → `during`, `reponse` → `response`, `usefull` → `useful`, `writen` → `written`, `completly` → `completely`, `ammount` → `amount`, `arround` → `around`, `scoket` → `socket`, etc.)
 * Fixed mod_php failing to load in `Dockerfile.all` due to missing `libphp.so` symlink in the runtime stage
-
 * Fixed SHA1 producing wrong digests on ARM64 (macOS Apple Silicon) due to incorrect big-endian classification of AArch64 in `cpu.h` — ARM64 is little-endian
 * Fixed SHA1 strict aliasing violation in `_transform_sha1` by copying buffer into a local union via `memcpy`
 * Replaced deprecated `Py_SetProgramName`/`Py_Initialize` with `PyConfig` API in mod_wsgi (fixes Python 3.11+ deprecation warning)

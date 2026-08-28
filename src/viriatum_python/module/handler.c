@@ -185,6 +185,13 @@ ERROR_CODE delete_handler_python_context(struct handler_python_context_t *handle
     /* allocates space for the index to be used in the
     iteration over the various header sequences */
     size_t index;
+    PyGILState_STATE gil_state;
+
+    /* acquires the global interpreter lock as the releasing of the
+    capsule interacts with the interpreter, this callback may be
+    reached from the polling of the service, which runs with the
+    lock released, and so it may not be assumed to be held */
+    gil_state = PyGILState_Ensure();
 
     /* releases the url and the body values in case they
     have been set during the parsing of the request */
@@ -223,6 +230,10 @@ ERROR_CODE delete_handler_python_context(struct handler_python_context_t *handle
     for(index = 0; index < handler_python_context->response_header_count; index++) {
         FREE(handler_python_context->response_headers[index]);
     }
+
+    /* releases the global interpreter lock, no more interpreter
+    usage happens for the remaining of the destruction */
+    PyGILState_Release(gil_state);
 
     /* releases the context structure itself */
     FREE(handler_python_context);
