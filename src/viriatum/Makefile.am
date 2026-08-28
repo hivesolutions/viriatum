@@ -49,6 +49,7 @@ handlers/handler_dispatch.c \
 handlers/handler_file.c \
 handlers/handler_proxy.c \
 http/hpack.c \
+http/http2.c \
 http/http_parser.c \
 http/http_request.c \
 http/http_util.c \
@@ -71,6 +72,7 @@ system/torrent.c \
 test/handler_dispatch_test.c \
 test/handler_file_test.c \
 test/hpack_test.c \
+test/http2_test.c \
 test/runner_test.c \
 test/service_test.c \
 test/simple_test.c \
@@ -85,6 +87,7 @@ handlers/handler_dispatch.c \
 handlers/handler_file.c \
 handlers/handler_proxy.c \
 http/hpack.c \
+http/http2.c \
 http/http_parser.c \
 http/http_request.c \
 http/http_util.c \
@@ -107,6 +110,7 @@ system/torrent.c \
 test/handler_dispatch_test.c \
 test/handler_file_test.c \
 test/hpack_test.c \
+test/http2_test.c \
 test/runner_test.c \
 test/service_test.c \
 test/simple_test.c \

@@ -295,6 +295,7 @@ xcopy /e /y "$(SolutionDir)..\..\src\$(ProjectName)\resources\config\viriatum" "
     <ClCompile Include="..\..\src\viriatum\handlers\handler_file.c" />
     <ClCompile Include="..\..\src\viriatum\handlers\handler_proxy.c" />
     <ClCompile Include="..\..\src\viriatum\http\hpack.c" />
+    <ClCompile Include="..\..\src\viriatum\http\http2.c" />
     <ClCompile Include="..\..\src\viriatum\http\http_parser.c" />
     <ClCompile Include="..\..\src\viriatum\http\http_request.c" />
     <ClCompile Include="..\..\src\viriatum\http\http_util.c" />
@@ -350,6 +351,7 @@ xcopy /e /y "$(SolutionDir)..\..\src\$(ProjectName)\resources\config\viriatum" "
     <ClInclude Include="..\..\src\viriatum\handlers\handler_proxy.h" />
     <ClInclude Include="..\..\src\viriatum\http\http.h" />
     <ClInclude Include="..\..\src\viriatum\http\hpack.h" />
+    <ClInclude Include="..\..\src\viriatum\http\http2.h" />
     <ClInclude Include="..\..\src\viriatum\http\http_parser.h" />
     <ClInclude Include="..\..\src\viriatum\http\http_request.h" />
     <ClInclude Include="..\..\src\viriatum\http\http_util.h" />

@@ -28,6 +28,7 @@
 #include "handler_dispatch_test.h"
 #include "handler_file_test.h"
 #include "hpack_test.h"
+#include "http2_test.h"
 #include "runner_test.h"
 #include "service_test.h"
 #include "websocket_test.h"
@@ -1301,6 +1302,15 @@ static struct test_entry_t _simple_entries[] = {
     V_TEST_T(test_hpack_encode, "hpack"),
     V_TEST_T(test_hpack_huffman, "hpack"),
     V_TEST_T(test_hpack_huffman_errors, "hpack"),
+    V_TEST_T(test_http2_number, "http2"),
+    V_TEST_T(test_http2_settings, "http2"),
+    V_TEST_T(test_http2_decode_frame, "http2"),
+    V_TEST_T(test_http2_encode_frame, "http2"),
+    V_TEST_T(test_http2_padding, "http2"),
+    V_TEST_T(test_http2_priority, "http2"),
+    V_TEST_T(test_http2_decode_settings, "http2"),
+    V_TEST_T(test_http2_encode_frames, "http2"),
+    V_TEST_T(test_http2_verify_frame, "http2"),
     V_TEST_T(test_websocket_accept_key, "websocket"),
     V_TEST_T(test_websocket_parse_frame, "websocket"),
     V_TEST_T(test_websocket_build_frame, "websocket"),
