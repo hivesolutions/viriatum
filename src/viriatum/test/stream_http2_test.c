@@ -2212,6 +2212,48 @@ const char *test_http2_connection_flow(void) {
     V_ASSERT(http2_stream->complete == TRUE);
     V_ASSERT(context->connection->write_queue->size > queued);
 
+    _delete_http2_test(context, http2_connection);
+
+    /* a change of the initial window widens the window of a stream
+    just the same, so the payload it is holding back also has to go
+    out as soon as the settings that carry it are applied */
+    _create_http2_test(&context, &http2_connection);
+    http2_connection->send_window = 0;
+
+    http2_frame.type = HTTP2_HEADERS;
+    http2_frame.flags = HTTP2_FLAG_END_HEADERS | HTTP2_FLAG_END_STREAM;
+    http2_frame.stream_id = 1;
+    http2_frame.length = _request_http2_test(block, sizeof(block), "/settings");
+    http2_frame.payload = block;
+    error = handle_frame_http2_connection(http2_connection, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+
+    http2_stream = find_stream_http2_connection(http2_connection, 1);
+    V_ASSERT_NOT_NULL(http2_stream);
+    V_ASSERT_EQ_U(http2_stream->pending->size, 1);
+    queued = context->connection->write_queue->size;
+
+    /* the window of the connection is widened by hand, the settings
+    only ever carry the one of the streams */
+    http2_connection->send_window = 1024;
+    payload[0] = 0x00;
+    payload[1] = HTTP2_SETTING_INITIAL_WINDOW_SIZE;
+    encode_number_http2(&payload[2], HTTP2_DEFAULT_WINDOW_SIZE + 1024);
+
+    http2_frame.type = HTTP2_SETTINGS;
+    http2_frame.flags = 0x00;
+    http2_frame.stream_id = 0;
+    http2_frame.length = HTTP2_SETTING_SIZE;
+    http2_frame.payload = payload;
+    error = handle_frame_http2_connection(http2_connection, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+
+    http2_stream = find_stream_http2_connection(http2_connection, 1);
+    V_ASSERT_NOT_NULL(http2_stream);
+    V_ASSERT_EQ_U(http2_stream->pending->size, 0);
+    V_ASSERT(http2_stream->complete == TRUE);
+    V_ASSERT(context->connection->write_queue->size > queued);
+
     _responder = FALSE;
     _delete_http2_test(context, http2_connection);
 
