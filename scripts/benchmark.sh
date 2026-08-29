@@ -100,16 +100,43 @@ mkdir -p "$OUTPUT/runs" "$OUTPUT/logs" "$OUTPUT/www/listing"
 echo "Running the harness in the $MODE mode ..."
 
 # builds the server in the release shape, a figure taken out of a
-# debug build measures the counters of that build and nothing else
+# debug build measures the counters of that build and nothing else,
+# the extension is built along with it so that the workloads of the
+# interfaces have something to be driven against
 if [ ! -x "$BUILD/bin/viriatum" ]; then
     echo "Building the server ..."
     cmake -S "$ROOT" -B "$BUILD" \
         -DCMAKE_BUILD_TYPE=Release \
-        -DCMAKE_C_COMPILER="$COMPILER" > "$OUTPUT/logs/build.log" 2>&1
-    cmake --build "$BUILD" --target viriatum -j 4 >> "$OUTPUT/logs/build.log" 2>&1
+        -DCMAKE_C_COMPILER="$COMPILER" \
+        -DVIRIATUM_BUILD_PYTHON=ON \
+        -DPython_EXECUTABLE="$(command -v "$PYTHON")" > "$OUTPUT/logs/build.log" 2>&1
+    cmake --build "$BUILD" -j 4 >> "$OUTPUT/logs/build.log" 2>&1
 fi
 
 BINARY=${BINARY:-$BUILD/bin/viriatum}
+
+# stages the extension next to the package so that the launcher of the
+# interfaces is able to import it without the package being installed
+MODULE=$(ls "$BUILD"/lib/_viriatum*.so "$BUILD"/lib/_viriatum*.pyd 2> /dev/null | head -1)
+if [ -n "$MODULE" ]; then cp "$MODULE" "$ROOT/src/viriatum_python/viriatum/"; fi
+
+# the flags the binary was built with are part of every figure that
+# comes out of it, a number that cannot be traced back to a build is
+# not a number that may be compared against another one
+{
+    echo "mode: $MODE"
+    echo "references: $REFERENCES"
+    echo "machine: $(uname -srm)"
+    echo "compiler: $("$COMPILER" --version 2> /dev/null | head -1)"
+    echo "flags: $(grep -s CMAKE_C_FLAGS_RELEASE:STRING "$BUILD/CMakeCache.txt" | cut -d= -f2-)"
+    echo "banner: $("$BINARY" --version 2> /dev/null | tail -1)"
+    echo "duration: ${DURATION}s"
+    echo "connections: $CONNECTIONS"
+    echo "threads: $THREADS"
+    echo "repeats: $REPEATS"
+    echo "workers: $WORKERS"
+} > "$OUTPUT/environment.txt"
+cat "$OUTPUT/environment.txt"
 
 # ---------------------------------------------------------------------------
 # the fixtures of the run
@@ -233,10 +260,25 @@ _configure() {
 }
 
 # starts the subject for the workload at hand, the handler being the
-# one the workload names and the configuration the one just written
+# one the workload names and the configuration the one just written,
+# the workloads of the interfaces are served by the extension instead
+# and go through a launcher of their own
 _start_subject() {
     _HANDLER=$1
+    _ROLE=$2
     cd "$OUTPUT"
+
+    case $_ROLE in
+        wsgi | asgi | asgi-stream)
+            PYTHONPATH="$ASSETS:$ROOT/src/viriatum_python" "$PYTHON" \
+                "$ASSETS/serve.py" "$_ROLE" "$PORT" \
+                < /dev/null > "$OUTPUT/logs/subject.log" 2>&1 &
+            PID=$!
+            _wait "$PORT"
+            return 0
+            ;;
+    esac
+
     if [ "$MODE" = "container" ]; then
         "$DOCKER" run -d --name viriatum-subject --network host \
             -v "$OUTPUT:/bench" -w /bench "$IMAGE" \
@@ -372,18 +414,25 @@ _start_reference() {
             fi
             ;;
         gunicorn)
+            # the reference is given the shape it was measured to be
+            # at its best under rather than the one that mirrors the
+            # subject, its worker answering a single request at a time
+            # loses every connection past the count of them, and a
+            # reference driven in a shape it was never meant for
+            # reports the shape and never the reference
             PYTHONPATH=$ASSETS "$PYTHON" -m gunicorn \
-                --bind "127.0.0.1:$PORT_REFERENCE" --workers "$WORKERS" \
+                --bind "127.0.0.1:$PORT_REFERENCE" \
+                --workers "$WORKERS" --worker-class gthread --threads 32 \
+                --backlog 4096 --keep-alive 65 \
                 --access-logfile /dev/null --error-logfile /dev/null \
-                --keep-alive 65 app:wsgi_app \
-                > "$OUTPUT/logs/reference.log" 2>&1 &
+                app:wsgi_app > "$OUTPUT/logs/reference.log" 2>&1 &
             PID_REFERENCE=$!
             ;;
         uvicorn)
             if [ "$_ROLE" = "asgi-stream" ]; then _APP=app:asgi_stream_app; else _APP=app:asgi_app; fi
             PYTHONPATH=$ASSETS "$PYTHON" -m uvicorn \
                 --host 127.0.0.1 --port "$PORT_REFERENCE" --workers "$WORKERS" \
-                --log-level critical --no-access-log "$_APP" \
+                --backlog 4096 --log-level critical --no-access-log "$_APP" \
                 > "$OUTPUT/logs/reference.log" 2>&1 &
             PID_REFERENCE=$!
             ;;
@@ -534,6 +583,9 @@ error-template|error|file|/missing||On|
 error-plain|error|file|/missing||Off|
 proxy-alive|proxy|dispatch|/small.html||On|http://127.0.0.1:$PORT_UPSTREAM/
 proxy-close|proxy|dispatch|/small.html|Connection: close|On|http://127.0.0.1:$PORT_UPSTREAM/
+python-wsgi-alive|wsgi|file|/||On|
+python-asgi-alive|asgi|file|/||On|
+python-asgi-stream-alive|asgi-stream|file|/||On|
 EOF
 }
 
@@ -650,7 +702,7 @@ while IFS='|' read -r NAME ROLE HANDLER PATH_ HEADER TEMPLATE PROXY; do
     fi
 
     _configure "$HANDLER" "$TEMPLATE" "$PROXY"
-    _start_subject "$HANDLER"
+    _start_subject "$HANDLER" "$ROLE"
 
     set -- $(_sample "viriatum --port=$PORT ")
     RSS_BEFORE=$1
