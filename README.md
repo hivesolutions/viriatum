@@ -350,9 +350,20 @@ To build the full image with all modules:
 
 ## Benchmarking
 
-* Most of the information presented in [gwan benchmark](http://gwan.ch/en_apachebench_httperf.html) is applicable for benchmarking Viriatum
+Viriatum is measured against the reference servers by a harness of its own, which starts the server and the references on the same machine, drives them through the same workloads and reports them side by side:
 
-For more information regarding benchmarking please check the list of [todo](doc/todo.md) information.
+    ./scripts/benchmark.sh
+
+A single workload may be selected, and every setting of a run is overridable:
+
+    ONLY=static-small-alive ./scripts/benchmark.sh
+    DURATION=10 REPEATS=5 CONNECTIONS=128 ./scripts/benchmark.sh
+
+The reports land under `benchmark/`, with the table in `benchmark/summary.md`. `wrk` is required; nginx, Caddy, HAProxy, gunicorn and uvicorn are each used when they are available and skipped with a note when they are not.
+
+Absolute numbers are not the point, and a figure taken on one machine says nothing about another. **The number to read is the ratio of Viriatum against a reference measured in the same run**, which is the only comparison that survives a noisy machine. The accepted numbers live in `scripts/benchmark/baseline.json` and every run is compared against them.
+
+The methodology, the configuration given to each server and the reasoning behind each of those choices are written down in [scripts/benchmark/README.md](scripts/benchmark/README.md). A scheduled workflow runs the harness and reports it; it never fails a build on a performance figure.
 
 ## Debugging
 

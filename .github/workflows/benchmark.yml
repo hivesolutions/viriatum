@@ -1,0 +1,90 @@
+name: Benchmark Workflow
+on:
+  schedule:
+    - cron: "0 4 * * *"
+  workflow_dispatch:
+    inputs:
+      refresh:
+        description: "Record the result of this run as the new baseline"
+        type: boolean
+        default: false
+      duration:
+        description: "Seconds each of the measurements is driven for"
+        type: string
+        default: "10"
+      repeats:
+        description: "Measurements kept per pair, the median of them is reported"
+        type: string
+        default: "3"
+jobs:
+  benchmark:
+    name: Benchmark
+    timeout-minutes: 120
+    # the class of the runner is part of every figure that comes out
+    # of it, changing it invalidates every stored comparison, so it is
+    # pinned here rather than left to the default of the moment
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential libssl-dev libpcre3-dev python3-dev \
+            wrk nginx haproxy strace
+          python -m pip install --upgrade pip
+          python -m pip install gunicorn uvicorn
+      - name: Install caddy
+        run: |
+          curl -fsSL https://github.com/caddyserver/caddy/releases/download/v2.8.4/caddy_2.8.4_linux_amd64.tar.gz \
+            | sudo tar -xz -C /usr/local/bin caddy
+          caddy version
+      - name: Pull the reference images
+        run: |
+          docker pull nginx:1.27-alpine
+          docker pull caddy:2.8-alpine
+          docker pull haproxy:3.0-alpine
+        continue-on-error: true
+      # the workloads that close every connection walk through the
+      # ephemeral ports of the machine, a measurement started on an
+      # exhausted table measures the table and never the server
+      - name: Widen the port range
+        run: |
+          sudo sysctl -w net.ipv4.ip_local_port_range="15000 65535"
+          sudo sysctl -w net.ipv4.tcp_tw_reuse=1
+          sudo sysctl -w net.core.somaxconn=8192
+          ulimit -n 65535 || true
+      - name: Run benchmark
+        env:
+          DURATION: ${{ inputs.duration || '10' }}
+          REPEATS: ${{ inputs.repeats || '3' }}
+        run: |
+          ./scripts/benchmark.sh
+      - name: Report benchmark
+        if: always()
+        run: |
+          cat benchmark/summary.md >> "$GITHUB_STEP_SUMMARY"
+      # the baseline is only ever refreshed when it is asked for, a
+      # run that recorded itself would let the numbers ratchet down
+      # one quiet run at a time and nobody would ever see it happen
+      - name: Refresh the baseline
+        if: inputs.refresh
+        run: |
+          cp benchmark/results.json scripts/benchmark/baseline.json
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add scripts/benchmark/baseline.json
+          git commit -m "chore: refresh the baseline of the benchmark" || exit 0
+          git push
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: benchmark
+          path: |
+            benchmark/summary.md
+            benchmark/results.json
+            benchmark/environment.txt
+            benchmark/logs
+          if-no-files-found: ignore

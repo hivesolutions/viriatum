@@ -84,6 +84,21 @@ The memory of the tree is measured by driving the suite under the address saniti
 
 An error of the memory fails the run outright, whatever its shape, and the allocations that are left behind are compared against `scripts/sanitize.baseline`, which a run above fails. The number is lowered as the leaks are closed and never raised to make a run pass, the very same rule the conformance and the coverage are held to. The leak part of the sanitizer only runs on some of the platforms, macOS not being one of them, so the job of the integration that runs this is what actually measures the leaks. The server also counts its own allocations in a debug build and reports the outstanding ones when the process ends.
 
+## Performance
+
+The serving is measured against the reference servers by a harness that starts them all on the same machine, drives them through the same workloads and reports them side by side:
+
+```bash
+./scripts/benchmark.sh
+ONLY=static-small-alive ./scripts/benchmark.sh
+```
+
+Absolute numbers from any one machine are not comparable to another, so the figure that is tracked is the **ratio of the server against a reference measured in the same run**. Every run is compared against `scripts/benchmark/baseline.json`, which is only ever refreshed through an explicit input of the workflow so that it cannot quietly ratchet down. The run reports and never gates, a hosted runner being far too noisy to fail a build on a performance figure.
+
+A claim about performance needs a run of the harness behind it. An optimisation lands with a before and after attached and is reverted when the gain does not hold, and a change is measured by driving the two binaries interleaved rather than in blocks, so that a drift of the machine lands on both of them equally. Establish where the time goes with a profile before changing anything: the widest gap is rarely where it is assumed to be, and an entry in `doc/todo.md` is a hypothesis rather than a finding.
+
+The methodology, the configuration each server is given and the reasoning behind every one of those choices are written down in `scripts/benchmark/README.md`. Anything that affects the comparison, such as the logging of a request or the pooling of an upstream connection, belongs there the moment it is changed.
+
 ## HTTP/2
 
 Both versions of the protocol are served on the same port and are told apart by the bytes that open a connection, the preface handing it to a session of HTTP/2 and anything else to the parser of HTTP/1.1. Over the transport the version is negotiated through ALPN instead, honouring the order the client announces.

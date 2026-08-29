@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Continuous integration now fails when the code is not formatted as the project asks
 * Continuous integration now measures the memory of the tree and fails when it gets worse
 * Scalable vector versions of the web illustrations, logos and UI assets
+* Serving performance is now measured against the reference servers on a schedule - [#49](https://github.com/hivesolutions/viriatum/issues/49)
 
 ### Changed
 
@@ -32,6 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Web pages now adapt to the small screen of a phone, the file listing included
 * Pages now use the scalable favicon whenever the browser supports it
 * Illustrations, logos and the listing arrow are now served as vectors
+* The recorded performance targets were replaced by numbers a run can reproduce - [#49](https://github.com/hivesolutions/viriatum/issues/49)
 
 ### Fixed
 
@@ -48,6 +50,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Sorting a sequence no longer reads past the end of it
 * Reading a configuration section no longer reads past the end of its name
 * A service that fails to start no longer leaves its handlers behind
+* Static files are now served considerably faster - [#49](https://github.com/hivesolutions/viriatum/issues/49)
+* A file that stops being readable while it is served no longer takes the server down - [#49](https://github.com/hivesolutions/viriatum/issues/49)
 
 ## [0.5.0] - 2026-08-28
 
