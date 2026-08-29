@@ -1006,7 +1006,9 @@ static ERROR_CODE _block_http2_connection(struct http2_connection_t *http2_conne
     _activate_http2_connection(http2_connection, http2_stream);
 
     /* tells the handler that a new message begins, this is the very
-    same sequence the HTTP/1.1 parser produces */
+    same sequence the HTTP/1.1 parser produces, note that the handler
+    of the stream is taken again once the block is over as a handler
+    that dispatches only resolves the target as the url reaches it */
     if(http2_stream->http_settings->on_message_begin) {
         http2_stream->http_settings->on_message_begin(http2_stream->request);
     }
@@ -1031,6 +1033,12 @@ static ERROR_CODE _block_http2_connection(struct http2_connection_t *http2_conne
     if(http2_stream->http_settings->on_headers_complete) {
         http2_stream->http_settings->on_headers_complete(http2_stream->request);
     }
+
+    /* takes the handler that is serving the stream again, one that
+    dispatches switches the connection onto the target as the url
+    reaches it and the stream has to follow it, otherwise the release
+    of the message would reach the handler that never served it */
+    http2_stream->http_handler = http2_connection->http_connection->http_handler;
 
     /* a block that closes the stream carries the complete message,
     so the handler is told that it is complete right away */
@@ -1182,6 +1190,10 @@ ERROR_CODE push_stream_http2_connection(struct http2_connection_t *http2_connect
     if(promised->http_settings->on_message_complete) {
         promised->http_settings->on_message_complete(promised->request);
     }
+
+    /* takes the handler that is serving the promised stream again,
+    the same way the block of a request does */
+    promised->http_handler = http2_connection->http_connection->http_handler;
 
     /* makes the stream that has promised the resource the current one
     again, the handler of it is still writing the response that has
@@ -1505,6 +1517,11 @@ ERROR_CODE handle_frame_http2_connection(struct http2_connection_t *http2_connec
             they have been applied */
             return_value = _write_settings_http2_connection(http2_connection, TRUE);
             if(IS_ERROR_CODE(return_value)) { RAISE_AGAIN(return_value); }
+
+            /* a change of the initial window is carried over to the
+            streams that are already open, so the payload that they
+            are holding back may have somewhere to go now */
+            _schedule_http2_connection(http2_connection);
 
             /* breaks the switch */
             break;

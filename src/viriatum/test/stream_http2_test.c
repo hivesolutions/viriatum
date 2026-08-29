@@ -1075,6 +1075,109 @@ const char *test_http2_connection_fields(void) {
     return NULL;
 }
 
+/**
+ * The handler that the dispatching one switches the connection
+ * onto, it stands in for the target of a message and counts the
+ * releases of it so that a test verifies that it is the one that
+ * gets to release what it has taken.
+ */
+static struct http_handler_t _target;
+
+/**
+ * The number of times the handler of the target has been unset,
+ * the release of a message is what drives it.
+ */
+static size_t _released = 0;
+
+static ERROR_CODE _set_target_http2_test(struct http_connection_t *http_connection) {
+    RAISE_NO_ERROR;
+}
+
+static ERROR_CODE _unset_target_http2_test(struct http_connection_t *http_connection) {
+    _released++;
+    RAISE_NO_ERROR;
+}
+
+/**
+ * Stands in for the setting of a handler that dispatches, it
+ * switches the connection onto the target as the url of a message
+ * reaches it, which is what the one of the tree does.
+ *
+ * @param http_connection The connection being served.
+ * @return The resulting error code.
+ */
+static ERROR_CODE _url_dispatch_http2_test(struct http_request_t *http_request, const unsigned char *data, size_t data_size) {
+    struct connection_t *connection = (struct connection_t *) http_request->parameters;
+    struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
+    struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
+
+    /* switches the connection onto the target, the very same way the
+    handler that dispatches does once it resolves one */
+    http_connection->http_handler->unset(http_connection);
+    _target.set(http_connection);
+    http_connection->http_handler = &_target;
+
+    return _url_http2_test(http_request, data, data_size);
+}
+
+static ERROR_CODE _set_dispatch_http2_test(struct http_connection_t *http_connection) {
+    _set_http2_test(http_connection);
+    http_connection->http_settings->on_url = _url_dispatch_http2_test;
+    RAISE_NO_ERROR;
+}
+
+const char *test_http2_connection_dispatch(void) {
+    /* allocates space for the chain of the connection, for the
+    session and for the block of the request */
+    struct test_context_t *context;
+    struct http2_connection_t *http2_connection;
+    struct http2_stream_t *http2_stream;
+    struct http2_frame_t http2_frame;
+    unsigned char block[256];
+    ERROR_CODE error;
+
+    _create_http2_test(&context, &http2_connection);
+
+    /* installs the handler that stands in for the target and makes
+    the one of the tests switch onto it as a dispatching one does */
+    _target.name = (unsigned char *) "target";
+    _target.resolve_index = FALSE;
+    _target.set = _set_target_http2_test;
+    _target.unset = _unset_target_http2_test;
+    _target.reset = NULL;
+    _released = 0;
+    _handler.set = _set_dispatch_http2_test;
+
+    /* hands a complete request over, the handler that serves it is
+    the target rather than the one the connection started with */
+    http2_frame.type = HTTP2_HEADERS;
+    http2_frame.flags = HTTP2_FLAG_END_HEADERS | HTTP2_FLAG_END_STREAM;
+    http2_frame.stream_id = 1;
+    http2_frame.length = _request_http2_test(block, sizeof(block), "/dispatched");
+    http2_frame.payload = block;
+    error = handle_frame_http2_connection(http2_connection, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+    V_ASSERT_EQ_S(_record.path, "/dispatched");
+
+    /* the stream carries the handler that is actually serving it, so
+    that the release of the message reaches the one that took it */
+    http2_stream = find_stream_http2_connection(http2_connection, 1);
+    V_ASSERT_NOT_NULL(http2_stream);
+    V_ASSERT_EQ_P(http2_stream->http_handler, &_target);
+
+    /* closing the stream releases the message through the handler of
+    the target, the one that never served it is left alone */
+    close_stream_http2_connection(http2_connection, http2_stream);
+    V_ASSERT_EQ_U(_released, 1);
+
+    _handler.set = _set_http2_test;
+    _delete_http2_test(context, http2_connection);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
 const char *test_http2_connection_continuation(void) {
     /* allocates space for the chain of the connection, for the
     session and for the block that is going to be split */

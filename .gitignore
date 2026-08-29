@@ -71,6 +71,9 @@ cmake_install.cmake
 /build-*
 /build.*
 /coverage
+/conformance
+/interop
+/fuzz
 /src/viriatum_python/viriatum/_viriatum*.so
 /src/viriatum_python/viriatum/_viriatum*.pyd
 /dist

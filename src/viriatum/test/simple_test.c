@@ -1339,6 +1339,7 @@ static struct test_entry_t _simple_entries[] = {
     V_TEST_T(test_http2_connection_frames, "http2"),
     V_TEST_T(test_http2_connection_headers, "http2"),
     V_TEST_T(test_http2_connection_fields, "http2"),
+    V_TEST_T(test_http2_connection_dispatch, "http2"),
     V_TEST_T(test_http2_connection_continuation, "http2"),
     V_TEST_T(test_http2_connection_trailers, "http2"),
     V_TEST_T(test_http2_connection_closed, "http2"),

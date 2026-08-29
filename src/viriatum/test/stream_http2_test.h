@@ -156,6 +156,16 @@ const char *test_http2_connection_headers(void);
 const char *test_http2_connection_fields(void);
 
 /**
+ * Tests that a stream follows the handler that a dispatching one
+ * switches the connection onto, so that the release of a message
+ * reaches the handler that actually served it.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_http2_connection_dispatch(void);
+
+/**
  * Tests a header block that is spread over a sequence of
  * continuation frames, including the frame that is not allowed
  * to come between them.

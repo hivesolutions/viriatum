@@ -187,6 +187,59 @@ jobs:
       - name: Test Viriatum (Python)
         run: |
           python -m unittest discover -s src/viriatum_python/test -v
+  build-conformance:
+    name: Build Conformance
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libssl-dev
+          curl -sL https://github.com/summerwind/h2spec/releases/download/v2.6.0/h2spec_linux_amd64.tar.gz | sudo tar -xz -C /usr/local/bin
+      - name: Run conformance
+        run: |
+          ./scripts/conformance.sh
+      - name: Report conformance
+        if: always()
+        run: |
+          cat conformance/summary.md >> $GITHUB_STEP_SUMMARY
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: conformance
+          path: |
+            conformance/summary.md
+            conformance/h2c.txt
+            conformance/h2.txt
+            conformance/server.log
+            conformance/server-ssl.log
+  build-interop:
+    name: Build Interop
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libssl-dev nghttp2-client
+      - name: Run interop
+        run: |
+          ./scripts/interop.sh
+      - name: Report interop
+        if: always()
+        run: |
+          cat interop/summary.md >> $GITHUB_STEP_SUMMARY
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: interop
+          path: |
+            interop/summary.md
+            interop/server.log
+            interop/server-ssl.log
   build-coverage:
     name: Build Coverage
     timeout-minutes: 30

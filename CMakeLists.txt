@@ -36,6 +36,20 @@ if(VIRIATUM_COVERAGE)
     message(STATUS "Viriatum: coverage instrumentation enabled")
 endif()
 
+# builds the targets that drive the decoders of the protocol over the
+# bytes an engine produces, they are the two places that take apart
+# what a peer controls, the instrumentation reaches the complete tree
+# so that the engine is able to follow the paths it opens
+option(VIRIATUM_FUZZ "Build the fuzz targets of the protocol decoders" OFF)
+if(VIRIATUM_FUZZ)
+    if(NOT CMAKE_C_COMPILER_ID MATCHES "Clang")
+        message(FATAL_ERROR "Viriatum: fuzzing requires clang, ${CMAKE_C_COMPILER_ID} carries no engine")
+    endif()
+    add_compile_options(-fsanitize=fuzzer-no-link,address -fno-omit-frame-pointer)
+    add_link_options(-fsanitize=fuzzer-no-link,address)
+    message(STATUS "Viriatum: fuzzing instrumentation enabled")
+endif()
+
 set(VIRIATUM_WWW_ROOT "" CACHE STRING "Path to the www root directory (sets WITH_WWW_ROOT)")
 if(VIRIATUM_WWW_ROOT)
     add_definitions(-DWITH_WWW_ROOT="${VIRIATUM_WWW_ROOT}")
@@ -87,6 +101,10 @@ endif()
 # carrying it may not be linked into a host process (eg: a Python module)
 file(GLOB_RECURSE VIRIATUM_SOURCES src/viriatum/*.c)
 list(REMOVE_ITEM VIRIATUM_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/viriatum/main.c)
+
+# the target of the fuzzing carries an entry point of its own and so
+# it never belongs to the library, it is built by the option below
+list(REMOVE_ITEM VIRIATUM_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/viriatum/test/fuzz_http2.c)
 add_library(viriatum_objects OBJECT ${VIRIATUM_SOURCES})
 set_target_properties(viriatum_objects PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
@@ -115,6 +133,14 @@ target_link_libraries(viriatum_shared PUBLIC viriatum_objects)
 
 add_executable(viriatum src/viriatum/main.c)
 target_link_libraries(viriatum viriatum_static)
+
+# the target of the fuzzing links the engine rather than an entry
+# point of its own, the corpus of it is driven by the script
+if(VIRIATUM_FUZZ)
+    add_executable(viriatum_fuzz_http2 src/viriatum/test/fuzz_http2.c)
+    target_link_libraries(viriatum_fuzz_http2 viriatum_static)
+    target_link_options(viriatum_fuzz_http2 PRIVATE -fsanitize=fuzzer,address)
+endif()
 
 # links the dynamic loader on Unix systems
 if(NOT WIN32)
