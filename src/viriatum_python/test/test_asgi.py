@@ -1127,6 +1127,40 @@ class AsgiTest(ServerCase):
         )
         connection.close()
 
+    def test_multiplexed_released(self):
+        # verifies that the objects of a request are released once the
+        # stream that carried it is over, several of them travel at the
+        # same time on one connection and each one carries a context of
+        # its own that must not outlive the stream
+        nghttp = shutil.which("nghttp")
+        if nghttp is None:
+            self.skipTest("no client of the most recent version is available")
+
+        def request(count):
+            paths = [self._url("/scope?a=%d" % index) for index in range(count)]
+            process = subprocess.Popen(
+                [nghttp] + paths, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+            )
+            process.communicate(timeout=30)
+            self.assertEqual(process.returncode, 0)
+
+        def objects():
+            gc.collect()
+            return len(gc.get_objects())
+
+        # a first round warms whatever is built once and kept, the
+        # count is only meaningful once that has settled
+        request(8)
+        time.sleep(0.5)
+        initial = objects()
+        request(40)
+        time.sleep(1.0)
+        retained = objects() - initial
+        self.assertTrue(
+            retained < 200,
+            "retained %d objects across 40 multiplexed streams" % retained,
+        )
+
     def test_pending_writes_released(self):
         # verifies that the payloads queued in a connection that is
         # dropped before they reach the wire are released, they are
