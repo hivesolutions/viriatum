@@ -69,6 +69,7 @@
     dump((void *) &context)
 #define STRCPY(destination, size, source) strcpy(destination, source)
 #define FOPEN(file_pointer, file_name, mode) *file_pointer = fopen(file_name, mode)
+#define READABLE(file_name) (access(file_name, R_OK) == 0)
 #define STROULL(start, end, base) strtoull(start, end, base)
 #define GET_ENV(buffer, buffer_size, variable_name) buffer = getenv(variable_name)
 #define GET_PROCESS() RUSAGE_SELF
@@ -93,6 +94,7 @@
 #define STRTOK(string, delimiter, context) strtok_s(string, delimiter, &context)
 #define STRCPY(destination, size, source) strcpy_s(destination, size, source)
 #define FOPEN(file_pointer, file_name, mode) fopen_s(file_pointer, file_name, mode)
+#define READABLE(file_name) (_access(file_name, 4) == 0)
 #define STROULL(start, end, base) _strtoui64(start, end, base)
 #endif
 
@@ -106,6 +108,7 @@
     dump((void *) &context)
 #define STRCPY(destination, size, source) strcpy(destination, source)
 #define FOPEN(file_pointer, file_name, mode) *file_pointer = fopen(file_name, mode)
+#define READABLE(file_name) (access(file_name, R_OK) == 0)
 #define STROULL(start, end, base) _strtoui64(start, end, base)
 #endif
 

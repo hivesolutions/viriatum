@@ -136,37 +136,40 @@ ERROR_CODE write_file(char *file_path, unsigned char *buffer, size_t buffer_size
 }
 
 ERROR_CODE count_file(char *file_path, size_t *file_size_pointer) {
-    /* allocates space for the file structure to be used
-    in the opening of the file */
-    FILE *file;
-
-    /* allocates space for the file size value, this value
-    is limited by the processor integer size */
-    size_t file_size;
+    /* allocates space for the structure that describes the file,
+    both the size of it and its mode being fields it carries */
+    struct stat file_stat;
 
     /* ensures that the file path is correctly converted
     into the proper system path, through encoding conversion */
     SYSTEM_PATH(file_path);
 
-    /* opens the file and in case the retrieved value
-    is not valid raises an error */
-    FOPEN(&file, file_path, "rb");
-    if(file == NULL) {
+    /* asks the file system to describe the file rather than opening
+    it, the size is the only thing wanted out of it and opening one
+    only to seek to the end and close it again costs four calls into
+    the kernel where describing it costs a single one, a cost that
+    the serving of a static file pays once on every request */
+    if(stat(file_path, &file_stat) != 0) {
         RAISE_ERROR_M(
             RUNTIME_EXCEPTION_ERROR_CODE,
             (unsigned char *) "Problem loading file"
         );
     }
 
-    /* seeks the file until the end retrieves the
-    current offset from it (file size) and then closes
-    it again to avoid any memory leak */
-    fseek(file, 0, SEEK_END);
-    file_size = ftell(file);
-    fclose(file);
+    /* the opening that was dropped above also answered whether this
+    process is allowed to read the file at all, which the description
+    of it already answers whenever everyone is allowed to, and only
+    the files that are not open to everyone are asked about again,
+    the asking being very nearly as expensive as the opening was */
+    if(!(file_stat.st_mode & S_IROTH) && !READABLE(file_path)) {
+        RAISE_ERROR_M(
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Problem loading file"
+        );
+    }
 
     /* sets the file size as the file size pointer */
-    *file_size_pointer = file_size;
+    *file_size_pointer = (size_t) file_stat.st_size;
 
     /* raise no error */
     RAISE_NO_ERROR;

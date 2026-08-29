@@ -1449,6 +1449,10 @@ ERROR_CODE _send_chunk_handler_file(struct connection_t *connection, struct data
     used in the reading operation from the file */
     unsigned char *file_buffer;
 
+    /* allocates the space for the result of the opening of the
+    file, which is no longer certain to have succeeded */
+    ERROR_CODE error_code;
+
     /* casts the parameters as handler file context and uses it
     to retrieve the proper file path for the sending */
     struct handler_file_context_t *handler_file_context = (struct handler_file_context_t *) parameters;
@@ -1465,8 +1469,12 @@ ERROR_CODE _send_chunk_handler_file(struct connection_t *connection, struct data
     /* in case the file is not defined (should be opened) */
     if(file == NULL) {
         /* opens the file in the most secure manner making sure
-        that the proper encoding is set for the path */
-        open_file((char *) file_path, "rb", &file);
+        that the proper encoding is set for the path, a file that
+        does not open at this point was there when the response was
+        decided upon and is not any longer, and there is then nothing
+        left to send and no pointer at all to be seeking through */
+        error_code = open_file((char *) file_path, "rb", &file);
+        if(IS_ERROR_CODE(error_code)) { RAISE_AGAIN(error_code); }
 
         /* seeks to the end of the file and then to the
         beginig in order to correctly retrieve the size
