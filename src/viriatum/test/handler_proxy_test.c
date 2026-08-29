@@ -158,6 +158,21 @@ const char *test_handler_proxy_request(void) {
     V_ASSERT(handler_proxy_context->buffer_size > 1024);
     V_ASSERT_MEM(handler_proxy_context->buffer, "X-Long: ", 8);
 
+    /* the line that opens the message of the upstream names the
+    version of HTTP/1.1 whatever the one serving the client is, the
+    most recent one carries no request line at all and an upstream
+    speaking the older one would refuse the name of it */
+    handler_proxy_context->buffer_size = 0;
+    http_request->version = HTTP20;
+    write_request_handler_proxy(handler_proxy_context, "GET", "/proxied");
+    V_ASSERT_EQ_U(handler_proxy_context->buffer_size, 23);
+    V_ASSERT_MEM(handler_proxy_context->buffer, "GET /proxied HTTP/1.1\r\n", 23);
+
+    handler_proxy_context->buffer_size = 0;
+    http_request->version = HTTP11;
+    write_request_handler_proxy(handler_proxy_context, "POST", "/other");
+    V_ASSERT_MEM(handler_proxy_context->buffer, "POST /other HTTP/1.1\r\n", 22);
+
     /* the completion of the message hands the buffer to the upstream,
     the connection of it is the one that takes it */
     error = message_complete_callback_handler_proxy(http_request);

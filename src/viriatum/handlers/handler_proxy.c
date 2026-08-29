@@ -473,6 +473,21 @@ ERROR_CODE location_callback_handler_proxy(struct http_request_t *http_request, 
     RAISE_NO_ERROR;
 }
 
+void write_request_handler_proxy(struct handler_proxy_context_t *handler_proxy_context, const char *method, const char *path) {
+    /* allocates space for the line being built and for the size that
+    the building of it produces */
+    char buffer[1024];
+    size_t size;
+
+    /* the message that travels to the upstream is always one of
+    HTTP/1.1, the version that is serving the client carries no
+    request line of its own and an upstream speaking the older one
+    would refuse the name of it, the response is still written back
+    to the client in the version that is serving it */
+    size = SPRINTF(buffer, 1024, "%s %s %s\r\n", method, path, get_http_version_string(HTTP11));
+    write_proxy_buffer(handler_proxy_context, buffer, size);
+}
+
 ERROR_CODE virtual_url_callback_handler_proxy(struct http_request_t *http_request, const unsigned char *data, size_t data_size) {
     /* reserves space for a return error code to be used in various
     operation in the current function call */
@@ -483,24 +498,15 @@ ERROR_CODE virtual_url_callback_handler_proxy(struct http_request_t *http_reques
     struct custom_parameters_t *parameters;
     struct connection_t *connection_c;
 
-    /* sets space for the resulting size of the buffer that will hold
-    the status line to be sent to the backend connection */
-    size_t size_m;
-
-    /* allocates two buffers for temporary and local operations to
-    in the current callback function */
-    char buffer[1024];
+    /* allocates the buffer that carries the resource being asked for
+    as a string that is closed */
     char path[1024];
 
     /* allocates space for the temporary variable that will store the
     on close handler that will be set in the associative map */
     io_connection_callback on_close;
 
-    /* retrieves the enumeration representation of the version and then
-    uses it to retrieve the string value out of it, then retrieves the
-    proper HTTP method used in the current call */
-    enum http_version_e version_e = http_request->version;
-    const char *version = get_http_version_string(version_e);
+    /* retrieves the proper HTTP method used in the current call */
     const char *method = http_method_strings[http_request->method - 1];
 
     /* retrieves the connection from the parser parameters and then uses
@@ -524,10 +530,9 @@ ERROR_CODE virtual_url_callback_handler_proxy(struct http_request_t *http_reques
     memcpy(path, data, data_size);
     path[data_size] = '\0';
 
-    /* writes the initial line of the HTTP message into the temporary buffer
-    and then sends this value to the current buffer for writing */
-    size_m = SPRINTF(buffer, 1024, "%s %s %s\r\n", method, path, version);
-    write_proxy_buffer(handler_proxy_context, buffer, size_m);
+    /* writes the initial line of the HTTP message into the buffer
+    that is going to travel to the upstream */
+    write_request_handler_proxy(handler_proxy_context, method, path);
 
     /*@todo: can put here the extra headers to be sent to the backend */
     write_proxy_buffer(handler_proxy_context, "X-Viriatum-Proxy:1\r\n", 20);
