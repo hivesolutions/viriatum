@@ -2481,6 +2481,17 @@ ERROR_CODE data_handler_stream_http2(struct io_connection_t *io_connection, unsi
 
         return_value = decode_frame_http2(_read, _read_size, &http2_frame);
         if(IS_ERROR_CODE(return_value)) { break; }
+
+        /* the size a frame announces is judged as soon as the header
+        of it has arrived rather than once the payload has, a peer
+        would otherwise make the buffer of the connection grow to the
+        largest size the field represents before being refused */
+        if(http2_frame.length > http2_connection->settings.max_frame_size) {
+            V_DEBUG_F("HTTP/2 frame of %d bytes is too large\n", (int) http2_frame.length);
+            write_goaway_http2_connection(http2_connection, HTTP2_FRAME_SIZE_ERROR);
+            RAISE_NO_ERROR;
+        }
+
         if(http2_frame.payload == NULL) { break; }
 
         http_connection->read_offset += HTTP2_HEADER_SIZE + http2_frame.length;

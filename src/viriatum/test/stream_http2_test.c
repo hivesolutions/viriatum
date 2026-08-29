@@ -2113,6 +2113,41 @@ const char *test_http2_connection_read(void) {
     frames has been handled */
     V_ASSERT_EQ_U(context->http_connection->buffer_offset, 0);
 
+    /* a frame that announces a size past the one this end allows is
+    refused as soon as its header arrives rather than once the whole
+    of it has, a peer would otherwise make the buffer of the
+    connection grow to the largest size the field represents */
+    V_ASSERT_EQ_U(get_closed_test_connection(), 0);
+    encode_frame_http2(
+        stream,
+        sizeof(stream),
+        http2_connection->settings.max_frame_size + 1,
+        HTTP2_DATA,
+        0x00,
+        1
+    );
+    data_handler_stream_http2(context->io_connection, stream, HTTP2_HEADER_SIZE);
+    V_ASSERT(http2_connection->goaway == TRUE);
+
+    /* the connection is taken down by the write of that frame, the
+    session is built again for the case that follows */
+    flush_test_connection(context, NULL, 0);
+    V_ASSERT_EQ_U(get_closed_test_connection(), 1);
+    delete_http2_connection(http2_connection);
+    delete_test_connection(context);
+    delete_test_context(context);
+
+    create_test_context(&context);
+    create_test_connection(context);
+    context->http_connection->base_handler = &_handler;
+    upgrade_handler_stream_http2(context->io_connection);
+    http2_connection = context->http_connection->http2_connection;
+    data_handler_stream_http2(
+        context->io_connection,
+        (unsigned char *) HTTP2_PREFACE,
+        HTTP2_PREFACE_SIZE
+    );
+
     /* a frame that violates the protocol takes the connection down,
     the peer is told the reason first and the closing only happens
     once that frame has actually reached it */
