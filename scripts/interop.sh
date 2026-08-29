@@ -150,6 +150,36 @@ if [ -f "$OUTPUT/cert/server.crt" ] && head -1 "$OUTPUT/server.log" | grep -q ss
             --http1.1 "https://127.0.0.1:$PORT_SSL/index.html"
     )"
 
+    # a browser is the client that the negotiation exists for, the one
+    # of the machine is driven without a window when it is around
+    BROWSER=${BROWSER:-/Applications/Google Chrome.app/Contents/MacOS/Google Chrome}
+    if [ ! -x "$BROWSER" ]; then BROWSER=$(command -v google-chrome || command -v chromium || true); fi
+    if [ -n "$BROWSER" ] && [ -x "$BROWSER" ]; then
+        "$BROWSER" --headless --disable-gpu --no-sandbox --ignore-certificate-errors \
+            --user-data-dir="$OUTPUT/profile" --log-net-log="$OUTPUT/net.json" \
+            --dump-dom "https://localhost:$PORT_SSL/index.html" \
+            > "$OUTPUT/dom.html" 2> "$OUTPUT/browser.log" &
+        BROWSER_PID=$!
+
+        INDEX=0
+        while [ "$INDEX" -lt 30 ]; do
+            if [ -s "$OUTPUT/dom.html" ]; then break; fi
+            sleep 1
+            INDEX=$((INDEX + 1))
+        done
+        kill "$BROWSER_PID" 2> /dev/null || true
+        sleep 1
+
+        _check "browser (alpn)" "h2" "$(
+            grep -o '"next_proto":"[^"]*"' "$OUTPUT/net.json" 2> /dev/null |
+                sed -n 's/.*:"\(.*\)"/\1/p' | sort -u | head -1
+        )"
+        _check "browser (contents)" "viriatum" "$(
+            tr -d '\n\r ' < "$OUTPUT/dom.html" 2> /dev/null |
+                sed -n 's/.*<body>\(.*\)<\/body>.*/\1/p'
+        )"
+    fi
+
     if command -v openssl > /dev/null 2>&1; then
         _check "openssl -alpn h2" "h2" "$(
             echo | openssl s_client -connect "127.0.0.1:$PORT_SSL" -alpn h2 2> /dev/null |
