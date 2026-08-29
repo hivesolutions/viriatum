@@ -21,6 +21,12 @@ ORDER = ("viriatum", "nginx", "caddy", "openlitespeed", "haproxy", "pingora", "g
 the references, so that a table always reads the same way """
 
 
+COMPARABLE = ("machine", "mode", "references", "connections", "threads", "workers")
+""" The parts of an environment that decide whether two runs may be
+compared at all, a figure taken on another machine or under another
+shape of load describes that one and never this one """
+
+
 def load(path):
     if not os.path.exists(path):
         return None
@@ -29,6 +35,44 @@ def load(path):
             return json.loads(file.read().decode("utf-8"))
     except ValueError:
         return None
+
+
+def environment(output):
+    # reads the description of the run that the harness wrote beside
+    # its reports, one value per line, so that a figure may always be
+    # traced back to the machine and the build that produced it
+    path = os.path.join(output, "environment.txt")
+    if not os.path.exists(path):
+        return {}
+    values = {}
+    with open(path, "rb") as file:
+        for line in file.read().decode("utf-8").splitlines():
+            if ":" not in line:
+                continue
+            name, value = line.split(":", 1)
+            values[name.strip()] = value.strip()
+    return values
+
+
+def stored(baseline):
+    # the recorded runs and the environment they were taken under, a
+    # baseline written before the environment was recorded carries the
+    # rows at the top level and is still understood
+    if isinstance(baseline, dict):
+        return baseline.get("results", []), baseline.get("environment", {})
+    return baseline or [], {}
+
+
+def comparable(current, recorded):
+    # says whether the run at hand may be compared against the one the
+    # baseline holds, the parts that decide it being the machine and
+    # the shape of the load rather than every value of either
+    if not recorded:
+        return True
+    for name in COMPARABLE:
+        if current.get(name) != recorded.get(name):
+            return False
+    return True
 
 
 def results(output):
@@ -79,10 +123,13 @@ def servers(rows, workload):
 def ratio(subject, reference):
     # the figure of the subject against the one of the reference, the
     # only number of the report that survives a noisy machine, as the
-    # two of them were measured on it one right after the other
+    # two of them were measured on it one right after the other, a
+    # measurement that was not a figure is never one half of a ratio
     if reference is None or not reference.get("rps"):
         return None
     if subject is None or not subject.get("rps"):
+        return None
+    if not reference.get("valid", True) or not subject.get("valid", True):
         return None
     return subject["rps"] / reference["rps"]
 
@@ -142,7 +189,7 @@ def table(rows, baseline):
     # of a workload carrying the ratio against each of its references
     # and every row carrying the change against the baseline
     known = index(rows)
-    stored = index(baseline) if baseline else {}
+    recorded = index(baseline) if baseline else {}
 
     lines = [
         "| Workload | Server | Req/s | p50 | p99 | p99.9 | CPU ms/1k | RSS MB | vs base | |",
@@ -153,8 +200,8 @@ def table(rows, baseline):
         subject = known.get((workload, SUBJECT))
         for server in servers(rows, workload):
             item = known[(workload, server)]
-            change = delta(item, stored.get((workload, server)))
-            state = moved(item, stored.get((workload, server)))
+            change = delta(item, recorded.get((workload, server)))
+            state = moved(item, recorded.get((workload, server)))
 
             # the subject is reported against the references of its
             # workload, a reference against the subject, so that the
@@ -196,31 +243,47 @@ def main_with(output, path):
         print("## Benchmark\n\nNo benchmark data was produced.")
         return 1
 
-    baseline = load(path) if path else None
+    current = environment(output)
+    recorded, taken = stored(load(path)) if path else ([], {})
+
+    # the baseline of another machine describes that machine, marking
+    # every row of this one as having moved against it would only ever
+    # teach whoever reads the table to stop reading the marks
+    matched = comparable(current, taken)
+    if not matched:
+        recorded = []
 
     print("## Benchmark\n")
-    print("\n".join(table(rows, baseline)))
+    print("\n".join(table(rows, recorded)))
+
+    if not path:
+        print("\nNo baseline was compared against, the change column is empty.")
+    elif not recorded:
+        print(
+            "\nThe baseline was recorded on `%s` and this ran on `%s`, so nothing "
+            "was compared against it." % (taken.get("machine", "?"), current.get("machine", "?"))
+        )
 
     # the environment a figure came out of is part of the figure, a
     # run on another machine or another build is never comparable and
     # the report says which one produced it rather than implying it
-    environment = os.path.join(output, "environment.txt")
-    if os.path.exists(environment):
-        with open(environment, "rb") as file:
-            print("\n<details><summary>Environment</summary>\n")
-            print("```")
-            print(file.read().decode("utf-8").strip())
-            print("```")
-            print("\n</details>")
+    if current:
+        print("\n<details><summary>Environment</summary>\n")
+        print("```")
+        for name in sorted(current):
+            print("%s: %s" % (name, current[name]))
+        print("```")
+        print("\n</details>")
 
-    if baseline is None:
-        print("\nNo baseline was compared against, the change column is empty.")
-
-    # the assembled result is written beside the table so that a run
-    # may be compared against by a later one without it having to
-    # walk the reports of every pair again
+    # the assembled result is written beside the table together with
+    # the environment it was taken under, so that a later run is able
+    # to tell whether it may be compared against this one at all
     with open(os.path.join(output, "results.json"), "wb") as file:
-        file.write(json.dumps(rows, indent=2, sort_keys=True).encode("utf-8"))
+        file.write(
+            json.dumps(
+                dict(environment=current, results=rows), indent=2, sort_keys=True
+            ).encode("utf-8")
+        )
 
     # the run reports and never gates, a hosted runner is far too
     # noisy for a figure of performance to fail a build on

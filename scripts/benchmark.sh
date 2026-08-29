@@ -139,6 +139,21 @@ if [ -z "$WRK2" ] && command -v git > /dev/null 2>&1; then
     fi
 fi
 
+# builds the reference of the proxying workload that ships as a
+# framework rather than as a server, it is the slowest thing a run
+# builds so the result is kept and only ever built once, a machine
+# without the toolchain simply does not measure it
+if [ ! -x "$BUILD/pingora/load_balancer" ] && command -v cargo > /dev/null 2>&1; then
+    echo "Building the reference that ships as a framework ..."
+    if cargo build --release --manifest-path "$ASSETS/pingora/Cargo.toml" \
+        --target-dir "$BUILD/pingora/target" > "$OUTPUT/logs/pingora.log" 2>&1; then
+        mkdir -p "$BUILD/pingora"
+        cp "$BUILD/pingora/target/release/load_balancer" "$BUILD/pingora/load_balancer"
+    else
+        echo "  it did not build here, the proxying workload carries one reference less"
+    fi
+fi
+
 # stages the extension next to the package so that the launcher of the
 # interfaces is able to import it without the package being installed
 MODULE=$(ls "$BUILD"/lib/_viriatum*.so "$BUILD"/lib/_viriatum*.pyd 2> /dev/null | head -1)
@@ -333,6 +348,49 @@ _render() {
         "$ASSETS/conf/$1" > "$OUTPUT/conf/$2"
 }
 
+# writes the configuration of the reference that wants a tree of its
+# own rather than a single file, the values that decide the comparison
+# being the very same ones every other server is given
+_render_litespeed() {
+    mkdir -p "$OUTPUT/conf/litespeed/conf" "$OUTPUT/conf/litespeed/logs"
+    {
+        echo "serverName benchmark"
+        echo "user nobody"
+        echo "group nogroup"
+        echo "priority 0"
+        echo "enableLve 0"
+        echo "autoRestart 0"
+        echo "gracefulRestartTimeout 0"
+        echo "httpdWorkers $WORKERS"
+        echo "indexFiles index.html"
+        echo "errorlog \$SERVER_ROOT/logs/error.log { logLevel ERROR }"
+        echo "accessLog \$SERVER_ROOT/logs/access.log { logHeaders 0 }"
+        echo "tuning {"
+        echo "    maxConnections 8192"
+        echo "    keepAliveTimeout 65"
+        echo "    maxKeepAliveReq 1000000"
+        echo "    enableGzipCompress 0"
+        echo "    enableBrCompress 0"
+        echo "    eventDispatcher epoll"
+        echo "}"
+        echo "virtualHost benchmark {"
+        echo "    vhRoot $_PREFIX/www"
+        echo "    docRoot \$VH_ROOT"
+        echo "    enableGzip 0"
+        echo "    context / {"
+        echo "        location \$DOC_ROOT"
+        echo "        allowBrowse 1"
+        echo "        autoIndex 1"
+        echo "    }"
+        echo "}"
+        echo "listener benchmark {"
+        echo "    address *:$PORT_REFERENCE"
+        echo "    secure 0"
+        echo "    map benchmark *"
+        echo "}"
+    } > "$OUTPUT/conf/litespeed/httpd_config.conf"
+}
+
 # starts a reference out of its image, every one of them is given the
 # network of the machine so that it is reached exactly the way the
 # subject is and no address translation sits in between
@@ -454,6 +512,20 @@ _start_reference() {
                     > "$OUTPUT/logs/reference.log" 2>&1 &
                 PID_REFERENCE=$!
             fi
+            ;;
+        openlitespeed)
+            # the reference that carries a configuration of its own
+            # shape, the tree of it is written out whole rather than
+            # rendered from a single file the way the others are
+            _render_litespeed
+            _run_image "$IMAGE_LITESPEED" \
+                /usr/local/lsws/bin/litespeed -d -c /bench/conf/litespeed/httpd_config.conf
+            ;;
+        pingora)
+            "$BUILD/pingora/load_balancer" "127.0.0.1:$PORT_REFERENCE" \
+                "127.0.0.1:$PORT_UPSTREAM" \
+                > "$OUTPUT/logs/reference.log" 2>&1 &
+            PID_REFERENCE=$!
             ;;
         gunicorn)
             # the reference is given the shape it was measured to be
@@ -623,10 +695,11 @@ _connections() {
 # a figure taken under the tracer would not be a figure of throughput
 _syscalls() {
     _REPORTS=$1
+    _OF=$3
 
-    if [ "$MODE" != "native" ] || ! command -v strace > /dev/null 2>&1; then return 0; fi
+    if [ -z "$_OF" ] || ! command -v strace > /dev/null 2>&1; then return 0; fi
 
-    strace -c -f -o "$_REPORTS/syscalls.txt" -p "$PID" 2> /dev/null &
+    strace -c -f -o "$_REPORTS/syscalls.txt" -p "$_OF" 2> /dev/null &
     _TRACER=$!
     sleep 1
 
@@ -791,7 +864,11 @@ _measure() {
     _PEAK=$(_values "$_REPORTS" rps | _stats | awk '{ print $1 }')
     _latency "$_TARGET" "$HEADER" "$_REPORTS" "$_PEAK"
     _connections "$_TARGET" "$_REPORTS"
-    if [ "$_SERVER" = "viriatum" ]; then _syscalls "$_REPORTS" "$_TARGET"; fi
+    # the calls into the kernel are counted for the subject and for
+    # every reference alike, the figure of one only says anything
+    # about the serving when it is read against the figure of another
+    if [ "$_SERVER" = "viriatum" ]; then _OWNER=$PID; else _OWNER=$PID_REFERENCE; fi
+    _syscalls "$_REPORTS" "$_TARGET" "$_OWNER"
 
     _record "$_NAME" "$_SERVER" "$_REPORTS" "$_VERSION"
 }
@@ -821,10 +898,12 @@ _record() {
 
     # a measurement that lost a noticeable part of its connections is
     # never reported as a figure, an exhausted port table answers far
-    # faster than a server does and would read as a win
+    # faster than a server does and would read as a win, and one that
+    # served nothing at all is never a figure either, whatever the
+    # reason it served nothing happened to have been
     _REQUESTS=$(_values "$_REPORTS" requests | awk '{ total += $1 } END { print total + 0 }')
     _VALID=$(echo "$_SOCKET $_REQUESTS" | awk \
-        '{ print ($1 * 1000 > $2) ? "false" : "true" }')
+        '{ print ($2 <= 0 || $1 * 1000 > $2) ? "false" : "true" }')
 
     # the tail is only ever read out of the run that was held at a
     # fixed rate, the percentiles of a saturated run leave out every
@@ -875,6 +954,8 @@ _record() {
     else
         printf "  %-12s %12.0f req/s  discarded, %s connections were lost\n" \
             "$_SERVER" "$_RPS" "$_SOCKET"
+        echo "    the machine is holding $(_waiting) closed sockets, a workload that"
+        echo "    closes every connection needs a wider range of ports than this to run"
     fi
 }
 

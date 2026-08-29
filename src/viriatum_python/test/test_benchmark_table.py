@@ -83,6 +83,51 @@ class BenchmarkTableTest(unittest.TestCase):
             file.write(b"{ this is not json")
         self.assertEqual(benchmark_table.load(path), None)
 
+    def test_environment(self):
+        with io.open(os.path.join(self.output, "environment.txt"), "wb") as file:
+            file.write(b"machine: Linux x86_64\nflags: -O3 -DNDEBUG\nbroken line\n")
+        values = benchmark_table.environment(self.output)
+        self.assertEqual(values["machine"], "Linux x86_64")
+        self.assertEqual(values["flags"], "-O3 -DNDEBUG")
+        self.assertEqual(len(values), 2)
+
+    def test_environment_missing(self):
+        self.assertEqual(benchmark_table.environment(self.output), {})
+
+    def test_stored(self):
+        # the baseline carries the runs together with the machine they
+        # were taken on, one written before that was recorded carries
+        # only the runs and is still understood
+        rows, taken = benchmark_table.stored(
+            dict(results=[SUBJECT], environment=dict(machine="Linux"))
+        )
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(taken["machine"], "Linux")
+
+        rows, taken = benchmark_table.stored([SUBJECT])
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(taken, {})
+
+        self.assertEqual(benchmark_table.stored(None), ([], {}))
+
+    def test_comparable(self):
+        # a run of the same machine and the same shape of load may be
+        # compared against the baseline, one of another machine is
+        # describing that machine and never this one
+        recorded = dict(machine="Linux", mode="native", connections="64")
+        self.assertEqual(benchmark_table.comparable(dict(recorded), recorded), True)
+        self.assertEqual(
+            benchmark_table.comparable(dict(recorded, machine="Darwin"), recorded), False
+        )
+        self.assertEqual(
+            benchmark_table.comparable(dict(recorded, connections="128"), recorded), False
+        )
+
+    def test_comparable_unrecorded(self):
+        # a baseline that never recorded where it was taken is compared
+        # against, there is nothing to say it should not be
+        self.assertEqual(benchmark_table.comparable(dict(machine="Linux"), {}), True)
+
     def test_results(self):
         self._write(SUBJECT)
         self._write(REFERENCE)
@@ -130,6 +175,16 @@ class BenchmarkTableTest(unittest.TestCase):
 
     def test_ratio(self):
         self.assertEqual(benchmark_table.ratio(SUBJECT, REFERENCE), 0.5)
+
+    def test_ratio_invalid(self):
+        # a measurement that was discarded is never one half of a
+        # ratio, a server that served nothing at all would otherwise
+        # read as one the subject is infinitely faster than
+        invalid = dict(REFERENCE, valid=False)
+        self.assertEqual(benchmark_table.ratio(SUBJECT, invalid), None)
+        self.assertEqual(
+            benchmark_table.ratio(dict(SUBJECT, valid=False), REFERENCE), None
+        )
 
     def test_ratio_missing(self):
         # a reference that never ran carries no figure and so no ratio
@@ -276,6 +331,36 @@ class BenchmarkTableTest(unittest.TestCase):
             sys.stdout = stdout
 
         self.assertTrue("-50.0%" in stream.getvalue())
+
+    def test_main_baseline_elsewhere(self):
+        # a baseline recorded on another machine is never compared
+        # against, marking every row as moved would only teach whoever
+        # reads the table to stop reading the marks at all
+        self._write(dict(SUBJECT, rps=500.0))
+        with io.open(os.path.join(self.output, "environment.txt"), "wb") as file:
+            file.write(b"machine: Darwin arm64\nmode: native")
+
+        path = os.path.join(self.output, "baseline.json")
+        with io.open(path, "wb") as file:
+            file.write(
+                json.dumps(
+                    dict(
+                        results=[SUBJECT],
+                        environment=dict(machine="Linux x86_64", mode="native"),
+                    )
+                ).encode("utf-8")
+            )
+
+        stream = io.StringIO()
+        stdout = sys.stdout
+        try:
+            sys.stdout = stream
+            self.assertEqual(benchmark_table.main_with(self.output, path), 0)
+        finally:
+            sys.stdout = stdout
+
+        self.assertTrue("-50.0%" not in stream.getvalue())
+        self.assertTrue("so nothing was compared against it" in stream.getvalue())
 
     def test_main_empty(self):
         self.assertEqual(benchmark_table.main_with(self.output, None), 1)

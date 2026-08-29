@@ -1,0 +1,24 @@
+# Hive Viriatum Web Server
+# Copyright (c) 2008-2026 Hive Solutions Lda.
+#
+# The reference of the proxying workload that is a framework rather
+# than a packaged server, so it has to be built into a binary of its
+# own before it may be measured beside the others.
+
+[package]
+name = "viriatum-benchmark-pingora"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+async-trait = "0.1"
+pingora = { version = "0.4", features = ["lb"] }
+
+[[bin]]
+name = "load_balancer"
+path = "src/main.rs"
+
+[profile.release]
+opt-level = 3
+lto = true
