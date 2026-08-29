@@ -501,16 +501,12 @@ ERROR_CODE update_window_http2_connection(struct http2_connection_t *http2_conne
         RAISE_NO_ERROR;
     }
 
-    /* an increment for a stream that has never been opened refers to
-    an idle one, which carries no window at all to be widened */
+    /* an increment for a stream that the connection no longer holds
+    refers to one that has already been closed and is discarded, the
+    peer is allowed to send one that crosses the closing of it and
+    the state of a stream is what refuses one that is still idle */
     http2_stream = find_stream_http2_connection(http2_connection, stream_id);
-    if(http2_stream == NULL) {
-        if(stream_id > http2_connection->last_stream_id) { RAISE_ERROR_S(HTTP2_PROTOCOL_ERROR); }
-
-        /* an increment for a stream that has already been closed is
-        discarded, the peer is allowed to send one that crosses it */
-        RAISE_NO_ERROR;
-    }
+    if(http2_stream == NULL) { RAISE_NO_ERROR; }
 
     if(http2_stream->send_window > (long) HTTP2_MAX_WINDOW_SIZE - (long) increment) {
         RAISE_ERROR_S(HTTP2_FLOW_CONTROL_ERROR);
@@ -1256,6 +1252,135 @@ static void _reset_block_http2_connection(struct http2_connection_t *http2_conne
     http2_connection->continuation_flags = 0;
 }
 
+/**
+ * Retrieves the state that the stream carrying the provided
+ * identifier is in, one that the connection no longer holds has
+ * either never been opened or already closed, the identifier of it
+ * is what tells the two apart.
+ *
+ * @param http2_connection The session holding the streams.
+ * @param stream_id The identifier of the stream being looked at.
+ * @param http2_stream The stream carrying that identifier, unset
+ * when the connection holds none.
+ * @return The state that the stream is in.
+ */
+static enum http2_stream_state_e _state_http2_connection(struct http2_connection_t *http2_connection, unsigned int stream_id, struct http2_stream_t *http2_stream) {
+    /* a stream that the connection still holds carries the state of
+    it, every other one has to be told from the identifier alone */
+    if(http2_stream != NULL) { return http2_stream->state; }
+
+    /* the even identifiers belong to this end and the odd ones to the
+    peer, each of the two is handed out in order and so the last that
+    has been used tells one that is still to come from one that has
+    already been through */
+    if(stream_id % 2 == 0) {
+        return stream_id > http2_connection->push_stream_id
+                   ? HTTP2_STATE_IDLE
+                   : HTTP2_STATE_CLOSED;
+    }
+    return stream_id > http2_connection->last_stream_id
+               ? HTTP2_STATE_IDLE
+               : HTTP2_STATE_CLOSED;
+}
+
+/**
+ * Verifies that the provided frame is one that the stream it belongs
+ * to is allowed to receive in the state it is in, which is the
+ * machine that the section 5.1 of the specification describes.
+ * Only what arrives from the peer is looked at here, the states that
+ * a stream reaches through what this end writes are set by the
+ * operations that write it.
+ *
+ * @param http2_connection The session holding the stream.
+ * @param http2_frame The frame that has just arrived.
+ * @param http2_stream The stream the frame belongs to, unset when
+ * the connection holds none carrying its identifier.
+ * @return The resulting error code.
+ */
+static ERROR_CODE _verify_stream_http2_connection(struct http2_connection_t *http2_connection, struct http2_frame_t *http2_frame, struct http2_stream_t *http2_stream) {
+    /* gathers the state of the stream, one that the connection no
+    longer holds is told from the identifier of it */
+    enum http2_stream_state_e state = _state_http2_connection(
+        http2_connection,
+        http2_frame->stream_id,
+        http2_stream
+    );
+
+    /* only the frames that carry a message, or that bound one, are
+    governed by the state of a stream, the place of it in the tree
+    may be described at any point of the life of it, a promise is
+    refused on its own account and a frame of a type that this end
+    does not know is ignored so that the protocol may be extended */
+    switch(http2_frame->type) {
+        case HTTP2_DATA:
+        case HTTP2_HEADERS:
+        case HTTP2_RST_STREAM:
+        case HTTP2_WINDOW_UPDATE:
+            /* breaks the switch */
+            break;
+
+        case HTTP2_CONTINUATION:
+            /* a continuation belongs to the block that is being
+            assembled rather than to a message of its own, so it is
+            the frame that opened the block that the state has
+            already judged, this one only carries the rest of it */
+            if(http2_connection->continuation == http2_frame->stream_id) { RAISE_NO_ERROR; }
+
+            /* breaks the switch */
+            break;
+
+        default:
+            RAISE_NO_ERROR;
+    }
+
+    switch(state) {
+        case HTTP2_STATE_IDLE:
+            /* a stream that has never been opened is opened by the
+            block of a request and by nothing else at all */
+            if(http2_frame->type == HTTP2_HEADERS) { RAISE_NO_ERROR; }
+            RAISE_ERROR_S(HTTP2_PROTOCOL_ERROR);
+
+        case HTTP2_STATE_RESERVED_LOCAL:
+            /* a stream that this end has reserved through a promise
+            carries a response of its own, the peer only ever bounds
+            what it is allowed to hold or drops it altogether */
+            if(http2_frame->type == HTTP2_RST_STREAM) { RAISE_NO_ERROR; }
+            if(http2_frame->type == HTTP2_WINDOW_UPDATE) { RAISE_NO_ERROR; }
+            RAISE_ERROR_S(HTTP2_PROTOCOL_ERROR);
+
+        case HTTP2_STATE_RESERVED_REMOTE:
+            /* a stream that the peer has reserved is opened by the
+            block of the response that it promised */
+            if(http2_frame->type == HTTP2_HEADERS) { RAISE_NO_ERROR; }
+            if(http2_frame->type == HTTP2_RST_STREAM) { RAISE_NO_ERROR; }
+            RAISE_ERROR_S(HTTP2_PROTOCOL_ERROR);
+
+        case HTTP2_STATE_HALF_CLOSED_REMOTE:
+            /* the peer has said everything it had to say on this
+            stream, so nothing carrying a message is taken from it */
+            if(http2_frame->type == HTTP2_RST_STREAM) { RAISE_NO_ERROR; }
+            if(http2_frame->type == HTTP2_WINDOW_UPDATE) { RAISE_NO_ERROR; }
+            RAISE_ERROR_S(HTTP2_STREAM_CLOSED);
+
+        case HTTP2_STATE_CLOSED:
+            /* a block that names a stream that has already closed is
+            refused by the opening of it instead, the identifiers of
+            the peer are required to be strictly increasing */
+            if(http2_frame->type == HTTP2_HEADERS) { RAISE_NO_ERROR; }
+            if(http2_frame->type == HTTP2_RST_STREAM) { RAISE_NO_ERROR; }
+            if(http2_frame->type == HTTP2_WINDOW_UPDATE) { RAISE_NO_ERROR; }
+            RAISE_ERROR_S(HTTP2_STREAM_CLOSED);
+
+        default:
+            /* a stream that is open, or that only this end has
+            closed, takes everything the peer sends on it */
+            break;
+    }
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
 ERROR_CODE handle_frame_http2_connection(struct http2_connection_t *http2_connection, struct http2_frame_t *http2_frame) {
     /* allocates space for the stream the frame belongs to and for
     the payload once the padding has been removed from it */
@@ -1281,19 +1406,31 @@ ERROR_CODE handle_frame_http2_connection(struct http2_connection_t *http2_connec
         }
     }
 
+    /* the payload of a stream that is no longer open is still
+    accounted against the window of the connection, the peer has
+    already sent it either way and that window is a shared one */
+    if(http2_frame->type == HTTP2_DATA) {
+        http2_connection->receive_window -= (long) http2_frame->length;
+        if(http2_connection->receive_window < 0) { RAISE_ERROR_S(HTTP2_FLOW_CONTROL_ERROR); }
+    }
+
+    /* takes the stream that the frame names and verifies that the
+    frame is one it is allowed to receive in the state it is in, a
+    frame of the connection itself belongs to no stream at all */
+    http2_stream = http2_frame->stream_id == 0
+                       ? NULL
+                       : find_stream_http2_connection(http2_connection, http2_frame->stream_id);
+    if(http2_frame->stream_id != 0) {
+        return_value = _verify_stream_http2_connection(
+            http2_connection,
+            http2_frame,
+            http2_stream
+        );
+        if(IS_ERROR_CODE(return_value)) { RAISE_AGAIN(return_value); }
+    }
+
     switch(http2_frame->type) {
         case HTTP2_DATA:
-            http2_stream = find_stream_http2_connection(http2_connection, http2_frame->stream_id);
-
-            /* the payload of a stream that is no longer open is
-            still accounted against the window of the connection,
-            the peer has already sent it either way */
-            http2_connection->receive_window -= (long) http2_frame->length;
-            if(http2_connection->receive_window < 0) { RAISE_ERROR_S(HTTP2_FLOW_CONTROL_ERROR); }
-
-            if(http2_stream == NULL) { RAISE_ERROR_S(HTTP2_STREAM_CLOSED); }
-            if(http2_stream->end_stream == TRUE) { RAISE_ERROR_S(HTTP2_STREAM_CLOSED); }
-
             http2_stream->receive_window -= (long) http2_frame->length;
             if(http2_stream->receive_window < 0) { RAISE_ERROR_S(HTTP2_FLOW_CONTROL_ERROR); }
 
@@ -1352,7 +1489,6 @@ ERROR_CODE handle_frame_http2_connection(struct http2_connection_t *http2_connec
             /* a header block that arrives for a stream that is
             already open is a trailer section, anything else opens
             a new stream */
-            http2_stream = find_stream_http2_connection(http2_connection, http2_frame->stream_id);
             if(http2_stream == NULL) {
                 return_value = open_stream_http2_connection(
                     http2_connection,
@@ -1474,7 +1610,6 @@ ERROR_CODE handle_frame_http2_connection(struct http2_connection_t *http2_connec
 
             /* the priority of a stream that is not open is simply
             discarded, the tree of this end holds only open ones */
-            http2_stream = find_stream_http2_connection(http2_connection, http2_frame->stream_id);
             if(http2_stream != NULL) {
                 return_value = prioritise_stream_http2_connection(
                     http2_connection,
@@ -1488,15 +1623,10 @@ ERROR_CODE handle_frame_http2_connection(struct http2_connection_t *http2_connec
             break;
 
         case HTTP2_RST_STREAM:
-            /* the reset of a stream that was never open refers to
-            an idle one, which the peer is not allowed to reset */
-            http2_stream = find_stream_http2_connection(http2_connection, http2_frame->stream_id);
-            if(http2_stream == NULL) {
-                if(http2_frame->stream_id > http2_connection->last_stream_id) {
-                    RAISE_ERROR_S(HTTP2_PROTOCOL_ERROR);
-                }
-                RAISE_NO_ERROR;
-            }
+            /* the reset of a stream that the connection no longer
+            holds refers to one that has already closed, so there's
+            nothing left of it to be taken down */
+            if(http2_stream == NULL) { RAISE_NO_ERROR; }
 
             close_stream_http2_connection(http2_connection, http2_stream);
 
@@ -1742,6 +1872,13 @@ ERROR_CODE write_flush_http2(struct connection_t *connection, unsigned char *dat
         RAISE_NO_ERROR;
     }
 
+    /* a stream that this end has reserved through a promise leaves
+    the reservation as soon as the block of the response is written,
+    the peer never says anything at all on such a stream */
+    if(http2_stream->state == HTTP2_STATE_RESERVED_LOCAL) {
+        http2_stream->state = HTTP2_STATE_HALF_CLOSED_REMOTE;
+    }
+
     /* hands the buffer over together with the structure that restores
     the stream once the write of it completes */
     write_connection(
@@ -1844,7 +1981,15 @@ size_t write_end_http2(struct connection_t *connection, char *buffer, size_t siz
     with the block of the headers */
     if(last == TRUE) {
         flags |= HTTP2_FLAG_END_STREAM;
-        if(http2_stream != NULL) { http2_stream->complete = TRUE; }
+        if(http2_stream != NULL) {
+            http2_stream->complete = TRUE;
+
+            /* this end has said everything it had to say, so the
+            stream is only left open for what the peer still owes */
+            if(http2_stream->state == HTTP2_STATE_OPEN) {
+                http2_stream->state = HTTP2_STATE_HALF_CLOSED_LOCAL;
+            }
+        }
     }
 
     /* writes the header of the frame into the space that has been
@@ -1926,7 +2071,15 @@ static ERROR_CODE _flush_http2_connection(struct http2_connection_t *http2_conne
         /* the fragment that closes the message is the last one that
         the stream is going to write, so the stream is done as soon
         as the handler lets go of it */
-        if(http2_pending->last == TRUE && complete == TRUE) { http2_stream->complete = TRUE; }
+        if(http2_pending->last == TRUE && complete == TRUE) {
+            http2_stream->complete = TRUE;
+
+            /* this end has said everything it had to say, so the
+            stream is only left open for what the peer still owes */
+            if(http2_stream->state == HTTP2_STATE_OPEN) {
+                http2_stream->state = HTTP2_STATE_HALF_CLOSED_LOCAL;
+            }
+        }
 
         /* the complete fragment fits in a single frame and none of it
         has gone out yet, so the buffer of the handler travels as it

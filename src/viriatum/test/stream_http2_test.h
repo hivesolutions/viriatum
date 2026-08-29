@@ -137,6 +137,16 @@ const char *test_http2_connection_settings(void);
 const char *test_http2_connection_frames(void);
 
 /**
+ * Tests the state machine of a stream, the frames that each of
+ * the states it goes through takes from the peer and the ones
+ * that are refused in it.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_http2_connection_states(void);
+
+/**
  * Tests that a header block reaches the handler as the very same
  * sequence of callbacks that an HTTP/1.1 message produces.
  *

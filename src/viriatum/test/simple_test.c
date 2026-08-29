@@ -890,10 +890,17 @@ const char *test_template_handler(void) {
 const char *test_quicksort(void) {
     /* allocates space for the template handler */
     size_t list[10] = {2, 4, 1, 2, 3, 5, 5, 3, 4, 1};
+    size_t index;
 
     /* sorts the sequence according to the compare function
     the algorithm to be used in the sorting is the quicksort */
     sort_quicksort((void **) &list, 0, 10, _compare);
+
+    /* the sequence is left in a non decreasing order, the end of
+    it is one past the last element and is never looked at */
+    for(index = 1; index < 10; index++) {
+        V_ASSERT(list[index - 1] <= list[index]);
+    }
 
     /* returns the default value, nothing happened so there's
     nothing to report for this execution */
@@ -1339,6 +1346,7 @@ static struct test_entry_t _simple_entries[] = {
     V_TEST_T(test_http2_connection_window, "http2"),
     V_TEST_T(test_http2_connection_settings, "http2"),
     V_TEST_T(test_http2_connection_frames, "http2"),
+    V_TEST_T(test_http2_connection_states, "http2"),
     V_TEST_T(test_http2_connection_headers, "http2"),
     V_TEST_T(test_http2_connection_fields, "http2"),
     V_TEST_T(test_http2_connection_dispatch, "http2"),

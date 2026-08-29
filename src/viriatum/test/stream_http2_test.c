@@ -546,9 +546,12 @@ const char *test_http2_connection_push(void) {
     V_ASSERT_EQ_U(http2_connection->push_stream_id, 2);
     promised = find_stream_http2_connection(http2_connection, 2);
     V_ASSERT_NOT_NULL(promised);
-    V_ASSERT_EQ_U(promised->state, HTTP2_STATE_RESERVED_LOCAL);
     V_ASSERT_EQ_U(promised->priority.dependency, 1);
     V_ASSERT_EQ_U(http2_connection->count, 2);
+
+    /* the stream leaves the reservation as soon as the block of the
+    response is written on it, which the handler has already done */
+    V_ASSERT_EQ_U(promised->state, HTTP2_STATE_HALF_CLOSED_REMOTE);
 
     /* the stream that has asked is the current one again, the
     handler of it is still writing the response of the request */
@@ -661,16 +664,15 @@ const char *test_http2_connection_window(void) {
     V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
     V_ASSERT_EQ_U(http2_stream->send_window, HTTP2_DEFAULT_WINDOW_SIZE + 2048);
 
-    /* an increment for a stream that has never been opened refers to
-    an idle one, which carries no window at all to be widened */
-    error = update_window_http2_connection(http2_connection, 99, 1024);
-    V_ASSERT_EQ_U(error, HTTP2_PROTOCOL_ERROR);
-
-    /* an increment for a stream that has already been closed is
-    discarded, the peer is allowed to send one that crosses it */
+    /* an increment for a stream that the connection no longer holds
+    is discarded, the peer is allowed to send one that crosses the
+    closing of it and one that is still idle is refused earlier, by
+    the state that the stream is in */
     open_stream_http2_connection(http2_connection, 3, &http2_stream);
     close_stream_http2_connection(http2_connection, http2_stream);
     error = update_window_http2_connection(http2_connection, 3, 1024);
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+    error = update_window_http2_connection(http2_connection, 99, 1024);
     V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
 
     /* takes the stream that is still open again, the closing of
@@ -864,6 +866,332 @@ const char *test_http2_connection_frames(void) {
     V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
 
     _delete_http2_test(context, http2_connection);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_http2_connection_states(void) {
+    /* allocates space for the chain of the connection, for the
+    session and for the frames that drive a stream through the
+    states that the specification describes */
+    struct test_context_t *context;
+    struct http2_connection_t *http2_connection;
+    struct http2_stream_t *http2_stream;
+    struct http2_frame_t http2_frame;
+    unsigned char block[256];
+    unsigned char payload[16];
+    char *headers;
+    size_t count;
+    ERROR_CODE error;
+
+    /* gathers the number of allocations that are outstanding so that
+    the frames that are refused may be verified to release theirs */
+    size_t allocated = ALLOCATIONS;
+
+    _create_http2_test(&context, &http2_connection);
+
+    /* a stream that has never been opened only ever takes the block
+    that opens it, everything else that carries or bounds a message
+    is a violation of the protocol by the peer */
+    http2_frame.flags = 0x00;
+    http2_frame.stream_id = 1;
+    http2_frame.payload = payload;
+
+    http2_frame.type = HTTP2_DATA;
+    http2_frame.length = 4;
+    error = handle_frame_http2_connection(http2_connection, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_PROTOCOL_ERROR);
+
+    http2_frame.type = HTTP2_CONTINUATION;
+    http2_frame.length = 0;
+    error = handle_frame_http2_connection(http2_connection, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_PROTOCOL_ERROR);
+
+    http2_frame.type = HTTP2_RST_STREAM;
+    http2_frame.length = 4;
+    encode_number_http2(payload, HTTP2_CANCEL);
+    error = handle_frame_http2_connection(http2_connection, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_PROTOCOL_ERROR);
+
+    http2_frame.type = HTTP2_WINDOW_UPDATE;
+    encode_number_http2(payload, 1024);
+    error = handle_frame_http2_connection(http2_connection, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_PROTOCOL_ERROR);
+
+    /* the place of a stream in the tree may be described before it
+    is opened, and a frame of a type that this end does not know is
+    ignored, which is what allows the protocol to be extended */
+    http2_frame.type = HTTP2_PRIORITY;
+    http2_frame.length = HTTP2_PRIORITY_SIZE;
+    encode_number_http2(payload, 0);
+    payload[4] = 15;
+    error = handle_frame_http2_connection(http2_connection, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+
+    http2_frame.type = 0xfe;
+    http2_frame.length = 0;
+    error = handle_frame_http2_connection(http2_connection, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+
+    /* the block of a request opens the stream, which from that point
+    on takes everything the peer sends on it */
+    http2_frame.type = HTTP2_HEADERS;
+    http2_frame.flags = HTTP2_FLAG_END_HEADERS;
+    http2_frame.length = _request_http2_test(block, sizeof(block), "/states");
+    http2_frame.payload = block;
+    error = handle_frame_http2_connection(http2_connection, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+
+    http2_stream = find_stream_http2_connection(http2_connection, 1);
+    V_ASSERT_NOT_NULL(http2_stream);
+    V_ASSERT_EQ_U(http2_stream->state, HTTP2_STATE_OPEN);
+
+    http2_frame.type = HTTP2_DATA;
+    http2_frame.flags = 0x00;
+    http2_frame.length = 4;
+    memcpy(payload, "body", 4);
+    http2_frame.payload = payload;
+    error = handle_frame_http2_connection(http2_connection, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+
+    /* the payload that closes the message leaves the stream closed
+    on the side of the peer, which has nothing more to say on it */
+    http2_frame.flags = HTTP2_FLAG_END_STREAM;
+    error = handle_frame_http2_connection(http2_connection, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+
+    http2_stream = find_stream_http2_connection(http2_connection, 1);
+    V_ASSERT_NOT_NULL(http2_stream);
+    V_ASSERT_EQ_U(http2_stream->state, HTTP2_STATE_HALF_CLOSED_REMOTE);
+
+    /* neither the payload of a message nor a block of headers is
+    taken from a peer that has already closed its side */
+    http2_frame.flags = 0x00;
+    error = handle_frame_http2_connection(http2_connection, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_STREAM_CLOSED);
+
+    http2_frame.type = HTTP2_HEADERS;
+    http2_frame.flags = HTTP2_FLAG_END_HEADERS | HTTP2_FLAG_END_STREAM;
+    http2_frame.length = _request_http2_test(block, sizeof(block), "/again");
+    http2_frame.payload = block;
+    error = handle_frame_http2_connection(http2_connection, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_STREAM_CLOSED);
+
+    /* the widening of the window is taken in that state, this end
+    may still be writing the response of the message */
+    http2_frame.type = HTTP2_WINDOW_UPDATE;
+    http2_frame.flags = 0x00;
+    http2_frame.length = 4;
+    encode_number_http2(payload, 1024);
+    http2_frame.payload = payload;
+    error = handle_frame_http2_connection(http2_connection, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+
+    /* the dropping of the stream closes it, from that point on the
+    connection holds nothing at all of it */
+    http2_frame.type = HTTP2_RST_STREAM;
+    encode_number_http2(payload, HTTP2_CANCEL);
+    error = handle_frame_http2_connection(http2_connection, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+    V_ASSERT_NULL(find_stream_http2_connection(http2_connection, 1));
+
+    /* a stream that has closed still takes the frames that refer to
+    it without carrying a message, the peer may well have sent them
+    before the closing of it reached that end */
+    http2_frame.type = HTTP2_WINDOW_UPDATE;
+    encode_number_http2(payload, 1024);
+    error = handle_frame_http2_connection(http2_connection, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+
+    http2_frame.type = HTTP2_RST_STREAM;
+    encode_number_http2(payload, HTTP2_CANCEL);
+    error = handle_frame_http2_connection(http2_connection, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+
+    http2_frame.type = HTTP2_DATA;
+    error = handle_frame_http2_connection(http2_connection, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_STREAM_CLOSED);
+
+    /* a block that names a stream that has already closed is refused
+    by the opening of it, the identifiers of the peer only ever grow */
+    http2_frame.type = HTTP2_HEADERS;
+    http2_frame.flags = HTTP2_FLAG_END_HEADERS;
+    http2_frame.length = _request_http2_test(block, sizeof(block), "/closed");
+    http2_frame.payload = block;
+    error = handle_frame_http2_connection(http2_connection, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_PROTOCOL_ERROR);
+
+    _delete_http2_test(context, http2_connection);
+
+    /* a stream that this end has reserved through a promise carries
+    a response of its own, so the peer only ever bounds what it is
+    allowed to hold on it or drops it altogether */
+    _create_http2_test(&context, &http2_connection);
+
+    http2_frame.type = HTTP2_HEADERS;
+    http2_frame.flags = HTTP2_FLAG_END_HEADERS | HTTP2_FLAG_END_STREAM;
+    http2_frame.stream_id = 1;
+    http2_frame.length = _request_http2_test(block, sizeof(block), "/index.html");
+    http2_frame.payload = block;
+    error = handle_frame_http2_connection(http2_connection, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+
+    http2_stream = find_stream_http2_connection(http2_connection, 1);
+    V_ASSERT_NOT_NULL(http2_stream);
+    error = push_stream_http2_connection(http2_connection, http2_stream, "/style.css");
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+
+    /* the handler of these tests answers nothing at all, so the
+    stream that the promise reserves is still waiting for a block */
+    http2_stream = find_stream_http2_connection(http2_connection, 2);
+    V_ASSERT_NOT_NULL(http2_stream);
+    V_ASSERT_EQ_U(http2_stream->state, HTTP2_STATE_RESERVED_LOCAL);
+
+    http2_frame.type = HTTP2_DATA;
+    http2_frame.flags = 0x00;
+    http2_frame.stream_id = 2;
+    http2_frame.length = 4;
+    http2_frame.payload = payload;
+    error = handle_frame_http2_connection(http2_connection, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_PROTOCOL_ERROR);
+
+    http2_frame.type = HTTP2_WINDOW_UPDATE;
+    encode_number_http2(payload, 1024);
+    error = handle_frame_http2_connection(http2_connection, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+
+    /* the peer drops the stream that has been promised to it, one
+    that this end has handed out and that has already closed */
+    http2_frame.type = HTTP2_RST_STREAM;
+    encode_number_http2(payload, HTTP2_CANCEL);
+    error = handle_frame_http2_connection(http2_connection, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+    V_ASSERT_NULL(find_stream_http2_connection(http2_connection, 2));
+
+    http2_frame.type = HTTP2_WINDOW_UPDATE;
+    encode_number_http2(payload, 1024);
+    error = handle_frame_http2_connection(http2_connection, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+
+    http2_frame.type = HTTP2_DATA;
+    error = handle_frame_http2_connection(http2_connection, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_STREAM_CLOSED);
+
+    /* an even identifier that this end has not handed out yet names
+    a stream that is still idle, and the peer is never the one that
+    opens such a stream, only the pushes of this end do */
+    http2_frame.stream_id = 4;
+    error = handle_frame_http2_connection(http2_connection, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_PROTOCOL_ERROR);
+
+    http2_frame.type = HTTP2_HEADERS;
+    http2_frame.flags = HTTP2_FLAG_END_HEADERS | HTTP2_FLAG_END_STREAM;
+    http2_frame.length = _request_http2_test(block, sizeof(block), "/even");
+    http2_frame.payload = block;
+    error = handle_frame_http2_connection(http2_connection, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_PROTOCOL_ERROR);
+
+    /* the state that a promise of the peer leaves a stream in is one
+    that a server never reaches, only a client that receives such a
+    promise does, the rules of it are pinned here all the same */
+    http2_stream = find_stream_http2_connection(http2_connection, 1);
+    V_ASSERT_NOT_NULL(http2_stream);
+    http2_stream->state = HTTP2_STATE_RESERVED_REMOTE;
+
+    http2_frame.type = HTTP2_DATA;
+    http2_frame.flags = 0x00;
+    http2_frame.stream_id = 1;
+    http2_frame.length = 4;
+    http2_frame.payload = payload;
+    error = handle_frame_http2_connection(http2_connection, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_PROTOCOL_ERROR);
+
+    http2_frame.type = HTTP2_RST_STREAM;
+    encode_number_http2(payload, HTTP2_CANCEL);
+    error = handle_frame_http2_connection(http2_connection, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+
+    _delete_http2_test(context, http2_connection);
+
+    /* a stream that only this end has closed still takes what the
+    peer owes on it, the message of it is not over yet */
+    _create_http2_test(&context, &http2_connection);
+
+    http2_frame.type = HTTP2_HEADERS;
+    http2_frame.flags = HTTP2_FLAG_END_HEADERS;
+    http2_frame.stream_id = 1;
+    http2_frame.length = _request_http2_test(block, sizeof(block), "/upload");
+    http2_frame.payload = block;
+    error = handle_frame_http2_connection(http2_connection, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+
+    /* answers the message before the peer is done sending it, which
+    is what leaves the stream closed on this end alone */
+    http2_stream = find_stream_http2_connection(http2_connection, 1);
+    V_ASSERT_NOT_NULL(http2_stream);
+    context->http_connection->request = http2_stream->request;
+
+    headers = (char *) MALLOC(VIRIATUM_HTTP_SIZE);
+    count = write_status_http2(
+        context->connection,
+        headers,
+        VIRIATUM_HTTP_SIZE,
+        HTTP20,
+        204,
+        "No Content",
+        KEEP_ALIVE
+    );
+    count = write_end_http2(context->connection, headers, VIRIATUM_HTTP_SIZE, count, TRUE);
+    error = write_flush_http2(context->connection, (unsigned char *) headers, count, NULL, NULL);
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT_EQ_U(http2_stream->state, HTTP2_STATE_HALF_CLOSED_LOCAL);
+
+    /* the payload that the peer still owes is taken just the same,
+    only the side of this end has been closed */
+    http2_frame.type = HTTP2_DATA;
+    http2_frame.flags = 0x00;
+    http2_frame.length = 4;
+    memcpy(payload, "body", 4);
+    http2_frame.payload = payload;
+    error = handle_frame_http2_connection(http2_connection, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+
+    _delete_http2_test(context, http2_connection);
+
+    /* a block that closes the message on the very frame that opens
+    it is still assembled over the frames that follow, the state the
+    stream has already reached must not refuse them */
+    _create_http2_test(&context, &http2_connection);
+
+    count = _request_http2_test(block, sizeof(block), "/split");
+
+    http2_frame.type = HTTP2_HEADERS;
+    http2_frame.flags = HTTP2_FLAG_END_STREAM;
+    http2_frame.stream_id = 1;
+    http2_frame.length = count / 2;
+    http2_frame.payload = block;
+    error = handle_frame_http2_connection(http2_connection, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+
+    http2_stream = find_stream_http2_connection(http2_connection, 1);
+    V_ASSERT_NOT_NULL(http2_stream);
+    V_ASSERT_EQ_U(http2_stream->state, HTTP2_STATE_HALF_CLOSED_REMOTE);
+
+    http2_frame.type = HTTP2_CONTINUATION;
+    http2_frame.flags = HTTP2_FLAG_END_HEADERS;
+    http2_frame.length = count - count / 2;
+    http2_frame.payload = &block[count / 2];
+    error = handle_frame_http2_connection(http2_connection, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+    V_ASSERT_EQ_S(_record.path, "/split");
+
+    _delete_http2_test(context, http2_connection);
+
+    /* nothing at all is left behind by the frames that have been
+    refused nor by the streams they have named */
+    V_ASSERT_EQ_U(ALLOCATIONS, allocated);
 
     /* returns the default value, nothing happened so there's
     nothing to report for this execution */

@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * The order a client asks for now decides which stream writes first - [#50](https://github.com/hivesolutions/viriatum/issues/50)
 * Build option that leaves HTTP/2 out for the smaller targets - [#50](https://github.com/hivesolutions/viriatum/issues/50)
 * Conformance and interoperability of HTTP/2 are now measured on every change - [#50](https://github.com/hivesolutions/viriatum/issues/50)
+* A stream of HTTP/2 now refuses what it is not allowed to receive at each point of its life - [#50](https://github.com/hivesolutions/viriatum/issues/50)
 * Continuous integration now builds with clang 22 and gcc 16
 * Scalable vector versions of the web illustrations, logos and UI assets
 
@@ -41,6 +42,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * A client that closes a connection now still receives the reason the server gives for it
 * The certificate that ships is accepted again by a current library
 * The project of Xcode builds again and carries every source of the tree
+* A window widened for a promised stream no longer takes the connection down
+* Sorting a sequence no longer reads past the end of it
 
 ## [0.5.0] - 2026-08-28
 
