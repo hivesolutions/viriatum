@@ -1585,6 +1585,14 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                     * is needed for the annoying case of recieving a response to a HEAD
                     * request */
                 if(http_settings->on_headers_complete) {
+                    /* saves the size that the message announces before the
+                    handler is told that the headers are over, the parsing
+                    of the payload only saves it further down and the
+                    handler would otherwise be told the size of the message
+                    that came before this one on the very same connection */
+                    http_parser->_content_length = http_parser->content_length > 0
+                                                       ? (size_t) http_parser->content_length
+                                                       : 0;
                     update_request_http_parser(http_parser);
                     switch(http_settings->on_headers_complete(http_parser->request)) {
                         case 0:

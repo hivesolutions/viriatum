@@ -318,6 +318,15 @@ const char *test_handler_proxy_upstream(void) {
         "\r\n"
         "gone!";
 
+    /* the headers of a response whose payload has not arrived yet,
+    the size it announces differs from the one of the response above
+    so that a value left over from it is told apart */
+    static const char *headers =
+        "HTTP/1.1 200 OK\r\n"
+        "Content-Type: text/html\r\n"
+        "Content-Length: 9\r\n"
+        "\r\n";
+
     _create_handler_proxy_test(&context, &handler_proxy_context, &connection_c);
 
     /* two responses travel on the connection of the upstream one
@@ -357,6 +366,20 @@ const char *test_handler_proxy_upstream(void) {
         it no longer affects the client of the proxy */
         V_ASSERT(handler_proxy_context->pending == FALSE);
     }
+
+    /* the size that a message announces is already saved when the
+    handler is told that the headers are over, so a message whose
+    payload has not arrived yet still carries it, one that is only
+    saved by the parsing of the payload would carry the size of the
+    message that came before it on the very same connection */
+    handler_proxy_context->pending = TRUE;
+    process_data_http_parser(
+        handler_proxy_context->http_parser,
+        handler_proxy_context->http_settings,
+        (unsigned char *) headers,
+        strlen(headers)
+    );
+    V_ASSERT_EQ_U(handler_proxy_context->http_parser->request->content_length, 9);
 
     _delete_handler_proxy_test(context, handler_proxy_context, connection_c);
 
