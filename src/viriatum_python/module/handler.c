@@ -63,13 +63,11 @@ static void _decode_handler_python(char *value) {
     percent escapes, any other character is copied unchanged */
     while(value[read] != '\0') {
         if(value[read] == '%' && isxdigit((unsigned char) value[read + 1]) &&
-            isxdigit((unsigned char) value[read + 2])) {
+           isxdigit((unsigned char) value[read + 2])) {
             first = value[read + 1];
             second = value[read + 2];
-            value[write] = (char) (
-                (isdigit((unsigned char) first) ? first - '0' : (toupper(first) - 'A') + 10) * 16 +
-                (isdigit((unsigned char) second) ? second - '0' : (toupper(second) - 'A') + 10)
-            );
+            value[write] = (char) ((isdigit((unsigned char) first) ? first - '0' : (toupper(first) - 'A') + 10) * 16 +
+                                   (isdigit((unsigned char) second) ? second - '0' : (toupper(second) - 'A') + 10));
             read += 3;
         } else {
             value[write] = value[read];
@@ -221,7 +219,7 @@ ERROR_CODE delete_handler_python_context(struct handler_python_context_t *handle
     /* releases the field of an incomplete header pair, one that has
     never been closed by the corresponding value callback */
     if(handler_python_context->header_count < VIRIATUM_PYTHON_MAX_HEADERS &&
-        handler_python_context->header_fields[handler_python_context->header_count] != NULL) {
+       handler_python_context->header_fields[handler_python_context->header_count] != NULL) {
         FREE(handler_python_context->header_fields[handler_python_context->header_count]);
     }
 
@@ -430,8 +428,7 @@ ERROR_CODE body_callback_handler_python(struct http_request_t *http_request, con
     /* grows the buffer geometrically whenever the payload no longer fits
     it, this keeps the accumulation linear over the various callbacks */
     if(handler_python_context->body_size + data_size > handler_python_context->body_capacity) {
-        body_capacity = handler_python_context->body_capacity == 0 ?
-            VIRIATUM_PYTHON_BODY_CAPACITY : handler_python_context->body_capacity;
+        body_capacity = handler_python_context->body_capacity == 0 ? VIRIATUM_PYTHON_BODY_CAPACITY : handler_python_context->body_capacity;
         while(body_capacity < handler_python_context->body_size + data_size) {
             body_capacity *= 2;
         }
@@ -548,7 +545,10 @@ static void _set_environ_handler_python(PyObject *environ_map, const char *key, 
     /* creates the unicode object from the provided value using the latin 1
     codec, as mandated by the WSGI specification for the native strings */
     object = PyUnicode_DecodeLatin1(value, strlen(value), "replace");
-    if(object == NULL) { PyErr_Clear(); return; }
+    if(object == NULL) {
+        PyErr_Clear();
+        return;
+    }
 
     /* in case a value is already set under the key the two are joined with
     a comma, as required for the repeated headers of a request, otherwise
@@ -557,7 +557,10 @@ static void _set_environ_handler_python(PyObject *environ_map, const char *key, 
     if(current != NULL) {
         joined = PyUnicode_FromFormat("%U, %U", current, object);
         Py_DECREF(object);
-        if(joined == NULL) { PyErr_Clear(); return; }
+        if(joined == NULL) {
+            PyErr_Clear();
+            return;
+        }
         object = joined;
     }
 
@@ -582,8 +585,7 @@ static void _set_environ_header_handler_python(PyObject *environ_map, const char
     /* converts the header name into the upper case underscore separated
     form that is used by the WSGI environ keys */
     for(index = 0; index < field_size; index++) {
-        name[index] = field[index] == '-' ?
-            '_' : (char) toupper((unsigned char) field[index]);
+        name[index] = field[index] == '-' ? '_' : (char) toupper((unsigned char) field[index]);
     }
     name[field_size] = '\0';
 
@@ -634,11 +636,8 @@ static PyObject *_build_environ_handler_python(
 
     /* splits the url around the get parameters divisor, the first part
     is the path and the remaining one the query string */
-    pointer = handler_python_context->url == NULL ?
-        NULL : strchr((char *) handler_python_context->url, '?');
-    path_size = handler_python_context->url == NULL ? 0 :
-        (pointer == NULL ? strlen((char *) handler_python_context->url) :
-        (size_t) (pointer - (char *) handler_python_context->url));
+    pointer = handler_python_context->url == NULL ? NULL : strchr((char *) handler_python_context->url, '?');
+    path_size = handler_python_context->url == NULL ? 0 : (pointer == NULL ? strlen((char *) handler_python_context->url) : (size_t) (pointer - (char *) handler_python_context->url));
     if(path_size >= VIRIATUM_MAX_URL_SIZE) { path_size = VIRIATUM_MAX_URL_SIZE - 1; }
     if(path_size > 0) { memcpy(path, handler_python_context->url, path_size); }
     path[path_size] = '\0';
@@ -686,7 +685,10 @@ static PyObject *_build_environ_handler_python(
     /* creates the input stream from the payload of the request using a
     bytes io object, this provides the complete file like interface */
     io_module = PyImport_ImportModule("io");
-    if(io_module == NULL) { Py_DECREF(environ_map); return NULL; }
+    if(io_module == NULL) {
+        Py_DECREF(environ_map);
+        return NULL;
+    }
     object = PyObject_CallMethod(
         io_module,
         "BytesIO",
@@ -695,7 +697,10 @@ static PyObject *_build_environ_handler_python(
         (Py_ssize_t) handler_python_context->body_size
     );
     Py_DECREF(io_module);
-    if(object == NULL) { Py_DECREF(environ_map); return NULL; }
+    if(object == NULL) {
+        Py_DECREF(environ_map);
+        return NULL;
+    }
     PyDict_SetItemString(environ_map, "wsgi.input", object);
     Py_DECREF(object);
 
@@ -820,7 +825,7 @@ static PyObject *_start_response_handler_python(PyObject *self, PyObject *args) 
         of the header, as they would allow the response to be split by
         an application that reflects data received from the client */
         if(_is_valid_handler_python(name_value) == FALSE ||
-            _is_valid_handler_python(value_value) == FALSE) {
+           _is_valid_handler_python(value_value) == FALSE) {
             Py_DECREF(name);
             Py_DECREF(value);
             PyErr_SetString(PyExc_ValueError, "header carries a control character");
@@ -919,8 +924,7 @@ ERROR_CODE _send_response_handler_python(struct http_request_t *http_request) {
     /* builds the environ map for the request and creates the start
     response callable carrying the context of the request, the
     application is not called for a refused request */
-    environ_map = handler_python_context->overflow == TRUE ?
-        NULL : _build_environ_handler_python(handler_python_context, http_request, connection);
+    environ_map = handler_python_context->overflow == TRUE ? NULL : _build_environ_handler_python(handler_python_context, http_request, connection);
     if(handler_python_context->overflow == TRUE) {
         result = NULL;
     } else if(environ_map == NULL) {
@@ -947,8 +951,7 @@ ERROR_CODE _send_response_handler_python(struct http_request_t *http_request) {
     if(result == NULL && handler_python_context->overflow == TRUE) {
         V_WARNING_F(
             "Refused oversized request %s\n",
-            handler_python_context->url == NULL ?
-                (unsigned char *) "" : handler_python_context->url
+            handler_python_context->url == NULL ? (unsigned char *) "" : handler_python_context->url
         );
     } else if(result == NULL) {
         _report_handler_python();
@@ -956,8 +959,7 @@ ERROR_CODE _send_response_handler_python(struct http_request_t *http_request) {
         handler_python_context->response_header_count = 0;
         V_WARNING_F(
             "Problem handling request %s\n",
-            handler_python_context->url == NULL ?
-                (unsigned char *) "" : handler_python_context->url
+            handler_python_context->url == NULL ? (unsigned char *) "" : handler_python_context->url
         );
     } else {
         /* joins the complete set of items of the resulting iterable into
@@ -984,7 +986,11 @@ ERROR_CODE _send_response_handler_python(struct http_request_t *http_request) {
         required by the WSGI specification for resource cleanup */
         if(PyObject_HasAttrString(result, "close")) {
             PyObject *closed = PyObject_CallMethod(result, "close", NULL);
-            if(closed == NULL) { PyErr_Clear(); } else { Py_DECREF(closed); }
+            if(closed == NULL) {
+                PyErr_Clear();
+            } else {
+                Py_DECREF(closed);
+            }
         }
         Py_DECREF(result);
     }
@@ -993,8 +999,7 @@ ERROR_CODE _send_response_handler_python(struct http_request_t *http_request) {
     the headers set by the application, these are unbounded in size and
     so they must be accounted for in the allocation of the buffer */
     body_total = handler_python_context->written_size + (size_t) body_size;
-    headers_size = handler_python_context->status_message == NULL ?
-        0 : strlen((char *) handler_python_context->status_message);
+    headers_size = handler_python_context->status_message == NULL ? 0 : strlen((char *) handler_python_context->status_message);
     for(index = 0; index < handler_python_context->response_header_count; index++) {
         headers_size += strlen((char *) handler_python_context->response_headers[index]) + 2;
     }
@@ -1014,8 +1019,7 @@ ERROR_CODE _send_response_handler_python(struct http_request_t *http_request) {
         buffer_size,
         http_request->version,
         handler_python_context->status_code,
-        handler_python_context->status_message == NULL ?
-            "Internal Server Error" : (char *) handler_python_context->status_message,
+        handler_python_context->status_message == NULL ? "Internal Server Error" : (char *) handler_python_context->status_message,
         http_request->flags & FLAG_KEEP_ALIVE ? KEEP_ALIVE : KEEP_CLOSE
     );
 

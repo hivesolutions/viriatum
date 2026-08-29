@@ -284,7 +284,7 @@ const char *test_handler_default_persistence(void) {
         "Connection: close\r\n",
         "Connection: keep-alive\r\n"
     };
-    static const size_t closings[] = { 0, 1, 1, 0 };
+    static const size_t closings[] = {0, 1, 1, 0};
 
     /* the most recent version of the protocol keeps a connection
     alive unless it is closed on purpose and the older one does the
@@ -326,4 +326,3 @@ const char *test_handler_default_persistence(void) {
     nothing to report for this execution */
     return NULL;
 }
-

@@ -78,8 +78,9 @@ ERROR_CODE delete_loop_python(struct loop_python_t *loop_python) {
     of them is ever going to be advanced once the loop is closed */
     if(loop_python->loop != NULL) {
         tasks = PyObject_CallMethod(loop_python->module, "all_tasks", "O", loop_python->loop);
-        if(tasks == NULL) { _clear_loop_python(); }
-        else {
+        if(tasks == NULL) {
+            _clear_loop_python();
+        } else {
             /* the set of tasks is not a sequence and so it must be
             converted into one before being iterated, both references
             are released as the fast variant creates a new object */
@@ -175,10 +176,16 @@ double time_loop_python(struct loop_python_t *loop_python) {
     the timers scheduled in it are measured against */
     PyObject *result = PyObject_CallMethod(loop_python->loop, "time", NULL);
     double value;
-    if(result == NULL) { _clear_loop_python(); return 0.0; }
+    if(result == NULL) {
+        _clear_loop_python();
+        return 0.0;
+    }
     value = PyFloat_AsDouble(result);
     Py_DECREF(result);
-    if(PyErr_Occurred()) { _clear_loop_python(); return 0.0; }
+    if(PyErr_Occurred()) {
+        _clear_loop_python();
+        return 0.0;
+    }
     return value;
 }
 
@@ -192,16 +199,26 @@ ERROR_CODE run_once_loop_python(struct loop_python_t *loop_python) {
     callbacks, this is what makes the run below advance the loop by
     exactly one iteration instead of blocking on its own selector */
     stop = PyObject_GetAttrString(loop_python->loop, "stop");
-    if(stop == NULL) { _clear_loop_python(); RAISE_NO_ERROR; }
+    if(stop == NULL) {
+        _clear_loop_python();
+        RAISE_NO_ERROR;
+    }
     result = PyObject_CallMethod(loop_python->loop, "call_soon", "O", stop);
     Py_DECREF(stop);
-    if(result == NULL) { _clear_loop_python(); RAISE_NO_ERROR; }
+    if(result == NULL) {
+        _clear_loop_python();
+        RAISE_NO_ERROR;
+    }
     Py_DECREF(result);
 
     /* runs the loop until the stopping callback above is reached, no
     blocking happens as the ready queue is never empty */
     result = PyObject_CallMethod(loop_python->loop, "run_forever", NULL);
-    if(result == NULL) { _clear_loop_python(); } else { Py_DECREF(result); }
+    if(result == NULL) {
+        _clear_loop_python();
+    } else {
+        Py_DECREF(result);
+    }
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -216,10 +233,16 @@ size_t pending_loop_python(struct loop_python_t *loop_python) {
     /* retrieves the complete set of tasks that are still pending in
     the loop, the done ones are never part of the resulting set */
     tasks = PyObject_CallMethod(loop_python->module, "all_tasks", "O", loop_python->loop);
-    if(tasks == NULL) { _clear_loop_python(); return 0; }
+    if(tasks == NULL) {
+        _clear_loop_python();
+        return 0;
+    }
     count = PyObject_Length(tasks);
     Py_DECREF(tasks);
-    if(count < 0) { _clear_loop_python(); return 0; }
+    if(count < 0) {
+        _clear_loop_python();
+        return 0;
+    }
 
     /* returns the number of tasks that are still pending */
     return (size_t) count;
@@ -248,7 +271,10 @@ ERROR_CODE resolve_future_loop_python(PyObject *future, PyObject *result) {
     the associated task has been cancelled in the meantime, nothing
     may be set on it (that would raise an invalid state error) */
     done = PyObject_CallMethod(future, "done", NULL);
-    if(done == NULL) { _clear_loop_python(); RAISE_NO_ERROR; }
+    if(done == NULL) {
+        _clear_loop_python();
+        RAISE_NO_ERROR;
+    }
     is_done = PyObject_IsTrue(done);
     Py_DECREF(done);
     if(is_done != 0) { RAISE_NO_ERROR; }
@@ -256,7 +282,11 @@ ERROR_CODE resolve_future_loop_python(PyObject *future, PyObject *result) {
     /* resolves the future with the provided result, waking up the task
     that is waiting on it on the next iteration of the loop */
     resolved = PyObject_CallMethod(future, "set_result", "O", result);
-    if(resolved == NULL) { _clear_loop_python(); } else { Py_DECREF(resolved); }
+    if(resolved == NULL) {
+        _clear_loop_python();
+    } else {
+        Py_DECREF(resolved);
+    }
 
     /* raises no error */
     RAISE_NO_ERROR;

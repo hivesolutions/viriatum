@@ -61,13 +61,11 @@ static void _decode_handler_asgi(char *value) {
     percent escapes, any other character is copied unchanged */
     while(value[read] != '\0') {
         if(value[read] == '%' && isxdigit((unsigned char) value[read + 1]) &&
-            isxdigit((unsigned char) value[read + 2])) {
+           isxdigit((unsigned char) value[read + 2])) {
             first = value[read + 1];
             second = value[read + 2];
-            value[write] = (char) (
-                (isdigit((unsigned char) first) ? first - '0' : (toupper(first) - 'A') + 10) * 16 +
-                (isdigit((unsigned char) second) ? second - '0' : (toupper(second) - 'A') + 10)
-            );
+            value[write] = (char) ((isdigit((unsigned char) first) ? first - '0' : (toupper(first) - 'A') + 10) * 16 +
+                                   (isdigit((unsigned char) second) ? second - '0' : (toupper(second) - 'A') + 10));
             read += 3;
         } else {
             value[write] = value[read];
@@ -154,7 +152,7 @@ static PyObject *_receive_handler_asgi(PyObject *self, PyObject *args) {
     /* in case an event is already queued it is used to resolve the
     future immediately, no suspension of the application happens */
     if(handler_asgi_context->events != NULL &&
-        PyList_Size(handler_asgi_context->events) > 0) {
+       PyList_Size(handler_asgi_context->events) > 0) {
         event = PyList_GetItem(handler_asgi_context->events, 0);
         Py_INCREF(event);
         if(PySequence_DelItem(handler_asgi_context->events, 0) < 0) { PyErr_Clear(); }
@@ -411,7 +409,10 @@ static PyObject *_send_handler_asgi(PyObject *self, PyObject *args) {
         reach the wire as a zero code */
         object = PyDict_GetItemString(message, "status");
         status_code = object == NULL ? -1 : PyLong_AsLong(object);
-        if(PyErr_Occurred()) { PyErr_Clear(); status_code = -1; }
+        if(PyErr_Occurred()) {
+            PyErr_Clear();
+            status_code = -1;
+        }
         if(status_code < 100 || status_code > 599) {
             Py_DECREF(future);
             PyErr_SetString(PyExc_ValueError, "status must be a valid code");
@@ -429,14 +430,20 @@ static PyObject *_send_handler_asgi(PyObject *self, PyObject *args) {
         application storing them as complete header lines */
         headers = PyDict_GetItemString(message, "headers");
         count = headers == NULL ? 0 : PySequence_Length(headers);
-        if(count < 0) { PyErr_Clear(); count = 0; }
+        if(count < 0) {
+            PyErr_Clear();
+            count = 0;
+        }
         for(index = 0; index < count; index++) {
             /* in case the maximum number of headers has been reached the
             remaining ones must be discarded (avoids overflow) */
             if(handler_asgi_context->response_header_count >= VIRIATUM_ASGI_MAX_HEADERS) { break; }
 
             header = PySequence_GetItem(headers, index);
-            if(header == NULL) { Py_DECREF(future); return NULL; }
+            if(header == NULL) {
+                Py_DECREF(future);
+                return NULL;
+            }
             name = PySequence_GetItem(header, 0);
             value = PySequence_GetItem(header, 1);
             Py_DECREF(header);
@@ -450,7 +457,7 @@ static PyObject *_send_handler_asgi(PyObject *self, PyObject *args) {
             /* the specification defines both the name and the value of
             a header as byte strings, no encoding is ever assumed */
             if(PyBytes_AsStringAndSize(name, &name_value, &name_size) < 0 ||
-                PyBytes_AsStringAndSize(value, &value_value, &value_size) < 0) {
+               PyBytes_AsStringAndSize(value, &value_value, &value_size) < 0) {
                 Py_DECREF(name);
                 Py_DECREF(value);
                 Py_DECREF(future);
@@ -461,7 +468,7 @@ static PyObject *_send_handler_asgi(PyObject *self, PyObject *args) {
             value of the header, as they would allow the response to be
             split by an application that reflects received data */
             if(_is_valid_handler_asgi(name_value, (size_t) name_size) == FALSE ||
-                _is_valid_handler_asgi(value_value, (size_t) value_size) == FALSE) {
+               _is_valid_handler_asgi(value_value, (size_t) value_size) == FALSE) {
                 Py_DECREF(name);
                 Py_DECREF(value);
                 Py_DECREF(future);
@@ -693,7 +700,7 @@ ERROR_CODE delete_handler_asgi_context(struct handler_asgi_context_t *handler_as
     /* releases the field of an incomplete header pair, one that has
     never been closed by the corresponding value callback */
     if(handler_asgi_context->header_count < VIRIATUM_ASGI_MAX_HEADERS &&
-        handler_asgi_context->header_fields[handler_asgi_context->header_count] != NULL) {
+       handler_asgi_context->header_fields[handler_asgi_context->header_count] != NULL) {
         FREE(handler_asgi_context->header_fields[handler_asgi_context->header_count]);
     }
 
@@ -740,8 +747,7 @@ static PyObject *_invoke_handler_asgi(struct handler_asgi_t *handler_asgi, PyObj
 static const char *_version_handler_asgi(struct handler_asgi_t *handler_asgi) {
     /* the version reported in the scope is the one of the interface
     that is being used for the calling of the application */
-    return handler_asgi->double_callable == TRUE ?
-        VIRIATUM_ASGI_VERSION_LEGACY : VIRIATUM_ASGI_VERSION;
+    return handler_asgi->double_callable == TRUE ? VIRIATUM_ASGI_VERSION_LEGACY : VIRIATUM_ASGI_VERSION;
 }
 
 ERROR_CODE register_handler_asgi(struct service_t *service, PyObject *application, struct loop_python_t *loop_python, char double_callable) {
@@ -856,15 +862,18 @@ static ERROR_CODE _wait_lifespan_handler_asgi(struct handler_asgi_t *handler_asg
         if(elapsed >= VIRIATUM_ASGI_LIFESPAN_TIMEOUT) { break; }
         if(*state != 0) { RAISE_NO_ERROR; }
         if(IS_ERROR_CODE(run_slice_loop_python(
-            handler_asgi->loop_python,
-            VIRIATUM_ASGI_LIFESPAN_SLICE
-        ))) {
+               handler_asgi->loop_python,
+               VIRIATUM_ASGI_LIFESPAN_SLICE
+           ))) {
             V_WARNING_F("Problem advancing the loop: %s\n", (char *) GET_ERROR());
             RAISE_NO_ERROR;
         }
         if(*state != 0) { RAISE_NO_ERROR; }
         done = PyObject_CallMethod(handler_asgi->lifespan_context->task, "done", NULL);
-        if(done == NULL) { PyErr_Clear(); break; }
+        if(done == NULL) {
+            PyErr_Clear();
+            break;
+        }
         is_done = PyObject_IsTrue(done);
         Py_DECREF(done);
         if(is_done != 0) { break; }
@@ -927,8 +936,7 @@ ERROR_CODE startup_handler_asgi(struct service_t *service) {
 
     /* calls the application with the lifespan scope, the resulting
     coroutine is wrapped in a task driven by the serving loop */
-    coroutine = scope == NULL || receive == NULL || send == NULL ? NULL :
-        _invoke_handler_asgi(handler_asgi, scope, receive, send);
+    coroutine = scope == NULL || receive == NULL || send == NULL ? NULL : _invoke_handler_asgi(handler_asgi, scope, receive, send);
     Py_XDECREF(scope);
     Py_XDECREF(receive);
     Py_XDECREF(send);
@@ -1145,8 +1153,9 @@ static PyObject *_done_handler_asgi(PyObject *self, PyObject *args) {
     /* a cancelled task is the usual way of ending the handling of a
     request and so nothing is ever reported for it */
     object = PyObject_CallMethod(task, "cancelled", NULL);
-    if(object == NULL) { PyErr_Clear(); }
-    else {
+    if(object == NULL) {
+        PyErr_Clear();
+    } else {
         is_cancelled = PyObject_IsTrue(object);
         Py_DECREF(object);
         if(is_cancelled != 0) {
@@ -1158,14 +1167,14 @@ static PyObject *_done_handler_asgi(PyObject *self, PyObject *args) {
     /* retrieves the exception that has been raised by the application
     and reports it into the standard error, as the usual reporting */
     exception = PyObject_CallMethod(task, "exception", NULL);
-    if(exception == NULL) { PyErr_Clear(); }
-    else if(exception != Py_None) {
+    if(exception == NULL) {
+        PyErr_Clear();
+    } else if(exception != Py_None) {
         PyErr_SetObject((PyObject *) Py_TYPE(exception), exception);
         _report_handler_asgi();
         V_WARNING_F(
             "Problem handling request %s\n",
-            handler_asgi_context->url == NULL ?
-                (unsigned char *) "" : handler_asgi_context->url
+            handler_asgi_context->url == NULL ? (unsigned char *) "" : handler_asgi_context->url
         );
     }
     Py_XDECREF(exception);
@@ -1361,8 +1370,7 @@ ERROR_CODE body_callback_handler_asgi(struct http_request_t *http_request, const
     /* grows the buffer geometrically whenever the payload no longer fits
     it, this keeps the accumulation linear over the various callbacks */
     if(handler_asgi_context->body_size + data_size > handler_asgi_context->body_capacity) {
-        body_capacity = handler_asgi_context->body_capacity == 0 ?
-            VIRIATUM_ASGI_BODY_CAPACITY : handler_asgi_context->body_capacity;
+        body_capacity = handler_asgi_context->body_capacity == 0 ? VIRIATUM_ASGI_BODY_CAPACITY : handler_asgi_context->body_capacity;
         while(body_capacity < handler_asgi_context->body_size + data_size) {
             body_capacity *= 2;
         }
@@ -1482,7 +1490,7 @@ static const char *_find_header_handler_asgi(struct handler_asgi_context_t *hand
         if(strlen((char *) handler_asgi_context->header_fields[index]) != name_size) { continue; }
         for(sub_index = 0; sub_index < name_size; sub_index++) {
             if(toupper(handler_asgi_context->header_fields[index][sub_index]) !=
-                toupper((unsigned char) name[sub_index])) { break; }
+               toupper((unsigned char) name[sub_index])) { break; }
         }
         if(sub_index == name_size) {
             return (const char *) handler_asgi_context->header_values[index];
@@ -1503,7 +1511,7 @@ static char _is_upgrade_handler_asgi(struct handler_asgi_context_t *handler_asgi
     if(strlen(upgrade) != strlen(reference)) { return FALSE; }
     for(index = 0; reference[index] != '\0'; index++) {
         if(toupper((unsigned char) upgrade[index]) !=
-            toupper((unsigned char) reference[index])) { return FALSE; }
+           toupper((unsigned char) reference[index])) { return FALSE; }
     }
     return TRUE;
 }
@@ -1543,11 +1551,8 @@ static PyObject *_build_scope_handler_asgi(
 
     /* splits the url around the get parameters divisor, the first part
     is the path and the remaining one the query string */
-    pointer = handler_asgi_context->url == NULL ?
-        NULL : strchr((char *) handler_asgi_context->url, '?');
-    path_size = handler_asgi_context->url == NULL ? 0 :
-        (pointer == NULL ? strlen((char *) handler_asgi_context->url) :
-        (size_t) (pointer - (char *) handler_asgi_context->url));
+    pointer = handler_asgi_context->url == NULL ? NULL : strchr((char *) handler_asgi_context->url, '?');
+    path_size = handler_asgi_context->url == NULL ? 0 : (pointer == NULL ? strlen((char *) handler_asgi_context->url) : (size_t) (pointer - (char *) handler_asgi_context->url));
     if(path_size >= VIRIATUM_MAX_URL_SIZE) { path_size = VIRIATUM_MAX_URL_SIZE - 1; }
     if(path_size > 0) { memcpy(path, handler_asgi_context->url, path_size); }
     path[path_size] = '\0';
@@ -1568,33 +1573,54 @@ static PyObject *_build_scope_handler_asgi(
     /* sets the various values that describe both the protocol and the
     interface that is being implemented by the server */
     object = PyUnicode_FromString(websocket == TRUE ? "websocket" : "http");
-    if(object != NULL) { PyDict_SetItemString(scope, "type", object); Py_DECREF(object); }
+    if(object != NULL) {
+        PyDict_SetItemString(scope, "type", object);
+        Py_DECREF(object);
+    }
     object = Py_BuildValue(
         "{s:s,s:s}",
         "version", _version_handler_asgi(handler_asgi_context->handler),
         "spec_version", VIRIATUM_ASGI_SPEC_VERSION
     );
-    if(object != NULL) { PyDict_SetItemString(scope, "asgi", object); Py_DECREF(object); }
+    if(object != NULL) {
+        PyDict_SetItemString(scope, "asgi", object);
+        Py_DECREF(object);
+    }
 
     /* sets the version of the protocol as gathered from the message,
     it is the one that framed the current request */
     object = PyUnicode_FromString(get_http_version_number(http_request->version));
-    if(object != NULL) { PyDict_SetItemString(scope, "http_version", object); Py_DECREF(object); }
+    if(object != NULL) {
+        PyDict_SetItemString(scope, "http_version", object);
+        Py_DECREF(object);
+    }
 
     /* sets the various request oriented values in the scope, note that
     the root path is always empty as the application owns the routing */
     object = PyUnicode_FromString(path);
-    if(object != NULL) { PyDict_SetItemString(scope, "path", object); Py_DECREF(object); }
+    if(object != NULL) {
+        PyDict_SetItemString(scope, "path", object);
+        Py_DECREF(object);
+    }
     object = PyBytes_FromString(pointer == NULL ? "" : pointer + 1);
-    if(object != NULL) { PyDict_SetItemString(scope, "query_string", object); Py_DECREF(object); }
+    if(object != NULL) {
+        PyDict_SetItemString(scope, "query_string", object);
+        Py_DECREF(object);
+    }
     object = PyUnicode_FromString("");
-    if(object != NULL) { PyDict_SetItemString(scope, "root_path", object); Py_DECREF(object); }
+    if(object != NULL) {
+        PyDict_SetItemString(scope, "root_path", object);
+        Py_DECREF(object);
+    }
 
     /* the method is only part of the scope of the http requests, the
     websocket ones are always the result of a get */
     if(websocket == FALSE) {
         object = PyUnicode_FromString(get_http_method_string(http_request->method));
-        if(object != NULL) { PyDict_SetItemString(scope, "method", object); Py_DECREF(object); }
+        if(object != NULL) {
+            PyDict_SetItemString(scope, "method", object);
+            Py_DECREF(object);
+        }
     }
 
     /* sets the scheme taking the ssl flag of the service into account
@@ -1604,19 +1630,31 @@ static PyObject *_build_scope_handler_asgi(
     } else {
         object = PyUnicode_FromString(service_options->ssl ? "https" : "http");
     }
-    if(object != NULL) { PyDict_SetItemString(scope, "scheme", object); Py_DECREF(object); }
+    if(object != NULL) {
+        PyDict_SetItemString(scope, "scheme", object);
+        Py_DECREF(object);
+    }
 
     /* sets both the client and the server addresses, they are provided
     as a pair of the host and of the port of each of the peers */
     object = Py_BuildValue("(si)", (char *) connection->host, (int) connection->port);
-    if(object != NULL) { PyDict_SetItemString(scope, "client", object); Py_DECREF(object); }
+    if(object != NULL) {
+        PyDict_SetItemString(scope, "client", object);
+        Py_DECREF(object);
+    }
     object = Py_BuildValue("(si)", (char *) service_options->address, (int) service_options->port);
-    if(object != NULL) { PyDict_SetItemString(scope, "server", object); Py_DECREF(object); }
+    if(object != NULL) {
+        PyDict_SetItemString(scope, "server", object);
+        Py_DECREF(object);
+    }
 
     /* creates the sequence of headers of the request, each of them is
     a pair of byte strings with the name lower cased */
     headers = PyList_New(0);
-    if(headers == NULL) { Py_DECREF(scope); return NULL; }
+    if(headers == NULL) {
+        Py_DECREF(scope);
+        return NULL;
+    }
     for(index = 0; index < handler_asgi_context->header_count; index++) {
         if(handler_asgi_context->header_fields[index] == NULL) { continue; }
         if(handler_asgi_context->header_values[index] == NULL) { continue; }
@@ -1632,7 +1670,10 @@ static PyObject *_build_scope_handler_asgi(
             (char *) handler_asgi_context->header_values[index],
             (Py_ssize_t) strlen((char *) handler_asgi_context->header_values[index])
         );
-        if(header == NULL) { PyErr_Clear(); continue; }
+        if(header == NULL) {
+            PyErr_Clear();
+            continue;
+        }
         PyList_Append(headers, header);
         Py_DECREF(header);
     }
@@ -1649,15 +1690,17 @@ static PyObject *_build_scope_handler_asgi(
         object = PyList_New(0);
         if(object != NULL && protocols != NULL) {
             PyObject *value = PyUnicode_FromString(protocols);
-            PyObject *split = value == NULL ?
-                NULL : PyObject_CallMethod(value, "split", "s", ",");
+            PyObject *split = value == NULL ? NULL : PyObject_CallMethod(value, "split", "s", ",");
             Py_XDECREF(value);
             if(split != NULL) {
                 Py_ssize_t count = PyList_Size(split);
                 Py_ssize_t sub;
                 for(sub = 0; sub < count; sub++) {
                     PyObject *item = PyObject_CallMethod(PyList_GetItem(split, sub), "strip", NULL);
-                    if(item == NULL) { PyErr_Clear(); continue; }
+                    if(item == NULL) {
+                        PyErr_Clear();
+                        continue;
+                    }
                     PyList_Append(object, item);
                     Py_DECREF(item);
                 }
@@ -1742,8 +1785,7 @@ ERROR_CODE _call_application_handler_asgi(struct http_request_t *http_request) {
         event = Py_BuildValue(
             "{s:s,s:y#,s:O}",
             "type", "http.request",
-            "body", handler_asgi_context->body == NULL ?
-                "" : (char *) handler_asgi_context->body,
+            "body", handler_asgi_context->body == NULL ? "" : (char *) handler_asgi_context->body,
             (Py_ssize_t) handler_asgi_context->body_size,
             "more_body", Py_False
         );
@@ -1755,8 +1797,7 @@ ERROR_CODE _call_application_handler_asgi(struct http_request_t *http_request) {
 
     /* calls the application with the scope that has just been built,
     the resulting coroutine is wrapped in a task */
-    coroutine = scope == NULL || receive == NULL || send == NULL ? NULL :
-        _invoke_handler_asgi(handler_asgi, scope, receive, send);
+    coroutine = scope == NULL || receive == NULL || send == NULL ? NULL : _invoke_handler_asgi(handler_asgi, scope, receive, send);
     Py_XDECREF(scope);
     Py_XDECREF(receive);
     Py_XDECREF(send);
@@ -1835,7 +1876,10 @@ ERROR_CODE _send_response_callback_handler_asgi(struct connection_t *connection,
     no longer released by the destruction of the latter */
     current = &handler_asgi_context->writes;
     while(*current != NULL) {
-        if(*current == write_asgi) { *current = write_asgi->next; break; }
+        if(*current == write_asgi) {
+            *current = write_asgi->next;
+            break;
+        }
         current = &(*current)->next;
     }
 
@@ -2055,7 +2099,10 @@ static PyObject *_send_websocket_handler_asgi(struct handler_asgi_context_t *han
         object = PyDict_GetItemString(message, "subprotocol");
         if(object != NULL && object != Py_None) {
             subprotocol = PyUnicode_AsUTF8(object);
-            if(subprotocol == NULL) { Py_DECREF(future); return NULL; }
+            if(subprotocol == NULL) {
+                Py_DECREF(future);
+                return NULL;
+            }
             if(_is_valid_handler_asgi(subprotocol, strlen(subprotocol)) == FALSE) {
                 Py_DECREF(future);
                 PyErr_SetString(PyExc_ValueError, "subprotocol carries a control character");
@@ -2072,10 +2119,16 @@ static PyObject *_send_websocket_handler_asgi(struct handler_asgi_context_t *han
         as a sequence of pairs of byte strings */
         headers = PyDict_GetItemString(message, "headers");
         count = headers == NULL ? 0 : PySequence_Length(headers);
-        if(count < 0) { PyErr_Clear(); count = 0; }
+        if(count < 0) {
+            PyErr_Clear();
+            count = 0;
+        }
         for(index = 0; index < count; index++) {
             header = PySequence_GetItem(headers, index);
-            if(header == NULL) { Py_DECREF(future); return NULL; }
+            if(header == NULL) {
+                Py_DECREF(future);
+                return NULL;
+            }
             name = PySequence_GetItem(header, 0);
             value = PySequence_GetItem(header, 1);
             Py_DECREF(header);
@@ -2086,7 +2139,7 @@ static PyObject *_send_websocket_handler_asgi(struct handler_asgi_context_t *han
                 return NULL;
             }
             if(PyBytes_AsStringAndSize(name, &data, &data_size) < 0 ||
-                PyBytes_AsStringAndSize(value, &value_data, &value_size) < 0) {
+               PyBytes_AsStringAndSize(value, &value_data, &value_size) < 0) {
                 Py_DECREF(name);
                 Py_DECREF(value);
                 Py_DECREF(future);
@@ -2096,7 +2149,7 @@ static PyObject *_send_websocket_handler_asgi(struct handler_asgi_context_t *han
             /* rejects any control character, as it would allow the
             response of the handshake to be split by the application */
             if(_is_valid_handler_asgi(data, (size_t) data_size) == FALSE ||
-                _is_valid_handler_asgi(value_data, (size_t) value_size) == FALSE) {
+               _is_valid_handler_asgi(value_data, (size_t) value_size) == FALSE) {
                 Py_DECREF(name);
                 Py_DECREF(value);
                 Py_DECREF(future);
@@ -2107,7 +2160,7 @@ static PyObject *_send_websocket_handler_asgi(struct handler_asgi_context_t *han
             /* formats the header line into the buffer, the ones that no
             longer fit it are discarded (avoids an overflow) */
             if(accept_size + (size_t) data_size + (size_t) value_size + 4 <
-                VIRIATUM_HTTP_SIZE) {
+               VIRIATUM_HTTP_SIZE) {
                 accept_size += SPRINTF(
                     &accept_headers[accept_size],
                     VIRIATUM_HTTP_SIZE - accept_size,
@@ -2124,10 +2177,10 @@ static PyObject *_send_websocket_handler_asgi(struct handler_asgi_context_t *han
         accept_headers[accept_size] = '\0';
 
         if(IS_ERROR_CODE(_accept_websocket_handler_asgi(
-            handler_asgi_context,
-            subprotocol,
-            accept_size > 0 ? accept_headers : NULL
-        ))) {
+               handler_asgi_context,
+               subprotocol,
+               accept_size > 0 ? accept_headers : NULL
+           ))) {
             Py_DECREF(future);
             PyErr_SetString(PyExc_RuntimeError, (char *) GET_ERROR());
             return NULL;
@@ -2148,7 +2201,10 @@ static PyObject *_send_websocket_handler_asgi(struct handler_asgi_context_t *han
         object = PyDict_GetItemString(message, "text");
         if(object != NULL && object != Py_None) {
             encoded = PyUnicode_AsUTF8String(object);
-            if(encoded == NULL) { Py_DECREF(future); return NULL; }
+            if(encoded == NULL) {
+                Py_DECREF(future);
+                return NULL;
+            }
             PyBytes_AsStringAndSize(encoded, &data, &data_size);
             opcode = WEBSOCKET_OPCODE_TEXT;
         } else {
@@ -2164,13 +2220,13 @@ static PyObject *_send_websocket_handler_asgi(struct handler_asgi_context_t *han
         /* builds the frame carrying the payload and writes it into the
         connection, a message is never fragmented by the server */
         if(IS_ERROR_CODE(build_frame_websocket(
-            opcode,
-            TRUE,
-            (unsigned char *) data,
-            (size_t) data_size,
-            &frame,
-            &frame_size
-        ))) {
+               opcode,
+               TRUE,
+               (unsigned char *) data,
+               (size_t) data_size,
+               &frame,
+               &frame_size
+           ))) {
             Py_XDECREF(encoded);
             Py_DECREF(future);
             PyErr_SetString(PyExc_ValueError, "message payload is too large");
@@ -2189,7 +2245,10 @@ static PyObject *_send_websocket_handler_asgi(struct handler_asgi_context_t *han
         object = PyDict_GetItemString(message, "code");
         if(object != NULL) {
             code = PyLong_AsLong(object);
-            if(PyErr_Occurred()) { PyErr_Clear(); code = WEBSOCKET_CLOSE_NORMAL; }
+            if(PyErr_Occurred()) {
+                PyErr_Clear();
+                code = WEBSOCKET_CLOSE_NORMAL;
+            }
         }
         object = PyDict_GetItemString(message, "reason");
         if(object != NULL && object != Py_None) {
@@ -2261,8 +2320,7 @@ static void _deliver_websocket_handler_asgi(struct handler_asgi_context_t *handl
         event = Py_BuildValue(
             "{s:s,s:y#,s:O}",
             "type", "websocket.receive",
-            "bytes", handler_asgi_context->websocket_message == NULL ?
-                "" : (char *) handler_asgi_context->websocket_message,
+            "bytes", handler_asgi_context->websocket_message == NULL ? "" : (char *) handler_asgi_context->websocket_message,
             (Py_ssize_t) handler_asgi_context->websocket_message_size,
             "text", Py_None
         );
@@ -2270,8 +2328,9 @@ static void _deliver_websocket_handler_asgi(struct handler_asgi_context_t *handl
 
     /* pushes the event so that it reaches the application through the
     receive callable and resets the reassembly state */
-    if(event == NULL) { PyErr_Clear(); }
-    else {
+    if(event == NULL) {
+        PyErr_Clear();
+    } else {
         _push_event_handler_asgi(handler_asgi_context, event);
         Py_DECREF(event);
     }
@@ -2292,13 +2351,13 @@ static void _frame_websocket_handler_asgi(struct handler_asgi_context_t *handler
     payload, this happens without the application ever noticing */
     if(websocket_frame->opcode == WEBSOCKET_OPCODE_PING) {
         if(IS_ERROR_CODE(build_frame_websocket(
-            WEBSOCKET_OPCODE_PONG,
-            TRUE,
-            websocket_frame->payload,
-            websocket_frame->payload_size,
-            &buffer,
-            &frame_size
-        ))) { return; }
+               WEBSOCKET_OPCODE_PONG,
+               TRUE,
+               websocket_frame->payload,
+               websocket_frame->payload_size,
+               &buffer,
+               &frame_size
+           ))) { return; }
         _write_raw_handler_asgi(handler_asgi_context, buffer, frame_size, FALSE);
         FREE(buffer);
         return;
@@ -2315,13 +2374,11 @@ static void _frame_websocket_handler_asgi(struct handler_asgi_context_t *handler
         event = Py_BuildValue(
             "{s:s,s:i}",
             "type", "websocket.disconnect",
-            "code", (int) close_code_websocket(
-                websocket_frame->payload,
-                websocket_frame->payload_size
-            )
+            "code", (int) close_code_websocket(websocket_frame->payload, websocket_frame->payload_size)
         );
-        if(event == NULL) { PyErr_Clear(); }
-        else {
+        if(event == NULL) {
+            PyErr_Clear();
+        } else {
             _push_event_handler_asgi(handler_asgi_context, event);
             Py_DECREF(event);
         }
@@ -2361,7 +2418,7 @@ static void _frame_websocket_handler_asgi(struct handler_asgi_context_t *handler
     /* in case the message would exceed the maximum allowed size the
     connection is closed, avoiding an unbounded growth of the buffer */
     if(handler_asgi_context->websocket_message_size + websocket_frame->payload_size >
-        VIRIATUM_WEBSOCKET_MAX_PAYLOAD) {
+       VIRIATUM_WEBSOCKET_MAX_PAYLOAD) {
         _close_websocket_handler_asgi(
             handler_asgi_context,
             WEBSOCKET_CLOSE_TOO_LARGE,
@@ -2373,11 +2430,10 @@ static void _frame_websocket_handler_asgi(struct handler_asgi_context_t *handler
     /* grows the buffer geometrically whenever the payload no longer fits
     it, this keeps the accumulation linear over the various frames */
     if(handler_asgi_context->websocket_message_size + websocket_frame->payload_size >
-        handler_asgi_context->websocket_message_capacity) {
-        message_capacity = handler_asgi_context->websocket_message_capacity == 0 ?
-            VIRIATUM_ASGI_BODY_CAPACITY : handler_asgi_context->websocket_message_capacity;
+       handler_asgi_context->websocket_message_capacity) {
+        message_capacity = handler_asgi_context->websocket_message_capacity == 0 ? VIRIATUM_ASGI_BODY_CAPACITY : handler_asgi_context->websocket_message_capacity;
         while(message_capacity < handler_asgi_context->websocket_message_size +
-            websocket_frame->payload_size) {
+                                     websocket_frame->payload_size) {
             message_capacity *= 2;
         }
         message = (unsigned char *) MALLOC(message_capacity);
@@ -2434,9 +2490,8 @@ ERROR_CODE data_handler_websocket_asgi(struct io_connection_t *io_connection, un
     /* grows the buffer geometrically whenever the received data no longer
     fits it, it holds at most one incomplete frame at a time */
     if(handler_asgi_context->websocket_buffer_size + buffer_size >
-        handler_asgi_context->websocket_buffer_capacity) {
-        websocket_buffer_capacity = handler_asgi_context->websocket_buffer_capacity == 0 ?
-            VIRIATUM_ASGI_BODY_CAPACITY : handler_asgi_context->websocket_buffer_capacity;
+       handler_asgi_context->websocket_buffer_capacity) {
+        websocket_buffer_capacity = handler_asgi_context->websocket_buffer_capacity == 0 ? VIRIATUM_ASGI_BODY_CAPACITY : handler_asgi_context->websocket_buffer_capacity;
         while(websocket_buffer_capacity < handler_asgi_context->websocket_buffer_size + buffer_size) {
             websocket_buffer_capacity *= 2;
         }

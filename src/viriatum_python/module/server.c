@@ -33,7 +33,10 @@ static char _has_marker_server_python(PyObject *application, const char *name) {
     are the ones set by the adaptation helpers of asgiref */
     PyObject *marker = PyObject_GetAttrString(application, name);
     int is_set;
-    if(marker == NULL) { PyErr_Clear(); return FALSE; }
+    if(marker == NULL) {
+        PyErr_Clear();
+        return FALSE;
+    }
     is_set = PyObject_IsTrue(marker);
     Py_DECREF(marker);
     return is_set != 0 ? TRUE : FALSE;
@@ -59,13 +62,17 @@ static char _is_asgi_server_python(PyObject *application) {
     /* imports the inspect module, it provides the detection of the
     coroutine functions that is required for the interface */
     module = PyImport_ImportModule("inspect");
-    if(module == NULL) { PyErr_Clear(); return FALSE; }
+    if(module == NULL) {
+        PyErr_Clear();
+        return FALSE;
+    }
 
     /* verifies if the application is itself a coroutine function, the
     usual shape of an asgi application defined as a plain function */
     result = PyObject_CallMethod(module, "iscoroutinefunction", "O", application);
-    if(result == NULL) { PyErr_Clear(); }
-    else {
+    if(result == NULL) {
+        PyErr_Clear();
+    } else {
         is_coroutine = PyObject_IsTrue(result);
         Py_DECREF(result);
     }
@@ -74,12 +81,14 @@ static char _is_asgi_server_python(PyObject *application) {
     one, the shape of an application defined as a class instance */
     if(is_coroutine == 0) {
         call = PyObject_GetAttrString(application, "__call__");
-        if(call == NULL) { PyErr_Clear(); }
-        else {
+        if(call == NULL) {
+            PyErr_Clear();
+        } else {
             result = PyObject_CallMethod(module, "iscoroutinefunction", "O", call);
             Py_DECREF(call);
-            if(result == NULL) { PyErr_Clear(); }
-            else {
+            if(result == NULL) {
+                PyErr_Clear();
+            } else {
                 is_coroutine = PyObject_IsTrue(result);
                 Py_DECREF(result);
             }
@@ -113,30 +122,42 @@ static char _is_double_callable_server_python(PyObject *application) {
     /* imports the inspect module, it provides both the detection of
     the classes and the one of the coroutine functions */
     module = PyImport_ImportModule("inspect");
-    if(module == NULL) { PyErr_Clear(); return FALSE; }
+    if(module == NULL) {
+        PyErr_Clear();
+        return FALSE;
+    }
 
     /* a class that has not been instantiated is a double callable one,
     the instance of it is what takes the pair of callables */
     result = PyObject_CallMethod(module, "isclass", "O", application);
-    if(result == NULL) { PyErr_Clear(); }
-    else {
+    if(result == NULL) {
+        PyErr_Clear();
+    } else {
         is_class = PyObject_IsTrue(result);
         Py_DECREF(result);
     }
-    if(is_class != 0) { Py_DECREF(module); return TRUE; }
+    if(is_class != 0) {
+        Py_DECREF(module);
+        return TRUE;
+    }
 
     /* an instance whose call method is a coroutine one is a single
     callable application, the shape of the third version */
     call = PyObject_GetAttrString(application, "__call__");
-    if(call == NULL) { PyErr_Clear(); }
-    else {
+    if(call == NULL) {
+        PyErr_Clear();
+    } else {
         result = PyObject_CallMethod(module, "iscoroutinefunction", "O", call);
         Py_DECREF(call);
-        if(result == NULL) { PyErr_Clear(); }
-        else {
+        if(result == NULL) {
+            PyErr_Clear();
+        } else {
             is_double = PyObject_IsTrue(result);
             Py_DECREF(result);
-            if(is_double != 0) { Py_DECREF(module); return FALSE; }
+            if(is_double != 0) {
+                Py_DECREF(module);
+                return FALSE;
+            }
         }
     }
 
@@ -144,7 +165,10 @@ static char _is_double_callable_server_python(PyObject *application) {
     as a double callable application (the legacy shape) */
     result = PyObject_CallMethod(module, "iscoroutinefunction", "O", application);
     Py_DECREF(module);
-    if(result == NULL) { PyErr_Clear(); return TRUE; }
+    if(result == NULL) {
+        PyErr_Clear();
+        return TRUE;
+    }
     is_double = PyObject_IsTrue(result);
     Py_DECREF(result);
     return is_double != 0 ? FALSE : TRUE;
@@ -178,9 +202,9 @@ static int _init_server_python(PyObject *self, PyObject *args, PyObject *kwargs)
     /* parses the arguments provided to the constructor according to
     the keywords sequence defined above */
     if(!PyArg_ParseTupleAndKeywords(
-        args, kwargs, "O|sizs", keywords,
-        &application, &host, &port, &www_root, &interface
-    )) { return -1; }
+           args, kwargs, "O|sizs", keywords,
+           &application, &host, &port, &www_root, &interface
+       )) { return -1; }
 
     /* in case the server has already been initialized rejects the new
     initialization, otherwise the previously created service and the
@@ -203,8 +227,7 @@ static int _init_server_python(PyObject *self, PyObject *args, PyObject *kwargs)
     callable one is indistinguishable from a wsgi callable */
     if(strcmp(interface, VIRIATUM_PYTHON_INTERFACE_AUTO) == 0) {
         asgi = _is_asgi_server_python(application);
-        server_python->double_callable = asgi == TRUE ?
-            _is_double_callable_server_python(application) : FALSE;
+        server_python->double_callable = asgi == TRUE ? _is_double_callable_server_python(application) : FALSE;
     } else if(strcmp(interface, VIRIATUM_PYTHON_INTERFACE_ASGI) == 0) {
         asgi = TRUE;
         server_python->double_callable = _is_double_callable_server_python(application);
@@ -262,8 +285,7 @@ static int _init_server_python(PyObject *self, PyObject *args, PyObject *kwargs)
     service->options->port = (unsigned short) port;
     SPRINTF((char *) server_python->host, VIRIATUM_MAX_HEADER_SIZE, "%s", host);
     service->options->address = server_python->host;
-    service->options->handler_name = asgi == TRUE ?
-        VIRIATUM_ASGI_HANDLER_NAME : VIRIATUM_PYTHON_HANDLER_NAME;
+    service->options->handler_name = asgi == TRUE ? VIRIATUM_ASGI_HANDLER_NAME : VIRIATUM_PYTHON_HANDLER_NAME;
     service->options->load_modules = 0;
     service->options->workers = 0;
     service->options->ip6 = 0;
@@ -374,7 +396,7 @@ static PyObject *_serve_forever_server_python(PyObject *self, PyObject *args) {
         /* runs the startup event of the lifespan protocol, a failure of
         it aborts the serving as the application refused to boot */
         if(server_python->loop_python != NULL &&
-            IS_ERROR_CODE(startup_handler_asgi(service))) {
+           IS_ERROR_CODE(startup_handler_asgi(service))) {
             close_service(service);
             server_python->opened = FALSE;
             PyErr_SetString(PyExc_RuntimeError, (char *) GET_ERROR());
@@ -387,9 +409,9 @@ static PyObject *_serve_forever_server_python(PyObject *self, PyObject *args) {
     that runs with the global interpreter lock released */
     while(service->status == STATUS_OPEN) {
         Py_BEGIN_ALLOW_THREADS
-        poll_service(service);
+            poll_service(service);
         Py_END_ALLOW_THREADS
-        call_service(service);
+            call_service(service);
 
         /* advances the event loop by a single iteration, this is what
         makes the tasks running the various applications progress, the
@@ -398,8 +420,7 @@ static PyObject *_serve_forever_server_python(PyObject *self, PyObject *args) {
         if(server_python->loop_python != NULL) {
             run_once_loop_python(server_python->loop_python);
             service->polling->timeout =
-                pending_loop_python(server_python->loop_python) > 0 ?
-                VIRIATUM_ASGI_POLL_TIMEOUT : VIRIATUM_PYTHON_POLL_TIMEOUT;
+                pending_loop_python(server_python->loop_python) > 0 ? VIRIATUM_ASGI_POLL_TIMEOUT : VIRIATUM_PYTHON_POLL_TIMEOUT;
         }
 
         /* verifies if a signal has been raised in the meantime, this

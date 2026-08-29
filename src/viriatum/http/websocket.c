@@ -135,7 +135,7 @@ ERROR_CODE parse_frame_websocket(unsigned char *buffer, size_t buffer_size, stru
     if(payload_size == 126) {
         if(buffer_size < offset + 2) { RAISE_NO_ERROR; }
         payload_size = ((unsigned long long) buffer[2] << 8) |
-            (unsigned long long) buffer[3];
+                       (unsigned long long) buffer[3];
         offset += 2;
         if(payload_size < 126) {
             RAISE_ERROR_M(
@@ -148,7 +148,7 @@ ERROR_CODE parse_frame_websocket(unsigned char *buffer, size_t buffer_size, stru
         payload_size = 0;
         for(index = 0; index < 8; index++) {
             payload_size = (payload_size << 8) |
-                (unsigned long long) buffer[offset + index];
+                           (unsigned long long) buffer[offset + index];
         }
         offset += 8;
         if(payload_size <= 65535) {
@@ -229,8 +229,11 @@ ERROR_CODE build_frame_websocket(unsigned char opcode, char fin, const unsigned 
 
     /* calculates the offset at which the payload starts, it grows with
     the variant of the length field that is required by the size */
-    if(payload_size > 65535) { offset += 8; }
-    else if(payload_size > 125) { offset += 2; }
+    if(payload_size > 65535) {
+        offset += 8;
+    } else if(payload_size > 125) {
+        offset += 2;
+    }
 
     /* allocates the buffer for the complete frame and writes the first
     byte of the header into it, the frames sent by the server are never
@@ -243,8 +246,7 @@ ERROR_CODE build_frame_websocket(unsigned char opcode, char fin, const unsigned 
     if(payload_size > 65535) {
         buffer[1] = 127;
         for(index = 0; index < 8; index++) {
-            buffer[2 + index] = (unsigned char)
-                ((unsigned long long) payload_size >> ((7 - index) * 8) & 0xff);
+            buffer[2 + index] = (unsigned char) ((unsigned long long) payload_size >> ((7 - index) * 8) & 0xff);
         }
     } else if(payload_size > 125) {
         buffer[1] = 126;
@@ -279,7 +281,7 @@ ERROR_CODE build_close_websocket(unsigned short code, const char *reason, unsign
         never cut in the middle of a code point, the specification
         requires it to be a valid utf-8 sequence */
         while(reason_size > 0 &&
-            ((unsigned char) reason[reason_size] & 0xc0) == 0x80) {
+              ((unsigned char) reason[reason_size] & 0xc0) == 0x80) {
             reason_size--;
         }
     }
@@ -316,5 +318,5 @@ unsigned short close_code_websocket(const unsigned char *payload, size_t payload
     /* unpacks the code from the first two bytes of the payload, they
     are laid out in network order as every other length is */
     return (unsigned short) (((unsigned short) payload[0] << 8) |
-        (unsigned short) payload[1]);
+                             (unsigned short) payload[1]);
 }
