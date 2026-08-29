@@ -1,0 +1,235 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+"""
+Builds the markdown table of the benchmark out of the reports that
+the harness has written, one per pair of a workload and a server,
+the result is meant to be appended to the step summary of the
+workflow the same way the one of the coverage is.
+"""
+
+import os
+import sys
+import json
+
+SUBJECT = "viriatum"
+""" The name the server under test is recorded under, every other
+server of a workload is a reference that it is reported against """
+
+ORDER = ("viriatum", "nginx", "caddy", "openlitespeed", "haproxy", "pingora", "gunicorn", "uvicorn")
+""" The order the servers are listed in, the subject first and then
+the references, so that a table always reads the same way """
+
+
+def load(path):
+    if not os.path.exists(path):
+        return None
+    try:
+        with open(path, "rb") as file:
+            return json.loads(file.read().decode("utf-8"))
+    except ValueError:
+        return None
+
+
+def results(output):
+    # gathers one entry per pair of a workload and a server, each of
+    # them written by the harness as a report of its own, the ones
+    # that could not be parsed are left out rather than failing
+    rows = []
+    runs = os.path.join(output, "runs")
+    if not os.path.isdir(runs):
+        return rows
+    for name in sorted(os.listdir(runs)):
+        if not name.endswith(".json"):
+            continue
+        item = load(os.path.join(runs, name))
+        if item is None:
+            continue
+        rows.append(item)
+    return rows
+
+
+def index(rows):
+    # maps every entry by the pair that identifies it, which is what
+    # both the ratio against a reference and the comparison against
+    # the baseline are looked up through
+    return dict(((item["workload"], item["server"]), item) for item in rows)
+
+
+def workloads(rows):
+    # the workloads in the order the harness drove them, a set would
+    # lose that order and the table would stop being readable
+    names = []
+    for item in rows:
+        if item["workload"] not in names:
+            names.append(item["workload"])
+    return names
+
+
+def servers(rows, workload):
+    # the servers of a workload, the subject first and the references
+    # after it, one that the order does not know about is kept last
+    # so that a reference added later still shows up in the table
+    names = [item["server"] for item in rows if item["workload"] == workload]
+    return sorted(
+        names, key=lambda name: (ORDER.index(name) if name in ORDER else len(ORDER), name)
+    )
+
+
+def ratio(subject, reference):
+    # the figure of the subject against the one of the reference, the
+    # only number of the report that survives a noisy machine, as the
+    # two of them were measured on it one right after the other
+    if reference is None or not reference.get("rps"):
+        return None
+    if subject is None or not subject.get("rps"):
+        return None
+    return subject["rps"] / reference["rps"]
+
+
+def moved(current, baseline):
+    # says whether a figure has moved beyond the spread the baseline
+    # was recorded with, a run inside that spread is the same run and
+    # the difference of it is the noise of the machine and nothing else
+    if baseline is None or current is None:
+        return None
+    if not current.get("valid", True):
+        return None
+    low = baseline.get("rps_low", 0.0)
+    high = baseline.get("rps_high", 0.0)
+    if not low or not high:
+        return None
+    if current["rps"] < low:
+        return "slower"
+    if current["rps"] > high:
+        return "faster"
+    return None
+
+
+def delta(current, baseline):
+    # the change of a figure against the baseline, as a share of it,
+    # so that the workloads may be read against one another
+    if baseline is None or current is None or not baseline.get("rps"):
+        return None
+    return (current["rps"] - baseline["rps"]) * 100.0 / baseline["rps"]
+
+
+def marker(item, state):
+    # the mark that closes a row, a measurement that lost its
+    # connections is never a figure at all and says so, one that moved
+    # beyond the spread of the baseline is pointed at either way it went
+    if not item.get("valid", True):
+        return "⚠️"
+    if state == "slower":
+        return "🔻"
+    if state == "faster":
+        return "🔺"
+    return ""
+
+
+def format_rps(value):
+    return "%.0f" % value if value else "-"
+
+
+def format_latency(value):
+    # the tail is recorded in microseconds and read in milliseconds,
+    # a value of zero stands for a run no corrected figure was taken on
+    return "%.2f" % (value / 1000.0) if value else "-"
+
+
+def table(rows, baseline):
+    # formats one row per pair of a workload and a server, the subject
+    # of a workload carrying the ratio against each of its references
+    # and every row carrying the change against the baseline
+    known = index(rows)
+    stored = index(baseline) if baseline else {}
+
+    lines = [
+        "| Workload | Server | Req/s | p50 | p99 | p99.9 | CPU ms/1k | RSS MB | vs base | |",
+        "| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | :-: |",
+    ]
+
+    for workload in workloads(rows):
+        subject = known.get((workload, SUBJECT))
+        for server in servers(rows, workload):
+            item = known[(workload, server)]
+            change = delta(item, stored.get((workload, server)))
+            state = moved(item, stored.get((workload, server)))
+
+            # the subject is reported against the references of its
+            # workload, a reference against the subject, so that the
+            # ratio reads the same way whichever row it sits on
+            if server == SUBJECT:
+                against = [
+                    "%s %.2fx" % (name, ratio(subject, known.get((workload, name))))
+                    for name in servers(rows, workload)
+                    if name != SUBJECT and ratio(subject, known.get((workload, name)))
+                ]
+                name = "**%s**" % server
+                if against:
+                    name = "%s <br><sub>%s</sub>" % (name, ", ".join(against))
+            else:
+                name = server
+
+            lines.append(
+                "| `%s` | %s | %s | %s | %s | %s | %s | %.1f | %s | %s |"
+                % (
+                    workload,
+                    name,
+                    format_rps(item.get("rps")),
+                    format_latency(item.get("latency_p50_us")),
+                    format_latency(item.get("latency_p99_us")),
+                    format_latency(item.get("latency_p999_us")),
+                    "%.1f" % item.get("cpu_ms_per_k", 0.0),
+                    item.get("peak_rss_kb", 0) / 1024.0,
+                    "-" if change is None else "%+.1f%%" % change,
+                    marker(item, state),
+                )
+            )
+
+    return lines
+
+
+def main_with(output, path):
+    rows = results(output)
+    if not rows:
+        print("## Benchmark\n\nNo benchmark data was produced.")
+        return 1
+
+    baseline = load(path) if path else None
+
+    print("## Benchmark\n")
+    print("\n".join(table(rows, baseline)))
+
+    # the environment a figure came out of is part of the figure, a
+    # run on another machine or another build is never comparable and
+    # the report says which one produced it rather than implying it
+    environment = os.path.join(output, "environment.txt")
+    if os.path.exists(environment):
+        with open(environment, "rb") as file:
+            print("\n<details><summary>Environment</summary>\n")
+            print("```")
+            print(file.read().decode("utf-8").strip())
+            print("```")
+            print("\n</details>")
+
+    if baseline is None:
+        print("\nNo baseline was compared against, the change column is empty.")
+
+    # the assembled result is written beside the table so that a run
+    # may be compared against by a later one without it having to
+    # walk the reports of every pair again
+    with open(os.path.join(output, "results.json"), "wb") as file:
+        file.write(json.dumps(rows, indent=2, sort_keys=True).encode("utf-8"))
+
+    # the run reports and never gates, a hosted runner is far too
+    # noisy for a figure of performance to fail a build on
+    return 0
+
+
+def main():
+    return main_with(sys.argv[1], sys.argv[2] if len(sys.argv) > 2 else None)
+
+
+if __name__ == "__main__":
+    sys.exit(main())

@@ -936,4 +936,21 @@ while IFS='|' read -r NAME ROLE HANDLER PATH_ HEADER TEMPLATE PROXY; do
 done < "$OUTPUT/workloads.txt"
 
 echo
+
+# builds the markdown table of the run, it is written to the step
+# summary of the workflow so that the numbers show up on the run page,
+# the comparison against the baseline happens inside it as well
+if [ -f "$BASELINE" ]; then
+    "$PYTHON" "$ROOT/scripts/benchmark_table.py" "$OUTPUT" "$BASELINE" > "$OUTPUT/summary.md"
+else
+    "$PYTHON" "$ROOT/scripts/benchmark_table.py" "$OUTPUT" > "$OUTPUT/summary.md"
+fi
+cat "$OUTPUT/summary.md"
+
+echo
 echo "Benchmark reports written to $OUTPUT"
+
+# the run reports and never gates, a hosted runner is far too noisy
+# for a figure of performance to be allowed to fail a build, the
+# comparison against the baseline is there to be read and not obeyed
+exit 0
