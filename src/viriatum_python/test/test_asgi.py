@@ -7,9 +7,11 @@ import base64
 import gc
 import hashlib
 import os
+import shutil
 import signal
 import socket
 import struct
+import subprocess
 import sys
 import threading
 import time
@@ -1010,6 +1012,39 @@ class AsgiTest(ServerCase):
         self.assertEqual(result.read(), b"plain")
         self.assertEqual(result.headers.get("Connection"), "close")
         connection.close()
+
+    def test_multiplexed_streams(self):
+        # verifies that several requests travelling at the same time on
+        # one connection of the most recent version of the protocol are
+        # each answered on the stream they came in on, an application
+        # answers on a clock of its own and by then the connection is
+        # likely serving another of the messages that travel on it
+        nghttp = shutil.which("nghttp")
+        if nghttp is None:
+            self.skipTest("no client of the most recent version is available")
+
+        # the client opens a single connection and asks for every one
+        # of the resources on a stream of its own, which is what makes
+        # the answers of them travel at the same time
+        paths = ["/scope?a=1", "/scope?a=2", "/scope?a=3", "/scope?a=4"]
+        process = subprocess.Popen(
+            [nghttp] + [self._url(path) for path in paths],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+        output = process.communicate(timeout=30)[0].decode()
+        self.assertEqual(process.returncode, 0)
+
+        # every one of the answers carries the query of the request it
+        # belongs to, one that had been written on another stream would
+        # carry the query of that one twice over and leave the query of
+        # the stream it belonged to out of the answers altogether
+        for index in range(1, len(paths) + 1):
+            self.assertEqual(output.count("a=%d" % index), 1)
+
+        # the answers name the version that served them, which is the
+        # most recent one as the client asked for nothing else
+        self.assertEqual(output.count("'2'"), len(paths))
 
     def test_system_exit(self):
         # verifies that an application requesting a system exit does

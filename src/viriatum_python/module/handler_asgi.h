@@ -276,6 +276,15 @@ typedef struct handler_asgi_context_t {
     struct connection_t *connection;
 
     /**
+     * The message that originated the request, it is made the
+     * current one of the connection before each part of the
+     * response is written, an application answers on a clock of
+     * its own and by then the connection is likely serving
+     * another of the messages that travel on it.
+     */
+    struct http_request_t *http_request;
+
+    /**
      * Flag controlling if the payload of the request exceeded the
      * maximum allowed size, in which case it may not be handed to
      * the application as it would be a truncated one.

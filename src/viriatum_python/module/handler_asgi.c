@@ -234,6 +234,12 @@ static ERROR_CODE _write_handler_asgi(struct handler_asgi_context_t *handler_asg
     handler_asgi_context->writes = write_asgi;
     Py_XINCREF(future);
 
+    /* makes the message of this request the current one so that the
+    payload is written on the stream it came in on, an application
+    answers on a clock of its own and by then the connection is
+    likely serving another of the messages that travel on it */
+    http_connection->request = handler_asgi_context->http_request;
+
     /* writes the payload into the connection, registering the callback
     that resolves the future and tears the request down */
     http_connection->write_chunk(
@@ -276,6 +282,12 @@ static ERROR_CODE _send_headers_handler_asgi(struct handler_asgi_context_t *hand
     take the remaining part of the buffer */
     buffer_size = VIRIATUM_HTTP_MAX_SIZE + headers_size;
     connection->alloc_data(connection, buffer_size, (void **) &buffer);
+
+    /* makes the message of this request the current one so that the
+    envelope is written on the stream it came in on, an application
+    answers on a clock of its own and by then the connection is
+    likely serving another of the messages that travel on it */
+    http_connection->request = handler_asgi_context->http_request;
 
     /* writes the default set of headers into the buffer, the connection
     is kept alive according to the flags of the current request */
@@ -1747,6 +1759,7 @@ ERROR_CODE _call_application_handler_asgi(struct http_request_t *http_request) {
     response, they are reached from the callables of the application */
     handler_asgi_context->connection = connection;
     handler_asgi_context->handler = handler_asgi;
+    handler_asgi_context->http_request = http_request;
     handler_asgi_context->flags = (unsigned char) http_request->flags;
     handler_asgi_context->version = http_request->version;
 
