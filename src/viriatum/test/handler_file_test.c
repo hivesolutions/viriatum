@@ -392,6 +392,151 @@ const char *test_file_cache_long(void) {
     return NULL;
 }
 
+const char *test_file_cache_expired(void) {
+    /* allocates space for the cache and for the entry that is made
+    to look older than the time it is trusted for */
+    int descriptor;
+    struct file_cache_t *file_cache;
+    struct file_cache_entry_t *entry;
+    ERROR_CODE error;
+
+    write_file(
+        (char *) FILE_CACHE_TEST_PATH,
+        (unsigned char *) FILE_CACHE_TEST_CONTENTS,
+        sizeof(FILE_CACHE_TEST_CONTENTS) - 1
+    );
+
+    create_file_cache(&file_cache);
+    error = acquire_file_cache(
+        file_cache,
+        (unsigned char *) FILE_CACHE_TEST_PATH,
+        &entry
+    );
+    V_ASSERT_EQ_U(error, 0);
+    descriptor = entry->descriptor;
+
+    /* the entry is made to look as though it had been sitting there
+    since well before the time it is trusted for, which is what sends
+    the next acquisition to look at the path again */
+    entry->checked = 0;
+
+    /* the file has not moved on, so the very same descriptor goes on
+    being used and only the moment it was looked at is renewed */
+    error = acquire_file_cache(
+        file_cache,
+        (unsigned char *) FILE_CACHE_TEST_PATH,
+        &entry
+    );
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT_EQ_I(entry->descriptor, descriptor);
+    V_ASSERT(entry->checked > 0);
+
+    delete_file_cache(file_cache);
+    remove(FILE_CACHE_TEST_PATH);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_file_cache_replaced(void) {
+    /* allocates space for the cache and for the entry of the file
+    that another one is put in the place of */
+    struct file_cache_t *file_cache;
+    struct file_cache_entry_t *entry;
+    ERROR_CODE error;
+
+    write_file(
+        (char *) FILE_CACHE_TEST_PATH,
+        (unsigned char *) FILE_CACHE_TEST_CONTENTS,
+        sizeof(FILE_CACHE_TEST_CONTENTS) - 1
+    );
+
+    create_file_cache(&file_cache);
+    error = acquire_file_cache(
+        file_cache,
+        (unsigned char *) FILE_CACHE_TEST_PATH,
+        &entry
+    );
+    V_ASSERT_EQ_U(error, 0);
+
+    /* another file is put in the place of the one that is held, the
+    descriptor of the entry goes on reaching the one that was there
+    before and only a look at the path is able to tell */
+    remove(FILE_CACHE_TEST_PATH);
+    write_file(
+        (char *) FILE_CACHE_TEST_PATH,
+        (unsigned char *) FILE_CACHE_TEST_CONTENTS FILE_CACHE_TEST_CONTENTS,
+        (sizeof(FILE_CACHE_TEST_CONTENTS) - 1) * 2
+    );
+    entry->checked = 0;
+
+    /* the file that is now under the path is opened in place of the
+    one that was, and the entry describes the one being served */
+    error = acquire_file_cache(
+        file_cache,
+        (unsigned char *) FILE_CACHE_TEST_PATH,
+        &entry
+    );
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT_EQ_U(entry->size, (sizeof(FILE_CACHE_TEST_CONTENTS) - 1) * 2);
+
+    delete_file_cache(file_cache);
+    remove(FILE_CACHE_TEST_PATH);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_file_cache_stale(void) {
+    /* allocates space for the cache and for the entry whose file is
+    taken out from underneath it */
+    struct file_cache_t *file_cache;
+    struct file_cache_entry_t *entry;
+    ERROR_CODE error;
+
+    write_file(
+        (char *) FILE_CACHE_TEST_PATH,
+        (unsigned char *) FILE_CACHE_TEST_CONTENTS,
+        sizeof(FILE_CACHE_TEST_CONTENTS) - 1
+    );
+
+    create_file_cache(&file_cache);
+    error = acquire_file_cache(
+        file_cache,
+        (unsigned char *) FILE_CACHE_TEST_PATH,
+        &entry
+    );
+    V_ASSERT_EQ_U(error, 0);
+
+    /* the file that the entry is holding is closed behind its back
+    and the entry is left pointing at a descriptor that reaches
+    nothing, which is the state the cache has to answer for rather
+    than go on describing a file it can no longer reach */
+    CLOSE_READ(entry->descriptor);
+    entry->descriptor = -2;
+
+    error = acquire_file_cache(
+        file_cache,
+        (unsigned char *) FILE_CACHE_TEST_PATH,
+        &entry
+    );
+    V_ASSERT(IS_ERROR_CODE(error));
+    RESET_ERROR;
+
+    /* the entry is emptied by hand as the cache is no longer able to
+    close what it was left holding */
+    entry->descriptor = -1;
+
+    delete_file_cache(file_cache);
+    remove(FILE_CACHE_TEST_PATH);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
 const char *test_handler_file_context(void) {
     /* allocates space for the handler file context
     structure to be used in the test */

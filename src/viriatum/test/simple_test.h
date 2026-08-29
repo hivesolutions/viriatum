@@ -241,6 +241,15 @@ const char *test_normalize_path(void);
  * @return A message describing the execution of
  * the unit test should describe possible errors.
  */
+/**
+ * Tests the counting of the size of a file, together
+ * with the files that it is unable to count at all.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_count_file(void);
+
 const char *test_join_path_file(void);
 
 /**

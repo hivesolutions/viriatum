@@ -1152,6 +1152,34 @@ const char *test_normalize_path(void) {
     return NULL;
 }
 
+const char *test_count_file(void) {
+    /* allocates space for the size that the counting reports and
+    for the error that it raises when it is unable to */
+    size_t file_size = 0;
+    ERROR_CODE error;
+
+    /* writes a file of a size that is known, which is the one the
+    counting of it is expected to come back with */
+    write_file((char *) "./viriatum_count_file_test.txt", (unsigned char *) "viriatum", 8);
+
+    error = count_file((char *) "./viriatum_count_file_test.txt", &file_size);
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT_EQ_U(file_size, 8);
+
+    /* a file that is not there is reported as an error rather than
+    as a file of no size at all, the handler tells the two apart by
+    exactly this and answers with a not found for the first */
+    error = count_file((char *) "./viriatum_count_file_gone.txt", &file_size);
+    V_ASSERT(IS_ERROR_CODE(error));
+    RESET_ERROR;
+
+    remove("./viriatum_count_file_test.txt");
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
 const char *test_join_path_file(void) {
     /* allocates space for the joined path buffer
     to be used in the join path tests */
@@ -1292,6 +1320,7 @@ static struct test_entry_t _simple_entries[] = {
     V_TEST_T(test_sha1, "checksum"),
     V_TEST_T(test_is_path_safe, "path"),
     V_TEST_T(test_normalize_path, "path"),
+    V_TEST_T(test_count_file, "path"),
     V_TEST_T(test_join_path_file, "path"),
     V_TEST_T(test_absolute_path_file, "path"),
     V_TEST_T(test_file_cache, "handler"),
@@ -1302,6 +1331,9 @@ static struct test_entry_t _simple_entries[] = {
     V_TEST_T(test_file_cache_clear, "handler"),
     V_TEST_T(test_file_cache_open, "handler"),
     V_TEST_T(test_file_cache_long, "handler"),
+    V_TEST_T(test_file_cache_expired, "handler"),
+    V_TEST_T(test_file_cache_replaced, "handler"),
+    V_TEST_T(test_file_cache_stale, "handler"),
     V_TEST_T(test_handler_file_context, "handler"),
     V_TEST_C(test_handler_file_url, "handler", setup_handler_file_test, cleanup_handler_file_test),
     V_TEST_T(test_handler_file_header_field, "handler"),

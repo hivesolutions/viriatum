@@ -102,6 +102,33 @@ const char *test_file_cache_open(void);
 const char *test_file_cache_long(void);
 
 /**
+ * Tests that an entry which has gone past the time it is
+ * trusted for is renewed when the file has not moved on.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_file_cache_expired(void);
+
+/**
+ * Tests that a file put in the place of the one being held
+ * is opened in its place once the entry is looked at again.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_file_cache_replaced(void);
+
+/**
+ * Tests that an entry left holding a descriptor which no
+ * longer reaches anything answers with an error.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_file_cache_stale(void);
+
+/**
  * Tests the handler file context creation
  * and default value initialization.
  *
