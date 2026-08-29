@@ -58,6 +58,15 @@ size_t write_field_http(
     const char *name,
     const char *value
 ) {
+    /* gathers the room that the field takes, the name and the value
+    of it plus the separator, the end of the line and the byte that
+    closes the string that is built */
+    size_t required = strlen(name) + strlen(value) + 5;
+
+    /* a field that does not fit the buffer is left out of the
+    response rather than written past the end of it */
+    if(offset + required > size) { return offset; }
+
     /* appends the field in the plain form of a name, a colon and a
     value, closed by the sequence that separates the lines */
     return offset + SPRINTF(&buffer[offset], size - offset, "%s: %s\r\n", name, value);

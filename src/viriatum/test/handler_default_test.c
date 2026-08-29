@@ -159,6 +159,35 @@ const char *test_handler_default_response(void) {
     what releases whatever it was carrying for the message */
     V_ASSERT_NULL(context->http_connection->http_handler);
 
+    /* a field that does not fit what is left of the buffer is left
+    out of the response rather than written past the end of it, the
+    position that comes back being the one that went in */
+    memset(written, 'x', sizeof(written));
+    size = context->http_connection->write_field(
+        context->connection,
+        (char *) written,
+        16,
+        0,
+        "X-Long-Name",
+        "a value that does not fit"
+    );
+    V_ASSERT_EQ_U(size, 0);
+    V_ASSERT_EQ_U(written[16], 'x');
+
+    /* a field that fits it exactly is written, the room it takes
+    being the two parts of it plus the separator, the end of the
+    line and the byte that closes the string */
+    size = context->http_connection->write_field(
+        context->connection,
+        (char *) written,
+        sizeof(written),
+        0,
+        "X-Name",
+        "value"
+    );
+    V_ASSERT_EQ_U(size, 15);
+    V_ASSERT_MEM(written, "X-Name: value\r\n", 15);
+
     _delete_handler_default_test(context, http_request);
 
     /* returns the default value, nothing happened so there's
