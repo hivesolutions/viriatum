@@ -1343,7 +1343,18 @@ const char *test_http2_connection_fields(void) {
         {":method", "GET", ":scheme", "http", ":path", "/", "keep-alive", "1", NULL},
         {":method", "GET", ":scheme", "http", ":path", "/", "upgrade", "h2c", NULL},
         {":method", "GET", ":scheme", "http", ":path", "/", "transfer-encoding", "chunked", NULL},
-        {":method", "GET", ":scheme", "http", ":path", "/", "te", "gzip", NULL}
+        {":method", "GET", ":scheme", "http", ":path", "/", "te", "gzip", NULL},
+        {":method", "GET", ":scheme", "http", ":path", "/", "x", "ok\r\nx-injected: yes", NULL},
+        {":method", "GET", ":scheme", "http", ":path", "/", "x", "ok\nx-injected: yes", NULL},
+        {":method", "GET", ":scheme", "http", ":path", "/", "x", "ok\rvalue", NULL},
+        {":method", "GET", ":scheme", "http", ":path", "/", "x", " padded", NULL},
+        {":method", "GET", ":scheme", "http", ":path", "/", "x", "padded ", NULL},
+        {":method", "GET", ":scheme", "http", ":path", "/", "x", "padded\t", NULL},
+        {":method", "GET", ":scheme", "http", ":path", "/", "a b", "value", NULL},
+        {":method", "GET", ":scheme", "http", ":path", "/", "a:b", "value", NULL},
+        {":method", "GET", ":scheme", "http", ":path", "/", "a(b", "value", NULL},
+        {":method", "GET", ":scheme", "http", ":path", "/", "a/b", "value", NULL},
+        {":method", "GET", ":scheme", "http", ":path", "/", "a@b", "value", NULL}
     };
 
     /* the block that leaves out the path, it is the only one of the

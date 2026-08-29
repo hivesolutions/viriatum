@@ -814,6 +814,67 @@ static ERROR_CODE _pseudo_http2_connection(struct http2_block_t *http2_block) {
 }
 
 /**
+ * Verifies that a field of a header block carries only the bytes it
+ * is allowed to, the name being a token and the value carrying none
+ * of the characters that bound a message under HTTP/1.1.
+ * A value that carried one of those would let a peer write fields of
+ * its own into a message that this end builds from it, which is what
+ * the section 8.2.1 of the specification refuses.
+ *
+ * @param hpack_header The field that has been decoded.
+ * @return The resulting error code.
+ */
+static ERROR_CODE _verify_header_http2_connection(struct hpack_header_t *hpack_header) {
+    /* allocates space for the iteration over the bytes of both the
+    name and the value of the field */
+    size_t index;
+    unsigned char value;
+
+    /* a name is a token, so it carries none of the separators nor any
+    of the control characters, the colon of a pseudo header is taken
+    apart before this and is the single exception to it */
+    for(index = 0; index < hpack_header->name_size; index++) {
+        value = hpack_header->name[index];
+        if(value <= 0x20 || value >= 0x7f) { RAISE_ERROR_S(HTTP2_PROTOCOL_ERROR); }
+        if(value == ':' || value == ',' || value == ';' || value == '\\') {
+            RAISE_ERROR_S(HTTP2_PROTOCOL_ERROR);
+        }
+        if(value == '(' || value == ')' || value == '<' || value == '>') {
+            RAISE_ERROR_S(HTTP2_PROTOCOL_ERROR);
+        }
+        if(value == '@' || value == '[' || value == ']' || value == '?') {
+            RAISE_ERROR_S(HTTP2_PROTOCOL_ERROR);
+        }
+        if(value == '=' || value == '{' || value == '}' || value == '"') {
+            RAISE_ERROR_S(HTTP2_PROTOCOL_ERROR);
+        }
+        if(value == '/') { RAISE_ERROR_S(HTTP2_PROTOCOL_ERROR); }
+    }
+
+    /* a value carries neither the characters that end a line nor the
+    one that ends a string, a message built out of one that did would
+    carry the fields the peer has written into it */
+    for(index = 0; index < hpack_header->value_size; index++) {
+        value = hpack_header->value[index];
+        if(value == '\r' || value == '\n' || value == '\0') {
+            RAISE_ERROR_S(HTTP2_PROTOCOL_ERROR);
+        }
+    }
+
+    /* a value is never padded, the space that bounds it belongs to
+    the encoding of HTTP/1.1 rather than to the value itself */
+    if(hpack_header->value_size > 0) {
+        value = hpack_header->value[0];
+        if(value == ' ' || value == '\t') { RAISE_ERROR_S(HTTP2_PROTOCOL_ERROR); }
+        value = hpack_header->value[hpack_header->value_size - 1];
+        if(value == ' ' || value == '\t') { RAISE_ERROR_S(HTTP2_PROTOCOL_ERROR); }
+    }
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+/**
  * Gathers a single field of a header block into the message of the
  * stream, the pseudo headers populate it directly and the regular
  * ones are handed to the handler as they would be under HTTP/1.1.
@@ -912,6 +973,12 @@ static ERROR_CODE _header_http2_connection(void *parameters, struct hpack_header
             RAISE_ERROR_S(HTTP2_PROTOCOL_ERROR);
         }
     }
+
+    /* a field that carries a byte it is not allowed to is refused
+    before it reaches a handler, one of them builds a message of
+    HTTP/1.1 out of what arrives here */
+    return_value = _verify_header_http2_connection(hpack_header);
+    if(IS_ERROR_CODE(return_value)) { RAISE_AGAIN(return_value); }
 
     /* the connection specific fields carry no meaning under HTTP/2
     and their presence is an error of the peer */
