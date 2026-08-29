@@ -12,7 +12,7 @@ ONLY=static-small-alive ./scripts/benchmark.sh
 DURATION=10 REPEATS=5 ./scripts/benchmark.sh
 ```
 
-Every setting has a default and every one of them is overridable: `BUILD`, `OUTPUT`, `DURATION`, `CONNECTIONS`, `THREADS`, `RATE`, `REPEATS`, `WORKERS`, `PORT`, `SETTLE`, `WAITING`, `ACCEPTS` and `ONLY`. The reports land under `benchmark/`, one file per pair of a workload and a server under `benchmark/runs`, with the table in `benchmark/summary.md` and the assembled result in `benchmark/results.json`.
+Every setting has a default and every one of them is overridable: `BUILD`, `OUTPUT`, `DURATION`, `CONNECTIONS`, `THREADS`, `RATE`, `REPEATS`, `WORKERS`, `PORT`, `SETTLE`, `WAITING` and `ONLY`. The reports land under `benchmark/`, one file per pair of a workload and a server under `benchmark/runs`, with the table in `benchmark/summary.md` and the assembled result in `benchmark/results.json`.
 
 `wrk` is required. Everything else is optional and is skipped, with a line saying so, when it is not on the machine.
 
@@ -55,6 +55,10 @@ A few of these deserve their reasoning written down.
 **Viriatum's request log is silenced by redirecting its output, not by configuration.** The server writes a line per request through `V_INFO` and carries no setting that turns it off, where every reference has one. Leaving it on while the references have theirs off was measured to cost the subject about 4% on the small static workload, so the harness sends its standard output to the sink and keeps only its error stream. That Viriatum cannot do this through its own configuration is a real gap against the references and is noted rather than worked around.
 
 **The Python references are given the shape they are fastest in, not the one that mirrors the subject.** Viriatum's embedded server holds every connection on the loop of a single process. gunicorn's default worker answers one request at a time and loses every connection past the worker count; measured across its shapes it is fastest at `gthread` with the worker count of the subject and 32 threads, and that is what it is given. A reference driven in a shape it was never meant for reports the shape and never the reference.
+
+**The templates have to be under the root the server is given.** The server looks for the listing and the error templates at `<root>/templates/`, and answers an empty body when they are not there. The fixtures did not carry them at first, so both generated workloads were measuring a response of nothing at all against pages of several kilobytes from the references, which is not a comparison of anything. They are copied into the fixtures now.
+
+**`use_template` only turns the engine off for the error page.** It is read in exactly one place, the writing of an error, so the listing renders through the template whichever way the setting is left. Driving the listing with it on and off therefore measures the same thing twice and the two rows come out equal; the error rows are the ones that isolate the cost of the engine, and they do so clearly, the page going from 1265 bytes to 75. The setting describes itself in the shipped configuration as covering the listing as well, which it does not.
 
 **The upstream of the proxy workload must be faster than every proxy in front of it.** It answers out of the cheapest handler there is. While it was serving files instead, all four proxies reported the same figure, because what was being measured was the upstream saturating and not any of them.
 

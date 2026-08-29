@@ -34,11 +34,6 @@ PORT_UPSTREAM=$((PORT + 2))
 # generate for itself
 ASSETS=$ROOT/scripts/benchmark
 
-# the connections that the measurement of the accept path opens, it
-# is a count rather than a duration because the connections are the
-# thing being measured and not the seconds they take
-ACCEPTS=${ACCEPTS:-2000}
-
 # the seconds a run waits for the ports of the machine to come back
 # between one workload and the next, together with the count of the
 # ones still held that a measurement is allowed to start on top of
@@ -205,6 +200,17 @@ import sys
 with open(sys.argv[1], 'wb') as file:
     file.write(b'viriatum' * (1024 * 1024 // 8))
 " "$OUTPUT/www/large.bin"
+
+# the templates the server builds the listing and the error page out
+# of, it looks for them under the root it serves and answers an empty
+# body when they are not there, which is not a page the reference can
+# be compared against, the workload measured exactly nothing until
+# these were put where the server actually looks for them
+mkdir -p "$OUTPUT/www/templates"
+cp "$ROOT/src/viriatum/resources/html/base/templates/listing.html.tpl" \
+    "$OUTPUT/www/templates/listing.html.tpl"
+cp "$ROOT/src/viriatum/resources/html/base/templates/error.html.tpl" \
+    "$OUTPUT/www/templates/error.html.tpl"
 
 # the directory the listing workload walks, it carries enough entries
 # that the building of the page is what ends up being measured
@@ -605,11 +611,11 @@ _sample() {
     # shellcheck disable=SC2009
     ps -A -o rss=,time=,command= 2> /dev/null | grep "$_MATCH" | grep -v grep | awk '
         {
-            split($2, parts, ":")
+            count = split($2, parts, ":")
             seconds = 0
-            if (length(parts) == 3) {
+            if (count == 3) {
                 seconds = parts[1] * 3600 + parts[2] * 60 + parts[3]
-            } else if (length(parts) == 2) {
+            } else if (count == 2) {
                 seconds = parts[1] * 60 + parts[2]
             }
             memory += $1
@@ -682,10 +688,17 @@ _connections() {
     # the fresh connections are driven by the generator rather than
     # counted against a clock of whole seconds, a couple of thousand
     # of them are taken up faster than such a clock is able to tell
-    # apart and every server would report the very same figure
-    BENCHMARK_REPORT="$_REPORTS/accept.json" wrk -t "$THREADS" -c "$CONNECTIONS" \
-        -d "${DURATION}s" -H "Connection: close" -s "$ASSETS/report.lua" \
-        "$_TARGET" > /dev/null 2>&1 || true
+    # apart and every server would report the very same figure, and a
+    # workload that closes every connection of its own accord has
+    # measured this already, driving it twice would only walk through
+    # the ports of the machine a second time for a figure in hand
+    if [ -n "$HEADER" ]; then
+        cp "$_REPORTS/repeat-0.json" "$_REPORTS/accept.json" 2> /dev/null || true
+    else
+        BENCHMARK_REPORT="$_REPORTS/accept.json" wrk -t "$THREADS" -c "$CONNECTIONS" \
+            -d "${DURATION}s" -H "Connection: close" -s "$ASSETS/report.lua" \
+            "$_TARGET" > /dev/null 2>&1 || true
+    fi
     sed -n 's/.*"rps": *\([0-9.]*\).*/\1/p' "$_REPORTS/accept.json" \
         2> /dev/null > "$_REPORTS/accept.txt" || true
 
