@@ -403,6 +403,11 @@ ERROR_CODE calculate_locations_service(struct service_t *service) {
         get_next_iterator(iterator, (void **) &element);
         if(element == NULL) { break; }
 
+        /* a key that is shorter than the prefix is never the one of
+        a location, comparing it against the prefix would read past
+        the end of the buffer that carries it */
+        if(strlen((char *) element->key_string) < sizeof("location:") - 1) { continue; }
+
         is_equal = memcmp(element->key_string, "location:", sizeof("location:") - 1);
         if(is_equal != 0) { continue; }
 
@@ -1323,6 +1328,16 @@ ERROR_CODE open_service(struct service_t *service) {
         service->service_socket6_handle = 0;
 #endif
         service->status = STATUS_CLOSED;
+
+        /* undoes the loading and the registrations that the opening
+        had already run, the closing of a service is what balances
+        them and it is never reached by one that failed to open */
+        unload_modules_service(service);
+        unregister_handler_proxy(service);
+        unregister_handler_file(service);
+        unregister_handler_default(service);
+        unregister_handler_dispatch(service);
+
         SOCKET_FINISH();
         RAISE_AGAIN(return_value);
     }

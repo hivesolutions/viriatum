@@ -74,6 +74,16 @@ Measure the coverage of the C tree and of the python package with:
 
 The script builds every target with instrumentation, runs the core, the module and the python suites and writes the reports under `coverage/`. Both clang, through llvm-cov, and gcc, through gcovr, are supported and produce the same set of reports. The threshold of the C tree is set through `THRESHOLD` and the one of the python surface through `PYTHON_THRESHOLD`, raise them as the coverage improves rather than lowering them to make a run pass.
 
+## Memory
+
+The memory of the tree is measured by driving the suite under the address sanitizer:
+
+```bash
+./scripts/sanitize.sh
+```
+
+An error of the memory fails the run outright, whatever its shape, and the allocations that are left behind are compared against `scripts/sanitize.baseline`, which a run above fails. The number is lowered as the leaks are closed and never raised to make a run pass, the very same rule the conformance and the coverage are held to. The leak part of the sanitizer only runs on some of the platforms, macOS not being one of them, so the job of the integration that runs this is what actually measures the leaks. The server also counts its own allocations in a debug build and reports the outstanding ones when the process ends.
+
 ## HTTP/2
 
 Both versions of the protocol are served on the same port and are told apart by the bytes that open a connection, the preface handing it to a session of HTTP/2 and anything else to the parser of HTTP/1.1. Over the transport the version is negotiated through ALPN instead, honouring the order the client announces.

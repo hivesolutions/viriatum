@@ -215,6 +215,32 @@ jobs:
       - name: Test Viriatum (Python)
         run: |
           python -m unittest discover -s src/viriatum_python/test -v
+  build-sanitize:
+    name: Build Sanitize
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang llvm libssl-dev
+      - name: Run sanitize
+        env:
+          CC: clang
+        run: |
+          ./scripts/sanitize.sh
+      - name: Report sanitize
+        if: always()
+        run: |
+          cat sanitize/summary.md >> $GITHUB_STEP_SUMMARY
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: sanitize
+          path: |
+            sanitize/summary.md
+            sanitize/tests.txt
   build-conformance:
     name: Build Conformance
     timeout-minutes: 30

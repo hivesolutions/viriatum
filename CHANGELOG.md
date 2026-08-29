@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * A stream of HTTP/2 now refuses what it is not allowed to receive at each point of its life - [#50](https://github.com/hivesolutions/viriatum/issues/50)
 * Continuous integration now builds with clang 22 and gcc 16
 * Continuous integration now fails when the code is not formatted as the project asks
+* Continuous integration now measures the memory of the tree and fails when it gets worse
 * Scalable vector versions of the web illustrations, logos and UI assets
 
 ### Changed
@@ -45,6 +46,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * The project of Xcode builds again and carries every source of the tree
 * A window widened for a promised stream no longer takes the connection down
 * Sorting a sequence no longer reads past the end of it
+* Reading a configuration section no longer reads past the end of its name
+* A service that fails to start no longer leaves its handlers behind
 
 ## [0.5.0] - 2026-08-28
 
