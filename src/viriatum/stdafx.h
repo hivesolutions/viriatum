@@ -77,6 +77,13 @@
 #endif
 #endif
 
+/* the most recent version of the protocol is served unless the build
+has been told otherwise, it carries no library of its own and so it is
+only ever left out for the footprint of the smaller targets */
+#ifndef HAVE_NO_HTTP2
+#define VIRIATUM_HTTP2
+#endif
+
 #ifdef _WIN32
 #include "global/targetver.h"
 #include "global/resource.h"

@@ -15,6 +15,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Negotiation of HTTP/2 through the transport, which is what a browser uses
 * Serving of the python applications, the modules and the error pages over HTTP/2
 * Setting that turns the cleartext form of HTTP/2 off
+* Resources listed in a location are now promised to the client over HTTP/2 - [#50](https://github.com/hivesolutions/viriatum/issues/50)
+* The order a client asks for now decides which stream writes first - [#50](https://github.com/hivesolutions/viriatum/issues/50)
+* Build option that leaves HTTP/2 out for the smaller targets - [#50](https://github.com/hivesolutions/viriatum/issues/50)
+* Conformance and interoperability of HTTP/2 are now measured on every change - [#50](https://github.com/hivesolutions/viriatum/issues/50)
 * Continuous integration now builds with clang 22 and gcc 16
 * Scalable vector versions of the web illustrations, logos and UI assets
 
@@ -29,6 +33,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 * Docker images of the PHP and full variants now build for the architecture of the machine instead of always amd64
+* A file served over HTTP/2 is now closed once the response has been sent - [#50](https://github.com/hivesolutions/viriatum/issues/50)
+* A client that narrows the window of a stream now receives what was held back - [#50](https://github.com/hivesolutions/viriatum/issues/50)
+* A proxied request with large headers no longer corrupts the memory of the server
+* The command that reports the information of the service no longer starts it
 
 ## [0.5.0] - 2026-08-28
 

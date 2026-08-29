@@ -107,12 +107,12 @@
  * to populate on its own, as the remaining ones are either
  * implicit in the connection or carried by an header.
  */
-#define HTTP_CALLBACK_URL()                                                             \
-    do {                                                                                \
-        if(url_mark) {                                                                  \
+#define HTTP_CALLBACK_URL()                                                               \
+    do {                                                                                  \
+        if(url_mark) {                                                                    \
             append_path_http_request(http_parser->request, url_mark, pointer - url_mark); \
-        }                                                                               \
-        HTTP_CALLBACK_DATA(url);                                                        \
+        }                                                                                 \
+        HTTP_CALLBACK_DATA(url);                                                          \
     } while(0)
 
 /**

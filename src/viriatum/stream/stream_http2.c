@@ -26,6 +26,8 @@
 
 #include "stream_http2.h"
 
+#ifdef VIRIATUM_HTTP2
+
 /**
  * The bits that mark each one of the pseudo headers of a request
  * as already seen, the specification refuses a block that carries
@@ -2219,3 +2221,5 @@ ERROR_CODE upgrade_handler_stream_http2(struct io_connection_t *io_connection) {
     /* raises no error */
     RAISE_NO_ERROR;
 }
+
+#endif

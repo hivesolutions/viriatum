@@ -139,4 +139,3 @@ const char *test_dispatch_handler_response(void) {
     nothing to report for this execution */
     return NULL;
 }
-

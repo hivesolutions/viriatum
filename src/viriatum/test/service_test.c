@@ -290,6 +290,7 @@ const char *test_ran_service(void) {
     nothing to report for this execution */
     return NULL;
 }
+
 const char *test_arguments_options_service(void) {
     /* allocates space for the service, for the map of the arguments
     that the command line produces and for one of them */
@@ -337,4 +338,53 @@ const char *test_arguments_options_service(void) {
     nothing to report for this execution */
     return NULL;
 }
+const char *test_flags_service(void) {
+    /* allocates space for the chain of the connection and for the
+    string of the flags that the banner of the startup carries */
+    struct test_context_t *context;
+    const char *flags = VIRIATUM_FLAGS;
 
+    /* the safety of the threading is always one of the two values
+    that the string carries, so it is never empty */
+    V_ASSERT_NOT_NULL(flags);
+
+    /* the transport only shows up in the banner when the build has
+    actually been able to reach the library of it */
+#ifdef VIRIATUM_SSL
+    V_ASSERT_NOT_NULL(strstr(flags, "ssl"));
+#else
+    V_ASSERT_NULL(strstr(flags, "ssl"));
+#endif
+
+    /* the most recent version of the protocol shows up in the very
+    same way, it is left out for the footprint of a smaller target */
+#ifdef VIRIATUM_HTTP2
+    V_ASSERT_NOT_NULL(strstr(flags, "http2"));
+#else
+    V_ASSERT_NULL(strstr(flags, "http2"));
+#endif
+
+    /* a connection only ever looks at the bytes that open it when
+    the build carries the version they may belong to */
+    create_test_context(&context);
+    create_test_connection(context);
+#ifdef VIRIATUM_HTTP2
+    V_ASSERT(context->http_connection->detect == TRUE);
+#else
+    V_ASSERT(context->http_connection->detect == FALSE);
+#endif
+    delete_test_connection(context);
+
+    /* the setting of the service decides it just the same, a service
+    that turns it off never looks at those bytes either */
+    context->options->http2 = 0;
+    create_test_connection(context);
+    V_ASSERT(context->http_connection->detect == FALSE);
+    delete_test_connection(context);
+
+    delete_test_context(context);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}

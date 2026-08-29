@@ -504,6 +504,7 @@ static size_t _write_headers_handler_file(
  * @param push The list of the paths to be promised.
  */
 static void _push_handler_file(struct http_connection_t *http_connection, struct http_request_t *http_request, unsigned char *push) {
+#ifdef VIRIATUM_HTTP2
     /* allocates space for the path being taken out of the list and
     for the walk over the list itself */
     char path[VIRIATUM_MAX_URL_SIZE];
@@ -550,6 +551,7 @@ static void _push_handler_file(struct http_connection_t *http_connection, struct
         if(*pointer == '\0') { break; }
         pointer++;
     }
+#endif
 }
 
 ERROR_CODE message_complete_callback_handler_file(struct http_request_t *http_request) {

@@ -1307,6 +1307,7 @@ static struct test_entry_t _simple_entries[] = {
     V_TEST_T(test_handler_proxy_gateway, "handler"),
     V_TEST_T(test_handler_proxy_upstream, "handler"),
     V_TEST_T(test_handler_proxy_handler, "handler"),
+#ifdef VIRIATUM_HTTP2
     V_TEST_T(test_hpack_table, "hpack"),
     V_TEST_T(test_hpack_table_resize, "hpack"),
     V_TEST_T(test_hpack_table_insert, "hpack"),
@@ -1356,6 +1357,7 @@ static struct test_entry_t _simple_entries[] = {
     V_TEST_T(test_http2_connection_schedule, "http2"),
     V_TEST_T(test_http2_connection_length, "http2"),
     V_TEST_T(test_http2_alpn, "http2"),
+#endif
     V_TEST_T(test_websocket_accept_key, "websocket"),
     V_TEST_T(test_websocket_parse_frame, "websocket"),
     V_TEST_T(test_websocket_build_frame, "websocket"),
@@ -1371,6 +1373,7 @@ static struct test_entry_t _simple_entries[] = {
     V_TEST_T(test_open_service_busy, "service"),
     V_TEST_T(test_file_options_service, "service"),
     V_TEST_T(test_arguments_options_service, "service"),
+    V_TEST_T(test_flags_service, "service"),
     V_TEST_T(test_ran_service, "service")
 };
 

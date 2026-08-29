@@ -261,4 +261,3 @@ const char *test_handler_default_stream(void) {
     nothing to report for this execution */
     return NULL;
 }
-

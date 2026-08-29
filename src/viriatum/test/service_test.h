@@ -106,6 +106,16 @@ const char *test_file_options_service(void);
 const char *test_arguments_options_service(void);
 
 /**
+ * Tests the flags that the banner of the startup carries, they
+ * describe the build and decide what a connection looks at when it
+ * opens.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_flags_service(void);
+
+/**
  * Tests that stopping the service tolerates a service
  * that has not been initialized yet.
  *

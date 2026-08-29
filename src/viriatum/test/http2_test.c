@@ -26,6 +26,8 @@
 
 #include "http2_test.h"
 
+#ifdef VIRIATUM_HTTP2
+
 const char *test_http2_number(void) {
     /* allocates space for the buffer that carries the value in the
     network order that the protocol uses */
@@ -591,3 +593,5 @@ const char *test_http2_verify_frame(void) {
     nothing to report for this execution */
     return NULL;
 }
+
+#endif

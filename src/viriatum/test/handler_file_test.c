@@ -568,6 +568,7 @@ const char *test_handler_file_missing(void) {
 }
 
 const char *test_handler_file_push(void) {
+#ifdef VIRIATUM_HTTP2
     /* allocates space for the chain of the connection, for the
     session and for the promises that the location produces */
     struct test_context_t *context;
@@ -650,6 +651,7 @@ const char *test_handler_file_push(void) {
     delete_test_connection(context);
     delete_test_context(context);
     remove(HANDLER_FILE_TEST_PATH);
+#endif
 
     /* returns the default value, nothing happened so there's
     nothing to report for this execution */
@@ -838,4 +840,3 @@ const char *test_handler_file_handler(void) {
     nothing to report for this execution */
     return NULL;
 }
-

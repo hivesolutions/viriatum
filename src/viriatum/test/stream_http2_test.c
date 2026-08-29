@@ -26,6 +26,8 @@
 
 #include "stream_http2_test.h"
 
+#ifdef VIRIATUM_HTTP2
+
 /**
  * The record that the handler of the tests writes into, it is a
  * single one as only one connection is driven at a time.
@@ -999,21 +1001,21 @@ const char *test_http2_connection_fields(void) {
     /* the blocks that a peer is not allowed to send, every one of
     them carrying a single violation of the rules of a request */
     static const char *invalid[][12] = {
-        { ":method", "BREW", ":scheme", "http", ":path", "/", NULL },
-        { ":method", "GET", ":scheme", "ftp", ":path", "/", NULL },
-        { ":method", "GET", ":scheme", "http", ":path", "", NULL },
-        { ":method", "GET", ":method", "POST", ":scheme", "http", ":path", "/", NULL },
-        { ":method", "GET", ":scheme", "http", ":scheme", "http", ":path", "/", NULL },
-        { ":method", "GET", ":scheme", "http", ":path", "/", ":path", "/", NULL },
-        { ":method", "GET", ":scheme", "http", ":path", "/", ":authority", "a", ":authority", "b", NULL },
-        { ":method", "GET", ":scheme", "http", ":path", "/", ":status", "200", NULL },
-        { ":method", "GET", ":scheme", "http", ":path", "/", "accept", "*/*", ":authority", "a", NULL },
-        { ":method", "GET", ":scheme", "http", ":path", "/", "Accept", "*/*", NULL },
-        { ":method", "GET", ":scheme", "http", ":path", "/", "connection", "close", NULL },
-        { ":method", "GET", ":scheme", "http", ":path", "/", "keep-alive", "1", NULL },
-        { ":method", "GET", ":scheme", "http", ":path", "/", "upgrade", "h2c", NULL },
-        { ":method", "GET", ":scheme", "http", ":path", "/", "transfer-encoding", "chunked", NULL },
-        { ":method", "GET", ":scheme", "http", ":path", "/", "te", "gzip", NULL }
+        {":method", "BREW", ":scheme", "http", ":path", "/", NULL},
+        {":method", "GET", ":scheme", "ftp", ":path", "/", NULL},
+        {":method", "GET", ":scheme", "http", ":path", "", NULL},
+        {":method", "GET", ":method", "POST", ":scheme", "http", ":path", "/", NULL},
+        {":method", "GET", ":scheme", "http", ":scheme", "http", ":path", "/", NULL},
+        {":method", "GET", ":scheme", "http", ":path", "/", ":path", "/", NULL},
+        {":method", "GET", ":scheme", "http", ":path", "/", ":authority", "a", ":authority", "b", NULL},
+        {":method", "GET", ":scheme", "http", ":path", "/", ":status", "200", NULL},
+        {":method", "GET", ":scheme", "http", ":path", "/", "accept", "*/*", ":authority", "a", NULL},
+        {":method", "GET", ":scheme", "http", ":path", "/", "Accept", "*/*", NULL},
+        {":method", "GET", ":scheme", "http", ":path", "/", "connection", "close", NULL},
+        {":method", "GET", ":scheme", "http", ":path", "/", "keep-alive", "1", NULL},
+        {":method", "GET", ":scheme", "http", ":path", "/", "upgrade", "h2c", NULL},
+        {":method", "GET", ":scheme", "http", ":path", "/", "transfer-encoding", "chunked", NULL},
+        {":method", "GET", ":scheme", "http", ":path", "/", "te", "gzip", NULL}
     };
 
     /* the block that leaves out the path, it is the only one of the
@@ -2662,3 +2664,5 @@ const char *test_http2_alpn(void) {
     nothing to report for this execution */
     return NULL;
 }
+
+#endif

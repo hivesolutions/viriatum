@@ -29,7 +29,8 @@
 #define HELP_STRING "\
 usage: viriatum [--version] [--port[=<port>] [--host[=<hostname>]] [-ip6]\n\
                 [handler[=<name>]] [workers[=<count>]] [wwwroot[=<path>]]\n\
-                [--local] [--ssl] [--daemon] [--test] [--speed] [--help]\n\
+                [--local] [--ssl] [--no-http2] [--daemon] [--test] [--speed]\n\
+                [--help]\n\
 \n\
 The most commonly used viriatum commands are:\n\
    --version   Prints the current version\n\
@@ -41,6 +42,7 @@ The most commonly used viriatum commands are:\n\
    --wwwroot   Sets the root directory from which static files are served\n\
    --local     Runs the service in local mode no internet support\n\
    --ssl       Listens to the sockets using ssl encryption\n\
+   --no-http2  Serves only the previous version of the http protocol\n\
    --daemon    Runs the service as daemon (background)\n\
    --test      Runs a series of test for viriatum\n\
    --speed     Runs a series of speed relates tests for viriatum\n\

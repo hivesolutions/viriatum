@@ -36,6 +36,15 @@ if(VIRIATUM_COVERAGE)
     message(STATUS "Viriatum: coverage instrumentation enabled")
 endif()
 
+# the most recent version of the protocol is served unless the build
+# is told otherwise, it carries no library of its own and so it is only
+# ever left out for the footprint of the smaller targets
+option(VIRIATUM_HTTP2 "Serve the most recent version of the protocol" ON)
+if(NOT VIRIATUM_HTTP2)
+    add_definitions(-DHAVE_NO_HTTP2)
+    message(STATUS "Viriatum: http2 disabled")
+endif()
+
 # builds the targets that drive the decoders of the protocol over the
 # bytes an engine produces, they are the two places that take apart
 # what a peer controls, the instrumentation reaches the complete tree

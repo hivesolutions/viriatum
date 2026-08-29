@@ -26,6 +26,8 @@
 
 #include "http2.h"
 
+#ifdef VIRIATUM_HTTP2
+
 unsigned int decode_number_http2(const unsigned char *data) {
     /* gathers the four bytes of the value in the network order that
     the protocol uses for every one of its numbers */
@@ -416,3 +418,5 @@ ERROR_CODE verify_frame_http2(struct http2_frame_t *http2_frame, struct http2_se
     /* raises no error */
     RAISE_NO_ERROR;
 }
+
+#endif

@@ -108,7 +108,11 @@ ERROR_CODE create_http_connection(struct http_connection_t **http_connection_poi
     time and so this reference never changes */
     http_connection->request = http_connection->http_parser->request;
     http_connection->http2_connection = NULL;
+#ifdef VIRIATUM_HTTP2
     http_connection->detect = service->options->http2;
+#else
+    http_connection->detect = FALSE;
+#endif
 
     /* sets the connection as the message parameter(s), this is the
     reference that allows an handler to reach the upper objects */
@@ -143,6 +147,7 @@ ERROR_CODE delete_http_connection(struct http_connection_t *http_connection) {
     to be used in this connection */
     struct http_handler_t *http_handler;
 
+#ifdef VIRIATUM_HTTP2
     /* in case the connection has been taken over by a session of
     HTTP/2 the session is released first, it owns the streams and
     the handlers that were serving them, and it restores the
@@ -151,6 +156,7 @@ ERROR_CODE delete_http_connection(struct http_connection_t *http_connection) {
         delete_http2_connection(http_connection->http2_connection);
         http_connection->http2_connection = NULL;
     }
+#endif
 
     /* retrieves the currently assigned handler and then unsets
     the connection from associated handler (unregister connection) */
@@ -274,6 +280,7 @@ ERROR_CODE data_handler_stream_http(struct io_connection_t *io_connection, unsig
     memcpy(_buffer, buffer, buffer_size);
     http_connection->buffer_offset += buffer_size;
 
+#ifdef VIRIATUM_HTTP2
     /* the connection may be opening with the preface of HTTP/2
     instead of a message of HTTP/1.1, the two are told apart by the
     very first bytes and the decision is taken only once */
@@ -316,6 +323,7 @@ ERROR_CODE data_handler_stream_http(struct io_connection_t *io_connection, unsig
             RAISE_NO_ERROR;
         }
     }
+#endif
 
     /* iterates continuously, this allows the stream handler
     to split the stream into possible multiple messages, useful

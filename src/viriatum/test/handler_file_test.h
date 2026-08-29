@@ -181,4 +181,3 @@ const char *test_handler_file_location(void);
  * the unit test should describe possible errors.
  */
 const char *test_handler_file_handler(void);
-

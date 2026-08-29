@@ -419,4 +419,3 @@ const char *test_handler_proxy_handler(void) {
     nothing to report for this execution */
     return NULL;
 }
-

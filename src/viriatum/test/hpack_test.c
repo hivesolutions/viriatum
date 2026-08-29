@@ -26,6 +26,8 @@
 
 #include "hpack_test.h"
 
+#ifdef VIRIATUM_HTTP2
+
 /**
  * Counts the fields that reach it and gathers nothing at all, so
  * that a test of the limits of the decoding is bounded by those
@@ -1098,3 +1100,5 @@ const char *test_hpack_huffman_errors(void) {
     nothing to report for this execution */
     return NULL;
 }
+
+#endif

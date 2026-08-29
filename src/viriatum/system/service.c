@@ -28,7 +28,7 @@
 
 static unsigned long long connection_id = 0;
 
-#ifdef VIRIATUM_ALPN
+#if defined(VIRIATUM_ALPN) && defined(VIRIATUM_HTTP2)
 int alpn_handler_service(SSL *ssl, const unsigned char **out, unsigned char *out_size, const unsigned char *in, unsigned int in_size, void *arguments) {
     /* allocates space for the position in the list of the peer and
     for the size of the name being visited */
@@ -952,7 +952,7 @@ ERROR_CODE _open_service(struct service_t *service) {
         /* announces the protocols that this end speaks so that a peer
         able to speak HTTP/2 negotiates it through the transport,
         which is the only form a browser ever uses */
-#ifdef VIRIATUM_ALPN
+#if defined(VIRIATUM_ALPN) && defined(VIRIATUM_HTTP2)
         SSL_CTX_set_alpn_select_cb(service->ssl_context, alpn_handler_service, NULL);
 #endif
 
