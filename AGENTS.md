@@ -25,6 +25,15 @@ Format C code before committing using clang-format with the project's `.clang-fo
 clang-format -i <file>
 ```
 
+The whole tree is checked at once through a script of its own, which reports every source the formatter would rewrite and fails when there is one, and which formats them in place when asked to:
+
+```bash
+./scripts/format.sh
+./scripts/format.sh --fix
+```
+
+A job of the integration runs the first of those on every push, so a source that is left unformatted fails the build rather than passing quietly. The formatter is pinned there to a single version, the output of it differs between versions and a drifting one would make the job flip on its own.
+
 ## Testing
 
 Run the core test suite and module tests before committing:
@@ -153,7 +162,7 @@ version: 0.4.0
 
 Before committing, ensure that the following items check:
 
-- [ ] Code is formatted with `clang-format`
+- [ ] Code is formatted with `clang-format`, which `./scripts/format.sh` verifies over the whole tree
 - [ ] Tests pass: `./bin/viriatum --test`
 - [ ] Module tests pass (if applicable): `./bin/viriatum_mod_lua_test`
 - [ ] CHANGELOG.md is updated in [Unreleased] section

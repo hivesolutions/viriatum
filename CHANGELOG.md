@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Conformance and interoperability of HTTP/2 are now measured on every change - [#50](https://github.com/hivesolutions/viriatum/issues/50)
 * A stream of HTTP/2 now refuses what it is not allowed to receive at each point of its life - [#50](https://github.com/hivesolutions/viriatum/issues/50)
 * Continuous integration now builds with clang 22 and gcc 16
+* Continuous integration now fails when the code is not formatted as the project asks
 * Scalable vector versions of the web illustrations, logos and UI assets
 
 ### Changed
