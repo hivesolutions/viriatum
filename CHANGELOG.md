@@ -37,6 +37,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * A client that narrows the window of a stream now receives what was held back - [#50](https://github.com/hivesolutions/viriatum/issues/50)
 * A proxied request with large headers no longer corrupts the memory of the server
 * The command that reports the information of the service no longer starts it
+* Connections are now kept alive by default, throughput no longer collapses under load
+* The certificate that ships is accepted again by a current library
+* The project of Xcode builds again and carries every source of the tree
 
 ## [0.5.0] - 2026-08-28
 

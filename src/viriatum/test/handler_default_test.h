@@ -56,3 +56,13 @@ const char *test_handler_default_close(void);
  * the unit test should describe possible errors.
  */
 const char *test_handler_default_stream(void);
+
+/**
+ * Tests whether a connection is kept alive once a message has been
+ * answered, the version of it and the field that carries the
+ * intention of the peer being what decide it.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_handler_default_persistence(void);

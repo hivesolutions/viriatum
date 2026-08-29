@@ -990,14 +990,22 @@ class AsgiTest(ServerCase):
         result = urllib.request.urlopen(self._url("/plain"), timeout=5)
         self.assertEqual(result.read(), b"plain")
 
-    def test_close_by_default(self):
-        # verifies that a request that does not ask for the keeping
-        # of the connection has it closed, mirroring the other
-        # handlers of the server which use the same flag
+    def test_keep_alive_by_default(self):
+        # verifies that a request of the most recent version of the
+        # protocol keeps the connection alive without asking for it
+        # and closes it when it does ask, which is what the
+        # specification requires of each of the two cases
         connection = http.client.HTTPConnection("127.0.0.1", self.port, timeout=5)
         connection.auto_open = 0
         connection.connect()
         connection.request("GET", "/plain")
+        result = connection.getresponse()
+        self.assertEqual(result.read(), b"plain")
+        self.assertEqual(result.headers.get("Connection"), "keep-alive")
+
+        # sends a second message over the very same connection, which
+        # only reaches the server because the first one kept it alive
+        connection.request("GET", "/plain", headers={"Connection": "close"})
         result = connection.getresponse()
         self.assertEqual(result.read(), b"plain")
         self.assertEqual(result.headers.get("Connection"), "close")

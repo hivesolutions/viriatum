@@ -102,6 +102,17 @@ void update_request_http_parser(struct http_parser_t *http_parser) {
     http_request->flags = http_parser->flags;
     http_request->content_length = http_parser->_content_length;
     http_request->trailers = http_parser->flags & FLAG_TRAILING ? TRUE : FALSE;
+
+    /* decides whether the connection is kept alive from the version
+    of the message and from the field that carries the intention of
+    the peer, under HTTP/1.1 a connection is persistent unless it is
+    closed on purpose and under the older one it is the other way
+    around, the flag of the parser only carries the field itself */
+    if(http_should_keep_alive(http_parser)) {
+        http_request->flags |= FLAG_KEEP_ALIVE;
+    } else {
+        http_request->flags &= ~FLAG_KEEP_ALIVE;
+    }
 }
 
 void create_http_settings(struct http_settings_t **http_settings_pointer) {

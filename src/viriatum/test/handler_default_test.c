@@ -203,12 +203,11 @@ const char *test_handler_default_stream(void) {
     ERROR_CODE error;
 
     /* the message as it travels on the wire, the parser of the
-    connection is the one that takes it apart, the field that keeps
-    the connection alive is the one that lets a second one follow */
+    connection is the one that takes it apart, this version of the
+    protocol keeps a connection alive without being asked to */
     static const char *request =
         "POST /submit HTTP/1.1\r\n"
         "Host: localhost\r\n"
-        "Connection: keep-alive\r\n"
         "Content-Length: 4\r\n"
         "\r\n"
         "body";
@@ -261,3 +260,70 @@ const char *test_handler_default_stream(void) {
     nothing to report for this execution */
     return NULL;
 }
+const char *test_handler_default_persistence(void) {
+    /* allocates space for the chain of the connection and for the
+    responses that the messages produce */
+    struct test_context_t *context;
+    unsigned char written[1024];
+    size_t size;
+    size_t index;
+    ERROR_CODE error;
+
+    /* the messages that decide whether the connection is kept alive,
+    together with what each one of them is answered with and with the
+    number of the closings that follows it */
+    static const char *messages[] = {
+        "GET / HTTP/1.1\r\nHost: localhost\r\n\r\n",
+        "GET / HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n",
+        "GET / HTTP/1.0\r\nHost: localhost\r\n\r\n",
+        "GET / HTTP/1.0\r\nHost: localhost\r\nConnection: keep-alive\r\n\r\n"
+    };
+    static const char *answers[] = {
+        "Connection: keep-alive\r\n",
+        "Connection: close\r\n",
+        "Connection: close\r\n",
+        "Connection: keep-alive\r\n"
+    };
+    static const size_t closings[] = { 0, 1, 1, 0 };
+
+    /* the most recent version of the protocol keeps a connection
+    alive unless it is closed on purpose and the older one does the
+    opposite, which is what the specification requires of each */
+    for(index = 0; index < sizeof(messages) / sizeof(messages[0]); index++) {
+        create_test_context(&context);
+        create_test_connection(context);
+
+        _handler.name = (unsigned char *) "default";
+        _handler.resolve_index = FALSE;
+        _handler.set = set_handler_default;
+        _handler.unset = unset_handler_default;
+        _handler.reset = NULL;
+        context->http_connection->base_handler = &_handler;
+
+        error = data_handler_stream_http(
+            context->io_connection,
+            (unsigned char *) messages[index],
+            strlen(messages[index])
+        );
+        V_ASSERT(error == 0);
+
+        size = flush_test_connection(context, written, sizeof(written));
+        V_ASSERT(size > 0 && size < sizeof(written));
+        written[size] = '\0';
+
+        V_ASSERT_NOT_NULL(strstr((char *) written, answers[index]));
+        V_ASSERT_EQ_U(get_closed_test_connection(), closings[index]);
+
+        if(context->http_connection->http_handler != NULL) {
+            unset_handler_default(context->http_connection);
+            context->http_connection->http_handler = NULL;
+        }
+        delete_test_connection(context);
+        delete_test_context(context);
+    }
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
