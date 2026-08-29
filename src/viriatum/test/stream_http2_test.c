@@ -1622,6 +1622,7 @@ const char *test_http2_connection_trailers(void) {
     http2_frame.payload = block;
     error = handle_frame_http2_connection(http2_connection, &http2_frame);
     V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+    V_ASSERT_EQ_U(_record.begin, 1);
     V_ASSERT_EQ_U(_record.headers, 1);
 
     /* the section of the trailers is a second block on the very same
@@ -1650,6 +1651,13 @@ const char *test_http2_connection_trailers(void) {
     V_ASSERT_EQ_S(_record.name, "x-checksum");
     V_ASSERT_EQ_S(_record.header, "1234");
     V_ASSERT_EQ_U(_record.complete, 1);
+
+    /* the section of the trailers belongs to the message that is
+    already under way, so it neither opens one of its own nor closes
+    the headers a second time, a handler that gathers a message would
+    otherwise drop everything it had gathered of it */
+    V_ASSERT_EQ_U(_record.begin, 1);
+    V_ASSERT_EQ_U(_record.headers, 1);
 
     _delete_http2_test(context, http2_connection);
 

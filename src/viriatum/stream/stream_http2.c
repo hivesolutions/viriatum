@@ -1073,9 +1073,14 @@ static ERROR_CODE _block_http2_connection(struct http2_connection_t *http2_conne
     /* tells the handler that a new message begins, this is the very
     same sequence the HTTP/1.1 parser produces, note that the handler
     of the stream is taken again once the block is over as a handler
-    that dispatches only resolves the target as the url reaches it */
-    if(http2_stream->http_settings->on_message_begin) {
-        http2_stream->http_settings->on_message_begin(http2_stream->request);
+    that dispatches only resolves the target as the url reaches it.
+    A trailer section belongs to the message that is already under way
+    rather than opening one of its own, so it never says this again,
+    a handler that gathers a message resets it on hearing it */
+    if(http2_block.trailers == FALSE) {
+        if(http2_stream->http_settings->on_message_begin) {
+            http2_stream->http_settings->on_message_begin(http2_stream->request);
+        }
     }
 
     /* decodes the block, a failure of it corrupts the dynamic table
@@ -1094,9 +1099,13 @@ static ERROR_CODE _block_http2_connection(struct http2_connection_t *http2_conne
     return_value = _pseudo_http2_connection(&http2_block);
     if(IS_ERROR_CODE(return_value)) { RAISE_AGAIN(return_value); }
 
-    http2_stream->headers_complete = TRUE;
-    if(http2_stream->http_settings->on_headers_complete) {
-        http2_stream->http_settings->on_headers_complete(http2_stream->request);
+    /* the section of the headers closes once, the fields a trailer
+    section carries have already been handed over one by one */
+    if(http2_block.trailers == FALSE) {
+        http2_stream->headers_complete = TRUE;
+        if(http2_stream->http_settings->on_headers_complete) {
+            http2_stream->http_settings->on_headers_complete(http2_stream->request);
+        }
     }
 
     /* takes the handler that is serving the stream again, one that
