@@ -38,6 +38,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * A proxied request with large headers no longer corrupts the memory of the server
 * The command that reports the information of the service no longer starts it
 * Connections are now kept alive by default, throughput no longer collapses under load
+* A client that closes a connection now still receives the reason the server gives for it
 * The certificate that ships is accepted again by a current library
 * The project of Xcode builds again and carries every source of the tree
 

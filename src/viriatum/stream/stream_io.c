@@ -407,9 +407,21 @@ ERROR_CODE read_handler_stream_io(struct connection_t *connection) {
                 V_DEBUG("Finished calling on data handler\n");
             }
 
+            /* writes whatever the handling of the data has queued, the
+            releasing of the connection drops it and the peer that has
+            closed its own end of the connection may still be waiting
+            for it, the reason of the closing among it */
+            if(connection->status != STATUS_CLOSED &&
+               connection->write_queue->size > 0) {
+                V_DEBUG("Flushing the writes that are still pending\n");
+                write_handler_stream_io(connection);
+            }
+
             /* closes the connection as the error was fatal, so this is the
             best escape approach to solve the issue */
-            connection->close_connection(connection);
+            if(connection->status != STATUS_CLOSED) {
+                connection->close_connection(connection);
+            }
 
             /* breaks the switch */
             break;
