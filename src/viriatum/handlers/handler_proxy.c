@@ -474,6 +474,33 @@ ERROR_CODE location_callback_handler_proxy(struct http_request_t *http_request, 
     RAISE_NO_ERROR;
 }
 
+char reuse_backend_handler_proxy(struct connection_t *connection_c, struct handler_proxy_context_t *handler_proxy_context) {
+    /* allocates space for the parameters that the connection carries
+    and for the exchange that they belong to */
+    struct custom_parameters_t *current;
+    struct handler_proxy_context_t *pending;
+
+    /* a connection that does not exist yet is never reused, one of
+    its own has to be opened for the exchange */
+    if(connection_c == NULL) { return FALSE; }
+
+    /* a connection that carries no parameters at all is between two
+    exchanges and so it is free to take */
+    current = (struct custom_parameters_t *) connection_c->parameters;
+    if(current == NULL) { return TRUE; }
+
+    /* the exchange that is already on it is the one of this very
+    message whenever the connection is being reused in sequence */
+    pending = (struct handler_proxy_context_t *) current->parameters;
+    if(pending == handler_proxy_context) { return TRUE; }
+
+    /* an exchange of another message that is still under way keeps
+    the connection, the response of it would otherwise be written for
+    the message of this one, several of them travel at the same time
+    under the most recent version of the protocol */
+    return pending->pending == TRUE ? FALSE : TRUE;
+}
+
 void write_request_handler_proxy(struct handler_proxy_context_t *handler_proxy_context, const char *method, const char *path) {
     /* allocates space for the line being built and for the size that
     the building of it produces */
@@ -556,6 +583,12 @@ ERROR_CODE virtual_url_callback_handler_proxy(struct http_request_t *http_reques
         NULL,
         (void **) &handler_proxy_context->connection_c
     );
+
+    /* a backend connection that is still carrying an exchange of its
+    own is never taken over, one of its own is opened instead */
+    if(reuse_backend_handler_proxy(handler_proxy_context->connection_c, handler_proxy_context) == FALSE) {
+        handler_proxy_context->connection_c = NULL;
+    }
 
     /* creates the parameters object that is going to be passed to
     the connection and used on the open operation to guide it's
@@ -653,6 +686,12 @@ ERROR_CODE virtual_url_callback_handler_proxy(struct http_request_t *http_reques
         /* retrieves the reference for the connection object that will be used
         for the connection with the final back-end client */
         connection_c = handler_proxy_context->connection_c;
+
+        /* releases the parameters that the connection was carrying, the
+        exchange they belonged to is over and the ones of this one take
+        their place, they are otherwise left behind by every message
+        that travels on a connection that is reused */
+        if(connection_c->parameters != NULL) { FREE(connection_c->parameters); }
 
         /* sets the protocol for the "client" connection as custom and sets
         the "custom" parameters structure in it so that the callback functions

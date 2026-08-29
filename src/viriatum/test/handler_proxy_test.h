@@ -55,6 +55,15 @@ const char *test_handler_proxy_response(void);
  * @return A message describing the execution of
  * the unit test should describe possible errors.
  */
+/**
+ * Tests the rule that decides whether the connection of an upstream
+ * may be taken over by the exchange of another message.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_handler_proxy_reuse(void);
+
 const char *test_handler_proxy_gateway(void);
 
 /**

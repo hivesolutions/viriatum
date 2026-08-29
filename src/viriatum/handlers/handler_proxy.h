@@ -254,6 +254,7 @@ ERROR_CODE headers_complete_callback_handler_proxy(struct http_request_t *http_r
 ERROR_CODE body_callback_handler_proxy(struct http_request_t *http_request, const unsigned char *data, size_t data_size);
 ERROR_CODE message_complete_callback_handler_proxy(struct http_request_t *http_request);
 ERROR_CODE location_callback_handler_proxy(struct http_request_t *http_request, size_t index, size_t offset);
+char reuse_backend_handler_proxy(struct connection_t *connection_c, struct handler_proxy_context_t *handler_proxy_context);
 void write_request_handler_proxy(struct handler_proxy_context_t *handler_proxy_context, const char *method, const char *path);
 ERROR_CODE virtual_url_callback_handler_proxy(struct http_request_t *http_request, const unsigned char *data, size_t data_size);
 ERROR_CODE data_backend_handler(struct io_connection_t *io_connection, unsigned char *buffer, size_t buffer_size);

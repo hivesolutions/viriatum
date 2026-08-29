@@ -1312,6 +1312,7 @@ static struct test_entry_t _simple_entries[] = {
     V_TEST_T(test_handler_default_persistence, "handler"),
     V_TEST_T(test_handler_proxy_request, "handler"),
     V_TEST_T(test_handler_proxy_response, "handler"),
+    V_TEST_T(test_handler_proxy_reuse, "handler"),
     V_TEST_T(test_handler_proxy_gateway, "handler"),
     V_TEST_T(test_handler_proxy_upstream, "handler"),
     V_TEST_T(test_handler_proxy_handler, "handler"),

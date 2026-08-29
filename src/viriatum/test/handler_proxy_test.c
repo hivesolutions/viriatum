@@ -257,6 +257,56 @@ const char *test_handler_proxy_response(void) {
     return NULL;
 }
 
+const char *test_handler_proxy_reuse(void) {
+    /* allocates space for the chain of the connection, for the two
+    exchanges that travel on it and for the parameters that bind one
+    of them to the connection of the upstream */
+    struct test_context_t *context;
+    struct handler_proxy_context_t *handler_proxy_context;
+    struct handler_proxy_context_t *other;
+    struct connection_t *connection_c;
+    struct custom_parameters_t parameters;
+
+    _create_handler_proxy_test(&context, &handler_proxy_context, &connection_c);
+    create_handler_proxy_context(&other);
+
+    /* a connection that does not exist yet is never reused, one of
+    its own has to be opened for the exchange */
+    V_ASSERT(reuse_backend_handler_proxy(NULL, handler_proxy_context) == FALSE);
+
+    /* a connection that carries no parameters at all sits between two
+    exchanges and so it is free to take */
+    connection_c->parameters = NULL;
+    V_ASSERT(reuse_backend_handler_proxy(connection_c, handler_proxy_context) == TRUE);
+
+    /* the exchange that is already on it is the one of this very
+    message whenever the connection is being reused in sequence, so
+    it is taken whether it is still under way or not */
+    parameters.parameters = (void *) handler_proxy_context;
+    connection_c->parameters = (void *) &parameters;
+    handler_proxy_context->pending = TRUE;
+    V_ASSERT(reuse_backend_handler_proxy(connection_c, handler_proxy_context) == TRUE);
+
+    /* an exchange of another message that is over leaves the
+    connection free for the one that comes after it */
+    parameters.parameters = (void *) other;
+    other->pending = FALSE;
+    V_ASSERT(reuse_backend_handler_proxy(connection_c, handler_proxy_context) == TRUE);
+
+    /* one that is still under way keeps it, the response of it would
+    otherwise be written for the message of this one */
+    other->pending = TRUE;
+    V_ASSERT(reuse_backend_handler_proxy(connection_c, handler_proxy_context) == FALSE);
+
+    connection_c->parameters = NULL;
+    delete_handler_proxy_context(other);
+    _delete_handler_proxy_test(context, handler_proxy_context, connection_c);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
 const char *test_handler_proxy_gateway(void) {
     /* allocates space for the chain of the connection, for the
     context of the proxy and for the response it produces */
