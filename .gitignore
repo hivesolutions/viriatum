@@ -71,6 +71,7 @@ cmake_install.cmake
 /build-*
 /build.*
 /coverage
+/benchmark
 /conformance
 /interop
 /fuzz
