@@ -585,8 +585,18 @@ ERROR_CODE virtual_url_callback_handler_proxy(struct http_request_t *http_reques
     );
 
     /* a backend connection that is still carrying an exchange of its
-    own is never taken over, one of its own is opened instead */
+    own is never taken over, one of its own is opened instead, the
+    one that is left behind carries its exchange to the end and is
+    then closed by the peer of it, so the association with this
+    client is undone before it is replaced, the closing of it would
+    otherwise reach a client that is gone by then */
     if(reuse_backend_handler_proxy(handler_proxy_context->connection_c, handler_proxy_context) == FALSE) {
+        set_value_hash_map(
+            proxy_handler->reverse_map,
+            (size_t) handler_proxy_context->connection_c,
+            NULL,
+            NULL
+        );
         handler_proxy_context->connection_c = NULL;
     }
 
@@ -784,26 +794,31 @@ ERROR_CODE close_backend_handler(struct io_connection_t *io_connection) {
         (void **) &connection_s
     );
 
-    /* uses the service connection to retrieve the currently associated
-    on close function callback in order to restore it */
-    get_value_hash_map(
-        proxy_handler->on_close_map,
-        (size_t) connection_s,
-        NULL,
-        (void **) &on_close
-    );
+    /* a backend connection that is associated with no client at all
+    has been left behind by another that took its place, the client
+    of it is likely gone by now and so nothing of it is restored */
+    if(connection_s != NULL) {
+        /* uses the service connection to retrieve the currently associated
+        on close function callback in order to restore it */
+        get_value_hash_map(
+            proxy_handler->on_close_map,
+            (size_t) connection_s,
+            NULL,
+            (void **) &on_close
+        );
 
-    /* resolves the service connection (proxy client) into the proper io
-    and HTTP connection and then restores the close handler to them */
-    io_connection_s = (struct io_connection_t *) connection_s->lower;
-    io_connection_s->on_close = on_close;
+        /* resolves the service connection (proxy client) into the proper io
+        and HTTP connection and then restores the close handler to them */
+        io_connection_s = (struct io_connection_t *) connection_s->lower;
+        io_connection_s->on_close = on_close;
 
-    /* unsets the complete set of map asociating the data from the frontend
-    connections to the backend so that no more resolution is possible, this
-    is the expected behavior because no more backend connections are available */
-    set_value_hash_map(proxy_handler->connections_map, (size_t) connection_s, NULL, NULL);
-    set_value_hash_map(proxy_handler->reverse_map, (size_t) connection, NULL, NULL);
-    set_value_hash_map(proxy_handler->on_close_map, (size_t) connection_s, NULL, NULL);
+        /* unsets the complete set of map asociating the data from the frontend
+        connections to the backend so that no more resolution is possible, this
+        is the expected behavior because no more backend connections are available */
+        set_value_hash_map(proxy_handler->connections_map, (size_t) connection_s, NULL, NULL);
+        set_value_hash_map(proxy_handler->reverse_map, (size_t) connection, NULL, NULL);
+        set_value_hash_map(proxy_handler->on_close_map, (size_t) connection_s, NULL, NULL);
+    }
 
     /* in case the custom parameters are set the connection is talking
     with the backend server and so the connection must be correctly and

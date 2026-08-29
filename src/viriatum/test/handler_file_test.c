@@ -272,6 +272,50 @@ const char *test_handler_file_header_field(void) {
     );
     V_ASSERT(handler_file_context->next_header == UNDEFINED_HEADER);
 
+    /* the case of a name carries no meaning at all, so one written
+    in any mixture of the two is recognised just the same */
+    header_field_callback_handler_file(
+        http_request,
+        (unsigned char *) "RANGE",
+        5
+    );
+    V_ASSERT(handler_file_context->next_header == RANGE);
+    handler_file_context->next_header = UNDEFINED_HEADER;
+
+    header_field_callback_handler_file(
+        http_request,
+        (unsigned char *) "cAcHe-CoNtRoL",
+        13
+    );
+    V_ASSERT(handler_file_context->next_header == CACHE_CONTROL);
+    handler_file_context->next_header = UNDEFINED_HEADER;
+
+    header_field_callback_handler_file(
+        http_request,
+        (unsigned char *) "aUtHoRiZaTiOn",
+        13
+    );
+    V_ASSERT(handler_file_context->next_header == AUTHORIZATION);
+    handler_file_context->next_header = UNDEFINED_HEADER;
+
+    header_field_callback_handler_file(
+        http_request,
+        (unsigned char *) "IF-none-MATCH",
+        13
+    );
+    V_ASSERT(handler_file_context->etag_status == 1);
+    V_ASSERT(handler_file_context->next_header == ETAG);
+    handler_file_context->next_header = UNDEFINED_HEADER;
+
+    /* a name shorter than the bytes the matching looks at is none of
+    the ones being looked for and is never read past its end */
+    header_field_callback_handler_file(
+        http_request,
+        (unsigned char *) "te",
+        2
+    );
+    V_ASSERT(handler_file_context->next_header == UNDEFINED_HEADER);
+
     /* deletes both the context and the request */
     delete_handler_file_context(handler_file_context);
     delete_http_request(http_request);
