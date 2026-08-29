@@ -2941,6 +2941,10 @@ const char *test_http2_alpn(void) {
     size_t offset;
     int result;
 
+    /* allocates space for the service whose option decides whether
+    the most recent version is spoken at all */
+    struct service_t *service;
+
     /* a peer that announces the two protocols in the order that a
     browser uses gets the most recent of them */
     offset = 0;
@@ -3005,6 +3009,65 @@ const char *test_http2_alpn(void) {
     list[1] = 'h';
     result = alpn_handler_service(NULL, &selected, &selected_size, list, 2, NULL);
     V_ASSERT_EQ_I(result, SSL_TLSEXT_ERR_NOACK);
+
+    /* a service that has been told not to speak the most recent
+    version never names it back, a connection negotiated into one
+    that is then handed to the parser of the older version would be
+    taken down by the peer rather than served */
+    create_service(&service, (unsigned char *) "test", (unsigned char *) "test");
+    service->options->http2 = 0;
+
+    offset = 0;
+    list[offset] = sizeof(HTTP2_ALPN) - 1;
+    memcpy(&list[offset + 1], HTTP2_ALPN, sizeof(HTTP2_ALPN) - 1);
+    offset += sizeof(HTTP2_ALPN);
+    list[offset] = sizeof(HTTP11_ALPN) - 1;
+    memcpy(&list[offset + 1], HTTP11_ALPN, sizeof(HTTP11_ALPN) - 1);
+    offset += sizeof(HTTP11_ALPN);
+
+    result = alpn_handler_service(
+        NULL,
+        &selected,
+        &selected_size,
+        list,
+        (unsigned int) offset,
+        (void *) service
+    );
+    V_ASSERT_EQ_I(result, SSL_TLSEXT_ERR_OK);
+    V_ASSERT_MEM(selected, HTTP11_ALPN, sizeof(HTTP11_ALPN) - 1);
+
+    /* the very same service with the option set speaks it again */
+    service->options->http2 = 1;
+    result = alpn_handler_service(
+        NULL,
+        &selected,
+        &selected_size,
+        list,
+        (unsigned int) offset,
+        (void *) service
+    );
+    V_ASSERT_EQ_I(result, SSL_TLSEXT_ERR_OK);
+    V_ASSERT_MEM(selected, HTTP2_ALPN, sizeof(HTTP2_ALPN) - 1);
+
+    /* a peer that announces only the most recent version negotiates
+    nothing at all when this end is not serving it */
+    service->options->http2 = 0;
+    offset = 0;
+    list[offset] = sizeof(HTTP2_ALPN) - 1;
+    memcpy(&list[offset + 1], HTTP2_ALPN, sizeof(HTTP2_ALPN) - 1);
+    offset += sizeof(HTTP2_ALPN);
+
+    result = alpn_handler_service(
+        NULL,
+        &selected,
+        &selected_size,
+        list,
+        (unsigned int) offset,
+        (void *) service
+    );
+    V_ASSERT_EQ_I(result, SSL_TLSEXT_ERR_NOACK);
+
+    delete_service(service);
 #endif
 
     /* returns the default value, nothing happened so there's

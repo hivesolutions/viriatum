@@ -35,6 +35,12 @@ int alpn_handler_service(SSL *ssl, const unsigned char **out, unsigned char *out
     unsigned int index = 0;
     unsigned char size;
 
+    /* gathers the service that the negotiation belongs to, the option
+    of it is what decides whether the most recent version is spoken
+    at all, a service that carries none speaks it */
+    struct service_t *service = (struct service_t *) arguments;
+    unsigned char http2 = service == NULL ? TRUE : service->options->http2;
+
     /* walks the list in the very order the peer has sent it, the
     first name that this end speaks is the one selected, so that the
     preference honoured is the one of the client */
@@ -43,7 +49,11 @@ int alpn_handler_service(SSL *ssl, const unsigned char **out, unsigned char *out
         index++;
         if(index + size > in_size) { break; }
 
-        if(size == sizeof(HTTP2_ALPN) - 1 && memcmp(&in[index], HTTP2_ALPN, size) == 0) {
+        /* the most recent version is only ever named back when this
+        end is going to serve it, a connection negotiated into one it
+        then hands to the parser of the older version is taken down
+        by the peer instead of being served by either of them */
+        if(http2 && size == sizeof(HTTP2_ALPN) - 1 && memcmp(&in[index], HTTP2_ALPN, size) == 0) {
             *out = &in[index];
             *out_size = size;
             return SSL_TLSEXT_ERR_OK;
@@ -958,7 +968,7 @@ ERROR_CODE _open_service(struct service_t *service) {
         able to speak HTTP/2 negotiates it through the transport,
         which is the only form a browser ever uses */
 #if defined(VIRIATUM_ALPN) && defined(VIRIATUM_HTTP2)
-        SSL_CTX_set_alpn_select_cb(service->ssl_context, alpn_handler_service, NULL);
+        SSL_CTX_set_alpn_select_cb(service->ssl_context, alpn_handler_service, (void *) service);
 #endif
 
         /* resolves the configuration file from the ssl certificate defaulting to
