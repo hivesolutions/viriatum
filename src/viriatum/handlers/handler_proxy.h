@@ -178,6 +178,14 @@ typedef struct handler_proxy_context_t {
     size_t value_size;
 
     /**
+     * Flag controlling if the value of the field has started to be
+     * gathered, which is what tells a name that is still arriving in
+     * fragments from one that is complete, the value of a valid
+     * field being allowed to carry nothing at all.
+     */
+    char value_started;
+
+    /**
      * The current service connection that "communicates" with the client
      * of the proxy service. This connection may be used to return the data
      * from the target proxy server back to the client.

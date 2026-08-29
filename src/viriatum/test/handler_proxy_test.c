@@ -306,10 +306,14 @@ const char *test_handler_proxy_upstream(void) {
     size_t index;
 
     /* the response of the upstream as it travels on the wire, the
-    parser of the backend is the one that takes it apart */
+    parser of the backend is the one that takes it apart, one of the
+    fields of it carries no value at all which a valid message is
+    allowed to do */
     static const char *response =
         "HTTP/1.1 404 Not Found\r\n"
         "Content-Type: text/html\r\n"
+        "X-Empty: \r\n"
+        "X-After: kept\r\n"
         "Content-Length: 5\r\n"
         "\r\n"
         "gone!";
@@ -342,6 +346,12 @@ const char *test_handler_proxy_upstream(void) {
         V_ASSERT_NOT_NULL(strstr((char *) written, "Content-Type: text/html\r\n"));
         V_ASSERT_NOT_NULL(strstr((char *) written, "Content-Length: 5\r\n"));
         V_ASSERT_NOT_NULL(strstr((char *) written, "\r\n\r\ngone!"));
+
+        /* the field whose value carries nothing at all is written
+        just the same, and the one that follows it reaches the client
+        under its own name rather than appended to that one */
+        V_ASSERT_NOT_NULL(strstr((char *) written, "X-Empty: \r\n"));
+        V_ASSERT_NOT_NULL(strstr((char *) written, "X-After: kept\r\n"));
 
         /* the message of the upstream is over, so a disconnection of
         it no longer affects the client of the proxy */

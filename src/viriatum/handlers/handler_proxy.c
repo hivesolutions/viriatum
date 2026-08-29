@@ -98,6 +98,7 @@ ERROR_CODE create_handler_proxy_context(struct handler_proxy_context_t **handler
     handler_proxy_context->out_buffer_max_size = 1024;
     handler_proxy_context->field_size = 0;
     handler_proxy_context->value_size = 0;
+    handler_proxy_context->value_started = FALSE;
     handler_proxy_context->connection = NULL;
     handler_proxy_context->http_request = NULL;
     handler_proxy_context->connection_c = NULL;
@@ -838,6 +839,7 @@ static void _flush_field_handler_proxy(struct handler_proxy_context_t *handler_p
     one is gathered from nothing */
     handler_proxy_context->field_size = 0;
     handler_proxy_context->value_size = 0;
+    handler_proxy_context->value_started = FALSE;
 }
 
 ERROR_CODE line_callback_backend(struct http_request_t *http_request) {
@@ -899,8 +901,12 @@ ERROR_CODE header_field_callback_backend(struct http_request_t *http_request, co
         (struct handler_proxy_context_t *) http_request->context;
 
     /* the arrival of a name closes the field that came before it, so
-    that one is written before this one starts being gathered */
-    if(handler_proxy_context->value_size > 0) { _flush_field_handler_proxy(handler_proxy_context); }
+    that one is written before this one starts being gathered, a name
+    reaches this end in as many pieces as the reads that carried it
+    and only the start of a value tells one field from the next */
+    if(handler_proxy_context->value_started == TRUE) {
+        _flush_field_handler_proxy(handler_proxy_context);
+    }
 
     /* gathers the fragment of the name, a field reaches this end in as
     many pieces as the reads that carried it */
@@ -915,6 +921,11 @@ ERROR_CODE header_field_callback_backend(struct http_request_t *http_request, co
 ERROR_CODE header_value_callback_backend(struct http_request_t *http_request, const unsigned char *data, size_t data_size) {
     struct handler_proxy_context_t *handler_proxy_context =
         (struct handler_proxy_context_t *) http_request->context;
+
+    /* the value of the field has started to arrive, which closes the
+    name of it however many pieces that took, a value that carries
+    nothing at all still marks the field as one to be written */
+    handler_proxy_context->value_started = TRUE;
 
     /* gathers the fragment of the value, the pair is only written once
     the name of the next field arrives or the section closes */
@@ -942,8 +953,11 @@ ERROR_CODE headers_complete_callback_backend(struct http_request_t *http_request
 
     /* writes the field that was still being gathered and then closes
     the section of the headers in the encoding of the protocol that is
-    serving the client of the proxy */
-    if(handler_proxy_context->value_size > 0) { _flush_field_handler_proxy(handler_proxy_context); }
+    serving the client of the proxy, a field whose value carries
+    nothing at all is written just the same */
+    if(handler_proxy_context->value_started == TRUE) {
+        _flush_field_handler_proxy(handler_proxy_context);
+    }
     http_connection->request = handler_proxy_context->http_request;
     reserve_proxy_out_buffer(handler_proxy_context, VIRIATUM_MAX_HEADER_C_SIZE);
     handler_proxy_context->out_buffer_size = http_connection->write_end(
