@@ -914,12 +914,21 @@ const char *test_http2_connection_frames(void) {
     V_ASSERT_EQ_U(error, HTTP2_PROTOCOL_ERROR);
 
     /* a promise is never received by a server, only a client is the
-    one that receives one */
+    one that receives one, the payload of it carries the identifier
+    of the stream it reserves so that the size of the frame is not
+    what refuses it here */
     http2_frame.type = HTTP2_PUSH_PROMISE;
     http2_frame.stream_id = 1;
-    http2_frame.length = 0;
+    http2_frame.length = 4;
+    encode_number_http2(payload, 2);
     error = handle_frame_http2_connection(http2_connection, &http2_frame);
     V_ASSERT_EQ_U(error, HTTP2_PROTOCOL_ERROR);
+
+    /* a promise whose payload is too short to carry that identifier
+    is refused by the size of it instead */
+    http2_frame.length = 3;
+    error = handle_frame_http2_connection(http2_connection, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_FRAME_SIZE_ERROR);
 
     /* a frame of an unknown type is ignored so that the protocol may
     be extended without breaking this end */

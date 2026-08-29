@@ -246,9 +246,11 @@ ERROR_CODE encode_settings_http2(unsigned char *buffer, size_t buffer_size, stru
     size_t offset = HTTP2_HEADER_SIZE;
     ERROR_CODE return_value;
 
-    /* the frame carries three of the settings, the ones whose value
-    on this end differs from the one of the specification */
-    if(buffer_size < HTTP2_HEADER_SIZE + HTTP2_SETTING_SIZE * 3) {
+    /* the frame carries every one of the settings that this end is
+    able to set, a peer that was told nothing of one of them keeps
+    the value of the specification for it and the two ends would
+    then disagree on what has been announced */
+    if(buffer_size < HTTP2_HEADER_SIZE + HTTP2_SETTING_SIZE * 5) {
         RAISE_ERROR_S(HTTP2_FRAME_SIZE_ERROR);
     }
 
@@ -271,6 +273,20 @@ ERROR_CODE encode_settings_http2(unsigned char *buffer, size_t buffer_size, stru
     buffer[offset] = 0x00;
     buffer[offset + 1] = HTTP2_SETTING_MAX_HEADER_LIST_SIZE;
     encode_number_http2(&buffer[offset + 2], (unsigned int) http2_settings->max_header_list_size);
+    offset += HTTP2_SETTING_SIZE;
+
+    /* announces the window that every stream of this end starts its
+    life with, which bounds what the peer sends before it is widened */
+    buffer[offset] = 0x00;
+    buffer[offset + 1] = HTTP2_SETTING_INITIAL_WINDOW_SIZE;
+    encode_number_http2(&buffer[offset + 2], (unsigned int) http2_settings->initial_window_size);
+    offset += HTTP2_SETTING_SIZE;
+
+    /* announces the largest frame that this end accepts, one past it
+    is refused as soon as the header of it arrives */
+    buffer[offset] = 0x00;
+    buffer[offset + 1] = HTTP2_SETTING_MAX_FRAME_SIZE;
+    encode_number_http2(&buffer[offset + 2], (unsigned int) http2_settings->max_frame_size);
     offset += HTTP2_SETTING_SIZE;
 
     /* writes the header of the frame now that the size of the
@@ -383,6 +399,16 @@ ERROR_CODE verify_frame_http2(struct http2_frame_t *http2_frame, struct http2_se
             /* a promise is made on the stream that has asked for the
             resource, so it never belongs to the connection */
             if(http2_frame->stream_id == 0) { RAISE_ERROR_S(HTTP2_PROTOCOL_ERROR); }
+
+            /* a promise carries the identifier of the stream it
+            reserves, and the byte of the padding before it when the
+            flag announces one, a payload shorter than that holds no
+            promise at all */
+            if(http2_frame->flags & HTTP2_FLAG_PADDED) {
+                if(http2_frame->length < 5) { RAISE_ERROR_S(HTTP2_FRAME_SIZE_ERROR); }
+            } else {
+                if(http2_frame->length < 4) { RAISE_ERROR_S(HTTP2_FRAME_SIZE_ERROR); }
+            }
 
             /* breaks the switch */
             break;

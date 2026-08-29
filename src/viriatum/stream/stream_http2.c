@@ -699,10 +699,10 @@ static ERROR_CODE _write_settings_http2_connection(struct http2_connection_t *ht
         );
         size = HTTP2_HEADER_SIZE;
     } else {
-        buffer = (unsigned char *) MALLOC(HTTP2_HEADER_SIZE + HTTP2_SETTING_SIZE * 3);
+        buffer = (unsigned char *) MALLOC(HTTP2_SETTINGS_SIZE);
         return_value = encode_settings_http2(
             buffer,
-            HTTP2_HEADER_SIZE + HTTP2_SETTING_SIZE * 3,
+            HTTP2_SETTINGS_SIZE,
             &http2_connection->settings,
             &size
         );

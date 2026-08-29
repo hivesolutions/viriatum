@@ -87,6 +87,12 @@
 #define HTTP2_SETTING_SIZE 6
 
 /**
+ * The size of the frame that announces the settings of one end, it
+ * carries every one of the values that this end is able to set.
+ */
+#define HTTP2_SETTINGS_SIZE (HTTP2_HEADER_SIZE + HTTP2_SETTING_SIZE * 5)
+
+/**
  * The size in bytes of the payload of a ping frame, the
  * specification fixes it and a different one is an error.
  */

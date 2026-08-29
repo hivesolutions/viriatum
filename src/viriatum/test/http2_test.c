@@ -389,9 +389,11 @@ const char *test_http2_encode_frames(void) {
     which is what opens a connection */
     create_settings_http2(&http2_settings);
     http2_settings.max_concurrent_streams = 64;
+    http2_settings.initial_window_size = 32768;
+    http2_settings.max_frame_size = 32768;
     error = encode_settings_http2(buffer, sizeof(buffer), &http2_settings, &size);
     V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
-    V_ASSERT_EQ_U(size, HTTP2_HEADER_SIZE + HTTP2_SETTING_SIZE * 3);
+    V_ASSERT_EQ_U(size, HTTP2_HEADER_SIZE + HTTP2_SETTING_SIZE * 5);
 
     /* the frame that has been written decodes into the very same
     values that have been announced */
@@ -407,6 +409,12 @@ const char *test_http2_encode_frames(void) {
     V_ASSERT_EQ_U(decoded.max_concurrent_streams, 64);
     V_ASSERT_EQ_U(decoded.header_table_size, HPACK_TABLE_SIZE);
     V_ASSERT_EQ_U(decoded.max_header_list_size, HPACK_MAX_HEADER_LIST_SIZE);
+
+    /* every setting this end is able to change travels in the frame,
+    one that was left out of it would leave the peer holding the
+    value of the specification while this end held another */
+    V_ASSERT_EQ_U(decoded.initial_window_size, 32768);
+    V_ASSERT_EQ_U(decoded.max_frame_size, 32768);
 
     /* a buffer that has no room for the complete frame is refused */
     error = encode_settings_http2(buffer, HTTP2_HEADER_SIZE, &http2_settings, &size);
@@ -486,6 +494,31 @@ const char *test_http2_verify_frame(void) {
     http2_frame.type = HTTP2_PUSH_PROMISE;
     error = verify_frame_http2(&http2_frame, &http2_settings);
     V_ASSERT_EQ_U(error, HTTP2_PROTOCOL_ERROR);
+
+    /* a promise carries the identifier of the stream it reserves, so
+    a payload too short to hold one carries no promise at all, and
+    the byte of the padding is required on top of it when the flag
+    of the frame announces one */
+    http2_frame.stream_id = 1;
+    http2_frame.length = 3;
+    error = verify_frame_http2(&http2_frame, &http2_settings);
+    V_ASSERT_EQ_U(error, HTTP2_FRAME_SIZE_ERROR);
+    http2_frame.length = 0;
+    error = verify_frame_http2(&http2_frame, &http2_settings);
+    V_ASSERT_EQ_U(error, HTTP2_FRAME_SIZE_ERROR);
+    http2_frame.length = 4;
+    error = verify_frame_http2(&http2_frame, &http2_settings);
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+
+    http2_frame.flags = HTTP2_FLAG_PADDED;
+    error = verify_frame_http2(&http2_frame, &http2_settings);
+    V_ASSERT_EQ_U(error, HTTP2_FRAME_SIZE_ERROR);
+    http2_frame.length = 5;
+    error = verify_frame_http2(&http2_frame, &http2_settings);
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+    http2_frame.flags = 0x00;
+    http2_frame.stream_id = 0;
+    http2_frame.length = 0;
 
     /* the priority carries a payload of a fixed size and belongs to
     a stream, both of the conditions are verified */
