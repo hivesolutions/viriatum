@@ -273,6 +273,68 @@ static size_t _request_http2_test(unsigned char *buffer, size_t buffer_size, con
     return offset;
 }
 
+/**
+ * Writes a header block carrying the pseudo headers of a request
+ * together with one regular field that is added to the table of the
+ * encoder, so that the position every earlier field holds in it is
+ * pushed along by one.
+ *
+ * @param encoder The table that the block is encoded against, it is
+ * kept across the calls so that the indexing of it accumulates.
+ * @param buffer The buffer to write the block into.
+ * @param buffer_size The size in bytes of the provided buffer.
+ * @param path The resource that the request asks for.
+ * @param name The name of the field that is added to the table, an
+ * unset value naming the one of the first call again so that it is
+ * carried as the position it holds rather than in full.
+ * @return The size in bytes of the block that has been written.
+ */
+static size_t _indexed_http2_test(
+    struct hpack_table_t *encoder,
+    unsigned char *buffer,
+    size_t buffer_size,
+    const char *path,
+    const char *name
+) {
+    struct hpack_header_t hpack_header;
+    size_t offset = 0;
+
+    hpack_header.name = (unsigned char *) ":method";
+    hpack_header.name_size = 7;
+    hpack_header.value = (unsigned char *) "GET";
+    hpack_header.value_size = 3;
+    encode_hpack(encoder, buffer, buffer_size, &offset, &hpack_header, FALSE);
+
+    hpack_header.name = (unsigned char *) ":scheme";
+    hpack_header.name_size = 7;
+    hpack_header.value = (unsigned char *) "http";
+    hpack_header.value_size = 4;
+    encode_hpack(encoder, buffer, buffer_size, &offset, &hpack_header, FALSE);
+
+    hpack_header.name = (unsigned char *) ":path";
+    hpack_header.name_size = 5;
+    hpack_header.value = (unsigned char *) path;
+    hpack_header.value_size = strlen(path);
+    encode_hpack(encoder, buffer, buffer_size, &offset, &hpack_header, FALSE);
+
+    hpack_header.name = (unsigned char *) ":authority";
+    hpack_header.name_size = 10;
+    hpack_header.value = (unsigned char *) "localhost";
+    hpack_header.value_size = 9;
+    encode_hpack(encoder, buffer, buffer_size, &offset, &hpack_header, FALSE);
+
+    /* the field that is indexed, a new name takes the first position
+    of the table and pushes every other one along, the name of the
+    first call is carried as the position it holds by then */
+    hpack_header.name = (unsigned char *) (name == NULL ? "x-first" : name);
+    hpack_header.name_size = strlen((char *) hpack_header.name);
+    hpack_header.value = (unsigned char *) "abcdef";
+    hpack_header.value_size = 6;
+    encode_hpack(encoder, buffer, buffer_size, &offset, &hpack_header, name != NULL);
+
+    return offset;
+}
+
 const char *test_http2_connection(void) {
     /* allocates space for the chain of the connection and for the
     session that drives the protocol over it */
@@ -1684,6 +1746,55 @@ const char *test_http2_connection_trailers(void) {
     its own, the connection carries on serving the other one */
     V_ASSERT(context->connection->write_queue->size > 0);
     V_ASSERT_EQ_U(get_closed_test_connection(), 0);
+
+    _delete_http2_test(context, http2_connection);
+
+    /* the block of a stream that is refused still travels through the
+    table of the connection, which every stream shares, one that was
+    skipped would leave it out of step with the one of the peer and
+    every later block would name a field other than the one meant */
+    _create_http2_test(&context, &http2_connection);
+    http2_connection->settings.max_concurrent_streams = 2;
+    create_hpack_table(&encoder);
+
+    http2_frame.type = HTTP2_HEADERS;
+    http2_frame.flags = HTTP2_FLAG_END_HEADERS | HTTP2_FLAG_END_STREAM;
+    http2_frame.payload = block;
+
+    /* the two streams this end is willing to serve, the field of the
+    first taking the head of the table */
+    http2_frame.stream_id = 1;
+    http2_frame.length = _indexed_http2_test(encoder, block, sizeof(block), "/one", "x-first");
+    error = handle_frame_http2_connection(http2_connection, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+
+    http2_frame.stream_id = 3;
+    http2_frame.length = _indexed_http2_test(encoder, block, sizeof(block), "/two", "x-second");
+    error = handle_frame_http2_connection(http2_connection, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+
+    /* the third one is past the number this end has announced and is
+    refused, the field of it still taking the head of the table and
+    pushing the two that came before it along */
+    http2_frame.stream_id = 5;
+    http2_frame.length = _indexed_http2_test(encoder, block, sizeof(block), "/refused", "x-third");
+    error = handle_frame_http2_connection(http2_connection, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+    V_ASSERT_NULL(find_stream_http2_connection(http2_connection, 5));
+
+    /* the stream that follows names the field of the first block by
+    the position it holds once the three of them have been consumed,
+    a table that had skipped the refused one would name another */
+    http2_connection->settings.max_concurrent_streams = HTTP2_MAX_CONCURRENT;
+    http2_frame.stream_id = 7;
+    http2_frame.length = _indexed_http2_test(encoder, block, sizeof(block), "/after", NULL);
+    error = handle_frame_http2_connection(http2_connection, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+    V_ASSERT_EQ_S(_record.path, "/after");
+    V_ASSERT_EQ_S(_record.name, "x-first");
+    V_ASSERT_EQ_S(_record.header, "abcdef");
+
+    delete_hpack_table(encoder);
 
     /* an increment that overflows the window of a stream takes only
     that stream down, the connection is left alone */

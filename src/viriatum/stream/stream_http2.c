@@ -323,6 +323,7 @@ ERROR_CODE create_http2_connection(struct http2_connection_t **http2_connection_
     http2_connection->goaway = FALSE;
     http2_connection->continuation = 0;
     http2_connection->continuation_flags = 0;
+    http2_connection->refused = 0;
     http2_connection->block = NULL;
     http2_connection->block_size = 0;
 
@@ -1326,6 +1327,22 @@ static void _reset_block_http2_connection(struct http2_connection_t *http2_conne
     http2_connection->block_size = 0;
     http2_connection->continuation = 0;
     http2_connection->continuation_flags = 0;
+    http2_connection->refused = 0;
+}
+
+/**
+ * Gathers a field of a block that is being decoded only so that the
+ * table of the connection consumes it, the stream it was meant for
+ * having been refused, so the field itself is dropped.
+ *
+ * @param parameters The parameters of the decoding, unused here.
+ * @param hpack_header The field that has been decoded.
+ * @return The resulting error code.
+ */
+static ERROR_CODE _discard_http2_connection(void *parameters, struct hpack_header_t *hpack_header) {
+    /* the field itself carries no meaning here, only the effect the
+    decoding of it has on the table of the connection does */
+    RAISE_NO_ERROR;
 }
 
 /**
@@ -1578,6 +1595,49 @@ ERROR_CODE handle_frame_http2_connection(struct http2_connection_t *http2_connec
                         http2_frame->stream_id,
                         HTTP2_REFUSED_STREAM
                     );
+
+                    /* the block of a stream that is refused still
+                    travels through the decoder of the connection,
+                    the table of it is shared by every stream and
+                    one that is skipped leaves it out of step with
+                    the one of the peer from that point on */
+                    http2_connection->refused = http2_frame->stream_id;
+                    return_value = strip_padding_http2(http2_frame, &payload, &payload_size);
+                    if(IS_ERROR_CODE(return_value)) { RAISE_AGAIN(return_value); }
+                    if(http2_frame->flags & HTTP2_FLAG_PRIORITY) {
+                        if(payload_size < HTTP2_PRIORITY_SIZE) {
+                            RAISE_ERROR_S(HTTP2_FRAME_SIZE_ERROR);
+                        }
+                        payload += HTTP2_PRIORITY_SIZE;
+                        payload_size -= HTTP2_PRIORITY_SIZE;
+                    }
+                    return_value = _gather_http2_connection(
+                        http2_connection,
+                        payload,
+                        payload_size
+                    );
+                    if(IS_ERROR_CODE(return_value)) { RAISE_AGAIN(return_value); }
+
+                    /* a block that this frame does not close carries
+                    on in the ones that follow it, which are gathered
+                    and dropped by the very same path */
+                    if(!(http2_frame->flags & HTTP2_FLAG_END_HEADERS)) {
+                        http2_connection->continuation = http2_frame->stream_id;
+                        http2_connection->continuation_flags = http2_frame->flags;
+                        RAISE_NO_ERROR;
+                    }
+
+                    return_value = decode_hpack(
+                        http2_connection->decoder,
+                        http2_connection->block,
+                        http2_connection->block_size,
+                        _discard_http2_connection,
+                        NULL
+                    );
+                    _reset_block_http2_connection(http2_connection);
+                    if(IS_ERROR_CODE(return_value)) {
+                        RAISE_ERROR_S(HTTP2_COMPRESSION_ERROR);
+                    }
                     RAISE_NO_ERROR;
                 }
                 if(IS_ERROR_CODE(return_value)) { RAISE_AGAIN(return_value); }
@@ -1654,6 +1714,22 @@ ERROR_CODE handle_frame_http2_connection(struct http2_connection_t *http2_connec
             if(IS_ERROR_CODE(return_value)) { RAISE_AGAIN(return_value); }
 
             if(!(http2_frame->flags & HTTP2_FLAG_END_HEADERS)) { RAISE_NO_ERROR; }
+
+            /* a block whose stream has been refused is decoded only
+            so that the table of the connection consumes it, nothing
+            of it is handed to a handler */
+            if(http2_connection->refused == http2_connection->continuation) {
+                return_value = decode_hpack(
+                    http2_connection->decoder,
+                    http2_connection->block,
+                    http2_connection->block_size,
+                    _discard_http2_connection,
+                    NULL
+                );
+                _reset_block_http2_connection(http2_connection);
+                if(IS_ERROR_CODE(return_value)) { RAISE_ERROR_S(HTTP2_COMPRESSION_ERROR); }
+                RAISE_NO_ERROR;
+            }
 
             http2_stream = find_stream_http2_connection(http2_connection, http2_connection->continuation);
             if(http2_stream == NULL) { RAISE_ERROR_S(HTTP2_PROTOCOL_ERROR); }

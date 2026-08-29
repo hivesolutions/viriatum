@@ -322,6 +322,14 @@ typedef struct http2_connection_t {
     unsigned int continuation;
 
     /**
+     * The stream whose header block is being assembled only so that
+     * the decoder of the connection consumes it, the stream itself
+     * having been refused, the value zero means that no such block
+     * is being assembled.
+     */
+    unsigned int refused;
+
+    /**
      * The flags of the headers frame that opened the sequence of
      * continuation frames currently being assembled.
      */
