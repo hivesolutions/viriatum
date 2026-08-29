@@ -1,0 +1,17 @@
+# Hive Viriatum Web Server
+# Copyright (c) 2008-2026 Hive Solutions Lda.
+#
+# The types of the fixtures the run serves, carried here rather than
+# taken from the machine so that the reference reports the very same
+# fields whether it was started out of an image or out of the binary
+# the machine happens to have installed on it.
+
+types {
+    text/html                             html htm;
+    text/plain                            txt;
+    text/css                              css;
+    application/javascript                js;
+    image/png                             png;
+    image/svg+xml                         svg;
+    application/octet-stream              bin;
+}

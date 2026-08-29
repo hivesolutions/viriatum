@@ -60,20 +60,39 @@ fi
 WRK2=${WRK2:-$(command -v wrk2 || true)}
 if [ -z "$WRK2" ] && [ -x "$BUILD/wrk2/wrk" ]; then WRK2=$BUILD/wrk2/wrk; fi
 
-# the references all come out of a pinned image, a machine without the
-# daemon still measures the subject and reports it on its own
+# the images the references are pinned to, so that a figure may always
+# be traced back to the exact build that produced it, the pulling of
+# them belongs to the workflow and never to a run, a run that pulled
+# would sit on a slow registry for minutes before measuring anything
+IMAGE_NGINX=${IMAGE_NGINX:-nginx:1.27-alpine}
+IMAGE_CADDY=${IMAGE_CADDY:-caddy:2.8-alpine}
+IMAGE_HAPROXY=${IMAGE_HAPROXY:-haproxy:3.0-alpine}
+IMAGE_LITESPEED=${IMAGE_LITESPEED:-litespeedtech/openlitespeed:1.8.1-lsphp81}
+IMAGE_SUBJECT=${IMAGE_SUBJECT:-viriatum-benchmark:local}
+
 DOCKER=${DOCKER:-$(command -v docker || true)}
 if [ -n "$DOCKER" ] && ! "$DOCKER" info > /dev/null 2>&1; then DOCKER=""; fi
 
-# the subject runs natively wherever a container shares the network of
-# the machine, which is every linux, and inside a container of its own
-# everywhere else, a subject reached through a different stack than
-# the reference it is compared against measures the stack and not it
-case $(uname -s) in
-    Linux) MODE=${MODE:-native} ;;
-    *) MODE=${MODE:-container} ;;
-esac
-if [ -z "$DOCKER" ]; then MODE=native; fi
+# the references run either out of an image or out of the binary that
+# the machine carries, and whichever of the two it is the subject is
+# run the same way, a subject reached over one stack and a reference
+# reached over another measure the stacks and never the servers, which
+# is exactly what a container on a machine whose daemon lives inside a
+# virtual one of its own would end up doing
+if [ -n "$DOCKER" ] && "$DOCKER" image inspect "$IMAGE_NGINX" > /dev/null 2>&1; then
+    REFERENCES=${REFERENCES:-container}
+else
+    REFERENCES=${REFERENCES:-native}
+fi
+
+# the subject only ever runs inside a container when it has to, which
+# is when the references do and the machine is not the one the daemon
+# runs on, on linux the two share a kernel and a network already
+if [ "$REFERENCES" = "container" ] && [ "$(uname -s)" != "Linux" ]; then
+    MODE=${MODE:-container}
+else
+    MODE=${MODE:-native}
+fi
 
 rm -rf "$OUTPUT"
 mkdir -p "$OUTPUT/runs" "$OUTPUT/logs" "$OUTPUT/www/listing"
@@ -128,8 +147,8 @@ SIZE_LARGE=$(wc -c < "$OUTPUT/www/large.bin" | tr -d ' ')
 # everything the run starts, taken down by the trap no matter how the
 # run itself ends up finishing
 PID=""
+PID_REFERENCE=""
 PID_UPSTREAM=""
-CONTAINERS=""
 
 _stop_subject() {
     if [ -n "$PID" ]; then
@@ -143,6 +162,14 @@ _stop_subject() {
 }
 
 _stop_reference() {
+    if [ -n "$PID_REFERENCE" ]; then
+        kill "$PID_REFERENCE" 2> /dev/null || true
+        wait "$PID_REFERENCE" 2> /dev/null || true
+        PID_REFERENCE=""
+    fi
+    # the reference that forks a set of workers of its own leaves them
+    # behind when only the one that was started is taken down
+    pkill -f "$OUTPUT/conf/" > /dev/null 2>&1 || true
     if [ -n "$DOCKER" ]; then
         "$DOCKER" rm -f viriatum-reference > /dev/null 2>&1 || true
     fi
@@ -223,6 +250,147 @@ _start_subject() {
         PID=$!
     fi
     _wait "$PORT"
+}
+
+# ---------------------------------------------------------------------------
+# the reference servers
+# ---------------------------------------------------------------------------
+
+# writes the configuration of a reference out of the template of it,
+# the values that decide the comparison are the ones the subject is
+# run with and are put in place here rather than being written twice
+_render() {
+    sed -e "s|@PORT@|$PORT_REFERENCE|g" \
+        -e "s|@UPSTREAM@|$PORT_UPSTREAM|g" \
+        -e "s|@WORKERS@|$WORKERS|g" \
+        -e "s|@ROOT@|$_PREFIX|g" \
+        "$ASSETS/conf/$1" > "$OUTPUT/conf/$2"
+}
+
+# starts a reference out of its image, every one of them is given the
+# network of the machine so that it is reached exactly the way the
+# subject is and no address translation sits in between
+_run_image() {
+    "$DOCKER" run -d --name viriatum-reference --network host \
+        -v "$OUTPUT:/bench" "$@" > "$OUTPUT/logs/reference.id" 2>&1
+}
+
+# reports the version of a reference, the exact build that produced a
+# figure is part of the figure and is recorded next to it
+_version() {
+    case $1 in
+        nginx) nginx -v 2>&1 | sed 's|.*/||' ;;
+        caddy) caddy version 2> /dev/null | head -1 | awk '{ print $1 }' ;;
+        haproxy) haproxy -v 2> /dev/null | head -1 | awk '{ print $3 }' ;;
+        gunicorn) "$PYTHON" -c "import gunicorn; print(gunicorn.__version__)" 2> /dev/null ;;
+        uvicorn) "$PYTHON" -c "import uvicorn; print(uvicorn.__version__)" 2> /dev/null ;;
+        *) echo unknown ;;
+    esac
+}
+
+# says whether a reference may be driven at all on this machine, one
+# whose image and binary are both missing is skipped rather than
+# failing the run, in the very same spirit the modules are skipped by
+# the coverage script when their dependency is not around
+_has_reference() {
+    case $1 in
+        nginx) _IMAGE=$IMAGE_NGINX; _BINARY=nginx ;;
+        caddy) _IMAGE=$IMAGE_CADDY; _BINARY=caddy ;;
+        haproxy) _IMAGE=$IMAGE_HAPROXY; _BINARY=haproxy ;;
+        openlitespeed) _IMAGE=$IMAGE_LITESPEED; _BINARY=__none__ ;;
+        pingora) _IMAGE=__none__; _BINARY=$BUILD/pingora/load_balancer ;;
+        gunicorn | uvicorn)
+            "$PYTHON" -c "import $1" > /dev/null 2>&1 && return 0
+            return 1
+            ;;
+        *) return 1 ;;
+    esac
+    if [ "$REFERENCES" = "container" ] && [ -n "$DOCKER" ] &&
+        "$DOCKER" image inspect "$_IMAGE" > /dev/null 2>&1; then
+        return 0
+    fi
+    if [ -x "$_BINARY" ] || command -v "$_BINARY" > /dev/null 2>&1; then return 0; fi
+    return 1
+}
+
+# starts the reference that stands for the role of the workload at
+# hand, the configuration of it having been matched against the one
+# the subject was given so that the comparison is of the servers
+_start_reference() {
+    _REF=$1
+    _ROLE=$2
+
+    # the paths inside a container and the ones on the machine differ,
+    # the configuration is written against whichever of the two the
+    # reference is about to be started under
+    if [ "$REFERENCES" = "container" ]; then _PREFIX=/bench; else _PREFIX=$OUTPUT; fi
+    mkdir -p "$OUTPUT/conf"
+    cp "$ASSETS/conf/mime.types" "$OUTPUT/conf/mime.types"
+
+    case $_REF in
+        nginx)
+            if [ "$_ROLE" = "proxy" ]; then
+                _render nginx-proxy.conf nginx.conf
+            elif [ "$_ROLE" = "default" ]; then
+                _render nginx-default.conf nginx.conf
+            else
+                _render nginx.conf nginx.conf
+            fi
+            if [ "$REFERENCES" = "container" ]; then
+                _run_image "$IMAGE_NGINX" nginx -c /bench/conf/nginx.conf
+            else
+                nginx -c "$OUTPUT/conf/nginx.conf" -e /dev/null \
+                    > "$OUTPUT/logs/reference.log" 2>&1 &
+                PID_REFERENCE=$!
+            fi
+            ;;
+        caddy)
+            if [ "$_ROLE" = "proxy" ]; then
+                _render Caddyfile.proxy Caddyfile
+            elif [ "$_ROLE" = "default" ]; then
+                _render Caddyfile.default Caddyfile
+            else
+                _render Caddyfile Caddyfile
+            fi
+            if [ "$REFERENCES" = "container" ]; then
+                _run_image "$IMAGE_CADDY" caddy run --config /bench/conf/Caddyfile
+            else
+                XDG_CONFIG_HOME=$OUTPUT XDG_DATA_HOME=$OUTPUT \
+                    caddy run --config "$OUTPUT/conf/Caddyfile" \
+                    > "$OUTPUT/logs/reference.log" 2>&1 &
+                PID_REFERENCE=$!
+            fi
+            ;;
+        haproxy)
+            _render haproxy.cfg haproxy.cfg
+            if [ "$REFERENCES" = "container" ]; then
+                _run_image "$IMAGE_HAPROXY" haproxy -f /bench/conf/haproxy.cfg
+            else
+                haproxy -f "$OUTPUT/conf/haproxy.cfg" \
+                    > "$OUTPUT/logs/reference.log" 2>&1 &
+                PID_REFERENCE=$!
+            fi
+            ;;
+        gunicorn)
+            PYTHONPATH=$ASSETS "$PYTHON" -m gunicorn \
+                --bind "127.0.0.1:$PORT_REFERENCE" --workers "$WORKERS" \
+                --access-logfile /dev/null --error-logfile /dev/null \
+                --keep-alive 65 app:wsgi_app \
+                > "$OUTPUT/logs/reference.log" 2>&1 &
+            PID_REFERENCE=$!
+            ;;
+        uvicorn)
+            if [ "$_ROLE" = "asgi-stream" ]; then _APP=app:asgi_stream_app; else _APP=app:asgi_app; fi
+            PYTHONPATH=$ASSETS "$PYTHON" -m uvicorn \
+                --host 127.0.0.1 --port "$PORT_REFERENCE" --workers "$WORKERS" \
+                --log-level critical --no-access-log "$_APP" \
+                > "$OUTPUT/logs/reference.log" 2>&1 &
+            PID_REFERENCE=$!
+            ;;
+        *) return 1 ;;
+    esac
+
+    _wait "$PORT_REFERENCE"
 }
 
 # ---------------------------------------------------------------------------
@@ -346,26 +514,42 @@ _settle() {
 # the workloads
 # ---------------------------------------------------------------------------
 
-# one row per workload, carrying the handler it is served by, the path
-# it asks for, the header that decides whether the connection is kept,
+# one row per workload, carrying the role that decides which of the
+# references stand for it, the handler it is served by, the path it
+# asks for, the header that decides whether the connection is kept,
 # the state of the template engine and the upstream of a proxy
 _workloads() {
     cat << EOF
-static-small-alive|file|/small.html||On|
-static-small-close|file|/small.html|Connection: close|On|
-static-mid-alive|file|/mid.png||On|
-static-mid-close|file|/mid.png|Connection: close|On|
-static-large-alive|file|/large.bin||On|
-static-large-close|file|/large.bin|Connection: close|On|
-default-alive|default|/||On|
-default-close|default|/|Connection: close|On|
-listing-template|file|/listing/||On|
-listing-plain|file|/listing/||Off|
-error-template|file|/missing||On|
-error-plain|file|/missing||Off|
-proxy-alive|dispatch|/small.html||On|http://127.0.0.1:$PORT_UPSTREAM/
-proxy-close|dispatch|/small.html|Connection: close|On|http://127.0.0.1:$PORT_UPSTREAM/
+static-small-alive|static|file|/small.html||On|
+static-small-close|static|file|/small.html|Connection: close|On|
+static-mid-alive|static|file|/mid.png||On|
+static-mid-close|static|file|/mid.png|Connection: close|On|
+static-large-alive|static|file|/large.bin||On|
+static-large-close|static|file|/large.bin|Connection: close|On|
+default-alive|default|default|/||On|
+default-close|default|default|/|Connection: close|On|
+listing-template|listing|file|/listing/||On|
+listing-plain|listing|file|/listing/||Off|
+error-template|error|file|/missing||On|
+error-plain|error|file|/missing||Off|
+proxy-alive|proxy|dispatch|/small.html||On|http://127.0.0.1:$PORT_UPSTREAM/
+proxy-close|proxy|dispatch|/small.html|Connection: close|On|http://127.0.0.1:$PORT_UPSTREAM/
 EOF
+}
+
+# the references that stand for each of the roles, a reference is only
+# ever put on a workload it is actually able to serve, haproxy holds
+# no file of its own and pingora is a framework rather than a server,
+# so the two of them are only ever measured in front of an upstream
+_role_references() {
+    case $1 in
+        static | listing | error) echo "nginx caddy openlitespeed" ;;
+        default) echo "nginx caddy" ;;
+        proxy) echo "nginx haproxy caddy pingora" ;;
+        wsgi) echo "gunicorn" ;;
+        asgi | asgi-stream) echo "uvicorn" ;;
+        *) echo "" ;;
+    esac
 }
 
 echo "Fixtures are $SIZE_SMALL, $SIZE_MID and $SIZE_LARGE bytes"
@@ -439,7 +623,7 @@ VERSION=$("$BINARY" --version 2> /dev/null | tail -1 | sed 's/viriatum - //;s/ (
 # of the servers it starts would never reach the trap that stops them
 _workloads > "$OUTPUT/workloads.txt"
 
-while IFS='|' read -r NAME HANDLER PATH_ HEADER TEMPLATE PROXY; do
+while IFS='|' read -r NAME ROLE HANDLER PATH_ HEADER TEMPLATE PROXY; do
     if [ -n "$ONLY" ] && [ "$NAME" != "$ONLY" ]; then continue; fi
 
     echo "Workload $NAME"
@@ -453,10 +637,13 @@ while IFS='|' read -r NAME HANDLER PATH_ HEADER TEMPLATE PROXY; do
 
     # the upstream of the proxy workload is held constant across every
     # server under test, so that what is measured is the proxying and
-    # never the thing that sits behind it
+    # never the thing that sits behind it, it answers out of the
+    # cheapest handler there is because an upstream that saturates
+    # before the proxies do reports its own ceiling for all of them,
+    # which it did while it was serving the requests off the disk
     if [ -n "$PROXY" ]; then
-        "$BINARY" --port="$PORT_UPSTREAM" --handler=file \
-            --wwwroot="$OUTPUT/www" --workers="$WORKERS" \
+        "$BINARY" --port="$PORT_UPSTREAM" --handler=default \
+            --workers="$WORKERS" \
             < /dev/null > "$OUTPUT/logs/upstream.log" 2>&1 &
         PID_UPSTREAM=$!
         _wait "$PORT_UPSTREAM"
@@ -486,6 +673,43 @@ while IFS='|' read -r NAME HANDLER PATH_ HEADER TEMPLATE PROXY; do
     _record "$NAME" viriatum "$REPORTS" "$VERSION"
 
     _stop_subject
+
+    # every reference that stands for the role of this workload is
+    # driven through the very same shape right after the subject and
+    # on the very same machine, the two figures only mean anything
+    # next to one another and never on their own
+    for REFERENCE in $(_role_references "$ROLE"); do
+        if ! _has_reference "$REFERENCE"; then
+            echo "  $REFERENCE is not available on this machine, skipping it"
+            continue
+        fi
+
+        REPORTS=$OUTPUT/runs/$NAME.$REFERENCE
+        mkdir -p "$REPORTS"
+
+        _settle
+        _start_reference "$REFERENCE" "$ROLE"
+
+        set -- $(_sample "$OUTPUT/conf/")
+        RSS_BEFORE=$1
+        CPU_BEFORE=$2
+
+        _drive "http://127.0.0.1:$PORT_REFERENCE$PATH_" "$HEADER" "$REPORTS"
+
+        set -- $(_sample "$OUTPUT/conf/")
+        RSS_AFTER=$1
+        CPU_AFTER=$2
+
+        REQUESTS=$(_values "$REPORTS" requests | awk '{ total += $1 } END { print total + 0 }')
+        _RSS=$(echo "$RSS_BEFORE $RSS_AFTER" | awk '{ print ($1 > $2) ? $1 : $2 }')
+        _CPU=$(echo "$CPU_BEFORE $CPU_AFTER $REQUESTS" | awk \
+            '{ if ($3 > 0) printf "%.3f", ($2 - $1) * 1000000.0 / $3; else print 0 }')
+
+        _record "$NAME" "$REFERENCE" "$REPORTS" "$(_version "$REFERENCE")"
+
+        _stop_reference
+    done
+
     _stop_upstream
 done < "$OUTPUT/workloads.txt"
 
