@@ -55,10 +55,18 @@ if ! command -v wrk > /dev/null 2>&1; then
 fi
 
 # the generator that holds a fixed rate is the only one whose tail
-# means anything, a machine without it still reports the throughput
-# and says in the report that no corrected percentile was taken
+# means anything, the one that drives as hard as it can reports the
+# latency of the requests it managed to send and never the one of the
+# requests it was held back from sending, which is the omission the
+# percentiles of a saturated run quietly leave out
 WRK2=${WRK2:-$(command -v wrk2 || true)}
 if [ -z "$WRK2" ] && [ -x "$BUILD/wrk2/wrk" ]; then WRK2=$BUILD/wrk2/wrk; fi
+
+# the commit the generator of the fixed rate is pinned to, it is
+# unmaintained and carries an interpreter of its own that never
+# learnt any of the 64 bit arm targets, so the build of it only ever
+# succeeds on the intel machines and the run says when it did not
+WRK2_COMMIT=${WRK2_COMMIT:-44a94c17d8e6a0bac8559b53da76848e430cb7a7}
 
 # the images the references are pinned to, so that a figure may always
 # be traced back to the exact build that produced it, the pulling of
@@ -114,6 +122,22 @@ if [ ! -x "$BUILD/bin/viriatum" ]; then
 fi
 
 BINARY=${BINARY:-$BUILD/bin/viriatum}
+
+# builds the generator of the fixed rate out of the pinned commit, it
+# is packaged by nobody and so it is either built here or absent, a
+# failure of the build is never a failure of the run and only ever
+# costs the run the percentiles that would have been corrected
+if [ -z "$WRK2" ] && command -v git > /dev/null 2>&1; then
+    echo "Building the generator of the fixed rate ..."
+    if git clone -q https://github.com/giltene/wrk2.git "$BUILD/wrk2" \
+        > "$OUTPUT/logs/wrk2.log" 2>&1 &&
+        git -C "$BUILD/wrk2" checkout -q "$WRK2_COMMIT" >> "$OUTPUT/logs/wrk2.log" 2>&1 &&
+        make -C "$BUILD/wrk2" -j 4 >> "$OUTPUT/logs/wrk2.log" 2>&1; then
+        WRK2=$BUILD/wrk2/wrk
+    else
+        echo "  it did not build here, the tail of the run carries no corrected latency"
+    fi
+fi
 
 # stages the extension next to the package so that the launcher of the
 # interfaces is able to import it without the package being installed
@@ -317,6 +341,24 @@ _run_image() {
         -v "$OUTPUT:/bench" "$@" > "$OUTPUT/logs/reference.id" 2>&1
 }
 
+# reports the pattern that finds a server together with every worker
+# it has forked, a reference that renames the title of its processes,
+# which most of them do, is never found by the command it was started
+# with and would be reported as having consumed nothing at all
+_match() {
+    case $1 in
+        viriatum) echo "viriatum --port=" ;;
+        nginx) echo "nginx:" ;;
+        caddy) echo "caddy run" ;;
+        haproxy) echo "haproxy -f" ;;
+        openlitespeed) echo "litespeed" ;;
+        pingora) echo "load_balancer" ;;
+        gunicorn) echo "gunicorn" ;;
+        uvicorn) echo "uvicorn" ;;
+        *) echo "$1" ;;
+    esac
+}
+
 # reports the version of a reference, the exact build that produced a
 # figure is part of the figure and is recorded next to it
 _version() {
@@ -518,6 +560,103 @@ _drive() {
     done
 }
 
+# drives the generator of the fixed rate against the provided target,
+# the rate being a share of the throughput that was just measured so
+# that the percentiles are taken below the point of saturation, above
+# it every figure of the tail is a figure of the queue and not of the
+# server that the queue happens to be standing in front of
+_latency() {
+    _TARGET=$1
+    _HEADER=$2
+    _REPORTS=$3
+    _PEAK=$4
+
+    if [ -z "$WRK2" ]; then return 0; fi
+
+    _RATE=$(echo "$_PEAK $RATE" | awk '{ printf "%d", $1 * $2 / 100 }')
+    if [ "$_RATE" -lt 1 ]; then return 0; fi
+
+    if [ -n "$_HEADER" ]; then
+        set -- -t "$THREADS" -c "$CONNECTIONS" -d "${DURATION}s" -R "$_RATE" -H "$_HEADER"
+    else
+        set -- -t "$THREADS" -c "$CONNECTIONS" -d "${DURATION}s" -R "$_RATE"
+    fi
+
+    BENCHMARK_REPORT="$_REPORTS/latency.json" "$WRK2" "$@" \
+        -s "$ASSETS/report.lua" "$_TARGET" \
+        > "$_REPORTS/latency.txt" 2>&1 || true
+}
+
+# measures the handling of the connections as two figures of its own,
+# the rate at which fresh ones are taken up and the number of requests
+# a kept one carries, the accept path and the serving one are separate
+# costs and a single figure of throughput hides which of them moved
+_connections() {
+    _TARGET=$1
+    _REPORTS=$2
+
+    # the fresh connections are driven by the generator rather than
+    # counted against a clock of whole seconds, a couple of thousand
+    # of them are taken up faster than such a clock is able to tell
+    # apart and every server would report the very same figure
+    BENCHMARK_REPORT="$_REPORTS/accept.json" wrk -t "$THREADS" -c "$CONNECTIONS" \
+        -d "${DURATION}s" -H "Connection: close" -s "$ASSETS/report.lua" \
+        "$_TARGET" > /dev/null 2>&1 || true
+    sed -n 's/.*"rps": *\([0-9.]*\).*/\1/p' "$_REPORTS/accept.json" \
+        2> /dev/null > "$_REPORTS/accept.txt" || true
+
+    # the requests a single connection carries is what says whether
+    # the server holds one open the way it claims to, a server that
+    # closes it every time opens a hundred of them for a hundred
+    # requests and gives itself away with a figure of one
+    curl -s --max-time 60 -w "%{num_connects}\n" \
+        $(_repeat 100 "$_TARGET") 2> /dev/null |
+        awk '/^[0-9]+$/ { total += $1 }
+            END { printf "%.1f\n", (total > 0) ? 100.0 / total : 100.0 }' \
+        > "$_REPORTS/reuse.txt"
+}
+
+# counts the calls into the kernel that a single request costs, which
+# is the figure that most directly explains a gap against a reference
+# on the static path, the run that is counted is never one of the
+# timed ones, tracing a process slows it by an order of magnitude and
+# a figure taken under the tracer would not be a figure of throughput
+_syscalls() {
+    _REPORTS=$1
+
+    if [ "$MODE" != "native" ] || ! command -v strace > /dev/null 2>&1; then return 0; fi
+
+    strace -c -f -o "$_REPORTS/syscalls.txt" -p "$PID" 2> /dev/null &
+    _TRACER=$!
+    sleep 1
+
+    _INDEX=0
+    while [ "$_INDEX" -lt 200 ]; do
+        curl -s -o /dev/null --max-time 5 "$2" 2> /dev/null || true
+        _INDEX=$((_INDEX + 1))
+    done
+
+    kill -INT "$_TRACER" 2> /dev/null || true
+    wait "$_TRACER" 2> /dev/null || true
+
+    # the total of the tracer is the last of the rows it writes, it is
+    # divided by the requests that were driven while it was attached
+    awk '/^total|^[[:space:]]*100\.00/ { total = $(NF - 1) }
+        END { printf "%.1f\n", total / 200.0 }' \
+        "$_REPORTS/syscalls.txt" > "$_REPORTS/syscalls.count" 2> /dev/null || true
+}
+
+# repeats the provided target the requested number of times, each one
+# of them paired with the sink its body is written to, the client is
+# handed the whole list at once and reuses whatever it may of it
+_repeat() {
+    _INDEX=0
+    while [ "$_INDEX" -lt "$1" ]; do
+        printf -- "-o /dev/null %s " "$2"
+        _INDEX=$((_INDEX + 1))
+    done
+}
+
 # reads a single number out of the reports of a measurement, their
 # shape is fixed by the hook that writes them so that a plain match is
 # enough and no parser of its own has to be carried into the shell
@@ -612,6 +751,51 @@ echo
 # the run
 # ---------------------------------------------------------------------------
 
+# drives every one of the metrics against a single server that is
+# already up and records the result of it, the subject and each of the
+# references go through this exactly the same way, a metric taken one
+# way on one of them and another way on the other would be comparing
+# the harness against itself rather than the servers against each other
+_measure() {
+    _NAME=$1
+    _SERVER=$2
+    _AT=$3
+    _VERSION=$4
+
+    _MATCH=$(_match "$_SERVER")
+    _REPORTS=$OUTPUT/runs/$_NAME.$_SERVER
+    _TARGET=http://127.0.0.1:$_AT$PATH_
+    mkdir -p "$_REPORTS"
+
+    set -- $(_sample "$_MATCH")
+    _RSS_BEFORE=$1
+    _CPU_BEFORE=$2
+
+    _drive "$_TARGET" "$HEADER" "$_REPORTS"
+
+    set -- $(_sample "$_MATCH")
+    _RSS_AFTER=$1
+    _CPU_AFTER=$2
+
+    # the processor time is reported against a thousand requests so
+    # that the workloads may be read against one another, the memory
+    # is the highest of the two samples taken around the run
+    _REQUESTS=$(_values "$_REPORTS" requests | awk '{ total += $1 } END { print total + 0 }')
+    _RSS=$(echo "$_RSS_BEFORE $_RSS_AFTER" | awk '{ print ($1 > $2) ? $1 : $2 }')
+    _CPU=$(echo "$_CPU_BEFORE $_CPU_AFTER $_REQUESTS" | awk \
+        '{ if ($3 > 0) printf "%.3f", ($2 - $1) * 1000000.0 / $3; else print 0 }')
+
+    # the remaining metrics are all taken outside of a timed run, the
+    # tail below saturation, the handling of the connections and the
+    # calls into the kernel each disturb a run of throughput
+    _PEAK=$(_values "$_REPORTS" rps | _stats | awk '{ print $1 }')
+    _latency "$_TARGET" "$HEADER" "$_REPORTS" "$_PEAK"
+    _connections "$_TARGET" "$_REPORTS"
+    if [ "$_SERVER" = "viriatum" ]; then _syscalls "$_REPORTS" "$_TARGET"; fi
+
+    _record "$_NAME" "$_SERVER" "$_REPORTS" "$_VERSION"
+}
+
 # records one measured pair as a report of its own, the assembly of
 # every one of them into a table is left to the builder of it
 _record() {
@@ -642,6 +826,25 @@ _record() {
     _VALID=$(echo "$_SOCKET $_REQUESTS" | awk \
         '{ print ($1 * 1000 > $2) ? "false" : "true" }')
 
+    # the tail is only ever read out of the run that was held at a
+    # fixed rate, the percentiles of a saturated run leave out every
+    # request the generator was held back from sending
+    if [ -s "$_REPORTS/latency.json" ]; then
+        _P50=$(sed -n 's/.*"p50": *\([0-9]*\).*/\1/p' "$_REPORTS/latency.json")
+        _P99=$(sed -n 's/.*"p99": *\([0-9]*\).*/\1/p' "$_REPORTS/latency.json")
+        _P999=$(sed -n 's/.*"p999": *\([0-9]*\).*/\1/p' "$_REPORTS/latency.json")
+        _CORRECTED=true
+    else
+        _P50=0
+        _P99=0
+        _P999=0
+        _CORRECTED=false
+    fi
+
+    _ACCEPT=$(cat "$_REPORTS/accept.txt" 2> /dev/null || echo 0)
+    _REUSE=$(cat "$_REPORTS/reuse.txt" 2> /dev/null || echo 0)
+    _CALLS=$(cat "$_REPORTS/syscalls.count" 2> /dev/null || echo 0)
+
     {
         echo "{"
         echo "  \"workload\": \"$_NAME\","
@@ -655,7 +858,14 @@ _record() {
         echo "  \"errors_socket\": ${_SOCKET:-0},"
         echo "  \"errors_status\": ${_STATUS:-0},"
         echo "  \"peak_rss_kb\": ${_RSS:-0},"
-        echo "  \"cpu_ms_per_k\": ${_CPU:-0}"
+        echo "  \"cpu_ms_per_k\": ${_CPU:-0},"
+        echo "  \"latency_corrected\": $_CORRECTED,"
+        echo "  \"latency_p50_us\": ${_P50:-0},"
+        echo "  \"latency_p99_us\": ${_P99:-0},"
+        echo "  \"latency_p999_us\": ${_P999:-0},"
+        echo "  \"accept_rps\": ${_ACCEPT:-0},"
+        echo "  \"requests_per_connection\": ${_REUSE:-0},"
+        echo "  \"syscalls_per_request\": ${_CALLS:-0}"
         echo "}"
     } > "$OUTPUT/runs/$_NAME.$_SERVER.json"
 
@@ -703,27 +913,7 @@ while IFS='|' read -r NAME ROLE HANDLER PATH_ HEADER TEMPLATE PROXY; do
 
     _configure "$HANDLER" "$TEMPLATE" "$PROXY"
     _start_subject "$HANDLER" "$ROLE"
-
-    set -- $(_sample "viriatum --port=$PORT ")
-    RSS_BEFORE=$1
-    CPU_BEFORE=$2
-
-    _drive "http://127.0.0.1:$PORT$PATH_" "$HEADER" "$REPORTS"
-
-    set -- $(_sample "viriatum --port=$PORT ")
-    RSS_AFTER=$1
-    CPU_AFTER=$2
-
-    # the processor time is reported against a thousand requests so
-    # that the workloads may be read against one another, the memory
-    # is the highest of the two samples that were taken around the run
-    REQUESTS=$(_values "$REPORTS" requests | awk '{ total += $1 } END { print total + 0 }')
-    _RSS=$(echo "$RSS_BEFORE $RSS_AFTER" | awk '{ print ($1 > $2) ? $1 : $2 }')
-    _CPU=$(echo "$CPU_BEFORE $CPU_AFTER $REQUESTS" | awk \
-        '{ if ($3 > 0) printf "%.3f", ($2 - $1) * 1000000.0 / $3; else print 0 }')
-
-    _record "$NAME" viriatum "$REPORTS" "$VERSION"
-
+    _measure "$NAME" viriatum "$PORT" "$VERSION"
     _stop_subject
 
     # every reference that stands for the role of this workload is
@@ -736,29 +926,9 @@ while IFS='|' read -r NAME ROLE HANDLER PATH_ HEADER TEMPLATE PROXY; do
             continue
         fi
 
-        REPORTS=$OUTPUT/runs/$NAME.$REFERENCE
-        mkdir -p "$REPORTS"
-
         _settle
         _start_reference "$REFERENCE" "$ROLE"
-
-        set -- $(_sample "$OUTPUT/conf/")
-        RSS_BEFORE=$1
-        CPU_BEFORE=$2
-
-        _drive "http://127.0.0.1:$PORT_REFERENCE$PATH_" "$HEADER" "$REPORTS"
-
-        set -- $(_sample "$OUTPUT/conf/")
-        RSS_AFTER=$1
-        CPU_AFTER=$2
-
-        REQUESTS=$(_values "$REPORTS" requests | awk '{ total += $1 } END { print total + 0 }')
-        _RSS=$(echo "$RSS_BEFORE $RSS_AFTER" | awk '{ print ($1 > $2) ? $1 : $2 }')
-        _CPU=$(echo "$CPU_BEFORE $CPU_AFTER $REQUESTS" | awk \
-            '{ if ($3 > 0) printf "%.3f", ($2 - $1) * 1000000.0 / $3; else print 0 }')
-
-        _record "$NAME" "$REFERENCE" "$REPORTS" "$(_version "$REFERENCE")"
-
+        _measure "$NAME" "$REFERENCE" "$PORT_REFERENCE" "$(_version "$REFERENCE")"
         _stop_reference
     done
 
