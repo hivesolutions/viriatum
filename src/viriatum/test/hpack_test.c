@@ -954,12 +954,16 @@ const char *test_hpack_encode(void) {
     V_ASSERT_EQ_U(error, 0);
     V_ASSERT_EQ_U(offset, 1);
 
-    /* a buffer that has no room for the field is refused rather than
-    being written past its end */
+    /* a field that the table holds in full takes a single byte, so a
+    buffer of exactly one still has room for it */
     offset = 0;
     error = encode_hpack(encoder, buffer, 1, &offset, &hpack_header, FALSE);
     V_ASSERT_EQ_U(error, 0);
+    V_ASSERT_EQ_U(offset, 1);
 
+    /* a field that the tables do not hold carries both of its parts
+    as literals, so a buffer with no room for them is refused rather
+    than being written past its end */
     hpack_header.name = (unsigned char *) "x-other";
     hpack_header.name_size = 7;
     offset = 0;

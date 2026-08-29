@@ -177,7 +177,14 @@ http2 = On
 
 The very same setting is turned off for a single run with `--no-http2`.
 
-Over the transport the version is negotiated rather than guessed. The server announces `h2` and `http/1.1` through ALPN and honours the order the client announces, so a client that prefers the older version is served it:
+Over the transport the version is negotiated rather than guessed. The server announces `h2` and `http/1.1` through ALPN and honours the order the client announces, so a client that prefers the older version is served it. The transport is off in the configuration that ships, so the two commands that reach it need it turned on first, either through `--ssl` for a single run or through the general section:
+
+```ini
+[general]
+ssl = On
+ssl_csr = cert/server.crt
+ssl_key = cert/server.key
+```
 
 ```bash
 curl --http2-prior-knowledge http://localhost:9090/

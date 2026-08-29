@@ -22,7 +22,7 @@ jobs:
       - name: Report format
         if: always()
         run: |
-          cat format/summary.md >> $GITHUB_STEP_SUMMARY
+          cat format/summary.md >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v7
         if: always()
         with:
@@ -233,7 +233,7 @@ jobs:
       - name: Report sanitize
         if: always()
         run: |
-          cat sanitize/summary.md >> $GITHUB_STEP_SUMMARY
+          cat sanitize/summary.md >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v7
         if: always()
         with:
@@ -258,7 +258,7 @@ jobs:
       - name: Report conformance
         if: always()
         run: |
-          cat conformance/summary.md >> $GITHUB_STEP_SUMMARY
+          cat conformance/summary.md >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v7
         if: always()
         with:
@@ -285,7 +285,7 @@ jobs:
       - name: Report interop
         if: always()
         run: |
-          cat interop/summary.md >> $GITHUB_STEP_SUMMARY
+          cat interop/summary.md >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v7
         if: always()
         with:
@@ -318,8 +318,8 @@ jobs:
       - name: Report coverage
         if: always()
         run: |
-          cat coverage/summary.md >> $GITHUB_STEP_SUMMARY
-          cat coverage/tests.md >> $GITHUB_STEP_SUMMARY
+          cat coverage/summary.md >> "$GITHUB_STEP_SUMMARY"
+          cat coverage/tests.md >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v7
         if: always()
         with:

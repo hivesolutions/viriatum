@@ -35,9 +35,12 @@ mkdir -p "$OUTPUT"
 echo "Running the suite under the sanitizer ..."
 
 # the run is never allowed to stop the process on the first error, the
-# complete report of it is what the comparison below is made against
+# complete report of it is what the comparison below is made against,
+# the status of it is kept so that a run that never got as far as the
+# tests is told from one that reported on them
+STATUS=0
 ASAN_OPTIONS="detect_leaks=$LEAKS:halt_on_error=0" \
-    "$BUILD/bin/viriatum" --test > "$OUTPUT/tests.txt" 2>&1 || true
+    "$BUILD/bin/viriatum" --test > "$OUTPUT/tests.txt" 2>&1 || STATUS=$?
 
 RESULT=$(sed -n 's/^Ran \(.*\)$/\1/p' "$OUTPUT/tests.txt" | tail -1)
 FAILED=$(grep -c "^not ok" "$OUTPUT/tests.txt" || true)
@@ -70,6 +73,15 @@ if [ -f "$BASELINE" ]; then ALLOWED=$(tr -d " \t\r\n" < "$BASELINE"); fi
 } > "$OUTPUT/summary.md"
 
 cat "$OUTPUT/summary.md"
+
+# a run that never reached the end of the suite has reported on
+# nothing at all, so the counts above carry no meaning and the run
+# fails on the status of the process instead
+if [ -z "$RESULT" ]; then
+    echo "The suite did not run to the end, it exited with $STATUS" >&2
+    tail -40 "$OUTPUT/tests.txt" >&2
+    exit 1
+fi
 
 if [ "$FAILED" -ne 0 ]; then
     echo "The suite reported $FAILED failing tests" >&2

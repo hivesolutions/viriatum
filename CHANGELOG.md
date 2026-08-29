@@ -43,7 +43,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Connections are now kept alive by default, throughput no longer collapses under load
 * A client that closes a connection now still receives the reason the server gives for it
 * The certificate that ships is accepted again by a current library
-* The project of Xcode builds again and carries every source of the tree
+* The Xcode project builds again and includes every source file in the tree
 * A window widened for a promised stream no longer takes the connection down
 * Sorting a sequence no longer reads past the end of it
 * Reading a configuration section no longer reads past the end of its name

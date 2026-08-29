@@ -36,12 +36,24 @@ if [ -z "$(ls -A "$CORPUS" 2> /dev/null)" ]; then
 fi
 
 # the amount of time and the number of the runs are both bounded so
-# that a job of the integration never hangs on it
+# that a job of the integration never hangs on it, the report is
+# written to the log rather than piped so that the status that comes
+# back is the one of the engine rather than the one of the pipe
+STATUS=0
 "$BUILD/bin/viriatum_fuzz_http2" \
     -max_total_time="$SECONDS_RUN" \
     -runs="$RUNS" \
     -max_len=16384 \
     -print_final_stats=1 \
-    "$CORPUS" 2>&1 | tee "$OUTPUT/fuzz.log"
+    "$CORPUS" > "$OUTPUT/fuzz.log" 2>&1 || STATUS=$?
+
+cat "$OUTPUT/fuzz.log"
+
+# whatever the engine has found leaves the run failing, the input that
+# produced it is kept beside the log for it to be reproduced
+if [ "$STATUS" -ne 0 ]; then
+    echo "The engine stopped with $STATUS, see $OUTPUT/fuzz.log" >&2
+    exit "$STATUS"
+fi
 
 echo "Fuzzing reports written to $OUTPUT"
