@@ -2311,6 +2311,8 @@ const char *test_http2_connection_response(void) {
     unsigned char block[256];
     unsigned char written[1024];
     size_t size;
+    size_t offset;
+    size_t index;
     ERROR_CODE error;
 
     /* gathers the number of allocations that are outstanding so that
@@ -2383,6 +2385,61 @@ const char *test_http2_connection_response(void) {
     http2_stream = find_stream_http2_connection(http2_connection, 1);
     V_ASSERT_NOT_NULL(http2_stream);
     V_ASSERT(http2_stream->complete == TRUE);
+
+    _responder = FALSE;
+    _delete_http2_test(context, http2_connection);
+
+    /* a block of headers larger than the frame the peer accepts is
+    written as a sequence of them, the first carrying the type of the
+    original and the ones that follow carrying the rest of it */
+    _create_http2_test(&context, &http2_connection);
+    _responder = TRUE;
+    http2_connection->remote.max_frame_size = 4;
+
+    http2_frame.type = HTTP2_HEADERS;
+    http2_frame.flags = HTTP2_FLAG_END_HEADERS | HTTP2_FLAG_END_STREAM;
+    http2_frame.stream_id = 1;
+    http2_frame.length = _request_http2_test(block, sizeof(block), "/answer");
+    http2_frame.payload = block;
+    error = handle_frame_http2_connection(http2_connection, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+
+    size = _written_http2_test(context, written, sizeof(written));
+    V_ASSERT(size > HTTP2_HEADER_SIZE);
+
+    /* the first of the frames carries the block without closing it,
+    the flag that ends the headers travels on the last one */
+    error = decode_frame_http2(written, size, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+    V_ASSERT_EQ_U(http2_frame.type, HTTP2_HEADERS);
+    V_ASSERT_EQ_U(http2_frame.stream_id, 1);
+    V_ASSERT_EQ_U(http2_frame.length, 4);
+    V_ASSERT(!(http2_frame.flags & HTTP2_FLAG_END_HEADERS));
+
+    /* walks the frames that follow it, every one of them bounded by
+    the size the peer accepts and only the last closing the block */
+    offset = HTTP2_HEADER_SIZE + http2_frame.length;
+    index = 0;
+    while(TRUE) {
+        error = decode_frame_http2(&written[offset], size - offset, &http2_frame);
+        V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+        if(http2_frame.type != HTTP2_CONTINUATION) { break; }
+        V_ASSERT_EQ_U(http2_frame.stream_id, 1);
+        V_ASSERT(http2_frame.length <= 4);
+        offset += HTTP2_HEADER_SIZE + http2_frame.length;
+        index++;
+        if(http2_frame.flags & HTTP2_FLAG_END_HEADERS) { break; }
+    }
+
+    /* the block took more than the one frame it started as and the
+    payload of the response follows the last of them */
+    V_ASSERT(index > 0);
+    V_ASSERT(http2_frame.flags & HTTP2_FLAG_END_HEADERS);
+
+    error = decode_frame_http2(&written[offset], size - offset, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+    V_ASSERT_EQ_U(http2_frame.type, HTTP2_DATA);
+    V_ASSERT(http2_frame.flags & HTTP2_FLAG_END_STREAM);
 
     _responder = FALSE;
     _delete_http2_test(context, http2_connection);

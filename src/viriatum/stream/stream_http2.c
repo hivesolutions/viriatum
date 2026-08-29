@@ -2011,6 +2011,83 @@ static struct http2_callback_t *_wrap_http2_connection(struct http2_connection_t
     return http2_callback;
 }
 
+/**
+ * Rebuilds a block of headers that is larger than the frame the peer
+ * accepts as a sequence of frames that it does accept, the first of
+ * them carrying the type of the original and the ones that follow it
+ * carrying the continuation of the block.
+ * The buffer that comes back is a new one, the provided one being
+ * released, and it is unchanged when the block already fits.
+ *
+ * @param http2_connection The session the block is written on.
+ * @param data The complete frame that carries the block.
+ * @param size The size in bytes of that frame.
+ * @param size_pointer The size in bytes of the frame that comes back.
+ * @return The frame, or the sequence of them, that the peer accepts.
+ */
+static unsigned char *_split_http2_connection(struct http2_connection_t *http2_connection, unsigned char *data, size_t size, size_t *size_pointer) {
+    /* allocates space for the buffer being built, for the positions
+    in both of them and for the size of the fragment being written */
+    unsigned char *buffer;
+    size_t allowed = http2_connection->remote.max_frame_size;
+    size_t block = size - HTTP2_HEADER_SIZE;
+    size_t frames;
+    size_t offset = 0;
+    size_t position = HTTP2_HEADER_SIZE;
+    size_t fragment;
+    unsigned char flags = data[4];
+    unsigned int stream_id = decode_number_http2(&data[5]) & (unsigned int) HTTP2_MAX_STREAM_ID;
+
+    /* a block that the peer accepts as a single frame is written as
+    it stands, which is the shape of every ordinary response */
+    *size_pointer = size;
+    if(block <= allowed) { return data; }
+
+    /* gathers the number of the frames that the block takes and out
+    of it the size of the buffer that carries every one of them */
+    frames = (block + allowed - 1) / allowed;
+    buffer = (unsigned char *) MALLOC(block + frames * HTTP2_HEADER_SIZE);
+
+    /* the first of the frames carries the type of the original one
+    and closes neither the block nor the stream, the flag that ends
+    the headers travels on the last of them instead */
+    fragment = allowed;
+    encode_frame_http2(
+        &buffer[offset],
+        block + frames * HTTP2_HEADER_SIZE - offset,
+        fragment,
+        data[3],
+        (unsigned char) (flags & ~HTTP2_FLAG_END_HEADERS),
+        stream_id
+    );
+    memcpy(&buffer[offset + HTTP2_HEADER_SIZE], &data[position], fragment);
+    offset += HTTP2_HEADER_SIZE + fragment;
+    position += fragment;
+
+    /* every one of the frames that follows carries the rest of the
+    block, the last of them closing it */
+    while(position < size) {
+        fragment = size - position < allowed ? size - position : allowed;
+        encode_frame_http2(
+            &buffer[offset],
+            block + frames * HTTP2_HEADER_SIZE - offset,
+            fragment,
+            HTTP2_CONTINUATION,
+            (unsigned char) (position + fragment == size ? HTTP2_FLAG_END_HEADERS : 0x00),
+            stream_id
+        );
+        memcpy(&buffer[offset + HTTP2_HEADER_SIZE], &data[position], fragment);
+        offset += HTTP2_HEADER_SIZE + fragment;
+        position += fragment;
+    }
+
+    /* releases the buffer that carried the block as a single frame
+    and hands back the one that carries the sequence of them */
+    FREE(data);
+    *size_pointer = offset;
+    return buffer;
+}
+
 ERROR_CODE write_flush_http2(struct connection_t *connection, unsigned char *data, size_t size, connection_data_callback_h2 callback, void *parameters) {
     /* allocates space for the session and for the stream that the
     response is being written on */
@@ -2022,6 +2099,13 @@ ERROR_CODE write_flush_http2(struct connection_t *connection, unsigned char *dat
     if(http2_stream == NULL) {
         FREE(data);
         RAISE_NO_ERROR;
+    }
+
+    /* a block that is larger than the frame the peer accepts travels
+    as a sequence of them, the payload is already bounded by the very
+    same value and this is the one path that was not */
+    if(size > HTTP2_HEADER_SIZE && data[3] == HTTP2_HEADERS) {
+        data = _split_http2_connection(http2_connection, data, size, &size);
     }
 
     /* a stream that this end has reserved through a promise leaves
