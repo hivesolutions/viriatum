@@ -49,6 +49,14 @@
 #define GET_MEMORY_USAGE(memory_information) memory_information.PagefileUsage
 #define FILE_EXISTS(file_path) GetFileAttributes(file_path) != 0xffffffff
 #define ACCESS(path, mode) _access(path, mode)
+#define READ_MODE 4
+#define OPEN_READ(path) _open(path, _O_RDONLY | _O_BINARY)
+#define DUPLICATE(descriptor) _dup(descriptor)
+#define CLOSE_READ(descriptor) _close(descriptor)
+#define READ_AT(descriptor, buffer, size, offset) \
+    (_lseek(descriptor, (long) offset, SEEK_SET) == -1 ? -1 : _read(descriptor, buffer, (unsigned int) size))
+#define STAT_READ(descriptor, file_stat) _fstat(descriptor, &file_stat)
+#define STAT_TYPE struct _stat
 #define CHANGE_DIRECTORY(path) _chdir(path)
 #define CURRENT_DIRECTORY(buffer, size) _getcwd(buffer, size)
 #define ROUND(value) (value + 0.5f)
@@ -59,6 +67,7 @@
 #define PROCESS_TYPE int
 #define MEMORY_INFORMATION_TYPE struct rusage
 #define LOCAL_TIME(local_time_value, time_value) local_time_value = localtime(time_value)
+#define GM_TIME(gm_time_value, time_value) gmtime_r(time_value, gm_time_value)
 #define SLEEP(milliseconds) usleep((useconds_t) milliseconds * 1000)
 #define GET_PID() getpid()
 #define SPRINTF(buffer, size, format, ...) sprintf(buffer, format, __VA_ARGS__)
@@ -69,7 +78,6 @@
     dump((void *) &context)
 #define STRCPY(destination, size, source) strcpy(destination, source)
 #define FOPEN(file_pointer, file_name, mode) *file_pointer = fopen(file_name, mode)
-#define READABLE(file_name) (access(file_name, R_OK) == 0)
 #define STROULL(start, end, base) strtoull(start, end, base)
 #define GET_ENV(buffer, buffer_size, variable_name) buffer = getenv(variable_name)
 #define GET_PROCESS() RUSAGE_SELF
@@ -78,6 +86,13 @@
 #define GET_MEMORY_USAGE(memory_information) memory_information.ru_ixrss
 #define FILE_EXISTS(file_path) access(file_path, F_OK) == 0
 #define ACCESS(path, mode) access(path, mode)
+#define READ_MODE R_OK
+#define OPEN_READ(path) open(path, O_RDONLY)
+#define DUPLICATE(descriptor) dup(descriptor)
+#define CLOSE_READ(descriptor) close(descriptor)
+#define READ_AT(descriptor, buffer, size, offset) pread(descriptor, buffer, size, offset)
+#define STAT_READ(descriptor, file_stat) fstat(descriptor, &file_stat)
+#define STAT_TYPE struct stat
 #define CHANGE_DIRECTORY(path) chdir(path)
 #define CURRENT_DIRECTORY(buffer, size) getcwd(buffer, size)
 #define ROUND(value) (value + 0.5f)
@@ -88,18 +103,19 @@
     struct tm local_time_value_value;            \
     local_time_value = &local_time_value_value;  \
     localtime_s(local_time_value, time_value)
+#define GM_TIME(gm_time_value, time_value) gmtime_s(gm_time_value, time_value)
 #define SPRINTF(buffer, size, format, ...) sprintf_s(buffer, size, format, __VA_ARGS__)
 #define VSPRINTF(buffer, size, format, arg) vsprintf_s(buffer, size, format, arg)
 #define SSCANF(buffer, format, ...) sscanf_s(buffer, format, __VA_ARGS__)
 #define STRTOK(string, delimiter, context) strtok_s(string, delimiter, &context)
 #define STRCPY(destination, size, source) strcpy_s(destination, size, source)
 #define FOPEN(file_pointer, file_name, mode) fopen_s(file_pointer, file_name, mode)
-#define READABLE(file_name) (_access(file_name, 4) == 0)
 #define STROULL(start, end, base) _strtoui64(start, end, base)
 #endif
 
 #ifdef VIRIATUM_PLATFORM_MINGW
 #define LOCAL_TIME(local_time_value, time_value) local_time_value = localtime(time_value)
+#define GM_TIME(gm_time_value, time_value) *(gm_time_value) = *gmtime(time_value)
 #define SPRINTF(buffer, size, format, ...) sprintf(buffer, format, __VA_ARGS__)
 #define VSPRINTF(buffer, size, format, arg) vsprintf(buffer, format, arg)
 #define SSCANF(buffer, format, ...) sscanf(buffer, format, __VA_ARGS__)
@@ -108,7 +124,6 @@
     dump((void *) &context)
 #define STRCPY(destination, size, source) strcpy(destination, source)
 #define FOPEN(file_pointer, file_name, mode) *file_pointer = fopen(file_name, mode)
-#define READABLE(file_name) (access(file_name, R_OK) == 0)
 #define STROULL(start, end, base) _strtoui64(start, end, base)
 #endif
 

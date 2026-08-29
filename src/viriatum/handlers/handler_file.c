@@ -26,6 +26,226 @@
 
 #include "handler_file.h"
 
+/* the files that the handler is keeping open, one set per process as
+the workers are forked and each of them serves on its own, so that
+nothing here is ever reached by two of them at the same time and no
+locking of any kind is called for around it */
+static struct file_cache_t *_file_cache = NULL;
+
+static struct file_cache_t *_get_file_cache(void) {
+    /* creates the cache the first time that one is asked for, which
+    happens inside the worker that is serving and never before the
+    forking of it, so that each of them ends up with one of its own
+    and none of them is ever left without one to reach for */
+    if(_file_cache == NULL) { create_file_cache(&_file_cache); }
+    return _file_cache;
+}
+
+static void _time_file_cache(STAT_TYPE *file_stat, struct date_time_t *date_time) {
+    /* allocates space for the structure that carries the parts of
+    the moment and for the moment itself as the system reports it */
+    struct tm time;
+    time_t written = (time_t) file_stat->st_mtime;
+
+    /* breaks the moment of the last write into its parts, the very
+    same way the commons does it for the time of a file, so that the
+    tag that travels with a response does not change over this */
+    GM_TIME(&time, &written);
+
+    /* populates the date time structure with the information
+    on the file various parts */
+    date_time->year = time.tm_year + 1900;
+    date_time->month = time.tm_mon + 1;
+    date_time->day = time.tm_mday;
+    date_time->hour = time.tm_hour;
+    date_time->minute = time.tm_min;
+    date_time->second = time.tm_sec;
+}
+
+ERROR_CODE create_file_cache(struct file_cache_t **file_cache_pointer) {
+    /* allocates space for the cache itself and for the entries that
+    it is made of, which are as many as a hash is able to fall on */
+    size_t index;
+    size_t file_cache_size = sizeof(struct file_cache_t);
+    size_t entries_size = sizeof(struct file_cache_entry_t) * CACHE_SIZE_HANDLER_FILE;
+    struct file_cache_t *file_cache = (struct file_cache_t *) MALLOC(file_cache_size);
+    file_cache->entries = (struct file_cache_entry_t *) MALLOC(entries_size);
+
+    /* empties every one of the entries, a descriptor of minus one
+    being what says that the slot holds no file at all */
+    for(index = 0; index < CACHE_SIZE_HANDLER_FILE; index++) {
+        file_cache->entries[index].descriptor = -1;
+        file_cache->entries[index].path[0] = '\0';
+        file_cache->entries[index].size = 0;
+        file_cache->entries[index].checked = 0;
+    }
+
+    /* sets the cache in the cache pointer */
+    *file_cache_pointer = file_cache;
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE delete_file_cache(struct file_cache_t *file_cache) {
+    /* closes every file that is still being held and then releases
+    both the entries and the cache that carried them */
+    clear_file_cache(file_cache);
+    FREE(file_cache->entries);
+    FREE(file_cache);
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE clear_file_cache(struct file_cache_t *file_cache) {
+    /* allocates space for the index to be used in the iteration
+    over the complete set of entries of the cache */
+    size_t index;
+
+    /* closes the file of every entry that is holding one, a
+    descriptor that is never closed is a descriptor leaked */
+    for(index = 0; index < CACHE_SIZE_HANDLER_FILE; index++) {
+        if(file_cache->entries[index].descriptor == -1) { continue; }
+        CLOSE_READ(file_cache->entries[index].descriptor);
+        file_cache->entries[index].descriptor = -1;
+        file_cache->entries[index].path[0] = '\0';
+    }
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE acquire_file_cache(struct file_cache_t *file_cache, unsigned char *file_path, struct file_cache_entry_t **file_cache_entry_pointer) {
+    /* allocates space for the structure that describes the file and
+    for the moment at which this is all happening */
+    STAT_TYPE file_stat;
+    unsigned int now = (unsigned int) time(NULL);
+
+    /* the entry that the provided path falls on, a path always falls
+    on the very same one of them and takes it over from whatever was
+    sitting there before, which is what makes both the finding of it
+    and the making of room for it a single step */
+    size_t index = _calculate_string_hash_map(file_path) % CACHE_SIZE_HANDLER_FILE;
+    struct file_cache_entry_t *entry = &file_cache->entries[index];
+
+    /* in case the entry is holding the very file that is being asked
+    for it may be handed back, once what is known about it has been
+    made to agree with the file that the descriptor actually reaches */
+    if(entry->descriptor != -1 && strcmp((char *) entry->path, (char *) file_path) == 0) {
+        /* the descriptor is asked about itself on every single one of
+        the requests, which costs nothing against the opening it saves
+        and is what keeps the size of the entry honest, a file written
+        over in place keeps the very same descriptor and would
+        otherwise be answered with the length it used to have and a
+        body cut short to match it */
+        if(STAT_READ(entry->descriptor, file_stat) != 0) {
+            RAISE_ERROR_M(
+                RUNTIME_EXCEPTION_ERROR_CODE,
+                (unsigned char *) "Problem loading file"
+            );
+        }
+        entry->size = (size_t) file_stat.st_size;
+        _time_file_cache(&file_stat, &entry->time);
+
+        /* within the time that an entry is trusted for there is
+        nothing else to be asked, the descriptor has just answered */
+        if(now - entry->checked < CACHE_VALID_HANDLER_FILE) {
+            *file_cache_entry_pointer = entry;
+            RAISE_NO_ERROR;
+        }
+
+        /* past that the file is looked at through its path as well,
+        which is the only way of telling that another one has been
+        put in its place, the descriptor that is held would go on
+        answering about the file that used to be there */
+        if(stat((char *) file_path, &file_stat) == 0 &&
+           (size_t) file_stat.st_size == entry->size) {
+            entry->checked = now;
+            *file_cache_entry_pointer = entry;
+            RAISE_NO_ERROR;
+        }
+    }
+
+    /* whatever the entry was holding is of no use, either because it
+    describes another file or because the one it describes has moved
+    on, and it is closed before the slot is taken over */
+    if(entry->descriptor != -1) {
+        CLOSE_READ(entry->descriptor);
+        entry->descriptor = -1;
+        entry->path[0] = '\0';
+    }
+
+    /* a path longer than an entry is able to carry is never cached,
+    the copying of it would run past the end of the buffer */
+    if(strlen((char *) file_path) >= VIRIATUM_MAX_PATH_SIZE) {
+        RAISE_ERROR_M(
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Problem loading file"
+        );
+    }
+
+    /* opens the file and describes it through the descriptor that
+    was just obtained, which answers about the very file that was
+    opened and never about one that took its place in between */
+    entry->descriptor = OPEN_READ((char *) file_path);
+    if(entry->descriptor == -1) {
+        RAISE_ERROR_M(
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Problem loading file"
+        );
+    }
+
+    if(STAT_READ(entry->descriptor, file_stat) != 0) {
+        CLOSE_READ(entry->descriptor);
+        entry->descriptor = -1;
+        RAISE_ERROR_M(
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Problem loading file"
+        );
+    }
+
+    /* fills the entry with what has just been learnt about the file,
+    the time of the last write to it included as the tag that travels
+    with the response is built out of it */
+    STRCPY((char *) entry->path, VIRIATUM_MAX_PATH_SIZE, (char *) file_path);
+    entry->size = (size_t) file_stat.st_size;
+    entry->checked = now;
+    _time_file_cache(&file_stat, &entry->time);
+
+    /* sets the entry in the entry pointer */
+    *file_cache_entry_pointer = entry;
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE open_file_cache(struct file_cache_t *file_cache, unsigned char *file_path, int *descriptor_pointer) {
+    /* allocates space for the entry of the cache and for the error
+    that the acquiring of it may raise */
+    ERROR_CODE error_code;
+    struct file_cache_entry_t *entry;
+
+    /* acquires the entry for the path, which opens the file when the
+    cache is not already holding it open */
+    error_code = acquire_file_cache(file_cache, file_path, &entry);
+    if(IS_ERROR_CODE(error_code)) { RAISE_AGAIN(error_code); }
+
+    /* hands back a duplicate rather than the descriptor of the entry
+    itself, so that the request owns what it reads through and the
+    cache is free to close its own whenever the slot is taken over */
+    *descriptor_pointer = DUPLICATE(entry->descriptor);
+    if(*descriptor_pointer == -1) {
+        RAISE_ERROR_M(
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Problem loading file"
+        );
+    }
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
 ERROR_CODE create_file_handler(struct file_handler_t **file_handler_pointer, struct http_handler_t *http_handler) {
     /* retrieves the file handler size */
     size_t file_handler_size = sizeof(struct file_handler_t);
@@ -71,8 +291,8 @@ ERROR_CODE create_handler_file_context(struct handler_file_context_t **handler_f
     handler_file_context->auth_basic = NULL;
     handler_file_context->auth_file = NULL;
     handler_file_context->push = NULL;
-    handler_file_context->file = NULL;
-    handler_file_context->file_size = 0;
+    handler_file_context->descriptor = -1;
+    handler_file_context->offset = 0;
     handler_file_context->initial_byte = 0;
     handler_file_context->final_byte = 0;
     handler_file_context->flags = 0;
@@ -91,10 +311,11 @@ ERROR_CODE create_handler_file_context(struct handler_file_context_t **handler_f
 }
 
 ERROR_CODE delete_handler_file_context(struct handler_file_context_t *handler_file_context) {
-    /* in case there is a file defined in the handler
-    file context closes it (avoiding a memory leak) */
-    if(handler_file_context->file != NULL) {
-        fclose(handler_file_context->file);
+    /* in case there is a file being read through in the handler file
+    context closes it, the cache holds one of its own and this is
+    only ever the duplicate that this request was handed */
+    if(handler_file_context->descriptor != -1) {
+        CLOSE_READ(handler_file_context->descriptor);
     }
 
     /* in case there is a template handler defined
@@ -212,6 +433,13 @@ ERROR_CODE unregister_handler_file(struct service_t *service) {
 
     /* deletes the file handler reference */
     delete_file_handler(file_handler);
+
+    /* closes every file that the cache was keeping open and releases
+    it, a descriptor that is never closed is a descriptor leaked */
+    if(_file_cache != NULL) {
+        delete_file_cache(_file_cache);
+        _file_cache = NULL;
+    }
 
     /* remove the HTTP handler from the service after
     that deletes the handler reference */
@@ -598,6 +826,10 @@ ERROR_CODE message_complete_callback_handler_file(struct http_request_t *http_re
     etag calculation structure (crc32 value), for the etag
     value and for the (file) extension and mime type */
     struct date_time_t time;
+
+    /* allocates space for the entry of the cache that describes the
+    file, both its size and the time of the last write to it */
+    struct file_cache_entry_t *file_cache_entry;
     char time_string[20];
     unsigned long crc32_value;
     char etag[11];
@@ -799,20 +1031,21 @@ ERROR_CODE message_complete_callback_handler_file(struct http_request_t *http_re
         /* counts the total size (in bytes) of the contents
         in the file path, this also the call used for checking
         the existence of the file */
-        error_code = count_file(
-            (char *) handler_file_context->file_path_d,
-            &file_size
+        error_code = acquire_file_cache(
+            _get_file_cache(),
+            handler_file_context->file_path_d,
+            &file_cache_entry
         );
 
         /* in case there is no error count the file size, avoids
         extra problems while computing the etag */
         if(!IS_ERROR_CODE(error_code)) {
-            /* resets the date time structure to avoid invalid
-            date requests */
-            memset(&time, 0, sizeof(struct date_time_t));
-
-            /* retrieve the time of the last write in the file path */
-            get_write_time_file((char *) handler_file_context->file_path_d, &time);
+            /* both the size and the time of the last write come out
+            of the entry that has just been acquired, which learnt
+            them from the very descriptor it is holding open, so that
+            neither of them costs a look at the file system of its own */
+            file_size = file_cache_entry->size;
+            time = file_cache_entry->time;
 
             /* creates the date time string for the file entry */
             SPRINTF(
@@ -1343,13 +1576,18 @@ ERROR_CODE _reset_http_request_handler_file(struct http_request_t *http_request)
     struct handler_file_context_t *handler_file_context =
         (struct handler_file_context_t *) http_request->context;
 
-    /* unsets the handler file context file */
-    handler_file_context->file = NULL;
+    /* closes whatever the request before this one was reading through
+    and had not finished with, a transfer that was cut short would
+    otherwise leave its descriptor behind for the whole connection */
+    if(handler_file_context->descriptor != -1) {
+        CLOSE_READ(handler_file_context->descriptor);
+        handler_file_context->descriptor = -1;
+    }
 
-    /* resets the file size to be processed and the various
+    /* resets the offset the reading had reached and the various
     range associated values so that the new file may be
     retrieved without any size related side problem */
-    handler_file_context->file_size = 0;
+    handler_file_context->offset = 0;
     handler_file_context->initial_byte = 0;
     handler_file_context->final_byte = 0;
 
@@ -1443,8 +1681,10 @@ ERROR_CODE _cleanup_handler_file(struct connection_t *connection, struct data_t 
 
 ERROR_CODE _send_chunk_handler_file(struct connection_t *connection, struct data_t *data, void *parameters) {
     /* allocates the number of bytes value to be used in
-    the read operation (read bytes) */
+    the read operation (read bytes), together with the signed
+    result of the read that a failure of it is told apart by */
     size_t number_bytes;
+    long read_bytes;
 
     /* reserves space for the offset, reamingin and buffer
     size values to be used in the calculus of the "optimal"
@@ -1471,30 +1711,24 @@ ERROR_CODE _send_chunk_handler_file(struct connection_t *connection, struct data
     struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
     struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
 
-    /* retrieves the file from the handler file context */
-    FILE *file = handler_file_context->file;
+    /* retrieves the descriptor from the handler file context */
+    int descriptor = handler_file_context->descriptor;
 
     /* in case the file is not defined (should be opened) */
-    if(file == NULL) {
-        /* opens the file in the most secure manner making sure
-        that the proper encoding is set for the path, a file that
-        does not open at this point was there when the response was
-        decided upon and is not any longer, and there is then nothing
-        left to send and no pointer at all to be seeking through */
-        error_code = open_file((char *) file_path, "rb", &file);
+    if(descriptor == -1) {
+        /* asks the cache for the file, which hands back a duplicate
+        of the one it is holding open and only ever opens it when it
+        is not already, a file that does not open at this point was
+        there when the response was decided upon and is not any
+        longer, and there is then nothing at all left to send */
+        error_code = open_file_cache(_get_file_cache(), file_path, &descriptor);
         if(IS_ERROR_CODE(error_code)) { RAISE_AGAIN(error_code); }
 
-        /* seeks to the end of the file and then to the
-        beginig in order to correctly retrieve the size
-        of the current file for reading */
-        fseek(file, 0, SEEK_END);
-        handler_file_context->file_size = ftell(file);
-        fseek(file, handler_file_context->initial_byte, SEEK_SET);
-
-        /* sets the file in the handler file context, this is
-        the pointer that will be used for the sending of the
-        various chunks of the file */
-        handler_file_context->file = file;
+        /* sets the descriptor in the handler file context together
+        with the position the reading of it starts from, which is the
+        one the range of the request asked to start at */
+        handler_file_context->descriptor = descriptor;
+        handler_file_context->offset = handler_file_context->initial_byte;
     }
 
     /* retrieves the current offset position in the file reading
@@ -1502,15 +1736,18 @@ ERROR_CODE _send_chunk_handler_file(struct connection_t *connection, struct data
     calculates the "target" buffer size from the minimum value
     between the (maximum) file buffer size and the remaining number
     of bytes to be read from the file (optimal buffer sizing) */
-    offset = ftell(file);
+    offset = handler_file_context->offset;
     remaining = handler_file_context->final_byte - offset + 1;
     buffer_size = remaining < FILE_BUFFER_SIZE_HANDLER_FILE ? remaining : FILE_BUFFER_SIZE_HANDLER_FILE;
     file_buffer = MALLOC(buffer_size);
 
-    /* reads the file contents, should read either the size
-    of a chunk or the size of the complete file in case it's
+    /* reads the file contents from the position that is wanted rather
+    than seeking the descriptor towards it first, should read either
+    the size of a chunk or the size of the complete file in case it's
     shorter than the chunk size */
-    number_bytes = fread(file_buffer, 1, buffer_size, file);
+    read_bytes = READ_AT(descriptor, file_buffer, buffer_size, offset);
+    number_bytes = read_bytes < 0 ? 0 : (size_t) read_bytes;
+    handler_file_context->offset += number_bytes;
 
     /* in case the number of read bytes is valid, there's
     data to be sent to the client side */
@@ -1530,15 +1767,16 @@ ERROR_CODE _send_chunk_handler_file(struct connection_t *connection, struct data
     /* otherwise the file "transfer" is complete and the control
     flow should proceed to the cleanup operations */
     else {
-        /* unsets the file from the handler file context */
-        handler_file_context->file = NULL;
+        /* unsets the descriptor from the handler file context */
+        handler_file_context->descriptor = -1;
 
         /* runs the cleanup handler file (releases internal structures) */
         _cleanup_handler_file(connection, data, parameters);
 
-        /* closes the file and the releases the currently allocated
-        file buffer (avoids memory leaking) */
-        fclose(file);
+        /* closes the duplicate that this request was reading through
+        and releases the currently allocated file buffer, the cache
+        keeps the one of its own open for whoever asks next */
+        CLOSE_READ(descriptor);
         FREE(file_buffer);
     }
 

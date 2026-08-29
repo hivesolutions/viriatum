@@ -30,6 +30,78 @@
 #include "test_support.h"
 
 /**
+ * Tests the creation of the cache of the files that
+ * the handler keeps open and its default state.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_file_cache(void);
+
+/**
+ * Tests the acquiring of a file out of the cache, both
+ * the first time and once it is already being held.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_file_cache_acquire(void);
+
+/**
+ * Tests the acquiring of a file that is not there, which
+ * raises instead of handing back an empty entry.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_file_cache_missing(void);
+
+/**
+ * Tests that a file written over in place is described by
+ * the size it now has and never by the one it used to have.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_file_cache_changed(void);
+
+/**
+ * Tests that two files falling on the same entry of the
+ * cache are each described by their own contents.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_file_cache_collision(void);
+
+/**
+ * Tests the clearing of the cache, which closes every file
+ * being held and leaves it working afterwards.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_file_cache_clear(void);
+
+/**
+ * Tests the handing out of a descriptor for a file of the
+ * cache, one apart from the descriptor it is holding.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_file_cache_open(void);
+
+/**
+ * Tests that a path longer than an entry is able to carry
+ * is refused instead of being copied past the end of it.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_file_cache_long(void);
+
+/**
  * Tests the handler file context creation
  * and default value initialization.
  *
