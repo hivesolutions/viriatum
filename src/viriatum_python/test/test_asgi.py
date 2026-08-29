@@ -807,6 +807,28 @@ class AsgiTest(ServerCase):
         self.assertEqual(result.headers.get("Transfer-Encoding"), "chunked")
         self.assertEqual(result.headers.get("Content-Length"), None)
 
+    def test_streaming_keep_alive(self):
+        # verifies that a response whose size is not known in advance
+        # still bounds the message, so a connection that is kept alive
+        # carries a second one after it rather than leaving the client
+        # waiting for the rest of the first forever
+        connection = http.client.HTTPConnection("127.0.0.1", self.port, timeout=5)
+        connection.auto_open = 0
+        connection.connect()
+        connection.request("GET", "/stream")
+        result = connection.getresponse()
+        self.assertEqual(result.read(), b"chunk0-chunk1-chunk2-end")
+        self.assertEqual(result.headers.get("Transfer-Encoding"), "chunked")
+        self.assertEqual(result.headers.get("Content-Length"), None)
+
+        # the message of the stream has been bounded by the framing of
+        # the chunks, so the one that follows it is served just the
+        # same on the very same connection
+        connection.request("GET", "/plain")
+        result = connection.getresponse()
+        self.assertEqual(result.read(), b"plain")
+        connection.close()
+
     def test_streaming_framing(self):
         # verifies that each of the chunks reaches the wire framed on
         # its own, which is what makes the response a streamed one
