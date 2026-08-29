@@ -296,7 +296,7 @@ _start_subject() {
         wsgi | asgi | asgi-stream)
             PYTHONPATH="$ASSETS:$ROOT/src/viriatum_python" "$PYTHON" \
                 "$ASSETS/serve.py" "$_ROLE" "$PORT" \
-                < /dev/null > "$OUTPUT/logs/subject.log" 2>&1 &
+                < /dev/null > /dev/null 2> "$OUTPUT/logs/subject.log" &
             PID=$!
             _wait "$PORT"
             return 0
@@ -312,7 +312,7 @@ _start_subject() {
     else
         "$BINARY" --port="$PORT" --handler="$_HANDLER" \
             --wwwroot="$OUTPUT/www" --workers="$WORKERS" \
-            < /dev/null > "$OUTPUT/logs/subject.log" 2>&1 &
+            < /dev/null > /dev/null 2> "$OUTPUT/logs/subject.log" &
         PID=$!
     fi
     _wait "$PORT"
@@ -906,7 +906,7 @@ while IFS='|' read -r NAME ROLE HANDLER PATH_ HEADER TEMPLATE PROXY; do
     if [ -n "$PROXY" ]; then
         "$BINARY" --port="$PORT_UPSTREAM" --handler=default \
             --workers="$WORKERS" \
-            < /dev/null > "$OUTPUT/logs/upstream.log" 2>&1 &
+            < /dev/null > /dev/null 2> "$OUTPUT/logs/upstream.log" &
         PID_UPSTREAM=$!
         _wait "$PORT_UPSTREAM"
     fi
