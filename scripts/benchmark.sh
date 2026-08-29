@@ -102,6 +102,18 @@ else
     MODE=${MODE:-native}
 fi
 
+# the subject has no image to be run out of unless one was built for
+# it, and running it natively against references that are not is the
+# one thing this is all meant to avoid, so the references come back
+# out of the containers rather than the comparison being spoiled
+if [ "$MODE" = "container" ] &&
+    ! "$DOCKER" image inspect "$IMAGE_SUBJECT" > /dev/null 2>&1; then
+    echo "There is no $IMAGE_SUBJECT image to run the subject out of,"
+    echo "  falling back to measuring everything natively instead"
+    MODE=native
+    REFERENCES=native
+fi
+
 rm -rf "$OUTPUT"
 mkdir -p "$OUTPUT/runs" "$OUTPUT/logs" "$OUTPUT/www/listing"
 
@@ -320,7 +332,7 @@ _start_subject() {
 
     if [ "$MODE" = "container" ]; then
         "$DOCKER" run -d --name viriatum-subject --network host \
-            -v "$OUTPUT:/bench" -w /bench "$IMAGE" \
+            -v "$OUTPUT:/bench" -w /bench "$IMAGE_SUBJECT" \
             viriatum --port="$PORT" --handler="$_HANDLER" \
             --wwwroot=/bench/www --workers="$WORKERS" \
             > "$OUTPUT/logs/subject.id" 2>&1
