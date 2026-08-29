@@ -173,6 +173,7 @@ void create_service_options(struct service_options_t **service_options_pointer) 
     service_options->default_index = 0;
     service_options->www_root[0] = '\0';
     service_options->use_template = 0;
+    service_options->access_log = 1;
     service_options->default_virtual_host = NULL;
     service_options->index_count = 0;
 
@@ -491,6 +492,7 @@ ERROR_CODE debug_options_service(struct service_t *service) {
     V_DEBUG_F("  resources_path       := %s\n", options->resources_path);
     V_DEBUG_F("  modules_path         := %s\n", options->modules_path);
     V_DEBUG_F("  use_template         := %s\n", options->use_template ? "on" : "off");
+    V_DEBUG_F("  access_log           := %s\n", options->access_log ? "on" : "off");
     V_DEBUG_F("  default_virtual_host := %s\n", options->default_virtual_host != NULL ? "(set)" : "(null)");
     V_DEBUG_F("  index_count          := %lu\n", (unsigned long) options->index_count);
     for(index = 0; index < options->index_count; index++) {
@@ -2568,6 +2570,11 @@ ERROR_CODE _file_options_service(struct service_t *service, struct hash_map_t *a
     sets the use template (boolean) value for the service */
     get_value_string_sort_map(general, (unsigned char *) "use_template", &value);
     if(value != NULL) { service_options->use_template = (unsigned char) atob(value); }
+
+    /* tries to retrieve the access log argument from the arguments map, then
+    sets the access log (boolean) value for the service */
+    get_value_string_sort_map(general, (unsigned char *) "access_log", &value);
+    if(value != NULL) { service_options->access_log = (unsigned char) atob(value); }
 
     /* tries to retrieve the www root argument from the arguments map, then
     sets the www root override for the contents path in service options */

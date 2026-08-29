@@ -645,6 +645,14 @@ typedef struct service_options_t {
     unsigned char use_template;
 
     /**
+     * If a line describing each of the requests should be
+     * written to the standard output, the writing of it is
+     * a call into the kernel per request and so it is the
+     * kind of thing a deployment under load turns off.
+     */
+    unsigned char access_log;
+
+    /**
      * The default virtual host to be used in any
      * non matched host request.
      */

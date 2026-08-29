@@ -284,8 +284,12 @@ ERROR_CODE url_callback_handler_file(struct http_request_t *http_request, const 
     memcpy(handler_file_context->url, data, path_size);
     handler_file_context->url[path_size] = '\0';
 
-    /* prints a debug message */
-    V_INFO_F("%s %s\n", get_http_method_string(http_request->method), handler_file_context->url);
+    /* prints the line that describes the request, the writing of it
+    is a call into the kernel that every request pays for, so it is
+    only ever written when the service has been asked for it */
+    if(connection->service->options->access_log) {
+        V_INFO_F("%s %s\n", get_http_method_string(http_request->method), handler_file_context->url);
+    }
 
     /* creates the file path using the base viriatum path
     this should be the complete absolute path */
@@ -1160,8 +1164,12 @@ ERROR_CODE path_callback_handler_file(struct http_request_t *http_request, const
     memcpy(handler_file_context->url, data, data_size);
     handler_file_context->url[data_size] = '\0';
 
-    /* prints a debug message */
-    V_INFO_F("%s %s\n", get_http_method_string(http_request->method), handler_file_context->url);
+    /* prints the line that describes the request, the writing of it
+    is a call into the kernel that every request pays for, so it is
+    only ever written when the service has been asked for it */
+    if(connection->service->options->access_log) {
+        V_INFO_F("%s %s\n", get_http_method_string(http_request->method), handler_file_context->url);
+    }
 
     /* in case a base path is not defined the contant values
     for the contents and base path must be used */
