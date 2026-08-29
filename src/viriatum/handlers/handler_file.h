@@ -68,6 +68,15 @@ typedef struct file_location_t {
      * confirm with the defined standard.
      */
     unsigned char *auth_file;
+
+    /**
+     * The resources that are promised to a peer together with a
+     * request that matches this location, given as a list of paths
+     * separated by spaces.
+     * Only ever acted upon under HTTP/2, the older version of the
+     * protocol carries no way of promising anything.
+     */
+    unsigned char *push;
 } file_location_t;
 
 /**
@@ -143,6 +152,13 @@ typedef struct handler_file_context_t {
      * the passwd file.
      */
     unsigned char *auth_file;
+
+    /**
+     * The resources that are promised to a peer together with the
+     * response of this request, taken from the location that has
+     * matched it.
+     */
+    unsigned char *push;
 
     /**
      * The reference to the file stream to be
@@ -258,19 +274,19 @@ ERROR_CODE unregister_handler_file(struct service_t *service);
 ERROR_CODE set_handler_file(struct http_connection_t *http_connection);
 ERROR_CODE unset_handler_file(struct http_connection_t *http_connection);
 ERROR_CODE reset_handler_file(struct http_connection_t *http_connection);
-ERROR_CODE message_begin_callback_handler_file(struct http_parser_t *http_parser);
-ERROR_CODE url_callback_handler_file(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size);
-ERROR_CODE header_field_callback_handler_file(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size);
-ERROR_CODE header_value_callback_handler_file(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size);
-ERROR_CODE headers_complete_callback_handler_file(struct http_parser_t *http_parser);
-ERROR_CODE body_callback_handler_file(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size);
-ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_parser);
-ERROR_CODE path_callback_handler_file(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size);
-ERROR_CODE location_callback_handler_file(struct http_parser_t *http_parser, size_t index, size_t offset);
-ERROR_CODE virtual_url_callback_handler_file(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size);
-ERROR_CODE _set_http_parser_handler_file(struct http_parser_t *http_parser);
-ERROR_CODE _unset_http_parser_handler_file(struct http_parser_t *http_parser);
-ERROR_CODE _reset_http_parser_handler_file(struct http_parser_t *http_parser);
+ERROR_CODE message_begin_callback_handler_file(struct http_request_t *http_request);
+ERROR_CODE url_callback_handler_file(struct http_request_t *http_request, const unsigned char *data, size_t data_size);
+ERROR_CODE header_field_callback_handler_file(struct http_request_t *http_request, const unsigned char *data, size_t data_size);
+ERROR_CODE header_value_callback_handler_file(struct http_request_t *http_request, const unsigned char *data, size_t data_size);
+ERROR_CODE headers_complete_callback_handler_file(struct http_request_t *http_request);
+ERROR_CODE body_callback_handler_file(struct http_request_t *http_request, const unsigned char *data, size_t data_size);
+ERROR_CODE message_complete_callback_handler_file(struct http_request_t *http_request);
+ERROR_CODE path_callback_handler_file(struct http_request_t *http_request, const unsigned char *data, size_t data_size);
+ERROR_CODE location_callback_handler_file(struct http_request_t *http_request, size_t index, size_t offset);
+ERROR_CODE virtual_url_callback_handler_file(struct http_request_t *http_request, const unsigned char *data, size_t data_size);
+ERROR_CODE _set_http_request_handler_file(struct http_request_t *http_request);
+ERROR_CODE _unset_http_request_handler_file(struct http_request_t *http_request);
+ERROR_CODE _reset_http_request_handler_file(struct http_request_t *http_request);
 ERROR_CODE _set_http_settings_handler_file(struct http_settings_t *http_settings);
 ERROR_CODE _unset_http_settings_handler_file(struct http_settings_t *http_settings);
 ERROR_CODE _cleanup_handler_file(struct connection_t *connection, struct data_t *data, void *parameters);

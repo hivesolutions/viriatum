@@ -1,0 +1,32 @@
+name: Fuzz Workflow
+on:
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+jobs:
+  fuzz-http2:
+    name: Fuzz HTTP/2
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang llvm libssl-dev
+      - name: Run fuzzing
+        env:
+          CC: clang
+          SECONDS_RUN: 900
+        run: |
+          ./scripts/fuzz.sh
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: fuzz
+          path: |
+            fuzz/fuzz.log
+            fuzz/crash-*
+            fuzz/leak-*
+            fuzz/timeout-*
+          if-no-files-found: ignore

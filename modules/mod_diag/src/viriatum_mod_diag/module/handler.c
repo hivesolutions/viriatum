@@ -40,19 +40,21 @@ ERROR_CODE unset_handler_diag(struct http_connection_t *http_connection) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE message_complete_callback_handler_diag(struct http_parser_t *http_parser) {
+ERROR_CODE message_complete_callback_handler_diag(struct http_request_t *http_request) {
     /* sends (and creates) the response from the currently parsed
     messages and then returns with no error the caller function */
-    _send_response_handler_diag(http_parser);
+    _send_response_handler_diag(http_request);
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _send_response_handler_diag(struct http_parser_t *http_parser) {
+ERROR_CODE _send_response_handler_diag(struct http_request_t *http_request) {
     /* allocates the space for the buffer to be used to
     send the data to the client side and for the counter
     that stores the size of the buffer to be sent*/
     char *buffer;
+    char *body;
     size_t count;
+    char length[32];
 
     /* reserves space for the json based info string for its
     size and for the complete size of the resulting message */
@@ -62,7 +64,7 @@ ERROR_CODE _send_response_handler_diag(struct http_parser_t *http_parser) {
 
     /* retrieves the connection from the HTTP parser parameters and
     uses it to retrieve the associated service instance */
-    struct connection_t *connection = (struct connection_t *) http_parser->parameters;
+    struct connection_t *connection = (struct connection_t *) http_request->parameters;
     struct service_t *service = (struct service_t *) connection->service;
 
     /* retrieves the HTTP connection from the io connection to be used
@@ -121,36 +123,58 @@ ERROR_CODE _send_response_handler_diag(struct http_parser_t *http_parser) {
     writes the message into the current HTTP connection, the message should
     be composed of an empty diag */
     http_connection->acquire(http_connection);
-    count = http_connection->write_headers_c(
+    count = http_connection->write_status(
         connection,
         buffer,
         message_size,
-        HTTP11,
+        http_request->version,
         200,
         "OK",
-        http_parser->flags & FLAG_KEEP_ALIVE ? KEEP_ALIVE : KEEP_CLOSE,
-        info_size,
-        NO_CACHE,
-        FALSE
+        http_request->flags & FLAG_KEEP_ALIVE ? KEEP_ALIVE : KEEP_CLOSE
     );
-    count += SPRINTF(
-        &buffer[count],
-        message_size - count,
-        CONTENT_TYPE_H ": %s\r\n\r\n",
+    SPRINTF(length, sizeof(length), "%lu", (long unsigned int) info_size);
+    count = http_connection->write_field(
+        connection,
+        buffer,
+        message_size,
+        count,
+        CONTENT_LENGTH_H,
+        length
+    );
+    count = http_connection->write_field(
+        connection,
+        buffer,
+        message_size,
+        count,
+        CACHE_CONTROL_H,
+        cache_codes[NO_CACHE - 1]
+    );
+    count = http_connection->write_field(
+        connection,
+        buffer,
+        message_size,
+        count,
+        CONTENT_TYPE_H,
         "application/json"
     );
-    memcpy(&buffer[count], info, info_size);
-    count += info_size;
+    count = http_connection->write_end(connection, buffer, message_size, count, FALSE);
+
+    /* gathers the payload into a buffer of its own, the protocol is
+    the one framing it and so it travels as a write of its own */
+    connection->alloc_data(connection, info_size, (void **) &body);
+    memcpy(body, info, info_size);
 
     /* writes the response to the connection, this will write the
     complete message to the connection, upon finishing the sent operation
     the callback will be called for finish operations */
-    connection->write_connection(
+    http_connection->write_flush(connection, (unsigned char *) buffer, count, NULL, NULL);
+    http_connection->write_chunk(
         connection,
-        (unsigned char *) buffer,
-        (unsigned int) count,
+        (unsigned char *) body,
+        info_size,
+        TRUE,
         _send_response_callback_handler_diag,
-        (void *) (size_t) http_parser->flags
+        (void *) (size_t) http_request->flags
     );
 
     /* raise no error */

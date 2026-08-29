@@ -25,6 +25,15 @@ Format C code before committing using clang-format with the project's `.clang-fo
 clang-format -i <file>
 ```
 
+The whole tree is checked at once through a script of its own, which reports every source the formatter would rewrite and fails when there is one, and which formats them in place when asked to:
+
+```bash
+./scripts/format.sh
+./scripts/format.sh --fix
+```
+
+A job of the integration runs the first of those on every push, so a source that is left unformatted fails the build rather than passing quietly. The formatter is pinned there to a single version, the output of it differs between versions and a drifting one would make the job flip on its own.
+
 ## Testing
 
 Run the core test suite and module tests before committing:
@@ -64,6 +73,39 @@ Measure the coverage of the C tree and of the python package with:
 ```
 
 The script builds every target with instrumentation, runs the core, the module and the python suites and writes the reports under `coverage/`. Both clang, through llvm-cov, and gcc, through gcovr, are supported and produce the same set of reports. The threshold of the C tree is set through `THRESHOLD` and the one of the python surface through `PYTHON_THRESHOLD`, raise them as the coverage improves rather than lowering them to make a run pass.
+
+## Memory
+
+The memory of the tree is measured by driving the suite under the address sanitizer:
+
+```bash
+./scripts/sanitize.sh
+```
+
+An error of the memory fails the run outright, whatever its shape, and the allocations that are left behind are compared against `scripts/sanitize.baseline`, which a run above fails. The number is lowered as the leaks are closed and never raised to make a run pass, the very same rule the conformance and the coverage are held to. The leak part of the sanitizer only runs on some of the platforms, macOS not being one of them, so the job of the integration that runs this is what actually measures the leaks. The server also counts its own allocations in a debug build and reports the outstanding ones when the process ends.
+
+## HTTP/2
+
+Both versions of the protocol are served on the same port and are told apart by the bytes that open a connection, the preface handing it to a session of HTTP/2 and anything else to the parser of HTTP/1.1. Over the transport the version is negotiated through ALPN instead, honouring the order the client announces.
+
+A handler never knows which of the two is serving it. The message it is driven for is `struct http_request_t`, populated either by the parser or by the decoding of a header block, and the response is written through the operations that `struct http_connection_t` carries, `write_status`, `write_field`, `write_line`, `write_end`, `write_chunk` and `write_flush`, which frame it according to the version in use. A handler that writes bytes straight to the connection is only ever correct for HTTP/1.1.
+
+The layers are `src/viriatum/http/hpack.c` for the compression of the header fields, `src/viriatum/http/http2.c` for the frames and `src/viriatum/stream/stream_http2.c` for the session, the streams and the flow control, the last one mirroring the shape of `stream_http.c`.
+
+The support is built unless the build is told otherwise, through `--disable-http2` under Autoconf or `-D VIRIATUM_HTTP2=OFF` under CMake, and the flag it defines shows up in the banner of the startup. The code of it is guarded by `VIRIATUM_HTTP2`, so a call into any of the three layers above belongs inside that guard.
+
+The conformance of the implementation is measured against `h2spec` and the interoperability against the clients a deployment meets:
+
+```bash
+./scripts/conformance.sh
+./scripts/interop.sh
+```
+
+The first compares the cases that pass against `scripts/conformance.baseline` and fails a run below it, so the number is raised as the implementation improves rather than lowered to make a run pass. The decoders of the frames and of the header blocks are the two places that take apart what a peer controls and are driven by an engine of fuzzing:
+
+```bash
+./scripts/fuzz.sh
+```
 
 ## Style Guide
 
@@ -130,7 +172,7 @@ version: 0.4.0
 
 Before committing, ensure that the following items check:
 
-- [ ] Code is formatted with `clang-format`
+- [ ] Code is formatted with `clang-format`, which `./scripts/format.sh` verifies over the whole tree
 - [ ] Tests pass: `./bin/viriatum --test`
 - [ ] Module tests pass (if applicable): `./bin/viriatum_mod_lua_test`
 - [ ] CHANGELOG.md is updated in [Unreleased] section

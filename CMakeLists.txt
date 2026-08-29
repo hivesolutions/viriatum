@@ -36,6 +36,29 @@ if(VIRIATUM_COVERAGE)
     message(STATUS "Viriatum: coverage instrumentation enabled")
 endif()
 
+# the most recent version of the protocol is served unless the build
+# is told otherwise, it carries no library of its own and so it is only
+# ever left out for the footprint of the smaller targets
+option(VIRIATUM_HTTP2 "Serve the most recent version of the protocol" ON)
+if(NOT VIRIATUM_HTTP2)
+    add_definitions(-DHAVE_NO_HTTP2)
+    message(STATUS "Viriatum: http2 disabled")
+endif()
+
+# builds the targets that drive the decoders of the protocol over the
+# bytes an engine produces, they are the two places that take apart
+# what a peer controls, the instrumentation reaches the complete tree
+# so that the engine is able to follow the paths it opens
+option(VIRIATUM_FUZZ "Build the fuzz targets of the protocol decoders" OFF)
+if(VIRIATUM_FUZZ)
+    if(NOT CMAKE_C_COMPILER_ID MATCHES "Clang")
+        message(FATAL_ERROR "Viriatum: fuzzing requires clang, ${CMAKE_C_COMPILER_ID} carries no engine")
+    endif()
+    add_compile_options(-fsanitize=fuzzer-no-link,address -fno-omit-frame-pointer)
+    add_link_options(-fsanitize=fuzzer-no-link,address)
+    message(STATUS "Viriatum: fuzzing instrumentation enabled")
+endif()
+
 set(VIRIATUM_WWW_ROOT "" CACHE STRING "Path to the www root directory (sets WITH_WWW_ROOT)")
 if(VIRIATUM_WWW_ROOT)
     add_definitions(-DWITH_WWW_ROOT="${VIRIATUM_WWW_ROOT}")
@@ -87,6 +110,10 @@ endif()
 # carrying it may not be linked into a host process (eg: a Python module)
 file(GLOB_RECURSE VIRIATUM_SOURCES src/viriatum/*.c)
 list(REMOVE_ITEM VIRIATUM_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/viriatum/main.c)
+
+# the target of the fuzzing carries an entry point of its own and so
+# it never belongs to the library, it is built by the option below
+list(REMOVE_ITEM VIRIATUM_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/viriatum/test/fuzz_http2.c)
 add_library(viriatum_objects OBJECT ${VIRIATUM_SOURCES})
 set_target_properties(viriatum_objects PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
@@ -116,9 +143,39 @@ target_link_libraries(viriatum_shared PUBLIC viriatum_objects)
 add_executable(viriatum src/viriatum/main.c)
 target_link_libraries(viriatum viriatum_static)
 
+# the target of the fuzzing links the engine rather than an entry
+# point of its own, the corpus of it is driven by the script
+if(VIRIATUM_FUZZ)
+    add_executable(viriatum_fuzz_http2 src/viriatum/test/fuzz_http2.c)
+    target_link_libraries(viriatum_fuzz_http2 viriatum_static)
+    target_link_options(viriatum_fuzz_http2 PRIVATE -fsanitize=fuzzer,address)
+endif()
+
 # links the dynamic loader on Unix systems
 if(NOT WIN32)
     target_link_libraries(viriatum_objects PUBLIC ${CMAKE_DL_LIBS})
+endif()
+
+# the transport security is optional, the server binds a plain socket
+# when it is absent, its presence is what also brings the negotiation
+# of the protocol through alpn along with it
+#
+# on Windows the libraries of it are linked statically, a module that
+# is loaded into a host process there carries no way of finding the
+# dynamic ones at load time and would fail to load altogether
+if(WIN32)
+    set(OPENSSL_USE_STATIC_LIBS TRUE)
+endif()
+find_package(OpenSSL QUIET)
+if(OPENSSL_FOUND)
+    # the definitions travel to everything that links against the
+    # objects, they decide the shape of the connection structure and
+    # so a translation unit that misses them would disagree on it
+    target_compile_definitions(viriatum_objects PUBLIC HAVE_LIBSSL HAVE_OPENSSL_SSL_H)
+    target_include_directories(viriatum_objects PUBLIC ${OPENSSL_INCLUDE_DIR})
+    target_link_libraries(viriatum_objects PUBLIC OpenSSL::SSL OpenSSL::Crypto)
+else()
+    message(STATUS "Viriatum: OpenSSL not available, disabling ssl and alpn")
 endif()
 
 find_package(PkgConfig QUIET)

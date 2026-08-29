@@ -25,6 +25,7 @@
 #pragma once
 
 #include "stream_http.h"
+#include "stream_http2.h"
 #include "stream_httpc.h"
 #include "stream_io.h"
 #include "stream_torrent.h"

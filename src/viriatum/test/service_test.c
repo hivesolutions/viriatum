@@ -77,6 +77,13 @@ const char *test_calculate_locations_service(void) {
     ERROR_CODE error;
     struct service_t *service;
 
+    /* allocates space for the configuration that is built by hand,
+    for the section that is too short to name a location and for the
+    one that does name one */
+    struct sort_map_t *configuration;
+    struct sort_map_t *general;
+    struct sort_map_t *location;
+
     /* creates the service, note that a newly created service
     has no configuration loaded into it */
     create_service(
@@ -92,6 +99,35 @@ const char *test_calculate_locations_service(void) {
     V_ASSERT(!IS_ERROR_CODE(error));
     V_ASSERT(service->locations.count == 0);
 
+    /* builds a configuration carrying a section whose name is shorter
+    than the prefix of a location, which is the shape of the general
+    one that every configuration file of the project opens with */
+    create_sort_map(&configuration, 0);
+    create_sort_map(&general, 0);
+    create_sort_map(&location, 0);
+    set_value_string_sort_map(location, (unsigned char *) "path", (void *) "/");
+    set_value_string_sort_map(location, (unsigned char *) "handler", (void *) "file");
+    set_value_string_sort_map(configuration, (unsigned char *) "general", (void *) general);
+    set_value_string_sort_map(configuration, (unsigned char *) "location:/", (void *) location);
+    service->configuration = configuration;
+
+    /* the section that is too short to carry the prefix is skipped
+    without the comparison reading past the end of the name of it,
+    and only the one that does carry it becomes a location */
+    error = calculate_locations_service(service);
+    V_ASSERT(!IS_ERROR_CODE(error));
+    V_ASSERT_EQ_U(service->locations.count, 1);
+    V_ASSERT_EQ_S((char *) service->locations.values[0].name, "/");
+    V_ASSERT_EQ_S((char *) service->locations.values[0].path, "/");
+    V_ASSERT_EQ_S((char *) service->locations.values[0].handler, "file");
+
+    /* releases the configuration that has been built by hand, the
+    service never took ownership of the maps inside of it */
+    service->configuration = NULL;
+    delete_sort_map(location);
+    delete_sort_map(general);
+    delete_sort_map(configuration);
+
     /* deletes the service releasing every internal structure */
     delete_service(service);
 
@@ -106,6 +142,10 @@ const char *test_open_close_service(void) {
     ERROR_CODE error;
     struct service_t *service;
     struct hash_map_t *arguments;
+
+    /* allocates space for the handler that is looked up so that the
+    registrations of the opening may be told from the closing */
+    struct http_handler_t *http_handler;
 
     /* creates the service and loads both the specifications and the
     default options into it, no configuration file is involved */
@@ -134,6 +174,17 @@ const char *test_open_close_service(void) {
     V_ASSERT(!IS_ERROR_CODE(error));
     V_ASSERT(service->status == STATUS_OPEN);
 
+    /* the opening registers the handlers that the service carries of
+    its own, no module is loaded by this test */
+    service->get_http_handler(service, &http_handler, (unsigned char *) "dispatch");
+    V_ASSERT_NOT_NULL(http_handler);
+    service->get_http_handler(service, &http_handler, (unsigned char *) "default");
+    V_ASSERT_NOT_NULL(http_handler);
+    service->get_http_handler(service, &http_handler, (unsigned char *) "file");
+    V_ASSERT_NOT_NULL(http_handler);
+    service->get_http_handler(service, &http_handler, (unsigned char *) "proxy");
+    V_ASSERT_NOT_NULL(http_handler);
+
     /* runs a single iteration of the loop with a non blocking timeout,
     without it the epoll based provider would wait indefinitely as no
     connection is ever established during the test */
@@ -153,6 +204,18 @@ const char *test_open_close_service(void) {
     the opening and then deletes the service itself */
     error = close_service(service);
     V_ASSERT(!IS_ERROR_CODE(error));
+
+    /* the closing unregisters every one of them again, which is what
+    releases the structures the registration had created */
+    service->get_http_handler(service, &http_handler, (unsigned char *) "dispatch");
+    V_ASSERT_NULL(http_handler);
+    service->get_http_handler(service, &http_handler, (unsigned char *) "default");
+    V_ASSERT_NULL(http_handler);
+    service->get_http_handler(service, &http_handler, (unsigned char *) "file");
+    V_ASSERT_NULL(http_handler);
+    service->get_http_handler(service, &http_handler, (unsigned char *) "proxy");
+    V_ASSERT_NULL(http_handler);
+
     delete_service(service);
 
     /* returns the default value, nothing happened so there's
@@ -161,6 +224,10 @@ const char *test_open_close_service(void) {
 }
 
 const char *test_open_service_busy(void) {
+    /* allocates space for the handler that is looked up so that a
+    failed opening may be verified to have left nothing behind */
+    struct http_handler_t *http_handler;
+
     /* allocates space for the error code and for the service that is
     going to fail the opening operation */
     ERROR_CODE error;
@@ -196,6 +263,18 @@ const char *test_open_service_busy(void) {
     V_ASSERT(IS_ERROR_CODE(error));
     V_ASSERT(service->status == STATUS_CLOSED);
     V_ASSERT(service->service_socket_handle == 0);
+
+    /* the handlers that the opening had already registered are
+    unregistered again, the closing of a service is what balances
+    them and it is never reached by one that failed to open */
+    service->get_http_handler(service, &http_handler, (unsigned char *) "dispatch");
+    V_ASSERT_NULL(http_handler);
+    service->get_http_handler(service, &http_handler, (unsigned char *) "default");
+    V_ASSERT_NULL(http_handler);
+    service->get_http_handler(service, &http_handler, (unsigned char *) "file");
+    V_ASSERT_NULL(http_handler);
+    service->get_http_handler(service, &http_handler, (unsigned char *) "proxy");
+    V_ASSERT_NULL(http_handler);
 
     /* deletes the service releasing every internal structure */
     delete_service(service);
@@ -285,6 +364,104 @@ const char *test_ran_service(void) {
     access to the unset (null) service reference */
     error = ran_service();
     V_ASSERT(!IS_ERROR_CODE(error));
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_arguments_options_service(void) {
+    /* allocates space for the service, for the map of the arguments
+    that the command line produces and for one of them */
+    ERROR_CODE error;
+    struct service_t *service;
+    struct hash_map_t *arguments;
+    struct argument_t argument;
+
+    /* creates the service together with the empty map of the
+    arguments, the options of it start at the default values */
+    create_service(
+        &service,
+        (unsigned char *) "test",
+        (unsigned char *) "test"
+    );
+    create_hash_map(&arguments, 0);
+
+    /* the cleartext form of the most recent version of the protocol
+    is served by default, no argument is required for it */
+    V_ASSERT_EQ_U(service->options->http2, VIRIATUM_DEFAULT_HTTP2);
+
+    /* an empty map leaves every one of the options at the value it
+    already carries, nothing at all is overridden */
+    error = _comand_line_options_service(service, arguments);
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT_EQ_U(service->options->http2, VIRIATUM_DEFAULT_HTTP2);
+
+    /* the presence of the argument is what turns the serving of the
+    cleartext form off, the value of it carries no meaning */
+    argument.type = VALUE_ARGUMENT;
+    SPRINTF(argument.key, sizeof(argument.key), "%s", "no-http2");
+    argument.value[0] = '\0';
+    set_value_string_hash_map(arguments, (unsigned char *) "no-http2", (void *) &argument);
+
+    error = _comand_line_options_service(service, arguments);
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT_EQ_U(service->options->http2, 0);
+
+    /* deletes the map of the arguments and the service, the options
+    of it are released together with it */
+    delete_hash_map(arguments);
+    delete_service(service);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+const char *test_flags_service(void) {
+    /* allocates space for the chain of the connection and for the
+    string of the flags that the banner of the startup carries */
+    struct test_context_t *context;
+    const char *flags = VIRIATUM_FLAGS;
+
+    /* the safety of the threading is always one of the two values
+    that the string carries, so it is never empty */
+    V_ASSERT_NOT_NULL(flags);
+
+    /* the transport only shows up in the banner when the build has
+    actually been able to reach the library of it */
+#ifdef VIRIATUM_SSL
+    V_ASSERT_NOT_NULL(strstr(flags, "ssl"));
+#else
+    V_ASSERT_NULL(strstr(flags, "ssl"));
+#endif
+
+    /* the most recent version of the protocol shows up in the very
+    same way, it is left out for the footprint of a smaller target */
+#ifdef VIRIATUM_HTTP2
+    V_ASSERT_NOT_NULL(strstr(flags, "http2"));
+#else
+    V_ASSERT_NULL(strstr(flags, "http2"));
+#endif
+
+    /* a connection only ever looks at the bytes that open it when
+    the build carries the version they may belong to */
+    create_test_context(&context);
+    create_test_connection(context);
+#ifdef VIRIATUM_HTTP2
+    V_ASSERT(context->http_connection->detect == TRUE);
+#else
+    V_ASSERT(context->http_connection->detect == FALSE);
+#endif
+    delete_test_connection(context);
+
+    /* the setting of the service decides it just the same, a service
+    that turns it off never looks at those bytes either */
+    context->options->http2 = 0;
+    create_test_connection(context);
+    V_ASSERT(context->http_connection->detect == FALSE);
+    delete_test_connection(context);
+
+    delete_test_context(context);
 
     /* returns the default value, nothing happened so there's
     nothing to report for this execution */

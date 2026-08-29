@@ -153,6 +153,39 @@ typedef struct handler_proxy_context_t {
     size_t out_buffer_max_size;
 
     /**
+     * The name of the header field of the upstream that is being
+     * gathered, a field reaches this end in fragments and so both
+     * the name and the value have to be assembled before the pair
+     * may be written into the response.
+     */
+    char field[VIRIATUM_MAX_HEADER_SIZE];
+
+    /**
+     * The size of the name of the field gathered so far.
+     */
+    size_t field_size;
+
+    /**
+     * The value of the header field of the upstream that is being
+     * gathered, it is complete once the next name begins or the
+     * section of the headers closes.
+     */
+    char value[VIRIATUM_MAX_HEADER_V_SIZE];
+
+    /**
+     * The size of the value of the field gathered so far.
+     */
+    size_t value_size;
+
+    /**
+     * Flag controlling if the value of the field has started to be
+     * gathered, which is what tells a name that is still arriving in
+     * fragments from one that is complete, the value of a valid
+     * field being allowed to carry nothing at all.
+     */
+    char value_started;
+
+    /**
      * The current service connection that "communicates" with the client
      * of the proxy service. This connection may be used to return the data
      * from the target proxy server back to the client.
@@ -165,6 +198,14 @@ typedef struct handler_proxy_context_t {
      * considered to be the backend connection.
      */
     struct connection_t *connection_c;
+
+    /**
+     * The message of the client that this exchange is serving, it is
+     * kept so that the response may be written on the very stream it
+     * came in on, the upstream answers on a clock of its own and by
+     * then the connection is likely serving another one.
+     */
+    struct http_request_t *http_request;
 
     /**
      * The current HTTP settings instance to be used for the connection with
@@ -205,31 +246,48 @@ ERROR_CODE close_proxy_connection(struct io_connection_t *io_connection);
 ERROR_CODE set_handler_proxy(struct http_connection_t *http_connection);
 ERROR_CODE unset_handler_proxy(struct http_connection_t *http_connection);
 ERROR_CODE reset_handler_proxy(struct http_connection_t *http_connection);
-ERROR_CODE message_begin_callback_handler_proxy(struct http_parser_t *http_parser);
-ERROR_CODE url_callback_handler_proxy(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size);
-ERROR_CODE header_field_callback_handler_proxy(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size);
-ERROR_CODE header_value_callback_handler_proxy(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size);
-ERROR_CODE headers_complete_callback_handler_proxy(struct http_parser_t *http_parser);
-ERROR_CODE body_callback_handler_proxy(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size);
-ERROR_CODE message_complete_callback_handler_proxy(struct http_parser_t *http_parser);
-ERROR_CODE location_callback_handler_proxy(struct http_parser_t *http_parser, size_t index, size_t offset);
-ERROR_CODE virtual_url_callback_handler_proxy(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size);
+ERROR_CODE message_begin_callback_handler_proxy(struct http_request_t *http_request);
+ERROR_CODE url_callback_handler_proxy(struct http_request_t *http_request, const unsigned char *data, size_t data_size);
+ERROR_CODE header_field_callback_handler_proxy(struct http_request_t *http_request, const unsigned char *data, size_t data_size);
+ERROR_CODE header_value_callback_handler_proxy(struct http_request_t *http_request, const unsigned char *data, size_t data_size);
+ERROR_CODE headers_complete_callback_handler_proxy(struct http_request_t *http_request);
+ERROR_CODE body_callback_handler_proxy(struct http_request_t *http_request, const unsigned char *data, size_t data_size);
+ERROR_CODE message_complete_callback_handler_proxy(struct http_request_t *http_request);
+ERROR_CODE location_callback_handler_proxy(struct http_request_t *http_request, size_t index, size_t offset);
+char reuse_backend_handler_proxy(struct connection_t *connection_c, struct handler_proxy_context_t *handler_proxy_context);
+void write_request_handler_proxy(struct handler_proxy_context_t *handler_proxy_context, const char *method, const char *path);
+ERROR_CODE virtual_url_callback_handler_proxy(struct http_request_t *http_request, const unsigned char *data, size_t data_size);
 ERROR_CODE data_backend_handler(struct io_connection_t *io_connection, unsigned char *buffer, size_t buffer_size);
 ERROR_CODE open_backend_handler(struct io_connection_t *io_connection);
 ERROR_CODE close_backend_handler(struct io_connection_t *io_connection);
-ERROR_CODE line_callback_backend(struct http_parser_t *http_parser);
-ERROR_CODE header_field_callback_backend(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size);
-ERROR_CODE header_value_callback_backend(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size);
-ERROR_CODE headers_complete_callback_backend(struct http_parser_t *http_parser);
-ERROR_CODE body_callback_backend(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size);
-ERROR_CODE message_complete_callback_backend(struct http_parser_t *http_parser);
-ERROR_CODE _set_http_parser_handler_proxy(struct http_parser_t *http_parser);
-ERROR_CODE _unset_http_parser_handler_proxy(struct http_parser_t *http_parser);
-ERROR_CODE _reset_http_parser_handler_proxy(struct http_parser_t *http_parser);
+ERROR_CODE line_callback_backend(struct http_request_t *http_request);
+ERROR_CODE header_field_callback_backend(struct http_request_t *http_request, const unsigned char *data, size_t data_size);
+ERROR_CODE header_value_callback_backend(struct http_request_t *http_request, const unsigned char *data, size_t data_size);
+ERROR_CODE headers_complete_callback_backend(struct http_request_t *http_request);
+ERROR_CODE body_callback_backend(struct http_request_t *http_request, const unsigned char *data, size_t data_size);
+ERROR_CODE message_complete_callback_backend(struct http_request_t *http_request);
+ERROR_CODE _set_http_request_handler_proxy(struct http_request_t *http_request);
+ERROR_CODE _unset_http_request_handler_proxy(struct http_request_t *http_request);
+ERROR_CODE _reset_http_request_handler_proxy(struct http_request_t *http_request);
 ERROR_CODE _set_http_settings_handler_proxy(struct http_settings_t *http_settings);
 ERROR_CODE _unset_http_settings_handler_proxy(struct http_settings_t *http_settings);
 ERROR_CODE _pending_handler_proxy(struct connection_t *connection, struct data_t *data, void *parameters);
 ERROR_CODE _cleanup_handler_proxy(struct connection_t *connection, struct data_t *data, void *parameters);
+
+/**
+ * Grows the output buffer of the proxy so that it is able to take
+ * the provided amount of bytes past what it already holds, the
+ * operations that build a response write into a buffer of a fixed
+ * size and so the room has to exist before they run.
+ *
+ * @param context The context holding the output buffer.
+ * @param size The amount of bytes that have to fit in it.
+ */
+static __inline void reserve_proxy_out_buffer(struct handler_proxy_context_t *context, size_t size) {
+    if(context->out_buffer_size + size <= context->out_buffer_max_size) { return; }
+    context->out_buffer_max_size = (context->out_buffer_size + size) * 2;
+    context->out_buffer = REALLOC(context->out_buffer, context->out_buffer_max_size);
+}
 
 static __inline void write_proxy_out_buffer(struct handler_proxy_context_t *context, char *data, size_t size) {
     if(context->out_buffer_size + size > context->out_buffer_max_size) {
@@ -244,7 +302,7 @@ static __inline void write_proxy_out_buffer(struct handler_proxy_context_t *cont
 static __inline void write_proxy_buffer(struct handler_proxy_context_t *context, char *data, size_t size) {
     if(context->buffer_size + size > context->buffer_max_size) {
         context->buffer_max_size = (context->buffer_size + size) * 2;
-        context->out_buffer = REALLOC(context->buffer, context->buffer_max_size);
+        context->buffer = REALLOC(context->buffer, context->buffer_max_size);
     }
 
     memcpy(&context->buffer[context->buffer_size], data, size);

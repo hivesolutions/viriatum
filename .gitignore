@@ -71,6 +71,11 @@ cmake_install.cmake
 /build-*
 /build.*
 /coverage
+/conformance
+/interop
+/fuzz
+/format
+/sanitize
 /src/viriatum_python/viriatum/_viriatum*.so
 /src/viriatum_python/viriatum/_viriatum*.pyd
 /dist
@@ -92,7 +97,9 @@ cmake_install.cmake
 /scripts/build/win32/base
 /scripts/build/win32/modules
 /darwin/xcode4/viriatum.xcworkspace/xcuserdata
+/darwin/xcode4/viriatum/build
 /darwin/xcode4/viriatum/viriatum.xcodeproj/xcuserdata
+/darwin/xcode4/viriatum_commons/build
 /darwin/xcode4/viriatum_commons/viriatum_commons.xcodeproj/xcuserdata
 
 /modules/mod_*/*.vcxproj

@@ -65,20 +65,54 @@ void create_http_parser(struct http_parser_t **http_parser_pointer, char request
     http_parser->status_code = 0;
     http_parser->method = 0;
     http_parser->upgrade = 0;
-    http_parser->context = NULL;
-    http_parser->parameters = NULL;
     http_parser->_content_length = 0;
     http_parser->header_field_mark = 0;
     http_parser->header_value_mark = 0;
     http_parser->url_mark = 0;
+
+    /* creates the message structure that is going to be populated
+    by this parser and then handed to the handlers, the structure
+    is owned by the parser and released together with it */
+    create_http_request(&http_parser->request);
 
     /* sets the HTTP parser in the HTTP parser pointer */
     *http_parser_pointer = http_parser;
 }
 
 void delete_http_parser(struct http_parser_t *http_parser) {
+    /* deletes the message structure owned by the parser */
+    delete_http_request(http_parser->request);
+
     /* releases the HTTP parser */
     FREE(http_parser);
+}
+
+void update_request_http_parser(struct http_parser_t *http_parser) {
+    /* retrieves the message structure owned by the parser, this is
+    the structure that the handlers are going to observe */
+    struct http_request_t *http_request = http_parser->request;
+
+    /* copies the values that the parsing has produced so far into
+    the message structure, note that the content length comes from
+    the persistent value as the transient one is reset along the
+    parsing logic */
+    http_request->version = get_http_version(http_parser->http_major, http_parser->http_minor);
+    http_request->method = http_parser->method;
+    http_request->status_code = http_parser->status_code;
+    http_request->flags = http_parser->flags;
+    http_request->content_length = http_parser->_content_length;
+    http_request->trailers = http_parser->flags & FLAG_TRAILING ? TRUE : FALSE;
+
+    /* decides whether the connection is kept alive from the version
+    of the message and from the field that carries the intention of
+    the peer, under HTTP/1.1 a connection is persistent unless it is
+    closed on purpose and under the older one it is the other way
+    around, the flag of the parser only carries the field itself */
+    if(http_should_keep_alive(http_parser)) {
+        http_request->flags |= FLAG_KEEP_ALIVE;
+    } else {
+        http_request->flags &= ~FLAG_KEEP_ALIVE;
+    }
 }
 
 void create_http_settings(struct http_settings_t **http_settings_pointer) {
@@ -187,6 +221,10 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                 http_parser->flags = 0;
                 http_parser->content_length = -1;
 
+                /* resets the message structure so that none of the
+                values of the previous message leaks into this one */
+                reset_http_request(http_parser->request);
+
                 /* calls the message begin callback indicating
                 that a new message parsing as just begin */
                 HTTP_CALLBACK(message_begin);
@@ -223,6 +261,8 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
             case STATE_START_RES:
                 http_parser->flags = 0;
                 http_parser->content_length = -1;
+
+                reset_http_request(http_parser->request);
 
                 HTTP_CALLBACK(message_begin);
 
@@ -430,6 +470,8 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                 http_parser->flags = 0;
                 http_parser->content_length = -1;
 
+                reset_http_request(http_parser->request);
+
                 HTTP_CALLBACK(message_begin);
 
                 if(!IS_ALPHA(byte)) {
@@ -628,7 +670,7 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                          * "GET http://foo.bar.com HTTP/1.1"
                          * That is, there is no path.
                          */
-                        HTTP_CALLBACK_DATA(url);
+                        HTTP_CALLBACK_URL();
                         state = STATE_REQ_HTTP_START;
 
                         /* breaks the switch */
@@ -661,7 +703,7 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                          *   "GET http://foo.bar.com:1234 HTTP/1.1"
                          * That is, there is no path.
                          */
-                        HTTP_CALLBACK_DATA(url);
+                        HTTP_CALLBACK_URL();
                         state = STATE_REQ_HTTP_START;
                         break;
                     case '?':
@@ -683,14 +725,14 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
 
                 switch(byte) {
                     case ' ':
-                        HTTP_CALLBACK_DATA(url);
+                        HTTP_CALLBACK_URL();
                         state = STATE_REQ_HTTP_START;
 
                         /* breaks the switch */
                         break;
 
                     case CR:
-                        HTTP_CALLBACK_DATA(url);
+                        HTTP_CALLBACK_URL();
                         http_parser->http_major = 0;
                         http_parser->http_minor = 9;
                         state = STATE_REQ_LINE_ALMOST_DONE;
@@ -699,7 +741,7 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                         break;
 
                     case LF:
-                        HTTP_CALLBACK_DATA(url);
+                        HTTP_CALLBACK_URL();
                         http_parser->http_major = 0;
                         http_parser->http_minor = 9;
                         HTTP_CALLBACK(line);
@@ -740,14 +782,14 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                         break;
 
                     case ' ':
-                        HTTP_CALLBACK_DATA(url);
+                        HTTP_CALLBACK_URL();
                         state = STATE_REQ_HTTP_START;
 
                         /* breaks the switch */
                         break;
 
                     case CR:
-                        HTTP_CALLBACK_DATA(url);
+                        HTTP_CALLBACK_URL();
                         http_parser->http_major = 0;
                         http_parser->http_minor = 9;
                         state = STATE_REQ_LINE_ALMOST_DONE;
@@ -756,7 +798,7 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                         break;
 
                     case LF:
-                        HTTP_CALLBACK_DATA(url);
+                        HTTP_CALLBACK_URL();
                         http_parser->http_major = 0;
                         http_parser->http_minor = 9;
                         HTTP_CALLBACK(line);
@@ -791,14 +833,14 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                         break;
 
                     case ' ':
-                        HTTP_CALLBACK_DATA(url);
+                        HTTP_CALLBACK_URL();
                         state = STATE_REQ_HTTP_START;
 
                         /* breaks the switch */
                         break;
 
                     case CR:
-                        HTTP_CALLBACK_DATA(url);
+                        HTTP_CALLBACK_URL();
                         http_parser->http_major = 0;
                         http_parser->http_minor = 9;
                         state = STATE_REQ_LINE_ALMOST_DONE;
@@ -807,7 +849,7 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                         break;
 
                     case LF:
-                        HTTP_CALLBACK_DATA(url);
+                        HTTP_CALLBACK_URL();
                         http_parser->http_major = 0;
                         http_parser->http_minor = 9;
                         HTTP_CALLBACK(line);
@@ -840,14 +882,14 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
 
                 switch(byte) {
                     case ' ':
-                        HTTP_CALLBACK_DATA(url);
+                        HTTP_CALLBACK_URL();
                         state = STATE_REQ_HTTP_START;
 
                         /* breaks the switch */
                         break;
 
                     case CR:
-                        HTTP_CALLBACK_DATA(url);
+                        HTTP_CALLBACK_URL();
                         http_parser->http_major = 0;
                         http_parser->http_minor = 9;
                         state = STATE_REQ_LINE_ALMOST_DONE;
@@ -856,7 +898,7 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                         break;
 
                     case LF:
-                        HTTP_CALLBACK_DATA(url);
+                        HTTP_CALLBACK_URL();
                         http_parser->http_major = 0;
                         http_parser->http_minor = 9;
                         HTTP_CALLBACK(line);
@@ -891,14 +933,14 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
 
                 switch(byte) {
                     case ' ':
-                        HTTP_CALLBACK_DATA(url);
+                        HTTP_CALLBACK_URL();
                         state = STATE_REQ_HTTP_START;
 
                         /* breaks the switch */
                         break;
 
                     case CR:
-                        HTTP_CALLBACK_DATA(url);
+                        HTTP_CALLBACK_URL();
                         http_parser->http_major = 0;
                         http_parser->http_minor = 9;
                         state = STATE_REQ_LINE_ALMOST_DONE;
@@ -907,7 +949,7 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                         break;
 
                     case LF:
-                        HTTP_CALLBACK_DATA(url);
+                        HTTP_CALLBACK_URL();
                         http_parser->http_major = 0;
                         http_parser->http_minor = 9;
                         HTTP_CALLBACK(line);
@@ -1543,7 +1585,16 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                     * is needed for the annoying case of recieving a response to a HEAD
                     * request */
                 if(http_settings->on_headers_complete) {
-                    switch(http_settings->on_headers_complete(http_parser)) {
+                    /* saves the size that the message announces before the
+                    handler is told that the headers are over, the parsing
+                    of the payload only saves it further down and the
+                    handler would otherwise be told the size of the message
+                    that came before this one on the very same connection */
+                    http_parser->_content_length = http_parser->content_length > 0
+                                                       ? (size_t) http_parser->content_length
+                                                       : 0;
+                    update_request_http_parser(http_parser);
+                    switch(http_settings->on_headers_complete(http_parser->request)) {
                         case 0:
                             break;
 
@@ -1608,7 +1659,7 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                     /* calls the on body event handler with the pointer to the
                     data to be read and the number of bytes to be read (new body
                     data should be processed) */
-                    CALL_V(http_settings->on_body, http_parser, pointer, to_read);
+                    CALL_V(http_settings->on_body, http_parser->request, pointer, to_read);
 
                     /* updates the current pointer to the end of the current
                     data and decrements the current content length by the number
@@ -1633,7 +1684,7 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                 to_read = pointer_end - pointer;
 
                 if(to_read > 0) {
-                    CALL_V(http_settings->on_body, http_parser, pointer, to_read);
+                    CALL_V(http_settings->on_body, http_parser->request, pointer, to_read);
 
                     pointer += to_read - 1;
                 }
@@ -1725,7 +1776,7 @@ int process_data_http_parser(struct http_parser_t *http_parser, struct http_sett
                 to_read = MIN(pointer_end - pointer, (long long) (http_parser->content_length));
 
                 if(to_read > 0) {
-                    CALL_V(http_settings->on_body, http_parser, pointer, to_read);
+                    CALL_V(http_settings->on_body, http_parser->request, pointer, to_read);
 
                     pointer += to_read - 1;
                 }

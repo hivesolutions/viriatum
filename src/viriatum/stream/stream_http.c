@@ -25,6 +25,7 @@
 #include "stdafx.h"
 
 #include "stream_http.h"
+#include "stream_http2.h"
 
 ERROR_CODE create_http_handler(struct http_handler_t **http_handler_pointer, unsigned char *name) {
     /* retrieves the HTTP handler size */
@@ -86,6 +87,12 @@ ERROR_CODE create_http_connection(struct http_connection_t **http_connection_poi
     http_connection->write_headers_m = write_http_headers_m;
     http_connection->write_message = write_http_message;
     http_connection->write_error = write_http_error;
+    http_connection->write_status = write_status_http;
+    http_connection->write_field = write_field_http;
+    http_connection->write_line = write_line_http;
+    http_connection->write_end = write_end_http;
+    http_connection->write_chunk = write_chunk_http;
+    http_connection->write_flush = write_flush_http;
     http_connection->log_request = log_http_request;
     http_connection->acquire = acquire_http_connection;
     http_connection->release = release_http_connection;
@@ -96,8 +103,29 @@ ERROR_CODE create_http_connection(struct http_connection_t **http_connection_poi
     /* creates the HTTP parser (for a request) */
     create_http_parser(&http_connection->http_parser, 1);
 
-    /* sets the connection as the parser parameter(s) */
-    http_connection->http_parser->parameters = io_connection->connection;
+    /* sets the message owned by the parser as the one currently being
+    handled, under HTTP/1.1 only one message is in transit at a given
+    time and so this reference never changes */
+    http_connection->request = http_connection->http_parser->request;
+    http_connection->http2_connection = NULL;
+#ifdef VIRIATUM_HTTP2
+    http_connection->detect = service->options->http2;
+#else
+    http_connection->detect = FALSE;
+#endif
+
+    /* sets the connection as the message parameter(s), this is the
+    reference that allows an handler to reach the upper objects */
+    http_connection->http_parser->request->parameters = io_connection->connection;
+
+    /* sets the scheme of the message according to the transport that
+    is carrying the connection, this value stays for the complete
+    life-time of the connection as it never changes on it */
+#ifdef VIRIATUM_SSL
+    if(io_connection->connection->ssl_handle != NULL) {
+        http_connection->http_parser->request->scheme = HTTPS_SCHEME;
+    }
+#endif
 
     /* sets the HTTP connection in the (upper) io connection substrate */
     io_connection->lower = http_connection;
@@ -118,6 +146,17 @@ ERROR_CODE delete_http_connection(struct http_connection_t *http_connection) {
     /* allocates space for the HTTP handler reference
     to be used in this connection */
     struct http_handler_t *http_handler;
+
+#ifdef VIRIATUM_HTTP2
+    /* in case the connection has been taken over by a session of
+    HTTP/2 the session is released first, it owns the streams and
+    the handlers that were serving them, and it restores the
+    structures that the connection itself owns */
+    if(http_connection->http2_connection != NULL) {
+        delete_http2_connection(http_connection->http2_connection);
+        http_connection->http2_connection = NULL;
+    }
+#endif
 
     /* retrieves the currently assigned handler and then unsets
     the connection from associated handler (unregister connection) */
@@ -192,6 +231,13 @@ ERROR_CODE data_handler_stream_http(struct io_connection_t *io_connection, unsig
     to be used in this connection */
     struct http_handler_t *http_handler;
 
+#ifdef VIRIATUM_ALPN
+    /* allocates space for the name of the protocol that has been
+    negotiated through the transport, if any at all */
+    const unsigned char *protocol;
+    unsigned int protocol_size;
+#endif
+
     /* retrieves the references to both the connection (upper)
     and the HTTP connection (lower) data structures */
     struct connection_t *connection = io_connection->connection;
@@ -233,6 +279,51 @@ ERROR_CODE data_handler_stream_http(struct io_connection_t *io_connection, unsig
     _buffer = http_connection->buffer + http_connection->buffer_offset;
     memcpy(_buffer, buffer, buffer_size);
     http_connection->buffer_offset += buffer_size;
+
+#ifdef VIRIATUM_HTTP2
+    /* the connection may be opening with the preface of HTTP/2
+    instead of a message of HTTP/1.1, the two are told apart by the
+    very first bytes and the decision is taken only once */
+    if(http_connection->detect == TRUE) {
+#ifdef VIRIATUM_ALPN
+        /* a connection that runs over the transport carries no
+        ambiguity at all, whatever has been negotiated is what it
+        speaks and the bytes are never looked at */
+        if(connection->ssl_handle != NULL) {
+            SSL_get0_alpn_selected(connection->ssl_handle, &protocol, &protocol_size);
+            http_connection->detect = FALSE;
+
+            if(protocol_size == sizeof(HTTP2_ALPN) - 1 &&
+               memcmp(protocol, HTTP2_ALPN, protocol_size) == 0) {
+                upgrade_handler_stream_http2(io_connection);
+                RAISE_AGAIN(data_handler_stream_http2(io_connection, NULL, 0));
+            }
+        }
+#endif
+
+        size_offset = http_connection->buffer_offset;
+        size_length = size_offset < HTTP2_PREFACE_SIZE ? size_offset : HTTP2_PREFACE_SIZE;
+
+        /* the bytes differ from the preface, so the connection is
+        carrying a message of HTTP/1.1 and nothing else has to be
+        looked at from this point on */
+        if(memcmp(http_connection->buffer, HTTP2_PREFACE, size_length) != 0) {
+            http_connection->detect = FALSE;
+        }
+        /* the complete preface has arrived, so the session of HTTP/2
+        takes the connection over together with what is buffered */
+        else if(size_offset >= HTTP2_PREFACE_SIZE) {
+            http_connection->detect = FALSE;
+            upgrade_handler_stream_http2(io_connection);
+            RAISE_AGAIN(data_handler_stream_http2(io_connection, NULL, 0));
+        }
+        /* only a part of the preface has arrived and it matches, so
+        the decision waits for the bytes that are still missing */
+        else {
+            RAISE_NO_ERROR;
+        }
+    }
+#endif
 
     /* iterates continuously, this allows the stream handler
     to split the stream into possible multiple messages, useful
@@ -305,6 +396,11 @@ ERROR_CODE data_handler_stream_http(struct io_connection_t *io_connection, unsig
             http_connection->http_parser->header_field_mark = 0;
             http_connection->http_parser->header_value_mark = 0;
             http_connection->http_parser->url_mark = 0;
+
+            /* resets the message structure so that none of the values
+            of the message that has just been handled leaks into the
+            next one of the same connection */
+            reset_http_request(http_connection->http_parser->request);
 
             /* in case the current HTTP connection read offset has reached
             the buffer size it's time to reset the buffer (no more data to

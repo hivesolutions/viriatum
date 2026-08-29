@@ -53,6 +53,11 @@ To set a custom www root path (equivalent to `--with-wwwroot` in Autoconf):
     cmake -D VIRIATUM_WWW_ROOT=/var/viriatum/www -B build
     cmake --build build
 
+To leave HTTP/2 out of the build (equivalent to `--disable-http2` in Autoconf):
+
+    cmake -D VIRIATUM_HTTP2=OFF -B build
+    cmake --build build
+
 If the project has Conan-managed dependencies, install them first:
 
     conan install . --output-folder=build --build=missing -s build_type=Debug
@@ -157,6 +162,47 @@ There are a lot of possible building features to enable
 * `--disable-epoll` - Disables the support for the epoll mechanism
 * `--enable-mpool`- Enables the memory pool support (optimized for windows only)
 * `--enable-prefork` - Enables the prefork support so that viriatum can create workers
+* `--disable-http2` - Disables the support for HTTP/2, leaving only the previous version of the protocol
+
+## HTTP/2
+
+Viriatum serves HTTP/2 alongside the previous version of the protocol, on the very same port, and decides between the two from the bytes that open a connection.
+
+A connection that opens with the preface of the protocol is handed to a session of it, which is the cleartext form that a client asks for with `curl --http2-prior-knowledge`. A connection that opens with anything else carries a message of HTTP/1.1 and is parsed as one. The detection happens once per connection and is turned off through the `http2` entry of the general section:
+
+```ini
+[general]
+http2 = On
+```
+
+The very same setting is turned off for a single run with `--no-http2`.
+
+Over the transport the version is negotiated rather than guessed. The server announces `h2` and `http/1.1` through ALPN and honours the order the client announces, so a client that prefers the older version is served it. The transport is off in the configuration that ships, so the two commands that reach it need it turned on first, either through `--ssl` for a single run or through the general section:
+
+```ini
+[general]
+ssl = On
+ssl_csr = cert/server.crt
+ssl_key = cert/server.key
+```
+
+```bash
+curl --http2-prior-knowledge http://localhost:9090/
+curl -k --http2 https://localhost:9090/
+openssl s_client -connect localhost:9090 -alpn h2
+```
+
+The negotiation needs a library of the transport that carries ALPN, which is OpenSSL 1.0.2 onwards, and the floor of the handshake is raised to TLS 1.2 and to the cipher suites that the protocol accepts, so a connection is never negotiated into one it would have to be torn down for.
+
+The resources that travel together with a request are listed in the location that serves it, each one of them promised on a stream of its own:
+
+```ini
+[location:/]
+handler = file
+push = /static/style.css /static/main.js
+```
+
+Every handler of the tree writes its response through the operations that the connection carries, so the file, the default, the dispatch and the proxy handlers, the pages of the errors and both of the python interfaces are served by either version of the protocol without knowing which one is in use.
 
 ## Python Package
 

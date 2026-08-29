@@ -25,10 +25,15 @@
 #include "stdafx.h"
 
 #include "simple_test.h"
+#include "handler_default_test.h"
 #include "handler_dispatch_test.h"
 #include "handler_file_test.h"
+#include "handler_proxy_test.h"
+#include "hpack_test.h"
+#include "http2_test.h"
 #include "runner_test.h"
 #include "service_test.h"
+#include "stream_http2_test.h"
 #include "websocket_test.h"
 
 #ifndef VIRIATUM_NO_THREADS
@@ -885,10 +890,17 @@ const char *test_template_handler(void) {
 const char *test_quicksort(void) {
     /* allocates space for the template handler */
     size_t list[10] = {2, 4, 1, 2, 3, 5, 5, 3, 4, 1};
+    size_t index;
 
     /* sorts the sequence according to the compare function
     the algorithm to be used in the sorting is the quicksort */
     sort_quicksort((void **) &list, 0, 10, _compare);
+
+    /* the sequence is left in a non decreasing order, the end of
+    it is one past the last element and is never looked at */
+    for(index = 1; index < 10; index++) {
+        V_ASSERT(list[index - 1] <= list[index]);
+    }
 
     /* returns the default value, nothing happened so there's
     nothing to report for this execution */
@@ -1286,6 +1298,76 @@ static struct test_entry_t _simple_entries[] = {
     V_TEST_C(test_handler_file_url, "handler", setup_handler_file_test, cleanup_handler_file_test),
     V_TEST_T(test_handler_file_header_field, "handler"),
     V_TEST_T(test_handler_file_header_value, "handler"),
+    V_TEST_T(test_handler_file_response, "handler"),
+    V_TEST_T(test_handler_file_range, "handler"),
+    V_TEST_T(test_handler_file_missing, "handler"),
+    V_TEST_T(test_handler_file_directory, "handler"),
+    V_TEST_T(test_handler_file_path, "handler"),
+    V_TEST_T(test_handler_file_location, "handler"),
+    V_TEST_T(test_handler_file_handler, "handler"),
+    V_TEST_T(test_handler_file_push, "handler"),
+    V_TEST_T(test_handler_default_response, "handler"),
+    V_TEST_T(test_handler_default_close, "handler"),
+    V_TEST_T(test_handler_default_stream, "handler"),
+    V_TEST_T(test_handler_default_persistence, "handler"),
+    V_TEST_T(test_handler_proxy_request, "handler"),
+    V_TEST_T(test_handler_proxy_response, "handler"),
+    V_TEST_T(test_handler_proxy_reuse, "handler"),
+    V_TEST_T(test_handler_proxy_gateway, "handler"),
+    V_TEST_T(test_handler_proxy_upstream, "handler"),
+    V_TEST_T(test_handler_proxy_handler, "handler"),
+#ifdef VIRIATUM_HTTP2
+    V_TEST_T(test_hpack_table, "hpack"),
+    V_TEST_T(test_hpack_table_resize, "hpack"),
+    V_TEST_T(test_hpack_table_insert, "hpack"),
+    V_TEST_T(test_hpack_table_find, "hpack"),
+    V_TEST_T(test_hpack_integer, "hpack"),
+    V_TEST_T(test_hpack_string, "hpack"),
+    V_TEST_T(test_hpack_decode_request, "hpack"),
+    V_TEST_T(test_hpack_decode_request_huffman, "hpack"),
+    V_TEST_T(test_hpack_decode_response, "hpack"),
+    V_TEST_T(test_hpack_decode_errors, "hpack"),
+    V_TEST_T(test_hpack_decode_limits, "hpack"),
+    V_TEST_T(test_hpack_encode, "hpack"),
+    V_TEST_T(test_hpack_huffman, "hpack"),
+    V_TEST_T(test_hpack_huffman_errors, "hpack"),
+    V_TEST_T(test_http2_number, "http2"),
+    V_TEST_T(test_http2_settings, "http2"),
+    V_TEST_T(test_http2_decode_frame, "http2"),
+    V_TEST_T(test_http2_encode_frame, "http2"),
+    V_TEST_T(test_http2_padding, "http2"),
+    V_TEST_T(test_http2_priority, "http2"),
+    V_TEST_T(test_http2_decode_settings, "http2"),
+    V_TEST_T(test_http2_encode_frames, "http2"),
+    V_TEST_T(test_http2_verify_frame, "http2"),
+    V_TEST_T(test_http2_connection, "http2"),
+    V_TEST_T(test_http2_connection_streams, "http2"),
+    V_TEST_T(test_http2_connection_priority, "http2"),
+    V_TEST_T(test_http2_connection_push, "http2"),
+    V_TEST_T(test_http2_connection_window, "http2"),
+    V_TEST_T(test_http2_connection_settings, "http2"),
+    V_TEST_T(test_http2_connection_frames, "http2"),
+    V_TEST_T(test_http2_connection_states, "http2"),
+    V_TEST_T(test_http2_connection_headers, "http2"),
+    V_TEST_T(test_http2_connection_fields, "http2"),
+    V_TEST_T(test_http2_connection_dispatch, "http2"),
+    V_TEST_T(test_http2_connection_continuation, "http2"),
+    V_TEST_T(test_http2_connection_trailers, "http2"),
+    V_TEST_T(test_http2_connection_closed, "http2"),
+    V_TEST_T(test_http2_connection_data, "http2"),
+    V_TEST_T(test_http2_connection_errors, "http2"),
+    V_TEST_T(test_http2_connection_read, "http2"),
+    V_TEST_T(test_http2_connection_preface, "http2"),
+    V_TEST_T(test_http2_connection_detect, "http2"),
+    V_TEST_T(test_http2_connection_response, "http2"),
+    V_TEST_T(test_http2_connection_complete, "http2"),
+    V_TEST_T(test_http2_connection_error, "http2"),
+    V_TEST_T(test_http2_connection_flow, "http2"),
+    V_TEST_T(test_http2_connection_split, "http2"),
+    V_TEST_T(test_http2_connection_schedule, "http2"),
+    V_TEST_T(test_http2_connection_length, "http2"),
+    V_TEST_T(test_http2_alpn, "http2"),
+#endif
     V_TEST_T(test_websocket_accept_key, "websocket"),
     V_TEST_T(test_websocket_parse_frame, "websocket"),
     V_TEST_T(test_websocket_build_frame, "websocket"),
@@ -1293,12 +1375,15 @@ static struct test_entry_t _simple_entries[] = {
     V_TEST_T(test_websocket_is_control, "websocket"),
     V_TEST_T(test_websocket_close_code, "websocket"),
     V_TEST_T(test_dispatch_handler_context_keepalive, "handler"),
+    V_TEST_T(test_dispatch_handler_response, "handler"),
     V_TEST_T(test_delete_service, "service"),
     V_TEST_T(test_create_service_options, "service"),
     V_TEST_T(test_calculate_locations_service, "service"),
     V_TEST_T(test_open_close_service, "service"),
     V_TEST_T(test_open_service_busy, "service"),
     V_TEST_T(test_file_options_service, "service"),
+    V_TEST_T(test_arguments_options_service, "service"),
+    V_TEST_T(test_flags_service, "service"),
     V_TEST_T(test_ran_service, "service")
 };
 

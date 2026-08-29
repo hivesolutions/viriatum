@@ -131,7 +131,7 @@ ERROR_CODE delete_handler_php_context(struct handler_php_context_t *handler_php_
 
 ERROR_CODE set_handler_php(struct http_connection_t *http_connection) {
     /* sets the HTTP parser values */
-    _set_http_parser_handler_php(http_connection->http_parser);
+    _set_http_request_handler_php(http_connection->request);
 
     /* sets the HTTP settings values */
     _set_http_settings_handler_php(http_connection->http_settings);
@@ -142,7 +142,7 @@ ERROR_CODE set_handler_php(struct http_connection_t *http_connection) {
 
 ERROR_CODE unset_handler_php(struct http_connection_t *http_connection) {
     /* unsets the HTTP parser values */
-    _unset_http_parser_handler_php(http_connection->http_parser);
+    _unset_http_request_handler_php(http_connection->request);
 
     /* unsets the HTTP settings values */
     _unset_http_settings_handler_php(http_connection->http_settings);
@@ -151,11 +151,11 @@ ERROR_CODE unset_handler_php(struct http_connection_t *http_connection) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE message_begin_callback_handler_module(struct http_parser_t *http_parser) {
+ERROR_CODE message_begin_callback_handler_module(struct http_request_t *http_request) {
     /* retrieves the handler PHP context from the HTTP parser
     in order to use it to update the content type to the default
     empty value (avoids possible problems in PHP interpreter)*/
-    struct handler_php_context_t *handler_php_context = (struct handler_php_context_t *) http_parser->context;
+    struct handler_php_context_t *handler_php_context = (struct handler_php_context_t *) http_request->context;
     handler_php_context->content_type[0] = '\0';
 
     /* populates the various generated strings, avoids possible recalculation
@@ -167,13 +167,13 @@ ERROR_CODE message_begin_callback_handler_module(struct http_parser_t *http_pars
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE url_callback_handler_php(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE url_callback_handler_php(struct http_request_t *http_request, const unsigned char *data, size_t data_size) {
     /* retrieves the handler PHP context from the HTTP parser */
-    struct handler_php_context_t *handler_php_context = (struct handler_php_context_t *) http_parser->context;
+    struct handler_php_context_t *handler_php_context = (struct handler_php_context_t *) http_request->context;
 
     /* retrieves the connection from the HTTP parser parameters and
     uses the pre-resolved contents path from service options */
-    struct connection_t *connection = (struct connection_t *) http_parser->parameters;
+    struct connection_t *connection = (struct connection_t *) http_request->parameters;
     char *contents_path = (char *) connection->service->options->contents_path;
 
     /* checks the position of the get parameters divisor position
@@ -219,9 +219,9 @@ ERROR_CODE url_callback_handler_php(struct http_parser_t *http_parser, const uns
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE header_field_callback_handler_php(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE header_field_callback_handler_php(struct http_request_t *http_request, const unsigned char *data, size_t data_size) {
     /* retrieves the handler PHP context from the HTTP parser */
-    struct handler_php_context_t *handler_php_context = (struct handler_php_context_t *) http_parser->context;
+    struct handler_php_context_t *handler_php_context = (struct handler_php_context_t *) http_request->context;
 
     /* copies the current header name into the appropriate structure
     and also updates the size of the name string in it */
@@ -249,9 +249,9 @@ ERROR_CODE header_field_callback_handler_php(struct http_parser_t *http_parser, 
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE header_value_callback_handler_php(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE header_value_callback_handler_php(struct http_request_t *http_request, const unsigned char *data, size_t data_size) {
     /* retrieves the handler PHP context from the HTTP parser */
-    struct handler_php_context_t *handler_php_context = (struct handler_php_context_t *) http_parser->context;
+    struct handler_php_context_t *handler_php_context = (struct handler_php_context_t *) http_request->context;
 
     /* allocates space for the pointer to be used for partial
     calculation on the header values */
@@ -348,31 +348,31 @@ ERROR_CODE header_value_callback_handler_php(struct http_parser_t *http_parser, 
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE headers_complete_callback_handler_php(struct http_parser_t *http_parser) {
+ERROR_CODE headers_complete_callback_handler_php(struct http_request_t *http_request) {
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE body_callback_handler_php(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE body_callback_handler_php(struct http_request_t *http_request, const unsigned char *data, size_t data_size) {
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE message_complete_callback_handler_php(struct http_parser_t *http_parser) {
+ERROR_CODE message_complete_callback_handler_php(struct http_request_t *http_request) {
     /* sends (and creates) the response */
-    _send_response_handler_php(http_parser);
+    _send_response_handler_php(http_request);
 
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE path_callback_handler_php(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE path_callback_handler_php(struct http_request_t *http_request, const unsigned char *data, size_t data_size) {
     /* retrieves the handler PHP context from the HTTP parser */
-    struct handler_php_context_t *handler_php_context = (struct handler_php_context_t *) http_parser->context;
+    struct handler_php_context_t *handler_php_context = (struct handler_php_context_t *) http_request->context;
 
     /* retrieves the connection from the HTTP parser parameters and
     uses the pre-resolved contents path from service options */
-    struct connection_t *connection = (struct connection_t *) http_parser->parameters;
+    struct connection_t *connection = (struct connection_t *) http_request->parameters;
     char *contents_path = (char *) connection->service->options->contents_path;
 
     /* copies the part of the data buffer relative to the file name
@@ -402,35 +402,35 @@ ERROR_CODE path_callback_handler_php(struct http_parser_t *http_parser, const un
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE location_callback_handler_php(struct http_parser_t *http_parser, size_t index, size_t offset) {
+ERROR_CODE location_callback_handler_php(struct http_request_t *http_request, size_t index, size_t offset) {
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE virtual_url_callback_handler_php(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE virtual_url_callback_handler_php(struct http_request_t *http_request, const unsigned char *data, size_t data_size) {
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _set_http_parser_handler_php(struct http_parser_t *http_parser) {
+ERROR_CODE _set_http_request_handler_php(struct http_request_t *http_request) {
     /* allocates space for the handler PHP context and
     then creates and populates the instance after that
     sets the handler file context as the context for
     the HTTP parser*/
     struct handler_php_context_t *handler_php_context;
     create_handler_php_context(&handler_php_context);
-    http_parser->context = handler_php_context;
+    http_request->context = handler_php_context;
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _unset_http_parser_handler_php(struct http_parser_t *http_parser) {
+ERROR_CODE _unset_http_request_handler_php(struct http_request_t *http_request) {
     /* retrieves the handler PHP context from the HTTP parser
     and then deletes (releases memory) */
-    struct handler_php_context_t *handler_php_context = (struct handler_php_context_t *) http_parser->context;
+    struct handler_php_context_t *handler_php_context = (struct handler_php_context_t *) http_request->context;
     delete_handler_php_context(handler_php_context);
-    http_parser->context = NULL;
+    http_request->context = NULL;
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -484,6 +484,11 @@ ERROR_CODE _send_data_callback_php(struct connection_t *connection, struct data_
     struct handler_php_context_t *handler_php_context = (struct handler_php_context_t *) parameters;
     struct linked_buffer_t *output_buffer = handler_php_context->output_buffer;
 
+    /* retrieves the substrates of the connection so that the writing
+    of the payload goes through the protocol that is serving it */
+    struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
+    struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
+
     /* retrieves the size of the output buffer, this is going to
     be used to measure the size of the output stream */
     size_t output_length = output_buffer->buffer_length;
@@ -499,11 +504,13 @@ ERROR_CODE _send_data_callback_php(struct connection_t *connection, struct data_
     memcpy(buffer, output_data, output_length);
 
     /* writes the response to the connection, this should flush the current
-    data in the output buffer to the network */
-    connection->write_connection(
+    data in the output buffer to the network, it is the fragment that
+    closes the message */
+    http_connection->write_chunk(
         connection,
         (unsigned char *) buffer,
         output_length,
+        TRUE,
         _send_response_callback_handler_php,
         parameters
     );
@@ -519,7 +526,7 @@ ERROR_CODE _send_data_callback_php(struct connection_t *connection, struct data_
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _send_response_handler_php(struct http_parser_t *http_parser) {
+ERROR_CODE _send_response_handler_php(struct http_request_t *http_request) {
     /* allocates space for the script file structure to be
     during for script execution */
     zend_file_handle script;
@@ -538,6 +545,7 @@ ERROR_CODE _send_response_handler_php(struct http_parser_t *http_parser) {
     the pointer that will hold the reference to the buffer containing
     the post data information */
     char *headers_buffer;
+    char length[32];
     unsigned char *post_data;
 
     /* allocates space for the address string reference
@@ -551,14 +559,14 @@ ERROR_CODE _send_response_handler_php(struct http_parser_t *http_parser) {
 
     /* retrieves the connection from the HTTP parser parameters
     and then retrieves the handler PHP context*/
-    struct connection_t *connection = (struct connection_t *) http_parser->parameters;
+    struct connection_t *connection = (struct connection_t *) http_request->parameters;
     struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
     struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
-    struct handler_php_context_t *handler_php_context = (struct handler_php_context_t *) http_parser->context;
+    struct handler_php_context_t *handler_php_context = (struct handler_php_context_t *) http_request->context;
 
     /* retrieves the HTTP method string value accessing the array of
     static string values */
-    char *method = (char *) http_method_strings[http_parser->method - 1];
+    char *method = (char *) http_method_strings[http_request->method - 1];
 
     /* acquires the lock on the HTTP connection, this will avoids further
     messages to be processed, no parallel request handling problems */
@@ -566,8 +574,8 @@ ERROR_CODE _send_response_handler_php(struct http_parser_t *http_parser) {
 
     /* in case there is contents to be read retrieves the appropriate
     reference to the start of the post data in the connection buffer */
-    if(http_parser->_content_length > 0) {
-        post_data = &http_connection->buffer[http_connection->buffer_offset - http_parser->_content_length];
+    if(http_request->content_length > 0) {
+        post_data = &http_connection->buffer[http_connection->buffer_offset - http_request->content_length];
     } else {
         post_data = NULL;
     }
@@ -588,8 +596,8 @@ ERROR_CODE _send_response_handler_php(struct http_parser_t *http_parser) {
     _output_buffer = output_buffer;
     handler_php_context->method = method;
     handler_php_context->post_data = post_data;
-    handler_php_context->flags = http_parser->flags;
-    handler_php_context->content_length = http_parser->_content_length;
+    handler_php_context->flags = http_request->flags;
+    handler_php_context->content_length = http_request->content_length;
     handler_php_context->output_buffer = output_buffer;
 
     /* resets the number of headers for the current PHP request
@@ -658,47 +666,47 @@ ERROR_CODE _send_response_handler_php(struct http_parser_t *http_parser) {
     /* allocates space for the header buffer and then writes the default values
     into it the value is dynamically constructed based on the current header values */
     connection->alloc_data(connection, VIRIATUM_HTTP_MAX_SIZE, (void **) &headers_buffer);
-    count = http_connection->write_headers(
+    count = http_connection->write_status(
         connection,
         headers_buffer,
-        VIRIATUM_HTTP_SIZE,
-        HTTP11,
+        VIRIATUM_HTTP_MAX_SIZE,
+        http_request->version,
         status_code,
         status_message,
-        http_parser->flags & FLAG_KEEP_ALIVE ? KEEP_ALIVE : KEEP_CLOSE,
-        FALSE
+        http_request->flags & FLAG_KEEP_ALIVE ? KEEP_ALIVE : KEEP_CLOSE
     );
-    count += SPRINTF(
-        &headers_buffer[count],
-        VIRIATUM_HTTP_SIZE - count,
-        CONTENT_LENGTH_H ": %lu\r\n",
-        (long unsigned int) output_buffer->buffer_length
+    SPRINTF(length, sizeof(length), "%lu", (long unsigned int) output_buffer->buffer_length);
+    count = http_connection->write_field(
+        connection,
+        headers_buffer,
+        VIRIATUM_HTTP_MAX_SIZE,
+        count,
+        CONTENT_LENGTH_H,
+        length
     );
 
-    /* iterates over all the headers present in the current PHP request to copy
+    /* iterates over all the headers present in the current PHP request to write
     their content into the current headers buffer */
     for(index = 0; index < _php_request.header_count; index++) {
-        /* copies the current PHP header into the current position of the headers
-        buffer (header copy), note that the trailing newlines are count in size */
-        count += SPRINTF(
-            &headers_buffer[count],
-            VIRIATUM_MAX_HEADER_C_SIZE,
-            "%s\r\n",
-            _php_request.headers[index]
+        count = http_connection->write_line(
+            connection,
+            headers_buffer,
+            VIRIATUM_HTTP_MAX_SIZE,
+            count,
+            (char *) _php_request.headers[index]
         );
     }
 
-    /* finishes the current headers sequence with the final carriage return newline
-    character values to closes the headers part of the envelope */
-    memcpy(&headers_buffer[count], "\r\n", 2);
-    count += 2;
+    /* finishes the current headers sequence, closing the headers part
+    of the envelope in the encoding of the protocol in use */
+    count = http_connection->write_end(connection, headers_buffer, VIRIATUM_HTTP_MAX_SIZE, count, FALSE);
 
     /* writes the response to the connection, this will only write
     the headers the remaining message will be sent on the callback */
-    connection->write_connection(
+    http_connection->write_flush(
         connection,
         (unsigned char *) headers_buffer,
-        (unsigned int) count,
+        count,
         _send_data_callback_php,
         (void *) handler_php_context
     );

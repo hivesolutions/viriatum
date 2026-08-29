@@ -28,6 +28,53 @@
 
 static unsigned long long connection_id = 0;
 
+#if defined(VIRIATUM_ALPN) && defined(VIRIATUM_HTTP2)
+int alpn_handler_service(SSL *ssl, const unsigned char **out, unsigned char *out_size, const unsigned char *in, unsigned int in_size, void *arguments) {
+    /* allocates space for the position in the list of the peer and
+    for the size of the name being visited */
+    unsigned int index = 0;
+    unsigned char size;
+
+    /* gathers the service that the negotiation belongs to, the option
+    of it is what decides whether the most recent version is spoken
+    at all, a service that carries none speaks it */
+    struct service_t *service = (struct service_t *) arguments;
+    unsigned char http2 = service == NULL ? TRUE : service->options->http2;
+
+    /* walks the list in the very order the peer has sent it, the
+    first name that this end speaks is the one selected, so that the
+    preference honoured is the one of the client */
+    while(index < in_size) {
+        size = in[index];
+        index++;
+        if(index + size > in_size) { break; }
+
+        /* the most recent version is only ever named back when this
+        end is going to serve it, a connection negotiated into one it
+        then hands to the parser of the older version is taken down
+        by the peer instead of being served by either of them */
+        if(http2 && size == sizeof(HTTP2_ALPN) - 1 && memcmp(&in[index], HTTP2_ALPN, size) == 0) {
+            *out = &in[index];
+            *out_size = size;
+            return SSL_TLSEXT_ERR_OK;
+        }
+
+        if(size == sizeof(HTTP11_ALPN) - 1 && memcmp(&in[index], HTTP11_ALPN, size) == 0) {
+            *out = &in[index];
+            *out_size = size;
+            return SSL_TLSEXT_ERR_OK;
+        }
+
+        index += size;
+    }
+
+    /* none of the names the peer announces is one that this end
+    speaks, so nothing at all is negotiated and the connection falls
+    back to the version that requires no negotiation */
+    return SSL_TLSEXT_ERR_NOACK;
+}
+#endif
+
 void create_service(struct service_t **service_pointer, unsigned char *name, unsigned char *program_name) {
     /* retrieves the service size */
     size_t service_size = sizeof(struct service_t);
@@ -114,6 +161,7 @@ void create_service_options(struct service_options_t **service_options_pointer) 
     service_options->port = 0;
     service_options->address = NULL;
     service_options->ip6 = 0;
+    service_options->http2 = VIRIATUM_DEFAULT_HTTP2;
     service_options->address6 = NULL;
     service_options->ssl = 0;
     service_options->ssl_csr = NULL;
@@ -364,6 +412,11 @@ ERROR_CODE calculate_locations_service(struct service_t *service) {
     while(TRUE) {
         get_next_iterator(iterator, (void **) &element);
         if(element == NULL) { break; }
+
+        /* a key that is shorter than the prefix is never the one of
+        a location, comparing it against the prefix would read past
+        the end of the buffer that carries it */
+        if(strlen((char *) element->key_string) < sizeof("location:") - 1) { continue; }
 
         is_equal = memcmp(element->key_string, "location:", sizeof("location:") - 1);
         if(is_equal != 0) { continue; }
@@ -887,9 +940,36 @@ ERROR_CODE _open_service(struct service_t *service) {
         OpenSSL_add_all_algorithms();
 
         /* creates the new ssl context and updates the context with the
-        correct certificate file and (private) key file */
+        correct certificate file and (private) key file, the method is
+        the one that negotiates the most recent version that both of
+        the ends are able to speak */
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L
+        service->ssl_context = SSL_CTX_new(TLS_server_method());
+#else
         service->ssl_context = SSL_CTX_new(SSLv23_server_method());
+#endif
         SSL_CTX_set_options(service->ssl_context, SSL_OP_SINGLE_DH_USE);
+
+        /* refuses every version below the one that HTTP/2 requires,
+        together with the cipher suites that it refuses, so that a
+        connection is never negotiated into something it then has to
+        be torn down for */
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L
+        SSL_CTX_set_min_proto_version(service->ssl_context, TLS1_2_VERSION);
+#else
+        SSL_CTX_set_options(
+            service->ssl_context,
+            SSL_OP_NO_SSLv2 | SSL_OP_NO_SSLv3 | SSL_OP_NO_TLSv1 | SSL_OP_NO_TLSv1_1
+        );
+#endif
+        SSL_CTX_set_cipher_list(service->ssl_context, VIRIATUM_SSL_CIPHERS);
+
+        /* announces the protocols that this end speaks so that a peer
+        able to speak HTTP/2 negotiates it through the transport,
+        which is the only form a browser ever uses */
+#if defined(VIRIATUM_ALPN) && defined(VIRIATUM_HTTP2)
+        SSL_CTX_set_alpn_select_cb(service->ssl_context, alpn_handler_service, (void *) service);
+#endif
 
         /* resolves the configuration file from the ssl certificate defaulting to
         the predefined "server" certificate file, then in case the returnin value
@@ -1258,6 +1338,16 @@ ERROR_CODE open_service(struct service_t *service) {
         service->service_socket6_handle = 0;
 #endif
         service->status = STATUS_CLOSED;
+
+        /* undoes the loading and the registrations that the opening
+        had already run, the closing of a service is what balances
+        them and it is never reached by one that failed to open */
+        unload_modules_service(service);
+        unregister_handler_proxy(service);
+        unregister_handler_file(service);
+        unregister_handler_default(service);
+        unregister_handler_dispatch(service);
+
         SOCKET_FINISH();
         RAISE_AGAIN(return_value);
     }
@@ -2434,6 +2524,11 @@ ERROR_CODE _file_options_service(struct service_t *service, struct hash_map_t *a
     get_value_string_sort_map(general, (unsigned char *) "ip6", &value);
     if(value != NULL) { service_options->ip6 = (unsigned char) atob(value); }
 
+    /* tries to retrieve the http2 argument from the arguments map and
+    in case the (http2) value is set, sets it in the service options */
+    get_value_string_sort_map(general, (unsigned char *) "http2", &value);
+    if(value != NULL) { service_options->http2 = (unsigned char) atob(value); }
+
     /* tries to retrieve the ip6 host argument from the arguments map and
     in case the (host) value is set, sets it in the service options */
     get_value_string_sort_map(general, (unsigned char *) "ip6_host", &value);
@@ -2515,6 +2610,11 @@ ERROR_CODE _comand_line_options_service(struct service_t *service, struct hash_m
     in case the (ip6) value is set, sets the service with ip6 support  */
     get_value_string_hash_map(arguments, (unsigned char *) "ip6", &value);
     if(value != NULL) { service_options->ip6 = 1; }
+
+    /* tries to retrieve the no http2 argument from the arguments map,
+    its presence turns the cleartext form of HTTP/2 off */
+    get_value_string_hash_map(arguments, (unsigned char *) "no-http2", &value);
+    if(value != NULL) { service_options->http2 = 0; }
 
     /* tries to retrieve the handler argument from the arguments map, then
     in case the (handler) value is set, sets the handler name value

@@ -61,20 +61,20 @@ const char *test_handler_lua_context(void) {
 
 const char *test_handler_lua_url(void) {
     ERROR_CODE error;
-    struct http_parser_t *http_parser;
+    struct http_request_t *http_request;
     struct handler_lua_context_t *handler_lua_context;
 
-    /* creates the HTTP parser and the handler Lua context
+    /* creates the HTTP request and the handler Lua context
     then wires them together through the context pointer */
-    create_http_parser(&http_parser, TRUE);
+    create_http_request(&http_request);
     create_handler_lua_context(&handler_lua_context);
-    http_parser->context = handler_lua_context;
+    http_request->context = handler_lua_context;
 
     /* tests that a normal URL is properly parsed,
     note that the file_name is normalized to the platform
     path separator while the url is kept as-is */
     error = url_callback_handler_lua(
-        http_parser,
+        http_request,
         (unsigned char *) "/index.html",
         11
     );
@@ -90,7 +90,7 @@ const char *test_handler_lua_url(void) {
     /* tests that a URL with query string has the query
     parameters properly separated from the path */
     error = url_callback_handler_lua(
-        http_parser,
+        http_request,
         (unsigned char *) "/page?id=1&name=test",
         20
     );
@@ -111,21 +111,21 @@ const char *test_handler_lua_url(void) {
     V_ASSERT(handler_lua_context->_query_string.length == 14);
 
     delete_handler_lua_context(handler_lua_context);
-    delete_http_parser(http_parser);
+    delete_http_request(http_request);
 
     return NULL;
 }
 
 const char *test_handler_lua_header_field(void) {
-    struct http_parser_t *http_parser;
+    struct http_request_t *http_request;
     struct handler_lua_context_t *handler_lua_context;
     struct http_headers_t headers;
 
-    /* creates the HTTP parser and the handler Lua context
+    /* creates the HTTP request and the handler Lua context
     then wires them together */
-    create_http_parser(&http_parser, TRUE);
+    create_http_request(&http_request);
     create_handler_lua_context(&handler_lua_context);
-    http_parser->context = handler_lua_context;
+    http_request->context = handler_lua_context;
 
     /* initializes the headers structure and wires it into
     the handler context (normally done by set_handler_lua) */
@@ -134,7 +134,7 @@ const char *test_handler_lua_header_field(void) {
 
     /* tests that "Content-Type" is recognized */
     header_field_callback_handler_lua(
-        http_parser,
+        http_request,
         (unsigned char *) "Content-Type",
         12
     );
@@ -143,7 +143,7 @@ const char *test_handler_lua_header_field(void) {
 
     /* tests that "Content-Length" is recognized */
     header_field_callback_handler_lua(
-        http_parser,
+        http_request,
         (unsigned char *) "Content-Length",
         14
     );
@@ -151,7 +151,7 @@ const char *test_handler_lua_header_field(void) {
 
     /* tests that "Cookie" is recognized */
     header_field_callback_handler_lua(
-        http_parser,
+        http_request,
         (unsigned char *) "Cookie",
         6
     );
@@ -159,7 +159,7 @@ const char *test_handler_lua_header_field(void) {
 
     /* tests that "Host" is recognized */
     header_field_callback_handler_lua(
-        http_parser,
+        http_request,
         (unsigned char *) "Host",
         4
     );
@@ -167,28 +167,28 @@ const char *test_handler_lua_header_field(void) {
 
     /* tests that an unknown header leaves the state as undefined */
     header_field_callback_handler_lua(
-        http_parser,
+        http_request,
         (unsigned char *) "X-Custom",
         8
     );
     V_ASSERT(handler_lua_context->_next_header == UNDEFINED_HEADER);
 
     delete_handler_lua_context(handler_lua_context);
-    delete_http_parser(http_parser);
+    delete_http_request(http_request);
 
     return NULL;
 }
 
 const char *test_handler_lua_header_value(void) {
-    struct http_parser_t *http_parser;
+    struct http_request_t *http_request;
     struct handler_lua_context_t *handler_lua_context;
     struct http_headers_t headers;
 
-    /* creates the HTTP parser and the handler Lua context
+    /* creates the HTTP request and the handler Lua context
     then wires them together */
-    create_http_parser(&http_parser, TRUE);
+    create_http_request(&http_request);
     create_handler_lua_context(&handler_lua_context);
-    http_parser->context = handler_lua_context;
+    http_request->context = handler_lua_context;
 
     /* initializes the headers structure */
     headers.count = 0;
@@ -196,12 +196,12 @@ const char *test_handler_lua_header_value(void) {
 
     /* simulates parsing a Content-Type header */
     header_field_callback_handler_lua(
-        http_parser,
+        http_request,
         (unsigned char *) "Content-Type",
         12
     );
     header_value_callback_handler_lua(
-        http_parser,
+        http_request,
         (unsigned char *) "text/html",
         9
     );
@@ -211,12 +211,12 @@ const char *test_handler_lua_header_value(void) {
 
     /* simulates parsing a Content-Length header */
     header_field_callback_handler_lua(
-        http_parser,
+        http_request,
         (unsigned char *) "Content-Length",
         14
     );
     header_value_callback_handler_lua(
-        http_parser,
+        http_request,
         (unsigned char *) "42",
         2
     );
@@ -226,12 +226,12 @@ const char *test_handler_lua_header_value(void) {
 
     /* simulates parsing a Host header with port */
     header_field_callback_handler_lua(
-        http_parser,
+        http_request,
         (unsigned char *) "Host",
         4
     );
     header_value_callback_handler_lua(
-        http_parser,
+        http_request,
         (unsigned char *) "localhost:8080",
         14
     );
@@ -241,19 +241,19 @@ const char *test_handler_lua_header_value(void) {
 
     /* simulates parsing a Cookie header */
     header_field_callback_handler_lua(
-        http_parser,
+        http_request,
         (unsigned char *) "Cookie",
         6
     );
     header_value_callback_handler_lua(
-        http_parser,
+        http_request,
         (unsigned char *) "session=abc123",
         14
     );
     V_ASSERT(strcmp((char *) handler_lua_context->cookie, "session=abc123") == 0);
 
     delete_handler_lua_context(handler_lua_context);
-    delete_http_parser(http_parser);
+    delete_http_request(http_request);
 
     return NULL;
 }

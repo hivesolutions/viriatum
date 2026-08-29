@@ -294,6 +294,8 @@ xcopy /e /y "$(SolutionDir)..\..\src\$(ProjectName)\resources\config\viriatum" "
     <ClCompile Include="..\..\src\viriatum\handlers\handler_dispatch.c" />
     <ClCompile Include="..\..\src\viriatum\handlers\handler_file.c" />
     <ClCompile Include="..\..\src\viriatum\handlers\handler_proxy.c" />
+    <ClCompile Include="..\..\src\viriatum\http\hpack.c" />
+    <ClCompile Include="..\..\src\viriatum\http\http2.c" />
     <ClCompile Include="..\..\src\viriatum\http\http_parser.c" />
     <ClCompile Include="..\..\src\viriatum\http\http_request.c" />
     <ClCompile Include="..\..\src\viriatum\http\http_util.c" />
@@ -314,6 +316,7 @@ xcopy /e /y "$(SolutionDir)..\..\src\$(ProjectName)\resources\config\viriatum" "
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\..\src\viriatum\stream\stream_http.c" />
+    <ClCompile Include="..\..\src\viriatum\stream\stream_http2.c" />
     <ClCompile Include="..\..\src\viriatum\stream\stream_httpc.c" />
     <ClCompile Include="..\..\src\viriatum\stream\stream_io.c" />
     <ClCompile Include="..\..\src\viriatum\stream\stream_torrent.c" />
@@ -322,7 +325,12 @@ xcopy /e /y "$(SolutionDir)..\..\src\$(ProjectName)\resources\config\viriatum" "
     <ClCompile Include="..\..\src\viriatum\system\service.c" />
     <ClCompile Include="..\..\src\viriatum\system\torrent.c" />
     <ClCompile Include="..\..\src\viriatum\test\handler_dispatch_test.c" />
+    <ClCompile Include="..\..\src\viriatum\test\handler_default_test.c" />
     <ClCompile Include="..\..\src\viriatum\test\handler_file_test.c" />
+    <ClCompile Include="..\..\src\viriatum\test\handler_proxy_test.c" />
+    <ClCompile Include="..\..\src\viriatum\test\hpack_test.c" />
+    <ClCompile Include="..\..\src\viriatum\test\http2_test.c" />
+    <ClCompile Include="..\..\src\viriatum\test\stream_http2_test.c" />
     <ClCompile Include="..\..\src\viriatum\test\runner_test.c" />
     <ClCompile Include="..\..\src\viriatum\test\websocket_test.c" />
     <ClCompile Include="..\..\src\viriatum\test\service_test.c" />
@@ -348,6 +356,8 @@ xcopy /e /y "$(SolutionDir)..\..\src\$(ProjectName)\resources\config\viriatum" "
     <ClInclude Include="..\..\src\viriatum\handlers\handler_file.h" />
     <ClInclude Include="..\..\src\viriatum\handlers\handler_proxy.h" />
     <ClInclude Include="..\..\src\viriatum\http\http.h" />
+    <ClInclude Include="..\..\src\viriatum\http\hpack.h" />
+    <ClInclude Include="..\..\src\viriatum\http\http2.h" />
     <ClInclude Include="..\..\src\viriatum\http\http_parser.h" />
     <ClInclude Include="..\..\src\viriatum\http\http_request.h" />
     <ClInclude Include="..\..\src\viriatum\http\http_util.h" />
@@ -365,6 +375,7 @@ xcopy /e /y "$(SolutionDir)..\..\src\$(ProjectName)\resources\config\viriatum" "
     <ClInclude Include="..\..\src\viriatum\stdafx.h" />
     <ClInclude Include="..\..\src\viriatum\stream\stream.h" />
     <ClInclude Include="..\..\src\viriatum\stream\stream_http.h" />
+    <ClInclude Include="..\..\src\viriatum\stream\stream_http2.h" />
     <ClInclude Include="..\..\src\viriatum\stream\stream_httpc.h" />
     <ClInclude Include="..\..\src\viriatum\stream\stream_io.h" />
     <ClInclude Include="..\..\src\viriatum\stream\stream_torrent.h" />
@@ -374,7 +385,12 @@ xcopy /e /y "$(SolutionDir)..\..\src\$(ProjectName)\resources\config\viriatum" "
     <ClInclude Include="..\..\src\viriatum\system\system.h" />
     <ClInclude Include="..\..\src\viriatum\system\torrent.h" />
     <ClInclude Include="..\..\src\viriatum\test\handler_dispatch_test.h" />
+    <ClInclude Include="..\..\src\viriatum\test\handler_default_test.h" />
     <ClInclude Include="..\..\src\viriatum\test\handler_file_test.h" />
+    <ClInclude Include="..\..\src\viriatum\test\handler_proxy_test.h" />
+    <ClInclude Include="..\..\src\viriatum\test\hpack_test.h" />
+    <ClInclude Include="..\..\src\viriatum\test\http2_test.h" />
+    <ClInclude Include="..\..\src\viriatum\test\stream_http2_test.h" />
     <ClInclude Include="..\..\src\viriatum\test\runner_test.h" />
     <ClInclude Include="..\..\src\viriatum\test\websocket_test.h" />
     <ClInclude Include="..\..\src\viriatum\test\service_test.h" />

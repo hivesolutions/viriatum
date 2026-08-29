@@ -28,7 +28,7 @@
 
 void sort_quicksort(void **sequence, size_t beginning, size_t end, comparator cmp) {
     /* retrieves the initial pivor, left and right elements */
-    void *pivot = sequence[beginning];
+    void *pivot;
     size_t left = beginning + 1;
     size_t right = end;
 
@@ -38,6 +38,11 @@ void sort_quicksort(void **sequence, size_t beginning, size_t end, comparator cm
         /* returns immediately */
         return;
     }
+
+    /* retrieves the pivot only once the sequence is known to carry
+    the elements the sorting needs, the recursion reaches this with
+    a beginning that sits one past the end of it */
+    pivot = sequence[beginning];
 
     /* iterates while the right index is greater
     than the left index */

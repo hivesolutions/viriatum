@@ -143,6 +143,134 @@ static const char *http_status_codes[5][64] = {
      "Network Authentication Required"}
 };
 
+/**
+ * Opens a response in the provided buffer under HTTP/1.1, this is
+ * the implementation of the status operation of a connection that
+ * speaks the first version of the protocol.
+ *
+ * @param connection The connection the response belongs to.
+ * @param buffer The buffer the response is built in.
+ * @param size The size in bytes of the provided buffer.
+ * @param version The version of the protocol in use.
+ * @param status_code The status code of the response.
+ * @param status_message The message that describes the status.
+ * @param keep_alive The mode the connection is left in.
+ * @return The number of bytes the buffer holds.
+ */
+size_t write_status_http(
+    struct connection_t *connection,
+    char *buffer,
+    size_t size,
+    enum http_version_e version,
+    int status_code,
+    char *status_message,
+    enum http_keep_alive_e keep_alive
+);
+
+/**
+ * Appends a single header field to a response being built under
+ * HTTP/1.1, in the plain form of a name, a colon and a value.
+ *
+ * @param connection The connection the response belongs to.
+ * @param buffer The buffer the response is built in.
+ * @param size The size in bytes of the provided buffer.
+ * @param offset The position the field is written at.
+ * @param name The name of the field.
+ * @param value The value of the field.
+ * @return The number of bytes the buffer holds.
+ */
+size_t write_field_http(
+    struct connection_t *connection,
+    char *buffer,
+    size_t size,
+    size_t offset,
+    const char *name,
+    const char *value
+);
+
+/**
+ * Closes the header section of a response being built under
+ * HTTP/1.1, which is the empty line that separates it from the
+ * payload that may follow.
+ *
+ * @param connection The connection the response belongs to.
+ * @param buffer The buffer the response is built in.
+ * @param size The size in bytes of the provided buffer.
+ * @param offset The position the section is closed at.
+ * @param last The value one when no payload follows.
+ * @return The number of bytes the buffer holds.
+ */
+size_t write_end_http(
+    struct connection_t *connection,
+    char *buffer,
+    size_t size,
+    size_t offset,
+    char last
+);
+
+/**
+ * Writes a fragment of the payload of a response under HTTP/1.1,
+ * which under this version of the protocol is the payload itself
+ * with nothing framing it.
+ *
+ * @param connection The connection the response belongs to.
+ * @param data The fragment to be written.
+ * @param size The size in bytes of the fragment.
+ * @param last The value one when the fragment is the last one.
+ * @param callback The callback of the completion of the write.
+ * @param parameters The value handed to the callback.
+ * @return The resulting error code.
+ */
+ERROR_CODE write_chunk_http(
+    struct connection_t *connection,
+    unsigned char *data,
+    size_t size,
+    char last,
+    connection_data_callback_hu callback,
+    void *parameters
+);
+
+/**
+ * Writes the buffer that a response has been built in through the
+ * connection under HTTP/1.1, where it travels as it stands.
+ *
+ * @param connection The connection the response belongs to.
+ * @param data The buffer of the response.
+ * @param size The size in bytes of the buffer.
+ * @param callback The callback of the completion of the write.
+ * @param parameters The value handed to the callback.
+ * @return The resulting error code.
+ */
+ERROR_CODE write_flush_http(
+    struct connection_t *connection,
+    unsigned char *data,
+    size_t size,
+    connection_data_callback_hu callback,
+    void *parameters
+);
+
+/**
+ * Writes a header field that is given as a complete line into the
+ * response being built, telling the name and the value apart before
+ * handing them to the operations of the connection.
+ * The surfaces that let an application set its own fields produce
+ * them in this shape, which is the one of the wire of HTTP/1.1.
+ *
+ * @param connection The connection the response belongs to.
+ * @param buffer The buffer the response is built in.
+ * @param size The size in bytes of the provided buffer.
+ * @param offset The position the field is written at.
+ * @param line The complete line of the field.
+ * @return The number of bytes the buffer holds.
+ */
+size_t write_line_http(
+    struct connection_t *connection,
+    char *buffer,
+    size_t size,
+    size_t offset,
+    const char *line
+);
+
 size_t write_http_headers(
     struct connection_t *connection,
     char *buffer,

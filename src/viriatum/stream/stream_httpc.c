@@ -30,7 +30,7 @@
 
 /* ----------------------------------------- */
 
-ERROR_CODE body_callback_handler_client(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE body_callback_handler_client(struct http_request_t *http_request, const unsigned char *data, size_t data_size) {
     struct type_t *type;
 
     decode_bencoding((unsigned char *) data, data_size, &type);
@@ -41,7 +41,7 @@ ERROR_CODE body_callback_handler_client(struct http_parser_t *http_parser, const
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE message_complete_callback_handler_client(struct http_parser_t *http_parser) {
+ERROR_CODE message_complete_callback_handler_client(struct http_request_t *http_request) {
     /* raises no error */
     RAISE_NO_ERROR;
 }
@@ -70,7 +70,7 @@ ERROR_CODE create_http_client_connection(struct http_client_connection_t **http_
     http_client_connection->http_settings->on_message_complete = message_complete_callback_handler_client;
 
     /* sets the connection as the parser parameter(s) */
-    http_client_connection->http_parser->parameters = io_connection->connection;
+    http_client_connection->http_parser->request->parameters = io_connection->connection;
 
     /* sets the HTTP client connection in the (upper) io connection substrate */
     io_connection->lower = http_client_connection;

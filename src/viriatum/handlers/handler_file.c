@@ -70,6 +70,7 @@ ERROR_CODE create_handler_file_context(struct handler_file_context_t **handler_f
     handler_file_context->base_path = NULL;
     handler_file_context->auth_basic = NULL;
     handler_file_context->auth_file = NULL;
+    handler_file_context->push = NULL;
     handler_file_context->file = NULL;
     handler_file_context->file_size = 0;
     handler_file_context->initial_byte = 0;
@@ -167,6 +168,7 @@ ERROR_CODE register_handler_file(struct service_t *service) {
         _location->base_path = NULL;
         _location->auth_basic = NULL;
         _location->auth_file = NULL;
+        _location->push = NULL;
 
         /* tries to retrieve the base path from the file configuration and in
         case it exists sets it in the location (attribute reference change) */
@@ -182,6 +184,11 @@ ERROR_CODE register_handler_file(struct service_t *service) {
         case it exists sets it in the location (attribute reference change) */
         get_value_string_sort_map(configuration, (unsigned char *) "auth_file", &value);
         if(value != NULL) { _location->auth_file = (unsigned char *) value; }
+
+        /* tries to retrieve the resources to be promised from the file
+        configuration and in case they exist sets them in the location */
+        get_value_string_sort_map(configuration, (unsigned char *) "push", &value);
+        if(value != NULL) { _location->push = (unsigned char *) value; }
     }
 
     /* adds the HTTP handler to the service */
@@ -218,7 +225,7 @@ ERROR_CODE unregister_handler_file(struct service_t *service) {
 ERROR_CODE set_handler_file(struct http_connection_t *http_connection) {
     /* sets both the HTTP parser values and the HTTP
     settings handler for the current file handler */
-    _set_http_parser_handler_file(http_connection->http_parser);
+    _set_http_request_handler_file(http_connection->request);
     _set_http_settings_handler_file(http_connection->http_settings);
 
     /* raises no error */
@@ -228,7 +235,7 @@ ERROR_CODE set_handler_file(struct http_connection_t *http_connection) {
 ERROR_CODE unset_handler_file(struct http_connection_t *http_connection) {
     /* unsets both the HTTP parser values and the HTTP
     settings handler from the current file handler */
-    _unset_http_parser_handler_file(http_connection->http_parser);
+    _unset_http_request_handler_file(http_connection->request);
     _unset_http_settings_handler_file(http_connection->http_settings);
 
     /* raises no error */
@@ -237,18 +244,18 @@ ERROR_CODE unset_handler_file(struct http_connection_t *http_connection) {
 
 ERROR_CODE reset_handler_file(struct http_connection_t *http_connection) {
     /* resets the HTTP parser values */
-    _reset_http_parser_handler_file(http_connection->http_parser);
+    _reset_http_request_handler_file(http_connection->request);
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE message_begin_callback_handler_file(struct http_parser_t *http_parser) {
+ERROR_CODE message_begin_callback_handler_file(struct http_request_t *http_request) {
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE url_callback_handler_file(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE url_callback_handler_file(struct http_request_t *http_request, const unsigned char *data, size_t data_size) {
     /* allocates memory for the variable that will hold the
     size of the decoded file path */
     size_t decoded_size;
@@ -259,11 +266,11 @@ ERROR_CODE url_callback_handler_file(struct http_parser_t *http_parser, const un
 
     /* retrieves the handler file context from the HTTP parser */
     struct handler_file_context_t *handler_file_context =
-        (struct handler_file_context_t *) http_parser->context;
+        (struct handler_file_context_t *) http_request->context;
 
     /* retrieves the connection from the HTTP parser parameters and
     uses the pre-resolved contents path from service options */
-    struct connection_t *connection = (struct connection_t *) http_parser->parameters;
+    struct connection_t *connection = (struct connection_t *) http_request->parameters;
     char *contents_path = (char *) connection->service->options->contents_path;
 
     /* checks the position of the get parameters divisor position
@@ -278,7 +285,7 @@ ERROR_CODE url_callback_handler_file(struct http_parser_t *http_parser, const un
     handler_file_context->url[path_size] = '\0';
 
     /* prints a debug message */
-    V_INFO_F("%s %s\n", get_http_method_string(http_parser->method), handler_file_context->url);
+    V_INFO_F("%s %s\n", get_http_method_string(http_request->method), handler_file_context->url);
 
     /* creates the file path using the base viriatum path
     this should be the complete absolute path */
@@ -321,15 +328,28 @@ ERROR_CODE url_callback_handler_file(struct http_parser_t *http_parser, const un
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE header_field_callback_handler_file(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE header_field_callback_handler_file(struct http_request_t *http_request, const unsigned char *data, size_t data_size) {
     /* retrieves the handler file context from the HTTP parser */
-    struct handler_file_context_t *handler_file_context = (struct handler_file_context_t *) http_parser->context;
+    struct handler_file_context_t *handler_file_context = (struct handler_file_context_t *) http_request->context;
+
+    /* allocates space for the first bytes of the name once they have
+    been lowered, the name of a field is never case sensitive and the
+    most recent version of the protocol carries them in lower case */
+    unsigned char lowered[4];
+    size_t index;
+
+    /* lowers the bytes that the matching below looks at, a name that
+    is shorter than them is none of the ones being looked for */
+    if(data_size < sizeof(lowered)) { RAISE_NO_ERROR; }
+    for(index = 0; index < sizeof(lowered); index++) {
+        lowered[index] = (unsigned char) tolower((unsigned char) data[index]);
+    }
 
     /* switches over the size of the header name (field)
     that was provided (used for faster parsing) */
     switch(data_size) {
         case 5:
-            if(data[0] == 'R' && data[1] == 'a' && data[2] == 'n' && data[3] == 'g') {
+            if(lowered[0] == 'r' && lowered[1] == 'a' && lowered[2] == 'n' && lowered[3] == 'g') {
                 /* updates the range status value, it's the next
                 value to be parsed and put in context */
                 handler_file_context->range_status = 1;
@@ -342,7 +362,7 @@ ERROR_CODE header_field_callback_handler_file(struct http_parser_t *http_parser,
             break;
 
         case 13:
-            if(data[0] == 'I' && data[1] == 'f' && data[2] == '-' && data[3] == 'N') {
+            if(lowered[0] == 'i' && lowered[1] == 'f' && lowered[2] == '-' && lowered[3] == 'n') {
                 /* updates the etag status value, it's the next
                 value to be parsed and put in context */
                 handler_file_context->etag_status = 1;
@@ -350,7 +370,7 @@ ERROR_CODE header_field_callback_handler_file(struct http_parser_t *http_parser,
                 break;
             }
 
-            if(data[0] == 'C' && data[1] == 'a' && data[2] == 'c' && data[3] == 'h') {
+            if(lowered[0] == 'c' && lowered[1] == 'a' && lowered[2] == 'c' && lowered[3] == 'h') {
                 /* updates the cache control status value, it's the next
                 value to be parsed and put in context */
                 handler_file_context->cache_control_status = 1;
@@ -358,7 +378,7 @@ ERROR_CODE header_field_callback_handler_file(struct http_parser_t *http_parser,
                 break;
             }
 
-            if(data[0] == 'A' && data[1] == 'u' && data[2] == 't' && data[3] == 'h') {
+            if(lowered[0] == 'a' && lowered[1] == 'u' && lowered[2] == 't' && lowered[3] == 'h') {
                 /* updates the authorization status value, it's the next
                 value to be parsed and put in context */
                 handler_file_context->authorization_status = 1;
@@ -375,9 +395,9 @@ ERROR_CODE header_field_callback_handler_file(struct http_parser_t *http_parser,
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE header_value_callback_handler_file(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE header_value_callback_handler_file(struct http_request_t *http_request, const unsigned char *data, size_t data_size) {
     /* retrieves the handler file context from the HTTP parser */
-    struct handler_file_context_t *handler_file_context = (struct handler_file_context_t *) http_parser->context;
+    struct handler_file_context_t *handler_file_context = (struct handler_file_context_t *) http_request->context;
 
     /* switches over the kind of next header to be
     processed, note that in case the value is set
@@ -419,17 +439,135 @@ ERROR_CODE header_value_callback_handler_file(struct http_parser_t *http_parser,
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE headers_complete_callback_handler_file(struct http_parser_t *http_parser) {
+ERROR_CODE headers_complete_callback_handler_file(struct http_request_t *http_request) {
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE body_callback_handler_file(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE body_callback_handler_file(struct http_request_t *http_request, const unsigned char *data, size_t data_size) {
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_parser) {
+/**
+ * Writes the status and the fields that every response of the file
+ * handler carries, through the operations of the connection so that
+ * the encoding of them follows the protocol in use.
+ *
+ * @param http_connection The connection the response belongs to.
+ * @param connection The connection the response is written on.
+ * @param buffer The buffer the response is built in.
+ * @param size The size in bytes of the provided buffer.
+ * @param version The version of the protocol in use.
+ * @param status_code The status code of the response.
+ * @param status_message The message that describes the status.
+ * @param keep_alive The mode the connection is left in.
+ * @param content_length The size in bytes of the payload.
+ * @return The number of bytes the buffer holds.
+ */
+static size_t _write_headers_handler_file(
+    struct http_connection_t *http_connection,
+    struct connection_t *connection,
+    char *buffer,
+    size_t size,
+    enum http_version_e version,
+    int status_code,
+    char *status_message,
+    enum http_keep_alive_e keep_alive,
+    size_t content_length
+) {
+    /* allocates space for the position in the buffer and for the
+    text of the length of the payload */
+    size_t count;
+    char length[32];
+
+    count = http_connection->write_status(
+        connection,
+        buffer,
+        size,
+        version,
+        status_code,
+        status_message,
+        keep_alive
+    );
+    SPRINTF(length, sizeof(length), "%lu", (long unsigned int) content_length);
+    count = http_connection->write_field(connection, buffer, size, count, CONTENT_LENGTH_H, length);
+    count = http_connection->write_field(
+        connection,
+        buffer,
+        size,
+        count,
+        CACHE_CONTROL_H,
+        cache_codes[NO_CACHE - 1]
+    );
+
+    /* returns the number of bytes that the buffer holds */
+    return count;
+}
+
+/**
+ * Promises the resources that the location of the request lists to
+ * the peer, each one of them opening a stream of its own that is
+ * served as though the peer had asked for it.
+ * Nothing at all happens under HTTP/1.1, which carries no way of
+ * promising a resource.
+ *
+ * @param http_connection The connection the request belongs to.
+ * @param http_request The message being served.
+ * @param push The list of the paths to be promised.
+ */
+static void _push_handler_file(struct http_connection_t *http_connection, struct http_request_t *http_request, unsigned char *push) {
+#ifdef VIRIATUM_HTTP2
+    /* allocates space for the path being taken out of the list and
+    for the walk over the list itself */
+    char path[VIRIATUM_MAX_URL_SIZE];
+    size_t size = 0;
+    unsigned char *pointer = push;
+    struct http2_stream_t *http2_stream;
+
+    /* the promising of a resource only exists under HTTP/2, so under
+    anything else there's nothing at all to be done */
+    if(http_connection->http2_connection == NULL) { return; }
+    if(push == NULL) { return; }
+
+    /* retrieves the stream of the request, it is the one the promises
+    are made on and the one they are going to hang from */
+    http2_stream = find_stream_http2_connection(
+        http_connection->http2_connection,
+        http_request->stream_id
+    );
+    if(http2_stream == NULL) { return; }
+
+    /* walks the list, every sequence of characters that is not a space
+    is one of the paths that gets promised */
+    while(TRUE) {
+        if(*pointer != ' ' && *pointer != '\0') {
+            if(size < sizeof(path) - 1) { path[size++] = (char) *pointer; }
+            pointer++;
+            continue;
+        }
+
+        if(size > 0) {
+            path[size] = '\0';
+            push_stream_http2_connection(http_connection->http2_connection, http2_stream, path);
+            size = 0;
+
+            /* the promising of a resource may have moved the streams
+            inside the table, so the one of the request is taken again */
+            http2_stream = find_stream_http2_connection(
+                http_connection->http2_connection,
+                http_request->stream_id
+            );
+            if(http2_stream == NULL) { return; }
+        }
+
+        if(*pointer == '\0') { break; }
+        pointer++;
+    }
+#endif
+}
+
+ERROR_CODE message_complete_callback_handler_file(struct http_request_t *http_request) {
     /* allocates the file size and for the temporary count
     variable used to count the written bytes */
     size_t file_size;
@@ -492,18 +630,22 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
     /* retrieves the handler file context from the HTTP parser and uses
     it to retrieve the respective flags value */
     struct handler_file_context_t *handler_file_context =
-        (struct handler_file_context_t *) http_parser->context;
-    unsigned char flags = http_parser->flags;
+        (struct handler_file_context_t *) http_request->context;
+    unsigned char flags = http_request->flags;
 
     /* retrieves the connection from the HTTP parser parameters,
     the connection object is going to be used for the input and
     outpu operations associated with the file handling */
-    struct connection_t *connection = (struct connection_t *) http_parser->parameters;
+    struct connection_t *connection = (struct connection_t *) http_request->parameters;
 
     /* retrieves the underlying connection references in order to be
     able to operate over them, for register */
     struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
     struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
+
+    /* allocates space for the value of the range of the contents, it
+    is written as a field of its own */
+    char range_value[64];
 
     /* verifies if the currently set flag grant "permission" to keep
     the connection alive at the end of the HTTP message processing,
@@ -513,6 +655,11 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
     /* acquires the lock on the HTTP connection, this will avoids further
     messages to be processed, no parallel request handling problems */
     http_connection->acquire(http_connection);
+
+    /* promises the resources that the location of the request lists,
+    this happens before the response so that the peer learns of them
+    before it has a chance to ask for them itself */
+    _push_handler_file(http_connection, http_request, handler_file_context->push);
 
     /* checks if the path being request is in fact a directory */
     is_directory_file((char *) handler_file_context->file_path_d, &is_directory);
@@ -684,7 +831,7 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
     }
 
     /* sets the (HTTP) flags in the handler file context */
-    handler_file_context->flags = http_parser->flags;
+    handler_file_context->flags = http_request->flags;
 
     /* tests the error code for error, in case there's an error
     the file is considered to be not found (normal error) */
@@ -735,29 +882,45 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
         );
     } else if(is_redirect) {
         /* writes the HTTP static headers to the response */
-        count = write_http_headers(
+        count = http_connection->write_status(
             connection,
             headers_buffer,
             VIRIATUM_HTTP_SIZE,
-            HTTP11,
+            http_request->version,
             307,
             "Temporary Redirect",
-            keep_alive ? KEEP_ALIVE : KEEP_CLOSE,
-            FALSE
+            keep_alive ? KEEP_ALIVE : KEEP_CLOSE
         );
-        SPRINTF(
-            &headers_buffer[count],
-            VIRIATUM_HTTP_SIZE - count,
-            CONTENT_LENGTH_H ": 0\r\n" LOCATION_H ": %s\r\n\r\n",
-            location
+        count = http_connection->write_field(
+            connection,
+            headers_buffer,
+            VIRIATUM_HTTP_SIZE,
+            count,
+            CONTENT_LENGTH_H,
+            "0"
+        );
+        count = http_connection->write_field(
+            connection,
+            headers_buffer,
+            VIRIATUM_HTTP_SIZE,
+            count,
+            LOCATION_H,
+            (const char *) location
+        );
+        count = http_connection->write_end(
+            connection,
+            headers_buffer,
+            VIRIATUM_HTTP_SIZE,
+            count,
+            TRUE
         );
 
         /* writes both the headers to the connection, registers
         for the appropriate callbacks */
-        write_connection(
+        http_connection->write_flush(
             connection,
             (unsigned char *) headers_buffer,
-            (unsigned int) strlen(headers_buffer),
+            count,
             _cleanup_handler_file,
             handler_file_context
         );
@@ -765,25 +928,31 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
     /* in case the current situation is a directory list */
     else if(is_directory) {
         /* writes the HTTP static headers to the response */
-        write_http_headers_c(
+        count = _write_headers_handler_file(
+            http_connection,
             connection,
             headers_buffer,
             VIRIATUM_HTTP_SIZE,
-            HTTP11,
+            http_request->version,
             200,
             "OK",
             keep_alive ? KEEP_ALIVE : KEEP_CLOSE,
-            strlen((char *) handler_file_context->template_handler->string_value),
-            NO_CACHE,
-            TRUE
+            strlen((char *) handler_file_context->template_handler->string_value)
+        );
+        count = http_connection->write_end(
+            connection,
+            headers_buffer,
+            VIRIATUM_HTTP_SIZE,
+            count,
+            FALSE
         );
 
         /* writes both the headers to the connection, register
         for the appropriate callbacks */
-        write_connection(
+        http_connection->write_flush(
             connection,
             (unsigned char *) headers_buffer,
-            (unsigned int) strlen(headers_buffer),
+            count,
             _send_data_handler_file,
             handler_file_context
         );
@@ -793,25 +962,31 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
     to the client indicating that cache should be used */
     else if(handler_file_context->etag_status == 2 && strcmp(etag, (char *) handler_file_context->etag) == 0) {
         /* writes the HTTP static headers to the response */
-        write_http_headers_c(
+        count = _write_headers_handler_file(
+            http_connection,
             connection,
             headers_buffer,
             VIRIATUM_HTTP_SIZE,
-            HTTP11,
+            http_request->version,
             304,
             "Not Modified",
             keep_alive ? KEEP_ALIVE : KEEP_CLOSE,
-            0,
-            NO_CACHE,
+            0
+        );
+        count = http_connection->write_end(
+            connection,
+            headers_buffer,
+            VIRIATUM_HTTP_SIZE,
+            count,
             TRUE
         );
 
         /* writes both the headers to the connection, registers for
         the appropriate callbacks */
-        write_connection(
+        http_connection->write_flush(
             connection,
             (unsigned char *) headers_buffer,
-            (unsigned int) strlen(headers_buffer),
+            count,
             _cleanup_handler_file,
             handler_file_context
         );
@@ -833,35 +1008,49 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
         that only a part of the file is going to be retrieved, then
         writes also the content range header indicating which bytes
         are going to be retrieved */
-        count = write_http_headers_c(
+        count = _write_headers_handler_file(
+            http_connection,
             connection,
             headers_buffer,
             VIRIATUM_HTTP_SIZE,
-            HTTP11,
+            http_request->version,
             206,
             "Partial content",
             keep_alive ? KEEP_ALIVE : KEEP_CLOSE,
             handler_file_context->final_byte -
-                handler_file_context->initial_byte + 1,
-            NO_CACHE,
-            FALSE
+                handler_file_context->initial_byte + 1
         );
         SPRINTF(
-            &headers_buffer[count],
-            VIRIATUM_HTTP_SIZE - count,
-            CONTENT_RANGE_H ": bytes %ld-%ld/%ld\r\n\r\n",
+            range_value,
+            sizeof(range_value),
+            "bytes %ld-%ld/%ld",
             (long int) handler_file_context->initial_byte,
             (long int) handler_file_context->final_byte,
             (long int) file_size
+        );
+        count = http_connection->write_field(
+            connection,
+            headers_buffer,
+            VIRIATUM_HTTP_SIZE,
+            count,
+            CONTENT_RANGE_H,
+            range_value
+        );
+        count = http_connection->write_end(
+            connection,
+            headers_buffer,
+            VIRIATUM_HTTP_SIZE,
+            count,
+            FALSE
         );
 
         /* writes both the headers to the connection, registers for the
         appropriate callbacks, this is going to trigger the chain of write
         to callback behavior expected for the file sending */
-        write_connection(
+        http_connection->write_flush(
             connection,
             (unsigned char *) headers_buffer,
-            (unsigned int) strlen(headers_buffer),
+            count,
             _send_chunk_handler_file,
             handler_file_context
         );
@@ -877,17 +1066,16 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
 
         /* writes the HTTP static headers to the response indicating
         that the file is going to be served normally */
-        count = write_http_headers_c(
+        count = _write_headers_handler_file(
+            http_connection,
             connection,
             headers_buffer,
             VIRIATUM_HTTP_SIZE,
-            HTTP11,
+            http_request->version,
             200,
             "OK",
             keep_alive ? KEEP_ALIVE : KEEP_CLOSE,
-            file_size,
-            NO_CACHE,
-            FALSE
+            file_size
         );
 
         /* retrieves the extension part of the file path and then uses
@@ -897,27 +1085,46 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
         extension = extension_path((char *) handler_file_context->file_path_d);
         mime_type = connection->service->get_mime_type(connection->service, extension);
         if(mime_type != NULL) {
-            count += SPRINTF(
-                &headers_buffer[count],
-                VIRIATUM_HTTP_SIZE - count,
-                CONTENT_TYPE_H ": %s\r\n",
+            count = http_connection->write_field(
+                connection,
+                headers_buffer,
+                VIRIATUM_HTTP_SIZE,
+                count,
+                CONTENT_TYPE_H,
                 mime_type
             );
         }
-        SPRINTF(
-            &headers_buffer[count],
-            VIRIATUM_HTTP_SIZE - count,
-            ACCEPT_RANGES_H ": bytes\r\n" ETAG_H ": %s\r\n\r\n",
+        count = http_connection->write_field(
+            connection,
+            headers_buffer,
+            VIRIATUM_HTTP_SIZE,
+            count,
+            ACCEPT_RANGES_H,
+            "bytes"
+        );
+        count = http_connection->write_field(
+            connection,
+            headers_buffer,
+            VIRIATUM_HTTP_SIZE,
+            count,
+            ETAG_H,
             etag
+        );
+        count = http_connection->write_end(
+            connection,
+            headers_buffer,
+            VIRIATUM_HTTP_SIZE,
+            count,
+            FALSE
         );
 
         /* writes both the headers to the connection, registers for the
         appropriate callbacks, this is going to trigger the chain of write
         to callback behavior expected for the file sending */
-        write_connection(
+        http_connection->write_flush(
             connection,
             (unsigned char *) headers_buffer,
-            (unsigned int) strlen(headers_buffer),
+            count,
             _send_chunk_handler_file,
             handler_file_context
         );
@@ -927,7 +1134,7 @@ ERROR_CODE message_complete_callback_handler_file(struct http_parser_t *http_par
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE path_callback_handler_file(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE path_callback_handler_file(struct http_request_t *http_request, const unsigned char *data, size_t data_size) {
     /* allocates memory for the variable that will hold the
     size of the decoded file path */
     size_t decoded_size;
@@ -939,12 +1146,12 @@ ERROR_CODE path_callback_handler_file(struct http_parser_t *http_parser, const u
     /* retrieves the handler file context from the HTTP parser
     and uses it to retrieve the reference to the base path in context */
     struct handler_file_context_t *handler_file_context =
-        (struct handler_file_context_t *) http_parser->context;
+        (struct handler_file_context_t *) http_request->context;
     unsigned char *base_path = handler_file_context->base_path;
 
     /* retrieves the connection from the HTTP parser parameters and
     uses the pre-resolved contents path from service options */
-    struct connection_t *connection = (struct connection_t *) http_parser->parameters;
+    struct connection_t *connection = (struct connection_t *) http_request->parameters;
     char *contents_path = (char *) connection->service->options->contents_path;
 
     /* copies the memory from the data to the url and then
@@ -954,7 +1161,7 @@ ERROR_CODE path_callback_handler_file(struct http_parser_t *http_parser, const u
     handler_file_context->url[data_size] = '\0';
 
     /* prints a debug message */
-    V_INFO_F("%s %s\n", get_http_method_string(http_parser->method), handler_file_context->url);
+    V_INFO_F("%s %s\n", get_http_method_string(http_request->method), handler_file_context->url);
 
     /* in case a base path is not defined the contant values
     for the contents and base path must be used */
@@ -1014,7 +1221,7 @@ ERROR_CODE path_callback_handler_file(struct http_parser_t *http_parser, const u
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE location_callback_handler_file(struct http_parser_t *http_parser, size_t index, size_t offset) {
+ERROR_CODE location_callback_handler_file(struct http_request_t *http_request, size_t index, size_t offset) {
     /* allocates memory for the variable that will hold the
     size of the decoded file path */
     size_t decoded_size;
@@ -1029,11 +1236,11 @@ ERROR_CODE location_callback_handler_file(struct http_parser_t *http_parser, siz
 
     /* retrieves the handler file context from the HTTP parser */
     struct handler_file_context_t *handler_file_context =
-        (struct handler_file_context_t *) http_parser->context;
+        (struct handler_file_context_t *) http_request->context;
 
     /* retrieves the connection from the parser and then uses it to  the
     the correct file handler reference from the HTTP connection */
-    struct connection_t *connection = (struct connection_t *) http_parser->parameters;
+    struct connection_t *connection = (struct connection_t *) http_request->parameters;
     struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
     struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
     struct file_handler_t *file_handler =
@@ -1046,6 +1253,7 @@ ERROR_CODE location_callback_handler_file(struct http_parser_t *http_parser, siz
     /* updates the various references in the current context, this
     should reflect the one present in the location */
     handler_file_context->base_path = location->base_path;
+    handler_file_context->push = location->push;
     handler_file_context->auth_basic = location->auth_basic;
     handler_file_context->auth_file = location->auth_file;
 
@@ -1091,41 +1299,41 @@ ERROR_CODE location_callback_handler_file(struct http_parser_t *http_parser, siz
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE virtual_url_callback_handler_file(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE virtual_url_callback_handler_file(struct http_request_t *http_request, const unsigned char *data, size_t data_size) {
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _set_http_parser_handler_file(struct http_parser_t *http_parser) {
+ERROR_CODE _set_http_request_handler_file(struct http_request_t *http_request) {
     /* allocates space for the handler file context */
     struct handler_file_context_t *handler_file_context;
 
     /* creates the handler file context and then sets the handler
     file context as the context for the HTTP parser */
     create_handler_file_context(&handler_file_context);
-    http_parser->context = handler_file_context;
+    http_request->context = handler_file_context;
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _unset_http_parser_handler_file(struct http_parser_t *http_parser) {
+ERROR_CODE _unset_http_request_handler_file(struct http_request_t *http_request) {
     /* retrieves the handler file context from the HTTP parser */
-    struct handler_file_context_t *handler_file_context = (struct handler_file_context_t *) http_parser->context;
+    struct handler_file_context_t *handler_file_context = (struct handler_file_context_t *) http_request->context;
 
     /* deletes the handler file context and nullifies the
     reference to avoid dangling pointer on keep-alive reuse */
     delete_handler_file_context(handler_file_context);
-    http_parser->context = NULL;
+    http_request->context = NULL;
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _reset_http_parser_handler_file(struct http_parser_t *http_parser) {
+ERROR_CODE _reset_http_request_handler_file(struct http_request_t *http_request) {
     /* retrieves the handler file context from the HTTP parser */
     struct handler_file_context_t *handler_file_context =
-        (struct handler_file_context_t *) http_parser->context;
+        (struct handler_file_context_t *) http_request->context;
 
     /* unsets the handler file context file */
     handler_file_context->file = NULL;
@@ -1246,6 +1454,11 @@ ERROR_CODE _send_chunk_handler_file(struct connection_t *connection, struct data
     struct handler_file_context_t *handler_file_context = (struct handler_file_context_t *) parameters;
     unsigned char *file_path = handler_file_context->file_path_d;
 
+    /* retrieves the underlying connection references in order to be
+    able to write the payload through the protocol in use */
+    struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
+    struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
+
     /* retrieves the file from the handler file context */
     FILE *file = handler_file_context->file;
 
@@ -1286,12 +1499,14 @@ ERROR_CODE _send_chunk_handler_file(struct connection_t *connection, struct data
     /* in case the number of read bytes is valid, there's
     data to be sent to the client side */
     if(number_bytes > 0) {
-        /* writes the complete set of contents in the file
-        buffer to the current connection (send operation) */
-        write_connection(
+        /* writes the complete set of contents in the file buffer to
+        the current connection, the fragment that exhausts the range
+        is the one that closes the message */
+        http_connection->write_chunk(
             connection,
             file_buffer,
-            (unsigned int) number_bytes,
+            number_bytes,
+            number_bytes == remaining ? TRUE : FALSE,
             _send_chunk_handler_file,
             handler_file_context
         );
@@ -1321,6 +1536,11 @@ ERROR_CODE _send_data_handler_file(struct connection_t *connection, struct data_
     struct handler_file_context_t *handler_file_context = (struct handler_file_context_t *) parameters;
     struct template_handler_t *template_handler = handler_file_context->template_handler;
 
+    /* retrieves the underlying connection references in order to be
+    able to write the payload through the protocol in use */
+    struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
+    struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
+
     /* in case the handler file context is already flushed
     time to clenaup pending structures */
     if(handler_file_context->flushed) {
@@ -1335,11 +1555,13 @@ ERROR_CODE _send_data_handler_file(struct connection_t *connection, struct data_
     /* otherwise the "normal" write connection applies */
     else {
         /* writes the (file) data to the connection and sets the handler
-        file context as flushed */
-        write_connection(
+        file context as flushed, the data is the complete payload of the
+        response and so it closes the message */
+        http_connection->write_chunk(
             connection,
             template_handler->string_value,
-            (unsigned int) strlen((char *) template_handler->string_value),
+            strlen((char *) template_handler->string_value),
+            TRUE,
             _send_data_handler_file,
             handler_file_context
         );

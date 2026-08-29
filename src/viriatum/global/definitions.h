@@ -191,6 +191,7 @@ static __inline char *get_config_path(void) {
 #define VIRIATUM_DEFAULT_HANDLER "dispatch"
 #define VIRIATUM_DEFAULT_INDEX 1
 #define VIRIATUM_DEFAULT_USE_TEMPLATE 0
+#define VIRIATUM_DEFAULT_HTTP2 1
 #define VIRIATUM_NON_BLOCKING 1
 #define VIRIATUM_KEEPALIVE 1
 #define VIRIATUM_NO_WAIT 1
@@ -211,6 +212,7 @@ static __inline char *get_config_path(void) {
 #define VIRIATUM_DEFAULT_HANDLER "dispatch"
 #define VIRIATUM_DEFAULT_INDEX 1
 #define VIRIATUM_DEFAULT_USE_TEMPLATE 0
+#define VIRIATUM_DEFAULT_HTTP2 1
 #define VIRIATUM_NON_BLOCKING 1
 #define VIRIATUM_KEEPALIVE 1
 #define VIRIATUM_NO_WAIT 1
@@ -260,6 +262,13 @@ static __inline char *get_config_path(void) {
 #define VIRIATUM_IP6_S ""
 #endif
 
+/**
+ * The set of cipher suites that the service offers, every one of
+ * them provides both forward secrecy and authenticated encryption
+ * so that none of the ones that HTTP/2 refuses is ever negotiated.
+ */
+#define VIRIATUM_SSL_CIPHERS "ECDHE+AESGCM:ECDHE+CHACHA20:DHE+AESGCM:!aNULL:!eNULL:!MD5:!RC4:!3DES:!DSS"
+
 #ifdef VIRIATUM_SSL
 #define VIRIATUM_SSL_S " ssl"
 #else
@@ -272,6 +281,13 @@ static __inline char *get_config_path(void) {
 #define VIRIATUM_PCRE_S ""
 #endif
 
-#define _VIRIATUM_FLAGS VIRIATUM_DEBUG_S VIRIATUM_THREAD_SAFE_S VIRIATUM_MPOOL_S \
-    VIRIATUM_PREFORK_S VIRIATUM_EPOLL_S VIRIATUM_IP6_S VIRIATUM_SSL_S VIRIATUM_PCRE_S
+#ifdef VIRIATUM_HTTP2
+#define VIRIATUM_HTTP2_S " http2"
+#else
+#define VIRIATUM_HTTP2_S ""
+#endif
+
+#define _VIRIATUM_FLAGS VIRIATUM_DEBUG_S VIRIATUM_THREAD_SAFE_S VIRIATUM_MPOOL_S      \
+    VIRIATUM_PREFORK_S VIRIATUM_EPOLL_S VIRIATUM_IP6_S VIRIATUM_SSL_S VIRIATUM_PCRE_S \
+        VIRIATUM_HTTP2_S
 #define VIRIATUM_FLAGS TRIM_STRING(_VIRIATUM_FLAGS)

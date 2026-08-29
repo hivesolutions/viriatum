@@ -132,7 +132,7 @@ ERROR_CODE delete_handler_lua_context(struct handler_lua_context_t *handler_lua_
 
 ERROR_CODE set_handler_lua(struct http_connection_t *http_connection) {
     /* sets the HTTP parser values */
-    _set_http_parser_handler_lua(http_connection->http_parser);
+    _set_http_request_handler_lua(http_connection->request);
 
     /* sets the HTTP settings values */
     _set_http_settings_handler_lua(http_connection->http_settings);
@@ -143,7 +143,7 @@ ERROR_CODE set_handler_lua(struct http_connection_t *http_connection) {
 
 ERROR_CODE unset_handler_lua(struct http_connection_t *http_connection) {
     /* unsets the HTTP parser values */
-    _unset_http_parser_handler_lua(http_connection->http_parser);
+    _unset_http_request_handler_lua(http_connection->request);
 
     /* unsets the HTTP settings values */
     _unset_http_settings_handler_lua(http_connection->http_settings);
@@ -152,10 +152,10 @@ ERROR_CODE unset_handler_lua(struct http_connection_t *http_connection) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE message_begin_callback_handler_module(struct http_parser_t *http_parser) {
+ERROR_CODE message_begin_callback_handler_module(struct http_request_t *http_request) {
     /* retrieves the connection from the parser and then uses it to retrieve the
     correct Lua HTTP handler reference from the HTTP connection */
-    struct connection_t *connection = (struct connection_t *) http_parser->parameters;
+    struct connection_t *connection = (struct connection_t *) http_request->parameters;
     struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
     struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
     struct mod_lua_http_handler_t *mod_lua_http_handler =
@@ -170,9 +170,9 @@ ERROR_CODE message_begin_callback_handler_module(struct http_parser_t *http_pars
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE url_callback_handler_lua(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE url_callback_handler_lua(struct http_request_t *http_request, const unsigned char *data, size_t data_size) {
     /* retrieves the handler Lua context from the HTTP parser */
-    struct handler_lua_context_t *handler_lua_context = (struct handler_lua_context_t *) http_parser->context;
+    struct handler_lua_context_t *handler_lua_context = (struct handler_lua_context_t *) http_request->context;
 
     /* checks the position of the get parameters divisor position
     and then uses it to calculate the size of the (base) path */
@@ -212,9 +212,9 @@ ERROR_CODE url_callback_handler_lua(struct http_parser_t *http_parser, const uns
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE header_field_callback_handler_lua(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE header_field_callback_handler_lua(struct http_request_t *http_request, const unsigned char *data, size_t data_size) {
     /* retrieves the handler Lua context from the HTTP parser */
-    struct handler_lua_context_t *handler_lua_context = (struct handler_lua_context_t *) http_parser->context;
+    struct handler_lua_context_t *handler_lua_context = (struct handler_lua_context_t *) http_request->context;
 
     /* copies the current header name into the appropriate structure
     and also updates the size of the name string in it */
@@ -242,9 +242,9 @@ ERROR_CODE header_field_callback_handler_lua(struct http_parser_t *http_parser, 
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE header_value_callback_handler_lua(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE header_value_callback_handler_lua(struct http_request_t *http_request, const unsigned char *data, size_t data_size) {
     /* retrieves the handler Lua context from the HTTP parser */
-    struct handler_lua_context_t *handler_lua_context = (struct handler_lua_context_t *) http_parser->context;
+    struct handler_lua_context_t *handler_lua_context = (struct handler_lua_context_t *) http_request->context;
 
     /* allocates space for the pointer to be used for partial
     calculation on the header values */
@@ -340,17 +340,17 @@ ERROR_CODE header_value_callback_handler_lua(struct http_parser_t *http_parser, 
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE headers_complete_callback_handler_lua(struct http_parser_t *http_parser) {
+ERROR_CODE headers_complete_callback_handler_lua(struct http_request_t *http_request) {
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE body_callback_handler_lua(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE body_callback_handler_lua(struct http_request_t *http_request, const unsigned char *data, size_t data_size) {
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE message_complete_callback_handler_lua(struct http_parser_t *http_parser) {
+ERROR_CODE message_complete_callback_handler_lua(struct http_request_t *http_request) {
     /* allocates space for the error return value from the sending
     of the response (loading, execution, etc.) */
     ERROR_CODE return_value;
@@ -359,37 +359,37 @@ ERROR_CODE message_complete_callback_handler_lua(struct http_parser_t *http_pars
     /* sends (and creates) the response and retrieves the (possible)
     error code from it then in such case sends the error code to
     the connection through the upstream pipe */
-    return_value = _send_response_handler_lua(http_parser);
+    return_value = _send_response_handler_lua(http_request);
     if(IS_ERROR_CODE(return_value)) {
         /* retrieves the handler Lua context to access the URL for
         logging, then logs the error at warning level for visibility */
         handler_lua_context =
-            (struct handler_lua_context_t *) http_parser->context;
+            (struct handler_lua_context_t *) http_request->context;
         V_WARNING_CTX_F("mod_lua", "Lua error for %s: %s\n", handler_lua_context ? (char *) handler_lua_context->url : "/", (char *) GET_ERROR());
-        _write_error_connection_lua(http_parser, (char *) GET_ERROR());
+        _write_error_connection_lua(http_request, (char *) GET_ERROR());
     }
 
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE path_callback_handler_lua(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE path_callback_handler_lua(struct http_request_t *http_request, const unsigned char *data, size_t data_size) {
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE location_callback_handler_lua(struct http_parser_t *http_parser, size_t index, size_t offset) {
+ERROR_CODE location_callback_handler_lua(struct http_request_t *http_request, size_t index, size_t offset) {
     /* allocates space for the temporary file path size variables
     to be used in internal string size calculations */
     size_t file_path_size;
 
     /* retrieves the handler Lua context from the HTTP parser */
     struct handler_lua_context_t *handler_lua_context =
-        (struct handler_lua_context_t *) http_parser->context;
+        (struct handler_lua_context_t *) http_request->context;
 
     /* retrieves the connection from the parser and then uses it to retrieve the
     correct Lua HTTP handler reference from the HTTP connection */
-    struct connection_t *connection = (struct connection_t *) http_parser->parameters;
+    struct connection_t *connection = (struct connection_t *) http_request->parameters;
     struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
     struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
     struct mod_lua_http_handler_t *mod_lua_http_handler =
@@ -422,7 +422,7 @@ ERROR_CODE location_callback_handler_lua(struct http_parser_t *http_parser, size
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE virtual_url_callback_handler_lua(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size) {
+ERROR_CODE virtual_url_callback_handler_lua(struct http_request_t *http_request, const unsigned char *data, size_t data_size) {
     /* allocates space for the variable that will hold the new size
     of the prefix path to be used, by removing the new virtual URL
     from the previously set file name (path) */
@@ -431,7 +431,7 @@ ERROR_CODE virtual_url_callback_handler_lua(struct http_parser_t *http_parser, c
     /* retrieves the handler Lua context from the HTTP parser and then
     uses it to retrieve the size of the file name (path) for prefix
     size calculation (to be used as the prefix path) */
-    struct handler_lua_context_t *handler_lua_context = (struct handler_lua_context_t *) http_parser->context;
+    struct handler_lua_context_t *handler_lua_context = (struct handler_lua_context_t *) http_request->context;
     size_t _path_size = handler_lua_context->_file_name_string.length;
 
     /* checks the position of the get parameters divisor position
@@ -474,25 +474,25 @@ ERROR_CODE virtual_url_callback_handler_lua(struct http_parser_t *http_parser, c
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _set_http_parser_handler_lua(struct http_parser_t *http_parser) {
+ERROR_CODE _set_http_request_handler_lua(struct http_request_t *http_request) {
     /* allocates space for the handler Lua context and
     then creates and populates the instance after that
     sets the handler Lua context as the context for
     the HTTP parser */
     struct handler_lua_context_t *handler_lua_context;
     create_handler_lua_context(&handler_lua_context);
-    http_parser->context = handler_lua_context;
+    http_request->context = handler_lua_context;
 
     /* raises no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _unset_http_parser_handler_lua(struct http_parser_t *http_parser) {
+ERROR_CODE _unset_http_request_handler_lua(struct http_request_t *http_request) {
     /* retrieves the handler Lua context from the HTTP parser
     and then deletes (releases memory) */
-    struct handler_lua_context_t *handler_lua_context = (struct handler_lua_context_t *) http_parser->context;
+    struct handler_lua_context_t *handler_lua_context = (struct handler_lua_context_t *) http_request->context;
     delete_handler_lua_context(handler_lua_context);
-    http_parser->context = NULL;
+    http_request->context = NULL;
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -534,14 +534,14 @@ ERROR_CODE _unset_http_settings_handler_lua(struct http_settings_t *http_setting
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _send_response_handler_lua(struct http_parser_t *http_parser) {
+ERROR_CODE _send_response_handler_lua(struct http_request_t *http_request) {
     /* retrieves the connection from the HTTP parser parameters */
-    struct connection_t *connection = (struct connection_t *) http_parser->parameters;
+    struct connection_t *connection = (struct connection_t *) http_request->parameters;
 
     /* retrieves the HTTP connection from the io connection and uses it to retrieve
     the correct (mod Lua) handler to operate around it */
     struct http_connection_t *http_connection = (struct http_connection_t *) ((struct io_connection_t *) connection->lower)->lower;
-    struct handler_lua_context_t *handler_lua_context = (struct handler_lua_context_t *) http_parser->context;
+    struct handler_lua_context_t *handler_lua_context = (struct handler_lua_context_t *) http_request->context;
     struct mod_lua_http_handler_t *mod_lua_http_handler = (struct mod_lua_http_handler_t *) http_connection->http_handler->lower;
 
     /* allocates space for the result code and for the pointers that
@@ -563,6 +563,7 @@ ERROR_CODE _send_response_handler_lua(struct http_parser_t *http_parser) {
     char *response_buffer;
     char has_content_length;
     char _header_name_lower[VIRIATUM_MAX_HEADER_SIZE];
+    char _length[32];
     char *error_message;
     const char *header_name;
     const char *header_value;
@@ -596,7 +597,7 @@ ERROR_CODE _send_response_handler_lua(struct http_parser_t *http_parser) {
 
     /* sets the flags from the current HTTP parser in the Lua
     context for later reference */
-    handler_lua_context->flags = http_parser->flags;
+    handler_lua_context->flags = http_request->flags;
 
     /* runs the script in case the current file is considered to be
     dirty, this is the case for the loading of the module and reloading */
@@ -669,7 +670,7 @@ ERROR_CODE _send_response_handler_lua(struct http_parser_t *http_parser) {
     }
 
     /* builds the WSAPI environ table on the Lua stack */
-    _start_environ_lua(*lua_state_pointer, http_parser);
+    _start_environ_lua(*lua_state_pointer, http_request);
 
     /* calls the run function with 1 argument (environ) expecting 3 return
     values: status code, headers table, body iterator */
@@ -757,15 +758,14 @@ ERROR_CODE _send_response_handler_lua(struct http_parser_t *http_parser) {
     /* allocates space for the header buffer and then writes the default values
     into it the value is dynamically constructed based on the current header values */
     connection->alloc_data(connection, VIRIATUM_HTTP_MAX_SIZE, (void **) &headers_buffer);
-    count = http_connection->write_headers(
+    count = http_connection->write_status(
         connection,
         headers_buffer,
-        VIRIATUM_HTTP_SIZE,
-        HTTP11,
+        VIRIATUM_HTTP_MAX_SIZE,
+        http_request->version,
         status_code,
         (char *) status_message,
-        http_parser->flags & FLAG_KEEP_ALIVE ? KEEP_ALIVE : KEEP_CLOSE,
-        FALSE
+        http_request->flags & FLAG_KEEP_ALIVE ? KEEP_ALIVE : KEEP_CLOSE
     );
 
     /* tracks whether the script already provided a Content-Length
@@ -784,10 +784,11 @@ ERROR_CODE _send_response_handler_lua(struct http_parser_t *http_parser) {
             /* copies the current header into the current position of the headers
             buffer (header copy), note that the trailing newlines are counted in size */
             if(header_name != NULL && header_value != NULL) {
-                count += SPRINTF(
-                    &headers_buffer[count],
-                    VIRIATUM_MAX_HEADER_C_SIZE,
-                    "%s: %s\r\n",
+                count = http_connection->write_field(
+                    connection,
+                    headers_buffer,
+                    VIRIATUM_HTTP_MAX_SIZE,
+                    count,
                     header_name,
                     header_value
                 );
@@ -854,33 +855,27 @@ ERROR_CODE _send_response_handler_lua(struct http_parser_t *http_parser) {
     /* in case the script did not provide a Content-Length header
     auto-inserts one based on the collected body size */
     if(!has_content_length) {
-        count += SPRINTF(
-            &headers_buffer[count],
-            VIRIATUM_MAX_HEADER_C_SIZE,
-            "Content-Length: %lu\r\n",
-            (unsigned long) body_size
+        SPRINTF(_length, sizeof(_length), "%lu", (unsigned long) body_size);
+        count = http_connection->write_field(
+            connection,
+            headers_buffer,
+            VIRIATUM_HTTP_MAX_SIZE,
+            count,
+            CONTENT_LENGTH_H,
+            _length
         );
     }
 
-    /* finishes the current headers sequence with the final carriage return newline
-    character values to close the headers part of the envelope */
-    memcpy(&headers_buffer[count], "\r\n", 2);
-    count += 2;
+    /* finishes the current headers sequence, closing the headers part
+    of the envelope in the encoding of the protocol in use */
+    count = http_connection->write_end(connection, headers_buffer, VIRIATUM_HTTP_MAX_SIZE, count, FALSE);
 
-    /* allocates the final response buffer containing both headers and
-    body then copies the headers and body data into it */
-    connection->alloc_data(connection, count + body_size, (void **) &response_buffer);
-    memcpy(response_buffer, headers_buffer, count);
-
-    /* releases the headers buffer as it has been copied into the
-    response buffer and is no longer needed */
-    FREE(headers_buffer);
-
-    /* in case there is body data available copies it into the
-    response buffer after the headers */
+    /* gathers the payload into a buffer of its own, the protocol is
+    the one framing it and so it travels as a write of its own */
+    connection->alloc_data(connection, body_size > 0 ? body_size : 1, (void **) &response_buffer);
     if(body_size > 0) {
         body_chunk = lua_tolstring(*lua_state_pointer, -1, &body_chunk_size);
-        if(body_chunk != NULL) { memcpy(&response_buffer[count], body_chunk, body_size); }
+        if(body_chunk != NULL) { memcpy(response_buffer, body_chunk, body_size); }
         lua_pop(*lua_state_pointer, 1);
     }
 
@@ -888,13 +883,16 @@ ERROR_CODE _send_response_handler_lua(struct http_parser_t *http_parser) {
     (status, headers, iterator) */
     lua_pop(*lua_state_pointer, 3);
 
-    /* writes the complete response (headers + body) to the connection */
-    connection->write_connection(
+    /* writes the headers and then the payload to the connection, the
+    buffer of the headers is released by the connection itself */
+    http_connection->write_flush(connection, (unsigned char *) headers_buffer, count, NULL, NULL);
+    http_connection->write_chunk(
         connection,
         (unsigned char *) response_buffer,
-        (unsigned int) (count + body_size),
+        body_size,
+        TRUE,
         _send_response_callback_handler_lua,
-        (void *) (size_t) http_parser->flags
+        (void *) (size_t) http_request->flags
     );
 
     /* raise no error */
@@ -934,12 +932,12 @@ ERROR_CODE _send_response_callback_handler_lua(struct connection_t *connection, 
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _write_error_connection_lua(struct http_parser_t *http_parser, char *message) {
+ERROR_CODE _write_error_connection_lua(struct http_request_t *http_request, char *message) {
     /* allocates space for the buffer to be used in the message */
     unsigned char *buffer;
 
     /* retrieves the connection from the HTTP parser parameters */
-    struct connection_t *connection = (struct connection_t *) http_parser->parameters;
+    struct connection_t *connection = (struct connection_t *) http_request->parameters;
 
     /* retrieves the underlying connection references in order to be
     able to operate over them, for unregister */
@@ -957,16 +955,16 @@ ERROR_CODE _write_error_connection_lua(struct http_parser_t *http_parser, char *
         500,
         "Internal Server Error",
         message,
-        http_parser->flags & FLAG_KEEP_ALIVE ? KEEP_ALIVE : KEEP_CLOSE,
+        http_request->flags & FLAG_KEEP_ALIVE ? KEEP_ALIVE : KEEP_CLOSE,
         _send_response_callback_handler_lua,
-        (void *) (size_t) http_parser->flags
+        (void *) (size_t) http_request->flags
     );
 
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE _start_environ_lua(lua_State *lua_state, struct http_parser_t *http_parser) {
+ERROR_CODE _start_environ_lua(lua_State *lua_state, struct http_request_t *http_request) {
     /* allocates space for the counter to be used for iteration
     on the various header values */
     size_t index;
@@ -982,10 +980,10 @@ ERROR_CODE _start_environ_lua(lua_State *lua_state, struct http_parser_t *http_p
 
     /* retrieves the connection from the HTTP parser parameters
     and then retrieves the handler Lua context */
-    struct connection_t *connection = (struct connection_t *) http_parser->parameters;
+    struct connection_t *connection = (struct connection_t *) http_request->parameters;
     struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
     struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
-    struct handler_lua_context_t *handler_lua_context = (struct handler_lua_context_t *) http_parser->context;
+    struct handler_lua_context_t *handler_lua_context = (struct handler_lua_context_t *) http_request->context;
 
     /* retrieves the port (string representation) from the service
     options associated with the current connection */
@@ -993,12 +991,12 @@ ERROR_CODE _start_environ_lua(lua_State *lua_state, struct http_parser_t *http_p
 
     /* retrieves the HTTP method string value accessing the array of
     static string values */
-    char *method = (char *) http_method_strings[http_parser->method - 1];
+    char *method = (char *) http_method_strings[http_request->method - 1];
 
     /* in case there is contents to be read retrieves the appropriate
     reference to the start of the post data in the connection buffer */
-    if(http_parser->_content_length > 0) {
-        post_data = &http_connection->buffer[http_connection->buffer_offset - http_parser->_content_length];
+    if(http_request->content_length > 0) {
+        post_data = &http_connection->buffer[http_connection->buffer_offset - http_request->content_length];
     } else {
         post_data = NULL;
     }
@@ -1068,7 +1066,7 @@ ERROR_CODE _start_environ_lua(lua_State *lua_state, struct http_parser_t *http_p
 
     /* creates and pushes the input userdata object that provides
     a read() method for accessing the request body (WSAPI input) */
-    lua_input_push(lua_state, post_data, http_parser->_content_length);
+    lua_input_push(lua_state, post_data, http_request->content_length);
     lua_setfield(lua_state, -2, "input");
 
     /* creates a simple table with a write() method that logs to the

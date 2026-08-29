@@ -7,9 +7,11 @@ import base64
 import gc
 import hashlib
 import os
+import shutil
 import signal
 import socket
 import struct
+import subprocess
 import sys
 import threading
 import time
@@ -805,6 +807,28 @@ class AsgiTest(ServerCase):
         self.assertEqual(result.headers.get("Transfer-Encoding"), "chunked")
         self.assertEqual(result.headers.get("Content-Length"), None)
 
+    def test_streaming_keep_alive(self):
+        # verifies that a response whose size is not known in advance
+        # still bounds the message, so a connection that is kept alive
+        # carries a second one after it rather than leaving the client
+        # waiting for the rest of the first forever
+        connection = http.client.HTTPConnection("127.0.0.1", self.port, timeout=5)
+        connection.auto_open = 0
+        connection.connect()
+        connection.request("GET", "/stream")
+        result = connection.getresponse()
+        self.assertEqual(result.read(), b"chunk0-chunk1-chunk2-end")
+        self.assertEqual(result.headers.get("Transfer-Encoding"), "chunked")
+        self.assertEqual(result.headers.get("Content-Length"), None)
+
+        # the message of the stream has been bounded by the framing of
+        # the chunks, so the one that follows it is served just the
+        # same on the very same connection
+        connection.request("GET", "/plain")
+        result = connection.getresponse()
+        self.assertEqual(result.read(), b"plain")
+        connection.close()
+
     def test_streaming_framing(self):
         # verifies that each of the chunks reaches the wire framed on
         # its own, which is what makes the response a streamed one
@@ -990,18 +1014,59 @@ class AsgiTest(ServerCase):
         result = urllib.request.urlopen(self._url("/plain"), timeout=5)
         self.assertEqual(result.read(), b"plain")
 
-    def test_close_by_default(self):
-        # verifies that a request that does not ask for the keeping
-        # of the connection has it closed, mirroring the other
-        # handlers of the server which use the same flag
+    def test_keep_alive_by_default(self):
+        # verifies that a request of the most recent version of the
+        # protocol keeps the connection alive without asking for it
+        # and closes it when it does ask, which is what the
+        # specification requires of each of the two cases
         connection = http.client.HTTPConnection("127.0.0.1", self.port, timeout=5)
         connection.auto_open = 0
         connection.connect()
         connection.request("GET", "/plain")
         result = connection.getresponse()
         self.assertEqual(result.read(), b"plain")
+        self.assertEqual(result.headers.get("Connection"), "keep-alive")
+
+        # sends a second message over the very same connection, which
+        # only reaches the server because the first one kept it alive
+        connection.request("GET", "/plain", headers={"Connection": "close"})
+        result = connection.getresponse()
+        self.assertEqual(result.read(), b"plain")
         self.assertEqual(result.headers.get("Connection"), "close")
         connection.close()
+
+    def test_multiplexed_streams(self):
+        # verifies that several requests travelling at the same time on
+        # one connection of the most recent version of the protocol are
+        # each answered on the stream they came in on, an application
+        # answers on a clock of its own and by then the connection is
+        # likely serving another of the messages that travel on it
+        nghttp = shutil.which("nghttp")
+        if nghttp is None:
+            self.skipTest("no client of the most recent version is available")
+
+        # the client opens a single connection and asks for every one
+        # of the resources on a stream of its own, which is what makes
+        # the answers of them travel at the same time
+        paths = ["/scope?a=1", "/scope?a=2", "/scope?a=3", "/scope?a=4"]
+        process = subprocess.Popen(
+            [nghttp] + [self._url(path) for path in paths],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+        output = process.communicate(timeout=30)[0].decode()
+        self.assertEqual(process.returncode, 0)
+
+        # every one of the answers carries the query of the request it
+        # belongs to, one that had been written on another stream would
+        # carry the query of that one twice over and leave the query of
+        # the stream it belonged to out of the answers altogether
+        for index in range(1, len(paths) + 1):
+            self.assertEqual(output.count("a=%d" % index), 1)
+
+        # the answers name the version that served them, which is the
+        # most recent one as the client asked for nothing else
+        self.assertEqual(output.count("'2'"), len(paths))
 
     def test_system_exit(self):
         # verifies that an application requesting a system exit does
@@ -1061,6 +1126,40 @@ class AsgiTest(ServerCase):
             ast.literal_eval(result.read().decode()), [(b"x-custom-value", b"custom")]
         )
         connection.close()
+
+    def test_multiplexed_released(self):
+        # verifies that the objects of a request are released once the
+        # stream that carried it is over, several of them travel at the
+        # same time on one connection and each one carries a context of
+        # its own that must not outlive the stream
+        nghttp = shutil.which("nghttp")
+        if nghttp is None:
+            self.skipTest("no client of the most recent version is available")
+
+        def request(count):
+            paths = [self._url("/scope?a=%d" % index) for index in range(count)]
+            process = subprocess.Popen(
+                [nghttp] + paths, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+            )
+            process.communicate(timeout=30)
+            self.assertEqual(process.returncode, 0)
+
+        def objects():
+            gc.collect()
+            return len(gc.get_objects())
+
+        # a first round warms whatever is built once and kept, the
+        # count is only meaningful once that has settled
+        request(8)
+        time.sleep(0.5)
+        initial = objects()
+        request(40)
+        time.sleep(1.0)
+        retained = objects() - initial
+        self.assertTrue(
+            retained < 200,
+            "retained %d objects across 40 multiplexed streams" % retained,
+        )
 
     def test_pending_writes_released(self):
         # verifies that the payloads queued in a connection that is

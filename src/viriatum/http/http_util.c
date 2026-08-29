@@ -26,6 +26,148 @@
 
 #include "http_util.h"
 
+size_t write_status_http(
+    struct connection_t *connection,
+    char *buffer,
+    size_t size,
+    enum http_version_e version,
+    int status_code,
+    char *status_message,
+    enum http_keep_alive_e keep_alive
+) {
+    /* writes the status line together with the fields that every
+    response of this version of the protocol carries, the section is
+    left open so that the handler appends its own fields */
+    return write_http_headers(
+        connection,
+        buffer,
+        size,
+        version,
+        status_code,
+        status_message,
+        keep_alive,
+        FALSE
+    );
+}
+
+size_t write_field_http(
+    struct connection_t *connection,
+    char *buffer,
+    size_t size,
+    size_t offset,
+    const char *name,
+    const char *value
+) {
+    /* gathers the room that the field takes, the name and the value
+    of it plus the separator, the end of the line and the byte that
+    closes the string that is built */
+    size_t required = strlen(name) + strlen(value) + 5;
+
+    /* a field that does not fit the buffer is left out of the
+    response rather than written past the end of it */
+    if(offset + required > size) { return offset; }
+
+    /* appends the field in the plain form of a name, a colon and a
+    value, closed by the sequence that separates the lines */
+    return offset + SPRINTF(&buffer[offset], size - offset, "%s: %s\r\n", name, value);
+}
+
+size_t write_end_http(
+    struct connection_t *connection,
+    char *buffer,
+    size_t size,
+    size_t offset,
+    char last
+) {
+    /* closes the section with the empty line that separates it from
+    the payload that may follow it, the sequence is written directly
+    as it carries no value at all to be formatted */
+    if(offset + 3 > size) { return offset; }
+    buffer[offset] = '\r';
+    buffer[offset + 1] = '\n';
+    buffer[offset + 2] = '\0';
+    return offset + 2;
+}
+
+ERROR_CODE write_chunk_http(
+    struct connection_t *connection,
+    unsigned char *data,
+    size_t size,
+    char last,
+    connection_data_callback_hu callback,
+    void *parameters
+) {
+    /* under this version of the protocol the payload travels with
+    nothing framing it, so it is written as it stands */
+    write_connection(
+        connection,
+        data,
+        (unsigned int) size,
+        (connection_data_callback) callback,
+        parameters
+    );
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+size_t write_line_http(
+    struct connection_t *connection,
+    char *buffer,
+    size_t size,
+    size_t offset,
+    const char *line
+) {
+    /* allocates space for the name of the field, for the position of
+    the separator that closes it and for the substrates of the
+    connection that carry the writing operations */
+    char name[VIRIATUM_MAX_HEADER_SIZE];
+    const char *separator = strchr(line, ':');
+    size_t name_size;
+    struct io_connection_t *io_connection;
+    struct http_connection_t *http_connection;
+
+    /* a line that carries no separator at all is not a field and so
+    it is left out of the response */
+    if(separator == NULL) { return offset; }
+
+    name_size = (size_t) (separator - line);
+    if(name_size >= sizeof(name)) { return offset; }
+    memcpy(name, line, name_size);
+    name[name_size] = '\0';
+
+    /* moves past the separator and the space that usually follows it,
+    what remains is the value of the field */
+    separator++;
+    while(*separator == ' ') { separator++; }
+
+    io_connection = (struct io_connection_t *) connection->lower;
+    http_connection = (struct http_connection_t *) io_connection->lower;
+
+    return http_connection->write_field(connection, buffer, size, offset, name, separator);
+}
+
+ERROR_CODE write_flush_http(
+    struct connection_t *connection,
+    unsigned char *data,
+    size_t size,
+    connection_data_callback_hu callback,
+    void *parameters
+) {
+    /* under this version of the protocol the response travels in the
+    very shape it has been built in */
+    write_connection(
+        connection,
+        data,
+        (unsigned int) size,
+        (connection_data_callback) callback,
+        parameters
+    );
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
 size_t write_http_headers(
     struct connection_t *connection,
     char *buffer, size_t size,
@@ -212,6 +354,113 @@ ERROR_CODE write_http_message(
     RAISE_NO_ERROR;
 }
 
+/**
+ * Writes a complete error response through the operations of the
+ * connection, so that the encoding of it follows the protocol that
+ * is serving it rather than being fixed at HTTP/1.1.
+ * The buffer of the headers is handed over to the connection, which
+ * releases it once the write completes, while the payload is copied
+ * so that a caller may hand over one that it does not own.
+ *
+ * @param connection The connection the response belongs to.
+ * @param buffer The buffer the headers are built in.
+ * @param size The size in bytes of the buffer of the headers.
+ * @param version The version of the protocol in use.
+ * @param error_code The status code of the response.
+ * @param error_message The message that describes the status.
+ * @param keep_alive The mode the connection is left in.
+ * @param realm The realm of the authentication, when there's one.
+ * @param message The payload of the response.
+ * @param message_size The size in bytes of the payload.
+ * @param callback The callback of the completion of the write.
+ * @param parameters The value handed to the callback.
+ * @return The resulting error code.
+ */
+static ERROR_CODE _write_error_http(
+    struct connection_t *connection,
+    char *buffer,
+    size_t size,
+    enum http_version_e version,
+    int error_code,
+    char *error_message,
+    enum http_keep_alive_e keep_alive,
+    char *realm,
+    unsigned char *message,
+    size_t message_size,
+    connection_data_callback_hu callback,
+    void *parameters
+) {
+    /* allocates space for the position in the buffer, for the text of
+    the length of the payload and for the one of the realm */
+    size_t count;
+    char length[32];
+    char authenticate[VIRIATUM_MAX_HEADER_SIZE];
+    unsigned char *payload;
+
+    /* retrieves the underlying connection references so that the
+    operations that write a response may be reached */
+    struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
+    struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
+
+    /* builds the headers of the response, the length of the payload is
+    always announced as the payload is fully built by now */
+    count = http_connection->write_status(
+        connection,
+        buffer,
+        size,
+        version,
+        error_code,
+        error_message,
+        keep_alive
+    );
+    SPRINTF(length, sizeof(length), "%lu", (long unsigned int) message_size);
+    count = http_connection->write_field(connection, buffer, size, count, CONTENT_LENGTH_H, length);
+    count = http_connection->write_field(
+        connection,
+        buffer,
+        size,
+        count,
+        CACHE_CONTROL_H,
+        cache_codes[NO_CACHE - 1]
+    );
+
+    /* announces the authentication that the client is expected to
+    provide, only present when a realm has been given */
+    if(realm != NULL) {
+        SPRINTF(authenticate, sizeof(authenticate), "Basic realm=\"%s\"", realm);
+        count = http_connection->write_field(
+            connection,
+            buffer,
+            size,
+            count,
+            WWW_AUTHENTICATE_H,
+            authenticate
+        );
+    }
+    count = http_connection->write_end(connection, buffer, size, count, FALSE);
+
+    /* copies the payload into a buffer of its own, the one of the
+    caller may well be sitting in the stack and the connection is the
+    one releasing whatever it is handed */
+    payload = (unsigned char *) MALLOC(message_size);
+    memcpy(payload, message, message_size);
+
+    /* writes the headers and then the payload, the callback of the
+    caller travels with the last of the two */
+    http_connection->write_flush(connection, (unsigned char *) buffer, count, NULL, NULL);
+    http_connection->write_chunk(
+        connection,
+        payload,
+        message_size,
+        TRUE,
+        (connection_data_callback_sh) callback,
+        parameters
+    );
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
 ERROR_CODE write_http_error(
     struct connection_t *connection,
     char *buffer,
@@ -252,14 +501,8 @@ ERROR_CODE write_http_error_a(
     connection_data_callback_hu callback,
     void *callback_parameters
 ) {
-    /* allocates space for the result buffer related
-    variables (for both the buffer pointer and size) */
-    size_t result_length;
-    unsigned char *result_buffer;
-
-    /* allocates space for the references the string
-    buffer and template handler structures */
-    struct string_buffer_t *string_buffer;
+    /* allocates space for the reference to the template handler
+    structure, the one that produces the page of the error */
     struct template_handler_t *template_handler;
 
     /* allocates space for the "possible" locally generated
@@ -351,7 +594,7 @@ ERROR_CODE write_http_error_a(
                 error_message,
                 error_description
             );
-            write_http_headers_m(
+            _write_error_http(
                 connection,
                 headers_buffer,
                 size,
@@ -359,15 +602,10 @@ ERROR_CODE write_http_error_a(
                 error_code,
                 error_message,
                 keep_alive,
+                NULL,
+                (unsigned char *) _error_description,
                 strlen(_error_description),
-                NO_CACHE,
-                _error_description
-            );
-            write_connection(
-                connection,
-                (unsigned char *) headers_buffer,
-                (unsigned int) strlen(headers_buffer),
-                (connection_data_callback) callback,
+                callback,
                 callback_parameters
             );
             RAISE_NO_ERROR;
@@ -379,59 +617,27 @@ ERROR_CODE write_http_error_a(
             template_path,
             (unsigned long) strlen((char *) template_handler->string_value)
         );
-        realm == NULL ? write_http_headers_c(
-                            connection,
-                            headers_buffer,
-                            size,
-                            version,
-                            error_code,
-                            error_message,
-                            keep_alive,
-                            strlen((char *) template_handler->string_value),
-                            NO_CACHE,
-                            TRUE
-                        )
-                      : write_http_headers_a(
-                            connection,
-                            headers_buffer,
-                            size,
-                            version,
-                            error_code,
-                            error_message,
-                            keep_alive,
-                            strlen((char *) template_handler->string_value),
-                            NO_CACHE,
-                            realm,
-                            TRUE
-                        );
-
-        /* creates a new string buffer to hold the complete set of contents
-        to be sent to the client then first writes the buffer containing
-        the headers and then the resulting contents from the template handler */
-        create_string_buffer(&string_buffer);
-        append_string_buffer(string_buffer, (unsigned char *) headers_buffer);
-        append_string_buffer(string_buffer, template_handler->string_value);
-        join_string_buffer(string_buffer, &result_buffer);
-        result_length = string_buffer->string_length;
-        delete_string_buffer(string_buffer);
+        /* writes the response through the operations of the connection
+        so that the encoding of it follows the protocol in use, the
+        contents of the template are copied by it */
+        _write_error_http(
+            connection,
+            headers_buffer,
+            size,
+            version,
+            error_code,
+            error_message,
+            keep_alive,
+            realm,
+            template_handler->string_value,
+            strlen((char *) template_handler->string_value),
+            callback,
+            callback_parameters
+        );
 
         /* deletes the template handler as all the processing on it
         has been done (buffer generated) */
         delete_template_handler(template_handler);
-
-        /* releases the contents of the headers buffer, no more need to
-        continue using them (not required) */
-        FREE(headers_buffer);
-
-        /* writes the resulting buffer into the connection in order to be sent
-        to the client (sends the template results) in one chunk */
-        write_connection(
-            connection,
-            result_buffer,
-            (unsigned int) result_length,
-            (connection_data_callback) callback,
-            callback_parameters
-        );
     } else {
         /* "stringifies" a possible null error description into a description
         string in order to be correctly displayed then formats the error
@@ -446,9 +652,9 @@ ERROR_CODE write_http_error_a(
             error_description
         );
 
-        /* writes the HTTP static headers to the response and
-        then writes the error description itself */
-        write_http_headers_m(
+        /* writes the response through the operations of the connection
+        so that the encoding of it follows the protocol in use */
+        _write_error_http(
             connection,
             headers_buffer,
             size,
@@ -456,18 +662,10 @@ ERROR_CODE write_http_error_a(
             error_code,
             error_message,
             keep_alive,
+            realm,
+            (unsigned char *) _error_description,
             strlen(_error_description),
-            NO_CACHE,
-            _error_description
-        );
-
-        /* writes both the headers to the connection, an then
-        registers for the appropriate callbacks */
-        write_connection(
-            connection,
-            (unsigned char *) headers_buffer,
-            (unsigned int) strlen(headers_buffer),
-            (connection_data_callback) callback,
+            callback,
             callback_parameters
         );
     }

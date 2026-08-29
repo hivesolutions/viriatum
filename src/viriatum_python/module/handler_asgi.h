@@ -94,10 +94,10 @@
  * The response that refuses a handshake, sent whenever the
  * application closes the connection before accepting it.
  */
-#define VIRIATUM_ASGI_REJECTED \
+#define VIRIATUM_ASGI_REJECTED   \
     "HTTP/1.1 403 Forbidden\r\n" \
-    "Content-Length: 0\r\n" \
-    "Connection: close\r\n" \
+    "Content-Length: 0\r\n"      \
+    "Connection: close\r\n"      \
     "\r\n"
 
 /**
@@ -209,6 +209,12 @@ typedef struct handler_asgi_context_t {
     unsigned char flags;
 
     /**
+     * The version of the protocol that has delivered the request,
+     * it decides the encoding of the response.
+     */
+    enum http_version_e version;
+
+    /**
      * The state of the websocket connection, set to the none
      * value for the plain http requests.
      */
@@ -268,6 +274,15 @@ typedef struct handler_asgi_context_t {
      * for the writing of the various parts of the response.
      */
     struct connection_t *connection;
+
+    /**
+     * The message that originated the request, it is made the
+     * current one of the connection before each part of the
+     * response is written, an application answers on a clock of
+     * its own and by then the connection is likely serving
+     * another of the messages that travel on it.
+     */
+    struct http_request_t *http_request;
 
     /**
      * Flag controlling if the payload of the request exceeded the
@@ -330,20 +345,20 @@ ERROR_CODE startup_handler_asgi(struct service_t *service);
 ERROR_CODE shutdown_handler_asgi(struct service_t *service);
 ERROR_CODE set_handler_asgi(struct http_connection_t *http_connection);
 ERROR_CODE unset_handler_asgi(struct http_connection_t *http_connection);
-ERROR_CODE message_begin_callback_handler_asgi(struct http_parser_t *http_parser);
-ERROR_CODE url_callback_handler_asgi(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size);
-ERROR_CODE header_field_callback_handler_asgi(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size);
-ERROR_CODE header_value_callback_handler_asgi(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size);
-ERROR_CODE headers_complete_callback_handler_asgi(struct http_parser_t *http_parser);
-ERROR_CODE body_callback_handler_asgi(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size);
-ERROR_CODE message_complete_callback_handler_asgi(struct http_parser_t *http_parser);
-ERROR_CODE path_callback_handler_asgi(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size);
-ERROR_CODE location_callback_handler_asgi(struct http_parser_t *http_parser, size_t index, size_t offset);
-ERROR_CODE virtual_url_callback_handler_asgi(struct http_parser_t *http_parser, const unsigned char *data, size_t data_size);
+ERROR_CODE message_begin_callback_handler_asgi(struct http_request_t *http_request);
+ERROR_CODE url_callback_handler_asgi(struct http_request_t *http_request, const unsigned char *data, size_t data_size);
+ERROR_CODE header_field_callback_handler_asgi(struct http_request_t *http_request, const unsigned char *data, size_t data_size);
+ERROR_CODE header_value_callback_handler_asgi(struct http_request_t *http_request, const unsigned char *data, size_t data_size);
+ERROR_CODE headers_complete_callback_handler_asgi(struct http_request_t *http_request);
+ERROR_CODE body_callback_handler_asgi(struct http_request_t *http_request, const unsigned char *data, size_t data_size);
+ERROR_CODE message_complete_callback_handler_asgi(struct http_request_t *http_request);
+ERROR_CODE path_callback_handler_asgi(struct http_request_t *http_request, const unsigned char *data, size_t data_size);
+ERROR_CODE location_callback_handler_asgi(struct http_request_t *http_request, size_t index, size_t offset);
+ERROR_CODE virtual_url_callback_handler_asgi(struct http_request_t *http_request, const unsigned char *data, size_t data_size);
 ERROR_CODE data_handler_websocket_asgi(struct io_connection_t *io_connection, unsigned char *buffer, size_t buffer_size);
-ERROR_CODE _set_http_parser_handler_asgi(struct http_parser_t *http_parser);
-ERROR_CODE _unset_http_parser_handler_asgi(struct http_parser_t *http_parser);
+ERROR_CODE _set_http_request_handler_asgi(struct http_request_t *http_request);
+ERROR_CODE _unset_http_request_handler_asgi(struct http_request_t *http_request);
 ERROR_CODE _set_http_settings_handler_asgi(struct http_settings_t *http_settings);
 ERROR_CODE _unset_http_settings_handler_asgi(struct http_settings_t *http_settings);
-ERROR_CODE _call_application_handler_asgi(struct http_parser_t *http_parser);
+ERROR_CODE _call_application_handler_asgi(struct http_request_t *http_request);
 ERROR_CODE _send_response_callback_handler_asgi(struct connection_t *connection, struct data_t *data, void *parameters);

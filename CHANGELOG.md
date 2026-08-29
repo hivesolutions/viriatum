@@ -9,11 +9,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+* Header compression for HTTP/2, built from scratch with no new dependency
+* Framing, streams and flow control for HTTP/2
+* Serving of requests over HTTP/2 in cleartext, without any negotiation
+* Negotiation of HTTP/2 through the transport, which is what a browser uses
+* Serving of the python applications, the modules and the error pages over HTTP/2
+* Setting that turns the cleartext form of HTTP/2 off
+* Resources listed in a location are now promised to the client over HTTP/2 - [#50](https://github.com/hivesolutions/viriatum/issues/50)
+* The order a client asks for now decides which stream writes first - [#50](https://github.com/hivesolutions/viriatum/issues/50)
+* Build option that leaves HTTP/2 out for the smaller targets - [#50](https://github.com/hivesolutions/viriatum/issues/50)
+* Conformance and interoperability of HTTP/2 are now measured on every change - [#50](https://github.com/hivesolutions/viriatum/issues/50)
+* A stream of HTTP/2 now refuses what it is not allowed to receive at each point of its life - [#50](https://github.com/hivesolutions/viriatum/issues/50)
 * Continuous integration now builds with clang 22 and gcc 16
+* Continuous integration now fails when the code is not formatted as the project asks
+* Continuous integration now measures the memory of the tree and fails when it gets worse
 * Scalable vector versions of the web illustrations, logos and UI assets
 
 ### Changed
 
+* Handlers now serve a request without knowing which protocol delivered it
+* Secure connections now refuse everything below TLS 1.2 and the weaker ciphers
 * Web pages now adapt to the small screen of a phone, the file listing included
 * Pages now use the scalable favicon whenever the browser supports it
 * Illustrations, logos and the listing arrow are now served as vectors
@@ -21,6 +36,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 * Docker images of the PHP and full variants now build for the architecture of the machine instead of always amd64
+* A file served over HTTP/2 is now closed once the response has been sent - [#50](https://github.com/hivesolutions/viriatum/issues/50)
+* A client that narrows the window of a stream now receives what was held back - [#50](https://github.com/hivesolutions/viriatum/issues/50)
+* A proxied request with large headers no longer corrupts the memory of the server
+* The command that reports the information of the service no longer starts it
+* Connections are now kept alive by default, throughput no longer collapses under load
+* A client that closes a connection now still receives the reason the server gives for it
+* The certificate that ships is accepted again by a current library
+* The Xcode project builds again and includes every source file in the tree
+* A window widened for a promised stream no longer takes the connection down
+* Sorting a sequence no longer reads past the end of it
+* Reading a configuration section no longer reads past the end of its name
+* A service that fails to start no longer leaves its handlers behind
 
 ## [0.5.0] - 2026-08-28
 

@@ -234,6 +234,8 @@
 		C2B2B79617561427002F55D1 /* passwd.h in Headers */ = {isa = PBXBuildFile; fileRef = C2B2B78C17561421002F55D1 /* passwd.h */; };
 		C2B2B79717561427002F55D1 /* url.c in Sources */ = {isa = PBXBuildFile; fileRef = C2B2B78D17561421002F55D1 /* url.c */; };
 		C2B2B79817561427002F55D1 /* url.h in Headers */ = {isa = PBXBuildFile; fileRef = C2B2B78E17561421002F55D1 /* url.h */; };
+		E70F1425133CCCA2576920C0 /* report.c in Sources */ = {isa = PBXBuildFile; fileRef = F3AFF758B00B7BDAF0AFC105 /* report.c */; };
+		CD238FDF12617A68D64F1D3B /* unit.c in Sources */ = {isa = PBXBuildFile; fileRef = FA27AE54BFDF8C45672194A9 /* unit.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -353,6 +355,11 @@
 		C2B2B78C17561421002F55D1 /* passwd.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = passwd.h; sourceTree = "<group>"; };
 		C2B2B78D17561421002F55D1 /* url.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = url.c; sourceTree = "<group>"; };
 		C2B2B78E17561421002F55D1 /* url.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = url.h; sourceTree = "<group>"; };
+		F3AFF758B00B7BDAF0AFC105 /* report.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = report.c; sourceTree = "<group>"; };
+		8194AA841E2D7327898B51B0 /* report.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = report.h; sourceTree = "<group>"; };
+		1BB2C5E4723050F0CE5E44BF /* test.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = test.h; sourceTree = "<group>"; };
+		FA27AE54BFDF8C45672194A9 /* unit.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = unit.c; sourceTree = "<group>"; };
+		3A2E5CCF5935D5F32E51E4F1 /* unit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = unit.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -411,6 +418,7 @@
 				C295E0A6155BCB7800036037 /* stream */,
 				C295E0B0155BCB7800036037 /* structures */,
 				C295E0C4155BCB7800036037 /* system */,
+				F87EE692E6200A38016F153E /* test */,
 				C295E0CC155BCB7800036037 /* template */,
 				C295E0D2155BCB7800036037 /* thread */,
 				C295E0D6155BCB7800036037 /* util */,
@@ -690,6 +698,19 @@
 			name = root;
 			sourceTree = "<group>";
 		};
+		F87EE692E6200A38016F153E /* test */ = {
+			isa = PBXGroup;
+			children = (
+				F3AFF758B00B7BDAF0AFC105 /* report.c */,
+				8194AA841E2D7327898B51B0 /* report.h */,
+				1BB2C5E4723050F0CE5E44BF /* test.h */,
+				FA27AE54BFDF8C45672194A9 /* unit.c */,
+				3A2E5CCF5935D5F32E51E4F1 /* unit.h */,
+			);
+			name = test;
+			path = ../../../src/viriatum_commons/test;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -960,6 +981,8 @@
 				C2B2B79017561421002F55D1 /* passwd.c in Sources */,
 				C2B2B79217561421002F55D1 /* url.c in Sources */,
 				C256798218365FD300B8AB66 /* priority_queue.c in Sources */,
+				E70F1425133CCCA2576920C0 /* report.c in Sources */,
+				CD238FDF12617A68D64F1D3B /* unit.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1007,6 +1030,8 @@
 				C2B2B79517561427002F55D1 /* passwd.c in Sources */,
 				C2B2B79717561427002F55D1 /* url.c in Sources */,
 				C256798518365FDF00B8AB66 /* priority_queue.c in Sources */,
+				E70F1425133CCCA2576920C0 /* report.c in Sources */,
+				CD238FDF12617A68D64F1D3B /* unit.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1025,9 +1050,11 @@
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/../../../src/viriatum_commons";
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
+				USE_HEADERMAP = NO;
 			};
 			name = Debug;
 		};
@@ -1040,8 +1067,10 @@
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/../../../src/viriatum_commons";
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				SDKROOT = macosx;
+				USE_HEADERMAP = NO;
 			};
 			name = Release;
 		};

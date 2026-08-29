@@ -27,13 +27,23 @@
 #include "../handlers/handler_dispatch.h"
 #include "../handlers/handler_file.h"
 #include "../http/http_parser.h"
+#include "test_support.h"
 
 /**
  * Tests that the dispatch handler unset does not
- * free http_parser->context when it was set by
+ * free http_request->context when it was set by
  * another handler (simulates keep-alive re-dispatch).
  *
  * @return A message describing the execution of
  * the unit test should describe possible errors.
  */
 const char *test_dispatch_handler_context_keepalive(void);
+
+/**
+ * Tests the complete pipeline of the dispatch handler, including
+ * the response of a message that has reached no handler at all.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_dispatch_handler_response(void);

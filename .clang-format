@@ -8,6 +8,7 @@ SpacesInParentheses: false
 SpaceAfterCStyleCast: true
 PointerAlignment: Right
 DerivePointerAlignment: false
+ObjCSpaceAfterProperty: true
 AlignAfterOpenBracket: BlockIndent
 ContinuationIndentWidth: 4
 AllowShortBlocksOnASingleLine: Always
@@ -22,3 +23,6 @@ BinPackArguments: true
 BinPackParameters: true
 ReflowComments: false
 SortIncludes: false
+StatementMacros:
+  - PyObject_HEAD
+  - PyObject_VAR_HEAD

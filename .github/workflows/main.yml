@@ -3,6 +3,34 @@ on:
   - push
   - workflow_dispatch
 jobs:
+  build-format:
+    name: Build Format
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install clang-format==20.1.7
+      - name: Run format
+        run: |
+          ./scripts/format.sh
+      - name: Report format
+        if: always()
+        run: |
+          cat format/summary.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: format
+          path: |
+            format/summary.md
+            format/format.diff
+          if-no-files-found: ignore
   build-gcc:
     name: Build GCC
     timeout-minutes: 30
@@ -187,6 +215,85 @@ jobs:
       - name: Test Viriatum (Python)
         run: |
           python -m unittest discover -s src/viriatum_python/test -v
+  build-sanitize:
+    name: Build Sanitize
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang llvm libssl-dev
+      - name: Run sanitize
+        env:
+          CC: clang
+        run: |
+          ./scripts/sanitize.sh
+      - name: Report sanitize
+        if: always()
+        run: |
+          cat sanitize/summary.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: sanitize
+          path: |
+            sanitize/summary.md
+            sanitize/tests.txt
+  build-conformance:
+    name: Build Conformance
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libssl-dev
+          curl -sL https://github.com/summerwind/h2spec/releases/download/v2.6.0/h2spec_linux_amd64.tar.gz | sudo tar -xz -C /usr/local/bin
+      - name: Run conformance
+        run: |
+          ./scripts/conformance.sh
+      - name: Report conformance
+        if: always()
+        run: |
+          cat conformance/summary.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: conformance
+          path: |
+            conformance/summary.md
+            conformance/h2c.txt
+            conformance/h2.txt
+            conformance/server.log
+            conformance/server-ssl.log
+  build-interop:
+    name: Build Interop
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libssl-dev nghttp2-client
+      - name: Run interop
+        run: |
+          ./scripts/interop.sh
+      - name: Report interop
+        if: always()
+        run: |
+          cat interop/summary.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: interop
+          path: |
+            interop/summary.md
+            interop/server.log
+            interop/server-ssl.log
   build-coverage:
     name: Build Coverage
     timeout-minutes: 30
@@ -211,8 +318,8 @@ jobs:
       - name: Report coverage
         if: always()
         run: |
-          cat coverage/summary.md >> $GITHUB_STEP_SUMMARY
-          cat coverage/tests.md >> $GITHUB_STEP_SUMMARY
+          cat coverage/summary.md >> "$GITHUB_STEP_SUMMARY"
+          cat coverage/tests.md >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v7
         if: always()
         with:
