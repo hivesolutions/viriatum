@@ -92,6 +92,7 @@ cmake_install.cmake
 /win32/vs2015/*/*
 /win32/vs2008ex/*/*
 /src/viriatum/viriatum
+/scripts/benchmark/pingora/target
 /scripts/build/tmp
 /scripts/build/builds
 /scripts/build/win32/build
