@@ -128,11 +128,35 @@ class BenchmarkTableTest(unittest.TestCase):
         # against, there is nothing to say it should not be
         self.assertEqual(benchmark_table.comparable(dict(machine="Linux"), {}), True)
 
+    def test_order(self):
+        with io.open(os.path.join(self.output, "workloads.txt"), "wb") as file:
+            file.write(b"static-small-alive|static|file|/small.html||On|\nproxy-alive|proxy|\n")
+        self.assertEqual(
+            benchmark_table.order(self.output), ["static-small-alive", "proxy-alive"]
+        )
+
+    def test_order_missing(self):
+        self.assertEqual(benchmark_table.order(self.output), [])
+
     def test_results(self):
         self._write(SUBJECT)
         self._write(REFERENCE)
         rows = benchmark_table.results(self.output)
         self.assertEqual(len(rows), 2)
+
+    def test_results_driven_order(self):
+        # the reports are named files and reading a directory hands
+        # them back alphabetically, the table is meant to read in the
+        # order the workloads were actually driven in
+        self._write(dict(SUBJECT, workload="proxy-alive"))
+        self._write(SUBJECT)
+        with io.open(os.path.join(self.output, "workloads.txt"), "wb") as file:
+            file.write(b"static-small-alive|static|\nproxy-alive|proxy|\n")
+
+        rows = benchmark_table.results(self.output)
+        self.assertEqual(
+            [item["workload"] for item in rows], ["static-small-alive", "proxy-alive"]
+        )
 
     def test_results_missing(self):
         self.assertEqual(benchmark_table.results(os.path.join(self.output, "gone")), [])
@@ -275,6 +299,16 @@ class BenchmarkTableTest(unittest.TestCase):
         lines = benchmark_table.table([current], [SUBJECT])
         self.assertTrue("-20.0%" in lines[2])
         self.assertTrue("🔻" in lines[2])
+
+    def test_table_discarded(self):
+        # a measurement that is not a figure carries no figures at all,
+        # the cost of a request divided by almost no requests is a
+        # vast number and printing it would read as a real one
+        item = dict(SUBJECT, valid=False, rps=3.0, cpu_ms_per_k=6030000.0)
+        lines = benchmark_table.table([item], None)
+        self.assertTrue("6030000" not in lines[2])
+        self.assertTrue("| - | - |" in lines[2])
+        self.assertTrue("⚠️" in lines[2])
 
     def test_table_no_reference(self):
         # a workload the references were all skipped on still reports

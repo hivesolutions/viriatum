@@ -75,6 +75,23 @@ def comparable(current, recorded):
     return True
 
 
+def order(output):
+    # the order the harness drove the workloads in, which it wrote out
+    # before driving any of them, the reports themselves are named
+    # files and reading a directory hands them back in the order of
+    # the alphabet rather than the order they were measured in
+    path = os.path.join(output, "workloads.txt")
+    if not os.path.exists(path):
+        return []
+    names = []
+    with open(path, "rb") as file:
+        for line in file.read().decode("utf-8").splitlines():
+            name = line.split("|")[0].strip()
+            if name:
+                names.append(name)
+    return names
+
+
 def results(output):
     # gathers one entry per pair of a workload and a server, each of
     # them written by the harness as a report of its own, the ones
@@ -90,6 +107,17 @@ def results(output):
         if item is None:
             continue
         rows.append(item)
+
+    # the rows are handed back in the order the workloads were driven,
+    # one the harness recorded, so that the table reads the way the
+    # run did rather than the way the alphabet does
+    driven = order(output)
+    if driven:
+        rows.sort(
+            key=lambda item: driven.index(item["workload"])
+            if item["workload"] in driven
+            else len(driven)
+        )
     return rows
 
 
@@ -200,6 +228,7 @@ def table(rows, baseline):
         subject = known.get((workload, SUBJECT))
         for server in servers(rows, workload):
             item = known[(workload, server)]
+            valid = item.get("valid", True)
             change = delta(item, recorded.get((workload, server)))
             state = moved(item, recorded.get((workload, server)))
 
@@ -219,16 +248,16 @@ def table(rows, baseline):
                 name = server
 
             lines.append(
-                "| `%s` | %s | %s | %s | %s | %s | %s | %.1f | %s | %s |"
+                "| `%s` | %s | %s | %s | %s | %s | %s | %s | %s | %s |"
                 % (
                     workload,
                     name,
-                    format_rps(item.get("rps")),
+                    format_rps(item.get("rps")) if valid else "-",
                     format_latency(item.get("latency_p50_us")),
                     format_latency(item.get("latency_p99_us")),
                     format_latency(item.get("latency_p999_us")),
-                    "%.1f" % item.get("cpu_ms_per_k", 0.0),
-                    item.get("peak_rss_kb", 0) / 1024.0,
+                    "%.1f" % item["cpu_ms_per_k"] if valid else "-",
+                    "%.1f" % (item.get("peak_rss_kb", 0) / 1024.0) if valid else "-",
                     "-" if change is None else "%+.1f%%" % change,
                     marker(item, state),
                 )
