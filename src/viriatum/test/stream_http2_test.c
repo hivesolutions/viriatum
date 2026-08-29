@@ -1791,17 +1791,55 @@ const char *test_http2_connection_trailers(void) {
     V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
     V_ASSERT_NULL(find_stream_http2_connection(http2_connection, 5));
 
-    /* the stream that follows names the field of the first block by
-    the position it holds once the three of them have been consumed,
-    a table that had skipped the refused one would name another */
-    http2_connection->settings.max_concurrent_streams = HTTP2_MAX_CONCURRENT;
+    /* a refused stream whose block is not closed by the frame that
+    opens it keeps the sequence open just the same, the frames that
+    carry the rest of it are gathered and dropped by the very same
+    path, the place of the stream in the tree travelling with it */
+    offset = _indexed_http2_test(encoder, block, sizeof(block), "/split", "x-fourth");
+    memmove(&block[HTTP2_PRIORITY_SIZE], block, offset);
+    encode_number_http2(block, 0);
+    block[4] = 15;
+
+    http2_frame.flags = HTTP2_FLAG_PRIORITY;
     http2_frame.stream_id = 7;
+    http2_frame.length = HTTP2_PRIORITY_SIZE + offset / 2;
+    error = handle_frame_http2_connection(http2_connection, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+    V_ASSERT_EQ_U(http2_connection->continuation, 7);
+
+    http2_frame.type = HTTP2_CONTINUATION;
+    http2_frame.flags = HTTP2_FLAG_END_HEADERS;
+    http2_frame.length = offset - offset / 2;
+    http2_frame.payload = &block[HTTP2_PRIORITY_SIZE + offset / 2];
+    error = handle_frame_http2_connection(http2_connection, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
+    V_ASSERT_EQ_U(http2_connection->continuation, 0);
+    V_ASSERT_NULL(find_stream_http2_connection(http2_connection, 7));
+
+    /* the stream that follows names the field of the first block by
+    the position it holds once the four of them have been consumed,
+    a table that had skipped a refused one would name another */
+    http2_connection->settings.max_concurrent_streams = HTTP2_MAX_CONCURRENT;
+    http2_frame.type = HTTP2_HEADERS;
+    http2_frame.flags = HTTP2_FLAG_END_HEADERS | HTTP2_FLAG_END_STREAM;
+    http2_frame.payload = block;
+    http2_frame.stream_id = 9;
     http2_frame.length = _indexed_http2_test(encoder, block, sizeof(block), "/after", NULL);
     error = handle_frame_http2_connection(http2_connection, &http2_frame);
     V_ASSERT_EQ_U(error, HTTP2_NO_ERROR);
     V_ASSERT_EQ_S(_record.path, "/after");
     V_ASSERT_EQ_S(_record.name, "x-first");
     V_ASSERT_EQ_S(_record.header, "abcdef");
+
+    /* a block of a refused stream that is not a valid one at all is
+    an error of the table rather than of the stream, the two ends are
+    out of step from that point on either way */
+    http2_connection->settings.max_concurrent_streams = 0;
+    http2_frame.stream_id = 11;
+    http2_frame.length = 4;
+    memset(block, 0xff, 4);
+    error = handle_frame_http2_connection(http2_connection, &http2_frame);
+    V_ASSERT_EQ_U(error, HTTP2_COMPRESSION_ERROR);
 
     delete_hpack_table(encoder);
 
