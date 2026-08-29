@@ -307,11 +307,12 @@ int execute_arguments(char *program_name, struct hash_map_t *arguments) {
     get_value_string_hash_map(arguments, (unsigned char *) "local", &value);
     if(value != NULL) { localize(); }
 
-    /* tries to retrieve the local argument from the arguments
-    map in case the value exists localizes the current service
-    so that any file read is read from the current directory */
+    /* tries to retrieve the info argument from the arguments map in
+    case the value exists prints the information of the service and
+    then returns, the same way the other commands that only report
+    something about the service do */
     get_value_string_hash_map(arguments, (unsigned char *) "info", &value);
-    if(value != NULL) { info(); }
+    if(value != NULL) { return info(); }
 
     /* in cas the flag that control if the service must be run is
     unset the control flow must be returned immediately (avoids

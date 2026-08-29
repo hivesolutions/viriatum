@@ -24,8 +24,9 @@ fi
 # builds the server in the release shape, the conformance of it is
 # measured over the binary that is actually shipped
 if [ ! -x "$BINARY" ]; then
+    echo "Building the server ..."
     cmake -S "$ROOT" -B "$BUILD" -DCMAKE_BUILD_TYPE=Release
-    cmake --build "$BUILD" -j 4
+    cmake --build "$BUILD" --target viriatum -j 4
 fi
 
 rm -rf "$OUTPUT"
@@ -83,7 +84,8 @@ _run() {
 
 cd "$OUTPUT"
 
-"$BINARY" --port="$PORT" --wwwroot="$OUTPUT/www" > "$OUTPUT/server.log" 2>&1 &
+echo "Starting the server on port $PORT ..."
+"$BINARY" --port="$PORT" --wwwroot="$OUTPUT/www" < /dev/null > "$OUTPUT/server.log" 2>&1 &
 PID=$!
 _wait "$PORT"
 
@@ -94,8 +96,9 @@ echo "$H2C"
 # the negotiated form is only reachable when the transport is built
 # into the binary and a certificate could be generated for it
 H2=""
-if [ -f "$OUTPUT/cert/server.crt" ] && "$BINARY" --info 2> /dev/null | head -1 | grep -q ssl; then
-    "$BINARY" --port="$PORT_SSL" --ssl --wwwroot="$OUTPUT/www" > "$OUTPUT/server-ssl.log" 2>&1 &
+if [ -f "$OUTPUT/cert/server.crt" ] && head -1 "$OUTPUT/server.log" | grep -q ssl; then
+    echo "Starting the server on port $PORT_SSL ..."
+    "$BINARY" --port="$PORT_SSL" --ssl --wwwroot="$OUTPUT/www" < /dev/null > "$OUTPUT/server-ssl.log" 2>&1 &
     PID_SSL=$!
     _wait "$PORT_SSL"
 
