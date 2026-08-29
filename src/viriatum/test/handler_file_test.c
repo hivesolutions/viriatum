@@ -217,12 +217,58 @@ const char *test_handler_file_header_field(void) {
     /* resets the next header to undefined */
     handler_file_context->next_header = UNDEFINED_HEADER;
 
+    /* the name of a field is never case sensitive and the most
+    recent version of the protocol carries them in lower case
+    alone, so every one of them is recognised in that shape too */
+    header_field_callback_handler_file(
+        http_request,
+        (unsigned char *) "range",
+        5
+    );
+    V_ASSERT(handler_file_context->next_header == RANGE);
+    handler_file_context->next_header = UNDEFINED_HEADER;
+
+    header_field_callback_handler_file(
+        http_request,
+        (unsigned char *) "cache-control",
+        13
+    );
+    V_ASSERT(handler_file_context->next_header == CACHE_CONTROL);
+    handler_file_context->next_header = UNDEFINED_HEADER;
+
+    header_field_callback_handler_file(
+        http_request,
+        (unsigned char *) "authorization",
+        13
+    );
+    V_ASSERT(handler_file_context->next_header == AUTHORIZATION);
+    handler_file_context->next_header = UNDEFINED_HEADER;
+
+    header_field_callback_handler_file(
+        http_request,
+        (unsigned char *) "if-none-match",
+        13
+    );
+    V_ASSERT(handler_file_context->next_header == ETAG);
+
+    /* resets the next header to undefined */
+    handler_file_context->next_header = UNDEFINED_HEADER;
+
     /* tests that an unknown header does not change
     the next header state from undefined */
     header_field_callback_handler_file(
         http_request,
         (unsigned char *) "X-Custom",
         8
+    );
+    V_ASSERT(handler_file_context->next_header == UNDEFINED_HEADER);
+
+    /* a name of the very same size that is not one of them is left
+    alone just the same, whatever the case of it */
+    header_field_callback_handler_file(
+        http_request,
+        (unsigned char *) "x-something-x",
+        13
     );
     V_ASSERT(handler_file_context->next_header == UNDEFINED_HEADER);
 

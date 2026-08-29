@@ -333,10 +333,13 @@ ERROR_CODE header_field_callback_handler_file(struct http_request_t *http_reques
     struct handler_file_context_t *handler_file_context = (struct handler_file_context_t *) http_request->context;
 
     /* switches over the size of the header name (field)
-    that was provided (used for faster parsing) */
+    that was provided (used for faster parsing), the letters that
+    carry a case are matched in either of them as the name of a
+    field is never case sensitive and the most recent version of the
+    protocol carries them in lower case alone */
     switch(data_size) {
         case 5:
-            if(data[0] == 'R' && data[1] == 'a' && data[2] == 'n' && data[3] == 'g') {
+            if((data[0] == 'R' || data[0] == 'r') && data[1] == 'a' && data[2] == 'n' && data[3] == 'g') {
                 /* updates the range status value, it's the next
                 value to be parsed and put in context */
                 handler_file_context->range_status = 1;
@@ -349,7 +352,8 @@ ERROR_CODE header_field_callback_handler_file(struct http_request_t *http_reques
             break;
 
         case 13:
-            if(data[0] == 'I' && data[1] == 'f' && data[2] == '-' && data[3] == 'N') {
+            if((data[0] == 'I' || data[0] == 'i') && data[1] == 'f' && data[2] == '-' &&
+               (data[3] == 'N' || data[3] == 'n')) {
                 /* updates the etag status value, it's the next
                 value to be parsed and put in context */
                 handler_file_context->etag_status = 1;
@@ -357,7 +361,7 @@ ERROR_CODE header_field_callback_handler_file(struct http_request_t *http_reques
                 break;
             }
 
-            if(data[0] == 'C' && data[1] == 'a' && data[2] == 'c' && data[3] == 'h') {
+            if((data[0] == 'C' || data[0] == 'c') && data[1] == 'a' && data[2] == 'c' && data[3] == 'h') {
                 /* updates the cache control status value, it's the next
                 value to be parsed and put in context */
                 handler_file_context->cache_control_status = 1;
@@ -365,7 +369,7 @@ ERROR_CODE header_field_callback_handler_file(struct http_request_t *http_reques
                 break;
             }
 
-            if(data[0] == 'A' && data[1] == 'u' && data[2] == 't' && data[3] == 'h') {
+            if((data[0] == 'A' || data[0] == 'a') && data[1] == 'u' && data[2] == 't' && data[3] == 'h') {
                 /* updates the authorization status value, it's the next
                 value to be parsed and put in context */
                 handler_file_context->authorization_status = 1;
