@@ -50,7 +50,6 @@
 #define FILE_EXISTS(file_path) GetFileAttributes(file_path) != 0xffffffff
 #define ACCESS(path, mode) _access(path, mode)
 #define READ_MODE 4
-#define OPEN_READ(path) _open(path, _O_RDONLY | _O_BINARY)
 #define DUPLICATE(descriptor) _dup(descriptor)
 #define CLOSE_READ(descriptor) _close(descriptor)
 #define READ_AT(descriptor, buffer, size, offset) \
@@ -87,7 +86,6 @@
 #define FILE_EXISTS(file_path) access(file_path, F_OK) == 0
 #define ACCESS(path, mode) access(path, mode)
 #define READ_MODE R_OK
-#define OPEN_READ(path) open(path, O_RDONLY)
 #define DUPLICATE(descriptor) dup(descriptor)
 #define CLOSE_READ(descriptor) close(descriptor)
 #define READ_AT(descriptor, buffer, size, offset) pread(descriptor, buffer, size, offset)

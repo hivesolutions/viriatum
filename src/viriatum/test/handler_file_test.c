@@ -909,7 +909,7 @@ const char *test_handler_file_handler(void) {
     handler_file_context->offset = 1024;
     handler_file_context->etag_status = 2;
     handler_file_context->range_status = 2;
-    handler_file_context->descriptor = OPEN_READ(HANDLER_FILE_TEST_PATH);
+    open_read_file((char *) HANDLER_FILE_TEST_PATH, &handler_file_context->descriptor);
     V_ASSERT(handler_file_context->descriptor != -1);
     reset_handler_file(context->http_connection);
     V_ASSERT_EQ_U(handler_file_context->offset, 0);
@@ -1068,12 +1068,16 @@ const char *test_file_cache_changed(void) {
 
     /* the file is written over in place, which keeps the very same
     descriptor reaching it, so an entry that went on trusting the size
-    it learnt before would answer with a body cut short to match it */
-    write_file(
+    it learnt before would answer with a body cut short to match it,
+    and the writing itself has to succeed while the cache is holding
+    the file open, which is not something every platform allows of
+    its own accord and which a deployment of a new file depends on */
+    error = write_file(
         (char *) FILE_CACHE_TEST_PATH,
         (unsigned char *) FILE_CACHE_TEST_CONTENTS FILE_CACHE_TEST_CONTENTS,
         (sizeof(FILE_CACHE_TEST_CONTENTS) - 1) * 2
     );
+    V_ASSERT_EQ_U(error, 0);
 
     error = acquire_file_cache(
         file_cache,

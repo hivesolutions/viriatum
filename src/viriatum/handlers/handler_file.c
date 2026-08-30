@@ -1516,6 +1516,7 @@ ERROR_CODE acquire_file_cache(struct file_cache_t *file_cache, unsigned char *fi
     /* allocates space for the structure that describes the file and
     for the moment at which this is all happening */
     STAT_TYPE file_stat;
+    ERROR_CODE error_code;
     unsigned int now = (unsigned int) time(NULL);
 
     /* the entry that the provided path falls on, a path always falls
@@ -1584,12 +1585,10 @@ ERROR_CODE acquire_file_cache(struct file_cache_t *file_cache, unsigned char *fi
     /* opens the file and describes it through the descriptor that
     was just obtained, which answers about the very file that was
     opened and never about one that took its place in between */
-    entry->descriptor = OPEN_READ((char *) file_path);
-    if(entry->descriptor == -1) {
-        RAISE_ERROR_M(
-            RUNTIME_EXCEPTION_ERROR_CODE,
-            (unsigned char *) "Problem loading file"
-        );
+    error_code = open_read_file((char *) file_path, &entry->descriptor);
+    if(IS_ERROR_CODE(error_code)) {
+        entry->descriptor = -1;
+        RAISE_AGAIN(error_code);
     }
 
     if(STAT_READ(entry->descriptor, file_stat) != 0) {

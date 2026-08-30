@@ -124,10 +124,20 @@ ERROR_CODE write_file(char *file_path, unsigned char *buffer, size_t buffer_size
     into the proper system path, through encoding conversion */
     SYSTEM_PATH(file_path);
 
-    /* opens the file, then writes the complete set of contents
-    from the provided buffer into it and closes the file to avoid
-    any memory leaks */
+    /* opens the file and in case the retrieved value is not valid
+    raises an error, a platform that refuses to open one that is
+    already held open elsewhere would otherwise be written through
+    a pointer to nothing at all */
     FOPEN(&file, file_path, "wb");
+    if(file == NULL) {
+        RAISE_ERROR_M(
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Problem writing file"
+        );
+    }
+
+    /* writes the complete set of contents from the provided buffer
+    into it and closes the file to avoid any memory leaks */
     fwrite(buffer, sizeof(char), buffer_size, file);
     fclose(file);
 
@@ -549,6 +559,57 @@ size_t path_to_system(char *path, char *path_s) {
     );
 }
 
+ERROR_CODE open_read_file(char *file_path, int *descriptor_pointer) {
+    /* allocates space for the handle of the file and for the
+    descriptor that the handle is going to be wrapped into */
+    HANDLE file_handle;
+    int descriptor;
+
+    /* ensures that the file path is correctly converted
+    into the proper system path, through encoding conversion */
+    SYSTEM_PATH(file_path);
+
+    /* opens the file letting everyone else go on writing to it,
+    reading it and taking it away, which is what the platform of the
+    unix family does by default and what a file that is being held
+    open for the serving of it has to go on allowing, a file that
+    could not be replaced while it was being served would make the
+    deploying of a new one impossible while the server was up */
+    file_handle = CreateFile(
+        file_path,
+        GENERIC_READ,
+        FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+        NULL,
+        OPEN_EXISTING,
+        FILE_ATTRIBUTE_NORMAL,
+        NULL
+    );
+    if(file_handle == INVALID_HANDLE_VALUE) {
+        RAISE_ERROR_M(
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Problem loading file"
+        );
+    }
+
+    /* wraps the handle into a descriptor of the runtime, so that the
+    reading of it goes through the very same calls on both platforms,
+    the closing of the descriptor closes the handle along with it */
+    descriptor = _open_osfhandle((intptr_t) file_handle, _O_RDONLY | _O_BINARY);
+    if(descriptor == -1) {
+        CloseHandle(file_handle);
+        RAISE_ERROR_M(
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Problem loading file"
+        );
+    }
+
+    /* sets the descriptor in the descriptor pointer */
+    *descriptor_pointer = descriptor;
+
+    /* raise no error */
+    RAISE_NO_ERROR;
+}
+
 ERROR_CODE get_write_time_file(char *file_path, struct date_time_t *date_time) {
     /* allocates space for the various file times */
     FILETIME time_create;
@@ -793,6 +854,33 @@ ERROR_CODE list_directory_file(char *file_path, struct linked_list_t *entries) {
 #endif
 
 #ifdef VIRIATUM_PLATFORM_UNIX
+
+ERROR_CODE open_read_file(char *file_path, int *descriptor_pointer) {
+    /* allocates space for the descriptor of the file that is going
+    to be handed back to the caller of this */
+    int descriptor;
+
+    /* ensures that the file path is correctly converted
+    into the proper system path, through encoding conversion */
+    SYSTEM_PATH(file_path);
+
+    /* opens the file for reading, one that is held open here goes on
+    being writable and removable by everyone else, which is what the
+    serving of it while it may be replaced calls for */
+    descriptor = open(file_path, O_RDONLY);
+    if(descriptor == -1) {
+        RAISE_ERROR_M(
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Problem loading file"
+        );
+    }
+
+    /* sets the descriptor in the descriptor pointer */
+    *descriptor_pointer = descriptor;
+
+    /* raise no error */
+    RAISE_NO_ERROR;
+}
 
 ERROR_CODE get_write_time_file(char *file_path, struct date_time_t *date_time) {
     struct stat file_stat;
