@@ -51,6 +51,7 @@ PHP_FUNCTION(viriatum_name);
 PHP_FUNCTION(viriatum_version);
 PHP_FUNCTION(viriatum_platform);
 PHP_FUNCTION(viriatum_flags);
+PHP_FUNCTION(viriatum_polling);
 PHP_FUNCTION(viriatum_compiler);
 PHP_FUNCTION(viriatum_compiler_version);
 PHP_FUNCTION(viriatum_compilation_date);

@@ -24,6 +24,8 @@ The metrics that would disturb a timed run are taken outside of one: the tail be
 
 A measurement that lost a noticeable share of its connections is recorded as invalid rather than reported as a figure, because a machine that has run out of something answers far faster than a server does and would otherwise read as a win.
 
+The load is driven over `CONNECTIONS` connections from `THREADS` threads, 256 and 8 by default. Both matter and both are recorded beside every figure. Too few connections and a server is never asked the question that separates one waiting mechanism from another, which only begins to tell them apart in the hundreds; too many threads and the generator takes the cores away from the subject it is measuring, which was seen to cost around 4% at sixteen of them on a machine of eighteen cores. A run that changes either of these is not comparable against a baseline recorded under the other, and the report says so rather than pretending otherwise.
+
 ## Where the servers run
 
 The subject and its references always run **the same way**. Either both come out of a pinned image or both come out of the binaries the machine carries. A subject reached over one stack and a reference reached over another measures the stacks and never the servers, which is exactly what would happen on a machine whose container daemon lives inside a virtual machine of its own.

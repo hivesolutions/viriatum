@@ -65,6 +65,13 @@
 #define VIRIATUM_EPOLL
 #endif
 
+/* the mechanism of the systems that carry no epoll, which is every
+one of the bsd family and the mac, only ever reached for when there
+is no epoll around as the two of them never sit on the same system */
+#if defined(HAVE_KQUEUE) && !defined(VIRIATUM_EPOLL)
+#define VIRIATUM_KQUEUE
+#endif
+
 #ifdef HAVE_LIBSSL
 #ifdef HAVE_OPENSSL_SSL_H
 #define VIRIATUM_SSL
@@ -96,6 +103,10 @@ only ever left out for the footprint of the smaller targets */
 
 #ifdef HAVE_EPOLL
 #include <sys/epoll.h>
+#endif
+
+#ifdef VIRIATUM_KQUEUE
+#include <sys/event.h>
 #endif
 
 #ifdef VIRIATUM_SSL

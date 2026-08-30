@@ -318,6 +318,13 @@ typedef struct service_t {
     unsigned char *flags;
 
     /**
+     * The name of the mechanism that the service waits
+     * on its connections through, one of epoll, kqueue
+     * or select depending on what the build found.
+     */
+    unsigned char *polling_name;
+
+    /**
      * The description (string) of the compiler
      * used to compile the service structures.
      */

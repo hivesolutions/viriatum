@@ -1423,6 +1423,7 @@ static struct test_entry_t _simple_entries[] = {
     V_TEST_T(test_open_service_busy, "service"),
     V_TEST_T(test_file_options_service, "service"),
     V_TEST_T(test_arguments_options_service, "service"),
+    V_TEST_T(test_polling_service, "service"),
     V_TEST_T(test_flags_service, "service"),
     V_TEST_T(test_ran_service, "service")
 };

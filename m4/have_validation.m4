@@ -24,4 +24,9 @@ if test "$have_epoll" = true; then
     AC_DEFINE(HAVE_EPOLL, 1, [Define to 1 if you have the epoll])
 fi
 
+if test "$have_kqueue" = true; then
+    AC_DEFINE(HAVE_KQUEUE, 1, [Define to 1 if you have the kqueue])
+fi
+
 AM_CONDITIONAL(COMPILE_EPOLL, test x"$have_epoll" = "xtrue")
+AM_CONDITIONAL(COMPILE_KQUEUE, test x"$have_kqueue" = "xtrue")
