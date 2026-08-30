@@ -1413,11 +1413,15 @@ const char *test_handler_file_handler(void) {
     V_ASSERT_NOT_NULL(http_settings->on_message_complete);
 
     /* a message that follows another one on the same connection
-    resets the values of the context rather than building it again */
+    resets the values of the context rather than building it again,
+    the descriptor of a transfer that was cut short included, one
+    left behind would be held for the whole of the connection */
     handler_file_context = (struct handler_file_context_t *) http_request->context;
     handler_file_context->offset = 1024;
     handler_file_context->etag_status = 2;
     handler_file_context->range_status = 2;
+    handler_file_context->descriptor = OPEN_READ(HANDLER_FILE_TEST_PATH);
+    V_ASSERT(handler_file_context->descriptor != -1);
     reset_handler_file(context->http_connection);
     V_ASSERT_EQ_U(handler_file_context->offset, 0);
     V_ASSERT_EQ_U(handler_file_context->etag_status, 0);
