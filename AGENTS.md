@@ -97,6 +97,8 @@ Absolute numbers from any one machine are not comparable to another, so the figu
 
 A claim about performance needs a run of the harness behind it. An optimisation lands with a before and after attached and is reverted when the gain does not hold, and a change is measured by driving the two binaries interleaved rather than in blocks, so that a drift of the machine lands on both of them equally. Establish where the time goes with a profile before changing anything: the widest gap is rarely where it is assumed to be, and an entry in `doc/todo.md` is a hypothesis rather than a finding.
 
+The files that the file handler serves are kept open in a cache of its own, one per worker process, so that serving a file again costs neither the opening of it nor the describing of it. The size of a held file is taken from its descriptor on every request, so a file written over in place is always served at the length it now has; a file **replaced** at the same path is picked up once the entry is looked at again, which is `CACHE_VALID_HANDLER_FILE` seconds at the latest. A path falls on exactly one entry, decided by the hash of it, and takes that entry over from whatever was there before.
+
 The methodology, the configuration each server is given and the reasoning behind every one of those choices are written down in `scripts/benchmark/README.md`. Anything that affects the comparison, such as the logging of a request or the pooling of an upstream connection, belongs there the moment it is changed.
 
 ## HTTP/2
