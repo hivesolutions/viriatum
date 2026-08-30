@@ -59,6 +59,7 @@ stream/io_stream.c \
 stream/memory_stream.c \
 structures/array_list.c \
 structures/buffer.c \
+structures/date_time.c \
 structures/hash_map.c \
 structures/iterator.c \
 structures/linked_buffer.c \
@@ -81,6 +82,7 @@ checksum/crc_32.c \
 checksum/md5.c \
 checksum/sha1.c \
 compression/huffman.c \
+crypto/rc4.c \
 debug/error.c \
 debug/logging.c \
 encoding/base_64.c \
@@ -100,6 +102,7 @@ stream/io_stream.c \
 stream/memory_stream.c \
 structures/array_list.c \
 structures/buffer.c \
+structures/date_time.c \
 structures/hash_map.c \
 structures/iterator.c \
 structures/linked_buffer.c \

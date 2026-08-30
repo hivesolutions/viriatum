@@ -17,6 +17,22 @@ conan profile detect --force
 conan install . --build=missing
 ```
 
+## Adding a Source File
+
+CMake gathers the sources of the tree through a pattern and so it picks a new file up on its own, every one of the other build systems names them one by one and has to be told. When a source or a header is added, removed or renamed, the following have to be kept in step with it:
+
+- `src/viriatum/Makefile.am` and `src/viriatum_commons/Makefile.am`, each of them carrying two lists of sources, the ones of the binary or of the static library and the ones of the shared library
+- `src/Makefile.am`, which carries the headers of both trees that the packaging installs
+- `win32/vs2015/viriatum.vcxproj` and `win32/vs2015/viriatum_commons.vcxproj`, along with the `.filters` beside each of them that says which group a file belongs to
+- `win32/vs2015/viriatum.vcproj`, `win32/vs2015/viriatum_commons.vcproj` and the pair of the same names under `win32/vs2008ex`, which are the older format of those very projects
+- `win32/vs2008ex/viriatum_mod_*.vcproj` and `win32/vs2015/viriatum_mod_*.vcproj`, for a source of a module
+- `darwin/xcode4/viriatum/viriatum.xcodeproj/project.pbxproj` and the one of the commons beside it, which name a file in four places, the reference of it, the group it hangs from and the build of it for each of the two targets
+- `examples/zig/build.zig`, which carries a list of its own
+
+A suite carries two more, `src/viriatum/test/simple_test.c` has to include the header of it and to name every one of its tests in the registry that closes that file.
+
+The packaging for Python builds through CMake and so needs nothing of its own. The fuzz targets are the single deliberate exception to all of the above, they carry an entry point of their own and are named by no project.
+
 ## Formatting
 
 Format C code before committing using clang-format with the project's `.clang-format` configuration:
@@ -191,6 +207,7 @@ version: 0.4.0
 
 Before committing, ensure that the following items check:
 
+- [ ] Every build system names a new source file, see [Adding a Source File](#adding-a-source-file)
 - [ ] Code is formatted with `clang-format`, which `./scripts/format.sh` verifies over the whole tree
 - [ ] Tests pass: `./bin/viriatum --test`
 - [ ] Module tests pass (if applicable): `./bin/viriatum_mod_lua_test`
