@@ -273,3 +273,42 @@ static __inline void remove_connection(
     remove_connections[remove_connections_size] = connection;
     (*remove_connections_size_pointer)++;
 }
+
+/**
+ * Takes the provided connection out of the provided array of
+ * connections, keeping the order of the ones that stay in it.
+ * A connection that is not in the array leaves it untouched.
+ *
+ * @param connections The array the connection is taken out of.
+ * @param connections_size_pointer A pointer to the size of the
+ * array of connections.
+ * @param connection The connection to be taken out.
+ */
+static __inline void discard_connection(
+    struct connection_t **connections,
+    size_t *connections_size_pointer,
+    struct connection_t *connection
+) {
+    /* allocates the index counter for the iteration and the one
+    that walks the connections that come after the one found */
+    size_t index;
+    size_t position;
+
+    /* retrieves the connections size value from the provided
+    pointer value (indirect value) */
+    size_t connections_size = *connections_size_pointer;
+
+    /* iterates over the connections looking for the one that is
+    meant to be taken out of the array */
+    for(index = 0; index < connections_size; index++) {
+        if(connections[index] != connection) { continue; }
+
+        /* pulls every connection that comes after the one found
+        one position back and shortens the array by one */
+        for(position = index; position + 1 < connections_size; position++) {
+            connections[position] = connections[position + 1];
+        }
+        (*connections_size_pointer)--;
+        return;
+    }
+}

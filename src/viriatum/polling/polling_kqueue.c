@@ -168,24 +168,33 @@ ERROR_CODE unregister_connection_polling_kqueue(
     EV_SET(&_events[1], connection->socket_handle, EVFILT_WRITE, EV_DELETE, 0, 0, NULL);
     result_code = kevent(polling_kqueue->kqueue_fd, _events, 2, NULL, 0, NULL);
 
-    /* a connection whose descriptor has already gone is no longer in
-    the queue of the kernel either, which drops the events of a closed
-    one on its own, so being told it is not there is not a failure */
-    if(SOCKET_TEST_ERROR(result_code) && errno == ENOENT) { result_code = 0; }
-
-    /* in case there was an error in kqueue need to correctly
-    handle it and propagate it to the caller */
+    /* in case there was an error in kqueue it is only reported, a
+    descriptor that has already gone is no longer in the queue of the
+    kernel either, which drops the events of a closed one on its own,
+    so the operation has reached what it was after, stopping here
+    would leave the connection below out of the removal for good */
     if(SOCKET_TEST_ERROR(result_code)) {
         SOCKET_ERROR_CODE kqueue_error_code = SOCKET_GET_ERROR_CODE(socket_result);
         V_WARNING_F(
             "Problem unregistering connection kqueue: %d\n",
             kqueue_error_code
         );
-        RAISE_ERROR_M(
-            RUNTIME_EXCEPTION_ERROR_CODE,
-            (unsigned char *) "Problem unregistering connection kqueue"
-        );
     }
+
+    /* takes the connection out of the buffers of the pending
+    operations, one that stays in them is reached again on the
+    next round of the loop, by then possibly already released */
+    discard_connection(
+        polling_kqueue->read_outstanding,
+        &polling_kqueue->read_outstanding_size,
+        connection
+    );
+    discard_connection(
+        polling_kqueue->write_outstanding,
+        &polling_kqueue->write_outstanding_size,
+        connection
+    );
+    connection->is_outstanding = FALSE;
 
     /* in case the remove connection flag is set the connection
     is also added to the list of connections to be removed
