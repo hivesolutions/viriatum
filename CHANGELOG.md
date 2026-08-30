@@ -26,6 +26,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Scalable vector versions of the web illustrations, logos and UI assets
 * Serving performance is now measured against the reference servers on a schedule - [#49](https://github.com/hivesolutions/viriatum/issues/49)
 * Setting that turns the line written for each request off - [#49](https://github.com/hivesolutions/viriatum/issues/49)
+* Waiting on connections through kqueue on the systems that carry it - [#49](https://github.com/hivesolutions/viriatum/issues/49)
+* The status page now names the mechanism the server is waiting through - [#49](https://github.com/hivesolutions/viriatum/issues/49)
 
 ### Changed
 
@@ -53,6 +55,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Sorting a sequence no longer reads past the end of it
 * Reading a configuration section no longer reads past the end of its name
 * A service that fails to start no longer leaves its handlers behind
+* The server no longer falls back on the slowest way of waiting on connections - [#49](https://github.com/hivesolutions/viriatum/issues/49)
+* The banner of the startup no longer leaves out features the build actually has - [#49](https://github.com/hivesolutions/viriatum/issues/49)
 * Static files are now served considerably faster - [#49](https://github.com/hivesolutions/viriatum/issues/49)
 * A file that stops being readable while it is served no longer takes the server down - [#49](https://github.com/hivesolutions/viriatum/issues/49)
 
