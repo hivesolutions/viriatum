@@ -76,6 +76,16 @@ const char *test_polling_event(void);
 const char *test_polling_closed(void);
 
 /**
+ * Tests that a descriptor which goes away behind the back
+ * of the mechanism is reported rather than taking the
+ * serving of everything else down with it.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_polling_gone(void);
+
+/**
  * Tests the connections that are pending an operation at the
  * beginning of a cycle, which are driven before the waiting.
  *

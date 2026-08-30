@@ -44,6 +44,14 @@ static size_t _read_count = 0;
 which is the other way a peer that has gone away shows up */
 static size_t _error_count = 0;
 
+/* the number of times that the handler of the writing has been
+called, which is how a write left pending is told to have been driven */
+static size_t _write_count = 0;
+
+/* the number of times that the handler of the handshake has been
+called, a connection is put through one before it is ever served */
+static size_t _handshake_count = 0;
+
 static ERROR_CODE _on_read_polling_test(struct connection_t *connection) {
     /* counts the call and reads whatever is waiting on the socket so
     that the mechanisms that report an edge do not report it again */
@@ -60,9 +68,19 @@ static ERROR_CODE _on_error_polling_test(struct connection_t *connection) {
     RAISE_NO_ERROR;
 }
 
+static ERROR_CODE _on_handshake_polling_test(struct connection_t *connection) {
+    /* counts the call and puts the connection through to the open
+    state, which is what the finishing of a handshake amounts to */
+    _handshake_count++;
+    connection->status = STATUS_OPEN;
+    RAISE_NO_ERROR;
+}
+
 static ERROR_CODE _on_write_polling_test(struct connection_t *connection) {
-    /* the writing is never the thing being observed, the handler only
-    exists so that the connection is considered to have one */
+    /* counts the call so that a test is able to tell that a write
+    left pending at the end of a cycle was driven at the start of
+    the one that came after it */
+    _write_count++;
     RAISE_NO_ERROR;
 }
 
@@ -270,6 +288,34 @@ const char *test_polling_write(void) {
     V_ASSERT(!IS_ERROR_CODE(error));
     V_ASSERT(connection->write_registered == FALSE);
 
+    /* a connection that carries no handler for the writing is never
+    taken up either, there would be nothing at all to call for it */
+    connection->write_valid = TRUE;
+    connection->on_write = NULL;
+    error = register_write_connection(connection);
+    V_ASSERT(!IS_ERROR_CODE(error));
+
+    /* nor is one that is no longer open, a connection on its way out
+    has nothing more that may be written to it */
+    connection->on_write = _on_write_polling_test;
+    connection->status = STATUS_CLOSED;
+    error = register_write_connection(connection);
+    V_ASSERT(!IS_ERROR_CODE(error));
+
+    /* and one that is open and able is taken up and then driven, a
+    pending write being performed at the start of a cycle rather than
+    at the moment it was asked for */
+    connection->status = STATUS_OPEN;
+    connection->write_registered = FALSE;
+    error = register_write_connection(connection);
+    V_ASSERT(!IS_ERROR_CODE(error));
+
+    _write_count = 0;
+    service->polling->timeout = 0;
+    error = service->polling->poll(service->polling);
+    V_ASSERT(!IS_ERROR_CODE(error));
+    V_ASSERT(_write_count > 0);
+
     remove_connection_service(service, connection);
     SOCKET_CLOSE(server);
     SOCKET_CLOSE(client);
@@ -296,8 +342,10 @@ const char *test_polling_event(void) {
     create_connection(&connection, server);
     connection->service = service;
     connection->status = STATUS_OPEN;
-    add_connection_service(service, connection);
     connection->on_read = _on_read_polling_test;
+    connection->on_handshake = _on_handshake_polling_test;
+    connection->status = STATUS_HANDSHAKE;
+    add_connection_service(service, connection);
 
     V_ASSERT(server > 0);
     V_ASSERT(client > 0);
@@ -311,6 +359,7 @@ const char *test_polling_event(void) {
     wait comes back with that alone and is over before whatever was
     sent has had the chance to land on the other end */
     _read_count = 0;
+    _handshake_count = 0;
     service->polling->timeout = 50;
     for(index = 0; index < 20; index++) {
         error = service->polling->poll(service->polling);
@@ -323,6 +372,7 @@ const char *test_polling_event(void) {
     /* the connection that had something waiting on it is handed back
     and the handler of the reading is called for it */
     V_ASSERT(_read_count > 0);
+    V_ASSERT(_handshake_count > 0);
     V_ASSERT(connection->read_valid == TRUE);
 
     remove_connection_service(service, connection);
@@ -379,6 +429,65 @@ const char *test_polling_closed(void) {
     remove_connection_service(service, connection);
 
     SOCKET_CLOSE(server);
+    _delete_polling_test(service);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_polling_gone(void) {
+    /* allocates space for the service that carries the mechanism, for
+    the pair of sockets and for the connection built over one of them */
+    ERROR_CODE error;
+    SOCKET_HANDLE server;
+    SOCKET_HANDLE client;
+    struct service_t *service;
+    struct connection_t *connection;
+    struct connection_t *other;
+
+    _create_polling_test(&service, VIRIATUM_TEST_POLLING_PORT + 7);
+    _create_pair_polling_test(&server, &client, POLLING_TEST_PORT + 7);
+
+    create_connection(&connection, server);
+    connection->service = service;
+    connection->status = STATUS_OPEN;
+    connection->on_read = _on_read_polling_test;
+    add_connection_service(service, connection);
+
+    /* the descriptor of the connection is closed without the
+    mechanism being told, which is the state that every one of the
+    operations below has an error path for, a server that is handed a
+    descriptor that no longer exists must report it and carry on
+    rather than take the whole of the serving down with it */
+    SOCKET_CLOSE(server);
+
+    unregister_read_connection(connection);
+    register_read_connection(connection);
+    remove_connection_service(service, connection);
+
+    /* whatever the operations above made of it, the mechanism is
+    still able to take another connection and wait on it, which is
+    the thing that actually matters about an error of this kind */
+    _create_pair_polling_test(&server, &client, POLLING_TEST_PORT + 8);
+    create_connection(&other, server);
+    other->service = service;
+    other->status = STATUS_OPEN;
+    other->on_read = _on_read_polling_test;
+
+    error = add_connection_service(service, other);
+    V_ASSERT(!IS_ERROR_CODE(error));
+
+    service->polling->timeout = 0;
+    error = service->polling->poll(service->polling);
+    V_ASSERT(!IS_ERROR_CODE(error));
+    error = service->polling->call(service->polling);
+    V_ASSERT(!IS_ERROR_CODE(error));
+
+    remove_connection_service(service, other);
+
+    SOCKET_CLOSE(server);
+    SOCKET_CLOSE(client);
     _delete_polling_test(service);
 
     /* returns the default value, nothing happened so there's
