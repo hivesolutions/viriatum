@@ -457,6 +457,11 @@ const char *test_bencoding(void) {
     unsigned char *encoded_buffer;
     size_t encoded_buffer_length;
 
+    /* gathers the number of allocations that are outstanding before
+    anything is built, so that the release of everything may be
+    verified against it once the test is over */
+    size_t allocated = ALLOCATIONS;
+
     /* creates the sequence structures (map and list), initializing
     them in the simple (empty) way */
     create_hash_map(&map, 0);
@@ -497,6 +502,11 @@ const char *test_bencoding(void) {
     created during the encoding using bencoding */
     FREE(encoded_buffer);
 
+    /* every one of the structures that has been built is gone, so
+    the number of outstanding allocations is the one it was before
+    the test started at all */
+    V_ASSERT_EQ_U(ALLOCATIONS, allocated);
+
     /* returns the default value, nothing happened so there's
     nothing to report for this execution */
     return NULL;
@@ -512,6 +522,11 @@ const char *test_bit_stream(void) {
     for the test of the bit stream infra-structure */
     struct file_stream_t *file_stream;
     struct bit_stream_t *bit_stream;
+
+    /* gathers the number of allocations that are outstanding before
+    anything is built, so that the release of everything may be
+    verified against it once the test is over */
+    size_t allocated = ALLOCATIONS;
 
     /* creates the file stream that is going to be used
     as the underlying stream for the bit stream */
@@ -697,6 +712,11 @@ const char *test_bit_stream(void) {
     delete_bit_stream(bit_stream);
     delete_file_stream(file_stream);
 
+    /* every one of the structures that has been built is gone, so
+    the number of outstanding allocations is the one it was before
+    the test started at all */
+    V_ASSERT_EQ_U(ALLOCATIONS, allocated);
+
     /* returns the default value, nothing happened so there's
     nothing to report for this execution */
     return NULL;
@@ -711,6 +731,11 @@ const char *test_file_stream(void) {
 
     /* allocates some space for the test buffer */
     unsigned char buffer[128];
+
+    /* gathers the number of allocations that are outstanding before
+    anything is built, so that the release of everything may be
+    verified against it once the test is over */
+    size_t allocated = ALLOCATIONS;
 
     /* creates the file stream */
     create_file_stream(
@@ -729,8 +754,10 @@ const char *test_file_stream(void) {
     /* writes some data to the stream */
     stream->write(stream, (unsigned char *) "hello world", 11);
 
-    /* close the stream */
+    /* close the stream and deletes the file stream that was used
+    for the writing, the reading is driven through another one */
     stream->close(stream);
+    delete_file_stream(file_stream);
 
     /* creates the file stream */
     create_file_stream(&file_stream, (unsigned char *) "hello.txt", (unsigned char *) "rb");
@@ -757,6 +784,11 @@ const char *test_file_stream(void) {
     /* deletes the file stream */
     delete_file_stream(file_stream);
 
+    /* every one of the structures that has been built is gone, so
+    the number of outstanding allocations is the one it was before
+    the test started at all */
+    V_ASSERT_EQ_U(ALLOCATIONS, allocated);
+
     /* returns the default value, nothing happened so there's
     nothing to report for this execution */
     return NULL;
@@ -769,6 +801,11 @@ const char *test_memory_stream(void) {
     struct stream_t *stream;
     struct memory_stream_t *memory_stream;
     unsigned char buffer[256];
+
+    /* gathers the number of allocations that are outstanding before
+    anything is built, so that the release of everything may be
+    verified against it once the test is over */
+    size_t allocated = ALLOCATIONS;
 
     /* creates the memory stream structure starting
     the values contained in it */
@@ -792,6 +829,11 @@ const char *test_memory_stream(void) {
     stream->close(stream);
     delete_memory_stream(memory_stream);
 
+    /* every one of the structures that has been built is gone, so
+    the number of outstanding allocations is the one it was before
+    the test started at all */
+    V_ASSERT_EQ_U(ALLOCATIONS, allocated);
+
     /* returns the default value, nothing happened so there's
     nothing to report for this execution */
     return NULL;
@@ -804,6 +846,11 @@ const char *test_huffman(void) {
     struct file_stream_t *in_stream;
     struct file_stream_t *out_stream;
     struct huffman_t *huffman;
+
+    /* gathers the number of allocations that are outstanding before
+    anything is built, so that the release of everything may be
+    verified against it once the test is over */
+    size_t allocated = ALLOCATIONS;
 
     /* creates the file stream that is going to be used for
     the testing of the huffman infra-structure, this is the
@@ -866,6 +913,11 @@ const char *test_huffman(void) {
     delete_file_stream(out_stream);
     delete_file_stream(in_stream);
     delete_huffman(huffman);
+
+    /* every one of the structures that has been built is gone, so
+    the number of outstanding allocations is the one it was before
+    the test started at all */
+    V_ASSERT_EQ_U(ALLOCATIONS, allocated);
 
     /* returns the default value, nothing happened so there's
     nothing to report for this execution */
@@ -1432,6 +1484,7 @@ static struct test_entry_t _simple_entries[] = {
     V_TEST_T(test_polling_closed, "polling"),
     V_TEST_T(test_polling_gone, "polling"),
     V_TEST_T(test_polling_outstanding, "polling"),
+    V_TEST_T(test_polling_discarded, "polling"),
     V_TEST_T(test_flags_service, "service"),
     V_TEST_T(test_ran_service, "service")
 };

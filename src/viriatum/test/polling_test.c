@@ -469,6 +469,7 @@ const char *test_polling_gone(void) {
     /* whatever the operations above made of it, the mechanism is
     still able to take another connection and wait on it, which is
     the thing that actually matters about an error of this kind */
+    SOCKET_CLOSE(client);
     _create_pair_polling_test(&server, &client, POLLING_TEST_PORT + 8);
     create_connection(&other, server);
     other->service = service;
@@ -535,6 +536,59 @@ const char *test_polling_outstanding(void) {
     V_ASSERT(connection->is_outstanding == FALSE);
 
     remove_connection_service(service, connection);
+    SOCKET_CLOSE(server);
+    SOCKET_CLOSE(client);
+    _delete_polling_test(service);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_polling_discarded(void) {
+    /* allocates space for the service that carries the mechanism, for
+    the pair of sockets and for the connection built over one of them */
+    ERROR_CODE error;
+    SOCKET_HANDLE server;
+    SOCKET_HANDLE client;
+    struct service_t *service;
+    struct connection_t *connection;
+
+    _create_polling_test(&service, VIRIATUM_TEST_POLLING_PORT + 9);
+    _create_pair_polling_test(&server, &client, POLLING_TEST_PORT + 9);
+
+    create_connection(&connection, server);
+    connection->service = service;
+    connection->status = STATUS_OPEN;
+    add_connection_service(service, connection);
+    connection->on_read = _on_read_polling_test;
+
+    /* the connection is left pending a read and is then taken out
+    of the service before the cycle that would drive it, which is
+    what a handler that closes the connection it could not finish
+    reading ends up asking for */
+    error = service->polling->add_outstanding(service->polling, connection);
+    V_ASSERT(!IS_ERROR_CODE(error));
+    V_ASSERT(connection->is_outstanding == TRUE);
+
+    remove_connection_service(service, connection);
+
+    /* the connection is no longer pending anything, the taking of
+    it out of the service is what says so, and it is still around
+    to be asked because the release of it is only queued */
+    V_ASSERT(connection->is_outstanding == FALSE);
+
+    /* the call is what releases the connection that was queued and
+    the waiting that follows is where a connection that stayed
+    pending would be reached again, by then already released */
+    _read_count = 0;
+    service->polling->timeout = 0;
+    error = service->polling->call(service->polling);
+    V_ASSERT(!IS_ERROR_CODE(error));
+    error = service->polling->poll(service->polling);
+    V_ASSERT(!IS_ERROR_CODE(error));
+    V_ASSERT_EQ_U(_read_count, 0);
+
     SOCKET_CLOSE(server);
     SOCKET_CLOSE(client);
     _delete_polling_test(service);

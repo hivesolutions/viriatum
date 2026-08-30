@@ -28,6 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Setting that turns the line written for each request off - [#49](https://github.com/hivesolutions/viriatum/issues/49)
 * Waiting on connections through kqueue on the systems that carry it - [#49](https://github.com/hivesolutions/viriatum/issues/49)
 * The status page now names the mechanism the server is waiting through - [#49](https://github.com/hivesolutions/viriatum/issues/49)
+* Test runs now report which tests left allocations behind them - [#49](https://github.com/hivesolutions/viriatum/issues/49)
 
 ### Changed
 
@@ -59,6 +60,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * The banner of the startup no longer leaves out features the build actually has - [#49](https://github.com/hivesolutions/viriatum/issues/49)
 * Static files are now served considerably faster - [#49](https://github.com/hivesolutions/viriatum/issues/49)
 * A file that stops being readable while it is served no longer takes the server down - [#49](https://github.com/hivesolutions/viriatum/issues/49)
+* A connection dropped while it still had work pending no longer takes the server down - [#49](https://github.com/hivesolutions/viriatum/issues/49)
+* Decoding a dictionary no longer leaves a second one behind, nor ignores the kind that was asked for
+* Bit streams and memory streams now release everything they take
 
 ## [0.5.0] - 2026-08-28
 

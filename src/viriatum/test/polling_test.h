@@ -93,3 +93,13 @@ const char *test_polling_gone(void);
  * the unit test should describe possible errors.
  */
 const char *test_polling_outstanding(void);
+
+/**
+ * Tests that a connection taken out of the service while it
+ * still has an operation pending is not driven again on the
+ * cycle that follows, by then it has already been released.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_polling_discarded(void);

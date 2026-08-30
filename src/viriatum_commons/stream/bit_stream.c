@@ -50,7 +50,7 @@ void create_bit_stream(struct bit_stream_t **bit_stream_pointer, struct stream_t
     /* calculates the buffer size using the pre-defined
     default value and then uses the value to allocate the
     buffer that is going to be used */
-    size_t buffer_size = BIT_STREAM_BUFFER_SIZE * sizeof(unsigned char *);
+    size_t buffer_size = BIT_STREAM_BUFFER_SIZE * sizeof(unsigned char);
     bit_stream->buffer = (unsigned char *) MALLOC(buffer_size);
 
     /* sets the (inner) stream reference, this is the reference
@@ -75,7 +75,9 @@ void create_bit_stream(struct bit_stream_t **bit_stream_pointer, struct stream_t
 }
 
 void delete_bit_stream(struct bit_stream_t *bit_stream) {
-    /* releases the bit stream */
+    /* releases the buffer that the bit stream writes through and
+    then the bit stream itself (avoid memory leaks) */
+    FREE(bit_stream->buffer);
     FREE(bit_stream);
 }
 
