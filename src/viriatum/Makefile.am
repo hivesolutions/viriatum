@@ -77,6 +77,7 @@ test/handler_proxy_test.c \
 test/hpack_test.c \
 test/http2_test.c \
 test/stream_http2_test.c \
+test/polling_test.c \
 test/runner_test.c \
 test/service_test.c \
 test/simple_test.c \
@@ -119,6 +120,7 @@ test/handler_proxy_test.c \
 test/hpack_test.c \
 test/http2_test.c \
 test/stream_http2_test.c \
+test/polling_test.c \
 test/runner_test.c \
 test/service_test.c \
 test/simple_test.c \

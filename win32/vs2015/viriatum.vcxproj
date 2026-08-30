@@ -331,6 +331,7 @@ xcopy /e /y "$(SolutionDir)..\..\src\$(ProjectName)\resources\config\viriatum" "
     <ClCompile Include="..\..\src\viriatum\test\hpack_test.c" />
     <ClCompile Include="..\..\src\viriatum\test\http2_test.c" />
     <ClCompile Include="..\..\src\viriatum\test\stream_http2_test.c" />
+    <ClCompile Include="..\..\src\viriatum\test\polling_test.c" />
     <ClCompile Include="..\..\src\viriatum\test\runner_test.c" />
     <ClCompile Include="..\..\src\viriatum\test\websocket_test.c" />
     <ClCompile Include="..\..\src\viriatum\test\service_test.c" />
@@ -391,6 +392,7 @@ xcopy /e /y "$(SolutionDir)..\..\src\$(ProjectName)\resources\config\viriatum" "
     <ClInclude Include="..\..\src\viriatum\test\hpack_test.h" />
     <ClInclude Include="..\..\src\viriatum\test\http2_test.h" />
     <ClInclude Include="..\..\src\viriatum\test\stream_http2_test.h" />
+    <ClInclude Include="..\..\src\viriatum\test\polling_test.h" />
     <ClInclude Include="..\..\src\viriatum\test\runner_test.h" />
     <ClInclude Include="..\..\src\viriatum\test\websocket_test.h" />
     <ClInclude Include="..\..\src\viriatum\test\service_test.h" />
