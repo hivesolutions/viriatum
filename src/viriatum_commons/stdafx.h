@@ -125,6 +125,7 @@ the windows xp operative system, must disable ipv6 */
 #include <io.h>
 #include <direct.h>
 #include <fcntl.h>
+#include <share.h>
 #include <sys/stat.h>
 /* the platform carries no notion of what everyone else is allowed
 to do with a file, so the bit that stands for it is never set and

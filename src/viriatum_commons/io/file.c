@@ -124,11 +124,11 @@ ERROR_CODE write_file(char *file_path, unsigned char *buffer, size_t buffer_size
     into the proper system path, through encoding conversion */
     SYSTEM_PATH(file_path);
 
-    /* opens the file and in case the retrieved value is not valid
-    raises an error, a platform that refuses to open one that is
-    already held open elsewhere would otherwise be written through
+    /* opens the file leaving it reachable to whoever else is holding
+    it and in case the retrieved value is not valid raises an error,
+    a path that cannot be written would otherwise be written through
     a pointer to nothing at all */
-    FOPEN(&file, file_path, "wb");
+    FOPEN_SHARED(&file, file_path, "wb");
     if(file == NULL) {
         RAISE_ERROR_M(
             RUNTIME_EXCEPTION_ERROR_CODE,
