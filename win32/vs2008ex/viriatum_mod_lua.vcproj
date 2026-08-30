@@ -208,6 +208,10 @@
                     >
                 </File>
                 <File
+                    RelativePath="..\..\modules\mod_lua\src\viriatum_mod_lua\module\extension.c"
+                    >
+                </File>
+                <File
                     RelativePath="..\..\modules\mod_lua\src\viriatum_mod_lua\module\handler.c"
                     >
                 </File>
@@ -231,6 +235,10 @@
                 >
                 <File
                     RelativePath="..\..\modules\mod_lua\src\viriatum_mod_lua\module\entry.h"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\modules\mod_lua\src\viriatum_mod_lua\module\extension.h"
                     >
                 </File>
                 <File
