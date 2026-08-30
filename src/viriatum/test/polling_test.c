@@ -40,12 +40,23 @@ system holds for a while yet, is never bound a second time */
 which is how a test tells that the waiting handed a connection back */
 static size_t _read_count = 0;
 
+/* the number of times that the handler of the error has been called,
+which is the other way a peer that has gone away shows up */
+static size_t _error_count = 0;
+
 static ERROR_CODE _on_read_polling_test(struct connection_t *connection) {
     /* counts the call and reads whatever is waiting on the socket so
     that the mechanisms that report an edge do not report it again */
     unsigned char buffer[128];
     _read_count++;
     SOCKET_RECEIVE(connection->socket_handle, (char *) buffer, sizeof(buffer), 0);
+    RAISE_NO_ERROR;
+}
+
+static ERROR_CODE _on_error_polling_test(struct connection_t *connection) {
+    /* counts the call so that a test is able to tell that the
+    mechanism reported the connection as being in trouble */
+    _error_count++;
     RAISE_NO_ERROR;
 }
 
@@ -189,7 +200,6 @@ const char *test_polling_read(void) {
     add_connection_service(service, connection);
     connection->on_read = _on_read_polling_test;
 
-
     /* the interest in reading is turned on and off again through the
     operations of the connection, which are what the serving of a
     message reaches for and what keeps the flag of the connection in
@@ -239,7 +249,6 @@ const char *test_polling_write(void) {
     connection->status = STATUS_OPEN;
     add_connection_service(service, connection);
     connection->on_write = _on_write_polling_test;
-
 
     /* a connection that is not write valid is never taken up, the
     writing only becomes possible once the mechanism has said so */
@@ -326,6 +335,57 @@ const char *test_polling_event(void) {
     return NULL;
 }
 
+const char *test_polling_closed(void) {
+    /* allocates space for the service that carries the mechanism, for
+    the pair of sockets and for the connection built over one of them */
+    size_t index;
+    ERROR_CODE error;
+    SOCKET_HANDLE server;
+    SOCKET_HANDLE client;
+    struct service_t *service;
+    struct connection_t *connection;
+
+    _create_polling_test(&service, VIRIATUM_TEST_POLLING_PORT + 6);
+    _create_pair_polling_test(&server, &client, POLLING_TEST_PORT + 6);
+
+    create_connection(&connection, server);
+    connection->service = service;
+    connection->status = STATUS_OPEN;
+    connection->on_read = _on_read_polling_test;
+    connection->on_error = _on_error_polling_test;
+    add_connection_service(service, connection);
+
+    /* the other end goes away without saying anything, which is what
+    a client that is closed rather than shut down does and what a
+    connection meets far more often than the orderly ending */
+    SOCKET_CLOSE(client);
+
+    _read_count = 0;
+    _error_count = 0;
+    service->polling->timeout = 50;
+    for(index = 0; index < 20; index++) {
+        error = service->polling->poll(service->polling);
+        V_ASSERT(!IS_ERROR_CODE(error));
+        error = service->polling->call(service->polling);
+        V_ASSERT(!IS_ERROR_CODE(error));
+        if(_read_count > 0 || _error_count > 0) { break; }
+    }
+
+    /* the connection is handed back one way or the other, a peer that
+    has gone shows up either as something to read, which reads as
+    nothing at all, or as an outright error of the connection */
+    V_ASSERT(_read_count > 0 || _error_count > 0);
+
+    remove_connection_service(service, connection);
+
+    SOCKET_CLOSE(server);
+    _delete_polling_test(service);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
 const char *test_polling_outstanding(void) {
     /* allocates space for the service that carries the mechanism, for
     the pair of sockets and for the connection built over one of them */
@@ -343,7 +403,6 @@ const char *test_polling_outstanding(void) {
     connection->status = STATUS_OPEN;
     add_connection_service(service, connection);
     connection->on_read = _on_read_polling_test;
-
 
     /* the connection is left pending a read at the beginning of the
     next cycle, which is what a handler that could not take all of

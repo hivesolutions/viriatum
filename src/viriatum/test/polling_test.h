@@ -66,6 +66,16 @@ const char *test_polling_write(void);
 const char *test_polling_event(void);
 
 /**
+ * Tests that a peer which goes away without saying so is
+ * reported by the mechanism, either as something to read
+ * that reads as nothing or as an error of the connection.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_polling_closed(void);
+
+/**
  * Tests the connections that are pending an operation at the
  * beginning of a cycle, which are driven before the waiting.
  *
