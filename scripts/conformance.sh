@@ -59,10 +59,13 @@ trap _stop EXIT INT TERM
 _wait() {
     INDEX=0
     while [ "$INDEX" -lt 50 ]; do
-        if command -v nc > /dev/null 2>&1; then
-            if nc -z 127.0.0.1 "$1" > /dev/null 2>&1; then return 0; fi
-        else
-            if curl -s -o /dev/null --max-time 1 "http://127.0.0.1:$1/"; then return 0; fi
+        # the readiness is decided by a complete exchange rather than
+        # by the socket merely accepting, one that only accepts is up
+        # before it is able to serve and the suite that follows it
+        # then races the setting up of the transport, which showed up
+        # as the synchronisation of the settings failing now and then
+        if curl -s -k -o /dev/null --max-time 2 "${2:-http}://127.0.0.1:$1/"; then
+            return 0
         fi
         sleep 0.2
         INDEX=$((INDEX + 1))
@@ -100,7 +103,7 @@ if [ -f "$OUTPUT/cert/server.crt" ] && head -1 "$OUTPUT/server.log" | grep -q ss
     echo "Starting the server on port $PORT_SSL ..."
     "$BINARY" --port="$PORT_SSL" --ssl --wwwroot="$OUTPUT/www" < /dev/null > "$OUTPUT/server-ssl.log" 2>&1 &
     PID_SSL=$!
-    _wait "$PORT_SSL"
+    _wait "$PORT_SSL" https
 
     echo "Running the conformance suite over h2 ..."
     H2=$(_run h2 -t -k -h 127.0.0.1 -p "$PORT_SSL")
