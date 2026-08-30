@@ -29,6 +29,7 @@
 #include "handler_dispatch_test.h"
 #include "handler_file_test.h"
 #include "handler_proxy_test.h"
+#include "polling_test.h"
 #include "hpack_test.h"
 #include "http2_test.h"
 #include "runner_test.h"
@@ -1424,6 +1425,11 @@ static struct test_entry_t _simple_entries[] = {
     V_TEST_T(test_file_options_service, "service"),
     V_TEST_T(test_arguments_options_service, "service"),
     V_TEST_T(test_polling_service, "service"),
+    V_TEST_T(test_polling_connection, "polling"),
+    V_TEST_T(test_polling_read, "polling"),
+    V_TEST_T(test_polling_write, "polling"),
+    V_TEST_T(test_polling_event, "polling"),
+    V_TEST_T(test_polling_outstanding, "polling"),
     V_TEST_T(test_flags_service, "service"),
     V_TEST_T(test_ran_service, "service")
 };
