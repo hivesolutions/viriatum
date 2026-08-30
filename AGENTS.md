@@ -98,7 +98,15 @@ The memory of the tree is measured by driving the suite under the address saniti
 ./scripts/sanitize.sh
 ```
 
-An error of the memory fails the run outright, whatever its shape, and the allocations that are left behind are compared against `scripts/sanitize.baseline`, which a run above fails. The number is lowered as the leaks are closed and never raised to make a run pass, the very same rule the conformance and the coverage are held to. The leak part of the sanitizer only runs on some of the platforms, macOS not being one of them, so the job of the integration that runs this is what actually measures the leaks. The server also counts its own allocations in a debug build and reports the outstanding ones when the process ends.
+An error of the memory fails the run outright, whatever its shape, and the allocations that are left behind are compared against `scripts/sanitize.baseline`, which a run above fails. The number is lowered as the leaks are closed and never raised to make a run pass, the very same rule the conformance and the coverage are held to.
+
+The leak part of the sanitizer does not run on macOS with the compiler that ships with the system, so the job of the integration is what measures the leaks by default. A compiler that does carry the detector may be driven through it, which is how a leak is chased without waiting for a run of the integration:
+
+```bash
+CC=/opt/homebrew/opt/llvm/bin/clang LEAKS=1 ./scripts/sanitize.sh
+```
+
+The runner counts the allocations each test leaves outstanding and lists the ones that left the most at the end of a run, which is what points at the test carrying a leak. An allocation that is still outstanding is not necessarily a leak, a value built by one test may well be released by a later one, so the listing narrows the search and the sanitizer settles it. The server counts its own allocations in a debug build too and reports the outstanding ones when the process ends.
 
 ## Performance
 
