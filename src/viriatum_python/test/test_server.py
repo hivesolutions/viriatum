@@ -524,10 +524,17 @@ class ServerLifecycleTest(unittest.TestCase):
         thread.join(timeout=10)
         self.assertFalse(thread.is_alive())
 
+    @unittest.skipIf(
+        sys.platform == "win32",
+        "the platform carries no interrupt of the kind this drives",
+    )
     def test_keyboard_interrupt(self):
         # verifies that an interrupt stops the serving loop, the
         # signals are only handled in the main thread and so it is the
-        # one that runs the loop while another raises the interrupt
+        # one that runs the loop while another raises the interrupt,
+        # the other platform is left out of it because the signal it
+        # raises is not one of the system there and the loop is left
+        # waiting on an interrupt that never reaches it
         state = {"raised": False, "expired": False}
         finished = threading.Event()
 
