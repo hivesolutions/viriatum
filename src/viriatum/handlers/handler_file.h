@@ -344,11 +344,6 @@ typedef struct handler_file_context_t {
     unsigned char range[128];
 } handler_file_context;
 
-ERROR_CODE create_file_cache(struct file_cache_t **file_cache_pointer);
-ERROR_CODE delete_file_cache(struct file_cache_t *file_cache);
-ERROR_CODE clear_file_cache(struct file_cache_t *file_cache);
-ERROR_CODE acquire_file_cache(struct file_cache_t *file_cache, unsigned char *file_path, struct file_cache_entry_t **file_cache_entry_pointer);
-ERROR_CODE open_file_cache(struct file_cache_t *file_cache, unsigned char *file_path, int *descriptor_pointer);
 ERROR_CODE create_file_handler(struct file_handler_t **file_handler_pointer, struct http_handler_t *http_handler);
 ERROR_CODE delete_file_handler(struct file_handler_t *file_handler);
 ERROR_CODE create_handler_file_context(struct handler_file_context_t **handler_file_context_pointer);
@@ -373,6 +368,12 @@ ERROR_CODE _unset_http_request_handler_file(struct http_request_t *http_request)
 ERROR_CODE _reset_http_request_handler_file(struct http_request_t *http_request);
 ERROR_CODE _set_http_settings_handler_file(struct http_settings_t *http_settings);
 ERROR_CODE _unset_http_settings_handler_file(struct http_settings_t *http_settings);
+
+ERROR_CODE create_file_cache(struct file_cache_t **file_cache_pointer);
+ERROR_CODE delete_file_cache(struct file_cache_t *file_cache);
+ERROR_CODE clear_file_cache(struct file_cache_t *file_cache);
+ERROR_CODE acquire_file_cache(struct file_cache_t *file_cache, unsigned char *file_path, struct file_cache_entry_t **file_cache_entry_pointer);
+ERROR_CODE open_file_cache(struct file_cache_t *file_cache, unsigned char *file_path, int *descriptor_pointer);
 ERROR_CODE _cleanup_handler_file(struct connection_t *connection, struct data_t *data, void *parameters);
 ERROR_CODE _send_chunk_handler_file(struct connection_t *connection, struct data_t *data, void *parameter);
 ERROR_CODE _send_data_handler_file(struct connection_t *connection, struct data_t *data, void *parameters);

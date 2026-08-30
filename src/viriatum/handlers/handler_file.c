@@ -62,190 +62,6 @@ static void _time_file_cache(STAT_TYPE *file_stat, struct date_time_t *date_time
     date_time->second = time.tm_sec;
 }
 
-ERROR_CODE create_file_cache(struct file_cache_t **file_cache_pointer) {
-    /* allocates space for the cache itself and for the entries that
-    it is made of, which are as many as a hash is able to fall on */
-    size_t index;
-    size_t file_cache_size = sizeof(struct file_cache_t);
-    size_t entries_size = sizeof(struct file_cache_entry_t) * CACHE_SIZE_HANDLER_FILE;
-    struct file_cache_t *file_cache = (struct file_cache_t *) MALLOC(file_cache_size);
-    file_cache->entries = (struct file_cache_entry_t *) MALLOC(entries_size);
-
-    /* empties every one of the entries, a descriptor of minus one
-    being what says that the slot holds no file at all */
-    for(index = 0; index < CACHE_SIZE_HANDLER_FILE; index++) {
-        file_cache->entries[index].descriptor = -1;
-        file_cache->entries[index].path[0] = '\0';
-        file_cache->entries[index].size = 0;
-        file_cache->entries[index].checked = 0;
-    }
-
-    /* sets the cache in the cache pointer */
-    *file_cache_pointer = file_cache;
-
-    /* raises no error */
-    RAISE_NO_ERROR;
-}
-
-ERROR_CODE delete_file_cache(struct file_cache_t *file_cache) {
-    /* closes every file that is still being held and then releases
-    both the entries and the cache that carried them */
-    clear_file_cache(file_cache);
-    FREE(file_cache->entries);
-    FREE(file_cache);
-
-    /* raises no error */
-    RAISE_NO_ERROR;
-}
-
-ERROR_CODE clear_file_cache(struct file_cache_t *file_cache) {
-    /* allocates space for the index to be used in the iteration
-    over the complete set of entries of the cache */
-    size_t index;
-
-    /* closes the file of every entry that is holding one, a
-    descriptor that is never closed is a descriptor leaked */
-    for(index = 0; index < CACHE_SIZE_HANDLER_FILE; index++) {
-        if(file_cache->entries[index].descriptor == -1) { continue; }
-        CLOSE_READ(file_cache->entries[index].descriptor);
-        file_cache->entries[index].descriptor = -1;
-        file_cache->entries[index].path[0] = '\0';
-    }
-
-    /* raises no error */
-    RAISE_NO_ERROR;
-}
-
-ERROR_CODE acquire_file_cache(struct file_cache_t *file_cache, unsigned char *file_path, struct file_cache_entry_t **file_cache_entry_pointer) {
-    /* allocates space for the structure that describes the file and
-    for the moment at which this is all happening */
-    STAT_TYPE file_stat;
-    unsigned int now = (unsigned int) time(NULL);
-
-    /* the entry that the provided path falls on, a path always falls
-    on the very same one of them and takes it over from whatever was
-    sitting there before, which is what makes both the finding of it
-    and the making of room for it a single step */
-    size_t index = _calculate_string_hash_map(file_path) % CACHE_SIZE_HANDLER_FILE;
-    struct file_cache_entry_t *entry = &file_cache->entries[index];
-
-    /* in case the entry is holding the very file that is being asked
-    for it may be handed back, once what is known about it has been
-    made to agree with the file that the descriptor actually reaches */
-    if(entry->descriptor != -1 && strcmp((char *) entry->path, (char *) file_path) == 0) {
-        /* the descriptor is asked about itself on every single one of
-        the requests, which costs nothing against the opening it saves
-        and is what keeps the size of the entry honest, a file written
-        over in place keeps the very same descriptor and would
-        otherwise be answered with the length it used to have and a
-        body cut short to match it */
-        if(STAT_READ(entry->descriptor, file_stat) != 0) {
-            RAISE_ERROR_M(
-                RUNTIME_EXCEPTION_ERROR_CODE,
-                (unsigned char *) "Problem loading file"
-            );
-        }
-        entry->size = (size_t) file_stat.st_size;
-        _time_file_cache(&file_stat, &entry->time);
-
-        /* within the time that an entry is trusted for there is
-        nothing else to be asked, the descriptor has just answered */
-        if(now - entry->checked < CACHE_VALID_HANDLER_FILE) {
-            *file_cache_entry_pointer = entry;
-            RAISE_NO_ERROR;
-        }
-
-        /* past that the file is looked at through its path as well,
-        which is the only way of telling that another one has been
-        put in its place, the descriptor that is held would go on
-        answering about the file that used to be there */
-        if(stat((char *) file_path, &file_stat) == 0 &&
-           (size_t) file_stat.st_size == entry->size) {
-            entry->checked = now;
-            *file_cache_entry_pointer = entry;
-            RAISE_NO_ERROR;
-        }
-    }
-
-    /* whatever the entry was holding is of no use, either because it
-    describes another file or because the one it describes has moved
-    on, and it is closed before the slot is taken over */
-    if(entry->descriptor != -1) {
-        CLOSE_READ(entry->descriptor);
-        entry->descriptor = -1;
-        entry->path[0] = '\0';
-    }
-
-    /* a path longer than an entry is able to carry is never cached,
-    the copying of it would run past the end of the buffer */
-    if(strlen((char *) file_path) >= VIRIATUM_MAX_PATH_SIZE) {
-        RAISE_ERROR_M(
-            RUNTIME_EXCEPTION_ERROR_CODE,
-            (unsigned char *) "Problem loading file"
-        );
-    }
-
-    /* opens the file and describes it through the descriptor that
-    was just obtained, which answers about the very file that was
-    opened and never about one that took its place in between */
-    entry->descriptor = OPEN_READ((char *) file_path);
-    if(entry->descriptor == -1) {
-        RAISE_ERROR_M(
-            RUNTIME_EXCEPTION_ERROR_CODE,
-            (unsigned char *) "Problem loading file"
-        );
-    }
-
-    if(STAT_READ(entry->descriptor, file_stat) != 0) {
-        CLOSE_READ(entry->descriptor);
-        entry->descriptor = -1;
-        RAISE_ERROR_M(
-            RUNTIME_EXCEPTION_ERROR_CODE,
-            (unsigned char *) "Problem loading file"
-        );
-    }
-
-    /* fills the entry with what has just been learnt about the file,
-    the time of the last write to it included as the tag that travels
-    with the response is built out of it */
-    STRCPY((char *) entry->path, VIRIATUM_MAX_PATH_SIZE, (char *) file_path);
-    entry->size = (size_t) file_stat.st_size;
-    entry->checked = now;
-    _time_file_cache(&file_stat, &entry->time);
-
-    /* sets the entry in the entry pointer */
-    *file_cache_entry_pointer = entry;
-
-    /* raises no error */
-    RAISE_NO_ERROR;
-}
-
-ERROR_CODE open_file_cache(struct file_cache_t *file_cache, unsigned char *file_path, int *descriptor_pointer) {
-    /* allocates space for the entry of the cache and for the error
-    that the acquiring of it may raise */
-    ERROR_CODE error_code;
-    struct file_cache_entry_t *entry;
-
-    /* acquires the entry for the path, which opens the file when the
-    cache is not already holding it open */
-    error_code = acquire_file_cache(file_cache, file_path, &entry);
-    if(IS_ERROR_CODE(error_code)) { RAISE_AGAIN(error_code); }
-
-    /* hands back a duplicate rather than the descriptor of the entry
-    itself, so that the request owns what it reads through and the
-    cache is free to close its own whenever the slot is taken over */
-    *descriptor_pointer = DUPLICATE(entry->descriptor);
-    if(*descriptor_pointer == -1) {
-        RAISE_ERROR_M(
-            RUNTIME_EXCEPTION_ERROR_CODE,
-            (unsigned char *) "Problem loading file"
-        );
-    }
-
-    /* raises no error */
-    RAISE_NO_ERROR;
-}
-
 ERROR_CODE create_file_handler(struct file_handler_t **file_handler_pointer, struct http_handler_t *http_handler) {
     /* retrieves the file handler size */
     size_t file_handler_size = sizeof(struct file_handler_t);
@@ -1637,6 +1453,190 @@ ERROR_CODE _unset_http_settings_handler_file(struct http_settings_t *http_settin
     http_settings->on_path = NULL;
     http_settings->on_location = NULL;
     http_settings->on_virtual_url = NULL;
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE create_file_cache(struct file_cache_t **file_cache_pointer) {
+    /* allocates space for the cache itself and for the entries that
+    it is made of, which are as many as a hash is able to fall on */
+    size_t index;
+    size_t file_cache_size = sizeof(struct file_cache_t);
+    size_t entries_size = sizeof(struct file_cache_entry_t) * CACHE_SIZE_HANDLER_FILE;
+    struct file_cache_t *file_cache = (struct file_cache_t *) MALLOC(file_cache_size);
+    file_cache->entries = (struct file_cache_entry_t *) MALLOC(entries_size);
+
+    /* empties every one of the entries, a descriptor of minus one
+    being what says that the slot holds no file at all */
+    for(index = 0; index < CACHE_SIZE_HANDLER_FILE; index++) {
+        file_cache->entries[index].descriptor = -1;
+        file_cache->entries[index].path[0] = '\0';
+        file_cache->entries[index].size = 0;
+        file_cache->entries[index].checked = 0;
+    }
+
+    /* sets the cache in the cache pointer */
+    *file_cache_pointer = file_cache;
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE delete_file_cache(struct file_cache_t *file_cache) {
+    /* closes every file that is still being held and then releases
+    both the entries and the cache that carried them */
+    clear_file_cache(file_cache);
+    FREE(file_cache->entries);
+    FREE(file_cache);
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE clear_file_cache(struct file_cache_t *file_cache) {
+    /* allocates space for the index to be used in the iteration
+    over the complete set of entries of the cache */
+    size_t index;
+
+    /* closes the file of every entry that is holding one, a
+    descriptor that is never closed is a descriptor leaked */
+    for(index = 0; index < CACHE_SIZE_HANDLER_FILE; index++) {
+        if(file_cache->entries[index].descriptor == -1) { continue; }
+        CLOSE_READ(file_cache->entries[index].descriptor);
+        file_cache->entries[index].descriptor = -1;
+        file_cache->entries[index].path[0] = '\0';
+    }
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE acquire_file_cache(struct file_cache_t *file_cache, unsigned char *file_path, struct file_cache_entry_t **file_cache_entry_pointer) {
+    /* allocates space for the structure that describes the file and
+    for the moment at which this is all happening */
+    STAT_TYPE file_stat;
+    unsigned int now = (unsigned int) time(NULL);
+
+    /* the entry that the provided path falls on, a path always falls
+    on the very same one of them and takes it over from whatever was
+    sitting there before, which is what makes both the finding of it
+    and the making of room for it a single step */
+    size_t index = _calculate_string_hash_map(file_path) % CACHE_SIZE_HANDLER_FILE;
+    struct file_cache_entry_t *entry = &file_cache->entries[index];
+
+    /* in case the entry is holding the very file that is being asked
+    for it may be handed back, once what is known about it has been
+    made to agree with the file that the descriptor actually reaches */
+    if(entry->descriptor != -1 && strcmp((char *) entry->path, (char *) file_path) == 0) {
+        /* the descriptor is asked about itself on every single one of
+        the requests, which costs nothing against the opening it saves
+        and is what keeps the size of the entry honest, a file written
+        over in place keeps the very same descriptor and would
+        otherwise be answered with the length it used to have and a
+        body cut short to match it */
+        if(STAT_READ(entry->descriptor, file_stat) != 0) {
+            RAISE_ERROR_M(
+                RUNTIME_EXCEPTION_ERROR_CODE,
+                (unsigned char *) "Problem loading file"
+            );
+        }
+        entry->size = (size_t) file_stat.st_size;
+        _time_file_cache(&file_stat, &entry->time);
+
+        /* within the time that an entry is trusted for there is
+        nothing else to be asked, the descriptor has just answered */
+        if(now - entry->checked < CACHE_VALID_HANDLER_FILE) {
+            *file_cache_entry_pointer = entry;
+            RAISE_NO_ERROR;
+        }
+
+        /* past that the file is looked at through its path as well,
+        which is the only way of telling that another one has been
+        put in its place, the descriptor that is held would go on
+        answering about the file that used to be there */
+        if(stat((char *) file_path, &file_stat) == 0 &&
+           (size_t) file_stat.st_size == entry->size) {
+            entry->checked = now;
+            *file_cache_entry_pointer = entry;
+            RAISE_NO_ERROR;
+        }
+    }
+
+    /* whatever the entry was holding is of no use, either because it
+    describes another file or because the one it describes has moved
+    on, and it is closed before the slot is taken over */
+    if(entry->descriptor != -1) {
+        CLOSE_READ(entry->descriptor);
+        entry->descriptor = -1;
+        entry->path[0] = '\0';
+    }
+
+    /* a path longer than an entry is able to carry is never cached,
+    the copying of it would run past the end of the buffer */
+    if(strlen((char *) file_path) >= VIRIATUM_MAX_PATH_SIZE) {
+        RAISE_ERROR_M(
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Problem loading file"
+        );
+    }
+
+    /* opens the file and describes it through the descriptor that
+    was just obtained, which answers about the very file that was
+    opened and never about one that took its place in between */
+    entry->descriptor = OPEN_READ((char *) file_path);
+    if(entry->descriptor == -1) {
+        RAISE_ERROR_M(
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Problem loading file"
+        );
+    }
+
+    if(STAT_READ(entry->descriptor, file_stat) != 0) {
+        CLOSE_READ(entry->descriptor);
+        entry->descriptor = -1;
+        RAISE_ERROR_M(
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Problem loading file"
+        );
+    }
+
+    /* fills the entry with what has just been learnt about the file,
+    the time of the last write to it included as the tag that travels
+    with the response is built out of it */
+    STRCPY((char *) entry->path, VIRIATUM_MAX_PATH_SIZE, (char *) file_path);
+    entry->size = (size_t) file_stat.st_size;
+    entry->checked = now;
+    _time_file_cache(&file_stat, &entry->time);
+
+    /* sets the entry in the entry pointer */
+    *file_cache_entry_pointer = entry;
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE open_file_cache(struct file_cache_t *file_cache, unsigned char *file_path, int *descriptor_pointer) {
+    /* allocates space for the entry of the cache and for the error
+    that the acquiring of it may raise */
+    ERROR_CODE error_code;
+    struct file_cache_entry_t *entry;
+
+    /* acquires the entry for the path, which opens the file when the
+    cache is not already holding it open */
+    error_code = acquire_file_cache(file_cache, file_path, &entry);
+    if(IS_ERROR_CODE(error_code)) { RAISE_AGAIN(error_code); }
+
+    /* hands back a duplicate rather than the descriptor of the entry
+    itself, so that the request owns what it reads through and the
+    cache is free to close its own whenever the slot is taken over */
+    *descriptor_pointer = DUPLICATE(entry->descriptor);
+    if(*descriptor_pointer == -1) {
+        RAISE_ERROR_M(
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Problem loading file"
+        );
+    }
 
     /* raises no error */
     RAISE_NO_ERROR;
