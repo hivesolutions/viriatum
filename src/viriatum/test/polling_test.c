@@ -93,7 +93,7 @@ static void _create_pair_polling_test(SOCKET_HANDLE *server, SOCKET_HANDLE *clie
     SOCKET_ADDRESS_INTERNET peer;
     SOCKET_ADDRESS_SIZE peer_size = sizeof(peer);
     SOCKET_OPTION_LARGE flag = 1;
-    int flags;
+    SOCKET_FLAGS flags = 1;
 
     /* opens the socket that the connecting end is going to reach and
     allows the address to be taken again, a suite that runs twice in

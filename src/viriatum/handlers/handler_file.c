@@ -1716,7 +1716,14 @@ ERROR_CODE _send_chunk_handler_file(struct connection_t *connection, struct data
         there when the response was decided upon and is not any
         longer, and there is then nothing at all left to send */
         error_code = open_file_cache(_get_file_cache(), file_path, &descriptor);
-        if(IS_ERROR_CODE(error_code)) { RAISE_AGAIN(error_code); }
+        if(IS_ERROR_CODE(error_code)) {
+            /* the cleanup the exhausting of a file runs is the one that
+            applies here as well, there is nothing left to send either
+            way, and returning without it would leave the connection
+            locked with the handler of it still in place */
+            _cleanup_handler_file(connection, data, parameters);
+            RAISE_AGAIN(error_code);
+        }
 
         /* sets the descriptor in the handler file context together
         with the position the reading of it starts from, which is the

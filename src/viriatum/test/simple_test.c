@@ -1383,6 +1383,7 @@ static struct test_entry_t _simple_entries[] = {
     V_TEST_T(test_handler_file_response, "handler"),
     V_TEST_T(test_handler_file_range, "handler"),
     V_TEST_T(test_handler_file_missing, "handler"),
+    V_TEST_T(test_handler_file_gone, "handler"),
     V_TEST_T(test_handler_file_directory, "handler"),
     V_TEST_T(test_handler_file_path, "handler"),
     V_TEST_T(test_handler_file_location, "handler"),

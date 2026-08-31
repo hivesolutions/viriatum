@@ -410,6 +410,12 @@ const char *test_handler_file_header_value(void) {
 #define HANDLER_FILE_TEST_CONTENTS "hello"
 
 /**
+ * The path that stands in for the resource once it is gone, no file
+ * is ever written under it and opening it is meant to fail.
+ */
+#define HANDLER_FILE_TEST_GONE "./viriatum_handler_file_gone.txt"
+
+/**
  * The handler that stands in for the one a message is served by, it
  * is only ever required so that the release of a message reaches
  * something, it installs no callback of its own.
@@ -647,6 +653,86 @@ const char *test_handler_file_missing(void) {
     url_callback_handler_file(http_request, (unsigned char *) "/absent.txt", 11);
     message_complete_callback_handler_file(http_request);
     V_ASSERT_EQ_U(get_closed_test_connection(), 0);
+    flush_test_connection(context, NULL, 0);
+    V_ASSERT_EQ_U(get_closed_test_connection(), 1);
+
+    _delete_handler_file_test(context, http_request, handler_file_context);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_handler_file_gone(void) {
+    /* allocates space for the chain of the connection, for the
+    message being served and for the response it produces */
+    struct test_context_t *context;
+    struct http_request_t *http_request;
+    struct handler_file_context_t *handler_file_context;
+    unsigned char written[2048];
+    size_t size;
+    ERROR_CODE error;
+
+    _create_handler_file_test(&context, &http_request, &handler_file_context);
+
+    /* drives the message through the callbacks of the handler, the
+    response of it is decided upon while the resource is still there */
+    error = url_callback_handler_file(
+        http_request,
+        (unsigned char *) "/" HANDLER_FILE_TEST_NAME,
+        sizeof(HANDLER_FILE_TEST_NAME)
+    );
+    V_ASSERT(error == 0);
+    error = message_complete_callback_handler_file(http_request);
+    V_ASSERT(error == 0);
+
+    /* the resource goes away between the deciding of the response and
+    the sending of the payload of it, which the handler only ever
+    finds out about when it opens the file for the first of the
+    chunks, the cache is still holding the one that was there */
+    remove(HANDLER_FILE_TEST_PATH);
+    SPRINTF(
+        (char *) handler_file_context->file_path_d,
+        VIRIATUM_MAX_PATH_SIZE,
+        "%s",
+        HANDLER_FILE_TEST_GONE
+    );
+
+    size = flush_test_connection(context, written, sizeof(written));
+    V_ASSERT(size > 0 && size < sizeof(written));
+    written[size] = '\0';
+
+    /* the headers went out because the resource was there when they
+    were decided upon, and the payload of it never followed them */
+    V_ASSERT(strstr((char *) written, "HTTP/1.1 200 OK\r\n") == (char *) written);
+    V_ASSERT_NULL(strstr((char *) written, "\r\n\r\n" HANDLER_FILE_TEST_CONTENTS));
+
+    /* the connection is handed back rather than left locked with the
+    handler of it still in place, one that kept either of them would
+    answer no further message for as long as it stayed open */
+    V_ASSERT_NULL(context->http_connection->http_handler);
+    V_ASSERT_EQ_U(context->http_connection->lock, FALSE);
+    V_ASSERT_EQ_U(get_closed_test_connection(), 0);
+
+    _delete_handler_file_test(context, http_request, handler_file_context);
+
+    /* a message that is not meant to be kept alive takes the
+    connection down rather than being handed back */
+    _create_handler_file_test(&context, &http_request, &handler_file_context);
+    http_request->flags = 0;
+    url_callback_handler_file(
+        http_request,
+        (unsigned char *) "/" HANDLER_FILE_TEST_NAME,
+        sizeof(HANDLER_FILE_TEST_NAME)
+    );
+    message_complete_callback_handler_file(http_request);
+    remove(HANDLER_FILE_TEST_PATH);
+    SPRINTF(
+        (char *) handler_file_context->file_path_d,
+        VIRIATUM_MAX_PATH_SIZE,
+        "%s",
+        HANDLER_FILE_TEST_GONE
+    );
     flush_test_connection(context, NULL, 0);
     V_ASSERT_EQ_U(get_closed_test_connection(), 1);
 
@@ -1380,8 +1466,10 @@ const char *test_file_cache_replaced(void) {
 
     /* another file is put in the place of the one that is held, the
     descriptor of the entry goes on reaching the one that was there
-    before and only a look at the path is able to tell */
-    remove(FILE_CACHE_TEST_PATH);
+    before and only a look at the path is able to tell, the removal
+    has to have gone through or the writing lands on the very same
+    file and there would be nothing to tell apart at all */
+    V_ASSERT_EQ_I(remove(FILE_CACHE_TEST_PATH), 0);
     write_file(
         (char *) FILE_CACHE_TEST_PATH,
         (unsigned char *) FILE_CACHE_TEST_CONTENTS FILE_CACHE_TEST_CONTENTS,
@@ -1434,8 +1522,9 @@ const char *test_file_cache_rewritten(void) {
     /* another file of the very same length is put in the place of
     the one that is held, which the size of it is unable to tell
     apart, so the entry has to reach the one now under the path
-    rather than the one its descriptor still opens */
-    remove(FILE_CACHE_TEST_PATH);
+    rather than the one its descriptor still opens, the removal has
+    to have gone through or the two of them are the same file */
+    V_ASSERT_EQ_I(remove(FILE_CACHE_TEST_PATH), 0);
     write_file(
         (char *) FILE_CACHE_TEST_PATH,
         (unsigned char *) FILE_CACHE_TEST_OTHER,
