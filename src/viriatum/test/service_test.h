@@ -113,6 +113,16 @@ const char *test_arguments_options_service(void);
  * @return A message describing the execution of
  * the unit test should describe possible errors.
  */
+/**
+ * Tests the naming of the mechanism that the service
+ * waits on its connections through, which the status
+ * page reads off the service to show which is in use.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_polling_service(void);
+
 const char *test_flags_service(void);
 
 /**

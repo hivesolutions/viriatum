@@ -181,3 +181,112 @@ const char *test_handler_file_location(void);
  * the unit test should describe possible errors.
  */
 const char *test_handler_file_handler(void);
+
+/**
+ * Tests the creation of the cache of the files that
+ * the handler keeps open and its default state.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_file_cache(void);
+
+/**
+ * Tests the acquiring of a file out of the cache, both
+ * the first time and once it is already being held.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_file_cache_acquire(void);
+
+/**
+ * Tests the acquiring of a file that is not there, which
+ * raises instead of handing back an empty entry.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_file_cache_missing(void);
+
+/**
+ * Tests that a file written over in place is described by
+ * the size it now has and never by the one it used to have.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_file_cache_changed(void);
+
+/**
+ * Tests that two files falling on the same entry of the
+ * cache are each described by their own contents.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_file_cache_collision(void);
+
+/**
+ * Tests the clearing of the cache, which closes every file
+ * being held and leaves it working afterwards.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_file_cache_clear(void);
+
+/**
+ * Tests the handing out of a descriptor for a file of the
+ * cache, one apart from the descriptor it is holding.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_file_cache_open(void);
+
+/**
+ * Tests that a path longer than an entry is able to carry
+ * is refused instead of being copied past the end of it.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_file_cache_long(void);
+
+/**
+ * Tests that an entry which has gone past the time it is
+ * trusted for is renewed when the file has not moved on.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_file_cache_expired(void);
+
+/**
+ * Tests that a file put in the place of the one being held
+ * is opened in its place once the entry is looked at again.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_file_cache_replaced(void);
+
+/**
+ * Tests that a file replaced by another of the very same length
+ * is served as the one that is now under the path, the length of
+ * it being unable to tell the two of them apart.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_file_cache_rewritten(void);
+
+/**
+ * Tests that an entry left holding a descriptor which no
+ * longer reaches anything answers with an error.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_file_cache_stale(void);

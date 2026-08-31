@@ -128,6 +128,38 @@ class BenchmarkTableTest(unittest.TestCase):
         # against, there is nothing to say it should not be
         self.assertEqual(benchmark_table.comparable(dict(machine="Linux"), {}), True)
 
+    def test_differing(self):
+        # the parts that do not meet are the ones named, and only
+        # those, a part that is the same in both is never pointed at
+        recorded = dict(machine="Linux", mode="native", connections="64", threads="4")
+        self.assertEqual(benchmark_table.differing(dict(recorded), recorded), [])
+        self.assertEqual(
+            benchmark_table.differing(dict(recorded, connections="256"), recorded),
+            ["connections"],
+        )
+        self.assertEqual(
+            benchmark_table.differing(
+                dict(recorded, connections="256", threads="8"), recorded
+            ),
+            ["connections", "threads"],
+        )
+
+    def test_differing_unrecorded(self):
+        # a baseline that never recorded where it was taken has nothing
+        # to differ on, the run is compared against it as it is
+        self.assertEqual(benchmark_table.differing(dict(machine="Linux"), {}), [])
+
+    def test_describe(self):
+        # the named parts are written out in the order they are given
+        # and a part the environment never carried is still named
+        values = dict(connections="64", threads="4")
+        self.assertEqual(
+            benchmark_table.describe(values, ["connections", "threads"]),
+            "connections 64, threads 4",
+        )
+        self.assertEqual(benchmark_table.describe(values, ["workers"]), "workers ?")
+        self.assertEqual(benchmark_table.describe(values, []), "")
+
     def test_order(self):
         with io.open(os.path.join(self.output, "workloads.txt"), "wb") as file:
             file.write(b"static-small-alive|static|file|/small.html||On|\nproxy-alive|proxy|\n")
@@ -395,6 +427,103 @@ class BenchmarkTableTest(unittest.TestCase):
 
         self.assertTrue("-50.0%" not in stream.getvalue())
         self.assertTrue("so nothing was compared against it" in stream.getvalue())
+
+    def test_main_baseline_shape(self):
+        # a baseline taken under another shape of load is not compared
+        # against either, and the report names the parts that do not
+        # meet rather than the machine, which is the same one
+        self._write(dict(SUBJECT, rps=500.0))
+        with io.open(os.path.join(self.output, "environment.txt"), "wb") as file:
+            file.write(b"machine: Linux x86_64\nconnections: 256\nthreads: 8")
+
+        path = os.path.join(self.output, "baseline.json")
+        with io.open(path, "wb") as file:
+            file.write(
+                json.dumps(
+                    dict(
+                        results=[SUBJECT],
+                        environment=dict(
+                            machine="Linux x86_64", connections="64", threads="4"
+                        ),
+                    )
+                ).encode("utf-8")
+            )
+
+        stream = io.StringIO()
+        stdout = sys.stdout
+        try:
+            sys.stdout = stream
+            self.assertEqual(benchmark_table.main_with(self.output, path), 0)
+        finally:
+            sys.stdout = stdout
+
+        value = stream.getvalue()
+        self.assertTrue("-50.0%" not in value)
+        self.assertTrue("connections 64, threads 4" in value)
+        self.assertTrue("connections 256, threads 8" in value)
+        self.assertTrue("refresh the baseline" in value)
+
+    def test_main_baseline_barren(self):
+        # a baseline taken under the very same shape and carrying no
+        # results at all is not a mismatch, so the report says there is
+        # nothing to compare against rather than naming a part
+        self._write(SUBJECT)
+        with io.open(os.path.join(self.output, "environment.txt"), "wb") as file:
+            file.write(b"machine: Linux x86_64\nconnections: 64")
+
+        path = os.path.join(self.output, "baseline.json")
+        with io.open(path, "wb") as file:
+            file.write(
+                json.dumps(
+                    dict(
+                        results=[],
+                        environment=dict(machine="Linux x86_64", connections="64"),
+                    )
+                ).encode("utf-8")
+            )
+
+        stream = io.StringIO()
+        stdout = sys.stdout
+        try:
+            sys.stdout = stream
+            self.assertEqual(benchmark_table.main_with(self.output, path), 0)
+        finally:
+            sys.stdout = stdout
+
+        value = stream.getvalue()
+        self.assertTrue("The baseline carries no results" in value)
+        self.assertTrue("refresh the baseline" not in value)
+
+    def test_main_baseline_barren_elsewhere(self):
+        # a baseline that carries no results and was taken under
+        # another shape is not a mismatch to be refreshed, there is
+        # nothing in it to compare against under any shape at all
+        self._write(SUBJECT)
+        with io.open(os.path.join(self.output, "environment.txt"), "wb") as file:
+            file.write(b"machine: Linux x86_64\nconnections: 256")
+
+        path = os.path.join(self.output, "baseline.json")
+        with io.open(path, "wb") as file:
+            file.write(
+                json.dumps(
+                    dict(
+                        results=[],
+                        environment=dict(machine="Linux x86_64", connections="64"),
+                    )
+                ).encode("utf-8")
+            )
+
+        stream = io.StringIO()
+        stdout = sys.stdout
+        try:
+            sys.stdout = stream
+            self.assertEqual(benchmark_table.main_with(self.output, path), 0)
+        finally:
+            sys.stdout = stdout
+
+        value = stream.getvalue()
+        self.assertTrue("The baseline carries no results" in value)
+        self.assertTrue("refresh the baseline" not in value)
 
     def test_main_empty(self):
         self.assertEqual(benchmark_table.main_with(self.output, None), 1)

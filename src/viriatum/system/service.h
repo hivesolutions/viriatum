@@ -318,6 +318,13 @@ typedef struct service_t {
     unsigned char *flags;
 
     /**
+     * The name of the mechanism that the service waits
+     * on its connections through, one of epoll, kqueue
+     * or select depending on what the build found.
+     */
+    unsigned char *polling_name;
+
+    /**
      * The description (string) of the compiler
      * used to compile the service structures.
      */
@@ -643,6 +650,14 @@ typedef struct service_options_t {
      * for denial of service (dos) attacks).
      */
     unsigned char use_template;
+
+    /**
+     * If a line describing each of the requests should be
+     * written to the standard output, the writing of it is
+     * a call into the kernel per request and so it is the
+     * kind of thing a deployment under load turns off.
+     */
+    unsigned char access_log;
 
     /**
      * The default virtual host to be used in any

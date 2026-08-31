@@ -17,6 +17,22 @@ conan profile detect --force
 conan install . --build=missing
 ```
 
+## Adding a Source File
+
+CMake gathers the sources of the tree through a pattern and so it picks a new file up on its own, every one of the other build systems names them one by one and has to be told. When a source or a header is added, removed or renamed, the following have to be kept in step with it:
+
+- `src/viriatum/Makefile.am` and `src/viriatum_commons/Makefile.am`, each of them carrying two lists of sources, the ones of the binary or of the static library and the ones of the shared library
+- `src/Makefile.am`, which carries the headers of both trees that the packaging installs
+- `win32/vs2015/viriatum.vcxproj` and `win32/vs2015/viriatum_commons.vcxproj`, along with the `.filters` beside each of them that says which group a file belongs to
+- `win32/vs2015/viriatum.vcproj`, `win32/vs2015/viriatum_commons.vcproj` and the pair of the same names under `win32/vs2008ex`, which are the older format of those very projects
+- `win32/vs2008ex/viriatum_mod_*.vcproj` and `win32/vs2015/viriatum_mod_*.vcproj`, for a source of a module
+- `darwin/xcode4/viriatum/viriatum.xcodeproj/project.pbxproj` and the one of the commons beside it, which name a file in four places, the reference of it, the group it hangs from and the build of it for each of the two targets
+- `examples/zig/build.zig`, which carries a list of its own
+
+A suite carries two more, `src/viriatum/test/simple_test.c` has to include the header of it and to name every one of its tests in the registry that closes that file.
+
+The packaging for Python builds through CMake and so needs nothing of its own. The fuzz targets are the single deliberate exception to all of the above, they carry an entry point of their own and are named by no project.
+
 ## Formatting
 
 Format C code before committing using clang-format with the project's `.clang-format` configuration:
@@ -82,7 +98,15 @@ The memory of the tree is measured by driving the suite under the address saniti
 ./scripts/sanitize.sh
 ```
 
-An error of the memory fails the run outright, whatever its shape, and the allocations that are left behind are compared against `scripts/sanitize.baseline`, which a run above fails. The number is lowered as the leaks are closed and never raised to make a run pass, the very same rule the conformance and the coverage are held to. The leak part of the sanitizer only runs on some of the platforms, macOS not being one of them, so the job of the integration that runs this is what actually measures the leaks. The server also counts its own allocations in a debug build and reports the outstanding ones when the process ends.
+An error of the memory fails the run outright, whatever its shape, and the allocations that are left behind are compared against `scripts/sanitize.baseline`, which a run above fails. The number is lowered as the leaks are closed and never raised to make a run pass, the very same rule the conformance and the coverage are held to.
+
+The leak part of the sanitizer does not run on macOS with the compiler that ships with the system, so the job of the integration is what measures the leaks by default. A compiler that does carry the detector may be driven through it, which is how a leak is chased without waiting for a run of the integration:
+
+```bash
+CC=/opt/homebrew/opt/llvm/bin/clang LEAKS=1 ./scripts/sanitize.sh
+```
+
+The runner counts the allocations each test leaves outstanding and lists the ones that left the most at the end of a run, which is what points at the test carrying a leak. An allocation that is still outstanding is not necessarily a leak, a value built by one test may well be released by a later one, so the listing narrows the search and the sanitizer settles it. The server counts its own allocations in a debug build too and reports the outstanding ones when the process ends.
 
 ## Performance
 
@@ -93,9 +117,13 @@ The serving is measured against the reference servers by a harness that starts t
 ONLY=static-small-alive ./scripts/benchmark.sh
 ```
 
-Absolute numbers from any one machine are not comparable to another, so the figure that is tracked is the **ratio of the server against a reference measured in the same run**. Every run is compared against `scripts/benchmark/baseline.json`, which is only ever refreshed through an explicit input of the workflow so that it cannot quietly ratchet down. The run reports and never gates, a hosted runner being far too noisy to fail a build on a performance figure.
+Absolute numbers from any one machine are not comparable to another, so the figure that is tracked is the **ratio of the server against a reference measured in the same run**. Every run is compared against `scripts/benchmark/baseline.json`, which is only ever refreshed through an explicit input of the workflow so that it cannot quietly ratchet down. The machine and the shape of the load are part of what makes two runs comparable, so a change to `CONNECTIONS`, `THREADS` or `WORKERS` leaves the stored baseline behind and the change column empty until it is refreshed under the new shape, which the report says outright. The run reports and never gates, a hosted runner being far too noisy to fail a build on a performance figure.
 
 A claim about performance needs a run of the harness behind it. An optimisation lands with a before and after attached and is reverted when the gain does not hold, and a change is measured by driving the two binaries interleaved rather than in blocks, so that a drift of the machine lands on both of them equally. Establish where the time goes with a profile before changing anything: the widest gap is rarely where it is assumed to be, and an entry in `doc/todo.md` is a hypothesis rather than a finding.
+
+The service waits on its connections through `epoll` where it exists, `kqueue` where it does not, and `select` only when neither is around. The one in use is named in the banner of the startup, in the flags that travel on every response, and on the status page. `select` walks every descriptor on every pass and stops working entirely past `FD_SETSIZE`, which is 1024, so a build that falls back on it is a build that will not hold more than a thousand connections; drive `CONNECTIONS=1200` and `CONNECTIONS=2000` against it before assuming otherwise, one run of the harness for each of them.
+
+The files that the file handler serves are kept open in a cache of its own, one per worker process, so that serving a file again costs neither the opening of it nor the describing of it. The size of a held file is taken from its descriptor on every request, so a file written over in place is always served at the length it now has; a file **replaced** at the same path is picked up once the entry is looked at again, which is `CACHE_VALID_HANDLER_FILE` seconds at the latest. A path falls on exactly one entry, decided by the hash of it, and takes that entry over from whatever was there before.
 
 The methodology, the configuration each server is given and the reasoning behind every one of those choices are written down in `scripts/benchmark/README.md`. Anything that affects the comparison, such as the logging of a request or the pooling of an upstream connection, belongs there the moment it is changed.
 
@@ -187,6 +215,7 @@ version: 0.4.0
 
 Before committing, ensure that the following items check:
 
+- [ ] Every build system names a new source file, see [Adding a Source File](#adding-a-source-file)
 - [ ] Code is formatted with `clang-format`, which `./scripts/format.sh` verifies over the whole tree
 - [ ] Tests pass: `./bin/viriatum --test`
 - [ ] Module tests pass (if applicable): `./bin/viriatum_mod_lua_test`

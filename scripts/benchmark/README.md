@@ -24,6 +24,8 @@ The metrics that would disturb a timed run are taken outside of one: the tail be
 
 A measurement that lost a noticeable share of its connections is recorded as invalid rather than reported as a figure, because a machine that has run out of something answers far faster than a server does and would otherwise read as a win.
 
+The load is driven over `CONNECTIONS` connections from `THREADS` threads, 256 and 8 by default. Both matter and both are recorded beside every figure. Too few connections and a server is never asked the question that separates one waiting mechanism from another, which only begins to tell them apart in the hundreds; too many threads and the generator takes the cores away from the subject it is measuring, which was seen to cost around 4% at sixteen of them on a machine of eighteen cores. A run that changes either of these is not comparable against a baseline recorded under the other, and the report says so rather than pretending otherwise.
+
 ## Where the servers run
 
 The subject and its references always run **the same way**. Either both come out of a pinned image or both come out of the binaries the machine carries. A subject reached over one stack and a reference reached over another measures the stacks and never the servers, which is exactly what would happen on a machine whose container daemon lives inside a virtual machine of its own.
@@ -39,7 +41,7 @@ The values below are the ones that actually decide the comparison. Everything el
 | Choice | Viriatum | nginx | Caddy | HAProxy | gunicorn | uvicorn |
 | --- | --- | --- | --- | --- | --- | --- |
 | Worker count | `WORKERS` | `worker_processes` | default | `nbthread` | `--workers` | `--workers` |
-| Access logging | stdout to the sink | `access_log off` | `output discard` | `log /dev/null` | `/dev/null` | `--no-access-log` |
+| Access logging | `access_log off` | `access_log off` | `output discard` | `log /dev/null` | `/dev/null` | `--no-access-log` |
 | Kernel file sending | none | `sendfile off` | default | n/a | n/a | n/a |
 | Compression | none | `gzip off` | not enabled | n/a | n/a | n/a |
 | Keep-alive idle | default | `65s` | `idle 65s` | `65s` | `--keep-alive 65` | default |
@@ -52,7 +54,7 @@ A few of these deserve their reasoning written down.
 
 **`keepalive_requests` is raised well past its default.** nginx closes a connection after a thousand requests by default and Viriatum does not close one at all, and that difference alone shows up as a gap that has nothing to do with the serving.
 
-**Viriatum's request log is silenced by redirecting its output, not by configuration.** The server writes a line per request through `V_INFO` and carries no setting that turns it off, where every reference has one. Leaving it on while the references have theirs off was measured to cost the subject about 4% on the small static workload, so the harness sends its standard output to the sink and keeps only its error stream. That Viriatum cannot do this through its own configuration is a real gap against the references and is noted rather than worked around.
+**Viriatum's request log is turned off through `access_log`, the way every reference turns its own off.** The server writes a line per request and leaving it on while the references have theirs off was measured to cost the subject about 6% on the small static workload. The output of the process is still sent to the sink on top of that, so that anything else it writes never reaches a disk during a measurement.
 
 **The Python references are given the shape they are fastest in, not the one that mirrors the subject.** Viriatum's embedded server holds every connection on the loop of a single process. gunicorn's default worker answers one request at a time and loses every connection past the worker count; measured across its shapes it is fastest at `gthread` with the worker count of the subject and 32 threads, and that is what it is given. A reference driven in a shape it was never meant for reports the shape and never the reference.
 

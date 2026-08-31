@@ -38,8 +38,8 @@ const char *test_handler_file_context(void) {
     V_ASSERT(handler_file_context->base_path == NULL);
     V_ASSERT(handler_file_context->auth_basic == NULL);
     V_ASSERT(handler_file_context->auth_file == NULL);
-    V_ASSERT(handler_file_context->file == NULL);
-    V_ASSERT(handler_file_context->file_size == 0);
+    V_ASSERT(handler_file_context->descriptor == -1);
+    V_ASSERT(handler_file_context->offset == 0);
     V_ASSERT(handler_file_context->initial_byte == 0);
     V_ASSERT(handler_file_context->final_byte == 0);
     V_ASSERT(handler_file_context->flags == 0);
@@ -902,16 +902,20 @@ const char *test_handler_file_handler(void) {
     V_ASSERT_NOT_NULL(http_settings->on_message_complete);
 
     /* a message that follows another one on the same connection
-    resets the values of the context rather than building it again */
+    resets the values of the context rather than building it again,
+    the descriptor of a transfer that was cut short included, one
+    left behind would be held for the whole of the connection */
     handler_file_context = (struct handler_file_context_t *) http_request->context;
-    handler_file_context->file_size = 1024;
+    handler_file_context->offset = 1024;
     handler_file_context->etag_status = 2;
     handler_file_context->range_status = 2;
+    open_read_file((char *) HANDLER_FILE_TEST_PATH, &handler_file_context->descriptor);
+    V_ASSERT(handler_file_context->descriptor != -1);
     reset_handler_file(context->http_connection);
-    V_ASSERT_EQ_U(handler_file_context->file_size, 0);
+    V_ASSERT_EQ_U(handler_file_context->offset, 0);
     V_ASSERT_EQ_U(handler_file_context->etag_status, 0);
     V_ASSERT_EQ_U(handler_file_context->range_status, 0);
-    V_ASSERT_NULL(handler_file_context->file);
+    V_ASSERT_EQ_I(handler_file_context->descriptor, -1);
 
     /* the unsetting releases the context and takes the pipeline
     down, so that another handler may take the connection */
@@ -925,6 +929,585 @@ const char *test_handler_file_handler(void) {
     delete_test_connection(context);
     delete_test_context(context);
     remove(HANDLER_FILE_TEST_PATH);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+/* the file that the tests of the cache write and serve, kept apart
+from the one of the handler so that the two never interfere */
+#define FILE_CACHE_TEST_PATH "./viriatum_file_cache_test.txt"
+
+/* the contents that the file above is written with, the size of it
+is what the entry of the cache is expected to report */
+#define FILE_CACHE_TEST_CONTENTS "viriatum"
+
+/* another set of contents of the very same length as the one
+above, so that a file replaced by it is told apart from the one
+that was there by nothing but what it holds */
+#define FILE_CACHE_TEST_OTHER "serviced"
+
+const char *test_file_cache(void) {
+    /* allocates space for the cache and for the index to be used in
+    the walking of the entries it is made of */
+    size_t index;
+    struct file_cache_t *file_cache;
+
+    /* creates the cache and verifies that every one of its entries
+    starts out holding no file at all */
+    create_file_cache(&file_cache);
+    V_ASSERT_NOT_NULL(file_cache);
+    V_ASSERT_NOT_NULL(file_cache->entries);
+
+    for(index = 0; index < CACHE_SIZE_HANDLER_FILE; index++) {
+        V_ASSERT_EQ_I(file_cache->entries[index].descriptor, -1);
+        V_ASSERT_EQ_U(file_cache->entries[index].size, 0);
+    }
+
+    delete_file_cache(file_cache);
+    remove(FILE_CACHE_TEST_PATH);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_file_cache_acquire(void) {
+    /* allocates space for the cache and for the entries that the
+    acquiring of the very same path hands back */
+    struct file_cache_t *file_cache;
+    struct file_cache_entry_t *first;
+    struct file_cache_entry_t *second;
+    ERROR_CODE error;
+
+    write_file(
+        (char *) FILE_CACHE_TEST_PATH,
+        (unsigned char *) FILE_CACHE_TEST_CONTENTS,
+        sizeof(FILE_CACHE_TEST_CONTENTS) - 1
+    );
+
+    create_file_cache(&file_cache);
+
+    /* the first acquisition opens the file and learns both its size
+    and the moment of the last write to it */
+    error = acquire_file_cache(
+        file_cache,
+        (unsigned char *) FILE_CACHE_TEST_PATH,
+        &first
+    );
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT_NOT_NULL(first);
+    V_ASSERT_EQ_U(first->size, sizeof(FILE_CACHE_TEST_CONTENTS) - 1);
+    V_ASSERT(first->descriptor != -1);
+    V_ASSERT(first->time.year >= 1970);
+
+    /* the second one falls on the very same entry and hands back the
+    file that was already open rather than opening it again */
+    error = acquire_file_cache(
+        file_cache,
+        (unsigned char *) FILE_CACHE_TEST_PATH,
+        &second
+    );
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT_EQ_P(first, second);
+    V_ASSERT_EQ_I(first->descriptor, second->descriptor);
+
+    delete_file_cache(file_cache);
+    remove(FILE_CACHE_TEST_PATH);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_file_cache_missing(void) {
+    /* allocates space for the cache and for the entry that the
+    acquiring of a file that is not there would have handed back */
+    struct file_cache_t *file_cache;
+    struct file_cache_entry_t *entry = NULL;
+    ERROR_CODE error;
+
+    create_file_cache(&file_cache);
+
+    /* a file that does not exist raises rather than handing back an
+    entry that describes nothing at all */
+    error = acquire_file_cache(
+        file_cache,
+        (unsigned char *) "./viriatum_file_cache_gone.txt",
+        &entry
+    );
+    V_ASSERT(IS_ERROR_CODE(error));
+    RESET_ERROR;
+
+    delete_file_cache(file_cache);
+    remove(FILE_CACHE_TEST_PATH);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_file_cache_changed(void) {
+    /* allocates space for the cache and for the entry that describes
+    the file before and after it has been written over */
+    struct file_cache_t *file_cache;
+    struct file_cache_entry_t *entry;
+    ERROR_CODE error;
+
+    write_file(
+        (char *) FILE_CACHE_TEST_PATH,
+        (unsigned char *) FILE_CACHE_TEST_CONTENTS,
+        sizeof(FILE_CACHE_TEST_CONTENTS) - 1
+    );
+
+    create_file_cache(&file_cache);
+
+    error = acquire_file_cache(
+        file_cache,
+        (unsigned char *) FILE_CACHE_TEST_PATH,
+        &entry
+    );
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT_EQ_U(entry->size, sizeof(FILE_CACHE_TEST_CONTENTS) - 1);
+
+    /* the file is written over in place, which keeps the very same
+    descriptor reaching it, so an entry that went on trusting the size
+    it learnt before would answer with a body cut short to match it,
+    and the writing itself has to succeed while the cache is holding
+    the file open, which is not something every platform allows of
+    its own accord and which a deployment of a new file depends on */
+    error = write_file(
+        (char *) FILE_CACHE_TEST_PATH,
+        (unsigned char *) FILE_CACHE_TEST_CONTENTS FILE_CACHE_TEST_CONTENTS,
+        (sizeof(FILE_CACHE_TEST_CONTENTS) - 1) * 2
+    );
+    V_ASSERT_EQ_U(error, 0);
+
+    error = acquire_file_cache(
+        file_cache,
+        (unsigned char *) FILE_CACHE_TEST_PATH,
+        &entry
+    );
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT_EQ_U(entry->size, (sizeof(FILE_CACHE_TEST_CONTENTS) - 1) * 2);
+
+    delete_file_cache(file_cache);
+    remove(FILE_CACHE_TEST_PATH);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_file_cache_collision(void) {
+    /* allocates space for the cache and for the entries of the two
+    files that are made to fall on the very same slot */
+    size_t index;
+    size_t taken;
+    char path[VIRIATUM_MAX_PATH_SIZE];
+    struct file_cache_t *file_cache;
+    struct file_cache_entry_t *entry;
+    ERROR_CODE error;
+
+    write_file(
+        (char *) FILE_CACHE_TEST_PATH,
+        (unsigned char *) FILE_CACHE_TEST_CONTENTS,
+        sizeof(FILE_CACHE_TEST_CONTENTS) - 1
+    );
+
+    create_file_cache(&file_cache);
+
+    error = acquire_file_cache(
+        file_cache,
+        (unsigned char *) FILE_CACHE_TEST_PATH,
+        &entry
+    );
+    V_ASSERT_EQ_U(error, 0);
+    taken = _calculate_string_hash_map((unsigned char *) FILE_CACHE_TEST_PATH) %
+            CACHE_SIZE_HANDLER_FILE;
+
+    /* looks for a second path that falls on the very same slot as the
+    first one, which is what a cache of this shape has instead of a
+    chain and what makes one of the files give way to the other */
+    for(index = 0; index < 100000; index++) {
+        SPRINTF(path, VIRIATUM_MAX_PATH_SIZE, "./viriatum_file_cache_%d.txt", (int) index);
+        if(_calculate_string_hash_map((unsigned char *) path) % CACHE_SIZE_HANDLER_FILE == taken) {
+            break;
+        }
+    }
+    V_ASSERT(index < 100000);
+
+    write_file(
+        path,
+        (unsigned char *) FILE_CACHE_TEST_CONTENTS FILE_CACHE_TEST_CONTENTS,
+        (sizeof(FILE_CACHE_TEST_CONTENTS) - 1) * 2
+    );
+
+    /* the second of them takes the slot over and is described by it,
+    a cache that handed back the entry of the first would be serving
+    one file under the name of another */
+    error = acquire_file_cache(file_cache, (unsigned char *) path, &entry);
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT_EQ_S((char *) entry->path, path);
+    V_ASSERT_EQ_U(entry->size, (sizeof(FILE_CACHE_TEST_CONTENTS) - 1) * 2);
+
+    /* and the first of them takes it back again, describing itself
+    and never what had displaced it */
+    error = acquire_file_cache(
+        file_cache,
+        (unsigned char *) FILE_CACHE_TEST_PATH,
+        &entry
+    );
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT_EQ_S((char *) entry->path, FILE_CACHE_TEST_PATH);
+    V_ASSERT_EQ_U(entry->size, sizeof(FILE_CACHE_TEST_CONTENTS) - 1);
+
+    delete_file_cache(file_cache);
+    remove(FILE_CACHE_TEST_PATH);
+    remove(path);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_file_cache_clear(void) {
+    /* allocates space for the cache and for the entry that is going
+    to be emptied out of it */
+    size_t index;
+    struct file_cache_t *file_cache;
+    struct file_cache_entry_t *entry;
+    ERROR_CODE error;
+
+    write_file(
+        (char *) FILE_CACHE_TEST_PATH,
+        (unsigned char *) FILE_CACHE_TEST_CONTENTS,
+        sizeof(FILE_CACHE_TEST_CONTENTS) - 1
+    );
+
+    create_file_cache(&file_cache);
+    error = acquire_file_cache(
+        file_cache,
+        (unsigned char *) FILE_CACHE_TEST_PATH,
+        &entry
+    );
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT(entry->descriptor != -1);
+
+    /* the clearing closes every file that was being held, an entry
+    left with a descriptor behind is a descriptor leaked */
+    clear_file_cache(file_cache);
+    for(index = 0; index < CACHE_SIZE_HANDLER_FILE; index++) {
+        V_ASSERT_EQ_I(file_cache->entries[index].descriptor, -1);
+    }
+
+    /* and the cache goes on working afterwards, the clearing empties
+    it rather than taking it out of use */
+    error = acquire_file_cache(
+        file_cache,
+        (unsigned char *) FILE_CACHE_TEST_PATH,
+        &entry
+    );
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT(entry->descriptor != -1);
+
+    delete_file_cache(file_cache);
+    remove(FILE_CACHE_TEST_PATH);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_file_cache_open(void) {
+    /* allocates space for the cache, for the entry of the file and
+    for the descriptors that are handed out of it */
+    char buffer[32];
+    long read_bytes;
+    int first;
+    int second;
+    struct file_cache_t *file_cache;
+    struct file_cache_entry_t *entry;
+    ERROR_CODE error;
+
+    write_file(
+        (char *) FILE_CACHE_TEST_PATH,
+        (unsigned char *) FILE_CACHE_TEST_CONTENTS,
+        sizeof(FILE_CACHE_TEST_CONTENTS) - 1
+    );
+
+    create_file_cache(&file_cache);
+
+    /* the opening hands back a descriptor of its own rather than the
+    one the cache is holding, so that the closing of it by whoever
+    asked never takes the one of the cache down with it */
+    error = open_file_cache(
+        file_cache,
+        (unsigned char *) FILE_CACHE_TEST_PATH,
+        &first
+    );
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT(first != -1);
+
+    acquire_file_cache(file_cache, (unsigned char *) FILE_CACHE_TEST_PATH, &entry);
+    V_ASSERT(first != entry->descriptor);
+
+    /* the contents are read through it at the position that is asked
+    for, without the descriptor ever being seeked towards it */
+    read_bytes = (long) READ_AT(first, buffer, sizeof(FILE_CACHE_TEST_CONTENTS) - 1, 0);
+    V_ASSERT_EQ_I((int) read_bytes, (int) sizeof(FILE_CACHE_TEST_CONTENTS) - 1);
+    V_ASSERT_MEM(buffer, FILE_CACHE_TEST_CONTENTS, sizeof(FILE_CACHE_TEST_CONTENTS) - 1);
+
+    /* a second one is handed out apart from the first, two requests
+    for the very same file never share what they read through */
+    error = open_file_cache(
+        file_cache,
+        (unsigned char *) FILE_CACHE_TEST_PATH,
+        &second
+    );
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT(second != first);
+
+    /* the closing of one of them leaves the other one working, which
+    is the whole reason they are handed out apart */
+    CLOSE_READ(first);
+    read_bytes = (long) READ_AT(second, buffer, sizeof(FILE_CACHE_TEST_CONTENTS) - 1, 0);
+    V_ASSERT_EQ_I((int) read_bytes, (int) sizeof(FILE_CACHE_TEST_CONTENTS) - 1);
+    CLOSE_READ(second);
+
+    delete_file_cache(file_cache);
+    remove(FILE_CACHE_TEST_PATH);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_file_cache_long(void) {
+    /* allocates space for the cache and for the path that is longer
+    than an entry of it is able to carry */
+    char path[VIRIATUM_MAX_PATH_SIZE * 2];
+    struct file_cache_t *file_cache;
+    struct file_cache_entry_t *entry = NULL;
+    ERROR_CODE error;
+
+    create_file_cache(&file_cache);
+
+    /* a path that does not fit inside an entry is refused rather than
+    being copied past the end of the buffer that is meant to hold it */
+    memset(path, 'a', sizeof(path) - 1);
+    path[sizeof(path) - 1] = '\0';
+    error = acquire_file_cache(file_cache, (unsigned char *) path, &entry);
+    V_ASSERT(IS_ERROR_CODE(error));
+    RESET_ERROR;
+
+    delete_file_cache(file_cache);
+    remove(FILE_CACHE_TEST_PATH);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_file_cache_expired(void) {
+    /* allocates space for the cache and for the entry that is made
+    to look older than the time it is trusted for */
+    int descriptor;
+    struct file_cache_t *file_cache;
+    struct file_cache_entry_t *entry;
+    ERROR_CODE error;
+
+    write_file(
+        (char *) FILE_CACHE_TEST_PATH,
+        (unsigned char *) FILE_CACHE_TEST_CONTENTS,
+        sizeof(FILE_CACHE_TEST_CONTENTS) - 1
+    );
+
+    create_file_cache(&file_cache);
+    error = acquire_file_cache(
+        file_cache,
+        (unsigned char *) FILE_CACHE_TEST_PATH,
+        &entry
+    );
+    V_ASSERT_EQ_U(error, 0);
+    descriptor = entry->descriptor;
+
+    /* the entry is made to look as though it had been sitting there
+    since well before the time it is trusted for, which is what sends
+    the next acquisition to look at the path again */
+    entry->checked = 0;
+
+    /* the file has not moved on, so the very same descriptor goes on
+    being used and only the moment it was looked at is renewed */
+    error = acquire_file_cache(
+        file_cache,
+        (unsigned char *) FILE_CACHE_TEST_PATH,
+        &entry
+    );
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT_EQ_I(entry->descriptor, descriptor);
+    V_ASSERT(entry->checked > 0);
+
+    delete_file_cache(file_cache);
+    remove(FILE_CACHE_TEST_PATH);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_file_cache_replaced(void) {
+    /* allocates space for the cache and for the entry of the file
+    that another one is put in the place of */
+    struct file_cache_t *file_cache;
+    struct file_cache_entry_t *entry;
+    ERROR_CODE error;
+
+    write_file(
+        (char *) FILE_CACHE_TEST_PATH,
+        (unsigned char *) FILE_CACHE_TEST_CONTENTS,
+        sizeof(FILE_CACHE_TEST_CONTENTS) - 1
+    );
+
+    create_file_cache(&file_cache);
+    error = acquire_file_cache(
+        file_cache,
+        (unsigned char *) FILE_CACHE_TEST_PATH,
+        &entry
+    );
+    V_ASSERT_EQ_U(error, 0);
+
+    /* another file is put in the place of the one that is held, the
+    descriptor of the entry goes on reaching the one that was there
+    before and only a look at the path is able to tell */
+    remove(FILE_CACHE_TEST_PATH);
+    write_file(
+        (char *) FILE_CACHE_TEST_PATH,
+        (unsigned char *) FILE_CACHE_TEST_CONTENTS FILE_CACHE_TEST_CONTENTS,
+        (sizeof(FILE_CACHE_TEST_CONTENTS) - 1) * 2
+    );
+    entry->checked = 0;
+
+    /* the file that is now under the path is opened in place of the
+    one that was, and the entry describes the one being served */
+    error = acquire_file_cache(
+        file_cache,
+        (unsigned char *) FILE_CACHE_TEST_PATH,
+        &entry
+    );
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT_EQ_U(entry->size, (sizeof(FILE_CACHE_TEST_CONTENTS) - 1) * 2);
+
+    delete_file_cache(file_cache);
+    remove(FILE_CACHE_TEST_PATH);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_file_cache_rewritten(void) {
+    /* allocates space for the cache, for the entry of the file and
+    for the buffer the contents of it are read into */
+    char buffer[32];
+    long read_bytes;
+    int descriptor;
+    struct file_cache_t *file_cache;
+    struct file_cache_entry_t *entry;
+    ERROR_CODE error;
+
+    write_file(
+        (char *) FILE_CACHE_TEST_PATH,
+        (unsigned char *) FILE_CACHE_TEST_CONTENTS,
+        sizeof(FILE_CACHE_TEST_CONTENTS) - 1
+    );
+
+    create_file_cache(&file_cache);
+    error = acquire_file_cache(
+        file_cache,
+        (unsigned char *) FILE_CACHE_TEST_PATH,
+        &entry
+    );
+    V_ASSERT_EQ_U(error, 0);
+
+    /* another file of the very same length is put in the place of
+    the one that is held, which the size of it is unable to tell
+    apart, so the entry has to reach the one now under the path
+    rather than the one its descriptor still opens */
+    remove(FILE_CACHE_TEST_PATH);
+    write_file(
+        (char *) FILE_CACHE_TEST_PATH,
+        (unsigned char *) FILE_CACHE_TEST_OTHER,
+        sizeof(FILE_CACHE_TEST_OTHER) - 1
+    );
+    entry->checked = 0;
+
+    /* the length is the one it always was, so only the contents
+    that are handed out say which of the two files is served */
+    error = open_file_cache(
+        file_cache,
+        (unsigned char *) FILE_CACHE_TEST_PATH,
+        &descriptor
+    );
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT(descriptor != -1);
+
+    read_bytes = (long) READ_AT(descriptor, buffer, sizeof(FILE_CACHE_TEST_OTHER) - 1, 0);
+    V_ASSERT_EQ_I((int) read_bytes, (int) sizeof(FILE_CACHE_TEST_OTHER) - 1);
+    V_ASSERT_MEM(buffer, FILE_CACHE_TEST_OTHER, sizeof(FILE_CACHE_TEST_OTHER) - 1);
+
+    CLOSE_READ(descriptor);
+    delete_file_cache(file_cache);
+    remove(FILE_CACHE_TEST_PATH);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_file_cache_stale(void) {
+    /* allocates space for the cache and for the entry whose file is
+    taken out from underneath it */
+    struct file_cache_t *file_cache;
+    struct file_cache_entry_t *entry;
+    ERROR_CODE error;
+
+    write_file(
+        (char *) FILE_CACHE_TEST_PATH,
+        (unsigned char *) FILE_CACHE_TEST_CONTENTS,
+        sizeof(FILE_CACHE_TEST_CONTENTS) - 1
+    );
+
+    create_file_cache(&file_cache);
+    error = acquire_file_cache(
+        file_cache,
+        (unsigned char *) FILE_CACHE_TEST_PATH,
+        &entry
+    );
+    V_ASSERT_EQ_U(error, 0);
+
+    /* the file that the entry is holding is closed behind its back
+    and the entry is left pointing at a descriptor that reaches
+    nothing, which is the state the cache has to answer for rather
+    than go on describing a file it can no longer reach */
+    CLOSE_READ(entry->descriptor);
+    entry->descriptor = -2;
+
+    error = acquire_file_cache(
+        file_cache,
+        (unsigned char *) FILE_CACHE_TEST_PATH,
+        &entry
+    );
+    V_ASSERT(IS_ERROR_CODE(error));
+    RESET_ERROR;
+
+    /* the entry is emptied by hand as the cache is no longer able to
+    close what it was left holding */
+    entry->descriptor = -1;
+
+    delete_file_cache(file_cache);
+    remove(FILE_CACHE_TEST_PATH);
 
     /* returns the default value, nothing happened so there's
     nothing to report for this execution */

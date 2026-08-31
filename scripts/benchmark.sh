@@ -15,8 +15,8 @@ OUTPUT=${OUTPUT:-$ROOT/benchmark}
 BASELINE=${BASELINE:-$ROOT/scripts/benchmark/baseline.json}
 PYTHON=${PYTHON:-python3}
 DURATION=${DURATION:-5}
-CONNECTIONS=${CONNECTIONS:-64}
-THREADS=${THREADS:-4}
+CONNECTIONS=${CONNECTIONS:-256}
+THREADS=${THREADS:-8}
 RATE=${RATE:-60}
 REPEATS=${REPEATS:-3}
 WORKERS=${WORKERS:-2}
@@ -306,6 +306,12 @@ _configure() {
         echo "index = index.html"
         echo "use_template = $_TEMPLATE"
         echo "handler = $_HANDLER"
+
+        # every reference is given its access log turned off and the
+        # subject is now able to be given the same, which it was not
+        # when the only way of silencing it was to send the output of
+        # the process somewhere that nobody reads
+        echo "access_log = Off"
         if [ -n "$_PROXY" ]; then
             echo
             echo "[location:proxy]"

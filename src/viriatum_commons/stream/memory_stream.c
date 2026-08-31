@@ -61,9 +61,11 @@ void create_memory_stream(struct memory_stream_t **memory_stream_pointer) {
 
 void delete_memory_stream(struct memory_stream_t *memory_stream) {
     /* in case the internal buffer is defined its memory
-    must be released and then releases the memory of the
-    proper memory stream structure (avoid memory leaks) */
+    must be released and then releases the underlying stream
+    reference and the memory of the proper memory stream
+    structure (avoid memory leaks) */
     if(memory_stream->buffer) { FREE(memory_stream->buffer); }
+    delete_stream(memory_stream->stream);
     FREE(memory_stream);
 }
 
