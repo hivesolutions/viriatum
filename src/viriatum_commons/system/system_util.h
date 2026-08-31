@@ -53,9 +53,10 @@
 #define DUPLICATE(descriptor) _dup(descriptor)
 #define CLOSE_READ(descriptor) _close(descriptor)
 #define READ_AT(descriptor, buffer, size, offset) \
-    (_lseek(descriptor, (long) offset, SEEK_SET) == -1 ? -1 : _read(descriptor, buffer, (unsigned int) size))
-#define STAT_READ(descriptor, file_stat) _fstat(descriptor, &file_stat)
-#define STAT_TYPE struct _stat
+    (_lseeki64(descriptor, (__int64) offset, SEEK_SET) == -1 ? -1 : _read(descriptor, buffer, (unsigned int) size))
+#define STAT_READ(descriptor, file_stat) _fstati64(descriptor, &file_stat)
+#define STAT_PATH(file_path, file_stat) _stati64(file_path, &file_stat)
+#define STAT_TYPE struct _stati64
 #define CHANGE_DIRECTORY(path) _chdir(path)
 #define CURRENT_DIRECTORY(buffer, size) _getcwd(buffer, size)
 #define ROUND(value) (value + 0.5f)
@@ -91,6 +92,7 @@
 #define CLOSE_READ(descriptor) close(descriptor)
 #define READ_AT(descriptor, buffer, size, offset) pread(descriptor, buffer, size, offset)
 #define STAT_READ(descriptor, file_stat) fstat(descriptor, &file_stat)
+#define STAT_PATH(file_path, file_stat) stat(file_path, &file_stat)
 #define STAT_TYPE struct stat
 #define CHANGE_DIRECTORY(path) chdir(path)
 #define CURRENT_DIRECTORY(buffer, size) getcwd(buffer, size)

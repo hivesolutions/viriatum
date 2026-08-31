@@ -38,7 +38,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Pages now use the scalable favicon whenever the browser supports it
 * Illustrations, logos and the listing arrow are now served as vectors
 * The recorded performance targets were replaced by numbers a run can reproduce - [#49](https://github.com/hivesolutions/viriatum/issues/49)
-* Static files are now served around three times faster, ahead of the reference servers - [#49](https://github.com/hivesolutions/viriatum/issues/49)
+* Static files are now served considerably faster, ahead of the reference servers on the larger ones - [#49](https://github.com/hivesolutions/viriatum/issues/49)
 * Files that are served are now kept open, so serving one again costs neither opening nor describing it - [#49](https://github.com/hivesolutions/viriatum/issues/49)
 
 ### Fixed

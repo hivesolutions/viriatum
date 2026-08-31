@@ -1398,6 +1398,7 @@ static struct test_entry_t _simple_entries[] = {
     V_TEST_T(test_file_cache_long, "handler"),
     V_TEST_T(test_file_cache_expired, "handler"),
     V_TEST_T(test_file_cache_replaced, "handler"),
+    V_TEST_T(test_file_cache_rewritten, "handler"),
     V_TEST_T(test_file_cache_stale, "handler"),
     V_TEST_T(test_handler_default_response, "handler"),
     V_TEST_T(test_handler_default_close, "handler"),

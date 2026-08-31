@@ -41,7 +41,7 @@ The values below are the ones that actually decide the comparison. Everything el
 | Choice | Viriatum | nginx | Caddy | HAProxy | gunicorn | uvicorn |
 | --- | --- | --- | --- | --- | --- | --- |
 | Worker count | `WORKERS` | `worker_processes` | default | `nbthread` | `--workers` | `--workers` |
-| Access logging | stdout to the sink | `access_log off` | `output discard` | `log /dev/null` | `/dev/null` | `--no-access-log` |
+| Access logging | `access_log off` | `access_log off` | `output discard` | `log /dev/null` | `/dev/null` | `--no-access-log` |
 | Kernel file sending | none | `sendfile off` | default | n/a | n/a | n/a |
 | Compression | none | `gzip off` | not enabled | n/a | n/a | n/a |
 | Keep-alive idle | default | `65s` | `idle 65s` | `65s` | `--keep-alive 65` | default |

@@ -21,6 +21,11 @@ if ! command -v h2spec > /dev/null 2>&1; then
     exit 1
 fi
 
+if ! command -v curl > /dev/null 2>&1; then
+    echo "conformance requires the curl tool" >&2
+    exit 1
+fi
+
 # builds the server in the release shape, the conformance of it is
 # measured over the binary that is actually shipped
 if [ ! -x "$BINARY" ]; then

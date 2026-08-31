@@ -1552,16 +1552,11 @@ ERROR_CODE acquire_file_cache(struct file_cache_t *file_cache, unsigned char *fi
             RAISE_NO_ERROR;
         }
 
-        /* past that the file is looked at through its path as well,
-        which is the only way of telling that another one has been
-        put in its place, the descriptor that is held would go on
-        answering about the file that used to be there */
-        if(stat((char *) file_path, &file_stat) == 0 &&
-           (size_t) file_stat.st_size == entry->size) {
-            entry->checked = now;
-            *file_cache_entry_pointer = entry;
-            RAISE_NO_ERROR;
-        }
+        /* past that the file is opened again through its path, the
+        only way of telling that another one has been put in its
+        place, the descriptor that is held would go on answering
+        about the file that used to be there and a replacement of
+        the very same length is told from it by nothing else */
     }
 
     /* whatever the entry was holding is of no use, either because it

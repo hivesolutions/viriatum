@@ -943,6 +943,11 @@ from the one of the handler so that the two never interfere */
 is what the entry of the cache is expected to report */
 #define FILE_CACHE_TEST_CONTENTS "viriatum"
 
+/* another set of contents of the very same length as the one
+above, so that a file replaced by it is told apart from the one
+that was there by nothing but what it holds */
+#define FILE_CACHE_TEST_OTHER "serviced"
+
 const char *test_file_cache(void) {
     /* allocates space for the cache and for the index to be used in
     the walking of the entries it is made of */
@@ -1394,6 +1399,65 @@ const char *test_file_cache_replaced(void) {
     V_ASSERT_EQ_U(error, 0);
     V_ASSERT_EQ_U(entry->size, (sizeof(FILE_CACHE_TEST_CONTENTS) - 1) * 2);
 
+    delete_file_cache(file_cache);
+    remove(FILE_CACHE_TEST_PATH);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_file_cache_rewritten(void) {
+    /* allocates space for the cache, for the entry of the file and
+    for the buffer the contents of it are read into */
+    char buffer[32];
+    long read_bytes;
+    int descriptor;
+    struct file_cache_t *file_cache;
+    struct file_cache_entry_t *entry;
+    ERROR_CODE error;
+
+    write_file(
+        (char *) FILE_CACHE_TEST_PATH,
+        (unsigned char *) FILE_CACHE_TEST_CONTENTS,
+        sizeof(FILE_CACHE_TEST_CONTENTS) - 1
+    );
+
+    create_file_cache(&file_cache);
+    error = acquire_file_cache(
+        file_cache,
+        (unsigned char *) FILE_CACHE_TEST_PATH,
+        &entry
+    );
+    V_ASSERT_EQ_U(error, 0);
+
+    /* another file of the very same length is put in the place of
+    the one that is held, which the size of it is unable to tell
+    apart, so the entry has to reach the one now under the path
+    rather than the one its descriptor still opens */
+    remove(FILE_CACHE_TEST_PATH);
+    write_file(
+        (char *) FILE_CACHE_TEST_PATH,
+        (unsigned char *) FILE_CACHE_TEST_OTHER,
+        sizeof(FILE_CACHE_TEST_OTHER) - 1
+    );
+    entry->checked = 0;
+
+    /* the length is the one it always was, so only the contents
+    that are handed out say which of the two files is served */
+    error = open_file_cache(
+        file_cache,
+        (unsigned char *) FILE_CACHE_TEST_PATH,
+        &descriptor
+    );
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT(descriptor != -1);
+
+    read_bytes = (long) READ_AT(descriptor, buffer, sizeof(FILE_CACHE_TEST_OTHER) - 1, 0);
+    V_ASSERT_EQ_I((int) read_bytes, (int) sizeof(FILE_CACHE_TEST_OTHER) - 1);
+    V_ASSERT_MEM(buffer, FILE_CACHE_TEST_OTHER, sizeof(FILE_CACHE_TEST_OTHER) - 1);
+
+    CLOSE_READ(descriptor);
     delete_file_cache(file_cache);
     remove(FILE_CACHE_TEST_PATH);
 

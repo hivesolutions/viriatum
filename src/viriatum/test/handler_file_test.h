@@ -273,6 +273,16 @@ const char *test_file_cache_expired(void);
 const char *test_file_cache_replaced(void);
 
 /**
+ * Tests that a file replaced by another of the very same length
+ * is served as the one that is now under the path, the length of
+ * it being unable to tell the two of them apart.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_file_cache_rewritten(void);
+
+/**
  * Tests that an entry left holding a descriptor which no
  * longer reaches anything answers with an error.
  *

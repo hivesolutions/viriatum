@@ -159,7 +159,7 @@ ERROR_CODE count_file(char *file_path, size_t *file_size_pointer) {
     only to seek to the end and close it again costs four calls into
     the kernel where describing it costs a single one, a cost that
     the serving of a static file pays once on every request */
-    if(stat(file_path, &file_stat) != 0) {
+    if(STAT_PATH(file_path, file_stat) != 0) {
         RAISE_ERROR_M(
             RUNTIME_EXCEPTION_ERROR_CODE,
             (unsigned char *) "Problem loading file"

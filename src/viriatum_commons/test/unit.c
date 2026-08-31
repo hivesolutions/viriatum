@@ -183,7 +183,7 @@ static void _run_test(
 
     end_time = clock();
     result->elapsed = (float) (end_time - start_time) / CLOCKS_PER_SEC;
-    result->outstanding = (long) (ALLOCATIONS - allocated);
+    result->outstanding = (long) ALLOCATIONS - (long) allocated;
 
     /* an entry marked as an expected failure inverts the meaning
     of its outcome, a failure becomes the expected result and a
@@ -268,6 +268,7 @@ static void _print_outstanding_test(struct test_report_t *report) {
     size_t count;
     size_t position;
     size_t selected;
+    size_t previous = report->count;
     size_t listed = 0;
     long limit = -1;
 
@@ -278,7 +279,18 @@ static void _print_outstanding_test(struct test_report_t *report) {
         selected = report->count;
         for(index = 0; index < report->count; index++) {
             if(report->results[index].outstanding <= 0) { continue; }
-            if(limit >= 0 && report->results[index].outstanding >= limit) { continue; }
+
+            /* a count above the one already listed has been listed
+            with it, and one equal to it only when it came before,
+            which is what keeps the tests that left the very same
+            count from being dropped after the first of them */
+            if(limit >= 0) {
+                if(report->results[index].outstanding > limit) { continue; }
+                if(report->results[index].outstanding == limit && index <= previous) {
+                    continue;
+                }
+            }
+
             if(selected != report->count &&
                report->results[index].outstanding <= report->results[selected].outstanding) {
                 continue;
@@ -287,6 +299,7 @@ static void _print_outstanding_test(struct test_report_t *report) {
         }
         if(selected == report->count) { break; }
         limit = report->results[selected].outstanding;
+        previous = selected;
         if(listed == 0) { V_PRINT("Outstanding allocations\n"); }
         listed++;
         V_PRINT_F("  %s (%ld allocations)\n", report->results[selected].name, limit);

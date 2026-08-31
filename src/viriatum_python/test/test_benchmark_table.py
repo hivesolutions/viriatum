@@ -494,6 +494,37 @@ class BenchmarkTableTest(unittest.TestCase):
         self.assertTrue("The baseline carries no results" in value)
         self.assertTrue("refresh the baseline" not in value)
 
+    def test_main_baseline_barren_elsewhere(self):
+        # a baseline that carries no results and was taken under
+        # another shape is not a mismatch to be refreshed, there is
+        # nothing in it to compare against under any shape at all
+        self._write(SUBJECT)
+        with io.open(os.path.join(self.output, "environment.txt"), "wb") as file:
+            file.write(b"machine: Linux x86_64\nconnections: 256")
+
+        path = os.path.join(self.output, "baseline.json")
+        with io.open(path, "wb") as file:
+            file.write(
+                json.dumps(
+                    dict(
+                        results=[],
+                        environment=dict(machine="Linux x86_64", connections="64"),
+                    )
+                ).encode("utf-8")
+            )
+
+        stream = io.StringIO()
+        stdout = sys.stdout
+        try:
+            sys.stdout = stream
+            self.assertEqual(benchmark_table.main_with(self.output, path), 0)
+        finally:
+            sys.stdout = stdout
+
+        value = stream.getvalue()
+        self.assertTrue("The baseline carries no results" in value)
+        self.assertTrue("refresh the baseline" not in value)
+
     def test_main_empty(self):
         self.assertEqual(benchmark_table.main_with(self.output, None), 1)
 

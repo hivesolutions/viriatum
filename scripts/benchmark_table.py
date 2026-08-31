@@ -289,6 +289,7 @@ def main_with(output, path):
 
     current = environment(output)
     recorded, taken = stored(load(path)) if path else ([], {})
+    carried = bool(recorded)
 
     # the baseline of another machine describes that machine, marking
     # every row of this one as having moved against it would only ever
@@ -304,7 +305,7 @@ def main_with(output, path):
         print("\nNo baseline was compared against, the change column is empty.")
     elif not recorded:
         names = differing(current, taken)
-        if names:
+        if carried and names:
             print(
                 "\nThe baseline was recorded with %s and this ran with %s, so nothing "
                 "was compared against it, refresh the baseline through the input of "

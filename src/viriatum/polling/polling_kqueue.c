@@ -52,6 +52,13 @@ void create_polling_kqueue(struct polling_kqueue_t **polling_kqueue_pointer, str
     that the events of every connection are read out of */
     polling_kqueue->kqueue_fd = kqueue();
 
+    /* in case the queue of the kernel could not be created the
+    problem is reported here, every call that follows it would
+    otherwise fail on its own and say nothing of the reason */
+    if(polling_kqueue->kqueue_fd == -1) {
+        V_ERROR_F("Problem creating kqueue: %d\n", SOCKET_GET_ERROR_CODE(socket_result));
+    }
+
     /* sets the polling kqueue in the polling kqueue pointer */
     *polling_kqueue_pointer = polling_kqueue;
 }
