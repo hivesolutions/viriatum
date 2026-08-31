@@ -20,6 +20,12 @@ jobs:
   benchmark:
     name: Benchmark
     timeout-minutes: 120
+    # the refresh of the baseline writes it back to the branch, which
+    # is the only thing this run ever writes, the default of the token
+    # is a setting of the repository and is pinned here so that a
+    # change of it never turns the refresh into a run that fails
+    permissions:
+      contents: write
     # the class of the runner is part of every figure that comes out
     # of it, changing it invalidates every stored comparison, so it is
     # pinned here rather than left to the default of the moment
@@ -76,7 +82,9 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add scripts/benchmark/baseline.json
-          git commit -m "chore: refresh the baseline of the benchmark" || exit 0
+          git commit -m "chore: refresh the baseline of the benchmark" \
+            -m "- taken from the run $GITHUB_RUN_ID of the workflow
+          - recorded on the $RUNNER_OS runner the schedule is pinned to" || exit 0
           git push
       - uses: actions/upload-artifact@v7
         if: always()

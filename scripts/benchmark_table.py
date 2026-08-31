@@ -275,6 +275,13 @@ def format_latency(value: float | None) -> str:
     return "%.2f" % (value / 1000.0) if value else "-"
 
 
+def format_cpu(value: float | None) -> str:
+    # the processor time of a container is not something that may be
+    # asked of it, a value of zero stands for a run it was never
+    # taken on rather than for a server that consumed nothing
+    return "%.1f" % value if value else "-"
+
+
 def table(rows: list[Row], baseline: list[Row]) -> list[str]:
     # formats one row per pair of a workload and a server, the subject
     # of a workload carrying the ratio against each of its references
@@ -292,8 +299,13 @@ def table(rows: list[Row], baseline: list[Row]) -> list[str]:
         for server in servers(rows, workload):
             item = known[(workload, server)]
             valid = item.get("valid", True)
-            change = delta(item, recorded.get((workload, server)))
-            state = moved(item, recorded.get((workload, server)))
+
+            # a measurement that lost its connections is no figure at
+            # all and neither is anything derived from it, the tail of
+            # it and the change of it against the baseline describe
+            # the losing of them and never the serving
+            change = delta(item, recorded.get((workload, server))) if valid else None
+            state = moved(item, recorded.get((workload, server))) if valid else None
 
             # the subject is reported against the references of its
             # workload, a reference against the subject, so that the
@@ -316,10 +328,10 @@ def table(rows: list[Row], baseline: list[Row]) -> list[str]:
                     workload,
                     name,
                     format_rps(item.get("rps")) if valid else "-",
-                    format_latency(item.get("latency_p50_us")),
-                    format_latency(item.get("latency_p99_us")),
-                    format_latency(item.get("latency_p999_us")),
-                    "%.1f" % item["cpu_ms_per_k"] if valid else "-",
+                    format_latency(item.get("latency_p50_us")) if valid else "-",
+                    format_latency(item.get("latency_p99_us")) if valid else "-",
+                    format_latency(item.get("latency_p999_us")) if valid else "-",
+                    format_cpu(item.get("cpu_ms_per_k")) if valid else "-",
                     "%.1f" % (item.get("peak_rss_kb", 0) / 1024.0) if valid else "-",
                     "-" if change is None else "%+.1f%%" % change,
                     marker(item, state),

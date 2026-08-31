@@ -40,6 +40,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * The recorded performance targets were replaced by numbers a run can reproduce - [#49](https://github.com/hivesolutions/viriatum/issues/49)
 * Static files are now served considerably faster, ahead of the reference servers on the larger ones - [#49](https://github.com/hivesolutions/viriatum/issues/49)
 * Files that are served are now kept open, so serving one again costs neither opening nor describing it - [#49](https://github.com/hivesolutions/viriatum/issues/49)
+* The benchmark now holds every server to the number of processes the subject actually runs with - [#49](https://github.com/hivesolutions/viriatum/issues/49)
 
 ### Fixed
 
@@ -66,6 +67,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * A secure connection is no longer dropped because of an error left behind by an earlier one - [#56](https://github.com/hivesolutions/viriatum/issues/56)
 * The test run no longer hangs or fails on the runtime that does not deliver an interrupt reliably - [#60](https://github.com/hivesolutions/viriatum/issues/60)
 * The PHP extension no longer loses the terminator of its table of functions
+* A resource that disappears while it is being sent no longer leaves the connection unusable - [#49](https://github.com/hivesolutions/viriatum/issues/49)
+* The benchmark now reports the memory, the processor time, the version and the kernel calls of the server it measured - [#49](https://github.com/hivesolutions/viriatum/issues/49)
+* A discarded measurement no longer shows a tail or a comparison against the baseline - [#49](https://github.com/hivesolutions/viriatum/issues/49)
 
 ## [0.5.0] - 2026-08-28
 

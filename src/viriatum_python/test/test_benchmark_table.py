@@ -337,6 +337,14 @@ class BenchmarkTableTest(TestCase):
         self.assertEqual(benchmark_table.format_latency(1500), "1.50")
         self.assertEqual(benchmark_table.format_latency(0), "-")
 
+    def test_format_cpu(self) -> None:
+        # the processor time of a container is never asked of it, a
+        # zero stands for a run it was not taken on rather than for a
+        # server that consumed nothing at all while it served
+        self.assertEqual(benchmark_table.format_cpu(40.0), "40.0")
+        self.assertEqual(benchmark_table.format_cpu(0), "-")
+        self.assertEqual(benchmark_table.format_cpu(None), "-")
+
     def test_table(self) -> None:
         lines = benchmark_table.table([SUBJECT, REFERENCE], None)
         self.assertEqual(len(lines), 4)
@@ -360,7 +368,18 @@ class BenchmarkTableTest(TestCase):
         item = dict(SUBJECT, valid=False, rps=3.0, cpu_ms_per_k=6030000.0)
         lines = benchmark_table.table([item], None)
         self.assertTrue("6030000" not in lines[2])
+        self.assertTrue("1.50" not in lines[2])
         self.assertTrue("| - | - |" in lines[2])
+        self.assertTrue("⚠️" in lines[2])
+
+    def test_table_discarded_baseline(self) -> None:
+        # the change of a discarded measurement against the baseline
+        # describes the losing of the connections and never the
+        # serving, a run that answered almost nothing is no regression
+        # of the server and must never be reported as one
+        item = dict(SUBJECT, valid=False, rps=3.0)
+        lines = benchmark_table.table([item], [SUBJECT])
+        self.assertTrue("%" not in lines[2])
         self.assertTrue("⚠️" in lines[2])
 
     def test_table_no_reference(self) -> None:
@@ -380,7 +399,8 @@ class BenchmarkTableTest(TestCase):
         # every one of the reports again
         with open(join(self.output, "results.json"), "rb") as file:
             rows = loads(file.read().decode("utf-8"))
-        self.assertEqual(len(rows), 2)
+        self.assertEqual(sorted(rows), ["environment", "results"])
+        self.assertEqual(len(rows["results"]), 2)
 
     def test_main_environment(self) -> None:
         # the machine and the build a figure came out of are part of

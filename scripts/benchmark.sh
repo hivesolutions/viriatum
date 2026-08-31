@@ -19,9 +19,15 @@ CONNECTIONS=${CONNECTIONS:-256}
 THREADS=${THREADS:-8}
 RATE=${RATE:-60}
 REPEATS=${REPEATS:-3}
-WORKERS=${WORKERS:-2}
 PORT=${PORT:-9410}
 COMPILER=${CC:-cc}
+
+# the count of the processes each of the servers is held to, the
+# subject serves out of a single one of them whatever it is told as
+# the forking of the workers is compiled out of every build there
+# is, so the references are held to one as well and what is compared
+# is the serving rather than the number of processes doing it
+WORKERS=${WORKERS:-1}
 
 # the ports of the pieces that are started around the subject, a
 # reference and the upstream take one of their own so that none of
@@ -118,15 +124,19 @@ echo "Running the harness in the $MODE mode ..."
 # debug build measures the counters of that build and nothing else,
 # the extension is built along with it so that the workloads of the
 # interfaces have something to be driven against
+echo "Building the server ..."
 if [ ! -x "$BUILD/bin/viriatum" ]; then
-    echo "Building the server ..."
     cmake -S "$ROOT" -B "$BUILD" \
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_C_COMPILER="$COMPILER" \
         -DVIRIATUM_BUILD_PYTHON=ON \
         -DPython_EXECUTABLE="$(command -v "$PYTHON")" > "$OUTPUT/logs/build.log" 2>&1
-    cmake --build "$BUILD" -j 4 >> "$OUTPUT/logs/build.log" 2>&1
 fi
+
+# the compiling always runs, it costs nothing when nothing has moved
+# and a run that skipped it would report the binary of whatever was
+# built before rather than the tree it was asked about
+cmake --build "$BUILD" -j 4 >> "$OUTPUT/logs/build.log" 2>&1
 
 BINARY=${BINARY:-$BUILD/bin/viriatum}
 
@@ -331,6 +341,13 @@ _start_subject() {
     _ROLE=$2
     cd "$OUTPUT"
 
+    # the container the subject is being run out of and the identifier
+    # of the process it was started as, whichever of the two applies,
+    # so that whatever is asked about it later reaches the one that is
+    # serving and never a process of the same name beside it
+    SUBJECT_CONTAINER=
+    PID=
+
     case $_ROLE in
         wsgi | asgi | asgi-stream)
             PYTHONPATH="$ASSETS:$ROOT/src/viriatum_python" "$PYTHON" \
@@ -343,6 +360,7 @@ _start_subject() {
     esac
 
     if [ "$MODE" = "container" ]; then
+        SUBJECT_CONTAINER=viriatum-subject
         "$DOCKER" run -d --name viriatum-subject --network host \
             -v "$OUTPUT:/bench" -w /bench "$IMAGE_SUBJECT" \
             viriatum --port="$PORT" --handler="$_HANDLER" \
@@ -419,8 +437,20 @@ _render_litespeed() {
 # network of the machine so that it is reached exactly the way the
 # subject is and no address translation sits in between
 _run_image() {
+    REFERENCE_CONTAINER=viriatum-reference
     "$DOCKER" run -d --name viriatum-reference --network host \
         -v "$OUTPUT:/bench" "$@" > "$OUTPUT/logs/reference.id" 2>&1
+}
+
+# reports a process together with the workers it has forked, as the
+# comma separated list that the tools of the machine take, a server
+# that forks is only ever described by the whole of the set
+_tree() {
+    _TREE=$1
+    for _CHILD in $(pgrep -P "$1" 2> /dev/null); do
+        _TREE=$_TREE,$_CHILD
+    done
+    echo "$_TREE"
 }
 
 # reports the pattern that finds a server together with every worker
@@ -441,13 +471,29 @@ _match() {
     esac
 }
 
+# runs the command that a reference is asked about itself with, inside
+# the image it is being served out of whenever there is one, a machine
+# that carries a package of the same server carries another build of it
+# and the one that answered the requests is the one being recorded
+_at_reference() {
+    _AT_IMAGE=$1
+    _AT_COMMAND=$2
+    shift 2
+    if [ "$REFERENCES" = "container" ] && [ -n "$DOCKER" ] &&
+        "$DOCKER" image inspect "$_AT_IMAGE" > /dev/null 2>&1; then
+        "$DOCKER" run --rm --entrypoint "$_AT_COMMAND" "$_AT_IMAGE" "$@" 2>&1 || true
+        return 0
+    fi
+    "$_AT_COMMAND" "$@" 2>&1 || true
+}
+
 # reports the version of a reference, the exact build that produced a
 # figure is part of the figure and is recorded next to it
 _version() {
     case $1 in
-        nginx) nginx -v 2>&1 | sed 's|.*/||' ;;
-        caddy) caddy version 2> /dev/null | head -1 | awk '{ print $1 }' ;;
-        haproxy) haproxy -v 2> /dev/null | head -1 | awk '{ print $3 }' ;;
+        nginx) _at_reference "$IMAGE_NGINX" nginx -v | sed 's|.*/||' ;;
+        caddy) _at_reference "$IMAGE_CADDY" caddy version | head -1 | awk '{ print $1 }' ;;
+        haproxy) _at_reference "$IMAGE_HAPROXY" haproxy -v | head -1 | awk '{ print $3 }' ;;
         gunicorn) "$PYTHON" -c "import gunicorn; print(gunicorn.__version__)" 2> /dev/null ;;
         uvicorn) "$PYTHON" -c "import uvicorn; print(uvicorn.__version__)" 2> /dev/null ;;
         *) echo unknown ;;
@@ -471,9 +517,14 @@ _has_reference() {
             ;;
         *) return 1 ;;
     esac
-    if [ "$REFERENCES" = "container" ] && [ -n "$DOCKER" ] &&
-        "$DOCKER" image inspect "$_IMAGE" > /dev/null 2>&1; then
-        return 0
+    # a reference that is going to be started out of an image is only
+    # available when the image is around, the binary of the same name
+    # on the machine is never the one that would be run in this mode
+    # and a run that fell back to it aborts on the first missing image
+    if [ "$REFERENCES" = "container" ] && [ "$_IMAGE" != "__none__" ]; then
+        if [ -z "$DOCKER" ]; then return 1; fi
+        "$DOCKER" image inspect "$_IMAGE" > /dev/null 2>&1 && return 0
+        return 1
     fi
     if [ -x "$_BINARY" ] || command -v "$_BINARY" > /dev/null 2>&1; then return 0; fi
     return 1
@@ -485,6 +536,12 @@ _has_reference() {
 _start_reference() {
     _REF=$1
     _ROLE=$2
+
+    # the very same pair the subject keeps, a reference is started
+    # either out of an image or on the machine and the two of them
+    # are asked about in different ways
+    REFERENCE_CONTAINER=
+    PID_REFERENCE=
 
     # the paths inside a container and the ones on the machine differ,
     # the configuration is written against whichever of the two the
@@ -605,17 +662,49 @@ _stats() {
 }
 
 # reports the resident memory and the consumed processor time of the
-# subject together with every worker it has forked, the two of them
-# are what says whether a win of throughput was paid for elsewhere
+# server under test together with every worker it has forked, the two
+# of them are what says whether a win of throughput was paid for
+# elsewhere, the server being named by the container it is running in
+# or by the process it was started as, and by the pattern that finds
+# it only when neither of the two was left behind
 _sample() {
     _MATCH=$1
-    if [ "$MODE" = "container" ]; then
-        "$DOCKER" stats --no-stream --format "{{.MemUsage}}" viriatum-subject 2> /dev/null |
-            awk '{ printf "%.0f 0\n", $1 * 1024 }'
+    _CONTAINER=$2
+    _OF=$3
+
+    # a server inside a container is asked about through the daemon,
+    # which reports the memory of it with the unit written beside the
+    # number and reports no processor time at all, so that one is left
+    # unset rather than reported as a server that consumed nothing
+    if [ -n "$_CONTAINER" ] && [ -n "$DOCKER" ] &&
+        "$DOCKER" inspect "$_CONTAINER" > /dev/null 2>&1; then
+        "$DOCKER" stats --no-stream --format "{{.MemUsage}}" "$_CONTAINER" 2> /dev/null |
+            awk '{
+                unit = $1
+                sub(/^[0-9.]*/, "", unit)
+                value = $1 + 0
+                if (unit == "GiB") { value *= 1024 * 1024 }
+                else if (unit == "MiB") { value *= 1024 }
+                else if (unit == "KiB") { value *= 1 }
+                else { value /= 1024 }
+                printf "%.0f 0\n", value
+            }'
         return 0
     fi
-    # shellcheck disable=SC2009
-    ps -A -o rss=,time=,command= 2> /dev/null | grep "$_MATCH" | grep -v grep | awk '
+
+    # the identifier of a process that was started here finds it and
+    # the workers it has forked and nothing else, the pattern of a
+    # name would also find the upstream of a proxy workload, which is
+    # the very same binary as the subject, and would find none of the
+    # interfaces at all as those are served by a launcher of their own
+    if [ -n "$_OF" ]; then
+        _LINES=$(ps -o rss=,time= -p "$(_tree "$_OF")" 2> /dev/null)
+    else
+        # shellcheck disable=SC2009
+        _LINES=$(ps -A -o rss=,time=,command= 2> /dev/null | grep "$_MATCH" | grep -v grep)
+    fi
+
+    echo "$_LINES" | awk '
         {
             count = split($2, parts, ":")
             seconds = 0
@@ -630,9 +719,27 @@ _sample() {
         END { printf "%.0f %.3f\n", memory, processor }'
 }
 
-# drives the generator against the provided target, the run before the
-# measured ones is thrown away so that a cold cache and a server whose
-# structures have not yet grown never land inside a reported figure
+# drives the run that is thrown away, so that a cold cache and a
+# server whose structures have not yet grown never land inside a
+# reported figure, it is driven before the counters of the server are
+# read as the processor time of it is divided by the requests of the
+# measured runs alone and would otherwise carry this one as well
+_warm() {
+    _TARGET=$1
+    _HEADER=$2
+
+    if [ -n "$_HEADER" ]; then
+        set -- -t "$THREADS" -c "$CONNECTIONS" -d "${DURATION}s" -H "$_HEADER"
+    else
+        set -- -t "$THREADS" -c "$CONNECTIONS" -d "${DURATION}s"
+    fi
+
+    BENCHMARK_REPORT=/dev/null wrk "$@" -s "$ASSETS/report.lua" \
+        "$_TARGET" > /dev/null 2>&1 || true
+}
+
+# drives the generator against the provided target the number of times
+# a measurement keeps, each of the runs writing a report of its own
 _drive() {
     _TARGET=$1
     _HEADER=$2
@@ -643,9 +750,6 @@ _drive() {
     else
         set -- -t "$THREADS" -c "$CONNECTIONS" -d "${DURATION}s"
     fi
-
-    BENCHMARK_REPORT=/dev/null wrk "$@" -s "$ASSETS/report.lua" \
-        "$_TARGET" > /dev/null 2>&1 || true
 
     _INDEX=0
     while [ "$_INDEX" -lt "$REPEATS" ]; do
@@ -726,26 +830,40 @@ _connections() {
 # a figure taken under the tracer would not be a figure of throughput
 _syscalls() {
     _REPORTS=$1
+    _URL=$2
     _OF=$3
 
     if [ -z "$_OF" ] || ! command -v strace > /dev/null 2>&1; then return 0; fi
 
-    strace -c -f -o "$_REPORTS/syscalls.txt" -p "$_OF" 2> /dev/null &
+    # every process that is doing the serving is attached to, one that
+    # follows the forking of a master only ever follows the children
+    # of it that come after the attaching and never the workers that
+    # were started along with it and have been serving all along
+    set --
+    for _PART in $(_tree "$_OF" | tr ',' ' '); do
+        set -- "$@" -p "$_PART"
+    done
+
+    strace -c -f -o "$_REPORTS/syscalls.txt" "$@" 2> /dev/null &
     _TRACER=$!
     sleep 1
 
     _INDEX=0
     while [ "$_INDEX" -lt 200 ]; do
-        curl -s -o /dev/null --max-time 5 "$2" 2> /dev/null || true
+        curl -s -o /dev/null --max-time 5 "$_URL" 2> /dev/null || true
         _INDEX=$((_INDEX + 1))
     done
 
     kill -INT "$_TRACER" 2> /dev/null || true
     wait "$_TRACER" 2> /dev/null || true
 
-    # the total of the tracer is the last of the rows it writes, it is
-    # divided by the requests that were driven while it was attached
-    awk '/^total|^[[:space:]]*100\.00/ { total = $(NF - 1) }
+    # the rows of the tracer are what is added up rather than the total
+    # it closes them with, that one leaves the column of the
+    # microseconds empty and shifts every column after it, so reading
+    # a fixed one out of it hands back the errors and not the calls,
+    # the sum is divided by the requests driven while it was attached
+    awk '/^[- ]+$/ { section++; next }
+        section == 1 { total += $4 }
         END { printf "%.1f\n", total / 200.0 }' \
         "$_REPORTS/syscalls.txt" > "$_REPORTS/syscalls.count" 2> /dev/null || true
 }
@@ -871,13 +989,27 @@ _measure() {
     _TARGET=http://127.0.0.1:$_AT$PATH_
     mkdir -p "$_REPORTS"
 
-    set -- $(_sample "$_MATCH")
+    # the container the server under test is running in or the process
+    # it was started as, whichever of the two the starting of it left
+    # behind, the pattern of its name standing in for both only when
+    # it was started by nothing that runs here
+    if [ "$_SERVER" = "viriatum" ]; then
+        _CONTAINER=$SUBJECT_CONTAINER
+        _OWNER=$PID
+    else
+        _CONTAINER=$REFERENCE_CONTAINER
+        _OWNER=$PID_REFERENCE
+    fi
+
+    _warm "$_TARGET" "$HEADER"
+
+    set -- $(_sample "$_MATCH" "$_CONTAINER" "$_OWNER")
     _RSS_BEFORE=$1
     _CPU_BEFORE=$2
 
     _drive "$_TARGET" "$HEADER" "$_REPORTS"
 
-    set -- $(_sample "$_MATCH")
+    set -- $(_sample "$_MATCH" "$_CONTAINER" "$_OWNER")
     _RSS_AFTER=$1
     _CPU_AFTER=$2
 
@@ -898,10 +1030,24 @@ _measure() {
     # the calls into the kernel are counted for the subject and for
     # every reference alike, the figure of one only says anything
     # about the serving when it is read against the figure of another
-    if [ "$_SERVER" = "viriatum" ]; then _OWNER=$PID; else _OWNER=$PID_REFERENCE; fi
     _syscalls "$_REPORTS" "$_TARGET" "$_OWNER"
 
     _record "$_NAME" "$_SERVER" "$_REPORTS" "$_VERSION"
+}
+
+# says whether the run that was held at the fixed rate may be read as
+# the tail of the serving, one that lost part of its connections is
+# held to the very same rule a timed one is, the percentiles of it
+# cover the requests that came back and leave out every one that the
+# losing of a socket took away, and describe that and not the server
+_corrected() {
+    if [ ! -s "$1/latency.json" ]; then return 1; fi
+    _LOST=$(grep -h -E '"(connect|read|write|timeout)":' "$1/latency.json" 2> /dev/null |
+        sed -n 's/.*: *\([0-9]*\).*/\1/p' |
+        awk '{ total += $1 } END { printf "%d\n", total }')
+    _SERVED=$(sed -n 's/.*"requests": *\([0-9]*\).*/\1/p' "$1/latency.json" 2> /dev/null)
+    echo "${_LOST:-0} ${_SERVED:-0}" |
+        awk '{ exit ($2 <= 0 || $1 * 1000 > $2) ? 1 : 0 }'
 }
 
 # records one measured pair as a report of its own, the assembly of
@@ -939,7 +1085,7 @@ _record() {
     # the tail is only ever read out of the run that was held at a
     # fixed rate, the percentiles of a saturated run leave out every
     # request the generator was held back from sending
-    if [ -s "$_REPORTS/latency.json" ]; then
+    if _corrected "$_REPORTS"; then
         _P50=$(sed -n 's/.*"p50": *\([0-9]*\).*/\1/p' "$_REPORTS/latency.json")
         _P99=$(sed -n 's/.*"p99": *\([0-9]*\).*/\1/p' "$_REPORTS/latency.json")
         _P999=$(sed -n 's/.*"p999": *\([0-9]*\).*/\1/p' "$_REPORTS/latency.json")

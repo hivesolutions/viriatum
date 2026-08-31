@@ -64,6 +64,11 @@ cmake --build "$BUILD" -j 4
 # stages the extension next to the package so that the test suites are
 # able to import it without the package having to be installed
 MODULE=$(ls "$BUILD"/lib/_viriatum*.so "$BUILD"/lib/_viriatum*.pyd 2>/dev/null | head -1)
+# the one that is already there is taken away rather than written
+# over, a system that signs what it loads holds the signature against
+# the file itself and a copy made on top of one it has already seen is
+# refused outright, which shows up as an import killed by the kernel
+rm -f "$ROOT/src/viriatum_python/viriatum/$(basename "$MODULE")"
 cp "$MODULE" "$ROOT/src/viriatum_python/viriatum/"
 
 # gathers the binaries that are going to be run, the ones of the
