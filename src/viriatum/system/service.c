@@ -307,6 +307,7 @@ ERROR_CODE load_specifications(struct service_t *service) {
     service->version = (unsigned char *) VIRIATUM_VERSION;
     service->platform = (unsigned char *) VIRIATUM_PLATFORM_COMPLETE;
     service->flags = (unsigned char *) VIRIATUM_FLAGS;
+    service->polling_name = (unsigned char *) VIRIATUM_POLLING;
     service->compiler = (unsigned char *) VIRIATUM_COMPILER;
     service->compiler_version = (unsigned char *) VIRIATUM_COMPILER_VERSION_STRING;
     service->compilation_date = (unsigned char *) VIRIATUM_COMPILATION_DATE;
@@ -1174,7 +1175,21 @@ ERROR_CODE _open_service(struct service_t *service) {
     /* sets the service in the polling */
     polling->service = service;
 
-#ifdef VIRIATUM_EPOLL
+#ifdef VIRIATUM_KQUEUE
+    /* sets the various handler values to the polling process
+    they will be called for the various read, write operations */
+    polling->open = open_polling_kqueue;
+    polling->close = close_polling_kqueue;
+    polling->register_connection = register_connection_polling_kqueue;
+    polling->unregister_connection = unregister_connection_polling_kqueue;
+    polling->register_read = register_read_polling_kqueue;
+    polling->unregister_read = unregister_read_polling_kqueue;
+    polling->register_write = register_write_polling_kqueue;
+    polling->unregister_write = unregister_write_polling_kqueue;
+    polling->add_outstanding = add_outstanding_polling_kqueue;
+    polling->poll = poll_polling_kqueue;
+    polling->call = call_polling_kqueue;
+#elif defined(VIRIATUM_EPOLL)
     /* sets the various handler values to the polling process
     they will be called for the various read, write operations */
     polling->open = open_polling_epoll;

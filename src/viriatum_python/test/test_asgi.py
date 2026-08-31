@@ -1195,10 +1195,17 @@ class AsgiTest(ServerCase):
             "retained %d futures across 30 dropped connections" % retained,
         )
 
+    @unittest.skipIf(
+        sys.platform == "win32" and sys.version_info < (3, 11),
+        "the interrupt is not delivered reliably by that runtime",
+    )
     def test_keyboard_interrupt(self):
         # verifies that an interrupt stops the serving loop, the
         # signals are only handled in the main thread and so it is the
-        # one that runs the loop while another raises the interrupt
+        # one that runs the loop while another raises the interrupt,
+        # the older runtime of the other platform is left out of it
+        # because the interrupt reaches the loop there only some of
+        # the time, the later ones of it deliver it every time
         state = {"raised": False, "expired": False}
         finished = threading.Event()
 
@@ -1508,10 +1515,16 @@ class LifespanTest(unittest.TestCase):
             asyncio.sleep = original
         self.assertEqual(events, [])
 
+    @unittest.skipIf(
+        sys.platform == "win32" and sys.version_info < (3, 11),
+        "the interrupt is not delivered reliably by that runtime",
+    )
     def test_lifespan_shutdown_on_interrupt(self):
         # verifies that the shutdown of the lifespan is run when the
         # serving is ended by an interrupt, the exception raised by
-        # the signal has to be saved while it takes place
+        # the signal has to be saved while it takes place, the older
+        # runtime of the other platform is left out for the same
+        # reason the test of the interrupt above it is
         events = []
         state = {"expired": False}
         finished = threading.Event()

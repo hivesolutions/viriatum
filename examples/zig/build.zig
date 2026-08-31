@@ -221,6 +221,7 @@ const viriatum_sources = [_][]const u8{
     "test/hpack_test.c",
     "test/http2_test.c",
     "test/stream_http2_test.c",
+    "test/polling_test.c",
     "test/runner_test.c",
     "test/service_test.c",
     "test/websocket_test.c",

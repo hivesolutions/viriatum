@@ -81,6 +81,32 @@ if(NOT WIN32)
     endif()
 endif()
 
+# checks for the mechanism that the service waits on its connections
+# through, the two of them never sit on the same system and either of
+# them is preferred over the one that is left to fall back on, which
+# walks every one of the connections on every single pass
+option(VIRIATUM_EPOLL "Wait on the connections through epoll when it is around" ON)
+option(VIRIATUM_KQUEUE "Wait on the connections through kqueue when it is around" ON)
+if(NOT WIN32)
+    check_symbol_exists(epoll_create1 "sys/epoll.h" HAVE_EPOLL_CREATE1)
+    check_symbol_exists(kqueue "sys/types.h;sys/event.h;sys/time.h" HAVE_KQUEUE_CALL)
+    if(NOT VIRIATUM_EPOLL)
+        set(HAVE_EPOLL_CREATE1 FALSE)
+    endif()
+    if(NOT VIRIATUM_KQUEUE)
+        set(HAVE_KQUEUE_CALL FALSE)
+    endif()
+    if(HAVE_EPOLL_CREATE1)
+        add_definitions(-DHAVE_EPOLL)
+        message(STATUS "Viriatum: polling through epoll")
+    elseif(HAVE_KQUEUE_CALL)
+        add_definitions(-DHAVE_KQUEUE)
+        message(STATUS "Viriatum: polling through kqueue")
+    else()
+        message(STATUS "Viriatum: polling through select")
+    endif()
+endif()
+
 # passes the effective C flags as a preprocessor define so the
 # compilation flags banner can display them at runtime
 if(CMAKE_BUILD_TYPE)
@@ -191,8 +217,8 @@ if(PCRE_FOUND)
     include(CheckIncludeFile)
     check_include_file("pcre.h" HAVE_PCRE_HEADER)
     if(HAVE_PCRE_HEADER)
-        target_compile_definitions(viriatum_objects PRIVATE VIRIATUM_PCRE HAVE_PCRE_H)
-        target_include_directories(viriatum_objects PRIVATE ${PCRE_INCLUDE_DIRS})
+        target_compile_definitions(viriatum_objects PUBLIC VIRIATUM_PCRE HAVE_PCRE_H)
+        target_include_directories(viriatum_objects PUBLIC ${PCRE_INCLUDE_DIRS})
         target_link_libraries(viriatum_objects PUBLIC ${PCRE_LINK_LIBRARIES})
     else()
         message(STATUS "Viriatum: PCRE pkg-config found but pcre.h not available, disabling")

@@ -664,19 +664,19 @@ ERROR_CODE _bencoding_dictionary_start_callback(struct bencoding_engine_t *benco
             create_type(&type, MAP_TYPE);
             *type = map_type(hash_map);
 
-        case SORT_MAP_TYPE:
-            /* creates a new sort map for the new structure (sequence) context
-            and then creates the respective type for the map */
-            create_sort_map(&sort_map, 0);
-            create_type(&type, SORT_MAP_TYPE);
-            *type = sort_map_type(sort_map);
+            /* breaks the switch */
+            break;
 
+        case SORT_MAP_TYPE:
         default:
             /* creates a new sort map for the new structure (sequence) context
             and then creates the respective type for the map */
             create_sort_map(&sort_map, 0);
             create_type(&type, SORT_MAP_TYPE);
             *type = sort_map_type(sort_map);
+
+            /* breaks the switch */
+            break;
     }
 
     /* adds the sequence type to the sequence stack and then adds the

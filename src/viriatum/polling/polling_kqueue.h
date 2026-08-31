@@ -23,3 +23,169 @@
 */
 
 #pragma once
+
+#include "../system/system.h"
+
+#ifdef VIRIATUM_KQUEUE
+
+typedef struct polling_kqueue_t {
+    /**
+     * The polling reference, for top
+     * level reference.
+     */
+    struct polling_t *polling;
+
+    /**
+     * The file descriptor to the object
+     * that control the kqueue structure.
+     * This object is used for each polling
+     * operation to be done.
+     */
+    int kqueue_fd;
+
+    /**
+     * Counter that controls the number of events
+     * currently present in the kqueue structure.
+     * This counter is very useful for debugging
+     * purposes and printing information.
+     */
+    size_t poll_count;
+
+    /**
+     * The buffer that holds the connections
+     * with data available for read.
+     */
+    struct connection_t *read_connections[VIRIATUM_MAX_EVENTS];
+
+    /**
+     * The buffer that holds the connections
+     * with data available for write.
+     */
+    struct connection_t *write_connections[VIRIATUM_MAX_EVENTS];
+
+    /**
+     * The buffer that holds the connections
+     * that are in an erroneous state
+     */
+    struct connection_t *error_connections[VIRIATUM_MAX_EVENTS];
+
+    /**
+     * The buffer that holds the connections
+     * to be house-kept (removed) at the end
+     * of the polling cycle.
+     */
+    struct connection_t *remove_connections[VIRIATUM_MAX_EVENTS];
+
+    /**
+     * The buffer that contains the various
+     * connections that have data pending to
+     * be read from the socket at the beginning
+     * of the next poll operation.
+     */
+    struct connection_t *read_outstanding[VIRIATUM_MAX_EVENTS];
+
+    /**
+     * The buffer that contains the various
+     * connections that have data pending to
+     * be written to the socket at the beginning
+     * of the next poll operation.
+     */
+    struct connection_t *write_outstanding[VIRIATUM_MAX_EVENTS];
+
+    /**
+     * Auxiliary buffer to be used in the performing
+     * of the outstanding read operations.
+     */
+    struct connection_t *_read_outstanding[VIRIATUM_MAX_EVENTS];
+
+    /**
+     * Auxiliary buffer to be used in the performing
+     * of the outstanding write operations.
+     */
+    struct connection_t *_write_outstanding[VIRIATUM_MAX_EVENTS];
+
+    /**
+     * The size of the read connections
+     * buffer.
+     */
+    size_t read_connections_size;
+
+    /**
+     * The size of the write connections
+     * buffer.
+     */
+    size_t write_connections_size;
+
+    /**
+     * The size of the error connections
+     * buffer.
+     */
+    size_t error_connections_size;
+
+    /**
+     * The size of the remove connections
+     * buffer.
+     */
+    size_t remove_connections_size;
+
+    /**
+     * The size as items of the sequence of
+     * connections that are pending to be read
+     * at he beginning of the poll operation.
+     */
+    size_t read_outstanding_size;
+
+    /**
+     * The size as items of the sequence of
+     * connection that are pending to be written
+     * at he beginning of the poll operation.
+     */
+    size_t write_outstanding_size;
+} polling_kqueue;
+
+void create_polling_kqueue(struct polling_kqueue_t **polling_kqueue_pointer, struct polling_t *polling);
+void delete_polling_kqueue(struct polling_kqueue_t *polling_kqueue);
+ERROR_CODE open_polling_kqueue(struct polling_t *polling);
+ERROR_CODE close_polling_kqueue(struct polling_t *polling);
+ERROR_CODE register_connection_polling_kqueue(struct polling_t *polling, struct connection_t *connection);
+ERROR_CODE unregister_connection_polling_kqueue(
+    struct polling_t *polling,
+    struct connection_t *connection,
+    unsigned char remove
+);
+ERROR_CODE register_read_polling_kqueue(struct polling_t *polling, struct connection_t *connection);
+ERROR_CODE unregister_read_polling_kqueue(struct polling_t *polling, struct connection_t *connection);
+ERROR_CODE register_write_polling_kqueue(struct polling_t *polling, struct connection_t *connection);
+ERROR_CODE unregister_write_polling_kqueue(struct polling_t *polling, struct connection_t *connection);
+ERROR_CODE add_outstanding_polling_kqueue(struct polling_t *polling, struct connection_t *connection);
+ERROR_CODE poll_polling_kqueue(struct polling_t *polling);
+ERROR_CODE call_polling_kqueue(struct polling_t *polling);
+ERROR_CODE _poll_polling_kqueue(
+    struct polling_kqueue_t *polling_kqueue,
+    struct connection_t **read_connections,
+    struct connection_t **write_connections,
+    struct connection_t **error_connections,
+    size_t *read_connections_size,
+    size_t *write_connections_size,
+    size_t *error_connections_size
+);
+ERROR_CODE _call_polling_kqueue(
+    struct polling_kqueue_t *polling_kqueue,
+    struct connection_t **read_connections,
+    struct connection_t **write_connections,
+    struct connection_t **error_connections,
+    size_t read_connections_size,
+    size_t write_connections_size,
+    size_t error_connections_size
+);
+ERROR_CODE _outstanding_polling_kqueue(
+    struct polling_kqueue_t *polling_kqueue,
+    struct connection_t **read_outstanding,
+    struct connection_t **write_outstanding,
+    struct connection_t **_read_outstanding,
+    struct connection_t **_write_outstanding,
+    size_t read_outstanding_size,
+    size_t write_outstanding_size
+);
+
+#endif

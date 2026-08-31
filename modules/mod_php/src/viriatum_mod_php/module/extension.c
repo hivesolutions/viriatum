@@ -44,14 +44,15 @@ zend_function_entry viriatum_functions[] = {
                         PHP_FE(viriatum_version, arginfo_viriatum_void)
                             PHP_FE(viriatum_platform, arginfo_viriatum_void)
                                 PHP_FE(viriatum_flags, arginfo_viriatum_void)
-                                    PHP_FE(viriatum_modules, arginfo_viriatum_void)
-                                        PHP_FE(viriatum_description, arginfo_viriatum_void)
-                                            PHP_FE(viriatum_compiler, arginfo_viriatum_void)
-                                                PHP_FE(viriatum_compiler_version, arginfo_viriatum_void)
-                                                    PHP_FE(viriatum_compilation_date, arginfo_viriatum_void)
-                                                        PHP_FE(viriatum_compilation_time, arginfo_viriatum_void)
-                                                            PHP_FE(viriatum_compilation_flags, arginfo_viriatum_void)
-                                                                PHP_FE_END
+                                    PHP_FE(viriatum_polling, arginfo_viriatum_void)
+                                        PHP_FE(viriatum_modules, arginfo_viriatum_void)
+                                            PHP_FE(viriatum_description, arginfo_viriatum_void)
+                                                PHP_FE(viriatum_compiler, arginfo_viriatum_void)
+                                                    PHP_FE(viriatum_compiler_version, arginfo_viriatum_void)
+                                                        PHP_FE(viriatum_compilation_date, arginfo_viriatum_void)
+                                                            PHP_FE(viriatum_compilation_time, arginfo_viriatum_void)
+                                                                PHP_FE(viriatum_compilation_flags, arginfo_viriatum_void)
+                                                                    PHP_FE_END
 };
 
 zend_module_entry viriatum_module = {
@@ -467,6 +468,10 @@ PHP_FUNCTION(viriatum_platform) {
 
 PHP_FUNCTION(viriatum_flags) {
     RETURN_STRING((char *) _service->flags);
+}
+
+PHP_FUNCTION(viriatum_polling) {
+    RETURN_STRING((char *) _service->polling_name);
 }
 
 PHP_FUNCTION(viriatum_compiler) {

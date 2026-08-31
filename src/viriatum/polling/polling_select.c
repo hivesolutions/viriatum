@@ -170,6 +170,21 @@ ERROR_CODE unregister_connection_polling_select(
         );
     }
 
+    /* takes the connection out of the buffers of the pending
+    operations, one that stays in them is reached again on the
+    next round of the loop, by then possibly already released */
+    discard_connection(
+        polling_select->read_outstanding,
+        &polling_select->read_outstanding_size,
+        connection
+    );
+    discard_connection(
+        polling_select->write_outstanding,
+        &polling_select->write_outstanding_size,
+        connection
+    );
+    connection->is_outstanding = FALSE;
+
     /* in case the remove connection flag is set the connection
     is also added to the list of connections to be removed
     after the io driven logic part is processed (at the end

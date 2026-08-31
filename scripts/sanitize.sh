@@ -17,11 +17,14 @@ COMPILER=${CC:-clang}
 
 # the leak part of the sanitizer only runs on some of the platforms,
 # on the others the memory errors are still caught and the leaks are
-# simply not looked at, the integration runs it where it does run
-LEAKS=1
+# simply not looked at, the integration runs it where it does run,
+# a compiler that does carry the detector on one of the others may
+# be driven through it by naming the compiler and asking for them
 case "$(uname -s)" in
-    Darwin) LEAKS=0 ;;
+    Darwin) DEFAULT_LEAKS=0 ;;
+    *) DEFAULT_LEAKS=1 ;;
 esac
+LEAKS=${LEAKS:-$DEFAULT_LEAKS}
 
 cmake -S "$ROOT" -B "$BUILD" \
     -DCMAKE_BUILD_TYPE=Debug \

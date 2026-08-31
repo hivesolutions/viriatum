@@ -138,6 +138,7 @@ static void _run_test(
 ) {
     long start_time;
     long end_time;
+    size_t allocated;
     void *context = NULL;
     const char *message = NULL;
 
@@ -150,6 +151,7 @@ static void _run_test(
     }
 
     result->elapsed = 0.0f;
+    result->outstanding = 0;
     result->message[0] = '\0';
 
     /* a skipped entry is reported without any of its functions
@@ -161,6 +163,7 @@ static void _run_test(
     }
 
     start_time = clock();
+    allocated = ALLOCATIONS;
 
     if(entry->setup != NULL) { context = entry->setup(); }
 
@@ -180,6 +183,7 @@ static void _run_test(
 
     end_time = clock();
     result->elapsed = (float) (end_time - start_time) / CLOCKS_PER_SEC;
+    result->outstanding = (long) (ALLOCATIONS - allocated);
 
     /* an entry marked as an expected failure inverts the meaning
     of its outcome, a failure becomes the expected result and a
@@ -247,6 +251,45 @@ static void _print_slowest_test(struct test_report_t *report) {
         if(selected == report->count) { break; }
         limit = report->results[selected].elapsed;
         V_PRINT_F("  %s (%.2f seconds)\n", report->results[selected].name, limit);
+    }
+}
+
+/**
+ * Prints the tests that left the most allocations outstanding,
+ * the listing is built the same way the one of the slowest is
+ * and a run that left none prints nothing at all. An allocation
+ * that is still outstanding is not necessarily a leak, a value
+ * built by one test may well be released by a later one.
+ *
+ * @param report The report whose results are going to be listed.
+ */
+static void _print_outstanding_test(struct test_report_t *report) {
+    size_t index;
+    size_t count;
+    size_t position;
+    size_t selected;
+    size_t listed = 0;
+    long limit = -1;
+
+    count = report->count < TEST_OUTSTANDING_COUNT ? report->count : TEST_OUTSTANDING_COUNT;
+    if(count == 0) { return; }
+
+    for(position = 0; position < count; position++) {
+        selected = report->count;
+        for(index = 0; index < report->count; index++) {
+            if(report->results[index].outstanding <= 0) { continue; }
+            if(limit >= 0 && report->results[index].outstanding >= limit) { continue; }
+            if(selected != report->count &&
+               report->results[index].outstanding <= report->results[selected].outstanding) {
+                continue;
+            }
+            selected = index;
+        }
+        if(selected == report->count) { break; }
+        limit = report->results[selected].outstanding;
+        if(listed == 0) { V_PRINT("Outstanding allocations\n"); }
+        listed++;
+        V_PRINT_F("  %s (%ld allocations)\n", report->results[selected].name, limit);
     }
 }
 
@@ -496,6 +539,7 @@ ERROR_CODE run_test_suite(struct test_suite_t *suite, struct test_options_t *opt
         if(test_case.skipped > 0) { V_PRINT_F(", %d skipped", test_case.skipped); }
         V_PRINT(")\n");
         _print_slowest_test(&report);
+        _print_outstanding_test(&report);
     }
 
     return_value = write_test_report(&report, options);
