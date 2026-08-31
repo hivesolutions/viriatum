@@ -19,7 +19,7 @@ Run from the project root with:
 from contextlib import redirect_stdout
 from io import StringIO
 from os.path import abspath, dirname, join
-from socket import AF_INET, SOCK_STREAM, socket
+from socket import AF_INET, SOCK_STREAM, setdefaulttimeout, socket
 from sys import path
 from threading import Thread
 from unittest import TestCase, main
@@ -33,6 +33,11 @@ import client_test
 SIZE = 4096
 """ The size of the buffer the listener reads through, larger than
 anything the client of a test is ever going to send """
+
+TIMEOUT = 5.0
+""" The seconds either of the two ends is allowed to wait on the
+other, a client that writes less than it was going to would leave the
+two of them waiting forever and take the whole of the suite with it """
 
 
 class ClientTestTest(TestCase):
@@ -48,8 +53,16 @@ class ClientTestTest(TestCase):
         self.listener = socket(AF_INET, SOCK_STREAM)
         self.listener.bind(("127.0.0.1", 0))
         self.listener.listen(1)
+        self.listener.settimeout(TIMEOUT)
         self.port = self.listener.getsockname()[1]
         self.received = b""
+        self.waited = False
+
+        # every socket that is opened from here on is held to the same
+        # wait, the one the client opens for itself included, so that
+        # an exchange that never completes fails the test rather than
+        # leaving it sitting on a socket nothing is going to write to
+        setdefaulttimeout(TIMEOUT)
 
         # points the client at the listener and takes the pause
         # between the writes away, the separation of the messages is
@@ -60,6 +73,7 @@ class ClientTestTest(TestCase):
         client_test.WRITE_SLEEP = 0
 
     def tearDown(self) -> None:
+        setdefaulttimeout(None)
         client_test.PORT = self.port_previous
         client_test.WRITE_SLEEP = self.sleep_previous
         self.listener.close()
@@ -73,7 +87,11 @@ class ClientTestTest(TestCase):
             connection, _address = self.listener.accept()
             try:
                 while len(self.received) < expected:
-                    data = connection.recv(SIZE)
+                    try:
+                        data = connection.recv(SIZE)
+                    except TimeoutError:
+                        self.waited = True
+                        break
                     if not data:
                         break
                     self.received += data
@@ -87,14 +105,20 @@ class ClientTestTest(TestCase):
         thread.start()
         return thread
 
-    def _call(self, messages: list[str], answer: bytes = b"") -> None:
-        # drives the client at the listener, the writing it does to
-        # the output is swallowed as it is not what is being tested
+    def _call(self, messages: list[str], answer: bytes = b"") -> str:
+        # drives the client at the listener and hands back what it
+        # wrote, which is where whatever it read shows up, the two
+        # ends are held to the wait so that neither of them is able to
+        # leave the other one sitting on a socket forever
         expected = len("".join(messages).encode("utf-8"))
         thread = self._accept(expected, answer)
-        with redirect_stdout(StringIO()):
+        stream = StringIO()
+        with redirect_stdout(stream):
             client_test.call(messages)
-        thread.join(5)
+        thread.join(TIMEOUT)
+        self.assertFalse(self.waited)
+        self.assertFalse(thread.is_alive())
+        return stream.getvalue()
 
     def test_messages(self) -> None:
         # the messages the client carries are text and the socket only
@@ -133,9 +157,15 @@ class ClientTestTest(TestCase):
     def test_call_answer(self) -> None:
         # the client reads until the other end closes, an answer that
         # is written before the closing is read rather than the client
-        # being left waiting on a socket nothing else is going to use
-        self._call(["GET / HTTP/1.1\r\n\r\n"], answer=b"HTTP/1.1 200 OK\r\n\r\n")
+        # being left waiting on a socket nothing else is going to use,
+        # and what it read is what it writes out, so that a client
+        # that stopped reading altogether is told apart from one that
+        # read and was handed nothing
+        written = self._call(
+            ["GET / HTTP/1.1\r\n\r\n"], answer=b"HTTP/1.1 200 OK\r\n\r\n"
+        )
         self.assertEqual(self.received, b"GET / HTTP/1.1\r\n\r\n")
+        self.assertIn("HTTP/1.1 200 OK", written)
 
     def test_call_empty(self) -> None:
         # a client handed nothing writes nothing and still reads the
