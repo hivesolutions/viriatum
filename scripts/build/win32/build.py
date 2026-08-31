@@ -22,7 +22,6 @@ Options:
 
 from os import chdir, listdir
 from os.path import join
-from sys import exit
 
 import atm
 

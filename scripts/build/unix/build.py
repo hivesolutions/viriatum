@@ -23,7 +23,6 @@ Options:
 
 from os import chdir, listdir
 from os.path import abspath, dirname, join
-from sys import exit
 
 import atm
 

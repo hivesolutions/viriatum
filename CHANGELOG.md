@@ -70,6 +70,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * A resource that disappears while it is being sent no longer leaves the connection unusable - [#49](https://github.com/hivesolutions/viriatum/issues/49)
 * The benchmark now reports the memory, the processor time, the version and the kernel calls of the server it measured - [#49](https://github.com/hivesolutions/viriatum/issues/49)
 * A discarded measurement no longer shows a tail or a comparison against the baseline - [#49](https://github.com/hivesolutions/viriatum/issues/49)
+* The client that drives requests by hand runs again on a current Python - [#49](https://github.com/hivesolutions/viriatum/issues/49)
 
 ## [0.5.0] - 2026-08-28
 

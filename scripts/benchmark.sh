@@ -442,6 +442,18 @@ _run_image() {
         -v "$OUTPUT:/bench" "$@" > "$OUTPUT/logs/reference.id" 2>&1
 }
 
+# reports the process a container is running as on this machine, which
+# only means anything where the daemon shares the kernel of it, on a
+# machine whose daemon lives inside a virtual one of its own the
+# identifier belongs to that one and would name whatever here happens
+# to carry the same number, so nothing is reported at all
+_hosted() {
+    if [ -z "$DOCKER" ] || [ "$(uname -s)" != "Linux" ]; then return 0; fi
+    _HOSTED=$("$DOCKER" inspect -f '{{.State.Pid}}' "$1" 2> /dev/null || echo 0)
+    if [ "$_HOSTED" = "0" ]; then return 0; fi
+    echo "$_HOSTED"
+}
+
 # reports a process together with the workers it has forked, as the
 # comma separated list that the tools of the machine take, a server
 # that forks is only ever described by the whole of the set
@@ -672,36 +684,42 @@ _sample() {
     _CONTAINER=$2
     _OF=$3
 
-    # a server inside a container is asked about through the daemon,
-    # which reports the memory of it with the unit written beside the
-    # number and reports no processor time at all, so that one is left
-    # unset rather than reported as a server that consumed nothing
-    if [ -n "$_CONTAINER" ] && [ -n "$DOCKER" ] &&
-        "$DOCKER" inspect "$_CONTAINER" > /dev/null 2>&1; then
-        "$DOCKER" stats --no-stream --format "{{.MemUsage}}" "$_CONTAINER" 2> /dev/null |
-            awk '{
-                unit = $1
-                sub(/^[0-9.]*/, "", unit)
-                value = $1 + 0
-                if (unit == "GiB") { value *= 1024 * 1024 }
-                else if (unit == "MiB") { value *= 1024 }
-                else if (unit == "KiB") { value *= 1 }
-                else { value /= 1024 }
-                printf "%.0f 0\n", value
-            }'
-        return 0
-    fi
-
-    # the identifier of a process that was started here finds it and
-    # the workers it has forked and nothing else, the pattern of a
-    # name would also find the upstream of a proxy workload, which is
-    # the very same binary as the subject, and would find none of the
-    # interfaces at all as those are served by a launcher of their own
+    # the identifier of a process finds it and the workers it has
+    # forked and nothing else, the pattern of a name would also find
+    # the upstream of a proxy workload, which is the very same binary
+    # as the subject, and would find none of the interfaces at all as
+    # those are served by a launcher of their own, a container that
+    # shares the kernel of the machine is reached this way as well and
+    # is the only way the processor time of one is ever answered
     if [ -n "$_OF" ]; then
-        _LINES=$(ps -o rss=,time= -p "$(_tree "$_OF")" 2> /dev/null)
+        _LINES=$(ps -o rss=,time= -p "$(_tree "$_OF")" 2> /dev/null || true)
     else
+        # a container the machine holds no process for is asked about
+        # through the daemon, which reports the memory of it with the
+        # unit written beside the number and reports no cumulative
+        # processor time at all, so that one is left unset rather than
+        # reported as a server that consumed nothing while it served
+        if [ -n "$_CONTAINER" ] && [ -n "$DOCKER" ] &&
+            "$DOCKER" inspect "$_CONTAINER" > /dev/null 2>&1; then
+            "$DOCKER" stats --no-stream --format "{{.MemUsage}}" "$_CONTAINER" 2> /dev/null |
+                awk '{
+                    unit = $1
+                    sub(/^[0-9.]*/, "", unit)
+                    value = $1 + 0
+                    if (unit == "GiB") { value *= 1024 * 1024 }
+                    else if (unit == "MiB") { value *= 1024 }
+                    else if (unit == "KiB") { value *= 1 }
+                    else { value /= 1024 }
+                    printf "%.0f 0\n", value
+                }'
+            return 0
+        fi
+        # a pattern that finds nothing is not an error, the server it
+        # names is reported as having consumed nothing rather than the
+        # sampling of it being given up on halfway through
         # shellcheck disable=SC2009
-        _LINES=$(ps -A -o rss=,time=,command= 2> /dev/null | grep "$_MATCH" | grep -v grep)
+        _LINES=$(ps -A -o rss=,time=,command= 2> /dev/null |
+            grep "$_MATCH" | grep -v grep || true)
     fi
 
     echo "$_LINES" | awk '
@@ -999,6 +1017,15 @@ _measure() {
     else
         _CONTAINER=$REFERENCE_CONTAINER
         _OWNER=$PID_REFERENCE
+    fi
+
+    # a container that shares the kernel of the machine is an ordinary
+    # process of it and the daemon says which one, so the sampling and
+    # the tracing reach it the very way they reach a server that was
+    # started here, which is the shape the run of the integration
+    # takes, its references being containers and its subject not
+    if [ -z "$_OWNER" ] && [ -n "$_CONTAINER" ]; then
+        _OWNER=$(_hosted "$_CONTAINER")
     fi
 
     _warm "$_TARGET" "$HEADER"

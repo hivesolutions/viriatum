@@ -109,7 +109,7 @@ string (to be used for long pipellined string
 testing) one string containing three messages """
 
 
-def call(messages: list[bytes]) -> None:
+def call(messages: list[str]) -> None:
     # creates the socket object and connects it to the
     # target host and port
     _socket = socket(AF_INET, SOCK_STREAM)
@@ -120,7 +120,7 @@ def call(messages: list[bytes]) -> None:
     # sent and sends them to the server side, note
     # that a delay time is used to separate messages
     for message in messages:
-        _socket.send(message)
+        _socket.send(message.encode("utf-8"))
         print("Sent:", message)
         sleep(WRITE_SLEEP)
 
