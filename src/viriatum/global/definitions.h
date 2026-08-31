@@ -256,6 +256,26 @@ static __inline char *get_config_path(void) {
 #define VIRIATUM_EPOLL_S ""
 #endif
 
+#ifdef VIRIATUM_KQUEUE
+#define VIRIATUM_KQUEUE_S " kqueue"
+#else
+#define VIRIATUM_KQUEUE_S ""
+#endif
+
+/**
+ * The name of the mechanism that the service waits on its
+ * connections through, the one that scales with the number
+ * of them being preferred and the one that walks every one
+ * of them on every pass being what is left to fall back on.
+ */
+#ifdef VIRIATUM_EPOLL
+#define VIRIATUM_POLLING "epoll"
+#elif defined(VIRIATUM_KQUEUE)
+#define VIRIATUM_POLLING "kqueue"
+#else
+#define VIRIATUM_POLLING "select"
+#endif
+
 #ifdef VIRIATUM_IP6
 #define VIRIATUM_IP6_S " ipv6"
 #else
@@ -287,7 +307,7 @@ static __inline char *get_config_path(void) {
 #define VIRIATUM_HTTP2_S ""
 #endif
 
-#define _VIRIATUM_FLAGS VIRIATUM_DEBUG_S VIRIATUM_THREAD_SAFE_S VIRIATUM_MPOOL_S      \
-    VIRIATUM_PREFORK_S VIRIATUM_EPOLL_S VIRIATUM_IP6_S VIRIATUM_SSL_S VIRIATUM_PCRE_S \
-        VIRIATUM_HTTP2_S
+#define _VIRIATUM_FLAGS VIRIATUM_DEBUG_S VIRIATUM_THREAD_SAFE_S VIRIATUM_MPOOL_S \
+    VIRIATUM_PREFORK_S VIRIATUM_EPOLL_S VIRIATUM_KQUEUE_S VIRIATUM_IP6_S         \
+        VIRIATUM_SSL_S VIRIATUM_PCRE_S VIRIATUM_HTTP2_S
 #define VIRIATUM_FLAGS TRIM_STRING(_VIRIATUM_FLAGS)

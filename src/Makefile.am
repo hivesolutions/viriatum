@@ -37,7 +37,9 @@ viriatum/handlers/handler_dispatch.h \
 viriatum/handlers/handler_file.h \
 viriatum/handlers/handler_proxy.h \
 viriatum/handlers/handlers.h \
+viriatum/http/hpack.h \
 viriatum/http/http.h \
+viriatum/http/http2.h \
 viriatum/http/http_parser.h \
 viriatum/http/http_request.h \
 viriatum/http/http_util.h \
@@ -54,6 +56,7 @@ viriatum/polling/polling_kqueue.h \
 viriatum/polling/polling_select.h \
 viriatum/stream/stream.h \
 viriatum/stream/stream_http.h \
+viriatum/stream/stream_http2.h \
 viriatum/stream/stream_httpc.h \
 viriatum/stream/stream_io.h \
 viriatum/stream/stream_torrent.h \
@@ -62,12 +65,20 @@ viriatum/system/environment.h \
 viriatum/system/service.h \
 viriatum/system/system.h \
 viriatum/system/torrent.h \
+viriatum/test/handler_default_test.h \
 viriatum/test/handler_dispatch_test.h \
 viriatum/test/handler_file_test.h \
+viriatum/test/handler_proxy_test.h \
+viriatum/test/hpack_test.h \
+viriatum/test/http2_test.h \
+viriatum/test/polling_test.h \
+viriatum/test/runner_test.h \
 viriatum/test/service_test.h \
 viriatum/test/simple_test.h \
 viriatum/test/speed_test.h \
+viriatum/test/stream_http2_test.h \
 viriatum/test/test.h \
+viriatum/test/test_support.h \
 viriatum/test/websocket_test.h \
 viriatum_commons/stdafx.h \
 viriatum_commons/viriatum_commons.h \
@@ -137,6 +148,7 @@ viriatum_commons/system/thread.h \
 viriatum_commons/template/engine.h \
 viriatum_commons/template/handler.h \
 viriatum_commons/template/template.h \
+viriatum_commons/test/report.h \
 viriatum_commons/test/test.h \
 viriatum_commons/test/unit.h \
 viriatum_commons/thread/thread.h \

@@ -715,6 +715,10 @@
                 Name="Test"
                 >
                 <File
+                    RelativePath="..\..\src\viriatum_commons\test\report.c"
+                    >
+                </File>
+                <File
                     RelativePath="..\..\src\viriatum_commons\test\unit.c"
                     >
                 </File>
@@ -1114,6 +1118,10 @@
                 >
                 <File
                     RelativePath="..\..\src\viriatum_commons\test\test.h"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\viriatum_commons\test\report.h"
                     >
                 </File>
                 <File

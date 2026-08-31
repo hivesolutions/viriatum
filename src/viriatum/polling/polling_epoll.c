@@ -171,19 +171,32 @@ ERROR_CODE unregister_connection_polling_epoll(
         NULL
     );
 
-    /* in case there was an error in epoll need to correctly
-    handle it and propagate it to the caller */
+    /* in case there was an error in epoll it is only reported, a
+    descriptor that has already gone is no longer watched either and
+    so the operation has reached what it was after, stopping here
+    would leave the connection below out of the removal for good */
     if(SOCKET_TEST_ERROR(result_code)) {
         SOCKET_ERROR_CODE epoll_error_code = SOCKET_GET_ERROR_CODE(socket_result);
         V_WARNING_F(
             "Problem unregistering connection epoll: %d\n",
             epoll_error_code
         );
-        RAISE_ERROR_M(
-            RUNTIME_EXCEPTION_ERROR_CODE,
-            (unsigned char *) "Problem unregistering connection epoll"
-        );
     }
+
+    /* takes the connection out of the buffers of the pending
+    operations, one that stays in them is reached again on the
+    next round of the loop, by then possibly already released */
+    discard_connection(
+        polling_epoll->read_outstanding,
+        &polling_epoll->read_outstanding_size,
+        connection
+    );
+    discard_connection(
+        polling_epoll->write_outstanding,
+        &polling_epoll->write_outstanding_size,
+        connection
+    );
+    connection->is_outstanding = FALSE;
 
     /* in case the remove connection flag is set the connection
     is also added to the list of connections to be removed

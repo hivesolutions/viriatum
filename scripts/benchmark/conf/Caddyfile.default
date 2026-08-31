@@ -1,0 +1,24 @@
+# Hive Viriatum Web Server
+# Copyright (c) 2008-2026 Hive Solutions Lda.
+#
+# The counterpart of the cheapest response the subject is able to
+# produce, answered out of the configuration and never off the file
+# system, the placeholders are replaced by the harness.
+
+{
+	admin off
+	auto_https off
+	persist_config off
+	log {
+		output discard
+	}
+	servers {
+		timeouts {
+			idle 65s
+		}
+	}
+}
+
+:@PORT@ {
+	respond "viriatum" 200
+}

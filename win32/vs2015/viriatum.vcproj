@@ -523,6 +523,26 @@
                 RelativePath="..\..\src\viriatum\viriatum.c"
                 >
             </File>
+            <File
+                RelativePath="..\..\src\viriatum\main.c"
+                >
+                <FileConfiguration
+                    Name="Library|Win32"
+                    ExcludedFromBuild="true"
+                    >
+                    <Tool
+                        Name="VCCLCompilerTool"
+                    />
+                </FileConfiguration>
+                <FileConfiguration
+                    Name="Library (Dynamic)|Win32"
+                    ExcludedFromBuild="true"
+                    >
+                    <Tool
+                        Name="VCCLCompilerTool"
+                    />
+                </FileConfiguration>
+            </File>
             <Filter
                 Name="System"
                 >
@@ -555,11 +575,43 @@
                     >
                 </File>
                 <File
+                    RelativePath="..\..\src\viriatum\test\handler_default_test.c"
+                    >
+                </File>
+                <File
                     RelativePath="..\..\src\viriatum\test\handler_file_test.c"
                     >
                 </File>
                 <File
+                    RelativePath="..\..\src\viriatum\test\handler_proxy_test.c"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\viriatum\test\hpack_test.c"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\viriatum\test\http2_test.c"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\viriatum\test\stream_http2_test.c"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\viriatum\test\polling_test.c"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\viriatum\test\runner_test.c"
+                    >
+                </File>
+                <File
                     RelativePath="..\..\src\viriatum\test\websocket_test.c"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\viriatum\test\service_test.c"
                     >
                 </File>
                 <File
@@ -586,6 +638,14 @@
             <Filter
                 Name="Http"
                 >
+                <File
+                    RelativePath="..\..\src\viriatum\http\hpack.c"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\viriatum\http\http2.c"
+                    >
+                </File>
                 <File
                     RelativePath="..\..\src\viriatum\http\http_parser.c"
                     >
@@ -628,6 +688,10 @@
                 >
                 <File
                     RelativePath="..\..\src\viriatum\stream\stream_http.c"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\viriatum\stream\stream_http2.c"
                     >
                 </File>
                 <File
@@ -745,11 +809,43 @@
                     >
                 </File>
                 <File
+                    RelativePath="..\..\src\viriatum\test\handler_default_test.h"
+                    >
+                </File>
+                <File
                     RelativePath="..\..\src\viriatum\test\handler_file_test.h"
                     >
                 </File>
                 <File
+                    RelativePath="..\..\src\viriatum\test\handler_proxy_test.h"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\viriatum\test\hpack_test.h"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\viriatum\test\http2_test.h"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\viriatum\test\stream_http2_test.h"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\viriatum\test\polling_test.h"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\viriatum\test\runner_test.h"
+                    >
+                </File>
+                <File
                     RelativePath="..\..\src\viriatum\test\websocket_test.h"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\viriatum\test\service_test.h"
                     >
                 </File>
                 <File
@@ -786,6 +882,14 @@
                 >
                 <File
                     RelativePath="..\..\src\viriatum\http\http.h"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\viriatum\http\hpack.h"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\viriatum\http\http2.h"
                     >
                 </File>
                 <File
@@ -838,6 +942,10 @@
                 </File>
                 <File
                     RelativePath="..\..\src\viriatum\stream\stream_http.h"
+                    >
+                </File>
+                <File
+                    RelativePath="..\..\src\viriatum\stream\stream_http2.h"
                     >
                 </File>
                 <File

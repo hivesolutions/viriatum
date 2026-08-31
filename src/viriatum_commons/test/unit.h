@@ -46,6 +46,13 @@
  */
 #define TEST_SLOWEST_COUNT 5
 
+/**
+ * The amount of tests that are listed in the summary of the
+ * ones that left the most allocations outstanding, printed at
+ * the end of a run just like the slowest ones are.
+ */
+#define TEST_OUTSTANDING_COUNT 5
+
 /* the flags that may be set on a test entry, they control
 whether the test is run at all and the way the result of its
 execution is to be interpreted by the runner */
@@ -464,6 +471,14 @@ typedef struct test_result_t {
      * The amount of seconds the execution of the test took.
      */
     float elapsed;
+
+    /**
+     * The amount of allocations the execution of the test left
+     * outstanding, which a later test may still release, a negative
+     * value for one that released more than it took and zero for a
+     * build that does not count them at all.
+     */
+    long outstanding;
 
     /**
      * The message of the assertion that failed, an empty string

@@ -114,6 +114,9 @@
     <ClCompile Include="..\..\src\viriatum\test\stream_http2_test.c">
       <Filter>Source Files\Test</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\viriatum\test\polling_test.c">
+      <Filter>Source Files\Test</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\src\viriatum\test\websocket_test.c">
       <Filter>Source Files\Test</Filter>
     </ClCompile>
@@ -252,6 +255,9 @@
       <Filter>Header Files\Test</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\viriatum\test\stream_http2_test.h">
+      <Filter>Header Files\Test</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\viriatum\test\polling_test.h">
       <Filter>Header Files\Test</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\viriatum\test\websocket_test.h">

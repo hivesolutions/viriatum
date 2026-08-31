@@ -60,6 +60,7 @@ const char *test_create_service_options(void) {
     V_ASSERT(service_options->default_index == 0);
     V_ASSERT(service_options->www_root[0] == '\0');
     V_ASSERT(service_options->use_template == 0);
+    V_ASSERT(service_options->access_log == 1);
     V_ASSERT(service_options->default_virtual_host == NULL);
     V_ASSERT(service_options->index_count == 0);
 
@@ -417,6 +418,65 @@ const char *test_arguments_options_service(void) {
     nothing to report for this execution */
     return NULL;
 }
+const char *test_polling_service(void) {
+    /* allocates space for the service whose specifications are going
+    to be loaded and for the name of the mechanism it reports */
+    struct service_t *service;
+    const char *flags = VIRIATUM_FLAGS;
+
+    create_service(
+        &service,
+        (unsigned char *) "test",
+        (unsigned char *) "test"
+    );
+    load_specifications(service);
+
+    /* the name is always one of the three, a service that reported
+    nothing would leave the status page with an empty row where the
+    mechanism in use is meant to be read */
+    V_ASSERT_NOT_NULL(service->polling_name);
+    V_ASSERT(
+        strcmp((char *) service->polling_name, "epoll") == 0 ||
+        strcmp((char *) service->polling_name, "kqueue") == 0 ||
+        strcmp((char *) service->polling_name, "select") == 0
+    );
+
+    /* the name has to agree with the mechanism the build reached for,
+    a page that named one while the service waited through another
+    would be worse than one that named none at all */
+#if defined(VIRIATUM_EPOLL)
+    V_ASSERT_EQ_S((char *) service->polling_name, "epoll");
+#elif defined(VIRIATUM_KQUEUE)
+    V_ASSERT_EQ_S((char *) service->polling_name, "kqueue");
+#else
+    V_ASSERT_EQ_S((char *) service->polling_name, "select");
+#endif
+
+    /* the mechanism that scales with the connections shows up in the
+    banner as well, and the one that is left to fall back on never
+    does, so that the two of them are told apart at a glance */
+#if defined(VIRIATUM_EPOLL)
+    V_ASSERT_NOT_NULL(strstr(flags, "epoll"));
+    V_ASSERT_NULL(strstr(flags, "kqueue"));
+#elif defined(VIRIATUM_KQUEUE)
+    V_ASSERT_NOT_NULL(strstr(flags, "kqueue"));
+    V_ASSERT_NULL(strstr(flags, "epoll"));
+#else
+    V_ASSERT_NULL(strstr(flags, "epoll"));
+    V_ASSERT_NULL(strstr(flags, "kqueue"));
+#endif
+
+    /* the description that a response carries is built out of the
+    flags, so the mechanism travels with every one of them */
+    V_ASSERT_NOT_NULL(strstr((char *) service->description, (char *) service->flags));
+
+    delete_service(service);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
 const char *test_flags_service(void) {
     /* allocates space for the chain of the connection and for the
     string of the flags that the banner of the startup carries */

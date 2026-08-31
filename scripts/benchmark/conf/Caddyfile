@@ -1,0 +1,25 @@
+# Hive Viriatum Web Server
+# Copyright (c) 2008-2026 Hive Solutions Lda.
+#
+# The configuration of the reference that stands for the serving of
+# files with the defaults of a modern server, the placeholders are
+# replaced by the harness before it is handed over.
+
+{
+	admin off
+	auto_https off
+	persist_config off
+	log {
+		output discard
+	}
+	servers {
+		timeouts {
+			idle 65s
+		}
+	}
+}
+
+:@PORT@ {
+	root * @ROOT@/www
+	file_server browse
+}

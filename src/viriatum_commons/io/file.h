@@ -127,6 +127,18 @@ VIRIATUM_EXPORT_PREFIX ERROR_CODE write_file(char *file_path, unsigned char *buf
 VIRIATUM_EXPORT_PREFIX ERROR_CODE count_file(char *file_path, size_t *file_size_pointer);
 
 /**
+ * Opens the file in the given path for reading and hands back
+ * the descriptor of it, one that is held open this way goes on
+ * being writable and removable by everyone else, which is what
+ * the serving of a file that may be replaced calls for.
+ *
+ * @param file_path The path to the file to be opened.
+ * @param descriptor_pointer The pointer to the descriptor to be
+ * set with the result of the open operation.
+ */
+VIRIATUM_EXPORT_PREFIX ERROR_CODE open_read_file(char *file_path, int *descriptor_pointer);
+
+/**
  * Retrieves the last write time (as a date time structure)
  * for the file in the given file path.
  *

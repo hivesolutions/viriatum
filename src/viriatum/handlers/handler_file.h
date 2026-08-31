@@ -44,6 +44,83 @@ struct http_connection_t;
 #define FILE_BUFFER_SIZE_HANDLER_FILE 262144
 
 /**
+ * The number of files that the cache of the handler is
+ * allowed to keep open at the same time, past which the
+ * one that has gone longest without being asked for is
+ * closed to make room for the one being asked for now.
+ */
+#define CACHE_SIZE_HANDLER_FILE 128
+
+/**
+ * The number of seconds that an entry of the cache is
+ * trusted for, once past it the file it describes is
+ * looked at again and the entry is either renewed or
+ * thrown away in favour of the file as it now stands.
+ */
+#define CACHE_VALID_HANDLER_FILE 4
+
+/**
+ * Structure describing a file that the handler has
+ * open, so that the serving of it again costs neither
+ * the opening of it nor the describing of it, which
+ * together are the greater part of what a request for
+ * a small file costs.
+ */
+typedef struct file_cache_entry_t {
+    /**
+     * The path of the file that this entry describes,
+     * which is also the key it is stored under.
+     */
+    unsigned char path[VIRIATUM_MAX_PATH_SIZE];
+
+    /**
+     * The descriptor of the file, kept open for as long
+     * as the entry lives, the requests read through a
+     * duplicate of it so that none of them is ever left
+     * holding one that the cache has closed.
+     */
+    int descriptor;
+
+    /**
+     * The size in bytes of the file, as it stood when the
+     * entry was last renewed.
+     */
+    size_t size;
+
+    /**
+     * The time of the last write to the file, as it stood
+     * when the entry was last renewed.
+     */
+    struct date_time_t time;
+
+    /**
+     * The moment at which the file was last looked at, an
+     * entry older than the validity is looked at again
+     * before it is trusted.
+     */
+    unsigned int checked;
+} file_cache_entry;
+
+/**
+ * Structure describing the set of files that the handler
+ * is keeping open, one per process as the workers are
+ * forked and each of them serves on its own, so that
+ * nothing here is ever reached by two at once.
+ *
+ * A path falls on exactly one of the entries, decided by
+ * the hash of it, and takes that entry over from whatever
+ * was sitting there before, which is what keeps both the
+ * lookup and the making of room down to a single step.
+ */
+typedef struct file_cache_t {
+    /**
+     * The entries of the cache, one slot per position that
+     * the hash of a path is able to fall on.
+     */
+    struct file_cache_entry_t *entries;
+} file_cache;
+
+/**
  * Structure describing the internal parameters
  * for a location in the file context.
  */
@@ -161,18 +238,20 @@ typedef struct handler_file_context_t {
     unsigned char *push;
 
     /**
-     * The reference to the file stream to be
-     * used in the file request.
+     * The descriptor of the file to be used in the file
+     * request, a duplicate of the one the cache holds so
+     * that the request owns it and closes it on its own,
+     * set to minus one while there is none.
      */
-    FILE *file;
+    int descriptor;
 
     /**
-     * The size of the file that is being opened
-     * in bytes.
-     * This value is limited by the proess architecutre
-     * which may cause problems in 32 bit or less.
+     * The offset the reading of the file has reached, kept
+     * here rather than in the descriptor so that the reads
+     * may name the position they want and never have to
+     * seek the descriptor towards it.
      */
-    size_t file_size;
+    size_t offset;
 
     /**
      * The initial byte value to be used for the retrieval of the
@@ -289,6 +368,12 @@ ERROR_CODE _unset_http_request_handler_file(struct http_request_t *http_request)
 ERROR_CODE _reset_http_request_handler_file(struct http_request_t *http_request);
 ERROR_CODE _set_http_settings_handler_file(struct http_settings_t *http_settings);
 ERROR_CODE _unset_http_settings_handler_file(struct http_settings_t *http_settings);
+
+ERROR_CODE create_file_cache(struct file_cache_t **file_cache_pointer);
+ERROR_CODE delete_file_cache(struct file_cache_t *file_cache);
+ERROR_CODE clear_file_cache(struct file_cache_t *file_cache);
+ERROR_CODE acquire_file_cache(struct file_cache_t *file_cache, unsigned char *file_path, struct file_cache_entry_t **file_cache_entry_pointer);
+ERROR_CODE open_file_cache(struct file_cache_t *file_cache, unsigned char *file_path, int *descriptor_pointer);
 ERROR_CODE _cleanup_handler_file(struct connection_t *connection, struct data_t *data, void *parameters);
 ERROR_CODE _send_chunk_handler_file(struct connection_t *connection, struct data_t *data, void *parameter);
 ERROR_CODE _send_data_handler_file(struct connection_t *connection, struct data_t *data, void *parameters);

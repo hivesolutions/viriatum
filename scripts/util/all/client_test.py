@@ -19,6 +19,24 @@
 # You should have received a copy of the Apache License along with
 # Hive Viriatum Web Server. If not, see <http://www.apache.org/licenses/>.
 
+"""
+Client that drives a fixed set of requests at a running server, one
+message at a time and with a pause between them, so that the way the
+server reads a request split across several packets may be watched
+from the outside.
+
+Carries three sets of messages, a plain request written in one go, a
+request whose header is broken across several writes, and a run of
+requests written one after the other without waiting for the answers,
+which is the shape a pipelining client takes.
+
+Run against a server that is already listening with:
+    python scripts/util/all/client_test.py
+"""
+
+from socket import AF_INET, IPPROTO_TCP, SOCK_STREAM, TCP_NODELAY, socket
+from time import sleep
+
 __author__ = "João Magalhães <joamag@hive.pt>"
 """ The author(s) of the module """
 
@@ -27,9 +45,6 @@ __copyright__ = "Copyright (c) 2008-2026 Hive Solutions Lda."
 
 __license__ = "Apache License, Version 2.0"
 """ The license for the module """
-
-import time
-import socket
 
 HOST = "127.0.0.1"
 """ The name of the host to connect to, this
@@ -94,20 +109,20 @@ string (to be used for long pipellined string
 testing) one string containing three messages """
 
 
-def call(messages):
+def call(messages: list[str]) -> None:
     # creates the socket object and connects it to the
     # target host and port
-    _socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    _socket.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+    _socket = socket(AF_INET, SOCK_STREAM)
+    _socket.setsockopt(IPPROTO_TCP, TCP_NODELAY, 1)
     _socket.connect((HOST, PORT))
 
     # iterates over each of the message to be
     # sent and sends them to the server side, note
     # that a delay time is used to separate messages
     for message in messages:
-        _socket.send(message)
+        _socket.send(message.encode("utf-8"))
         print("Sent:", message)
-        time.sleep(WRITE_SLEEP)
+        sleep(WRITE_SLEEP)
 
     # receives the complete chunk of responses
     # from the server side and then breaks

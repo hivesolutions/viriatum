@@ -172,6 +172,11 @@ ERROR_CODE accept_handler_stream_io(struct connection_t *connection) {
                 client_connection->ssl_context = connection->ssl_context;
                 client_connection->ssl_handle = ssl_handle;
 
+                /* empties the queue of the errors so that the reason of a
+                failure below is the one of this call and not one that an
+                earlier connection left behind in it */
+                ERR_clear_error();
+
                 /* runs the accept operation in the ssl handle, this is possible to
                 break as this operation involves the handshake operation non blocking
                 sockets may block on this */
@@ -308,6 +313,13 @@ ERROR_CODE read_handler_stream_io(struct connection_t *connection) {
             buffer_pointer = (unsigned char *) buffer;
             buffer_size = 0;
         }
+
+#ifdef VIRIATUM_SSL
+        /* empties the queue of the errors so that the reason of a failure
+        below is the one of this read and not one that an earlier
+        connection left behind in it, the queue is shared by all of them */
+        if(connection->ssl_handle != NULL) { ERR_clear_error(); }
+#endif
 
         /* receives from the connection socket (takes into account the type
         of socket in use) should be able to take care of secure connections */
@@ -487,6 +499,13 @@ ERROR_CODE write_handler_stream_io(struct connection_t *connection) {
             connection->socket_handle
         );
 
+#ifdef VIRIATUM_SSL
+        /* empties the queue of the errors so that the reason of a failure
+        below is the one of this write and not one that an earlier
+        connection left behind in it, the queue is shared by all of them */
+        if(connection->ssl_handle != NULL) { ERR_clear_error(); }
+#endif
+
         /* sends the value into the connection socket (takes into account the type
         of socket in use) should be able to take care of secure connections */
         number_bytes = CONNECTION_SEND(
@@ -649,6 +668,11 @@ ERROR_CODE handshake_handler_stream_io(struct connection_t *connection) {
     /* prints a debug message about the retry of the handshake for the
     provided socket handle in the ssl context */
     V_DEBUG("Trying handshake for SSL handle\n");
+
+    /* empties the queue of the errors so that the reason of a failure
+    below is the one of this call and not one that an earlier connection
+    left behind in it */
+    ERR_clear_error();
 
     /* runs the accept operation in the ssl handle, this is possible to
     break as this operation involves the handshake operation non blocking

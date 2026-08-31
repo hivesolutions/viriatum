@@ -34,7 +34,7 @@ series of HTTP headers trying to find if they ensure a properly secured web page
 
 ## Performance refactor
 
-* Remove the strlen references and use String_t structures to reduce size calculations (in constant access situations)
+* Remove the strlen references and use String_t structures to reduce size calculations (in constant access situations), note that a profile of the static workload taken in August 2026 did not find the length calculations anywhere near the top, so this wants a profile behind it before it is acted upon
 
 ## Worker processes
 
@@ -46,7 +46,8 @@ series of HTTP headers trying to find if they ensure a properly secured web page
 
 ## Target performance
 
-* `ab -n 10000 -c 100 -k http://servidor2.hive:9090/error` should be able to run at 45K-60K requests per second (using file handler without template for error)
-* `ab -n 10000 -c 100 -k  http://srio.hive:9090/eclipse` should be able to run at 15K-24K requests per second raw power (not confirmed)
-* `weighttp -n 10000 -t 5 -c 20 -k http://127.0.0.1:9090/resources/images/illustration/main-illustration.png` should be able to handle between 320MB and 580MB per second or 13K-26K requests (under node2.startomni.com)
-* `weighttp -n 100000 -t 5 -c 20 -k http://127.0.0.1:9090/resourasdasd` 200 K requests per second under node2.startomni.com and default handler enforced
+The numbers that used to sit here were recorded years ago against machines that no longer exist, with one of them marked as unconfirmed, so none of them could be reproduced or compared against. They have been replaced by a harness that measures the serving continuously.
+
+* Run it with `./scripts/benchmark.sh`, the methodology and the configuration of every server are written down in [scripts/benchmark/README.md](../scripts/benchmark/README.md)
+* The accepted numbers live in `scripts/benchmark/baseline.json` and every run is compared against them
+* The figure to track is the ratio against a reference measured in the same run on the same machine, never an absolute number on its own

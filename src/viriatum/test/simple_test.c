@@ -29,6 +29,7 @@
 #include "handler_dispatch_test.h"
 #include "handler_file_test.h"
 #include "handler_proxy_test.h"
+#include "polling_test.h"
 #include "hpack_test.h"
 #include "http2_test.h"
 #include "runner_test.h"
@@ -456,6 +457,11 @@ const char *test_bencoding(void) {
     unsigned char *encoded_buffer;
     size_t encoded_buffer_length;
 
+    /* gathers the number of allocations that are outstanding before
+    anything is built, so that the release of everything may be
+    verified against it once the test is over */
+    size_t allocated = ALLOCATIONS;
+
     /* creates the sequence structures (map and list), initializing
     them in the simple (empty) way */
     create_hash_map(&map, 0);
@@ -496,6 +502,11 @@ const char *test_bencoding(void) {
     created during the encoding using bencoding */
     FREE(encoded_buffer);
 
+    /* every one of the structures that has been built is gone, so
+    the number of outstanding allocations is the one it was before
+    the test started at all */
+    V_ASSERT_EQ_U(ALLOCATIONS, allocated);
+
     /* returns the default value, nothing happened so there's
     nothing to report for this execution */
     return NULL;
@@ -511,6 +522,11 @@ const char *test_bit_stream(void) {
     for the test of the bit stream infra-structure */
     struct file_stream_t *file_stream;
     struct bit_stream_t *bit_stream;
+
+    /* gathers the number of allocations that are outstanding before
+    anything is built, so that the release of everything may be
+    verified against it once the test is over */
+    size_t allocated = ALLOCATIONS;
 
     /* creates the file stream that is going to be used
     as the underlying stream for the bit stream */
@@ -696,6 +712,11 @@ const char *test_bit_stream(void) {
     delete_bit_stream(bit_stream);
     delete_file_stream(file_stream);
 
+    /* every one of the structures that has been built is gone, so
+    the number of outstanding allocations is the one it was before
+    the test started at all */
+    V_ASSERT_EQ_U(ALLOCATIONS, allocated);
+
     /* returns the default value, nothing happened so there's
     nothing to report for this execution */
     return NULL;
@@ -710,6 +731,11 @@ const char *test_file_stream(void) {
 
     /* allocates some space for the test buffer */
     unsigned char buffer[128];
+
+    /* gathers the number of allocations that are outstanding before
+    anything is built, so that the release of everything may be
+    verified against it once the test is over */
+    size_t allocated = ALLOCATIONS;
 
     /* creates the file stream */
     create_file_stream(
@@ -728,8 +754,10 @@ const char *test_file_stream(void) {
     /* writes some data to the stream */
     stream->write(stream, (unsigned char *) "hello world", 11);
 
-    /* close the stream */
+    /* close the stream and deletes the file stream that was used
+    for the writing, the reading is driven through another one */
     stream->close(stream);
+    delete_file_stream(file_stream);
 
     /* creates the file stream */
     create_file_stream(&file_stream, (unsigned char *) "hello.txt", (unsigned char *) "rb");
@@ -756,6 +784,11 @@ const char *test_file_stream(void) {
     /* deletes the file stream */
     delete_file_stream(file_stream);
 
+    /* every one of the structures that has been built is gone, so
+    the number of outstanding allocations is the one it was before
+    the test started at all */
+    V_ASSERT_EQ_U(ALLOCATIONS, allocated);
+
     /* returns the default value, nothing happened so there's
     nothing to report for this execution */
     return NULL;
@@ -768,6 +801,11 @@ const char *test_memory_stream(void) {
     struct stream_t *stream;
     struct memory_stream_t *memory_stream;
     unsigned char buffer[256];
+
+    /* gathers the number of allocations that are outstanding before
+    anything is built, so that the release of everything may be
+    verified against it once the test is over */
+    size_t allocated = ALLOCATIONS;
 
     /* creates the memory stream structure starting
     the values contained in it */
@@ -791,6 +829,11 @@ const char *test_memory_stream(void) {
     stream->close(stream);
     delete_memory_stream(memory_stream);
 
+    /* every one of the structures that has been built is gone, so
+    the number of outstanding allocations is the one it was before
+    the test started at all */
+    V_ASSERT_EQ_U(ALLOCATIONS, allocated);
+
     /* returns the default value, nothing happened so there's
     nothing to report for this execution */
     return NULL;
@@ -803,6 +846,11 @@ const char *test_huffman(void) {
     struct file_stream_t *in_stream;
     struct file_stream_t *out_stream;
     struct huffman_t *huffman;
+
+    /* gathers the number of allocations that are outstanding before
+    anything is built, so that the release of everything may be
+    verified against it once the test is over */
+    size_t allocated = ALLOCATIONS;
 
     /* creates the file stream that is going to be used for
     the testing of the huffman infra-structure, this is the
@@ -865,6 +913,11 @@ const char *test_huffman(void) {
     delete_file_stream(out_stream);
     delete_file_stream(in_stream);
     delete_huffman(huffman);
+
+    /* every one of the structures that has been built is gone, so
+    the number of outstanding allocations is the one it was before
+    the test started at all */
+    V_ASSERT_EQ_U(ALLOCATIONS, allocated);
 
     /* returns the default value, nothing happened so there's
     nothing to report for this execution */
@@ -1152,6 +1205,34 @@ const char *test_normalize_path(void) {
     return NULL;
 }
 
+const char *test_count_file(void) {
+    /* allocates space for the size that the counting reports and
+    for the error that it raises when it is unable to */
+    size_t file_size = 0;
+    ERROR_CODE error;
+
+    /* writes a file of a size that is known, which is the one the
+    counting of it is expected to come back with */
+    write_file((char *) "./viriatum_count_file_test.txt", (unsigned char *) "viriatum", 8);
+
+    error = count_file((char *) "./viriatum_count_file_test.txt", &file_size);
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT_EQ_U(file_size, 8);
+
+    /* a file that is not there is reported as an error rather than
+    as a file of no size at all, the handler tells the two apart by
+    exactly this and answers with a not found for the first */
+    error = count_file((char *) "./viriatum_count_file_gone.txt", &file_size);
+    V_ASSERT(IS_ERROR_CODE(error));
+    RESET_ERROR;
+
+    remove("./viriatum_count_file_test.txt");
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
 const char *test_join_path_file(void) {
     /* allocates space for the joined path buffer
     to be used in the join path tests */
@@ -1292,6 +1373,7 @@ static struct test_entry_t _simple_entries[] = {
     V_TEST_T(test_sha1, "checksum"),
     V_TEST_T(test_is_path_safe, "path"),
     V_TEST_T(test_normalize_path, "path"),
+    V_TEST_T(test_count_file, "path"),
     V_TEST_T(test_join_path_file, "path"),
     V_TEST_T(test_absolute_path_file, "path"),
     V_TEST_T(test_handler_file_context, "handler"),
@@ -1301,11 +1383,24 @@ static struct test_entry_t _simple_entries[] = {
     V_TEST_T(test_handler_file_response, "handler"),
     V_TEST_T(test_handler_file_range, "handler"),
     V_TEST_T(test_handler_file_missing, "handler"),
+    V_TEST_T(test_handler_file_gone, "handler"),
     V_TEST_T(test_handler_file_directory, "handler"),
     V_TEST_T(test_handler_file_path, "handler"),
     V_TEST_T(test_handler_file_location, "handler"),
     V_TEST_T(test_handler_file_handler, "handler"),
     V_TEST_T(test_handler_file_push, "handler"),
+    V_TEST_T(test_file_cache, "handler"),
+    V_TEST_T(test_file_cache_acquire, "handler"),
+    V_TEST_T(test_file_cache_missing, "handler"),
+    V_TEST_T(test_file_cache_changed, "handler"),
+    V_TEST_T(test_file_cache_collision, "handler"),
+    V_TEST_T(test_file_cache_clear, "handler"),
+    V_TEST_T(test_file_cache_open, "handler"),
+    V_TEST_T(test_file_cache_long, "handler"),
+    V_TEST_T(test_file_cache_expired, "handler"),
+    V_TEST_T(test_file_cache_replaced, "handler"),
+    V_TEST_T(test_file_cache_rewritten, "handler"),
+    V_TEST_T(test_file_cache_stale, "handler"),
     V_TEST_T(test_handler_default_response, "handler"),
     V_TEST_T(test_handler_default_close, "handler"),
     V_TEST_T(test_handler_default_stream, "handler"),
@@ -1383,6 +1478,15 @@ static struct test_entry_t _simple_entries[] = {
     V_TEST_T(test_open_service_busy, "service"),
     V_TEST_T(test_file_options_service, "service"),
     V_TEST_T(test_arguments_options_service, "service"),
+    V_TEST_T(test_polling_service, "service"),
+    V_TEST_T(test_polling_connection, "polling"),
+    V_TEST_T(test_polling_read, "polling"),
+    V_TEST_T(test_polling_write, "polling"),
+    V_TEST_T(test_polling_event, "polling"),
+    V_TEST_T(test_polling_closed, "polling"),
+    V_TEST_T(test_polling_gone, "polling"),
+    V_TEST_T(test_polling_outstanding, "polling"),
+    V_TEST_T(test_polling_discarded, "polling"),
     V_TEST_T(test_flags_service, "service"),
     V_TEST_T(test_ran_service, "service")
 };

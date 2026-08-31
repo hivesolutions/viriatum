@@ -1,0 +1,24 @@
+# Hive Viriatum Web Server
+# Copyright (c) 2008-2026 Hive Solutions Lda.
+#
+# The proxying counterpart of the configuration beside this one, put
+# in front of the very same upstream every server under test is put in
+# front of, the placeholders are replaced by the harness.
+
+{
+	admin off
+	auto_https off
+	persist_config off
+	log {
+		output discard
+	}
+	servers {
+		timeouts {
+			idle 65s
+		}
+	}
+}
+
+:@PORT@ {
+	reverse_proxy 127.0.0.1:@UPSTREAM@
+}

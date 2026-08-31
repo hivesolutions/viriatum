@@ -24,6 +24,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Continuous integration now fails when the code is not formatted as the project asks
 * Continuous integration now measures the memory of the tree and fails when it gets worse
 * Scalable vector versions of the web illustrations, logos and UI assets
+* Serving performance is now measured against the reference servers on a schedule - [#49](https://github.com/hivesolutions/viriatum/issues/49)
+* Setting that turns the line written for each request off - [#49](https://github.com/hivesolutions/viriatum/issues/49)
+* Waiting on connections through kqueue on the systems that carry it - [#49](https://github.com/hivesolutions/viriatum/issues/49)
+* The status page now names the mechanism the server is waiting through - [#49](https://github.com/hivesolutions/viriatum/issues/49)
+* Test runs now report which tests left allocations behind them - [#49](https://github.com/hivesolutions/viriatum/issues/49)
 
 ### Changed
 
@@ -32,6 +37,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Web pages now adapt to the small screen of a phone, the file listing included
 * Pages now use the scalable favicon whenever the browser supports it
 * Illustrations, logos and the listing arrow are now served as vectors
+* The recorded performance targets were replaced by numbers a run can reproduce - [#49](https://github.com/hivesolutions/viriatum/issues/49)
+* Static files are now served considerably faster, ahead of the reference servers on the larger ones - [#49](https://github.com/hivesolutions/viriatum/issues/49)
+* Files that are served are now kept open, so serving one again costs neither opening nor describing it - [#49](https://github.com/hivesolutions/viriatum/issues/49)
+* The benchmark now holds every server to the number of processes the subject actually runs with - [#49](https://github.com/hivesolutions/viriatum/issues/49)
 
 ### Fixed
 
@@ -48,6 +57,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Sorting a sequence no longer reads past the end of it
 * Reading a configuration section no longer reads past the end of its name
 * A service that fails to start no longer leaves its handlers behind
+* The server no longer falls back on the slowest way of waiting on connections - [#49](https://github.com/hivesolutions/viriatum/issues/49)
+* The banner of the startup no longer leaves out features the build actually has - [#49](https://github.com/hivesolutions/viriatum/issues/49)
+* Static files are now served considerably faster - [#49](https://github.com/hivesolutions/viriatum/issues/49)
+* A file that stops being readable while it is served no longer takes the server down - [#49](https://github.com/hivesolutions/viriatum/issues/49)
+* A connection dropped while it still had work pending no longer takes the server down - [#49](https://github.com/hivesolutions/viriatum/issues/49)
+* Decoding a dictionary no longer leaves a second one behind, nor ignores the kind that was asked for
+* Bit streams and memory streams now release everything they take
+* A secure connection is no longer dropped because of an error left behind by an earlier one - [#56](https://github.com/hivesolutions/viriatum/issues/56)
+* The test run no longer hangs or fails on the runtime that does not deliver an interrupt reliably - [#60](https://github.com/hivesolutions/viriatum/issues/60)
+* The PHP extension no longer loses the terminator of its table of functions
+* A resource that disappears while it is being sent no longer leaves the connection unusable - [#49](https://github.com/hivesolutions/viriatum/issues/49)
+* The benchmark now reports the memory, the processor time, the version and the kernel calls of the server it measured - [#49](https://github.com/hivesolutions/viriatum/issues/49)
+* A discarded measurement no longer shows a tail or a comparison against the baseline - [#49](https://github.com/hivesolutions/viriatum/issues/49)
+* The client that drives requests by hand runs again on a current Python - [#49](https://github.com/hivesolutions/viriatum/issues/49)
 
 ## [0.5.0] - 2026-08-28
 

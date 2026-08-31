@@ -26,25 +26,22 @@ AC_CHECK_HEADER(sys/epoll.h, have_epoll_include=true, have_epoll_include=false)
 # checks if the user wants epoll
 AC_ARG_ENABLE(epoll, AC_HELP_STRING([--disable-epoll], [disable epoll() support]), wants_epoll="$enableval", wants_epoll="true")
 
-# in case the user wants epoll and the system has epoll
+# in case the user wants epoll and the system has epoll, the call is
+# reached through the library rather than through the number of the
+# system call, the older of the two numbers no longer exists at all on
+# the 64 bit arm targets and a probe that names it fails to build
+# there, which used to leave epoll quietly turned off on them
 if test "x$have_epoll_include" = "xtrue" && test "x$wants_epoll" = "xtrue"; then
     AC_MSG_CHECKING(for epoll system call)
     AC_RUN_IFELSE(
         [AC_LANG_SOURCE([
-            #include <stdint.h>
-            #include <sys/param.h>
-            #include <sys/types.h>
-            #include <sys/syscall.h>
+            #include <stdlib.h>
             #include <sys/epoll.h>
             #include <unistd.h>
 
-            int epoll_create(int size) {
-                return (syscall(__NR_epoll_create, size));
-            }
-
             int main (int argc, char **argv) {
                 int epfd;
-                epfd = epoll_create(256);
+                epfd = epoll_create1(0);
                 exit(epfd == -1 ? 1 : 0);
             }
         ])], have_epoll=true, have_epoll=false, have_epoll=true)

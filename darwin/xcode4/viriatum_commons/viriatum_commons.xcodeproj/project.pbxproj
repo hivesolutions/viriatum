@@ -78,7 +78,9 @@
 		C295E0F9155BCB7800036037 /* base_64.h in Headers */ = {isa = PBXBuildFile; fileRef = C295E089155BCB7800036037 /* base_64.h */; };
 		C295E0FA155BCB7800036037 /* encoding.h in Headers */ = {isa = PBXBuildFile; fileRef = C295E08A155BCB7800036037 /* encoding.h */; };
 		C295E0FB155BCB7800036037 /* encoding.h in Headers */ = {isa = PBXBuildFile; fileRef = C295E08A155BCB7800036037 /* encoding.h */; };
+		C2A1E4480B7F53D6094E118C /* common.h in Headers */ = {isa = PBXBuildFile; fileRef = C2A1E4470B7F53D6094E118C /* common.h */; };
 		C295E0FC155BCB7800036037 /* compilation.h in Headers */ = {isa = PBXBuildFile; fileRef = C295E08C155BCB7800036037 /* compilation.h */; };
+		C2A1E4490B7F53D6094E118C /* common.h in Headers */ = {isa = PBXBuildFile; fileRef = C2A1E4470B7F53D6094E118C /* common.h */; };
 		C295E0FD155BCB7800036037 /* compilation.h in Headers */ = {isa = PBXBuildFile; fileRef = C295E08C155BCB7800036037 /* compilation.h */; };
 		C295E0FE155BCB7800036037 /* compiler.h in Headers */ = {isa = PBXBuildFile; fileRef = C295E08D155BCB7800036037 /* compiler.h */; };
 		C295E0FF155BCB7800036037 /* compiler.h in Headers */ = {isa = PBXBuildFile; fileRef = C295E08D155BCB7800036037 /* compiler.h */; };
@@ -93,7 +95,9 @@
 		C295E108155BCB7800036037 /* resource.h in Headers */ = {isa = PBXBuildFile; fileRef = C295E092155BCB7800036037 /* resource.h */; };
 		C295E109155BCB7800036037 /* resource.h in Headers */ = {isa = PBXBuildFile; fileRef = C295E092155BCB7800036037 /* resource.h */; };
 		C295E10A155BCB7800036037 /* targetver.h in Headers */ = {isa = PBXBuildFile; fileRef = C295E093155BCB7800036037 /* targetver.h */; };
+		C2A1E44B0B7F53D6094E118C /* types.h in Headers */ = {isa = PBXBuildFile; fileRef = C2A1E44A0B7F53D6094E118C /* types.h */; };
 		C295E10B155BCB7800036037 /* targetver.h in Headers */ = {isa = PBXBuildFile; fileRef = C295E093155BCB7800036037 /* targetver.h */; };
+		C2A1E44C0B7F53D6094E118C /* types.h in Headers */ = {isa = PBXBuildFile; fileRef = C2A1E44A0B7F53D6094E118C /* types.h */; };
 		C295E10C155BCB7800036037 /* ini.c in Sources */ = {isa = PBXBuildFile; fileRef = C295E095155BCB7800036037 /* ini.c */; };
 		C295E10D155BCB7800036037 /* ini.c in Sources */ = {isa = PBXBuildFile; fileRef = C295E095155BCB7800036037 /* ini.c */; };
 		C295E10E155BCB7800036037 /* ini.h in Headers */ = {isa = PBXBuildFile; fileRef = C295E096155BCB7800036037 /* ini.h */; };
@@ -214,9 +218,15 @@
 		C295E181155BCB7800036037 /* arguments_util.h in Headers */ = {isa = PBXBuildFile; fileRef = C295E0D8155BCB7800036037 /* arguments_util.h */; };
 		C295E182155BCB7800036037 /* dump_util.h in Headers */ = {isa = PBXBuildFile; fileRef = C295E0D9155BCB7800036037 /* dump_util.h */; };
 		C295E183155BCB7800036037 /* dump_util.h in Headers */ = {isa = PBXBuildFile; fileRef = C295E0D9155BCB7800036037 /* dump_util.h */; };
+		C2A1E44E0B7F53D6094E118C /* function_util.h in Headers */ = {isa = PBXBuildFile; fileRef = C2A1E44D0B7F53D6094E118C /* function_util.h */; };
+		C2A1E4510B7F53D6094E118C /* random_util.h in Headers */ = {isa = PBXBuildFile; fileRef = C2A1E4500B7F53D6094E118C /* random_util.h */; };
 		C295E184155BCB7800036037 /* string_util.h in Headers */ = {isa = PBXBuildFile; fileRef = C295E0DA155BCB7800036037 /* string_util.h */; };
+		C2A1E44F0B7F53D6094E118C /* function_util.h in Headers */ = {isa = PBXBuildFile; fileRef = C2A1E44D0B7F53D6094E118C /* function_util.h */; };
+		C2A1E4520B7F53D6094E118C /* random_util.h in Headers */ = {isa = PBXBuildFile; fileRef = C2A1E4500B7F53D6094E118C /* random_util.h */; };
 		C295E185155BCB7800036037 /* string_util.h in Headers */ = {isa = PBXBuildFile; fileRef = C295E0DA155BCB7800036037 /* string_util.h */; };
+		C2A1E4540B7F53D6094E118C /* string_util_s.h in Headers */ = {isa = PBXBuildFile; fileRef = C2A1E4530B7F53D6094E118C /* string_util_s.h */; };
 		C295E186155BCB7800036037 /* util.h in Headers */ = {isa = PBXBuildFile; fileRef = C295E0DB155BCB7800036037 /* util.h */; };
+		C2A1E4550B7F53D6094E118C /* string_util_s.h in Headers */ = {isa = PBXBuildFile; fileRef = C2A1E4530B7F53D6094E118C /* string_util_s.h */; };
 		C295E187155BCB7800036037 /* util.h in Headers */ = {isa = PBXBuildFile; fileRef = C295E0DB155BCB7800036037 /* util.h */; };
 		C2B2B783175613FF002F55D1 /* crypto.h in Headers */ = {isa = PBXBuildFile; fileRef = C2B2B780175613FF002F55D1 /* crypto.h */; };
 		C2B2B784175613FF002F55D1 /* rc4.c in Sources */ = {isa = PBXBuildFile; fileRef = C2B2B781175613FF002F55D1 /* rc4.c */; };
@@ -277,6 +287,7 @@
 		C295E088155BCB7800036037 /* base_64.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = base_64.c; sourceTree = "<group>"; };
 		C295E089155BCB7800036037 /* base_64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = base_64.h; sourceTree = "<group>"; };
 		C295E08A155BCB7800036037 /* encoding.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = encoding.h; sourceTree = "<group>"; };
+		C2A1E4470B7F53D6094E118C /* common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = common.h; sourceTree = "<group>"; };
 		C295E08C155BCB7800036037 /* compilation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = compilation.h; sourceTree = "<group>"; };
 		C295E08D155BCB7800036037 /* compiler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = compiler.h; sourceTree = "<group>"; };
 		C295E08E155BCB7800036037 /* cpu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cpu.h; sourceTree = "<group>"; };
@@ -285,6 +296,7 @@
 		C295E091155BCB7800036037 /* platforms.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = platforms.h; sourceTree = "<group>"; };
 		C295E092155BCB7800036037 /* resource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = resource.h; sourceTree = "<group>"; };
 		C295E093155BCB7800036037 /* targetver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = targetver.h; sourceTree = "<group>"; };
+		C2A1E44A0B7F53D6094E118C /* types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = types.h; sourceTree = "<group>"; };
 		C295E095155BCB7800036037 /* ini.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ini.c; sourceTree = "<group>"; };
 		C295E096155BCB7800036037 /* ini.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ini.h; sourceTree = "<group>"; };
 		C295E098155BCB7800036037 /* info.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = info.c; sourceTree = "<group>"; };
@@ -345,7 +357,10 @@
 		C295E0D7155BCB7800036037 /* arguments_util.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = arguments_util.c; sourceTree = "<group>"; };
 		C295E0D8155BCB7800036037 /* arguments_util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = arguments_util.h; sourceTree = "<group>"; };
 		C295E0D9155BCB7800036037 /* dump_util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dump_util.h; sourceTree = "<group>"; };
+		C2A1E44D0B7F53D6094E118C /* function_util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = function_util.h; sourceTree = "<group>"; };
+		C2A1E4500B7F53D6094E118C /* random_util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = random_util.h; sourceTree = "<group>"; };
 		C295E0DA155BCB7800036037 /* string_util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = string_util.h; sourceTree = "<group>"; };
+		C2A1E4530B7F53D6094E118C /* string_util_s.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = string_util_s.h; sourceTree = "<group>"; };
 		C295E0DB155BCB7800036037 /* util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = util.h; sourceTree = "<group>"; };
 		C2B2B780175613FF002F55D1 /* crypto.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = crypto.h; sourceTree = "<group>"; };
 		C2B2B781175613FF002F55D1 /* rc4.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = rc4.c; sourceTree = "<group>"; };
@@ -502,6 +517,7 @@
 		C295E08B155BCB7800036037 /* global */ = {
 			isa = PBXGroup;
 			children = (
+				C2A1E4470B7F53D6094E118C /* common.h */,
 				C295E08C155BCB7800036037 /* compilation.h */,
 				C295E08D155BCB7800036037 /* compiler.h */,
 				C295E08E155BCB7800036037 /* cpu.h */,
@@ -510,6 +526,7 @@
 				C295E091155BCB7800036037 /* platforms.h */,
 				C295E092155BCB7800036037 /* resource.h */,
 				C295E093155BCB7800036037 /* targetver.h */,
+				C2A1E44A0B7F53D6094E118C /* types.h */,
 			);
 			name = global;
 			path = ../../../src/viriatum_commons/global;
@@ -656,7 +673,10 @@
 				C295E0D7155BCB7800036037 /* arguments_util.c */,
 				C295E0D8155BCB7800036037 /* arguments_util.h */,
 				C295E0D9155BCB7800036037 /* dump_util.h */,
+				C2A1E44D0B7F53D6094E118C /* function_util.h */,
+				C2A1E4500B7F53D6094E118C /* random_util.h */,
 				C295E0DA155BCB7800036037 /* string_util.h */,
+				C2A1E4530B7F53D6094E118C /* string_util_s.h */,
 				C295E0DB155BCB7800036037 /* util.h */,
 			);
 			name = util;
@@ -731,6 +751,7 @@
 				C295E0F4155BCB7800036037 /* logging.h in Headers */,
 				C295E0F8155BCB7800036037 /* base_64.h in Headers */,
 				C295E0FA155BCB7800036037 /* encoding.h in Headers */,
+				C2A1E4480B7F53D6094E118C /* common.h in Headers */,
 				C295E0FC155BCB7800036037 /* compilation.h in Headers */,
 				C295E0FE155BCB7800036037 /* compiler.h in Headers */,
 				C295E100155BCB7800036037 /* cpu.h in Headers */,
@@ -739,6 +760,7 @@
 				C295E106155BCB7800036037 /* platforms.h in Headers */,
 				C295E108155BCB7800036037 /* resource.h in Headers */,
 				C295E10A155BCB7800036037 /* targetver.h in Headers */,
+				C2A1E44B0B7F53D6094E118C /* types.h in Headers */,
 				C295E10E155BCB7800036037 /* ini.h in Headers */,
 				C295E112155BCB7800036037 /* info.h in Headers */,
 				C295E114155BCB7800036037 /* jni.h in Headers */,
@@ -777,7 +799,10 @@
 				C295E17C155BCB7800036037 /* thread_pool.h in Headers */,
 				C295E180155BCB7800036037 /* arguments_util.h in Headers */,
 				C295E182155BCB7800036037 /* dump_util.h in Headers */,
+				C2A1E44E0B7F53D6094E118C /* function_util.h in Headers */,
+				C2A1E4510B7F53D6094E118C /* random_util.h in Headers */,
 				C295E184155BCB7800036037 /* string_util.h in Headers */,
+				C2A1E4540B7F53D6094E118C /* string_util_s.h in Headers */,
 				C295E186155BCB7800036037 /* util.h in Headers */,
 				C24EF47615820F4C00FAE3A0 /* file.h in Headers */,
 				C24EF47815820F4C00FAE3A0 /* io.h in Headers */,
@@ -808,6 +833,7 @@
 				C295E0F5155BCB7800036037 /* logging.h in Headers */,
 				C295E0F9155BCB7800036037 /* base_64.h in Headers */,
 				C295E0FB155BCB7800036037 /* encoding.h in Headers */,
+				C2A1E4490B7F53D6094E118C /* common.h in Headers */,
 				C295E0FD155BCB7800036037 /* compilation.h in Headers */,
 				C295E0FF155BCB7800036037 /* compiler.h in Headers */,
 				C295E101155BCB7800036037 /* cpu.h in Headers */,
@@ -816,6 +842,7 @@
 				C295E107155BCB7800036037 /* platforms.h in Headers */,
 				C295E109155BCB7800036037 /* resource.h in Headers */,
 				C295E10B155BCB7800036037 /* targetver.h in Headers */,
+				C2A1E44C0B7F53D6094E118C /* types.h in Headers */,
 				C295E10F155BCB7800036037 /* ini.h in Headers */,
 				C295E113155BCB7800036037 /* info.h in Headers */,
 				C295E115155BCB7800036037 /* jni.h in Headers */,
@@ -854,7 +881,10 @@
 				C295E17D155BCB7800036037 /* thread_pool.h in Headers */,
 				C295E181155BCB7800036037 /* arguments_util.h in Headers */,
 				C295E183155BCB7800036037 /* dump_util.h in Headers */,
+				C2A1E44F0B7F53D6094E118C /* function_util.h in Headers */,
+				C2A1E4520B7F53D6094E118C /* random_util.h in Headers */,
 				C295E185155BCB7800036037 /* string_util.h in Headers */,
+				C2A1E4550B7F53D6094E118C /* string_util_s.h in Headers */,
 				C295E187155BCB7800036037 /* util.h in Headers */,
 				C24EF47715820F4C00FAE3A0 /* file.h in Headers */,
 				C24EF47915820F4C00FAE3A0 /* io.h in Headers */,
