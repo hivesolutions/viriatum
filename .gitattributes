@@ -1,0 +1,5 @@
+# the python of the tree is held to a single ending, the newer
+# sources were written with it and the older ones carried the one
+# of the sources written in C, which left the set split between
+# the two of them
+*.py text eol=lf
