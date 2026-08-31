@@ -26,7 +26,7 @@
 
 #include "entry.h"
 
-extern zend_function_entry viriatum_functions[16];
+extern zend_function_entry viriatum_functions[];
 extern zend_module_entry viriatum_module;
 extern sapi_module_struct viriatum_sapi_module;
 
