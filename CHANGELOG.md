@@ -64,7 +64,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Decoding a dictionary no longer leaves a second one behind, nor ignores the kind that was asked for
 * Bit streams and memory streams now release everything they take
 * A secure connection is no longer dropped because of an error left behind by an earlier one - [#56](https://github.com/hivesolutions/viriatum/issues/56)
-* The test run on Windows no longer hangs on the interrupt the platform does not carry - [#60](https://github.com/hivesolutions/viriatum/issues/60)
+* The test run no longer hangs or fails on the runtime that does not deliver an interrupt reliably - [#60](https://github.com/hivesolutions/viriatum/issues/60)
 * The PHP extension no longer loses the terminator of its table of functions
 
 ## [0.5.0] - 2026-08-28
