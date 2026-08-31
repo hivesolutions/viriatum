@@ -1,8 +1,28 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import os
-import sys
+"""
+Windows build that drives the whole of the packaging of the server on
+that platform, the compilation of the core through the project that
+ships with the tree together with the ones of every module beside it.
+
+The dependencies the build is given are looked for under the home of
+the development tools, which the environment names, so that a machine
+that keeps them elsewhere is served by the very same script.
+
+Run from the project root with:
+    python scripts/build/win32/build.py [options]
+
+Options:
+    --file=<path>       The configuration the build is described by
+    --no-modules        Leaves the modules out of the build
+    --arch=<name>       The architecture that is built, win32 by default
+    --mode=<name>       The configuration that is built, Release by default
+"""
+
+from os import chdir, listdir
+from os.path import join
+from sys import exit
 
 import atm
 
@@ -12,10 +32,10 @@ as the root for the includes, libraries and
 binary utilities """
 
 INCLUDES = (
-    DEV_HOME + "\include\php",
-    DEV_HOME + "\include\php\main",
-    DEV_HOME + "\include\php\TSRM",
-    DEV_HOME + "\include\php\Zend",
+    DEV_HOME + r"\include\php",
+    DEV_HOME + r"\include\php\main",
+    DEV_HOME + r"\include\php\TSRM",
+    DEV_HOME + r"\include\php\Zend",
 )
 """ The list of extra include directories
 for the build process """
@@ -30,7 +50,12 @@ be used for the creation of the package
 it includes the modules directory """
 
 
-def build(file=None, build_m=True, arch="win32", mode="Release"):
+def build(
+    file: str | None = None,
+    build_m: bool = True,
+    arch: str = "win32",
+    mode: str = "Release",
+) -> None:
     # runs the initial assertion for the various commands
     # that are mandatory for execution, this should avoid
     # errors in the middle of the build
@@ -48,9 +73,9 @@ def build(file=None, build_m=True, arch="win32", mode="Release"):
     dist_f = atm.path("dist")
     build_f = atm.path("build")
     base_f = repo_f
-    bin_f = os.path.join(base_f, "bin/viriatum/i386/win32/%s" % mode)
-    solution_f = os.path.join(base_f, "win32/vs2008ex")
-    modules_f = os.path.join(repo_f, "modules")
+    bin_f = join(base_f, "bin/viriatum/i386/win32/%s" % mode)
+    solution_f = join(base_f, "win32/vs2008ex")
+    modules_f = join(repo_f, "modules")
 
     # retrieves the various values from the global configuration
     # that are going to be used around the configuration
@@ -61,72 +86,66 @@ def build(file=None, build_m=True, arch="win32", mode="Release"):
     # clones the current repository using the git command and then
     # copies the resulting directory to the temporary directory
     atm.git(clean=True)
-    atm.copy(repo_f, os.path.join(tmp_f, name_src))
+    atm.copy(repo_f, join(tmp_f, name_src))
 
     # lists the modules directory so that all the modules are
     # discovered (module folder names) this will be used to
     # build the various modules (iteration trigger)
-    modules = build_m and os.listdir(modules_f) or []
+    modules = build_m and listdir(modules_f) or []
 
     # constructs the path to the solution file and uses it for
     # the msbuild command to build the project
-    sln_path = os.path.join(solution_f, "viriatum.sln")
+    sln_path = join(solution_f, "viriatum.sln")
     atm.msbuild(sln_path)
 
     # changes to the binary directory and copies the built files
     # to the result directory
-    os.chdir(bin_f)
+    chdir(bin_f)
     atm.copy("viriatum.exe", result_f)
-    atm.copy("config", os.path.join(result_f, "config"))
-    atm.copy("htdocs", os.path.join(result_f, "htdocs"))
+    atm.copy("config", join(result_f, "config"))
+    atm.copy("htdocs", join(result_f, "htdocs"))
 
     # constructs the path to the solution file and uses it for
     # the msbuild command to build the project
-    mod_sln_path = os.path.join(solution_f, "viriatum_mod.sln")
+    mod_sln_path = join(solution_f, "viriatum_mod.sln")
     build_m and atm.msbuild(mod_sln_path, includes=INCLUDES)
 
     # iterates over all the modules to copy their resulting files
     # into the appropriate modules directory
     for module in modules:
-        module_bin_f = os.path.join(
-            base_f, "bin/viriatum_%s/i386/win32/%s" % (module, mode)
-        )
-        os.chdir(module_bin_f)
-        atm.copy(
-            "viriatum_%s.dll" % module, os.path.join(result_f, "modules"), replace=False
-        )
+        module_bin_f = join(base_f, "bin/viriatum_%s/i386/win32/%s" % (module, mode))
+        chdir(module_bin_f)
+        atm.copy("viriatum_%s.dll" % module, join(result_f, "modules"), replace=False)
 
     # copies the resulting files to the temporary directory with
     # the name of the build for later compression
-    atm.copy(result_f, os.path.join(tmp_f, name_arc))
+    atm.copy(result_f, join(tmp_f, name_arc))
 
     # changes the current directory to the result directory and
     # creates a tar based file with the binary contents
-    os.chdir(result_f)
+    chdir(result_f)
     atm.tar(name_raw + ".tar", build_m and FILES_M or FILES)
     atm.move(name_raw + ".tar", dist_f)
 
     # changes to build directory and creates the capsule file for the
     # current configuration, the metadata values will be used from the
     # context that is currently defined
-    os.chdir(build_f)
-    atm.capsule(
-        os.path.join(dist_f, name_arc + ".exe"), os.path.join(dist_f, name_raw + ".tar")
-    )
+    chdir(build_f)
+    atm.capsule(join(dist_f, name_arc + ".exe"), join(dist_f, name_raw + ".tar"))
 
     # creates the various compressed files for both the archive and
     # source directories (distribution files)
-    os.chdir(tmp_f)
+    chdir(tmp_f)
     atm.compress(name_arc, target=dist_f)
     atm.compress(name_src, target=dist_f)
 
     # creates the various hash files for the complete set of files in
     # the distribution directory
-    os.chdir(dist_f)
+    chdir(dist_f)
     atm.hash_d()
 
 
-def run():
+def run() -> None:
     # parses the various arguments provided by the
     # command line and retrieves it defaulting to
     # pre-defined values in case they do not exist
@@ -141,7 +160,7 @@ def run():
     build(file=file, build_m=build_m, arch=arch, mode=mode)
 
 
-def cleanup():
+def cleanup() -> None:
     atm.cleanup()
 
 

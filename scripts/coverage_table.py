@@ -2,27 +2,57 @@
 # -*- coding: utf-8 -*-
 
 """
-Builds the markdown table of the coverage out of the reports that
-have been exported by the coverage script, the result is meant to
-be appended to the step summary of the workflow.
+Coverage table builder that turns the reports exported by the
+coverage script into the markdown table that closes a run, meant to
+be appended to the step summary of the workflow the same way the one
+of the benchmark is.
+
+Reads the export of the native tree and the one of the python surface
+out of the output directory, collapses the sources into one row per
+directory, and marks the ones that fall below the threshold the run
+was held to.
+
+Features:
+    - Both toolchains understood, the export of llvm carrying the
+      files under a data element and the one of gcovr at the top
+      level, so that the table is the same one for either of them.
+    - The native tree and the python surface reported together, the
+      statements of the latter standing for the lines of the former.
+    - One row per directory rather than per source, a tree of a few
+      hundred sources not being readable a line at a time, the detail
+      of each one staying in the artifact of the run.
+    - The threshold applied to the native rows alone, the coverage
+      script holding the python surface to one of its own.
+
+Run from the project root with:
+    python scripts/coverage_table.py <output> [threshold]
+
+Arguments:
+    output      The directory the coverage script wrote its reports into
+    threshold   The percentage the native tree is held to, 90 by default
 """
 
-import os
-import sys
-import json
+from json import loads
+from os.path import abspath, dirname, exists, join, relpath
+from sys import argv, exit
+from typing import Any
+
+Row = tuple[str, int, int]
+""" A single row of the table, the name of what is measured together
+with the lines it carries and the ones that were never reached """
 
 
-def load(path):
-    if not os.path.exists(path):
+def load(path: str) -> Any | None:
+    if not exists(path):
         return None
     try:
         with open(path, "rb") as file:
-            return json.loads(file.read().decode("utf-8"))
+            return loads(file.read().decode("utf-8"))
     except ValueError:
         return None
 
 
-def rows_native(data, root):
+def rows_native(data: dict[str, Any], root: str) -> list[Row]:
     # gathers one row per source file of the native tree, the export
     # of llvm carries the files under a data element while the one of
     # gcovr carries them at the top level, both are understood so that
@@ -31,18 +61,18 @@ def rows_native(data, root):
     if "data" in data:
         for item in data["data"][0].get("files", []):
             summary = item["summary"]["lines"]
-            name = os.path.relpath(item["filename"], root)
+            name = relpath(item["filename"], root)
             rows.append((name, summary["count"], summary["count"] - summary["covered"]))
     else:
         for item in data.get("files", []):
-            name = os.path.relpath(os.path.join(root, item["filename"]), root)
+            name = relpath(join(root, item["filename"]), root)
             rows.append(
                 (name, item["line_total"], item["line_total"] - item["line_covered"])
             )
     return sorted(rows)
 
 
-def rows_python(data, root):
+def rows_python(data: dict[str, Any], root: str) -> list[Row]:
     # gathers one row per module of the pure python surface, the
     # statements are the equivalent of the lines of the native one
     rows = []
@@ -50,7 +80,7 @@ def rows_python(data, root):
         summary = item["summary"]
         rows.append(
             (
-                os.path.relpath(os.path.join(root, name), root),
+                relpath(join(root, name), root),
                 summary["num_statements"],
                 summary["missing_lines"],
             )
@@ -58,19 +88,19 @@ def rows_python(data, root):
     return rows
 
 
-def group(rows):
+def group(rows: list[Row]) -> list[Row]:
     # collapses the rows into one per directory, the complete tree
     # carries a few hundred sources and a row for each of them would
     # not be readable, the per file detail stays in the artifact
     groups = {}
     for name, count, absent in rows:
-        directory = os.path.dirname(name)
+        directory = dirname(name)
         total, missed = groups.get(directory, (0, 0))
         groups[directory] = (total + count, missed + absent)
     return [(name, groups[name][0], groups[name][1]) for name in sorted(groups)]
 
 
-def coverage(rows):
+def coverage(rows: list[Row]) -> float:
     # calculates the overall coverage of the provided rows, an
     # empty set of rows is considered to be fully covered
     total = sum(count for _name, count, _absent in rows)
@@ -78,7 +108,7 @@ def coverage(rows):
     return 100.0 if total == 0 else (total - missed) * 100.0 / total
 
 
-def table(rows, threshold):
+def table(rows: list[Row], threshold: float) -> tuple[list[str], float]:
     # formats the rows as a markdown table, the directories that fall
     # below the threshold are marked so that they stand out
     lines = [
@@ -102,18 +132,18 @@ def table(rows, threshold):
     return lines, cover
 
 
-def main():
-    output = sys.argv[1]
-    threshold = float(sys.argv[2]) if len(sys.argv) > 2 else 90.0
-    root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+def main() -> int:
+    output = argv[1]
+    threshold = float(argv[2]) if len(argv) > 2 else 90.0
+    root = abspath(join(dirname(__file__), ".."))
 
     native_rows = []
-    native = load(os.path.join(output, "native.json"))
+    native = load(join(output, "native.json"))
     if native:
         native_rows = rows_native(native, root)
 
     rows = list(native_rows)
-    python = load(os.path.join(output, "python.json"))
+    python = load(join(output, "python.json"))
     if python:
         rows += rows_python(python, root)
 
@@ -139,4 +169,4 @@ def main():
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    exit(main())

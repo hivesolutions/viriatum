@@ -1,12 +1,33 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 # Hive Viriatum Web Server
 # Copyright (c) 2008-2026 Hive Solutions Lda.
-#
-# Minimal WSGI handler for mod_wsgi test suite.
-# Returns a simple text response with predictable content
-# so that the C test harness can verify the output.
+
+"""
+Minimal application of the older interface, driven by the suite of
+the module so that the output of it may be verified from the side of
+the project that is written in C.
+
+Answers every request the same way, with the method and the path it
+was reached through written into the body, so that the harness is
+able to tell one request from another without the application ever
+having to carry state of its own.
+"""
+
+from collections.abc import Callable
+from typing import Any
+
+Environ = dict[str, Any]
+""" The map of the request as the interface builds it, one entry per
+part of the request and of the environment """
+
+StartResponse = Callable[[str, list[tuple[str, str]]], Any]
+""" The operation that opens the answer, taking the status and the
+fields that travel with it """
 
 
-def application(environ, start_response):
+def application(environ: Environ, start_response: StartResponse) -> list[bytes]:
     method = environ.get("REQUEST_METHOD", "GET")
     path = environ.get("PATH_INFO", "/")
 

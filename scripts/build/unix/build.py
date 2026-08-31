@@ -1,8 +1,29 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import os
-import sys
+"""
+Unix build that drives the whole of the packaging of the server on
+the platforms of that family, the configuration and the compilation
+of the core together with the ones of every module beside it.
+
+The headers the build is given are gathered from the environment it
+runs in, and a cross build is given the ones of the tree it is
+pointed at instead, so that the very same script serves a build for
+the machine it runs on and one for another.
+
+Run from the project root with:
+    python scripts/build/unix/build.py [options]
+
+Options:
+    --file=<path>       The configuration the build is described by
+    --no-modules        Leaves the modules out of the build
+    --cflags=<flags>    Extra flags handed to the compiler
+    --cross=<path>      The tree of the target of a cross build
+"""
+
+from os import chdir, listdir
+from os.path import abspath, dirname, join
+from sys import exit
 
 import atm
 
@@ -29,7 +50,12 @@ templates that should be completed with the
 cross compilation host value """
 
 
-def build(file=None, build_m=True, cflags=None, cross=None):
+def build(
+    file: str | None = None,
+    build_m: bool = True,
+    cflags: str | None = None,
+    cross: str | None = None,
+) -> None:
     # runs the initial assertion for the various commands
     # that are mandatory for execution, this should avoid
     # errors in the middle of the build
@@ -53,11 +79,11 @@ def build(file=None, build_m=True, cflags=None, cross=None):
     tmp_f = atm.path("tmp")
     dist_f = atm.path("dist")
     target_f = atm.path("target")
-    modules_f = os.path.join(repo_f, "modules")
-    deb_base_f = os.path.join(target_f, "deb")
-    deb_f = os.path.join(deb_base_f, name_deb)
-    script_f = os.path.dirname(__file__)
-    script_f = os.path.abspath(script_f)
+    modules_f = join(repo_f, "modules")
+    deb_base_f = join(target_f, "deb")
+    deb_f = join(deb_base_f, name_deb)
+    script_f = dirname(__file__)
+    script_f = abspath(script_f)
 
     # clones the current repository using the git command this
     # should retrieve all the source data from the server
@@ -66,27 +92,27 @@ def build(file=None, build_m=True, cflags=None, cross=None):
     # lists the modules directory so that all the modules are
     # discovered (module folder names) this will be used to
     # build the various modules (iteration trigger)
-    modules = build_m and os.listdir(modules_f) or []
+    modules = build_m and listdir(modules_f) or []
 
     # changes the current directory into the repository one and
     # runs the auto generation process for the creation of the
     # configuration files
-    os.chdir(repo_f)
+    chdir(repo_f)
     atm.autogen(clean=True)
 
     # iterates over all the modules to prepare their source code
     # for compilation distribution
     for module in modules:
-        module_f = os.path.join(modules_f, module)
-        os.chdir(module_f)
+        module_f = join(modules_f, module)
+        chdir(module_f)
         atm.autogen(clean=True)
 
     # changes the current directory to the repository one and
     # copies the contents of it into the temporary folder named
     # after the project name, then runs the configuration program
     # and the build process (compilation of the project)
-    os.chdir(repo_f)
-    atm.copy(repo_f, os.path.join(tmp_f, name_src))
+    chdir(repo_f)
+    atm.copy(repo_f, join(tmp_f, name_src))
     atm.configure(
         args=(
             "--prefix=" + result_f,
@@ -101,8 +127,8 @@ def build(file=None, build_m=True, cflags=None, cross=None):
     # iterates over each of the modules to run the build process
     # operations for each of them
     for module in modules:
-        module_f = os.path.join(modules_f, module)
-        os.chdir(module_f)
+        module_f = join(modules_f, module)
+        chdir(module_f)
         atm.configure(
             args=("--prefix=" + result_f,),
             includes=cross and INCLUDES_CROSS or INCLUDES,
@@ -128,30 +154,30 @@ def build(file=None, build_m=True, cflags=None, cross=None):
     # the process of packing the deb file from the files in the
     # folder and then moves the resulting deb file to the distribution
     # based directory
-    os.chdir(deb_f)
+    chdir(deb_f)
     atm.deb(section="httpd", depends="libc6", size="1024")
-    atm.move(os.path.join(deb_base_f, name_deb + ".deb"), dist_f)
+    atm.move(join(deb_base_f, name_deb + ".deb"), dist_f)
 
     # changes the current directory to the resulting folder and
     # creates the tar file for it moving it then to the distribution
     # based folder (final place)
-    os.chdir(result_f)
+    chdir(result_f)
     atm.tar(name_raw + ".tar")
     atm.move(name_raw + ".tar", dist_f)
 
     # creates the various compressed files for both the archive and
     # source directories (distribution files)
-    os.chdir(tmp_f)
+    chdir(tmp_f)
     atm.compress(name_arc, target=dist_f)
     atm.compress(name_src, target=dist_f)
 
     # creates the various hash files for the complete set of files in
     # the distribution directory
-    os.chdir(dist_f)
+    chdir(dist_f)
     atm.hash_d()
 
 
-def run():
+def run() -> None:
     # parses the various arguments provided by the
     # command line and retrieves it defaulting to
     # pre-defined values in case they do not exist
@@ -166,7 +192,7 @@ def run():
     build(file=file, build_m=build_m, cflags=cflags, cross=cross)
 
 
-def cleanup():
+def cleanup() -> None:
     atm.cleanup()
 
 

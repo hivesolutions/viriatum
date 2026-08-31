@@ -1,6 +1,24 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+"""
+Viriatum package that exposes the embedded server to python, the
+extension underneath it carrying the whole of the serving and this
+surface carrying nothing but the names of it and the helper that
+serves an application through a single call.
+
+The server drives an application of either interface, the older one
+and the more recent one, and tells the two of them apart from the
+shape of the callable when it is not told which of them to use.
+
+Reached as:
+    import viriatum
+    viriatum.serve(application, port=8080)
+"""
+
+from collections.abc import Callable
+from typing import Any
+
 from ._viriatum import (
     Server,
     NAME,
@@ -14,7 +32,13 @@ from ._viriatum import (
 __version__ = VERSION
 
 
-def serve(application, host="0.0.0.0", port=8080, www_root=None, interface="auto"):
+def serve(
+    application: Callable[..., Any],
+    host: str = "0.0.0.0",
+    port: int = 8080,
+    www_root: str | None = None,
+    interface: str = "auto",
+) -> Server:
     """
     Creates a server for the provided WSGI or ASGI application
     and runs its loop until the server is stopped.

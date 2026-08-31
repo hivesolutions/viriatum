@@ -1,27 +1,77 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import ast
-import asyncio
-import base64
-import gc
-import hashlib
-import os
-import shutil
-import signal
-import socket
-import struct
-import subprocess
-import sys
-import threading
-import time
-import unittest
+"""
+Test suite for the more recent of the two interfaces, driving the
+embedded server over the whole of what the specification describes,
+the plain exchange of a request, the protocol of the lifespan and the
+one of the websocket.
 
-import http.client
-import urllib.error
-import urllib.request
+One server is opened for the class and reached over the loopback, so
+that what is exercised is the serving itself rather than a stand in
+for it, and a client of the websocket written against the framing of
+the specification carries the exchanges that no client of the
+standard library is able to.
+
+Features:
+    - Both versions of the interface, the single callable of the more
+      recent one and the pair of the older, told apart the way the
+      server tells them apart.
+    - The lifespan of an application, the startup and the shutdown of
+      it together with the refusals of either.
+    - The framing of the websocket, the handshake and the messages of
+      it written and read a frame at a time.
+    - The counts of what the interpreter is holding, so that an
+      exchange that leaks a task or a future is caught.
+
+Run from the project root with:
+    python -m unittest discover -s src/viriatum_python/test
+"""
+
+import asyncio
+
+from ast import literal_eval
+from base64 import b64encode
+from collections.abc import Awaitable, Callable
+from gc import collect, get_objects
+from hashlib import sha1
+from http.client import HTTPConnection
+from os import urandom
+from shutil import which
+from signal import SIGINT, raise_signal
+from socket import SO_LINGER, SOL_SOCKET, create_connection
+from struct import pack, unpack
+from subprocess import PIPE, Popen
+from sys import platform, version_info
+from threading import Event, Thread
+from time import sleep, time
+from typing import Any
+from unittest import TestCase, main, skipIf
+from urllib.error import HTTPError
+from urllib.request import Request, urlopen
 
 import viriatum
+
+Environ = dict[str, Any]
+""" The map of the request as the older interface builds it, one
+entry per part of the request and of the environment """
+
+StartResponse = Callable[[str, list[tuple[str, str]]], Any]
+""" The operation that opens the answer of the older interface """
+
+Scope = dict[str, Any]
+""" The map of the connection as the more recent interface builds it,
+which says what kind of exchange is being served """
+
+Message = dict[str, Any]
+""" A single event of the more recent interface, the ones that carry
+the answer and the ones that carry what the client sent """
+
+Receive = Callable[[], Awaitable[Message]]
+""" The operation that reads the next event of the client """
+
+Send = Callable[[Message], Awaitable[None]]
+""" The operation that writes the next event of the answer """
 
 PORT = 19401
 """ The base port to be used by the various servers created
@@ -38,9 +88,11 @@ class WebSocketClient(object):
     frames and unframes the payloads according to the protocol.
     """
 
-    def __init__(self, port, path="/ws", protocols=None):
-        self.socket = socket.create_connection(("127.0.0.1", port), timeout=5)
-        self.key = base64.b64encode(os.urandom(16)).decode("ascii")
+    def __init__(
+        self, port: int, path: str = "/ws", protocols: list[str] | None = None
+    ) -> None:
+        self.socket = create_connection(("127.0.0.1", port), timeout=5)
+        self.key = b64encode(urandom(16)).decode("ascii")
         request = (
             "GET %s HTTP/1.1\r\n"
             "Host: 127.0.0.1\r\n"
@@ -62,51 +114,57 @@ class WebSocketClient(object):
         self.response, _, self.buffer = self.response.partition(b"\r\n\r\n")
 
     @property
-    def status(self):
+    def status(self) -> int:
         return int(self.response.split(b" ")[1])
 
     @property
-    def accept(self):
-        digest = hashlib.sha1((self.key + GUID).encode("ascii")).digest()
-        return base64.b64encode(digest).decode("ascii")
+    def accept(self) -> str:
+        digest = sha1((self.key + GUID).encode("ascii")).digest()
+        return b64encode(digest).decode("ascii")
 
-    def header(self, name):
+    def header(self, name: str) -> str | None:
         for line in self.response.split(b"\r\n"):
             if line.lower().startswith(name.lower().encode("ascii") + b":"):
                 return line.split(b":", 1)[1].strip().decode("ascii")
         return None
 
-    def send(self, opcode, payload, mask=b"\x01\x02\x03\x04", fin=True):
+    def send(
+        self,
+        opcode: int,
+        payload: bytes,
+        mask: bytes = b"\x01\x02\x03\x04",
+        fin: bool = True,
+    ) -> None:
         size = len(payload)
         header = bytes([(0x80 if fin else 0x00) | opcode])
         if size < 126:
             header += bytes([0x80 | size])
         elif size < 65536:
-            header += bytes([0x80 | 126]) + struct.pack("!H", size)
+            header += bytes([0x80 | 126]) + pack("!H", size)
         else:
-            header += bytes([0x80 | 127]) + struct.pack("!Q", size)
+            header += bytes([0x80 | 127]) + pack("!Q", size)
         masked = bytes(payload[index] ^ mask[index % 4] for index in range(size))
         self.socket.sendall(header + mask + masked)
 
-    def send_raw(self, data):
+    def send_raw(self, data: bytes) -> None:
         self.socket.sendall(data)
 
-    def receive(self):
+    def receive(self) -> tuple[int | None, bytes | None]:
         header = self._read(2)
         if header is None:
             return None, None
         opcode = header[0] & 0x0F
         size = header[1] & 0x7F
         if size == 126:
-            size = struct.unpack("!H", self._read(2))[0]
+            size = unpack("!H", self._read(2))[0]
         elif size == 127:
-            size = struct.unpack("!Q", self._read(8))[0]
+            size = unpack("!Q", self._read(8))[0]
         return opcode, self._read(size) if size > 0 else b""
 
-    def close(self):
+    def close(self) -> None:
         self.socket.close()
 
-    def _read(self, size):
+    def _read(self, size: int) -> bytes | None:
         data = self.buffer[:size]
         self.buffer = self.buffer[size:]
         while len(data) < size:
@@ -117,7 +175,7 @@ class WebSocketClient(object):
         return data
 
 
-class ServerCase(unittest.TestCase):
+class ServerCase(TestCase):
     """
     Base of the various suites, it owns the application that is
     served and the lifecycle of the server running it.
@@ -128,39 +186,39 @@ class ServerCase(unittest.TestCase):
     the suites binds a port of its own """
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         # creates the server for the application defined below and
         # runs its loop in a separate thread, so that the requests
         # may be issued from the main one
         cls.port = PORT + cls.OFFSET
         cls.server = viriatum.Server(cls._application, port=cls.port)
-        cls.thread = threading.Thread(target=cls.server.serve_forever, daemon=True)
+        cls.thread = Thread(target=cls.server.serve_forever, daemon=True)
         cls.thread.start()
         cls._wait_server()
 
     @classmethod
-    def tearDownClass(cls):
+    def tearDownClass(cls) -> None:
         cls.server.stop()
         cls.thread.join(timeout=10)
 
     @classmethod
-    def _wait_server(cls):
+    def _wait_server(cls) -> None:
         # tries to reach the server for a limited amount of time,
         # failing the complete suite in case it never becomes ready
         for _ in range(100):
             try:
-                urllib.request.urlopen(cls._url("/plain"), timeout=1).read()
+                urlopen(cls._url("/plain"), timeout=1).read()
                 return
             except Exception:
-                time.sleep(0.1)
+                sleep(0.1)
         raise AssertionError("server did not become ready")
 
     @classmethod
-    def _url(cls, path):
+    def _url(cls, path: str) -> str:
         return "http://127.0.0.1:%d%s" % (cls.port, path)
 
     @staticmethod
-    async def _websocket(scope, receive, send):
+    async def _websocket(scope: Scope, receive: Receive, send: Send) -> None:
         path = scope["path"]
         message = await receive()
         if message["type"] != "websocket.connect":
@@ -262,7 +320,7 @@ class ServerCase(unittest.TestCase):
                 )
 
     @staticmethod
-    async def _application(scope, receive, send):
+    async def _application(scope: Scope, receive: Receive, send: Send) -> None:
         if scope["type"] == "websocket":
             await AsgiTest._websocket(scope, receive, send)
             return
@@ -586,13 +644,13 @@ class AsgiTest(ServerCase):
     the complete request cycle of an application.
     """
 
-    def test_interface_detection(self):
+    def test_interface_detection(self) -> None:
         # verifies that a coroutine function is detected as an asgi
         # application while a plain one is taken as a wsgi one
-        async def application(scope, receive, send):
+        async def application(scope: Scope, receive: Receive, send: Send) -> None:
             pass
 
-        def wsgi(environ, start_response):
+        def wsgi(environ: Environ, start_response: StartResponse) -> None:
             pass
 
         server = viriatum.Server(application, port=self.port + 90)
@@ -600,20 +658,22 @@ class AsgiTest(ServerCase):
         server = viriatum.Server(wsgi, port=self.port + 91)
         self.assertFalse(server.asgi)
 
-    def test_interface_detection_callable(self):
+    def test_interface_detection_callable(self) -> None:
         # verifies that an instance whose call method is a coroutine
         # one is also detected as an asgi application
         class Application(object):
-            async def __call__(self, scope, receive, send):
+            async def __call__(
+                self, scope: Scope, receive: Receive, send: Send
+            ) -> None:
                 pass
 
         server = viriatum.Server(Application(), port=self.port + 92)
         self.assertTrue(server.asgi)
 
-    def test_interface_explicit(self):
+    def test_interface_explicit(self) -> None:
         # verifies that the interface may be forced regardless of the
         # shape of the application that has been provided
-        def wsgi(environ, start_response):
+        def wsgi(environ: Environ, start_response: StartResponse) -> None:
             pass
 
         server = viriatum.Server(wsgi, port=self.port + 93, interface="asgi")
@@ -621,23 +681,23 @@ class AsgiTest(ServerCase):
         server = viriatum.Server(wsgi, port=self.port + 94, interface="wsgi")
         self.assertFalse(server.asgi)
 
-    def test_interface_version(self):
+    def test_interface_version(self) -> None:
         # verifies that the shape of the application selects the
         # version of the interface used for the calling of it
-        def legacy(scope):
-            async def application(receive, send):
+        def legacy(scope: Scope) -> Callable[..., Any]:
+            async def application(receive: Receive, send: Send) -> None:
                 pass
 
             return application
 
         class LegacyClass(object):
-            def __init__(self, scope):
+            def __init__(self, scope: Scope) -> None:
                 self.scope = scope
 
-            async def __call__(self, receive, send):
+            async def __call__(self, receive: Receive, send: Send) -> None:
                 pass
 
-        async def modern(scope, receive, send):
+        async def modern(scope: Scope, receive: Receive, send: Send) -> None:
             pass
 
         server = viriatum.Server(legacy, port=self.port + 80, interface="asgi")
@@ -647,10 +707,10 @@ class AsgiTest(ServerCase):
         server = viriatum.Server(modern, port=self.port + 82, interface="asgi")
         self.assertFalse(server.double_callable)
 
-    def test_interface_version_forced(self):
+    def test_interface_version_forced(self) -> None:
         # verifies that the version of the interface may be forced
         # regardless of the shape of the application
-        async def application(scope, receive, send):
+        async def application(scope: Scope, receive: Receive, send: Send) -> None:
             pass
 
         server = viriatum.Server(application, port=self.port + 83, interface="asgi2")
@@ -660,13 +720,13 @@ class AsgiTest(ServerCase):
         self.assertTrue(server.asgi)
         self.assertFalse(server.double_callable)
 
-    def test_interface_markers(self):
+    def test_interface_markers(self) -> None:
         # verifies that the markers set by the adaptation helpers take
         # precedence over the inspection of the application
-        async def single(scope, receive, send):
+        async def single(scope: Scope, receive: Receive, send: Send) -> None:
             pass
 
-        def double(scope):
+        def double(scope: Scope) -> None:
             pass
 
         single._asgi_double_callable = True
@@ -677,13 +737,13 @@ class AsgiTest(ServerCase):
         server = viriatum.Server(double, port=self.port + 86, interface="asgi")
         self.assertFalse(server.double_callable)
 
-    def test_interface_markers_auto(self):
+    def test_interface_markers_auto(self) -> None:
         # verifies that the markers are honoured by the automatic
         # interface as well, a wsgi application never carries them
-        def double(scope):
+        def double(scope: Scope) -> None:
             pass
 
-        async def single(scope, receive, send):
+        async def single(scope: Scope, receive: Receive, send: Send) -> None:
             pass
 
         double._asgi_double_callable = True
@@ -696,10 +756,10 @@ class AsgiTest(ServerCase):
         self.assertTrue(server.asgi)
         self.assertFalse(server.double_callable)
 
-    def test_interface_invalid(self):
+    def test_interface_invalid(self) -> None:
         # verifies that an unknown interface is rejected at the
         # construction of the server object
-        async def application(scope, receive, send):
+        async def application(scope: Scope, receive: Receive, send: Send) -> None:
             pass
 
         self.assertRaises(
@@ -710,13 +770,13 @@ class AsgiTest(ServerCase):
             interface="nonsense",
         )
 
-    def test_loop_creation_failure(self):
+    def test_loop_creation_failure(self) -> None:
         # verifies that a failure in the creation of the event loop
         # is reported instead of leaving a half built server
-        async def application(scope, receive, send):
+        async def application(scope: Scope, receive: Receive, send: Send) -> None:
             pass
 
-        def new_event_loop():
+        def new_event_loop() -> Any:
             raise RuntimeError("intentional failure")
 
         original = asyncio.new_event_loop
@@ -728,15 +788,15 @@ class AsgiTest(ServerCase):
         finally:
             asyncio.new_event_loop = original
 
-    def test_simple_request(self):
-        result = urllib.request.urlopen(self._url("/plain"), timeout=5)
+    def test_simple_request(self) -> None:
+        result = urlopen(self._url("/plain"), timeout=5)
         self.assertEqual(result.status, 200)
         self.assertEqual(result.read(), b"plain")
         self.assertEqual(result.headers.get("Content-Type"), "text/plain")
 
-    def test_scope(self):
-        result = urllib.request.urlopen(self._url("/scope?a=1&b=2"), timeout=5)
-        values = ast.literal_eval(result.read().decode())
+    def test_scope(self) -> None:
+        result = urlopen(self._url("/scope?a=1&b=2"), timeout=5)
+        values = literal_eval(result.read().decode())
         self.assertEqual(values[0], "http")
         self.assertEqual(values[1], {"version": "3.0", "spec_version": "2.3"})
         self.assertEqual(values[2], "1.1")
@@ -749,70 +809,70 @@ class AsgiTest(ServerCase):
         self.assertEqual(values[9], "127.0.0.1")
         self.assertEqual(values[10], self.port)
 
-    def test_scope_decoded_path(self):
+    def test_scope_decoded_path(self) -> None:
         # verifies that the path reaches the application already
         # decoded while the raw one keeps the escapes
-        result = urllib.request.urlopen(self._url("/decoded%2Da%20b"), timeout=5)
+        result = urlopen(self._url("/decoded%2Da%20b"), timeout=5)
         self.assertEqual(result.read(), "/decoded-a b".encode("utf-8"))
 
-    def test_scope_encoded_separator(self):
+    def test_scope_encoded_separator(self) -> None:
         # verifies that an encoded query separator is not able to
         # forge one, the split happens before the decoding
-        result = urllib.request.urlopen(self._url("/decoded%3Fa=1"), timeout=5)
+        result = urlopen(self._url("/decoded%3Fa=1"), timeout=5)
         self.assertEqual(result.read(), b"/decoded?a=1")
 
-    def test_request_headers(self):
+    def test_request_headers(self) -> None:
         # verifies that the headers of the request reach the
         # application as a sequence of lower cased byte pairs
-        request = urllib.request.Request(
+        request = Request(
             self._url("/headers-in"), headers={"X-Custom-Value": "custom"}
         )
-        result = urllib.request.urlopen(request, timeout=5)
+        result = urlopen(request, timeout=5)
         self.assertEqual(
-            ast.literal_eval(result.read().decode()), [(b"x-custom-value", b"custom")]
+            literal_eval(result.read().decode()), [(b"x-custom-value", b"custom")]
         )
 
-    def test_response_headers(self):
-        result = urllib.request.urlopen(self._url("/headers-out"), timeout=5)
+    def test_response_headers(self) -> None:
+        result = urlopen(self._url("/headers-out"), timeout=5)
         self.assertEqual(result.headers.get("X-First"), "one")
         self.assertEqual(result.headers.get("X-Second"), "two")
 
-    def test_receive_body(self):
-        result = urllib.request.urlopen(self._url("/echo"), data=b"payload", timeout=5)
+    def test_receive_body(self) -> None:
+        result = urlopen(self._url("/echo"), data=b"payload", timeout=5)
         self.assertEqual(result.status, 201)
         self.assertEqual(result.read(), b"got:payload")
 
-    def test_receive_empty_body(self):
-        result = urllib.request.urlopen(self._url("/size"), data=b"", timeout=5)
+    def test_receive_empty_body(self) -> None:
+        result = urlopen(self._url("/size"), data=b"", timeout=5)
         self.assertEqual(result.read(), b"0")
 
-    def test_receive_large_body(self):
+    def test_receive_large_body(self) -> None:
         # verifies that a payload that spans several of the body
         # callbacks of the parser is properly accumulated
         payload = b"x" * 200000
-        result = urllib.request.urlopen(self._url("/size"), data=payload, timeout=15)
+        result = urlopen(self._url("/size"), data=payload, timeout=15)
         self.assertEqual(result.read(), str(len(payload)).encode("utf-8"))
 
-    def test_receive_exhausted(self):
+    def test_receive_exhausted(self) -> None:
         # verifies that the request stream carries a single event, a
         # further receive blocks instead of producing a bogus one
-        result = urllib.request.urlopen(self._url("/exhausted"), timeout=5)
+        result = urlopen(self._url("/exhausted"), timeout=5)
         self.assertEqual(result.read(), b"exhausted")
 
-    def test_streaming_response(self):
+    def test_streaming_response(self) -> None:
         # verifies that the various chunks are joined by the client
         # and that the chunked framing has been used for them
-        result = urllib.request.urlopen(self._url("/stream"), timeout=5)
+        result = urlopen(self._url("/stream"), timeout=5)
         self.assertEqual(result.read(), b"chunk0-chunk1-chunk2-end")
         self.assertEqual(result.headers.get("Transfer-Encoding"), "chunked")
         self.assertEqual(result.headers.get("Content-Length"), None)
 
-    def test_streaming_keep_alive(self):
+    def test_streaming_keep_alive(self) -> None:
         # verifies that a response whose size is not known in advance
         # still bounds the message, so a connection that is kept alive
         # carries a second one after it rather than leaving the client
         # waiting for the rest of the first forever
-        connection = http.client.HTTPConnection("127.0.0.1", self.port, timeout=5)
+        connection = HTTPConnection("127.0.0.1", self.port, timeout=5)
         connection.auto_open = 0
         connection.connect()
         connection.request("GET", "/stream")
@@ -829,10 +889,10 @@ class AsgiTest(ServerCase):
         self.assertEqual(result.read(), b"plain")
         connection.close()
 
-    def test_streaming_framing(self):
+    def test_streaming_framing(self) -> None:
         # verifies that each of the chunks reaches the wire framed on
         # its own, which is what makes the response a streamed one
-        connection = http.client.HTTPConnection("127.0.0.1", self.port, timeout=5)
+        connection = HTTPConnection("127.0.0.1", self.port, timeout=5)
         connection.putrequest("GET", "/stream", skip_accept_encoding=True)
         connection.endheaders()
         raw = connection.sock.recv(65536)
@@ -846,41 +906,41 @@ class AsgiTest(ServerCase):
         self.assertTrue(body.startswith(b"7\r\nchunk0-\r\n"))
         self.assertTrue(body.endswith(b"3\r\nend\r\n0\r\n\r\n"))
 
-    def test_own_length(self):
+    def test_own_length(self) -> None:
         # verifies that a content length set by the application
         # replaces the chunked framing of the payload
-        result = urllib.request.urlopen(self._url("/own-length"), timeout=5)
+        result = urlopen(self._url("/own-length"), timeout=5)
         self.assertEqual(result.read(), b"exact")
         self.assertEqual(result.headers.get("Content-Length"), "5")
         self.assertEqual(result.headers.get("Transfer-Encoding"), None)
 
-    def test_head_request(self):
+    def test_head_request(self) -> None:
         # verifies that the response of a head request carries no
         # payload and is not framed as a chunked one
-        request = urllib.request.Request(self._url("/plain"), method="HEAD")
-        result = urllib.request.urlopen(request, timeout=5)
+        request = Request(self._url("/plain"), method="HEAD")
+        result = urlopen(request, timeout=5)
         self.assertEqual(result.status, 200)
         self.assertEqual(result.read(), b"")
         self.assertEqual(result.headers.get("Transfer-Encoding"), None)
 
-    def test_start_only_response(self):
+    def test_start_only_response(self) -> None:
         # verifies that an application that starts the response and
         # returns without any payload still produces a complete
         # envelope, the client would otherwise receive no status line
-        result = urllib.request.urlopen(self._url("/start-only"), timeout=5)
+        result = urlopen(self._url("/start-only"), timeout=5)
         self.assertEqual(result.status, 200)
         self.assertEqual(result.read(), b"")
         self.assertEqual(result.headers.get("X-Marker"), "present")
 
-    def test_long_response_header(self):
+    def test_long_response_header(self) -> None:
         # verifies that a header longer than the maximum size of a
         # single one reaches the wire, the formatting of the envelope
         # is bounded by the remaining capacity of its buffer
-        result = urllib.request.urlopen(self._url("/long-header"), timeout=5)
+        result = urlopen(self._url("/long-header"), timeout=5)
         self.assertEqual(result.read(), b"long")
         self.assertEqual(result.headers.get("X-Long"), "v" * 4000)
 
-    def test_oversized_body(self):
+    def test_oversized_body(self) -> None:
         # verifies that a payload beyond the maximum allowed size is
         # refused, handing a truncated one to the application would
         # have it processed as valid but incomplete data
@@ -889,83 +949,83 @@ class AsgiTest(ServerCase):
         self.assertEqual(result.status, 413)
         self.assertEqual(result.read(), b"Payload Too Large")
 
-    def test_no_content(self):
+    def test_no_content(self) -> None:
         # verifies that a status that carries no payload discards the
         # body that has been provided by the application
-        result = urllib.request.urlopen(self._url("/no-content"), timeout=5)
+        result = urlopen(self._url("/no-content"), timeout=5)
         self.assertEqual(result.status, 204)
         self.assertEqual(result.read(), b"")
         self.assertEqual(result.headers.get("Transfer-Encoding"), None)
 
-    def test_status_message(self):
+    def test_status_message(self) -> None:
         # verifies that the status message is derived from the code
         # provided by the application, as asgi carries no reason
         result = self._request("/missing")
         self.assertEqual(result.status, 404)
         self.assertEqual(result.reason, "Not Found")
 
-    def test_application_error(self):
+    def test_application_error(self) -> None:
         # verifies that an application that raises before starting
         # the response has an internal error produced for it
         result = self._request("/boom")
         self.assertEqual(result.status, 500)
         self.assertEqual(result.read(), b"Internal Server Error")
 
-    def test_application_error_after_start(self):
+    def test_application_error_after_start(self) -> None:
         # verifies that an application that raises after starting the
         # response has the stream terminated instead of hanging
-        result = urllib.request.urlopen(self._url("/raise-after"), timeout=5)
+        result = urlopen(self._url("/raise-after"), timeout=5)
         self.assertEqual(result.status, 200)
         self.assertEqual(result.read(), b"partial")
 
-    def test_application_never_closes(self):
+    def test_application_never_closes(self) -> None:
         # verifies that an application that returns without closing
         # the response has the stream terminated for it
-        result = urllib.request.urlopen(self._url("/never-close"), timeout=5)
+        result = urlopen(self._url("/never-close"), timeout=5)
         self.assertEqual(result.read(), b"open")
 
-    def test_bad_header(self):
+    def test_bad_header(self) -> None:
         # verifies that a header carrying a control character is
         # rejected, avoiding the splitting of the response
-        result = urllib.request.urlopen(self._url("/bad-header"), timeout=5)
+        result = urlopen(self._url("/bad-header"), timeout=5)
         self.assertEqual(result.read(), b"rejected")
         self.assertEqual(result.headers.get("Injected"), None)
 
-    def test_bad_status(self):
+    def test_bad_status(self) -> None:
         # verifies that a status outside of the valid range is
         # rejected instead of reaching the wire
-        result = urllib.request.urlopen(self._url("/bad-status"), timeout=5)
+        result = urlopen(self._url("/bad-status"), timeout=5)
         self.assertEqual(result.read(), b"rejected")
 
-    def test_body_before_start(self):
+    def test_body_before_start(self) -> None:
         # verifies that a payload sent before the start of the
         # response is rejected as an out of order message
-        result = urllib.request.urlopen(self._url("/body-first"), timeout=5)
+        result = urlopen(self._url("/body-first"), timeout=5)
         self.assertEqual(result.read(), b"rejected")
 
-    def test_double_start(self):
+    def test_double_start(self) -> None:
         # verifies that the response may only be started once, a
         # second attempt is reported as a problem
-        result = urllib.request.urlopen(self._url("/double-start"), timeout=5)
+        result = urlopen(self._url("/double-start"), timeout=5)
         self.assertEqual(result.read(), b"rejected")
 
-    def test_body_after_complete(self):
+    def test_body_after_complete(self) -> None:
         # verifies that no payload may follow the one that closed
         # the response, the stream has already been terminated
-        result = urllib.request.urlopen(self._url("/after-complete"), timeout=5)
+        result = urlopen(self._url("/after-complete"), timeout=5)
         self.assertEqual(result.read(), b"done")
 
-    def test_unknown_message(self):
+    def test_unknown_message(self) -> None:
         # verifies that a message type that is not part of the http
         # scope is rejected as an unexpected one
-        result = urllib.request.urlopen(self._url("/unknown-message"), timeout=5)
+        result = urlopen(self._url("/unknown-message"), timeout=5)
         self.assertEqual(result.read(), b"rejected")
 
-    def test_keep_alive(self):
+    def test_keep_alive(self) -> None:
         # verifies that two requests may be issued over a single
         # connection, the handler is reset between them, the
         # reopening of it is disabled so that a closed one fails
-        connection = http.client.HTTPConnection("127.0.0.1", self.port, timeout=5)
+        connection = HTTPConnection("127.0.0.1", self.port, timeout=5)
         connection.auto_open = 0
         connection.connect()
         connection.request("GET", "/plain", headers={"Connection": "keep-alive"})
@@ -978,7 +1038,7 @@ class AsgiTest(ServerCase):
         self.assertEqual(connection.getresponse().read(), b"got:again")
         connection.close()
 
-    def test_concurrent_keep_alive(self):
+    def test_concurrent_keep_alive(self) -> None:
         # drives a series of requests over several connections that are
         # kept alive, so that the writing of the responses completes
         # from the polling of the service rather than from the calling
@@ -986,8 +1046,8 @@ class AsgiTest(ServerCase):
         # interpreter lock released in that path
         failures = []
 
-        def hammer(count):
-            connection = http.client.HTTPConnection("127.0.0.1", self.port, timeout=15)
+        def hammer(count: int) -> None:
+            connection = HTTPConnection("127.0.0.1", self.port, timeout=15)
             connection.auto_open = 0
             try:
                 connection.connect()
@@ -1003,7 +1063,7 @@ class AsgiTest(ServerCase):
             finally:
                 connection.close()
 
-        threads = [threading.Thread(target=hammer, args=(30,)) for _ in range(4)]
+        threads = [Thread(target=hammer, args=(30,)) for _ in range(4)]
         for thread in threads:
             thread.start()
         for thread in threads:
@@ -1011,15 +1071,15 @@ class AsgiTest(ServerCase):
 
         self.assertEqual(failures, [])
         self.assertEqual([thread.is_alive() for thread in threads], [False] * 4)
-        result = urllib.request.urlopen(self._url("/plain"), timeout=5)
+        result = urlopen(self._url("/plain"), timeout=5)
         self.assertEqual(result.read(), b"plain")
 
-    def test_keep_alive_by_default(self):
+    def test_keep_alive_by_default(self) -> None:
         # verifies that a request of the most recent version of the
         # protocol keeps the connection alive without asking for it
         # and closes it when it does ask, which is what the
         # specification requires of each of the two cases
-        connection = http.client.HTTPConnection("127.0.0.1", self.port, timeout=5)
+        connection = HTTPConnection("127.0.0.1", self.port, timeout=5)
         connection.auto_open = 0
         connection.connect()
         connection.request("GET", "/plain")
@@ -1035,13 +1095,13 @@ class AsgiTest(ServerCase):
         self.assertEqual(result.headers.get("Connection"), "close")
         connection.close()
 
-    def test_multiplexed_streams(self):
+    def test_multiplexed_streams(self) -> None:
         # verifies that several requests travelling at the same time on
         # one connection of the most recent version of the protocol are
         # each answered on the stream they came in on, an application
         # answers on a clock of its own and by then the connection is
         # likely serving another of the messages that travel on it
-        nghttp = shutil.which("nghttp")
+        nghttp = which("nghttp")
         if nghttp is None:
             self.skipTest("no client of the most recent version is available")
 
@@ -1049,10 +1109,10 @@ class AsgiTest(ServerCase):
         # of the resources on a stream of its own, which is what makes
         # the answers of them travel at the same time
         paths = ["/scope?a=1", "/scope?a=2", "/scope?a=3", "/scope?a=4"]
-        process = subprocess.Popen(
+        process = Popen(
             [nghttp] + [self._url(path) for path in paths],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
+            stdout=PIPE,
+            stderr=PIPE,
         )
         output = process.communicate(timeout=30)[0].decode()
         self.assertEqual(process.returncode, 0)
@@ -1068,138 +1128,130 @@ class AsgiTest(ServerCase):
         # most recent one as the client asked for nothing else
         self.assertEqual(output.count("'2'"), len(paths))
 
-    def test_system_exit(self):
+    def test_system_exit(self) -> None:
         # verifies that an application requesting a system exit does
         # not terminate the process that is hosting the server
         result = self._request("/exit")
         self.assertEqual(result.status, 500)
-        result = urllib.request.urlopen(self._url("/plain"), timeout=5)
+        result = urlopen(self._url("/plain"), timeout=5)
         self.assertEqual(result.read(), b"plain")
 
-    def test_send_not_dictionary(self):
+    def test_send_not_dictionary(self) -> None:
         # verifies that a message that is not a mapping is rejected
         # instead of being inspected for a type
-        result = urllib.request.urlopen(self._url("/send-not-dict"), timeout=5)
+        result = urlopen(self._url("/send-not-dict"), timeout=5)
         self.assertEqual(result.read(), b"rejected")
 
-    def test_send_without_type(self):
+    def test_send_without_type(self) -> None:
         # verifies that a message that carries no type is rejected
         # as it may not be dispatched
-        result = urllib.request.urlopen(self._url("/send-no-type"), timeout=5)
+        result = urlopen(self._url("/send-no-type"), timeout=5)
         self.assertEqual(result.read(), b"rejected")
 
-    def test_header_not_bytes(self):
+    def test_header_not_bytes(self) -> None:
         # verifies that a header that is not a pair of byte strings
         # is rejected, as the specification requires them
-        result = urllib.request.urlopen(self._url("/header-not-bytes"), timeout=5)
+        result = urlopen(self._url("/header-not-bytes"), timeout=5)
         self.assertEqual(result.read(), b"rejected")
 
-    def test_body_not_bytes(self):
+    def test_body_not_bytes(self) -> None:
         # verifies that a payload that is not a byte string is
         # rejected instead of reaching the wire
-        result = urllib.request.urlopen(self._url("/body-not-bytes"), timeout=5)
+        result = urlopen(self._url("/body-not-bytes"), timeout=5)
         self.assertEqual(result.read(), b"rejected")
 
-    def test_similar_header(self):
+    def test_similar_header(self) -> None:
         # verifies that a header whose name is as long as the content
         # length one is not mistaken for it, the payload stays framed
-        result = urllib.request.urlopen(self._url("/similar-header"), timeout=5)
+        result = urlopen(self._url("/similar-header"), timeout=5)
         self.assertEqual(result.read(), b"similar")
         self.assertEqual(result.headers.get("X-Content-Type"), "one")
         self.assertEqual(result.headers.get("Transfer-Encoding"), "chunked")
 
-    def test_short_header(self):
+    def test_short_header(self) -> None:
         # verifies that a header that is not a complete pair is
         # rejected instead of reaching the wire half formed
-        result = urllib.request.urlopen(self._url("/short-header"), timeout=5)
+        result = urlopen(self._url("/short-header"), timeout=5)
         self.assertEqual(result.read(), b"rejected")
 
-    def test_empty_header_value(self):
+    def test_empty_header_value(self) -> None:
         # verifies that a request header carrying an empty value does
         # not leave the name of it pending in the context
-        connection = http.client.HTTPConnection("127.0.0.1", self.port, timeout=5)
+        connection = HTTPConnection("127.0.0.1", self.port, timeout=5)
         connection.request(
             "GET", "/headers-in", headers={"X-Empty": "", "X-Custom-Value": "custom"}
         )
         result = connection.getresponse()
         self.assertEqual(
-            ast.literal_eval(result.read().decode()), [(b"x-custom-value", b"custom")]
+            literal_eval(result.read().decode()), [(b"x-custom-value", b"custom")]
         )
         connection.close()
 
-    def test_multiplexed_released(self):
+    def test_multiplexed_released(self) -> None:
         # verifies that the objects of a request are released once the
         # stream that carried it is over, several of them travel at the
         # same time on one connection and each one carries a context of
         # its own that must not outlive the stream
-        nghttp = shutil.which("nghttp")
+        nghttp = which("nghttp")
         if nghttp is None:
             self.skipTest("no client of the most recent version is available")
 
-        def request(count):
+        def request(count: int) -> None:
             paths = [self._url("/scope?a=%d" % index) for index in range(count)]
-            process = subprocess.Popen(
-                [nghttp] + paths, stdout=subprocess.PIPE, stderr=subprocess.PIPE
-            )
+            process = Popen([nghttp] + paths, stdout=PIPE, stderr=PIPE)
             process.communicate(timeout=30)
             self.assertEqual(process.returncode, 0)
 
-        def objects():
-            gc.collect()
-            return len(gc.get_objects())
+        def objects() -> int:
+            collect()
+            return len(get_objects())
 
         # a first round warms whatever is built once and kept, the
         # count is only meaningful once that has settled
         request(8)
-        time.sleep(0.5)
+        sleep(0.5)
         initial = objects()
         request(40)
-        time.sleep(1.0)
+        sleep(1.0)
         retained = objects() - initial
         self.assertTrue(
             retained < 200,
             "retained %d objects across 40 multiplexed streams" % retained,
         )
 
-    def test_pending_writes_released(self):
+    def test_pending_writes_released(self) -> None:
         # verifies that the payloads queued in a connection that is
         # dropped before they reach the wire are released, they are
         # never handed back through the callback of the connection
-        def drop(count):
+        def drop(count: int) -> None:
             for _ in range(count):
-                connection = socket.create_connection(
-                    ("127.0.0.1", self.port), timeout=5
-                )
+                connection = create_connection(("127.0.0.1", self.port), timeout=5)
                 connection.sendall(b"GET /flood HTTP/1.1\r\nHost: 127.0.0.1\r\n\r\n")
-                time.sleep(0.02)
-                connection.setsockopt(
-                    socket.SOL_SOCKET, socket.SO_LINGER, struct.pack("ii", 1, 0)
-                )
+                sleep(0.02)
+                connection.setsockopt(SOL_SOCKET, SO_LINGER, pack("ii", 1, 0))
                 connection.close()
-                time.sleep(0.02)
+                sleep(0.02)
 
-        def futures():
-            gc.collect()
-            return sum(
-                1 for item in gc.get_objects() if type(item).__name__ == "Future"
-            )
+        def futures() -> int:
+            collect()
+            return sum(1 for item in get_objects() if type(item).__name__ == "Future")
 
         drop(5)
-        time.sleep(0.5)
+        sleep(0.5)
         initial = futures()
         drop(30)
-        time.sleep(1.0)
+        sleep(1.0)
         retained = futures() - initial
         self.assertTrue(
             retained < 10,
             "retained %d futures across 30 dropped connections" % retained,
         )
 
-    @unittest.skipIf(
-        sys.platform == "win32" and sys.version_info < (3, 11),
+    @skipIf(
+        platform == "win32" and version_info < (3, 11),
         "the interrupt is not delivered reliably by that runtime",
     )
-    def test_keyboard_interrupt(self):
+    def test_keyboard_interrupt(self) -> None:
         # verifies that an interrupt stops the serving loop, the
         # signals are only handled in the main thread and so it is the
         # one that runs the loop while another raises the interrupt,
@@ -1207,9 +1259,9 @@ class AsgiTest(ServerCase):
         # because the interrupt reaches the loop there only some of
         # the time, the later ones of it deliver it every time
         state = {"raised": False, "expired": False}
-        finished = threading.Event()
+        finished = Event()
 
-        async def application(scope, receive, send):
+        async def application(scope: Scope, receive: Receive, send: Send) -> None:
             # refuses the lifespan scope so that the opening of the
             # service is immediate, the interrupt has to reach the
             # serving loop rather than the wait of the protocol
@@ -1222,33 +1274,31 @@ class AsgiTest(ServerCase):
 
         server = viriatum.Server(application, port=self.port + 30, interface="asgi")
 
-        def request():
+        def request() -> None:
             # keeps a request in flight so that a task stays pending
             # and the loop is advancing the interpreter, which is the
             # window where the interrupt used to be discarded
             try:
-                urllib.request.urlopen(
-                    "http://127.0.0.1:%d/" % (self.port + 30), timeout=10
-                )
+                urlopen("http://127.0.0.1:%d/" % (self.port + 30), timeout=10)
             except Exception:
                 pass
 
-        def interrupt():
+        def interrupt() -> None:
             # waits for the service to be listening before raising the
             # interrupt, so that it never reaches the opening of it
             for _ in range(200):
                 try:
-                    connection = socket.create_connection(
+                    connection = create_connection(
                         ("127.0.0.1", self.port + 30), timeout=1
                     )
                     connection.close()
                     break
                 except Exception:
-                    time.sleep(0.05)
-            threading.Thread(target=request, daemon=True).start()
-            time.sleep(0.5)
+                    sleep(0.05)
+            Thread(target=request, daemon=True).start()
+            sleep(0.5)
             state["raised"] = True
-            signal.raise_signal(signal.SIGINT)
+            raise_signal(SIGINT)
 
             # stops the server in case the interrupt is ignored, so
             # that the test fails instead of hanging forever
@@ -1256,7 +1306,7 @@ class AsgiTest(ServerCase):
                 state["expired"] = True
                 server.stop()
 
-        threading.Thread(target=interrupt, daemon=True).start()
+        Thread(target=interrupt, daemon=True).start()
         try:
             self.assertRaises(KeyboardInterrupt, server.serve_forever)
         finally:
@@ -1264,23 +1314,23 @@ class AsgiTest(ServerCase):
         self.assertTrue(state["raised"])
         self.assertFalse(state["expired"], "the interrupt was ignored")
 
-    def test_serve_helper(self):
+    def test_serve_helper(self) -> None:
         # verifies that the helper builds a server with the provided
         # arguments and runs its loop until it is stopped
         created = []
         original = viriatum.Server
 
         class Capturing(object):
-            def __init__(self, *args, **kwargs):
+            def __init__(self, *args: Any, **kwargs: Any) -> None:
                 self.server = original(*args, **kwargs)
                 created.append(self.server)
 
-            def serve_forever(self):
+            def serve_forever(self) -> Any:
                 return self.server.serve_forever()
 
         viriatum.Server = Capturing
         try:
-            thread = threading.Thread(
+            thread = Thread(
                 target=viriatum.serve,
                 args=(self._application,),
                 kwargs=dict(port=self.port + 20, interface="asgi"),
@@ -1290,14 +1340,12 @@ class AsgiTest(ServerCase):
             url = "http://127.0.0.1:%d/plain" % (self.port + 20)
             for _ in range(100):
                 try:
-                    self.assertEqual(
-                        urllib.request.urlopen(url, timeout=1).read(), b"plain"
-                    )
+                    self.assertEqual(urlopen(url, timeout=1).read(), b"plain")
                     break
                 except AssertionError:
                     raise
                 except Exception:
-                    time.sleep(0.1)
+                    sleep(0.1)
             else:
                 raise AssertionError("server did not become ready")
         finally:
@@ -1308,44 +1356,44 @@ class AsgiTest(ServerCase):
         thread.join(timeout=10)
         self.assertFalse(thread.is_alive())
 
-    def test_concurrent_requests(self):
+    def test_concurrent_requests(self) -> None:
         # verifies that two slow requests genuinely overlap, which is
         # the whole point of driving the loop from the polling one
         results = []
 
-        def issue():
-            result = urllib.request.urlopen(self._url("/slow"), timeout=15)
+        def issue() -> None:
+            result = urlopen(self._url("/slow"), timeout=15)
             results.append(result.read())
 
-        initial = time.time()
-        threads = [threading.Thread(target=issue) for _ in range(2)]
+        initial = time()
+        threads = [Thread(target=issue) for _ in range(2)]
         for thread in threads:
             thread.start()
         for thread in threads:
             thread.join(timeout=15)
-        elapsed = time.time() - initial
+        elapsed = time() - initial
 
         self.assertEqual(results, [b"slow", b"slow"])
         self.assertTrue(elapsed < 0.7, "requests took %.2f seconds" % elapsed)
 
-    def _request_data(self, path, data):
+    def _request_data(self, path: str, data: bytes) -> Any:
         # issues a request carrying a payload returning the response
         # even when the status of it is one of the error ones
         try:
-            return urllib.request.urlopen(self._url(path), data=data, timeout=30)
-        except urllib.error.HTTPError as error:
+            return urlopen(self._url(path), data=data, timeout=30)
+        except HTTPError as error:
             return error
 
-    def _request(self, path):
+    def _request(self, path: str) -> Any:
         # issues a request returning the response even when the status
         # of it is one of the error ones (not raising)
         try:
-            return urllib.request.urlopen(self._url(path), timeout=5)
-        except urllib.error.HTTPError as error:
+            return urlopen(self._url(path), timeout=5)
+        except HTTPError as error:
             return error
 
 
-class LegacyTest(unittest.TestCase):
+class LegacyTest(TestCase):
     """
     Test suite for the second version of the interface, the one
     where the application is a double callable.
@@ -1354,35 +1402,35 @@ class LegacyTest(unittest.TestCase):
     OFFSET = 20
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         # creates the server for the legacy application defined below
         # and runs its loop in a separate thread
         cls.port = PORT + cls.OFFSET
         cls.server = viriatum.Server(cls._application, port=cls.port, interface="asgi")
-        cls.thread = threading.Thread(target=cls.server.serve_forever, daemon=True)
+        cls.thread = Thread(target=cls.server.serve_forever, daemon=True)
         cls.thread.start()
         for _ in range(100):
             try:
-                urllib.request.urlopen(cls._url("/plain"), timeout=1).read()
+                urlopen(cls._url("/plain"), timeout=1).read()
                 return
             except Exception:
-                time.sleep(0.1)
+                sleep(0.1)
         raise AssertionError("server did not become ready")
 
     @classmethod
-    def tearDownClass(cls):
+    def tearDownClass(cls) -> None:
         cls.server.stop()
         cls.thread.join(timeout=10)
 
     @classmethod
-    def _url(cls, path):
+    def _url(cls, path: str) -> str:
         return "http://127.0.0.1:%d%s" % (cls.port, path)
 
     @staticmethod
-    def _application(scope):
+    def _application(scope: Scope) -> Callable[..., Any]:
         # the scope is taken by the outer callable and only then are
         # the two callables provided, the double callable shape
-        async def application(receive, send):
+        async def application(receive: Receive, send: Send) -> None:
             if scope["type"] == "lifespan":
                 while True:
                     message = await receive()
@@ -1411,41 +1459,39 @@ class LegacyTest(unittest.TestCase):
 
         return application
 
-    def test_simple_request(self):
-        result = urllib.request.urlopen(self._url("/plain"), timeout=5)
+    def test_simple_request(self) -> None:
+        result = urlopen(self._url("/plain"), timeout=5)
         self.assertEqual(result.status, 200)
         self.assertEqual(result.read(), b"plain")
 
-    def test_scope_version(self):
+    def test_scope_version(self) -> None:
         # verifies that the scope reports the version of the interface
         # that is being used for the calling of the application
-        result = urllib.request.urlopen(self._url("/scope"), timeout=5)
-        self.assertEqual(
-            ast.literal_eval(result.read().decode()), ("http", "2.0", "GET")
-        )
+        result = urlopen(self._url("/scope"), timeout=5)
+        self.assertEqual(literal_eval(result.read().decode()), ("http", "2.0", "GET"))
 
-    def test_receive_body(self):
-        result = urllib.request.urlopen(self._url("/echo"), data=b"payload", timeout=5)
+    def test_receive_body(self) -> None:
+        result = urlopen(self._url("/echo"), data=b"payload", timeout=5)
         self.assertEqual(result.read(), b"got:payload")
 
-    def test_lifespan(self):
+    def test_lifespan(self) -> None:
         # verifies that the lifespan protocol is driven through the
         # double callable shape as well, the server is already up
         self.assertTrue(self.thread.is_alive())
 
 
-class LifespanTest(unittest.TestCase):
+class LifespanTest(TestCase):
     """
     Test suite for the lifespan scope, each of the cases runs a
     server of its own as the protocol spans the complete serving.
     """
 
-    def test_lifespan(self):
+    def test_lifespan(self) -> None:
         # verifies that both the startup and the shutdown events
         # reach an application that implements the protocol
         events = []
 
-        async def application(scope, receive, send):
+        async def application(scope: Scope, receive: Receive, send: Send) -> None:
             if scope["type"] != "lifespan":
                 await self._plain(receive, send)
                 return
@@ -1461,13 +1507,13 @@ class LifespanTest(unittest.TestCase):
         self._serve(application, PORT + 1)
         self.assertEqual(events, ["lifespan.startup", "lifespan.shutdown"])
 
-    def test_lifespan_slow_startup(self):
+    def test_lifespan_slow_startup(self) -> None:
         # verifies that a startup that awaits real work is waited for
         # rather than being abandoned, an application that connects to
         # a database on startup depends on it
         events = []
 
-        async def application(scope, receive, send):
+        async def application(scope: Scope, receive: Receive, send: Send) -> None:
             if scope["type"] != "lifespan":
                 await self._plain(receive, send)
                 return
@@ -1483,18 +1529,18 @@ class LifespanTest(unittest.TestCase):
                     await send({"type": "lifespan.shutdown.complete"})
                     return
 
-        initial = time.time()
+        initial = time()
         self._serve(application, PORT + 7)
         self.assertEqual(events, ["startup", "shutdown"])
-        self.assertTrue(time.time() - initial >= 0.3, "startup was not waited for")
+        self.assertTrue(time() - initial >= 0.3, "startup was not waited for")
 
-    def test_lifespan_loop_failure(self):
+    def test_lifespan_loop_failure(self) -> None:
         # verifies that a loop that is unable to advance does not hang
         # the opening of the service, the wait gives up and the
         # requests are served without any lifespan handling
         events = []
 
-        async def application(scope, receive, send):
+        async def application(scope: Scope, receive: Receive, send: Send) -> None:
             if scope["type"] != "lifespan":
                 await self._plain(receive, send)
                 return
@@ -1504,7 +1550,7 @@ class LifespanTest(unittest.TestCase):
                 if message["type"] == "lifespan.startup":
                     await send({"type": "lifespan.startup.complete"})
 
-        def sleep(*args, **kwargs):
+        def sleep(*args: Any, **kwargs: Any) -> Any:
             raise RuntimeError("intentional failure")
 
         original = asyncio.sleep
@@ -1515,11 +1561,11 @@ class LifespanTest(unittest.TestCase):
             asyncio.sleep = original
         self.assertEqual(events, [])
 
-    @unittest.skipIf(
-        sys.platform == "win32" and sys.version_info < (3, 11),
+    @skipIf(
+        platform == "win32" and version_info < (3, 11),
         "the interrupt is not delivered reliably by that runtime",
     )
-    def test_lifespan_shutdown_on_interrupt(self):
+    def test_lifespan_shutdown_on_interrupt(self) -> None:
         # verifies that the shutdown of the lifespan is run when the
         # serving is ended by an interrupt, the exception raised by
         # the signal has to be saved while it takes place, the older
@@ -1527,9 +1573,9 @@ class LifespanTest(unittest.TestCase):
         # reason the test of the interrupt above it is
         events = []
         state = {"expired": False}
-        finished = threading.Event()
+        finished = Event()
 
-        async def application(scope, receive, send):
+        async def application(scope: Scope, receive: Receive, send: Send) -> None:
             if scope["type"] != "lifespan":
                 await self._plain(receive, send)
                 return
@@ -1544,22 +1590,20 @@ class LifespanTest(unittest.TestCase):
 
         server = viriatum.Server(application, port=PORT + 9, interface="asgi")
 
-        def interrupt():
+        def interrupt() -> None:
             for _ in range(200):
                 try:
-                    connection = socket.create_connection(
-                        ("127.0.0.1", PORT + 9), timeout=1
-                    )
+                    connection = create_connection(("127.0.0.1", PORT + 9), timeout=1)
                     connection.close()
                     break
                 except Exception:
-                    time.sleep(0.05)
-            signal.raise_signal(signal.SIGINT)
+                    sleep(0.05)
+            raise_signal(SIGINT)
             if not finished.wait(timeout=10.0):
                 state["expired"] = True
                 server.stop()
 
-        threading.Thread(target=interrupt, daemon=True).start()
+        Thread(target=interrupt, daemon=True).start()
         try:
             self.assertRaises(KeyboardInterrupt, server.serve_forever)
         finally:
@@ -1567,20 +1611,20 @@ class LifespanTest(unittest.TestCase):
         self.assertFalse(state["expired"], "the interrupt was ignored")
         self.assertEqual(events, ["lifespan.startup", "lifespan.shutdown"])
 
-    def test_lifespan_unsupported(self):
+    def test_lifespan_unsupported(self) -> None:
         # verifies that an application that refuses the lifespan
         # scope is served anyway, as the specification requires
-        async def application(scope, receive, send):
+        async def application(scope: Scope, receive: Receive, send: Send) -> None:
             if scope["type"] == "lifespan":
                 raise NotImplementedError("no lifespan here")
             await self._plain(receive, send)
 
         self._serve(application, PORT + 2)
 
-    def test_lifespan_startup_failed(self):
+    def test_lifespan_startup_failed(self) -> None:
         # verifies that an application that fails the startup event
         # aborts the serving, reporting the problem to the caller
-        async def application(scope, receive, send):
+        async def application(scope: Scope, receive: Receive, send: Send) -> None:
             if scope["type"] != "lifespan":
                 return
             await receive()
@@ -1593,12 +1637,12 @@ class LifespanTest(unittest.TestCase):
         server = viriatum.Server(application, port=PORT + 3)
         self.assertRaises(RuntimeError, server.serve_forever)
 
-    def test_lifespan_unknown_message(self):
+    def test_lifespan_unknown_message(self) -> None:
         # verifies that a message that is not part of the lifespan
         # protocol is refused, the startup completes anyway
         failures = []
 
-        async def application(scope, receive, send):
+        async def application(scope: Scope, receive: Receive, send: Send) -> None:
             if scope["type"] != "lifespan":
                 await self._plain(receive, send)
                 return
@@ -1617,37 +1661,37 @@ class LifespanTest(unittest.TestCase):
         self._serve(application, PORT + 5)
         self.assertEqual(failures, ["unknown-message"])
 
-    def test_lifespan_not_a_coroutine(self):
+    def test_lifespan_not_a_coroutine(self) -> None:
         # verifies that a plain function forced into the asgi
         # interface is refused, both at the lifespan and the request
-        def application(scope, receive, send):
+        def application(scope: Scope, receive: Receive, send: Send) -> None:
             return None
 
         server = viriatum.Server(application, port=PORT + 6, interface="asgi")
-        thread = threading.Thread(target=server.serve_forever, daemon=True)
+        thread = Thread(target=server.serve_forever, daemon=True)
         thread.start()
         url = "http://127.0.0.1:%d/plain" % (PORT + 6)
         for _ in range(100):
             try:
-                urllib.request.urlopen(url, timeout=1).read()
+                urlopen(url, timeout=1).read()
                 raise AssertionError("request should have failed")
-            except urllib.error.HTTPError as error:
+            except HTTPError as error:
                 self.assertEqual(error.status, 500)
                 break
             except AssertionError:
                 raise
             except Exception:
-                time.sleep(0.1)
+                sleep(0.1)
         else:
             raise AssertionError("server did not become ready")
         server.stop()
         thread.join(timeout=10)
         self.assertFalse(thread.is_alive())
 
-    def test_lifespan_shutdown_failed(self):
+    def test_lifespan_shutdown_failed(self) -> None:
         # verifies that a failure of the shutdown event does not
         # prevent the serving from ending properly
-        async def application(scope, receive, send):
+        async def application(scope: Scope, receive: Receive, send: Send) -> None:
             if scope["type"] != "lifespan":
                 await self._plain(receive, send)
                 return
@@ -1667,28 +1711,26 @@ class LifespanTest(unittest.TestCase):
         self._serve(application, PORT + 4)
 
     @staticmethod
-    async def _plain(receive, send):
+    async def _plain(receive: Receive, send: Send) -> None:
         await receive()
         await send({"type": "http.response.start", "status": 200, "headers": []})
         await send({"type": "http.response.body", "body": b"plain"})
 
-    def _serve(self, application, port):
+    def _serve(self, application: Callable[..., Any], port: int) -> None:
         # runs the provided application for the time it takes to
         # answer a single request, then stops the server
         server = viriatum.Server(application, port=port)
-        thread = threading.Thread(target=server.serve_forever, daemon=True)
+        thread = Thread(target=server.serve_forever, daemon=True)
         thread.start()
         url = "http://127.0.0.1:%d/plain" % port
         for _ in range(100):
             try:
-                self.assertEqual(
-                    urllib.request.urlopen(url, timeout=1).read(), b"plain"
-                )
+                self.assertEqual(urlopen(url, timeout=1).read(), b"plain")
                 break
             except AssertionError:
                 raise
             except Exception:
-                time.sleep(0.1)
+                sleep(0.1)
         else:
             raise AssertionError("server did not become ready")
         server.stop()
@@ -1704,7 +1746,7 @@ class WebsocketTest(ServerCase):
 
     OFFSET = 10
 
-    def test_handshake(self):
+    def test_handshake(self) -> None:
         # verifies that the handshake is answered with the accept
         # value derived from the key provided by the client
         client = WebSocketClient(self.port)
@@ -1714,7 +1756,7 @@ class WebsocketTest(ServerCase):
         self.assertEqual(client.header("Sec-WebSocket-Accept"), client.accept)
         client.close()
 
-    def test_scope(self):
+    def test_scope(self) -> None:
         # verifies that the scope of an upgraded connection carries
         # both the websocket type and the proposed subprotocols
         client = WebSocketClient(
@@ -1723,16 +1765,16 @@ class WebsocketTest(ServerCase):
         opcode, payload = client.receive()
         self.assertEqual(opcode, 0x1)
         self.assertEqual(
-            ast.literal_eval(payload.decode("utf-8")),
+            literal_eval(payload.decode("utf-8")),
             ("websocket", "ws", "/ws-scope", b"a=1", ["chat", "json"]),
         )
         client.close()
 
-    def test_partial_upgrade(self):
+    def test_partial_upgrade(self) -> None:
         # verifies that an upgrade value that merely resembles the
         # websocket one is not handled as such, it would otherwise
         # receive a handshake response for an unrelated protocol
-        connection = http.client.HTTPConnection("127.0.0.1", self.port, timeout=5)
+        connection = HTTPConnection("127.0.0.1", self.port, timeout=5)
         connection.putrequest("GET", "/plain", skip_accept_encoding=True)
         connection.putheader("Upgrade", "w1234567t")
         connection.putheader("Connection", "Upgrade")
@@ -1743,7 +1785,7 @@ class WebsocketTest(ServerCase):
         self.assertEqual(result.status, 200)
         connection.close()
 
-    def test_accept_headers(self):
+    def test_accept_headers(self) -> None:
         # verifies that the headers set by the application are part of
         # the response of the handshake, a framework depends on them
         # for the setting of the cookies of the connection
@@ -1753,7 +1795,7 @@ class WebsocketTest(ServerCase):
         self.assertEqual(client.header("X-Extra"), "yes")
         client.close()
 
-    def test_accept_bad_header(self):
+    def test_accept_bad_header(self) -> None:
         # verifies that a header carrying a control character is
         # rejected, avoiding the splitting of the handshake response
         client = WebSocketClient(self.port, path="/ws-bad-header")
@@ -1762,7 +1804,7 @@ class WebsocketTest(ServerCase):
         self.assertEqual(client.header("Injected"), None)
         client.close()
 
-    def test_subprotocol(self):
+    def test_subprotocol(self) -> None:
         # verifies that the subprotocol selected by the application
         # is part of the response of the handshake
         client = WebSocketClient(self.port, path="/ws-protocol", protocols="chat")
@@ -1770,25 +1812,25 @@ class WebsocketTest(ServerCase):
         self.assertEqual(client.header("Sec-WebSocket-Protocol"), "chat")
         client.close()
 
-    def test_text_message(self):
+    def test_text_message(self) -> None:
         client = WebSocketClient(self.port)
         client.send(0x1, "hello".encode("utf-8"))
         self.assertEqual(client.receive(), (0x1, b"echo:hello"))
         client.close()
 
-    def test_binary_message(self):
+    def test_binary_message(self) -> None:
         client = WebSocketClient(self.port)
         client.send(0x2, b"\x00\xff")
         self.assertEqual(client.receive(), (0x2, b"bin:\x00\xff"))
         client.close()
 
-    def test_empty_message(self):
+    def test_empty_message(self) -> None:
         client = WebSocketClient(self.port)
         client.send(0x2, b"")
         self.assertEqual(client.receive(), (0x2, b"bin:"))
         client.close()
 
-    def test_extended_length_message(self):
+    def test_extended_length_message(self) -> None:
         # verifies that a payload beyond the base length variant is
         # properly unmasked and reassembled by the server
         payload = bytes(index % 256 for index in range(1000))
@@ -1797,7 +1839,7 @@ class WebsocketTest(ServerCase):
         self.assertEqual(client.receive(), (0x2, b"bin:" + payload))
         client.close()
 
-    def test_grown_message(self):
+    def test_grown_message(self) -> None:
         # verifies that both the reception buffer and the reassembly
         # one grow beyond their initial capacity when required
         payload = bytes(index % 256 for index in range(10000))
@@ -1807,7 +1849,7 @@ class WebsocketTest(ServerCase):
         self.assertEqual(client.receive(), (0x2, b"bin:" + payload))
         client.close()
 
-    def test_buffered_frames(self):
+    def test_buffered_frames(self) -> None:
         # verifies that a reception carrying a complete frame plus the
         # beginning of another one keeps only the incomplete part
         client = WebSocketClient(self.port)
@@ -1827,7 +1869,7 @@ class WebsocketTest(ServerCase):
         self.assertEqual(client.receive(), (0x1, b"echo:two"))
         client.close()
 
-    def test_refused_messages(self):
+    def test_refused_messages(self) -> None:
         # verifies that the messages that are out of order or unknown
         # are refused, the application collects the failures
         client = WebSocketClient(self.port, path="/ws-refused")
@@ -1842,31 +1884,31 @@ class WebsocketTest(ServerCase):
         )
         client.close()
 
-    def test_application_returns_unaccepted(self):
+    def test_application_returns_unaccepted(self) -> None:
         # verifies that an application that returns without ever
         # accepting has the handshake refused for it
         client = WebSocketClient(self.port, path="/ws-silent")
         self.assertEqual(client.status, 403)
         client.close()
 
-    def test_payload_not_bytes(self):
+    def test_payload_not_bytes(self) -> None:
         # verifies that a binary payload that is not a byte string is
         # rejected instead of being framed
         client = WebSocketClient(self.port, path="/ws-not-bytes")
         self.assertEqual(client.receive(), (0x1, b"rejected"))
         client.close()
 
-    def test_application_returns(self):
+    def test_application_returns(self) -> None:
         # verifies that an application that returns without closing
         # the connection has it closed for it
         client = WebSocketClient(self.port, path="/ws-return")
         self.assertEqual(client.status, 101)
         opcode, payload = client.receive()
         self.assertEqual(opcode, 0x8)
-        self.assertEqual(struct.unpack("!H", payload[:2])[0], 1000)
+        self.assertEqual(unpack("!H", payload[:2])[0], 1000)
         client.close()
 
-    def test_fragmented_message(self):
+    def test_fragmented_message(self) -> None:
         # verifies that a message split over several frames is
         # reassembled before reaching the application
         client = WebSocketClient(self.port)
@@ -1876,7 +1918,7 @@ class WebsocketTest(ServerCase):
         self.assertEqual(client.receive(), (0x1, b"echo:abcdefghi"))
         client.close()
 
-    def test_ping_pong(self):
+    def test_ping_pong(self) -> None:
         # verifies that a ping is answered with the corresponding
         # pong without the application ever noticing it
         client = WebSocketClient(self.port)
@@ -1886,7 +1928,7 @@ class WebsocketTest(ServerCase):
         self.assertEqual(client.receive(), (0x1, b"echo:after"))
         client.close()
 
-    def test_pong_ignored(self):
+    def test_pong_ignored(self) -> None:
         # verifies that an unsolicited pong is silently discarded
         # instead of being handed to the application
         client = WebSocketClient(self.port)
@@ -1895,67 +1937,65 @@ class WebsocketTest(ServerCase):
         self.assertEqual(client.receive(), (0x1, b"echo:after"))
         client.close()
 
-    def test_close_by_client(self):
+    def test_close_by_client(self) -> None:
         # verifies that the closing handshake is answered with the
         # corresponding close frame carrying a normal code
         client = WebSocketClient(self.port)
-        client.send(0x8, struct.pack("!H", 1000))
+        client.send(0x8, pack("!H", 1000))
         opcode, payload = client.receive()
         self.assertEqual(opcode, 0x8)
-        self.assertEqual(struct.unpack("!H", payload[:2])[0], 1000)
+        self.assertEqual(unpack("!H", payload[:2])[0], 1000)
         client.close()
 
-    def test_close_by_application(self):
+    def test_close_by_application(self) -> None:
         # verifies that the application is able to close the
         # connection carrying both a code and a reason
         client = WebSocketClient(self.port, path="/ws-close")
         client.send(0x1, "bye".encode("utf-8"))
         opcode, payload = client.receive()
         self.assertEqual(opcode, 0x8)
-        self.assertEqual(struct.unpack("!H", payload[:2])[0], 4001)
+        self.assertEqual(unpack("!H", payload[:2])[0], 4001)
         self.assertEqual(payload[2:], b"done")
         client.close()
 
-    def test_rejected(self):
+    def test_rejected(self) -> None:
         # verifies that an application that closes before accepting
         # has the handshake refused instead of completed
         client = WebSocketClient(self.port, path="/ws-reject")
         self.assertEqual(client.status, 403)
         client.close()
 
-    def test_unmasked_frame(self):
+    def test_unmasked_frame(self) -> None:
         # verifies that a frame that is not masked is rejected as a
         # violation of the protocol, closing the connection
         client = WebSocketClient(self.port)
         client.send_raw(bytes([0x81, 0x02]) + b"hi")
         opcode, payload = client.receive()
         self.assertEqual(opcode, 0x8)
-        self.assertEqual(struct.unpack("!H", payload[:2])[0], 1002)
+        self.assertEqual(unpack("!H", payload[:2])[0], 1002)
         client.close()
 
-    def test_oversized_frame(self):
+    def test_oversized_frame(self) -> None:
         # verifies that a frame announcing a payload beyond the
         # maximum allowed one is rejected before being buffered
         client = WebSocketClient(self.port)
-        client.send_raw(
-            bytes([0x82, 0xFF]) + struct.pack("!Q", 1 << 32) + b"\x01\x02\x03\x04"
-        )
+        client.send_raw(bytes([0x82, 0xFF]) + pack("!Q", 1 << 32) + b"\x01\x02\x03\x04")
         opcode, payload = client.receive()
         self.assertEqual(opcode, 0x8)
-        self.assertEqual(struct.unpack("!H", payload[:2])[0], 1002)
+        self.assertEqual(unpack("!H", payload[:2])[0], 1002)
         client.close()
 
-    def test_unexpected_continuation(self):
+    def test_unexpected_continuation(self) -> None:
         # verifies that a continuation frame that continues nothing
         # is rejected as a violation of the protocol
         client = WebSocketClient(self.port)
         client.send(0x0, b"orphan")
         opcode, payload = client.receive()
         self.assertEqual(opcode, 0x8)
-        self.assertEqual(struct.unpack("!H", payload[:2])[0], 1002)
+        self.assertEqual(unpack("!H", payload[:2])[0], 1002)
         client.close()
 
-    def test_interleaved_message(self):
+    def test_interleaved_message(self) -> None:
         # verifies that a new message may not start while another
         # one is still being reassembled
         client = WebSocketClient(self.port)
@@ -1963,25 +2003,25 @@ class WebsocketTest(ServerCase):
         client.send(0x1, b"second")
         opcode, payload = client.receive()
         self.assertEqual(opcode, 0x8)
-        self.assertEqual(struct.unpack("!H", payload[:2])[0], 1002)
+        self.assertEqual(unpack("!H", payload[:2])[0], 1002)
         client.close()
 
-    def test_invalid_text_payload(self):
+    def test_invalid_text_payload(self) -> None:
         # verifies that a textual message that is not properly
         # encoded closes the connection with the invalid code
         client = WebSocketClient(self.port)
         client.send(0x1, b"\xff\xfe")
         opcode, payload = client.receive()
         self.assertEqual(opcode, 0x8)
-        self.assertEqual(struct.unpack("!H", payload[:2])[0], 1007)
+        self.assertEqual(unpack("!H", payload[:2])[0], 1007)
         client.close()
 
-    def test_partial_frame(self):
+    def test_partial_frame(self) -> None:
         # verifies that a frame that arrives split over several
         # receptions is only handled once it is complete
         client = WebSocketClient(self.port)
         client.send_raw(bytes([0x81, 0x85, 0x01]))
-        time.sleep(0.2)
+        sleep(0.2)
         payload = "hello".encode("utf-8")
         mask = b"\x01\x02\x03\x04"
         client.send_raw(
@@ -1992,4 +2032,4 @@ class WebsocketTest(ServerCase):
 
 
 if __name__ == "__main__":
-    unittest.main()
+    main()
