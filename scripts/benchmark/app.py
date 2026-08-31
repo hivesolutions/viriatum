@@ -2,11 +2,53 @@
 # -*- coding: utf-8 -*-
 
 """
-The application that every one of the python interfaces is driven
-against, the very same object being served by the server and by the
-reference that stands for its interface, so that what ends up being
-measured is the interface and never the application behind it.
+Benchmark application that every one of the python interfaces is
+driven against, the very same object being served by the server and
+by the reference that stands for its interface, so that what ends up
+being measured is the interface and never the application behind it.
+
+Carries one application per shape of answer, the two plain ones of
+the older and of the more recent interface answering with a fixed
+body in a single part, and a streaming one that breaks the very same
+body into several, which is the shape an application that produces
+its answer as it goes ends up taking.
+
+Features:
+    - A body small enough that the cost of producing it never shows
+      up in the figure of the interface that carried it.
+    - A length among the fields of every answer, so that no interface
+      is forced into a framing the other one is not paying for.
+    - The same set of fields on every one of them, so that a figure
+      of one is a figure of the interface and not of the answer.
+
+Reached through scripts/benchmark/serve.py for the server and through
+the command line of the reference for each of the interfaces.
 """
+
+from collections.abc import Awaitable, Callable
+from typing import Any
+
+Environ = dict[str, Any]
+""" The map of the request as the older of the two interfaces builds
+it, one entry per part of the request and of the environment """
+
+StartResponse = Callable[[str, list[tuple[str, str]]], Any]
+""" The operation that opens the answer of the older interface, taking
+the status and the fields that travel with it """
+
+Scope = dict[str, Any]
+""" The map of the connection as the more recent interface builds it,
+which says what kind of exchange is being served """
+
+Message = dict[str, Any]
+""" A single event of the more recent interface, the ones that carry
+the answer and the ones that carry what the client sent """
+
+Receive = Callable[[], Awaitable[Message]]
+""" The operation that reads the next event of the client """
+
+Send = Callable[[Message], Awaitable[None]]
+""" The operation that writes the next event of the answer """
 
 BODY = b"viriatum"
 """ The body that the plain applications answer with, a small and
@@ -24,7 +66,7 @@ that no interface is forced into a chunked framing the other one is
 not paying the cost of """
 
 
-def wsgi_app(environ, start_response):
+def wsgi_app(environ: Environ, start_response: StartResponse) -> list[bytes]:
     """
     The application of the older of the two interfaces, answering
     with a fixed body and the smallest set of fields that a complete
@@ -42,7 +84,7 @@ def wsgi_app(environ, start_response):
     return [BODY]
 
 
-async def asgi_app(scope, receive, send):
+async def asgi_app(scope: Scope, receive: Receive, send: Send) -> None:
     """
     The application of the more recent of the two interfaces, the
     counterpart of the one above and answering exactly the same way.
@@ -68,7 +110,7 @@ async def asgi_app(scope, receive, send):
     await send({"type": "http.response.body", "body": BODY, "more_body": False})
 
 
-async def asgi_stream_app(scope, receive, send):
+async def asgi_stream_app(scope: Scope, receive: Receive, send: Send) -> None:
     """
     The streaming counterpart of the application above, sending the
     body in several parts instead of a single one, which is the shape

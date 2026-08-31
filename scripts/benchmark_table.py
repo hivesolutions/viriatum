@@ -2,21 +2,66 @@
 # -*- coding: utf-8 -*-
 
 """
-Builds the markdown table of the benchmark out of the reports that
-the harness has written, one per pair of a workload and a server,
-the result is meant to be appended to the step summary of the
+Benchmark table builder that turns the reports the harness writes,
+one per pair of a workload and a server, into the markdown table that
+closes a run, meant to be appended to the step summary of the
 workflow the same way the one of the coverage is.
+
+Reads the reports out of the runs directory of the output, the order
+the workloads were driven out of workloads.txt and the description of
+the machine and of the load out of environment.txt, then reports every
+figure of the subject against the references measured beside it in the
+same run and against the baseline recorded for that shape of load.
+
+Features:
+    - Ratio of the subject against every reference of a workload,
+      measured in the same run on the same machine, which is the only
+      figure that survives a noisy one.
+    - Comparison against the recorded baseline, refused outright when
+      the machine or the shape of the load differ, with the parts
+      that do not meet named in the report rather than implied.
+    - Markers for a figure that moved beyond the spread the baseline
+      was recorded with, and for a measurement that lost connections
+      and is therefore no figure at all.
+    - The environment the figures came out of written beside them, so
+      that a number may always be traced back to the run.
+
+Run from the project root with:
+    python scripts/benchmark_table.py <output> [baseline]
+
+Arguments:
+    output      The directory the harness wrote its reports into
+    baseline    The recorded run to compare against, optional
 """
 
-import os
-import sys
-import json
+from json import dumps, loads
+from os import listdir
+from os.path import exists, isdir, join
+from sys import argv, exit
+from typing import Any
+
+Row = dict[str, Any]
+""" A single report as the harness writes it, one per pair of a
+workload and a server, read back exactly as it was written """
+
+Environment = dict[str, str]
+""" The description of the run a set of figures came out of, one
+value per line the way the harness records it """
 
 SUBJECT = "viriatum"
 """ The name the server under test is recorded under, every other
 server of a workload is a reference that it is reported against """
 
-ORDER = ("viriatum", "nginx", "caddy", "openlitespeed", "haproxy", "pingora", "gunicorn", "uvicorn")
+ORDER = (
+    "viriatum",
+    "nginx",
+    "caddy",
+    "openlitespeed",
+    "haproxy",
+    "pingora",
+    "gunicorn",
+    "uvicorn",
+)
 """ The order the servers are listed in, the subject first and then
 the references, so that a table always reads the same way """
 
@@ -27,22 +72,22 @@ compared at all, a figure taken on another machine or under another
 shape of load describes that one and never this one """
 
 
-def load(path):
-    if not os.path.exists(path):
+def load(path: str) -> Any | None:
+    if not exists(path):
         return None
     try:
         with open(path, "rb") as file:
-            return json.loads(file.read().decode("utf-8"))
+            return loads(file.read().decode("utf-8"))
     except ValueError:
         return None
 
 
-def environment(output):
+def environment(output: str) -> Environment:
     # reads the description of the run that the harness wrote beside
     # its reports, one value per line, so that a figure may always be
     # traced back to the machine and the build that produced it
-    path = os.path.join(output, "environment.txt")
-    if not os.path.exists(path):
+    path = join(output, "environment.txt")
+    if not exists(path):
         return {}
     values = {}
     with open(path, "rb") as file:
@@ -54,7 +99,7 @@ def environment(output):
     return values
 
 
-def stored(baseline):
+def stored(baseline: Any) -> tuple[list[Row], Environment]:
     # the recorded runs and the environment they were taken under, a
     # baseline written before the environment was recorded carries the
     # rows at the top level and is still understood
@@ -63,7 +108,7 @@ def stored(baseline):
     return baseline or [], {}
 
 
-def comparable(current, recorded):
+def comparable(current: Environment, recorded: Environment) -> bool:
     # says whether the run at hand may be compared against the one the
     # baseline holds, the parts that decide it being the machine and
     # the shape of the load rather than every value of either
@@ -75,7 +120,7 @@ def comparable(current, recorded):
     return True
 
 
-def differing(current, recorded):
+def differing(current: Environment, recorded: Environment) -> list[str]:
     # the parts of the environment that keep the run at hand from being
     # compared against the one the baseline holds, named so that
     # whoever reads the report knows what has to be refreshed
@@ -84,19 +129,19 @@ def differing(current, recorded):
     return [name for name in COMPARABLE if current.get(name) != recorded.get(name)]
 
 
-def describe(values, names):
+def describe(values: Environment, names: list[str]) -> str:
     # writes the named parts of an environment out, so that a mismatch
     # may be read without the baseline having to be opened beside it
     return ", ".join("%s %s" % (name, values.get(name, "?")) for name in names)
 
 
-def order(output):
+def order(output: str) -> list[str]:
     # the order the harness drove the workloads in, which it wrote out
     # before driving any of them, the reports themselves are named
     # files and reading a directory hands them back in the order of
     # the alphabet rather than the order they were measured in
-    path = os.path.join(output, "workloads.txt")
-    if not os.path.exists(path):
+    path = join(output, "workloads.txt")
+    if not exists(path):
         return []
     names = []
     with open(path, "rb") as file:
@@ -107,18 +152,18 @@ def order(output):
     return names
 
 
-def results(output):
+def results(output: str) -> list[Row]:
     # gathers one entry per pair of a workload and a server, each of
     # them written by the harness as a report of its own, the ones
     # that could not be parsed are left out rather than failing
     rows = []
-    runs = os.path.join(output, "runs")
-    if not os.path.isdir(runs):
+    runs = join(output, "runs")
+    if not isdir(runs):
         return rows
-    for name in sorted(os.listdir(runs)):
+    for name in sorted(listdir(runs)):
         if not name.endswith(".json"):
             continue
-        item = load(os.path.join(runs, name))
+        item = load(join(runs, name))
         if item is None:
             continue
         rows.append(item)
@@ -129,21 +174,23 @@ def results(output):
     driven = order(output)
     if driven:
         rows.sort(
-            key=lambda item: driven.index(item["workload"])
-            if item["workload"] in driven
-            else len(driven)
+            key=lambda item: (
+                driven.index(item["workload"])
+                if item["workload"] in driven
+                else len(driven)
+            )
         )
     return rows
 
 
-def index(rows):
+def index(rows: list[Row]) -> dict[tuple[str, str], Row]:
     # maps every entry by the pair that identifies it, which is what
     # both the ratio against a reference and the comparison against
     # the baseline are looked up through
     return dict(((item["workload"], item["server"]), item) for item in rows)
 
 
-def workloads(rows):
+def workloads(rows: list[Row]) -> list[str]:
     # the workloads in the order the harness drove them, a set would
     # lose that order and the table would stop being readable
     names = []
@@ -153,17 +200,18 @@ def workloads(rows):
     return names
 
 
-def servers(rows, workload):
+def servers(rows: list[Row], workload: str) -> list[str]:
     # the servers of a workload, the subject first and the references
     # after it, one that the order does not know about is kept last
     # so that a reference added later still shows up in the table
     names = [item["server"] for item in rows if item["workload"] == workload]
     return sorted(
-        names, key=lambda name: (ORDER.index(name) if name in ORDER else len(ORDER), name)
+        names,
+        key=lambda name: (ORDER.index(name) if name in ORDER else len(ORDER), name),
     )
 
 
-def ratio(subject, reference):
+def ratio(subject: Row | None, reference: Row | None) -> float | None:
     # the figure of the subject against the one of the reference, the
     # only number of the report that survives a noisy machine, as the
     # two of them were measured on it one right after the other, a
@@ -177,7 +225,7 @@ def ratio(subject, reference):
     return subject["rps"] / reference["rps"]
 
 
-def moved(current, baseline):
+def moved(current: Row | None, baseline: Row | None) -> str | None:
     # says whether a figure has moved beyond the spread the baseline
     # was recorded with, a run inside that spread is the same run and
     # the difference of it is the noise of the machine and nothing else
@@ -196,7 +244,7 @@ def moved(current, baseline):
     return None
 
 
-def delta(current, baseline):
+def delta(current: Row | None, baseline: Row | None) -> float | None:
     # the change of a figure against the baseline, as a share of it,
     # so that the workloads may be read against one another
     if baseline is None or current is None or not baseline.get("rps"):
@@ -204,7 +252,7 @@ def delta(current, baseline):
     return (current["rps"] - baseline["rps"]) * 100.0 / baseline["rps"]
 
 
-def marker(item, state):
+def marker(item: Row, state: str | None) -> str:
     # the mark that closes a row, a measurement that lost its
     # connections is never a figure at all and says so, one that moved
     # beyond the spread of the baseline is pointed at either way it went
@@ -217,17 +265,17 @@ def marker(item, state):
     return ""
 
 
-def format_rps(value):
+def format_rps(value: float | None) -> str:
     return "%.0f" % value if value else "-"
 
 
-def format_latency(value):
+def format_latency(value: float | None) -> str:
     # the tail is recorded in microseconds and read in milliseconds,
     # a value of zero stands for a run no corrected figure was taken on
     return "%.2f" % (value / 1000.0) if value else "-"
 
 
-def table(rows, baseline):
+def table(rows: list[Row], baseline: list[Row]) -> list[str]:
     # formats one row per pair of a workload and a server, the subject
     # of a workload carrying the ratio against each of its references
     # and every row carrying the change against the baseline
@@ -281,7 +329,7 @@ def table(rows, baseline):
     return lines
 
 
-def main_with(output, path):
+def main_with(output: str, path: str | None) -> int:
     rows = results(output)
     if not rows:
         print("## Benchmark\n\nNo benchmark data was produced.")
@@ -329,9 +377,9 @@ def main_with(output, path):
     # the assembled result is written beside the table together with
     # the environment it was taken under, so that a later run is able
     # to tell whether it may be compared against this one at all
-    with open(os.path.join(output, "results.json"), "wb") as file:
+    with open(join(output, "results.json"), "wb") as file:
         file.write(
-            json.dumps(
+            dumps(
                 dict(environment=current, results=rows), indent=2, sort_keys=True
             ).encode("utf-8")
         )
@@ -341,9 +389,9 @@ def main_with(output, path):
     return 0
 
 
-def main():
-    return main_with(sys.argv[1], sys.argv[2] if len(sys.argv) > 2 else None)
+def main() -> int:
+    return main_with(argv[1], argv[2] if len(argv) > 2 else None)
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    exit(main())
