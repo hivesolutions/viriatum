@@ -75,6 +75,21 @@ def comparable(current, recorded):
     return True
 
 
+def differing(current, recorded):
+    # the parts of the environment that keep the run at hand from being
+    # compared against the one the baseline holds, named so that
+    # whoever reads the report knows what has to be refreshed
+    if not recorded:
+        return []
+    return [name for name in COMPARABLE if current.get(name) != recorded.get(name)]
+
+
+def describe(values, names):
+    # writes the named parts of an environment out, so that a mismatch
+    # may be read without the baseline having to be opened beside it
+    return ", ".join("%s %s" % (name, values.get(name, "?")) for name in names)
+
+
 def order(output):
     # the order the harness drove the workloads in, which it wrote out
     # before driving any of them, the reports themselves are named
@@ -288,10 +303,16 @@ def main_with(output, path):
     if not path:
         print("\nNo baseline was compared against, the change column is empty.")
     elif not recorded:
-        print(
-            "\nThe baseline was recorded on `%s` and this ran on `%s`, so nothing "
-            "was compared against it." % (taken.get("machine", "?"), current.get("machine", "?"))
-        )
+        names = differing(current, taken)
+        if names:
+            print(
+                "\nThe baseline was recorded with %s and this ran with %s, so nothing "
+                "was compared against it, refresh the baseline through the input of "
+                "the workflow to compare against this shape."
+                % (describe(taken, names), describe(current, names))
+            )
+        else:
+            print("\nThe baseline carries no results, the change column is empty.")
 
     # the environment a figure came out of is part of the figure, a
     # run on another machine or another build is never comparable and
