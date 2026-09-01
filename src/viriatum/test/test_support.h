@@ -154,3 +154,22 @@ void create_test_connection(struct test_context_t *context);
  * @param context The test context to be reduced.
  */
 void delete_test_connection(struct test_context_t *context);
+
+/**
+ * Takes the standard output of the process over, so that whatever is
+ * written to it lands in a file the test is able to read back.
+ * Every capture has to be closed by the release below, the output of
+ * the run would otherwise never reach the terminal again.
+ */
+void capture_test_output(void);
+
+/**
+ * Gives the standard output of the process back and gathers what was
+ * written to it while it was taken over.
+ *
+ * @param buffer The buffer to gather the output into, it is always
+ * closed with the end of string character.
+ * @param buffer_size The size in bytes of the provided buffer.
+ * @return The number of the bytes that have been gathered.
+ */
+size_t release_test_output(char *buffer, size_t buffer_size);

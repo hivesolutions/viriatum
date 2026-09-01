@@ -73,6 +73,28 @@ ERROR_CODE run_service(void);
 ERROR_CODE run_service_s(char *program_name, struct hash_map_t *parameters);
 
 /**
+ * Loads and validates everything that a run of the service is made
+ * of and then tears it back down, without ever binding a socket.
+ *
+ * @param program_name The name of the program being run.
+ * @param arguments The map of the arguments of the command line.
+ * @param print If the configuration that the merging produced is to
+ * be written once it has been loaded.
+ * @return The resulting error code.
+ */
+ERROR_CODE check_service_s(char *program_name, struct hash_map_t *arguments, char print);
+
+/**
+ * Writes the handlers that the current build carries, the ones of
+ * the service itself together with the ones of the modules.
+ *
+ * @param program_name The name of the program being run.
+ * @param arguments The map of the arguments of the command line.
+ * @return The resulting error code.
+ */
+ERROR_CODE handlers_service_s(char *program_name, struct hash_map_t *arguments);
+
+/**
  * Stops the process of a running the service.
  * This call unblock a previous run service call.
  */

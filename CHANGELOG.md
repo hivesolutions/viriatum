@@ -37,6 +37,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Serving of the index file for any path that does not resolve, which is what a single page application needs - [#69](https://github.com/hivesolutions/viriatum/issues/69)
 * Raising and lowering of how much is written, and turning the line written for each request on and off - [#69](https://github.com/hivesolutions/viriatum/issues/69)
 * A single flag that turns on the friendly shape of the serving for a person trying the server - [#69](https://github.com/hivesolutions/viriatum/issues/69)
+* Writing of the configuration a run would actually use, without having to start one - [#69](https://github.com/hivesolutions/viriatum/issues/69)
+* Validating everything a run is made of and reporting the result, without serving anything - [#69](https://github.com/hivesolutions/viriatum/issues/69)
+* Listing of the handlers the build carries, so that naming one is discoverable - [#69](https://github.com/hivesolutions/viriatum/issues/69)
 
 ### Changed
 

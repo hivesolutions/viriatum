@@ -290,6 +290,25 @@ int execute_arguments(char *program_name, struct hash_map_t *arguments) {
     get_value_string_hash_map(arguments, (unsigned char *) "speed", &value);
     if(value != NULL) { return speed(arguments); }
 
+    /* tries to retrieve the list handlers argument from the arguments
+    map and in case it's set writes the handlers this build carries
+    and returns, so that the flag that names one is discoverable */
+    get_value_string_hash_map(arguments, (unsigned char *) "list-handlers", &value);
+    if(value != NULL) { return handlers_service_s(program_name, arguments); }
+
+    /* tries to retrieve the print config argument from the arguments
+    map and in case it's set writes the configuration that the merging
+    of the three layers produced and returns, so that it is possible to
+    see what a run would actually do without starting one */
+    get_value_string_hash_map(arguments, (unsigned char *) "print-config", &value);
+    if(value != NULL) { return check_service_s(program_name, arguments, TRUE); }
+
+    /* tries to retrieve the check argument from the arguments map and
+    in case it's set loads and validates everything a run is made of
+    and returns the status of that, without ever serving anything */
+    get_value_string_hash_map(arguments, (unsigned char *) "check", &value);
+    if(value != NULL) { return check_service_s(program_name, arguments, FALSE); }
+
     /* tries to retrieve the daemon argument from the
     arguments map in case the value is set "daemonizes"
     the current process so that it remains in background

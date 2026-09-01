@@ -26,6 +26,90 @@
 
 #include "test_support.h"
 
+#ifdef VIRIATUM_PLATFORM_WIN32
+#define TEST_DUP(descriptor) _dup(descriptor)
+#define TEST_DUP2(descriptor, target) _dup2(descriptor, target)
+#define TEST_CLOSE(descriptor) _close(descriptor)
+#define TEST_FILENO(stream) _fileno(stream)
+#endif
+
+#ifdef VIRIATUM_PLATFORM_UNIX
+#define TEST_DUP(descriptor) dup(descriptor)
+#define TEST_DUP2(descriptor, target) dup2(descriptor, target)
+#define TEST_CLOSE(descriptor) close(descriptor)
+#define TEST_FILENO(stream) fileno(stream)
+#endif
+
+/**
+ * The path of the file that the output of the process is gathered
+ * into while the standard output of it is taken over.
+ */
+#define TEST_OUTPUT_PATH "./viriatum_test_output.txt"
+
+/**
+ * The descriptor that the standard output was pointing at before it
+ * was taken over, it is what gives it back at the end.
+ */
+static int _output_test = -1;
+
+/**
+ * The file that whatever is written to the standard output lands in
+ * while it is taken over.
+ */
+static FILE *_file_test = NULL;
+
+void capture_test_output(void) {
+    /* flushes whatever is still pending so that it lands on the
+    output the process was pointing at and not on the file */
+    fflush(stdout);
+
+    /* keeps the descriptor of the standard output around and points
+    it at the file that is going to gather what is written */
+    _output_test = TEST_DUP(TEST_FILENO(stdout));
+    FOPEN(&_file_test, TEST_OUTPUT_PATH, "wb+");
+    if(_file_test == NULL) { return; }
+    TEST_DUP2(TEST_FILENO(_file_test), TEST_FILENO(stdout));
+}
+
+size_t release_test_output(char *buffer, size_t buffer_size) {
+    /* allocates space for the number of the bytes that have been
+    gathered out of the file */
+    size_t count = 0;
+
+    /* flushes what has been written so that all of it is in the file
+    before it is read back */
+    fflush(stdout);
+
+    /* gives the standard output back to the descriptor it was
+    pointing at before the capture was started */
+    TEST_DUP2(_output_test, TEST_FILENO(stdout));
+    TEST_CLOSE(_output_test);
+    _output_test = -1;
+
+    /* in case the file was never opened there is nothing that could
+    have been gathered out of it */
+    if(_file_test == NULL) {
+        if(buffer_size > 0) { buffer[0] = '\0'; }
+        return 0;
+    }
+
+    /* reads what has been written back into the provided buffer and
+    closes it with the end of string character */
+    fseek(_file_test, 0, SEEK_SET);
+    if(buffer_size > 0) {
+        count = fread(buffer, sizeof(char), buffer_size - 1, _file_test);
+        buffer[count] = '\0';
+    }
+
+    /* closes the file and takes it out of the file system, nothing of
+    it is meant to be left behind by a run */
+    fclose(_file_test);
+    _file_test = NULL;
+    remove(TEST_OUTPUT_PATH);
+
+    return count;
+}
+
 void create_test_context(struct test_context_t **context_pointer) {
     /* retrieves the test context size */
     size_t context_size = sizeof(struct test_context_t);

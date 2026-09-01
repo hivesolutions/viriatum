@@ -146,6 +146,61 @@ ERROR_CODE run_service_s(char *program_name, struct hash_map_t *arguments) {
     RAISE_NO_ERROR;
 }
 
+ERROR_CODE check_service_s(char *program_name, struct hash_map_t *arguments, char print) {
+    /* allocates space for the error value that will be used
+    to check for an error in the call */
+    ERROR_CODE return_value;
+
+    /* initializes the service the very same way a run of it would, so
+    that whatever would fail a start fails this instead, and then tears
+    it back down again without ever reaching for a socket */
+    return_value = init_service(program_name, arguments);
+    if(IS_ERROR_CODE(return_value)) {
+        destroy_service();
+        RAISE_AGAIN(return_value);
+    }
+
+    /* writes the configuration that the merging of the three layers
+    produced, whenever the writing of it is what was asked for */
+    if(print == TRUE) { print_config_service(service); }
+
+    /* destroys the service eliminating any structures that have
+    been created while it was being initialized */
+    return_value = destroy_service();
+    if(IS_ERROR_CODE(return_value)) { RAISE_AGAIN(return_value); }
+
+    /* raises no error as everything the service is made of was loaded
+    and validated without a single problem */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE handlers_service_s(char *program_name, struct hash_map_t *arguments) {
+    /* allocates space for the error value that will be used
+    to check for an error in the call */
+    ERROR_CODE return_value;
+
+    /* initializes the service so that the modules path it carries is
+    the resolved one, the handlers of the modules are only reachable
+    once that path is known */
+    return_value = init_service(program_name, arguments);
+    if(IS_ERROR_CODE(return_value)) {
+        destroy_service();
+        RAISE_AGAIN(return_value);
+    }
+
+    /* writes the handlers that this build carries, the ones of the
+    service itself together with the ones of the modules */
+    list_handlers_service(service);
+
+    /* destroys the service eliminating any structures that have
+    been created while it was being initialized */
+    return_value = destroy_service();
+    if(IS_ERROR_CODE(return_value)) { RAISE_AGAIN(return_value); }
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
 ERROR_CODE ran_service(void) {
     /* allocates the return value */
     ERROR_CODE return_value;

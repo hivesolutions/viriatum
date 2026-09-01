@@ -1289,6 +1289,8 @@ ERROR_CODE calculate_locations_service(struct service_t *service);
  * @return The resulting error code.
  */
 ERROR_CODE print_options_service(struct service_t *service);
+ERROR_CODE print_config_service(struct service_t *service);
+ERROR_CODE list_handlers_service(struct service_t *service);
 
 /**
  * Prints every global configuration value contained in the

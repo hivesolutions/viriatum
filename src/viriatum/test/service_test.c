@@ -1119,6 +1119,140 @@ const char *test_dev_options_service(void) {
     return NULL;
 }
 
+const char *test_print_config_service(void) {
+    /* allocates space for the error code of the writing, for the
+    service it is run over and for the output it produced */
+    ERROR_CODE error;
+    struct service_t *service;
+    struct hash_map_t *arguments;
+    char written[4096];
+    size_t size;
+
+    /* creates the service carrying nothing but the values that a
+    freshly created one starts with, several of which are unset and
+    would take the writing down were they not accounted for */
+    create_service(
+        &service,
+        (unsigned char *) "test",
+        (unsigned char *) "test"
+    );
+
+    capture_test_output();
+    error = print_config_service(service);
+    size = release_test_output(written, sizeof(written));
+
+    /* an option that is unset is named as such instead of being
+    reached into, which is what would take the writing down */
+    V_ASSERT(!IS_ERROR_CODE(error));
+    V_ASSERT(size > 0);
+    V_ASSERT_NOT_NULL(strstr(written, "address              := (null)"));
+    V_ASSERT_NOT_NULL(strstr(written, "www_root             := (unset)"));
+    V_ASSERT_NOT_NULL(strstr(written, "target_module        := (unset)"));
+
+    /* the options that the merging of the layers produced are the
+    ones that are written, and every one of them is */
+    create_hash_map(&arguments, 0);
+    _default_options_service(service, arguments);
+    delete_hash_map(arguments);
+    service->options->port = VIRIATUM_TEST_PORT;
+    service->options->spa = 1;
+    service->options->cors = 1;
+    service->options->listing = 0;
+    SPRINTF(
+        (char *) service->options->index[0],
+        sizeof(service->options->index[0]),
+        "%s",
+        "app.html"
+    );
+    service->options->index_count = 1;
+    calculate_options_service(service);
+
+    capture_test_output();
+    error = print_config_service(service);
+    size = release_test_output(written, sizeof(written));
+
+    V_ASSERT(!IS_ERROR_CODE(error));
+    V_ASSERT(size > 0);
+    V_ASSERT_NOT_NULL(strstr(written, "port                 := 19399"));
+    V_ASSERT_NOT_NULL(strstr(written, "address              := " VIRIATUM_DEFAULT_HOST));
+    V_ASSERT_NOT_NULL(strstr(written, "handler_name         := " VIRIATUM_DEFAULT_HANDLER));
+    V_ASSERT_NOT_NULL(strstr(written, "listing              := off"));
+    V_ASSERT_NOT_NULL(strstr(written, "spa                  := on"));
+    V_ASSERT_NOT_NULL(strstr(written, "cors                 := on"));
+    V_ASSERT_NOT_NULL(strstr(written, "index_count          := 1"));
+    V_ASSERT_NOT_NULL(strstr(written, "index[0]             := app.html"));
+
+    /* deletes the service releasing every internal structure */
+    delete_service(service);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_list_handlers_service(void) {
+    /* allocates space for the error code of the writing, for the
+    service it is run over and for the output it produced */
+    ERROR_CODE error;
+    struct service_t *service;
+    struct hash_map_t *arguments;
+    struct http_handler_t *http_handler;
+    char written[2048];
+    size_t size;
+
+    /* creates the service and loads both the specifications and the
+    default options into it, the modules are left out so that the run
+    of the test never reaches for the file system */
+    create_service(
+        &service,
+        (unsigned char *) "test",
+        (unsigned char *) "test"
+    );
+    load_specifications(service);
+    create_hash_map(&arguments, 0);
+    _default_options_service(service, arguments);
+    delete_hash_map(arguments);
+    service->options->load_modules = 0;
+    calculate_options_service(service);
+
+    capture_test_output();
+    error = list_handlers_service(service);
+    size = release_test_output(written, sizeof(written));
+
+    /* every one of the handlers that the service carries of its own
+    is named, which is what makes the flag that names one usable */
+    V_ASSERT(!IS_ERROR_CODE(error));
+    V_ASSERT(size > 0);
+    V_ASSERT_NOT_NULL(strstr(written, "Handlers\n"));
+    V_ASSERT_NOT_NULL(strstr(written, "\n  dispatch\n"));
+    V_ASSERT_NOT_NULL(strstr(written, "\n  default\n"));
+    V_ASSERT_NOT_NULL(strstr(written, "\n  file\n"));
+    V_ASSERT_NOT_NULL(strstr(written, "\n  proxy\n"));
+
+    /* none of the handlers is left registered behind the listing, one
+    that was would be registered a second time by an opening */
+    service->get_http_handler(service, &http_handler, (unsigned char *) "file");
+    V_ASSERT_NULL(http_handler);
+    service->get_http_handler(service, &http_handler, (unsigned char *) "dispatch");
+    V_ASSERT_NULL(http_handler);
+
+    /* running it a second time reports the very same handlers, the
+    first of the runs having left nothing at all behind */
+    capture_test_output();
+    error = list_handlers_service(service);
+    size = release_test_output(written, sizeof(written));
+
+    V_ASSERT(!IS_ERROR_CODE(error));
+    V_ASSERT_NOT_NULL(strstr(written, "\n  file\n"));
+
+    /* deletes the service releasing every internal structure */
+    delete_service(service);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
 const char *test_ephemeral_service(void) {
     /* allocates space for the error codes of the lifecycle calls, for
     the service and for the port that was bound */

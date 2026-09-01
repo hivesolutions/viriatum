@@ -513,6 +513,116 @@ ERROR_CODE debug_options_service(struct service_t *service) {
     RAISE_NO_ERROR;
 }
 
+ERROR_CODE print_config_service(struct service_t *service) {
+    /* retrieves a direct pointer to the service options
+    to reduce the verbosity of the reporting code below */
+    struct service_options_t *options = service->options;
+
+    /* allocates the iteration variable used to write the
+    parsed index file entries as a sequence of values */
+    size_t index;
+
+    /* writes the configuration that the merging of the three layers
+    produced, the defaults, the file and the command line, so that it
+    is possible to see what a run would actually do without having to
+    start one and watch it, this is written whatever the level of the
+    logging as it is the very thing that was asked for */
+    V_PRINT("Configuration\n");
+    V_PRINT_F("  port                 := %u\n", (unsigned int) options->port);
+    V_PRINT_F("  address              := %s\n", options->address != NULL ? (char *) options->address : "(null)");
+    V_PRINT_F("  ip6                  := %s\n", options->ip6 ? "on" : "off");
+    V_PRINT_F("  address6             := %s\n", options->address6 != NULL ? (char *) options->address6 : "(null)");
+    V_PRINT_F("  http2                := %s\n", options->http2 ? "on" : "off");
+    V_PRINT_F("  ssl                  := %s\n", options->ssl ? "on" : "off");
+    V_PRINT_F("  ssl_csr              := %s\n", options->ssl_csr != NULL ? (char *) options->ssl_csr : "(null)");
+    V_PRINT_F("  ssl_key              := %s\n", options->ssl_key != NULL ? (char *) options->ssl_key : "(null)");
+    V_PRINT_F("  handler_name         := %s\n", options->handler_name != NULL ? (char *) options->handler_name : "(null)");
+    V_PRINT_F("  target_module        := %s\n", options->target_module[0] != '\0' ? (char *) options->target_module : "(unset)");
+    V_PRINT_F("  target_attribute     := %s\n", options->target_attribute[0] != '\0' ? (char *) options->target_attribute : "(unset)");
+    V_PRINT_F("  target_path          := %s\n", options->target_path[0] != '\0' ? (char *) options->target_path : "(unset)");
+    V_PRINT_F("  local                := %s\n", options->local ? "on" : "off");
+    V_PRINT_F("  workers              := %u\n", (unsigned int) options->workers);
+    V_PRINT_F("  default_index        := %s\n", options->default_index ? "on" : "off");
+    V_PRINT_F("  www_root             := %s\n", options->www_root[0] != '\0' ? (char *) options->www_root : "(unset)");
+    V_PRINT_F("  contents_path        := %s\n", options->contents_path);
+    V_PRINT_F("  resources_path       := %s\n", options->resources_path);
+    V_PRINT_F("  modules_path         := %s\n", options->modules_path);
+    V_PRINT_F("  use_template         := %s\n", options->use_template ? "on" : "off");
+    V_PRINT_F("  access_log           := %s\n", options->access_log ? "on" : "off");
+    V_PRINT_F("  listing              := %s\n", options->listing ? "on" : "off");
+    V_PRINT_F("  spa                  := %s\n", options->spa ? "on" : "off");
+    V_PRINT_F("  cors                 := %s\n", options->cors ? "on" : "off");
+    V_PRINT_F("  logging              := %u\n", (unsigned int) get_level_logging());
+    V_PRINT_F("  index_count          := %lu\n", (unsigned long) options->index_count);
+    for(index = 0; index < options->index_count; index++) {
+        V_PRINT_F("  index[%lu]             := %s\n", (unsigned long) index, (char *) options->index[index]);
+    }
+    V_PRINT_F("  locations            := %lu\n", (unsigned long) service->locations.count);
+    for(index = 0; index < service->locations.count; index++) {
+        V_PRINT_F(
+            "  location[%lu]         := %s => %s\n",
+            (unsigned long) index,
+            (char *) service->locations.values[index].path,
+            (char *) service->locations.values[index].handler
+        );
+    }
+    V_PRINT_F("  mime_types           := %lu entries\n", options->mime_types != NULL ? (unsigned long) options->mime_types->size : 0UL);
+    V_PRINT_F("  virtual_hosts        := %lu entries\n", options->virtual_hosts != NULL ? (unsigned long) options->virtual_hosts->size : 0UL);
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE list_handlers_service(struct service_t *service) {
+    /* allocates space for the element of the map that is walked, for
+    the iterator that walks it and for the handler it holds */
+    struct hash_map_element_t *element;
+    struct iterator_t *iterator;
+    struct http_handler_t *http_handler;
+
+    /* unpacks the service options from the service */
+    struct service_options_t *service_options = service->options;
+
+    /* registers the handlers that the service carries of its own and
+    loads the modules, which register the ones they carry, this is the
+    very same sequence that the opening of the service runs and the
+    only way of learning which handlers a build really has */
+    register_handler_dispatch(service);
+    register_handler_default(service);
+    register_handler_file(service);
+    register_handler_proxy(service);
+    if(service_options->load_modules) { load_modules_service(service); }
+
+    /* walks the map of the handlers writing the name of every one of
+    them, so that the flag that names one is discoverable */
+    V_PRINT("Handlers\n");
+    create_element_iterator_hash_map(service->http_handlers_map, &iterator);
+    while(TRUE) {
+        get_next_iterator(iterator, (void **) &element);
+        if(element == NULL) { break; }
+        get_value_hash_map(
+            service->http_handlers_map,
+            element->key,
+            element->key_string,
+            (void **) &http_handler
+        );
+        if(http_handler == NULL) { continue; }
+        V_PRINT_F("  %s\n", (char *) http_handler->name);
+    }
+    delete_iterator_hash_map(service->http_handlers_map, iterator);
+
+    /* takes the handlers back out of the service, the ones of the
+    modules first as they belong to the modules themselves */
+    if(service_options->load_modules) { unload_modules_service(service); }
+    unregister_handler_proxy(service);
+    unregister_handler_file(service);
+    unregister_handler_default(service);
+    unregister_handler_dispatch(service);
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
 #ifdef VIRIATUM_PREFORK
 ERROR_CODE create_workers(struct service_t *service) {
     /* creates the variables to hold the current pid value and

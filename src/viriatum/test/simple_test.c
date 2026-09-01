@@ -1488,6 +1488,8 @@ static struct test_entry_t _simple_entries[] = {
     V_TEST_T(test_bind_options_service, "service"),
     V_TEST_T(test_static_options_service, "service"),
     V_TEST_T(test_dev_options_service, "service"),
+    V_TEST_T(test_print_config_service, "service"),
+    V_TEST_T(test_list_handlers_service, "service"),
     V_TEST_T(test_ephemeral_service, "service"),
     V_TEST_T(test_polling_service, "service"),
     V_TEST_T(test_polling_connection, "polling"),
