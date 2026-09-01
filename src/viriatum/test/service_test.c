@@ -59,6 +59,15 @@ const char *test_create_service_options(void) {
     V_ASSERT(service_options->workers == 0);
     V_ASSERT(service_options->default_index == 0);
     V_ASSERT(service_options->www_root[0] == '\0');
+    V_ASSERT(service_options->contents_path[0] == '\0');
+    V_ASSERT(service_options->resources_path[0] == '\0');
+    V_ASSERT(service_options->modules_path[0] == '\0');
+    V_ASSERT(service_options->listing == 1);
+    V_ASSERT(service_options->spa == 0);
+    V_ASSERT(service_options->cors == 0);
+    V_ASSERT(service_options->target_module[0] == '\0');
+    V_ASSERT(service_options->target_attribute[0] == '\0');
+    V_ASSERT(service_options->target_path[0] == '\0');
     V_ASSERT(service_options->use_template == 0);
     V_ASSERT(service_options->access_log == 1);
     V_ASSERT(service_options->default_virtual_host == NULL);
@@ -1193,6 +1202,12 @@ const char *test_print_config_service(void) {
     V_ASSERT_NOT_NULL(strstr(written, "address              := (null)"));
     V_ASSERT_NOT_NULL(strstr(written, "www_root             := (unset)"));
     V_ASSERT_NOT_NULL(strstr(written, "target_module        := (unset)"));
+
+    /* the paths that the calculation of the options resolves read as
+    empty before it has run, they used to be left at whatever the
+    allocation of the options happened to carry */
+    V_ASSERT_NOT_NULL(strstr(written, "contents_path        := \n"));
+    V_ASSERT_NOT_NULL(strstr(written, "modules_path         := \n"));
 
     /* the options that the merging of the layers produced are the
     ones that are written, and every one of them is */

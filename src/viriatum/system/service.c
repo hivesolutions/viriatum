@@ -176,6 +176,9 @@ void create_service_options(struct service_options_t **service_options_pointer) 
     service_options->load_modules = 1;
     service_options->default_index = 0;
     service_options->www_root[0] = '\0';
+    service_options->contents_path[0] = '\0';
+    service_options->resources_path[0] = '\0';
+    service_options->modules_path[0] = '\0';
     service_options->use_template = 0;
     service_options->access_log = 1;
     service_options->listing = 1;

@@ -69,6 +69,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * The certificate that ships is accepted again by a current library
 * The Xcode project builds again and includes every source file in the tree
 * A window widened for a promised stream no longer takes the connection down
+* The paths a service resolves are no longer read before they have been written - [#69](https://github.com/hivesolutions/viriatum/issues/69)
 * Sorting a sequence no longer reads past the end of it
 * Reading a configuration section no longer reads past the end of its name
 * A service that fails to start no longer leaves its handlers behind
