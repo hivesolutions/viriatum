@@ -160,6 +160,7 @@ void create_service_options(struct service_options_t **service_options_pointer) 
     /* sets the service options attributes (default) values */
     service_options->port = 0;
     service_options->address = NULL;
+    service_options->_address[0] = '\0';
     service_options->ip6 = 0;
     service_options->http2 = VIRIATUM_DEFAULT_HTTP2;
     service_options->address6 = NULL;
@@ -680,6 +681,7 @@ ERROR_CODE _open_service(struct service_t *service) {
 
     /* allocates the socket address structure */
     SOCKET_ADDRESS_INTERNET socket_address;
+    SOCKET_ADDRESS_SIZE socket_address_size;
 
     /* allocates space for the service socket handle and for
     the associated connection structure */
@@ -1059,6 +1061,37 @@ ERROR_CODE _open_service(struct service_t *service) {
             RUNTIME_EXCEPTION_ERROR_CODE,
             (unsigned char *) "Problem binding socket"
         );
+    }
+
+    /* a port of zero asks the kernel for an ephemeral one, so the port
+    that was actually bound is read back off the socket and set on the
+    options, otherwise neither the banner nor a request would name it */
+    if(service_options->port == 0) {
+        socket_address_size = sizeof(socket_address);
+        socket_result = SOCKET_GET_NAME(
+            service->service_socket_handle,
+            socket_address,
+            socket_address_size
+        );
+
+        /* in case the name of the socket could not be read there is no
+        way of telling which port is being served */
+        if(SOCKET_TEST_ERROR(socket_result)) {
+            SOCKET_ERROR_CODE name_error_code = SOCKET_GET_ERROR_CODE(socket_result);
+            V_ERROR_F("Problem reading the name of the socket: %d\n", name_error_code);
+            SOCKET_CLOSE(service->service_socket_handle);
+            RAISE_ERROR_M(
+                RUNTIME_EXCEPTION_ERROR_CODE,
+                (unsigned char *) "Problem reading the name of the socket"
+            );
+        }
+
+        /* sets the port that was bound on the options together with the
+        string of it, which is the one that the ip6 binding and the
+        responses of the service are going to read */
+        service_options->port = ntohs(socket_address.sin_port);
+        SPRINTF((char *) service_options->_port, 128, "%d", service_options->port);
+        string_populate(&service_options->_port_string, service_options->_port, 0, 1);
     }
 
     /* listens for a service socket change */
@@ -2863,8 +2896,66 @@ ERROR_CODE _comand_line_options_service(struct service_t *service, struct hash_m
     flags apart, the asgi one from the wsgi one */
     char asgi;
 
+    /* allocates space for the value that names both the interface and
+    the port, together with the position it is divided at and the size
+    of the part of it that names the interface */
+    char *bind_value;
+    char *separator;
+    size_t address_size;
+
     /* unpacks the service options from the service */
     struct service_options_t *service_options = service->options;
+
+    /* tries to retrieve the bind argument from the arguments map, its
+    value naming both the interface and the port at once, the two of
+    them divided by the last of the colons so that an ip6 address
+    written between brackets is never taken apart at the wrong one */
+    get_value_string_hash_map(arguments, (unsigned char *) "bind", &value);
+    if(value != NULL) {
+        if(((struct argument_t *) value)->type != VALUE_ARGUMENT) {
+            RAISE_ERROR_M(
+                RUNTIME_EXCEPTION_ERROR_CODE,
+                (unsigned char *) "--bind requires a host and a port"
+            );
+        }
+
+        bind_value = ((struct argument_t *) value)->value;
+        separator = strrchr(bind_value, ':');
+        if(separator == NULL) {
+            RAISE_ERROR_F(
+                RUNTIME_EXCEPTION_ERROR_CODE,
+                (unsigned char *) "Invalid bind '%s', expected host:port",
+                bind_value
+            );
+        }
+
+        /* what follows the separator names the port, the reading of it
+        stopping at the end of the value on its own */
+        service_options->port = (unsigned short) atoi(separator + 1);
+
+        /* what comes before the separator names the interface, copied
+        into a buffer of its own since the value it sits in carries the
+        port right beside it and may not be pointed at */
+        address_size = (size_t) (separator - bind_value);
+        if(address_size >= sizeof(service_options->_address)) {
+            RAISE_ERROR_F(
+                RUNTIME_EXCEPTION_ERROR_CODE,
+                (unsigned char *) "Invalid bind '%s', the host of it is too long",
+                bind_value
+            );
+        }
+
+        /* a value that names no interface at all stands for every one of
+        them, the flag setting the two options together and so naming
+        the address just as plainly as it names the port */
+        if(address_size > 0) {
+            memcpy(service_options->_address, bind_value, address_size);
+            service_options->_address[address_size] = '\0';
+            service_options->address = service_options->_address;
+        } else {
+            service_options->address = (unsigned char *) VIRIATUM_DEFAULT_HOST;
+        }
+    }
 
     /* tries to retrieve the port argument from the arguments map, then
     in case the (port) value is set, casts the port value into

@@ -544,6 +544,13 @@ typedef struct service_options_t {
     unsigned char *address;
 
     /**
+     * The buffer that holds the address whenever it was named
+     * together with the port in a single value, which carries the
+     * two of them and so cannot be pointed at directly.
+     */
+    unsigned char _address[128];
+
+    /**
      * Flag that controls if the service is meant
      * to be run "inside" an ipv6 protocol connection.
      */

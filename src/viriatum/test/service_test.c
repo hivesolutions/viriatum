@@ -777,6 +777,170 @@ const char *test_mode_options_service(void) {
     return NULL;
 }
 
+const char *test_bind_options_service(void) {
+    /* allocates space for the service, for the map of the arguments
+    that the command line produces and for the ones of them through
+    which the place the service listens at is named */
+    ERROR_CODE error;
+    struct service_t *service;
+    struct hash_map_t *arguments;
+    struct argument_t bind;
+    struct argument_t port;
+    struct argument_t host;
+
+    /* creates the service together with the empty map of the
+    arguments and loads the defaults, which are what the flags below
+    are meant to be taking the place of */
+    create_service(
+        &service,
+        (unsigned char *) "test",
+        (unsigned char *) "test"
+    );
+    create_hash_map(&arguments, 0);
+    _default_options_service(service, arguments);
+
+    /* the value that names both the interface and the port sets the
+    two of them at once, dividing at the colon between them */
+    bind.type = VALUE_ARGUMENT;
+    SPRINTF(bind.key, sizeof(bind.key), "%s", "bind");
+    SPRINTF(bind.value, sizeof(bind.value), "%s", "127.0.0.1:8080");
+    set_value_string_hash_map(arguments, (unsigned char *) "bind", (void *) &bind);
+
+    error = _comand_line_options_service(service, arguments);
+    V_ASSERT(!IS_ERROR_CODE(error));
+    V_ASSERT_EQ_S((char *) service->options->address, "127.0.0.1");
+    V_ASSERT_EQ_U(service->options->port, 8080);
+
+    /* the value that names no interface stands for every one of them,
+    the address being left at the one the defaults carry */
+    SPRINTF(bind.value, sizeof(bind.value), "%s", ":8081");
+
+    error = _comand_line_options_service(service, arguments);
+    V_ASSERT(!IS_ERROR_CODE(error));
+    V_ASSERT_EQ_S((char *) service->options->address, VIRIATUM_DEFAULT_HOST);
+    V_ASSERT_EQ_U(service->options->port, 8081);
+
+    /* an ip6 address written between brackets is divided at the last
+    of its colons and not at one of the ones it carries itself */
+    SPRINTF(bind.value, sizeof(bind.value), "%s", "[::1]:8082");
+
+    error = _comand_line_options_service(service, arguments);
+    V_ASSERT(!IS_ERROR_CODE(error));
+    V_ASSERT_EQ_S((char *) service->options->address, "[::1]");
+    V_ASSERT_EQ_U(service->options->port, 8082);
+
+    /* a value carrying no colon at all names no port and so there is
+    nothing that could be bound out of it */
+    SPRINTF(bind.value, sizeof(bind.value), "%s", "127.0.0.1");
+
+    error = _comand_line_options_service(service, arguments);
+    V_ASSERT(IS_ERROR_CODE(error));
+
+    /* the flag on its own names neither of the two */
+    bind.type = SINGLE_ARGUMENT;
+
+    error = _comand_line_options_service(service, arguments);
+    V_ASSERT(IS_ERROR_CODE(error));
+    V_ASSERT_EQ_S(
+        (char *) get_last_error_message_safe(),
+        "--bind requires a host and a port"
+    );
+
+    /* the short forms name the same things the long ones do, and are
+    read after the value that names the two of them together, so that
+    the narrower of the flags is the one that decides */
+    set_value_string_hash_map(arguments, (unsigned char *) "bind", NULL);
+    port.type = VALUE_ARGUMENT;
+    SPRINTF(port.key, sizeof(port.key), "%s", "p");
+    SPRINTF(port.value, sizeof(port.value), "%s", "8083");
+    set_value_string_hash_map(arguments, (unsigned char *) "p", (void *) &port);
+    host.type = VALUE_ARGUMENT;
+    SPRINTF(host.key, sizeof(host.key), "%s", "h");
+    SPRINTF(host.value, sizeof(host.value), "%s", "127.0.0.2");
+    set_value_string_hash_map(arguments, (unsigned char *) "h", (void *) &host);
+
+    error = _comand_line_options_service(service, arguments);
+    V_ASSERT(!IS_ERROR_CODE(error));
+    V_ASSERT_EQ_S((char *) service->options->address, "127.0.0.2");
+    V_ASSERT_EQ_U(service->options->port, 8083);
+
+    /* the long forms take the place of the short ones whenever both
+    of them are given, they are the ones looked for first */
+    port.type = VALUE_ARGUMENT;
+    SPRINTF(port.key, sizeof(port.key), "%s", "port");
+    SPRINTF(port.value, sizeof(port.value), "%s", "8084");
+    set_value_string_hash_map(arguments, (unsigned char *) "port", (void *) &port);
+
+    error = _comand_line_options_service(service, arguments);
+    V_ASSERT(!IS_ERROR_CODE(error));
+    V_ASSERT_EQ_U(service->options->port, 8084);
+
+    /* deletes the map of the arguments and the service, the options
+    of it are released together with it */
+    delete_hash_map(arguments);
+    delete_service(service);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_ephemeral_service(void) {
+    /* allocates space for the error codes of the lifecycle calls, for
+    the service and for the port that was bound */
+    ERROR_CODE error;
+    struct service_t *service;
+    struct hash_map_t *arguments;
+    unsigned short port;
+
+    /* creates the service and loads both the specifications and the
+    default options into it, no configuration file is involved */
+    create_service(
+        &service,
+        (unsigned char *) "test",
+        (unsigned char *) "test"
+    );
+    load_specifications(service);
+    create_hash_map(&arguments, 0);
+    _default_options_service(service, arguments);
+    delete_hash_map(arguments);
+
+    /* asks for an ephemeral port, which is the one the kernel picks
+    at the binding instead of one that was named */
+    service->options->port = 0;
+    service->options->load_modules = 0;
+    service->options->workers = 0;
+    service->options->ip6 = 0;
+    calculate_options_service(service);
+    calculate_locations_service(service);
+
+    /* opens the service, which binds the socket and reads the port
+    that was given back off it */
+    error = open_service(service);
+    V_ASSERT(!IS_ERROR_CODE(error));
+    port = service->options->port;
+
+    /* closes the service before anything is verified, so that the
+    socket is never left behind by a failing assertion */
+    error = close_service(service);
+    V_ASSERT(!IS_ERROR_CODE(error));
+
+    /* the port that was bound is the one the options now carry, a
+    port of zero would leave nothing at all able to name it */
+    V_ASSERT(port != 0);
+
+    /* the string of the port agrees with it, that is the one the ip6
+    binding and the responses of the service are going to read */
+    V_ASSERT_EQ_U((unsigned short) atoi((char *) service->options->_port), port);
+
+    /* deletes the service releasing every internal structure */
+    delete_service(service);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
 const char *test_polling_service(void) {
     /* allocates space for the service whose specifications are going
     to be loaded and for the name of the mechanism it reports */

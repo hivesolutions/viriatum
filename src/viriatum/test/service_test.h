@@ -136,6 +136,25 @@ const char *test_arguments_options_service(void);
 const char *test_mode_options_service(void);
 
 /**
+ * Tests the flags of the command line that decide where the service
+ * listens, the one that names both the interface and the port at
+ * once and the short forms of the two that name each of them.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_bind_options_service(void);
+
+/**
+ * Tests that a service asked for an ephemeral port ends up carrying
+ * the port that was actually bound, so that it may be named.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_ephemeral_service(void);
+
+/**
  * Tests the flags that the banner of the startup carries, they
  * describe the build and decide what a connection looks at when it
  * opens.

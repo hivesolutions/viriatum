@@ -31,6 +31,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Test runs now report which tests left allocations behind them - [#49](https://github.com/hivesolutions/viriatum/issues/49)
 * Serving of a directory or of a python application straight from the command line - [#69](https://github.com/hivesolutions/viriatum/issues/69)
 * Naming of the configuration file to read, and a way of asking for none to be read at all - [#69](https://github.com/hivesolutions/viriatum/issues/69)
+* Naming of the interface and the port together, with short forms for each of them - [#69](https://github.com/hivesolutions/viriatum/issues/69)
+* Binding to a port picked by the system, which is then reported so a script may read it - [#69](https://github.com/hivesolutions/viriatum/issues/69)
 
 ### Changed
 
