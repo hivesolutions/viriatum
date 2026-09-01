@@ -2816,11 +2816,17 @@ ERROR_CODE _file_options_service(struct service_t *service, struct hash_map_t *a
 }
 
 /**
- * Verifies if the current build carries the handlers that serve a
- * python application, which are the ones that both the asgi and the
- * wsgi flags select.
+ * Verifies if this binary is able to serve a python application,
+ * which is what both the asgi and the wsgi flags ask of it.
+ * No build defines the guard below today and so the answer is always
+ * that it cannot: the two handlers that serve an application live in
+ * the extension under src/viriatum_python and are handed an
+ * application that the interpreter has already imported, while this
+ * binary embeds no interpreter of its own and so has nothing to hand
+ * them. The guard marks where that would be answered otherwise, once
+ * a build that does embed one exists.
  *
- * @return If the handlers of the python applications are around.
+ * @return If a python application may be served by this binary.
  */
 static char _has_python_options_service(void) {
 #ifdef VIRIATUM_PYTHON
@@ -3157,13 +3163,14 @@ ERROR_CODE _comand_line_options_service(struct service_t *service, struct hash_m
         );
         if(IS_ERROR_CODE(return_value)) { RAISE_AGAIN(return_value); }
 
-        /* a build that carries none of the python handlers would fail deep
-        inside the resolution of the handler, so the missing support is
-        named here together with the way of getting it */
+        /* a binary that embeds no interpreter would fail deep inside the
+        resolution of the handler, so what is missing is named here
+        together with the thing that does serve an application today,
+        naming a build option instead would send no one anywhere */
         if(_has_python_options_service() == FALSE) {
             RAISE_ERROR_F(
                 RUNTIME_EXCEPTION_ERROR_CODE,
-                (unsigned char *) "%s requires a build carrying python support, rebuild with VIRIATUM_BUILD_PYTHON",
+                (unsigned char *) "%s names an application but this binary embeds no python interpreter, serve it through the python package instead (viriatum.serve)",
                 selector
             );
         }

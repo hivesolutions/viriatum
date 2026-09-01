@@ -739,12 +739,20 @@ const char *test_mode_options_service(void) {
     V_ASSERT_EQ_S((char *) service->options->target_attribute, "app");
     V_ASSERT_EQ_S((char *) service->options->target_path, ".");
 
-    /* a build that carries no python support reports the missing
-    support instead of failing deep inside the resolution */
+    /* a binary that embeds no interpreter reports as much instead of
+    failing deep inside the resolution of the handler, and points at
+    the thing that does serve an application rather than at a build
+    option that would send no one anywhere */
 #ifdef VIRIATUM_PYTHON
     V_ASSERT(!IS_ERROR_CODE(error));
 #else
     V_ASSERT(IS_ERROR_CODE(error));
+    V_ASSERT_EQ_S(
+        (char *) get_last_error_message_safe(),
+        "--asgi names an application but this binary embeds no python "
+        "interpreter, serve it through the python package instead "
+        "(viriatum.serve)"
+    );
 #endif
 
     /* a target that names no attribute is refused before the support

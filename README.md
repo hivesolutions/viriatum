@@ -162,11 +162,13 @@ Serve the build of a single page application, with the routing and the cross ori
 
     viriatum --file=./dist --spa --cors --dev
 
-Serve a python application, named the way gunicorn and uvicorn name one, as a dotted path or as a file and an attribute (this needs a build carrying python support):
+Name a python application, the way gunicorn and uvicorn name one, as a dotted path or as a file and an attribute:
 
     viriatum --wsgi=budy:app --port=8080
     viriatum --asgi=budy.App --port=8080
     viriatum --asgi=./app.py:app --port=8080
+
+Neither of those two is served by this binary yet, which embeds no python interpreter of its own, so each of them reports as much and points at the [Python Package](#python-package) below, which is what serves an application today.
 
 Take a port from the system and read back the one that was bound, which is what a script driving the server wants:
 

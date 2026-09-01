@@ -24,10 +24,12 @@ The binary runs a useful server from its arguments alone, no file on disk is req
 ```bash
 ./bin/viriatum --file=. --bind=:8080
 ./bin/viriatum --file=./dist --spa --cors --dev
-./bin/viriatum --wsgi=budy:app --port=0
+./bin/viriatum --file=. --port=0
 ```
 
 The parser is flag based, a value travels after an equals sign, there is no positional argument and no sub command, so `viriatum .` is an error and a flag given a value with a space is not read as one. The short forms are `-p` for the port and `-h` for the host, help is reachable as `--help` alone.
+
+`--asgi` and `--wsgi` are the exception to all of that: they normalise the target they are given, onto a module, an attribute and the directory that has to be reachable for the import, and then report that this binary is not the thing that serves it. The two handlers that do live in the extension under `src/viriatum_python` and are handed an application the interpreter has already imported, while the binary embeds no interpreter of its own and so has nothing to hand them; `viriatum.serve` is what serves an application today. The guard `VIRIATUM_PYTHON` in `src/viriatum/system/service.c` marks where that would be answered otherwise and is defined by no build.
 
 The options are layered, the defaults first, then the configuration file, then the command line, so the flags complement a file rather than replace one. Which file is read is decided by `--config`, which names one and fails outright when it is not there, and by `--no-config`, which skips the discovery altogether; with neither of them the first of the three paths that `--help` lists is the one that is read. A flag that selects what is served, `--file`, `--asgi` or `--wsgi`, conflicts with a `--handler` that asks for another one and the run is refused naming both, so neither of them ever wins quietly.
 

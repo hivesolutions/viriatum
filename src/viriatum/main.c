@@ -43,13 +43,16 @@ positional argument and no sub command.\n\
 \n\
 What is going to be served:\n\
    --file      Serves the files of a directory, the working one by default\n\
-   --asgi      Serves the application of a target through a loop of events\n\
-   --wsgi      Serves the application of a target synchronously\n\
+   --asgi      Names the application of a target, driven through a loop\n\
+                 of events\n\
+   --wsgi      Names the application of a target, driven synchronously\n\
    --handler   Name of the handler to be used as default\n\
    --wwwroot   Sets the root directory from which static files are served\n\
 \n\
-Both --asgi and --wsgi need a build carrying python support, and name the\n\
-application as 'module:attribute', 'module.attribute' or 'file.py:attribute'.\n\
+Both of them name the application as 'module:attribute', 'module.attribute'\n\
+or 'file.py:attribute'. Neither is served by this binary, which embeds no\n\
+python interpreter of its own; the python package is what serves an\n\
+application today, through 'import viriatum; viriatum.serve(app)'.\n\
 \n\
 Where it is going to listen:\n\
    --bind      Sets the host and the port together, ':8080' standing for\n\
@@ -108,7 +111,7 @@ The tests may be selected and reported using:\n\
 Examples:\n\
    viriatum --file=. --bind=:8080\n\
    viriatum --file=./dist --spa --cors --dev\n\
-   viriatum --wsgi=budy:app --no-config -p=8080\n\
+   viriatum --list-handlers\n\
    viriatum --config=/etc/viriatum/viriatum.ini --check\n"
 
 ERROR_CODE print_information(void) {
