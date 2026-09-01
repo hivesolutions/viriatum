@@ -34,6 +34,24 @@ Windows 10 SDK and later, so guard against older SDKs */
 #endif
 #endif
 
+/**
+ * The level the process has been set to, every message under it is
+ * dropped instead of being written to the output.
+ */
+static enum logging_level_e _level_logging = LOGGING_INFO;
+
+void set_level_logging(enum logging_level_e level) {
+    _level_logging = level;
+}
+
+enum logging_level_e get_level_logging(void) {
+    return _level_logging;
+}
+
+int is_level_logging(enum logging_level_e level) {
+    return level >= _level_logging;
+}
+
 int use_color_logging(void) {
     /* caches the detection result so that the terminal
     check runs only once during the process lifetime */

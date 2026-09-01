@@ -41,6 +41,21 @@
 #define PRINT_FLUSH() fflush(stdout)
 #endif
 
+/**
+ * The levels a message may be written under, a message reaching the
+ * output only once the level of it is at or above the one that the
+ * process has been set to.
+ * The debug level is only ever produced by a build that carries the
+ * debug messages, a release one writes none of them whatever the
+ * level it has been set to.
+ */
+typedef enum logging_level_e {
+    LOGGING_DEBUG = 1,
+    LOGGING_INFO,
+    LOGGING_WARNING,
+    LOGGING_ERROR
+} logging_level;
+
 /* ANSI colour escape sequences used to decorate log level labels
 and the date prefix when the terminal supports colour output */
 #define V_COLOR_RESET "\x1b[0m"
@@ -79,31 +94,63 @@ terminal supports it, or as plain text otherwise */
 #endif
 
 #ifdef VIRIATUM_DEBUG
-#define V_DEBUG(format)                    \
-    V_MESSAGE("[DEBUG]  ", V_COLOR_DEBUG); \
-    PRINTF(format)
-#define V_DEBUG_F(format, ...)             \
-    V_MESSAGE("[DEBUG]  ", V_COLOR_DEBUG); \
-    PRINTF_F(format, __VA_ARGS__)
-#define V_DEBUG_CTX(context, format)                        \
-    V_MESSAGE_CONTEXT("[DEBUG]  ", V_COLOR_DEBUG, context); \
-    PRINTF(format)
-#define V_DEBUG_CTX_F(context, format, ...)                 \
-    V_MESSAGE_CONTEXT("[DEBUG]  ", V_COLOR_DEBUG, context); \
-    PRINTF_F(format, __VA_ARGS__)
+#define V_DEBUG(format)                            \
+    do {                                           \
+        if(is_level_logging(LOGGING_DEBUG)) {      \
+            V_MESSAGE("[DEBUG]  ", V_COLOR_DEBUG); \
+            PRINTF(format);                        \
+        }                                          \
+    } while(0)
+#define V_DEBUG_F(format, ...)                     \
+    do {                                           \
+        if(is_level_logging(LOGGING_DEBUG)) {      \
+            V_MESSAGE("[DEBUG]  ", V_COLOR_DEBUG); \
+            PRINTF_F(format, __VA_ARGS__);         \
+        }                                          \
+    } while(0)
+#define V_DEBUG_CTX(context, format)                                \
+    do {                                                            \
+        if(is_level_logging(LOGGING_DEBUG)) {                       \
+            V_MESSAGE_CONTEXT("[DEBUG]  ", V_COLOR_DEBUG, context); \
+            PRINTF(format);                                         \
+        }                                                           \
+    } while(0)
+#define V_DEBUG_CTX_F(context, format, ...)                         \
+    do {                                                            \
+        if(is_level_logging(LOGGING_DEBUG)) {                       \
+            V_MESSAGE_CONTEXT("[DEBUG]  ", V_COLOR_DEBUG, context); \
+            PRINTF_F(format, __VA_ARGS__);                          \
+        }                                                           \
+    } while(0)
 
-#define V_INFO(format)                    \
-    V_MESSAGE("[INFO]   ", V_COLOR_INFO); \
-    PRINTF(format)
-#define V_INFO_F(format, ...)             \
-    V_MESSAGE("[INFO]   ", V_COLOR_INFO); \
-    PRINTF_F(format, __VA_ARGS__)
-#define V_INFO_CTX(context, format)                        \
-    V_MESSAGE_CONTEXT("[INFO]   ", V_COLOR_INFO, context); \
-    PRINTF(format)
-#define V_INFO_CTX_F(context, format, ...)                 \
-    V_MESSAGE_CONTEXT("[INFO]   ", V_COLOR_INFO, context); \
-    PRINTF_F(format, __VA_ARGS__)
+#define V_INFO(format)                            \
+    do {                                          \
+        if(is_level_logging(LOGGING_INFO)) {      \
+            V_MESSAGE("[INFO]   ", V_COLOR_INFO); \
+            PRINTF(format);                       \
+        }                                         \
+    } while(0)
+#define V_INFO_F(format, ...)                     \
+    do {                                          \
+        if(is_level_logging(LOGGING_INFO)) {      \
+            V_MESSAGE("[INFO]   ", V_COLOR_INFO); \
+            PRINTF_F(format, __VA_ARGS__);        \
+        }                                         \
+    } while(0)
+#define V_INFO_CTX(context, format)                                \
+    do {                                                           \
+        if(is_level_logging(LOGGING_INFO)) {                       \
+            V_MESSAGE_CONTEXT("[INFO]   ", V_COLOR_INFO, context); \
+            PRINTF(format);                                        \
+        }                                                          \
+    } while(0)
+#define V_INFO_CTX_F(context, format, ...)                         \
+    do {                                                           \
+        if(is_level_logging(LOGGING_INFO)) {                       \
+            V_MESSAGE_CONTEXT("[INFO]   ", V_COLOR_INFO, context); \
+            PRINTF_F(format, __VA_ARGS__);                         \
+        }                                                          \
+    } while(0)
 #endif
 
 #ifndef VIRIATUM_DEBUG
@@ -112,45 +159,93 @@ terminal supports it, or as plain text otherwise */
 #define V_DEBUG_CTX(context, format) dump_context(context, format)
 #define V_DEBUG_CTX_F(context, format, ...) dump_context_multiple(context, format, __VA_ARGS__)
 
-#define V_INFO(format)                    \
-    V_MESSAGE("[INFO]   ", V_COLOR_INFO); \
-    PRINTF(format)
-#define V_INFO_F(format, ...)             \
-    V_MESSAGE("[INFO]   ", V_COLOR_INFO); \
-    PRINTF_F(format, __VA_ARGS__)
-#define V_INFO_CTX(context, format)                        \
-    V_MESSAGE_CONTEXT("[INFO]   ", V_COLOR_INFO, context); \
-    PRINTF(format)
-#define V_INFO_CTX_F(context, format, ...)                 \
-    V_MESSAGE_CONTEXT("[INFO]   ", V_COLOR_INFO, context); \
-    PRINTF_F(format, __VA_ARGS__)
+#define V_INFO(format)                            \
+    do {                                          \
+        if(is_level_logging(LOGGING_INFO)) {      \
+            V_MESSAGE("[INFO]   ", V_COLOR_INFO); \
+            PRINTF(format);                       \
+        }                                         \
+    } while(0)
+#define V_INFO_F(format, ...)                     \
+    do {                                          \
+        if(is_level_logging(LOGGING_INFO)) {      \
+            V_MESSAGE("[INFO]   ", V_COLOR_INFO); \
+            PRINTF_F(format, __VA_ARGS__);        \
+        }                                         \
+    } while(0)
+#define V_INFO_CTX(context, format)                                \
+    do {                                                           \
+        if(is_level_logging(LOGGING_INFO)) {                       \
+            V_MESSAGE_CONTEXT("[INFO]   ", V_COLOR_INFO, context); \
+            PRINTF(format);                                        \
+        }                                                          \
+    } while(0)
+#define V_INFO_CTX_F(context, format, ...)                         \
+    do {                                                           \
+        if(is_level_logging(LOGGING_INFO)) {                       \
+            V_MESSAGE_CONTEXT("[INFO]   ", V_COLOR_INFO, context); \
+            PRINTF_F(format, __VA_ARGS__);                         \
+        }                                                          \
+    } while(0)
 #endif
 
-#define V_WARNING(format)                    \
-    V_MESSAGE("[WARNING]", V_COLOR_WARNING); \
-    PRINTF(format)
-#define V_WARNING_F(format, ...)             \
-    V_MESSAGE("[WARNING]", V_COLOR_WARNING); \
-    PRINTF_F(format, __VA_ARGS__)
-#define V_WARNING_CTX(context, format)                        \
-    V_MESSAGE_CONTEXT("[WARNING]", V_COLOR_WARNING, context); \
-    PRINTF(format)
-#define V_WARNING_CTX_F(context, format, ...)                 \
-    V_MESSAGE_CONTEXT("[WARNING]", V_COLOR_WARNING, context); \
-    PRINTF_F(format, __VA_ARGS__)
+#define V_WARNING(format)                            \
+    do {                                             \
+        if(is_level_logging(LOGGING_WARNING)) {      \
+            V_MESSAGE("[WARNING]", V_COLOR_WARNING); \
+            PRINTF(format);                          \
+        }                                            \
+    } while(0)
+#define V_WARNING_F(format, ...)                     \
+    do {                                             \
+        if(is_level_logging(LOGGING_WARNING)) {      \
+            V_MESSAGE("[WARNING]", V_COLOR_WARNING); \
+            PRINTF_F(format, __VA_ARGS__);           \
+        }                                            \
+    } while(0)
+#define V_WARNING_CTX(context, format)                                \
+    do {                                                              \
+        if(is_level_logging(LOGGING_WARNING)) {                       \
+            V_MESSAGE_CONTEXT("[WARNING]", V_COLOR_WARNING, context); \
+            PRINTF(format);                                           \
+        }                                                             \
+    } while(0)
+#define V_WARNING_CTX_F(context, format, ...)                         \
+    do {                                                              \
+        if(is_level_logging(LOGGING_WARNING)) {                       \
+            V_MESSAGE_CONTEXT("[WARNING]", V_COLOR_WARNING, context); \
+            PRINTF_F(format, __VA_ARGS__);                            \
+        }                                                             \
+    } while(0)
 
-#define V_ERROR(format)                    \
-    V_MESSAGE("[ERROR]  ", V_COLOR_ERROR); \
-    PRINTF(format)
-#define V_ERROR_F(format, ...)             \
-    V_MESSAGE("[ERROR]  ", V_COLOR_ERROR); \
-    PRINTF_F(format, __VA_ARGS__)
-#define V_ERROR_CTX(context, format)                        \
-    V_MESSAGE_CONTEXT("[ERROR]  ", V_COLOR_ERROR, context); \
-    PRINTF(format)
-#define V_ERROR_CTX_F(context, format, ...)                 \
-    V_MESSAGE_CONTEXT("[ERROR]  ", V_COLOR_ERROR, context); \
-    PRINTF_F(format, __VA_ARGS__)
+#define V_ERROR(format)                            \
+    do {                                           \
+        if(is_level_logging(LOGGING_ERROR)) {      \
+            V_MESSAGE("[ERROR]  ", V_COLOR_ERROR); \
+            PRINTF(format);                        \
+        }                                          \
+    } while(0)
+#define V_ERROR_F(format, ...)                     \
+    do {                                           \
+        if(is_level_logging(LOGGING_ERROR)) {      \
+            V_MESSAGE("[ERROR]  ", V_COLOR_ERROR); \
+            PRINTF_F(format, __VA_ARGS__);         \
+        }                                          \
+    } while(0)
+#define V_ERROR_CTX(context, format)                                \
+    do {                                                            \
+        if(is_level_logging(LOGGING_ERROR)) {                       \
+            V_MESSAGE_CONTEXT("[ERROR]  ", V_COLOR_ERROR, context); \
+            PRINTF(format);                                         \
+        }                                                           \
+    } while(0)
+#define V_ERROR_CTX_F(context, format, ...)                         \
+    do {                                                            \
+        if(is_level_logging(LOGGING_ERROR)) {                       \
+            V_MESSAGE_CONTEXT("[ERROR]  ", V_COLOR_ERROR, context); \
+            PRINTF_F(format, __VA_ARGS__);                          \
+        }                                                           \
+    } while(0)
 
 #define V_PRINT(format) PRINTF(format)
 #define V_PRINT_F(format, ...) PRINTF_F(format, __VA_ARGS__)
@@ -167,6 +262,9 @@ terminal supports it, or as plain text otherwise */
         if(use_color_logging()) { PRINTF_F("%s", V_COLOR_RESET); } \
     } while(0)
 
+VIRIATUM_EXPORT_PREFIX void set_level_logging(enum logging_level_e level);
+VIRIATUM_EXPORT_PREFIX enum logging_level_e get_level_logging(void);
+VIRIATUM_EXPORT_PREFIX int is_level_logging(enum logging_level_e level);
 VIRIATUM_EXPORT_PREFIX int use_color_logging(void);
 VIRIATUM_EXPORT_PREFIX void print_date_logging(void);
 VIRIATUM_EXPORT_PREFIX void debug(const char *format, ...);

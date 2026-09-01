@@ -35,6 +35,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Binding to a port picked by the system, which is then reported so a script may read it - [#69](https://github.com/hivesolutions/viriatum/issues/69)
 * Naming of the index file, turning the directory listing off, and the permissive cross origin fields - [#69](https://github.com/hivesolutions/viriatum/issues/69)
 * Serving of the index file for any path that does not resolve, which is what a single page application needs - [#69](https://github.com/hivesolutions/viriatum/issues/69)
+* Raising and lowering of how much is written, and turning the line written for each request on and off - [#69](https://github.com/hivesolutions/viriatum/issues/69)
+* A single flag that turns on the friendly shape of the serving for a person trying the server - [#69](https://github.com/hivesolutions/viriatum/issues/69)
 
 ### Changed
 

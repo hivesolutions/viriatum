@@ -3070,6 +3070,18 @@ ERROR_CODE _comand_line_options_service(struct service_t *service, struct hash_m
         if(IS_ERROR_CODE(return_value)) { RAISE_AGAIN(return_value); }
     }
 
+    /* tries to retrieve the dev argument from the arguments map, its
+    presence turning on the friendly shape of the serving together,
+    the listing of a directory, the line written for each request and
+    the level that writes the most, so that a person trying the server
+    gets all of it without having to name each part */
+    get_value_string_hash_map(arguments, (unsigned char *) "dev", &value);
+    if(value != NULL) {
+        service_options->listing = 1;
+        service_options->access_log = 1;
+        set_level_logging(LOGGING_DEBUG);
+    }
+
     /* tries to retrieve the index argument from the arguments map, then
     sets the split value around the space character in the index value,
     the same way the configuration file names them */
@@ -3113,6 +3125,23 @@ ERROR_CODE _comand_line_options_service(struct service_t *service, struct hash_m
         );
         service_options->index_count = 1;
     }
+
+    /* tries to retrieve both of the arguments that decide whether a line
+    is written for each of the requests, the command line form of the
+    setting that the configuration file already carries */
+    get_value_string_hash_map(arguments, (unsigned char *) "access-log", &value);
+    if(value != NULL) { service_options->access_log = 1; }
+    get_value_string_hash_map(arguments, (unsigned char *) "no-access-log", &value);
+    if(value != NULL) { service_options->access_log = 0; }
+
+    /* tries to retrieve both of the arguments that move the level of the
+    logging, the raising one down to the messages of the debugging and
+    the lowering one up to the ones that report a problem, they are read
+    last so that either of them takes the place of the umbrella */
+    get_value_string_hash_map(arguments, (unsigned char *) "v", &value);
+    if(value != NULL) { set_level_logging(LOGGING_DEBUG); }
+    get_value_string_hash_map(arguments, (unsigned char *) "q", &value);
+    if(value != NULL) { set_level_logging(LOGGING_WARNING); }
 
     /* tries to retrieve the local argument from the arguments map, then
     in case the (local) value is set, sets the service as local  */

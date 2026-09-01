@@ -157,6 +157,17 @@ const char *test_bind_options_service(void);
 const char *test_static_options_service(void);
 
 /**
+ * Tests the flags of the command line that make the serving friendly
+ * to a person trying it, the ones that move the level of the logging,
+ * that decide whether a line is written for each request and the
+ * umbrella that turns the whole shape of it on.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_dev_options_service(void);
+
+/**
  * Tests that a service asked for an ephemeral port ends up carrying
  * the port that was actually bound, so that it may be named.
  *

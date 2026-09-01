@@ -991,6 +991,134 @@ const char *test_static_options_service(void) {
     return NULL;
 }
 
+const char *test_dev_options_service(void) {
+    /* allocates space for the service, for the map of the arguments
+    that the command line produces and for the ones of them that make
+    the serving friendly to a person trying it */
+    ERROR_CODE error;
+    struct service_t *service;
+    struct hash_map_t *arguments;
+    struct argument_t dev;
+    struct argument_t quiet;
+    struct argument_t verbose;
+    struct argument_t access_log;
+    struct argument_t no_access_log;
+
+    /* keeps the level the process is running under so that it may be
+    restored, the tests that follow write under it */
+    enum logging_level_e level = get_level_logging();
+
+    /* creates the service together with the empty map of the
+    arguments and loads the defaults into it */
+    create_service(
+        &service,
+        (unsigned char *) "test",
+        (unsigned char *) "test"
+    );
+    create_hash_map(&arguments, 0);
+    _default_options_service(service, arguments);
+
+    /* a line is written for each of the requests by default, which is
+    what a deployment under load is the one to turn off */
+    V_ASSERT_EQ_U(service->options->access_log, 1);
+
+    /* the negative form of the access log flag turns the writing of
+    that line off, the positive one turning it back on */
+    no_access_log.type = SINGLE_ARGUMENT;
+    SPRINTF(no_access_log.key, sizeof(no_access_log.key), "%s", "no-access-log");
+    set_value_string_hash_map(arguments, (unsigned char *) "no-access-log", (void *) &no_access_log);
+
+    error = _comand_line_options_service(service, arguments);
+    V_ASSERT(!IS_ERROR_CODE(error));
+    V_ASSERT_EQ_U(service->options->access_log, 0);
+
+    /* the negative form is read last and so it is the one that decides
+    whenever the two of them are given together */
+    access_log.type = SINGLE_ARGUMENT;
+    SPRINTF(access_log.key, sizeof(access_log.key), "%s", "access-log");
+    set_value_string_hash_map(arguments, (unsigned char *) "access-log", (void *) &access_log);
+
+    error = _comand_line_options_service(service, arguments);
+    V_ASSERT(!IS_ERROR_CODE(error));
+    V_ASSERT_EQ_U(service->options->access_log, 0);
+
+    /* on its own the positive form turns the writing of the line back
+    on, which is the value the defaults already carry */
+    set_value_string_hash_map(arguments, (unsigned char *) "no-access-log", NULL);
+
+    error = _comand_line_options_service(service, arguments);
+    V_ASSERT(!IS_ERROR_CODE(error));
+    V_ASSERT_EQ_U(service->options->access_log, 1);
+
+    /* the lowering flag moves the level up to the messages that report
+    a problem, so that the ones which merely inform are dropped */
+    quiet.type = SINGLE_ARGUMENT;
+    SPRINTF(quiet.key, sizeof(quiet.key), "%s", "q");
+    set_value_string_hash_map(arguments, (unsigned char *) "q", (void *) &quiet);
+
+    error = _comand_line_options_service(service, arguments);
+    V_ASSERT(!IS_ERROR_CODE(error));
+    V_ASSERT_EQ_U(get_level_logging(), LOGGING_WARNING);
+    V_ASSERT(is_level_logging(LOGGING_WARNING));
+    V_ASSERT(!is_level_logging(LOGGING_INFO));
+
+    /* the raising flag moves it back down to the messages of the
+    debugging, the ones a release build carries none of */
+    verbose.type = SINGLE_ARGUMENT;
+    SPRINTF(verbose.key, sizeof(verbose.key), "%s", "v");
+    set_value_string_hash_map(arguments, (unsigned char *) "v", (void *) &verbose);
+
+    error = _comand_line_options_service(service, arguments);
+    V_ASSERT(!IS_ERROR_CODE(error));
+    V_ASSERT_EQ_U(get_level_logging(), LOGGING_WARNING);
+
+    /* on its own it is the raising one that decides, the lowering flag
+    being the one that is read last of the two */
+    set_value_string_hash_map(arguments, (unsigned char *) "q", NULL);
+
+    error = _comand_line_options_service(service, arguments);
+    V_ASSERT(!IS_ERROR_CODE(error));
+    V_ASSERT_EQ_U(get_level_logging(), LOGGING_DEBUG);
+
+    /* the umbrella turns the friendly shape of the serving on together,
+    reaching the listing, the line of the request and the level */
+    set_value_string_hash_map(arguments, (unsigned char *) "v", NULL);
+    set_value_string_hash_map(arguments, (unsigned char *) "access-log", NULL);
+    set_level_logging(LOGGING_INFO);
+    service->options->listing = 0;
+    service->options->access_log = 0;
+    dev.type = SINGLE_ARGUMENT;
+    SPRINTF(dev.key, sizeof(dev.key), "%s", "dev");
+    set_value_string_hash_map(arguments, (unsigned char *) "dev", (void *) &dev);
+
+    error = _comand_line_options_service(service, arguments);
+    V_ASSERT(!IS_ERROR_CODE(error));
+    V_ASSERT_EQ_U(service->options->listing, 1);
+    V_ASSERT_EQ_U(service->options->access_log, 1);
+    V_ASSERT_EQ_U(get_level_logging(), LOGGING_DEBUG);
+
+    /* the umbrella is read before every one of the flags it turns on,
+    so that any of them given beside it is still the one that decides */
+    set_value_string_hash_map(arguments, (unsigned char *) "no-access-log", (void *) &no_access_log);
+
+    error = _comand_line_options_service(service, arguments);
+    V_ASSERT(!IS_ERROR_CODE(error));
+    V_ASSERT_EQ_U(service->options->access_log, 0);
+
+    /* restores the level the process was running under, the tests that
+    follow this one are meant to write the very same way */
+    set_level_logging(level);
+
+    /* deletes the map of the arguments and the service, the options
+    of it are released together with it */
+    delete_hash_map(arguments);
+    delete_service(service);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
 const char *test_ephemeral_service(void) {
     /* allocates space for the error codes of the lifecycle calls, for
     the service and for the port that was bound */
