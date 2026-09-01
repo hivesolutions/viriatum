@@ -592,6 +592,27 @@ typedef struct service_options_t {
     unsigned char *handler_name;
 
     /**
+     * The module of the application that the python based handler
+     * is meant to load, normalised out of the target that either
+     * the asgi or the wsgi flag carried.
+     */
+    unsigned char target_module[VIRIATUM_MAX_PATH_SIZE];
+
+    /**
+     * The attribute of the module above under which the application
+     * itself is found, the last segment of a dotted target and the
+     * part that follows the colon of the other two spellings.
+     */
+    unsigned char target_attribute[VIRIATUM_MAX_PATH_SIZE];
+
+    /**
+     * The directory that must be reachable for the module above to
+     * be imported, the one of the target when it named a file and
+     * the working directory when it named a bare module.
+     */
+    unsigned char target_path[VIRIATUM_MAX_PATH_SIZE];
+
+    /**
      * If the current service is running in
      * the local version (local file system).
      */
@@ -658,6 +679,27 @@ typedef struct service_options_t {
      * kind of thing a deployment under load turns off.
      */
     unsigned char access_log;
+
+    /**
+     * If the listing of a directory should be produced for a path
+     * that resolves to one and carries no index file, an unset
+     * value answering such a request with an error instead.
+     */
+    unsigned char listing;
+
+    /**
+     * If a path that resolves to nothing at all should be served
+     * with the index file instead of an error, which is the
+     * routing that a single page application requires.
+     */
+    unsigned char spa;
+
+    /**
+     * If the permissive cross origin fields should travel on every
+     * one of the responses, so that a page served from another
+     * origin is allowed to read what this service answers.
+     */
+    unsigned char cors;
 
     /**
      * The default virtual host to be used in any
@@ -1632,6 +1674,7 @@ ERROR_CODE _open_service(struct service_t *service);
 ERROR_CODE _default_options_service(struct service_t *service, struct hash_map_t *arguments);
 ERROR_CODE _file_options_service(struct service_t *service, struct hash_map_t *arguments);
 ERROR_CODE _comand_line_options_service(struct service_t *service, struct hash_map_t *arguments);
+ERROR_CODE _target_options_service(char *target, unsigned char *module, unsigned char *attribute, unsigned char *path);
 const char *_get_uptime_service(struct service_t *service, size_t count);
 const char *_get_mime_type_service(struct service_t *service, char *extension);
 

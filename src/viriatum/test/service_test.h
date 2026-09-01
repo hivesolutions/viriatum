@@ -96,6 +96,16 @@ const char *test_open_service_busy(void);
 const char *test_file_options_service(void);
 
 /**
+ * Tests the normalisation of the target of an application into the
+ * module, the attribute and the directory that has to be reachable
+ * for that module to be imported.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_target_options_service(void);
+
+/**
  * Tests the options that the arguments of the command line carry,
  * including the one that turns the serving of the cleartext form
  * of the most recent version of the protocol off.
@@ -104,6 +114,16 @@ const char *test_file_options_service(void);
  * the unit test should describe possible errors.
  */
 const char *test_arguments_options_service(void);
+
+/**
+ * Tests the flags of the command line that select what the service
+ * is going to serve, together with the conflicts between them that
+ * have to be rejected instead of one of them winning quietly.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_mode_options_service(void);
 
 /**
  * Tests the flags that the banner of the startup carries, they

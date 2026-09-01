@@ -355,6 +355,95 @@ const char *test_file_options_service(void) {
     return NULL;
 }
 
+const char *test_target_options_service(void) {
+    /* allocates space for the error code of the normalisation and
+    for the three parts that a target is taken apart into */
+    ERROR_CODE error;
+    unsigned char module[VIRIATUM_MAX_PATH_SIZE];
+    unsigned char attribute[VIRIATUM_MAX_PATH_SIZE];
+    unsigned char path[VIRIATUM_MAX_PATH_SIZE];
+
+    /* allocates space for a target longer than the buffers it would
+    be taken apart into, used in the verification of the rejection */
+    char long_target[VIRIATUM_MAX_PATH_SIZE + 2];
+
+    /* the dotted spelling carries the attribute as the last of its
+    segments and the module as everything that comes before it */
+    error = _target_options_service("budy.App", module, attribute, path);
+    V_ASSERT(!IS_ERROR_CODE(error));
+    V_ASSERT_EQ_S((char *) module, "budy");
+    V_ASSERT_EQ_S((char *) attribute, "App");
+    V_ASSERT_EQ_S((char *) path, ".");
+
+    /* the colon spelling, the one that both gunicorn and uvicorn
+    take, divides the module from the attribute at the colon */
+    error = _target_options_service("budy:app", module, attribute, path);
+    V_ASSERT(!IS_ERROR_CODE(error));
+    V_ASSERT_EQ_S((char *) module, "budy");
+    V_ASSERT_EQ_S((char *) attribute, "app");
+    V_ASSERT_EQ_S((char *) path, ".");
+
+    /* a module of more than one segment keeps every one of them, the
+    colon and not the dot being what divides the two parts */
+    error = _target_options_service("budy.web.main:app", module, attribute, path);
+    V_ASSERT(!IS_ERROR_CODE(error));
+    V_ASSERT_EQ_S((char *) module, "budy.web.main");
+    V_ASSERT_EQ_S((char *) attribute, "app");
+
+    /* the file spelling names the file the module lives in, the
+    directory of it being what has to be put on the import path */
+    error = _target_options_service("./app.py:app", module, attribute, path);
+    V_ASSERT(!IS_ERROR_CODE(error));
+    V_ASSERT_EQ_S((char *) module, "app");
+    V_ASSERT_EQ_S((char *) attribute, "app");
+    V_ASSERT_EQ_S((char *) path, "./");
+
+    /* a file named with no directory at all is looked for under the
+    working directory, the same one a bare module is looked for in */
+    error = _target_options_service("app.py:app", module, attribute, path);
+    V_ASSERT(!IS_ERROR_CODE(error));
+    V_ASSERT_EQ_S((char *) module, "app");
+    V_ASSERT_EQ_S((char *) path, ".");
+
+    /* a directory written with the separator of windows is taken
+    apart the very same way as one written with the other */
+    error = _target_options_service("srv\\app.py:app", module, attribute, path);
+    V_ASSERT(!IS_ERROR_CODE(error));
+    V_ASSERT_EQ_S((char *) module, "app");
+    V_ASSERT_EQ_S((char *) path, "srv\\");
+
+    /* a target that names no attribute at all leaves nothing to be
+    loaded out of the module and so is refused */
+    error = _target_options_service("budy", module, attribute, path);
+    V_ASSERT(IS_ERROR_CODE(error));
+    error = _target_options_service("./app.py", module, attribute, path);
+    V_ASSERT(IS_ERROR_CODE(error));
+    error = _target_options_service("budy:", module, attribute, path);
+    V_ASSERT(IS_ERROR_CODE(error));
+
+    /* a target that names no module is refused the same way, the
+    attribute on its own naming nothing that may be imported */
+    error = _target_options_service(":app", module, attribute, path);
+    V_ASSERT(IS_ERROR_CODE(error));
+
+    /* neither an unset nor an empty target names anything at all */
+    error = _target_options_service(NULL, module, attribute, path);
+    V_ASSERT(IS_ERROR_CODE(error));
+    error = _target_options_service("", module, attribute, path);
+    V_ASSERT(IS_ERROR_CODE(error));
+
+    /* a target longer than the buffers is refused instead of being
+    truncated into a module that was never named */
+    memset(long_target, 'a', sizeof(long_target) - 1);
+    long_target[sizeof(long_target) - 1] = '\0';
+    error = _target_options_service(long_target, module, attribute, path);
+    V_ASSERT(IS_ERROR_CODE(error));
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
 const char *test_ran_service(void) {
     /* allocates space for the error code returned by the
     service stopping operation */
@@ -418,6 +507,134 @@ const char *test_arguments_options_service(void) {
     nothing to report for this execution */
     return NULL;
 }
+const char *test_mode_options_service(void) {
+    /* allocates space for the service, for the map of the arguments
+    that the command line produces and for the ones of them through
+    which what is served is selected */
+    ERROR_CODE error;
+    struct service_t *service;
+    struct hash_map_t *arguments;
+    struct argument_t file;
+    struct argument_t handler;
+    struct argument_t application;
+
+    /* creates the service together with the empty map of the
+    arguments, the options of it start at the default values */
+    create_service(
+        &service,
+        (unsigned char *) "test",
+        (unsigned char *) "test"
+    );
+    create_hash_map(&arguments, 0);
+
+    /* the file flag on its own selects the handler of the static
+    files and serves them out of the working directory */
+    file.type = SINGLE_ARGUMENT;
+    SPRINTF(file.key, sizeof(file.key), "%s", "file");
+    set_value_string_hash_map(arguments, (unsigned char *) "file", (void *) &file);
+
+    error = _comand_line_options_service(service, arguments);
+    V_ASSERT(!IS_ERROR_CODE(error));
+    V_ASSERT_EQ_S((char *) service->options->handler_name, "file");
+    V_ASSERT_EQ_S((char *) service->options->www_root, ".");
+
+    /* the value that the flag carries names the root the files are
+    served from, taking the place of the working directory */
+    file.type = VALUE_ARGUMENT;
+    SPRINTF(file.value, sizeof(file.value), "%s", "/srv/www");
+
+    error = _comand_line_options_service(service, arguments);
+    V_ASSERT(!IS_ERROR_CODE(error));
+    V_ASSERT_EQ_S((char *) service->options->www_root, "/srv/www");
+
+    /* a handler flag asking for the very same handler is no conflict
+    at all, the two of them agreeing on what is going to serve */
+    handler.type = VALUE_ARGUMENT;
+    SPRINTF(handler.key, sizeof(handler.key), "%s", "handler");
+    SPRINTF(handler.value, sizeof(handler.value), "%s", "file");
+    set_value_string_hash_map(arguments, (unsigned char *) "handler", (void *) &handler);
+
+    error = _comand_line_options_service(service, arguments);
+    V_ASSERT(!IS_ERROR_CODE(error));
+    V_ASSERT_EQ_S((char *) service->options->handler_name, "file");
+
+    /* a handler flag asking for another handler is in conflict with
+    the mode flag and is rejected naming both of them, so that
+    neither of the two wins over the other quietly */
+    SPRINTF(handler.value, sizeof(handler.value), "%s", "proxy");
+
+    error = _comand_line_options_service(service, arguments);
+    V_ASSERT(IS_ERROR_CODE(error));
+    V_ASSERT_EQ_S(
+        (char *) get_last_error_message_safe(),
+        "conflicting handler: --file selects \"file\", --handler asks for \"proxy\""
+    );
+
+    /* the two flags are taken out of the map so that the modes which
+    follow are verified on their own */
+    set_value_string_hash_map(arguments, (unsigned char *) "file", NULL);
+    set_value_string_hash_map(arguments, (unsigned char *) "handler", NULL);
+
+    /* the asgi flag selects the handler that drives an application
+    through the loop of events and records the target it named */
+    application.type = VALUE_ARGUMENT;
+    SPRINTF(application.key, sizeof(application.key), "%s", "asgi");
+    SPRINTF(application.value, sizeof(application.value), "%s", "budy:app");
+    set_value_string_hash_map(arguments, (unsigned char *) "asgi", (void *) &application);
+
+    error = _comand_line_options_service(service, arguments);
+    V_ASSERT_EQ_S((char *) service->options->handler_name, "asgi");
+    V_ASSERT_EQ_S((char *) service->options->target_module, "budy");
+    V_ASSERT_EQ_S((char *) service->options->target_attribute, "app");
+    V_ASSERT_EQ_S((char *) service->options->target_path, ".");
+
+    /* a build that carries no python support reports the missing
+    support instead of failing deep inside the resolution */
+#ifdef VIRIATUM_PYTHON
+    V_ASSERT(!IS_ERROR_CODE(error));
+#else
+    V_ASSERT(IS_ERROR_CODE(error));
+#endif
+
+    /* a target that names no attribute is refused before the support
+    of the build is ever looked at */
+    SPRINTF(application.value, sizeof(application.value), "%s", "budy");
+    error = _comand_line_options_service(service, arguments);
+    V_ASSERT(IS_ERROR_CODE(error));
+
+    /* the flag on its own carries no application at all and so is
+    refused naming the flag that was given */
+    application.type = SINGLE_ARGUMENT;
+    error = _comand_line_options_service(service, arguments);
+    V_ASSERT(IS_ERROR_CODE(error));
+    V_ASSERT_EQ_S(
+        (char *) get_last_error_message_safe(),
+        "--asgi requires an application target"
+    );
+
+    /* the wsgi flag selects the synchronous handler instead, the key
+    of the argument being what tells the two of them apart */
+    set_value_string_hash_map(arguments, (unsigned char *) "asgi", NULL);
+    application.type = VALUE_ARGUMENT;
+    SPRINTF(application.key, sizeof(application.key), "%s", "wsgi");
+    SPRINTF(application.value, sizeof(application.value), "%s", "budy.App");
+    set_value_string_hash_map(arguments, (unsigned char *) "wsgi", (void *) &application);
+
+    error = _comand_line_options_service(service, arguments);
+    V_ASSERT_EQ_S((char *) service->options->handler_name, "python");
+    V_ASSERT_EQ_S((char *) service->options->target_module, "budy");
+    V_ASSERT_EQ_S((char *) service->options->target_attribute, "App");
+
+    /* deletes the map of the arguments and the service, the options
+    of it are released together with it */
+    delete_hash_map(arguments);
+    delete_service(service);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
 const char *test_polling_service(void) {
     /* allocates space for the service whose specifications are going
     to be loaded and for the name of the mechanism it reports */

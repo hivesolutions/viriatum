@@ -167,6 +167,9 @@ void create_service_options(struct service_options_t **service_options_pointer) 
     service_options->ssl_csr = NULL;
     service_options->ssl_key = NULL;
     service_options->handler_name = NULL;
+    service_options->target_module[0] = '\0';
+    service_options->target_attribute[0] = '\0';
+    service_options->target_path[0] = '\0';
     service_options->local = 0;
     service_options->workers = 0;
     service_options->load_modules = 1;
@@ -174,6 +177,9 @@ void create_service_options(struct service_options_t **service_options_pointer) 
     service_options->www_root[0] = '\0';
     service_options->use_template = 0;
     service_options->access_log = 1;
+    service_options->listing = 1;
+    service_options->spa = 0;
+    service_options->cors = 0;
     service_options->default_virtual_host = NULL;
     service_options->index_count = 0;
 
@@ -2608,10 +2614,199 @@ ERROR_CODE _file_options_service(struct service_t *service, struct hash_map_t *a
     RAISE_NO_ERROR;
 }
 
+/**
+ * Verifies if the current build carries the handlers that serve a
+ * python application, which are the ones that both the asgi and the
+ * wsgi flags select.
+ *
+ * @return If the handlers of the python applications are around.
+ */
+static char _has_python_options_service(void) {
+#ifdef VIRIATUM_PYTHON
+    return TRUE;
+#else
+    return FALSE;
+#endif
+}
+
+/**
+ * Selects the handler that is going to serve the requests, keeping
+ * the flag that selected it around so that a second and different
+ * selection is rejected naming both of them instead of one of them
+ * quietly winning over the other.
+ *
+ * @param service_options The options the handler is selected on.
+ * @param flag The name of the flag asking for the handler.
+ * @param handler The name of the handler being asked for.
+ * @param selector The flag that has already selected a handler, unset
+ * while none of them has selected one.
+ * @return The resulting error code.
+ */
+static ERROR_CODE _select_handler_options_service(
+    struct service_options_t *service_options,
+    char *flag,
+    char *handler,
+    char **selector
+) {
+    /* in case a flag has already selected a handler and the one that
+    it selected is not the one now being asked for, the two of them
+    are in conflict and neither may be allowed to win quietly */
+    if(*selector != NULL && strcmp((char *) service_options->handler_name, handler) != 0) {
+        RAISE_ERROR_F(
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "conflicting handler: %s selects \"%s\", %s asks for \"%s\"",
+            *selector,
+            (char *) service_options->handler_name,
+            flag,
+            handler
+        );
+    }
+
+    /* sets the handler in the options and keeps the flag that has
+    selected it for the verification of the next one */
+    service_options->handler_name = (unsigned char *) handler;
+    *selector = flag;
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE _target_options_service(
+    char *target,
+    unsigned char *module,
+    unsigned char *attribute,
+    unsigned char *path
+) {
+    /* allocates space for the positions of the separators that may
+    divide the target, the colon that precedes the attribute, the dot
+    that does the same in a dotted target and the one of the directory
+    that precedes the name of a file */
+    char *dot;
+    char *colon;
+    char *separator;
+    char *_separator;
+
+    /* allocates space for the part of the target that names the
+    module, taken apart from the attribute before anything else */
+    char _module[VIRIATUM_MAX_PATH_SIZE];
+    size_t module_size;
+
+    /* a target that names nothing at all carries no module to be
+    imported and so there is nothing to be normalised out of it */
+    if(target == NULL || target[0] == '\0') {
+        RAISE_ERROR_M(
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Empty application target"
+        );
+    }
+
+    /* the target has to fit the buffers it is taken apart into, a
+    longer one would be truncated into something else altogether */
+    if(strlen(target) >= VIRIATUM_MAX_PATH_SIZE) {
+        RAISE_ERROR_M(
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Application target is too long"
+        );
+    }
+
+    /* starts the three parts of the target as empty, so that the ones
+    that it does not carry are left unset instead of stale */
+    module[0] = '\0';
+    attribute[0] = '\0';
+    path[0] = '\0';
+
+    /* looks for the colon that separates the module from the attribute,
+    the last one of them being the separator so that the drive letter of
+    a windows path is never taken for one */
+    colon = strrchr(target, ':');
+    if(colon != NULL) {
+        SPRINTF((char *) attribute, VIRIATUM_MAX_PATH_SIZE, "%s", colon + 1);
+        module_size = (size_t) (colon - target);
+        memcpy(_module, target, module_size);
+        _module[module_size] = '\0';
+    } else {
+        SPRINTF(_module, VIRIATUM_MAX_PATH_SIZE, "%s", target);
+        module_size = strlen(_module);
+    }
+
+    /* a module part that names a python file is the third of the
+    spellings, the directory of the file is what has to be reachable
+    for it and the name of it, with the extension dropped, is the
+    module that is going to be imported */
+    if(module_size > 3 && strcmp(&_module[module_size - 3], ".py") == 0) {
+        /* looks for the last of the two separators that a directory may
+        be written with, so that a path of either shape is taken apart */
+        separator = strrchr(_module, '/');
+        _separator = strrchr(_module, '\\');
+        if(separator == NULL || (_separator != NULL && _separator > separator)) {
+            separator = _separator;
+        }
+
+        /* drops the extension of the file, from this point on the part
+        that remains is the name of the module itself */
+        _module[module_size - 3] = '\0';
+
+        /* in case the target named no directory at all the working
+        directory is the one that has to carry the file, otherwise the
+        directory it named is kept together with its separator */
+        if(separator == NULL) {
+            SPRINTF((char *) path, VIRIATUM_MAX_PATH_SIZE, "%s", ".");
+            SPRINTF((char *) module, VIRIATUM_MAX_PATH_SIZE, "%s", _module);
+        } else {
+            memcpy(path, _module, (size_t) (separator - _module) + 1);
+            path[(size_t) (separator - _module) + 1] = '\0';
+            SPRINTF((char *) module, VIRIATUM_MAX_PATH_SIZE, "%s", separator + 1);
+        }
+    } else {
+        /* a bare module is looked for under the working directory, which
+        is where the import path of the runtime would reach for it */
+        SPRINTF((char *) path, VIRIATUM_MAX_PATH_SIZE, "%s", ".");
+
+        /* when no colon divided the target the last segment of the dotted
+        name is the attribute and everything before it is the module,
+        which is the spelling of a dotted target */
+        if(colon == NULL) {
+            dot = strrchr(_module, '.');
+            if(dot != NULL) {
+                SPRINTF((char *) attribute, VIRIATUM_MAX_PATH_SIZE, "%s", dot + 1);
+                *dot = '\0';
+            }
+        }
+
+        SPRINTF((char *) module, VIRIATUM_MAX_PATH_SIZE, "%s", _module);
+    }
+
+    /* both of the parts have to have been found, a target that names no
+    attribute leaves nothing at all to be loaded out of the module */
+    if(module[0] == '\0' || attribute[0] == '\0') {
+        RAISE_ERROR_F(
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Invalid application target '%s', expected module:attribute",
+            target
+        );
+    }
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
 ERROR_CODE _comand_line_options_service(struct service_t *service, struct hash_map_t *arguments) {
     /* allocates the value reference to be used
     during the arguments retrieval */
     void *value;
+
+    /* allocates space for the error code returned by the operations
+    that may reject the arguments they are given */
+    ERROR_CODE return_value;
+
+    /* allocates space for the flag that has selected the handler, so
+    that a second and conflicting selection is rejected naming the two
+    of them instead of one of them winning quietly */
+    char *selector = NULL;
+
+    /* allocates space for the flag that tells the two of the application
+    flags apart, the asgi one from the wsgi one */
+    char asgi;
 
     /* unpacks the service options from the service */
     struct service_options_t *service_options = service->options;
@@ -2620,13 +2815,19 @@ ERROR_CODE _comand_line_options_service(struct service_t *service, struct hash_m
     in case the (port) value is set, casts the port value into
     integer and set it in the service options */
     get_value_string_hash_map(arguments, (unsigned char *) "port", &value);
-    if(value != NULL) { service_options->port = (unsigned short) atoi(((struct argument_t *) value)->value); }
+    if(value == NULL) { get_value_string_hash_map(arguments, (unsigned char *) "p", &value); }
+    if(value != NULL && ((struct argument_t *) value)->type == VALUE_ARGUMENT) {
+        service_options->port = (unsigned short) atoi(((struct argument_t *) value)->value);
+    }
 
     /* tries to retrieve the host argument from the arguments map, then
     in case the (host) value is set, sets the address value in
     the service options */
     get_value_string_hash_map(arguments, (unsigned char *) "host", &value);
-    if(value != NULL) { service_options->address = (unsigned char *) ((struct argument_t *) value)->value; }
+    if(value == NULL) { get_value_string_hash_map(arguments, (unsigned char *) "h", &value); }
+    if(value != NULL && ((struct argument_t *) value)->type == VALUE_ARGUMENT) {
+        service_options->address = (unsigned char *) ((struct argument_t *) value)->value;
+    }
 
     /* tries to retrieve the ip6 argument from the arguments map, then
     in case the (ip6) value is set, sets the service with ip6 support  */
@@ -2638,11 +2839,90 @@ ERROR_CODE _comand_line_options_service(struct service_t *service, struct hash_m
     get_value_string_hash_map(arguments, (unsigned char *) "no-http2", &value);
     if(value != NULL) { service_options->http2 = 0; }
 
+    /* tries to retrieve the file argument from the arguments map, its
+    presence selecting the handler that serves the static files and the
+    value of it naming the root they are served from, the working
+    directory standing in for it when the flag carries none */
+    get_value_string_hash_map(arguments, (unsigned char *) "file", &value);
+    if(value != NULL) {
+        return_value = _select_handler_options_service(
+            service_options,
+            "--file",
+            "file",
+            &selector
+        );
+        if(IS_ERROR_CODE(return_value)) { RAISE_AGAIN(return_value); }
+        SPRINTF(
+            (char *) service_options->www_root,
+            VIRIATUM_MAX_PATH_SIZE,
+            "%s",
+            ((struct argument_t *) value)->type == VALUE_ARGUMENT ? ((struct argument_t *) value)->value : "."
+        );
+    }
+
+    /* tries to retrieve both of the arguments that name an application,
+    each of them selecting the handler of its own kind and recording the
+    target on the options for that handler to load */
+    get_value_string_hash_map(arguments, (unsigned char *) "asgi", &value);
+    if(value == NULL) { get_value_string_hash_map(arguments, (unsigned char *) "wsgi", &value); }
+    if(value != NULL) {
+        /* the two of them are told apart by the key of the argument, the
+        asgi one selecting the handler that drives the application through
+        the loop of events and the wsgi one the synchronous handler */
+        asgi = strcmp(((struct argument_t *) value)->key, "asgi") == 0;
+        return_value = _select_handler_options_service(
+            service_options,
+            asgi ? "--asgi" : "--wsgi",
+            asgi ? "asgi" : "python",
+            &selector
+        );
+        if(IS_ERROR_CODE(return_value)) { RAISE_AGAIN(return_value); }
+
+        /* a target has to be named for there to be an application at all,
+        the flag on its own carries nothing that could be loaded */
+        if(((struct argument_t *) value)->type != VALUE_ARGUMENT) {
+            RAISE_ERROR_F(
+                RUNTIME_EXCEPTION_ERROR_CODE,
+                (unsigned char *) "%s requires an application target",
+                selector
+            );
+        }
+
+        /* normalises the target into the module, the attribute and the
+        directory that has to be reachable for the module to be imported */
+        return_value = _target_options_service(
+            ((struct argument_t *) value)->value,
+            service_options->target_module,
+            service_options->target_attribute,
+            service_options->target_path
+        );
+        if(IS_ERROR_CODE(return_value)) { RAISE_AGAIN(return_value); }
+
+        /* a build that carries none of the python handlers would fail deep
+        inside the resolution of the handler, so the missing support is
+        named here together with the way of getting it */
+        if(_has_python_options_service() == FALSE) {
+            RAISE_ERROR_F(
+                RUNTIME_EXCEPTION_ERROR_CODE,
+                (unsigned char *) "%s requires a build carrying python support, rebuild with VIRIATUM_BUILD_PYTHON",
+                selector
+            );
+        }
+    }
+
     /* tries to retrieve the handler argument from the arguments map, then
     in case the (handler) value is set, sets the handler name value
     in the service options */
     get_value_string_hash_map(arguments, (unsigned char *) "handler", &value);
-    if(value != NULL) { service_options->handler_name = (unsigned char *) ((struct argument_t *) value)->value; }
+    if(value != NULL && ((struct argument_t *) value)->type == VALUE_ARGUMENT) {
+        return_value = _select_handler_options_service(
+            service_options,
+            "--handler",
+            ((struct argument_t *) value)->value,
+            &selector
+        );
+        if(IS_ERROR_CODE(return_value)) { RAISE_AGAIN(return_value); }
+    }
 
     /* tries to retrieve the local argument from the arguments map, then
     in case the (local) value is set, sets the service as local  */
@@ -2657,12 +2937,16 @@ ERROR_CODE _comand_line_options_service(struct service_t *service, struct hash_m
     /* tries to retrieve the workers argument from the arguments map, then
     sets the workers (count) value for the service */
     get_value_string_hash_map(arguments, (unsigned char *) "workers", &value);
-    if(value != NULL) { service_options->workers = (unsigned char) atoi(((struct argument_t *) value)->value); }
+    if(value != NULL && ((struct argument_t *) value)->type == VALUE_ARGUMENT) {
+        service_options->workers = (unsigned char) atoi(((struct argument_t *) value)->value);
+    }
 
     /* tries to retrieve the www root argument from the arguments map, then
     sets the www root override for the contents path in service options */
     get_value_string_hash_map(arguments, (unsigned char *) "wwwroot", &value);
-    if(value != NULL) { SPRINTF((char *) service_options->www_root, VIRIATUM_MAX_PATH_SIZE, "%s", ((struct argument_t *) value)->value); }
+    if(value != NULL && ((struct argument_t *) value)->type == VALUE_ARGUMENT) {
+        SPRINTF((char *) service_options->www_root, VIRIATUM_MAX_PATH_SIZE, "%s", ((struct argument_t *) value)->value);
+    }
 
     /* raises no error */
     RAISE_NO_ERROR;
