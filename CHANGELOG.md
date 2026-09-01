@@ -33,6 +33,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Naming of the configuration file to read, and a way of asking for none to be read at all - [#69](https://github.com/hivesolutions/viriatum/issues/69)
 * Naming of the interface and the port together, with short forms for each of them - [#69](https://github.com/hivesolutions/viriatum/issues/69)
 * Binding to a port picked by the system, which is then reported so a script may read it - [#69](https://github.com/hivesolutions/viriatum/issues/69)
+* Naming of the index file, turning the directory listing off, and the permissive cross origin fields - [#69](https://github.com/hivesolutions/viriatum/issues/69)
+* Serving of the index file for any path that does not resolve, which is what a single page application needs - [#69](https://github.com/hivesolutions/viriatum/issues/69)
 
 ### Changed
 
@@ -41,6 +43,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Web pages now adapt to the small screen of a phone, the file listing included
 * Pages now use the scalable favicon whenever the browser supports it
 * Illustrations, logos and the listing arrow are now served as vectors
+* A directory is now served with its index file when one is around, the listing answering only when none is - [#69](https://github.com/hivesolutions/viriatum/issues/69)
 * The recorded performance targets were replaced by numbers a run can reproduce - [#49](https://github.com/hivesolutions/viriatum/issues/49)
 * Static files are now served considerably faster, ahead of the reference servers on the larger ones - [#49](https://github.com/hivesolutions/viriatum/issues/49)
 * Files that are served are now kept open, so serving one again costs neither opening nor describing it - [#49](https://github.com/hivesolutions/viriatum/issues/49)

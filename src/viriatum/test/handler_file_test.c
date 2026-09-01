@@ -833,6 +833,214 @@ const char *test_handler_file_push(void) {
     nothing to report for this execution */
     return NULL;
 }
+const char *test_handler_file_index(void) {
+    /* allocates space for the chain of the connection, for the
+    message being served and for the response it produces */
+    struct test_context_t *context;
+    struct http_request_t *http_request;
+    struct handler_file_context_t *handler_file_context;
+    unsigned char written[2048];
+    size_t size;
+    ERROR_CODE error;
+
+    _create_handler_file_test(&context, &http_request, &handler_file_context);
+
+    /* names the file that has been written as the index of a
+    directory, the process directory being the one that is served */
+    SPRINTF(
+        (char *) context->options->index[0],
+        sizeof(context->options->index[0]),
+        "%s",
+        HANDLER_FILE_TEST_NAME
+    );
+    context->options->index_count = 1;
+
+    /* asks for the directory itself, which is what the index file is
+    meant to be answering for */
+    error = url_callback_handler_file(http_request, (unsigned char *) "/", 1);
+    V_ASSERT(error == 0);
+    error = message_complete_callback_handler_file(http_request);
+    V_ASSERT(error == 0);
+
+    size = flush_test_connection(context, written, sizeof(written));
+    V_ASSERT(size > 0 && size < sizeof(written));
+    written[size] = '\0';
+
+    /* the contents of the index file are what answers the request, no
+    listing of the directory is produced at all */
+    V_ASSERT(strstr((char *) written, "HTTP/1.1 200 OK\r\n") == (char *) written);
+    V_ASSERT_NOT_NULL(strstr((char *) written, "Content-Length: 5\r\n"));
+    V_ASSERT_NOT_NULL(strstr((char *) written, "\r\n\r\n" HANDLER_FILE_TEST_CONTENTS));
+
+    _delete_handler_file_test(context, http_request, handler_file_context);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_handler_file_listing(void) {
+    /* allocates space for the chain of the connection, for the
+    message being served and for the response it produces */
+    struct test_context_t *context;
+    struct http_request_t *http_request;
+    struct handler_file_context_t *handler_file_context;
+    unsigned char written[2048];
+    size_t size;
+    ERROR_CODE error;
+
+    _create_handler_file_test(&context, &http_request, &handler_file_context);
+
+    /* turns the producing of the listing off, no index file is named
+    so nothing else is able to answer for the directory */
+    context->options->listing = 0;
+    context->options->index_count = 0;
+
+    error = url_callback_handler_file(http_request, (unsigned char *) "/", 1);
+    V_ASSERT(error == 0);
+    error = message_complete_callback_handler_file(http_request);
+    V_ASSERT(error == 0);
+
+    size = flush_test_connection(context, written, sizeof(written));
+    V_ASSERT(size > 0 && size < sizeof(written));
+    written[size] = '\0';
+
+    /* the status that says the contents may not be reached is what
+    answers, none of the entries of the directory is written */
+    V_ASSERT(strstr((char *) written, "HTTP/1.1 403 Forbidden\r\n") == (char *) written);
+    V_ASSERT_NULL(strstr((char *) written, HANDLER_FILE_TEST_NAME));
+
+    _delete_handler_file_test(context, http_request, handler_file_context);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_handler_file_spa(void) {
+    /* allocates space for the chain of the connection, for the
+    message being served and for the response it produces */
+    struct test_context_t *context;
+    struct http_request_t *http_request;
+    struct handler_file_context_t *handler_file_context;
+    unsigned char written[2048];
+    size_t size;
+    ERROR_CODE error;
+
+    _create_handler_file_test(&context, &http_request, &handler_file_context);
+
+    /* asks for the routing of a single page application and names the
+    file that has been written as the index of it */
+    context->options->spa = 1;
+    SPRINTF(
+        (char *) context->options->index[0],
+        sizeof(context->options->index[0]),
+        "%s",
+        HANDLER_FILE_TEST_NAME
+    );
+    context->options->index_count = 1;
+
+    /* asks for a path that resolves to nothing at all, which is what
+    every route of such an application looks like */
+    error = url_callback_handler_file(http_request, (unsigned char *) "/deep/route", 11);
+    V_ASSERT(error == 0);
+    error = message_complete_callback_handler_file(http_request);
+    V_ASSERT(error == 0);
+
+    size = flush_test_connection(context, written, sizeof(written));
+    V_ASSERT(size > 0 && size < sizeof(written));
+    written[size] = '\0';
+
+    /* the index file is what answers the route, the application
+    itself deciding what the path it was given means */
+    V_ASSERT(strstr((char *) written, "HTTP/1.1 200 OK\r\n") == (char *) written);
+    V_ASSERT_NOT_NULL(strstr((char *) written, "\r\n\r\n" HANDLER_FILE_TEST_CONTENTS));
+
+    _delete_handler_file_test(context, http_request, handler_file_context);
+
+    /* the very same route is answered with the error once the routing
+    has not been asked for, nothing else about it having changed */
+    _create_handler_file_test(&context, &http_request, &handler_file_context);
+    context->options->index_count = 0;
+
+    url_callback_handler_file(http_request, (unsigned char *) "/deep/route", 11);
+    message_complete_callback_handler_file(http_request);
+
+    size = flush_test_connection(context, written, sizeof(written));
+    V_ASSERT(size > 0 && size < sizeof(written));
+    written[size] = '\0';
+
+    V_ASSERT(strstr((char *) written, "HTTP/1.1 404 Not Found\r\n") == (char *) written);
+
+    _delete_handler_file_test(context, http_request, handler_file_context);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_handler_file_cors(void) {
+    /* allocates space for the chain of the connection, for the
+    message being served and for the response it produces */
+    struct test_context_t *context;
+    struct http_request_t *http_request;
+    struct handler_file_context_t *handler_file_context;
+    unsigned char written[2048];
+    size_t size;
+    ERROR_CODE error;
+
+    _create_handler_file_test(&context, &http_request, &handler_file_context);
+
+    /* the fields never travel on a response that has not asked for
+    them, which is what every serving does by default */
+    error = url_callback_handler_file(
+        http_request,
+        (unsigned char *) "/" HANDLER_FILE_TEST_NAME,
+        sizeof(HANDLER_FILE_TEST_NAME)
+    );
+    V_ASSERT(error == 0);
+    error = message_complete_callback_handler_file(http_request);
+    V_ASSERT(error == 0);
+
+    size = flush_test_connection(context, written, sizeof(written));
+    V_ASSERT(size > 0 && size < sizeof(written));
+    written[size] = '\0';
+
+    V_ASSERT_NULL(strstr((char *) written, ACCESS_CONTROL_ORIGIN_H));
+
+    _delete_handler_file_test(context, http_request, handler_file_context);
+
+    /* once they have been asked for the three of them travel on the
+    response, a page of another origin being allowed to read it */
+    _create_handler_file_test(&context, &http_request, &handler_file_context);
+    context->options->cors = 1;
+
+    url_callback_handler_file(
+        http_request,
+        (unsigned char *) "/" HANDLER_FILE_TEST_NAME,
+        sizeof(HANDLER_FILE_TEST_NAME)
+    );
+    message_complete_callback_handler_file(http_request);
+
+    size = flush_test_connection(context, written, sizeof(written));
+    V_ASSERT(size > 0 && size < sizeof(written));
+    written[size] = '\0';
+
+    V_ASSERT_NOT_NULL(strstr((char *) written, ACCESS_CONTROL_ORIGIN_H ": *\r\n"));
+    V_ASSERT_NOT_NULL(strstr((char *) written, ACCESS_CONTROL_METHODS_H ": GET, HEAD, POST, PUT, DELETE, OPTIONS\r\n"));
+    V_ASSERT_NOT_NULL(strstr((char *) written, ACCESS_CONTROL_HEADERS_H ": *\r\n"));
+
+    /* the payload of the file is still what follows the fields, the
+    response of it is otherwise untouched */
+    V_ASSERT_NOT_NULL(strstr((char *) written, "\r\n\r\n" HANDLER_FILE_TEST_CONTENTS));
+
+    _delete_handler_file_test(context, http_request, handler_file_context);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
 const char *test_handler_file_directory(void) {
     /* allocates space for the chain of the connection, for the
     message being served and for the response it produces */

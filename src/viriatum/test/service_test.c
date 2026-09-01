@@ -885,6 +885,112 @@ const char *test_bind_options_service(void) {
     return NULL;
 }
 
+const char *test_static_options_service(void) {
+    /* allocates space for the service, for the map of the arguments
+    that the command line produces and for the ones of them that
+    qualify the serving of the static files */
+    ERROR_CODE error;
+    struct service_t *service;
+    struct hash_map_t *arguments;
+    struct argument_t index;
+    struct argument_t listing;
+    struct argument_t no_listing;
+    struct argument_t spa;
+    struct argument_t cors;
+
+    /* creates the service together with the empty map of the
+    arguments and loads the defaults into it */
+    create_service(
+        &service,
+        (unsigned char *) "test",
+        (unsigned char *) "test"
+    );
+    create_hash_map(&arguments, 0);
+    _default_options_service(service, arguments);
+
+    /* the listing of a directory is produced by default and neither
+    the routing of an application nor the cross origin fields are */
+    V_ASSERT_EQ_U(service->options->listing, 1);
+    V_ASSERT_EQ_U(service->options->spa, 0);
+    V_ASSERT_EQ_U(service->options->cors, 0);
+    V_ASSERT_EQ_U(service->options->index_count, 0);
+
+    /* the value of the index flag is divided around the space, so that
+    more than one name may be given the way the configuration does */
+    index.type = VALUE_ARGUMENT;
+    SPRINTF(index.key, sizeof(index.key), "%s", "index");
+    SPRINTF(index.value, sizeof(index.value), "%s", "app.html index.html");
+    set_value_string_hash_map(arguments, (unsigned char *) "index", (void *) &index);
+
+    error = _comand_line_options_service(service, arguments);
+    V_ASSERT(!IS_ERROR_CODE(error));
+    V_ASSERT_EQ_U(service->options->index_count, 2);
+    V_ASSERT_EQ_S((char *) service->options->index[0], "app.html");
+    V_ASSERT_EQ_S((char *) service->options->index[1], "index.html");
+
+    /* the negative form of the listing flag turns the producing of one
+    off and the positive one turns it back on */
+    no_listing.type = SINGLE_ARGUMENT;
+    SPRINTF(no_listing.key, sizeof(no_listing.key), "%s", "no-listing");
+    set_value_string_hash_map(arguments, (unsigned char *) "no-listing", (void *) &no_listing);
+
+    error = _comand_line_options_service(service, arguments);
+    V_ASSERT(!IS_ERROR_CODE(error));
+    V_ASSERT_EQ_U(service->options->listing, 0);
+
+    /* the negative form is read last and so it is the one that decides
+    whenever both of them are given */
+    listing.type = SINGLE_ARGUMENT;
+    SPRINTF(listing.key, sizeof(listing.key), "%s", "listing");
+    set_value_string_hash_map(arguments, (unsigned char *) "listing", (void *) &listing);
+
+    error = _comand_line_options_service(service, arguments);
+    V_ASSERT(!IS_ERROR_CODE(error));
+    V_ASSERT_EQ_U(service->options->listing, 0);
+
+    /* on its own the positive form turns the producing of the listing
+    back on, which is the value the defaults already carry */
+    set_value_string_hash_map(arguments, (unsigned char *) "no-listing", NULL);
+
+    error = _comand_line_options_service(service, arguments);
+    V_ASSERT(!IS_ERROR_CODE(error));
+    V_ASSERT_EQ_U(service->options->listing, 1);
+
+    /* both of the remaining flags are turned on by their presence
+    alone, neither of them carrying a value of its own */
+    spa.type = SINGLE_ARGUMENT;
+    SPRINTF(spa.key, sizeof(spa.key), "%s", "spa");
+    set_value_string_hash_map(arguments, (unsigned char *) "spa", (void *) &spa);
+    cors.type = SINGLE_ARGUMENT;
+    SPRINTF(cors.key, sizeof(cors.key), "%s", "cors");
+    set_value_string_hash_map(arguments, (unsigned char *) "cors", (void *) &cors);
+
+    error = _comand_line_options_service(service, arguments);
+    V_ASSERT(!IS_ERROR_CODE(error));
+    V_ASSERT_EQ_U(service->options->spa, 1);
+    V_ASSERT_EQ_U(service->options->cors, 1);
+
+    /* the routing of an application is decided by an index file, so one
+    is named whenever nothing else has named any, the flag would
+    otherwise have nothing at all to fall back on */
+    set_value_string_hash_map(arguments, (unsigned char *) "index", NULL);
+    service->options->index_count = 0;
+
+    error = _comand_line_options_service(service, arguments);
+    V_ASSERT(!IS_ERROR_CODE(error));
+    V_ASSERT_EQ_U(service->options->index_count, 1);
+    V_ASSERT_EQ_S((char *) service->options->index[0], VIRIATUM_DEFAULT_INDEX_FILE);
+
+    /* deletes the map of the arguments and the service, the options
+    of it are released together with it */
+    delete_hash_map(arguments);
+    delete_service(service);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
 const char *test_ephemeral_service(void) {
     /* allocates space for the error codes of the lifecycle calls, for
     the service and for the port that was bound */

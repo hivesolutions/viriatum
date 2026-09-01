@@ -3070,6 +3070,50 @@ ERROR_CODE _comand_line_options_service(struct service_t *service, struct hash_m
         if(IS_ERROR_CODE(return_value)) { RAISE_AGAIN(return_value); }
     }
 
+    /* tries to retrieve the index argument from the arguments map, then
+    sets the split value around the space character in the index value,
+    the same way the configuration file names them */
+    get_value_string_hash_map(arguments, (unsigned char *) "index", &value);
+    if(value != NULL && ((struct argument_t *) value)->type == VALUE_ARGUMENT) {
+        service_options->index_count = split(
+            ((struct argument_t *) value)->value,
+            (char *) service_options->index,
+            128,
+            ' '
+        );
+    }
+
+    /* tries to retrieve both of the arguments that decide whether the
+    listing of a directory is produced, the negative one following the
+    spelling that the other negative flags already take */
+    get_value_string_hash_map(arguments, (unsigned char *) "listing", &value);
+    if(value != NULL) { service_options->listing = 1; }
+    get_value_string_hash_map(arguments, (unsigned char *) "no-listing", &value);
+    if(value != NULL) { service_options->listing = 0; }
+
+    /* tries to retrieve the spa argument from the arguments map, its
+    presence serving the index file for a path that resolves to nothing */
+    get_value_string_hash_map(arguments, (unsigned char *) "spa", &value);
+    if(value != NULL) { service_options->spa = 1; }
+
+    /* tries to retrieve the cors argument from the arguments map, its
+    presence putting the permissive cross origin fields on a response */
+    get_value_string_hash_map(arguments, (unsigned char *) "cors", &value);
+    if(value != NULL) { service_options->cors = 1; }
+
+    /* the routing of a single page application is decided by an index
+    file, so one is named whenever nothing else has named one, the flag
+    would otherwise have nothing at all to fall back on */
+    if(service_options->spa && service_options->index_count == 0) {
+        SPRINTF(
+            (char *) service_options->index[0],
+            sizeof(service_options->index[0]),
+            "%s",
+            VIRIATUM_DEFAULT_INDEX_FILE
+        );
+        service_options->index_count = 1;
+    }
+
     /* tries to retrieve the local argument from the arguments map, then
     in case the (local) value is set, sets the service as local  */
     get_value_string_hash_map(arguments, (unsigned char *) "local", &value);

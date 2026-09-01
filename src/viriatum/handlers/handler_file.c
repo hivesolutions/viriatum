@@ -549,6 +549,36 @@ static size_t _write_headers_handler_file(
         cache_codes[NO_CACHE - 1]
     );
 
+    /* the permissive cross origin fields travel on the response only
+    when they have been asked for, a page served from another origin
+    being allowed to read what is answered here */
+    if(connection->service->options->cors) {
+        count = http_connection->write_field(
+            connection,
+            buffer,
+            size,
+            count,
+            ACCESS_CONTROL_ORIGIN_H,
+            "*"
+        );
+        count = http_connection->write_field(
+            connection,
+            buffer,
+            size,
+            count,
+            ACCESS_CONTROL_METHODS_H,
+            "GET, HEAD, POST, PUT, DELETE, OPTIONS"
+        );
+        count = http_connection->write_field(
+            connection,
+            buffer,
+            size,
+            count,
+            ACCESS_CONTROL_HEADERS_H,
+            "*"
+        );
+    }
+
     /* returns the number of bytes that the buffer holds */
     return count;
 }
@@ -631,11 +661,20 @@ ERROR_CODE message_complete_callback_handler_file(struct http_request_t *http_re
     unsigned int is_directory = FALSE;
     unsigned int is_redirect = FALSE;
 
+    /* allocates space for the flag that marks a listing that has been
+    asked for while the producing of one is turned off */
+    unsigned int is_forbidden = FALSE;
+
     /* allocates space for the new location value for
     redirect request cases and for the path to the
     template (for directory listing) */
     unsigned char location[VIRIATUM_MAX_PATH_SIZE];
     unsigned char template_path[VIRIATUM_MAX_PATH_SIZE];
+
+    /* allocates space for the name of the index file that answers for a
+    directory and for the complete path that is built out of it */
+    char *index_;
+    unsigned char index_path[VIRIATUM_MAX_PATH_SIZE];
 
     /* allocates space for the computation of the time
     and of the time string, then allocates space for the
@@ -716,6 +755,41 @@ ERROR_CODE message_complete_callback_handler_file(struct http_request_t *http_re
     /* checks if the path being request is in fact a directory */
     is_directory_file((char *) handler_file_context->file_path_d, &is_directory);
 
+    /* a request for a directory that already carries the trailing slash is
+    served with the index file of it whenever one of the named ones is
+    around, which is what a request for a directory means to every server
+    of this class, the listing being only what answers for a directory
+    that carries none of them */
+    url_size = strlen((char *) handler_file_context->url);
+    if(is_directory && url_size > 0 && handler_file_context->url[url_size - 1] == '/') {
+        index_ = validate_file(
+            (char *) handler_file_context->file_path_d,
+            (char *) connection->service->options->index,
+            connection->service->options->index_count,
+            128
+        );
+
+        /* the index file takes the place of the directory in the path that
+        is going to be served, from this point on it is a normal file and
+        neither the listing nor the status that stands in for it applies */
+        if(index_ != NULL) {
+            SPRINTF(
+                (char *) index_path,
+                VIRIATUM_MAX_PATH_SIZE,
+                "%s" VIRIATUM_PATH_SEPARATOR "%s",
+                (char *) handler_file_context->file_path_d,
+                index_
+            );
+            SPRINTF(
+                (char *) handler_file_context->file_path_d,
+                VIRIATUM_MAX_PATH_SIZE,
+                "%s",
+                (char *) index_path
+            );
+            is_directory = FALSE;
+        }
+    }
+
     /* in case the auth basic value is set in the current file
     context must proceed with the authentication process for
     the current authorization value */
@@ -749,6 +823,11 @@ ERROR_CODE message_complete_callback_handler_file(struct http_request_t *http_re
 
             /* sets the is redirect flag (forces temporary redirect) */
             is_redirect = TRUE;
+        }
+        /* otherwise the listing of the directory has been turned off and
+        so the contents of it may not be revealed to the user agent */
+        else if(!connection->service->options->listing) {
+            is_forbidden = TRUE;
         }
         /* otherwise it's the correct directory location and must present the
         listing of the directory to the user agent */
@@ -853,6 +932,26 @@ ERROR_CODE message_complete_callback_handler_file(struct http_request_t *http_re
             &file_cache_entry
         );
 
+        /* a path that resolves to nothing is served with the index file
+        instead of an error whenever the routing of a single page
+        application has been asked for, the application itself being
+        what decides what the path it was given means */
+        if(IS_ERROR_CODE(error_code) && connection->service->options->spa) {
+            RESET_ERROR;
+            SPRINTF(
+                (char *) handler_file_context->file_path_d,
+                VIRIATUM_MAX_PATH_SIZE,
+                "%s" VIRIATUM_PATH_SEPARATOR "%s",
+                (char *) connection->service->options->contents_path,
+                (char *) connection->service->options->index[0]
+            );
+            error_code = acquire_file_cache(
+                _get_file_cache(),
+                handler_file_context->file_path_d,
+                &file_cache_entry
+            );
+        }
+
         /* in case there is no error count the file size, avoids
         extra problems while computing the etag */
         if(!IS_ERROR_CODE(error_code)) {
@@ -929,6 +1028,26 @@ ERROR_CODE message_complete_callback_handler_file(struct http_request_t *http_re
             "Unauthorized",
             "Invalid password or user not found",
             (char *) handler_file_context->auth_basic,
+            keep_alive ? KEEP_ALIVE : KEEP_CLOSE,
+            _cleanup_handler_file,
+            handler_file_context
+        );
+    } else if(is_forbidden) {
+        /* prints some debug information about the listing that was
+        asked for while the producing of one is turned off */
+        V_DEBUG("Listing of the directory is not allowed\n");
+
+        /* sends the message containing the error definition for the
+        listing that may not be produced, the contents of a directory
+        are never revealed once the listing of it is turned off */
+        write_http_error(
+            connection,
+            headers_buffer,
+            VIRIATUM_HTTP_SIZE,
+            HTTP11,
+            403,
+            "Forbidden",
+            "Directory listing is not allowed",
             keep_alive ? KEEP_ALIVE : KEEP_CLOSE,
             _cleanup_handler_file,
             handler_file_context

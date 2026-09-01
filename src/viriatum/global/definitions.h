@@ -190,6 +190,7 @@ static __inline char *get_config_path(void) {
 #define VIRIATUM_DEFAULT_PORT 9090
 #define VIRIATUM_DEFAULT_HANDLER "dispatch"
 #define VIRIATUM_DEFAULT_INDEX 1
+#define VIRIATUM_DEFAULT_INDEX_FILE "index.html"
 #define VIRIATUM_DEFAULT_USE_TEMPLATE 0
 #define VIRIATUM_DEFAULT_HTTP2 1
 #define VIRIATUM_NON_BLOCKING 1
@@ -211,6 +212,7 @@ static __inline char *get_config_path(void) {
 #define VIRIATUM_DEFAULT_PORT 9090
 #define VIRIATUM_DEFAULT_HANDLER "dispatch"
 #define VIRIATUM_DEFAULT_INDEX 1
+#define VIRIATUM_DEFAULT_INDEX_FILE "index.html"
 #define VIRIATUM_DEFAULT_USE_TEMPLATE 0
 #define VIRIATUM_DEFAULT_HTTP2 1
 #define VIRIATUM_NON_BLOCKING 1

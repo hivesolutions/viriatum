@@ -146,6 +146,17 @@ const char *test_mode_options_service(void);
 const char *test_bind_options_service(void);
 
 /**
+ * Tests the flags of the command line that qualify the serving of
+ * the static files, the ones that name the index, that turn the
+ * listing of a directory on and off, that ask for the routing of a
+ * single page application and for the cross origin fields.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_static_options_service(void);
+
+/**
  * Tests that a service asked for an ephemeral port ends up carrying
  * the port that was actually bound, so that it may be named.
  *

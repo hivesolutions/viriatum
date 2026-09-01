@@ -155,6 +155,45 @@ const char *test_handler_file_gone(void);
  * the unit test should describe possible errors.
  */
 const char *test_handler_file_push(void);
+
+/**
+ * Tests that a request for a directory is served with the index file
+ * of it whenever one of the named ones is around, the listing being
+ * only what answers for a directory carrying none of them.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_handler_file_index(void);
+
+/**
+ * Tests that a directory whose listing has been turned off is
+ * answered with the status that says so, instead of the contents
+ * of it being revealed.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_handler_file_listing(void);
+
+/**
+ * Tests that a path resolving to nothing is served with the index
+ * file whenever the routing of a single page application has been
+ * asked for, and with the error otherwise.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_handler_file_spa(void);
+
+/**
+ * Tests that the permissive cross origin fields travel on a response
+ * only once they have been asked for.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_handler_file_cors(void);
 /**
  * Tests the serving of a directory that is asked for without the
  * trailing slash, the peer is sent to the very same place with it.

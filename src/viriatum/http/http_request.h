@@ -38,6 +38,9 @@
 #define CONTENT_LENGTH_H "Content-Length"
 #define WWW_AUTHENTICATE_H "WWW-Authenticate"
 #define TRANSFER_ENCODING_H "Transfer-Encoding"
+#define ACCESS_CONTROL_ORIGIN_H "Access-Control-Allow-Origin"
+#define ACCESS_CONTROL_METHODS_H "Access-Control-Allow-Methods"
+#define ACCESS_CONTROL_HEADERS_H "Access-Control-Allow-Headers"
 
 /**
  * The scheme values under which a message may be
