@@ -3236,6 +3236,14 @@ ERROR_CODE _comand_line_options_service(struct service_t *service, struct hash_m
         service_options->index_count = 1;
     }
 
+    /* tries to retrieve both of the arguments that decide whether the
+    error pages go through the template engine, the command line form
+    of the setting that the configuration file already carries */
+    get_value_string_hash_map(arguments, (unsigned char *) "template", &value);
+    if(value != NULL) { service_options->use_template = 1; }
+    get_value_string_hash_map(arguments, (unsigned char *) "no-template", &value);
+    if(value != NULL) { service_options->use_template = 0; }
+
     /* tries to retrieve both of the arguments that decide whether a line
     is written for each of the requests, the command line form of the
     setting that the configuration file already carries */

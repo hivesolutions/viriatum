@@ -300,42 +300,50 @@ _wait() {
     return 1
 }
 
-# writes the configuration the subject reads for the workload at hand,
-# the server picks the file up out of the directory it is started in
+# builds the flags the subject is driven with for the workload at
+# hand, everything that decides the comparison now travels on the
+# command line rather than through a file written beside it, which is
+# what a person running the server one line at a time is given too
+#
+# the upstream of a proxy is the single thing left that no flag names,
+# it is a location and locations are written down, so the workloads
+# that carry one are the only ones that still read a file at all
 _configure() {
     _HANDLER=$1
     _TEMPLATE=$2
     _PROXY=$3
-    {
-        echo "[general]"
-        echo "host = 127.0.0.1"
-        echo "port = $PORT"
-        echo "ip6 = Off"
-        echo "ssl = Off"
-        echo "workers = $WORKERS"
-        echo "index = index.html"
-        echo "use_template = $_TEMPLATE"
-        echo "handler = $_HANDLER"
 
-        # every reference is given its access log turned off and the
-        # subject is now able to be given the same, which it was not
-        # when the only way of silencing it was to send the output of
-        # the process somewhere that nobody reads
-        echo "access_log = Off"
-        if [ -n "$_PROXY" ]; then
-            echo
-            echo "[location:proxy]"
-            echo "path = /"
-            echo "handler = proxy"
-            echo "proxy_pass = $_PROXY"
-        fi
+    # every reference is given its access log turned off and the
+    # subject is given the same, which it was not when the only way of
+    # silencing it was to send the output of the process somewhere
+    # that nobody reads
+    FLAGS="--host=127.0.0.1 --port=$PORT --handler=$_HANDLER"
+    FLAGS="$FLAGS --workers=$WORKERS --index=index.html --no-access-log"
+    if [ "$_TEMPLATE" = "On" ]; then
+        FLAGS="$FLAGS --template"
+    else
+        FLAGS="$FLAGS --no-template"
+    fi
+
+    rm -f "$OUTPUT/viriatum.ini"
+    if [ -z "$_PROXY" ]; then
+        FLAGS="$FLAGS --no-config"
+        return 0
+    fi
+
+    {
+        echo "[location:proxy]"
+        echo "path = /"
+        echo "handler = proxy"
+        echo "proxy_pass = $_PROXY"
     } > "$OUTPUT/viriatum.ini"
+    FLAGS="$FLAGS --config=$OUTPUT/viriatum.ini"
 }
 
-# starts the subject for the workload at hand, the handler being the
-# one the workload names and the configuration the one just written,
-# the workloads of the interfaces are served by the extension instead
-# and go through a launcher of their own
+# starts the subject for the workload at hand, driven by the flags
+# that were just built for it, the workloads of the interfaces are
+# served by the extension instead and go through a launcher of their
+# own
 _start_subject() {
     _HANDLER=$1
     _ROLE=$2
@@ -361,14 +369,15 @@ _start_subject() {
 
     if [ "$MODE" = "container" ]; then
         SUBJECT_CONTAINER=viriatum-subject
+        # shellcheck disable=SC2086
         "$DOCKER" run -d --name viriatum-subject --network host \
             -v "$OUTPUT:/bench" -w /bench "$IMAGE_SUBJECT" \
-            viriatum --port="$PORT" --handler="$_HANDLER" \
-            --wwwroot=/bench/www --workers="$WORKERS" \
+            viriatum $(echo "$FLAGS" | sed "s|$OUTPUT|/bench|g") \
+            --wwwroot=/bench/www \
             > "$OUTPUT/logs/subject.id" 2>&1
     else
-        "$BINARY" --port="$PORT" --handler="$_HANDLER" \
-            --wwwroot="$OUTPUT/www" --workers="$WORKERS" \
+        # shellcheck disable=SC2086
+        "$BINARY" $FLAGS --wwwroot="$OUTPUT/www" \
             < /dev/null > /dev/null 2> "$OUTPUT/logs/subject.log" &
         PID=$!
     fi
@@ -1190,7 +1199,7 @@ while IFS='|' read -r NAME ROLE HANDLER PATH_ HEADER TEMPLATE PROXY; do
     # which it did while it was serving the requests off the disk
     if [ -n "$PROXY" ]; then
         "$BINARY" --port="$PORT_UPSTREAM" --handler=default \
-            --workers="$WORKERS" \
+            --workers="$WORKERS" --no-config --no-access-log \
             < /dev/null > /dev/null 2> "$OUTPUT/logs/upstream.log" &
         PID_UPSTREAM=$!
         _wait "$PORT_UPSTREAM"

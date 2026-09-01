@@ -787,6 +787,8 @@ const char *test_bind_options_service(void) {
     struct argument_t bind;
     struct argument_t port;
     struct argument_t host;
+    struct argument_t workers;
+    struct argument_t www_root;
 
     /* creates the service together with the empty map of the
     arguments and loads the defaults, which are what the flags below
@@ -846,6 +848,20 @@ const char *test_bind_options_service(void) {
         "--bind requires a host and a port"
     );
 
+    /* a host longer than the buffer it is kept in is refused instead of
+    being truncated into an interface that was never named */
+    bind.type = VALUE_ARGUMENT;
+    memset(bind.value, 'a', sizeof(service->options->_address));
+    SPRINTF(
+        &bind.value[sizeof(service->options->_address)],
+        sizeof(bind.value) - sizeof(service->options->_address),
+        "%s",
+        ":8080"
+    );
+
+    error = _comand_line_options_service(service, arguments);
+    V_ASSERT(IS_ERROR_CODE(error));
+
     /* the short forms name the same things the long ones do, and are
     read after the value that names the two of them together, so that
     the narrower of the flags is the one that decides */
@@ -874,6 +890,33 @@ const char *test_bind_options_service(void) {
     error = _comand_line_options_service(service, arguments);
     V_ASSERT(!IS_ERROR_CODE(error));
     V_ASSERT_EQ_U(service->options->port, 8084);
+
+    /* both the count of the workers and the root of the contents are
+    read off the value of the flag that names them */
+    workers.type = VALUE_ARGUMENT;
+    SPRINTF(workers.key, sizeof(workers.key), "%s", "workers");
+    SPRINTF(workers.value, sizeof(workers.value), "%s", "4");
+    set_value_string_hash_map(arguments, (unsigned char *) "workers", (void *) &workers);
+    www_root.type = VALUE_ARGUMENT;
+    SPRINTF(www_root.key, sizeof(www_root.key), "%s", "wwwroot");
+    SPRINTF(www_root.value, sizeof(www_root.value), "%s", "/srv/www");
+    set_value_string_hash_map(arguments, (unsigned char *) "wwwroot", (void *) &www_root);
+
+    error = _comand_line_options_service(service, arguments);
+    V_ASSERT(!IS_ERROR_CODE(error));
+    V_ASSERT_EQ_U(service->options->workers, 4);
+    V_ASSERT_EQ_S((char *) service->options->www_root, "/srv/www");
+
+    /* neither of them is read off a flag that carries no value at all,
+    which used to be a reach into memory that was never written */
+    workers.type = SINGLE_ARGUMENT;
+    www_root.type = SINGLE_ARGUMENT;
+    service->options->workers = 0;
+
+    error = _comand_line_options_service(service, arguments);
+    V_ASSERT(!IS_ERROR_CODE(error));
+    V_ASSERT_EQ_U(service->options->workers, 0);
+    V_ASSERT_EQ_S((char *) service->options->www_root, "/srv/www");
 
     /* deletes the map of the arguments and the service, the options
     of it are released together with it */
@@ -1125,6 +1168,8 @@ const char *test_print_config_service(void) {
     ERROR_CODE error;
     struct service_t *service;
     struct hash_map_t *arguments;
+    struct sort_map_t *configuration;
+    struct sort_map_t *location;
     char written[4096];
     size_t size;
 
@@ -1181,6 +1226,32 @@ const char *test_print_config_service(void) {
     V_ASSERT_NOT_NULL(strstr(written, "cors                 := on"));
     V_ASSERT_NOT_NULL(strstr(written, "index_count          := 1"));
     V_ASSERT_NOT_NULL(strstr(written, "index[0]             := app.html"));
+    V_ASSERT_NOT_NULL(strstr(written, "locations            := 0"));
+
+    /* the locations that a configuration named are written beside the
+    options, they are as much a part of what a run would do */
+    create_sort_map(&configuration, 0);
+    create_sort_map(&location, 0);
+    set_value_string_sort_map(location, (unsigned char *) "path", (void *) "/");
+    set_value_string_sort_map(location, (unsigned char *) "handler", (void *) "proxy");
+    set_value_string_sort_map(configuration, (unsigned char *) "location:/", (void *) location);
+    service->configuration = configuration;
+    calculate_locations_service(service);
+
+    capture_test_output();
+    error = print_config_service(service);
+    size = release_test_output(written, sizeof(written));
+
+    V_ASSERT(!IS_ERROR_CODE(error));
+    V_ASSERT(size > 0);
+    V_ASSERT_NOT_NULL(strstr(written, "locations            := 1"));
+    V_ASSERT_NOT_NULL(strstr(written, "location[0]         := / => proxy"));
+
+    /* releases the configuration that was built by hand, the service
+    never took ownership of the maps inside of it */
+    service->configuration = NULL;
+    delete_sort_map(location);
+    delete_sort_map(configuration);
 
     /* deletes the service releasing every internal structure */
     delete_service(service);
@@ -1247,6 +1318,122 @@ const char *test_list_handlers_service(void) {
 
     /* deletes the service releasing every internal structure */
     delete_service(service);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_check_service(void) {
+    /* allocates space for the error code of the loading, for the map
+    of the arguments it is driven with and for the two of them that
+    keep the run out of both the file system and the modules */
+    ERROR_CODE error;
+    struct hash_map_t *arguments;
+    struct argument_t no_config;
+    struct argument_t handler;
+    char written[4096];
+    size_t size;
+
+    /* the discovery of a configuration file is skipped so that the run
+    of the test never depends on the directory it is started in */
+    create_hash_map(&arguments, 0);
+    no_config.type = SINGLE_ARGUMENT;
+    SPRINTF(no_config.key, sizeof(no_config.key), "%s", "no-config");
+    set_value_string_hash_map(arguments, (unsigned char *) "no-config", (void *) &no_config);
+
+    /* everything a run is made of is loaded and validated, and nothing
+    at all is written while only the validating was asked for */
+    capture_test_output();
+    error = check_service_s("test", arguments, FALSE);
+    size = release_test_output(written, sizeof(written));
+
+    V_ASSERT(!IS_ERROR_CODE(error));
+    V_ASSERT_NULL(strstr(written, "Configuration\n"));
+
+    /* the configuration that the merging produced is written once the
+    writing of it is the thing that was asked for */
+    capture_test_output();
+    error = check_service_s("test", arguments, TRUE);
+    size = release_test_output(written, sizeof(written));
+
+    V_ASSERT(!IS_ERROR_CODE(error));
+    V_ASSERT(size > 0);
+    V_ASSERT_NOT_NULL(strstr(written, "Configuration\n"));
+    V_ASSERT_NOT_NULL(strstr(written, "handler_name         := " VIRIATUM_DEFAULT_HANDLER));
+
+    /* whatever would fail a start fails this instead, the conflict
+    between the two of the flags being one such thing */
+    handler.type = VALUE_ARGUMENT;
+    SPRINTF(handler.key, sizeof(handler.key), "%s", "handler");
+    SPRINTF(handler.value, sizeof(handler.value), "%s", "proxy");
+    set_value_string_hash_map(arguments, (unsigned char *) "handler", (void *) &handler);
+    set_value_string_hash_map(arguments, (unsigned char *) "file", (void *) &no_config);
+
+    capture_test_output();
+    error = check_service_s("test", arguments, TRUE);
+    release_test_output(written, sizeof(written));
+
+    V_ASSERT(IS_ERROR_CODE(error));
+
+    /* deletes the map of the arguments, the service the calls above
+    built was torn back down by each of them */
+    delete_hash_map(arguments);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_handlers_service(void) {
+    /* allocates space for the error code of the listing, for the map
+    of the arguments it is driven with and for the output it wrote */
+    ERROR_CODE error;
+    struct hash_map_t *arguments;
+    struct argument_t no_config;
+    struct argument_t config;
+    char written[2048];
+    size_t size;
+
+    /* the discovery of a configuration file is skipped so that the run
+    of the test never depends on the directory it is started in */
+    create_hash_map(&arguments, 0);
+    no_config.type = SINGLE_ARGUMENT;
+    SPRINTF(no_config.key, sizeof(no_config.key), "%s", "no-config");
+    set_value_string_hash_map(arguments, (unsigned char *) "no-config", (void *) &no_config);
+
+    capture_test_output();
+    error = handlers_service_s("test", arguments);
+    size = release_test_output(written, sizeof(written));
+
+    /* every one of the handlers that the service carries of its own is
+    named, whichever modules the machine happens to carry beside them */
+    V_ASSERT(!IS_ERROR_CODE(error));
+    V_ASSERT(size > 0);
+    V_ASSERT_NOT_NULL(strstr(written, "Handlers\n"));
+    V_ASSERT_NOT_NULL(strstr(written, "\n  dispatch\n"));
+    V_ASSERT_NOT_NULL(strstr(written, "\n  default\n"));
+    V_ASSERT_NOT_NULL(strstr(written, "\n  file\n"));
+    V_ASSERT_NOT_NULL(strstr(written, "\n  proxy\n"));
+
+    /* a configuration that would fail a start fails the listing too,
+    the handlers of the modules are only reachable once the path they
+    are looked for under has been resolved */
+    config.type = VALUE_ARGUMENT;
+    SPRINTF(config.key, sizeof(config.key), "%s", "config");
+    SPRINTF(config.value, sizeof(config.value), "%s", SERVICE_CONFIG_TEST_MISSING);
+    set_value_string_hash_map(arguments, (unsigned char *) "no-config", NULL);
+    set_value_string_hash_map(arguments, (unsigned char *) "config", (void *) &config);
+
+    capture_test_output();
+    error = handlers_service_s("test", arguments);
+    release_test_output(written, sizeof(written));
+
+    V_ASSERT(IS_ERROR_CODE(error));
+
+    /* deletes the map of the arguments, the service the call above
+    built was torn back down by it */
+    delete_hash_map(arguments);
 
     /* returns the default value, nothing happened so there's
     nothing to report for this execution */

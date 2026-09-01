@@ -27,36 +27,89 @@
 #include "viriatum.h"
 
 #define HELP_STRING "\
-usage: viriatum [--version] [--port[=<port>] [--host[=<hostname>]] [-ip6]\n\
-                [handler[=<name>]] [workers[=<count>]] [wwwroot[=<path>]]\n\
-                [--local] [--ssl] [--no-http2] [--daemon] [--test] [--speed]\n\
+usage: viriatum [--file[=<path>]] [--asgi=<target>] [--wsgi=<target>]\n\
+                [--bind=<host>:<port>] [-p=<port>] [-h=<host>] [--ip6]\n\
+                [--config=<path>] [--no-config] [--handler=<name>]\n\
+                [--index=<file>] [--listing] [--no-listing] [--spa] [--cors]\n\
+                [--workers=<count>] [--wwwroot=<path>] [--local] [--ssl]\n\
+                [--no-http2] [--template] [--no-template] [--access-log]\n\
+                [--no-access-log] [-v] [-q]\n\
+                [--dev] [--daemon] [--print-config] [--check]\n\
+                [--list-handlers] [--version] [--info] [--test] [--speed]\n\
                 [--help]\n\
 \n\
-The most commonly used viriatum commands are:\n\
-   --version   Prints the current version\n\
-   --port      Sets the tcp port to be used as primary\n\
-   --host      Sets the tcp host to bind\n\
-   --ip6       Runs the service with support for ipv6\n\
+Every flag that carries a value takes it after an equals sign, there is no\n\
+positional argument and no sub command.\n\
+\n\
+What is going to be served:\n\
+   --file      Serves the files of a directory, the working one by default\n\
+   --asgi      Serves the application of a target through a loop of events\n\
+   --wsgi      Serves the application of a target synchronously\n\
    --handler   Name of the handler to be used as default\n\
-   --workers   Defines the amount of worker to be used\n\
    --wwwroot   Sets the root directory from which static files are served\n\
-   --local     Runs the service in local mode no internet support\n\
+\n\
+Both --asgi and --wsgi need a build carrying python support, and name the\n\
+application as 'module:attribute', 'module.attribute' or 'file.py:attribute'.\n\
+\n\
+Where it is going to listen:\n\
+   --bind      Sets the host and the port together, ':8080' standing for\n\
+                 every interface and a port of '0' for one the system picks\n\
+   --port, -p  Sets the tcp port to be used as primary\n\
+   --host, -h  Sets the tcp host to bind\n\
+   --ip6       Runs the service with support for ipv6\n\
    --ssl       Listens to the sockets using ssl encryption\n\
    --no-http2  Serves only the previous version of the http protocol\n\
-   --daemon    Runs the service as daemon (background)\n\
-   --test      Runs a series of test for viriatum\n\
-   --speed     Runs a series of speed relates tests for viriatum\n\
-   --info      Prints the service information\n\
-   --help      Prints this (help) message\n\
+\n\
+Which configuration file is read:\n\
+   --config     Reads the named configuration file and no other one\n\
+   --no-config  Reads none of them, the defaults and these flags decide\n\
+\n\
+With neither of them the first of the following that is around is read:\n\
+   %s" VIRIATUM_PATH_SEPARATOR "viriatum.ini\n\
+   ." VIRIATUM_PATH_SEPARATOR "viriatum.ini\n\
+   ." VIRIATUM_PATH_SEPARATOR "src" VIRIATUM_PATH_SEPARATOR "viriatum" VIRIATUM_PATH_SEPARATOR "resources" VIRIATUM_PATH_SEPARATOR "config" VIRIATUM_PATH_SEPARATOR "viriatum" VIRIATUM_PATH_SEPARATOR "viriatum.ini\n\
+\n\
+How the static files are served:\n\
+   --index       Names the file that answers for a directory\n\
+   --listing     Produces the listing of a directory carrying no index\n\
+   --no-listing  Answers such a directory with an error instead\n\
+   --spa         Serves the index file for a path that resolves to nothing\n\
+   --cors        Puts the permissive cross origin fields on a response\n\
+\n\
+What is written and how it runs:\n\
+   -v               Writes the messages of the debugging as well\n\
+   -q               Writes only the messages that report a problem\n\
+   --template       Sends the error pages through the template engine\n\
+   --no-template    Sends the plain ones instead\n\
+   --access-log     Writes a line for each one of the requests\n\
+   --no-access-log  Writes none of those lines\n\
+   --dev            Turns the friendly shape of the serving on together\n\
+   --workers        Defines the amount of worker to be used\n\
+   --local          Runs the service in local mode no internet support\n\
+   --daemon         Runs the service as daemon (background)\n\
+\n\
+What this build would do:\n\
+   --print-config   Writes the configuration a run would use and exits\n\
+   --check          Validates everything a run is made of and exits\n\
+   --list-handlers  Writes the handlers that this build carries\n\
+   --version        Prints the current version\n\
+   --info           Prints the service information\n\
+   --help           Prints this (help) message\n\
 \n\
 The tests may be selected and reported using:\n\
+   --test           Runs a series of test for viriatum\n\
+   --speed          Runs a series of speed relates tests for viriatum\n\
    --test-list      Lists the selected tests instead of running them\n\
    --test-filter    Runs only the tests whose name matches the pattern\n\
    --test-tags      Runs only the tests carrying one of the tags\n\
    --test-format    Format of the report (text, tap, junit or markdown)\n\
    --test-output    Path of the file the report is written to\n\
 \n\
-See 'viriatum --help[=<command>]' for more information on a specific command.\n"
+Examples:\n\
+   viriatum --file=. --bind=:8080\n\
+   viriatum --file=./dist --spa --cors --dev\n\
+   viriatum --wsgi=budy:app --no-config -p=8080\n\
+   viriatum --config=/etc/viriatum/viriatum.ini --check\n"
 
 ERROR_CODE print_information(void) {
     /* retrieves the viriatum version and description */
@@ -87,7 +140,10 @@ ERROR_CODE print_information(void) {
 }
 
 ERROR_CODE help(void) {
-    V_PRINT(HELP_STRING);
+    /* writes the help of the command, the path of the system wide
+    configuration file is only known at runtime on some of the
+    platforms and so it travels as a value of its own */
+    V_PRINT_F(HELP_STRING, VIRIATUM_CONFIG_PATH);
     RAISE_NO_ERROR;
 }
 ERROR_CODE version(void) {

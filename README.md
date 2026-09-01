@@ -150,6 +150,41 @@ FreeBSD ignores the /usr/local directory by default so it must be included in or
 
     setenv CFLAGS "-L/usr/local/lib -I/usr/local/include"
 
+## Running
+
+Viriatum runs a useful server from its arguments alone, no file on disk is required for any of the following. Every flag that carries a value takes it after an equals sign, there is no positional argument and no sub command, so `viriatum .` remains an error.
+
+Serve the files of a directory, the working one when the flag names none:
+
+    viriatum --file=. --bind=:8080
+
+Serve the build of a single page application, with the routing and the cross origin fields it needs, and the friendly shape that a person trying the server wants:
+
+    viriatum --file=./dist --spa --cors --dev
+
+Serve a python application, named the way gunicorn and uvicorn name one, as a dotted path or as a file and an attribute (this needs a build carrying python support):
+
+    viriatum --wsgi=budy:app --port=8080
+    viriatum --asgi=budy.App --port=8080
+    viriatum --asgi=./app.py:app --port=8080
+
+Take a port from the system and read back the one that was bound, which is what a script driving the server wants:
+
+    viriatum --file=. --port=0
+
+Name the configuration file to read, or ask for none of them to be read at all so that a file sitting in the working directory never changes what a command does:
+
+    viriatum --config=/etc/viriatum/viriatum.ini
+    viriatum --file=. --no-config
+
+See what a run would actually do, validate it without serving anything, or find out which handlers the build carries:
+
+    viriatum --file=. --print-config
+    viriatum --config=/etc/viriatum/viriatum.ini --check
+    viriatum --list-handlers
+
+The flags are a complement to a configuration file rather than a replacement for one, the layering is the defaults first, then the file, then the command line. Run `viriatum --help` for the complete list, grouped by what each one is for.
+
 ## Features
 
 There are a lot of possible building features to enable

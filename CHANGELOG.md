@@ -40,6 +40,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Writing of the configuration a run would actually use, without having to start one - [#69](https://github.com/hivesolutions/viriatum/issues/69)
 * Validating everything a run is made of and reporting the result, without serving anything - [#69](https://github.com/hivesolutions/viriatum/issues/69)
 * Listing of the handlers the build carries, so that naming one is discoverable - [#69](https://github.com/hivesolutions/viriatum/issues/69)
+* Turning the template engine of the error pages on and off from the command line - [#69](https://github.com/hivesolutions/viriatum/issues/69)
 
 ### Changed
 
@@ -49,6 +50,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Pages now use the scalable favicon whenever the browser supports it
 * Illustrations, logos and the listing arrow are now served as vectors
 * A directory is now served with its index file when one is around, the listing answering only when none is - [#69](https://github.com/hivesolutions/viriatum/issues/69)
+* The help now groups the flags by what they are for and carries examples of the common cases - [#69](https://github.com/hivesolutions/viriatum/issues/69)
+* The benchmark now drives the server from its command line instead of a configuration written beside it - [#69](https://github.com/hivesolutions/viriatum/issues/69)
 * The recorded performance targets were replaced by numbers a run can reproduce - [#49](https://github.com/hivesolutions/viriatum/issues/49)
 * Static files are now served considerably faster, ahead of the reference servers on the larger ones - [#49](https://github.com/hivesolutions/viriatum/issues/49)
 * Files that are served are now kept open, so serving one again costs neither opening nor describing it - [#49](https://github.com/hivesolutions/viriatum/issues/49)

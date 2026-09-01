@@ -17,6 +17,24 @@ conan profile detect --force
 conan install . --build=missing
 ```
 
+## Running
+
+The binary runs a useful server from its arguments alone, no file on disk is required for any of it:
+
+```bash
+./bin/viriatum --file=. --bind=:8080
+./bin/viriatum --file=./dist --spa --cors --dev
+./bin/viriatum --wsgi=budy:app --port=0
+```
+
+The parser is flag based, a value travels after an equals sign, there is no positional argument and no sub command, so `viriatum .` is an error and a flag given a value with a space is not read as one. The short forms are `-p` for the port and `-h` for the host, help is reachable as `--help` alone.
+
+The options are layered, the defaults first, then the configuration file, then the command line, so the flags complement a file rather than replace one. Which file is read is decided by `--config`, which names one and fails outright when it is not there, and by `--no-config`, which skips the discovery altogether; with neither of them the first of the three paths that `--help` lists is the one that is read. A flag that selects what is served, `--file`, `--asgi` or `--wsgi`, conflicts with a `--handler` that asks for another one and the run is refused naming both, so neither of them ever wins quietly.
+
+`--print-config` writes the configuration the three layers merged into and `--check` validates everything a run is made of, both of them without ever binding a socket, which is what a change to any of the layering should be verified through. `--list-handlers` writes the handlers the build carries, the ones of the modules included.
+
+The harness of the benchmark is the first real user of all of this and drives the subject entirely from these flags, the proxy workloads excepted, an upstream being a location and a location being written down.
+
 ## Adding a Source File
 
 CMake gathers the sources of the tree through a pattern and so it picks a new file up on its own, every one of the other build systems names them one by one and has to be told. When a source or a header is added, removed or renamed, the following have to be kept in step with it:
