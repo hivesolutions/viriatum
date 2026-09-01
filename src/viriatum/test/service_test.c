@@ -355,6 +355,148 @@ const char *test_file_options_service(void) {
     return NULL;
 }
 
+/**
+ * The path of the configuration file that the test writes so that
+ * the reading of a named one may be observed, it is taken out of
+ * the file system once the test is over.
+ */
+#define SERVICE_CONFIG_TEST_PATH "./viriatum_service_config.ini"
+
+/**
+ * The path that stands in for a configuration file that is not
+ * around, no file is ever written under it.
+ */
+#define SERVICE_CONFIG_TEST_MISSING "./viriatum_service_config_missing.ini"
+
+/**
+ * The contents that the configuration file carries, a general
+ * section naming a port that no default would ever produce.
+ */
+#define SERVICE_CONFIG_TEST_CONTENTS "[general]\nport = 19499\n"
+
+/**
+ * That very same port, kept apart so that the options the loading
+ * produced may be verified against it.
+ */
+#define SERVICE_CONFIG_TEST_PORT 19499
+
+/**
+ * Runs the loading of the options that a configuration file carries
+ * over a service of its own, so that each of the scenarios starts
+ * from a service that carries nothing at all and the configuration
+ * of the previous one is never left behind.
+ *
+ * @param arguments The map of the arguments of the command line.
+ * @param port The pointer to the port the options ended up with.
+ * @param configured The pointer to the flag that says whether a
+ * configuration map was produced at all.
+ * @return The resulting error code.
+ */
+static ERROR_CODE _config_options_service_test(
+    struct hash_map_t *arguments,
+    unsigned short *port,
+    char *configured
+) {
+    ERROR_CODE error;
+    struct service_t *service;
+
+    create_service(
+        &service,
+        (unsigned char *) "test",
+        (unsigned char *) "test"
+    );
+    _default_options_service(service, arguments);
+    error = _file_options_service(service, arguments);
+
+    /* gathers the state that is going to be verified before the
+    service, and with it the configuration, is released */
+    *port = service->options->port;
+    *configured = service->configuration != NULL;
+    delete_service(service);
+
+    return error;
+}
+
+const char *test_config_options_service(void) {
+    /* allocates space for the error code of the loading, for the
+    state that is gathered out of each of the scenarios and for the
+    two arguments that decide which file is read */
+    ERROR_CODE error;
+    unsigned short port;
+    char configured;
+    struct hash_map_t *arguments;
+    struct argument_t config;
+    struct argument_t no_config;
+
+    /* writes the configuration file that is going to be named, the
+    directory of the process is what the path is resolved against */
+    write_file(
+        (char *) SERVICE_CONFIG_TEST_PATH,
+        (unsigned char *) SERVICE_CONFIG_TEST_CONTENTS,
+        sizeof(SERVICE_CONFIG_TEST_CONTENTS) - 1
+    );
+    create_hash_map(&arguments, 0);
+
+    /* the named configuration file is the only one that is read and
+    the options of the service are taken out of it */
+    config.type = VALUE_ARGUMENT;
+    SPRINTF(config.key, sizeof(config.key), "%s", "config");
+    SPRINTF(config.value, sizeof(config.value), "%s", SERVICE_CONFIG_TEST_PATH);
+    set_value_string_hash_map(arguments, (unsigned char *) "config", (void *) &config);
+
+    error = _config_options_service_test(arguments, &port, &configured);
+    V_ASSERT(!IS_ERROR_CODE(error));
+    V_ASSERT(configured == TRUE);
+    V_ASSERT_EQ_U(port, SERVICE_CONFIG_TEST_PORT);
+
+    /* a named configuration file that is not around fails the loading
+    outright, instead of falling back on one never asked for */
+    SPRINTF(config.value, sizeof(config.value), "%s", SERVICE_CONFIG_TEST_MISSING);
+
+    error = _config_options_service_test(arguments, &port, &configured);
+    V_ASSERT(IS_ERROR_CODE(error));
+    V_ASSERT(configured == FALSE);
+
+    /* the flag on its own names no file at all and so there is
+    nothing that could be read out of it */
+    config.type = SINGLE_ARGUMENT;
+
+    error = _config_options_service_test(arguments, &port, &configured);
+    V_ASSERT(IS_ERROR_CODE(error));
+
+    /* the two of the flags ask for opposite things, one for a file to
+    be read and the other for none, so neither may win quietly */
+    no_config.type = SINGLE_ARGUMENT;
+    SPRINTF(no_config.key, sizeof(no_config.key), "%s", "no-config");
+    set_value_string_hash_map(arguments, (unsigned char *) "no-config", (void *) &no_config);
+
+    error = _config_options_service_test(arguments, &port, &configured);
+    V_ASSERT(IS_ERROR_CODE(error));
+    V_ASSERT_EQ_S(
+        (char *) get_last_error_message_safe(),
+        "conflicting configuration: --config names a file, --no-config asks for none"
+    );
+
+    /* the discovery is skipped altogether when asked for, no
+    configuration map being produced and the port remaining the one
+    that the defaults carry */
+    set_value_string_hash_map(arguments, (unsigned char *) "config", NULL);
+
+    error = _config_options_service_test(arguments, &port, &configured);
+    V_ASSERT(!IS_ERROR_CODE(error));
+    V_ASSERT(configured == FALSE);
+    V_ASSERT_EQ_U(port, VIRIATUM_DEFAULT_PORT);
+
+    /* deletes the map of the arguments and takes the configuration
+    file that was written out of the file system */
+    delete_hash_map(arguments);
+    remove(SERVICE_CONFIG_TEST_PATH);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
 const char *test_target_options_service(void) {
     /* allocates space for the error code of the normalisation and
     for the three parts that a target is taken apart into */

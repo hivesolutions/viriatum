@@ -2472,6 +2472,12 @@ ERROR_CODE _file_options_service(struct service_t *service, struct hash_map_t *a
     void *value;
     ERROR_CODE return_value;
 
+    /* allocates space for the two arguments that decide which of the
+    configuration files is read, the one that names a file and the one
+    that asks for the discovery to be skipped */
+    void *config;
+    void *no_config;
+
     /* allocates space for the path to the proper configuration
     file (the ini base file) */
     char config_path[VIRIATUM_MAX_PATH_SIZE];
@@ -2484,11 +2490,60 @@ ERROR_CODE _file_options_service(struct service_t *service, struct hash_map_t *a
     /* unpacks the service options from the service */
     struct service_options_t *service_options = service->options;
 
-    /* tries to load the configuration ini file from a series of
-    candidate paths, using the first one that succeeds: the system
+    /* tries to retrieve both of the arguments that decide which
+    configuration file is read, the one that names a file and the one
+    that asks for none of them to be looked for at all */
+    get_value_string_hash_map(arguments, (unsigned char *) "config", &config);
+    get_value_string_hash_map(arguments, (unsigned char *) "no-config", &no_config);
+
+    /* the two of them ask for opposite things, one for a file to be
+    read and the other for none to be, so neither may win quietly */
+    if(config != NULL && no_config != NULL) {
+        RAISE_ERROR_M(
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "conflicting configuration: --config names a file, --no-config asks for none"
+        );
+    }
+
+    /* the discovery is skipped altogether when asked for, leaving the
+    defaults and the command line as the only sources of the options,
+    so that a file in the working directory surprises no one */
+    if(no_config != NULL) {
+        V_DEBUG("Skipping the discovery of the configuration file\n");
+        service->configuration = NULL;
+        RAISE_NO_ERROR;
+    }
+
+    /* a configuration file that has been named is the only one that is
+    ever read, an absent one failing the loading outright instead of
+    falling back on a file the command never asked for */
+    if(config != NULL) {
+        if(((struct argument_t *) config)->type != VALUE_ARGUMENT) {
+            RAISE_ERROR_M(
+                RUNTIME_EXCEPTION_ERROR_CODE,
+                (unsigned char *) "--config requires the path of a configuration file"
+            );
+        }
+
+        SPRINTF(config_path, VIRIATUM_MAX_PATH_SIZE, "%s", ((struct argument_t *) config)->value);
+        V_DEBUG_F("Reading the named configuration file (%s)\n", config_path);
+        return_value = process_ini_file(config_path, &configuration);
+        if(IS_ERROR_CODE(return_value)) {
+            CATCH_ERROR;
+            RAISE_ERROR_F(
+                RUNTIME_EXCEPTION_ERROR_CODE,
+                (unsigned char *) "Problem reading the configuration file '%s'",
+                config_path
+            );
+        }
+
+        V_INFO_F("Loaded configuration file (%s)\n", config_path);
+    }
+    /* otherwise tries to load the configuration ini file from a series
+    of candidate paths, using the first one that succeeds: the system
     config directory, the current working directory, and finally a
     path relative to the source tree for development convenience */
-    {
+    else {
         const char *candidates[] = {
             NULL,
             "./viriatum.ini",

@@ -106,6 +106,16 @@ const char *test_file_options_service(void);
 const char *test_target_options_service(void);
 
 /**
+ * Tests the arguments that decide which configuration file is read,
+ * the one that names a file and the one that asks for none of them
+ * to be looked for at all.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_config_options_service(void);
+
+/**
  * Tests the options that the arguments of the command line carry,
  * including the one that turns the serving of the cleartext form
  * of the most recent version of the protocol off.

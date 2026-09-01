@@ -1477,6 +1477,7 @@ static struct test_entry_t _simple_entries[] = {
     V_TEST_T(test_open_close_service, "service"),
     V_TEST_T(test_open_service_busy, "service"),
     V_TEST_T(test_file_options_service, "service"),
+    V_TEST_T(test_config_options_service, "service"),
     V_TEST_T(test_target_options_service, "service"),
     V_TEST_T(test_arguments_options_service, "service"),
     V_TEST_T(test_mode_options_service, "service"),
