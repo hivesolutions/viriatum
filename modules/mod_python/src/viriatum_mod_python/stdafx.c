@@ -25,7 +25,7 @@
 #include "stdafx.h"
 
 static unsigned char name[] = "viriatum_mod_python";
-static unsigned char name_s[] = "wsgi";
+static unsigned char name_s[] = "python";
 static unsigned char version[] = "1.0.0";
 static unsigned char description[] = "Viriatum Python Module";
 

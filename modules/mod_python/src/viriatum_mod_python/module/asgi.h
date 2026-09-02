@@ -43,10 +43,12 @@
 
 /**
  * The waiting of the polling that applies while no task of an
- * application is pending, the blocking one the service uses when
- * nothing of the sort is running beside it.
+ * application is pending, which is never a blocking one as the
+ * counting of the tasks says nothing about a callback that was
+ * scheduled through the loop rather than run as one of them, and a
+ * service that blocked would leave it waiting for a request.
  */
-#define VIRIATUM_ASGI_IDLE_TIMEOUT -1
+#define VIRIATUM_ASGI_IDLE_TIMEOUT 250
 
 /**
  * The directory that a relative import of an application resolves

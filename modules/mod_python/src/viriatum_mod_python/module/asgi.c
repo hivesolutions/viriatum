@@ -33,9 +33,14 @@ char _is_absolute_asgi(unsigned char *file_path) {
     one that opens with a drive letter and a separator is absolute on
     the platform that carries them, a configuration naming either is
     never resolved against the contents of the service */
-    if(file_path[0] == '/' || file_path[0] == '\\') { return TRUE; }
+    if(file_path[0] == '/') { return TRUE; }
+#ifdef VIRIATUM_PLATFORM_WIN32
+    if(file_path[0] == '\\') { return TRUE; }
     if(file_path[0] == '\0' || file_path[1] != ':') { return FALSE; }
     return file_path[2] == '/' || file_path[2] == '\\' ? TRUE : FALSE;
+#else
+    return FALSE;
+#endif
 }
 
 ERROR_CODE create_mod_python_asgi(struct mod_python_asgi_t **mod_python_asgi_pointer) {
@@ -273,10 +278,11 @@ ERROR_CODE _path_asgi_state(char *file_path) {
     and so is already covered by the insertion above */
     SPRINTF(base_path, VIRIATUM_MAX_PATH_SIZE, "%s", file_path);
     separator = strrchr(base_path, '/');
-#ifdef VIRIATUM_PLATFORM_WINDOWS
+#ifdef VIRIATUM_PLATFORM_WIN32
     if(separator == NULL) { separator = strrchr(base_path, '\\'); }
 #endif
     if(separator == NULL) { RAISE_NO_ERROR; }
+    if(separator == base_path) { separator++; }
     *separator = '\0';
 
     /* and puts it ahead of everything else, so that a module sitting

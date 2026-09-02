@@ -111,9 +111,14 @@ ERROR_CODE start_module_python(struct environment_t *environment, struct module_
     /* populates the module structure */
     info_module_python(module);
 
-    /* loads the WSGI state populating all the required values
-    for state initialization */
-    _load_python_state();
+    /* loads the python state populating all the required values
+    for state initialization, a failure of it is a failure of the
+    starting as nothing may be built upon an interpreter that is
+    not running */
+    if(IS_ERROR_CODE(_load_python_state())) {
+        V_DEBUG_CTX("mod_python", "Problem starting the interpreter\n");
+        RAISE_AGAIN(D_ERROR_CODE);
+    }
 
     /* creates the HTTP handler */
     service->create_http_handler(service, &http_handler, (unsigned char *) "wsgi");
@@ -144,8 +149,11 @@ ERROR_CODE start_module_python(struct environment_t *environment, struct module_
 #ifdef VIRIATUM_ASGI
     /* starts the serving of the more recent of the two interfaces,
     which only happens when an application has been named for it, the
-    module being usable for either of them on its own */
-    _start_asgi_module(service, mod_python_module);
+    module being usable for either of them on its own, a failure of
+    it is a failure of the starting of the module itself */
+    if(IS_ERROR_CODE(_start_asgi_module(service, mod_python_module))) {
+        RAISE_AGAIN(D_ERROR_CODE);
+    }
 #endif
 
     /* raises no error */
@@ -180,6 +188,7 @@ ERROR_CODE _start_asgi_module(struct service_t *service, struct mod_python_modul
     been handed to the service at this point and so nothing serves */
     if(IS_ERROR_CODE(load_application_asgi(mod_python_asgi))) {
         V_DEBUG_CTX_F("mod_python", "No application was loaded from '%s'\n", mod_python_asgi->file_path);
+        _stop_asgi_module(service, mod_python_module);
         RAISE_ERROR_M(
             D_ERROR_CODE,
             (unsigned char *) "No application was loaded for the asgi handler"
@@ -191,6 +200,7 @@ ERROR_CODE _start_asgi_module(struct service_t *service, struct mod_python_modul
     is being served, the cycle of the service advances the rest */
     if(IS_ERROR_CODE(create_loop_python(&mod_python_module->loop_python))) {
         V_DEBUG_CTX("mod_python", "Problem creating the loop of the applications\n");
+        _stop_asgi_module(service, mod_python_module);
         RAISE_ERROR_M(
             D_ERROR_CODE,
             (unsigned char *) "Problem creating the loop of the applications"
@@ -218,6 +228,7 @@ ERROR_CODE _start_asgi_module(struct service_t *service, struct mod_python_modul
     if(IS_ERROR_CODE(startup_handler_asgi(service))) {
         V_DEBUG_CTX("mod_python", "The application refused to start\n");
         unregister_handler_asgi(service);
+        _stop_asgi_module(service, mod_python_module);
         RAISE_ERROR_M(
             D_ERROR_CODE,
             (unsigned char *) "The application refused to start"
@@ -245,6 +256,11 @@ ERROR_CODE _stop_asgi_module(struct service_t *service, struct mod_python_module
     no application was named for it in the configuration */
     if(mod_python_module->mod_python_asgi == NULL) { RAISE_NO_ERROR; }
 
+    /* the lock of the interpreter is taken for the whole of the
+    taking down, every part of it reaching python and the loop of the
+    service holding none of it */
+    VIRIATUM_ACQUIRE_GIL;
+
     /* gives the operation run once per cycle back, the loop it
     advances is about to go */
     service->on_cycle = NULL;
@@ -270,6 +286,8 @@ ERROR_CODE _stop_asgi_module(struct service_t *service, struct mod_python_module
         delete_loop_python(mod_python_module->loop_python);
         mod_python_module->loop_python = NULL;
     }
+
+    VIRIATUM_RELEASE_GIL;
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -498,16 +516,19 @@ ERROR_CODE _load_locations_wsgi(struct service_t *service, struct mod_python_htt
 }
 
 ERROR_CODE _load_python_state() {
+    /* allocates space for the configuration of the interpreter and
+    for the state that the starting of it reports */
+    PyConfig config;
+    PyStatus status;
+    wchar_t *program_name;
+
     /* initializes the python interpreter using the PyConfig API,
     setting the program name from the service configuration */
-    PyConfig config;
     PyConfig_InitPythonConfig(&config);
 
     /* converts the program name to wide char and sets it in
     the interpreter configuration structure */
-    wchar_t *program_name = Py_DecodeLocale(
-        (char *) _service->program_name, NULL
-    );
+    program_name = Py_DecodeLocale((char *) _service->program_name, NULL);
     if(program_name != NULL) {
         PyConfig_SetString(&config, &config.program_name, program_name);
         PyMem_RawFree(program_name);
@@ -515,9 +536,16 @@ ERROR_CODE _load_python_state() {
 
     /* starts the python interpreter initializing all the resources
     related with the virtual machine, this is the main entry point
-    for the python interpreter (virtual machine) */
-    Py_InitializeFromConfig(&config);
+    for the python interpreter (virtual machine), a failure of it
+    leaves nothing running and must never be built upon */
+    status = Py_InitializeFromConfig(&config);
     PyConfig_Clear(&config);
+    if(PyStatus_Exception(status)) {
+        RAISE_ERROR_M(
+            D_ERROR_CODE,
+            (unsigned char *) "Problem starting the python interpreter"
+        );
+    }
 
     /* starts the WSGI state updating the major global value in
     the current interpreter state */

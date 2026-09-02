@@ -704,19 +704,25 @@ const char *test_asgi_absolute(void) {
     /* a path that opens with a separator is absolute wherever it is
     read, which is the only shape the older module told apart */
     V_ASSERT_EQ_U(_is_absolute_asgi((unsigned char *) "/srv/app.py"), TRUE);
-    V_ASSERT_EQ_U(_is_absolute_asgi((unsigned char *) "\\srv\\app.py"), TRUE);
 
-    /* one that opens with a drive letter and a separator is absolute
-    as well, a configuration naming one was being resolved against
-    the contents of the service and reaching nothing at all */
+    /* a backslash opens one only where the platform carries it as a
+    separator, elsewhere it is an ordinary character of a name and
+    the module has always stripped it and resolved the rest, which
+    the configuration that ships relies on */
+#ifdef VIRIATUM_PLATFORM_WIN32
+    V_ASSERT_EQ_U(_is_absolute_asgi((unsigned char *) "\\srv\\app.py"), TRUE);
     V_ASSERT_EQ_U(_is_absolute_asgi((unsigned char *) "C:\\srv\\app.py"), TRUE);
     V_ASSERT_EQ_U(_is_absolute_asgi((unsigned char *) "c:/srv/app.py"), TRUE);
+    V_ASSERT_EQ_U(_is_absolute_asgi((unsigned char *) "C:app.py"), FALSE);
+#else
+    V_ASSERT_EQ_U(_is_absolute_asgi((unsigned char *) "\\handler.asgi"), FALSE);
+    V_ASSERT_EQ_U(_is_absolute_asgi((unsigned char *) "C:\\srv\\app.py"), FALSE);
+#endif
 
     /* everything else is relative and is resolved against them, a
     letter that carries no separator after it among them */
     V_ASSERT_EQ_U(_is_absolute_asgi((unsigned char *) "app.py"), FALSE);
     V_ASSERT_EQ_U(_is_absolute_asgi((unsigned char *) "srv/app.py"), FALSE);
-    V_ASSERT_EQ_U(_is_absolute_asgi((unsigned char *) "C:app.py"), FALSE);
     V_ASSERT_EQ_U(_is_absolute_asgi((unsigned char *) ""), FALSE);
 
     /* returns the default value, nothing happened so there's
@@ -741,6 +747,15 @@ const char *test_asgi_path(void) {
     first = PyUnicode_AsUTF8(value);
     V_ASSERT_EQ_S((char *) first, "/srv/application");
 
+    /* an application sitting directly under the root of the file
+    system leaves the root itself at the front, the cutting away of
+    the separator would name the working directory instead */
+    _path_asgi_state((char *) "/app.py");
+    path = PySys_GetObject("path");
+    value = PyList_GetItem(path, 0);
+    first = PyUnicode_AsUTF8(value);
+    V_ASSERT_EQ_S((char *) first, "/");
+
     /* a path that carries no directory at all leaves the working
     one at the front, which is where the application sits */
     _path_asgi_state((char *) "app.py");
@@ -763,7 +778,7 @@ const char *test_module_python_info(void) {
     together with the operations the service reaches it through */
     info_module_python(&module);
     V_ASSERT_EQ_S((char *) module.name, "viriatum_mod_python");
-    V_ASSERT_EQ_S((char *) module.name_s, "asgi");
+    V_ASSERT_EQ_S((char *) module.name_s, "python");
     V_ASSERT_EQ_U(module.type, MODULE_TYPE_HTTP_HANDLER);
     V_ASSERT_EQ_P(module.start, start_module_python);
     V_ASSERT_EQ_P(module.stop, stop_module_python);
@@ -1062,6 +1077,8 @@ void exec_mod_python_tests(struct test_case_t *test_case) {
     V_RUN_TEST(test_asgi_path, test_case);
     V_RUN_TEST(test_asgi_configuration, test_case);
     V_RUN_TEST(test_asgi_cycle, test_case);
+    V_RUN_TEST(test_module_python_info, test_case);
+    V_RUN_TEST(test_module_python_error, test_case);
     V_RUN_TEST(test_asgi_marker, test_case);
     V_RUN_TEST(test_asgi_start_unconfigured, test_case);
     V_RUN_TEST(test_asgi_start_missing, test_case);

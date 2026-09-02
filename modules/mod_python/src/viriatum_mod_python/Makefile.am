@@ -35,11 +35,19 @@ libviriatum_mod_python_la_CXXFLAGS = $(AM_CXXFLAGS)
 libviriatum_mod_python_la_LDFLAGS = -version-info $(MOD_PYTHON_MAJOR_VERSION):$(MOD_PYTHON_MINOR_VERSION):$(MOD_PYTHON_MICRO_VERSION)
 
 libviriatum_mod_python_a_SOURCES = stdafx.c \
+module/asgi.c \
 module/entry.c \
 module/extension.c \
-module/handler.c
+module/handler.c \
+../../../../src/viriatum_python/module/handler_asgi.c \
+../../../../src/viriatum_python/module/loop.c \
+../../../../src/viriatum/http/websocket.c
 
 libviriatum_mod_python_la_SOURCES = stdafx.c \
+module/asgi.c \
 module/entry.c \
 module/extension.c \
-module/handler.c
+module/handler.c \
+../../../../src/viriatum_python/module/handler_asgi.c \
+../../../../src/viriatum_python/module/loop.c \
+../../../../src/viriatum/http/websocket.c
