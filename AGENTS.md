@@ -82,13 +82,13 @@ The formats of the report are `text`, `tap`, `junit` and `markdown`. A format gi
 
 ## Coverage
 
-Measure the coverage of the C tree and of the python package with:
+Measure the coverage of the C tree and of the Python package with:
 
 ```bash
 ./scripts/coverage.sh
 ```
 
-The script builds every target with instrumentation, runs the core, the module and the python suites and writes the reports under `coverage/`. Both clang, through llvm-cov, and gcc, through gcovr, are supported and produce the same set of reports. The threshold of the C tree is set through `THRESHOLD` and the one of the python surface through `PYTHON_THRESHOLD`, raise them as the coverage improves rather than lowering them to make a run pass.
+The script builds every target with instrumentation, runs the core, the module and the Python suites and writes the reports under `coverage/`. Both clang, through llvm-cov, and gcc, through gcovr, are supported and produce the same set of reports. The threshold of the C tree is set through `THRESHOLD` and the one of the Python surface through `PYTHON_THRESHOLD`, raise them as the coverage improves rather than lowering them to make a run pass.
 
 ## Memory
 

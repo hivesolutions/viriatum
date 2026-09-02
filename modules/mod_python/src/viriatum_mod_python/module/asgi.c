@@ -145,7 +145,7 @@ ERROR_CODE _load_module_asgi(PyObject **module_pointer, char *name, char *file_p
     used for reading the module file */
     FILE *file;
 
-    /* allocates space for the code and module python objects */
+    /* allocates space for the code and module Python objects */
     PyObject *code;
     PyObject *module;
 
@@ -179,7 +179,7 @@ ERROR_CODE _load_module_asgi(PyObject **module_pointer, char *name, char *file_p
     fseek(file, 0, SEEK_SET);
 
     /* allocates space for the file buffer that will contain the
-    complete python file, this should be a null terminated string */
+    complete Python file, this should be a null terminated string */
     file_buffer = (char *) MALLOC(file_size + 1);
     number_bytes = fread(file_buffer, 1, file_size, file);
     file_buffer[number_bytes] = '\0';

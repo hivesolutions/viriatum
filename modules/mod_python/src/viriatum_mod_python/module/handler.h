@@ -28,7 +28,7 @@
 
 /**
  * The maximum size of the name of the module
- * to be used in the python module.
+ * to be used in the Python module.
  */
 #define VIRIATUM_WSGI_MODULE_SIZE 128
 
@@ -70,7 +70,7 @@ typedef struct mod_python_location_t {
 /**
  * The structure that holds the internal
  * structure to support the context
- * of the python module.
+ * of the Python module.
  */
 typedef struct mod_python_http_handler_t {
     /**
@@ -106,7 +106,7 @@ typedef struct mod_python_http_handler_t {
 
     /**
      * The buffer used to store the "main" module name
-     * so that it may be referred in the python interpreter.
+     * so that it may be referred in the Python interpreter.
      */
     char module_name[VIRIATUM_WSGI_MODULE_SIZE];
 

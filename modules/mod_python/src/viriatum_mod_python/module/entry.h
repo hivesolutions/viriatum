@@ -61,7 +61,7 @@
 /**
  * Structure describing the internal
  * structures and information for the
- * mod python module.
+ * mod Python module.
  */
 typedef struct mod_python_module_t {
     /**
@@ -71,7 +71,7 @@ typedef struct mod_python_module_t {
     struct http_handler_t *http_handler;
 
     /**
-     * The mod python HTTP handler associated
+     * The mod Python HTTP handler associated
      * with the module.
      */
     struct mod_python_http_handler_t *mod_python_http_handler;

@@ -27,14 +27,14 @@
 #include "handler.h"
 
 ERROR_CODE create_mod_python_http_handler(struct mod_python_http_handler_t **mod_python_http_handler_pointer, struct http_handler_t *http_handler) {
-    /* retrieves the mod python HTTP handler size */
+    /* retrieves the mod Python HTTP handler size */
     size_t mod_python_http_handler_size = sizeof(struct mod_python_http_handler_t);
 
-    /* allocates space for the mod python HTTP handler */
+    /* allocates space for the mod Python HTTP handler */
     struct mod_python_http_handler_t *mod_python_http_handler =
         (struct mod_python_http_handler_t *) MALLOC(mod_python_http_handler_size);
 
-    /* sets the mod python HTTP handler attributes (default) values */
+    /* sets the mod Python HTTP handler attributes (default) values */
     mod_python_http_handler->file_path[0] = '\0';
     mod_python_http_handler->reload = FALSE;
     mod_python_http_handler->counter = 0;
@@ -42,10 +42,10 @@ ERROR_CODE create_mod_python_http_handler(struct mod_python_http_handler_t **mod
     mod_python_http_handler->locations = NULL;
     mod_python_http_handler->locations_count = 0;
 
-    /* sets the mod python HTTP handler in the upper HTTP handler substrate */
+    /* sets the mod Python HTTP handler in the upper HTTP handler substrate */
     http_handler->lower = (void *) mod_python_http_handler;
 
-    /* sets the mod python HTTP handler in the mod python HTTP handler pointer */
+    /* sets the mod Python HTTP handler in the mod Python HTTP handler pointer */
     *mod_python_http_handler_pointer = mod_python_http_handler;
 
     /* raises no error */
@@ -82,7 +82,7 @@ ERROR_CODE delete_mod_python_http_handler(struct mod_python_http_handler_t *mod_
     lock on the global interpreter state */
     VIRIATUM_RELEASE_GIL;
 
-    /* releases the mod python HTTP handler */
+    /* releases the mod Python HTTP handler */
     FREE(mod_python_http_handler);
 
     /* raises no error */
@@ -537,7 +537,7 @@ ERROR_CODE _unset_http_settings_handler_wsgi(struct http_settings_t *http_settin
 }
 
 ERROR_CODE _send_data_callback_wsgi(struct connection_t *connection, struct data_t *data, void *parameters) {
-    /* allocates space for the buffers (both the python internal and
+    /* allocates space for the buffers (both the Python internal and
     the copy) and for the size of both of them */
     char *buffer;
     char *_buffer;
@@ -612,7 +612,7 @@ ERROR_CODE _send_data_callback_wsgi(struct connection_t *connection, struct data
     }
 
     /* allocates data for the current connection and then copies the
-    current python buffer data into it (for writing into the connection) */
+    current Python buffer data into it (for writing into the connection) */
     connection->alloc_data(connection, buffer_size, (void **) &_buffer);
     memcpy(_buffer, buffer, buffer_size);
 
@@ -642,7 +642,7 @@ ERROR_CODE _send_data_callback_wsgi(struct connection_t *connection, struct data
 
 ERROR_CODE _send_response_handler_wsgi(struct http_request_t *http_request) {
     /* allocates space for the local (application) module, for the global
-    python module (containing util function) an then allocates also space
+    Python module (containing util function) an then allocates also space
     for the application handler function and for the start response function */
     PyObject *module;
     PyObject *wsgi_module;
@@ -675,7 +675,7 @@ ERROR_CODE _send_response_handler_wsgi(struct http_request_t *http_request) {
     size_t sequence_length;
 
     /* allocates space for the reference to the modules object that
-    may be used to unregister the module from the python interpreter */
+    may be used to unregister the module from the Python interpreter */
     PyObject *modules;
 
     /* allocates space for the temporary item to be used to possible calculate
@@ -693,7 +693,7 @@ ERROR_CODE _send_response_handler_wsgi(struct http_request_t *http_request) {
     char *headers_buffer;
 
     /* retrieves the connection from the HTTP parser parameters
-    and then retrieves the handler WSGI context and mod python handler */
+    and then retrieves the handler WSGI context and mod Python handler */
     struct connection_t *connection = (struct connection_t *) http_request->parameters;
     struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
     struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
@@ -718,7 +718,7 @@ ERROR_CODE _send_response_handler_wsgi(struct http_request_t *http_request) {
 
     /* in case the reload flag is set and the module is already loaded must
     release its memory and unset it from the handler then removes the module
-    reference from the modules object in the python interpreter */
+    reference from the modules object in the Python interpreter */
     if(handler_wsgi_context->reload && handler_wsgi_context->module) {
         Py_DECREF(handler_wsgi_context->module);
         handler_wsgi_context->module = NULL;
@@ -728,7 +728,7 @@ ERROR_CODE _send_response_handler_wsgi(struct http_request_t *http_request) {
     }
 
     /* in case the module is not defined, must be loaded again from the
-    file into the python interpreter */
+    file into the Python interpreter */
     if(handler_wsgi_context->module == NULL) {
         /* retrieves the correct file path for the module to be loaded
         defaulting to the preddefined path in case none is defined */
@@ -758,7 +758,7 @@ ERROR_CODE _send_response_handler_wsgi(struct http_request_t *http_request) {
         *handler_wsgi_context->module_pointer = handler_wsgi_context->module;
     }
 
-    /* imports the python module containing the util methods to be used by the
+    /* imports the Python module containing the util methods to be used by the
     application to access viriatum WSGI functions */
     wsgi_module = PyImport_ImportModule("viriatum_wsgi");
     if(wsgi_module == NULL) {
@@ -767,8 +767,8 @@ ERROR_CODE _send_response_handler_wsgi(struct http_request_t *http_request) {
         RAISE_ERROR_M(D_ERROR_CODE, (unsigned char *) "Problem loading (WSGI) module");
     }
 
-    /* retrieves the reference to the start response function from the python module
-    and then verifies that it's a valid python function */
+    /* retrieves the reference to the start response function from the Python module
+    and then verifies that it's a valid Python function */
     start_response_function = PyObject_GetAttrString(wsgi_module, "start_response");
     if(!start_response_function || !PyCallable_Check(start_response_function)) {
         Py_XDECREF(start_response_function);
@@ -846,7 +846,7 @@ ERROR_CODE _send_response_handler_wsgi(struct http_request_t *http_request) {
     }
 
     /* unsets the flag that controls if the size of the message
-    is meant to be controlled by the python module instead of the
+    is meant to be controlled by the Python module instead of the
     user application directly */
     has_size = FALSE;
 
@@ -910,7 +910,7 @@ ERROR_CODE _send_response_handler_wsgi(struct http_request_t *http_request) {
     );
 
     /* in case the current message is meant to have the content length
-    header controlled by the python module it must be set in the headers */
+    header controlled by the Python module it must be set in the headers */
     if(has_size == TRUE) {
         /* writes the content length header into the headers
         with the size value associated so that the client is
@@ -1101,7 +1101,7 @@ ERROR_CODE _start_environ_wsgi(PyObject *environ, struct http_request_t *http_re
 
         /* converts the current header name to uppercase
         and appends the HTTP prefix into it, then converts
-        the header value into a python string object */
+        the header value into a Python string object */
         uppercase(header->name);
         SPRINTF(name, VIRIATUM_MAX_HEADER_SIZE + sizeof("HTTP_"), "HTTP_%s", header->name);
         _value = PyUnicode_FromString(header->value);
@@ -1193,7 +1193,7 @@ ERROR_CODE _load_module_python(PyObject **module_pointer, char *name, char *file
     used for reading the module file */
     FILE *file;
 
-    /* allocates space for the code and module python objects */
+    /* allocates space for the code and module Python objects */
     PyObject *code;
     PyObject *module;
 
@@ -1208,8 +1208,8 @@ ERROR_CODE _load_module_python(PyObject **module_pointer, char *name, char *file
     *module_pointer = NULL;
 
     /* prints a debug message to notify the system about the loading
-    of the python module (provides logging) */
-    V_DEBUG_CTX_F("mod_python", "Loading python module '%s'\n", file_path);
+    of the Python module (provides logging) */
+    V_DEBUG_CTX_F("mod_python", "Loading Python module '%s'\n", file_path);
 
     /* opens the file for reading (in binary mode) and checks if
     there was a problem opening it, raising an error in such case */
@@ -1227,7 +1227,7 @@ ERROR_CODE _load_module_python(PyObject **module_pointer, char *name, char *file
     fseek(file, 0, SEEK_SET);
 
     /* allocates space for the file buffer that will contain the
-    complete python file, this should be a null terminated string */
+    complete Python file, this should be a null terminated string */
     file_buffer = (char *) MALLOC(file_size + 1);
     number_bytes = fread(file_buffer, 1, file_size, file);
     file_buffer[number_bytes] = '\0';

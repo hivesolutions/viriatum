@@ -94,7 +94,7 @@ const char *test_wsgi_input_read_data(void);
 const char *test_wsgi_app_lifecycle(void);
 
 /**
- * Tests that a loaded python module remains accessible
+ * Tests that a loaded Python module remains accessible
  * across multiple lookups without reloading the file
  * (the reload=0 path).
  *
@@ -104,11 +104,11 @@ const char *test_wsgi_app_lifecycle(void);
 const char *test_wsgi_app_persistence(void);
 
 /**
- * Executes the set of mod python tests in the current
+ * Executes the set of mod Python tests in the current
  * test case.
  *
  * @param test_case The test case context for which
- * the mod python tests will be executed, should be able
+ * the mod Python tests will be executed, should be able
  * to store some context information about the execution.
  */
 /**
@@ -303,8 +303,8 @@ const char *test_asgi_marker(void);
 void exec_mod_python_tests(struct test_case_t *test_case);
 
 /**
- * Runs the set of mod python tests in the current
+ * Runs the set of mod Python tests in the current
  * test case. This is the main entry point for the
- * mod python test case.
+ * mod Python test case.
  */
 ERROR_CODE run_mod_python_tests(void);

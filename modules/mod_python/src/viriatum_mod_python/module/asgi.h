@@ -76,7 +76,7 @@ typedef struct mod_python_asgi_t {
 
     /**
      * The buffer used to store the "main" module name
-     * so that it may be referred in the python interpreter.
+     * so that it may be referred in the Python interpreter.
      */
     char module_name[VIRIATUM_ASGI_MODULE_SIZE];
 

@@ -1,4 +1,4 @@
-# detects Python 3 using python3-config for the python module
+# detects Python 3 using python3-config for the Python module
 find_program(PYTHON3_CONFIG python3-config)
 if(PYTHON3_CONFIG)
     execute_process(COMMAND ${PYTHON3_CONFIG} --includes OUTPUT_VARIABLE PY3_INCLUDES_RAW OUTPUT_STRIP_TRAILING_WHITESPACE)
@@ -22,7 +22,7 @@ if(PYTHON3_CONFIG)
         COMMAND ${PYTHON3_CONFIG} --embed
         OUTPUT_QUIET ERROR_QUIET RESULT_VARIABLE PY3_EMBED_RESULT
     )
-    find_program(PYTHON3_BINARY NAMES python3 python)
+    find_program(PYTHON3_BINARY NAMES python3 Python)
     if(PYTHON3_BINARY)
         execute_process(
             COMMAND ${PYTHON3_BINARY} -c "import sys; print(1 if sys.version_info >= (3, 8) else 0)"

@@ -40,13 +40,13 @@ struct mod_python_module_t *_mod_python_module;
 #endif
 
 ERROR_CODE create_mod_python_module(struct mod_python_module_t **mod_python_module_pointer, struct module_t *module) {
-    /* retrieves the mod python module size */
+    /* retrieves the mod Python module size */
     size_t mod_python_module_size = sizeof(struct mod_python_module_t);
 
-    /* allocates space for the mod python module */
+    /* allocates space for the mod Python module */
     struct mod_python_module_t *mod_python_module = (struct mod_python_module_t *) MALLOC(mod_python_module_size);
 
-    /* sets the mod python module attributes (default) values */
+    /* sets the mod Python module attributes (default) values */
     mod_python_module->http_handler = NULL;
     mod_python_module->mod_python_http_handler = NULL;
 #ifdef VIRIATUM_ASGI
@@ -55,10 +55,10 @@ ERROR_CODE create_mod_python_module(struct mod_python_module_t **mod_python_modu
     mod_python_module->started = FALSE;
 #endif
 
-    /* sets the mod python module in the (upper) module substrate */
+    /* sets the mod Python module in the (upper) module substrate */
     module->lower = (void *) mod_python_module;
 
-    /* sets the mod python module in the module pointer */
+    /* sets the mod Python module in the module pointer */
     *mod_python_module_pointer = mod_python_module;
 
     /* raises no error */
@@ -66,7 +66,7 @@ ERROR_CODE create_mod_python_module(struct mod_python_module_t **mod_python_modu
 }
 
 ERROR_CODE delete_mod_python_module(struct mod_python_module_t *mod_python_module) {
-    /* releases the mod python module */
+    /* releases the mod Python module */
     FREE(mod_python_module);
 
     /* raises no error */
@@ -74,13 +74,13 @@ ERROR_CODE delete_mod_python_module(struct mod_python_module_t *mod_python_modul
 }
 
 ERROR_CODE start_module_python(struct environment_t *environment, struct module_t *module) {
-    /* allocates the mod python module */
+    /* allocates the mod Python module */
     struct mod_python_module_t *mod_python_module;
 
     /* allocates the HTTP handler */
     struct http_handler_t *http_handler;
 
-    /* allocates the mod python HTTP handler */
+    /* allocates the mod Python HTTP handler */
     struct mod_python_http_handler_t *mod_python_http_handler;
 
     /* retrieves the name, version and description of
@@ -99,7 +99,7 @@ ERROR_CODE start_module_python(struct environment_t *environment, struct module_
     externalized function for the interpreter */
     _service = service;
 
-    /* creates the mod python module */
+    /* creates the mod Python module */
     create_mod_python_module(&mod_python_module, module);
 
 #ifdef VIRIATUM_ASGI
@@ -111,7 +111,7 @@ ERROR_CODE start_module_python(struct environment_t *environment, struct module_
     /* populates the module structure */
     info_module_python(module);
 
-    /* loads the python state populating all the required values
+    /* loads the Python state populating all the required values
     for state initialization, a failure of it is a failure of the
     starting as nothing may be built upon an interpreter that is
     not running */
@@ -123,7 +123,7 @@ ERROR_CODE start_module_python(struct environment_t *environment, struct module_
     /* creates the HTTP handler */
     service->create_http_handler(service, &http_handler, (unsigned char *) "wsgi");
 
-    /* creates the mod python HTTP handler */
+    /* creates the mod Python HTTP handler */
     create_mod_python_http_handler(&mod_python_http_handler, http_handler);
 
     /* sets the HTTP handler attributes */
@@ -132,7 +132,7 @@ ERROR_CODE start_module_python(struct environment_t *environment, struct module_
     http_handler->unset = unset_handler_wsgi;
     http_handler->reset = NULL;
 
-    /* sets the mod python module attributes */
+    /* sets the mod Python module attributes */
     mod_python_module->http_handler = http_handler;
     mod_python_module->mod_python_http_handler = mod_python_http_handler;
 
@@ -257,7 +257,7 @@ ERROR_CODE _stop_asgi_module(struct service_t *service, struct mod_python_module
     if(mod_python_module->mod_python_asgi == NULL) { RAISE_NO_ERROR; }
 
     /* the lock of the interpreter is taken for the whole of the
-    taking down, every part of it reaching python and the loop of the
+    taking down, every part of it reaching Python and the loop of the
     service holding none of it */
     VIRIATUM_ACQUIRE_GIL;
 
@@ -328,13 +328,13 @@ ERROR_CODE stop_module_python(struct environment_t *environment, struct module_t
     /* retrieves the (environment) service */
     struct service_t *service = environment->service;
 
-    /* retrieves the mod python module (from the module) */
+    /* retrieves the mod Python module (from the module) */
     struct mod_python_module_t *mod_python_module = (struct mod_python_module_t *) module->lower;
 
-    /* retrieves the HTTP handler from the mod python module */
+    /* retrieves the HTTP handler from the mod Python module */
     struct http_handler_t *http_handler = mod_python_module->http_handler;
 
-    /* retrieves the mod python HTTP handler from the mod python module */
+    /* retrieves the mod Python HTTP handler from the mod Python module */
     struct mod_python_http_handler_t *mod_python_http_handler = mod_python_module->mod_python_http_handler;
 
     /* prints a debug message */
@@ -349,10 +349,10 @@ ERROR_CODE stop_module_python(struct environment_t *environment, struct module_t
     /* removes the HTTP handler from the service */
     service->remove_http_handler(service, http_handler);
 
-    /* in case the mod python HTTP handler is valid and
+    /* in case the mod Python HTTP handler is valid and
     initialized (correct state) */
     if(mod_python_http_handler != NULL) {
-        /* deletes the mod python HTTP handler */
+        /* deletes the mod Python HTTP handler */
         delete_mod_python_http_handler(mod_python_http_handler);
     }
 
@@ -367,7 +367,7 @@ ERROR_CODE stop_module_python(struct environment_t *environment, struct module_t
     for state destroyed */
     _unload_python_state();
 
-    /* deletes the mod python module */
+    /* deletes the mod Python module */
     delete_mod_python_module(mod_python_module);
 
     /* sets the global references this is no longer necessary
@@ -423,7 +423,7 @@ ERROR_CODE _load_configuration_wsgi(struct service_t *service, struct mod_python
     must return immediately (not possible to load it) */
     if(service->configuration == NULL) { RAISE_NO_ERROR; }
 
-    /* tries to retrieve the mod python section configuration from the configuration
+    /* tries to retrieve the mod Python section configuration from the configuration
     map in case none is found returns immediately no need to process anything more */
     get_value_string_sort_map(service->configuration, (unsigned char *) "mod_python", (void **) &configuration);
     if(configuration == NULL) { RAISE_NO_ERROR; }
@@ -462,7 +462,7 @@ ERROR_CODE _load_locations_wsgi(struct service_t *service, struct mod_python_htt
     struct location_t *location;
     struct sort_map_t *configuration;
 
-    /* allocates space for the mod python location structure
+    /* allocates space for the mod Python location structure
     reference to be used to resolve the request */
     struct mod_python_location_t *_location;
 
@@ -484,7 +484,7 @@ ERROR_CODE _load_locations_wsgi(struct service_t *service, struct mod_python_htt
         location = &service->locations.values[index];
         configuration = location->configuration;
 
-        /* retrieves the current mod python configuration reference from
+        /* retrieves the current mod Python configuration reference from
         the location buffer, this is going to be populated and sets the
         default values in it */
         _location = &mod_python_http_handler->locations[index];
@@ -522,7 +522,7 @@ ERROR_CODE _load_python_state() {
     PyStatus status;
     wchar_t *program_name;
 
-    /* initializes the python interpreter using the PyConfig API,
+    /* initializes the Python interpreter using the PyConfig API,
     setting the program name from the service configuration */
     PyConfig_InitPythonConfig(&config);
 
@@ -534,16 +534,16 @@ ERROR_CODE _load_python_state() {
         PyMem_RawFree(program_name);
     }
 
-    /* starts the python interpreter initializing all the resources
+    /* starts the Python interpreter initializing all the resources
     related with the virtual machine, this is the main entry point
-    for the python interpreter (virtual machine), a failure of it
+    for the Python interpreter (virtual machine), a failure of it
     leaves nothing running and must never be built upon */
     status = Py_InitializeFromConfig(&config);
     PyConfig_Clear(&config);
     if(PyStatus_Exception(status)) {
         RAISE_ERROR_M(
             D_ERROR_CODE,
-            (unsigned char *) "Problem starting the python interpreter"
+            (unsigned char *) "Problem starting the Python interpreter"
         );
     }
 
@@ -556,7 +556,7 @@ ERROR_CODE _load_python_state() {
 }
 
 ERROR_CODE _unload_python_state() {
-    /* shuts down the python interpreter, releasing all the resources
+    /* shuts down the Python interpreter, releasing all the resources
     associated with it (everything is destroyed), the atexit handlers
     registered by modules will be called automatically by Py_Finalize */
     Py_Finalize();
@@ -586,7 +586,7 @@ static PyObject *_init_wsgi_module(void) {
 
 ERROR_CODE _start_python_state() {
     /* allocates space for the reference to the to be created
-    python module and the type to be exported */
+    Python module and the type to be exported */
     PyObject *wsgi_module;
     PyTypeObject *type;
 
@@ -597,7 +597,7 @@ ERROR_CODE _start_python_state() {
     PyList_Insert(path, 0, current_path);
     Py_DECREF(current_path);
 
-    /* registers the viriatum python module in the python interpreter
+    /* registers the viriatum Python module in the Python interpreter
     this module may be used to provide WSGI functions */
     wsgi_module = _init_wsgi_module();
     if(wsgi_module == NULL) { RAISE_NO_ERROR; }
@@ -621,7 +621,7 @@ ERROR_CODE _start_python_state() {
     PyModule_AddStringConstant(wsgi_module, "PLATFORM_CPU", VIRIATUM_PLATFORM_CPU);
 
     /* checks the input type for readiness and then casts the
-    type as a python type and registers it as input */
+    type as a Python type and registers it as input */
     PyType_Ready(&input_type);
     type = &input_type;
     Py_INCREF(type);

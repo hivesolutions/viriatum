@@ -37,7 +37,7 @@ if(VIRIATUM_BUILD_MOD_LUA)
     add_subdirectory(mod_lua)
 endif()
 
-option(VIRIATUM_BUILD_MOD_PYTHON "Build the python module" ON)
+option(VIRIATUM_BUILD_MOD_PYTHON "Build the Python module" ON)
 if(VIRIATUM_BUILD_MOD_PYTHON)
     add_subdirectory(mod_python)
 endif()

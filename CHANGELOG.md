@@ -9,13 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-* Serving of applications of the more recent python interface straight from the server - [#71](https://github.com/hivesolutions/viriatum/issues/71)
-* The two python interfaces are now served by a single module, which owns the interpreter - [#71](https://github.com/hivesolutions/viriatum/issues/71)
+* Serving of applications of the more recent Python interface straight from the server - [#71](https://github.com/hivesolutions/viriatum/issues/71)
+* The two Python interfaces are now served by a single module, which owns the interpreter - [#71](https://github.com/hivesolutions/viriatum/issues/71)
 * Header compression for HTTP/2, built from scratch with no new dependency
 * Framing, streams and flow control for HTTP/2
 * Serving of requests over HTTP/2 in cleartext, without any negotiation
 * Negotiation of HTTP/2 through the transport, which is what a browser uses
-* Serving of the python applications, the modules and the error pages over HTTP/2
+* Serving of the Python applications, the modules and the error pages over HTTP/2
 * Setting that turns the cleartext form of HTTP/2 off
 * Resources listed in a location are now promised to the client over HTTP/2 - [#50](https://github.com/hivesolutions/viriatum/issues/50)
 * The order a client asks for now decides which stream writes first - [#50](https://github.com/hivesolutions/viriatum/issues/50)
@@ -112,8 +112,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Server can now be imported from Python to serve a WSGI application on its own event loop - [#39](https://github.com/hivesolutions/viriatum/issues/39)
 * Continuous integration job building and testing the Python package on Linux, macOS and Windows - [#39](https://github.com/hivesolutions/viriatum/issues/39)
 * Core server can now be built as a shared or static library, so it can be embedded in another program - [#39](https://github.com/hivesolutions/viriatum/issues/39)
-* python module introspection methods: `connections()`, `connections_l()`, `connection_info()`, and `uptime()` for runtime server state inspection
-* python module constants (`NAME`, `VERSION`, `PLATFORM`, `FLAGS`, `MODULES`, `DESCRIPTION`, `COMPILER`, `COMPILER_VERSION`, `COMPILATION_DATE`, `COMPILATION_TIME`, `COMPILATION_FLAGS`) exposed via `viriatum_wsgi` module
+* Python module introspection methods: `connections()`, `connections_l()`, `connection_info()`, and `uptime()` for runtime server state inspection
+* Python module constants (`NAME`, `VERSION`, `PLATFORM`, `FLAGS`, `MODULES`, `DESCRIPTION`, `COMPILER`, `COMPILER_VERSION`, `COMPILATION_DATE`, `COMPILATION_TIME`, `COMPILATION_FLAGS`) exposed via `viriatum_wsgi` module
 * Enhanced handler.wsgi and handler.lua demo pages with server info (engine, version, platform, compiler, uptime, connections)
 * Path traversal validation (`is_path_safe`) in `viriatum_commons/util/string_util.h`
 * Unit test `test_is_path_safe` covering traversal detection and false positive avoidance
@@ -188,7 +188,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Fixed IPv6 autodetection failing with GCC 15 (C23) due to `void main` and missing `arpa/inet.h` in m4 network checks
 * Fixed double-free of `http_parser->context` in dispatch handler unset causing server hang on keep-alive connections
 * File and proxy handler unsets now NULL `http_parser->context` after freeing to prevent dangling pointers
-* PHP and python module handler unsets now NULL `http_parser->context` after freeing
+* PHP and Python module handler unsets now NULL `http_parser->context` after freeing
 * Fixed `REQUEST_URI` length using path size instead of full URL size in mod_php handler
 * Connection info page now shows "not found" message instead of empty fields for closed connections
 * Fixed `setvbuf` crash on Windows/MSVC by using `_IONBF` (unbuffered) instead of `_IOLBF` which rejects size 0

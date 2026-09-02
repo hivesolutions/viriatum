@@ -202,7 +202,7 @@ handler = file
 push = /static/style.css /static/main.js
 ```
 
-Every handler of the tree writes its response through the operations that the connection carries, so the file, the default, the dispatch and the proxy handlers, the pages of the errors and both of the python interfaces are served by either version of the protocol without knowing which one is in use.
+Every handler of the tree writes its response through the operations that the connection carries, so the file, the default, the dispatch and the proxy handlers, the pages of the errors and both of the Python interfaces are served by either version of the protocol without knowing which one is in use.
 
 ## Python Package
 
