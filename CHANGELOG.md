@@ -46,6 +46,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+* Interrupting a server no longer skips the shutdown that a Python application is told about - [#60](https://github.com/hivesolutions/viriatum/issues/60)
 * Docker images of the PHP and full variants now build for the architecture of the machine instead of always amd64
 * A file served over HTTP/2 is now closed once the response has been sent - [#50](https://github.com/hivesolutions/viriatum/issues/50)
 * A client that narrows the window of a stream now receives what was held back - [#50](https://github.com/hivesolutions/viriatum/issues/50)

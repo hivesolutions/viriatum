@@ -941,14 +941,22 @@ static PyObject *_build_lifespan_scope_handler_asgi(const char *version) {
 
 static ERROR_CODE _wait_lifespan_handler_asgi(struct handler_asgi_t *handler_asgi, char *state) {
     /* allocates space for the flag controlling if the task is already
-    done and for the deadline of the complete operation, the latter is
-    measured against the clock of the loop so that a slice that fails
-    to let time pass is never mistaken for a completed wait */
+    done, for the count of the slices that failed in a row and for the
+    deadline of the complete operation, the latter is measured against
+    the clock of the loop so that a slice that fails to let time pass
+    is never mistaken for a completed wait */
     PyObject *done;
     int is_done = 0;
     size_t index;
+    size_t failures = 0;
     double initial = time_loop_python(handler_asgi->loop_python);
     double elapsed = 0.0;
+
+    /* holds the re arming of the interrupt for the complete duration
+    of the wait, a signal that is in flight while the event is being
+    delivered would otherwise abort every one of the slices and leave
+    the application without ever seeing it */
+    hold_interrupt_loop_python();
 
     /* advances the loop until the application reports the completion
     of the event, the task dies or the deadline is reached, each of
@@ -959,24 +967,36 @@ static ERROR_CODE _wait_lifespan_handler_asgi(struct handler_asgi_t *handler_asg
     for(index = 0; index < VIRIATUM_ASGI_LIFESPAN_ITERATIONS; index++) {
         elapsed = time_loop_python(handler_asgi->loop_python) - initial;
         if(elapsed >= VIRIATUM_ASGI_LIFESPAN_TIMEOUT) { break; }
-        if(*state != 0) { RAISE_NO_ERROR; }
+        if(*state != 0) { break; }
         if(IS_ERROR_CODE(run_slice_loop_python(
                handler_asgi->loop_python,
                VIRIATUM_ASGI_LIFESPAN_SLICE
            ))) {
             V_WARNING_F("Problem advancing the loop: %s\n", (char *) GET_ERROR());
-            RAISE_NO_ERROR;
+
+            /* a slice fails for reasons the next one is no longer
+            subject to, a signal that was in flight or a stopping that
+            the aborted running of the loop left scheduled in it, only
+            a run of them tells a loop unable to run at all */
+            failures++;
+            if(failures >= VIRIATUM_ASGI_LIFESPAN_FAILURES) { break; }
+            continue;
         }
-        if(*state != 0) { RAISE_NO_ERROR; }
+        failures = 0;
+        if(*state != 0) { break; }
         done = PyObject_CallMethod(handler_asgi->lifespan_context->task, "done", NULL);
         if(done == NULL) {
-            PyErr_Clear();
+            _clear_loop_python();
             break;
         }
         is_done = PyObject_IsTrue(done);
         Py_DECREF(done);
         if(is_done != 0) { break; }
     }
+
+    /* resumes the re arming of the interrupt, giving back the one that
+    may have reached the loop while the event was being delivered */
+    release_interrupt_loop_python();
 
     /* reports the giving up on a task that is still alive, this is
     what tells apart an application that never answers from a loop

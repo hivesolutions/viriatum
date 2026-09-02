@@ -67,4 +67,6 @@ size_t pending_loop_python(struct loop_python_t *loop_python);
 PyObject *create_task_loop_python(struct loop_python_t *loop_python, PyObject *coroutine);
 PyObject *create_future_loop_python(struct loop_python_t *loop_python);
 ERROR_CODE resolve_future_loop_python(PyObject *future, PyObject *result);
+void hold_interrupt_loop_python(void);
+void release_interrupt_loop_python(void);
 void _clear_loop_python(void);

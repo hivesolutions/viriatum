@@ -1561,6 +1561,156 @@ class LifespanTest(TestCase):
             asyncio.sleep = original
         self.assertEqual(events, [])
 
+    def test_lifespan_transient_loop_failure(self) -> None:
+        # verifies that a slice of the loop that fails does not
+        # abandon the event, only a run of them does, both a signal in
+        # flight and a stopping left scheduled by the running of the
+        # loop it aborted fail a single slice and let the next one run
+        events = []
+        failed = []
+
+        async def application(scope: Scope, receive: Receive, send: Send) -> None:
+            if scope["type"] != "lifespan":
+                await self._plain(receive, send)
+                return
+            while True:
+                message = await receive()
+                events.append(message["type"])
+                if message["type"] == "lifespan.startup":
+                    await send({"type": "lifespan.startup.complete"})
+                elif message["type"] == "lifespan.shutdown":
+                    await send({"type": "lifespan.shutdown.complete"})
+                    return
+
+        original = asyncio.sleep
+
+        def sleep(*args: Any, **kwargs: Any) -> Any:
+            # fails the first slice of each of the two events and then
+            # gets out of the way, only the waits of the lifespan
+            # reach this as the serving loop advances the loop itself
+            if len(events) not in failed:
+                failed.append(len(events))
+                raise RuntimeError("intentional failure")
+            return original(*args, **kwargs)
+
+        asyncio.sleep = sleep
+        try:
+            self._serve(application, PORT + 10)
+        finally:
+            asyncio.sleep = original
+        self.assertEqual(failed, [0, 1], "the slices of both events never failed")
+        self.assertEqual(events, ["lifespan.startup", "lifespan.shutdown"])
+
+    def test_lifespan_liveness_failure(self) -> None:
+        # verifies that a task whose liveness is unable to be read
+        # ends the wait rather than keeping it running to the deadline
+        # of it, the requests are served without any lifespan handling
+        events = []
+        tasks = []
+
+        async def application(scope: Scope, receive: Receive, send: Send) -> None:
+            if scope["type"] != "lifespan":
+                await self._plain(receive, send)
+                return
+            while True:
+                message = await receive()
+                events.append(message["type"])
+
+        class Task(object):
+            # stands in for the task of the application answering
+            # everything but the reading of the liveness of it
+
+            def __init__(self, task: Any) -> None:
+                self.task = task
+
+            def __getattr__(self, name: str) -> Any:
+                return getattr(self.task, name)
+
+            def done(self) -> Any:
+                raise RuntimeError("intentional failure")
+
+        original = asyncio.new_event_loop
+
+        def new_event_loop() -> Any:
+            # wraps only the first of the tasks that the loop creates,
+            # which is the one running the lifespan, the ones of the
+            # requests are left untouched by it
+            loop = original()
+            create_task = loop.create_task
+
+            def create(*args: Any, **kwargs: Any) -> Any:
+                task = create_task(*args, **kwargs)
+                if tasks:
+                    return task
+                tasks.append(task)
+                return Task(task)
+
+            loop.create_task = create
+            return loop
+
+        asyncio.new_event_loop = new_event_loop
+        try:
+            self._serve(application, PORT + 12)
+        finally:
+            asyncio.new_event_loop = original
+        self.assertEqual(len(tasks), 1, "no task was ever created")
+        self.assertEqual(events, ["lifespan.startup"])
+
+    @skipIf(
+        platform == "win32" and version_info < (3, 11),
+        "the interrupt is not delivered reliably by that runtime",
+    )
+    def test_lifespan_startup_on_interrupt(self) -> None:
+        # verifies that an interrupt raised while the startup of the
+        # lifespan is being waited for neither loses the protocol nor
+        # is lost itself, the signal is held for the duration of the
+        # wait and given back once the event has been delivered, the
+        # older runtime of the other platform is left out for the same
+        # reason the tests of the interrupt beside it are
+        events = []
+        state = {"expired": False}
+        finished = Event()
+
+        async def application(scope: Scope, receive: Receive, send: Send) -> None:
+            if scope["type"] != "lifespan":
+                await self._plain(receive, send)
+                return
+            while True:
+                message = await receive()
+                events.append(message["type"])
+                if message["type"] == "lifespan.startup":
+                    await asyncio.sleep(0.3)
+                    await send({"type": "lifespan.startup.complete"})
+                elif message["type"] == "lifespan.shutdown":
+                    await send({"type": "lifespan.shutdown.complete"})
+                    return
+
+        server = viriatum.Server(application, port=PORT + 11, interface="asgi")
+
+        def interrupt() -> None:
+            # raises the interrupt while the startup is still being
+            # awaited, the socket is listening before the wait of it
+            # starts and so reaching it is what marks the window
+            for _ in range(200):
+                try:
+                    connection = create_connection(("127.0.0.1", PORT + 11), timeout=1)
+                    connection.close()
+                    break
+                except Exception:
+                    sleep(0.05)
+            raise_signal(SIGINT)
+            if not finished.wait(timeout=10.0):
+                state["expired"] = True
+                server.stop()
+
+        Thread(target=interrupt, daemon=True).start()
+        try:
+            self.assertRaises(KeyboardInterrupt, server.serve_forever)
+        finally:
+            finished.set()
+        self.assertFalse(state["expired"], "the interrupt was ignored")
+        self.assertEqual(events, ["lifespan.startup", "lifespan.shutdown"])
+
     @skipIf(
         platform == "win32" and version_info < (3, 11),
         "the interrupt is not delivered reliably by that runtime",

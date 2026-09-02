@@ -26,6 +26,12 @@
 
 #include "loop.h"
 
+/* flags controlling if the re arming of the interrupt is being held
+and if one has reached the loop while it was, the delivering of the
+events of the lifespan is what holds it */
+static char _hold_loop_python = FALSE;
+static char _interrupt_loop_python = FALSE;
+
 ERROR_CODE create_loop_python(struct loop_python_t **loop_python_pointer) {
     /* retrieves the structure size and allocates space for it, then
     resets the complete set of values so that no invalid reference
@@ -292,14 +298,38 @@ ERROR_CODE resolve_future_loop_python(PyObject *future, PyObject *result) {
     RAISE_NO_ERROR;
 }
 
+void hold_interrupt_loop_python(void) {
+    /* holds the re arming of the interrupt, from this point on one
+    that reaches the loop is remembered instead of being given back to
+    the interpreter, so that the running of the loop is able to make
+    progress while the signal is still in flight */
+    _hold_loop_python = TRUE;
+}
+
+void release_interrupt_loop_python(void) {
+    /* resumes the re arming and gives back the interrupt that may have
+    reached the loop while it was held, the serving loop is the one
+    that notices it and ends the serving because of it */
+    _hold_loop_python = FALSE;
+    if(_interrupt_loop_python == FALSE) { return; }
+    _interrupt_loop_python = FALSE;
+    PyErr_SetInterrupt();
+}
+
 void _clear_loop_python(void) {
     /* in case the pending exception is a keyboard interrupt it is re
     armed instead of being discarded, the serving loop verifies the
     signals right after advancing the loop and would otherwise never
-    notice the one that reached the interpreter while it was running */
+    notice the one that reached the interpreter while it was running,
+    while the re arming is held it is remembered instead, so that the
+    one giving it back is the operation that holds it */
     if(PyErr_ExceptionMatches(PyExc_KeyboardInterrupt)) {
         PyErr_Clear();
-        PyErr_SetInterrupt();
+        if(_hold_loop_python == TRUE) {
+            _interrupt_loop_python = TRUE;
+        } else {
+            PyErr_SetInterrupt();
+        }
         return;
     }
 

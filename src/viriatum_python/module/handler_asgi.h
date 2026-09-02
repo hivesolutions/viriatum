@@ -78,11 +78,14 @@
 /**
  * The amount of time (in seconds) that the lifespan operations
  * may take before being abandoned, together with the duration
- * of each of the slices that the wait is broken into.
+ * of each of the slices that the wait is broken into and the
+ * number of them that may fail in a row before the loop is
+ * taken as one unable to run at all.
  */
 #define VIRIATUM_ASGI_LIFESPAN_TIMEOUT 30.0
 #define VIRIATUM_ASGI_LIFESPAN_SLICE 0.005
 #define VIRIATUM_ASGI_LIFESPAN_ITERATIONS 20000
+#define VIRIATUM_ASGI_LIFESPAN_FAILURES 16
 
 /**
  * The maximum size of the subprotocol that may be selected
