@@ -29,8 +29,8 @@
 #include "../stdafx.h"
 
 /**
- * The maximum size of the name of the module
- * to be used in the ASGI module.
+ * The maximum size of the name that the module of an
+ * application is loaded under.
  */
 #define VIRIATUM_ASGI_MODULE_SIZE 128
 
@@ -58,8 +58,8 @@
 
 /**
  * The structure that holds the internal
- * structure to support the context
- * of the ASGI module.
+ * structure to support the serving of the
+ * more recent of the two interfaces.
  */
 typedef struct mod_python_asgi_t {
     /**

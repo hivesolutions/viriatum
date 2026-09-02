@@ -112,7 +112,7 @@ const char *test_wsgi_app_persistence(void);
  * to store some context information about the execution.
  */
 /**
- * Tests that the mod ASGI HTTP handler is created with the
+ * Tests that the state of the interface is created with the
  * default values and released without leaving anything behind.
  *
  * @return A message describing the execution of

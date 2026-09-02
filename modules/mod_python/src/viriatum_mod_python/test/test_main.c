@@ -35,7 +35,7 @@ int main(int argc, char **argv) {
         VIRIATUM_COMPILATION_TIME
     );
 
-    /* initializes the python interpreter and prepares the WSGI
+    /* initializes the Python interpreter and prepares the WSGI
     input type so that both the extension and lifecycle tests can
     operate against a fully initialized virtual machine */
     Py_Initialize();
@@ -43,7 +43,7 @@ int main(int argc, char **argv) {
 
     return_value = run_mod_python_tests();
 
-    /* shuts down the python interpreter, releasing all the resources
+    /* shuts down the Python interpreter, releasing all the resources
     associated with it (everything is destroyed) */
     Py_Finalize();
 

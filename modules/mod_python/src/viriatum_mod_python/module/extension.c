@@ -67,8 +67,8 @@ PyObject *wsgi_start_response(PyObject *self, PyObject *args) {
     PyObject *wsgi_module;
     PyObject *write_function;
 
-    /* allocates space for the return value as a python reference to
-    be returned to the calling python function */
+    /* allocates space for the return value as a Python reference to
+    be returned to the calling Python function */
     PyObject *return_value;
 
     /* allocates space for all the arguments, the status line (error
@@ -82,7 +82,7 @@ PyObject *wsgi_start_response(PyObject *self, PyObject *args) {
     PyObject *iterator;
     PyObject *item;
 
-    /* allocates space for both the python representation of the header
+    /* allocates space for both the Python representation of the header
     name and value but also for their internal buffers */
     PyObject *header_name;
     PyObject *header_value;
@@ -169,7 +169,7 @@ PyObject *wsgi_start_response(PyObject *self, PyObject *args) {
     if(wsgi_module == NULL) { return NULL; }
 
     /* retrieves the reference to the write function from the WSGI module
-    and then verifies that it's a valid python function */
+    and then verifies that it's a valid Python function */
     write_function = PyObject_GetAttrString(wsgi_module, "write");
     if(!write_function || !PyCallable_Check(write_function)) {
         Py_XDECREF(write_function);
@@ -209,7 +209,7 @@ PyObject *wsgi_connections_l(PyObject *self, PyObject *args) {
     char is_empty;
 
     /* creates a new list to hold the connection dictionaries
-    that will be returned to the python caller */
+    that will be returned to the Python caller */
     PyObject *list = PyList_New(0);
 
     /* creates an iterator object for the current list of connections
@@ -273,7 +273,7 @@ PyObject *wsgi_connection_info(PyObject *self, PyObject *args) {
     unsigned long long delta;
     char uptime[128];
 
-    /* parses the id argument from the python call */
+    /* parses the id argument from the Python call */
     if(!PyArg_ParseTuple(args, "l", &id)) { return NULL; }
 
     /* creates an iterator object for the current list of connections
@@ -307,7 +307,7 @@ PyObject *wsgi_connection_info(PyObject *self, PyObject *args) {
     is_empty = connection->host[0] == '\0';
 
     /* creates a dictionary with the connection attributes and
-    returns it to the python caller */
+    returns it to the Python caller */
     PyObject *dict = PyDict_New();
     PyObject *_value;
 

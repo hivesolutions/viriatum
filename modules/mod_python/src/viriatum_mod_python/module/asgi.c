@@ -44,10 +44,10 @@ char _is_absolute_asgi(unsigned char *file_path) {
 }
 
 ERROR_CODE create_mod_python_asgi(struct mod_python_asgi_t **mod_python_asgi_pointer) {
-    /* retrieves the mod ASGI HTTP handler size */
+    /* retrieves the size of the state of the interface */
     size_t mod_python_asgi_size = sizeof(struct mod_python_asgi_t);
 
-    /* allocates space for the mod ASGI HTTP handler */
+    /* allocates space for the state of the interface */
     struct mod_python_asgi_t *mod_python_asgi = (struct mod_python_asgi_t *) MALLOC(mod_python_asgi_size);
 
     /* sets the state attributes (default) values, the path of the
@@ -59,7 +59,7 @@ ERROR_CODE create_mod_python_asgi(struct mod_python_asgi_t **mod_python_asgi_poi
     mod_python_asgi->module = NULL;
     mod_python_asgi->application = NULL;
 
-    /* sets the mod ASGI HTTP handler in the pointer */
+    /* sets the state of the interface in the pointer */
     *mod_python_asgi_pointer = mod_python_asgi;
 
     /* raises no error */
@@ -72,7 +72,7 @@ ERROR_CODE delete_mod_python_asgi(struct mod_python_asgi_t *mod_python_asgi) {
     against an interpreter that is no longer there */
     unload_application_asgi(mod_python_asgi);
 
-    /* releases the mod ASGI HTTP handler */
+    /* releases the state of the interface */
     FREE(mod_python_asgi);
 
     /* raises no error */
@@ -160,14 +160,14 @@ ERROR_CODE _load_module_asgi(PyObject **module_pointer, char *name, char *file_p
     *module_pointer = NULL;
 
     /* prints a debug message to notify the system about the loading
-    of the ASGI module (provides logging) */
-    V_DEBUG_CTX_F("mod_asgi", "Loading ASGI module '%s'\n", file_path);
+    of the application (provides logging) */
+    V_DEBUG_CTX_F("mod_python", "Loading ASGI application '%s'\n", file_path);
 
     /* opens the file for reading (in binary mode) and checks if
     there was a problem opening it, raising an error in such case */
     FOPEN(&file, file_path, "rb");
     if(file == NULL) {
-        V_DEBUG_CTX_F("mod_asgi", "Module file not found '%s'\n", file_path);
+        V_DEBUG_CTX_F("mod_python", "Module file not found '%s'\n", file_path);
         RAISE_NO_ERROR;
     }
 
@@ -194,7 +194,7 @@ ERROR_CODE _load_module_asgi(PyObject **module_pointer, char *name, char *file_p
     FREE(file_buffer);
     if(code == NULL) {
         PyErr_Clear();
-        V_DEBUG_CTX_F("mod_asgi", "Module file did not compile '%s'\n", file_path);
+        V_DEBUG_CTX_F("mod_python", "Module file did not compile '%s'\n", file_path);
         RAISE_NO_ERROR;
     }
 
@@ -204,7 +204,7 @@ ERROR_CODE _load_module_asgi(PyObject **module_pointer, char *name, char *file_p
     Py_DECREF(code);
     if(module == NULL) {
         PyErr_Clear();
-        V_DEBUG_CTX_F("mod_asgi", "Module file did not run '%s'\n", file_path);
+        V_DEBUG_CTX_F("mod_python", "Module file did not run '%s'\n", file_path);
         RAISE_NO_ERROR;
     }
 
@@ -225,7 +225,7 @@ ERROR_CODE _load_configuration_asgi(struct service_t *service, struct mod_python
     must return immediately (not possible to load it) */
     if(service->configuration == NULL) { RAISE_NO_ERROR; }
 
-    /* tries to retrieve the mod ASGI section configuration from the configuration
+    /* tries to retrieve the mod Python section configuration from the configuration
     map in case none is found returns immediately no need to process anything more */
     get_value_string_sort_map(service->configuration, (unsigned char *) "mod_python", (void **) &configuration);
     if(configuration == NULL) { RAISE_NO_ERROR; }

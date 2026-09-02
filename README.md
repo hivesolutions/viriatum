@@ -338,7 +338,7 @@ It's possible to run viriatum inside a Docker container. Three Dockerfiles are p
 
 * `Dockerfile` - Core server only (~11 MB)
 * `Dockerfile.php` - Core + mod_php with PHP 8.4 (~22 MB)
-* `Dockerfile.all` - All modules: diag, gif, lua, php, wsgi (~112 MB)
+* `Dockerfile.all` - All modules: diag, gif, lua, php, python (~112 MB)
 
 To build and run:
 

@@ -70,7 +70,7 @@ FROM alpine:latest
 LABEL version="1.0"
 LABEL maintainer="Hive Solutions <development@hive.pt>"
 LABEL org.opencontainers.image.title="viriatum-all"
-LABEL org.opencontainers.image.description="Hive Viriatum with all modules: diag, gif, lua, php, wsgi"
+LABEL org.opencontainers.image.description="Hive Viriatum with all modules: diag, gif, lua, php, python"
 LABEL org.opencontainers.image.source="https://github.com/hivesolutions/viriatum"
 LABEL org.opencontainers.image.url="https://github.com/hivesolutions/viriatum"
 LABEL org.opencontainers.image.vendor="Hive Solutions"
