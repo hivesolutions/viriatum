@@ -13,9 +13,13 @@ Benchmark reports serve as:
 
 ## Method
 
-Every report is produced the same way. The harness starts the server and each reference on the same machine, drives them through the same workloads and records one report per pair. The figure that is tracked is the **ratio of the server against a reference measured in the same run**, because absolute numbers from one machine are never comparable to another and are moved by whatever else the machine happens to be doing.
+A report is produced this way. The harness starts the server and each reference on the same machine, drives them through the same workloads and records one report per pair. The figure that is tracked is the **ratio of the server against a reference measured in the same run**, because absolute numbers from one machine are never comparable to another and are moved by whatever else the machine happens to be doing.
 
 A run is only compared against the baseline when the machine and the shape of the load agree with it, which the harness checks on `machine`, `mode`, `references`, `connections`, `threads` and `workers`. A report taken under a different shape says so and compares nothing.
+
+Comparing a run against the stored baseline is not the same as measuring a change, which is done by driving the two binaries interleaved so that a drift of the machine lands on both of them equally. A report therefore attributes a movement to a change only where the movement is far larger than the noise floor of the run it was read in, and says which of the two it is doing.
+
+Where a run departs from any of this, because a workload had to be driven again on another interpreter or because the reports of two runs were merged, the report records it in its appendix and the figures it touches are read as the appendix describes rather than as the rest.
 
 ## Severity
 
@@ -23,9 +27,11 @@ A run is only compared against the baseline when the machine and the shape of th
 | -------- | ------------------------------------------------------------------------------ |
 | Critical | A ratio lost more than half, or the server stopped serving a workload at all   |
 | High     | A ratio lost more than a quarter, or a cost figure more than doubled           |
-| Medium   | A ratio lost more than a tenth, which is the threshold a run is read against   |
-| Low      | A movement inside the noise of the machine, recorded so that a trend may form  |
+| Medium   | A ratio lost more than a tenth and standing outside the noise floor of the run |
+| Low      | A movement inside that noise, or one the run is unable to compare at all      |
 | Info     | An observation about the harness or the machine rather than about the serving  |
+
+The noise floor of a run is read from a reference whose binary did not change between it and the baseline, so a loss smaller than that reference moved on its own is Low however large it reads.
 
 ## Document Index
 
