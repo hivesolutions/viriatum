@@ -78,11 +78,14 @@
 /**
  * The amount of time (in seconds) that the lifespan operations
  * may take before being abandoned, together with the duration
- * of each of the slices that the wait is broken into.
+ * of each of the slices that the wait is broken into and the
+ * number of them that may fail in a row before the loop is
+ * taken as one unable to run at all.
  */
 #define VIRIATUM_ASGI_LIFESPAN_TIMEOUT 30.0
 #define VIRIATUM_ASGI_LIFESPAN_SLICE 0.005
 #define VIRIATUM_ASGI_LIFESPAN_ITERATIONS 20000
+#define VIRIATUM_ASGI_LIFESPAN_FAILURES 16
 
 /**
  * The maximum size of the subprotocol that may be selected
@@ -139,7 +142,7 @@ typedef struct write_asgi_t {
 /**
  * Structure holding the state of a single request being
  * handled, one of these exists per connection so that no
- * global state is required (contrary to mod_wsgi).
+ * global state is required (contrary to mod_python).
  */
 typedef struct handler_asgi_context_t {
     /**
@@ -337,6 +340,8 @@ typedef struct handler_asgi_t {
     char lifespan_shutdown;
 } handler_asgi;
 
+char has_marker_handler_asgi(PyObject *application, const char *name);
+char double_callable_handler_asgi(PyObject *application);
 ERROR_CODE create_handler_asgi_context(struct handler_asgi_context_t **handler_asgi_context_pointer);
 ERROR_CODE delete_handler_asgi_context(struct handler_asgi_context_t *handler_asgi_context);
 ERROR_CODE register_handler_asgi(struct service_t *service, PyObject *application, struct loop_python_t *loop_python, char double_callable);

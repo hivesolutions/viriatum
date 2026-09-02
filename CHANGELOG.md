@@ -9,11 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+* Serving of applications of the more recent Python interface straight from the server - [#71](https://github.com/hivesolutions/viriatum/issues/71)
+* The two Python interfaces are now served by a single module, which owns the interpreter - [#71](https://github.com/hivesolutions/viriatum/issues/71)
 * Header compression for HTTP/2, built from scratch with no new dependency
 * Framing, streams and flow control for HTTP/2
 * Serving of requests over HTTP/2 in cleartext, without any negotiation
 * Negotiation of HTTP/2 through the transport, which is what a browser uses
-* Serving of the python applications, the modules and the error pages over HTTP/2
+* Serving of the Python applications, the modules and the error pages over HTTP/2
 * Setting that turns the cleartext form of HTTP/2 off
 * Resources listed in a location are now promised to the client over HTTP/2 - [#50](https://github.com/hivesolutions/viriatum/issues/50)
 * The order a client asks for now decides which stream writes first - [#50](https://github.com/hivesolutions/viriatum/issues/50)
@@ -44,6 +46,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+* Interrupting a server no longer skips the shutdown that a Python application is told about - [#60](https://github.com/hivesolutions/viriatum/issues/60)
 * Docker images of the PHP and full variants now build for the architecture of the machine instead of always amd64
 * A file served over HTTP/2 is now closed once the response has been sent - [#50](https://github.com/hivesolutions/viriatum/issues/50)
 * A client that narrows the window of a stream now receives what was held back - [#50](https://github.com/hivesolutions/viriatum/issues/50)
@@ -110,8 +113,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Server can now be imported from Python to serve a WSGI application on its own event loop - [#39](https://github.com/hivesolutions/viriatum/issues/39)
 * Continuous integration job building and testing the Python package on Linux, macOS and Windows - [#39](https://github.com/hivesolutions/viriatum/issues/39)
 * Core server can now be built as a shared or static library, so it can be embedded in another program - [#39](https://github.com/hivesolutions/viriatum/issues/39)
-* WSGI module introspection methods: `connections()`, `connections_l()`, `connection_info()`, and `uptime()` for runtime server state inspection
-* WSGI module constants (`NAME`, `VERSION`, `PLATFORM`, `FLAGS`, `MODULES`, `DESCRIPTION`, `COMPILER`, `COMPILER_VERSION`, `COMPILATION_DATE`, `COMPILATION_TIME`, `COMPILATION_FLAGS`) exposed via `viriatum_wsgi` module
+* Python module introspection methods: `connections()`, `connections_l()`, `connection_info()`, and `uptime()` for runtime server state inspection
+* Python module constants (`NAME`, `VERSION`, `PLATFORM`, `FLAGS`, `MODULES`, `DESCRIPTION`, `COMPILER`, `COMPILER_VERSION`, `COMPILATION_DATE`, `COMPILATION_TIME`, `COMPILATION_FLAGS`) exposed via `viriatum_wsgi` module
 * Enhanced handler.wsgi and handler.lua demo pages with server info (engine, version, platform, compiler, uptime, connections)
 * Path traversal validation (`is_path_safe`) in `viriatum_commons/util/string_util.h`
 * Unit test `test_is_path_safe` covering traversal detection and false positive avoidance
@@ -129,7 +132,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Documentation for `upgrade` and `context` fields in `http_parser_t`
 * Compilation flags shown in startup banner (e.g. `[nts ipv6 pcre]`)
 * Regression test for dispatch handler context lifecycle on keep-alive connections
-* Warning-level logging in mod_lua, mod_php, and mod_wsgi for 500 errors with request context
+* Warning-level logging in mod_lua, mod_php, and mod_python for 500 errors with request context
 * Line-buffered stdout/stderr via `setvbuf` to ensure log output is visible when piped (e.g. Docker)
 * `absolute_path_file` function in `viriatum_commons/io/file.c` for resolving relative paths to absolute (`realpath` on Unix, `_fullpath` on Windows)
 * Pre-resolved `contents_path`, `resources_path` and `modules_path` fields in `service_options_t` computed once at startup
@@ -146,14 +149,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Applied `black` across all Python sources and the examples in the documentation
 * Zig example is now built with a newer Zig release, restoring the macOS build - [#39](https://github.com/hivesolutions/viriatum/issues/39)
 * Renamed `logging_use_color` to `use_color_logging` and `logging_print_date` to `print_date_logging`
-* Upgraded mod_wsgi from Python 2.7 to Python 3 (PyGILState API, modern embed workflow)
+* Upgraded mod_python from Python 2.7 to Python 3 (PyGILState API, modern embed workflow)
 * Upgraded mod_php from PHP 5.6 to PHP 8.x (libphp.so, updated header paths)
 * `Dockerfile.all` rewritten: uses Alpine system packages (python3-dev, php84-embed, lua5.1-dev) instead of building Python 2.7 and PHP 5.6 from source
 * `Dockerfile.php` updated from PHP 5.6 source build to php84-embed Alpine package
-* Static `file_path` buffers in mod_lua and mod_wsgi handler structs (eliminates MALLOC/FREE for path strings)
+* Static `file_path` buffers in mod_lua and mod_python handler structs (eliminates MALLOC/FREE for path strings)
 * ASCII art banner and runtime diagnostics in handler.lua, handler.wsgi, and phpinfo page
 * Module documentation in README updated for Python 3, PHP 8, and modern package managers
-* Autoconf m4 macros modernized: mod_php detects `libphp` (PHP 8+), mod_wsgi auto-detects Python 3 via `python3-config`, mod_lua tries multiple library names across distros
+* Autoconf m4 macros modernized: mod_php detects `libphp` (PHP 8+), mod_python auto-detects Python 3 via `python3-config`, mod_lua tries multiple library names across distros
 * Header detection in m4 switched from `AC_CHECK_HEADERS` to `AC_COMPILE_IFELSE` for PHP, Python, and Lua (fixes false negatives with complex headers)
 * Added `www_root` configuration option to override the compile-time web root for file serving
 * Migrated from Conan 1 to Conan 2 across all CMake CI jobs (GCC, Windows, macOS)
@@ -177,8 +180,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Fixed mod_php failing to load in `Dockerfile.all` due to missing `libphp.so` symlink in the runtime stage
 * Fixed SHA1 producing wrong digests on ARM64 (macOS Apple Silicon) due to incorrect big-endian classification of AArch64 in `cpu.h` — ARM64 is little-endian
 * Fixed SHA1 strict aliasing violation in `_transform_sha1` by copying buffer into a local union via `memcpy`
-* Replaced deprecated `Py_SetProgramName`/`Py_Initialize` with `PyConfig` API in mod_wsgi (fixes Python 3.11+ deprecation warning)
-* Fixed `DESCRIPTION` module constant in mod_wsgi pointing to `compiler` field instead of `description`
+* Replaced deprecated `Py_SetProgramName`/`Py_Initialize` with `PyConfig` API in mod_python (fixes Python 3.11+ deprecation warning)
+* Fixed `DESCRIPTION` module constant in mod_python pointing to `compiler` field instead of `description`
 * Fixed Python object reference leaks in `wsgi_connections_l` and `wsgi_connection_info` (missing `Py_DECREF` after `PyDict_SetItemString`)
 * Reject URLs containing `..` path traversal sequences in file handler to prevent access outside the web root
 * Fixed leaked `#pragma pack(1)` in `stream_torrent.h` causing struct alignment mismatches across compilation units
@@ -186,13 +189,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Fixed IPv6 autodetection failing with GCC 15 (C23) due to `void main` and missing `arpa/inet.h` in m4 network checks
 * Fixed double-free of `http_parser->context` in dispatch handler unset causing server hang on keep-alive connections
 * File and proxy handler unsets now NULL `http_parser->context` after freeing to prevent dangling pointers
-* PHP and WSGI module handler unsets now NULL `http_parser->context` after freeing
+* PHP and Python module handler unsets now NULL `http_parser->context` after freeing
 * Fixed `REQUEST_URI` length using path size instead of full URL size in mod_php handler
 * Connection info page now shows "not found" message instead of empty fields for closed connections
 * Fixed `setvbuf` crash on Windows/MSVC by using `_IONBF` (unbuffered) instead of `_IOLBF` which rejects size 0
 * Fixed error and directory listing templates not respecting `www_root` config (was using compile-time resources path)
-* Fixed multiple Python C API reference leaks in mod_wsgi on error paths (handler, extension, entry)
-* Fixed missing GIL release on type-error path in mod_wsgi response data callback
+* Fixed multiple Python C API reference leaks in mod_python on error paths (handler, extension, entry)
+* Fixed missing GIL release on type-error path in mod_python response data callback
 * Fixed `zend_string` memory leak in mod_php INI entry setup (missing `zend_string_release`)
 * Fixed `normalize_path` to use platform-native separators (`\` on Windows, `/` on Unix)
 * Fixed `join_path_file` to use platform-native path separator instead of hardcoded `/`

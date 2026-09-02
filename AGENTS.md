@@ -82,13 +82,13 @@ The formats of the report are `text`, `tap`, `junit` and `markdown`. A format gi
 
 ## Coverage
 
-Measure the coverage of the C tree and of the python package with:
+Measure the coverage of the C tree and of the Python package with:
 
 ```bash
 ./scripts/coverage.sh
 ```
 
-The script builds every target with instrumentation, runs the core, the module and the python suites and writes the reports under `coverage/`. Both clang, through llvm-cov, and gcc, through gcovr, are supported and produce the same set of reports. The threshold of the C tree is set through `THRESHOLD` and the one of the python surface through `PYTHON_THRESHOLD`, raise them as the coverage improves rather than lowering them to make a run pass.
+The script builds every target with instrumentation, runs the core, the module and the Python suites and writes the reports under `coverage/`. Both clang, through llvm-cov, and gcc, through gcovr, are supported and produce the same set of reports. The threshold of the C tree is set through `THRESHOLD` and the one of the Python surface through `PYTHON_THRESHOLD`, raise them as the coverage improves rather than lowering them to make a run pass.
 
 ## Memory
 
@@ -235,7 +235,7 @@ To create a new release follow the following steps:
   - `pyproject.toml` — update the `version` field, it is the one published to PyPI
   - `m4/settings.m4` — update `viriatum_major_version`, `viriatum_minor_version`, `viriatum_micro_version`
   - `src/viriatum_commons/stdafx.c` — update the `version[]` string
-  - Each module's `m4/settings.m4` and `stdafx.c` version string (under `modules/mod_diag/`, `modules/mod_gif/`, `modules/mod_lua/`, `modules/mod_php/`, `modules/mod_wsgi/`)
+  - Each module's `m4/settings.m4` and `stdafx.c` version string (under `modules/mod_diag/`, `modules/mod_gif/`, `modules/mod_lua/`, `modules/mod_php/`, `modules/mod_python/`)
 - Move all the `CHANGELOG.md` Unreleased items that have at least one non empty item into a new section with the new version number and date, and then create new empty sub-sections (Added, Changed and Fixed) for the Unreleased section with a single empty item.
 - Create a commit with the following message `version: $VERSION_NUMBER`.
 - Push the commit.

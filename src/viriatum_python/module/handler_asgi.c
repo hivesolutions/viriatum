@@ -607,6 +607,93 @@ static PyMethodDef send_method = {
     NULL
 };
 
+char has_marker_handler_asgi(PyObject *application, const char *name) {
+    /* verifies if the application carries the provided marker, they
+    are the ones set by the adaptation helpers of asgiref */
+    PyObject *marker = PyObject_GetAttrString(application, name);
+    int is_set;
+    if(marker == NULL) {
+        PyErr_Clear();
+        return FALSE;
+    }
+    is_set = PyObject_IsTrue(marker);
+    Py_DECREF(marker);
+    return is_set != 0 ? TRUE : FALSE;
+}
+
+char double_callable_handler_asgi(PyObject *application) {
+    /* allocates space for the various objects used during the
+    inspection of the application that has been provided */
+    PyObject *module;
+    PyObject *result;
+    PyObject *call;
+    int is_double = 0;
+    int is_class = 0;
+
+    /* the markers set by the adaptation helpers of asgiref take
+    precedence over any inspection of the application */
+    if(has_marker_handler_asgi(application, "_asgi_single_callable") == TRUE) {
+        return FALSE;
+    }
+    if(has_marker_handler_asgi(application, "_asgi_double_callable") == TRUE) {
+        return TRUE;
+    }
+
+    /* imports the inspect module, it provides both the detection of
+    the classes and the one of the coroutine functions */
+    module = PyImport_ImportModule("inspect");
+    if(module == NULL) {
+        PyErr_Clear();
+        return FALSE;
+    }
+
+    /* a class that has not been instantiated is a double callable one,
+    the instance of it is what takes the pair of callables */
+    result = PyObject_CallMethod(module, "isclass", "O", application);
+    if(result == NULL) {
+        PyErr_Clear();
+    } else {
+        is_class = PyObject_IsTrue(result);
+        Py_DECREF(result);
+    }
+    if(is_class != 0) {
+        Py_DECREF(module);
+        return TRUE;
+    }
+
+    /* an instance whose call method is a coroutine one is a single
+    callable application, the shape of the third version */
+    call = PyObject_GetAttrString(application, "__call__");
+    if(call == NULL) {
+        PyErr_Clear();
+    } else {
+        result = PyObject_CallMethod(module, "iscoroutinefunction", "O", call);
+        Py_DECREF(call);
+        if(result == NULL) {
+            PyErr_Clear();
+        } else {
+            is_double = PyObject_IsTrue(result);
+            Py_DECREF(result);
+            if(is_double != 0) {
+                Py_DECREF(module);
+                return FALSE;
+            }
+        }
+    }
+
+    /* everything that is not a coroutine function of its own is taken
+    as a double callable application (the legacy shape) */
+    result = PyObject_CallMethod(module, "iscoroutinefunction", "O", application);
+    Py_DECREF(module);
+    if(result == NULL) {
+        PyErr_Clear();
+        return TRUE;
+    }
+    is_double = PyObject_IsTrue(result);
+    Py_DECREF(result);
+    return is_double != 0 ? FALSE : TRUE;
+}
+
 ERROR_CODE create_handler_asgi_context(struct handler_asgi_context_t **handler_asgi_context_pointer) {
     /* retrieves the context size and allocates space for it, then
     resets the complete set of values so that no invalid reference
@@ -854,14 +941,22 @@ static PyObject *_build_lifespan_scope_handler_asgi(const char *version) {
 
 static ERROR_CODE _wait_lifespan_handler_asgi(struct handler_asgi_t *handler_asgi, char *state) {
     /* allocates space for the flag controlling if the task is already
-    done and for the deadline of the complete operation, the latter is
-    measured against the clock of the loop so that a slice that fails
-    to let time pass is never mistaken for a completed wait */
+    done, for the count of the slices that failed in a row and for the
+    deadline of the complete operation, the latter is measured against
+    the clock of the loop so that a slice that fails to let time pass
+    is never mistaken for a completed wait */
     PyObject *done;
     int is_done = 0;
     size_t index;
+    size_t failures = 0;
     double initial = time_loop_python(handler_asgi->loop_python);
     double elapsed = 0.0;
+
+    /* holds the re arming of the interrupt for the complete duration
+    of the wait, a signal that is in flight while the event is being
+    delivered would otherwise abort every one of the slices and leave
+    the application without ever seeing it */
+    hold_interrupt_loop_python();
 
     /* advances the loop until the application reports the completion
     of the event, the task dies or the deadline is reached, each of
@@ -872,24 +967,36 @@ static ERROR_CODE _wait_lifespan_handler_asgi(struct handler_asgi_t *handler_asg
     for(index = 0; index < VIRIATUM_ASGI_LIFESPAN_ITERATIONS; index++) {
         elapsed = time_loop_python(handler_asgi->loop_python) - initial;
         if(elapsed >= VIRIATUM_ASGI_LIFESPAN_TIMEOUT) { break; }
-        if(*state != 0) { RAISE_NO_ERROR; }
+        if(*state != 0) { break; }
         if(IS_ERROR_CODE(run_slice_loop_python(
                handler_asgi->loop_python,
                VIRIATUM_ASGI_LIFESPAN_SLICE
            ))) {
             V_WARNING_F("Problem advancing the loop: %s\n", (char *) GET_ERROR());
-            RAISE_NO_ERROR;
+
+            /* a slice fails for reasons the next one is no longer
+            subject to, a signal that was in flight or a stopping that
+            the aborted running of the loop left scheduled in it, only
+            a run of them tells a loop unable to run at all */
+            failures++;
+            if(failures >= VIRIATUM_ASGI_LIFESPAN_FAILURES) { break; }
+            continue;
         }
-        if(*state != 0) { RAISE_NO_ERROR; }
+        failures = 0;
+        if(*state != 0) { break; }
         done = PyObject_CallMethod(handler_asgi->lifespan_context->task, "done", NULL);
         if(done == NULL) {
-            PyErr_Clear();
+            _clear_loop_python();
             break;
         }
         is_done = PyObject_IsTrue(done);
         Py_DECREF(done);
         if(is_done != 0) { break; }
     }
+
+    /* resumes the re arming of the interrupt, giving back the one that
+    may have reached the loop while the event was being delivered */
+    release_interrupt_loop_python();
 
     /* reports the giving up on a task that is still alive, this is
     what tells apart an application that never answers from a loop

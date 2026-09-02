@@ -202,7 +202,7 @@ handler = file
 push = /static/style.css /static/main.js
 ```
 
-Every handler of the tree writes its response through the operations that the connection carries, so the file, the default, the dispatch and the proxy handlers, the pages of the errors and both of the python interfaces are served by either version of the protocol without knowing which one is in use.
+Every handler of the tree writes its response through the operations that the connection carries, so the file, the default, the dispatch and the proxy handlers, the pages of the errors and both of the Python interfaces are served by either version of the protocol without knowing which one is in use.
 
 ## Python Package
 
@@ -269,7 +269,7 @@ Current modules include:
 
 * `mod_lua` - For interaction with the Lua interpreter
 * `mod_php` - For interaction with the PHP interpreter (complex compilation)
-* `mod_wsgi` - For interaction with the Python interpreter using the [WSGI](http://wsgi.org) specification.
+* `mod_python` - For interaction with the Python interpreter using either the [WSGI](http://wsgi.org) or the [ASGI](https://asgi.readthedocs.io) specification, the second one requiring an interpreter that carries the event loop it rests on.
 
 ### Lua Module
 
@@ -311,7 +311,9 @@ Or manually:
 
 Additional information about PHP compilation flags may be found [here](https://www.php.net/manual/en/configure.about.php).
 
-### WSGI Module
+### Python Module
+
+Serves an application of either of the two interfaces, the older one through the `wsgi` handler and the more recent through the `asgi` one, which is only built when the interpreter it is compiled against carries the event loop that interface rests on.
 
 Requires Python 3 development headers and shared library. On Ubuntu/Debian:
 
@@ -336,7 +338,7 @@ It's possible to run viriatum inside a Docker container. Three Dockerfiles are p
 
 * `Dockerfile` - Core server only (~11 MB)
 * `Dockerfile.php` - Core + mod_php with PHP 8.4 (~22 MB)
-* `Dockerfile.all` - All modules: diag, gif, lua, php, wsgi (~112 MB)
+* `Dockerfile.all` - All modules: diag, gif, lua, php, python (~112 MB)
 
 To build and run:
 

@@ -28,20 +28,6 @@
 #include "handler.h"
 #include "handler_asgi.h"
 
-static char _has_marker_server_python(PyObject *application, const char *name) {
-    /* verifies if the application carries the provided marker, they
-    are the ones set by the adaptation helpers of asgiref */
-    PyObject *marker = PyObject_GetAttrString(application, name);
-    int is_set;
-    if(marker == NULL) {
-        PyErr_Clear();
-        return FALSE;
-    }
-    is_set = PyObject_IsTrue(marker);
-    Py_DECREF(marker);
-    return is_set != 0 ? TRUE : FALSE;
-}
-
 static char _is_asgi_server_python(PyObject *application) {
     /* allocates space for the various objects used during the
     inspection of the application that has been provided */
@@ -52,10 +38,10 @@ static char _is_asgi_server_python(PyObject *application) {
 
     /* an application that carries either of the markers is an asgi one
     regardless of its shape, a wsgi one never carries them */
-    if(_has_marker_server_python(application, "_asgi_single_callable") == TRUE) {
+    if(has_marker_handler_asgi(application, "_asgi_single_callable") == TRUE) {
         return TRUE;
     }
-    if(_has_marker_server_python(application, "_asgi_double_callable") == TRUE) {
+    if(has_marker_handler_asgi(application, "_asgi_double_callable") == TRUE) {
         return TRUE;
     }
 
@@ -99,79 +85,6 @@ static char _is_asgi_server_python(PyObject *application) {
     classification of the provided application */
     Py_DECREF(module);
     return is_coroutine != 0 ? TRUE : FALSE;
-}
-
-static char _is_double_callable_server_python(PyObject *application) {
-    /* allocates space for the various objects used during the
-    inspection of the application that has been provided */
-    PyObject *module;
-    PyObject *result;
-    PyObject *call;
-    int is_double = 0;
-    int is_class = 0;
-
-    /* the markers set by the adaptation helpers of asgiref take
-    precedence over any inspection of the application */
-    if(_has_marker_server_python(application, "_asgi_single_callable") == TRUE) {
-        return FALSE;
-    }
-    if(_has_marker_server_python(application, "_asgi_double_callable") == TRUE) {
-        return TRUE;
-    }
-
-    /* imports the inspect module, it provides both the detection of
-    the classes and the one of the coroutine functions */
-    module = PyImport_ImportModule("inspect");
-    if(module == NULL) {
-        PyErr_Clear();
-        return FALSE;
-    }
-
-    /* a class that has not been instantiated is a double callable one,
-    the instance of it is what takes the pair of callables */
-    result = PyObject_CallMethod(module, "isclass", "O", application);
-    if(result == NULL) {
-        PyErr_Clear();
-    } else {
-        is_class = PyObject_IsTrue(result);
-        Py_DECREF(result);
-    }
-    if(is_class != 0) {
-        Py_DECREF(module);
-        return TRUE;
-    }
-
-    /* an instance whose call method is a coroutine one is a single
-    callable application, the shape of the third version */
-    call = PyObject_GetAttrString(application, "__call__");
-    if(call == NULL) {
-        PyErr_Clear();
-    } else {
-        result = PyObject_CallMethod(module, "iscoroutinefunction", "O", call);
-        Py_DECREF(call);
-        if(result == NULL) {
-            PyErr_Clear();
-        } else {
-            is_double = PyObject_IsTrue(result);
-            Py_DECREF(result);
-            if(is_double != 0) {
-                Py_DECREF(module);
-                return FALSE;
-            }
-        }
-    }
-
-    /* everything that is not a coroutine function of its own is taken
-    as a double callable application (the legacy shape) */
-    result = PyObject_CallMethod(module, "iscoroutinefunction", "O", application);
-    Py_DECREF(module);
-    if(result == NULL) {
-        PyErr_Clear();
-        return TRUE;
-    }
-    is_double = PyObject_IsTrue(result);
-    Py_DECREF(result);
-    return is_double != 0 ? FALSE : TRUE;
 }
 
 static int _init_server_python(PyObject *self, PyObject *args, PyObject *kwargs) {
@@ -227,10 +140,10 @@ static int _init_server_python(PyObject *self, PyObject *args, PyObject *kwargs)
     callable one is indistinguishable from a wsgi callable */
     if(strcmp(interface, VIRIATUM_PYTHON_INTERFACE_AUTO) == 0) {
         asgi = _is_asgi_server_python(application);
-        server_python->double_callable = asgi == TRUE ? _is_double_callable_server_python(application) : FALSE;
+        server_python->double_callable = asgi == TRUE ? double_callable_handler_asgi(application) : FALSE;
     } else if(strcmp(interface, VIRIATUM_PYTHON_INTERFACE_ASGI) == 0) {
         asgi = TRUE;
-        server_python->double_callable = _is_double_callable_server_python(application);
+        server_python->double_callable = double_callable_handler_asgi(application);
     } else if(strcmp(interface, VIRIATUM_PYTHON_INTERFACE_ASGI3) == 0) {
         asgi = TRUE;
         server_python->double_callable = FALSE;

@@ -38,7 +38,7 @@ static int _exec_module_python(PyObject *module) {
     }
 
     /* adds the various constants describing the underlying server
-    to the module, mirroring the ones exposed by mod_wsgi */
+    to the module, mirroring the ones exposed by mod_python */
     if(PyModule_AddStringConstant(module, "NAME", VIRIATUM_NAME) < 0) { return -1; }
     if(PyModule_AddStringConstant(module, "VERSION", VIRIATUM_VERSION) < 0) { return -1; }
     if(PyModule_AddStringConstant(module, "PLATFORM", VIRIATUM_PLATFORM_STRING) < 0) { return -1; }

@@ -55,8 +55,8 @@ RUN cd /viriatum/modules/mod_php && \
     ./configure --prefix=/usr && \
     make && make install
 
-# build and install mod_wsgi (needs Python 3 headers + shared lib)
-RUN cd /viriatum/modules/mod_wsgi && \
+# build and install mod_python (needs Python 3 headers + shared lib)
+RUN cd /viriatum/modules/mod_python && \
     ./autogen.sh && \
     export PY_INCLUDES="$(python3-config --includes)" && \
     export CFLAGS="${PY_INCLUDES}" && \
@@ -70,7 +70,7 @@ FROM alpine:latest
 LABEL version="1.0"
 LABEL maintainer="Hive Solutions <development@hive.pt>"
 LABEL org.opencontainers.image.title="viriatum-all"
-LABEL org.opencontainers.image.description="Hive Viriatum with all modules: diag, gif, lua, php, wsgi"
+LABEL org.opencontainers.image.description="Hive Viriatum with all modules: diag, gif, lua, php, python"
 LABEL org.opencontainers.image.source="https://github.com/hivesolutions/viriatum"
 LABEL org.opencontainers.image.url="https://github.com/hivesolutions/viriatum"
 LABEL org.opencontainers.image.vendor="Hive Solutions"

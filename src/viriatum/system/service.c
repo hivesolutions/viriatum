@@ -98,6 +98,7 @@ void create_service(struct service_t **service_pointer, unsigned char *name, uns
     service->add_http_handler = add_http_handler_service;
     service->remove_http_handler = remove_http_handler_service;
     service->get_http_handler = get_http_handler_service;
+    service->on_cycle = NULL;
     service->locations.count = 0;
 
 #ifdef VIRIATUM_SSL
@@ -1490,6 +1491,11 @@ ERROR_CODE start_service(struct service_t *service) {
         using the polling (provider) */
         poll_service(service);
         call_service(service);
+
+        /* gives the control flow to whatever a module keeps running
+        beside the serving, an event loop of another runtime only
+        advances the tasks that no request is driving from here */
+        if(service->on_cycle != NULL) { service->on_cycle(service); }
     }
 
     /* closes the service, releasing every structure that has

@@ -64,7 +64,7 @@ SOURCE_DIRS = (
     "modules/mod_gif/src/viriatum_mod_gif",
     "modules/mod_lua/src/viriatum_mod_lua",
     "modules/mod_php/src/viriatum_mod_php",
-    "modules/mod_wsgi/src/viriatum_mod_wsgi",
+    "modules/mod_python/src/viriatum_mod_python",
     "src/viriatum_commons",
     "src/viriatum",
 )
