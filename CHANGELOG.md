@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+* Serving of applications of the more recent python interface straight from the server - [#71](https://github.com/hivesolutions/viriatum/issues/71)
 * Header compression for HTTP/2, built from scratch with no new dependency
 * Framing, streams and flow control for HTTP/2
 * Serving of requests over HTTP/2 in cleartext, without any negotiation

@@ -81,6 +81,14 @@ typedef ERROR_CODE (*service_http_handler_access)(struct service_t *, struct htt
 typedef ERROR_CODE (*service_http_handler_update)(struct service_t *, struct http_handler_t *);
 
 /**
+ * The function called once per cycle of the loop of the service,
+ * so that a module keeping something of its own running beside the
+ * serving is given the control flow even while no request is being
+ * handled, which is what an event loop of another runtime needs.
+ */
+typedef ERROR_CODE (*service_cycle)(struct service_t *);
+
+/**
  * The "default" function used to update a state in the connection
  * for the given service context.
  */
@@ -492,6 +500,12 @@ typedef struct service_t {
     service_http_handler_update add_http_handler;
     service_http_handler_update remove_http_handler;
     service_http_handler_access get_http_handler;
+
+    /**
+     * The operation run once per cycle of the loop, unset unless a
+     * module has something to advance beside the serving.
+     */
+    service_cycle on_cycle;
 
 #ifdef VIRIATUM_SSL
     /**

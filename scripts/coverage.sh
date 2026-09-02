@@ -74,7 +74,7 @@ cp "$MODULE" "$ROOT/src/viriatum_python/viriatum/"
 # gathers the binaries that are going to be run, the ones of the
 # modules only exist when their dependencies were available
 BINARIES="$BUILD/bin/viriatum"
-for name in viriatum_mod_lua_test viriatum_mod_wsgi_test; do
+for name in viriatum_mod_lua_test viriatum_mod_wsgi_test viriatum_mod_asgi_test; do
     if [ -x "$BUILD/bin/$name" ]; then BINARIES="$BINARIES $BUILD/bin/$name"; fi
 done
 

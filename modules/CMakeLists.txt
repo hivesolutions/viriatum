@@ -41,3 +41,8 @@ option(VIRIATUM_BUILD_MOD_WSGI "Build the WSGI module" ON)
 if(VIRIATUM_BUILD_MOD_WSGI)
     add_subdirectory(mod_wsgi)
 endif()
+
+option(VIRIATUM_BUILD_MOD_ASGI "Build the ASGI module" ON)
+if(VIRIATUM_BUILD_MOD_ASGI)
+    add_subdirectory(mod_asgi)
+endif()
