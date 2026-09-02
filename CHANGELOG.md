@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+* Ready to run builds for Linux, macOS and Windows are now attached to every release
+* The server now finds its modules, configuration and contents beside its own binary, so an unpacked build runs from anywhere
 * Serving of applications of the more recent Python interface straight from the server - [#71](https://github.com/hivesolutions/viriatum/issues/71)
 * The two Python interfaces are now served by a single module, which owns the interpreter - [#71](https://github.com/hivesolutions/viriatum/issues/71)
 * Header compression for HTTP/2, built from scratch with no new dependency

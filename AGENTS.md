@@ -241,6 +241,7 @@ To create a new release follow the following steps:
 - Push the commit.
 - Create a new tag with the value of the new version number `$VERSION_NUMBER`.
 - Create a new release on the GitHub repo using the Markdown from the corresponding version entry in `CHANGELOG.md` as the description of the release and the version number as the title. Do not include the title of the release (version and date) in the description.
+- Publishing the release drives `.github/workflows/release.yml`, which builds the server on the three platforms with and without the crypto library, assembles each of them into a tree through `scripts/bundle.sh` and attaches the archives to the release. Nothing is uploaded by hand, and the archives land a few minutes after the release is published.
 
 ## License
 

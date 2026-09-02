@@ -1643,6 +1643,7 @@ ERROR_CODE add_http_handler_service(struct service_t *service, struct http_handl
 ERROR_CODE remove_http_handler_service(struct service_t *service, struct http_handler_t *http_handler);
 ERROR_CODE get_http_handler_service(struct service_t *service, struct http_handler_t **http_handler_pointer, unsigned char *name);
 ERROR_CODE _open_service(struct service_t *service);
+void _bundled_path_service(unsigned char *path, const char *name, const char *fallback);
 ERROR_CODE _default_options_service(struct service_t *service, struct hash_map_t *arguments);
 ERROR_CODE _file_options_service(struct service_t *service, struct hash_map_t *arguments);
 ERROR_CODE _comand_line_options_service(struct service_t *service, struct hash_map_t *arguments);

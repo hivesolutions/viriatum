@@ -152,6 +152,10 @@ whoever tests it always ends up asking about the file properly */
 #include <sys/prctl.h>
 #endif
 
+#ifdef VIRIATUM_PLATFORM_MACOSX
+#include <mach-o/dyld.h>
+#endif
+
 #ifdef VIRIATUM_JNI
 #include <jni.h>
 #endif

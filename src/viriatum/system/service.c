@@ -350,6 +350,24 @@ ERROR_CODE load_options_service(struct service_t *service, struct hash_map_t *ar
     RAISE_NO_ERROR;
 }
 
+void _bundled_path_service(unsigned char *path, const char *name, const char *fallback) {
+    /* allocates space for the flag that tells a directory apart from
+    whatever else may be sitting under the same name */
+    unsigned int is_directory = 0;
+
+    /* builds the path that an unpacked archive would carry, which is
+    the one beside the binary, and keeps it only when it is really
+    there, a tree that was installed keeps the path it was built with */
+    SPRINTF(
+        (char *) path, VIRIATUM_MAX_PATH_SIZE,
+        "%s" VIRIATUM_PATH_SEPARATOR "%s", get_base_path(), name
+    );
+    is_directory_file((char *) path, &is_directory);
+    if(is_directory) { return; }
+
+    SPRINTF((char *) path, VIRIATUM_MAX_PATH_SIZE, "%s", fallback);
+}
+
 ERROR_CODE calculate_options_service(struct service_t *service) {
     /* allocates a pointer to the resolved www root value,
     used as base for contents and resources path resolution */
@@ -365,20 +383,25 @@ ERROR_CODE calculate_options_service(struct service_t *service) {
     taking www_root override into account so all handlers and modules
     can use the pre-resolved values without repeating this logic */
     www_root = service->options->www_root[0] != '\0' ? (char *) service->options->www_root : NULL;
-    SPRINTF(
-        (char *) service->options->contents_path,
-        VIRIATUM_MAX_PATH_SIZE, "%s",
-        www_root != NULL ? www_root : VIRIATUM_CONTENTS_PATH
-    );
-    SPRINTF(
-        (char *) service->options->resources_path,
-        VIRIATUM_MAX_PATH_SIZE, "%s",
-        www_root != NULL ? www_root : VIRIATUM_RESOURCES_PATH
-    );
-    SPRINTF(
-        (char *) service->options->modules_path,
-        VIRIATUM_MAX_PATH_SIZE, "%s",
-        VIRIATUM_MODULES_PATH
+    if(www_root != NULL) {
+        SPRINTF(
+            (char *) service->options->contents_path,
+            VIRIATUM_MAX_PATH_SIZE, "%s", www_root
+        );
+        SPRINTF(
+            (char *) service->options->resources_path,
+            VIRIATUM_MAX_PATH_SIZE, "%s", www_root
+        );
+    } else {
+        _bundled_path_service(
+            service->options->contents_path, "htdocs", VIRIATUM_CONTENTS_PATH
+        );
+        _bundled_path_service(
+            service->options->resources_path, "htdocs", VIRIATUM_RESOURCES_PATH
+        );
+    }
+    _bundled_path_service(
+        service->options->modules_path, "modules", VIRIATUM_MODULES_PATH
     );
 
     /* resolves the contents, resources and modules paths
@@ -2489,13 +2512,24 @@ ERROR_CODE _file_options_service(struct service_t *service, struct hash_map_t *a
     config directory, the current working directory, and finally a
     path relative to the source tree for development convenience */
     {
-        const char *candidates[] = {
-            NULL,
-            "./viriatum.ini",
-            "./src/viriatum/resources/config/viriatum/viriatum.ini"
-        };
+        char bundle_path[VIRIATUM_MAX_PATH_SIZE];
+        const char *candidates[4];
         size_t candidate_count = sizeof(candidates) / sizeof(candidates[0]);
         size_t candidate_index;
+
+        /* the configuration that an unpacked archive carries, which
+        sits in the tree beside the binary rather than in the one of
+        the system, and is looked at right after it */
+        SPRINTF(
+            bundle_path, VIRIATUM_MAX_PATH_SIZE,
+            "%s" VIRIATUM_PATH_SEPARATOR "config" VIRIATUM_PATH_SEPARATOR "viriatum.ini",
+            get_base_path()
+        );
+
+        candidates[0] = NULL;
+        candidates[1] = bundle_path;
+        candidates[2] = "./viriatum.ini";
+        candidates[3] = "./src/viriatum/resources/config/viriatum/viriatum.ini";
 
         return_value = 1;
         for(candidate_index = 0; candidate_index < candidate_count; candidate_index++) {

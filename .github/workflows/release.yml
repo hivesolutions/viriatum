@@ -1,0 +1,70 @@
+name: Release Workflow
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+jobs:
+  build-binaries:
+    name: Build Binaries
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        crypto: [ssl, nossl]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+      - name: Build & Install Dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y -q libssl-dev libpng-dev
+      - name: Setup msbuild
+        if: runner.os == 'Windows'
+        uses: microsoft/setup-msbuild@v3
+      - name: Build Viriatum
+        shell: bash
+        run: |
+          cmake -S . -B build.release -DCMAKE_BUILD_TYPE=Release ${CRYPTO}
+          cmake --build build.release --config Release
+        env:
+          CRYPTO: ${{ matrix.crypto == 'nossl' && '-DCMAKE_DISABLE_FIND_PACKAGE_OpenSSL=TRUE' || '' }}
+      - name: Test Viriatum
+        shell: bash
+        run: |
+          ./build.release/bin/viriatum --test
+      - name: Assemble Bundle
+        shell: bash
+        run: |
+          ./scripts/bundle.sh
+        env:
+          BUILD: build.release
+          VERSION: ${{ github.event_name == 'release' && github.event.release.tag_name || github.sha }}
+          SUFFIX: ${{ matrix.crypto == 'nossl' && '-nossl' || '' }}
+      - uses: actions/upload-artifact@v7
+        with:
+          name: binaries-${{ matrix.os }}-${{ matrix.crypto }}
+          path: |
+            dist/*.tar.gz
+            dist/*.zip
+          if-no-files-found: error
+  publish:
+    name: Publish to Release
+    timeout-minutes: 30
+    needs: [build-binaries]
+    if: github.event_name == 'release'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v7
+        with:
+          path: dist
+          merge-multiple: true
+      - name: Publish binaries to the release
+        run: |
+          gh release upload "${TAG}" dist/* --repo "${GITHUB_REPOSITORY}" --clobber
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.event.release.tag_name }}

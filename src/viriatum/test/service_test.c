@@ -72,6 +72,64 @@ const char *test_create_service_options(void) {
     return NULL;
 }
 
+const char *test_base_path_service(void) {
+    /* allocates space for the path of the directory that the binary
+    sits in and for the flag that tells a directory apart */
+    char *base_path;
+    unsigned int is_directory = 0;
+
+    /* resolves the directory of the binary, which every tree that is
+    unpacked rather than installed is found from */
+    base_path = get_base_path();
+    V_ASSERT_NOT_NULL(base_path);
+    V_ASSERT_M(base_path[0] != '\0', "the base path was not resolved");
+
+    /* the resolving happens once and is kept, a second call gives
+    back the very same buffer rather than doing it again */
+    V_ASSERT_EQ_P(get_base_path(), base_path);
+
+    /* what it names is a directory, the one holding the binary, and
+    it never carries the separator that closed it */
+    is_directory_file(base_path, &is_directory);
+    V_ASSERT_M(is_directory, "the base path is not a directory");
+    V_ASSERT(base_path[strlen(base_path) - 1] != VIRIATUM_PATH_SEPARATOR_C);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_bundled_path_service(void) {
+    /* allocates space for the path that is resolved and for the one
+    that stands for a tree that was installed rather than unpacked */
+    unsigned char path[VIRIATUM_MAX_PATH_SIZE];
+    const char *fallback = "viriatum-installed-tree";
+
+    /* a name that is really a directory beside the binary is the one
+    that is kept, the parent of it being one on every platform */
+    _bundled_path_service(path, "..", fallback);
+    V_ASSERT_M(
+        strcmp((char *) path, fallback) != 0,
+        "a directory beside the binary was not preferred"
+    );
+    V_ASSERT_NOT_NULL(strstr((char *) path, ".."));
+    V_ASSERT(strstr((char *) path, get_base_path()) == (char *) path);
+
+    /* a name that nothing sits under falls back to the path that the
+    binary was built with, which is what an installed tree uses */
+    _bundled_path_service(path, "viriatum-not-a-directory", fallback);
+    V_ASSERT_EQ_S((char *) path, fallback);
+
+    /* a name that is a file rather than a directory is no more a tree
+    than a missing one is, so it falls back just the same */
+    _bundled_path_service(path, VIRIATUM_NAME, fallback);
+    V_ASSERT_EQ_S((char *) path, fallback);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
 const char *test_calculate_locations_service(void) {
     /* allocates space for the error code returned by the
     locations calculation and for the service structure */
