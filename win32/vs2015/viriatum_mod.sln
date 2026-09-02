@@ -5,9 +5,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "viriatum_mod_lua", "viriatu
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "viriatum_mod_php", "viriatum_mod_php.vcproj", "{CA1DE8E0-8EB7-4C5A-811E-DF6511BB9996}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "viriatum_mod_wsgi", "viriatum_mod_wsgi.vcproj", "{7A3601AD-A7C1-49C8-A218-3CC4D0D6F44F}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "viriatum_mod_asgi", "viriatum_mod_asgi.vcproj", "{3F5B27C4-9E1D-4A62-B8D7-1C0E4A9F63B2}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "viriatum_mod_python", "viriatum_mod_python.vcproj", "{7A3601AD-A7C1-49C8-A218-3CC4D0D6F44F}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "viriatum_mod_gif", "viriatum_mod_gif.vcproj", "{AD527577-164D-40EF-9BFF-F6176FFA55D0}"
 EndProject
@@ -31,10 +29,6 @@ Global
         {7A3601AD-A7C1-49C8-A218-3CC4D0D6F44F}.Debug|Win32.Build.0 = Debug|Win32
         {7A3601AD-A7C1-49C8-A218-3CC4D0D6F44F}.Release|Win32.ActiveCfg = Release|Win32
         {7A3601AD-A7C1-49C8-A218-3CC4D0D6F44F}.Release|Win32.Build.0 = Release|Win32
-        {3F5B27C4-9E1D-4A62-B8D7-1C0E4A9F63B2}.Debug|Win32.ActiveCfg = Debug|Win32
-        {3F5B27C4-9E1D-4A62-B8D7-1C0E4A9F63B2}.Debug|Win32.Build.0 = Debug|Win32
-        {3F5B27C4-9E1D-4A62-B8D7-1C0E4A9F63B2}.Release|Win32.ActiveCfg = Release|Win32
-        {3F5B27C4-9E1D-4A62-B8D7-1C0E4A9F63B2}.Release|Win32.Build.0 = Release|Win32
         {AD527577-164D-40EF-9BFF-F6176FFA55D0}.Debug|Win32.ActiveCfg = Debug|Win32
         {AD527577-164D-40EF-9BFF-F6176FFA55D0}.Debug|Win32.Build.0 = Debug|Win32
         {AD527577-164D-40EF-9BFF-F6176FFA55D0}.Release|Win32.ActiveCfg = Release|Win32

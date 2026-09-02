@@ -108,7 +108,7 @@ jobs:
           ./bin/viriatum --test --test-format=junit --test-output=test-results.xml
       - name: Test Viriatum Mod WSGI
         run: |
-          ./bin/viriatum_mod_wsgi_test
+          ./bin/viriatum_mod_python_test
       - name: Test Viriatum Mod Lua
         run: |
           ./bin/viriatum_mod_lua_test
@@ -164,7 +164,7 @@ jobs:
           ./bin/viriatum --test --test-format=junit --test-output=test-results.xml
       - name: Test Viriatum Mod WSGI
         run: |
-          ./bin/viriatum_mod_wsgi_test
+          ./bin/viriatum_mod_python_test
       - name: Test Viriatum Mod Lua
         run: |
           ./bin/viriatum_mod_lua_test

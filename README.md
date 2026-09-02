@@ -269,7 +269,7 @@ Current modules include:
 
 * `mod_lua` - For interaction with the Lua interpreter
 * `mod_php` - For interaction with the PHP interpreter (complex compilation)
-* `mod_wsgi` - For interaction with the Python interpreter using the [WSGI](http://wsgi.org) specification.
+* `mod_python` - For interaction with the Python interpreter using the [WSGI](http://wsgi.org) specification.
 
 ### Lua Module
 

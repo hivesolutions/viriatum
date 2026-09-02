@@ -59,7 +59,7 @@
 /**
  * Structure holding the state of a single request being
  * handled, one of these exists per connection so that no
- * global state is required (contrary to mod_wsgi).
+ * global state is required (contrary to mod_python).
  */
 typedef struct handler_python_context_t {
     /**

@@ -139,7 +139,7 @@ typedef struct write_asgi_t {
 /**
  * Structure holding the state of a single request being
  * handled, one of these exists per connection so that no
- * global state is required (contrary to mod_wsgi).
+ * global state is required (contrary to mod_python).
  */
 typedef struct handler_asgi_context_t {
     /**
@@ -337,6 +337,8 @@ typedef struct handler_asgi_t {
     char lifespan_shutdown;
 } handler_asgi;
 
+char has_marker_handler_asgi(PyObject *application, const char *name);
+char double_callable_handler_asgi(PyObject *application);
 ERROR_CODE create_handler_asgi_context(struct handler_asgi_context_t **handler_asgi_context_pointer);
 ERROR_CODE delete_handler_asgi_context(struct handler_asgi_context_t *handler_asgi_context);
 ERROR_CODE register_handler_asgi(struct service_t *service, PyObject *application, struct loop_python_t *loop_python, char double_callable);

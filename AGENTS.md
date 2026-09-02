@@ -235,7 +235,7 @@ To create a new release follow the following steps:
   - `pyproject.toml` — update the `version` field, it is the one published to PyPI
   - `m4/settings.m4` — update `viriatum_major_version`, `viriatum_minor_version`, `viriatum_micro_version`
   - `src/viriatum_commons/stdafx.c` — update the `version[]` string
-  - Each module's `m4/settings.m4` and `stdafx.c` version string (under `modules/mod_diag/`, `modules/mod_gif/`, `modules/mod_lua/`, `modules/mod_php/`, `modules/mod_wsgi/`)
+  - Each module's `m4/settings.m4` and `stdafx.c` version string (under `modules/mod_diag/`, `modules/mod_gif/`, `modules/mod_lua/`, `modules/mod_php/`, `modules/mod_python/`)
 - Move all the `CHANGELOG.md` Unreleased items that have at least one non empty item into a new section with the new version number and date, and then create new empty sub-sections (Added, Changed and Fixed) for the Unreleased section with a single empty item.
 - Create a commit with the following message `version: $VERSION_NUMBER`.
 - Push the commit.
