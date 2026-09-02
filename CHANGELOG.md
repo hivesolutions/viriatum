@@ -31,6 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Waiting on connections through kqueue on the systems that carry it - [#49](https://github.com/hivesolutions/viriatum/issues/49)
 * The status page now names the mechanism the server is waiting through - [#49](https://github.com/hivesolutions/viriatum/issues/49)
 * Test runs now report which tests left allocations behind them - [#49](https://github.com/hivesolutions/viriatum/issues/49)
+* Reports of the serving measured against the reference servers, kept as documents - [#49](https://github.com/hivesolutions/viriatum/issues/49)
 
 ### Changed
 
@@ -74,6 +75,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * The benchmark now reports the memory, the processor time, the version and the kernel calls of the server it measured - [#49](https://github.com/hivesolutions/viriatum/issues/49)
 * A discarded measurement no longer shows a tail or a comparison against the baseline - [#49](https://github.com/hivesolutions/viriatum/issues/49)
 * The client that drives requests by hand runs again on a current Python - [#49](https://github.com/hivesolutions/viriatum/issues/49)
+* The harness runs the workloads of the interfaces again on the systems that sign what they load - [#49](https://github.com/hivesolutions/viriatum/issues/49)
 
 ## [0.5.0] - 2026-08-28
 
