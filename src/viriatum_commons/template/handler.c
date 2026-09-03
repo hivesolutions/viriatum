@@ -863,8 +863,12 @@ void _traverse_out_buffer(struct template_handler_t *template_handler, struct te
     from the source data type of a possible reference */
     unsigned char *buffer;
 
-    /* retrieves value parameter from the parameters map */
+    /* retrieves value parameter from the parameters map, a tag that
+    carries no parameters at all or not the one it needs is left out
+    of the page rather than taking the rendering down */
+    if(node->parameters_map == NULL) { return; }
     get_value_string_hash_map(node->parameters_map, (unsigned char *) "value", (void **) &value_parameter);
+    if(value_parameter == NULL) { return; }
 
     /* switches over the value parameter type to
     update the string buffer accordingly */
@@ -930,9 +934,13 @@ void _traverse_for_each_buffer(struct template_handler_t *template_handler, stru
     /* allocates space for the current vale temporary variable */
     void *_current_value;
 
-    /* retrieves both the item and from parameters from the parameters map */
+    /* retrieves both the item and from parameters from the parameters
+    map, a tag that carries no parameters at all or not the ones it
+    needs is left out of the page rather than taking the rendering down */
+    if(node->parameters_map == NULL) { return; }
     get_value_string_hash_map(node->parameters_map, (unsigned char *) "item", (void **) &item_parameter);
     get_value_string_hash_map(node->parameters_map, (unsigned char *) "from", (void **) &from_parameter);
+    if(item_parameter == NULL || from_parameter == NULL) { return; }
 
     /* tries to retrieve the reference value from the map of names in the
     template handler (dereferencing) */
@@ -983,10 +991,14 @@ void _traverse_if_buffer(struct template_handler_t *template_handler, struct tem
     /* allocates space for the value to be retrieved */
     struct type_t *value;
 
-    /* retrieves both the from and the item parameters from the parameters map */
+    /* retrieves both the from and the item parameters from the parameters
+    map, a tag that carries no parameters at all or not the ones it needs
+    is left out of the page rather than taking the rendering down */
+    if(node->parameters_map == NULL) { return; }
     get_value_string_hash_map(node->parameters_map, (unsigned char *) "item", (void **) &item_parameter);
     get_value_string_hash_map(node->parameters_map, (unsigned char *) "value", (void **) &value_parameter);
     get_value_string_hash_map(node->parameters_map, (unsigned char *) "operator", (void **) &operator_parameter);
+    if(item_parameter == NULL || value_parameter == NULL) { return; }
 
     /* tries to retrieve the reference value from the map of names in the
     template handler (dereferencing) */
