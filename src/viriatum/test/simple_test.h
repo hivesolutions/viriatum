@@ -390,6 +390,15 @@ const char *test_count_file(void);
  */
 const char *test_is_directory_file(void);
 
+/**
+ * Tests the describing of the set of entries of a directory as
+ * a number, one that moves with the set and not with the entries.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_fingerprint_directory_file(void);
+
 const char *test_join_path_file(void);
 
 /**

@@ -2444,6 +2444,45 @@ const char *test_is_directory_file(void) {
     return NULL;
 }
 
+const char *test_fingerprint_directory_file(void) {
+    /* allocates space for the numbers that describe the directory
+    before and after its contents have changed and for the error
+    the describing raises when it is unable to */
+    unsigned long first;
+    unsigned long second;
+    ERROR_CODE error;
+
+    /* the directory the process is running from is described by a
+    number that stays the very same for as long as the set of its
+    entries does, whatever else happens to them */
+    error = fingerprint_directory_file((char *) ".", &first);
+    V_ASSERT_EQ_U(error, 0);
+    error = fingerprint_directory_file((char *) ".", &second);
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT_EQ_U(second, first);
+
+    /* an entry added to the directory moves the number and taking
+    it out again brings the number back to what it was */
+    write_file((char *) "./viriatum_fingerprint_test.txt", (unsigned char *) "viriatum", 8);
+    error = fingerprint_directory_file((char *) ".", &second);
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT(second != first);
+    remove("./viriatum_fingerprint_test.txt");
+    error = fingerprint_directory_file((char *) ".", &second);
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT_EQ_U(second, first);
+
+    /* a directory that is not there is reported as an error rather
+    than described as a directory with nothing in it */
+    error = fingerprint_directory_file((char *) "./viriatum_fingerprint_gone", &second);
+    V_ASSERT(IS_ERROR_CODE(error));
+    RESET_ERROR;
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
 const char *test_join_path_file(void) {
     /* allocates space for the joined path buffer
     to be used in the join path tests */
@@ -2600,6 +2639,7 @@ static struct test_entry_t _simple_entries[] = {
     V_TEST_T(test_normalize_path, "path"),
     V_TEST_T(test_count_file, "path"),
     V_TEST_T(test_is_directory_file, "path"),
+    V_TEST_T(test_fingerprint_directory_file, "path"),
     V_TEST_T(test_join_path_file, "path"),
     V_TEST_T(test_absolute_path_file, "path"),
     V_TEST_T(test_handler_file_context, "handler"),
@@ -2631,6 +2671,13 @@ static struct test_entry_t _simple_entries[] = {
     V_TEST_T(test_file_cache_replaced, "handler"),
     V_TEST_T(test_file_cache_rewritten, "handler"),
     V_TEST_T(test_file_cache_stale, "handler"),
+    V_TEST_T(test_listing_cache, "handler"),
+    V_TEST_T(test_listing_cache_render, "handler"),
+    V_TEST_T(test_listing_cache_changed, "handler"),
+    V_TEST_T(test_listing_cache_template, "handler"),
+    V_TEST_T(test_listing_cache_expired, "handler"),
+    V_TEST_T(test_listing_cache_missing, "handler"),
+    V_TEST_T(test_listing_cache_clear, "handler"),
     V_TEST_T(test_handler_default_response, "handler"),
     V_TEST_T(test_handler_default_close, "handler"),
     V_TEST_T(test_handler_default_stream, "handler"),

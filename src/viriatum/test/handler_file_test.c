@@ -1989,3 +1989,345 @@ const char *test_file_cache_stale(void) {
     nothing to report for this execution */
     return NULL;
 }
+
+/* the url that the listings of the tests are asked for under, the
+directory of the process being what it resolves to */
+#define LISTING_CACHE_TEST_URL "/"
+
+/* the template the listings of the tests are built out of, one that
+names every entry between brackets and closes with the count */
+#define LISTING_CACHE_TEST_TEMPLATE "${foreach item=entry from=entries}[${out value=entry.name /}]${/foreach}(${out value=items /})"
+
+/* another template of another shape, so that a listing built out of
+the one before is told apart from one built out of this */
+#define LISTING_CACHE_TEST_OTHER "L:${out value=items /}"
+
+/**
+ * Builds the caches and the template that the tests of the listing
+ * cache render through, together with the file the fixture serves so
+ * that the directory of the process carries an entry that is known.
+ *
+ * @param listing_cache_pointer The pointer to the cache of listings.
+ * @param template_cache_pointer The pointer to the cache of templates.
+ */
+static void _create_listing_cache_test(
+    struct listing_cache_t **listing_cache_pointer,
+    struct template_cache_t **template_cache_pointer
+) {
+    write_file(
+        (char *) HANDLER_FILE_TEST_PATH,
+        (unsigned char *) HANDLER_FILE_TEST_CONTENTS,
+        sizeof(HANDLER_FILE_TEST_CONTENTS) - 1
+    );
+    _write_template_handler_file_test((char *) HANDLER_FILE_TEST_LISTING, LISTING_CACHE_TEST_TEMPLATE);
+    create_template_cache(template_cache_pointer);
+    create_listing_cache(listing_cache_pointer);
+}
+
+/**
+ * Releases the caches built by the above and takes the template and
+ * the file out of the file system.
+ *
+ * @param listing_cache The cache of listings to be released.
+ * @param template_cache The cache of templates to be released.
+ */
+static void _delete_listing_cache_test(
+    struct listing_cache_t *listing_cache,
+    struct template_cache_t *template_cache
+) {
+    delete_listing_cache(listing_cache);
+    delete_template_cache(template_cache);
+    _remove_template_handler_file_test((char *) HANDLER_FILE_TEST_LISTING);
+    remove(HANDLER_FILE_TEST_PATH);
+}
+
+/**
+ * Renders the listing of the directory of the process out of the
+ * provided caches into a handler of its own and copies the page that
+ * results into the provided buffer.
+ *
+ * @param listing_cache The cache of listings to be rendered out of.
+ * @param template_cache The cache of templates to be rendered out of.
+ * @param buffer The buffer the page is copied into.
+ * @param size The size in bytes of the provided buffer.
+ * @return The resulting error code.
+ */
+static ERROR_CODE _render_listing_cache_test(struct listing_cache_t *listing_cache, struct template_cache_t *template_cache, char *buffer, size_t size) {
+    struct template_handler_t *template_handler;
+    ERROR_CODE error;
+
+    create_template_handler(&template_handler);
+    error = render_listing_cache(
+        listing_cache,
+        template_cache,
+        template_handler,
+        (unsigned char *) LISTING_CACHE_TEST_URL,
+        (unsigned char *) ".",
+        (unsigned char *) HANDLER_FILE_TEST_LISTING
+    );
+    SPRINTF(buffer, size, "%s", (char *) template_handler->string_value);
+    delete_template_handler(template_handler);
+
+    return error;
+}
+
+const char *test_listing_cache(void) {
+    /* allocates space for the cache and for the index to be used in
+    the walking of the entries it is made of */
+    size_t index;
+    struct listing_cache_t *listing_cache;
+
+    /* creates the cache and verifies that every one of its entries
+    starts out holding no listing at all */
+    create_listing_cache(&listing_cache);
+    V_ASSERT_NOT_NULL(listing_cache);
+    V_ASSERT_NOT_NULL(listing_cache->entries);
+
+    for(index = 0; index < CACHE_LISTINGS_HANDLER_FILE; index++) {
+        V_ASSERT_NULL(listing_cache->entries[index].page);
+        V_ASSERT_EQ_U(listing_cache->entries[index].size, 0);
+        V_ASSERT_EQ_S((char *) listing_cache->entries[index].url, "");
+    }
+
+    delete_listing_cache(listing_cache);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_listing_cache_render(void) {
+    /* allocates space for the caches, for the entry that holds the
+    listing, for the page it held first and for the pages rendered */
+    struct listing_cache_t *listing_cache;
+    struct template_cache_t *template_cache;
+    struct listing_cache_entry_t *entry;
+    unsigned char *page;
+    char first[16384];
+    char second[16384];
+    size_t allocated = ALLOCATIONS;
+    ERROR_CODE error;
+
+    _create_listing_cache_test(&listing_cache, &template_cache);
+
+    /* the first listing is built out of the directory and the template
+    and held under the url, the page handed over being a copy of its own */
+    error = _render_listing_cache_test(listing_cache, template_cache, first, sizeof(first));
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT_NOT_NULL(strstr(first, "[" HANDLER_FILE_TEST_NAME "]"));
+
+    entry = &listing_cache->entries[_calculate_string_hash_map((unsigned char *) LISTING_CACHE_TEST_URL) % CACHE_LISTINGS_HANDLER_FILE];
+    V_ASSERT_EQ_S((char *) entry->url, LISTING_CACHE_TEST_URL);
+    V_ASSERT_NOT_NULL(entry->page);
+    V_ASSERT_EQ_S((char *) entry->page, first);
+    V_ASSERT_EQ_U(entry->size, strlen(first));
+    V_ASSERT(entry->fingerprint != 0);
+    V_ASSERT(entry->checked > 0);
+    V_ASSERT_NOT_NULL(entry->root);
+    page = entry->page;
+
+    /* the second listing is the page that was held, the directory being
+    walked for the names of its entries and none of them described */
+    error = _render_listing_cache_test(listing_cache, template_cache, second, sizeof(second));
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT_EQ_P(entry->page, page);
+    V_ASSERT_EQ_S(second, first);
+
+    /* the pages go away with the cache, so the number of outstanding
+    allocations is the one it was before the test started at all */
+    _delete_listing_cache_test(listing_cache, template_cache);
+    V_ASSERT_EQ_U(ALLOCATIONS, allocated);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_listing_cache_changed(void) {
+    /* allocates space for the caches and for the pages rendered before
+    and after the contents of the directory have changed */
+    struct listing_cache_t *listing_cache;
+    struct template_cache_t *template_cache;
+    char page[16384];
+    ERROR_CODE error;
+
+    _create_listing_cache_test(&listing_cache, &template_cache);
+
+    /* the directory is listed as it stands, the entry that is about
+    to be added to it is nowhere in the page */
+    error = _render_listing_cache_test(listing_cache, template_cache, page, sizeof(page));
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT_NULL(strstr(page, "[" HANDLER_FILE_TEST_ADDED "]"));
+
+    /* a file is added to the directory, the set of its entries has
+    moved and so the page is built again rather than handed over as
+    it was, a listing held from before would name a directory that
+    no longer exists */
+    write_file((char *) "./" HANDLER_FILE_TEST_ADDED, (unsigned char *) "viriatum", 8);
+    error = _render_listing_cache_test(listing_cache, template_cache, page, sizeof(page));
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT_NOT_NULL(strstr(page, "[" HANDLER_FILE_TEST_ADDED "]"));
+
+    /* and once the file is gone again so is the entry of it */
+    remove("./" HANDLER_FILE_TEST_ADDED);
+    error = _render_listing_cache_test(listing_cache, template_cache, page, sizeof(page));
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT_NULL(strstr(page, "[" HANDLER_FILE_TEST_ADDED "]"));
+
+    _delete_listing_cache_test(listing_cache, template_cache);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_listing_cache_template(void) {
+    /* allocates space for the caches and for the pages rendered before
+    and after the template has been rewritten */
+    struct listing_cache_t *listing_cache;
+    struct template_cache_t *template_cache;
+    char page[16384];
+    ERROR_CODE error;
+
+    _create_listing_cache_test(&listing_cache, &template_cache);
+
+    error = _render_listing_cache_test(listing_cache, template_cache, page, sizeof(page));
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT_EQ_I(page[0], '[');
+
+    /* the template is rewritten underneath the caches, the page is
+    built again out of the template as it now stands, the one that
+    was held describing a template that is no longer there */
+    _write_template_handler_file_test((char *) HANDLER_FILE_TEST_LISTING, LISTING_CACHE_TEST_OTHER);
+    error = _render_listing_cache_test(listing_cache, template_cache, page, sizeof(page));
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT_MEM(page, "L:", 2);
+
+    _delete_listing_cache_test(listing_cache, template_cache);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_listing_cache_expired(void) {
+    /* allocates space for the caches, for the entry that is made to
+    look older than the time it is trusted for and for the pages */
+    struct listing_cache_t *listing_cache;
+    struct template_cache_t *template_cache;
+    struct listing_cache_entry_t *entry;
+    char first[16384];
+    char second[16384];
+    ERROR_CODE error;
+
+    _create_listing_cache_test(&listing_cache, &template_cache);
+
+    error = _render_listing_cache_test(listing_cache, template_cache, first, sizeof(first));
+    V_ASSERT_EQ_U(error, 0);
+    entry = &listing_cache->entries[_calculate_string_hash_map((unsigned char *) LISTING_CACHE_TEST_URL) % CACHE_LISTINGS_HANDLER_FILE];
+
+    /* the entry is made to look as though it had been built since well
+    before the time it is trusted for, the sizes and the moments of the
+    entries may have moved without the set of them moving, which sends
+    the next listing to be built again */
+    entry->checked = 0;
+    error = _render_listing_cache_test(listing_cache, template_cache, second, sizeof(second));
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT(entry->checked > 0);
+    V_ASSERT_EQ_S(second, first);
+
+    _delete_listing_cache_test(listing_cache, template_cache);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_listing_cache_missing(void) {
+    /* allocates space for the caches, for the handler the page is
+    built into and for the entry a url falls on */
+    struct listing_cache_t *listing_cache;
+    struct template_cache_t *template_cache;
+    struct template_handler_t *template_handler;
+    struct listing_cache_entry_t *entry;
+    ERROR_CODE error;
+
+    _create_listing_cache_test(&listing_cache, &template_cache);
+
+    /* a directory that is not there cannot be walked, the page is built
+    the way it always was, out of no entries at all, and nothing is held */
+    create_template_handler(&template_handler);
+    error = render_listing_cache(
+        listing_cache,
+        template_cache,
+        template_handler,
+        (unsigned char *) "/gone/",
+        (unsigned char *) "./viriatum_listing_gone",
+        (unsigned char *) HANDLER_FILE_TEST_LISTING
+    );
+    V_ASSERT(IS_ERROR_CODE(error));
+    RESET_ERROR;
+    V_ASSERT_EQ_S((char *) template_handler->string_value, "(0)");
+    delete_template_handler(template_handler);
+    entry = &listing_cache->entries[_calculate_string_hash_map((unsigned char *) "/gone/") % CACHE_LISTINGS_HANDLER_FILE];
+    V_ASSERT_NULL(entry->page);
+
+    /* a template that is not there leaves the page empty, the way it
+    always did, and nothing is held either */
+    create_template_handler(&template_handler);
+    error = render_listing_cache(
+        listing_cache,
+        template_cache,
+        template_handler,
+        (unsigned char *) LISTING_CACHE_TEST_URL,
+        (unsigned char *) ".",
+        (unsigned char *) "./templates/viriatum_listing_gone.tpl"
+    );
+    V_ASSERT(IS_ERROR_CODE(error));
+    RESET_ERROR;
+    V_ASSERT_EQ_S((char *) template_handler->string_value, "");
+    delete_template_handler(template_handler);
+    entry = &listing_cache->entries[_calculate_string_hash_map((unsigned char *) LISTING_CACHE_TEST_URL) % CACHE_LISTINGS_HANDLER_FILE];
+    V_ASSERT_NULL(entry->page);
+
+    _delete_listing_cache_test(listing_cache, template_cache);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_listing_cache_clear(void) {
+    /* allocates space for the caches, for the index used in the walking
+    of the entries and for the pages rendered */
+    size_t index;
+    struct listing_cache_t *listing_cache;
+    struct template_cache_t *template_cache;
+    char page[16384];
+    ERROR_CODE error;
+
+    _create_listing_cache_test(&listing_cache, &template_cache);
+
+    error = _render_listing_cache_test(listing_cache, template_cache, page, sizeof(page));
+    V_ASSERT_EQ_U(error, 0);
+
+    /* the clearing releases every page that was being held, an entry
+    left with one behind is a page leaked */
+    clear_listing_cache(listing_cache);
+    for(index = 0; index < CACHE_LISTINGS_HANDLER_FILE; index++) {
+        V_ASSERT_NULL(listing_cache->entries[index].page);
+        V_ASSERT_EQ_S((char *) listing_cache->entries[index].url, "");
+    }
+
+    /* and the cache goes on working afterwards, the clearing empties
+    it rather than taking it out of use */
+    error = _render_listing_cache_test(listing_cache, template_cache, page, sizeof(page));
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT_NOT_NULL(strstr(page, "[" HANDLER_FILE_TEST_NAME "]"));
+
+    _delete_listing_cache_test(listing_cache, template_cache);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}

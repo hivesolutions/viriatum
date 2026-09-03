@@ -41,6 +41,104 @@ static struct file_cache_t *_get_file_cache(void) {
     return _file_cache;
 }
 
+/* the listings that the handler is keeping rendered, one set per
+process the very way the files it keeps open are, so that nothing
+here is ever reached by two of them at the same time either */
+static struct listing_cache_t *_listing_cache = NULL;
+
+static struct listing_cache_t *_get_listing_cache(void) {
+    /* creates the cache the first time that one is asked for, inside
+    the worker that is serving and never before the forking of it, so
+    that each of them ends up with one of its own */
+    if(_listing_cache == NULL) { create_listing_cache(&_listing_cache); }
+    return _listing_cache;
+}
+
+/**
+ * Builds the page that lists the directory in the provided path
+ * into the provided handler, the entries of the directory being
+ * listed, converted into the maps the template walks and rendered
+ * through the template of the listing out of the cache of templates.
+ *
+ * @param template_handler The handler the page is built into.
+ * @param template_cache The cache the template is rendered out of.
+ * @param url The url the directory was asked for under.
+ * @param file_path The path of the directory to be listed.
+ * @param template_path The path of the template of the listing.
+ */
+static void _render_listing_handler_file(
+    struct template_handler_t *template_handler,
+    struct template_cache_t *template_cache,
+    unsigned char *url,
+    unsigned char *file_path,
+    unsigned char *template_path
+) {
+    /* allocates space for the directory entries and for the
+    maps that describe them to the template */
+    struct linked_list_t *directory_entries;
+    struct linked_list_t *directory_entries_map;
+
+    /* allocates space for the size of the url string to
+    be calculates and for the folder path variable */
+    size_t url_size;
+    char folder_path[VIRIATUM_MAX_PATH_SIZE];
+
+    /* creates the directory entries (linked list) */
+    create_linked_list(&directory_entries);
+
+    /* lists the directory file into the directory
+    entries linked list and then converts them into maps */
+    list_directory_file((char *) file_path, directory_entries);
+    entries_to_map_file(directory_entries, &directory_entries_map);
+
+    /* retrieves the current size of the url and copies into
+    the folder path the appropriate part of it, this strategy
+    takes into account the size of the url */
+    url_size = strlen((char *) url);
+    if(url_size > 2) { memcpy(folder_path, &url[1], url_size - 2); }
+    if(url_size > 2) {
+        folder_path[url_size - 2] = '\0';
+    } else {
+        folder_path[0] = '\0';
+    }
+
+    /* assigns the name of the current folder being listed to
+    the template handler (to be set on the template) */
+    assign_string_template_handler(
+        template_handler,
+        (unsigned char *) "folder_path",
+        folder_path
+    );
+
+    /* assigns the directory entries to the template handler,
+    this variable will be exposed to the template */
+    assign_list_template_handler(
+        template_handler,
+        (unsigned char *) "entries",
+        directory_entries_map
+    );
+    assign_integer_template_handler(
+        template_handler,
+        (unsigned char *) "items",
+        (int) directory_entries_map->size
+    );
+
+    /* processes the file as a template handler, out of the
+    cache of the service so that the file is only ever parsed
+    when it has changed since it was last parsed */
+    process_cache_template_handler(template_handler, template_cache, template_path);
+
+    /* deletes the directory entries map and the
+    directory entries */
+    delete_directory_entries_map_file(directory_entries_map);
+    delete_directory_entries_file(directory_entries);
+
+    /* deletes the directory entries (linked list) and
+    the entries map (linked list) */
+    delete_linked_list(directory_entries);
+    delete_linked_list(directory_entries_map);
+}
+
 static void _time_file_cache(STAT_TYPE *file_stat, struct date_time_t *date_time) {
     /* allocates space for the structure that carries the parts of
     the moment and for the moment itself as the system reports it */
@@ -255,6 +353,13 @@ ERROR_CODE unregister_handler_file(struct service_t *service) {
     if(_file_cache != NULL) {
         delete_file_cache(_file_cache);
         _file_cache = NULL;
+    }
+
+    /* releases every listing that the cache was keeping rendered
+    together with the cache itself */
+    if(_listing_cache != NULL) {
+        delete_listing_cache(_listing_cache);
+        _listing_cache = NULL;
     }
 
     /* remove the HTTP handler from the service after
@@ -621,10 +726,7 @@ ERROR_CODE message_complete_callback_handler_file(struct http_request_t *http_re
     size_t file_size;
     size_t count;
 
-    /* allocates space for the directory entries and for
-    the template handler */
-    struct linked_list_t *directory_entries;
-    struct linked_list_t *directory_entries_map;
+    /* allocates space for the template handler */
     struct template_handler_t *template_handler;
 
     /* allocates space for the is directory and the is redirect flags */
@@ -656,11 +758,6 @@ ERROR_CODE message_complete_callback_handler_file(struct http_request_t *http_re
     the connection is meant to be kep alive at the end of the
     HTTP message processing or not */
     unsigned char keep_alive;
-
-    /* allocates space for the size of the url string to
-    be calculates and for the folder path variable */
-    size_t url_size;
-    char folder_path[VIRIATUM_MAX_PATH_SIZE];
 
     /* allocates space for the temporary buffer that will hold
     the description of the error to be sent to the client in case
@@ -767,55 +864,17 @@ ERROR_CODE message_complete_callback_handler_file(struct http_request_t *http_re
             /* prints a debug message */
             V_DEBUG_F("Processing template file '%s'\n", template_path);
 
-            /* creates the directory entries (linked list) */
-            create_linked_list(&directory_entries);
-
-            /* lists the directory file into the directory
-            entries linked list and then converts them into maps */
-            list_directory_file((char *) handler_file_context->file_path_d, directory_entries);
-            entries_to_map_file(directory_entries, &directory_entries_map);
-
-            /* retrieves the current size of the url and copies into
-            the folder path the appropriate part of it, this strategy
-            takes into account the size of the url */
-            url_size = strlen((char *) handler_file_context->url_d);
-            if(url_size > 2) { memcpy(folder_path, &handler_file_context->url_d[1], url_size - 2); }
-            if(url_size > 2) {
-                folder_path[url_size - 2] = '\0';
-            } else {
-                folder_path[0] = '\0';
-            }
-
-            /* creates the template handler */
+            /* creates the template handler and asks the cache for the
+            page that lists the directory, which is built out of the
+            entries and the template only when either of them has moved
+            since it was last built and handed over as it stands otherwise */
             create_template_handler(&template_handler);
-
-            /* assigns the name of the current folder being listed to
-            the template handler (to be set on the template) */
-            assign_string_template_handler(
-                template_handler,
-                (unsigned char *) "folder_path",
-                folder_path
-            );
-
-            /* assigns the directory entries to the template handler,
-            this variable will be exposed to the template */
-            assign_list_template_handler(
-                template_handler,
-                (unsigned char *) "entries",
-                directory_entries_map
-            );
-            assign_integer_template_handler(
-                template_handler,
-                (unsigned char *) "items",
-                (int) directory_entries_map->size
-            );
-
-            /* processes the file as a template handler, out of the
-            cache of the service so that the file is only ever parsed
-            when it has changed since it was last parsed */
-            process_cache_template_handler(
-                template_handler,
+            render_listing_cache(
+                _get_listing_cache(),
                 connection->service->template_cache,
+                template_handler,
+                handler_file_context->url_d,
+                handler_file_context->file_path_d,
                 template_path
             );
 
@@ -835,16 +894,6 @@ ERROR_CODE message_complete_callback_handler_file(struct http_request_t *http_re
             the flushed flag */
             handler_file_context->template_handler = template_handler;
             handler_file_context->flushed = FALSE;
-
-            /* deletes the directory entries map and the
-            directory entries */
-            delete_directory_entries_map_file(directory_entries_map);
-            delete_directory_entries_file(directory_entries);
-
-            /* deletes the directory entries (linked list) and
-            the entries map (linked list) */
-            delete_linked_list(directory_entries);
-            delete_linked_list(directory_entries_map);
         }
     }
     /* otherwise the file path must refer to a "normal" file path and
@@ -1637,6 +1686,140 @@ ERROR_CODE open_file_cache(struct file_cache_t *file_cache, unsigned char *file_
             (unsigned char *) "Problem loading file"
         );
     }
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE create_listing_cache(struct listing_cache_t **listing_cache_pointer) {
+    /* allocates space for the cache itself and for the entries that
+    it is made of, which are as many as a hash is able to fall on */
+    size_t index;
+    size_t listing_cache_size = sizeof(struct listing_cache_t);
+    size_t entries_size = sizeof(struct listing_cache_entry_t) * CACHE_LISTINGS_HANDLER_FILE;
+    struct listing_cache_t *listing_cache = (struct listing_cache_t *) MALLOC(listing_cache_size);
+    listing_cache->entries = (struct listing_cache_entry_t *) MALLOC(entries_size);
+
+    /* empties every one of the entries, a page that is unset
+    being what says that the slot holds no listing at all */
+    for(index = 0; index < CACHE_LISTINGS_HANDLER_FILE; index++) {
+        listing_cache->entries[index].url[0] = '\0';
+        listing_cache->entries[index].fingerprint = 0;
+        listing_cache->entries[index].root = NULL;
+        listing_cache->entries[index].template_size = 0;
+        listing_cache->entries[index].template_written = 0;
+        listing_cache->entries[index].checked = 0;
+        listing_cache->entries[index].page = NULL;
+        listing_cache->entries[index].size = 0;
+    }
+
+    /* sets the cache in the cache pointer */
+    *listing_cache_pointer = listing_cache;
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE delete_listing_cache(struct listing_cache_t *listing_cache) {
+    /* releases every page that is still being held and then releases
+    both the entries and the cache that carried them */
+    clear_listing_cache(listing_cache);
+    FREE(listing_cache->entries);
+    FREE(listing_cache);
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE clear_listing_cache(struct listing_cache_t *listing_cache) {
+    /* allocates space for the index to be used in the iteration
+    over the complete set of entries of the cache */
+    size_t index;
+
+    /* releases the page of every entry that is holding one, the
+    slot then describes nothing any longer */
+    for(index = 0; index < CACHE_LISTINGS_HANDLER_FILE; index++) {
+        if(listing_cache->entries[index].page == NULL) { continue; }
+        FREE(listing_cache->entries[index].page);
+        listing_cache->entries[index].page = NULL;
+        listing_cache->entries[index].size = 0;
+        listing_cache->entries[index].url[0] = '\0';
+    }
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE render_listing_cache(struct listing_cache_t *listing_cache, struct template_cache_t *template_cache, struct template_handler_t *template_handler, unsigned char *url, unsigned char *file_path, unsigned char *template_path) {
+    /* allocates space for the number that describes the set of entries
+    of the directory as it now stands, for the entry of the cache of
+    templates that holds the template, for the moment at which this is
+    all happening and for the errors of the two of them */
+    unsigned long fingerprint;
+    struct template_cache_entry_t *template_entry;
+    unsigned int now = (unsigned int) time(NULL);
+    ERROR_CODE error_code;
+
+    /* the entry that the provided url falls on, a url always falls on
+    the very same one of them and takes it over from whatever was there */
+    size_t index = _calculate_string_hash_map(url) % CACHE_LISTINGS_HANDLER_FILE;
+    struct listing_cache_entry_t *entry = &listing_cache->entries[index];
+
+    /* describes the set of entries of the directory as it now stands
+    and asks the cache of templates for the template as it now stands,
+    the two of them being what a page is built out of, walking the names
+    of a directory costs a few calls into the kernel where describing
+    every one of its entries costs one for each, a directory that cannot
+    be walked or a template that cannot be loaded leave the page to be
+    built the way it always was, which is what says what is wrong */
+    error_code = fingerprint_directory_file((char *) file_path, &fingerprint);
+    if(IS_ERROR_CODE(error_code)) {
+        _render_listing_handler_file(template_handler, template_cache, url, file_path, template_path);
+        RAISE_AGAIN(error_code);
+    }
+    error_code = acquire_template_cache(template_cache, template_path, &template_entry);
+    if(IS_ERROR_CODE(error_code)) {
+        _render_listing_handler_file(template_handler, template_cache, url, file_path, template_path);
+        RAISE_AGAIN(error_code);
+    }
+
+    /* in case the entry is holding the page of this very directory,
+    built out of the entries as they now stand and out of the template
+    as it now stands, and the sizes and the moments of the entries are
+    still trusted, the page is handed over as it stands, copied as the
+    handler owns what it carries and the connection releases it */
+    if(entry->page != NULL && strcmp((char *) entry->url, (char *) url) == 0 &&
+       entry->fingerprint == fingerprint && entry->root == template_entry->root &&
+       entry->template_size == template_entry->size &&
+       entry->template_written == template_entry->written &&
+       now - entry->checked < CACHE_VALID_HANDLER_FILE) {
+        template_handler->string_value = (unsigned char *) MALLOC(entry->size + 1);
+        memcpy(template_handler->string_value, entry->page, entry->size + 1);
+        RAISE_NO_ERROR;
+    }
+
+    /* otherwise the page is built out of the directory and the template
+    as they now stand and takes the entry over from whatever was there,
+    a url longer than an entry is able to carry is built but never held */
+    _render_listing_handler_file(template_handler, template_cache, url, file_path, template_path);
+    if(entry->page != NULL) {
+        FREE(entry->page);
+        entry->page = NULL;
+        entry->url[0] = '\0';
+    }
+    if(strlen((char *) url) >= VIRIATUM_MAX_URL_SIZE) { RAISE_NO_ERROR; }
+
+    /* fills the entry with the page and with what it was built out of,
+    the page being copied as the handler goes on owning its own */
+    entry->size = template_handler->string_buffer->string_length;
+    entry->page = (unsigned char *) MALLOC(entry->size + 1);
+    memcpy(entry->page, template_handler->string_value, entry->size + 1);
+    STRCPY((char *) entry->url, VIRIATUM_MAX_URL_SIZE, (char *) url);
+    entry->fingerprint = fingerprint;
+    entry->root = template_entry->root;
+    entry->template_size = template_entry->size;
+    entry->template_written = template_entry->written;
+    entry->checked = now;
 
     /* raises no error */
     RAISE_NO_ERROR;
