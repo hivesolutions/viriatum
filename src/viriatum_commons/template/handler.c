@@ -26,6 +26,196 @@
 
 #include "handler.h"
 
+/**
+ * Creates the engine and the settings through which a template
+ * is parsed into a tree by the callbacks of the provided handler,
+ * together with the root node the tree is going to hang from,
+ * which is set as the current node of the handler so that the
+ * first of the callbacks finds it there.
+ *
+ * @param template_handler The handler the tree is built through.
+ * @param template_engine_pointer The pointer to the engine that
+ * has been created, carrying the handler as its context.
+ * @param template_settings_pointer The pointer to the settings
+ * that have been created, with the callbacks set in them.
+ * @param root_node_pointer The pointer to the root node that
+ * has been created.
+ */
+static void _create_engine_template_handler(
+    struct template_handler_t *template_handler,
+    struct template_engine_t **template_engine_pointer,
+    struct template_settings_t **template_settings_pointer,
+    struct template_node_t **root_node_pointer
+) {
+    /* allocates space for the template engine, for the
+    template settings and for the root node */
+    struct template_engine_t *template_engine;
+    struct template_settings_t *template_settings;
+    struct template_node_t *root_node;
+
+    /* creates the template engine */
+    create_template_engine(&template_engine);
+
+    /* creates the template engine */
+    create_template_settings(&template_settings);
+
+    /* creates the root node and sets it as the initial
+    current node */
+    create_template_node(&root_node, TEMPLATE_NODE_ROOT);
+    template_handler->current_node = root_node;
+
+    /* sets the context (template handler) in the template engine */
+    template_engine->context = template_handler;
+
+    /* sets the various callbacks in the template settings */
+    template_settings->on_text_begin = _text_begin_callback;
+    template_settings->on_text_end = _text_end_callback;
+    template_settings->on_tag_begin = _tag_begin_callback;
+    template_settings->on_tag_close_begin = _tag_close_begin_callback;
+    template_settings->on_tag_end = _tag_end_callback;
+    template_settings->on_tag_name = _tag_name_callback;
+    template_settings->on_parameter = _parameter_callback;
+    template_settings->on_parameter_value = _parameter_value_callback;
+
+    /* sets the created structures in the provided pointers */
+    *template_engine_pointer = template_engine;
+    *template_settings_pointer = template_settings;
+    *root_node_pointer = root_node;
+}
+
+/**
+ * Empties the provided entry of the cache, closing the file it
+ * is holding and releasing the tree that was parsed out of it,
+ * so that the slot may be taken over by another template or the
+ * cache may be released altogether.
+ *
+ * @param entry The entry of the cache to be emptied.
+ */
+static void _empty_template_cache(struct template_cache_entry_t *entry) {
+    /* allocates space for the temporary node variable */
+    struct template_node_t *node;
+
+    /* closes the file that the entry is holding, a descriptor
+    that is never closed is a descriptor leaked */
+    if(entry->descriptor != -1) {
+        CLOSE_READ(entry->descriptor);
+        entry->descriptor = -1;
+    }
+
+    /* releases every one of the nodes of the tree, the flat
+    list of them is what the handler that parsed the template
+    kept them in and it is walked the very same way */
+    if(entry->nodes != NULL) {
+        while(TRUE) {
+            /* pops a node from the nodes list */
+            pop_value_linked_list(entry->nodes, (void **) &node, 1);
+
+            /* in case the value is invalid (empty list) */
+            if(node == NULL) {
+                /* breaks the cycle */
+                break;
+            }
+
+            /* deletes the template node */
+            delete_template_node(node);
+        }
+
+        /* deletes the nodes list */
+        delete_linked_list(entry->nodes);
+        entry->nodes = NULL;
+    }
+
+    /* releases the root node the tree was hanging from, the
+    children of it have all been released above */
+    if(entry->root != NULL) {
+        delete_template_node(entry->root);
+        entry->root = NULL;
+    }
+
+    /* unsets the path, the slot describes nothing any longer */
+    entry->path[0] = '\0';
+}
+
+/**
+ * Reads the template that the descriptor of the entry reaches
+ * and parses it into the tree of the entry, the bytes that are
+ * parsed being the bytes of the very file the descriptor was
+ * asked about and never of one that took its place in between.
+ *
+ * @param entry The entry of the cache to be populated.
+ * @param size The size in bytes of the file to be read.
+ * @return The resulting error code.
+ */
+static ERROR_CODE _parse_template_cache(struct template_cache_entry_t *entry, size_t size) {
+    /* allocates space for the handler that the tree is built
+    through, for the engine and the settings that parse it and
+    for the root node the tree hangs from */
+    struct template_handler_t *template_handler;
+    struct template_engine_t *template_engine;
+    struct template_settings_t *template_settings;
+    struct template_node_t *root_node;
+
+    /* allocates space for the buffer that is going to hold the
+    contents of the file, for the number of bytes that the reading
+    hands back and for the result of the parsing */
+    unsigned char *buffer;
+    long read_bytes;
+    ERROR_CODE error_code;
+
+    /* reads the file whole through the descriptor, at the position
+    it starts at rather than at whatever the descriptor has reached,
+    a reading cut short would leave the parser running over what the
+    buffer happens to hold past it */
+    buffer = (unsigned char *) MALLOC(size);
+    read_bytes = (long) READ_AT(entry->descriptor, buffer, size, 0);
+    if(read_bytes < 0 || (size_t) read_bytes != size) {
+        FREE(buffer);
+        RAISE_ERROR_M(
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Problem reading from template"
+        );
+    }
+
+    /* a handler is what the callbacks of the engine build a tree
+    through, so one is created for the parsing alone and is left
+    holding nothing once the tree has been taken out of it */
+    create_template_handler(&template_handler);
+    _create_engine_template_handler(
+        template_handler,
+        &template_engine,
+        &template_settings,
+        &root_node
+    );
+    error_code = process_buffer_template_engine(
+        template_engine,
+        template_settings,
+        buffer,
+        size
+    );
+
+    /* moves the tree out of the handler and into the entry, the
+    nodes now belong to the entry for as long as it lives and the
+    handler is released without any of them */
+    entry->root = root_node;
+    entry->nodes = template_handler->nodes;
+    template_handler->nodes = NULL;
+
+    /* deletes the template settings, the template engine and the
+    handler and releases the buffer, the parsing is complete */
+    delete_template_settings(template_settings);
+    delete_template_engine(template_engine);
+    delete_template_handler(template_handler);
+    FREE(buffer);
+
+    /* in case the parsing raised an error it is raised again, the
+    tree that was built up to it is left in the entry for the
+    caller to release along with everything else the entry holds */
+    if(IS_ERROR_CODE(error_code)) { RAISE_AGAIN(error_code); }
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
 void create_template_handler(struct template_handler_t **template_handler_pointer) {
     /* retrieves the template handler size */
     size_t template_handler_size = sizeof(struct template_handler_t);
@@ -40,8 +230,11 @@ void create_template_handler(struct template_handler_t **template_handler_pointe
     template_handler->nodes = NULL;
     template_handler->contexts = NULL;
 
-    /* creates a new hash map for the names */
-    create_hash_map(&template_handler->names, 0);
+    /* creates a new hash map for the names, sized for the handful
+    of them that a page assigns rather than the default of a map,
+    a table of the default size costs more to build and to release
+    than the rendering of the page does and one is built per page */
+    create_hash_map(&template_handler->names, 16);
 
     /* creates a new string buffer for buffering
     the result of the template processing */
@@ -213,6 +406,152 @@ void delete_template_parameter(struct template_parameter_t *template_parameter) 
     FREE(template_parameter);
 }
 
+void create_template_cache(struct template_cache_t **template_cache_pointer) {
+    /* allocates space for the cache itself and for the entries that
+    it is made of, which are as many as a hash is able to fall on */
+    size_t index;
+    size_t template_cache_size = sizeof(struct template_cache_t);
+    size_t entries_size = sizeof(struct template_cache_entry_t) * CACHE_SIZE_TEMPLATE_HANDLER;
+    struct template_cache_t *template_cache = (struct template_cache_t *) MALLOC(template_cache_size);
+    template_cache->entries = (struct template_cache_entry_t *) MALLOC(entries_size);
+
+    /* empties every one of the entries, a descriptor of minus one
+    being what says that the slot holds no template at all */
+    for(index = 0; index < CACHE_SIZE_TEMPLATE_HANDLER; index++) {
+        template_cache->entries[index].descriptor = -1;
+        template_cache->entries[index].path[0] = '\0';
+        template_cache->entries[index].size = 0;
+        template_cache->entries[index].written = 0;
+        template_cache->entries[index].checked = 0;
+        template_cache->entries[index].root = NULL;
+        template_cache->entries[index].nodes = NULL;
+    }
+
+    /* sets the cache in the cache pointer */
+    *template_cache_pointer = template_cache;
+}
+
+void delete_template_cache(struct template_cache_t *template_cache) {
+    /* closes every file that is still being held, releases every
+    tree and then both the entries and the cache that carried them */
+    clear_template_cache(template_cache);
+    FREE(template_cache->entries);
+    FREE(template_cache);
+}
+
+void clear_template_cache(struct template_cache_t *template_cache) {
+    /* allocates space for the index to be used in the iteration
+    over the complete set of entries of the cache */
+    size_t index;
+
+    /* empties every one of the entries, closing the file it holds
+    and releasing the tree that was parsed out of it */
+    for(index = 0; index < CACHE_SIZE_TEMPLATE_HANDLER; index++) {
+        _empty_template_cache(&template_cache->entries[index]);
+    }
+}
+
+ERROR_CODE acquire_template_cache(struct template_cache_t *template_cache, unsigned char *file_path, struct template_cache_entry_t **template_cache_entry_pointer) {
+    /* allocates space for the structure that describes the file and
+    for the moment at which this is all happening */
+    STAT_TYPE file_stat;
+    ERROR_CODE error_code;
+    unsigned int now = (unsigned int) time(NULL);
+
+    /* the entry that the provided path falls on, a path always falls
+    on the very same one of them and takes it over from whatever was
+    sitting there before, which is what makes both the finding of it
+    and the making of room for it a single step */
+    size_t index = _calculate_string_hash_map(file_path) % CACHE_SIZE_TEMPLATE_HANDLER;
+    struct template_cache_entry_t *entry = &template_cache->entries[index];
+
+    /* in case the entry is holding the very template that is being
+    asked for the tree it holds may be handed back, once the file has
+    been found to still be the one that the tree was parsed out of */
+    if(entry->descriptor != -1 && strcmp((char *) entry->path, (char *) file_path) == 0) {
+        /* the descriptor is asked about itself on every single one of
+        the requests, which costs nothing against the parsing it saves,
+        a template written over in place keeps the very same descriptor
+        and is told from the one that was parsed by nothing but the
+        size and the moment of the last write it now reports */
+        if(STAT_READ(entry->descriptor, file_stat) != 0) {
+            RAISE_ERROR_M(
+                RUNTIME_EXCEPTION_ERROR_CODE,
+                (unsigned char *) "Problem loading template"
+            );
+        }
+
+        /* within the time that an entry is trusted for a file that
+        reports what it reported when it was parsed is the very same
+        file and there is nothing else to be asked */
+        if((size_t) file_stat.st_size == entry->size && file_stat.st_mtime == entry->written &&
+           now - entry->checked < CACHE_VALID_TEMPLATE_HANDLER) {
+            *template_cache_entry_pointer = entry;
+            RAISE_NO_ERROR;
+        }
+
+        /* past that the file is opened again through its path and
+        parsed again, the only way of telling that another one has
+        been put in its place, the descriptor that is held would go
+        on answering about the file that used to be there */
+    }
+
+    /* whatever the entry was holding is of no use, either because it
+    describes another template or because the one it describes has
+    moved on, and it is released before the slot is taken over */
+    _empty_template_cache(entry);
+
+    /* a path longer than an entry is able to carry is never cached,
+    the copying of it would run past the end of the buffer */
+    if(strlen((char *) file_path) >= VIRIATUM_MAX_PATH_SIZE) {
+        RAISE_ERROR_M(
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Problem loading template"
+        );
+    }
+
+    /* opens the file and describes it through the descriptor that
+    was just obtained, which answers about the very file that was
+    opened and never about one that took its place in between */
+    error_code = open_read_file((char *) file_path, &entry->descriptor);
+    if(IS_ERROR_CODE(error_code)) {
+        entry->descriptor = -1;
+        RAISE_AGAIN(error_code);
+    }
+
+    if(STAT_READ(entry->descriptor, file_stat) != 0) {
+        CLOSE_READ(entry->descriptor);
+        entry->descriptor = -1;
+        RAISE_ERROR_M(
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Problem loading template"
+        );
+    }
+
+    /* reads the file through the descriptor and parses it into the
+    tree of the entry, a file that cannot be parsed leaves the entry
+    empty rather than half way through describing it */
+    error_code = _parse_template_cache(entry, (size_t) file_stat.st_size);
+    if(IS_ERROR_CODE(error_code)) {
+        _empty_template_cache(entry);
+        RAISE_AGAIN(error_code);
+    }
+
+    /* fills the entry with what has just been learnt about the file,
+    the size and the moment of the last write to it included as they
+    are what the tree is going to be held against */
+    STRCPY((char *) entry->path, VIRIATUM_MAX_PATH_SIZE, (char *) file_path);
+    entry->size = (size_t) file_stat.st_size;
+    entry->written = file_stat.st_mtime;
+    entry->checked = now;
+
+    /* sets the entry in the entry pointer */
+    *template_cache_entry_pointer = entry;
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
 void process_template_handler(struct template_handler_t *template_handler, unsigned char *file_path) {
     /* allocates space for the template engine */
     struct template_engine_t *template_engine;
@@ -223,29 +562,15 @@ void process_template_handler(struct template_handler_t *template_handler, unsig
     /* allocates space for the root node */
     struct template_node_t *root_node;
 
-    /* creates the template engine */
-    create_template_engine(&template_engine);
-
-    /* creates the template engine */
-    create_template_settings(&template_settings);
-
-    /* creates the root node and sets it as the initial
-    current node */
-    create_template_node(&root_node, TEMPLATE_NODE_ROOT);
-    template_handler->current_node = root_node;
-
-    /* sets the context (template handler) in the template engine */
-    template_engine->context = template_handler;
-
-    /* sets the various callbacks in the template settings */
-    template_settings->on_text_begin = _text_begin_callback;
-    template_settings->on_text_end = _text_end_callback;
-    template_settings->on_tag_begin = _tag_begin_callback;
-    template_settings->on_tag_close_begin = _tag_close_begin_callback;
-    template_settings->on_tag_end = _tag_end_callback;
-    template_settings->on_tag_name = _tag_name_callback;
-    template_settings->on_parameter = _parameter_callback;
-    template_settings->on_parameter_value = _parameter_value_callback;
+    /* creates the template engine and the template settings that
+    build the tree through the callbacks of the template handler,
+    together with the root node that the tree hangs from */
+    _create_engine_template_handler(
+        template_handler,
+        &template_engine,
+        &template_settings,
+        &root_node
+    );
 
     /* processes the file as a template engine and then uses the
     created node structure to traverse for string buffer output */
@@ -264,6 +589,28 @@ void process_template_handler(struct template_handler_t *template_handler, unsig
 
     /* deletes the template engine */
     delete_template_engine(template_engine);
+}
+
+void process_cache_template_handler(struct template_handler_t *template_handler, struct template_cache_t *template_cache, unsigned char *file_path) {
+    /* allocates space for the entry of the cache that holds the
+    template and for the error the acquiring of it may raise */
+    struct template_cache_entry_t *entry;
+    ERROR_CODE error_code;
+
+    /* asks the cache for the template, which reads and parses the
+    file only when it is not already holding it as it now stands,
+    and then uses the tree it hands back to traverse for string
+    buffer output, a template that cannot be loaded leaves the
+    handler with an empty result, the very same way the processing
+    of a file that is not there does */
+    error_code = acquire_template_cache(template_cache, file_path, &entry);
+    if(!IS_ERROR_CODE(error_code)) {
+        traverse_node_buffer(template_handler, entry->root);
+    }
+
+    /* "joins" the template handler string buffer into the string
+    value, retrieving the final template result */
+    join_string_buffer(template_handler->string_buffer, &template_handler->string_value);
 }
 
 void assign_template_handler(struct template_handler_t *template_handler, unsigned char *name, struct type_t *value) {
@@ -871,8 +1218,10 @@ ERROR_CODE _parameter_callback(struct template_engine_t *template_engine, const 
     /* in case the parameters (map) are not defined for the
     temporary node */
     if(temporary_node->parameters_map == NULL) {
-        /* creates a new hash map for the parameters */
-        create_hash_map(&temporary_node->parameters_map, 0);
+        /* creates a new hash map for the parameters, sized for
+        the few of them that a tag carries rather than the default
+        of a map, which is a thousand slots built for three names */
+        create_hash_map(&temporary_node->parameters_map, 8);
     }
 
     /* creates the template parameter, sets it as the temporary parameter
