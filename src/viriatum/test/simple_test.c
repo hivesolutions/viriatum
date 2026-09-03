@@ -924,16 +924,1008 @@ const char *test_huffman(void) {
     return NULL;
 }
 
-const char *test_template_handler(void) {
-    /* allocates space for the template handler */
+/* the file that the tests of the template engine, of the handler and
+of the cache write and parse, it is written into the directory the
+process is running from and taken out of it once a test is done */
+#define TEMPLATE_TEST_PATH "./viriatum_template_test.tpl"
+
+/* the path that stands in for a template that is not there, no
+file is ever written under it and opening it is meant to fail */
+#define TEMPLATE_TEST_GONE "./viriatum_template_gone.tpl"
+
+/* the contents that the file above is written with, a single tag
+that prints the name assigned to it between two runs of text */
+#define TEMPLATE_TEST_CONTENTS "<p>${out value=name /}</p>"
+
+/* another set of contents of the very same length as the one
+above, so that a file replaced by it is told apart from the one
+that was there by nothing but the tree parsed out of it */
+#define TEMPLATE_TEST_OTHER "<b>${out value=name /}</b>"
+
+/* a longer set of contents, so that a file written over with it
+is told apart from the one that was there by the size alone */
+#define TEMPLATE_TEST_LONGER "<div>${out value=name /}</div>"
+
+/* the template that goes through every one of the tags, the value
+of a name, the walking of a list and the condition on the type of
+an entry, which is what the listing of a directory is built on */
+#define TEMPLATE_TEST_PAGE                                 \
+    "<h1>${out value=title /}</h1>"                        \
+    "${foreach item=entry from=entries}"                   \
+    "<li>${if item=entry.type value=1 operator=eq}D${/if}" \
+    "${out value=entry.name /}</li>"                       \
+    "${/foreach}"                                          \
+    "<p>${out value=count /}</p>"
+
+/* the template whose tags carry none of the parameters they need,
+every one of them is left out of the page and the text around them
+is what the page ends up being made of */
+#define TEMPLATE_TEST_MALFORMED "<a>${out /}${out/}${foreach item=entry /}${if item=entry.type /}</a>"
+
+/* the number of events that the collector of the engine is able to
+hold and the size of the text each of them carries, a parsing that
+reports more than that fails rather than writing past the end */
+#define TEMPLATE_TEST_MAX_EVENTS 32
+#define TEMPLATE_TEST_MAX_DATA 64
+
+/**
+ * Collects the events that the engine reports while parsing, each
+ * of them as a line of text made of the name of the event and the
+ * data it carries, so that the sequence of them may be compared
+ * against the one a template is expected to produce.
+ */
+typedef struct template_collector_t {
+    size_t count;
+    char events[TEMPLATE_TEST_MAX_EVENTS][TEMPLATE_TEST_MAX_DATA];
+} template_collector;
+
+static ERROR_CODE _collect_template_test(struct template_engine_t *template_engine, const char *name, const unsigned char *pointer, size_t size) {
+    /* retrieves the collector out of the context of the engine and
+    then verifies that there's still room for one more event */
+    struct template_collector_t *collector = (struct template_collector_t *) template_engine->context;
+
+    if(collector->count >= TEMPLATE_TEST_MAX_EVENTS) { RAISE_ERROR_S(RUNTIME_EXCEPTION_ERROR_CODE); }
+    if(strlen(name) + size + 2 > TEMPLATE_TEST_MAX_DATA) { RAISE_ERROR_S(RUNTIME_EXCEPTION_ERROR_CODE); }
+
+    /* writes the event as the name and the data it carries, the
+    engine hands the data over without a termination */
+    SPRINTF(
+        collector->events[collector->count],
+        TEMPLATE_TEST_MAX_DATA,
+        "%s:%.*s",
+        name,
+        (int) size,
+        (const char *) pointer
+    );
+    collector->count++;
+
+    /* raises no error */
+    RAISE_NO_ERROR;
+}
+
+static ERROR_CODE _text_begin_template_test(struct template_engine_t *template_engine) {
+    return _collect_template_test(template_engine, "text_begin", (const unsigned char *) "", 0);
+}
+
+static ERROR_CODE _text_end_template_test(struct template_engine_t *template_engine, const unsigned char *pointer, size_t size) {
+    return _collect_template_test(template_engine, "text_end", pointer, size);
+}
+
+static ERROR_CODE _tag_begin_template_test(struct template_engine_t *template_engine) {
+    return _collect_template_test(template_engine, "tag_begin", (const unsigned char *) "", 0);
+}
+
+static ERROR_CODE _tag_close_begin_template_test(struct template_engine_t *template_engine) {
+    return _collect_template_test(template_engine, "tag_close_begin", (const unsigned char *) "", 0);
+}
+
+static ERROR_CODE _tag_end_template_test(struct template_engine_t *template_engine, const unsigned char *pointer, size_t size) {
+    return _collect_template_test(template_engine, "tag_end", pointer, size);
+}
+
+static ERROR_CODE _tag_name_template_test(struct template_engine_t *template_engine, const unsigned char *pointer, size_t size) {
+    return _collect_template_test(template_engine, "tag_name", pointer, size);
+}
+
+static ERROR_CODE _parameter_template_test(struct template_engine_t *template_engine, const unsigned char *pointer, size_t size) {
+    return _collect_template_test(template_engine, "parameter", pointer, size);
+}
+
+static ERROR_CODE _parameter_value_template_test(struct template_engine_t *template_engine, const unsigned char *pointer, size_t size) {
+    return _collect_template_test(template_engine, "parameter_value", pointer, size);
+}
+
+static ERROR_CODE _fail_template_test(struct template_engine_t *template_engine) {
+    /* stands in for a callback that is unable to handle what the
+    engine reports, the parsing is expected to fail along with it */
+    RAISE_ERROR_S(RUNTIME_EXCEPTION_ERROR_CODE);
+}
+
+/**
+ * Creates the settings that send every one of the events of the
+ * engine to the collector that the context of the engine points at.
+ *
+ * @param template_settings_pointer The pointer to the settings that
+ * have been created.
+ */
+static void _create_settings_template_test(struct template_settings_t **template_settings_pointer) {
+    struct template_settings_t *template_settings;
+
+    create_template_settings(&template_settings);
+    template_settings->on_text_begin = _text_begin_template_test;
+    template_settings->on_text_end = _text_end_template_test;
+    template_settings->on_tag_begin = _tag_begin_template_test;
+    template_settings->on_tag_close_begin = _tag_close_begin_template_test;
+    template_settings->on_tag_end = _tag_end_template_test;
+    template_settings->on_tag_name = _tag_name_template_test;
+    template_settings->on_parameter = _parameter_template_test;
+    template_settings->on_parameter_value = _parameter_value_template_test;
+
+    *template_settings_pointer = template_settings;
+}
+
+/**
+ * Creates an entry of the shape the listing of a directory hands a
+ * template, a map carrying the name of the entry and the type of it.
+ *
+ * @param entry_pointer The pointer to the entry that has been created.
+ * @param name The name the entry is going to carry.
+ * @param type The type the entry is going to carry.
+ */
+static void _create_entry_template_test(struct type_t **entry_pointer, char *name, int type) {
+    struct hash_map_t *map;
+    struct type_t *value;
+    struct type_t *entry;
+
+    create_hash_map(&map, 8);
+    create_type(&value, STRING_TYPE);
+    value->value.value_string = name;
+    set_value_string_hash_map(map, (unsigned char *) "name", (void *) value);
+    create_type(&value, INTEGER_TYPE);
+    value->value.value_int = type;
+    set_value_string_hash_map(map, (unsigned char *) "type", (void *) value);
+    create_type(&entry, MAP_TYPE);
+    entry->value.value_map = map;
+
+    *entry_pointer = entry;
+}
+
+/**
+ * Releases an entry created by the above, together with the values
+ * it carries and the map that holds them.
+ *
+ * @param entry The entry to be released.
+ */
+static void _delete_entry_template_test(struct type_t *entry) {
+    struct hash_map_t *map = entry->value.value_map;
+    struct type_t *value;
+
+    get_value_string_hash_map(map, (unsigned char *) "name", (void **) &value);
+    delete_type(value);
+    get_value_string_hash_map(map, (unsigned char *) "type", (void **) &value);
+    delete_type(value);
+    delete_hash_map(map);
+    delete_type(entry);
+}
+
+/**
+ * Renders the template under the provided path out of the provided
+ * cache with the single name the templates of the tests print, and
+ * copies the page that results into the provided buffer.
+ *
+ * @param template_cache The cache the template is rendered out of.
+ * @param file_path The path of the template to be rendered.
+ * @param buffer The buffer the page is copied into.
+ * @param size The size in bytes of the provided buffer.
+ */
+static void _render_template_test(struct template_cache_t *template_cache, char *file_path, char *buffer, size_t size) {
     struct template_handler_t *template_handler;
 
-    /* creates the template handler then uses it to process
-    the test template file and then deletes the template
-    handler removing any memory resources */
     create_template_handler(&template_handler);
-    process_template_handler(template_handler, (unsigned char *) "test.tpl");
+    assign_string_template_handler(template_handler, (unsigned char *) "name", "viriatum");
+    process_cache_template_handler(template_handler, template_cache, (unsigned char *) file_path);
+    SPRINTF(buffer, size, "%s", (char *) template_handler->string_value);
     delete_template_handler(template_handler);
+}
+
+const char *test_template_engine(void) {
+    /* allocates space for the engine, for the settings that send
+    its events to the collector and for the collector itself */
+    struct template_engine_t *template_engine;
+    struct template_settings_t *template_settings;
+    struct template_collector_t collector;
+    ERROR_CODE error;
+
+    create_template_engine(&template_engine);
+    _create_settings_template_test(&template_settings);
+    template_engine->context = (void *) &collector;
+
+    /* a file is parsed exactly the way its contents would be, the
+    reading of it whole into memory changes nothing of the events */
+    write_file((char *) TEMPLATE_TEST_PATH, (unsigned char *) "a ${out value=x /} b", 20);
+    collector.count = 0;
+    error = process_template_engine(template_engine, template_settings, (unsigned char *) TEMPLATE_TEST_PATH);
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT_EQ_U(collector.count, 9);
+    V_ASSERT_EQ_S(collector.events[0], "text_begin:");
+    V_ASSERT_EQ_S(collector.events[1], "text_end:a ");
+    V_ASSERT_EQ_S(collector.events[2], "tag_begin:");
+    V_ASSERT_EQ_S(collector.events[3], "tag_name:out");
+    V_ASSERT_EQ_S(collector.events[4], "parameter:value");
+    V_ASSERT_EQ_S(collector.events[5], "parameter_value:x");
+    V_ASSERT_EQ_S(collector.events[6], "tag_end:${out value=x /}");
+    V_ASSERT_EQ_S(collector.events[7], "text_begin:");
+    V_ASSERT_EQ_S(collector.events[8], "text_end: b");
+
+    /* a file that is not there is not an error, the parsing simply
+    reports nothing at all, which is what leaves a page empty */
+    collector.count = 0;
+    error = process_template_engine(template_engine, template_settings, (unsigned char *) TEMPLATE_TEST_GONE);
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT_EQ_U(collector.count, 0);
+
+    /* a callback that fails takes the parsing of a file down with it
+    and the failure is reported rather than swallowed */
+    template_settings->on_text_begin = _fail_template_test;
+    error = process_template_engine(template_engine, template_settings, (unsigned char *) TEMPLATE_TEST_PATH);
+    V_ASSERT(IS_ERROR_CODE(error));
+    RESET_ERROR;
+
+    delete_template_settings(template_settings);
+    delete_template_engine(template_engine);
+    remove(TEMPLATE_TEST_PATH);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_template_engine_buffer(void) {
+    /* allocates space for the engine, for the settings that send
+    its events to the collector and for the collector itself */
+    struct template_engine_t *template_engine;
+    struct template_settings_t *template_settings;
+    struct template_collector_t collector;
+    ERROR_CODE error;
+
+    create_template_engine(&template_engine);
+    _create_settings_template_test(&template_settings);
+    template_engine->context = (void *) &collector;
+
+    /* a run of text and nothing else is reported as a single text,
+    opened before the first character and closed after the last */
+    collector.count = 0;
+    error = process_buffer_template_engine(template_engine, template_settings, (unsigned char *) "hello", 5);
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT_EQ_U(collector.count, 2);
+    V_ASSERT_EQ_S(collector.events[0], "text_begin:");
+    V_ASSERT_EQ_S(collector.events[1], "text_end:hello");
+
+    /* a value between quotes is handed over with the quotes and with
+    the spaces within them, the text on either side of the tag is
+    reported even when there is nothing in it */
+    collector.count = 0;
+    error = process_buffer_template_engine(template_engine, template_settings, (unsigned char *) "${out value=\"a b\" /}", 20);
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT_EQ_U(collector.count, 9);
+    V_ASSERT_EQ_S(collector.events[1], "text_end:");
+    V_ASSERT_EQ_S(collector.events[3], "tag_name:out");
+    V_ASSERT_EQ_S(collector.events[4], "parameter:value");
+    V_ASSERT_EQ_S(collector.events[5], "parameter_value:\"a b\"");
+    V_ASSERT_EQ_S(collector.events[6], "tag_end:${out value=\"a b\" /}");
+    V_ASSERT_EQ_S(collector.events[7], "text_begin:");
+
+    /* a tag that opens a context and the one that closes it are told
+    apart, the closing one being reported as such before its end */
+    collector.count = 0;
+    error = process_buffer_template_engine(template_engine, template_settings, (unsigned char *) "${foreach item=e from=l}x${/foreach}", 36);
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT_EQ_U(collector.count, 17);
+    V_ASSERT_EQ_S(collector.events[3], "tag_name:foreach");
+    V_ASSERT_EQ_S(collector.events[4], "parameter:item");
+    V_ASSERT_EQ_S(collector.events[5], "parameter_value:e");
+    V_ASSERT_EQ_S(collector.events[6], "parameter:from");
+    V_ASSERT_EQ_S(collector.events[7], "parameter_value:l");
+    V_ASSERT_EQ_S(collector.events[8], "tag_end:${foreach item=e from=l}");
+    V_ASSERT_EQ_S(collector.events[10], "text_end:x");
+    V_ASSERT_EQ_S(collector.events[11], "tag_begin:");
+    V_ASSERT_EQ_S(collector.events[12], "tag_close_begin:");
+    V_ASSERT_EQ_S(collector.events[13], "tag_name:foreach");
+    V_ASSERT_EQ_S(collector.events[14], "tag_end:${/foreach}");
+    V_ASSERT_EQ_S(collector.events[16], "text_end:");
+
+    /* a slash inside a value is part of the value, the look ahead
+    past it finding no brace to close the tag with */
+    collector.count = 0;
+    error = process_buffer_template_engine(template_engine, template_settings, (unsigned char *) "${out value=a/b /}", 18);
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT_EQ_U(collector.count, 9);
+    V_ASSERT_EQ_S(collector.events[5], "parameter_value:a/b");
+    V_ASSERT_EQ_S(collector.events[6], "tag_end:${out value=a/b /}");
+
+    /* a tag that closes right after its name, with or without the
+    slash of a single tag, still reports the name, one that went
+    without would be rendered through a node with no name at all */
+    collector.count = 0;
+    error = process_buffer_template_engine(template_engine, template_settings, (unsigned char *) "${out/}", 7);
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT_EQ_U(collector.count, 7);
+    V_ASSERT_EQ_S(collector.events[3], "tag_name:out");
+    V_ASSERT_EQ_S(collector.events[4], "tag_end:${out/}");
+
+    collector.count = 0;
+    error = process_buffer_template_engine(template_engine, template_settings, (unsigned char *) "${out}", 6);
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT_EQ_U(collector.count, 7);
+    V_ASSERT_EQ_S(collector.events[3], "tag_name:out");
+    V_ASSERT_EQ_S(collector.events[4], "tag_end:${out}");
+
+    /* a tag that closes on the very last character of the buffer is
+    reported whole, the parsing used to stop one character short of
+    the end and lose whatever that character was closing */
+    collector.count = 0;
+    error = process_buffer_template_engine(template_engine, template_settings, (unsigned char *) "${out value=1 /}", 16);
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT_EQ_U(collector.count, 9);
+    V_ASSERT_EQ_S(collector.events[5], "parameter_value:1");
+    V_ASSERT_EQ_S(collector.events[6], "tag_end:${out value=1 /}");
+    V_ASSERT_EQ_S(collector.events[8], "text_end:");
+
+    /* a buffer with nothing in it opens and closes an empty text and
+    reads nothing at all past its end */
+    collector.count = 0;
+    error = process_buffer_template_engine(template_engine, template_settings, (unsigned char *) "", 0);
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT_EQ_U(collector.count, 2);
+    V_ASSERT_EQ_S(collector.events[0], "text_begin:");
+    V_ASSERT_EQ_S(collector.events[1], "text_end:");
+
+    /* a callback that fails takes the parsing down with it */
+    template_settings->on_tag_begin = _fail_template_test;
+    collector.count = 0;
+    error = process_buffer_template_engine(template_engine, template_settings, (unsigned char *) "${out value=1 /}", 16);
+    V_ASSERT(IS_ERROR_CODE(error));
+    RESET_ERROR;
+
+    delete_template_settings(template_settings);
+    delete_template_engine(template_engine);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_template_cache(void) {
+    /* allocates space for the cache and for the index to be used in
+    the walking of the entries it is made of */
+    size_t index;
+    struct template_cache_t *template_cache;
+
+    /* creates the cache and verifies that every one of its entries
+    starts out holding no template at all */
+    create_template_cache(&template_cache);
+    V_ASSERT_NOT_NULL(template_cache);
+    V_ASSERT_NOT_NULL(template_cache->entries);
+
+    for(index = 0; index < CACHE_SIZE_TEMPLATE_HANDLER; index++) {
+        V_ASSERT_EQ_I(template_cache->entries[index].descriptor, -1);
+        V_ASSERT_EQ_U(template_cache->entries[index].size, 0);
+        V_ASSERT_NULL(template_cache->entries[index].root);
+        V_ASSERT_NULL(template_cache->entries[index].nodes);
+    }
+
+    delete_template_cache(template_cache);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_template_cache_acquire(void) {
+    /* allocates space for the cache, for the entries that the
+    acquiring of the very same path hands back and for the root of
+    the tree the first of them is holding */
+    struct template_cache_t *template_cache;
+    struct template_cache_entry_t *first;
+    struct template_cache_entry_t *second;
+    struct template_node_t *root;
+    size_t allocated = ALLOCATIONS;
+    ERROR_CODE error;
+
+    write_file(
+        (char *) TEMPLATE_TEST_PATH,
+        (unsigned char *) TEMPLATE_TEST_CONTENTS,
+        sizeof(TEMPLATE_TEST_CONTENTS) - 1
+    );
+
+    create_template_cache(&template_cache);
+
+    /* the first acquisition opens the file, parses it into a tree
+    and learns both its size and the moment of the last write */
+    error = acquire_template_cache(
+        template_cache,
+        (unsigned char *) TEMPLATE_TEST_PATH,
+        &first
+    );
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT_NOT_NULL(first);
+    V_ASSERT_EQ_S((char *) first->path, TEMPLATE_TEST_PATH);
+    V_ASSERT_EQ_U(first->size, sizeof(TEMPLATE_TEST_CONTENTS) - 1);
+    V_ASSERT(first->descriptor != -1);
+    V_ASSERT(first->checked > 0);
+    V_ASSERT_NOT_NULL(first->root);
+    V_ASSERT_NOT_NULL(first->nodes);
+    V_ASSERT_EQ_I(first->root->type, TEMPLATE_NODE_ROOT);
+
+    /* the second one falls on the very same entry and hands back the
+    tree that was already parsed rather than parsing the file again */
+    root = first->root;
+    error = acquire_template_cache(
+        template_cache,
+        (unsigned char *) TEMPLATE_TEST_PATH,
+        &second
+    );
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT_EQ_P(first, second);
+    V_ASSERT_EQ_P(second->root, root);
+    V_ASSERT_EQ_I(first->descriptor, second->descriptor);
+
+    /* the tree, the entries and the cache are all gone together, so
+    the number of outstanding allocations is the one it was before */
+    delete_template_cache(template_cache);
+    remove(TEMPLATE_TEST_PATH);
+    V_ASSERT_EQ_U(ALLOCATIONS, allocated);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_template_cache_missing(void) {
+    /* allocates space for the cache, for the entry that the acquiring
+    of a template that is not there would have handed back and for the
+    index of the slot that such a path falls on */
+    size_t index;
+    struct template_cache_t *template_cache;
+    struct template_cache_entry_t *entry = NULL;
+    ERROR_CODE error;
+
+    create_template_cache(&template_cache);
+
+    /* a template that does not exist raises rather than handing back
+    an entry that describes nothing at all */
+    error = acquire_template_cache(
+        template_cache,
+        (unsigned char *) TEMPLATE_TEST_GONE,
+        &entry
+    );
+    V_ASSERT(IS_ERROR_CODE(error));
+    V_ASSERT_NULL(entry);
+    RESET_ERROR;
+
+    /* a directory under the path is not a template either, on the
+    platforms that open one for reading it is the reading of it that
+    fails and on the others the opening, either way the entry it fell
+    on is left empty rather than half way through describing it */
+    error = acquire_template_cache(template_cache, (unsigned char *) ".", &entry);
+    V_ASSERT(IS_ERROR_CODE(error));
+    V_ASSERT_NULL(entry);
+    RESET_ERROR;
+    index = _calculate_string_hash_map((unsigned char *) ".") % CACHE_SIZE_TEMPLATE_HANDLER;
+    V_ASSERT_EQ_I(template_cache->entries[index].descriptor, -1);
+    V_ASSERT_NULL(template_cache->entries[index].root);
+
+    delete_template_cache(template_cache);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_template_cache_changed(void) {
+    /* allocates space for the cache, for the entry that describes the
+    template before and after it has been written over and for the
+    page that is rendered out of it */
+    char page[64];
+    struct template_cache_t *template_cache;
+    struct template_cache_entry_t *entry;
+    ERROR_CODE error;
+
+    write_file(
+        (char *) TEMPLATE_TEST_PATH,
+        (unsigned char *) TEMPLATE_TEST_CONTENTS,
+        sizeof(TEMPLATE_TEST_CONTENTS) - 1
+    );
+
+    create_template_cache(&template_cache);
+
+    error = acquire_template_cache(
+        template_cache,
+        (unsigned char *) TEMPLATE_TEST_PATH,
+        &entry
+    );
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT_EQ_U(entry->size, sizeof(TEMPLATE_TEST_CONTENTS) - 1);
+    _render_template_test(template_cache, (char *) TEMPLATE_TEST_PATH, page, sizeof(page));
+    V_ASSERT_EQ_S(page, "<p>viriatum</p>");
+
+    /* the file is written over in place, which keeps the very same
+    descriptor reaching it, so an entry that went on trusting the
+    tree it parsed would render the page as it used to be, and the
+    writing itself has to succeed while the cache is holding the
+    file open, which is not something every platform allows */
+    error = write_file(
+        (char *) TEMPLATE_TEST_PATH,
+        (unsigned char *) TEMPLATE_TEST_LONGER,
+        sizeof(TEMPLATE_TEST_LONGER) - 1
+    );
+    V_ASSERT_EQ_U(error, 0);
+
+    error = acquire_template_cache(
+        template_cache,
+        (unsigned char *) TEMPLATE_TEST_PATH,
+        &entry
+    );
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT_EQ_U(entry->size, sizeof(TEMPLATE_TEST_LONGER) - 1);
+    _render_template_test(template_cache, (char *) TEMPLATE_TEST_PATH, page, sizeof(page));
+    V_ASSERT_EQ_S(page, "<div>viriatum</div>");
+
+    delete_template_cache(template_cache);
+    remove(TEMPLATE_TEST_PATH);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_template_cache_collision(void) {
+    /* allocates space for the cache and for the entries of the two
+    templates that are made to fall on the very same slot */
+    size_t index;
+    size_t taken;
+    char path[VIRIATUM_MAX_PATH_SIZE];
+    char page[64];
+    struct template_cache_t *template_cache;
+    struct template_cache_entry_t *entry;
+    ERROR_CODE error;
+
+    write_file(
+        (char *) TEMPLATE_TEST_PATH,
+        (unsigned char *) TEMPLATE_TEST_CONTENTS,
+        sizeof(TEMPLATE_TEST_CONTENTS) - 1
+    );
+
+    create_template_cache(&template_cache);
+
+    error = acquire_template_cache(
+        template_cache,
+        (unsigned char *) TEMPLATE_TEST_PATH,
+        &entry
+    );
+    V_ASSERT_EQ_U(error, 0);
+    taken = _calculate_string_hash_map((unsigned char *) TEMPLATE_TEST_PATH) %
+            CACHE_SIZE_TEMPLATE_HANDLER;
+
+    /* looks for a second path that falls on the very same slot as the
+    first one, which is what a cache of this shape has instead of a
+    chain and what makes one of the templates give way to the other */
+    for(index = 0; index < 100000; index++) {
+        SPRINTF(path, VIRIATUM_MAX_PATH_SIZE, "./viriatum_template_%d.tpl", (int) index);
+        if(_calculate_string_hash_map((unsigned char *) path) % CACHE_SIZE_TEMPLATE_HANDLER == taken) {
+            break;
+        }
+    }
+    V_ASSERT(index < 100000);
+
+    write_file(
+        path,
+        (unsigned char *) TEMPLATE_TEST_LONGER,
+        sizeof(TEMPLATE_TEST_LONGER) - 1
+    );
+
+    /* the second of them takes the slot over and is described by it,
+    a cache that handed back the entry of the first would be rendering
+    one template under the name of another */
+    error = acquire_template_cache(template_cache, (unsigned char *) path, &entry);
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT_EQ_S((char *) entry->path, path);
+    V_ASSERT_EQ_U(entry->size, sizeof(TEMPLATE_TEST_LONGER) - 1);
+    _render_template_test(template_cache, path, page, sizeof(page));
+    V_ASSERT_EQ_S(page, "<div>viriatum</div>");
+
+    /* and the first of them takes it back again, describing itself
+    and never what had displaced it */
+    error = acquire_template_cache(
+        template_cache,
+        (unsigned char *) TEMPLATE_TEST_PATH,
+        &entry
+    );
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT_EQ_S((char *) entry->path, TEMPLATE_TEST_PATH);
+    V_ASSERT_EQ_U(entry->size, sizeof(TEMPLATE_TEST_CONTENTS) - 1);
+    _render_template_test(template_cache, (char *) TEMPLATE_TEST_PATH, page, sizeof(page));
+    V_ASSERT_EQ_S(page, "<p>viriatum</p>");
+
+    delete_template_cache(template_cache);
+    remove(TEMPLATE_TEST_PATH);
+    remove(path);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_template_cache_clear(void) {
+    /* allocates space for the cache and for the entry that is going
+    to be emptied out of it */
+    size_t index;
+    struct template_cache_t *template_cache;
+    struct template_cache_entry_t *entry;
+    ERROR_CODE error;
+
+    write_file(
+        (char *) TEMPLATE_TEST_PATH,
+        (unsigned char *) TEMPLATE_TEST_CONTENTS,
+        sizeof(TEMPLATE_TEST_CONTENTS) - 1
+    );
+
+    create_template_cache(&template_cache);
+    error = acquire_template_cache(
+        template_cache,
+        (unsigned char *) TEMPLATE_TEST_PATH,
+        &entry
+    );
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT(entry->descriptor != -1);
+    V_ASSERT_NOT_NULL(entry->root);
+
+    /* the clearing closes every file that was being held and releases
+    every tree, an entry left with either behind is a leak */
+    clear_template_cache(template_cache);
+    for(index = 0; index < CACHE_SIZE_TEMPLATE_HANDLER; index++) {
+        V_ASSERT_EQ_I(template_cache->entries[index].descriptor, -1);
+        V_ASSERT_NULL(template_cache->entries[index].root);
+        V_ASSERT_NULL(template_cache->entries[index].nodes);
+    }
+
+    /* and the cache goes on working afterwards, the clearing empties
+    it rather than taking it out of use */
+    error = acquire_template_cache(
+        template_cache,
+        (unsigned char *) TEMPLATE_TEST_PATH,
+        &entry
+    );
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT(entry->descriptor != -1);
+    V_ASSERT_NOT_NULL(entry->root);
+
+    delete_template_cache(template_cache);
+    remove(TEMPLATE_TEST_PATH);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_template_cache_long(void) {
+    /* allocates space for the cache and for the path that is longer
+    than an entry of it is able to carry */
+    char path[VIRIATUM_MAX_PATH_SIZE * 2];
+    struct template_cache_t *template_cache;
+    struct template_cache_entry_t *entry = NULL;
+    ERROR_CODE error;
+
+    create_template_cache(&template_cache);
+
+    /* a path that does not fit inside an entry is refused rather than
+    being copied past the end of the buffer that is meant to hold it */
+    memset(path, 'a', sizeof(path) - 1);
+    path[sizeof(path) - 1] = '\0';
+    error = acquire_template_cache(template_cache, (unsigned char *) path, &entry);
+    V_ASSERT(IS_ERROR_CODE(error));
+    V_ASSERT_NULL(entry);
+    RESET_ERROR;
+
+    delete_template_cache(template_cache);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_template_cache_expired(void) {
+    /* allocates space for the cache, for the entry that is made to
+    look older than the time it is trusted for and for the page that
+    is rendered out of it */
+    char page[64];
+    struct template_cache_t *template_cache;
+    struct template_cache_entry_t *entry;
+    ERROR_CODE error;
+
+    write_file(
+        (char *) TEMPLATE_TEST_PATH,
+        (unsigned char *) TEMPLATE_TEST_CONTENTS,
+        sizeof(TEMPLATE_TEST_CONTENTS) - 1
+    );
+
+    create_template_cache(&template_cache);
+    error = acquire_template_cache(
+        template_cache,
+        (unsigned char *) TEMPLATE_TEST_PATH,
+        &entry
+    );
+    V_ASSERT_EQ_U(error, 0);
+
+    /* the entry is made to look as though it had been sitting there
+    since well before the time it is trusted for, which is what sends
+    the next acquisition to look at the path again */
+    entry->checked = 0;
+
+    /* the file has not moved on, so the page comes out exactly as it
+    did and only the moment the entry was looked at is renewed */
+    error = acquire_template_cache(
+        template_cache,
+        (unsigned char *) TEMPLATE_TEST_PATH,
+        &entry
+    );
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT(entry->checked > 0);
+    V_ASSERT(entry->descriptor != -1);
+    V_ASSERT_NOT_NULL(entry->root);
+    _render_template_test(template_cache, (char *) TEMPLATE_TEST_PATH, page, sizeof(page));
+    V_ASSERT_EQ_S(page, "<p>viriatum</p>");
+
+    delete_template_cache(template_cache);
+    remove(TEMPLATE_TEST_PATH);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_template_cache_replaced(void) {
+    /* allocates space for the cache, for the entry of the template
+    that another one is put in the place of and for the page that is
+    rendered out of it */
+    char page[64];
+    struct template_cache_t *template_cache;
+    struct template_cache_entry_t *entry;
+    ERROR_CODE error;
+
+    write_file(
+        (char *) TEMPLATE_TEST_PATH,
+        (unsigned char *) TEMPLATE_TEST_CONTENTS,
+        sizeof(TEMPLATE_TEST_CONTENTS) - 1
+    );
+
+    create_template_cache(&template_cache);
+    error = acquire_template_cache(
+        template_cache,
+        (unsigned char *) TEMPLATE_TEST_PATH,
+        &entry
+    );
+    V_ASSERT_EQ_U(error, 0);
+    _render_template_test(template_cache, (char *) TEMPLATE_TEST_PATH, page, sizeof(page));
+    V_ASSERT_EQ_S(page, "<p>viriatum</p>");
+
+    /* another template of the very same length is put in the place
+    of the one that is held, which neither the size nor the moment of
+    the last write is able to tell apart, so only a look at the path
+    is, the removal has to have gone through or the writing lands on
+    the very same file and there would be nothing to tell apart */
+    V_ASSERT_EQ_I(remove(TEMPLATE_TEST_PATH), 0);
+    write_file(
+        (char *) TEMPLATE_TEST_PATH,
+        (unsigned char *) TEMPLATE_TEST_OTHER,
+        sizeof(TEMPLATE_TEST_OTHER) - 1
+    );
+    entry->checked = 0;
+
+    /* the template that is now under the path is parsed in place of
+    the one that was, and the page is rendered out of it */
+    error = acquire_template_cache(
+        template_cache,
+        (unsigned char *) TEMPLATE_TEST_PATH,
+        &entry
+    );
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT_EQ_U(entry->size, sizeof(TEMPLATE_TEST_OTHER) - 1);
+    _render_template_test(template_cache, (char *) TEMPLATE_TEST_PATH, page, sizeof(page));
+    V_ASSERT_EQ_S(page, "<b>viriatum</b>");
+
+    delete_template_cache(template_cache);
+    remove(TEMPLATE_TEST_PATH);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_template_cache_stale(void) {
+    /* allocates space for the cache and for the entry whose file is
+    taken out from underneath it */
+    struct template_cache_t *template_cache;
+    struct template_cache_entry_t *entry;
+    ERROR_CODE error;
+
+    write_file(
+        (char *) TEMPLATE_TEST_PATH,
+        (unsigned char *) TEMPLATE_TEST_CONTENTS,
+        sizeof(TEMPLATE_TEST_CONTENTS) - 1
+    );
+
+    create_template_cache(&template_cache);
+    error = acquire_template_cache(
+        template_cache,
+        (unsigned char *) TEMPLATE_TEST_PATH,
+        &entry
+    );
+    V_ASSERT_EQ_U(error, 0);
+
+    /* the file that the entry is holding is closed behind its back
+    and the entry is left pointing at a descriptor that reaches
+    nothing, which is the state the cache has to answer for rather
+    than go on rendering a template it can no longer ask about */
+    CLOSE_READ(entry->descriptor);
+    entry->descriptor = -2;
+
+    error = acquire_template_cache(
+        template_cache,
+        (unsigned char *) TEMPLATE_TEST_PATH,
+        &entry
+    );
+    V_ASSERT(IS_ERROR_CODE(error));
+    RESET_ERROR;
+
+    /* the descriptor is unset by hand as the cache is no longer able
+    to close what it was left holding, the tree it still holds is
+    released along with the cache */
+    entry->descriptor = -1;
+
+    delete_template_cache(template_cache);
+    remove(TEMPLATE_TEST_PATH);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_template_handler(void) {
+    /* allocates space for the template handler, for the list of the
+    entries that the template walks and for the entries themselves */
+    struct template_handler_t *template_handler;
+    struct linked_list_t *entries;
+    struct type_t *first;
+    struct type_t *second;
+    size_t allocated = ALLOCATIONS;
+
+    /* writes the template that goes through every one of the tags
+    and builds the entries that the walking of the list is fed */
+    write_file(
+        (char *) TEMPLATE_TEST_PATH,
+        (unsigned char *) TEMPLATE_TEST_PAGE,
+        sizeof(TEMPLATE_TEST_PAGE) - 1
+    );
+    create_linked_list(&entries);
+    _create_entry_template_test(&first, "alpha", 1);
+    _create_entry_template_test(&second, "beta", 2);
+    append_value_linked_list(entries, (void *) first);
+    append_value_linked_list(entries, (void *) second);
+
+    /* creates the template handler then uses it to process the
+    template file, the page carries the value of every name, one run
+    of the list per entry and the mark of the condition on the one
+    entry whose type matches it */
+    create_template_handler(&template_handler);
+    assign_string_template_handler(template_handler, (unsigned char *) "title", "Title");
+    assign_list_template_handler(template_handler, (unsigned char *) "entries", entries);
+    assign_integer_template_handler(template_handler, (unsigned char *) "count", 2);
+    process_template_handler(template_handler, (unsigned char *) TEMPLATE_TEST_PATH);
+    V_ASSERT_EQ_S(
+        (char *) template_handler->string_value,
+        "<h1>Title</h1><li>Dalpha</li><li>beta</li><p>2</p>"
+    );
+    delete_template_handler(template_handler);
+
+    /* a template that is not there leaves the handler with an empty
+    result rather than an error, the one that builds a page out of it
+    is what warns about the absence and falls back */
+    create_template_handler(&template_handler);
+    process_template_handler(template_handler, (unsigned char *) TEMPLATE_TEST_GONE);
+    V_ASSERT_EQ_S((char *) template_handler->string_value, "");
+    delete_template_handler(template_handler);
+
+    /* a template whose tags carry none of the parameters they need
+    renders the text around them and nothing for the tags themselves,
+    rather than taking the rendering down over the missing values */
+    write_file(
+        (char *) TEMPLATE_TEST_PATH,
+        (unsigned char *) TEMPLATE_TEST_MALFORMED,
+        sizeof(TEMPLATE_TEST_MALFORMED) - 1
+    );
+    create_template_handler(&template_handler);
+    process_template_handler(template_handler, (unsigned char *) TEMPLATE_TEST_PATH);
+    V_ASSERT_EQ_S((char *) template_handler->string_value, "<a></a>");
+    delete_template_handler(template_handler);
+
+    /* every one of the structures that has been built is gone, so
+    the number of outstanding allocations is the one it was before
+    the test started at all */
+    _delete_entry_template_test(first);
+    _delete_entry_template_test(second);
+    delete_linked_list(entries);
+    remove(TEMPLATE_TEST_PATH);
+    V_ASSERT_EQ_U(ALLOCATIONS, allocated);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_template_handler_cache(void) {
+    /* allocates space for the cache, for the entry that describes the
+    template within it, for the handler and for the root of the tree
+    that the first page is rendered out of */
+    struct template_cache_t *template_cache;
+    struct template_cache_entry_t *entry;
+    struct template_handler_t *template_handler;
+    struct template_node_t *root;
+    size_t allocated = ALLOCATIONS;
+    ERROR_CODE error;
+
+    write_file(
+        (char *) TEMPLATE_TEST_PATH,
+        (unsigned char *) TEMPLATE_TEST_CONTENTS,
+        sizeof(TEMPLATE_TEST_CONTENTS) - 1
+    );
+
+    create_template_cache(&template_cache);
+
+    /* the page is rendered out of the cache with the names that were
+    assigned to the handler, exactly as it would be out of the file */
+    create_template_handler(&template_handler);
+    assign_string_template_handler(template_handler, (unsigned char *) "name", "first");
+    process_cache_template_handler(template_handler, template_cache, (unsigned char *) TEMPLATE_TEST_PATH);
+    V_ASSERT_EQ_S((char *) template_handler->string_value, "<p>first</p>");
+    delete_template_handler(template_handler);
+
+    /* a second page out of the very same template costs no parsing,
+    the tree that the cache holds is the one it is rendered from, and
+    the names of one handler never reach the page of another */
+    error = acquire_template_cache(
+        template_cache,
+        (unsigned char *) TEMPLATE_TEST_PATH,
+        &entry
+    );
+    V_ASSERT_EQ_U(error, 0);
+    root = entry->root;
+
+    create_template_handler(&template_handler);
+    assign_string_template_handler(template_handler, (unsigned char *) "name", "second");
+    process_cache_template_handler(template_handler, template_cache, (unsigned char *) TEMPLATE_TEST_PATH);
+    V_ASSERT_EQ_S((char *) template_handler->string_value, "<p>second</p>");
+    delete_template_handler(template_handler);
+
+    error = acquire_template_cache(
+        template_cache,
+        (unsigned char *) TEMPLATE_TEST_PATH,
+        &entry
+    );
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT_EQ_P(entry->root, root);
+
+    /* a template that is not there leaves the handler with an empty
+    result rather than an error, the very same way the processing of
+    the file itself does, so that the fallback of the page is reached */
+    create_template_handler(&template_handler);
+    process_cache_template_handler(template_handler, template_cache, (unsigned char *) TEMPLATE_TEST_GONE);
+    V_ASSERT_EQ_S((char *) template_handler->string_value, "");
+    delete_template_handler(template_handler);
+
+    delete_template_cache(template_cache);
+    remove(TEMPLATE_TEST_PATH);
+    V_ASSERT_EQ_U(ALLOCATIONS, allocated);
 
     /* returns the default value, nothing happened so there's
     nothing to report for this execution */
@@ -1233,6 +2225,37 @@ const char *test_count_file(void) {
     return NULL;
 }
 
+const char *test_is_directory_file(void) {
+    /* allocates space for the flag that the checking reports and
+    for the error that it raises when it is unable to */
+    unsigned int is_directory = 2;
+    ERROR_CODE error;
+
+    /* the directory the process is running from is one, which is
+    the very question the handler asks before serving a path */
+    error = is_directory_file((char *) ".", &is_directory);
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT_EQ_U(is_directory, 1);
+
+    /* a file is not a directory, whatever else it may be */
+    write_file((char *) "./viriatum_directory_test.txt", (unsigned char *) "viriatum", 8);
+    error = is_directory_file((char *) "./viriatum_directory_test.txt", &is_directory);
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT_EQ_U(is_directory, 0);
+    remove("./viriatum_directory_test.txt");
+
+    /* a path that is not there is not a directory either, rather
+    than an error, the handler goes on to answer the absence of it */
+    is_directory = 2;
+    error = is_directory_file((char *) "./viriatum_directory_gone", &is_directory);
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT_EQ_U(is_directory, 0);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
 const char *test_join_path_file(void) {
     /* allocates space for the joined path buffer
     to be used in the join path tests */
@@ -1365,7 +2388,20 @@ static struct test_entry_t _simple_entries[] = {
     V_TEST_T(test_file_stream, "stream"),
     V_TEST_T(test_memory_stream, "stream"),
     V_TEST_T(test_huffman, "compression"),
+    V_TEST_T(test_template_engine, "template"),
+    V_TEST_T(test_template_engine_buffer, "template"),
+    V_TEST_T(test_template_cache, "template"),
+    V_TEST_T(test_template_cache_acquire, "template"),
+    V_TEST_T(test_template_cache_missing, "template"),
+    V_TEST_T(test_template_cache_changed, "template"),
+    V_TEST_T(test_template_cache_collision, "template"),
+    V_TEST_T(test_template_cache_clear, "template"),
+    V_TEST_T(test_template_cache_long, "template"),
+    V_TEST_T(test_template_cache_expired, "template"),
+    V_TEST_T(test_template_cache_replaced, "template"),
+    V_TEST_T(test_template_cache_stale, "template"),
     V_TEST_T(test_template_handler, "template"),
+    V_TEST_T(test_template_handler_cache, "template"),
     V_TEST_T(test_quicksort, "sorting"),
     V_TEST_T(test_quicksort_linked_list, "sorting"),
     V_TEST_T(test_crc_32, "checksum"),
@@ -1374,6 +2410,7 @@ static struct test_entry_t _simple_entries[] = {
     V_TEST_T(test_is_path_safe, "path"),
     V_TEST_T(test_normalize_path, "path"),
     V_TEST_T(test_count_file, "path"),
+    V_TEST_T(test_is_directory_file, "path"),
     V_TEST_T(test_join_path_file, "path"),
     V_TEST_T(test_absolute_path_file, "path"),
     V_TEST_T(test_handler_file_context, "handler"),
@@ -1383,8 +2420,12 @@ static struct test_entry_t _simple_entries[] = {
     V_TEST_T(test_handler_file_response, "handler"),
     V_TEST_T(test_handler_file_range, "handler"),
     V_TEST_T(test_handler_file_missing, "handler"),
+    V_TEST_T(test_handler_file_missing_template, "handler"),
     V_TEST_T(test_handler_file_gone, "handler"),
     V_TEST_T(test_handler_file_directory, "handler"),
+    V_TEST_T(test_handler_file_listing, "handler"),
+    V_TEST_T(test_handler_file_listing_changed, "handler"),
+    V_TEST_T(test_handler_file_listing_template, "handler"),
     V_TEST_T(test_handler_file_path, "handler"),
     V_TEST_T(test_handler_file_location, "handler"),
     V_TEST_T(test_handler_file_handler, "handler"),

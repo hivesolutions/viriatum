@@ -138,6 +138,16 @@ const char *test_handler_file_range(void);
 const char *test_handler_file_missing(void);
 
 /**
+ * Tests the page of an error built out of the template of it,
+ * including one that is rewritten between two requests served
+ * by the very same service.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_handler_file_missing_template(void);
+
+/**
  * Tests the serving of a resource that goes away after the response
  * of it has been decided upon, the connection is handed back rather
  * than left locked with the handler of it still in place.
@@ -163,6 +173,35 @@ const char *test_handler_file_push(void);
  * the unit test should describe possible errors.
  */
 const char *test_handler_file_directory(void);
+
+/**
+ * Tests the listing of a directory, the page that is built out of
+ * the template of it naming every entry and the count of them.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_handler_file_listing(void);
+
+/**
+ * Tests a directory whose contents change between two requests,
+ * an entry that appears and one that goes away being listed as
+ * they stand at the time of each request.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_handler_file_listing_changed(void);
+
+/**
+ * Tests the template of the listing rewritten between two requests
+ * served by the very same service, the second page being built out
+ * of the template as it now stands.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_handler_file_listing_template(void);
 
 /**
  * Tests the resolution of the path of a resource, both against the

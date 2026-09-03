@@ -165,12 +165,133 @@ const char *test_file_stream(void);
 const char *test_memory_stream(void);
 
 /**
- * Tests the template handler.
+ * Tests the parsing of a template file by the engine, together
+ * with the file that is not there and the callback that fails.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_template_engine(void);
+
+/**
+ * Tests the parsing of a buffer by the engine, the events that
+ * every kind of tag reports and the character that closes the
+ * very end of it.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_template_engine_buffer(void);
+
+/**
+ * Tests the creation of the cache of templates, every one of
+ * its entries starting out empty.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_template_cache(void);
+
+/**
+ * Tests the acquiring of a template, the first time parsing it
+ * and every time after that handing back the tree already parsed.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_template_cache_acquire(void);
+
+/**
+ * Tests that a template that is not there is reported as an
+ * error rather than as an entry that describes nothing.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_template_cache_missing(void);
+
+/**
+ * Tests that a template written over in place is rendered as
+ * it now stands and never as it used to be.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_template_cache_changed(void);
+
+/**
+ * Tests two templates that fall on the very same entry of
+ * the cache, each of them taking the entry over from the other.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_template_cache_collision(void);
+
+/**
+ * Tests the clearing of the cache, which closes every file and
+ * releases every tree and leaves the cache usable afterwards.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_template_cache_clear(void);
+
+/**
+ * Tests that a path too long for an entry to carry is refused
+ * rather than copied past the end of the entry.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_template_cache_long(void);
+
+/**
+ * Tests an entry past the time it is trusted for, which is looked
+ * at again through its path and renewed when nothing has changed.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_template_cache_expired(void);
+
+/**
+ * Tests that a template replaced by another of the very same
+ * length is rendered as the one now under the path once the
+ * entry is looked at again.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_template_cache_replaced(void);
+
+/**
+ * Tests that an entry left holding a descriptor which no
+ * longer reaches anything answers with an error.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_template_cache_stale(void);
+
+/**
+ * Tests the template handler, the page that every one of the
+ * tags builds, the template that is not there and the tags that
+ * carry none of the parameters they need.
  *
  * @return A message describing the execution of
  * the unit test should describe possible errors.
  */
 const char *test_template_handler(void);
+
+/**
+ * Tests the rendering of a page out of the cache of templates,
+ * the tree being parsed once and rendered as many times as asked.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_template_handler_cache(void);
 
 /**
  * Tests the quicksort (algorithm).
@@ -249,6 +370,15 @@ const char *test_normalize_path(void);
  * the unit test should describe possible errors.
  */
 const char *test_count_file(void);
+
+/**
+ * Tests the telling of a directory from a file, together with
+ * the path that is not there at all.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_is_directory_file(void);
 
 const char *test_join_path_file(void);
 
