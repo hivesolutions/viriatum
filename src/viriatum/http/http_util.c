@@ -576,12 +576,13 @@ ERROR_CODE write_http_error_a(
             assign_string_template_handler(template_handler, (unsigned char *) "error_description", error_description);
         }
 
-        /* processes the file as a template handler, at this point
-        the output buffer of the template engine should be populated
-        with the complete header information, the appropriate header
-        writing method is chosen based on the existence or not of
-        the realm authorization field */
-        process_template_handler(template_handler, template_path);
+        /* processes the file as a template handler, out of the cache
+        of the service so that the file is only ever parsed when it
+        has changed, at this point the output buffer of the template
+        engine should be populated with the complete header information,
+        the appropriate header writing method is chosen based on the
+        existence or not of the realm authorization field */
+        process_cache_template_handler(template_handler, service->template_cache, template_path);
         if(template_handler->string_value == NULL || template_handler->string_value[0] == '\0') {
             V_WARNING_F("Template file not found or empty '%s', falling back to text mode\n", template_path);
             delete_template_handler(template_handler);

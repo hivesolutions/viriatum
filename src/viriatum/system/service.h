@@ -486,6 +486,15 @@ typedef struct service_t {
     struct hash_map_t *http_handlers_map;
 
     /**
+     * The templates that the service is keeping parsed,
+     * the pages that are built out of one, the listing
+     * of a directory and the error page among them, cost
+     * only their rendering for as long as the file of the
+     * template stands as it was parsed.
+     */
+    struct template_cache_t *template_cache;
+
+    /**
      * Buffer used as static reference to the
      * value to be returned in the retrieval of
      * the uptime function.

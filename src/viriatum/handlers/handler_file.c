@@ -810,8 +810,14 @@ ERROR_CODE message_complete_callback_handler_file(struct http_request_t *http_re
                 (int) directory_entries_map->size
             );
 
-            /* processes the file as a template handler */
-            process_template_handler(template_handler, template_path);
+            /* processes the file as a template handler, out of the
+            cache of the service so that the file is only ever parsed
+            when it has changed since it was last parsed */
+            process_cache_template_handler(
+                template_handler,
+                connection->service->template_cache,
+                template_path
+            );
 
             /* warns if the template file was not found or produced no output
             this will allow proper debugging of the situation */

@@ -117,6 +117,7 @@ void create_service(struct service_t **service_pointer, unsigned char *name, uns
     create_linked_list(&service->connections_list);
     create_linked_list(&service->modules_list);
     create_hash_map(&service->http_handlers_map, 0);
+    create_template_cache(&service->template_cache);
 
     /* sets the service in the service pointer */
     *service_pointer = service;
@@ -140,7 +141,10 @@ void delete_service(struct service_t *service) {
     }
 
     /* deletes the various internal structures associated
-    with the service avoiding any memory leak */
+    with the service avoiding any memory leak, the templates
+    that were being kept parsed are released along with the
+    files that the keeping of them held open */
+    delete_template_cache(service->template_cache);
     delete_hash_map(service->http_handlers_map);
     delete_linked_list(service->modules_list);
     delete_linked_list(service->connections_list);
