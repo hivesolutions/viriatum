@@ -329,6 +329,11 @@ _configure() {
         # when the only way of silencing it was to send the output of
         # the process somewhere that nobody reads
         echo "access_log = Off"
+
+        # the references write nothing per error either, nginx being
+        # held at the critical level by its configuration, where the
+        # subject wrote a warning for every error it answered
+        echo "error_log = Off"
         if [ -n "$_PROXY" ]; then
             echo
             echo "[location:proxy]"

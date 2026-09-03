@@ -61,6 +61,7 @@ const char *test_create_service_options(void) {
     V_ASSERT(service_options->www_root[0] == '\0');
     V_ASSERT(service_options->use_template == 0);
     V_ASSERT(service_options->access_log == 1);
+    V_ASSERT(service_options->error_log == 1);
     V_ASSERT(service_options->default_virtual_host == NULL);
     V_ASSERT(service_options->index_count == 0);
 
