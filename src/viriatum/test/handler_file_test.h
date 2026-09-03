@@ -339,3 +339,70 @@ const char *test_file_cache_rewritten(void);
  * the unit test should describe possible errors.
  */
 const char *test_file_cache_stale(void);
+
+/**
+ * Tests the creation of the cache of listings, every one of
+ * its entries starting out empty.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_listing_cache(void);
+
+/**
+ * Tests the rendering of a listing out of the cache, the first
+ * time building it and every time after that handing back the
+ * page held under the url as a copy of its own.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_listing_cache_render(void);
+
+/**
+ * Tests a directory whose contents change between two listings,
+ * an entry that appears and one that goes away being listed as
+ * they stand at the time of each.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_listing_cache_changed(void);
+
+/**
+ * Tests the template of the listing rewritten between two of
+ * them, the second page being built out of the template as it
+ * now stands.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_listing_cache_template(void);
+
+/**
+ * Tests an entry past the time it is trusted for, which is built
+ * again out of the directory as it now stands.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_listing_cache_expired(void);
+
+/**
+ * Tests that a directory that is not there and a template that
+ * is not there are reported as errors, the page being built the
+ * way it always was and nothing being held.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_listing_cache_missing(void);
+
+/**
+ * Tests the clearing of the cache, which releases every page and
+ * leaves the cache usable afterwards.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_listing_cache_clear(void);

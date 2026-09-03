@@ -854,6 +854,71 @@ ERROR_CODE list_directory_file(char *file_path, struct linked_list_t *entries) {
     RAISE_NO_ERROR;
 }
 
+ERROR_CODE fingerprint_directory_file(char *file_path, unsigned long *fingerprint_pointer) {
+    /* allocates the string to hold the composite wildcard
+    listing directory path and the length of the path */
+    char *list_path;
+    size_t path_length;
+
+    /* allocates space for the number that describes the set of
+    entries and for the count of them, folded into it at the end */
+    unsigned long fingerprint = 0;
+    unsigned long count = 0;
+
+    /* allocates the various windows internal structures
+    for the finding of the directory entries */
+    WIN32_FIND_DATA find_data;
+    HANDLE handler_find = INVALID_HANDLE_VALUE;
+
+    /* ensures that the file path is correctly converted
+    into the proper system path, through encoding conversion */
+    SYSTEM_PATH(file_path);
+
+    /* retrieves the length of the file path */
+    path_length = strlen(file_path);
+
+    /* allocates and populates the list (directory) path
+    with the appropriate wildcard value */
+    list_path = (char *) MALLOC(path_length + 3);
+    memcpy(list_path, file_path, path_length + 1);
+    memcpy(list_path + path_length, "\\*", 3);
+
+    /* tries to find the first file with the wildcard
+    value (checks for error) */
+    handler_find = FindFirstFile(list_path, &find_data);
+
+    /* in case the retieved handler is not valid
+    (error) */
+    if(handler_find == INVALID_HANDLE_VALUE) {
+        /* releases the currently allocated memory and
+        raises an error indicating the listing problem */
+        FREE(list_path);
+        RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem listing directory");
+    }
+
+    do {
+        /* folds the name of the entry into the number, none of the
+        entries is described as the names are what says whether the
+        set of them has changed, in the order the file system keeps */
+        fingerprint = fingerprint * 31 +
+                      crc_32((unsigned char *) find_data.cFileName, (unsigned int) strlen(find_data.cFileName));
+        count++;
+    } while(FindNextFile(handler_find, &find_data) != 0);
+
+    /* closes the handler to find */
+    FindClose(handler_find);
+
+    /* releases the list path reference */
+    FREE(list_path);
+
+    /* folds the count of the entries into the number and sets it
+    in the fingerprint pointer */
+    *fingerprint_pointer = fingerprint * 31 + count;
+
+    /* raise no error */
+    RAISE_NO_ERROR;
+}
+
 #endif
 
 #ifdef VIRIATUM_PLATFORM_UNIX
@@ -1040,6 +1105,62 @@ ERROR_CODE list_directory_file(char *file_path, struct linked_list_t *entries) {
 
     /* closes the directory reference */
     closedir(directory);
+
+    /* raise no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE fingerprint_directory_file(char *file_path, unsigned long *fingerprint_pointer) {
+    /* allocates space for the directory reference and
+    for the entity reference */
+    DIR *directory;
+    struct dirent *entity;
+
+    /* allocates space for the number that describes the set of
+    entries and for the count of them, folded into it at the end */
+    unsigned long fingerprint = 0;
+    unsigned long count = 0;
+
+    /* opens the directory for the file path */
+    directory = opendir(file_path);
+
+    /* in case the directory reference is not valid */
+    if(directory == NULL) {
+        /* raises an error */
+        RAISE_ERROR_M(
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Problem listing directory"
+        );
+    }
+
+    /* walks the entries of the directory folding the name of each
+    of them into the number, none of them is described as the names
+    are what says whether the set of them has changed, in the order
+    the file system keeps them in, which only ever moves along with
+    the set itself */
+    while(TRUE) {
+        /* retrieves the entity by reading it from the directory */
+        entity = readdir(directory);
+
+        /* in case the entity is not defined
+        (the directory list is finished) */
+        if(entity == NULL) {
+            /* breaks the switch */
+            break;
+        }
+
+        /* folds the name of the entry into the number */
+        fingerprint = fingerprint * 31 +
+                      crc_32((unsigned char *) entity->d_name, (unsigned int) strlen(entity->d_name));
+        count++;
+    }
+
+    /* closes the directory reference */
+    closedir(directory);
+
+    /* folds the count of the entries into the number and sets it
+    in the fingerprint pointer */
+    *fingerprint_pointer = fingerprint * 31 + count;
 
     /* raise no error */
     RAISE_NO_ERROR;

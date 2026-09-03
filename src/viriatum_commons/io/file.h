@@ -24,6 +24,7 @@
 
 #pragma once
 
+#include "../checksum/checksum.h"
 #include "../util/util.h"
 #include "../structures/structures.h"
 
@@ -166,6 +167,18 @@ VIRIATUM_EXPORT_PREFIX ERROR_CODE is_directory_file(char *file_path, unsigned in
  * hold the various directory file entries.
  */
 VIRIATUM_EXPORT_PREFIX ERROR_CODE list_directory_file(char *file_path, struct linked_list_t *entries);
+
+/**
+ * Describes the set of entries of the directory in the given path
+ * as a single number, built out of the names of every one of them,
+ * so that an entry added, removed or renamed is told from the number
+ * alone without any of the entries having to be described.
+ *
+ * @param file_path The path to the directory to be described.
+ * @param fingerprint_pointer The pointer to the number that describes
+ * the set of entries of the directory.
+ */
+VIRIATUM_EXPORT_PREFIX ERROR_CODE fingerprint_directory_file(char *file_path, unsigned long *fingerprint_pointer);
 
 /**
  * Deletes, releases memory from all the directory entries described
