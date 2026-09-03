@@ -27,8 +27,6 @@
 #include "../debug/debug.h"
 #include "../system/system.h"
 
-#define ENGINE_BUFFER_SIZE 4096
-
 #define TEMPLATE_MARK(FOR) TEMPLATE_MARK_N(FOR, 0)
 #define TEMPLATE_MARK_BACK(FOR) TEMPLATE_MARK_N(FOR, 1)
 #define TEMPLATE_MARK_N(FOR, N)   \
@@ -199,18 +197,18 @@ VIRIATUM_EXPORT_PREFIX void delete_template_engine(struct template_engine_t *tem
 VIRIATUM_EXPORT_PREFIX void create_template_settings(struct template_settings_t **template_settings_pointer);
 VIRIATUM_EXPORT_PREFIX void delete_template_settings(struct template_settings_t *template_settings);
 VIRIATUM_EXPORT_PREFIX ERROR_CODE process_template_engine(struct template_engine_t *template_engine, struct template_settings_t *template_settings, unsigned char *file_path);
+VIRIATUM_EXPORT_PREFIX ERROR_CODE process_buffer_template_engine(struct template_engine_t *template_engine, struct template_settings_t *template_settings, unsigned char *buffer, size_t size);
 
 /**
- * Retrieves a new character from the file stream
+ * Retrieves a new character from the buffer being parsed
  * updating the pointer status, and all the associated
  * structure.
  *
- * @param file The file stream to be used for character
- * retrieveal.
- * @param pointer The pointer reference to the buffer to
- * updated with the read chracter.
+ * @param pointer The pointer reference to the position in
+ * the buffer to be read, moved past the read character.
  * @param size The pointer to the variable containing the
- * (remaining) size in the file.
- * @return The character read from the file stream.
+ * (remaining) size in the buffer.
+ * @return The character read from the buffer, or the end
+ * of file marker in case nothing remains to be read.
  */
-VIRIATUM_EXPORT_PREFIX char _getc_template_engine(FILE *file, unsigned char **pointer, size_t *size);
+VIRIATUM_EXPORT_PREFIX char _getc_template_engine(unsigned char **pointer, size_t *size);
