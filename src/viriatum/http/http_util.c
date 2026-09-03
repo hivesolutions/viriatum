@@ -587,7 +587,21 @@ ERROR_CODE write_http_error_a(
         engine should be populated with the complete header information,
         the appropriate header writing method is chosen based on the
         existence or not of the realm authorization field */
-        process_cache_template_handler(template_handler, service->template_cache, template_path);
+        if(error_description == NULL) {
+            /* a page that carries nothing but the code and the message
+            of the error is the very same page every time it is asked
+            for, so it is rendered once and held under the two of them
+            for as long as the template stands as it was parsed */
+            SPRINTF(_error_description, sizeof(_error_description), "%d %s", error_code, error_message);
+            process_page_template_handler(
+                template_handler,
+                service->template_cache,
+                template_path,
+                (unsigned char *) _error_description
+            );
+        } else {
+            process_cache_template_handler(template_handler, service->template_cache, template_path);
+        }
         if(template_handler->string_value == NULL || template_handler->string_value[0] == '\0') {
             V_WARNING_F("Template file not found or empty '%s', falling back to text mode\n", template_path);
             delete_template_handler(template_handler);

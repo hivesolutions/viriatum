@@ -2023,6 +2023,103 @@ const char *test_template_handler_cache(void) {
     return NULL;
 }
 
+const char *test_template_handler_page(void) {
+    /* allocates space for the cache, for the entry that describes the
+    template within it, for the page held under the key and for the
+    handler that renders through the cache */
+    struct template_cache_t *template_cache;
+    struct template_cache_entry_t *entry;
+    struct template_cache_page_t *page;
+    struct template_handler_t *template_handler;
+    unsigned char *contents;
+    size_t allocated = ALLOCATIONS;
+    ERROR_CODE error;
+
+    write_file(
+        (char *) TEMPLATE_TEST_PATH,
+        (unsigned char *) TEMPLATE_TEST_CONTENTS,
+        sizeof(TEMPLATE_TEST_CONTENTS) - 1
+    );
+
+    create_template_cache(&template_cache);
+
+    /* the first page under a key is rendered with the names that
+    were assigned to the handler and held under the key from then on */
+    create_template_handler(&template_handler);
+    assign_string_template_handler(template_handler, (unsigned char *) "name", "first");
+    process_page_template_handler(template_handler, template_cache, (unsigned char *) TEMPLATE_TEST_PATH, (unsigned char *) "one");
+    V_ASSERT_EQ_S((char *) template_handler->string_value, "<p>first</p>");
+    delete_template_handler(template_handler);
+
+    error = acquire_template_cache(
+        template_cache,
+        (unsigned char *) TEMPLATE_TEST_PATH,
+        &entry
+    );
+    V_ASSERT_EQ_U(error, 0);
+    page = &entry->pages[_calculate_string_hash_map((unsigned char *) "one") % CACHE_PAGES_TEMPLATE_HANDLER];
+    V_ASSERT_NOT_NULL(page->contents);
+    V_ASSERT_EQ_S((char *) page->key, "one");
+    V_ASSERT_EQ_S((char *) page->contents, "<p>first</p>");
+    V_ASSERT_EQ_U(page->size, 12);
+    contents = page->contents;
+
+    /* the second page under the very same key is the one that was
+    held, whatever names the handler carries, and is handed over as
+    a copy of its own so that the held one outlives the handler */
+    create_template_handler(&template_handler);
+    assign_string_template_handler(template_handler, (unsigned char *) "name", "second");
+    process_page_template_handler(template_handler, template_cache, (unsigned char *) TEMPLATE_TEST_PATH, (unsigned char *) "one");
+    V_ASSERT_EQ_S((char *) template_handler->string_value, "<p>first</p>");
+    V_ASSERT(template_handler->string_value != contents);
+    V_ASSERT_EQ_P(page->contents, contents);
+    delete_template_handler(template_handler);
+
+    /* a page under another key is rendered on its own, the key and
+    not the slot being what tells one page from another, a second key
+    that falls on the very same slot takes it over */
+    create_template_handler(&template_handler);
+    assign_string_template_handler(template_handler, (unsigned char *) "name", "second");
+    process_page_template_handler(template_handler, template_cache, (unsigned char *) TEMPLATE_TEST_PATH, (unsigned char *) "two");
+    V_ASSERT_EQ_S((char *) template_handler->string_value, "<p>second</p>");
+    delete_template_handler(template_handler);
+    page = &entry->pages[_calculate_string_hash_map((unsigned char *) "two") % CACHE_PAGES_TEMPLATE_HANDLER];
+    V_ASSERT_EQ_S((char *) page->key, "two");
+    V_ASSERT_EQ_S((char *) page->contents, "<p>second</p>");
+
+    /* the template is written over in place, the tree is parsed again
+    and every page that was rendered out of the one before goes with
+    it, a page under a key it was held under is rendered anew */
+    error = write_file(
+        (char *) TEMPLATE_TEST_PATH,
+        (unsigned char *) TEMPLATE_TEST_LONGER,
+        sizeof(TEMPLATE_TEST_LONGER) - 1
+    );
+    V_ASSERT_EQ_U(error, 0);
+    create_template_handler(&template_handler);
+    assign_string_template_handler(template_handler, (unsigned char *) "name", "third");
+    process_page_template_handler(template_handler, template_cache, (unsigned char *) TEMPLATE_TEST_PATH, (unsigned char *) "one");
+    V_ASSERT_EQ_S((char *) template_handler->string_value, "<div>third</div>");
+    delete_template_handler(template_handler);
+
+    /* a template that is not there leaves the handler with an empty
+    result rather than an error and holds no page at all */
+    create_template_handler(&template_handler);
+    process_page_template_handler(template_handler, template_cache, (unsigned char *) TEMPLATE_TEST_GONE, (unsigned char *) "one");
+    V_ASSERT_EQ_S((char *) template_handler->string_value, "");
+    delete_template_handler(template_handler);
+
+    /* the pages go away with the cache, so the number of outstanding
+    allocations is the one it was before the test started at all */
+    delete_template_cache(template_cache);
+    remove(TEMPLATE_TEST_PATH);
+    V_ASSERT_EQ_U(ALLOCATIONS, allocated);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
 const char *test_quicksort(void) {
     /* allocates space for the template handler */
     size_t list[10] = {2, 4, 1, 2, 3, 5, 5, 3, 4, 1};
@@ -2493,6 +2590,7 @@ static struct test_entry_t _simple_entries[] = {
     V_TEST_T(test_template_cache_stale, "template"),
     V_TEST_T(test_template_handler, "template"),
     V_TEST_T(test_template_handler_cache, "template"),
+    V_TEST_T(test_template_handler_page, "template"),
     V_TEST_T(test_quicksort, "sorting"),
     V_TEST_T(test_quicksort_linked_list, "sorting"),
     V_TEST_T(test_crc_32, "checksum"),
