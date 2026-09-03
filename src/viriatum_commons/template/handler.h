@@ -48,6 +48,14 @@
 #define CACHE_VALID_TEMPLATE_HANDLER 4
 
 /**
+ * The number of pages that an entry of the cache holds
+ * rendered, each of them under a key of the caller's own
+ * choosing, a page falls on exactly one of the slots and
+ * takes it over from whatever was sitting there before.
+ */
+#define CACHE_PAGES_TEMPLATE_HANDLER 8
+
+/**
  * Enumeration defining the types of
  * template nodes that may exist in
  * the template parsing context.
@@ -181,6 +189,32 @@ typedef struct template_handler_t {
 } template_handler;
 
 /**
+ * Structure describing a page that has been rendered out
+ * of a held template and is being held itself, under the
+ * key it was rendered for, so that a page whose names
+ * never change, the one of an error among them, costs
+ * not even its rendering the second time around.
+ */
+typedef struct template_cache_page_t {
+    /**
+     * The key the page is held under, which is what a
+     * caller asks for it by, unset while there is no page.
+     */
+    unsigned char *key;
+
+    /**
+     * The contents of the page, as they came out of the
+     * rendering, null terminated.
+     */
+    unsigned char *contents;
+
+    /**
+     * The size in bytes of the contents of the page.
+     */
+    size_t size;
+} template_cache_page;
+
+/**
  * Structure describing a template that has been parsed
  * and is being held, so that the building of a page out
  * of it costs only the rendering and never the reading
@@ -234,6 +268,14 @@ typedef struct template_cache_entry_t {
      * with the entry, the very way a handler keeps its own.
      */
     struct linked_list_t *nodes;
+
+    /**
+     * The pages that have been rendered out of the tree and
+     * are held under the keys they were rendered for, they
+     * go away with the tree, a page of a template that has
+     * changed underneath it describes nothing any longer.
+     */
+    struct template_cache_page_t pages[CACHE_PAGES_TEMPLATE_HANDLER];
 } template_cache_entry;
 
 /**
@@ -268,6 +310,7 @@ VIRIATUM_EXPORT_PREFIX void clear_template_cache(struct template_cache_t *templa
 VIRIATUM_EXPORT_PREFIX ERROR_CODE acquire_template_cache(struct template_cache_t *template_cache, unsigned char *file_path, struct template_cache_entry_t **template_cache_entry_pointer);
 VIRIATUM_EXPORT_PREFIX void process_template_handler(struct template_handler_t *template_handler, unsigned char *file_path);
 VIRIATUM_EXPORT_PREFIX void process_cache_template_handler(struct template_handler_t *template_handler, struct template_cache_t *template_cache, unsigned char *file_path);
+VIRIATUM_EXPORT_PREFIX void process_page_template_handler(struct template_handler_t *template_handler, struct template_cache_t *template_cache, unsigned char *file_path, unsigned char *key);
 VIRIATUM_EXPORT_PREFIX void assign_template_handler(struct template_handler_t *template_handler, unsigned char *name, struct type_t *value);
 VIRIATUM_EXPORT_PREFIX void assign_integer_template_handler(struct template_handler_t *template_handler, unsigned char *name, int value);
 VIRIATUM_EXPORT_PREFIX void assign_string_template_handler(struct template_handler_t *template_handler, unsigned char *name, char *value);

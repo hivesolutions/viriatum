@@ -92,8 +92,10 @@ static void _create_engine_template_handler(
  * @param entry The entry of the cache to be emptied.
  */
 static void _empty_template_cache(struct template_cache_entry_t *entry) {
-    /* allocates space for the temporary node variable */
+    /* allocates space for the temporary node variable and for
+    the index used in the walking of the pages */
     struct template_node_t *node;
+    size_t index;
 
     /* closes the file that the entry is holding, a descriptor
     that is never closed is a descriptor leaked */
@@ -130,6 +132,18 @@ static void _empty_template_cache(struct template_cache_entry_t *entry) {
     if(entry->root != NULL) {
         delete_template_node(entry->root);
         entry->root = NULL;
+    }
+
+    /* releases every page that was rendered out of the tree,
+    together with the key each of them was held under, a page
+    of a tree that is gone describes nothing any longer */
+    for(index = 0; index < CACHE_PAGES_TEMPLATE_HANDLER; index++) {
+        if(entry->pages[index].contents == NULL) { continue; }
+        FREE(entry->pages[index].key);
+        FREE(entry->pages[index].contents);
+        entry->pages[index].key = NULL;
+        entry->pages[index].contents = NULL;
+        entry->pages[index].size = 0;
     }
 
     /* unsets the path, the slot describes nothing any longer */
@@ -415,8 +429,10 @@ void delete_template_parameter(struct template_parameter_t *template_parameter) 
 
 void create_template_cache(struct template_cache_t **template_cache_pointer) {
     /* allocates space for the cache itself and for the entries that
-    it is made of, which are as many as a hash is able to fall on */
+    it is made of, which are as many as a hash is able to fall on,
+    together with the index of the pages each of them holds */
     size_t index;
+    size_t page;
     size_t template_cache_size = sizeof(struct template_cache_t);
     size_t entries_size = sizeof(struct template_cache_entry_t) * CACHE_SIZE_TEMPLATE_HANDLER;
     struct template_cache_t *template_cache = (struct template_cache_t *) MALLOC(template_cache_size);
@@ -432,6 +448,11 @@ void create_template_cache(struct template_cache_t **template_cache_pointer) {
         template_cache->entries[index].checked = 0;
         template_cache->entries[index].root = NULL;
         template_cache->entries[index].nodes = NULL;
+        for(page = 0; page < CACHE_PAGES_TEMPLATE_HANDLER; page++) {
+            template_cache->entries[index].pages[page].key = NULL;
+            template_cache->entries[index].pages[page].contents = NULL;
+            template_cache->entries[index].pages[page].size = 0;
+        }
     }
 
     /* sets the cache in the cache pointer */
@@ -618,6 +639,54 @@ void process_cache_template_handler(struct template_handler_t *template_handler,
     /* "joins" the template handler string buffer into the string
     value, retrieving the final template result */
     join_string_buffer(template_handler->string_buffer, &template_handler->string_value);
+}
+
+void process_page_template_handler(struct template_handler_t *template_handler, struct template_cache_t *template_cache, unsigned char *file_path, unsigned char *key) {
+    /* allocates space for the entry of the cache that holds the
+    template, for the page held under the key within it and for
+    the error the acquiring of the entry may raise */
+    struct template_cache_entry_t *entry;
+    struct template_cache_page_t *page;
+    ERROR_CODE error_code;
+
+    /* asks the cache for the template, a template that cannot be
+    loaded leaves the handler with an empty result, the very same
+    way the processing of a file that is not there does */
+    error_code = acquire_template_cache(template_cache, file_path, &entry);
+    if(IS_ERROR_CODE(error_code)) {
+        join_string_buffer(template_handler->string_buffer, &template_handler->string_value);
+        return;
+    }
+
+    /* the page that the key falls on, a key always falls on the very
+    same one of them and takes it over from whatever was there before,
+    in case it is holding the page rendered under this very key that
+    page is handed over as it stands, copied as the result belongs to
+    the handler and goes away with it */
+    page = &entry->pages[_calculate_string_hash_map(key) % CACHE_PAGES_TEMPLATE_HANDLER];
+    if(page->contents != NULL && strcmp((char *) page->key, (char *) key) == 0) {
+        template_handler->string_value = (unsigned char *) MALLOC(page->size + 1);
+        memcpy(template_handler->string_value, page->contents, page->size + 1);
+        return;
+    }
+
+    /* otherwise the page is rendered out of the tree with the names
+    that were assigned to the handler, the way any page is */
+    traverse_node_buffer(template_handler, entry->root);
+    join_string_buffer(template_handler->string_buffer, &template_handler->string_value);
+
+    /* whatever the slot was holding is released and the page that
+    has just been rendered takes it over, held under its key as a
+    copy of its own for the next time the key is asked for */
+    if(page->contents != NULL) {
+        FREE(page->key);
+        FREE(page->contents);
+    }
+    page->size = template_handler->string_buffer->string_length;
+    page->key = (unsigned char *) MALLOC(strlen((char *) key) + 1);
+    memcpy(page->key, key, strlen((char *) key) + 1);
+    page->contents = (unsigned char *) MALLOC(page->size + 1);
+    memcpy(page->contents, template_handler->string_value, page->size + 1);
 }
 
 void assign_template_handler(struct template_handler_t *template_handler, unsigned char *name, struct type_t *value) {

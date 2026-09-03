@@ -294,6 +294,16 @@ const char *test_template_handler(void);
 const char *test_template_handler_cache(void);
 
 /**
+ * Tests the pages held rendered by the cache of templates, one
+ * under each key, handed over as they stand and gone with the
+ * tree they were rendered out of.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_template_handler_page(void);
+
+/**
  * Tests the quicksort (algorithm).
  *
  * @return A message describing the execution of
