@@ -259,6 +259,17 @@ const char *test_file_cache_acquire(void);
 const char *test_file_cache_missing(void);
 
 /**
+ * Tests that a directory is refused by the cache with the reason
+ * the platform gives for one, and a file that is not there with
+ * its own, so that the handler tells the two apart without
+ * describing the path.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_file_cache_directory(void);
+
+/**
  * Tests that a file written over in place is described by
  * the size it now has and never by the one it used to have.
  *

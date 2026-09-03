@@ -810,8 +810,36 @@ ERROR_CODE message_complete_callback_handler_file(struct http_request_t *http_re
     before it has a chance to ask for them itself */
     _push_handler_file(http_connection, http_request, handler_file_context->push);
 
-    /* checks if the path being request is in fact a directory */
-    is_directory_file((char *) handler_file_context->file_path_d, &is_directory);
+    /* asks the cache for the file, which opens it when it is not already
+    held, a path that is a directory or one that is not there at all is
+    told from the reason the opening gives for refusing it, so that the
+    file system is asked about the path once rather than described first
+    and opened after, which every request used to pay a call for */
+    error_code = acquire_file_cache(
+        _get_file_cache(),
+        handler_file_context->file_path_d,
+        &file_cache_entry
+    );
+    if(IS_ERROR_CODE(error_code)) {
+#ifdef VIRIATUM_PLATFORM_WIN32
+        /* the opening of a directory is refused here without a reason
+        the process is able to read, so the path is described instead */
+        is_directory_file((char *) handler_file_context->file_path_d, &is_directory);
+#else
+        /* a directory is refused with the reason of it and a path that
+        is not there with its own, anything else is described to tell
+        the two of them apart, a file that cannot be read among them */
+        if(errno == EISDIR) {
+            is_directory = TRUE;
+        } else if(errno != ENOENT) {
+            is_directory_file((char *) handler_file_context->file_path_d, &is_directory);
+        }
+#endif
+
+        /* a directory is not a file that failed to open, so the error
+        of the opening is left behind together with the message of it */
+        if(is_directory) { error_code = 0; }
+    }
 
     /* in case the auth basic value is set in the current file
     context must proceed with the authentication process for
@@ -899,17 +927,9 @@ ERROR_CODE message_complete_callback_handler_file(struct http_request_t *http_re
     /* otherwise the file path must refer to a "normal" file path and
     it must be checked */
     else {
-        /* counts the total size (in bytes) of the contents
-        in the file path, this also the call used for checking
-        the existence of the file */
-        error_code = acquire_file_cache(
-            _get_file_cache(),
-            handler_file_context->file_path_d,
-            &file_cache_entry
-        );
-
-        /* in case there is no error count the file size, avoids
-        extra problems while computing the etag */
+        /* in case there was no error opening the file it has been
+        counted along the way, avoids extra problems while computing
+        the etag */
         if(!IS_ERROR_CODE(error_code)) {
             /* both the size and the time of the last write come out
             of the entry that has just been acquired, which learnt
@@ -1649,6 +1669,22 @@ ERROR_CODE acquire_file_cache(struct file_cache_t *file_cache, unsigned char *fi
             (unsigned char *) "Problem loading file"
         );
     }
+
+#ifndef VIRIATUM_PLATFORM_WIN32
+    /* a directory opens the way a file does on this family of platforms
+    and is never one to be held, so it is closed again and refused with
+    the reason the platform itself gives for a directory, which is what
+    the handler reads to tell it from a file that is not there */
+    if(S_ISDIR(file_stat.st_mode)) {
+        CLOSE_READ(entry->descriptor);
+        entry->descriptor = -1;
+        errno = EISDIR;
+        RAISE_ERROR_M(
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Problem loading file"
+        );
+    }
+#endif
 
     /* fills the entry with what has just been learnt about the file,
     the time of the last write to it included as the tag that travels

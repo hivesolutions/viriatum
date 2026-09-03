@@ -1521,6 +1521,52 @@ const char *test_file_cache_missing(void) {
     return NULL;
 }
 
+const char *test_file_cache_directory(void) {
+    /* allocates space for the cache and for the entry that the
+    acquiring of a directory would have handed back */
+    struct file_cache_t *file_cache;
+    struct file_cache_entry_t *entry = NULL;
+    size_t index;
+    ERROR_CODE error;
+
+    create_file_cache(&file_cache);
+
+    /* a directory is never held as a file, on the platforms that open
+    one the way they open a file it is closed again and refused with the
+    reason the platform gives for a directory, which is what tells it
+    from a file that is not there without describing the path again */
+    error = acquire_file_cache(file_cache, (unsigned char *) ".", &entry);
+    V_ASSERT(IS_ERROR_CODE(error));
+#ifndef VIRIATUM_PLATFORM_WIN32
+    V_ASSERT_EQ_I(errno, EISDIR);
+#endif
+    V_ASSERT_NULL(entry);
+    RESET_ERROR;
+
+    /* the slot the directory fell on is left holding nothing */
+    index = _calculate_string_hash_map((unsigned char *) ".") % CACHE_SIZE_HANDLER_FILE;
+    V_ASSERT_EQ_I(file_cache->entries[index].descriptor, -1);
+
+    /* and a file that is not there is refused with the reason of its
+    own, which is the one the handler answers with a not found for */
+    error = acquire_file_cache(
+        file_cache,
+        (unsigned char *) "./viriatum_file_cache_gone.txt",
+        &entry
+    );
+    V_ASSERT(IS_ERROR_CODE(error));
+#ifndef VIRIATUM_PLATFORM_WIN32
+    V_ASSERT_EQ_I(errno, ENOENT);
+#endif
+    RESET_ERROR;
+
+    delete_file_cache(file_cache);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
 const char *test_file_cache_changed(void) {
     /* allocates space for the cache and for the entry that describes
     the file before and after it has been written over */
