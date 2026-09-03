@@ -382,6 +382,14 @@ const char *test_normalize_path(void);
 const char *test_count_file(void);
 
 /**
+ * Tests the reporting of the moment a file was last written.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_get_write_time_file(void);
+
+/**
  * Tests the telling of a directory from a file, together with
  * the path that is not there at all.
  *

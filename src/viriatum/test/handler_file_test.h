@@ -148,6 +148,15 @@ const char *test_handler_file_missing(void);
 const char *test_handler_file_missing_template(void);
 
 /**
+ * Tests a file that exists but cannot be read, which is answered
+ * as one that is not there rather than as a directory.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_handler_file_unreadable(void);
+
+/**
  * Tests the serving of a resource that goes away after the response
  * of it has been decided upon, the connection is handed back rather
  * than left locked with the handler of it still in place.
