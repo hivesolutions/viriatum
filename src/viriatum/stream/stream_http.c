@@ -376,10 +376,15 @@ ERROR_CODE data_handler_stream_http(struct io_connection_t *io_connection, unsig
 
         /* in case the current state in the HTTP parser is the
         start state, the message is considered to be completely
-        parsed (new message may come after) */
-        if(http_connection->http_parser->state == STATE_START_RES) {
+        parsed (new message may come after), the parser of a
+        connection reads requests and so the start state it comes
+        back to is the one of a request, the one of a response was
+        being looked for here and it never came, so the buffer of
+        a kept connection was never released and grew with every
+        message it served, each of them copying all the ones before */
+        if(http_connection->http_parser->state == STATE_START_REQ) {
             /* resets the HTTP parser state */
-            http_connection->http_parser->type = 2;
+            http_connection->http_parser->type = HTTP_REQUEST;
             http_connection->http_parser->flags = 6;
             http_connection->http_parser->state = STATE_START_REQ;
             http_connection->http_parser->header_state = 0;
@@ -403,10 +408,11 @@ ERROR_CODE data_handler_stream_http(struct io_connection_t *io_connection, unsig
             reset_http_request(http_connection->http_parser->request);
 
             /* in case the current HTTP connection read offset has reached
-            the buffer size it's time to reset the buffer (no more data to
-            be processed), the buffer size should come from the content length
-            value of the actual message */
-            if(http_connection->read_offset == http_connection->buffer_size) {
+            the end of the data in the buffer it's time to reset the buffer
+            (no more data to be processed), the buffer itself may well be
+            larger than the data it holds as the growing of it looks at the
+            content length of the message */
+            if(http_connection->read_offset == http_connection->buffer_offset) {
                 /* releases the current HTTP connection buffer and then
                 unsets the buffer from the connection and updates the size
                 of it to the initial empty value (buffer reset) */
@@ -420,7 +426,7 @@ ERROR_CODE data_handler_stream_http(struct io_connection_t *io_connection, unsig
 
         /* in case all the data has been read from the connection
         buffer must break the loop */
-        if(http_connection->read_offset == http_connection->buffer_size) { break; }
+        if(http_connection->read_offset == http_connection->buffer_offset) { break; }
 
         /* in case all the remaining data has been processed
         no need to process more HTTP data (breaks the loop) */

@@ -223,10 +223,12 @@ const char *test_handler_default_close(void) {
     return NULL;
 }
 const char *test_handler_default_stream(void) {
-    /* allocates space for the chain of the connection and for the
-    responses that the messages produce */
+    /* allocates space for the chain of the connection, for the
+    responses that the messages produce and for the pair of messages
+    that travel in a single read */
     struct test_context_t *context;
     unsigned char written[2048];
+    char pair[256];
     size_t size;
     size_t index;
     ERROR_CODE error;
@@ -264,6 +266,15 @@ const char *test_handler_default_stream(void) {
         );
         V_ASSERT(error == 0);
 
+        /* the buffer of a message that has been read whole is released
+        as soon as it has, a connection that served a thousand of them
+        used to go on holding the bytes of every one and to copy them
+        all over again for each message that followed */
+        V_ASSERT_NULL(context->http_connection->buffer);
+        V_ASSERT_EQ_U(context->http_connection->buffer_size, 0);
+        V_ASSERT_EQ_U(context->http_connection->buffer_offset, 0);
+        V_ASSERT_EQ_U(context->http_connection->read_offset, 0);
+
         size = flush_test_connection(context, written, sizeof(written));
         V_ASSERT(size > 0 && size < sizeof(written));
         written[size] = '\0';
@@ -274,7 +285,36 @@ const char *test_handler_default_stream(void) {
         V_ASSERT_NOT_NULL(strstr((char *) written, "\r\n\r\n" HANDLER_DEFAULT_MESSAGE));
     }
 
-    /* the connection is kept alive through both of the messages, so
+    /* points the reading of the connection at the stream, the very way
+    the opening of a connection does, the release of a message is what
+    reaches for it to serve whatever is still buffered behind it */
+    context->io_connection->on_data = data_handler_stream_http;
+
+    /* two messages that arrive in a single read are served one after
+    the other out of the very same buffer, the second of them waits for
+    the first to be answered and the buffer is only released once it
+    has been read out of it as well */
+    SPRINTF(pair, sizeof(pair), "%s%s", request, request);
+    error = data_handler_stream_http(
+        context->io_connection,
+        (unsigned char *) pair,
+        strlen(pair)
+    );
+    V_ASSERT(error == 0);
+    V_ASSERT_NOT_NULL(context->http_connection->buffer);
+    V_ASSERT_EQ_U(context->http_connection->buffer_offset, strlen(pair));
+    V_ASSERT_EQ_U(context->http_connection->read_offset, strlen(request));
+
+    size = flush_test_connection(context, written, sizeof(written));
+    V_ASSERT(size > 0 && size < sizeof(written));
+    written[size] = '\0';
+
+    V_ASSERT(strstr((char *) written, "HTTP/1.1 200 OK\r\n") == (char *) written);
+    V_ASSERT_NOT_NULL(strstr(strstr((char *) written, "\r\n\r\n" HANDLER_DEFAULT_MESSAGE) + 1, "HTTP/1.1 200 OK\r\n"));
+    V_ASSERT_NULL(context->http_connection->buffer);
+    V_ASSERT_EQ_U(context->http_connection->buffer_size, 0);
+
+    /* the connection is kept alive through all of the messages, so
     nothing has taken it down along the way */
     V_ASSERT_EQ_U(get_closed_test_connection(), 0);
 
