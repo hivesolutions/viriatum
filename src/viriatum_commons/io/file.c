@@ -305,8 +305,11 @@ ERROR_CODE entries_to_map_file(struct linked_list_t *entries, struct linked_list
             break;
         }
 
-        /* creates the hash map */
-        create_hash_map(&entry_map, 0);
+        /* creates the hash map, sized for the five values that
+        describe an entry rather than the default of a map, one
+        of the default size is built and released for every entry
+        of a listing and costs more than the walking of it does */
+        create_hash_map(&entry_map, 8);
 
         /* allocates space for the date time string */
         date_time_string = MALLOC(17);
@@ -904,24 +907,24 @@ ERROR_CODE get_write_time_file(char *file_path, struct date_time_t *date_time) {
 }
 
 ERROR_CODE is_directory_file(char *file_path, unsigned int *is_directory) {
-    /* allocates space for the directory reference */
-    DIR *directory;
+    /* allocates space for the structure that describes the file,
+    the kind of it being one of the fields it carries */
+    struct stat file_stat;
 
-    /* tries to open the directory for the file path */
-    directory = opendir(file_path);
-
-    /* in case the directory reference is not valid (null) */
-    if(directory == NULL) {
+    /* asks the file system to describe the path rather than opening
+    it as a directory, the opening costs three calls into the kernel
+    where the describing of it costs a single one, and every request
+    for a file pays this before the file is even looked at, in case
+    the path cannot be described at all it is not a directory */
+    if(stat(file_path, &file_stat) != 0) {
         /* unsets the is directory flag */
         *is_directory = 0;
     }
-    /* otherwise the directory reference is valid */
+    /* otherwise the path exists and the description says
+    whether it is a directory or not */
     else {
-        /* sets the is directory flag */
-        *is_directory = 1;
-
-        /* closes the directory reference */
-        closedir(directory);
+        /* sets the is directory flag according to the mode */
+        *is_directory = S_ISDIR(file_stat.st_mode) ? 1 : 0;
     }
 
     /* raise no error */
