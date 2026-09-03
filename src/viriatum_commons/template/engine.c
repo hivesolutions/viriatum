@@ -228,6 +228,10 @@ ERROR_CODE process_buffer_template_engine(struct template_engine_t *template_eng
                     if(ahead == '/') {
                         TEMPLATE_CALLBACK(tag_close_begin);
                         ahead_set = 0;
+
+                        /* marks the tag name past the slash, so that
+                        the name of a closing tag never carries it */
+                        TEMPLATE_MARK(tag_name);
                     }
                 } else {
                     /* resets the state to the "normal" */
@@ -248,6 +252,11 @@ ERROR_CODE process_buffer_template_engine(struct template_engine_t *template_eng
                         /* unsets the ahead set flag */
                         ahead_set = 0;
 
+                        /* calls the tag name callback, the name of a
+                        tag that closes right after it ends at the slash
+                        and is reported the way any other name is */
+                        TEMPLATE_CALLBACK_DATA_N(tag_name, 2);
+
                         /* marks the text end */
                         TEMPLATE_MARK(text_end);
 
@@ -261,6 +270,10 @@ ERROR_CODE process_buffer_template_engine(struct template_engine_t *template_eng
 
                 if(current == '}') {
                     state = TEMPLATE_ENGINE_NORMAL;
+
+                    /* calls the tag name callback, the name of a tag
+                    that carries no parameters ends at the brace */
+                    TEMPLATE_CALLBACK_DATA_BACK(tag_name);
 
                     TEMPLATE_MARK(text_end);
 
