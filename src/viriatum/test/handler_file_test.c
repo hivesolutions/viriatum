@@ -416,11 +416,64 @@ const char *test_handler_file_header_value(void) {
 #define HANDLER_FILE_TEST_GONE "./viriatum_handler_file_gone.txt"
 
 /**
+ * The directory that the templates of the tests are written into,
+ * it is where the handler looks for them once the resources of the
+ * service are pointed at the directory the process is running from.
+ */
+#define HANDLER_FILE_TEST_TEMPLATES "./templates"
+
+/**
+ * The paths of the templates of the listing and of the error page
+ * under that directory, the names being the very ones the handler
+ * and the writer of an error look for.
+ */
+#define HANDLER_FILE_TEST_LISTING "." VIRIATUM_LISTING_PATH
+#define HANDLER_FILE_TEST_ERROR "." VIRIATUM_ERROR_PATH
+
+/**
+ * The name of the file that is added to the directory between two
+ * listings of it, so that the second of them is expected to carry
+ * an entry the first did not.
+ */
+#define HANDLER_FILE_TEST_ADDED "viriatum_handler_file_added.txt"
+
+/**
  * The handler that stands in for the one a message is served by, it
  * is only ever required so that the release of a message reaches
  * something, it installs no callback of its own.
  */
 static struct http_handler_t _handler;
+
+/**
+ * Writes a template under the directory the handler looks for them
+ * in, creating the directory when it is not there yet.
+ *
+ * @param path The path of the template to be written.
+ * @param contents The contents the template is written with.
+ */
+static void _write_template_handler_file_test(char *path, char *contents) {
+#ifdef VIRIATUM_PLATFORM_WIN32
+    _mkdir(HANDLER_FILE_TEST_TEMPLATES);
+#else
+    mkdir(HANDLER_FILE_TEST_TEMPLATES, 0755);
+#endif
+    write_file(path, (unsigned char *) contents, strlen(contents));
+}
+
+/**
+ * Takes a template written by the above out of the file system,
+ * together with the directory once nothing else is left in it.
+ *
+ * @param path The path of the template to be removed.
+ */
+static void _remove_template_handler_file_test(char *path) {
+    remove(path);
+#ifdef VIRIATUM_PLATFORM_WIN32
+    _rmdir(HANDLER_FILE_TEST_TEMPLATES);
+#else
+    rmdir(HANDLER_FILE_TEST_TEMPLATES);
+#endif
+}
 
 static ERROR_CODE _set_handler_file_test(struct http_connection_t *http_connection) {
     RAISE_NO_ERROR;
@@ -428,6 +481,37 @@ static ERROR_CODE _set_handler_file_test(struct http_connection_t *http_connecti
 
 static ERROR_CODE _unset_handler_file_test(struct http_connection_t *http_connection) {
     RAISE_NO_ERROR;
+}
+
+/**
+ * Builds a message together with the context of the handler on top
+ * of the provided chain of a connection, wired the very same way
+ * the parser of a connection would wire them.
+ *
+ * @param context The test context holding the connection.
+ * @param http_request_pointer The pointer to the message that is
+ * going to be served.
+ * @param handler_file_context_pointer The pointer to the context
+ * that the handler carries along the message.
+ */
+static void _create_request_handler_file_test(
+    struct test_context_t *context,
+    struct http_request_t **http_request_pointer,
+    struct handler_file_context_t **handler_file_context_pointer
+) {
+    struct http_request_t *http_request;
+    struct handler_file_context_t *handler_file_context;
+
+    create_http_request(&http_request);
+    create_handler_file_context(&handler_file_context);
+    http_request->context = handler_file_context;
+    http_request->parameters = context->connection;
+    http_request->method = HTTP_GET;
+    http_request->version = HTTP11;
+    http_request->flags = FLAG_KEEP_ALIVE;
+
+    *http_request_pointer = http_request;
+    *handler_file_context_pointer = handler_file_context;
 }
 
 /**
@@ -486,17 +570,65 @@ static void _create_handler_file_test(
     context->http_connection->base_handler = &_handler;
     context->http_connection->http_handler = &_handler;
 
-    create_http_request(&http_request);
-    create_handler_file_context(&handler_file_context);
-    http_request->context = handler_file_context;
-    http_request->parameters = context->connection;
-    http_request->method = HTTP_GET;
-    http_request->version = HTTP11;
-    http_request->flags = FLAG_KEEP_ALIVE;
+    _create_request_handler_file_test(context, &http_request, &handler_file_context);
 
     *context_pointer = context;
     *http_request_pointer = http_request;
     *handler_file_context_pointer = handler_file_context;
+}
+
+/**
+ * Drives a request for the provided url through the handler on the
+ * provided chain of a connection and gathers the response of it, the
+ * message and the context of it being built and released around it,
+ * so that a test may serve a second request through the very same
+ * service, which is what the caches of it are shared across.
+ *
+ * @param context The test context holding the connection.
+ * @param url The url of the resource being asked for.
+ * @param written The buffer to gather the response into.
+ * @param size The size in bytes of the provided buffer.
+ * @return The number of the bytes that have been gathered.
+ */
+static size_t _serve_handler_file_test(struct test_context_t *context, char *url, unsigned char *written, size_t size) {
+    struct http_request_t *http_request;
+    struct handler_file_context_t *handler_file_context;
+    size_t count;
+
+    _create_request_handler_file_test(context, &http_request, &handler_file_context);
+    url_callback_handler_file(http_request, (unsigned char *) url, strlen(url));
+    message_complete_callback_handler_file(http_request);
+    count = flush_test_connection(context, written, size - 1);
+    written[count] = '\0';
+    delete_handler_file_context(handler_file_context);
+    delete_http_request(http_request);
+
+    return count;
+}
+
+/**
+ * Counts the entries that a page built out of the template of the
+ * tests names, each of them being written between square brackets,
+ * and reads the count that closes the page, the two of them being
+ * expected to agree.
+ *
+ * @param written The response the page is part of.
+ * @param counted_pointer The pointer to the number of entries named.
+ * @param announced_pointer The pointer to the count that closes the
+ * page, minus one when there is none.
+ */
+static void _count_listing_handler_file_test(unsigned char *written, int *counted_pointer, int *announced_pointer) {
+    char *pointer = (char *) written;
+    int counted = 0;
+
+    while((pointer = strchr(pointer, '[')) != NULL) {
+        counted++;
+        pointer++;
+    }
+
+    pointer = strrchr((char *) written, '(');
+    *counted_pointer = counted;
+    *announced_pointer = pointer == NULL ? -1 : atoi(pointer + 1);
 }
 
 /**
@@ -655,6 +787,75 @@ const char *test_handler_file_missing(void) {
     V_ASSERT_EQ_U(get_closed_test_connection(), 0);
     flush_test_connection(context, NULL, 0);
     V_ASSERT_EQ_U(get_closed_test_connection(), 1);
+
+    _delete_handler_file_test(context, http_request, handler_file_context);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_handler_file_missing_template(void) {
+    /* allocates space for the chain of the connection, for the
+    message being served and for the responses it produces */
+    struct test_context_t *context;
+    struct http_request_t *http_request;
+    struct handler_file_context_t *handler_file_context;
+    struct template_cache_entry_t *entry;
+    unsigned char written[2048];
+    size_t size;
+    ERROR_CODE error;
+
+    _create_handler_file_test(&context, &http_request, &handler_file_context);
+
+    /* asks for the errors to be built out of their template and
+    points the resources of the service at the directory of the
+    process, which is where the template is written */
+    context->options->use_template = 1;
+    SPRINTF((char *) context->options->resources_path, VIRIATUM_MAX_PATH_SIZE, "%s", ".");
+    _write_template_handler_file_test(
+        (char *) HANDLER_FILE_TEST_ERROR,
+        "<e>${out value=error_code /}</e>"
+    );
+
+    /* the page of the error is built out of the template, the code
+    of the error being what the template prints */
+    error = url_callback_handler_file(http_request, (unsigned char *) "/absent.txt", 11);
+    V_ASSERT(error == 0);
+    error = message_complete_callback_handler_file(http_request);
+    V_ASSERT(error == 0);
+
+    size = flush_test_connection(context, written, sizeof(written));
+    V_ASSERT(size > 0 && size < sizeof(written));
+    written[size] = '\0';
+
+    V_ASSERT(strstr((char *) written, "HTTP/1.1 404 Not Found\r\n") == (char *) written);
+    V_ASSERT_NOT_NULL(strstr((char *) written, "Content-Length: 10\r\n"));
+    V_ASSERT_NOT_NULL(strstr((char *) written, "\r\n\r\n<e>404</e>"));
+
+    /* the template is rewritten underneath the live service, the
+    next page is built out of it as it now stands and never out of
+    the tree that the service is holding of it */
+    _write_template_handler_file_test(
+        (char *) HANDLER_FILE_TEST_ERROR,
+        "<err>${out value=error_message /}</err>"
+    );
+    size = _serve_handler_file_test(context, "/absent.txt", written, sizeof(written));
+    V_ASSERT(size > 0);
+    V_ASSERT(strstr((char *) written, "HTTP/1.1 404 Not Found\r\n") == (char *) written);
+    V_ASSERT_NOT_NULL(strstr((char *) written, "\r\n\r\n<err>Not Found</err>"));
+
+    /* with the template gone and the entry of it past the time it is
+    trusted for, the page falls back on the text of the error, the
+    very way it does for an installation that carries no template */
+    _remove_template_handler_file_test((char *) HANDLER_FILE_TEST_ERROR);
+    entry = &context->service->template_cache->entries[_calculate_string_hash_map((unsigned char *) HANDLER_FILE_TEST_ERROR) % CACHE_SIZE_TEMPLATE_HANDLER];
+    V_ASSERT_EQ_S((char *) entry->path, HANDLER_FILE_TEST_ERROR);
+    entry->checked = 0;
+    size = _serve_handler_file_test(context, "/absent.txt", written, sizeof(written));
+    V_ASSERT(size > 0);
+    V_ASSERT_NOT_NULL(strstr((char *) written, "\r\n\r\n404 - Not Found - "));
+    V_ASSERT_EQ_U(get_closed_test_connection(), 0);
 
     _delete_handler_file_test(context, http_request, handler_file_context);
 
@@ -862,6 +1063,186 @@ const char *test_handler_file_directory(void) {
     V_ASSERT_NOT_NULL(strstr((char *) written, "Content-Length: 0\r\n"));
     V_ASSERT_NOT_NULL(strstr((char *) written, "Location: /./\r\n"));
 
+    _delete_handler_file_test(context, http_request, handler_file_context);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_handler_file_listing(void) {
+    /* allocates space for the chain of the connection, for the
+    message being served and for the response it produces, the
+    listing of the directory of the process being of a size that
+    depends on whatever else is sitting there */
+    struct test_context_t *context;
+    struct http_request_t *http_request;
+    struct handler_file_context_t *handler_file_context;
+    unsigned char written[16384];
+    size_t size;
+    int counted;
+    int announced;
+    char *body;
+    ERROR_CODE error;
+
+    _create_handler_file_test(&context, &http_request, &handler_file_context);
+
+    /* points the resources of the service at the directory of the
+    process and writes the template of the listing there, one that
+    names every entry between brackets and closes with the count */
+    SPRINTF((char *) context->options->resources_path, VIRIATUM_MAX_PATH_SIZE, "%s", ".");
+    _write_template_handler_file_test(
+        (char *) HANDLER_FILE_TEST_LISTING,
+        "${foreach item=entry from=entries}[${out value=entry.name /}]${/foreach}(${out value=items /})"
+    );
+
+    /* asks for the directory the process runs from, the file that
+    the fixture wrote into it is among the entries the page lists
+    and so is the directory the template was written into */
+    error = url_callback_handler_file(http_request, (unsigned char *) "/", 1);
+    V_ASSERT(error == 0);
+    error = message_complete_callback_handler_file(http_request);
+    V_ASSERT(error == 0);
+
+    size = flush_test_connection(context, written, sizeof(written) - 1);
+    V_ASSERT(size > 0 && size < sizeof(written) - 1);
+    written[size] = '\0';
+
+    V_ASSERT(strstr((char *) written, "HTTP/1.1 200 OK\r\n") == (char *) written);
+    V_ASSERT_NOT_NULL(strstr((char *) written, "[" HANDLER_FILE_TEST_NAME "]"));
+    V_ASSERT_NOT_NULL(strstr((char *) written, "[templates]"));
+
+    /* the count that closes the page agrees with the entries that
+    it names and the length that is announced is the length of the
+    page that follows the headers */
+    _count_listing_handler_file_test(written, &counted, &announced);
+    V_ASSERT(counted > 0);
+    V_ASSERT_EQ_I(announced, counted);
+    body = strstr((char *) written, "\r\n\r\n");
+    V_ASSERT_NOT_NULL(body);
+    V_ASSERT_NOT_NULL(strstr((char *) written, "Content-Length: "));
+    V_ASSERT_EQ_U(
+        (size_t) atoi(strstr((char *) written, "Content-Length: ") + 16),
+        strlen(body + 4)
+    );
+    V_ASSERT_EQ_U(get_closed_test_connection(), 0);
+
+    _remove_template_handler_file_test((char *) HANDLER_FILE_TEST_LISTING);
+    _delete_handler_file_test(context, http_request, handler_file_context);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_handler_file_listing_changed(void) {
+    /* allocates space for the chain of the connection, for the
+    message being served and for the responses it produces */
+    struct test_context_t *context;
+    struct http_request_t *http_request;
+    struct handler_file_context_t *handler_file_context;
+    unsigned char written[16384];
+    size_t size;
+    int counted;
+    int announced;
+    int before;
+
+    _create_handler_file_test(&context, &http_request, &handler_file_context);
+    SPRINTF((char *) context->options->resources_path, VIRIATUM_MAX_PATH_SIZE, "%s", ".");
+    _write_template_handler_file_test(
+        (char *) HANDLER_FILE_TEST_LISTING,
+        "${foreach item=entry from=entries}[${out value=entry.name /}]${/foreach}(${out value=items /})"
+    );
+
+    /* the directory is listed as it stands, the entry that is about
+    to be added to it is nowhere in the page */
+    size = _serve_handler_file_test(context, "/", written, sizeof(written));
+    V_ASSERT(size > 0);
+    V_ASSERT_NULL(strstr((char *) written, "[" HANDLER_FILE_TEST_ADDED "]"));
+    _count_listing_handler_file_test(written, &counted, &announced);
+    V_ASSERT_EQ_I(announced, counted);
+    before = counted;
+
+    /* a file is added to the directory between two requests, the
+    second of them lists it, a listing held from the first would
+    have answered with a directory that no longer exists */
+    write_file((char *) "./" HANDLER_FILE_TEST_ADDED, (unsigned char *) "viriatum", 8);
+    size = _serve_handler_file_test(context, "/", written, sizeof(written));
+    V_ASSERT(size > 0);
+    V_ASSERT_NOT_NULL(strstr((char *) written, "[" HANDLER_FILE_TEST_ADDED "]"));
+    _count_listing_handler_file_test(written, &counted, &announced);
+    V_ASSERT_EQ_I(announced, counted);
+    V_ASSERT_EQ_I(counted, before + 1);
+
+    /* and once the file is gone again so is the entry of it */
+    remove("./" HANDLER_FILE_TEST_ADDED);
+    size = _serve_handler_file_test(context, "/", written, sizeof(written));
+    V_ASSERT(size > 0);
+    V_ASSERT_NULL(strstr((char *) written, "[" HANDLER_FILE_TEST_ADDED "]"));
+    _count_listing_handler_file_test(written, &counted, &announced);
+    V_ASSERT_EQ_I(counted, before);
+    V_ASSERT_EQ_U(get_closed_test_connection(), 0);
+
+    _remove_template_handler_file_test((char *) HANDLER_FILE_TEST_LISTING);
+    _delete_handler_file_test(context, http_request, handler_file_context);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_handler_file_listing_template(void) {
+    /* allocates space for the chain of the connection, for the
+    message being served, for the responses it produces and for the
+    entry of the cache that holds the template of the listing */
+    struct test_context_t *context;
+    struct http_request_t *http_request;
+    struct handler_file_context_t *handler_file_context;
+    struct template_cache_entry_t *entry;
+    struct template_node_t *root;
+    unsigned char written[16384];
+    size_t size;
+
+    _create_handler_file_test(&context, &http_request, &handler_file_context);
+    SPRINTF((char *) context->options->resources_path, VIRIATUM_MAX_PATH_SIZE, "%s", ".");
+    _write_template_handler_file_test(
+        (char *) HANDLER_FILE_TEST_LISTING,
+        "A:${out value=items /}"
+    );
+
+    /* the first page is built out of the template as written and
+    leaves the service holding the tree that was parsed out of it */
+    size = _serve_handler_file_test(context, "/", written, sizeof(written));
+    V_ASSERT(size > 0);
+    V_ASSERT(strstr((char *) written, "HTTP/1.1 200 OK\r\n") == (char *) written);
+    V_ASSERT_NOT_NULL(strstr((char *) written, "\r\n\r\nA:"));
+
+    entry = &context->service->template_cache->entries[_calculate_string_hash_map((unsigned char *) HANDLER_FILE_TEST_LISTING) % CACHE_SIZE_TEMPLATE_HANDLER];
+    V_ASSERT_EQ_S((char *) entry->path, HANDLER_FILE_TEST_LISTING);
+    V_ASSERT_NOT_NULL(entry->root);
+    root = entry->root;
+
+    /* a second page out of the very same template is rendered out of
+    the tree that is held, the file is not parsed again for it */
+    size = _serve_handler_file_test(context, "/", written, sizeof(written));
+    V_ASSERT(size > 0);
+    V_ASSERT_NOT_NULL(strstr((char *) written, "\r\n\r\nA:"));
+    V_ASSERT_EQ_P(entry->root, root);
+
+    /* the template is rewritten underneath the live service, the
+    next page is built out of it as it now stands, the tree that was
+    held describing a file that is no longer there */
+    _write_template_handler_file_test(
+        (char *) HANDLER_FILE_TEST_LISTING,
+        "BB:${out value=items /}"
+    );
+    size = _serve_handler_file_test(context, "/", written, sizeof(written));
+    V_ASSERT(size > 0);
+    V_ASSERT_NOT_NULL(strstr((char *) written, "\r\n\r\nBB:"));
+    V_ASSERT_NULL(strstr((char *) written, "\r\n\r\nA:"));
+    V_ASSERT_EQ_U(get_closed_test_connection(), 0);
+
+    _remove_template_handler_file_test((char *) HANDLER_FILE_TEST_LISTING);
     _delete_handler_file_test(context, http_request, handler_file_context);
 
     /* returns the default value, nothing happened so there's
