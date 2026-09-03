@@ -42,13 +42,15 @@ static __inline char *get_base_path(void) {
     GetModuleFileName(NULL, base_path, VIRIATUM_MAX_PATH_SIZE);
     base_path_length = strlen(base_path);
 
-    for(index = base_path_length; index >= 0; index--) {
-        if(base_path[index] != '\\') { continue; }
+    /* walks the path backwards looking for the separator that closes
+    the directory the executable sits in, the index counts one above
+    the character it is looking at so that it never wraps around */
+    for(index = base_path_length; index > 0; index--) {
+        if(base_path[index - 1] != '\\') { continue; }
         break;
     }
 
-    memcpy(base_path, base_path, index);
-    base_path[index] = '\0';
+    base_path[index > 0 ? index - 1 : 0] = '\0';
 
     return base_path;
 }
@@ -123,6 +125,13 @@ static __inline char *get_config_path(void) {
 #ifdef VIRIATUM_PLATFORM_UNIX
 #ifdef VIRIATUM_PLATFORM_ANDROID
 #define VIRIATUM_DATA_PATH "/data/data/pt.hive.viriatum/files"
+
+/* the tree of the platform is the one the package was installed
+into, nothing is ever unpacked beside the binary there */
+static __inline char *get_base_path(void) {
+    return (char *) VIRIATUM_DATA_PATH "/viriatum";
+}
+
 #define VIRIATUM_MODULES_PATH VIRIATUM_DATA_PATH "/viriatum/modules"
 #define VIRIATUM_RESOURCES_PATH VIRIATUM_DATA_PATH "/viriatum/www"
 #define VIRIATUM_CONFIG_PATH VIRIATUM_DATA_PATH "/viriatum/config"
@@ -136,6 +145,74 @@ static __inline char *get_config_path(void) {
 #define VIRIATUM_EMBED
 #endif
 #else
+
+static char base_path[VIRIATUM_MAX_PATH_SIZE] = {'\0'};
+
+static __inline char *get_base_path(void) {
+    size_t index;
+    size_t base_path_length = 0;
+#ifdef VIRIATUM_PLATFORM_MACOSX
+    char *resolved;
+    char launch_path[VIRIATUM_MAX_PATH_SIZE];
+    uint32_t buffer_size = VIRIATUM_MAX_PATH_SIZE;
+#elif defined(VIRIATUM_PLATFORM_LINUX)
+    ssize_t read_size;
+#endif
+
+    /* in case the path has already been resolved gives it back, the
+    executable of a process never moves while it is running */
+    if(base_path[0] != '\0') { return base_path; }
+
+    /* asks for the name of the executable, the loader answering it on
+    one of the platforms and the file system of the process on the
+    other, a platform that offers neither leaves the path empty and so
+    goes on with the tree the binary was built with */
+#ifdef VIRIATUM_PLATFORM_MACOSX
+    /* the loader gives back the name the process was launched through,
+    which may be a link into the tree rather than the binary of it, so
+    the real one is asked for before anything is taken from it, a name
+    that cannot be resolved being kept the way it came, note that the
+    null based variant of the resolution is used so that the buffer is
+    allocated with the proper size, the in place one requires one of at
+    least PATH_MAX bytes and the runtime aborts the process otherwise */
+    if(_NSGetExecutablePath(launch_path, &buffer_size) == 0) {
+        resolved = realpath(launch_path, NULL);
+        if(resolved != NULL && strlen(resolved) < VIRIATUM_MAX_PATH_SIZE) {
+            STRCPY(base_path, VIRIATUM_MAX_PATH_SIZE, resolved);
+        } else {
+            STRCPY(base_path, VIRIATUM_MAX_PATH_SIZE, launch_path);
+        }
+        free(resolved);
+        base_path_length = strlen(base_path);
+    }
+#elif defined(VIRIATUM_PLATFORM_LINUX)
+    read_size = readlink("/proc/self/exe", base_path, VIRIATUM_MAX_PATH_SIZE - 1);
+    if(read_size > 0) {
+        base_path[read_size] = '\0';
+        base_path_length = (size_t) read_size;
+    }
+#endif
+
+    /* nothing was resolved, the caller is the one that decides what to
+    do without a directory to hang the rest of the tree from */
+    if(base_path_length == 0) {
+        base_path[0] = '\0';
+        return base_path;
+    }
+
+    /* walks the path backwards looking for the separator that closes
+    the directory the executable sits in, the index counts one above
+    the character it is looking at so that it never wraps around */
+    for(index = base_path_length; index > 0; index--) {
+        if(base_path[index - 1] != '/') { continue; }
+        break;
+    }
+
+    base_path[index > 0 ? index - 1 : 0] = '\0';
+
+    return base_path;
+}
+
 #ifndef VIRIATUM_MODULES_PATH
 #define VIRIATUM_MODULES_PATH "/usr/lib/viriatum/modules"
 #endif
@@ -161,6 +238,13 @@ static __inline char *get_config_path(void) {
 #define VIRIATUM_PID_PATH "/var/run/viriatum.pid"
 #define VIRIATUM_MODULE_PREFIX sizeof("libviriatum_mod_") - 1
 #endif
+
+/**
+ * The path of the configuration file that a tree which was
+ * unpacked rather than installed carries, taken from the
+ * directory that the binary of it sits in.
+ */
+#define VIRIATUM_BUNDLE_CONFIG_PATH VIRIATUM_PATH_SEPARATOR "config" VIRIATUM_PATH_SEPARATOR "viriatum.ini"
 
 #define VIRIATUM_NAME "viriatum"
 #define VIRIATUM_VERSION TOSTRING(VIRIATUM_MAJOR) "." TOSTRING(VIRIATUM_MINOR) "." TOSTRING(VIRIATUM_MICRO) VIRIATUM_STAGE

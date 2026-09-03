@@ -60,6 +60,34 @@ const char *test_delete_service(void);
 const char *test_create_service_options(void);
 
 /**
+ * Tests the resolving of the directory that the binary
+ * of the process sits in.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_base_path_service(void);
+
+/**
+ * Tests the preferring of a directory that sits beside
+ * the binary over the one built into the binary.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_bundled_path_service(void);
+
+/**
+ * Tests the resolving of the paths of a service, both
+ * the ones taken from the tree and the ones that a web
+ * root set on the options overrides.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_calculate_options_service(void);
+
+/**
  * Tests the locations calculation against a service
  * that has no configuration currently loaded.
  *
