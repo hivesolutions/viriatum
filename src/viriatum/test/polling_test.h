@@ -56,6 +56,17 @@ const char *test_polling_read(void);
 const char *test_polling_write(void);
 
 /**
+ * Tests the sending of the values queued on a connection, the
+ * headers of a response and the payload behind them going out
+ * together and a value too large for the socket waiting with
+ * what is left of it.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_polling_gather(void);
+
+/**
  * Tests that a connection with something waiting on it is
  * handed back by the waiting and that the handler of the
  * reading is called for it.

@@ -387,6 +387,18 @@ ERROR_CODE read_handler_stream_io(struct connection_t *connection) {
         /* in case the viriatum is set to blocking must break
         the loop, no more that one read operation is allowed */
         if(!VIRIATUM_NON_BLOCKING) { break; }
+
+        /* a read that came back with less than was asked for has
+        emptied the socket at that moment, whatever arrives after it
+        raises an event of its own, so the read that would only come
+        back with nothing to report is never made, a secure connection
+        hands back a record at a time and says nothing of the socket
+        underneath it, so that one goes on reading until told to stop */
+#ifdef VIRIATUM_SSL
+        if(connection->ssl_handle == NULL && (size_t) number_bytes < VIRIATUM_READ_SIZE) { break; }
+#else
+        if((size_t) number_bytes < VIRIATUM_READ_SIZE) { break; }
+#endif
     }
 
     /* switches over the error flag and value */
@@ -477,6 +489,16 @@ ERROR_CODE write_handler_stream_io(struct connection_t *connection) {
     /* allocates the data */
     struct data_t *data;
 
+#ifndef VIRIATUM_PLATFORM_WIN32
+    /* allocates space for the buffers that are handed to the kernel
+    together, for the message that carries them, for the node of the
+    queue being walked to gather them and for their count */
+    struct iovec buffers[WRITE_BUFFERS_STREAM_IO];
+    struct msghdr message;
+    struct linked_list_node_t *node;
+    size_t count;
+#endif
+
     /* flag and value controlling the state of the write */
     ERROR_CODE error = 0;
 
@@ -506,6 +528,42 @@ ERROR_CODE write_handler_stream_io(struct connection_t *connection) {
         if(connection->ssl_handle != NULL) { ERR_clear_error(); }
 #endif
 
+#ifndef VIRIATUM_PLATFORM_WIN32
+        /* a response is queued as its headers and then the payload that
+        follows them, and the two of them go out in a single call into
+        the kernel rather than in one each, the values at the head of
+        the queue are gathered up to a bound, a secure connection writes
+        through the library one value at a time and is sent below */
+        count = 0;
+#ifdef VIRIATUM_SSL
+        if(connection->ssl_handle == NULL && connection->write_queue->size > 1) {
+#else
+        if(connection->write_queue->size > 1) {
+#endif
+            node = connection->write_queue->first;
+            while(node != NULL && count < WRITE_BUFFERS_STREAM_IO) {
+                buffers[count].iov_base = (void *) ((struct data_t *) node->value)->data;
+                buffers[count].iov_len = ((struct data_t *) node->value)->size;
+                count++;
+                node = node->next;
+            }
+            memset(&message, 0, sizeof(message));
+            message.msg_iov = buffers;
+            message.msg_iovlen = count;
+            number_bytes = SOCKET_SEND_MESSAGE(connection->socket_handle, &message, 0);
+        }
+        /* otherwise a single value is sent into the connection socket
+        (takes into account the type of socket in use) should be able
+        to take care of secure connections */
+        else {
+            number_bytes = CONNECTION_SEND(
+                connection,
+                (char *) data->data,
+                data->size,
+                0
+            );
+        }
+#else
         /* sends the value into the connection socket (takes into account the type
         of socket in use) should be able to take care of secure connections */
         number_bytes = CONNECTION_SEND(
@@ -514,6 +572,7 @@ ERROR_CODE write_handler_stream_io(struct connection_t *connection) {
             data->size,
             0
         );
+#endif
         connection->sent += number_bytes;
 
         /* in case there was an error receiving from the socket */
@@ -563,50 +622,74 @@ ERROR_CODE write_handler_stream_io(struct connection_t *connection) {
         /* prints a debug message */
         V_DEBUG_F("Data [%d bytes] sent without errors\n", number_bytes);
 
-        /* in case the number of bytes sent is the same as the value size
-        (not all data has been sent) */
-        if(number_bytes != data->size) {
+        /* walks the values that the bytes sent cover, the ones that
+        went out whole are taken out of the queue one by one and the
+        one that went out in part, if any, is left waiting */
+        while(TRUE) {
+            /* in case the number of bytes sent is smaller than the value
+            size (not all data has been sent) */
+            if((size_t) number_bytes < data->size) {
+                /* prints a debug message */
+                V_DEBUG_F("Shrinking data [%d bytes] (partial message sent)\n", number_bytes);
+
+                /* updates the data internal structure
+                to allow the sending of the pending partial data */
+                data->data += number_bytes;
+                data->size -= number_bytes;
+
+                /* sets the error flag (non fatal) */
+                error = 2;
+
+                /* breaks the loop */
+                break;
+            }
+
+            /* deducts the size of the value from the bytes that are
+            still to be accounted for, the ones that follow it may
+            well have gone out in the very same call */
+            number_bytes -= (SOCKET_ERROR_CODE) data->size;
+
+            /* pops a value (data) from the linked list (write queue)
+            this way the item will not be re-used again */
+            pop_value_linked_list(connection->write_queue, (void **) &data, TRUE);
+
+            /* in case the data callback is set */
+            if(data->callback != NULL) {
+                /* prints some debug information about the calling of the callback
+                associated with the data and then calls the callback associated */
+                V_DEBUG("Calling write callback\n");
+                data->callback(connection, data, data->callback_parameters);
+                V_DEBUG("Finished calling write callback\n");
+            }
+
             /* prints a debug message */
-            V_DEBUG_F("Shrinking data [%d bytes] (partial message sent)\n", number_bytes);
+            V_DEBUG("Deleting data (cleanup structures)\n");
 
-            /* updates the data internal structure
-            to allow the sending of the pending partial data */
-            data->data += number_bytes;
-            data->size -= number_bytes;
+            /* deletes the data, this should remove the underlying
+            buffer in case the flag for such operation is set */
+            delete_data(data);
 
-            /* sets the error flag (non fatal) */
-            error = 2;
+            /* in case the connection has been closed sets the
+            error flag to non fatal and then breaks the loop */
+            if(connection->status == STATUS_CLOSED) {
+                error = 2;
+                break;
+            }
 
-            /* breaks the loop */
-            break;
+            /* in case every byte that went out has been accounted for
+            there is nothing more to be walked, the value that follows
+            is peeked at by the outer loop and sent on its own turn */
+            if(number_bytes == 0) { break; }
+
+            /* peeks the value that the remaining bytes belong to, a
+            queue that is left with none is not one that was sent from */
+            peek_value_linked_list(connection->write_queue, (void **) &data);
+            if(data == NULL) { break; }
         }
 
-        /* pops a value (data) from the linked list (write queue)
-        this way the item will not be re-used again */
-        pop_value_linked_list(connection->write_queue, (void **) &data, TRUE);
-
-        /* in case the data callback is set */
-        if(data->callback != NULL) {
-            /* prints some debug information about the calling of the callback
-            associated with the data and then calls the callback associated */
-            V_DEBUG("Calling write callback\n");
-            data->callback(connection, data, data->callback_parameters);
-            V_DEBUG("Finished calling write callback\n");
-        }
-
-        /* prints a debug message */
-        V_DEBUG("Deleting data (cleanup structures)\n");
-
-        /* deletes the data, this should remove the underlying
-        buffer in case the flag for such operation is set */
-        delete_data(data);
-
-        /* in case the connection has been closed sets the
-        error flag to non fatal and then breaks the loop */
-        if(connection->status == STATUS_CLOSED) {
-            error = 2;
-            break;
-        }
+        /* in case an error (or a closing) was flagged while walking
+        the values sent there is nothing more to be sent */
+        if(error != 0) { break; }
     }
 
     /* prints a debug message */

@@ -2617,6 +2617,7 @@ static struct test_entry_t _simple_entries[] = {
     V_TEST_T(test_polling_connection, "polling"),
     V_TEST_T(test_polling_read, "polling"),
     V_TEST_T(test_polling_write, "polling"),
+    V_TEST_T(test_polling_gather, "polling"),
     V_TEST_T(test_polling_event, "polling"),
     V_TEST_T(test_polling_closed, "polling"),
     V_TEST_T(test_polling_gone, "polling"),
