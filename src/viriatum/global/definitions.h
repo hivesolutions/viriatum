@@ -152,8 +152,10 @@ static __inline char *get_base_path(void) {
     size_t index;
     size_t base_path_length = 0;
 #ifdef VIRIATUM_PLATFORM_MACOSX
+    char *resolved;
+    char launch_path[VIRIATUM_MAX_PATH_SIZE];
     uint32_t buffer_size = VIRIATUM_MAX_PATH_SIZE;
-#else
+#elif defined(VIRIATUM_PLATFORM_LINUX)
     ssize_t read_size;
 #endif
 
@@ -163,12 +165,27 @@ static __inline char *get_base_path(void) {
 
     /* asks for the name of the executable, the loader answering it on
     one of the platforms and the file system of the process on the
-    other, a failure of either leaves the path empty */
+    other, a platform that offers neither leaves the path empty and so
+    goes on with the tree the binary was built with */
 #ifdef VIRIATUM_PLATFORM_MACOSX
-    if(_NSGetExecutablePath(base_path, &buffer_size) == 0) {
+    /* the loader gives back the name the process was launched through,
+    which may be a link into the tree rather than the binary of it, so
+    the real one is asked for before anything is taken from it, a name
+    that cannot be resolved being kept the way it came, note that the
+    null based variant of the resolution is used so that the buffer is
+    allocated with the proper size, the in place one requires one of at
+    least PATH_MAX bytes and the runtime aborts the process otherwise */
+    if(_NSGetExecutablePath(launch_path, &buffer_size) == 0) {
+        resolved = realpath(launch_path, NULL);
+        if(resolved != NULL && strlen(resolved) < VIRIATUM_MAX_PATH_SIZE) {
+            STRCPY(base_path, VIRIATUM_MAX_PATH_SIZE, resolved);
+        } else {
+            STRCPY(base_path, VIRIATUM_MAX_PATH_SIZE, launch_path);
+        }
+        free(resolved);
         base_path_length = strlen(base_path);
     }
-#else
+#elif defined(VIRIATUM_PLATFORM_LINUX)
     read_size = readlink("/proc/self/exe", base_path, VIRIATUM_MAX_PATH_SIZE - 1);
     if(read_size > 0) {
         base_path[read_size] = '\0';
@@ -221,6 +238,13 @@ static __inline char *get_base_path(void) {
 #define VIRIATUM_PID_PATH "/var/run/viriatum.pid"
 #define VIRIATUM_MODULE_PREFIX sizeof("libviriatum_mod_") - 1
 #endif
+
+/**
+ * The path of the configuration file that a tree which was
+ * unpacked rather than installed carries, taken from the
+ * directory that the binary of it sits in.
+ */
+#define VIRIATUM_BUNDLE_CONFIG_PATH VIRIATUM_PATH_SEPARATOR "config" VIRIATUM_PATH_SEPARATOR "viriatum.ini"
 
 #define VIRIATUM_NAME "viriatum"
 #define VIRIATUM_VERSION TOSTRING(VIRIATUM_MAJOR) "." TOSTRING(VIRIATUM_MINOR) "." TOSTRING(VIRIATUM_MICRO) VIRIATUM_STAGE

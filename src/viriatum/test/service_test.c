@@ -82,11 +82,18 @@ const char *test_base_path_service(void) {
     unpacked rather than installed is found from */
     base_path = get_base_path();
     V_ASSERT_NOT_NULL(base_path);
-    V_ASSERT_M(base_path[0] != '\0', "the base path was not resolved");
 
     /* the resolving happens once and is kept, a second call gives
     back the very same buffer rather than doing it again */
     V_ASSERT_EQ_P(get_base_path(), base_path);
+
+    /* the platforms that are able to ask for the name of their own
+    executable always resolve it, the ones that are not are left with
+    an empty path and nothing more may be said about it */
+#if defined(VIRIATUM_PLATFORM_WIN32) || defined(VIRIATUM_PLATFORM_MACOSX) || defined(VIRIATUM_PLATFORM_LINUX)
+    V_ASSERT_M(base_path[0] != '\0', "the base path was not resolved");
+#endif
+    if(base_path[0] == '\0') { return NULL; }
 
     /* what it names is a directory, the one holding the binary, and
     it never carries the separator that closed it */
@@ -94,16 +101,37 @@ const char *test_base_path_service(void) {
     V_ASSERT_M(is_directory, "the base path is not a directory");
     V_ASSERT(base_path[strlen(base_path) - 1] != VIRIATUM_PATH_SEPARATOR_C);
 
+    /* the directory is named in absolute terms, the name the process
+    was launched through being resolved before anything is taken from
+    it, otherwise the tree would move with the process */
+#ifdef VIRIATUM_PLATFORM_WIN32
+    V_ASSERT(base_path[0] == VIRIATUM_PATH_SEPARATOR_C || base_path[1] == ':');
+#else
+    V_ASSERT(base_path[0] == VIRIATUM_PATH_SEPARATOR_C);
+#endif
+
     /* returns the default value, nothing happened so there's
     nothing to report for this execution */
     return NULL;
 }
 
 const char *test_bundled_path_service(void) {
-    /* allocates space for the path that is resolved and for the one
+    /* allocates space for the path that is resolved, for the name
+    that is built to the length that is under test and for the one
     that stands for a tree that was installed rather than unpacked */
     unsigned char path[VIRIATUM_MAX_PATH_SIZE];
+    char name[VIRIATUM_MAX_PATH_SIZE];
+    size_t name_length;
     const char *fallback = "viriatum-installed-tree";
+
+    /* a tree beside the binary only exists once the directory of it
+    has been resolved, a platform that is unable to ask for it keeps
+    the tree it was built with and prefers nothing over it */
+    if(get_base_path()[0] == '\0') {
+        _bundled_path_service(path, "..", fallback);
+        V_ASSERT_EQ_S((char *) path, fallback);
+        return NULL;
+    }
 
     /* a name that is really a directory beside the binary is the one
     that is kept, the parent of it being one on every platform */
@@ -124,6 +152,98 @@ const char *test_bundled_path_service(void) {
     than a missing one is, so it falls back just the same */
     _bundled_path_service(path, VIRIATUM_NAME, fallback);
     V_ASSERT_EQ_S((char *) path, fallback);
+
+    /* the longest name that still fits beside the base path is built
+    the way any other one is, the path of it filling the buffer that
+    holds it right up to the end of it */
+    name_length = VIRIATUM_MAX_PATH_SIZE - strlen(get_base_path()) - 2;
+    V_ASSERT(name_length > 0 && name_length < VIRIATUM_MAX_PATH_SIZE);
+    memset(name, 'v', name_length);
+    name[name_length] = '\0';
+    _bundled_path_service(path, name, fallback);
+    V_ASSERT_EQ_S((char *) path, fallback);
+
+    /* one character more than that no longer fits, the path of it is
+    never built so that nothing is written past the end of the buffer
+    that was handed over to hold it */
+    name[name_length] = 'v';
+    name[name_length + 1] = '\0';
+    _bundled_path_service(path, name, fallback);
+    V_ASSERT_EQ_S((char *) path, fallback);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_calculate_options_service(void) {
+    /* allocates space for the error code returned by the options
+    calculation, for the service that carries them and for the map
+    of arguments that the loading of the defaults takes */
+    ERROR_CODE error;
+    struct service_t *service;
+    struct hash_map_t *arguments;
+
+    /* allocates space for the directory that stands in for a web
+    root and for the absolute form that it is resolved into */
+    char current_directory[VIRIATUM_MAX_PATH_SIZE];
+    char expected_path[VIRIATUM_MAX_PATH_SIZE];
+
+    /* retrieves the working directory of the process, the only one
+    that is known to exist on every machine the tests run on */
+    if(CURRENT_DIRECTORY(current_directory, VIRIATUM_MAX_PATH_SIZE) == NULL) {
+        return "problem retrieving the current directory";
+    }
+
+    /* creates the service and the empty arguments map that the
+    loading of the default options takes */
+    create_service(
+        &service,
+        (unsigned char *) "test",
+        (unsigned char *) "test"
+    );
+    create_hash_map(&arguments, 0);
+    V_ASSERT(service->options->www_root[0] == '\0');
+
+    /* the web root stands for the override that the configuration and
+    the command line carry, the loading of the defaults never sets it
+    or the tree beside the binary would never be preferred */
+    _default_options_service(service, arguments);
+    V_ASSERT_M(
+        service->options->www_root[0] == '\0',
+        "the loading of the default options set a web root"
+    );
+
+    /* with no web root set both the contents and the resources come
+    from the same tree, the one beside the binary when it was unpacked
+    and the one it was built with when it was installed */
+    error = calculate_options_service(service);
+    V_ASSERT(!IS_ERROR_CODE(error));
+    V_ASSERT_EQ_S(
+        (char *) service->options->contents_path,
+        (char *) service->options->resources_path
+    );
+    V_ASSERT(service->options->modules_path[0] != '\0');
+
+    /* a web root that was set overrides both of them, the modules
+    being resolved on their own and so never following it */
+    SPRINTF(
+        (char *) service->options->www_root,
+        VIRIATUM_MAX_PATH_SIZE, "%s", current_directory
+    );
+    error = calculate_options_service(service);
+    V_ASSERT(!IS_ERROR_CODE(error));
+
+    STRCPY(expected_path, VIRIATUM_MAX_PATH_SIZE, current_directory);
+    absolute_path_file(expected_path, TRUE);
+    V_ASSERT_EQ_S((char *) service->options->contents_path, expected_path);
+    V_ASSERT_EQ_S((char *) service->options->resources_path, expected_path);
+    V_ASSERT(strcmp((char *) service->options->modules_path, expected_path) != 0);
+
+    /* deletes the arguments map and the service releasing every
+    internal structure that has been created */
+    delete_hash_map(arguments);
+    delete_service(service);
 
     /* returns the default value, nothing happened so there's
     nothing to report for this execution */

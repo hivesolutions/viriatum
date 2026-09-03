@@ -352,18 +352,24 @@ ERROR_CODE load_options_service(struct service_t *service, struct hash_map_t *ar
 
 void _bundled_path_service(unsigned char *path, const char *name, const char *fallback) {
     /* allocates space for the flag that tells a directory apart from
-    whatever else may be sitting under the same name */
+    whatever else may be sitting under the same name and resolves the
+    directory that the binary of the process sits in */
     unsigned int is_directory = 0;
+    const char *base_path = get_base_path();
 
     /* builds the path that an unpacked archive would carry, which is
     the one beside the binary, and keeps it only when it is really
-    there, a tree that was installed keeps the path it was built with */
-    SPRINTF(
-        (char *) path, VIRIATUM_MAX_PATH_SIZE,
-        "%s" VIRIATUM_PATH_SEPARATOR "%s", get_base_path(), name
-    );
-    is_directory_file((char *) path, &is_directory);
-    if(is_directory) { return; }
+    there, a tree that was installed keeps the path it was built with,
+    a base path that was not resolved or one that leaves no room for
+    the name naming no such tree and so being skipped altogether */
+    if(base_path[0] != '\0' && strlen(base_path) + strlen(name) + 2 <= VIRIATUM_MAX_PATH_SIZE) {
+        SPRINTF(
+            (char *) path, VIRIATUM_MAX_PATH_SIZE,
+            "%s" VIRIATUM_PATH_SEPARATOR "%s", base_path, name
+        );
+        is_directory_file((char *) path, &is_directory);
+        if(is_directory) { return; }
+    }
 
     SPRINTF((char *) path, VIRIATUM_MAX_PATH_SIZE, "%s", fallback);
 }
@@ -2264,16 +2270,10 @@ ERROR_CODE _default_options_service(struct service_t *service, struct hash_map_t
     service_options->default_index = VIRIATUM_DEFAULT_INDEX;
     service_options->use_template = VIRIATUM_DEFAULT_USE_TEMPLATE;
 
-    /* sets the default www root directory from the statically defined values
-    and converts the value to an absolute path */
-    if(VIRIATUM_WWW_ROOT[0] != '\0') {
-        SPRINTF(
-            (char *) service->options->www_root,
-            VIRIATUM_MAX_PATH_SIZE, "%s",
-            VIRIATUM_WWW_ROOT
-        );
-        absolute_path_file((char *) service->options->www_root, TRUE);
-    }
+    /* the www root is left unset, it stands for the override that the
+    configuration or the command line carry rather than for the path
+    the binary was built with, which reaches the contents and the
+    resources as the fallback of the tree beside the binary */
 
     /* sets the default and statically defined mime type values
     for the evaluation of the basic file extensions */
@@ -2513,23 +2513,28 @@ ERROR_CODE _file_options_service(struct service_t *service, struct hash_map_t *a
     path relative to the source tree for development convenience */
     {
         char bundle_path[VIRIATUM_MAX_PATH_SIZE];
+        const char *base_path = get_base_path();
         const char *candidates[4];
-        size_t candidate_count = sizeof(candidates) / sizeof(candidates[0]);
+        size_t candidate_count = 0;
         size_t candidate_index;
+
+        candidates[candidate_count++] = NULL;
 
         /* the configuration that an unpacked archive carries, which
         sits in the tree beside the binary rather than in the one of
-        the system, and is looked at right after it */
-        SPRINTF(
-            bundle_path, VIRIATUM_MAX_PATH_SIZE,
-            "%s" VIRIATUM_PATH_SEPARATOR "config" VIRIATUM_PATH_SEPARATOR "viriatum.ini",
-            get_base_path()
-        );
+        the system, and is looked at right after it, a base path that
+        was not resolved or one that leaves no room for the name of
+        the file naming no such configuration */
+        if(base_path[0] != '\0' && strlen(base_path) + sizeof(VIRIATUM_BUNDLE_CONFIG_PATH) <= VIRIATUM_MAX_PATH_SIZE) {
+            SPRINTF(
+                bundle_path, VIRIATUM_MAX_PATH_SIZE, "%s" VIRIATUM_BUNDLE_CONFIG_PATH,
+                base_path
+            );
+            candidates[candidate_count++] = bundle_path;
+        }
 
-        candidates[0] = NULL;
-        candidates[1] = bundle_path;
-        candidates[2] = "./viriatum.ini";
-        candidates[3] = "./src/viriatum/resources/config/viriatum/viriatum.ini";
+        candidates[candidate_count++] = "./viriatum.ini";
+        candidates[candidate_count++] = "./src/viriatum/resources/config/viriatum/viriatum.ini";
 
         return_value = 1;
         for(candidate_index = 0; candidate_index < candidate_count; candidate_index++) {
