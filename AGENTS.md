@@ -125,6 +125,8 @@ The service waits on its connections through `epoll` where it exists, `kqueue` w
 
 The files that the file handler serves are kept open in a cache of its own, one per worker process, so that serving a file again costs neither the opening of it nor the describing of it. The size of a held file is taken from its descriptor on every request, so a file written over in place is always served at the length it now has; a file **replaced** at the same path is picked up once the entry is looked at again, which is `CACHE_VALID_HANDLER_FILE` seconds at the latest. A path falls on exactly one entry, decided by the hash of it, and takes that entry over from whatever was there before.
 
+The templates that the listing and the error page are built out of are held parsed in a cache of the same shape, one per service, so that a page built out of one costs only its rendering. The held file is asked about itself on every request, so a template written over in place is parsed again as soon as its size or the moment of its last write moves; one **replaced** at the same path is opened and parsed again once the entry is looked at again, which is `CACHE_VALID_TEMPLATE_HANDLER` seconds at the latest, the very same period the file cache trusts an entry for. A template rewritten within the same second to exactly the same length is the one case the first check misses, and the second one bounds it.
+
 The methodology, the configuration each server is given and the reasoning behind every one of those choices are written down in `scripts/benchmark/README.md`. Anything that affects the comparison, such as the logging of a request or the pooling of an upstream connection, belongs there the moment it is changed.
 
 ## HTTP/2
