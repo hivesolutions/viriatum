@@ -46,9 +46,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Static files are now served considerably faster, ahead of the reference servers on the larger ones - [#49](https://github.com/hivesolutions/viriatum/issues/49)
 * Files that are served are now kept open, so serving one again costs neither opening nor describing it - [#49](https://github.com/hivesolutions/viriatum/issues/49)
 * The benchmark now holds every server to the number of processes the subject actually runs with - [#49](https://github.com/hivesolutions/viriatum/issues/49)
+* The templates of the listing and of the error page are now parsed once and held, a page built out of one costs only its rendering - [#77](https://github.com/hivesolutions/viriatum/issues/77)
+* Directory listings and error pages are now served considerably faster - [#77](https://github.com/hivesolutions/viriatum/issues/77)
+* Telling a directory from a file now costs a single call into the kernel rather than three - [#77](https://github.com/hivesolutions/viriatum/issues/77)
 
 ### Fixed
 
+* A template that closes a tag on its very last character no longer loses that tag - [#77](https://github.com/hivesolutions/viriatum/issues/77)
+* A template with a tag that misses its name or its parameters no longer brings the rendering down - [#77](https://github.com/hivesolutions/viriatum/issues/77)
 * Interrupting a server no longer skips the shutdown that a Python application is told about - [#60](https://github.com/hivesolutions/viriatum/issues/60)
 * Docker images of the PHP and full variants now build for the architecture of the machine instead of always amd64
 * A file served over HTTP/2 is now closed once the response has been sent - [#50](https://github.com/hivesolutions/viriatum/issues/50)
