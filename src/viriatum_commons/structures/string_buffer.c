@@ -35,14 +35,14 @@ void create_string_buffer(struct string_buffer_t **string_buffer_pointer) {
 
     /* sets the default values in the string buffer */
     string_buffer->string_length = 0;
+    string_buffer->count = 0;
+    string_buffer->capacity = DEFAULT_STRING_BUFFER_SIZE;
 
-    /* creates the list to hold the various strings
-    for the string buffer runtime */
-    create_linked_list(&string_buffer->string_list);
-
-    /* creates the list to hold the various strings
-    lengths for the string in the string buffer runtime */
-    create_linked_list(&string_buffer->length_list);
+    /* allocates the buffers to hold the various strings and
+    their lengths for the string buffer runtime, sized for a
+    few of them to begin with and grown as they fill up */
+    string_buffer->strings = (unsigned char **) MALLOC(sizeof(unsigned char *) * string_buffer->capacity);
+    string_buffer->lengths = (size_t *) MALLOC(sizeof(size_t) * string_buffer->capacity);
 
     /* creates the list to hold the various strings
     to have the memory released upon destruction */
@@ -73,11 +73,11 @@ void delete_string_buffer(struct string_buffer_t *string_buffer) {
     /* deletes the list of release strings from the string buffer */
     delete_linked_list(string_buffer->release_list);
 
-    /* deletes the list of lengths from the string buffer */
-    delete_linked_list(string_buffer->length_list);
-
-    /* deletes the list of strings from the string buffer */
-    delete_linked_list(string_buffer->string_list);
+    /* releases the buffers of lengths and of strings from the
+    string buffer, the strings themselves belong to whoever added
+    them unless they were handed over for release above */
+    FREE(string_buffer->lengths);
+    FREE(string_buffer->strings);
 
     /* releases the string buffer */
     FREE(string_buffer);
@@ -87,20 +87,34 @@ void append_string_buffer(struct string_buffer_t *string_buffer, unsigned char *
     /* retrieves the length of the string value */
     size_t string_value_length = strlen((char *) string_value);
 
-    /* adds the string value to the list of strings and then
-    increments the (total) string length with the length of
-    the current string value */
-    append_value_linked_list(string_buffer->string_list, (void *) string_value);
-    append_value_linked_list(string_buffer->length_list, (void *) string_value_length);
-    string_buffer->string_length += string_value_length;
+    /* adds the string value to the string buffer, using
+    the length oriented append function */
+    append_string_l_buffer(string_buffer, string_value, string_value_length);
 }
 
 void append_string_l_buffer(struct string_buffer_t *string_buffer, unsigned char *string_value, size_t string_length) {
-    /* adds the string value to the list of strings and then
-    increments the (total) string length with the length of
-    the current string value */
-    append_value_linked_list(string_buffer->string_list, (void *) string_value);
-    append_value_linked_list(string_buffer->length_list, (void *) string_length);
+    /* in case the buffers are full they are grown to twice their
+    size, the strings of a page are many and the growing of the
+    buffers a handful of times costs a fraction of what a node of
+    a list for every one of the strings did */
+    if(string_buffer->count == string_buffer->capacity) {
+        string_buffer->capacity *= 2;
+        string_buffer->strings = (unsigned char **) REALLOC(
+            (void *) string_buffer->strings,
+            sizeof(unsigned char *) * string_buffer->capacity
+        );
+        string_buffer->lengths = (size_t *) REALLOC(
+            (void *) string_buffer->lengths,
+            sizeof(size_t) * string_buffer->capacity
+        );
+    }
+
+    /* adds the string value and its length to the buffers and then
+    increments the (total) string length with the length of the
+    current string value */
+    string_buffer->strings[string_buffer->count] = string_value;
+    string_buffer->lengths[string_buffer->count] = string_length;
+    string_buffer->count++;
     string_buffer->string_length += string_length;
 }
 
@@ -111,52 +125,28 @@ void append_string_t_buffer(struct string_buffer_t *string_buffer, struct string
 }
 
 void join_string_buffer(struct string_buffer_t *string_buffer, unsigned char **string_value_pointer) {
-    /* allocates space for the iterators used for percolating
-    the various (partial) string values (include string length) */
-    struct iterator_t *string_iterator;
-    struct iterator_t *length_iterator;
-
-    /* allocates space for the partial value and the partial value length */
-    unsigned char *partial_value;
-    size_t partial_value_length;
+    /* allocates space for the index used for percolating
+    the various (partial) string values */
+    size_t index;
 
     /* allocates space for the pointer and allocates the buffer to hold
     the complete "joined" string value */
     unsigned char *pointer;
     unsigned char *string_value = (unsigned char *) MALLOC(string_buffer->string_length + 1);
 
-    /* creates the iterators for the list of strings, to go
-    arround them joining the strings into a single buffer */
-    create_iterator_linked_list(string_buffer->string_list, &string_iterator);
-    create_iterator_linked_list(string_buffer->length_list, &length_iterator);
-
     /* sets the "initial" pointer value to the "base" string value position */
     pointer = string_value;
 
-    /* iterates continuously to process to "join" the
-    various "partial" string values into a single buffer */
-    while(TRUE) {
-        /* retrieves the next value from the string iterator
-        as the partial value */
-        get_next_iterator(string_iterator, (void **) &partial_value);
-
-        /* retrieves the next value from the length iterator
-        as the partial value length (length of the string) */
-        get_next_iterator(length_iterator, (void **) &partial_value_length);
-
-        /* in case the partial value is not set
-        there are no more items to be retrieved from
-        the iterator, breaks the loop */
-        if(partial_value == NULL) { break; }
-
-        /* copoes the contents of the partial value to
-        the buffer "pointed" by pointer, using the previously
-        retrieved partial value length */
-        memcpy(pointer, partial_value, partial_value_length);
+    /* iterates over the various "partial" string values to
+    "join" them into a single buffer */
+    for(index = 0; index < string_buffer->count; index++) {
+        /* copies the contents of the partial value to the buffer
+        "pointed" by pointer, using the length stored beside it */
+        memcpy(pointer, string_buffer->strings[index], string_buffer->lengths[index]);
 
         /* updates the pointer value with the length of the
         partial (string) value */
-        pointer += partial_value_length;
+        pointer += string_buffer->lengths[index];
     }
 
     /* "closes" the string value, useful for usage as a "classic"
@@ -166,11 +156,6 @@ void join_string_buffer(struct string_buffer_t *string_buffer, unsigned char **s
     /* sets the string value in the value "pointed" by
     the string value pointer */
     *string_value_pointer = string_value;
-
-    /* deletes both the length and the string iterators, in order
-    to avoid possible memory leaks */
-    delete_iterator_linked_list(string_buffer->length_list, length_iterator);
-    delete_iterator_linked_list(string_buffer->string_list, string_iterator);
 }
 
 void _append_string_buffer(struct string_buffer_t *string_buffer, unsigned char *string_value) {

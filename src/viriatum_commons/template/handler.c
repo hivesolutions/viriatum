@@ -824,9 +824,9 @@ void traverse_node_buffer(struct template_handler_t *template_handler, struct te
 }
 
 void traverse_nodes_buffer(struct template_handler_t *template_handler, struct template_node_t *node) {
-    /* allocates space for the iterator to be used to retrieve
-    the various children from the node */
-    struct iterator_t *child_iterator;
+    /* allocates space for the node of the list being walked
+    to retrieve the various children from the node */
+    struct linked_list_node_t *child_node;
 
     /* allocates space for the child element */
     struct template_node_t *child;
@@ -838,26 +838,23 @@ void traverse_nodes_buffer(struct template_handler_t *template_handler, struct t
         return;
     }
 
-    /* creates a "new" iterator for the children linked list */
-    create_iterator_linked_list(node->children, &child_iterator);
+    /* walks the children straight through the nodes of the
+    list, an iterator would be created and released for every
+    node with children and a page walks through thousands of
+    them, one per entry of a listing and per tag inside it */
+    child_node = node->children->first;
 
     /* iterates continuously for children percolation */
-    while(TRUE) {
-        /* retrieves the child element from the child iterator */
-        get_next_iterator(child_iterator, (void **) &child);
-
-        /* in case the child is not valid (no more items available) */
-        if(child == NULL) {
-            /* breaks the loop */
-            break;
-        }
+    while(child_node != NULL) {
+        /* retrieves the child element from the list node */
+        child = (struct template_node_t *) child_node->value;
 
         /* traverses the child node (recursion step) */
         traverse_node_buffer(template_handler, child);
-    }
 
-    /* deletes the child iterator */
-    delete_iterator_linked_list(node->children, child_iterator);
+        /* moves to the next node of the list */
+        child_node = child_node->next;
+    }
 }
 
 void _traverse_out_buffer(struct template_handler_t *template_handler, struct template_node_t *node) {
@@ -893,12 +890,20 @@ void _traverse_out_buffer(struct template_handler_t *template_handler, struct te
 
             /* in case the value was successfully found */
             if(value != NULL) {
-                /* converts the value into a string representation, to
-                be used in the template generation */
-                to_string_type(value, &buffer);
-
-                /* adds the value (string) to the string buffer */
-                _append_string_buffer(template_handler->string_buffer, buffer);
+                /* a string is added to the string buffer as it stands,
+                it outlives the building of the page and copying it would
+                cost an allocation for every one of them, anything else is
+                converted into a string representation of its own, to be
+                used in the template generation and released with it */
+                if(value->type == STRING_TYPE) {
+                    append_string_buffer(
+                        template_handler->string_buffer,
+                        (unsigned char *) value->value.value_string
+                    );
+                } else {
+                    to_string_type(value, &buffer);
+                    _append_string_buffer(template_handler->string_buffer, buffer);
+                }
             }
 
             /* breaks the switch */
@@ -1008,8 +1013,10 @@ void _traverse_if_buffer(struct template_handler_t *template_handler, struct tem
     if(item_parameter == NULL || value_parameter == NULL) { return; }
 
     /* tries to retrieve the reference value from the map of names in the
-    template handler (dereferencing) */
-    get_template_handler(template_handler, (unsigned char *) "entry.type", &value);
+    template handler (dereferencing), the item of the tag is what names
+    it, the type of the entry of a listing used to be looked up whatever
+    the item said */
+    get_template_handler(template_handler, item_parameter->reference_value, &value);
 
     /* in case the value was not found */
     if(value == NULL) {
