@@ -2270,11 +2270,6 @@ ERROR_CODE _default_options_service(struct service_t *service, struct hash_map_t
     service_options->default_index = VIRIATUM_DEFAULT_INDEX;
     service_options->use_template = VIRIATUM_DEFAULT_USE_TEMPLATE;
 
-    /* the www root is left unset, it stands for the override that the
-    configuration or the command line carry rather than for the path
-    the binary was built with, which reaches the contents and the
-    resources as the fallback of the tree beside the binary */
-
     /* sets the default and statically defined mime type values
     for the evaluation of the basic file extensions */
     set_value_string_hash_map(service_options->mime_types, (unsigned char *) ".323", "text/h323");
