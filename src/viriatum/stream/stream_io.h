@@ -29,6 +29,14 @@
 #include "stream_httpc.h"
 #include "stream_torrent.h"
 
+/**
+ * The number of values of the write queue that are handed
+ * to the kernel together, the headers of a response and the
+ * payload that follows them are queued apart and go out in
+ * a single call rather than in one each.
+ */
+#define WRITE_BUFFERS_STREAM_IO 8
+
 struct io_connection_t;
 
 typedef ERROR_CODE (*data_io_connection_callback)(struct io_connection_t *, unsigned char *, size_t);
