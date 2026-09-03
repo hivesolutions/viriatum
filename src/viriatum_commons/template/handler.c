@@ -261,6 +261,13 @@ void delete_template_handler(struct template_handler_t *template_handler) {
         FREE(template_handler->string_value);
     }
 
+    /* in case a temporary node is still set the tag it was built for
+    was never closed, so it hangs from no list at all and would be
+    left behind, it is released here along with the handler */
+    if(template_handler->temporary_node) {
+        delete_template_node(template_handler->temporary_node);
+    }
+
     /* in case the template contexts are defined */
     if(template_handler->contexts) {
         /* deletes the contexts list */
@@ -1089,9 +1096,11 @@ ERROR_CODE _text_end_callback(struct template_engine_t *template_engine, const u
     }
 
     /* adds the temporary node to the current list of nodes
-    in the template handler and to the children list of the current node */
+    in the template handler and to the children list of the current
+    node, the node now belongs to the list and is no longer temporary */
     append_value_linked_list(template_handler->nodes, template_node);
     append_value_linked_list(current_node->children, template_node);
+    template_handler->temporary_node = NULL;
 
     /* raises no error */
     RAISE_NO_ERROR;
@@ -1165,8 +1174,10 @@ ERROR_CODE _tag_end_callback(struct template_engine_t *template_engine, const un
 
     /* in case the temporary node is of type close */
     if(temporary_node->type == TEMPLATE_NODE_CLOSE) {
-        /* deletes the temporary node (no need to process it) */
+        /* deletes the temporary node (no need to process it) and
+        unsets it so that nothing reaches for it afterwards */
         delete_template_node(temporary_node);
+        template_handler->temporary_node = NULL;
 
         /* raise no error */
         RAISE_NO_ERROR;
@@ -1187,9 +1198,11 @@ ERROR_CODE _tag_end_callback(struct template_engine_t *template_engine, const un
     }
 
     /* adds the temporary node to the current list of nodes
-    in the template handler and to the children list of the temporary node */
+    in the template handler and to the children list of the temporary
+    node, the node now belongs to the list and is no longer temporary */
     append_value_linked_list(current_node->children, temporary_node);
     append_value_linked_list(template_handler->nodes, temporary_node);
+    template_handler->temporary_node = NULL;
 
     /* raise no error */
     RAISE_NO_ERROR;
