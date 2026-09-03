@@ -338,8 +338,14 @@ const char *test_priority_queue(void) {
 }
 
 const char *test_string_buffer(void) {
-    /* allocates space for the string buffer */
+    /* allocates space for the string buffer, for the string that
+    is handed over to it for release, for the structure based
+    string and for the index of the appending loop */
     struct string_buffer_t *string_buffer;
+    unsigned char *owned;
+    struct string_t string;
+    size_t index;
+    size_t allocated = ALLOCATIONS;
 
     /* allocates the space for the string to
     hold the various joined values */
@@ -348,20 +354,53 @@ const char *test_string_buffer(void) {
     /* creates the string buffer */
     create_string_buffer(&string_buffer);
 
-    /* adds a set of strings to the string buffer */
-    append_string_buffer(string_buffer, (unsigned char *) "hello");
-    append_string_buffer(string_buffer, (unsigned char *) " ");
-    append_string_buffer(string_buffer, (unsigned char *) "world");
-
-    /* "joins" the string buffer values into a single
-    value (from the internal string list) */
+    /* a buffer with nothing in it joins into an empty string
+    rather than into nothing at all */
     join_string_buffer(string_buffer, &string_value);
-
-    /* releases the string value (string) */
+    V_ASSERT_EQ_S((char *) string_value, "");
+    V_ASSERT_EQ_U(string_buffer->string_length, 0);
     FREE(string_value);
 
-    /* deletes the string buffer */
+    /* adds a set of strings to the string buffer, through every
+    one of the ways a string may be added, the one that carries
+    its own length and the one that is handed over for release
+    among them */
+    append_string_buffer(string_buffer, (unsigned char *) "hello");
+    append_string_l_buffer(string_buffer, (unsigned char *) " world", 6);
+    string.buffer = (unsigned char *) "!";
+    string.length = 1;
+    append_string_t_buffer(string_buffer, &string);
+    owned = (unsigned char *) MALLOC(3);
+    memcpy(owned, "!!", 3);
+    _append_string_buffer(string_buffer, owned);
+
+    /* "joins" the string buffer values into a single value, in the
+    very order they were added and with the length of all of them */
+    join_string_buffer(string_buffer, &string_value);
+    V_ASSERT_EQ_S((char *) string_value, "hello world!!!");
+    V_ASSERT_EQ_U(string_buffer->string_length, 14);
+    V_ASSERT_EQ_U(string_buffer->count, 4);
+    FREE(string_value);
+
+    /* adds far more strings than the buffer is sized for to begin
+    with, which is what a page with many entries does, every one of
+    them ends up in the joined value in its place */
+    for(index = 0; index < DEFAULT_STRING_BUFFER_SIZE * 3; index++) {
+        append_string_buffer(string_buffer, (unsigned char *) "ab");
+    }
+    V_ASSERT_EQ_U(string_buffer->count, DEFAULT_STRING_BUFFER_SIZE * 3 + 4);
+    V_ASSERT(string_buffer->capacity >= string_buffer->count);
+    join_string_buffer(string_buffer, &string_value);
+    V_ASSERT_EQ_U(strlen((char *) string_value), DEFAULT_STRING_BUFFER_SIZE * 6 + 14);
+    V_ASSERT_MEM(string_value, "hello world!!!ab", 16);
+    V_ASSERT_MEM(string_value + DEFAULT_STRING_BUFFER_SIZE * 6 + 12, "ab", 3);
+    FREE(string_value);
+
+    /* deletes the string buffer, the string that was handed over
+    goes with it and so the number of outstanding allocations is
+    the one it was before the test started at all */
     delete_string_buffer(string_buffer);
+    V_ASSERT_EQ_U(ALLOCATIONS, allocated);
 
     /* returns the default value, nothing happened so there's
     nothing to report for this execution */
@@ -956,6 +995,16 @@ an entry, which is what the listing of a directory is built on */
     "${out value=entry.name /}</li>"                       \
     "${/foreach}"                                          \
     "<p>${out value=count /}</p>"
+
+/* the template that walks the list under a name of its own and
+conditions on the type of the item under that very name, which the
+condition used to ignore in favour of the one the listing uses */
+#define TEMPLATE_TEST_ROWS                    \
+    "${foreach item=row from=entries}"        \
+    "${if item=row.type value=2 operator=eq}" \
+    "[${out value=row.name /}]"               \
+    "${/if}"                                  \
+    "${/foreach}"
 
 /* the template whose tags carry none of the parameters they need,
 every one of them is left out of the page and the text around them
@@ -1845,6 +1894,20 @@ const char *test_template_handler(void) {
         (char *) template_handler->string_value,
         "<h1>Title</h1><li>Dalpha</li><li>beta</li><p>2</p>"
     );
+    delete_template_handler(template_handler);
+
+    /* the condition of a template reads the item that its own tag
+    names, a list walked under any name other than the one of the
+    listing used to render nothing out of its conditions at all */
+    write_file(
+        (char *) TEMPLATE_TEST_PATH,
+        (unsigned char *) TEMPLATE_TEST_ROWS,
+        sizeof(TEMPLATE_TEST_ROWS) - 1
+    );
+    create_template_handler(&template_handler);
+    assign_list_template_handler(template_handler, (unsigned char *) "entries", entries);
+    process_template_handler(template_handler, (unsigned char *) TEMPLATE_TEST_PATH);
+    V_ASSERT_EQ_S((char *) template_handler->string_value, "[beta]");
     delete_template_handler(template_handler);
 
     /* a template that is not there leaves the handler with an empty
