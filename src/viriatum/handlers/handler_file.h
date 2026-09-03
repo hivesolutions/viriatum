@@ -121,6 +121,79 @@ typedef struct file_cache_t {
 } file_cache;
 
 /**
+ * The number of listings that the handler is allowed to
+ * keep rendered at the same time, a directory falls on
+ * exactly one of the entries and takes it over from
+ * whatever was sitting there before.
+ */
+#define CACHE_LISTINGS_HANDLER_FILE 32
+
+/**
+ * Structure describing the page of a directory that the
+ * handler has rendered and is holding, so that listing the
+ * directory again costs neither describing every one of its
+ * entries nor building the page out of them, which together
+ * are almost all of what a listing costs.
+ */
+typedef struct listing_cache_entry_t {
+    /**
+     * The url the directory was asked for under, which is
+     * also the key the entry is stored under, the page names
+     * the folder after it.
+     */
+    unsigned char url[VIRIATUM_MAX_URL_SIZE];
+
+    /**
+     * The number that describes the set of entries of the
+     * directory as it stood when the page was built, an
+     * entry added, removed or renamed moves it.
+     */
+    unsigned long fingerprint;
+
+    /**
+     * The tree of the template the page was built out of,
+     * together with the size and the moment of the last
+     * write of the template as it then stood, a template
+     * that has changed is parsed into another tree.
+     */
+    struct template_node_t *root;
+    size_t template_size;
+    time_t template_written;
+
+    /**
+     * The moment at which the page was built, one older than
+     * the validity is built again, the sizes and the moments
+     * of the entries move without the set of them moving.
+     */
+    unsigned int checked;
+
+    /**
+     * The page as it was built, null terminated, unset while
+     * the entry holds no listing at all.
+     */
+    unsigned char *page;
+
+    /**
+     * The size in bytes of the page.
+     */
+    size_t size;
+} listing_cache_entry;
+
+/**
+ * Structure describing the set of listings that the handler
+ * is keeping rendered, one per process the very way the set
+ * of open files is, so that nothing here is ever reached by
+ * two at once.
+ */
+typedef struct listing_cache_t {
+    /**
+     * The entries of the cache, one slot per position that
+     * the hash of a url is able to fall on.
+     */
+    struct listing_cache_entry_t *entries;
+} listing_cache;
+
+/**
  * Structure describing the internal parameters
  * for a location in the file context.
  */
@@ -288,12 +361,6 @@ typedef struct handler_file_context_t {
     struct template_handler_t *template_handler;
 
     /**
-     * The flag that controlls the flushing of the
-     * internal structures of the file handler.
-     */
-    unsigned int flushed;
-
-    /**
      * The flag that controls if the cache control value
      * has already been retrieved (and parsed).
      */
@@ -374,6 +441,10 @@ ERROR_CODE delete_file_cache(struct file_cache_t *file_cache);
 ERROR_CODE clear_file_cache(struct file_cache_t *file_cache);
 ERROR_CODE acquire_file_cache(struct file_cache_t *file_cache, unsigned char *file_path, struct file_cache_entry_t **file_cache_entry_pointer);
 ERROR_CODE open_file_cache(struct file_cache_t *file_cache, unsigned char *file_path, int *descriptor_pointer);
+ERROR_CODE create_listing_cache(struct listing_cache_t **listing_cache_pointer);
+ERROR_CODE delete_listing_cache(struct listing_cache_t *listing_cache);
+ERROR_CODE clear_listing_cache(struct listing_cache_t *listing_cache);
+ERROR_CODE render_listing_cache(struct listing_cache_t *listing_cache, struct template_cache_t *template_cache, struct template_handler_t *template_handler, unsigned char *url, unsigned char *file_path, unsigned char *template_path);
 ERROR_CODE _cleanup_handler_file(struct connection_t *connection, struct data_t *data, void *parameters);
 ERROR_CODE _send_chunk_handler_file(struct connection_t *connection, struct data_t *data, void *parameter);
 ERROR_CODE _send_data_handler_file(struct connection_t *connection, struct data_t *data, void *parameters);

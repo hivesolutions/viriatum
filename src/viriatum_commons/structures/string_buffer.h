@@ -29,6 +29,14 @@
 #include "linked_list.h"
 
 /**
+ * The number of strings that a string buffer is
+ * able to hold before it has to grow, a page that
+ * is built out of a template appends a few of them
+ * for every one of its tags.
+ */
+#define DEFAULT_STRING_BUFFER_SIZE 32
+
+/**
  * Structure holding internal information
  * for a buffer (in memory) of strings.
  * The buffer is linear and contains the various
@@ -42,16 +50,30 @@ typedef struct string_buffer_t {
     size_t string_length;
 
     /**
-     * The list of strings that compose the
-     * the complete string value.
+     * The number of strings that compose the
+     * complete string value.
      */
-    struct linked_list_t *string_list;
+    size_t count;
 
     /**
-     * The list of lengths for the strings
-     * that compose the complete string value.
+     * The number of strings that the buffers
+     * below are able to hold before growing.
      */
-    struct linked_list_t *length_list;
+    size_t capacity;
+
+    /**
+     * The strings that compose the complete
+     * string value, in the order they were
+     * added, a node of a list per string was
+     * what a page paid for every one of them.
+     */
+    unsigned char **strings;
+
+    /**
+     * The lengths of the strings that compose
+     * the complete string value, one per string.
+     */
+    size_t *lengths;
 
     /**
      * The list of strings to have the memory

@@ -34,6 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * The status page now names the mechanism the server is waiting through - [#49](https://github.com/hivesolutions/viriatum/issues/49)
 * Test runs now report which tests left allocations behind them - [#49](https://github.com/hivesolutions/viriatum/issues/49)
 * Reports of the serving measured against the reference servers, kept as documents - [#49](https://github.com/hivesolutions/viriatum/issues/49)
+* Setting that turns the line written for each error that is answered off - [#77](https://github.com/hivesolutions/viriatum/issues/77)
 
 ### Changed
 
@@ -46,9 +47,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Static files are now served considerably faster, ahead of the reference servers on the larger ones - [#49](https://github.com/hivesolutions/viriatum/issues/49)
 * Files that are served are now kept open, so serving one again costs neither opening nor describing it - [#49](https://github.com/hivesolutions/viriatum/issues/49)
 * The benchmark now holds every server to the number of processes the subject actually runs with - [#49](https://github.com/hivesolutions/viriatum/issues/49)
+* The templates of the listing and of the error page are now parsed once and held, a page built out of one costs only its rendering - [#77](https://github.com/hivesolutions/viriatum/issues/77)
+* Directory listings and error pages are now served considerably faster - [#77](https://github.com/hivesolutions/viriatum/issues/77)
+* Telling a directory from a file now costs a single call into the kernel rather than three - [#77](https://github.com/hivesolutions/viriatum/issues/77)
+* Pages built out of a template now allocate a fraction of what they did while being rendered - [#77](https://github.com/hivesolutions/viriatum/issues/77)
+* The page of an error is now rendered once and held for as long as its template stands - [#77](https://github.com/hivesolutions/viriatum/issues/77)
+* The listing of a directory is now held once built and served as it stands until an entry appears, goes away or is renamed, or four seconds pass - [#77](https://github.com/hivesolutions/viriatum/issues/77)
+* The headers and the payload of a response now go out in a single call into the kernel, and a read that emptied the socket is no longer followed by one that comes back empty - [#77](https://github.com/hivesolutions/viriatum/issues/77)
+* Listing a directory now describes every entry once rather than twice - [#77](https://github.com/hivesolutions/viriatum/issues/77)
+* A request for a path now opens it straight away rather than describing it first, the opening telling a directory from a file that is not there - [#77](https://github.com/hivesolutions/viriatum/issues/77)
 
 ### Fixed
 
+* A connection that is kept alive no longer holds the bytes of every request it has served and copies them over again for each new one - [#77](https://github.com/hivesolutions/viriatum/issues/77)
+* The condition of a template now reads the item its own tag names rather than always the entry of a listing - [#77](https://github.com/hivesolutions/viriatum/issues/77)
+* A template that closes a tag on its very last character no longer loses that tag - [#77](https://github.com/hivesolutions/viriatum/issues/77)
+* A template with a tag that misses its name or its parameters no longer brings the rendering down - [#77](https://github.com/hivesolutions/viriatum/issues/77)
 * Interrupting a server no longer skips the shutdown that a Python application is told about - [#60](https://github.com/hivesolutions/viriatum/issues/60)
 * Docker images of the PHP and full variants now build for the architecture of the machine instead of always amd64
 * A file served over HTTP/2 is now closed once the response has been sent - [#50](https://github.com/hivesolutions/viriatum/issues/50)

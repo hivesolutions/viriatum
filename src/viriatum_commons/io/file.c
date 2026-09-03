@@ -305,8 +305,11 @@ ERROR_CODE entries_to_map_file(struct linked_list_t *entries, struct linked_list
             break;
         }
 
-        /* creates the hash map */
-        create_hash_map(&entry_map, 0);
+        /* creates the hash map, sized for the five values that
+        describe an entry rather than the default of a map, one
+        of the default size is built and released for every entry
+        of a listing and costs more than the walking of it does */
+        create_hash_map(&entry_map, 8);
 
         /* allocates space for the date time string */
         date_time_string = MALLOC(17);
@@ -851,6 +854,71 @@ ERROR_CODE list_directory_file(char *file_path, struct linked_list_t *entries) {
     RAISE_NO_ERROR;
 }
 
+ERROR_CODE fingerprint_directory_file(char *file_path, unsigned long *fingerprint_pointer) {
+    /* allocates the string to hold the composite wildcard
+    listing directory path and the length of the path */
+    char *list_path;
+    size_t path_length;
+
+    /* allocates space for the number that describes the set of
+    entries and for the count of them, folded into it at the end */
+    unsigned long fingerprint = 0;
+    unsigned long count = 0;
+
+    /* allocates the various windows internal structures
+    for the finding of the directory entries */
+    WIN32_FIND_DATA find_data;
+    HANDLE handler_find = INVALID_HANDLE_VALUE;
+
+    /* ensures that the file path is correctly converted
+    into the proper system path, through encoding conversion */
+    SYSTEM_PATH(file_path);
+
+    /* retrieves the length of the file path */
+    path_length = strlen(file_path);
+
+    /* allocates and populates the list (directory) path
+    with the appropriate wildcard value */
+    list_path = (char *) MALLOC(path_length + 3);
+    memcpy(list_path, file_path, path_length + 1);
+    memcpy(list_path + path_length, "\\*", 3);
+
+    /* tries to find the first file with the wildcard
+    value (checks for error) */
+    handler_find = FindFirstFile(list_path, &find_data);
+
+    /* in case the retieved handler is not valid
+    (error) */
+    if(handler_find == INVALID_HANDLE_VALUE) {
+        /* releases the currently allocated memory and
+        raises an error indicating the listing problem */
+        FREE(list_path);
+        RAISE_ERROR_M(RUNTIME_EXCEPTION_ERROR_CODE, (unsigned char *) "Problem listing directory");
+    }
+
+    do {
+        /* folds the name of the entry into the number, none of the
+        entries is described as the names are what says whether the
+        set of them has changed, in the order the file system keeps */
+        fingerprint = fingerprint * 31 +
+                      crc_32((unsigned char *) find_data.cFileName, (unsigned int) strlen(find_data.cFileName));
+        count++;
+    } while(FindNextFile(handler_find, &find_data) != 0);
+
+    /* closes the handler to find */
+    FindClose(handler_find);
+
+    /* releases the list path reference */
+    FREE(list_path);
+
+    /* folds the count of the entries into the number and sets it
+    in the fingerprint pointer */
+    *fingerprint_pointer = fingerprint * 31 + count;
+
+    /* raise no error */
+    RAISE_NO_ERROR;
+}
+
 #endif
 
 #ifdef VIRIATUM_PLATFORM_UNIX
@@ -882,13 +950,20 @@ ERROR_CODE open_read_file(char *file_path, int *descriptor_pointer) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE get_write_time_file(char *file_path, struct date_time_t *date_time) {
-    struct stat file_stat;
+/**
+ * Populates the provided date time structure out of the moment of
+ * the last write that the provided description of a file carries,
+ * so that a file that has just been described is never described
+ * again only to learn the moment it was written.
+ *
+ * @param file_stat The description of the file, as the file system
+ * reports it.
+ * @param date_time The date time structure to be populated.
+ */
+static void _write_time_file(struct stat *file_stat, struct date_time_t *date_time) {
     struct tm time;
 
-    stat(file_path, &file_stat);
-
-    gmtime_r((const time_t *) &file_stat.st_mtime, &time);
+    gmtime_r((const time_t *) &file_stat->st_mtime, &time);
 
     /* populates the date time structure with the information
     on the file various parts */
@@ -898,30 +973,37 @@ ERROR_CODE get_write_time_file(char *file_path, struct date_time_t *date_time) {
     date_time->hour = time.tm_hour;
     date_time->minute = time.tm_min;
     date_time->second = time.tm_sec;
+}
+
+ERROR_CODE get_write_time_file(char *file_path, struct date_time_t *date_time) {
+    struct stat file_stat;
+
+    stat(file_path, &file_stat);
+    _write_time_file(&file_stat, date_time);
 
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
 ERROR_CODE is_directory_file(char *file_path, unsigned int *is_directory) {
-    /* allocates space for the directory reference */
-    DIR *directory;
+    /* allocates space for the structure that describes the file,
+    the kind of it being one of the fields it carries */
+    struct stat file_stat;
 
-    /* tries to open the directory for the file path */
-    directory = opendir(file_path);
-
-    /* in case the directory reference is not valid (null) */
-    if(directory == NULL) {
+    /* asks the file system to describe the path rather than opening
+    it as a directory, the opening costs three calls into the kernel
+    where the describing of it costs a single one, and every request
+    for a file pays this before the file is even looked at, in case
+    the path cannot be described at all it is not a directory */
+    if(stat(file_path, &file_stat) != 0) {
         /* unsets the is directory flag */
         *is_directory = 0;
     }
-    /* otherwise the directory reference is valid */
+    /* otherwise the path exists and the description says
+    whether it is a directory or not */
     else {
-        /* sets the is directory flag */
-        *is_directory = 1;
-
-        /* closes the directory reference */
-        closedir(directory);
+        /* sets the is directory flag according to the mode */
+        *is_directory = S_ISDIR(file_stat.st_mode) ? 1 : 0;
     }
 
     /* raise no error */
@@ -998,11 +1080,12 @@ ERROR_CODE list_directory_file(char *file_path, struct linked_list_t *entries) {
         /* joins the base name with the directory path to
         retrieve the full entry name then uses it to retrieve
         the entry stat structure and then uses it to retrieve its size
-        and it's last write time */
+        and it's last write time, the one description of the entry
+        answering both rather than the file being described twice */
         join_path_file(file_path, entity->d_name, entry_full_name);
         stat(entry_full_name, &entry_stat);
         entry->size = entry_stat.st_size;
-        get_write_time_file(entry_full_name, &entry->time);
+        _write_time_file(&entry_stat, &entry->time);
 
         /* calculates the length of the entry name and uses
         it to create the memory space for the entry name and then
@@ -1022,6 +1105,62 @@ ERROR_CODE list_directory_file(char *file_path, struct linked_list_t *entries) {
 
     /* closes the directory reference */
     closedir(directory);
+
+    /* raise no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE fingerprint_directory_file(char *file_path, unsigned long *fingerprint_pointer) {
+    /* allocates space for the directory reference and
+    for the entity reference */
+    DIR *directory;
+    struct dirent *entity;
+
+    /* allocates space for the number that describes the set of
+    entries and for the count of them, folded into it at the end */
+    unsigned long fingerprint = 0;
+    unsigned long count = 0;
+
+    /* opens the directory for the file path */
+    directory = opendir(file_path);
+
+    /* in case the directory reference is not valid */
+    if(directory == NULL) {
+        /* raises an error */
+        RAISE_ERROR_M(
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Problem listing directory"
+        );
+    }
+
+    /* walks the entries of the directory folding the name of each
+    of them into the number, none of them is described as the names
+    are what says whether the set of them has changed, in the order
+    the file system keeps them in, which only ever moves along with
+    the set itself */
+    while(TRUE) {
+        /* retrieves the entity by reading it from the directory */
+        entity = readdir(directory);
+
+        /* in case the entity is not defined
+        (the directory list is finished) */
+        if(entity == NULL) {
+            /* breaks the switch */
+            break;
+        }
+
+        /* folds the name of the entry into the number */
+        fingerprint = fingerprint * 31 +
+                      crc_32((unsigned char *) entity->d_name, (unsigned int) strlen(entity->d_name));
+        count++;
+    }
+
+    /* closes the directory reference */
+    closedir(directory);
+
+    /* folds the count of the entries into the number and sets it
+    in the fingerprint pointer */
+    *fingerprint_pointer = fingerprint * 31 + count;
 
     /* raise no error */
     RAISE_NO_ERROR;
