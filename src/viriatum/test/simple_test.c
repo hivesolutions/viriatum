@@ -2662,6 +2662,7 @@ static struct test_entry_t _simple_entries[] = {
     V_TEST_T(test_file_cache, "handler"),
     V_TEST_T(test_file_cache_acquire, "handler"),
     V_TEST_T(test_file_cache_missing, "handler"),
+    V_TEST_T(test_file_cache_directory, "handler"),
     V_TEST_T(test_file_cache_changed, "handler"),
     V_TEST_T(test_file_cache_collision, "handler"),
     V_TEST_T(test_file_cache_clear, "handler"),
