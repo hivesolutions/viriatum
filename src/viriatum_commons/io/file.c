@@ -885,13 +885,20 @@ ERROR_CODE open_read_file(char *file_path, int *descriptor_pointer) {
     RAISE_NO_ERROR;
 }
 
-ERROR_CODE get_write_time_file(char *file_path, struct date_time_t *date_time) {
-    struct stat file_stat;
+/**
+ * Populates the provided date time structure out of the moment of
+ * the last write that the provided description of a file carries,
+ * so that a file that has just been described is never described
+ * again only to learn the moment it was written.
+ *
+ * @param file_stat The description of the file, as the file system
+ * reports it.
+ * @param date_time The date time structure to be populated.
+ */
+static void _write_time_file(struct stat *file_stat, struct date_time_t *date_time) {
     struct tm time;
 
-    stat(file_path, &file_stat);
-
-    gmtime_r((const time_t *) &file_stat.st_mtime, &time);
+    gmtime_r((const time_t *) &file_stat->st_mtime, &time);
 
     /* populates the date time structure with the information
     on the file various parts */
@@ -901,6 +908,13 @@ ERROR_CODE get_write_time_file(char *file_path, struct date_time_t *date_time) {
     date_time->hour = time.tm_hour;
     date_time->minute = time.tm_min;
     date_time->second = time.tm_sec;
+}
+
+ERROR_CODE get_write_time_file(char *file_path, struct date_time_t *date_time) {
+    struct stat file_stat;
+
+    stat(file_path, &file_stat);
+    _write_time_file(&file_stat, date_time);
 
     /* raise no error */
     RAISE_NO_ERROR;
@@ -1001,11 +1015,12 @@ ERROR_CODE list_directory_file(char *file_path, struct linked_list_t *entries) {
         /* joins the base name with the directory path to
         retrieve the full entry name then uses it to retrieve
         the entry stat structure and then uses it to retrieve its size
-        and it's last write time */
+        and it's last write time, the one description of the entry
+        answering both rather than the file being described twice */
         join_path_file(file_path, entity->d_name, entry_full_name);
         stat(entry_full_name, &entry_stat);
         entry->size = entry_stat.st_size;
-        get_write_time_file(entry_full_name, &entry->time);
+        _write_time_file(&entry_stat, &entry->time);
 
         /* calculates the length of the entry name and uses
         it to create the memory space for the entry name and then
