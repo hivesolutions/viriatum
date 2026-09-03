@@ -1260,6 +1260,25 @@ const char *test_template_engine_buffer(void) {
     V_ASSERT_EQ_S(collector.events[3], "tag_name:out");
     V_ASSERT_EQ_S(collector.events[4], "tag_end:${out}");
 
+    /* a parameter that is left without a value before the slash of
+    a single tag is dropped, the tag itself closes as any other */
+    collector.count = 0;
+    error = process_buffer_template_engine(template_engine, template_settings, (unsigned char *) "${out value/}", 13);
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT_EQ_U(collector.count, 7);
+    V_ASSERT_EQ_S(collector.events[3], "tag_name:out");
+    V_ASSERT_EQ_S(collector.events[4], "tag_end:${out value/}");
+
+    /* a buffer that ends as a tag opens reads nothing past its end,
+    the look ahead finding nothing there, and reports no text after
+    the tag that was left open */
+    collector.count = 0;
+    error = process_buffer_template_engine(template_engine, template_settings, (unsigned char *) "a${", 3);
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT_EQ_U(collector.count, 3);
+    V_ASSERT_EQ_S(collector.events[1], "text_end:a");
+    V_ASSERT_EQ_S(collector.events[2], "tag_begin:");
+
     /* a tag that closes on the very last character of the buffer is
     reported whole, the parsing used to stop one character short of
     the end and lose whatever that character was closing */
@@ -1847,6 +1866,15 @@ const char *test_template_handler(void) {
     create_template_handler(&template_handler);
     process_template_handler(template_handler, (unsigned char *) TEMPLATE_TEST_PATH);
     V_ASSERT_EQ_S((char *) template_handler->string_value, "<a></a>");
+    delete_template_handler(template_handler);
+
+    /* a template that ends with a tag left open renders the text
+    before it and the node built for the tag goes away with the
+    handler, it used to hang from nothing and be left behind */
+    write_file((char *) TEMPLATE_TEST_PATH, (unsigned char *) "x${out value=1", 14);
+    create_template_handler(&template_handler);
+    process_template_handler(template_handler, (unsigned char *) TEMPLATE_TEST_PATH);
+    V_ASSERT_EQ_S((char *) template_handler->string_value, "x");
     delete_template_handler(template_handler);
 
     /* every one of the structures that has been built is gone, so
