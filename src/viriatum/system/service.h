@@ -683,6 +683,15 @@ typedef struct service_options_t {
     unsigned char access_log;
 
     /**
+     * If a line describing each of the errors that are answered
+     * should be written to the standard output, one is written
+     * per error and so a deployment that is asked over and over
+     * for what is not there pays a call into the kernel for each
+     * of them, the very way the request log costs one.
+     */
+    unsigned char error_log;
+
+    /**
      * The default virtual host to be used in any
      * non matched host request.
      */

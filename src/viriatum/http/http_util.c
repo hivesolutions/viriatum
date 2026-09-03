@@ -534,8 +534,13 @@ ERROR_CODE write_http_error_a(
     size = size == 0 ? VIRIATUM_HTTP_SIZE : size;
 
     /* logs the HTTP error being sent to the client, using the warning
-    level to ensure visibility in both debug and release builds */
-    V_WARNING_F("HTTP error %d %s\n", error_code, error_message);
+    level to ensure visibility in both debug and release builds, the
+    writing of it is a call into the kernel for every error that is
+    answered and so it is only ever written when the service has been
+    asked for it, the very way the line of a request is */
+    if(options->error_log) {
+        V_WARNING_F("HTTP error %d %s\n", error_code, error_message);
+    }
 
 #ifndef VIRIATUM_DEBUG
     /* sets the error description as null in order to avoid any

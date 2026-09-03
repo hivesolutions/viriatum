@@ -779,13 +779,19 @@ const char *test_handler_file_missing(void) {
     _delete_handler_file_test(context, http_request, handler_file_context);
 
     /* a message that is not meant to be kept alive takes the
-    connection down once the response of it has gone out */
+    connection down once the response of it has gone out, the line
+    that describes the error is only written when the service has
+    been asked for it and the response is the same either way */
     _create_handler_file_test(&context, &http_request, &handler_file_context);
+    context->options->error_log = 0;
     http_request->flags = 0;
     url_callback_handler_file(http_request, (unsigned char *) "/absent.txt", 11);
     message_complete_callback_handler_file(http_request);
     V_ASSERT_EQ_U(get_closed_test_connection(), 0);
-    flush_test_connection(context, NULL, 0);
+    size = flush_test_connection(context, written, sizeof(written));
+    V_ASSERT(size > 0 && size < sizeof(written));
+    written[size] = '\0';
+    V_ASSERT(strstr((char *) written, "HTTP/1.1 404 Not Found\r\n") == (char *) written);
     V_ASSERT_EQ_U(get_closed_test_connection(), 1);
 
     _delete_handler_file_test(context, http_request, handler_file_context);
