@@ -361,12 +361,6 @@ typedef struct handler_file_context_t {
     struct template_handler_t *template_handler;
 
     /**
-     * The flag that controlls the flushing of the
-     * internal structures of the file handler.
-     */
-    unsigned int flushed;
-
-    /**
      * The flag that controls if the cache control value
      * has already been retrieved (and parsed).
      */

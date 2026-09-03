@@ -918,10 +918,8 @@ ERROR_CODE message_complete_callback_handler_file(struct http_request_t *http_re
                 );
             }
 
-            /* sets the template handler in the handler file context and unsets
-            the flushed flag */
+            /* sets the template handler in the handler file context */
             handler_file_context->template_handler = template_handler;
-            handler_file_context->flushed = FALSE;
         }
     }
     /* otherwise the file path must refer to a "normal" file path and
@@ -1075,15 +1073,31 @@ ERROR_CODE message_complete_callback_handler_file(struct http_request_t *http_re
             FALSE
         );
 
-        /* writes both the headers to the connection, register
-        for the appropriate callbacks */
+        /* writes the headers to the connection and queues the page
+        right behind them rather than once they have gone out, so that
+        the two of them go out in the very same call into the kernel,
+        the page is the complete payload of the response and so it
+        closes the message, the callback of it releasing the handler
+        once the page is away */
         http_connection->write_flush(
             connection,
             (unsigned char *) headers_buffer,
             count,
+            NULL,
+            NULL
+        );
+        http_connection->write_chunk(
+            connection,
+            handler_file_context->template_handler->string_value,
+            strlen((char *) handler_file_context->template_handler->string_value),
+            TRUE,
             _send_data_handler_file,
             handler_file_context
         );
+
+        /* unsets the string value in the template handler, the
+        connection is the one releasing what it has been handed */
+        handler_file_context->template_handler->string_value = NULL;
     }
     /* in case there's an etag value defined and the values matched
     the one defined for the file, time to return a not modified value
@@ -2016,40 +2030,15 @@ ERROR_CODE _send_data_handler_file(struct connection_t *connection, struct data_
     struct handler_file_context_t *handler_file_context = (struct handler_file_context_t *) parameters;
     struct template_handler_t *template_handler = handler_file_context->template_handler;
 
-    /* retrieves the underlying connection references in order to be
-    able to write the payload through the protocol in use */
-    struct io_connection_t *io_connection = (struct io_connection_t *) connection->lower;
-    struct http_connection_t *http_connection = (struct http_connection_t *) io_connection->lower;
+    /* the page has gone out, it was queued right behind the headers
+    of the response, so it is time to cleanup pending structures,
+    deletes the template handler (releases memory) and unsets the
+    reference in the handler file context */
+    delete_template_handler(template_handler);
+    handler_file_context->template_handler = NULL;
 
-    /* in case the handler file context is already flushed
-    time to clenaup pending structures */
-    if(handler_file_context->flushed) {
-        /* deletes the template handler (releases memory) and
-        unsets the reference in the handler file context */
-        delete_template_handler(template_handler);
-        handler_file_context->template_handler = NULL;
-
-        /* runs the cleanup handler file (releases internal structures) */
-        _cleanup_handler_file(connection, data, parameters);
-    }
-    /* otherwise the "normal" write connection applies */
-    else {
-        /* writes the (file) data to the connection and sets the handler
-        file context as flushed, the data is the complete payload of the
-        response and so it closes the message */
-        http_connection->write_chunk(
-            connection,
-            template_handler->string_value,
-            strlen((char *) template_handler->string_value),
-            TRUE,
-            _send_data_handler_file,
-            handler_file_context
-        );
-        handler_file_context->flushed = TRUE;
-
-        /* unsets the string value in the template handler (avoids double release) */
-        template_handler->string_value = NULL;
-    }
+    /* runs the cleanup handler file (releases internal structures) */
+    _cleanup_handler_file(connection, data, parameters);
 
     /* raise no error */
     RAISE_NO_ERROR;
