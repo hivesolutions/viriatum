@@ -416,6 +416,14 @@ const char *test_handler_file_header_value(void) {
 #define HANDLER_FILE_TEST_GONE "./viriatum_handler_file_gone.txt"
 
 /**
+ * The name and the path of the file that is written without any
+ * permission on it, kept apart from the one of the handler so that
+ * no test before it has asked the cache to hold the path.
+ */
+#define HANDLER_FILE_TEST_UNREADABLE_NAME "viriatum_handler_file_unreadable.txt"
+#define HANDLER_FILE_TEST_UNREADABLE "./" HANDLER_FILE_TEST_UNREADABLE_NAME
+
+/**
  * The directory that the templates of the tests are written into,
  * it is where the handler looks for them once the resources of the
  * service are pointed at the directory the process is running from.
@@ -864,6 +872,59 @@ const char *test_handler_file_missing_template(void) {
     V_ASSERT_EQ_U(get_closed_test_connection(), 0);
 
     _delete_handler_file_test(context, http_request, handler_file_context);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_handler_file_unreadable(void) {
+#ifndef VIRIATUM_PLATFORM_WIN32
+    /* allocates space for the chain of the connection, for the
+    message being served and for the response it produces */
+    struct test_context_t *context;
+    struct http_request_t *http_request;
+    struct handler_file_context_t *handler_file_context;
+    unsigned char written[2048];
+    size_t size;
+    ERROR_CODE error;
+
+    _create_handler_file_test(&context, &http_request, &handler_file_context);
+
+    /* writes a file of its own, one that no test before this one has
+    asked the cache of the handler to hold, and takes every permission
+    away from it, so that the opening of it is refused for a reason that
+    says neither that the path is a directory nor that it is not there,
+    which is what sends the handler to describe the path and find a file
+    it is unable to serve */
+    write_file(
+        (char *) HANDLER_FILE_TEST_UNREADABLE,
+        (unsigned char *) HANDLER_FILE_TEST_CONTENTS,
+        sizeof(HANDLER_FILE_TEST_CONTENTS) - 1
+    );
+    V_ASSERT_EQ_I(chmod(HANDLER_FILE_TEST_UNREADABLE, 0), 0);
+    error = url_callback_handler_file(
+        http_request,
+        (unsigned char *) "/" HANDLER_FILE_TEST_UNREADABLE_NAME,
+        sizeof(HANDLER_FILE_TEST_UNREADABLE_NAME)
+    );
+    V_ASSERT(error == 0);
+    error = message_complete_callback_handler_file(http_request);
+    V_ASSERT(error == 0);
+
+    size = flush_test_connection(context, written, sizeof(written));
+    V_ASSERT(size > 0 && size < sizeof(written));
+    written[size] = '\0';
+
+    /* a file that cannot be read is answered the way one that is not
+    there is, and never as the listing of a directory */
+    V_ASSERT(strstr((char *) written, "HTTP/1.1 404 Not Found\r\n") == (char *) written);
+    V_ASSERT_EQ_U(get_closed_test_connection(), 0);
+
+    chmod(HANDLER_FILE_TEST_UNREADABLE, 0644);
+    remove(HANDLER_FILE_TEST_UNREADABLE);
+    _delete_handler_file_test(context, http_request, handler_file_context);
+#endif
 
     /* returns the default value, nothing happened so there's
     nothing to report for this execution */

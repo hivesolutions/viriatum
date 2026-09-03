@@ -2032,6 +2032,9 @@ const char *test_template_handler_page(void) {
     struct template_cache_page_t *page;
     struct template_handler_t *template_handler;
     unsigned char *contents;
+    char key[32];
+    size_t taken;
+    size_t index;
     size_t allocated = ALLOCATIONS;
     ERROR_CODE error;
 
@@ -2086,6 +2089,26 @@ const char *test_template_handler_page(void) {
     page = &entry->pages[_calculate_string_hash_map((unsigned char *) "two") % CACHE_PAGES_TEMPLATE_HANDLER];
     V_ASSERT_EQ_S((char *) page->key, "two");
     V_ASSERT_EQ_S((char *) page->contents, "<p>second</p>");
+
+    /* a key that falls on the very same slot as a held page takes the
+    slot over, the page that was there being released along with its
+    key, which is what a cache of this shape has instead of a chain */
+    taken = _calculate_string_hash_map((unsigned char *) "one") % CACHE_PAGES_TEMPLATE_HANDLER;
+    for(index = 0; index < 100000; index++) {
+        SPRINTF(key, sizeof(key), "key%d", (int) index);
+        if(_calculate_string_hash_map((unsigned char *) key) % CACHE_PAGES_TEMPLATE_HANDLER == taken) {
+            break;
+        }
+    }
+    V_ASSERT(index < 100000);
+    create_template_handler(&template_handler);
+    assign_string_template_handler(template_handler, (unsigned char *) "name", "taken");
+    process_page_template_handler(template_handler, template_cache, (unsigned char *) TEMPLATE_TEST_PATH, (unsigned char *) key);
+    V_ASSERT_EQ_S((char *) template_handler->string_value, "<p>taken</p>");
+    delete_template_handler(template_handler);
+    page = &entry->pages[taken];
+    V_ASSERT_EQ_S((char *) page->key, key);
+    V_ASSERT_EQ_S((char *) page->contents, "<p>taken</p>");
 
     /* the template is written over in place, the tree is parsed again
     and every page that was rendered out of the one before goes with
@@ -2413,6 +2436,29 @@ const char *test_count_file(void) {
     return NULL;
 }
 
+const char *test_get_write_time_file(void) {
+    /* allocates space for the moment of the last write that the
+    describing reports and for the error it raises */
+    struct date_time_t date_time;
+    ERROR_CODE error;
+
+    /* a file that has just been written was written in the year the
+    test is running in, whatever the clock of the machine says of the
+    hour, and never in the very first one a moment is able to name */
+    write_file((char *) "./viriatum_write_time_test.txt", (unsigned char *) "viriatum", 8);
+    memset(&date_time, 0, sizeof(date_time));
+    error = get_write_time_file((char *) "./viriatum_write_time_test.txt", &date_time);
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT(date_time.year >= 2026);
+    V_ASSERT(date_time.month >= 1 && date_time.month <= 12);
+    V_ASSERT(date_time.day >= 1 && date_time.day <= 31);
+    remove("./viriatum_write_time_test.txt");
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
 const char *test_is_directory_file(void) {
     /* allocates space for the flag that the checking reports and
     for the error that it raises when it is unable to */
@@ -2638,6 +2684,7 @@ static struct test_entry_t _simple_entries[] = {
     V_TEST_T(test_is_path_safe, "path"),
     V_TEST_T(test_normalize_path, "path"),
     V_TEST_T(test_count_file, "path"),
+    V_TEST_T(test_get_write_time_file, "path"),
     V_TEST_T(test_is_directory_file, "path"),
     V_TEST_T(test_fingerprint_directory_file, "path"),
     V_TEST_T(test_join_path_file, "path"),
@@ -2650,6 +2697,7 @@ static struct test_entry_t _simple_entries[] = {
     V_TEST_T(test_handler_file_range, "handler"),
     V_TEST_T(test_handler_file_missing, "handler"),
     V_TEST_T(test_handler_file_missing_template, "handler"),
+    V_TEST_T(test_handler_file_unreadable, "handler"),
     V_TEST_T(test_handler_file_gone, "handler"),
     V_TEST_T(test_handler_file_directory, "handler"),
     V_TEST_T(test_handler_file_listing, "handler"),
