@@ -56,6 +56,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * The headers and the payload of a response now go out in a single call into the kernel, and a read that emptied the socket is no longer followed by one that comes back empty - [#77](https://github.com/hivesolutions/viriatum/issues/77)
 * Listing a directory now describes every entry once rather than twice - [#77](https://github.com/hivesolutions/viriatum/issues/77)
 * A request for a path now opens it straight away rather than describing it first, the opening telling a directory from a file that is not there - [#77](https://github.com/hivesolutions/viriatum/issues/77)
+* Continuous integration now builds with gcc 11 on a Debian release that is still supported
 
 ### Fixed
 
