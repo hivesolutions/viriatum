@@ -249,6 +249,12 @@ ERROR_CODE data_handler_stream_http(struct io_connection_t *io_connection, unsig
     initial zero value until the proper header is parsed */
     size_t content_length = http_connection->http_parser->_content_length;
 
+    /* in case the call carries nothing at all and there is no buffer to
+    be drained either there is nothing to be done, the releasing of a
+    message drains whatever is buffered behind it this way and a buffer
+    that was released once every byte of it had been read holds nothing */
+    if(buffer_size == 0 && http_connection->buffer == NULL) { RAISE_NO_ERROR; }
+
     /* in case no HTTP connection buffer is currently set, time to start
     a new one from the provided buffer (fast access) */
     if(http_connection->buffer == NULL) {
@@ -275,10 +281,14 @@ ERROR_CODE data_handler_stream_http(struct io_connection_t *io_connection, unsig
 
     /* retrieves the pointer reference to the current position in the
     buffer to be used for writing then copies the current buffer data
-    into it and updates the buffer size */
-    _buffer = http_connection->buffer + http_connection->buffer_offset;
-    memcpy(_buffer, buffer, buffer_size);
-    http_connection->buffer_offset += buffer_size;
+    into it and updates the buffer size, a call that carries nothing
+    at all, the one the releasing of a message makes to drain whatever
+    is still buffered behind it, has nothing to be copied */
+    if(buffer_size > 0) {
+        _buffer = http_connection->buffer + http_connection->buffer_offset;
+        memcpy(_buffer, buffer, buffer_size);
+        http_connection->buffer_offset += buffer_size;
+    }
 
 #ifdef VIRIATUM_HTTP2
     /* the connection may be opening with the preface of HTTP/2
