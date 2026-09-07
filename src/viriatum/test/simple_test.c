@@ -1410,14 +1410,17 @@ const char *test_template_engine_buffer(void) {
 }
 
 const char *test_template_cache(void) {
-    /* allocates space for the cache and for the index to be used in
-    the walking of the entries it is made of */
+    /* allocates space for the cache, for the index to be used in
+    the walking of the entries it is made of and for the error the
+    building and the releasing of it raise */
     size_t index;
     struct template_cache_t *template_cache;
+    ERROR_CODE error;
 
     /* creates the cache and verifies that every one of its entries
     starts out holding no template at all */
-    create_template_cache(&template_cache);
+    error = create_template_cache(&template_cache);
+    V_ASSERT_EQ_U(error, 0);
     V_ASSERT_NOT_NULL(template_cache);
     V_ASSERT_NOT_NULL(template_cache->entries);
 
@@ -1428,7 +1431,8 @@ const char *test_template_cache(void) {
         V_ASSERT_NULL(template_cache->entries[index].nodes);
     }
 
-    delete_template_cache(template_cache);
+    error = delete_template_cache(template_cache);
+    V_ASSERT_EQ_U(error, 0);
 
     /* returns the default value, nothing happened so there's
     nothing to report for this execution */
@@ -1696,7 +1700,8 @@ const char *test_template_cache_clear(void) {
 
     /* the clearing closes every file that was being held and releases
     every tree, an entry left with either behind is a leak */
-    clear_template_cache(template_cache);
+    error = clear_template_cache(template_cache);
+    V_ASSERT_EQ_U(error, 0);
     for(index = 0; index < CACHE_SIZE_TEMPLATE_HANDLER; index++) {
         V_ASSERT_EQ_I(template_cache->entries[index].descriptor, -1);
         V_ASSERT_NULL(template_cache->entries[index].root);
@@ -1923,6 +1928,7 @@ const char *test_template_handler(void) {
     struct type_t *first;
     struct type_t *second;
     size_t allocated = ALLOCATIONS;
+    ERROR_CODE error;
 
     /* writes the template that goes through every one of the tags
     and builds the entries that the walking of the list is fed */
@@ -1945,7 +1951,8 @@ const char *test_template_handler(void) {
     assign_string_template_handler(template_handler, (unsigned char *) "title", "Title");
     assign_list_template_handler(template_handler, (unsigned char *) "entries", entries);
     assign_integer_template_handler(template_handler, (unsigned char *) "count", 2);
-    process_template_handler(template_handler, (unsigned char *) TEMPLATE_TEST_PATH);
+    error = process_template_handler(template_handler, (unsigned char *) TEMPLATE_TEST_PATH);
+    V_ASSERT_EQ_U(error, 0);
     V_ASSERT_EQ_S(
         (char *) template_handler->string_value,
         "<h1>Title</h1><li>Dalpha</li><li>beta</li><p>2</p>"
@@ -1962,7 +1969,8 @@ const char *test_template_handler(void) {
     );
     create_template_handler(&template_handler);
     assign_list_template_handler(template_handler, (unsigned char *) "entries", entries);
-    process_template_handler(template_handler, (unsigned char *) TEMPLATE_TEST_PATH);
+    error = process_template_handler(template_handler, (unsigned char *) TEMPLATE_TEST_PATH);
+    V_ASSERT_EQ_U(error, 0);
     V_ASSERT_EQ_S((char *) template_handler->string_value, "[beta]");
     delete_template_handler(template_handler);
 
@@ -1970,7 +1978,8 @@ const char *test_template_handler(void) {
     result rather than an error, the one that builds a page out of it
     is what warns about the absence and falls back */
     create_template_handler(&template_handler);
-    process_template_handler(template_handler, (unsigned char *) TEMPLATE_TEST_GONE);
+    error = process_template_handler(template_handler, (unsigned char *) TEMPLATE_TEST_GONE);
+    V_ASSERT_EQ_U(error, 0);
     V_ASSERT_EQ_S((char *) template_handler->string_value, "");
     delete_template_handler(template_handler);
 
@@ -1983,8 +1992,20 @@ const char *test_template_handler(void) {
         sizeof(TEMPLATE_TEST_MALFORMED) - 1
     );
     create_template_handler(&template_handler);
-    process_template_handler(template_handler, (unsigned char *) TEMPLATE_TEST_PATH);
+    error = process_template_handler(template_handler, (unsigned char *) TEMPLATE_TEST_PATH);
+    V_ASSERT_EQ_U(error, 0);
     V_ASSERT_EQ_S((char *) template_handler->string_value, "<a></a>");
+    delete_template_handler(template_handler);
+
+    /* a value that has no form as a string, the list of the entries
+    being one, is written out as undefined rather than as whatever
+    the memory happened to hold */
+    write_file((char *) TEMPLATE_TEST_PATH, (unsigned char *) "<${out value=entries /}>", 24);
+    create_template_handler(&template_handler);
+    assign_list_template_handler(template_handler, (unsigned char *) "entries", entries);
+    error = process_template_handler(template_handler, (unsigned char *) TEMPLATE_TEST_PATH);
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT_EQ_S((char *) template_handler->string_value, "<undefined>");
     delete_template_handler(template_handler);
 
     /* a template that ends with a tag left open renders the text
@@ -1992,7 +2013,8 @@ const char *test_template_handler(void) {
     handler, it used to hang from nothing and be left behind */
     write_file((char *) TEMPLATE_TEST_PATH, (unsigned char *) "x${out value=1", 14);
     create_template_handler(&template_handler);
-    process_template_handler(template_handler, (unsigned char *) TEMPLATE_TEST_PATH);
+    error = process_template_handler(template_handler, (unsigned char *) TEMPLATE_TEST_PATH);
+    V_ASSERT_EQ_U(error, 0);
     V_ASSERT_EQ_S((char *) template_handler->string_value, "x");
     delete_template_handler(template_handler);
 
@@ -2033,7 +2055,8 @@ const char *test_template_handler_cache(void) {
     assigned to the handler, exactly as it would be out of the file */
     create_template_handler(&template_handler);
     assign_string_template_handler(template_handler, (unsigned char *) "name", "first");
-    process_cache_template_handler(template_handler, template_cache, (unsigned char *) TEMPLATE_TEST_PATH);
+    error = process_cache_template_handler(template_handler, template_cache, (unsigned char *) TEMPLATE_TEST_PATH);
+    V_ASSERT_EQ_U(error, 0);
     V_ASSERT_EQ_S((char *) template_handler->string_value, "<p>first</p>");
     delete_template_handler(template_handler);
 
@@ -2050,7 +2073,8 @@ const char *test_template_handler_cache(void) {
 
     create_template_handler(&template_handler);
     assign_string_template_handler(template_handler, (unsigned char *) "name", "second");
-    process_cache_template_handler(template_handler, template_cache, (unsigned char *) TEMPLATE_TEST_PATH);
+    error = process_cache_template_handler(template_handler, template_cache, (unsigned char *) TEMPLATE_TEST_PATH);
+    V_ASSERT_EQ_U(error, 0);
     V_ASSERT_EQ_S((char *) template_handler->string_value, "<p>second</p>");
     delete_template_handler(template_handler);
 
@@ -2066,7 +2090,9 @@ const char *test_template_handler_cache(void) {
     result rather than an error, the very same way the processing of
     the file itself does, so that the fallback of the page is reached */
     create_template_handler(&template_handler);
-    process_cache_template_handler(template_handler, template_cache, (unsigned char *) TEMPLATE_TEST_GONE);
+    error = process_cache_template_handler(template_handler, template_cache, (unsigned char *) TEMPLATE_TEST_GONE);
+    V_ASSERT(IS_ERROR_CODE(error));
+    RESET_ERROR;
     V_ASSERT_EQ_S((char *) template_handler->string_value, "");
     delete_template_handler(template_handler);
 
@@ -2106,7 +2132,8 @@ const char *test_template_handler_page(void) {
     were assigned to the handler and held under the key from then on */
     create_template_handler(&template_handler);
     assign_string_template_handler(template_handler, (unsigned char *) "name", "first");
-    process_page_template_handler(template_handler, template_cache, (unsigned char *) TEMPLATE_TEST_PATH, (unsigned char *) "one");
+    error = process_page_template_handler(template_handler, template_cache, (unsigned char *) TEMPLATE_TEST_PATH, (unsigned char *) "one");
+    V_ASSERT_EQ_U(error, 0);
     V_ASSERT_EQ_S((char *) template_handler->string_value, "<p>first</p>");
     delete_template_handler(template_handler);
 
@@ -2128,7 +2155,8 @@ const char *test_template_handler_page(void) {
     a copy of its own so that the held one outlives the handler */
     create_template_handler(&template_handler);
     assign_string_template_handler(template_handler, (unsigned char *) "name", "second");
-    process_page_template_handler(template_handler, template_cache, (unsigned char *) TEMPLATE_TEST_PATH, (unsigned char *) "one");
+    error = process_page_template_handler(template_handler, template_cache, (unsigned char *) TEMPLATE_TEST_PATH, (unsigned char *) "one");
+    V_ASSERT_EQ_U(error, 0);
     V_ASSERT_EQ_S((char *) template_handler->string_value, "<p>first</p>");
     V_ASSERT(template_handler->string_value != contents);
     V_ASSERT_EQ_P(page->contents, contents);
@@ -2139,7 +2167,8 @@ const char *test_template_handler_page(void) {
     that falls on the very same slot takes it over */
     create_template_handler(&template_handler);
     assign_string_template_handler(template_handler, (unsigned char *) "name", "second");
-    process_page_template_handler(template_handler, template_cache, (unsigned char *) TEMPLATE_TEST_PATH, (unsigned char *) "two");
+    error = process_page_template_handler(template_handler, template_cache, (unsigned char *) TEMPLATE_TEST_PATH, (unsigned char *) "two");
+    V_ASSERT_EQ_U(error, 0);
     V_ASSERT_EQ_S((char *) template_handler->string_value, "<p>second</p>");
     delete_template_handler(template_handler);
     page = &entry->pages[_calculate_string_hash_map((unsigned char *) "two") % CACHE_PAGES_TEMPLATE_HANDLER];
@@ -2159,7 +2188,8 @@ const char *test_template_handler_page(void) {
     V_ASSERT(index < 100000);
     create_template_handler(&template_handler);
     assign_string_template_handler(template_handler, (unsigned char *) "name", "taken");
-    process_page_template_handler(template_handler, template_cache, (unsigned char *) TEMPLATE_TEST_PATH, (unsigned char *) key);
+    error = process_page_template_handler(template_handler, template_cache, (unsigned char *) TEMPLATE_TEST_PATH, (unsigned char *) key);
+    V_ASSERT_EQ_U(error, 0);
     V_ASSERT_EQ_S((char *) template_handler->string_value, "<p>taken</p>");
     delete_template_handler(template_handler);
     page = &entry->pages[taken];
@@ -2177,14 +2207,17 @@ const char *test_template_handler_page(void) {
     V_ASSERT_EQ_U(error, 0);
     create_template_handler(&template_handler);
     assign_string_template_handler(template_handler, (unsigned char *) "name", "third");
-    process_page_template_handler(template_handler, template_cache, (unsigned char *) TEMPLATE_TEST_PATH, (unsigned char *) "one");
+    error = process_page_template_handler(template_handler, template_cache, (unsigned char *) TEMPLATE_TEST_PATH, (unsigned char *) "one");
+    V_ASSERT_EQ_U(error, 0);
     V_ASSERT_EQ_S((char *) template_handler->string_value, "<div>third</div>");
     delete_template_handler(template_handler);
 
     /* a template that is not there leaves the handler with an empty
     result rather than an error and holds no page at all */
     create_template_handler(&template_handler);
-    process_page_template_handler(template_handler, template_cache, (unsigned char *) TEMPLATE_TEST_GONE, (unsigned char *) "one");
+    error = process_page_template_handler(template_handler, template_cache, (unsigned char *) TEMPLATE_TEST_GONE, (unsigned char *) "one");
+    V_ASSERT(IS_ERROR_CODE(error));
+    RESET_ERROR;
     V_ASSERT_EQ_S((char *) template_handler->string_value, "");
     delete_template_handler(template_handler);
 

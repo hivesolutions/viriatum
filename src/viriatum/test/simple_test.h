@@ -278,8 +278,9 @@ const char *test_template_cache_stale(void);
 
 /**
  * Tests the template handler, the page that every one of the
- * tags builds, the template that is not there and the tags that
- * carry none of the parameters they need.
+ * tags builds, the template that is not there, the tags that
+ * carry none of the parameters they need and the value that has
+ * no form as a string.
  *
  * @return A message describing the execution of
  * the unit test should describe possible errors.
@@ -288,7 +289,8 @@ const char *test_template_handler(void);
 
 /**
  * Tests the rendering of a page out of the cache of templates,
- * the tree being parsed once and rendered as many times as asked.
+ * the tree being parsed once and rendered as many times as asked,
+ * and the template that is not there being reported.
  *
  * @return A message describing the execution of
  * the unit test should describe possible errors.

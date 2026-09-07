@@ -118,25 +118,29 @@ const char *test_base_path_service(void) {
 
 const char *test_bundled_path_service(void) {
     /* allocates space for the path that is resolved, for the name
-    that is built to the length that is under test and for the one
-    that stands for a tree that was installed rather than unpacked */
+    that is built to the length that is under test, for the one that
+    stands for a tree that was installed rather than unpacked and for
+    the error the resolving raises */
     unsigned char path[VIRIATUM_MAX_PATH_SIZE];
     char name[VIRIATUM_MAX_PATH_SIZE];
     size_t name_length;
     const char *fallback = "viriatum-installed-tree";
+    ERROR_CODE error;
 
     /* a tree beside the binary only exists once the directory of it
     has been resolved, a platform that is unable to ask for it keeps
     the tree it was built with and prefers nothing over it */
     if(get_base_path()[0] == '\0') {
-        _bundled_path_service(path, "..", fallback);
+        error = _bundled_path_service(path, "..", fallback);
+        V_ASSERT_EQ_U(error, 0);
         V_ASSERT_EQ_S((char *) path, fallback);
         return NULL;
     }
 
     /* a name that is really a directory beside the binary is the one
     that is kept, the parent of it being one on every platform */
-    _bundled_path_service(path, "..", fallback);
+    error = _bundled_path_service(path, "..", fallback);
+    V_ASSERT_EQ_U(error, 0);
     V_ASSERT_M(
         strcmp((char *) path, fallback) != 0,
         "a directory beside the binary was not preferred"
@@ -146,12 +150,14 @@ const char *test_bundled_path_service(void) {
 
     /* a name that nothing sits under falls back to the path that the
     binary was built with, which is what an installed tree uses */
-    _bundled_path_service(path, "viriatum-not-a-directory", fallback);
+    error = _bundled_path_service(path, "viriatum-not-a-directory", fallback);
+    V_ASSERT_EQ_U(error, 0);
     V_ASSERT_EQ_S((char *) path, fallback);
 
     /* a name that is a file rather than a directory is no more a tree
     than a missing one is, so it falls back just the same */
-    _bundled_path_service(path, VIRIATUM_NAME, fallback);
+    error = _bundled_path_service(path, VIRIATUM_NAME, fallback);
+    V_ASSERT_EQ_U(error, 0);
     V_ASSERT_EQ_S((char *) path, fallback);
 
     /* the longest name that still fits beside the base path is built
@@ -161,7 +167,8 @@ const char *test_bundled_path_service(void) {
     V_ASSERT(name_length > 0 && name_length < VIRIATUM_MAX_PATH_SIZE);
     memset(name, 'v', name_length);
     name[name_length] = '\0';
-    _bundled_path_service(path, name, fallback);
+    error = _bundled_path_service(path, name, fallback);
+    V_ASSERT_EQ_U(error, 0);
     V_ASSERT_EQ_S((char *) path, fallback);
 
     /* one character more than that no longer fits, the path of it is
@@ -169,7 +176,8 @@ const char *test_bundled_path_service(void) {
     that was handed over to hold it */
     name[name_length] = 'v';
     name[name_length + 1] = '\0';
-    _bundled_path_service(path, name, fallback);
+    error = _bundled_path_service(path, name, fallback);
+    V_ASSERT_EQ_U(error, 0);
     V_ASSERT_EQ_S((char *) path, fallback);
 
     /* returns the default value, nothing happened so there's

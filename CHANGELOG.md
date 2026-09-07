@@ -57,6 +57,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Listing a directory now describes every entry once rather than twice - [#77](https://github.com/hivesolutions/viriatum/issues/77)
 * A request for a path now opens it straight away rather than describing it first, the opening telling a directory from a file that is not there - [#77](https://github.com/hivesolutions/viriatum/issues/77)
 * Continuous integration no longer builds the CMake tree with gcc 11, whose Debian release is end of life
+* The rendering of a template now reports what went wrong rather than leaving an empty page behind in silence - [#77](https://github.com/hivesolutions/viriatum/issues/77)
 
 ### Fixed
 

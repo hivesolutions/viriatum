@@ -65,8 +65,9 @@ static struct listing_cache_t *_get_listing_cache(void) {
  * @param url The url the directory was asked for under.
  * @param file_path The path of the directory to be listed.
  * @param template_path The path of the template of the listing.
+ * @return The resulting error code.
  */
-static void _render_listing_handler_file(
+static ERROR_CODE _render_listing_handler_file(
     struct template_handler_t *template_handler,
     struct template_cache_t *template_cache,
     unsigned char *url,
@@ -85,12 +86,19 @@ static void _render_listing_handler_file(
     size_t folder_size;
     char folder_path[VIRIATUM_MAX_PATH_SIZE];
 
+    /* allocates space for the result of the listing of the
+    directory and for the one of the rendering of the page */
+    ERROR_CODE error_code;
+    ERROR_CODE render_code;
+
     /* creates the directory entries (linked list) */
     create_linked_list(&directory_entries);
 
-    /* lists the directory file into the directory
-    entries linked list and then converts them into maps */
-    list_directory_file((char *) file_path, directory_entries);
+    /* lists the directory file into the directory entries linked
+    list and then converts them into maps, a directory that cannot
+    be listed is built into a page of no entries, the reason of it
+    being reported once the page is built */
+    error_code = list_directory_file((char *) file_path, directory_entries);
     entries_to_map_file(directory_entries, &directory_entries_map);
 
     /* retrieves the current size of the url and copies into
@@ -129,7 +137,7 @@ static void _render_listing_handler_file(
     /* processes the file as a template handler, out of the
     cache of the service so that the file is only ever parsed
     when it has changed since it was last parsed */
-    process_cache_template_handler(template_handler, template_cache, template_path);
+    render_code = process_cache_template_handler(template_handler, template_cache, template_path);
 
     /* deletes the directory entries map and the
     directory entries */
@@ -140,6 +148,14 @@ static void _render_listing_handler_file(
     the entries map (linked list) */
     delete_linked_list(directory_entries);
     delete_linked_list(directory_entries_map);
+
+    /* in case the listing or the rendering raised an error it is
+    raised again, the page being whatever was built for it */
+    if(IS_ERROR_CODE(error_code)) { RAISE_AGAIN(error_code); }
+    if(IS_ERROR_CODE(render_code)) { RAISE_AGAIN(render_code); }
+
+    /* raises no error */
+    RAISE_NO_ERROR;
 }
 
 static void _time_file_cache(STAT_TYPE *file_stat, struct date_time_t *date_time) {
@@ -671,8 +687,9 @@ static size_t _write_headers_handler_file(
  * @param http_connection The connection the request belongs to.
  * @param http_request The message being served.
  * @param push The list of the paths to be promised.
+ * @return The resulting error code.
  */
-static void _push_handler_file(struct http_connection_t *http_connection, struct http_request_t *http_request, unsigned char *push) {
+static ERROR_CODE _push_handler_file(struct http_connection_t *http_connection, struct http_request_t *http_request, unsigned char *push) {
 #ifdef VIRIATUM_HTTP2
     /* allocates space for the path being taken out of the list and
     for the walk over the list itself */
@@ -681,10 +698,13 @@ static void _push_handler_file(struct http_connection_t *http_connection, struct
     unsigned char *pointer = push;
     struct http2_stream_t *http2_stream;
 
+    /* allocates space for the result of a promise */
+    ERROR_CODE error_code;
+
     /* the promising of a resource only exists under HTTP/2, so under
     anything else there's nothing at all to be done */
-    if(http_connection->http2_connection == NULL) { return; }
-    if(push == NULL) { return; }
+    if(http_connection->http2_connection == NULL) { RAISE_NO_ERROR; }
+    if(push == NULL) { RAISE_NO_ERROR; }
 
     /* retrieves the stream of the request, it is the one the promises
     are made on and the one they are going to hang from */
@@ -692,7 +712,7 @@ static void _push_handler_file(struct http_connection_t *http_connection, struct
         http_connection->http2_connection,
         http_request->stream_id
     );
-    if(http2_stream == NULL) { return; }
+    if(http2_stream == NULL) { RAISE_NO_ERROR; }
 
     /* walks the list, every sequence of characters that is not a space
     is one of the paths that gets promised */
@@ -705,7 +725,8 @@ static void _push_handler_file(struct http_connection_t *http_connection, struct
 
         if(size > 0) {
             path[size] = '\0';
-            push_stream_http2_connection(http_connection->http2_connection, http2_stream, path);
+            error_code = push_stream_http2_connection(http_connection->http2_connection, http2_stream, path);
+            if(IS_ERROR_CODE(error_code)) { RAISE_AGAIN(error_code); }
             size = 0;
 
             /* the promising of a resource may have moved the streams
@@ -714,13 +735,16 @@ static void _push_handler_file(struct http_connection_t *http_connection, struct
                 http_connection->http2_connection,
                 http_request->stream_id
             );
-            if(http2_stream == NULL) { return; }
+            if(http2_stream == NULL) { RAISE_NO_ERROR; }
         }
 
         if(*pointer == '\0') { break; }
         pointer++;
     }
 #endif
+
+    /* raises no error */
+    RAISE_NO_ERROR;
 }
 
 ERROR_CODE message_complete_callback_handler_file(struct http_request_t *http_request) {
@@ -1854,7 +1878,8 @@ ERROR_CODE render_listing_cache(struct listing_cache_t *listing_cache, struct te
     /* otherwise the page is built out of the directory and the template
     as they now stand and takes the entry over from whatever was there,
     a url longer than an entry is able to carry is built but never held */
-    _render_listing_handler_file(template_handler, template_cache, url, file_path, template_path);
+    error_code = _render_listing_handler_file(template_handler, template_cache, url, file_path, template_path);
+    if(IS_ERROR_CODE(error_code)) { RAISE_AGAIN(error_code); }
     if(entry->page != NULL) {
         FREE(entry->page);
         entry->page = NULL;

@@ -429,7 +429,7 @@ void delete_template_parameter(struct template_parameter_t *template_parameter) 
     FREE(template_parameter);
 }
 
-void create_template_cache(struct template_cache_t **template_cache_pointer) {
+ERROR_CODE create_template_cache(struct template_cache_t **template_cache_pointer) {
     /* allocates space for the cache itself and for the entries that
     it is made of, which are as many as a hash is able to fall on,
     together with the index of the pages each of them holds */
@@ -459,17 +459,23 @@ void create_template_cache(struct template_cache_t **template_cache_pointer) {
 
     /* sets the cache in the cache pointer */
     *template_cache_pointer = template_cache;
+
+    /* raises no error */
+    RAISE_NO_ERROR;
 }
 
-void delete_template_cache(struct template_cache_t *template_cache) {
+ERROR_CODE delete_template_cache(struct template_cache_t *template_cache) {
     /* closes every file that is still being held, releases every
     tree and then both the entries and the cache that carried them */
     clear_template_cache(template_cache);
     FREE(template_cache->entries);
     FREE(template_cache);
+
+    /* raises no error */
+    RAISE_NO_ERROR;
 }
 
-void clear_template_cache(struct template_cache_t *template_cache) {
+ERROR_CODE clear_template_cache(struct template_cache_t *template_cache) {
     /* allocates space for the index to be used in the iteration
     over the complete set of entries of the cache */
     size_t index;
@@ -479,6 +485,9 @@ void clear_template_cache(struct template_cache_t *template_cache) {
     for(index = 0; index < CACHE_SIZE_TEMPLATE_HANDLER; index++) {
         _empty_template_cache(&template_cache->entries[index]);
     }
+
+    /* raises no error */
+    RAISE_NO_ERROR;
 }
 
 ERROR_CODE acquire_template_cache(struct template_cache_t *template_cache, unsigned char *file_path, struct template_cache_entry_t **template_cache_entry_pointer) {
@@ -586,7 +595,7 @@ ERROR_CODE acquire_template_cache(struct template_cache_t *template_cache, unsig
     RAISE_NO_ERROR;
 }
 
-void process_template_handler(struct template_handler_t *template_handler, unsigned char *file_path) {
+ERROR_CODE process_template_handler(struct template_handler_t *template_handler, unsigned char *file_path) {
     /* allocates space for the template engine */
     struct template_engine_t *template_engine;
 
@@ -595,6 +604,11 @@ void process_template_handler(struct template_handler_t *template_handler, unsig
 
     /* allocates space for the root node */
     struct template_node_t *root_node;
+
+    /* allocates space for the result of the parsing and for the
+    one of the rendering, each of them reported on its own */
+    ERROR_CODE error_code;
+    ERROR_CODE render_code;
 
     /* creates the template engine and the template settings that
     build the tree through the callbacks of the template handler,
@@ -607,9 +621,11 @@ void process_template_handler(struct template_handler_t *template_handler, unsig
     );
 
     /* processes the file as a template engine and then uses the
-    created node structure to traverse for string buffer output */
-    process_template_engine(template_engine, template_settings, file_path);
-    traverse_node_buffer(template_handler, template_handler->current_node);
+    created node structure to traverse for string buffer output, a
+    parsing that failed part of the way still renders the part of
+    the tree that was built before it did */
+    error_code = process_template_engine(template_engine, template_settings, file_path);
+    render_code = traverse_node_buffer(template_handler, template_handler->current_node);
 
     /* "joins" the template handler string buffer into the string
     value, retrieving the final template result */
@@ -623,11 +639,21 @@ void process_template_handler(struct template_handler_t *template_handler, unsig
 
     /* deletes the template engine */
     delete_template_engine(template_engine);
+
+    /* in case the parsing or the rendering raised an error it is
+    raised again, the page that was built up to it stays in the
+    handler for the caller to use or to throw away */
+    if(IS_ERROR_CODE(error_code)) { RAISE_AGAIN(error_code); }
+    if(IS_ERROR_CODE(render_code)) { RAISE_AGAIN(render_code); }
+
+    /* raises no error */
+    RAISE_NO_ERROR;
 }
 
-void process_cache_template_handler(struct template_handler_t *template_handler, struct template_cache_t *template_cache, unsigned char *file_path) {
+ERROR_CODE process_cache_template_handler(struct template_handler_t *template_handler, struct template_cache_t *template_cache, unsigned char *file_path) {
     /* allocates space for the entry of the cache that holds the
-    template and for the error the acquiring of it may raise */
+    template and for the error the acquiring of it or the rendering
+    out of it may raise */
     struct template_cache_entry_t *entry;
     ERROR_CODE error_code;
 
@@ -636,32 +662,40 @@ void process_cache_template_handler(struct template_handler_t *template_handler,
     and then uses the tree it hands back to traverse for string
     buffer output, a template that cannot be loaded leaves the
     handler with an empty result, the very same way the processing
-    of a file that is not there does */
+    of a file that is not there does, and the reason is reported */
     error_code = acquire_template_cache(template_cache, file_path, &entry);
     if(!IS_ERROR_CODE(error_code)) {
-        traverse_node_buffer(template_handler, entry->root);
+        error_code = traverse_node_buffer(template_handler, entry->root);
     }
 
     /* "joins" the template handler string buffer into the string
     value, retrieving the final template result */
     join_string_buffer(template_handler->string_buffer, &template_handler->string_value);
+
+    /* in case the loading or the rendering raised an error it is
+    raised again, the handler holding whatever was rendered */
+    if(IS_ERROR_CODE(error_code)) { RAISE_AGAIN(error_code); }
+
+    /* raises no error */
+    RAISE_NO_ERROR;
 }
 
-void process_page_template_handler(struct template_handler_t *template_handler, struct template_cache_t *template_cache, unsigned char *file_path, unsigned char *key) {
+ERROR_CODE process_page_template_handler(struct template_handler_t *template_handler, struct template_cache_t *template_cache, unsigned char *file_path, unsigned char *key) {
     /* allocates space for the entry of the cache that holds the
     template, for the page held under the key within it and for
-    the error the acquiring of the entry may raise */
+    the error the acquiring of the entry or the rendering may raise */
     struct template_cache_entry_t *entry;
     struct template_cache_page_t *page;
     ERROR_CODE error_code;
 
     /* asks the cache for the template, a template that cannot be
     loaded leaves the handler with an empty result, the very same
-    way the processing of a file that is not there does */
+    way the processing of a file that is not there does, and the
+    reason is reported */
     error_code = acquire_template_cache(template_cache, file_path, &entry);
     if(IS_ERROR_CODE(error_code)) {
         join_string_buffer(template_handler->string_buffer, &template_handler->string_value);
-        return;
+        RAISE_AGAIN(error_code);
     }
 
     /* the page that the key falls on, a key always falls on the very
@@ -673,13 +707,15 @@ void process_page_template_handler(struct template_handler_t *template_handler, 
     if(page->contents != NULL && strcmp((char *) page->key, (char *) key) == 0) {
         template_handler->string_value = (unsigned char *) MALLOC(page->size + 1);
         memcpy(template_handler->string_value, page->contents, page->size + 1);
-        return;
+        RAISE_NO_ERROR;
     }
 
     /* otherwise the page is rendered out of the tree with the names
-    that were assigned to the handler, the way any page is */
-    traverse_node_buffer(template_handler, entry->root);
+    that were assigned to the handler, the way any page is, a page
+    whose rendering failed is not one to be held */
+    error_code = traverse_node_buffer(template_handler, entry->root);
     join_string_buffer(template_handler->string_buffer, &template_handler->string_value);
+    if(IS_ERROR_CODE(error_code)) { RAISE_AGAIN(error_code); }
 
     /* whatever the slot was holding is released and the page that
     has just been rendered takes it over, held under its key as a
@@ -693,6 +729,9 @@ void process_page_template_handler(struct template_handler_t *template_handler, 
     memcpy(page->key, key, strlen((char *) key) + 1);
     page->contents = (unsigned char *) MALLOC(page->size + 1);
     memcpy(page->contents, template_handler->string_value, page->size + 1);
+
+    /* raises no error */
+    RAISE_NO_ERROR;
 }
 
 void assign_template_handler(struct template_handler_t *template_handler, unsigned char *name, struct type_t *value) {
@@ -858,13 +897,17 @@ void traverse_node_debug(struct template_handler_t *template_handler, struct tem
     delete_iterator_linked_list(node->children, child_iterator);
 }
 
-void traverse_node_buffer(struct template_handler_t *template_handler, struct template_node_t *node) {
+ERROR_CODE traverse_node_buffer(struct template_handler_t *template_handler, struct template_node_t *node) {
+    /* allocates space for the result of the traversing of
+    whatever hangs from the node, nothing at all by default */
+    ERROR_CODE error_code = 0;
+
     /* switches over the type of node to be traversed,
     to print the correct value */
     switch(node->type) {
         case TEMPLATE_NODE_ROOT:
             /* traverses all the nodes in the root node */
-            traverse_nodes_buffer(template_handler, node);
+            error_code = traverse_nodes_buffer(template_handler, node);
 
             /* breaks the switch */
             break;
@@ -880,13 +923,13 @@ void traverse_node_buffer(struct template_handler_t *template_handler, struct te
         case TEMPLATE_NODE_OPEN:
             if(strcmp((char *) node->name, "out") == 0) {
                 /* traverses the out node in buffer mode */
-                _traverse_out_buffer(template_handler, node);
+                error_code = _traverse_out_buffer(template_handler, node);
             } else if(strcmp((char *) node->name, "foreach") == 0) {
                 /* traverses the foreach node in buffer mode */
-                _traverse_for_each_buffer(template_handler, node);
+                error_code = _traverse_for_each_buffer(template_handler, node);
             } else if(strcmp((char *) node->name, "if") == 0) {
                 /* traverses the if node in buffer mode */
-                _traverse_if_buffer(template_handler, node);
+                error_code = _traverse_if_buffer(template_handler, node);
             }
 
             /* breaks the switch */
@@ -896,9 +939,16 @@ void traverse_node_buffer(struct template_handler_t *template_handler, struct te
             /* breaks the switch */
             break;
     }
+
+    /* in case the traversing of the node raised an error
+    it is raised again */
+    if(IS_ERROR_CODE(error_code)) { RAISE_AGAIN(error_code); }
+
+    /* raises no error */
+    RAISE_NO_ERROR;
 }
 
-void traverse_nodes_buffer(struct template_handler_t *template_handler, struct template_node_t *node) {
+ERROR_CODE traverse_nodes_buffer(struct template_handler_t *template_handler, struct template_node_t *node) {
     /* allocates space for the node of the list being walked
     to retrieve the various children from the node */
     struct linked_list_node_t *child_node;
@@ -906,11 +956,14 @@ void traverse_nodes_buffer(struct template_handler_t *template_handler, struct t
     /* allocates space for the child element */
     struct template_node_t *child;
 
+    /* allocates space for the result of the traversing of a child */
+    ERROR_CODE error_code;
+
     /* in case the node contains no children, it should
     be a leaf node (nothing to be done) */
     if(node->children == NULL) {
         /* returns immediately */
-        return;
+        RAISE_NO_ERROR;
     }
 
     /* walks the children straight through the nodes of the
@@ -924,15 +977,20 @@ void traverse_nodes_buffer(struct template_handler_t *template_handler, struct t
         /* retrieves the child element from the list node */
         child = (struct template_node_t *) child_node->value;
 
-        /* traverses the child node (recursion step) */
-        traverse_node_buffer(template_handler, child);
+        /* traverses the child node (recursion step), a child
+        that fails takes the traversing down with it */
+        error_code = traverse_node_buffer(template_handler, child);
+        if(IS_ERROR_CODE(error_code)) { RAISE_AGAIN(error_code); }
 
         /* moves to the next node of the list */
         child_node = child_node->next;
     }
+
+    /* raises no error */
+    RAISE_NO_ERROR;
 }
 
-void _traverse_out_buffer(struct template_handler_t *template_handler, struct template_node_t *node) {
+ERROR_CODE _traverse_out_buffer(struct template_handler_t *template_handler, struct template_node_t *node) {
     /* allocates space for the value parameter and for
     the value reference */
     struct template_parameter_t *value_parameter;
@@ -942,12 +1000,15 @@ void _traverse_out_buffer(struct template_handler_t *template_handler, struct te
     from the source data type of a possible reference */
     unsigned char *buffer;
 
+    /* allocates space for the result of the converting of a value */
+    ERROR_CODE error_code;
+
     /* retrieves value parameter from the parameters map, a tag that
     carries no parameters at all or not the one it needs is left out
     of the page rather than taking the rendering down */
-    if(node->parameters_map == NULL) { return; }
+    if(node->parameters_map == NULL) { RAISE_NO_ERROR; }
     get_value_string_hash_map(node->parameters_map, (unsigned char *) "value", (void **) &value_parameter);
-    if(value_parameter == NULL) { return; }
+    if(value_parameter == NULL) { RAISE_NO_ERROR; }
 
     /* switches over the value parameter type to
     update the string buffer accordingly */
@@ -976,7 +1037,8 @@ void _traverse_out_buffer(struct template_handler_t *template_handler, struct te
                         (unsigned char *) value->value.value_string
                     );
                 } else {
-                    to_string_type(value, &buffer);
+                    error_code = to_string_type(value, &buffer);
+                    if(IS_ERROR_CODE(error_code)) { RAISE_AGAIN(error_code); }
                     _append_string_buffer(template_handler->string_buffer, buffer);
                 }
             }
@@ -1002,9 +1064,12 @@ void _traverse_out_buffer(struct template_handler_t *template_handler, struct te
             /* breaks the switch */
             break;
     }
+
+    /* raises no error */
+    RAISE_NO_ERROR;
 }
 
-void _traverse_for_each_buffer(struct template_handler_t *template_handler, struct template_node_t *node) {
+ERROR_CODE _traverse_for_each_buffer(struct template_handler_t *template_handler, struct template_node_t *node) {
     /* allocates space for the item and the from parameters */
     struct template_parameter_t *item_parameter;
     struct template_parameter_t *from_parameter;
@@ -1021,13 +1086,16 @@ void _traverse_for_each_buffer(struct template_handler_t *template_handler, stru
     /* allocates space for the current vale temporary variable */
     void *_current_value;
 
+    /* allocates space for the result of the traversing of a run */
+    ERROR_CODE error_code;
+
     /* retrieves both the item and from parameters from the parameters
     map, a tag that carries no parameters at all or not the ones it
     needs is left out of the page rather than taking the rendering down */
-    if(node->parameters_map == NULL) { return; }
+    if(node->parameters_map == NULL) { RAISE_NO_ERROR; }
     get_value_string_hash_map(node->parameters_map, (unsigned char *) "item", (void **) &item_parameter);
     get_value_string_hash_map(node->parameters_map, (unsigned char *) "from", (void **) &from_parameter);
-    if(item_parameter == NULL || from_parameter == NULL) { return; }
+    if(item_parameter == NULL || from_parameter == NULL) { RAISE_NO_ERROR; }
 
     /* tries to retrieve the reference value from the map of names in the
     template handler (dereferencing) */
@@ -1036,7 +1104,7 @@ void _traverse_for_each_buffer(struct template_handler_t *template_handler, stru
     /* in case the value was not found */
     if(value == NULL) {
         /* returns immediately */
-        return;
+        RAISE_NO_ERROR;
     }
 
     /* sets the list as the value represented by the type */
@@ -1062,14 +1130,21 @@ void _traverse_for_each_buffer(struct template_handler_t *template_handler, stru
         in the template handler (to be used in the current context) and
         then traverses the child nodes of the node */
         assign_template_handler(template_handler, item_parameter->reference_value, _current_value);
-        traverse_nodes_buffer(template_handler, node);
+        error_code = traverse_nodes_buffer(template_handler, node);
+        if(IS_ERROR_CODE(error_code)) {
+            delete_iterator_linked_list(list, iterator);
+            RAISE_AGAIN(error_code);
+        }
     }
 
     /* deletes the iterator */
     delete_iterator_linked_list(list, iterator);
+
+    /* raises no error */
+    RAISE_NO_ERROR;
 }
 
-void _traverse_if_buffer(struct template_handler_t *template_handler, struct template_node_t *node) {
+ERROR_CODE _traverse_if_buffer(struct template_handler_t *template_handler, struct template_node_t *node) {
     /* allocates space for the item, the value and the operator parameters */
     struct template_parameter_t *item_parameter;
     struct template_parameter_t *value_parameter;
@@ -1078,14 +1153,17 @@ void _traverse_if_buffer(struct template_handler_t *template_handler, struct tem
     /* allocates space for the value to be retrieved */
     struct type_t *value;
 
+    /* allocates space for the result of the traversing of the nodes */
+    ERROR_CODE error_code;
+
     /* retrieves both the from and the item parameters from the parameters
     map, a tag that carries no parameters at all or not the ones it needs
     is left out of the page rather than taking the rendering down */
-    if(node->parameters_map == NULL) { return; }
+    if(node->parameters_map == NULL) { RAISE_NO_ERROR; }
     get_value_string_hash_map(node->parameters_map, (unsigned char *) "item", (void **) &item_parameter);
     get_value_string_hash_map(node->parameters_map, (unsigned char *) "value", (void **) &value_parameter);
     get_value_string_hash_map(node->parameters_map, (unsigned char *) "operator", (void **) &operator_parameter);
-    if(item_parameter == NULL || value_parameter == NULL) { return; }
+    if(item_parameter == NULL || value_parameter == NULL) { RAISE_NO_ERROR; }
 
     /* tries to retrieve the reference value from the map of names in the
     template handler (dereferencing), the item of the tag is what names
@@ -1096,16 +1174,20 @@ void _traverse_if_buffer(struct template_handler_t *template_handler, struct tem
     /* in case the value was not found */
     if(value == NULL) {
         /* returns immediately */
-        return;
+        RAISE_NO_ERROR;
     }
 
     if(value->value.value_int != value_parameter->int_value) {
-        return;
+        RAISE_NO_ERROR;
     }
 
     /* traverses the child nodes of the node
     (condition validated and verified) */
-    traverse_nodes_buffer(template_handler, node);
+    error_code = traverse_nodes_buffer(template_handler, node);
+    if(IS_ERROR_CODE(error_code)) { RAISE_AGAIN(error_code); }
+
+    /* raises no error */
+    RAISE_NO_ERROR;
 }
 
 ERROR_CODE _open_context_template_handler(struct template_handler_t *template_handler) {

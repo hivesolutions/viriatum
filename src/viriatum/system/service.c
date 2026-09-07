@@ -355,11 +355,13 @@ ERROR_CODE load_options_service(struct service_t *service, struct hash_map_t *ar
     RAISE_NO_ERROR;
 }
 
-void _bundled_path_service(unsigned char *path, const char *name, const char *fallback) {
+ERROR_CODE _bundled_path_service(unsigned char *path, const char *name, const char *fallback) {
     /* allocates space for the flag that tells a directory apart from
-    whatever else may be sitting under the same name and resolves the
-    directory that the binary of the process sits in */
+    whatever else may be sitting under the same name, for the result
+    of the asking about it and resolves the directory that the binary
+    of the process sits in */
     unsigned int is_directory = 0;
+    ERROR_CODE error_code;
     const char *base_path = get_base_path();
 
     /* builds the path that an unpacked archive would carry, which is
@@ -372,11 +374,15 @@ void _bundled_path_service(unsigned char *path, const char *name, const char *fa
             (char *) path, VIRIATUM_MAX_PATH_SIZE,
             "%s" VIRIATUM_PATH_SEPARATOR "%s", base_path, name
         );
-        is_directory_file((char *) path, &is_directory);
-        if(is_directory) { return; }
+        error_code = is_directory_file((char *) path, &is_directory);
+        if(IS_ERROR_CODE(error_code)) { RAISE_AGAIN(error_code); }
+        if(is_directory) { RAISE_NO_ERROR; }
     }
 
     SPRINTF((char *) path, VIRIATUM_MAX_PATH_SIZE, "%s", fallback);
+
+    /* raises no error */
+    RAISE_NO_ERROR;
 }
 
 ERROR_CODE calculate_options_service(struct service_t *service) {
